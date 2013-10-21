@@ -1,11 +1,11 @@
-      SUBROUTINE slUPCD (DISCO,X,Y)
+      SUBROUTINE slUPCD ( DISCO, X, Y )
 *+
 *     - - - - - -
 *      U P C D
 *     - - - - - -
 *
-*  Remove pincushion/barrel distortion from a distorted [x,y]
-*  to give tangent-plane [x,y].
+*  Remove pincushion/barrel distortion from a distorted [x,y] to give
+*  tangent-plane [x,y].
 *
 *  Given:
 *     DISCO    d      pincushion/barrel distortion coefficient
@@ -16,7 +16,7 @@
 *
 *  Notes:
 *
-*  1)  The distortion is of the form RP = R*(1 + C*R**2), where R is
+*  1)  The distortion is of the form RP = R*(1+C*R^2), where R is
 *      the radial distance from the tangent point, C is the DISCO
 *      argument, and RP is the radial distance in the presence of
 *      the distortion.
@@ -37,17 +37,36 @@
 *          AAT f/8          +21.20
 *          JKT f/8          +13.32
 *
-*  4)  The present routine is an approximate inverse to the
-*      companion routine slPCD, obtained from two iterations
-*      of Newton's method.  The mismatch between the slPCD and
-*      slUPCD routines is negligible for astrometric applications;
-*      to reach 1 milliarcsec at the edge of the AAT triplet or
-*      Schmidt field would require field diameters of 2.4 degrees
-*      and 42 degrees respectively.
+*  4)  The present routine is a rigorous inverse of the companion
+*      routine slPCD.  The expression for RP in Note 1 is rewritten
+*      in the form x^3+a*x+b=0 and solved by standard techniques.
 *
-*  P.T.Wallace   Starlink   1 August 1994
+*  5)  Cases where the cubic has multiple real roots can sometimes
+*      occur, corresponding to extreme instances of barrel distortion
+*      where up to three different undistorted [X,Y]s all produce the
+*      same distorted [X,Y].  However, only one solution is returned,
+*      the one that produces the smallest change in [X,Y].
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  P.T.Wallace   Starlink   3 September 2000
+*
+*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -55,15 +74,72 @@
 
       DOUBLE PRECISION DISCO,X,Y
 
-      DOUBLE PRECISION CR2,A,CR2A2,F
+      DOUBLE PRECISION THIRD
+      PARAMETER (THIRD=1D0/3D0)
+      DOUBLE PRECISION D2PI
+      PARAMETER (D2PI=6.283185307179586476925286766559D0)
+
+      DOUBLE PRECISION RP,Q,R,D,W,S,T,F,C,T3,F1,F2,F3,W1,W2,W3
 
 
 
-      CR2=DISCO*(X*X+Y*Y)
-      A=(2D0*CR2+1D0)/(3D0*CR2+1D0)
-      CR2A2=CR2*A*A
-      F=(2D0*CR2A2*A+1D0)/(3D0*CR2A2+1D0)
-      X=X*F
-      Y=Y*F
+*  Distance of the point from the origin.
+      RP = SQRT(X*X+Y*Y)
+
+*  If zero, or if no distortion, no action is necessary.
+      IF (RP.NE.0D0.AND.DISCO.NE.0D0) THEN
+
+*     Begin algebraic solution.
+         Q = 1D0/(3D0*DISCO)
+         R = RP/(2D0*DISCO)
+         W = Q*Q*Q+R*R
+
+*     Continue if one real root, or three of which only one is positive.
+         IF (W.GE.0D0) THEN
+            D = SQRT(W)
+            W = R+D
+            S = SIGN(ABS(W)**THIRD,W)
+            W = R-D
+            T = SIGN((ABS(W))**THIRD,W)
+            F = S+T
+         ELSE
+
+*        Three different real roots:  use geometrical method instead.
+            W = 2D0/SQRT(-3D0*DISCO)
+            C = 4D0*RP/(DISCO*W*W*W)
+            S = SQRT(1D0-MIN(C*C,1D0))
+            T3 = ATAN2(S,C)
+
+*        The three solutions.
+            F1 = W*COS((D2PI-T3)/3D0)
+            F2 = W*COS((T3)/3D0)
+            F3 = W*COS((D2PI+T3)/3D0)
+
+*        Pick the one that moves [X,Y] least.
+            W1 = ABS(F1-RP)
+            W2 = ABS(F2-RP)
+            W3 = ABS(F3-RP)
+            IF (W1.LT.W2) THEN
+               IF (W1.LT.W3) THEN
+                  F = F1
+               ELSE
+                  F = F3
+               END IF
+            ELSE
+               IF (W2.LT.W3) THEN
+                  F = F2
+               ELSE
+                  F = F3
+               END IF
+            END IF
+
+         END IF
+
+*     Remove the distortion.
+         F = F/RP
+         X = F*X
+         Y = F*Y
+
+      END IF
 
       END

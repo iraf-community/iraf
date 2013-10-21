@@ -1,86 +1,97 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGINST - Install the named package.
 
-unalias 	grep sort uniq ls awk
-
-if ($#argv < 1) then
+if (( $#<1 )); then
     exit 0
 else
-    set pkg = $1
-endif
+    pkg=$1
+fi
 
-set  bindir     = "`dirname $0`"                # get iraf root directory 
-set  irafdir    = $bindir:h
+bindir="`dirname $0`"                # get iraf root directory 
+irafdir=${bindir%/*}
 
-set  REPO	= `${irafdir}/util/pkgrepo`
-if ($?IRAFARCH) then
-    set arch    = $IRAFARCH
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
 else
-    set arch    = `${irafdir}/unix/hlib/irafarch.csh -actual`
-endif
+    source $iraf/unix/hlib/setup.sh
+fi
 
-echo "Setting architecture: '$arch' .... "
+
+REPO=`${irafdir}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
+fi
+
+/bin/echo "Setting architecture: '$arch' .... "
  
 
 # Get any dependency package names.
-set deps=`grep ^$pkg .repo_desc | awk '{printf("%s\n",$2)}' | sed -e 's/,/ /g'`
-set pkg_dep = ""
-foreach d ( $deps )
-   if ("$d" != "none") then
-      echo "Adding dependency '$d' ...."
-      set pkg_dep = "$pkg_dep $d"
-   endif
-end
+deps=`grep ^$pkg .repo_desc | awk '{printf("%s\n",$2)}' | sed -e 's/,/ /g'`
+pkg_dep=""
+for d in ${deps[@]}; do 
+   if [ "$d" != "none" ]; then
+      /bin/echo "Adding dependency '$d' ...."
+      pkg_dep="$pkg_dep $d"
+   fi
+done
 
 # Make a unique list of package, i.e. remove multiple instances of a package.
 #   [Note:  Not used, the manifest should have this already. ]
-set list = `echo $pkg_dep $pkg|awk 'BEGIN {RS=" |\n";}{print $1;}'|sort|uniq`
+list=`/bin/echo $pkg_dep $pkg|awk 'BEGIN {RS=" |\n";}{print $1;}'|sort|uniq`
 
 # Process the requested package and any dependencies.
-foreach ip ($pkg_dep $pkg)
+dep=("$pkg_dep" "$pkg")
+for ip in ${dep[@]}; do
 
-  set pfile = `grep \ $ip\  .repo_manifest | grep ${arch}\  | head -1 | awk '{printf("%s\n",$4)}'`
+  pfile=`grep \ $ip\  .repo_manifest | grep ${arch}\  | head -1 | awk '{printf("%s\n",$4)}'`
 
-  echo $pfile | grep src.tar.gz  > /dev/null
-  if ($status == 0) then
-    set src_only = 1
+  /bin/echo $pfile | grep src.tar.gz  >> /dev/null 2>&1
+  if (( $?==0 )); then
+    src_only=1
   else
-    set src_only = 0
-  endif
+    src_only=0
+  fi
 
   # Remove an existing package file.
-  if (-e $pfile) then
+  if [ -e $pfile ]; then
     /bin/rm -f $pfile
-  endif
+  fi
 
   # Download the repo file and unpack it.
-  echo -n "Installing package '$ip' .... "
+  /bin/echo -n "Installing package '$ip' .... "
   ${irafdir}/util/pkgget ${REPO}/$pfile
-  if ($status == 1) then
-    echo    " [Error]"
-    exit $status
-  endif
+  if (( $?>0 )); then
+    /bin/echo    " [Error]"
+    exit $?
+  fi
 
-  if (-e $pfile) then
+  if [ -e $pfile ]; then
 
     tar zxf $pfile
     /bin/rm -f $pfile
-    echo `date +%s`"  " ${ip}.${arch} > $ip/.installed.${arch}
-    echo `date +%s`"  " $ip > $ip/.installed	
+    /bin/echo `date +%s`"  " ${ip}.${arch} > $ip/.installed.${arch}
+    /bin/echo `date +%s`"  " $ip > $ip/.installed	
 
-    if ($src_only == 1) then
-      echo    " [SOURCE ONLY]"
-      echo `date +%s`"  " $ip > $ip/.src_only
+    if (( $src_only>0 )); then
+      /bin/echo    " [SOURCE ONLY]"
+      /bin/echo `date +%s`"  " $ip > $ip/.src_only
     else
-      echo    " [OK]"
-    endif
+      /bin/echo    " [OK]"
+    fi
   else
-    echo    " [Error]"
-  endif
+    /bin/echo    " [Error]"
+  fi
 
   ${irafdir}/util/pkgenv -init
 
-end
+done
 
 exit 0

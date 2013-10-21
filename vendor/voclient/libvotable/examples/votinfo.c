@@ -78,10 +78,10 @@ main (int argc, char **argv)
 	vot_getLength (res), vot_getDATATypeString (data), ncols, nrows);
 
     handle = vot_getINFO (res);
-    printf ("         INFO:  %d\n", vot_getLength (handle));
+    printf ("         INFO:  %d\n", (handle ? vot_getLength (handle) : 0));
 
     handle = vot_getPARAM (res);
-    printf ("        PARAM:  %d\t", (len = vot_getLength (handle)) );
+    printf ("        PARAM:  %d\t", (len=(handle ? vot_getLength(handle):0)));
     if (verbose) {
 	for (len-- ; handle; handle=vot_getNext(handle),len--) {
 	    name  = vot_getAttr (handle, "id");

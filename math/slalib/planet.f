@@ -108,19 +108,36 @@
 *
 *  7  For NP=3 the result is for the Earth-Moon Barycentre.  To
 *     obtain the heliocentric position and velocity of the Earth,
-*     either use the SLALIB routine slEVP or call slDMON and
-*     subtract 0.012150581 times the geocentric Moon vector from
-*     the EMB vector produced by the present routine.  (The Moon
-*     vector should be precessed to J2000 first, but this can
-*     be omitted for modern epochs without introducing significant
+*     either use the SLALIB routine slEVP (or slEPV) or call
+*     slDMON and subtract 0.012150581 times the geocentric Moon
+*     vector from the EMB vector produced by the present routine.
+*     (The Moon vector should be precessed to J2000 first, but this
+*     can be omitted for modern epochs without introducing significant
 *     inaccuracy.)
 *
 *  References:  Simon et al., Astron. Astrophys. 282, 663 (1994).
 *               Meeus, Astronomical Algorithms, Willmann-Bell (1991).
 *
-*  P.T.Wallace   Starlink   27 May 1997
+*  This revision:  19 June 2004
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright (C) 2004 P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

@@ -110,26 +110,26 @@ vot_startElement (void *user, const char *name, const char **atts)
 void 
 vot_endElement (void *user, const char *name)
 {
-    Element *cur;
-    Element *parent;
-    int  type, cols = 0, rows = 0;
+    static int  cols = 0, rows = 0;
+    Element *cur, *parent;
+    int  type;
     char name_str[SZ_ATTRNAME];
     char value[SZ_ATTRNAME];
     char tempstr[SZ_ATTRNAME];
     
 
+    memset (value, 0, SZ_ATTRNAME);
+    memset (tempstr, 0, SZ_ATTRNAME);
     memset (name_str, 0, SZ_ATTRNAME);
     strncpy (name_str, name, (SZ_ATTRNAME - 1));
     
-    type = vot_eType (name_str);
-
-    if (type != -1) {
+    if ( (type = vot_eType (name_str)) != -1) {
         /* BUILD TYPE */
-        if (!vot_isEmpty (element_stack)) {
+        if (element_stack->head) {
             cur = votPop (element_stack);
             
             if (!vot_isEmpty (element_stack)) {
-                parent = votPeek (element_stack);
+                parent = element_stack->head->element;
                 
                 if (parent->type == TY_TABLE) {
                     if (cur->type == TY_FIELD) {

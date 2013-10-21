@@ -5,19 +5,19 @@ include	<ctype.h>
 
 define	MAX_FIELDS	100		# Maximum number of fields in list
 define	TABSIZE		8		# Spacing of tab stops
-define	LEN_TR		9		# Length of structure TR
+define	LEN_TR		18		# Length of structure TR
 
 # The TR transformation descriptor structure.
 
-define	X1		Memr[P2R($1)]	# Input origin
-define	Y1		Memr[P2R($1+1)]
-define	XSCALE		Memr[P2R($1+2)]	# Scale factors
-define	YSCALE		Memr[P2R($1+3)]
-define	THETA		Memr[P2R($1+4)]	# Rotation angle
-define	X2		Memr[P2R($1+5)]	# Output origin
-define	Y2		Memr[P2R($1+6)]
-define  COS_THETA	Memr[P2R($1+7)]
-define	SIN_THETA	Memr[P2R($1+8)]
+define	X1		Memd[P2D($1)]	# Input origin
+define	Y1		Memd[P2D($1+2)]
+define	XSCALE		Memd[P2D($1+4)]	# Scale factors
+define	YSCALE		Memd[P2D($1+6)]
+define	THETA		Memd[P2D($1+8)]	# Rotation angle
+define	X2		Memd[P2D($1+10)]	# Output origin
+define	Y2		Memd[P2D($1+12)]
+define  COS_THETA	Memd[P2D($1+14)]
+define	SIN_THETA	Memd[P2D($1+16)]
 
 
 # LINTRAN -- Performs a linear translation on each element of the
@@ -68,19 +68,19 @@ procedure lt_initialize_transform (tr)
 pointer	tr
 
 bool	clgetb()
-real	clgetr()
+double	clgetd()
 
 begin
 	# Get parameters from cl
-	X1(tr) = clgetr ("x1")				# (x1,y1) = crnt origin
-	Y1(tr) = clgetr ("y1")
-	XSCALE(tr) = clgetr ("xscale")
-	YSCALE(tr) = clgetr ("yscale")
-	THETA(tr) = clgetr ("angle")
+	X1(tr) = clgetd ("x1")				# (x1,y1) = crnt origin
+	Y1(tr) = clgetd ("y1")
+	XSCALE(tr) = clgetd ("xscale")
+	YSCALE(tr) = clgetd ("yscale")
+	THETA(tr) = clgetd ("angle")
 	if (! clgetb ("radians"))
 	    THETA(tr) = THETA(tr) / 57.29577951 
-	X2(tr) = clgetr ("x2")				# (x2,y2) = new origin
-	Y2(tr) = clgetr ("y2")
+	X2(tr) = clgetd ("x2")				# (x2,y2) = new origin
+	Y2(tr) = clgetd ("y2")
 
 	# The following terms are constant for a given transformation.
 	# They are calculated once and saved in the structure.

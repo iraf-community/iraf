@@ -14,7 +14,7 @@ include "imx.h"
 include <votParse_spp.h>
 
 
-define      SZ_BUF          4096	# name buffer string
+define      SZ_BUF          8192	# name buffer string
 
 
 # IMX_IMEXPAND -- Expand a template of FITS files into a list of image
@@ -149,7 +149,7 @@ char	ikparams[ARB]			# Image kernel parameters
 char	section[ARB]			# Image section parameters
 int	nimages				# Number of output images
 
-pointer	sp, name, exp, lexp
+pointer	sp, name, exp, lexp, nexp
 int	fd, ip, op, len, elen, nlines, nims, maxch, nchars, level
 bool	do_proc
 char	line[SZ_LINE], buf[SZ_LINE], ch
@@ -169,8 +169,9 @@ begin
 	call smark (sp)
 	call salloc (name, SZ_PATHNAME, TY_CHAR)
 
-	maxch = SZ_LINE
+	maxch = SZ_FNT
 	call calloc (exp, maxch, TY_CHAR)
+	call aclrc (Memc[exp], maxch)
 
 #call eprintf (
 #  "fexpand: index='%s' name='%s' ver='%s' sec='%s' ik='%s' expr='%s'\n")
@@ -209,9 +210,13 @@ begin
 		    elen = strlen (Memc[lexp])
 
 		# Reallocate space is the output name if needed.
-	        if ((nchars + elen) >= (maxch - SZ_FNAME)) {
+	        #if ((nchars + elen) >= (maxch - SZ_FNAME)) {
+	        if ((nchars + elen) >= maxch) {
+		    call calloc (nexp, maxch + SZ_FNT, TY_CHAR)
+		    call amovc (Memc[exp], Memc[nexp], maxch)
+		    call mfree (exp, TY_CHAR)
 		    maxch = maxch + SZ_FNT
-		    call realloc (exp, maxch, TY_CHAR)
+		    exp = nexp
 	        }
 
 		# Create a comma-delimited list.
@@ -223,8 +228,10 @@ begin
 	        }
 	        nimages = nimages + nims
 	    } else {
-	        if (nlines > 1) 
+	        if (nlines > 1) {
 		    call strcat (",", Memc[exp], maxch)
+	            nchars = nchars + 1
+		}
 		if (stridx ('[', line) != 0) {
 		    call aclrc (buf, SZ_LINE)
 		    op = 1
@@ -266,17 +273,24 @@ begin
 			op = op + 1
 		    }
 	            call strcat (buf, Memc[exp], maxch)
+	            nchars = nchars + strlen (buf)
 
-		} else
+		} else {
 	            call strcat (line, Memc[exp], maxch)
+	            nchars = nchars + strlen (line)
+		}
 
 	        nchars = nchars + len + 1
 	        nimages = nimages + 1
 
 		# Reallocate space is the output name if needed.
-	        if ((maxch - SZ_FNAME) < nchars) {
+
+	        if ((nchars + SZ_LINE) >= maxch) {
+		    call calloc (nexp, maxch + SZ_FNT, TY_CHAR)
+		    call amovc (Memc[exp], Memc[nexp], maxch)
+		    call mfree (exp, TY_CHAR)
 		    maxch = maxch + SZ_FNT
-		    call realloc (exp, maxch, TY_CHAR)
+		    exp = nexp
 	        }
 	    }
 	    call mfree (lexp, TY_CHAR)

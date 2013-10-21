@@ -6,8 +6,6 @@
 /* the May 1989 issue of Fortran Forum. */
 
 
-extern char *f__fmtbuf;
-
 #ifdef Allow_TYQUAD
 static longint f__llx;
 #endif
@@ -31,7 +29,10 @@ int (*f__lioproc)(), (*l_getc)(), (*l_ungetc)();
 extern "C" {
 #endif
 
-#ifndef KR_headers
+#ifdef KR_headers
+extern char *f__fmtbuf;
+#else
+extern const char *f__fmtbuf;
 int (*f__lioproc)(ftnint*, char*, ftnlen, ftnint), (*l_getc)(void),
 	(*l_ungetc)(int,FILE*);
 #endif

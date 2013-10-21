@@ -3,7 +3,9 @@
 
 #ifdef KR_headers
 extern double atof();
+#define Const /*nothing*/
 #else
+#define Const const
 #undef abs
 #undef min
 #undef max
@@ -26,17 +28,18 @@ rd_Z(Uint *n, int w, ftnlen len)
 {
 	long x[9];
 	char *s, *s0, *s1, *se, *t;
+	Const char *sc;
 	int ch, i, w1, w2;
 	static char hex[256];
 	static int one = 1;
 	int bad = 0;
 
 	if (!hex['0']) {
-		s = "0123456789";
-		while(ch = *s++)
+		sc = "0123456789";
+		while(ch = *sc++)
 			hex[ch] = ch - '0' + 1;
-		s = "ABCDEF";
-		while(ch = *s++)
+		sc = "ABCDEF";
+		while(ch = *sc++)
 			hex[ch] = hex[ch + 'a' - 'A'] = ch - 'A' + 11;
 		}
 	s = s0 = (char *)x;

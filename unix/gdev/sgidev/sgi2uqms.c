@@ -2,11 +2,16 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #define	import_spp
 #define	import_error
 #include <iraf.h>
+
+#include "sgiUtil.h"
+
 
 /*
  * SGI2UQMS.C -- Read IRAF SGI metacode from standard input, translate into
@@ -72,13 +77,17 @@ int	dev_height;
 int	dev_penbase  = DEF_PENBASE;
 int	dev_penslope = DEF_PENSLOPE;
 
+static void  translate (FILE *in, FILE *out);
+static char *xyencode (int opcode, int x, int y);
+static char *penencode (char *opcode, int val);
+
+
 
 /* MAIN -- Main entry point for SGI2UQMS.  Optional arguments are device
  * window parameters and name of input file.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	FILE	*in;
 	char	*infile;
@@ -86,7 +95,7 @@ char	*argv[];
 	int	argno;
 	int	np;
 	char	penparam[SZ_PENCMD];
-	int	get_iarg();
+
 
 	infile = "stdin";
 
@@ -110,11 +119,11 @@ char	*argv[];
 		    dev_height = get_iarg (argp[2], argv, argno, DEF_HEIGHT);
 		    break;
 		case 'p':
-		    if (argp[2] == NULL)
+		    if (argp[2] == (char) 0)
 			if (argv[argno+1] == NULL) {
 			    fprintf (stderr, "missing arg to switch `%s';",
 				argp);
-			    fprintf (stderr, " reset to %d.d\n", dev_penbase,
+			    fprintf (stderr, " reset to %d.%d\n", dev_penbase,
 				dev_penslope);
 			} else
 			    strcpy (penparam, argv[++argno]);
@@ -160,50 +169,24 @@ char	*argv[];
 
 	if (in != stdin)
 	    fclose (in);
-}
 
-
-/* GET_IARG -- Get an integer argument, whether appended directly to flag
- * or separated by a whitespace character; if error, report and assign default.
- */
-
-get_iarg (argp, argv, argno, def_val)
-char	argp;
-char	**argv;
-int	argno;
-int	def_val;
-
-{
-	int	temp_val;
-
-	if (argp == NULL)
-	    if (argv[argno+1] == NULL) {
-		fprintf (stderr, "missing arg to switch `%s';", argp);
-		fprintf (stderr, " reset to %d\n", def_val);
-		temp_val = def_val;
-	    } else
-		temp_val = atoi (argv[++argno]);
-	else
-	    temp_val = atoi (argv[argno]+2);
-
-	return (temp_val);
+	return (0);
 }
 
 
 /* TRANSLATE -- Interpret input SGI metacode instructions into device 
  * instructions and write to stdout.
  */
-translate (in, out)
-FILE	*in;
-FILE	*out;
+static void
+translate (FILE *in, FILE *out)
 {
 	int	 n, x, y, swap_bytes;
 	float	 xscale, yscale;
 	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
-	char	 *xyencode(), *penencode();
 
-	swap_bytes = swapped();
+
+	swap_bytes = isSwapped();
 
 	xscale = (float) dev_width / (float) GKI_MAXNDC;
 	yscale = (float) dev_height / (float) GKI_MAXNDC;
@@ -221,7 +204,8 @@ FILE	*out;
 	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
+		bswap2 ((unsigned char *)inbuf, (unsigned char *)inbuf, 
+		    sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
@@ -264,44 +248,14 @@ FILE	*out;
 }
 
 
-/* BSWAP2 -- Move bytes from array "a" to array "b", swapping successive
- * pairs of bytes.  The two arrays may be the same but may not be offset
- * and overlapping.
- */
-bswap2 (a, b, nbytes)
-char	*a;			/* input array			*/
-char	*b;			/* output array			*/
-int	nbytes;			/* number of bytes to swap	*/
-{
-	register char *ip, *op, *otop;
-	register unsigned temp;
-
-	ip = a;
-	op = b;
-	otop = op + (nbytes & ~1);
-
-	/* Swap successive pairs of bytes.
-	 */
-	while (op < otop) {
-	    temp  = *ip++;
-	    *op++ = *ip++;
-	    *op++ = temp;
-	}
-
-	/* If there is an odd byte left, move it to the output array.
-	 */
-	if (nbytes & 1)
-	    *op = *ip;
-}
-
-
 /* XYENCODE -- Encode x, y into a character string formatted for the device.
  */
-
-char *
-xyencode (opcode, x, y)
-int	opcode;		/* draw or move		*/
-int	x, y;		/* must be positive	*/
+static char *
+xyencode (
+    int	opcode,		/* draw or move		*/
+    int	x, 		/* must be positive	*/
+    int	y		/* must be positive	*/
+)
 {
 	static char	obuf[] = "^X0000:0000";
 	register int	digit, n;
@@ -323,11 +277,11 @@ int	x, y;		/* must be positive	*/
 /* PENENCODE -- Encode base, slope into a character string formatted for the
  * device set-pen command.
  */
-
-char *
-penencode (opcode, val)
-char	*opcode;		/* device set-linewidth command */
-int	val;			/* device line width 		*/
+static char *
+penencode (
+    char *opcode,		/* device set-linewidth command */
+    int	  val 			/* device line width 		*/
+)
 {
 	static char	obuf[SZ_PENCMD+1];
 	register int	digit, n;
@@ -340,17 +294,3 @@ int	val;			/* device line width 		*/
 
 	return (obuf);
 }
-
-
-/* SWAPPED -- Test whether we are running on a byte-swapped machine.
- */
-swapped()
-{
-	union {
-	    short   tswap;
-	    char    b[2];
-	} test;
-
-	test.tswap = 1;
-	return (test.b[0]);
-}	

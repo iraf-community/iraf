@@ -31,7 +31,7 @@ setenv SHELL 	     /bin/csh
 #setenv IRAFARCH	    `/iraf/iraf/unix/hlib/irafarch.csh -actual`
 
 # Setup the iraf environment.
-setenv iraf /iraf/iraf/
+setenv iraf /iraf/build/iraf/
 
 foreach f ($iraf/unix/hlib/irafuser.csh ~/.alias)
   if (-e $f) then

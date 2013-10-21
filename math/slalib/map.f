@@ -30,32 +30,55 @@
 *
 *  Notes:
 *
-*  1)  EQ is the Julian epoch specifying both the reference
-*      frame and the epoch of the position - usually 2000.
-*      For positions where the epoch and equinox are
-*      different, use the routine slPM to apply proper
-*      motion corrections before using this routine.
+*  1)  EQ is the Julian epoch specifying both the reference frame and
+*      the epoch of the position - usually 2000.  For positions where
+*      the epoch and equinox are different, use the routine slPM to
+*      apply proper motion corrections before using this routine.
 *
-*  2)  The distinction between the required TDB and TT is
-*      always negligible.  Moreover, for all but the most
-*      critical applications UTC is adequate.
+*  2)  The distinction between the required TDB and TT is always
+*      negligible.  Moreover, for all but the most critical
+*      applications UTC is adequate.
 *
-*  3)  The proper motions in RA are dRA/dt rather than
-*      cos(Dec)*dRA/dt.
+*  3)  The proper motions in RA are dRA/dt rather than cos(Dec)*dRA/dt.
 *
-*  4)  This routine may be wasteful for some applications
-*      because it recomputes the Earth position/velocity and
-*      the precession/nutation matrix each time, and because
-*      it allows for parallax and proper motion.  Where
-*      multiple transformations are to be carried out for one
-*      epoch, a faster method is to call the slMAPA routine
-*      once and then either the slMAPQ routine (which includes
-*      parallax and proper motion) or slMAPZ (which assumes
-*      zero parallax and proper motion).
+*  4)  This routine may be wasteful for some applications because it
+*      recomputes the Earth position/velocity and the precession-
+*      nutation matrix each time, and because it allows for parallax
+*      and proper motion.  Where multiple transformations are to be
+*      carried out for one epoch, a faster method is to call the
+*      slMAPA routine once and then either the slMAPQ routine
+*      (which includes parallax and proper motion) or slMAPZ (which
+*      assumes zero parallax and proper motion).
 *
-*  P.T.Wallace   Starlink   19 January 1993
+*  5)  The accuracy is sub-milliarcsecond, limited by the
+*      precession-nutation model (IAU 1976 precession, Shirai &
+*      Fukushima 2001 forced nutation and precession corrections).
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  6)  The accuracy is further limited by the routine slEVP, called
+*      by slMAPA, which computes the Earth position and velocity
+*      using the methods of Stumpff.  The maximum error is about
+*      0.3 mas.
+*
+*  P.T.Wallace   Starlink   17 September 2001
+*
+*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

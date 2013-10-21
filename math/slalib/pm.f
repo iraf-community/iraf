@@ -28,14 +28,37 @@
 *     slDC2S       Cartesian to spherical
 *     slDA2P      normalize angle 0-2Pi
 *
-*  Note:
-*     The proper motions in RA are dRA/dt rather than
-*     cos(Dec)*dRA/dt, and are in the same coordinate
-*     system as R0,D0.
+*  Notes:
 *
-*  P.T.Wallace   Starlink   23 August 1996
+*  1  The proper motions in RA are dRA/dt rather than cos(Dec)*dRA/dt,
+*     and are in the same coordinate system as R0,D0.
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  2  If the available proper motions are pre-FK5 they will be per
+*     tropical year rather than per Julian year, and so the epochs
+*     must both be Besselian rather than Julian.  In such cases, a
+*     scaling factor of 365.2422D0/365.25D0 should be applied to the
+*     radial velocity before use.
+*
+*  P.T.Wallace   Starlink   19 January 2000
+*
+*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -43,9 +66,9 @@
 
       DOUBLE PRECISION R0,D0,PR,PD,PX,RV,EP0,EP1,R1,D1
 
-*  Km/s to AU/year multiplied by arc seconds to radians
+*  Km/s to AU/year multiplied by arcseconds to radians
       DOUBLE PRECISION VFR
-      PARAMETER (VFR=0.21094502D0*0.484813681109535994D-5)
+      PARAMETER (VFR=(365.25D0*86400D0/149597870D0)*4.8481368111D-6)
 
       INTEGER I
       DOUBLE PRECISION slDA2P

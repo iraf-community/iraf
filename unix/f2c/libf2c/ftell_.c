@@ -8,7 +8,7 @@ extern "C" {
 #ifdef KR_headers
 unit_chk(Unit, who) integer Unit; char *who;
 #else
-unit_chk(integer Unit, char *who)
+unit_chk(integer Unit, const char *who)
 #endif
 {
 	if (Unit >= MXUNIT || Unit < 0)

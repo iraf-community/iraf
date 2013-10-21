@@ -8480,3 +8480,48 @@ BUG:    The optimal extraction for significantly tilted spectra, the Marsh
 
 STATUS: Fixed for V2.16.
 
+
+NUMBER:	584
+MODULE:	cosmicrays
+SYSTEM:	-V2.16
+DATE:	Thu Aug  2 14:55:18 MST 2012
+FROM:	iraf
+
+BUG:	A pointer to a an array of pointers was used in one place as a real.
+	This is an error (e.g. segmentation error) when integer and real
+	arrays are not of the same size; i.e. on 64-bit architectures.
+	There is no workaround other than using a 32-bit architecture.
+
+STATUS:	Fixed in future updated.
+
+NUMBER:	585
+MODULE:	mscred.mscfinder.msctpeak, nfextern.msctools.mscfinder.msctpeak
+SYSTEM:	V2.16
+DATE:	Wed Aug  8 19:26:21 MST 2012
+FROM:	valdes
+
+BUG:	The IRAF system core version of the tables library now used changed
+        in its default behavior when creating and reading tables without
+	an explicit extension.  This results in the error:
+
+	    ERROR: Table `/tmp/iraf?????' does not exist or cannot be opened.
+
+	This requires a change to the script to use an explicit extension.
+	A workaround is possible by editing the script but it is recommended
+	that you just update the appropriate external package.
+
+STATUS:	Fixed in the latest version of the packages.
+
+NUMBER:	586
+MODULE:	apsum/apall
+SYSTEM:	V2.16
+DATE:	Tue Mar 12 12:55:34 MST 2013
+FROM:	valdes
+
+BUG:	When cleaning or weighting and an aperture runs off the edge of the
+	there was a bug that could allow referencing outside of the image
+	data array.  The value would then be arbitrary which could produce
+	errors such as floating or arithmetic exceptions.  The workaround
+	is to eliminate apertures that go off the edge.
+
+STATUS:	Fixed for the next release.

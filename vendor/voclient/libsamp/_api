@@ -1,0 +1,207 @@
+/**
+**  SAMP.H -- SAMP interface include file.
+*/
+
+/**
+ *   Prototype declarations.
+ */
+
+/******************************************************************************
+ **  Public Interface Methods
+ *****************************************************************************/
+
+/*  samp.c -- Methods called by user apps to initialize the interface.
+ */
+handle_t  sampInit (String appName, String description);
+int  	  sampStartup (handle_t handle);
+int  	  sampShutdown (handle_t handle);
+int  	  sampDebug (handle_t handle, int value);
+int  	  sampVerbose (handle_t handle, int value);
+void 	  sampClose (handle_t handle);
+
+/*  Applications declare metadata and subscribe to mtypes.
+ */
+void 	  samp_Metadata (handle_t handle, String field, String value);
+void 	  samp_Subscribe (handle_t handle, String mtype, void *func);
+void 	  samp_Unsubscribe (handle_t handle, String mtype);
+
+/*  For setting the interface message pattern.
+ */
+void 	  samp_setSyncMode (handle_t handle);
+void 	  samp_setASyncMode (handle_t handle);
+void 	  samp_setNotifyMode (handle_t handle);
+void 	  samp_setMsgMode (handle_t handle, int mode);
+void 	  samp_setCallByRef (handle_t handle);
+void 	  samp_setCallMode (handle_t handle, int mode);
+
+void 	  samp_setReplyCallback (handle_t handle, int *func);
+void 	  samp_setResponseCallback (handle_t handle, int *func);
+void      samp_setTimeout (handle_t handle, int timeout);
+void      samp_setAppName (handle_t handle, String name);
+void      samp_setAppVersion (handle_t handle, String version);
+
+void 	  samp_defaultReplyHandler (handle_t handle);
+void 	  samp_deaultfResponseHandler (handle_t handle);
+int 	  samp_replyStatus (handle_t handle);
+
+/*  For identifying other client apps.
+ */
+int  	  samp_mapClients (handle_t handle);
+int  	  samp_listClients (handle_t handle);
+char  	 *samp_getClients (handle_t handle);
+int  	  samp_addClient (handle_t handle, String name, String id);
+int  	  samp_removeClient (handle_t handle, String id);
+
+
+int 	  samp_hubActive (handle_t handle);
+int 	  samp_setOpt (handle_t handle, char *opt, int value);
+
+Map	  samp_getOKMap (void);
+Map	  samp_getNullMap (void);
+
+
+/*  sampCommands.c -- Methods called to send messages to the Hub.
+ */
+int 	samp_Register (handle_t handle);
+int 	samp_UnRegister (handle_t handle);
+int 	samp_DeclareMetadata (handle_t handle);
+int 	samp_Ping (handle_t handle, String appName);
+Map 	samp_GetMetadata (handle_t handle, String pubId);
+int 	samp_DeclareSubscriptions (handle_t handle);
+Map     samp_GetSubscriptions (handle_t handle, String pubId);
+List 	samp_GetRegisteredClients (handle_t handle);
+List 	samp_GetSubscribedClients (handle_t handle, String mtype);
+
+
+/*  sampMType.c -- Methods called to send messages to other apps.
+ */
+int 	samp_tableLoadVOTable (handle_t handle, String recip, String url, 
+		String tableId, String name);
+int 	samp_tableLoadFITS (handle_t handle, String recip, String url, 
+		String tableId, String name);
+int 	samp_imageLoadFITS (handle_t handle, String recip, String url, 
+		String imageId, String name);
+
+int 	samp_tableHighlightRow (handle_t handle, String recip, String tableId, 
+		String url, int row);
+int 	samp_tableSelectRowList (handle_t handle, String recip, String tableId, 
+		String url, int rows[], int nrows);
+int 	samp_coordPointAtSky (handle_t handle, String recip, 
+		float ra, float dec);
+int 	samp_specLoadSSAGeneric (handle_t handle, String recip, String url, 
+		Map meta, String spectrumId, String name);
+
+int     samp_cmdExec (handle_t handle, String recip, String cmd);
+char   *samp_envGet (handle_t handle, String recip, String name);
+int 	samp_envSet (handle_t handle, String recip, String name, String value);
+char   *samp_paramGet (handle_t handle, String recip, String name);
+int 	samp_paramSet(handle_t handle, String recip, String name, String value);
+int 	samp_bibLoad (handle_t handle, String recip, String bibcode);
+int 	samp_resourceLoad (handle_t handle, String recip, String type, 
+		String name, Map resMap);
+
+int 	samp_sendGeneric (handle_t handle, String recip, String mtype, 
+		String args[]);
+int 	samp_sendMsg (handle_t handle, String recip, Map msg);
+
+
+
+/*  sampClient.c -- Low-level methods to send messages.
+ */
+void    samp_notify (handle_t handle, String recipId, Map msg);
+List    samp_notifyAll (handle_t handle, Map msg);
+String  samp_call (handle_t handle, String recipId, String tag, Map msg);
+int     samp_callAll (handle_t handle, String msg_tag, Map msg);
+int     samp_callAndWait (handle_t handle, String recipId, String msg_tag, 
+				Map msg);
+int  	samp_Reply (handle_t handle, String msg_id, Map resp);
+
+String 	samp_clientName (handle_t handle, String pubId);
+int	samp_setErr (handle_t handle, Map resp);
+String  samp_getErr (handle_t handle);
+
+
+/*  sampMethods.c -- SAMP methods implemented by a callable client.
+ */
+int 	samp_receiveCall (void *data);
+int 	samp_receiveNotification (void *data);
+int 	samp_receiveResponse (void *data);
+
+void	samp_setHandlerReply (Map resp);
+Map	samp_getHandlerReply (void);
+
+
+/*  sampHandlers.c -- Handlers to responses from the message.
+ */
+void 	samp_setUserHandler (handle_t handle, String mtype, void *func);
+void 	samp_setSampHandler (handle_t handle, String mtype, void *func);
+void   *samp_getUserHandler (String mtype);
+void   *samp_getSampHandler (String mtype);
+void    samp_execUserHandler (String mtype, String sender, 
+		String msg_id, Map params);
+
+int     samp_genericMsgHandler (String sender, String mtype, String msg_id, 
+		Map msg_map);
+
+int 	samp_PingHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_StatusHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_imLoadHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_tbLoadHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_tbLoadFITSHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_tbLoadVOTHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_tbHighlightHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_tbSelectHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_pointAtHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_specLoadHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_specSSAHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_cmdExecHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_envGetHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_envSetHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_paramGetHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_paramSetHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_bibcodeHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+int 	samp_resLoadHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_resConeHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_resSiapHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_resSsapHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_resTapHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+int 	samp_resVOSpaceHandler (String sender, String mtype, String msg_id,
+		Map msg_map);
+
+void    samp_printMessage (String mtype, String sender, String msg_id, 
+		Map params);
+
+void    samp_printMap (String name, Map map);
+int 	samp_nullResponse (void *data);
+int 	samp_testEcho (void *data);
+
+
+

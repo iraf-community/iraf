@@ -1,4 +1,4 @@
-      SUBROUTINE slH2E (AZ, EL, PHI, HA, DEC)
+      SUBROUTINE slH2E ( AZ, EL, PHI, HA, DEC )
 *+
 *     - - - - -
 *      D E 2 H
@@ -46,39 +46,56 @@
 *      use inline code, having previously computed fixed terms such
 *      as sine and cosine of latitude.
 *
-*  P.T.Wallace   Starlink   21 February 1996
+*  Last revision:   11 September 2005
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
       IMPLICIT NONE
 
-      REAL AZ,EL,PHI,HA,DEC
+      REAL AZ, EL, PHI, HA, DEC
 
-      DOUBLE PRECISION SA,CA,SE,CE,SP,CP,X,Y,Z,R
+      DOUBLE PRECISION SA, CA, SE, CE, SP, CP, X, Y, Z, R
 
 
-*  Useful trig functions
-      SA=SIN(AZ)
-      CA=COS(AZ)
-      SE=SIN(EL)
-      CE=COS(EL)
-      SP=SIN(PHI)
-      CP=COS(PHI)
+*  Useful trig functions.
+      SA = SIN(AZ)
+      CA = COS(AZ)
+      SE = SIN(EL)
+      CE = COS(EL)
+      SP = SIN(PHI)
+      CP = COS(PHI)
 
-*  HA,Dec as x,y,z
-      X=-CA*CE*SP+SE*CP
-      Y=-SA*CE
-      Z=CA*CE*CP+SE*SP
+*  HA,Dec as x,y,z.
+      X = -CA*CE*SP+SE*CP
+      Y = -SA*CE
+      Z = CA*CE*CP+SE*SP
 
-*  To HA,Dec
-      R=SQRT(X*X+Y*Y)
+*  To HA,Dec.
+      R = SQRT(X*X+Y*Y)
       IF (R.EQ.0.0) THEN
-         HA=0.0
+         HA = 0.0
       ELSE
-         HA=ATAN2(Y,X)
+         HA = REAL(ATAN2(Y,X))
       END IF
-      DEC=ATAN2(Z,R)
+      DEC = REAL(ATAN2(Z,R))
 
       END

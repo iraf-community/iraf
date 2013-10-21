@@ -95,19 +95,17 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, "ipad");
 #else
 #ifdef MACOSX
-	/* Setup for cross-compilation.
+	/* Setup for cross-compilation, default to 'macintel'.
 	 */
-	{ char *irafpath;
-
-            if ((irafarch = getenv("IRAFARCH"))) {
-                if (strcmp (irafarch, "macosx") == 0) 
-		    strcat (pathname, "macosx");
-                else if (strcmp (irafarch, "macintel") == 0) 
-		    strcat (pathname, "macintel");
-                else 
-		    strcat (pathname, "macosx");
-            }
-        }
+        if ((irafarch = getenv("IRAFARCH"))) {
+            if (strcmp (irafarch, "macosx") == 0) 
+		strcat (pathname, "macosx");
+            else if (strcmp (irafarch, "macintel") == 0) 
+		strcat (pathname, "macintel");
+            else 
+		strcat (pathname, "macosx");
+        } else
+	    strcat (pathname, "macintel");
 #else
 #ifdef SOLARIS
 #ifdef X86

@@ -18,7 +18,7 @@
 *     R5        d      RA (radians)
 *     D5        d      Dec (radians)
 *
-*  Called:  slDS2C, slDAVM, slDMXV, slDAVM, slDMXM,
+*  Called:  slDS2C, slDAVM, slDMXV, slDMXM,
 *           slDIMV, slDVXV, slDC6S, slDA2P
 *
 *  Notes:
@@ -42,23 +42,38 @@
 *  5)  The position returned by this routine is in the FK5 J2000
 *      reference frame but at Julian epoch EPOCH.
 *
-*  6)  See also slFK5H, slHFK5, slF5HZ.
+*  6)  See also slFK5H, slHFK5, sla_FK5ZHZ.
 *
 *  Reference:
 *
 *     M.Feissel & F.Mignard, Astron. Astrophys. 331, L33-L36 (1998).
 *
-*  P.T.Wallace   Starlink   7 October 1998
+*  P.T.Wallace   Starlink   30 December 1999
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
       IMPLICIT NONE
 
       DOUBLE PRECISION RH,DH,EPOCH,R5,D5,DR5,DD5
-
-      DOUBLE PRECISION slDA2P
 
       DOUBLE PRECISION AS2R
       PARAMETER (AS2R=0.484813681109535994D-5)
@@ -75,8 +90,10 @@
      :            OMY = +0.60D-3 * AS2R,
      :            OMZ = +0.70D-3 * AS2R )
 
-      DOUBLE PRECISION PH(6),ORTN(3),R5H(3,3),S5(3),SH(3),T,VST(3),
-     :                 RST(3,3),R5HT(3,3),PV5E(6),VV(3),R,V,W
+      DOUBLE PRECISION PH(3),ORTN(3),R5H(3,3),S5(3),SH(3),T,VST(3),
+     :                 RST(3,3),R5HT(3,3),PV5E(6),VV(3),W,R,V
+
+      DOUBLE PRECISION slDA2P
 
 
 

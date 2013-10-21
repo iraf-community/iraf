@@ -4,12 +4,17 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define	NOKNET
 #define	import_spp
 #define	import_finfo
 #define	import_knames
 #include <iraf.h>
+
+#include "../bootProto.h"
+
 
 /*
  * WTAR -- Write a UNIX tar format file (on disk, tape, or to stdout)
@@ -74,20 +79,20 @@ struct fheader {
 /* Map TAR file mode bits into characters for printed output.
  */
 struct _modebits {
-	int	code;
-	char	ch;
+    int	  code;
+    char  ch;
 } modebits[] = {
-	040000,	'd',
-	0400,	'r',
-	0200,	'w',
-	0100,	'x',
-	040,	'r',
-	020,	'w',
-	010,	'x',
-	04,	'r',
-	02,	'w',
-	01,	'x',
-	0,	0
+    { 040000,	'd' },
+    { 0400,	'r' },
+    { 0200,	'w' },
+    { 0100,	'x' },
+    { 040,	'r' },
+    { 020,	'w' },
+    { 010,	'x' },
+    { 04,	'r' },
+    { 02,	'w' },
+    { 01,	'x' },
+    { 0,	0   }
 };
 
 int	debug=NO;		/* Print debugging messages		*/
@@ -104,18 +109,35 @@ int	nblocks;
 int	in;
 int	out = EOF;
 
-extern	char *vfn2osfn();
-long	os_utime();
-char	*dname();
+
+extern  int ZZSTRT (void);
+extern  int ZZSTOP (void);
+extern  int ZFINFO (PKCHAR *fname, XLONG *finfo_struct, XINT *status);
+
+extern  int tape_open (char *fname, int mode);
+extern  int tape_close (int fd);
+extern  int tape_write (int fd, char *buf, int nbytes);
+
+
+static void  putfiles (char *dir, int   out, char *path);
+static void  tarfileout (char *fname, int out, int ftype, char *path);
+static int   putheader (register struct fheader *fh, int out);
+static int   cchksum (register char *p, register int nbytes);
+static void  printheader (FILE *fp, register struct fheader *fh, int verbose);
+static void  copyfile (char *fname, struct fheader *fh, int ftype, int out);
+static int   putblock (int out, char *buf);
+static void  endtar (int out);
+static int   u_fmode (int iraf_fmode, int ftype);
+static char *dname (char *dir);
+
+
 
 
 /* MAIN -- "wtar [-tvdo] [-f tarfile] [files]".  If no files are listed the
  * current directory tree is used as input.  If no output file is specified
  * output is to the standard output.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int main (int argc, char *argv[])
 {
 	static	char	*def_flist[2] = { ".", NULL };
 	char	*argp, **flist;
@@ -215,16 +237,20 @@ char	*argv[];
 
 	ZZSTOP();
 	exit (OSOK);
+
+	return (0);
 }
 
 
 /* PUTFILES -- Put the named directory tree to the output tarfile.  We chdir
  * to each subdirectory to minimize path searches and speed up execution.
  */
-putfiles (dir, out, path)
-char	*dir;			/* directory name		*/
-int	out;			/* output file			*/
-char	*path;			/* pathname of curr. directory	*/
+static void
+putfiles (
+    char *dir,			/* directory name		*/
+    int	  out,			/* output file			*/
+    char *path 			/* pathname of curr. directory	*/
+)
 {
 	char	newpath[SZ_PATHNAME+1];
 	char	oldpath[SZ_PATHNAME+1];
@@ -284,11 +310,13 @@ char	*path;			/* pathname of curr. directory	*/
 
 /* TARFILEOUT -- Write the named file to the output in tar format.
  */
-tarfileout (fname, out, ftype, path)
-char	*fname;			/* file to be output	*/
-int	out;			/* output stream	*/
-int	ftype;			/* file type		*/
-char	*path;			/* current path		*/
+static void
+tarfileout (
+    char *fname,			/* file to be output	*/
+    int	  out,				/* output stream	*/
+    int	  ftype,			/* file type		*/
+    char *path				/* current path		*/
+)
 {
 	struct	_finfo fi;
 	struct	fheader fh;
@@ -308,7 +336,7 @@ char	*path;			/* current path		*/
 
 	/* Get info on file to make file header.
 	 */
-	ZFINFO ((PKCHAR *)vfn2osfn(fname,0), &fi, &status);
+	ZFINFO ((PKCHAR *)vfn2osfn(fname,0), (XLONG *) &fi, (XINT *) &status);
 	if (status == XERR) {
 	    fflush (stdout);
 	    fprintf (stderr, "Warning: can't get info on file `%s'\n", fname);
@@ -375,14 +403,17 @@ char	*path;			/* current path		*/
 
 /* PUTHEADER -- Encode and write the file header to the output tarfile.
  */
-putheader (fh, out)
-register struct	fheader *fh;	/* (input) file header		*/
-int	 out;			/* output file descriptor	*/
+static int
+putheader (
+    register struct fheader *fh,	/* (input) file header		*/
+    int	 out 				/* output file descriptor	*/
+)
 {
 	register char	*ip;
 	register int	n;
 	union	hblock	hb;
 	char	chksum[10];
+
 
 	/* Clear the header block. */
 	for (n=0;  n < TBLOCK;  n++)
@@ -445,9 +476,11 @@ int	 out;			/* output file descriptor	*/
 
 /* CCHKSUM -- Compute the checksum of a byte array.
  */
-cchksum (p, nbytes)
-register char	*p;
-register int	nbytes;
+static int
+cchksum (
+    register char	*p,
+    register int	nbytes
+)
 {
 	register int	sum;
 
@@ -462,10 +495,12 @@ register int	nbytes;
  * format, e.g.:
  *		drwxr-xr-x  9 tody         1024 Nov  3 17:53 .
  */
-printheader (fp, fh, verbose)
-FILE	*fp;			/* output file			*/
-register struct fheader *fh;	/* file header struct		*/
-int	verbose;		/* long format output		*/
+static void
+printheader (
+    FILE  *fp,				/* output file			*/
+    register struct fheader *fh,	/* file header struct		*/
+    int	verbose 			/* long format output		*/
+)
 {
 	register struct	_modebits *mp;
 	char	*tp, *ctime();
@@ -479,7 +514,7 @@ int	verbose;		/* long format output		*/
 	    fprintf (fp, "%c", mp->code & fh->mode ? mp->ch : '-');
 
 	tp = ctime (&fh->mtime);
-	fprintf (fp, "%3d %4d %2d %8d %-12.12s %-4.4s %s",
+	fprintf (fp, "%3d %4d %2d %8ld %-12.12s %-4.4s %s",
 	    fh->linkflag,
 	    fh->uid,
 	    fh->gid,
@@ -497,11 +532,13 @@ int	verbose;		/* long format output		*/
 /* COPYFILE -- Copy bytes from the input file to the output file.  Each file
  * consists of a integral number of TBLOCK size blocks on the output file.
  */
-copyfile (fname, fh, ftype, out)
-char	*fname;			/* file being read from		*/
-struct	fheader *fh;		/* file header structure	*/
-int	ftype;			/* file type, text or binary	*/
-int	out;			/* output file			*/
+static void
+copyfile (
+    char  *fname,		/* file being read from		*/
+    struct fheader *fh,		/* file header structure	*/
+    int	   ftype,		/* file type, text or binary	*/
+    int	   out 			/* output file			*/
+)
 {
 	register char	*bp;
 	register int	i;
@@ -546,7 +583,7 @@ int	out;			/* output file			*/
 		    } else
 			nleft = 0;
 
-		    bp = (char *) ((int)buf + nleft);
+		    bp = (char *) ((long)buf + nleft);
 		    total += nbytes;
 		    nbytes = nleft;
 		}
@@ -582,9 +619,8 @@ pad_:
 
 /* PUTBLOCK -- Write a block to tape (buffered).
  */
-putblock (out, buf)
-int	out;
-char	*buf;
+static int
+putblock (int out, char *buf)
 {
 	int	nbytes = 0;
 
@@ -613,8 +649,8 @@ char	*buf;
 
 /* ENDTAR -- Write the end of the tar file, i.e., two zero blocks.
  */
-endtar (out)
-int	out;
+static void
+endtar (int out)
 {
 	register int  i;
 	union    hblock hb;
@@ -634,9 +670,8 @@ int	out;
 /* U_FMODE -- Convert the IRAF file mode bits to the corresponding UNIX bits
  * for the tar file header.
  */
-u_fmode (iraf_fmode, ftype)
-int	iraf_fmode;
-int	ftype;
+static int
+u_fmode (int iraf_fmode, int ftype)
 {
 	register int	in = iraf_fmode;
 	register int	m = 0;
@@ -664,9 +699,8 @@ int	ftype;
  * an // sequences into a single /, and make sure the directory pathname ends
  * in a single /.
  */
-char *
-dname (dir)
-char	*dir;
+static char *
+dname (char *dir)
 {
 	register char	*ip, *op;
 	static	char path[SZ_PATHNAME+1];

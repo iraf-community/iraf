@@ -1,8 +1,11 @@
-This directory contains the Fortran source for the SLALIB version 2.3.0
+This directory contains the Fortran source for the SLALIB version 2.5-2
 routines. The SLALIB Fortran library has been made available to the IRAF
-project courtesy of Patrick Wallace of the Starlink project. All the
-documentation normally provided with the Starlink routines can be found
-in the doc subdirectory
+project courtesy of Patrick Wallace of the Starlink project, the version
+distributed here is derived from the Starlink 2012 release in order to
+include the GPL'd version of the code.  All the documentation normally
+provided with the Starlink routines can be found in the doc subdirectory,
+and in the sun67.tex file.  See the 'read.me' and 'SLA_CONDITIONS' file
+in this directory for additional information and license restrictions.
 
 In order to complete the port to iraf the following name changes were
 made to the package routines. The package prefix was changed from "sla_"

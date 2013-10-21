@@ -1,7 +1,8 @@
 .\" @(#)vodata.1 1.0 June-07 MJF
-.TH VODATA 1 "July 2007" "NVO VO-CLI Project"
+.TH VODATA 1 "July 2007" "VOClient Project"
 .SH NAME
 vodata \- query and access VO data services
+
 .SH SYNOPSIS
 \fBvodata\fP [\fI<flags>\fP] [ <\fIresource\fP> [[ <\fIobjname\fP> [ <\fIsr\fP> ]]] ]
 
@@ -19,10 +20,12 @@ following this flag.
 .B \-v,\--verbose
 Verbose output.  The output will be more verbose than normal but exactly
 what is printed depends on whether other flags are enabled to changed the
-basic task behavior.
+basic task behavior.  Sets the \fIVERBOSE\fR query parameter to its highest
+level.
 .TP 8
 .B \--vverbose
-Very-verbose output.  Even more output.
+Very-verbose output.  Sets the \fIVERBOSE\fR query parameter to its highest
+level.
 
 .TP 0
 The following flags control the major behavior of the task, i.e. the type 
@@ -31,7 +34,7 @@ of output to present.
 .B \-a, --all
 Perform an action based on all available data.  When used as part of a
 data query, this flag causes the <\fIresource\fP> argument to be used in
-a substring match of Directory \fIShortName\fR or \fIIdentifier\fR fields
+a substring match of Registry \fIShortName\fR or \fIIdentifier\fR fields
 to create the actual list of resources to be queried.  If the \fIShortName\fP
 of a \fITABULARSKYSERVICE\fP from Vizier is given, the <\fIresource\fP>
 will typically expand to include all tables associated with the paper,
@@ -79,11 +82,11 @@ The following flags specify data query options:
 .B \-b <bpass>  or   --bandpass=<bpass>
 Constrain the query by bandpass.  The argument following the flag must
 be one of the allowed bandpass specification string.  Setting the flag
-will constrain any Directory search used to only those resources where 
+will constrain any Registry search used to only those resources where 
 the spectral coverage matches the given bandpass.  Aliases for bandpasses
 are allowed, see below.
 .TP 8
-.B \-i <file>
+.B \-i <file> or --input=<file>
 Specify a file containing the remaining positional command-line input. The
 command line is thought of as having the following components:  the options
 beginning with a '-' character and their associated arguments, one or more
@@ -153,7 +156,7 @@ Specify the service or url to invoke.  In most cases the service, i.e.
 the <\fIresource\fP> argument will be taken from the commandline based on
 it's position.  The exception is when the user want to specify a service
 URL directly (e.g. to test a local service) because it isn't known to the
-Directory, or to use the reserved values '-' or 'any'.  Use of '-' tells
+Registry, or to use the reserved values '-' or 'any'.  Use of '-' tells
 the task to read the service list from the standard input;  use of
 the word 'any' is a means to telling the task to dynamically create the
 resource list from other options (e.g. "any image service" by using the
@@ -161,7 +164,7 @@ resource list from other options (e.g. "any image service" by using the
 .TP 8
 .B \-t <type>  or  --type=<type>
 Constrain the query by service type.  The list of allowed service types
-is given below.  The actual string used in a Directory resource record
+is given below.  The actual string used in a Registry resource record
 may be used if known, otherwise common use is to specify 'image' to
 access Simple Image Access (SIAP) services, 'catalog' for Cone searches,
 or 'table' for Vizier tabular data.
@@ -169,13 +172,22 @@ or 'table' for Vizier tabular data.
 .TP 0
 The following flags are specific to the writing of HTML or KML files:
 .TP 8
-.B \--webnoborder
+.B \--webborder
+Enable the shaded border drawn around an HTML table (default).
+.TP 8
+.B \--webcolor
+Enable the coloring for an HTML table (default).
+.TP 8
+.B \--webheader
+Enable the HTML page header written to the output file (default).
+.TP 8
+.B --wb, \--webnoborder
 Disable the shaded border drawn around an HTML table.
 .TP 8
-.B \--webnocolor
+.B --wc, \--webnocolor
 Disable the coloring for an HTML table.
 .TP 8
-.B \--webnoheader
+.B --wh, \--webnoheader
 Disable the HTML page header written to the output file.
 
 .TP 8
@@ -321,29 +333,33 @@ There will be three attributes:  \fIsvc\fP will be the data service name,
 giving an index into the results.  This index list is created by looping over
 each service, and for each service, looping over the object/position list.
 .TP 8
-.B \-e,--extract
-Extract positional and access information to extra output files.  By
-default both files will be written, using \fI--extract=pos\fP will write only the
-positional information file, using \fI--extract=urls\fP will write the access URLs only.
-Access URLs are written one-per-line to a file with the same root name as
-the main output but with a ".urls" extension;  Positional information is
-written to a file with a ".pos" extension and will contain three columns
-made up of the identifier (the column with the \fIID_MAIN\fP ucd), RA and
-Dec (the \fIPOS_EQ_RA_MAIN\fP and \fIPOS_EQ_DEC_MAIN\fP ucd columns
-respectively).  If these ucds appear more than once in a table, the first
-occurrance will be used.
+.B \-e,--extract[=<type>]
+Extract positional or access information to extra output files.  By
+default both files will be written, using \fI--extract=pos\fP will write 
+only the positional information file, using \fI--extract=urls\fP will write
+the access URLs only.  Access URLs are written one-per-line to a file with
+the same root name as the main output but with a ".urls" extension;  
+Positional information is written to a file with a ".pos" extension and 
+will contain three columns made up of the identifier (the column with 
+the \fIID_MAIN\fP ucd), RA and Dec (the \fIPOS_EQ_RA_MAIN\fP 
+and \fIPOS_EQ_DEC_MAIN\fP ucd columns respectively).  If these ucds appear 
+more than once in a table, the first occurrance will be used.
 
-Additionally, the \fI--extract=headers\fP and \fI--extract=kml\fP flags may be to to specify the
-HTML and KML output be written to files with ".html" and ".kml"
-extensions respectively.  The \fI--extract=KML\fP flag will cause multi-resource 
-and/or multi-object queries to be collected into a single KML file.
-The format-specific \fI--kml<opt>\fP and \fI--web<opt>\fP flags will apply to these files.
-A \fI--extract=xml\fP flag will force the output format to be raw VOTable and gather
-the results to a single XML document (see the \fI-X\fP option).
+Additionally, the \fI--extract=headers\fP and \fI--extract=kml\fP flags may 
+used be to to specify the HTML and KML output be written to files with 
+".html" and ".kml" extensions respectively.  The \fI--extract=KML\fP flag 
+will cause multi-resource and/or multi-object queries to be collected into 
+a single KML file.  The format-specific \fI--kml<opt>\fP and \fI--web<opt>\fP
+flags will apply to these files.  A \fI--extract=xml\fP flag will force the
+output format to be raw VOTable and gather the results to a single XML 
+document (see the \fI-X\fP option).
 
 Note that the URLs file can be used to later access the data (perhaps
 after sub-selecting from the table based on some criteria) by calling
 the task again using the filename as the only argument.
+
+If no argument is given to the \fI--extract\fP flag then all possible 
+options will be enabled.
 .TP 8
 .B \-n,--nosave
 If enabled, this flag tells the task not to save results to local disk.
@@ -389,7 +405,7 @@ the task interface is meant to provide the following features:
 .B \-
 Resources (i.e. data services) may be referred to using a more familiar
 \fIShortName\fP designation, or an IVO identifier, either of which will be
-resolved to a specific \fIServiceURL\fR internally using the Directory.
+resolved to a specific \fIServiceURL\fR internally using the Registry.
 .TP 4
 .B \-
 Object names may be used to specify the location of a data query, the 
@@ -413,7 +429,7 @@ to allow the task to be used in multiple ways.
 
 .PP
 The task should quickly become familiar to users and is meant operate in
-concert with the \fBvodirectory\fP and \fBvosesame\fP tasks to allow novice
+concert with the \fBvoregistry\fP and \fBvosesame\fP tasks to allow novice
 users to begin to explore for data resources to be used in the final query.
 Some of the flexibility of the task is shown in the Examples section below.
 Major concepts of the task are detailed below as well.
@@ -427,7 +443,7 @@ The meaning of the various command-line arguments is detailed below:
 .B \fI<resource>\fP
 The \fIShortName\fP or \fIIdentifier\fP of a data resource to be queried, a
 comma-delimited list of either, or the name of a file containing either.
-These names will be resolved to a data service URL using the Directory.  The
+These names will be resolved to a data service URL using the Registry.  The
 \fI-s\fP option may be used to specify a non-registered \fIServiceURL\fP that
 the task may use, however the \fI-t\fP option is then also required to
 specify the type of service.
@@ -520,7 +536,7 @@ processing scenarios, with similar root names for multiple files associated
 with a specific query.
 
 Output tables may be created in a number of formats and will likewise have
-extensions indicating the table type.  The \fI-e\fP/\fI--extract\fP option
+extensions indicating the table type.  The \fI--extract\fP option
 may create additional files for each query, and the \fI-g\fP/\fI--get\fP 
 option to access data will similarly create additional files.  The structure 
 of an output filename is:
@@ -547,13 +563,13 @@ object name or the index in a list of positions of no object was specified.
 
 .SS Verbosity
 .PP
-The \fI-v\fP and \fI-vv\fP options serve a dual purpose: within the task they
-set the level of output verbosity in terms of what is reported during
+The \fI-v\fP and \fI--vverbose\fP options serve a dual purpose: within the 
+task they set the level of output verbosity in terms of what is reported during
 processing  (Similarly, the \fI-q\fP option can be used to turn off output
 reporting entirely).  These flags will however also increase the value of the
 \fBVERBOSE\fP parameter sent to services during a data query.  The default
 value is at least 1, with the highest level being 3.  Using the \fI-v\fP flag
-sets \fBVERBOSE=2\fP and \fI-vv\fP sets \fBVERBOSE=3\fP.
+sets \fBVERBOSE=2\fP and \fI--vverbose\fP sets \fBVERBOSE=3\fP.
 .PP
 The VERBOSE level can be important in accessing result columns that may only
 be returned at the highest level.  When using the \fI-m\fR
@@ -572,7 +588,7 @@ following arguments:
     image  		Simple Image Access services
     spectra		Simple Spectral Access services
     table   		Vizier services
-    <literal>		ResourceType from Directory record
+    <literal>		ResourceType from Registry record
 
 .fi
 .PP
@@ -647,7 +663,7 @@ window before running the task so you can monitor the output for error
 messages.
 
 .SH RESOURCE CACHING
-Directory resolution is a common activity of VO-CLI tasks and so results
+Registry resolution is a common activity of VO-CLI tasks and so results
 will be cached in the $HOME/.voclient/cache/regResolver directory based on
 the search term, service type and bandpass parameters.  Defining the
 \fIVOC_NO_CACHE\fP environment variable will cause the task to ignore the
@@ -684,7 +700,7 @@ IC 10, print a count of the results only:
 
 .fi
 Note that we use the reserved word '\fIany\fP' for the service name and
-constrain by image type.  The task will automatically query the Directory to
+constrain by image type.  The task will automatically query the Registry to
 create the list of services to be queried.
 
 .TP 4
@@ -697,7 +713,7 @@ Print a count of X-ray catalog data around Abell2712:
 
 .fi
 In this case we constrain both the service type as well as the spectral
-coverage published for the resource in the Directory.  We use the reserved
+coverage published for the resource in the Registry.  We use the reserved
 '\fIany\fP' service name to query multiple services and use the '\fI-c\fP'
 flag to print a count without saving results.  The object name is resolved
 to coordinates internally. (Note: this example may take a while to run).
@@ -712,15 +728,15 @@ Print the column metadata returned by the RC3 catalog service:
 
 .fi
 The output will print the result using the default VERBOSE level, adding
-the \fI-v\fP will set the query parameter VERBOSE=2, adding \fI-vv\fP will
-set VERBOSE=3 (to print all available columns).  When accessing data the
+the \fI-v\fP will set the query parameter VERBOSE=2, adding \fI--verbose\fP
+will set VERBOSE=3 (to print all available columns).  When accessing data the
 same \fI-v\fP flags will be required to retrieve columns at that
 \fIVERBOSE\fP level.
 
 
 .TP 4
 5)
-Use the Directory to query for resources using the search terms
+Use the Registry to query for resources using the search terms
 "cooling flow".  Upon examining the output the user notices a 
 Vizier paper titled "\fICooling Flows in 207 clusters of Galaxies\fP" 
 that looks interesting.  Use the \fBvodata\fP task to download all 
@@ -728,9 +744,9 @@ tables associated with this paper, save tables in the default
 CSV format:
 .nf
 
-	% vodirectory cooling flow
-	% vodata -O white97 -all J/MNRAS/292/419/
-	% vodata --output=white97 --all J/MNRAS/292/419/
+	% voregistry cooling flow
+	% vodata -O white97 -all J/MNRAS/292/419
+	% vodata --output=white97 --all J/MNRAS/292/419
 
 .fi
 All 7 tables will be written to the current directory to files 
@@ -745,7 +761,7 @@ XMM images available for 3c273, and if there aren't too many,
 download the images and save the extracted access URLs:
 .nf
 
-	% vodirectory -rv -t image xmm
+	% voregistry -rv -t image xmm
 	ShortName       ResourceType    Title
 	------------------------------------------------------....
 	XMM-Newton      SIAP/ARCHIVE    XMM-Newton Archive ....
@@ -802,18 +818,18 @@ Use \fBvodata\fP as a test client for a locally-installed SIAP service:
 
 .fi
 In this case we force the ServiceURL using the '\fI-s\fP' flag, but since we
-can't do a Directory query to discover what type of service this is, we must
+can't do a Registry query to discover what type of service this is, we must
 use the '\fI-t\fP' flag to indicate it is an image service.
 
 
 .TP 4
 9)
 Create a local table containing the Abell catalog.  Begin with a
-Directory query to find likely services using the \fBvodirectory\fP task, print
+Registry query to find likely services using the \fBvoregistry\fP task, print
 a verbose description of each resource and page the results with \fIless\fP:
 .nf
 
-	% vodirectory -v -v --type=catalog abell | less
+	% voregistry -v -v --type=catalog abell | less
 
 .fi
 The verbose results indicate a number of services with differing
@@ -841,7 +857,7 @@ and query for Chandra observations at each position:
 Here we used the unix '\fIcut\fP' utility to remove the first column and
 pipe the resulting positions to the task, using the '\fI-p -\fP' option to
 indicate positions should be read from stding, and the IVO identifier of
-the Chandra observation master log we also discovered from the Directory.
+the Chandra observation master log we also discovered from the Registry.
 
 
 .TP 4
@@ -983,4 +999,4 @@ June 2007 - This task is new.
 .SH Author
 Michael Fitzpatrick (fitz@noao.edu), June 2007
 .SH "SEE ALSO"
-voclient(1), voclientd(1), vosesame(1), vodirectory(1)
+voclient, voclientd, vosesame, voregistry

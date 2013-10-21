@@ -3,7 +3,7 @@
 
 #include "ratdef.h"
 
-CLOSE(fd)
+void CLOSE(fd)
 FINT	*fd;
 {
 	fclose(_fdtofile[*fd]);

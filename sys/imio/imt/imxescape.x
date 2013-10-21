@@ -48,18 +48,20 @@ begin
 		    output ('%')
 		    output ('%')
 		    output (CH_DELIM)
-		    #init_esc = true
+		    init_esc = true
 		}
 		escape (ch)
 		level = level + 1
 	    } else if (ch == ']') {
 		output (ch)
-		if (peek != '[')
+		if (peek != '[')		# closing delim
 		    output ('%')
 		level = level - 1
 	    } else if (ch == ',') {
                 if (level > 0)
 		    output('\\')
+                if (level == 0)
+		    init_esc = false
 		output (ch)
 	    } else if (ch == '*')
 		escape (ch)

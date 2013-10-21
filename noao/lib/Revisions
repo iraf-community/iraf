@@ -1,5 +1,9 @@
 .help revisions May93 noao.lib
 .nf
+
+noaolib$obsdb.dat
+    Added entries for 'saoras' and 'terskol' observatories (4/11/13)
+
 noaolib$ccdtime/kpno.dat
     Added data for MOSAIC1_1 provided by Jannuzi.  (9/28/11, Valdes)
 

@@ -1,17 +1,25 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGDEL -- Delete an external package from the dynamic directory.
-#
-#
 
 
-set  bindir	= "`dirname $0`"	# get iraf root
-set  irafdir	= $bindir:h
+bindir="`dirname $0`"	# get iraf root
+irafdir=${bindir%/*}
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
 
 
-
-if (-e $1) then
-    /bin/rm -rf $1		>& /dev/null
-endif
+if [ -e $1 ]; then
+    /bin/rm -rf $1	>> /dev/null 2>&1
+fi
 
 exit 0

@@ -62,7 +62,7 @@ SPP_TASKS   = votget_spp votinfo_spp
 F77_TASKS   = votpos_f77 votdump_f77
 C_TASKS	    = votcompress votcopy votdump votget votinfo votconcat votpos
 	      
-TARGETS	    = $(SPP_TASKS) $(C_TASKS) # $(F77_TASKS)
+TARGETS	    = $(C_TASKS) # $(F77_TASKS) $(SPP_TASKS)
 
 
 # Targets

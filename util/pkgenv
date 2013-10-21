@@ -1,15 +1,16 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGENV -- Initialize the package environment
 
 
 /bin/rm -f .installed .zzsetenv.def
 
-foreach p ( `cat .repo_pkgs` )
+files=`cat .repo_pkgs`
+for p in ${files[@]} ; do
 
-    if (-e $p/.installed) then
-	cat $p/.installed 		>> .installed
-	echo "reset  $p	= $cwd/$p/"	>> .zzsetenv.def
-    endif
-end
-echo "keep"				>> .zzsetenv.def
+    if [ -e $p/.installed ]; then
+	cat $p/.installed 			>> .installed
+	/bin/echo "re$p	="`pwd`"/$p/"		>> .zzsetenv.def
+    fi
+done
+/bin/echo "keep"				>> .zzsetenv.def

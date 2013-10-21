@@ -43,7 +43,8 @@ updatex::
 latest::
 	@echo "Updating IRAF $(RELEASE) to latest release."
 	@echo "" ; date ; echo ""
-	(util/iraf_update -all)
+	(util/self_update)
+	(util/iraf_update -all 2>&1 | egrep -v "unexpected end of file")
 	@echo "" ; date ; echo ""
 
 # Check if system is the latest distributed version

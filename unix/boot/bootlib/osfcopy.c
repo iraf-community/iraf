@@ -21,6 +21,8 @@ os_fcopy (
 	XCHAR	buf[SZ_FBUF];
 	XINT	status,	junk, maxch = SZ_FBUF, mode = 0, in, out, n, nw;
 
+	extern  int ZOPNTX(), ZGETTX(), ZCLSTX(), ZPUTTX();
+
 
 	if (os_access (oldfile,0,0) == NO)
 	    return (ERR);

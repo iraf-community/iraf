@@ -33,7 +33,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 # START OF MACHDEP DEFINITIONS.
 ##############################################################################
 
-set VERSION		= "V2.16"
+set VERSION		= "V2.16.1"
 set hmach 		= "INDEF"
 set nbits 		= 32
 set pipes 		= 1
@@ -133,11 +133,11 @@ switch ($MNAME)
         if ($?IRAFARCH) then
             set mach 		= "$IRAFARCH"
             set hmach 		= "$IRAFARCH"
-	    if ($mach == "macintel") then
+	    if ("$mach" == "macintel") then
 		set nbits	= 64
 	    endif
 	else 
-            if ($MNAME_M == "x86_64") then		# 64-bit
+            if ("$MNAME_M" == "x86_64") then		# 64-bit
                 set mach 	= "macintel"
                 set hmach 	= "macintel"
 		set nbits	= 64
@@ -162,11 +162,11 @@ switch ($MNAME)
         if ($?IRAFARCH) then
             set mach 		= "$IRAFARCH"
             set hmach 		= "$IRAFARCH"
-	    if ($mach == "linux64") then
+	    if ("$mach" == "linux64") then
 		set nbits	= 64
 	    endif
 	else 
-            if ($MNAME_M == "x86_64") then		# Linux x86_64
+            if ("$MNAME_M" == "x86_64") then		# Linux x86_64
                 set mach 	= "linux64"
                 set hmach 	= "linux64"
 	        set nbits	= 64
@@ -223,7 +223,7 @@ switch ($MNAME)
             breaksw
 
 	else
-	    echo  "Unable to determine platform architecture for ($MNAME)."
+	    echo  "Unable to configure platform IRAFARCH='$MNAME'."
 	    exit 1
 	endif
 endsw
@@ -250,7 +250,7 @@ else
     else if ("$1" == "-pipes") then
 	echo $pipes
     else if ("$1" == "-tapecap") then
-	echo $tapecap
+	echo $tapecaps
     else if ("$1" == "-tapes") then
 	echo $tapes
     else if ("$1" == "-shlib") then
@@ -266,3 +266,5 @@ else
 	echo "Invalid option '"$1"'"
     endif
 endif
+
+exit 0

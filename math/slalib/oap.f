@@ -1,12 +1,12 @@
-      SUBROUTINE slOAP (TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
-     :                    HM, XP, YP, TDK, PMB, RH, WL, TLR,
-     :                    RAP, DAP)
+      SUBROUTINE slOAP ( TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
+     :                     HM, XP, YP, TDK, PMB, RH, WL, TLR,
+     :                     RAP, DAP )
 *+
 *     - - - -
 *      O A P
 *     - - - -
 *
-*  Observed to apparent place
+*  Observed to apparent place.
 *
 *  Given:
 *     TYPE   c*(*)  type of coordinates - 'R', 'H' or 'A' (see below)
@@ -19,11 +19,11 @@
 *     HM     d      observer's height above sea level (metres)
 *     XP     d      polar motion x-coordinate (radians)
 *     YP     d      polar motion y-coordinate (radians)
-*     TDK    d      local ambient temperature (DegK; std=273.155D0)
-*     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+*     TDK    d      local ambient temperature (K; std=273.15D0)
+*     PMB    d      local atmospheric pressure (mb; std=1013.25D0)
 *     RH     d      local relative humidity (in the range 0D0-1D0)
 *     WL     d      effective wavelength (micron, e.g. 0.55D0)
-*     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+*     TLR    d      tropospheric lapse rate (K/metre, e.g. 0.0065D0)
 *
 *  Returned:
 *     RAP    d      geocentric apparent right ascension
@@ -32,11 +32,11 @@
 *  Notes:
 *
 *  1)  Only the first character of the TYPE argument is significant.
-*      'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
-*      Ascension and Declination;  'H' or 'h' indicates that they are
-*      Hour Angle (West +ve) and Declination;  anything else ('A' or
-*      'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
-*      (North zero, East is 90 deg) and zenith distance.  (Zenith
+*      'R' or 'r' indicates that OBS1 and OBS2 are the observed right
+*      ascension and declination;  'H' or 'h' indicates that they are
+*      hour angle (west +ve) and declination;  anything else ('A' or
+*      'a' is recommended) indicates that OBS1 and OBS2 are azimuth
+*      (north zero, east 90 deg) and zenith distance.  (Zenith
 *      distance is used rather than elevation in order to reflect the
 *      fact that no allowance is made for depression of the horizon.)
 *
@@ -90,21 +90,24 @@
 *      properties which would need to be accounted for at the
 *      appropriate point in the sequence.
 *
-*  7)  The star-independent apparent-to-observed-place parameters
-*      in AOPRMS may be computed by means of the slAOPA routine.
-*      If nothing has changed significantly except the time, the
-*      slAOPT routine may be used to perform the requisite
-*      partial recomputation of AOPRMS.
+*  7)  This routine takes time to execute, due mainly to the rigorous
+*      integration used to evaluate the refraction.  For processing
+*      multiple stars for one location and time, call slAOPA once
+*      followed by one call per star to slOAPQ.  Where a range of
+*      times within a limited period of a few hours is involved, and the
+*      highest precision is not required, call slAOPA once, followed
+*      by a call to slAOPT each time the time changes, followed by
+*      one call per star to slOAPQ.
 *
-*  8)  The DATE argument is UTC expressed as an MJD.  This is,
-*      strictly speaking, wrong, because of leap seconds.  However,
-*      as long as the delta UT and the UTC are consistent there
-*      are no difficulties, except during a leap second.  In this
-*      case, the start of the 61st second of the final minute should
-*      begin a new MJD day and the old pre-leap delta UT should
-*      continue to be used.  As the 61st second completes, the MJD
-*      should revert to the start of the day as, simultaneously,
-*      the delta UTC changes by one second to its post-leap new value.
+*  8)  The DATE argument is UTC expressed as an MJD.  This is, strictly
+*      speaking, wrong, because of leap seconds.  However, as long as
+*      the delta UT and the UTC are consistent there are no
+*      difficulties, except during a leap second.  In this case, the
+*      start of the 61st second of the final minute should begin a new
+*      MJD day and the old pre-leap delta UT should continue to be used.
+*      As the 61st second completes, the MJD should revert to the start
+*      of the day as, simultaneously, the delta UTC changes by one
+*      second to its post-leap new value.
 *
 *  9)  The delta UT (UT1-UTC) is tabulated in IERS circulars and
 *      elsewhere.  It increases by exactly one second at the end of
@@ -133,27 +136,44 @@
 *
 *             HM ~ -29.3D0*TSL*LOG(P/1013.25D0).
 *
-*      where TSL is the approximate sea-level air temperature in
-*      deg K (see Astrophysical Quantities, C.W.Allen, 3rd edition,
-*      section 52.)  Similarly, if the pressure P is not known,
+*      where TSL is the approximate sea-level air temperature in K
+*      (see Astrophysical Quantities, C.W.Allen, 3rd edition,
+*      section 52).  Similarly, if the pressure P is not known,
 *      it can be estimated from the height of the observing
-*      station, HM as follows:
+*      station, HM, as follows:
 *
 *             P ~ 1013.25D0*EXP(-HM/(29.3D0*TSL)).
 *
-*      Note, however, that the refraction is proportional to the
-*      pressure and that an accurate P value is important for
-*      precise work.
+*      Note, however, that the refraction is nearly proportional to the
+*      pressure and that an accurate P value is important for precise
+*      work.
 *
-*  13) The azimuths etc used by the present routine are with respect
+*  13) The azimuths etc. used by the present routine are with respect
 *      to the celestial pole.  Corrections from the terrestrial pole
 *      can be computed using slPLMO.
 *
 *  Called:  slAOPA, slOAPQ
 *
-*  P.T.Wallace   Starlink   9 June 1998
+*  Last revision:   2 December 2005
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

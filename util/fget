@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  FGET -- Download a URL.
 #
@@ -17,14 +17,7 @@
 # ----------------------------------------------------------------------------
 
 
-unset	noclobber
-onintr	cleanup_
-unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch sort which
-unalias ftp wget
-
-setenv	path  "(../util /sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $path /usr/local/bin /opt/local/bin /local/bin /home/local/bin)"
-
-# set echo
+export PATH=../util:/sbin:/usr/sbin:/bin:/usr/bin:$PATH:/usr/local/bin:/opt/local/bin:/local/bin
 
 
 ##############################################################################
@@ -35,28 +28,32 @@ setenv	path  "(../util /sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /us
 
 
 # Find the iraf root directory.
-if (! $?iraf) then
-  set iraf = ""
-  foreach f ( ~/.iraf.h ~/.iraf/iraf.h /usr/include/iraf.h)
+if [ -n "$iraf" ]; then
+  iraf=""
+  files=("~/.iraf.h" "~/.iraf/iraf.h" "/usr/include/iraf.h")
+  for f in ${files[@]}; do
      # $iraf is defined, use a well-known path for the system
-     if (-e ${f}) then
-       set i = `egrep IRAF ${f} | egrep \#define | sed -e 's/"//g'`
-       set iraf = $i[3]
-echo $i
+     if [ -e $f ]; then
+       i=`egrep IRAF $f | egrep \#define | sed -e 's/"//g'  | awk '{print $3}'`
+       iraf=${i}
        break
-     endif
-  end
-endif
-if ("$iraf" == "") then
-    if (-e /iraf/iraf) then
-	set iraf = /iraf/iraf/
-    else
-	set iraf = `dirname $0`/../
-    endif
-endif
+     fi
+  done
+fi
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
 
 # Determine platform architecture.
-set arch = `$iraf/unix/hlib/irafarch.csh`
+arch=`$iraf/unix/hlib/irafarch.sh`
 
 
 ##############################################################################
@@ -67,103 +64,104 @@ set arch = `$iraf/unix/hlib/irafarch.csh`
 # Declarations and initializations.
 #=============================================================================
 
-set exec	= yes
-set verb	= no
-set url		= ""
-set fname	= ""
-set ddir	= ""
+exec=yes
+verb=no
+url=""
+fname=""
+ddir=""
 
 
 # Process cmdline flags.
-while ("$1" != "")
-    switch ("$1")
-    case -n:                            # no execute
-        set exec  = no
-        breaksw
-    case -q:                            # be quiet
-        set verb  = no
-        set quiet = yes
-        breaksw
-    case -v:                            # be chatty
-        set verb  = yes
-        set quiet = no
-        breaksw
-    case -h:                            # print help summary
-        goto Usage
-    case -d:                            # set download directory
-        set ddir = $2
+while [ -n "$1" ] ; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+        ;;
+    "-q")                            # be quiet
+        verb=no
+        quiet=yes
+        ;;
+    "-v")                            # be chatty
+        verb=yes
+        quiet=no
+        ;;
+    "-h")                            # print help summary
+        _Usage
+	;;
+    "-d")                            # set download directory
+        ddir=$2
 	shift
-        breaksw
-    case -o:                            # set output file name
-        set fname = $2
+        ;;
+    "-o")                            # set output file name
+        fname=$2
 	shift
-        breaksw
-    default:
-        set url = $1
-        break
-    endsw
+        ;;
+    *)
+        url=$1
+        ;;
+    esac
 
-    if ("$2" == "") then
+    if [ "$2" == "" ]; then
         break
     else
         shift
-    endif
-end
+    fi
+done
 
 
 #  Error checks.
-if ("$url" == "") then
-   if ("$verb" == "yes") then
-      echo "ERROR: URL not specified"
-   endif
+if [ -z "$url" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "ERROR: URL not specified"
+   fi
    exit 1
-endif
+fi
 
 # Get the download filename.  Delete an existing copy of the file
-if ($fname == "") then
-    set fname = $url:t
-endif
-if (-e "$fname") then
+if [ -z $fname ]; then
+    fname=${url##*/}
+fi
+if [ -e "$fname" ]; then
     /bin/rm -f $fname
-endif
+fi
 
 # Ensure URL is an HTTP protocol.
-set prot =  `echo $url | cut -c1-3`
-if ("$prot" == "ftp") then
-  set u = `echo $url | sed -e 's;ftp://iraf.noao.edu/iraf;http://iraf.noao.edu/ftp;'`
-  set url = $u
-endif
+prot=`echo $url | cut -c1-3`
+if [ "$prot" == "ftp" ]; then
+  u=`echo $url | sed -e 's;ftp://iraf.noao.edu/iraf;http://iraf.noao.edu/ftp;'`
+  url=$u
+fi
 
 #  Do it.
-if ("$exec" == "yes") then
-   if ("$verb" == "yes") then
-      echo "Downloading "$url" ...."
-   endif
+if [ "$exec" == "yes" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Downloading "$url" ...."
+   fi
 
-   set args = "url='$url' fname='${ddir}${fname}' cache='/tmp' verbose=no extn='' use_cache=no"
-   if ("$verb" == "no") then
-      $iraf/bin.$arch/x_system.e urlget ${args} \$nargs=2	>& /dev/null
+   args="url='$url' fname='${ddir}${fname}' cache='/tmp' verbose=no extn='' use_cache=no"
+   if [ "$verb" == "no" ]; then
+      $iraf/bin.$arch/x_system.e urlget ${args} \$nargs=2  >> /dev/null 2>&1
    else
       $iraf/bin.$arch/x_system.e urlget ${args} \$nargs=2
-   endif
+   fi
 
-   if ("$verb" == "yes") then
-      echo "done"
-   endif
-endif
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "done"
+   fi
+fi
 
 
 #  Verify we have the file.
-if (! -e $url:t) then
-   if ("$verb" == "yes") then
-      echo "Error downloading file '"$fname"'"
-   endif
+if [ ! -e ${url##*/} ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Error downloading file '"$fname"'"
+   fi
    exit 1
 else
-   if ($#argv > 1) then
-      mv $url:t $2
-   endif
-endif
+   if (( $#>1 )); then
+      mv ${url##*/} $2
+   fi
+fi
 
 #  Normal exit.
 exit 0
@@ -174,12 +172,13 @@ exit 0
 # Usage
 #=============================================================================
 
-Usage:
-    echo "Usage: fget [-h] [-n] [-q | -v] url"
-    echo ""
-    echo "    where -n          # no execute"
-    echo "          -q          # suppress output"
-    echo "          -v          # verbose output"
-    echo "          -h          # this message"
+_Usage() {
+    /bin/echo "Usage: fget [-h] [-n] [-q | -v] url"
+    /bin/echo ""
+    /bin/echo "    where -n          # no execute"
+    /bin/echo "          -q          # suppress output"
+    /bin/echo "          -v          # verbose output"
+    /bin/echo "          -h          # this message"
 
-exit 0
+    exit 0
+}

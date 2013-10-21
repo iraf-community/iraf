@@ -1,10 +1,14 @@
-/***************************************************************************
- *
- *  SPP Language binding for the VOClient interface.
+/**
+ *  VOCUTIL_SPP.C -- Utility routines for the SPP proceduers.
  *
  *  Michael Fitzpatrick, NOAO, Jul 2006
  *
- **************************************************************************/
+ *  @file       vocUtil_spp.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
+ *
+ *************************************************************************
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,27 +20,29 @@
 #include "VOClient.h"
 
 
-/*  SPP Name mapping macros.  SPP procedure names are mappad as the first-5
-**  plus the last character of a name minus any underscores.  This should
-**  be done such that a unique 6-character name is produced for each SPP
-**  symbol.  In these definitions the SPP code may use the long form of the
-**  name in the code, the mapping is done automatically and so we need the
-**  macros here so the symbol entered in the library is actually the short
-**  name.
-*/
+/**
+ *  SPP Name mapping macros.  SPP procedure names are mappad as the first-5
+ *  plus the last character of a name minus any underscores.  This should
+ *  be done such that a unique 6-character name is produced for each SPP
+ *  symbol.  In these definitions the SPP code may use the long form of the
+ *  name in the code, the mapping is done automatically and so we need the
+ *  macros here so the symbol entered in the library is actually the short
+ *  name.
+ */
 
-
-/* SPP Type definitions.
-*/
+/**
+ *  SPP Type definitions.
+ */
 #define XCHAR		short
 #define PKCHAR		char
 #define XINT		int
 #define XEOS		VOC_NULL
 
 
-/*  Public interface procedures.
-**
-*/
+/**
+ *  Public interface procedures.
+ *
+ */
 PKCHAR *spp2c (XCHAR *instr,  int maxch);
 int     c2spp (PKCHAR *instr, XCHAR *outstr, int maxch);
 int    spplen (XCHAR *str);
@@ -45,7 +51,18 @@ int  out_typecode (char *typestr);
 
 
 
-char *spp2c (XCHAR *instr, int maxch)
+/**
+ *  SPP2C -- Convert an SPP string to a C string.
+ *
+ *  @brief      Convert an SPP string to a C string.
+ *  @fn         cstr = spp2c (XCHAR *sppstr, int maxch)
+ *
+ *  @param  sppstr      input SPP string
+ *  @param  maxch       max length of SPP string
+ *  @returns            converted C string
+ */
+char *
+spp2c (XCHAR *instr, int maxch)
 {
     XCHAR  *ip = instr;
     char   *outstr = (char *) calloc (1, maxch+1);
@@ -60,6 +77,16 @@ char *spp2c (XCHAR *instr, int maxch)
 }
 
 
+/**
+ *  C2SPP2C -- Convert a C string to an SPP string.
+ *
+ *  @brief      Convert a C string to an SPP string.
+ *  @fn         sppstr = c2spp (PKCHAR *instr, int maxch)
+ *
+ *  @param  sppstr      input SPP string
+ *  @param  maxch       max length of SPP string
+ *  @returns            converted C string
+ */
 int c2spp (PKCHAR *instr, XCHAR *outstr, int maxch)
 {
     char   *ip = (char *)instr;
@@ -88,6 +115,15 @@ int c2spp (PKCHAR *instr, XCHAR *outstr, int maxch)
 }
 
 
+/**
+ *  SPPLEN -- Get the length of an SPP string.
+ *
+ *  @brief      Get the length of an SPP string.
+ *  @fn         len = spplen (XCHAR *str)
+ *
+ *  @param  str         input SPP string
+ *  @returns            length of string
+ */
 int spplen (XCHAR *str)
 {
     int len = 0;
@@ -99,7 +135,15 @@ int spplen (XCHAR *str)
 }
 
 
-
+/**
+ *  DAL_TYPECODE -- Convert a DAL service type string to a code.
+ *
+ *  @brief      Convert a DAL service type string to a code
+ *  @fn         code = dal_typecode (char *typestr)
+ *
+ *  @param  typestr     input DAL string
+ *  @returns            type code
+ */
 
 #define SZ_TYPECODE     32
 
@@ -115,11 +159,23 @@ int dal_typecode (char *typestr)
     if (strcmp (type, "dal") == 0)  return (DAL_CONN);
     if (strcmp (type, "cone") == 0) return (CONE_CONN);
     if (strcmp (type, "siap") == 0) return (SIAP_CONN);
+    if (strcmp (type, "ssap") == 0) return (SSAP_CONN);
+    if (strcmp (type, "slap") == 0) return (SLAP_CONN);
+    if (strcmp (type, "stap") == 0) return (STAP_CONN);
 
     return (ERR);
 }
 
 
+/**
+ *  OUT_TYPECODE -- Convert an output type string to a code.
+ *
+ *  @brief      Convert an output type string to a code
+ *  @fn         code = out_typecode (char *typestr)
+ *
+ *  @param  typestr     input type string
+ *  @returns            type code
+ */
 int out_typecode (char *typestr) 
 {
     char type[SZ_TYPECODE];

@@ -7,7 +7,7 @@ setenv CC 	"gcc"
 setenv CXX 	"g++"
 
 set	build_cfitsio	= 1
-set	build_readline	= 1
+set	build_readline	= 1		# not needed in v2.16.1 and beyond
 set	build_voclient	= 1
 
 
@@ -48,7 +48,28 @@ if ($build_readline == 1) then
 
   echo -n "    Building Readline libs ...."
   set	opts = "$gopts --bindir=../../bin --libdir=../../bin"
-  (chdir readline ; mkpkg ; make clean 		 >& _spool)
+  (chdir readline ; mkpkg ; make clean 		>& _spool)
   echo "done"
 
 endif
+
+
+
+####################################################################
+####   VOClient Library
+####################################################################
+if ($build_voclient == 1) then
+
+  echo -n "    Building VOClient libs ...."
+
+  (chdir voclient ; \
+	make all 			>>& _spool ; \
+	cp lib/libVO.a  ../../bin/ 	>>& _spool ; \
+	cp voclient.jar ../../vo/java/ 	>>& _spool ; \
+	cp voclientd    ../../vo/java/ 	>>& _spool ; \
+	make clean 		 	>>& _spool   )
+  echo "done"
+
+endif
+
+

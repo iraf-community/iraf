@@ -26,32 +26,52 @@
 *
 *  Notes:
 *
-*  1)  The distinction between the required TDB and TT is
-*      always negligible.  Moreover, for all but the most
-*      critical applications UTC is adequate.
+*  1)  The distinction between the required TDB and TT is always
+*      negligible.  Moreover, for all but the most critical
+*      applications UTC is adequate.
 *
-*  2)  The accuracy is limited by the routine slEVP, called
-*      by slMAPA, which computes the Earth position and
-*      velocity using the methods of Stumpff.  The maximum
-*      error is about 0.3 milliarcsecond.
+*  2)  Iterative techniques are used for the aberration and light
+*      deflection corrections so that the routines slAMP (or
+*      slAMPQ) and slMAP (or slMAPQ) are accurate inverses;
+*      even at the edge of the Sun's disc the discrepancy is only
+*      about 1 nanoarcsecond.
 *
-*  3)  Iterative techniques are used for the aberration and
-*      light deflection corrections so that the routines
-*      slAMP (or slAMPQ) and slMAP (or slMAPQ) are
-*      accurate inverses;  even at the edge of the Sun's disc
-*      the discrepancy is only about 1 nanoarcsecond.
+*  3)  Where multiple apparent places are to be converted to mean
+*      places, for a fixed date and equinox, it is more efficient to
+*      use the slMAPA routine to compute the required parameters
+*      once, followed by one call to slAMPQ per star.
 *
-*  4)  Where multiple apparent places are to be converted to
-*      mean places, for a fixed date and equinox, it is more
-*      efficient to use the slMAPA routine to compute the
-*      required parameters once, followed by one call to
-*      slAMPQ per star.
+*  4)  The accuracy is sub-milliarcsecond, limited by the
+*      precession-nutation model (IAU 1976 precession, Shirai &
+*      Fukushima 2001 forced nutation and precession corrections).
+*
+*  5)  The accuracy is further limited by the routine slEVP, called
+*      by slMAPA, which computes the Earth position and velocity
+*      using the methods of Stumpff.  The maximum error is about
+*      0.3 mas.
 *
 *  Called:  slMAPA, slAMPQ
 *
-*  P.T.Wallace   Starlink   19 January 1993
+*  P.T.Wallace   Starlink   17 September 2001
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

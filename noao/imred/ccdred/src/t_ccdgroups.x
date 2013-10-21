@@ -46,6 +46,8 @@ begin
 	group = clgwrd ("group", Memc[image], SZ_FNAME, GROUPS)
 	radius = clgetr ("radius")
 	call clgstr ("instrument", Memc[image], SZ_FNAME)
+        if (Memc[image] == EOS)
+            call error (1, "No 'instrument' translation file specified.")
 	call hdmopen (Memc[image])
 	verbose = clgetb ("verbose")
 

@@ -1,5 +1,5 @@
-      SUBROUTINE slRFRO (ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
-     :                      EPS, REF)
+      SUBROUTINE slRFRO ( ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
+     :                       EPS, REF )
 *+
 *     - - - - - -
 *      R F R O
@@ -10,12 +10,12 @@
 *  Given:
 *    ZOBS    d  observed zenith distance of the source (radian)
 *    HM      d  height of the observer above sea level (metre)
-*    TDK     d  ambient temperature at the observer (deg K)
+*    TDK     d  ambient temperature at the observer (K)
 *    PMB     d  pressure at the observer (millibar)
 *    RH      d  relative humidity at the observer (range 0-1)
 *    WL      d  effective wavelength of the source (micrometre)
 *    PHI     d  latitude of the observer (radian, astronomical)
-*    TLR     d  temperature lapse rate in the troposphere (degK/metre)
+*    TLR     d  temperature lapse rate in the troposphere (K/metre)
 *    EPS     d  precision required to terminate iteration (radian)
 *
 *  Returned:
@@ -26,7 +26,8 @@
 *  1  A suggested value for the TLR argument is 0.0065D0.  The
 *     refraction is significantly affected by TLR, and if studies
 *     of the local atmosphere have been carried out a better TLR
-*     value may be available.
+*     value may be available.  The sign of the supplied TLR value
+*     is ignored.
 *
 *  2  A suggested value for the EPS argument is 1D-8.  The result is
 *     usually at least two orders of magnitude more computationally
@@ -61,24 +62,24 @@
 *     .  More accurate expressions for Pwo have been adopted
 *        (again from Gill 1982).
 *
+*     .  The formula for the water vapour pressure, given the
+*        saturation pressure and the relative humidity, is from
+*        Crane (1976), expression 2.5.5.
+*
 *     .  Provision for radio wavelengths has been added using
 *        expressions devised by A.T.Sinclair, RGO (private
-*        communication 1989), based on the Essen & Froome
-*        refractivity formula adopted in Resolution 1 of the
-*        13th International Geodesy Association General Assembly
-*        (Bulletin Geodesique 70 p390, 1963).
+*        communication 1989).  The refractivity model currently
+*        used is from J.M.Rueger, "Refractive Index Formulae for
+*        Electronic Distance Measurement with Radio and Millimetre
+*        Waves", in Unisurv Report S-68 (2002), School of Surveying
+*        and Spatial Information Systems, University of New South
+*        Wales, Sydney, Australia.
+*
+*     .  The optical refractivity for dry air is from Resolution 3 of
+*        the International Association of Geodesy adopted at the XXIIth
+*        General Assembly in Birmingham, UK, 1999.
 *
 *     .  Various small changes have been made to gain speed.
-*
-*     None of the changes significantly affects the optical/IR results
-*     with respect to the algorithm given in the 1992 Explanatory
-*     Supplement.  For example, at 70 deg zenith distance the present
-*     routine agrees with the ES algorithm to better than 0.05 arcsec
-*     for any reasonable combination of parameters.  However, the
-*     improved water-vapour expressions do make a significant difference
-*     in the radio band, at 70 deg zenith distance reaching almost
-*     4 arcsec for a hot, humid, low-altitude site during a period of
-*     low pressure.
 *
 *  5  The radio refraction is chosen by specifying WL > 100 micrometres.
 *     Because the algorithm takes no account of the ionosphere, the
@@ -109,11 +110,36 @@
 *     mass of dry air divided by that for saturated air at the same
 *     temperature and pressure (see Gill 1982).
 *
+*  10 The algorithm is designed for observers in the troposphere.  The
+*     supplied temperature, pressure and lapse rate are assumed to be
+*     for a point in the troposphere and are used to define a model
+*     atmosphere with the tropopause at 11km altitude and a constant
+*     temperature above that.  However, in practice, the refraction
+*     values returned for stratospheric observers, at altitudes up to
+*     25km, are quite usable.
+*
 *  Called:  slDA1P, slATMT, slATMS
 *
-*  P.T.Wallace   Starlink   3 June 1997
+*  Last revision:   5 December 2005
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -125,6 +151,7 @@
 *  Fixed parameters
 *
       DOUBLE PRECISION D93,GCR,DMD,DMW,S,DELTA,HT,HS
+      INTEGER ISMAX
 *  93 degrees in radians
       PARAMETER (D93=1.623156204D0)
 *  Universal gas constant
@@ -141,6 +168,8 @@
       PARAMETER (HT=11000D0)
 *  Upper limit for refractive effects (metre)
       PARAMETER (HS=80000D0)
+*  Numerical integration: maximum number of strips.
+      PARAMETER (ISMAX=16384)
 
       INTEGER IS,K,N,I,J
       LOGICAL OPTIC,LOOP
@@ -156,7 +185,7 @@
 
 *  The refraction integrand
       DOUBLE PRECISION REFI
-      REFI(R,DN,RDNDR) = RDNDR/(DN+RDNDR)
+      REFI(DN,RDNDR) = RDNDR/(DN+RDNDR)
 
 
 
@@ -165,7 +194,7 @@
       ZOBS2 = MIN(ABS(ZOBS1),D93)
 
 *  Keep other arguments within safe bounds.
-      HMOK = MIN(MAX(HM,-1D3),10D3)
+      HMOK = MIN(MAX(HM,-1D3),HS)
       TDKOK = MIN(MAX(TDK,100D0),500D0)
       PMBOK = MIN(MAX(PMB,0D0),10000D0)
       RHOK = MIN(MAX(RH,0D0),1D0)
@@ -182,10 +211,10 @@
       WLSQ = WLOK*WLOK
       GB = 9.784D0*(1D0-0.0026D0*COS(PHI+PHI)-0.00000028D0*HMOK)
       IF (OPTIC) THEN
-         A = (287.604D0+(1.6288D0+0.0136D0/WLSQ)/WLSQ)
+         A = (287.6155D0+(1.62887D0+0.01360D0/WLSQ)/WLSQ)
      :                                              *273.15D-6/1013.25D0
       ELSE
-         A = 77.624D-6
+         A = 77.6890D-6
       END IF
       GAMAL = (GB*DMD)/GCR
       GAMMA = GAMAL/ALPHA
@@ -204,7 +233,7 @@
       IF (OPTIC) THEN
          C2 = (A*W+11.2684D-6*PWO)/TDKOK
       ELSE
-         C2 = (A*W+12.92D-6*PWO)/TDKOK
+         C2 = (A*W+6.3938D-6*PWO)/TDKOK
       END IF
       C3 = (GAMMA-1D0)*ALPHA*C1/TDKOK
       C4 = (DELTA-1D0)*ALPHA*C2/TDKOK
@@ -212,7 +241,7 @@
          C5 = 0D0
          C6 = 0D0
       ELSE
-         C5 = 371897D-6*PWO/TDKOK
+         C5 = 375463D-6*PWO/TDKOK
          C6 = C5*DELM2*ALPHA/(TDKOK*TDKOK)
       END IF
 
@@ -221,44 +250,42 @@
       CALL slATMT(R0,TDKOK,ALPHA,GAMM2,DELM2,C1,C2,C3,C4,C5,C6,
      :                                              R0,TEMPO,DN0,RDNDR0)
       SK0 = DN0*R0*SIN(ZOBS2)
-      F0 = REFI(R0,DN0,RDNDR0)
+      F0 = REFI(DN0,RDNDR0)
 
 *  Conditions in the troposphere at the tropopause.
-      RT = S+HT
+      RT = S+MAX(HT,HMOK)
       CALL slATMT(R0,TDKOK,ALPHA,GAMM2,DELM2,C1,C2,C3,C4,C5,C6,
      :                                                 RT,TT,DNT,RDNDRT)
       SINE = SK0/(RT*DNT)
       ZT = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
-      FT = REFI(RT,DNT,RDNDRT)
+      FT = REFI(DNT,RDNDRT)
 
 *  Conditions in the stratosphere at the tropopause.
       CALL slATMS(RT,TT,DNT,GAMAL,RT,DNTS,RDNDRP)
       SINE = SK0/(RT*DNTS)
       ZTS = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
-      FTS = REFI(RT,DNTS,RDNDRP)
+      FTS = REFI(DNTS,RDNDRP)
 
 *  Conditions at the stratosphere limit.
       RS = S+HS
       CALL slATMS(RT,TT,DNT,GAMAL,RS,DNS,RDNDRS)
       SINE = SK0/(RS*DNS)
       ZS = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
-      FS = REFI(RS,DNS,RDNDRS)
+      FS = REFI(DNS,RDNDRS)
 
-*
+*  Variable initialization to avoid compiler warning.
+      REFT = 0D0
+
 *  Integrate the refraction integral in two parts;  first in the
 *  troposphere (K=1), then in the stratosphere (K=2).
-*
 
-*  Initialize previous refraction to ensure at least two iterations.
-      REFOLD = 1D6
-
-*  Start off with 8 strips for the troposphere integration, and then
-*  use the final troposphere value for the stratosphere integration,
-*  which tends to need more strips.
-      IS = 8
-
-*  Troposphere then stratosphere.
       DO K = 1,2
+
+*     Initialize previous refraction to ensure at least two iterations.
+         REFOLD = 1D0
+
+*     Start off with 8 strips.
+         IS = 8
 
 *     Start Z, Z range, and start and end values.
          IF (K.EQ.1) THEN
@@ -327,7 +354,7 @@
                ELSE
                   CALL slATMS(RT,TT,DNT,GAMAL,R,DN,RDNDR)
                END IF
-               F = REFI(R,DN,RDNDR)
+               F = REFI(DN,RDNDR)
 
 *           Accumulate odd and (first time only) even values.
                IF (N.EQ.1.AND.MOD(I,2).EQ.0) THEN
@@ -340,8 +367,8 @@
 *        Evaluate the integrand using Simpson's Rule.
             REFP = H*(FB+4D0*FO+2D0*FE+FF)/3D0
 
-*        Has the required precision been achieved?
-            IF (ABS(REFP-REFOLD).GT.TOL) THEN
+*        Has the required precision been achieved (or can't be)?
+            IF (ABS(REFP-REFOLD).GT.TOL.AND.IS.LT.ISMAX) THEN
 
 *           No: prepare for next iteration.
 

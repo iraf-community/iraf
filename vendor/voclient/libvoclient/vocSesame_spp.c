@@ -1,20 +1,23 @@
-/***************************************************************************
+/**
+ *  VOCSESAME_SPP.C -- SPP Interface to the Sesame name resolver service.
+ *
+ *  @section DESCRIPTION
  *
  *  Sesame Name Resolver SPP Interface:
  *  -----------------------------------
  *
- *          sr = vx_nameResolver (target)
- *      pos_str = vx_resolverPos (sr)
- *         radeg = vx_resolverRA (sr)
- *       decdeg = vx_resolverDEC (sr)
- *    typ_str = vx_resolverOtype (sr)
- *      raerr = vx_resolverRAErr (sr)
- *    decerr = vx_resolverDECErr (sr)
+ *          sr = vx_nameResolver  (target)
+ *      pos_str = vx_resolverPos  (sr)
+ *         radeg = vx_resolverRA  (sr)
+ *       decdeg = vx_resolverDEC  (sr)
+ *    typ_str = vx_resolverOtype  (sr)
+ *      raerr = vx_resolverRAErr  (sr)
+ *    decerr = vx_resolverDECErr  (sr)
  * 
- *
- *  Michael Fitzpatrick, NOAO, June 2006
- *
- **************************************************************************/
+ *  @file       vocSesame_spp.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,12 +81,17 @@ extern int    spplen (XCHAR *str);
 
 
 
-
-/******************************************************************************
-**  NAMERESOLVER -- Query the CDS Sesame service to resolve the target name
-**  to coordinates.  The query is done when creating the Sesame object, 
-**  thereafter we simply query the object data.
-*/
+/**
+ *  VX_NAMERESOLVER -- Query the CDS Sesame service to resolve the target
+ *  name to coordinates.  The query is done when creating the Sesame object, 
+ *  thereafter we simply query the object data.
+ *
+ *  @brief      Query the CDS Sesame name resolver service.
+ *  @fn         sr = vx_nameresolver (XCHAR *target)
+ *
+ *  @param  target      name of target to be resolved
+ *  @returns            handle to Sesame object
+ */
 int
 vx_nameresolver (XCHAR *target)
 {
@@ -96,10 +104,18 @@ vx_nameresolver (XCHAR *target)
 }
 
 
-/******************************************************************************
-**  RESOLVERPOS --  Return a string containing the (ra,dec) position as
-**  sexagesimal strings. 
-*/
+/**
+ *  VX_RESOLVERPOS --  Return a string containing the (ra,dec) position as
+ *  sexagesimal strings. 
+ *
+ *  @brief      Return a string containing the (ra,dec) position.
+ *  @fn         len = vx_resolverpos (int *sr, XCHAR *pos, int *maxch)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @param  pos         returned position string
+ *  @param  maxch       max size of position string
+ *  @returns            length of position string
+ */
 int
 vx_resolverpos (int *sr, XCHAR *pos, int *maxch)
 {
@@ -111,9 +127,17 @@ vx_resolverpos (int *sr, XCHAR *pos, int *maxch)
 }
 
 
-/******************************************************************************
-**  RESOLVEROTYPE --  Return a string containing the object type description.
-*/
+/**
+ *  VX_RESOLVEROTYPE --  Return a string containing the object type description.
+ *
+ *  @brief      Return a string containing the object type description.
+ *  @fn         len = vx_resolvertype (int *sr, XCHAR *type, int *maxch)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @param  pos         returned object type
+ *  @param  maxch       max size of type string
+ *  @returns            length of type string
+ */
 int
 vx_resolverotype (int *sr, XCHAR *type, int *maxch)
 {
@@ -125,9 +149,15 @@ vx_resolverotype (int *sr, XCHAR *type, int *maxch)
 }
 
 
-/******************************************************************************
-**  RESOLVERRA --  Return the RA as a double precision value.
-*/
+/**
+ *  VX_RESOLVERRA --  Return the RA as a double precision value.
+ *
+ *  @brief      Return the RA as a double precision value.
+ *  @fn         ra = vx_resolverra (int *sr)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @returns            RA of object position (decimal degrees)
+ */
 double      
 vx_resolverra (int *sr)
 {
@@ -135,9 +165,15 @@ vx_resolverra (int *sr)
 }
 
 
-/******************************************************************************
-**  RESOLVERDEC --  Return the DEC as a double precision value. 
-*/
+/**
+ *  VX_RESOLVERDEC --  Return the DEC as a double precision value. 
+ *
+ *  @brief      Return the DEC as a double precision value. 
+ *  @fn         dec = vx_resolverdec (int *sr)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @returns            Dec of object position (decimal degrees)
+ */
 double      
 vx_resolverdec (int *sr)
 {
@@ -145,9 +181,15 @@ vx_resolverdec (int *sr)
 }
 
 
-/******************************************************************************
-**  ERRRESOLVERRA --  Return the RA as a double precision value.
-*/
+/**
+ *  VX_ERRRESOLVERRA --  Return the RA error as a double precision value.
+ *
+ *  @brief      Return the RA error as a double precision value.
+ *  @fn         err = vx_errresolverra (int *sr)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @returns            RA error of object position (decimal degrees)
+ */
 double      
 vx_errresolverra (int *sr)
 {
@@ -155,9 +197,15 @@ vx_errresolverra (int *sr)
 }
 
 
-/******************************************************************************
-**  ERRRESOLVERDEC --  Return the DEC as a double precision value. 
-*/
+/**
+ *  VX_ERRRESOLVERDEC --  Return the DEC as a double precision value. 
+ *
+ *  @brief      Return the Dec error as a double precision value.
+ *  @fn         err = vx_errresolverdec (int *sr)
+ *
+ *  @param  sr      	handle to Sesame object
+ *  @returns            Dec error of object position (decimal degrees)
+ */
 double      
 vx_errresolverdec (int *sr)
 {

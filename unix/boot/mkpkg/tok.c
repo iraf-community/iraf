@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define	import_spp
 #define	import_error
@@ -10,6 +13,10 @@
 
 #include "mkpkg.h"
 #include "extern.h"
+#include "../bootProto.h"
+
+
+
 
 /*
  * TOK.C -- Preprocessor functions.
@@ -18,10 +25,12 @@
 /* GETTOK -- Get the next token from the make file currently being scanned.
  * Conditional interpretation is provided via the $IFxxx directives.
  */
-gettok (cx, outstr, maxch)
-register struct context *cx;		/* current context	*/
-char	*outstr;			/* receives token	*/
-int	maxch;
+int
+gettok (
+  register struct context *cx,		/* current context	*/
+  char	*outstr,			/* receives token	*/
+  int	maxch 
+)
 {
 	register int	ch;
 	register char	*op;
@@ -162,8 +171,8 @@ again:
  * the command, otherwise an (unescaped) newline terminates the command.
  * The parenthesized form permits additional directives on the same line.
  */
-do_osescape (cx)
-register struct context *cx;
+void
+do_osescape (register struct context *cx)
 {
 	register int	ch;
 	char	cmd[SZ_CMD+1];
@@ -220,9 +229,11 @@ register struct context *cx;
  * when a $ prefixed preprocessor directive has already been recognized in
  * the input.
  */
-do_ppdir (cx, token)
-struct context *cx;		/* current context		*/
-char	*token;			/* directive to be executed	*/
+void
+do_ppdir (
+    struct context *cx,		/* current context		*/
+    char	*token		/* directive to be executed	*/
+)
 {
 	int	islib;
 
@@ -277,7 +288,7 @@ char	*token;			/* directive to be executed	*/
 	    do_xc (cx);
 
 	else if (strncmp (token, "$debug",	6) == 0) {
-	    if (debug = (strcmp (getargs(cx), "off") != 0))
+	    if ((debug = (strcmp (getargs(cx), "off")) != 0))
 		verbose++; }
 	else if (strncmp (token, "$verbose",	8) == 0)
 	    verbose = (strcmp (getargs(cx), "off") != 0);
@@ -290,9 +301,8 @@ char	*token;			/* directive to be executed	*/
 /* DO_IF -- Called when a "$if.." token is seen in the input stream.  Read in
  * the predicate and set the state of the ifcode accordingly.
  */
-do_if (cx, keyword)
-struct	context *cx;
-char	*keyword;
+void
+do_if (struct context *cx, char	*keyword)
 {
 	register int	ch;
 	register char	*op;
@@ -503,8 +513,8 @@ char	*keyword;
  * indicating that this $ELSE is nested inside the false clause of an
  * outer $IF.
  */
-do_else (cx)
-struct	context *cx;
+void
+do_else (struct	context *cx)
 {
 	if (debug > 1) {
 	    printf ("do_else:\n");
@@ -523,8 +533,8 @@ struct	context *cx;
 /* DO_ENDIF -- Called when the token "$endif" is seen in the input stream.
  * Pop the if stack.
  */
-do_endif (cx)
-struct	context *cx;
+void
+do_endif (struct context *cx)
 {
 	if (debug > 1) {
 	    printf ("do_endif:\n");
@@ -539,8 +549,8 @@ struct	context *cx;
 /* DO_END -- Called when the token "$end" is seen in the input stream.
  * Clear the if stack and reenable pass-token.
  */
-do_end (cx)
-struct	context *cx;
+void
+do_end (struct context *cx)
 {
 	if (debug > 1) {
 	    printf ("do_end:\n");
@@ -569,10 +579,12 @@ struct	context *cx;
  * Note that the statements are interpreted (as is everything in mkpkg), hence
  * mkpkg subroutines should not be used for trivial things.
  */
-do_call (cx, program, islib)
-struct	context *cx;		/* current context		*/
-char	*program;		/* module to be called		*/
-int	islib;			/* module list for a library	*/
+void
+do_call (
+  struct context *cx,		/* current context		*/
+  char	*program,		/* module to be called		*/
+  int	 islib 			/* module list for a library	*/
+)
 {
 	struct	context *ncx;
 	char	module[SZ_FNAME+1], subdir[SZ_FNAME+1], fname[SZ_FNAME+1];
@@ -622,9 +634,8 @@ int	islib;			/* module list for a library	*/
 
 /* DO_ECHO -- Print a message on the standard output.
  */
-do_echo (cx, msg)
-struct	context *cx;
-char	*msg;
+void
+do_echo (struct context *cx, char *msg)
 {
 	if (ifstate[iflev] == PASS) {
 	    printf ("%s\n", msg);
@@ -636,9 +647,8 @@ char	*msg;
 /* DO_GOTO -- Advance the file pointer to the named symbol in the current
  * file, without changing the current context.
  */
-do_goto (cx, symbol)
-struct	context *cx;
-char	*symbol;
+int
+do_goto (struct context *cx, char *symbol)
 {
 	register char	*ip;
 	char	match[SZ_FNAME+1];
@@ -687,9 +697,11 @@ char	*symbol;
  * Macros defined in an include are retained after the context of the include
  * is popped.
  */
-do_include (cx, fname)
-struct	context *cx;		/* current context	*/
-char	*fname;			/* include file name	*/
+int
+do_include (
+  struct context *cx,		/* current context	*/
+  char *fname 			/* include file name	*/
+)
 {
 	struct	context *ncx;
 	int	islib;
@@ -715,9 +727,11 @@ char	*fname;			/* include file name	*/
 /* DO_OMAKE -- Generate the object module for the named source module, if
  * the object does not exist or is older than the source module.
  */
-do_omake (cx, fname)
-struct	context *cx;
-char	*fname;
+void
+do_omake (
+  struct context *cx,
+  char	*fname
+)
 {
 	char	cmd[SZ_COMMAND+1];
 	char	xflags[SZ_LINE+1];
@@ -725,6 +739,7 @@ char	*fname;
 	char	*s_xflags, *dfile;
 	long	sourcedate, objdate, date;
 	int	recompile, i;
+
 
 	if (ifstate[iflev] == STOP)
 	    return;
@@ -792,10 +807,11 @@ char	*fname;
 /* DO_XC -- Call XC.  Note that the current default xflags are not
  * automatically included in the generated command.
  */
-do_xc (cx)
-struct	context *cx;
+int
+do_xc (struct context *cx)
 {
 	char	cmd[SZ_CMD+1];
+
 
 	if (debug > 1) {
 	    printf ("do_xc:\n");
@@ -815,7 +831,7 @@ struct	context *cx;
 	getcmd (cx, cmd, cmd, SZ_CMD);
 
 	if (ifstate[iflev] == STOP)
-	    return;
+	    return 0;
 
 	if (verbose) {
 	    printf ("%s\n", cmd);
@@ -834,8 +850,8 @@ struct	context *cx;
 /* DO_LINK -- Call XC to link a list of objects and/or libraries.  This is
  * equivalent to $XC, except that the LFLAGS are used instead of the XFLAGS.
  */
-do_link (cx)
-struct	context *cx;
+int
+do_link (struct context *cx)
 {
 	register struct sfile *sflist, *sfp=NULL;
 	static int skip_sf = 0;
@@ -845,6 +861,7 @@ struct	context *cx;
 	char *cmd = cmdbuf;
 	int lflags_set = 0;
 	char *lflags;
+
 
 	if (debug > 1) {
 	    printf ("do_link:\n");
@@ -861,7 +878,7 @@ struct	context *cx;
 	    for (ip=linkline;  getword(&ip,token,SZ_FNAME);  )
 		if (strcmp (token, "-o") == 0)
 		    if (getword (&ip, token, SZ_FNAME))
-			if (sfp = sf_filesearch (sflist, token))
+			if ((sfp = sf_filesearch (sflist, token)))
 			    break;
 	}
 
@@ -887,7 +904,7 @@ struct	context *cx;
 	strcat (cmd, linkline);
 
 	if (ifstate[iflev] == STOP)
-	    return;
+	    return 0;
 
 	/* Check whether a special $link command or other build command
 	 * should be executed.
@@ -920,8 +937,8 @@ struct	context *cx;
 
 /* DO_GENERIC -- Call the generic preprocessor.
  */
-do_generic (cx)
-struct	context *cx;
+int
+do_generic (struct context *cx)
 {
 	char	cmd[SZ_CMD+1];
 
@@ -933,7 +950,7 @@ struct	context *cx;
 	getcmd (cx, GENERIC, cmd, SZ_CMD);
 
 	if (ifstate[iflev] == STOP)
-	    return;
+	    return 0;
 
 	if (verbose) {
 	    printf ("%s\n", cmd);
@@ -952,8 +969,8 @@ struct	context *cx;
 /* DO_SET -- Enter the name and value of a symbol (macro) into the symbol
  * table.
  */
-do_set (cx)
-struct	context *cx;
+void
+do_set (struct context *cx)
 {
 	char	symbol[SZ_FNAME+1];
 	char	value[SZ_PBBUF+1];
@@ -980,8 +997,8 @@ struct	context *cx;
  * (the "in" is first to make the external function name unique on systems
  * which truncate external names).
  */
-do_incheck (cx)
-struct	context *cx;
+int
+do_incheck (struct context *cx)
 {
 	char	fname[SZ_FNAME+1];
 	char	dname[SZ_FNAME+1];
@@ -1004,8 +1021,8 @@ struct	context *cx;
 
 /* DO_OUTCHECK -- Check a file (e.g, library) out of the named directory.
  */
-do_outcheck (cx)
-struct	context *cx;
+int
+do_outcheck (struct context *cx)
 {
 	char	fname[SZ_FNAME+1];
 	char	dname[SZ_FNAME+1];
@@ -1029,8 +1046,8 @@ struct	context *cx;
 
 /* DO_COPYFILE -- Copy a file.
  */
-do_copyfile (cx)
-struct	context *cx;
+int
+do_copyfile (struct context *cx)
 {
 	char	old[SZ_FNAME+1];
 	char	new[SZ_FNAME+1];
@@ -1044,7 +1061,7 @@ struct	context *cx;
 	strcpy (new, getargs (cx));
 
 	if (ifstate[iflev] == STOP)
-	    return;
+	    return 0;
 
 	if (verbose) {
 	    printf ("copy `%s' to `%s'\n", old, new);
@@ -1062,8 +1079,8 @@ struct	context *cx;
 /* DO_MOVEFILE -- Move a file to another directory, or rename the file in the
  * current directory.
  */
-do_movefile (cx)
-struct	context *cx;
+int
+do_movefile (struct context *cx)
 {
 	register char *ip, *op;
 	char	old[SZ_FNAME+1];
@@ -1078,7 +1095,7 @@ struct	context *cx;
 	strcpy (new, getargs (cx));
 
 	if (ifstate[iflev] == STOP)
-	    return;
+	    return 0;
 
 	/* If NEW is a directory, concatenate the filename.  Always pass a
 	 * filename to h_movefile.
@@ -1104,10 +1121,11 @@ struct	context *cx;
 
 /* DO_DELETE -- Delete a file or list of files.
  */
-do_delete (cx)
-struct	context *cx;
+void
+do_delete (struct context *cx)
 {
 	char	fname[SZ_PATHNAME+1];
+
 
 	if (debug > 1) {
 	    printf ("do_delete:\n");
@@ -1139,9 +1157,11 @@ struct	context *cx;
 /* DO_PURGE -- Purge all files in a directory.  This is a no-op on systems
  * that do not support multiple file versions.
  */
-do_purge (cx, dname)
-struct	context *cx;		/* not used			*/
-char	*dname;			/* logical directory name	*/
+void
+do_purge (
+  struct context *cx,		/* not used			*/
+  char	*dname			/* logical directory name	*/
+)
 {
 	if (debug > 1) {
 	    printf ("do_purge: %s\n", dname);
@@ -1160,14 +1180,17 @@ char	*dname;			/* logical directory name	*/
 /* GETCMD -- Extract a possibly multiline command from the input stream
  * into a buffer, with macro replacement in the process.
  */
-getcmd (cx, prefix, cmd, maxch)
-register struct context *cx;
-char	*prefix;		/* first part of command	*/
-char	*cmd;			/* receives the command		*/
-int	maxch;
+int
+getcmd (
+  register struct context *cx,
+  char	*prefix,		/* first part of command	*/
+  char	*cmd,			/* receives the command		*/
+  int	maxch
+)
 {
 	register char	*op, *otop;
 	register int	ch;
+
 
 	otop = &cmd[maxch];
 	strcpy (cmd, prefix);
@@ -1203,13 +1226,15 @@ int	maxch;
  * otherwise we look for whitespace or newline as the delimiter.
  */
 char *
-getargs (cx)
-register struct context *cx;	/* current context	*/
+getargs (
+  register struct context *cx	/* current context	*/
+)
 {
 	register int	ch;
 	static	char	args[SZ_PBBUF+1];
 	char	tokbuf[SZ_COMMAND+1];
 	int	delim;
+
 
 	while ((ch = m_getc(cx)) == ' ')
 	    ;
@@ -1241,11 +1266,13 @@ register struct context *cx;	/* current context	*/
  * even within quoted strings, as in MAKE (macros are defined at the character
  * level, rather than at the token level).
  */
-getstr (cx, outstr, maxch, delim)
-register struct context *cx;	/* current context	*/
-char	*outstr;		/* receives string	*/
-int	maxch;			/* max chars out	*/
-int	delim;			/* delimiter character	*/
+int
+getstr (
+  register struct context *cx,	/* current context	*/
+  char	*outstr,		/* receives string	*/
+  int	maxch,			/* max chars out	*/
+  int	delim 			/* delimiter character	*/
+)
 {
 	register char	*op;
 	register int	ch, n;
@@ -1278,10 +1305,12 @@ int	delim;			/* delimiter character	*/
 /* GETKWVPAIR -- Extract the keyword and value fields from a "keyword=value"
  * construct in the input stream.
  */
-getkwvpair (cx, symbol, value)
-register struct context *cx;	/* current context		*/
-char	*symbol;		/* receives name of symbol	*/
-char	*value;			/* receives value of symbol	*/
+int
+getkwvpair (
+  register struct context *cx,	/* current context		*/
+  char	*symbol,		/* receives name of symbol	*/
+  char	*value			/* receives value of symbol	*/
+)
 {
 	register char	*op;
 	register int	ch;
@@ -1316,10 +1345,12 @@ char	*value;			/* receives value of symbol	*/
  * The input pointer is left pointing to the first character following
  * the extracted string.
  */
-getword (str, outstr, maxch)
-char **str;
-char *outstr;
-int maxch;
+int
+getword (
+  char **str,
+  char *outstr,
+  int maxch
+)
 {
 	register char *ip=(*str), *op=outstr;
 	register char *otop = outstr + maxch;
@@ -1350,9 +1381,11 @@ int maxch;
  * Symbol names are treated in a case insensitive fashion to simplify use
  * on systems that do not preserve case, e.g., in the MKPKG argument list.
  */
-putsym (name, value)
-char	*name;		/* symbol name		*/
-char	*value;		/* symbol value		*/
+void
+putsym (
+  char	*name,		/* symbol name		*/
+  char	*value		/* symbol value		*/
+)
 {
 	char	*symbol;
 
@@ -1379,8 +1412,9 @@ char	*value;		/* symbol value		*/
  * referenced as $(NAME), hence a simple linear search is best.
  */
 char *
-getsym (name)
-char	*name;		/* symbol name		*/
+getsym (
+  char	*name		/* symbol name		*/
+)
 {
 	register struct	symbol *sp, *stop;
 	register int	ch;
@@ -1406,8 +1440,7 @@ char	*name;		/* symbol name		*/
  * a local copy of the new string.
  */
 char *
-mklower (s)
-char	*s;
+mklower (char *s)
 {
 	register char	*ip, *op;
 	register int	n, ch;

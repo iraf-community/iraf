@@ -28,6 +28,10 @@ extern	int pr_onint();
 #  endif
 #endif
 
+extern void pr_enter (int pid, int inchan, int outchan);
+extern int  pr_wait (int pid);
+
+
 
 /* ZOSCMD -- Send a (machine dependent) command to the host operating
  * system.  If nonnull stdout or stderr filenames are given, try to spool
@@ -151,7 +155,7 @@ ZOSCMD (
 	     */
 	    signal (SIGINT, SIG_DFL);
 
-	    execl (shell, shell, "-c", cmd, 0);
+	    execl (shell, shell, "-c", cmd, (char *) 0);
 
 	    /* NOTREACHED (unless execl fails) */
 	    _exit (1);

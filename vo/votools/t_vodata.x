@@ -308,7 +308,7 @@ pointer	sp, line, svc, obj, dir, new, old
 int	i, j, ip, sfd, nch, nfound, nrows, ncols, stat
 
 int	access(), stridx(), strldx(), getline(), open(), ctoi()
-int	vot_convert(), vod_tinfo()
+int	vot_convert()
 bool	streq()
 
 begin

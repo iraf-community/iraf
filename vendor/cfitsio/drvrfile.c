@@ -318,6 +318,72 @@ int file_create(char *filename, int *handle)
     int ii;
     char mode[4];
 
+#if defined(BUILD_HERA) 
+
+    /* special code to verify that the path to the file to be created */
+    /* is within the users data directory on Hera */
+ 
+    int status = 0, rootlen, slen;
+    char *cpos;
+    char cwd[FLEN_FILENAME], absURL[FLEN_FILENAME];
+    /* note that "/heradata/users/" is actually "/.hera_mountpnt/hera_users/"  */
+    char rootstring[]="/.hera_mountpnt/hera_users/";
+    char username[FLEN_FILENAME], userroot[FLEN_FILENAME];
+
+    /* Get the current working directory */
+    fits_get_cwd(cwd, &status);  
+    slen = strlen(cwd);
+    if (cwd[slen-1] != '/') strcat(cwd,"/"); /* make sure the CWD ends with slash */
+
+/*    printf("CWD = %s\n", cwd);  */
+
+    /* check that CWD string matches the rootstring */
+    rootlen = strlen(rootstring);
+    if (strncmp(rootstring, cwd, rootlen)) {
+       ffpmsg("invalid CWD: does not match Hera data directory");
+/*       ffpmsg(rootstring);  */
+       return(FILE_NOT_CREATED); 
+    } else {
+
+       /* get the user name from CWD (it follows the root string) */
+       strcpy(username, cwd+rootlen);  
+       cpos=strchr(username, '/');
+       if (!cpos) {
+          ffpmsg("invalid CWD: not equal to Hera data directory + username");
+/*          ffpmsg(cwd); */
+          return(FILE_NOT_CREATED); 
+       } else {
+          *(cpos+1) = '\0';   /* truncate user name string */
+
+          /* construct full user root name */
+          strcpy(userroot, rootstring);
+          strcat(userroot, username);
+          rootlen = strlen(userroot);
+
+          /* convert the input filename to absolute path relative to the CWD */
+          fits_relurl2url(cwd,  filename,  absURL, &status);
+/*
+          printf("username = %s\n", username);
+          printf("userroot = %s\n", userroot);
+          printf("filename = %s\n", filename);
+          printf("ABS = %s\n", absURL);
+*/
+          /* check that CWD string matches the rootstring */
+
+          if (strncmp(userroot, absURL, rootlen)) {
+             ffpmsg("invalid filename: path not within user directory");
+/*
+             ffpmsg(absURL);
+             ffpmsg(userroot);
+*/
+             return(FILE_NOT_CREATED); 
+          }
+       }
+    }
+    /* if we got here, then the input filename appears to be valid */
+
+#endif
+
     *handle = -1;
     for (ii = 0; ii < NMAXFILES; ii++)  /* find empty slot in table */
     {
@@ -391,7 +457,26 @@ int file_size(int handle, LONGLONG *filesize)
 
     diskfile = handleTable[handle].fileptr;
 
-#if _FILE_OFFSET_BITS - 0 == 64
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+ 
+/* call the VISUAL C++ version of the routines which support */
+/*  Large Files (> 2GB) if they are supported (since VC 8.0)  */
+
+    position1 = _ftelli64(diskfile);   /* save current postion */
+    if (position1 < 0)
+        return(SEEK_ERROR);
+
+    if (_fseeki64(diskfile, 0, 2) != 0)  /* seek to end of file */
+        return(SEEK_ERROR);
+
+    position2 = _ftelli64(diskfile);     /* get file size */
+    if (position2 < 0)
+        return(SEEK_ERROR);
+
+    if (_fseeki64(diskfile, position1, 0) != 0)  /* seek back to original pos */
+        return(SEEK_ERROR);
+
+#elif _FILE_OFFSET_BITS - 0 == 64
 
 /* call the newer ftello and fseeko routines , which support */
 /*  Large Files (> 2GB) if they are supported.  */
@@ -484,7 +569,15 @@ int file_seek(int handle, LONGLONG offset)
 */
 {
 
-#if _FILE_OFFSET_BITS - 0 == 64
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+    
+     /* Microsoft visual studio C++ */
+     /* _fseeki64 supported beginning with version 8.0 */
+ 
+    if (_fseeki64(handleTable[handle].fileptr, (OFF_T) offset, 0) != 0)
+        return(SEEK_ERROR);
+	
+#elif _FILE_OFFSET_BITS - 0 == 64
 
     if (fseeko(handleTable[handle].fileptr, (OFF_T) offset, 0) != 0)
         return(SEEK_ERROR);

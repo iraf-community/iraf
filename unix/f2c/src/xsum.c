@@ -193,6 +193,7 @@ process(char *s, int x)
 	close(x);
 	}
 
+ int
 #ifdef KR_headers
 main(argc, argv)
  char **argv;

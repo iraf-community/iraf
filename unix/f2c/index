@@ -11,6 +11,8 @@ file	f2c/f2c.h
 file	f2c/f2c.ps
 lang	Postscript
 
+file	f2c/f2c.pdf
+
 file	f2c/fc
 lang	Bourne shell script
 
@@ -38,13 +40,6 @@ for	Win32 f2c binaries (ftp only)
 
 lib	f2c/src
 for	f2c source
-,	The request "send all from f2c/src" emailed to
-,	netlib@research.bell-labs.com retrieves the
-,	complete source for f2c (sans libraries).  Other files
-,	in src are component modules, so you can request just the
-,	modules that have changed since last you got f2c source
-,	(look at the timestamps at the end of "readme from f2c").
-,	Alternatively, get ftp://netlib.bell-labs.com:21/netlib/f2c/src.tar
 
-file	f2c/readme
+file	f2c/README
 

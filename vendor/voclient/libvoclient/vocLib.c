@@ -134,6 +134,7 @@ typedef struct {
     int   console;			/* initiate a console?		*/
     int   onetrip;			/* force a single instance?	*/
     int   use_cache;			/* use object/registry cache?   */
+    int   use_runid;			/* use RUNID parameter?		*/
     int   quiet;			/* suppress API output?		*/
 } vocOpt;
 
@@ -210,16 +211,16 @@ voc_initVOClient (char *opts)
 	** either and environment variable or the default path.
 	*/
 	memset (config, 0, 128);
-	if ((s = getenv("VOC_CONFIG")))
+	if ((s = getenv ("VOC_CONFIG")))
 	    strcpy (config, s);
 	else if ((home = getenv ("HOME")))
             sprintf (config, "%s/.voclient/config", home);
 
 	/* Use the config from the environment, then try the user's
 	** config file before using the default.
+	*/  
 	if (access (config, R_OK) == 0)
 	    vopt = voc_readConfig (config);
-	*/  
     }
 
 
@@ -234,6 +235,7 @@ voc_initVOClient (char *opts)
         vopt->spawn     =  TRUE;
         vopt->quiet     =  TRUE;
         vopt->use_cache =  TRUE;
+        vopt->use_runid =  TRUE;
         vopt->console   =  FALSE;
         vopt->onetrip   =  onetrip;
     }
@@ -323,6 +325,7 @@ voc_initVOClient (char *opts)
 
     vo->quiet     = vopt->quiet;
     vo->use_cache = vopt->use_cache;
+    vo->use_runid = vopt->use_runid;
     vo->onetrip   = vopt->onetrip;
     vo->runid     = vopt->runid;
 
@@ -368,7 +371,10 @@ voc_closeVOClient (int shutdown)
 
     /* Close the VOClient connection.
      */
-    close (vo->io_chan);
+    if (vo->io_chan >= 0) {
+        close (vo->io_chan);
+	vo->io_chan = -1;
+    }
 
     /* Free the structure.
      */
@@ -638,6 +644,7 @@ voc_initOpts ()
     vopt->spawn     =  TRUE;
     vopt->quiet     =  TRUE;
     vopt->use_cache =  TRUE;
+    vopt->use_runid =  TRUE;
     vopt->console   =  FALSE;
     vopt->onetrip   =  FALSE;
 
@@ -663,6 +670,8 @@ voc_initOpts ()
 **      runid           Set the RUNID logging string
 **
 **      use_cache       Use the object/registry cache?
+**
+**      use_runid       Use the RUNID parameter?
 **
 **      server          VOClient daemon server address.  The address is of
 **                      the form
@@ -705,6 +714,7 @@ voc_parseOpts (char *opts)
     int   lone       = FALSE;
     int   lquiet     = TRUE;
     int   luse_cache = TRUE;
+    int   luse_runid = TRUE;
     int   len;
 
     vocOpt *vopt  = (vocOpt *) NULL;
@@ -736,9 +746,9 @@ voc_parseOpts (char *opts)
 	}
 	len = strlen (val);
 
+
 	/*  Ugly but effective parsing.
 	*/
-
 	if (strncmp ("config", keyw, 4) == 0)
 	    strcpy (lconfig, val);
 
@@ -767,8 +777,11 @@ voc_parseOpts (char *opts)
 	else if (strncmp ("spawn", keyw, 2) == 0)
 	    lspawn = (val[0] == 'y' || val[0] == '1');
 
-	else if (strncmp ("use_cache", keyw, 2) == 0)
+	else if (strncmp ("use_cache", keyw, 5) == 0)
 	    luse_cache = (val[0] == 'y' || val[0] == '1');
+
+	else if (strncmp ("use_runid", keyw, 5) == 0)
+	    luse_runid = (val[0] == 'y' || val[0] == '1');
 
 	else if (strncmp ("server", keyw, 2) == 0)
 	    strcpy (lserver, val);
@@ -799,6 +812,7 @@ voc_parseOpts (char *opts)
     vopt->spawn     = lspawn;
     vopt->quiet     = lquiet;
     vopt->use_cache = luse_cache;
+    vopt->use_runid = luse_runid;
     vopt->console   = lcons;
 
     return (vopt);
@@ -903,3 +917,4 @@ voc_cacheCreate (char *home, char *cache, char *subdir)
 }
 
 
+int voc_dbg (void) { static int count = 0; count++; return (count); }

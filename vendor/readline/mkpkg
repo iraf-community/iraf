@@ -1,0 +1,36 @@
+# Make the GNU Readline/History libraries
+
+$call libs
+$exit
+
+libs:
+	$ifeq (IRAFARCH, macosx) then
+	    !(./configure --disable-dynamic --enable-static")
+	    !make libreadline.a |& tee spool
+	    !mv libreadline.a ../../bin
+	$else $ifeq (IRAFARCH, macintel) then
+	    !(./configure --disable-dynamic --enable-static)
+	    !make libreadline.a |& tee spool
+	    !mv libreadline.a ../../bin
+	$else $ifeq (IRAFARCH, linux) then
+	    !(./configure --disable-dynamic --enable-static CFLAGS="-m32")
+	    !make libreadline.a |& tee spool
+	    !mv libreadline.a ../../bin
+	$else $ifeq (IRAFARCH, freebsd) then
+	    !(./configure --disable-dynamic --enable-static CFLAGS="-m32")
+	    !make libreadline.a |& tee spool
+	    !mv libreadline.a ../../bin
+	$else
+	    !(./configure --disable-dynamic --enable-static)
+	    !make libreadline.a |& tee spool
+	    !mv libreadline.a ../../bin
+	$endif
+	!make clean
+	!rm Makefile spool
+	;
+
+clean:
+	!make clean
+	!rm Makefile spool
+	;
+

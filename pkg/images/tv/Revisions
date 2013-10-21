@@ -2,6 +2,10 @@
 .help revisions Nov93 nmisc
 .nf
 
+tv/imedit/epstatistics.x
+    The 'x', 'y', and 'z' pointers were declared as TY_INT instead of TY_REAL
+    (5/4/13, MJF)
+
 imexamine/imexam.h
     The coordinates arrays in the main structure were improperly indexed
     with the P2R macro (2/10/11, MJF)

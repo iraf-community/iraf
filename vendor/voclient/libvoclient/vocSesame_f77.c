@@ -1,17 +1,22 @@
-/***************************************************************************
-**
-**  Sesame Name Resolver F77 Interface:
-**  -----------------------------------
-**
-**         vf_nameResolver (target, sr)
-**          vf_resolverPos (sr, pos_str, len)
-**           vf_resolverRA (sr, radeg)
-**          vf_resolverDEC (sr, decdeg)
-** 
-**
-**  Michael Fitzpatrick, NOAO, July 2006
-**
-***************************************************************************/
+/**
+ *  VOCSESAME_F77.C -- F77 Interface to the Sesame name resolver service.
+ *
+ *  @section DESCRIPTION
+ *
+ *  Sesame Name Resolver F77 Interface:
+ *  -----------------------------------
+ *
+ *         vf_nameResolver  (target, sr)
+ *          vf_resolverPos  (sr, pos_str, len)
+ *           vf_resolverRA  (sr, radeg)
+ *        vf_resolverRAErr  (sr, radeg)
+ *          vf_resolverDEC  (sr, decdeg)
+ *       vf_resolverDECErr  (sr, decdeg)
+ * 
+ *  @file       vocSesame_f77.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,19 +50,28 @@
 #endif
 
 
-/** Private interface declarations.
-**/
+/** 
+ *  Private interface declarations.
+ */
 extern char *sstrip (char *instr, int len);
 extern void  spad (char *outstr, int len);
 
 
 
+/*****************************************************************************/
 
-/******************************************************************************
-**  NAMERESOLVER -- Query the CDS Sesame service to resolve the target name
-**  to coordinates.  The query is done when creating the Sesame object, 
-**  thereafter we simply query the object data.
-*/
+/**
+ *  VF_NAMERESOLVER -- Query the CDS Sesame service to resolve the target
+ *  name to coordinates.  The query is done when creating the Sesame object, 
+ *  thereafter we simply query the object data.
+ *
+ *  @brief      Query the CDS Sesame name resolver service.
+ *  @fn         call vfnameresolver (char *target, int *sr)
+ *
+ *  @param  target      name of target to be resolved
+ *  @param  sr      	returned Sesame handle
+ *  @returns            nothing
+ */
 void
 VF_NAMERESOLVER (char *target, int *sr, int tlen)
 {
@@ -69,10 +83,17 @@ VF_NAMERESOLVER (char *target, int *sr, int tlen)
 }
 
 
-/******************************************************************************
-**  RESOLVERPOS --  Return a string containing the (ra,dec) position as
-**  sexagesimal strings. 
-*/
+/**
+ *  VF_RESOLVERPOS --  Return a string containing the (ra,dec) position as
+ *  sexagesimal strings. 
+ *
+ *  @brief      Get the resolved position as a string
+ *  @fn         call vfresolverpos (int *srm char *target, int *sr)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  pos         position string
+ *  @returns            nothing
+ */
 void
 VF_RESOLVERPOS (int *sr, char *pos, int *len, int plen)
 {
@@ -88,9 +109,16 @@ VF_RESOLVERPOS (int *sr, char *pos, int *len, int plen)
 }
 
 
-/******************************************************************************
-**  RESOLVEROTYPE --  Return a string containing the object type description
-*/
+/**
+ *  VF_RESOLVEROTYPE --  Return a string containing the object type description
+ *
+ *  @brief      Get the object type description string
+ *  @fn         call vfresolverotype (int *sr, char *type)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  type        object type string
+ *  @returns            nothing
+ */
 void
 VF_RESOLVEROTYPE (int *sr, char *otype, int *len, int olen)
 {
@@ -106,9 +134,16 @@ VF_RESOLVEROTYPE (int *sr, char *otype, int *len, int olen)
 }
 
 
-/******************************************************************************
-**  RESOLVERRA --  Return the RA as a double precision value.
-*/
+/**
+ *  VF_RESOLVERRA --  Return the RA as a double precision value.
+ *
+ *  @brief      Return the RA as a double precision value.
+ *  @fn         call vfresolverra (int *sr, double *ra)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  ra          RA of object (decimal degrees)
+ *  @returns            nothing
+ */
 void
 VF_RESOLVERRA (int *sr, double *ra)
 {
@@ -116,9 +151,16 @@ VF_RESOLVERRA (int *sr, double *ra)
 }
 
 
-/******************************************************************************
-**  RESOLVERDEC --  Return the DEC as a double precision value. 
-*/
+/**
+ *  VF_RESOLVERDEC --  Return the DEC as a double precision value. 
+ *
+ *  @brief      Return the DEC as a double precision value. 
+ *  @fn         call vfresolverdec (int *sr, double *dec)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  dec      	Dec of object (decimal degrees)
+ *  @returns            nothing
+ */
 void
 VF_RESOLVERDEC (int *sr, double *dec)
 {
@@ -126,9 +168,16 @@ VF_RESOLVERDEC (int *sr, double *dec)
 }
 
 
-/******************************************************************************
-**  RESOLVERRAERR --  Return the RA error as a double precision value.
-*/
+/**
+ *  VF_RESOLVERRAERR --  Return the RA error as a double precision value.
+ *
+ *  @brief      Return the RA error as a double precision value.
+ *  @fn         call vfresolverraerr (int *sr, double *err)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  target      RA error of position (decimal degrees)
+ *  @returns            nothing
+ */
 void
 VF_RESOLVERRAERR (int *sr, double *err)
 {
@@ -136,9 +185,16 @@ VF_RESOLVERRAERR (int *sr, double *err)
 }
 
 
-/******************************************************************************
-**  RESOLVERDECERR --  Return the DEC error as a double precision value. 
-*/
+/**
+ *  VF_RESOLVERDECERR --  Return the DEC error as a double precision value. 
+ *
+ *  @brief      Return the DEC error as a double precision value. 
+ *  @fn         call vfresolverdecerr (int *sr, double *err)
+ *
+ *  @param  sr      	Sesame handle
+ *  @param  target      Dec error of position (decimal degrees)
+ *  @returns            nothing
+ */
 void
 VF_RESOLVERDECERR (int *sr, double *err)
 {

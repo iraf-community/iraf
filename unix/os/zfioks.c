@@ -186,7 +186,8 @@ static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
 static	int ks_getresvport(), ks_rexecport();
 static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
-static	void dbgsp(), dbgmsg(), dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
+static	void dbgsp(), dbgmsg(), dbgmsgs();
+static  void dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
 static	char *ks_getpass();
 static	void ks_onsig(), ks_reaper();
 
@@ -227,7 +228,7 @@ ZOPNKS (
 
 
 	/* Initialize local arrays */
-	host[0] = username[0] = password[0] = (char) NULL;
+	host[0] = username[0] = password[0] = (char) 0;
 
 	/* Parse the server specification.  We can be called to set up either
 	 * the irafks daemon or to open a client connection.
@@ -368,7 +369,7 @@ ZOPNKS (
 	    struct  timeval timeout;
 	    int     check, fromlen, req_port;
 	    int     nsec, fd, sig;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	    fd_set  rfd;
 #else
 	    int     rfd;
@@ -483,7 +484,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 	    for (;;) {
 		timeout.tv_sec = nsec;
 		timeout.tv_usec = 0;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		FD_ZERO(&rfd);
 		FD_SET(s,&rfd);
 #else
@@ -498,8 +499,8 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		if ((sig = setjmp(jmpbuf))) {
 	    	    if (sig == SIGCHLD) {
 	    		dbgmsg ("S:in.irafksd sigchld return\n");
-			while (waitpid ((pid_t)NULL, NULL, WNOHANG) > 0) 
-			    ;
+			while (waitpid ((pid_t)0, (int *)0, WNOHANG) > 0)
+			        ;
 		    } else
 			exit (0);
 		}
@@ -507,19 +508,21 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		    exit (0);
 
 		/* Accept the connection. */
-		if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
-		    fprintf (stderr,
-			"S:in.irafksd: accept on port %d failed\n", port);
+		if ((fd = accept (s, (struct sockaddr *)0, 
+			(socklen_t *)0)) < 0) {
+		    	    fprintf (stderr,
+			      "S:in.irafksd: accept on port %d failed\n", port);
 		    exit (2);
 		} else
 		    dbgmsg ("S:in.irafksd: connection established\n");
 
 		/* Find out where the connection is coming from. */
 		fromlen = sizeof (from);
-#ifdef POSIX
-		if (getpeername (fd, (struct sockaddr *)&from, &fromlen) < 0) {
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
+		if (getpeername (fd, (struct sockaddr *)&from, 
+		    (socklen_t *)&fromlen) < 0) {
 #else
-		if (getpeername (fd, &from, &fromlen) < 0) {
+		if (getpeername (fd, &from, (socklen_t *)&fromlen) < 0) {
 #endif
 		    fprintf (stderr, "in.irafksd: getpeername failed\n");
 		    exit (3);
@@ -666,7 +669,7 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 
 	    /* Wait for the server to call us back. */
 	    dbgmsg1 ("waiting for connection on port %d\n", s_port);
-	    if ((tfd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
+	    if ((tfd = accept (s, (struct sockaddr *)0, (socklen_t *)0)) < 0) {
 r_err:		dbgmsg ("rexec-callback connect failed\n");
 		close(s);  close(ss);
 		*chan = ERR;
@@ -882,7 +885,7 @@ retry:
 	    }
 
 	    /* Wait for the server to call us back. */
-	    if ((tfd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
+	    if ((tfd = accept (s, (struct sockaddr *)0, (socklen_t *)0)) < 0) {
 c_err:		dbgmsg1 ("C:zfioks client status=%o\n", status);
 		close(t);  close(s);
 		kill (pid, SIGTERM);
@@ -1100,7 +1103,7 @@ ks_reaper (
 {
         int status=0, pid=0;
 
-        while ((pid = waitpid ((pid_t)NULL, &status, WNOHANG)) > 0)
+        while ((pid = waitpid ((pid_t)0, (int *) &status, WNOHANG)) > 0)
 	    dbgmsg2 ("ks_reaper -- pid=%d, status=%d\n", pid, status);
 
 	if (jmpset)
@@ -1232,7 +1235,7 @@ int	*alport;
 
 	for (;;) {
 	    sin.sin_port = htons((u_short)*alport);
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) >= 0) {
 #else
 	    if (bind(s, (caddr_t)&sin, sizeof (sin)) >= 0) {
@@ -1298,7 +1301,7 @@ int	fd;
 	register int value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	fd_set  rfd;
 #else
 	int     rfd;
@@ -1308,11 +1311,11 @@ int	fd;
 	jmpset++;
 	if ((sig = setjmp(jmpbuf)))
 	    if (sig == SIGCHLD)
-		waitpid ((pid_t)NULL, NULL, WNOHANG);
+		waitpid ((pid_t)0, (int *)0, WNOHANG);
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	FD_ZERO(&rfd);
 	FD_SET(fd,&rfd);
 #else
@@ -1391,7 +1394,19 @@ char    *msg;
 	int pid;
 	if (debug_ks) {
 	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, msg);
+	    fprintf (debug_fp, "%s", msg);
+	}
+}
+static void
+dbgmsgs (fmt, arg)
+char    *fmt;
+char    *arg;
+{
+	int pid;
+	if (debug_ks) {
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
+	    fprintf (debug_fp, fmt, arg);
+	    fflush (debug_fp);
 	}
 }
 static void
@@ -1723,6 +1738,7 @@ ks_sysname (char *filename, char *pathname)
 {
 	XCHAR	irafdir[SZ_PATHNAME+1];
 	XINT	x_maxch=SZ_PATHNAME, x_nchars;
+	extern  int  ZGTENV();
 
 
 	ZGTENV ("iraf", irafdir, &x_maxch, &x_nchars);
@@ -1751,7 +1767,7 @@ ks_rhosts (char *filename)
 	int	value;
 	FILE	*fp;
 
-	dbgmsg1 ("read %s\n", filename);
+	dbgmsgs ("read %s\n", filename);
 
 	/* Open irafhosts file. */
 	if ((fp = fopen (filename, "r")) == NULL)
@@ -1918,7 +1934,7 @@ ks_whosts (
 	int	fd, q, i;
 	FILE	*fp;
 
-	dbgmsg1 ("update %s\n", filename);
+	dbgmsgs ("update %s\n", filename);
 
 	/* Open new irafhosts file. */
 	unlink (filename);

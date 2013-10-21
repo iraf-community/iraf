@@ -1,7 +1,8 @@
 .\" @(#)vosesame.1 1.0 June-07 MJF
-.TH VOSESAME 1 "July 2007" "NVO VO-CLI Project"
+.TH VOSESAME 1 "July 2007" "VOClient Project"
 .SH NAME
 vosesame \- call the Sesame name resolver service
+
 .SH SYNOPSIS
 \fBvosesame\fP [\-\fIadefhinstACHT\fP] [\fIfile\fP | \fItarget\fP ] [ ... ]
 
@@ -46,21 +47,6 @@ Output the position as sexagesimal RA and Dec.
 .TP 0
 Control Flags:
 .TP 8
-.B \-c <ra> <dec>  or \-c <ra>,<dec>  or \--coord-<ra>,<dec>
-Specify a coordinate to be explicitly used.  If set an RA and DEC are
-expected as either the next argument if they are a comma-separated string,
-or as the next two arguments.  Values may be input as floating point 
-decimal or sexagesimal strings.  Upon receipt, the task will create an
-artifical record for the object and output the values requested with the
-output flags described above.  Multiple \fI-c\fP options may be specified
-may be specified and mixed with object names, user coordinates are processed
-before the object names are resolved in the order they occur on the command
-line.
-.TP 8
-.B \-i, --invert
-Invert the sense of the search and print only objects which cannot be
-resolved to coordinates.
-.TP 8
 .B \-f, --force
 Force the object(s) to be resolved even if it is cached.  This option will
 cause the task to call the Sesame service rather than output a previously
@@ -70,26 +56,34 @@ environment variable is defined.
 .B \-o <name>  or  --output=<name>
 Specify the output file.  The default is to write the results to the
 standard output.
+.TP 8
+.B \-p <ra,dec>  or  --pos=<ra,dec>
+Specify a comma-delimited input position.  This option can be used to 
+convert input sexagesimal or floating-point values using the formatting
+options.
 
 .TP 0
 Formatting Flags:
 .TP 8
 .B \-A, --ascii
-Print the results as a whitespace delimited ascii table.  If an output file
-is specified it will have a ".txt" extension appended automatically.
+Print the results as a whitespace delimited ascii table.
 .TP 8
 .B \-C, --csv
-Print the results as a comma-separated-value (CSV) table.  If an output file
-is specified it will have a ".csv" extension appended automatically.
+Print the results as a comma-separated-value (CSV) table.
+.TP 8
+.B \-F, --format
+Format ASCII results using fixed-width columns.
 .TP 8
 .B \-H, --header
 Print a table header.  The table header will be a single line beginning with
 a '#' character to indicate a comment, and followed by the name of each 
 column in the specified format.
 .TP 8
+.B \-I, --init_cache
+Initialize the resolver cache directory.
+.TP 8
 .B \-T, --tsv
-Print the results as a tab-separated-value (TSV) table.  If an output file
-is specified it will have a ".csv" extension appended automatically.
+Print the results as a tab-separated-value (TSV) table.
 
 .SH DESCRIPTION
 The \fIvosesame\fP task provides a command-line interface to the
@@ -229,7 +223,7 @@ Type the EOF character (typically Ctrl-D or Ctrl-Z) to quit.
 Print the sexagesimal and decimal values for multiple user coords:
 .nf
 
-	% vosesame -sd -c 12:30:0.0 -45:00:0.0 -c 187.5 2.05
+	% vosesame -sd -p 12:30:0.0,-45:00:0.0 -p 187.5,2.05
 	12:30:00.0 -45:00:00.0  12.500000 -45.000000
 	12:30:00.0  02:03:00.0 187.500000   2.050000
 
@@ -246,15 +240,4 @@ June 2007 - This task is new.
 .SH Author
 Michael Fitzpatrick (fitz@noao.edu), July 2007
 .SH "SEE ALSO"
-voclient(1), voclientd(1), vodirectory(1), vodata(1)
-.SH BUGS
-The Sesame service can sometimes respond without resolving the object.  In
-this case all values are returned as zero or a null string.  \fIVosesame\fP
-will sense this as a non-response and not print a result.  If the
-\fIverbose\fP flag is set a warning message will be printed.
-.SH Revision History
-June 2007 - This task is new.
-.SH Author
-Michael Fitzpatrick (fitz@noao.edu), July 2007
-.SH "SEE ALSO"
-voclient(1), voclientd(1), vodirectory(1), vodata(1)
+voclient, voclientd, voregistry, vodata

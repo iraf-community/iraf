@@ -22,9 +22,9 @@ begin
 	call ep_gindata (ep, x1, x2, y1, y2)
 	if (EP_INDATA(ep) != NULL) {
 	    call malloc (mask, EP_NPTS(ep), TY_INT)
-	    call malloc (x, EP_NPTS(ep), TY_INT)
-	    call malloc (y, EP_NPTS(ep), TY_INT)
-	    call malloc (w, EP_NPTS(ep), TY_INT)
+	    call malloc (x, EP_NPTS(ep), TY_REAL)
+	    call malloc (y, EP_NPTS(ep), TY_REAL)
+	    call malloc (w, EP_NPTS(ep), TY_REAL)
 
 	    call ep_search (ep, Memr[EP_INDATA(ep)], EP_NX(ep),
 		EP_NY(ep), ap, xa, ya, xb, yb)
@@ -39,9 +39,9 @@ begin
 		    EP_X1(ep), EP_Y1(ep), xa, ya, xb, yb)
 
 	    call mfree (mask, TY_INT)
-	    call mfree (x, TY_INT)
-	    call mfree (y, TY_INT)
-	    call mfree (w, TY_INT)
+	    call mfree (x, TY_REAL)
+	    call mfree (y, TY_REAL)
+	    call mfree (w, TY_REAL)
 	    call gsfree (gs)
 	}
 end

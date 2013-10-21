@@ -10,6 +10,8 @@
 #include <sys/socket.h>
 #include <signal.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <readline/readline.h>		/* to install rl_event_hook	*/
 
 #define import_spp
 #define import_libc
@@ -18,7 +20,6 @@
 #define import_xwhen
 #include <iraf.h>
 
-#include "readline.h"			/* to install rl_event_hook	*/
 #include "config.h"			/* CL declarations		*/
 #include "clmodes.h"
 #include "operand.h"

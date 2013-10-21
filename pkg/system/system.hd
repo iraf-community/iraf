@@ -6,6 +6,7 @@ $help	= "system$help/"
 
 allocate	hlp=doc$allocate.hlp,	 src=hlib$allocate.cl
 concatenate	hlp=doc$concatenate.hlp, src=concatenate.x
+chkupdate	hlp=doc$chkupdate.hlp, 	 src=chkupdate.x
 copy		hlp=doc$copy.hlp,	 src=copy.x
 count		hlp=doc$count.hlp,	 src=count.x
 deallocate	hlp=doc$deallocate.hlp,	 src=hlib$deallocate.cl

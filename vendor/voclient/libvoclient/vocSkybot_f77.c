@@ -55,7 +55,11 @@
  *                              "Dec: " + sb.getDblAttr("dec",i) + " " +
  *                              "Mv: " + sb.getDblAttr("vmag",i) + " "); 
  * 
- *  Michael Fitzpatrick, NOAO, August 2006
+ *
+ *
+ *  @file       vocSkybot_f77.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
  *
  **************************************************************************/
 
@@ -93,14 +97,25 @@ extern void  spad (char *outstr, int len);
 
 
 
-
-/******************************************************************************
-**  SKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
-**  This service returns a list of minor planets withing the specified
-**  search radius/box about the poition at the epoch given.  Epoch is 
-**  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
-**  given in arcsec.
-*/
+/**
+ *  VFSKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  This service returns a list of minor planets withing the specified
+ *  search radius/box about the poition at the epoch given.  Epoch is 
+ *  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
+ *  given in arcsec.
+ *
+ *  @brief      Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  @fn         call vfskybot (double *ra, double *dec, double *rsz,
+ *                      double *dsz, double *epoch, int *sb)
+ *
+ *  @param  ra          RA position of query (decimal degrees)
+ *  @param  dec         Dec position of query (decimal degrees)
+ *  @param  rsz         RA size of query (arcsec)
+ *  @param  dsz         Dec size of query (arcsec)
+ *  @param  epoch       epoch of query (JD)
+ *  @param  sb          handle to Skybot return object
+ *  @returns            nothing
+ */
 void      
 VF_SKYBOT (double *ra, double *dec, double *rsz, double *dsz, double *epoch,
 	int *sb)
@@ -109,10 +124,19 @@ VF_SKYBOT (double *ra, double *dec, double *rsz, double *dsz, double *epoch,
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a string value. 
-**  Notice the index begins at 1 and not 0.
-*/
+/**
+ *  VFSKYBOTSTR -- Return a real-valued field as a string value. 
+ *  Notice the index begins at 1 and not 0.
+ *
+ *  @brief      Return a real-valued field as a string value.
+ *  @fn         call vfskybotstr (int *sb, char *attr, int *index, char *out)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @param  out         output string value
+ *  @returns            nothing
+ */
 void
 VF_SKYBOTSTR (int *sb, char *attrname, int *index, char *outstr, int *len,
 	int alen, int olen)
@@ -131,10 +155,19 @@ VF_SKYBOTSTR (int *sb, char *attrname, int *index, char *outstr, int *len,
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a double-precision value.
-**  Notice the index begins at 1 and not 0.
-*/
+/**
+ *  VFSKYBOTDBL -- Return a real-valued field as a double-precision value.
+ *  Notice the index begins at 1 and not 0.
+ *
+ *  @brief      Return a real-valued field as a double-precision value.
+ *  @fn         call vfskybotdbl (int *sb, char *attr, int *index, double *dval)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @param  out         output string value
+ *  @returns            nothing
+ */
 void      
 VF_SKYBOTDBL (int *sb, char *attrname, int *index, double *dval, int alen)
 {
@@ -146,9 +179,16 @@ VF_SKYBOTDBL (int *sb, char *attrname, int *index, double *dval, int alen)
 }
 
 
-/******************************************************************************
-**  SKYBOTNOBJS -- Return the number of objects found from the query.
-*/
+/**
+ *  VFSKYBOTNOBJS -- Return the number of objects found from the query.
+ *
+ *  @brief      Return the number of objects found from the query.
+ *  @fn         call vfskybotnobjs (int *sb, int *nobjs)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  nobjs       number of objects in the query
+ *  @returns            nothing
+ */
 void      
 VF_SKYBOTNOBJS (int *sb, int *nobjs)
 {

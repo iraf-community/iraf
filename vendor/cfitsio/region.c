@@ -601,7 +601,6 @@ int fits_read_ascii_region( const char *filename,
 		coords[2] += (wcs->rot);
 		coords[3] += (wcs->rot);
 		coords[10] += (wcs->rot);
-		break;
 	      }
 	    }
 
@@ -1212,11 +1211,19 @@ void fits_setup_shape ( RgnShape *newShape)
     newShape->param.gen.a    = R + 0.5;
     break;
   case panda_rgn:
+    while( coords[2]> 180.0 ) coords[2] -= 360.0;
+    while( coords[2]<=-180.0 ) coords[2] += 360.0;
+    while( coords[3]> 180.0 ) coords[3] -= 360.0;
+    while( coords[3]<=-180.0 ) coords[3] += 360.0;
     newShape->param.gen.a = newShape->param.gen.p[5]*newShape->param.gen.p[5];
     newShape->param.gen.b = newShape->param.gen.p[6]*newShape->param.gen.p[6];
     break;
   case epanda_rgn:
   case bpanda_rgn:
+    while( coords[2]> 180.0 ) coords[2] -= 360.0;
+    while( coords[2]<=-180.0 ) coords[2] += 360.0;
+    while( coords[3]> 180.0 ) coords[3] -= 360.0;
+    while( coords[3]<=-180.0 ) coords[3] += 360.0;
     newShape->param.gen.sinT = sin( myPI * (coords[10] / 180.0) );
     newShape->param.gen.cosT = cos( myPI * (coords[10] / 180.0) );
     break;

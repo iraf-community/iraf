@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -12,6 +15,7 @@
 #include <iraf.h>
 #include "mkpkg.h"
 #include "extern.h"
+#include "../bootProto.h"
 
 #ifdef LINUX
 #  undef SYSV
@@ -29,8 +33,10 @@
  */
 
 #define	SZ_COPYBUF	4096
-#define	SZ_CMD		512		/* max size OS command	*/
-#define	SZ_LIBPATH	512		/* path to library */
+#ifndef SZ_CMD
+#define	SZ_CMD		2048		/* max size OS command, see mkpkg.h */
+#endif
+#define	SZ_LIBPATH	512		/* path to library 		    */
 #define	LIBRARIAN	"ar"
 #define	LIBTOOL		"libtool"
 #define	LIBFLAGS	"r"
@@ -41,8 +47,35 @@
 extern	char *makeobj();
 extern	char *vfn2osfn();
 extern	char *getenv();
+
+extern  void fatals (char *fmt, char *arg);
+
 char	*resolvefname();
 char	*mkpath();
+
+int   h_updatelibrary (char *library, char *flist[], int totfiles, 
+                char *xflags, char *irafdir);
+int   h_rebuildlibrary (char *library);
+int   h_incheck (char *file, char *dir);
+int   h_outcheck (char *file, char *dir, int clobber);
+void  h_getlibname (char *file, char *fname);
+int   h_xc (char *cmd);
+int   h_purge (char *dir);
+int   h_copyfile (char *oldfile, char *newfile);
+ 
+int   u_fcopy (char *old, char *new);
+int   h_movefile (char *old, char *new);
+int   u_fmove (char *old, char *new );
+int   add_sources (char *cmd, int maxch, char *flist[], 
+                int totfiles, int hostnames, int  *nsources);
+int   add_objects (char *cmd, int maxch, char *flist[], 
+                int totfiles, int hostnames);
+
+char *makeobj (char *fname);
+char *mkpath (char *module, char *directory, char *outstr);
+char *resolvefname (char *fname);
+int   h_direq (char *dir1, char *dir2);
+
 
 
 /* H_UPDATELIBRARY -- Compile a list of source files and replace them in the
@@ -54,12 +87,14 @@ char	*mkpath();
  * Note also that the file list may contain object files which cannot be
  * compiled, but which must be replaced in the library.
  */
-h_updatelibrary (library, flist, totfiles, xflags, irafdir)
-char	*library;		/* pathname of library		*/
-char	*flist[];		/* pointers to filename strings	*/
-int	totfiles;		/* number of files in list	*/
-char	*xflags;		/* XC compiler flags		*/
-char	*irafdir;		/* iraf root directory		*/
+int
+h_updatelibrary (
+    char   *library,		/* pathname of library		*/
+    char   *flist[],		/* pointers to filename strings	*/
+    int	    totfiles,		/* number of files in list	*/
+    char   *xflags,		/* XC compiler flags		*/
+    char   *irafdir 		/* iraf root directory		*/
+)
 {
 	char	cmd[SZ_CMD+1], *args;
 	int	exit_status, baderr, npass;
@@ -108,7 +143,7 @@ char	*irafdir;		/* iraf root directory		*/
 		printf ("OS command overflow; cannot compile files\n");
 		fflush (stdout);
 		exit_status = ERR;
-		return;
+		return 0;
 	    }
 
 	    if (verbose) {
@@ -144,7 +179,7 @@ char	*irafdir;		/* iraf root directory		*/
 	 * the library will be updated.
 	 */
 	if (baderr)
-	    return;
+	    return 0;
 
 	/*
 	 * Update the library.
@@ -197,7 +232,7 @@ char	*irafdir;		/* iraf root directory		*/
 		    libfname);
 		fflush (stdout);
 		exit_status = ERR;
-		return;
+		return 0;
 	    }
 
 	    if (verbose) {
@@ -205,7 +240,7 @@ char	*irafdir;		/* iraf root directory		*/
 		fflush (stdout);
 	    }
 
-	    if (execute)
+	    if (execute) {
 		if ((exit_status = os_cmd (cmd)) == OK) {
 		    /* Delete the object files.
 		     */
@@ -215,6 +250,7 @@ char	*irafdir;		/* iraf root directory		*/
 			os_delete (makeobj (flist[ndone+i]));
 		} else if (exit_status == INTERRUPT)
 		    fatals ("<ctrl/c> interrupt %s", library);
+	    }
 
 	    /* Truncate command and repeat with the next few files.
 	     */
@@ -236,8 +272,10 @@ char	*irafdir;		/* iraf root directory		*/
  * replaced in the library.  When we are called we are in the same directory
  * as the library.
  */
-h_rebuildlibrary (library)
-char	*library;		/* filename of library	*/
+int
+h_rebuildlibrary (
+    char  *library 		/* filename of library	*/
+)
 {
 #ifdef SYSV
 	/* Skip the library rebuild if COFF format library. */
@@ -272,9 +310,11 @@ char	*library;		/* filename of library	*/
  * On a VMS system the checked out file is a copy, and we have to physically
  * copy the new file back, creating a new version of the original file.
  */
-h_incheck (file, dir)
-char	*file;			/* file to be checked in	*/
-char	*dir;			/* where to put the file	*/
+int
+h_incheck (
+    char  *file,		/* file to be checked in	*/
+    char  *dir 			/* where to put the file	*/
+)
 {
 	char    backup[SZ_PATHNAME+1];
 	char    path[SZ_PATHNAME+1];
@@ -305,7 +345,7 @@ char	*dir;			/* where to put the file	*/
 	 */
 	if (dir != NULL && !(fi.st_mode & S_IFLNK)) {
 	    path[0] = EOS;
-	    if (ip = getenv("IRAFULIB"))
+	    if ((ip = getenv("IRAFULIB")))
 		if (access (mkpath(fname,ip,path), 0) < 0)
 		    path[0] = EOS;
 
@@ -340,10 +380,12 @@ char	*dir;			/* where to put the file	*/
  * been checked out do not check it out again.  In principle we should also
  * place some sort of a lock on the file while it is checked out, but...
  */
-h_outcheck (file, dir, clobber)
-char	*file;			/* file to be checked out		*/
-char	*dir;			/* where to get the file		*/
-int	clobber;		/* clobber existing copy of file?	*/
+int
+h_outcheck (
+    char  *file,		/* file to be checked out		*/
+    char  *dir,			/* where to get the file		*/
+    int	   clobber 		/* clobber existing copy of file?	*/
+)
 {
 	register char	*ip, *op;
 	char path[SZ_PATHNAME+1];
@@ -356,7 +398,7 @@ int	clobber;		/* clobber existing copy of file?	*/
 	 * Use the IRAFULIB version of the file if there is one.
 	 */
 	path[0] = EOS;
-	if (ip = getenv("IRAFULIB"))
+	if ((ip = getenv("IRAFULIB")))
 	    if (access (mkpath(fname,ip,path), 0) < 0)
 		path[0] = EOS;
 
@@ -418,9 +460,11 @@ int	clobber;		/* clobber existing copy of file?	*/
  * or -x), and we are checking out a library file (.a), update the debug
  * version of the library (XX_p.a).
  */
-h_getlibname (file, fname)
-char *file;
-char *fname;
+void
+h_getlibname (
+    char  *file,
+    char  *fname
+)
 {
 	register char *ip;
 
@@ -443,8 +487,8 @@ char *fname;
 /* H_XC -- Host interface to the XC compiler.  On UNIX all we do is use the
  * oscmd facility to pass the XC command line on to UNIX.
  */
-h_xc (cmd)
-char	*cmd;
+int
+h_xc (char *cmd)
 {
 	return (os_cmd (cmd));
 }
@@ -453,8 +497,10 @@ char	*cmd;
 /* H_PURGE -- Purge all old versions of all files in the named directory.
  * This is a no-op on UNIX since multiple file versions are not supported.
  */
-h_purge (dir)
-char	*dir;		/* LOGICAL directory name */
+int
+h_purge (
+    char  *dir		/* LOGICAL directory name */
+)
 {
 	if (verbose) {
 	    printf ("purge directory `%s'\n", dir);
@@ -476,9 +522,11 @@ char	*dir;		/* LOGICAL directory name */
 /* H_COPYFILE -- Copy a file.  If the new file already exists it is
  * clobbered (updated).
  */
-h_copyfile (oldfile, newfile)
-char	*oldfile;		/* existing file to be copied	*/
-char	*newfile;		/* new file, not a directory name */
+int
+h_copyfile (
+    char  *oldfile,		/* existing file to be copied	*/
+    char  *newfile 		/* new file, not a directory name */
+)
 {
 	char	old[SZ_PATHNAME+1];
 	char	new[SZ_PATHNAME+1];
@@ -506,9 +554,11 @@ char	*newfile;		/* new file, not a directory name */
 
 /* U_FCOPY -- Copy a file, UNIX.
  */
-u_fcopy (old, new)
-char	*old;
-char	*new;
+int
+u_fcopy (
+    char  *old,
+    char  *new
+)
 {
 	char	buf[SZ_COPYBUF], *ip;
 	int	in, out, nbytes;
@@ -548,7 +598,7 @@ char	*new;
 	 */
 	if (totbytes != fi.st_size) {
 	    printf ("$copy: file changed size `%s' oldsize=%d, newsize=%d\n",
-		old, fi.st_size, totbytes);
+		old, (int)fi.st_size, (int)totbytes);
 	    fflush (stdout);
 	    return (ERR);
 	}
@@ -576,9 +626,11 @@ char	*new;
  * or rename the file within the current directory.  If the destination file
  * already exists it is clobbered.
  */
-h_movefile (old, new)
-char	*old;		/* file to be moved		*/
-char	*new;		/* new pathname of file		*/
+int
+h_movefile (
+    char  *old,		/* file to be moved		*/
+    char  *new 		/* new pathname of file		*/
+)
 {
 	char	old_osfn[SZ_PATHNAME+1];
 	char	new_osfn[SZ_PATHNAME+1];
@@ -607,9 +659,11 @@ char	*new;		/* new pathname of file		*/
 /* U_FMOVE -- Unix procedure to move or rename a file.  Will move file to a
  * different device (via a file copy) if necessary.
  */
-u_fmove (old, new)
-char	*old;
-char	*new;
+int
+u_fmove (
+    char  *old,
+    char  *new 
+)
 {
 	unlink (new);
 	if (link (old, new) == ERR)
@@ -636,13 +690,15 @@ char	*new;
  * else must be done (e.g., write a command file and have the host system
  * process that).
  */
-add_sources (cmd, maxch, flist, totfiles, hostnames, nsources)
-char	*cmd;			/* concatenate to this		*/
-int	maxch;			/* max chars out		*/
-char	*flist[];		/* pointers to filename strings	*/
-int	totfiles;		/* number of files in list	*/
-int	hostnames;		/* return host filenames?	*/
-int	*nsources;		/* receives number of src files */
+int
+add_sources (
+    char *cmd,			/* concatenate to this		*/
+    int	  maxch,			/* max chars out		*/
+    char *flist[],		/* pointers to filename strings	*/
+    int	  totfiles,		/* number of files in list	*/
+    int	  hostnames,		/* return host filenames?	*/
+    int	 *nsources 		/* receives number of src files */
+)
 {
 	register char	*ip, *op, *otop;
 	register int	i;
@@ -677,7 +733,7 @@ int	*nsources;		/* receives number of src files */
 	    else
 		ip = flist[i];
 
-	    for (;  *op = *ip++;  op++)
+	    for (;  (*op = *ip++);  op++)
 		;
 	}
 
@@ -688,12 +744,14 @@ int	*nsources;		/* receives number of src files */
 /* ADD_OBJECTS -- Append the ".o" equivalent of each file name to the
  * output command buffer.  Return the number of file names appended.
  */
-add_objects (cmd, maxch, flist, totfiles, hostnames)
-char	*cmd;			/* concatenate to this		*/
-int	maxch;			/* max chars out		*/
-char	*flist[];		/* pointers to filename strings	*/
-int	totfiles;		/* number of files in list	*/
-int	hostnames;		/* return host filenames?	*/
+int
+add_objects (
+    char *cmd,			/* concatenate to this		*/
+    int	  maxch,		/* max chars out		*/
+    char *flist[],		/* pointers to filename strings	*/
+    int	  totfiles,		/* number of files in list	*/
+    int	  hostnames 		/* return host filenames?	*/
+)
 {
 	register char	*ip, *op, *otop;
 	register int	i;
@@ -714,7 +772,7 @@ int	hostnames;		/* return host filenames?	*/
 	    if (hostnames)
 		ip = vfn2osfn (ip,0);
 
-	    for (;  *op = *ip++;  op++)
+	    for (;  (*op = *ip++);  op++)
 		;
 	}
 
@@ -727,8 +785,7 @@ int	hostnames;		/* return host filenames?	*/
  * filename extension.
  */
 char *
-makeobj (fname)
-char	*fname;
+makeobj (char *fname)
 {
 	register char	*ip, *op;
 	static	char objfile[SZ_FNAME+1];
@@ -751,21 +808,22 @@ char	*fname;
  * module name is already a pathname.
  */
 char *
-mkpath (module, directory, outstr)
-char	*module;
-char	*directory;
-char	*outstr;
+mkpath (
+    char  *module,
+    char  *directory,
+    char  *outstr
+)
 {
 	register char	*ip, *op;
 
 	if (directory && module[0] != '/') {
-	    for (ip=directory, op=outstr;  *op = *ip++;  op++)
+	    for (ip=directory, op=outstr;  (*op = *ip++);  op++)
 		;
 	    if (op > outstr && *(op-1) != '/') {
 		*op++ = '/';
 		*op = EOS;
 	    }
-	    for (ip=module;  *op = *ip++;  op++)
+	    for (ip=module;  (*op = *ip++);  op++)
 		;
 	} else
 	    strcpy (outstr, module);
@@ -789,8 +847,7 @@ char	*outstr;
  * in the output pathname.
  */
 char *
-resolvefname (fname)
-char *fname;
+resolvefname (char *fname)
 {
 	static char pathname[SZ_LIBPATH];
 	char relpath[SZ_LIBPATH];
@@ -822,8 +879,8 @@ char *fname;
  * name, but get-cwd will return a different path, causing the comparison to
  * fail.
  */
-h_direq (dir1, dir2)
-char	*dir1, *dir2;
+int
+h_direq (char *dir1, char *dir2)
 {
 	register char	*ip1, *ip2;
 

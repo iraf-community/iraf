@@ -71,7 +71,7 @@ int	history_number;		/* the current history record		*/
 /*  Input polling structure.
  */
 typedef struct {
-    int fds;                            /* polling file descriptor set  */
+    XINT fds;                           /* polling file descriptor set  */
     int nfds;                           /* top of pollfd stack          */
     int timeout;                        /* polling timeout              */
 } PollFd;
@@ -86,9 +86,11 @@ extern	int do_error;			/* Are we processing errors?	  */
 extern  char samp_cmd[];		/* samp command buffer		  */
 extern  pthread_mutex_t samp_mutex;
 
+extern  XINT  c_poll_open (void);
+
 
 extern	void *memset();
-char   *readline (char *prompt);
+char   *freadline (char *prompt);
 int     add_history (char *buf);
 
 
@@ -199,7 +201,6 @@ get_command (FILE *fp)
 	char	new_cmd[SZ_CMDBLK+1];	/* temporary for processed cmd	*/
 	int	execute=1, temp, status, n;
 
-
 	if (!(currentask->t_flags & T_INTERACTIVE)  ||
 	    parse_state == PARSE_PARAMS) {
 
@@ -244,7 +245,7 @@ get_command (FILE *fp)
 
 	    if (cldebug || echocmds())
 		eprintf ("%s", status == EOF ? "bye\n" : cmdblk);
-
+		
 	    return (status);
 	}
 
@@ -288,11 +289,10 @@ input_:
 
 		} else {
 		    char  *cmd = (char *)NULL;
-		    char  *readline();
 
 		    get_prompt((cmdblk_line==0) ? curpack->pk_name : NOCLOSURE);
 
-    		    if ((cmd = readline (prompt)) == (char *)NULL)
+    		    if ((cmd = freadline (prompt)) == (char *)NULL)
 			return (EOF);
 
 		    pthread_mutex_lock (&samp_mutex);
@@ -301,12 +301,14 @@ input_:
 		  	 */
 			char cmdbuf[SZ_CMDBLK];
 
+			memset (cmdbuf, 0, SZ_CMDBLK);
 			get_samp_command (cmdbuf, SZ_CMDBLK);
 		        strcpy (raw_cmd, cmdbuf);
-		    } else
+		    } else {
 		        strcpy (raw_cmd, cmd);
-
+		    }
     		    strcat (raw_cmd, "\n");
+
 		    pthread_mutex_unlock (&samp_mutex);
 		}
 	    }
@@ -429,7 +431,7 @@ input_:
 */
 #ifdef NO_READLINE
 char *
-readline (char *prompt) { }
+freadline (char *prompt) { }
 int 
 add_history (char *buf)    { }
 #endif
@@ -716,8 +718,17 @@ expand_history_macros (char *in_text, char *out_text)
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
 	 */
-	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++)
-	    if (*ip == HISTCHAR) {
+	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++) {
+	    if (*ip == '"') {			/* span literal strings	*/
+		while (1) {
+		   *op++ = *ip++;
+		   if (*ip == '"' && *(ip+1) != '"') {
+		       *op = *ip;
+			break;
+		   }
+		}
+		continue;
+	    } else if (*ip == HISTCHAR) {
 		if (ip > in_text && *(ip-1) == '\\') {
 		    *(--op) = HISTCHAR;				/* \^	*/
 		    continue;
@@ -767,6 +778,7 @@ expand_history_macros (char *in_text, char *out_text)
 		--op;		/* leave pointing at last char output	*/
 		ip++;		/* skip the macro type metacharacter	*/
 	    }
+	}
 
 	return (have_arg_strings > 0);
 }
@@ -1257,12 +1269,11 @@ putlog (
 */
 pollInit ()
 {
-/* Allocate the structure. */
-if (poll_fd == NULL)
-    poll_fd = (PollFd *) calloc (sizeof(PollFd), 1);
+    /* Allocate the structure. */
+    if (poll_fd == NULL)
+        poll_fd = (PollFd *) calloc (1, sizeof(PollFd));
 
     /* Get a descriptor set and initialize the stdin. */
-    c_poll_set ((poll_fd->fds = c_poll_open()), fileno(stdin), POLLIN);
+    c_poll_set ((poll_fd->fds = c_poll_open()), fileno(stdin), (int) POLLIN);
     poll_fd->nfds++;
 }
-

@@ -43,15 +43,38 @@ int vot_handleCount () { return (handleCount); }
 handle_t
 vot_lookupHandle (Element *elem)
 {
-    unsigned int i = 0;
+#ifdef HANDLE_SEARCH
+    unsigned int i = 0, j = 0;
+    unsigned int big   = 1024, small = 20;
+#endif
     
     if (elem == (Element *) NULL)
         return (0);
     
-    for (i = 0; i < handleMax; i++) {
-        if (handles[i] == elem)
-            return ((i + 1));
-    }
+    /*  The handle structure is basically an array of pointers.  In general the
+     *  address will be an increasing value, but is not guaranteed to always be 
+     *  offset by an integer number of Elem structs.  The strategy is to search 
+     *  in large chunks before resorting to sequential access to the array to
+     * find the exact match.
+     *
+     */
+
+#ifdef HANDLE_SEARCH
+    big = max (1024, (handleCount / 10));
+    small = max (20, (handleCount / 200));
+    for (i = 0; i < handleMax; i+=big)
+	if (elem > handles[i] || i >= handleMax) 
+	    break;
+    for (j = (i - big); j < handleMax; j+=small)
+	if (elem > handles[j] || j >= handleMax) 
+	    break;
+    for (j = (j - small); j < handleMax; j++)
+        if (handles[j] == elem)
+            return ((j + 1));
+#else
+    if (elem->handle >= 0)
+        return (elem->handle);
+#endif
     
     return (vot_setHandle (elem));
 }
@@ -77,7 +100,7 @@ vot_setHandle (Element *elem)
     
     if (handleCount == handleMax) {
         old_handles = handles;
-        handles = (Element **) calloc ((handleMax + HANDLE_INCREMENT), 
+        handles = (Element **) calloc ((handleMax + HANDLE_INCREMENT + 1), 
 	    sizeof(Element *));
         
         for (i = 0; i < handleMax; i++)
@@ -87,8 +110,9 @@ vot_setHandle (Element *elem)
         free (old_handles);
     }
     
-    for (i = 0; i < handleMax; i++) {
+    for (i = handleCount+1; i >= 0; i--) {
         if (handles[i] == NULL) {
+	    elem->handle = i + 1;
             handles[i] = elem;
             handleCount++;
             return ((i + 1));

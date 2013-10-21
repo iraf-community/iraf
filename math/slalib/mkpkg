@@ -66,6 +66,7 @@ libslalib.a:
 	ds2c6.f   
 	ds2tp.f   
 	dsep.f   
+	dsepv.f   
 	dt.f   
 	dtf2d.f   
 	dtf2r.f   

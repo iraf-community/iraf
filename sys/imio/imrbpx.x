@@ -94,12 +94,12 @@ begin
 		step = xstep
 
 	    # Perform the boundary extension.
+	    ncp = sz_pixel
 	    call aclrc (pixval, 8)
 	    if ((i == 2 && !oob) || btype == BT_REFLECT || btype == BT_WRAP)
 		call imrdpx (im, obuf[op], npix, v1, step)
 	    else {
 		# Use constant or value of nearest boundary pixel.
-		ncp = sz_pixel
 		if (btype == BT_CONSTANT)
 		    call impakr (IM_OOBPIX(im), pixval, 1, IM_PIXTYPE(im))
 		else

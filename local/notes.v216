@@ -82,3 +82,447 @@ sys/imio/imt/imxbreakout.x
     Fixed multiple problems in correctly distinguishing sections from index
     ranges, escaping string, etc.  Also added ability to use @ and @@ in
     front of directories.  (5/24/12)
+
+pkg/vocl/bkg.c
+    Background jobs were broken because they were calling the ECL to execute
+    instead of the VOCL, so the dictionary address differed. (7/5/12)
+
+unix/hlib/install		-
+$iraf/install			+
+    Moved the install script to the toplevel directory where it logically
+    belongs.  Also added code so that if no $iraf is defined, the toplevel
+    directory is assumed (7/5/12)
+
+sys/imio/imt/imxparse.x
+    The parsing of extension names (e.g. "foo.fits[im1]") was failing and
+    being mistaken as an index range.  (7/14/12)
+
+sys/fmtio/evvexpr.y
+    The min/max/mod/median functions were incorrectly passing the operand
+    pointer to the xvv_newtype() function rather than the type code (7/24/12)
+
+sys/etc/votable.x
+    Moved the VOClient SPP support code for VOTable to the iraf system.  This
+    is mostly to remove the SPP dependency from the voclient source tree but
+    this code only makes sense in IRAF anyway.  (8/12/12)
+
+unix/as.macosx/ieee.gx
+unix/as.macosx/ieeed.x
+unix/as.macosx/ieeer.x
+    An earlier change to the IEEE code for macintel was not carried over to
+    the macosx architecture, meaning the same bug (all BITPIX=-64 pixels are
+    zero) was present for 32-bit Mac systems (9/4/12)
+
+sys/imio/imwrpx.x
+    Writing sections that are reversed what not working properly for INT
+    images.  (10/02/12)
+
+pkg/cl/history.c
+pkg/ecl/history.c
+pkg/vocl/history.c
+    The history character '^' was being improperly expanded in literal 
+    strings on the commandline.  (10/28/12)
+
+math/slalib
+math/slalib/README
+math/slalib/sedscript
+math/slalib/SED1
+math/slalib/SED3		-
+     Replaced the SLALIB with the GPL'd version from Starlink per a request
+     by Pat Wallace.  This updates the library to v2.5-2 and includes updates
+     to the leap-second table to 2012.  The IRAF copyright was not edited into
+     the files, instead each file contains the GPL copyright (full text of
+     which is in SLA_CONDITIONS.  (11/2/12)
+
+local/LICENSES/GPL	+
+local/LICENSES/README
+     Added the GPL license for math$slalib and ecl$readline. (11/2/12)
+
+pkg/cl/grammar.y
+pkg/ecl/grammar.y
+pkg/vocl/grammar.y
+    Removed extra commas from %token declarations (11/30/12)
+
+install
+    Remove 'redhat' architecture name (2/1/13)
+
+sys/imio/imrbpx.x
+    The 'ncp' variable wasn't being properly initialized (2/10/13)
+
+unix/hlib/login.cl
+    Added 'sed' to the list of foreign tasks (2/14/13)
+
+pkg/cl/config.h
+pkg/ecl/config.h
+pkg/vocl/config.h
+    Increased the max number of background jobs from 4 to 32 (2/20/13)
+
+sys/libc/fgets.c
+    The newline that was being added was corrupting the parameter buffers
+    read from the uparm files when parameter strings were longer than
+    PF_MAXLIN chars (3/11/13)
+
+sys/imio/imt/imx.h
+sys/imio/imt/imx.x
+sys/imio/imt/imt.x
+sys/imio/imt/imxexpand.x
+sys/imio/imt/imxescape.x
+sys/imio/imt/imxpreproc.x
+    Various fixes to all the know image template bugs (3/14/13)
+
+noao/lib/obsdb.dat
+    Added entries for the 'saoras' and 'terskol' observatories (4/11/13)
+
+pkg/ecl/eparam.c
+pkg/vocl/samp.c
+pkg/vocl/sampFuncs.c
+pkg/vocl/eparam.c
+unix/boot/spp/xpp/xpp.l
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/xppcode.c
+unix/boot/spp/rpp/ratlibc/putch.c
+unix/boot/rtar/rtar.c
+unix/boot/wtar/wtar.c
+unix/boot/generic/generic.c
+unix/boot/mkpkg/host.c
+unix/boot/mkpkg/pkg.c
+unix/boot/mkpkg/tok.c
+unix/boot/rmbin/rmbin.c
+unix/boot/rmfiles/rmfiles.c
+    Misc changes to fix compiler errors for gcc 4.2 (4/17/13)
+
+sys/fio/poll.x
+sys/libc/cpoll.c
+unix/hlib/libc/libc.h
+pkg/vocl/history.c
+    The polling structure was being used as an 'int' instead of 'XINT' (4/25/13)
+
+sys/pmio/pmglr.gz
+    The 'rl_out' pointer was being explicitly allocated as TY_SHORT but used
+    as 'Mem$t', changed to TY_PIXEL declaration. (5/4/13)
+
+install
+    The install script wasn't properly allowing the arch to be overwritten
+    by an IRAFARCH setting (5/28/13)
+
+unix/boot/bootProto.h		+
+unix/bootlib/kproto32.h		-
+unix/bootlib/kproto64.h		-
+    Added a new 'bootProto.h' include to enable prototype declaration
+    checking in the code.  Removed earlier (unused) kprotoNN.h files (7/2/13)
+
+unix/boot/bootlib/bootlib.h
+unix/boot/bootlib/osaccess.c
+unix/boot/bootlib/oschdir.c
+unix/boot/bootlib/osclose.c
+unix/boot/bootlib/osdelete.c
+unix/boot/bootlib/osdir.c
+unix/boot/bootlib/osfcopy.c
+unix/boot/bootlib/osfpathname.c
+unix/boot/bootlib/osproto.h
+unix/boot/bootlib/tape.c
+unix/boot/generic/chario.c
+unix/boot/generic/generic.c
+unix/boot/generic/lexyy.c
+unix/boot/generic/tok.l
+unix/boot/generic/yywrap.c
+unix/boot/mkpkg/char.c
+unix/boot/mkpkg/fdcache.c
+unix/boot/mkpkg/fncache.c
+unix/boot/mkpkg/host.c
+unix/boot/mkpkg/main.c
+unix/boot/mkpkg/mkpkg.h
+unix/boot/mkpkg/pkg.c
+unix/boot/mkpkg/scanlib.c
+unix/boot/mkpkg/sflist.c
+unix/boot/mkpkg/tok.c
+unix/boot/rmbin/rmbin.c
+unix/boot/rmfiles/rmfiles.c
+unix/boot/rtar/rtar.c
+unix/boot/spp/rpp/ratlibc/cant.c
+unix/boot/spp/rpp/ratlibc/close.c
+unix/boot/spp/rpp/ratlibc/endst.c
+unix/boot/spp/rpp/ratlibc/getarg.c
+unix/boot/spp/rpp/ratlibc/getlin.c
+unix/boot/spp/rpp/ratlibc/initst.c
+unix/boot/spp/rpp/ratlibc/open.c
+unix/boot/spp/rpp/ratlibc/putch.c
+unix/boot/spp/rpp/ratlibc/putlin.c
+unix/boot/spp/rpp/ratlibc/r4tocstr.c
+unix/boot/spp/rpp/ratlibc/remark.c
+unix/boot/spp/rpp/rpp.c
+unix/boot/spp/xc.c
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/lex.sed
+unix/boot/spp/xpp/lexyy.c
+unix/boot/spp/xpp/xpp.l
+unix/boot/spp/xpp/xppcode.c
+unix/boot/spp/xpp/xppmain.c
+unix/boot/spp/xpp/xppProto.h
+unix/boot/wtar/wtar.c
+unix/boot/xyacc/dextern.h
+unix/boot/xyacc/y1.c
+unix/boot/xyacc/y2.c
+unix/boot/xyacc/y3.c
+unix/boot/xyacc/y4.c
+    General changes necessary to clean up any "gcc -Wall" warnings and
+    errors.  This cleaned up several actual errors that might have been
+    caused by NULL pointers and generally added prototypes and ANSI-fied
+    declaratations  (7/2/13)
+
+unix/gdev/sgidev/sgi2gif.c
+unix/gdev/sgidev/sgi2svg.c
+unix/gdev/sgidev/sgi2uapl.c
+unix/gdev/sgidev/sgi2ueps.c
+unix/gdev/sgidev/sgi2uhpgl.c
+unix/gdev/sgidev/sgi2uhplj.c
+unix/gdev/sgidev/sgi2uimp.c
+unix/gdev/sgidev/sgi2uptx.c
+unix/gdev/sgidev/sgi2uqms.c
+unix/gdev/sgidev/sgi2xbm.c
+unix/gdev/sgidev/sgidispatch.c
+unix/gdev/sgidev/sgiUtil.c		+
+unix/gdev/sgidev/sgiUtil.h		+
+    Cleaned up all warning messages and made code ANSI.  In the process
+    extracted the common procedures such as bswap2() to a new common
+    sgiUtil.[ch] file.  (7/11/13)
+
+unix/os/irafpath.c
+    Removed unused string buffer declaration (7/11/13)
+
+unix/os/prwait.c
+    Fixed pointer size warnings (7/11/13)
+
+unix/os/alloc.c
+unix/os/zalloc.c
+    Modified to use <utmpx.h> and /var/run/utmp interface instead of the
+    older deprecated utmp API  (7/11/13)
+
+unix/os/zawset.c
+    Fixed printf() type warnings (7/11/13)
+
+unix/os/zflink.c
+    Fixed type warnings of PKCHAR on (char *) values (7/11/13)
+
+unix/os/zzepro.c
+    Added declaration for ex_handler() function (7/11/13)
+
+unix/os/zzdbg.c
+    Various format type changes to print statements (7/11/13)
+
+unix/os/zoscmd.c
+unix/os/zopdpr.c
+    Added declarations for prwait.c functions (7/11/13)
+
+unix/os/zgcmdl.c
+    Removed unused variable declarations (7/11/13)
+
+unix/os/zfiopr.c
+    Various format type changes to print statements (7/11/13)
+
+unix/os/zfiond.c
+    Various type changes to accept()/select() calls (7/11/13)
+
+unix/os/zfiomt.c
+    The #ifndef that disabled the code for MACOSX didn't cover the 
+    declarations for the interface (7/11/13)
+
+unix/os/zfioks.c
+    Type casting and format conversion fixes (7/12/13)
+
+unix/os/zzstrt.c
+    Declarations for other ZAWSET/ZOPNTY/ZZSETK procedures (7/12/13)
+
+unix/os/zxwhen.c
+    Fixed macro definitions for MACOSX being redefined (7/12/13)
+
+unix/boot/bootlib/osfn2vfn.c
+unix/boot/bootlib/vfn2osfn.c
+    Type casting fixes (7/12/13)
+
+unix/f2c
+unix/f2c/mkpkg.sh		+
+unix/f2c/src/mkpkg.sh		+
+unix/f2c/libf2c/mkpkg.sh	+
+    Updated to latest version of F2C sources to get a working 64-bit version.
+    (7/13/13)
+
+unix/mkpkg.sh
+    Added F2C to build as part of bootstrap.  (7/13/13)
+
+unix/f2c/src/makefile.u
+unix/f2c/libf2c/makefile.u
+    Removed the 'xsum' targets (7/13/13)
+
+unix/hlib/zzsetenv.def
+    Added 'fts' to the list of valid FITS extensions (7/14/13)
+
+pkg/vocl/vocl.x
+    Renamed the 't_ecl' task.  (7/21/13)
+
+pkg/system/touch.x
+    Fixed a segvio when trying to touch a non-existent file where some
+    element of the path doesn't exist or isn't writeable. (7/30/13)
+
+extern/configure
+    Replaced with a Bourne-shell version of the script (7/30/13)
+
+math/slalib/_mkdiff		-
+    Removed development file.  (7/30/13)
+
+lib/imio.h.ORIG
+noao/astcat/lib/catdb.dat.old
+noao/astcat/src/agetcat/atfcat.x.old
+noao/astcat/src/attools/atinpars.x.old
+noao/digiphot/daophot/allstar/dpalinit.x.OLD
+noao/digiphot/photcal/evaluate/phminv.f.old
+noao/digiphot/photcal/fitparams/ftweights.x.old
+noao/digiphot/photcal/lib/obsfile.h.old
+noao/digiphot/photcal/mkobsfile/phimtable.x.old
+noao/digiphot/photcal/mkobsfile/phsort.x.old
+noao/digiphot/photcal/mkobsfile/t_obsfile.x.old
+noao/imred/hydra/demos/xgdohydra.bak
+noao/imred/src/dofoe/proc.bak
+noao/onedspec/scombine/t_iscombine.bak
+noao/twodspec/apextract/apmw1.bak
+noao/twodspec/apextract/apmw2.bak
+pkg/dataio/reblock/reblock_file.x.old
+pkg/images/imcoords/src/t_ccmap.x.old
+pkg/images/immatch/doc/imcentroid.hlp.old
+pkg/images/imutil/src/t_minmax.x.old
+pkg/images/tv/tvmark/mkoutname.x.old
+pkg/system/help/helpdb.x.bak
+pkg/xtools/catquery/cqgfields.x.old
+pkg/xtools/inlfit/infit.gx.old
+pkg/xtools/inlfit/inrefit.gx.old
+unix/boot/spp/rpp/rppfor/endcod.f.OLD
+    Removed old, unused, source files.  (7/31/13)
+
+unix/hlib/buglog.sh
+unix/hlib/cl.sh
+unix/hlib/ecl.sh
+unix/hlib/f77.sh
+unix/hlib/fc.sh
+unix/hlib/helplog.sh
+unix/hlib/irafarch.sh
+unix/hlib/irafuser.sh
+unix/hlib/mkfloat.sh
+unix/hlib/mkiraf.sh
+unix/hlib/mkmlist.sh
+unix/hlib/util.sh
+unix/hlib/vocl.sh
+    Added Bourne shell equivalents of all scripts (7/31/13)
+
+unix/reboot
+unix/os/mkproto
+    Converted to Bourne shell script (7/31/13)
+
+unix/os/zmfree.c
+unix/hlib/libc/knames.h
+    Added a new ZFREE procedure to free pointers allocated from host malloc()
+    calls.  Needed to free the readline() return value.  (7/31/13)
+
+sys/libc/freadline.c
+unix/hlib/libc/libc.h
+    Added a new freadline() wrapper on a host readline() call.  This allows
+    libc to get the command buffer and then free the value in the interface.
+    (7/31/13)
+
+pkg/ecl/mkpkg
+pkg/ecl/history.c
+pkg/ecl/readline		-
+pkg/vocl/mkpkg
+pkg/vocl/history.c
+pkg/vocl/readline		-
+    Modified to use libc readline interface to avoid having multiple copies
+    of the library for each version of the CL.  (7/31/13)
+
+unix/hlib/libc/stdarg-linux.h
+    Added typedef change to __builtin_stdarg_start to work w/ GCC 4.4 (10/8/13)
+
+pkg/vocl/samp.c
+pkg/vocl/sampCmd.c
+pkg/vocl/sampFuncs.c
+pkg/vocl/sampHandlers.c
+    Changed declaration of rl_event_hoot to fix compiler warning.  Modified
+    to use the readline include files however readline itself is no longer
+    compiled as part of the binary, instead we rely on the system lib. (10/9/13)
+
+unix/boot/spp/xc.c
+    Added "-lrt" to the link line for Linux systems to satisfy GCC 4.4. and
+    later compilers (10/8/13)
+
+pkg/cl/main.c
+pkg/ecl/main.c
+pkg/vocl/main.c
+unix/hlib/login.cl
+    Modified to allow login using the global $HOME/.iraf startup when there is
+    no login.cl in the current directory.  The user is notified when this file
+    in used in the banner message.  Note that that use of logout.cl is
+    unaffected since the hlib$cllogout.cl script refers to home$logout.cl and
+    in a global login home$ is $HOME/.iraf
+    (10/10/13)
+
+unix/hlib/mkiraf.sh
+    Modifications to allow global login (10/10/13)
+
+unix/hlib/setup.sh
+unix/hlib/setup.csh
+    Changed the IRAFARCH to user 'irafarch.sh' (10/10/13)
+
+system/system.hd
+system/system.men
+system/system.par
+system/chkupdate.x		+
+system/chkupdate.par		+
+system/doc/chkupdate.hlp	+
+unix/hlib/login.cl
+    Added a new CHKUPDATE task to check iraf.noao.edu for a newer release
+    of IRAF than the one currently installed.  By default, the file
+    '.release_date' defines the current release date, a similar timestamp
+    file is kept on the server.  The check is only done ever 'interval'
+    days to minimize the impact and may be disabled entirely. (10/12/13)
+
+unix/hlib/login.cl
+    Modified to allow a 'loginuser.cl' and/or 'uparm' directory in the
+    current working dir to override a global version in the $HOME/.iraf
+    directory.  (10/13/13)
+
+vo/java/Aladin.jar
+vo/java/topcat-full.jar
+    Updated to latest version (10/14/13)
+
+unix/hlib/libc/fpoll.h
+    undefined POLLIN etc to avoid compiler warnings (10/14/13)
+    
+unix/hlib/irafuser.csh
+    Added an XC_CFLAGS to add a '-I$HOME/.iraf' to the opts to allow
+    compilation of C files in a sysgen.  (10/14/13)
+
+.version
+pkg/cl/cl.par
+pkg/ecl/cl.par
+pkg/vocl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/irafarch.csh
+unix/hlib/zzsetenv.def
+    Updated version strings to final export (10/14/13)
+
+unix/hlib/irafuser.sh
+unix/hlib/irafuser.csh
+unix/hlib/irafarch.sh
+unix/hlib/irafarch.csh
+    Removed 'ppc' architecture references.  Also fixed a 'too many arguments' 
+    error when sourcing these files with an invalid IRAFARCH set (10/15/13)
+
+install
+    Modified to create cmdlink targets for source-only system.  (10/18/13)
+
+pkg/vocl/mkpkg
+pkg/vocl/readline/		-
+    Modified to use the iraf$vendor readline includes (10/18/13)
+
+==============================================================================
+

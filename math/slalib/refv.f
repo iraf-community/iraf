@@ -39,26 +39,31 @@
 *
 *  3  At low elevations (below about 3 degrees) the refraction
 *     correction is held back to prevent arithmetic problems and
-*     wildly wrong results.  Over a wide range of observer heights
-*     and corresponding temperatures and pressures, the following
-*     levels of accuracy (arcsec) are achieved, relative to numerical
-*     integration through a model atmosphere:
+*     wildly wrong results.  For optical/IR wavelengths, over a wide
+*     range of observer heights and corresponding temperatures and
+*     pressures, the following levels of accuracy (arcsec, worst case)
+*     are achieved, relative to numerical integration through a model
+*     atmosphere:
 *
 *              ZD    error
 *
-*              80      0.4
-*              81      0.8
-*              82      1.6
-*              83      3
-*              84      7
-*              85     17
-*              86     45
-*              87    150
-*              88    340
-*              89    620
+*              80      0.7
+*              81      1.3
+*              82      2.5
+*              83      5
+*              84     10
+*              85     20
+*              86     55
+*              87    160
+*              88    360
+*              89    640
 *              90   1100
-*              91   1900         } relevant only to
-*              92   3200         } high-elevation sites
+*              91   1700         } relevant only to
+*              92   2600         } high-elevation sites
+*
+*     The results for radio are slightly worse over most of the range,
+*     becoming significantly worse below ZD=88 and unusable beyond
+*     ZD=90.
 *
 *  4  See also the routine slREFZ, which performs the adjustment to
 *     the zenith distance rather than in Cartesian Az/El coordinates.
@@ -67,9 +72,26 @@
 *     about ZD 84 degrees slREFZ should be used, and for the utmost
 *     accuracy iterative use of slRFRO should be considered.
 *
-*  P.T.Wallace   Starlink   26 December 1994
+*  P.T.Wallace   Starlink   10 April 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2004 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

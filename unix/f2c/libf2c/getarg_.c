@@ -10,25 +10,27 @@ extern "C" {
 */
 
 #ifdef KR_headers
-VOID getarg_(n, s, ls) ftnint *n; register char *s; ftnlen ls;
+VOID getarg_(n, s, ls) ftnint *n; char *s; ftnlen ls;
+#define Const /*nothing*/
 #else
-void getarg_(ftnint *n, register char *s, ftnlen ls)
+#define Const const
+void getarg_(ftnint *n, char *s, ftnlen ls)
 #endif
 {
-extern int xargc;
-extern char **xargv;
-register char *t;
-register int i;
-
-if(*n>=0 && *n<xargc)
-	t = xargv[*n];
-else
-	t = "";
-for(i = 0; i<ls && *t!='\0' ; ++i)
-	*s++ = *t++;
-for( ; i<ls ; ++i)
-	*s++ = ' ';
-}
+	extern int xargc;
+	extern char **xargv;
+	Const char *t;
+	int i;
+	
+	if(*n>=0 && *n<xargc)
+		t = xargv[*n];
+	else
+		t = "";
+	for(i = 0; i<ls && *t!='\0' ; ++i)
+		*s++ = *t++;
+	for( ; i<ls ; ++i)
+		*s++ = ' ';
+	}
 #ifdef __cplusplus
 }
 #endif

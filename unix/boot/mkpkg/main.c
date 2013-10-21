@@ -3,13 +3,18 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define	import_spp
 #define	import_knames
 #define	import_error
 
 #include <iraf.h>
+
 #include "mkpkg.h"
+#include "../bootProto.h"
 
 /*
  * MKPKG -- Make a package or library, following the instructions given in
@@ -53,14 +58,23 @@ int	forceupdate = NO;		/* forcibly update libmod dates	*/
 extern	char *os_getenv();
 
 
-zzpause () { printf ("ready ...."); (void) getc(stdin); }
+void warns (char *fmt, char *arg);
+void fatals (char *fmt, char *arg);
+
+extern  int  ZZSTRT (void);
+extern  int  ZZSTOP (void);
+
+extern  int  do_mkpkg (struct context *cx, int islib);
+
+
+
+void zzpause () { printf ("ready ...."); (void) getc(stdin); }
 
 
 /* MAIN -- Entry point of mkpkg.e
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	struct	context *cx;
 	char	flags[SZ_LINE+1];
@@ -99,7 +113,7 @@ char	*argv[];
 		    switch (*ip) {
 		    case 'f':
 			if (*argp == NULL)
-			    warns ("missing argument to switch `-f'");
+			    warns ("missing argument to switch `-f'", NULL);
 			else
 			    strcpy (cx->mkpkgfile, *argp++);
 			break;
@@ -123,12 +137,12 @@ char	*argv[];
 			break;
 		    case 'p':
 			if (*argp == NULL)
-			    warns ("missing argument to switch `-p'");
+			    warns ("missing argument to switch `-p'", NULL);
 			else {
 			    pkgenv[npkg] = *argp++;
 			    loadpkgenv (pkgenv[npkg]);
 			    if (npkg++ >= MAX_PKGENV)
-				fatals ("too many -p package arguments");
+				fatals ("too many -p package arguments", NULL);
 			}
 			break;
 		    case 'u':
@@ -142,7 +156,7 @@ char	*argv[];
 			break;
 		    case 'r':
 			if (*argp == NULL)
-			    warns ("missing argument to switch `-r'");
+			    warns ("missing argument to switch `-r'", NULL);
 			else
 			    strcpy (irafdir, *argp++);
 			break;
@@ -194,7 +208,7 @@ addflag:		for (op=flags;  *op;  op++)
 	 * otherwise look for the name PKGENV in the user's environment.
 	 */
 	if (npkg <= 0)
-	    if (pkgenv[0] = os_getenv (PKGENV)) {
+	    if ((pkgenv[0] = os_getenv (PKGENV))) {
 		char    *ip;
 
 		strcpy (v_pkgenv, pkgenv[0]);
@@ -207,7 +221,7 @@ addflag:		for (op=flags;  *op;  op++)
 		    *ip++ = EOS;
 		    loadpkgenv (pkgenv[npkg]);
 		    if (npkg++ >= MAX_PKGENV)
-			fatals ("too many -p package arguments");
+			fatals ("too many -p package arguments", NULL);
 		}
 	    }
 
@@ -305,9 +319,8 @@ addflag:		for (op=flags;  *op;  op++)
 /* WARNS -- Print error message with one string argument but do not terminate
  * program execution.
  */
-warns (fmt, arg)
-char	*fmt;
-char	*arg;
+void
+warns (char *fmt, char *arg)
 {
 	char	errmsg[SZ_LINE+1];
 
@@ -321,9 +334,8 @@ char	*arg;
 /* FATALS -- Print error message with one string argument and terminate
  * program execution.
  */
-fatals (fmt, arg)
-char	*fmt;
-char	*arg;
+void
+fatals (char *fmt, char	*arg)
 {
 	char	errmsg[SZ_LINE+1];
 

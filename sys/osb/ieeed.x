@@ -51,7 +51,7 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 define	IEEE_SWAP	IEEE_SWAP8
 define	BSWAP		bswap8
 define	NSWAP		8
-define	IOFF		1	# MACHDEP (normally 1, 2 on e.g. Intel)
+define	IOFF		2	# MACHDEP (normally 1, 2 on e.g. Intel)
 
 
 # IEEVPAK -- Convert an array in the native floating point format into an

@@ -603,6 +603,11 @@ int ffgcrd( fitsfile *fptr,     /* I - FITS file pointer        */
                   return(*status);   /* found the matching keyword */
                 }
               }
+	      else if (namelen == 0 && cardlen == 0)
+	      {
+	         /* matched a blank keyword */
+		 return(*status);
+	      }
             }
           }
         }
@@ -857,10 +862,11 @@ int ffgkls( fitsfile *fptr,     /* I - FITS file pointer         */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
-int fffree( char *value,       /* I - pointer to keyword value  */
+int fffree( void *value,       /* I - pointer to keyword value  */
             int  *status)      /* IO - error status             */
 /*
-  Free the memory that was allocated by ffgkls for the long string keyword value.
+  Free the memory that was previously allocated by CFITSIO, 
+  such as by ffgkls or fits_hdr2str
 */
 {
     if (*status > 0)

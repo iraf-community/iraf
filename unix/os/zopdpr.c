@@ -20,6 +20,10 @@
 #define	vfork	fork
 #endif
 
+extern void pr_enter (int pid, int inchan, int outchan);
+extern int  pr_wait (int pid);
+extern void pr_release (int pid);
+
 
 /* ZOPDPR -- Open a detached process.  In this implementation detached
  * processes begin execution immediately, runing concurrently with the parent.
@@ -136,7 +140,8 @@ ZOPDPR (
 	     * child, which reads the file to learn what to do, and deletes
 	     * the file upon exit.
 	     */
-	    execl ((char *)osfn, (char *)osfn, "-d", (char *)bkgfile, 0);
+	    execl ((char *)osfn, (char *)osfn, "-d", (char *)bkgfile, 
+		(char *) 0);
 
 	    /* If we get here the new process could not be executed for some
 	     * reason.  Shutdown, calling _exit to avoid flushing parent's

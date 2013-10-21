@@ -5,11 +5,11 @@
 
 find tok.l -newer lexyy.c -exec rm lexyy.c \;
 if test -f lexyy.c; then\
-    $CC -c $HSI_CF lexyy.c;\
+    $CC -c $HSI_CF -w lexyy.c;\
 else\
     lex	tok.l;\
     sed -f lex.sed lex.yy.c > lexyy.c;  rm lex.yy.c;\
-    $CC -c $HSI_CF lexyy.c;\
+    $CC -c $HSI_CF -w lexyy.c;\
 fi
 
 $CC -c $HSI_CF	generic.c chario.c yywrap.c

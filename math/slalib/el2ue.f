@@ -6,39 +6,40 @@
 *      E L U E
 *     - - - - - -
 *
-*  Transform conventional osculating orbital elements into "universal" form.
+*  Transform conventional osculating orbital elements into "universal"
+*  form.
 *
 *  Given:
-*     DATE     d       epoch (TT MJD) of osculation (Note 3)
-*     JFORM    i       choice of element set (1-3, Note 6)
-*     EPOCH    d       epoch (TT MJD) of the elements
-*     ORBINC   d       inclination (radians)
-*     ANODE    d       longitude of the ascending node (radians)
-*     PERIH    d       longitude or argument of perihelion (radians)
-*     AORQ     d       mean distance or perihelion distance (AU)
-*     E        d       eccentricity
-*     AORL     d       mean anomaly or longitude (radians, JFORM=1,2 only)
-*     DM       d       daily motion (radians, JFORM=1 only)
+*     DATE    d      epoch (TT MJD) of osculation (Note 3)
+*     JFORM   i      choice of element set (1-3, Note 6)
+*     EPOCH   d      epoch (TT MJD) of the elements
+*     ORBINC  d      inclination (radians)
+*     ANODE   d      longitude of the ascending node (radians)
+*     PERIH   d      longitude or argument of perihelion (radians)
+*     AORQ    d      mean distance or perihelion distance (AU)
+*     E       d      eccentricity
+*     AORL    d      mean anomaly or longitude (radians, JFORM=1,2 only)
+*     DM      d      daily motion (radians, JFORM=1 only)
 *
 *  Returned:
-*     U        d(13)   universal orbital elements (Note 1)
+*     U       d(13)  universal orbital elements (Note 1)
 *
-*                (1)   combined mass (M+m)
-*                (2)   total energy of the orbit (alpha)
-*                (3)   reference (osculating) epoch (t0)
-*              (4-6)   position at reference epoch (r0)
-*              (7-9)   velocity at reference epoch (v0)
-*               (10)   heliocentric distance at reference epoch
-*               (11)   r0.v0
-*               (12)   date (t)
-*               (13)   universal eccentric anomaly (psi) of date, approx
+*               (1)  combined mass (M+m)
+*               (2)  total energy of the orbit (alpha)
+*               (3)  reference (osculating) epoch (t0)
+*             (4-6)  position at reference epoch (r0)
+*             (7-9)  velocity at reference epoch (v0)
+*              (10)  heliocentric distance at reference epoch
+*              (11)  r0.v0
+*              (12)  date (t)
+*              (13)  universal eccentric anomaly (psi) of date, approx
 *
-*     JSTAT    i       status:  0 = OK
-*                              -1 = illegal JFORM
-*                              -2 = illegal E
-*                              -3 = illegal AORQ
-*                              -4 = illegal DM
-*                              -5 = numerical error
+*     JSTAT   i      status:  0 = OK
+*                            -1 = illegal JFORM
+*                            -2 = illegal E
+*                            -3 = illegal AORQ
+*                            -4 = illegal DM
+*                            -5 = numerical error
 *
 *  Called:  slUEPV, slPVUE
 *
@@ -121,9 +122,26 @@
 *
 *  Reference:  Everhart & Pitkin, Am.J.Phys. 51, 712 (1983).
 *
-*  P.T.Wallace   Starlink   18 February 1999
+*  Last revision:   8 September 2005
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -178,21 +196,30 @@
 *  CM    = combined mass, M+m (mu)
 
       IF (JFORM.EQ.1) THEN
+
+*     Major planet.
          PHT = EPOCH-(AORL-PERIH)/DM
          ARGPH = PERIH-ANODE
          Q = AORQ*(1D0-E)
          W = DM/GCON
          CM = W*W*AORQ*AORQ*AORQ
+
       ELSE IF (JFORM.EQ.2) THEN
+
+*     Minor planet.
          PHT = EPOCH-AORL*SQRT(AORQ*AORQ*AORQ)/GCON
          ARGPH = PERIH
          Q = AORQ*(1D0-E)
          CM = 1D0
-      ELSE IF (JFORM.EQ.3) THEN
+
+      ELSE
+
+*     Comet.
          PHT = EPOCH
          ARGPH = PERIH
          Q = AORQ
          CM = 1D0
+
       END IF
 
 *  The universal variable alpha.  This is proportional to the total
@@ -259,7 +286,7 @@
 
       DT = (DATE-PHT)*GCON
 
-*  First Approximation to the Universal Eccentric Anomaly, PSI,
+*  First approximation to the Universal Eccentric Anomaly, PSI,
 *  based on the circle (FC) and parabola (FP) values.
 
       FC = DT/Q

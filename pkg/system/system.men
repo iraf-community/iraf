@@ -1,5 +1,6 @@
        allocate - Allocate a device, i.e., magtape drive mta, mtb, ...
     concatenate - Concatenate a list of files
+      chkupdate - Check for an available IRAF update
 	   copy - Copy a file or files (use IMCOPY for imagefiles)
 	  count - Count the number of lines, words, characters in a text file
      deallocate - Deallocate a previously allocated device

@@ -17,8 +17,8 @@
  *   str = samp_getStringFromMap  (Map map, char *key)
  *      map = samp_getMapFromMap  (Map map, char *key)
  *    list = samp_getListFromMap  (Map map, char *key)
- *       ival = samp_getIntInMap  (Map map, char *key)
- *     rval = samp_getFloatInMap  (Map map, char *key)
+ *     ival = samp_getIntFromMap  (Map map, char *key)
+ *   rval = samp_getFloatFromMap  (Map map, char *key)
  *
  *
  *  @brief      (Internal) Interface to support the Map structure
@@ -66,9 +66,10 @@ samp_newMap ()
 void
 samp_freeMap (Map map)
 {
-    if (map >= 0)
+    if (map > 0)
         xr_freeStruct (map);
 }
+
 
 /*
  *  SAMP_GETMAPSIZE -- Get the number of elements in a Map.
@@ -210,7 +211,6 @@ samp_setFloatInMap (Map map, char *key, float value)
 
 
 /****************************************************************************/
-
 
 /**
  *  SAMP_GETSTRINGFROMMAP -- Get a string from the Map

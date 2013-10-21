@@ -49,7 +49,7 @@ begin
 	# and substitute the fitted values for the parameter values at all
 	# the sample lines.
 
-	call fit_function (ms, Memr[samples], nsamples, spectra, param_id,
+	call fit_function (ms, Memi[samples], nsamples, spectra, param_id,
 	    function, order)
 
 	# Finish up.

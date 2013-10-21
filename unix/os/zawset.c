@@ -117,8 +117,8 @@ ZAWSET (
 	getrlimit (RLIMIT_RSS, &rlp);
 	if (debug)
 	    fprintf (stderr, "zawset: starting rlimit cur=%ldm, max=%ldm\n",
-		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
-		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
+		(long)(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
+		(long)(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
 
 	working_set_size = min (max_wss,
 	    rlp.rlim_cur == RLIM_INFINITY ? max_wss : rlp.rlim_cur);
@@ -142,12 +142,13 @@ ZAWSET (
 	}
 	if (debug)
 	    fprintf (stderr, "zawset: adjusted rlimit cur=%ldm, max=%ldm\n",
-		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
-		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
+		(long)(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
+		(long)(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
 #endif
 	if (debug)
-	    fprintf (stderr, "zawset: best=%dm, old=%dm, new=%dm, max=%dm\n",
-		*best_size/MB, *old_size/MB, *new_size/MB, *max_size/MB);
+	    fprintf (stderr, "zawset: best=%ldm old=%ldm new=%ldm max=%ldm\n",
+		(long)*best_size/MB, (long)*old_size/MB, 
+		(long)*new_size/MB, (long)*max_size/MB);
 
 	return (XOK);
 }

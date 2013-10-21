@@ -1,6 +1,10 @@
 .help revisions Jun88 noao.onedspec
 .nf
 
+splot/eqwidthcp.x
+    The 'sg' and 'lg' pointers were allocated as TY_REAL and re-allocated
+    as TY_INT (5/4/13)
+
 splot/anshdr.x
     Added a F_FLUSHNL flag to the logfile descriptors to flush the 
     data as it is written (5/12/12, MJF)

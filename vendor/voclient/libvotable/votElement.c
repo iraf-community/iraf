@@ -59,53 +59,53 @@ struct {
     char *opt;		/** optional attrs		*/
 } elemAttrs[] = {
  { TY_ROOT, 	"", 
-	 	""							},
+	 	""							    },
  { TY_VOTABLE, 	"", 
-	 	"ID|version|"						},
+	 	"ID|version|"						    },
  { TY_RESOURCE, "",
-	 	"ID|name|type|utype|"					},
+	 	"ID|name|type|utype|"					    },
  { TY_TABLE, 	"",
-	 	"ID|name|ucd|utype|ref|nrows|ncols|"			},
+	 	"ID|name|ucd|utype|ref|nrows|ncols|"			    },
  { TY_INFO, 	"name|value|",
-	 	"ID|unit|ucd|utype|ref|"				},
+	 	"ID|unit|ucd|utype|ref|"				    },
  { TY_STREAM, 	"",
-	 	"type|href|actuate|encoding|expires|rights|"		},
+	 	"type|href|actuate|encoding|expires|rights|serialization"   },
  { TY_FITS, 	"",
-	 	"extnum|"						},
+	 	"extnum|"						    },
  { TY_TD, 	"",
-	 	"encoding|"						},
+	 	"encoding|serialization"				    },
  { TY_TR, 	"",
-	 	""							},
+	 	""							    },
  { TY_COOSYS, 	"",
-	 	"ID|equinox|epoch|system|"				},
+	 	"ID|equinox|epoch|system|"				    },
  { TY_DESCRIPTION, "",
-	 	""							},
+	 	""							    },
  { TY_DEFINITIONS, "",
-	 	""							},
+	 	""							    },
  { TY_DATA, 	"",
-	 	""							},
+	 	""							    },
  { TY_TABLEDATA,"",
-	 	"nrows|ncols"						},
+	 	"nrows|ncols"						    },
  { TY_GROUP, 	"",
-	 	"ID|name|ucd|utype|ref|"				},
+	 	"ID|name|ucd|utype|ref|"				    },
  { TY_PARAM, 	"datatype|name|value|",
-	 	"ID|unit|ucd|utype|ref|precision|width|arraysize|"	},
+	 	"ID|unit|ucd|utype|ref|precision|width|arraysize|"	    },
  { TY_FIELD, 	"datatype|name|type|xtype|",
-	 	"ID|unit|ucd|utype|ref|precision|width|arraysize|" 	},
+	 	"ID|unit|ucd|utype|ref|precision|width|arraysize|" 	    },
  { TY_FIELDREF, "ref|",
-	 	"ucd|utype"						},
+	 	"ucd|utype"						    },
  { TY_PARAMREF, "ref|",
-	 	"ucd|utype"						},
+	 	"ucd|utype"						    },
  { TY_MIN, 	"value|",
-	 	"inclusive|"						},
+	 	"inclusive|"						    },
  { TY_MAX, 	"value|",
-	 	"inclusive|"						},
+	 	"inclusive|"						    },
  { TY_OPTION, 	"value|",
-	 	"name|"							},
+	 	"name|"							    },
  { TY_VALUES, 	"",
-	 	"ID|type|null|ref|"					},
+	 	"ID|type|null|ref|"					    },
  { TY_LINK, 	"action|",
-	 	"ID|content-role|content-type|title|value|href|"	},
+	 	"ID|content-role|content-type|title|value|href|"	    },
   { -1,		NULL,		NULL		}
 };
 
@@ -251,6 +251,7 @@ vot_newElem (unsigned int type)
             new->attr->req = elemAttrs[i].req;
             new->attr->opt = elemAttrs[i].opt;
             vot_setDefaultAttrs (new->attr);
+	    new->handle = -1;
             return (new);
         }
     }
@@ -283,7 +284,9 @@ vot_setDefaultAttrs (AttrBlock *ablock)
         while ((name = strtok (tok, "|")) != NULL) {
             tok = NULL;
 	    if (strcasecmp ("datatype", name) == 0) {
+		/*
                 vot_attrSet (ablock, "arraysize", "*");
+		*/
                 vot_attrSet (ablock, name, "char");
 	    } else
                 vot_attrSet (ablock, name, "");

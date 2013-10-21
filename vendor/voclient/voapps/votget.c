@@ -1,39 +1,43 @@
 /**
- *  VOTGET -- Download all access references in a VOTable.
+ *  VOTGET -- Download select/all access references in a VOTable.
  *
  *  Usage:
  *
- *	votget [-b <base>] [-c <col>] [-u <ucd>] [-v] [-x] [-o fname] <file>
+ *	votget [<opts>] <votable.xml>
+ *	votget [<opts>] --samp 		# to listen for SMAP messages
  *
  *  Where
- *	    -b <base>		Base output filename
- *	    -e [<extn>] 	Extension to add to filename (or auto)
- *	    -f <fmt>  		Download only specified <type>
- *	    -h			Print help summary
- *	    -s 			Use sequential file numbers
- *	    -t 			Input file is temporary, delete when done
- *	    -u <ucd>		Use ucd to identify acref column
+ *	    -b,--base <base>	    Base output filename
+ *	    -e,--extn [<extn>] 	    Extension to add to filename (or auto)
+ *	    -f,--fmt <fmt>  	    Download only specified <type>
+ *	    -s,--sum 		    Use checksum as file number
+ *	    -t,--tmp 		    Input file is temporary, delete when done
+ *	    -u,--ucd <ucd>	    Use ucd to identify acref column
  *
- *	    -o <fname> 		Output extracted filename (or 'stdout' or '-')
- *	    -v 			Verbose output
- *	    -x 			Extract access references
+ *	    -o,--output <fname>     Output filename (single download)
+ *	    -v,--verbose 	    Verbose output
+ *	    -x,--extract 	    Extract access references
  *
- *	    -A <colnum>		Col number to use as acref column (0-indexed)
- *	    -B  		Background, i.e. run in forked child process
- *	    -C  		Cache the downloaded file
- *	    -D  		Set download directory
- *	    -F <colnum>		Col number to use as format column (0-indexed)
- *	    -N <N> 		Number of simultaneous downloads
+ *	    -A,--acref <colnum>	    Col number for acref column (0-indexed)
+ *	    -B,--bkg  		    Background, i.e. run in forked child process
+ *	    -C,--cache  	    Cache the downloaded file
+ *	    -D,--download  	    Set download directory
+ *	    -F,--fmtcol <colnum>    Col number for format column (0-indexed)
+ *	    -N,--num <N> 	    Number of simultaneous downloads
+ *	    -S,--samp		    start as SAMP listener
+ *	    -m,--mtype <mtype>	    mtype to wait for
  *
- *	    +d			debug output
+ *	    -h,--help		    Print help summary
+ *	    -d,--debug		    Debug output
+ *	       --test		    Run unit tests
  *
- *	    <file>		Name of file to process, or '-' for stdin
+ *	    <votable>		    VOTable to process
  *
  *  @file       votget.c
  *  @author     Mike Fitzpatrick
- *  @date       6/03/11
+ *  @date       6/03/12
  *
- *  @brief      Download all access references in a VOTable.
+ *  @brief      Download select/all access references in a VOTable.
  */
 
 
@@ -55,11 +59,11 @@
 #include <curl/types.h>
 #include <curl/easy.h>
 
+#include "samp.h"
 #include "votParse.h"
+#include "voApps.h"
 
 
-#define	SZ_FNAME	256		/* max size of a file name	*/
-#define	SZ_URL		4096		/* max URL size			*/
 #define	MIN_THREADS	4		/* min no. simultaneous thread	*/
 #define	MAX_THREADS	64		/* max no. simultaneous threads */
 #define	MAX_DOWNLOADS	4096		/* max no. files to download	*/
@@ -72,32 +76,33 @@
 #define FORMAT_UCD   	"VOX:Image_Format"
 
 
-static int	vot	  = 0;		/* VOTable handle	     	*/
-static int	verbose	  = 0;		/* verbose parameter	     	*/
-static int	debug	  = 0;		/* debug flag	     		*/
-static int	extract	  = 0;		/* extract references only	*/
-static int	detach	  = 0;		/* run as detached process	*/
-static int	nfiles    = 0;		/* number of download files	*/
-static int	ngot 	  = 0;		/* number of files downloaded	*/
-static int	seq 	  = 0;		/* use sequential file numbers  */
-static int	isCache   = 0;		/* is this a cache file?	*/
-static int	isTemp    = 0;		/* is this a temp file?		*/
-static int	force     = 0;		/* overwrite existing file      */
-static int	acol	  = -1;		/* access reference column 	*/
-static int	tcol	  = -1;		/* image type column 		*/
+static int   vot	= 0;		/* VOTable handle	     	*/
+static int   verbose	= 0;		/* verbose parameter	     	*/
+static int   debug	= 0;		/* debug flag	     		*/
+static int   extract	= 0;		/* extract references only	*/
+static int   detach	= 0;		/* run as detached process	*/
+static int   nfiles     = 0;		/* number of download files	*/
+static int   ngot 	= 0;		/* number of files downloaded	*/
+static int   seq 	= 1;		/* use sequential file numbers  */
+static int   isCache    = 0;		/* is this a cache file?	*/
+static int   isTemp     = 0;		/* is this a temp file?		*/
+static int   force      = 0;		/* overwrite existing file      */
+static int   acol	= -1;		/* access reference column 	*/
+static int   tcol	= -1;		/* image type column 		*/
+static int   filenum	= 0;		/* running download file number	*/
 
-static int	nthreads  = MIN_THREADS;/* number of download threads	*/
-static int	maxTrys	  = MAX_TRYS;	/* download attempts		*/
+static int   nthreads   = MIN_THREADS;	/* number of download threads	*/
+static int   maxTrys	= MAX_TRYS;	/* download attempts		*/
 
-static char   *base	  = "file";	/* output base filename    	*/
-static char   *extn	  = NULL;	/* output filename extension   	*/
-static char   *dir	  = NULL;	/* download directory		*/
-static char   *afname 	  = NULL;	/* output acref filename	*/
+static char *base	= NULL;		/* output base filename    	*/
+static char *extn	= NULL;		/* output filename extension   	*/
+static char *dir	= NULL;		/* download directory		*/
+static char *afname 	= NULL;		/* output acref filename	*/
 
-static char   *acref 	  = NULL;	/* acref url 		     	*/
-static char   *acref_ucd  = NULL;	/* acref UCD 		     	*/
-static char   *fmt 	  = NULL;	/* image format 	     	*/
-static char   *fmt_ucd    = NULL;	/* image format UCD 	     	*/
+static char *acref 	= NULL;		/* acref url 		     	*/
+static char *acref_ucd  = NULL;		/* acref UCD 		     	*/
+static char *fmt 	= NULL;		/* image format 	     	*/
+static char *fmt_ucd    = NULL;		/* image format UCD 	     	*/
 
 static FILE  *afd = (FILE *) NULL;	/* acref file descriptor	*/
 
@@ -114,24 +119,70 @@ typedef struct {
 Acref   aclist[MAX_DOWNLOADS];		/* access list			*/
 
 
+/*  Task specific option declarations.
+ */
+int  votget (int argc, char **argv, size_t *len, void **result);
+
+static Task  self       = {  "votget",  votget,  0,  0,  0  };
+static char  *opts      = "%:hb:e:f:dstu:o:vxA:BCD:F:N:Sm:";
+static struct option long_opts[] = {
+        { "base",         1, 0,   'b'},         /* task option          */
+        { "extn",         1, 0,   'e'},         /* task option          */
+        { "fmt",          1, 0,   'f'},         /* task option          */
+        { "sum",          2, 0,   's'},         /* task option          */
+        { "tmp",          2, 0,   't'},         /* task option          */
+        { "ucd",          1, 0,   'u'},         /* task option          */
+        { "output",       1, 0,   'o'},         /* task option          */
+        { "verbose",      2, 0,   'v'},         /* task option          */
+        { "extract",      2, 0,   'x'},         /* task option          */
+        { "acref",        1, 0,   'A'},         /* task option          */
+        { "bkg",          2, 0,   'B'},         /* task option          */
+        { "cache",        2, 0,   'C'},         /* task option          */
+        { "download",     1, 0,   'D'},         /* task option          */
+        { "fmtcol",       1, 0,   'F'},         /* task option          */
+        { "num",          1, 0,   'N'},         /* task option          */
+        { "force",        2, 0,   'O'},         /* task option          */
+        { "samp",         2, 0,   'S'},         /* task option          */
+        { "mtype",        1, 0,   'm'},         /* task option          */
+
+        { "help",         2, 0,   'h'},         /* required             */
+        { "debug",        2, 0,   'd'},         /* required             */
+        { "test",         1, 0,   '%'},         /* required             */
+        { NULL,           0, 0,    0 }
+};
+
+static int   do_return	= 0;			/* NOT USED		*/
+static int   do_samp	= 0;			/* samp listener?	*/
+static char *mtype	= NULL; 		/* samp mtype		*/
+
+
+static void Usage (void);
+static void Tests (char *input);
+
+
 /*  Public methods.
  */
+extern int   vot_isValidFormat (char *fmt);
+extern int   vot_atoi (char *val);
+extern int   vot_sum32 (char *str);
+extern char *strcasestr ();
 
 
 /*  Private methods.
  */
+static void  votableHandler (char *url, char *tblId, char *name);
+
+static int   vot_procFile (char *iname);
 static int   vot_isVOTable (char *infile);
 static int   vot_acrefColumn (handle_t tab);
 static int   vot_typeColumn (handle_t tab);
 static int   vot_loadText (char *infile);
 static int   vot_loadVOTable (char *infile);
-static int   vot_getURL (char *url, char *ofname);
-static int   vot_sum32 (char *str);
+static int   vot_getData (char *url, char *ofname);
 
-static void  vot_saveAcref (char *acref, int num);
+static void  vot_saveAcref (char *acref, int num, int fnum);
 static void *vot_getAclist (void *arg);
 static void  vot_printAclist ();
-static void  vot_Usage ();
 static void  vot_reaper (int sig, int *arg1, int *arg2);
 
 
@@ -141,85 +192,216 @@ static void  vot_reaper (int sig, int *arg1, int *arg2);
  *  Program entry point.
  */
 int
-votget (int argc, char **argv)
+votget (int argc, char **argv, size_t *reslen, void **result)
 {
-    int   i, stat = OK;
-    char  *fname;
+    char **pargv, optval[SZ_FNAME];
+    char  *iname = NULL, ch;
+    int    samp = 0, pos = 0, stat = OK;
 
 
-    if (argc < 2) {
-	vot_Usage ();
-	return (1);
+    /*  Initialize. 
+     */
+    *reslen = 0;
+    *result = NULL;
 
-    } else if (argc >= 2) {
-	for (i=1; i < argc; i++) {
-	    if (argv[i][0] == '-' && strlen (argv[i]) > 1) {
-		switch (argv[i][1]) {
 
-		case 'h':    vot_Usage ();			return (0);
+    /*  Parse the argument list.
+     */
+    pargv = vo_paramInit (argc, argv, opts, long_opts);
+    while ((ch = vo_paramNext (opts,long_opts,argc,pargv,optval,&pos)) != 0) {
+        if (ch > 0) {
 
-		case 'b':    base = argv[++i]; 			break;
-		case 'e':    extn = argv[++i];			break;
-		case 'f':    fmt = argv[++i];			break;
-		case 's':    seq++;				break;
-		case 't':    isTemp++;				break;
-		case 'u':    acref_ucd = argv[++i];		break;
+	    switch (ch) {
+	    case '%':   Tests (optval);			return (self.nfail);
+	    case 'h':   Usage ();			return (OK);
 
-		case 'o':    afname = argv[++i];		break;
-		case 'v':    verbose++;				break;
-		case 'x':    extract++;				break;
+	    case 'b':   base = strdup (optval); 	break;
+	    case 'e':   extn = strdup (optval);		break;
+            case 'f':   if (!vot_isValidFormat ((fmt = strdup (optval)))) {
+                            fprintf (stderr, "Error: invalid format '%s'\n",
+                                fmt);
+                            return (ERR);
+                        }
+                        break;
+	    case 'd':   debug++;			break;
+	    case 's':   seq=0;				break;
+	    case 't':   isTemp++;			break;
+	    case 'u':   acref_ucd = strdup (optval);	break;
 
-		case 'A':    acol = atoi(argv[++i]); 		break;
-		case 'B':    detach++;				break;
-		case 'C':    isCache++;				break;
-		case 'D':    dir = argv[++i];			break;
-		case 'F':    tcol = atoi(argv[++i]); 		break;
-		case 'N':    nthreads = atoi(argv[++i]); 	break;
-		case 'O':    force++;				break;
+	    case 'o':   afname = strdup (optval);	break;
+	    case 'v':   verbose++;			break;
+	    case 'x':   extract++;			break;
 
-		default:
-		    fprintf (stderr, "Invalid argument '%c'\n", argv[i][1]);
-		    return (1);
-		}
-	    } else if (argv[i][0] == '+' && strlen (argv[i]) > 1) {
-		switch (argv[i][1]) {
-		case 'd':    debug++;				break;
-		case 'n':    /* null opt */			break;	
-		}
-	    } else
-		fname = argv[i];
+	    case 'A':   acol = vot_atoi (optval);	break;
+	    case 'B':   detach++;			break;
+	    case 'C':   isCache++;			break;
+	    case 'D':   dir = strdup (optval);		break;
+	    case 'F':   tcol = vot_atoi (optval);	break;
+	    case 'N':   nthreads = vot_atoi (optval); 	break;
+	    case 'O':   force++;			break;
+	    case 'S':   do_samp++;			break;
+	    case 'm':   mtype = strdup (optval);;	break;
+
+	    default:
+		fprintf (stderr, "Invalid option '%c'\n", ch);
+		return (1);
+	    }
+
+        } else if (ch == PARG_ERR) {
+            return (ERR);
+
+	} else {
+	    iname = strdup (optval);
 	}
     }
 
 
+    /*  Sanity checks
+     */
+    if (iname == NULL) iname = strdup ("stdin");
+    if (strcmp (iname, "-") == 0) { free (iname), iname = strdup ("stdin"); }
+
+
     /*  Setup defaults and initialize.
      */
-    memset (&aclist[0], 0, MAX_DOWNLOADS);
-    if (!fmt_ucd)
-	fmt_ucd = FORMAT_UCD;
-    if (!acref_ucd)
-	acref_ucd = ACREF_UCD;
+    do_return = 0;
+    memset (&aclist[0], 0, (sizeof (Acref) * MAX_DOWNLOADS));
 
     if (afname && (afd = fopen (afname, "a+")) == (FILE *) NULL) {
 	if (verbose)
-	    fprintf (stderr, "Error: cannot open output file '%s'\n", afname);
+	    fprintf (stderr, "Error: cannot open aclist file '%s'\n", afname);
 	return (ERR);
     }
+
+    if (!base)      base = strdup ("file");
+    if (!mtype)     mtype = strdup ("table.load.votable");
+    if (!fmt_ucd)   fmt_ucd = strdup (FORMAT_UCD);
+    if (!acref_ucd) acref_ucd = strdup (ACREF_UCD);
+
+
+    if (do_samp) {
+        /*  Initialize and startup the SAMP interface.  Wait for a message.
+         */
+	if (verbose)
+	    fprintf (stderr, "Initializing samp ....\n");
+        samp = sampInit ("votget", "VOClient Task");
+        samp_Subscribe (samp, mtype, votableHandler);
+	if (sampStartup (samp) < 0)
+	    return (ERR);
+
+	if (verbose)
+	    fprintf (stderr, "Type <cr> to quit ....");
+	while (fgetc(stdin) != EOF)
+	    break;
+
+	sampShutdown (samp);
+
+    } else {
+	/*  Process the file.
+	 */
+        stat = vot_procFile (iname);
+    }
+
+
+    /*  Close the table and clean up.
+     */
+    if (base)      free (base);
+    if (extn)      free (extn);
+    if (dir)       free (dir);
+    if (afname)    free (afname);
+    if (acref)     free (acref);
+    if (acref_ucd) free (acref_ucd);
+    if (fmt)       free (fmt);
+    if (fmt_ucd)   free (fmt_ucd);
+    if (mtype)     free (mtype);
+
+    vo_paramFree (argc, pargv);
+    if (detach)
+        exit (OK);
+    else
+        return (stat);
+}
+
+
+/**
+ *  VOTABLEHANDLER -- Callback for the load.table.votable message.
+ */
+static void 
+votableHandler (char *url, char *tblId, char *name) 
+{
+    char  fname[SZ_FNAME];
+
+
+    memset (fname, 0, SZ_FNAME);
+
+    if (verbose) 
+	printf ("\n");
+
+
+    if (strncmp (url, "http://", 7) == 0) {
+        strcpy (fname, "/tmp/votgetXXXXXX");    /* temp download name    */
+        mktemp (fname);
+        if (vot_getData (url, fname) < 0) 
+	    fprintf (stderr, "Error accessing url '%s'\n", url);
+
+        vot_procFile (fname);
+        unlink (fname);
+
+    } else if (strncmp (url, "file://", 7) == 0) {
+	strcpy (fname, &url[7]);
+        vot_procFile (fname);
+
+    } else {
+	fprintf (stderr, "Error: unsupported URL type '%s'\n", url);
+	return;
+    }
+
+    /*  Clean up for the next file to process.
+     */
+    memset (&aclist[0], 0, (sizeof (Acref) * MAX_DOWNLOADS));
+    nfiles = 0;
+}
+
+
+/**
+ *  VOT_PROCFILE -- Process a VOTable file.
+ */
+static int
+vot_procFile (char *iname)
+{
+    int   stat = OK;
 
 
     /*  Determine the type of input file.
      */
-    switch ((vot = vot_isVOTable (fname))) {
-    case -1:  	stat = ERR; 			goto done_;
-    case  0:    vot_loadText (fname); 		break;
-    case  1:    vot_loadVOTable (fname); 	break;
+    if (strncmp (iname, "http://", 7) == 0) {
+        if (vot_loadVOTable (iname) < 0) {
+	   fprintf (stderr, "Error opening votable '%s'\n", iname);
+	   return ( (stat = ERR) );
+	}
+
+    } else {
+        switch ((vot = vot_isVOTable (iname))) {
+        case -1:  fprintf (stderr, "Error opening file '%s'\n", iname);
+		  return ( (stat = ERR) );
+        case  0:  if (vot_loadText (iname) < 0) {
+		      fprintf (stderr, "Error opening text file '%s'\n", iname);
+		      return ( (stat = ERR) );
+		  }
+		  break;
+        case  1:  if (vot_loadVOTable (iname) < 0) {
+		      fprintf (stderr, "Error opening votable '%s'\n", iname);
+		      return ( (stat = ERR) );
+		  }
+		  break;
+        }
     }
 
 
     /*  If all we're doing is extracting the URLs we can quit now.
      */
     if (extract)
-        goto done_;
+        return (OK);
 
     if (debug) {
 	fprintf (stderr, "acol = %d   tcol = %d\n", acol, tcol);
@@ -236,12 +418,9 @@ votget (int argc, char **argv)
 
         signal (SIGCHLD, (SIGFUNC)vot_reaper);
         switch ((pid = fork ())) {
-        case -1:  
-		return (ERR);			/* We are an error      */
-        case 0:   
-		break;				/* We are the child     */
-        default:  
-		return (OK);			/* We are the parent    */
+        case -1:  return (ERR);			/* We are an error      */
+        case 0:   break;			/* We are the child     */
+        default:  return (OK);			/* We are the parent    */
         }
     }
 
@@ -250,11 +429,11 @@ votget (int argc, char **argv)
      */
     if (dir) {
 	if (access (dir, F_OK) < 0)
-	    mkdir (dir, 0644);
+	    mkdir (dir, 0755);
 	if (access (dir, W_OK) < 0) {
 	   if (verbose)
 	       fprintf (stderr, "Error: Cannot write to directory '%s'\n", dir);
-	   return (1);
+	   return (ERR);
 	}
 	chdir (dir);
     }
@@ -308,8 +487,9 @@ votget (int argc, char **argv)
         }
 
         if (verbose) {
-	    fprintf (stderr, "Downloaded %d files -- Download complete\n", 
-		nfiles);
+	    fprintf (stderr, 
+		"Downloaded %d files -- Download complete (Total:  %d)\n", 
+		nfiles, (filenum+1));
 	    fflush (stderr);
         }
     }
@@ -318,64 +498,108 @@ votget (int argc, char **argv)
     /*  Remove input file if it is temporary.
      */
     if (isTemp)
-	unlink (fname);
+	unlink (iname);
 
-    /*  Close the table and clean up.
-     */
-done_:
-
-    if (detach)
-        exit (OK);
-    else
-        return (0);
+    return (stat);
 }
 
 
-/**********************************************************************
-**  Private Procedures
-**********************************************************************/
 
 
 /**
  *  VOT_USAGE -- Print the task usage and exit.
  */
 static void
-vot_Usage ()
+Usage (void)
 {
-fprintf (stderr, 
- "\n"
- "  Usage:\n"
- "\n"
- "      votget [-b <base>] [-c <col>] [-u <ucd>] [-v] [-x] [-o fname] <file>\n"
- "\n"
- "  Where\n"
- "          -b <base>           Base output filename\n"
- "	    -e [<extn>] 	Extension to add to filename (or auto)\n"
- "          -f <fmt>            Download only specified <type>\n"
- "          -h                  Print help summary\n"
- "          -s                  Use sequential file numbers\n"
- "	    -t 			Input file is temporary, delete when done\n"
- "          -u <ucd>            Use ucd to identify acref column\n"
- "\n"
- "          -o <fname>          Output extracted filename (or 'stdout' or\n"
- "          '-')\n"
- "          -v                  Verbose output\n"
- "          -x                  Extract access references\n"
- "\n"
- "          -A <colnum>         Col number to use as acref column (0-indexed)\n"
- "          -B                  Background, i.e. run in forked child process\n"
- "          -C                  Cache the downloaded file\n"
- "          -D                  Set download directory\n"
- "          -F <colnum>         Col number to use as format column\n"
- "          (0-indexed)\n"
- "          -N <N>              Number of simultaneous downloads\n"
- "\n"
- "          +d                  debug output\n"
- "\n"
- "          <file>              Name of file to process, or '-' for stdin\n"
- );
+    fprintf (stderr, "\n  Usage:\n\t"
+        "votget [<opts>] [ <votable.xml> | <urls.txt> ]\n\t"
+        "votget [<opts>] --samp          # to listen for SMAP messages\n"
+        "\n" 
+        "Where\n"
+        "   -b,--base <base>        Base output filename\n"
+        "   -e,--extn [<extn>]      Extension to add to filename (or auto)\n"
+        "   -f,--fmt <fmt>          Download only specified <type>\n"
+        "   -s,--sum                Use 32-bit checksum as file numbers\n"
+        "   -t,--tmp                Input file is temporary, delete when done\n"
+        "   -u,--ucd <ucd>          Use ucd to identify acref column\n"
+        "\n" 
+        "   -o,--output <fname>     Output filename (single download)\n"
+        "   -v,--verbose            Verbose output\n"
+        "   -x,--extract            Extract access references\n"
+        "\n" 
+        "   -A,--acref <colnum>     Col number for acref column (0-indexed)\n"
+        "   -B,--bkg                Background, i.e. run in forked child\n"
+        "   -C,--cache              Cache the downloaded file\n"
+        "   -D,--download           Set download directory\n"
+        "   -F,--fmtcol <colnum>    Col number for format column (0-indexed)\n"
+        "   -N,--num <N>            Number of simultaneous downloads\n"
+        "   -S,--samp               start as SAMP listener\n"
+        "\n" 
+        "   -h,--help               Print help summary\n"
+        "   -d,--debug              Debug output\n"
+        "      --test               Run unit tests\n"
+        "\n" 
+        "   <votable>               VOTable to process\n"
+        "\n"
+        "  Examples:\n\n"
+
+        "  1) Download all files in the VOTable 'results.xml', 3 files at\n"
+        "     a time:\n\n"
+        "       %% votget -N 3 results.xml\n"
+        "\n"
+        "  2) Start as a SAMP listener waiting for VOTable events to be \n"
+        "     broadcast, saved files will begin with the string 'foo' and \n"
+        "     contain a 'fits' filename extension:\n\n"
+        "       %% votget -b foo -e fits -S\n"
+        "\n"
+        "     To exit the task, hit the <CR>.\n"
+        "\n"
+        "  3) Download all the urls in the file 'urls.txt':\n\n"
+        "       %% votget -b foo urls.txt\n"
+        "\n"
+        "  4) Extract all the access references in a VOTable:\n\n"
+        "       %% votget -x results.xml\n"
+        "\n"
+    );
 }
 
+
+/**
+ *  Tests -- Task unit tests.
+ */
+static void
+Tests (char *input)
+{
+    Task *task = &self;
+    char *urls = "http://iraf.noao.edu/votest/sia.xml\n";
+
+
+    vo_taskTest (task, "--help", NULL);
+
+    if (access (input, F_OK) != 0) {
+	fprintf (stderr, "Warning: cannot open file '%s'\n", input);
+	return;
+    }
+
+    vo_taskTestFile (urls, "urls.txt");
+
+    vo_taskTest (task, "-N", "3", input, NULL);				// Ex 1
+    vo_taskTest (task, "-b", "foo", input, NULL);			// Ex 3
+    vo_taskTest (task, "-x", input, NULL);				// Ex 4
+    vo_taskTest (task, "-x", "-o", "/tmp/acref", input, NULL); 
+
+    if (access ("/tmp/acref", F_OK) == 0)  unlink ("/tmp/acref");
+    if (access ("urls.txt", F_OK) == 0)    unlink ("urls.txt");
+
+    vo_taskTestReport (self);
+}
+
+
+
+/**********************************************************************
+**  Private Procedures
+**********************************************************************/
 
 /**
  *  VOT_REAPER -- Catch a SIGCHLD signal and reap all children.
@@ -405,6 +629,10 @@ vot_loadText (char *infile)
     char  *acref, *buf, *ip;
     struct stat info;
 
+
+    nfiles = 0;
+    memset (&aclist[0], 0, (sizeof (Acref) * MAX_DOWNLOADS));
+
     if ((fd = open (infile, O_RDONLY)) < 0)
 	return (-1);
 
@@ -421,7 +649,7 @@ vot_loadText (char *infile)
 	    ;
 	*ip = '\0';
 
-	vot_saveAcref (acref, i);
+	vot_saveAcref (acref, i, filenum++);
 
 	acref = ip + 1;
 	nfiles++;
@@ -446,6 +674,9 @@ vot_loadVOTable (char *infile)
     char  *acref;
 
 
+    nfiles = 0;
+    memset (&aclist[0], 0, (sizeof (Acref) * MAX_DOWNLOADS));
+
     /*  Open the table.  This also parses it.
      */
     if ( (vot = vot_openVOTABLE (infile) ) <= 0) {
@@ -466,8 +697,10 @@ vot_loadVOTable (char *infile)
 	    if (verbose) fprintf (stderr, "Error: No <TABLE> in <RESOURCE>\n");
 	    continue;
         }
-        data  = vot_getDATA (tab);
-        tdata = vot_getTABLEDATA (data);
+        if ((data  = vot_getDATA (tab)))
+            tdata = vot_getTABLEDATA (data);
+	else
+	    continue;		/* empty data table */
 
         /*  Loop through the FIELDs to find the acref.  Let the cmdline param
          *  override the acref column ucd.
@@ -490,7 +723,7 @@ vot_loadVOTable (char *infile)
 		    continue;
 	    }
 
-	    vot_saveAcref (acref, i);
+	    vot_saveAcref (acref, i, filenum++);
 
 	    nfiles++;
 	    tnum++;
@@ -498,9 +731,13 @@ vot_loadVOTable (char *infile)
         }
     }
 
-    vot_closeVOTABLE (vot);			
+
+    /*  Clean up.
+     */
     if (afd)					/* close the acref file	*/
 	fclose (afd);
+
+    vot_closeVOTABLE (vot);			
 
     return (nfiles);
 }
@@ -510,7 +747,7 @@ vot_loadVOTable (char *infile)
  *  VOT_SAVEACREF -- Save the URL to the access list.
  */
 static void
-vot_saveAcref (char *acref, int num)
+vot_saveAcref (char *acref, int num, int fnum)
 {
     if (afd)
 	fprintf (afd, "%s\n", acref);
@@ -521,8 +758,10 @@ vot_saveAcref (char *acref, int num)
 	 */
 	aclist[num].tnum = ((nthreads == 1) ? 0 : (num % nthreads));
 	strcpy (aclist[num].url, acref);
-	sprintf (aclist[num].fname, "%s%d", base, 
-	    (seq ? (int) num : vot_sum32 (acref)) );
+	if (seq)
+	    sprintf (aclist[num].fname, "%s%04d", base, (int) fnum);
+	else
+	    sprintf (aclist[num].fname, "%s%d", base, vot_sum32 (acref));
     }
 }
 
@@ -540,17 +779,23 @@ static int
 vot_isVOTable (char *infile)
 {
     FILE  *fd = (FILE *) NULL;
-    char  buf[SZ_READ];
+    char  buf[SZ_READ], fname[SZ_READ];
     register int nread;;
 
 
+    memset (fname, 0, SZ_READ);
+    if (strncmp (infile, "file://", 7) == 0) 
+	strcpy (fname, &infile[7]);
+    else
+	strcpy (fname, infile);
+
     /* read the first 1024 bytes and search for a 'votable' string... */
-    if (access (infile, F_OK) < 0) {
+    if (access (fname, F_OK) < 0) {
 	if (verbose)
-	    fprintf (stderr, "Error: Cannot open input file '%s'\n", infile);
+	    fprintf (stderr, "Error: Cannot open input file '%s'\n", fname);
 	return (-1);
 
-    } else if ((fd = fopen (infile, "r"))) {
+    } else if ((fd = fopen (fname, "r"))) {
 	memset (buf, 0, SZ_READ);
 	nread = fread (buf, sizeof (char), SZ_READ, fd);
 	fclose (fd);
@@ -635,7 +880,7 @@ vot_getAclist (void *arg)
     for (i=0; i < nfiles; i++) {
 	if (aclist[i].tnum == threadNum) {
     	    for (j=0; j < maxTrys; j++) {
-	        if ((ret = vot_getURL (aclist[i].url, aclist[i].fname)))
+	        if ((ret = vot_getData (aclist[i].url, aclist[i].fname)))
 		    break;
 	    }
 	    done += ret;
@@ -650,10 +895,10 @@ vot_getAclist (void *arg)
 
 
 /** 
- *  VOT_GETURL -- Utility routine to do a simple URL download to the file.
+ *  VOT_GETDATA -- Utility routine to do a simple URL download to the file.
  */
 static int 
-vot_getURL (char *url, char *ofname)
+vot_getData (char *url, char *ofname)
 {
     int  stat = 0;
     char lockfile[SZ_FNAME], dot[SZ_FNAME], errBuf[CURL_ERROR_SIZE];
@@ -714,7 +959,9 @@ vot_getURL (char *url, char *ofname)
     curl_global_init (CURL_GLOBAL_ALL);     	/* init curl session	*/
     curl_handle = curl_easy_init ();
 
-    if ((fd = fopen (fname, "wb")) == NULL) { 	/* open the output file */
+    /*  Open the output file.
+     */
+    if ((fd = fopen (fname, "wb")) == NULL) { 	
 	if (verbose)
 	    fprintf (stderr, "Error: cannot open output file '%s'\n", fname);
         curl_easy_cleanup (curl_handle);
@@ -794,7 +1041,7 @@ vot_getURL (char *url, char *ofname)
 	    memset (new, 0, SZ_FNAME);
 	    if (strncmp ("SIMPLE", buf, 6) == 0) {	/* FITS		*/
 		sprintf (new, "%s.fits", fname);
-		link (fname, new);
+		rename (fname, new);
 		for (i=0; i < maxtrys; i++) {
 		    if (access (new, F_OK) != 0)
 			sleep (1);
@@ -818,40 +1065,6 @@ vot_getURL (char *url, char *ofname)
     unlink (lockfile);
 
     return (1);
-}
-
-
-/**
- *  VOT_SUM32 -- Internet checksum, 32 bit unsigned integer version.
- */
-
-static int
-vot_sum32 (char *str)
-{
-    register int i;
-    unsigned int *iarray;
-    unsigned long lsum = 0;
-    int      sum = 0;
-    int      len, carry=0, newcarry=0;
-
-    iarray = (unsigned int *) str;
-    len = strlen (str) / 4;
-
-    for (i=0; i<len; i++) {
-        if (iarray[i] > ~ lsum)
-            carry++;
-        lsum += iarray[i];
-    }
-
-    while (carry) {
-        if (carry > ~ lsum)
-            newcarry++;
-        lsum += carry;
-        carry = newcarry;
-        newcarry = 0;
-    }
-
-    return (abs(sum = lsum));
 }
 
 

@@ -73,11 +73,14 @@ float ffvers(float *version)  /* IO - version number */
   return the current version number of the FITSIO software
 */
 {
-      *version = (float) 3.28;
+      *version = (float) 3.31;
 
-/*       12 May 2011
+/*       18 Jul 2012
 
    Previous releases:
+      *version = 3.30    11 Apr 2012
+      *version = 3.29    22 Sep 2011
+      *version = 3.28    12 May 2011
       *version = 3.27     3 Mar 2011
       *version = 3.26    30 Dec 2010
       *version = 3.25    9 June 2010
@@ -7007,6 +7010,21 @@ int ffghdt(fitsfile *fptr,      /* I - FITS file pointer             */
             *exttype = IMAGE_HDU;
     }
     return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int fits_is_reentrant(void)
+/*
+   Was CFITSIO compiled with the -D_REENTRANT flag?  1 = yes, 0 = no.
+   Note that specifying the -D_REENTRANT flag is required, but may not be 
+   sufficient, to ensure that CFITSIO can be safely used in a multi-threaded 
+   environoment.
+*/
+{
+#ifdef _REENTRANT
+       return(1);
+#else
+       return(0);
+#endif
 }
 /*--------------------------------------------------------------------------*/
 int fits_is_compressed_image(fitsfile *fptr,  /* I - FITS file pointer  */

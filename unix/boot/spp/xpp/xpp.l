@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "xpp.h"
+#include "../../bootProto.h"
+#include "xppProto.h"
 
 #define import_spp
 #include <iraf.h>
@@ -24,6 +26,9 @@
 #define	HEX		16
 #define CHARCON		1
 
+#ifdef YYLMAX
+#undef YYLMAX
+#endif
 #define YYLMAX		YY_BUF_SIZE
 
 YY_BUFFER_STATE include_stack[MAX_INCLUDE];
@@ -46,6 +51,17 @@ extern  int ntasks;
 static	int dtype;			/* set if typed procedure	*/
 
 extern  char *vfn2osfn();
+extern  void skipnl (void);
+
+
+void  typespec (int typecode);
+void  process_task_statement (void);
+
+void  do_include (void);
+int   yywrap (void);
+int   yy_input (void);
+void  yy_unput (char ch);
+
 
 %}
 
@@ -202,6 +218,7 @@ NI	[^a-zA-Z0-9_]
  * space, and the type spec begins a function declaration; save the datatype
  * code for d_newproc().
  */
+void
 typespec (typecode)
 int	typecode;
 {
@@ -223,6 +240,7 @@ int	typecode;
  * sysruk.x file as an include file.  Special macros therein are
  * replaced by the taskname dictionary as processing continues.
  */
+void
 process_task_statement()
 {
         char    ch;
@@ -275,6 +293,7 @@ process_task_statement()
  * statement, push the current input file on a stack, and open the new file.
  * System include files are referenced as "<file>", other files as "file".
  */
+void
 do_include()
 {
 	char    *p, delim, *rindex();
@@ -405,6 +424,7 @@ do_include()
  * nonzero when the stack is empty, i.e., when we reach the end of the
  * main file.
  */
+int
 yywrap()
 {
 	/* The last line of a file is not necessarily newline terminated.
@@ -439,7 +459,8 @@ yywrap()
 
 /* YY_INPUT -- Get a character from the input stream.
  */
-yy_input()
+int
+yy_input ()
 {
 	return (input());
 }
@@ -447,7 +468,8 @@ yy_input()
 
 /* YY_UNPUT -- Put a character back into the input stream.
  */
-yy_unput(ch)
+void
+yy_unput (ch)
 char	ch;
 {
 	unput(ch);

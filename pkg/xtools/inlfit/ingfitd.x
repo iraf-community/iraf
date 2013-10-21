@@ -108,7 +108,7 @@ begin
 		# Fit.
 		do i = 1, npts {
 		    if (wts[i] > double(0.0))
-		        wts[i] = Memr[oldwts+i-1]
+		        wts[i] = Memd[oldwts+i-1]
 		}
 		call in_fitd (in, nl, x, y, wts, npts, nvars, wtflag, stat)
 

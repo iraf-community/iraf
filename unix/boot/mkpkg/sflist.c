@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #define	import_spp
 #define	import_error
@@ -10,6 +11,8 @@
 
 #include "mkpkg.h"
 #include "extern.h"
+#include "../bootProto.h"
+
 
 /*
  * SFLIST.C -- Special file list package.  The special file list is a list of
@@ -78,8 +81,10 @@ static	char	nullstr[] = "";
  * strings are optional.  The token "&" in <sfname> or <mkobj_command> is
  * replaced by <stname>.
  */
-sf_scanlist (cx)
-struct	context *cx;		/* current mkpkg context */
+int
+sf_scanlist (
+  struct context *cx		/* current mkpkg context */
+)
 {
 	register struct	sfile *sfp;
 	register char	*ip, *op, *tp;
@@ -162,9 +167,9 @@ struct	context *cx;		/* current mkpkg context */
 		/* Extract the command string, expanding any "&" filename
 		 * references therein.
 		 */
-		for (ip=token, op=mkobj;  *op = *ip++;  op++)
+		for (ip=token, op=mkobj;  (*op = *ip++);  op++)
 		    if (*op == '&') {
-			for (tp=stname;  *op = *tp++;  op++)
+			for (tp=stname;  (*op = *tp++);  op++)
 			    ;
 			--op;
 		    }
@@ -222,7 +227,7 @@ err:
 		break;
 
 	/* Return memory and sfile database space. */
-	sf_prune (cp = old_cp);
+	sf_prune ((cp = old_cp));
 
 	return (ERR);
 }
@@ -236,8 +241,9 @@ err:
  * pathname already resolved.
  */
 struct sfile *
-sf_dirsearch (dirname)
-char	*dirname;		/* host pathname of directory */
+sf_dirsearch (
+  char	*dirname		/* host pathname of directory */
+)
 {
 	register int	i;
 
@@ -262,9 +268,10 @@ char	*dirname;		/* host pathname of directory */
  * exact match.
  */
 struct sfile *
-sf_filesearch (sflist, stname)
-struct	sfile *sflist;		/* special file list	*/
-char	*stname;		/* standard file name	*/
+sf_filesearch (
+  struct sfile *sflist,		/* special file list	*/
+  char	*stname 		/* standard file name	*/
+)
 {
 	register struct sfile *sfp;
 	register char	*p1, *p2;
@@ -283,8 +290,10 @@ char	*stname;		/* standard file name	*/
 /* SF_PRUNE -- Prune the special file database back to the given point in the
  * string buffer.
  */
-sf_prune (cp)
-register char	*cp;		/* lop off everything here and above */
+void
+sf_prune (
+  register char	*cp		/* lop off everything here and above */
+)
 {
 	register struct sfile *sfp, *sf_top;
 	register int	i;

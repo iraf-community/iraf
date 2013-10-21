@@ -24,6 +24,10 @@ extern	int errno;		/* error code returned by the kernel	*/
 #  endif
 #endif
 
+extern void pr_enter (int pid, int inchan, int outchan);
+
+
+
 /* ZFIOPR -- File i/o to a subprocess.  A "connected" subprocess is connected
  * to the parent via two IPC channels (read and write), and is analogous to a
  * streaming binary file:
@@ -150,7 +154,7 @@ err:	    close (pin[0]);  close (pin[1]);
 	     * The "-c" flag tells the subprocess that it is a connected
 	     * subprocess.
 	     */
-	    execl ((char *)osfn, (char *)osfn, "-c", 0);
+	    execl ((char *)osfn, (char *)osfn, "-c", (char *) 0);
 
 	    /* If we get here the new process could not be executed for some
 	     * reason.  Shutdown, calling _exit to avoid flushing parent's
@@ -175,7 +179,7 @@ err:	    close (pin[0]);  close (pin[1]);
 	    pr_enter (*pid, pin[0], pout[1]);
 
 	    if (debug_ipc)
-		fprintf (stderr, " [%d]\n", *pid);
+		fprintf (stderr, " [%ld]\n", (long) *pid);
 	}
 
 	return (XOK);
@@ -201,8 +205,8 @@ ZCLCPR (XINT *pid, XINT *exit_status)
 	}
 
 	if (debug_ipc)
-	    fprintf (stderr, "[%d] terminated, exit code %d\n",
-		*pid, *exit_status);
+	    fprintf (stderr, "[%ld] terminated, exit code %ld\n",
+		(long)*pid, (long)*exit_status);
 
 	return (*exit_status);
 }
@@ -243,8 +247,8 @@ ZARDPR (
 
 	if (debug_ipc)
 	    fprintf (stderr,
-		"[%d] initiate read for %d bytes from IPC channel %d\n",
-		getpid(), *maxbytes, fd);
+		"[%d] initiate read for %ld bytes from IPC channel %d\n",
+		getpid(), (long)*maxbytes, fd);
 
 	/* In TTY debug mode we simulate IPC i/o but are actually talking to
 	 * a terminal.  Omit the packet headers and unpack input into XCHAR.
@@ -338,8 +342,8 @@ for (nc=0; nc < 30; nc++) {
     fprintf (stderr, "rd ipc_in=%d [%d] '%c' %d \n", ipc_in, nc, ch, ch);
 }
 */
-	    fprintf (stderr, "[%d] read %d bytes from IPC channel %d:\n",
-		getpid(), op - (char *)buf, fd);
+	    fprintf (stderr, "[%d] read %ld bytes from IPC channel %d:\n",
+		getpid(), (long) (op - (char *)buf), fd);
 	    write (2, (char *)buf, op - (char *)buf);
 	}
 

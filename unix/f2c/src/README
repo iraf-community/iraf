@@ -28,13 +28,13 @@ system.
 
 Should you get the message "xsum0.out xsum1.out differ", see what lines
 are different (`diff xsum0.out xsum1.out`) and ask netlib
-(e.g., netlib@netlib.bell-labs.com) to send you the files in question,
+(e.g., netlib@netlib.org) to send you the files in question,
 plus the current xsum0.out (which may have changed) "from f2c/src".
 For example, if exec.c and expr.c have incorrect check sums, you would
 send netlib the message
 	send exec.c expr.c xsum0.out from f2c/src
 You can also ftp these files from netlib.bell-labs.com; for more
-details, ask netlib@netlib.bell-labs.com to "send readme from f2c".
+details, ask netlib@netlib.org to "send readme from f2c".
 
 On some systems, the malloc and free in malloc.c let f2c run faster
 than do the standard malloc and free.  Other systems may not tolerate
@@ -164,8 +164,8 @@ send the E-mail message
 
 	send dtoa.c g_fmt.c from fp
 
-to netlib@netlib.bell-labs.com (or use anonymous ftp from
-netlib.bell-labs.com and look in directory /netlib/fp).
+to netlib@netlib.netlib.org (or use anonymous ftp from
+ftp.netlib.org and look in directory /netlib/fp).
 
 The makefile has a rule for creating tokdefs.h.  If you cannot use the
 makefile, an alternative is to extract tokdefs.h from the beginning of

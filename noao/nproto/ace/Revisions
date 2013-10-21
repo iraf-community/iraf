@@ -1,3 +1,10 @@
+
+convolve.x
+    An amovki() call was mistakenly used as amovi() (6/3/13, MJF)
+
+convolve.x
+    The 'bpbuf' pointer was declared as TY_REAL instead of TY_INT (5/4/13)
+
 objs.h
     Added P2R for 64-bit systems.
 

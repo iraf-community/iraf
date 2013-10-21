@@ -83,8 +83,10 @@ public class VOCRegistryQuery {
     /*  Set the default Registry to use.    
      */
     private static final boolean  DEBUG        = false; 
+    //private static final String 
+    //        DEF_REGISTRY = "http://nvo.stsci.edu/vor10/NVORegInt.asmx/";
     private static final String 
-            DEF_REGISTRY = "http://nvo.stsci.edu/vor10/NVORegInt.asmx/";
+            DEF_REGISTRY = "http://vao.stsci.edu/directory/NVORegInt.asmx/";
     //private static final String DEF_METHOD   = "VOTPredicate";
     private static final String DEF_METHOD   = "VOTPredOpt";
 
@@ -517,8 +519,8 @@ public class VOCRegistryQuery {
             /* Get a registry service object and an interface object to
 	     * process the query.
 	     */
-            v10.riws.net.ivoa.NVORegInt regService = new NVORegIntLocator();
-            NVORegIntSoap regIf = regService.getNVORegIntSoap();
+//            v10.riws.net.ivoa.NVORegInt regService = new NVORegIntLocator();
+//            NVORegIntSoap regIf = regService.getNVORegIntSoap();
 
             /* Now submit the query and save the results.
 	     */
@@ -531,25 +533,58 @@ public class VOCRegistryQuery {
 		System.err.println ("dalOnly = :"+DALOnly+":");
 	    }
 
-	    if (svcType != null && waveband != null) {
+	    if (System.getenv ("VAO_REGTEST") != null) {
+              v10.riws.net.ivoa.NVOTestRegInt regService = new NVOTestRegIntLocator();
+              NVOTestRegIntSoap regIf = regService.getNVOTestRegIntSoap();
+
+	      System.err.println ("INFO: Using vaotest.stsci.edu Registry....");
+	      if (svcType != null && waveband != null) {
 	        if (DEBUG)
 		    System.err.println ("Calling VOTCapBandPredOpt()....."+
 			"svctype="+svcType+"  waveband="+waveband);
             	results = regIf.VOTCapBandPredOpt(query, svcType, waveband, 2);
-	    } else if (svcType != null) {
+	      } else if (svcType != null) {
 	        if (DEBUG)
 		    System.err.println ("Calling VOTCapabilityPredOpt()....."+
 			"svctype="+svcType);
             	results = regIf.VOTCapabilityPredOpt(query, svcType, 2);
-	    } else if (keywOnly) {
+	      } else if (keywOnly) {
 	        if (DEBUG)
 		    System.err.println ("Calling VOTKeyOpt().....");
             	results = regIf.VOTKeyOpt(query, andKeys, 2);
-	    } else {
+	      } else {
 	        if (DEBUG)
 		    System.err.println ("Calling VOTPredOpt().....");
             	results = regIf.VOTPredOpt(query, 2);
+	      }
+
+
+	    } else {
+              v10.riws.net.ivoa.NVORegInt regService = new NVORegIntLocator();
+              NVORegIntSoap regIf = regService.getNVORegIntSoap();
+
+	      if (svcType != null && waveband != null) {
+	        if (DEBUG)
+		    System.err.println ("Calling VOTCapBandPredOpt()....."+
+			"svctype="+svcType+"  waveband="+waveband);
+            	results = regIf.VOTCapBandPredOpt(query, svcType, waveband, 2);
+	      } else if (svcType != null) {
+	        if (DEBUG)
+		    System.err.println ("Calling VOTCapabilityPredOpt()....."+
+			"svctype="+svcType);
+            	results = regIf.VOTCapabilityPredOpt(query, svcType, 2);
+	      } else if (keywOnly) {
+	        if (DEBUG)
+		    System.err.println ("Calling VOTKeyOpt().....");
+            	results = regIf.VOTKeyOpt(query, andKeys, 2);
+	      } else {
+	        if (DEBUG)
+		    System.err.println ("Calling VOTPredOpt().....");
+            	results = regIf.VOTPredOpt(query, 2);
+	      }
+
 	    }
+
 
 	    /* Turn the VOTable into an Array of VOTResource objects.  We
 	     * need to do this in order to expand the resources that have
@@ -653,6 +688,12 @@ public class VOCRegistryQuery {
     private String buildBaseURL ()
     {
         String url = DEF_REGISTRY;
+
+	String testURL = System.getenv ("VAO_REGURL");
+	if (testURL != null) {
+	    System.err.println ("DEV: Using test URL: " + testURL);
+	    url = testURL;
+	}
 
         // Try to ensure that the service URL is properly terminated.
         char lastch = url.charAt(url.length() - 1);

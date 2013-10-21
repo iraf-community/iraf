@@ -1,100 +1,109 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  IRAF_UPDATE - Update the core IRAF system with a cumulative patch.
 
-unalias 	grep ls
+opt="all"
+all=yes
+src_only=no
+list_only=no
+core_only=no
+noao_only=no
+vo_only=no
 
-set opt		= "all"
-set all		= yes
-set src_only	= no
-set list_only	= no
-set core_only	= no
-set noao_only	= no
-set vo_only	= no
-
-if ($#argv < 1) then
-    set opt	= "all"
-    set all	= yes
+if (( $#<1 )); then
+    opt="all"
+    all=yes
 else
 
     # Process cmdline flags.
-    while ("$1" != "")
-      switch ("$1")
-      case -all:                          # clean all package sources
-        set all = yes
-	set opt	 = "all"
-        breaksw
-      case -src:                          # update only source code
-        set src_only = yes
-	set opt	 = "src"
-        breaksw
-      case -list:                         # list files needing updating
-        set list_only = yes
-	set opt	 = "list"
+    while [ -n "$1" ]; do
+      case "$1" in
+      "-all")                          # clean all package .s
+          all=yes
+	  opt="all"
+	  ;;
+      "-src")                          # update only . code
+          src_only=yes
+	  opt="src"
+	  ;;
+      "-list")                         # list files needing updating
+          list_only=yes
+	  opt="list"
 
-	echo ""
-	util/check_update
-	if ($status == 0) then
-	    echo "IRAF is up to date"
-	else
-	    echo "An IRAF update is available"
-	endif
-	echo ""
-	(chdir util ; ${iraf}/util/pkgupdate -list)
-	exit 0
-
-      case -core:                         # update only core system
-        set core_only = yes
-	set opt	 = "core"
-        breaksw
-      case -noao:                         # update only NOAO package
-        set noao_only = yes
-	set opt	 = "noao"
-        breaksw
-      case -vo:                           # update only VO package
-        set vo_only = yes
-	set opt	 = "vo"
-        breaksw
-      default:
-        echo "Error: Unknown option '"$1"', quitting."
-        exit 1
-      endsw
+	  /bin/echo ""
+	  util/check_update
+	  if (( $?==0 )); then
+	      /bin/echo "IRAF is up to date"
+	  else
+	      /bin/echo "An IRAF update is available"
+	  fi
+	  /bin/echo ""
+	  (cd util; ${iraf}/util/pkgupdate -list)
+	  exit 0
+	  ;;
+      "-core")                         # update only core system
+          core_only=yes
+	  opt="core"
+	  ;;
+      "-noao")                         # update only NOAO package
+          noao_only=yes
+	  opt="noao"
+	  ;;
+      "-vo")                           # update only VO package
+          vo_only=yes
+	  opt="vo"
+	  ;;
+      *)
+          /bin/echo "Error: Unknown option '"$1"', quitting."
+          exit 1
+      esac
 
       shift
-   end
-endif
+   done
+fi
 
 
-# Called from Makefile, set iraf root.
-set  iraf       = $cwd/			
-source $iraf/unix/hlib/irafuser.csh
-set  irafdir    = $iraf
-
-
-set REPO	= `${irafdir}/util/pkgrepo`
-if ($?IRAFARCH) then
-    set arch    = $IRAFARCH
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
 else
-    set arch    = `${irafdir}/unix/hlib/irafarch.csh -actual`
-endif
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Called from Makefile, iraf=true root.
+source $iraf/unix/hlib/irafuser.sh
+irafdir=$iraf
+
+
+REPO=`${irafdir}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
+fi
 
 
 #  Init the build scripts as the first update.
-#echo "Updating build scripts ...."
-util/self_update
+#/bin/echo "Updating build scripts ...."
+#${iraf}/util/self_update
 
 
 #  Execute the update.
-echo "Updating IRAF system  ...."
+/bin/echo "Updating IRAF system  ...."
 util/iraf_latest $opt
 
-if ($status == 2) then
-   echo -n "Update Status:    No updates necessary"
-else if ($status == 0) then
-   echo -n "Update Status:    Successful	"
+if (( $? == 2 )); then
+   /bin/echo -n "Update Status:    No updates necessary"
+else if (( $? == 0 )); then
+   /bin/echo -n "Update Status:    Successful	"
 else
-   echo -n "Update Status:    Fails	"
-endif
-echo ""
+   /bin/echo -n "Update Status:    Fails	"
+fi
+/bin/echo ""
 
 exit 0

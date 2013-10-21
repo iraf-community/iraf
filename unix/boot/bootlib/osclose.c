@@ -14,6 +14,8 @@ os_close (int fd)
 	XINT	junk, xfd=fd;
 	XINT	nchars;
 
+	extern  int ZPUTTX(), ZCLSTX();
+
 
 	if (osfiletype == BINARY_FILE)
 	    close (fd);

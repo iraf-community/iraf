@@ -17,15 +17,23 @@ string	format = "raw"		{ prompt = "Output format",
 int	status = 0		{ prompt = "Service status code"	}
 
 begin
-	string  lname, lres, url, loname, tname, ltype, args, tcat
+	string  lname, lres, lpos, url, loname, tname, ltype, args, tcat
 	bool	ldisp, lover, lplot
 	real	ra, dec
-	int     nread, len, nres, nfields, nrows, ncols
+	int     nread, len, nres, nfields, nrows, ncols, comma
 
 
 	# Get params to local variables
-	lres    = resource		
-	lname   = fields
+	#lres    = resource		
+	#lname   = fields
+	lpos    = ""
+	lname   = ""
+	print (resource) | translit ("STDIN"," ","+") | scan (lres)
+	print (fields) | translit ("STDIN"," ","+") | scan (lname)
+	if (fields == "") {
+	    lpos = pos
+	}
+
 	ltype   = format
 	loname  = output
 	ldisp   = display
@@ -41,8 +49,12 @@ begin
 		count (tcat) | scan (nfields)
 	    }
 	} else {
-	    files (lname, sort-, > tcat)
-	    count (tcat) | scan (nfields)
+	    if (lpos == "") {
+		nfields = 1
+	    } else {
+	        files (lname, sort-, > tcat)
+	        count (tcat) | scan (nfields)
+	    }
 	}
 
 	# Simple error checking.
@@ -59,7 +71,7 @@ begin
 	}
 
 	#  Resolve resource name.
-	if (resource == "")
+	if (lres == "")
 	    error (0, "No resource specified")
 	    
 	if (substr (lres, 1, 7) == "http://") {
@@ -76,6 +88,10 @@ begin
             } else {
                 url   = regdb.url
 	    }
+
+            if (url == "INDEF") {
+                error (0, "Resource '" // lres // "' is not a known service")
+            }
 	}
 
 	#  Make sure the URL has a trailing '/' or '&'
@@ -92,15 +108,24 @@ begin
 
 	# Determine the query params from the image WCS.
 	if (imaccess (lname) == no) {
-	    #error (0, "Cannot open image '" // lname // "'")
-            sesame (lname, verbose-)
-            ra  = sesame.ra
-            dec = sesame.dec
+	    if (lpos == "") {
+	        #error (0, "Cannot open image '" // lname // "'")
+                sesame (lname, verbose-)
+                ra  = sesame.ra
+                dec = sesame.dec
 
-	    if (ldisp)
-		dss (lname, use_disp+)
-            lname = "cache$" // lname // ".fits"
-	    args = "RA=" // ra // "&DEC=" // dec  // "&SR=" // size
+	        if (ldisp)
+		    dss (lname, use_disp+)
+                lname = "cache$" // lname // ".fits"
+	        args = "RA=" // ra // "&DEC=" // dec  // "&SR=" // size
+	    } else {
+		comma = stridx (",", lpos)
+		ra = real (substr(lpos,1,comma-1))
+		dec = real (substr(lpos,comma+1,strlen(lpos)))
+	        args = "RA=" // ra 
+	        args = args // "&DEC=" // dec 
+	        args = args // "&SR=" // size
+	    }
 
 	} else {
 	    wcsinfo (lname)
@@ -114,7 +139,6 @@ begin
 
 	if (vo.runid != "")
 	    args = args // "&RUNID=" // vo.runid
-
 
 	# Create a temporary output name.
 	tname = mktemp ("tmp$raw") // ".xml"

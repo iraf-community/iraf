@@ -33,9 +33,26 @@ SHAREDLIB  = $(HERE)/$(LIBBASE).so
 # includes, flags and libraries
 CC        = gcc
 CINCS     = -I$(HERE)
+ifeq ($(PLATFORM),Darwin)
+    ifeq ($(PLMACH),x86_64)
+        CARCH   = -m64 -mmacosx-version-min=10.5
+    else
+        CARCH   = -arch i386 -m32 -mmacosx-version-min=10.4
+    endif
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),macintel)
+            CARCH = -m64 -mmacosx-version-min=10.5
+        else
+            CARCH = -arch i386 -m32 -mmacosx-version-min=10.5
+        endif
+    endif
+else
+    CARCH       = 
+endif
+
 #CFLAGS   = -O2 -DDEBUG -D$(PLATFORM)
-#CFLAGS    = -arch i386 -arch ppc -g -Wall -D$(PLATFORM)
-CFLAGS    = -g -Wall -D$(PLATFORM)
+CFLAGS    = -g -Wall -D$(PLATFORM) $(CARCH)
+
 
 
 # list of source and include files
@@ -149,7 +166,8 @@ PY_INCS = -I.   -I/usr/include/python2.2 -I/usr/include/python2.3 \
 
 python_lib:  VOClient.i
 	$(CC) -w -c $(PY_INCS) $(SRCS) vocWrapPython.c
-	ld -shared $(OBJS) vocWrapPython.o -o _$(NAME).so
+	$(CC) -fPIC -shared $(OBJS) vocWrapPython.o -o _$(NAME).so \
+	    -I/usr/include/python2.6/ -lpython2.6
 	$(RM) VOClient_wrap.*
 
 perl_lib:  VOClient.i

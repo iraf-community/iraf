@@ -64,6 +64,7 @@ extern	char		MEMCOM[];
 #define	fputc		u_fputc
 #define	fputs		u_fputs
 #define	fread		u_fread
+#define	freadline	u_readline
 #define	free		u_free
 #define	freopen		u_freopen
 #define	fscanf		u_fscanf
@@ -141,6 +142,7 @@ extern char    *gets (char *buf);
 extern char    *index (char *str, int ch);
 extern char    *malloc (unsigned nbytes);
 extern char    *mktemp (char *template);
+extern char    *freadline (char *prompt);
 extern char    *realloc (char *buf, unsigned newsize);
 extern char    *rindex (char *str, int ch);
 extern char    *sprintf (char *str, char *format, ...);
@@ -191,10 +193,10 @@ extern int	c_mktemp (char *root, char *temp_filename, int maxch);
 extern int	c_ndopen (char *fname, int mode);
 extern int	c_open (char *fname, int mode, int type);
 extern int	c_oscmd (char *cmd, char *infile, char *outfile, char *errfile);
-extern int	c_poll (int fds, int nfds, int timeout);
-extern int	c_poll_get_nfds (int fds);
-extern int	c_poll_open (void);
-extern int	c_poll_test (int fds, XINT fd, int type);
+extern int	c_poll (XINT fds, int nfds, int timeout);
+extern int	c_poll_get_nfds (XINT fds);
+extern XINT	c_poll_open (void);
+extern int	c_poll_test (XINT fds, XINT fd, int type);
 extern int	c_prchdir (int pid, char *newdir);
 extern int	c_prcldpr (unsigned job);
 extern int	c_prclose (unsigned int pid);
@@ -274,11 +276,11 @@ extern void	c_pargl (long lval);
 extern void	c_pargr (float rval);
 extern void	c_pargs (short sval);
 extern void	c_pargstr (char *strval);
-extern void	c_poll_clear (int fds, XINT fd, int type);
-extern void	c_poll_close (int fds);
-extern void	c_poll_print (int fds);
-extern void	c_poll_set (int fds, XINT fd, int type);
-extern void	c_poll_zero (int fds);
+extern void	c_poll_clear (XINT fds, XINT fd, int type);
+extern void	c_poll_close (XINT fds);
+extern void	c_poll_print (XINT fds);
+extern void	c_poll_set (XINT fds, XINT fd, int type);
+extern void	c_poll_zero (XINT fds);
 extern void	c_sfree (int sp);
 extern void	c_smark (int *sp);
 extern void	c_sttyco (char *args, XINT ttin, XINT ttout, XINT outfd);

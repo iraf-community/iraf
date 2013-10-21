@@ -17,15 +17,23 @@ string	format = "ascii"		{ prompt = "Output format",
 int	status = 0		{ prompt = "Service status code"	}
 
 begin
-	string  lname, lres, url, loname, tname, ltype, args, tcat
+	string  lname, lres, lpos, url, loname, tname, ltype, args, tcat
 	bool	ldisp, lover, lplot
 	real	ra, dec
 	int     nread, len, nres, nfields, nrows, ncols
 
 
 	# Get params to local variables.
-	lres  = resource		
-	lname  = fields
+        #lres    = resource
+        #lname   = fields
+        lpos    = ""
+        lname   = ""
+        print (resource) | translit ("STDIN"," ","+") | scan (lres)
+        print (fields) | translit ("STDIN"," ","+") | scan (lname)
+        if (fields == "") {
+            lpos = pos
+        }
+
 	ltype  = format
 	loname = output
 	ldisp  = display
@@ -40,8 +48,12 @@ begin
                 count (tcat) | scan (nfields)
             }
         } else {
-            files (lname, sort-, > tcat)
-            count (tcat) | scan (nfields)
+            if (lpos == "") {
+                nfields = 1
+            } else {
+                files (lname, sort-, > tcat)
+                count (tcat) | scan (nfields)
+            }
         }
 
         # Simple error checking.
@@ -58,7 +70,7 @@ begin
         }
 
 	# Resolve resource name
-	if (resource == "")
+	if (lres == "")
 	    error (0, "No resource specified")
 	    
         if (substr (lres, 1, 7) == "http://") {
@@ -75,12 +87,16 @@ begin
         #    list = "uparm$url" ; nread = fscan (list, url) ; list = ""
         } else {
             regdb ("resolve", lres, type="I", >& "dev$null")
-            if (regdb.status == 0 && regdb.svctype != "I")  {
+	    if (regdb.status == 0 && regdb.svctype != "I")  {
                 error (0, "Resource '" // lres // "' is not a catalog service")
             } else if (regdb.status == 1) {
                 url   = regResolver (lres)  # not found, query the Registry
             } else {
                 url   = regdb.url
+            }
+
+            if (url == "INDEF") {
+                error (0, "Resource '" // lres // "' is not a known service")
             }
         }
 
@@ -98,14 +114,20 @@ begin
 
 	# Determine the query params from the image WCS.
 	if (imaccess (lname) == no) {
-            sesame (lname, verbose-)
-            ra  = sesame.ra
-            dec = sesame.dec
+            if (lpos == "") {
+                sesame (lname, verbose-)
+                ra  = sesame.ra
+                dec = sesame.dec
 
-            if (ldisp)
-                dss (lname, use_disp+)
-            lname = "cache$" // lname // ".fits"
-            args = "POS=" // ra // "," // dec  // "&SIZE=" // size
+                if (ldisp)
+                    dss (lname, use_disp+)
+                lname = "cache$" // lname // ".fits"
+                args = "POS=" // lpos // "&SIZE=" // size
+
+            } else {
+                lname = ""
+                args = "POS=" // lpos // "&SIZE=" // size
+            }
 
 	} else {
 	    wcsinfo (lname)

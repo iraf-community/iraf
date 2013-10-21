@@ -61,6 +61,9 @@ static	XLONG offset = 0;
 
 static  int os_mtname (char *fname, char *osdev);
 
+extern  int ZZOPMT(), ZOPNBF(), ZCLSBF(), ZZCLMT();
+extern  int ZARDBF(), ZAWTBF(), ZZRDMT(), ZZWTMT(), ZAWRBF(), ZZWRMT();
+
 
 
 /* TAPE_OPEN -- Open the named file, which need not actually be a tape device.

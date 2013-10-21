@@ -17,7 +17,7 @@
 *     J        i        status:  0 = OK
 *                               -1 = illegal ITYPE
 *                               -2 = insufficient data
-*                               -3 = singular solution
+*                               -3 = no solution
 *
 *  Notes:
 *
@@ -64,9 +64,26 @@
 *
 *  Called:  slDMAT, slDMXV
 *
-*  P.T.Wallace   Starlink   11 February 1991
+*  Last revision:   8 September 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -77,16 +94,27 @@
       INTEGER J
 
       INTEGER I,JSTAT,IW(4),NSOL
-      DOUBLE PRECISION P,SXE,SXEXM,SXEYM,SYE,SYEYM,SYEXM,SXM,
+      DOUBLE PRECISION A,B,C,D,AOLD,BOLD,COLD,DOLD,SOLD,
+     :                 P,SXE,SXEXM,SXEYM,SYE,SYEYM,SYEXM,SXM,
      :                 SYM,SXMXM,SXMYM,SYMYM,XE,YE,
      :                 XM,YM,V(4),DM3(3,3),DM4(4,4),DET,
-     :                 SGN,SXXYY,SXYYX,SX2Y2,A,B,C,D,
-     :                 SDR2,XR,YR,AOLD,BOLD,COLD,DOLD,SOLD
+     :                 SGN,SXXYY,SXYYX,SX2Y2,SDR2,XR,YR
 
 
 
 *  Preset the status
       J=0
+
+*  Variable initializations to avoid compiler warnings
+      A = 0D0
+      B = 0D0
+      C = 0D0
+      D = 0D0
+      AOLD = 0D0
+      BOLD = 0D0
+      COLD = 0D0
+      DOLD = 0D0
+      SOLD = 0D0
 
 *  Float the number of samples
       P=DBLE(NP)

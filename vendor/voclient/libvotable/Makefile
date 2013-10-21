@@ -25,12 +25,19 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 
 # includes, flags and libraries
 CC 	  	= gcc
-CINCS  	  	= -I$(INCDIR)  -I.
-ifeq  ($(PLATFORM), "Darwin")
-    ifeq  ($(PLMACH), "x86_64")
+CINCS  	  	= -I$(INCDIR)  -I. -I../../../include
+ifeq ($(PLATFORM),Darwin)
+    ifeq ($(PLMACH),x86_64)
 	CARCH	= -m64 -mmacosx-version-min=10.5
     else
-	CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+	CARCH	= -arch i386 -m32 -mmacosx-version-min=10.4
+    endif
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),macintel)
+	    CARCH = -m64 -mmacosx-version-min=10.5
+        else
+	    CARCH = -arch i386 -m32 -mmacosx-version-min=10.5
+	endif
     endif
 else
     CARCH	= 
@@ -67,7 +74,7 @@ install: .BASE lib apps
 objs:	$(OBJS) $(SPP_OBJS)
 
 clean:
-	/bin/rm -f *.o *.a *.e *.so .BASE
+	/bin/rm -f *.o *.a *.e *.so .BASE __*
 	/bin/rm -f SWIG* libvot* php_libvot.h
 	/bin/rm -f votParseJava.[co]
 	/bin/rm -f votParsePerl.[co]
@@ -105,7 +112,7 @@ lib: objs
 ###############################################################################
 
 votUtil_spp.o: votUtil_spp.x votParse_spp.h
-	xc -c votUtil_spp.x
+	(xc -c votUtil_spp.x)
 
 
 ###############################################################################
@@ -204,7 +211,7 @@ $(STATICLIB): $(SRCS:%.c=Static/%.o)
 Static/%.o: %.c $(INCS)
 	/usr/bin/gcc $(CINCS) $(CFLAGS) -c $< -o $@
 Static/%.o: %.x $(SPP_INCS)
-	xc -c $< -o $@
+	(xc -c $< -o $@)
 Static:
 	/bin/mkdir $@
 	chmod 777 $@

@@ -35,37 +35,46 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#9985b96289047cafc24f2adbfeed977f">samp_newMap</a> ()</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a new Map object.  <a href="#9985b96289047cafc24f2adbfeed977f"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#fe80438de542c6657d623993360b37d1">samp_freeMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#fe80438de542c6657d623993360b37d1">samp_freeMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Free the given Map object.  <a href="#fe80438de542c6657d623993360b37d1"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#b9b2157de89369eb5cd95bfe804eb89a">samp_setStringInMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, char *value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="1c99f7146ad3acd3e381a02d5df1234f"></a><!-- doxytag: member="sampMap.c::samp_getMapSize" ref="1c99f7146ad3acd3e381a02d5df1234f" args="(Map map)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_getMapSize</b> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="4c8a1b402743b52f2837e97cf41e9e34"></a><!-- doxytag: member="sampMap.c::samp_getMapKey" ref="4c8a1b402743b52f2837e97cf41e9e34" args="(Map map, int index)" -->
+char *&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_getMapKey</b> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, int index)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="7dcdf07dd7f3252f3bf2dd5002c62251"></a><!-- doxytag: member="sampMap.c::samp_getMapVal" ref="7dcdf07dd7f3252f3bf2dd5002c62251" args="(Map map, int index)" -->
+char *&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_getMapVal</b> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, int index)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#b9b2157de89369eb5cd95bfe804eb89a">samp_setStringInMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, char *value)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set a string in a Map (append).  <a href="#b9b2157de89369eb5cd95bfe804eb89a"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#f102490efe1b92d99b67f244dc498c7b">samp_setMapInMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map1, char *key, <a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map2)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#f102490efe1b92d99b67f244dc498c7b">samp_setMapInMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map1, char *key, <a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map2)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set a Map in a Map (append).  <a href="#f102490efe1b92d99b67f244dc498c7b"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#362c2f670c98dd6a3ef69debd1871604">samp_setListInMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, <a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a> list)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#362c2f670c98dd6a3ef69debd1871604">samp_setListInMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, <a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a> list)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set a List in a Map (append).  <a href="#362c2f670c98dd6a3ef69debd1871604"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#c22ec42dbf9a01c9b4e00cf011e7eb9d">samp_setIntInMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, int value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#c22ec42dbf9a01c9b4e00cf011e7eb9d">samp_setIntInMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, int value)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set a Int in a Map (append).  <a href="#c22ec42dbf9a01c9b4e00cf011e7eb9d"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#0f07ae542f5b317311b3799bd96a88fd">samp_setFloatInMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, float value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#0f07ae542f5b317311b3799bd96a88fd">samp_setFloatInMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key, float value)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set a string in a Map (append).  <a href="#0f07ae542f5b317311b3799bd96a88fd"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#96ca606e0e7da659c3dc0a30846bcd66">samp_getStringFromMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#96ca606e0e7da659c3dc0a30846bcd66">samp_getStringFromMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a string from the Map.  <a href="#96ca606e0e7da659c3dc0a30846bcd66"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#525e8ffdfa32867f392f2c1340215453">samp_getMapFromMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#525e8ffdfa32867f392f2c1340215453">samp_getMapFromMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a Map from the Map.  <a href="#525e8ffdfa32867f392f2c1340215453"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#31ddb90cf2184ae0151b9e7ec8c1a51f">samp_getListFromMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#31ddb90cf2184ae0151b9e7ec8c1a51f">samp_getListFromMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a LIST from the Map.  <a href="#31ddb90cf2184ae0151b9e7ec8c1a51f"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#210fc0eba30abddf1bdc2e780d58072c">samp_getIntFromMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#210fc0eba30abddf1bdc2e780d58072c">samp_getIntFromMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a integer from the Map.  <a href="#210fc0eba30abddf1bdc2e780d58072c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#b0d3768990294554a298c4057b3b315d">samp_getFloatFromMap</a> (<a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMap_8c.html#b0d3768990294554a298c4057b3b315d">samp_getFloatFromMap</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> map, char *key)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a float from the Map.  <a href="#b0d3768990294554a298c4057b3b315d"></a><br></td></tr>
 </table>
@@ -74,8 +83,9 @@
 <p>
 SAMPMAP.C -- (Internal) Interface to support the Map structure<p>
 map = samp_newMap () samp_freeMap (Map map)<p>
+nelem = samp_getMapSize (Map map) key = samp_getMapKey (Map map, int index) val = samp_getMapVal (Map map, int index)<p>
 samp_setStringInMap (Map map, char *value) samp_setMapInMap (Map map1, Map map2) samp_setListInMap (Map map, List list) samp_setIntInMap (Map map, int ival) samp_setFloatInMap (Map map, float rval)<p>
-str = samp_getStringFromMap (Map map, char *key) map = samp_getMapFromMap (Map map, char *key) list = samp_getListFromMap (Map map, char *key) ival = samp_getIntInMap (Map map, char *key) rval = samp_getFloatInMap (Map map, char *key)<p>
+str = samp_getStringFromMap (Map map, char *key) map = samp_getMapFromMap (Map map, char *key) list = samp_getListFromMap (Map map, char *key) ival = samp_getIntFromMap (Map map, char *key) rval = samp_getFloatFromMap (Map map, char *key)<p>
 <dl class="author" compact><dt><b>Author:</b></dt><dd>Mike Fitzpatrick </dd></dl>
 <dl class="date" compact><dt><b>Date:</b></dt><dd>7/10/09 </dd></dl>
 <hr><h2>Function Documentation</h2>
@@ -86,7 +96,7 @@ str = samp_getStringFromMap (Map map, char *key) map = samp_getMapFromMap (Map m
         <tr>
           <td class="memname">void samp_freeMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -106,7 +116,7 @@ SAMP_FREEMAP -- Free the given Map object<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="sampHub_8c_source.html#l00509">samp_hubDeclareSubscriptions()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, and <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, <a class="el" href="sampHub_8c_source.html#l00550">samp_hubDeclareSubscriptions()</a>, <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>, and <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>.</p>
 
 </div>
 </div><p>
@@ -117,7 +127,7 @@ SAMP_FREEMAP -- Free the given Map object<p>
         <tr>
           <td class="memname">float samp_getFloatFromMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -147,7 +157,7 @@ SAMP_GETFLOATFROMMAP -- Get a float from the Map<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>floating point value </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00607">samp_pointAtHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00962">samp_printMessage()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00786">samp_pointAtHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -158,7 +168,7 @@ SAMP_GETFLOATFROMMAP -- Get a float from the Map<p>
         <tr>
           <td class="memname">int samp_getIntFromMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -188,7 +198,7 @@ SAMP_GETINTFROMMAP -- Get a integer from the Map<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>integer value </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00962">samp_printMessage()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00528">samp_tbHighlightHandler()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00705">samp_tbHighlightHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -197,9 +207,9 @@ SAMP_GETINTFROMMAP -- Get a integer from the Map<p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a> samp_getListFromMap           </td>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a> samp_getListFromMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -229,7 +239,7 @@ SAMP_GETLISTFROMMAP -- Get a LIST from the Map<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>handle to List value </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00565">samp_tbSelectHandler()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00743">samp_tbSelectHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -238,9 +248,9 @@ SAMP_GETLISTFROMMAP -- Get a LIST from the Map<p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> samp_getMapFromMap           </td>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> samp_getMapFromMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -270,7 +280,7 @@ SAMP_GETMAPFROMMAP -- Get a Map from the Map<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>handle to Map value </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00962">samp_printMessage()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00642">samp_specLoadHandler()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01190">samp_resConeHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01153">samp_resLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01231">samp_resSiapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01272">samp_resSsapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01313">samp_resTapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01354">samp_resVOSpaceHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00822">samp_specLoadHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00862">samp_specSSAHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -281,7 +291,7 @@ SAMP_GETMAPFROMMAP -- Get a Map from the Map<p>
         <tr>
           <td class="memname">char* samp_getStringFromMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -311,7 +321,7 @@ SAMP_GETSTRINGFROMMAP -- Get a string from the Map<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>string value from Map </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00888">samp_bibcodeHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00681">samp_cmdExecHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00767">samp_envSetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00455">samp_imLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00853">samp_paramSetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00962">samp_printMessage()</a>, <a class="el" href="sampHandlers_8c_source.html#l00922">samp_resLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00642">samp_specLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00528">samp_tbHighlightHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00491">samp_tbLoadHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00565">samp_tbSelectHandler()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l01118">samp_bibcodeHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00906">samp_cmdExecHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00994">samp_envSetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00547">samp_imLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01082">samp_paramSetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01190">samp_resConeHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01153">samp_resLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01231">samp_resSiapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01272">samp_resSsapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01313">samp_resTapHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l01354">samp_resVOSpaceHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00822">samp_specLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00862">samp_specSSAHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00705">samp_tbHighlightHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00621">samp_tbLoadFITSHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00584">samp_tbLoadHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00663">samp_tbLoadVOTHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l00743">samp_tbSelectHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -337,7 +347,7 @@ Create a new Map object.
 SAMP_NEWMAP -- Create a new Map object<p>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>handle to new Map </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00752">samp_getNullMap()</a>, <a class="el" href="samp_8c_source.html#l00737">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00957">samp_getNullMap()</a>, <a class="el" href="samp_8c_source.html#l00942">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
 
 </div>
 </div><p>
@@ -348,7 +358,7 @@ SAMP_NEWMAP -- Create a new Map object<p>
         <tr>
           <td class="memname">void samp_setFloatInMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -394,7 +404,7 @@ SAMP_SETFLOATINMAP -- Set a Float in a Map (append)<p>
         <tr>
           <td class="memname">void samp_setIntInMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -440,7 +450,7 @@ SAMP_SETINTINMAP -- Set a Int in a Map (append)<p>
         <tr>
           <td class="memname">void samp_setListInMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -452,7 +462,7 @@ SAMP_SETINTINMAP -- Set a Int in a Map (append)<p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td>
           <td class="paramname"> <em>list</em></td><td>&nbsp;</td>
         </tr>
         <tr>
@@ -486,7 +496,7 @@ SAMP_SETLISTINMAP -- Set a List in a Map (append)<p>
         <tr>
           <td class="memname">void samp_setMapInMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map1</em>, </td>
         </tr>
         <tr>
@@ -498,7 +508,7 @@ SAMP_SETLISTINMAP -- Set a List in a Map (append)<p>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map2</em></td><td>&nbsp;</td>
         </tr>
         <tr>
@@ -523,7 +533,7 @@ SAMP_SETMAPINMAP -- Set a Map in a Map (append)<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00737">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00942">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
 
 </div>
 </div><p>
@@ -534,7 +544,7 @@ SAMP_SETMAPINMAP -- Set a Map in a Map (append)<p>
         <tr>
           <td class="memname">void samp_setStringInMap           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
           <td class="paramname"> <em>map</em>, </td>
         </tr>
         <tr>
@@ -571,12 +581,12 @@ SAMP_SETSTRINGINMAP -- Set a string in a Map (append)<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00737">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, <a class="el" href="samp_8c_source.html#l00942">samp_getOKMap()</a>, <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 31 13:23:14 2011 for SAMP Client Library by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 27 21:10:16 2013 for SAMP Client Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.9 </small></address>
 </body>

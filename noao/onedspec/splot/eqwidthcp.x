@@ -198,8 +198,8 @@ begin
 	} else if (ng != 1) {
 	    call realloc (xg, 1, TY_REAL)
 	    call realloc (yg, 1, TY_REAL)
-	    call realloc (sg, 1, TY_INT)
-	    call realloc (lg, 1, TY_INT)
+	    call realloc (sg, 1, TY_REAL)
+	    call realloc (lg, 1, TY_REAL)
 	    call realloc (pg, 1, TY_INT)
 	}
 	Memr[xg] = w

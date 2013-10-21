@@ -50,10 +50,16 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#754b50ad59145c7fd1e4c8f4277f11e4">samp_receiveResponse</a> (void *data)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">receiveResponse () client method.  <a href="#754b50ad59145c7fd1e4c8f4277f11e4"></a><br></td></tr>
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#68bf22a5b3f2531242f5c6d6ecf2ea1e">nullMap</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#82fec51207e326e6373e174bb6855634">samp_setHandlerReply</a> (<a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> resp)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#a2106c7fe3a5747178c046238fbd5d55">nullList</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the <a class="el" href="structSamp.html">Samp</a> Handler reply map.  <a href="#82fec51207e326e6373e174bb6855634"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#eebed5000d39977556e0bc330a020915">samp_getHandlerReply</a> ()</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the <a class="el" href="structSamp.html">Samp</a> Handler reply map.  <a href="#eebed5000d39977556e0bc330a020915"></a><br></td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#68bf22a5b3f2531242f5c6d6ecf2ea1e">nullMap</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMethods_8c.html#a2106c7fe3a5747178c046238fbd5d55">nullList</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="12abcaf1a16a8a7c2ef6358cdbf4d705"></a><!-- doxytag: member="sampMethods.c::sampP" ref="12abcaf1a16a8a7c2ef6358cdbf4d705" args="" -->
 <a class="el" href="structSamp.html">Samp</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><b>sampP</b></td></tr>
@@ -68,6 +74,34 @@ SAMPMETHODS.C -- SAMP methods implemented by a callable client.<p>
 <dl class="author" compact><dt><b>Author:</b></dt><dd>Mike Fitzpatrick </dd></dl>
 <dl class="date" compact><dt><b>Date:</b></dt><dd>7/10/09 </dd></dl>
 <hr><h2>Function Documentation</h2>
+<a class="anchor" name="eebed5000d39977556e0bc330a020915"></a><!-- doxytag: member="sampMethods.c::samp_getHandlerReply" ref="eebed5000d39977556e0bc330a020915" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> samp_getHandlerReply           </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Get the <a class="el" href="structSamp.html">Samp</a> Handler reply map. 
+<p>
+SAMP_GETHANDLERREPLY -- Get the <a class="el" href="structSamp.html">Samp</a> Handler reply map.<p>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Map handle for reply map </dd></dl>
+
+<p>References <a class="el" href="samp_8c_source.html#l00053">nullMap</a>, and <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>.</p>
+
+<p>Referenced by <a class="el" href="sampMethods_8c_source.html#l00045">samp_receiveCall()</a>, and <a class="el" href="sampMethods_8c_source.html#l00115">samp_receiveNotification()</a>.</p>
+
+</div>
+</div><p>
 <a class="anchor" name="59f85e0fce4c9ae7121c98e137d3f743"></a><!-- doxytag: member="sampMethods.c::samp_receiveCall" ref="59f85e0fce4c9ae7121c98e137d3f743" args="(void *data)" -->
 <div class="memitem">
 <div class="memproto">
@@ -103,7 +137,7 @@ SAMP_RECEIVECALL -- receiveCall() client method.<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>status code or errno </dd></dl>
 
-<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00159">samp_getSampHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00126">samp_getUserHandler()</a>, <a class="el" href="sampClient_8c_source.html#l00278">samp_Reply()</a>, <a class="el" href="samp_8c_source.html#l00051">sampH</a>, and <a class="el" href="samp_8h_source.html#l00206">Samp::trace</a>.</p>
+<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, <a class="el" href="sampMethods_8c_source.html#l00252">samp_getHandlerReply()</a>, <a class="el" href="sampHandlers_8c_source.html#l00159">samp_getSampHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00126">samp_getUserHandler()</a>, <a class="el" href="sampClient_8c_source.html#l00278">samp_Reply()</a>, <a class="el" href="samp_8c_source.html#l00051">sampH</a>, and <a class="el" href="samp_8h_source.html#l00205">Samp::trace</a>.</p>
 
 </div>
 </div><p>
@@ -134,7 +168,7 @@ SAMP_RECEIVENOTIFICATION -- receiveNotification() client method.<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>status code or errno </dd></dl>
 
-<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00159">samp_getSampHandler()</a>, <a class="el" href="sampHub_8c_source.html#l00214">samp_processHubEvent()</a>, and <a class="el" href="samp_8h_source.html#l00206">Samp::trace</a>.</p>
+<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, <a class="el" href="sampMethods_8c_source.html#l00252">samp_getHandlerReply()</a>, <a class="el" href="sampHandlers_8c_source.html#l00159">samp_getSampHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00126">samp_getUserHandler()</a>, <a class="el" href="sampHub_8c_source.html#l00250">samp_processHubEvent()</a>, and <a class="el" href="samp_8h_source.html#l00205">Samp::trace</a>.</p>
 
 </div>
 </div><p>
@@ -165,7 +199,38 @@ SAMP_RECEIVERESPONSE -- receiveResponse() client method.<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>status code or errno </dd></dl>
 
-<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00190">samp_execUserHandler()</a>, and <a class="el" href="samp_8h_source.html#l00206">Samp::trace</a>.</p>
+<p>References <a class="el" href="structSamp.html#eb399d3fb381bee752b5747ff4cb9a9b">Samp::defaultUserFunc</a>, <a class="el" href="samp_8c_source.html#l00054">OK_Map</a>, <a class="el" href="sampHandlers_8c_source.html#l00191">samp_execUserHandler()</a>, and <a class="el" href="samp_8h_source.html#l00205">Samp::trace</a>.</p>
+
+</div>
+</div><p>
+<a class="anchor" name="82fec51207e326e6373e174bb6855634"></a><!-- doxytag: member="sampMethods.c::samp_setHandlerReply" ref="82fec51207e326e6373e174bb6855634" args="(Map resp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void samp_setHandlerReply           </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a>&nbsp;</td>
+          <td class="paramname"> <em>resp</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Set the <a class="el" href="structSamp.html">Samp</a> Handler reply map. 
+<p>
+SAMP_SETHANDLERREPLY -- Set the <a class="el" href="structSamp.html">Samp</a> Handler reply map.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>resp</em>&nbsp;</td><td>response map </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00941">samp_envGetHandler()</a>, and <a class="el" href="sampHandlers_8c_source.html#l01030">samp_paramGetHandler()</a>.</p>
 
 </div>
 </div><p>
@@ -175,7 +240,7 @@ SAMP_RECEIVERESPONSE -- receiveResponse() client method.<p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="samp_8h.html#39f9d235896a8fd920f319105eb82791">List</a> <a class="el" href="sampMethods_8c.html#a2106c7fe3a5747178c046238fbd5d55">nullList</a>          </td>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#39f9d235896a8fd920f319105eb82791">List</a> <a class="el" href="sampMethods_8c.html#a2106c7fe3a5747178c046238fbd5d55">nullList</a>          </td>
         </tr>
       </table>
 </div>
@@ -192,7 +257,7 @@ SAMP_OK Map struct
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="samp_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> <a class="el" href="sampMethods_8c.html#68bf22a5b3f2531242f5c6d6ecf2ea1e">nullMap</a>          </td>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#39a90bc041db57e1a6ba736ba91eee30">Map</a> <a class="el" href="sampMethods_8c.html#68bf22a5b3f2531242f5c6d6ecf2ea1e">nullMap</a>          </td>
         </tr>
       </table>
 </div>
@@ -200,7 +265,7 @@ SAMP_OK Map struct
 
 <p>
 SAMP handle 
-<p>Referenced by <a class="el" href="samp_8c_source.html#l00737">samp_getOKMap()</a>, <a class="el" href="sampHub_8c_source.html#l00509">samp_hubDeclareSubscriptions()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
+<p>Referenced by <a class="el" href="sampMethods_8c_source.html#l00252">samp_getHandlerReply()</a>, <a class="el" href="samp_8c_source.html#l00942">samp_getOKMap()</a>, <a class="el" href="sampHub_8c_source.html#l00550">samp_hubDeclareSubscriptions()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
 
 </div>
 </div><p>
@@ -217,12 +282,12 @@ SAMP handle
 
 <p>
 SAMP struct pointer 
-<p>Referenced by <a class="el" href="sampHandlers_8c_source.html#l00715">samp_envGetHandler()</a>, <a class="el" href="sampHandlers_8c_source.html#l00802">samp_paramGetHandler()</a>, <a class="el" href="sampHub_8c_source.html#l00214">samp_processHubEvent()</a>, <a class="el" href="sampMethods_8c_source.html#l00044">samp_receiveCall()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
+<p>Referenced by <a class="el" href="sampHub_8c_source.html#l00250">samp_processHubEvent()</a>, <a class="el" href="sampMethods_8c_source.html#l00045">samp_receiveCall()</a>, and <a class="el" href="samp_8c_source.html#l00079">sampInit()</a>.</p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 31 13:23:14 2011 for SAMP Client Library by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 27 21:10:16 2013 for SAMP Client Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.9 </small></address>
 </body>

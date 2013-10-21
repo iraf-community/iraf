@@ -23,7 +23,7 @@
 *  2  For epochs from 1961 January 1 onwards, the expressions from the
 *     file ftp://maia.usno.navy.mil/ser7/tai-utc.dat are used.
 *
-*  3  The 5ms timestep at 1961 January 1 is taken from 2.58.1 (p87) of
+*  3  The 5ms time step at 1961 January 1 is taken from 2.58.1 (p87) of
 *     the 1992 Explanatory Supplement.
 *
 *  4  UTC began at 1960 January 1.0 (JD 2436934.5) and it is improper
@@ -39,13 +39,13 @@
 *     :     occasion that a leap second is      :
 *     :                announced                :
 *     :                                         :
-*     :  Latest leap second:  1999 January 1    :
+*     :  Latest leap second:  2012 July 1       :
 *     :                                         :
 *     :-----------------------------------------:
 *
-*  P.T.Wallace   Starlink   31 May 1999
+*  Last revision:   5 July 2008
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -64,6 +64,18 @@
 *  leap second is announced, and update the   *
 *  preamble comments appropriately.           *
 * - - - - - - - - - - - - - - - - - - - - - - *
+
+*     2012 July 1
+      ELSE IF (UTC.GE.56109D0) THEN
+         DT=35D0
+
+*     2009 January 1
+      ELSE IF (UTC.GE.54832D0) THEN
+         DT=34D0
+
+*     2006 January 1
+      ELSE IF (UTC.GE.53736D0) THEN
+         DT=33D0
 
 *     1999 January 1
       ELSE IF (UTC.GE.51179D0) THEN

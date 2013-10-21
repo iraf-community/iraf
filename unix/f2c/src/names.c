@@ -108,7 +108,7 @@ c_type_decl(int type, int is_extern)
 /* Subroutines must return an INT, because they might return a label
    value.  Even if one doesn't, the caller will EXPECT it to. */
 
-	case TYSUBR:	strcpy (buff, "/* Subroutine */ integer");
+	case TYSUBR:	strcpy (buff, "/* Subroutine */ int");
 							break;
 	case TYERROR:	strcpy (buff, "ERROR");		break;
 	case TYVOID:	strcpy (buff, "void");		break;

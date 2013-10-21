@@ -30,11 +30,29 @@
 *       13/5 E-5 AU = 19200/7600 km in position
 *       47/26 E-10 AU/s = 0.0070/0.0039 km/s in speed
 *
-*  4  More precise results are obtainable with the routine slEVP.
+*  4  More accurate results are obtainable with the routines slEVP
+*     and slEPV.
 *
-*  P.T.Wallace   Starlink   23 November 1994
+*  Last revision:   5 April 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

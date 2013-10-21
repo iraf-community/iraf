@@ -4,7 +4,7 @@
 *      C C 2 S
 *     - - - - -
 *
-*  Direction cosines to spherical coordinates (single precision)
+*  Cartesian to spherical coordinates (single precision)
 *
 *  Given:
 *     V     r(3)   x,y,z vector
@@ -12,18 +12,34 @@
 *  Returned:
 *     A,B   r      spherical coordinates in radians
 *
-*  The spherical coordinates are longitude (+ve anticlockwise
-*  looking from the +ve latitude pole) and latitude.  The
-*  Cartesian coordinates are right handed, with the x axis
-*  at zero longitude and latitude, and the z axis at the
-*  +ve latitude pole.
+*  The spherical coordinates are longitude (+ve anticlockwise looking
+*  from the +ve latitude pole) and latitude.  The Cartesian coordinates
+*  are right handed, with the x axis at zero longitude and latitude, and
+*  the z axis at the +ve latitude pole.
 *
-*  If V is null, zero A and B are returned.
-*  At either pole, zero A is returned.
+*  If V is null, zero A and B are returned.  At either pole, zero A is
+*  returned.
 *
-*  P.T.Wallace   Starlink   July 1989
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

@@ -32,7 +32,6 @@ typedef unsigned long long ULlong;
 #define TYSHORT 3
 #define TYLONG 4
 /* #define TYQUAD 5 */
-#define TYQUAD 5
 #define TYREAL (5+TYQUAD_inc)
 #define TYDREAL (6+TYQUAD_inc)
 #define TYCOMPLEX (7+TYQUAD_inc)

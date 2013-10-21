@@ -636,8 +636,17 @@ expand_history_macros (
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
 	 */
-	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++)
-	    if (*ip == HISTCHAR) {
+	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++) {
+            if (*ip == '"') {                   /* span literal strings */
+                while (1) {
+                   *op++ = *ip++;
+                   if (*ip == '"' && *(ip+1) != '"') {
+                       *op = *ip;
+                        break;
+                   }
+                }
+                continue;
+            } else if (*ip == HISTCHAR) {
 		if (ip > in_text && *(ip-1) == '\\') {
 		    *(--op) = HISTCHAR;				/* \^	*/
 		    continue;
@@ -687,6 +696,7 @@ expand_history_macros (
 		--op;		/* leave pointing at last char output	*/
 		ip++;		/* skip the macro type metacharacter	*/
 	    }
+	}
 
 	return (have_arg_strings > 0);
 }

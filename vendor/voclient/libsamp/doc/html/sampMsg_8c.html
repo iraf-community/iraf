@@ -32,19 +32,19 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#d6dfdab2715ea070713515754dd499dd">samp_newMsg</a> ()</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#d6dfdab2715ea070713515754dd499dd">samp_newMsg</a> ()</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create a new Msg object.  <a href="#d6dfdab2715ea070713515754dd499dd"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#adf2979a5fad0c9a855740330b7fd9ce">samp_freeMsg</a> (<a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#adf2979a5fad0c9a855740330b7fd9ce">samp_freeMsg</a> (<a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Free the given Msg object.  <a href="#adf2979a5fad0c9a855740330b7fd9ce"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="34c9e29fa57216f19a70764df8e5826b"></a><!-- doxytag: member="sampMsg.c::samp_msgMType" ref="34c9e29fa57216f19a70764df8e5826b" args="(Msg msg, String mtype)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_msgMType</b> (<a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg, <a class="el" href="samp_8h.html#2efe6d463d80744789f228f5dc4baa39">String</a> mtype)</td></tr>
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_msgMType</b> (<a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg, <a class="el" href="sampDecl_8h.html#2efe6d463d80744789f228f5dc4baa39">String</a> mtype)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="b6887edd7c0924460bcee0282544c82f"></a><!-- doxytag: member="sampMsg.c::samp_msgTag" ref="b6887edd7c0924460bcee0282544c82f" args="()" -->
 char *&nbsp;</td><td class="memItemRight" valign="bottom"><b>samp_msgTag</b> ()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#281c8f7f8b21a74704dd200d5aaed481">samp_msgParam</a> (<a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg, <a class="el" href="samp_8h.html#4c5a7aff173725461e76e5f0183d7ed8">Param</a> param)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="sampMsg_8c.html#281c8f7f8b21a74704dd200d5aaed481">samp_msgParam</a> (<a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> msg, <a class="el" href="sampDecl_8h.html#4c5a7aff173725461e76e5f0183d7ed8">Param</a> param)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a parameter to the Msg.  <a href="#281c8f7f8b21a74704dd200d5aaed481"></a><br></td></tr>
 </table>
@@ -63,7 +63,7 @@ msg = samp_newMsg () samp_msgMType (Msg msg, String mtype) samp_msgParam (Msg ms
         <tr>
           <td class="memname">void samp_freeMsg           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td>
           <td class="paramname"> <em>msg</em>          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -83,7 +83,7 @@ SAMP_FREEMSG -- Free the given Msg object<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
-<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00659">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00418">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00341">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00456">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00517">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00294">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00557">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00616">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00704">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00216">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00172">samp_tableLoadFITS()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00128">samp_tableLoadVOTable()</a>.</p>
+<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00794">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00459">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00367">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00497">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00604">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00320">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00643">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00751">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00839">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00898">samp_sendGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00413">samp_specLoadSSAGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00221">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00177">samp_tableLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00133">samp_tableLoadVOTable()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00266">samp_tableSelectRowList()</a>.</p>
 
 </div>
 </div><p>
@@ -94,13 +94,13 @@ SAMP_FREEMSG -- Free the given Msg object<p>
         <tr>
           <td class="memname">void samp_msgParam           </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a>&nbsp;</td>
           <td class="paramname"> <em>msg</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="samp_8h.html#4c5a7aff173725461e76e5f0183d7ed8">Param</a>&nbsp;</td>
+          <td class="paramtype"><a class="el" href="sampDecl_8h.html#4c5a7aff173725461e76e5f0183d7ed8">Param</a>&nbsp;</td>
           <td class="paramname"> <em>param</em></td><td>&nbsp;</td>
         </tr>
         <tr>
@@ -125,7 +125,7 @@ SAMP_MSGPARAM -- Add a parameter to the Msg.<p>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
-<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00659">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00418">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00341">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00456">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00517">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00294">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00557">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00616">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00704">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00216">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00172">samp_tableLoadFITS()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00128">samp_tableLoadVOTable()</a>.</p>
+<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00794">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00459">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00367">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00497">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00604">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00320">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00643">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00751">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00839">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00898">samp_sendGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00413">samp_specLoadSSAGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00221">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00177">samp_tableLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00133">samp_tableLoadVOTable()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00266">samp_tableSelectRowList()</a>.</p>
 
 </div>
 </div><p>
@@ -134,7 +134,7 @@ SAMP_MSGPARAM -- Add a parameter to the Msg.<p>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="samp_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> samp_newMsg           </td>
+          <td class="memname"><a class="el" href="sampDecl_8h.html#eb3d03dd240212c044285bdd522e3b2b">Msg</a> samp_newMsg           </td>
           <td>(</td>
           <td class="paramtype">void&nbsp;</td>
           <td class="paramname">          </td>
@@ -151,12 +151,12 @@ Create a new Msg object.
 SAMP_NEWMSG -- Create a new Msg object<p>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>handle to new Msg </dd></dl>
 
-<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00659">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00418">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00341">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00456">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00517">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00294">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00557">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00616">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00704">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00216">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00172">samp_tableLoadFITS()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00128">samp_tableLoadVOTable()</a>.</p>
+<p>Referenced by <a class="el" href="sampMTypes_8c_source.html#l00794">samp_bibLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00459">samp_cmdExec()</a>, <a class="el" href="sampMTypes_8c_source.html#l00367">samp_coordPointAtSky()</a>, <a class="el" href="sampMTypes_8c_source.html#l00497">samp_envGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00604">samp_envSet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00320">samp_imageLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00643">samp_paramGet()</a>, <a class="el" href="sampMTypes_8c_source.html#l00751">samp_paramSet()</a>, <a class="el" href="sampCommands_8c_source.html#l00141">samp_Ping()</a>, <a class="el" href="sampMTypes_8c_source.html#l00839">samp_resourceLoad()</a>, <a class="el" href="sampMTypes_8c_source.html#l00898">samp_sendGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00413">samp_specLoadSSAGeneric()</a>, <a class="el" href="sampMTypes_8c_source.html#l00221">samp_tableHighlightRow()</a>, <a class="el" href="sampMTypes_8c_source.html#l00177">samp_tableLoadFITS()</a>, <a class="el" href="sampMTypes_8c_source.html#l00133">samp_tableLoadVOTable()</a>, and <a class="el" href="sampMTypes_8c_source.html#l00266">samp_tableSelectRowList()</a>.</p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 31 13:23:14 2011 for SAMP Client Library by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 27 21:10:16 2013 for SAMP Client Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.9 </small></address>
 </body>

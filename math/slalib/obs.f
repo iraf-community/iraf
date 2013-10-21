@@ -71,9 +71,26 @@
 *         better station identifiers or names
 *         additional stations
 *
-*  P.T.Wallace   Starlink   21 April 1999
+*  P.T.Wallace   Starlink   15 March 2002
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright (C) 2002 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -92,7 +109,7 @@
       PARAMETER (AS2R=0.484813681109535994D-5)
 
 *  Table of station identifiers
-      PARAMETER (NMAX=75)
+      PARAMETER (NMAX=83)
       CHARACTER*10 CTAB(NMAX)
       DATA CTAB  (1) /'AAT       '/
       DATA CTAB  (2) /'LPO4.2    '/
@@ -169,6 +186,14 @@
       DATA CTAB (73) /'FCRAO     '/
       DATA CTAB (74) /'IRTF      '/
       DATA CTAB (75) /'CSO       '/
+      DATA CTAB (76) /'VLT1      '/
+      DATA CTAB (77) /'VLT2      '/
+      DATA CTAB (78) /'VLT3      '/
+      DATA CTAB (79) /'VLT4      '/
+      DATA CTAB (80) /'GEMINIS   '/
+      DATA CTAB (81) /'KOSMA3M   '/
+      DATA CTAB (82) /'MAGELLAN1 '/
+      DATA CTAB (83) /'MAGELLAN2 '/
 
 *  Degrees, arcminutes, arcseconds to radians
       WEST(ID,IAM,AS)=AS2R*(DBLE(60*(60*ID+IAM))+DBLE(AS))
@@ -219,7 +244,8 @@
      :       410,420,430,440,450,460,470,480,490,500,
      :       510,520,530,540,550,560,570,580,590,600,
      :       610,620,630,640,650,660,670,680,690,700,
-     :       710,720,730,740,750) M
+     :       710,720,730,740,750,760,770,780,790,800,
+     :       810,820,830) M
       GO TO 9000
 
 *  AAT (Observer's Guide)                                            AAT
@@ -254,12 +280,12 @@
       H=2364D0
       GO TO 9999
 
-*  Lick 120" (1984 Almanac)                                      LICK120
+*  Lick 120" (S.L.Allen, private communication, 2002)            LICK120
  50   CONTINUE
       NAME='Lick 120 inch'
-      W=WEST(121,38,09.9)
-      P=NORTH(37,20,35.2)
-      H=1290D0
+      W=WEST(121,38,13.689)
+      P=NORTH(37,20,34.931)
+      H=1286D0
       GO TO 9999
 
 *  MMT 6.5m conversion (MMT Observatory website)                     MMT
@@ -632,7 +658,7 @@
       GO TO 9999
 
 *  Australia Telescope Parkes Observatory                         PARKES
-*  (Peter te Lintel Hekkert, private comm)
+*  (Peter te Lintel Hekkert)
  520  CONTINUE
       NAME='Parkes 64 metre'
       W=EAST(148,15,44.3591)
@@ -673,12 +699,12 @@
       GO TO 9999
 
 *  James Clerk Maxwell 15 metre mm telescope, Mauna Kea             JCMT
-*  (IfA website, Richard Wainscoat, height from I.Coulson)
+*  From GPS measurements on 11Apr2007 for eSMA setup (R. Tilanus)
  570  CONTINUE
       NAME='JCMT 15 metre'
-      W=WEST(155,28,37.20)
-      P=NORTH(19,49,22.11)
-      H=4111D0
+      W=WEST(155,28,37.30)
+      P=NORTH(19,49,22.22)
+      H=4124.75D0
       GO TO 9999
 
 *  ESO 3.5 metre NTT, La Silla (K.Wirenstrand)                    ESONTT
@@ -706,7 +732,7 @@
       GO TO 9999
 
 *  W.M.Keck Observatory, Telescope 1                               KECK1
-*  (William Lupton, private comm)
+*  (William Lupton)
  610  CONTINUE
       NAME='Keck 10m Telescope #1'
       W=WEST(155,28,28.99)
@@ -755,7 +781,7 @@
       GO TO 9999
 
 *  Australia Telescope Compact Array                                ATCA
-*  (WGS84 coordinates of Station 35, Mark Calabretta, private comm)
+*  (WGS84 coordinates of Station 35, Mark Calabretta)
  670  CONTINUE
       NAME='Australia Telescope Compact Array'
       W=EAST(149,33,00.500)
@@ -764,7 +790,7 @@
       GO TO 9999
 
 *  Australia Telescope Mopra Observatory                           MOPRA
-*  (Peter te Lintel Hekkert, private comm)
+*  (Peter te Lintel Hekkert)
  680  CONTINUE
       NAME='ATNF Mopra Observatory'
       W=EAST(149,05,58.732)
@@ -791,7 +817,7 @@
       GO TO 9999
 
 *  W.M.Keck Observatory, Telescope 2                                KECK2
-*  (William Lupton, private comm)
+*  (William Lupton)
  710  CONTINUE
       NAME='Keck 10m Telescope #2'
       W=WEST(155,28,27.24)
@@ -809,7 +835,7 @@
       GO TO 9999
 
 *  Five College Radio Astronomy Observatory                        FCRAO
-*  (Tim Jenness, private comm)
+*  (Tim Jenness)
  730  CONTINUE
       NAME='Five College Radio Astronomy Obs'
       W=WEST(72,20,42.0)
@@ -833,6 +859,78 @@
       W=WEST(155,28,31.79)
       P=NORTH(19,49,20.78)
       H=4080D0
+      GO TO 9999
+
+* ESO VLT, UT1                                                       VLT1
+* (ESO website, VLT Whitebook Chapter 2)
+ 760  CONTINUE
+      NAME='ESO VLT, Paranal, Chile: UT1'
+      W=WEST(70,24,11.642)
+      P=SOUTH(24,37,33.117)
+      H=2635.43
+      GO TO 9999
+
+* ESO VLT, UT2                                                       VLT2
+* (ESO website, VLT Whitebook Chapter 2)
+ 770  CONTINUE
+      NAME='ESO VLT, Paranal, Chile: UT2'
+      W=WEST(70,24,10.855)
+      P=SOUTH(24,37,31.465)
+      H=2635.43
+      GO TO 9999
+
+* ESO VLT, UT3                                                       VLT3
+* (ESO website, VLT Whitebook Chapter 2)
+ 780  CONTINUE
+      NAME='ESO VLT, Paranal, Chile: UT3'
+      W=WEST(70,24,09.896)
+      P=SOUTH(24,37,30.300)
+      H=2635.43
+      GO TO 9999
+
+* ESO VLT, UT4                                                       VLT4
+* (ESO website, VLT Whitebook Chapter 2)
+ 790  CONTINUE
+      NAME='ESO VLT, Paranal, Chile: UT4'
+      W=WEST(70,24,08.000)
+      P=SOUTH(24,37,31.000)
+      H=2635.43
+      GO TO 9999
+
+*  Gemini South, Cerro Pachon                                     GEMINIS
+*  (GPS readings by Patrick Wallace)
+ 800  CONTINUE
+      NAME='Gemini South 8-m telescope'
+      W=WEST(70,44,11.5)
+      P=SOUTH(30,14,26.7)
+      H=2738D0
+      GO TO 9999
+
+*  Cologne Observatory for Submillimeter Astronomy (KOSMA)        KOSMA3M
+*  (Holger Jakob)
+ 810  CONTINUE
+      NAME='KOSMA 3m telescope, Gornergrat'
+      W=EAST(7,47,3.48)
+      P=NORTH(45,58,59.772)
+      H=3141D0
+      GO TO 9999
+
+*  Magellan 1, 6.5m telescope at Las Campanas, Chile            MAGELLAN1
+*  (Skip Schaller)
+ 820  CONTINUE
+      NAME='Magellan 1, 6.5m, Las Campanas'
+      W=WEST(70,41,31.9)
+      P=SOUTH(29,00,51.7)
+      H=2408D0
+      GO TO 9999
+
+*  Magellan 2, 6.5m telescope at Las Campanas, Chile            MAGELLAN2
+*  (Skip Schaller)
+ 830  CONTINUE
+      NAME='Magellan 2, 6.5m, Las Campanas'
+      W=WEST(70,41,33.5)
+      P=SOUTH(29,00,50.3)
+      H=2408D0
       GO TO 9999
 
 *  Unrecognized station

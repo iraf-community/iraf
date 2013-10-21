@@ -454,9 +454,10 @@ ZOPNND (
 		 * return the server socket on the channel.
 		 */
 		if (!(np->flags & F_NONBLOCK)) {
-		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
-			close (s);
-			goto err;
+		    if ((fd = accept (s, (struct sockaddr *)0, 
+			(socklen_t *)0)) < 0) {
+			    close (s);
+			    goto err;
 		    } else
 			close (s);
 		} else
@@ -497,9 +498,10 @@ ZOPNND (
 		 * return the server socket on the channel.
 		 */
 		if (!(np->flags & F_NONBLOCK)) {
-		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
-			close (s);
-			goto err;
+		    if ((fd = accept (s, (struct sockaddr *)0, 
+			(socklen_t *)0)) < 0) {
+			    close (s);
+			    goto err;
 		    } else
 			close (s);
 		} else
@@ -515,7 +517,7 @@ ZOPNND (
 
                 if (s_np->flags & F_NODELAY) {
 		    struct timeval timeout;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		    fd_set readfds;
                     FD_ZERO (&readfds);
                     FD_SET (s, &readfds);
@@ -525,14 +527,16 @@ ZOPNND (
                     timeout.tv_sec = 0;
                     timeout.tv_usec = 0;
                     if (select (MAXSEL, &readfds, NULL, NULL, &timeout)) {
-                        if ((fd = accept (s, (struct sockaddr *)0, (int *)0))<0)
-                            goto err;
+                        if ((fd = accept (s, (struct sockaddr *)0, 
+			    (socklen_t *)0))<0)
+                                goto err;
 	            } else {
 			goto err;
 	            }
 		} else {
-		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0)
-		        goto err;
+		    if ((fd = accept (s, (struct sockaddr *)0, 
+			(socklen_t *)0)) < 0)
+		            goto err;
 		}
 
 		np->datain = fd;
@@ -684,7 +688,7 @@ ZARDND (
 	register XCHAR *op;
 	int nbytes, maxread;
 	struct timeval timeout;
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	fd_set readfds;
 	FD_ZERO (&readfds);
 	FD_SET (np->datain, &readfds);
@@ -701,7 +705,7 @@ ZARDND (
 	 * end writes any data.  This happens even though fcntl is called to
 	 * restore blocking i/o after the open.
 	 */
-#ifdef POSIX
+#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	FD_ZERO (&readfds);
 	FD_SET (np->datain, &readfds);
 #else

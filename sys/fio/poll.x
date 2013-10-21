@@ -135,7 +135,6 @@ int	ori()
 begin
 	top = POLL_NFD(fds)
 	if (top > MAX_POLL_FD)
-	    #call syserr (SYS_FPOVERFLOW)
 	    call eprintf ("File descriptor set overflow.\n")
 
 	for (i=0; i < top; i=i+1) {

@@ -16,7 +16,7 @@ define	MAX_ALIASES	10
 define	DEF_LENINDEX	97
 define	DEF_LENSTAB	1024
 define	DEF_LENSBUF	8192
-define	DEF_LINELEN	8192
+define	DEF_LINELEN	32768
 
 # Input image operands.
 define	LEN_IMOPERAND	18

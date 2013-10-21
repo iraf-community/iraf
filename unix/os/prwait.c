@@ -86,7 +86,7 @@ pr_wait (int pid)
 	    /* Process has already terminated.  Clear table entry and return
 	     * exit status (set in a previous call).
 	     */
-	    pr->pr_pid = (int) NULL;
+	    pr->pr_pid = (int) 0;
 	    return (pr->pr_exit_status);
 
 	} else {
@@ -112,7 +112,7 @@ pr_wait (int pid)
 		    pr->pr_exit_status = error_code ? error_code : XOK;
 
 		    if (waitpid == pid) {
-			pr->pr_pid = (int) NULL;
+			pr->pr_pid = (int) 0;
 			return (pr->pr_exit_status);
 		    }
 		}
@@ -171,5 +171,5 @@ pr_release (int pid)
 	register struct proctable *pr;
 
 	if ((pr = pr_findpid (pid)) != NULL)
-	    pr->pr_pid = (int) NULL;
+	    pr->pr_pid = (int) 0;
 }

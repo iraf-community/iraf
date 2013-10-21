@@ -1,6 +1,10 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+inlfit/ingfit.gx
+    The 'oldwts' pointer was being used explicitly with Memr, changed to use
+    'Mem$t' so the appropriate type is used (5/4/13, MJF)
+
 rmsorted.x
     A 64-bit problem was fixed.  (12/5/11, Valdes)
 

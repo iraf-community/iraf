@@ -2,10 +2,15 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #define import_spp
 #define import_knames
 #include <iraf.h>
+
+#include "../bootProto.h"
+
 
 #define	MAXEXTN		128
 #define	ALL		0	/* delete all files			*/
@@ -17,6 +22,14 @@ int	execute;		/* permission to delete files		*/
 int	debug;			/* print debugging info			*/
 
 extern	char *vfn2osfn();
+
+
+extern int  ZZSTRT (void);
+extern int  ZZSTOP (void);
+
+static void rmfiles (char *prog, int oneliner);
+static void stripdir (char *dir, char *path, char *extnlist[], int mode);
+static int  got_one (char *fname, char *extnlist[]);
 
 
 /*
@@ -36,9 +49,7 @@ extern	char *vfn2osfn();
  * There is no default action as a safety measure.  If -all is specifed,
  * the extension list is ignored.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int main (int argc, char *argv[])
 {
 	char	prog[SZ_LINE+1];
 	char	*argp, *ip, *op;
@@ -85,7 +96,7 @@ char	*argv[];
 		 * line is assumed to be the program.
 		 */
 		for (op=prog;  (ip = argv[argno]) != NULL;  argno++) {
-		    while (*op = *ip++)
+		    while ((*op = *ip++))
 			op++;
 		    *op++ = ' ';
 		}
@@ -102,6 +113,8 @@ help_:
  	fprintf (stderr, "rmfiles [-dnv] [-p prog] [progfile]\n");
 	ZZSTOP();
 	exit (OSOK+1);
+
+	return (0);
 }
 
 
@@ -109,9 +122,11 @@ help_:
  * directories.  We are driven either by a program in the named text file,
  * or in the prog string itself.
  */
-rmfiles (prog, oneliner)
-char	*prog;			/* program, or program file name	*/
-int	oneliner;		/* if !oneliner, open program file	*/
+static void
+rmfiles (
+    char  *prog, 		/* program, or program file name	*/
+    int	   oneliner 		/* if !oneliner, open program file	*/
+)
 {
 	char	dir[SZ_PATHNAME+1], path[SZ_PATHNAME+1];
 	char	*extnlist[MAXEXTN], *ip, *op;
@@ -145,11 +160,12 @@ int	oneliner;		/* if !oneliner, open program file	*/
 	     */
 	    for (ip=lbuf;  isspace(*ip);  ip++)
 		;
-	    if (*ip == EOS || *ip == '#')
+	    if (*ip == EOS || *ip == '#') {
 		if (oneliner)
 		    break;
 		else
 		    continue;
+	    }
 
 	    /* Check for a single filename entry of the form `-file filename',
 	     * deleting the named file if this type of entry is encountered.
@@ -251,11 +267,13 @@ int	oneliner;		/* if !oneliner, open program file	*/
  * on the mode, which can be ALL, ALLBUT, or ONLY.  We chdir to each directory
  * to minimize path searches.
  */
-stripdir (dir, path, extnlist, mode)
-char	*dir;			/* start with this directory		*/
-char	*path;			/* pathname of current directory	*/
-char	*extnlist[];		/* list of file extensions		*/
-int	mode;			/* ALL, ALLBUT, ONLY			*/
+static void
+stripdir (
+    char  *dir, 		/* start with this directory		*/
+    char  *path, 		/* pathname of current directory	*/
+    char  *extnlist[], 		/* list of file extensions		*/
+    int	   mode 		/* ALL, ALLBUT, ONLY			*/
+)
 {
 	char	oldpath[SZ_PATHNAME+1];
 	char	newpath[SZ_PATHNAME+1];
@@ -332,9 +350,11 @@ int	mode;			/* ALL, ALLBUT, ONLY			*/
 /* GOT_ONE -- Check the file extension, if there is one, to see if the
  * file is on the list of extensions.
  */
-got_one (fname, extnlist)
-char	*fname;			/* file to be examined		*/
-char	*extnlist[];		/* list of extensions		*/
+static int
+got_one (
+    char  *fname,		/* file to be examined		*/
+    char  *extnlist[]		/* list of extensions		*/
+)
 {
 	register char	*ip, *ep;
 	register int	ch, i;

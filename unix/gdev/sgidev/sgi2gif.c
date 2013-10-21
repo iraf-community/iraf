@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "sgiUtil.h"
+
+
 /*
  *  SGI2GIF.C -- Read an IRAF SGI bitmap file on standard input and convert
  *  to a GIF format image on standard outout.
@@ -79,10 +82,10 @@ static int blue[]  = { DEF_BG, DEF_FG } ;
 static char *infile[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static char *s_root = "sgigif_";
 
-static int	GIFNextPixel(), isSwappedMachine();
+static int	GIFNextPixel();
 static void 	BumpPixel(), GIFEncode(), Putword(), compress();
 static void 	output(), cl_block(), cl_hash(), char_init();
-static void 	char_out(), flush_char(), unpack1to8(), bswap4();
+static void 	char_out(), flush_char(), unpack1to8();
 
 
 
@@ -189,7 +192,7 @@ main (int argc, char *argv[])
 		 * it's in the correct order for unpacking to be interpreted
 		 * as an LSB-ordered image.
 	         */
-	        if ( ! isSwappedMachine())
+	        if ( ! isSwapped ())
 		    bswap4 (buffer, buffer, len_buf);
 
 	        unpack1to8 ((ip+=px), buffer, px);
@@ -232,63 +235,6 @@ unpack1to8 (byte *dest, byte *src, int len)
             *dest++ = (byte) ((c >> (b++)) & 1);
         }
 }
-
-
-/* IS_SWAPPED_MACHINE -- See if this is a byte-swapped (LSB) machine.
- */
-
-static int
-isSwappedMachine (void)
-{
-        union {
-            char ch[4];
-            int  i;
-        } u;
-
-        u.i = 1;
-        return ((int) u.ch[0]);
-}
-
-
-/* BSWAP4 - Move bytes from array "a" to array "b", swapping the four bytes
- * in each successive 4 byte group, i.e., 12345678 becomes 43218765.
- * The input and output arrays may be the same but may not partially overlap.
- */
-static void
-bswap4 (a, b, nbytes)
-byte   *a;                     /* input array                  */
-byte   *b;                     /* output array                 */
-int    nbytes;                 /* number of bytes to swap      */
-{
-        register byte   *ip, *op, *tp;
-        register int    n;
-        static   byte temp[4];
-
-        tp = temp;
-        ip = (byte *)a;
-        op = (byte *)b;
-
-        /* Swap successive four byte groups.
-         */
-        for (n = nbytes >> 2;  --n >= 0;  ) {
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *op++ = *--tp;
-            *op++ = *--tp;
-            *op++ = *--tp;
-            *op++ = *--tp;
-        }
-
-        /* If there are any odd bytes left, move them to the output array.
-         * Do not bother to swap as it is unclear how to swap a partial
-         * group, and really incorrect if the data is not modulus 4.
-         */
-        for (n = nbytes & 03;  --n >= 0;  )
-            *op++ = *ip++;
-}
-
 
 
 /* GIF Writing Procedures.

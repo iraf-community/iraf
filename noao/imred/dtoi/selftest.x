@@ -137,7 +137,7 @@ pointer	sp, lut
 
 begin
 	call smark (sp)
-	call salloc (lut, nvalues, TY_INT)
+	call salloc (lut, nvalues, TY_REAL)
 
 	cfit[1] = 5.0
 	cfit[2] = 4.0

@@ -1,11 +1,10 @@
 # Make the package.
 
-$call	update@src
-$call	update@votools
+$call	update
 $exit
 
 update:
-        #$echo "--------------------- VO SRC ---------------------"
+        $echo "---------------------VO SRC ----------------------"
 	$call update@src
         $echo "------------------ VO VOTOOLS --------------------"
 	$call update@votools
@@ -49,7 +48,7 @@ generic:				# generic installation (no bin)
 	    !mkdir bin.generic
 	$endif
 	$verbose off
-	$set DIRS = "lib src"
+	$set DIRS = "lib votools"
 	!$(hlib)/mkfloat.csh generic -d $(DIRS)
 	;
 
@@ -58,7 +57,7 @@ linux:                                  # install Slackwkare Linux binaries
 	    !mkdir bin.linux
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh linux -d $(DIRS)
         ;
 linux64:                                # install x86_64 binaries
@@ -66,7 +65,7 @@ linux64:                                # install x86_64 binaries
 	    !mkdir bin.linux64
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh linux64 -d $(DIRS)
         ;
 macosx:                                 # install Mac OS X (PPC) binaries
@@ -74,7 +73,7 @@ macosx:                                 # install Mac OS X (PPC) binaries
 	    !mkdir bin.macosx
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh macosx -d $(DIRS)
         ;
 macintel:                               # install Mac OS X (Intel) binaries
@@ -82,7 +81,7 @@ macintel:                               # install Mac OS X (Intel) binaries
 	    !mkdir bin.macintel
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh macintel -d $(DIRS)
         ;
 cygwin:                                 # install Cygwin binaries
@@ -90,7 +89,7 @@ cygwin:                                 # install Cygwin binaries
 	    !mkdir bin.cygwin
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh cygwin -d $(DIRS)
         ;
 sparc:					# install sparc binaries
@@ -98,7 +97,7 @@ sparc:					# install sparc binaries
 	    !mkdir bin.sparc
 	$endif
 	$verbose off
-	$set DIRS = "lib src"
+	$set DIRS = "lib votools"
 	!$(hlib)/mkfloat.csh sparc -d $(DIRS)
 	;
 ssun:					# install Sun/Solaris binaries
@@ -106,7 +105,7 @@ ssun:					# install Sun/Solaris binaries
 	    !mkdir bin.ssun
 	$endif
 	$verbose off
-	$set DIRS = "lib src"
+	$set DIRS = "lib votools"
 	!$(hlib)/mkfloat.csh ssun -d $(DIRS)
 	;
 sunos:                                  # install SunOS (Solaris x86) binaries
@@ -114,6 +113,6 @@ sunos:                                  # install SunOS (Solaris x86) binaries
 	    !mkdir bin.sunos
 	$endif
         $verbose off
-        $set DIRS = "lib src"
+        $set DIRS = "lib votools"
         !$(hlib)/mkfloat.csh sunos -d $(DIRS)
         ;

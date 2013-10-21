@@ -165,7 +165,7 @@ begin
 	call amovkr (INDEFR, Memr[LS_RSKYERR(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_RMAG(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_RMAGERR(ls)], LS_MAXNREGIONS(ls))
-	call amovki (INDEFI, Memr[LS_RNPTS(ls)], LS_MAXNREGIONS(ls))
+	call amovki (INDEFI, Memi[LS_RNPTS(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_IMEAN(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_IMEDIAN(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_IMODE(ls)], LS_MAXNREGIONS(ls))
@@ -174,7 +174,7 @@ begin
 	call amovkr (INDEFR, Memr[LS_ISKYERR(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_IMAG(ls)], LS_MAXNREGIONS(ls))
 	call amovkr (INDEFR, Memr[LS_IMAGERR(ls)], LS_MAXNREGIONS(ls))
-	call amovki (INDEFI, Memr[LS_INPTS(ls)], LS_MAXNREGIONS(ls))
+	call amovki (INDEFI, Memi[LS_INPTS(ls)], LS_MAXNREGIONS(ls))
 
 	# Initialize the answers.
 	call amovkr (INDEFR, Memr[LS_RBSCALE(ls)], LS_MAXNREGIONS(ls))

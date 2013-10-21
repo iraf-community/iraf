@@ -1,29 +1,39 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGINIT - Initialize the dynamic package directory by fetching the most
 #  recent repository definition files.
 
-unalias 	grep
+bindir="`dirname $0`"                # get iraf root directory 
+irafdir=${bindir%/*}
 
-set  bindir     = "`dirname $0`"                # get iraf root directory 
-set  irafdir    = $bindir:h
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
 
-set  REPO	= `${irafdir}/util/pkgrepo`	# get repo url
-set  man 	= ".repo_manifest"
-set  arch	= `${irafdir}/unix/hlib/irafarch.csh -actual`
+
+REPO=`${irafdir}/util/pkgrepo`			# get repo url
+man=".repo_manifest"
+arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
 
 
 $irafdir/util/pkgget ${REPO}/REPO.MANIFEST  .repo_manifest
-if ($status == 1) then
-    echo "Cannot download repository manifest file, quitting."
-    exit $status
-endif
+if (( $?>0 )); then
+    /bin/echo "Cannot download repository manifest file, quitting."
+    exit $?
+fi
 
 $irafdir/util/pkgget ${REPO}/REPO.DESC 	    .repo_desc
-if ($status == 1) then
-    echo "Cannot download repository description file, quitting."
-    exit $status
-endif
+if (( $?>1 )); then
+    /bin/echo "Cannot download repository description file, quitting."
+    exit $?
+fi
 
 
 # Create a list of packages available for the current platform.  We pull
@@ -31,13 +41,13 @@ endif
 # IRAFARCH defined, assumed we're interested in managing multiple
 # architectures so don't filter by the current architecture.
 
-if ($?IRAFARCH) then
+if [ -n "$IRAFARCH" ]; then
     cat $man | egrep -v "^#" | awk '{printf("%s\n", $2)}' | uniq  >  .repo_pkgs
     cat $man    			 	        	  >  .repo_local
 else
     cat $man | grep "${arch}\ " | awk '{printf("%s\n", $2)}' 	  >  .repo_pkgs
     cat $man | grep "${arch}\ " 			 	  >  .repo_local
-endif
+fi
 
 
 exit 0

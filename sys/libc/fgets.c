@@ -33,8 +33,10 @@ fgets (
 	if (ch == EOF && op == buf)
 	    return ((char *) NULL);
 	else {
+#ifdef ADD_NEWLINE
 	    if (lastch != '\n')		/* handle missing NL at EOF	*/
 	        *op++ = '\n';
+#endif
 	    *op = EOS;
 	    return (buf);
 	}

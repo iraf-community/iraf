@@ -20,6 +20,19 @@ AC_ARG_ENABLE(
   [ if test $enableval = yes; then BUILD_REENTRANT=yes; fi ]
 )
 
+SSE_FLAGS=""
+AC_ARG_ENABLE(
+  sse2,
+  [AS_HELP_STRING([--enable-sse2],[Enable use of instructions in the SSE2 extended instruction set])],
+  [ if test $enableval = yes; then SSE_FLAGS="-msse2"; fi ]
+)
+
+AC_ARG_ENABLE(
+  ssse3,
+  [AS_HELP_STRING([--enable-ssse3],[Enable use of instructions in the SSSE3 extended instruction set])],
+  [ if test $enableval = yes; then SSE_FLAGS="$SSE_FLAGS -mssse3"; fi ]
+)
+
 # Define BUILD_HERA when building for HERA project to activate code in
 # drvrfile.c (by way of fitsio2.h):
 AC_ARG_ENABLE(
@@ -149,6 +162,20 @@ if test $ANSI_HEADER = no -o $PROTO = no; then
      exit 0;
 fi
 
+dnl Check if C compiler supports sse extended instruction flags.
+if test "x$SSE_FLAGS" != x; then
+    SAVE_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $SSE_FLAGS"
+    AC_MSG_CHECKING([whether $CC accepts $SSE_FLAGS])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],[c_has_option=yes],[c_has_option=no])
+    AC_MSG_RESULT($c_has_option)
+    AC_LANG_POP([])
+    if test "$c_has_option" = no; then SSE_FLAGS=""; fi
+    CFLAGS="$SAVE_CFLAGS"
+fi
+AC_SUBST(SSE_FLAGS)
+
 CFLAGS="$CFLAGS"
 LIBPRE=""
 
@@ -163,19 +190,16 @@ case $system in
                 changequote([,])
                 # Test to see whether the C compiler accepts the "-arch"
                 # flags for building "universal" binaries (Apple XCode only):
-                C_UNIV_SWITCH="-arch i386 -arch x86_64"
                 SAVE_CFLAGS="$CFLAGS"
+                C_UNIV_SWITCH="-arch i386 -arch x86_64"
                 CFLAGS="$CFLAGS $C_UNIV_SWITCH"
                 AC_MSG_CHECKING([whether $CC accepts $C_UNIV_SWITCH])
                 AC_LANG_PUSH([C])
-                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                                  [c_has_option=yes],[c_has_option=no])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],[c_has_option=yes],[c_has_option=no])
                 AC_MSG_RESULT($c_has_option)
                 AC_LANG_POP([])
                 # Value of C_UNIV_SWITCH will be needed later for SHLIB_LD:
-                if test "$c_has_option" = no; then
-                   C_UNIV_SWITCH=""
-                fi
+                if test "$c_has_option" = no; then C_UNIV_SWITCH=""; fi
                 CFLAGS="$SAVE_CFLAGS $C_UNIV_SWITCH"
                 ;;
         esac

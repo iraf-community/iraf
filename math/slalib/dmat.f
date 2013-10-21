@@ -26,13 +26,13 @@
 *
 *       N      i                    no. of unknowns       unchanged
 *       A      d      (N,N)             matrix             inverse
-*       Y      d       (N)              vector            solution
+*       Y      d       (N)            known vector      solution vector
 *       D      d                           -             determinant
 *     * JF     i                           -           singularity flag
 *       IW     i       (N)                 -              workspace
 *
-*  *  JF is the singularity flag.  If the matrix is non-singular,
-*    JF=0 is returned.  If the matrix is singular, JF=-1 & D=0D0 are
+*  * JF is the singularity flag.  If the matrix is non-singular, JF=0
+*    is returned.  If the matrix is singular, JF=-1 & D=0D0 are
 *    returned.  In the latter case, the contents of array A on return
 *    are undefined.
 *
@@ -46,9 +46,26 @@
 *     Fairly accurate - errors 1 to 4 times those of routines optimized
 *     for accuracy.
 *
-*  P.T.Wallace   Starlink   7 February 1995
+*  P.T.Wallace   Starlink   4 December 2001
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

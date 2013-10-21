@@ -540,7 +540,20 @@ login (char *cmd)
 	    compile (EXEC);
 
 	} else if (c_access (loginfile,0,0) == NO) {
-	    printf ("Warning: no login.cl found in login directory\n");
+	    char *home = envget ("HOME");
+	    char global[SZ_LINE];
+
+	    memset (global, 0, SZ_LINE);
+	    sprintf (global, "%s/.iraf/login.cl", home);
+	    if (c_access (global, 0, 0) == YES) {
+	        o.o_val.v_s = global;
+	        compile (CALL, "cl");
+	        compile (PUSHCONST, &o);
+	        compile (REDIRIN);
+	        compile (EXEC);
+	    } else {
+	        printf ("Warning: no login.cl found in login directory\n");
+	    }
 
 	} else {
 	    o.o_val.v_s = loginfile;

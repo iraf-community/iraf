@@ -36,7 +36,7 @@
 *  Returned (status flag):
 *     JSTAT   i    status: +102 = warning, distant epoch
 *                          +101 = warning, large timespan ( > 100 years)
-*                      +1 to +8 = coincident with major planet (Note 6)
+*                     +1 to +10 = coincident with planet (Note 6)
 *                             0 = OK
 *                            -1 = illegal JFORM
 *                            -2 = illegal E0
@@ -100,7 +100,8 @@
 *     suspiciously small value (0.001 AU) as an attempt to apply it to
 *     the planet concerned.  If this condition is detected, the
 *     contribution from that planet is ignored, and the status is set to
-*     the planet number (Mercury=1,...,Neptune=8) as a warning.
+*     the planet number (1-10 = Mercury, Venus, EMB, Mars, Jupiter,
+*     Saturn, Uranus, Neptune, Earth, Moon) as a warning.
 *
 *  Reference:
 *
@@ -109,9 +110,26 @@
 *
 *  Called:  slELUE, slPRTE, slUEEL
 *
-*  P.T.Wallace   Starlink   14 March 1999
+*  This revision:   19 June 2004
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright (C) 2004 P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -131,6 +149,10 @@
       IF (JFORM.LT.2.OR.JFORM.GT.3) THEN
          JSTAT = -1
          GO TO 9999
+      ELSE
+
+*     Provisionally set the status to OK.
+         JSTAT = 0
       END IF
 
 *  Transform the elements from conventional to universal form.
@@ -151,7 +173,7 @@
       END IF
 
 *  Transform from universal to conventional elements.
-      CALL slUEEL(U,2,
+      CALL slUEEL(U,JFORM,
      :               JF, EPOCH1, ORBI1, ANODE1, PERIH1,
      :               AORQ1, E1, AM1, DM, J)
       IF (JF.NE.JFORM.OR.J.NE.0) JSTAT=-5

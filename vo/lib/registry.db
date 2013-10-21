@@ -17,4 +17,4 @@ C,2mass-psc,infrared,ivo://irsa.ipac/2MASS-PSC,2MASS-PSC,http://irsa.ipac.caltec
 C,simbad,*,ivo://simbad.u-strasbg.fr/simbad,Simbad,http://simbad.u-strasbg.fr/simbad/sim-cone?,SIMBAD:Database
 C,veron,opt/rad,ivo://nasa.heasarc/veroncat,Veron,http://heasarc.gsfc.nasa.gov/cgi-bin/vo/cone/coneGet.pl?table=veroncat&,Veron:Catalog:of:Quasars:&:AGN:-:13th:Ed.
 C,usnob,optical,ivo://fs.usno/cat/usnob,USNO-B1,http://www.nofs.navy.mil/cgi-bin/vo_cone.cgi?CAT=USNO-B1&,USNO-B1:Catalogue
-C,foo-cat,infrared,ivo://irsa.ipac/2MASS-PSC,2MASS-PSC,http://irsa.ipac.caltech.edu/cgi-bin/Oasis/CatSearch/nph-catsearch?CAT=fp_psc&,2MASS:All-Sky:Point:Source:Catalog
+C,dr7phot,optical,ivo://CDS.VizieR/II/294#sdss7,II/294,http://vizier.u-strasbg.fr/viz-bin/votable/-A?-source=II/294/sdss7,SDSS-DR7:Photometric:Catalogue

@@ -75,7 +75,6 @@ begin
 	    else
 		call amovr (native, ieee, nelem)
 	} else {
-	    call ieee_sigmask()
 	    do i = 1, nelem
 		if (native[i] == native_NaN) {
 		    ieee(i) = ieee_NaN
@@ -86,7 +85,6 @@ begin
 	    # Byteswap if necessary.
 	    if (IEEE_SWAP == YES)
 		call BSWAP (ieee, 1, ieee, 1, nelem * NSWAP)
-	    call ieee_sigrestore()
 	}
 end
 
@@ -100,24 +98,23 @@ real	ieee[ARB]		#I input IEEE floating format array
 real	native[ARB]		#O output native floating format array
 int	nelem			#I number of floating point numbers
 
-int	expon, i
+int	expon, i, val
 real	fval
 int	ival[1]
 %	equivalence (fval, ival)
+%	equivalence (ival, val)
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
 	    if (mapin != NO) {
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = native[i]
 		    expon = and (ival[IOFF], NaNmask)
@@ -128,7 +125,6 @@ begin
 			nin = nin + 1
 		    }
 		}
-		call ieee_sigrestore()
 	    }
 	} else {
 	    if (mapin == NO)
@@ -137,7 +133,6 @@ begin
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = ieee[i]
 		    expon = and (ival[IOFF], NaNmask)
@@ -149,11 +144,8 @@ begin
 		    } else
 			native[i] = ieee[i]
 		}
-		call ieee_sigrestore()
 	    }
 	}
-
-
 end
 
 
@@ -168,14 +160,11 @@ int	mapin, mapout, nin, nout, NaNmask
 common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-	if (mapout != NO) {
-	    call ieee_sigmask()
+	if (mapout != NO)
 	    if (x == native_NaN) {
 		x = ieee_NaN
 		nout = nout + 1
 	    }
-	    call ieee_sigrestore()
-	}
 	if (IEEE_SWAP == YES)
 	    call BSWAP (x, 1, x, 1, NSWAP)
 end
@@ -187,10 +176,11 @@ procedure ieeupkr (x)
 
 real	x			#U datum to be converted
 
-int	expon
+int	expon, val
 real	fval
 int	ival[1]
 %	equivalence (fval, ival)
+%	equivalence (val, ival)
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
@@ -204,7 +194,6 @@ begin
 	# value, and denormalized numbers (zero exponent) to zero.
 
 	if (mapin != NO) {
-	    call ieee_sigmask()
 	    fval = x
 	    expon = and (ival[IOFF], NaNmask)
 	    if (expon == 0)
@@ -213,7 +202,6 @@ begin
 	        x = native_NaN
 		nin = nin + 1
 	    }
-	    call ieee_sigrestore()
 	}
 end
 
@@ -330,63 +318,28 @@ int	inval				#I enable NaN mapping for input?
 int	outval				#I enable NaN mapping for output?
 
 # MACHDEP.
-real	fval
-int	ival[1]
+#$if (datatype == r)
+#%	real r_quiet_nan
+#$else
+#%	double precision d_quiet_nan
+#$endif
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
-
-%	equivalence (fval, ival)
-%	data	ival(1) / '7ff7ffff'x /
 
 begin
 	mapin = inval
 	mapout = outval
 
 	# MACHDEP.
-	if (mapout == YES)
-	    ieee_NaN = fval
+#	if (mapout == YES)
+#	$if (datatype == r)
+#%	    ieeenn = r_quiet_NaN()
+#	$else
+#%	    ieeenn = d_quiet_NaN()
+#	$endif
 
 	if (mapin == YES)
 	    NaNmask = 7F800000X
-end
-
-
-
-# IEEE_SIGMASK, IEEE_SIGRESTORE -- Routines for masking IEEE exceptions.
-#
-#	ieee_sigmask()
-#	ieee_sigrestore()
-#
-# These routines are meant to be used only internally by the routines in
-# this file.  iee_sigmask saves the current IEEE FPU exception mask, and
-# sets a new mask which masks the invalid operand exception.  This is
-# necessary to permit the routines in this file to handle NaN values without
-# raising the IEEE invalid operand exception.  iee_sigrestore restores
-# the original exception mask.  These routines are meant to be called as
-# pairs to temporarily block the invalid operand exception within an IEEE
-# conversion routine.
-
-procedure ieee_sigmask()
-int	fpscr
-common	/ieesig/ fpscr
-begin
-	# Old mask code for LinuxPPC.
-	#call gfpucw (fpucw)
-	#call sfpucw (or (fpucw, 80X))
-
-	# Mask code for MacOSX (see os$zzepro.c).
-	call mxmask()
-end
-
-procedure ieee_sigrestore()
-int	fpscr
-common	/ieesig/ fpscr
-begin
-	# Old mask code for LinuxPPC.
-	#call sfpucw (fpucw)
-
-	# Mask code for MacOSX (see os$zzepro.c).
-	call mxumsk()
 end

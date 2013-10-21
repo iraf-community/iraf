@@ -207,7 +207,7 @@ p1_const(register Constp cp)
 		err("p1_const:  bad vleng\n");
 	    else
 		fprintf(pass1_file, "%d: %d %lx\n", P1_CONST, type,
-			cpexpr((expptr)cp));
+			(unsigned long)cpexpr((expptr)cp));
 	    break;
 	default:
 	    erri ("p1_const:  bad constant type '%d'", type);

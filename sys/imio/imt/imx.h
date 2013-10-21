@@ -3,7 +3,7 @@
 include <mach.h>
 
 
-define	SZ_FNT		16766
+define	SZ_FNT		32768
 define	CH_DELIM	20B		    # used to flag image section
 
 define	IMT_FILE	0		    # file list
@@ -19,7 +19,7 @@ define  IMTY_LIST       2                   # List output
 define  IMTY_FILE       3                   # File output
 
 define  SZ_RANGE        100                 # Size of extension range list
-define  SZ_LISTOUT      8192                # Size of extension output list
+define  SZ_LISTOUT      16384               # Size of extension output list
 
 define  FIRST   	1                   # Default starting range
 define  LAST    	MAX_INT             # Default ending range

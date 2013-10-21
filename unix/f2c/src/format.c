@@ -1722,7 +1722,7 @@ list_decls(FILE *outfile)
 			&& multitype)
 		continue;
 	    if (!did_one)
-		nice_printf (outfile, "/* zz System generated locals */\n");
+		nice_printf (outfile, "/* System generated locals */\n");
 
 	    if (last_type == type && did_one)
 		nice_printf (outfile, ", ");
@@ -1981,7 +1981,7 @@ list_decls(FILE *outfile)
 		int et0, expr_type, k;
 		Extsym *E;
 		struct Equivblock *eb;
-		char buf[16];
+		char buf[MAXNAMELEN+30]; /*30 should be overkill*/
 
 /* We DON'T want to use oneof_stg here, because we need to distinguish
    between them */
@@ -2328,6 +2328,7 @@ p1get_const(FILE *infile, int type, struct Constblock **resultp)
 #endif
 {
     int status;
+    unsigned long a;
     struct Constblock *result;
 
 	if (type != TYCHAR) {
@@ -2363,7 +2364,8 @@ p1get_const(FILE *infile, int type, struct Constblock **resultp)
 	    result->vstg = 1;
 	    break;
 	case TYCHAR:
-	    status = fscanf(infile, "%lx", resultp);
+	    status = fscanf(infile, "%lx", &a);
+	    *resultp = (struct Constblock *) a;
 	    break;
 	default:
 	    erri ("p1get_const:  bad constant type '%d'", type);

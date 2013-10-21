@@ -18,6 +18,8 @@ os_fpathname (
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XINT	x_maxch = SZ_PATHNAME, x_nchars;
 
+	extern  int ZFGCWD(), ZFSUBD(), ZFPATH();
+
 
 	if (vfn[0])
 	    os_strupk (vfn2osfn(vfn,0), x_vfn, x_maxch);

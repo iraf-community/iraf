@@ -1,29 +1,28 @@
 /**
- * @file  	vocSesame.c
- * @author  	Michael Fitzpatrick
- * @version	June 2006
+ *  VOCSESAME.C  -- Interface to the Sesame name resolver service.
  *
- * @section DESCRIPTION
+ *  @section DESCRIPTION
  *
  *  Sesame Name Resolver Interface:
  *  -------------------------------
  *
- *          sr = voc_nameResolver (target)
- *      pos_str = voc_resolverPos (sr)
- *         radeg = voc_resolverRA (sr)
- *       decdeg = voc_resolverDEC (sr)
- *     ra_err = voc_resolverRAErr (sr)
- *   dec_err = voc_resolverDECErr (sr)
- *    typ_str = voc_resolverOtype (sr)
- * 
+ *          sr = voc_nameResolver  (target)
+ *      pos_str = voc_resolverPos  (sr)
+ *         radeg = voc_resolverRA  (sr)
+ *       decdeg = voc_resolverDEC  (sr)
+ *     ra_err = voc_resolverRAErr  (sr)
+ *   dec_err = voc_resolverDECErr  (sr)
+ *    typ_str = voc_resolverOtype  (sr)
  *
  *	Client programs may be written in any language that can interface to
  *  C code.  Sample programs using the interface are provided as is a SWIG
  *  interface definition file.  This inferface is based closely on the DAL
  *  client code produced for the 2005 NVOSS, as that interface evolves 
  * 
- *
- *  Michael Fitzpatrick, NOAO, June 2006
+ * 
+ *  @file  	vocSesame.c
+ *  @author  	Michael Fitzpatrick
+ *  @version	June 2006
  *
  *************************************************************************
  */
@@ -34,6 +33,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 
 
@@ -51,11 +51,11 @@
  *  Structure for the object being queried.
  */
 typedef struct {
-    char  target[SZ_TARGET];		/* target name			*/
-    char  hms_pos[SZ_TARGET];		/* sexagesimal position		*/
-    double ra, dec;			/* dec. degrees position	*/
-    double era, edec;			/* dec. degrees error		*/
-    char  type[SZ_TARGET];		/* object type			*/
+    char    target[SZ_TARGET];		/* target name			*/
+    char    hms_pos[SZ_TARGET];		/* sexagesimal position		*/
+    double  ra, dec;			/* decimal degrees position	*/
+    double  era, edec;			/* decimal degrees error	*/
+    char    type[SZ_TARGET];		/* object type			*/
 } Object, *ObjectPtr;
 
 
@@ -82,14 +82,17 @@ static double 	voc_resDblVal (Sesame sr, char *method, char *ifcall);
 
 
 /*****************************************************************************/
+
 /**
  *  NAMERESOLVER -- Query the CDS Sesame service to resolve the target name
  *  to coordinates.  The query is done when creating the Sesame object, 
  *  thereafter we simply query the object data.
  * 
- *  @param[in]  target  name of target to be resolved
- *  @return	Sesame  Sesame object handle
- * 
+ *  @brief	Query the CDS Sesame name resolver service.
+ *  @fn		handle = voc_nameResolver (char *name)
+ *
+ *  @param  target  	name of target to be resolved
+ *  @returns		Sesame  Sesame object handle
  */
 Sesame
 voc_nameResolver (char *target)
@@ -110,9 +113,8 @@ voc_nameResolver (char *target)
     /* Before we query the server, see whether this is a familiar
     ** object and we're using the cache.  Otherwise, return the cached result.
     */
-    if (vo->use_cache && (sr=voc_isCachedObject (target)) != (Sesame)VOC_NULL) {
+    if (vo->use_cache && (sr=voc_isCachedObject (target)) != (Sesame)VOC_NULL)
 	return (sr);
-    }
 
     if (target) {
         vocRes_t *result = (vocRes_t *) NULL;
@@ -128,8 +130,16 @@ voc_nameResolver (char *target)
         } else
             sr = msg_getIntResult (result, 0);
 
-        if (msg) free ((void *)msg);         /* free the pointers        */
+        if (msg) free ((void *)msg);         /* free the pointers 	*/
         if (result) free ((void *)result);
+
+	if (voc_resolverRA(sr)     == 0.0 &&
+	    voc_resolverRAErr(sr)  == 0.0 &&
+	    voc_resolverDEC(sr)    == 0.0 &&
+	    voc_resolverDECErr(sr) == 0.0) {
+		return (0);		    /* no match found		*/
+	}
+
     } else if (!vo->quiet)
         fprintf (stderr, "ERROR: no target specified\n");
 
@@ -143,10 +153,15 @@ voc_nameResolver (char *target)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVERPOS --  Return a string containing the (ra,dec) position as
  *  sexagesimal strings. 
+ *
+ *  @brief	Return the (ra,dec) position for the object
+ *  @fn		str = voc_resolverPos (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		string containing (ra,dec) position
  */
 char *
 voc_resolverPos (Sesame sr)
@@ -158,9 +173,14 @@ voc_resolverPos (Sesame sr)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVEROTYPE --  Return a string containing the object type description
+ *
+ *  @brief	Return a string containing the object type description
+ *  @fn		str = voc_resolverOtype (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		string to object type description
  */
 char *
 voc_resolverOtype (Sesame sr)
@@ -172,9 +192,14 @@ voc_resolverOtype (Sesame sr)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVERRA --  Return the RA as a double precision value.
+ *
+ *  @brief	Return the RA as a double precision value.
+ *  @fn		str = voc_resolverRA (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		object RA (decimal degrees)
  */
 double      
 voc_resolverRA (Sesame sr)
@@ -186,9 +211,14 @@ voc_resolverRA (Sesame sr)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVERRAERR --  Return the RA error as a double precision value.
+ *
+ *  @brief	Return the RA error as a double precision value.
+ *  @fn		str = voc_resolverRAErr (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		object RA error (decimal degrees)
  */
 double      
 voc_resolverRAErr (Sesame sr)
@@ -200,9 +230,14 @@ voc_resolverRAErr (Sesame sr)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVERDEC --  Return the DEC as a double precision value.
+ *
+ *  @brief	Return the DEC as a double precision value.
+ *  @fn		str = voc_resolverDEC (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		object Declination (decimal degrees)
  */
 double      
 voc_resolverDEC (Sesame sr)
@@ -214,9 +249,14 @@ voc_resolverDEC (Sesame sr)
 }
 
 
-/*****************************************************************************/
 /**
  *  RESOLVERDECERR --  Return the Dec error as a double precision value.
+ *
+ *  @brief	Return the Dec error as a double precision value.
+ *  @fn		str = voc_resolverDECErr (Sesame sr)
+ *
+ *  @param  sr  	handle to previus query return
+ *  @returns		object DEC error (decimal degrees)
  */
 double      
 voc_resolverDECErr (Sesame sr)
@@ -233,12 +273,17 @@ voc_resolverDECErr (Sesame sr)
  *	Private procedures
  ***********************************************************/
 
-    
 extern char *voc_getCacheDir (char *subdir);
     
 
 /**
- *  See if the requested object is in the cache.
+ *  VOC_ISCACHEDOBJECT -- See if the requested object is in the cache.
+ *
+ *  @brief	See if the requested object is in the cache.
+ *  @fn		sr = voc_isCachedObject (char *target)
+ *
+ *  @param  target	target name
+ *  @returns		handle to cached object
  */
 static Sesame
 voc_isCachedObject (char *target)
@@ -247,6 +292,7 @@ voc_isCachedObject (char *target)
     register int index;
     char  *ip, *op, *dir, fname[SZ_FNAME], path[SZ_FNAME], buf[256];
     Object *obj = (Object *) NULL;
+    struct stat info;
 
 
     /* Look first for the object in the runtime cache.
@@ -268,9 +314,12 @@ voc_isCachedObject (char *target)
     *op = '\0';
 
     sprintf (path, "%s/%s", (dir = voc_getCacheDir("sesame")), fname);
-    if (! (fd = fopen (path, "r")) ) {
+    if (! (fd = fopen (path, "r")) )
 	return ((Sesame) VOC_NULL);		/* not in cache		*/
-    }
+    if (fstat (fileno (fd), &info) < 0)
+	return ((Sesame) VOC_NULL);		/* invalid cache	*/
+    if (info.st_size == 0)
+	return ((Sesame) VOC_NULL);		/* invalid cache	*/
 
     fgets (buf, 256, fd);
 
@@ -299,7 +348,14 @@ voc_isCachedObject (char *target)
 
 
 /**
- *  Store the object in the cache.
+ *  VOC_CACHEOBJECT -- Store the object in the cache.
+ *
+ *  @brief	Store the object in the cache.
+ *  @fn		sr = voc_cacheObject (Sesame sr, char *target)
+ *
+ *  @param  sr		handle to sesame query
+ *  @param  target	target name
+ *  @returns		handle to cached object
  */
 static Sesame
 voc_cacheObject (Sesame sr, char *target)
@@ -355,7 +411,15 @@ voc_cacheObject (Sesame sr, char *target)
 
 
 /**
- *  Return a string value from a method with no arguments.
+ *  VOC_RESSTRVAL -- Return a string value from a method with no arguments.
+ *
+ *  @brief	Return a string value from a method with no args.
+ *  @fn		str = voc_resStrVal (Sesame sr, char *method, char *ifcall)
+ *
+ *  @param  sr		handle to sesame query
+ *  @param  method	mehod to call
+ *  @param  ifcall	interface method name
+ *  @returns		the value
  */
 static char *
 voc_resStrVal (Sesame sr, char *method, char *ifcall)
@@ -389,7 +453,16 @@ voc_resStrVal (Sesame sr, char *method, char *ifcall)
 
 
 /**
- *  Return a double precision value from a method with no arguments.
+ *  VOC_RESDBLVAL -- Return a double precision value from a method with 
+ *  no arguments.
+ *
+ *  @brief	Return a double precision value from a method with no args.
+ *  @fn		dval = voc_resDblVal (Sesame sr, char *method, char *ifcall)
+ *
+ *  @param  sr		handle to sesame query
+ *  @param  method	mehod to call
+ *  @param  ifcall	interface method name
+ *  @returns		the value
  */
 static double      
 voc_resDblVal (Sesame sr, char *method, char *ifcall)

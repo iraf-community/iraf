@@ -26,9 +26,26 @@
 *  that the points are specified in the form of spherical
 *  coordinates.
 *
-*  Patrick Wallace   Starlink   13 July 1997
+*  Last revision:   16 March 2005
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -36,38 +53,30 @@
 
       DOUBLE PRECISION V1(3),V2(3)
 
-      DOUBLE PRECISION X1,Y1,Z1,W,R,XU1,YU1,ZU1,DX,DY,DZ,SQ,CQ
+      DOUBLE PRECISION X1,Y1,Z1,W,X2,Y2,Z2,SQ,CQ
 
 
 
-*  Unit vector to point 1
-      X1=V1(1)
-      Y1=V1(2)
-      Z1=V1(3)
-      W=SQRT(X1*X1+Y1*Y1+Z1*Z1)
+*  The unit vector to point 1.
+      X1 = V1(1)
+      Y1 = V1(2)
+      Z1 = V1(3)
+      W = SQRT(X1*X1+Y1*Y1+Z1*Z1)
       IF (W.NE.0D0) THEN
-         X1=X1/W
-         Y1=Y1/W
-         Z1=Z1/W
+         X1 = X1/W
+         Y1 = Y1/W
+         Z1 = Z1/W
       END IF
 
-*  Unit vector "north" from point 1
-      R=SQRT(X1*X1+Y1*Y1)
-      IF (R.EQ.0.0) R=1D-5
-      W=Z1/R
-      XU1=-X1*W
-      YU1=-Y1*W
-      ZU1=R
+*  The vector to point 2.
+      X2 = V2(1)
+      Y2 = V2(2)
+      Z2 = V2(3)
 
-*  Vector from point 1 to point 2
-      DX=V2(1)-X1
-      DY=V2(2)-Y1
-      DZ=V2(3)-Z1
-
-*  Position angle
-      SQ=DX*YU1*Z1+DY*ZU1*X1+DZ*XU1*Y1-DZ*YU1*X1-DY*XU1*Z1-DX*ZU1*Y1
-      CQ=DX*XU1+DY*YU1+DZ*ZU1
+*  Position angle.
+      SQ = Y2*X1-X2*Y1
+      CQ = Z2*(X1*X1+Y1*Y1)-Z1*(X2*X1+Y2*Y1)
       IF (SQ.EQ.0D0.AND.CQ.EQ.0D0) CQ=1D0
-      slDPAV=ATAN2(SQ,CQ)
+      slDPAV = ATAN2(SQ,CQ)
 
       END

@@ -30,7 +30,6 @@ ZGTENV (
 	register char	*ip, *op;
 	register int	n;
 	char	*getenv();
-	char	*_ev_scaniraf();
 
 
 	op = (char *)outstr;

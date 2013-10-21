@@ -73,7 +73,7 @@ extern	char *findexe();
 #define	WAIT_PERIOD	5		/* bkg_wait wait interval	*/
 #define	BKG_MAGIC	237
 #define	SZ_BKGMSG	64
-#define	CLDIR		"iraf$pkg/ecl/"
+#define	CLDIR		"iraf$pkg/vocl/"
 
 char	bkgmsg[SZ_BKGMSG+1];		/* passed to kernel		*/
 int	lastjobno;			/* last job slot used		*/

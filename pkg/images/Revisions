@@ -1,6 +1,21 @@
 .help revisions Jan97 images
 .nf
 
+imfit/src/imsurfit.x
+    The 'fbuf' and 'colsfit' pointers were declared with the wrong type.
+    (5/4/13, MJF)
+
+tv/imedit/epstatistics.x
+    The 'x', 'y', and 'z' pointers were declared as TY_INT instead of TY_REAL
+    (5/4/13, MJF)
+
+immatch/src/linmatch/rgltools.x
+    There were TY_INT arrays being called with Memr[] (4/20/13)
+
+imcoords/src/t_ccmap.x
+    There were missing arguments that will cause "refpoint=user" to crash
+    with a floating point overflow.  (9/21/12, Valdes)
+
 imatch/src/imcombine/src/icombine.x
     Removed TRAP debug message.  (5/11/12, Valdes)
 

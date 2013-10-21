@@ -181,7 +181,7 @@ begin
 		    IM_MAX(im))
 
 		call amapr (Memr[buf], Memr[buf], npix, z1, z2, STARTPT, ENDPT)
-		call achtri (Memr[buf], Memr[ibuf], npix)
+		call achtri (Memr[buf], Memi[ibuf], npix)
 		call alutr (Memi[ibuf], Memr[buf], npix, Memr[rlut])
 	        call ahgmr (Memr[buf], npix, greys_hgram, NBINS, real (dz1),
 		    real (dz2))

@@ -19,6 +19,9 @@ os_diropen (char *dirname)
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	chan;
 
+	extern  int ZOPDIR();
+
+
 	strcpy ((char *)osfn, dirname);
 	ZOPDIR (osfn, &chan);
 
@@ -32,6 +35,9 @@ int
 os_dirclose (int chan)
 {
 	XINT	x_chan=chan, status;
+
+	extern  int ZCLDIR();
+
 
 	ZCLDIR (&x_chan, &status);
 	return (status);
@@ -49,6 +55,8 @@ os_gfdir (
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	x_chan=chan, x_maxch=maxch, status;
+
+	extern  int ZGFDIR();
 
 	for (;;) {
 	    ZGFDIR (&x_chan, osfn, &x_maxch, &status);

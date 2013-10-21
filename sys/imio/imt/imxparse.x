@@ -178,11 +178,11 @@ begin
 	    	return (IMT_EXPR)
 
 	# [extname,extver]
-	if (IS_ALPHA(expr[1]) && IS_DIGIT(expr[len]))
+	ch = ','
+	if (IS_ALPHA(expr[1]) && IS_DIGIT(expr[len]) && stridx (ch, expr) > 0)
 	    return (IMT_VER)
 
 	# [extname]
-	ch = ','
 	if (IS_ALPHA(expr[1]) && stridx (ch, expr) == 0)
 	    return (IMT_NAME)
 

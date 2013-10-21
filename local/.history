@@ -1,0 +1,200 @@
+#+1294164956
+cd immatch/src/imcombine/src
+#+1294164959
+ed generic/mkpkg
+#+1294165034
+cd ../../..
+#+1294165177
+ar t libpkg.a > junk
+#+1294165179
+ed junk
+#+1294165234
+mkpkg -n update
+#+1294165266
+mkpkg update
+#+1294165300
+ar t $iraf/lib/libimc.a > junk
+#+1294165302
+type junk
+#+1294165305
+cat junk
+#+1294165314
+ar d libpkg.a `cat junk`
+#+1294165338
+ar t libpkg.a | egrep '^ic'
+#+1294165366
+rm junk
+#+1294165445
+mkpkg install
+#+1294165473
+cd $iraf
+#+1294166009
+cd /iraf/extern.v215
+#+1294166039
+ed lib/src
+#+1294166041
+cd lib
+#+1294166071
+cd nfextern/lib
+#+1294166099
+cd ../..
+#+1294166106
+cd mscred
+#+1294166139
+cd src/ccdred/src
+#+1294166296
+rm mkpkg.OLD
+#+1294347727
+vi Revisions
+#+1294347923
+cd /iraf/iraf/noao/imred/ccdred
+#+1294347930
+cd src/combine
+#+1294347935
+cd src/
+#+1294348046
+mkdir combine
+#+1294348078
+mv ic* combine
+#+1294348080
+ls combine
+#+1294348187
+ls xt*
+#+1294348191
+ls ty*
+#+1294348211
+cd combine
+#+1294348220
+cp ../mkpkg .
+#+1294348465
+mkdir generic
+#+1294348474
+cd generic
+#+1294348490
+mv ../../generic/ic* .
+#+1294348514
+cp ../../generic/mkpkg .
+#+1294348671
+ed Revisions
+#+1294348882
+cd ccdred
+#+1294348901
+setenv PKGENV noao
+#+1294348918
+setenv noao /iraf/iraf/noao/
+#+1294348921
+ls /iraf/iraf/noao
+#+1294348940
+cd src
+#+1294348944
+ls icomb*h
+#+1294348953
+ed mkpkg
+#+1294349036
+ed src/mkpkg
+#+1294349091
+mkpkg -n
+#+1294350057
+cd /iraf
+#+1294350076
+cd iraf
+#+1294350137
+cd doc
+#+1294350186
+cd /iraf/extern
+#+1294350193
+ed nfextern.diff
+#+1294350241
+/iraf/iraf/local/
+#+1294350245
+cd /iraf/iraf/local
+#+1294350280
+ed notes.v215
+#+1294421894
+cd /iraf/iraf/sys/imio
+#+1294421901
+del sz_pix
+#+1294424362
+whoami
+#+1294424365
+cd pkg/proto/doc
+#+1294424370
+cd /iraf/iraf/pkg/proto/doc
+#+1294424386
+/bin/rm -rf maskexpr masks mkpkg vol *.par *.x proto.* intrp.f ringavg.cl
+#+1294677620
+ssh irafnet@iraf.net
+#+1294678613
+alias ed vi
+#+1294678616
+ed icaclip.gx
+#+1294678808
+ed iccclip.gx
+#+1294678896
+ed icmm.gx
+#+1294678937
+ed icpclip.gx
+#+1294678989
+ed icsclip.gx
+#+1294679084
+ed iccomb.gx
+#+1294679089
+ed icomb.gx
+#+1294679135
+ed icsigma.gx
+#+1294679229
+mkpkg
+#+1294679239
+ls -lrt
+#+1294679246
+ls -rt
+#+1294679259
+ls -rt -1
+#+1294679276
+ed /iraf/iraf/pkg/images/Revisions
+#+1295046238
+w
+#+1295046240
+df
+#+1295046743
+su
+#+1295467961
+cd /iraf/iraf
+#+1295467966
+make generic
+#+1295471576
+ls l
+#+1295471590
+tar zxvf /tmp/new.tgz
+#+1295471726
+cd extern
+#+1295471728
+ls -l
+#+1295471789
+ls song
+#+1295472062
+/bin/rm -rf FVfitsutil/ adccdrom iue mem0 mtools optic rvsao song sqiid stecf steward ucsclris upsqiid/ xdimsum/
+#+1295472073
+cat .zzsetenv.def
+#+1295472085
+foreach i ( * )
+#+1295472115
+vi .zzsetenv.def
+#+1295472161
+cd ..
+#+1295472164
+ls -l bin
+#+1295472167
+du bin*
+#+1295472172
+ls bin.cygwin/
+#+1295472180
+make linux
+#+1295472194
+pwd
+#+1295472205
+ls
+#+1295472215
+make
+#+1295472355
+exit

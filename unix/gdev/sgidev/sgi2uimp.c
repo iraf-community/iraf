@@ -2,11 +2,16 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #define	import_spp
 #define	import_error
 #include <iraf.h>
+
+#include "sgiUtil.h"
+
 
 /*
  * SGI2UIMP.C -- Read IRAF SGI metacode from standard input, translate into
@@ -89,13 +94,14 @@ int	imp_height;
 int	imp_penbase  = DEF_PENBASE;
 int	imp_penslope = DEF_PENSLOPE;
 
+static void translate (FILE *in, FILE *out);
+
 
 /* MAIN -- Main entry point for SGI2UIMP.  Optional arguments are device
  * window parameters and name of input file.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	FILE	*in;
 	char	*infile;
@@ -103,7 +109,7 @@ char	*argv[];
 	int	argno;
 	int	np;
 	char	penparam[SZ_PENPARAM];
-	int	get_iarg();
+
 
 	infile = "stdin";
 
@@ -127,11 +133,11 @@ char	*argv[];
 		    imp_height = get_iarg (argp[2], argv, argno, DEF_HEIGHT);
 		    break;
 		case 'p':
-		    if (argp[2] == NULL)
+		    if (argp[2] == (char) 0)
 			if (argv[argno+1] == NULL) {
 			    fprintf (stderr, "missing arg to switch `%s';",
 				argp);
-			    fprintf (stderr, " reset to %d.d\n", imp_penbase,
+			    fprintf (stderr, " reset to %d.%d\n", imp_penbase,
 				imp_penslope);
 			} else
 			    strcpy (penparam, argv[++argno]);
@@ -177,42 +183,16 @@ char	*argv[];
 
 	if (in != stdin)
 	    fclose (in);
-}
 
-
-/* GET_IARG -- Get an integer argument, whether appended directly to flag
- * or separated by a whitespace character; if error, report and assign default.
- */
-
-get_iarg (argp, argv, argno, def_val)
-char	argp;
-char	**argv;
-int	argno;
-int	def_val;
-
-{
-	int	temp_val;
-
-	if (argp == NULL)
-	    if (argv[argno+1] == NULL) {
-		fprintf (stderr, "missing arg to switch `%s';", argp);
-		fprintf (stderr, " reset to %d\n", def_val);
-		temp_val = def_val;
-	    } else
-		temp_val = atoi (argv[++argno]);
-	else
-	    temp_val = atoi (argv[argno]+2);
-
-	return (temp_val);
+	return (0);
 }
 
 
 /* TRANSLATE -- Interpret input SGI metacode instructions into the device
  * language and write to stdout.
  */
-translate (in, out)
-FILE	*in;
-FILE	*out;
+static void
+translate (FILE *in, FILE *out)
 {
 	int	 n, x, y, swap_bytes;
 	float	 xscale, yscale;
@@ -220,7 +200,7 @@ FILE	*out;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	DECL_OBUF;
 
-	swap_bytes = swapped();
+	swap_bytes = isSwapped();
 
 	xscale = (float) imp_width / (float) GKI_MAXNDC;
 	yscale = (float) imp_height / (float) GKI_MAXNDC;
@@ -248,7 +228,8 @@ FILE	*out;
 	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
+		bswap2 ((unsigned char *)inbuf, (unsigned char *)inbuf, 
+		    sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
@@ -357,49 +338,4 @@ FILE	*out;
 	 */
 	putc (END_PAGE, out);
 	putc (END_DOCUMENT, out);
-}
-
-
-/* BSWAP2 -- Move bytes from array "a" to array "b", swapping successive
- * pairs of bytes.  The two arrays may be the same but may not be offset
- * and overlapping.
- */
-bswap2 (a, b, nbytes)
-char	*a;			/* input array			*/
-char	*b;			/* output array			*/
-int	nbytes;			/* number of bytes to swap	*/
-{
-	register char *ip, *op, *otop;
-	register unsigned temp;
-
-	ip = a;
-	op = b;
-	otop = op + (nbytes & ~1);
-
-	/* Swap successive pairs of bytes.
-	 */
-	while (op < otop) {
-	    temp  = *ip++;
-	    *op++ = *ip++;
-	    *op++ = temp;
-	}
-
-	/* If there is an odd byte left, move it to the output array.
-	 */
-	if (nbytes & 1)
-	    *op = *ip;
-}
-
-
-/* SWAPPED -- Test whether we are running on a byte-swapped machine.
- */
-swapped()
-{
-	union {
-	    short   tswap;
-	    char    b[2];
-	} test;
-
-	test.tswap = 1;
-	return (test.b[0]);
 }

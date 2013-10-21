@@ -64,9 +64,26 @@
 *     slDC2S       Cartesian to spherical
 *     slDA2P      normalize angle 0-2Pi
 *
-*  P.T.Wallace   Starlink   23 August 1996
+*  P.T.Wallace   Starlink   15 January 2000
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -86,7 +103,7 @@
 
       DOUBLE PRECISION PMT,GR2E,AB1,EB(3),EHN(3),ABV(3),
      :                 Q(3),PXR,W,EM(3),P(3),PN(3),PDE,PDEP1,
-     :                 P1(3),P1DV,P1DVP1,P2(3),P3(3)
+     :                 P1(3),P1DV,P2(3),P3(3)
 
       DOUBLE PRECISION slDVDV,slDA2P
 
@@ -126,12 +143,11 @@
          P1(I) = PN(I)+W*(EHN(I)-PDE*PN(I))
       END DO
 
-*  Aberration
+*  Aberration (normalization omitted)
       P1DV = slDVDV(P1,ABV)
-      P1DVP1 = P1DV+1D0
       W = 1D0+P1DV/(AB1+1D0)
       DO I=1,3
-         P2(I) = (AB1*P1(I)+W*ABV(I))/P1DVP1
+         P2(I) = AB1*P1(I)+W*ABV(I)
       END DO
 
 *  Precession and nutation

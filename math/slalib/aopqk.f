@@ -46,9 +46,9 @@
 *       Even at a topocentric zenith distance of 90 degrees, the
 *       accuracy in elevation should be better than 1 arcmin;  useful
 *       results are available for a further 3 degrees, beyond which
-*       the slaRefro routine returns a fixed value of the refraction.
-*       The complementary routines slaAop (or slaAopqk) and slaOap
-*       (or slaOapqk) are self-consistent to better than 1 micro-
+*       the slRFRO routine returns a fixed value of the refraction.
+*       The complementary routines slAOP (or slAOPQ) and sla_OaAP
+*       (or slOAPQ) are self-consistent to better than 1 micro-
 *       arcsecond all over the celestial sphere.
 *
 *   3)  It is advisable to take great care with units, as even
@@ -119,9 +119,26 @@
 *
 *  Called:  slDS2C, slREFZ, slRFRO, slDC2S, slDA2P
 *
-*  P.T.Wallace   Starlink   22 February 1996
+*  P.T.Wallace   Starlink   24 October 2003
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright (C) 2003 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

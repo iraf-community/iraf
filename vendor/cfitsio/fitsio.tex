@@ -47,7 +47,7 @@ USA}
 \vfill
 \bigskip
 \begin{center}
-{\Large April 2009\\}
+{\Large May 2011\\}
 \end{center}
 \vfill
 \end{titlepage}
@@ -186,6 +186,7 @@ The CFITSIO library is built on Unix systems by typing:
 
 \begin{verbatim}
  >  ./configure [--prefix=/target/installation/path]
+                [--enable-sse2] [--enable-ssse3]
  >  make          (or  'make shared')
  >  make install  (this step is optional)
 \end{verbatim}
@@ -202,11 +203,16 @@ the CFITSIO library and include files should be installed via the later
    > ./configure --prefix=/usr1/local
 \end{verbatim}
 will cause the 'make install' command to copy the CFITSIO libcfitsio file
-to /usr1/local/lib and the necessary include file to /usr1/local/include
-(assuming of course that the process has permission to write to these
+to /usr1/local/lib and the necessary include files to /usr1/local/include
+(assuming of course that the  process has permission to write to these
 directories).
 
-By default this also builds the set of Fortran-callable
+The optional --enable-sse2 and --enable-ssse3 flags will cause configure to
+attempt to build CFITSIO using faster byte-swapping algorithms.
+See the "Optimizing Programs" section of this manual for
+more information about these options.
+
+By default, the Makefile will be configured to build the set of Fortran-callable
 wrapper routines whose calling sequences are described later in this
 document.
 
@@ -589,6 +595,9 @@ Martin Reinecke (Max Planck Institute, Garching)) provided the modifications to
 cfortran.h that are necessary to support 64-bit integer values when calling
 C routines from fortran programs.  The cfortran.h macros were originally developed
 by Burkhard Burow (CERN).
+
+Julian Taylor (ESO, Garching) provided the fast byte-swapping algorithms
+that use the SSE2 and SSSE3 machine instructions available on x86\_64 CPUs.
 
 In addition, many other people have made valuable contributions to the
 development of CFITSIO.  These include (with apologies to others that may
@@ -1380,7 +1389,57 @@ being read then flushed from a IO buffer multiple times.
 The following section gives more specific suggestions for optimizing
 the use of CFITSIO.
 
-1.  When dealing with a FITS primary array or IMAGE extension, it is
+
+\subsection{Optimization Strategies}
+
+1.  Because the data in FITS files is always stored in "big-endian" byte order,
+where the first byte of numeric values contains the most significant bits and the
+last byte contains the least significant bits, CFITSIO must swap the order of the bytes
+when reading or writing FITS files when running on little-endian machines (e.g.,
+Linux and Microsoft Windows operating systems running on PCs with x86 CPUs).
+
+On fairly new CPUs that support "SSSE3" machine instructions
+(e.g., starting with Intel Core 2 CPUs in 2007, and in AMD CPUs
+beginning in 2011) significantly faster 4-byte and 8-byte swapping
+algorithms are available. These faster byte swapping functions are
+not used by default in CFITSIO (because of the potential code
+portablility issues), but users can enable them on supported
+platforms by adding the appropriate compiler flags (-mssse3 with gcc
+or icc on linux) when compiling the swapproc.c source file, which will
+allow the compiler to generate code using the SSSE3 instruction set.
+A convenient way to do this is to configure the CFITSIO library
+with the following command:
+
+\begin{verbatim}
+  >  ./configure --enable-ssse3
+\end{verbatim}
+Note, however, that a binary executable file that is
+created using these faster functions will only run on
+machines that support the SSSE3 machine instructions. It will
+crash on machines that do not support them.
+
+For faster 2-byte swaps on virtually all x86-64 CPUs (even those that
+do not support SSSE3), a variant using only SSE2 instructions exists.
+SSE2 is enabled by default on x86\_64 CPUs with 64-bit operating systems
+(and is also automatically enabled by the --enable-ssse3 flag).
+When running on x86\_64 CPUs with 32-bit operating systems, these faster
+2-byte swapping algorithms are not used by default in CFITSIO, but can be
+enabled explicitly with:
+
+\begin{verbatim}
+./configure --enable-sse2
+\end{verbatim}
+Preliminary testing indicates that these SSSE3 and SSE2 based
+byte-swapping algorithms can boost the CFITSIO performance when
+reading or writing FITS images by 20\% - 30\% or more.
+It is important to note, however, that compiler optimization must be
+turned on (e.g., by using the -O1 or -O2 flags in gcc) when building
+programs that use these fast byte-swapping algorithms in order
+to reap the full benefit of the SSSE3 and SSE2 instructions; without
+optimization, the code may actually run slower than when using
+more traditional byte-swapping techniques.
+
+2.  When dealing with a FITS primary array or IMAGE extension, it is
 more efficient to read or write large chunks of the  image at a time
 (at least 3 FITS blocks = 8640 bytes) so that the direct IO mechanism
 will be used as described in the previous section.  Smaller chunks of
@@ -1392,7 +1451,7 @@ possible, however, if the array becomes so large that the operating
 system cannot store it all in RAM, then the performance may be degraded
 because of the increased swapping of virtual memory to disk.
 
-2.  When dealing with FITS tables, the most important efficiency factor
+3.  When dealing with FITS tables, the most important efficiency factor
 in the software design is to read or write the data in the FITS file in
 a single pass through the file.  An example of poor program design
 would be to read a large, 3-column table by sequentially reading the
@@ -1431,13 +1490,13 @@ loaded into the I/O buffers displacing data from the original table,
 and should be avoided during the critical period while the table is
 being read or written.
 
-3.  Use binary table extensions rather than ASCII table
+4.  Use binary table extensions rather than ASCII table
 extensions for better efficiency  when dealing with tabular data.  The
 I/O to ASCII tables is slower because of the overhead in formatting or
 parsing the ASCII data fields, and because ASCII tables are about twice
 as large as binary tables with the same information content.
 
-4. Design software so that it reads the FITS header keywords in the
+5. Design software so that it reads the FITS header keywords in the
 same order in which they occur in the file.  When reading keywords,
 FITSIO searches forward starting from the position of the last keyword
 that was read.  If it reaches the end of the header without finding the
@@ -1447,20 +1506,20 @@ the entire FITS header can fit at one time in the available internal I/O
 buffers, then the header keyword access will be very fast and it makes
 little difference which order they are accessed.
 
-5. Avoid the use of scaling (by using the BSCALE and BZERO or TSCAL and
+6. Avoid the use of scaling (by using the BSCALE and BZERO or TSCAL and
 TZERO keywords) in FITS files since the scaling operations add to the
 processing time needed to read or write the data.  In some cases it may
 be more efficient to temporarily turn off the scaling (using ftpscl or
 fttscl) and then read or write the raw unscaled values in the FITS
 file.
 
-6. Avoid using the 'implicit datatype conversion' capability in
+7. Avoid using the 'implicit datatype conversion' capability in
 FITSIO.  For instance, when reading a FITS image with BITPIX = -32
 (32-bit floating point pixels), read the data into a single precision
 floating point data array in the program.  Forcing FITSIO to convert
 the data to a different datatype can significantly slow the program.
 
-7. Where feasible, design FITS binary tables using vector column
+8. Where feasible, design FITS binary tables using vector column
 elements so that the data are written as a contiguous set of bytes,
 rather than as single elements in multiple rows.  For example, it is
 faster to access the data in a table that contains a single row
@@ -1474,12 +1533,12 @@ in the first column is interleaved with the integer value in the second
 column of the same row so CFITSIO has to explicitly move to the
 position of each element to be read or written.
 
-8. Avoid the use of variable length vector columns in binary tables,
+9. Avoid the use of variable length vector columns in binary tables,
 since any reading or writing of these data requires that CFITSIO first
 look up or compute the starting address of each row of data in the
 heap.  In practice, this is probably not a significant efficiency issue.
 
-9. When copying data from one FITS table to another, it is faster to
+10. When copying data from one FITS table to another, it is faster to
 transfer the raw bytes instead of reading then writing each column of
 the table.  The FITSIO subroutines FTGTBS and FTPTBS (for ASCII
 tables), and  FTGTBB and FTPTBB (for binary tables) will perform
@@ -1497,7 +1556,7 @@ and should only be used by programmers who thoroughly understand the
 internal byte structure of the FITS tables they are reading or
 writing.
 
-10. Another strategy for improving the speed of writing a FITS table,
+11. Another strategy for improving the speed of writing a FITS table,
 similar to the previous one, is to directly construct the entire byte
 stream for a whole table row (or multiple rows) within the application
 program and then write it to the FITS file with
@@ -1508,7 +1567,7 @@ difficult to understand and maintain, and it makes the code more system
 dependent (e.g., do the bytes need to be swapped before writing to the
 FITS file?).
 
-11.  Finally, external factors such as the type of magnetic disk
+12.  Finally, external factors such as the type of magnetic disk
 controller (SCSI or IDE), the size of the disk cache, the average seek
 speed of the disk, the amount of disk fragmentation, and the amount of
 RAM available on the system can all have a significant impact on
@@ -1726,7 +1785,9 @@ used by these interface routines.
     routine is identical
     to the FTITAB routine except that the 2nd and 3rd parameters (that give
     the size of the table) are 64-bit integers rather than
-   32-bit integers.
+    32-bit integers.  Under normal circumstances, the nrows and nrowsll
+    paramenters should have a value of 0; CFITSIO will automatically update
+   the number of rows as data is written to the table.
 \end{description}
 
 \begin{verbatim}
@@ -1745,7 +1806,9 @@ used by these interface routines.
     routine is identical
     to the FTIBIN routine except that the 2nd parameter (that gives
     the length of the table) is a 64-bit integer rather than
-   a 32-bit integer.
+    a 32-bit integer. Under normal circumstances, the nrows and nrowsll
+    paramenters should have a value of 0; CFITSIO will automatically update
+   the number of rows as data is written to the table.
 \end{description}
 
 \begin{verbatim}
@@ -3697,7 +3760,10 @@ do not use ASCII character codes in the internal data representations
     All the rows FOLLOWING row FROW are shifted down by NROWS rows.  If
     FROW or FROWLL equals 0 then the blank rows are inserted at the beginning of the
     table.  These routines modify the NAXIS2 keyword to reflect the new
-   number of rows in the table.
+    number of rows in the table.  Note that it is *not* necessary to insert rows in a table before
+    writing data to those rows (indeed, it would be inefficient to do so).
+    Instead, one may simply write data to any row of the table, whether that
+   row of data already exists or not.
 \end{description}
 
 \begin{verbatim}
@@ -3797,8 +3863,11 @@ differs from the data type of the calling subroutine.  The data values are also
 scaled by the TSCALn and TZEROn header values as they are being written to
 or read from the FITS array.  The fttscl subroutine MUST be used to define the
 scaling parameters when writing data to the table or to override the default
-scaling values given in the header
-when reading from the table.
+scaling values given in the header when reading from the table.
+Note that it is *not* necessary to insert rows in a table before
+writing data to those rows (indeed, it would be inefficient to do so).
+Instead, one may simply write data to any row of the table, whether that
+row of data already exists or not.
 
     In the case of binary tables with vector elements, the 'felem'
 parameter defines the starting pixel within the element vector.  This
@@ -4151,11 +4220,15 @@ and lastrow give the starting and ending row number of each range.
 \end{verbatim}
 
 \begin{description}
-\item[7 ]Evaluate the given expression and return information on the result.
+\item[7 ]Evaluate the given expression and return dimension and type information
+on the result.  The returned dimensions correspond to a single row entry
+of the requested expression, and are equivalent to the result of fits\_read\_tdim().
+Note that strings are considered to be one element regardless of string length.
+If maxdim == 0, then naxes is optional.
 \end{description}
 
 \begin{verbatim}
-         FTTEXP(unit, expr, > datatype, nelem, naxis, naxes, status)
+         FTTEXP(unit, expr, maxdim > datatype, nelem, naxis, naxes, status)
 \end{verbatim}
 
 
@@ -4710,16 +4783,16 @@ The following utility subroutines may be useful for certain applications:
         (numeric, logical, or character string) is automatically determined
         and  the output CARD string is formatted accordingly.  The value
         token may be forced to be interpreted as a string (e.g. if it is a
-       string of numeric digits) by enclosing it in single quotes.
+        string of numeric digits) by enclosing it in single quotes.
+        If the value token is a character string that contains 1 or more
+        embedded blank space characters or slash ('/') characters then the
+       entire character string must be enclosed in single quotes.
 \end{description}
 
 
 \begin{description}
 \item[- ]     The COMMENT token is optional, but if present must be separated from
-        the VALUE token by at least one blank space.  A leading '/' character
-        may be used to mark the beginning of the comment field, otherwise the
-        comment field begins with the first non-blank character following the
-       value token.
+       the VALUE token by a blank space or a  '/' character.
 \end{description}
 
 
@@ -5830,7 +5903,7 @@ also supplied.
 
 The column/keyword filter can be used to perform the following
 operations.  More than one operation may be specified by separating
-them with semi-colons.
+them with commas or semi-colons.
 
 \begin{itemize}
 
@@ -5915,10 +5988,10 @@ used to add comments into the file.
 Examples:
 
 \begin{verbatim}
-   [col Time;rate]               - only the Time and rate columns will
+   [col Time; rate]              - only the Time and rate columns will
                                    appear in the filtered input file.
 
-   [col Time;*raw]               - include the Time column and any other
+   [col Time, *raw]              - include the Time column and any other
                                    columns whose name ends with 'raw'.
 
    [col -TIME; Good == STATUS]   - deletes the TIME column and
@@ -6368,15 +6441,18 @@ value.
 \end{verbatim}
     where each "[]" demarks optional parameters. The region file name
     is required and must be  enclosed in quotes.  The remaining
-    parameters are optional.  The region file is an ASCII text file
-    which contains a list of one or more geometric shapes (circle,
+    parameters are optional.  There are 2 supported formats for the
+    region file: ASCII file or FITS binary table.  The region file
+    contains a list of one or more geometric shapes (circle,
     ellipse, box, etc.) which defines a region on the celestial sphere
     or an area within a particular 2D image.  The region file is
     typically generated using an image display program such as fv/POW
     (distribute by the HEASARC), or ds9 (distributed by the Smithsonian
     Astrophysical Observatory).  Users should refer to the documentation
     provided with these programs for more details on the syntax used in
-    the region files.
+    the region files.  The FITS region file format is defined in a document
+    available from the FITS Support Office at
+    http://fits.gsfc.nasa.gov/ registry/ region.html
 
     In its simplest form, (e.g., regfilter("region.reg") ) the
     coordinates in the default 'X' and 'Y' columns will be used to

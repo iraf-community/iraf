@@ -8,72 +8,114 @@
 *  a point on the surface of the Earth and coordinate time in the Solar
 *  System barycentric space-time frame of reference.
 *
-*  The proper time is Terrestrial Time TT;  the coordinate
-*  time is an implementation of the Barycentric Dynamical Time TDB.
+*  The proper time is terrestrial time, TT;  the coordinate time is an
+*  implementation of barycentric dynamical time, TDB.
 *
 *  Given:
-*    TDB   dp   coordinate time (MJD: JD-2400000.5)
-*    UT1   dp   universal time (fraction of one day)
-*    WL    dp   clock longitude (radians west)
-*    U     dp   clock distance from Earth spin axis (km)
-*    V     dp   clock distance north of Earth equatorial plane (km)
+*    TDB      d     TDB (MJD: JD-2400000.5)
+*    UT1      d     universal time (fraction of one day)
+*    WL       d     clock longitude (radians west)
+*    U        d     clock distance from Earth spin axis (km)
+*    V        d     clock distance north of Earth equatorial plane (km)
 *
 *  Returned:
-*    The clock correction, TDB-TT, in seconds.  TDB may be considered
-*    to be the coordinate time in the Solar System barycentre frame of
-*    reference, and TT is the proper time given by clocks at mean sea
-*    level on the Earth.
+*    The clock correction, TDB-TT, in seconds:
 *
-*    The result has a main (annual) sinusoidal term of amplitude
-*    approximately 0.00166 seconds, plus planetary terms up to about
-*    20 microseconds, and lunar and diurnal terms up to 2 microseconds.
-*    The variation arises from the transverse Doppler effect and the
-*    gravitational red-shift as the observer varies in speed and moves
-*    through different gravitational potentials.
+*    .  TDB is coordinate time in the solar system barycentre frame
+*       of reference, in units chosen to eliminate the scale difference
+*       with respect to terrestrial time.
 *
-*  The argument TDB is, strictly, the barycentric coordinate time;
-*  however, the terrestrial proper time (TT) can in practice be used.
+*    .  TT is the proper time for clocks at mean sea level on the
+*       Earth.
 *
-*  The geocentric model is that of Fairhead & Bretagnon (1990), in its
-*  full form.  It was supplied by Fairhead (private communication) as a
-*  FORTRAN subroutine.  The original Fairhead routine used explicit
-*  formulae, in such large numbers that problems were experienced with
-*  certain compilers (Microsoft Fortran on PC aborted with stack
-*  overflow, Convex compiled successfully but extremely slowly).  The
-*  present implementation is a complete recoding, with the original
-*  Fairhead coefficients held in a table.  To optimise arithmetic
-*  precision, the terms are accumulated in reverse order, smallest
-*  first.  A number of other coding changes were made, in order to match
-*  the calling sequence of previous versions of the present routine, and
-*  to comply with Starlink programming standards.  Under VAX/VMS, the
-*  numerical results compared with those from the Fairhead form are
-*  essentially unaffected by the changes, the differences being at the
-*  10^-20 sec level.
+*  Notes:
 *
-*  The topocentric part of the model is from Moyer (1981) and
-*  Murray (1983).
+*  1  The argument TDB is, strictly, the barycentric coordinate time;
+*     however, the terrestrial time TT can in practice be used without
+*     any significant loss of accuracy.
 *
-*  During the interval 1950-2050, the absolute accuracy is better
-*  than +/- 3 nanoseconds relative to direct numerical integrations
-*  using the JPL DE200/LE200 solar system ephemeris.
+*  2  The result returned by slRCC comprises a main (annual)
+*     sinusoidal term of amplitude approximately 0.00166 seconds, plus
+*     planetary and lunar terms up to about 20 microseconds, and diurnal
+*     terms up to 2 microseconds.  The variation arises from the
+*     transverse Doppler effect and the gravitational red-shift as the
+*     observer varies in speed and moves through different gravitational
+*     potentials.
 *
-*  The IAU definition of TDB is that it must differ from TT only by
-*  periodic terms.  Though practical, this is an imprecise definition
-*  which ignores the existence of very long-period and secular effects
-*  in the dynamics of the solar system.  As a consequence, different
-*  implementations of TDB will, in general, differ in zero-point and
-*  will drift linearly relative to one other.
+*  3  The geocentric model is that of Fairhead & Bretagnon (1990), in
+*     its full form.  It was supplied by Fairhead (private
+*     communication) as a FORTRAN subroutine.  The original Fairhead
+*     routine used explicit formulae, in such large numbers that
+*     problems were experienced with certain compilers (Microsoft
+*     Fortran on PC aborted with stack overflow, Convex compiled
+*     successfully but extremely slowly).  The present implementation is
+*     a complete recoding, with the original Fairhead coefficients held
+*     in a table.  To optimise arithmetic precision, the terms are
+*     accumulated in reverse order, smallest first.  A number of other
+*     coding changes were made, in order to match the calling sequence
+*     of previous versions of the present routine, and to comply with
+*     Starlink programming standards.  The numerical results compared
+*     with those from the Fairhead form are essentially unaffected by
+*     the changes, the differences being at the 10^-20 sec level.
+*
+*  4  The topocentric part of the model is from Moyer (1981) and
+*     Murray (1983).  It is an approximation to the expression
+*     ( v / c ) . ( r / c ), where v is the barycentric velocity of
+*     the Earth, r is the geocentric position of the observer and
+*     c is the speed of light.
+*
+*  5  During the interval 1950-2050, the absolute accuracy of is better
+*     than +/- 3 nanoseconds relative to direct numerical integrations
+*     using the JPL DE200/LE200 solar system ephemeris.
+*
+*  6  The IAU definition of TDB was that it must differ from TT only by
+*     periodic terms.  Though practical, this is an imprecise definition
+*     which ignores the existence of very long-period and secular
+*     effects in the dynamics of the solar system.  As a consequence,
+*     different implementations of TDB will, in general, differ in zero-
+*     point and will drift linearly relative to one other.
+*
+*  7  TDB was, in principle, superseded by new coordinate timescales
+*     which the IAU introduced in 1991:  geocentric coordinate time,
+*     TCG, and barycentric coordinate time, TCB.  However, slRCC
+*     can be used to implement the periodic part of TCB-TCG.
 *
 *  References:
-*    Bretagnon P, 1982 Astron. Astrophys., 114, 278-288.
-*    Fairhead L & Bretagnon P, 1990, Astron. Astrophys., 229, 240-247.
-*    Meeus J, 1984, l'Astronomie, 348-354.
-*    Moyer T D, 1981, Cel. Mech., 23, 33.
-*    Murray C A, 1983, Vectorial Astrometry, Adam Hilger.
 *
-*  P.T.Wallace   Starlink   10 November 1995
+*  1  Fairhead, L., & Bretagnon, P., Astron.Astrophys., 229, 240-247
+*     (1990).
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  2  Moyer, T.D., Cel.Mech., 23, 33 (1981).
+*
+*  3  Murray, C.A., Vectorial Astrometry, Adam Hilger (1983).
+*
+*  4  Seidelmann, P.K. et al, Explanatory Supplement to the
+*     Astronomical Almanac, Chapter 2, University Science Books
+*     (1992).
+*
+*  5  Simon J.L., Bretagnon P., Chapront J., Chapront-Touze M.,
+*     Francou G. & Laskar J., Astron.Astrophys., 282, 663-683 (1994).
+*
+*  P.T.Wallace   Starlink   7 May 2000
+*
+*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -81,10 +123,11 @@
 
       DOUBLE PRECISION TDB,UT1,WL,U,V
 
-      DOUBLE PRECISION D2PI
-      PARAMETER (D2PI=6.283185307179586476925287D0)
+      DOUBLE PRECISION D2PI,D2R
+      PARAMETER (D2PI=6.283185307179586476925287D0,
+     :           D2R=0.0174532925199432957692369D0)
 
-      DOUBLE PRECISION T,TSOL,RLE,RGE,RTJ,RTS,RDMOON,
+      DOUBLE PRECISION T,TSOL,W,ELSUN,EMSUN,D,ELJ,ELS,
      :                 WT,W0,W1,W2,W3,W4,WF,WJ
 
 * -----------------------------------------------------------------------
@@ -94,7 +137,7 @@
 *  787 sets of three coefficients.
 *
 *  Each set is amplitude (microseconds)
-*              frequency (radians per Julian millenium since J2000),
+*              frequency (radians per Julian millennium since J2000),
 *              phase (radians).
 *
 *  Sets   1-474 are the T**0 terms,
@@ -977,42 +1020,45 @@
 
 
 
-*  Time since J2000.0 in Julian millennia
+*  Time since J2000.0 in Julian millennia.
       T=(TDB-51544.5D0)/365250D0
 
 * -------------------- Topocentric terms -------------------------------
 
-*  Convert UT1 to local solar time in radians
+*  Convert UT1 to local solar time in radians.
       TSOL = MOD(UT1,1D0)*D2PI - WL
 
-*  Planetary arguments:  taken or derived from Bretagnon 1982
+*  FUNDAMENTAL ARGUMENTS:  Simon et al 1994
 
-*  RLp = mean longitude, mean equinox of date
-*  RGp = mean anomaly
-*  RTp = mean longitude difference, EMB minus planet
+*  Combine time argument (millennia) with deg/arcsec factor.
+      W = T / 3600D0
 
-*  EMB
-      RLE = MOD (1.75347031435D0 + 6283.3196666635D0 * T, D2PI)
-      RGE = MOD (6.24005997418D0 + 6283.0195512850D0 * T, D2PI)
-*  Jupiter
-      RTJ = MOD (1.15392381696D0 + 5753.3848591241D0 * T, D2PI)
-*  Saturn
-      RTS = MOD (0.87945355785D0 + 6069.7767103654D0 * T, D2PI)
+*  Sun Mean Longitude.
+      ELSUN = MOD(280.46645683D0+1296027711.03429D0*W,360D0)*D2R
 
-*  Lunar mean elongation:  derived from Meeus 1984.
-      RDMOON = MOD (5.198468D0 + 77713.77144D0 * T, D2PI)
+*  Sun Mean Anomaly.
+      EMSUN = MOD(357.52910918D0+1295965810.481D0*W,360D0)*D2R
 
-*  Topocentric terms (Moyer 1981 and Murray 1983)
-      WT =  + 0.00029D-10 * U * SIN (TSOL+RTS)
-     :      + 0.00100D-10 * U * SIN (TSOL-2D0*RGE)
-     :      + 0.00133D-10 * U * SIN (TSOL-RDMOON)
-     :      + 0.00133D-10 * U * SIN (TSOL+RTJ)
-     :      - 0.00229D-10 * U * SIN (TSOL+2D0*RLE+RGE)
-     :      - 0.0220 D-10 * V * SIN (RLE+RGE)
-     :      + 0.05312D-10 * U * SIN (TSOL-RGE)
-     :      - 0.13677D-10 * U * SIN (TSOL+2D0*RLE)
-     :      - 1.3184 D-10 * V * COS (RLE)
-     :      + 3.17679D-10 * U * SIN (TSOL)
+*  Mean Elongation of Moon from Sun.
+      D = MOD(297.85019547D0+16029616012.090D0*W,360D0)*D2R
+
+*  Mean Longitude of Jupiter.
+      ELJ = MOD(34.35151874D0+109306899.89453D0*W,360D0)*D2R
+
+*  Mean Longitude of Saturn.
+      ELS = MOD(50.07744430D0+44046398.47038D0*W,360D0)*D2R
+
+*  TOPOCENTRIC TERMS:  Moyer 1981 and Murray 1983.
+      WT =  +0.00029D-10*U*SIN(TSOL+ELSUN-ELS)
+     :      +0.00100D-10*U*SIN(TSOL-2D0*EMSUN)
+     :      +0.00133D-10*U*SIN(TSOL-D)
+     :      +0.00133D-10*U*SIN(TSOL+ELSUN-ELJ)
+     :      -0.00229D-10*U*SIN(TSOL+2D0*ELSUN+EMSUN)
+     :      -0.0220 D-10*V*COS(ELSUN+EMSUN)
+     :      +0.05312D-10*U*SIN(TSOL-EMSUN)
+     :      -0.13677D-10*U*SIN(TSOL+2D0*ELSUN)
+     :      -1.3184 D-10*V*COS(ELSUN)
+     :      +3.17679D-10*U*SIN(TSOL)
 
 * --------------- Fairhead model ---------------------------------------
 
@@ -1046,10 +1092,10 @@
          W4=W4+FAIRHD(1,I)*SIN(FAIRHD(2,I)*T+FAIRHD(3,I))
       END DO
 
-*  Multiply by powers of T and combine
+*  Multiply by powers of T and combine.
       WF=T*(T*(T*(T*W4+W3)+W2)+W1)+W0
 
-*  Adjustments to use JPL planetary masses instead of IAU
+*  Adjustments to use JPL planetary masses instead of IAU.
       WJ=     0.00065D-6  * SIN(   6069.776754D0   *T + 4.021194D0   ) +
      :        0.00033D-6  * SIN(    213.299095D0   *T + 5.543132D0   ) +
      :      (-0.00196D-6  * SIN(   6208.294251D0   *T + 5.696701D0   ))+
@@ -1058,7 +1104,7 @@
 
 * -----------------------------------------------------------------------
 
-*  Final result:  TDB-TT in seconds
+*  Final result:  TDB-TT in seconds.
       slRCC=WT+WF+WJ
 
       END

@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 #include "xpp.h"
+#include "../../bootProto.h"
 
 #define	import_spp
 #define	import_knames
@@ -30,10 +33,14 @@ extern	char *vfn2osfn();
 extern	char *os_getenv();
 char	*dottor();
 
+extern  void ZZSTRT (void);
+extern  void ZZSTOP (void);
+extern  int yylex (void);
 
-main (argc, argv)
-int	argc;
-char	*argv[];
+static  int  isxfile (char *fname);
+
+
+int main (int argc, char *argv[])
 {
 	int	i, rfflag, nfiles;
 	FILE	*fp_defs, *source;
@@ -91,11 +98,12 @@ char	*argv[];
 	/* If no package environment was specified on the command line,
 	 * check if the user has a default package set in their environment.
 	 */
-	if (!pkgenv)
-	    if (pkgenv = os_getenv("PKGENV")) {
+	if (!pkgenv) {
+	    if ((pkgenv = os_getenv("PKGENV"))) {
 		strcpy (v_pkgenv, pkgenv);
 		loadpkgenv (pkgenv = v_pkgenv);
 	    }
+	}
 
 	/* Generate pathname of <iraf.h>.
 	 */
@@ -170,13 +178,15 @@ char	*argv[];
 
 	ZZSTOP();
 	exit (errflag);
+
+	return (0);
 }
 
 
 /* ISXFILE -- Does the named file have a ".x" extension.
  */
-isxfile (fname)
-char	*fname;
+static int 
+isxfile (char *fname)
 {
 	char	*p;
 

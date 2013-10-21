@@ -55,7 +55,10 @@
  *                              "Dec: " + sb.getDblAttr("dec",i) + " " +
  *                              "Mv: " + sb.getDblAttr("vmag",i) + " "); 
  * 
- *  Michael Fitzpatrick, NOAO, August 2006
+ *
+ *  @file       vocSkybot_f77.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
  *
  **************************************************************************/
 
@@ -96,12 +99,12 @@
 
 /*  Public interface procedures.
 */
-int         vx_skybot (double *ra, double *dec, double *rsz, double *dsz,
+int     vx_skybot (double *ra, double *dec, double *rsz, double *dsz,
 		double *epoch);
-int         vx_skybotnobjs (int *sb);
-int         vx_skybotstr (int *sb, XCHAR *attr, int *index, XCHAR *outstr,
+int     vx_skybotnobjs (int *sb);
+int     vx_skybotstr (int *sb, XCHAR *attr, int *index, XCHAR *outstr,
 		int *maxch);
-double      vx_skybotdbl (int *sb, XCHAR *attr, int *index);
+double  vx_skybotdbl (int *sb, XCHAR *attr, int *index);
 
 
 /*  Private interface procedures.
@@ -112,13 +115,24 @@ extern int    spplen (XCHAR *str);
 
 
 
-/******************************************************************************
-**  SKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
-**  This service returns a list of minor planets withing the specified
-**  search radius/box about the poition at the epoch given.  Epoch is 
-**  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
-**  given in arcsec.
-*/
+/**
+ *  VX_SKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  This service returns a list of minor planets withing the specified
+ *  search radius/box about the poition at the epoch given.  Epoch is 
+ *  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
+ *  given in arcsec.
+ *
+ *  @brief      Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  @fn         sb = vx_skybot (double *ra, double *dec, double *rsz,
+ *                      double *dsz, double *epoch)
+ *
+ *  @param  ra          RA position of query (decimal degrees)
+ *  @param  dec         Dec position of query (decimal degrees)
+ *  @param  rsz         RA size of query (arcsec)
+ *  @param  dsz         Dec size of query (arcsec)
+ *  @param  epoch       epoch of query (JD)
+ *  @returns            handle to Skybot query
+ */
 int      
 vx_skybot (double *ra, double *dec, double *rsz, double *dsz, double *epoch)
 {
@@ -126,9 +140,20 @@ vx_skybot (double *ra, double *dec, double *rsz, double *dsz, double *epoch)
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a string value. 
-*/
+/**
+ *  VX_SKYBOTSTR -- Return a real-valued field as a string value. 
+ *
+ *  @brief      Return a real-valued field as a string value.
+ *  @fn         len = vx_skybotstr (int *sb, XCHAR *attr, int *index, 
+ *				XCHAR *out, int *maxch)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @param  out         output string value
+ *  @param  maxch       max length of output string
+ *  @returns            length of string value
+ */
 int
 vx_skybotstr (int *sb, XCHAR *attrname, int *index, XCHAR *outstr, int *maxch)
 {
@@ -144,9 +169,17 @@ vx_skybotstr (int *sb, XCHAR *attrname, int *index, XCHAR *outstr, int *maxch)
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a double-precision value.
-*/
+/**
+ *  VX_SKYBOTDBL -- Return a real-valued field as a double-precision value.
+ *
+ *  @brief      Return a real-valued field as a double-precision value.
+ *  @fn         dval = vx_skybotdbl (int *sb, char *attr, int *index)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @returns            double-precision value
+ */
 double      
 vx_skybotdbl (int *sb, XCHAR *attrname, int *index)
 {
@@ -159,9 +192,15 @@ vx_skybotdbl (int *sb, XCHAR *attrname, int *index)
 }
 
 
-/******************************************************************************
-**  SKYBOTNOBJS -- Return the number of objects found from the query.
-*/
+/**
+ *  VX_SKYBOTNOBJS -- Return the number of objects found from the query.
+ *
+ *  @brief      Return the number of objects found from the query.
+ *  @fn         nobjs = vx_skybotnobjs (int *sb)
+ *
+ *  @param  sb          handle to skybot query
+ *  @returns            nothing
+ */
 int      
 vx_skybotnobjs (int *sb)
 {

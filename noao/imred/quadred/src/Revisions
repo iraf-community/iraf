@@ -1,6 +1,9 @@
 .help revisions Jun88 noao.imred.quadred
 .nf
 
+ccdproc/ccdcache.x
+    The 'bufs' pointer was declared as TY_REAL instead of TY_SHORT (5/4/13)
+
 quad/qproc.cl
 quad/quad.cl
 quad/quadjoin.x

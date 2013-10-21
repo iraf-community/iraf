@@ -13,11 +13,13 @@ This step will create the cfitsio.def, cfitsio.dll, and cfitsio.lib files.
 
   A. With Microsoft Visual C++:
 
-      1. Execute the vcvars32.bat file that is distributed with Visual C++
+      1. Open a DOS command window and execute the vcvars32.bat file that 
+         is distributed with older versions of Visual C++, or simply open 
+         the Visual C++ command window (e.g., when using Visual Studio 2010).
 
-      2. Unpack the CFITSIO source files (cfitxxxx.zip) into temporary directory
+      2. Unpack the CFITSIO source files (cfitxxxx.zip) into a new empty directory
 
-      3. In a dos command window, cd to that directory and enter the 
+      3. In the DOS command window, cd to that directory and enter the 
          following commands:
 
 		nmake winDumpExts.mak
@@ -38,15 +40,15 @@ This step will create the cfitsio.def, cfitsio.dll, and cfitsio.lib files.
 ===============================================================================
 2.  Test the CFITSIO library with Visual C++
 
-       Compile and link the testprog.c test program with this command:
+     Compile and link the testprog.c test program.  When using Visual Studio,
+     the command is:
 
 		cl /MD testprog.c cfitsio.lib
 
 
-	This will create the testprog.exe executable program.  Running this
-	program should print out a long series of diagnostic messages
-	that should end with "Status = 0; OK - no error"
-
+     This will create the testprog.exe executable program.  Running this
+     program should print out a long series of diagnostic messages
+     that should end with "Status = 0; OK - no error"
 
 ===============================================================================
 3.  Compile and link an application program that calls CFITSIO routines

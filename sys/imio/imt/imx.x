@@ -2,6 +2,7 @@
 
 include <error.h>
 include <syserr.h>
+include <ctype.h>
 include "imx.h"
 
 define	DEBUG		FALSE
@@ -16,15 +17,16 @@ pointer	procedure imxopen (template)
 char	template[ARB]		# image template
 
 int	i, sort, level, ip, ch, expand, nchars, nimages, index, type
-int	max_fnt, fnt_len, len
+int	max_fnt, fnt_len, len, flen
 pointer	listp, intmp, fnt, op, exp
 char    lfile[SZ_LINE], lexpr[SZ_LINE], likparams[SZ_LINE], lsec[SZ_LINE]
-char    lindex[SZ_LINE], lextname[SZ_LINE], lextver[SZ_LINE], elem[SZ_FNT]
+char    lindex[SZ_LINE], lextname[SZ_LINE], lextver[SZ_LINE], elem[SZ_LINE]
 
 pointer	imx_preproc (), imx_imexpand (), imx_fexpand ()
 pointer	imx_texpand (), imx_dexpand ()
 int	imx_filetype (), imx_parse (), imx_get_element ()
 int	fntopnb (), strlen (), strsearch()
+int	sum, fntlenb()
 bool	envgetb()
 
 define	output 	{Memc[op]=$1;op=op+1}
@@ -119,7 +121,7 @@ begin
 		# Break out the listfile from the filtering expression.
         
 		index = 1
-	        nchars = imx_get_element (Memc[ip], index, elem, SZ_FNT)
+	        nchars = imx_get_element (Memc[ip], index, elem, SZ_LINE)
 		ip = ip + strlen(elem) - 1
 
 		nchars = imx_parse (elem, lfile, lindex, lextname, 
@@ -169,19 +171,25 @@ begin
 		}
 
 		if (DEBUG) {
-		    call eprintf ("expand:   exp='%s'  nim=%d\n")
-		        call pargstr (Memc[exp]); call pargi (nimages)
+		    call eprintf ("expand:   exp='%s' len=%d  nim=%d\n")
+		        call pargstr (Memc[exp])
+			call pargi (strlen(Memc[exp]))
+			call pargi (nimages)
 		}
-		    
 		    
 		    
 		# Copy to the output template string.
 		len = strlen (Memc[exp])
 		if (nimages > 0) {
 		    if ((fnt_len + len) >= max_fnt) {
-			max_fnt = max_fnt + SZ_FNT
-			call realloc (fnt, max_fnt, TY_CHAR)
-			op = fnt + strlen (Memc[fnt])
+			max_fnt = max_fnt + len + 1
+			if (fnt != NULL)
+			    call realloc (fnt, max_fnt, TY_CHAR)
+			else
+			    call calloc (fnt, max_fnt, TY_CHAR)
+			op = fnt
+			if (fnt_len > 0)
+			    op = fnt + strlen (Memc[fnt])
 		    }
 		    for (i=0; i < len; i=i+1)
 		        output (Memc[exp+i])

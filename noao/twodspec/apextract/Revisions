@@ -2,6 +2,20 @@
 .nf
 
 approfile.x
+     When an aperture goes off the edge of an image there was an error
+     which allowed the imio data buffer from the image to go out of bounds.
+     (3/12/13, MJF)
+
+aptrace.x
+     The line1/line2 variables weren't being initialized to zero in the
+     ap_ctrace() procedure.  This woule lead to old values from a previous
+     run of the task being reused.  (2/6/13, MJF)
+
+=======
+V2.16.1
+=======
+
+approfile.x
      Fixed a bug in the Marsh algorithm causing segfaults on 64-bit
      platforms (Buglog 583)  (3/5/12, Valdes)
 

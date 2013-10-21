@@ -1,9 +1,10 @@
-#!/bin/csh -f
+#!/bin/bash
 
-foreach i (cygwin freebsd linux linux64 macintel macosx sunos)
+bins=("cygwin" "freebsd" "linux" "linux64" "macintel" "macosx" "sunos")
+for i in ${bins[@]}; do
     touch bin.$i/IRAF.NET
     touch noao/bin.$i/IRAF.NET
-end
+done
 
 touch bin.cygwin/IB.CYGW.x86
 touch bin.freebsd/IB.FBSD.x86

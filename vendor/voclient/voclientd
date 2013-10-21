@@ -79,7 +79,7 @@ fi
 
 
 #  Pull out any arguments which look to be destined for the java binary.
-javaArgs=""
+javaArgs="-Xmx1024m"
 while test "$1"
 do
    if echo $1 | grep -- '^-[XD]' >/dev/null; then

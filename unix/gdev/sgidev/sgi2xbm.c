@@ -2,6 +2,12 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#include "sgiUtil.h"
+
 
 /* SGI2XBM.C -- Read an IRAF SGI bitmap file on standard input and convert
  *  to a GIF format image on standard outout.
@@ -50,16 +56,12 @@ static int py = DEF_HEIGHT;
 static int invert = 0;
 static char *infile[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static int  	isSwappedMachine();
-static void 	bswap4();
 
-
-main (argc, argv)
-int	argc;
-char	**argv;
+int
+main (int argc, char *argv[])
 {
 	FILE	*fd;
-	byte 	*buffer, *ip;
+	byte 	*buffer;
 	int	i, n, len_buf, numin = 0, cnt = 0;
 	int     index; 			/* goes through all files */
 
@@ -107,12 +109,12 @@ char	**argv;
                  * it's in the correct order for unpacking to be interpreted
                  * as an LSB-ordered image.
                  */
-                if (!isSwappedMachine())
+                if (!isSwapped ())
                     bswap4 (buffer, buffer, len_buf);
 
 		/* Write out the pixels. */
 		for (i=0; i < len_buf; i++, cnt++) {
-		    printf ("0x%0.2x", 
+		    printf ("0x%.2x", 
 			(byte) (invert ? ~buffer[i]: buffer[i])), n += 4;
 		    if (cnt < (len_buf * py - 1))
 		        printf (","), n++;
@@ -128,60 +130,6 @@ char	**argv;
             fflush (fd);
 	}
 	free (buffer);
-}
 
-
-/* IS_SWAPPED_MACHINE -- See if this is a byte-swapped (LSB) machine.
- */
-
-static int
-isSwappedMachine ()
-{
-        union {
-            char ch[4];
-            int  i;
-        } u;
-
-        u.i = 1;
-        return ((int) u.ch[0]);
-}
-
-
-/* BSWAP4 - Move bytes from array "a" to array "b", swapping the four bytes
- * in each successive 4 byte group, i.e., 12345678 becomes 43218765.
- * The input and output arrays may be the same but may not partially overlap.
-*/
-static void
-bswap4 (a, b, nbytes)
-byte   *a;                     /* input array                  */
-byte   *b;                     /* output array                 */
-int    nbytes;                 /* number of bytes to swap      */
-{
-        register byte   *ip, *op, *tp;
-        register int    n;
-        static   byte temp[4];
-
-        tp = temp;
-        ip = (byte *)a;
-        op = (byte *)b;
-
-        /* Swap successive four byte groups.
-         */
-        for (n = nbytes >> 2;  --n >= 0;  ) {
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *tp++ = *ip++;
-            *op++ = *--tp;
-            *op++ = *--tp;
-            *op++ = *--tp;
-            *op++ = *--tp;
-        }
-
-        /* If there are any odd bytes left, move them to the output array.
-         * Do not bother to swap as it is unclear how to swap a partial
-         * group, and really incorrect if the data is not modulus 4.
-         */
-        for (n = nbytes & 03;  --n >= 0;  )
-            *op++ = *ip++;
+	return (0);
 }

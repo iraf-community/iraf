@@ -85,6 +85,15 @@ extern int Fitsio_Pthread_Status;
 #define MACHINE NATIVE
 #define LONGSIZE 64   
 
+                            /* IBM System z mainframe support */ 
+#elif defined(__s390x__)
+#define BYTESWAPPED FALSE
+#define LONGSIZE 64
+
+#elif defined(__s390__)
+#define BYTESWAPPED FALSE
+#define LONGSIZE 32
+
 #elif defined(__ia64__)  || defined(__x86_64__)
                   /*  Intel itanium 64-bit PC, or AMD opteron 64-bit PC */
 #define BYTESWAPPED TRUE

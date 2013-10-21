@@ -125,6 +125,7 @@ libc.a:
 	fputc.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h>
 	fputs.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h>
 	fread.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h>
+	freadline.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h>
 	free.c		<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	freopen.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h>
 	fseek.c		<libc/fset.h> <libc/libc.h> <libc/spp.h> <libc/stdio.h>

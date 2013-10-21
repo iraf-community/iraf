@@ -33,13 +33,17 @@ int \hyperlink{sampMethods_8c_59f85e0fce4c9ae7121c98e137d3f743}{samp\_\-receiveC
 int \hyperlink{sampMethods_8c_03be7cc9e154a6ccdd499286df640936}{samp\_\-receiveNotification} (void $\ast$data)
 \begin{CompactList}\small\item\em receiveNotification () client method. \item\end{CompactList}\item 
 int \hyperlink{sampMethods_8c_754b50ad59145c7fd1e4c8f4277f11e4}{samp\_\-receiveResponse} (void $\ast$data)
-\begin{CompactList}\small\item\em receiveResponse () client method. \item\end{CompactList}\end{CompactItemize}
+\begin{CompactList}\small\item\em receiveResponse () client method. \item\end{CompactList}\item 
+void \hyperlink{sampMethods_8c_82fec51207e326e6373e174bb6855634}{samp\_\-setHandlerReply} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} resp)
+\begin{CompactList}\small\item\em Set the \hyperlink{structSamp}{Samp} Handler reply map. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampMethods_8c_eebed5000d39977556e0bc330a020915}{samp\_\-getHandlerReply} ()
+\begin{CompactList}\small\item\em Get the \hyperlink{structSamp}{Samp} Handler reply map. \item\end{CompactList}\end{CompactItemize}
 \subsection*{Variables}
 \begin{CompactItemize}
 \item 
-\hyperlink{samp_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampMethods_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{nullMap}
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampMethods_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{nullMap}
 \item 
-\hyperlink{samp_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampMethods_8c_a2106c7fe3a5747178c046238fbd5d55}{nullList}
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampMethods_8c_a2106c7fe3a5747178c046238fbd5d55}{nullList}
 \item 
 \hypertarget{sampMethods_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}{
 \hyperlink{structSamp}{Samp} $\ast$ \textbf{sampP}}
@@ -64,7 +68,24 @@ SAMPMETHODS.C -- SAMP methods implemented by a callable client.
 
 
 \subsection{Function Documentation}
-\hypertarget{sampMethods_8c_59f85e0fce4c9ae7121c98e137d3f743}{
+\hypertarget{sampMethods_8c_eebed5000d39977556e0bc330a020915}{
+\index{sampMethods.c@{sampMethods.c}!samp\_\-getHandlerReply@{samp\_\-getHandlerReply}}
+\index{samp\_\-getHandlerReply@{samp\_\-getHandlerReply}!sampMethods.c@{sampMethods.c}}
+\subsubsection[{samp\_\-getHandlerReply}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} samp\_\-getHandlerReply (void)}}
+\label{sampMethods_8c_eebed5000d39977556e0bc330a020915}
+
+
+Get the \hyperlink{structSamp}{Samp} Handler reply map. 
+
+SAMP\_\-GETHANDLERREPLY -- Get the \hyperlink{structSamp}{Samp} Handler reply map.
+
+\begin{Desc}
+\item[Returns:]Map handle for reply map \end{Desc}
+
+
+References nullMap, and OK\_\-Map.
+
+Referenced by samp\_\-receiveCall(), and samp\_\-receiveNotification().\hypertarget{sampMethods_8c_59f85e0fce4c9ae7121c98e137d3f743}{
 \index{sampMethods.c@{sampMethods.c}!samp\_\-receiveCall@{samp\_\-receiveCall}}
 \index{samp\_\-receiveCall@{samp\_\-receiveCall}!sampMethods.c@{sampMethods.c}}
 \subsubsection[{samp\_\-receiveCall}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-receiveCall (void $\ast$ {\em data})}}
@@ -95,7 +116,7 @@ SAMP\_\-RECEIVECALL -- receiveCall() client method.
 \item[Returns:]status code or errno \end{Desc}
 
 
-References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), samp\_\-getSampHandler(), samp\_\-getUserHandler(), samp\_\-Reply(), sampH, and Samp::trace.\hypertarget{sampMethods_8c_03be7cc9e154a6ccdd499286df640936}{
+References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), samp\_\-getHandlerReply(), samp\_\-getSampHandler(), samp\_\-getUserHandler(), samp\_\-Reply(), sampH, and Samp::trace.\hypertarget{sampMethods_8c_03be7cc9e154a6ccdd499286df640936}{
 \index{sampMethods.c@{sampMethods.c}!samp\_\-receiveNotification@{samp\_\-receiveNotification}}
 \index{samp\_\-receiveNotification@{samp\_\-receiveNotification}!sampMethods.c@{sampMethods.c}}
 \subsubsection[{samp\_\-receiveNotification}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-receiveNotification (void $\ast$ {\em data})}}
@@ -115,7 +136,7 @@ SAMP\_\-RECEIVENOTIFICATION -- receiveNotification() client method.
 \item[Returns:]status code or errno \end{Desc}
 
 
-References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), samp\_\-getSampHandler(), samp\_\-processHubEvent(), and Samp::trace.\hypertarget{sampMethods_8c_754b50ad59145c7fd1e4c8f4277f11e4}{
+References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), samp\_\-getHandlerReply(), samp\_\-getSampHandler(), samp\_\-getUserHandler(), samp\_\-processHubEvent(), and Samp::trace.\hypertarget{sampMethods_8c_754b50ad59145c7fd1e4c8f4277f11e4}{
 \index{sampMethods.c@{sampMethods.c}!samp\_\-receiveResponse@{samp\_\-receiveResponse}}
 \index{samp\_\-receiveResponse@{samp\_\-receiveResponse}!sampMethods.c@{sampMethods.c}}
 \subsubsection[{samp\_\-receiveResponse}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-receiveResponse (void $\ast$ {\em data})}}
@@ -135,7 +156,27 @@ SAMP\_\-RECEIVERESPONSE -- receiveResponse() client method.
 \item[Returns:]status code or errno \end{Desc}
 
 
-References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), and Samp::trace.
+References Samp::defaultUserFunc, OK\_\-Map, samp\_\-execUserHandler(), and Samp::trace.\hypertarget{sampMethods_8c_82fec51207e326e6373e174bb6855634}{
+\index{sampMethods.c@{sampMethods.c}!samp\_\-setHandlerReply@{samp\_\-setHandlerReply}}
+\index{samp\_\-setHandlerReply@{samp\_\-setHandlerReply}!sampMethods.c@{sampMethods.c}}
+\subsubsection[{samp\_\-setHandlerReply}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setHandlerReply ({\bf Map} {\em resp})}}
+\label{sampMethods_8c_82fec51207e326e6373e174bb6855634}
+
+
+Set the \hyperlink{structSamp}{Samp} Handler reply map. 
+
+SAMP\_\-SETHANDLERREPLY -- Set the \hyperlink{structSamp}{Samp} Handler reply map.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em resp}]response map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-envGetHandler(), and samp\_\-paramGetHandler().
 
 \subsection{Variable Documentation}
 \hypertarget{sampMethods_8c_a2106c7fe3a5747178c046238fbd5d55}{
@@ -156,7 +197,7 @@ Referenced by sampInit().\hypertarget{sampMethods_8c_68bf22a5b3f2531242f5c6d6ecf
 
 SAMP handle 
 
-Referenced by samp\_\-getOKMap(), samp\_\-hubDeclareSubscriptions(), and sampInit().\hypertarget{sampMethods_8c_b04b61ee02d86e15b02b861699ae7424}{
+Referenced by samp\_\-getHandlerReply(), samp\_\-getOKMap(), samp\_\-hubDeclareSubscriptions(), and sampInit().\hypertarget{sampMethods_8c_b04b61ee02d86e15b02b861699ae7424}{
 \index{sampMethods.c@{sampMethods.c}!sampH@{sampH}}
 \index{sampH@{sampH}!sampMethods.c@{sampMethods.c}}
 \subsubsection[{sampH}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t {\bf sampH}}}
@@ -165,4 +206,4 @@ Referenced by samp\_\-getOKMap(), samp\_\-hubDeclareSubscriptions(), and sampIni
 
 SAMP struct pointer 
 
-Referenced by samp\_\-envGetHandler(), samp\_\-paramGetHandler(), samp\_\-processHubEvent(), samp\_\-receiveCall(), and sampInit().
+Referenced by samp\_\-processHubEvent(), samp\_\-receiveCall(), and sampInit().

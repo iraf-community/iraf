@@ -1,6 +1,16 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
 
+imred$dtoi/selftest.x
+	The 'lut' was declared as TY_INT instead of TY_REAL (5/4/13)
+
+imred$dtoi/spolist.x
+	A TY_INT pointer was being used with Memr[] (4/20/13)
+
+=======
+V2.16
+=======
+
 imred$dtoi/hdtoi.x
 	The hd_fogcalc() procedure was being called with too few arguments
 	(7/12/09, MJF)

@@ -93,8 +93,5 @@ tv              # image display
 utilities       # miscellaneous utilities
 noao            # optical astronomy packages
 
-stsdas
-stplot
-
 keep
 

@@ -2,6 +2,9 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define	NBITS_CHAR	8	/* number of bits in a char */
 #define	MASK	64	/* printronix raster flag */
@@ -11,9 +14,8 @@
 
 /* PRINTRONIX translator from the SGI bitmap file to the STDOUT */
 
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 
    FILE	*fpi;
@@ -54,5 +56,6 @@ char	*argv[];
       fclose (fpi);
 
    }
-}
 
+   return (0);
+}

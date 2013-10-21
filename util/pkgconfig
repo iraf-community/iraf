@@ -1,19 +1,29 @@
-#!/bin/csh -f
+#!/bin/sh
 #
 #  PKGCONFIG -- Re-create the system Makefile to take into account new
 #  packages.
 
 
-set  irafdir    = $cwd/../util
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
 
-echo "Initializing repository data ...."
-$irafdir/pkginit				# init repository information
-if ($status == 1) then
+
+/bin/echo "Initializing repository data ...."
+$iraf/util/pkginit				# init repository information
+if (( $? == 1 )); then
    exit
-endif
+fi
 
 # Create the template Makefile.
-echo "Creating system makefile ...."
+/bin/echo "Creating system makefile ...."
 cat << MAKE_TEMP_END		> Makefile
 #
 #  Makefile for IRAF external package installation/maintenance.
@@ -30,6 +40,10 @@ all:: update
 update::
 	@./configure
 	@../util/pkgupdate -all
+
+# Install all available packages for this platform.
+install_all::
+	@../util/pkgall
 
 # List packages available on the repository.
 list::
@@ -64,23 +78,24 @@ echo "Setup Complete."
 
 
 # For each package we have, append a makefile entry.
-foreach p (`cat .repo_pkgs`)
+pkg=`cat .repo_pkgs`
+for p in ${pkg[@]} ; do
 
    # Create template makefile entries for each package
-   echo "${p}::"						>> Makefile
-   echo "	@../util/pkginst $p"			>> Makefile
-   echo "clean_${p}::"					>> Makefile
-   echo "	@../util/pkgclean $p"			>> Makefile
-   echo "update_${p}::"					>> Makefile
-   echo "	@../util/pkgupdate $p"			>> Makefile
-   echo ""						>> Makefile
+   /bin/echo "${p}::"					>> Makefile
+   /bin/echo "	@../util/pkginst $p"			>> Makefile
+   /bin/echo "clean_${p}::"				>> Makefile
+   /bin/echo "	@../util/pkgclean $p"			>> Makefile
+   /bin/echo "update_${p}::"				>> Makefile
+   /bin/echo "	@../util/pkgupdate $p"			>> Makefile
+   /bin/echo ""						>> Makefile
 
    # Create the directory
-   if (-e $p ) then
+   if [ -e "$p" ]; then
       /bin/rm -rf $p
-   endif
+   fi
    mkdir $p
-end
+done
 
-echo ""
+/bin/echo ""
 exit 0

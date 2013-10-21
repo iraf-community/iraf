@@ -23,14 +23,14 @@ done
 
 #ar rv		libos.a *.o; ar dv libos.a zmain.o; rm *.o
 
-if test "$IRAFARCH" = "macosx"; then
-    $CC -c -O -DMACOSX -w -Wunused -arch ppc  ../as/zsvjmp_ppc.s  -o zsvjmp.o ;\
-    libtool -a -T -o libos.a zsvjmp.o
-    rm -f zsvjmp.o
-    $CC -c -O -DMACOSX -w -Wunused -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
-    libtool -a -T -o libos.a libos.a zsvjmp.o
-    rm -f zsvjmp.o zmain.o
-    libtool -a -T -o libos.a libos.a *.o
+if [ "$IRAFARCH" = "macosx" ]; then
+##    $CC -c -O -DMACOSX -w -Wunused -arch ppc  ../as/zsvjmp_ppc.s  -o zsvjmp.o ;\
+##    libtool -a -T -o libos.a zsvjmp.o
+##    rm -f zsvjmp.o
+    $CC -c -O -DMACOSX -w -Wunused -m32 -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
+    ar r	libos.a *.o; 
+    ranlib	libos.a
+    rm -f 	zsvjmp.o zmain.o
 
 else
     rm -f zmain.o

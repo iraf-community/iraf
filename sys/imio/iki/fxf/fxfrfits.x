@@ -46,7 +46,7 @@ long	cputime(), fstatl()
 int	finfo(), open(), stropen(), getline()
 
 errchk	putline, syserrs, seek, calloc, realloc, syserr
-errchk	fpathname, malloc, fxf_load_header, fxf_skip_xtn, fxf_read_xtn
+errchk	fpathname, calloc, fxf_load_header, fxf_skip_xtn, fxf_read_xtn
 
 include "fxfcache.com"
 
@@ -76,7 +76,7 @@ begin
 
 	if (finfo (Memc[hdrfile], fi) == ERR) 
 	    call syserrs (SYS_FOPEN, IM_HDRFILE(im))
-	
+
         acmode = FIT_ACMODE(o_fit)
 	ext_append = (acmode == NEW_IMAGE || acmode == NEW_COPY)
 	repeat {
@@ -265,7 +265,7 @@ begin
 	    fitslen = fstatl (spool, F_FILESIZE)
 
 	    # Prepare cache area to store the FITS header.
-	    call malloc (hdr, fitslen, TY_CHAR)
+	    call calloc (hdr, fitslen, TY_CHAR)
 	    user = stropen (Memc[hdr], fitslen, NEW_FILE)
 	    rf_hdr[slot] = hdr
 	    rf_fitslen[slot] = fitslen
@@ -464,7 +464,7 @@ rxtn_
 
 	if (po != NULL)
 	    call mfree(po, TY_CHAR)
-	call malloc(po, fitslen+1, TY_CHAR)
+	call calloc (po, fitslen+1, TY_CHAR)
 
 	i = po
 	call seek (spool, BOFL)
@@ -767,8 +767,8 @@ begin
 		    call mfree (FIT_TFORMP(fit), TY_CHAR)
 		    call mfree (FIT_TTYPEP(fit), TY_CHAR)
 	        }
-		call malloc (FIT_TFORMP(fit), ncols*LEN_FORMAT, TY_CHAR)
-		call malloc (FIT_TTYPEP(fit), ncols*LEN_OBJECT, TY_CHAR)
+		call calloc (FIT_TFORMP(fit), ncols*LEN_FORMAT, TY_CHAR)
+		call calloc (FIT_TTYPEP(fit), ncols*LEN_OBJECT, TY_CHAR)
 	    case KW_TFORM:
 		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
 		if (index == 1) {

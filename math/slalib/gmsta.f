@@ -28,7 +28,9 @@
 *  the GMST at 0 hours UT1.  In fact, it gives the difference between
 *  the GMST and the UT, the steady 4-minutes-per-day drawing-ahead of
 *  ST with respect to UT.  When whole days are ignored, the expression
-*  happens to equal the GMST at 0 hours UT1 each day.
+*  happens to equal the GMST at 0 hours UT1 each day.  Note that the
+*  factor 1.0027379... does not appear explicitly but in the form of
+*  the coefficient 8640184.812866, which is 86400x36525x0.0027379...
 *
 *  In this routine, the entire UT1 (the sum of the two arguments DATE
 *  and UT) is used directly as the argument for the standard formula.
@@ -43,9 +45,26 @@
 *
 *  Called:  slDA2P
 *
-*  P.T.Wallace   Starlink   13 April 1998
+*  P.T.Wallace   Starlink   14 October 2001
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

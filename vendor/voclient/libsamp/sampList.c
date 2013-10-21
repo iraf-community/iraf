@@ -3,6 +3,7 @@
  *
  *                list = samp_newList  ()
  *                      samp_freeList  (List list)
+ *		   len = samp_listLen  (List list)
  *        
  *               samp_setStringInList  (List list, char *value)
  *                  samp_setMapInList  (List list, Map map)

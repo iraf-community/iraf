@@ -9,9 +9,7 @@
 NAME       	= samp
 VERSION    	= 1.0
 PLATFORM       := $(shell uname -s)
-#PLATFORM  	= LINUX
-#PLATFORM  	= MACOSX
-#PLATFORM  	= CYGWIN
+PLMACH         := $(shell ../../getarch)
 HERE           := $(shell /bin/pwd)
 
 
@@ -32,6 +30,24 @@ SHAREDLIB   = $(HERE)/$(LIBBASE).so.$(VERSION)
 CC 	    = gcc
 CINCS  	    = -I$(HERE) -I../ -I../../include -L../ -L../../lib/ -L../
 CFLAGS 	    = -g -Wall -D$(PLATFORM) $(CINCS)
+
+ifeq ("$(PLATFORM)", "Darwin")
+    ifeq  ("$(PLMACH)", "macintel")
+        CARCH   = -m64 -mmacosx-version-min=10.5
+    else
+        CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+    endif
+else
+    CLIBS       = -lm -lc -lpthread -lcurl
+    CARCH       = -D$(PLATFORM)
+endif
+
+#CARCH   	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+CLIBS           = -lm -lc -lcurl -lpthread
+CFLAGS          = -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
+
+
+
 
 #F77 	    = g77
 F77 	    = gfortran

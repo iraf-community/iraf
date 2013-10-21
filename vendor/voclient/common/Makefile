@@ -19,11 +19,11 @@ INCDIR    	:= ../include/
 # includes, flags and libraries
 CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR) -I./
-ifeq  ($(PLATFORM), "Darwin")
-    ifeq  ($(PLATFORM), "x86_64")
+ifeq ($(PLATFORM),Darwin)
+    ifeq  ($(PLATFORM),x86_64)
         CARCH	= -m64 -mmacosx-version-min=10.5
     else
-        CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+        CARCH	= -mmacosx-version-min=10.5
     endif
     LIBS	= -lm -lc
 else
@@ -34,7 +34,7 @@ endif
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
-all::	curl expat
+all::	expat cfitsio curl
 
 libs::
 	(/bin/csh -f mklibs)
@@ -46,20 +46,25 @@ curl::
 expat::
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
 
+cfitsio::
+	(cd cfitsio ; /bin/csh -f mklibs)
+
 apps:
 
 install:
-	(cd curl  ; make install)
-	#(cd expat ; make install)
+	(if [ "${PLATFORM}" != "Darwin" ]; then (cd curl ; make install); fi)
+	(cd expat ; make install)
 	(/bin/rm -rf ../man ../share)
 
 clean:
-	(cd curl  	; make clean)
+	(if [ "${PLATFORM}" != "Darwin" ]; then (cd curl ; make clean); fi)
 	(cd expat     	; make clean)
+	(cd cfitsio   	; make clean)
 
 distclean:
-	(cd curl  	; make distclean)
+	(if [ "${PLATFORM}" != "Darwin" ]; then (cd curl ; make distclean); fi)
 	(cd expat     	; make distclean)
+	#(cd cfitsio   	; make distclean)
 
 
 

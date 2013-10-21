@@ -7,13 +7,11 @@
 *  From a rotation matrix, determine the corresponding axial vector.
 *  (double precision)
 *
-*  A rotation matrix describes a rotation about some arbitrary axis.
-*  The axis is called the Euler axis, and the angle through which the
-*  reference frame rotates is called the Euler angle.  The axial
-*  vector returned by this routine has the same direction as the
-*  Euler axis, and its magnitude is the Euler angle in radians.  (The
-*  magnitude and direction can be separated by means of the routine
-*  slDVN.)
+*  A rotation matrix describes a rotation about some arbitrary axis,
+*  called the Euler axis.  The "axial vector" returned by this routine
+*  has the same direction as the Euler axis, and its magnitude is the
+*  amount of rotation in radians.  (The magnitude and direction can be
+*  separated by means of the routine slDVN.)
 *
 *  Given:
 *    RMAT   d(3,3)   rotation matrix
@@ -26,9 +24,26 @@
 *
 *  If RMAT is null, so is the result.
 *
-*  P.T.Wallace   Starlink   24 December 1992
+*  Last revision:   26 November 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -45,8 +60,8 @@
       Z = RMAT(1,2)-RMAT(2,1)
       S2 = SQRT(X*X+Y*Y+Z*Z)
       IF (S2.NE.0D0) THEN
-         C2 = (RMAT(1,1)+RMAT(2,2)+RMAT(3,3)-1D0)
-         PHI = ATAN2(S2/2D0,C2/2D0)
+         C2 = RMAT(1,1)+RMAT(2,2)+RMAT(3,3)-1D0
+         PHI = ATAN2(S2,C2)
          F = PHI/S2
          AXVEC(1) = X*F
          AXVEC(2) = Y*F

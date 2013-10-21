@@ -1,3 +1,5 @@
+#!/bin/csh -f
+#
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
@@ -48,8 +50,14 @@ endif
 
 else		# old_method
             
-    setenv MACH 	`$iraf/unix/hlib/irafarch.csh`
-    setenv IRAFARCH 	`$iraf/unix/hlib/irafarch.csh`
+    set a = `$iraf/unix/hlib/irafarch.csh`
+    if ($status == 0) then
+        setenv MACH 	 $a
+        setenv IRAFARCH  $a
+    else
+	echo "Error:  "$a
+	exit 1
+    endif
             
 endif		# old_method
 
@@ -80,13 +88,10 @@ case freebsd:
     breaksw
 
 case macosx:
-    setenv CC 	cc
-    setenv F2C 	$hbin/f2c.e
-
-    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//ppc -/arch -//i386 -/mmacosx-version-min=10.4"
-    setenv HSI_FF "-O -arch ppc -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
-    setenv HSI_LF "-arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
+    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch i386 -m32 -mmacosx-version-min=10.4"
+    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386"
+    setenv HSI_FF "-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
+    setenv HSI_LF "-arch i386 -m32 -mmacosx-version-min=10.4"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
@@ -94,9 +99,6 @@ case macosx:
     breaksw
 
 case macintel:
-    setenv CC 	cc
-    setenv F2C 	$hbin/f2c.e
-
     setenv HSI_CF "-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64 -g"
     setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused -/DMACH64 -/m64"
     setenv HSI_FF "-O -m64 -DMACH64 -DBLD_KERNEL"
@@ -108,9 +110,6 @@ case macintel:
     breaksw
 
 case ipad:
-    setenv CC 	cc
-    setenv F2C 	$hbin/f2c.e
-
     setenv XC_CFLAGS	"-I/var/include"
     setenv HSI_CF "-O -I/var/include -DMACOSX -DMACINTEL -DIPAD -w -Wunused"
     setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -/DIPAD -w -/Wunused"
@@ -182,10 +181,11 @@ endsw
 # Prepend a user <iraf.h> file to the compile flags in case we don't
 # install as root.
 #
-setenv HSI_CF  "-I${HOME}/.iraf/ $HSI_CF"
-setenv HSI_FF  "-I${HOME}/.iraf/ $HSI_FF"
-setenv HSI_LF  "-I${HOME}/.iraf/ $HSI_LF"
-setenv HSI_XF  "-I${HOME}/.iraf/ $HSI_XF"
+setenv HSI_CF  	  "-I${HOME}/.iraf/ $HSI_CF"
+setenv HSI_FF  	  "-I${HOME}/.iraf/ $HSI_FF"
+setenv HSI_LF  	  "-I${HOME}/.iraf/ $HSI_LF"
+setenv HSI_XF  	  "-I${HOME}/.iraf/ $HSI_XF"
+setenv XC_CFLAGS  "-I${HOME}/.iraf/"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

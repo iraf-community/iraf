@@ -81,11 +81,11 @@ begin
 	call qsort (Memi[rank], nthreshold, compare)
 
 	# Reject the weaker peaks within sep of a stronger peak.
-	nisolated = find_isolated (x, Memr[rank], nthreshold, separation,
+	nisolated = find_isolated (x, Memi[rank], nthreshold, separation,
 	    debug)
 
 	# Select the strongest nmax peaks.
-	npeaks = find_nmax (data, x, Memr[rank], nthreshold, nmax, debug)
+	npeaks = find_nmax (data, x, Memi[rank], nthreshold, nmax, debug)
 
 	call sfree (sp)
 	return (npeaks)

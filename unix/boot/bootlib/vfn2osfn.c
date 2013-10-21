@@ -102,7 +102,7 @@ vfn2osfn (
 	_envinit();
 
 	err = 0;
-	iferr (vp = VFNOPEN (upkvfn, &mode)) {
+	iferr (vp = VFNOPEN (upkvfn, (integer *)&mode)) {
 	    fprintf (stderr, "Warning: cannot open vfn `%s' for %s\n",
 		vfn, mode == VFN_WRITE ? "writing" : "reading");
 	    err++;
@@ -110,17 +110,17 @@ vfn2osfn (
 
 	if (new) {
 	    if (!err)
-		iferr (VFNADD (&vp, pk_osfn, &maxch))
+		iferr (VFNADD ((integer *)&vp, pk_osfn, (integer *)&maxch))
 		    fprintf (stderr, "Warning: cannot add filename `%s'\n",vfn);
 	} else {
 	    if (!err)
-		iferr (VFNMAP (&vp, pk_osfn, &maxch))
+		iferr (VFNMAP ((integer *)&vp, pk_osfn, (integer *)&maxch))
 		    fprintf (stderr, "Warning: cannot map filename `%s'\n",vfn);
 	}
 
 	mode = (mode == VFN_WRITE) ? VFN_UPDATE : VFN_NOUPDATE;
 	if (!err) {
-	    iferr (VFNCLOSE (&vp, &mode))
+	    iferr (VFNCLOSE ((integer *)&vp, (integer *)&mode))
 		fprintf (stderr, "Warning: error closing mapping file\n");
 	} else
 	    *osfn = EOS;

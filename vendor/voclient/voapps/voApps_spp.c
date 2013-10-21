@@ -80,10 +80,10 @@ static void   func_exec (PFV func, char *name, int *argc, XCHAR *firstArg,
 #define	MAX_ARGS	64
 
 void  vodata (int argc, char **argv);
-void  vodirectory (int argc, char **argv);
+void  voregistry (int argc, char **argv);
 void  vosesame (int argc, char **argv);
 
-void  votcopy (int argc, char **argv);
+void  votcnv (int argc, char **argv);
 void  votget (int argc, char **argv);
 void  votinfo (int argc, char **argv);
 
@@ -146,7 +146,7 @@ void VX_VOCOPY (int *argc, XCHAR *firstArg, ...)
     va_list  argp;
 
     va_start (argp, firstArg);
-    func_exec (votcopy, "votcopy", argc, firstArg, argp);
+    func_exec (votcnv, "votcopy", argc, firstArg, argp);
     va_end (argp);
 }
 
@@ -172,7 +172,7 @@ void VX_VODIRECTORY (int *argc, XCHAR *firstArg, ...)
     va_list  argp;
 
     va_start (argp, firstArg);
-    func_exec (vodirectory, "vodirectory", argc, firstArg, argp);
+    func_exec (voregistry, "vodirectory", argc, firstArg, argp);
     va_end (argp);
 }
 

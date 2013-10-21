@@ -8,7 +8,7 @@
 #endif
 
 #ifdef KR_headers
-void sig_die(s, kill) register char *s; int kill;
+void sig_die(s, kill) char *s; int kill;
 #else
 #include "stdlib.h"
 #ifdef __cplusplus
@@ -19,7 +19,7 @@ extern "C" {
 #endif
  extern void f_exit(void);
 
-void sig_die(register char *s, int kill)
+void sig_die(const char *s, int kill)
 #endif
 {
 	/* print error message, then clear buffers */

@@ -19,6 +19,8 @@ os_chdir (char *dir)
 	XCHAR	osdir[SZ_PATHNAME+1];
 	XINT	sz_dpath, sz_osdir, status, x_maxch=SZ_PATHNAME;
 
+	extern  int ZFXDIR(), ZFGCWD(), ZFSUBD(), ZFCHDR();
+
 
 	sz_dpath = os_fpathname (dir, (char *)dpath, SZ_PATHNAME);
 	os_strupk ((char *)dpath, osdir, SZ_PATHNAME);

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 # f77-style shell script to compile and load fortran, C, and assembly codes
 #	usage:	f77 [-g] [-O|-O[23456]] [-o absfile] [-c] files [-l library]

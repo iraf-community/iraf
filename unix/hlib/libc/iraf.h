@@ -103,11 +103,15 @@
 #ifdef import_knames
 #ifndef D_knames
 #include "/iraf/iraf/unix/hlib/libc/knames.h"
-/*
-#include "/iraf/iraf/unix/hlib/libc/kproto.h"
-*/
 #endif
 #undef import_knames
+#endif
+
+#ifdef import_kproto
+#ifndef D_kproto
+#include "/iraf/iraf/unix/hlib/libc/kproto.h"
+#endif
+#undef import_kproto
 #endif
 
 #ifdef import_setjmp

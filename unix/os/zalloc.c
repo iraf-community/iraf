@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <utmp.h>
+#include <utmpx.h>
 #include <pwd.h>
 
 #define import_spp
@@ -149,12 +149,12 @@ ZDVOWN (
 int
 loggedin (int uid)
 {
-	struct	utmp ubuf;
+	struct	utmpx ubuf;
 	struct	passwd *pw, *getpwuid();
 	FILE	*ufp;
 
-	if ((ufp = fopen ("/etc/utmp", "r")) == NULL) {
-	    printf ("zdvown: cannot open /etc/utmp\n");
+	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {
+	    printf ("zdvown: cannot open /var/run/utmp\n");
 	    return (1);
 	}
 
@@ -164,11 +164,11 @@ loggedin (int uid)
 	}
 
 	do {
-	    if (fread (&ubuf, sizeof (struct utmp), 1, ufp) == (size_t) 0) {
+	    if (fread (&ubuf, sizeof (struct utmpx), 1, ufp) == (size_t) 0) {
 		fclose (ufp);
 		return (0);
 	    }
-	} while (strncmp (ubuf.ut_name, pw->pw_name, 8) != 0);
+	} while (strncmp (ubuf.ut_user, pw->pw_name, 8) != 0);
 
 	fclose (ufp);
 

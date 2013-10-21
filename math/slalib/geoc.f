@@ -15,15 +15,35 @@
 *     Z     dp     distance from plane of Earth equator (AU)
 *
 *  Notes:
-*     1)  Geocentric latitude can be obtained by evaluating ATAN2(Z,R).
-*     2)  IAU 1976 constants are used.
+*
+*  1  Geocentric latitude can be obtained by evaluating ATAN2(Z,R).
+*
+*  2  IAU 1976 constants are used.
 *
 *  Reference:
+*
 *     Green,R.M., Spherical Astronomy, CUP 1985, p98.
 *
-*  P.T.Wallace   Starlink   4th October 1989
+*  Last revision:   22 July 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -48,11 +68,11 @@
 
 
 *  Geodetic to geocentric conversion
-      SP=SIN(P)
-      CP=COS(P)
-      C=1D0/SQRT(CP*CP+B*SP*SP)
-      S=B*C
-      R=(A0*C+H)*CP/AU
-      Z=(A0*S+H)*SP/AU
+      SP = SIN(P)
+      CP = COS(P)
+      C = 1D0/SQRT(CP*CP+B*SP*SP)
+      S = B*C
+      R = (A0*C+H)*CP/AU
+      Z = (A0*S+H)*SP/AU
 
       END

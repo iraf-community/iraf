@@ -54,7 +54,7 @@ begin
 	newoff = 1
 	call seek (newfd, newoff)
         if (SZ_INT != SZ_INT32)
-             call ipak32 (Memr[sbuf], Memr[sbuf], SZ_SIZINFO)
+             call ipak32 (Memi[sbuf], Memi[sbuf], SZ_SIZINFO)
 	call write (newfd, Memi[sbuf], SZ_SIZINFO)
 
 	# Copy each user parameter to the temporary file.

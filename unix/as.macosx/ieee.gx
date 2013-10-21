@@ -57,7 +57,7 @@ $else
 define	IEEE_SWAP	IEEE_SWAP8
 define	BSWAP		bswap8
 define	NSWAP		8
-define	IOFF		1	# MACHDEP (normally 1, 2 on e.g. Intel)
+define	IOFF		2	# MACHDEP (normally 1, 2 on e.g. Intel)
 $endif
 
 
@@ -82,7 +82,6 @@ begin
 	    else
 		call amov$t (native, ieee, nelem)
 	} else {
-	    call ieee_sigmask()
 	    do i = 1, nelem
 		if (native[i] == native_NaN) {
 		    ieee(i) = ieee_NaN
@@ -93,7 +92,6 @@ begin
 	    # Byteswap if necessary.
 	    if (IEEE_SWAP == YES)
 		call BSWAP (ieee, 1, ieee, 1, nelem * NSWAP)
-	    call ieee_sigrestore()
 	}
 end
 
@@ -107,7 +105,7 @@ PIXEL	ieee[ARB]		#I input IEEE floating format array
 PIXEL	native[ARB]		#O output native floating format array
 int	nelem			#I number of floating point numbers
 
-int	expon, i
+int	expon, i, val
 $if (datatype == r)
 real	fval
 int	ival[1]
@@ -116,24 +114,31 @@ $else
 double	fval
 int	ival[2]
 %	equivalence (fval, ival)
+int	iand32()
 $endif
+%	equivalence (ival, val)
 
 PIXEL	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
 	    if (mapin != NO) {
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = native[i]
+$if (datatype == r)
 		    expon = and (ival[IOFF], NaNmask)
+$else
+		    if (SZ_INT == SZ_INT32)
+		        expon = and (ival[IOFF], NaNmask)
+		    else
+		        expon = iand32 (val, NaNmask)
+$endif
 		    if (expon == 0) {
 			native[i] = 0
 		    } else if (expon == NaNmask) {
@@ -141,7 +146,6 @@ begin
 			nin = nin + 1
 		    }
 		}
-		call ieee_sigrestore()
 	    }
 	} else {
 	    if (mapin == NO)
@@ -150,10 +154,16 @@ begin
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = ieee[i]
+$if (datatype == r)
 		    expon = and (ival[IOFF], NaNmask)
+$else
+		    if (SZ_INT == SZ_INT32)
+		        expon = and (ival[IOFF], NaNmask)
+		    else
+		        expon = iand32 (val, NaNmask)
+$endif
 		    if (expon == 0) {
 			native[i] = 0
 		    } else if (expon == NaNmask) {
@@ -162,11 +172,8 @@ begin
 		    } else
 			native[i] = ieee[i]
 		}
-		call ieee_sigrestore()
 	    }
 	}
-
-
 end
 
 
@@ -181,14 +188,11 @@ int	mapin, mapout, nin, nout, NaNmask
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-	if (mapout != NO) {
-	    call ieee_sigmask()
+	if (mapout != NO)
 	    if (x == native_NaN) {
 		x = ieee_NaN
 		nout = nout + 1
 	    }
-	    call ieee_sigrestore()
-	}
 	if (IEEE_SWAP == YES)
 	    call BSWAP (x, 1, x, 1, NSWAP)
 end
@@ -200,7 +204,7 @@ procedure ieeupk$t (x)
 
 PIXEL	x			#U datum to be converted
 
-int	expon
+int	expon, val
 $if (datatype == r)
 real	fval
 int	ival[1]
@@ -209,7 +213,9 @@ $else
 double	fval
 int	ival[2]
 %	equivalence (fval, ival)
+int	iand32()
 $endif
+%	equivalence (val, ival)
 
 PIXEL	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
@@ -223,16 +229,21 @@ begin
 	# value, and denormalized numbers (zero exponent) to zero.
 
 	if (mapin != NO) {
-	    call ieee_sigmask()
 	    fval = x
+$if (datatype == r)
 	    expon = and (ival[IOFF], NaNmask)
+$else
+	    if (SZ_INT == SZ_INT32)
+	        expon = and (ival[IOFF], NaNmask)
+	    else
+	        expon = iand32 (val, NaNmask)
+$endif
 	    if (expon == 0)
 		x = 0
 	    else if (expon == NaNmask) {
 	        x = native_NaN
 		nin = nin + 1
 	    }
-	    call ieee_sigrestore()
 	}
 end
 
@@ -349,33 +360,27 @@ int	inval				#I enable NaN mapping for input?
 int	outval				#I enable NaN mapping for output?
 
 # MACHDEP.
-$if (datatype == r)
-real	fval
-int	ival[1]
-$else
-double	fval
-int	ival[2]
-$endif
+#$if (datatype == r)
+#%	real r_quiet_nan
+#$else
+#%	double precision d_quiet_nan
+#$endif
 
 PIXEL	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
-
-$if (datatype == r)
-%	equivalence (fval, ival)
-%	data	ival(1) / '7ff7ffff'x /
-$else
-%	equivalence (fval, ival)
-%	data	ival(1) / '7ff7ffff'x /, ival(2) /-1/
-$endif
 
 begin
 	mapin = inval
 	mapout = outval
 
 	# MACHDEP.
-	if (mapout == YES)
-	    ieee_NaN = fval
+#	if (mapout == YES)
+#	$if (datatype == r)
+#%	    ieeenn = r_quiet_NaN()
+#	$else
+#%	    ieeenn = d_quiet_NaN()
+#	$endif
 
 	if (mapin == YES)
 	$if (datatype == r)
@@ -383,44 +388,4 @@ begin
 	$else
 	    NaNmask = 7FF00000X
 	$endif
-end
-
-
-$if (datatype == r)
-
-# IEEE_SIGMASK, IEEE_SIGRESTORE -- Routines for masking IEEE exceptions.
-#
-#	ieee_sigmask()
-#	ieee_sigrestore()
-#
-# These routines are meant to be used only internally by the routines in
-# this file.  iee_sigmask saves the current IEEE FPU exception mask, and
-# sets a new mask which masks the invalid operand exception.  This is
-# necessary to permit the routines in this file to handle NaN values without
-# raising the IEEE invalid operand exception.  iee_sigrestore restores
-# the original exception mask.  These routines are meant to be called as
-# pairs to temporarily block the invalid operand exception within an IEEE
-# conversion routine.
-
-procedure ieee_sigmask()
-int	fpscr
-common	/ieesig/ fpscr
-begin
-	# Old mask code for LinuxPPC.
-	#call gfpucw (fpucw)
-	#call sfpucw (or (fpucw, 80X))
-
-	# Mask code for MacOSX (see os$zzepro.c).
-	call mxmask()
-end
-
-procedure ieee_sigrestore()
-int	fpscr
-common	/ieesig/ fpscr
-begin
-	# Old mask code for LinuxPPC.
-	#call sfpucw (fpucw)
-
-	# Mask code for MacOSX (see os$zzepro.c).
-	call mxumsk()
 end

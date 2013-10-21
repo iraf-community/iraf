@@ -19,7 +19,7 @@ extern
 #ifdef __cplusplus
 	"C"
 #endif
-	char *F77_aloc(ftnlen, char*);
+	char *F77_aloc(ftnlen, const char*);
 #endif
 #include "string.h"
 #endif /* NO_OVERWRITE */

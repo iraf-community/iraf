@@ -6,8 +6,29 @@ set top = `pwd`
 setenv CC 	"gcc"
 setenv CXX 	"g++"
 
+setenv PLATFORM	`uname -s`
+setenv PLMACH	`uname -m`
+
 set	build_curl	= 0
 set	build_xmlrpc	= 1
+
+
+if ($PLATFORM == "Darwin") then
+   if ( $?IRAFARCH ) then
+       if ( "$IRAFARCH" == "macintel" ) then
+   	   setenv CFLAGS   '-m64 -mmacosx-version-min=10.4'
+   	   setenv LDFLAGS  '-m64 -mmacosx-version-min=10.4'
+           setenv LADD     '-m64 -mmacosx-version-min=10.4'
+       else
+   	   setenv CFLAGS   '-arch i386 -m32 -mmacosx-version-min=10.4'
+   	   setenv LDFLAGS  '-arch i386 -m32 -mmacosx-version-min=10.4'
+           setenv LADD     '-arch i386 -m32 -mmacosx-version-min=10.4'
+       endif
+   endif
+else
+    setenv CFLAGS   "-O2"
+endif
+   
 
 
 
@@ -20,7 +41,8 @@ set	gopts = "--prefix=$top --exec-prefix=$top --disable-shared"
 #echo "    Cleaning files ...."
 #./mkclean
 
-if ($build_curl == 1) then
+#if ( $build_curl == 1 || (! -e ../../lib/libcurl.a) ) then
+if ( $build_curl == 1 ) then
 
   echo -n "    Building CURL libs ...."
   set	opts = "$gopts \
@@ -45,12 +67,12 @@ if ($build_curl == 1) then
 		--without-nss \
 		--without-ca-path \
 		--without-libidn"
-  (chdir curl-7.20.1 ;  \
-    ./configure $opts  				 >& _spool ; \
-    make clean 					>>& _spool ; \
+  (chdir curl ;  \
+    ./configure $opts	 			 >& _spool ; \
     make 					>>& _spool ; \
     make install 				>>& _spool )
   echo "done"
+    #make clean 					>>& _spool ; \
 
 endif
 
@@ -82,11 +104,12 @@ echo -n "    Building XMLRPC-C libs ...."
 # was 32
 # was 38
   (chdir xmlrpc-c-1.16.29 ;  \
-    ./configure $opts  				 >& _spool ; \
-    make clean 					>>& _spool ; \
-    make 					>>& _spool ; \
-    make install 				>>& _spool ; \
-    make clean 					>>& _spool )
+    setenv curdir "CURDIR=`pwd`" 			   ; \
+    ./configure $opts		 		 >& _spool ; \
+    make clean $curdir 				>>& _spool ; \
+    make $curdir 				>>& _spool ; \
+    make install $curdir 			>>& _spool ; \
+    make distclean $curdir			>>& _spool )
 echo "done"
 
 

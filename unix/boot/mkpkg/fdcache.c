@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 /*
  * FDCACHE -- Maintain a cache of filenames and their associated modification
@@ -37,13 +39,18 @@ struct	_fdate *fd_unlink();
 struct	_fdate *fd_tohead();
 struct	_fdate *fd_totail();
 
+long  m_fdate (char *fname);
+void  m_fdinit (int debug);
+int   fd_chksum (char *s);
+
+extern  long         os_fdate (char *fname);
+
 
 /* M_FDATE -- Get file modification date.  This is functionally equivalent to
  * os_fdate().
  */
 long
-m_fdate (fname)
-char	*fname;
+m_fdate (char *fname)
 {
 	register struct _fdate *fd;
 	register int	chksum;
@@ -79,8 +86,8 @@ char	*fname;
 
 /* M_FDINIT -- Initialize (clear) the fdate cache.
  */
-m_fdinit (debug)
-int	debug;
+void
+m_fdinit (int debug)
 {
 	register struct _fdate *fd;
 	register int	i;
@@ -93,7 +100,7 @@ int	debug;
 
 	    for (fd=fd_head;  fd != NULL;  fd=fd->dnlnk)
 		if (fd->fname[0])
-		    printf ("%3d %10d (%05d) %s\n",
+		    printf ("%3d %10ld (%05d) %s\n",
 			fd->nrefs, fd->fdate, fd->chksum, fd->fname);
 
 	    fd_hits   = 0;
@@ -121,8 +128,7 @@ int	debug;
 /* FD_TOHEAD -- Link a fdate struct at the head of the list.
  */
 struct _fdate *
-fd_tohead (fd)
-register struct _fdate *fd;
+fd_tohead (register struct _fdate *fd)
 {
 	if (fd != fd_head) {
 	    fd->uplnk = NULL;
@@ -138,8 +144,7 @@ register struct _fdate *fd;
 /* FD_TOTAIL -- Link a fdate struct at the tail of the list.
  */
 struct _fdate *
-fd_totail (fd)
-register struct _fdate *fd;
+fd_totail (register struct _fdate *fd)
 {
 	if (fd != fd_tail) {
 	    fd->uplnk = fd_tail;
@@ -155,8 +160,7 @@ register struct _fdate *fd;
 /* FD_UNLINK -- Unlink an fdate struct.
  */
 struct _fdate *
-fd_unlink (fd)
-register struct _fdate *fd;
+fd_unlink (register struct _fdate *fd)
 {
 	if (fd == fd_head)
 	    fd_head = fd->dnlnk;
@@ -174,8 +178,8 @@ register struct _fdate *fd;
 
 /* FD_CHKSUM -- Compute the checksum of a character string.
  */
-fd_chksum (s)
-register char *s;
+int
+fd_chksum (char *s)
 {
 	register int sum=0;
 

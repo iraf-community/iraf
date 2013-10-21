@@ -101,6 +101,7 @@ if (-e bin.$float) then
 else
     echo "old objects will not be archived as no bin.$float directory found"
 endif
+echo ""
 rm -f `cat $DFL` $DFL
 
 if ($ARCH != generic) then
@@ -121,6 +122,7 @@ if ($ARCH != generic) then
 	endif
 	echo "done"
     else
+	echo ""
 	echo "no object archive found; full sysgen will be needed"
     endif
 endif

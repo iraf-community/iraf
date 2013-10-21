@@ -1,4 +1,4 @@
-#!/bin/csh -f 
+#!/bin/bash
 
 find . -type f -name \*.x -exec egrep -H SZ_REAL {} \; >& _real
 find . -type f -name \*.h -exec egrep -H SZ_REAL {} \; >& _realh

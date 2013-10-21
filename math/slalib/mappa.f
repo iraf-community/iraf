@@ -39,17 +39,21 @@
 *      is always negligible.  Moreover, for all but the most
 *      critical applications UTC is adequate.
 *
-*  2)  The accuracy of the routines using the parameters AMPRMS is
-*      limited by the routine slEVP, used here to compute the
-*      Earth position and velocity by the methods of Stumpff.
-*      The maximum error in the resulting aberration corrections is
-*      about 0.3 milliarcsecond.
-*
-*  3)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
+*  2)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
 *      the mean equinox and equator of epoch EQ.
 *
-*  4)  The parameters AMPRMS produced by this routine are used by
-*      slMAPQ and slMAPZ.
+*  3)  The parameters AMPRMS produced by this routine are used by
+*      slAMPQ, slMAPQ and slMAPZ.
+*
+*  4)  The accuracy is sub-milliarcsecond, limited by the
+*      precession-nutation model (IAU 1976 precession, Shirai &
+*      Fukushima 2001 forced nutation and precession corrections).
+*
+*  5)  A further limit to the accuracy of routines using the parameter
+*      array AMPRMS is imposed by the routine slEVP, used here to
+*      compute the Earth position and velocity by the methods of
+*      Stumpff.  The maximum error in the resulting aberration
+*      corrections is about 0.3 milliarcsecond.
 *
 *  Called:
 *     slEPJ         MDJ to Julian epoch
@@ -57,9 +61,26 @@
 *     slDVN         normalize vector
 *     slPRNU      precession/nutation matrix
 *
-*  P.T.Wallace   Starlink   23 November 1995
+*  P.T.Wallace   Starlink   24 October 2003
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2003 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -71,7 +92,7 @@
       DOUBLE PRECISION CR
       PARAMETER (CR=499.004782D0)
 
-*  Gravitational radius of the sun x 2 (2*mu/c**2, AU)
+*  Gravitational radius of the Sun x 2 (2*mu/c**2, AU)
       DOUBLE PRECISION GR2
       PARAMETER (GR2=2D0*9.87063D-9)
 

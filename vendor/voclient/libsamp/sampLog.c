@@ -73,7 +73,7 @@ sampLog (handle_t handle, char *format, ...)
     if (sampP->debug)
         fprintf (stderr, "[%s] %s", logtime(), buf);
 
-    free ((void *) buf);
+    if (buf) free ((void *) buf);
 }
 
 
@@ -110,7 +110,7 @@ sampTrace (handle_t handle, char *format, ...)
     
     fprintf (stderr, "[%s] %s", logtime(), buf);
 
-    free ((void *) buf);
+    if (buf) free ((void *) buf);
 }
 
 

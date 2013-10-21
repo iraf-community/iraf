@@ -5,10 +5,15 @@
 #include <ctype.h>
 #include <time.h>
 #include <pwd.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define	import_spp
 #define	import_error
 #include <iraf.h>
+
+#include "sgiUtil.h"
+
 
 /*
  * SGI2UEPS.C -- Read IRAF SGI metacode from standard input, translate into
@@ -186,13 +191,20 @@ static	int dev_penbase  = DEF_PENBASE;
 static	int dev_penslope = DEF_PENSLOPE;
 static	char progname[SZ_LINE+1];
 
+static  void  translate (FILE *in, FILE *out);
+static  void  xy_point (FILE *out, register int x, register int y, int flag);
+static  void  xy_flush (FILE *out);
+static  char *penencode (int val, char *code);
+static  void  textout (FILE *out, char *text[]);
+static  void  eps_comments (FILE *out);
+
+
 
 /* MAIN -- Main entry point for SGI2UAPL.  Optional arguments are device
  * window parameters and name of input file.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	FILE	*in;
 	char	*infile;
@@ -200,7 +212,7 @@ char	*argv[];
 	int	argno;
 	int	np;
 	char	penparam[SZ_PENCMD];
-	int	get_iarg();
+
 
 	strcpy (progname, argv[0]);
 	infile = "stdin";
@@ -228,7 +240,7 @@ char	*argv[];
 		    dev_height = get_iarg (argp[2], argv, argno, DEF_HEIGHT);
 		    break;
 		case 'p':
-		    if (argp[2] == NULL)
+		    if (argp[2] == (char) 0)
 			if (argv[argno+1] == NULL) {
 			    fprintf (stderr, "missing arg to switch `%s';",
 				argp);
@@ -278,23 +290,24 @@ char	*argv[];
 
 	if (in != stdin)
 	    fclose (in);
+
+	return (0);
 }
 
 
 /* TRANSLATE -- Interpret input SGI metacode instructions into device 
  * instructions and write to stdout.
  */
-translate (in, out)
-FILE	*in;
-FILE	*out;
+static void
+translate (FILE *in, FILE *out)
 {
 	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	int	 n, x, y, curpoints = 0, swap_bytes;
 	float	 xscale, yscale;
-	char	 *xyencode(), *penencode();
 
-	swap_bytes = swapped();
+
+	swap_bytes = isSwapped();
 
 	xscale = (float) dev_width / (float) SGK_MAXNDC;
 	yscale = (float) dev_height / (float) SGK_MAXNDC;
@@ -318,7 +331,8 @@ FILE	*out;
 	 */
 	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
+		bswap2 ((unsigned char *)inbuf, (unsigned char *)inbuf, 
+		    sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
@@ -383,10 +397,13 @@ FILE	*out;
 /* XY_POINT -- Output a move or draw instruction, using either the 4 byte or
  * 7 byte encoding scheme.
  */
-xy_point (out, x, y, flag)
-FILE	*out;			/* output file */
-register int x, y;		/* coords to move to */
-int	flag;			/* move or draw? */
+static void
+xy_point (
+    FILE *out,			/* output file */
+    register int x, 		/* coords to move to */
+    register int y,		/* coords to move to */
+    int	flag 			/* move or draw? */
+)
 {
 	static char o[] = "m XXXX";
 	register char	*op = o;
@@ -429,8 +446,8 @@ int	flag;			/* move or draw? */
 /* XY_FLUSH -- Terminate the current drawing sequence, if any, and issue the
  * stroke command to Postscript to draw the buffered points.
  */
-xy_flush (out)
-FILE	*out;
+static void
+xy_flush (FILE *out)
 {
 	if (npts > 0) {
 	    if (fourbyte)
@@ -443,40 +460,14 @@ FILE	*out;
 }
 
 
-/* XYENCODE -- Encode x, y into a character string formatted for the device.
- */
-char *
-xyencode (x, y, code)
-int	x, y;			/* must be positive	*/
-char	*code;			/* draw or move		*/
-{
-	static char	obuf[SZ_VECT+1];
-	register int	digit, n, i;
-	register char	*op, *ip;
-
-	i = 0 + SZ_COORD - 1;
-	for (op = &obuf[i++], digit=SZ_COORD, n=x;  --digit >= 0;  n = n / 10)
-	    *op-- = n % 10 + '0';
-	obuf[i] = ' ';
-	i = i + SZ_COORD;
-	for (op = &obuf[i++], digit=SZ_COORD, n=y;  --digit >= 0;  n = n / 10)
-	    *op-- = n % 10 + '0';
-
-	obuf[i++] = ' ';
-	for (op = &obuf[i++], ip = code, n = SZ_VCODE;  --n >= 0;  i++)
-	    *op++ = *ip++;
-
-	return (obuf);
-}
-
-
 /* PENENCODE -- Encode base, slope into a character string formatted for the
  * device set-pen command.
  */
-char *
-penencode (val, code)
-char	*code;			/* device set-linewidth command */
-int	val;			/* device line width 		*/
+static char *
+penencode (
+    int	  val, 			/* device line width 		*/
+    char *code			/* device set-linewidth command */
+)
 {
 	static char	obuf[SZ_PENCMD+1];
 	register int	digit, n;
@@ -495,9 +486,11 @@ int	val;			/* device line width 		*/
 
 /* TEXTOUT -- Output lines of text to a file.
  */
-textout (out, text)
-FILE	*out;			/* output file */
-char	*text[];		/* array of lines of text */
+static void
+textout (
+    FILE  *out,			/* output file */
+    char  *text[] 		/* array of lines of text */
+)
 {
 	register char **lp;
 
@@ -508,81 +501,10 @@ char	*text[];		/* array of lines of text */
 }
 
 
-/* SWAPPED -- Test whether we are running on a byte-swapped machine.
- */
-swapped()
-{
-	union {
-	    short   tswap;
-	    char    b[2];
-	} test;
-
-	test.tswap = 1;
-	return (test.b[0]);
-}	
-
-
-/* BSWAP2 -- Move bytes from array "a" to array "b", swapping successive
- * pairs of bytes.  The two arrays may be the same but may not be offset
- * and overlapping.
- */
-bswap2 (a, b, nbytes)
-char	*a;			/* input array			*/
-char	*b;			/* output array			*/
-int	nbytes;			/* number of bytes to swap	*/
-{
-	register char *ip, *op, *otop;
-	register unsigned temp;
-
-	ip = a;
-	op = b;
-	otop = op + (nbytes & ~1);
-
-	/* Swap successive pairs of bytes.
-	 */
-	while (op < otop) {
-	    temp  = *ip++;
-	    *op++ = *ip++;
-	    *op++ = temp;
-	}
-
-	/* If there is an odd byte left, move it to the output array.
-	 */
-	if (nbytes & 1)
-	    *op = *ip;
-}
-
-
-/* GET_IARG -- Get an integer argument, whether appended directly to flag
- * or separated by a whitespace character; if error, report and assign default.
- */
-get_iarg (argp, argv, argno, def_val)
-char	argp;
-char	**argv;
-int	argno;
-int	def_val;
-
-{
-	int	temp_val;
-
-	if (argp == NULL) {
-	    if (argv[argno+1] == NULL) {
-		fprintf (stderr, "missing arg to switch `%s';", argp);
-		fprintf (stderr, " reset to %d\n", def_val);
-		temp_val = def_val;
-	    } else
-		temp_val = atoi (argv[++argno]);
-	} else
-	    temp_val = atoi (argv[argno]+2);
-
-	return (temp_val);
-}
-
-
 /* EPS_COMMENTS -- Set identifying comments for EPS conformance.
  */
-eps_comments (out)
-FILE	*out;
+static void
+eps_comments (FILE *out)
 {
 	time_t	clock;
 	int	llx, lly, urx, ury;

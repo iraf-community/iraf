@@ -477,7 +477,7 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
     char imagecolname[FLEN_VALUE], rowexpress[FLEN_FILENAME];
     char binspec[FLEN_FILENAME], colspec[FLEN_FILENAME], pixfilter[FLEN_FILENAME];
     char histfilename[FLEN_FILENAME];
-    char filtfilename[FLEN_FILENAME];
+    char filtfilename[FLEN_FILENAME], compspec[FLEN_FILENAME];
     char wtcol[FLEN_VALUE];
     char minname[4][FLEN_VALUE], maxname[4][FLEN_VALUE];
     char binname[4][FLEN_VALUE];
@@ -566,6 +566,7 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
         colspec[0] = '\0';
         rowfilter[0] = '\0';
         pixfilter[0] = '\0';
+        compspec[0] = '\0';
     }
     else
     {
@@ -576,8 +577,9 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
 	/* therefore in general we do not have to worry about buffer */
 	/* overflow of any of the returned strings. */
 	
-        fits_parse_input_filename(url, urltype, infile, outfile, extspec,
-              rowfilter, binspec, colspec, pixfilter, status);
+        /* call the newer version of this parsing routine that supports 'compspec' */
+        ffifile2(url, urltype, infile, outfile, extspec,
+              rowfilter, binspec, colspec, pixfilter, compspec, status);
     }
     
     if (*status > 0)
@@ -635,11 +637,14 @@ int ffopen(fitsfile **fptr,      /* O - FITS file pointer                   */
     /* check if this same file is already open, and if so, attach to it  */
     /*-------------------------------------------------------------------*/
 
+    FFLOCK;
     if (fits_already_open(fptr, url, urltype, infile, extspec, rowfilter,
             binspec, colspec, mode, &isopen, status) > 0)
     {
+        FFUNLOCK;
         return(*status);
     }
+    FFUNLOCK;
 
     if (isopen) {
        goto move2hdu;  
@@ -1027,7 +1032,7 @@ move2hdu:
           ffpmsg(outfile);
           return(*status);
        }
-       
+      
        if (fits_copy_cell2image(*fptr, newptr, imagecolname, rownum,
                                 status) > 0)
        {
@@ -1281,10 +1286,9 @@ move2hdu:
           "CFITSIO used the following expression to create this image:",
           status);
           ffphis(*fptr, name, status);
-
-          return *status;
        }
-       else {
+       else
+       {
           ffpmsg("cannot use pixel filter on non-IMAGE HDU");
           ffpmsg(pixfilter);
           ffclos(*fptr, status);
@@ -1293,6 +1297,12 @@ move2hdu:
           return(*status);
        }
     }
+
+   /* parse and save image compression specification, if given */
+   if (*compspec) {
+      ffparsecompspec(*fptr, compspec, status);
+   }
+ 
 
     return(*status);
 }
@@ -1355,12 +1365,14 @@ int fits_clear_Fptr(FITSfile *Fptr,  /* O - FITS file pointer               */
 {
     int ii;
 
+    FFLOCK;
     for (ii = 0; ii < NMAXFILES; ii++) {
         if (FptrTable[ii] == Fptr) {
             FptrTable[ii] = 0;
             break;
         }
     }
+    FFUNLOCK;
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -1578,7 +1590,7 @@ int ffedit_columns(
 {
     fitsfile *newptr;
     int ii, hdunum, slen, colnum = -1, testnum, deletecol = 0, savecol = 0;
-    int numcols = 0, *colindex = 0, tstatus = 0;
+    int numcols = 0, *colindex = 0, tstatus = 0, inparen;
     char *cptr, *cptr2, *cptr3, clause[FLEN_FILENAME], keyname[FLEN_KEYWORD];
     char colname[FLEN_VALUE], oldname[FLEN_VALUE], colformat[FLEN_VALUE];
     char *file_expr = NULL, testname[FLEN_VALUE], card[FLEN_CARD];
@@ -1662,8 +1674,28 @@ int ffedit_columns(
     tstatus = 0;
     ffgncl(*fptr, &numcols, &tstatus);  /* get initial # of cols */
 
-    /* parse expression and get first clause, if more than 1 */
+    /* as of July 2012, the CFITSIO column filter syntax was modified */
+    /* so that commas may be used to separate clauses, as well as semi-colons. */
+    /* This was done because users cannot enter the semi-colon in the HEASARC's */
+    /* Hera on-line data processing system due for computer security reasons.  */
+    /* Therefore, we must convert those commas back to semi-colons here, but we */
+    /* must not convert any columns that occur within parenthesies.  */
 
+    cptr2 = cptr;
+    inparen = 0;  /* flag to indicate we are within a parenthetical clause */
+
+    while (*cptr2) {
+       if (*cptr2 == '(') {
+           inparen++;    /* increment the nested-parenthesis counter */
+       } else if (*cptr2 == ')') {
+           inparen--;   /* decrement the nested-parenthesis counter */
+       } else if (*cptr2 == ',' && !inparen) {
+           *cptr2 = ';';   /* replace this comma with a semi-colon */
+       }
+       cptr2++;
+    }
+
+    /* parse expression and get first clause, if more than 1 */
     while ((slen = fits_get_token(&cptr, ";", clause, NULL)) > 0 )
     {
         if( *cptr==';' ) cptr++;
@@ -3315,7 +3347,7 @@ when writing FITS images.
 
     fits_set_compression_type(fptr, compresstype, status);
     fits_set_tile_dim(fptr, MAX_COMPRESS_DIM, tilesize, status);
-    
+ 
     if (compresstype == HCOMPRESS_1) {
         fits_set_hcomp_scale (fptr, scale,  status);
         fits_set_hcomp_smooth(fptr, smooth, status);
@@ -4530,13 +4562,12 @@ int ffiurl(char *url,               /* input filename */
            int *status)
 /*
    parse the input URL into its basic components.
-   This routine is big and ugly and should be redesigned someday!
+   This routine does not support the pixfilter or compspec components.
 */
 {
-	return fits_parse_input_filename(url, urltype, infilex, outfile,
-               extspec, rowfilterx, binspec, colspec, 0, status);
+	return ffifile2(url, urltype, infilex, outfile,
+               extspec, rowfilterx, binspec, colspec, 0, 0, status);
 }
-
 /*--------------------------------------------------------------------------*/
 /* fits_parse_input_file */
 int ffifile(char *url,       /* input filename */
@@ -4552,13 +4583,35 @@ int ffifile(char *url,       /* input filename */
 /*
    fits_parse_input_filename
    parse the input URL into its basic components.
+   This routine does not support the compspec component.
+*/
+{
+	return ffifile2(url, urltype, infilex, outfile,
+               extspec, rowfilterx, binspec, colspec, pixfilter, 0, status);
+
+} 
+/*--------------------------------------------------------------------------*/
+int ffifile2(char *url,       /* input filename */
+           char *urltype,    /* e.g., 'file://', 'http://', 'mem://' */
+           char *infilex,    /* root filename (may be complete path) */
+           char *outfile,    /* optional output file name            */
+           char *extspec,    /* extension spec: +n or [extname, extver]  */
+           char *rowfilterx, /* boolean row filter expression */
+           char *binspec,    /* histogram binning specifier   */
+           char *colspec,    /* column or keyword modifier expression */
+           char *pixfilter,  /* pixel filter expression */
+           char *compspec,   /* image compression specification */
+           int *status)
+/*
+   fits_parse_input_filename
+   parse the input URL into its basic components.
    This routine is big and ugly and should be redesigned someday!
 */
 { 
     int ii, jj, slen, infilelen, plus_ext = 0, collen;
     char *ptr1, *ptr2, *ptr3, *ptr4, *tmptr;
     int hasAt, hasDot, hasOper, followingOper, spaceTerm, rowFilter;
-    int colStart, binStart, pixStart;
+    int colStart, binStart, pixStart, compStart;
 
 
     /* must have temporary variable for these, in case inputs are NULL */
@@ -4578,7 +4631,7 @@ int ffifile(char *url,       /* input filename */
     if (colspec) *colspec = '\0';
     if (rowfilterx) *rowfilterx = '\0';
     if (pixfilter) *pixfilter = '\0';
- 
+    if (compspec) *compspec = '\0';
     slen = strlen(url);
 
     if (slen == 0)       /* blank filename ?? */
@@ -4911,6 +4964,7 @@ int ffifile(char *url,       /* input filename */
                    /* first brackets must enclose extension name or # */
                    /* or it encloses a image subsection specification */
                    /* or a raw binary image specifier */
+                   /* or a image compression specifier */
 
                    /* Or, the extension specification may have been */
                    /* omitted and we have to guess what the user intended */
@@ -5070,6 +5124,8 @@ int ffifile(char *url,       /* input filename */
             [gtifilter()]
             [regfilter("region.reg")]
 
+            [compress Rice]
+
          There will always be some ambiguity between an extension name and 
          a boolean row filtering expression, (as in a couple of the above
          examples).  If there is any doubt, the expression should be treated
@@ -5112,6 +5168,7 @@ int ffifile(char *url,       /* input filename */
            colStart = 0;
            binStart = 0;
            pixStart = 0;
+           compStart = 0;
 
            if (*tmptr == '@')  /* test for leading @ symbol */
                hasAt = 1;
@@ -5124,6 +5181,10 @@ int ffifile(char *url,       /* input filename */
 
            if ( !strncasecmp(tmptr, "pix", 3) )
               pixStart = 1;
+
+           if ( !strncasecmp(tmptr, "compress ", 9) ||
+                !strncasecmp(tmptr, "compress]", 9) )
+              compStart = 1;
 
            if ( !strncasecmp(tmptr, "gtifilter(", 10) ||
                 !strncasecmp(tmptr, "regfilter(", 10) )
@@ -5178,6 +5239,7 @@ int ffifile(char *url,       /* input filename */
            if ( rowFilter || (pixStart && spaceTerm) ||
                 (hasAt && hasDot) ||
                 hasOper ||
+                compStart ||
                 (spaceTerm && followingOper) )
            {
                /* this is (probably) not an extension specifier */
@@ -5439,7 +5501,56 @@ int ffifile(char *url,       /* input filename */
         strcpy(ptr1, tmpstr);      /* overwrite binspec */
     }
 
+    /* ------------------------------------------------------------ */
+    /* does the filter contain an image compression specification?  */
+    /* ------------------------------------------------------------ */
 
+    ptr1 = strstr(rowfilter, "[compress");
+
+    if (ptr1)
+    {
+      ptr2 = ptr1 + 9;     /* end of the '[compress' string */
+
+      if ( *ptr2 != ' ' && *ptr2 != ']')
+        ptr1 = NULL;   /* compress string must be followed by space or ] */
+    }
+
+    if (ptr1)
+    {
+        /* found the compress string */
+        if (compspec)
+        {
+	    if (strlen(ptr1 +1) > FLEN_FILENAME - 1)
+	    {
+                    free(infile);
+                    return(*status = URL_PARSE_ERROR);
+            }
+
+            strcpy(compspec, ptr1 + 1);       
+            ptr2 = strchr(compspec, ']');
+
+            if (ptr2)      /* terminate the binning filter */
+            {
+                *ptr2 = '\0';
+
+                if ( *(--ptr2) == ' ')  /* delete trailing spaces */
+                    *ptr2 = '\0';
+            }
+            else
+            {
+                ffpmsg("input file URL is missing closing bracket ']'");
+                ffpmsg(rowfilter);
+                free(infile);
+                return(*status = URL_PARSE_ERROR);  /* error, no closing ] */
+            }
+        }
+
+        /* delete the compression spec from the row filter string */
+        ptr2 = strchr(ptr1, ']');
+        strcpy(tmpstr, ptr2+1);  /* copy any chars after the binspec */
+        strcpy(ptr1, tmpstr);    /* overwrite binspec */
+    }
+   
     /* copy the remaining string to the rowfilter output... should only */
     /* contain a rowfilter expression of the form "[expr]"              */
 
@@ -6301,8 +6412,10 @@ int fits_get_token(char **ptr,
    Returns the length of the token, not including the delimiter char;
 */
 {
-    int slen, ii;
-
+    char *loc, tval[73];
+    int slen;
+    double dval;
+    
     *token = '\0';
 
     while (**ptr == ' ')  /* skip over leading blanks */
@@ -6315,20 +6428,24 @@ int fits_get_token(char **ptr,
 
         (*ptr) += slen;                   /* skip over the token */
 
-        if (isanumber)
+        if (isanumber)  /* check if token is a number */
         {
             *isanumber = 1;
- 
-            for (ii = 0; ii < slen; ii++)
-            {
-                if ( !isdigit((int) token[ii]) && token[ii] != '.' && 
-                     token[ii] != '-' && token[ii] != '+' &&
-                     token[ii] != 'E' && token[ii] != 'e')
-                {
-                    *isanumber = 0;
-                    break;
-                }
-            }
+
+	    if (strchr(token, 'D'))  {
+	        strcpy(tval, token);
+
+	        /*  The C language does not support a 'D'; replace with 'E' */
+	        if (loc = strchr(tval, 'D')) *loc = 'E';
+
+	        dval =  strtod(tval, &loc);
+	    } else {
+	        dval =  strtod(token, &loc);
+ 	    }
+
+	    /* check for read error, or junk following the value */
+	    if (*loc != '\0' && *loc != ' ' ) *isanumber = 0;
+	    if (errno == ERANGE) *isanumber = 0;
         }
     }
 

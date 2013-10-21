@@ -12,8 +12,8 @@ rename it gzip.exe, and rename f2c.exe.gz f2c.exz and f2cx.exe f2cx.exz,
 then on the MSDOS machine you can recover f2c.exe and f2cx.exe by
 executing "gzip -dN f2c.exz f2cx.exz".
 
-"xsum f2c.exe f2c.exe.gz" should give you:
-f2c.exe	12dbb72d	245760
-f2c.exe.gz	12fb0f5c	132963
+"xsum f2c.exe f2c.exe.gz" should give you: 
+f2c.exe	b39b23e	245760
+f2c.exe.gz	efe20e82	133264
 
-Last update: 6 March 2003
+Last update: 6 May 2006

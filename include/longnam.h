@@ -554,6 +554,7 @@
 #define fits_modify_vector_len  ffmvec
 
 #define fits_read_img_coord ffgics
+#define fits_read_img_coord_version ffgicsa
 #define fits_read_tbl_coord ffgtcs
 #define fits_pix_to_world ffwldp
 #define fits_world_to_pix ffxypx

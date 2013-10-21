@@ -360,7 +360,7 @@ setdata(register Addrp varp, register Constp valp, ftnint elen)
 		k = elen - valp->vleng->constblock.Const.ci;
 		if(k > 0) {
 			dataline(varname, offset, TYBLANK);
-			fprintf(dfile, "\t%d\n", k);
+			fprintf(dfile, "\t%d\n", (int)k);
 			}
 		break;
 

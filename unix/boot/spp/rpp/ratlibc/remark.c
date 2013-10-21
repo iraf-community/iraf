@@ -3,7 +3,7 @@
 
 #include "ratdef.h"
 
-REMARK (strarg)
+void REMARK (strarg)
 int	*strarg;		/* hollerith string is an integer array */
 {
 	register char  *strin = (char *)strarg;

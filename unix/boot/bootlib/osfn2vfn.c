@@ -51,19 +51,20 @@ char	*osfn;			/* input OS filename	*/
 	
 	os_strupk ("./", x_vfn, SZ_PATHNAME);
 	x_mode = VFN_UNMAP;
-	iferr (vp = VFNOPEN (x_vfn, &x_mode)) {
+	iferr (vp = VFNOPEN (x_vfn, (integer *)&x_mode)) {
 	    vp = 0;
 	    goto err_;
 	}
 
 	strcpy ((char *)x_osfn, osfn);
-	iferr (nchars = VFNUNMAP (&vp, x_osfn, x_vfn, &x_maxch))
-	    goto err_;
+	iferr (nchars = VFNUNMAP ((integer *)&vp, x_osfn, x_vfn, 
+	    (integer *)&x_maxch))
+	        goto err_;
 	if (nchars < 0)
 	    goto err_;
 
 	x_mode = VFN_NOUPDATE;
-	VFNCLOSE (&vp, &x_mode);
+	VFNCLOSE ((integer *)&vp, (integer *)&x_mode);
 
 	os_strpak (x_vfn, vfn, SZ_PATHNAME);
 	return (vfn);
@@ -71,7 +72,7 @@ char	*osfn;			/* input OS filename	*/
 err_:
 	fprintf (stderr, "cannot unmap filename `%s'\n", osfn);
 	if (vp > 0)
-	    VFNCLOSE (&vp, &x_mode);
+	    VFNCLOSE ((integer *)&vp, (integer *)&x_mode);
 
 	strcpy (vfn, osfn);
 	return (vfn);

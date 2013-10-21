@@ -46,6 +46,9 @@
 
 #include "samp.h"
 
+typedef void  (*SIGFUNC)();             /* signal handler type          */
+
+
 
 Samp        *sampP;			/** SAMP struct pointer		*/
 handle_t     sampH;			/** SAMP handle			*/
@@ -61,6 +64,7 @@ extern long  hubHandles[MAX_HUBS];	/** Handles for hubs		*/
 
 static int  samp_initServer (Samp *sampP);
 static void samp_printSubs (Samp *sampP);
+void 	    samp_Exit (void);		/** exit handler		*/
 
 
 
@@ -110,6 +114,7 @@ sampInit (String appName, String description)
     sampP->serverPort      = samp_serverPort ();
     sampP->svrThread       = (pthread_t) 0;
     sampP->defaultUserFunc = NULL;
+    sampP->mapClients 	   = TRUE;
 
     sampTrace (handle, "%d = sampInit(%s,'%s')\n", handle,appName,description);
     
@@ -119,15 +124,43 @@ sampInit (String appName, String description)
     nullList = samp_newList ();
 
     /*  Create a OK map for messages when there is no real value to be 
-     * returned.
+     *  returned.
      */
     OK_Map = samp_newMap ();
         samp_setStringInMap (OK_Map, "samp.status", "samp.ok");
         samp_setMapInMap (OK_Map, "samp.result", nullMap);
 
-    /* Return the handle to the structure.
+    /*  Install signal handlers to do a proper cleanup.
+     */
+#ifndef IRAF
+    signal (SIGCHLD, (SIGFUNC)samp_Exit);
+    signal (SIGINT,  (SIGFUNC)samp_Exit);
+#endif
+
+    /*  Return the handle to the structure.
      */
     return ( handle );
+}
+
+
+/**
+ *  SAMP_EXIT -- Cleanup at application exit.
+ *
+ *  @brief  	Cleanup at application exit.
+ *  @fn		void samp_Exit (void)
+ * 
+ *  @return		nothing
+ */
+void 
+samp_Exit (void)
+{
+    if (sampP) {
+	handle_t sampH = samp_P2H (sampP);
+
+	(void) sampShutdown (sampH);
+        sampClose (sampH);
+	exit (0);
+    }
 }
 
 
@@ -147,11 +180,17 @@ sampClose (handle_t handle)
 
 
     sampTrace (handle, "sampClose (%d)\n", handle);
+    if (sampP == (Samp *) NULL)
+	return;
 
     /* Close existing Hub handle.
      */
-    if (sampP->hubHandle > 0 && samp_hubClose (sampP->hubHandle) != SAMP_OK)
-	fprintf (stderr, "Error closing Hub connection.\n");
+    if (sampP && sampP->hub) {
+      if (sampP->hubHandle > 0 && samp_hubClose (sampP->hubHandle) != SAMP_OK)
+	  if (sampP->verbose)
+	      fprintf (stderr, "Error closing Hub connection.\n");
+    }
+    sampP->hubHandle = 0;
 
     if (sampP->hub)				/* free Hub structure	*/
 	 free ((void *) sampP->hub);
@@ -162,7 +201,7 @@ sampClose (handle_t handle)
     sampP->hubHandle = -1;
     samp_freeHandle (handle);
 
-    free ((void *) sampP);			/* free SAMP structure	*/
+    if (sampP) free ((void *) sampP);		/* free SAMP structure	*/
     sampP = (Samp *) NULL;
 }
 
@@ -259,28 +298,30 @@ sampStartup (handle_t handle)
     if (sampP->hub) {
 	char  base[SZ_LINE];
 
-        /*  Final step is to gather the metadata from the other attached
-         *  clients.  This allows us to send messages to the appName and not
-         *  just the public ID.
-         */
-        samp_mapClients (handle);
+	if (sampP->mapClients) {
+            /*  Final step is to gather the metadata from the other attached
+             *  clients.  This allows us to send messages to the appName and not
+             *  just the public ID.
+             */
+            samp_mapClients (handle);
 
-	/* First get the list of currently registered clients.  If we find
- 	 * one already registered using our name, add a number to the name
-	 * and try agin.
-	 */
-	memset (base, 0, SZ_LINE);
-	strcpy (base, sampP->appName);
-	while (!done) {
-	    done = 1;
-            for (i=0; i < sampP->nclients; i++) {
-                if (strcasecmp (sampP->appName, sampP->clients[i].name) == 0) {
-		    sprintf (sampP->appName, "%s%d", base, ++appnum);
-    		    strcpy (hub->appName, sampP->appName);
-		    done = 0;
-                    break;
+	    /* First get the list of currently registered clients.  If we find
+ 	     * one already registered using our name, add a number to the name
+	     * and try agin.
+	     */
+	    memset (base, 0, SZ_LINE);
+	    strcpy (base, sampP->appName);
+	    while (!done) {
+	        done = 1;
+                for (i=0; i < sampP->nclients; i++) {
+                    if (strcasecmp (sampP->appName,sampP->clients[i].name)==0) {
+		        sprintf (sampP->appName, "%s%d", base, ++appnum);
+    		        strcpy (hub->appName, sampP->appName);
+		        done = 0;
+                        break;
+                    }
                 }
-            }
+	    }
 	}
 
         if (samp_hubDeclareMetadata (hub) != SAMP_OK) {
@@ -319,7 +360,8 @@ sampShutdown (handle_t handle)
     /* Close existing Hub handle.
      */
     if (sampP->hubHandle > 0 && samp_hubClose (sampP->hubHandle) != SAMP_OK)
-        fprintf (stderr, "Error closing Hub connection.\n");
+	if (sampP->verbose)
+            fprintf (stderr, "Error closing Hub connection.\n");
 
     /*  Stop XML-RPC server thread
      */
@@ -353,6 +395,31 @@ samp_hubActive (handle_t handle)
     return (sampP->active);
 }
 
+
+/**
+ *  SAMP_HUBACTIVE -- Determine if the Hub is active (i.e. connected).
+ *
+ *  @brief  	Determine if the Hub is active (i.e. connected).
+ *  @fn		samp_hubActive (handle_t handle)
+ * 
+ *  @param handle	user handle to samp struct
+ *  @return		nothing
+ */
+int 
+samp_setOpt (handle_t handle, char *opt, int value)
+{
+    Samp *sampP = samp_H2P (handle);
+
+    if (strcasecmp ("mapClients", opt) == 0) {
+	sampP->mapClients = value;
+    }
+
+    return (0);
+}
+
+
+
+/*****************************************************************************/
 
 
 /*****************************************************************************/
@@ -576,6 +643,24 @@ samp_setNotifyMode (handle_t handle)
 
 
 /**
+ *  SAMP_SETMSGMODE -- Set the message pattern to the specified mode.
+ *
+ *  @brief	Set the message pattern to the specified mode.
+ *  @fn 	samp_setMsgMode (handle_t handle, int mode)
+ * 
+ *  @param  handle	samp handle
+ *  @param  mode	message mode
+ *  @return		nothing
+ */
+void
+samp_setMsgMode (handle_t handle, int mode)
+{
+    Samp *sampP = samp_H2P (handle);
+    sampP->msgMode = mode;
+}
+
+
+/**
  *  SAMP_SETCALLBYREF -- Have interface call user handlers by reference.
  *
  *  @brief	Have interface call user handlers by reference.
@@ -765,7 +850,10 @@ samp_mapClients (handle_t handle)
 	sampP->nclients++;
 	strcpy (sampP->clients[i].name, sres);
 	strcpy (sampP->clients[i].pubId, pub);
-	xr_freeStruct (resp);
+	/*
+	if (resp) 
+	    xr_freeStruct (resp);
+	*/
     }
     samp_freeList (clients);
 
@@ -805,8 +893,7 @@ samp_addClient (handle_t handle, String name, String id)
 
 
 /**
- *  SAMP_ADDCLIENT -- Add a newly registered client to the list of known
- *  apps so we can do the public-private name translation.
+ *  SAMP_LISTCLIENTS -- List the available clients to stdout.
  */
 int
 samp_listClients (handle_t handle)
@@ -814,12 +901,37 @@ samp_listClients (handle_t handle)
     Samp  *sampP = samp_H2P (handle);	/* get struct pointer	*/
     register int  i = 0;
 
-
     for (i=0; i < sampP->nclients; i++)
-	printf ("%2d:  PubID = '%s'  Name = '%s'\n",
+	printf ("%2d:  PubID = '%s'\tName = '%s'\n",
 	    i, sampP->clients[i].pubId, sampP->clients[i].name);
 
     return (SAMP_OK);
+}
+
+
+/**
+ *  SAMP_GETCLIENTS -- Get a list of clients as a character string as
+ *  the PubID and Name separated by a space, one client per line.
+ */
+
+#define SZ_CLIENT_LIST		1024
+
+char *
+samp_getClients (handle_t handle)
+{
+    Samp  *sampP = samp_H2P (handle);	/* get struct pointer	*/
+    static char clients[SZ_CLIENT_LIST];
+    register int  i = 0;
+
+    memset (clients, 0, SZ_CLIENT_LIST);
+    for (i=0; i < sampP->nclients; i++) {
+	strcat (clients, sampP->clients[i].pubId);
+	strcat (clients, " ");
+	strcat (clients, sampP->clients[i].name);
+	strcat (clients, "\n");
+    }
+	
+    return (clients);
 }
 
 

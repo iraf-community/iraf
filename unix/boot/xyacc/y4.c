@@ -26,9 +26,10 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-#pragma ident	"%Z%%M%	%I%	%E% SMI"
+//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include "dextern.h"
+#include <wctype.h>
 #define	NOMORE -1000
 
 static void gin (int);
@@ -381,6 +382,7 @@ nxti ()
     /* finds the next i */
     int i, max, maxi;
     max = 0;
+    maxi = 0;
 
     for (i = 1; i <= nnonter; ++i)
 	if (ggreed[i] >= max) {
@@ -452,7 +454,7 @@ arout (s, v, n)
      char *s;
      int *v, n;
 {
-    register i, j;
+    register int i, j;
 
     fprintf (ftable, "short\t%s[%d]\n", s, n);
 

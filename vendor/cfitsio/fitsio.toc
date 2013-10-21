@@ -27,6 +27,7 @@
 \contentsline {subsection}{\numberline {4.12.4}HIERARCH Convention for Extended Keyword Names}{23}
 \contentsline {section}{\numberline {4.13}Optimizing Code for Maximum Processing Speed}{24}
 \contentsline {subsection}{\numberline {4.13.1}Background Information: How CFITSIO Manages Data I/O}{25}
+\contentsline {subsection}{\numberline {4.13.2}Optimization Strategies}{25}
 \contentsline {chapter}{\numberline {5} Basic Interface Routines }{29}
 \contentsline {section}{\numberline {5.1}FITSIO Error Status Routines }{29}
 \contentsline {section}{\numberline {5.2}File I/O Routines}{30}

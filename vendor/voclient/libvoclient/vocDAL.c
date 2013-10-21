@@ -142,7 +142,7 @@ voc_coneCaller (char *url, double ra, double dec, double sr, int otype)
     /*  Initialize the VOClient code.  Error messages are printed by the
      *  interface so we just quit if there is a problem.
      */
-    if (voc_initVOClient (NULL) == ERR)  	/* FIXME		*/
+    if (!vo && voc_initVOClient (NULL) == ERR)
         return ((char *)NULL);
 
     /*  Get a new connection to the named service.
@@ -196,7 +196,7 @@ voc_siapCaller (char *url, double ra, double dec, double rsize, double dsize,
     /*  Initialize the VOClient code.  Error messages are printed by the
      *  interface so we just quit if there is a problem.
      */
-    if (voc_initVOClient (NULL) == ERR) 	/* FIXME		*/
+    if (!vo && voc_initVOClient (NULL) == ERR)
         return ((char *) NULL);
 
     /*  Get a new connection to the named service.
@@ -254,7 +254,7 @@ voc_ssapCaller (char *url, double ra, double dec, double size,
     /*  Initialize the VOClient code.  Error messages are printed by the
      *  interface so we just quit if there is a problem.
      */
-    if (voc_initVOClient (NULL) == ERR) 	/* FIXME		*/
+    if (!vo && voc_initVOClient (NULL) == ERR)
         return ((char *) NULL);
 
     /*  Get a new connection to the named service.
@@ -326,10 +326,9 @@ voc_getRawURL (char *url, int *nbytes)
         /* Skip leading newlines	
         */
         while ((c = *ip) == '\n') {
-	    ip++; 
-	    nb--;
+	    ip++,  nb--;
         }
-	buf = calloc (nb, sizeof (char));
+	buf = calloc (result->buflen+2, sizeof (char));
 	memmove (buf, ip, nb);
         *nbytes = nb;
     }
@@ -592,7 +591,8 @@ voc_getConeQuery (DAL dal, double ra, double dec, double sr)
     
     /*  Add a RUNID string to the query for logging.
      */
-    voc_addStringParam (query, "RUNID", vo->runid);
+    if (vo->use_runid)
+        voc_addStringParam (query, "RUNID", vo->runid);
 
     return (query);
 }
@@ -645,7 +645,8 @@ voc_getSiapQuery (DAL dal, double ra, double dec, double ra_size,
     
     /*  Add a RUNID string to the query for logging.
      */
-    voc_addStringParam (query, "RUNID", vo->runid);
+    if (vo->use_runid)
+	voc_addStringParam (query, "RUNID", vo->runid);
 
     return (query);
 }
@@ -693,7 +694,8 @@ voc_getSsapQuery (DAL dal, double ra, double dec, double size, char *band,
     
     /*  Add a RUNID string to the query for logging.
      */
-    voc_addStringParam (query, "RUNID", vo->runid);
+    if (vo->use_runid)
+	voc_addStringParam (query, "RUNID", vo->runid);
 
     return (query);
 }

@@ -108,7 +108,7 @@ begin
 		# Fit.
 		do i = 1, npts {
 		    if (wts[i] > PIXEL(0.0))
-		        wts[i] = Memr[oldwts+i-1]
+		        wts[i] = Mem$t[oldwts+i-1]
 		}
 		call in_fit$t (in, nl, x, y, wts, npts, nvars, wtflag, stat)
 

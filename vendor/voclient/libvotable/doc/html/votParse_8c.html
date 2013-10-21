@@ -29,7 +29,12 @@
 <code>#include &lt;string.h&gt;</code><br>
 <code>#include &lt;expat.h&gt;</code><br>
 <code>#include &lt;unistd.h&gt;</code><br>
+<code>#include &lt;assert.h&gt;</code><br>
 <code>#include &lt;ctype.h&gt;</code><br>
+<code>#include &lt;sys/stat.h&gt;</code><br>
+<code>#include &lt;curl/curl.h&gt;</code><br>
+<code>#include &lt;curl/types.h&gt;</code><br>
+<code>#include &lt;curl/easy.h&gt;</code><br>
 <code>#include &quot;<a class="el" href="votParseP_8h_source.html">votParseP.h</a>&quot;</code><br>
 <code>#include &quot;<a class="el" href="votParse_8h_source.html">votParse.h</a>&quot;</code><br>
 <table border="0" cellpadding="0" cellspacing="0">
@@ -69,6 +74,9 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#014fabbc855181d68dfea2ddfd0fc1a2">vot_getBINARY</a> (handle_t handle)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the BINARY node from the parent handle.  <a href="#014fabbc855181d68dfea2ddfd0fc1a2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#fa4e525692b7538f81b9b1e759a642f0">vot_getBINARY2</a> (handle_t handle)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the BINARY2 node from the parent handle.  <a href="#fa4e525692b7538f81b9b1e759a642f0"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#fadc14723954225b56a12b48ab78a50b">vot_getFITS</a> (handle_t handle)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the FITS node from the parent handle.  <a href="#fadc14723954225b56a12b48ab78a50b"></a><br></td></tr>
@@ -111,12 +119,81 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#33e1c4a4f3752beeb62fd8d88d1d2ca2">vot_getCOOSYS</a> (handle_t handle)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the COOSYS node from the parent handle.  <a href="#33e1c4a4f3752beeb62fd8d88d1d2ca2"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="22027ab5bee16020fd23a4a2132a80d8"></a><!-- doxytag: member="votParse.c::vot_getDATAType" ref="22027ab5bee16020fd23a4a2132a80d8" args="(handle_t data_h)" -->
-int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_getDATAType</b> (handle_t data_h)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#458d365096a2f3602a1a6443c392a9e9">vot_getDATAType</a> (handle_t data_h)</td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the type of the DATA element.  <a href="#458d365096a2f3602a1a6443c392a9e9"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#b3cc5a3facdd5451e81dfe9c337184d0">vot_getDATATypeString</a> (handle_t data_h)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the type of the DATA element.  <a href="#b3cc5a3facdd5451e81dfe9c337184d0"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the type of the DATA element as a string.  <a href="#b3cc5a3facdd5451e81dfe9c337184d0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#533e8601d14245fb5167b188195db93c">vot_newRESOURCE</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new RESOURCE node under the parent handle.  <a href="#533e8601d14245fb5167b188195db93c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#9b3b14d5e15a9384be65b8aa49c33d85">vot_newTABLE</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new TABLE node under the parent handle.  <a href="#9b3b14d5e15a9384be65b8aa49c33d85"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#ffb519519c2a850cd9cf7eb9060f45cf">vot_newFIELD</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new FIELD node under the parent handle.  <a href="#ffb519519c2a850cd9cf7eb9060f45cf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#5c824351474fad74aa22a21d242207d8">vot_newDATA</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new DATA node under the parent handle.  <a href="#5c824351474fad74aa22a21d242207d8"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#b2d26904f7e0e73b08efdb0cea7d2b37">vot_newTABLEDATA</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new TABLEDATA node under the parent handle.  <a href="#b2d26904f7e0e73b08efdb0cea7d2b37"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#dbdaa6d5a36014a2b9706454530079ef">vot_newTR</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new TR node under the parent handle.  <a href="#dbdaa6d5a36014a2b9706454530079ef"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#4d9959a7a406212ff0a3846ce83a3df9">vot_newTD</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new TD node under the parent handle.  <a href="#4d9959a7a406212ff0a3846ce83a3df9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#66d0fc2beb2ef9e36827f76536996fe4">vot_newBINARY</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new BINARY node under the parent handle.  <a href="#66d0fc2beb2ef9e36827f76536996fe4"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#75230378094d2ae4a0e251b6375cb6f9">vot_newBINARY2</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new BINARY2 node under the parent handle.  <a href="#75230378094d2ae4a0e251b6375cb6f9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#b2747ed1c27749cdc71c777e80860d65">vot_newFITS</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new FITS node under the parent handle.  <a href="#b2747ed1c27749cdc71c777e80860d65"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#007736cbf81342651f68c5d13defb430">vot_newGROUP</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new GROUP node under the parent handle.  <a href="#007736cbf81342651f68c5d13defb430"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#3c96074082ed42497d16710349d5cc24">vot_newFIELDRef</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new FIELDref node under the parent handle.  <a href="#3c96074082ed42497d16710349d5cc24"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#4e13c3061bbd014b7bbf22ff13a3d5b0">vot_newPARAMRef</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new PARAMRef node under the parent handle.  <a href="#4e13c3061bbd014b7bbf22ff13a3d5b0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#40c235bcee979806d4e9a4e19d653e5a">vot_newDESCRIPTION</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new DESCRIPTION node under the parent handle.  <a href="#40c235bcee979806d4e9a4e19d653e5a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#fd01485535d703abdcdebf94090c368a">vot_newPARAM</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new PARAM node under the parent handle.  <a href="#fd01485535d703abdcdebf94090c368a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#070b31a75054f0dca1c1f95413feb57a">vot_newINFO</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new INFO node under the parent handle.  <a href="#070b31a75054f0dca1c1f95413feb57a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#859c2bb4a2c46a3f0b4f6c1baceb0b0c">vot_newSTREAM</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new STREAM node under the parent handle.  <a href="#859c2bb4a2c46a3f0b4f6c1baceb0b0c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#386be2face7c78b44c1fc8a507de9905">vot_newVALUES</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new VALUES node under the parent handle.  <a href="#386be2face7c78b44c1fc8a507de9905"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#e83ea7fecfe55213807cdcfaf98e8c70">vot_newMIN</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new MIN node under the parent handle.  <a href="#e83ea7fecfe55213807cdcfaf98e8c70"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#377b833aaf74d26159ebb769f6bbb2a1">vot_newMAX</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new MAX node under the parent handle.  <a href="#377b833aaf74d26159ebb769f6bbb2a1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#4acd4ce8efb3c972a7d25c5eaaac3b48">vot_newOPTION</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new OPTION node under the parent handle.  <a href="#4acd4ce8efb3c972a7d25c5eaaac3b48"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#239b0beb633d364c304e77188b6842ef">vot_newLINK</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new LINK node under the parent handle.  <a href="#239b0beb633d364c304e77188b6842ef"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#53caf9cc36f817a213a4b9f1047c9250">vot_newCOOSYS</a> (handle_t parent_h)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new COOSYS node under the parent handle.  <a href="#53caf9cc36f817a213a4b9f1047c9250"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#d87843bde9d0d99c5e20311f8820eba6">vot_newNode</a> (handle_t parent, int type)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Creates a new blank unlinked node.  <a href="#d87843bde9d0d99c5e20311f8820eba6"></a><br></td></tr>
@@ -141,13 +218,31 @@ int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_getDATAType</b> (h
 <tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#f5cc4f23dd183be8336e74686e46f6da">vot_getTableCell</a> (handle_t tdata_h, int row, int col)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the nuber of columns in the structure.  <a href="#f5cc4f23dd183be8336e74686e46f6da"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="560f5059ffbabc3802522fccecca3a14"></a><!-- doxytag: member="votParse.c::vot_tableCompare" ref="560f5059ffbabc3802522fccecca3a14" args="(const void *row1, const void *row2)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_tableCompare</b> (const void *row1, const void *row2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="26516f1b1af65cc75d1c533220fef696"></a><!-- doxytag: member="votParse.c::vot_sortTable" ref="26516f1b1af65cc75d1c533220fef696" args="(handle_t tdata_h, int col, int strsort, int order)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_sortTable</b> (handle_t tdata_h, int col, int strsort, int order)</td></tr>
+
 <tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#02de38f123a9b7cbd24bee996b8ecc10">vot_getLength</a> (handle_t elem_h)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the number of sibling Elements of the same type.  <a href="#02de38f123a9b7cbd24bee996b8ecc10"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#6b7565c412ba45c5578a61dda5afd1c1">vot_getNumberOf</a> (handle_t elem_h, int type)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the number of sibling Elements of the type.  <a href="#6b7565c412ba45c5578a61dda5afd1c1"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#a11bb4e59e1dd773771e25ce7a40bb61">vot_findByAttr</a> (handle_t parent, char *name, char *value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="3b88f976d0fb4d94c8fca96aeba9815e"></a><!-- doxytag: member="votParse.c::vot_colByAttr" ref="3b88f976d0fb4d94c8fca96aeba9815e" args="(int tab, char *attr, char *name, char *alt)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_colByAttr</b> (int tab, char *attr, char *<a class="el" href="votElement_8c.html#5ac083a645d964373f022d03df4849c8">name</a>, char *alt)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="f665b8c5b5bce1d7e68a50f5f356b256"></a><!-- doxytag: member="votParse.c::vot_colByName" ref="f665b8c5b5bce1d7e68a50f5f356b256" args="(int tab, char *name, char *alt)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_colByName</b> (int tab, char *<a class="el" href="votElement_8c.html#5ac083a645d964373f022d03df4849c8">name</a>, char *alt)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="4b7591b70ef2df63dd8516dd15553cac"></a><!-- doxytag: member="votParse.c::vot_colByUCD" ref="4b7591b70ef2df63dd8516dd15553cac" args="(int tab, char *name, char *alt)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_colByUCD</b> (int tab, char *<a class="el" href="votElement_8c.html#5ac083a645d964373f022d03df4849c8">name</a>, char *alt)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="bb0eb690fb14450e518d2fa82f88c156"></a><!-- doxytag: member="votParse.c::vot_colByID" ref="bb0eb690fb14450e518d2fa82f88c156" args="(int tab, char *name, char *alt)" -->
+int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_colByID</b> (int tab, char *<a class="el" href="votElement_8c.html#5ac083a645d964373f022d03df4849c8">name</a>, char *alt)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#a11bb4e59e1dd773771e25ce7a40bb61">vot_findByAttr</a> (handle_t parent, char *<a class="el" href="votElement_8c.html#5ac083a645d964373f022d03df4849c8">name</a>, char *value)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get a handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> with the requested attribute.  <a href="#a11bb4e59e1dd773771e25ce7a40bb61"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">handle_t *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#b334dc390ea30a9e8bdc2c2c01b21deb">vot_findInGroup</a> (handle_t group, int type)</td></tr>
@@ -186,12 +281,38 @@ int&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_getDATAType</b> (h
 <tr><td class="memItemLeft" nowrap align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#63e8d82821f4b42083c6b63c21bdfffe">vot_getAttr</a> (handle_t elem_h, char *attr)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the attribute for the <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a>.  <a href="#63e8d82821f4b42083c6b63c21bdfffe"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#3693c41e776d763abe69428750c13e51">vot_writeVOTable</a> (handle_t node, FILE *fd)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#e900f566d3ba4816476b5a4b7ee8d772">vot_writeVOTable</a> (handle_t node, char *fname, int indent)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor.  <a href="#3693c41e776d763abe69428750c13e51"></a><br></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor.  <a href="#e900f566d3ba4816476b5a4b7ee8d772"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#dda7f3daced5125c581a7c7c8743eb7f">vot_writeHTML</a> (handle_t node, char *ifname, char *ofname)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as HTML.  <a href="#dda7f3daced5125c581a7c7c8743eb7f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#796870e256501455dbeeb37d5ad3f34a">vot_writeSHTML</a> (handle_t node, char *ifname, char *ofname)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as an HTML table.  <a href="#796870e256501455dbeeb37d5ad3f34a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#5c74670a17d17908075ba315ff4f16c0">vot_writeFITS</a> (handle_t node, char *fname)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as an FITS table.  <a href="#5c74670a17d17908075ba315ff4f16c0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="4010feb574c20becf36757005758ef04"></a><!-- doxytag: member="votParse.c::vot_writeDelimited" ref="4010feb574c20becf36757005758ef04" args="(handle_t vot, char *fname, char delim, int hdr)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>vot_writeDelimited</b> (handle_t vot, char *fname, char delim, int hdr)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#7e080fb459b7aaa36a086e3aeb153f5e">vot_writeASV</a> (handle_t node, char *fname, int header)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as a ASV file.  <a href="#7e080fb459b7aaa36a086e3aeb153f5e"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#c6ff4fb7fae0bbf78633738447fb9b60">vot_writeBSV</a> (handle_t node, char *fname, int header)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as a BSV file.  <a href="#c6ff4fb7fae0bbf78633738447fb9b60"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#bd35238a3744eed55c11ebf5b24da87b">vot_writeCSV</a> (handle_t node, char *fname, int header)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as a CSV file.  <a href="#bd35238a3744eed55c11ebf5b24da87b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#756fd6178fc599d6fda55d7127c38f79">vot_writeTSV</a> (handle_t node, char *fname, int header)</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Write the VOTable to the file descriptor as a TSV file.  <a href="#756fd6178fc599d6fda55d7127c38f79"></a><br></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#3d0ad178e6974fb915d4b0b3efcad4c7">vot_setWarnings</a> (int value)</td></tr>
 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the warning level.  <a href="#3d0ad178e6974fb915d4b0b3efcad4c7"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#450a2645f182104c3a0445f022bdbf01">votEmsg</a> (char *msg)</td></tr>
+
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="structStack.html">Stack</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="votParse_8c.html#8972288a8eaa6d5249e562915527a958">element_stack</a> = NULL</td></tr>
 
@@ -203,6 +324,17 @@ char *&nbsp;</td><td class="memItemRight" valign="bottom"><b>votELevel</b> = &qu
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="d818c9653e001b7c8bf7cffd3b69b2a6"></a><!-- doxytag: member="votParse.c::votWarn" ref="d818c9653e001b7c8bf7cffd3b69b2a6" args="" -->
 int&nbsp;</td><td class="memItemRight" valign="bottom"><b>votWarn</b> = 0</td></tr>
+
+<tr><td class="memItemLeft" nowrap><a class="anchor" name="e9ea24a4aa20e4c6c60c3a23bded6fd6"></a><!-- doxytag: member="votParse.c::elemParents" ref="e9ea24a4aa20e4c6c60c3a23bded6fd6" args="[]" -->
+struct {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;int&nbsp;&nbsp;&nbsp;<b>type</b></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;int&nbsp;&nbsp;&nbsp;<a class="el" href="votParse_8c.html#3c69fd8b9b1c377197c9214043ed2c82">parents</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;int&nbsp;&nbsp;&nbsp;<a class="el" href="votParse_8c.html#93ed9b546e7fadad14615c5ef0065277">children</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><b>elemParents</b> []</td></tr>
 
 </table>
 <hr><h2>Detailed Description</h2>
@@ -531,6 +663,35 @@ vot_getBINARY -- Gets the BINARY node from the parent handle<p>
 
 </div>
 </div><p>
+<a class="anchor" name="fa4e525692b7538f81b9b1e759a642f0"></a><!-- doxytag: member="votParse.c::vot_getBINARY2" ref="fa4e525692b7538f81b9b1e759a642f0" args="(handle_t handle)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_getBINARY2           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>handle</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Gets the BINARY2 node from the parent handle. 
+<p>
+vot_getBINARY2 -- Gets the BINARY2 node from the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>handle</em>&nbsp;</td><td>Parent handle containing a BINARY2 </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first BINARY2 node, or zero </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="e0b096dc07c30708e6e86cf81750a01f"></a><!-- doxytag: member="votParse.c::vot_getChild" ref="e0b096dc07c30708e6e86cf81750a01f" args="(handle_t elem_h)" -->
 <div class="memitem">
 <div class="memproto">
@@ -657,6 +818,35 @@ vot_getDATA -- Gets the DATA node from the parent handle<p>
 
 </div>
 </div><p>
+<a class="anchor" name="458d365096a2f3602a1a6443c392a9e9"></a><!-- doxytag: member="votParse.c::vot_getDATAType" ref="458d365096a2f3602a1a6443c392a9e9" args="(handle_t data_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * vot_getDATAType           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>data_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the type of the DATA element. 
+<p>
+vot_getDATAType -- Returns the type of the DATA element.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>data_h</em>&nbsp;</td><td>A handle_t to a DATA </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The type as an int </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="b3cc5a3facdd5451e81dfe9c337184d0"></a><!-- doxytag: member="votParse.c::vot_getDATATypeString" ref="b3cc5a3facdd5451e81dfe9c337184d0" args="(handle_t data_h)" -->
 <div class="memitem">
 <div class="memproto">
@@ -674,16 +864,8 @@ vot_getDATA -- Gets the DATA node from the parent handle<p>
 <div class="memdoc">
 
 <p>
-Returns the type of the DATA element. 
+Returns the type of the DATA element as a string. 
 <p>
-Returns the type of the DATA element as a string.<p>
-vot_getDATAType -- Returns the type of the DATA element.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>data_h</em>&nbsp;</td><td>A handle_t to a DATA </td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The type as an int</dd></dl>
 vot_getDATATypeString -- Returns the type of the DATA element as a string.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
@@ -1533,6 +1715,383 @@ vot_getVALUES -- Gets the VALUES node from the parent handle<p>
 
 </div>
 </div><p>
+<a class="anchor" name="66d0fc2beb2ef9e36827f76536996fe4"></a><!-- doxytag: member="votParse.c::vot_newBINARY" ref="66d0fc2beb2ef9e36827f76536996fe4" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newBINARY           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new BINARY node under the parent handle. 
+<p>
+vot_newBINARY -- Create new BINARY node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a BINARY </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first BINARY node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="75230378094d2ae4a0e251b6375cb6f9"></a><!-- doxytag: member="votParse.c::vot_newBINARY2" ref="75230378094d2ae4a0e251b6375cb6f9" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newBINARY2           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new BINARY2 node under the parent handle. 
+<p>
+vot_newBINARY2 -- Create new BINARY2 node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a BINARY2 </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first BINARY2 node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="53caf9cc36f817a213a4b9f1047c9250"></a><!-- doxytag: member="votParse.c::vot_newCOOSYS" ref="53caf9cc36f817a213a4b9f1047c9250" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newCOOSYS           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new COOSYS node under the parent handle. 
+<p>
+vot_newCOOSYS -- Create new COOSYS node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a COOSYS </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first COOSYS node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5c824351474fad74aa22a21d242207d8"></a><!-- doxytag: member="votParse.c::vot_newDATA" ref="5c824351474fad74aa22a21d242207d8" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newDATA           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new DATA node under the parent handle. 
+<p>
+vot_newDATA -- Create new DATA node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a DATA </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first DATA node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="40c235bcee979806d4e9a4e19d653e5a"></a><!-- doxytag: member="votParse.c::vot_newDESCRIPTION" ref="40c235bcee979806d4e9a4e19d653e5a" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newDESCRIPTION           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new DESCRIPTION node under the parent handle. 
+<p>
+vot_newDESCRIPTION -- Create new DESCRIPTION node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a DESCRIPTION </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first DESCRIPTION node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="ffb519519c2a850cd9cf7eb9060f45cf"></a><!-- doxytag: member="votParse.c::vot_newFIELD" ref="ffb519519c2a850cd9cf7eb9060f45cf" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newFIELD           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new FIELD node under the parent handle. 
+<p>
+vot_newFIELD -- Create new FIELD node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a FIELD </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first FIELD node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3c96074082ed42497d16710349d5cc24"></a><!-- doxytag: member="votParse.c::vot_newFIELDRef" ref="3c96074082ed42497d16710349d5cc24" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newFIELDRef           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new FIELDref node under the parent handle. 
+<p>
+vot_newFIELDref -- Create new FIELDref node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a FIELDref </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first FIELDref node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b2747ed1c27749cdc71c777e80860d65"></a><!-- doxytag: member="votParse.c::vot_newFITS" ref="b2747ed1c27749cdc71c777e80860d65" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newFITS           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new FITS node under the parent handle. 
+<p>
+vot_newFITS -- Create new FITS node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a FITS </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first FITS node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="007736cbf81342651f68c5d13defb430"></a><!-- doxytag: member="votParse.c::vot_newGROUP" ref="007736cbf81342651f68c5d13defb430" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newGROUP           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new GROUP node under the parent handle. 
+<p>
+vot_newGROUP -- Create new GROUP node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a GROUP </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first GROUP node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="070b31a75054f0dca1c1f95413feb57a"></a><!-- doxytag: member="votParse.c::vot_newINFO" ref="070b31a75054f0dca1c1f95413feb57a" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newINFO           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new INFO node under the parent handle. 
+<p>
+vot_newINFO -- Create new INFO node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a INFO </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first INFO node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="239b0beb633d364c304e77188b6842ef"></a><!-- doxytag: member="votParse.c::vot_newLINK" ref="239b0beb633d364c304e77188b6842ef" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newLINK           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new LINK node under the parent handle. 
+<p>
+vot_newLINK -- Create new LINK node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a LINK </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first LINK node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="377b833aaf74d26159ebb769f6bbb2a1"></a><!-- doxytag: member="votParse.c::vot_newMAX" ref="377b833aaf74d26159ebb769f6bbb2a1" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newMAX           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new MAX node under the parent handle. 
+<p>
+vot_newMAX -- Create new MAX node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a MAX </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first MAX node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e83ea7fecfe55213807cdcfaf98e8c70"></a><!-- doxytag: member="votParse.c::vot_newMIN" ref="e83ea7fecfe55213807cdcfaf98e8c70" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newMIN           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new MIN node under the parent handle. 
+<p>
+vot_newMIN -- Create new MIN node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a MIN </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first MIN node, or zero </dd></dl>
+
+</div>
+</div><p>
 <a class="anchor" name="d87843bde9d0d99c5e20311f8820eba6"></a><!-- doxytag: member="votParse.c::vot_newNode" ref="d87843bde9d0d99c5e20311f8820eba6" args="(handle_t parent, int type)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1569,6 +2128,296 @@ vot_newNode -- Creates a new blank unlinked node.<p>
   </table>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the created node </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4acd4ce8efb3c972a7d25c5eaaac3b48"></a><!-- doxytag: member="votParse.c::vot_newOPTION" ref="4acd4ce8efb3c972a7d25c5eaaac3b48" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newOPTION           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new OPTION node under the parent handle. 
+<p>
+vot_newOPTION -- Create new OPTION node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a OPTION </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first OPTION node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fd01485535d703abdcdebf94090c368a"></a><!-- doxytag: member="votParse.c::vot_newPARAM" ref="fd01485535d703abdcdebf94090c368a" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newPARAM           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new PARAM node under the parent handle. 
+<p>
+vot_newPARAM -- Create new PARAM node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a PARAM </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first PARAM node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4e13c3061bbd014b7bbf22ff13a3d5b0"></a><!-- doxytag: member="votParse.c::vot_newPARAMRef" ref="4e13c3061bbd014b7bbf22ff13a3d5b0" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newPARAMRef           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new PARAMRef node under the parent handle. 
+<p>
+vot_newPARAMRef -- Create new PARAMref node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a PARAMRef </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first PARAMRef node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="533e8601d14245fb5167b188195db93c"></a><!-- doxytag: member="votParse.c::vot_newRESOURCE" ref="533e8601d14245fb5167b188195db93c" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newRESOURCE           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new RESOURCE node under the parent handle. 
+<p>
+vot_newRESOURCE -- Create new RESOURCE node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a RESOURCE </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first RESOURCE node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="859c2bb4a2c46a3f0b4f6c1baceb0b0c"></a><!-- doxytag: member="votParse.c::vot_newSTREAM" ref="859c2bb4a2c46a3f0b4f6c1baceb0b0c" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newSTREAM           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new STREAM node under the parent handle. 
+<p>
+vot_newSTREAM -- Create new STREAM node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a STREAM </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first STREAM node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9b3b14d5e15a9384be65b8aa49c33d85"></a><!-- doxytag: member="votParse.c::vot_newTABLE" ref="9b3b14d5e15a9384be65b8aa49c33d85" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newTABLE           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new TABLE node under the parent handle. 
+<p>
+vot_newTABLE -- Create new TABLE node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a TABLE </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first TABLE node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b2d26904f7e0e73b08efdb0cea7d2b37"></a><!-- doxytag: member="votParse.c::vot_newTABLEDATA" ref="b2d26904f7e0e73b08efdb0cea7d2b37" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newTABLEDATA           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new TABLEDATA node under the parent handle. 
+<p>
+vot_newTABLEDATA -- Create new TABLEDATA node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a TABLEDATA </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first TABLEDATA node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4d9959a7a406212ff0a3846ce83a3df9"></a><!-- doxytag: member="votParse.c::vot_newTD" ref="4d9959a7a406212ff0a3846ce83a3df9" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newTD           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new TD node under the parent handle. 
+<p>
+vot_newTD -- Create new TD node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a TD </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first TD node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="dbdaa6d5a36014a2b9706454530079ef"></a><!-- doxytag: member="votParse.c::vot_newTR" ref="dbdaa6d5a36014a2b9706454530079ef" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newTR           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new TR node under the parent handle. 
+<p>
+vot_newTR -- Create new TR node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a TR </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first TR node, or zero </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="386be2face7c78b44c1fc8a507de9905"></a><!-- doxytag: member="votParse.c::vot_newVALUES" ref="386be2face7c78b44c1fc8a507de9905" args="(handle_t parent_h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">handle_t vot_newVALUES           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>parent_h</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create new VALUES node under the parent handle. 
+<p>
+vot_newVALUES -- Create new VALUES node under the parent handle<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>parent_h</em>&nbsp;</td><td>Parent handle of a VALUES </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A handle to the first VALUES node, or zero </dd></dl>
 
 </div>
 </div><p>
@@ -1773,7 +2622,322 @@ vot_valueOf -- Return type of the <a class="el" href="structElement.html" title=
 
 </div>
 </div><p>
-<a class="anchor" name="3693c41e776d763abe69428750c13e51"></a><!-- doxytag: member="votParse.c::vot_writeVOTable" ref="3693c41e776d763abe69428750c13e51" args="(handle_t node, FILE *fd)" -->
+<a class="anchor" name="7e080fb459b7aaa36a086e3aeb153f5e"></a><!-- doxytag: member="votParse.c::vot_writeASV" ref="7e080fb459b7aaa36a086e3aeb153f5e" args="(handle_t node, char *fname, int header)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeASV           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>header</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as a ASV file. 
+<p>
+vot_writeASV -- Write the VOTable to the file descriptor as a ASV file<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>header</em>&nbsp;</td><td>Write output header? </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c6ff4fb7fae0bbf78633738447fb9b60"></a><!-- doxytag: member="votParse.c::vot_writeBSV" ref="c6ff4fb7fae0bbf78633738447fb9b60" args="(handle_t node, char *fname, int header)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeBSV           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>header</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as a BSV file. 
+<p>
+vot_writeBSV -- Write the VOTable to the file descriptor as a BSV file<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>header</em>&nbsp;</td><td>Write output header? </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="bd35238a3744eed55c11ebf5b24da87b"></a><!-- doxytag: member="votParse.c::vot_writeCSV" ref="bd35238a3744eed55c11ebf5b24da87b" args="(handle_t node, char *fname, int header)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeCSV           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>header</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as a CSV file. 
+<p>
+vot_writeCSV -- Write the VOTable to the file descriptor as a CSV file<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>header</em>&nbsp;</td><td>Write output header? </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5c74670a17d17908075ba315ff4f16c0"></a><!-- doxytag: member="votParse.c::vot_writeFITS" ref="5c74670a17d17908075ba315ff4f16c0" args="(handle_t node, char *fname)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeFITS           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as an FITS table. 
+<p>
+vot_writeFITS -- Write the VOTable to the file descriptor as a FITS table.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="dda7f3daced5125c581a7c7c8743eb7f"></a><!-- doxytag: member="votParse.c::vot_writeHTML" ref="dda7f3daced5125c581a7c7c8743eb7f" args="(handle_t node, char *ifname, char *ofname)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeHTML           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>ifname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>ofname</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as HTML. 
+<p>
+vot_writeHTML -- Write the VOTable to the file descriptor as HTML.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ifname</em>&nbsp;</td><td>Input filename </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ofname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="796870e256501455dbeeb37d5ad3f34a"></a><!-- doxytag: member="votParse.c::vot_writeSHTML" ref="796870e256501455dbeeb37d5ad3f34a" args="(handle_t node, char *ifname, char *ofname)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeSHTML           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>ifname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>ofname</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as an HTML table. 
+<p>
+vot_writeSHTML -- Write the VOTable to the file descriptor as an HTML table.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ifname</em>&nbsp;</td><td>Input filename </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ofname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="756fd6178fc599d6fda55d7127c38f79"></a><!-- doxytag: member="votParse.c::vot_writeTSV" ref="756fd6178fc599d6fda55d7127c38f79" args="(handle_t node, char *fname, int header)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vot_writeTSV           </td>
+          <td>(</td>
+          <td class="paramtype">handle_t&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>header</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write the VOTable to the file descriptor as a TSV file. 
+<p>
+vot_writeTSV -- Write the VOTable to the file descriptor as a TSV file<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>header</em>&nbsp;</td><td>Write output header? </td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e900f566d3ba4816476b5a4b7ee8d772"></a><!-- doxytag: member="votParse.c::vot_writeVOTable" ref="e900f566d3ba4816476b5a4b7ee8d772" args="(handle_t node, char *fname, int indent)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1786,8 +2950,14 @@ vot_valueOf -- Return type of the <a class="el" href="structElement.html" title=
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">FILE *&nbsp;</td>
-          <td class="paramname"> <em>fd</em></td><td>&nbsp;</td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>indent</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1805,14 +2975,50 @@ vot_writeVOTable -- Write the VOTable to the file descriptor.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A handle to an <a class="el" href="structElement.html" title="This is a structure that hold the information for an XML element.">Element</a> that you to print </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>fd</em>&nbsp;</td><td>The file descriptor to send teh output to </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>fname</em>&nbsp;</td><td>Output filename (or "stdout" or "-" for STDOUT) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>indent</em>&nbsp;</td><td>Number of spaces to indent at each level </td></tr>
   </table>
 </dl>
 <dl class="return" compact><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
 
 </div>
 </div><p>
+<a class="anchor" name="450a2645f182104c3a0445f022bdbf01"></a><!-- doxytag: member="votParse.c::votEmsg" ref="450a2645f182104c3a0445f022bdbf01" args="(char *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void votEmsg           </td>
+          <td>(</td>
+          <td class="paramtype">char *&nbsp;</td>
+          <td class="paramname"> <em>msg</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+votEmsg -- Error message print utility. 
+</div>
+</div><p>
 <hr><h2>Variable Documentation</h2>
+<a class="anchor" name="93ed9b546e7fadad14615c5ef0065277"></a><!-- doxytag: member="votParse.c::children" ref="93ed9b546e7fadad14615c5ef0065277" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="votParse_8c.html#93ed9b546e7fadad14615c5ef0065277">children</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+allowed parent types 
+</div>
+</div><p>
 <a class="anchor" name="8972288a8eaa6d5249e562915527a958"></a><!-- doxytag: member="votParse.c::element_stack" ref="8972288a8eaa6d5249e562915527a958" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1829,24 +3035,42 @@ vot_writeVOTable -- Write the VOTable to the file descriptor.<p>
 vot = vot_openVOTABLE (filename|str|NULL) vot_closeVOTABLE (vot)<p>
 res = vot_getRESOURCE (vot|res) tab = vot_getTABLE (res) field = vot_getFIELD (tab)<p>
 data = vot_getDATA (tab)<p>
-tdata = vot_getTABLEDATA (data) // data elements tr = vot_getTR (tdata) td = vot_getTD (tr) bin = vot_getBINARY (data) fits = vot_getFITS (data)<p>
+tdata = vot_getTABLEDATA (data) // data elements tr = vot_getTR (tdata) td = vot_getTD (tr) bin = vot_getBINARY (data) bin = vot_getBINARY2 (data) fits = vot_getFITS (data)<p>
 group = vot_getGROUP (vot|res|tab|group) fldref = vot_getFIELDRef (group) parref = vot_getPARAMRef (group)<p>
 desc = vot_getDESCRIPTION (handle) param = vot_getPARAM (handle) info = vot_getINFO (handle) stream = vot_getSTREAM (bin|fits)<p>
 val = vot_getVALUES (field|param|info) min = vot_getMIN (val) max = vot_getMAX (val) opt = vot_getOPTION (val)<p>
 link = vot_getLINK (res|info|param|field|table)<p>
 sys = vot_getCOOSYS (vot) // Compatability<p>
+h = vot_newRESOURCE (handle_t parent_h) h = vot_newTABLE (handle_t parent_h) h = vot_newFIELD (handle_t parent_h) h = vot_newDATA (handle_t parent_h) h = vot_newTABLEDATA (handle_t parent_h) h = vot_newTR (handle_t parent_h) h = vot_newTD (handle_t parent_h) h = vot_newBINARY (handle_t parent_h) h = vot_newBINARY2 (handle_t parent_h) h = vot_newFITS (handle_t parent_h) h = vot_newGROUP (handle_t parent_h) h = vot_newFIELDRef (handle_t parent_h) h = vot_newPARAMRef (handle_t parent_h) h = vot_newDESCRIPTION (handle_t parent_h) h = vot_newPARAM (handle_t parent_h) h = vot_newINFO (handle_t parent_h) h = vot_newSTREAM (handle_t parent_h) h = vot_newVALUES (handle_t parent_h) h = vot_newMIN (handle_t parent_h) h = vot_newMAX (handle_t parent_h) h = vot_newOPTION (handle_t parent_h) h = vot_newLINK (handle_t parent_h) h = vot_newCOOSYS (handle_t parent_h)<p>
 handle = vot_newNode (parent, type) vot_freeNode (node) vot_deleteNode (node) vot_attachNode (parent, new) handle = vot_copyElement (handle_t source_h, handle_t parent_h)<p>
 val = vot_getValue (handle) stat = vot_setValue (handle, value)<p>
 attr = vot_getAttr (handle, attr) stat = vot_setAttr (handle, attr, value)<p>
 type = vot_getDATAType (data) // Utilities typeStr = vot_getDATATypeString (data)<p>
-nc = vot_getNCols (tdata_h) nr = vot_getNRows (tdata_h) val = vot_getTableCell (tdata_h, row, col) len = vot_getLength (elem_h) N = vot_getNumberOf (elem_h, type)<p>
+nc = vot_getNCols (tdata_h) nr = vot_getNRows (tdata_h) val = vot_getTableCell (tdata_h, row, col) stat = vot_sortTable (tdata_h, col, string_sort, sort_order)<p>
+len = vot_getLength (elem_h) N = vot_getNumberOf (elem_h, type)<p>
+col = vot_colByName (tab_h, name, alt) col = vot_colByUCD (tab_h, name, alt) col = vot_colByID (tab_h, name, alt)<p>
 handle = vot_findByAttr (parent, name, value) handle *vot_findInGroup (group, type) handle = vot_getNext (handle) handle = vot_getSibling (handle) handle = vot_getChild (handle) handle = vot_getParent (handle) handle = vot_getChildOfType (handle, int type)<p>
 int = vot_valueOf (handle) type = vot_typeOf (handle) vot_setWarnings (value)<p>
-vot_writeVOTable (handle, FILE *fd) 
+vot_writeVOTable (handle, char *fname, int indent) vot_writeHTML (handle, char *fname) vot_writeSHTML (handle, char *fname) vot_writeFITS (handle, char *fname) vot_writeASV (handle, char *fname, int hdr) vot_writeBSV (handle, char *fname, int hdr) vot_writeCSV (handle, char *fname, int hdr) vot_writeTSV (handle, char *fname, int hdr) vot_writeDelimited (handle, char *fname, char delim, int hdr) 
+</div>
+</div><p>
+<a class="anchor" name="3c69fd8b9b1c377197c9214043ed2c82"></a><!-- doxytag: member="votParse.c::parents" ref="3c69fd8b9b1c377197c9214043ed2c82" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="votParse_8c.html#3c69fd8b9b1c377197c9214043ed2c82">parents</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+element type 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed May 5 16:32:06 2010 for libVOTable by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Feb 27 21:10:08 2013 for libVOTable by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.9 </small></address>
 </body>

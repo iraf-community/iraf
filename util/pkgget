@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGGET -- Download the specified URL to the current directory.  We use 
 #  a command specific to the system we're on.  We assume the URL has been 
@@ -16,31 +16,22 @@
 # ----------------------------------------------------------------------------
 
 
-unset	noclobber
-onintr	cleanup_
-unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch sort which
-unalias ftp wget
+export 	PATH=../util:$PATH
 
-setenv	path  "(../util /sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $path /usr/local/bin /opt/local/bin /local/bin /home/local/bin)"
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
 
 # Utility aliases.
-alias PUT      "mv -f \!*; chown $user \!$ "                   # [MACHDEP]
-alias BOLD_ON  "(tput bold)"
-alias BOLD_OFF "(tput sgr0)"
-alias SO_ON    "(tput smso)"
-alias SO_OFF   "(tput sgr0)"
-
-alias DO_OK    "(echo -n '[ '; BOLD_ON; echo -n ' OK '; BOLD_OFF; echo ' ]')"
-alias DO_WARN  "(echo -n '[ '; BOLD_ON; echo -n 'WARN'; BOLD_OFF; echo ' ]')"
-alias DO_FAIL  "(echo -n '[ ';   SO_ON; echo -n 'FAIL';   SO_OFF; echo ' ]')"
-
-alias ERRMSG   "(echo -n '   ';BOLD_ON;echo -n 'ERROR: '  ;BOLD_OFF; echo \!*)"
-alias WARNING  "(echo -n '   ';BOLD_ON;echo -n 'WARNING: ';BOLD_OFF; echo \!*)"
-alias NEWLINE  "(echo '')"
-
-
-
-# set echo
+source ${iraf}/unix/hlib/util.sh
 
 
 
@@ -49,50 +40,46 @@ alias NEWLINE  "(echo '')"
 ##############################################################################
 
 # MACHDEP definitions which may be reset below.
-set VERSION		= `cat ../.version`
-
-# Utility aliases.
+VERSION=`cat ../.version`
 
 
 #----------------------------------
 # Determine platform architecture.
 #----------------------------------
 
-set UNAME=""
-if (-e /usr/bin/uname) then
-    set uname_cmd = /usr/bin/uname
-    set UNAME=`/usr/bin/uname | tr '[A-Z]' '[a-z]'`
-else if (-e /bin/uname) then
-    set uname_cmd = /bin/uname
-    set UNAME=`/bin/uname | tr '[A-Z]' '[a-z]'`
+UNAME=""
+if [ -e /usr/bin/uname ]; then
+    uname_cmd=/usr/bin/uname
+    UNAME=`/usr/bin/uname | tr '[A-Z]' '[a-z]'`
+elif [ -e /bin/uname ]; then
+    uname_cmd=/bin/uname
+    UNAME=`/bin/uname | tr '[A-Z]' '[a-z]'`
 else
     WARNING  "No 'uname' command found to determine architecture."
     exit 1
-endif
+fi
 
-switch ($UNAME) 
-    case linux:
-	set dlcmd		= "/usr/bin/wget"
-        breaksw
-    case darwin: 					    # Mac OSX/iOS
-    case macosx:
-    case macintel:
-    case ipad:
-        #set dlcmd 		= "/usr/bin/ftp -A"
-        set dlcmd 		= "/usr/bin/ftp"
-        breaksw
+case $UNAME in 
+    "linux" | "linux64")
+	dlcmd="/usr/bin/wget"
+	;;
+    "darwin" | "macosx" | "macintel" | "ipad")		    # Mac OSX/iOS
+        #dlcmd="/usr/bin/ftp -A"
+        dlcmd="/usr/bin/ftp"
+	;;
 
     # Other architectures to be added here
 
-    default:      
+    *)      
 	ERRMSG  "Unable to determine platform architecture."
 	exit 1
-endsw
+	;;
+esac
 
 # If we don't have a download command installed, use our own .....
-if (! -e $dlcmd) then
-    set dlcmd = `dirname $0`/fget
-endif
+if [ ! -e $dlcmd ]; then
+    dlcmd=`dirname $0`/fget
+fi
 
 ##############################################################################
 # END OF MACHDEP DEFINITIONS.
@@ -102,75 +89,83 @@ endif
 # Declarations and initializations.
 #=============================================================================
 
-set exec	= yes
-set verb	= no
-set url		= ""
+exec=yes
+verb=no
+url=""
 
 
 # Process cmdline flags.
-while ("$1" != "")
-    switch ("$1")
-    case -n:                            # no execute
-        set exec  = no
-        breaksw
-    case -v:                            # be chatty
-        set verb  = yes
-        set quiet = no
-        breaksw
-    case -h:                            # print help summary
-        goto Usage
-    default:
-        set url = $1
-        break
-    endsw
+while [ -n "$1" ]; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+	;;
+    "-v")                            # be chatty
+        verb=yes
+        quiet=no
+	;;
+    "-h")                            # print help summary
+    	/bin/echo "Usage: pkgget [-h] [-n] [-q | -v] url"
+    	/bin/echo ""
+    	/bin/echo "    where -n          # no execute"
+    	/bin/echo "          -q          # suppress output"
+    	/bin/echo "          -v          # verbose output"
+    	/bin/echo "          -h          # this message"
+	exit 0
+	;;
 
-    if ("$2" == "") then
+    *)
+        url=$1
         break
-    else
+    esac
+
+    if [ -n "$2" ];  then
         shift
-    endif
-end
+    else
+        break
+    fi
+done
 
 
 #  Error checks.
-if ("$url" == "") then
-   if ("$verb" == "yes") then
-      echo "ERROR: URL not specified"
-   endif
+if [ -z "$url" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "ERROR: URL not specified"
+   fi
    exit 1
-endif
+fi
 
 
 #  Do it.
-if ("$exec" == "yes") then
-   if ("$verb" == "yes") then
-      echo "Downloading "$url" ...."
-   endif
+if [ "$exec" == "yes" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Downloading "$url" ...."
+   fi
 
-   if ("$verb" == "no") then
-      $dlcmd $url 		>& /dev/null
+   if [ "$verb" == "no" ]; then
+      $dlcmd ${url} 	>> /dev/null 2>&1
    else
       $dlcmd $url
-   endif
+   fi
 
-   if ("$verb" == "yes") then
-      echo "done"
-   endif
-endif
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "done"
+   fi
+fi
 
 
 #  Verify we have the file.
-if (! -e $url:t) then
-   if ("$verb" == "yes") then
-      echo "Error downloading file '"$url:t"'"
-   endif
+if [ ! -e ${url##*/} ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Error downloading file '"${url##*/}"'"
+   fi
    exit 1
 
 else
-   if ($#argv > 1) then
-      mv $url:t $2
-   endif
-endif
+   if (( $#>1 )); then
+      mv ${url##*/} $2
+   fi
+fi
 
 #  Normal exit.
 exit 0
@@ -180,13 +175,3 @@ exit 0
 #=============================================================================
 # Usage
 #=============================================================================
-
-Usage:
-    echo "Usage: pkgget [-h] [-n] [-q | -v] url"
-    echo ""
-    echo "    where -n          # no execute"
-    echo "          -q          # suppress output"
-    echo "          -v          # verbose output"
-    echo "          -h          # this message"
-
-exit 0

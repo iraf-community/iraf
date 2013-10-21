@@ -88,7 +88,7 @@ begin
 	    call mfree (buf, TY_REAL)
 	    call mfree (buf2, TY_REAL)
 	    call mfree (buf3, TY_REAL)
-	    call mfree (bpbuf, TY_REAL)
+	    call mfree (bpbuf, TY_INT)
 	    call mfree (bpwts, TY_REAL)
 
 	    return
@@ -125,7 +125,7 @@ begin
 		call mfree (buf, TY_REAL)
 		call mfree (buf2, TY_REAL)
 		call mfree (buf3, TY_REAL)
-		call mfree (bpbuf, TY_REAL)
+		call mfree (bpbuf, TY_INT)
 		call mfree (bpwts, TY_REAL)
 	    }
 
@@ -188,7 +188,7 @@ begin
 	    else
 		dobpm = true
 	    if (dobpm) {
-		call malloc (bpbuf, nc*ny, TY_REAL)
+		call malloc (bpbuf, nc*ny, TY_INT)
 		call malloc (bpwts, nc, TY_REAL)
 		call calloc (symwts, ny*ny+1, TY_POINTER)
 		Memi[symwts+ny*ny] = -1
@@ -680,7 +680,7 @@ begin
 
 	l2 = line + loff
 	if (l2 < 1 || l2 > nl2) {
-	    call amovi (1, Memi[bp], nc1)
+	    call amovki (1, Memi[bp], nc1)
 	    return
 	}
 

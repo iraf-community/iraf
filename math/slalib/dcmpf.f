@@ -18,6 +18,8 @@
 *     PERP     d        nonperpendicularity (radians)
 *     ORIENT   d        orientation (radians)
 *
+*  Called:  slDA1P
+*
 *  The model relates two sets of [X,Y] coordinates as follows.
 *  Naming the elements of COEFFS:
 *
@@ -58,9 +60,26 @@
 *
 *  See also slFTXY, slPXY, slINVF, slXYXY
 *
-*  P.T.Wallace   Starlink   14 August 1994
+*  P.T.Wallace   Starlink   19 December 2001
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -69,73 +88,73 @@
       DOUBLE PRECISION COEFFS(6),XZ,YZ,XS,YS,PERP,ORIENT
 
       DOUBLE PRECISION A,B,C,D,E,F,RB2E2,RC2F2,XSC,YSC,P1,P2,P,WS,WC,
-     :                 OR,HP,SHP,CHP,SOR,COR,DET,X0,Y0
+     :                 OR,HP,SHP,CHP,SOR,COR,DET,X0,Y0,slDA1P
 
 
 
-*  Copy the six coefficients
-      A=COEFFS(1)
-      B=COEFFS(2)
-      C=COEFFS(3)
-      D=COEFFS(4)
-      E=COEFFS(5)
-      F=COEFFS(6)
+*  Copy the six coefficients.
+      A = COEFFS(1)
+      B = COEFFS(2)
+      C = COEFFS(3)
+      D = COEFFS(4)
+      E = COEFFS(5)
+      F = COEFFS(6)
 
-*  Scales
-      RB2E2=SQRT(B*B+E*E)
-      RC2F2=SQRT(C*C+F*F)
+*  Scales.
+      RB2E2 = SQRT(B*B+E*E)
+      RC2F2 = SQRT(C*C+F*F)
       IF (B*F-C*E.GE.0D0) THEN
-         XSC=RB2E2
+         XSC = RB2E2
       ELSE
-         B=-B
-         C=-C
-         XSC=-RB2E2
+         B = -B
+         E = -E
+         XSC = -RB2E2
       END IF
-      YSC=RC2F2
+      YSC = RC2F2
 
-*  Non-perpendicularity
+*  Non-perpendicularity.
       IF (C.NE.0D0.OR.F.NE.0D0) THEN
-         P1=ATAN2(C,F)
+         P1 = ATAN2(C,F)
       ELSE
-         P1=0D0
+         P1 = 0D0
       END IF
       IF (E.NE.0D0.OR.B.NE.0D0) THEN
-         P2=ATAN2(E,B)
+         P2 = ATAN2(E,B)
       ELSE
-         P2=0D0
+         P2 = 0D0
       END IF
-      P=P1+P2
+      P = slDA1P(P1+P2)
 
-*  Orientation
-      WS=C*RB2E2-E*RC2F2
-      WC=B*RC2F2+F*RB2E2
+*  Orientation.
+      WS = C*RB2E2-E*RC2F2
+      WC = B*RC2F2+F*RB2E2
       IF (WS.NE.0D0.OR.WC.NE.0D0) THEN
-         OR=ATAN2(WS,WC)
+         OR = ATAN2(WS,WC)
       ELSE
-         OR=0D0
+         OR = 0D0
       END IF
 
-*  Zero corrections
-      HP=P/2D0
-      SHP=SIN(HP)
-      CHP=COS(HP)
-      SOR=SIN(OR)
-      COR=COS(OR)
-      DET=XSC*YSC*(CHP+SHP)*(CHP-SHP)
+*  Zero points.
+      HP = P/2D0
+      SHP = SIN(HP)
+      CHP = COS(HP)
+      SOR = SIN(OR)
+      COR = COS(OR)
+      DET = XSC*YSC*(CHP+SHP)*(CHP-SHP)
       IF (ABS(DET).GT.0D0) THEN
-         X0=YSC*(A*(CHP*COR-SHP*SOR)-D*(CHP*SOR+SHP*COR))/DET
-         Y0=XSC*(A*(CHP*SOR-SHP*COR)+D*(CHP*COR+SHP*SOR))/DET
+         X0 = YSC*(A*(CHP*COR-SHP*SOR)-D*(CHP*SOR+SHP*COR))/DET
+         Y0 = XSC*(A*(CHP*SOR-SHP*COR)+D*(CHP*COR+SHP*SOR))/DET
       ELSE
-         X0=0D0
-         Y0=0D0
+         X0 = 0D0
+         Y0 = 0D0
       END IF
 
-*  Results
-      XZ=X0
-      YZ=Y0
-      XS=XSC
-      YS=YSC
-      PERP=P
-      ORIENT=OR
+*  Results.
+      XZ = X0
+      YZ = Y0
+      XS = XSC
+      YS = YSC
+      PERP = P
+      ORIENT = OR
 
       END

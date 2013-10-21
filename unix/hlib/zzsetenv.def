@@ -17,7 +17,7 @@ set	use_vo		= yes
 set	use_new_imt	= yes
 set	vo_prefetch	= yes
 set	vo_nthreads	= 4
-set	vo_runid	= "iraf2160"
+set	vo_runid	= "iraf2161"
 
 set	samp_auto	= yes
 set	samp_onstart	= no
@@ -38,7 +38,7 @@ set	filewait	= yes
 set	glbcolor	= "pt=3,fr=9,al=3,tl=6,ax=5,tk=5"
 set	graphcap	= dev$graphcap
 set	imtype		= "fits"
-set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+set	imextn		= "oif:imh fxf:fits,fit,fts plf:pl qpf:qp stf:hhh,??h"
 set	min_lenuserarea	= 64000
 set	multversions	= no
 set	printer		= lp
@@ -54,7 +54,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.16"
+set	version		= "NOAO/IRAF V2.16.1"
 
 # System directories.
 

@@ -40,6 +40,7 @@
 
 #ifdef KR_headers
  extern char *malloc(), *memset();
+#define Const /*nothing*/
 
 #ifdef ungetc
  static int
@@ -51,6 +52,7 @@ un_getc(x,f__cf) int x; FILE *f__cf;
 #endif
 
 #else
+#define Const const
 #undef abs
 #undef min
 #undef max
@@ -149,8 +151,8 @@ static char Alpha[256], Alphanum[256];
 
  static VOID
 nl_init(Void) {
-	register char *s;
-	register int c;
+	Const char *s;
+	int c;
 
 	if(!f__init)
 		f_init();

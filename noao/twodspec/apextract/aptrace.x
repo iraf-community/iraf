@@ -221,6 +221,8 @@ begin
 
 	# Trace each feature.
 
+	line1 = 0
+	line2 = 0
 	do j = 1, naps {
 	    if (AP_SELECT(aps[j]) == NO)
 		next

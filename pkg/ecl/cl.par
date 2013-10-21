@@ -20,7 +20,7 @@ menus,b,h,yes,,,Display menu when changing packages?
 showtype,b,h,no,,,Add task-type suffix in menus?
 notify,b,h,yes,,,Send done message when bkgrnd task finishes?
 szprcache,i,h,4,1,10,Size of the process cache
-version,s,h,"IRAF V2.16.0 March 2012",,IRAF version
+version,s,h,"IRAF V2.16.1 Oct 2013",,IRAF version
 logver,s,h,"",,,login.cl version
 logregen,b,h,no,,,Updating of login.cl to current version is advised
 release,s,h,"2.16",,,IRAF release

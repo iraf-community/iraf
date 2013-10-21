@@ -46,6 +46,7 @@ typedef int16_t flex_int16_t;
 typedef uint16_t flex_uint16_t;
 typedef int32_t flex_int32_t;
 typedef uint32_t flex_uint32_t;
+typedef uint64_t flex_uint64_t;
 #else
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
@@ -174,7 +175,7 @@ extern FILE *yyin, *yyout;
      */
     #define  YY_LESS_LINENO(n) \
             do { \
-                int yyl;\
+                yy_size_t yyl;\
                 for ( yyl = n; yyl < yyleng; ++yyl )\
                     if ( yytext[yyl] == '\n' )\
                         --yylineno;\
@@ -367,7 +368,7 @@ static void yy_fatal_error (yyconst char msg[]  );
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	yyleng = (size_t) (yy_cp - yy_bp); \
+	yyleng = (yy_size_t) (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	if ( yyleng + (yy_more_offset) >= YYLMAX ) \
@@ -988,6 +989,8 @@ char *yytext_ptr;
 #include <stdio.h>
 #include <ctype.h>
 #include "xpp.h"
+#include "../../bootProto.h"
+#include "xppProto.h"
 
 #define import_spp
 #include <iraf.h>
@@ -1009,6 +1012,9 @@ char *yytext_ptr;
 #define	HEX		16
 #define CHARCON		1
 
+#ifdef YYLMAX
+#undef YYLMAX
+#endif
 #define YYLMAX		YY_BUF_SIZE
 
 YY_BUFFER_STATE include_stack[MAX_INCLUDE];
@@ -1031,8 +1037,19 @@ extern  int ntasks;
 static	int dtype;			/* set if typed procedure	*/
 
 extern  char *vfn2osfn();
+extern  void skipnl (void);
 
-#line 1036 "lex.yy.c"
+
+void  typespec (int typecode);
+void  process_task_statement (void);
+
+void  do_include (void);
+int   yywrap (void);
+int   yy_input (void);
+void  yy_unput (char ch);
+
+
+#line 1053 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -1217,10 +1234,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 63 "xpp.l"
+#line 79 "xpp.l"
 
 
-#line 1224 "lex.yy.c"
+#line 1241 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -1335,7 +1352,7 @@ find_rule: /* we branch to this label when backing up */
 
 		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
 			{
-			int yyl;
+			yy_size_t yyl;
 			for ( yyl = (yy_prev_more_offset); yyl < yyleng; ++yyl )
 				if ( yytext[yyl] == '\n' )
 					   
@@ -1350,67 +1367,67 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 65 "xpp.l"
+#line 81 "xpp.l"
 typespec (XTY_BOOL);
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 66 "xpp.l"
+#line 82 "xpp.l"
 typespec (XTY_CHAR);
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 67 "xpp.l"
+#line 83 "xpp.l"
 typespec (XTY_SHORT);
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 68 "xpp.l"
+#line 84 "xpp.l"
 typespec (XTY_INT);
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 69 "xpp.l"
+#line 85 "xpp.l"
 typespec (XTY_LONG);
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 70 "xpp.l"
+#line 86 "xpp.l"
 typespec (XTY_REAL);
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 71 "xpp.l"
+#line 87 "xpp.l"
 typespec (XTY_DOUBLE);
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 72 "xpp.l"
+#line 88 "xpp.l"
 typespec (XTY_COMPLEX);
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 73 "xpp.l"
+#line 89 "xpp.l"
 typespec (XTY_POINTER);
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 74 "xpp.l"
+#line 90 "xpp.l"
 typespec (XTY_EXTERN);
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 76 "xpp.l"
+#line 92 "xpp.l"
 {
 				    /* Subroutine declaration. */
 				    pushcontext (PROCSTMT);
@@ -1421,7 +1438,7 @@ YY_RULE_SETUP
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 83 "xpp.l"
+#line 99 "xpp.l"
 {
 				    /* Function declaration. */
 				    pushcontext (PROCSTMT);
@@ -1433,7 +1450,7 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 91 "xpp.l"
+#line 107 "xpp.l"
 {   if (context & BODY)
 					ECHO;
 				    else {
@@ -1444,17 +1461,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 98 "xpp.l"
+#line 114 "xpp.l"
 put_dictionary();
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 99 "xpp.l"
+#line 115 "xpp.l"
 put_interpreter();
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 100 "xpp.l"
+#line 116 "xpp.l"
 {
 				    skip_helpblock(); 
 				    setline();
@@ -1463,7 +1480,7 @@ YY_RULE_SETUP
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 104 "xpp.l"
+#line 120 "xpp.l"
 {
 				    begin_code();
 				    setline();
@@ -1471,7 +1488,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 108 "xpp.l"
+#line 124 "xpp.l"
 {
 				    macro_redef();
 				    setline();
@@ -1479,7 +1496,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 112 "xpp.l"
+#line 128 "xpp.l"
 {
 				    str_enter();
 				}
@@ -1487,7 +1504,7 @@ YY_RULE_SETUP
 case 20:
 /* rule 20 can match eol */
 YY_RULE_SETUP
-#line 115 "xpp.l"
+#line 131 "xpp.l"
 {
 				    pushcontext (DEFSTMT);
 				    ECHO;
@@ -1496,7 +1513,7 @@ YY_RULE_SETUP
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 119 "xpp.l"
+#line 135 "xpp.l"
 {
 				    end_code();
 				    setline();
@@ -1505,7 +1522,7 @@ YY_RULE_SETUP
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 123 "xpp.l"
+#line 139 "xpp.l"
 {
 				    (context & BODY) ? ECHO
 					: do_string ('"', STR_DECL);
@@ -1514,7 +1531,7 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 127 "xpp.l"
+#line 143 "xpp.l"
 {
 				    if (!(context & BODY))
 					pushcontext (DATASTMT);
@@ -1524,7 +1541,7 @@ YY_RULE_SETUP
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 133 "xpp.l"
+#line 149 "xpp.l"
 {
 				    ECHO;
 				    if (context & BODY)
@@ -1533,47 +1550,47 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 139 "xpp.l"
+#line 155 "xpp.l"
 skipnl();
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 140 "xpp.l"
+#line 156 "xpp.l"
 ECHO;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 142 "xpp.l"
+#line 158 "xpp.l"
 do_include();
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 144 "xpp.l"
+#line 160 "xpp.l"
 mapident();
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 146 "xpp.l"
+#line 162 "xpp.l"
 hms (yytext);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 147 "xpp.l"
+#line 163 "xpp.l"
 int_constant (yytext, OCTAL);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 148 "xpp.l"
+#line 164 "xpp.l"
 int_constant (yytext, HEX);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 149 "xpp.l"
+#line 165 "xpp.l"
 int_constant (yytext, CHARCON);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 151 "xpp.l"
+#line 167 "xpp.l"
 {
 				    if (context & (BODY|PROCSTMT))
 					ECHO;
@@ -1581,17 +1598,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 156 "xpp.l"
+#line 172 "xpp.l"
 output ('&');
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 157 "xpp.l"
+#line 173 "xpp.l"
 output ('|');
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 159 "xpp.l"
+#line 175 "xpp.l"
 {
 				    ECHO;
 				    nbrace++;
@@ -1599,7 +1616,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 163 "xpp.l"
+#line 179 "xpp.l"
 {
 				    ECHO;
 				    nbrace--;
@@ -1607,22 +1624,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 167 "xpp.l"
+#line 183 "xpp.l"
 output ('(');
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 168 "xpp.l"
+#line 184 "xpp.l"
 output (')');
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 170 "xpp.l"
+#line 186 "xpp.l"
 do_hollerith();
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 172 "xpp.l"
+#line 188 "xpp.l"
 {
 				    if (context & BODY)
 					do_string ('"', STR_INLINE);
@@ -1633,7 +1650,7 @@ YY_RULE_SETUP
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 179 "xpp.l"
+#line 195 "xpp.l"
 {
 				    /* If statement is continued do not pop
 				     * the context.
@@ -1645,7 +1662,7 @@ YY_RULE_SETUP
 case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
-#line 187 "xpp.l"
+#line 203 "xpp.l"
 {
 				    /* End of newline and end of statement.
 				     */
@@ -1656,10 +1673,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 195 "xpp.l"
+#line 211 "xpp.l"
 ECHO;
 	YY_BREAK
-#line 1663 "lex.yy.c"
+#line 1680 "lex.yy.c"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 
@@ -2644,7 +2661,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 195 "xpp.l"
+#line 211 "xpp.l"
 
 
 
@@ -2656,6 +2673,7 @@ void yyfree (void * ptr )
  * space, and the type spec begins a function declaration; save the datatype
  * code for d_newproc().
  */
+void
 typespec (typecode)
 int	typecode;
 {
@@ -2677,6 +2695,7 @@ int	typecode;
  * sysruk.x file as an include file.  Special macros therein are
  * replaced by the taskname dictionary as processing continues.
  */
+void
 process_task_statement()
 {
         char    ch;
@@ -2729,6 +2748,7 @@ process_task_statement()
  * statement, push the current input file on a stack, and open the new file.
  * System include files are referenced as "<file>", other files as "file".
  */
+void
 do_include()
 {
 	char    *p, delim, *rindex();
@@ -2859,6 +2879,7 @@ do_include()
  * nonzero when the stack is empty, i.e., when we reach the end of the
  * main file.
  */
+int
 yywrap()
 {
 	/* The last line of a file is not necessarily newline terminated.
@@ -2893,7 +2914,8 @@ yywrap()
 
 /* YY_INPUT -- Get a character from the input stream.
  */
-yy_input()
+int
+yy_input ()
 {
 	return (input());
 }
@@ -2901,7 +2923,8 @@ yy_input()
 
 /* YY_UNPUT -- Put a character back into the input stream.
  */
-yy_unput(ch)
+void
+yy_unput (ch)
 char	ch;
 {
 	unput(ch);

@@ -39,6 +39,7 @@
 #define VF_GETTR   		vf_gettr
 #define VF_GETTD   		vf_gettd
 #define VF_GETBINARY   		vf_getbinary
+#define VF_GETBINARY2  		vf_getbinary2
 #define VF_GETFITS   		vf_getfits
 #define VF_GETGROUP   		vf_getgroup
 #define VF_GETFIELDREF   	vf_getfieldref
@@ -64,6 +65,7 @@
 #define VF_NEWTR   		vf_newtr
 #define VF_NEWTD   		vf_newtd
 #define VF_NEWBINARY   		vf_newbinary
+#define VF_NEWBINARY2  		vf_newbinary2
 #define VF_NEWFITS   		vf_newfits
 #define VF_NEWGROUP   		vf_newgroup
 #define VF_NEWFIELDREF   	vf_newfieldref
@@ -129,6 +131,7 @@
 #define VF_GETTR   		vf_gettr_
 #define VF_GETTD   		vf_gettd_
 #define VF_GETBINARY   		vf_getbinary_
+#define VF_GETBINARY2   	vf_getbinary2_
 #define VF_GETFITS   		vf_getfits_
 #define VF_GETGROUP   		vf_getgroup_
 #define VF_GETFIELDREF   	vf_getfieldref_
@@ -154,6 +157,7 @@
 #define VF_NEWTR   		vf_newtr_
 #define VF_NEWTD   		vf_newtd_
 #define VF_NEWBINARY   		vf_newbinary_
+#define VF_NEWBINARY2  		vf_newbinary2_
 #define VF_NEWFITS   		vf_newfits_
 #define VF_NEWGROUP   		vf_newgroup_
 #define VF_NEWFIELDREF   	vf_newfieldref_
@@ -223,6 +227,7 @@ handle_t  VF_GETTABLEDATA (handle_t *handle);
 handle_t  VF_GETTR (handle_t *handle);
 handle_t  VF_GETTD (handle_t *handle);
 handle_t  VF_GETBINARY (handle_t *handle);
+handle_t  VF_GETBINARY2 (handle_t *handle);
 handle_t  VF_GETFITS (handle_t *handle);
 handle_t  VF_GETGROUP (handle_t *handle);
 handle_t  VF_GETFIELDRef (handle_t *handle);
@@ -246,6 +251,7 @@ handle_t  VF_NEWTABLEDATA (handle_t *parent_h);
 handle_t  VF_NEWTR (handle_t *parent_h);
 handle_t  VF_NEWTD (handle_t *parent_h);
 handle_t  VF_NEWBINARY (handle_t *parent_h);
+handle_t  VF_NEWBINARY2 (handle_t *parent_h);
 handle_t  VF_NEWFITS (handle_t *parent_h);
 handle_t  VF_NEWGROUP (handle_t *parent_h);
 handle_t  VF_NEWFIELDRef (handle_t *parent_h);
@@ -467,6 +473,19 @@ handle_t
 VF_GETBINARY (handle_t *handle)
 {
     return ( vot_getBINARY (*handle) );
+}
+
+
+/** VF_GETBINARY2
+ * 
+ *  @brief		Gets the node of a specified type.
+ *  @param[in] handle 	A handle to the Element will you wish to search from.
+ *  @return 		A handle to the found node. Zero otherwise.
+ */
+handle_t
+VF_GETBINARY2 (handle_t *handle)
+{
+    return ( vot_getBINARY2 (*handle) );
 }
 
 
@@ -791,6 +810,19 @@ handle_t
 VF_NEWBINARY (handle_t *parent_h)
 {
     return ( vot_newBINARY (*parent_h) );
+}
+
+
+/** VF_NEWBINARY2
+ * 
+ *  @brief		   Create the node of a specified type.
+ *  @param[in] parent_h    A handle to the parent node. from.
+ *  @return 		   A handle to the new node. Zero otherwise.
+ */
+handle_t
+VF_NEWBINARY2 (handle_t *parent_h)
+{
+    return ( vot_newBINARY2 (*parent_h) );
 }
 
 
@@ -1495,7 +1527,7 @@ VF_WRITEASV (handle_t *elem, char *fname, int flen)
 {
     char *_fname = sstrip (fname, flen);
 
-    vot_writeASV (*elem, _fname);
+    vot_writeASV (*elem, _fname, 1);
 
     free ((char *) _fname);
 }
@@ -1512,7 +1544,7 @@ VF_WRITEBSV (handle_t *elem, char *fname, int flen)
 {
     char *_fname = sstrip (fname, flen);
 
-    vot_writeBSV (*elem, _fname);
+    vot_writeBSV (*elem, _fname, 1);
 
     free ((char *) _fname);
 }
@@ -1529,7 +1561,7 @@ VF_WRITECSV (handle_t *elem, char *fname, int flen)
 {
     char *_fname = sstrip (fname, flen);
 
-    vot_writeCSV (*elem, _fname);
+    vot_writeCSV (*elem, _fname, 1);
 
     free ((char *) _fname);
 }
@@ -1546,7 +1578,7 @@ VF_WRITETSV (handle_t *elem, char *fname, int flen)
 {
     char *_fname = sstrip (fname, flen);
 
-    vot_writeTSV (*elem, _fname);
+    vot_writeTSV (*elem, _fname, 1);
 
     free ((char *) _fname);
 }

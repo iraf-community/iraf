@@ -8,8 +8,8 @@ GETLIN(line, fd)
 RCHAR	*line;
 FINT	*fd;
 {
-	register  c=0;
-	register  count=0;
+	register  int c=0;
+	register  int count=0;
 	register  RCHAR *cs;
 	FILE	  *fp;
 

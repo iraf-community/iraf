@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <utmp.h>
+#include <utmpx.h>
 #include <pwd.h>
 #include <sys/stat.h>
 #include <ctype.h>
@@ -242,7 +242,7 @@ loggedin (int uid)
 	register int i;
 	static	int uidcache[10];
 	static	int nuid = 0;
-	struct	utmp ubuf;
+	struct	utmpx ubuf;
 	struct	passwd *pw, *getpwuid();
 	FILE	*ufp;
 
@@ -250,7 +250,7 @@ loggedin (int uid)
 	    if (uid == uidcache[i])
 		return (1);
 
-	if ((ufp = fopen ("/etc/utmp", "r")) == NULL) {
+	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {
 	    printf ("cannot open utmp file\n");
 	    exit (DV_ERROR);
 	}
@@ -261,9 +261,9 @@ loggedin (int uid)
 	}
 
 	do {
-	    if (fread (&ubuf, sizeof (struct utmp), 1, ufp) == NULL)
+	    if (fread (&ubuf, sizeof (struct utmpx), 1, ufp) == NULL)
 		return (0);
-	} while (strncmp (ubuf.ut_name, pw->pw_name, 8) != 0);
+	} while (strncmp (ubuf.ut_user, pw->pw_name, 8) != 0);
 
 	if (nuid < 10)
 	    uidcache[nuid++] = uid;

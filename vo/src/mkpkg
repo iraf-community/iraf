@@ -1,4 +1,4 @@
-# Make the NVO package compiled tasks.
+# Make the VO package compiled tasks.
 
 $call	  relink
 $exit
@@ -12,12 +12,12 @@ relink:
 	$set	LIBS = "-lasttools libvoclient.a"
 
 	#$update	libpkg.a
-	#$omake	x_nvoapps.x
-	#$link	x_nvoapps.o libpkg.a $(LIBS) -o xx_nvoapps.e
+	#$omake	x_voapps.x
+	#$link	x_voapps.o libpkg.a $(LIBS) -o xx_voapps.e
 	;
 
 install:
-	#$move	xx_nvoapps.e nvobin$x_nvoapps.e
+	#$move	xx_voapps.e vobin$x_voapps.e
 	;
 
 

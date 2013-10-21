@@ -23,7 +23,7 @@ ZFLINK (
 {
 	/*  Create a symlink 'path2' pointing to 'path1'.
 	 */
-	*status = (symlink (path1, path2) < 0) ? XERR : XOK;
+	*status = (symlink ((char *) path1, (char *) path2) < 0) ? XERR : XOK;
 
 	return (*status);
 }
@@ -39,7 +39,7 @@ ZFULNK (
 {
 	/*  Remove the link at 'path'.
 	 */
-	*status = (unlink (path) < 0) ? XERR : XOK;
+	*status = (unlink ((char *) path) < 0) ? XERR : XOK;
 
 	return (*status);
 }

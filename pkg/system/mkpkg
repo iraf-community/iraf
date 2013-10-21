@@ -22,6 +22,7 @@ libpkg.a:
 	@help
 
 	cmdstr.x	<ctype.h>
+	chkupdate.x	<fio.h> <fset.h> <finfo.h> <syserr.h>
 	concatenate.x	
 	copy.x		<error.h>
 	count.x		<chars.h> <ctype.h> <error.h>

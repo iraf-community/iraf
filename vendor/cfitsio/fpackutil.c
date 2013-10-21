@@ -287,7 +287,7 @@ int fp_info_hdu (fitsfile *infptr)
 
 	    if (hdutype == IMAGE_HDU) {
 		sprintf (msg, "  %d IMAGE", hdupos); fp_msg (msg);
-                sprintf (msg, " SUMS=%lu/%lu", ~((int) hdusum), datasum); fp_msg (msg);
+                sprintf (msg, " SUMS=%lu/%lu", (unsigned long) (~((int) hdusum)), datasum); fp_msg (msg);
 
 		fits_get_img_param (infptr, 9, &bitpix, &naxis, naxes, &stat);
 
@@ -327,15 +327,15 @@ int fp_info_hdu (fitsfile *infptr)
 
             } else if (hdutype == ASCII_TBL) {
                 sprintf (msg, "  %d ASCII_TBL", hdupos); fp_msg (msg);
-                sprintf (msg, " SUMS=%lu/%lu\n", ~((int) hdusum), datasum); fp_msg (msg);
+                sprintf (msg, " SUMS=%lu/%lu\n", (unsigned long) (~((int) hdusum)), datasum); fp_msg (msg);
 
             } else if (hdutype == BINARY_TBL) {
                 sprintf (msg, "  %d BINARY_TBL", hdupos); fp_msg (msg);
-                sprintf (msg, " SUMS=%lu/%lu\n", ~((int) hdusum), datasum); fp_msg (msg);
+                sprintf (msg, " SUMS=%lu/%lu\n", (unsigned long) (~((int) hdusum)), datasum); fp_msg (msg);
 
             } else {
                 sprintf (msg, "  %d OTHER", hdupos); fp_msg (msg);
-                sprintf (msg, " SUMS=%lu/%lu", ~((int) hdusum), datasum); fp_msg (msg);
+                sprintf (msg, " SUMS=%lu/%lu", (unsigned long) (~((int) hdusum), datasum)); fp_msg (msg);
                 sprintf (msg, " %s\n", val); fp_msg (msg);
             }
 
@@ -759,8 +759,6 @@ int fp_loop (int argc, char *argv[], int unpack, fpstate fpvar)
                         continue;
 		    }
 		}
- 
-	        /* rename clobbers input, may be unix/shell version dependent */
 
 		if (iraf_infile) {  /* special case of deleting an IRAF format header and pixel file */
 		   if (fits_delete_iraf_file(infits, &status)) {
@@ -769,10 +767,22 @@ int fp_loop (int argc, char *argv[], int unpack, fpstate fpvar)
 		    }
 		}
 				
+#if defined(unix) || defined(__unix__)  || defined(__unix)
+	        /* rename clobbers input on Unix platforms */
 		if (rename (outfits, temp) != 0) {
 		        fp_msg ("\nError renaming tmp file to ");
 		        fp_msg (temp); fp_msg ("\n"); exit (-1);
 		}
+#else
+	        /* rename DOES NOT clobber existing files on Windows platforms */
+                /* so explicitly remove any existing file before renaming the file */
+                remove(temp);
+		if (rename (outfits, temp) != 0) {
+		        fp_msg ("\nError renaming tmp file to ");
+		        fp_msg (temp); fp_msg ("\n"); exit (-1);
+		}
+#endif
+
 		tempfilename[0] = '\0';  /* clear temporary file name */
                 strcpy(outfits, temp);
 

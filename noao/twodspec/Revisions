@@ -1,5 +1,9 @@
 .help revisions Jun88 noao.twodspec
 .nf
+twodspec$multispec/peaks.x
+twodspec$multispec/t_fitfunc.x
+    The 'rank' and 'samples' pointers were being used with Memr (5/4/13, MJF)
+
 twodspec$mkpkg
     Commented out multispec package.
     (2/14/92, Valdes)

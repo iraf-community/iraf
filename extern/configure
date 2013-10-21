@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  CONFIGURE -- Bootstrap the dynamic external package system by downloading
 #  the repository manifest and creating a workable Makefile to be used for
@@ -7,32 +7,32 @@
 #  See the README file for details.
 
 
-set  irafdir    = $cwd/../util
-
-set  clean	= 1
+clean=1
+irafdir=`pwd`/../util
 
 
 # Process cmdline flags.
-while ("$1" != "")
-   switch ("$1")
-   case -noclean:                      # clean all package sources
+while [ -n "$1" ]; do
+   case "$1" in
+   "-noclean")                      # clean all package sources
       set clean = 0
-      breaksw
-   default:
+      ;;
+   *)
       break
-   endsw
+      ;;
+   esac
 
    shift
-end
+done
 
 
 
-echo "Initializing repository data ...."
+/bin/echo "Initializing repository data ...."
 $irafdir/pkginit				# init repository information
 
 
 # Create the template Makefile.
-echo "Creating system makefile ...."
+/bin/echo "Creating system makefile ...."
 cat << MAKE_TEMP_END		> Makefile
 #
 #  Makefile for IRAF external package installation/maintenance.
@@ -41,7 +41,7 @@ cat << MAKE_TEMP_END		> Makefile
 
 # Compiler Flags.
 
-RELEASE		= v2.15
+RELEASE		= v2.16
         
 all:: update
 
@@ -49,6 +49,10 @@ all:: update
 update::
 	@./configure -noclean
 	@../util/pkgupdate -all
+
+# Install all available packages for this platform.
+install_all::
+	@../util/pkgall
 
 # List packages available on the repository.
 list::
@@ -87,53 +91,52 @@ echo "Setup Complete."
 
 
 # For each package we have, append a makefile entry.
-foreach p (`cat .repo_pkgs`)
+files=`cat .repo_pkgs`
+for p in ${files[@]}; do
 
    # Create template makefile entries for each package
-   echo "${p}::"						>> Makefile
-   echo "	@../util/pkginst $p"			>> Makefile
-   echo "clean_${p}::"					>> Makefile
-   echo "	@../util/pkgclean $p"			>> Makefile
-   echo "update_${p}::"					>> Makefile
-   echo "	@../util/pkgupdate $p"			>> Makefile
-   echo ""						>> Makefile
+   /bin/echo "${p}::"						>> Makefile
+   /bin/echo "	@../util/pkginst $p"				>> Makefile
+   /bin/echo "clean_${p}::"					>> Makefile
+   /bin/echo "	@../util/pkgclean $p"				>> Makefile
+   /bin/echo "update_${p}::"					>> Makefile
+   /bin/echo "	@../util/pkgupdate $p"				>> Makefile
+   /bin/echo ""							>> Makefile
 
    # Create the directory
-   if ( -e $p ) then
-	if ($clean == 1) then
+   if [ -e "$p" ]; then
+	if (( $clean==1 )); then
 	    /bin/rm -rf $p
-	endif
+	fi
    else
        mkdir $p
-   endif
-end
+   fi
+done
 
-if ($clean == 0) then
+if (( $clean==0 )); then
     exit 0
-endif
+fi
 
 
-echo ""
-echo ""
-echo "    To install packages, use 'ls' to list the currently available"
-echo "    packages from the IRAF repository.  For each package you wish"
-echo "    to install, use the command:"
-echo ""
-echo "      make <pkg>"
-echo ""
-echo "    The package will be loaded dynamically the next time you start"
-echo "    the CL session."
-echo ""
-echo "    Use the commmands:"
-echo ""
-echo "      make update	# to update pkgs to the latest repository version"
-echo "      make check	# to list available updates"
-echo "      make clean	# to delete installed all packages"
-echo "      make init    	# restore to pre-configure state"
-echo "      make <pkg>	# to force a re-install of named <pkg>"
-echo ""
-echo ""
-
-
+/bin/echo ""
+/bin/echo ""
+/bin/echo "    To install packages, use 'ls' to list the currently available"
+/bin/echo "    packages from the IRAF repository.  For each package you wish"
+/bin/echo "    to install, use the command:"
+/bin/echo ""
+/bin/echo "      make <pkg>"
+/bin/echo ""
+/bin/echo "    The package will be loaded dynamically the next time you start"
+/bin/echo "    the CL session."
+/bin/echo ""
+/bin/echo "    Use the commmands:"
+/bin/echo ""
+/bin/echo "      make update	# to update pkgs to the latest repository version"
+/bin/echo "      make check	# to list available updates"
+/bin/echo "      make clean	# to delete installed all packages"
+/bin/echo "      make init    	# restore to pre-configure state"
+/bin/echo "      make <pkg>	# to force a re-install of named <pkg>"
+/bin/echo ""
+/bin/echo ""
 
 exit 0

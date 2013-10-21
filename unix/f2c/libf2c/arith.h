@@ -4,3 +4,6 @@
 #define Intcast (int)(long)
 #define Double_Align
 #define X64_bit_pointers
+#define NANCHECK
+#define QNaN0 0x0
+#define QNaN1 0xfff80000

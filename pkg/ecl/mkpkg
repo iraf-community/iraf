@@ -6,8 +6,6 @@ $exit
 update:					# make ecl.e and install in bin$
         $ifeq (MACH, sparc) then
             $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
-        $else
-            $call   libs@readline
         $endif
 	$call	relink
 	$call	install
@@ -53,8 +51,6 @@ relink:
 
 	$ifeq (MACH, sparc) then
 	    $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
-	$else
-	    $call	libs@readline
 	$endif
 
 	$update libpkg.a
@@ -71,9 +67,9 @@ link:
 	$set	LIBS = "-lc -lcur -lds -lstg"
 	$ifneq (MACH, sparc) then
 	  $ifeq (MACH, linux) then
-	    $set	LIBS2 = "libreadline.a -/L/usr/lib32 -lncurses"
+	    $set	LIBS2 = "-/L/usr/lib32 -lreadline -lncurses"
 	  $else
-	    $set	LIBS2 = "libreadline.a -lncurses"
+	    $set	LIBS2 = "-lreadline -lncurses"
 	  $endif
 	$else
 	$set	LIBS2 = ""

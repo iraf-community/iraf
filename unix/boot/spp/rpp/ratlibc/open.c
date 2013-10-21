@@ -3,6 +3,8 @@
 
 #include "ratdef.h"
 
+extern void r4tocstr (register RCHAR *rstr, register char *cstr);
+
 FINT
 OPEN(rname, mode)
 RCHAR *rname;

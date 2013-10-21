@@ -899,7 +899,7 @@ int
 e_moreflag (register int topkey)
 {
 	if ((numkeys == botkey) && (topkey == 1))
-	    return;
+	    return 0;
 
 	if (botkey < numkeys) {
 	    e_ctrl ("so");
@@ -2016,7 +2016,7 @@ e_ctrl (char *cap)
 	 */
 	if (strcmp(cap,"so") == 0 || strcmp(cap,"us") == 0)
 	    if (standout == NO)
-		return;
+		return 0;
 
 	c_ttyctrl (tty_fd, tty, cap, 1);
 }

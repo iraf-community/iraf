@@ -2,7 +2,8 @@
 
 # Process x_system (the executable part of the SYSTEM package).
 
-task	concatenate	= t_concatenate,
+task	chkupdate	= t_chkupdate,
+	concatenate	= t_concatenate,
 	copy		= t_copy,
 	count		= t_count,
 	delete		= t_delete,

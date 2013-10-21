@@ -558,7 +558,7 @@ end
 # point celestial coordinate system to the input coordinate celestial
 # coordinate system.
 
-pointer	procedure cc_utan (refcoo, coo, idlngref, idlatref, odlngref, odlatref,
+pointer	procedure cc_utan (refcoo, coo, idxref, idyref, idlngref, idlatref, odlngref, odlatref,
 	lngrefunits, latrefunits)
 
 pointer	refcoo			#I pointer to the reference point system

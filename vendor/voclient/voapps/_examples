@@ -20,8 +20,7 @@ VOREGISTRY
 
 VODATA
     vodata gsc2.3 ngc1234                       # simplest query
-    vodata gsc2.3 /tmp/_abell.pos               # multi-src file input
-(speed)
+    vodata gsc2.3 /tmp/_abell.pos               # multi-src file input (speed)
     vodata -rm 10 gsc2.3 ngc1234                # alt SR spec
     vodata -all hst ngc1234
     vodata gsc2.3 ngc1234

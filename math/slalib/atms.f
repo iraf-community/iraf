@@ -11,7 +11,7 @@
 *
 *  Given:
 *    RT      d    height of tropopause from centre of the Earth (metre)
-*    TT      d    temperature at the tropopause (deg K)
+*    TT      d    temperature at the tropopause (K)
 *    DNT     d    refractive index at the tropopause
 *    GAMAL   d    constant of the atmospheric model = G*MD/R
 *    R       d    current distance from the centre of the Earth (metre)
@@ -20,9 +20,26 @@
 *    DN      d    refractive index at R
 *    RDNDR   d    R * rate the refractive index is changing at R
 *
-*  P.T.Wallace   Starlink   14 July 1995
+*  Last revision:   26 December 2004
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

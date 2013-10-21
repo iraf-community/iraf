@@ -10,6 +10,9 @@ sh -x setarch.sh
 echo "----------------------- OS -----------------------------"
 echo "+"; echo "+"
 (cd os;   sh -x mkpkg.sh)
+echo "----------------------- F2C ----------------------------"
+echo "+"; echo "+"
+(cd f2c; sh -x mkpkg.sh)
 echo "----------------------- BOOT ---------------------------"
 echo "+"; echo "+"
 (cd boot; sh -x mkpkg.sh)

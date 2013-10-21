@@ -3,11 +3,17 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #define NOKNET
 #define	import_spp
 #define	import_knames
 #include <iraf.h>
+
+#include "../bootProto.h"
+
 
 /*
  * RTAR -- Read a UNIX tar format tape containing files with legal IRAF
@@ -106,7 +112,7 @@ struct fheader {
 
 static int advance;		/* Advance to named file		*/
 static int stripblanks;		/* strip blank padding at end of file	*/
-static int debug;			/* Print debugging messages		*/
+static int debug;		/* Print debugging messages		*/
 static int binaryout;		/* make only binary byte stream files	*/
 static int omitbinary;		/* omit binary files (do not write)	*/
 static int extract;		/* Extract files from the tape		*/
@@ -114,9 +120,9 @@ static int replace;		/* Replace existing files		*/
 static int exclude;		/* Excluded named files			*/
 static int printfnames;		/* Print file names			*/
 static int verbose;		/* Print everything			*/
-static int links;			/* Defeat copy to resolve link		*/
+static int links;		/* Defeat copy to resolve link		*/
 static int setmtime;		/* Restore file modify times		*/
-static int setuid;			/* Restore file user id			*/
+static int rsetuid;		/* Restore file user id			*/
 
 static char *pathprefix = NULL;
 static int len_pathprefix = 0;
@@ -128,15 +134,35 @@ static char tapeblock[SZ_TAPEBUFFER];
 static char *nextblock;
 static int nblocks;
 
+extern int  ZZSTRT (void);
+extern int  ZZSTOP (void);
+
+extern  int tape_open (char *fname, int mode);
+extern  int tape_close (int fd);
+extern  int tape_read (int fd, char *buf, int nbytes);
+
+static int   matchfile (char *fname, register char **files);
+static int   getheader (int in, register struct fheader *fh);
+static int   cchksum (register char *p, register int nbyte);
+static void  printheader (FILE *out, register struct fheader *fh, int verbose);
+static int   filetype (int in, struct fheader *fh);
+static int   newfile (char *fname, int mode, int uid, int gid, int type);
+static int   checkdir (register char *path, int mode, int uid, int gid);
+static void  copyfile (int in, int out, struct fheader *fh, int ftype);
+static void  strip_blanks (int in, int out, long nbytes);
+static void  skipfile (int in, struct fheader *fh);
+static char *getblock (int in);
+
+
+
+
 char	*getblock();
 
 
 /* MAIN -- "rtar [xtvlef] [names]".  The default operation is to extract all
  * files from the tar format standard input in quiet mode.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int main (int argc, char *argv[])
 {
 	struct	fheader fh;
 	char	**argp;
@@ -158,7 +184,7 @@ char	*argv[];
 	verbose		= 0;
 	links		= 0;
 	setmtime	= 1;
-	setuid		= 1;
+	rsetuid		= 1;
 	stripblanks	= 1;	/* strip blanks at end of file by default */
 
 	/* Get parameters.  Argp is left pointing at the list of files to be
@@ -207,7 +233,7 @@ char	*argv[];
 			setmtime = 0;
 			break;
 		    case 'u':
-			setuid = 0;
+			rsetuid = 0;
 			break;
 		    case 'o':
 			omitbinary++;
@@ -252,7 +278,7 @@ char	*argv[];
 	 */
 	while (getheader (in, &fh) != EOF) {
 	    curfil = &fh;
-	    if (advance)
+	    if (advance) {
 		if (strcmp (fh.name, first_file) == 0) {
 		    if (debug)
 			fprintf (stderr, "match\n");
@@ -263,6 +289,7 @@ char	*argv[];
 		    skipfile (in, &fh);
 		    continue;
 		}
+	    }
 
 	    if (matchfile (fh.name, argp) == exclude) {
 		if (debug)
@@ -298,7 +325,7 @@ char	*argv[];
 				fh.linkname, fh.name);
 			} else {
 			    os_setfmode (fh.name, fh.mode);
-			    if (setuid)
+			    if (rsetuid)
 				os_setowner (fh.name, fh.uid, fh.gid);
 			    if (setmtime)
 				os_setmtime (fh.name, fh.mtime);
@@ -331,7 +358,7 @@ char	*argv[];
 		    os_close (out);
 		}
 		os_setfmode (fh.name, fh.mode);
-		if (setuid)
+		if (rsetuid)
 		    os_setowner (fh.name, fh.uid, fh.gid);
 		if (setmtime)
 		    os_setmtime (fh.name, fh.mtime);
@@ -352,6 +379,8 @@ char	*argv[];
 
 	ZZSTOP();
 	exit (OSOK);
+
+	return (0);
 }
 
 
@@ -360,9 +389,11 @@ char	*argv[];
  * exact match is required (excluding the $), otherwise we have a match if
  * the list element is a prefix of the filename.
  */
-matchfile (fname, files)
-char	*fname;			/* filename to be compared to list	*/
-register char	**files;	/* pointer to array of fname pointers	*/
+static int
+matchfile (
+    char *fname,		/* filename to be compared to list	*/
+    register char **files	/* pointer to array of fname pointers	*/
+)
 {
 	register char *fn, *ln;
 	register int firstchar;
@@ -391,9 +422,11 @@ register char	**files;	/* pointer to array of fname pointers	*/
  * indicates that the tape is not positioned to the beginning of a file.
  * If we have a legal header, decode the character valued fields into binary.
  */
-getheader (in, fh)
-int	in;			/* input file			*/
-register struct	fheader *fh;	/* decoded file header (output)	*/
+static int
+getheader (
+    int	in,				/* input file			*/
+    register struct fheader *fh		/* decoded file header (output)	*/
+)
 {
 	register char *ip, *op;
 	register int n;
@@ -465,9 +498,11 @@ register struct	fheader *fh;	/* decoded file header (output)	*/
 
 /* CCHKSUM -- Compute the checksum of a byte array.
  */
-cchksum (p, nbytes)
-register char	*p;
-register int	nbytes;
+static int
+cchksum (
+    register char *p,
+    register int   nbytes
+)
 {
 	register int	sum;
 
@@ -482,17 +517,17 @@ struct _modebits {
 	int	code;
 	char	ch;
 } modebits[] = {
-	040000,	'd',
-	0400,	'r',
-	0200,	'w',
-	0100,	'x',
-	040,	'r',
-	020,	'w',
-	010,	'x',
-	04,	'r',
-	02,	'w',
-	01,	'x',
-	0,	0
+    { 040000,	'd' },
+    { 0400,	'r' },
+    { 0200,	'w' },
+    { 0100,	'x' },
+    { 040,	'r' },
+    { 020,	'w' },
+    { 010,	'x' },
+    { 04,	'r' },
+    { 02,	'w' },
+    { 01,	'x' },
+    { 0,	0   }
 };
 
 
@@ -500,10 +535,12 @@ struct _modebits {
  * format, e.g.:
  *		drwxr-xr-x  9 tody         1024 Nov  3 17:53 .
  */
-printheader (out, fh, verbose)
-FILE	*out;			/* output file			*/
-register struct fheader *fh;	/* file header struct		*/
-int	verbose;		/* long format output		*/
+static void
+printheader (
+    FILE  *out,				/* output file			*/
+    register struct fheader *fh,	/* file header struct		*/
+    int	  verbose			/* long format output		*/
+)
 {
 	register struct	_modebits *mp;
 	char	*tp, *ctime();
@@ -517,7 +554,7 @@ int	verbose;		/* long format output		*/
 	    fprintf (out, "%c", mp->code & fh->mode ? mp->ch : '-');
 
 	tp = ctime (&fh->mtime);
-	fprintf (out, "%3d %4d %2d %8d %-12.12s %-4.4s %s",
+	fprintf (out, "%3d %4d %2d %8ld %-12.12s %-4.4s %s",
 	    fh->linkflag,
 	    fh->uid,
 	    fh->gid,
@@ -540,9 +577,11 @@ int	verbose;		/* long format output		*/
  * in nearly all cases.  This can be overriden, producing only binary byte
  * stream files as output, by a command line switch.
  */
-filetype (in, fh)
-int	in;			/* input file			*/
-struct	fheader *fh;		/* decoded file header		*/
+static int
+filetype (
+    int	   in,			/* input file			*/
+    struct fheader *fh		/* decoded file header		*/
+)
 {
 	register char	*cp;
 	register int	n, ch;
@@ -588,11 +627,13 @@ struct	fheader *fh;		/* decoded file header		*/
  * with the mode bits given.  Create all directories leading to the file if
  * necessary (and possible).
  */
-newfile (fname, mode, uid, gid, type)
-char	*fname;			/* pathname of file		*/
-int	mode;			/* file mode bits		*/
-int	uid, gid;		/* file owner, group codes	*/
-int	type;			/* text, binary, directory	*/
+static int
+newfile (
+    char *fname,		/* pathname of file		*/
+    int	  mode,			/* file mode bits		*/
+    int	  uid, int gid,		/* file owner, group codes	*/
+    int	  type 			/* text, binary, directory	*/
+)
 {
 	int	fd;
 	char	*cp;
@@ -633,10 +674,12 @@ int	type;			/* text, binary, directory	*/
 /* CHECKDIR -- Verify that all the directories in the pathname of a file
  * exist.  If they do not exist, try to create them.
  */
-checkdir (path, mode, uid, gid)
-register char *path;
-int	mode;
-int	uid, gid;
+static int
+checkdir (
+    register char *path,
+    int	mode,
+    int	uid, int gid
+)
 {
 	register char	*cp;
 	char	*rindex();
@@ -683,15 +726,18 @@ int	uid, gid;
  * Each file consists of a integral number of TBLOCK size blocks on the
  * input file.
  */
-copyfile (in, out, fh, ftype)
-int	in;			/* input file			*/
-int	out;			/* output file			*/
-struct	fheader *fh;		/* file header structure	*/
-int	ftype;			/* text or binary file		*/
+static void
+copyfile (
+    int	   in,			/* input file			*/
+    int	   out,			/* output file			*/
+    struct fheader *fh,		/* file header structure	*/
+    int	   ftype		/* text or binary file		*/
+)
 {
 	long	nbytes = fh->size;
 	int	nblocks = 0, maxpad;
 	char	*bp;
+
 
 	/* Link files are zero length on the tape. */
 	if (fh->linkflag)
@@ -735,9 +781,8 @@ int	ftype;			/* text or binary file		*/
  * the actual size of a text file and have to pad with blanks at the end to
  * make the file the size noted in the file header.
  */
-strip_blanks (in, out, nbytes)
-int	in, out;
-long	nbytes;
+static void
+strip_blanks (int in, int out, long nbytes)
 {
 	register char	*ip, *op;
 	char	padbuf[SZ_PADBUF+10];
@@ -773,9 +818,11 @@ long	nbytes;
 
 /* SKIPFILE -- Skip the indicated number of bytes on the input (tar) file.
  */
-skipfile (in, fh)
-int	in;			/* input file			*/
-struct	fheader *fh;		/* file header			*/
+static void
+skipfile (
+    int	   in,			/* input file			*/
+    struct fheader *fh 		/* file header			*/
+)
 {
 	register long nbytes = fh->size;
 
@@ -791,9 +838,8 @@ struct	fheader *fh;		/* file header			*/
 /* GETBLOCK -- Return a pointer to the next file block of size TBLOCK bytes
  * in the input file.
  */
-char *
-getblock (in)
-int	in;			/* input file			*/
+static char *
+getblock (int in)
 {
 	char	*bp;
 	int	nbytes;

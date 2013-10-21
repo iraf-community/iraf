@@ -298,7 +298,7 @@ samp_GetRegisteredClients (handle_t handle)
 	    xr_getStringFromArray (res, i, &str);
 	    samp_setStringInList (lres, str);
 
-	    free ((void *) str);
+	    //free ((void *) str);
         }
     } else {
         lres = samp_newList ();

@@ -101,6 +101,8 @@ int	BSS_kludge[256];
 
 void 	ready_ (void);
 
+extern int ZAWSET(), ZOPNTY(), ZZSETK();
+
 
 
 /* ZZSTRT -- Initialize the IRAF kernel at process startup time.

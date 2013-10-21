@@ -1,5 +1,8 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg/plot/crtpict/calchgms.x
+    The 'ibuf pointer was being used with Memr (5/4/13, MJF)
+
 pkg/plot/hgpline.x		+
 pkg/plot/t_prows.x
 pkg/plot/t_pcols.x

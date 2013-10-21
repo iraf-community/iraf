@@ -38,11 +38,14 @@ LIBS		= -lm -lc -lpthread
 
 all:
 	(cd common      ; make all  ; make install)
-	(cd libvotable  ; make all  ; make install)
 	(cd libsamp     ; make all  ; make install)
+	(cd libvotable  ; make all  ; make install)
 	(cd libvoclient ; make all  ; make install)
 	(cd voapps      ; make all  ; make install)
 	(cd libvo       ; make all  ; make install)
+	cp voclient.jar voclientd bin/
+	/bin/rm -rf bin/curl* lib/pkgconfig
+	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 libs:
 	(cd common      ; make libs)
@@ -73,16 +76,21 @@ install:
 	(cd libvoclient ; make install)
 	(cd voapps      ; make install)
 	(cd libvo       ; make install)
+	cp voclient.jar voclientd bin/
+	/bin/rm -rf bin/curl* lib/pkgconfig
+	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 clean:
-	(cd common      ; make clean)
+	(cd common      ; make distclean)
 	(cd libvotable  ; make clean)
 	(cd libsamp     ; make clean)
 	(cd libvoclient ; make clean)
 	(cd voapps      ; make clean)
 	(cd libvo       ; make clean)
 	/bin/rm -rf voclient/lib/libvoclient.*
-	/bin/rm -rf bin/* lib/* include/* spool
+	/bin/rm -rf bin/* lib/* include/* *spool* */*spool* */*/*spool*
+	/bin/rm -rf */config.log */*/config.log */*/*/config.log
+	/bin/rm -rf */*.dylib
 
 
 

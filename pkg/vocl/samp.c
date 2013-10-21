@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <signal.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <readline/readline.h>		/* to install rl_event_hook	*/
 
 #define import_spp
 #define import_libc
@@ -20,7 +22,6 @@
 #define import_xwhen
 #include <iraf.h>
 
-#include "readline.h"			/* to install rl_event_hook	*/
 #include "config.h"			/* CL declarations		*/
 #include "clmodes.h"
 #include "operand.h"
@@ -48,7 +49,6 @@ char    samp_cmd[SZ_CMDBLK];
 
 extern int     optbl[];
 extern char   *ifnames[];
-
 
 
 /**
@@ -452,7 +452,7 @@ sampio_handler (int signum)
 int
 samp_rl_hook (void)
 {
-    rl_set_keyboard_input_timeout (333333);
+    /* rl_set_keyboard_input_timeout (333333); */
     rl_done = (samp_cmd[0] ? 1 : 0);
 
     return ( rl_done );
@@ -514,7 +514,7 @@ sampop (int opcode, int op_index, int nargs)
 
 	    if (! samp_hubActive (samp)) {
 		oprintf ("Error: Hub is not active.\n");
-		return;
+		return 0;
 	    }
 	}
 

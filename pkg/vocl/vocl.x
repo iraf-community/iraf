@@ -1,9 +1,11 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-task	ecl = t_ecl
-procedure t_ecl()
+task	vocl = t_vocl
+
+procedure t_vocl ()
 begin
 end
+
 
 # CL -- The main entry point of the CL.  Unlike most IRAF tasks, the CL task
 # occupies a process all by itself and takes control immediately when the task

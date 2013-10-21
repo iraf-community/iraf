@@ -1,13 +1,13 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGREPO - Get the repository base URI, either from the environment
 #  variable 'IRAF_REPO' or the default.
 
 
-if ($?IRAF_REPO) then
-   echo $IRAF_REPO
+if [ -z "$IRAF_REPO" ]; then
+   /bin/echo "ftp://iraf.noao.edu/iraf/v216/REPO"
 else
-   echo "ftp://iraf.noao.edu/iraf/v216/REPO"
-endif
+   /bin/echo $IRAF_REPO
+fi
 
 exit 0

@@ -554,3 +554,18 @@ observatory = "lno"
        altitude = 111
        timezone = -8 
 
+# Submitted by Eugene Esemenko 4/11/13  (BTA 6m, http://www.sao.ru/Doc-en/)
+observatory = "saoras" 
+       name = "Special Astrophysical Observatory, Russia" 
+       longitude = -41:26:25.61 
+       latitude = 43:38:48.57 
+       altitude = 2080. 
+       timezone = -4 
+
+# Submitted by Eugene Esemenko 4/11/13 (http://www.terskol.com/)
+observatory = "terskol" 
+       name = "Terskol mountain observatory, Russia" 
+       longitude = -42:30:00.0 
+       latitude = 43:16:22.0 
+       altitude = 3100. 
+       timezone = -4 

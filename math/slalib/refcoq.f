@@ -1,4 +1,4 @@
-      SUBROUTINE slRFCQ (TDK, PMB, RH, WL, REFA, REFB)
+      SUBROUTINE slRFCQ ( TDK, PMB, RH, WL, REFA, REFB )
 *+
 *     - - - - - - -
 *      R F C Q
@@ -13,7 +13,7 @@
 *  zenith distance.
 *
 *  Given:
-*    TDK      d      ambient temperature at the observer (deg K)
+*    TDK      d      ambient temperature at the observer (K)
 *    PMB      d      pressure at the observer (millibar)
 *    RH       d      relative humidity at the observer (range 0-1)
 *    WL       d      effective wavelength of the source (micrometre)
@@ -48,7 +48,7 @@
 *
 *     The model was tested using the following range of conditions:
 *
-*       lapse rates 0.0055, 0.0065, 0.0075 deg/metre
+*       lapse rates 0.0055, 0.0065, 0.0075 K/metre
 *       latitudes 0, 25, 50, 75 degrees
 *       heights 0, 2500, 5000 metres ASL
 *       pressures mean for height -10% to +5% in steps of 5%
@@ -67,11 +67,11 @@
 *
 *     For this particular set of conditions:
 *
-*       lapse rate 0.0065 degK/metre
+*       lapse rate 0.0065 K/metre
 *       latitude 50 degrees
 *       sea level
-*       pressure 1005 mB
-*       temperature 280.15 degK
+*       pressure 1005 mb
+*       temperature 280.15 K
 *       humidity 80%
 *       wavelength 5740 Angstroms
 *
@@ -122,9 +122,8 @@
 *     c) The refractivity of air is a function of temperature,
 *        total pressure, water-vapour pressure and, in the case
 *        of optical/IR but not radio, wavelength.  The formulae
-*        for the two cases are developed from the Essen and Froome
-*        expressions adopted in Resolution 1 of the 12th International
-*        Geodesy Association General Assembly (1963).
+*        for the two cases are developed from Hohenkerk & Sinclair
+*        (1985) and Rueger (2002).
 *
 *     The above three items are as used in the slRFRO routine.
 *
@@ -146,18 +145,37 @@
 *
 *     Gill, Adrian E., "Atmosphere-Ocean Dynamics", Academic Press, 1982.
 *
+*     Green, R.M., "Spherical Astronomy", Cambridge University Press, 1987.
+*
 *     Hohenkerk, C.Y., & Sinclair, A.T., NAO Technical Note No. 63, 1985.
 *
-*     International Geodesy Association General Assembly, Bulletin
-*     Geodesique 70 p390, 1963.
+*     Rueger, J.M., "Refractive Index Formulae for Electronic Distance
+*     Measurement with Radio and Millimetre Waves", in Unisurv Report
+*     S-68, School of Surveying and Spatial Information Systems,
+*     University of New South Wales, Sydney, Australia, 2002.
 *
 *     Stone, Ronald C., P.A.S.P. 108 1051-1058, 1996.
 *
-*     Green, R.M., "Spherical Astronomy", Cambridge University Press, 1987.
+*  Last revision:   2 December 2005
 *
-*  P.T.Wallace   Starlink   4 June 1997
+*  Copyright P.T.Wallace.  All rights reserved.
 *
-*  Copyright (C) 1997 Rutherford Appleton Laboratory
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -191,11 +209,11 @@
 
 *  Refractive index minus 1 at the observer.
       IF (OPTIC) THEN
-         WLSQ = WL*WL
-         GAMMA = ((77.532D-6+(4.391D-7+3.57D-9/WLSQ)/WLSQ)*P
+         WLSQ = W*W
+         GAMMA = ((77.53484D-6+(4.39108D-7+3.666D-9/WLSQ)/WLSQ)*P
      :                                                 -11.2684D-6*PW)/T
       ELSE
-         GAMMA = (77.624D-6*P-(12.92D-6-0.371897D0/T)*PW)/T
+         GAMMA = (77.6890D-6*P-(6.3938D-6-0.375463D0/T)*PW)/T
       END IF
 
 *  Formula for beta adapted from Stone, with empirical adjustments.

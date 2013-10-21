@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define	import_spp
 #define	import_error
@@ -22,8 +25,8 @@
  * expansion at this low level permits the use of macros in any part of
  * the input except comments.
  */
-m_getc (cx)
-register struct context *cx;
+int
+m_getc (register struct context *cx)
 {
 	register int	ch, nch;
 	register char	*op;
@@ -68,7 +71,7 @@ register struct context *cx;
 	     */
 	    if (name[0] == '?') {
 		/* Interactive query. */
-		if (cx->fp == stdin) {
+		if ((cx->fp == stdin)) {
 		    warns ("`$(%s)': cannot query in -f stdin mode", name);
 		    val = &name[1];
 		} else {
@@ -76,7 +79,7 @@ register struct context *cx;
 		    fflush (stdout);
 		    if (fgets (lbuf, SZ_CMD, stdin) == NULL)
 			strcpy (lbuf, name);
-		    if (val = index (lbuf, '\n'))
+		    if ((val = index (lbuf, '\n')))
 			*val = EOS;
 		    val = lbuf;
 		}
@@ -128,8 +131,8 @@ push:
 /* M_RAWGETC -- Get a (possibly pushed back) character from the mkpkgfile
  * associated with the given context.
  */
-m_rawgetc (cx)
-register struct context *cx;
+int
+m_rawgetc (register struct context *cx)
 {
 	register struct	pushback *pb;
 	register int	ch;
@@ -138,7 +141,7 @@ register struct context *cx;
 	    /* Check for single character pushback first.  This type of pushback
 	     * occurs at the end of every token.
 	     */
-	    if (ch = cx->pbchar) {
+	    if ((ch = cx->pbchar)) {
 		if (debug > 3) {
 		    if (ch <= 040)
 			printf ("return pushback character 0%o\n", ch);
@@ -198,16 +201,18 @@ register struct context *cx;
  * PUSHSTR we can provide additional pushback at additional expense (no
  * problem provided it is not used a lot).
  */ 
-m_ungetc (ch, cx)
-int	ch;
-struct	context *cx;
+void
+m_ungetc (
+  int	ch,
+  struct context *cx
+)
 {
 	static	char ps[2] = "\0";
 
 	if (ch == '\n')
 	    --cx->lineno;
 	    
-	if (ps[0] = cx->pbchar)
+	if ((ps[0] = cx->pbchar))
 	    m_pushstr (cx, ps);
 
 	cx->pbchar = ch;
@@ -225,16 +230,18 @@ struct	context *cx;
 /* M_PUSHSTR -- Pushback a string.  Pushed strings are read back LIFO, although
  * of course the individual characters are returned FIFO.
  */ 
-m_pushstr (cx, str)
-struct	context *cx;
-char	*str;
+void
+m_pushstr (
+  struct context *cx,
+  char	*str
+)
 {
 	register struct	pushback *pb;
 	register char	*ip, *op, *otop, ch;
 
 	if (debug > 2) {
 	    if (str[0] <= 040)
-		printf ("pushback punct char 0%o\n", str);
+		printf ("pushback punct char 0x%lx\n", (long) str);
 	    else
 		printf ("pushback string `%s'\n", str);
 	    fflush (stdout);
@@ -260,8 +267,13 @@ char	*str;
 
 	if (debug > 2) {
 	    printf ("pb status: ");
-	    printf ("level=%d(%d), nleft=%d, ip=%d, op=%d, bp=%d, otop=%d\n",
-		pb->npb, SZ_PBSTK, otop-op, pb->ip, pb->op, pb->pbbuf, otop);
+	    printf ("level=%d(%d) nleft=%ld ip=%ld op=%ld bp=%ld otop=%ld\n",
+		pb->npb, SZ_PBSTK, 
+		(long) (otop-op), 
+		(long) pb->ip, 
+		(long) pb->op, 
+		(long) pb->pbbuf, 
+		(long) otop);
 	    fflush (stdout);
 	}
 
@@ -273,8 +285,8 @@ char	*str;
 
 /* MK_PBBUF -- Allocate and initialize the pushback descriptor.
  */
-mk_pbbuf (cx)
-register struct context *cx;
+void
+mk_pbbuf (register struct context *cx)
 {
 	register struct	pushback *pb;
 
@@ -291,8 +303,8 @@ register struct context *cx;
 
 /* PB_CANCEL -- Cancel any pushback.
  */
-pb_cancel (cx)
-register struct context *cx;
+void
+pb_cancel (register struct context *cx)
 {
 	register struct	pushback *pb;
 
@@ -312,8 +324,7 @@ register struct context *cx;
  * if the string buffer overflows.
  */
 char *
-putstr (s)
-char	*s;
+putstr (char *s)
 {
 	register char *ip, *op, *otop;
 	char	*start;
@@ -328,7 +339,7 @@ char	*s;
 	cp = op;
 
 	if (debug > 2) {
-	    printf ("putstr `%s': nleft=%d\n", s, otop-op);
+	    printf ("putstr `%s': nleft=%ld\n", s, (long)(otop-op));
 	    fflush (stdout);
 	}
 
@@ -347,8 +358,8 @@ char	*s;
 
 #ifdef vms
 
-k_getc (cx)
-register struct context *cx;
+int
+k_getc (register struct context *cx)
 {
 	register int	ch;
 
@@ -362,10 +373,11 @@ register struct context *cx;
 }
 
 char *
-k_fgets (obuf, maxch, cx)
-char	*obuf;
-int	maxch;
-register struct context *cx;
+k_fgets (
+  char	*obuf,
+  int	maxch,
+  register struct context *cx
+)
 {
 	register int	ch, n;
 	register char	*op;
@@ -382,10 +394,12 @@ register struct context *cx;
 	return (obuf);
 }
 
-k_fseek (cx, offset, type)
-register struct context *cx;
-long	offset;
-int	type;
+int
+k_fseek (
+  register struct context *cx,
+  long	offset,
+  int	type
+)
 {
 	register FILE	*fp = cx->fp;
 	register int	ch;
@@ -417,8 +431,8 @@ int	type;
 	}
 }
 
-k_ftell (cx)
-register struct context *cx;
+long
+k_ftell (register struct context *cx)
 {
 	if (debug > 1) {
 	    printf ("ftell returns %d\n", cx->fpos);
@@ -429,31 +443,34 @@ register struct context *cx;
 
 #else
 
-k_getc (cx)
-struct	context *cx;
+int
+k_getc (struct	context *cx)
 {
 	return (getc (cx->fp));
 }
 
 char *
-k_fgets (op, maxch, cx)
-char	*op;
-int	maxch;
-register struct context *cx;
+k_fgets (
+  char	*op,
+  int	maxch,
+  register struct context *cx
+)
 {
 	return (fgets (op, maxch, cx->fp));
 }
 
-k_fseek (cx, offset, type)
-struct	context *cx;
-long	offset;
-int	type;
+int
+k_fseek (
+  struct context *cx,
+  long	offset,
+  int	type 
+)
 {
 	return (fseek (cx->fp, offset, type));
 }
 
-k_ftell (cx)
-struct	context *cx;
+long
+k_ftell (struct context *cx)
 {
 	return (ftell (cx->fp));
 }

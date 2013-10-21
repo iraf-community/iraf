@@ -1,0 +1,118 @@
+
+
+			Installation Instructions
+			=========================
+
+
+Distribution files:
+-------------------
+
+     The IRAF v2.16.1 system is available from the anonftp archive at
+
+	ftp://iraf.noao.edu/iraf/v216/PCIX
+
+Distribution files for supported platforms include:
+
+    iraf-src.tar.gz			# IRAF v2.16.1 source-only
+
+    iraf-all.tar.gz			# all supported binaries
+    iraf-linux.tar.gz			# 32- and 64-bit Linux binaries
+    iraf-macosx.tar.gz			# 32- and 64-bit Mac OSX binaries
+
+    iraf.lnux.x86_64.tar.gz		# 64-bit Linux binaries
+    iraf.lnux.x86.tar.gz		# 32-bit Linux binaries
+    iraf.macx.x86_64.tar.gz		# 64-bit Mac OSX (Intel) binaries
+    iraf.macx.x86.tar.gz		# 32-bit Mac OSX (Intel) binaries
+    iraf.macx.ppc.tar.gz		# 32-bit Mac OSX (PPC) binaries
+
+The advantage to installing the combined 'linux' or 'macosx' distributions
+is that on 64-bit platforms the 32-bit binaries will be available in the
+event a 64-bit bug is discovered.  By defining the IRAFARCH environment
+variable to be the name of the 32-bit system one can switch easily to the
+new architecture and continue working.
+
+
+To Download and Unpack teh IRAF Distribution
+--------------------------------------------
+
+     All distribution files are built as a tarball of the toplevel
+IRAF directory, i.e. they should be unpacked in a directory the user
+creates.  This is done to simplify updates by allowing a distribution to
+overlay an existing installation.  Thus, distribution files can be unpacked
+with the command, e.g.
+
+	% mkdir iraf.v2161
+	% cd iraf.v2161
+	% tar zxf /<path>/iraf-<arch>.tar.gz
+
+This will create a 'iraf.v2161' subdirectory containing the IRAF system.
+See below for further instructions on installing IRAF.
+
+    Note that if you are updating an existing installation, you can simply
+unpack the distribution tarball in the existing $iraf directory.
+
+
+
+To Install IRAF for personal use:  
+---------------------------------
+
+  1) Download and unpack the appropriate distribution file as above.
+
+  2) Execute the install script:
+
+	% ./install			# execute the install script
+
+     Answer the prompts, in most cases simply accepting the defaults will
+     be all that is needed.
+
+     This will create a private (i.e. user) installation of the IRAF system
+  that supercedes any system installation on the machine.  Root permission
+  is NOT required to run the install script. 
+
+  IRAF is immediately available by typing
+
+	% cl			# login to IRAF from current terminal
+	% iraf			# start IRAF in an XGterm window
+
+
+To Install IRAF for system-wide use:  
+------------------------------------
+
+  1) Download and unpack the appropriate distribution file as above.
+
+  2) Execute the install script with root permissions:
+
+	% sudo ./install --system	# execute the install script
+
+	or as the 'root' user:
+
+	# ./install --system		# execute the install script
+
+     This will create a system installation of IRAF for all users of the
+  machine.  Root permissions are required in order to write to system
+  directories.
+
+  IRAF is immediately available by typing
+
+	% cl			# login to IRAF from current terminal
+	% iraf			# start IRAF in an XGterm window
+
+
+To Build From Sources:
+----------------------
+
+  1) Download and unpack the source distribution file:
+
+	% tar zxf /<path>/iraf-src.tar.gz	# unpack tar file
+	% cd iraf.v2161				# go to the IRAF directory
+
+  2) Execute the install script to create needed links:
+
+	% ./install 		# execute the install script
+
+  2) Configure the system for the proper architecture and build
+
+	% make <arch>		# where <arch> is 'linux', 'macintel', etc
+	% make sysgen
+
+

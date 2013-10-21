@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define	import_spp
 #define	import_error
@@ -10,6 +13,8 @@
 
 #include "mkpkg.h"
 #include "extern.h"
+#include "../bootProto.h"
+
 
 /* DO_MKPKG -- Open the mkpkg file and scan it for the named program.  A program
  * may be either a sequence of preprocessor directives or the module list for
@@ -17,9 +22,11 @@
  * up a list of library modules needing updating, and replace these modules
  * in the library.
  */
-do_mkpkg (cx, islib)
-struct	context *cx;		/* current context	*/
-int	islib;			/* update a library?	*/
+int
+do_mkpkg (
+  struct context *cx,		/* current context	*/
+  int	islib 			/* update a library?	*/
+)
 {
 	if (cx->mkpkgfile[0] == EOS)
 	    strcpy (cx->mkpkgfile, MKPKGFILE);
@@ -83,9 +90,11 @@ int	islib;			/* update a library?	*/
  * procedure when done to perform any library rebuild or cleanup operations
  * necessary on the local system.
  */
-scan_modlist (cx, islib)
-struct	context *cx;		/* current mkpkg context	*/
-int	islib;
+int
+scan_modlist (
+  struct context *cx,		/* current mkpkg context	*/
+  int	islib
+)
 {
 	char	token[SZ_FNAME+1];
 	char	*dflist[MAX_DEPFILES+1];
@@ -231,7 +240,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		     * stream to compile the source, and set the useobj flag
 		     * to defeat recompilation of this module.
 		     */
-		    if (sfp && sfp->sf_mkobj[0])
+		    if (sfp && sfp->sf_mkobj[0]) {
 			if (useobj) {
 			    warns ("module %s has already been compiled",
 				modname);
@@ -240,6 +249,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 			    m_pushstr (cx, sfp->sf_mkobj);
 			    useobj++;
 			}
+		    }
 
 		    /* Add the local filename to the list of files to be
 		     * updated.
@@ -284,7 +294,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		if (exit_status != OK && !ignore)
 		    return (exit_status);
 
-	    } else if (tok == TOK_END || tok == NULL) {
+	    } else if (tok == TOK_END || tok == 0) {
 		/* We have reached the end of the current module list (;),
 		 * executed a $EXIT, or seen EOF on the mkpkg file.  If the
 		 * file list is nonempty update the current library, restore
@@ -375,11 +385,13 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
  * Syntax:	module@subdir/fname
  *	or	@(module)subdir/fname
  */
-parse_modname (modname, module, subdir, fname)
-char	*modname;		/* "module@subdir/fname"	*/
-char	*module;		/* receives module		*/
-char	*subdir;		/* receives subdir		*/
-char	*fname;			/* receives fname		*/
+void
+parse_modname (
+  char	*modname,		/* "module@subdir/fname"	*/
+  char	*module,		/* receives module		*/
+  char	*subdir,		/* receives subdir		*/
+  char	*fname 			/* receives fname		*/
+)
 {
 	register char	*ip, *op;
 	register int	ch;
@@ -412,33 +424,37 @@ char	*fname;			/* receives fname		*/
 	 */
 	fname[0] = EOS;
 	for (op=subdir, path=ip;  (ch = *op = *ip++);  op++)
-	    if (ch == '$' || ch == '/')
+	    if (ch == '$' || ch == '/') {
 		if (*(op-1) == '\\')
 		    *--op = ch;
 		else {
 		    parse_fname (path, subdir, fname);
 		    break;
 		}
+	    }
 }
 
 
 /* PARSE_FNAME -- Return logical directory and filename fields of a filename.
  */
-parse_fname (path, dname, fname)
-char	*path;			/* input filename		*/
-char	*dname;			/* receives directory name	*/
-char	*fname;			/* receives file name		*/
+void
+parse_fname (
+  char	*path,			/* input filename		*/
+  char	*dname,			/* receives directory name	*/
+  char	*fname 			/* receives file name		*/
+)
 {
 	register char	*ip, *op;
 	register char	*delim;
 
 	delim = NULL;
 	for (ip=path, op=fname;  (*op = *ip);  op++, ip++)
-	    if (*ip == '$' || *ip == '/')
+	    if (*ip == '$' || *ip == '/') {
 		if (*(ip-1) == '\\')
 		    *(--op) = *ip;
 		else
 		    delim = ip;
+	    }
 
 	if (delim == NULL) {
 	    dname[0] = EOS;
@@ -460,11 +476,12 @@ char	*fname;			/* receives file name		*/
  * but do not open the new mkpkgfile.
  */
 struct context *
-push_context (cx, module, newdir, fname)
-register struct context *cx;		/* current context	*/
-char	*module;			/* new module (library)	*/
-char	*newdir;			/* new directory	*/
-char	*fname;				/* mkpkgfile name	*/
+push_context (
+  register struct context *cx,		/* current context	*/
+  char	*module,			/* new module (library)	*/
+  char	*newdir,			/* new directory	*/
+  char	*fname 				/* mkpkgfile name	*/
+)
 {
 	register struct context *ncx;
 
@@ -504,7 +521,7 @@ char	*fname;				/* mkpkgfile name	*/
 	 * a sub-member list of the current library, strip the () and set the
 	 * sublib flag for scanlibrary().
 	 */
-	if (module[0])
+	if (module[0]) {
 	    if (strcmp (module, "BOF") == 0) {
 		ncx->library[0] = EOS;
 	    } else if (module[0] == '(') {
@@ -517,6 +534,7 @@ char	*fname;				/* mkpkgfile name	*/
 		ncx->sublib = YES;
 	    } else
 		strcpy (ncx->library, module);
+	}
 
 	if (newdir[0] && strcmp(newdir,".") != 0 && strcmp(newdir,"./") != 0) {
 	    /* Record the directory path for printed output.  Note that this
@@ -557,8 +575,9 @@ char	*fname;				/* mkpkgfile name	*/
  * directory.
  */
 struct context *
-pop_context (cx)
-register struct context *cx; 		/* current context	*/
+pop_context (
+  register struct context *cx 		/* current context	*/
+)
 {
 	register struct context *pcx;
 	int     root_modlist;
@@ -617,11 +636,13 @@ register struct context *cx; 		/* current context	*/
  * caller.  Note that the string buffer space is only "borrowed" and the
  * filenames should be used promptly, before the string buffer space is reused.
  */
-get_dependency_list (cx, module, dflist, maxfiles)
-struct	context *cx;		/* current library context	*/
-char	*module;		/* module list is for		*/
-char	*dflist[];		/* receives filename pointers	*/
-int	maxfiles;		/* maxfiles out			*/
+void
+get_dependency_list (
+  struct context *cx,		/* current library context	*/
+  char	*module,		/* module list is for		*/
+  char	*dflist[],		/* receives filename pointers	*/
+  int	maxfiles 		/* maxfiles out			*/
+)
 {
 	char	fname[SZ_FNAME+1];
 	int	token, nfiles=0;
@@ -630,7 +651,7 @@ int	maxfiles;		/* maxfiles out			*/
 
 	save_cp = cp;
 
-	while ((token = gettok (cx, fname, SZ_FNAME)) != NULL) {
+	while ((token = gettok (cx, fname, SZ_FNAME)) != 0) {
 	    switch (token) {
 	    case TOK_NEWLINE:
 		goto done;
@@ -674,12 +695,14 @@ done:
  * set the USEOBJ flag to tell our caller to use the .o file, rather than
  * recompile the module.
  */
-up_to_date (cx, module, lname, dflist, useobj)
-struct	context *cx;		/* current library context	*/
-char	*module;		/* module to compare dates for	*/
-char	*lname;			/* local name of module		*/
-char	*dflist[];		/* list of dependent files	*/
-int	*useobj;		/* obj exists and is usable	*/
+int
+up_to_date (
+  struct context *cx,		/* current library context	*/
+  char	*module,		/* module to compare dates for	*/
+  char	*lname,			/* local name of module		*/
+  char	*dflist[],		/* list of dependent files	*/
+  int	*useobj 		/* obj exists and is usable	*/
+)
 {
 	long	armod_date, newest_date, date;
 	long	h_ardate();
@@ -738,8 +761,8 @@ int	*useobj;		/* obj exists and is usable	*/
  * If the same file is already physically open by this process, this is
  * a "soft" open.
  */
-open_mkpkgfile (cx)
-register struct context *cx;
+int
+open_mkpkgfile (register struct context *cx)
 {
 	register char	*fname = cx->mkpkgfile;
 	struct	context *find_mkpkgfile();
@@ -766,8 +789,8 @@ register struct context *cx;
  * software) wait until the last context closes the file to physically close
  * the file.
  */
-close_mkpkgfile (cx)
-register struct context *cx;
+void
+close_mkpkgfile (register struct context *cx)
 {
 	struct context *find_mkpkgfile();
 
@@ -781,10 +804,11 @@ register struct context *cx;
  * which already has the named mkpkgfile open.
  */
 struct context *
-find_mkpkgfile (head_cx, mkpkgfile, level)
-struct	context *head_cx;	/* head of context list		*/
-char	*mkpkgfile;		/* file to search for		*/
-int	level;			/* subdirectory level		*/
+find_mkpkgfile (
+  struct context *head_cx,	/* head of context list		*/
+  char	*mkpkgfile,		/* file to search for		*/
+  int	level 			/* subdirectory level		*/
+)
 {
 	register struct context *cx;
 
@@ -803,8 +827,8 @@ int	level;			/* subdirectory level		*/
  * for the first entry, executing any preprocessor directives encountered
  * while searching.
  */
-search_mkpkgfile (cx)
-register struct context *cx;
+int
+search_mkpkgfile (register struct context *cx)
 {
 	char	word1[SZ_FNAME+1], word2[SZ_FNAME+1];
 	char	*prev, *curr, *temp;
@@ -834,7 +858,7 @@ register struct context *cx;
 	 * and then continue locally.
 	 */
 	while ((tok = gettok (cx, curr, SZ_FNAME)) != TOK_BEGIN) {
-	    if (tok == NULL || tok == TOK_END) {
+	    if (tok == 0 || tok == TOK_END) {
 		/* Exit; no entry found.
 		 */
 		return (ERR);

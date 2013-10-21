@@ -2,7 +2,7 @@
 \section{votStack.c File Reference}
 \label{votStack_8c}\index{votStack.c@{votStack.c}}
 }
-(Internal) Methods to manage the parser Element stack.  
+(Private) Methods to manage the parser \hyperlink{structElement}{Element} stack.  
 
 
 {\tt \#include $<$stdio.h$>$}\par
@@ -13,28 +13,28 @@
 \subsection*{Functions}
 \begin{CompactItemize}
 \item 
-Stack $\ast$ \hyperlink{votStack_8c_97706e275290da18b8d8a94ab319db94}{vot\_\-newStack} (void)
-\begin{CompactList}\small\item\em Makes a new stack (internal method). \item\end{CompactList}\item 
-Element $\ast$ \hyperlink{votStack_8c_f5e05232387d525ab141206095a5980d}{votPop} (Stack $\ast$st)
-\begin{CompactList}\small\item\em Return a Node from the top of the stack (internal method). \item\end{CompactList}\item 
-void \hyperlink{votStack_8c_a3251a683eae285cccc688daf2d87dae}{votPush} (Stack $\ast$st, Element $\ast$elem)
-\begin{CompactList}\small\item\em Push a Node to the top of the stack (internal method). \item\end{CompactList}\item 
-Element $\ast$ \hyperlink{votStack_8c_6e987eaeb90a1fa27b600386ca749bd6}{votPeek} (Stack $\ast$st)
-\begin{CompactList}\small\item\em Peek at Element on top of the Stack (internal method). \item\end{CompactList}\item 
-int \hyperlink{votStack_8c_11691bde61e5b2bbdea3649eb69d8253}{vot\_\-isEmpty} (Stack $\ast$st)
-\begin{CompactList}\small\item\em Checks to see if the stack is empty (internal method). \item\end{CompactList}\item 
-void \hyperlink{votStack_8c_b59d04018e68e36a1db5cff42740a809}{vot\_\-clearStack} (Stack $\ast$st)
-\begin{CompactList}\small\item\em Clear the stack (internal method). \item\end{CompactList}\item 
-void \hyperlink{votStack_8c_8eda4c629b19d8dec39ea86177dc18bd}{vot\_\-printStack} (Stack $\ast$st)
-\begin{CompactList}\small\item\em Print the name of all the stack elements (internal method). \item\end{CompactList}\end{CompactItemize}
+\hyperlink{structStack}{Stack} $\ast$ \hyperlink{votStack_8c_4a7f5a306e9f1c1cf35ec9605c92d42f}{vot\_\-newStack} (void)
+\begin{CompactList}\small\item\em Makes a new stack (private method). \item\end{CompactList}\item 
+\hyperlink{structElement}{Element} $\ast$ \hyperlink{votStack_8c_9e1d4fd4b9c06ddbd95f4029b0f8d3a5}{votPop} (\hyperlink{structStack}{Stack} $\ast$st)
+\begin{CompactList}\small\item\em Return a \hyperlink{structNode}{Node} from the top of the stack (private method). \item\end{CompactList}\item 
+void \hyperlink{votStack_8c_fb95db917a89f2d55ae6522435929229}{votPush} (\hyperlink{structStack}{Stack} $\ast$st, \hyperlink{structElement}{Element} $\ast$elem)
+\begin{CompactList}\small\item\em Push a \hyperlink{structNode}{Node} to the top of the stack (private method). \item\end{CompactList}\item 
+\hyperlink{structElement}{Element} $\ast$ \hyperlink{votStack_8c_ded18f1ce833d773a50e2d1a4a2db2c8}{votPeek} (\hyperlink{structStack}{Stack} $\ast$st)
+\begin{CompactList}\small\item\em Peek at \hyperlink{structElement}{Element} on top of the \hyperlink{structStack}{Stack} (private method). \item\end{CompactList}\item 
+int \hyperlink{votStack_8c_11691bde61e5b2bbdea3649eb69d8253}{vot\_\-isEmpty} (\hyperlink{structStack}{Stack} $\ast$st)
+\begin{CompactList}\small\item\em Checks to see if the stack is empty (private method). \item\end{CompactList}\item 
+void \hyperlink{votStack_8c_c5e777e900166c7c7a79eeb28f838f61}{vot\_\-clearStack} (\hyperlink{structStack}{Stack} $\ast$st)
+\begin{CompactList}\small\item\em Clear the stack (private method). \item\end{CompactList}\item 
+void \hyperlink{votStack_8c_db67217b47d7871eee607df6754dfa88}{vot\_\-printStack} (\hyperlink{structStack}{Stack} $\ast$st)
+\begin{CompactList}\small\item\em Print the name of all the stack elements (private method). \item\end{CompactList}\end{CompactItemize}
 
 
 \label{_details}
 \hypertarget{_details}{}
 \subsection{Detailed Description}
-(Internal) Methods to manage the parser Element stack. 
+(Private) Methods to manage the parser \hyperlink{structElement}{Element} stack. 
 
-VOTSTACK.C -- (Internal) Methods to manage the parser Element stack.
+VOTSTACK.C -- (Private) Methods to manage the parser \hyperlink{structElement}{Element} stack.
 
 \begin{Desc}
 \item[Author:]Mike Fitzpatrick and Eric Timmermann \end{Desc}
@@ -43,124 +43,124 @@ VOTSTACK.C -- (Internal) Methods to manage the parser Element stack.
 
 
 \subsection{Function Documentation}
-\hypertarget{votStack_8c_b59d04018e68e36a1db5cff42740a809}{
+\hypertarget{votStack_8c_c5e777e900166c7c7a79eeb28f838f61}{
 \index{votStack.c@{votStack.c}!vot\_\-clearStack@{vot\_\-clearStack}}
 \index{vot\_\-clearStack@{vot\_\-clearStack}!votStack.c@{votStack.c}}
-\subsubsection[{vot\_\-clearStack}]{\setlength{\rightskip}{0pt plus 5cm}vot\_\-clearStack (Stack $\ast$ {\em st})}}
-\label{votStack_8c_b59d04018e68e36a1db5cff42740a809}
+\subsubsection[{vot\_\-clearStack}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-clearStack ({\bf Stack} $\ast$ {\em st})}}
+\label{votStack_8c_c5e777e900166c7c7a79eeb28f838f61}
 
 
-Clear the stack (internal method). 
+Clear the stack (private method). 
 
-vot\_\-clearStack -- Clear the stack (internal method)
+vot\_\-clearStack -- Clear the stack (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \end{description}
 \end{Desc}
 \begin{Desc}
 \item[Returns:]nothing \end{Desc}
 \hypertarget{votStack_8c_11691bde61e5b2bbdea3649eb69d8253}{
 \index{votStack.c@{votStack.c}!vot\_\-isEmpty@{vot\_\-isEmpty}}
 \index{vot\_\-isEmpty@{vot\_\-isEmpty}!votStack.c@{votStack.c}}
-\subsubsection[{vot\_\-isEmpty}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-isEmpty (Stack $\ast$ {\em st})}}
+\subsubsection[{vot\_\-isEmpty}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-isEmpty ({\bf Stack} $\ast$ {\em st})}}
 \label{votStack_8c_11691bde61e5b2bbdea3649eb69d8253}
 
 
-Checks to see if the stack is empty (internal method). 
+Checks to see if the stack is empty (private method). 
 
-vot\_\-isEmpty -- Checks to see if the stack is empty (internal method)
+vot\_\-isEmpty -- Checks to see if the stack is empty (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \end{description}
 \end{Desc}
 \begin{Desc}
 \item[Returns:]{\em 1\/} if true, {\em 0\/} if false. \end{Desc}
-\hypertarget{votStack_8c_97706e275290da18b8d8a94ab319db94}{
+\hypertarget{votStack_8c_4a7f5a306e9f1c1cf35ec9605c92d42f}{
 \index{votStack.c@{votStack.c}!vot\_\-newStack@{vot\_\-newStack}}
 \index{vot\_\-newStack@{vot\_\-newStack}!votStack.c@{votStack.c}}
-\subsubsection[{vot\_\-newStack}]{\setlength{\rightskip}{0pt plus 5cm}Stack $\ast$ vot\_\-newStack (void)}}
-\label{votStack_8c_97706e275290da18b8d8a94ab319db94}
+\subsubsection[{vot\_\-newStack}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Stack}$\ast$ vot\_\-newStack (void)}}
+\label{votStack_8c_4a7f5a306e9f1c1cf35ec9605c92d42f}
 
 
-Makes a new stack (internal method). 
+Makes a new stack (private method). 
 
-vot\_\-newStack -- Makes a new stack (internal method)
+vot\_\-newStack -- Makes a new stack (private method)
 
 \begin{Desc}
-\item[Returns:]A pointer to a new Stack. \end{Desc}
-\hypertarget{votStack_8c_8eda4c629b19d8dec39ea86177dc18bd}{
+\item[Returns:]A pointer to a new \hyperlink{structStack}{Stack}. \end{Desc}
+\hypertarget{votStack_8c_db67217b47d7871eee607df6754dfa88}{
 \index{votStack.c@{votStack.c}!vot\_\-printStack@{vot\_\-printStack}}
 \index{vot\_\-printStack@{vot\_\-printStack}!votStack.c@{votStack.c}}
-\subsubsection[{vot\_\-printStack}]{\setlength{\rightskip}{0pt plus 5cm}vot\_\-printStack (Stack $\ast$ {\em st})}}
-\label{votStack_8c_8eda4c629b19d8dec39ea86177dc18bd}
+\subsubsection[{vot\_\-printStack}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-printStack ({\bf Stack} $\ast$ {\em st})}}
+\label{votStack_8c_db67217b47d7871eee607df6754dfa88}
 
 
-Print the name of all the stack elements (internal method). 
+Print the name of all the stack elements (private method). 
 
-vot\_\-printStack -- Print the name of all the stack elements (internal method)
+vot\_\-printStack -- Print the name of all the stack elements (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \end{description}
 \end{Desc}
 \begin{Desc}
 \item[Returns:]nothing \end{Desc}
-\hypertarget{votStack_8c_6e987eaeb90a1fa27b600386ca749bd6}{
+\hypertarget{votStack_8c_ded18f1ce833d773a50e2d1a4a2db2c8}{
 \index{votStack.c@{votStack.c}!votPeek@{votPeek}}
 \index{votPeek@{votPeek}!votStack.c@{votStack.c}}
-\subsubsection[{votPeek}]{\setlength{\rightskip}{0pt plus 5cm}Element $\ast$ votPeek (Stack $\ast$ {\em st})}}
-\label{votStack_8c_6e987eaeb90a1fa27b600386ca749bd6}
+\subsubsection[{votPeek}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Element}$\ast$ votPeek ({\bf Stack} $\ast$ {\em st})}}
+\label{votStack_8c_ded18f1ce833d773a50e2d1a4a2db2c8}
 
 
-Peek at Element on top of the Stack (internal method). 
+Peek at \hyperlink{structElement}{Element} on top of the \hyperlink{structStack}{Stack} (private method). 
 
-votPeek -- Peek at Element on top of the Stack (internal method)
+votPeek -- Peek at \hyperlink{structElement}{Element} on top of the \hyperlink{structStack}{Stack} (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \end{description}
 \end{Desc}
 \begin{Desc}
-\item[Returns:]A pointer to the head Element, or NULL if empty \end{Desc}
-\hypertarget{votStack_8c_f5e05232387d525ab141206095a5980d}{
+\item[Returns:]A pointer to the head \hyperlink{structElement}{Element}, or NULL if empty \end{Desc}
+\hypertarget{votStack_8c_9e1d4fd4b9c06ddbd95f4029b0f8d3a5}{
 \index{votStack.c@{votStack.c}!votPop@{votPop}}
 \index{votPop@{votPop}!votStack.c@{votStack.c}}
-\subsubsection[{votPop}]{\setlength{\rightskip}{0pt plus 5cm}Element $\ast$ votPop (Stack $\ast$ {\em st})}}
-\label{votStack_8c_f5e05232387d525ab141206095a5980d}
+\subsubsection[{votPop}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Element}$\ast$ votPop ({\bf Stack} $\ast$ {\em st})}}
+\label{votStack_8c_9e1d4fd4b9c06ddbd95f4029b0f8d3a5}
 
 
-Return a Node from the top of the stack (internal method). 
+Return a \hyperlink{structNode}{Node} from the top of the stack (private method). 
 
-votPop -- Return a Node from the top of the stack (internal method)
+votPop -- Return a \hyperlink{structNode}{Node} from the top of the stack (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \end{description}
 \end{Desc}
 \begin{Desc}
-\item[Returns:]A pointer to the popped Element. \end{Desc}
-\hypertarget{votStack_8c_a3251a683eae285cccc688daf2d87dae}{
+\item[Returns:]A pointer to the popped \hyperlink{structElement}{Element}. \end{Desc}
+\hypertarget{votStack_8c_fb95db917a89f2d55ae6522435929229}{
 \index{votStack.c@{votStack.c}!votPush@{votPush}}
 \index{votPush@{votPush}!votStack.c@{votStack.c}}
-\subsubsection[{votPush}]{\setlength{\rightskip}{0pt plus 5cm}votPush (Stack $\ast$ {\em st}, \/  Element $\ast$ {\em elem})}}
-\label{votStack_8c_a3251a683eae285cccc688daf2d87dae}
+\subsubsection[{votPush}]{\setlength{\rightskip}{0pt plus 5cm}void votPush ({\bf Stack} $\ast$ {\em st}, \/  {\bf Element} $\ast$ {\em elem})}}
+\label{votStack_8c_fb95db917a89f2d55ae6522435929229}
 
 
-Push a Node to the top of the stack (internal method). 
+Push a \hyperlink{structNode}{Node} to the top of the stack (private method). 
 
-votPush -- Push a Node to the top of the stack (internal method)
+votPush -- Push a \hyperlink{structNode}{Node} to the top of the stack (private method)
 
 \begin{Desc}
 \item[Parameters:]
 \begin{description}
-\item[{\em st}]A pointer to a Stack \item[{\em elem}]A pointer to an element to be put on the stack \end{description}
+\item[{\em st}]A pointer to a \hyperlink{structStack}{Stack} \item[{\em elem}]A pointer to an element to be put on the stack \end{description}
 \end{Desc}
 \begin{Desc}
 \item[Returns:]nothing \end{Desc}

@@ -75,9 +75,26 @@
 *               to the Astronomical Almanac", ISBN 0-935702-68-7,
 *               sections 3.27, 4.25, 4.52.
 *
-*  P.T.Wallace   Starlink   22 February 1996
+*  P.T.Wallace   Starlink   30 November 2000
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -123,12 +140,20 @@
       CEL=XT/CPH
 
 *  Return true longitude and true geodetic latitude of site
-      ELONG=ATAN2(YT,XT)
+      IF (XT.NE.0D0.OR.YT.NE.0D0) THEN
+         ELONG=ATAN2(YT,XT)
+      ELSE
+         ELONG=0D0
+      END IF
       PHI=ATAN2(ZT,CPH)
 
 *  Return current azimuth of terrestrial pole seen from site position
       XNT=(XNM*CEL+YNM*SEL)*ZT-ZNM*CPH
       YNT=-XNM*SEL+YNM*CEL
-      DAZ=ATAN2(-YNT,-XNT)
+      IF (XNT.NE.0D0.OR.YNT.NE.0D0) THEN
+         DAZ=ATAN2(-YNT,-XNT)
+      ELSE
+         DAZ=0D0
+      END IF
 
       END

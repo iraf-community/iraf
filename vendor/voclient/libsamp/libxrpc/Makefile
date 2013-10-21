@@ -5,9 +5,11 @@
 
 # primary dependencies
 
-NAME     = xrpc
-VERSION  = 1.0
-HERE    := $(shell /bin/pwd)
+NAME     	= xrpc
+VERSION  	= 1.0
+HERE    	:= $(shell /bin/pwd)
+PLATFORM        := $(shell uname -s)
+PLMACH          := $(shell uname -m)
 
 
 # secondary dependencies
@@ -25,8 +27,24 @@ SHAREDLIB   = $(HERE)/$(LIBBASE).so.$(VERSION)
 
 # includes, flags and libraries
 CINCS   = -I./ -I./include -I../include -Ixmlrpc-c/lib/abyss/src
-#CFLAGS  = -O2 -m32 -g $(CINCS)
-CFLAGS  = -g -Wall $(CINCS)
+ifeq ($(PLATFORM),Darwin)
+    ifeq ($(PLMACH),x86_64)
+        CARCH   = -m64 -mmacosx-version-min=10.5
+    else
+        CARCH   = -arch i386 -m32 -mmacosx-version-min=10.4
+    endif
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),macintel)
+            CARCH = -m64 -mmacosx-version-min=10.5
+        else
+            CARCH = -arch i386 -m32 -mmacosx-version-min=10.5
+        endif
+    endif
+else
+    CARCH       = 
+endif
+
+CFLAGS  = -O2 -Wall -g $(CINCS) $(CARCH)
 
 
 # list of source and include files
@@ -50,7 +68,11 @@ clean:
 
 install: xrpc
 	(cp libxrpc.a ../libsamp.a)
-	cp -rp $(INCS) ./include/* ../../include
+	mkdir -p ../../include/xmlrpc-c
+	cp -p $(INCS)  ../../include
+	cp -p ./include/xmlrpc*.h ../../include
+	cp -p ./include/xmlrpc-c/*.h ../../include/xmlrpc-c
+	cp -p ./include/xmlrpc-c/*.hpp ../../include/xmlrpc-c
 
 World:
 everything:
@@ -70,7 +92,11 @@ xrpc: $(SRCS:%.c=%.o)
 	cp $(OBJS) lib/build/
 	/usr/bin/ar rv libxrpc.a $?
 	(cp libxrpc.a ../libsamp.a)
-	cp -rp $(INCS) ./include/* ../../include
+	mkdir -p ../../include/xmlrpc-c
+	cp -p $(INCS)  ../../include
+	cp -p ./include/xmlrpc*.h ../../include
+	cp -p ./include/xmlrpc-c/*.h ../../include/xmlrpc-c
+	cp -p ./include/xmlrpc-c/*.hpp ../../include/xmlrpc-c
 
 %.o: %.c $(INCS)
 	/usr/bin/gcc -Wall $(CINCS) $(CFLAGS) -c $< -o $@

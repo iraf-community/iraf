@@ -3,7 +3,7 @@
 
 #include "ratdef.h"
 
-PUTCH(c, fd)
+int PUTCH(c, fd)
 register RCHAR *c;
 register FINT  *fd;
 {
@@ -11,5 +11,5 @@ register FINT  *fd;
 
 	file = _fdtofile[*fd];
 	putc(*c, file);
-	return;
+	return 0;
 }

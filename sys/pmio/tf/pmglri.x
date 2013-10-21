@@ -70,7 +70,7 @@ begin
 	    rl_len = RLI_LEN(rl_src) * RL_LENELEM
 	    call amovi (Memi[rl_src], rl_dst, rl_len)
 	} else {
-	    call salloc (rl_out, RL_MAXLEN(pl), TY_SHORT)
+	    call salloc (rl_out, RL_MAXLEN(pl), TY_INT)
 	    call pl_rangeropi (Memi[rl_src], 1, PL_MAXVAL(pl), rl_dst, 1,
 		MV(rl_depth), Memi[rl_out], npix, rop)
 		rl_len = RLI_LEN(rl_out) * RL_LENELEM

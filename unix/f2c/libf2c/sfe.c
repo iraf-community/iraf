@@ -5,7 +5,11 @@
 extern "C" {
 #endif
 
+#ifdef KR_headers
 extern char *f__fmtbuf;
+#else
+extern const char *f__fmtbuf;
+#endif
 
 integer e_rsfe(Void)
 {	int n;

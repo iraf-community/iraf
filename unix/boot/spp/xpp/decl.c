@@ -3,12 +3,15 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "xpp.h"
 
 #define	import_spp
 #include <iraf.h>
 
+#ifndef SZ_SBUF
 #define	SZ_SBUF		4096		/* max chars in proc. decls.	*/
+#endif
 #define	SZ_TOKEN	63		/* max chars in a token		*/
 #define	MAX_SYMBOLS	300		/* max symbol table entries	*/
 #define	SPMAX		(&sbuf[SZ_SBUF-1])
@@ -63,6 +66,25 @@ static	int nsym = 0;			/* number of symbols		*/
 struct	symbol *d_enter();
 struct	symbol *d_lookup();
 
+extern  void error (int errcode, char *errmsg);
+extern  void xpp_warn (char *warnmsg);
+extern  int  yy_input (void);
+extern  void yy_unput (char ch);
+
+
+void  d_newproc (char *name, int dtype);
+int   d_declaration (int dtype);
+void  d_codegen (register FILE *fp);
+void  d_runtime (char *text);
+void  d_makedecl (struct symbol *sp, FILE *fp);
+struct symbol *d_enter (char *name, int dtype, int flags);
+struct symbol *d_lookup (char *name);
+void  d_chksbuf (void);
+int   d_gettok (char *tokstr, int maxch);
+void  d_declfunc (struct symbol *sp, FILE *fp);
+
+
+
 
 /* D_NEWPROC -- Process a procedure declaration.  The name of the procedure
  * is passed as the single argument.  The input stream is left positioned
@@ -71,6 +93,7 @@ struct	symbol *d_lookup();
  * several lines.  The symbol table is cleared whenever a new procedure
  * declaration is started.
  */
+void
 d_newproc (name, dtype)
 char	*name;			/* procedure name		*/
 int	dtype;			/* procedure type (0 if subr)	*/
@@ -133,8 +156,8 @@ int	dtype;			/* procedure type (0 if subr)	*/
  * converting [] into (), adding 1 for char arrays, etc. in the process.
  * Each OBJ identifier is entered into the symbol table with its attributes.
  */
-d_declaration (dtype)
-int	dtype;			/* data type			*/
+int
+d_declaration (int dtype)
 {
 	register struct	symbol *sp = NULL;
 	register char	ch;
@@ -278,6 +301,8 @@ int	dtype;			/* data type			*/
 	}
 
 	yy_unput ('\n');
+
+	return (0);
 }
 
 
@@ -285,6 +310,7 @@ int	dtype;			/* data type			*/
  * Declare scalar arguments first, followed by array arguments, followed
  * by nonarguments.
  */
+void
 d_codegen (fp)
 register FILE	*fp;
 {
@@ -352,8 +378,8 @@ register FILE	*fp;
  * i.e., statements to be executed at runtime when a procedure is entered,
  * in the given output buffer.
  */
-d_runtime (text)
-char	*text;
+void
+d_runtime (char *text)
 {
 	/* For certain types of functions, ensure that the function value
 	 * is initialized to a legal value, in case the procedure is exited
@@ -374,6 +400,7 @@ char	*text;
 /* D_MAKEDECL -- Output a single RPP symbol declaration.  Each declaration
  * is output on a separate line.
  */
+void
 d_makedecl (sp, fp)
 register struct symbol *sp;	/* symbol table entry		*/
 register FILE	*fp;		/* output file			*/
@@ -408,7 +435,7 @@ int	dtype;			/* data type code		*/
 int	flags;			/* flag bits			*/
 {
 	register struct	symbol *sp;
-	char	*strcpy();
+
 
 	sp = &sym[nsym];
 	nsym++;
@@ -448,6 +475,7 @@ char	*name;			/* symbol name			*/
 
 /* D_CHKSBUF -- Check for overflow on the string buffer.
  */
+void
 d_chksbuf()
 {
 	if (nextch > SPMAX)
@@ -459,6 +487,7 @@ d_chksbuf()
  * value of the first character of the token as the function value.  EOF
  * is an error in this application, not a token.
  */
+int
 d_gettok (tokstr, maxch)
 char	*tokstr;		/* receives token string	*/
 int	maxch;			/* max chars to token string	*/
@@ -527,6 +556,7 @@ int	maxch;			/* max chars to token string	*/
  * for any special treatment required for certain types of function
  * declarations.
  */
+void
 d_declfunc (sp, fp)
 register struct symbol *sp;
 FILE  *fp;

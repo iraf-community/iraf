@@ -32,13 +32,13 @@
 *  Notes:
 *
 *  1)  Only the first character of the TYPE argument is significant.
-*      'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
-*      Ascension and Declination;  'H' or 'h' indicates that they are
-*      Hour Angle (West +ve) and Declination;  anything else ('A' or
-*      'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
-*      (North zero, East is 90 deg) and zenith distance.  (Zenith
-*      distance is used rather than elevation in order to reflect the
-*      fact that no allowance is made for depression of the horizon.)
+*      'R' or 'r' indicates that OBS1 and OBS2 are the observed right
+*      ascension and declination;  'H' or 'h' indicates that they are
+*      hour angle (west +ve) and declination;  anything else ('A' or
+*      'a' is recommended) indicates that OBS1 and OBS2 are azimuth
+*      (north zero, east 90 deg) and zenith distance.  (Zenith distance
+*      is used rather than elevation in order to reflect the fact that
+*      no allowance is made for depression of the horizon.)
 *
 *  2)  The accuracy of the result is limited by the corrections for
 *      refraction.  Providing the meteorological parameters are
@@ -102,9 +102,26 @@
 *
 *  Called:  slDS2C, slDC2S, slRFRO, slDA2P
 *
-*  P.T.Wallace   Starlink   23 June 1997
+*  Last revision:   29 December 2004
 *
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -196,7 +213,7 @@
 
 *     Fast algorithm using two constant model
          TZ = SZ/ZAEO
-         DREF = AOPRMS(11)*TZ+AOPRMS(12)*TZ*TZ*TZ
+         DREF = (AOPRMS(11)+AOPRMS(12)*TZ*TZ)*TZ
 
       ELSE
 

@@ -34,8 +34,8 @@ SERVICES PROVIDED HEREUNDER."
 #ifndef _FITSIO_H
 #define _FITSIO_H
 
-#define CFITSIO_VERSION 3.28
-#define CFITSIO_MINOR 28
+#define CFITSIO_VERSION 3.31
+#define CFITSIO_MINOR 31
 #define CFITSIO_MAJOR 3
 
 #include <stdio.h>
@@ -67,6 +67,8 @@ SERVICES PROVIDED HEREUNDER."
 /*  i.e, "(defined(linux) && defined(__off_t_defined))" */
 #if defined(_OFF_T) || (defined(linux) && defined(__off_t_defined)) || defined(_MIPS_SZLONG) || defined(__APPLE__) || defined(_AIX)
 #    define OFF_T off_t
+#elif defined(_MSC_VER) &&  (_MSC_VER>= 1400)
+#    define OFF_T long long
 #else
 #    define OFF_T long
 #endif
@@ -684,6 +686,9 @@ int ffiurl(  char *url,  char *urltype, char *infile,
 int ffifile (char *url,  char *urltype, char *infile,
                     char *outfile, char *extspec, char *rowfilter,
                     char *binspec, char *colspec, char *pixfilter, int *status);
+int ffifile2 (char *url,  char *urltype, char *infile,
+                    char *outfile, char *extspec, char *rowfilter,
+                    char *binspec, char *colspec, char *pixfilter, char *compspec, int *status);
 int ffrtnm(char *url, char *rootname, int *status);
 int ffexist(const char *infile, int *exists, int *status);
 int ffexts(char *extspec, int *extnum,  char *extname, int *extvers,
@@ -886,6 +891,7 @@ int ffgky( fitsfile *fptr, int datatype, const char *keyname, void *value,
            char *comm, int *status);
 int ffgkys(fitsfile *fptr, const char *keyname, char *value, char *comm, int *status);
 int ffgkls(fitsfile *fptr, const char *keyname, char **value, char *comm, int *status);
+int fffree(void *value,  int  *status); 
 int fffkls(char *value, int *status);
 int ffgkyl(fitsfile *fptr, const char *keyname, int *value, char *comm, int *status);
 int ffgkyj(fitsfile *fptr, const char *keyname, long *value, char *comm, int *status);
@@ -1730,6 +1736,9 @@ int ffcprw(fitsfile *infptr, fitsfile *outfptr, LONGLONG firstrow,
 int ffgics(fitsfile *fptr, double *xrval, double *yrval, double *xrpix,
            double *yrpix, double *xinc, double *yinc, double *rot,
            char *type, int *status);
+int ffgicsa(fitsfile *fptr, char version, double *xrval, double *yrval, double *xrpix,
+           double *yrpix, double *xinc, double *yinc, double *rot,
+           char *type, int *status);
 int ffgtcs(fitsfile *fptr, int xcol, int ycol, double *xrval,
            double *yrval, double *xrpix, double *yrpix, double *xinc,
            double *yinc, double *rot, char *type, int *status);
@@ -1892,6 +1901,7 @@ int fits_img_compress(fitsfile *infptr, fitsfile *outfptr, int *status);
 int fits_compress_img(fitsfile *infptr, fitsfile *outfptr, int compress_type,
          long *tilesize, int parm1, int parm2, int *status);
 int fits_is_compressed_image(fitsfile *fptr, int *status);
+int fits_is_reentrant(void);
 int fits_decompress_img (fitsfile *infptr, fitsfile *outfptr, int *status);
 int fits_img_decompress_header(fitsfile *infptr, fitsfile *outfptr, int *status);
 int fits_img_decompress (fitsfile *infptr, fitsfile *outfptr, int *status);

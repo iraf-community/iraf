@@ -38,7 +38,8 @@ begin
 
 	# Flip the pixel array end for end.
 	if (xstep < 0)
-	    call imaflp (buf, npix, sz_dtype)
+	    #call imaflp (buf, npix, sz_dtype)
+	    call imaflp (buf, npix, sz_pixel)
 
 	# Byte swap if necessary.
 	if (IM_SWAP(im) == YES) {

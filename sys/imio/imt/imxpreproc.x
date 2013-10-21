@@ -10,7 +10,7 @@ pointer procedure imx_preproc (template)
 
 char	template[ARB]				#i input template string
 
-pointer	exp, pre, out, op,list
+pointer	exp, pre, out, op, list
 char	file[SZ_PATHNAME]
 char 	mods[SZ_LINE], fname[SZ_LINE]
 int	i, j, osize, len, llen, nmods
@@ -30,13 +30,11 @@ begin
 
 	exp = imx_fnexpand (template)
 
-
 	# Second Pass: Process the matched list to expand the '@' files and 
 	# modifiers into a simple comma-delimited list the FNT interface 
 	# will process.
 
 	pre = imx_preproc_list (Memc[exp])
-
 
 	# Third Pass: Handle concatenation in the filenames.
 	if ((strncmp (Memc[pre],"http://",7) == 0) ||
@@ -134,7 +132,7 @@ begin
 	nelem = 0
 	op = out
 	op_start = out
-	op_end = out + SZ_FNT
+	op_end = out + SZ_FNT - 1
 	sz_out = SZ_FNT
 
 	while (imx_get_element (template, in, Memc[elem], SZ_FNT) != EOS) {
@@ -293,7 +291,6 @@ begin
 	output ('\0')
 
 	call mfree (elem, TY_CHAR)
-
 	return (out)
 end
 

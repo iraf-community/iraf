@@ -36,7 +36,7 @@ typedef unsigned long memel;	/* type for dictionary, stack, etc.	*/
 #define	LEN_PKPREFIX	3	/* length of package prefix string	*/
 #define	LEN_PFILENAME	6	/* length of pfilename in uparm		*/
 
-#define	NBKG		4	/* max number of active background jobs	*/
+#define	NBKG		32	/* max number of active background jobs	*/
 #define	MAXSUBPROC	10	/* max number cached subprocesses	*/
 #define	MAXPIPES	20	/* max pipes in a command		*/
 

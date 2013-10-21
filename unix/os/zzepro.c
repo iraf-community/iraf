@@ -13,6 +13,15 @@
 #define import_knames
 #include <iraf.h>
 
+
+
+#if (defined(MACOSX) && defined(OLD_MACOSX))
+void ex_handler ( int, int, struct sigcontext * );
+#else
+void ex_handler ( int, siginfo_t *, void * );
+#endif
+
+
 /*
  * ZZEPRO.C -- Code which is executed at the end of every procedure.
  */
@@ -43,7 +52,7 @@ ZZEPRO (void)
 	}
 
 	/* Clear the exception. */
-    	flagp = (fexcept_t) NULL;
+    	flagp = (fexcept_t) 0;
     	feclearexcept (FE_ALL_EXCEPT);
 
 	return (XOK);

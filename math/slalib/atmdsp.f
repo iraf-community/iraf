@@ -7,7 +7,7 @@
 *  Apply atmospheric-dispersion adjustments to refraction coefficients.
 *
 *  Given:
-*     TDK       d       ambient temperature, degrees K
+*     TDK       d       ambient temperature, K
 *     PMB       d       ambient pressure, millibars
 *     RH        d       ambient relative humidity, 0-1
 *     WL1       d       reference wavelength, micrometre (0.4D0 recommended)
@@ -36,7 +36,7 @@
 *
 *        height above sea level    2000 m
 *                      latitude    29 deg
-*                      pressure    793 mB
+*                      pressure    793 mb
 *                   temperature    17 degC
 *                      humidity    50%
 *                    lapse rate    0.0065 degC/m
@@ -53,7 +53,9 @@
 *
 *  4  If either wavelength exceeds 100 micrometres, the radio case
 *     is assumed and the returned refraction coefficients are the
-*     same as the given ones.
+*     same as the given ones.  Note that radio refraction coefficients
+*     cannot be turned into optical values using this routine, nor
+*     vice versa.
 *
 *  5  The algorithm consists of calculation of the refractivity of the
 *     air at the observer for the two wavelengths, using the methods
@@ -63,9 +65,26 @@
 *     the B coefficient almost in the same ratio (see R.M.Green,
 *     "Spherical Astronomy", Cambridge University Press, 1985).
 *
-*  P.T.Wallace   Starlink   6 October 1995
+*  Last revision   2 December 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

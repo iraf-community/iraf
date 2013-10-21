@@ -6,8 +6,13 @@
 #include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 #include <dirent.h>
+#include <string.h>
+#include <stdlib.h>
 #include "xpp.h"
+#include "../bootProto.h"
 
 #define	NOKNET
 #define	import_kernel
@@ -82,7 +87,7 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 #endif
 		    "-lpthread",		/*  4  */
 		    "-lm",			/*  5  */
-		    "",				/*  6  */
+		    "-lrt",			/*  6  */
 		    "",				/*  7  */
 		    "",				/*  8  */
 		    "",				/*  9  */
@@ -115,7 +120,7 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
-		    "",				/*  3  */
+		    "-lcurl",			/*  3  */
 		    "",				/*  4  */
 		    "",				/*  5  */
 		    "",				/*  6  */
@@ -291,7 +296,7 @@ char	*pkgenv = NULL;
 char	*pkglibs = NULL;
 char	v_pkgenv[SZ_PKGENV+1];
 int	nflags, nfiles, nhlibs, nxfiles, nffiles;
-int	sig_int, sig_quit, sig_hup, sig_term;
+long	sig_int, sig_quit, sig_hup, sig_term;
 char	*shellname = "/bin/sh";
 int	foreigndefs = NO;
 char	*foreign_defsfile = "";
@@ -299,31 +304,61 @@ char	*irafarch = "";				/* IRAFARCH string */
 char	floatoption[32] = "";			/* f77 arch flag, if any */
 int	pid;
 
-char	*vfn2osfn();
-char	*os_getenv();
-char	*findexe();
-char	*iraflib();
+
+/**
+ *  External procedure declarations.
+ */
+extern 	void ZZSTRT (void);
+extern 	void ZZSTOP (void);
+
+/**
+ *  Local procedure declarations.
+ */
+static char *mkfname (char *i_fname);
+static int   addflags (char *flag, char *arglist[], int *p_nargs);
+static char *iraflib (char *libref);
+static void  printargs (char *cmd, char *arglist[], int nargs);
+static void  xtof (char *file);
+static int   getextn (char *fname);
+static void  chdot (char *fname, char dotchar);
+
+static int   run (char *task, char *argv[]);
+static int   sys (char *cmd);
+
+static void  done (int k);
+static void  enbint (SIGFUNC handler);
+static void  interrupt (void);
+static int   await (int waitpid);
+static void  rmfiles (void);
+
+static void  fatalstr (char *s1, char *s2);
+static void  fatal (char *s);
+
+static int   isv13 (void);
+static char *findexe (char *prog, char *dir);
 
 
-/* MAIN -- Execution begins here.  Interpret command line arguments and
- * pass commands to UNIX to execute the various passes, i.e.:
+
+
+/**
+ *  MAIN -- Execution begins here.  Interpret command line arguments and
+ *  pass commands to UNIX to execute the various passes, i.e.:
  *
  *	xpp		SPP to modified-ratfor
  *	rpp		modified-ratfor to Fortran
  *	f77		UNIX fortran compiler
  *	cc		compile other sources, link if desired
  *
- * The Fortran source is left behind if the -F flag is given.  The IRAF root
- * directory must either be given on the command line as "-r pathname" or in
- * the environment as the variable "irafdir".
+ *  The Fortran source is left behind if the -F flag is given.  The IRAF root
+ *  directory must either be given on the command line as "-r pathname" or in
+ *  the environment as the variable "irafdir".
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
-	int	i, j, interrupt(), nargs, ncomp;
+	int	i, j, nargs, ncomp;
 	char	*arglist[MAXFILE+MAXFLAG+10];
-	char	*arg, *ip, *s, *mkfname();
+	char	*arg, *ip, *s;
 	int	status, noperands;
 
 	/* Initialization. */
@@ -344,10 +379,10 @@ char	*argv[];
 
 	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
 
-	sig_int  = (int) signal (SIGINT,  SIG_IGN) & 01;
-	sig_quit = (int) signal (SIGQUIT, SIG_IGN) & 01;
-	sig_hup  = (int) signal (SIGHUP,  SIG_IGN) & 01;
-	sig_term = (int) signal (SIGTERM, SIG_IGN) & 01;
+	sig_int  = (long) signal (SIGINT,  SIG_IGN) & 01;
+	sig_quit = (long) signal (SIGQUIT, SIG_IGN) & 01;
+	sig_hup  = (long) signal (SIGHUP,  SIG_IGN) & 01;
+	sig_term = (long) signal (SIGTERM, SIG_IGN) & 01;
 
 	enbint ((SIGFUNC)interrupt);
 	pid = getpid();
@@ -391,7 +426,7 @@ char	*argv[];
 	    char *s, u_pkgenv[SZ_PKGENV+1];
 	    char *pkgname, *ip;
 
-	    if (s = os_getenv ("PKGENV")) {
+	    if ((s = os_getenv ("PKGENV"))) {
 		strcpy (ip = u_pkgenv, s);
 		while (*ip) {
 		    while (isspace(*ip))
@@ -430,7 +465,7 @@ char	*argv[];
                     else
                         *bp++ = '-';
 
-                    while (*bp++ = *ip++)
+                    while ((*bp++ = *ip++))
                         ;
 
                     if (nflags++ >= MAXFLAG)
@@ -696,11 +731,11 @@ passflag:		    mkobject = YES;
 	 * directory names formed by loading the core system and layered
 	 * package environments.
 	 */
-	if (pkglibs = os_getenv ("pkglibs")) {
+	if ((pkglibs = os_getenv ("pkglibs"))) {
 	    char *ip, *op, *vp, fname[SZ_FNAME];
 
 	    for (ip=pkglibs;  *ip;  ) {
-		while (*ip && isspace(*ip) || *ip == ',')
+		while (*ip && (isspace(*ip) || *ip == ','))
 		    ip++;
 		for (op=fname;  *ip && !(isspace (*ip) || *ip == ',');  )
 		    *op++ = *ip++;
@@ -713,7 +748,7 @@ passflag:		    mkobject = YES;
 		    lflags[nflags] = bp;
 		    *bp++ = '-';
 		    *bp++ = 'I';
-		    for (vp=vfn2osfn(fname,0);  *bp++ = *vp++;  )
+		    for (vp=vfn2osfn(fname,0);  (*bp++ = *vp++);  )
 			;
 		    if (*(bp-2) == '/') {
 			--bp;
@@ -769,8 +804,10 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
 	        if (strcmp (irafarch, "macosx") == 0) {
+		    /*
 	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "ppc";
+		    */
 	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "i386";
 	    	    arglist[nargs++] = "-m32";
@@ -849,8 +886,10 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
+		    /*
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "ppc";
+		    */
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
@@ -960,8 +999,10 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
+		    /*
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "ppc";
+		    */
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
@@ -1043,8 +1084,10 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
             if (strcmp (irafarch, "macosx") == 0) {
+		/*
                 arglist[nargs++] = "-arch";
                 arglist[nargs++] = "ppc";
+		*/
                 arglist[nargs++] = "-arch";
                 arglist[nargs++] = "i386";
                 arglist[nargs++] = "-m32";
@@ -1295,8 +1338,9 @@ passflag:		    mkobject = YES;
 	    }
 	}
 	errflag += status;
-
 	done (errflag);
+
+	return (0);
 }
 
 
@@ -1304,9 +1348,8 @@ passflag:		    mkobject = YES;
  * the get the vfn of the library file, so that we do not have to know what
  * system directory the library file is in.
  */
-char *
-mkfname (i_fname)
-char *i_fname;
+static char *
+mkfname (char *i_fname)
 {
 	char fname[SZ_PATHNAME+1];
 	char *oname;
@@ -1314,7 +1357,7 @@ char *i_fname;
 	/* Library referenced as -lXXX */
 	if (strncmp (i_fname, "-l", 2) == 0) {
 	    sprintf (fname, "lib%s.a", &i_fname[2]);
-	    if (oname = iraflib (fname))
+	    if ((oname = iraflib (fname)))
 		return (oname);
 	    else
 		return (i_fname);
@@ -1322,7 +1365,7 @@ char *i_fname;
 
 	/* Must be a library filename or pathname */
 	strcpy (fname, i_fname);
-	if (oname = iraflib (fname))
+	if ((oname = iraflib (fname)))
 	    strcpy (libp, oname);
 	else
 	    strcpy (libp, fname);
@@ -1337,10 +1380,8 @@ char *i_fname;
 /* ADDFLAGS -- Add one or more flags to an argument list.  Ignore null flags,
  * separate multiple flags on whitespace.
  */
-addflags (flag, arglist, p_nargs)
-char *flag;
-char *arglist[];
-int *p_nargs;
+static int
+addflags (char *flag, char *arglist[], int *p_nargs)
 {
 	register int i, len, nargs = *p_nargs;
 	char *fp, *fs, lflag[SZ_FNAME];
@@ -1400,9 +1441,8 @@ int *p_nargs;
 /* IRAFLIB -- Determine if "libname" is an IRAF library.  If so return
  * the pathname of the library, else return NULL.
  */
-char *
-iraflib (libref)
-char	*libref;
+static char *
+iraflib (char *libref)
 {
 	register char *ip, *op;
 	char savename[SZ_PATHNAME+1];
@@ -1437,7 +1477,7 @@ again:
 	} else {
 	    /* Normalize the library file name, "libXXX[_p].a".
 	     */
-	    for (ip=libref, op=fname;  *op = *ip;  op++, ip++)
+	    for (ip=libref, op=fname;  (*op = *ip);  op++, ip++)
 		;
 	    if ((*(op-2) == '.' && *(op-1) == 'a')) {
 		*(op-2) = '\0';
@@ -1484,10 +1524,8 @@ again:
 
 /* PRINTARGS -- Echo a UNIX command on the standard error output.
  */
-printargs (cmd, arglist, nargs)
-char	*cmd;
-char	*arglist[];
-int	nargs;
+static void
+printargs (char *cmd, char *arglist[], int nargs)
 {
 	int	i;
 
@@ -1502,12 +1540,14 @@ int	nargs;
 /* XTOF -- Convert a ".x" file into a ".f" file, i.e., call up the preprocessor
  * to translate an SPP file into Fortran.
  */
-xtof (file)
-char	*file;
+static void
+xtof (char *file)
 {
 	static  char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
 	char	cmdbuf[SZ_CMDBUF], fname[SZ_FNAME];
+#if defined(LINUX64) || defined(MACH64)
 	char    iraf_h[SZ_PATHNAME];
+#endif
 
 
 	lxfiles[nxfiles++] = file;
@@ -1573,8 +1613,8 @@ char	*file;
 
 /* GETEXTN -- Get a one letter extension from a file name (BPS 07.23.96)
  */
-getextn (fname)
-char	*fname;
+static int
+getextn (char *fname)
 {
 	register char *ip, *dot;
         int ch;
@@ -1596,9 +1636,8 @@ char	*fname;
 /* CHDOT -- Change the filename extension, i.e., the single character
  * following the "." at the end of the filename, to the indicated character.
  */
-chdot (fname, dotchar)
-char	*fname;
-char	dotchar;
+static void
+chdot (char *fname, char dotchar)
 {
 	char	*p;
 
@@ -1614,9 +1653,8 @@ char	dotchar;
 /* RUN -- Send a command to UNIX and return the execution status to our
  * caller at the completion of the command.
  */
-run (task, argv)
-char	*task;
-char	*argv[];
+static int
+run (char *task, char *argv[])
 {
 	int	waitpid;
 	pid_t	fork();
@@ -1650,8 +1688,8 @@ char	*argv[];
  * contain i/o redirection metacharacters.  The full path of the command to
  * be executed should be given (and always is in the case of XC).
  */
-sys (cmd)
-char	*cmd;
+static int
+sys (char *cmd)
 {
 	register char *ip;
 	char	*argv[256];
@@ -1721,8 +1759,8 @@ char	*cmd;
  * the intermediate Fortran files, unless the -F flag was given on the command
  * line.
  */
-done (k)
-int	k;
+static void
+done (int k)
 {
 	static	int recurs = NO;
 
@@ -1740,8 +1778,8 @@ int	k;
 /* ENBINT -- Post an exception handler function to be executed if any sort
  * of interrupt occurs.
  */
-enbint (handler)
-SIGFUNC	handler;
+static void
+enbint (SIGFUNC handler)
 {
 	if (sig_int == 0)
 	    signal (SIGINT, handler);
@@ -1757,7 +1795,8 @@ SIGFUNC	handler;
 /* INTERRUPT -- Exception handler, called if an interrupt is received
  * during compilation.
  */
-interrupt()
+static void
+interrupt (void)
 {
 	done (2);
 }
@@ -1765,11 +1804,10 @@ interrupt()
 
 /* AWAIT -- Wait for an asynchronous child process to terminate.
  */
-await (waitpid)
-int	waitpid;
+static int
+await (int waitpid)
 {
 	int	w, status;
-	extern	interrupt();
 
 	enbint (SIG_IGN);
 	while ((w = wait (&status)) != waitpid)
@@ -1789,7 +1827,8 @@ int	waitpid;
 
 /* RMFILES -- Delete all of the ".f" intermediate Fortran files.
  */
-rmfiles()
+static void
+rmfiles (void)
 {
 	int	i;
 
@@ -1802,8 +1841,8 @@ rmfiles()
 
 /* FATALSTR -- Fatal error with an sprintf format and one string argument.
  */
-fatalstr (s1, s2)
-char	*s1, *s2;
+static void
+fatalstr (char *s1, char *s2)
 {
 	char	out[SZ_CMDBUF];
 
@@ -1815,8 +1854,8 @@ char	*s1, *s2;
 /* FATAL -- A fatal error has occurred.  Print error message and terminate
  * process execution.
  */
-fatal (s)
-char	*s;
+static void
+fatal (char *s)
 {
 	fprintf (stderr, "Fatal compiler error: %s\n", s);
 	fflush (stderr);
@@ -1824,63 +1863,13 @@ char	*s;
 }
 
 
-/* ERROR -- Print a warning message but do not terminate the process.
- */
-error (s)
-char	*s;
-{
-	fprintf (stderr, "Error: %s\n", s);
-	fflush (stderr);
-}
-
-
-/* ISV3 -- Test if we are using the version 3.x (or greater) Sunsoft Compilers.
- * This returns true unless SC2.x.x is detected.
- */
-isv3()
-{
-	static	int v3 = -1;
-	struct	dirent *dp;
-	char	dir[SZ_PATHNAME];
-	char	*name;
-	DIR	*dirp;
-
-#ifndef SOLARIS
-	return (v3 = 0);
-#else
-	char	*path;
-	char	link[SZ_PATHNAME];
-	int	n;
-
-        if (v3 != -1)
-            return (v3);
-
-        if ((path = findexe ("f77", dir))) {
-            /* Check if command is a symlink to someplace else, if so look
-             * for the string 'SC2.0' in the link path indicating this is
-             * a V2 compiler installation.  Otherwise check the path to a
-             * file for the same thing.  This assumes that V3 is true
-             * unless something is found to say otherwise.
-             */
-            if ((n = readlink (path, link, 128)) > 0) {
-                link[n] = '\0';
-                if (strstr (link, "SC2.0"))
-                    return (v3 = 0);
-            } else
-                if (strstr (dir, "SC2.0"))
-                    return (v3 = 0);
-        }
-
-        return (v3 = 1);
-#endif
-}
-
 /* ISV13 -- Test if we are using the version 1.3 Sun Fortran compiler.
  * There is no simple, reliable way to do this.  The heuristic used is
  * to first locate the "f77" we will use, then see if there is a file
  * named "f77-1.3*" in the same directory.
  */
-isv13()
+static int
+isv13 (void)
 {
 	static	int v13 = -1;
 	struct	dirent *dp;
@@ -1897,7 +1886,7 @@ return (0);
 	    return (v13);
 
 	if (findexe ("f77", dir) && (dirp = opendir(dir)) != NULL) {
-	    while (dp = readdir(dirp)) {
+	    while ((dp = readdir(dirp))) {
 		/* Actually, we don't want to be too picky about the
 		 * version number of this won't work for future versions,
 		 * so just match up to the version number.
@@ -1921,10 +1910,11 @@ return (0);
  * returned in the string buffer pointed to.  The user's PATH is searched,
  * followed by SYSBINDIR, then LOCALBINDIR.
  */
-char *
-findexe (prog, dir)
-char	*prog;			/* file to search for */
-char	*dir;			/* pointer to output string buf, or NULL */
+static char *
+findexe (
+    char  *prog,		/* file to search for */
+    char  *dir			/* pointer to output string buf, or NULL */
+)
 {
 	register char *ip, *op;
 	static	char path[SZ_PATHNAME];
@@ -1960,7 +1950,7 @@ char	*dir;			/* pointer to output string buf, or NULL */
 	     * executed once, since the next time findexe is called the
 	     * SYSBINDIR directory will be in the default path, above.
 	     */
-	    if (oldpath = pathp) {
+	    if ((oldpath = pathp)) {
 		sprintf (envpath, "PATH=%s:%s", SYSBINDIR, oldpath);
 		putenv (envpath);
 	    }

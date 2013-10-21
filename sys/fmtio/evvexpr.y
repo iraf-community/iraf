@@ -2316,7 +2316,7 @@ begin
 	    optype = O_TYPE(args[1])
 	    nelem = O_LEN(args[1])
 	    do i = 2, nargs {
-		optype = xvv_newtype (optype, args[i])
+		optype = xvv_newtype (optype, O_TYPE(args[i]))
 		if (O_LEN(args[i]) > 0)
 		    if (nelem > 0)
 			nelem = min (nelem, O_LEN(args[i]))

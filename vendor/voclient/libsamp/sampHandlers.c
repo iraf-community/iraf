@@ -185,7 +185,7 @@ samp_getSampHandler (String mtype)
  *  @return             nothing
  */
 
-#define	MATCH(s)	(func&&strncasecmp(mtype,s,len)==0)
+#define	MATCH(s)	(func&&strncasecmp(mtype,s,min(len,16))==0)
 
 void
 samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
@@ -227,6 +227,9 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
     } else if (MATCH ("samp.hub.event.*")) {		/*  no-op  */
 	;
 
+						 /***********************
+						 ***   Table MTypes   ***
+						 ***********************/
     } else if (MATCH ("table.load.fits")) {
         strcpy (s1, samp_getStringFromMap (params, "url"));
         strcpy (s2, samp_getStringFromMap (params, "table-id"));
@@ -248,8 +251,8 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
             (*func) (s1, s2, s3);
 
     } else if (MATCH ("table.highlight.row")) {
-        strcpy (s1, samp_getStringFromMap (params, "table-id"));
-        strcpy (s2, samp_getStringFromMap (params, "url"));
+        strcpy (s1, samp_getStringFromMap (params, "url"));
+        strcpy (s2, samp_getStringFromMap (params, "table-id"));
 	ival1 = samp_getIntFromMap (params, "row");
 
 	if (sampP->handlerMode == SAMP_CBR)
@@ -257,6 +260,28 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
 	else
             (*func) (s1, s2, ival1);
 	
+    } else if (MATCH ("table.select.rowList")) {
+	int   i, listlen, *rows;
+	List  rowlist;
+
+        strcpy (s1, samp_getStringFromMap (params, "url"));
+        strcpy (s2, samp_getStringFromMap (params, "table-id"));
+	rowlist = samp_getListFromMap (params, "row-list");
+
+	listlen = samp_listLen (rowlist);
+	rows = calloc (1, listlen * sizeof(int));
+	for (i=0; i < listlen; i++)
+	    rows[i] = samp_getIntFromList (rowlist, i);
+
+	if (sampP->handlerMode == SAMP_CBR)
+            (*func) (s1, s2, rows, &listlen, strlen(s1), strlen(s2));
+	else
+            (*func) (s1, s2, rows, listlen);
+	
+	free ((void *) rows);
+						 /***********************
+						 ***   Image MTypes   ***
+						 ***********************/
     } else if (MATCH ("image.load.fits")) {
         strcpy (s1, samp_getStringFromMap (params, "url"));
         strcpy (s2, samp_getStringFromMap (params, "image-id"));
@@ -266,7 +291,9 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
             (*func) (s1, s2, s3, strlen(s1), strlen(s2), strlen(s3));
 	else
             (*func) (s1, s2, s3);
-
+						 /***********************
+						 ***   Coord MTypes   ***
+						 ***********************/
     } else if (MATCH ("coord.pointAt.sky")) {
 	dval1 = (double) samp_getFloatFromMap (params, "ra");
 	dval2 = (double) samp_getFloatFromMap (params, "dec");
@@ -275,7 +302,9 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
             (*func) (&dval1, &dval2);
 	else
             (*func) (dval1, dval2);
-
+						 /***********************
+						 ***   Client MTypes  ***
+						 ***********************/
     } else if (MATCH ("client.env.get")) {
         strcpy (s1, samp_getStringFromMap (params, "name"));
 
@@ -310,7 +339,9 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
             (*func) (s1, s2, strlen(s1), strlen(s2));
 	else
             (*func) (s1, s2);
-
+						 /***********************
+						 ***  Bibcode MTypes  ***
+						 ***********************/
     } else if (MATCH ("bibcode.load")) {
         strcpy (s1, samp_getStringFromMap (params, "url"));
 
@@ -318,17 +349,38 @@ samp_execUserHandler (String sender, String mtype, String msg_id, Map params)
             (*func) (s1, strlen (s1));
 	else
             (*func) (s1);
+						 /***********************
+						 ***  Spectrum MTypes ***
+						 ***********************/
+    } else if (MATCH ("spectrum.load.ssa-generic")) {
+	Map  meta; 
+        strcpy (s1, samp_getStringFromMap (params, "url"));
+        strcpy (s2, samp_getStringFromMap (params, "spectrum-id"));
+        strcpy (s3, samp_getStringFromMap (params, "name"));
+  	meta = samp_getMapFromMap (params, "meta");
+	
+	if (sampP->handlerMode == SAMP_CBR)
+            (*func) (s1, s2, s3, meta, strlen(s1), strlen(s2), strlen(s3));
+	else
+            (*func) (s1, s2, s3, meta);
 
-    /**********************************************************************/
-    } else if (MATCH ("table.select.rowList")) {
-	;
+						 /***********************
+						 ***  Resource MTypes ***
+						 ***********************/
+    } else if (MATCH ("voresource.loadlist.")) {
+	Map  idmap; 
 
-    } else if (MATCH ("spectrum.load.*")) {
-	;
+        strcpy (s1, samp_getStringFromMap (params, "name"));
+  	idmap = samp_getMapFromMap (params, "ids");
 
-    } else if (MATCH ("voresource.loadlist.*")) {
-	;
+	if (sampP->handlerMode == SAMP_CBR)
+            (*func) (s1, idmap, strlen(s1));
+	else
+            (*func) (s1, idmap);
 
+						 /***********************
+						 ***  Generic MTypes  ***
+						 ***********************/
     } else {
 	/* Call the generic handler.  The signature for this method is 
 	 * required to be:

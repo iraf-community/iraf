@@ -75,7 +75,7 @@ int can_include = YES;	/* so we can disable includes for netlib */
 static char *def_i2 = "";
 
 static int useshortints = NO;	/* YES => tyint = TYSHORT */
-static int uselongints = YES;	/* YES => tyint = TYLONG */
+static int uselongints = NO;	/* YES => tyint = TYLONG */
 int addftnsrc = NO;		/* Include ftn source in output */
 int usedefsforcommon = NO;	/* Use #defines for common reference */
 int forcedouble = YES;		/* force real functions to double */
@@ -88,7 +88,7 @@ int inqmask = M(TYLONG)|M(TYLOGICAL);
 int wordalign = NO;
 int forcereal = NO;
 int warn72 = NO;
-static int skipC, skipversion;
+static int help, showver, skipC, skipversion;
 char *file_name, *filename0, *parens;
 int Castargs = 1;
 static int Castargs1;
@@ -212,7 +212,16 @@ static arg_info table[] = {
 	/* treatment of unary minus of REAL expressions by	*/
 	/* promoting them to DOUBLE PRECISION . */
 
-    f2c_entry ("dneg", P_NO_ARGS, P_INT, &dneg, YES)
+    f2c_entry ("dneg", P_NO_ARGS, P_INT, &dneg, YES),
+
+	/* -?, --help, -v, --version */
+
+    f2c_entry ("?", P_NO_ARGS, P_INT, &help, YES),
+    f2c_entry ("-help", P_NO_ARGS, P_INT, &help, YES),
+
+    f2c_entry ("v", P_NO_ARGS, P_INT, &showver, YES),
+    f2c_entry ("-version", P_NO_ARGS, P_INT, &showver, YES)
+
 }; /* table */
 
 extern char *c_functions;	/* "c_functions"	*/
@@ -498,6 +507,32 @@ omit_non_f(Void)
 		}
 	}
 
+ static void
+show_version(Void)
+{
+	printf("f2c (Fortran to C Translator) version %s.\n", F2C_version);
+	}
+
+ static void
+#ifdef KR_headers
+show_help(progname) char *progname;
+#else
+show_help(char *progname)
+#endif
+{
+	show_version();
+	if (!progname)
+		progname = "f2c";
+	printf("Usage: %s [ option ... ] [file ...]\n%s%s%s%s%s%s%s",
+	progname,
+	"For usage details, see the man page, f2c.1.\n",
+	"For technical details, see the f2c report.\n",
+	"Both are available from netlib, e.g.,\n",
+	"\thttp://netlib.bell-labs.com/netlib/f2c/f2c.1.gz\n",
+	"\thttp://netlib.bell-labs.com/netlib/f2c/f2c.pdf\n",
+	"or\n\thttp://www.netlib.org/f2c/f2c.1\n",
+	"\thttp://www.netlib.org/f2c/f2c.pdf\n");
+	}
 
  int retcode = 0;
 
@@ -529,6 +564,14 @@ main(int argc, char **argv)
 		ftn_files, Max_ftn_files);
 	if (badargs)
 		return 1;
+	if (help) {
+		show_help(argv[0]);
+		return 0;
+		}
+	if (showver && !ftn_files[0]) {
+		show_version();
+		return 0;
+		}
 	intr_omit = no_cd | no_i90;
 	if (keepsubs && checksubs) {
 		warn("-C suppresses -s\n");

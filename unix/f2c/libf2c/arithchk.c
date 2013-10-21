@@ -57,7 +57,7 @@ CRAY		= { "CRAY", 5};
  static double t_nan;
 
  static Akind *
-Lcheck()
+Lcheck(void)
 {
 	union {
 		double d;
@@ -84,7 +84,7 @@ Lcheck()
 	}
 
  static Akind *
-icheck()
+icheck(void)
 {
 	union {
 		double d;
@@ -113,7 +113,7 @@ icheck()
 char *emptyfmt = "";	/* avoid possible warning message with printf("") */
 
  static Akind *
-ccheck()
+ccheck(void)
 {
 	union {
 		double d;
@@ -134,7 +134,7 @@ ccheck()
 	}
 
  static int
-fzcheck()
+fzcheck(void)
 {
 	double a, b;
 	int i;
@@ -153,7 +153,7 @@ fzcheck()
 	}
 
  static int
-need_nancheck()
+need_nancheck(void)
 {
 	double t;
 
@@ -166,11 +166,26 @@ need_nancheck()
 	return errno == 0;
 	}
 
-main()
+ void
+get_nanbits(unsigned int *b, int k)
+{
+	union { double d; unsigned int z[2]; } u, u1, u2;
+
+	k = 2 - k;
+	u1.z[k] = u2.z[k] = 0x7ff00000;
+	u1.z[1-k] = u2.z[1-k] = 0;
+	u.d = u1.d - u2.d;	/* Infinity - Infinity */
+	b[0] = u.z[0];
+	b[1] = u.z[1];
+	}
+
+ int
+main(void)
 {
 	FILE *f;
 	Akind *a = 0;
 	int Ldef = 0;
+	unsigned int nanbits[2];
 
 	fpinit_ASL();
 #ifdef WRITE_ARITH_H	/* for Symantec's buggy "make" */
@@ -201,6 +216,9 @@ main()
 		if (sizeof(char*) == 8)
 			fprintf(f, "#define X64_bit_pointers\n");
 #ifndef NO_LONG_LONG
+		if (sizeof(long long) > sizeof(long)
+		 && sizeof(long long) == sizeof(void*))
+			fprintf(f, "#define LONG_LONG_POINTERS\n");
 		if (sizeof(long long) < 8)
 #endif
 			fprintf(f, "#define NO_LONG_LONG\n");
@@ -210,6 +228,11 @@ main()
 			t_nan = -a->kind;
 			if (need_nancheck())
 				fprintf(f, "#define NANCHECK\n");
+			if (sizeof(double) == 2*sizeof(unsigned int)) {
+				get_nanbits(nanbits, a->kind);
+				fprintf(f, "#define QNaN0 0x%x\n", nanbits[0]);
+				fprintf(f, "#define QNaN1 0x%x\n", nanbits[1]);
+				}
 			}
 		return 0;
 		}

@@ -26,7 +26,7 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-#pragma ident	"%Z%%M%	%I%	%E% SMI"
+//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include "dextern.h"
 #include <stdio.h>
@@ -71,9 +71,11 @@ static void cpyact (int);
 static void lhsfill (char *);
 static void rhsfill (char *);
 static void lrprnt (void);
+#ifdef XYACC_DEBUG
 static void beg_debug (void);
 static void end_toks (void);
 static void end_debug (void);
+#endif
 static void exp_tokname (void);
 static void exp_prod (void);
 static void exp_ntok (void);
@@ -83,7 +85,9 @@ static int gettok (void);
 static int chfind (int, char *);
 static int skipcom (void);
 static int findchtok (int);
+#ifdef PREFIX_DEFINE
 static void put_prefix_define (char *);
+#endif
 
 
 /* storage of names */
@@ -347,7 +351,9 @@ setup (argc, argv)
     lev = 0;
     ty = 0;
     i = 0;
-    /*beg_debug();  /* initialize fdebug file */
+#ifdef XYACC_DEBUG
+    beg_debug();  /* initialize fdebug file */
+#endif
 
     /*
      * sorry -- no yacc parser here.....
@@ -577,7 +583,9 @@ setup (argc, argv)
     /* t is MARK */
 
     defout ();
-    /*end_toks();   /* all tokens dumped - get ready for reductions */
+#ifdef XYACC_DEBUG
+    end_toks();   /* all tokens dumped - get ready for reductions */
+#endif
 
     fprintf (fsppout, "define\tyyclearin\tyychar = -1\n");
     fprintf (fsppout, "define\tyyerrok\t\tyyerrflag = 0\n");
@@ -679,7 +687,9 @@ setup (argc, argv)
 	    if ((t = gettok ()) == IDENTIFIER) {
 		/* action within rule... */
 
-		/*lrprnt();             /* dump lhs, rhs */
+#ifdef XYACC_DEBUG
+		lrprnt();             /* dump lhs, rhs */
+#endif
 		(void) sprintf (actname, "$$%d", nprod);
 		/*
 		 * make it nonterminal
@@ -766,7 +776,9 @@ setup (argc, argv)
     }
     /* end of all rules */
 
-    /*end_debug();          /* finish fdebug file's input */
+#ifdef XYACC_DEBUG
+    end_debug();          /* finish fdebug file's input */
+#endif
     finact ();
     if (t == MARK) {
 	/*
@@ -836,6 +848,7 @@ defin (int t, char *s)
 
     int val;
 
+    val = 0;
     if (t) {
 	if (++nnonter >= nnontersz)
 	    exp_nonterm ();
@@ -1329,12 +1342,13 @@ cpycode ()
     if (gen_lines)
 	(void) fprintf (out, "\n# line %d \"%s\"\n", lineno, infile);
     for (; c >= 0; c = getc (finput)) {
-	if (c == '\\')
+	if (c == '\\') {
 	    if ((c = getc (finput)) == '}')
 		return;
 	    else
 		putc ('\\', out);
-	if (c == '%')
+	}
+	if (c == '%') {
 	    if ((c = getc (finput)) == '}') {
 		return;
 	    } else if (c == 'L') {
@@ -1342,6 +1356,7 @@ cpycode ()
 		continue;
 	    } else
 		putc ('%', out);
+	}
 	putc (c, out);
 	if (c == '\n')
 	    ++lineno;
@@ -1353,7 +1368,7 @@ cpycode ()
 static int
 skipcom ()
 {
-    register ch;
+    register int ch;
 
     /* skip over SPP comments */
     while ((ch = getc (finput)) != '\n')
@@ -1368,7 +1383,7 @@ static void
 cpyact (int offset)
 {
     /* copy C action to the next ; or closing } */
-    int brac, c, match, i, t, j, s, tok, argument, m;
+    int brac, c, match, j, s, tok, argument;
     char id_name[NAMESIZE + 1];
     int id_idx = 0;
 
@@ -1619,9 +1634,10 @@ rhsfill (s)
 	*loc++ = '\'';		/* add first quote */
 	p++;
     }
-    while (*loc = *p++)
+    while ((*loc = *p++)) {
 	if (loc++ > &rhstext[RHS_TEXT_LEN] - 3)
 	    break;
+    }
 
     if (*s == ' ')
 	*loc++ = '\'';
@@ -1702,6 +1718,8 @@ lrprnt ()
 }
 
 
+#ifdef XYACC_DEBUG 
+
 static void
 beg_debug ()
 {				/* dump initial sequence for fdebug file */
@@ -1736,6 +1754,8 @@ end_debug ()
     (void) fprintf (fdebug, "};\n#endif /* YYDEBUG */\n");
     (void) fclose (fdebug);
 }
+
+#endif
 
 
 /*
@@ -1901,6 +1921,8 @@ findchtok (chlit)
  *	yy{lval, val, char, debug, errflag, nerrs}
  * are defined to the specified name.
  */
+#ifdef PREFIX_DEFINE
+
 static void
 put_prefix_define (char *pre)
 {
@@ -1924,3 +1946,7 @@ put_prefix_define (char *pre)
 	(void) fprintf (fsppout, "define\tyy%s\t%s%s\n",
 			syms[i], pre, syms[i]);
 }
+
+#endif
+
+

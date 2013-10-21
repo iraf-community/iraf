@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #define	import_spp
@@ -21,16 +23,17 @@
 
 #define	DEF_HOST	"unix"		/* default host system        */
 #define	F_OK		0		/* access mode `file exists'  */
+#ifndef X_OK
 #define	X_OK		1		/* access mode `executable'   */
+#endif
 
 char	*irafpath();
 
 
 /* MAIN -- Main entry point for SGIDISPATCH.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	char	tpath[SZ_PATHNAME+1];
 	char	translator[SZ_PATHNAME+1];

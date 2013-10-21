@@ -19,20 +19,21 @@
 
 void zzval_ (XINT *val) 
 { 
-    fprintf (stderr, "zzprnt: %d 0x%x\n", *val, *val); 
+    fprintf (stderr, "zzprnt: %ld 0x%lx\n", (long)*val, (long)*val); 
 }
 
 
 void zzprnt_ (XINT *val, XINT *len) 
 {   
     int  i;
-    char *cp = (char *) val;
+
 
     fprintf (stderr, "zzprnt:\n");
     for (i=0; i < *len; i++)
-        fprintf (stderr, "%d\n", *val, *val); 
+        fprintf (stderr, "%ld\n", (long)*val); 
     fprintf (stderr, "\n");
 }
+
 
 void zzmsg_ (XCHAR *buf, XINT *val) 
 { 
@@ -44,7 +45,7 @@ void zzmsg_ (XCHAR *buf, XINT *val)
 	    break;
 	fprintf (stderr, "%c", *cp);
     }
-    fprintf (stderr, "   %d 0x%x\n", *val, *val); 
+    fprintf (stderr, "   %ld 0x%lx\n", (long)*val, (long)*val); 
     fflush (stderr);
 }
 
@@ -53,13 +54,13 @@ void zzmfd_ (XCHAR *buf, XINT *fd, XINT *val)
 { 
     char i, *cp = (char *) buf;
 
-    fprintf (stderr, "zzmfd[%2d]: ", *fd);
+    fprintf (stderr, "zzmfd[%2d]: ", (int) *fd);
     for (i=0; i < 64; i++) {
 	if (*cp == '\n' || (*cp == '\0' && *(cp+1) == '\0'))
 	    break;
 	fprintf (stderr, "%c", *cp++);
     }
-    fprintf (stderr, "   %d 0x%x\n", *val, *val); 
+    fprintf (stderr, "   %ld 0x%lx\n", (long)*val, (long)*val); 
     fflush (stderr);
 }
 
@@ -80,7 +81,7 @@ void zzmstr_ (XCHAR *s1, XCHAR *s2, XINT *val) {
 	    break;
 	fprintf (stderr, "%c", *c2++);
     }
-    fprintf (stderr, "   %d 0x%x\n", *val, *val); 
+    fprintf (stderr, "   %ld 0x%lx\n", (long)*val, (long)*val); 
     fflush (stderr);
 }
 
@@ -101,7 +102,7 @@ void zzdmp_ (XCHAR *buf, XINT *len) {
 
 void mdump_ (XINT *buf, XINT *nbytes)
 {
-    register int i=0, j=0, nl=0, nb=(*nbytes);
+    register int i=0, j=0, nb=(*nbytes);
     char ch, *p = LOC_TO_ADDR(*buf,char);
 
     /*
@@ -112,7 +113,7 @@ void mdump_ (XINT *buf, XINT *nbytes)
 
     printf ("\n");
     while ( i < nb ) {
-        printf ("%4d  %d 0x%x\t", i, (int)(p+i), (int)(p+i) );
+        printf ("%4d  %ld 0x%lx\t", i, (long)(p+i), (long)(p+i) );
         for (j=0; j < 8; j++) {
             ch = *(p+i);
             printf ("0x%02x ", (ch & 0xff));
@@ -139,8 +140,8 @@ zzpeek_ (void *a, XINT *nelems, XINT *nl)
 void
 zzpdat_ (XCHAR *msg, void *a, XINT *nelems, XINT *nl)
 {
-    XINT  i;
-    char *c, *ch;
+    XINT   i;
+    char  *c;
 
     for (i=0; i < 32; i++) {
         if (msg[i])

@@ -1,5 +1,4 @@
-/***************************************************************************
- *
+/**
  *  SkyBoT Minor Planet Service Interface:
  *  --------------------------------------
  *
@@ -55,7 +54,10 @@
  *                              "Dec: " + sb.getDblAttr("dec",i) + " " +
  *                              "Mv: " + sb.getDblAttr("vmag",i) + " "); 
  * 
- *  Michael Fitzpatrick, NOAO, August 2006
+ * 
+ *  @file       vocSkybot.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
  *
  **************************************************************************/
 
@@ -81,13 +83,24 @@ char       *voc_skybotStrAttr (Skybot sb, char *attr, int index);
 double      voc_skybotDblAttr (Skybot sb, char *attr, int index);
 
 
-/******************************************************************************
-**  SKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
-**  This service returns a list of minor planets withing the specified
-**  search radius/box about the poition at the epoch given.  Epoch is 
-**  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
-**  given in arcsec.
-*/
+/**
+ *  VOC_SKYBOT --  Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  This service returns a list of minor planets withing the specified
+ *  search radius/box about the poition at the epoch given.  Epoch is 
+ *  assumed to be JD, ra/dec are J2000 decimal degrees, search size is 
+ *  given in arcsec.
+ *
+ *  @brief      Call the SkyBoT (Sky Bodies Tracker) service from IMCCE.
+ *  @fn         sb = voc_skybot (double ra, double dec, double rsz,
+ *  			double dsz, double epoch)
+ *
+ *  @param  ra       	RA position of query (decimal degrees)
+ *  @param  dec       	Dec position of query (decimal degrees)
+ *  @param  rsz       	RA size of query (arcsec)
+ *  @param  dsz       	Dec size of query (arcsec)
+ *  @param  epoch      	epoch of query (JD)
+ *  @returns            the string value
+ */
 Skybot      
 voc_skybot (double ra, double dec, double rsz, double dsz, double epoch)
 {
@@ -128,9 +141,17 @@ voc_skybot (double ra, double dec, double rsz, double dsz, double epoch)
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a string value. 
-*/
+/**
+ *  VOC_SKYBOTSTRATTR -- Return a real-valued field as a string value. 
+ *
+ *  @brief      Return a real-valued field as a string value. 
+ *  @fn         dval = voc_skybotStrAttr (Skybot sb, char *attr, int index)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @returns            the string value
+ */
 char *
 voc_skybotStrAttr (Skybot sb, char *attrname, int index)
 {
@@ -163,9 +184,17 @@ voc_skybotStrAttr (Skybot sb, char *attrname, int index)
 }
 
 
-/******************************************************************************
-**  SKYBOTDBLATTR -- Return a real-valued field as a double-precision value.
-*/
+/**
+ *  VOC_SKYBOTDBLATTR -- Return a real-valued field as a double-precision value.
+ *
+ *  @brief      Return a real-valued field as a double-precision value.
+ *  @fn         dval = voc_skybotDblAttr (Skybot sb, char *attr, int index)
+ *
+ *  @param  sb          handle to skybot query
+ *  @param  attr        attribute name
+ *  @param  index       object index
+ *  @returns            the double-precision value
+ */
 double      
 voc_skybotDblAttr (Skybot sb, char *attrname, int index)
 {
@@ -196,9 +225,15 @@ voc_skybotDblAttr (Skybot sb, char *attrname, int index)
 }
 
 
-/******************************************************************************
-**  SKYBOTNOBJS -- Return the number of objects found from the query.
-*/
+/**
+ *  VOC_SKYBOTNOBJS -- Return the number of objects found from the query.
+ *
+ *  @brief      Return the number of objects found from the query.
+ *  @fn         int = voc_skybotNObjs (Skybot sb)
+ *
+ *  @param  sb          handle to skybot query
+ *  @returns            the number of objects found 
+ */
 int      
 voc_skybotNObjs (Skybot sb)
 {

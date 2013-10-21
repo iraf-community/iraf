@@ -27,11 +27,12 @@
 *     JSTAT    i       status:
 *                          +102 = warning, distant epoch
 *                          +101 = warning, large timespan ( > 100 years)
-*                      +1 to +8 = coincident with major planet (Note 5)
+*                     +1 to +10 = coincident with major planet (Note 5)
 *                             0 = OK
 *                            -1 = numerical error
 *
-*  Called:  slPLNT, slUEPV, slPVUE
+*  Called:  slEPJ, slPLNT, slPVUE, slUEPV, slEPV,
+*           slPREC, slDMON, slDMXV
 *
 *  Notes:
 *
@@ -111,14 +112,18 @@
 *     linear extrapolation goes off at a tangent.
 *
 *     Various other approximations are made.  For example, perturbations
-*     by Pluto and the minor planets are neglected, relativistic effects
-*     are not taken into account and the Earth-Moon system is treated as
-*     a single body.
+*     by Pluto and the minor planets are neglected and relativistic
+*     effects are not taken into account.
 *
 *     In the interests of simplicity, the background calculations for
 *     the major planets are carried out en masse.  The mean elements and
 *     state vectors for all the planets are refreshed at the same time,
 *     without regard for orbit curvature, mass or proximity.
+*
+*     The Earth-Moon system is treated as a single body when the body is
+*     distant but as separate bodies when closer to the EMB than the
+*     parameter RNE, which incurs a time penalty but improves accuracy
+*     for near-Earth objects.
 *
 *  5  This routine is not intended to be used for major planets.
 *     However, if major-planet elements are supplied, sensible results
@@ -127,8 +132,8 @@
 *     interprets a suspiciously small value (0.001 AU) as an attempt to
 *     apply the routine to the planet concerned.  If this condition is
 *     detected, the contribution from that planet is ignored, and the
-*     status is set to the planet number (Mercury=1,...,Neptune=8) as a
-*     warning.
+*     status is set to the planet number (1-10 = Mercury, Venus, EMB,
+*     Mars, Jupiter, Saturn, Uranus, Neptune, Earth, Moon) as a warning.
 *
 *  References:
 *
@@ -137,15 +142,40 @@
 *
 *     2  Everhart, E. & Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
 *
-*  P.T.Wallace   Starlink   18 March 1999
+*  Last revision:   27 December 2004
 *
-*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
       IMPLICIT NONE
       DOUBLE PRECISION DATE,U(13)
       INTEGER JSTAT
+
+*  Distance from EMB at which Earth and Moon are treated separately
+      DOUBLE PRECISION RNE
+      PARAMETER (RNE=1D0)
+
+*  Coincidence with major planet distance
+      DOUBLE PRECISION COINC
+      PARAMETER (COINC=0.0001D0)
 
 *  Coefficient relating timestep to perturbing force
       DOUBLE PRECISION TSC
@@ -230,6 +260,15 @@
 *  State vectors for the major planets (AU,AU/s)
       DOUBLE PRECISION PVIN(6,8)
 
+*  Earth velocity and position vectors (AU,AU/s)
+      DOUBLE PRECISION VB(3),PB(3),VH(3),PE(3)
+
+*  Moon geocentric state vector (AU,AU/s) and position part
+      DOUBLE PRECISION PVM(6),PM(3)
+
+*  Date to J2000 de-precession matrix
+      DOUBLE PRECISION PMAT(3,3)
+
 *
 *  Correction terms for extrapolated major planet vectors
 *
@@ -260,15 +299,36 @@
 
 *  Miscellaneous
       INTEGER I,J
-      DOUBLE PRECISION R2,W,DT,DT2,FT
+      DOUBLE PRECISION R2,W,DT,DT2,R,FT
+      LOGICAL NE
 
-*  Planetary inverse masses, Mercury through Neptune
-      DOUBLE PRECISION AMAS(8)
-      DATA AMAS / 6023600D0,408523.5D0,328900.5D0,3098710D0,
-     :            1047.355D0,3498.5D0,22869D0,19314D0 /
+      DOUBLE PRECISION slEPJ
 
+*  Planetary inverse masses, Mercury through Neptune then Earth and Moon
+      DOUBLE PRECISION AMAS(10)
+      DATA AMAS / 6023600D0, 408523.5D0, 328900.5D0, 3098710D0,
+     :            1047.355D0, 3498.5D0, 22869D0, 19314D0,
+     :            332946.038D0, 27068709D0 /
+
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+*    Boston, MA  02111-1307  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-*---------------------------------------------------------------------*
+*----------------------------------------------------------------------*
 
 
 *  Preset the status to OK.
@@ -423,55 +483,102 @@
 
 *     Ready to compute the direct planetary effects.
 
+*     Reset the "near-Earth" flag.
+         NE = .FALSE.
+
 *     Interval from state-vector epoch to middle of current timestep.
          DT = T-TPMO
          DT2 = DT*DT
 
-*     Planet by planet.
-         DO NP=1,8
+*     Planet by planet, including separate Earth and Moon.
+         DO NP=1,10
 
-*        First compute the extrapolation in longitude (squared).
-            R2 = 0D0
-            DO J=4,6
-               W = PVIN(J,NP)*DT
-               R2 = R2+W*W
-            END DO
+*        Which perturbing body?
+            IF (NP.LE.8) THEN
 
-*        Hence the tangential-to-circular correction factor.
-            FC = 1D0+R2/R2X3(NP)
-
-*        The radial correction factor due to the inwards acceleration.
-            FG = 1D0-GC(NP)*DT2
-
-*        Planet's position, and heliocentric distance cubed.
-            R2 = 0D0
-            DO I=1,3
-               W = FG*(PVIN(I,NP)+FC*PVIN(I+3,NP)*DT)
-               RHO(I) = W
-               R2 = R2+W*W
-            END DO
-            RHO3 = R2*SQRT(R2)
-
-*        Body-to-planet vector, light-time, and distance cubed.
-            R2 = 0D0
-            DO I=1,3
-               W = RHO(I)-PV(I)
-               DELTA(I) = W
-               R2 = R2+W*W
-            END DO
-            W = SQRT(R2)
-            DELTA3 = R2*SQRT(R2)
-
-*        If too close, ignore this planet and set a warning.
-            IF (R2.LT.1D-6) THEN
-               JSTAT = NP
-            ELSE
-
-*           Accumulate "direct" part of perturbation acceleration.
-               W = AMAS(NP)
-               DO I=1,3
-                  FD(I) = FD(I)+(DELTA(I)/DELTA3-RHO(I)/RHO3)/W
+*           Planet: compute the extrapolation in longitude (squared).
+               R2 = 0D0
+               DO J=4,6
+                  W = PVIN(J,NP)*DT
+                  R2 = R2+W*W
                END DO
+
+*           Hence the tangential-to-circular correction factor.
+               FC = 1D0+R2/R2X3(NP)
+
+*           The radial correction factor due to the inwards acceleration.
+               FG = 1D0-GC(NP)*DT2
+
+*           Planet's position.
+               DO I=1,3
+                  RHO(I) = FG*(PVIN(I,NP)+FC*PVIN(I+3,NP)*DT)
+               END DO
+
+            ELSE IF (NE) THEN
+
+*           Near-Earth and either Earth or Moon.
+
+               IF (NP.EQ.9) THEN
+
+*              Earth: position.
+                  CALL slEPV(T,PE,VH,PB,VB)
+                  DO I=1,3
+                     RHO(I) = PE(I)
+                  END DO
+
+               ELSE
+
+*              Moon: position.
+                  CALL slPREC(slEPJ(T),2000D0,PMAT)
+                  CALL slDMON(T,PVM)
+                  CALL slDMXV(PMAT,PVM,PM)
+                  DO I=1,3
+                     RHO(I) = PM(I)+PE(I)
+                  END DO
+               END IF
+            END IF
+
+*        Proceed unless Earth or Moon and not the near-Earth case.
+            IF (NP.LE.8.OR.NE) THEN
+
+*           Heliocentric distance cubed.
+               R2 = 0D0
+               DO I=1,3
+                  W = RHO(I)
+                  R2 = R2+W*W
+               END DO
+               R = SQRT(R2)
+               RHO3 = R2*R
+
+*           Body-to-planet vector, and distance.
+               R2 = 0D0
+               DO I=1,3
+                  W = RHO(I)-PV(I)
+                  DELTA(I) = W
+                  R2 = R2+W*W
+               END DO
+               R = SQRT(R2)
+
+*           If this is the EMB, set the near-Earth flag appropriately.
+               IF (NP.EQ.3.AND.R.LT.RNE) NE = .TRUE.
+
+*           Proceed unless EMB and this is the near-Earth case.
+               IF (.NOT.(NE.AND.NP.EQ.3)) THEN
+
+*              If too close, ignore this planet and set a warning.
+                  IF (R.LT.COINC) THEN
+                     JSTAT = NP
+
+                  ELSE
+
+*                 Accumulate "direct" part of perturbation acceleration.
+                     DELTA3 = R2*R
+                     W = AMAS(NP)
+                     DO I=1,3
+                        FD(I) = FD(I)+(DELTA(I)/DELTA3-RHO(I)/RHO3)/W
+                     END DO
+                  END IF
+               END IF
             END IF
          END DO
 

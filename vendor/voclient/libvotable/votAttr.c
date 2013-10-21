@@ -16,6 +16,8 @@
 
 #include "votParseP.h"
 
+extern char  *strcasestr();
+
 
 /** 
  *  vot_attrSet -- Set/Create an attributes (private method).
@@ -34,19 +36,13 @@ int
 vot_attrSet (AttrBlock *ablock, char *name, char *value)
 {
     char  *name_m = NULL;
-    int   value_found = 0, value_existing = 0, i, len;
-    AttrList *attr = (AttrList *) ablock->attributes;
+    int   value_found = 0, value_existing = 0;
+    AttrList *attr = (ablock ? ablock->attributes : (AttrList *) NULL);
 
     
     if (name == NULL)
         return (0);
-    
-    /* Convert to an upper-case name.
-     */
-    name_m = calloc (1, (len = strlen(name)));
-    for (i=0; i < len; i++)
-        /*name_m[i] = toupper (name[i]); */
-        name_m[i] = name[i];
+    name_m = strdup (name);
     
     /* Check for namespace qualifiers on the attribute.
      */
@@ -64,13 +60,17 @@ vot_attrSet (AttrBlock *ablock, char *name, char *value)
 	value_found = 1;
 
     if (!value_found) {
+#ifdef USE_STRICT
 	fprintf (stderr, "Error: '%s' not a valid Attribute.\n", name);
         return (0);
+#else
+        return (1);
+#endif
 
     } else {
 	while (attr != NULL) {
             if (name_m[0] && strcasecmp (attr->name, name_m) == 0) {
-                strcpy (attr->value, value);
+                strncpy (attr->value, value, min (strlen (value), SZ_ATTRVAL));
                 value_existing = 1;
             }
             attr = attr->next;
@@ -80,12 +80,12 @@ vot_attrSet (AttrBlock *ablock, char *name, char *value)
             attr = (AttrList *) calloc (1, sizeof(AttrList));
             if (ablock->attributes == NULL) {
 		attr->next = NULL;
-                strcpy (attr->value, value);
+                strncpy (attr->value, value, min (strlen (value), SZ_ATTRVAL));
                 strcpy (attr->name, name_m);
 	    } else {
                 attr = (AttrList *) calloc (1, sizeof(AttrList));
                 attr->next = ablock->attributes;
-                strcpy (attr->value, value);
+                strncpy (attr->value, value, min (strlen (value), SZ_ATTRVAL));
                 strcpy (attr->name, name_m);
 	    }
 	    ablock->attributes = attr;
@@ -113,13 +113,13 @@ char *
 vot_attrGet (AttrBlock *ablock, char *name)
 {
     char *value;
-    AttrList *attr = ablock->attributes;
+    AttrList *attr = (ablock ? ablock->attributes : (AttrList *) NULL);
     
     while (attr != NULL) {
         if (strcasecmp (attr->name, name) == 0) {
-            value = (char *) calloc (SZ_ATTRNAME, sizeof(char));
+            value = (char *) calloc (SZ_ATTRNAME, strlen(attr->value)+1);
             
-            strncpy (value, attr->value, SZ_ATTRNAME);
+            strncpy (value, attr->value, strlen (attr->value));
 	    if (value && value[0])
                 return (value);
 	    else 
@@ -145,7 +145,7 @@ char *
 vot_attrXML (AttrBlock *ablock)
 {
     char  *out = (char *) calloc (SZ_XMLTAG, sizeof (char));
-    AttrList *attr = ablock->attributes;
+    AttrList *attr = (ablock ? ablock->attributes : (AttrList *) NULL);
     
     while (attr != NULL) {
 

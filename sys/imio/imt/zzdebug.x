@@ -26,20 +26,36 @@ procedure t_imt ()
 char	template[SZ_LINE]
 char	image[SZ_FNAME]
 
-pointer	imt, imtopen()
+pointer	imt, im, imtopen(), immap()
 int	i, imtgetim()
+bool	num, clgetb()
 
 begin
 	call clgstr ("in", template, SZ_LINE)
+	num = clgetb ("number")
 
 	imt = imtopen (template)
+
 	for (i=0; imtgetim (imt, image, SZ_FNAME) != EOF; i=i+1) {
-	    if (i > 0)
-		call printf (",")
-	    call printf ("%s")
-		call pargstr (image)
+ 
+	    if (num) {
+	        im = immap (image, READ_ONLY, 0)
+		call printf ("%3d  %s  %d x %d\n") 
+		    call pargi (i+1) 
+		    call pargstr (image)
+		    call pargi (IM_LEN(im,1))
+		    call pargi (IM_LEN(im,2))
+	        call imunmap (im)
+	    } else {
+	        if (i > 0)
+		    call printf (",")
+	        call printf ("%s")
+		    call pargstr (image)
+	    }
 	}
 	call printf ("\n")
+	call printf ("Nimages = %d\n")
+	    call pargi (i)
 
 	call imtclose (imt)
 end
@@ -135,7 +151,7 @@ procedure t_breakout ()
 char	template[SZ_LINE]
 
 int	nchars
-char	image[SZ_FNAME], expr[SZ_FNAME], sec[SZ_FNAME], ikparams[SZ_FNAME]
+char	image[SZ_LINE], expr[SZ_LINE], sec[SZ_LINE], ikparams[SZ_LINE]
 
 int	imx_breakout()
 

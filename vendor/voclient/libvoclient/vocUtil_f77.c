@@ -1,15 +1,13 @@
-/***************************************************************************
+/**
  *
- *  VOCF77.C  -- Fortran binding for the VOClient interface.  As part of 
- *  the binding we map the interface procedure names and convert string
- *  constants as needed per Fortran rules.  Note that another aspect of
- *  the fortran calling convention is that the length of strings in the
- *  argument list are appended to the call stack.  As C code we need to
- *  take this into account when defining the interface.
+ *  VOCUTIL_F77.C  -- Utility routines to support Fortran bindings.
  *
- *  M. Fitzpatrick, NOAO, Jul 2006
+ *  @file       vocUtil_f77.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
  *
- **************************************************************************/
+ *************************************************************************
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,39 +19,26 @@
 #include "VOClient.h"
 
 
-/** Local interface declarations.
-**/
-char *sstrip (char *instr, int len);
-void  spad (char *outstr, int len);
-int   typecode (char *typestr);
+/** 
+ *  Local interface declarations.
+ */
+char  *sstrip (char *instr, int len);
+void   spad (char *outstr, int len);
+int    typecode (char *typestr);
 
 
 
-/******************************************************************************
-** Support utility to trim trailing blanks from string and add
-** a null terminator.
-*/
-
-#ifdef _OLD_SSTRIP_
+/**
+ *  SSTRIP -- Strip trailing blanks from a string and add null terminator.
+ *
+ *  @brief      Strip trailing blanks from a string and add null terminator
+ *  @fn         outstr = sstrip (char *instr, int len)
+ *
+ *  @param  instr       string to strip
+ *  @param  len		length of input string
+ *  @returns            stripped output string
+ */
 #define SZ_LINE		1024
-
-char *sstrip (char *instr, int len)
-{
-    int i;
-
-    memset (t, 0, SZ_LINE);
-    if (instr == NULL)
-        t[0] = '\0';
-    else {
-        strncpy (t, instr, (len < SZ_LINE ? len : SZ_LINE));
-        i = (len < SZ_LINE ? len : SZ_LINE) - 1;
-        while (t[i] == ' ')
-            i = i - 1;
-        t[i+1] = '\0';
-    }
-    return(t);
-
-#else
 
 char *sstrip (char *instr, int len)
 {
@@ -72,16 +57,17 @@ char *sstrip (char *instr, int len)
     return ((char *) NULL);
 }
 
-#endif
 
-
-
-
-/******************************************************************************
-** SPAD --- Pad a string to length 'len' with blanks, as Fortran
-** requires.
-*/
- 
+/**
+ *  SPAD -- Pad a string to length 'len' with blanks, as Fortran requires.
+ *
+ *  @brief      Pad a string to length 'len' with blanks, as Fortran requires.
+ *  @fn         spad (char *outstr, int len)
+ *
+ *  @param  outstr      string to pad
+ *  @param  len		pad string to this length
+ *  @returns            nothing
+ */
 void spad (char *outstr, int len)
 {
     int i=0;
@@ -93,10 +79,19 @@ void spad (char *outstr, int len)
 }
 
 
+/**
+ *  TYPECODE -- Convert a DAL type string to a code value.
+ *
+ *  @brief      Convert a DAL type string to a code value.
+ *  @fn         val = typecode (char *typestr)
+ *
+ *  @param  typestr     DAL type string
+ *  @returns            DAL type code
+ */
+
 #define SZ_TYPECODE 	32
 
-int
-typecode (char *typestr) 
+int typecode (char *typestr) 
 {
     char type[SZ_TYPECODE];
     int  i = 0;
@@ -108,6 +103,8 @@ typecode (char *typestr)
     if (strcmp (type, "dal") == 0)  return (DAL_CONN);
     if (strcmp (type, "cone") == 0) return (CONE_CONN);
     if (strcmp (type, "siap") == 0) return (SIAP_CONN);
+    if (strcmp (type, "ssap") == 0) return (SSAP_CONN);
+    if (strcmp (type, "slap") == 0) return (SLAP_CONN);
 
     return (ERR);
 }

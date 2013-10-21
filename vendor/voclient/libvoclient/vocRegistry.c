@@ -1,9 +1,9 @@
-/*
+/**
  *  VOC_REGISTRYQUERY -- Utility code to act as a client interface to
  *  the NVO Registry service.
  *
- * RegistryQuery
- * ----------------------
+ *  RegistryQuery
+ *  ----------------------
  * 
  *  High-Level Query:
  * 
@@ -28,7 +28,7 @@
  *          res = voc_regExecute (query)		// return result obj
  *       str = voc_regExecuteRaw (query)		// return raw XML
  * 
- * RegistryQueryResult
+ *  RegistryQueryResult
  * 
  *     count = voc_resGetCount  (res)
  * 
@@ -37,13 +37,18 @@
  *        ival = voc_resGetInt  (res, attribute, index)
  * 
  *     For this implementation, we've chose to use the NVO Registry at
- * JHU/STScI, specifically the QueryRegistry() method which provides a
- * 'SimpleResource' form of the resource record.  Support for the newer
- * IVOA standard will be added later, for now we can quickly access the most
- * commonly used fields of a resource using both a keyword and SQL form of
- * the search.
+ *  JHU/STScI, specifically the QueryRegistry() method which provides a
+ *  'SimpleResource' form of the resource record.  Support for the newer
+ *  IVOA standard will be added later, for now we can quickly access the most
+ *  commonly used fields of a resource using both a keyword and SQL form of
+ *  the search.
  * 
- *  M. Fitzpatrick, NOAO, July 2006
+ *
+ *  @file       vocRegistry.c
+ *  @author     Michael Fitzpatrick
+ *  @version    July 2006
+ *
+ *************************************************************************
  */
 
 
@@ -62,7 +67,8 @@ extern VOClient *vo;                    /* Interface runtime struct     */
 
 
 
-/*  VOC_REGSEARCH --  High-level procedure to form a query and execute it
+/**
+ *  VOC_REGSEARCH --  High-level procedure to form a query and execute it
  *  immediately.  We allow that 'term1' may be a complex SQL WHERE predicate,
  *  and that 'term2' (or vice versa) is a search-keyword list.  The
  *  'orValues' applies to the keyword list (if present), otherwise it applies
@@ -73,9 +79,17 @@ extern VOClient *vo;                    /* Interface runtime struct     */
  *  is easily expressed in an SQL form to get SIAP resources, however a
  *  Quasar may be known as a QSO, AGN, active-nuclei, etc and so we need a 
  *  easy way to OR the keywords but AND that result with the SQL predicate.
+ *
+ *  @brief  High-level Registry query interface
+ *  @fn	    res = voc_regSearch (char *term1, char *term2, int orValues)
+ *
+ *  @param  term1	first search term
+ *  @param  term2	second search term
+ *  @param  orValues	logically OR values?
+ *  @returns		handle to Registry result object
  */
 RegResult 
-voc_regSearch (char *term1,  char *term2, int orValues)
+voc_regSearch (char *term1, char *term2, int orValues)
 {
     RegResult res = (RegResult) VOC_NULL;
     vocRes_t *result = (vocRes_t *) NULL;
@@ -110,8 +124,17 @@ voc_regSearch (char *term1,  char *term2, int orValues)
 }
 
 
-/*
- *  easy way to OR the keywords but AND that result with the SQL predicate.
+/**
+ *  VOC_REGSEARCHBYSERVICE -- Search the Registry using a search term and
+ *  constrain by service type. 
+ *
+ *  @brief  Search Registry using a search term and service constraint
+ *  @fn	    res = voc_regSearchByService (char *svc, char *term, int orValues)
+ *
+ *  @param  svc 	service type constraint
+ *  @param  term	keyword search term
+ *  @param  orValues	logically OR values?
+ *  @returns		handle to Registry result object
  */
 RegResult 
 voc_regSearchByService (char *svc,  char *term, int orValues)
@@ -145,7 +168,15 @@ voc_regSearchByService (char *svc,  char *term, int orValues)
 }
 
 
-/* VOC_REGQUERY --  Get a RegistryQuery object.
+/**
+ *  VOC_REGQUERY --  Create a RegistryQuery object.
+ *
+ *  @brief  Create a RegistryQuery object.
+ *  @fn	    v = voc_regQuery (char *term, int orValues)
+ *
+ *  @param  term	keyword search term
+ *  @param  orValues	logically OR values?
+ *  @returns		handle to Registry Query object
  */
 RegQuery  
 voc_regQuery (char *term, int orValues)
@@ -181,8 +212,17 @@ voc_regQuery (char *term, int orValues)
 }
 
 
-/*  VOC_REGADDSEARCHTERM -- Add a search term (sql predicate or keyword list)
+/**
+ *  VOC_REGADDSEARCHTERM -- Add a search term (sql predicate or keyword list)
  *  to the specified query.
+ *
+ *  @brief  Add a search term to the specified query
+ *  @fn	    voc_regAddSearchTerm (RegQuery query, char *term, int orValue)
+ *
+ *  @param  query	Registry query handle
+ *  @param  term	keyword search term
+ *  @param  orValues	logically OR values?
+ *  @returns		nothing
  */
 void
 voc_regAddSearchTerm (RegQuery query, char *term, int orValue)
@@ -209,7 +249,15 @@ voc_regAddSearchTerm (RegQuery query, char *term, int orValue)
 }
 
 
-/*  VOC_REMOVESEARCHTERM -- Remove the search term from the query.
+/**
+ *  VOC_REMOVESEARCHTERM -- Remove the search term from the query.
+ *
+ *  @brief  Remove a search term to the specified query
+ *  @fn	    voc_regRemoveSearchTerm (RegQuery query, char *term)
+ *
+ *  @param  query	Registry query handle
+ *  @param  term	keyword search term
+ *  @returns		nothing
  */
 void
 voc_regRemoveSearchTerm (RegQuery query, char *term)
@@ -235,7 +283,15 @@ voc_regRemoveSearchTerm (RegQuery query, char *term)
 }
 
 
-/*  VOC_REGCONSTWAVEBAND -- Constraing the Registry search by waveband.
+/**
+ *  VOC_REGCONSTWAVEBAND -- Constrain the Registry search by waveband.
+ *
+ *  @brief  Constrain the Registry search by waveband.
+ *  @fn	    voc_regConstWaveband (RegQuery query, char *waveband)
+ *
+ *  @param  query	Registry query handle
+ *  @param  waveband	waveband string
+ *  @returns		nothing
  */
 void
 voc_regConstWaveband (RegQuery query, char *waveband)
@@ -257,7 +313,15 @@ voc_regConstWaveband (RegQuery query, char *waveband)
 }
 
 
-/*  VOC_REGCONSTSVCTYPE -- Constraing the Registry search by service type.
+/**
+ *   VOC_REGCONSTSVCTYPE -- Constraing the Registry search by service type.
+ *
+ *  @brief  Constrain the Registry search by service type.
+ *  @fn	    voc_regConstWaveband (RegQuery query, char *svcType)
+ *
+ *  @param  query	Registry query handle
+ *  @param  svcType	service type string
+ *  @returns		nothing
  */
 void
 voc_regConstSvcType (RegQuery query, char *svcType)
@@ -279,8 +343,16 @@ voc_regConstSvcType (RegQuery query, char *svcType)
 }
 
 
-/*  VOC_REGDALONLY -- Set the "DAL Only" flag.  If set, we expand a resource
+/**
+ *  VOC_REGDALONLY -- Set the "DAL Only" flag.  If set, we expand a resource
  *  search to break out the individual DAL services into separate results.
+ *
+ *  @brief  Set the "DAL Only" flag
+ *  @fn	    voc_regDALOnly (RegQuery query, int value)
+ *
+ *  @param  query	Registry query handle
+ *  @param  value	value of the DAL-only flag
+ *  @returns		nothing
  */
 void
 voc_regDALOnly (RegQuery query, int value)
@@ -302,8 +374,16 @@ voc_regDALOnly (RegQuery query, int value)
 }
 
 
-/*  VOC_REGSORTRES -- Set the resource "sort" flag.   If enabled, we try to
+/**
+ *  VOC_REGSORTRES -- Set the resource "sort" flag.   If enabled, we try to
  *  order the resource table by some logical means.
+ *
+ *  @brief  Set the resource "sort" flag
+ *  @fn	    voc_regSortRes (RegQuery query, int value)
+ *
+ *  @param  query	Registry query handle
+ *  @param  value	value of the sort flag
+ *  @returns		nothing
  */
 void
 voc_regSortRes (RegQuery query, int value)
@@ -325,7 +405,14 @@ voc_regSortRes (RegQuery query, int value)
 }
 
 
-/*  VOC_REGGETSTCOUNT -- Get the number of search terms in the current query.
+/**
+ *  VOC_REGGETSTCOUNT -- Get the number of search terms in the current query.
+ *
+ *  @brief  Get the number of search terms in the current query.
+ *  @fn	    count = voc_regGetSTCount (RegQuery query)
+ *
+ *  @param  query	Registry query handle
+ *  @returns		nothing
  */
 int
 voc_regGetSTCount (RegQuery query)
@@ -353,7 +440,14 @@ voc_regGetSTCount (RegQuery query)
 }
 
 
-/*  VOC_REGGETQUERYSTRING -- Get the current query as an http GET URL.
+/**
+ *  VOC_REGGETQUERYSTRING -- Get the current query as an http GET URL.
+ *
+ *  @brief  Get the current query as an http GET URL.
+ *  @fn	    url = voc_regGetQueryString (RegQuery query)
+ *
+ *  @param  query	Registry query handle
+ *  @returns		query URL
  */
 char *
 voc_regGetQueryString (RegQuery query)
@@ -386,8 +480,15 @@ voc_regGetQueryString (RegQuery query)
 }
 
 
-/*  VOC_REGEXECUTE -- Execute the specified query, returning a result object
+/**
+ *  VOC_REGEXECUTE -- Execute the specified query, returning a result object
  *  code or NULL.
+ *
+ *  @brief  Execute the specified query
+ *  @fn	    res = voc_regExecute (RegQuery query)
+ *
+ *  @param  query	Registry query handle
+ *  @returns		registry result object handle
  */
 RegResult
 voc_regExecute (RegQuery query)
@@ -414,8 +515,15 @@ voc_regExecute (RegQuery query)
 }
 
 
-/*  VOC_REGEXECUTERAW -- Execute the specified query and return the raw
+/**
+ *  VOC_REGEXECUTERAW -- Execute the specified query and return the raw
  *  resulting XML string.
+ *
+ *  @brief  Execute the specified query and return raw result string
+ *  @fn	    str = voc_regExecuteRaw (RegQuery query)
+ *
+ *  @param  query	Registry query handle
+ *  @returns		raw data return from data
  */
 char *
 voc_regExecuteRaw (RegQuery query)
@@ -447,12 +555,19 @@ voc_regExecuteRaw (RegQuery query)
 }
 
 
-/****************************************************************************/
-/*********************  RegistryQueryResult Methods  ************************/
-/****************************************************************************/
+/*****************************************************************************/
+/*****		      RegistryQueryResult Methods  			******/
+/*****************************************************************************/
 
 
-/*  VOC_RESGETCOUNT -- Return a count of the number of results records.
+/**
+ *  VOC_RESGETCOUNT -- Return a count of the number of results records.
+ *
+ *  @brief  Return a count of the number of results records.
+ *  @fn	    count = voc_resGetCount (RegResult res)
+ *
+ *  @param  res 	Registry result handle
+ *  @returns		number of result records
  */
 int
 voc_resGetCount (RegResult res)
@@ -480,7 +595,8 @@ voc_resGetCount (RegResult res)
 }
 
 
-/*  VOC_GETSTR -- Get a string-valued attribute from the result resource
+/**
+ *  VOC_GETSTR -- Get a string-valued attribute from the result resource
  *  record.  Currently recognized real-valued attributes include:
  *
  *	Title			Resource title (long version)
@@ -498,6 +614,15 @@ voc_resGetCount (RegResult res)
  *	ContentLevel		Content level (research, EPO, etc -- csv list)
  *
  *  Attribute strings are case-insensitive.
+ *
+ *
+ *  @brief  Get a string-valued attribute from the result resource record
+ *  @fn	    str = voc_resGetStr (RegResult res, char *attr, int index)
+ *
+ *  @param  res 	Registry result handle
+ *  @param  attr 	record attribute
+ *  @param  index 	record index
+ *  @returns		string-valued attribute
  */
 char *
 voc_resGetStr (RegResult res, char *attribute, int index)
@@ -550,12 +675,21 @@ voc_resGetStr (RegResult res, char *attribute, int index)
 }
 
 
-/*  VOC_GETFLOAT -- Get a real-valued attribute from the result resource
+/**
+ *  VOC_GETFLOAT -- Get a real-valued attribute from the result resource
  *  record.  Currently recognized real-valued attributes include:
  *
  *	MaxSR			maximum search radius
  *
  *  Attribute string are case-insensitive.
+ *
+ *  @brief  Get a real-valued attribute from the result resource record
+ *  @fn	    dval = voc_resGetFloat (RegResult res, char *attr, int index)
+ *
+ *  @param  res 	Registry result handle
+ *  @param  attr 	record attribute
+ *  @param  index 	record index
+ *  @returns		string-valued attribute
  */
 double
 voc_resGetFloat (RegResult res, char *attribute, int index)
@@ -586,12 +720,21 @@ voc_resGetFloat (RegResult res, char *attribute, int index)
 }
 
 
-/*  VOC_GETINT -- Get a integer-valued attribute from the result resource
+/**
+ *  VOC_GETINT -- Get a integer-valued attribute from the result resource
  *  record.  Currently recognized real-valued attributes include:
  *
  *	MaxRecords		maximum records returned by the service
  *
  *  Attribute string are case-insensitive.
+ *
+ *  @brief  Get an int-valued attribute from the result resource record
+ *  @fn	    ival = voc_resGetInt (RegResult res, char *attr, int index)
+ *
+ *  @param  res 	Registry result handle
+ *  @param  attr 	record attribute
+ *  @param  index 	record index
+ *  @returns		string-valued attribute
  */
 int
 voc_resGetInt (RegResult res, char *attribute, int index)

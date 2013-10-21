@@ -343,7 +343,7 @@ begin
 	call smark (sp)
 	call salloc (tmp, nvals, TY_INT)
 
-	call amovi (array, Memr[tmp], nvals)
+	call amovi (array, Memi[tmp], nvals)
 	do i = 1, nvals
 	    array[i] = Memi[tmp+nvals-i]
 

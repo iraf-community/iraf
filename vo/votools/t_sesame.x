@@ -8,7 +8,7 @@ define	NRANGES		64
 procedure t_sesame ()
 
 char	target[SZ_FNAME], root[SZ_FNAME], tname[SZ_FNAME], range_str[SZ_FNAME]
-char	pos[SZ_LINE], otype[SZ_LINE]
+char	pos[SZ_LINE], otype[SZ_LINE], ip, op
 double	ra, dec, ra_err, dec_err
 int	sr, len, ntargets, nobjs, nvalues, number, list, status
 int	ranges[2,NRANGES]
@@ -38,6 +38,12 @@ begin
 	    call clputi ("status", ERR)
 	    call error (0, "Error initializing VO Client")
 	    return
+	}
+
+	# Encode spaces in the object name.
+	for (ip=1; target[ip] != EOS; ip=ip+1) {
+	    if (target[ip] == ' ')
+		target[ip] = '+'
 	}
 
 	# Open the target list.

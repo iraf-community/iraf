@@ -255,6 +255,10 @@ int fp_get_param (int argc, char *argv[], fpstate *fpptr)
 	    if ((fpptr->comptype != GZIP_1) && (fpptr->comptype != GZIP_2)) {
 	        fp_msg ("Error: `-q 0' only allowed with GZIP\n"); exit (-1);
 	    }
+
+            if (fpptr->int_to_float == 1) {
+	        fp_msg ("Error: `-q 0' not allowed with -i2f\n"); exit (-1);
+	    }
 	}
 
 	if (wholetile) {

@@ -81,6 +81,9 @@ PATH=/usr/local/bin:/bin:/usr/bin
 #		-U def		passed to C compiler (for .c files)
 #				or to cpp (for .F files) to remove def
 
+#		-v		show current f2c version
+#		--version	same as -v
+
 s=/tmp/stderr_$$
 t=/tmp/f77_$$.o
 ### On some systems (e.g., IRIX), -common prevents complaints
@@ -92,6 +95,24 @@ EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 RATFOR=${RATFOR:-ratfor}
 RFLAGS=${RFLAGS:-'-6&'}
 F2C=${F2C:-/usr/local/bin/f2c}
+show_fc_help=0
+case $1 in
+	--help)		show_fc_help=1;;
+	--version)	show_fc_help=2;;
+	'-?')		show_fc_help=1;;
+	-h)		show_fc_help=1;;
+	-v)		show_fc_help=2;;
+	esac
+case $show_fc_help in
+	1)
+	echo 'f77 script based on f2c'
+	echo 'For usage details, see comments at the beginning of' $0 .
+	echo 'For pointers to f2c documentation, invoke' $F2C --help
+	exit 0;;
+	2)
+	echo $0 'script based on f2c:'; $F2C -v
+	exit 0;;
+	esac
 F2CFLAGS=${F2CFLAGS:='-ARw8 -Nn802 -Nq300 -Nx400'}
 CPP=${CPP:-/lib/cpp}
 rc=0
@@ -99,7 +120,7 @@ trap "rm -f $s $t; exit \$rc" 0
 OUTF=a.out
 OUTO=
 cOPT=1
-set -- `getopt acCD:gI:L:m:N:OU:o:r:sSt:uw6 "$@"`
+set -- `getopt acCD:gI:L:m:N:O:U:o:r:sSt:uw6 "$@"`
 case $? in 0);; *) rc=$?; exit;; esac
 CPPFLAGS=${CPPFLAGS:-'-I/usr/local/include'}
 CFLAGSF2C=${CFLAGSF2C:-'-I/usr/local/include'}
@@ -135,7 +156,7 @@ do
 		shift 2
 		;;
 
-	-m)	CFLAGS="$CFLAGS -m$2"
+	-m)	CC="$CC -m$2"
 		shift 2
 		;;
 
@@ -148,7 +169,7 @@ do
 		shift 2
 		;;
 
-	-O)	case $2 in -1) O=-O1;; -2) O=-O2;; -3) O=-O3;; *) O=-O;; esac
+	-O)	case $2 in 1) O=-O1;; 2) O=-O2;; 3) O=-O3;; *) O=-O;; esac
 		case $O in -O);; *) shift;; esac
 		CFLAGS="$CFLAGS $O"
 #		CFLAGS="$CFLAGS $O -Olimit 2000"
@@ -210,6 +231,8 @@ do
 				shift;;
 			esac
 		;;
+
+	'')	echo $0: 'unexpected null argument'; exit 1;;
 
 	*)
 		echo "invalid parameter $1" 1>&2

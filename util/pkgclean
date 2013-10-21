@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  PKGCLEAN -- Clean the named package, or all packages from the system.
 #
@@ -10,65 +10,64 @@
 # ----------------------------------------------------------------------------
 
 
-unset	noclobber
-unalias rm 
-
-set	all 	= no
-set	init 	= no
+all=no
+init=no
 
 # Process cmdline flags.
-while ("$1" != "")
-    switch ("$1")
-    case -all:                          # clean all package sources
-        set all = yes
-        breaksw
-    case -init:                         # init all packages
-        set init = yes
-        breaksw
-    default:
-        set pkg = $1
+while [ -n "$1" ]; do
+    case "$1" in
+    "-all")                          # clean all package .s
+        all=yes
+	;;
+    "-init")                         # init all packages
+        init=yes
+	;;
+    *)
+        pkg=$1
         break
-    endsw
-
+	;;
+    esac
     shift
-end
+done
 
 
-if ("$all" == "yes") then
-  if (-e ".repo_pkgs") then
-    foreach p (`cat .repo_pkgs`)
-      if (-e $p) then
+if [ "$all" == "yes" ]; then
+  if [ -e ".repo_pkgs" ]; then
+    files=`cat .repo_pkgs`
+    for p in ${files[@]}; do
+      if [ -e $p ]; then
         /bin/rm -rf $p
         mkdir $p
 
-        echo "" > .installed
-        echo "" > .zzsetenv.def
-      endif
-    end
-  endif
+        /bin/echo "" > .installed
+        /bin/echo "" > .zzexport .def=
+      fi
+    done
+  fi
 
-else if ("$init" == "yes") then
-  if (-e ".repo_pkgs") then
-    foreach p (`cat .repo_pkgs`)
-      if (-e $p) then
+elif [ "$init" == "yes" ]; then
+  if [ -e ".repo_pkgs" ]; then
+    files=`cat .repo_pkgs`
+    for p in ${files[@]}; do
+      if [ -e $p ]; then
         /bin/rm -rf $p
-      endif
-    end
-  endif
-  /bin/rm -rf Makefile    >& /dev/null
-  /bin/rm -rf .installed  >& /dev/null
-  /bin/rm -rf .repo*      >& /dev/null
-  echo "" > .zzsetenv.def
+      fi
+    done
+  fi
+  /bin/rm -rf Makefile    >> /dev/null 2>&1
+  /bin/rm -rf .installed  >> /dev/null 2>&1
+  /bin/rm -rf .repo*      >> /dev/null 2>&1
+  /bin/echo "" > .zzexport .def=
 
 else
-   if (-e $pkg) then
+   if [ -e $pkg ]; then
       /bin/rm -rf $pkg
       mkdir $pkg
    else
-     echo "Package '$pkg' is not currently installed"
+     /bin/echo "Package '$pkg' is not currently installed"
      exit 1
-   endif
-endif
+   fi
+fi
 
 
 #  Normal exit.
@@ -81,9 +80,9 @@ exit 0
 #=============================================================================
 
 Usage:
-    echo "Usage: pkgclean [-all] [-dist] [-init] <pkg>"
-    echo ""
-    echo "    Where    -all	clean all packages"
-    echo "	       <pkg>	package to be removed"
+    /bin/echo "Usage: pkgclean [-all] [-dist] [-init] <pkg>"
+    /bin/echo ""
+    /bin/echo "    Where    -all	clean all packages"
+    /bin/echo "	       <pkg>	package to be removed"
 
 exit 0

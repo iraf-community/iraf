@@ -19,13 +19,25 @@
 
 
 #define SZ_ATTRNAME             32      /** size of attribute name            */
-#define SZ_ATTRVAL              256     /** size of attribute value           */
+#define SZ_ATTRVAL              2048    /** size of attribute value           */
 #define SZ_FNAME                255     /** size of filename+path             */
 #define SZ_XMLTAG               1024    /** max length of entire XML tag      */
 #define SZ_LINE                 4096    /** handy size                        */
 
 #define MAX_ATTR                100     /** max size of an attribute/value    */
-#define HANDLE_INCREMENT        8000    /** incr size of handle table         */
+#define HANDLE_INCREMENT        1024000 /** incr size of handle table         */
+
+
+#ifdef  min
+#undef  min
+#endif
+#define min(a,b)	((a<b)?a:b)
+
+#ifdef  max
+#undef  max
+#endif
+#define max(a,b)	((a>b)?a:b)
+
 
 
 
@@ -72,19 +84,20 @@ typedef struct {
  *  @brief This is a structure that hold the information for an XML element.
  */
 typedef struct elem_t {
-    unsigned int type;        /** @brief   Type of element this is            */
-    AttrBlock *attr;          /** @brief   A pointer to a block of attributes */
-    char *content;            /** @brief   Content of the tag elements        */
-    int   isCData;            /** @brief   Is value a CDATA string?           */
+    unsigned int type;        /** @brief   Type of element this is            	*/
+    AttrBlock *attr;          /** @brief   A pointer to a block of attributes 	*/
+    char *content;            /** @brief   Content of the tag elements        	*/
+    int   isCData;            /** @brief   Is value a CDATA string?           	*/
+    int   handle;             /** @brief   handle value			      	*/
 
-    struct elem_t *next;      /** @brief   Ptr to the next element (sibling)  */
-    struct elem_t *last_child;/** @brief   Ptr the the last child element     */
-    struct elem_t *child;     /** @brief   Ptr the the child element          */
-    struct elem_t *parent;    /** @brief   Ptr to the parent element          */
+    struct elem_t *next;      /** @brief   Ptr to the next element (sibling)  	*/
+    struct elem_t *last_child;/** @brief   Ptr the the last child element     	*/
+    struct elem_t *child;     /** @brief   Ptr the the child element          	*/
+    struct elem_t *parent;    /** @brief   Ptr to the parent element          	*/
 
-    char  **data;             /** @brief   Ptr to the data matrix             */
+    char  **data;             /** @brief   Ptr to the data matrix             	*/
 
-    unsigned char ref_count;  /** @brief   No. refrences to this Element      */
+    unsigned char ref_count;  /** @brief   No. refrences to this Element      	*/
 } Element;
 
 

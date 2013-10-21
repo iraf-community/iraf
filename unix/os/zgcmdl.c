@@ -36,9 +36,8 @@ ZGCMDL (
   XINT	  *status
 )
 {
-	register char	*ip, *op;
-	unsigned int	*ep;
-	register int	n, narg;
+	register char *ip, *op;
+	register int   n;
 	char	**argv;
 
 #ifdef	MACOSX
@@ -47,6 +46,10 @@ ZGCMDL (
 	xargv = argv;
 
 #else
+	unsigned int  *ep;
+	register int  narg;
+
+
 	if (!(argv = xargv)) {
 	    /* Locate the ARGV array.  This assumes that argc,argv are
 	     * stored in memory immediately preceeding the environment

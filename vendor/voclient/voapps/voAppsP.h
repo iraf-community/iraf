@@ -1,8 +1,12 @@
-/*************************************************************************
-**  NVOTOOLS.H --  Global include file for the VO-CLI Tools.
-**
-**  M. Fitzpatrick, NOAO, June 2007
-*/
+/**
+ *  VOAPPSP.h -- Internal declarations for the VOClient Package applications.
+ *
+ *  @file       voAppsP.h
+ *  @author     Mike Fitzpatrick
+ *  @date       6/03/11
+ *
+ *  @brief      Internal declarations for the VOClient Package applications.
+ */
 
 
 #ifndef SZ_LINE
@@ -14,14 +18,15 @@
 #define DEF_SR                  0.1
 
 
+
 /* Local processing definitions.
 */
 #define MAX_DOWNLOADS            8      /* max downloads to run         */
 #define MAX_THREADS            128      /* max threads to run           */
-#define MAX_PROCS              128      /* max processes to run         */
+#define MAX_PROCS               64      /* max processes to run         */
 #define DEF_DOWNLOADS            1      /* default no. downloads to run */
-#define DEF_NTHREADS            20      /* default max threads to run   */
-#define DEF_NPROCS              10      /* default max processes to run */
+#define DEF_NTHREADS            16      /* default num threads to run   */
+#define DEF_NPROCS              10      /* default num processes to run */
 #define DEF_PGID              6200      /* default process group id	*/
 
 #define SZ_TARGET               64      /* size of target name          */
@@ -130,7 +135,7 @@ typedef int (*PFI)();           	/* ptr to func returning an int */
 #ifdef   abs
 #undef   abs
 #endif
-#define  abs(a)        		(((a)<0)?-(a):(b))
+#define  abs(a)        		(((a)<0)?-(a):(a))
 
 
 /*************************************************************************
@@ -246,4 +251,5 @@ typedef struct {
 
     void    *next;			/* linked list pointer		*/
 } Service;
+
 

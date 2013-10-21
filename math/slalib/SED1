@@ -204,3 +204,11 @@
 1,$s/sla_XY2XY/slXYXY/g
 
 1,$s/sla_ZD/slZD/g
+
+
+1,$s/sla_COMBN/slCMBN/g
+1,$s/sla_EPV/slEPV/g
+1,$s/sla_PERMUT/slPERM/g
+1,$s/sla_PLANTU/slPLTU/g
+1,$s/sla_VERI/slVERI/g
+1,$s/sla_WAIT/slWAIT/g

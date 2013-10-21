@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -31,8 +33,7 @@ ZFPROT (
 {
 	register char	*p;
 	char	link_name[SZ_PATHNAME];
-	int	first, link(), chk_prot();
-	char	*strrchr();
+	int	first;
 
 
 	/* Build up name of link file: "dir/..fname".  This is done by copying

@@ -3,7 +3,7 @@
 
 #include "ratdef.h"
 
-PUTLIN(line, fd)
+void PUTLIN(line, fd)
 RCHAR *line;
 FINT	*fd;
 {

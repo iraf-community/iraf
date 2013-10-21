@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define _GNU_SOURCE
 #include <string.h>
 #include <expat.h>
 #include <unistd.h>
@@ -29,6 +30,9 @@
 
 
 #define	BUFSIZE			4096
+
+    
+extern char  *strcasestr();
 
 
 /* Private procedures
@@ -74,6 +78,7 @@ static void 	votBob (void);
  *                  tr = vot_getTR  (tdata)
  *                  td = vot_getTD  (tr)
  *             bin = vot_getBINARY  (data)
+ *            bin = vot_getBINARY2  (data)
  *              fits = vot_getFITS  (data)
  *
  *            group = vot_getGROUP  (vot|res|tab|group)
@@ -103,6 +108,7 @@ static void 	votBob (void);
  *                   h = vot_newTR  (handle_t parent_h)
  *                   h = vot_newTD  (handle_t parent_h)
  *               h = vot_newBINARY  (handle_t parent_h)
+ *              h = vot_newBINARY2  (handle_t parent_h)
  *                 h = vot_newFITS  (handle_t parent_h)
  *                h = vot_newGROUP  (handle_t parent_h)
  *             h = vot_newFIELDRef  (handle_t parent_h)
@@ -139,6 +145,8 @@ static void 	votBob (void);
  *               nc = vot_getNCols  (tdata_h)
  *               nr = vot_getNRows  (tdata_h)
  *          val = vot_getTableCell  (tdata_h, row, col)
+ *            stat = vot_sortTable  (tdata_h, col, string_sort, sort_order)
+ *
  *             len = vot_getLength  (elem_h)
  *             N = vot_getNumberOf  (elem_h, type)
  *
@@ -162,11 +170,11 @@ static void 	votBob (void);
  *                   vot_writeHTML  (handle, char *fname)
  *                  vot_writeSHTML  (handle, char *fname)
  *                   vot_writeFITS  (handle, char *fname)
- *                    vot_writeASV  (handle, char *fname)
- *                    vot_writeBSV  (handle, char *fname)
- *                    vot_writeCSV  (handle, char *fname)
- *                    vot_writeTSV  (handle, char *fname)
- *	        vot_writeDelimited  (handle, char *fname, char delim);
+ *                    vot_writeASV  (handle, char *fname, int hdr)
+ *                    vot_writeBSV  (handle, char *fname, int hdr)
+ *                    vot_writeCSV  (handle, char *fname, int hdr)
+ *                    vot_writeTSV  (handle, char *fname, int hdr)
+ *	        vot_writeDelimited  (handle, char *fname, char delim, int hdr)
  *
  *
  ** *************************************************************************/
@@ -244,12 +252,14 @@ vot_openVOTABLE (char *arg)
 
     } else if (strncmp (arg, "http://", 7) == 0) { /* input from URL	*/
 	extern int vot_getURL (char *url, char *fname, int *nbytes);
+	int  tfd = 0;
 
 	/*  Open a temp file for the downloaded URL.
 	 */
 	strcpy (urlFname, "/tmp/votXXXXXX");
-	if (mkstemp (urlFname) < 0)
+	if ((tfd = mkstemp (urlFname) < 0))
 	    strcpy (urlFname, "/tmp/votquery");
+	close (tfd);
 
 	nerrs = vot_simpleGetURL (arg, urlFname);
         if ( !(fd = fopen (urlFname, "r")) ) {
@@ -259,9 +269,19 @@ vot_openVOTABLE (char *arg)
 	fstat (fileno(fd), &st);
         fsize	= (size_t) st.st_size;
 
-    } else if (strcmp (arg, "-") == 0) {	   /* input from stdin	*/
+    } else if (strcmp (arg, "-") == 0 || strncasecmp (arg, "stdin", 5) == 0) {
+	/* input from stdin	*/
         fd = stdin;
         fsize = -1;
+
+    } else if (strncmp (arg, "file://", 7) == 0) { /* input from URL	*/
+        len = strlen (&arg[7]);
+        if (!(fd = fopen (&arg[7], "r"))) {
+            fprintf (stderr, "Unable to open input file '%s'\n", &arg[7]);
+            return (0);			/* cannot open file error	*/
+        }
+	fstat (fileno(fd), &st);
+        fsize = (size_t) st.st_size;
 
     } else if (access (arg, R_OK) == 0) { 	   /* input from file 	*/ 
         len = strlen (arg);
@@ -272,8 +292,15 @@ vot_openVOTABLE (char *arg)
 	fstat (fileno(fd), &st);
         fsize = (size_t) st.st_size;
 
-    } else
+    } else if (strcasestr (arg, "votable")) {
+        /*  input argument is XML string */
+	ip = arg;
+	len = strlen (arg);
+
+    } else {
         fprintf (stderr, "openVOTable(): Invalid input arg '%s'\n", arg);
+	return (-1);
+    }
 
   
     /*  Create the parser and set the input handlers.
@@ -292,9 +319,24 @@ vot_openVOTABLE (char *arg)
         do {
 	    memset (buf, 0, BUFSIZE);
             len = fread (buf, 1, sizeof(buf), fd);
+
+	    if (nread == 0) {
+		/*  Check that this actually is a VOTable.
+		 */
+		if (strcasestr (buf, "<votable") == (char *) NULL) {
+    		    if (fd != stdin) fclose (fd);
+    		    if (urlFname[0]) unlink (urlFname);
+		    return (-1);	/* not a votable */
+		}
+	    }
 	    nread += len;
-	    nleft -= len;
-            done = nread >= fsize;
+
+	    if (fd != stdin) {
+	        nleft -= len;
+                done = nread >= fsize;
+	    } else
+		done = (len == 0 ? feof (stdin) : 0);
+	    
 
 	    if (done && buf[len-1] == '\0')	/* trim trailing null	*/
 		while (len && !buf[len-1])
@@ -628,7 +670,40 @@ vot_getBINARY (handle_t handle)
     }
     
     for (child = elem->child; child; child = child->next)
-        if (child->type == TY_BINARY)
+        if (child->type == TY_BINARY || child->type == TY_BINARY2)
+            break;
+         
+    return (vot_lookupHandle (child));
+}
+
+
+/**
+ *  vot_getBINARY2 -- Gets the BINARY2 node from the parent handle
+ *
+ *  @brief  Gets the BINARY2 node from the parent handle
+ *  @fn     handle_t vot_getBINARY2 (handle_t handle)
+ *
+ *  @param  handle 	Parent handle containing a BINARY2
+ *  @return 		A handle to the first BINARY2 node, or zero
+ */
+handle_t
+vot_getBINARY2 (handle_t handle)
+{
+    /* Refer to vot_getRESOURCE for detailed comments on function workings. */
+    
+    Element *elem, *child;
+    int my_type;
+    
+    elem = vot_getElement (handle);
+    my_type = vot_elemType (elem);
+    
+    if (my_type != TY_DATA) {
+        votEmsg ("BINARY2 must be child of a DATA tag\n");
+        return (0);
+    }
+    
+    for (child = elem->child; child; child = child->next)
+        if (child->type == TY_BINARY2)
             break;
          
     return (vot_lookupHandle (child));
@@ -867,9 +942,11 @@ vot_getSTREAM (handle_t handle)
     elem = vot_getElement (handle);
     my_type = vot_elemType (elem);
     
-    if ((my_type != TY_BINARY) && (my_type != TY_FITS)) {
-        votEmsg ("STREAM must be child of a BINARY or FITS tag\n");
-        return (0);
+    if ((my_type != TY_BINARY) && 
+	(my_type != TY_BINARY2) && 
+	(my_type != TY_FITS)) {
+            votEmsg ("STREAM must be child of a BINARY(2) or FITS tag\n");
+            return (0);
     }
     
     for (child = elem->child; child; child = child->next)
@@ -1114,7 +1191,7 @@ vot_getDATATypeString (handle_t data_h)
 {
     Element *elem = vot_getElement (data_h);
     
-    return (vot_elemName (elem->child));
+    return ((elem ? vot_elemName (elem->child) : "none"));
 }
 
 
@@ -1249,6 +1326,22 @@ handle_t
 vot_newBINARY (handle_t parent_h)
 {
     return (vot_newNode (parent_h, TY_BINARY));
+}
+
+
+/**
+ *  vot_newBINARY2 -- Create new BINARY2 node under the parent handle
+ *
+ *  @brief  Create new BINARY2 node under the parent handle
+ *  @fn     handle_t vot_newBINARY2 (handle_t parent_h)
+ *
+ *  @param  parent_h 	Parent handle of a BINARY2
+ *  @return 		A handle to the first BINARY2 node, or zero
+ */
+handle_t
+vot_newBINARY2 (handle_t parent_h)
+{
+    return (vot_newNode (parent_h, TY_BINARY2));
 }
 
 
@@ -1505,7 +1598,7 @@ struct {
     TY_DESCRIPTION|TY_VALUES|TY_LINK
   },
   { TY_STREAM,
-    TY_BINARY|TY_FITS,
+    TY_BINARY|TY_BINARY2|TY_FITS,
     0
   },
   { TY_FITS,
@@ -1534,7 +1627,7 @@ struct {
   },
   { TY_DATA,
     TY_TABLE,
-    TY_TABLEDATA|TY_BINARY|TY_FITS
+    TY_TABLEDATA|TY_BINARY|TY_BINARY2|TY_FITS
   },
   { TY_TABLEDATA,
     TY_DATA,
@@ -1673,7 +1766,8 @@ vot_freeNode (handle_t node)
     handle_t child_handle, sibling_handle;
     
 
-    node_ptr = vot_getElement (node);
+    if (! (node_ptr = vot_getElement (node)) )
+	return;
     
     if (node_ptr->child) {
         child_handle = vot_lookupHandle (node_ptr->child);
@@ -1863,11 +1957,96 @@ vot_getTableCell (handle_t tdata_h, int row, int col)
     if ( (row < rows) && (col < cols) ) {
         if (tdata) {
             s = tdata->data[(row * cols) + col];
-            return ((s ? s : " "));
+            return ((s ? s : ""));
         }
     }
     
-    return ("N/A");
+    return ("");
+}
+
+
+/**
+ *  vot_sortTable -- Sort a data table based on the specified column.
+ * 
+ *  @brief  Sort a data table based on the specified column.
+ *  @fn     int vot_sortTable (handle_t tdata_h, int col, int strsort, 
+ *				int order))
+ *
+ *  @param  tdata_h 	A handle_t to a TABLEDATA
+ *  @param  col 	An int for a col
+ *  @param  strsort 	String sort?
+ *  @param  order 	Sort order (1=ascending, -1=descending);
+ *  @return	 	return status
+ */
+
+static int 	sort_strings = 0;
+static int 	sort_column  = -1;
+static int 	sort_order   =  1;
+
+int
+vot_tableCompare (const void *row1, const void *row2)
+{
+    char  **a = (char **)row1, 
+	  **b = (char **)row2;
+    char   *s1, *s2;
+    double  x1, x2;
+    int     result;
+
+
+    s1 = a[sort_column];
+    s2 = b[sort_column];
+
+    if (!s1 || !s2)
+        return (-1);
+    if (sort_strings)
+        result = (sort_order * strcasecmp (s1, s2));
+    else {
+	x1 = atof (s1);
+	x2 = atof (s2);
+	result = (sort_order * ((x1 < x2) ? -1 : (x1 == x2) ? 0 : 1));
+    }
+    return (result);
+}
+
+
+int
+vot_sortTable (handle_t tdata_h, int col, int strsort, int order)
+{
+    Element *tdata = vot_getElement (tdata_h);
+    int       cols = vot_getNCols (tdata_h), 
+	      rows = vot_getNRows (tdata_h);
+    handle_t  tr, td;
+    int    i = 0;
+    
+
+    if (col < 0)
+	return (ERR);
+
+    sort_column  = col;
+    sort_strings = strsort;
+    sort_order   = order;
+
+    /*  Sort the compiled table of TDATA strings by rows.  The comparison
+     *  function decides which column is used for the sort.
+     */
+    qsort (&tdata->data[0], rows, (cols * sizeof(char *)), vot_tableCompare);
+
+
+    /*  Rewrite the TDATA elements.  We've re-ordered the compiled string
+     *  table, now we need to reset the <TD> contents accordingly.  Do not
+     *  free existing pointers first since we've simply moved around the 
+     *  values.
+     */
+    i = 0;
+    for (tr = vot_getTR (tdata_h); tr; tr = vot_getNext(tr)) {
+        for (td = vot_getTD(tr); td; td = vot_getNext(td)) {
+	    Element *e = vot_getElement (td);
+	    char  *s = tdata->data[i++];
+	    e->content = (s ? strdup (s) : NULL);
+	}
+    }
+
+    return (OK);
 }
 
 
@@ -1947,14 +2126,15 @@ vot_getNumberOf (handle_t elem_h, int type)
 int
 vot_colByAttr (int tab, char *attr, char *name, char *alt)
 {
-    int   n, col = 0, field, ntest = (alt ? 2 : 1);
-    char  cname[SZ_FNAME], *ctest;
+    int   n, col = 0, field, ntest = ((alt && alt[0]) ? 2 : 1);
+    char  cname[SZ_FNAME], *ctest, *atest;
 
     for (n=0; n < ntest; n++) {
-        ctest = (n ? name : alt);
-        for (field=vot_getFIELD (tab); field; field=vot_getNext (field)) {
+        ctest = ((n == 0) ? name : alt);
+        for (col=0,field=vot_getFIELD (tab); field; field=vot_getNext (field)) {
             memset (cname, 0, SZ_FNAME);
-            strcpy (cname, vot_getAttr (field, attr));
+            if ((atest = vot_getAttr (field, attr)))
+                strcpy (cname, atest);
             if (cname[0] && strcasecmp (ctest, cname) == 0)
                 return (col);
 	    col++;
@@ -2320,7 +2500,11 @@ vot_getValue (handle_t elem_h)
 {
     Element *elem = vot_getElement (elem_h);
     
+#ifdef USE_NULL_VALUE
     return ((elem ? elem->content : NULL));
+#else
+    return ((elem ? elem->content : ""));
+#endif
 }
 
 
@@ -2394,7 +2578,7 @@ vot_writeVOTable (handle_t node, char *fname, int indent)
     vot_dumpXML (vot_getElement (node), 0, indent, fd);
     fprintf (fd, "\n");
 
-
+    fflush (fd);
     if (fd != stdout)
 	fclose (fd);
 }
@@ -2416,6 +2600,7 @@ vot_writeHTML (handle_t node, char *ifname, char *ofname)
 {
     FILE *fd = (FILE *) NULL;
     handle_t  res = vot_getRESOURCE (node);
+    handle_t  sub_res = 0, top_res = 0;
 
 
     if (strcasecmp (ofname, "stdout") == 0 || strncmp (ofname, "-", 1) == 0)
@@ -2434,17 +2619,36 @@ vot_writeHTML (handle_t node, char *ifname, char *ofname)
     /*  Loop over all the <RESOURCE> elements.
      */
     while (res) {
+
+	/*  Make sure we have a <TABLE> element in the <RESOURCE>.  If not,
+	 *  look for a child resource to process.  Only do one level of
+	 *  nesting.    -- FIXME --
+	 */
+	if (!sub_res && vot_getTABLE (res) <= 0) {
+	    if ((sub_res = vot_getChildOfType  (res, TY_RESOURCE))) {
+		top_res = res;
+		res = sub_res;
+	    }
+	}
+
         vot_htmlTableMeta (fd, res, ifname);
         vot_htmlTableData (fd, res, NULL);
 
 	res = vot_getNext (res);
 	if (res)
 	    fprintf (fd, "<hr noshade='3'>\n");
+	else if (sub_res) {
+	    /*  End of child resources, go back up.
+	     */
+	    sub_res = 0;
+	    res = vot_getNext (top_res);
+	}
     }
 
     /*  Write the footer and close the file. 	
      */
     vot_htmlFooter (fd);
+    fflush (fd);
     if (fd != stdout)
 	fclose (fd);
 }
@@ -2484,6 +2688,7 @@ vot_writeSHTML (handle_t node, char *ifname, char *ofname)
      */
     vot_htmlTableData (fd, res, ifname);
 
+    fflush (fd);
     if (fd != stdout)
 	fclose (fd);
 }
@@ -2582,7 +2787,6 @@ vot_writeFITS (handle_t vot, char *oname)
     fitsfile  *fp;		/* CFITSIO descriptor		*/
 
 
-
     if (access (oname, F_OK) == 0)	/* remove an existing file	*/
 	unlink (oname);
 
@@ -2601,9 +2805,12 @@ vot_writeFITS (handle_t vot, char *oname)
 
 	/*  Get handles for the current resource.
 	 */
-      	tab   = vot_getTABLE (res);
-      	data  = vot_getDATA (tab);
-      	tdata = vot_getTABLEDATA (data);
+      	if ((tab   = vot_getTABLE (res)) <= 0)
+	    continue;
+      	if ((data  = vot_getDATA (tab)) <= 0)
+	    continue;
+        if ((tdata = vot_getTABLEDATA (data)) <= 0)
+	    return;
       	nrows = vot_getNRows (tdata);
       	ncols = vot_getNCols (tdata);
 
@@ -2662,10 +2869,12 @@ vot_writeFITS (handle_t vot, char *oname)
 	    tunit[i] = ((unit=vot_getAttr(field, "unit")) ? unit : strdup(""));
 
 	    tform[i] = calloc (1, 16);
+
 	    if (strncasecmp (dtype, "char", 4) == 0 ||
 	        strncasecmp (dtype, "bool", 4) == 0 ||
 	        strncasecmp (dtype, "unsignedByte", 12) == 0) {
-		    if (asize[0]) {
+
+		    if (asize && asize[0]  && widths[i]) {
 		        sprintf (tform[i], "%dA", 
 			    (asize[0] == '*' ? widths[i] : atoi (asize)));
 		    } else
@@ -2866,11 +3075,12 @@ static int
 vot_writeFITSData (fitsfile *fp, char **data, char *fmt[], int nrows, int ncols)
 {
     int     i, j, n, type, width, status = 0;
-    char    **ccol, *tform, cell[1024], *tok, *sep = " ", *brkt = NULL;
+    char    **ccol, *d, *tform, cell[1024], *tok, *sep = " ", *brkt = NULL;
     float  *fcol;
     double *dcol;
     long   *icol;
-    long    frow = 1, felem = 1;
+    short  *scol;
+    long    frow = 1, felem = 1, nr = nrows;
     
 
     for (j = 0; j < ncols; j++) {
@@ -2881,12 +3091,15 @@ vot_writeFITSData (fitsfile *fp, char **data, char *fmt[], int nrows, int ncols)
 
 	switch (tform[type]) {
 	case 'A':						/* CHAR	    */
-    	    ccol = (char **) calloc (1, (nrows * (width+1) * sizeof (char *)));
+//    	    ccol = (char **) calloc (1, (nrows * (width+1) * sizeof (char *)));
+    	    ccol = (char **) calloc (1, (nrows * (SZ_LINE) * sizeof (char *)));
 
-    	    for (i = 0; i < nrows; i++)
-        	ccol[i] = (char *) data[i * ncols + j];
+    	    for (i = 0; i < nrows; i++) {
+		d = data[i * ncols + j];
+		ccol[i] = ((d && *d) ? d : (char *) "");
+	    }
 
-	    fits_write_col (fp, TSTRING, j+1, frow,felem, nrows, ccol, &status);
+	    fits_write_col (fp, TSTRING, j+1, frow,felem, nr, ccol, &status);
 	    free ((void *) ccol);
 	    break;
 
@@ -2900,7 +3113,7 @@ vot_writeFITSData (fitsfile *fp, char **data, char *fmt[], int nrows, int ncols)
 		    else
         	        ((double *) dcol)[i] = (double) atof(data[i*ncols + j]);
 		}
-	        fits_write_col (fp, TDOUBLE, j+1, frow,felem, nrows, dcol, 
+	        fits_write_col (fp, TDOUBLE, j+1, frow,felem, nr, dcol, 
 			&status);
 	    } else {
 		double *dp = dcol, *dpr = dp;
@@ -2931,8 +3144,7 @@ vot_writeFITSData (fitsfile *fp, char **data, char *fmt[], int nrows, int ncols)
 	    if (width == 0) {
     	        for (i = 0; i < nrows; i++)
         	    ((float *) fcol)[i] = (float) atof (data[i * ncols + j]);
-	        fits_write_col (fp, TFLOAT, j+1, frow,felem, nrows, fcol, 
-			&status);
+	        fits_write_col (fp, TFLOAT, j+1, frow,felem, nr, fcol, &status);
 	    } else {
 		float *rp = fcol, *rpr = rp;
 
@@ -2956,14 +3168,44 @@ vot_writeFITSData (fitsfile *fp, char **data, char *fmt[], int nrows, int ncols)
 	    free ((void *) fcol);
 	    break;
 
+	case 'S':						/* SHORT    */
+	case 'I':						/* SHORT    */
+    	    scol = (short *) calloc (1, (nrows * (width+1) * sizeof (short)));
+
+	    if (width == 0) {
+    	        for (i = 0; i < nrows; i++)
+        	    ((short *) scol)[i] = (short) atoi (data[i * ncols + j]);
+	        fits_write_col (fp, TSHORT, j+1, frow,felem, nr, scol, &status);
+	    } else {
+		short *sp = scol, *spr = sp;
+
+    	        for (i = 0; i < nrows; i++) {
+		    brkt = NULL;
+		    memset (cell, 0, 1024);
+		    strcpy (cell, data[i * ncols + j]);
+
+		    spr = sp;
+		    for (n=1, tok=strtok_r (cell, sep, &brkt); tok;
+		         tok=strtok_r (NULL, sep, &brkt), n++)
+			    *sp++ = (short) atoi (tok);
+		    for ( ; n < width; n++)		/* missing values  */
+			*sp++ = (short) 0;
+
+	            fits_write_col (fp, TSHORT, j+1, i+1,felem, width, spr, 
+			&status);
+		}
+	    }
+
+	    free ((void *) scol);
+	    break;
+
 	case 'J':						/* INT      */
     	    icol = (long *) calloc (1, (nrows * (width+1) * sizeof (long)));
 
 	    if (width == 0) {
     	        for (i = 0; i < nrows; i++)
         	    ((long *) icol)[i] = (long) atoi (data[i * ncols + j]);
-	        fits_write_col (fp, TLONG, j+1, frow,felem, nrows, icol, 
-			&status);
+	        fits_write_col (fp, TLONG, j+1, frow,felem, nr, icol, &status);
 	    } else {
 		long *ip = icol, *ipr = ip;
 
@@ -3065,6 +3307,7 @@ vot_htmlHeader (FILE *fd, char *fname)
     fprintf (fd, 
 	"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     fprintf (fd, "<html><head><title>File: %s</title></head><body>\n", fname);
+    fflush (fd);
 }
 
 
@@ -3139,6 +3382,7 @@ vot_htmlTableMeta (FILE *fd, handle_t res, char *ifname)
     fprintf (fd, "<tr><td>&nbsp;</td><td colspan='3'/></tr>\n");
 
     fprintf (fd, "</tr></tbody></table>\n");
+    fflush (fd);
 }
 
 
@@ -3162,9 +3406,12 @@ vot_htmlTableData (FILE *fd, handle_t res, char *ifname)
     char  *ocolor	= "eee";		/* odd-row color	*/
 
 
-    tab   = vot_getTABLE (res);			/* get handles		*/
-    data  = vot_getDATA (tab);
-    tdata = vot_getTABLEDATA (data);
+    if ((tab = vot_getTABLE (res)) <= 0)	/* get handles		*/
+	return;
+    if ((data = vot_getDATA (tab)) <= 0)
+	return;
+    if ((tdata = vot_getTABLEDATA (data)) <= 0)
+	return;
     nrows = vot_getNRows (tdata);
     ncols = vot_getNCols (tdata);
 
@@ -3210,6 +3457,7 @@ vot_htmlTableData (FILE *fd, handle_t res, char *ifname)
     fprintf (fd, "</tbody>\n");
 
     fprintf (fd, "</table>\n");
+    fflush (fd);
 }
 
 
@@ -3220,6 +3468,7 @@ static void
 vot_htmlFooter (FILE *fd)
 {
     fprintf (fd, "</body>\n</html>\n"); 	/* write the footer 	*/
+    fflush (fd);
 }
 
 
@@ -3233,14 +3482,15 @@ vot_htmlFooter (FILE *fd)
  *  vot_writeDelimited -- Write the VOTable as a delimited text file.
  *
  *  @brief  Write the VOTable as a delimited text file.
- *  @fn     vot_writeDelimited (handle_t vot, FILE *fd, char delim)
+ *  @fn     vot_writeDelimited (handle_t vot, FILE *fd, char delim, int hdr)
  *
  *  @param  vot 	A handle to an Element that you to print
  *  @param  fname	Output filename (or "stdout" or "-" for STDOUT)
+ *  @param  hdr		Write an output header?
  *  @return		nothing
  */
 void
-vot_writeDelimited (handle_t vot, char *fname, char delim)
+vot_writeDelimited (handle_t vot, char *fname, char delim, int hdr)
 {
     char  *name, *id, *ucd, *s;
     int   res, tab, data, tdata, field, tr, td;         /* handles      */
@@ -3259,26 +3509,33 @@ vot_writeDelimited (handle_t vot, char *fname, char delim)
         return;
     }
 
-    tab = vot_getTABLE (res);
-    data = vot_getDATA (tab);
-    tdata = vot_getTABLEDATA (data);
+    if ((tab = vot_getTABLE (res)) <= 0)
+	return;
+    if ((data = vot_getDATA (tab)) <= 0)
+	return;
+    if ((tdata = vot_getTABLEDATA (data)) <= 0)
+	return;
     ncols = vot_getNCols (tdata);
 
     /* Print the Column header names.
     */
-    fprintf (fd, "# ");
-    for (field=vot_getFIELD (tab),i=0; field; field = vot_getNext (field),i++) {
-        name = vot_getAttr (field, "name");     /* find reasonable value */
-        id   = vot_getAttr (field, "id");
-        ucd  = vot_getAttr (field, "ucd");
-        if (name || id || ucd)
-            fprintf (fd, "%s", (name ? name : (id ? id : ucd)) );
-        else
-            fprintf (fd, "col%d", i);
-        if (i < (ncols-1))
-            fprintf (fd, "%c", delim);
+    if (hdr) {
+        fprintf (fd, "# ");
+	i = 0;
+        for (field=vot_getFIELD (tab); field; field = vot_getNext (field)) {
+            name = vot_getAttr (field, "name");     /* find reasonable value */
+            id   = vot_getAttr (field, "id");
+            ucd  = vot_getAttr (field, "ucd");
+            if (name || id || ucd)
+                fprintf (fd, "%s", (name ? name : (id ? id : ucd)) );
+            else
+                fprintf (fd, "col%d", i);
+            if (i < (ncols-1))
+                fprintf (fd, "%c", delim);
+	    i++;
+        }
+        fprintf (fd, "\n");
     }
-    fprintf (fd, "\n");
                 
             
     /* Now dump the data.
@@ -3296,6 +3553,7 @@ vot_writeDelimited (handle_t vot, char *fname, char delim)
 	fprintf (fd, "\n");
     }
 
+    fflush (fd);
     if (fd != stdout)
 	fclose (fd);
 }
@@ -3305,16 +3563,17 @@ vot_writeDelimited (handle_t vot, char *fname, char delim)
  *  vot_writeASV -- Write the VOTable to the file descriptor as a ASV file
  *
  *  @brief  Write the VOTable to the file descriptor as a ASV file
- *  @fn     vot_writeASV (handle_t node, char *fname)
+ *  @fn     vot_writeASV (handle_t node, char *fname, int header)
  *
  *  @param  node 	A handle to an Element that you to print
  *  @param  fname	Output filename (or "stdout" or "-" for STDOUT)
+ *  @param  header	Write output header?
  *  @return		nothing
  */
 void
-vot_writeASV (handle_t node, char *fname)
+vot_writeASV (handle_t node, char *fname, int header)
 {
-    vot_writeDelimited (node, fname, ' ');
+    vot_writeDelimited (node, fname, ' ', header);
 }
 
 
@@ -3322,16 +3581,17 @@ vot_writeASV (handle_t node, char *fname)
  *  vot_writeBSV -- Write the VOTable to the file descriptor as a BSV file
  *
  *  @brief  Write the VOTable to the file descriptor as a BSV file
- *  @fn     vot_writeBSV (handle_t node, char *fname)
+ *  @fn     vot_writeBSV (handle_t node, char *fname, int header)
  *
  *  @param  node 	A handle to an Element that you to print
  *  @param  fname	Output filename (or "stdout" or "-" for STDOUT)
+ *  @param  header	Write output header?
  *  @return		nothing
  */
 void
-vot_writeBSV (handle_t node, char *fname)
+vot_writeBSV (handle_t node, char *fname, int header)
 {
-    vot_writeDelimited (node, fname, '|');
+    vot_writeDelimited (node, fname, '|', header);
 }
 
 
@@ -3339,16 +3599,17 @@ vot_writeBSV (handle_t node, char *fname)
  *  vot_writeCSV -- Write the VOTable to the file descriptor as a CSV file
  *
  *  @brief  Write the VOTable to the file descriptor as a CSV file
- *  @fn     vot_writeCSV (handle_t node, char *fname)
+ *  @fn     vot_writeCSV (handle_t node, char *fname, int header)
  *
  *  @param  node 	A handle to an Element that you to print
  *  @param  fname	Output filename (or "stdout" or "-" for STDOUT)
+ *  @param  header	Write output header?
  *  @return		nothing
  */
 void
-vot_writeCSV (handle_t node, char *fname)
+vot_writeCSV (handle_t node, char *fname, int header)
 {
-    vot_writeDelimited (node, fname, ',');
+    vot_writeDelimited (node, fname, ',', header);
 }
 
 
@@ -3356,16 +3617,17 @@ vot_writeCSV (handle_t node, char *fname)
  *  vot_writeTSV -- Write the VOTable to the file descriptor as a TSV file
  *
  *  @brief  Write the VOTable to the file descriptor as a TSV file
- *  @fn     vot_writeTSV (handle_t node, char *fname)
+ *  @fn     vot_writeTSV (handle_t node, char *fname, int header)
  *
  *  @param  node 	A handle to an Element that you to print
  *  @param  fname	Output filename (or "stdout" or "-" for STDOUT)
+ *  @param  header	Write output header?
  *  @return		nothing
  */
 void
-vot_writeTSV (handle_t node, char *fname)
+vot_writeTSV (handle_t node, char *fname, int header)
 {
-    vot_writeDelimited (node, fname, '\t');
+    vot_writeDelimited (node, fname, '\t', header);
 }
 
 
@@ -3641,6 +3903,7 @@ vot_dumpXML (Element *node, int level, int indent, FILE *fd)
     
     /* At this point there should be no more children or sibling on this node.
     */
+    fflush (fd);
 }
 
 
@@ -3718,7 +3981,7 @@ vot_printData (Element *tdata)
 
 
     if (tdata->type != TY_TABLEDATA) {
-        fprintf (stderr, "ERROR: Must be a TABLEDATA element to compile.\n");
+        fprintf (stderr, "ERROR: Must be a TABLEDATA element to print.\n");
         return;
     }
     

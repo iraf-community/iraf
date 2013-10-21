@@ -1,5 +1,10 @@
 .help revisions Jun88 pkg.lists
 .nf
+
+lintran.x
+	Modified to store parameter structure as doubles to avoid round-off
+	issues (9/4/12)
+
 =====
 V2.13
 =====

@@ -9,7 +9,7 @@ $exit
 
 
 update:	
-	!./mklibs
+	!make all
 	;
 
 
@@ -17,6 +17,6 @@ update:
 # for the iraf kernel (libos.a) is maintained in host$.
 
 sysgen:
-	!./mklibs
+	!make all
 	$purge lib$
 	;

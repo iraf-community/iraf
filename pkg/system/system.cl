@@ -6,6 +6,7 @@ lists
 package	system
 
 task	cmdstr,
+	chkupdate,
 	concatenate,
 	copy,
 	count,

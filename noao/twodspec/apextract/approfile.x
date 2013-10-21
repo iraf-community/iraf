@@ -103,9 +103,14 @@ begin
 	    Memr[x2+iy] = s + dat
 	    Memr[x1+iy] = max (0.5, Memr[x1+iy]) + c1 - xs[iy]
 	    Memr[x2+iy] = min (nc + 0.49, Memr[x2+iy]) + c1 - xs[iy]
+	    ix1 = nint (Memr[x1+iy])
+	    ix2 = nint (Memr[x2+iy])
 	    Memr[y+iy] = iy
 	    do ix = 1, nx {
-		Memb[xreject] = true
+		if (ix < ix1 || ix > ix2)
+		    Memb[xreject] = false
+		else
+		    Memb[xreject] = true
 		xreject = xreject + 1
 	    }
 	}
@@ -115,6 +120,7 @@ begin
 	# estimates are obtained by normalizing by the spectrum estimate.
 	# Profiles where the spectrum is below sky are set to zero.
 
+	call aclrr (profile, nx * ny)
 	nrej = 0
 	do iy = 1, ny {
 	    if (Memr[x1+iy] >= Memr[x2+iy]) {
@@ -126,11 +132,8 @@ begin
 
 	    call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
 		Memr[x1+iy]-c1+xs[iy], Memr[x2+iy]-c1+xs[iy], data, asi)
-#	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 	    if (sbuf != NULL)
 		sky = sbuf + (iy - 1) * nx - 1
-#	    if (asi != NULL)
-#	        call asifit (asi, Memr[data], nc-xs[iy]+c1)
 	    call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 	    ix1 = nint (Memr[x1+iy])
 	    ix2 = nint (Memr[x2+iy])
@@ -153,10 +156,10 @@ begin
 	    }
 
 	    if (s > 0.) {
-	        do ix = 1, nx
+	        do ix = ix1, ix2
 		    profile[iy,ix] = max (0., (Memr[data+ix]-Memr[sky+ix])/s)
 	    } else {
-	        do ix = 1, nx
+	        do ix = ix1, ix2
 		    profile[iy,ix] = 0.
 	    }
 	    Memr[spec+iy] = s
@@ -206,18 +209,15 @@ begin
 		    next
 		call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
 		    Memr[x1+iy]-c1+xs[iy], Memr[x2+iy]-c1+xs[iy], data, asi)
-#		data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 		if (sbuf != NULL) {
 		    sky = sbuf + (iy - 1) * nx - 1
 		    var0 = rdnoise + Memr[svar+iy-1]
 		}
-#		if (asi != NULL)
-#		    call asifit (asi, Memr[data], nc-xs[iy]+c1)
 		call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 		xreject = reject + (iy - 1) * nx - 1
 	        ix1 = nint (Memr[x1+iy])
 	        ix2 = nint (Memr[x2+iy])
-	        do ix = 1, nx {
+	        do ix = ix1, ix2 {
 	            if (Memb[xreject+ix]) {
 	                nsum = nsum + 1
 	                predict = max (0., s * profile[iy,ix] + Memr[sky+ix])

@@ -1,5 +1,150 @@
                    Log of Changes Made to CFITSIO
 
+Version 3.31 - 18 July 2012
+
+   - enhanced the CFITSIO column filtering syntax to allow the comma, in addition
+     to the semi-colon, to be used to separate clauses, for example:
+     [col X,Y;Z = max(X,Y)].  This was done because users are not allowed to
+     enter the semi-colon character in the on-line Hera data processing
+     system due to computer security concerns.
+
+   - enhanced the CFITSIO extended filename syntax to allow specifying image
+     compression parameters (e.g. '[compress Rice]') when opening an existing
+     FITS file with write access.  The specified compression parameters will
+     be used by default if more images are appended to the existing file.
+
+   - modified drvrfile.c to do additional file secrity checks when CFITSIO
+     is running within the HEASARC's Hera software system.  In this case
+     CFITSIO will not allow FITS files to be created outside of the user's
+     individual Hera data directory area.
+
+   - fixed an issue in fpack and funpack on Windows machines, caused by
+     the fact that the 'rename' function behaves differently on Windows
+     in that it does not clobber an existing file, as it does on Unix
+     platforms.
+
+   - fixed bug in the way byte-swapping was being performed when writing 
+     integer*8 null values to an image or binary table column.  
+
+   - added the missing macro definition for fffree to fitsio.h.
+
+   - modified the low level table read and write functions in getcol*.c and 
+     putcol*.c to remove the 32-bit limitation on the number of elements. 
+     These routines now support reading and writing more than 2**31 elements
+     at one time. Thanks to Keh-Cheng Chu (Stanford U.) for the patch.
+
+   - modified Makefile.in so that the shared libcfitsio.so is linked against 
+     pthreads and libm.
+
+Version 3.30 - 11 April 2012
+
+  Enhancements
+
+   - Added new routine called fits_is_reentrant which returns 1 or 0 depending on
+     whether or not CFITSIO was compiled with the -D_REENTRANT directive.  This can
+     be used to determine if it is safe to use CFITSIO in multi-threaded programs.
+
+   - Implimented much faster byte-swapping algorithms in swapproc.c based on code
+     provided by Julian Taylor at ESO, Garching.  These routines significantly 
+     improve the FITS image read and write speed (by more than a factor of 2 in 
+     some cases) on little-endian machines (e.g., Linux and Microsoft Windows and
+     Macs running on x86 CPUs) where byte-swapping is required when reading and 
+     writing data in FITS files.  This has no effect on big-endian machines 
+     (e.g. Motorola CPUs and some IBM systems).  Even faster byte-swapping
+     performance can be achieved in some cases by invoking the new "--enable-sse2" 
+     or "--enable-ssse3" configure options when building CFITSIO on machines that
+     have CPUs and compilers that support the SSE2 and SSSE3 machine instructions.
+
+   - added additional support for implicit data type conversion in cases where
+     the floating point image has been losslessly compressed with gzip.  The
+     pixels in these compressed images can now be read back as arrays of short, 
+     int, and long integers as well as single and double precision floating-point.
+
+   - modified fitsio2.h and f77_wrap.h to recognize IBM System z mainframes by
+     testing if __s390x__ or __s390__ is defined.
+
+   - small change to ffgcrd in getkey.c so that it supports reading a blank
+     keyword (e.g., a keyword whose name simply contains 8 space chracters).
+
+   Bug Fixes
+
+   - fixed a bug in imcomp_decompress_tile that caused the tile-compressed image 
+     to be uncompressed incorrectly (even though the tile-compressed image itself
+     was written correctly) under the following specific conditions:
+      - the original FITS image has a "float" datatype (R*4) 
+      - one or more of the image tiles cannot be compressed using the standard
+        quantization method  and instead are losslessly compressed with gzip
+      - the pixels in these tiles are not all equal to zero (this bug does
+        affect tiles where all the pixels are equal to zero)
+      - the program that is reading the compressed image uses CFITSIO's
+        "implicit datatype conversion" feature to read the "float" image
+        back into an array of "double" pixel values.
+      If all these conditions are met, then the returned pixel values in the
+      affected image tiles will be garbage, with values often ranging 
+      up to 10**34.  Note that this bug does not affect the fpack/funpack
+      programs, because funpack does not use CFITSIO's implicit datatype
+      conversion feature when uncompressing the image.
+
+Version 3.29 - 2 December 2011
+
+  Enhancements
+
+   - modified Makefile.in to allow configure to override the lib and include
+     destination directories.
+		   
+   - added (or restored actually) support for tile compression of 1-byte integer 
+     images in imcomp_compress_tile.  Support for that data type was overlooked
+     during recent updates to this routine.
+
+   - modified the fits_get_token command-line parsing routine to perform more
+     rigorous checks to determine if the token can be interpreted as a number 
+     or not.
+
+   - made small modification to fpack.c to not allow the -i2f option (convert
+     image from integer to floating point) with the "-g -q 0" option (do lossless 
+     gzip compression).  It is more efficient to simply use the -g option alone.
+
+   - made modifications to fitsio.h and drvrfile.c to support reading and
+     writing large FITS files (> 2.1 GB) when building CFITSIO using 
+     Microsoft Visual C++ on Windows platforms.
+
+   - added new WCS routine (ffgicsa) which returns the WCS keyword values
+     for a particular WCS version ('A' - 'Z').
+
+   Bug Fixes
+
+   - fixed a problem with multi-threaded apps that open/close FITS files
+     simultaneously by putting mutex locks around the call to
+     fits_already_open and in fits_clear_Fptr.
+
+   - fixed a bug when using the 'regfilter' function to select a subset of the
+     rows in a FITS table that have coordinates that lie within a specified
+     spatial region on the sky.  This bug only affects the rarely used panda
+     (and epanda and bpanda) region shapes in which the region is defined by
+     the intersection of an annulus  and a pie-shaped wedge.  The previous code
+     (starting with version 3.181 of CFITSIO where support for the panda region
+     was first introduced) only worked correctly if the 2 angles that define
+     the wedge have values between -180 and +180.  If not, then fewer rows than
+     expected may have been selected from the table.
+
+   - fixed the extended filename parser so that when creating a histogram by
+     binning 2 table columns, if a keyword or column name is given as the
+     weighting factor,  then the output histrogram image will have a floating
+     point datatype, not the default integer datatype as is the case when no
+     weigth is specified (e.g. with a filename like 
+     "myfile.fits[bin x,y; weight_column]"
+
+   - added fix to the code in imcompress.c to work around a problem with
+     dereferencing the value of a pointer, in cases where the address of 
+     that pointer has not been defined (e.g., the nulval variable).
+
+    - modified the byte shuffling algorithm in fits_shuffle_8bytes to work
+     around a strange bug in the proprietary SunStudioExpress C compiler
+     under OpenSolaris.
+
+   - removed spurious messages on the CFITSIO error stack when opening a
+     FITS file with FTP (in drvrnet.c);
+
 Version 3.28 - 12 May 2011
 
    - added an enhancement to the tiled-image compression method when compressing

@@ -1,6 +1,6 @@
-/******************************************************************************
- *
- *  VOClient Messaging Interface
+/**
+ *  VOCMSG.C -- VOClient Messaging Interface.  This interface is used
+ *  internally to communicate between the API and the VOClient Daemon.
  *
  *            msg = newCallMsg (objid, method, nparams)
  *          msg = newResultMsg (status, type, nitems)
@@ -28,16 +28,23 @@
  *       dval = getFloatResult (res, index)
  *       str = getStringResult (res, index)
  *
- *  M. Fitzpatrick, NOAO, June 2006
+ *
+ *  @file       vocMsg.c
+ *  @author     Michael Fitzpatrick
+ *  @version    June 2006
+ *
+ *************************************************************************
  */
 
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -60,8 +67,9 @@ extern	VOClient *vo;
 #define SELWIDTH	32
 
 
-/*  Private interface procedure
-*/
+/**
+ *  Private procedures
+ */
 static int       msg_write (int fd, char *buf, int nbytes);
 static int       msg_read (int fd, char *buf, int maxbytes, int *nbytes);
 static void      msg_addParam (vocMsg_t *msg, int type, char *str);
@@ -75,11 +83,22 @@ static int   	 msg_readBulkToFile (int fd, char *fname, int nexpect,
 static int	 msg_onsig(int sig, int *arg1, int *arg2);
 
 
+/***************************************************************************/
+/****			    Public Procedures				****/
+/***************************************************************************/
 
-/*****************************************************************************
- *  NEWCALLMSG --  Create a CALL message structure and initialize with
+/**
+ *  MSG_NEWCALLMSG --  Create a CALL message structure and initialize with
  *  the requested parameters.  Structures are allocated dynamically,
  *  the caller is responsible for freeing the struct when finished.
+ * 
+ *  @brief   Create a CALL message structure initialized w/ parameters.
+ *  @fn      msg = msg_newCallMsg (ObjectID objid, char *method, int nparams)
+ *
+ *  @param   objid       object id
+ *  @param   method      name of method to call
+ *  @param   nparams     number of parameters in message
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_newCallMsg (ObjectID objid, char *method, int nparams)
@@ -98,10 +117,18 @@ msg_newCallMsg (ObjectID objid, char *method, int nparams)
 }
 
 
-/*****************************************************************************
- *  NEWRESULTMSG -- Create a new RESULT message context and initialize
+/**
+ *  MSG_NEWRESULTMSG -- Create a new RESULT message context and initialize
  *  with the requested parameters.  The caller is responsible for freeing
  *  the struct when complete.
+ * 
+ *  @brief   Create a RESULT message structure initialized w/ parameters.
+ *  @fn      msg = msg_newResultMsg (int status, int type, int nitems)
+ *
+ *  @param   status      result status
+ *  @param   type        result type
+ *  @param   nitems      number of items in message
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_newResultMsg (int status, int type, int nitems)
@@ -119,10 +146,17 @@ msg_newResultMsg (int status, int type, int nitems)
 }
 
 
-/*****************************************************************************
- *  NEWMSG -- Create a new MSG message context and initialize with the 
+/**
+ *  MSG_NEWMSG -- Create a new MSG message context and initialize with the 
  *  requested parameters.  The caller is responsible for freeing the struct 
  *  when complete.
+ * 
+ *  @brief   Create a MSG message initialized w/ parameters.
+ *  @fn      msg = msg_newMsg (char *msgclass, char *str)
+ *
+ *  @param   msgclass    message class
+ *  @param   str         message string
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_newMsg (char *msgclass, char *str)
@@ -138,8 +172,14 @@ msg_newMsg (char *msgclass, char *str)
 }
 
 
-/*****************************************************************************
- *  SHUTDOWNMSG -- Create an END message to the VOClient Server to shut it down.
+/**
+ *  MSG_SHUTDOWNMSG -- Create an END message to the VOClient Server to shut 
+ *  it down.
+ * 
+ *  @brief   Create a END message to shutdown the server.
+ *  @fn      msg = msg_shutdownMsg (void)
+ *
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_shutdownMsg ()
@@ -149,10 +189,15 @@ msg_shutdownMsg ()
     return (msg);
 }
 
-                    
-/*****************************************************************************
- *  QUITMSG -- Create a QUIT message to the VOClient Server to tell it we're
- *  leaving but that it should keep running
+
+/**
+ *  MSG_QUITMSG -- Create a QUIT message to the VOClient Server to tell it
+ *  we're leaving but that it should keep running
+ * 
+ *  @brief   Create a QUIT message
+ *  @fn      msg = msg_quitMsg (void)
+ *
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_quitMsg ()
@@ -163,8 +208,13 @@ msg_quitMsg ()
 }
 
 
-/*****************************************************************************
- *  ACKMSG -- Create an ACK message to the VOClient Server.
+/**
+ *  MSG_ACKMSG -- Create an ACK message to the VOClient Server.
+ * 
+ *  @brief   Create an ACK message
+ *  @fn      msg = msg_ackMsg (void)
+ *
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_ackMsg ()
@@ -175,8 +225,13 @@ msg_ackMsg ()
 }
 
 
-/*****************************************************************************
- *  NOACKMSG -- Create an NO-ACK message to the VOClient Server.
+/**
+ *  MSG_NOACKMSG -- Create an NO-ACK message to the VOClient Server.
+ * 
+ *  @brief   Create a NOACK message
+ *  @fn      msg = msg_noackMsg (void)
+ *
+ *  @returns             a new message object
  */
 vocMsg_t *
 msg_noackMsg ()
@@ -187,10 +242,17 @@ msg_noackMsg ()
 }
 
                     
-/*****************************************************************************
- *  SENDMSG -- Send the message to the VOClient Server and wait for the ACK.  
+/**
+ *  MSG_SENDMSG -- Send the message to the VOClient Server and wait for the ACK.  
  *  The simple form of the message returns the result handle, for the raw 
  *  message we only send to allow to a bullk return object.
+ * 
+ *  @brief   Send the message to the VOClient server
+ *  @fn      msg = msg_sendMsg (int fd, vocMsg_t *msg)
+ *
+ *  @param   fd          message channel descriptor
+ *  @param   str         message string
+ *  @returns             a new message object
  */
 vocRes_t *
 msg_sendMsg (int fd, vocMsg_t *msg)
@@ -199,6 +261,17 @@ msg_sendMsg (int fd, vocMsg_t *msg)
     return ( (stat != ERR) ? msg_getResult (fd) : (vocRes_t *)NULL );
 }
 
+
+/**
+ *  MSG_SENDRAWMSG -- Send the message to the VOClient Server.
+ * 
+ *  @brief   Send the message to the VOClient server
+ *  @fn      len = msg_sendRawMsg (int fd, vocMsg_t *msg)
+ *
+ *  @param   fd          message channel descriptor
+ *  @param   str         message string
+ *  @returns             a new message object
+ */
 int
 msg_sendRawMsg (int fd, vocMsg_t *msg)
 {
@@ -217,21 +290,46 @@ msg_sendRawMsg (int fd, vocMsg_t *msg)
 }
 
 
-/*****************************************************************************
- * GETRESULT -- Read and parse a result message.
+/**
+ *  MSG_GETRESULT -- Read and parse a result message.
+ * 
+ *  @brief   Read and parse a result message.
+ *  @fn      res = msg_getResult (int fd)
+ *
+ *  @param   fd          message channel descriptor
+ *  @returns             result message object
  */
 vocRes_t *
 msg_getResult (int fd)
 {
     char c, last_ch = '\0', complete = 0;
-    int  i=0, stat, nread = 0;
-    char buf[SZ_MSGBUF], rembuf[SZ_MSGBUF];
+    int  i=0, stat, nread = 0, rc;
+    char *buf;
     vocRes_t *res = (vocRes_t *) NULL;
+    struct timeval  timeout;
+    fd_set   fds, wfds;
 
-    memset (buf, 0, SZ_MSGBUF);		/* clear buffers		*/
-    memset (rembuf, 0, SZ_MSGBUF);
+
+    buf = (char *) calloc (1, SZ_MSGBUF); /* clear buffers		*/
+
+    timeout.tv_sec  = 600;
+    timeout.tv_usec = 0;
+    FD_ZERO (&fds);
+    FD_SET (fd, &fds);
 
     while (!complete) {			/* read the result message	*/
+	memcpy (&wfds, &fds, sizeof(fds));
+	rc = select (fd+1, &wfds, NULL, NULL, &timeout);
+	if (rc == 0) { 			/* timeout 			*/
+	    /* 
+	    int stat = ERR;
+	    fprintf (stderr, "msg_getResult timeout .... fd=%d\n", fd); 
+	    pthread_exit (&stat);
+	    */
+    	    free ((void *) buf);
+	    return (res);
+	}
+
         stat = msg_read (fd, &c, 1, &nread);
 	if (c == ';' && last_ch == '}') {
 	    buf[i++] = c;
@@ -264,25 +362,31 @@ msg_getResult (int fd)
 	}
     }
 
+    free ((void *) buf);
     return ((vocRes_t *) res);
 }
 
 
-/*****************************************************************************
- * GETRESULTTOFILE -- Read and parse a result message, save bulk data to the
- * named file.
+/**
+ *  MSG_GETRESULTTOFILE -- Read and parse a result message, save bulk data
+ *  to the named file.
+ * 
+ *  @brief   Read and parse a result message, saving data to named file.
+ *  @fn      res = msg_getResultToFile (int fd, char *fname, int overwrite)
+ *
+ *  @param   fd          message channel descriptor
+ *  @returns             result message object
  */
 vocRes_t *
 msg_getResultToFile (int fd, char *fname, int overwrite)
 {
     char c, last_ch = '\0', complete = 0;
     int  i=0, stat=OK, nread = 0;
-    char buf[SZ_MSGBUF], rembuf[SZ_MSGBUF];
+    char  *buf;
     vocRes_t *res = (vocRes_t *) NULL;
 
 
-    memset (buf, 0, SZ_MSGBUF);		/* clear buffers	*/
-    memset (rembuf, 0, SZ_MSGBUF);
+    buf = calloc (1, SZ_MSGBUF);		/* clear buffers	*/
 
     while (!complete && stat == OK) {
         stat = msg_read (fd, &c, 1, &nread);
@@ -304,13 +408,21 @@ msg_getResultToFile (int fd, char *fname, int overwrite)
 	stat = msg_readBulkToFile (fd, fname, overwrite, nbytes, &res->buflen);
     }
 
+    free ((void *) buf);
     return ((vocRes_t *) res);
 }
 
 
-/*****************************************************************************
- *  ADD<type>PARAM -- Add a int/float/string parameter to an outgoing   
- *  CALL message.  We simply append to an existing message.
+/**
+ *  MSG_ADDINTPARAM -- Add a int parameter to an outgoing CALL message.  
+ *  We simply append to an existing message.
+ * 
+ *  @brief   Add a int parameter to an outgoing CALL message
+ *  @fn      msg_addIntParam (vocMsg_t *msg, int ival)
+ *
+ *  @param   msg         outgoing message
+ *  @param   ival        integer value
+ *  @returns             nothing
  */
 void msg_addIntParam (vocMsg_t *msg, int ival)
 {
@@ -320,6 +432,18 @@ void msg_addIntParam (vocMsg_t *msg, int ival)
     msg_addParam (msg, 1, str);
 }
 
+
+/**
+ *  MSG_ADDFLOATPARAM -- Add a float parameter to an outgoing CALL message.
+ *  We simply append to an existing message.
+ * 
+ *  @brief   Add a float parameter to an outgoing CALL message
+ *  @fn      msg_addFloatParam (vocMsg_t *msg, double dval)
+ *
+ *  @param   msg         outgoing message
+ *  @param   dval        double value
+ *  @returns             nothing
+ */
 void msg_addFloatParam (vocMsg_t *msg, double dval)
 {
     char str[SZ_PBUF];
@@ -328,16 +452,33 @@ void msg_addFloatParam (vocMsg_t *msg, double dval)
     msg_addParam (msg, 2, str);
 }
 
+
+/**
+ *  MSG_ADDSTRINGPARAM -- Add a string parameter to an outgoing CALL message.
+ *  We simply append to an existing message.
+ * 
+ *  @brief   Add a string parameter to an outgoing CALL message
+ *  @fn      msg_addStringParam (vocMsg_t *msg, char *str)
+ *
+ *  @param   msg         outgoing message
+ *  @param   str         string value
+ *  @returns             nothing
+ */
 void msg_addStringParam (vocMsg_t *msg, char *str)
 {
     msg_addParam (msg, 3, str);
 }
 
 
-
-
-/*****************************************************************************
- *  ADD<type>RESULT -- Add an int/float/string value to a results string.
+/**
+ *  MSG_ADDINTRESULT -- Add an integer value to a RESULT string.
+ * 
+ *  @brief   Add a integer value to a RESULT string.
+ *  @fn      msg_addIntResult (vocMsg_t *msg, int ival)
+ *
+ *  @param   msg         result string
+ *  @param   ival        integer value
+ *  @returns             nothing
  */
 void msg_addIntResult (vocMsg_t *msg, int ival)
 {
@@ -347,7 +488,17 @@ void msg_addIntResult (vocMsg_t *msg, int ival)
     sprintf (&msg->message[i], " 1 1 %d }", ival);
 }
 
-             
+
+/**
+ *  MSG_ADDFLOATRESULT -- Add a float value to a RESULT string.
+ * 
+ *  @brief   Add a float value to a RESULT string.
+ *  @fn      msg_addFloatResult (vocMsg_t *msg, int ival)
+ *
+ *  @param   msg         result string
+ *  @param   dval        double value
+ *  @returns             nothing
+ */
 void msg_addFloatResult (vocMsg_t *msg, double dval)
 {
     register int i;
@@ -356,7 +507,17 @@ void msg_addFloatResult (vocMsg_t *msg, double dval)
     sprintf (&msg->message[i], " 2 1 %g }", dval);
 }
 
-            
+
+/**
+ *  MSG_ADDSTRINGRESULT -- Add a string value to a RESULT string.
+ * 
+ *  @brief   Add a string value to a RESULT string.
+ *  @fn      msg_addStringResult (vocMsg_t *msg, char *str)
+ *
+ *  @param   msg         result string
+ *  @param   str         string value
+ *  @returns             nothing
+ */
 void msg_addStringResult (vocMsg_t *msg, char *str)
 {
     register int i;
@@ -366,42 +527,125 @@ void msg_addStringResult (vocMsg_t *msg, char *str)
 }
 
 
-
-/*  MSG_RESULTS -- Get various bits of information from the RESULT message.
+/**
+ *  MSG_RESULTSTATUS -- Get result status.
+ * 
+ *  @brief   Get result status
+ *  @fn      status = msg_resultStatus (vocRes_t *res)
+ *
+ *  @param   msg         result string
+ *  @returns             result status
  */
+int msg_resultStatus (vocRes_t *res)
+{ 
+    return (res ? res->status : ERR);
+}
 
-int msg_resultStatus (vocRes_t *res) { return ( res ? res->status : ERR); }
-int msg_resultType   (vocRes_t *res) { return (res->type); 	}
-int msg_resultLength (vocRes_t *res) { return (res->nitems); 	}
+
+/**
+ *  MSG_RESULTTYPE -- Get result type.
+ * 
+ *  @brief   Get result type
+ *  @fn      type = msg_resultType (vocRes_t *res)
+ *
+ *  @param   msg         result string
+ *  @returns             result type
+ */
+int msg_resultType (vocRes_t *res)
+{
+    return (res->type); 		  
+}
 
 
-int msg_getIntResult (vocRes_t *res, int index)
+/**
+ *  MSG_RESULTLENGTH -- Get result length.
+ * 
+ *  @brief   Get result length
+ *  @fn      len = msg_resultLength (vocRes_t *res)
+ *
+ *  @param   msg         result string
+ *  @returns             result length
+ */
+int 
+msg_resultLength (vocRes_t *res) 
+{
+    return (res->nitems);
+}
+
+
+/**
+ *  MSG_GETINTRESULT -- Get an integer result by index.
+ * 
+ *  @brief   Get an integer result by index.
+ *  @fn      ival = msg_getIntResult (vocRes_t *res, int index)
+ *
+ *  @param   res         result message
+ *  @param   index       result index
+ *  @returns             integer value
+ */
+int 
+msg_getIntResult (vocRes_t *res, int index)
 {
     return (atoi (res->value[index]));
 }
 
-double msg_getFloatResult (vocRes_t *res, int index)
+
+/**
+ *  MSG_GETFLOATRESULT -- Get a float result by index.
+ * 
+ *  @brief   Get a float result by index.
+ *  @fn      dval = msg_getFloatResult (vocRes_t *res, int index)
+ *
+ *  @param   res         result message
+ *  @param   index       result index
+ *  @returns             float value
+ */
+double 
+msg_getFloatResult (vocRes_t *res, int index)
 {
     return ((double)atof (res->value[index]));
 }
 
-char *msg_getStringResult (vocRes_t *res, int index)
+
+/**
+ *  MSG_GETSTRINGRESULT -- Get a string result by index.
+ * 
+ *  @brief   Get a string result by index.
+ *  @fn      str = msg_getStringResult (vocRes_t *res, int index)
+ *
+ *  @param   res         result message
+ *  @param   index       result index
+ *  @returns             string value
+ */
+char *
+msg_getStringResult (vocRes_t *res, int index)
 {
     if (strlen (res->value[index]) > SZ_MSGSTR)
         *res->value[SZ_MSGSTR-1] = '\0';
     return (strdup(res->value[index]));
 }
 
-void *msg_getBuffer (vocRes_t *res)
+
+/**
+ *  MSG_GETBUFFER -- Get result buffer.
+ * 
+ *  @brief   Get result buffer
+ *  @fn      len = msg_getBuffer (vocRes_t *res)
+ *
+ *  @param   res         result message
+ *  @returns             pointer to result buffer
+ */
+void *
+msg_getBuffer (vocRes_t *res)
 {
     return ((res ? (void *)res->buf : NULL));
 }
 
 
 
-/******************************************************************************
- * PRIVATE PROCEDURES
- *****************************************************************************/
+/***************************************************************************/
+/****			    Private Procedures				****/
+/***************************************************************************/
 
 
 /* MSG_WRITE -- Asynchronous write of data to the server.  Write exactly
@@ -419,7 +663,6 @@ int 	nbytes;				/* number of bytes to write	*/
     fd_set   fds, allset;
     struct timeval tv;
     SIGFUNC sigpipe;
-
 
 
     /* Enable a signal mask to catch SIGPIPE when the server has died.
@@ -450,7 +693,7 @@ int 	nbytes;				/* number of bytes to write	*/
 	        return (ERR);
 	    }
 	} else
-	    printf ("select timeout ....\n");
+	    printf ("msg_write select timeout ....\n");
     }
 
     signal (SIGPIPE, sigpipe); 	/* restore the signal mask */
@@ -506,9 +749,11 @@ int 	*nbytes;			/* number of bytes actually read*/
 static void *
 msg_readBulk (int fd, int *len, int *status)
 {
-    int   i, nbytes=0, nread=0, blen, leading=1;
+    int   i, rc, nbytes=0, nread=0, blen, leading=1;
     void  *chunk, *data, *dp, *ep;
     char  ch;
+    struct timeval timeout;
+    fd_set fds, wfds;
 
 
     /* Allocate a big chunk and initial data buffer.  We'll resize the
@@ -526,8 +771,27 @@ msg_readBulk (int fd, int *len, int *status)
     ep       = data + SZ_BULKDATA;	/* save end of buffer		*/
     blen     = SZ_BULKDATA;
 
+    timeout.tv_sec  = 600;
+    timeout.tv_usec = 0;
+    FD_ZERO (&fds);
+    FD_SET (fd, &fds);
+
     while (1) {
 	memset (chunk, 0, SZ_CHUNK);
+
+        memcpy (&wfds, &fds, sizeof(fds));
+        rc = select (fd+1, &wfds, NULL, NULL, &timeout);
+        if (rc == 0) {                  /* timeout                      */
+            /* 
+	    int stat = ERR;
+	    fprintf (stderr, "msg_getBulk timeout .... fd=%d\n", fd); 
+	    pthread_exit (&stat);
+	    */
+	    free ((void *) chunk);
+	    free ((void *) data);
+	    return ( (void *) NULL );
+        }
+
         if ( (nread = read (fd, chunk, SZ_CHUNK)) < 0) {
             if (errno == EINTR)
                 nread = 0;          	/* and call read() again 	*/

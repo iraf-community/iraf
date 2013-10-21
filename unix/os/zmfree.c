@@ -21,3 +21,15 @@ ZMFREE (
 	free (LOC_TO_ADDR (*buf, char));
 	return ( (*status = XOK) );
 }
+
+
+/* ZFREE -- Return heap space previously allocated by a host malloc();
+ */
+int
+ZFREE (
+  void 	*buf
+)
+{
+	free ((void *) buf);
+	return ( XOK );
+}

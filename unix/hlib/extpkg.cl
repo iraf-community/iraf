@@ -18,8 +18,7 @@ extdir = osfn ("iraf$extern")
 printf ("!pwd\n") | cl () | scan (curdir)
 chdir (extdir)
 
-#  Create a file list to process.  We need to use host commands because the
-#  FILES task isn't yet available.
+#  Create a file list to process.
 dpkg = mktemp ("tmp$dpkg")
 if (access (dpkg) == yes)
   printf ("!/bin/rm -f %s\n", osfn(dpkg))                              	| cl ()

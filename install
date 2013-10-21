@@ -1,0 +1,1722 @@
+#!/bin/bash
+# 
+#  INSTALL.SH -- Install IRAF on the local machine, either as a system-wide
+#  facility, and/or for personal use.  Root privileges are only required for
+#  a system installation. 
+# 
+#   Usage:
+#   		% install [opts]
+# 
+#   Where [opts] include:
+# 
+#     -h, --help                  # print help
+#     --version                   # print script version
+# 
+#     -n, --noop                  # no execute
+#     -d, --debug                 # debug output
+#     -v, --verbose               # verbose output
+#     -s, --system                # do a system install (needs root)
+#     -C, --csh              	  # install C-shell scripts
+# 
+#     -t, --term <term>           # set default terminal type
+#     -b, --bindir <dir>          # set local bin directory
+#     -c, --cache <dir>           # set cache directory
+#     -i, --imdir <dir>           # set image directory
+#     -m, --mach <arch>           # set architecture
+#     -r, --root <dir>            # set iraf root directory
+# 
+#     -C, --oldcache <dir>        # set old cache directory
+#     -I, --oldimdir <dir>        # set old image directory
+#     -R, --oldroot <dir>         # set old iraf root directory
+# 
+# 
+
+
+# Initialize script variables.
+
+if [ ! -n "$iraf" ]; then
+    export iraf=$PWD
+fi
+if [ -e "$iraf/unix/hlib/util.sh" ]; then
+    source $iraf/unix/hlib/util.sh
+fi
+if [ -e "${iraf}/unix/hlib/irafarch.sh" ]; then
+  mach=`${iraf}/unix/hlib/irafarch.sh	`	# current platform architecture
+  hmach=`${iraf}/unix/hlib/irafarch.sh -hsi`	# current HSI architecture
+  if [ -z "$IRAFARCH" ]; then
+      IRAFARCH=$mach
+  fi
+
+elif [ -e "./unix/hlib/irafarch.sh" ]; then
+  mach=`./unix/hlib/irafarch.sh	`	# current platform architecture
+  hmach=`./unix/hlib/irafarch.sh -hsi`	# current HSI architecture
+  if [ -z "$IRAFARCH" ]; then
+      IRAFARCH=$mach
+  fi
+
+else
+  mach=""
+  hmach=""
+  /bin/echo "Error: Cannot determine platform architecture, quitting."
+  /bin/echo '     : Try setting a $iraf or $IRAFARCH variable.'
+  exit 1
+fi
+
+
+if [ -e "${iraf}/.version" ]; then
+  VERSION=`cat ${iraf}/.version`
+else
+  VERSION="v2.16"
+fi
+
+
+debug=0					# debug output
+verbose=0				# verbose output
+defterm="xgterm"			# default terminal type
+do_system=0				# system or personal install?
+err_seen=0				# have errors been seen?
+err_count=0				# error count
+exec="yes"				# take action?
+old_links=0				# use old link method?
+extn="sh"				# shell script extension
+
+LS="/bin/ls"				# directory listing command
+W='\([ 	"]\)'                   	# match a blank, tab, or quote
+TEMP="/tmp/iraf_install.$$"		# temp output file
+
+bindir="/usr/local/bin"			# commands directory
+
+imdir=""				# image directory
+cache=""				# cache directory
+
+p_iraf=""				# <param> iraf root directory
+p_imdir=""				# <param> image directory
+p_cache=""				# <param> cache directory
+o_iraf=""				# old iraf root directory
+o_imdir=""				# old image directory
+o_cache=""				# old cache directory
+
+
+
+#  INSTALL_HELP -- Print script help.
+
+install_help() {
+    ECHO ""
+    ECHO "  Usage:"
+    ECHO "  		% install [opts]"
+    ECHO ""
+    ECHO "  Where [opts] include:"
+    ECHO ""
+    ECHO "    -h, --help                # print help"
+    ECHO "    --version                 # print script version"
+    ECHO ""
+    ECHO "    -n, --noop                # no execute"
+    ECHO "    -d, --debug               # debug output"
+    ECHO "    -v, --verbose             # verbose output"
+    ECHO "    -s, --system              # do a system install (needs root)"
+    ECHO "    -C, --csh              	# install C-shell scripts"
+    ECHO ""
+    ECHO "    -t, --term <term>         # set default terminal type"
+    ECHO "    -b, --bindir <dir>        # set local bin directory"
+    ECHO "    -c, --cache <dir>         # set cache directory"
+    ECHO "    -i, --imdir <dir>         # set image directory"
+    ECHO "    -m, --mach <arch>         # set architecture"
+    ECHO "    -r, --root <dir>          # set iraf root directory"
+    ECHO ""
+    ECHO "    -C, --oldcache <dir>      # set old cache directory"
+    ECHO "    -I, --oldimdir <dir>      # set old image directory"
+    ECHO "    -R, --oldroot <dir>       # set old iraf root directory"
+    ECHO ""
+    ECHO ""
+}
+
+
+#=============================================================================
+#  Process command line arguments.  The defaults are set to empty strings
+#  in order to allow them to be defined first on the command-line.  In 
+#  addition, if the 'sysinstall" option is used it will change how we 
+#  look for installation directories.
+#=============================================================================
+
+while [ -n "$1" ] ; do
+    case "$1" in
+    "-h"|"-help"|"--help")                   	# print script help
+        install_help
+	exit 0
+        ;;
+    "-version"|"--version")                   	# print script version
+        echo "$VERSION"
+	exit 0
+        ;;
+
+
+    "-n"|"-noop"|"--noop")                   	# no execute
+        exec=no
+        ;;
+    "-d"|"-debug"|"--debug")                  	# debug output
+        debug=1
+        ;;
+    "-v"|"-verbose"|"--verbose")               	# verbose output
+        verbose=1
+        ;;
+    "-s"|"-system"|"--system")                 	# do a system-wide install?
+        do_system=1
+        ;;
+    "-C"|"-csh"|"--csh")                   	# install C-shell scripts
+        extn="csh"
+        ;;
+
+    "-t"|"-term"|"--term")                 	# set default terminal type.
+	defterm=$2 ; 	shift
+        ;;
+    "-b"|"-bindir"|"--bindir")                 	# set local bin directory
+	bindir=$2 ; 	shift
+        ;;
+    "-c"|"-cache"|"--cache")               	# set cache directory
+	p_cache=$2 ; 	shift
+        ;;
+    "-i"|"-imdir"|"--imdir")                  	# set image directory
+	p_imdir=$2 ; 	shift
+        ;;
+    "-m"|"-mach"|"--mach")                   	# set architecture
+	mach=$2 ; 	shift
+        ;;
+    "-r"|"-root"|"--root")                   	# set iraf root directory
+	p_iraf=$2 ; 	shift
+	if [ ! -n "$p_iraf" ]; then
+    	    export iraf=$p_iraf
+	fi
+	if [ -e "$iraf/unix/hlib/util.sh" ]; then
+	    source $iraf/unix/hlib/util.sh
+	fi
+	if [ -e "${iraf}/unix/hlib/irafarch.sh" ]; then
+	    mach=`${iraf}/unix/hlib/irafarch.sh`
+	fi
+        ;;
+
+    "-C"|"-oldcache"|"--oldcache")              # set old cache directory
+	o_cache=$2 ; shift
+        ;;
+    "-I"|"-oldimdir"|"--oldimdir")              # set old image directory
+	o_imdir=$2 ; 	shift
+        ;;
+    "-R"|"-oldroot"|"--oldroot")                # set old iraf root directory
+	o_iraf=$2 ; 	shift
+        ;;
+    *)
+        MSG "Unknown option '$1'"
+	exit 1
+        ;;
+    esac
+
+    if [ "$2" == "" ]; then
+        break
+    else
+        shift
+    fi
+done
+
+
+
+#=============================================================================
+#  Get the values of o_iraf and o_imdir from the current mkiraf.*sh file, if
+#  not already otherwise defined.  Strip any trailing / in the pathname to be
+#  matched, so that the trailing /, if present, will be LEFT in the occurrence
+#  of the path in the file.
+#=============================================================================
+
+mkiraf=${iraf}/unix/hlib/mkiraf.sh
+
+WS='[ 	]'
+
+if [ "$o_iraf" == "" ]; then
+   o_iraf=`grep "^iraf=" $mkiraf | sed -e "s+iraf=++" -e 's+"++g'`
+fi
+o_iraf=`echo $o_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+
+if [ "$o_imdir" == "" ]; then
+   o_imdir=`grep "^imdir=" $mkiraf | sed -e "s+imdir=++" -e 's+"++g'`
+fi
+o_imdir=`echo $o_imdir | sed -e 's+/\(["]*\)$+\1+'`
+
+if [ "$o_cache" == "" ]; then
+   o_cache=`grep "^cachedir=" $mkiraf | sed -e "s+cachedir=++" -e 's+"++g'`
+fi
+o_cache=`echo $o_cache | sed -e 's+/\(["]*\)$+\1+'`
+
+
+
+#=============================================================================
+#  User Check
+#
+#  If we're doing a private install, initialize the $HOME/.iraf directory.
+#=============================================================================
+
+# Get the current user name.
+WHOAMI=`whoami`
+if [ -e /usr/bin/whoami ]; then
+    WHOAMI=`/usr/bin/whoami`
+elif [ -e /usr/ucb/whoami ]; then
+    WHOAMI=`/usr/ucb/whoami`
+fi
+
+
+if [ "$WHOAMI" == "root" ]; then
+  if (( $do_system==0 )); then
+    do_proceed="yes"
+    while [ "$do_proceed" == "yes" ]; do
+	BOLD_ON
+	ECHO "You are running as the root user: "
+	PROMPT "Install IRAF for all users on this machine?"
+	read ans
+
+	do_proceed="no"
+	if [ -n $ans ]; then
+  	  if [ "$ans" == "" -o "$ans" == "y" -o "$ans" == "yes" ]; then
+    	    ECHO "Proceeding with a system-wide install on this machine ..."
+	    do_system=1
+    	    do_proceed="no"
+  	  elif [ "$ans" == "quit" -o "$ans" == "q" ]; then
+    	    exit 0
+  	  elif [ "$ans" == "no" -o "$ans" == "n" ]; then
+    	    ECHO "Proceeding with a personal install for 'root' ...."
+	    do_system=0
+    	    do_proceed="no"
+  	  elif [ "$ans" == "help" -o "$ans" == "h" -o "$ans" == "?" ]; then
+    	    NEWLINE
+	    MSG "If you proceed, IRAF will be installed on this machine for all"
+	    MSG "users.  This means that files and links will be put in the "
+	    MSG "system directories such as /usr/include and a local bin dir,"
+	    MSG "doing so requires root permission.  If you say 'no', then IRAF"
+	    MSG "will be installed as a personal system for the user."
+	    NEWLINE
+            MSG  "Type <cr> to continue, or 'q' to quit to exit."
+    	    NEWLINE
+    	    do_proceed="yes"
+  	  else 
+    	    ECHO "Huh?"
+    	    do_proceed="yes"
+  	  fi
+	else
+    	    ECHO "Proceeding with a system-wide install on this machine ..."
+	    do_system=1
+    	    do_proceed="no"
+	fi
+    done
+  fi
+fi
+
+if (( $do_system==0 )); then
+    if [ ! -e "$HOME/.iraf" ]; then
+        NEWLINE
+        ECHO "Initializing $HOME/.iraf directory ....."
+        NEWLINE
+
+        mkdir $HOME/.iraf
+        (cd $HOME/.iraf ; mkdir imdir cache bin)
+    fi
+    bindir="$HOME/.iraf/bin"
+fi
+
+
+
+#=============================================================================
+
+clear
+NEWLINE
+BOLD_ON; 
+ECHO "		===================================="
+ECHO "		       IRAF "$VERSION" Installation"
+ECHO "		===================================="
+BOLD_OFF
+NEWLINE
+
+ECHO "       Welcome to the IRAF installation script.   This script will first"
+ECHO "  prompt you for several needed path names.   Once  the  installation is"
+ECHO "  complete, you will be allowed to do some minimal system configuration."
+
+# Print a quick usage summary.
+NEWLINE
+ECHO -n "  For each prompt: hit "
+BOLD_ON ; ECHO -n "<CR>"; BOLD_OFF;
+ECHO -n " to accept the default value, "
+BOLD_ON ; ECHO -n "'q'" ; BOLD_OFF
+ECHO ' to quit,'
+
+ECHO -n "  or "
+BOLD_ON ; ECHO -n "'help'"; BOLD_OFF
+ECHO -n " or ";
+BOLD_ON ; ECHO -n "'?'"; BOLD_OFF
+ECHO -n " to print an explanation of the prompt."
+NEWLINE
+NEWLINE
+
+
+
+#=============================================================================
+# Prompt the user for needed paths.
+#=============================================================================
+
+NEWLINE
+BOLD_ON
+ECHO "========================================================================"
+ECHO "=====================  Query for System Settings  ======================"
+ECHO "========================================================================"
+BOLD_OFF
+NEWLINE
+
+
+
+#=============================================================================
+# Set $iraf, the new root directory for iraf.  The system must already have
+# been read in at this directory (e.g., /iraf/iraf), but we assume that no
+# files have yet been modified.
+#=============================================================================
+
+if [ "$iraf" == "" ]; then
+    if [ -e "IRAF.NET" -a -e "IS.PORT.GEN" ]; then
+        # Use the current directory.
+        d_iraf=`pwd`
+
+    else
+        # Make a guess at what the new root directory is.
+        d_iraf=""
+        if [ -d "/iraf/iraf" ]; then
+            d_iraf="/iraf/iraf"
+        elif [ -d "/iraf" ]; then
+            d_iraf="/iraf"
+        elif [ -d "/usr/local/iraf" ]; then
+            d_iraf="/usr/local/iraf"
+        elif [ -d "/usr/iraf" ]; then
+            d_iraf="/usr/iraf"
+        else
+            # Search for an iraf directory.
+            IDIRS=("/u* /local /home /opt /iraf* /")
+            for i in ${IDIRS[@]} ; do
+                if [ -d "$i/iraf" ]; then
+                    d_iraf="$i/iraf"
+                    break
+                fi
+            done
+        fi
+
+        if [ "$d_iraf" == "" ]; then
+            d_iraf="/iraf/iraf"
+        fi
+    fi
+else
+    if [ -n "$p_iraf" ]; then
+	d_iraf=$p_iraf
+    else
+        d_iraf="$iraf"
+    fi
+fi
+
+
+iraf_prompt="yes"
+while [ $iraf_prompt == "yes" ]; do
+    d_iraf=`ECHO $d_iraf | sed -e 's+/\(["]*\)$+\1+'`
+
+    iraf_prompt="no"
+    NEWLINE
+    BOLD_ON ; ECHO -n "New iraf root directory " ; BOLD_OFF
+    ECHO -n "($d_iraf): "
+    read iraf
+
+    if [ "$iraf" == "" ]; then
+        export iraf="$d_iraf"
+	break
+    elif [ "$iraf" == "quit" -o "$iraf" == "q" ]; then
+        exit 0
+    elif [ "$iraf" == "help" -o "$iraf" == "h" -o "$iraf" == "?" ]; then
+        NEWLINE
+            MSG "The iraf root directory is the place where the IRAF tar"
+            MSG "file was unpacked; it contains subdirectories such as 'dev',"
+            MSG "'local', 'noao', 'pkg', and the file IS.PORT.GEN."
+
+        di=$d_iraf
+        if [ -d $di/dev -a -d $di/pkg -a -d $di/noao ]; then
+            MSG  ""
+            MSG  "The default path '$d_iraf' appears to be correct ..."
+        else 
+            MSG  ""
+            MSG  "The default path '$d_iraf' appears to be incorrect ..."
+        fi
+        NEWLINE
+
+        iraf=$d_iraf
+        iraf_prompt="yes"
+    fi
+done
+
+
+#=============================================================================
+# Set $imdir, the default user image storage root directory.  Each user imdir
+# will be a subdirectory of this directory by default, when MKIRAF is run.
+# Since bulk image data can consume hundreds of megabytes of disk space, IRAF
+# likes to keep such data on a public scratch device, which is probably not
+# backed up, which has a short file expiration interval, and possibly which
+# has been configured (newfs/mkfs) with a large block size for fast seq. i/o.
+#=============================================================================
+
+if [ "$imdir" == "" ]; then
+
+  if (( $do_system==0 )); then
+      d_imdir="$HOME/.iraf/imdir/"
+  elif [ -d "$o_imdir" ]; then
+      d_imdir=$o_imdir
+  elif [ -d "/iraf" ]; then
+      d_imdir=/iraf/imdirs
+  elif [ -d "/home/iraf" ]; then
+      d_imdir=/home/iraf/imdirs
+  elif [ -d "$iraf_p" ]; then
+      d_imdir=$iraf_p/imdirs
+  elif [ -d "/usr/local/iraf" ]; then
+      d_imdir=/usr/local/iraf/imdirs
+  else
+      d_imdir="/tmp"
+  fi
+
+  imdir_prompt="yes"
+  while [ "$imdir_prompt" == "yes" ]; do
+
+    imdir_prompt="no"
+    BOLD_ON ; ECHO -n "Default root image storage directory " ; BOLD_OFF
+    ECHO -n "($d_imdir): "
+    read imdir
+
+    if [ "$imdir" == "" ]; then
+        imdir="$d_imdir"
+        imdir_prompt="no"
+    elif [ "$imdir" == "quit" -o "$imdir" == "q" ]; then
+        exit 0
+    elif [ "$imdir" == "help" -o "$imdir" == "h" -o "$imdir" == "?" ]; then
+        NEWLINE
+            MSG "The root imdir directory is the default image storage dir"
+            MSG 'for OIF images (i.e. the ".imh" format) used by all users on'
+            MSG "this system.   Individual user dirs will be created as needed."
+            MSG "It should be some large data disk on the machine which has a"
+            MSG "regular backup, scratch or tmp disks should be avoided or data"
+            MSG "may be lost."
+            MSG ""
+            MSG 'The "HDR$" syntax should not be used at this stage, please'
+            MSG 'edit the hlib$mkiraf.sh script after installation if you wish'
+            MSG "to make this the default."
+        export imdir=$d_imdir
+        imdir_prompt="yes"
+    fi
+
+    # Cannot have iraf and imdir the same.
+    if [ "$imdir" == "$iraf" ]; then
+        NEWLINE
+            MSG  "The definition of imdir cannot be the same as the iraf"
+            MSG  "root, please choose a different directory.  Ideally this"
+            MSG  "should be some large data area on your system or a user"
+            MSG  "data area such as /home, /users, /u1, etc."
+        NEWLINE
+        NEWLINE
+        imdir_prompt="yes"
+    fi
+  done
+fi
+
+
+#=============================================================================
+# Set $cache, the default user file cache root directory.
+#=============================================================================
+
+if [ "$cache" == "" ]; then
+
+  if (( $do_system==0 )); then
+      d_cache="$HOME/.iraf/cache/"
+  elif [ -d "/iraf" ]; then
+      d_cache="/iraf/cache"
+  elif [ -d "/home/iraf" ]; then
+      d_cache="/home/iraf/cache"
+  elif [ -d "$iraf_p" ]; then
+      d_cache="$iraf_p/cache"
+  elif [ -d "/usr/local/iraf" ]; then
+      d_cache="/usr/local/iraf/cache"
+  else
+      d_cache="/tmp"
+  fi
+
+  cache_prompt="yes"
+  while [ "$cache_prompt" == "yes" ]; do
+
+    cache_prompt="no"
+    BOLD_ON ; ECHO -n "Default root cache directory " ; BOLD_OFF
+    ECHO -n "($d_cache): "
+    read cache
+    if [ "$cache" == "" ]; then
+        cache="$d_cache"
+        cache_prompt="no"
+    elif [ "$cache" == "quit" -o "$cache" == "q" ]; then
+        exit 0
+    elif [ "$cache" == "help" -o "$cache" == "h" -o "$cache" == "?" ]; then
+        NEWLINE
+            MSG "The root cache directory is the default storage directory for"
+            MSG "URL-referenced files. Individual user dirs will be created as"
+            MSG "needed. It should be some large data disk on the machine "
+            MSG "which has a regular backup, scratch or tmp disks should be"
+            MSG "avoided or data may be lost."
+            MSG ""
+        NEWLINE
+        export cache=$d_cache
+        cache_prompt="yes"
+    fi
+
+    # Cannot have iraf and cache the same.
+    if [ "$cache" == "$iraf" ]; then
+        NEWLINE
+            MSG  "The definition of cache cannot be the same as the iraf"
+            MSG  "root, please choose a different directory.  Ideally this"
+            MSG  "should be some large data area on your system or a user"
+            MSG  "data area such as /home, /users, /u1, etc."
+        NEWLINE
+        NEWLINE
+        cache_prompt="yes"
+    fi
+  done
+fi
+
+
+
+#=============================================================================
+# Get UNIX directory where HSI commands (links) are to be installed, if not
+# set on command line.  IRAF will only install a very few new commands in this
+# directory.  Ideally it should be a directory on the standard user $path,
+# so that users do not have to customize their . files just to run IRAF.
+#=============================================================================
+
+if [ "$lbin" == "" ]; then
+  # Look around and come up with a likely candidate directory.
+  if (( $do_system==0 )); then
+      d_lbin="$HOME/.iraf/bin/"
+  elif [ -d "/usr/local/bin" ]; then
+      d_lbin="/usr/local/bin"
+  elif [ -d "/opt/local/bin" ]; then
+      d_lbin="/opt/local/bin"
+  elif [ -d "/local/bin" ]; then
+      d_lbin="/local/bin"
+  else
+      d_lbin="/usr/bin"
+  fi
+
+  lbin_prompt="yes"
+  while [ "$lbin_prompt" == "yes" ]; do
+
+    lbin_prompt="no"
+    BOLD_ON ; ECHO -n "Local unix commands directory " ; BOLD_OFF
+    ECHO -n "($d_lbin): "
+    read lbin
+    if [ "$lbin" == "" ]; then
+        lbin="$d_lbin"
+        lbin_prompt="no"
+    elif [ "$lbin" == "quit" -o "$lbin" == "q" ]; then
+        exit 0
+    elif [ "$lbin" == "help" -o "$lbin" == "h" -o "$lbin" == "?" ]; then
+        NEWLINE
+            MSG "The local bin directory is the system directory into which the"
+            MSG "iraf commands (e.g. cl, mkiraf, mkpkg, etc) will be installed"
+            MSG "as symlinks to files in the iraf tree. This should be a common"
+            MSG "dir such as /usr/local/bin which will likely be found in every"
+            MSG "user's path."
+        NEWLINE
+        export lbin=$d_lbin
+        lbin_prompt="yes"
+    fi
+
+    # Create the local bin directory if it doesn't exist?
+    if [ ! -e $lbin ]; then
+        if (( $do_system==0 )); then
+	    ans="yes"
+        else
+            BOLD_ON ; 
+	    ECHO -n "    Sorry, but $lbin does not exist, create it? "
+	    BOLD_OFF
+            read ans
+        fi
+        if [ "$ans" == "" -o "$ans" == "y" -o "$ans" == "yes" ]; then
+            ECHO "  Creating directory $lbin..."
+            if [ "$exec" == "yes" ]; then
+                mkdir $lbin
+                if [ ! -e $lbin ]; then
+                    ERRMSG  "Cannot create $lbin, please retry..."
+                    export lbin=$d_lbin
+                    lbin_prompt="yes"
+                fi
+            fi
+        else
+            lbin_prompt="yes"
+        fi
+        NEWLINE
+    fi
+  done
+fi
+
+
+
+#  Prompt for the terminal to use in a private installation.
+
+if (( $do_system==0 )); then
+    myterm="none"
+    BOLD_ON
+    ECHO    "Terminal types: xgterm, xtermjh, xterm, etc."
+    ECHO -n 'Enter default terminal type ('
+    BOLD_OFF
+    ECHO -n $defterm
+    BOLD_ON
+    ECHO -n '): '
+    BOLD_OFF
+
+    read myterm
+    if [ -z "$myterm" ]; then
+        myterm=$defterm
+    fi
+fi
+
+
+
+#===============================================================================
+# Determine iraf root directory
+#===============================================================================
+
+
+#===============================================================================
+# Determine the old 'iraf', 'imdir' and 'cachedir' for editing.
+#===============================================================================
+
+
+#===============================================================================
+# Verify the machine type.
+#===============================================================================
+
+if [ -e /usr/bin/uname ]; then
+    uname_cmd="/usr/bin/uname"
+elif [ -e /bin/uname ]; then
+    uname_cmd="/bin/uname"
+else
+    WARNING  "No 'uname' command found to determine architecture."
+    exit 1
+fi
+
+export  UNAME=`$uname_cmd    | tr '[A-Z]' '[a-z]'`
+if [ "$UNAME" == "sunos" ]; then
+    export  UNAME_M=`$uname_cmd -m | cut -c2- | tr '[A-Z]' '[a-z]'`
+else
+    export  UNAME_M=`$uname_cmd -m | tr '[A-Z]' '[a-z]' | tr ' ' '_'` 
+fi
+export  OSVERSION=`$uname_cmd -r | cut -c1`
+
+
+
+
+
+# ============================================
+# The following is partially system dependent.
+# ============================================
+
+# Set the BINDIRS pathnames - directories where the HSI executables go.
+host="$iraf/unix"
+hbin="$iraf/unix/bin.$hmach"
+hlib="$iraf/unix/hlib"
+ibin="$iraf/bin.$IRAFARCH"
+fbin="$iraf/bin"
+
+# Replace any // by /.
+host=`echo $host | sed -e "s+//+/+g"`
+hbin=`echo $hbin | sed -e "s+//+/+g"`
+fbin=`echo $fbin | sed -e "s+//+/+g"`
+hlib=`echo $hlib | sed -e "s+//+/+g"`
+
+# Strip any trailing /.
+host=`echo $host | sed -e 's+/\(["]*\)$+\1+'`
+hbin=`echo $hbin | sed -e 's+/\(["]*\)$+\1+'`
+fbin=`echo $fbin | sed -e 's+/\(["]*\)$+\1+'`
+hlib=`echo $hlib | sed -e 's+/\(["]*\)$+\1+'`
+
+BINDIRS="$hbin $hlib $fbin $host"
+
+
+# The following file lists are partially system dependent.
+PATHFILES="mkiraf.${extn} libc/iraf.h cl.${extn} ecl.${extn} vocl.${extn} setup.sh setup.csh"
+MODEFILES="cl.${extn} fc.${extn} mkiraf.${extn} mkfloat.${extn} mkmlist.${extn} $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.${extn}"
+LINKFILES="ecl.${extn} cl.${extn} vocl.${extn} mkiraf.${extn} mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
+LINKCMDS=(ecl cl vocl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
+LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/vocl.${extn} ${hlib}/mkiraf.${extn} ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
+CMDLINKS="ecl cl vocl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
+
+
+
+
+
+
+#===============================================================================
+# Echo parameters, get go-ahead.
+#===============================================================================
+
+NEWLINE
+BOLD_ON
+ECHO "========================================================================"
+ECHO "=====================  Verifying System Settings  ======================"
+ECHO "========================================================================"
+BOLD_OFF
+
+
+
+
+NEWLINE
+BOLD_ON; ECHO -n "Hostname      = "; \
+    BOLD_OFF; ECHO `hostname` | awk '{printf("%-20.20s  ", $1)}'
+BOLD_ON; ECHO -n "OS version    = "; \
+    BOLD_OFF; ECHO `$uname_cmd`" "`$uname_cmd -r`
+BOLD_ON; ECHO -n "Architecture  = "; \
+    BOLD_OFF; ECHO $mach | awk '{printf("%-20s  ", $1)}'
+BOLD_ON; ECHO -n "HSI arch      = "; \
+    BOLD_OFF; ECHO $hmach | awk '{printf("%-20s\n", $1)}'
+BOLD_ON; ECHO -n "Old iraf root = "; \
+    BOLD_OFF; ECHO $o_iraf | awk '{printf("%-20s  ", $1)}'
+BOLD_ON; ECHO -n "New iraf root = "; \
+    BOLD_OFF; ECHO $iraf | awk '{printf("%-20s\n", $1)}'
+BOLD_ON; ECHO -n "Old imdir     = "; \
+    BOLD_OFF; ECHO $o_imdir | awk '{printf("%-20s  ", $1)}'
+BOLD_ON; ECHO -n "New imdir     = "; \
+    BOLD_OFF; ECHO $imdir | awk '{printf("%-s\n", $1)}'
+BOLD_ON; ECHO -n "Old cache     = "; \
+    BOLD_OFF; ECHO $o_cache | awk '{printf("%-20s  ", $1)}'
+BOLD_ON; ECHO -n "New cache     = "; \
+    BOLD_OFF; ECHO $cache | awk '{printf("%-s\n", $1)}'
+NEWLINE
+
+BOLD_ON; ECHO -n "Local bin dir = "; \
+    BOLD_OFF; ECHO $bindir | awk '{printf("%-20s\n", $1)}'
+NEWLINE ; NEWLINE
+
+
+
+
+#=============================================================================
+# Prompt for the go-ahead ...
+#=============================================================================
+
+do_proceed="yes"
+while [ "$do_proceed" == "yes" ]; do
+  PROMPT "Proceed with installation? "
+  read ans
+
+  do_proceed="no"
+  if [ "$ans" == "" -o "$ans" == "y" -o "$ans" == "yes" ]; then
+    NEWLINE
+    do_proceed="no"
+  elif [ "$ans" == "quit" -o "$ans" == "q" ]; then
+    exit 0
+  elif [ "$ans" == "no" -o "$ans" == "n" ]; then
+    exit 0
+  elif [ "$ans" == "help" -o "$ans" == "h" -o "$ans" == "?" ]; then
+    NEWLINE
+        MSG  "If you proceed, the system will be installed on this machine."
+        MSG  "This means that command links will be placed in the local bin"
+        MSG  "directory, needed system files will be created, and the iraf"
+        MSG  "root path will be edited into key files.  Stopping at this stage"
+        MSG  "will have no side effects on your system or the iraf files."
+        MSG  "Type <cr> to continue, or 'q' to quit to exit the installation."
+    NEWLINE
+    do_proceed="yes"
+  else 
+    ECHO "Huh?"
+    do_proceed="yes"
+  fi
+done
+
+
+
+# Constraints:
+#
+#	- validate iraf root directory
+#	- imdir cannot be under iraf root directory
+#	- cache cannot be under iraf root directory
+#	- check for write permission on iraf directory
+#
+#	- if [ sysinstall ]; then
+#	    - check we're running with root/sudo permissions
+#	    - check file permissions to $iraf, $iraf/unix, $iraf/unix/hlib
+#	  fi
+#
+#	- check that bin directory exists
+#	- delete existing command directory
+
+
+#  Do the actual installation.  This involves:
+#       
+#       1) Editing the $iraf path into system files
+#       2) Creating the <iraf.h> link
+#       3) Creating the system command links
+#          Install VOClient Code
+#       4) Creating the image directory (imdir)
+#       5) Creating the cache directory (cache)
+#       6) Tape setup (modes on alloc.e and /dev tape devices)
+#       7) Graphics/Display file installation/setup
+
+
+#=============================================================================
+# See whether there is an existing commands dir we need to delete.
+#=============================================================================
+
+NEWLINE
+BOLD_ON
+ECHO "========================================================================"
+ECHO "=========================  Begin Installation  ========================="
+ECHO "========================================================================"
+BOLD_OFF
+
+NEWLINE
+NEWLINE
+ECHO -n "Checking for existing commands directory...                    "
+cl_found=0
+clpath=""
+paths=`echo $PATH | sed -e "s/:/ /g"`
+for d in ${paths[@]}; do
+    if [ -e "$d/cl" ]; then
+        cl_found=1
+        clpath="$d/cl"
+        break
+    fi
+done
+if (( $do_system==0 )); then
+  cl_found=0
+fi
+if (( $cl_found==1 )); then
+  o_lbin=${clpath%/*}
+
+  if [ "$o_lbin" != "$lbin" ]; then
+      DO_WARN
+      NEWLINE
+          MSG  "IRAF commands were found in the directory:"
+          MSG  ""
+          MSG  "      $o_lbin"
+          MSG  ""
+          MSG  "    These commands may conflict with the commands now being"
+          MSG  "installed in:  '$lbin'"
+          MSG  ""
+
+      del_cmd_="yes"
+      while [ "$del_cmd_" == "yes" ]; do
+        PROMPT "Do you want to delete commands in the old directory? "
+        read ans
+
+	del_cmd_="no"
+        if [ -n $ans ]; then
+	  if [ "$ans" == "y" -o "$ans" == "yes" ]; then
+            NEWLINE
+            for i in ${CMDLINKS[@]}; do            # remove the iraf commands
+                file=$o_lbin/$i
+                if [ -e "$file" ]; then
+                    MSG  "Deleting old command $file ..."
+                    if [ "$exec"=="yes" ]; then
+                        RM $file	>> /dev/null 2>&1
+                    fi
+                fi
+            done
+	    del_cmd_="no"
+          elif [ "$ans" == "quit" -o "$ans" == "q" ]; then
+            exit 1
+          elif [ "$ans" == "no" -o "$ans" == "n" ]; then
+            junk=1   				# fall through
+	    del_cmd_="no"
+          elif [ "$ans" == "help" -o "$ans" == "h" -o "$ans" == "?" ]; then
+            NEWLINE
+                MSG "Multiple commands such as 'cl' or 'mkiraf' on a machine"
+                MSG "may cause errors (such as 'command not found' due to an"
+                MSG "invalid link), or confusions as to which version of iraf"
+                MSG "is being run if the old link is still valid.  This is"
+                MSG "because the command being used depends on the order in"
+                MSG 'which the directories occur in the users "$path" environ-'
+                MSG "ment variable (which may vary by user)."
+                MSG ""
+                MSG "It is recommended there be only one iraf command directory"
+                MSG "on a given system, other methods can be used to start a"
+                MSG "different IRAF installation.  This script will not auto-"
+                MSG "matically remove those links, and will only correct the"
+                MSG "path is the local bin directory is the same as before."
+                MSG ""
+                MSG "Type 'q' to quit and rerun the install script to specify"
+                MSG "a different local bin directory, 'yes' to remove the old"
+                MSG "links, and 'no' to leave the old commands around."
+                MSG ""
+            NEWLINE
+	    del_cmd_="yes"
+          else
+            NEWLINE
+            for i in ${CMDLINKS[@]}; do            # remove the iraf commands
+                file=$o_lbin/$i
+                if [ -e "$file" ]; then
+                    MSG  "Deleting old command $file ..."
+                    if [ "$exec"=="yes" ]; then
+                        RM $file	>> /dev/null 2>&1
+                    fi
+                fi
+            done
+	    del_cmd_="no"
+          fi
+        fi
+        NEWLINE
+      done
+    else
+        DO_OK
+    fi
+
+else
+    DO_OK
+fi
+
+
+#  Step 1)  Edit the $iraf path into the system files
+
+NEWLINE
+BOLD_ON
+ECHO "                             Editing Paths"
+ECHO "                             -------------"
+BOLD_OFF
+
+# Edit the $iraf pathname in the .login file for user 'iraf'.
+if (( $do_system==0 )); then
+  ECHO -n "Editing the iraf user .login/.cshrc paths ...                  "
+  pfiles=("$iraf/local/.cshrc $iraf/local/.login")
+else
+  ECHO -n "Editing the user .login/.cshrc paths ...                       "
+  if [ "$SHELL" == "/bin/sh" ]; then
+   pfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
+  else
+   pfiles=("$HOME/.cshrc $HOME/.login")
+  fi
+fi
+for file in ${pfiles[@]}; do
+    if [ -e "$file" ]; then
+	if [ "$exec" == "yes" ]; then
+            RM $TEMP >& /dev/null
+            sed -e "s+$o_iraf+$iraf+" $file > $TEMP
+            cmp -s $file $TEMP
+            if (( $?==1 )); then
+                PUT $TEMP $file
+            fi
+            RM $TEMP >& /dev/null
+	fi
+    else
+        if (( "$err_seen"=0 )); then
+            DO_FAIL
+            err_seen=1
+            err_count=$(( err_count+1 ))
+        fi
+        MSG  "Cannot find the iraf $file file"
+        RM $TEMP >& /dev/null
+    fi
+done
+if (( "$err_seen"==0 )); then
+    DO_OK
+fi
+
+# Edit the $iraf and $imdir paths in mkiraf.*sh, *cl.*sh, and libc/iraf.h
+# files.
+
+ECHO -n "Editing iraf/imdir/cache paths into system files ...           "
+
+err_seen=0
+for i in ${PATHFILES[@]}; do
+    if [ -e "$iraf/unix/hlib/$i" ]; then
+        RM $TEMP >> /dev/null 2>&1
+	cat $iraf/unix/hlib/$i | \
+	    sed -e "s+$o_iraf+$iraf+"   | \
+            sed -e "s+$o_cache+$cache+" | \
+            sed -e "s+$o_imdir+$imdir+" > $TEMP
+        cmp -s $iraf/unix/hlib/$i $TEMP
+        if (( $?==1 )); then
+            if [ "$exec"=="yes" ]; then
+                PUT $TEMP $iraf/unix/hlib/$i
+                chmod 755 $iraf/unix/hlib/$i
+            fi
+        fi
+        RM $TEMP >& /dev/null
+    else
+        if [ "$err_seen" == 0 ]; then
+            DO_FAIL
+            err_seen=1
+            err_count=$(( err_count+1 ))
+        fi
+        MSG  "File $i not found."
+        RM $TEMP >& /dev/null
+    fi
+done
+if (( "$err_seen"==0 )); then
+    DO_OK
+fi
+
+
+
+
+NEWLINE
+BOLD_ON
+ECHO "                       Checking File Permissions"
+ECHO "                       -------------------------"
+BOLD_OFF
+
+# Set default file permissions for the executable files in the BINDIRS,
+# in case the file mode has somehow been changed, e.g., in a file restore
+# or copy.
+
+ECHO -n "Checking iraf file permissions ...                             "
+
+err_seen=0
+for i in ${MODEFILES[@]}; do
+    file=$i
+    if [ ! -e "$file" ]; then
+        for j in ${BINDIRS[@]}; do
+            if [ -e "$j/$i" ]; then
+                file=$j/$i
+                break
+            fi
+        done
+    fi
+
+    if [ -e "$file" ]; then
+        if [ "`$LS -l $file | grep '^.rw[xs]r.[xs]r.[xt]'`" == "" ]; then
+            if [ "$err_seen" == 0 ]; then
+                DO_WARN
+                err_seen=1
+                err_count=$(( err_count+1 ))
+            fi
+            MSG  "Setting $file:t to mode 0755."
+            if [ "$exec" == "yes" ]; then
+                chmod 755 $file
+            fi
+        fi
+    else
+        if [ "$err_seen" == 0 ]; then
+            DO_FAIL
+            err_seen=1
+            err_count=$(( err_count+1 ))
+        fi
+        MSG  "File $i not found."
+    fi
+done
+if [ "$err_seen" == 0 ]; then
+    DO_OK
+fi
+
+
+    # Create the root imdir as a public scratch directory, if not already
+    # created.
+    err_seen=0
+    if [ -d "$imdir" ]; then
+        if [ "`$LS -ld $imdir | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
+            ECHO -n 'Checking imdir permissions ...'
+            ECHO -n '                                 '
+        else
+            ECHO -n 'Setting mode for $imdir to 0777                  '
+            if [ "$exec" == "yes" ]; then
+                chmod 777 $imdir
+            fi
+        fi
+    else
+	if (( "do_system"==1 )); then
+          ECHO -n "Creating root imdir at $imdir ...                    "
+	else
+          ECHO -n 'Creating root imdir at $HOME/.iraf/imdir ...		'
+          ECHO -n '       '
+	fi
+        if [ "$exec" == "yes" ]; then
+            mkdir $imdir; chmod 777 $imdir
+        fi
+    fi
+    if [ "$err_seen" == 0 ]; then
+        DO_OK
+    fi
+
+
+    # Create the root cache as a public scratch directory, if not already
+    # created.
+    err_seen=0
+    if [ -d $cache ]; then
+        if [ "`$LS -ld $cache | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
+            ECHO -n 'Checking cache permissions ...'
+            ECHO -n '                                 '
+        else
+            ECHO -n 'Setting mode for $cache to 0777                  '
+            if [ "$exec" == "yes" ]; then
+                chmod 777 $cache
+            fi
+        fi
+    else
+	if (( "do_system"==1 )); then
+          ECHO -n "Creating root cache at $cache ...                    "
+	else
+          ECHO -n 'Creating root cache at $HOME/.iraf/cach  ...		'
+          ECHO -n '       '
+	fi
+        if [ "$exec" == "yes" ]; then
+            mkdir $cache; chmod 777 $cache
+        fi
+    fi
+    if [ "$err_seen" == 0 ]; then
+        DO_OK
+    fi
+
+if (( "do_system"==1 )); then
+    # Allow deletion of files in /tmp - needed for multiuser tape allocation.
+    ECHO -n "Reset /tmp sticky bit setting ...                              "
+    if [ "$exec" == "yes" ]; then
+        chmod -t /tmp
+    fi
+    DO_OK
+fi
+
+
+
+NEWLINE
+BOLD_ON
+ECHO "                         Creating File Links"
+ECHO "                         -------------------"
+BOLD_OFF
+
+
+# Create a /iraf symlink on the system to establish a /iraf/iraf root
+# path regardless of the actual root dir.  We only do this if there is
+# no /iraf on the system already.
+
+if (( "$do_system"==1 )); then
+    ECHO -n "Checking for /iraf symlink ...                                 "
+    if [ ! -e "/iraf" ]; then
+        if [ "$exec" == "yes" ]; then
+            ln -s $iraf_p /iraf
+        fi
+        if [ "$exec" == "no" -o -e "/iraf/iraf" ]; then
+            DO_OK
+        else
+            DO_FAIL
+            err_count=$(( err_count++ ))
+        fi
+    else
+        DO_OK
+    fi
+
+
+    # Link $hlib/libc/iraf.h to <iraf.h>.  This is needed not only to compile
+    # C source files in iraf, but also to define $iraf, $host, etc. for iraf
+    # tasks.
+
+    # Verify we have a /usr/include directory (some MacOSX systems won't)
+    ECHO -n "Checking /usr/include directory ...                            "
+    if [ ! -e /usr/include ]; then
+        if [ $exec == yes ]; then
+            mkdir /usr/include
+            if [ -d /usr/include ]; then
+                DO_OK
+            else
+                DO_FAIL
+                err_count=$(( err_count++ ))
+            fi
+        else
+            DO_OK
+        fi
+    else
+        DO_OK
+    fi
+
+    ECHO -n "Creating <iraf.h> symlink ...                                  "
+    file1="/usr/include/iraf.h"
+    file2="$iraf/unix/hlib/libc/iraf.h"
+
+    err_seen=0
+    if [ -e "$file1" ]; then
+        if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
+            if [ "$exec" == "yes" ]; then
+                RM $file1
+                ln -s $file2 $file1
+            fi
+        fi
+    else
+        if [ "$exec" == "yes" ]; then
+            ln -s $file2 $file1
+        fi
+    fi
+    if [ "$exec" == "no" ]; then
+        DO_OK
+    elif [ "$err_seen" == 0 -a -e "$file1" ]; then
+        DO_OK
+    else
+        DO_FAIL
+	err_count=$(( err_count++ ))
+    fi
+
+
+else			# else of 'do_system'
+
+    ECHO -n "Creating <iraf.h> symlink ...                                  "
+    file1="$HOME/.iraf/iraf.h"
+    file2="$iraf/unix/hlib/libc/iraf.h"
+
+    err_seen=0
+    if [ -e "$file1" ]; then
+        if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
+            if [ "$exec" == "yes" ]; then
+                RM $file1
+                ln -s $file2 $file1
+            fi
+        fi
+    else
+        if [ "$exec" == "yes" ]; then
+            ln -s $file2 $file1
+        fi
+    fi
+    if [ "$exec" == "no" ]; then
+        DO_OK
+    elif [ "$err_seen" == 0 -a -e "$file1" ]; then
+        DO_OK
+    else
+        DO_FAIL
+	err_count=$(( err_count++ ))
+    fi
+
+
+    ECHO -n 'Marking system architecture ...                                '
+    if [ "$exec" == "yes" ]; then
+	if [ -e "$HOME/.iraf/arch" ]; then
+            RM $HOME/.iraf/arch
+	fi
+        echo $IRAFARCH >  $HOME/.iraf/arch
+    fi
+    DO_OK
+
+fi			# end of 'do_system'
+
+
+# Establish the remaining symbolic links to HSI tasks.
+ECHO -n "Creating iraf command links in local bin dir ...               "
+
+err_seen=0
+
+if (( $old_links == 1 )); then
+  for i in ${LINKFILES[@]}; do
+    # Locate the file to be linked to.
+    file1=${i%.*}
+    for j in ${BINDIRS[@]}; do
+        file2="$j/$file1.${extn}"
+        if [ -e "$file2" ]; then
+            break
+        fi
+        file2="$j/$i"
+        if [ -e "$file2" ]; then
+            break
+        fi
+    done
+
+    # Verify or set the link.
+    if [ -e "$lbin/$file1" ]; then
+        if [ "`$LS -l $lbin/$file1 | grep $file2`" == "" ]; then
+            if [ "$exec" == "yes" ]; then
+                RM $lbin/$file1
+                ln -s $file2 $lbin/$file1
+            fi
+        fi
+    else
+        if [ "$exec" == "yes" ]; then
+            RM $lbin/$file1
+            ln -s $file2 $lbin/$file1
+        fi
+    fi
+
+    if [ "$exec" == "yes" ]; then
+        if [ ! -e "$lbin/$file1" ]; then
+            if [ "$err_seen" == 0 ]; then
+                DO_FAIL
+            fi
+            MSG  "Could not make link $file1 -> $file2"
+            err_seen=1
+	    err_count=$(( err_count++ ))
+        fi
+    fi
+  done
+
+else
+
+  # Create the command links, regardless of whether the target binaries exist.
+  # This allows us to create links on a source-only system.
+  for i in ${!LINKCMDS[*]}; do
+    file1=${LINKCMDS[$i]}
+    file2=${LTARGETS[$i]}
+
+    # Verify or set the link.
+    if [ -e "$lbin/$file1" ]; then
+        if [ "`$LS -l $lbin/$file1 | grep $file2`" == "" ]; then
+            if [ "$exec" == "yes" ]; then
+                RM $lbin/$file1
+                ln -s $file2 $lbin/$file1
+            fi
+        fi
+    else
+        if [ "$exec" == "yes" ]; then
+            RM $lbin/$file1
+            ln -s $file2 $lbin/$file1
+        fi
+    fi
+  done
+
+fi
+
+
+if [ "$err_seen" == 0 ]; then
+    DO_OK
+fi
+
+
+# Mark the system update time.
+ECHO -n 'Marking system update time hlib$utime ...                      '
+if [ "$exec" == "yes" ]; then
+    touch $hlib/utime
+fi
+DO_OK
+
+
+
+#=============================================================================
+# Install the VOClient Daemon code.
+#=============================================================================
+
+NEWLINE
+BOLD_ON
+ECHO "                      Installing VOClient Code"
+ECHO "                      ------------------------"
+BOLD_OFF
+
+
+ECHO -n "Creating 'voclientd' symlink ...                               "
+file1=$lbin/voclientd
+file2=$iraf/vo/java/voclientd
+
+err_seen=0
+if [ -e "$file1" ]; then
+    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
+        if [ "$exec" == "yes" ]; then
+            RM $file1
+            ln -s $file2 $file1
+        fi
+    fi
+else
+    if [ "$exec" == "yes" ]; then
+        ln -s $file2 $file1
+    fi
+fi
+if [ "$exec" == "no" ]; then
+    DO_OK
+elif [ "$err_seen" == 0 -a -e "$file1" ]; then
+    DO_OK
+else
+    DO_FAIL
+    err_count=$(( err_count++ ))
+fi
+
+ECHO -n "Creating 'voclient.jar' symlink ...                            "
+file1=$lbin/voclient.jar
+file2=$iraf/vo/java/voclient.jar
+
+err_seen=0
+if [ -e "$file1" ]; then
+    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
+        if [ "$exec" == "yes" ]; then
+            RM $file1
+            ln -s $file2 $file1
+        fi
+    fi
+else
+    if [ "$exec" == "yes" ]; then
+        ln -s $file2 $file1
+    fi
+fi
+if [ "$exec" == "no" ]; then
+    DO_OK
+elif [ "$err_seen" == 0 -a -e "$file1" ]; then
+    DO_OK
+else
+    DO_FAIL
+    err_count=$(( err_count++ ))
+fi
+
+
+#=============================================================================
+# Common code for XGTERM/XIMTOOL installation.
+#=============================================================================
+
+NEWLINE
+BOLD_ON
+ECHO "                    Creating Graphics Device Files"
+ECHO "                    ------------------------------"
+BOLD_OFF
+
+
+#=============================================================================
+# Install the default IMTOOLRC frame buffer configuration file.  The path
+# /usr/local/lib path hardwired in to ximtool and cannot easily be changed,
+# but if installation of the default imtoolrc in this directory is not 
+# possible, the file can be installed in each imtool user's login directory
+# as .imtoolrc, or the environment variable IMTOOLRC can be defined in each
+# imtool user's # .login or .cshrc to define the path to the file.
+#=============================================================================
+
+# Verify imtoolrc link.
+if (( "do_system"==1 )); then
+    ECHO -n "Checking /usr/local/lib directory ...                          "
+    if [ ! -e "/usr/local/lib" ]; then
+        if [ "$exec" == "yes" ]; then
+            if [ ! -e "/usr/local" ]; then
+                mkdir /usr/local
+            fi
+            mkdir /usr/local/lib
+            if [ -d "/usr/local/lib" ]; then
+                DO_OK
+            else
+                DO_FAIL
+    	        err_count=$(( err_count++ ))
+            fi
+        else
+            DO_OK
+        fi
+    else
+        DO_OK
+    fi
+fi
+
+
+# Verify or set the IMTOOLRC link.
+if (( "$do_system"==1 )); then
+    file1=/usr/local/lib/imtoolrc
+    ECHO -n "Creating /usr/local/lib/imtoolrc link ...                      "
+else
+    file1=$HOME/.imtoolrc
+    ECHO -n 'Creating $HOME/.imtoolrc link ...                              '
+fi
+RM -f $file1
+file2=$iraf/dev/imtoolrc
+
+
+err_seen=0
+if [ -e $file1 ]; then
+    if [ "`$LS $file1`" == "$file1" ]; then
+        if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
+            if [ "$exec" == "yes" ]; then
+                RM $file1
+                ln -s $file2 $file1
+            fi
+        fi
+    fi
+else
+    if [ "$exec" == "yes" ]; then
+	if [ -e $file1 ]; then
+	    RM -f $file1
+	fi
+        ln -s $file2 $file1
+    fi
+fi
+if [ "$exec" == "no" ]; then
+    DO_OK
+elif [ "$err_seen" == 0 -a -e "$file1" ]; then
+    DO_OK
+else
+    DO_FAIL
+    err_count=$(( err_count++ ))
+fi
+
+
+# Install links for the X11IRAF binaries.
+ECHO -n "Creating X11IRAF links ...                                     "
+if (( "$do_system"==0 )); then
+    xfiles=("xgterm ximtool ism_wcspix.e")
+
+    for f in ${xfiles[@]}; do
+        if [ -e "$iraf/vendor/x11iraf/bin.$IRAFARCH/$f" ]; then
+            if [ "$exec" == "yes" ]; then
+        	if [ -e "$HOME/.iraf/bin/$f" ]; then
+		    RM $HOME/.iraf/bin/$f
+        	fi
+                ln -s $iraf/vendor/x11iraf/bin.$IRAFARCH/$f $HOME/.iraf/bin/$f
+            fi
+        fi
+    done
+fi
+DO_OK
+
+
+#=============================================================================
+# Initialize the login.cl/uparm for a personal installation
+#=============================================================================
+
+if [ "$do_system" == 0 ]; then
+  NEWLINE
+  BOLD_ON
+  ECHO "                      Initializing Login Files"
+  ECHO "                      ------------------------"
+  BOLD_OFF
+
+  cur=$PWD
+  if [ ! -e $HOME/.iraf ]; then
+      mkdir $HOME/.iraf
+  fi
+  cd $HOME/.iraf
+  ECHO -n "Creating global login.cl and uparm directory ....              "
+  $iraf/unix/hlib/mkiraf.sh --default --init --term=$myterm  >& /dev/null
+  if [ -e "$HOME/.iraf/login.cl" ]; then
+      DO_OK
+  else
+      DO_FAIL
+  fi
+
+  cd $cur
+
+  # Add the setup to the user's login files.
+  cfiles=("$HOME/.cshrc $HOME/.tcshrc $HOME/.login")
+  bfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
+
+  for file in ${cfiles[@]}; do
+    if [ -e "$file" ]; then
+	if [ "$exec" == "yes" ]; then
+            RM -f $TEMP >& /dev/null
+	    cp $file $TEMP
+
+	    egrep -e "iraf/setup.csh" $TEMP			>& /dev/null
+            if (( $?==1 )); then
+	        echo ""						>> $TEMP
+	        echo "# Add iraf setup commands"		>> $TEMP
+ 	        echo "if ( -e $HOME/.iraf/setup.csh ) then"	>> $TEMP
+ 	        echo "    source $HOME/.iraf/setup.csh"		>> $TEMP
+ 	        echo "endif"					>> $TEMP
+		cp $file ${file}.bak
+                PUT $TEMP $file
+            fi
+            RM -f $TEMP >& /dev/null
+	fi
+    else
+        RM -f $TEMP >& /dev/null
+	echo ""							 > $file
+	echo "# Add iraf setup commands"			>> $file
+ 	echo "if ( -e $HOME/.iraf/setup.csh ) then"		>> $file
+ 	echo "    source $HOME/.iraf/setup.csh"			>> $file
+ 	echo "endif"						>> $file
+    fi
+  done
+
+  for file in ${bfiles[@]}; do
+    if [ -e "$file" ]; then
+	if [ "$exec" == "yes" ]; then
+            RM -f $TEMP >& /dev/null
+	    cp $file $TEMP
+
+	    egrep -e "iraf/setup.sh" $TEMP			>& /dev/null
+            if (( $?==1 )); then
+	        echo ""						>> $TEMP
+	        echo "# Add iraf setup commands"		>> $TEMP
+ 	        echo "if [ -e $HOME/.iraf/setup.sh ]; then"	>> $TEMP
+ 	        echo "    source $HOME/.iraf/setup.sh"		>> $TEMP
+ 	        echo "fi"					>> $TEMP
+		cp $file ${file}.bak
+                PUT $TEMP $file
+            fi
+            RM -f $TEMP >& /dev/null
+	fi
+    else
+        RM -f $TEMP >& /dev/null
+	echo ""							 > $file
+	echo "# Add iraf setup commands"			>> $file
+ 	echo "if [ -e $HOME/.iraf/setup.sh ]; then"		>> $file
+ 	echo "    source $HOME/.iraf/setup.sh"			>> $file
+ 	echo "fi"						>> $file
+    fi
+  done
+
+fi
+
+
+
+#=============================================================================
+#  Finish up and set the exit status.
+#=============================================================================
+
+
+NEWLINE ; NEWLINE
+
+if (( "$err_count"==0 )); then
+ BOLD_ON
+ ECHO "========================================================================"
+ ECHO -n "Congratulations!  "
+ BOLD_OFF
+ ECHO "IRAF has been successfully installed on this system."
+ BOLD_ON
+ ECHO "========================================================================"
+ BOLD_OFF
+ NEWLINE
+
+ if (( "$do_system"==1 )); then
+
+   ECHO "    To begin using the system simply log in as any user and from the"
+   ECHO "directory you wish to use as your iraf login directory type:"
+   ECHO ""
+   ECHO -n '          % ';
+   BOLD_ON; ECHO -n 'mkiraf'; BOLD_OFF
+   ECHO '     # create a login.cl file'
+   ECHO -n '          % ';
+   BOLD_ON; ECHO -n 'cl    '; BOLD_OFF
+   ECHO '     # start IRAF'
+   ECHO ""
+   ECHO "The 'iraf' user is already configured with a login.cl file so a simple"
+   ECHO "'cl' command is sufficient to start the system."
+
+ else
+
+   ECHO "    To begin using IRAF you can simply type"
+   ECHO ""
+   ECHO -n '          % ';
+   BOLD_ON; ECHO    'source ~/.login    '; BOLD_OFF
+   ECHO -n '          % ';
+   BOLD_ON; ECHO    'cl    '; BOLD_OFF
+   ECHO ""
+   ECHO "From any directory to use the global login files created in the"
+   BOLD_ON ; ECHO -n "$HOME/.iraf " ; BOLD_OFF
+   ECHO "directory.   If you wish to have a login.cl/uparm that"
+   ECHO "is specific to a particular directory, you will need to type"
+   ECHO ""
+   ECHO -n '          % ';
+   BOLD_ON; ECHO -n 'mkiraf'; BOLD_OFF
+   ECHO '     # create a login.cl file (needed once)'
+   ECHO -n '          % ';
+   BOLD_ON; ECHO -n 'cl    '; BOLD_OFF
+   ECHO '     # start IRAF'
+   ECHO ""
+ fi
+
+ ECHO "Additional user information can be found at the IRAF.NET web site:"
+ NEWLINE
+ BOLD_ON ; ECHO "                   http://iraf.net" ; BOLD_OFF
+ NEWLINE
+ ECHO "Please contact http://iraf.net with any questions or problems."
+ NEWLINE
+ NEWLINE
+
+ BOLD_ON
+ ECHO "========================================================================"
+ ECHO "================  Installation Completed With No Errors  ==============="
+ ECHO "========================================================================"
+ BOLD_OFF
+ NEWLINE
+ exit 0
+
+else
+ BOLD_ON
+ ECHO "========================================================================"
+ ECHO "=================  Installation Completed With Errors  ================="
+ ECHO "========================================================================"
+ BOLD_OFF
+ NEWLINE
+ exit 1
+
+fi
+
+exit 0
+

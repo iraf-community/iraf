@@ -2,6 +2,7 @@
 /* presence of mkdtemp and mkstemp by whether this links without error. */
 
 #include <stdio.h>
+#include <unistd.h>
 
  int
 #ifdef KR_headers

@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+#  PKGALL -- Install all available packages.
+
+
+if [ -e ".repo_pkgs" ]; then
+    p=`cat .repo_pkgs`
+    for f in ${p[@]} ; do
+	make $f
+    done
+fi
+
+exit 0

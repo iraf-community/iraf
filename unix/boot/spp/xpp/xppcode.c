@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "xpp.h"
+#include "../../bootProto.h"
 
 #define	import_spp
 #include <iraf.h>
@@ -57,8 +61,11 @@ extern	int	yylineno;
 #define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
 */
 
-extern int input();
-extern void yyunput();
+extern int   input();
+extern void  yyunput();
+extern void  d_codegen (register FILE *fp);
+extern void  d_runtime (char *text);
+
 extern char *yytext_ptr;
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
@@ -114,9 +121,53 @@ int	errhand = NO;			/* set if proc employs error handler  */
 int	errchk = NO;			/* set if proc employs error checking */
 
 
+void  skipnl (void);
+void  setcontext (int new_context);
+void  pushcontext (int new_context);
+int   popcontext (void);
+void  hashtbl (void);
+int   findkw (void);
+void  mapident (void);
+void  str_enter (void);
+char *str_fetch (register char *strname);
+void  macro_redef (void);
+void  setline (void);
+void  output (char ch);
+
+void  do_type (int type);
+void  do_char (void);
+void  skip_helpblock (void);
+int   parse_task_statement (void);
+int   get_task (char *task_name, char *proc_name, int maxch);
+int   get_name (char *outstr, int maxch);
+int   nextch (void);
+void  put_dictionary (void);
+void  put_interpreter (void);
+void  outstr (char *string);
+void  begin_code (void);
+void  end_code (void);
+void  init_strings (void);
+void  write_string_data_statement (struct string *s);
+void  do_string (char delim, int strtype);
+void  do_hollerith (void);
+void  sbuf_check (void);
+
+char *str_uniqid (void);
+void  traverse (char delim);
+void  error (int errcode, char *errmsg);
+void  xpp_warn (char *warnmsg);
+long  accum (int base, char **strp);
+
+int   charcon (char *string);
+void  int_constant (char *string, int base);
+void  hms (char *number);
+
+
+
 /* SKIPNL -- Skip to newline, e.g., when a comment is encountered.
  */
-skipnl()
+void
+skipnl (void)
 {
 	int c;
 	while ((c=input()) != '\n')
@@ -140,8 +191,8 @@ int	cntxsp = 0;		/* save stack pointer		*/
 
 /* SETCONTEXT -- Set the context.  Clears any saved context.
  */
-setcontext (new_context)
-int	new_context;
+void
+setcontext (int new_context)
 {
 	context = new_context;
 	cntxsp = 0;
@@ -150,8 +201,8 @@ int	new_context;
 
 /* PUSHCONTEXT -- Push a temporary context.
  */
-pushcontext (new_context)
-int	new_context;
+void
+pushcontext (int new_context)
 {
 	cntxstk[cntxsp++] = context;
 	context = new_context;
@@ -165,7 +216,8 @@ int	new_context;
  * (just finished compiling a procedure statement) then set the context to DECL
  * to indicate that we are entering the declarations section of a procedure.
  */
-popcontext()
+int
+popcontext (void)
 {
 	if (context & PROCSTMT) {
 	    context = DECL;
@@ -190,25 +242,25 @@ struct {
 				 * to get to next character class.
 				 */
 } kwtbl[] = {
-	"FALSE",	XTY_FALSE,	0,
-	"TRUE",		XTY_TRUE,	0,
-	"bool",		XTY_BOOL,	0,
-	"char",		XTY_CHAR,	1,
-	"complex",	XTY_COMPLEX,	0,
-	"double",	XTY_DOUBLE,	0,
-	"error",	XTY_ERROR,	1,
-	"extern",	XTY_EXTERN,	0,
-	"false",	XTY_FALSE,	0,
-	"iferr",	XTY_IFERR,	2,
-	"ifnoerr",	XTY_IFNOERR,	1,
-	"int",		XTY_INT,	0,
-	"long",		XTY_LONG,	0,
-	"pointer",	XTY_POINTER,	1,
-	"procedure",	XTY_PROC,	0,
-	"real",		XTY_REAL,	0,
-	"short",	XTY_SHORT,	0,
-	"true",		XTY_TRUE,	0,
-	};
+    { "FALSE",	    XTY_FALSE,	  0 },
+    { "TRUE",	    XTY_TRUE,	  0 },
+    { "bool",	    XTY_BOOL,	  0 },
+    { "char",	    XTY_CHAR,	  1 },
+    { "complex",    XTY_COMPLEX,  0 },
+    { "double",	    XTY_DOUBLE,	  0 },
+    { "error",	    XTY_ERROR,	  1 },
+    { "extern",	    XTY_EXTERN,	  0 },
+    { "false",	    XTY_FALSE,	  0 },
+    { "iferr",	    XTY_IFERR,	  2 },
+    { "ifnoerr",    XTY_IFNOERR,  1 },
+    { "int",	    XTY_INT,	  0 },
+    { "long",	    XTY_LONG,	  0 },
+    { "pointer",    XTY_POINTER,  1 },
+    { "procedure",  XTY_PROC,	  0 },
+    { "real",	    XTY_REAL,	  0 },
+    { "short",	    XTY_SHORT,	  0 },
+    { "true",	    XTY_TRUE,	  0 },
+};
 
 /* short kwindex[30];		simple alphabetic hash index		*/
 /* #define CINDEX(ch)		(isupper(ch)?ch-'A':ch-'a')		*/
@@ -223,7 +275,8 @@ short	kwindex[MAXCH];		/* simple alphabetic hash index		*/
  * sorted keyword table.  If there is no keyword name beginning with the index
  * character, the index entry is set to -1.
  */
-hashtbl()
+void
+hashtbl (void)
 {
 	int	i, j;
 
@@ -240,7 +293,8 @@ hashtbl()
 /* FINDKW -- Lookup an indentifier in the keyword table.  Return the opcode
  * of the keyword, or ERR if no match.
  */
-findkw()
+int
+findkw (void)
 {
 	register char ch, *p, *q;
 	int	i, ilimit;
@@ -280,7 +334,8 @@ findkw()
  * keywords are mapped into special x$.. identifiers for further processing
  * by the second pass.
  */
-mapident()
+void
+mapident (void)
 {
 	int     i, findkw();
 	char	*str_fetch();
@@ -365,7 +420,8 @@ int	st_nstr = 0;
  * N.B.: we are called by the lexical analyser with 'define name "' in
  * yytext.  The next input() will return the first char of the string.
  */
-str_enter()
+void
+str_enter (void)
 {
 	register char	*ip, *op, ch;
 	register struct st_def *s;
@@ -409,7 +465,7 @@ str_enter()
 		error (XPP_COMPERR, "Too many defined strings");
 
 	    /* Put defined NAME in string buffer.  */
-	    for (s->st_name = st_next, ip=name;  *st_next++ = *ip++;  )
+	    for (s->st_name = st_next, (ip=name);  (*st_next++ = *ip++);  )
 		;
 	}
 
@@ -430,8 +486,7 @@ str_enter()
  * parameter and return a pointer to the string if found, NULL otherwise.
  */
 char *
-str_fetch (strname)
-register char *strname;
+str_fetch (register char *strname)
 {
 	register struct st_def *s = st_list;
 	register int n = st_nstr;
@@ -451,9 +506,10 @@ register char *strname;
 /*  MACRO_REDEF --  Redefine the macro to automatically add a P2<T> macro
  *  to struct definitions.
  */
-macro_redef ()
+void
+macro_redef (void)
 {
-	register int	n, nb=0;
+	register int	nb=0;
 	register char	*ip, *op, ch;
 	char	name[SZ_FNAME];
 	char	value[SZ_LINE];
@@ -510,8 +566,10 @@ macro_redef ()
 
 	outstr ("Memr(");
 	if (strcmp (value, "$1") == 0) {
+#if defined(MACH64) && defined(AUTO_P2R)
 	    char *emsg[SZ_LINE];
 	    int strict = 0;
+#endif
 
 	    /*  A macro such as "Memr[$1]" which is typically used as a 
 	     *  shorthand for an array allocated as TY_REAL and not a part
@@ -569,7 +627,8 @@ macro_redef ()
  * places.  Necessary to get correct line numbers in error messages from
  * the second pass.
  */
-setline()
+void
+setline (void)
 {
 	char	msg[20];
 
@@ -586,8 +645,8 @@ setline()
  *
  * NOTE -- the redirection logic shown below is duplicated in OUTSTR.
  */
-output (ch)
-char	ch;
+void
+output (char ch)
 {
 	if (context & (BODY|DATASTMT)) {
 	    /* In body of procedure or in a data statement (which is output
@@ -657,8 +716,8 @@ char	*intrinsic_function[] = {
  * is properly resolved by processing macros BEFORE code generation.
  * In the current implementation, macros are handled by the second pass (RPP).
  */
-do_type (type)
-int	type;
+void
+do_type (int type)
 {
 	char    ch;
 
@@ -690,7 +749,7 @@ int	type;
 	} else {
 	    /* UNREACHABLE when in declarations section of a procedure.
 	     */
-	    fprintf (yyout, type_decl[type]);
+	    fprintf (yyout, "%s", type_decl[type]);
 	}
 }
 
@@ -700,7 +759,8 @@ int	type;
  * "char name[".  If we reach the closing ']', convert it into a right paren
  * for the second pass.
  */
-do_char()
+void
+do_char (void)
 {
 	char	ch;
 
@@ -722,7 +782,8 @@ do_char()
 
 /* SKIP_HELPBLOCK -- Skip over a help block (documentation section).
  */
-skip_helpblock()
+void
+skip_helpblock (void)
 {
 	char   ch;
 
@@ -780,7 +841,8 @@ skip_helpblock()
  * N.B.: Upon entry, the input is left positioned to just past the "task"
  *   keyword.
  */
-parse_task_statement()
+int
+parse_task_statement (void)
 {
 	register struct task *tp;
 	register char ch, *ip;
@@ -857,10 +919,8 @@ err:	    error (XPP_COMPERR, "too many tasks in task statement");
 /* GET_TASK -- Process a single task declaration of the form "taskname" or
  * "taskname = procname".
  */
-get_task (task_name, proc_name, maxch)
-char	*task_name;
-char	*proc_name;
-int	maxch;
+int
+get_task (char *task_name, char *proc_name, int maxch)
 {
 	register char ch;
 
@@ -888,9 +948,8 @@ int	maxch;
  * ERR is returned if the output string overflows, or if the token is not
  * a legal identifier.
  */
-get_name (outstr, maxch)
-char	*outstr;
-int	maxch;
+int
+get_name (char *outstr, int maxch)
 {
 	register char ch, *op;
 	register int nchars;
@@ -920,7 +979,8 @@ int	maxch;
 /* NEXTCH -- Get next nonwhite character from the input stream.  Ignore
  * comments.  Newline is not considered whitespace.
  */
-nextch()
+int
+nextch (void)
 {
 	register char ch;
 
@@ -945,7 +1005,8 @@ nextch()
  */
 #define	NDP_PERLINE		8	/* num DP data elements per line */
 
-put_dictionary()
+void
+put_dictionary (void)
 {
 	register struct task *tp;
 	char	buf[SZ_LINE];
@@ -1008,7 +1069,8 @@ put_dictionary()
  * for a task and call the associated procedure.  We are called when the
  * keyword TN$INTERP is encountered in the input stream.
  */
-put_interpreter()
+void
+put_interpreter (void)
 {
 	char	lbuf[SZ_LINE];
 	int	i;
@@ -1034,8 +1096,8 @@ put_interpreter()
  * either go direct to the output file, or will be buffered in the output
  * buffer.
  */
-outstr (string)
-char	*string;
+void
+outstr (char *string)
 {
 	register char *ip;
 
@@ -1072,7 +1134,8 @@ char	*string;
  * i.e., when we begin processing the executable part of a procedure
  * declaration.
  */
-begin_code()
+void
+begin_code (void)
 {
 	char	text[1024];
 
@@ -1110,7 +1173,8 @@ begin_code()
  * output.  Finally, we output the spooled procedure body, followed by and END
  * statement for the benefit of the second pass.
  */
-end_code()
+void
+end_code (void)
 {
 	int	i;
 
@@ -1197,7 +1261,8 @@ end_code()
  * smallest integer datatype provided by the host Fortran compiler, usually
  * INTEGER*2 (XTY_CHAR).
  */
-init_strings()
+void
+init_strings (void)
 {
 	register int str;
 
@@ -1228,8 +1293,8 @@ init_strings()
  * on some compilers (crazy but true).  Determine if we will be generating any
  * implied dos and declare the variable if so.
  */
-write_string_data_statement (s)
-struct	string *s;
+void
+write_string_data_statement (struct string *s)
 {
 	register int i, len;
 	register char *ip;
@@ -1273,9 +1338,11 @@ struct	string *s;
  * save name of string array in sbuf.  If inline string, manufacture the
  * name of the string array.
  */
-do_string (delim, strtype)
-char	delim;				/* char which delimits string	*/
-int	strtype;			/* string type			*/
+void
+do_string (
+  char	delim,				/* char which delimits string	*/
+  int	strtype 			/* string type			*/
+)
 {
 	register char ch, *ip;
 	register struct string *s;
@@ -1420,7 +1487,8 @@ sterr:		    error (XPP_SYNTAX, "String declaration syntax");
  * as in the statement 'call_f77_sub (arg, *"any string", arg)'.  Escape
  * sequences are not recognized.
  */
-do_hollerith()
+void
+do_hollerith (void)
 {
 	register char *op;
 	char	strbuf[SZ_LINE], outbuf[SZ_LINE];
@@ -1448,7 +1516,8 @@ do_hollerith()
 /* SBUF_CHECK -- Check to see that the string buffer has not overflowed.
  * It is a fatal error if it does.
  */
-sbuf_check()
+void
+sbuf_check (void)
 {
 	if (sp >= &sbuf[SZ_SBUF]) {
 	    error (XPP_COMPERR, "String buffer overflow");
@@ -1460,7 +1529,7 @@ sbuf_check()
 /* STR_UNIQID -- Generate a unit identifier name for an inline string.
  */
 char *
-str_uniqid()
+str_uniqid (void)
 {
 	static  char id[] = "ST0000";
 
@@ -1478,8 +1547,8 @@ str_uniqid()
  * Quotes may be included in the string by escaping them, or by means of
  * the double quote convention.
  */
-traverse (delim)
-char	delim;
+void
+traverse (char delim)
 {
 	register char *op, *cp, ch;
 	char	*index();
@@ -1531,9 +1600,8 @@ char	delim;
  * Do not abort compiler, however, because it is better to keep going and
  * find all the errors in a single compilation.
  */
-error (errcode, errmsg)
-int	errcode;
-char	*errmsg;
+void
+error (int errcode, char *errmsg)
 {
 	fprintf (stderr, "Error on line %d of %s: %s\n", linenum[istkptr],
 	    fname[istkptr], errmsg);
@@ -1546,8 +1614,8 @@ char	*errmsg;
  * a warning message; linking should occur if there are not any more serious
  * errors.
  */
-xpp_warn (warnmsg)
-char	*warnmsg;
+void
+xpp_warn (char *warnmsg)
 {
 	fprintf (stderr, "Warning on line %d of %s: %s\n", linenum[istkptr],
 	    fname[istkptr], warnmsg);
@@ -1560,9 +1628,7 @@ char	*warnmsg;
  * indicated base.
  */
 long
-accum (base, strp)
-int	base;
-char	**strp;
+accum (int base, char **strp)
 {
 	register char *ip;
 	long    sum;
@@ -1605,8 +1671,8 @@ char	**strp;
  * The regular escape sequences are recognized; numeric values are assumed
  * to be octal.
  */
-charcon (string)
-char	*string;
+int
+charcon (char *string)
 {
 	register char *ip, ch;
 	char	*cc, *index();
@@ -1637,9 +1703,8 @@ char	*string;
  * octal, or sexagesimal number, or a character constant.  The numeric string
  * is converted in the indicated base and replaced by its decimal value.
  */
-int_constant (string, base)
-char	*string;
-int	base;
+void
+int_constant (char *string, int base)
 {
 	char    decimal_constant[SZ_NUMBUF], *p;
 	long    accum(), value;
@@ -1696,9 +1761,8 @@ int	base;
  * the preceeding field.  Thus "12:30" is equivalent to "12.5".  Some care
  * is taken to preserve the precision of the number.
  */
-char *
-hms (number)
-char	*number;
+void
+hms (char *number)
 {
 	char	cvalue[SZ_NUMBUF], *ip;
 	int	bvalue, ndigits;
@@ -1731,9 +1795,9 @@ char	*number;
 
 	/* Format the output number. */
 	if (ndigits > MIN_REALPREC)
-	    sprintf (cvalue, "%d.%dD0", bvalue, value);
+	    sprintf (cvalue, "%d.%ldD0", bvalue, value);
 	else
-	    sprintf (cvalue, "%d.%d", bvalue, value);
+	    sprintf (cvalue, "%d.%ld", bvalue, value);
 	cvalue[ndigits+1] = '\0';
 
 	/* Print the translated number. */

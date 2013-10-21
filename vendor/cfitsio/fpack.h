@@ -15,6 +15,13 @@
 #define	FPACK_VERSION	"1.6.0 (Feb 2011)"
 /*
 VERSION	History
+
+1.6.0 (June 2012)
+    - Fixed behavior of the "rename" function on Windows platforms so that
+      it will clobber/delete an existing file before renaming a file to 
+      that name (the rename command behaves differently on POSIX and non-POSIX
+      environments).
+
 1.6.0 (February 2011)
     - Added full support for compressing and uncompressing FITS binary tables
       using a newly proposed format convention.  This is intended only for

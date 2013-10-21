@@ -2,9 +2,14 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #define import_spp
 #define import_knames
 #include <iraf.h>
+
+#include "../bootProto.h"
+
 
 #define	MAXEXTN		128
 
@@ -14,6 +19,14 @@ int	interactive;		/* verify if file does not have extn	*/
 int	recurse;		/* recursively descend directories	*/
 int	verbose;		/* print names of deleted files		*/
 int	execute;		/* permission to delete files		*/
+
+
+extern  int ZZSTRT(void);
+extern  int ZZSTOP(void);
+
+static void rmbin (char *dir, int recurse, char *path);
+static int  verify_delete (char *fname, char *path);
+static int  exclude_file (char *fname);
 
 
 /*
@@ -33,9 +46,8 @@ int	execute;		/* permission to delete files		*/
  * switches for different directories.
  *
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	char	path[SZ_PATHNAME+1];
 	char	*argp;
@@ -111,10 +123,12 @@ help_:
 /* RMBIN -- Remove all binaries in a directory or in a directory tree.
  * We chdir to each directory to minimize path searches.
  */
-rmbin (dir, recurse, path)
-char	*dir;
-int	recurse;
-char	*path;			/* pathname of current directory */
+static void
+rmbin (
+    char *dir, 
+    int	  recurse, 
+    char *path 			/* pathname of current directory */
+)
 {
 	char	newpath[SZ_PATHNAME+1];
 	char	fname[SZ_PATHNAME+1];
@@ -188,8 +202,8 @@ char	*path;			/* pathname of current directory */
 /* EXCLUDE_FILE -- Check the "only" and "exclude" file lists to see if the
  * file should be excluded from deletion.
  */
-exclude_file (fname)
-char	*fname;
+static int
+exclude_file (char *fname)
 {
 	register char	*ip, *ep;
 	register int	ch, i;
@@ -228,9 +242,11 @@ char	*fname;
 
 /* VERIFY_DELETE -- Ask the user if they want to delete the named file.
  */
-verify_delete (fname, path)
-char	*fname;			/* name of file to be deleted	*/
-char	*path;			/* current directory pathname	*/
+static int
+verify_delete (
+    char  *fname,		/* name of file to be deleted	*/
+    char  *path 		/* current directory pathname	*/
+)
 {
 	char    lbuf[SZ_LINE+1];
 	char    *ip;

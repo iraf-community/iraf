@@ -1,1 +1,6 @@
-
+refitsutil	=/iraf/iraf/extern/fitsutil/
+remscred	=/iraf/iraf/extern/mscred/
+renfextern	=/iraf/iraf/extern/nfextern/
+restsdas	=/iraf/iraf/extern/stsdas/
+retables	=/iraf/iraf/extern/tables/
+keep

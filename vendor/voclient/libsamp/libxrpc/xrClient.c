@@ -773,6 +773,7 @@ xr_getStructFromResult (int cnum, int *snum)
 
     assert (cnum < MAX_CLIENTS);		/* validate the client number */
 
+    *snum = 0;
     if (client_errstat == OK) {
 	*snum = xr_newStruct ();		/* FIXME	*/
 	xr_setSParam (*snum, client->result);

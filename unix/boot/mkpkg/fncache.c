@@ -2,6 +2,11 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//#include "../bootProto.h"
+
 
 /*
  * FNCACHE -- Maintain a cache of system logical filenames (e.g., <config.h>)
@@ -39,14 +44,25 @@ struct	_sysfile *fn_tohead();
 struct	_sysfile *fn_totail();
 
 
+extern  int  os_sysfile (char *sysfile, char *fname, int maxch);
+
+int   m_sysfile (char *lname, char *fname, int maxch);
+void  m_fninit (int debug);
+int   fn_chksum (char *s);
+int   fn_strncpy (char *out, char *in, int maxch);
+
+
+
 /* M_SYSFILE -- Search for the named system file and return the virtual file
  * name in the output string if the system file is found.  This is functionally
  * equivalent to os_sysfile().
  */
-m_sysfile (lname, fname, maxch)
-char	*lname;			/* logical name of system file	*/
-char	*fname;			/* receives virtual file name	*/
-int	maxch;
+int
+m_sysfile (
+  char	*lname,			/* logical name of system file	*/
+  char	*fname,			/* receives virtual file name	*/
+  int	maxch 
+)
 {
 	register struct _sysfile *fn;
 	register int	chksum;
@@ -85,8 +101,8 @@ int	maxch;
 
 /* M_FNINIT -- Initialize (clear) the sysfile cache.
  */
-m_fninit (debug)
-int	debug;
+void
+m_fninit (int debug)
 {
 	register struct _sysfile *fn;
 	register int	i;
@@ -131,8 +147,7 @@ int	debug;
 /* FN_TOHEAD -- Link a sysfile struct at the head of the list.
  */
 struct _sysfile *
-fn_tohead (fn)
-register struct _sysfile *fn;
+fn_tohead (register struct _sysfile *fn)
 {
 	if (fn != fn_head) {
 	    fn->uplnk = NULL;
@@ -148,8 +163,7 @@ register struct _sysfile *fn;
 /* FN_TOTAIL -- Link a sysfile struct at the tail of the list.
  */
 struct _sysfile *
-fn_totail (fn)
-register struct _sysfile *fn;
+fn_totail (register struct _sysfile *fn)
 {
 	if (fn != fn_tail) {
 	    fn->uplnk = fn_tail;
@@ -165,8 +179,7 @@ register struct _sysfile *fn;
 /* FN_UNLINK -- Unlink an sysfile struct.
  */
 struct _sysfile *
-fn_unlink (fn)
-register struct _sysfile *fn;
+fn_unlink (register struct _sysfile *fn)
 {
 	if (fn == fn_head)
 	    fn_head = fn->dnlnk;
@@ -184,8 +197,8 @@ register struct _sysfile *fn;
 
 /* FN_CHKSUM -- Compute the checksum of a character string.
  */
-fn_chksum (s)
-register char *s;
+int
+fn_chksum (char *s)
 {
 	register int sum=0;
 
@@ -199,10 +212,12 @@ register char *s;
 /* FN_STRNCPY -- Copy up to maxch characters from a string and return the
  * number of characters copied as the function value.
  */
-fn_strncpy (out, in, maxch)
-char	*out;
-char	*in;
-int	maxch;
+int
+fn_strncpy (
+  char	*out,
+  char	*in,
+  int	maxch 
+)
 {
 	register char	*ip, *op;
 	register int	n;

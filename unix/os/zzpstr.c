@@ -46,7 +46,7 @@
 
 #define	LOGFILE "/tmp/k.log"
 
-void 	spp_printmemc (int memc_ptr);
+void 	spp_printmemc (long memc_ptr);
 void 	spp_printstr (XCHAR *s);
 
 
@@ -169,7 +169,8 @@ spp_printstr (XCHAR *s)
  * string passed as a pointer to char.
  */
 void
-spp_printmemc (int memc_ptr)
+spp_printmemc (long memc_ptr)
 {
-	spp_printstr ((XCHAR *) ((memc_ptr - 1) * 2 - 2));
+	XCHAR *str = (XCHAR *) ((memc_ptr - 1) * 2 - 2);
+	spp_printstr (str);
 }

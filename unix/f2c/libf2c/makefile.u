@@ -15,7 +15,7 @@
 .SUFFIXES: .c .o
 CC = cc
 SHELL = /bin/sh
-CFLAGS = -O
+CFLAGS = -O -w $(HSI_CF)
 
 # compile, then strip unnecessary symbols
 .c.o:
@@ -28,7 +28,7 @@ CFLAGS = -O
 ## or remove both the ld and mv lines above.
 
 MISC =	f77vers.o i77vers.o main.o s_rnge.o abort_.o exit_.o getarg_.o iargc_.o\
-	getenv_.o signal_.o s_stop.o s_paus.o system_.o cabs.o\
+	getenv_.o signal_.o s_stop.o s_paus.o system_.o cabs.o ctype.o\
 	derf_.o derfc_.o erf_.o erfc_.o sig_die.o uninit.o
 POW =	pow_ci.o pow_dd.o pow_di.o pow_hh.o pow_ii.o pow_ri.o pow_zi.o pow_zz.o
 CX =	c_abs.o c_cos.o c_div.o c_exp.o c_log.o c_sin.o c_sqrt.o
@@ -79,10 +79,14 @@ libf2c.a: $(OFILES)
 ## systems.  Details are system-dependent.  Under Linux, -fPIC
 ## must appear in the CFLAGS assignment when making libf2c.so.
 ## Under Solaris, use -Kpic in CFLAGS and use "ld -G" instead
-## of "cc -shared".
+## of "$(CC) -shared".
+## For MacOSX 10.4 and 10.5 (and perhaps other versions >= 10.3), use
+## "MACOSX_DEPLOYMENT_TARGET=10.3 libtool -dynamic -undefined dynamic_lookup -single_module"
+## instead of "$(CC) -shared", and when running programs linked against libf2c.so,
+## arrange for $DYLD_LIBRARY_PATH to include the directory containing libf2c.so.
 
 libf2c.so: $(OFILES)
-	cc -shared -o libf2c.so $(OFILES)
+	$(CC) -shared -o libf2c.so $(OFILES)
 
 ### If your system lacks ranlib, you don't need it; see README.
 
@@ -187,6 +191,7 @@ arith.h: arithchk.c
 check:
 	xsum Notice README abort_.c arithchk.c backspac.c c_abs.c c_cos.c \
 	c_div.c c_exp.c c_log.c c_sin.c c_sqrt.c cabs.c close.c comptry.bat \
+	ctype.c ctype.h \
 	d_abs.c d_acos.c d_asin.c d_atan.c d_atn2.c d_cnjg.c d_cos.c d_cosh.c \
 	d_dim.c d_exp.c d_imag.c d_int.c d_lg10.c d_log.c d_mod.c \
 	d_nint.c d_prod.c d_sign.c d_sin.c d_sinh.c d_sqrt.c d_tan.c \

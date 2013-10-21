@@ -3,7 +3,10 @@
 
 #include "ratdef.h"
 
-CANT(rname)
+extern  int  ENDST (void);
+
+
+void CANT(rname)
 register RCHAR *rname;
 {
 	while (*rname != REOS)

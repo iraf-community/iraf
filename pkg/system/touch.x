@@ -25,6 +25,8 @@ int	clpopni(), clgfil()
 int	finfo(), dtm_ltime()
 bool	clgetb()
 
+errchk	touch
+
 begin
 	# Initialize.
 	call aclrc (time, SZ_FNAME)
@@ -108,8 +110,10 @@ begin
 
 
 	# Process the list of input files.
-	while (clgfil (list, fname, SZ_FNAME) != EOF)
-	    call touch (fname, create, t_atime, t_mtime, verbose)
+	while (clgfil (list, fname, SZ_FNAME) != EOF) {
+	    iferr (call touch (fname, create, t_atime, t_mtime, verbose))
+		;
+	}
 
 	# Clean up and close the list.
 	call clpcls (list)
@@ -125,6 +129,8 @@ bool	create				#i create file if necessary?
 long	atime, mtime			#i access and modify time
 bool	verbose				#i verbose output?
 
+char 	dir[SZ_PATHNAME], ip
+char 	vfn[SZ_PATHNAME]
 int	fd
 int	access(), open(), futime()
 
@@ -137,9 +143,25 @@ begin
 	# Check first it the file exists.
 	if (access (fname, 0, 0) == NO) {
 	    if (create) {
+
+		call fnldir (fname, vfn, SZ_PATHNAME)
+		call fpathname (vfn, dir, SZ_PATHNAME)
+		if (access (dir, READ_WRITE, 0) == NO) {
+		    for (ip=1; dir[ip] != '!'; ip=ip+1)
+			;
+		    call eprintf ("Error: Cannot open directory '%s'\n")
+		        call pargstr (dir[ip+1])
+		    call erract (EA_ERROR)
+		    return;
+		}
+
 		# Create a new empty file.
-	        iferr (fd = open (fname, NEW_FILE, TEXT_FILE))
-		    call erract (EA_WARN)
+	        iferr (fd = open (fname, NEW_FILE, TEXT_FILE)) {
+		    call eprintf ("Error: Cannot touch file '%s'\n")
+		        call pargstr (fname)
+		    call erract (EA_ERROR)
+		    return;
+		}
 	        call close (fd)
 		if (verbose) call printf ("(created) ")
 

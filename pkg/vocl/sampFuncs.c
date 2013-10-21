@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <readline/readline.h>		/* to install rl_event_hook	*/
 
 #define import_spp
 #define import_libc
@@ -20,7 +22,6 @@
 #define import_xwhen
 #include <iraf.h>
 
-#include "readline.h"			/* to install rl_event_hook	*/
 #include "config.h"			/* CL declarations		*/
 #include "clmodes.h"
 #include "operand.h"
@@ -519,7 +520,7 @@ func_sampLoadImage (int nargs)
 	    c_fmapfn (what, osfn, SZ_PATHNAME);
 	    if (c_access (osfn, READ_ONLY, 0) == NO) {
         	cl_error (E_UERR, "Cannot access image '%s'", what);
-		return (ERR);
+		return;
 	    }
 	    sprintf (url, "file://%s", osfn);
 	}
@@ -527,7 +528,7 @@ func_sampLoadImage (int nargs)
 
     default:
         cl_error (E_UERR, "sampImLoad: invalid number of arguments\n");
-	return (ERR);
+	return;
     }
 
     if (name == NULL) name = strdup (what);
@@ -614,7 +615,7 @@ func_sampLoadFITS (int nargs)
 	    c_fmapfn (what, osfn, SZ_PATHNAME);
 	    if (c_access (osfn, READ_ONLY, 0) == NO) {
         	cl_error (E_UERR, "Cannot access image '%s'", what);
-		return (ERR);
+		return;
 	    }
 	    sprintf (url, "file://%s", osfn);
 	}
@@ -622,7 +623,7 @@ func_sampLoadFITS (int nargs)
 
     default:
         cl_error (E_UERR, "sampImLoad: invalid number of arguments\n");
-	return (ERR);
+	return;
     }
 
     if (name == NULL) name = strdup (what);
@@ -709,7 +710,7 @@ func_sampLoadVOTable (int nargs)
 	    c_fmapfn (what, osfn, SZ_PATHNAME);
 	    if (c_access (osfn, READ_ONLY, 0) == NO) {
         	cl_error (E_UERR, "Cannot access file '%s'", what);
-		return (ERR);
+		return;
 	    }
 	    sprintf (url, "file://%s", osfn);
 	}
@@ -717,7 +718,7 @@ func_sampLoadVOTable (int nargs)
 
     default:
         cl_error (E_UERR, "sampLoadVOTable: invalid number of arguments\n");
-	return (ERR);
+	return;
     }
 
     if (name == NULL) name = strdup (what);
@@ -780,14 +781,14 @@ func_sampShowRow (int nargs)
 	    c_fmapfn (what, osfn, SZ_PATHNAME);
 	    if (c_access (osfn, READ_ONLY, 0) == NO) {
         	cl_error (E_UERR, "Cannot access file '%s'", what);
-		return (ERR);
+		return;
 	    }
 	    sprintf (url, "file://%s", osfn);
 	}
 	break;
     default:
         cl_error (E_UERR, "usage: sampShowRow (url, tblId, row[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -844,14 +845,14 @@ func_sampSelectRowList (int nargs)
 	    c_fmapfn (what, osfn, SZ_PATHNAME);
 	    if (c_access (osfn, READ_ONLY, 0) == NO) {
         	cl_error (E_UERR, "Cannot access file '%s'", what);
-		return (ERR);
+		return;
 	    }
 	    sprintf (url, "file://%s", osfn);
 	}
 	break;
     default:
         cl_error (E_UERR, "usage: sampShowRow (url, tblId, row[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -956,7 +957,7 @@ func_sampBibcodeLoad (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampShowRow (tblId, url, row[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -997,7 +998,7 @@ func_sampCmdExec (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampCmdExec (cmd[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -1037,7 +1038,7 @@ func_sampEnvGet (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampEnvGet (param[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -1081,7 +1082,7 @@ func_sampEnvSet (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampEnvSet (param, val[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -1122,7 +1123,7 @@ func_sampParamGet (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampParamGet (param[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");
@@ -1166,7 +1167,7 @@ func_sampParamSet (int nargs)
 	break;
     default:
         cl_error (E_UERR, "usage: sampParamSet (param, val[, to])");
-	return (ERR);
+	return;
     }
 
     if (!to)  to = strdup ("all");

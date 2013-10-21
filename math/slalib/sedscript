@@ -11,9 +11,6 @@ foreach file (*.f)
     sed -f SED2 $file > tempfile.f
     rm $file
     mv tempfile.f $file
-    sed -f SED3 $file > tempfile.f
-    rm $file
-    mv tempfile.f $file
 end
 
 # Restore IRAF version of the preces.f file from a save version.

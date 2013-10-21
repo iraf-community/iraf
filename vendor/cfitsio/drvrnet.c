@@ -1679,7 +1679,7 @@ int ftp_open_network(char *filename, FILE **ftpfile, FILE **command, int *sock)
     puts("Sent RETR command");
 #endif
     if (ftp_status(*command,"150 ")) {
-      ffpmsg ("RETR error, most likely file is not there (ftp_open)");
+    /*  ffpmsg ("RETR error, most likely file is not there (ftp_open)"); */
       fclose(*command);
 #ifdef DEBUG
       puts("File not there");

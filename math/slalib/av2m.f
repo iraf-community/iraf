@@ -8,11 +8,10 @@
 *
 *  (single precision)
 *
-*  A rotation matrix describes a rotation about some arbitrary axis.
-*  The axis is called the Euler axis, and the angle through which the
-*  reference frame rotates is called the Euler angle.  The axial
-*  vector supplied to this routine has the same direction as the
-*  Euler axis, and its magnitude is the Euler angle in radians.
+*  A rotation matrix describes a rotation about some arbitrary axis,
+*  called the Euler axis.  The "axial vector" supplied to this routine
+*  has the same direction as the Euler axis, and its magnitude is the
+*  amount of rotation in radians.
 *
 *  Given:
 *    AXVEC  r(3)     axial vector (radians)
@@ -25,9 +24,26 @@
 *  The reference frame rotates clockwise as seen looking along
 *  the axial vector from the origin.
 *
-*  P.T.Wallace   Starlink   June 1989
+*  Last revision:   26 November 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -39,7 +55,7 @@
 
 
 
-*  Euler angle - magnitude of axial vector - and functions
+*  Rotation angle - magnitude of axial vector - and functions
       X = AXVEC(1)
       Y = AXVEC(2)
       Z = AXVEC(3)

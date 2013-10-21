@@ -28,19 +28,26 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
-ifeq ("$(PLATFORM)", "Darwin")
-    ifeq  ("$(PLMACH)", "macintel")
-	CARCH	= -m64 -mmacosx-version-min=10.5
+ifeq ($(PLATFORM),Darwin)
+    ifeq ($(PLMACH),x86_64)
+        CARCH   = -m64 -mmacosx-version-min=10.5
     else
-        CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+        CARCH   = -arch i386 -m32 -mmacosx-version-min=10.4
+    endif
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),macintel)
+            CARCH = -m64 -mmacosx-version-min=10.5
+        else
+            CARCH = -arch i386 -m32 -mmacosx-version-min=10.5
+        endif
     endif
 else
     CLIBS       = -lm -lc -lpthread -lcurl
-    CARCH       = -D$(PLATFORM)
+    CARCH       = 
 endif
 
 CLIBS		= -lm -lc -lcurl -lpthread
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
+CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -DIRAF -L./
 
 
 
@@ -54,24 +61,24 @@ OBJS 		= samp.o sampHub.o sampCommands.o sampHandlers.o \
 INCS 		= samp.h sampDecl.h
 LIBS		= lib$(NAME).a $(CLIBS)
 
-APPS		= zztest 
+APPS		= 
 
 
-all:	.BASE lib apps install
+all:	.BASE lib install
 
 World:	.BASE lib apps install
 
 install: .BASE lib apps
 	cp lib$(NAME).a $(LIBDIR)
 	cp $(INCS) $(INCDIR)
+	/bin/rm -rf *.o
 
 objs:	$(OBJS) $(INCS)
 
 clean:
-	/bin/rm -f *.o *.a *.e *.so .BASE $(APPS)
+	/bin/rm -f *.o *.a *.e *.so .BASE $(APPS) __*
 	(cd examples ; make clean)
 	(cd libxrpc  ; make clean)
-	(cd cfitsio  ; make clean)
 	/bin/rm -rf libxrpc/lib/build/* libxrpc/lib/*.dylib
 	/bin/rm -f SWIG* libvot* php_libvot.h
 	/bin/rm -f sampJava.[co]
@@ -101,7 +108,6 @@ zztest: zztest.o $(OBJS) lib
 
 .BASE:
 	(cd libxrpc ; ./mklibs ; make install)
-	#(cd cfitsio ; ./mklibs )
 	touch .BASE
 
 lib: objs $(INCS)

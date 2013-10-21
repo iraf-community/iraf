@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/csh
 #
 # CL.CSH -- Startup the version of the CL executable compiled for the
 # architecture or floating point hardware appropriate for the current

@@ -10,6 +10,7 @@ Section: User Commands  (1)<BR>Updated: July 2007<BR><A HREF="#index">Index</A>
 <H2>NAME</H2>
 
 vodata - query and access VO data services
+<P>
 <A NAME="lbAC">&nbsp;</A>
 <H2>SYNOPSIS</H2>
 
@@ -34,11 +35,13 @@ following this flag.
 <DD>
 Verbose output.  The output will be more verbose than normal but exactly
 what is printed depends on whether other flags are enabled to changed the
-basic task behavior.
+basic task behavior.  Sets the <I>VERBOSE</I> query parameter to its highest
+level.
 <DT><B>--vverbose</B>
 
 <DD>
-Very-verbose output.  Even more output.
+Very-verbose output.  Sets the <I>VERBOSE</I> query parameter to its highest
+level.
 <P>
 <DT>The following flags control the major behavior of the task, i.e. the type <DD>
 of output to present.
@@ -47,7 +50,7 @@ of output to present.
 <DD>
 Perform an action based on all available data.  When used as part of a
 data query, this flag causes the &lt;<I>resource</I>&gt; argument to be used in
-a substring match of Directory <I>ShortName</I> or <I>Identifier</I> fields
+a substring match of Registry <I>ShortName</I> or <I>Identifier</I> fields
 to create the actual list of resources to be queried.  If the <I>ShortName</I>
 of a <I>TABULARSKYSERVICE</I> from Vizier is given, the &lt;<I>resource</I>&gt;
 will typically expand to include all tables associated with the paper,
@@ -98,10 +101,10 @@ the same level of verbosity must be set during a data query.
 <DD>
 Constrain the query by bandpass.  The argument following the flag must
 be one of the allowed bandpass specification string.  Setting the flag
-will constrain any Directory search used to only those resources where 
+will constrain any Registry search used to only those resources where 
 the spectral coverage matches the given bandpass.  Aliases for bandpasses
 are allowed, see below.
-<DT><B>-i &lt;file&gt;</B>
+<DT><B>-i &lt;file&gt; or --input=&lt;file&gt;</B>
 
 <DD>
 Specify a file containing the remaining positional command-line input. The
@@ -178,7 +181,7 @@ Specify the service or url to invoke.  In most cases the service, i.e.
 the &lt;<I>resource</I>&gt; argument will be taken from the commandline based on
 it's position.  The exception is when the user want to specify a service
 URL directly (e.g. to test a local service) because it isn't known to the
-Directory, or to use the reserved values '-' or 'any'.  Use of '-' tells
+Registry, or to use the reserved values '-' or 'any'.  Use of '-' tells
 the task to read the service list from the standard input;  use of
 the word 'any' is a means to telling the task to dynamically create the
 resource list from other options (e.g. &quot;any image service&quot; by using the
@@ -187,21 +190,33 @@ resource list from other options (e.g. &quot;any image service&quot; by using th
 
 <DD>
 Constrain the query by service type.  The list of allowed service types
-is given below.  The actual string used in a Directory resource record
+is given below.  The actual string used in a Registry resource record
 may be used if known, otherwise common use is to specify 'image' to
 access Simple Image Access (SIAP) services, 'catalog' for Cone searches,
 or 'table' for Vizier tabular data.
 <P>
 <DT>The following flags are specific to the writing of HTML or KML files:<DD>
-<DT><B>--webnoborder</B>
+<DT><B>--webborder</B>
+
+<DD>
+Enable the shaded border drawn around an HTML table (default).
+<DT><B>--webcolor</B>
+
+<DD>
+Enable the coloring for an HTML table (default).
+<DT><B>--webheader</B>
+
+<DD>
+Enable the HTML page header written to the output file (default).
+<DT><B>--wb, --webnoborder</B>
 
 <DD>
 Disable the shaded border drawn around an HTML table.
-<DT><B>--webnocolor</B>
+<DT><B>--wc, --webnocolor</B>
 
 <DD>
 Disable the coloring for an HTML table.
-<DT><B>--webnoheader</B>
+<DT><B>--wh, --webnoheader</B>
 
 <DD>
 Disable the HTML page header written to the output file.
@@ -371,31 +386,35 @@ There will be three attributes:  <I>svc</I> will be the data service name,
 <I>obj</I> will be the object name (if supplied), and the <I>index</I> attribute
 giving an index into the results.  This index list is created by looping over
 each service, and for each service, looping over the object/position list.
-<DT><B>-e,--extract</B>
+<DT><B>-e,--extract[=&lt;type&gt;]</B>
 
 <DD>
-Extract positional and access information to extra output files.  By
-default both files will be written, using <I>--extract=pos</I> will write only the
-positional information file, using <I>--extract=urls</I> will write the access URLs only.
-Access URLs are written one-per-line to a file with the same root name as
-the main output but with a &quot;.urls&quot; extension;  Positional information is
-written to a file with a &quot;.pos&quot; extension and will contain three columns
-made up of the identifier (the column with the <I>ID_MAIN</I> ucd), RA and
-Dec (the <I>POS_EQ_RA_MAIN</I> and <I>POS_EQ_DEC_MAIN</I> ucd columns
-respectively).  If these ucds appear more than once in a table, the first
-occurrance will be used.
+Extract positional or access information to extra output files.  By
+default both files will be written, using <I>--extract=pos</I> will write 
+only the positional information file, using <I>--extract=urls</I> will write
+the access URLs only.  Access URLs are written one-per-line to a file with
+the same root name as the main output but with a &quot;.urls&quot; extension;  
+Positional information is written to a file with a &quot;.pos&quot; extension and 
+will contain three columns made up of the identifier (the column with 
+the <I>ID_MAIN</I> ucd), RA and Dec (the <I>POS_EQ_RA_MAIN</I> 
+and <I>POS_EQ_DEC_MAIN</I> ucd columns respectively).  If these ucds appear 
+more than once in a table, the first occurrance will be used.
 <P>
-Additionally, the <I>--extract=headers</I> and <I>--extract=kml</I> flags may be to to specify the
-HTML and KML output be written to files with &quot;.html&quot; and &quot;.kml&quot;
-extensions respectively.  The <I>--extract=KML</I> flag will cause multi-resource 
-and/or multi-object queries to be collected into a single KML file.
-The format-specific <I>--kml&lt;opt&gt;</I> and <I>--web&lt;opt&gt;</I> flags will apply to these files.
-A <I>--extract=xml</I> flag will force the output format to be raw VOTable and gather
-the results to a single XML document (see the <I>-X</I> option).
+Additionally, the <I>--extract=headers</I> and <I>--extract=kml</I> flags may 
+used be to to specify the HTML and KML output be written to files with 
+&quot;.html&quot; and &quot;.kml&quot; extensions respectively.  The <I>--extract=KML</I> flag 
+will cause multi-resource and/or multi-object queries to be collected into 
+a single KML file.  The format-specific <I>--kml&lt;opt&gt;</I> and <I>--web&lt;opt&gt;</I>
+flags will apply to these files.  A <I>--extract=xml</I> flag will force the
+output format to be raw VOTable and gather the results to a single XML 
+document (see the <I>-X</I> option).
 <P>
 Note that the URLs file can be used to later access the data (perhaps
 after sub-selecting from the table based on some criteria) by calling
 the task again using the filename as the only argument.
+<P>
+If no argument is given to the <I>--extract</I> flag then all possible 
+options will be enabled.
 <DT><B>-n,--nosave</B>
 
 <DD>
@@ -450,7 +469,7 @@ the task interface is meant to provide the following features:
 <DD>
 Resources (i.e. data services) may be referred to using a more familiar
 <I>ShortName</I> designation, or an IVO identifier, either of which will be
-resolved to a specific <I>ServiceURL</I> internally using the Directory.
+resolved to a specific <I>ServiceURL</I> internally using the Registry.
 <DT><B>-</B>
 
 <DD>
@@ -481,7 +500,7 @@ to allow the task to be used in multiple ways.
 <P>
 
 The task should quickly become familiar to users and is meant operate in
-concert with the <B>vodirectory</B> and <B>vosesame</B> tasks to allow novice
+concert with the <B>voregistry</B> and <B>vosesame</B> tasks to allow novice
 users to begin to explore for data resources to be used in the final query.
 Some of the flexibility of the task is shown in the Examples section below.
 Major concepts of the task are detailed below as well.
@@ -500,7 +519,7 @@ The meaning of the various command-line arguments is detailed below:
 <DD>
 The <I>ShortName</I> or <I>Identifier</I> of a data resource to be queried, a
 comma-delimited list of either, or the name of a file containing either.
-These names will be resolved to a data service URL using the Directory.  The
+These names will be resolved to a data service URL using the Registry.  The
 <I>-s</I> option may be used to specify a non-registered <I>ServiceURL</I> that
 the task may use, however the <I>-t</I> option is then also required to
 specify the type of service.
@@ -607,7 +626,7 @@ processing scenarios, with similar root names for multiple files associated
 with a specific query.
 <P>
 Output tables may be created in a number of formats and will likewise have
-extensions indicating the table type.  The <I>-e</I>/<I>--extract</I> option
+extensions indicating the table type.  The <I>--extract</I> option
 may create additional files for each query, and the <I>-g</I>/<I>--get</I> 
 option to access data will similarly create additional files.  The structure 
 of an output filename is:
@@ -639,13 +658,13 @@ object name or the index in a list of positions of no object was specified.
 
 <P>
 
-The <I>-v</I> and <I>-vv</I> options serve a dual purpose: within the task they
-set the level of output verbosity in terms of what is reported during
+The <I>-v</I> and <I>--vverbose</I> options serve a dual purpose: within the 
+task they set the level of output verbosity in terms of what is reported during
 processing  (Similarly, the <I>-q</I> option can be used to turn off output
 reporting entirely).  These flags will however also increase the value of the
 <B>VERBOSE</B> parameter sent to services during a data query.  The default
 value is at least 1, with the highest level being 3.  Using the <I>-v</I> flag
-sets <B>VERBOSE=2</B> and <I>-vv</I> sets <B>VERBOSE=3</B>.
+sets <B>VERBOSE=2</B> and <I>--vverbose</I> sets <B>VERBOSE=3</B>.
 <P>
 
 The VERBOSE level can be important in accessing result columns that may only
@@ -668,7 +687,7 @@ following arguments:
     image               Simple Image Access services
     spectra             Simple Spectral Access services
     table               Vizier services
-    &lt;literal&gt;           ResourceType from Directory record
+    &lt;literal&gt;           ResourceType from Registry record
 
 </PRE>
 
@@ -756,7 +775,7 @@ messages.
 <A NAME="lbAM">&nbsp;</A>
 <H2>RESOURCE CACHING</H2>
 
-Directory resolution is a common activity of VO-CLI tasks and so results
+Registry resolution is a common activity of VO-CLI tasks and so results
 will be cached in the $HOME/.voclient/cache/regResolver directory based on
 the search term, service type and bandpass parameters.  Defining the
 <I>VOC_NO_CACHE</I> environment variable will cause the task to ignore the
@@ -796,7 +815,7 @@ IC 10, print a count of the results only:
 </PRE>
 
 Note that we use the reserved word '<I>any</I>' for the service name and
-constrain by image type.  The task will automatically query the Directory to
+constrain by image type.  The task will automatically query the Registry to
 create the list of services to be queried.
 <P>
 <DT>3)<DD>
@@ -809,7 +828,7 @@ Print a count of X-ray catalog data around Abell2712:
 </PRE>
 
 In this case we constrain both the service type as well as the spectral
-coverage published for the resource in the Directory.  We use the reserved
+coverage published for the resource in the Registry.  We use the reserved
 <I>
 any</I>' service name to query multiple services and use the '<I>-c</I>'
 flag to print a count without saving results.  The object name is resolved
@@ -825,14 +844,14 @@ Print the column metadata returned by the RC3 catalog service:
 </PRE>
 
 The output will print the result using the default VERBOSE level, adding
-the <I>-v</I> will set the query parameter VERBOSE=2, adding <I>-vv</I> will
-set VERBOSE=3 (to print all available columns).  When accessing data the
+the <I>-v</I> will set the query parameter VERBOSE=2, adding <I>--verbose</I>
+will set VERBOSE=3 (to print all available columns).  When accessing data the
 same <I>-v</I> flags will be required to retrieve columns at that
 <I>VERBOSE</I> level.
 <P>
 <P>
 <DT>5)<DD>
-Use the Directory to query for resources using the search terms
+Use the Registry to query for resources using the search terms
 &quot;cooling flow&quot;.  Upon examining the output the user notices a 
 Vizier paper titled &quot;<I>Cooling Flows in 207 clusters of Galaxies</I>&quot; 
 that looks interesting.  Use the <B>vodata</B> task to download all 
@@ -840,9 +859,9 @@ tables associated with this paper, save tables in the default
 CSV format:
 <PRE>
 
-        % vodirectory cooling flow
-        % vodata -O white97 -all J/MNRAS/292/419/
-        % vodata --output=white97 --all J/MNRAS/292/419/
+        % voregistry cooling flow
+        % vodata -O white97 -all J/MNRAS/292/419
+        % vodata --output=white97 --all J/MNRAS/292/419
 
 </PRE>
 
@@ -857,7 +876,7 @@ XMM images available for 3c273, and if there aren't too many,
 download the images and save the extracted access URLs:
 <PRE>
 
-        % vodirectory -rv -t image xmm
+        % voregistry -rv -t image xmm
         ShortName       ResourceType    Title
         ------------------------------------------------------....
         XMM-Newton      SIAP/ARCHIVE    XMM-Newton Archive ....
@@ -916,17 +935,17 @@ Use <B>vodata</B> as a test client for a locally-installed SIAP service:
 </PRE>
 
 In this case we force the ServiceURL using the '<I>-s</I>' flag, but since we
-can't do a Directory query to discover what type of service this is, we must
+can't do a Registry query to discover what type of service this is, we must
 use the '<I>-t</I>' flag to indicate it is an image service.
 <P>
 <P>
 <DT>9)<DD>
 Create a local table containing the Abell catalog.  Begin with a
-Directory query to find likely services using the <B>vodirectory</B> task, print
+Registry query to find likely services using the <B>voregistry</B> task, print
 a verbose description of each resource and page the results with <I>less</I>:
 <PRE>
 
-        % vodirectory -v -v --type=catalog abell | less
+        % voregistry -v -v --type=catalog abell | less
 
 </PRE>
 
@@ -957,7 +976,7 @@ and query for Chandra observations at each position:
 Here we used the unix '<I>cut</I>' utility to remove the first column and
 pipe the resulting positions to the task, using the '<I>-p -</I>' option to
 indicate positions should be read from stding, and the IVO identifier of
-the Chandra observation master log we also discovered from the Directory.
+the Chandra observation master log we also discovered from the Registry.
 <P>
 <P>
 <DT>10)<DD>
@@ -1116,7 +1135,7 @@ Michael Fitzpatrick (<A HREF="mailto:fitz@noao.edu">fitz@noao.edu</A>), June 200
 <A NAME="lbAS">&nbsp;</A>
 <H2>SEE ALSO</H2>
 
-<A HREF="http://localhost/cgi-bin/man/man2html?1+voclient">voclient</A>(1), <A HREF="http://localhost/cgi-bin/man/man2html?1+voclientd">voclientd</A>(1), <A HREF="http://localhost/cgi-bin/man/man2html?1+vosesame">vosesame</A>(1), <A HREF="http://localhost/cgi-bin/man/man2html?1+vodirectory">vodirectory</A>(1)
+voclient, voclientd, vosesame, voregistry
 <P>
 
 <HR>
@@ -1147,6 +1166,6 @@ Michael Fitzpatrick (<A HREF="mailto:fitz@noao.edu">fitz@noao.edu</A>), June 200
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 20:46:31 GMT, May 21, 2009
+Time: 02:52:33 GMT, June 28, 2013
 </BODY>
 </HTML>

@@ -296,6 +296,10 @@ struct mtdesc {
 /* Device characteristic codes. */
 #define	PNAME(a,b)	((((int)(a))<<8)+(int)(b))
 
+/* Tape drives aren't supported on Mac systems currently.
+*/
+#ifndef MACOSX
+
 /* Device flag table. */
 static struct mtchar {
 	int	pname;		/* 2 byte parameter name code */
@@ -343,6 +347,7 @@ static struct mtchar {
 	{ 0, 0, 0, 0 },
 };
 
+
 static	int zmtgetfd();
 static	int zmtbsr(), zmtbsf(), zmtfsr(), zmtfsf();
 static	int zmtclose(), zmtfpos(), zmtrew();
@@ -360,7 +365,6 @@ static int zmtbsf (int fd, int nfiles);
 static int zmtfsr (int fd, int nrecords);
 static int zmtbsr (int fd, int nrecords);
 
-
 static void zmtdbgn (struct mtdesc *mp, const char *argsformat, ... );
 static void zmtdbg (struct mtdesc *mp, char *msg);
 static void zmtdbgopen (struct mtdesc *mp);
@@ -368,9 +372,6 @@ static void zmtdbgclose (struct mtdesc *mp);
 
 
 
-/* Tape drives aren't supported on Mac systems currently.
-*/
-#ifndef MACOSX
 
 /* ZZOPMT -- Open the named magtape device and position to the given file.
  * On output, "newfile" contains the number of the file actually opened,

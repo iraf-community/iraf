@@ -706,7 +706,11 @@ putcx1(register expptr p)
 								ICON(ts));
 				}
 			}
+#ifdef TYQUAD
+		resp = mktmp(q->headblock.vtype == TYQUAD ? TYQUAD : tyint, ENULL);
+#else
 		resp = mktmp(tyint, ENULL);
+#endif
 		putout(putassign(cpexpr((expptr)resp), q));
 		p->addrblock.memoffset = tskludge
 			? mkexpr(OPSTAR, (expptr)resp, ICON(tskludge))

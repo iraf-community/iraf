@@ -3428,5 +3428,55 @@ precision alone rather than forcing it to 53 bits; compile with
 -DUNINIT_F2C_PRECISION_53 to get the former behavior.  This only
 affects Fortran files translated by f2c -trapuv .
 
+Sun May  7 00:38:59 MDT 2006
+  main.c, version.c:  add options -? (or --help) that print out
+pointers to usage documentation and -v (or --version) that print
+the current version.
+  fc script:  fix botch with -O[123]; recognize --version (or -v)
+and --help (or -?).
+  Add f2c.pdf == PDF version of f2c.ps.
+
+Sun Oct  8 02:45:04 MDT 2006
+  putpcc.c: fix glitch in subscripting complex variables:  subscripts
+of type integer*8 were converted to integer*4, which causes trouble
+when 32-bit addressing does not suffice.
+
+Tue Sep 11 23:54:05 MDT 2007
+  xsum.c:  insert explicit "int" before main.
+
+Mon Dec  3 20:53:24 MST 2007
+  libf2c/main.c: insert explicit "int" before main.
+
+Sat Apr  5 21:39:57 MDT 2008
+  libf2c.zip: tweaks for political C++ and const correctness, and
+to fix ctype trouble in some recent Linux versions.  No behavior
+should change.
+
+Sun Apr  6 22:38:56 MDT 2008
+  libf2c.zip: adjust alternate makefiles to reflect yesterday's change.
+
+Wed Nov 26 23:23:27 MST 2008
+  libf2c.zip: add brief discussion of MacOSX to comments in makefile.u.
+
+Fri Jan  2 23:13:25 MST 2009
+  libf2c.zip: add  -DNO_ISATTY to CFLAGS assignment in makefile.vc.
+
+Sat Apr 11 18:06:00 MDT 2009
+  src/sysdep.c src/sysdeptest.c: tweak for MacOSX (include <unistd.h>).
+
+Wed Jul  7 10:51:12 MDT 2010
+  src/data.c, src/format.c, src/p1output.c:  "invisible" tweaks to
+silence warnings seen in compilation under Ubuntu; version.c not changed.
+
+Fri Aug 27 09:14:17 MDT 2010
+  format.c: make sizeof(buf) depend on MAXNAMELEN to fix a bug with long
+names.  Update mswin/f2c.exe.gz accordingly.
+
+Fri Sep  3 16:03:24 MDT 2010
+  fc:  have "-m ..." modify CC rather than CFLAGS (to affect linking).
+
+Mon Aug  1 13:46:40 MDT 2011
+  README, README in libf2c.zip: update some netlib pointers.
+
 NOTE:  the old libf77 and libi77 bundles are no longer being updated.
 Use libf2c.zip instead.

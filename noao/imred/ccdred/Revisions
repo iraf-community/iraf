@@ -1,5 +1,32 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+t_ccdgroups.x
+t_ccdhedit.x
+t_ccdinst.x
+t_ccdlist.x
+t_ccdproc.x
+t_combine.x
+t_mkfringe.x
+t_mkillumcor.x
+t_mkillumft.x
+t_mkskycor.x
+t_mkskyflat.x
+    Added a check that the filename given to the hdmopen() procedure wasn't 
+    empty.  This provides a more informative error message than the "floating
+    invalid operation' one gets now when e.g. no 'instrument' file is 
+    specified (10/12/13, MJF)
+
+src/ccdcache.x
+    The 'bufs' pointer was declared as TY_REAL instead of TY_SHORT (5/4/13)
+
+t_cosmicrays.x
+    A pointer to a an array of pointers was used in one place as a real.  This
+    is an error when integer and real arrays are not of the same size; i.e.
+    on 64-bit architectures.  (8/2/12, Valdes)
+
+=======
+V2.16.1
+=======
 
 various
     Separated the generic combine code to a subdirectory as is done

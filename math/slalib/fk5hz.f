@@ -24,7 +24,8 @@
 *     RH        d      RA (radians)
 *     DH        d      Dec (radians)
 *
-*  Called:  slDS2C, slDAVM, slDIMV, slDMXV, slDC2S, slDA2P
+*  Called:  slDS2C, slDAVM, slDIMV, slDMXV, slDC2S,
+*           slDA2P
 *
 *  Notes:
 *
@@ -42,17 +43,32 @@
 *
 *     M.Feissel & F.Mignard, Astron. Astrophys. 331, L33-L36 (1998).
 *
-*  P.T.Wallace   Starlink   7 October 1998
+*  P.T.Wallace   Starlink   22 June 1999
 *
-*  Copyright (C) 1998 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+*    Boston, MA  02110-1301  USA
+*
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
       IMPLICIT NONE
 
       DOUBLE PRECISION R5,D5,EPOCH,RH,DH
-
-      DOUBLE PRECISION slDA2P
 
       DOUBLE PRECISION AS2R
       PARAMETER (AS2R=0.484813681109535994D-5)
@@ -71,6 +87,8 @@
 
       DOUBLE PRECISION P5E(3),ORTN(3),R5H(3,3),T,VST(3),RST(3,3),
      :                 P5(3),PH(3),W
+
+      DOUBLE PRECISION slDA2P
 
 
 

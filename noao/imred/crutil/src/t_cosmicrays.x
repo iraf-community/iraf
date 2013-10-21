@@ -194,7 +194,7 @@ begin
 
 	        do l = 1, nl {
 		    do i = 1, szwin-1
-			Memr[data+i-1] = Memr[data+i]
+			Memi[data+i-1] = Memi[data+i]
 		    Memi[data+szwin-1] =
 			imgs2r (in, c1, c2, l+szhwin, l+szhwin)
 		    if (out != in)

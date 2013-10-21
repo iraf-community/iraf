@@ -179,13 +179,37 @@ struct	_hwx {
 };
 
 #ifdef MACOSX
+#ifdef  FPE_INTDIV
+#undef  FPE_INTDIV
+#endif
 #define	FPE_INTDIV	(-2)		/* N/A */
+#ifdef  FPE_INTOVF
+#undef  FPE_INTOVF
+#endif
 #define	FPE_INTOVF	(-2)		/* N/A */
+#ifdef  FPE_FLTRES
+#undef  FPE_FLTRES
+#endif
 #define FPE_FLTRES	FE_INEXACT	/* inexact */
+#ifdef  FPE_FLTDIV
+#undef  FPE_FLTDIV
+#endif
 #define FPE_FLTDIV	FE_DIVBYZERO	/* divide-by-zero */
+#ifdef  FPE_FLTUND
+#undef  FPE_FLTUND
+#endif
 #define FPE_FLTUND	FE_UNDERFLOW	/* underflow */
+#ifdef  FPE_FLTOVF
+#undef  FPE_FLTOVF
+#endif
 #define FPE_FLTOVF	FE_OVERFLOW	/* overflow */
+#ifdef  FPE_FLTINV
+#undef  FPE_FLTINV
+#endif
 #define FPE_FLTINV	FE_INVALID	/* invalid */
+#ifdef  FPE_FLTSUB
+#undef  FPE_FLTSUB
+#endif
 #define	FPE_FLTSUB	(-2)		/* N/A */
 #endif
 
@@ -231,7 +255,7 @@ ZXWHEN (
 	    vex = *sig_code - X_FIRST_EXCEPTION;
 	    break;
 	default:
-	    vex = (int) NULL;
+	    vex = (int) 0;
 	    kernel_panic ("zxwhen: bad exception code");
 	}
 	    

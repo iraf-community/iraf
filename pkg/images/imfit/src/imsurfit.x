@@ -748,7 +748,7 @@ begin
 	call salloc (cols, ncols, TY_INT)
 	call salloc (colsfit, ncols, TY_INT)
 	call salloc (lines, nlines, TY_INT)
-	call salloc (fbuf, ncols, TY_INT)
+	call salloc (fbuf, ncols, TY_REAL)
 	call salloc (wgt, ncols, TY_REAL)
 	call salloc (granges, 3 * max_nranges + 1, TY_INT)
 
@@ -937,7 +937,7 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (colsfit, ncols, TY_REAL)
+	call salloc (colsfit, ncols, TY_INT)
 	call salloc (x, ncols, TY_REAL)
 	call salloc (xfit, ncols, TY_REAL)
 	call salloc (y, ncols, TY_REAL)

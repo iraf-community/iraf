@@ -67,7 +67,7 @@ extern	char *ifseen;		/* Processing an IF statement?		*/
 extern	int do_error;		/* Are we processing errors?		*/
 
 extern	void *memset();
-char   *readline (char *prompt);
+char   *freadline (char *prompt);
 int     add_history (char *buf);
 
 
@@ -261,10 +261,9 @@ input_:
 
 		} else {
 		    char *cmd = (char *)NULL;
-		    char *readline();
 
 		    get_prompt((cmdblk_line==0) ? curpack->pk_name : NOCLOSURE);
-    		    if ((cmd = readline (prompt)) == (char *)NULL)
+    		    if ((cmd = freadline (prompt)) == (char *)NULL)
 			return (EOF);
     		    strcpy (raw_cmd, cmd);
     		    strcat (raw_cmd, "\n");
@@ -389,7 +388,7 @@ input_:
 */
 #ifdef NO_READLINE
 char *
-readline (char *prompt) { }
+freadline (char *prompt) { }
 int 
 add_history (char *buf)    { }
 #endif
@@ -676,8 +675,17 @@ expand_history_macros (char *in_text, char *out_text)
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
 	 */
-	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++)
-	    if (*ip == HISTCHAR) {
+	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++) {
+            if (*ip == '"') {                   /* span literal strings */
+                while (1) {
+                   *op++ = *ip++;
+                   if (*ip == '"' && *(ip+1) != '"') {
+                       *op = *ip;
+                        break;
+                   }
+                }
+                continue;
+            } else if (*ip == HISTCHAR) {
 		if (ip > in_text && *(ip-1) == '\\') {
 		    *(--op) = HISTCHAR;				/* \^	*/
 		    continue;
@@ -727,6 +735,7 @@ expand_history_macros (char *in_text, char *out_text)
 		--op;		/* leave pointing at last char output	*/
 		ip++;		/* skip the macro type metacharacter	*/
 	    }
+	}
 
 	return (have_arg_strings > 0);
 }

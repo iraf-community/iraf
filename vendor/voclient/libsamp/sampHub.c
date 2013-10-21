@@ -87,7 +87,7 @@ samp_hubOpen (Samp *sampP)
         if (HUB_DBG)
 	    fprintf (stderr, "Error: hubOpen registration fails: '%s'\n", 
 	        xr_getErrMsg (hub->id));
-	return ((int) -1);
+	return (SAMP_ERR);
 
     } else if (HUB_DBG)
 	fprintf (stderr, "hubOpen: registration OK....hub->id = %d\n", hub->id);
@@ -96,9 +96,10 @@ samp_hubOpen (Samp *sampP)
     /*  Make the application 'callable'.
      */
     if (samp_hubSetXmlrpcCallback (hub) != SAMP_OK) {
-	fprintf (stderr, "Error: client callability fails: '%s'\n", 
-	    xr_getErrMsg (hub->id));
-	return ((int) -1);
+        if (HUB_DBG)
+	    fprintf (stderr, "Error: client callability fails: '%s'\n", 
+	        xr_getErrMsg (hub->id));
+	return (SAMP_ERR);
     } else if (HUB_DBG)
 	fprintf (stderr, "hubOpen: Client made callable OK ....\n");
 
@@ -148,12 +149,29 @@ samp_hubClose (handle_t handle)
 #endif
 
 #ifdef SINGLE_HUB
-    free ((void *) hub);
-    hub = NULL;
+    if (hub) 
+        free ((void *) hub);
     samp_freeHandle (handle);
+    hub = NULL;
 #endif
 
     return (status);
+}
+
+
+/**
+ *  SAMP_HUBRUNNING -- See whether a Hub is running.  The test simply checks
+ *  the existence of a Hub lockfile.
+ */
+int
+samp_hubRunning (void)
+{
+    char   lockfile[SZ_NAME];
+
+    memset (lockfile, 0, SZ_NAME);
+    sprintf (lockfile, "%s/.samp", getenv ("HOME"));	/* MACHDEP	*/
+
+    return ( ((access (lockfile, R_OK) == 0) ? 1 : 0) );
 }
 
 

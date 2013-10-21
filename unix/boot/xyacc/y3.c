@@ -26,7 +26,7 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-#pragma ident	"%Z%%M%	%I%	%E% SMI"
+//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include "dextern.h"
 
@@ -524,7 +524,7 @@ warray (s, v, n)
      char *s;
      int *v, n;
 {
-    register i, j;
+    register int i, j;
 
     fprintf (ftable, "short\t%s[%d]\n", s, n);
 

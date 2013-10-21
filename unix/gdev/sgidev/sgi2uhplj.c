@@ -1,9 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #define	import_spp
 #define	import_error
 #include <iraf.h>
+
+#include "sgiUtil.h"
+
 
 /*
  * SGI2UHPLJ.C -- Read IRAF SGI rasterfile from standard input, translate into
@@ -70,19 +75,21 @@ int	dev_bottom;
 int	dev_width;
 int	dev_height;
 
+static void  translate (FILE *in, FILE *out);
+static char *xyencode (int x, int y);
+
 
 /* MAIN -- Main entry point for SGI2UHPII.  Optional arguments are device
  * window parameters and name of input file.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	FILE	*in;
 	char	*infile;
 	char	*argp;
 	int	argno;
-	int	get_iarg();
+
 
 	infile = "stdin";
 
@@ -134,50 +141,24 @@ char	*argv[];
 
 	if (in != stdin)
 	    fclose (in);
-}
 
-
-/* GET_IARG -- Get an integer argument, whether appended directly to flag
- * or separated by a whitespace character; if error, report and assign default.
- */
-
-get_iarg (argp, argv, argno, def_val)
-char	argp;
-char	**argv;
-int	argno;
-int	def_val;
-
-{
-	int	temp_val;
-
-	if (argp == NULL)
-	    if (argv[argno+1] == NULL) {
-		fprintf (stderr, "missing arg to switch `%s';", argp);
-		fprintf (stderr, " reset to %d\n", def_val);
-		temp_val = def_val;
-	    } else
-		temp_val = atoi (argv[++argno]);
-	else
-	    temp_val = atoi (argv[argno]+2);
-
-	return (temp_val);
+	return (0);
 }
 
 
 /* TRANSLATE -- Interpret input SGI Raster File format into Hewlett Packard
  * Raster graphics instructions and write to stdout.
  */
-translate (in, out)
-FILE	*in;
-FILE	*out;
+static void
+translate (FILE *in, FILE *out)
 {
 	int	n1, swap_bytes;
 	int	n, nlines, length, len_buf;
 	register unsigned char *bp1, *buffer1;
 	char buf_rast [SZ_RAST];
-	char *xyencode ();
 
-	swap_bytes = swapped ();
+
+	swap_bytes = isSwapped ();
 
 	len_buf = dev_width / NBITS_CHAR;
 	buffer1 = (unsigned char *)malloc (len_buf);
@@ -228,61 +209,15 @@ FILE	*out;
 	fwrite (DEV_END, strlen(DEV_END), 1, out);
 }
 
+
 /* XYENCODE -- Encode x, y into a character string formatted for the device.
  */
-
-char *
-xyencode (x, y)
-int x, y;	
+static char *
+xyencode (int x, int y)
 {
-    char obuf [SZ_VECT];
+    static char obuf [SZ_VECT];
 
+    memset (obuf, 0, SZ_VECT);
     sprintf (obuf, DEV_VECT, x, y);
     return (obuf);
 }
-
-/* BSWAP2 -- Move bytes from array "a" to array "b", swapping successive
- * pairs of bytes.  The two arrays may be the same but may not be offset
- * and overlapping.
- */
-bswap2 (a, b, nbytes)
-char	*a;			/* input array			*/
-char	*b;			/* output array			*/
-int	nbytes;			/* number of bytes to swap	*/
-{
-	register char *ip, *op, *otop;
-	register unsigned temp;
-
-	ip = a;
-	op = b;
-	otop = op + (nbytes & ~1);
-
-	/* Swap successive pairs of bytes.
-	 */
-	while (op < otop) {
-	    temp  = *ip++;
-	    *op++ = *ip++;
-	    *op++ = temp;
-	}
-
-	/* If there is an odd byte left, move it to the output array.
-	 */
-	if (nbytes & 1)
-	    *op = *ip;
-}
-
-
-/* SWAPPED -- Test whether we are running on a byte-swapped machine.
- */
-swapped()
-{
-	union {
-	    short   tswap;
-	    char    b[2];
-	} test;
-
-	test.tswap = 1;
-	return (test.b[0]);
-}	
-
-

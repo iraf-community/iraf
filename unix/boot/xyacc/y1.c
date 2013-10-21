@@ -26,7 +26,7 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-#pragma ident	"%Z%%M%	%I%	%E% SMI"
+//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include "dextern.h"
 #include <sys/param.h>
@@ -361,7 +361,7 @@ static char *
 chcopy (p, q)
      char *p, *q;
 {
-    while (*p = *q++)
+    while ((*p = *q++))
 	++p;
     return (p);
 }

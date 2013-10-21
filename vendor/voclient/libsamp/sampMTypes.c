@@ -103,6 +103,10 @@
  *   stat = samp_paramSet (handle_t handle, String recip, String name,
  *                              String value)
  *
+ *   stat = samp_bibLoad (handle_t handle, String recip, String bibcode)
+ *
+ *   stat = samp_resourceLoad (handle_t handle, String recip, String type, 
+ *				String name, Map resMap)
  * 
  *****************************************************************************/
 
@@ -262,12 +266,32 @@ int
 samp_tableSelectRowList (handle_t handle, String recip, String tableId, 
 		String url, int rows[], int nrows)
 {
+    register  int  i, status;
     Samp *sampP = samp_H2P (handle);
-    Hub *hub = sampP->hub;
+    Hub  *hub = sampP->hub;
+    Msg   msg    = samp_newMsg ();
+    Param param  = samp_newParam ();
+    List  rowlist;
 
 
     if (!hub)
 	return (SAMP_ERR);
+
+    rowlist = samp_newList ();
+    for (i=0; i < nrows; i++)
+	samp_setIntInList (rowlist, rows[i]);
+
+    /*  Create message map.
+     */
+    samp_msgMType (msg, "table.select.rowList");
+    samp_msgParam (msg, param);
+	samp_addStringParam (msg, "url", url);
+	samp_addStringParam (msg, "table-id", tableId);
+	samp_addListParam (msg, "row-list", rowlist);
+
+    status = samp_sendMsg (handle, recip, msg);
+    samp_freeMsg (msg);
+    samp_freeList (rowlist);
 
     return (SAMP_OK);
 }
@@ -419,7 +443,6 @@ samp_specLoadSSAGeneric (handle_t handle, String recip, String url, Map meta,
 /******************************************
  *  Environment MTypes
  ******************************************/
-
 
 /**
  *  SAMP_CMDEXEC -- Execute a command in a remote application.
@@ -923,7 +946,6 @@ samp_sendGeneric (handle_t handle, String recip, String mtype, String args[])
 
     return (status);
 }
-
 
              
 /**

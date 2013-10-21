@@ -365,7 +365,7 @@ begin
 		        data = CCD_DATA(pcache)+(line-1)*IM_LEN(im,1)+col1-1
 		        bufs = CCD_BUFS(pcache)
 		        if (bufs == NULL) {
-			    call malloc (bufs, IM_LEN(im,1), TY_REAL)
+			    call malloc (bufs, IM_LEN(im,1), TY_SHORT)
 			    CCD_BUFS(pcache) = bufs
 		        }
 		        call achtrs (Memr[data], Mems[bufs], IM_LEN(im,1))

@@ -31,7 +31,7 @@
 \medskip
 \medskip
 \begin{center}
-{\Large Version 3.2 \\}
+{\Large Version 3.3 \\}
 \end{center}
 \bigskip
 \vskip 2.5cm
@@ -46,7 +46,7 @@ USA}
 \vfill
 \bigskip
 \begin{center}
-{\Large December 2010\\}
+{\Large April 2012\\}
 \end{center}
 \vfill
 \end{titlepage}
@@ -209,6 +209,9 @@ cfortran.h that are necessary to support 64-bit integer values when calling
 C routines from fortran programs.  The cfortran.h macros were originally developed
 by Burkhard Burow (CERN).
 
+Julian Taylor (ESO, Garching) provided the fast byte-swapping algorithms
+that use the SSE2 and SSSE3 machine instructions available on x86\_64 CPUs.
+
 In addition, many other people have made valuable contributions to the
 development of CFITSIO.  These include (with apologies to others that may
 have inadvertently been omitted):
@@ -296,7 +299,8 @@ supercomputers are currently not supported.
 The CFITSIO library is built on Unix systems by typing:
 
 \begin{verbatim}
- >  ./configure [--prefix=/target/installation/path]
+ >  ./configure [--prefix=/target/installation/path] [--enable-reentrant]
+                [--enable-sse2] [--enable-ssse3]
  >  make          (or  'make shared')
  >  make install  (this step is optional)
 \end{verbatim}
@@ -316,6 +320,14 @@ will cause the 'make install' command to copy the CFITSIO libcfitsio file
 to /usr1/local/lib and the necessary include files to /usr1/local/include
 (assuming of course that the  process has permission to write to these
 directories).
+
+The optional --enable-reentrant flag will attempt to configure CFITSIO
+so that it can be used in multi-threaded programs.  See the "Using CFITSIO in Multi-threaded Environments" section, below, for more
+
+The optional --enable-sse2 and --enable-ssse3 flags will cause configure to
+attempt to build CFITSIO using faster byte-swapping algorithms.
+See the "Optimizing Programs" chapter of this manual for
+more information about these options.
 
 The 'make shared' option builds a shared or dynamic version of the
 CFITSIO library.  When using the shared library the executable code is
@@ -499,8 +511,8 @@ because the definitions in fitsio.h often change.
 \section{Using CFITSIO in Multi-threaded Environments}
 
 CFITSIO can be used either with the
-POSIX pthreads interface or the OpenMP interface for multithreaded
-parallel programs.  When used in a multithreaded environment,
+POSIX pthreads interface or the OpenMP interface for multi-threaded
+parallel programs.  When used in a multi-threaded environment,
 the CFITSIO library *must* be built using
 the -D\_REENTRANT compiler directive.  This can be done using the following
 build commands:
@@ -509,11 +521,20 @@ build commands:
   >./configure --enable-reentrant
   > make
 \end{verbatim}
-Multiple threads can then call any of the CFITSIO routines
-to read or write separate
+A function called fits\_is\_reentrant is available to test
+whether or not CFITSIO was compiled with the -D\_REENTRANT
+directive.  When this feature is enabled, multiple threads can
+call any of the CFITSIO routines
+to simultaneously read or write separate
 FITS files.  Multiple threads can also read data from
-the same FITS file simultaneously,
-but different threads must never try to write to the same
+the same FITS file simultaneously, as long as the file
+was opened independently by each thread.  This relies on
+the operating system to correctly deal with reading the
+same file by multiple processes.  Different threads should
+not share the same 'fitsfile' pointer to read an opened
+FITS file, unless locks are placed around the calls to
+the CFITSIO reading routines.
+Different threads should never try to write to the same
 FITS file.
 
 
@@ -2073,7 +2094,8 @@ header.
     terminating characters. The last header record is terminated with
     a NULL character.  These routine allocates memory for the returned
     character array, so the calling program must free the memory when
-    finished.
+    finished.  The cleanest way to do this is to
+    call the fits\_free\_memory routine.
 
     There are 2 related routines: fits\_hdr2str simply concatenates all
     the existing keywords in the header; fits\_convert\_hdr2str is similar,
@@ -3027,7 +3049,12 @@ spaces).  Trailing blank characters are not significant.
 \item[1 ] Insert or delete rows in an ASCII or binary table. When inserting rows
     all the rows following row FROW are shifted down by NROWS rows;  if
     FROW = 0 then the blank rows are inserted at the beginning of the
-    table.  The first delete routine deletes NROWS consecutive rows
+    table.  Note that it is *not* necessary to insert rows in a table before
+    writing data to those rows (indeed, it would be inefficient to do so).
+    Instead one may simply write data to any row of the table, whether that
+    row of data already exists or not.
+
+    The first delete routine deletes NROWS consecutive rows
     starting with row FIRSTROW.  The second delete routine takes an
     input string that lists the rows or row ranges (e.g.,
     '5-10,12,20-30'), whereas the third delete routine takes an input
@@ -3139,6 +3166,11 @@ tables support the following data type values:  TSTRING, TBYTE, TSBYTE, TSHORT,
 TUSHORT, TINT, TUINT, TLONG, TLONGLONG, TULONG, TFLOAT, or TDOUBLE.
 Binary tables also support TLOGICAL (internally mapped to the `char'
 data type), TCOMPLEX, and TDBLCOMPLEX.
+
+Note that it is *not* necessary to insert rows in a table before
+writing data to those rows (indeed, it would be inefficient to do so).
+Instead, one may simply write data to any row of the table, whether that
+row of data already exists or not.
 
 Individual bits in a binary table 'X' or 'B' column may be read/written
 to/from a *char array by specifying the TBIT datatype.  The *char
@@ -3357,14 +3389,17 @@ and lastrow give the starting and ending row number of each range. \label{ffcalc
        >  int *status)
 \end{verbatim}
 
-
 \begin{description}
-\item[7 ]Evaluate the given expression and return information on the result. \label{fftexp}
+\item[7 ]Evaluate the given expression and return dimension and type information
+on the result.  The returned dimensions correspond to a single row entry
+of the requested expression, and are equivalent to the result of fits\_read\_tdim().
+Note that strings are considered to be one element regardless of string length.
+If maxdim == 0, then naxes is optional. \label{fftexp}
 \end{description}
 
 \begin{verbatim}
   int fits_test_expr / fftexp
-      (fitsfile *fptr, char *expr, > int *datatype, long *nelem, int *naxis,
+      (fitsfile *fptr, char *expr, int maxdim > int *datatype, long *nelem, int *naxis,
        long *naxes, int *status)
 \end{verbatim}
 
@@ -4046,13 +4081,16 @@ The following utility routines may be useful for certain applications.
         (numeric, logical, or character string) is automatically determined
         and  the output CARD string is formatted accordingly.  The value
         token may be forced to be interpreted as a string (e.g. if it is a
-       string of numeric digits) by enclosing it in single quotes.
+        string of numeric digits) by enclosing it in single quotes.
+        If the value token is a character string that contains 1 or more
+        embedded blank space characters or slash ('/') characters then the
+       entire character string must be enclosed in single quotes.
 \end{description}
 
 
 \begin{description}
 \item[- ]     The COMMENT token is optional, but if present must be separated from
-       the VALUE token by at least one blank space and a  '/' character.
+       the VALUE token by a blank space or a  '/' character.
 \end{description}
 
 
@@ -4321,7 +4359,18 @@ large number if there are no null pixels). \label{imageRMS}
                    > double *rms, int *status)
 \end{verbatim}
 
+\begin{description}
+\item[25]  Was CFITSIO compiled with the -D\_REENTRANT directive
+so that it may be safely used in multi-threaded environments?
+The following function returns 1 if yes, 0 if no.  Note, however,
+that even if the -D\_REENTRANT directive was specified, this does
+not guarantee that the CFITSIO routines are thread-safe, because
+some compilers may not support this feature.\label{reentrant}
+\end{description}
 
+\begin{verbatim}
+int fits_is_reentrant(void)
+\end{verbatim}
 
 \chapter{  The CFITSIO Iterator Function }
 
@@ -4899,6 +4948,12 @@ given in units of degrees.
     this routine will swap them so that the longitudinal-like coordinate
     is returned as the first axis.
 
+    The first routine (ffgics) returns
+    the primary WCS, whereas the second routine returns the particular
+    version of the WCS specified by the 'version' parameter, which much
+    be a character ranging from 'A' to 'Z' (or a blank character, which is
+    equivalent to calling ffgics).
+
     If the file uses the newer 'CDj\_i' WCS transformation matrix
     keywords instead of old style 'CDELTn' and 'CROTA2' keywords, then
     this routine will calculate and return the values of the equivalent
@@ -4917,6 +4972,11 @@ given in units of degrees.
 \begin{verbatim}
   int fits_read_img_coord / ffgics
       (fitsfile *fptr, > double *xrefval, double *yrefval,
+       double *xrefpix, double *yrefpix, double *xinc, double *yinc,
+       double *rot, char *coordtype, int *status)
+
+  int fits_read_img_coord_version / ffgicsa
+      (fitsfile *fptr, char version, > double *xrefval, double *yrefval,
        double *xrefpix, double *yrefpix, double *xinc, double *yinc,
        double *rot, char *coordtype, int *status)
 \end{verbatim}
@@ -5429,8 +5489,12 @@ the column specifier,
 and the
 image pixel filtering specifier.
 \end{itemize}
- Null strings will be returned for any components that are not present
-in the input file name.  These routines are mainly for internal use
+A null pointer (0) may be be specified for any of the output string arguments
+that are not needed.  Null strings will be returned for any components that are not
+present in the input file name.  The calling routine must allocate sufficient
+memory to hold the returned character strings.  Allocating the string lengths
+equal to FLEN\_FILENAME is guaranteed to be safe.
+These routines are mainly for internal use
 by other CFITSIO routines. \label{ffiurl}
 \end{description}
 
@@ -5478,7 +5542,9 @@ call to fits\_open\_file.
 name includes the file type if specified, (e.g.  'ftp://' or 'http://')
 and the full path name, to the extent that it is specified in the input
 filename.  It does not include the HDU name or number, or any filtering
-specifications.
+specifications. The calling routine must allocate sufficient
+memory to hold the returned rootname character string.  Allocating the length
+equal to FLEN\_FILENAME is guaranteed to be safe.
  \label{ffrtnm}
 \end{description}
 
@@ -5618,7 +5684,10 @@ the 'exists' parameter will have 1 of the 4 following values:
     parameter in which case each column of the table will be separated
     by a single space character. Similarly, if the input value of
     rowlen is  0, then CFITSIO will calculate the default rowlength
-    based on the tbcol and ttype values.  When inserting a binary table
+    based on the tbcol and ttype values.  Under normal circumstances,
+    the nrows
+    paramenter should have a value of 0; CFITSIO will automatically update
+    the number of rows as data is written to the table.  When inserting a binary table
     with fits\_insert\_btbl, if there are following extensions in the
     file and if the table contains variable length array columns then
     pcount must specify the expected final size of the data heap,
@@ -6037,7 +6106,7 @@ routines.
 
 \begin{verbatim}
   int fits_insert_card / ffikey
-      (fitsfile *fptr, char *card, > &status)
+      (fitsfile *fptr, char *card, > int *status)
 
   int fits_insert_key_[str, longstr] / ffi[kys, kls]
       (fitsfile *fptr, char *keyname, char *value, char *comment,
@@ -7973,7 +8042,7 @@ also supplied.
 
 The column/keyword filter can be used to perform the following
 operations.  More than one operation may be specified by separating
-them with semi-colons.
+them with commas or semi-colons.
 
 \begin{itemize}
 
@@ -8058,10 +8127,10 @@ used to add comments into the file.
 Examples:
 
 \begin{verbatim}
-   [col Time;rate]               - only the Time and rate columns will
+   [col Time; rate]              - only the Time and rate columns will
                                    appear in the filtered input file.
 
-   [col Time;*raw]               - include the Time column and any other
+   [col Time, *raw]              - include the Time column and any other
                                    columns whose name ends with 'raw'.
 
    [col -TIME; Good == STATUS]   - deletes the TIME column and
@@ -8518,15 +8587,18 @@ usage. Also, the integer to real casts values to double precision:
 \end{verbatim}
     where each "[]" demarks optional parameters. The region file name
     is required and must be  enclosed in quotes.  The remaining
-    parameters are optional.  The region file is an ASCII text file
-    which contains a list of one or more geometric shapes (circle,
+    parameters are optional.  There are 2 supported formats for the
+    region file: ASCII file or FITS binary table.  The region file
+    contains a list of one or more geometric shapes (circle,
     ellipse, box, etc.) which defines a region on the celestial sphere
     or an area within a particular 2D image.  The region file is
     typically generated using an image display program such as fv/POW
     (distribute by the HEASARC), or ds9 (distributed by the Smithsonian
     Astrophysical Observatory).  Users should refer to the documentation
     provided with these programs for more details on the syntax used in
-    the region files.
+    the region files.  The FITS region file format is defined in a document
+    available from the FITS Support Office at
+    http://fits.gsfc.nasa.gov/ registry/ region.html
 
     In its simplest form, (e.g., regfilter("region.reg") ) the
     coordinates in the default 'X' and 'Y' columns will be used to
@@ -9410,7 +9482,54 @@ the use of CFITSIO.
 
 \section{Optimization Strategies}
 
-1.  When dealing with a FITS primary array or IMAGE extension, it is
+1.  Because the data in FITS files is always stored in "big-endian" byte order,
+where the first byte of numeric values contains the most significant bits and the
+last byte contains the least significant bits, CFITSIO must swap the order of the bytes
+when reading or writing FITS files when running on little-endian machines (e.g.,
+Linux and Microsoft Windows operating systems running on PCs with x86 CPUs).
+
+On fairly new CPUs that support "SSSE3" machine instructions
+(e.g., starting with Intel Core 2 CPUs in 2007, and in AMD CPUs
+beginning in 2011) significantly faster 4-byte and 8-byte swapping
+algorithms are available. These faster byte swapping functions are
+not used by default in CFITSIO (because of the potential code
+portablility issues), but users can enable them on supported
+platforms by adding the appropriate compiler flags (-mssse3 with gcc
+or icc on linux) when compiling the swapproc.c source file, which will
+allow the compiler to generate code using the SSSE3 instruction set.
+A convenient way to do this is to configure the CFITSIO library
+with the following command:
+
+\begin{verbatim}
+  >  ./configure --enable-ssse3
+\end{verbatim}
+Note, however, that a binary executable file that is
+created using these faster functions will only run on
+machines that support the SSSE3 machine instructions. It will
+crash on machines that do not support them.
+
+For faster 2-byte swaps on virtually all x86-64 CPUs (even those that
+do not support SSSE3), a variant using only SSE2 instructions exists.
+SSE2 is enabled by default on x86\_64 CPUs with 64-bit operating systems
+(and is also automatically enabled by the --enable-ssse3 flag).
+When running on x86\_64 CPUs with 32-bit operating systems, these faster
+2-byte swapping algorithms are not used by default in CFITSIO, but can be
+enabled explicitly with:
+
+\begin{verbatim}
+./configure --enable-sse2
+\end{verbatim}
+Preliminary testing indicates that these SSSE3 and SSE2 based
+byte-swapping algorithms can boost the CFITSIO performance when
+reading or writing FITS images by 20\% - 30\% or more.
+It is important to note, however, that compiler optimization must be
+turned on (e.g., by using the -O1 or -O2 flags in gcc) when building
+programs that use these fast byte-swapping algorithms in order
+to reap the full benefit of the SSSE3 and SSE2 instructions; without
+optimization, the code may actually run slower than when using
+more traditional byte-swapping techniques.
+
+2.  When dealing with a FITS primary array or IMAGE extension, it is
 more efficient to read or write large chunks of the  image at a time
 (at least 3 FITS blocks = 8640 bytes) so that the direct IO mechanism
 will be used as described in the previous section.  Smaller chunks of
@@ -9422,7 +9541,7 @@ possible, however, if the array becomes so large that the operating
 system cannot store it all in RAM, then the performance may be degraded
 because of the increased swapping of virtual memory to disk.
 
-2.  When dealing with FITS tables, the most important efficiency factor
+3.  When dealing with FITS tables, the most important efficiency factor
 in the software design is to read or write the data in the FITS file in
 a single pass through the file.  An example of poor program design
 would be to read a large, 3-column table by sequentially reading the
@@ -9459,41 +9578,41 @@ to be loaded into the IO buffers displacing data from the original
 table, and should be avoided during the critical period while the table
 is being read or written.
 
-3.  Use the CFITSIO Iterator routine.  This routine provides a
+4.  Use the CFITSIO Iterator routine.  This routine provides a
 more `object oriented' way of reading and writing FITS files
 which automatically uses the most appropriate data buffer size
 to achieve the maximum I/O throughput.
 
-4.  Use binary table extensions rather than ASCII table
+5.  Use binary table extensions rather than ASCII table
 extensions for better efficiency  when dealing with tabular data.  The
 I/O to ASCII tables is slower because of the overhead in formatting or
 parsing the ASCII data fields and because ASCII tables are about twice
-as large as binary tables with the same information content.
+as large as binary tables that have the same information content.
 
-5. Design software so that it reads the FITS header keywords in the
+6. Design software so that it reads the FITS header keywords in the
 same order in which they occur in the file.  When reading keywords,
 CFITSIO searches forward starting from the position of the last keyword
 that was read.  If it reaches the end of the header without finding the
 keyword, it then goes back to the start of the header and continues the
 search down to the position where it started.  In practice, as long as
 the entire FITS header can fit at one time in the available internal IO
-buffers, then the header keyword access will be very fast and it makes
+buffers, then the header keyword access will be relatively fast and it makes
 little difference which order they are accessed.
 
-6. Avoid the use of scaling (by using the BSCALE and BZERO or TSCAL and
+7. Avoid the use of scaling (by using the BSCALE and BZERO or TSCAL and
 TZERO keywords) in FITS files since the scaling operations add to the
 processing time needed to read or write the data.  In some cases it may
 be more efficient to temporarily turn off the scaling (using fits\_set\_bscale or
 fits\_set\_tscale) and then read or write the raw unscaled values in the FITS
 file.
 
-7. Avoid using the `implicit data type conversion' capability in
+8. Avoid using the `implicit data type conversion' capability in
 CFITSIO.  For instance, when reading a FITS image with BITPIX = -32
 (32-bit floating point pixels), read the data into a single precision
 floating point data array in the program.  Forcing CFITSIO to convert
 the data to a different data type can slow the program.
 
-8. Where feasible, design FITS binary tables using vector column
+9. Where feasible, design FITS binary tables using vector column
 elements so that the data are written as a contiguous set of bytes,
 rather than as single elements in multiple rows.  For example, it is
 faster to access the data in a table that contains a single row
@@ -9507,12 +9626,12 @@ in the first column is interleaved with the integer value in the second
 column of the same row so CFITSIO has to explicitly move to the
 position of each element to be read or written.
 
-9. Avoid the use of variable length vector columns in binary tables,
+10. Avoid the use of variable length vector columns in binary tables,
 since any reading or writing of these data requires that CFITSIO first
 look up or compute the starting address of each row of data in the
 heap.  In practice, this is probably not a significant efficiency issue.
 
-10. When copying data from one FITS table to another, it is faster to
+11. When copying data from one FITS table to another, it is faster to
 transfer the raw bytes instead of reading then writing each column of
 the table.  The CFITSIO routines fits\_read\_tblbytes and
 fits\_write\_tblbytes will perform low-level reads or writes of any
@@ -9530,7 +9649,7 @@ pieces of code and should only be used by programmers who thoroughly
 understand the internal format of the FITS tables they are reading or
 writing.
 
-11. Another strategy for improving the speed of writing a FITS table,
+12. Another strategy for improving the speed of writing a FITS table,
 similar to the previous one, is to directly construct the entire byte
 stream for a whole table row (or multiple rows) within the application
 program and then write it to the FITS file with
@@ -9541,8 +9660,8 @@ difficult to understand and maintain, and it makes the code more system
 dependent (e.g., do the bytes need to be swapped before writing to the
 FITS file?).
 
-12.  Finally, external factors such as the speed of the magnetic disk,
-the size of the disk cache, the amount of disk fragmentation, and the amount of
+13.  Finally, external factors such as the speed of the data storage device,
+the size of the data cache, the amount of disk fragmentation, and the amount of
 RAM available on the system can all have a significant impact on
 overall I/O efficiency.  For critical applications, the entire hardware
 and software system should be reviewed to identify any
@@ -9665,6 +9784,7 @@ fits\_insert\_key\_null   & \pageref{ffikyu} \\
 fits\_insert\_key\_TYP    & \pageref{ffikyx} \\
 fits\_insert\_record     & \pageref{ffirec} \\
 fits\_insert\_rows  & \pageref{ffirow} \\
+fits\_is\_reentrant  & \pageref{reentrant} \\
 fits\_iterate\_data   & \pageref{ffiter} \\
 fits\_make\_hist  & \pageref{makehist} \\
 fits\_make\_keyn      & \pageref{ffkeyn} \\
@@ -9703,10 +9823,9 @@ fits\_read\_atblhdr      & \pageref{ffghtb} \\
 fits\_read\_btblhdr      & \pageref{ffghbn} \\
 fits\_read\_card         & \pageref{ffgcrd} \\
 fits\_read\_col        & \pageref{ffgcv} \\
-fits\_read\_col\_bit\_ & \pageref{ffgcx} \\
-
 \end{tabular}
 \begin{tabular}{lr}
+fits\_read\_col\_bit\_ & \pageref{ffgcx} \\
 fits\_read\_col\_TYP    & \pageref{ffgcvx} \\
 fits\_read\_colnull    & \pageref{ffgcf} \\
 fits\_read\_colnull\_TYP    & \pageref{ffgcfx} \\
@@ -9754,10 +9873,9 @@ fits\_set\_btblnull   & \pageref{fftnul} \\
 fits\_set\_compression\_type  & \pageref{ffsetcomp} \\
 fits\_set\_hdrsize    & \pageref{ffhdef} \\
 fits\_set\_hdustruc   & \pageref{ffrdef} \\
-fits\_set\_imgnull    & \pageref{ffpnul} \\
-
 \end{tabular}
 \begin{tabular}{lr}
+fits\_set\_imgnull    & \pageref{ffpnul} \\
 fits\_set\_noise\_bits  & \pageref{ffsetcomp} \\
 fits\_set\_tile\_dim  & \pageref{ffsetcomp} \\
 fits\_set\_tscale     & \pageref{fftscl} \\
@@ -9805,12 +9923,10 @@ fits\_write\_grppar\_TYP & \pageref{ffpgpx} \\
 fits\_write\_hdu       & \pageref{ffwrhdu} \\
 fits\_write\_history      & \pageref{ffphis} \\
 fits\_write\_img        & \pageref{ffppr} \\
-fits\_write\_img\_null & \pageref{ffppru} \\
-
 \end{tabular}
 \newpage
 \begin{tabular}{lr}
-
+fits\_write\_img\_null & \pageref{ffppru} \\
 fits\_write\_img\_TYP    & \pageref{ffpprx} \\
 fits\_write\_imghdr       & \pageref{ffphps} \\
 fits\_write\_imgnull     & \pageref{ffppn} \\
@@ -9837,7 +9953,6 @@ fits\_write\_tdim         & \pageref{ffptdm} \\
 fits\_write\_theap    & \pageref{ffpthp} \\
 \end{tabular}
 \newpage
-
 \begin{tabular}{lr}
 ffasfm    & \pageref{ffasfm} \\
 ffbnfm   & \pageref{ffbnfm} \\

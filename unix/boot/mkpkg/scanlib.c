@@ -2,6 +2,10 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
 
 #include <ar.h>
 #ifdef MACOSX
@@ -14,7 +18,7 @@
 #include "mkpkg.h"
 #include "extern.h"
 
-#ifdef  MACOSX
+#ifdef  OLD_MACOSX
 #define AR_EFMT1	1
 #endif
 
@@ -46,11 +50,18 @@ struct	dbentry {			/* module entry on disk		*/
 };
 
 
+/**
+ *  Local procedure declarations.
+ */
+int mlb_setdate (char *modname, long fdate);
+
+
+
 /* SCANLIBRARY -- Scan the archive file, extract module names and dates,
  * building the "ar" module list.
  */
-h_scanlibrary (library)
-char	*library;
+int
+h_scanlibrary (char *library)
 {
 	register char	*ip, *op;
 	register int	i, is_fat = 0;
@@ -71,6 +82,7 @@ char	*library;
 	mlb_op = 1;
 	nmodules = 0;
 
+	len = 0;
 	for (i=0;  i < MAX_LIBFILES;  i++)
 	    mlb_index[i] = 0;
 
@@ -114,7 +126,7 @@ char	*library;
 		 * nfat_arch field in Intel systems.  Assumes we'll never
 		 * see more that 8-bits worth of architectures. 8-)
 		 */
-	    	ip = &fh, ip += 7;
+	    	ip = (char *) &fh, ip += 7;
 		memmove (&narch, ip, 1);
 		for (i=0; i < narch; i++) {	    /* skip headers */
 		    memset (&fa, 0, sizeof(struct fat_arch));
@@ -184,9 +196,10 @@ char	*library;
 		        len = atoi(&arf.ar_name[3]);
 	                bzero (p, SZ_PATHNAME);
 		        if (fread(p, len, 1, fp) != 1) {
-		            fprintf (stderr, "%s: premature EOF");
+		            fprintf (stderr, "%s: premature EOF", libfname);
 		        }
-		        sprintf (modname, "%s\0", p);
+	                bzero (modname, SZ_KEY+1);
+		        sprintf (modname, "%s", p);
 	        } else 
 		    len = 0;
 #endif
@@ -231,8 +244,7 @@ err:
  * to get the update date of a library module.
  */
 long
-h_ardate (fname)
-char	*fname;
+h_ardate (char *fname)
 {
 	extern	char *makeobj();
 	long	mlb_getdate();
@@ -244,9 +256,11 @@ char	*fname;
 /* MLB_SETDATE -- Enter the given module and file date into the symbol table,
  * or update the file date if the module is already present in the table.
  */
-mlb_setdate (modname, fdate)
-char	*modname;		/* module name		*/
-long	fdate;			/* object file date	*/
+int
+mlb_setdate (
+  char	*modname,		/* module name		*/
+  long	fdate 			/* object file date	*/
+)
 {
 	register int	hashval, keylen, i;
 	register char	*ip;
@@ -309,8 +323,7 @@ long	fdate;			/* object file date	*/
  * Return zero if the module is not found.
  */
 long
-mlb_getdate (modname)
-char	*modname;
+mlb_getdate (char *modname)
 {
 	register int	hashval, keylen, i;
 	register char	*ip;

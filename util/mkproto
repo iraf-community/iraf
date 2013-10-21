@@ -1,67 +1,76 @@
-#!/bin/csh -f
+#!/bin/bash
 #
 #  MKPROTO -- Generate the VOS prototype definitions.
 
-unalias  chdir ls egrep wc rm
+
+vos_dir="sys"
+math_dir=""
+xtools_dir="pkg/xtools"
+ds_dir="pkg/images/tv/display pkg/images/tv/wcslab"
+
+#vosdirs="$vos_dir $math_dir $ds_dir"
+vosdirs="$vos_dir $math_dir $xtools_dir $ds_dir"
+
+curdir=`pwd`
+tproto=/tmp/_vosproto.$$
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
 
 
-set vos_dir	= "sys"
-#set math_dir	= "math"
-set math_dir	= ""
-set xtools_dir	= "pkg/xtools"
-set ds_dir	= "pkg/images/tv/display pkg/images/tv/wcslab"
-
-#set vosdirs	= "$vos_dir $math_dir $ds_dir"
-set vosdirs	= "$vos_dir $math_dir $xtools_dir $ds_dir"
-
-set curdir	= `echo $cwd`
-set tproto	= /tmp/_vosproto.$$
-
-
-foreach d ($vosdirs)
+for d in ${vosdirs[@]}; do
 
     # Process each of the subdirectories.
     #
-    foreach sd (`find $d -type d -print`)
+    sdirs=`find $d -type d -print`
+    for sd in ${sdirs[@]}; do
 
 	# Skip the IMFORT library and any documentation directories
-	if ($sd:t != "doc" && "`echo $sd | egrep -e imfort`" == "" && \
-			      "`echo $sd | egrep -e osb`" == "" && \
-			      "`echo $sd | egrep -e memdbg`" == "" && \
-			      "`echo $sd | egrep -e nspp`" == "") then
+	fname=${sd##*/}
+	if [ $fname != "doc" -a -n "`/bin/echo $sd | egrep -e imfort`" -a \
+			        -n "`/bin/echo $sd | egrep -e osb`"    -a \
+			        -n "`/bin/echo $sd | egrep -e memdbg`" -a \
+			        -n "`/bin/echo $sd | egrep -e nspp`" ]; then
 
-	    chdir $sd					# go to subdirectory
+	    cd $sd					# go to subdirectory
 
-	    set nf = `ls -1 | egrep -e "\.f" | wc -l`	# nfiles to process
-	    set nx = `ls -1 | egrep -e "\.x" | wc -l`	# nfiles to process
+	    nf=`ls -1 | egrep -e "\.f" | wc -l`	# nfiles to process
+	    nx=`ls -1 | egrep -e "\.x" | wc -l`	# nfiles to process
 
-	    echo "Processing: "$nx"	"$nf"	"$sd
-	    if ($nf > 0 || $nx > 0) then
+	    /bin/echo "Processing: "$nx"	"$nf"	"$sd
+	    if (( $nf>0 -o $nx>0 )); then
 
 		# Skip any files beginning with the letters 'zz', e.g. test
 		# files like zzdebug.x
 
-	 	foreach f ( [a-z][a-y]*.[xf] )
-		    if ($f != 'intrp.f' &&   \
-		 	$f != 'xtpmmap.x' && \
-		 	$f != 'ytpmmap.x') then
-	                    xc -c -/P $f  >& /dev/null	# make prototype
+	 	fils=( `/bin/ls -1 [a-z][a-y]*.[xf]` )
+	 	for f in ${fils[@]}; do
+		    if [ $f != "intrp.f" -a   \
+		 	 $f != "xtpmmap.x" -a \
+		 	 $f != "ytpmmap.x" ]; then
+	                    xc -c -/P $f >> /dev/null 2>&1	# make prototype
 		    else
-		        echo "    Skipping  " $f
-		    endif
-		end
+		        /bin/echo "    Skipping  " $f
+		    fi
+		done
 
 	        egrep -h ^extern *.P >> $tproto		# save prototypes
-	        /bin/rm -f *.[oP]    >& /dev/null	# clean up
-	    endif
-
-	    chdir $curdir				# back to top
-
+	        /bin/rm -f *.[oP]    >> /dev/null 2>&1	# clean up
+	    fi
+	    cd $curdir				# back to top
 	else
-            echo "    Skipping  " $sd
-	endif
-    end
-end
+            /bin/echo "    Skipping  " $sd
+	fi
+    done
+done
 
 # Sort the prototype file, exclude certain symbols which are duplicates 
 # in the VOS but harmless because they occur in places that never conflict,

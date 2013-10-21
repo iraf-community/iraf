@@ -337,7 +337,7 @@ getweight:
         /* creat a float datatype histogram by default, if weight */
         /* factor is not = 1.0  */
 
-        if (defaulttype && *wt != 1.0)
+        if ( (defaulttype && *wt != 1.0) || (defaulttype && *wtname) )
             *imagetype = TFLOAT;
     }
 

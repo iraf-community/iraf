@@ -21,16 +21,16 @@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 DESTDIR		= 
-CFITSIO_PREFIX	= $(prefix)
-CFITSIO_LIB	= $(DESTDIR)$(exec_prefix)/bin
-CFITSIO_INCLUDE	= $(DESTDIR)$(prefix)/include
-INSTALL_DIRS	= $(DESTDIR)@INSTALL_ROOT@ ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig ${CFITSIO_INCLUDE}
+CFITSIO_LIB	= ${DESTDIR}@libdir@
+CFITSIO_INCLUDE	= ${DESTDIR}@includedir@
+INSTALL_DIRS	= @INSTALL_ROOT@ ${CFITSIO_INCLUDE} ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig
 
 
 SHELL =		/bin/sh
 RANLIB =	@RANLIB@
 CC =		@CC@
 CFLAGS =	@CFLAGS@
+SSE_FLAGS =	@SSE_FLAGS@
 FC =		@FC@
 LDFLAGS =	$(CFLAGS)
 DEFS =		@DEFS@
@@ -40,9 +40,6 @@ BISON =		bison
 
 SHLIB_LD =	@SHLIB_LD@
 SHLIB_SUFFIX =	@SHLIB_SUFFIX@
-
-.c.o:
-		$(CC) -c $(CFLAGS) $(DEFS) $<
 
 
 CORE_SOURCES = 	buffers.c cfileio.c checksum.c drvrfile.c drvrmem.c \
@@ -90,7 +87,7 @@ libcfitsio.a:	${OBJECTS}
 shared: libcfitsio${SHLIB_SUFFIX}
 
 libcfitsio${SHLIB_SUFFIX}: ${OBJECTS}
-		${SHLIB_LD} ${LDFLAGS} -o $@ ${OBJECTS}
+		${SHLIB_LD} ${LDFLAGS} -o $@ ${OBJECTS} -lm ${LIBS}
 
 install:	libcfitsio.a $(INSTALL_DIRS)
 		@if [ -f libcfitsio.a ]; then \
@@ -101,6 +98,12 @@ install:	libcfitsio.a $(INSTALL_DIRS)
 		fi; \
 		/bin/cp fitsio.h fitsio2.h longnam.h drvrsmem.h ${CFITSIO_INCLUDE}/; \
 		/bin/cp cfitsio.pc ${CFITSIO_LIB}/pkgconfig
+
+.c.o:
+		$(CC) -c $(CFLAGS) $(DEFS) $<
+
+swapproc.o:	swapproc.c
+		$(CC) -c $(CFLAGS) $(SSE_FLAGS) $(DEFS) $<
 
 smem:		smem.o libcfitsio.a ${OBJECTS}
 		${CC} $(CFLAGS) $(DEFS) -o smem smem.o -L. -lcfitsio -lm

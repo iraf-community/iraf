@@ -2,7 +2,7 @@
 #	   of execution by each shell
 
 umask 022
-setenv iraf /iraf/iraf/
+setenv iraf /iraf/build/iraf/
 setenv IRAFARCH  `$iraf/unix/hlib/irafarch.csh -actual`
 source $iraf/unix/hlib/irafuser.csh
 
