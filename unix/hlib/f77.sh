@@ -30,6 +30,17 @@ PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 # the Fortran file has a .F extension.  The modified (no f2ctmp_) behavior is
 # for .f files.
 
+# This f77.sh will modify the IRAF generated files so that the memd struct
+# contains two elements rather than one element.  This is essential to 
+# insure that doubles are aligned on 128 byte boundaries, which is necessary
+# for gcc 4.8 to correctly generate instructions with SSE2.
+#
+# Also note that config.h has to also have the memory alignment set so that
+# doubles are aligned against 128-bit boundaries.
+#
+# This was the reported with Mageia bug #11507
+# https://bugs.mageia.org/show_bug.cgi?id=11507
+
 s=/tmp/stderr_$$
 t=/tmp/f77_$$
 #CC=${CC_f2c:-'/usr/bin/cc -m486'}
@@ -197,6 +208,7 @@ do
 		if [ $xsrc = 1 ]; then
 		    sed -e "s/$b\\.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
 		fi
+		sed -i -e "s/memd\[1\]/memd\[2\]/" $b.c
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
@@ -224,6 +236,7 @@ do
 		if [ -f f2ctmp_$b.P ]; then mv f2ctmp_$b.P $b.P; fi
 		case $? in 0);; *) rm -f $b.c ; exit 5;; esac
                 trap "rm -f $s ; exit 4" 0
+		sed -i -e "s/memd\[1\]/memd\[2\]/" $b.c
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
@@ -241,6 +254,7 @@ do
 		case $? in 0);; *) exit;; esac
 		$F2C $F2CFLAGS $b.f
 		case $? in 0);; *) exit;; esac
+		sed -i -e "s/memd\[1\]/memd\[2\]/" $b.c
                 $CC -c $CFLAGS $b.c
 		case $? in 0);; *) exit;; esac
 		OFILES="$OFILES $b.o"
