@@ -18,8 +18,8 @@ IMOFNLS opens the list sorted, whereas IMOFNLU opens it unsorted.  Both std.
 and user header keywords are included in the list.
 .endhelp ---------------------------------------------------------------------
 
-define	MAX_FIELDS	1024
-define	SZ_SBUF		8192
+define	MAX_FIELDS	2048
+define	SZ_SBUF		16384
 define	LEN_FNSTRUCT	(10+MAX_FIELDS)
 
 define	FN_NENTRIES	Memi[$1]	# number of field names in list
