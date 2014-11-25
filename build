@@ -11,7 +11,7 @@ setenv XC_LFLAGS "-g"
 source build.setup
 
 # this is to put GNU ranlib/libtools on PATH for 10.7 builds
-setenv PATH "/usr/local/binutils/bin:$PATH"
+#setenv PATH "/usr/local/binutils/bin:$PATH"
 
 env | sort
 pwd
