@@ -25,12 +25,12 @@ done
 
 if test "$IRAFARCH" = "macosx"; then
     $CC -c -O -DMACOSX -w -Wunused -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
-    libtool -a -T -o libos.a zsvjmp.o
-    #ar r libos.a zsvjmp.o
+    #libtool -a -T -o libos.a zsvjmp.o
+    ar r libos.a zsvjmp.o
     rm -f zsvjmp.o zmain.o
-    libtool -a -T -o libos.a libos.a *.o
-    #ar r libos.a *.o
-    #ranlib libos.a
+    #libtool -a -T -o libos.a libos.a *.o
+    ar r libos.a *.o
+    ranlib libos.a
 
 else
     rm -f zmain.o
