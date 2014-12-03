@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -v
 #
 # See BUILD_NOTES for details
 #
@@ -6,8 +6,6 @@
 
 # try to force debugging
 #   to build IRAF statically, add -static -static-libgcc to XC_LFLAGS
-
-set -x
 
 setenv XC_LFLAGS "-g"
 
@@ -17,7 +15,7 @@ source build.setup
 #setenv PATH "/usr/local/binutils/bin:$PATH"
 
 mkdir $iraf/tmp_bin
-echo '#!/bin/sh' > $iraf/tmp_bin/ranlib
+echo '#\!/bin/sh' > $iraf/tmp_bin/ranlib
 echo 'exit 0' > $iraf/tmp_bin/ranlib
 chmod +x $iraf/tmp_bin/ranlib
 setenv PATH $iraf/tmp_bin:$PATH
