@@ -41,7 +41,8 @@ case Darwin.64:
 	breaksw
 
 case Darwin.32:
-	setenv IRAFARCH macosx
+	#setenv IRAFARCH macosx
+    setenv IRAFARCH macintel
 	setenv CFLAGS -m32 
 	setenv CXXFLAGS -m32 
 	breaksw
