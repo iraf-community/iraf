@@ -6,6 +6,9 @@
 
 # try to force debugging
 #   to build IRAF statically, add -static -static-libgcc to XC_LFLAGS
+
+set -x
+
 setenv XC_LFLAGS "-g"
 
 source build.setup
