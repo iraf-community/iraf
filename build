@@ -1,4 +1,4 @@
-#!/bin/csh -v
+#!/bin/csh
 #
 # See BUILD_NOTES for details
 #
@@ -14,14 +14,16 @@ source build.setup
 # this is to put GNU ranlib/libtools on PATH for 10.7 builds
 #setenv PATH "/usr/local/binutils/bin:$PATH"
 
-mkdir $iraf/tmp_bin
-echo '#\!/bin/sh' > $iraf/tmp_bin/ranlib
-echo 'exit 0' > $iraf/tmp_bin/ranlib
-chmod +x $iraf/tmp_bin/ranlib
-setenv PATH $iraf/tmp_bin:$PATH
+#mkdir $iraf/tmp_bin
+#echo '#\!/bin/sh' > $iraf/tmp_bin/ranlib
+#echo 'exit 0' > $iraf/tmp_bin/ranlib
+#chmod +x $iraf/tmp_bin/ranlib
+#setenv PATH $iraf/tmp_bin:$PATH
 
 env | sort
 pwd
+
+which ranlib
 
 # Record determination of IRAFARCH for later use by ur-sel-real,
 # ur_normalize etc. Also note that IRAF 2.15 now has a helper script

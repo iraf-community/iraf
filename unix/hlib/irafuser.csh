@@ -65,7 +65,7 @@ setenv	tmp	/tmp/
 setenv	CC	gcc
 setenv	F77	$hlib/f77.sh
 setenv	F2C	$hbin/f2c.e
-setenv	RANLIB	ranlib
+#setenv	RANLIB	ranlib
 
 switch ($MACH)
 case freebsd:
