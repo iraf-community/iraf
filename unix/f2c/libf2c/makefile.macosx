@@ -75,7 +75,7 @@ all: f2c.h signal1.h sysdep1.h libf2c.a
 libf2c.a: $(OFILES)
 	#ar r libf2c.a $?
 	libtool -o libf2c.a *.o
-	libf2c.a
+	-ranlib libf2c.a
 	/bin/rm -f *.o
 
 ## Shared-library variant: the following rule works on Linux
@@ -122,7 +122,7 @@ sysdep1.h: sysdep1.h0
 
 install: libf2c.a
 	cp libf2c.a $(LIBDIR)
-	 $(LIBDIR)/libf2c.a
+	-ranlib $(LIBDIR)/libf2c.a
 
 clean:
 	rm -f libf2c.a *.o arith.h signal1.h sysdep1.h
