@@ -100,6 +100,12 @@ else
 fi
 imdir=$imdir/
 
+# IRAF 2.16 now also has this cachedir, which doesn't seem very consequential
+# for our purposes (maybe for VO) but defaults to /tmp in mkiraf.csh when
+# there is no writeable /iraf/cache, as in Ureka:
+
+cachedir=/tmp/
+
 # make a sed script that hacks up login.cl
 # JT: the original cl.csh also substitutes U_UPARM below, but uparm is
 # already set to home$uparm/ by default in login.cl.
@@ -109,6 +115,7 @@ s?U_TERM?$termtype?g
 s?U_HOME?$irafhome?g
 s?U_IMDIR?$imdir?g
 s?U_USER?$USER?g
+s?U_CACHEDIR?$cachedir?g
 ARF
 
 # do it

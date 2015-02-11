@@ -1200,7 +1200,7 @@ set hlib	= `echo $hlib | sed -e 's+/\(["]*\)$+\1+'`
 set BINDIRS	= "$hbin $hlib $fbin $host"
 
 # The following file lists are partially system dependent.
-set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
+set PATHFILES	= "libc/iraf.h"
 set MODEFILES	= "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot irafarch.csh"
 set CMDLINKS	= "ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
