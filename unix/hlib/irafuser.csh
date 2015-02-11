@@ -1,6 +1,14 @@
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
+# In Ureka we don't use this script -- the environment should already be
+# configured as needed by ur_setup (for sh or csh) and the settings here are
+# NOT valid for the Ureka enviroment. We therefore just tell the user this
+# and exit; the remainder of this script is kept in its original form,
+# however, in case someone really wants to refer to it.
+echo "irafuser.csh: this script is not used in Ureka; run ur_setup instead" \
+    > /dev/stderr
+exit 1
 
 set old_method		= 0
 
