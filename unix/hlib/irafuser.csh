@@ -8,7 +8,17 @@
 # however, in case someone really wants to refer to it.
 echo "irafuser.csh: this script is not used in Ureka; run ur_setup instead" \
     > /dev/stderr
-exit 1
+
+# Exit without running the original script but only indicate failure if
+# ur_setup hasn't already been run, so as not to break any existing IRAF site
+# admin scripts unnecessarily.
+if ($?UR_DIR && $?iraf) then
+    exit 0
+else
+    exit 1
+endif
+
+# The original script continues below here.
 
 set old_method		= 0
 
