@@ -1,21 +1,33 @@
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
-# In Ureka we don't use this script -- the environment should already be
-# configured as needed by ur_setup (for sh or csh) and the settings here are
-# NOT valid for the Ureka enviroment. We therefore just tell the user this
-# and exit; the remainder of this script is kept in its original form,
-# however, in case someone really wants to refer to it.
-echo "irafuser.csh: this script is not used in Ureka; run ur_setup instead" \
-    > /dev/stderr
+# In Ureka we don't use this script once our build is complete -- the
+# environment should already be configured as needed by ur_setup (for sh or
+# csh) and the settings here are NOT valid for the relocated Ureka enviroment.
+# We therefore just tell the user this and exit; the remainder of this script
+# is kept in its original form and can still be executed if really needed by
+# setting UR_IRAFUSER=1.
 
-# Exit without running the original script but only indicate failure if
-# ur_setup hasn't already been run, so as not to break any existing IRAF site
-# admin scripts unnecessarily.
-if ($?UR_DIR && $?iraf) then
-    exit 0
+if ($?UR_IRAFUSER) then
+    if ($UR_IRAFUSER == 1) then
+        set override = 1
+    else
+        set override = 0
+    endif
 else
-    exit 1
+    set override = 0
+endif
+
+if (! $override) then
+    echo "irafuser.csh: this script is not used in Ureka; run ur_setup instead" > /dev/stderr
+
+    # Only indicate failure if ur_setup hasn't already been run, so as not to
+    # break any existing IRAF site admin scripts unnecessarily.
+    if ($?UR_DIR && $?iraf) then
+        exit 0
+    else
+        exit 1
+    endif
 endif
 
 # The original script continues below here.
