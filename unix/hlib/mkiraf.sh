@@ -100,11 +100,15 @@ else
 fi
 imdir=$imdir/
 
-# IRAF 2.16 now also has this cachedir, which doesn't seem very consequential
-# for our purposes (maybe for VO) but defaults to /tmp in mkiraf.csh when
-# there is no writeable /iraf/cache, as in Ureka:
-
-cachedir=/tmp/
+# IRAF 2.16 now also has a "cache" directory variable, where HTTP downloads
+# are stored for its VO functionality (according to its release notes). We
+# should therefore be replacing U_CACHEDIR in the sed call below with, say,
+# cachedir=/tmp/ (which is what the IRAF installer uses in mkiraf.csh when
+# there's no /iraf directory). However, setting cache = "/tmp/" causes
+# imdelete to crash with segmentation errors(!!) so leave its dummy value in
+# place until we can test a better solution. The value of UR_CACHEDIR does
+# not cause problems with our software but might affect anyone wanting to use
+# IRAF's VO features.
 
 # make a sed script that hacks up login.cl
 # JT: the original cl.csh also substitutes U_UPARM below, but uparm is
@@ -115,7 +119,6 @@ s?U_TERM?$termtype?g
 s?U_HOME?$irafhome?g
 s?U_IMDIR?$imdir?g
 s?U_USER?$USER?g
-s?U_CACHEDIR?$cachedir?g
 ARF
 
 # do it
