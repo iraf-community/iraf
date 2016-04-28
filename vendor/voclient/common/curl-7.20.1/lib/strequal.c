@@ -75,7 +75,10 @@ int curl_strnequal(const char *first, const char *second, size_t max)
 #endif
 }
 
-#ifndef HAVE_STRLCAT
+/* UR: The following is removed as in the patch for curl bug #1192, to avoid
+   a conflict with the standard library on MacOS >= 10.9. /*
+
+/* #ifndef HAVE_STRLCAT */
 /*
  * The strlcat() function appends the NUL-terminated string src to the end
  * of dst. It will append at most size - strlen(dst) - 1 bytes, NUL-termi-
@@ -89,33 +92,33 @@ int curl_strnequal(const char *first, const char *second, size_t max)
  *
  *
  */
-size_t Curl_strlcat(char *dst, const char *src, size_t siz)
-{
-  char *d = dst;
-  const char *s = src;
-  size_t n = siz;
-  union {
-    ssize_t sig;
-     size_t uns;
-  } dlen;
+/* size_t Curl_strlcat(char *dst, const char *src, size_t siz) */
+/* { */
+/*   char *d = dst; */
+/*   const char *s = src; */
+/*   size_t n = siz; */
+/*   union { */
+/*     ssize_t sig; */
+/*      size_t uns; */
+/*   } dlen; */
 
-  /* Find the end of dst and adjust bytes left but don't go past end */
-  while(n-- != 0 && *d != '\0')
-    d++;
-  dlen.sig = d - dst;
-  n = siz - dlen.uns;
+/*   /\* Find the end of dst and adjust bytes left but don't go past end *\/ */
+/*   while(n-- != 0 && *d != '\0') */
+/*     d++; */
+/*   dlen.sig = d - dst; */
+/*   n = siz - dlen.uns; */
 
-  if(n == 0)
-    return(dlen.uns + strlen(s));
-  while(*s != '\0') {
-    if(n != 1) {
-      *d++ = *s;
-      n--;
-    }
-    s++;
-  }
-  *d = '\0';
+/*   if(n == 0) */
+/*     return(dlen.uns + strlen(s)); */
+/*   while(*s != '\0') { */
+/*     if(n != 1) { */
+/*       *d++ = *s; */
+/*       n--; */
+/*     } */
+/*     s++; */
+/*   } */
+/*   *d = '\0'; */
 
-  return(dlen.uns + (s - src));     /* count does not include NUL */
-}
-#endif
+/*   return(dlen.uns + (s - src));     /\* count does not include NUL *\/ */
+/* } */
+/* #endif */
