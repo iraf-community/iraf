@@ -42,8 +42,8 @@ case Darwin.64:
 
 case Darwin.32:
 	setenv IRAFARCH macosx
-	setenv CFLAGS -m32 
-	setenv CXXFLAGS -m32 
+	setenv CFLAGS "-m32 -mmacosx-version-min=10.4"
+	setenv CXXFLAGS "-m32 -mmacosx-version-min=10.4"
 	breaksw
 
 default:

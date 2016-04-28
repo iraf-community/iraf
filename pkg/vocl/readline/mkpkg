@@ -6,7 +6,7 @@ $exit
 libs:
 	$ifnfile (../libreadline.a)
 	    $ifeq (IRAFARCH, macosx) then
-	        !(./configure --disable-dynamic --enable-static CFLAGS="-arch i386")
+	        !(./configure --disable-dynamic --enable-static)
 	        !make libreadline.a >& spool
 	        !mv libreadline.a ../
 	    $else $ifeq (IRAFARCH, macintel) then

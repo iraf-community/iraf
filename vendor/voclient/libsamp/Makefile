@@ -9,8 +9,8 @@
 NAME       	 = samp
 VERSION    	 = 1.0
 PLATFORM  	:= $(shell uname -s)
-#PLMACH  	:= $(shell uname -m)
-PLMACH  	:= $(shell ../getarch)
+PLMACH  	:= $(shell uname -m)
+PLBITS  	:= $(shell ../getarch -nbits)  # UR
 HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
@@ -30,7 +30,7 @@ CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
 ifeq ("$(PLATFORM)", "Darwin")
-    ifeq  ("$(PLMACH)", "macintel")
+    ifeq  ("$(PLBITS)", "64")  # Base on IRAFARCH for UR, rather than OS bits
 	CARCH	= -mmacosx-version-min=10.5
     else
         CARCH   = -arch i386 -mmacosx-version-min=10.4

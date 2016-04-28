@@ -10,6 +10,7 @@ NAME       	 = VO
 VERSION    	 = 1.0
 PLATFORM  	:= $(shell uname -s)
 PLMACH  	:= $(shell uname -m)
+PLBITS  	:= $(shell ../getarch -nbits)  # UR
 HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
@@ -29,7 +30,15 @@ CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
 CLIBS		= -lm -lc -lcurl -lpthread
-CARCH		= -mmacosx-version-min=10.5
+ifeq  ($(PLATFORM), "Darwin")
+    ifeq  ($(PLBITS), "64")  # Base on IRAFARCH for UR, rather than OS bits
+        CARCH	= -mmacosx-version-min=10.5
+    else
+        CARCH	= -arch i386 -mmacosx-version-min=10.4
+    endif
+else
+    CARCH	= 
+endif
 
 CFLAGS 		= $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 

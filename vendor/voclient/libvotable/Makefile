@@ -10,6 +10,7 @@ NAME       	 = VOTable
 VERSION    	 = 1.1
 PLATFORM  	:= $(shell uname -s)
 PLMACH  	:= $(shell uname -m)
+PLBITS  	:= $(shell ../getarch -nbits)  # UR
 HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
@@ -29,7 +30,7 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 CC 	  	= gcc
 CINCS  	  	= -I$(IRAFINCDIR)  -I$(INCDIR)  -I.
 ifeq  ($(PLATFORM), "Darwin")
-    ifeq  ($(PLMACH), "x86_64")
+    ifeq  ($(PLBITS), "64")  # Base on IRAFARCH for UR, rather than OS bits
 	CARCH	= -mmacosx-version-min=10.5
     else
 	CARCH	= -arch i386 -mmacosx-version-min=10.4

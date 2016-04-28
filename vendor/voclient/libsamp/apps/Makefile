@@ -10,6 +10,7 @@ NAME       	= samp
 VERSION    	= 1.0
 PLATFORM       := $(shell uname -s)
 PLMACH	       := $(shell uname -m)
+PLBITS  	:= $(shell ../../getarch -nbits)  # UR
 HERE           := $(shell /bin/pwd)
 BINDIR          := ../../bin/
 LIBDIR          := ../../lib/
@@ -28,7 +29,7 @@ SHAREDLIB   = $(HERE)/$(LIBBASE).so.$(VERSION)
 
 
 ifeq ($(PLATFORM), "Darwin")
-    ifeq  ($(PLMACH), "x86_64")
+    ifeq  ($(PLBITS), "64")  # Base on IRAFARCH for UR, rather than OS bits
         CARCH   = -m64 -mmacosx-version-min=10.5
     else
         CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4

@@ -33,7 +33,12 @@ if test "$IRAFARCH" = "macosx"; then
 #    libtool -a -T -o libos.a libos.a *.o
 
 
-    $CC -c -O -DMACOSX -w -Wunused -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
+    # UR (JT): I'm not sure why HSI_CF was missing here, for macosx only, but
+    # it causes lots of OS version warnings from clang on 10.10. I've instead
+    # added HSI_LF below, which is a bit of a hack but specifies the correct
+    # architecture without including additional compiler options that might
+    # perhaps have been omitted intentionally to avoid some obscure problem.
+    $CC -c $HSI_LF -O -DMACOSX -w -Wunused -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
     libtool -a -T -o libos.a zsvjmp.o
     rm -f zsvjmp.o zmain.o
     libtool -a -T -o libos.a libos.a *.o

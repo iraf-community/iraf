@@ -16,7 +16,9 @@ st=0
 case "$IRAFARCH"
 in
 macosx)
-	./configure --disable-dynamic --enable-static CFLAGS="-arch i386" > spool.config 2>&1
+	# JT: removed CFLAGS="-arch i386" before the redirect, to get our
+	# global CFLAGS options, avoiding clang OSX version warnings on 10.10.
+	./configure --disable-dynamic --enable-static > spool.config 2>&1
 	;;
 
 macintel)
