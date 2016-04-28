@@ -8,6 +8,9 @@
 /*
  * BITFIELDS.C -- Portable C routines for extracting and inserting small
  * integers into an integer value.
+ *
+ * UR: Removed the last 2 int literals below, which were >2**64, to avoid a
+ *     clang error. For 32-bit binaries, XINT is only 32 bits anyway.
  */
 
 unsigned XINT bitmask[] = {	0,		/* MACHDEP		*/
@@ -32,7 +35,7 @@ unsigned XINT bitmask[] = {	0,		/* MACHDEP		*/
   01777777777777777777,	    03777777777777777777,    07777777777777777777,
   017777777777777777777,    037777777777777777777,   077777777777777777777,
   0177777777777777777777,   0377777777777777777777,  0777777777777777777777,
-  01777777777777777777777,  03777777777777777777777, 07777777777777777777777
+  01777777777777777777777
 };
 
 
