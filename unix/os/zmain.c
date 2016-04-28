@@ -136,6 +136,8 @@ ipc_:
 #if defined(SYSV) || (defined(MACH64) && defined(MACOSX) || defined(IPAD))
 		setpgrp ();
 #else
+		/* UR: must replace setpgrp() with an identical setpgid() call
+		   if using mmacosx-version-min > 10.4 in future */
 		setpgrp (0, jobcode);
 #endif
 
