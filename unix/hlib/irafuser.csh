@@ -117,7 +117,7 @@ case macosx:
     # fail with "Abort" at libsys, preventing almost everything from compiling.
     setenv XC_CFLAGS "-Wno-return-type"
     setenv HSI_CF "-O -DMACOSX -w -Wunused -arch i386 -m32 -mmacosx-version-min=10.4 -Wno-return-type"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386 -/mmacosx-version-min=10.4 -Wno-return-type"
+    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386 -/mmacosx-version-min=10.4 -/Wno-return-type"
     setenv HSI_FF "-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4 -Wno-return-type"
     setenv HSI_LF "-arch i386 -m32 -mmacosx-version-min=10.4"
     setenv HSI_F77LIBS ""
