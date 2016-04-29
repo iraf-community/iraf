@@ -82,7 +82,7 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 #endif
 		    "-lpthread",		/*  4  */
 		    "-lm",			/*  5  */
-		    "",				/*  6  */
+		    "-lrt",			/*  6  */
 		    "",				/*  7  */
 		    "",				/*  8  */
 		    "",				/*  9  */
