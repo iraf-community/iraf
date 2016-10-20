@@ -1,0 +1,87 @@
+^[ 	]*[a-zA-Z0-9_.-]*:$
+^done$
+^\+ mkpkg
+^\+ chmod
+^\+ cd
+^\+ echo 
+^\+ '\['
+^\+ env
+^\+ sort
+^\+ sed
+^\+ mkdir
+^\+ mkiraf
+^\+ touch
+^\+ cl
+^\+ cp 
+^\+ grep
+^\+ diff
+^\+ ur_
+^\+ [A-Za-z0-9_][A-Za-z0-9_]*=[^ 	]
+^\+ :
+^\+ ''
+^\+ rm -rf
+^Warning: library.*not found
+^xc *-
+^ar r 
+^ar rv 
+^ranlib 
+^Updated .* files in 
+^ar: creating
+^[wW]arning.* not found
+^generic -k
+^move .* to 
+^Library .* is up to date
+^Object .* is up to date
+^check out file 
+^check file .* into 
+^deleting any dreg [.]e files
+^archiving and deleting [a-z]* objects[.][.][.]
+^$
+^==============
+^--------------
+^Subdirectory.* is up to date
+^NOTE:  CFITSIO
+^build_stsdas_mkpkg
+^!date$
+^[SMTWTFS][a-z][a-z] .* 201[0-9]$
+^purge directory 
+^delete file
+^!clear;
+^generic uimgmp[.]gx -k -o gen/uimgmp[.]x 
+^generic uimpmp[.]gx -k -o gen/uimpmp[.]x 
+^!/usr/stsci/irafdev/iraf/unix/hlib//mkfloat[.]csh macintel -d lib pkg
+Warning: local variable .* never used
+^!/usr/stsci/irafx/iraf/unix/hlib//mkfloat[.]csh macintel -d lib pkg
+^No match
+^system is already configured for 
+^archiving and deleting [a-z0-9]* objects[.][.][.] restoring archived [a-z0-9]* objects[.][.][.] no object archive found; full sysgen will be needed
+statement not reached
+^ld: warning alignment lost in merging tentative definition _xercom_
+^a - [a-zA-Z0-9_]*[.]o
+^d - [a-zA-Z0-9_]*[.]o
+^install HSI executables
+^       entry    [a-z0-9]*:
+^ld warning: alignment lost in merging tentative definition _xercom_
+^/.*[.]c:[0-9][0-9]*: warning:
+^!/bin/cp[ 	]
+^!cc 
+^!rm 
+^!CFLAGS=
+^checking for .*[.]{3}
+^checking whether .*[.]{3}
+^checking how to .*[.]{3}
+^checking .* usability[.]{3}
+^checking .* presence[.]{3}
+^checking \".*\"...
+^configure: creating
+^config.status: creating
+^make.: Entering
+^make.: Leaving
+^gcc[ 	]
+^cc[ 	]
+^[A-Za-z0-9_-]*[.]c:[0-9][0-9]*: warning:
+^[ 	]*ranlib [A-Za-z0-9_-]*[.]a
+^Warning on line [0-9]
+^libtool[ 	]
+^[A-z/.]*ranlib: .* has no symbols
+^(>[ 	])*SH[ 	]CL

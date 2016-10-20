@@ -26,18 +26,13 @@ $iraf/util/mkclean				# clean old binaries
 NOTE mkpkg.sh
 
 cd $iraf/unix					# NOVOS bootstrap
-source hlib/irafuser.csh
+eval `hlib/setup --csh --level core_build`
 sh -x mkpkg.sh |& tee log.040.NOVOS-boot
-
-if ( "$sm_logs" != "" ) cp log.040.NOVOS-boot $sm_logs
-
 
 NOTE mklibs
 
 cd $iraf/vendor					# UR: build libs in vendor/
 ./mklibs |& tee log.050.00.vendor
-
-if ( "$sm_logs" != "" ) cp log.050.00.vendor $sm_logs
 
 NOTE mkpkg
 
@@ -48,22 +43,16 @@ pwd
 
 mkpkg |& tee log.060.NOVOS
 
-if ( "$sm_logs" != "" ) cp log.060.NOVOS $sm_logs
-
 NOTE mkpkg.sh again
 
 cd $iraf/unix					# VOS bootstrap
-source hlib/irafuser.csh
+eval `hlib/setup --csh --level core_build`  # repeat setup to pick up VOS libs
 sh -x mkpkg.sh |& tee log.070.VOS
-
-if ( "$sm_logs" != "" ) cp log.070.VOS $sm_logs
 
 NOTE mkpkg again
 
 cd $iraf/					# build core system
 mkpkg |& tee log.080.core
-
-if ( "$sm_logs" != "" ) cp log.080.core $sm_logs
 
 NOTE noao
 
@@ -71,15 +60,11 @@ cd $iraf/noao					# build NOAO package
 setenv noao $cwd/
 mkpkg -p noao |& tee log.090.noao
 
-if ( "$sm_logs" != "" ) cp log.090.noao $sm_logs
-
 NOTE vo
 
 cd $iraf/vo					# build VO package
 setenv vo $cwd/
 mkpkg -p vo |& tee log.100.vo
-
-if ( "$sm_logs" != "" ) cp log.100.vo $sm_logs
 
 NOTE 'end'
 

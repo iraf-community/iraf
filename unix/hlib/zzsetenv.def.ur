@@ -125,6 +125,7 @@ set	@iraf$extern/.zzsetenv.def
 #  $iraf/unix/boot/bootlib/envinit.c 
 
 # set     @UR_DIR$/variants/common/extern.pkg
+# set     @UR_DIR_PKG$/extern.pkg
 
-set     @UR_DIR_PKG$/extern.pkg
+set     @IRAF_EXTPKG$
 

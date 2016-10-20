@@ -3,42 +3,50 @@
 # See BUILD_NOTES for details
 #
 # This is a csh script because it uses stuff that comes with IRAF
+# - as of June 2016, it could be converted to sh, since irafuser.csh has been.
 
 # try to force debugging
 #   to build IRAF statically, add -static -static-libgcc to XC_LFLAGS
-
 setenv XC_LFLAGS "-g"
 
-source build.setup
+switch ( $1 )
+case 64:
+        setenv bitsflag ""
+        breaksw
+default:
+        setenv bitsflag "--32"
+        breaksw
+endsw
 
-# this is to put GNU ranlib/libtools on PATH for 10.7 builds
-#setenv PATH "/usr/local/binutils/bin:$PATH"
+# Configure the environment for building IRAF (this is repeated by mksysgen
+# to pick up the VOS libraries, once available):
+eval `unix/hlib/setup --csh --level core_build $bitsflag`
 
-#mkdir $iraf/tmp_bin
-#echo '#\!/bin/sh' > $iraf/tmp_bin/ranlib
-#echo 'exit 0' > $iraf/tmp_bin/ranlib
-#chmod +x $iraf/tmp_bin/ranlib
-#setenv PATH $iraf/tmp_bin:$PATH
+# During the build, we keep IRAF commands that should be on the PATH in
+# bin_directory/, which gets created by ./install below. This later gets
+# replaced by bin/, in the parent directory of the final installation.
+set path = ( $iraf/bin_directory `echo $path | sed 's?/usr/local/bin??' ` )
 
+# Record build environment to help with troubleshooting:
 env | sort
 pwd
-
 which ranlib
+echo
 
-# Record determination of IRAFARCH for later use by ur-sel-real,
-# ur_normalize etc. Also note that IRAF 2.15 now has a helper script
-# hlib/irafarch.csh that we could use to figure out IRAFARCH above.
+# Record determination of IRAFARCH for later use by unix/hlib/setup:
 if (! -e ur) then
     mkdir ur
 endif
 echo $IRAFARCH > ur/irafarch
 
-yes '' | unix/hlib/install
+# Do a temporary in-place "install", mainly to create links in the PATH to
+# IRAF binaries needed during compilation (the "." specifies in-place mode):
+./install $bitsflag .
 
+# Link to some headers needed for compilation, which NOAO IRAF historically
+# installs in an OS directory as root (& others found to be needed):
 rm -rf include ; mkdir include
 
-# cp $iraf/unix/hlib/libc/iraf.h  		include/
-# ln -s $iraf/unix/bin/f2c.h			include/
 ln -s ../unix/hlib/libc/iraf.h			include/  # ur_normalized copy
 ln -s ../unix/bin/f2c.h				include/  # relocatable link
 cp $iraf/unix/hlib/libc/vosproto.h 		include/
@@ -52,37 +60,25 @@ if ( $status != 0 ) then
 	exit 1
 endif
 
-if ( "$sm_logs" != "" ) cp log.010.f2c $sm_logs
-
 ( cd unix/f2c/libf2c ; make -f makefile.u CFLAGS="$CFLAGS" ; cp f2c.h libf2c.a $iraf/unix/bin.$IRAFARCH/ ) >& log.020.libf2c
 if ( $status != 0 ) then
 	echo libf2c compile failed - see log.020.libf2c
 	exit 1
 endif
 
-if ( "$sm_logs" != "" ) cp log.020.libf2c $sm_logs
-
+# Link to the right bin directories & headers for the build platform:
 make $IRAFARCH 
 
-source $iraf/unix/hlib/irafuser.csh
-
-# this is all that "make sysgen" does
+# This is all that "make sysgen" does:
 util/mksysgen >& log.030.mksysgen
 
-if ( "$sm_logs" != "" ) cp log.030.mksysgen $sm_logs
-
+# Check the main build logs for unrecognized errors or warnings (since IRAF
+# compilation doesn't return a reliable exit status):
 tr -d '[\015]' < log.030.mksysgen | egrep -v -f mkpkg_patterns
 set st=$status
 
-# remove proprietary sources from list; ideally we'd do this only if the
-# build succeeds, but that's hard to determine very reliably above
-util/de_numrec local/numrec_list.txt >& log.150.de_numrec
-if ( $status != 0 ) then
-    echo de_numrec failed - see log.150.de_numrec
-    exit 1
-endif
-
-if ( "$sm_logs" != "" ) cp log.150.de_numrec $sm_logs
-
+# Remove an erroneous circular symlink that the build leaves lying around
+# (to prevent conda failing when updating link paths):
+rm -f $iraf/vo/bin.generic/bin.$IRAFARCH
 
 exit $st

@@ -39,13 +39,10 @@ if ($build_cfitsio == 1) then
   (chdir cfitsio ;  make clean 			>>& _spool )
   echo "done"
   echo "results in $cwd/cfitsio/_spool"
-  if ( "$?sm_logs" ) cp cfitsio/_spool $sm_logs/$logpref.10.cfitsio
 
 else
 
-  if ( "$?sm_logs" ) then
-	echo build_cfitsio = $build_cfitsio > $sm_logs/$logpref.10.cfitsio
-  endif
+  echo build_cfitsio = $build_cfitsio
 
 endif
 
@@ -61,13 +58,10 @@ if ($build_readline == 1) then
   (chdir readline ; mkpkg ; make clean 		 >& _spool)
   echo "done"
   echo "results in $cwd/readline/_spool"
-  if ( "$?sm_logs" ) ln readline/_spool $sm_logs/$logpref.20.readline
 
 else
 
-  if ( "$?sm_logs" ) then
-	echo build_readline = $build_readline > $sm_logs/$logpref.20.readline
-  endif
+  echo build_readline = $build_readline
 
 endif
 
@@ -92,12 +86,9 @@ if ($build_voclient == 1) then
   cp -p voclient/lib/libVO.a $top/bin/
   echo "done"
   echo "results in $cwd/voclient/_spool"
-  if ( "$?sm_logs" ) ln voclient/_spool $sm_logs/$logpref.30.voclient
 
 else
 
-  if ( "$?sm_logs" ) then
-	echo build_voclient = $build_voclient > $sm_logs/$logpref.30.voclient
-  endif
+  echo build_voclient = $build_voclient
 
 endif

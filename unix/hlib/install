@@ -25,7 +25,7 @@
 #  Usage:     install [-n] [-r rootdir] [-i imdir] [-b localbindir] \
 #		    [-R oldroot] [-I oldimdir] [-u username (e.g., 'iraf')]
 #		    [-l locallibdir]  [-m mach (e.g., 'sparc', 'ssun') ]
-#		    [-noedit]
+#		    [-noedit] [-defaults]
 #
 #  Example:
 #		% su
@@ -35,6 +35,9 @@
 #
 #  If run with no arguments, INSTALL will make an informed guess and prompt
 #  with this value; type <return> to accept the value, or enter a new value.
+#
+#  For the Ureka/AstroConda build, the "defaults" flag causes the script to
+#  run non-interactively, using default values instead of prompting.
 #
 #  Use "install -n" to do a dry run to see what the would be done, without
 #  actually modifying the host system and IRAF configuration files.  To do the
@@ -311,6 +314,7 @@ endsw
 set W		= '\([ 	"]\)'			# match a blank, tab, or quote
 set TEMP	= "/tmp/iraf_install.$$"
 set exec	= yes
+set prompt_user	= yes
 set user	= iraf
 set port	= 0
 
@@ -492,6 +496,9 @@ while ("$1" != "")
 	endif
 	set user = "$1"
 	breaksw
+    case -defaults:			# don't prompt; just use defaults
+	set prompt_user = no
+	breaksw
     default:
 	ERRMSG  "install: unknown argument $1"
 	goto Usage
@@ -634,7 +641,12 @@ if ("$imdir" == "") then
 imdir_prompt:
     BOLD_ON ; echo -n "Default root image storage directory " ; BOLD_OFF
     echo -n "($d_imdir): "
-    set imdir = "$<"
+    if ("$prompt_user" == "yes") then
+        set imdir = "$<"
+    else
+        set imdir = ""
+        echo
+    endif
     if ("$imdir" == "") then
 	set imdir = "$d_imdir"
     else if ("$imdir" == "quit" || "$imdir" == "q") then
@@ -691,7 +703,12 @@ if ("$cache" == "") then
 cache_prompt:
     BOLD_ON ; echo -n "Default root cache directory " ; BOLD_OFF
     echo -n "($d_cache): "
-    set cache = "$<"
+    if ("$prompt_user" == "yes") then
+        set cache = "$<"
+    else
+        set cache = ""
+        echo
+    endif
     if ("$cache" == "") then
 	set cache = "$d_cache"
     else if ("$cache" == "quit" || "$cache" == "q") then
@@ -745,7 +762,12 @@ if ("$lbin" == "") then
 lbin_prompt:
     BOLD_ON ; echo -n "Local unix commands directory " ; BOLD_OFF
     echo -n "($d_lbin): "
-    set lbin = "$<"
+    if ("$prompt_user" == "yes") then
+        set lbin = "$<"
+    else
+        set lbin = ""
+        echo
+    endif
     if ("$lbin" == "") then
 	set lbin = "$d_lbin"
     else if ("$lbin" == "quit" || "$lbin" == "q") then
@@ -765,7 +787,12 @@ lbin_prompt:
     # Create the local bin directory if it doesn't exist?
     if (! (-e $lbin)) then
   	PROMPT "    Sorry, but $lbin does not exist, create it? "
-        set ans = "$<"
+        if ("$prompt_user" == "yes") then
+            set ans = "$<"
+        else
+            set ans = ""
+            echo
+        endif
 	if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
   	    echo "  Creating directory $lbin..."
 	    if ($exec == yes) then
@@ -807,7 +834,12 @@ if ("$shlib" == "yes") then
 llib_prompt:
         BOLD_ON ; echo -n "Directory for local shared libraries " ; BOLD_OFF
  	echo -n "($d_llib): "
-        set llib = "$<"
+        if ("$prompt_user" == "yes") then
+            set llib = "$<"
+        else
+            set llib = ""
+            echo
+        endif
         if ("$llib" == "") then
             set llib = "$d_llib"
         else if ("$llib" == "quit" || "$llib" == "q") then
@@ -827,7 +859,12 @@ llib_prompt:
         # Create the local lib directory if it doesn't exist?
         if (! (-e $llib)) then
   	    PROMPT "    Sorry, but $llib does not exist, create it? "
-            set ans = "$<"
+            if ("$prompt_user" == "yes") then
+                set ans = "$<"
+            else
+                set ans = ""
+                echo
+            endif
 	    if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
   	        echo "  Creating directory $llib..."
 	        if ($exec == yes) then
@@ -1013,8 +1050,12 @@ echo -n "Checking iraf directory write permissions ...			"
 	    echo -n '***  Would you like to continue with a no-edit install? '
 	    BOLD_OFF
 	    echo -n "(yes) "
-
-            set ans = "$<"
+            if ("$prompt_user" == "yes") then
+                set ans = "$<"
+            else
+                set ans = ""
+                echo
+            endif
             if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
 		set no_edit = 1
 	    else
@@ -1201,7 +1242,7 @@ set BINDIRS	= "$hbin $hlib $fbin $host"
 
 # The following file lists are partially system dependent.
 set PATHFILES	= "libc/iraf.h"
-set MODEFILES	= "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot irafarch.csh"
+set MODEFILES	= "cl.sh fc.csh mkiraf.sh mkfloat.csh mkmlist.csh $host/reboot irafarch.csh"
 set CMDLINKS	= "ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
 
@@ -1234,7 +1275,12 @@ if ($cl_found == 1) then
 	    MSG  ""
 del_cmd_:
 	PROMPT "Do you want to delete commands in the old directory? "
-        set ans = "$<"
+        if ("$prompt_user" == "yes") then
+            set ans = "$<"
+        else
+            set ans = ""
+            echo
+        endif
 
 	if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
 	    NEWLINE
@@ -1290,7 +1336,12 @@ endif
 NEWLINE
 proceed_:
 PROMPT "Proceed with installation? "
-set ans = "$<"
+if ("$prompt_user" == "yes") then
+    set ans = "$<"
+else
+    set ans = ""
+    echo
+endif
 if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
     NEWLINE
 else if ("$ans" == "quit" || "$ans" == "q") then
@@ -1526,10 +1577,10 @@ cd $lbin
 
 rm -f cl ecl generic mkiraf mkpkg rmbin rmfiles rpp rtar sgidispatch wtar xc xpp xyacc
 
-ln -s ../unix/hlib/cl.csh 			cl
-ln -s ../unix/hlib/ecl.csh			ecl
+ln -s ../unix/hlib/cl.sh 			cl
+ln -s ../unix/hlib/ecl.sh			ecl
+ln -s ../unix/hlib/mkiraf.sh		mkiraf
 ln -s ../unix/bin.$IRAFARCH/generic.e		generic
-ln -s ../unix/bin.$IRAFARCH/mkiraf.csh		mkiraf
 ln -s ../unix/bin.$IRAFARCH/mkpkg.e		mkpkg
 ln -s ../unix/bin.$IRAFARCH/rmbin.e		rmbin
 ln -s ../unix/bin.$IRAFARCH/rmfiles.e		rmfiles
@@ -1550,7 +1601,11 @@ if ("$shlib" == "yes") then
 	echo LIBFILES = $LIBFILES
 	if ( "$LIBFILES" != "" ) then
 		echo SOMETHING TO SEE
-		echo $<
+                if ("$prompt_user" == "yes") then
+                    echo $<
+                else
+                    echo
+                endif
 	endif
 
     set err_seen = 0
@@ -1727,7 +1782,12 @@ echo "discussion of IRAF system management, configuration of printers, etc."
 NEWLINE
 post_install_:
 PROMPT "Proceed to post-install configuration stage? "
-set ans = "$<"
+if ("$prompt_user" == "yes") then
+    set ans = "$<"
+else
+    set ans = ""
+    echo
+endif
 if ("$ans" == "" || "$ans" == "y") then
  NEWLINE
  BOLD_ON
@@ -1839,7 +1899,12 @@ if ("$ans" == "" || "$ans" == "y") then
 net_overwrite_:
 	    NEWLINE
 	    PROMPT_N "Overwrite the existing entry with recommended one?"
-	    set ans = "$<"
+            if ("$prompt_user" == "yes") then
+                set ans = "$<"
+            else
+                set ans = ""
+                echo
+            endif
     	    if ("$ans" == "" || "$ans" == "no" || "$ans" == "n") then
 		set overwrite = 0
 	        goto net_check_
@@ -1878,7 +1943,12 @@ net_rec_:
 
 net_proc_:
         PROMPT "Proceed with this entry? "
-        set ans = "$<"
+        if ("$prompt_user" == "yes") then
+            set ans = "$<"
+        else
+            set ans = ""
+            echo
+        endif
         if ("$ans" == "" || "$ans" == "y") then
 	    ;
         else if ("$ans" == "help" || "$ans" == "h" || "$ans" == "?") then
@@ -1894,7 +1964,12 @@ net_proc_:
         else if ("$ans" == "no" || "$ans" == "n") then
 net_edit_:
           PROMPT 'Do you wish to edit the dev$hosts file manually? '
-          set ans = "$<"
+          if ("$prompt_user" == "yes") then
+              set ans = "$<"
+          else
+              set ans = ""
+              echo
+          endif
 
           if ("$ans" == "" || "$ans" == "y") then
 	      if ($?EDITOR) then
@@ -2011,7 +2086,12 @@ net_edit_:
 net_sort_:
 	# See if we want to sort the file.
 	PROMPT "Do you want to sort the hosts file by node name? "
-	set ans = "$<"
+        if ("$prompt_user" == "yes") then
+            set ans = "$<"
+        else
+            set ans = ""
+            echo
+        endif
     	if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
 	    sort /tmp/_hdat$$ >& /tmp/_hsdat$$
     	else if ("$ans" == "no" || "$ans" == "n") then
@@ -2079,7 +2159,12 @@ net_check_:
 net_restart_:
     if ($errstat == 1) then
         PROMPT "Would you like to return to networking setup? "
-        set ans = "$<"
+        if ("$prompt_user" == "yes") then
+            set ans = "$<"
+        else
+            set ans = ""
+            echo
+        endif
 	if ("$ans" == "" || "$ans" == "y" || "$ans" == "yes") then
 	    goto net_conf_
 	else if ("$ans" == "n" || "$ans" == "no") then
@@ -2154,7 +2239,12 @@ NEWLINE
 
 tape_conf_:
 PROMPT "Create a default tapecap file? "
-set ans = "$<"
+if ("$prompt_user" == "yes") then
+    set ans = "$<"
+else
+    set ans = ""
+    echo
+endif
 if ("$ans" == "" || "$ans" == "y") then
 
     # Figure out what the template should be.
@@ -2221,7 +2311,12 @@ tape_link1_:
 
 tape_def_:
     PROMPT 'Do you wish to create a default dev$tapecap link? '
-    set ans = "$<"
+    if ("$prompt_user" == "yes") then
+        set ans = "$<"
+    else
+        set ans = ""
+        echo
+    endif
     if ("$ans" == "" || "$ans" == "y") then
 
         set file1 = $iraf/dev/tapecap
@@ -2559,7 +2654,7 @@ Usage:
     echo "Usage:    install [-n] [-h] [-hl] [-f] [-r rootdir] [-i imdir]"
     echo "              [-b localbindir] [-R oldroot] [-I oldimdir]"
     echo "              [-u username ] [-l locallibdir]  [-m mach ]"
-    echo "              [-noedit]"
+    echo "              [-noedit] [-defaults]"
     echo ""
     echo "    where -n          # no execute"
     echo "          -h          # print this help summary"
@@ -2576,4 +2671,5 @@ Usage:
     echo "          -u          # set username to own files"
     echo "          -m          # set machine type (ssun, redhat, etc)"
     echo "          -noedit     # install but don't edit pathnames"
+    echo "          -defaults   # use defaults instead of prompting"
     exit 0

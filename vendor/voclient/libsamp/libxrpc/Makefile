@@ -53,7 +53,7 @@ install: xrpc
 	(cp libxrpc.a ../libsamp.a)
 	# cp -rp $(INCS) ./include/* ../../include  # tries to copy .svn!
 	cp -p $(INCS) ../../include
-        ( cd include && tar cf - --exclude=".svn" --exclude="curl" * | ( cd ../../../include; tar xf - ) )
+	( cd include && tar cf - --exclude=".svn" --exclude="curl" * | ( cd ../../../include; tar xf - ) )
 
 World:
 everything:

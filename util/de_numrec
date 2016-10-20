@@ -12,10 +12,10 @@ fi
 awk '{ print $1 }' < $inlist | (
 	while read f
 	do
-		egrep "^([#*][ \t]|/[*/])" $f > $f.doc  # keep just comments
-                echo "" >> $f.doc
-                echo "###  Proprietary source code removed  ###" >> $f.doc
-		if rm $f
+		egrep "^([#*][ \t]|/[*/])" "$f" > "$f.doc" # keep just comments
+                echo "" >> "$f.doc"
+                echo "###  Proprietary source code removed  ###" >> "$f.doc"
+		if mv -f "$f.doc" "$f"
 		then
 			:
 		else

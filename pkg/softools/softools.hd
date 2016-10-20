@@ -2,10 +2,12 @@
 
 $help		= "pkg$system/help/"
 $lroff		= "pkg$system/help/lroff/"
+$mkapropos      = "pkg$softools/mkapropos/"
 
 generic		hlp = host$boot/generic/generic.hlp
 hdbexamine	hlp = help$hdbexamine.hlp
 lroff		hlp = lroff$lroff.hlp
+mkapropos	hlp = mkapropos.hlp, src=mkapropos$t_mkapropos.x
 mkhelpdb	hlp = help$mkhelpdb.hlp
 mkmanpage	hlp = mkmanpage.hlp
 mkpkg		hlp = host$boot/mkpkg/mkpkg.hlp

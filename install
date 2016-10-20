@@ -1,0 +1,221 @@
+#!/bin/sh
+#
+# A relatively simple script to copy IRAF to some installation path and create
+# the necessary links to its binaries in the PATH etc., mainly for AstroConda.
+# It is used in packaging our distribution and is not normally needed by end
+# users, who can instead use "conda install iraf" to get a pre-built package.
+#
+# Although there is also a version of NOAO's original installer in unix/hlib,
+# it should not be used with this Ureka/AstroConda version of IRAF, as it does
+# not know how our distribution is structured and has been hacked to perform a
+# specific role in our build process.
+
+# The PATH argument is the destination directory for bin/, iraf/ etc. To get
+# an in-place install during the main IRAF build, just specify "." and only
+# the appropriate subset of steps will be executed.
+usage="Usage: install [--32] PATH"
+
+# Parse argument(s):
+unset dest bitsflag errs
+while [ "$1" != "" ]; do
+    case "$1" in
+        --32) bitsflag="--32"  # force link to 32-bit IRAFARCH even on 64 bits
+            ;;                 # (only needed during the main IRAF build)
+        -*)
+            errs=${errs}1
+            ;;
+        *)
+            if [ "$dest" ]; then
+                errs=${errs}1  # unexpected duplicate arg
+            else
+                dest=$1
+            fi
+	    ;;
+    esac
+    shift
+done
+
+# Show usage message in case of error:
+if [ "$errs" -o ! "$dest" ]; then
+    echo $usage >&2
+    [ "$errs" ] && exit 1 || exit 0
+fi
+
+# Make sure the destination is writeable:
+if [ ! \( -d "$dest" -a -w "$dest" -a -x "$dest" \) ]; then
+    echo "Cannot write files to $dest" >&2
+    exit 1
+fi
+
+# Always create new dirs & files with the expected permissions:
+umask 022
+
+# Remember this working directory (for updating absolute symlinks later):
+src=`pwd`
+
+# Convert $dest to a nominal absolute path:
+dest=`cd $dest && pwd`
+
+# If destination is the CWD, do an in-place "install" for the build process:
+if [ "$dest" == "`pwd`" ]; then
+    iraf=$dest
+    bindir="$iraf/bin_directory"
+    bintoiraf=".."
+    extern=""
+    extern_pkg=""
+
+# Otherwise, copy IRAF (sans proprietary sources) to $dest/iraf:
+else
+    iraf="$dest/iraf"
+    bindir="$dest/bin"
+    bintoiraf="../iraf"
+    extern="$dest/iraf_extern"
+    extern_pkg="$dest/extern.pkg"
+
+    mkdir -p "$iraf"  # (should always succeed after above permissions checks)
+
+    # Fail if any existing IRAF dir isn't empty, to avoid possible mishaps:
+    if [ -n "`ls -A \"$iraf/\"`" ]; then
+        echo "Directory $iraf/ already contains files (aborting)" >&2
+        exit 1
+    fi
+
+    # To keep the usage simple & portable, first copy everything with tar and
+    # then remove any proprietary files (whoever does this install already has
+    # access to the sources anyway). Avoid depending on rsync, which is not
+    # part of the LSB and can sometimes get hung up in my experience (JT).
+    # Tar has an "--exclude" option on both Linux/MacOS that may be faster(?).
+
+    echo "Copy IRAF tree to $iraf ..."
+    if ! tar cf - ./ | (cd "$iraf" && tar xf -); then
+	echo "  Copying $iraf/ with tar failed" >&2
+        exit 1
+    fi
+
+    # Work in target directory from now on:
+    cd "$iraf" || exit 1  # should never fail but wouldn't want to continue...
+
+    echo "Remove version control files ..."
+    # Using "-depth" avoids errors from find deleting dirs before processing
+    # their contents (the native "-delete" doesn't work on non-empty dirs):
+    find . -depth -type d -name ".svn" -exec rm -fr {} \;
+    
+    echo "Remove proprietary source code ..."
+    if ! util/de_numrec local/numrec_list.txt; then
+        echo "  Script de_numrec failed (did the build succeed?)" >&2
+        exit 1
+    fi
+
+    echo "Remove temporary (build-time) irafbin/ ..."
+    [ -d bin_directory ] && rm -fr bin_directory
+
+fi
+
+# This $iraf path is needed by a couple of scripts below:
+export iraf
+
+# These were originally $iraf, $imdir & $cache in mkiraf.csh, cl.csh &
+# libc/iraf.h but we only actually use the last of these scripts now.
+echo "Update \$iraf definitions in unix/hlib ..."
+if ! unix/hlib/update_paths; then
+    echo "  Script update_paths failed" >&2
+    exit 1
+fi
+
+echo "Update any absolute symbolic links (so conda doesn't fail) ..."
+# (find -lname is not entirely portable but does work on Linux & MacOS)
+find . -type l -lname "/*" | while read name; do
+    errs=""
+    target=`readlink $name | sed -e "s|$src|$iraf|"`
+    rm -f $name || errs=1
+    ln -s $target $name || errs=1
+    [ "$errs" ] && echo "  Warning: failed to update $name" >&2
+done
+
+echo "Ensure bin/ exists ..."
+mkdir -p "$bindir"  # should succeed after above permissions checks
+
+# Use the environment setup script to determine $IRAFARCH for binary links.
+# If IRAF has already been built, the IRAFARCH used will be picked up from
+# ur/irafarch, but $bitsflag is needed for creating links during the build.
+eval `unix/hlib/setup --level run $bitsflag | grep '^export[ 	]*IRAFARCH'`
+
+# Work in bin directory from here on:
+cd "$bindir" || exit 1
+
+hlib="$iraf/unix/hlib"
+
+echo "Create links to IRAF $IRAFARCH binaries in bin/ ..."
+ln -s -f $bintoiraf/unix/hlib/cl.sh                    cl
+ln -s -f $bintoiraf/unix/hlib/mkiraf.sh                mkiraf
+ln -s -f $bintoiraf/unix/hlib/mkmlist.csh              mkmlist
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/generic.e       generic
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/mkpkg.e         mkpkg
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/rmbin.e         rmbin
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/rmfiles.e       rmfiles
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/rpp.e           rpp
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/rtar.e          rtar
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/sgidispatch.e   sgidispatch
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/wtar.e          wtar
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/xc.e            xc
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/xpp.e           xpp
+ln -s -f $bintoiraf/unix/bin.$IRAFARCH/xyacc.e         xyacc
+
+# The IRAF environment setup is invoked automatically by "activate" when using
+# AstroConda, but can also be accessed manually by sourcing scripts generated
+# at this step. Unfortunately, these cannot be made relocatable here, since a
+# sourced script cannot know its own path (unless BASH-only), so just use an
+# absolute path and leave it to the AstroConda build to update as needed:
+echo "Create environment setup wrapper scripts ..."
+if ! $hlib/wrap_setup; then
+    echo "  Script wrap_setup failed" >&2
+    exit 1
+fi
+
+# Ensure $iraf_extern and extern.pkg exist if defined and zzsetenv.def picks
+# up the defs from the latter. Although critical at run-time and for external
+# package builds, I believe these are not needed during the main build (JT).
+if [ "$extern" -o "$extern_pkg" ]; then
+    echo "Ensure iraf_extern/ & extern.pkg exist ..."
+    [ "$extern" ] && mkdir -p "$extern"
+    if [ "$extern_pkg" ]; then
+        if [ ! -e "$extern_pkg" ]; then
+            if ! echo keep > "$extern_pkg"; then
+                echo "  Failed to create extern.pkg" >&2
+                exit 1
+            fi
+        fi
+        echo "Replace zzsetenv.def with a copy that includes \$IRAF_EXTPKG ..."
+        errs=1
+        if [ -f "$hlib/zzsetenv.def.ur" ]; then
+            # Save any existing copy unless not the original:
+            if [ ! -f "$hlib/zzsetenv.def.orig" -a \
+                   -f "$hlib/zzsetenv.def" ]; then
+                mv $hlib/zzsetenv.def $hlib/zzsetenv.def.orig
+            fi
+            # (I think this version causes compilation to crash if used before
+            # our extern.pkg is created outside the IRAF tree)
+            cp -f $hlib/zzsetenv.def.ur $hlib/zzsetenv.def && errs=""
+        fi
+        if [ "$errs" ]; then
+            echo "  Failed to replace zzsetenv.def" >&2
+            exit 1
+        fi
+    fi
+fi
+
+# Other possible tasks from hlib/install:
+# - Check file permissions? No, we take care of this above.
+# - Create an $imdir/$cache? But the install is not guaranteed to be writeable.
+# - I think we already put libs directly into lib/ rather than bin.
+# - Should we do anything to help the user maintain a local termcap/graphcap?
+# - We are not configuring dev$hosts (IRAF networking) or dev$tapecap. The
+#   installer mostly adds a hostname following the other examples anyway and
+#   site admins can easily update these files if they know what they are doing.
+# - We're providing display tools & xgterm as part of AstroConda and don't
+#   really need to check that there is one of each thing.
+# - We could consider documenting how to get started with IRAF on the Web pages
+#   if there's time in future. It probably doesn't need to be in the installer.
+
+echo
+

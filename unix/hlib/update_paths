@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# An AstroConda replacement for the section of unix/hlib/install that generates
+# files like iraf.h, cl.csh & mkiraf.csh from templates by substituting /iraf
+# with the actual path to the IRAF tree (since we use a simplified sh "install"
+# script instead of the original).
+
+PATHFILES="libc/iraf.h"
+
+# Template values to replace:
+o_iraf=/iraf/iraf
+o_imdir=/iraf/imdirs
+
+if [ ! -d "$iraf" ]; then
+    echo "Must set \$iraf variable first" 2>&1
+    exit 1
+fi
+
+cd $iraf/unix/hlib || exit 1
+
+# Strip any trailing slash from the substitute value, just to avoid duplicates:
+iraf=`echo $iraf | sed -e 's|/$||'`
+
+# (Re-)generate file(s) from their templates by replacing instances of
+# /iraf/iraf and /iraf/imdirs with the actual path to the IRAF tree:
+st=0
+for f in $PATHFILES; do
+    sed -e "s|\([ 	\"]\)$o_iraf|\1$iraf|" \
+	-e "s|\([ 	\"]\)$o_imdir|\1$imdir|" $f.in  > $f || st=1
+    chmod 755 $f || st=1
+done
+
+# Propagate any errors encountered to the caller:
+exit $st
+

@@ -1,0 +1,386 @@
+#!/bin/sh
+#
+# A script to determine the environment for running & compiling IRAF tasks,
+# primarily for use in AstroConda. This does not configure the environment
+# directly; it outputs shell commands for use by other scripts, such as
+# bin/iraf_setup.sh in the installation path.
+
+usage="Usage: setup [--sh] [--csh] [--level run|build|core_build] [--32] \
+       [--forget]"
+
+# Settings needed to run IRAF:
+VARS_RUN="IRAFARCH MACH iraf hostid host hlib hbin tmp IRAF_EXTPKG IMTOOLRC"
+
+# Settings needed to build IRAF packages:
+VARS_BUILD="CC F2C F77 RANLIB HSI_CF HSI_FF HSI_XF HSI_LF HSI_F77LIBS \
+            HSI_LFLAGS HSI_LIBS HSI_OSLIBS"
+
+# Variables needed for building IRAF that we don't set routinely because they
+# interfere with compiling other software and/or should not be needed for SPP:
+VARS_CORE_BUILD="XC_CFLAGS XC_FFLAGS XC_LFLAGS CFLAGS CXXFLAGS"
+
+# Remember what $iraf & $IRAFARCH were before running this script:
+old_iraf=$iraf
+old_IRAFARCH=$IRAFARCH
+
+# Determine $iraf and its parent from the location of this script:
+loc=`dirname "$0"`
+iraf=`cd "$loc/../.."; pwd`/                   # guarantee trailing slash
+parent=`echo "$iraf" | sed -e 's|[^/]*/*$||'`  # guarantee trailing slash
+
+# Parse argument(s):
+unset errs shell_type os_bits level
+mode="setup"
+while [ "$1" != "" ]; do
+
+    case "$1" in
+	--sh)
+	    [ "$shell_type" ] && errs=${errs}1
+            shell_type="sh"
+            ;;
+	--csh)
+	    [ "$shell_type" ] && errs=${errs}1
+            shell_type="csh"
+            ;;
+	--level)
+            [ "$level" ] && errs=${errs}1
+            shift
+            level=$1
+            case "$level" in
+                "run"|"build"|"core_build") ;;
+                *) errs=${errs}1 ;;
+            esac
+            ;;
+	--32)
+            os_bits=32
+            ;;
+	--forget)
+            mode="forget"
+            ;;
+        *)
+            errs=${errs}1
+            ;;
+    esac
+    shift
+
+done
+
+# Default to using sh syntax and the "build" level (compiler flags mostly
+# harmless, though not 100%):
+[ -z "$shell_type" ] && shell_type="sh"
+[ -z "$level" ] && level="build"
+
+# Show usage message in case of error:
+if [ "$errs" ]; then
+    echo $usage >&2
+    exit 1
+fi
+
+# These helper functions are vaguely adapted from Ureka's ur-functions script
+# (best avoid making IRAF dependent on definitions in some other package):
+
+env_set() {    # env_set "varnames" (their values should already be defined)
+    for var in $1; do
+        val=`eval "echo \\$$var"`
+        # should this omit any variable whose value is empty?
+        case "$shell_type" in
+        csh)
+            echo setenv $var \'$val\' \;  # '' preserves "" within OLD_IRAF
+            ;;
+        sh)
+            echo export $var=\'$val\' \;
+            ;;
+        esac
+    done
+}
+
+env_unset() {    # env_unset "varnames"
+    case "$shell_type" in
+        csh)	
+            echo 'unsetenv '$1 ';'
+            ;;
+        sh)
+            echo 'unset '$1 ';'
+            ;;
+    esac
+}
+
+alias_set() {    # alias_set alias_name value (an individual alias)
+    case "$shell_type" in
+        csh)
+            echo 'alias ' $1 '"'$2'"' ';'
+            ;;
+        sh)
+            echo alias $1='"'$2'"' ';'
+            ;;
+    esac
+}
+
+alias_unset() {    # alias_unset "alias_names"
+    case "$shell_type" in
+        csh)
+            echo unalias "$1" ';'
+            ;;
+        sh)
+            echo unalias "$1" ' 2>/dev/null || :;' # ignore errs when unset
+            ;;
+    esac
+    
+}
+
+# Determine whether running on Linux or Apple and with how many bits, if not
+# overridden (in practice we currently always force 32-bits for IRAF). These
+# are used to pick the right IRAFARCH, MACH & corresponding compiler flags.
+os_type=`uname -s | tr 'A-Z' 'a-z'`
+if [ -z "$os_bits" ]; then
+    case `uname -m` in
+        i386)              # (on 32-bit Apple)
+            os_bits=32 ;;
+        i686)              # (on 32-bit Linux)
+            os_bits=32 ;;
+        x86_64)            # (on 64-bit Apple & Linux)
+            os_bits=64 ;;
+        *)
+            os_bits=32 ;;  # (default to what we build in practice anyway)
+    esac
+fi
+
+# The run-time value of IRAFARCH needs to match what was actually built
+# (eg. "linux"), rather than the platform we happen to be running on (eg.
+# "linux64"). This information is saved in $iraf/ur/irafarch by the build
+# script. When that file is not available (ie. during the build), we fall
+# back to determining the architecture according to the actual platform:
+if [ -r "${iraf}ur/irafarch" ]; then
+    IRAFARCH=`cat ${iraf}ur/irafarch`
+else
+    case "$os_type.$os_bits" in
+        linux.32)
+            IRAFARCH="linux"
+            ;;
+        linux.64)
+            IRAFARCH="linux64"
+            ;;
+        darwin.32)
+            IRAFARCH="macosx"
+            ;;
+        darwin.64)
+            IRAFARCH="macintel"
+            ;;
+	*)
+	    echo "Unknown platform: $os_type ($os_bits bits)" >&2
+	    exit 1
+            ;;
+    esac
+fi
+
+# Forget existing IRAF variables (without actually doing so in this script)
+# before optionally setting some subset of new values:
+env_unset "$VARS_RUN"
+env_unset "$VARS_BUILD"
+if [ "$level" == "core_build" ]; then
+    # Only unset existing C(XX)FLAGS when building core IRAF, since they are
+    # not IRAF-specific and may be needed for compiling other software:
+    env_unset "$VARS_CORE_BUILD"
+else
+    env_unset "XC_CFLAGS XC_FFLAGS XC_LFLAGS"
+fi
+# These are set if one runs irafuser.csh:
+alias_unset "mkiraf mkmlist mkz edsym generic mkpkg rmbin rmfiles rtar wtar xc xyacc"
+
+# Configure the environment unless told to forget it:
+if [ "$mode" == "setup" ]; then
+
+    # Preserve a copy of the user's old environment in $OLD_IRAF -- only if
+    # it's a different installation from the one we're setting up here (which
+    # allows running setup multiple times, eg. to restore mangled settings,
+    # without losing the "forget" functionality):
+    if [ \( "$old_iraf" -a "$old_iraf" != "$iraf" \) -o \
+	 \( "${old_IRAFARCH}" -a "$old_IRAFARCH" != "$IRAFARCH" \) ]; then
+        tmp_iraf=$iraf; iraf=$old_iraf
+	tmp_IRAFARCH=$IRAFARCH; IRAFARCH=$old_IRAFARCH
+        OLD_IRAF=""
+        for varname in $VARS_RUN $VARS_BUILD $VARS_CORE_BUILD; do
+            # This condition is true if the variable is set (even if empty):
+            if [ "`eval echo \\${$varname+1}`" ]; then
+                vardef="${varname}=\"`eval \"echo \\$$varname\"`\""
+                if [ "$OLD_IRAF" ]; then
+                    OLD_IRAF="$OLD_IRAF ${vardef};"
+                else
+                    OLD_IRAF="${vardef};"
+                fi
+            fi
+        done
+	iraf=$tmp_iraf
+	IRAFARCH=$tmp_IRAFARCH
+    fi
+
+    # We've already set iraf & IRAFARCH above. For some reason MACH needs to
+    # duplicate the latter (I think in theory it distinguishes hardware while
+    # IRAFARCH corresponds to the OS, but there is no difference in PC-IRAF):
+    MACH=$IRAFARCH
+
+    # Set additional core IRAF path definitions:
+    hostid=unix
+    host=${iraf}unix/
+    hlib=${iraf}unix/hlib/
+    hbin=${iraf}unix/bin.$IRAFARCH/
+    tmp=/tmp/
+
+    # Define the path to extern.pkg in Ureka/AstroConda. We have to assume it
+    # gets installed in some fixed location WRT the main iraf directory (unless
+    # we add an option), since only core IRAF is dealt with here, but this path
+    # could later be overridden by the wrapper or installer through which one
+    # calls this script, if needed:
+    IRAF_EXTPKG=${parent}extern.pkg
+
+    # Define display tool config:
+    IMTOOLRC=${iraf}dev/imtoolrc
+
+    # Output definitions for all the run-time variables defined so far:
+    env_set "$VARS_RUN"
+
+    # Set SPP compilation flags according to the platform (if applicable):
+    if [ "$level" != "run" ]; then
+
+        F77=${hlib}f77.sh
+        F2C=${hbin}f2c.e
+        RANLIB=ranlib
+        HSI_F77LIBS=""
+        HSI_LFLAGS=""
+        HSI_OSLIBS=""
+
+        case "$IRAFARCH" in
+	    linux)
+                CC=gcc
+                HSI_CF="-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -m32 -Wunused"
+                HSI_FF="-O -DBLD_KERNEL -m32"
+                HSI_XF="-Inolibc -w -/Wunused -/m32"
+                HSI_LF="-m32"
+                mkzflags="'lflags=-Nxz -/Wl,-Bstatic'"
+		CFLAGS="-m32"
+		CXXFLAGS="-m32"
+	        ;;
+	    linux64)
+                CC=gcc
+		# Building with these flags is untested, but they match what
+		# was in irafuser.csh.  ??
+                HSI_CF="-g -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 \
+                        -w -m64"
+                HSI_FF="-g -m64 -DBLD_KERNEL"
+                HSI_XF="-g -Inolibc -w -/m64 -/Wunused"
+                HSI_LF="-m64"
+                mkzflags="'lflags=-Nxz -/Wl,-Bstatic'"
+		CFLAGS="-m64"
+		CXXFLAGS="-m64"
+	        ;;
+	    macosx)
+                CC=cc
+	        # Setting mmacosx-version-min higher than 10.4 causes the build
+		# to fail with "Abort" at libsys.
+                HSI_CF="-O -DMACOSX -w -Wunused -arch i386 -m32 \
+                        -mmacosx-version-min=10.4 -Wno-return-type"
+                HSI_FF="-O -arch i386 -m32 -DBLD_KERNEL \
+                        -mmacosx-version-min=10.4 -Wno-return-type"
+                HSI_XF="-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386 \
+                        -/mmacosx-version-min=10.4 -/Wno-return-type"
+                HSI_LF="-arch i386 -m32 -mmacosx-version-min=10.4"
+                mkzflags="'lflags=-z'"
+		CFLAGS="-m32 -mmacosx-version-min=10.4"
+		CXXFLAGS="-m32 -mmacosx-version-min=10.4"
+                # Ureka didn't set XC_CFLAGS (needed to compile some core IRAF
+                # C code with clang) and we only set it for "core_build",
+                # though it actually seems harmless during external package
+                # builds too, whereas XC_FFLAGS triggers a lot of irrelevant
+                # compiler warnings (presumably a bug):
+                XC_CFLAGS="-Wno-return-type"
+	        ;;
+	    macintel)
+                CC=cc
+		# Building with these flags is untested; it is assumed that
+		# return-type warnings need disabling as for 32 bits.
+                HSI_CF="-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64 \
+                        -Wno-return-type"
+                HSI_FF="-O -m64 -DMACH64 -DBLD_KERNEL -Wno-return-type"
+                HSI_XF="-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused -/DMACH64 \
+                        -/m64 -/Wno-return-type"
+                HSI_LF="-m64 -DMACH64"
+                mkzflags="'lflags=-z'"
+		CFLAGS="-m64"
+		CXXFLAGS="-m64"
+	        ;;
+        esac
+
+        # Add compiler include flags to support non-root installations:
+        HSI_CF="-I${iraf}include/ $HSI_CF"
+        HSI_FF="-I${iraf}include/ $HSI_FF"
+        HSI_XF="-I${iraf}include/ $HSI_XF"
+
+	# Compile against all the IRAF system libs if available, enabling the
+	# VOS for IRAF-style filenames, otherwise use a subset (when building
+	# IRAF itself):
+	if [ -f ${iraf}lib/libsys.a ]; then
+	    # irafuser.csh also included libf2c here but ur_setup did not
+            HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a \
+                      ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
+	else
+	    HSI_CF="$HSI_CF -DNOVOS"
+            HSI_LIBS="${hlib}libboot.a ${hlib}libos.a"
+        fi
+	HSI_LIBS="$HSI_LIBS $HSI_OSLIBS"
+
+        # Output definitions for SPP build flags:
+        env_set "$VARS_BUILD"
+
+        # Set & output definitions needed for building core IRAF:
+        if [ "$level" == "core_build" ]; then
+
+            # The extra $VARS_CORE_BUILD flags correspond to what used to be
+            # defined in $iraf/build.setup in Ureka. They are defined in the
+            # platform-specific blocks above but only get printed out and set
+            # in our parent environment if we reach this condition. Any
+            # existing user flags are discarded, as they are likely to break
+            # the process.
+
+	    # Output the variable defs:
+	    env_set "$VARS_CORE_BUILD"
+
+        fi
+    fi
+
+    # Output definitions saved in $OLD_IRAF (if applicable):
+    [ "$OLD_IRAF" ] && env_set OLD_IRAF
+
+elif [ "$mode" == "forget" -a "$OLD_IRAF" ]; then
+
+    # Restore saved IRAF environment if there is one (rather than just
+    # forgetting the current one).
+
+    # We could eval $OLD_IRAF directly in sh and then export the variables,
+    # but for csh, a regexp is needed to convert it to the right syntax first
+    # (decomposing the value with a for loop is very difficult, due to the way
+    # spaces are interpreted as field separators).
+    case "$shell_type" in
+        csh)
+            OLD_IRAF=`echo $OLD_IRAF | \
+                sed -e 's|\([^ 	=]*\)=\("[^"]*";\)|setenv \1 \2|'g`
+            ;;
+        sh)
+            OLD_IRAF=`echo $OLD_IRAF | \
+                sed -e 's|\([^ 	=]*="[^"]*";\)|export \1|'g`
+            ;;
+    esac    
+
+    # Simply output the value of OLD_IRAF, for execution with the other cmds
+    # (this will produce an error like "command not found" if the user has
+    # changed its value to some non-excutable string).
+    echo $OLD_IRAF
+
+    # This variable has served its purpose now:
+    env_unset OLD_IRAF
+
+fi
+
+# Explicitly report success if everything completed (in case the last command
+# was a condition that happened to evaluate to false):
+exit 0
+

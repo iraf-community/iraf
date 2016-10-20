@@ -1,0 +1,73 @@
+#!/bin/sh
+#
+# Generate wrapper scripts for unix/hlib/setup, which can be sourced from the
+# PATH with a slightly less arcane syntax than an eval command with flags
+# (though without allowing for "--level" arguments). Users don't normally need
+# to run this directly though, as conda's "activate" will take care of it.
+
+usage="Usage: wrap_setup [--no-check] [iraf_path]"
+
+st=0
+
+# Parse argument(s):
+unset iraf
+check="yes"
+while [ "$1" != "" ]; do
+    case "$1" in
+	--no-check) check=""
+            ;;
+        -*) st=1
+            ;;
+        *)  [ "$iraf" ] && st=1 || iraf=$1
+	    ;;
+    esac
+    shift
+done
+
+if [ $st != 0 ]; then
+    echo $usage >&2
+    exit 1
+fi
+
+# Use path to $iraf specified by the user, if applicable (which can be a string
+# deferencing an environment variable, eg. '$CONDA_ENV_PATH/iraf/').
+if [ "$iraf" ]; then
+
+    iraf=`echo "$iraf" | sed -e 's|/*$||'`/  # exactly one slash
+    setup="${iraf}unix/hlib/setup"
+
+    # Unless otherwise specified, deference any variables to check the path is
+    # OK. This probably doesn't work with $CONDA_ENV_PATH, which I think is not
+    # actually set at build time, so use "--no-check" in that case.
+    if [ "$check" ]; then
+        actual=`eval echo "$setup"`
+        if [ ! \( -r "$actual" -a -x "$actual" \) ]; then
+            echo "wrap_setup: cannot execute $actual" >&2
+            exit 1
+        fi
+    fi
+
+# Otherwise, use the "setup" found in the same directory as this script:
+else
+    loc=`dirname "$0"`
+    setup=`cd "$loc" ; pwd`/setup
+fi
+
+# Create/overwrite the wrapper scripts. Note that eval discards the setup
+# command exit status in these sh versions; this could be avoided using an
+# intermediate variable (commented) but I'm a bit paranoid about the output
+# from setup overfilling the variable in some shell implementation (and this
+# is how we did it in Ureka) -- JT.
+st=0
+# echo "cmd=\`$setup --sh\` && eval \"\$cmd\"" > setup_iraf.sh || st=1
+# echo "cmd=\`$setup --sh --forget\` && eval \"\$cmd\"" > forget_iraf.sh || st=1
+echo "eval \`$setup --sh\`" > setup_iraf.sh || st=1
+echo "eval \`$setup --sh --forget\`" > forget_iraf.sh || st=1
+echo "eval \`$setup --csh\`" > setup_iraf.csh || st=1
+echo "eval \`$setup --csh --forget\`" > forget_iraf.csh || st=1
+
+# Should this script also add the CWD to the $PATH if not there already, so
+# IRAF commands are actually found? Conda will do this anyway, if applicable.
+
+exit $st
+

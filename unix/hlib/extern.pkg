@@ -18,7 +18,13 @@ task	vo.pkg		= vo$vo.cl
 
 # tasks that we defined
 
-cl < UR_DIR_PKG$extern.pkg
+# this condition avoids a CL crash if $IRAF_EXTPKG is unset/missing but it can
+# still fail silently if the value is a directory (hard to determine in CL):
+if (defvar("IRAF_EXTPKG") && access("IRAF_EXTPKG$"))
+	cl < "IRAF_EXTPKG$"
+else
+	print "warning: missing external package definitions file (IRAF_EXTPKG)"
+;
 
 # tasks that are actually part of iraf:
 
