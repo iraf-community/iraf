@@ -177,7 +177,7 @@ fi
 # before optionally setting some subset of new values:
 env_unset "$VARS_RUN"
 env_unset "$VARS_BUILD"
-if [ "$level" == "core_build" ]; then
+if [ "$level" = "core_build" ]; then
     # Only unset existing C(XX)FLAGS when building core IRAF, since they are
     # not IRAF-specific and may be needed for compiling other software:
     env_unset "$VARS_CORE_BUILD"
@@ -188,7 +188,7 @@ fi
 alias_unset "mkiraf mkmlist mkz edsym generic mkpkg rmbin rmfiles rtar wtar xc xyacc"
 
 # Configure the environment unless told to forget it:
-if [ "$mode" == "setup" ]; then
+if [ "$mode" = "setup" ]; then
 
     # Preserve a copy of the user's old environment in $OLD_IRAF -- only if
     # it's a different installation from the one we're setting up here (which
@@ -332,7 +332,7 @@ if [ "$mode" == "setup" ]; then
         env_set "$VARS_BUILD"
 
         # Set & output definitions needed for building core IRAF:
-        if [ "$level" == "core_build" ]; then
+        if [ "$level" = "core_build" ]; then
 
             # The extra $VARS_CORE_BUILD flags correspond to what used to be
             # defined in $iraf/build.setup in Ureka. They are defined in the
@@ -350,7 +350,7 @@ if [ "$mode" == "setup" ]; then
     # Output definitions saved in $OLD_IRAF (if applicable):
     [ "$OLD_IRAF" ] && env_set OLD_IRAF
 
-elif [ "$mode" == "forget" -a "$OLD_IRAF" ]; then
+elif [ "$mode" = "forget" -a "$OLD_IRAF" ]; then
 
     # Restore saved IRAF environment if there is one (rather than just
     # forgetting the current one).
