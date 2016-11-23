@@ -50,14 +50,16 @@ fi
 # Always create new dirs & files with the expected permissions:
 umask 022
 
-# Remember this working directory (for updating absolute symlinks later):
-src=`pwd`
+# Remember this working directory (for updating absolute symlinks later).
+# The POSIX -P option follows any symbolic links to the installation, ensuring
+# a proper match when updating symbolic link targets below.
+src=`pwd -P`
 
 # Convert $dest to a nominal absolute path:
-dest=`cd $dest && pwd`
+dest=`cd $dest && pwd -P`
 
 # If destination is the CWD, do an in-place "install" for the build process:
-if [ "$dest" == "`pwd`" ]; then
+if [ "$dest" == "`pwd -P`" ]; then
     iraf=$dest
     bindir="$iraf/bin_directory"
     bintoiraf=".."
@@ -123,12 +125,20 @@ if ! unix/hlib/update_paths; then
 fi
 
 echo "Update any absolute symbolic links (so conda doesn't fail) ..."
-# (find -lname is not entirely portable but does work on Linux & MacOS)
-find . -type l -lname "/*" | while read name; do
+# (find -lname is not entirely portable but does work on Linux & MacOS; the
+# `pwd` avoids a MacOS 10.6 bug, described at superuser.com/questions/233068).
+find `pwd` -type l -lname "/*" | while read name; do
     errs=""
-    target=`readlink $name | sed -e "s|$src|$iraf|"`
-    rm -f $name || errs=1
-    ln -s $target $name || errs=1
+    target=$(readlink "$name")
+    # Unless the path to the link target is broken or unreadable, convert to
+    # its canonical version, without any further symlinks that can cause the
+    # path substitution to fail:
+    if targdir=$(cd $(dirname "$target") && pwd -P); then
+        target="$targdir"/$(basename "$target")
+    fi
+    target=$(echo "$target" | sed -e "s|^$src|$iraf|")
+    rm -f "$name" || errs=1
+    ln -s "$target" "$name" || errs=1
     [ "$errs" ] && echo "  Warning: failed to update $name" >&2
 done
 
@@ -167,7 +177,7 @@ ln -s -f $bintoiraf/unix/bin.$IRAFARCH/xyacc.e         xyacc
 # sourced script cannot know its own path (unless BASH-only), so just use an
 # absolute path and leave it to the AstroConda build to update as needed:
 echo "Create environment setup wrapper scripts ..."
-if ! $hlib/wrap_setup; then
+if ! "$hlib/wrap_setup"; then
     echo "  Script wrap_setup failed" >&2
     exit 1
 fi
@@ -191,11 +201,11 @@ if [ "$extern" -o "$extern_pkg" ]; then
             # Save any existing copy unless not the original:
             if [ ! -f "$hlib/zzsetenv.def.orig" -a \
                    -f "$hlib/zzsetenv.def" ]; then
-                mv $hlib/zzsetenv.def $hlib/zzsetenv.def.orig
+                mv "$hlib/zzsetenv.def" "$hlib/zzsetenv.def.orig"
             fi
             # (I think this version causes compilation to crash if used before
             # our extern.pkg is created outside the IRAF tree)
-            cp -f $hlib/zzsetenv.def.ur $hlib/zzsetenv.def && errs=""
+            cp -f "$hlib/zzsetenv.def.ur" "$hlib/zzsetenv.def" && errs=""
         fi
         if [ "$errs" ]; then
             echo "  Failed to replace zzsetenv.def" >&2
