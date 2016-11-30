@@ -29,7 +29,7 @@ umask 022
 rm -fr "$tmpdir"
 if mkdir "$tmpdir"; then
     cd "$tmpdir"
-    echo xterm | mkiraf > mkhelp_log 2>&1
+    echo xterm | mkiraf > mkhelp_log 2>&1 || status=1
     echo >> mkhelp_log 2>&1
     touch .hushiraf
 else
@@ -39,7 +39,7 @@ fi
 
 # Run the commands to build help & apropos databases in a CL session
 # (the Sienkiewicz way) and subsequently confirm their existence:
-cl >> mkhelp_log << ARF
+cl >> mkhelp_log << ARF || status=1
 softools
 printf("PATH: %s\n", envget("$pkgname"))
 printf("\nMake helpdb for package $pkgname\n")
