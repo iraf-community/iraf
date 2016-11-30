@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Copyright(c) 2016 Association of Universities for Research in Astronomy, Inc.
+#
+# Make the help & apropos databases for an IRAF package (CL version of the
+# earlier Ureka PyRAF script, make_iraf_help, to try to simplify the build).
+#
+# Usage: /path/to/make_help pkgname
+# - The package should already have been defined in extern.pkg, otherwise
+#   IRAF can't find it.
+#
+# Past attempts to do this with cl would intermittently segfault, but this
+# version invokes the interpreter differently and has been working well so far
+# (it could go into an infinite loop if cl prompts the user for some reason,
+# but that is not expected to happen).
+
+pkgname=$1
+if [ $# -ne 1 ]; then
+    echo Usage: `basename "$0"` pkgname >&2
+    exit 1
+fi
+
+status=0
+
+tmpdir=tmpiraf.$$
+umask 022
+
+# Make a working directory for IRAF, with login.cl & uparm:
+rm -fr "$tmpdir"
+if mkdir "$tmpdir"; then
+    cd "$tmpdir"
+    echo xterm | mkiraf > mkhelp_log 2>&1
+    echo >> mkhelp_log 2>&1
+    touch .hushiraf
+else
+    echo "Failed to create $tmpdir" >&2
+    exit 1
+fi
+
+# The specified package needs loading in cl unless it's iraf$ itself
+# (actually, this is untrue, so remove after committing for the record):
+if [ "$1" = "iraf" ]; then
+    loadpkg=""
+else
+    loadpkg=$pkgname
+fi
+
+# Run the commands to build help & apropos databases in a CL session
+# (the Sienkiewicz way) and subsequently confirm their existence:
+cl >> mkhelp_log << ARF
+softools
+#$loadpkg
+printf("PATH: %s\n", envget("$pkgname"))
+printf("\nMake helpdb for package $pkgname\n")
+mkhelpdb("${pkgname}\$lib/root.hd", "${pkgname}\$lib/helpdb.mip", verbose-)
+printf("\nMake apropos.db for package $pkgname\n")
+mkapropos("${pkgname}", "lib/root.hd", "${pkgname}\$lib/apropos.db", verbose-)
+printf("\n")
+printf("ACCESS helpdb.mip: %b\n", access("${pkgname}\$lib/helpdb.mip"))
+printf("ACCESS apropos.db: %b\n", access("${pkgname}\$lib/apropos.db"))
+logout
+ARF
+
+# Check that the expected files are present, by grepping the above output
+# (this doesn't guarantee they were regenerated, but at least they're there)
+# and that there were no ERROR messages (could be made more robust still by
+# grepping the log for unexpected patterns in general):
+egrep -q 'ACCESS (helpdb[.]mip|apropos[.]db): (NO|0)' mkhelp_log && status=1
+egrep -q '(^|[ \t>])ERROR:' mkhelp_log && status=1
+
+# Print the IRAF output without prompts, for logging (use awk for portability):
+awk -v PKG="$pkgname" '{sub("((ecl|softools|"PKG")>[ \t])*", ""); print}' \
+    mkhelp_log
+
+# Clean up temporary files:
+cd .. && rm -fr "$tmpdir"
+
+exit $status
+

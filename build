@@ -81,4 +81,10 @@ set st=$status
 # (to prevent conda failing when updating link paths):
 rm -f $iraf/vo/bin.generic/bin.$IRAFARCH
 
+# Generate the help & apropos databases:
+./make_help iraf >& log.110.help || st=1
+./make_help noao >>& log.110.help || st=1
+./make_help color >>& log.110.help || st=1
+./make_help vol >>& log.110.help || st=1
+
 exit $st

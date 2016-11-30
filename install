@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# Copyright(c) 2016 Association of Universities for Research in Astronomy, Inc.
+#
 # A relatively simple script to copy IRAF to some installation path and create
 # the necessary links to its binaries in the PATH etc., mainly for AstroConda.
 # It is used in packaging our distribution and is not normally needed by end
