@@ -10,9 +10,9 @@
 #   IRAF can't find it.
 #
 # Past attempts to do this with cl would intermittently segfault, but this
-# version invokes the interpreter differently and has been working well so far
-# (it could go into an infinite loop if cl prompts the user for some reason,
-# but that is not expected to happen).
+# version invokes the interpreter differently and has been working reliably so
+# far (it could go into an infinite loop if cl prompts the user for some
+# reason, but that is not expected to happen).
 
 pkgname=$1
 if [ $# -ne 1 ]; then
@@ -37,19 +37,10 @@ else
     exit 1
 fi
 
-# The specified package needs loading in cl unless it's iraf$ itself
-# (actually, this is untrue, so remove after committing for the record):
-if [ "$1" = "iraf" ]; then
-    loadpkg=""
-else
-    loadpkg=$pkgname
-fi
-
 # Run the commands to build help & apropos databases in a CL session
 # (the Sienkiewicz way) and subsequently confirm their existence:
 cl >> mkhelp_log << ARF
 softools
-#$loadpkg
 printf("PATH: %s\n", envget("$pkgname"))
 printf("\nMake helpdb for package $pkgname\n")
 mkhelpdb("${pkgname}\$lib/root.hd", "${pkgname}\$lib/helpdb.mip", verbose-)
