@@ -129,3 +129,4 @@ set	@iraf$extern/.zzsetenv.def
 
 set     @IRAF_EXTPKG$
 
+reset use_new_imt = no
