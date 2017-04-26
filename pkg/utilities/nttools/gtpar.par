@@ -1,0 +1,27 @@
+wx1,r,h,0.,,,left  world x-coord if not autoscaling
+wx2,r,h,0.,,,right world x-coord if not autoscaling
+wy1,r,h,0.,,,lower world y-coord if not autoscaling
+wy2,r,h,0.,,,upper world y-coord if not autoscaling
+marker,s,h,"box","point|box|plus|cross|circle|diamond|hline|vline|hebar|vebar",\
+,"point marker character: \n\
+    point, box, plus, cross, circle,\n\
+    diamond, hline, vline, hebar, vebar"
+szmarker,r,h,5E-3,,,marker size (0 => list input; < 0 => NDC)
+logx,b,h,no,,,log scale x-axis?
+logy,b,h,no,,,log scale y-axis?
+box,b,h,yes,,,draw box around periphery of window?
+ticklabels,b,h,yes,,,label tick marks?
+grid,b,h,no,,,draw grid lines on plot
+xlabel,s,h,"",,,x-axis label
+ylabel,s,h,"",,,y-axis label
+title,s,h,"imtitle",,,title for plot
+vx1,r,h,0.,,,left limit of device viewport (0.0:1.0)
+vx2,r,h,0.,,,right limit of device viewport (0.0:1.0)
+vy1,r,h,0.,,,bottom limit of device viewport (0.0:1.0)
+vy2,r,h,0.,,,upper limit of device viewport (0.0:1.0)
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?
+fill,b,h,yes,,,fill viewport vs enforce unity aspect ratio?

@@ -1,0 +1,75 @@
+.help package Feb86 language
+.ih
+NAME
+package -- define a new package
+.ih
+USAGE
+package	pkgname
+.ih
+PARAMETERS
+.ls pkgname
+The name of the new package to be created.  If called with no arguments,
+\fIpackage\fR lists the currently defined packages in task search order.
+.le
+.ih
+DESCRIPTION
+The \fIpackage\fR task creates a new package.
+The newly defined package becomes the current package, and the prompt
+is changed to use the first two characters of the package name.
+The package command does not define any tasks within the package, that
+is done by subsequent \fItask\fR declarations.  Subsequent \fItask\fR
+declarations will add tasks to the task list for the new package.
+
+The new package remains the "current package" until another \fIpackage\fR
+command is entered, or until the task in which the package command was
+entered is terminated.
+Normally \fIpackage\fR will be used at the beginning of a script to define
+the package name.  It will be followed by one or more task definitions,
+and then by a \fIcl\fR or \fIclbye\fR to interpret user commands,
+until the command \fIbye\fR is entered by the user, at which time the
+package script task terminates, discarding the package and any associated
+definitions.
+.ih
+EXAMPLES
+1. The use of \fIpackage\fR in a package script task.
+
+.nf
+	package lists
+
+	set	lists		= "pkg$lists/"
+
+	task	table,
+		tokens,
+		unique,
+		lintran,
+		columns,
+		words		= "lists$x_lists.e"
+
+	task	$gcursor	= "lists$gcursor.cl"
+	task	$imcursor	= "lists$imcursor.cl"
+	task	average		= "lists$average.cl"
+
+	clbye()
+.fi
+
+
+2. List the currently defined packages in the order in which they will
+be searched for tasks.
+
+.nf
+	cl> pack
+	clpackage
+	language
+	user
+	system
+.fi
+.ih
+BUGS
+All active packages must have unique names.  To eliminate the possibility
+of parameter file name collisions in UPARM, the three character string
+formed by concatenating the first two and final characters of the package
+name should be unique.
+.ih
+SEE ALSO
+task, redefine
+.endhelp

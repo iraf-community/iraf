@@ -1,0 +1,7 @@
+# CALIBLIST parameter file
+
+option,s,a,,,,"List option (bands, ext, mags, fnu, flam, stars)"
+star_name,s,a,,,,Star name in calibration list
+extinction,s,h,,,,Extinction file
+caldir,s,h,)_.caldir,,,Directory containing calibration data
+fnuzero,r,h,3.68e-20,,,Absolute flux zero point

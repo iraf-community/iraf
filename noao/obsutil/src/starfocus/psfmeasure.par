@@ -1,0 +1,24 @@
+# PSFMEASURE -- Measure PSF.
+
+images,s,a,,,,"List of images"
+coords,s,h,"markall","center|mark1|markall",,"Object coordinates"
+wcs,s,h,"logical","logical|physical|world",,"Coordinate system"
+display,b,h,yes,,,"Display images?"
+frame,i,h,1,1,,"Display frame to use
+"
+level,r,h,0.5,,,"Measurement level (fraction or percent)"
+size,s,h,"FWHM","Radius|FWHM|GFWHM|MFWHM",,"Size to display"
+beta,r,h,INDEF,2.1,,Moffat beta parameter
+scale,r,h,1.,,,"Pixel scale"
+radius,r,h,5.,,,"Measurement radius (pixels)"
+sbuffer,r,h,5.,,,"Sky buffer (pixels)"
+swidth,r,h,5.,,,"Sky width (pixels)"
+saturation,r,h,INDEF,,,"Saturation level"
+ignore_sat,b,h,no,,,"Ignore objects with saturated pixels?"
+iterations,i,h,2,1,,"Number of radius adjustment iterations"
+xcenter,r,h,INDEF,,,X field center (pixels)
+ycenter,r,h,INDEF,,,X field center (pixels)
+logfile,s,h,"logfile",,,"Logfile
+"
+imagecur,*imcur,h,"",,,"Image cursor input"
+graphcur,*gcur,h,"",,,"Graphics cursor input"

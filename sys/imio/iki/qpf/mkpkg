@@ -1,0 +1,22 @@
+# Make the IKI/QPF interface (photon image kernel).
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	qpfaccess.x	qpf.h
+	qpfclose.x	qpf.h <imhdr.h> <imio.h>
+	qpfcopy.x	qpf.h <error.h>
+	qpfcopypar.x	qpf.h <error.h> <imhdr.h> <imio.h> <qpset.h>
+	qpfdelete.x	<error.h>
+	qpfopen.x	qpf.h <error.h> <imhdr.h> <imio.h> <mach.h>\
+			<qpioset.h> <qpset.h>
+	qpfopix.x	qpf.h <imhdr.h> <imio.h>
+	qpfrename.x	qpf.h <error.h>
+	qpfupdhdr.x	
+	qpfwattr.x	qpf.h <ctype.h> <qpioset.h>
+	qpfwfilter.x	qpf.h
+	zfioqp.x	qpf.h <fio.h> <imhdr.h> <imio.h> <mach.h> <qpioset.h>
+	;

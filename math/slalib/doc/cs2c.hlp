@@ -1,0 +1,31 @@
+.help cs2c Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slCS2C (A, B, V)
+
+     - - - - -
+      C S 2 C
+     - - - - -
+
+  Spherical coordinates to direction cosines (single precision)
+
+  Given:
+     A,B      real      spherical coordinates in radians
+                        (RA,Dec), (Long,Lat) etc
+
+  Returned:
+     V        real(3)   x,y,z unit vector
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+
+  P.T.Wallace   Starlink   October 1984
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

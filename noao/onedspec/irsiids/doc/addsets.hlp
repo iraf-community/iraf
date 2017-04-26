@@ -1,0 +1,66 @@
+.help addsets Feb85 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+addsets - Add subsets of a string of spectra
+.ih
+USAGE
+addsets input records
+.ih
+PARAMETERS
+.ls input
+The root file name for the input spectra in the string.
+.le
+.ls records
+The range of spectra indicating the elements of the string.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the names of the spectra which will
+be created by the addset operation.
+.le
+.ls start_rec = 1
+The starting record number to be appended to the root name of the
+created spectra.
+.le
+.ls subset = 2
+The length of the substring of spectra which will be added together.
+For IIDS/IRS data which has been processed through BSWITCH, this
+parameter should be 2. This implies that spectra will be taken 
+2 at a time, added, and the sum written as a new spectrum.
+.le
+.ls weighting = yes
+If set to yes, an average of the substring of spectra is generated
+(if flux calibrated) weighted by the integration times of the
+individual spectra. If set to no, a simple average is generated.
+If not flux calibrated, this parameter has no effect - a simple
+sum is generated.
+.le
+.ih
+DESCRIPTION
+Every "subset" group of spectra will be accumulated and the sum will be
+written as a new spectrum. For example, if the input string contains
+100 spectra, and subset=2, then 50 new spectra will be created. Each
+new spectrum will be the sum of the consecutive pairs in the original string.
+
+If there are insufficient spectra to complete a subset accumulation,
+the sum is written out anyway and a warning printed. For example,
+if the input string contains 23 spectra, and subset=4, there will be
+6 new spectra created, but the last one will be based on only 3 spectra.
+
+Subset may be set to 1 to allow a copy operation although this is not
+a very efficient way to do so.
+.ih
+EXAMPLES
+The following three examples are those described above.
+
+.nf
+	cl> addsets nite1 2001-2100
+	cl> addsets nite1 2001-2023 subset=4
+	cl> addsets nite1 2001-2010 subset=1 output=nite2 \
+	>>> start_rec=2001
+.fi
+.ih
+SEE ALSO
+bswitch
+.endhelp

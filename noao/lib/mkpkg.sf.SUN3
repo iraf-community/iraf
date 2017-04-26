@@ -1,0 +1,11 @@
+# Mkpkg special file list for SUN/IRAF, Sun-3/OS-4.
+
+$set	XNO	= '& "$xc -cq -/$(MACH) &"'
+$set	XO1	= '& "$xc -cq -/O1 -/$(MACH) &"'
+$set	XO2	= '& "$xc -cq -/O2 -/$(MACH) &"'
+$set	XP	= '& "$xc -cq -/P -/$(MACH) &"'
+
+#$special "$(noao)twodspec/apextract/":	trltrace.x	$(XO2)
+#$special "$(noao)onedspec/dispcor/":	ranges.x	$(XNO)	# OS-3
+#$special "$(noao)nproto/ir/":		irmatch2d.x	$(XP)	# OS-3
+##$special "$(noao)astutil/asttools/":	astcoord.x	$(XNO)

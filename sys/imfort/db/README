@@ -1,0 +1,120 @@
+IMFORT/DB -- Image header keyword access for IMFORT (20Apr86)
+
+    This directory contains a version of the imio/db package, modified for
+IMFORT.  The modifications consisted of [1] elimination of calls to the
+various printf routines, so that only pure code (no external dependencies
+or use of VOS i/o) is linked into the Fortran program, [2] deleted imgnfn
+template stuff, [3] added provision for comments when adding new keywords,
+[4] changed datatype code to integer uniformly.  Error checking is still
+used but should be iferr-ed and turned into an IER code in the Fortran
+binding.
+
+
+Old IDBI readme docs:
+----------------------------------------
+
+			Image Header Database Interface
+				dct 16-Apr-85
+
+1. Overview
+
+    This directory contains the first version of the image header database
+interface.  In this implementation the image header is a variable length fixed
+format binary structure.  The first, fixed format, part of the image header
+contains the standard fields in binary and is fixed in size.  This is followed
+by the so called "user area", a string buffer containing a sequence of
+variable length, newline delimited FITS format keyword=value header cards.
+When an image is open a large user area is allocated to permit the addition
+of new parameters without filling up the buffer.  When the header is
+subsequently updated on disk only as much disk space is used as is needed to
+store the actual header.
+
+This format header is upwards compatible with the old image header format,
+hence old images and programs do not have to be modified to use the IMIO
+release supporting database accesss.  In the future image headers will be
+maintained under DBIO, but the routines in the image header database interface
+are not exected to change.  The actual disk format of images will of course
+change when we switch over to the  DBIO headers.
+
+
+
+2. Functions
+
+	get,g - get the value of a field
+	put,p - set the value of a field
+	add,a - add a new field to a database
+	  acc - determine if the named field exists
+
+
+3. Procedures
+
+       value = imget[bcsilrdx] (im, "field")
+		        imgstr (im, "field", outstr, maxch)
+	       imput[bcsilrdx] (im, "field", value)
+		        impstr (im, "field", value)
+       	       imadd[bcsilrdx] (im, "field", def_value)
+		        imastr (im, "field", def_value)
+		        imaddf (im, "field", "datatype")
+	          y/n = imaccf (im, "field")
+
+             list = imofnl[su] (im, template)
+                  nch = imgnfn (im, outstr, maxch)
+                        imcfnl (im)
+
+
+
+4. Description
+
+    New parameters will typically be added to the image header with either
+one of the typed procedures IMADD_ or with the lower level procedure IMADDF.
+The former procedures permit the parameter to be created and the value
+initialized all in one call, while the latter only creates the parameter.
+In addition, the typed IMADD_ procedures may be used to update the values
+of existing parameters (it is not considered an error if the parameter
+already exists).  The principal limitation of the typed procedures is that
+they may only be used to add or set parameters of a standard datatype.
+The IMADDF procedure will permit creation of parameters with more descriptive
+datatypes (domains) when the interface is recut upon DBIO.
+
+The value of any parameter may be fetched with one of the IMGET functions.
+The IMACCF function may be used (like ACCESS for a file) to determine
+whether a parameter exists.
+
+The database interface may be used to access any field of the image header,
+including the following standard fields.  Note that the nomenclature has
+been changed slightly to make it more consistent with FITS.  Additional
+standard fields will be defined in the future.
+
+
+	  keyword     type                 description
+
+	i_naxis		i	number of axes (dimensionality)
+	i_naxis[1-7]	l	length of an axis ("i_naxis1", etc.)
+	i_pixtype	i	pixel datatype (SPP integer code)
+	i_minpixval	r	minimum pixel value
+	i_maxpixval	r	maximum pixel value
+	i_ctime		l	time of image creation
+	i_mtime		l	time of last modify
+	i_limtime	l	time when limits (minmax) were last updated
+	i_title		s	title string
+
+
+The names of the standard fields share an "i_" prefix to reduce the possibility
+of collisions with data dependent keywords, to identify the standard fields in
+sorted listings, to allow use of pattern matching to discriminate between the
+standard fields and user fields, and so on.  For the convenience of the user,
+the "i_" prefix may be omitted provided the resultant name does not match the
+name of a user parameter.  It is however recommended that the full name be
+used in all applications software.
+
+
+5. Restrictions
+
+    The use of FITS format as the internal format for storing fields in this
+version of the interface places restrictions on the size of field names and
+of the string value of string valued parameters.  Field names are currently
+limited to eight characters or less and case is ignored (since FITS requires
+upper case).  The eight character limit does not apply to the standard fields.
+String values are limited to at most 68 characters.  If put string is passed
+a longer string it will be silently truncated.  Trailing whitespace and
+newlines are chopped when a string value is read.

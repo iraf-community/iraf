@@ -1,0 +1,90 @@
+.help intin Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slINTI (STRING, NSTRT, IRESLT, JFLAG)
+
+     - - - - - -
+      I N T I
+     - - - - - -
+
+  Convert free-format input into an integer
+
+  Given:
+     STRING     c     string containing number to be decoded
+     NSTRT      i     pointer to where decoding is to start
+     IRESLT     i     current value of result
+
+  Returned:
+     NSTRT      i      advanced to next number
+     IRESLT     i      result
+     JFLAG      i      status: -1 = -OK, 0 = +OK, 1 = null, 2 = error
+
+  Called:  slICHI
+
+  Notes:
+
+     1     The reason INTIN has separate OK status values for +
+           and - is to enable minus zero to be detected.   This is
+           of crucial importance when decoding mixed-radix numbers.
+           For example, an angle expressed as deg, arcmin, arcsec
+           may have a leading minus sign but a zero degrees field.
+
+     2     A TAB is interpreted as a space.
+
+     3     The basic format is the sequence of fields #^, where
+           # is a sign character + or -, and ^ means a string of
+           decimal digits.
+
+     4     Spaces:
+
+             .  Leading spaces are ignored.
+
+             .  Spaces between the sign and the number are allowed.
+
+             .  Trailing spaces are ignored;  the first signifies
+                end of decoding and subsequent ones are skipped.
+
+     5     Delimiters:
+
+             .  Any character other than +,-,0-9 or space may be
+                used to signal the end of the number and terminate
+                decoding.
+
+             .  Comma is recognized by INTIN as a special case;  it
+                is skipped, leaving the pointer on the next character.
+                See 9, below.
+
+     6     The sign is optional.  The default is +.
+
+     7     A "null result" occurs when the string of characters being
+           decoded does not begin with +,- or 0-9, or consists
+           entirely of spaces.  When this condition is detected, JFLAG
+           is set to 1 and IRESLT is left untouched.
+
+     8     NSTRT = 1 for the first character in the string.
+
+     9     On return from INTIN, NSTRT is set ready for the next
+           decode - following trailing blanks and any comma.  If a
+           delimiter other than comma is being used, NSTRT must be
+           incremented before the next call to INTIN, otherwise
+           all subsequent calls will return a null result.
+
+     10    Errors (JFLAG=2) occur when:
+
+             .  there is a + or - but no number;  or
+
+             .  the number is greater than BIG (defined below).
+
+     11    When an error has been detected, NSTRT is left
+           pointing to the character following the last
+           one used before the error came to light.
+
+     12    See also FLOTIN and DFLTIN.
+
+  P.T.Wallace   Starlink   27 April 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

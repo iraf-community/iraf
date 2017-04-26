@@ -1,0 +1,22 @@
+.help bfbsiz Sep86 imfort.bfio
+.ih
+NAME
+bfbsiz -- get the buffer size in chars of a binary file
+.ih
+SYNOPSIS
+.nf
+integer function bfbsiz (fd)
+
+integer		fd		#I BFIO file descriptor of open file
+.fi
+.ih
+DESCRIPTION
+The \fIbfbsiz\fR function is used to query the size in SPP char units of
+storage of the internal BFIO file buffer.
+.ih
+RETURN VALUE
+The size of the BFIO file buffer in chars is returned as the function value.
+.ih
+SEE ALSO
+bffsiz, bfchan
+.endhelp

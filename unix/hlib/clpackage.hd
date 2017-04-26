@@ -1,0 +1,86 @@
+# Help directory for the package CLPACKAGE (the root package of the CL).
+
+$dataio		= "pkg$dataio/"
+$dbms		= "pkg$dbms/"
+$images		= "pkg$images/"
+$language	= "pkg$language/"
+$lists		= "pkg$lists/"
+$obsolete	= "pkg$obsolete/"
+$plot		= "pkg$plot/"
+$proto		= "pkg$proto/"
+$softools	= "pkg$softools/"
+$system		= "pkg$system/"
+$utilities	= "pkg$utilities/"
+$xtools		= "pkg$xtools/doc/"
+
+# Define help files for the standard IRAF system packages.
+
+dataio		men = dataio$dataio.men,
+		hlp = ..,
+		sys = dataio$dataio.hlp,
+		pkg = dataio$dataio.hd,
+		src = dataio$dataio.cl
+
+dbms		men = dbms$dbms.men,
+		hlp = ..,
+		sys = dbms$dbms.hlp,
+		pkg = dbms$dbms.hd,
+		src = dbms$dbms.cl
+
+images		men = images$images.men,
+		hlp = ..,
+		sys = images$images.hlp,
+		pkg = images$images.hd,
+		src = images$images.cl
+
+language	men = language$language.men,
+		hlp = ..,
+		sys = language$language.hlp,
+		pkg = language$language.hd,
+		src = language$language.cl
+
+lists		men = lists$lists.men,
+		hlp = ..,
+		sys = lists$lists.hlp,
+		pkg = lists$lists.hd,
+		src = lists$lists.cl
+
+obsolete	men = obsolete$obsolete.men,
+		hlp = ..,
+		sys = obsolete$obsolete.hlp,
+		pkg = obsolete$obsolete.hd,
+		src = obsolete$obsolete.cl
+
+plot		men = plot$plot.men,
+		hlp = ..,
+		sys = plot$plot.hlp,
+		pkg = plot$plot.hd,
+		src = plot$plot.cl
+
+proto		men = proto$proto.men,
+		hlp = ..,
+		sys = proto$proto.hlp,
+		pkg = proto$proto.hd,
+		src = proto$proto.cl
+
+softools	men = softools$softools.men,
+		hlp = ..,
+		sys = softools$softools.hlp,
+		pkg = softools$softools.hd,
+		src = softools$softools.cl
+
+system		men = system$system.men,
+		hlp = ..,
+		sys = system$system.hlp,
+		pkg = system$system.hd,
+		src = system$system.cl
+
+utilities	men = utilities$utilities.men,
+		hlp = ..,
+		sys = utilities$utilities.hlp,
+		pkg = utilities$utilities.hd,
+		src = utilities$utilities.cl
+
+xtools		hlp=xtools$xtools.men,
+		sys=xtools$README,
+		pkg=xtools$xtools.hd

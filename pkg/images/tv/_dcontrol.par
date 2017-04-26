@@ -1,0 +1,18 @@
+type,s,h,frame,,,"Display type (frame, rgb)"
+map,s,h,mono,,,"Display map (mono, psuedo, 8color, cycle)"
+red_frame,i,h,1,1,4,Red frame
+green_frame,i,h,2,1,4,Green frame
+blue_frame,i,h,3,1,4,Blue frame
+frame,i,h,1,1,4,Display frame
+alternate,s,h,0,,,Alternate frame or frames
+erase,b,h,no,,,Erase display
+window,b,h,no,,,Window display frame
+rgb_window,b,h,no,,,Window RGB frames
+cursor,b,h,no,,,Print cursor position
+blink,b,h,no,,,Blink display frame with alternate frame
+match,b,h,no,,,Match display frame window with alternate frame
+roam,b,h,no,,,Roam display
+zoom,i,h,2,1,4,Zoom factor
+rate,r,h,1.,,,Blink rate (sec per frame)
+coords,*imcur,h,,,,Coordinate list
+device,s,h,"stdimage",,,Display device

@@ -1,0 +1,47 @@
+.help zfprot May84 "System Interface"
+.ih
+NAME
+zfprot -- set, remove, or query file delete protection
+.ih
+SYNOPSIS
+.nf
+zfprot (osfn, protflag, status)
+
+packed	char osfn[ARB]		# OS filename
+int	protflag		# operation to be performed
+int	status
+.fi
+.ih
+DESCRIPTION
+A protected file cannot be deleted, accidentally or otherwise.
+Protecting a file does not remove write permission.
+File protection is set, removed, or queried as specified by the \fIprotflag\fR
+argument, which has the following values:
+
+.nf
+	REMOVE_PROTECTION	0
+	SET_PROTECTION		1
+	QUERY_PROTECTION	2
+.fi
+
+It is not an error to attempt to protect a file which is already protected,
+nor is it an error to attempt to remove protection from a file which is not
+protected.
+.ih
+RETURN VALUE
+OK is returned if a set_protection or remove_protection operation is
+successful.  YES (protected) or NO (not protected) is returned in response
+to a query.  ERR is returned if the named file does not exist or if
+the operation cannot be performed.
+.ih
+NOTES
+FIO will query for file protection before attempting to delete a file.
+If the host system does not provide file protection facilities they can
+often be faked by creating a hidden file in the same directory; the existence
+of the file will indicate that the file is protected.  If the hidden file
+technique is used, the hidden file should not be seen when the directory
+is read by the high level code.
+.ih
+SEE ALSO
+zfdele
+.endhelp

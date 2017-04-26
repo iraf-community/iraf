@@ -1,0 +1,19 @@
+#  PSET file for image header keywords used by RV package
+
+ra,s,h,"RA",,,"Right Ascension keyword"
+dec,s,h,"DEC",,,"Declination keyword"
+ut,s,h,"UT",,,"UT of observation keyword"
+utmiddle,s,h,"UTMIDDLE",,,"UT of mid-point of observation keyword"
+exptime,s,h,"EXPTIME",,,"Exposure time keyword"
+epoch,s,h,"EPOCH",,,"Epoch of observation keyword"
+date_obs,s,h,"DATE-OBS",,,"Date of observation keyword
+"
+# Output Image Header Keywords
+hjd,s,h,"HJD",,,"Heliocentric Julian date keyword"
+mjd_obs,s,h,"MJD-OBS",,,"Modified Julian Date of observation keyword"
+vobs,s,h,"VOBS",,,"Observed velocity keyword"
+vrel,s,h,"VREL",,,"Relative velocity keyword"
+vhelio,s,h,"VHELIO",,,"Heliocentric velocity keyword"
+vlsr,s,h,"VLSR",,,"LSR velocity keyword"
+vsun,s,h,"VSUN",,,"Epoch of solar motion keyword"
+mode,s,h,"ql"

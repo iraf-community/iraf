@@ -1,0 +1,52 @@
+.help msider Dec98 "Image Interpolation Package"
+.ih
+NAME
+msider -- evaluate the interpolant derivatives at x and y 
+.ih
+SYNOPSIS
+msider (msi, x, y, der, nxder, nyder, len_der)
+
+.nf
+    pointer	msi			#I interpolant descriptor
+    real	x[4]			#I x value, 1 <= x[1-4] <= nxpix
+    real	y[4]			#I y value, 1 <= y[1-4] <= nypix
+    real	der[len_der, ARB]	#O derivative array
+    int		nxder			#I number of x derivatives
+    int		nyder			#I number of y derivatives
+    int		len_der			#I row length of der, len_der >= nxder
+.fi
+.ih
+ARGUMENTS
+.ls msi
+Pointer to the 2D sequential interpolant descriptor.
+.le
+.ls x, y
+The single x and y values or in the case of the drizzle interpolant the
+single quadrilateral at / over which the point is to be evaluated.
+.le
+.ls der
+The array containing the derivatives. Der[1,1] contains the value of
+the interpolant at x and y. Der[2,1] and der[1,2] contain the 1st
+derivatives of x and y respectively.
+.le
+.ls nxder, nyder
+The number derivatives in x and y.
+.le
+.ls len_der
+The row length of der. Len_der must be >= nxder.
+.le
+.ih
+DESCRIPTION
+The polynomial and spline interpolants are evaluated using the polynomial
+coefficients and nested multiplication. The polynomial interpolants are
+stored as the data points. The spline interpolant is stored as a set of
+B-spline coefficients.
+.ih
+NOTES
+MRIDER checks that the number of derivatives requested is reasonable.
+Checking for out of bounds and INDEF valued pixels is the responsibility of the
+user. MSIINIT and MSIFIT must be called before using MSIDER.
+.ih
+SEE ALSO
+mrider
+.endhelp

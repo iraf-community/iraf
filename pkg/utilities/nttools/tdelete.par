@@ -1,0 +1,5 @@
+table,s,a,"",,,"list of tables to be deleted"
+verify,b,h,no,,,verify operation before deleting each table?
+default_action,b,h,yes,,,default delete action for verify query
+go_ahead,b,q,yes,,," ?"
+mode,s,h,"al",,,

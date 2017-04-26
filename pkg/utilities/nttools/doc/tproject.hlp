@@ -1,0 +1,79 @@
+.help tproject May1999 tables
+.ih
+NAME
+tproject -- Create a new table from selected columns of an old table.
+.ih
+USAGE
+tproject intable outtable columns
+.ih
+DESCRIPTION
+This task will create a new table containing a subset of the columns in an
+old table. The column names are given as a column name template. There is an
+optional parameter, 'uniq', that filters out duplicate rows from the
+new table.
+
+If you do not need to eliminate duplicate rows, you can also use tcopy 
+with a column selector on the input table name.
+.ih
+PARAMETERS
+.ls intable [file name template]
+The table(s) from which the columns are to be copied. If input is
+redirected, this parameter will ignored and input will be read from
+STDIN instead.
+.le
+.ls outtable [file name template]
+The new table(s) containing the copied columns.
+The number of output tables must equal the number of input tables.
+.le
+.ls columns [string]
+This is the column template describing those columns that should be
+selected from the old table and put in the new table.
+A column template consists of a list
+of either column names or column name templates that include wildcard
+characters.  Column names (or templates) are separated by commas or white space.
+This parameter will accept the name of a list file (preceded by the "@"
+character) containing all of the column names to be selected.
+If the first non-white character in the column template
+is the negation character (either "~" or "!"),
+the new table will contain those columns
+whose names DO NOT match rest of the column template.
+.le
+.ls (uniq = no) [boolean]
+Eliminate duplicate rows from the output table?
+
+If 'unique' is set to "yes", only one of each set of duplicate rows is
+included in the output table.  All columns in the output table must be
+identical for the row to be removed.  String comparisons are case
+sensitive. Care should be used in setting this option for
+large tables, as it significantly increases the running time.
+.le
+.ih
+EXAMPLES
+1. Extract the star names, magnitudes, and colors from a catalog:
+
+.nf
+tt> tproject starcat.tab starmag.tab "name,mag,color"
+.fi
+
+2. Exclude the measurement error from a set of spectra.  Change the file name
+extensions from ".tab" to ".tbl":
+
+.nf
+tt> tproject  *.tab  *.%tab%tbl%  "!error"
+.fi
+
+3. Create a new table of engineering parameters using a column template stored
+in the file 'columns.dat'.  Eliminate duplicate rows:
+
+.nf
+tt> tproject datalog.tab sublog.tab @columns.dat uniq+
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+tselect, tjoin, tproduct,tcopy
+.endhelp

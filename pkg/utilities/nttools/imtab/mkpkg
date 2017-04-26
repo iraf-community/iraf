@@ -1,0 +1,13 @@
+# Update the imtab & tabim application code in the ttools package library.
+# Author: HODGE, 31-DEC-1990
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	imtab.x        		<error.h> <imhdr.h> <mach.h> <tbset.h> "imtab.h"
+	itbwcs.x		<imhdr.h> <mwset.h> "imtab.h"
+	tabim.x        		<imhdr.h> <tbset.h> 
+	;

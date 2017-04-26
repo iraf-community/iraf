@@ -1,0 +1,27 @@
+.help imacck Sep86 imfort
+.ih
+NAME
+imacck -- determine if the named header keyword exists
+.ih
+SYNOPSIS
+.nf
+subroutine imacck (im, keyw, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of keyword to be accessed
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimacck\fR procedure is used to test if the named header keyword
+can be accessed, i.e., if it exists.
+.ih
+RETURN VALUE
+A zero status return indicates that the header does indeed have such a
+keyword.
+
+IE_NEXKW:	nonexistent header keyword referenced
+.ih
+SEE ALSO
+imtypek, imaddk, imokwl
+.endhelp

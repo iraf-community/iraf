@@ -1,0 +1,153 @@
+.help pconvert Aug91 noao.digiphot.ptools
+.ih
+NAME
+pconvert -- convert an APPHOT/DAOPHOT text database into an STSDAS table
+.ih
+USAGE
+pconvert textfile table fields
+.ih
+PARAMETERS
+.ls textfile
+The APPHOT/DAOPHOT text database which is to be converted into an
+APPHOT/DAOPHOT STSDAS table database.
+.le
+.ls table
+The name of the output STSDAS table database.
+.le
+.ls fields = "*"
+Template defining the fields to be selected from each record. By default
+all the fields are output. Fields
+are specified by using the names defined in the APPHOT/DAOPHOT text
+database by the
+#N entries. Upper or lower case and minimum match abbreviations are
+permissible. For those fields which have multiple entries such as 
+magnitude, an individual value can be referenced by specifying an array
+index, e.g. MAG[2] or several values can be selected by specifying a
+range of elements, e.g. MAG[1-4].
+.le
+.ls expr = yes
+The boolean expression, evaluated independently for each record,
+which serves as a selection criterion. By default all records are selected.
+.le
+.ls append = no
+If append is yes then the converted APPHOT/DAOPHOT text file is appended to an 
+existing output STSDAS table database.
+.le
+.ih
+DESCRIPTION
+PCONVERT selects a subset of the fields from each record of an
+APPHOT/DAOPHOT text database and writes these into an STSDAS tabl database.
+The #K keyword parameters in the text database are
+stored as header parameters in the STSDAS table while the selected fields
+are stored in fields (columns) with the names specified by the text
+database #N keywords, units specified
+by the #U keywords, and print format specified by the #F keywords.
+
+The output records are selected on the basis of the boolean
+expression \fIexpr\fR whose variables are the field (column) names
+specified by the #N keywords in the APPHOT/DAOPHOT text database.
+If after substituting the values associated
+with a particular record into the field name variables the
+expression evaluates to yes, that record is included in the output table.
+
+The supported
+operators and functions are briefly described below. A detailed description
+of the boolean expression evaluator and its syntax can be found
+in the manual page for the IMAGES package HEDIT task.
+
+The following logical operators can be used in the boolean expression. 
+
+.nf
+	equal		  ==	not equal		!=
+	less than	  <	less than or equal	<=
+	greater than	  >	greater than or equal	>=
+	or		  ||	and			&&
+	negation	  !	pattern match		?=
+	concatenation	  //
+.fi
+
+The pattern match character ?=  takes a
+string expression as its first argument and a pattern as its second argument.
+The result is yes if the pattern is contained in the string expression.
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters are described below. 
+
+.nf
+	beginning of string	^	end of string		$
+	one character		?	zero or more characters	*
+	white space		#	escape character	\
+	ignore case		{	end ignore case		}
+	begin character class	[	end character class	]
+	not, in char class	^	range, in char class	-
+.fi
+
+The boolean expression may also include arithmetic operators and functions.
+The following arithmetic operators and functions are supported.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
+
+
+If the append parameter is "yes" then the converted input text database is
+appended to the specified output table. When appending to a table each of the
+output fields must already exist in the output table.
+
+.ih
+EXAMPLES
+
+1. Convert the text output from the DAOPHOT PHOT task in the file n4147.mag.1
+to an STSDAS table, selecting only the fields ID, XCENTER, YCENTER,
+MAG,and MSKY ncessary for input to the DAOPHOT fitting routines.
+Put the output in an STSDAS table named n4147.tmag.1.
+
+.nf
+   pt> pconvert n4147.mag.1 n4147.tmag.1 "ID,XCENTER,YCENTER,MAG,MSKY"
+.fi
+
+If there were 4 magnitude fields in n4147.mag.1
+then there would be 4 columns in the output table with names of 
+MAG[1], MAG[2], MAG[3] and MAG[4]
+
+
+2. Convert the same file as in example 1. but append the output to
+   n4147.tmag.1 and only select records with YCENTER <= 200.0.
+
+.nf
+   pt> pconvert n4147.mag.1 n4147.tmag.1 "ID,XCENTER,YCENTER,MAG,MSKY" \
+       expr="YCENTER < 200.0" append+
+
+.fi
+
+3. Convert all the records in the NSTAR text database n4147.nst.1 to
+   an STSDAS table.
+
+   pt> pconvert n4147.nst.1 n4147.tnst.1 "*"
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Changes in the values of the #K keyword quantities which are permitted by
+the APPHOT/DAOPHOT text database format will be lost in the conversion to
+STSDAS table format which does not permit such changes. For example users
+who have
+set up and run PHOT interactively and changed the values of the parameters
+after writing the first record to the text database will see only the initial
+values of the #K keywords in the STSDAS table headers after conversion.
+.ih
+SEE ALSO
+images.hedit
+.endhelp

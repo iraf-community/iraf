@@ -1,0 +1,71 @@
+# Helpdir for the OS package.
+
+$os	= "host$os/"
+$doc	= "host$os/doc/"
+
+zawset		hlp = doc$zawset.hlp,	src = os$zawset.c
+zcall		hlp = doc$zcall.hlp,	src = os$zcall.c
+zclcpr		hlp = doc$zclcpr.hlp,	src = os$zfiopr.c
+zcldir		hlp = doc$zcldir.hlp,	src = os$zgfdir.c
+zcldpr		hlp = doc$zcldpr.hlp,	src = os$zfiopr.c
+zdojmp		hlp = doc$zsvjmp.hlp,	src = os$zsvjmp.c
+zfacss		hlp = doc$zfacss.hlp,	src = os$zfacss.c
+zfaloc		hlp = doc$zfaloc.hlp,	src = os$zfaloc.c
+zfchdr		hlp = doc$zfchdr.hlp,	src = os$zfchdr.c
+zfdele		hlp = doc$zfdele.hlp,	src = os$zfdele.c
+zfgcwd		hlp = doc$zfgcwd.hlp,	src = os$zfgcwd.c
+zfinfo		hlp = doc$zfinfo.hlp,	src = os$zfinfo.c
+zfmkcp		hlp = doc$zfmkcp.hlp,	src = os$zfmkcp.c
+zfpath		hlp = doc$zfpath.hlp,	src = os$zfpath.x
+zfprot		hlp = doc$zfprot.hlp,	src = os$zfprot.c
+zfrnam		hlp = doc$zfrnam.hlp,	src = os$zfrnam.c
+zfsubd		hlp = doc$zfsubd.hlp,	src = os$zfsubd.x
+zfxdir		hlp = doc$zfxdir.hlp,	src = os$zfxdir.x
+zgfdir		hlp = doc$zgfdir.hlp,	src = os$zgfdir.c
+zgtime		hlp = doc$zgtime.hlp,	src = os$zgtime.c
+zgtpid		hlp = doc$zgtpid.hlp,	src = os$zgtpid.c
+zintpr		hlp = doc$zintpr.hlp,	src = os$zintpr.c
+zlocpr		hlp = doc$zlocpr.hlp,	src = os$zlocpr.c
+zlocva		hlp = doc$zlocva.hlp,	src = os$zlocva.c
+zmain		hlp = doc$zmain.hlp,	src = os$zmain.c
+zmaloc		hlp = doc$zmaloc.hlp,	src = os$zmaloc.c
+zmfree		hlp = doc$zmfree.hlp,	src = os$zmfree.c
+zopcpr		hlp = doc$zopcpr.hlp,	src = os$zfiopr.c
+zopdir		hlp = doc$zopdir.hlp,	src = os$zopdir.c
+zopdpr		hlp = doc$zopdpr.hlp,	src = os$zfiopr.c
+zoscmd		hlp = doc$zoscmd.hlp,	src = os$zoscmd.c
+zpanic		hlp = doc$zpanic.hlp,	src = os$zpanic.c
+zraloc		hlp = doc$zraloc.hlp,	src = os$zraloc.c
+zsvjmp		hlp = doc$zsvjmp.hlp,	src = os$zsvjmp.c
+ztslee		hlp = doc$ztslee.hlp,	src = os$ztslee.c
+zxgmes		hlp = doc$zxgmes.hlp,	src = os$zxgmes.c
+zxwhen		hlp = doc$zxwhen.hlp,	src = os$zxwhen.c
+
+zfiobf		hlp = doc$zfiobf.hlp,	src = os$zfiobf.c
+zfiotx		hlp = doc$zfiotx.hlp,	src = os$zfiotx.c
+zfioty		hlp = doc$zfioty.hlp,	src = os$zfioty.c
+zfiolp		hlp = doc$zfiolp.hlp,	src = os$zfiolp.c
+zfiopr		hlp = doc$zfiopr.hlp,	src = os$zfiopr.c
+zfiosf		hlp = doc$zfiosf.hlp,	src = os$zfiosf.c
+zfiomt		hlp = doc$zfiomt.hlp,	src = os$zfiomt.c
+
+zopntx		hlp = doc$zopntx.hlp,	src = os$zfiotx.c
+zclstx		hlp = doc$zclstx.hlp,	src = os$zfiotx.c
+zgettx		hlp = doc$zgettx.hlp,	src = os$zfiotx.c
+zputtx		hlp = doc$zputtx.hlp,	src = os$zfiotx.c
+zflstx		hlp = doc$zflstx.hlp,	src = os$zfiotx.c
+zsektx		hlp = doc$zsektx.hlp,	src = os$zfiotx.c
+znottx		hlp = doc$znottx.hlp,	src = os$zfiotx.c
+zstttx		hlp = doc$zstttx.hlp,	src = os$zfiotx.c
+zopnbf		hlp = doc$zopnbf.hlp,	src = os$zfiobf.c
+zclsbf		hlp = doc$zclsbf.hlp,	src = os$zfiobf.c
+zardbf		hlp = doc$zardbf.hlp,	src = os$zfiobf.c
+zawrbf		hlp = doc$zawrbf.hlp,	src = os$zfiobf.c
+zawtbf		hlp = doc$zawtbf.hlp,	src = os$zfiobf.c
+zsttbf		hlp = doc$zsttbf.hlp,	src = os$zfiobf.c
+zzopmt		hlp = doc$zzopmt.hlp,	src = os$zfiomt.c
+zzclmt		hlp = doc$zzclmt.hlp,	src = os$zfiomt.c
+zzrdmt		hlp = doc$zzrdmt.hlp,	src = os$zfiomt.c
+zzwrmt		hlp = doc$zzwrmt.hlp,	src = os$zfiomt.c
+zzwtmt		hlp = doc$zzwtmt.hlp,	src = os$zfiomt.c
+zzrwmt		hlp = doc$zzrwmt.hlp,	src = os$zfiomt.c

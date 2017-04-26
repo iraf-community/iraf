@@ -1,0 +1,39 @@
+.help imflsh Sep86 imfort
+.ih
+NAME
+imflsh -- flush any buffered image data to disk
+.ih
+SYNOPSIS
+.nf
+subroutine imflsh (im, ier)
+
+integer		im		#I image descriptor of open image
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimflsh\fR procedure flushes any buffered image data to disk.  Both the
+image header and pixel file are updated if either has been modified since
+the image was opened, or since the last call to \fIimflsh\fR.  All buffered
+image data is automatically flushed when an image is closed with \fIimclos\fR.
+Explicit calls to \fIimflsh\fR are rarely needed since synchronization occurs
+automatically when the image is closed, but may be desirable in applications
+where the image will be open for a substantial period of time, increasing the
+possibility of a program abort or interrupt before the image is closed.
+Calling \fIimflsh\fR on an image opened for read-only access is harmless.
+.ih
+RETURN VALUE
+A zero status is returned if no image data has been modified and an update
+is not necessary, or if either the header or pixel data has been modified and
+the update was successful.  The most likely cause of an update failure is lack
+of write permission on the image.
+
+.nf
+IE_FLUSH:	error flushing buffered data to pixel file
+IE_UPDHDR:	error updating image header file
+IE_UPDRO:	image header modified but image was opened read only
+.fi
+.ih
+SEE ALSO
+imclos
+.endhelp

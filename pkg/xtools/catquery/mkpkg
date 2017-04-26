@@ -1,0 +1,32 @@
+# Catalog and survey access tools subdirectory
+
+$checkout libxtools.a lib$
+$update libxtools.a
+$checkin libxtools.a lib$
+$exit
+
+libxtools.a:
+	cqmap.x		<ctype.h> "cqdef.h" 
+	cqstat.x	"cqdef.h" "cq.h"
+	cqlocate.x	"cqdef.h"
+
+	cqsetcat.x	"cqdef.h" "cq.h"
+	cqnqpars.x	"cqdef.h"
+	cqgqpars.x	"cqdef.h"
+	cqsqpars.x	"cqdef.h" "cq.h"
+
+	cqquery.x	<fset.h> "cqdef.h" "cq.h"
+	cqrstat.x	"cqdef.h" "cq.h"
+	cqrinfo.x	"cqdef.h" "cq.h"
+	cqgrecords.x	"cqdef.h" "cq.h"
+	cqgfields.x	<ctype.h> "cqdef.h" "cq.h" 
+
+	cqimquery.x	<fset.h> "cqdef.h" "cq.h"
+	cqistat.x	"cqdef.h" "cq.h"
+	cqiminfo.x	"cqdef.h" "cq.h"
+
+	cqget.x		"cqdef.h" "cq.h"
+	cqdb.x		<ctype.h> "cqdef.h" "cq.h"
+        cqwrdstr.x
+	cqdtype.x
+	;

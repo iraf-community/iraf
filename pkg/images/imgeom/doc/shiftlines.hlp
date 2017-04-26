@@ -1,0 +1,119 @@
+.help shiftlines Dec98 images.imgeom
+.ih
+NAME
+shiftlines -- shift lines in a list of images
+.ih
+USAGE	
+.nf
+shiftlines input output shift
+.fi
+.ih
+PARAMETERS
+.ls input
+List of images to be shifted.  Image sections are allowed.
+.le
+.ls output
+List of output image names.  If the output image name is the same as the input
+image name then the shifted image replaces the input image.
+.le
+.ls shift
+Shift in pixels.
+.le
+.ls interp_type = "linear"
+The interpolant type use to computed the output shifted image.
+The choices are the following:
+.ls nearest
+nearest neighbor interpolation.
+.le
+.ls linear
+linear interpolation in x.
+.le
+.ls poly3
+third order interior polynomial in x.
+.le
+.ls poly5
+fifth order interior polynomial in x.
+.le
+.ls spline3
+cubic spline in x.
+.le
+.ls sinc
+sinc interpolation in x. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 pixel wide sinc interpolant. The sinc width input by the user will
+be rounded up to the nearest odd number. The default sinc width
+is 31 pixels.
+.le
+.ls drizzle
+1D drizzle resampling. Users can specify the drizzle pixel fraction
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0. The
+value 0.0 is increased to 0.001. Drizzle resampling with a pixel fraction
+of 1.0 is identical to linear interpolation.
+.le
+.le
+.ls boundary_type = "nearest"
+Boundary condition for shifts outside the input image.
+The minimum match abbreviated choices are:
+.ls "nearest"
+Use the values of the nearest boundary pixel.
+.le
+.ls "wrap"
+Generate a value by wrapping around to the opposite boundary.
+.le
+.ls "reflect"
+Generate a value by reflecting around the boundary
+.le
+.ls "constant"
+Use a user supplied constant pixel value.
+.le
+.le
+.ls constant = "0.0"
+The constant for constant boundary extension.
+.le
+.ih
+DESCRIPTION
+The list of images in \fIinput\fR is shifted by the amount \fIshift\fR
+and copied to the list of output images \fIoutput\fR.
+The number of output image names must be the same as the number of input
+images.  An output image name may be the same as the corresponding
+input image in which case the shifted image replaces the input image.
+
+The shift is defined by the following relation.
+
+    xout = xint + shift
+
+Features in the input image are moved to higher columns when the shift
+is positive and to lower columns when the shift is negative.  For example,
+to shift a feature at column 10 to column 12 the shift is 2.0. The task
+has been optimized for integral pixel shifts.
+
+There are five choices for the one dimensional image interpolation
+which is selected with the parameter \fIinterp_type\fR.
+The value of the output pixels corresponding to input pixel positions
+outside the boundaries of the image is determined by the parameter
+\fIboundary_type\fR.
+
+.ih
+EXAMPLES
+
+1. Shift the lines of an image by 0.25 pixels to the right.
+
+	cl> shiftlines imagein imageout 0.25
+
+2. Shift the lines of an image by -.3 pixels using cubic spline interpolation
+and replace the input image by the output image.
+
+	cl> shiftlines image image -.3 interp=spline3
+
+.ih
+TIMINGS
+It requires approximately 28 and 59 seconds to shift a 512 square image
+using linear and cubic spline interpolation respectively
+(Vax 11/750 with fpa).
+.ih
+BUGS
+.ih
+SEE ALSO
+imshift, magnify, rotate, imlintran, blkrep, blkav, geotran
+.endhelp

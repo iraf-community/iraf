@@ -1,0 +1,17 @@
+# Make the CCDTIME task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$update	libpkg.a
+	$omake	x_ccdtime.x
+	$link	x_ccdtime.o libpkg.a -lxtools -o xx_ccdtime.e
+	;
+
+libpkg.a:
+	ccddb.x	
+	t_ccdtime.x	
+	;

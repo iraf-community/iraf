@@ -1,0 +1,30 @@
+
+Cmd			Status		Args
+---			------		----
+
+quit			done
+start			done
+stop			done
+help			done
+trace			done
+set
+get
+
+Register		done		argName argDesc
+Unregister		done
+DeclareMetadata
+Ping			done		appName
+SetMetadata
+GetMetadata
+DeclareSubscriptions
+GetSubscriptions
+GetRegisteredClients	done
+
+tableLoadVotable
+tableLoadFits
+tableHighlightRow
+tableSelectRowList
+
+imageLoadFits
+coordPointAtSky
+specLoadSSAGeneric

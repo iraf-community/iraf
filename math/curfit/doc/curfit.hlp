@@ -1,0 +1,163 @@
+.help curfit Jul84 "Math Package"
+.ih
+NAME
+curfit -- curve fitting package
+.ih
+SYNOPSIS
+
+.nf
+        cvinit	(cv, curve_type, order, xmin, xmax)
+	cvzero	(cv)
+       cvaccum	(cv, x, y, weight, wtflag)
+      cvreject	(cv, x, y, weight)
+       cvsolve	(cv, ier)
+	 cvfit	(cv, x, y, weight, npts, wtflag, ier)
+       cvrefit	(cv, x, y, weight, ier)
+    y = cveval	(cv, x)
+      cvvector	(cv, x, yfit, npts)
+       cvcoeff	(cv, coeff, ncoeff)
+      cverrors	(cv, y, weight, yfit, rms, errors)
+	cvsave	(cv, fit)
+       cvstati  (cv, parameter, ival)
+       cvstatr  (cv, parameter, ival)
+     cvrestore	(cv, fit)
+         cvset	(cv, curve_type, xmin, xmax, coeff, ncoeff)
+        cvfree	(cv)
+.fi
+.ih
+DESCRIPTION
+The curfit package provides a set of routines for fitting data to functions
+linear in their coefficients using least squares techniques. The numerical
+technique employed is the solution of the normal equations by the
+Cholesky method.
+.ih
+NOTES
+The fitting function curve_type is chosen at run time from the following
+list.
+
+.nf
+    LEGENDRE	# Legendre polynomials
+    CHEBYSHEV	# Chebyshev polynomials
+    SPLINE3	# cubic spline with uniformly spaced break points
+    SPLINE1	# linear spline with uniformly spaced break points
+.fi
+
+
+The CURFIT package performs a weighted fit.
+The weighting options are WTS_USR, WTS_UNIFORM and WTS_SPACING.
+The user must supply a weight array. In WTS_UNIFORM mode the curfit
+routines set the weights to 1. In WTS_USER mode the user must supply an
+array of weight values.
+In WTS_SPACING mode
+the weights are set to the difference between adjacent data points.
+The data must be sorted in x in order to use the WTS_SPACING mode.
+In WTS_UNIFORM mode the reduced chi-squared returned by CVERRORS 
+is the variance of the fit and the errors in the coefficients are scaled
+by the square root of this variance. Otherwise the weights are
+interpreted as one over the variance of the data and the true reduced
+chi-squared is returned.
+
+The routines assume that all the x values  of interest lie in the region
+xmin <= x <= xmax. Checking for out of bounds x values is the responsibility
+of the calling program. The package routines assume that INDEF values
+have been removed from the data set prior to entering the package
+routines.
+
+In order to make the package definitions available to the calling program
+an include <curfit.h> statement must be included in the user program.
+CVINIT must be called before each fit. CVFREE frees space used by the
+CURFIT package.
+.ih
+EXAMPLES
+.nf
+Example 1: Fit curve to data, unifrom weighting
+
+    include <math/curfit.h>
+
+    ...
+
+    call cvinit (cv, CHEBYSHEV, 4, 1., 512.)
+
+    call cvfit (cv, x, y, weight, 512, WTS_UNIFORM, ier)
+    if (ier != OK)
+	call error (...)
+
+    do i = 1, 512 {
+	x = i
+	call printf ("%g %g\n")
+	    call pargr (x)
+	    call pargr (cveval (cv, x))
+    }
+
+    call cvfree (cv)
+
+
+Example 2: Fit curve using accumulate mode, weight based on spacing
+
+    include <math/curfit.h>
+
+    ...
+
+    old_x = x
+    do i = 1, 512 {
+	x = real (i)
+	if (y[i] != INDEF) {
+	    call cvaccum (cv, x, y, weight, x - old_x, WTS_USER)
+	    old_x = x
+	}
+    }
+
+    call cvsolve (cv, ier)
+    if (ier != OK)
+	call error (...)
+
+    ...
+
+    call cvfree (cv)
+
+
+Example 3: Fit and subtract smooth curve from image lines
+
+    include <math/curfit.h>
+
+    ...
+
+    call cvinit (cv, CHEBYSHEV, order, 1., 512.)
+
+    do line = 1, nlines {
+	inpix = imgl2r (im, line)
+	outpix = impl2r (im, line)
+	if (line == 1)
+	    call cvfit (cv, x, Memr[inpix], weight, 512, WTS_UNIFORM, ier)
+	else
+	    call cvrefit (cv, x, Memr[inpix], weight, ier)
+	if (ier != OK)
+	    ...
+	call cvvector (cv, x, y, 512)
+	call asubr (Memr[inpix], y, Memr[outpix], 512)
+    }
+
+    call cvfree (cv)
+
+
+Example 4: Fit curve, save fit for later use by CVEVAL. LEN_FIT must be a least
+	   order + 7 elements long.
+
+    include <math/curfit.h>
+
+    real  fit[LEN_FIT]
+
+    ...
+    call cvinit (cv, CHEBYSHEV, order, xmin, xmax)
+    call cvfit (cv, x, y, w, npts, WTS_UNIFORM, ier)
+    if (ier != OK)
+	...
+    call cvsave (cv, fit)
+    call cvfree (cv)
+    ...
+    call cvrestore (cv, fit)
+    do i = 1, npts
+	yfit[i] = cveval (cv, x[i])
+    call cvfree (cv)
+    ...
+.fi

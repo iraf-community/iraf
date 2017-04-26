@@ -1,0 +1,12 @@
+# Reblock Library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_reblock.x	reblock.com reblock.h <fset.h> <error.h> <ctype.h>\
+			<mach.h>
+	reblock_file.x	reblock.com reblock.h <fset.h> <error.h> <mach.h>
+	;

@@ -1,0 +1,6 @@
+# Parameter file for IMFUNCTION
+
+input,s,a,,,,Input images
+output,s,a,,,,Output images
+function,s,a,,"log10|alog10|ln|aln|sqrt|square|cbrt|cube|abs|neg|cos|sin|tan|acos|asin|atan|hcos|hsin|htan|reciprocal",,Function
+verbose,b,h,yes,,,Verbose mode?

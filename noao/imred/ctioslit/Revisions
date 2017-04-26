@@ -1,0 +1,26 @@
+.help revisions Dec94 noao.imred.ctioslit
+.nf
+
+=====
+V2.12
+=====
+
+imred$ctioslit/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
+imred$ctioslit/demos/mkdoslit.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$ctioslit/sparams.par
+    Changed match from 10. to -3.  (4/5/96, Valdes)
+
+imred$ctioslit/ctioslit.cl
+imred$ctioslit/ctioslit.men
+    Added background, illumination, response, apflatten, apnormalize.
+    (12/29/94, Valdes)
+
+.endhelp

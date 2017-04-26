@@ -1,0 +1,14 @@
+# Help directory for the MULTISPEC package.
+
+$doc = "./doc/"
+
+findpeaks	hlp=doc$findpeaks.hlp,	src=t_findpeaks.x
+fitfunction	hlp=doc$fitfunc.hlp,	src=t_fitfunc.x
+fitgauss5	hlp=doc$fitgauss5.hlp,	src=t_fitgauss5.x
+modellist	hlp=doc$modellist.hlp,	src=t_modellist.x
+msextract	hlp=doc$msextract.hlp,	src=t_msextract.x
+mslist		hlp=doc$mslist.hlp,	src=t_mslist.x
+msplot		hlp=doc$msplot.hlp,	src=t_msplot.cl
+msset		hlp=doc$msset.hlp,	src=t_msset.x
+newextraction	hlp=doc$newextract.hlp,	src=t_newextract.x
+newimage	hlp=doc$newimage.hlp,	src=t_newimage.x

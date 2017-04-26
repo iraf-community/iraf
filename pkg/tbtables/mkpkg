@@ -1,0 +1,250 @@
+#   MKPKG file for the STSDAS TABLES I/O routines.
+#   Author: HODGE, 15-JUL-1987
+#	Phil Hodge, 14-AUG-1987, add tbhad[]
+#	Phil Hodge, 11-SEP-1987, use relative location for object library
+#	Phil Hodge, 30-SEP-1987, add tbrcpy, tbrswp
+#	Phil Hodge, 28-DEC-1987, routines for different data types are
+#					combined into single files
+#	Phil Hodge, 16-Jun-1992, update for text tables
+#	Phil Hodge,  7-Jun-1994, include tbzd2t, tbzi2d, tbzi2t, tbzt2t.
+#	Phil Hodge,  2-Oct-1995, include fitsio.
+#	Phil Hodge, 26-Mar-1998, include tbcdes.x, tbfchp.x, tbs*.x;
+#				delete tbtszd.x, tbxwsk.x, tbytsz.x.
+#	Phil Hodge, 14-Apr-1998, delete tbcftg.x and tbcftp.x.
+#	Ellyne Kinney, 30-Sep-1998, added line for cfitsio.
+#	Phil Hodge, 18-Jan-1999, include tbfpri.x.
+#	Phil Hodge, 22-Mar-1999, include SPPFITSIO switch;
+#		add -Inolibc to XFLAGS for running mkpkg from this directory.
+#	Phil Hodge, 19-Apr-1999, add tbttyp.
+#	Phil Hodge,  7-Jun-1999, add tbzrds.x, tbzrdx.x and tbzsub.x.
+#	Phil Hodge,  5-Aug-1999, delete tbalen.x.
+#	Phil Hodge, 24-Sep-1999, add tbztyp.x.
+#	Phil Hodge, 23-Jun-2000, add tbcscal.x and tbfscal.x.
+#	Phil Hodge, 31-Aug-2000, add tbfhp_f.x to the section for SPPFITSIO,
+#		and move tbfhp.x to the non-SPPFITSIO section.
+#	Phil Hodge, 31-July-2001, move @cfitsio.
+
+
+
+update:
+        $checkout libtbtables.a lib$
+        $update   libtbtables.a
+        $checkin  libtbtables.a lib$
+        $purge    lib$
+        ;
+
+
+libtbtables.a:
+	$set XFLAGS 	= "-Inolibc $(XFLAGS)"
+
+	tbagt.x		<mach.h> <tbset.h> tbtables.h
+	tbapt.x		<tbset.h> tbtables.h
+	tbbadf.x			
+	tbbaln.x	<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbbcmt.x	tbtables.h
+	tbbftp.x	<tbset.h>
+	tbbnll.x	tbtables.h
+	tbbptf.x	<tbset.h>
+	tbbtyp.x	tblerr.h
+	tbbwrd.x	<ctype.h>
+	tbcadd.x	<tbset.h> tbtables.h
+	tbcchg.x	<tbset.h> tbtables.h tblerr.h
+	tbcdef.x	<tbset.h> tbtables.h tblerr.h
+	tbcdef1.x	<tbset.h>
+	tbcdes.x	<tbset.h> tbtables.h
+	tbcfmt.x	<tbset.h> tbtables.h
+	tbcfnd.x	<tbset.h> tbtables.h
+	tbcfnd1.x	<tbset.h>
+	tbcftl.x	<tbset.h> tbtables.h
+	tbcgt.x		<tbset.h> tbtables.h tblerr.h
+	tbciga.x	<tbset.h> tbtables.h
+	tbcigi.x	<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbcigt.x	<tbset.h> tbtables.h tblerr.h
+	tbcinf.x	<mach.h> <tbset.h> tbtables.h
+	tbcnam.x	<tbset.h> tbtables.h
+	tbcnit.x	<tbset.h> tbtables.h
+	tbcnum.x	tbtables.h
+	tbcpt.x		<tbset.h> tbtables.h tblerr.h
+	tbcrcd.x	<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbcscal.x	<tbset.h> tbtables.h
+	tbctpe.x	<tbset.h> tbtables.h
+	tbcwcd.x	<mach.h> <tbset.h> tbtables.h
+	tbdsav.x	tbtables.h
+	tbegp.x		<mach.h> tbtables.h
+	tbegt.x		<tbset.h> tbtables.h tblerr.h
+	tbeoff.x	<tbset.h> tbtables.h tblerr.h
+	tbepp.x		<mach.h> tbtables.h
+	tbept.x		<tbset.h> tbtables.h tblerr.h
+	tbeszt.x	<mach.h> tbtables.h
+	tbfag.x		<tbset.h> tbtables.h
+	tbfanp.x	<tbset.h> tbtables.h
+	tbfap.x		tbtables.h
+	tbfcal.x	<ctype.h> <tbset.h> tbtables.h
+	tbfchp.x	tbtables.h
+	tbfckn.x	<tbset.h> tbtables.h
+	tbfclo.x	<tbset.h> tbtables.h
+	tbfdef.x	<tbset.h> tbtables.h tblfits.h
+	tbfdel.x	tbtables.h
+	tbferr.x
+	tbffkw.x	<tbset.h> tbtables.h
+	tbffmt.x	tbtables.h tblfits.h
+	tbffnd.x	tbtables.h tblfits.h
+	tbfgcm.x	<tbset.h> tbtables.h
+	tbfgnp.x	<tbset.h> tbtables.h
+	tbfhdl.x	tbtables.h
+	tbfhg.x		<tbset.h> tbtables.h
+	tbfiga.x	tbtables.h
+	tbfopn.x	<tbset.h> tbtables.h tblfits.h
+	tbfnam.x	tbtables.h tblfits.h
+	tbfnew.x	<tbset.h> tbtables.h tblfits.h
+	tbfnit.x	tbtables.h tblfits.h
+	tbfnll.x	<tbset.h> tbtables.h
+	tbfpcm.x	tbtables.h
+	tbfpnp.x	<ctype.h> <tbset.h> tbtables.h
+	tbfpri.x	<tbset.h>
+	tbfptf.x
+	tbfrcd.x	<tbset.h> tbtables.h tblfits.h
+	tbfres.x	<tbset.h>
+	tbfrsi.x	<tbset.h> tbtables.h
+	tbfscal.x	tbtables.h
+	tbfsiz.x	<mach.h> tbtables.h
+	tbfsft.x	tbtables.h
+	tbftya.x	<mach.h> tbtables.h
+	tbftyb.x	<mach.h> tbtables.h
+	tbfudf.x	<tbset.h> tbtables.h
+	tbfwcd.x	<tbset.h> tbtables.h
+	tbfwer.x	<tbset.h> tbtables.h tblfits.h
+	tbfwsi.x	<tbset.h> tbtables.h
+	tbhad.x		<tbset.h> tbtables.h tblerr.h
+	tbhanp.x	<tbset.h> tbtables.h
+	tbhcal.x	<tbset.h> tbtables.h tblerr.h
+	tbhckn.x	<tbset.h> tbtables.h
+	tbhdel.x	<tbset.h> tbtables.h tblerr.h
+	tbhfcm.x	<ctype.h> <tbset.h>
+	tbhfkr.x	<chars.h> <ctype.h> <tbset.h> tbtables.h
+	tbhfkw.x	<tbset.h> tbtables.h
+	tbhgcm.x	<tbset.h> tbtables.h
+	tbhgnp.x	<chars.h> <ctype.h> <tbset.h> tbtables.h
+	tbhgt.x		<tbset.h> tblerr.h tbtables.h
+	tbhisc.x	<ctype.h> <tbset.h>
+	tbhkeq.x	<tbset.h>
+	tbhpcm.x	<ctype.h> <tbset.h> tbtables.h
+	tbhpnp.x	<tbset.h> tbtables.h tblerr.h
+	tbhpt.x		<tbset.h> tbtables.h tblerr.h
+	tbhrpr.x	<mach.h> <tbset.h> tbtables.h
+	tbhwpr.x	<mach.h> <tbset.h> tbtables.h
+	tbnopen.x
+	tbpset.x	<fset.h> <tbset.h> tbtables.h tblerr.h
+	tbpsta.x	<fset.h> <tbset.h> tbtables.h tblerr.h
+	tbrchg.x	<tbset.h> tbtables.h tblerr.h
+	tbrcmp.x	<tbset.h> tbtables.h
+	tbrcpy.x	<tbset.h> tbtables.h tblerr.h
+	tbrcsc.x	<tbset.h> tbtables.h tblerr.h
+	tbrdel.x	<tbset.h> tbtables.h tblerr.h
+	tbrgt.x		<tbset.h> tbtables.h tblerr.h
+	tbrnll.x	<tbset.h> tbtables.h tblerr.h
+	tbrpt.x		<tbset.h> tbtables.h tblerr.h
+	tbrsft.x	<tbset.h> tbtables.h tblerr.h
+	tbrswp.x	<tbset.h> tbtables.h tblerr.h
+	tbrudf.x	<tbset.h> tbtables.h tblerr.h
+	tbscol.x	tbtables.h
+	tbsirow.x	tbtables.h tblerr.h
+	tbsopn.x	<tbset.h> tbtables.h
+	tbsrow.x	tbtables.h
+	tbswer.x	<tbset.h> tbtables.h tblerr.h
+	tbswer1.x	<tbset.h> tbtables.h
+	tbtacc.x	<tbset.h>
+	tbtbod.x	<mach.h> <tbset.h> tbtables.h
+	tbtchs.x	<tbset.h> tbtables.h tblerr.h
+	tbtclo.x	<tbset.h> tbtables.h tblerr.h
+	tbtcpy.x	<tbset.h> tbtables.h
+	tbtcre.x	<tbset.h> tbtables.h tblerr.h
+	tbtdel.x	tbtables.h
+	tbtext.x	<ctype.h> <tbset.h> tblerr.h
+	tbtflu.x	tbtables.h tblerr.h
+	tbtfst.x	<tbset.h> tbtables.h tblerr.h
+	tbtnam.x	tbtables.h
+	tbtopn.x	<tbset.h> tbtables.h tblerr.h
+	tbtopns.x	<mach.h> <error.h> <tbset.h> tbtables.h tblerr.h
+	tbtren.x	<tbset.h> tbtables.h
+	tbtrsi.x	<tbset.h> tbtables.h tblerr.h
+	tbtscd.x	<mach.h> <tbset.h> tbtables.h
+	tbtscu.x	<mach.h> <tbset.h> tbtables.h
+	tbtsrt.x
+	tbttyp.x	<chars.h> <mach.h> <tbset.h> tbtables.h
+	tbtwer.x	tbtables.h
+	tbtwsi.x	<tbset.h> tbtables.h
+	tbuopn.x	<error.h> <tbset.h> tbtables.h tblerr.h
+	tbxag.x		<mach.h> <tbset.h> tbtables.h
+	tbxap.x		<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbxcg.x		<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbxcp.x		tbtables.h tblerr.h
+	tbxncn.x	tbtables.h
+	tbxnew.x	<tbset.h> tbtables.h
+	tbxnll.x	tbtables.h
+	tbxoff.x	tbtables.h
+	tbxrg.x		<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbxrp.x		<mach.h> tbtables.h tblerr.h
+	tbxscp.x	tbtables.h
+	tbxsft.x	tbtables.h
+	tbxsiz.x	<fset.h> tbtables.h
+	tbxudf.x	tbtables.h
+	tbxwnc.x	tbtables.h
+	tbxwer.x	tbtables.h
+	tbycg.x		<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbycp.x		tbtables.h tblerr.h
+	tbyncn.x	tbtables.h
+	tbynew.x	<tbset.h> tbtables.h
+	tbynll.x	tbtables.h
+	tbyoff.x	tbtables.h
+	tbyrg.x		<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbyrp.x		<mach.h> tbtables.h tblerr.h
+	tbyscn.x	tbtables.h
+	tbyscp.x	tbtables.h
+	tbysft.x	tbtables.h tblerr.h
+	tbysiz.x	<fset.h> tbtables.h
+	tbyudf.x	<tbset.h> tbtables.h
+	tbywer.x	tbtables.h
+	tbywnc.x	tbtables.h
+	tbzadd.x	<tbset.h> tbtables.h
+	tbzcg.x		tbtables.h
+	tbzclo.x	<tbset.h> tbtables.h
+	tbzcol.x	<ctype.h> <tbset.h> tbtables.h
+	tbzcp.x		tbtables.h
+	tbzd2t.x	<mach.h> tbtables.h
+	tbzgt.x		<tbset.h> tbtables.h
+	tbzi2d.x	tbtables.h
+	tbzi2t.x	tbtables.h
+	tbzt2t.x	tbtables.h
+	tbzkey.x	tbtables.h tbltext.h
+	tbzlin.x	<chars.h> <ctype.h> tbltext.h
+	tbzmem.x	<ctype.h> <tbset.h> tbtables.h
+	tbznew.x	tbtables.h tbltext.h
+	tbznll.x	tbtables.h tblerr.h
+	tbzopn.x	<tbset.h> tbtables.h tbltext.h
+	tbzpt.x		tbtables.h
+	tbzrds.x	<mach.h> <tbset.h> tbtables.h tbltext.h
+	tbzrdx.x	<tbset.h> tbtables.h tbltext.h
+	tbzsft.x	tbtables.h tblerr.h
+	tbzsiz.x	tbtables.h
+	tbzsub.x	<tbset.h> tbtables.h tbltext.h
+	tbztyp.x	tblerr.h
+	tbzudf.x	<tbset.h> tbtables.h tblerr.h
+	tbzwer.x	tbtables.h
+	tbzwrt.x	<ctype.h> <tbset.h> tbtables.h tbltext.h
+	tbparse.x	<ctype.h> <tbset.h>
+	tbnparse.x	<ctype.h> <ctotok.h> <tbset.h>
+	@selector
+
+#	$ifdef (SPPFITSIO)
+	    $echo "NOTE:  SPP FITSIO will be used for FITS tables."
+	    tbfhp_f.x	<tbset.h> tbtables.h tblfits.h
+	    @fitsio
+#	$else
+#	    $echo "NOTE:  CFITSIO will be used for FITS tables."
+#	    $echo "NOTE:  CFITSIO does not support IRAF networking."
+#	    tbfhp.x	<tbset.h> tbtables.h tblfits.h
+#	    tbfxff.c	"cfitsio/fitsio.h" fitsio_spp.h underscore.h
+#	    @cfitsio
+#	$endif
+	;

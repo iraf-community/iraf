@@ -1,0 +1,25 @@
+.help zgtpid May84 "System Interface"
+.ih
+NAME
+zgtpid -- get unique process-id number
+.ih
+SYNOPSIS
+.nf
+zgtpid (pid)
+
+int	pid			# process id number
+.fi
+.ih
+DESCRIPTION
+The magic integer value by which the current process is known to the host
+operating system is returned as the argument \fIpid\fR.  The process-id
+is used by all process control operators to uniquely identify the process
+to be operated upon.
+.ih
+NOTES
+The process id number is also used by \fBmktemp\fR to generate unique temporary
+filenames.
+.ih
+SEE ALSO
+zopcpr, zclcpr, zintpr, zopdpr, zcldpr
+.endhelp

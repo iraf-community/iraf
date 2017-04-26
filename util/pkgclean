@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+#  PKGCLEAN -- Clean the named package, or all packages from the system.
+#
+#  Usage:     pkgclean [-all] [-dist] [-init] <pkg>
+#
+#  Where	-all	clean all packages
+#		<pkg>	package to be removed
+#
+# ----------------------------------------------------------------------------
+
+
+all=no
+init=no
+
+# Process cmdline flags.
+while [ -n "$1" ]; do
+    case "$1" in
+    "-all")                          # clean all package .s
+        all=yes
+	;;
+    "-init")                         # init all packages
+        init=yes
+	;;
+    *)
+        pkg=$1
+        break
+	;;
+    esac
+    shift
+done
+
+
+if [ "$all" == "yes" ]; then
+  if [ -e ".repo_pkgs" ]; then
+    files=`cat .repo_pkgs`
+    for p in ${files[@]}; do
+      if [ -e $p ]; then
+        /bin/rm -rf $p
+        mkdir $p
+
+        /bin/echo "" > .installed
+        /bin/echo "" > .zzexport .def=
+      fi
+    done
+  fi
+
+elif [ "$init" == "yes" ]; then
+  if [ -e ".repo_pkgs" ]; then
+    files=`cat .repo_pkgs`
+    for p in ${files[@]}; do
+      if [ -e $p ]; then
+        /bin/rm -rf $p
+      fi
+    done
+  fi
+  /bin/rm -rf Makefile    >> /dev/null 2>&1
+  /bin/rm -rf .installed  >> /dev/null 2>&1
+  /bin/rm -rf .repo*      >> /dev/null 2>&1
+  /bin/echo "" > .zzexport .def=
+
+else
+   if [ -e $pkg ]; then
+      /bin/rm -rf $pkg
+      mkdir $pkg
+   else
+     /bin/echo "Package '$pkg' is not currently installed"
+     exit 1
+   fi
+fi
+
+
+#  Normal exit.
+exit 0
+
+
+
+#=============================================================================
+# Usage
+#=============================================================================
+
+Usage:
+    /bin/echo "Usage: pkgclean [-all] [-dist] [-init] <pkg>"
+    /bin/echo ""
+    /bin/echo "    Where    -all	clean all packages"
+    /bin/echo "	       <pkg>	package to be removed"
+
+exit 0

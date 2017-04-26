@@ -1,0 +1,602 @@
+# Observatory Parameters.
+#
+# Some were taken from the Almanac and others have been submitted.
+# Observatories wishing to be added or make changes in the default
+# distributed database should send information to iraf@noao.edu.
+
+observatory = "kpno"
+	name = "Kitt Peak National Observatory"
+	longitude = 111:36.0
+	latitude = 31:57.8
+	altitude = 2120.
+	timezone = 7
+
+observatory = "wiyn"
+        name = "WIYN Observatory"
+        longitude = 111:36.0
+        latitude = 31:57.8
+        altitude = 2120.
+        timezone = 7
+
+observatory = "ctio"
+	name = "Cerro Tololo Interamerican Observatory"
+	longitude = 70.815
+	latitude = -30.16527778
+	altitude = 2215.
+	timezone = 4
+
+observatory = "lasilla"
+	name = "European Southern Observatory: La Silla"
+	longitude = 70:43.8
+	latitude = -29:15.4
+	altitude = 2347
+	timezone = 4
+
+observatory = "paranal"
+	name = "European Southern Observatory: Paranal"
+	longitude = 70:24.2
+	latitude = -24:37.5
+	altitude = 2635
+	timezone = 4
+
+observatory = "lick"
+	name = "Lick Observatory"
+	longitude = 121:38.2
+	latitude = 37:20.6
+	altitude = 1290
+	timezone = 8
+
+# Observatory entry from a conversation with Craig Foltz 8/20/97.
+# Name was changed and the "mmt" entry was removed.
+observatory = "mmto"
+	name = "MMT Observatory"
+	longitude = 110:53.1
+	latitude = 31:41.3
+	altitude = 2600
+	timezone = 7
+
+observatory = "cfht"
+	name = "Canada-France-Hawaii Telescope"
+	longitude = 155:28.3
+	latitude = 19:49.6
+	altitude = 4215
+	timezone = 10
+
+observatory = "lapalma"
+	name = "Roque de los Muchachos, La Palma"
+	longitude = 17:52.8
+	latitude = 28:45.5
+	altitude = 2327
+	timezone = 0
+
+observatory = "mso"
+	name = "Mt. Stromlo Observatory"
+	longitude = 210:58:32.4
+	latitude = -35:19:14.34
+	altitude = 767
+	timezone = -10
+
+observatory = "sso"
+	name = "Siding Spring Observatory"
+	longitude = 210:56:19.70
+	latitude = -31:16:24.10
+	altitude = 1149
+	timezone = -10
+
+observatory = "aao"
+	name = "Anglo-Australian Observatory"
+	longitude = 210:56:2.09
+	latitude = -31:16:37.34
+	altitude = 1164
+	timezone = -10
+
+observatory = "mcdonald"
+	name = "McDonald Observatory"
+	longitude = 104.0216667
+	latitude = 30.6716667
+	altitude = 2075
+	timezone = 6
+
+observatory = "lco"
+	name = "Las Campanas Observatory"
+	longitude = 70:42.1
+	latitude = -29:0.2
+	altitude = 2282
+	timezone = 4
+
+# Submitted by Alan Koski 1/13/93
+observatory = "mtbigelow"
+	name = "Catalina Observatory: 61 inch telescope"
+	longitude = 110:43.9
+	latitude = 32:25.0
+	altitude = 2510.
+	timezone = 7
+
+# Revised by Daniel Durand 2/23/93
+observatory = "dao"
+	name = "Dominion Astrophysical Observatory"
+	longitude = 123:25.0
+	latitude = 48:31.3
+	altitude = 229
+	timezone = 8
+
+# Submitted by Patrick Vielle 5/4/93
+observatory = "spm"
+	name = "Observatorio Astronomico Nacional, San Pedro Martir"
+	longitude = 115:29:13
+	latitude = 31:01:45
+	altitude = 2830
+	timezone = 7
+
+# Submitted by Patrick Vielle 5/4/93
+observatory = "tona"
+	name = "Observatorio Astronomico Nacional, Tonantzintla"
+	longitude = 98:18:50
+	latitude = 19:01:58
+	timezone = 8
+
+# Submitted by Don Hamilton 8/18/93
+observatory = "Palomar"
+	name = "The Hale Telescope"
+	longitude = 116:51:46.80
+	latitude = 33:21:21.6
+	altitude = 1706.
+	timezone = 8
+
+# Submitted by Pat Seitzer 10/31/93
+observatory = "mdm"
+	name = "Michigan-Dartmouth-MIT Observatory"
+	longitude = 111:37.0
+	latitude = 31:57.0
+	altitude = 1938.5
+	timezone = 7
+
+# Submitted by Ignacio Ferrin 9/1/94
+observatory = "NOV"
+	name = "National Observatory of Venezuela"
+	longitude = 70:52.0
+	latitude = 8:47.4
+	altitude = 3610
+	timezone = 4
+
+# Submitted by Alan Welty 10/28/94
+observatory = "bmo"
+	name = "Black Moshannon Observatory"
+	longitude = 78:00.3
+	latitude = 40:55.3
+	altitude = 738
+	timezone = 5
+
+# Submitted by Biwei JIANG 11/28/95
+observatory = "BAO"
+	name = "Beijing XingLong Observatory"
+	longitude = 242:25.5
+	latitude = 40:23.6
+	altitude = 950.
+	timezone = -8
+
+# From Astronomical Almanac 1996
+observatory = "keck"
+	name = "W. M. Keck Observatory"
+	longitude = 155:28.7
+	latitude = 19:49.7
+	altitude = 4160
+	timezone = 10
+
+# Submitted by Lina Tomasella 6/11/96:  Padova Astronomical Obs., Asiago, Italy.
+observatory = "ekar"
+	name = "Mt. Ekar 182 cm. Telescope"
+	longitude = 348:25:07.92
+	latitude = 45:50:54.92
+	altitude = 1413.69
+	timezone = -1
+
+# Submitted by Michael Ledlow 8/8/96
+observatory = "apo"
+	name = "Apache Point Observatory"
+	longitude = 105:49.2
+	latitude = 32:46.8
+	altitude = 2798.
+	timezone = 7 
+
+# Submitted by Michael Ledlow 8/8/96
+observatory = "lowell"
+	name = "Lowell Observatory"
+	longitude = 111:32.1
+	latitude = 35:05.8
+	altitude = 2198. 
+	timezone = 7 
+
+# Submitted by S.G. Bhargavi 8/12/96
+observatory = "vbo"
+	name = "Vainu Bappu Observatory"
+	longitude = 281.1734
+	latitude = 12.57666
+	altitude = 725. 
+	timezone = -5.5
+
+# Submitted by S. Giridhar 6/28/03
+observatory = "iao"
+	name = "Indian Astronomical Observatory, Hanle"
+	longitude = 281.03583
+	latitude = 32.7794
+	altitude = 4500
+	timezone = -5.5
+
+# Submitted by Doug Mink 1/6/97
+observatory = "flwo"
+        name = "Whipple Observatory"
+        longitude = 110:52:39
+        latitude = 31:40:51.4
+        altitude = 2320
+        timezone = 7
+observatory = "flwo1"
+        name = "Whipple Observatory"
+        longitude = 110:52:39
+        latitude = 31:40:51.4
+        altitude = 2320
+        timezone = 7
+
+# Submitted by Doug Mink 1/6/97
+observatory = "oro"
+	name = "Oak Ridge Observatory"
+        longitude = 71:33:29.32
+        latitude =  42:30:18.94
+        altitude =  184
+        timezone = 5
+
+# Submitted by Claudia Vilega Rodriques 12/12/97
+observatory = "lna"
+        name = "Laboratorio Nacional de Astrofisica - Brazil"
+        longitude = 45.5825
+        latitude = -22:32:04
+        altitude = 1864
+        timezone = 3
+
+# Submitted by John Memzies 12/31/99
+observatory = "saao"
+	name = "South African Astronomical Observatory"
+	longitude = 339:11:21.5
+	latitude =  -32:22:46
+	altitude =  1798
+	timezone = -2
+
+# Submitted by Jorge Federico Gonzalez 12/10/98
+observatory = "casleo"
+        name = "Complejo Astronomico El Leoncito, San Juan"
+        longitude = 69:18:00 
+        latitude = -31:47:57
+        altitude = 2552
+        timezone = 3
+
+# Submitted by Jorge Federico Gonzalez 12/10/98
+observatory = "bosque"
+        name = "Estacion Astrofisica Bosque Alegre, Cordoba"
+        longitude = 64:32:45
+        latitude = -31:35:54
+        altitude = 1250
+        timezone = 3
+
+# Submitted by Ilian Iliev 1/19/99
+observatory = "rozhen"
+        name = "National Astronomical Observatory Rozhen - Bulgaria"
+	longitude = 335:15:22
+	latitude = 41:41:35
+	altitude = 1759
+	timezone = -2
+
+# Submitted by Bill Vacca 7/14/99
+observatory = "irtf"
+	name        = "NASA Infrared Telescope Facility"
+	longitude   = 155.471999
+	latitude    = 19.826218
+	altitude    = 4168
+	timezone    = 10
+
+# Submitted by Andy Layden 7/16/99
+observatory = "bgsuo"
+        name = "Bowling Green State Univ Observatory"
+        longitude = 83:39:33
+        latitude = 41:22:42
+        altitude = 225.
+        timezone = 5
+
+# Submitted by Oliver-Mark Cordes 8/5/99
+observatory = "DSAZ"
+        name = "Deutsch-Spanisches Observatorium Calar Alto - Spain"
+        longitude = 2:32:46.5
+        latitude = 37:13:25
+        altitude = 2168
+        timezone = -1
+
+# Submitted by Matilde Fernandez 2/2/99
+observatory = "ca"
+	name = "Calar Alto Observatory"
+	longitude = 2:32:46.5
+	latitude = 37:13:25
+	altitude = 2168
+	timezone = -1
+
+# Submitted by Oliver-Mark Cordes 8/5/99
+observatory = "holi"
+        name = "Observatorium Hoher List (Universitaet Bonn) - Germany"
+        longitude = 6.85
+        latitude = 50.16276
+        altitude = 541
+        timezone = -1
+
+# Submitted by Steven Majewski 8/27/99
+observatory = "lmo"
+        name = "Leander McCormick Observatory"
+        longitude = 78:31:24
+        latitude =  38:02:00
+        altitude = 264
+        timezone = 5
+
+# Submitted by Steven Majewski 8/27/99
+observatory = "fmo"
+        name = "Fan Mountain Observatory"
+        longitude = 78:41:36
+        latitude =  37:52:42
+        altitude = 566 
+        timezone = 5
+
+# Submitted by Kim K. McLeod 10/13/1999
+observatory = "whitin"
+	name = "Whitin Observatory, Wellesley College"
+	longitude = 71.305833
+	latitude = 42.295
+	altitude = 32
+	timezone = 5
+
+# Submitted by Nuno Peixinho 6/7/2000
+# Parameters for the Sierra Nevada Observatory (Spain)
+observatory = "osn"
+        name = "Observatorio de Sierra Nevada"
+        longitude = 3:23:05
+        latitude = 37:03:51
+        altitude = 2896
+        timezone = -1
+
+# Gemini Observatory - Submitted by Inger Jorgensen 
+#
+# Gemini-North
+# These values are from the aerial survey made Sept 25, 1996
+#    http://www.ifa.hawaii.edu/mko/coordinates.html
+
+observatory = "gemini-north"
+        name = "Gemini North Observatory"
+        longitude = 155:28.142805
+        latitude = 19:49.42809
+        altitude = 4213.4
+        timezone = 10
+
+# Gemini-South
+# The coordinates are from GPS measurements and the elevation
+# is from the Gemini Web pages http://www.gemini.edu/public
+
+#observatory = "gemini-south"
+#        name = "Gemini South Observatory"
+#        longitude = 70:43.4
+#        latitude = -30:13.7
+#        altitude = 2737.
+#        timezone = 4
+
+# Corrected coords from Bryan Miller, 5/18/2006
+observatory = "gemini-south"
+        name = "Gemini South Observatory"
+        longitude = 70:44.2016
+        latitude = -30:14.445
+        altitude = 2722.
+        timezone = 4
+
+# ESO
+
+observatory = "lasilla"
+	name = "European Southern Observatory: La Silla"
+	longitude = 70:43.8
+	latitude = -29:15.4
+	altitude = 2347
+	timezone = 4
+
+observatory = "paranal"
+	name = "European Southern Observatory: Paranal"
+	longitude = 70:24.2
+	latitude = -24:37.5
+	altitude = 2635
+	timezone = 4
+
+# The following additional entries were suppied by Peter Weilbacher
+# weilbach@uni-sw.gwdg.de on 28 Jan 2002 13:12:59 -0700.
+
+observatory = "esontt"
+	name = "European Southern Observatory, NTT, La Silla"
+	longitude = 70:43:54.272
+	latitude = -29:15:18.440
+	altitude = 2375
+	timezone = 4
+
+observatory = "eso36m"
+	name = "European Southern Observatory, 3.6m Telescope, La Silla"
+	longitude = 70:43:46.606
+	latitude = -29:15:25.814
+	altitude = 2400
+	timezone = 4
+
+observatory = "esovlt"
+	name = "European Southern Observatory, VLT, Paranal"
+	longitude = 70.4022
+	latitude = -24.6253
+	altitude = 2648
+	timezone = 4
+
+
+# Submited by Giovanni Catanzaro, 7/17/03.
+observatory = "sln"
+	name = "SLN - Catania Astrophysical Observatory"
+	longitude = 345:01:36
+	latitude = 37:41.5
+	altitude = 1725.
+	timezone = -1
+
+
+# Submited by Ahmet Devlen, 4/21/04
+observatory = "euo"
+        name = "Ege University Observatory"
+        longitude = -27:16.5
+        latitude = 38:23.9
+        altitude = 795.
+        timezone = 2
+
+# Submitted by Zeki Aslan 8/15/05 who said the "tno" entry was wrong.
+#observatory = "tno"
+#        name = "Turkiye National Observatory"
+#        longitude = -30:21:11
+#        latitude = 36:49:28
+#        altitude = 2555.
+#        timezone = 2
+#
+observatory = "tug"
+        name = "TUBITAK National Observatory, Turkey"
+	longitude = -30:20:00
+	latitude = 36:49:30
+	altitude = 2547.
+	timezone = -2
+
+
+# Submited by Ricky Patterson for Vatican Obs. Research Group, 6/15/04
+observatory = "mgo"
+        name = "Mount Graham Observatory"
+        longitude = 109:53:30
+        latitude = 32:42:06
+        altitude = 3181
+        timezone = 7
+
+# Submited by Jeewan C. Bandey 7/28/05
+# Changed to W longitude MJF 4/1/06)
+# 	(E) longitude = 79.45639
+observatory = "aries"
+        name = "Aryabhatta Research Institute of Observational Sciences"
+	longitude = 280.54361
+	latitude = 29.36
+	altitude = 1950.
+	timezone = -5.5
+
+# Submitted by Eduardo Fernández Lajús 10/28/05
+observatory = "oalp"                                                            
+        name = 'Observatorio Astronómico de La Plata'                           
+        longitude = 57:55:56.2782                                               
+        latitude = -34:54:24.3040                                               
+        altitude = 20.                                                          
+        timezone = 3.                                                           
+
+# Submitted by Leslie F. Brown 7/29/06
+observatory = "olin"
+	name = Connecticut College - Olin Observatory"
+	longitude = 72:06:19
+	latitude = 41:22:44
+	altitude = 85
+	timezone = 5
+
+# Submitted by Pat van Heerden 11/20/06
+observatory = "boyden"
+	name = Boyden Observatory
+	longitude = 332:35:40.0
+	latitude = -29:02:20
+	altitude = 1387
+	timezone = -2
+
+# Submitted by Mike Yang 8/19/09
+observatory = "lulin"
+	name = "Lulin Observatory"
+	longitude = 240:52.4
+	latitude = 23:28.1
+	altitude = 2862.
+	timezone = -8
+
+# Submitted by Mairan Teodoro 1/27/10
+observatory = "soar" 
+	name = "Southern Astrophysical Research Telescope" 
+	longitude = 70:44:01.4 
+	latitude = -30:14:16.8 
+	altitude = 2738 
+	timezone = 4
+
+# Submitted from iraf.net 4/12/10
+observatory = "baker" 
+	name = "Baker Observatory" 
+	longitude = 93:02:30.29 
+	latitude = 37:23:55.05 
+	altitude = 418.2 
+	timezone = 6 
+
+# Added MJF 6/1/2010
+observatory = "het"
+        name = "McDonald Observatory - Hobby-Eberly Telescope"
+        longitude = 104.014722222
+        latitude = 30.68144444
+        altitude = 2026
+        timezone = 6
+
+# Submitted by Robert D. Collier 9/1/10
+observatory = "jcdo"
+       name = "Jack C. Davis Observatory, Western Nevada College"
+       longitude = 119:47:26.4
+       latitude = 39:11:08.6
+       altitude = 1534
+       timezone = 8 
+
+# Submitted by mas_nomi1711@yahoo.com 3/16/12
+observatory = "lno"
+       name = "Langkawi National Observatory"
+       longitude = 260:13:08.0
+       latitude = 06:18:25.0
+       altitude = 111
+       timezone = -8 
+
+# Submitted by Eugene Esemenko 4/11/13  (BTA 6m, http://www.sao.ru/Doc-en/)
+observatory = "saoras" 
+       name = "Special Astrophysical Observatory, Russia" 
+       longitude = -41:26:25.61 
+       latitude = 43:38:48.57 
+       altitude = 2080. 
+       timezone = -4 
+
+# Submitted by Eugene Esemenko 4/11/13 (http://www.terskol.com/)
+observatory = "terskol" 
+       name = "Terskol mountain observatory, Russia" 
+       longitude = -42:30:00.0 
+       latitude = 43:16:22.0 
+       altitude = 3100. 
+       timezone = -4 
+
+# Submitted by user 11/24/13 
+observatory = "soao"
+       name = "Sobaeksan Optical Astronomy Observatory"
+       longitude = 231:32:32.64
+       latitude = 36:56:03.88
+       altitude = 1378.
+       timezone = -9
+
+# Submitted by nmasdiana@gmail.com 12/12/13
+       name = "Observatoire de Haute-Provence"
+       longitude = 354.2900
+       latitude = 43.94
+       altitude = 650.
+       timezone = 1
+
+# Submitted by G. Altavilla 1/14/14:  Bologna Astronomical Obs., Loiano, Italy.
+observatory = "loiano"
+       name = "1.52m G.D. Cassini Telescope"
+       longitude = 348:39:58
+       latitude =  44:15:33
+       altitude = 785
+       timezone = -1
+
+# Submitted by Alceste Bonanos 2/17/14
+observatory = "helmos"
+       name = "Helmos Observatory"
+       longitude = 22.1961
+       latitude = 37.9844
+       altitude = 2340
+       timezone = -2

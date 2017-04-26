@@ -1,0 +1,733 @@
+\hypertarget{samp_8c}{
+\section{samp.c File Reference}
+\label{samp_8c}\index{samp.c@{samp.c}}
+}
+Top-level interface to the SAMP library.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$time.h$>$}\par
+{\tt \#include $<$signal.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define \hyperlink{samp_8c_92d198f56296c0b6a531ce4bce977185}{SZ\_\-CLIENT\_\-LIST}~1024
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{samp_8c_db03c60f2933ed9785bfb4457c359af2}{sampInit} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} appName, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} description)
+\begin{CompactList}\small\item\em Initialize the SAMP interface. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_f861f637942c5f971bab824708581f82}{sampClose} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Close the SAMP interface and free resources. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_6bfd947988e5dbc846af7f99bcd99ee7}{sampDebug} (handle\_\-t handle, int value)
+\begin{CompactList}\small\item\em Set interface debug level. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_e3a6e918b3fe22db2fe014da16f81aad}{sampVerbose} (handle\_\-t handle, int value)
+\begin{CompactList}\small\item\em Set interface debug level. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_1f6d544576fec785be1acfeaf3f2cf63}{sampStartup} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Startup the SAMP interface to send/receive messages. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_d634392fbb12cf4e1b2eb05da34759c5}{sampShutdown} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Shut down the active SAMP interface. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_b2f9c71819e1956e1c29e969968f453c}{samp\_\-hubActive} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Determine if the \hyperlink{structHub}{Hub} is active (i.e. connected). \item\end{CompactList}\item 
+\hypertarget{samp_8c_d4ecb0b92b749647d1c3af8a1d11d5d4}{
+int \textbf{samp\_\-setOpt} (handle\_\-t handle, char $\ast$opt, int value)}
+\label{samp_8c_d4ecb0b92b749647d1c3af8a1d11d5d4}
+
+\item 
+void \hyperlink{samp_8c_1428f653b9502c6e6d540f873de2b24f}{samp\_\-Metadata} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} field, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} value)
+\begin{CompactList}\small\item\em Set a metadata field value for the application. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_ed050606c5076a4a34eb8f0f982a25d4}{samp\_\-Subscribe} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, void $\ast$userFunc)
+\begin{CompactList}\small\item\em Subscribe to a given mtype. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_dc0e418fbaee507e661260c4480ecfcd}{samp\_\-Unsubscribe} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype)
+\begin{CompactList}\small\item\em Unsubscribe to a given mtype. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_3e01437224c73b91e49c6428cb69735d}{samp\_\-setCallMode} (handle\_\-t handle, int mode)
+\begin{CompactList}\small\item\em Set the default calling mode (synch or asynch). \item\end{CompactList}\item 
+void \hyperlink{samp_8c_d636ae12dd05df43a077f91882a197ec}{samp\_\-setSyncMode} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Set the calling mode to use synchronous messaging. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_9b2292b819e590b1f7c63bbdfaa09e31}{samp\_\-setASyncMode} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Set the calling mode to use asynchronous messaging. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_7bfbc2e767fe234f83c13b8316a09ecd}{samp\_\-setNotifyMode} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Set the calling mode to use notification messaging. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_01721eabf3e664bae3bea0c2b72268e2}{samp\_\-setMsgMode} (handle\_\-t handle, int mode)
+\begin{CompactList}\small\item\em Set the message pattern to the specified mode. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_b6b49029386c3efd0520daa93a4ab3eb}{samp\_\-setCallByRef} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Have interface call user handlers by reference. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_a3c0bdb4c512357dbc53b0ad7a7d5b01}{samp\_\-setReplyCallback} (handle\_\-t handle, int $\ast$func)
+\begin{CompactList}\small\item\em Set the Reply callback.  samp\_\-setReplyCallback (handle\_\-t handle, int $\ast$func). \item\end{CompactList}\item 
+void \hyperlink{samp_8c_3db66f28546459327665f8491ea97f4d}{samp\_\-setResponseCallback} (handle\_\-t handle, int $\ast$func)
+\begin{CompactList}\small\item\em Set the Response callback.  samp\_\-setResponseCallback (handle\_\-t handle, int $\ast$func). \item\end{CompactList}\item 
+void \hyperlink{samp_8c_114bf9fb0d3e6eabd8bb93f3c87f5233}{samp\_\-defaultReplyHandler} (handle\_\-t handle)
+\begin{CompactList}\small\item\em The interface's default Reply handler. \item\end{CompactList}\item 
+\hypertarget{samp_8c_cd506ac12f25f64ada7c9859af3f857f}{
+void \textbf{samp\_\-deaultfResponseHandler} (handle\_\-t handle)}
+\label{samp_8c_cd506ac12f25f64ada7c9859af3f857f}
+
+\item 
+int \hyperlink{samp_8c_985afa0baeb135c9ee72d09394314ff1}{samp\_\-replyStatus} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Reply with the status of the last message sent. \item\end{CompactList}\item 
+void \hyperlink{samp_8c_c057d32437a96a527c63f938757099af}{samp\_\-setTimeout} (handle\_\-t handle, int timeout)
+\begin{CompactList}\small\item\em Set the message timeout value (in seconds). \item\end{CompactList}\item 
+\hypertarget{samp_8c_7731da5bec549e7554d1bdc11b13eaf6}{
+void \textbf{samp\_\-setAppName} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)}
+\label{samp_8c_7731da5bec549e7554d1bdc11b13eaf6}
+
+\item 
+void \hyperlink{samp_8c_0f50f8dbae701aa6b19912fc99f6475a}{samp\_\-setAppVersion} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} version)
+\begin{CompactList}\small\item\em Set the application name string. \item\end{CompactList}\item 
+int \hyperlink{samp_8c_ff4d125fc9594be25984989fad2fd3c8}{samp\_\-mapClients} (handle\_\-t handle)
+\item 
+int \hyperlink{samp_8c_8a2111bbe4c88cef635e3bf67e899563}{samp\_\-addClient} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} id)
+\item 
+int \hyperlink{samp_8c_1e494e73abe2ddfd946fb39e84da42a9}{samp\_\-listClients} (handle\_\-t handle)
+\item 
+\hypertarget{samp_8c_61e09b672e5f610dae0f242ea8256328}{
+char $\ast$ \textbf{samp\_\-getClients} (handle\_\-t handle)}
+\label{samp_8c_61e09b672e5f610dae0f242ea8256328}
+
+\item 
+int \hyperlink{samp_8c_e30e492f306a40f853a454faf60ab479}{samp\_\-removeClient} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} id)
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{samp_8c_f299ea13607279f60f16b8639a00658f}{samp\_\-getOKMap} ()
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{samp_8c_6bb8b1f5c6268ad8c7f165733d4af86d}{samp\_\-getNullMap} ()
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{samp_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}{
+\hyperlink{structSamp}{Samp} $\ast$ \textbf{sampP}}
+\label{samp_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}
+
+\item 
+handle\_\-t \hyperlink{samp_8c_b04b61ee02d86e15b02b861699ae7424}{sampH}
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{samp_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{nullMap}
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{samp_8c_a68efe925f0d8f29fa203c0f3747a6e2}{OK\_\-Map}
+\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{samp_8c_a2106c7fe3a5747178c046238fbd5d55}{nullList}
+\item 
+\hyperlink{structHub}{Hub} $\ast$ \hyperlink{samp_8c_d702b07240de0e0cf9e4b781a38317ad}{hub}
+\item 
+int \hyperlink{samp_8c_037f00cb1101b007b4bf45e8bee1bd3e}{numHubs}
+\item 
+long \hyperlink{samp_8c_dbf72aff0293f6556c1c6a2f4a62e2b9}{hubHandles} \mbox{[}MAX\_\-HUBS\mbox{]}
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Top-level interface to the SAMP library. 
+
+SAMP.C -- Top-level interface to the SAMP library.
+
+samp = sampInit (appName, descr) sampClose (samp)
+
+stat = sampStartup (samp) sampShutdown (samp)
+
+samp\_\-Metadata (samp, field, value) samp\_\-Subscribe (samp, mtype, handler) samp\_\-Unsubscribe (samp, mtype)
+
+samp\_\-setReplyCallback (samp, func) samp\_\-setResponseCallback (samp, func) stat = samp\_\-replyStatus (samp)
+
+Utility Methods: samp\_\-setSyncMode (samp) // Default samp\_\-setASyncMode (samp) samp\_\-setNotifyMode (samp) samp\_\-setCallByRef (samp)
+
+samp\_\-setTimeout (samp, timeout) samp\_\-setAppNmae (samp, version) samp\_\-setAppVersion (samp, name)
+
+samp\_\-mapClients (handle\_\-t handle) samp\_\-addClient (handle\_\-t handle, String name, String id) samp\_\-removeClient (handle\_\-t handle, String id)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/09 \end{Desc}
+
+
+\subsection{Define Documentation}
+\hypertarget{samp_8c_92d198f56296c0b6a531ce4bce977185}{
+\index{samp.c@{samp.c}!SZ\_\-CLIENT\_\-LIST@{SZ\_\-CLIENT\_\-LIST}}
+\index{SZ\_\-CLIENT\_\-LIST@{SZ\_\-CLIENT\_\-LIST}!samp.c@{samp.c}}
+\subsubsection[{SZ\_\-CLIENT\_\-LIST}]{\setlength{\rightskip}{0pt plus 5cm}\#define SZ\_\-CLIENT\_\-LIST~1024}}
+\label{samp_8c_92d198f56296c0b6a531ce4bce977185}
+
+
+SAMP\_\-GETCLIENTS -- Get a list of clients as a character string as the PubID and Name separated by a space, one client per line. 
+
+\subsection{Function Documentation}
+\hypertarget{samp_8c_8a2111bbe4c88cef635e3bf67e899563}{
+\index{samp.c@{samp.c}!samp\_\-addClient@{samp\_\-addClient}}
+\index{samp\_\-addClient@{samp\_\-addClient}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-addClient}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-addClient (handle\_\-t {\em handle}, \/  {\bf String} {\em name}, \/  {\bf String} {\em id})}}
+\label{samp_8c_8a2111bbe4c88cef635e3bf67e899563}
+
+
+SAMP\_\-ADDCLIENT -- Add a newly registered client to the list of known apps so we can do the public-private name translation. 
+
+References Samp::clients, Client::name, Samp::nclients, and SZ\_\-NAME.
+
+Referenced by samp\_\-processHubEvent().\hypertarget{samp_8c_114bf9fb0d3e6eabd8bb93f3c87f5233}{
+\index{samp.c@{samp.c}!samp\_\-defaultReplyHandler@{samp\_\-defaultReplyHandler}}
+\index{samp\_\-defaultReplyHandler@{samp\_\-defaultReplyHandler}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-defaultReplyHandler}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-defaultReplyHandler (handle\_\-t {\em handle})}}
+\label{samp_8c_114bf9fb0d3e6eabd8bb93f3c87f5233}
+
+
+The interface's default Reply handler. 
+
+SAMP\_\-DEFAULTREPLYHANDLER -- The interface's default Reply handler.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{samp_8c_6bb8b1f5c6268ad8c7f165733d4af86d}{
+\index{samp.c@{samp.c}!samp\_\-getNullMap@{samp\_\-getNullMap}}
+\index{samp\_\-getNullMap@{samp\_\-getNullMap}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-getNullMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} samp\_\-getNullMap (void)}}
+\label{samp_8c_6bb8b1f5c6268ad8c7f165733d4af86d}
+
+
+SAMP\_\-GETNULLMAP -- Generate a 'Null' map we can return to the \hyperlink{structHub}{Hub}. 
+
+References samp\_\-newMap().\hypertarget{samp_8c_f299ea13607279f60f16b8639a00658f}{
+\index{samp.c@{samp.c}!samp\_\-getOKMap@{samp\_\-getOKMap}}
+\index{samp\_\-getOKMap@{samp\_\-getOKMap}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-getOKMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} samp\_\-getOKMap (void)}}
+\label{samp_8c_f299ea13607279f60f16b8639a00658f}
+
+
+SAMP\_\-GETOKMAP -- Generate an 'OK' map we can return to the \hyperlink{structHub}{Hub}. 
+
+References nullMap, samp\_\-newMap(), samp\_\-setMapInMap(), and samp\_\-setStringInMap().\hypertarget{samp_8c_b2f9c71819e1956e1c29e969968f453c}{
+\index{samp.c@{samp.c}!samp\_\-hubActive@{samp\_\-hubActive}}
+\index{samp\_\-hubActive@{samp\_\-hubActive}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-hubActive}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-hubActive (handle\_\-t {\em handle})}}
+\label{samp_8c_b2f9c71819e1956e1c29e969968f453c}
+
+
+Determine if the \hyperlink{structHub}{Hub} is active (i.e. connected). 
+
+SAMP\_\-HUBACTIVE -- Determine if the \hyperlink{structHub}{Hub} is active (i.e. connected).
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::active.\hypertarget{samp_8c_1e494e73abe2ddfd946fb39e84da42a9}{
+\index{samp.c@{samp.c}!samp\_\-listClients@{samp\_\-listClients}}
+\index{samp\_\-listClients@{samp\_\-listClients}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-listClients}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-listClients (handle\_\-t {\em handle})}}
+\label{samp_8c_1e494e73abe2ddfd946fb39e84da42a9}
+
+
+SAMP\_\-LISTCLIENTS -- List the available clients to stdout. 
+
+References Samp::clients, Client::name, and Samp::nclients.\hypertarget{samp_8c_ff4d125fc9594be25984989fad2fd3c8}{
+\index{samp.c@{samp.c}!samp\_\-mapClients@{samp\_\-mapClients}}
+\index{samp\_\-mapClients@{samp\_\-mapClients}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-mapClients}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-mapClients (handle\_\-t {\em handle})}}
+\label{samp_8c_ff4d125fc9594be25984989fad2fd3c8}
+
+
+SAMP\_\-MAPCLIENTS -- Map the public-ids of registered clients to the appName. 
+
+References Samp::clients, Client::name, Samp::nclients, samp\_\-freeList(), samp\_\-GetMetadata(), samp\_\-GetRegisteredClients(), samp\_\-getStringFromList(), samp\_\-listLen(), and SZ\_\-NAME.
+
+Referenced by sampStartup().\hypertarget{samp_8c_1428f653b9502c6e6d540f873de2b24f}{
+\index{samp.c@{samp.c}!samp\_\-Metadata@{samp\_\-Metadata}}
+\index{samp\_\-Metadata@{samp\_\-Metadata}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-Metadata}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-Metadata (handle\_\-t {\em handle}, \/  {\bf String} {\em field}, \/  {\bf String} {\em value})}}
+\label{samp_8c_1428f653b9502c6e6d540f873de2b24f}
+
+
+Set a metadata field value for the application. 
+
+SAMP\_\-METADATA -- Set a metadata field for the application. This will be sent to the \hyperlink{structHub}{Hub} later in a declareMetadata() call.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em field}]metadata field to set (name, author, etc) \item[{\em samp}]value of field \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References appMD::aKey, Samp::appVer, Hub::appVer, appMD::aVal, appMD::desc, Hub::description, Samp::description, appMD::docURL, Samp::hub, appMD::iconURL, Hub::meta, Samp::meta, appMD::nkeys, and sampTrace().\hypertarget{samp_8c_e30e492f306a40f853a454faf60ab479}{
+\index{samp.c@{samp.c}!samp\_\-removeClient@{samp\_\-removeClient}}
+\index{samp\_\-removeClient@{samp\_\-removeClient}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-removeClient}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-removeClient (handle\_\-t {\em handle}, \/  {\bf String} {\em id})}}
+\label{samp_8c_e30e492f306a40f853a454faf60ab479}
+
+
+SAMP\_\-REMOVECLIENT -- Remove a registered client from the list of known apps that do the public-private name translation. 
+
+References Samp::clients, Client::name, Samp::nclients, and SZ\_\-NAME.
+
+Referenced by samp\_\-processHubEvent().\hypertarget{samp_8c_985afa0baeb135c9ee72d09394314ff1}{
+\index{samp.c@{samp.c}!samp\_\-replyStatus@{samp\_\-replyStatus}}
+\index{samp\_\-replyStatus@{samp\_\-replyStatus}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-replyStatus}]{\setlength{\rightskip}{0pt plus 5cm}status samp\_\-replyStatus (handle\_\-t {\em handle})}}
+\label{samp_8c_985afa0baeb135c9ee72d09394314ff1}
+
+
+Reply with the status of the last message sent. 
+
+SAMP\_\-REPLYSTATUS -- Reply with the status of the last message sent.
+
+May be used to 'poll' for a reponse from the caller in cases where use of a callback is a problem. Codes are: $<$0==ERR, 0==PENDING, 1==OK
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em samp}]samp struct ptr \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]message status \end{Desc}
+
+
+Referenced by samp\_\-Register().\hypertarget{samp_8c_0f50f8dbae701aa6b19912fc99f6475a}{
+\index{samp.c@{samp.c}!samp\_\-setAppVersion@{samp\_\-setAppVersion}}
+\index{samp\_\-setAppVersion@{samp\_\-setAppVersion}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setAppVersion}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setAppVersion (handle\_\-t {\em handle}, \/  {\bf String} {\em version})}}
+\label{samp_8c_0f50f8dbae701aa6b19912fc99f6475a}
+
+
+Set the application name string. 
+
+Set the application version string.
+
+SAMP\_\-SETAPPNAME -- Set the application name string.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em name}]application name \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing\end{Desc}
+SAMP\_\-SETAPPVERSION -- Set the application version string.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em name}]application version \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Hub::appVer, Samp::appVer, and Samp::hub.\hypertarget{samp_8c_9b2292b819e590b1f7c63bbdfaa09e31}{
+\index{samp.c@{samp.c}!samp\_\-setASyncMode@{samp\_\-setASyncMode}}
+\index{samp\_\-setASyncMode@{samp\_\-setASyncMode}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setASyncMode}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setASyncMode (handle\_\-t {\em handle})}}
+\label{samp_8c_9b2292b819e590b1f7c63bbdfaa09e31}
+
+
+Set the calling mode to use asynchronous messaging. 
+
+SAMP\_\-SETASYNCMODE -- Set the calling mode to use asynchronous messaging.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::msgMode.\hypertarget{samp_8c_b6b49029386c3efd0520daa93a4ab3eb}{
+\index{samp.c@{samp.c}!samp\_\-setCallByRef@{samp\_\-setCallByRef}}
+\index{samp\_\-setCallByRef@{samp\_\-setCallByRef}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setCallByRef}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setCallByRef (handle\_\-t {\em handle})}}
+\label{samp_8c_b6b49029386c3efd0520daa93a4ab3eb}
+
+
+Have interface call user handlers by reference. 
+
+SAMP\_\-SETCALLBYREF -- Have interface call user handlers by reference.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::handlerMode.\hypertarget{samp_8c_3e01437224c73b91e49c6428cb69735d}{
+\index{samp.c@{samp.c}!samp\_\-setCallMode@{samp\_\-setCallMode}}
+\index{samp\_\-setCallMode@{samp\_\-setCallMode}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setCallMode}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setCallMode (handle\_\-t {\em handle}, \/  int {\em mode})}}
+\label{samp_8c_3e01437224c73b91e49c6428cb69735d}
+
+
+Set the default calling mode (synch or asynch). 
+
+SAMP\_\-SETCALLMODE -- Set the default calling mode (synch or asynch)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em mode}]call mode (synch or asynch) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::msgMode.\hypertarget{samp_8c_01721eabf3e664bae3bea0c2b72268e2}{
+\index{samp.c@{samp.c}!samp\_\-setMsgMode@{samp\_\-setMsgMode}}
+\index{samp\_\-setMsgMode@{samp\_\-setMsgMode}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setMsgMode}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setMsgMode (handle\_\-t {\em handle}, \/  int {\em mode})}}
+\label{samp_8c_01721eabf3e664bae3bea0c2b72268e2}
+
+
+Set the message pattern to the specified mode. 
+
+SAMP\_\-SETMSGMODE -- Set the message pattern to the specified mode.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em mode}]message mode \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::msgMode.\hypertarget{samp_8c_7bfbc2e767fe234f83c13b8316a09ecd}{
+\index{samp.c@{samp.c}!samp\_\-setNotifyMode@{samp\_\-setNotifyMode}}
+\index{samp\_\-setNotifyMode@{samp\_\-setNotifyMode}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setNotifyMode}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setNotifyMode (handle\_\-t {\em handle})}}
+\label{samp_8c_7bfbc2e767fe234f83c13b8316a09ecd}
+
+
+Set the calling mode to use notification messaging. 
+
+SAMP\_\-SETNOTIFYMODE -- Set the calling mode to use notification messaging.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::msgMode.\hypertarget{samp_8c_a3c0bdb4c512357dbc53b0ad7a7d5b01}{
+\index{samp.c@{samp.c}!samp\_\-setReplyCallback@{samp\_\-setReplyCallback}}
+\index{samp\_\-setReplyCallback@{samp\_\-setReplyCallback}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setReplyCallback}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setReplyCallback (handle\_\-t {\em handle}, \/  int $\ast$ {\em func})}}
+\label{samp_8c_a3c0bdb4c512357dbc53b0ad7a7d5b01}
+
+
+Set the Reply callback.  samp\_\-setReplyCallback (handle\_\-t handle, int $\ast$func). 
+
+SAMP\_\-SETREPLYCALLBACK -- Set the Reply callback.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em func}]callback for Reply message \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{samp_8c_3db66f28546459327665f8491ea97f4d}{
+\index{samp.c@{samp.c}!samp\_\-setResponseCallback@{samp\_\-setResponseCallback}}
+\index{samp\_\-setResponseCallback@{samp\_\-setResponseCallback}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setResponseCallback}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setResponseCallback (handle\_\-t {\em handle}, \/  int $\ast$ {\em func})}}
+\label{samp_8c_3db66f28546459327665f8491ea97f4d}
+
+
+Set the Response callback.  samp\_\-setResponseCallback (handle\_\-t handle, int $\ast$func). 
+
+SAMP\_\-SETRESPONSECALLBACK -- Set the Response callback.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em func}]callback for message response \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{samp_8c_d636ae12dd05df43a077f91882a197ec}{
+\index{samp.c@{samp.c}!samp\_\-setSyncMode@{samp\_\-setSyncMode}}
+\index{samp\_\-setSyncMode@{samp\_\-setSyncMode}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setSyncMode}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setSyncMode (handle\_\-t {\em handle})}}
+\label{samp_8c_d636ae12dd05df43a077f91882a197ec}
+
+
+Set the calling mode to use synchronous messaging. 
+
+SAMP\_\-SETSYNCMODE -- Set the calling mode to use synchronous messaging.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::msgMode.\hypertarget{samp_8c_c057d32437a96a527c63f938757099af}{
+\index{samp.c@{samp.c}!samp\_\-setTimeout@{samp\_\-setTimeout}}
+\index{samp\_\-setTimeout@{samp\_\-setTimeout}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-setTimeout}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-setTimeout (handle\_\-t {\em handle}, \/  int {\em timeout})}}
+\label{samp_8c_c057d32437a96a527c63f938757099af}
+
+
+Set the message timeout value (in seconds). 
+
+SAMP\_\-SETTIMEOUT -- Set the message timeout value (in seconds).
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp handle \item[{\em name}]application name \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::hub, and Hub::timeout.\hypertarget{samp_8c_ed050606c5076a4a34eb8f0f982a25d4}{
+\index{samp.c@{samp.c}!samp\_\-Subscribe@{samp\_\-Subscribe}}
+\index{samp\_\-Subscribe@{samp\_\-Subscribe}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-Subscribe}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-Subscribe (handle\_\-t {\em handle}, \/  {\bf String} {\em mtype}, \/  void $\ast$ {\em func})}}
+\label{samp_8c_ed050606c5076a4a34eb8f0f982a25d4}
+
+
+Subscribe to a given mtype. 
+
+SAMP\_\-SUBSCRIBE -- Subscribe to a given mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em mtype}]mtype name \item[{\em func}]callback function \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::nsubs, samp\_\-getSampHandler(), samp\_\-setSampHandler(), and samp\_\-setUserHandler().\hypertarget{samp_8c_dc0e418fbaee507e661260c4480ecfcd}{
+\index{samp.c@{samp.c}!samp\_\-Unsubscribe@{samp\_\-Unsubscribe}}
+\index{samp\_\-Unsubscribe@{samp\_\-Unsubscribe}!samp.c@{samp.c}}
+\subsubsection[{samp\_\-Unsubscribe}]{\setlength{\rightskip}{0pt plus 5cm}samp\_\-Unsubscribe (handle\_\-t {\em handle}, \/  {\bf String} {\em mtype})}}
+\label{samp_8c_dc0e418fbaee507e661260c4480ecfcd}
+
+
+Unsubscribe to a given mtype. 
+
+SAMP\_\-UNSUBSCRIBE -- Unsubscribe to a given mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em mtype}]mtype name \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::nsubs, samp\_\-DeclareSubscriptions(), Subs::sampFunc, and Subs::userFunc.\hypertarget{samp_8c_f861f637942c5f971bab824708581f82}{
+\index{samp.c@{samp.c}!sampClose@{sampClose}}
+\index{sampClose@{sampClose}!samp.c@{samp.c}}
+\subsubsection[{sampClose}]{\setlength{\rightskip}{0pt plus 5cm}sampClose (handle\_\-t {\em handle})}}
+\label{samp_8c_f861f637942c5f971bab824708581f82}
+
+
+Close the SAMP interface and free resources. 
+
+SAMP\_\-CLOSE -- Close the SAMP interface.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::hub, Samp::hubHandle, samp\_\-freeHandle(), samp\_\-hubClose(), sampTrace(), and Samp::verbose.\hypertarget{samp_8c_6bfd947988e5dbc846af7f99bcd99ee7}{
+\index{samp.c@{samp.c}!sampDebug@{sampDebug}}
+\index{sampDebug@{sampDebug}!samp.c@{samp.c}}
+\subsubsection[{sampDebug}]{\setlength{\rightskip}{0pt plus 5cm}sampDebug (handle\_\-t {\em handle}, \/  int {\em value})}}
+\label{samp_8c_6bfd947988e5dbc846af7f99bcd99ee7}
+
+
+Set interface debug level. 
+
+SAMPDEBUG -- Set interface debug level.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em value}]debug value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::debug, and Samp::verbose.\hypertarget{samp_8c_db03c60f2933ed9785bfb4457c359af2}{
+\index{samp.c@{samp.c}!sampInit@{sampInit}}
+\index{sampInit@{sampInit}!samp.c@{samp.c}}
+\subsubsection[{sampInit}]{\setlength{\rightskip}{0pt plus 5cm}handle sampInit ({\bf String} {\em name}, \/  {\bf String} {\em descr})}}
+\label{samp_8c_db03c60f2933ed9785bfb4457c359af2}
+
+
+Initialize the SAMP interface. 
+
+SAMP\_\-INIT -- Initialize the SAMP interface.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em appName}]application name \item[{\em description}]description of application \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]samp handle \end{Desc}
+
+
+References nullList, nullMap, OK\_\-Map, samp\_\-hubOpen(), samp\_\-newHandle(), samp\_\-newList(), samp\_\-newMap(), samp\_\-serverPort(), samp\_\-setMapInMap(), samp\_\-setStringInMap(), sampH, and sampTrace().\hypertarget{samp_8c_d634392fbb12cf4e1b2eb05da34759c5}{
+\index{samp.c@{samp.c}!sampShutdown@{sampShutdown}}
+\index{sampShutdown@{sampShutdown}!samp.c@{samp.c}}
+\subsubsection[{sampShutdown}]{\setlength{\rightskip}{0pt plus 5cm}sampShutdown (handle\_\-t {\em handle})}}
+\label{samp_8c_d634392fbb12cf4e1b2eb05da34759c5}
+
+
+Shut down the active SAMP interface. 
+
+SAMP\_\-SHUTDOWN -- Shut down the active SAMP interface.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::active, Samp::hubHandle, samp\_\-hubClose(), Samp::svrThread, and Samp::verbose.
+
+Referenced by samp\_\-processHubEvent().\hypertarget{samp_8c_1f6d544576fec785be1acfeaf3f2cf63}{
+\index{samp.c@{samp.c}!sampStartup@{sampStartup}}
+\index{sampStartup@{sampStartup}!samp.c@{samp.c}}
+\subsubsection[{sampStartup}]{\setlength{\rightskip}{0pt plus 5cm}sampStartup (handle\_\-t {\em handle})}}
+\label{samp_8c_1f6d544576fec785be1acfeaf3f2cf63}
+
+
+Startup the SAMP interface to send/receive messages. 
+
+SAMP\_\-STARTUP -- Startup the SAMP interface to send/receive messages.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::active, Samp::clients, Samp::hub, Samp::hubHandle, Hub::id, Samp::mapClients, Client::name, Samp::nclients, samp\_\-hubDeclareMetadata(), samp\_\-hubDeclareSubscriptions(), samp\_\-hubOpen(), samp\_\-mapClients(), Samp::trace, and Samp::verbose.\hypertarget{samp_8c_e3a6e918b3fe22db2fe014da16f81aad}{
+\index{samp.c@{samp.c}!sampVerbose@{sampVerbose}}
+\index{sampVerbose@{sampVerbose}!samp.c@{samp.c}}
+\subsubsection[{sampVerbose}]{\setlength{\rightskip}{0pt plus 5cm}sampVerbose (handle\_\-t {\em handle}, \/  int {\em value})}}
+\label{samp_8c_e3a6e918b3fe22db2fe014da16f81aad}
+
+
+Set interface debug level. 
+
+SAMPVERBOSE -- Set interface verbose level.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em value}]verbose value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::verbose.
+
+\subsection{Variable Documentation}
+\hypertarget{samp_8c_d702b07240de0e0cf9e4b781a38317ad}{
+\index{samp.c@{samp.c}!hub@{hub}}
+\index{hub@{hub}!samp.c@{samp.c}}
+\subsubsection[{hub}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Hub}$\ast$ {\bf hub}}}
+\label{samp_8c_d702b07240de0e0cf9e4b781a38317ad}
+
+
+empty List struct 
+
+Referenced by samp\_\-bibLoad(), samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-DeclareMetadata(), samp\_\-DeclareSubscriptions(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-GetMetadata(), samp\_\-imageLoadFITS(), samp\_\-notify(), samp\_\-notifyAll(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Register(), samp\_\-Reply(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), samp\_\-tableSelectRowList(), and samp\_\-UnRegister().\hypertarget{samp_8c_dbf72aff0293f6556c1c6a2f4a62e2b9}{
+\index{samp.c@{samp.c}!hubHandles@{hubHandles}}
+\index{hubHandles@{hubHandles}!samp.c@{samp.c}}
+\subsubsection[{hubHandles}]{\setlength{\rightskip}{0pt plus 5cm}long {\bf hubHandles}\mbox{[}MAX\_\-HUBS\mbox{]}}}
+\label{samp_8c_dbf72aff0293f6556c1c6a2f4a62e2b9}
+
+
+No. of available hubs \hypertarget{samp_8c_a2106c7fe3a5747178c046238fbd5d55}{
+\index{samp.c@{samp.c}!nullList@{nullList}}
+\index{nullList@{nullList}!samp.c@{samp.c}}
+\subsubsection[{nullList}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} {\bf nullList}}}
+\label{samp_8c_a2106c7fe3a5747178c046238fbd5d55}
+
+
+SAMP\_\-OK Map struct 
+
+Referenced by sampInit().\hypertarget{samp_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{
+\index{samp.c@{samp.c}!nullMap@{nullMap}}
+\index{nullMap@{nullMap}!samp.c@{samp.c}}
+\subsubsection[{nullMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} {\bf nullMap}}}
+\label{samp_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}
+
+
+SAMP handle 
+
+Referenced by samp\_\-getHandlerReply(), samp\_\-getOKMap(), samp\_\-hubDeclareSubscriptions(), and sampInit().\hypertarget{samp_8c_037f00cb1101b007b4bf45e8bee1bd3e}{
+\index{samp.c@{samp.c}!numHubs@{numHubs}}
+\index{numHubs@{numHubs}!samp.c@{samp.c}}
+\subsubsection[{numHubs}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf numHubs}}}
+\label{samp_8c_037f00cb1101b007b4bf45e8bee1bd3e}
+
+
+HUB connection \hypertarget{samp_8c_a68efe925f0d8f29fa203c0f3747a6e2}{
+\index{samp.c@{samp.c}!OK\_\-Map@{OK\_\-Map}}
+\index{OK\_\-Map@{OK\_\-Map}!samp.c@{samp.c}}
+\subsubsection[{OK\_\-Map}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} {\bf OK\_\-Map}}}
+\label{samp_8c_a68efe925f0d8f29fa203c0f3747a6e2}
+
+
+empty Map struct 
+
+Referenced by samp\_\-getHandlerReply(), samp\_\-receiveCall(), samp\_\-receiveNotification(), samp\_\-receiveResponse(), and sampInit().\hypertarget{samp_8c_b04b61ee02d86e15b02b861699ae7424}{
+\index{samp.c@{samp.c}!sampH@{sampH}}
+\index{sampH@{sampH}!samp.c@{samp.c}}
+\subsubsection[{sampH}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t {\bf sampH}}}
+\label{samp_8c_b04b61ee02d86e15b02b861699ae7424}
+
+
+SAMP struct pointer 
+
+Referenced by samp\_\-processHubEvent(), samp\_\-receiveCall(), and sampInit().

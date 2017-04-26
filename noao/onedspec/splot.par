@@ -1,0 +1,52 @@
+# SPLOT -- Parameter file for spectral plot package
+
+images,s,a,,,,"List of images to plot"
+line,i,q,1,0,,"Image line/aperture to plot"
+band,i,q,1,1,,"Image band to plot"
+
+units,s,h,"",,,"Plotting units"
+options,s,h,"auto wreset",,,"Combination of plotting options:
+auto, zero, xydraw, histogram,
+nosysid, wreset, flip, overplot"
+xmin,r,h,INDEF,,,"Minimum X value of initial graph"
+xmax,r,h,INDEF,,,"Maximum X value of initial graph"
+ymin,r,h,INDEF,,,"Minimum Y value of initial graph"
+ymax,r,h,INDEF,,,"Maximum Y value of initial graph"
+save_file,s,h,"splot.log",,,"File to contain answers"
+graphics,s,h,"stdgraph",,,"Output graphics device"
+cursor,*gcur,h,"",,,"Graphics cursor input
+
+# PARAMETERS FOR ERROR ANALYSIS"
+nerrsample,i,h,0,0,,"Number of error samples (<10 for no errors)"
+sigma0,r,h,INDEF,,,"Constant gaussian noise term (INDEF for no errors)"
+invgain,r,h,INDEF,,,"Inverse gain term (INDEF for no errors)
+
+# PARAMETERS FOR CONTINUUM FITTING"
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,"Fitting function"
+order,i,h,1,1,,"Order of fitting function"
+low_reject,r,h,2.,0.,,"Low rejection in sigma of fit"
+high_reject,r,h,4.,0.,,"High rejection in sigma of fit"
+niterate,i,h,10,0,,"Number of rejection iterations"
+grow,r,h,1.,0.,,"Rejection growing radius"
+markrej,b,h,yes,,,"Mark rejected points?
+
+# PARAMETERS FOR OVERPLOTTING STANDARD STAR FLUXES"
+star_name,s,q,,,,"Standard star name"
+mag,r,q,,,,"Magnitude of star"
+magband,s,q,,"U|B|V|R|I|J|H|K|L|Lprime|M",,"Magnitude type"
+teff,s,q,,,,"Effective temperature or spectral type"
+caldir,s,h,)_.caldir,,,"Directory containing calibration data"
+fnuzero,r,h,3.68e-20,,,"Absolute flux zero point
+
+# PARAMETERS USED IN INTERACTIVE QUERIES"
+next_image,s,q,,,,"Next image to plot"
+new_image,s,q,,,,"Image to create"
+overwrite,b,q,,,,"Overwrite image?"
+spec2,s,q,,,,"Spectrum"
+constant,r,q,,,,"Constant to be applied"
+wavelength,r,q,,,,"Dispersion coordinate:"
+linelist,f,q,,,,"File"
+wstart,r,q,,,,"Starting wavelength"
+wend,r,q,,,,"Ending wavelength"
+dw,r,q,,,,"Wavelength per pixel"
+boxsize,i,q,,1,,"Smoothing box size (odd number)"

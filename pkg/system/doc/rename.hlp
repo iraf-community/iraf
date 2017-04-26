@@ -1,0 +1,69 @@
+.help rename Aug97 system
+.ih
+NAME
+rename -- rename a file or set of files
+.ih
+USAGE
+rename file newname
+.ih
+PARAMETERS
+.ls file
+A template specifying the file or files to be renamed.
+.le
+.ls newname
+If a single file is being renamed, the new filename, else the new name of
+the field being renamed in a set of filenames.  If \fInewname\fR is a
+directory the input files will be moved to this directory with the same
+name.
+.le
+.ls field = all
+If set to "all" the file name remains unchanged and the \fInewname\fR is
+assumed to be a destination directory in the case of multiple input files,
+or the new filename (which may contain a new directory path) in the case of
+a single input file.  If set to \fIldir\fR the \fInewname\fR value is taken
+to be a destination directory and the file is moved to this directory.
+Setting to \fIroot\fR will rename only the root portion of the filename,
+a value of \fIextn\fR will change or append the extension. \fInewname\fR
+cannot contain a directory path when changing the root or extn field.
+.le
+.ih
+DESCRIPTION
+\fIRename\fR renames either a single file to "newname", or a set of files,
+changing either the ldir, root or the extension part of each name.  
+If \fInewname\fR is a directory or  \fIfield\fR is "ldir" the input files
+are moved to this directory and the filenames remain the same.  When
+modifying the root or extension part of the filename \fInewname\fR is the
+new root or extension name for the input files, an extension will be added
+to the file name if it doesn't already exist and the extension field is being
+modified.  For multiple input files it is assumed
+that \fInewname\fR is a directory if the value of \fIfield\fR is "all", 
+otherwise an error is generated to prevent overwriting files.
+.ih
+EXAMPLES
+
+1. Rename file "fred" to "jay".
+
+    cl> rename fred jay
+
+2. Change the root name of a set of files from "out" to "pkout".
+
+    cl> rename out.x,out.o,out.par pkout field=root
+
+3. Change the extension of all ".f77" files from ".f77" to ".f".
+
+    cl> rename *.f77 f field=extn
+
+4. Move all files with a ".dat" extension to a new directory.
+
+    cl> rename *.dat data$
+    cl> rename *.dat /data/user
+
+5. Add a ".fits" extension to all files in a directory.
+
+    cl> rename im00* fits field=extn
+.ih
+BUGS
+.ih
+SEE ALSO
+movefiles, copy
+.endhelp

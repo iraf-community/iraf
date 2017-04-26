@@ -1,0 +1,396 @@
+\hypertarget{sampMTypes_8c}{
+\section{sampMTypes.c File Reference}
+\label{sampMTypes_8c}\index{sampMTypes.c@{sampMTypes.c}}
+}
+SAMP interface procedures for application mtypes.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$time.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{sampMTypes_8c_34e9d38073f36daaf41c418f8d680ee5}{samp\_\-tableLoadVOTable} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} tableId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Tell an app to load a VOTable. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_74aeaaf742121348390ec854c30c1479}{samp\_\-tableLoadFITS} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} tableId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Tell an app to load a FITS table. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_e38ac987f1dfd87ad64f97d55396270e}{samp\_\-tableHighlightRow} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} tableId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, int row)
+\begin{CompactList}\small\item\em Tell an app to highlight a table row. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_f133efb67fe4bcfd2b9c8ab9d23b4c5e}{samp\_\-tableSelectRowList} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} tableId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, int rows\mbox{[}$\,$\mbox{]}, int nrows)
+\begin{CompactList}\small\item\em Tell an app to select a list of table rows. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_4812b571ed87f7842ca20b7024770df3}{samp\_\-imageLoadFITS} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} imageId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Tell an app to load a FITS image. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_e1e86e79d9a1768e5f265cbb44279172}{samp\_\-coordPointAtSky} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, float ra, float dec)
+\begin{CompactList}\small\item\em Tell an app to point at an RA/Dec coordinate. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_18b351385bd175581a6788a4f7342f07}{samp\_\-specLoadSSAGeneric} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} url, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} meta, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} spectrumId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Load a generic spectrum from an SSA service. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_5900317c1609ddd5b6da70dc0eb2040c}{samp\_\-cmdExec} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} cmd)
+\begin{CompactList}\small\item\em Execute a command in a remote application. \item\end{CompactList}\item 
+char $\ast$ \hyperlink{sampMTypes_8c_9c64fef9c158d7fd4ff7f72691ccd319}{samp\_\-envGet} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Get an environment variable in a remote application. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_ded4b8bdac87c5b6faa7f13d8abb22a1}{samp\_\-envSet} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} value)
+\begin{CompactList}\small\item\em Set an environment variable in a remote application. \item\end{CompactList}\item 
+char $\ast$ \hyperlink{sampMTypes_8c_19b75403d63714c4fccc8a8d4fa4c8cf}{samp\_\-paramGet} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name)
+\begin{CompactList}\small\item\em Get a parameter variable in a remote application. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_535cb6760c733a75746d2f104b1a01be}{samp\_\-paramSet} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} value)
+\begin{CompactList}\small\item\em Set an parameter variable in a remote application. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_ae7f51c1f6169b918568a1202d0fa031}{samp\_\-bibLoad} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} bibcode)
+\begin{CompactList}\small\item\em Exchange a bibcode. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_8013c549ef47e0507edf39c8ab1b62aa}{samp\_\-resourceLoad} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} type, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} resMap)
+\begin{CompactList}\small\item\em Exchange a resource list. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_b2ff2e029c57b56ad57416c624341fe6}{samp\_\-sendGeneric} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} args\mbox{[}$\,$\mbox{]})
+\begin{CompactList}\small\item\em Send a geenric message. \item\end{CompactList}\item 
+int \hyperlink{sampMTypes_8c_80ef1a82845b96091857c7d4a3c7972c}{samp\_\-sendMsg} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recip, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Send the specified message. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+SAMP interface procedures for application mtypes. 
+
+SAMPMTYPES.C -- SAMP interface procedures for application mtypes.
+
+samp\_\-tableLoadVOTable (handle, recip, url, tableId, name) samp\_\-tableLoadFITS (handle, recip, url, tableId, name) samp\_\-tableHighlightRow (handle, recip, tableId, url, row) samp\_\-tableSelectRowList (handle, recip, tableId, url, rows\mbox{[}\mbox{]}, nrows)
+
+samp\_\-imageLoadFITS (handle, recip, url, imageId, name) samp\_\-coordPointAtSky (handle, recip, ra, dec)
+
+samp\_\-specLoadSSAGeneric (handle, recip, url, meta\_\-map, specId, name) samp\_\-cmdExec (handle, recip, cmd) samp\_\-envGet (handle, recip, name) samp\_\-envSet (handle, recip, name, value) samp\_\-paramGet (handle, recip, name) samp\_\-paramSet (handle, recip, name, value) samp\_\-bibLoad (handle, recip, bibcode) samp\_\-resourceLoad (handle, recip, type, resList\mbox{[}\mbox{]})
+
+samp\_\-sendGeneric (handle, recip, mtype, args) samp\_\-sendMsg (handle, recip, Map msg\_\-map)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/18/11 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampMTypes_8c_ae7f51c1f6169b918568a1202d0fa031}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-bibLoad@{samp\_\-bibLoad}}
+\index{samp\_\-bibLoad@{samp\_\-bibLoad}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-bibLoad}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-bibLoad (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em bibcode})}}
+\label{sampMTypes_8c_ae7f51c1f6169b918568a1202d0fa031}
+
+
+Exchange a bibcode. 
+
+SAMP\_\-BIBLOAD -- Exchange a bibcode.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em bibcode}]Bibcode string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_5900317c1609ddd5b6da70dc0eb2040c}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-cmdExec@{samp\_\-cmdExec}}
+\index{samp\_\-cmdExec@{samp\_\-cmdExec}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-cmdExec}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-cmdExec (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em cmd})}}
+\label{sampMTypes_8c_5900317c1609ddd5b6da70dc0eb2040c}
+
+
+Execute a command in a remote application. 
+
+SAMP\_\-CMDEXEC -- Execute a command in a remote application.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em cmd}]Command string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_e1e86e79d9a1768e5f265cbb44279172}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-coordPointAtSky@{samp\_\-coordPointAtSky}}
+\index{samp\_\-coordPointAtSky@{samp\_\-coordPointAtSky}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-coordPointAtSky}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-coordPointAtSky (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  float {\em ra}, \/  float {\em dec})}}
+\label{sampMTypes_8c_e1e86e79d9a1768e5f265cbb44279172}
+
+
+Tell an app to point at an RA/Dec coordinate. 
+
+SAMP\_\-COORDPOINTATSKY -- Tell an app to point at an RA/Dec coordinate.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em ra}]RA of coord in degrees \item[{\em dec}]Dec of coord in degrees \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-addFloatParam(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_9c64fef9c158d7fd4ff7f72691ccd319}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-envGet@{samp\_\-envGet}}
+\index{samp\_\-envGet@{samp\_\-envGet}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-envGet}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ samp\_\-envGet (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_9c64fef9c158d7fd4ff7f72691ccd319}
+
+
+Get an environment variable in a remote application. 
+
+SAMP\_\-ENVGET -- Get an environment variable in a remote application.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em name}]Name of variable in receiver's environment \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]NULL, Value of variable, or list of values \end{Desc}
+
+
+References Samp::clients, Samp::errortxt, Samp::hub, hub, Hub::id, Client::name, Samp::nclients, Hub::privateKey, samp\_\-app2id(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and Hub::timeout.\hypertarget{sampMTypes_8c_ded4b8bdac87c5b6faa7f13d8abb22a1}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-envSet@{samp\_\-envSet}}
+\index{samp\_\-envSet@{samp\_\-envSet}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-envSet}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-envSet (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em name}, \/  {\bf String} {\em value})}}
+\label{sampMTypes_8c_ded4b8bdac87c5b6faa7f13d8abb22a1}
+
+
+Set an environment variable in a remote application. 
+
+SAMP\_\-ENVSET -- Set an environment variable in a remote application.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em name}]Name of variable in receiver's environment \item[{\em value}]Value of variable or NULL \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_4812b571ed87f7842ca20b7024770df3}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-imageLoadFITS@{samp\_\-imageLoadFITS}}
+\index{samp\_\-imageLoadFITS@{samp\_\-imageLoadFITS}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-imageLoadFITS}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-imageLoadFITS (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em url}, \/  {\bf String} {\em imageId}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_4812b571ed87f7842ca20b7024770df3}
+
+
+Tell an app to load a FITS image. 
+
+SAMP\_\-IMAGELOADFITS -- Tell an app to load a FITS image.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Message recipient (or \char`\"{}all\char`\"{} for broadcast) \item[{\em url}]URL to table to be loaded \item[{\em imageId}]ID assigned to image (optional) \item[{\em name}]Name assigned to image (optional) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_19b75403d63714c4fccc8a8d4fa4c8cf}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-paramGet@{samp\_\-paramGet}}
+\index{samp\_\-paramGet@{samp\_\-paramGet}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-paramGet}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ samp\_\-paramGet (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_19b75403d63714c4fccc8a8d4fa4c8cf}
+
+
+Get a parameter variable in a remote application. 
+
+SAMP\_\-PARAMGET -- Get a parameter variable in a remote application.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em name}]Name of variable in receiver's environment \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]NULL, Value of variable, or list of values \end{Desc}
+
+
+References Samp::clients, Samp::errortxt, Samp::hub, hub, Hub::id, Client::name, Samp::nclients, Hub::privateKey, samp\_\-app2id(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and Hub::timeout.\hypertarget{sampMTypes_8c_535cb6760c733a75746d2f104b1a01be}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-paramSet@{samp\_\-paramSet}}
+\index{samp\_\-paramSet@{samp\_\-paramSet}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-paramSet}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-paramSet (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em name}, \/  {\bf String} {\em value})}}
+\label{sampMTypes_8c_535cb6760c733a75746d2f104b1a01be}
+
+
+Set an parameter variable in a remote application. 
+
+SAMP\_\-PARAMSET -- Set an parameter variable in a remote application.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em name}]Name of variable in receiver's environment \item[{\em value}]Value of variable or NULL \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_8013c549ef47e0507edf39c8ab1b62aa}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-resourceLoad@{samp\_\-resourceLoad}}
+\index{samp\_\-resourceLoad@{samp\_\-resourceLoad}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-resourceLoad}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resourceLoad (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em type}, \/  {\bf String} {\em name}, \/  {\bf Map} {\em resMap})}}
+\label{sampMTypes_8c_8013c549ef47e0507edf39c8ab1b62aa}
+
+
+Exchange a resource list. 
+
+SAMP\_\-RESOURCELOAD -- Exchange a resource list.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Name of recipient (or 'all') \item[{\em type}]Resource type (or NULL) \item[{\em name}]Descriptive name (optional) \item[{\em resMap}]Resource map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-addMapParam(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), samp\_\-sendMsg(), and SZ\_\-NAME.\hypertarget{sampMTypes_8c_b2ff2e029c57b56ad57416c624341fe6}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-sendGeneric@{samp\_\-sendGeneric}}
+\index{samp\_\-sendGeneric@{samp\_\-sendGeneric}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-sendGeneric}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-sendGeneric (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em args}\mbox{[}$\,$\mbox{]})}}
+\label{sampMTypes_8c_b2ff2e029c57b56ad57416c624341fe6}
+
+
+Send a geenric message. 
+
+SAMP\_\-SENDGENERIC -- Send a generic message.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Name of recipient (or 'all') \item[{\em mtype}]Message type \item[{\em args}]Argument list \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR\end{Desc}
+This method can be used to send any user-defined message. The 'mtype' string is arbitrary, we just assume the receiving client can understand what it means. The 'args' String array can be an array of values in which case the parameter name will be a series of generic 'arg0' thru 'argN-1' names. 
+
+References Samp::hub, hub, samp\_\-addFloatParam(), samp\_\-addIntParam(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), samp\_\-sendMsg(), and SZ\_\-NAME.\hypertarget{sampMTypes_8c_80ef1a82845b96091857c7d4a3c7972c}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-sendMsg@{samp\_\-sendMsg}}
+\index{samp\_\-sendMsg@{samp\_\-sendMsg}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-sendMsg}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-sendMsg (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf Map} {\em msg})}}
+\label{sampMTypes_8c_80ef1a82845b96091857c7d4a3c7972c}
+
+
+Send the specified message. 
+
+SAMP\_\-SENDMSG -- Send the specified message.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Name of recipient (or 'all') \item[{\em msg}]Message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::clients, Samp::msgMode, Samp::nclients, samp\_\-app2id(), samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-notify(), samp\_\-notifyAll(), and samp\_\-setErr().
+
+Referenced by samp\_\-bibLoad(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-envSet(), samp\_\-imageLoadFITS(), samp\_\-paramSet(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), and samp\_\-tableSelectRowList().\hypertarget{sampMTypes_8c_18b351385bd175581a6788a4f7342f07}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-specLoadSSAGeneric@{samp\_\-specLoadSSAGeneric}}
+\index{samp\_\-specLoadSSAGeneric@{samp\_\-specLoadSSAGeneric}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-specLoadSSAGeneric}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-specLoadSSAGeneric (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em url}, \/  {\bf Map} {\em meta}, \/  {\bf String} {\em spectrumId}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_18b351385bd175581a6788a4f7342f07}
+
+
+Load a generic spectrum from an SSA service. 
+
+SAMP\_\-SPECLOADSSAGENERIC -- Load a generic spectrum from an SSA service.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]name of recipient (or 'all') \item[{\em url}]URL of spectrum to load \item[{\em meta}]Metadata map describing data found at the URL \item[{\em spectrumId}]Identifier for spectrum (optional) \item[{\em name}]Name used to label spectrum (optional); \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-addMapParam(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_e38ac987f1dfd87ad64f97d55396270e}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-tableHighlightRow@{samp\_\-tableHighlightRow}}
+\index{samp\_\-tableHighlightRow@{samp\_\-tableHighlightRow}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-tableHighlightRow}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tableHighlightRow (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em tableId}, \/  {\bf String} {\em url}, \/  int {\em row})}}
+\label{sampMTypes_8c_e38ac987f1dfd87ad64f97d55396270e}
+
+
+Tell an app to highlight a table row. 
+
+SAMP\_\-TABLEHIGHLIGHTROW -- Tell an app to highlight a table row.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Message recipient (or \char`\"{}all\char`\"{} for broadcast) \item[{\em tableId}]ID associated with a previously loaded table \item[{\em url}]URL to table to be loaded \item[{\em rows}]List of (zero-based) row indices \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-addIntParam(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_74aeaaf742121348390ec854c30c1479}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-tableLoadFITS@{samp\_\-tableLoadFITS}}
+\index{samp\_\-tableLoadFITS@{samp\_\-tableLoadFITS}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-tableLoadFITS}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tableLoadFITS (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em url}, \/  {\bf String} {\em tableId}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_74aeaaf742121348390ec854c30c1479}
+
+
+Tell an app to load a FITS table. 
+
+SAMP\_\-TABLELOADFITS -- Tell an app to load a FITS table.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Message recipient (or \char`\"{}all\char`\"{} for broadcast) \item[{\em url}]URL to table to be loaded \item[{\em tableId}]ID assigned to table (optional) \item[{\em name}]Name assigned to table (optional) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_34e9d38073f36daaf41c418f8d680ee5}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-tableLoadVOTable@{samp\_\-tableLoadVOTable}}
+\index{samp\_\-tableLoadVOTable@{samp\_\-tableLoadVOTable}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-tableLoadVOTable}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tableLoadVOTable (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em url}, \/  {\bf String} {\em tableId}, \/  {\bf String} {\em name})}}
+\label{sampMTypes_8c_34e9d38073f36daaf41c418f8d680ee5}
+
+
+Tell an app to load a VOTable. 
+
+SAMP\_\-TABLELOADVOTABLE -- Tell an app to load a VOTable.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Message recipient (or \char`\"{}all\char`\"{} for broadcast) \item[{\em url}]URL to table to be loaded \item[{\em tableId}]ID assigned to table (optional) \item[{\em name}]Name assigned to table (optional) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newMsg(), samp\_\-newParam(), and samp\_\-sendMsg().\hypertarget{sampMTypes_8c_f133efb67fe4bcfd2b9c8ab9d23b4c5e}{
+\index{sampMTypes.c@{sampMTypes.c}!samp\_\-tableSelectRowList@{samp\_\-tableSelectRowList}}
+\index{samp\_\-tableSelectRowList@{samp\_\-tableSelectRowList}!sampMTypes.c@{sampMTypes.c}}
+\subsubsection[{samp\_\-tableSelectRowList}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tableSelectRowList (handle\_\-t {\em handle}, \/  {\bf String} {\em recip}, \/  {\bf String} {\em tableId}, \/  {\bf String} {\em url}, \/  int {\em rows}\mbox{[}$\,$\mbox{]}, \/  int {\em nrows})}}
+\label{sampMTypes_8c_f133efb67fe4bcfd2b9c8ab9d23b4c5e}
+
+
+Tell an app to select a list of table rows. 
+
+SAMP\_\-TABLESELECTROWLIST -- Tell an app to select a list of table rows.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recip}]Message recipient (or \char`\"{}all\char`\"{} for broadcast) \item[{\em tableId}]ID associated with a previously loaded table \item[{\em url}]URL to table to be loaded \item[{\em rows}]Array of (zero-based) row indices \item[{\em nrows}]Number of rows \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, samp\_\-addListParam(), samp\_\-freeList(), samp\_\-freeMsg(), samp\_\-msgParam(), samp\_\-newList(), samp\_\-newMsg(), samp\_\-newParam(), samp\_\-sendMsg(), and samp\_\-setIntInList().

@@ -1,0 +1,130 @@
+.help newimage Jul84 noao.twodspec.multispec
+.ih
+NAME
+newimage -- Create a new multi-spectra image
+.ih
+USAGE
+newimage image output
+.ih
+PARAMETERS
+.ls image
+Image to be used to create the new image.
+.le
+.ls output
+Filename for the new multi-spectra image.
+.le
+.ls lower = -10
+Lower limit for model profiles.  It is measured in pixels from the
+spectra centers defined by the position functions in the database.
+.le
+.ls upper = -10
+Upper limit for model profiles.  It is measured in pixels from the
+spectra centers defined by the position functions in the database.
+.le
+.ls lines = "*"
+Image lines of the multi-spectra image to be in the new multi-spectra image.
+.le
+.ls ex_model = no
+Create a model image?
+.le
+.ls clean = yes
+Replace bad pixels with model values?  The following parameters are used:
+.ls  nreplace = 1000.
+Maximum number of pixels to be replaced per image line when cleaning with
+model \fIgauss5\fR or maximum number of pixels to be replaced per spectrum when
+cleaning with model \fIsmooth\fR.
+.le
+.ls sigma_cut = 4.
+The cleaning threshold in terms of the predicted pixel sigma.
+.le
+.ls niterate = 1
+Maximum number of cleaning iterations per line when cleaning with model
+\fIgauss5\fR.
+.le
+.le
+.ls model = "smooth"
+Choice of \fIgauss5\fR or \fIsmooth\fR.  Minimum match abbreviation is
+allowed.  This parameter is required only if \fIex_model\fR = yes
+or \fIclean\fR = yes.
+.le
+.ls fit_type = 2
+Model fitting algorithm for model \fIgauss5\fR.
+.le
+.ls naverage = 20
+Number of lines to be averaged in model \fIsmooth\fR.
+.le
+.ls interpolator = "spline3"
+Type of image interpolation function to be used.
+The choices are "nearest", "linear", "poly3", "poly5", and "spline3".
+Minimum match abbreviation is allowed.
+.le
+.ls verbose = no
+Print verbose output?
+.le
+.ih
+DESCRIPTION
+A new multi-spectra image is created using the description of the
+multi-spectra image in the MULTISPEC database associated with \fIimage\fR.
+The user selects the image \fIlines\fR from the original image to be in
+the new image.  The options allow the creation of model images or images in
+which the bad or deviant pixels are replaced by model profile values.
+
+If \fIex_model\fR = yes or \fIclean\fR = yes model
+spectra are fit to the spectra in the image.  There are two models:
+a five parameter Gaussian profile called \fIgauss5\fR and profiles obtained
+by averaging \fInaverage\fR image lines surrounding the image line being
+modeled called \fIsmooth\fR.  The model is selected with the parameter
+\fImodel\fR.
+
+When \fIex_model\fR = yes an image containing model spectra is produced.
+
+When \fIclean\fR = yes pixels with large residuals from the model are
+detected and removed from the model fit.  The selected model is
+fit to the pixels which are not in the bad pixel list (not yet implemented)
+and which have not been removed from the model fit.  The sigma of the fit
+is computed.  Deviant pixels are detected by comparing them to the model
+to determine if they differ by more than \fIsigma_cut\fR times the sigma.
+The model fit is iterated, removing deviant pixels at each iteration, until
+no more pixels are found deviant or \fInreplace\fR pixels have been found.
+The pixels removed or in the bad pixel list are then replaced with
+model values.  (To clean and extract the spectra with this algorithm see
+\fBmsextract\fR.)
+
+There are some technical differences in the model fitting and cleaning
+algorithms for the two models.  In model \fIsmooth\fR
+the fit for the profile scale factors is done independently for each spectrum
+and automatically corrected when a bad pixel is detected.  This fitting process
+is fast and rigorous.  The parameter \fInreplace\fR in this model refers to
+the maximum number of pixels replaced \fIper spectrum\fR.
+
+In model \fIgauss5\fR, however, the profile scale factors are fit
+to the entire image line (hence its ability to fit blended spectra).
+There are two fitting algorithms; a rigorous simultaneous fit
+and an approximate method.  The simultaneous fit is selected when
+\fIfit_type\fR = 1.  This step is relatively slow. The
+alternative method of \fIfit_type\fR = 2 sets the scale factor for each
+spectrum by taking the median scale, where scale = data / model profile,
+for the three pixels nearest the center of the profile.  The median
+minimizes the chance of a large error due to a single bad pixel.  This
+scale may be greatly in error in the case of extreme blending but is also
+quite fast; the extraction time is reduced by at least 40%.
+The steps of profile fitting and deviant pixel detection are alternated
+and the maximum number of iterations through these two steps is
+set by \fIniterate\fR.  The default of 1 means that the model fitting is not
+repeated after detecting deviant pixels.
+
+The option \fIverbose\fR can be used to print the image lines being extracted
+and any pixels replaced by the cleaning process.
+.ih
+EXAMPLES
+To create a cleaned version of the image using model \fIsmooth\fR for cleaning:
+
+	cl> newimage image newimage
+
+To create an model image using model \fIgauss5\fR:
+
+	cl> newimage image newimage ex_model=yes model="gauss5"
+.ih
+SEE ALSO
+msextract
+.endhelp

@@ -1,0 +1,65 @@
+.help imokwl,imgnkw,imckwl Sep86 imfort
+.ih
+NAME
+.nf
+imokwl -- open an image header keyword list
+imgnkw -- get the next keyword from the list
+imckwl -- close the keyword list
+.fi
+.ih
+SYNOPSIS
+.nf
+subroutine imokwl (im, patstr, sortit, kwl, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	patstr		#I pattern matching subset of keywords
+logical		sortit		#I sort the list by keyword name?
+integer		kwl		#O keyword list descriptor
+integer		ier		#O status return
+
+subroutine imgnkw (kwl, outstr, ier)
+
+integer		kwl		#I keyword list descriptor
+character*(*)	outstr		#O the next keyword name
+integer		ier		#O status return
+
+subroutine imckwl (kwl, ier)
+
+integer		kwl		#I keyword list descriptor
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The keyword list package is used to define some subset of the keywords in an
+image header, and then read successive elements of the set, i.e., read back
+the keyword names.  The keyword names are normally used as input to
+\fIimtypk\fR or one of the \fIimgkw\fR procedures to obtain additional
+information about each keyword.  The keyword list package is the only means
+whereby a program can examine the contents of an image header without knowing
+in advance the names of the individual header keywords.  A typical application
+of the keyword list package is listing the contents of an image header.
+
+The pattern string \fIpatstr\fR is used to specify the subset of header keywords
+to be used to form the output list.  Some useful values are "*", which returns
+the names of all header keywords, and "i_", which returns the names of only the
+standard header keywords.  If the pattern string does not contain any pattern
+matching meta-characters it is treated as a prefix string (e.g., as "^patstr*").
+.ih
+RETURN VALUE
+The \fIimokwl\fR procedure returns a nonzero status only if it runs out of
+storage for the keyword list.  It is not an error for a list to be empty.
+The \fIimgnkw\fR procedure returns a nonzero status when the end of the
+keyword list is reached.
+
+.nf
+SYS_IMFNOVFL:	out of space for header keyword name list
+IE_EOF:		end of file or list detected
+.fi
+.ih
+NOTES
+An example illustrating the use of the keyword list package may be found
+in imfort$tasks/phead.f.
+.ih
+SEE ALSO
+imtypk, imgkw
+.endhelp

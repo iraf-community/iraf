@@ -1,0 +1,8 @@
+#  PSET file for filtering operations
+
+f_type,s,h,"ramp","ramp|welch|hanning|square",,Filter window type
+cuton,i,h,0,,,Cuton component for filter
+cutoff,i,h,0,,,Cutoff component for filter
+fullon,i,h,0,,,Component at which (ramp) filter reaches full value
+fulloff,i,h,0,,,Component at which (ramp) filter reaches zero
+mode,s,h,'ql'

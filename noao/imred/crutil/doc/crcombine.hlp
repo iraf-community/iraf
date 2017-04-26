@@ -1,0 +1,35 @@
+.help crcombine Apr98 noao.imred.crutil
+.ih
+NAME
+crcombine -- combine multiple exposures to eliminate cosmic rays
+.ih
+USAGE	
+.nf
+crcombine input output
+.fi
+.ih
+PARAMETERS
+See parameters for \fBimcombine\fR.
+.ih
+DESCRIPTION
+This task is a version of \fBimcombine\fR.  See the help for that task
+for a description of the parameters and algorithms.
+
+For the purpose of removing cosmic rays the most useful options
+are the "crreject" algorithm and/or combining with a median.  Many other
+options may work as well.  The best use of this task depends on the
+number of images available.  If there are more than a few images the
+images should be combined with an "average" and using a rejection
+algorithm.
+.ih
+EXAMPLES
+1.  To combine two images using the gain and read noise parameters in
+the image header:
+
+.nf
+    cl> crcombine obj012,obj013 abc gain=gain rdnoise=rdnoise 
+.fi
+.ih
+SEE ALSO
+imcombine
+.endhelp

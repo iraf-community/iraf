@@ -1,0 +1,38 @@
+# Help directory for the CCDRED package.
+
+$doc = "./doc/"
+
+badpiximage	hlp=doc$badpiximage.hlp
+ccdgroups	hlp=doc$ccdgroups.hlp
+ccdhedit	hlp=doc$ccdhedit.hlp
+ccdlist		hlp=doc$ccdlist.hlp
+ccdmask		hlp=doc$ccdmask.hlp
+ccdproc		hlp=doc$ccdproc.hlp
+combine		hlp=doc$combine.hlp
+darkcombine	hlp=doc$darkcombine.hlp
+flatcombine	hlp=doc$flatcombine.hlp
+mkfringecor	hlp=doc$mkfringecor.hlp
+mkillumcor	hlp=doc$mkillumcor.hlp
+mkillumflat	hlp=doc$mkillumflat.hlp
+mkskycor	hlp=doc$mkskycor.hlp
+mkskyflat	hlp=doc$mkskyflat.hlp
+setinstrument	hlp=doc$setinstrument.hlp
+zerocombine	hlp=doc$zerocombine.hlp
+
+ccdgeometry	hlp=doc$ccdgeometry.hlp
+ccdinstrument	hlp=doc$ccdinst.hlp
+ccdtypes	hlp=doc$ccdtypes.hlp
+flatfields	hlp=doc$flatfields.hlp
+guide		hlp=doc$guide.hlp
+instruments	hlp=doc$instruments.hlp
+package		hlp=doc$ccdred.hlp
+subsets		hlp=doc$subsets.hlp
+
+revisions	sys=Revisions
+
+$ccdtest	= "noao$imred/ccdred/ccdtest/"
+
+ccdtest		men=ccdtest$ccdtest.men,
+		hlp=..,
+		pkg=ccdtest$ccdtest.hd,
+		src=ccdtest$ccdtest.cl

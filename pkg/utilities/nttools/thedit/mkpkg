@@ -1,0 +1,13 @@
+# Update thedit in the ttools package library.
+# Author: HODGE, 10-MAY-2000
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_thedit.x	<error.h> <evexpr.h> <ctype.h> <lexnum.h> <tbset.h>
+	t_thselect.x	<error.h> <evexpr.h> <ctype.h> <tbset.h>
+	tkw.x		<ctype.h> <finfo.h> <time.h> <tbset.h>
+	;

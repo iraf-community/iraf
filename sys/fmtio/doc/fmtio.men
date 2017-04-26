@@ -1,0 +1,59 @@
+	  cctoc - Character constant to char
+      chdeposit - Deposit a character in a string with overflow protection
+	chfetch - Fetch a character from a string
+	 chrlwr - Convert a character to lower case
+	 chrupr - Convert a character to upper case
+       clprintf - Formatted print to a CL parameter
+	 clscan - Scan a CL parameter
+	  ctocc - Char to character constant
+	   ctod - Character to double
+	   ctoi - Character to integer
+	   ctol - Character to long
+	   ctor - Character to real
+	   ctox - Character to complex
+	 ctotok - Character to lexical token
+	 ctowrd - Character to whitespace delimited word
+	   dtoc - Double to character
+	eprintf - Formatted print to STDERR
+	fprintf - Formatted print to any file
+	  fscan - Scan a file
+ garg[bcsilrdx] - Get scan argument
+	gargrad - Get scan argument in any numerical radix
+	gargstr - Get scan argument of type string
+	gargtok - Get scan argument of type token
+	gargwrd - Get scan argument of type word
+	  gctod - General character to double
+	  gctol - General character to long (any radix)
+	  gltoc - General long to character (any radix)
+	gstrcat - String concatenation returning length of output string
+	gstrcpy - String copy returning length of output string
+	   itoc - Integer to character
+	 lexnum - Lexically analyze a string to determine if it is a number
+	   ltoc - Long to character
+	  nscan - Get number of arguments successfully converted in last scan
+ parg[bcsilrdx] - Pass an argument to a printf
+	pargstr - Pass a string type argument to a printf
+       patmatch - General pattern matching
+	 printf - Formatted print to STDOUT
+	  scanc - Get the next character from a scan
+	sprintf - Formatted print to a string buffer
+	  sscan - Scan a string buffer
+	 strcat - String concatenation
+	 strcpy - String copy
+	 strdic - Look a string up in a dictionary
+	  streq - Compare strings for equality
+	  strge - Is string A greater than or equal to string B
+	  strgt - Is string A greater than string B
+	 stridx - First occurrence of a character in a string
+	 strldx - Last occurrence of a character in a string
+	  strle - Is string A less than or equal to string B
+	 strlen - Length of a string
+	  strlt - Is string A less than string B
+	 strlwr - Convert string to lower case
+       strmatch - Search a string for a pattern
+	strncmp - Compare the first N characters of two strings
+	  strne - Is string A not equal to string B
+      strsearch - Fast string search, no metacharacters
+	 strtbl - Print a list of strings in a table
+	 strupr - Convert a string to upper case
+	   xtoc - Complex to character

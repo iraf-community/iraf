@@ -1,0 +1,25 @@
+# Miscellaneous Routines used by the APPHOT Package
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbsmooth.x
+	apclip.x
+	apdate.x		<time.h>
+	apdiverr.x
+	apfnames.x
+	apgscur.x		<gset.h>		<fset.h>
+	apgtools.x		<pkg/gtools.h>		<gset.h>
+	aplucy.x
+	apnlfuncs.x		<mach.h>		<math.h>
+	apmapr.x
+	apmeds.x
+	apmoments.x
+	appcache.x		<imhdr.h>		<imset.h>
+	aprmwhite.x		<ctype.h>
+	aptopt.x		<math.h> <mach.h>
+	apvectors.x
+	;

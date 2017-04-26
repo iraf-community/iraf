@@ -1,0 +1,20 @@
+# Make the IMCOMBINE Task.
+
+$checkout libpkg.a ../../../
+$update   libpkg.a
+$checkin  libpkg.a ../../../
+$exit
+
+standalone:
+	$set LIBS1 = "src/libimc.a -lxtools -lcurfit -lsurfit -lgsurfit"
+	$set LIBS2 = "-liminterp -lnlfit -lslalib -lncar -lgks"
+	$update	libimc.a@src
+	$update	libpkg.a
+	$omake	x_imcombine.x
+	$link	x_imcombine.o libpkg.a $(LIBS1) $(LIBS2) -o xx_imcombine.e
+	;
+
+libpkg.a:
+	t_imcombine.x	src/icombine.com src/icombine.h <error.h> <mach.h> \
+			<imhdr.h>
+	;

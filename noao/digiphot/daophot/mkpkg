@@ -1,0 +1,44 @@
+# DAOPHOT libraries
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$omake x_daophot.x
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	;
+
+linkonly:
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	;
+
+install:
+	$move xx_daophot.e noaobin$x_daophot.e
+	;
+
+trelink:
+	$set LIBS = "-lncar -lgks -ltbtables -lxtools -lds"
+	$set XFLAGS = "$(XFLAGS) $(XF)"
+	$set LFLAGS = "$(LFLAGS) $(LF)"
+	$update libpkg.a
+	$link x_daophot.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_daophot.e
+	;
+
+libpkg.a:
+	@addstar
+	@allstar
+	@daoedit
+	@daolib
+	@group
+	@nstar
+	@peak
+	@psf
+	@seepsf
+	@select
+	@substar
+	;

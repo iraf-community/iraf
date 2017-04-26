@@ -1,0 +1,11 @@
+# Make the LIBNSPP.A library for the Ncar system plot package.
+
+$checkout libnspp.a lib$
+$update   libnspp.a
+$checkin  libnspp.a lib$
+$exit
+
+libnspp.a:
+	@portlib
+	@sysint
+	;

@@ -1,0 +1,66 @@
+# MULTISPEC Package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	multispec
+	;
+
+install:
+	$move	x_multispec.e noaobin$
+	;
+
+multispec:
+	$omake	x_multispec.x
+	$set	LIBS = "-lxtools -lllsq -lcurfit -ldeboor -linterp"
+	$link	x_multispec.o libpkg.a $(LIBS)
+	;
+
+libpkg.a:
+	@dbio
+
+	armsr.x
+	clinput.x
+	exgauss5.x	ms.h
+	exsmooth.x	ms.h
+	exstrip.x	ms.h
+	fitclean.x	ms.h
+	fitgauss5.x	ms.h fitgauss5.com
+	fitsmooth.x	ms.h
+	history.x	ms.h
+	intgauss5.x	ms.h
+	modgauss5.x	ms.h
+	msextract.x	ms.h
+	msget.x		ms.h
+	msio.x		ms.h
+	msnames.x	ms.h
+	msput.x		ms.h
+	mssmooth.x
+	peaks.x
+	profinterp.x	ms.h
+	ranges.x
+	sampline.x	ms.h
+	setfitparams.x	ms.h
+	setmodel.x	ms.h
+	setranges.x	ms.h
+	setsmooth.x	ms.h
+	solve.x		ms.h
+	unblend.x	ms.h
+	msplot.x	<imhdr.h>
+	t_findpeaks.x	ms.h
+	t_fitfunc.x	ms.h
+	t_fitgauss5.x	ms.h fitgauss5.com
+	t_modellist.x	ms.h
+	t_msextract.x	ms.h
+	t_mslist.x	ms.h
+	t_msset.x	ms.h
+	t_newextract.x	ms.h
+	t_newimage.x	ms.h
+	;

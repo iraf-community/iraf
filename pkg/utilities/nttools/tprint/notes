@@ -1,0 +1,40 @@
+     Structure chart for tprint:			1988 Jan 21
+
+tprint:
+	(tbtopn)
+	tpr_fm_date:
+		(finfo)
+	tpr_param_pr:
+		(tbhgnp)
+	tpr_data_pr:
+		(tctexp)
+		tpr_plain_pr:
+			(decode_ranges)
+			get_page:
+				(tbcigi)
+			tpr_pfmt:
+				(tbcigt)
+			tpr_cnames_pr:
+				(tbcigt)
+			(get_next_number)
+			prt_row
+				(tbcigi)
+				(tbegt[])
+		tpr_latex_pr:
+			(decode_ranges)
+			tpr_pfmt:
+				(tbcigt)
+			tpr_beg_doc
+			tpr_def
+			tpr_begin_tbl
+			tpr_cnames_pr_l:
+				tpr_w_colsep
+				(tbcigt)
+			(get_next_number)
+			tpr_end_tbl
+			prt_row_l:
+				tpr_w_colsep
+				(tbcigi)
+				(tbegt[])
+			tpr_end_doc
+	(tbtclo)

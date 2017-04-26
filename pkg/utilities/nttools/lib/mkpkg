@@ -1,0 +1,33 @@
+# Update the library application code in the ttools package library
+# Author: B.Simon, 21-Dec-87
+
+$checkout libpkg.a ../
+$update	libpkg.a
+$checkin libpkg.a ../
+$exit
+
+libpkg.a:
+	allcols.x      		<tbset.h> 
+	allrows.x      		<tbset.h> 
+	ftnexpr.x		<ctype.h>
+	gettabcol.x		<tbset.h>
+	inquotes.x		<chars.h> 
+	invert.x		<tbset.h>
+	mjd.x          		<ctype.h> reloperr.h 
+	newcolnam.x    		<ctype.h> <tbset.h> reloperr.h 
+	reorder.x      		<tbset.h> 
+	select.x       		reloperr.h 
+	tabvar.x		<tbset.h>  "../tabvar.com"
+	tbfile.x		<ctype.h>
+	tuopen.x
+	tbleval.x      		<config.h> <error.h> <evexpr.h> \
+				<xwhen.h> reloperr.h tblterm.com
+	tblsearch.x      	<config.h> <evexpr.h> <xwhen.h> \
+				reloperr.h tblterm.com
+	tblsort.x
+	tblterm.x      		<config.h> <evexpr.h> <tbset.h> \
+				<xwhen.h> reloperr.h tblterm.com
+	tctexp.x       		<tbset.h> <ctype.h> reloperr.h
+	tldtype.x
+	unique.x
+	;

@@ -1,0 +1,81 @@
+# Library for making the IMUTIL tasks
+
+$checkout libpkg.a ../../
+$update libpkg.a
+$checkin libpkg.a ../../
+$exit
+
+generic:
+	$set GEN = "$$generic -k"
+
+        $ifolder (imexpr.x, imexpr.gx)
+            $(GEN) imexpr.gx -o imexpr.x $endif
+
+        $ifolder (generic/imfuncs.x, imfuncs.gx)
+            $(GEN) imfuncs.gx -o generic/imfuncs.x $endif
+
+        $ifolder (generic/imjoin.x, imjoin.gx)
+            $(GEN) imjoin.gx -o generic/imjoin.x $endif
+
+        $ifolder (generic/imrep.x, imrep.gx)
+            $(GEN) imrep.gx -o generic/imrep.x $endif
+
+        $ifolder (generic/imsum.x, imsum.gx)
+            $(GEN) imsum.gx  -o generic/imsum.x  $endif
+
+        $ifolder (generic/imaadd.x, imaadd.gx)
+            $(GEN) imaadd.gx -o generic/imaadd.x $endif
+        $ifolder (generic/imadiv.x, imadiv.gx)
+            $(GEN) imadiv.gx -o generic/imadiv.x $endif
+        $ifolder (generic/imamax.x, imamax.gx)
+            $(GEN) imamax.gx -o generic/imamax.x $endif
+        $ifolder (generic/imamin.x, imamin.gx)
+            $(GEN) imamin.gx -o generic/imamin.x $endif
+        $ifolder (generic/imamul.x, imamul.gx)
+            $(GEN) imamul.gx -o generic/imamul.x $endif
+        $ifolder (generic/imasub.x, imasub.gx)
+            $(GEN) imasub.gx -o generic/imasub.x $endif
+        $ifolder (generic/imanl.x, imanl.gx)
+            $(GEN) imanl.gx -o generic/imanl.x $endif
+
+	;
+
+libpkg.a:
+        $ifeq (USE_GENERIC, yes) $call generic $endif
+
+	@generic
+
+        getcmd.x        <error.h> <ctotok.h> <lexnum.h>
+        gettok.x        <error.h> <ctype.h> <fset.h> gettok.h <syserr.h>
+        hedit.x         <error.h> <evexpr.h> <imset.h> <ctype.h> <lexnum.h>
+        imdelete.x      <imhdr.h> <error.h>
+	imexpr.x        <ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\
+			<fset.h> <lexnum.h> <evvexpr.h> gettok.h
+	iegsym.x        <ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\
+			<fset.h> <lexnum.h> <evvexpr.h> gettok.h
+	imfunction.x    <imhdr.h>
+	imgets.x	<imhdr.h> <error.h> <ctype.h>
+	imheader.x	<imhdr.h> <imio.h> <time.h> <ctype.h> <error.h>\
+			<imset.h>
+	imhistogram.x	<mach.h> <imhdr.h> <gset.h>
+        imminmax.x      <imhdr.h>
+	listpixels.x	<error.h> <imhdr.h> <mwset.h>
+        minmax.x        <imhdr.h>
+        nhedit.x        <ctype.h> <error.h> <evexpr.h> <imset.h> <lexnum.h>
+	t_imstat.x	<mach.h> <imhdr.h> <imset.h> "imstat.h"
+	t_sections.x
+	hselect.x	<error.h> <evexpr.h> <ctype.h>
+	t_imarith.x     <imhdr.h> <error.h> <lexnum.h>
+	t_imaxes.x	<imhdr.h>
+        t_chpix.x       <error.h> <imhdr.h> <fset.h>
+        t_imcopy.x      <imhdr.h>
+	t_imdivide.x    <imhdr.h>
+	t_imjoin.x	<syserr.h> <error.h> <imhdr.h>
+        t_imrename.x	<imhdr.h>
+	t_imreplace.x	<imhdr.h>
+        t_imslice.x     <error.h> <imhdr.h> <ctype.h> <mwset.h>
+	t_imsum.x       <imhdr.h>
+        t_imstack.x     <imhdr.h> <mwset.h>
+	t_imtile.x	<imhdr.h> <fset.h> "imtile.h"
+        t_minmax.x      <error.h> <imhdr.h> <imset.h>
+	;

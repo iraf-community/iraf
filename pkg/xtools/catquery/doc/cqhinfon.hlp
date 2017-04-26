@@ -1,0 +1,47 @@
+.help cqhinfon Mar00 "Catquery Package"
+.ih
+NAME
+cqhinfon -- get a catalog results header parameter value by number
+.ih
+SYNOPSIS
+
+hparno = cq_hinfon (res, hparno, hname, max_hname, hvalue, max_hvalue)
+
+.nf
+pointer	res		# the results descriptor
+int	hparno		# the results header parameter sequence number
+char	hname		# the returned results header parameter name
+int	max_hname	# the maximum size of the header parameter name
+char	hvalue		# the returned header parameter value
+int	max_hvalue	# the maximum size of the header parameter value
+.fi
+.ih
+ARGUMENTS
+.ls  res    
+The results descriptor.
+.le
+.ls hparno
+The requested results header parameter sequence number.
+.le
+.ls hname
+The returned name of the results header parameter.
+.le
+.ls max_hname
+The maximum size of the results header parameter name.
+.le
+.ls hvalue
+The returned results header parameter value.
+.le
+.ls max_hvalue
+The maximum size of the results header parameter value.
+.le
+.ih
+DESCRIPTION
+Cq_hinfon returns the name and value of the requested results header
+parameter. Cq_hinfon is an integer function which returns the
+sequence number of the requested parameter as its function value.
+Zero is returned if the results header parameter is not found.
+.ih
+SEE ALSO
+cqhinfo
+.endhelp

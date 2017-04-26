@@ -1,0 +1,51 @@
+
+.help error, fatal, errchk, erract, iferr 2 "Error Handling Strategy"
+.sh
+ERROR HANDLING
+
+    A recoverable error condition is asserted with ERROR.  An irrecoverable
+error condition is asserted with FATAL.  Error recovery is implemented
+using the IFERR and IFNOERR statements in the preprocessor language.
+ERRACT may be called in an IFERR statement to cause a warning to be issued,
+or to cause a particular error action to be taken.  ERRCODE returns either
+OK or the integer code of the posted error.
+
+Language support includes the IFERR and IFNOERR statements and the ERRCHK
+declaration.  The IFERR statement is grammatically equivalent to the IF
+statement.  Note that the condition to be tested in an IFERR statement may
+be a procedure call or assignment statement, while the IF statement tests
+a boolean expression.
+
+
+.nf
+	errchk	proc1, proc2, ...		# errchk declaration
+
+	iferr (procedure call or assignment statement)
+	    <error_action_statement>
+
+	iferr {
+	    <any statements, including IFERR>
+	} then
+	    <error_action_statement>
+
+
+Library procedures (ERROR and FATAL cause a RETURN):
+
+	  error (errcode, error_message)
+	  fatal (errcode, error_message)
+	 erract (severity)
+  val = errcode ()
+
+
+ERRACT severity codes (<error.h>):
+
+	EA_WARN			# issue a warning message
+	EA_ERROR		# assert recoverable error
+	EA_FATAL		# assert fatal error
+.fi
+
+
+An arithmetic exception (X_ARITH) will be trapped by an IFERR statement,
+provided the posted handler(s) return without causing error restart.
+X_INT and X_ACV may only be caught by posting an exception handler with
+XWHEN.

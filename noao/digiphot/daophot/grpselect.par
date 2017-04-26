@@ -1,0 +1,8 @@
+# GRPSELECT Parameters
+
+ingroupfile,s,a,,,,Input group file
+outgroupfile,s,a,,,,Output group file
+min_group,i,a,,,,Minimum group size to select
+max_group,i,a,,,,Maximum group size to select
+verbose,b,h,)_.verbose,,,Print grpselect messages?
+mode,s,h,'ql'

@@ -1,0 +1,257 @@
+.help imcentroid Jan97 images.immatch
+.ih
+NAME
+imcentroid -- center sources in images, optionally find shifts
+
+.ih
+USAGE
+imcentroid input reference coords
+
+.ih
+PARAMETERS
+
+.ls input
+The list of images within which sources are to be centered.  If a
+\fIreference\fR image is specified, imcentroid will calculate the mean
+X and Y shifts between the centered sources within each image and those
+same sources within the reference image.  The input image list
+should normally include the reference image so that its borders are
+used in the calculation of the  overlap region.
+.le
+.ls reference = ""
+The reference image to which the input images will be aligned.  If
+a reference image is specified the mean X and Y shifts between each of
+the input images and the reference image will be calculated, otherwise
+only the centers for the individual sources will be reported.
+.le
+.ls coords
+A text file containing the coordinates of the registration objects to
+be centered in each image, one object per line with the x and y
+coordinates in columns one and two respectively.  These coordinates
+should be measured in the frame of the reference image.
+.le
+.ls shifts = ""
+A text file containing the initial estimate for each image of the
+shift in each axis relative to the reference image.  These
+estimates are used to modify the coordinates of the registration
+objects prior to centering.  The format of the file is one image per
+line with the fractional x and y shifts in columns one and two
+respectively.  The sense of the shifts is such that:
+Xshift =Xref - Xin and shift= Yref - Yin. If shifts is undefined,
+a coarse centering pass will be made to attempt to determine
+the initial shifts.
+.le
+.ls boxsize = 7
+The size in pixels of the box to use for the final centering, during
+which all the sources in the coords file are recentered in each image
+using the initial estimate of the relative shift for each image.
+Care should be taken to choose an appropriate value for this parameter,
+since it is highly data dependent.
+.le
+.ls bigbox = 11
+The size in pixels of the box to use for coarse centering.  The coarse
+pass through the centering algorithm is made with the box centered at
+the nominal position of the first source in the coordinate list.
+Coarse centering is performed only if the shifts file is undefined.
+Care should be taken to choose an appropriate value for this parameter,
+since it is highly data dependent.  Large value should be suspect until
+the final results are checked to see that the centering did not converge
+on the wrong coordinates, although the usual result for an inappropriate
+bigbox size is that the algorithm fails to converge and the task
+aborts.
+.le
+.ls negative = no
+Are the features negative ?
+.le
+.ls background = INDEF
+The absolute reference level for the marginal centroid calculation.
+If background is INDEF, this is set to the mean value (between the
+thresholds) of the individual sources.
+.le
+.ls lower = INDEF
+The lower threshold for the data.  Individual pixels less than this
+value will be given zero weight in the centroids.
+.le
+.ls upper = INDEF
+The upper threshold for the data.  Individual pixels greater than this
+value will be given zero weight in the centroids.
+.le
+.ls niterate = 3
+The maximum number of centering iterations to perform.  The centering
+will halt when this limit is reached or when the desired tolerance
+is achieved.
+.le
+.ls tolerance = 0
+The tolerance for convergence of the centering algorithm.  This is the
+integral shift of the centering box from one iteration to the next.
+.le
+.ls maxshift = INDEFR
+The maximum permitted difference between the predicted shift and the
+the computed shift for each object. Objects with shifts greater than
+maxshift are ignored. If maxshift is undefined no shift checking is done.
+.le
+.ls verbose = yes
+Print the centers for the individual objects ?  If verbose is no
+only the shifts relative to the reference coordinates will be reported.
+If no reference image is supplied, verbose is automatically set to yes.
+.le
+
+.ih
+DESCRIPTION
+
+IMCENTROID measures the X and Y coordinates of a list of sources in a
+list of images and finds the mean X and Y shifts between the input
+images \fIinput\fR and a \fIreference\fR image, where the shifts are
+defined as the shifts that should be added to the input image coordinates to
+convert them into the reference coordinates.  The task is meant to
+address the class of two dimensional image registration problems in
+which the images have the same pixel scale, are shifted relative to
+each other by simple translations in each axis, and contain enough high
+signal-to-noise, pointlike sources in common to form good average
+positions.  The basic operation of the task is to find centers for the
+list of registration objects in the coordinate frame of each image and
+then to subtract the corresponding centers found in the reference
+image.  The shifts of the objects are averaged for each image.
+
+A list of the X and Y coordinates of the registration objects should be
+provided in the coordinates file \fIcoords\fR.  The registration objects do not
+all have to be common to each frame, rather only that subset of the
+objects that is contained within the bounds of a given image will be
+centered.  Only the objects that are common to both the given image and
+the reference will be used to calculate the shifts.  The coordinates
+should be measured in the frame of the reference image\fIreference\fR.
+If coarse centering is to be done, which is to say, if no \fIshifts\fR file is
+provided, then the first registration source should be separated from
+other sources by at least the maximum expected relative shift.
+
+An initial estimate of the shifts between each of the input images
+\fIinput\fR and the reference image \fIreference\fR is required for the
+centering algorithm (a marginal centroid) to work.  This estimate can be
+explicitly supplied in the text file \fIshifts\fR where Xshift = Xref -Xin
+and Yshift = Yref -Y in, or can be generated from the images by measuring
+the relative shift of the first source listed in the coordinates file
+\fIcoords\fR for each input image.  This coarse
+centering pass requires that the first source be detached from other
+sources and from the border of each image by a distance that is at
+least the maximum shift between the reference and input image.  This
+source should be pointlike and have a high signal to noise ratio.  The
+value of the \fIbigbox\fR parameter should be chosen to include the
+location of the source in each of the images to be aligned while
+excluding other sources.  Large values of \fIbigbox\fR should be held
+suspect until the final convergence of the centering algorithm is
+verified, although given a small value for the \fItolerance\fR, the
+quality of the final centers is independent of the estimate for the
+initial shifts.  Better convergence may also be obtained by increasing
+the \fIniterate\fR parameter, although the default value of three
+should work for most cases.  \fINiterate\fR should be kept small to
+avoid runaway.
+
+The \fIboxsize\fR parameter controls the size of the centering box for
+the fine centering pass and should be chosen so as to exclude sky
+background and other sources while including the wings of the point
+spread function.  The sense of the shifts that are calculated is
+consistent with the file supplied to the \fIshifts\fR parameter and
+with that used with the IMSHIFT task.
+
+IMCENTROID may be used with a set of input images which vary in size.
+This can result in vignetting of the calculated overlap region because
+of the nature of tasks such as IMSHIFT to preserve the size of an input
+image.  To visualize this, imagine a large reference image and a single
+small image to be aligned to it, both containing the same registration
+object which is at the center of each image.  IMCENTROID will cause the
+coordinate system of the small image to be shifted such that the object 
+will be positioned at the same pixel location as in the reference.  If
+the shift is performed, a large fraction of the area of the small image
+may be shifted outside of its own borders, whereas the physical overlap
+of the large and small images includes ALL of the pixels of the small
+image.  In the case of such vignetting, IMCENTROID will print a warning
+message and both the vignetted and unvignetted trim sections.  Note
+that the vignetting will not occur if the small image is used as the
+reference image.
+
+The vignetting message may also be printed if the input images are all
+the same size but the reference image is not included in the list.
+This will occur if the sense of the measured shifts in a coordinate are
+all positive or all negative since in this case the border of the
+reference image would have provided one of the limits to the trim
+section.  The reality of this vignetting depends on your point of view.
+
+Note that many of these difficulties are due to the intrinsically fuzzy
+nature of the process of image registration.  This all leads to a few
+guidelines:
+
+.nf
+    o	Include the reference image in the input image list
+
+    o	Use the smallest image as the reference image
+
+    o	Choose the reference image such that the input images
+        are scattered to either side in the shifts in each axis
+
+    o	Align images that are the same size, OR
+
+    o	Pad dissimilar sized images with blanks to the largest size
+.fi
+
+.ih
+CENTERING ALGORITHM
+
+The algorithm is a "marginal" centroid in which the fit for each axis
+is performed separately upon a vector created by collapsing the
+centering box perpendicular to that axis.  The centroid is calculated
+with respect to the level specified by \fIbackground\fR.  If
+\fIbackground\fR is INDEF, the reference level for each source in each
+image is the local mean for those pixels that lie between the
+\fIlower\fR and \fIupper\fR thresholds.  The thresholds are set to the
+local data minimum or maximum if \fIlower\fR or \fIupper\fR,
+respectively, are INDEF.  If \fInegative\fR is yes, than the marginal
+vector will be inverted before being passed to the centroid algorithm.
+
+The maximum number of centering iterations and the tolerance for
+convergence are controlled by \fIniterate\fR and \fItolerance\fR.  Note
+that the tolerance is an integer value that represents the maximum
+movement of the centering box between two successive iterations.  The
+default value of 0 requires that the centroid lie within the center
+pixel of the centering box which is \fIboxsize\fR in extent (note that
+\fIboxsize\fR must be an odd number).  This should normally be the case
+for bright, circularly symmetric point sources in images with a flat
+sky background.  If the registration sources are not circular symmetric
+try increasing the tolerance gingerly.  If the sky background is not
+flat, but varies across the image, it can be removed before processing.
+
+.ih
+EXAMPLES
+
+1. Calculate the shifts between three images using the first image
+as a reference image and the list of registration star coordinates in
+the file "x1.coords".
+
+.nf
+    cl> imcentroid x1,x2,x3 x1 x1.coords
+.fi
+
+2. Calculate the shifts between a list of images contained in the file
+"imlist":
+
+.nf
+    pr> imcentroid @imlist x1 x1.coords
+.fi
+
+3. Perform the centering, but don't calculate the shifts, i.e., don't
+supply a reference image.  Note that the \fIinput\fR list of shifts,
+or a coarse centering pass are still needed:
+
+.nf
+    pr> imcentroid @imlist "" x1.coords
+.fi
+
+.ih
+BUGS
+The coarse centering portion of the algorithm can be fooled if the
+first source on the list is not well separated from other sources, or
+if the first source has a low signal to noise ratio, or if there is a
+complicated shape to the background.
+.ih
+SEE ALSO
+imalign, imshift, xregister, geomap, geotran
+.endhelp

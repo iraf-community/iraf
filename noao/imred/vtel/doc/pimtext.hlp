@@ -1,0 +1,110 @@
+.help pimtext May86 noao.imred.vtel
+.ih
+NAME
+pimtext -- Put image text. Use pixel font to write text into image.
+.ih
+USAGE
+pimtext iraf_files
+.ih
+PARAMETERS
+.ls iraf_files
+Image or images to be written into.  This entry may contain wild cards and
+will be expanded into however many files match the wild card.
+.le
+.ls refim
+Reference image to pull date and time parameters from in the event the "ref"
+flag is set.
+.le
+.ls ref
+Reference flag.  When set, causes the program to take information (date/time)
+from the reference image and write it into the image or images expanded from
+the template "iraf_images".
+.le
+.ls x = 10
+X position (column) in image to write text.
+.le
+.ls y = 10
+Y position (line) in image to write text.
+.le
+.ls xmag = 2
+Factor by which to magnify the text in the x direction.  This must be an
+integer.  The pixelfont is expanded by pixel replication.  The font width
+at xmag=1 is 6.
+.le
+.ls ymag = 2
+Factor by which to magnify the text in the y direction.  This must be an
+integer.  The pixelfont is expanded by pixel replication.  The font width
+at ymag=1 is 7.
+.le
+.ls val = -10000
+Value to put in text pixels.
+.le
+.ls setbgnd = yes
+Boolean parameter to signal the program to fill in the area behind the
+characters with pixels set to bgndval.
+.le
+.ls bgndval = 10000
+Pixel value to use to fill in background in text block.
+.le
+.ls date = yes
+Flag that instructs the program to look for the date in the 
+image header and write it into the image.  If the date and time
+flags are both set, both will be written into the image as a single
+string.
+.le
+.ls time = yes
+Flag that instructs the program to look for the time in the 
+image header and write it into the image.
+.le
+.ls text
+Text string to write into image.
+.le
+.ih
+DESCRIPTION
+Pimtext writes either the date and/or time or the indicated text string into
+the image or images specified.
+Pimtext, by default, writes the date and/or time into the image in the lower
+left corner.  If it cannot find the date or time pimtext will give a warning
+and read a text string from the users terminal.  If the date and time flags are
+set to 'no', pimtext will take the text string to be written from the user.
+The position of the text may be adjusted by setting
+the parameters 'x' and 'y' which set the lower left pixel of
+the text block.  The pixels in the text block behind the characters may
+be set to a particular value when the 'setbgnd' flag is set.  The pixel
+values used to write the text and the background can be set by adjusting
+the parameters 'val' and 'bgndval'.  If the text overlaps the image
+edge in the X direction it will be truncated.  If it overlaps in Y it will
+not be written.
+The user may magnify the text by adjusting the "xmag" and "ymag" parameters.
+The default (2,2) is a nice size for display in a 512 by 512 image.  Bigger
+images may need bigger text, smaller images may need smaller text.
+The "ref" flag is used to write information from one image into another
+image.
+
+.ih
+EXAMPLES
+1. To write the date and time into the three images s13_1709_001, v13_1709_001,
+and b13_1709_001 (assuming the directory contains only these three images)
+the command would be:
+
+.nf
+	vt> pimtext ?13*
+.fi
+
+2. To write the text string "hello world" into the image 'testim' the command
+would be
+
+.nf
+	vt> pimtext testim 'hello world' date=no time=no
+.fi
+
+3. To write the date and time into the images s1, s2, s3, s4 and position
+the text at pixel 30,30, and turn off the text background fill, the command
+would be:
+
+.nf
+	vt> pimtext s* x=30 y=30 setbgnd=no
+.fi
+.ih
+SEE ALSO
+.endhelp

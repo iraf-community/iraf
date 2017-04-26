@@ -1,0 +1,48 @@
+# SMW/SHDR Interface
+
+update:
+	$checkout libsmw.a noaolib$
+	$update   libsmw.a
+	$checkin  libsmw.a noaolib$
+	;
+
+generic:
+	$set	GEN = "$$generic -k"
+
+	$ifolder (smwctran.x, smwctran.gx)
+	    $(GEN) smwctran.gx -o smwctran.x $endif
+	;
+
+libsmw.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	funits.x	<ctype.h> <error.h> <funits.h>
+	shdr.x		<error.h> <funits.h> <imset.h> <math/iminterp.h>\
+			<smw.h> <units.h> <imhdr.h>
+	smwclose.x	<smw.h>
+	smwct.x	<smw.h>
+	smwctfree.x	<smw.h>
+	smwctran.x	<smw.h>
+	smwdaxis.x	<smw.h>
+	smwequispec.x	<mwset.h> <smw.h> <imhdr.h>
+	smwesms.x	<mwset.h> <smw.h>
+	smwgapid.x	<smw.h>
+	smwgwattrs.x	<error.h> <smw.h>
+	smwmerge.x	<mwset.h> <smw.h>
+	smwmultispec.x	<smw.h>
+	smwmw.x		<smw.h>
+	smwnd.x		<imhdr.h> <smw.h>
+	smwndes.x	<imhdr.h> <smw.h>
+	smwnewcopy.x	<smw.h>
+	smwoldms.x	<mwset.h> <smw.h>
+	smwonedspec.x	<smw.h> <imhdr.h>
+	smwopen.x	<smw.h>
+	smwopenim.x	<imio.h> <mwset.h> <imhdr.h>
+	smwsapid.x	<smw.h>
+	smwsaveim.x	<imio.h> <smw.h> <imhdr.h>
+	smwsaxes.x	<imhdr.h> <mwset.h> <smw.h>
+	smwsctran.x	<smw.h>
+	smwsmw.x	<smw.h>
+	smwswattrs.x	<error.h> <smw.h>
+	units.x		<ctype.h> <error.h> <units.h>
+	;

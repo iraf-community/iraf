@@ -1,0 +1,21 @@
+# DAOFIND
+
+image,s,a,,,,"Input image(s)"
+output,f,h,"default",,,"The output coordinates list(s) (default: image.coo.?)"
+starmap,s,h,"",,,"The output density enhancement image(s)"
+skymap,s,h,"",,,"The output sky image(s)" 
+datapars,pset,h,"",,,"Data dependent parameters"
+findpars,pset,h,"",,,"Object detection parameters"
+boundary,s,h,nearest,,,"Boundary extension (constant, nearest, reflect, wrap)"
+constant,r,h,0.0,,,"Constant for constant boundary extension"
+interactive,b,h,no,,,"Interactive mode ?"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the image pixels ?"
+verify,b,h,)_.verify,,,"Verify critical parameters in non-interactive mode ?"
+update,b,h,)_.update,,,"Update critical parameters in non-interactive mode ?"
+verbose,b,h,)_.verbose,,,"Print messages in non-interactive mode ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
+mode,s,h,'ql'

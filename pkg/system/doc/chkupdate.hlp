@@ -1,0 +1,72 @@
+.help chkupdate Oct13 system
+.ih
+NAME
+chkupdate - Check for an available IRAF update
+.ih
+USAGE
+chkupdate
+.ih
+PARAMETERS
+.ls interval = 0
+Number of days between updates checks.  A value less than zero will disable
+the checks entirely, a value of zero will cause a check to be made with 
+each login.
+.le
+.ls ref_file = "iraf$.release_date"
+.le
+.ls release = ")_.release"
+Current IRAF release version.  This value is inherited from the CL 'release'
+parameter by default.
+.le
+.ls baseurl = "http://iraf.noao.edu/ftp"
+Base URL to the IRAF release timestamp directory.
+.le
+.ls verbose = yes
+Print verbose output?
+.le
+.ih
+DESCRIPTION
+This task compares the currently installed IRAF version with what is
+available from the NOAO servers and will indicate whether an update is
+available.  The task is executed from the login.cl each time you login 
+to the CL, however the comparison is only done if 1) the uparm$update 
+file used to indicate the time of last check does not exist, 2) the 
+\fIinterval\fR parameter is zero to indicate the check should be done
+with each login, or 3) more than \fIinterval\fR days have passed since
+the last time the servers were contacted.  An \fIinterval\fR value less
+that zero may be used to disable the version updates entirely.
+
+The update check is done by comparing the file timestamp of the file
+named in the \fIref_file\fR parameter with a distribution timestamp file
+on the NOAO servers.  The URL to this file is constructed from the 
+\fIbaseurl\fR and \fIrelease\fR parameters in addition to the \fIarch\fR
+environment value, yielding a unique URL for each version and each platform.
+If the contents of the file contain a timestamp more recent than the 
+timestamp of the \fIref_file\fR value, a message is printed to indicate
+an update is available, otherwise a message is printed indicating the
+installed system is current.
+.ih
+EXAMPLES
+
+1. Check whether an IRAF update is available, regardless of when we last
+checked.
+
+.nf
+	cl> chkupdate interval=0
+.fi
+
+2. Check for an IRAF update once a month.
+
+.nf
+	cl> chkupdate.interval = 30
+.fi
+
+.ih
+NOTES
+This task is called automatically from the login.cl file at startup.
+
+Modifying the timestamp information of the \fIref_file\fR parameter, e.g.
+by moving the IRAF tree, may invalidate the output.
+.ih
+SEE ALSO
+.endhelp

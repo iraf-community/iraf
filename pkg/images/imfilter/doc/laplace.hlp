@@ -1,0 +1,132 @@
+.help laplace Dec85 images.imfilter
+.ih
+NAME
+laplace -- convolve a list of images with a Laplacian filter
+.ih
+USAGE
+laplace input output
+.ih
+PARAMETERS
+.ls input
+List of images to be convolved.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input image name equals the output image name the
+convolved image will replace the input image.
+.le
+.ls laplace = "xycentral"
+The Laplacian filters are a set of four three by three kernels which
+approximate the Laplacian operator, where a Laplacian operator is defined
+as the sum of the partial second derivatives in x and y.
+The elements of the four Laplacian kernels are shown in detail below.
+.ls xycentral
+The elements of the central column and row of a 3 by 3 image subraster are
+combined to estimate the Laplacian at the position of the central pixel.
+.le
+.ls diagonals
+The elements of the two diagonals of a 3 by 3 image subraster are combined
+to estimate the Laplacian at the position of the central pixel.
+.le
+.ls xyall
+The three columns and rows of a three by three image subraster are averaged
+to estimate the Laplacian at the position of the central pixel.
+.le
+.ls xydiagonals
+The central row and column and the two diagonals of a three by three image
+subraster are combined to estimate the Laplacian at the position of the
+central pixel.
+.le
+.le
+.ls boundary = "nearest"
+The algorithm used to compute the values of the out of bounds pixels.
+The options are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+LAPLACE convolves the list of images specified by \fIinput\fR with one of
+four 3 by 3 Laplacian kernels specified by \fIlaplace\fR
+and places the convolved images in \fIoutput\fR. If the image names
+in \fIoutput\fR equal the image names in \fIinput\fR the Laplacian
+operation is performed in place and the original images are overwritten.
+Out of bounds pixels are computed using the algorithm specified by
+\fIboundary\fR.
+
+The Laplacian filters are high-pass filters which act as a local edge detector.
+A characteristic of the Laplacian is that it is zero at points where the
+gradient is a maximum or a minimum. Therefore points detected as gradient
+edges would generally not be detected as edge points with the Laplacian
+filter. Another characteristic of Laplacian operators is that a single
+grey level transition may produce two distinct peaks one positive and
+one negative in the Laplacian which may be offset from the gradient location.
+
+The four Laplacian filters are listed below. The I[*,*] are the elements of the
+input image and the O[*,*] are the elements of the output image.
+
+.nf
+    			xycenter
+
+	     0*I[-1,1]  + 1*I[0,1]  + 0*I[1,1]  +
+    O[0,0] = 1*I[-1,0]  - 4*I[0,0]  + 1*I[1,0]  +
+             0*I[-1,-1] + 1*I[0,-1] + 0*I[1,-1]
+
+
+		       diagonals
+
+          I[-1,1]/sqrt(2)  + I[0,1]*0         +  I[1,1]/sqrt(2) +
+O[0,0] =  I[-1,0]*0        - I[0,0]*4/sqrt(2) +  I[1,0]*0       +
+	  I[-1,-1]/sqrt(2) + I[0,-1]*0        +  I[1,-1]/sqrt(2) 
+
+		         xyall
+
+	       2/3*I[-1,1]  -  1/3*I[0,1]  + 2/3*I[1,1]  +
+    O[0,0] = - 1/3*I[-1,0]  -  4/3*I[0,0]  - 1/3*I[1,0]  +
+               2/3*I[-1,-1] -  1/3*I[0,-1] + 2/3*I[1,-1]
+
+		       xydiagonals
+
+          I[-1,1]/sqrt(2)/2  + I[0,1]/2           + I[1,1]/sqrt(2)/2 +
+O[0,0] =  I[-1,0]/2          - I[0,0]*(2-sqrt(2)) + I[1,0]/2         +
+	  I[-1,-1]/sqrt(2)/2 + I[0,-1]/2          + I[1,-1]/sqrt(2) 
+
+.fi
+
+.ih
+EXAMPLES
+
+1. Convolve an image with the Laplacian filter xyall using nearest neighbor
+boundary extension.
+
+    cl> laplace m83 m83.lap xyall
+
+.ih
+TIME REQUIREMENTS
+
+LAPLACE requires approximately 1.7 cpu seconds to convolve a
+512 square real image with a 3 by 3 Laplacian kernel on a Sparc
+Station 1.
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+convolve, gauss, gradient, boxcar
+.endhelp

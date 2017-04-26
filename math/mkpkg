@@ -1,0 +1,138 @@
+# Update the IRAF MATH libraries.
+
+$ifeq (hostid, unix)  !(clear;date)  $endif
+$call mathgen
+$echo "-------------- (done) -------------------"
+$ifeq (hostid, unix) !(date) $endif
+$exit
+
+# MATHGEN -- Update the math libraries.  The source for each library is
+# maintained in a separate subidrectory.  The binary libraries are in lib$.
+# To update a single library type "mkpkg" in the source directory for the
+# library, or type "mkpkg libname" in this directory, e.g. "mkpkg llsq".
+
+mathgen:
+	$call bev
+	$call curfit
+	$call deboor
+	$call gsurfit
+	# $call ieee
+	$call iminterp
+	$call interp
+	$call llsq
+	$call nlfit
+	$call slalib
+	$call surfit
+	$purge lib$
+	;
+
+bev:
+	$echo "-------------- LIBBEV -------------------"
+	$checkout libbev.a lib$
+	$update   libbev.a
+	$checkin  libbev.a lib$
+	;
+curfit:
+	$echo "-------------- LIBCURFIT ----------------"
+	$checkout libcurfit.a lib$
+	$update   libcurfit.a
+	$checkin  libcurfit.a lib$
+	;
+deboor:
+	$echo "-------------- LIBDEBOOR ----------------"
+	$checkout libdeboor.a lib$
+	$update   libdeboor.a
+	$checkin  libdeboor.a lib$
+	;
+gsurfit:
+	$echo "-------------- LIBGSURFIT ---------------"
+	$checkout libgsurfit.a lib$
+	$update   libgsurfit.a
+	$checkin  libgsurfit.a lib$
+	;
+ieee:
+	$echo "-------------- LIBIEEE ------------------"
+	$checkout libieee.a lib$
+	$update   libieee.a
+	$checkin  libieee.a lib$
+	;
+iminterp:
+	$echo "-------------- LIBIMINTERP --------------"
+	$checkout libiminterp.a lib$
+	$update   libiminterp.a
+	$checkin  libiminterp.a lib$
+	;
+interp:
+	$echo "-------------- LIBINTERP ----------------"
+	$checkout libinterp.a lib$
+	$update   libinterp.a
+	$checkin  libinterp.a lib$
+	;
+llsq:
+	$echo "-------------- LIBLLSQ ------------------"
+	$checkout libllsq.a lib$
+	$update   libllsq.a
+	$checkin  libllsq.a lib$
+	;
+nlfit:
+	$echo "-------------- LIBNLFIT -----------------"
+	$checkout libnlfit.a lib$
+	$update   libnlfit.a
+	$checkin  libnlfit.a lib$
+	;
+slalib:
+	$echo "-------------- LIBSLALIB ----------------"
+	$checkout libslalib.a lib$
+	$update   libslalib.a
+	$checkin  libslalib.a lib$
+	;
+surfit:
+	$echo "-------------- LIBSURFIT ----------------"
+	$checkout libsurfit.a lib$
+	$update   libsurfit.a
+	$checkin  libsurfit.a lib$
+	;
+
+libbev.a:				# Bevington routines
+	@bevington
+	;
+
+libcurfit.a:				# Curve fitting package
+	@curfit
+	;
+
+libdeboor.a:				# DeBoor spline package
+	@deboor
+	;
+
+libgsurfit.a:				# Generalized 2d surface fitting pkg
+	@gsurfit
+	;
+
+libieee.a:				# IEEE signal processing package
+	@ieee
+	;
+
+libiminterp.a:				# Image interpolation package
+	@iminterp
+	;
+
+libinterp.a:				# Obsolete version of iminterp pkg
+	@interp
+	;
+
+libllsq.a:				# Lawson and Hanson Least Squares pkg
+	@llsq
+	;
+
+libnlfit.a:                             # Levenberg-Marquardt fitting package
+	@nlfit
+	;
+
+libslalib.a:				# Starlink positional astronomy library
+	@slalib
+	;
+
+libsurfit.a:				# Surface fitting on an even grid
+	@surfit
+	;

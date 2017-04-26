@@ -1,0 +1,48 @@
+.help cqstats Mar00 "Catquery Package"
+.ih
+NAME
+cqstats -- get a catalog / survey string parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+call cq_stats (cq, parameter, str, maxch)
+
+.nf
+pointer	cq		# the configuration file descriptor
+int	parameter	# the parameter to be returned
+char	str		# the returned string parameter value
+int	maxch		# the maximum size of the returned string parameter
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The catalog / survey configuration file descriptor.
+.le
+.ls parameter
+The parameter to be returned.  The string parameters defined
+in cq.h are:
+.nf
+	CQCATDB		# the name of the configuration file
+	CQCATNAME	# the name of the current catalog
+.fi
+.le
+.ls str
+Array containing returned string parameter.
+.le
+.ls maxch
+The maximum size of the returned string parameter.
+.le
+.ih
+DESCRIPTION
+Cq_stats returns the requested catalog / survey string parameters.
+
+.ih
+NOTES
+The current catalog name CQCATNAME is "" if the current catalog has not been
+set by a call to cq_setcat or cq_setcatn.
+
+.ih
+SEE ALSO
+cq_stati, cq_statt
+.endhelp

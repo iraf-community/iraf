@@ -1,0 +1,39 @@
+.help cvsolve Jun84 "Curfit Package"
+.ih
+NAME
+cvsolve -- solve a linear system of eqns by the Cholesky method
+.ih
+SYNOPSIS
+cvsolve (cv, ier)
+
+.nf
+pointer	cv	# curve descriptor
+int	ier	# error code
+.fi
+.ih
+ARGUMENTS
+.ls cv    
+Pointer to the curve descriptor
+.le
+.ls ier    
+Error code returned by the fitting routines. The options are
+OK, SINGULAR and NO_DEG_FREEDOM. If ier is SINGULAR the matrix is singular,
+CVSOLVE will compute a solution to the normal equationsbut one or more of the
+coefficients will be zero.
+If ier equals NO_DEG_FREEDOM, too few data points exist for a reasonable
+solution to be computed. CVSOLVE returns
+without fitting the data.
+.le
+.ih
+DESCRIPTION
+CVSOLVE call two routines CVCHOFAC and CVCHOSLV. CVCHOFAC computes the
+Cholesky factorization of the data matrix. CVCHOSLV solves for the
+coefficients of the fitting function by forward and back substitution.
+An error code is returned by CVSOLVE if it is unable to solve the normal
+equations as formulated.
+.ih
+NOTES
+.ih
+SEE ALSO
+cvchofac, cvchoslv
+.endhelp

@@ -1,0 +1,35 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+xlabel,s,h,"Radius",,,"X-axis label"
+ylabel,s,h,"Pixel Value",,,"Y-axis label"
+fitplot,b,h,yes,,,"Overplot profile fit?"
+fittype,s,h,"moffat","gaussian|moffat",,"Profile type to fit"
+
+center,b,h,yes,,,"Center object in aperture?"
+background,b,h,yes,,,"Fit and subtract background?"
+radius,r,h,5.,1.,,"Object radius"
+buffer,r,h,5.,0.,,Background buffer width
+width,r,h,5.,1.,,Background width
+iterations,i,h,3,1,,"Number of radius adjustment iterations"
+xorder,i,h,0,0,,Background x order
+yorder,i,h,0,0,,Background y order
+magzero,r,h,25.,,,Magnitude zero point
+beta,r,h,INDEF,,,Moffat beta parameter
+
+rplot,r,h,8.,1.,,"Plotting radius"
+x1,r,h,INDEF,,,X-axis window limit
+x2,r,h,INDEF,,,X-axis window limit
+y1,r,h,INDEF,,,Y-axis window limit
+y2,r,h,INDEF,,,Y-axis window limit
+pointmode,b,h,yes,,,plot points instead of lines?
+marker,s,h,"plus",,,point marker character?
+szmarker,r,h,1.,,,marker size
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?

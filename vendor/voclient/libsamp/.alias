@@ -1,0 +1,21 @@
+
+
+alias zt0   "unsetenv XMLRPC_TRACE_XML"
+alias zt1   "setenv XMLRPC_TRACE_XML 1"
+alias zt2   "setenv XMLRPC_TRACE_XML 2"
+
+alias hub   "java -jar jsamp/jsamp-1.3.jar hub"
+alias hmon  "java -jar jsamp/jsamp-1.3.jar hubmonitor"
+
+alias hubm  "java -jar jsamp/jsamp-1.3.jar hub -v -v -mode msg-gui"
+
+alias hubv  "java -jar jsamp/jsamp-1.3.jar hub -v -v"
+alias hmonv "java -jar jsamp/jsamp-1.3.jar hubmonitor -v -v"
+
+alias xhub  "java -jar jsamp/jsamp-1.3-nocheck.jar hub -verbose"
+alias xhmon "java -jar jsamp/jsamp-1.3-nocheck.jar hubmonitor -verbose"
+
+alias ssend "java -jar jsamp/jsamp-1.3.jar MessageSender \!*" 
+alias snoop "java -jar jsamp/jsamp-1.3.jar Snooper -verbose" 
+alias hubtester "java -jar jsamp/jsamp-1.3.jar HubTester -verbose" 
+alias sping "java -jar jsamp/jsamp-1.3.jar MessageSender -mtype samp.app.ping" 

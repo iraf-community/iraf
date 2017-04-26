@@ -1,0 +1,39 @@
+# ATTOOLS tools subdirectory
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+tfiles:
+        $ifolder (liststr.x,liststr.gx)
+            $generic -k liststr.gx -o liststr.x $endif
+        ;
+
+libpkg.a:
+        $ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	atalloc.x	"../../lib/astromdef.h" "../../lib/astrom.h"      \
+	                "../../lib/acatalog.h" "../../lib/aimparsdef.h"   \
+			"../../lib/aimpars.h"
+	atcathdr.x	<pkg/cq.h> "../../lib/acatalog.h"
+	atfnames.x	"../../lib/astrom.h" <pkg/cq.h>
+	atinpars.x	"../../lib/astrom.h" "../../lib/acatalog.h"       \
+	                "../../lib/aimpars.h"
+	atdefpars.x	"../../lib/astrom.h" "../../lib/acatalog.h"       \
+	                "../../lib/aimpars.h"
+	atoutpars.x	"../../lib/astrom.h" "../../lib/acatalog.h"       \
+	                "../../lib/aimpars.h"
+	atset.x		"../../lib/astromdef.h" "../../lib/astrom.h"      \
+	                "../../lib/aimparsdef.h" "../../lib/aimpars.h"
+	atshow.x	"../../lib/astrom.h" "../../lib/acatalog.h"       \
+	                "../../lib/aimpars.h"
+	atstat.x	"../../lib/astromdef.h" "../../lib/astrom.h"      \
+	                "../../lib/aimparsdef.h" "../../lib/aimpars.h"
+	atwrdstr.x
+
+        liststr.x       <ctype.h>
+	atvectors.x
+	atsort.x
+	atdtype.x
+	;

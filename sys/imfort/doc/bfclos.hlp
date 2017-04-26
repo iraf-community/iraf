@@ -1,0 +1,27 @@
+.help bfclos Sep86 imfort.bfio
+.ih
+NAME
+bfclos -- close a file opened for binary file i/o
+.ih
+SYNOPSIS
+.nf
+subroutine bfclos (fd, status)
+
+integer		fd		#I BFIO file descriptor of open file
+integer		status		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIbfclos\fR procedure closes a file previously opened with \fIbfopen\fR,
+freeing the file descriptor and any other system resources associated with the
+file descriptor.  The output buffer is automatically flushed before the file
+is closed.
+.ih
+RETURN VALUE
+A negative status indicates failure, e.g., either a write error occurred
+when the output buffer was flushed, or the file descriptor \fIfd\fR was
+invalid.
+.ih
+SEE ALSO
+bfopen
+.endhelp

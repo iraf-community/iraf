@@ -1,0 +1,20 @@
+# IRALIGN
+
+input,f,a,,,,Input image
+output,f,a,,,,Output image
+database,f,a,,,,Database file
+coords,f,a,,,,Coordinate file
+xshift,r,a,0.0,,,Xshift for align by shifts
+yshift,r,a,0.0,,,Yshift for align by shifts
+alignment,s,h,"coords",,,'Alignment technique (coords|shifts|file)'
+nxrsub,i,h,INDEF,,,Row index of reference subraster
+nyrsub,i,h,INDEF,,,Column index of reference subraster
+xref,i,h,0,,,X offset of reference subraster in pixels
+yref,i,h,0,,,Y offset of reference subraster in pixels
+trimlimits,s,h,"[1:1,1:1]",,,Trim limits for each subraster
+nimcols,i,h,INDEF,,,Number of column in the output image
+nimlines,i,h,INDEF,,,Number of lines in the output image
+oval,r,h,INDEF,,,The value of undefined regions the image
+interpolant,s,h,'linear',,,'Interpolant (nearest|linear|poly3|poly5,spline3)'
+verbose,b,h,yes,,,Print messages
+mode,s,h,'ql'

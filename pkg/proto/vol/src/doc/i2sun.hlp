@@ -1,0 +1,152 @@
+.help i2sun Oct88 local
+.ih
+NAME
+i2sun -- convert IRAF images to Sun rasterfiles
+.ih
+USAGE
+i2sun input output z1 z2
+.ih
+PARAMETERS
+.ls input
+Input image template, @file, n-dimensional image, or combination.
+.le
+.ls output
+Root template for output images, e.g. "home$ras/frame.%d".
+.le
+.ls clutfile
+Previously saved Sun rasterfile (e.g. output from IMTOOL), containing the
+color/greyscale lookup table information to be passed along to each output
+frame.  Standard ones can be saved and used with any number of images (e.g.
+"pseudo.ras").
+.le
+.ls z1 = INDEF, z2 = INDEF
+Minimum and maximum pixel/voxel intensities to scale to full output
+color/greyscale range.  Both are required parameters, and will apply to all
+images in the sequence.
+.le
+.ls ztrans = "linear"
+Intensity transformation on input data (linear|log|none|user).
+If "user", you must also specify \fIulutfile\fR.
+.le
+.ls ulutfile
+Name of text file containing the look up table when \fIztrans\fR = user.
+The table should contain two columns per line; column 1 contains the
+intensity, column 2 the desired greyscale output.
+.le
+.ls xsize = INDEF, ysize = INDEF
+If specified, these will be the dimensions of all output Sun rasterfiles
+in pixels.  The default will be the same size as the input images (which
+could vary, though this would create a jittery movie).
+.le
+.ls xmag = 1.0, ymag = 1.0
+Another way to specify output rasterfile dimensions.  These are the 
+magnification factors to apply to the input image dimensions.
+.le
+.ls order = 1
+Order of the interpolator to be used for spatially interpolating the image.
+The current choices are 0 for pixel replication, and 1 for bilinear
+interpolation.
+.le
+.ls sliceaxis = 3
+Image axis from which to cut multiple slices when input image dimension is
+greater than 2.  Only x-y sections are allowed, so \fIsliceaxis\fR must
+be 3 or greater.
+.le
+.ls swap = no
+Swap rasterfile bytes on output?  Used when rasterfiles are being written
+to a computer with opposite byte-swapping from that of the home computer
+(e.g. between VAX and Sun).
+.le
+
+
+.ih
+DESCRIPTION
+
+Given a series of IRAF images, an intensity transformation, and a file
+containing color/greyscale lookup table information, produces one 2d image
+in Sun rasterfile format for each 2D IRAF image.  This is a temporary task
+usually used as a step in creating filmloops for playback by a Sun Movie
+program.
+
+The input images may be specified as an image template ("zoom*.imh"),
+an "@" file ("@movie.list"), or as an n-dimensional image from which to
+create multiple 2d rasterfiles.  If any images in a list are nD images,
+all 2d sections from the specified \fIsliceaxis\fR will be written out
+(default = band or z axis).  At present, only x-y sections may be made,
+i.e. the slice axis must be axis 3 or higher.
+
+The minimum and maximum pixel/voxel intensities, z1 and z2, must be specified
+as it would be not only inefficient to calculate the full zrange of
+each image in a sequence, but would also make very jumpy movies.
+Between input intensities z1 and z2, the pixel intensities may be transformed
+according to the \fIztrans\fR parameter: "linear", "log10", "none",
+or "user".
+
+When \fIztrans\fR = "user", a look up table of intensity values and their
+corresponding greyscale levels is read from the file specified by the
+\fIulutfile\fR parameter.  From this information, a piecewise linear
+look up table containing 4096 discrete values is composed.  The text
+format table contains two columns per line; column 1 contains the
+intensity, column 2 the desired greyscale output.  The greyscale values
+specified by the user must match those available on the output device.
+Task \fIshowcap\fR can be used to determine the range of acceptable
+greyscale levels.  
+
+A color table file (\fIclutfile\fR) may be produced on a Sun workstation from
+IMTOOL (see IMTOOL manual page, R_RASTERFILE parameter and Imcopy function).
+This file may be specified to I2SUN as the \fIclutfile\fR parameter.
+Likewise, any rasterfiles previously created with
+I2SUN may be used as input clutfiles.
+
+The output rasterfile dimensions may be larger or smaller than the input 
+images (see parameters \fIxsize\fR and \fIysize\fR, or \fIxmag\fR and
+\fIymag\fR).  The parameter \fIorder\fR controls the mode of interpolation;
+0=pixel replication, 1=bilinear.
+
+If the output rasterfiles are being sent to a computer with opposite
+byte-swapping characteristics, set \fIswap\fR = yes (e.g., when running
+I2SUN on a VAX, with output to a Sun).
+
+
+.ih
+EXAMPLES
+
+.nf
+1.  Produce a series of Sun rasterfiles in tmp$mydir/movie/,
+    using a pseudocolor color table file saved earlier, with
+    input greylevels scaled between 10 and 100.
+
+    cl> i2sun nzoom*.imh tmp$mydir/movie/frame.%d \
+	home$colors/pseudo.ras 10 100
+
+2.  Make a movie through the z, or band, axis of a datacube.
+
+    cl> i2sun cube tmp$cubemovie/frame.%d 1 256 
+
+3.  Make a movie through the 4th, or hyper-axis of a datacube,
+    holding image band 10 constant.
+
+    cl> i2sun hypercube[*,*,10,*] tmp$movie/frame.%d 1 256 \
+	sliceaxis=4
+
+4.  Run I2SUN on a VAX, with output to a Sun.
+
+    cl> i2sun @imlist sunnode!home$ras/frame.%d 1 256 swap+
+
+.fi
+
+.ih
+TIMINGS
+49 seconds (1 sec/frame) to produce 50 100*100 rasterfiles from a
+100*100*50 datacube with no magnification, on a diskless Sun-3/110
+using NFS to Eagle disks on a lightly loaded Sun-3/160 fileserver
+(load factor < 1.5).  
+5 minutes for the same with a magnification factor of 2 in both x and y,
+bilinear interpolation.
+20 minutes for the same with a magnification factor of 5 in both x and y.
+.ih
+BUGS
+.ih
+SEE ALSO
+display, imtool, volumes.pvol
+.endhelp

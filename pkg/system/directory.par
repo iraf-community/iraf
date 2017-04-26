@@ -1,0 +1,6 @@
+files,s,a,,,,files or directory to be listed
+long,b,h,no,,,long format listing
+ncols,i,h,0,0,,number of columns if multicolumn format
+maxch,i,h,18,,,max filename chars to show if multicolumn format
+sort,b,h,yes,,,sort the file list
+all,b,h,no,,,list hidden files too

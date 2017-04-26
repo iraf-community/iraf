@@ -1,0 +1,52 @@
+.help asivector Dec98 "Image Interpolator Package"
+.ih
+NAME
+asivector -- evaluate the interpolant
+.ih
+SYNOPSIS
+asivector (asi, x, y, npix)
+
+.nf
+    pointer	asi		#I interpolator descriptor
+    real	x[npix/2*npix]	#I x array, 1 <= x[i] <= npix
+    real	y[npix]		#O array of interpolated values
+    int		npix		#I number of x values
+.fi
+.ih
+ARGUMENTS
+.ls asi  
+Pointer to the sequential interpolator descriptor structure.
+.le
+.ls x   
+Array of npix x values, or array of npix x ranges if the interpolant is
+drizzle.
+.le
+.ls y
+Array of interpolated values.
+.le
+.ls npix   
+The number of x values.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated directly from the data points
+for the polynomial interpolants, and from the B-spline coefficients for
+the cubic spline interpolant. The actual calculation is done by adding and
+multiplying terms according to Everett's central difference interpolation
+formula. The boundary extension algorithm is projection.
+
+The sinc interpolant is computed using a range of data points around
+the desired position. Look-up table sinc interpolation is computed
+using the most appropriate entry in a precomputed look-up table.
+The boundary extension algorithm is nearest neighbor.
+
+The drizzle interpolant is computed by summing the data over the user
+supplied X intervals.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility of the
+user. ASIINIT or ASISINIT and ASIFIT must be called before calling ASIVECTOR.
+.ih
+SEE ALSO
+asieval, asider, arieval, arider
+.endhelp

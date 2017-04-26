@@ -1,0 +1,8 @@
+input,s,a,"",,,"name of input image"
+outtable,s,a,"",,,"name of output table"
+colname,s,a,"",,,"name of column for image data"
+pname,s,h,"",,,"root for pixel position column name, or null"
+wcs,s,h,"logical","logical|physical|world",,"coordinate system for pixels"
+formats,s,h,"",,,"list of pixel coordinate formats"
+tbltype,s,h,"default","default|row|column|text",,"row or column ordered table"
+mode,s,h,"al",,,

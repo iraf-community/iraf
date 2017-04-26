@@ -1,0 +1,22 @@
+# Make the IRAF Virtual Operating System (VOS).  (07-May-83 Dct). 
+# Revised to use the new MKPKG facilities (12Dec85 Dct).
+
+$ifeq (hostid, unix) !(clear;date) $endif
+$call sysgen
+$echo "-------------- (done) ----------------"
+$ifeq (hostid, unix) !(date) $endif
+$exit
+
+
+update:	
+	!make all
+	;
+
+
+# SYSGEN -- Update the system libraries (VOS).  Note that the system library
+# for the iraf kernel (libos.a) is maintained in host$.
+
+sysgen:
+	!make all
+	$purge lib$
+	;

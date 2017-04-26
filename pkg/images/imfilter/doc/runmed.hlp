@@ -1,0 +1,206 @@
+.help runmed May05 images.imfilter
+.ih
+NAME
+runmed -- running median filter a list of images
+.ih
+USAGE
+runmed input output window
+.ih
+PARAMETERS
+.ls input
+List of input images.  The list is used in the order provided without
+sorting.  All images must be the same dimensionality and size.  There must
+be at least three images.
+.le
+.ls output
+List of output images. The number of output images must be the same as
+the number of input images.  If the input image name is the same as the
+output image name the original image is replaced by the filtered image.
+.le
+.ls window
+Number of images for the running window.  This must be at least three, and
+less than or equal to the number of images in the input list.
+.le
+.ls masks = ""
+List of output masks indicating the number of pixels used in calculating the
+filter value.  If specified the list must match the output list.
+.le
+.ls inmaskkey = ""
+Keyword in the input image containing a maskname for selecting or ignoring
+pixels.  Pixels to be used are selected by zero values in the mask.
+.le
+.ls outmaskkey = "HOLES"
+Keyword in the output image to containing the name of the output mask.
+If no output mask is created or if no keyword is specified then the
+keyword is not added or replaced in the output image.
+.le
+.ls outtype = "filter" (filter|difference|ratio)
+The type of output values in the images.  The choices are "filter" for
+the filter value, "difference" for the difference of the input and
+filter value (input-filter), and "ratio" for the ratio of the input
+and filter value (input/filter).
+.le
+.ls exclude = no
+Exclude the input image from the filter.
+.le
+.ls nclip = 0.
+This parameter allows clipping high values from the median calculation.
+The value multiples the difference between the median and the lowest value
+and rejects values that exceed the median by this amount.  The is done
+after scaling, mask rejections, and image exclusion.
+.le
+.ls navg = 1
+Number of central values to average.  A value of 1 is used to compute
+the median.
+.le
+.ls scale = "none" (none|mode|!<keyword>|@<file>)
+Scale the images with the specified method.  The choices are
+"none", "mode" to compute a mode for each image and divide by the value,
+"!<keyword>" to find the value to multiple the image from the specified
+keyword in the header, and "@<file>" to get the values to multiple the
+images from the specified file.  The scales are normalized by the scale
+for the first image to make the scaling relative to the first image.
+The values in a file must be in the same order as the input images.
+.le
+.ls normscale = yes
+Normalize the scales to the first image scale?
+.le
+.ls outscale = yes
+Scale output images?  If yes the output images will be on the system
+defined by the input scale factors.  If no the output is scaled back
+to match the input levels.
+.le
+.ls blank = 0
+Filter value when all data have been excluded from the calculation.
+.le
+.ls storetype = "real"
+Internal storage type which may be "real" or "short".  The short
+integer type saves memory at the cost of rounding.  Unless memory
+is a problem real storage is recommended.
+.le
+.ls verbose = yes
+Print progress information to the standard output.
+.le
+.ih
+DESCRIPTION
+\fBRUNMED\fR takes a list of input images (\fIinput\fR) and produces
+a set of filtered output images (\fIoutput\fR).  The output images
+are matched with the input images and the header of the output image
+is that of the matching input image.  The output image may be the
+same as the input image if desired.
+
+Each input image may have an associated pixel mask.  The mask is specified
+by the keyword in the image specified by the \fIinmaskkey\fR parameter.
+The masks must be of a matching size.  This task matches mask pixel with
+image pixels based on the logical pixel coordinates.  In other words, it
+does not take into account any subsection that may have been applied to the
+input images which was not also applied to the mask images.  A non-zero
+mask value identifies pixels to be excluded from the computation of the
+filter value or the mode of the image.
+
+The input images may be scaled (\fIscale\fR) as they are read.
+The scale factors may be normalized relative to the first image in the
+list (\fInormscale\fR).  The scale factors may be given explicitly in a
+file or keyword or computed from an estimate of the mode of the image.
+The mode computation excludes pixels identified by non-zero values in
+the associated input mask.  On output the computed filter value based
+on the set of scaled pixel values maybe scaled back to match that of
+the input image (\fIoutscale\fR).
+
+The running filter operates independently on the sequence of pixel
+values across the list of input images at each pixel position.  If an
+input mask is specified then non-zero mask values identify pixel values
+to exclude from the calculations.  The \fIexclude\fR parameter may be
+used to exclude the central image of the window.  This is useful to
+avoid unnatural histograms with a spike at for the output image.
+The filter sorts the sequence of unrejected values in a running window
+(\fIwindow\fR).
+
+The median is the central value when the number of unrejected values is
+odd and the average of the two central values.  This median may be used
+with the \fInclip\fR parameter to exclude high outliers in the sorted
+values at each point.  The clipping computes the difference between
+the median and the lowest value, multiplies by the clipping factor,
+and rejects values more than this threshold above the median.  This is
+only done when \fInclip\fR is greater than zero and there are at least
+3 unrejected values prior to this clipping step.
+
+After the clipping the average, as set by \fInavg\fR, of the central values
+is computed.  Note that an average of one is a median.
+
+The number of central values averaged will be even when the number of
+pixels is even and odd when it is odd.  What is done is that high
+and low values are excluded symmetrically until the number of remaining
+pixels is less than or equal to the specified average but with at least
+one or two values remaining.
+
+The number of values available to the average is odd when no data is
+excluded because the window size must be odd.  When the \fIexclude\fR
+parameter is selected the number of values will be even.  And when pixel
+masks are used the number be anywhere from zero to the window size.
+When all pixels are excluded the filter value is the \fIblank\fR value.
+Also when the ratio output is selected and the filter value used as the
+denominator is zero the \fIblank\fR value is also used.
+
+The output of this task are images of the filter values
+(\fIouttype\fR="filter"), the difference of the input image and the
+filter value (\fIouttype\fR="difference"), or the ratio of the input
+image and the filter value (\fIouttype\fR="ratio").  The difference
+output is useful as a background subtraction for a background that varies
+systematically through the list of images.  When the difference
+is selected the input and filter value are matched by their scale factors
+either in the scaled system (\fIoutscale\fR=yes) or in the input
+system (\fIoutscale\fR=no).
+
+The \fIexclude\fR option is useful for the background subtraction case.
+Use of this option excludes the input image from the to the filter
+computation value for the matching output.  This insures that the output
+pixel value histogram does not have a spike of zero values when \fInavg\fR
+= 1 and the median pixel value is that of the input image.
+
+An output mask list (\fImasks\fR) may be specified to produce masks which
+contain the number of pixels used in computing the filter value.  This
+is most useful to define regions where no pixels were used and the
+blank value was substituted.  The name of the output mask is recorded
+in the output image header under the keyword specified by the
+\fIoutmaskkey\fR parameter.  Note that it is valid to specify the
+output mask keyword to be the same as the input mask keyword.  If this
+is not done the input mask keyword, if present, will remain in the
+output header.
+
+Normally the filter window is centered on each input image within the list.
+In other words there are an equal number of images before and after the
+input image taken from the input list.  However, at the beginning and end
+of the input list, the window spans the first or last \fIwindow\fR images.
+The filter value will then be the same except that the \fIexclude\fR
+option applies to the particular input image and the difference and
+ratio output types will be based on the particular input image.
+
+This task is designed to be as efficient as possible so that images
+are read only once (or twice if the mode is computed) and added to an
+optimized tree algorithm to avoid completely resorting data as each new
+image is read.  In order to do this it buffers pixel data internally as
+well as having some memory overhead from the tree algorithm.  The memory
+is compressed as much as possible.  The amount of memory required will
+scale with the size of the window, the number of pixels in the images,
+and the storage datatype.  The storage datatype (\fIstoretype\fR) may be
+short integer, which is two bytes per pixel, and real, which is four bytes
+per pixel.  If memory limitations are an issue one may chose to use short
+storage which requires of order 75% less memory.  The tradeoff is that
+data will be rounded (not truncated).  In many cases this effect
+will be minor.  Note that even if the input data is integer the pixels
+values may be scaled resulting in fractional scaled values.  The output
+images will be real regardless of the input type.
+
+With sufficiently large images and large windows it is possible this task
+will fail to run requiring the user to make adjustments.  The simplest
+method would be to break the images into smaller pieces and run this task
+on each piece.  Note that input image sections can be used to reduce the
+size of the input images being processed and \fBimtile\fR
+can be use to piece the output back together.
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+imcombine, rskysub, irproc
+.endhelp

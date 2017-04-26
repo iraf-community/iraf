@@ -1,0 +1,15 @@
+# Make the 2-d frutti portion of the mtlocal library.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	r2dfrd.x	r2df.com r2df.h <error.h> <imhdr.h>
+	r2dfrhdr.x	r2df.com r2df.h r2df.com <imhdr.h> <mach.h>
+	r2dfrim.x	r2df.com r2df.h <imhdr.h> <mach.h>
+	r2dfrpix.x	r2df.com <fset.h> <mach.h> <mii.h>
+	r2dftoks.x	<mach.h> r2df.h <imhdr.h>
+	t_r2df.x	r2df.com <error.h> <fset.h>
+	;

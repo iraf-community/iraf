@@ -1,0 +1,65 @@
+.help fields Jan86 proto
+.ih
+NAME
+fields -- extract selected fields from a list.
+.ih
+USAGE
+fields files fields
+.ih
+PARAMETERS
+.ls files
+File or files from which the fields are to be extracted.
+.le
+.ls fields
+The fields to be extracted.  
+.le
+.ls lines = "1-"
+The lines from which the fields are to be extracted.  If multiple files are 
+being extracted, the same lines apply to each file.
+.le
+.ls quit_if_missing = no
+This flag determines the task behavior when a field is missing from the
+specified line.  If \fBquit_if_missing\fR = yes, the task exits and an error 
+is reported.
+.le
+.ls print_file_names = no
+If \fBprint_file_name\fR = yes, the first string of each output line of
+extracted fields is the file name.  
+.le
+.ih
+DESCRIPTION
+The list processing tool \fIfields\fR is used to extract whitespace
+separated fields from the specified files and lines.
+The input to this task can be either the standard input or a list of
+files; output is a new list of the extracted fields.
+
+The fields of a line are numbered from 1 up to a newline character; those
+fields to be extracted are specified as a range of numbers.
+If a specified field is missing from a selected
+line the action taken is determined by the \fBquit_if_missing\fR flag;
+\fIfields\fR will either continue processing after printing a warning
+message, or call an error and exit.
+.ih
+EXAMPLES
+1. Reverse the order of the 5 columns in list file "list".
+.nf
+
+	cl> fields list 5-1 > newlist
+.fi
+
+2. Extract columns 1 and 3 from file "newlist" and pipe them to task
+\fIgraph\fR.
+.nf
+
+	cl> fields newlist 1,3 | graph
+.fi
+.ih
+REVISIONS
+.ls FIELDS V2.11
+The default value for the \fIlines\fR parameter was changed to an open
+upper limit.
+.le
+.ih
+SEE ALSO
+joinlines, xtools.ranges
+.endhelp

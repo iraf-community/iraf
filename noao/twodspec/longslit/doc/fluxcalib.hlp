@@ -1,0 +1,106 @@
+.help fluxcalib Oct86 noao.twodspec.longslit
+.ih
+NAME
+fluxcalib -- Apply flux calibration
+.ih
+USAGE
+fluxcalib images fluxfile
+.ih
+PARAMETERS
+.ls input
+List of input images to be flux calibrated.
+.le
+.ls output
+List of output flux calibrated images.  The output images may be the same
+as the input images.  The output image will be of type real regardless
+of the input pixel type.
+.le
+.ls fluxfile
+Flux calibration file from \fBonedspec.sensfunc\fR.
+.le
+.ls fnu = no
+Convert the flux calibration to flux per unit frequency (F-nu)?
+.le
+.ls exposure = "otime"
+Exposure time keyword in image headers.
+.le
+.ih
+DESCRIPTION
+The specified images are flux calibrated using a flux calibration image
+file derived from the \fBonedspec\fR package using standard stars.
+The flux calibration pixel values are in magnitudes and the pixel coordinates
+are in wavelength.  The multiplicative calibration factor is given by the
+formula
+
+    factor = 10 ** (-0.4 * calibration) / exposure / dispersion.
+
+Since the calibration data has units of (instrumental intensity) /
+(ergs/cm**2), the exposure time for the image must be in seconds and the
+pixel dispersion in wavelength/pixel to yield units of
+ergs/cm**2/sec/wavelength.
+
+The calibration wavelengths are interpolated to the wavelengths
+of the image pixels and the correction applied to the pixel values.
+Note that the image pixel values are modified.
+
+If flux per unit frequency is requested then the flux values are multiplied
+by
+
+	wavelength ** 2 / velocity of light (in Angstroms/sec)
+
+to yield units of ergs/cm**2/Hz/sec/(wavelength/Angstrom).  Note that normally
+the wavelength units should be Angstroms.
+
+It is possible to flux calibrate images which are binned in logarithmic
+wavelength intervals.  The point to note is that the units of the flux
+calibrated image will be the same.  Therefore, rebinning to linear
+wavelength coordinates requires only interpolation and not flux conservation.
+When extracting standard stars from logarithmicaly bin spectra for determination
+of a flux calibration it is necessary to rebin the extracted one dimensional
+spectra to linear wavelength (required by \fBonedspec\fR) conserving
+flux so that the instrumental counts are preserved.
+
+The image header keyword DISPAXIS must be present with a value of 1 for
+dispersion parallel to the lines (varying with the column coordinate) or 2
+for dispersion parallel to the columns (varying with line coordinate).
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\R).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
+.ih
+EXAMPLES
+Standard stars were observed and extracted to one dimensional spectra.
+The standard stars are then used to determine a flux calibration using
+the \fBonedspec\fR package.  A set of dispersion and extinction corrected
+images is flux calibrated in-place with the command
+
+.nf
+	cl> fluxcalib img* img* sens.0000
+.fi
+
+where "sens.0000" is the calibration file produced by the task
+\fBonedspec.sensfunc\fR.
+
+To keep the uncalibrated image:
+
+.nf
+	cl> fluxcalib n1ext.004 n1extf.004 sens.0000
+.fi
+
+3.  If the DISPAXIS keyword is missing and the dispersion is running
+vertically (varying with the image lines):
+
+.nf
+	cl> hedit *.imh dispaxis 2 add+
+.fi
+.ih
+REVISIONS
+.ls FLUXCALIB V2.10
+The output pixel type is now forced to be real.
+.le
+.ih
+SEE ALSO
+onedspec.standard onedspec.sensfunc
+.endhelp

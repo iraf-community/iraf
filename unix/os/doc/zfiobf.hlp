@@ -1,0 +1,53 @@
+.help zfiobf May84 "System Interface"
+.ih
+NAME
+zfiobf -- binary file driver
+.ih
+SYNOPSIS
+.nf
+zopnbf (osfn, mode, chan)		# open or create binary file
+zclsbf (chan, status)			# close binary file
+zardbf (chan, buf, maxbytes, loffset)	# asynchronous read
+zawrbf (chan, buf,   nbytes, loffset)	# asynchronous write
+zawtbf (chan, status)			# wait for transfer
+zsttbf (chan, param, lvalue)		# get file/device status
+
+packed	char osfn[]
+char	buf[]
+int	mode, chan, maxbytes, nbytes, param, status
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+A binary file is an extendable array of machine bytes.  There are two types
+of binary files: \fBblocked\fR files, which are randomly accessible in chunks
+the size of a device block, and \fBstreaming\fR binary files, which are
+restricted to sequential access and characterized by a variable block size.
+A binary file is effectively an extension of host memory, i.e., arbitrary
+regions of memory may be written to a binary file and later restored
+(possibly at a different location) without modification of the data.
+Unlike the text file, there are no restrictions on the contents of a binary
+file.
+.ih
+RETURN VALUES
+When a binary file is opened the kernel assigns a channel to the file
+and all subsequent file operations refer to the file by the channel number.
+The asynchronous read and write primitives do not return a status value;
+the number of bytes read or written or ERR is returned in a subsequent
+call to \fBzawtbf\fR.  Every i/o transfer must be followed by a call to
+\fBzawtbf\fR.  Only one transfer is permitted on a file at a time.
+.ih
+NOTES
+If a file is accessed by name (rather than by channel number) while the file
+is open the results are machine dependent.
+If a file is blocked reads and writes must be aligned on block boundaries;
+file offsets are one-indexed.  A binary file may be extended by writing at
+EOF or by overwriting EOF.  All blocks but the last in a blocked file are the
+same size; the last block may be partially full.  A write to a streaming
+file appends a new block of size \fInbytes\fR to the file; successive blocks
+may vary in size.  Each read from a streaming file returns a single variable
+length block.
+.ih
+SEE ALSO
+zfiotx, manual pages for the individual routines
+.endhelp

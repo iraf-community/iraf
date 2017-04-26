@@ -1,0 +1,61 @@
+.help isinit Apr85 "Surfit Package"
+.ih
+NAME
+isinit -- initialize surface grid descriptor
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+.nf
+isinit (sf, surface_type, xorder, yorder, xterms, ncols, nlines)
+.fi
+
+.nf
+pointer	sf		# surface descriptor
+int	surface_type	# surface function
+int	xorder		# order of function in x
+int	yorder		# order of function in y
+int	xterms		# include cross-terms? (YES/NO)
+int	ncols		# number of columns in the surface grid
+int	nlines		# number of lines in the surface grid
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ls surface_type
+Fitting function. Permitted values are SF_LEGENDRE and SF_CHEBYSHEV for
+the Legendre and Chebyshev polynomials and SF_SPLINE1 and SF_SPLINE3
+for the linear and bicubic splines.
+.le
+.ls xorder, yorder
+Order of the polynomial to be fit in x and y or the number of spline pieces to 
+be fit in x and y. The orders must be greater than or equal to 1.
+.le
+.ls xterms
+Include cross-terms? If xterms = YES coefficients are fit to terms containing
+the cross products of x and y polynomials. Xterms defaults to YES for the
+spline functions.
+.le
+.ls ncols
+The number of columns in the surface grid. The surface is assumed to lie
+on a rectangular grid such that 1 <= x <= ncols.
+.le
+.ls nlines
+The number of lines in the surface to be grid. The surface is assumed to lie
+on a rectangular grid such that 1 <= y <= nlines.
+.le
+.ih
+DESCRIPTION
+ISINIT allocates space for the surface descriptor and the arrays and vectors
+used by the numerical routines. It initializes all arrays and vectors to zero,
+calculates and stores the basis functions in x and y
+and returns the surface descriptor to the calling routine.
+.ih
+NOTES
+ISINIT must be the first SURFIT routine called.
+.ih
+SEE ALSO
+isfree
+.endhelp

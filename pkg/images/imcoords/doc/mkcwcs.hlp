@@ -1,0 +1,93 @@
+.help mkcwcs Jun05 images.imcoords
+.ih
+NAME
+mkcwcs -- make or update a simple celestial wcs
+.ih
+USAGE
+mkcwcs wcsname
+.ih
+PARAMETERS
+.ls wcsname
+Image to be created or modified.  If a new (non-existent) image is specified
+then a data-less image (NDIM=0) is created.
+.le
+.ls wcsref = ""
+Image whose WCS is first inherited and then updated.
+.le
+
+.ls equinox = INDEF
+Equinox of the coordinates specified in decimal years.  If INDEF then the
+current value is not modified.
+.le
+.ls ra = INDEF
+Right ascension in hours.  This may be typed in standard sexagesimal
+notation though it will be converted to decimal hours in EPARAM and
+to decimal degrees in the WCS as required by the standard.  If INDEF
+then the current value is not modified.
+.le
+.ls dec = INDEF
+Declination in degrees.  This may be typed in standard sexagesimal
+notation though it will be converted to decimal degrees in EPARAM.
+If INDEF then the current value is not modified.
+.le
+.ls scale = INDEF, pa = 0., lefthanded = yes
+Celestial pixel scale in arc seconds per pixel, the position angle in
+degrees, and the handedness of the axes.  These are all represented by
+the WCS rotation matrix.  If the scale is INDEF the current
+rotation matrix is unchanged and the position angle is ignored.  If the
+scale is not INDEF then orthogonal axes are defined with the same scale on
+both axes.  The handedness of the axes are specified by the
+\fIlefthanded\fR parameter.  The position angle is measured from north
+increasing with the image lines (up in a standard display) and rotated
+towards east.  Note that if the axes are lefthanded the angle is
+counterclockwise and if not it is clockwise.
+.le
+.ls projection = "tan" (tan|sin|linear)
+WCS projection function which may be "tan", "sin", or "linear".
+.le
+.ls rapix = INDEF, decpix = INDEF
+The reference pixel for the right ascension (first image axis) and for
+the declination (second image axes).  The reference pixel may be fractional
+and lie outside the size of the image as allowed by the standard.
+.le
+.ih
+DESCRIPTION
+MKCWCS creates or modifies a celestial (RA/DEC) WCS in an image header.  If a
+new image is specified the WCS is created in a data-less image header.  A
+data-less WCS may be used in various tasks as a template.  If a reference
+WCS is specified it is copied in whole and then desired elements of the WCS
+are modified.  If a new WCS is created without a reference the initial values
+are for the pixel coordinates.
+
+The elements of the WCS which may be set are the coordinate equinox,
+the right ascension and declination, the pixel scale, the axes orientation,
+and the reference pixel in the image which corresponds to the specified
+right ascension and declination.  If values are specified they WCS elements
+are left unchanged.
+
+The WCS is simple and not completely general because it defines the first
+coordinate axis to be right ascension and the second to be declination and
+that the axes are orthogonal with a uniform pixel scale (apart from the
+projection function).
+.ih
+EXAMPLES
+1. Create a data-less header by specifying a new wcs name.
+
+.nf
+    cl> mkcwcs new ra=1:20:23.1 dec=-12:11:13 scale=0.25
+.fi
+
+The reference pixel will be (0,0).  To apply it later to an actual
+image (say with WCSCOPY) would require assigning the reference pixel.
+Note the use of sexagesimal notation.
+
+2. Modify the WCS of an existing image by changing the reference value
+and pixel.
+
+.nf
+    cl> mkcwcs old ra=1:20:23.1 dec=-12:11:13 rapix=1234 decpix=345
+.fi
+.ih
+SEE ALSO
+wcsedit,wcscopy,mkcwwcs
+.endhelp

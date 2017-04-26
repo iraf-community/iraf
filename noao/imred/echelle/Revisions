@@ -1,0 +1,247 @@
+.help revisions Jun88 noao.imred.echelle
+.nf
+=======
+V2.12.3
+=======
+
+imred$echelle/echelle.cl
+    With the change of SCOMBINE to a separate executable the package
+    file needed to be updated.  (1/19/05)
+
+=======
+V2.12.2
+=======
+
+imred$echelle/doc/ecidentify.hlp
+    Fixed some minor typos in the function description section.
+    (8/26/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+imred$echelle/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+imred$echelle/doc/ecidentify.hlp
+    Added a description of how to evaluate the dispersion functions.
+    (4/20/01, Valdes)
+
+imred$echelle/doc/dofoe.hlp
+    Modified to explain that this task may be used with a single fiber.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
+imred$echelle/doc/ecidentify.hlp
+    Fixed minor formating problem. (4/22/99, Valdes)
+
+=====
+V2.11
+=====
+
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+    Added sapertures to the pacakge.  (12/4/97, Valdes)
+
+=====
+V2.11
+=====
+
+imred$echelle/demos/mkdoecslit.cl
+imred$echelle/demos/mkdofoe.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$echelle/demos/xgdoecslit.dat
+    The test now includes batch processing.  (10/3/96, Valdes)
+
+imred$echelle/echelle.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$echelle/demos/mkdoecslit.cl
+    Added a flat field.  (11/6/94, Valdes)
+
+imred$echelle/*
+    Further updates for WCS version of ONEDSPEC. (7/24/91, Valdes)
+
+imred$echelle/echelle.cl
+imred$echelle/echelle.par
+imred$echelle/echelle.men
+imred$echelle/echelle.hd
+    The package was updated for V3 of APEXTRACT and ONEDSPEC.  All parameter
+    files are now part of those packages and now local copies are used.
+    Some tasks have disappeared such as APIO and ECSELECT and a number of
+    others have been added.
+
+imred$echelle/ecbplot.cl -
+imred$echelle/doc/ecbplot.hlp -
+imred$echelle/echelle.cl
+imred$echelle/echelle.hd
+imred$echelle/echelle.men
+    The generic task BPLOT replaces ECBPLOT.  (8/24/90, Valdes)
+
+============================
+V3 of APEXTRACT and ONEDSPEC
+============================
+
+imred$echelle/doc/ecreidentify.hlp
+    The refit option now maintains the order offset of the reference.
+    (6/12/90, Valdes)
+
+====
+V2.9
+====
+
+imred$echelle/ecbplot.cl
+    Added a missing parameter declaration for "cur".  (10/27/89, Valdes)
+
+====
+V2.8
+====
+
+imred$echelle/eccontinuum.par +
+imred$echelle/doc/eccontinuum.hlp +
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$echelle/echelle.hd
+    Added the hooks for the new eccontinuum.  The executable is in
+    onedspec$t_ecctm.x.  (6/2/89, Seaman)
+
+imred$echelle/ecbplot.cl +
+imred$echelle/doc/ecbplot.hlp +
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$echelle/echelle.hd
+    Added the new script and removed bplot.  (6/2/89, Seaman)
+
+imred$echelle/standard.par
+    Removed ennumerated list.  (4/10/89, Valdes)
+
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$echelle/specplot.par+
+	Task SPECPLOT added.  (4/3/89 ShJ)
+
+imred$echelle/ecselect.par +
+imred$echelle/doc/ecselect.hlp +
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$echelle/echelle.hd
+    Added a new task ECSELECT to select and extract apertures from
+    echelle format spectra.  (3/8/89, Valdes)
+
+imred$echelle/apscatter.par +
+imred$echelle/apscat1.par +
+imred$echelle/apscat2.par +
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+    Added a new task, APSCATTER, to fit and subtract scattered light.
+    It includes two hidden psets, APSCAT1 and APSCAT2.  (3/3/89, Valdes)
+
+imred$echelle/doc/ecidentify.hlp
+    Add a little discussion concerning the speed advantage of the 'o'
+    fit compared to the 'f' fit. (2/2/89, Valdes)
+
+noao$imred/echelle/
+    Davis, Oct 31, 1988
+    The tasks ecbplot and eccontinuum and the hidden task _enranges were
+    added to the echelle package. These tasks were written by Rob
+    Seaman.
+
+imred$echelle/echelle.cl
+imred$echelle/echelle.par
+imred$echelle/echelle.men
+imred$echelle/ecdispcor.par +
+imred$echelle/ecidentify.par +
+imred$echelle/ecreidentify.par +
+imred$echelle/refspectra.par +
+imred$echelle/dispcor.par -
+imred$echelle/identify.par -
+imred$echelle/reidentify.par -
+    New version of this package using new echelle tools instead of ONEDSPEC
+    tools.  (4/7/88 Valdes)
+
+================================================================================
+
+noao$imred/echelle/reidentify.par
+    Valdes, Jan 4, 1988
+    Updated parameter file for new REIDENTIFY parameter.
+
+noao$imred/echelle/echelle.cl
+noao$imred/echelle/echelle.men
+noao$imred/echelle/apnormalize.par +
+    Added the APNORMALIZE task to the package. (fv 7/1/87)
+
+noao$imred/echelle/dispcor.par
+    Valdes, March 5, 1987
+    1.  The DISPCOR default parameter file has been updated because of
+	changes to the task; most notable being that wstart and wpc are
+	list structured.
+
+noao$imred/echelle/echelle.cl
+noao$imred/echelle/echelle.men
+noao$imred/echelle/shedit.par +
+    Valdes, October 6, 1986
+    1.  Added new task SHEDIT.
+
+noao$imred/echelle/identify.par
+    Valdes, October 3, 1986
+    1.  Added new IDENTIFY parameter "threshold".
+
+noao$imred/echelle/echelle.cl
+noao$imred/echelle/echelle.men
+noao$imred/echelle/apdefine.par -
+noao$imred/echelle/extract.par -
+noao$imred/echelle/trace.par -
+    Valdes, September 16, 1986
+    1.  Package modified to use the new APEXTRACT package.
+    2.  Deleted obsolete files
+
+noao$imred/echelle/echelle.hd
+noao$imred/echelle/echelle.men
+noao$imred/echelle/doc/Tutorial.hlp +
+    Valdes, August 18, 1986:
+    1.  Added prototype tutorial document to the ECHELLE package.
+     
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+echelle:  Valdes, July 3, 1986:
+    1.  IDENTIFY parameter file updated to reflect new name for line list.
+
+=====================================
+STScI Pre-release and SUN 2.3 Release
+=====================================
+
+echelle:  Valdes, June 2, 1986:
+    1.  New APEXTRACT tasks defined in package.
+
+echelle:  Valdes, May 12, 1986:
+    1.  SPLOT updated.  New parameters XMIN, XMAX, YMIN, YMAX.
+
+echelle:  Valdes, April 7, 1986:
+    1.  Package parameter file changed to delete latitude.
+    2.  DISPCOR latitude parameter now obtained from OBSERVATORY.
+
+echelle:  Valdes, March 27, 1986:
+    1.  New task SETDISP added.
+    2.  APEXTRACT tasks defined in ECHELLE package instead of loaded from
+	TWODSPEC$APEXTRACT.
+
+===========
+Release 2.2
+===========
+From Valdes December 31, 1985:
+
+1.  Tasks FLATFIT, FLATDIV, and EXTRACT have been removed from the ECHELLE
+package.  The TWODSPEC package containing the task EXTRACT is loaded with
+the ECHELLE package.
+.endhelp

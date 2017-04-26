@@ -1,0 +1,355 @@
+.help starlist Feb90 noao.artdata
+.ih
+TASK
+starlist -- make an artificial star list
+.ih
+USAGE
+starlist starlist nstars
+.ih
+PARAMETERS
+.ls starlist
+The name of the output text file for the x and y coordinates
+and magnitudes of the artificial stars.  Output will be appended to this
+file is it exists.
+.le
+.ls nstars = 5000
+The number of stars in the output star list.
+.le
+.ls interactive = no
+Examine plots and change the parameters of the spatial luminosity
+distributions interactively.
+.le
+
+			SPATIAL DISTRIBUTION
+.ls spatial = "uniform"
+Type of spatial distribution.  The types are:
+.ls uniform
+The stars are uniformly distributed between \fIxmin\fR, \fIxmax\fR, \fIymin\fR,
+and \fIymax\fR.
+.le
+.ls hubble
+The stars are distributed around the center of symmetry \fIxcenter\fR and
+\fIycenter\fR according to a Hubble density law of core radius
+\fIcore_radius\fR and background density \fIbase\fR.
+.le
+.ls file
+The radial density function is contained in the text file \fIsfile\fR.
+.le
+.le
+.ls xmin = 1., xmax = 512., ymin = 1., ymax = 512.
+The range of output coordinates in x and y.
+.le
+.ls xcenter = INDEF, ycenter = INDEF
+The coordinate of the center of symmetry for the "hubble"
+and "file" radial density functions. The default is the
+midpoint of the coordinate limits.
+.le
+.ls core_radius = 30
+The core radius of the Hubble spatial distribution in pixels.
+.le
+.ls base = 0.0
+The background density relative to the central density of the Hubble
+density distribution.
+.le
+.ls sseed = 1
+The initial value supplied to the random number generator used to
+generate the output x and y coordinates.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each execution.
+.le
+
+			MAGNITUDE DISTRIBUTION
+.ls luminosity = "powlaw"
+Type of luminosity distribution.  The types are:
+.ls uniform
+The stars are uniformly distributed between \fIminmag\fR and \fImaxmag\fR.
+.le
+.ls powlaw
+The stars are distributed according to a power law with coefficient
+\fIpower\fR.
+.le
+.ls salpeter
+The stars are distributed with a Salpeter luminosity function between
+\fIminmag\fR and \fImaxmag\fR.
+.le
+.ls bands
+The stars are distributed with a Bahcall and Soneira luminosity function
+between \fIminmag\fR and \fImaxmag\fR.  The function is described
+by the parameters \fIalpha\fR, \fIbeta\fR, \fIdelta\fR and \fImstar\fR
+whose default values give a best fit to the observed main sequence in several
+nearby globular clusters.
+.le
+.ls file
+The luminosity function is contained in the text file \fIlfile\fR.
+.le
+.le
+.ls minmag = -7., maxmag = 0.
+The range of output magnitudes.  The "salpeter" luminosity function
+imposes limits of -4 and 16 and the "bands" luminosity function
+imposes limits of -7 and 17 relative to the zero point given by
+\fImzero\fR.
+.le
+.ls mzero = -4.
+The zero point for converting the output relative magnitudes
+to absolute magnitudes for the Salpeter and Bahcall and Soneira
+luminosity functions.  For example the default values give an
+absolute magnitude range of -3 to +4.
+.le
+.ls power = 0.6
+Coefficient for the power law magnitude distribution.
+The default value of 0.6 is the value for a homogeneous
+and isotropic distribution with no cutoff in distance.
+.le
+.ls alpha = 0.74, beta = 0.04, delta = 0.294, mstar = 1.28
+The parameters of the Bahcall and Soneira luminosity function.
+.le
+.ls lseed = 1
+The initial value supplied to the random number generator used to
+generate the output magnitudes.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each execution.
+.le
+
+			USER FUNCTIONS
+.ls sfile
+The name of the input text file containing the sampled spatial radial
+density
+function, one sample point per line, with the radius and relative probability
+in columns one and two respectively. The sample points need not be
+uniformly spaced or normalized.
+.le
+.ls nssample = 100
+The number of points at which the \fIspatial\fR density function is 
+sampled. If the \fIspatial\fR density function is analytic or approximated
+analytically (the "uniform" and "hubble" options) the function is sampled
+directly. If the function is read from a file  (the "file" option) an
+initial smoothing step is performed before sampling.
+.le
+.ls sorder = 10
+The order of the spline fits used to evaluate the integrated spatial
+density function.
+.le
+.ls lfile
+The name of the input text file containing the sampled luminosity
+function, one sample point per line, with the magnitude and relative probability
+in columns one and two respectively. The sample points need not be
+uniformly spaced or normalized.
+.le
+.ls nlsample = 100
+The number of points at which the luminosity function is sampled. If
+the luminosity function is analytic or approximated analytically (the
+"salpeter" and "bands" options) the function is sampled directly.  If
+it is read from a file  (the "file" option) an initial smoothing step
+is performed before sampling.
+.le
+.ls lorder = 10
+The order of the spline fits used to evaluate the integrated
+\fIluminosity\fR function.
+.le
+
+			INTERACTIVE PARAMETERS
+.ls rbinsize = 10.
+The bin size in pixels of the plotted histogram of the radial density
+distribution.
+.le
+.ls mbinsize = 0.5
+The bin size in magnitudes of the plotted histogram of the luminosity function.
+.le
+.ls graphics = stdgraph
+The default graphics device.
+.le
+.ls cursor = ""
+The graphics cursor.
+.le
+.ih
+DESCRIPTION
+\fBStarlist\fR generates a list of x and y coordinates and magnitudes
+for a sample of \fInstars\fR stars based on a user selected spatial
+density function \fIspatial\fR  and luminosity function
+\fIluminosity\fR and writes (appends) the results to the text file
+\fIstarlist\fR. If the \fIinteractive\fR parameter is "yes" the user
+can interactively examine plots of the spatial density function,
+the radial density function, and the luminosity function, and alter the
+parameters of the task until a satisfactory artificial field is
+generated.
+
+The spatial density function generates x and y values around a center
+of symmetry defined by \fIxcenter\fR and \fIycenter\fR within the x and
+y limits \fIxmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR according to
+the spatial density function specified by \fIspatial\fR.  The three
+supported spatial density functions are listed below where R is the
+radial distance in pixels, P is the relative spatial density, C is a
+constant and f is the best fitting cubic spline function to the spatial
+density function R(user), P(user) supplied by the user in the text file
+\fIsfile\fR.
+
+.nf
+    uniform:  P = C
+    hubble:   P = 1.0 / (1 + R / core_radius) ** 2 + base
+    file:     P = f (R(user), P(user))
+.fi
+
+The Hubble and user file spatial density function are sampled at
+\fInssample\fR equally spaced points, and integrated to give the
+spatial density probability function at each sampled point. The
+integrated probability function is normalized and approximated by a
+cubic spline of order \fIsorder\fR.  The x and y coordinates are
+computed by randomly sampling the integrated probability function until
+\fInstars\fR stars which satisfy the x and y coordinate limits
+\fIxmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR are generated.
+
+The luminosity function generates relative magnitude values between
+\fIminmag\fR and \fImaxmag\fR according to the luminosity function
+specified by \fIluminosity\fR.  The four supported luminosity functions
+are defined below where M is the magnitude, P is the relative luminosity
+function, C is a constant and f is the best fitting cubic spline
+function to the luminosity function M(user), P(user) supplied by the
+in the text file \fIlfile\fR.
+
+.nf
+  uniform:  P = C
+
+  powlaw:   P = C * 10. ** (power * M)
+
+  salpeter: P = C * 10. ** (-3.158 + 1.551e-1*dM - 5.194e-3*dM**2)
+
+            dM = M - mzero
+
+                             C * 10. ** (beta * dM)
+  bands:   P =  --------------------------------------------------
+               (1. + 10. ** ((beta-alpha)*delta*dM))) ** 1. /delta
+
+           dM = M - mstar - mzero
+
+  file:    P = f (M(user), P(user))
+.fi
+
+The Salpeter and "bands" functions are defined in terms of absolute
+magnitudes so the parameter \fImzero\fR is used to convert from
+relative magnitudes.  Equivalently, one could use absolute magnitudes
+for the magnitude limits while setting the zero point to 0.
+
+The luminosity function is sampled at \fInlsample\fR equally spaced
+points, and integrated to give the luminosity probability function at
+each sampled point. The probablity function is normalized and
+approximated by a cubic spline of order \fIlorder\fR. The magnitudes
+are computed by randomly sampling the integrated probability function
+until \fInstars\fR objects which satisfy the magnitude limits
+\fIminmag\fR and \fImaxmag\fR are generated.  The Salpeter luminosity
+is a best fit function to the data of McCuskey (McCuskey, 1966, Vistas
+Astr. 7, 141). The Bahcall and Soneira function and the default values
+of the parameters are discussed by Bahcall and Soneira (Ap.J.  Supp. 44, 73).
+.ih
+CURSORS
+The following interactive keystroke commands are available from within the
+STARLIST task.
+
+.nf
+	Starlist Keystroke Commands
+
+?	Print options
+f	Fit  one or more of the following
+	    Spatial density function (SDF)
+	    Luminosity functions (LF)
+x	Plot the x-y spatial density function
+r	Plot the histogram of the radial density function
+m	Plot the histogram of the luminosity function
+:	Colon escape commands (see below)
+q	Exit program
+.fi
+
+The following parameters can be shown or set from within the STARLIST task.
+
+
+.nf
+		Starlist Colon Commands
+
+:show			Show starlist parameters
+:nstars     [value]	Number of stars
+
+:spatial    [string]	Spatial density function (SDF)
+			(uniform|hubble|file) 
+:xmin       [value]	Minimum X value
+:xmax       [value]	Maximum X value
+:ymin       [value]	Minimum Y value
+:ymax       [value]	Maximum Y value
+:xcenter    [value]	X center for SDF
+:ycenter    [value]	Y center for SDF
+:core       [value]	Core radius for Hubble density function
+:base       [value]	Background density for Hubble density function
+
+:luminosity [string]	Luminosity function (LF)
+			(uniform|powlaw|salpeter|bands|file)
+:minmag     [value]	Minimum magnitude
+:maxmag     [value]	Maximum magnitude
+:mzero	    [value]	Magnitude zero-point for salpeter and bands LF
+:power	    [value]	Exponent for powlaw LF
+:alpha      [value]	Alpha parameter for bands LF
+:beta       [value]	Beta parameter for bands LF
+:delta      [value]	Delta parameter for bands LF
+:mstar      [value]	Mstar parameter for bands LF
+
+:sfile	    [string]    File containing the user SDF
+:nssample   [value]	Number of SDF sample points
+:sorder	    [value]	Order of spline fit to integrated SDF
+:lfile	    [string]    File containing the user LF
+:nlsample   [value]	Number of LF sample points 
+:lorder	    [value]	Order of spline fit to the integrated LF
+
+:rbinsize   [value]	Resolution of radial profile histogram (pixels)
+:mbinsize   [value]	Resolution of magnitude histogram (mag)
+.fi
+
+.ih
+EXAMPLES
+1. Create a uniform artificial starfield of 5000 stars for a 512 square image.
+
+.nf
+    ar> starlist starfield.dat 5000
+    ar> mkobjects starfield obj=starfield.dat gain=2 rdnoise=10 poisson+
+.fi
+
+This example takes about a minute on a SPARCstation 1.
+
+2. Create a globular cluster field of 5000 stars for a 512 square image.
+
+.nf
+    ar> starlist gc.dat 5000 spat=hubble lum=bands
+    ar> mkobjects starfield obj=gc.dat gain=2 rdnoise=10 poisson+
+.fi
+
+This example takes about a minute on a SPARCstation 1.
+
+3. Examine the distributions for a Hubble spatial distribution
+and Salpeter magnitude distribution using 1000 stars without
+creating a data file.
+
+.nf
+    ar> starlist dev$null 1000 inter+ spat=hubble lum=salpeter
+	    ... an x-y plot will appear on the screen
+	    ... type r to examine the radial density function
+	    ... type m to examine the luminosity function
+	    ... type = to make a copy of any of the plots
+	    ... type q to quit
+.fi
+.ih
+REVISIONS
+.ls STARLIST V2.11+
+The random number seeds can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
+.ih
+BUGS
+The spline approximation to the spatial density and luminosity
+probability functions can  cause wiggles in the output spatial density
+and luminosity functions. Users can examine the results interactively
+and experiment with the spline order and number of sample points if
+they are not satisfied with the results of STARLIST. The default setup
+of 10 sample points per spline piece is generally satisfactory for the
+spatial density and luminosity functions supplied here.
+.ih
+SEE ALSO
+gallist mkobjects
+.endhelp

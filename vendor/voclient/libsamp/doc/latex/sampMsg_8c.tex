@@ -1,0 +1,105 @@
+\hypertarget{sampMsg_8c}{
+\section{sampMsg.c File Reference}
+\label{sampMsg_8c}\index{sampMsg.c@{sampMsg.c}}
+}
+(Internal) Interface to Message objects.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} \hyperlink{sampMsg_8c_d6dfdab2715ea070713515754dd499dd}{samp\_\-newMsg} ()
+\begin{CompactList}\small\item\em Create a new Msg object. \item\end{CompactList}\item 
+void \hyperlink{sampMsg_8c_adf2979a5fad0c9a855740330b7fd9ce}{samp\_\-freeMsg} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg)
+\begin{CompactList}\small\item\em Free the given Msg object. \item\end{CompactList}\item 
+\hypertarget{sampMsg_8c_34c9e29fa57216f19a70764df8e5826b}{
+void \textbf{samp\_\-msgMType} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype)}
+\label{sampMsg_8c_34c9e29fa57216f19a70764df8e5826b}
+
+\item 
+\hypertarget{sampMsg_8c_b6887edd7c0924460bcee0282544c82f}{
+char $\ast$ \textbf{samp\_\-msgTag} ()}
+\label{sampMsg_8c_b6887edd7c0924460bcee0282544c82f}
+
+\item 
+void \hyperlink{sampMsg_8c_281c8f7f8b21a74704dd200d5aaed481}{samp\_\-msgParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, \hyperlink{sampDecl_8h_4c5a7aff173725461e76e5f0183d7ed8}{Param} param)
+\begin{CompactList}\small\item\em Add a parameter to the Msg. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+(Internal) Interface to Message objects. 
+
+SAMPMSG.C -- (Internal) Interface to Message objects.
+
+msg = samp\_\-newMsg () samp\_\-msgMType (Msg msg, String mtype) samp\_\-msgParam (Msg msg, Param param) samp\_\-msgTag () samp\_\-freeMsg (Msg msg)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/11 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampMsg_8c_adf2979a5fad0c9a855740330b7fd9ce}{
+\index{sampMsg.c@{sampMsg.c}!samp\_\-freeMsg@{samp\_\-freeMsg}}
+\index{samp\_\-freeMsg@{samp\_\-freeMsg}!sampMsg.c@{sampMsg.c}}
+\subsubsection[{samp\_\-freeMsg}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-freeMsg ({\bf Msg} {\em msg})}}
+\label{sampMsg_8c_adf2979a5fad0c9a855740330b7fd9ce}
+
+
+Free the given Msg object. 
+
+SAMP\_\-FREEMSG -- Free the given Msg object
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]Msg object to free \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-bibLoad(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-imageLoadFITS(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Ping(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), and samp\_\-tableSelectRowList().\hypertarget{sampMsg_8c_281c8f7f8b21a74704dd200d5aaed481}{
+\index{sampMsg.c@{sampMsg.c}!samp\_\-msgParam@{samp\_\-msgParam}}
+\index{samp\_\-msgParam@{samp\_\-msgParam}!sampMsg.c@{sampMsg.c}}
+\subsubsection[{samp\_\-msgParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-msgParam ({\bf Msg} {\em msg}, \/  {\bf Param} {\em param})}}
+\label{sampMsg_8c_281c8f7f8b21a74704dd200d5aaed481}
+
+
+Add a parameter to the Msg. 
+
+SAMP\_\-MSGPARAM -- Add a parameter to the Msg.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \item[{\em keyw}]map keyword \item[{\em param}]parameter map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-bibLoad(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-imageLoadFITS(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Ping(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), and samp\_\-tableSelectRowList().\hypertarget{sampMsg_8c_d6dfdab2715ea070713515754dd499dd}{
+\index{sampMsg.c@{sampMsg.c}!samp\_\-newMsg@{samp\_\-newMsg}}
+\index{samp\_\-newMsg@{samp\_\-newMsg}!sampMsg.c@{sampMsg.c}}
+\subsubsection[{samp\_\-newMsg}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Msg} samp\_\-newMsg (void)}}
+\label{sampMsg_8c_d6dfdab2715ea070713515754dd499dd}
+
+
+Create a new Msg object. 
+
+SAMP\_\-NEWMSG -- Create a new Msg object
+
+\begin{Desc}
+\item[Returns:]handle to new Msg \end{Desc}
+
+
+Referenced by samp\_\-bibLoad(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-imageLoadFITS(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Ping(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), and samp\_\-tableSelectRowList().

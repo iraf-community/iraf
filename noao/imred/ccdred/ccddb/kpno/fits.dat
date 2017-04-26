@@ -1,0 +1,21 @@
+exptime		itime
+darktime	itime
+imagetyp	data-typ
+subset		f1pos
+biassec		biassec []
+datasec		datasec []
+
+fixpix		bp-flag 0
+overscan	bt-flag 0
+zerocor		bi-flag 0
+darkcor		dk-flag 0
+flatcor		ff-flag 0
+fringcor	fr-flag 0
+
+'object (  0 )'		object
+'dark (  1 )'		dark
+'proj flat (  2 )'	flat
+'sky flat (  3 )'	other
+'comp (  4 )'		other
+'bias (  5 )'		zero
+'dome flat (  6 )'	flat

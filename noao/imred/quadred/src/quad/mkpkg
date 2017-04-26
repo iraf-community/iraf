@@ -1,0 +1,56 @@
+# QUAD mkpkg file (Mon Mar 28 14:07:29 CST 1994)
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_quad.x
+	$link	x_quad.o libpkg.a -lxtools -o xx_quad.e
+	;
+
+install:
+	$move	xx_quad.e noaobin$x_quad.e
+	;
+
+libpkg.a:
+
+	$ifolder (qsplits.x, qsplit.gx) $generic -k -t silrd qsplit.gx $endif
+
+	ccddelete.x	
+	ccdgetparam.x	
+	ccdlog.x	
+	ccdprcselect.x	"ccdtypes.h"
+	ccdsection.x	<ctype.h>
+	ccdssselect.x	"ccdtypes.h"
+	ccdsubsets.x	
+	ccdtypes.x	"ccdtypes.h"
+	gainmeasure.x	"quadgeom.h" <imhdr.h>
+	hdrmap.x	"hdrmap.com" <error.h> <syserr.h>
+	qghdr2.x	"quadgeom.h" <imhdr.h>
+	qguser.x	"quadgeom.h"
+	qpcalimage.x	"ccdtypes.h" <error.h> <imset.h>
+	qpselect.x	"ccdtypes.h"
+	qsplitd.x	"quadgeom.h" <imhdr.h>
+	qspliti.x	"quadgeom.h" <imhdr.h>
+	qsplitl.x	"quadgeom.h" <imhdr.h>
+	qsplitr.x	"quadgeom.h" <imhdr.h>
+	qsplits.x	"quadgeom.h" <imhdr.h>
+	quadalloc.x	"quadgeom.h" <imhdr.h>
+	quaddelete.x	"quadgeom.h"
+	quadgeom.x	"quadgeom.h" <imhdr.h>
+	quadgeomred.x	"quadgeom.h" <imhdr.h>
+	quadjoin.x	"quadgeom.h" <imhdr.h>
+	quadmap.x	"quadgeom.h" <error.h> <imhdr.h>
+	quadmerge.x	"quadgeom.h" <imhdr.h>
+	quadscale.x	"quadgeom.h" <imhdr.h>
+	quadsections.x	"quadgeom.h" <imhdr.h>
+	quadsplit.x	"quadgeom.h" <imhdr.h>
+	test.x		"quadgeom.h"
+	timelog.x	<time.h>
+	;

@@ -1,0 +1,52 @@
+.help revisions Jun88 pkg.lists
+.nf
+
+lintran.x
+	Modified to store parameter structure as doubles to avoid round-off
+	issues (9/4/12)
+
+=====
+V2.13
+=====
+
+raverage.cl		+
+doc/raverage.hlp	+
+lists.cl
+lists.men
+lists.hd
+	Added a new running average task.  (5/4/07, Valdes)
+
+=======
+V2.12.3
+=======
+
+=====
+V2.12
+=====
+
+doc/Lcalc.hlp
+doc/Lcalc.hlp
+doc/Lists.hlp
+doc/unique.hlp
+doc/average.hlp
+        Fixed various formatting problems in the lists package help files.
+	(19/09/01, Davis)
+
+rimcursor.par
+rimcursor.x
+doc/rimcursor.hlp
+	Added the parameters wxformat and wyformat to the rimcursor task.
+	These default formats take precedence over the formats stored in the
+	WCS in the image header and the default format for all values
+	of the wcs parameter. (Davis 9/3/92)
+
+columns.x
+	The columns task has been reinstalled.  The default value of
+	outroot was changed, source code cleaned up and manual page
+	updated.  (ShJ 12-NOV-88)
+
+Davis, October 5, 1988
+        1. I replaced the data_value ** 2 and sum ** 2 constructs in the
+        average script to get around a SUN problem with raising 0.0 to any
+        power. This is probably good programming practice in any case.
+.endhelp

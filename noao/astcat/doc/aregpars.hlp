@@ -1,0 +1,106 @@
+.help aregpars Mar00 astcat
+.ih
+NAME
+aregpars -- edit the region extraction parameters
+.ih
+USAGE
+aregpars
+.ih
+PARAMETERS
+.ls rcra = "00:00:00.0"
+The right ascension / longitude of the center of the region to be extracted.
+.le
+.ls rcdec = "+00:00.00"
+The declination / latitude of the center of the region to be extracted.
+.le
+.ls rrawidth = 10.0
+The right ascension / longitude width in minutes of arc of the region to
+be extracted.
+.le
+.ls rdecwidth = 10.0
+The declination / latitude width in minutes of arc of the region to
+be extracted.
+.le
+.ls rcsystem = ""
+The input celestial coordinate system. This is the celestial coordinate system
+of the region center. If the input celestial coordinate system is undefined it
+defaults to the query celestial coordinate system. Popular options are
+"icrs", "j2000.0", and "b1950.0". The full set of options can be examined
+by typing "help ccsystems".
+.le
+.ls rcraunits = ""
+The units of rcra. Permitted values are "hours", "degrees", and radians. If
+rcraunits is undefined it defaults to the preferred units of the
+input celestial coordinate system, e.g. hours for equatorial coordinate
+system, degrees for ecliptic, galactic, and super-galactic coordinate
+systems.
+.le
+.ls rcdecunits = ""
+The units of rcdec. Permitted values are "degrees" and "radians". If rcdecunits
+is undefined it defaults to the preferred units of the input celestial
+coordinate system, e.g. degrees for all systems.
+.le
+.ih
+DESCRIPTION
+The region to extracted from the selected astrometric catalog or image survey
+is defined by the aregpars parameters \fIrcra\fR, \fIrcdec\fR, \fIrcrawidth\fR,
+and \fIrcdecwidth\fR.
+
+\fIrcra\fR and \fIrcdec\fR are defined in the input celestial coordinate system
+specified by \fIrcsystem\fR.  If \fIrcsystem\fR is undefined it defaults to the
+query celestial coordinate system defined by the qsystem query parameter in
+the catalog configuration file.
+
+\fIrcra\fR and \fIrcdec\fR are expressed in the units specified by 
+\fIrcraunits\fR, and \fIrcdecunits\fR.  If undefined \fIrcraunits\fR and
+\fIrcdecunits\fR are expressed in the preferred units of the input
+celestial coordinate system, e.g. hours and degrees for equatorial coordinate
+systems, and degrees and degrees for ecliptic, galactic,
+and super-galactic coordinate systems.
+.ih
+EXAMPLES
+1. List the region extraction parameters.
+
+.nf
+cl> lpar aregpars
+.fi
+
+2. Edit the region extraction parameters.
+
+.nf
+cl> aregpars
+... edit the parameters in the usual way
+... type :wq to quit and save the edits
+.fi
+
+3. Edit the region extraction parameters from the agetcat task.
+
+.nf
+cl> epar agetcat
+... edit the agetcat parameters
+... move to the aregpars parameter line and type :e
+... edit the aregpar parameters
+... type :wq to quit and save the aregpars edits
+... continue editing the remaining agetcat parameters
+... type :go to execute the task
+.fi
+
+4. Save the current aregpars parameter values in a text file called
+areg1.par.  Use the saved parameter set in the next call to the agetcat 
+task.
+
+.nf
+cl> epar aregpars
+... edit some parameters in the usual way
+... type :w areg1.par 
+... type :q to quit
+cl> agetcat ... aregpars=areg1.par ...
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+agetcat, agetim, help ccsystems
+.endhelp

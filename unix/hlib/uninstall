@@ -1,0 +1,365 @@
+#!/bin/csh
+#
+# ----------------------------------------------------------------------------
+#
+# UNINSTALL -- Remove IRAF on a UNIX/IRAF host.
+#
+# Usage:   uninstall [-n] [-h] [-hl] [-c] [-v] [-b <directory>]
+#
+#     where	-n	# no execute
+# 		-h	# print this help summary
+# 		-hl	# disable text highlighting
+# 		-c	# remove command links only
+# 		-v	# print verbage output
+# 		-b	# specify local bin directory to search
+#
+# Use "uninstall -n" to do a dry run to see what the would be done, without
+# actually modifying the host system.  To do the actual un-install one must
+# be superuser, but anyone can run "uninstall -n" to see what it would do.
+#
+# ----------------------------------------------------------------------------
+
+unset		noclobber
+unalias 	rm set grep ls pwd
+onintr		uninstall_cleanup_
+
+set exec	= yes
+set lbin	= ""
+set cmd_only	= no
+set verbage	= no
+set hilite      = 1
+
+set FILES	= "/usr/include/iraf.h /usr/local/lib/imtoolrc"
+set DEVS	= "/dev/imt1i /dev/imt1o /dev/imt1"
+set CMDS	= "cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc"
+
+alias RM	"/bin/rm -f"
+
+# Utility aliases.
+alias BOLD_ON   "(if ($hilite) tput bold)"
+alias BOLD_OFF  "(if ($hilite) tput sgr0)"
+
+alias ERRMSG   "(echo -n '   ';BOLD_ON;echo -n 'ERROR: ';BOLD_OFF; echo \!*)"
+alias WARNING  "(echo -n '   ';BOLD_ON;echo -n 'WARNING: ';BOLD_OFF; echo \!*)"
+alias NEWLINE  "(echo '')"
+
+
+#=============================================================================
+# Process any command line arguments.
+#=============================================================================
+while ("$1" != "")
+    switch ("$1")
+    case -n:				# no execute
+	set exec = no
+  	alias RM "echo -n \!* >& /dev/null"
+	breaksw
+    case -hl:                           # disable highlighting
+        set hilite = 0
+    case +hl:                           # enable highlighting
+        set hilite = 1
+        breaksw
+    case -h:				# print usage
+	goto Usage
+    case -c:				# command file links only
+	set cmd_only = yes
+	breaksw
+    case -q:				# quiet output
+	set verbage = no
+	breaksw
+    case -v:				# verbage output
+	set verbage = yes
+	breaksw
+    case -b:                            # set local bin directory (unix)
+        if ("$2" != "") then
+            shift
+        else
+            echo "missing argument to '-b <localbindir>' switch"
+            exit 1
+        endif
+        set lbin = "$1"
+
+	if (! -e $lbin) then
+	    echo "ERROR: Local bin dir '$lbin' not found."
+	    exit 1
+	endif
+        breaksw
+    default:
+	echo "ERROR:  unrecognized command-line argument '$1'"
+        goto Usage
+    endsw
+
+    if ("$2" == "") then
+        break
+    else
+	shift
+    endif
+end
+
+# Initialize.
+clear
+NEWLINE
+BOLD_ON
+echo "		     IRAF System Un-installation"
+echo "		     ---------------------------"
+BOLD_OFF
+NEWLINE
+
+
+# See whether we're gonna work....
+if ($exec == yes && `whoami` != "root") then
+
+  BOLD_ON
+  echo "**********************************************************************"
+  echo -n "WARNING"
+  BOLD_OFF
+  echo ": This script must be run as root for changes to take effect."
+  echo "         If you decide to proceed,  the 'no-op' flag will be enabled"
+  echo "         by default.   No changes will be made to the system  files,"
+  echo "         however you will be able to see what the script does."
+  BOLD_ON
+  echo "**********************************************************************"
+  BOLD_OFF
+  echo ""
+  echo -n "Proceed with a no-op uninstallation anyway (y)? " ; setenv ans "$<"
+  if ("$ans" == "n" || "$ans" == "no") then
+      echo "Quitting."
+      exit 0
+  endif
+  NEWLINE; NEWLINE
+
+  set exec = no
+  alias RM "echo -n \!* >& /dev/null"
+endif
+
+
+set iraf_paths 	  = ""
+set n_iraf_paths  = 0
+
+# Search the path for iraf command directories, assume we may have more than
+# one so build up a list of all of them.
+if ("$lbin" == "") then
+    foreach i ($path) 
+        if (-d $i && -e $i/cl && -e $i/mkiraf) then
+	    set iraf_paths = ($iraf_paths $i)
+	    set n_iraf_paths = `expr $n_iraf_paths + 1`
+        endif
+    end
+
+    # Look around and come up with a likely candidate directory.
+    if ($n_iraf_paths == 0) then
+        set d_lbin = ""
+        foreach dir (/usr/local/bin /opt/local/bin /local/bin /usr/bin /bin)
+            if (-d $i && -e $i/cl && -e $i/mkiraf) then
+	        set iraf_paths = ($iraf_paths $i)
+	        set n_iraf_paths = `expr $n_iraf_paths + 1`
+	    endif
+        end
+
+        if (! $n_iraf_paths) then
+	    echo "WARNING: no IRAF command directories found."
+	endif
+    endif
+endif
+
+
+echo "Files to be deleted to remove IRAF from this machine:"
+NEWLINE
+BOLD_ON
+if ("$cmd_only" == "no") then
+    foreach i ($FILES $DEVS)
+        if (-e $i) echo "	$i"
+    end
+endif
+
+foreach i ($iraf_paths)
+    echo "	All IRAF commands found in $i, including"
+end
+echo ""
+echo "	    cl      mkiraf     mkmlist     generic       mkpkg"
+echo "	    rmbin   rmfiles    rtar        wtar          xc"
+echo "	    xpp     rpp        xyacc       sgidispatch"
+echo ""
+BOLD_OFF
+
+
+NEWLINE
+echo 'You will be prompted before any files are removed. The system may'
+echo 'be restored by rerunning the IRAF install script on this machine.'
+NEWLINE
+
+echo -n "Hit <CR> to proceed, 'q' to quit: "
+            
+set ans = "$<"
+if ("$ans" == "q" || "$ans" == "quit") exit 0
+NEWLINE ; NEWLINE
+
+
+# Initialize the local bin dir to delete.
+set npath = 1
+set d_lbin = $iraf_paths[$npath]
+
+
+
+# ============================================================================
+# Delete the miscellaneous files associated with the system. 
+# ============================================================================
+
+if ("$cmd_only" == "no") then
+
+    # See whether we want to delete the <iraf.h> symlink.
+    foreach file ($FILES)
+	if ($verbage == yes) NEWLINE
+        if (-e $file) then
+            echo -n "Remove the $file link (y/n/q)? (y) "
+            set ans = "$<"
+            if ("$ans" == "y" || "$ans" == "Y" || "$ans" == "") then
+                if ($verbage == yes) echo -n "    Deleting $file...."
+                RM $file
+	    	if (-e $i && $exec == yes && $verbage == yes) then
+            	    echo "file '$i' could not be deleted."
+	    	else if ($verbage == yes) then
+            	    echo "ok"
+	    	endif
+            else if ("$ans" == "q" || "$ans" == "q") then
+	        echo "Quitting."
+	        exit 0
+            endif
+        endif
+    end
+
+    # See whether we want to delete the fifo pipes.
+    if (-e /dev/imt1i || -e /dev/imt1o) then
+	if ($verbage == yes) NEWLINE
+        echo -n "Remove the /dev fifo pipes (y/n/q)? (y) "
+        set ans = "$<"
+        if ("$ans" == "y" || "$ans" == "Y" || "$ans" == "") then
+    	    foreach i ($DEVS)			# remove fifo devs
+		if ($verbage == yes) echo -n "    Deleting $i...."
+        	if (-e $i) then
+                    RM $file
+	    	    if (-e $i && $exec == yes && $verbage == yes) then
+            	        echo "file '$i' could not be deleted."
+	    	    else if ($verbage == yes) then
+            	        echo "ok"
+	    	    endif
+        	endif
+	    end
+        else if ("$ans" == "q" || "$ans" == "q") then
+	    echo "Quitting."
+	    exit 0
+        endif
+    endif
+
+endif
+
+
+#=============================================================================
+# Get UNIX directory where commands (links) are installed, if not found then
+# set it on command line. 
+#=============================================================================
+
+if ($n_iraf_paths > 0) then
+    # Initialize the local bin dir to delete.
+    set npath = 1
+    set d_lbin = $iraf_paths[$npath]
+endif
+
+
+if ("$d_lbin" == "") then
+again_:
+    echo -n "Local iraf commands directory? "
+    set lbin = "$<"
+    if ("$lbin" == "") goto again_
+
+    if (!( -e $lbin/cl && -e $lbin/mkiraf)) then
+	echo "IRAF commands not found in $lbin, please try again..."
+	set lbin = ""
+	goto again_
+    endif
+
+else
+next_:
+    if ($verbage == yes) NEWLINE
+    echo -n "Remove IRAF Commands in $d_lbin (y/n/q)? (y) "
+    set ans = "$<"
+    if ("$ans" == "y" || "$ans" == "Y" || "$ans" == "") then
+	set lbin = $d_lbin
+    else if ("$ans" == "n" || "$ans" == "no") then
+	goto no_delete_
+    else if ("$ans" == "q" || "$ans" == "quit") then
+	echo "Quitting."
+	exit 0
+    else
+        set npath = `expr $npath + 1`
+        set d_lbin = $iraf_paths[$npath]
+	goto next_
+    endif
+endif
+
+foreach i ($CMDS)				# remove the iraf commands
+    set file = $lbin/$i
+    if (-e $file) then
+        if ($verbage == yes) echo -n "    Deleting $file...."
+        if (-e $file) then
+	    RM $file
+	    if (-e $file && $exec == yes && $verbage == yes) then
+                echo "[ ERROR: file '$file' could not be deleted. ]"
+	    else if ($verbage == yes) then
+                echo "ok"
+	    endif
+        endif
+    else
+	echo -n "    Warning: $file was not found on this machine...."
+    endif
+end
+
+
+#=============================================================================
+# Delete the iraf commands and files.
+#=============================================================================
+
+set npath = `expr $npath + 1`
+
+# See whether this was the only instance and quit.
+if ($npath <= $n_iraf_paths) then
+    set d_lbin = $iraf_paths[$npath]
+    goto next_
+endif
+
+no_delete_:
+
+set back = `pwd` ; chdir $iraf/.. ; set iraf_p = `pwd` ; chdir $back
+NEWLINE
+NEWLINE
+echo "IRAF has been successfully uninstalled from this system.  To fully"
+echo "remove the system you must delete the iraf directory tree using the"
+echo "command: "
+NEWLINE
+BOLD_ON
+echo "	% /bin/rm -rf $iraf_p"
+BOLD_OFF
+NEWLINE
+echo "External packages, X11IRAF and/or other display servers and packages"
+echo "will also need to be deleted separately."
+NEWLINE
+exit 0
+
+uninstall_cleanup_:
+
+exit 0
+
+
+
+# Print usage information.  We will not get here unless the "-help" flag
+# was issued.
+
+Usage:
+    echo "Usage:    uninstall [-n] [-h] [-hl] [-c] [-v] [-b <directory>]"
+    echo " "
+    echo "    where	-n	# no execute"
+    echo "		-h	# print this help summary"
+    echo "		-hl	# disable text highlighting"
+    echo "		-c	# remove command links only"
+    echo "		-v	# print verbage output"
+    echo "		-b	# specify local bin directory to search"
+    exit 0

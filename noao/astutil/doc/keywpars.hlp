@@ -1,0 +1,94 @@
+.help keywpars May93 noao.astutil
+.ih
+NAME
+keywpars -- edit the image header keywords used by the package
+.ih
+USAGE
+keywpars
+.ih
+PARAMETERS
+.ls ra = "RA"
+Right Ascension keyword. (Value in HMS format).
+.le
+.ls dec = "DEC"
+Declination keyword. (Value in HMS format).
+.le
+.ls ut = "UT"
+UT of observation keyword.  This field is the UT start of the observation.
+(Value in HMS Format).
+.le
+.ls utmiddle = "UTMIDDLE"
+UT mid-point of observation keyword.  This field is the UT mid-point of 
+the observation.  (Value in HMS Format).
+.le
+.ls exptime = "EXPTIME"
+Exposure time keyword. (Value in Seconds).
+.le
+.ls epoch = "EPOCH"
+Epoch of coordinates keyword. (Value in Years).
+.le
+.ls date_obs = "DATE-OBS"
+Date of observation keyword.  Format for this field should be
+dd/mm/yy (old FITS format), yyyy-mm-dd (new FITS format), or
+yyyy-mm-ddThh:mm:ss.sss (new FITS format with time).
+.le
+
+.ce 
+OUTPUT KEYWORDS
+.ls hjd = "HJD"
+Heliocentric Julian date keyword. (Value in Days).
+.le
+.ls mjd_obs = "MJD-OBS"
+Modified Julian Data keyword.  The MJD is defined as the Julian date of
+the mid-point of the observation - 2440000.5.  (Value in Days).
+.le
+.ls vobs = "VOBS"
+Observed radial velocity keyword.  (Value in Km/sec).
+.le
+.ls vrel = "VREL"
+Observed radial velocity keyword. (Value in Km/sec).
+.le
+.ls vhelio = "VHELIO"
+Corrected heliocentric radial velocity keyword.  (Value in Km/sec).
+.le
+.ls vlsr = "VLSR"
+Local Standard of Rest velocity keyword.  (Value in Km/sec).
+.le
+.ls vsun = "VSUN"
+Epoch of solar motion.  (Character string with four real valued fields 
+describing the solar velocity (km/sec), the RA of the solar velocity (hours),
+the declination of the solar velocity (degrees), and the epoch of solar
+coordinates (years)).
+.le
+.ih
+DESCRIPTION
+The image header keywords used by the \fIfxcor\fR task can be 
+edited if they differ
+from the NOAO standard keywords.  For example, if the image header keyword
+giving the exposure time for the image is written out as "EXP-TIME" instead
+of the standard "OTIME" at a given site, the keyword accessed for 
+that information
+may be changed based on the value of the \fIexptime\fR parameter.
+
+.ih
+EXAMPLES
+1. List the image header keywords.
+
+.nf
+	as> lpar keywpars
+.fi
+
+2. Edit the image header keywords
+
+.nf
+	as> keywpars
+.fi
+.ih
+REVISIONS
+.ls KEYPARS V2.10.3
+First version.  Currently only used by the \fIRVCORRECT\fR task.
+.le
+.ih
+SEE ALSO
+fxcor, rvcorrect
+.endhelp

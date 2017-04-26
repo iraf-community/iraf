@@ -1,0 +1,31 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+$if (datatype == r)
+include "gsurfitdef.h"
+$else
+include "dgsurfitdef.h"
+$endif
+
+# GSCOEFF -- Procedure to fetch the number and magnitude of the coefficients.
+# If the GS_XTERMS(sf) = GS_XBI (YES) then the number of coefficients will be
+# (GS_NXCOEFF(sf) * GS_NYCOEFF(sf)); if GS_XTERMS is GS_XTRI then the number
+# of coefficients will be (GS_NXCOEFF(sf) *  GS_NYCOEFF(sf) - order *
+# (order - 1) / 2) where order is the minimum of the x and yorders;  if
+# GS_XTERMS(sf) = GS_XNONE then the number of coefficients will be
+# (GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1).
+
+$if (datatype == r)
+procedure gscoeff (sf, coeff, ncoeff)
+$else
+procedure dgscoeff (sf, coeff, ncoeff)
+$endif
+
+pointer	sf		# pointer to the surface fitting descriptor
+PIXEL	coeff[ARB]	# the coefficients of the fit
+int	ncoeff		# the number of coefficients
+
+begin
+	# calculate the number of coefficients
+	ncoeff = GS_NCOEFF(sf)
+	call amov$t (COEFF(GS_COEFF(sf)), coeff, ncoeff)
+end

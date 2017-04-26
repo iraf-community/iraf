@@ -1,0 +1,9 @@
+# RV_DEBUG - Hidden task to control debugging information
+
+debug,b,h,no,,,"Enable debugging information"
+file,s,h,"",,,"Filename of debugging info"
+level,i,h,4,,,"Level of debugging information"
+other,i,h,0,,,"Compare algorithms?"
+keystroke,s,h,'x',,,"Intial keystroke?"
+quickdraw,b,h,no,,,"Supress some graphics for speed?"
+mode,s,h,"ql"

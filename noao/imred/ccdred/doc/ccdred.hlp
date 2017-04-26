@@ -1,0 +1,104 @@
+.help package Dec93 noao.imred
+.ih
+NAME
+ccdred -- CCD image reduction package
+.ih
+USAGE
+ccdred
+.ih
+PARAMETERS
+.ls pixeltype = "real real"
+Output pixel datatype and calculation datatype.  When images are processed
+or created the output pixel datatype is determined by this parameter if the
+specified datatype is of equal or higher precision otherwise the input
+image datatype is preserved.  For example if the output datatype is
+specified as "input" then input images which are "short" or "ushort" will
+be output as integer but any real datatype input images will remain real.
+The allowed types and order of precision are "short", "ushort", "int",
+"long", "real", or "double", for short signed integer, short unsigned
+integer, integer, long integers, and real or double floating point.  Note
+that if short input images are processed into real images the disk space
+required will generally increase.  The calculation datatypes may only be
+short and real with a default of real if none is specified.
+.le
+.ls verbose = no
+Print log information to the standard output?
+.le
+.ls logfile = "logfile"
+Text log file.  If no filename is specified then no log file is kept.
+.le
+.ls plotfile = ""
+Log metacode plot file for the overscan bias vector fits.  If no filename
+is specified then no metacode plot file is kept.
+.le
+.ls backup = ""
+Backup prefix for backup images.  If no prefix is specified then no backup
+images are kept when processing.  If specified then the backup image
+has the specified prefix.
+.le
+.ls instrument = ""
+CCD instrument translation file.  This is usually set with
+\fBsetinstrument\fR.
+.le
+.ls ssfile = "subsets"
+Subset translation file used to define the subset identifier.  See
+\fBsubsets\fR for more.
+.le
+.ls graphics = "stdgraph"
+Interactive graphics output device when fitting the overscan bias vector.
+.le
+.ls cursor = ""
+Graphics cursor input.  The default is the standard graphics cursor.
+.le
+.ls version = "June 1987"
+Package version.
+.le
+.ih
+DESCRIPTION
+The CCD reduction package is loaded when this command is entered.  The
+package contains parameters which affect the operation of the tasks it
+defines.  When images are processed or new image are created the output
+pixel datatype is that specified by the parameter \fBpixeltype\fR.  Note
+that CCD processing replaces the original image by the processed image so
+the pixel type of the CCD images may change during processing.  The output
+pixel type is not allowed to change to a lower precision but it is common
+for input short images to be processed to real images.  Processing images
+from short to real pixel datatypes will generally increase the amount of
+disk space required (a factor of 2 on most computers).
+
+The tasks produce log output which may be printed on the standard
+output (the terminal unless redirected) and appended to a file.  The
+parameter \fIverbose\fR determines whether processing information
+is printed.  This may be desirable initially, but when using background
+jobs the verbose output should be turned off.  The user may look at
+the end of the log file (for example with \fBtail\fR) to determine
+the status of the processing.
+
+The package was designed to work with data from many different observatories
+and instruments.  In order to accomplish this an instrument translation
+file is used to define a mapping between the package parameters and
+the particular image header format.  The instrument translation file
+is specified to the package by the parameter \fIinstrument\fR.  This
+parameter is generally set by the task \fBsetinstrument\fR.  The other
+file used is a subset file.  This is generally created and maintained
+by the package and the user need not do anything.  For more sophisticated
+users see \fBinstruments\fR and \fBsubsets\fR.
+
+The package has very little graphics
+output.  The exception is the overscan bias subtraction.  The bias
+vector is logged in the metacode plot file if given.  The plot file
+may be examined with the tasks in the \fBplot\fR package such as
+\fBgkimosaic\fR.  When interactively fitting the overscan vector
+the graphics input and output devices must be specified.  The defaults
+should apply in most cases.
+
+Because processing replaces the input image by the processed image it
+may be desired to save the original image.  This may be done by
+specifying a backup prefix with the parameter \fIbackup\fR.  For
+example, if the prefix is "orig" and the image is "ccd001", the backup
+image will be "origccd001".  The prefix may be a directory but it must
+end with '/' or '$' (for logical directories).
+.ih
+SEE ALSO
+ccdproc, instruments, setinstrument, subsets
+.endhelp

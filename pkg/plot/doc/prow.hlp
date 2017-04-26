@@ -1,0 +1,146 @@
+.help prow Sep91 plot
+.ih
+NAME
+prow -- plot an image row
+.ih
+USAGE
+prow image row
+.ih
+PARAMETERS
+.ls image
+Input image containing the row to be plotted.
+.le
+.ls row       
+The row to be plotted.
+.le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling when
+input is f rom images.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
+.ls wx1=0., wx2=0., wy1=0., wy2=0.
+The range of window (user) coordinates to be included in the plot.  If
+the range of values in x or y = 0, the plot is automatically scaled
+from the minimum to maximum data values along the degenerate direction.
+.le
+.le
+.ls vx1=0., vx2=0., vy1=0., vy2=0.
+NDC coordinates (0-1) of the device plotting viewport.  If not set by
+the user, a suitable viewport which allows sufficient room for all
+labels is used.
+.le
+.ls pointmode = no
+Plot individual points instead of a continuous line?
+.le
+.ls marker = "box"
+Marker or line type to be drawn.  If \fBpointmode\fR = yes the markers are
+"point", "box", "cross", "plus", "circle", "hebar", "vebar", "hline",
+"vline" or "diamond".  Any other value defaults to "box".  If drawing lines,
+\fBpointmode\fR = no, the values are "line", "lhist", "bhist".  Any other
+value defaults to "line".  "bhist" (box histogram) draws lines to the
+bottom of the graph while "lhist" does not.  In both cases the
+horizontal histogram lines run between the half way points (reflected
+at the ends).
+.le
+.ls szmarker = 0.005
+The size of the marker drawn when \fBpointmode\fR = yes.
+.le
+.ls logx = no, logy = no
+Draw the x or y axis in log units, versus linear?
+.le
+.ls xlabel = "wcslabel", ylabel = ""
+Label for the X-axis or Y-axis.  if \fBxlabel\fR = "wcslabel"
+the world coordinate system label in the image, if defined, is used.
+.le
+.ls xformat = "wcsformat"
+The numerical format for the coordinate labels.  The values may be ""
+(an empty string), %f for decimal format, %h and %H for xx:xx:xx format, and
+%m and %M for xx:xx.x format.  The upper case %H and %M convert degrees
+to hours.  Some images have a recommended x coordinate format defined as
+a WCS attribute.  If the xformat value is "wcsformat" the WCS attribute
+format will be used.  Any other value will override the image attribute.
+.le
+.ls title = "imtitle"
+Title for plot.  If not changed from the default, the title string from the
+image header, appended with the row being plotted, is used.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5
+The number of major and minor divisions along the x or y axis.
+.le
+.ls round = no
+Round axes up to nice values?
+.le
+.ls fill = yes
+Fill plotting viewport regardless of device aspect ratio?
+.le
+.ls append = no
+Append to an existing plot?
+.le
+.ls device="stdgraph"
+Output device.
+.le
+.ih
+DESCRIPTION
+Plot a specified row from an image.  The user can control the
+plot size and placement, the scaling and labeling of axes.  Rows can be
+plotted as a continuous line or individual points with a specified marker.
+
+If \fBappend\fR is enabled, previous values for \fBbox\fR,
+\fBfill\fR, \fBround\fR, the plotting viewport (\fBvx1\fR, \fBvx2\fR, 
+\fBvy1\fR, \fBvy2\fR), and the plotting window (\fBwx1\fR, \fBwx2\fR, 
+\fBwy1\fR, \fBwy2\fR) are used.
+
+If the plotting viewport was not set by the user, \fBprow\fR 
+automatically sets a viewport centered on the device.  The default value
+of \fBfill\fR = yes means the plot spans equal amounts of NDC space in
+x and y.  Setting
+the value of \fBfill\fR  to "no" means the viewport will be adjusted so 
+that the square plot will span equal physical lengths in x and y
+when plotted.  That is, when \fBfill = no\fR, a unity aspect ratio is 
+enforced, and plots
+appear square regardless of the device aspect ratio.  On devices with non 
+square full device viewports (e.g., the vt640), a plot drawn by \fIprow\fR
+appears extended in the x direction unless \fBfill\fR = no.
+
+.ih
+EXAMPLES
+1. Plot row 128 of image crab.5009 with default parameters:
+
+    cl> prow crab.5009 128
+
+2. Overplot row 128 of crab.red using crosses to mark the added points:
+
+    cl> prow crab.red 128 append+ pointmode+ marker=cross
+
+3. Annotate the axes of a row plot:
+
+    cl> prow crab.5009 64 xlabel="Column Number" ylabel=Intensity
+.ih
+TIME REQUIREMENTS
+\fIprow\fR takes about 1 cp second to plot a row of a 512 square image.
+.ih
+BUGS
+.ih
+SEE ALSO
+prows, pcol, pcols
+.endhelp

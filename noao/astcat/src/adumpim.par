@@ -1,0 +1,7 @@
+imsurvey,s,a,dss2@cadc,,,"The input image survey"
+output,s,a,"",,,"The output image"
+ra,s,a,"00:00:00.0",,,"The field center ra / longitude"
+dec,s,a,"+00:00:00",,,"The field center dec / latitude"
+size,s,a,15.0,,,"The field size"
+imdb,s,h,")_.imdb",,,"The image survey configuration file"
+mode,s,h,"ql",,,

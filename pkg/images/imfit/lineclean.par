@@ -1,0 +1,13 @@
+input,s,a,,,,Images to be cleaned
+output,s,a,,,,Output images
+interactive,b,h,yes,,,Set fitting parameters interactively?
+sample,s,h,"*",,,Sample points to use in fit
+naverage,i,h,1,,,Number of points in sample averaging
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+low_reject,r,h,2.5,0.,,Low rejection in sigma of fit
+high_reject,r,h,2.5,0.,,High rejection in sigma of fit
+niterate,i,h,1,0,,Number of rejection iterations
+grow,r,h,1.,0.,,Rejection growing radius in pixels
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

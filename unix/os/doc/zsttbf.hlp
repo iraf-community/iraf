@@ -1,0 +1,53 @@
+.help zsttbf May84 "System Interface"
+.ih
+NAME
+zsttbf -- get file status for a binary file
+.ih
+SYNOPSIS
+.nf
+zsttbf (chan, param, lvalue)
+
+int	chan			# OS channel assigned to file
+int	param			# parameter to be returned
+long	lvalue			# return value of parameter
+.fi
+.ih
+DESCRIPTION
+The \fBzsttbf\fR primitive is used to obtain file, device, and machine
+dependent information for the binary file (and device) connected to the
+channel \fIchan\fR.  The integer argument \fIparam\fR selects the parameter
+to be returned; a separate call is required to access each parameter.
+.ls
+.ls FSTT_BLKSIZE        (=1)
+If the file is a blocked file, the size of a device block in bytes.
+A streaming file is indicated by a device block size of zero.
+Variable size records may be read from or written to a streaming file.
+A blocked file with a block size of one byte denotes a randomly addressable
+file with no blocking restrictions.
+.le
+.ls FSTT_FILSIZE        (=2)
+The current file size in machine bytes.  FIO uses this parameter when
+appending to blocked binary files.  The file size is undefined for streaming
+files.  FIO will ask for this parameter once when the file is opened,
+and thereafter FIO will keep track of the file size internally.
+.le
+.ls FSTT_OPTBUFSIZE     (=3)
+The optimum, i.e. default, buffer size for a FIO file buffer for "regular"
+i/o.  Should be an integral multiple of the device block size.
+FIO will create a larger or smaller buffer if advised that i/o is to be
+abnormally sequential or random in nature.  The optimum transfer size is
+expected to be both device and machine dependent.
+.le
+.ls FSTT_MAXBUFSIZE     (=4)
+The maximum size of a FIO file buffer, i.e., the maximum permissible
+transfer size.  If there is no maximum value zero is returned.
+.le
+.le
+.ih
+RETURN VALUE
+ERR is returned (coerced into a long integer) if \fIchan\fR or \fIparam\fR
+is illegal.  The legal \fIlvalues\fR are all nonnegative integer values.
+.ih
+SEE ALSO
+zfiobf
+.endhelp

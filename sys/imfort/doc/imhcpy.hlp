@@ -1,0 +1,30 @@
+.help imhcpy Sep86 imfort
+.ih
+NAME
+imhcpy -- copy an image header
+.ih
+SYNOPSIS
+.nf
+subroutine imhcpy (oim, nim, ier)
+
+integer		oim		#I image descriptor of input image
+integer		nim		#I image descriptor of output image
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimhcpy\fR procedure is used to copy the non-pixel fields in the header
+of one image to another image, given the runtime descriptors of the two images.
+The images must previously have been opened with \fIimopen\fR or \fIimopnc\fR.
+The header fields which are \fInot\fR copied are those describing the physical
+attributes the pixel array, i.e., the number of axes, the physical dimensions
+of the image, the pixel datatype code, and the minimum and maximum pixel values.
+.ih
+RETURN VALUE
+A zero status will be returned provided both image descriptors are valid.
+
+IE_MAGIC:	illegal imfort image descriptor
+.ih
+SEE ALSO
+imgsiz, imgkw, impkw
+.endhelp

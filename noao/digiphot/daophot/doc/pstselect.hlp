@@ -1,0 +1,418 @@
+.help pstselect May00 noao.digiphot.daophot
+.ih
+NAME
+pstselect -- select candidate psf stars from a photometry file
+.ih
+USAGE
+pstselect image photfile pstfile maxnpsf
+.ih
+PARAMETERS
+.ls image
+The list of images containing the candidate psf stars.
+.le
+.ls photfile
+The list of input  photometry files. The number of photometry files must
+be equal to the number of input images. If photfile is "default", "dir$default",
+or a directory specification PSTSELECT searches for a file called 
+dir$image.mag.#  where # is the highest available version number for the file.
+Photfile is normally the output of the PHOT task but may also be the  output
+of  the  PSF,  PEAK,  NSTAR and ALLSTAR tasks. Photfile may be a
+text file or an STSDAS binary table.
+.le
+.ls pstfile
+The  list  of  output  psf star photometry files. There must be one output
+psf star photometry file for every input image. If pstfile is "default",
+"dir$default",  or a  directory  specification  then  PSTSELECT writes
+a file called dir$image.pst.# where # is the next  available  version  number.
+Pstfile  inherits its file type, it may be either an APPHOT/DAOPHOT
+text or STSDAS binary file, from photfile.
+.le
+.ls maxnpsf = 25
+The maximum number of candidate psf stars to be selected.
+.le
+.ls mkstars = no
+Mark the selected or deleted psf stars on the image display ?
+.le
+.ls plotfile = ""
+The name of the output file containing mesh, contour, or profile plots of the
+selected PSF stars. If plotfile is undefined no plot file is created; otherwise
+a mesh, contour, or profile plot is written to this file for each PSF star
+selected. Plotfile is opened in append mode and may become very large.
+.le
+.ls datapars = ""
+The name of the file containing the data dependent parameters. The parameter
+\fIscale\fR is located here. If \fIdatapars\fR is undefined then the default
+parameter set in uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the daophot fitting parameters. The parameters
+\fIpsfrad\fR and \fIfitrad\fR are located here. If \fIdaopars\fR is undefined
+then the default parameter set in uparm directory is used.
+.le
+.ls interactive = no
+Select the psf stars interactively ? If interactive = yes and icommands is
+undefined, PSTSELECT reads in the star list from \fIphotfile\fR, sorts the
+stars by magnitude and waits for commands from the user. If interactive = no
+and icommands="", PSTSELECT selects candidate PSF stars from \fIphotfile\fR
+automatically. If icommands is not undefined then interactive is automatically
+set to "no", and commands are read from the image cursor command file.
+.le
+.ls plottype = "mesh"
+The default plot type displayed when a psf star is selected interactively.
+The choices are "mesh", "contour", or "radial".
+.le
+.ls icommands = ""
+The image display cursor or image cursor command file.
+.le
+.ls gcommands = ""
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIphotfile\fR and
+of the output coordinates written to \fIpstfile\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", "tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv  
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default caching is
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical PSTSELECT parameters ?
+Verify can be set to the DAOPHOT package parameter value (the default),
+"yes", or "no".
+.le
+.ls update = ")_.update"
+Update the algorithm parameters if verify is "yes"?
+Update can be set to the DAOPHOT package parameter value (the default),
+"yes", or "no".
+.le
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task in non-interactive mode ?
+Verbose can be set to the DAOPHOT package parameter value (the default),
+"yes", or "no".
+.le
+.ls
+graphics = ")_.graphics"
+The default graphics device.  Graphics can be set to the default
+daophot package parameter value, "yes", or "no".
+.le
+.ls display = ")_.display"
+The  default  image  display  device.  Display can be set to the DAOPHOT
+package parameter value (the default), "yes", or "no". By default graphics
+overlay is disabled.  Setting display to one of "imdr", "imdg", "imdb", or
+"imdy" enables graphics overlay with the IMD graphics kernel.
+.le
+
+.ih
+DESCRIPTION
+
+PSTSELECT reads the input photometry file \fIphotfile\fR, extracts the ID,
+XCENTER, YCENTER, MAG, and MSKY fields for up to \fImaxnpsf\fR psf stars,
+and the results to \fIpstfile\fR. \fIPstfile\fR automatically inherits the
+file format of \fIphotfile\fR.
+
+The coordinates read from \fIphotfile\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use the "tv" or "physical" input coordinate systems.
+
+The coordinates written to \fIpstfile\fR are in the coordinate system defined
+by \fIwcsout\fR. The options are "logical", "tv", and "physical". The simplest
+default is the "logical" system. Users wishing to correlate the output
+coordinates of objects measured in image sections or mosaic pieces with
+coordinates in the parent image must use the "tv" or "physical" coordinate
+systems.
+
+After reading the star list from \fIphotfile\fR, PSTSELECT sorts the list in
+order of increasing magnitude, after rejecting any stars that have INDEF
+valued magnitudes, or which lie less than \fIfitrad\fR / \fIscale\fR
+pixels from the edge of the \fIimage\fR. From this list the brightest
+\fImaxnpsf\fR stars which have no brighter neighbor stars within (\fIpsfrad\fR +
+\fIfitrad\fR) / \fIscale\fR + 1 pixels are selected as candidate psf stars.
+\fIPsfrad\fR and \fIfitrad\fR are the psf radius and fitting radius parameters
+respectively and are stored in the DAOPARS parameter set. \fIScale\fR is the
+image scale parameter and is located in the DATAPARS parameter set. Plots,
+either mesh, contour or radial profile depending on the value of
+\fIplottype\fR, of the selected stars may be saved in the file \fIplotfile\fR.
+
+If \fIinteractive\fR = "no", PSTSELECT reads the star list in \fIphotfile\fR,
+selects the candidate psf stars as described above, and writes the results to
+\fIpstfile\fR automatically. If interactive = "yes", PSTSELECT reads
+the star list, selects the candidate psf stars and waits for further
+instruction from the user. At this point the user can step through the stars
+chosen by PSTSELECT, check their surface, contour, or radial profile plots
+for blemishes, neighbors etc, and accept the good candidates and reject
+the poor ones, or use the image cursor and/or id number to select psf
+stars until a maximum of \fImaxnpsf\fR stars is reached. At any point in
+this process a previously selected psf star can be deleted.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If caching
+is enabled and PSTSELECT is run interactively the first data access will appear
+to take a long time as the entire image must be read in before the data
+is actually fetched. All subsequent measurements will be very fast because
+PSTSELECT is accessing memory not disk. The point of caching is to speed up
+random image access by making the internal image i/o buffers the same size as
+the image itself. However if the input object lists are sorted in row order and
+sparse caching may actually worsen not improve the execution time. Also at
+present there is no point in enabling caching for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of caching in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halves of the image are alternated.
+
+
+.ih
+CURSORS
+
+    The  following  cursor  commands are available once the image cursor
+    has been activated.
+
+.nf
+
+	Keystroke Commands 
+
+?	Print help
+p	Print photometry for star nearest the cursor
+l	List the current psf stars
+n	Select the next good candidate psf star from the list
+a	Add star nearest cursor to psf star list
+d	Delete psf star nearest cursor from psf star list
+q	Quit task
+
+	Colon Commands
+
+:p [n]	Print photometry for star n
+:a [n]	Add star n to psf star list
+:d [n]	Delete star n from psf star list
+
+The following cursor commands are available once a star has been selected
+and the graphics cursor has been activated.
+
+        Interactive Graphics Keystroke Commands
+
+?       Print help
+p       Print the photometry for this star
+t       Print the plot parameters and data minimum and maximum
+a       Accept star and proceed
+d       Reject star and select another with image cursor
+m       Plot the default mesh plot for this star
+n       Increase vertical angle by 15 degrees (mesh plot only)
+s       Decrease vertical angle by 15 degrees (mesh plot only)
+w       Decrease horizontal angle by 15 degrees (mesh plot only)
+e       Increase horizontal angle by 15 degrees (mesh plot only)
+c       Plot the default contour plot for this star
+r       Plot the radial profile for this star
+
+
+        Colon Graphics Commands
+
+:m [val] [val]  Set the mesh plot vertical and horizontal viewing angles
+:v [val]        Set the mesh plot vertical viewing angle
+:h [val]        Set the mesh plot horizontal viewing angle
+:c [val] [val]  Set the contour plot floor and ceiling levels
+:l [value]      Set the contour plot floor level
+:u [value]      Set the contour plot ceiling level
+.fi
+
+.ih
+OUTPUT
+
+If \fIverbose\fR = "yes" a single line is written to the terminal for each
+star added to the candidate psf star list. Full output is written to the
+file \fIpstfile\fR. At the beginning of this file is a header listing the
+values of all the important parameters. For each star included in the candidate
+psf star list the following quantities are written.
+
+.nf
+	id  xcenter ycenter mag msky
+.fi
+
+Id, xcenter, ycenter, mag, and msky are the id, x and y coordinates,
+magnitudes and sky values for the candidate psf stars listed in
+\fIphotfile\fR.
+
+.ih
+EXAMPLES
+
+1. Select up to 10 psf stars from the PHOT task output non-interactively. 
+Save surface plots of the selected stars in the file "psf.plots".
+
+.nf
+    da> daofind dev$ypix default fwhmpsf=2.5 sigma=5.0 threshold=20.0
+
+        ... answer verify prompts
+
+        ... find stars in the image
+
+	... answer will appear in ypix.coo.1
+
+    da> phot dev$ypix default default annulus=10. dannulus=5.       \
+	apertures = 5.0
+
+        ... answer verify prompts
+
+        ... do aperture photometry on the detected stars
+
+	... answer will appear in ypix.mag.1
+
+    da> pstselect dev$ypix default default 10 psfrad=9.0 fitrad=3.0 \
+        plotfile=psf.plots
+
+        ... answer verify prompts
+
+        ... select candidate psf stars
+
+        ... the output will appear in ypix.pst.1 
+
+    da> display dev$ypix 1
+
+        ... display the image
+
+    da> pdump ypix.pst.1 xc,yc yes | tvmark 1 STDIN col=204
+
+        ... mark the stars
+
+    da> gkiextract psf.plots 1 | stdgraph
+
+	... make a surface plot of the first candidate psf star
+.fi
+
+
+2. Repeat the previous results for an image section while preserving the
+coordinate system of the original image.
+
+
+.nf
+    da> daofind dev$ypix[150:450,150:450] default wcsout=tv fwhmpsf=2.5 \
+        sigma=5.0 threshold=20.0
+
+	... answer verify prompts
+
+        ... find stars in the image
+
+	... answer will appear in ypix.coo.2
+
+    da> phot dev$ypix[150:450,150:450] default default wcsin=tv wcsout=tv \
+        annulus=10.  dannulus=5. apertures = 5.0
+
+	... answer verify prompts
+
+        ... do aperture photometry on the detected stars
+
+	... answer will appear in ypix.mag.2
+
+    da> pstselect dev$ypix[150:450,150:450] default default 10 wcsin=tv \
+        wcsout=tv psfrad=9.0 fitrad=3.0 plotfile=psf.plots2
+
+	... answer verify prompts
+
+        ... select candidate psf stars
+
+        ... the output will appear in ypix.pst.2 
+
+    da> display dev$ypix[150:450,150:450] 1
+
+        ... display the image
+
+    da> pdump ypix.pst.2 xc,yc yes | tvmark 1 STDIN col=204
+
+        ... mark the stars
+
+    da> gkiextract psf.plots2 4 | stdgraph
+
+	... make a surface plot of the 4th candidate psf star
+.fi
+
+
+3. Repeat example 1 but run pstselect in interactive mode and do not save the
+plots.
+
+.nf
+    da> display dev$ypix 1
+
+        ... display the image 
+
+    da> pstselect dev$ypix ypix.mag.1 default 10 psfrad=9. fitrad=3. \
+        interactive+ mkstars+ display=imdr
+
+	... verify the critical parameters as instructed
+
+	... when the image cursor appears type the n keystroke
+	    command to select the first suitable candidate psf
+	    star, examine its surface plot, and type a or d to
+	    accept or reject the candidate
+
+	... repeat the previous command until 10 psf stars have
+    	    been selected, the end of the star list is reached,
+	    or a sufficient number of stars but fewer than maxnpsf
+	    have been selected
+
+	... if fewer than maxnpsf stars are found automatically
+	    add psf stars to the list with the a keystroke command
+
+	... type q to quit
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,phot,psf
+.endhelp

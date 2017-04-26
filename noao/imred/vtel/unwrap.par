@@ -1,0 +1,9 @@
+image,s,a,,,,image
+outimage,s,a,,,,outimage
+threshold1,i,h,128,,,threshold for first unwrap
+wrapval1,i,h,256,,,wrap displacement for first unwrap
+threshold2,i,h,128,,,threshold for second unwrap
+wrapval2,i,h,256,,,wrap displacement for second unwrap
+cstart,i,h,2,,,column start
+step,i,h,5,,,number of steps to take
+verbose,b,h,yes,,,verbose flag

@@ -1,0 +1,148 @@
+.help aimfind Mar00 astcat
+.ih
+NAME
+aimfind -- Select images containing catalog data and predict pixel coordinates
+for the catalog objects
+.ih
+USAGE
+aimfind images output imfile
+.ih
+PARAMETERS
+.ls images
+The input image list. The input images must contain a valid fits world
+coordinate system which is used to determine the catalog extraction region.
+.le
+.ls output 
+The list of output astrometry file names.  The number of output file names
+must be equal to the number of input images. Output files are only created
+if at least one catalog object is in the image. By default the output files
+are assigned names of the form "image.cat.#", e.g. "image.cat.1". 
+.le
+.ls imfile
+The list of images containing catalog data.
+.le
+.ls catalogs = ")_.catalogs"
+The input astrometry catalog. By default the catalog name is set to the
+value of the package parameter catalogs. 
+.le
+.ls standard = yes
+Output a standard astrometry file ? If standard = yes then a header describing
+the format of the astrometry file is written to the output file. The
+astcat package
+tasks use this information to decode the file. If standard = no, no
+header is written and the user must instruct the astcat tasks how to decode the
+file.
+.le
+.ls filter = no
+Filter the results of the catalog query before writing the final results
+to the output astrometry file ?
+.le
+.ls afiltpars = ""
+The astrometry file filtering parameter set. These parameters permit the user
+to sort the output on a field or field expression, select or reject
+catalog records using a boolean expression, select or reject fields
+to output, add new fields that are expressions of existing fields to
+the output, and perform simple coordinate transformations.
+.le
+.ls append = no
+By default the predicted pixel coordinates are prepended to each selected
+output file record. If append = yes they are appended to each selected
+record instead.
+.le
+.ls update = no
+Update the default values of the algorithm parameters, e.g. aregpars and
+afiltpars, at task termination ?
+.le
+.ls verbose = yes
+Print status messages on the terminal as the task proceeds ?
+.le
+.ls catdb = ")_.catdb"
+The catalog configuration file. Catdb defaults to the value of the
+package parameter catdb. The default catalog configuration file is
+"astcat$lib/catdb.dat".
+.le
+
+.ih
+DESCRIPTION
+
+Aimfind selects those images from the input image list \fIimages\fR
+which contain one or more  catalog \fIcatalogs\fR objects and writes
+the resulting catalog records along with predicted pixel coordinates to
+\fIoutput\fR and the selected image name to \fIimfile\fR. The input images
+must contain a valid FITs wcs.
+
+For each input image aimfind determines the region of the sky covered 
+by the image, formats the appropriate catalog query, makes a local or remote
+connection to the catalog server using the catalog description in the
+catalog configuration file \fIcatdb\fR, and captures the results.
+Catalog names must be of the form catalog@site, e.g. lan92@noao.
+
+If \fIfilter\fR = yes, the captured results are filtered using the
+values of the parameters in the filtering parameter set \fIafiltpars\fR.
+The afilterpars parameters permit the user to sort the query results by setting
+the sort field parameter \fIfsort\fR, select or reject
+catalog records by setting the selection expression parameter \fIfexpr\fR,
+select or reject fields for output by setting the output field
+list parameter \fIfields\fR, and change the coordinate system, units,
+and format of the catalog coordinates by setting the \fIfosystem\fR,
+\fIforaunits\fR, \fIfodecunits\fR, \fIforaformat\fR, and \fIfodecformat\fR
+parameters. At present the names, data types, units, and format of the
+predicted pixel coordinates computed by aimfind are fixed at "xp,yp",
+"d,d", "pixels,pixels", and "%10.3f,%10.3f" respectively. A more detailed
+description of the region filtering parameters can be obtained by typing
+"help afiltpars".
+
+If \fIstandard\fR = yes a header is written to the output astrometry file which
+defines the contents and format of the output object list. The astcat
+tasks use this header to decode the input catalog files. If it is
+missing or has been modified by non-astcat tasks the user must use
+the \fIacatpars\fR parameters to define the astrometry file format. Most
+non-astcat tasks will interpret the astrometry file header as documentation
+and skip it.
+
+If \fIappend\fR = no then the values of the predicted pixel coordinates
+are prepended to each selected catalog record. If append = tes they
+are appended instead.
+
+If \fIupdate\fR = yes the values of the \fIaregpars\fR and \fIafilterpars\fR
+parameters will be updated at task termination. If \fIverbose\fR = yes
+then detailed status reports are issued as the task executes.
+
+.ih
+EXAMPLES
+
+1. Determine which images in the input image list contain Landolt standards.
+
+.nf
+cl> aimfind *.imh "" imlist catalogs=lan92@noao
+cl> page imlist
+.fi
+
+2. Repeat the previous example but write an output astrometry file for
+each selected image.
+
+.nf
+cl> aimfind *.imh default imlist catalogs=lan92@noao
+.fi
+
+3. Repeat example 2 but sort the output on a field called v.
+
+.nf
+cl> aimfind *.imh default filter+ fsort="v"
+.fi
+
+4. Repeat example 2 but transform the catalog coordinates to the B1950
+system.
+
+.nf
+cl> aimfind *.imh default filter+ fosystem="B1950"
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+aclist, adumpcat, agetcat, afiltpars
+.endhelp

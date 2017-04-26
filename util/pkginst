@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+#  PKGINST - Install the named package.
+
+if (( $#<1 )); then
+    exit 0
+else
+    pkg=$1
+fi
+
+bindir="`dirname $0`"                # get iraf root directory 
+irafdir=${bindir%/*}
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+REPO=`${irafdir}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
+fi
+
+/bin/echo "Setting architecture: '$arch' .... "
+ 
+
+# Get any dependency package names.
+deps=`grep ^$pkg .repo_desc | awk '{printf("%s\n",$2)}' | sed -e 's/,/ /g'`
+pkg_dep=""
+for d in ${deps[@]}; do 
+   if [ "$d" != "none" ]; then
+      /bin/echo "Adding dependency '$d' ...."
+      pkg_dep="$pkg_dep $d"
+   fi
+done
+
+# Make a unique list of package, i.e. remove multiple instances of a package.
+#   [Note:  Not used, the manifest should have this already. ]
+list=`/bin/echo $pkg_dep $pkg|awk 'BEGIN {RS=" |\n";}{print $1;}'|sort|uniq`
+
+# Process the requested package and any dependencies.
+dep=("$pkg_dep" "$pkg")
+for ip in ${dep[@]}; do
+
+  pfile=`grep \ $ip\  .repo_manifest | grep ${arch}\  | head -1 | awk '{printf("%s\n",$4)}'`
+
+  /bin/echo $pfile | grep src.tar.gz  >> /dev/null 2>&1
+  if (( $?==0 )); then
+    src_only=1
+  else
+    src_only=0
+  fi
+
+  # Remove an existing package file.
+  if [ -e $pfile ]; then
+    /bin/rm -f $pfile
+  fi
+
+  # Download the repo file and unpack it.
+  /bin/echo -n "Installing package '$ip' .... "
+  ${irafdir}/util/pkgget ${REPO}/$pfile
+  if (( $?>0 )); then
+    /bin/echo    " [Error]"
+    exit $?
+  fi
+
+  if [ -e $pfile ]; then
+
+    tar zxf $pfile
+    /bin/rm -f $pfile
+    /bin/echo `date +%s`"  " ${ip}.${arch} > $ip/.installed.${arch}
+    /bin/echo `date +%s`"  " $ip > $ip/.installed	
+
+    if (( $src_only>0 )); then
+      /bin/echo    " [SOURCE ONLY]"
+      /bin/echo `date +%s`"  " $ip > $ip/.src_only
+    else
+      /bin/echo    " [OK]"
+    fi
+  else
+    /bin/echo    " [Error]"
+  fi
+
+  ${irafdir}/util/pkgenv -init
+
+done
+
+exit 0

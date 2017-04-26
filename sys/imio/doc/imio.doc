@@ -1,0 +1,232 @@
+				IRAF IMIO OVERVIEW
+				    7 May 1986
+
+
+
+1. DATA MANAGEMENT ROUTINES
+
+include <imhdr.h>
+
+	       im = immap (image, mode, oim)
+		  imunmap (im)
+
+		 imdelete (image)
+		 imrename (oldname, newname)
+
+where
+	struct	imhdr *im, *oim;	image header/descriptor
+	char	image[];		image name or image section
+	int	mode;			ro, wo, rw, new_image, new_copy
+
+important header parameters:
+
+	im->im_naxis			number of axes
+	im->im_axlen[i]			axis lengths
+	im->im_pixtype			pixel datatype
+	im->im_datamin			min pixel value
+	im->im_datamax			max pixel value
+	im->im_title			title string
+
+
+Existing images are normally opened either read only or read write.
+New images are opened either new_image or new_copy.  In the latter case,
+the third argument is a pointer to the image descriptor of an existing
+image, with the new image inheriting the non-data attributes of the
+existing image header.  This latter feature is important for data
+independence.
+
+The IMIO interface supports images of up to naxis=7.  In a sense, all images
+are multidimensional, with the higher, unused axis lengths set to 1.
+An N dimensional image may therefore be accessed by a program coded to
+operate upon an M dimensional image.
+
+The image section facility greatly inceases the flexibility of the IMIO
+interface.  Image sections are specified as part of the image name input
+to IMOPEN, and are not visible to the applications program, which sees
+a somewhat smaller image, or an image of lesser dimensionality.  Some examples
+are shown below.
+
+
+	section				refers to
+
+	pix[]			whole image
+	pix[i,j]		the pixel value (scalar) at [i,j]
+	pix[*,*]		whole image, two dimensions
+	pix[*,-*]		flip y-axis
+	pix[*,*,b]		band B of three dimensional image
+	pix[*,*:s]		subsample in y by S
+	pix[*,l]		line L of image
+	pix[c,*]		column C of image
+	pix[i1:i2,j1:j2]	subraster of image
+	pix[i1:i2:sx,j1:j2:sy]	subraster with subsampling
+
+
+Sections are implemented by defining a linear transformation upon the
+pixel coordinates input when image i/o takes place.  All image data
+transfers can be represented as subrasters defined by corner points
+pointed to by the vectors VS and VE, each of length NAXIS.  If an image
+section is specified, the IMIO i/o routines merely transform these
+vectors into PVS and PVE, the physical coordinates of the referenced
+subraster, before doing any i/o.
+
+
+2. IMIO OPTIONS
+
+    IMIO options may be set and queried with the IMSET and IMSTAT procedures,
+shown below.
+
+		imseti (im, option, int_value)
+		imsetr (im, option, real_value)
+
+	 int = imstati (im, option)
+	real = imstatr (im, option)
+
+The options currently supported are shown below (from <imset.h>).
+
+
+# IMSET.H -- Definitions for IMIO user settable options
+
+define	IM_ADVICE		1	# RANDOM or SEQUENTIAL
+define	IM_NBUFS		2	# number of input buffers
+define	IM_COMPRESS		3	# align lines on device blocks?
+define	IM_NBNDRYPIX		4	# width of boundary region
+define	IM_TYBNDRY		5	# type of boundary extension
+define	IM_FLAGBADPIX		6	# set bad pix to INDEF
+define	IM_PIXFD		7	# pixfile fd (special devices)
+define	IM_WHEADER		8	# update image header at unmap time
+define	IM_BNDRYPIXVAL		9	# for option IM_CONSTANT
+
+
+# Types of Boundary Extension
+
+define	BT_CONSTANT		1	# return constant if out of bounds
+define	BT_NEAREST		2	# return nearest boundary pixel
+define	BT_REFLECT		3	# reflect back into image
+define	BT_WRAP			4	# wrap around to other side
+define	BT_PROJECT		5	# project about boundary
+
+
+The most useful options are the multiple input buffers and boundary extension,
+used to implement filtering operators.
+
+
+3. IMIO I/O ROUTINES
+
+    There are two basic approaches used in image interfaces: images may be
+mapped into virtual memory, or accessed via conventional file i/o.  IMIO
+provides both but emphasizes the latter, since it is more portable, more
+efficient for sequential image operations, and because it provides data
+independence.  All buffering is handled internally by the interface to
+simplify the interface (externally), and to provide the control necessary
+for sophisticated features and optimizations.
+
+IMIO currently provides three classes of i/o routines: [1] get/put line
+random, [2] get/put line sequential, and [3] get/put subraster random.
+
+
+3.1 Get/Put Line Random (for images of known dimension)
+
+	ptr = im[gp]l[123][usilrdx] (im, line [, band [, ...]])
+e.g.,
+	(short *) = imgl1s (im)			# get line from 1d short image
+	(short *) = imgl2s (im, lineno)		# get line from 2d short image
+	(real *)  = imgl2r (im, lineno)		# get line from 2d real image
+	(short *) = impl2s (im, lineno)		# put line to 2d short image
+	(real *)  = imgl3r (im, line, band)	# get from 3d image
+
+
+3.2 Get/Put Line Sequential (for images of any dimension)
+
+	int = im[gp]nl[usilrdx] (im, ptr, v)
+e.g.,
+	(EOF?) = imgnlr (im, ptr, v)		# get next line, real
+	(EOF?) = impnls (im, ptr, v)		# put next line, short
+
+Here, STAT is either EOF or not EOF, with EOF being returned when the last
+line of the image has been read.  The output argument PTR is set to point
+to the buffer containing the input pixels, or the buffer into which the
+output pixels are to be written.  The vector V, of length IM_MAXDIM, points
+to the next line of the image to be read.  It is set initially to [1,1,1,...]
+by the user (assuming the entire image is to be accessed), and is automatically
+updated by IMIO in each call.
+
+
+3.3 Get/Put Subraster Random
+
+	ptr = im[gp]s[123][usilrdx]
+e.g.,
+	(short *) = imgs2s (im, x1,x2, y1,y2)	# get 2d subraster, short
+	(real *)  = imps1r (im, x1,x2)		# put 1d subraster, real
+
+These routines (and indeed all the i/o routines) can be used for either
+sequential or random accesses.  The subraster routines must be used to
+reference outside the boundary in X.
+
+
+3.4 Other I/O Routines
+
+    Other, lower level routines are provided for unusual applications for which
+the above routines are not suited.
+
+	ptr = im[pg]gs[usilrdx] (im, vs, ve, ndim)
+
+The above puts/gets a general section of any dimension.  The vectors VS and VE
+define the starting and ending corners of the subraster to be accessed.
+An IMFLUSH routine is provided for flushing the output buffer (remember the
+delayed write).
+
+
+In all cases, no buffers are allocated until i/o takes place, allowing IMSET
+calls to set options after the image has been opened.  In the case of a new
+image (or new copy image), the pixel file is not allocated until i/o takes
+place, giving the user time to set the number of axes, size of each axis,
+pixel type, etc. after the image has been opened.
+
+
+4. STORAGE FORMATS
+
+    IMIO stores images on disk in line storage mode, like a multidimensional
+Fortran array.  Image lines are normally padded out to an integral number
+of disk blocks to increase i/o efficiency.  We store the header information
+separately from the pixels, since the header is variable length.  The pixel
+storage file is preallocated and fixed in size.  We call this a "static file".
+A special FIO driver is provided for static files to provide optimal i/o.
+Since the file is not dynamically extended at run time and the physical
+blocks allocated for the file do not move about, it is possible to bypass
+the host files system to directly access the data with a low level interface.
+
+
+5. EXAMPLE (SPP)
+
+
+# IMCOPY -- Copy an image.  The header information is preserved.  The output
+# image has the same size, dimensionality, and pixel type as the input image.
+# An image section may however be used to copy a subsection of the input image.
+
+procedure imcopy (in_image, out_image)
+
+char	in_image[ARB]
+char	out_image[ARB]
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	in, out, l1, l2
+pointer	immap(), imgnlr(), impnlr()
+
+begin
+	# Open/create the images.
+	in  = immap (in_image, READ_ONLY, 0)
+	out = immap (out_image, NEW_COPY, im_a)
+
+	# Initialize position vectors to line 1, column 1, band 1, ...
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+	npix = IM_LEN(in,1)
+
+	# Copy the image.
+	while (imgnlr (in, l1, v1) != EOF && impnlr (out, l2, v2) != EOF)
+	    call amovr (Memr[l1], Memr[l2], npix)
+	
+	call imunmap (in)
+	call imunmap (out)
+end

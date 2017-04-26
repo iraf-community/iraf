@@ -1,0 +1,7 @@
+# POWERCOR parameter file
+
+input,s,a,,,,Input image root file name
+records,s,a,,,,Range of spectral records
+output,s,a,,,,Output file root name for new spectra
+start_rec,i,a,1,0,9999,Next starting spectral record
+power,r,h,)_.power,,,Power law coefficient

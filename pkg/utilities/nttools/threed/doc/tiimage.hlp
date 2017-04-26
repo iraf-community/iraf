@@ -1,0 +1,108 @@
+.help tiimage Jan97 tables
+.ih
+NAME
+tiimage -- Inserts images into rows of a 3-D table.
+.ih
+USAGE
+tiimage input outtable
+.ih
+DESCRIPTION
+This task performs the inverse operation of task tximage: it inserts one or 
+more images into rows of a 3-D table  The input may be a filename template, 
+including wildcard characters, or the name of a file (preceded by an @ sign) 
+containing image names.  The output is a single 3-D table name.
+Each image in the input list is inserted as an array into a single cell at 
+the specified row in the output table. Any dimensionality information existent
+in the input image is lost in the process, that is, the image will be always
+inserted as a 1-D array, regardless of its number of axis.
+
+If the output table exists, insertion will be done in place. Alternatively, 
+the task can create a 3-D table from information taken either from a template 
+3-D table, or, if this table is not supplied, from the input images themselves. 
+This task supports a column selector in table names. This selector may be 
+used to select a single column in the table. If no selector is used, all 
+columns will be processed. Type 'help selectors' to see a description of 
+the selector syntax. 
+
+If the output table exists, insertion may take place in two ways. If the
+output table name contains a column selector that selects a single column
+in the table, all input images will be inserted in that column, starting
+at the row pointed by task parameter "row". 
+If "row" is negative or INDEF the task will look for the ORIG_ROW
+keyword in the image header and use that keyword value for row number.
+The second mode of insertion in an existing table is used if no matching
+column selector is found in the output table name. In this case the task
+will look for the columnar information written in the input image header by 
+task tximage, and use that information to place the image in the proper 
+column. If no columnar information exists in the header, or if the column 
+name in there does not match any column in the output table, the image is 
+skipped and the user warned. The "row" parameter processing works the same 
+way in this second mode.
+
+If the output table does not exist, the task will look for a template table
+where to take column information from. If the template exists, the insertion
+operation will be performed in an analogous way as above. Notice that the
+result may be a single-column table if the template has a valid (matching)
+column selector in its name, or a sparse table if not, because only the 
+actual input images will be stored in an otherwise empty table (the template 
+data is not copied into the output, only the column descriptors).
+
+If the template is missing, the task will attempt to retrieve columnar
+information from the input image headers and build the output table with
+enough columns and rows to fit all images in the list. Only images that
+have columnar information in their headers can be processed, though. If
+no images are found with the proper header keywords, no output takes place.
+
+NOTE: Both the output and template table names must always be supplied 
+complete, including their extension. Otherwise the task may get confused 
+on the existence of an already existing table.
+
+The column matching criterion is based on the column name. An error results 
+when data types in input image and output column do not agree.
+
+If the maximum array size in a target column in the output 3-D table is
+larger than the number of pixels in the input image, the array will be filled 
+up starting from its first element, and the empty elements at the end will 
+be set to INDEF. If the maximum array size is smaller than the number of 
+pixels, insertion begins by the first pixel up to the maximum allowable size, 
+the remaining pixels being ignored.
+.ih
+PARAMETERS
+.ls input [image name list/template]
+A list of one or more images to be inserted.
+.le
+.ls outtable [table name]
+Name of 3-D output table, including extension. No support exists for 
+"STDOUT" (ASCII output).
+.le
+.ls (template = "") [table name]
+Name of 3-D table to be used as template when creating a new output table.
+.le
+.ls (row = INDEF) [int]
+Row where insertion begins. If set to INDEF or a negative value, the row
+number will be looked for in the input image header.
+.le
+.ls (verbose = yes) [boolean]
+Display names as files are processed ?
+.le
+.ih
+EXAMPLES
+Insert images into a 3-D table at column named FLUX:
+
+.nf
+cl> tiimage flux*.hhh "otable.tab[c:FLUX]"
+.fi
+.ih
+BUGS
+The output and template table names must be supplied in full, including 
+the extension (e.g. ".tab"). If the output table name is not typed in full, 
+the task will create a new table in place of the existing one, with only 
+the rows actually inserted. This behavior relates to the way the underlying 
+"access" routine in IRAF's fio library works.
+.ih
+REFERENCES
+This task was written by I. Busko.
+.ih
+SEE ALSO
+tximage, selectors
+.endhelp

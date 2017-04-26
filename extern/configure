@@ -1,0 +1,142 @@
+#!/bin/bash
+#
+#  CONFIGURE -- Bootstrap the dynamic external package system by downloading
+#  the repository manifest and creating a workable Makefile to be used for
+#  install packages and updates.  This script only needs to be run once
+#  after the system is installed, thereafter the 'make' commands are used.
+#  See the README file for details.
+
+
+clean=1
+irafdir=`pwd`/../util
+
+
+# Process cmdline flags.
+while [ -n "$1" ]; do
+   case "$1" in
+   "-noclean")                      # clean all package sources
+      set clean = 0
+      ;;
+   *)
+      break
+      ;;
+   esac
+
+   shift
+done
+
+
+
+/bin/echo "Initializing repository data ...."
+$irafdir/pkginit				# init repository information
+
+
+# Create the template Makefile.
+/bin/echo "Creating system makefile ...."
+cat << MAKE_TEMP_END		> Makefile
+#
+#  Makefile for IRAF external package installation/maintenance.
+#
+# ---------------------------------------------------------------------------
+
+# Compiler Flags.
+
+RELEASE		= v2.16
+        
+all:: update
+
+# Update recent changes from the repository.
+update::
+	@./configure -noclean
+	@../util/pkgupdate -all
+
+# Install all available packages for this platform.
+install_all::
+	@../util/pkgall
+
+# List packages available on the repository.
+list::
+	@cat .repo_pkgs
+
+# Clean the IRAF tree of binaries for the currently configured arch.
+init::
+	@../util/pkgclean -init
+
+# Remove all package code but leave the structure in place.
+clean::
+	@../util/pkgclean -all
+
+# Restore the dynamic package directory to its distribution state.
+distclean::
+	@../util/pkgclean -init
+
+# Check to see which installed packages could be updated.
+check::
+	@../util/pkgupdate -list
+
+# Update recent changes from the repository.
+self_update::
+	@../util/pkgupdate -self
+	@./configure -noclean
+
+# Update recent changes from the repository.
+config_update::
+	@../util/pkgupdate -config
+
+
+MAKE_TEMP_END
+
+echo "Setup Complete."
+
+
+
+# For each package we have, append a makefile entry.
+files=`cat .repo_pkgs`
+for p in ${files[@]}; do
+
+   # Create template makefile entries for each package
+   /bin/echo "${p}::"						>> Makefile
+   /bin/echo "	@../util/pkginst $p"				>> Makefile
+   /bin/echo "clean_${p}::"					>> Makefile
+   /bin/echo "	@../util/pkgclean $p"				>> Makefile
+   /bin/echo "update_${p}::"					>> Makefile
+   /bin/echo "	@../util/pkgupdate $p"				>> Makefile
+   /bin/echo ""							>> Makefile
+
+   # Create the directory
+   if [ -e "$p" ]; then
+	if (( $clean==1 )); then
+	    /bin/rm -rf $p
+	fi
+   else
+       mkdir $p
+   fi
+done
+
+if (( $clean==0 )); then
+    exit 0
+fi
+
+
+/bin/echo ""
+/bin/echo ""
+/bin/echo "    To install packages, use 'ls' to list the currently available"
+/bin/echo "    packages from the IRAF repository.  For each package you wish"
+/bin/echo "    to install, use the command:"
+/bin/echo ""
+/bin/echo "      make <pkg>"
+/bin/echo ""
+/bin/echo "    The package will be loaded dynamically the next time you start"
+/bin/echo "    the CL session."
+/bin/echo ""
+/bin/echo "    Use the commmands:"
+/bin/echo ""
+/bin/echo "      make update	# to update pkgs to the latest repository version"
+/bin/echo "      make check	# to list available updates"
+/bin/echo "      make clean	# to delete installed all packages"
+/bin/echo "      make init    	# restore to pre-configure state"
+/bin/echo "      make <pkg>	# to force a re-install of named <pkg>"
+/bin/echo ""
+/bin/echo ""
+
+exit 0

@@ -1,0 +1,151 @@
+.help bscale Aug91 proto
+.ih
+NAME
+bscale -- linearly transform the intensity scales of a list of images
+.ih
+USAGE	
+bscale input output 
+.ih
+PARAMETERS
+.ls input 
+List of images to be transformed.
+.le
+.ls output
+List of output transformed images. If the output list is the same as the input
+list the input images are overwritten.
+.le
+.ls bzero = "0."
+The zero point to be subtracted before applying the scale factor.
+The options are a numerical value, "mean", "median", or "mode".
+.le
+.ls bscale = "1."
+The scale factor to be applied.  The options are a numerical value,
+"mean", "median", or "mode".
+.le
+.ls section = ""
+The image section to be used for computing the image statistics.  If section
+is "", \fIstep\fR is used to define the default image section. \fISection\fR
+is used to confine the computation of the mean, median, and mode
+to a specific region of the image.
+.le
+.ls step = 10
+The step size in pixels which defines the default image section to be used
+for computing the mean, median, and mode.
+In image section notation the default section is equivalent to [*:10,*:10,...].
+\fIStep\fR is used if
+the sampling along an axis is not defined by \fIsection\fR.
+Subsampling can significantly reduce the memory and 
+time required for the computation of the mean, median, and mode.
+.le
+.ls upper = "INDEF"
+Upper intensity limit to be used for computing the mean, median, and mode.
+.le 
+.ls lower = "INDEF"
+Lower intensity limit to be used for computing the mean, median, and mode.
+.le
+.ls verbose = yes
+Print messages about actions taken by the task?
+.le
+
+.ih
+DESCRIPTION
+
+The specified input images \fIinput\fR  are linearly transformed in intensity
+and written to the list of output images \fIoutput\fR, using the
+zero point specified by \fIbzero\fR and the scale factor specified by
+\fIbscale\fR.  If the output image list
+is the same as the input image list the input images will be overwritten.
+
+The expression defining the linear transformation is listed below.
+
+	NEW = (OLD - BZERO) / BSCALE
+
+OLD is the input pixel brightness, NEW is the output
+pixel brightness, BZERO is the zero point offset, and BSCALE is the
+scale factor.  The values of the scaling parameters \fIbzero\fR and
+\fIbscale\fR
+may be specified explicitly or the mean, median, or mode of the image
+may be used for either quantity.  If the input image pixel type
+is short, integer, or long, overflow or truncation may occur.
+
+When one of the scaling parameters is the image mean, median,
+or mode, then the image mean, median, and mode are calculated. The statistics
+computation can be restricted to a section of the input image by setting
+the parameter
+\fIsection\fR. Otherwise the parameter \fIstep\fR is used to
+define a default image section.
+Subsampling the image can significantly reduce the memory
+and time requirements for computing the statistics of large images.
+If numerical values for both the scaling parameters are specified, then
+the image statistics are not computed. The statistics computation can
+be limited to given intensity range by setting the parameters
+\fIlower\fR and \fIupper\fR.
+
+The mean, median, and mode are computed using the following algorithm.
+Note that this algorithm requires that all the data to used for computing
+the statistics must be in memory.
+
+.nf
+1. The data in the specified image section is read into a buffer.
+2. The data is sorted in increasing order of intensity.
+3. The points outside upper and lower are excluded.
+4. The median is set to the data value at the midpoint of the remaining
+   data.
+5. The mean and sigma of the remaining data are computed.
+6. The histogram bin width (.1*sigma)  and separation (.01*sigma) are
+   computed.
+7. The location of the bin containing the most data points is determined.
+8. The median of the data values in that bin is used to estimate the mode.
+.fi
+
+.ih
+EXAMPLES
+
+1. Use the mode to subtract a constant background from a list of images.
+Overwrite the input images.
+
+.nf
+	cl> bscale *.imh *.imh bzero=mode
+.fi
+
+2. Scale a list of images to a unit mean. Overwrite the input images.
+
+.nf
+	cl> bscale *.imh *.imh bscale=mean
+.fi
+
+3. Scale a list of images to the intensity range 0 to 511,
+where 234. and 1243. are the original data range. Overwrite the input
+images. This example uses the CL to calculate bscale.
+
+.nf
+	cl> bscale.bzero = 234.
+	cl> bscale.bscale = (1243. - 234.) / 512.
+	cl> bscale *.imh *.imh
+.fi
+
+4. Scale an image using a user specified bzero and bscale and create a new
+output image: 
+
+.nf
+        cl> bscale imagein imageout bzero=0.0 bscale=1.10 
+.fi
+
+5. Median subtract a list of input images using the percent replace facility to
+create the output image names.
+
+.nf
+        cl> bscale images*.imh %i%outi%*.imh bzero=median bscale=1.0
+.fi
+
+6. Repeat the previous example but use the @ file facility for specifying
+the input and output image lists.
+
+.nf
+        cl> bscale @infile @outfile bzero=median bscale=1.0
+.fi
+
+.ih
+SEE ALSO
+imarith,imcombine
+.endhelp

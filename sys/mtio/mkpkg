@@ -1,0 +1,48 @@
+# Make the MTIO routines.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+zzdebug:
+	$checkout libsys.a lib$
+	$update   libsys.a
+	$checkin  libsys.a lib$
+
+	#$set	XFLAGS = "$(XFLAGS) -qx"
+	$omake	zzdebug.x
+	$link	-z zzdebug.o
+	;
+
+libsys.a:
+	#$set	XFLAGS = "$(XFLAGS) -qx"
+
+	mtalloc.x	mtio.h <time.h>
+	mtcache.x	mtcache.com mtio.com mtio.h <config.h> <error.h>
+	mtcap.x	mtio.h
+	mtclean.x	mtio.h <finfo.h> <xalloc.h>
+	mtdealloc.x	<error.h>
+	mtdevall.x	<knet.h> <xalloc.h>
+	mtencode.x	
+	mtfile.x	
+	mtfname.x	mtio.h
+	mtglock.x	mtio.h
+	mtgtyopen.x	mtio.h
+	mtlocknam.x	mtio.h <chars.h> <ctype.h>
+	mtneedf.x	mtio.h
+	mtopen.x	mtio.com mtio.h <config.h> <fset.h> <knet.h> <mach.h>
+	mtparse.x	mtio.h <config.h> <ctype.h>
+	mtpos.x	mtio.h
+	mtrdlock.x	mtio.com mtio.h <config.h>
+	mtrewind.x	mtio.h <error.h>
+	mtskip.x	<fset.h>
+	mtstatus.x	
+	mtupdlock.x	mtio.com mtio.h <config.h> <knet.h> <mach.h>
+	zardmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zawrmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zawtmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zclsmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zopnmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zsttmt.x	mtio.com mtio.h <config.h> <fio.h> <knet.h> <mach.h>
+	;

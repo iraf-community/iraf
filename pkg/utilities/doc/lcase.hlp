@@ -1,0 +1,32 @@
+.help lcase Jan85 utilities
+.ih
+NAME
+lcase -- convert text files to lower case
+.ih
+USAGE
+lcase files
+.ih
+PARAMETERS
+.ls files
+The list of text files to be converted to lower case. If more than one
+text file is specified as input the suffix .lc is appended to the input
+file name to create the output file name.
+.le
+.ih
+DESCRIPTION
+LCASE takes input from a list of text files or the standard input, converts
+the text to lower case and prints the result on the standard output.
+If multiple files are specified as input, the suffix .lc is appended to
+the input file name to create the output file name.
+.ih
+EXAMPLES
+1. Convert a list of files to lower case
+
+.nf
+	cl> lcase *.x
+.fi
+
+.ih
+SEE ALSO
+ucase
+.endhelp

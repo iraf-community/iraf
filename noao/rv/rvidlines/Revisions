@@ -1,0 +1,52 @@
+idinit.x
+reidentify.x
+    Changed aclrr to aclri and updated the 'b' key in reidentify.x.
+    (12/1/93, Valdes)
+
+idlog.x
+    Added the spectrum title and heliocentric Julian date to the log output.
+    (11/17/93, Valdes)
+
+iddblend.x	+
+    Needed copy of ONEDSPEC deblend with names changes to protect the
+    innocent and avoid conflict with the version in RV.  (8/25/93, Valdes)
+
+t_identify.x
+t_reidentify.x
+idcenter.x
+idcolon.x
+iddb.x
+iddofit.x
+iddoshift.x
+idgdata.x
+idgraph.x
+ididentify.x
+idinit.x
+idlinelist.x
+idlog.x
+idmark.x
+idrms.x
+idshift.x
+idshow.x
+idvelocity.x +
+idvhelio.x
+peaks.gx
+reidentify.x
+mkpkg
+identify.h
+identify.par
+reidentify.par
+rvidlines.par	+
+rvreidlines.par	+
+identify.key
+rvidlines.key	+
+doc/rvidlines.hlp	+
+doc/rvreidlines.hlp	+
+    1.  A new cursor key was added for marking and deblending features.
+    2.  Two new feature types (ftype) were added:
+	    gabsorption  Absorption features fit by gaussian
+	    gemission    Emission features fit by gaussian
+    3.  The 'u' key was modified to allow setting a feature weight
+    4.  Two new tasks were added RVIDLINES and RVREIDLINES.  These
+	are implemented as special entry points and a task flag.
+    (8/23/93, Valdes)

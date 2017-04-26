@@ -1,0 +1,45 @@
+# Mkpkg file for the CDL Image Display Library
+#
+
+$call update
+$exit
+
+update:
+        $ifeq (MACH, alpha) then
+        $set XFLAGS = "$(XFLAGS) -DOSF1"
+        $else $ifeq (MACH, dsux, dmip) then
+        $set XFLAGS = "$(XFLAGS) -DULTRIX"
+        $else $ifeq (MACH, hp700, rs6000) then
+        $set XFLAGS = "$(XFLAGS) -D_NO_US_"
+        $endif
+        $endif
+        $endif
+
+        $set XFLAGS = "$(XFLAGS) -Inolibc"
+
+        # Uncomment the following if you want to compile the library
+        # using ANSI C function prototypes.  NOTE:  If the library is
+        # compiled with prototypes then *all* client applications must
+        # also be compiled with prototypes.
+
+        #$set XFLAGS = "$(XFLAGS) -DCDL_ANSIC"
+
+        #$checkout libcdl.a ../
+        $update   libcdl.a
+        #$checkin  libcdl.a ../
+        ;
+
+
+libcdl.a:
+        cdl.c           cdl.h cdlP.h
+        cdlmark.c       cdl.h cdlP.h cdlfont.h
+        cdl_f77.c       cdl.h cdlP.h cdl_f77.h
+        cdl_spp.c       cdl.h cdlP.h cdl_f77.h
+        cdlfits.c       cdl.h cdlP.h
+        cdliraf.c       cdl.h cdlP.h
+        cdlzscale.c     cdl.h cdlP.h
+        comm.c          cdl.h cdlP.h
+        imd.c           cdl.h cdlP.h
+        eps.c           cdl.h cdlP.h eps.h
+        ;
+

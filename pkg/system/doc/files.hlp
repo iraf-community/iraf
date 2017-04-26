@@ -1,0 +1,72 @@
+.help files Jun86 system
+.ih
+NAME
+files -- expand a file name template into a list of files
+.ih
+USAGE
+files template
+.ih
+PARAMETERS
+.ls template
+A file name template specifying the set of files to be listed.
+.le
+.ls sort = "yes"
+Sort the file list.
+.le
+.ih
+DESCRIPTION
+\fIFiles\fR lists all files matching the given template.  The existence of
+the listed files is checked only if pattern matching is used, hence \fIfiles\fR
+may also be used to parse a comma delimited list of strings which are not
+necessarily filenames.  \fIFiles\fR performs the same function as "dir l+"
+but is simpler and more convenient to use when generating file lists.
+
+The \fIfiles\fR task and all other tasks which operate upon groups of files
+use the \fBfile template\fR facility to specify the set of files to be
+operated upon.  This should not be confused with the \fBimage template\fR
+facility, used by tasks which operate upon sets of images and which is
+documented in the manual page for the \fIsections\fR task.
+
+Pattern matching in a file template is provided by the usual pattern matching
+meta-characters "*?[]", documented in the CL User's Guide.  Pattern matching 
+is used to select files from one or more directories.  In addition, the
+filename template notation provides two operators for generating new filenames
+from the matched filenames.  These are the \fBconcatenation\fR operator "//",
+and the \fBstring substitution\fR operator "%chars%newchars%".
+The concatenation operator concatenates either a prefix to a filename,
+or a suffix to the root of a filename.  The string substitution operator
+uses the "chars" to match filenames, and then replaces the "chars" by the
+"newchars" to generate the final output filename.  Either string may be null
+length to insert into or delete characters from a filename.
+.ih
+EXAMPLES
+
+1. Generate a single column list of files in the current directory,
+sorted in ASCII collating sequence.
+
+	cl> files
+
+2. Generate an unsorted single column list of files in logical directory
+"lib$".  Each entry in the output list is of the form "lib$...".
+
+	cl> files lib$ sort-
+
+3. Generate a file list to be used to make a set of new files.  The new file
+names will be the old file names with "_1" concatenated to the root, e.g.,
+"root.x" would map to "root_1.x" and so on.
+
+	cl> files root.*//_1
+
+4. Generate a file list similar to that in [3], adding a directory prefix
+to each filename.
+
+	cl> files dir$//root.*
+
+5. Use string substitution to change the filename extension of a set of files
+to ".y".
+
+	cl> files root.%*%y%
+.ih
+SEE ALSO
+directory, pathnames, images.sections
+.endhelp

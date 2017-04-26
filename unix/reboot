@@ -1,0 +1,26 @@
+#!/bin/sh
+# REBOOT -- Bootstrap IRAF.  The HSI system may be booted either of two ways,
+# VOS or NOVOS.  Booting VOS gives the HSI utility programs the ability to
+# deal with VOS filename mapping, but requires the VOS system libraries libsys
+# and libos.  A NOVOS HSI is standalone.  The procedure to build IRAF from
+# only the sources is to boot NOVOS, compile the VOS system libraries with
+# mkpkg, and then rebuild the HSI VOS.
+#
+# External dependencies: "iraf" should be defined in the user's environment
+# before running this script.  This is normally done by sourcing the iraf/local
+# .login file (which is automatic if the reboot is performed using the iraf
+# account).
+
+source hlib/irafuser.sh
+
+/bin/echo "iraf     = $iraf"
+/bin/echo "mach     = $MACH"
+/bin/echo "HSI_CF   = $HSI_CF"
+/bin/echo "HSI_LIBS = $HSI_LIBS"
+
+if [ "`echo $HSI_CF | grep NOVOS`" != "" ]; then
+    echo "HSI is being built NOVOS, should be rebuilt once VOS is compiled"
+fi
+
+/bin/echo "---------------------- REBOOT -----------------------"
+sh -x mkpkg.sh

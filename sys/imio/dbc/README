@@ -1,0 +1,29 @@
+October 4, 2004
+
+These routines represent an extension to the imio header routines manipulation.
+Most of them have a new parameter which is the FITS header comment field. 
+The routine names have changed slighly to avoid collision and to have some 
+meaning; e.g. the ending 'c' for comment.
+
+There are a couple of new routines to handle only comments.
+
+Nelson Zarate
+
+
+imakbc.x:# IMAKBC -- Add a new field to the image header and initialize to the value
+imakdc.x:# IMAKDC -- Add a new field to the image header and initialize to the value
+imakic.x:# IMAKIC -- Add a new field to the image header and initialize to the value
+imaklc.x:# IMAKLC -- Add a new field to the image header and initialize to the value
+imakrc.x:# IMAKRC -- Add a new field to the image header and initialize to the value
+imaksc.x:# IMAKSC -- Add a new field to the image header and initialize to the value
+imastrc.x:# IMASTRC -- Add a new field to the image header and initialize to the value
+imgcom.x:# IMGCOM -- Get the comment field for a keyword.
+impcom.x:# IMPCOM -- Change the comment field for a keyword.
+impkbc.x:# IMPKBC -- Put an image header parameter of type boolean.
+impkdc.x:# IMPKDDC -- Put an image header parameter of type double.
+impkic.x:# IMPKIC -- Put an image header parameter of type integer.
+impklc.x:# IMPKLC -- Put an image header parameter of type long integer.
+impkrc.x:# IMPKRC -- Put an image header parameter of type real.
+imdrmcom.x:# IMDRMCOM -- Remove the comment field for a keyword.
+impksc.x:# IMPKSC -- Put an image header parameter of type short integer.
+impstrc.x:# IMPSTRC -- Put an image header parameter of type string.  If the named

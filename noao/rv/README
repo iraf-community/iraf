@@ -1,0 +1,5 @@
+							9/30/91
+
+	This directory contains the source for the Radial Velocity
+analysis package.  Package PSET support code as well as the source
+for the cross-correlation task, FXCOR, are included.

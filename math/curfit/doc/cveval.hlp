@@ -1,0 +1,33 @@
+.help cveval Jun84 "Curfit Package"
+.ih
+NAME
+cveval -- evaluate the fitted function at a single x value
+.ih
+SYNOPSIS
+y = cveval (cv, x)
+
+.nf
+pointer	cv	# curve descriptor
+real	x	# x value
+.fi
+.ih
+ARGUMENTS
+.ls cv    
+Pointer to the curve descriptor structure.
+.le
+.ls x   
+X value at which the curve is to be evaluated.
+.le
+.ih
+DESCRIPTION
+Evaluate the curve at the specified value of x. CVEVAL is a real
+function which returns the fitted y value.
+.ih
+NOTES
+It uses the coefficient array stored in the curve descriptor structure.
+The x values are assumed to lie in the region xmin <= x <= xmax. Checking
+for out of bounds x values is the responsibility of the user.
+.ih
+SEE ALSO
+cvvector
+.endhelp

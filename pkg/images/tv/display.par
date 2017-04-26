@@ -1,0 +1,30 @@
+# Parameter file for DISPLAY
+
+image,f,a,,,,image to be displayed
+frame,i,a,1,1,4,frame to be written into
+bpmask,f,h,"BPM",,,bad pixel mask
+bpdisplay,s,h,"none","none|overlay|interpolate",,bad pixel display (none|overlay|interpolate)
+bpcolors,s,h,"red",,,bad pixel colors
+overlay,f,h,"",,,overlay mask
+ocolors,s,h,"green",,,overlay colors
+erase,b,h,yes,,,erase frame
+border_erase,b,h,no,,,erase unfilled area of window
+select_frame,b,h,yes,,,display frame being loaded
+repeat,b,h,no,,,repeat previous display parameters
+fill,b,h,no,,,scale image to fit display window
+zscale,b,h,yes,,,display range of greylevels near median
+contrast,r,h,0.25,,,contrast adjustment for zscale algorithm
+zrange,b,h,yes,,,display full image intensity range
+zmask,f,h,"",,,sample mask
+nsample,i,h,1000,100,,maximum number of sample pixels to use
+xcenter,r,h,0.5,0,1,display window horizontal center
+ycenter,r,h,0.5,0,1,display window vertical center
+xsize,r,h,1,0,1,display window horizontal size
+ysize,r,h,1,0,1,display window vertical size
+xmag,r,h,1.,,,display window horizontal magnification
+ymag,r,h,1.,,,display window vertical magnification
+order,i,h,0,0,1,"spatial interpolator order (0=replicate, 1=linear)"
+z1,r,h,,,,minimum greylevel to be displayed
+z2,r,h,,,,maximum greylevel to be displayed
+ztrans,s,h,linear,,,greylevel transformation (linear|log|none|user)
+lutfile,f,h,"",,,file containing user defined look up table

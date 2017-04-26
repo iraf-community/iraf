@@ -1,0 +1,16 @@
+infiles,s,a,,,,Input file
+outfiles,s,a,,,,Output file
+file_list,s,a,,,,Tape file list
+newtape,b,a,,,,Blank tape?
+outblock,i,h,INDEF,,,Size of output block in bytes
+inrecord,i,h,INDEF,,,Size of input records in bytes
+outrecord,i,h,INDEF,,,Size of output records in btyes
+pad_block,b,h,no,,,Pad last block?
+padchar,s,h,'0',,,Pad character
+skipn,i,h,0,,,Skip n blocks (tape) or records (disk)
+copyn,i,h,INDEF,,,Copy n blocks (tape) or records (disk)
+byteswap,b,h,no,,,Swap bytes?
+wordswap,b,h,no,,,Swap words?
+offset,i,h,0,,,Tape file number offset
+verbose,b,h,yes,,,Print messages?
+mode,s,h,"ql",,,

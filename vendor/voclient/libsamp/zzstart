@@ -1,0 +1,20 @@
+#!/bin/csh -f
+
+onintr shutdown
+source .alias
+
+echo "Rebuilding SAMP ...."
+(make |& egrep -i error);
+
+
+echo "Starting Hub ...."
+(xgterm -T Hub -fn 6x13 -geom 80x18+50+560 -e "java -jar jsamp/jsamp-1.2.jar hub") &
+sleep 3
+
+echo "Starting App1 ...."
+(xgterm -T App1 -fn 6x13 -geom 80x18+50+30 -e ./zztest -n a1) &
+
+echo "Starting App2 ...."
+(xgterm -T App2 -fn 6x13 -geom 80x18+50+300 -e ./zztest -n a2) &
+
+

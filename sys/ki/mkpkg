@@ -1,0 +1,107 @@
+# Update the KI kernel interface.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$omake	irafks.x\
+		ki.h kii.com <clset.h> <finfo.h> <fset.h> <knet.h> <mach.h>
+	$link	irafks.o
+	;
+
+install:
+	$move	irafks.e bin$
+	;
+
+libsys.a:
+	# Do not put irafks.x in this list.
+	kbzard.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kbzawr.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kbzawt.x	ki.h kichan.com <config.h>
+	kbzcls.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kbzopn.x	ki.h kii.com <mach.h>
+	kbzstt.x	ki.h kichan.com kii.com kinode.com <config.h>\
+			<fio.h> <mach.h>
+	kclcpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kcldir.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kcldpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kdvall.x	ki.h kii.com <mach.h>
+	kdvown.x	ki.h kii.com <mach.h>
+	kfacss.x	ki.h kii.com <mach.h>
+	kfaloc.x	ki.h kii.com <mach.h>
+	kfchdr.x	ki.h kii.com kinode.com <chars.h> <config.h> <mach.h>
+	kfdele.x	ki.h kii.com <mach.h>
+	kfgcwd.x	ki.h kii.com kinode.com <chars.h> <config.h> <mach.h>
+	kfinfo.x	ki.h kii.com <finfo.h> <mach.h>
+	kfiobf.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfiogd.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfiolp.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfiopl.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfiopr.x	ki.h kichan.com <config.h> <mach.h>
+	kfiosf.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfiotx.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kfioty.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kfmkcp.x	ki.h kii.com <mach.h>
+	kfmkdr.x	ki.h kii.com <mach.h>
+	kfpath.x	ki.h kinode.com <chars.h>
+	kfprot.x	ki.h kii.com <mach.h>
+	kfrnam.x	ki.h kii.com <mach.h>
+	kfrmdr.x	ki.h kii.com <mach.h>
+	kfsubd.x	ki.h
+	kfutim.x	ki.h kii.com <mach.h>
+	kfxdir.x	ki.h kinode.com <chars.h>
+	kgfdir.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kiconnect.x	ki.h kichan.com kii.com kinode.com <chars.h>\
+			<config.h> <mach.h>
+	kiencode.x	
+	kienvreset.x	ki.h kii.com kinode.com <config.h> <mach.h>
+	kierror.x	kinode.com ki.h <config.h>
+	kiextnode.x	ki.h kinode.com <chars.h>
+	kifchan.x	kichan.com kinode.com ki.h <config.h>
+	kifmapfn.x	ki.h kii.com <mach.h>
+	kifndnode.x	kinode.com ki.h
+	kigchan.x	kichan.com kinode.com ki.h <config.h>
+	kighost.x	ki.h kinode.com <ctype.h>
+	kignode.x	kinode.com <chars.h> <ctype.h> ki.h
+	kiinit.x	ki.h kichan.com kinode.com <config.h>
+	kilnode.x	kinode.com ki.h
+	kimapchan.x	ki.h kichan.com kinode.com <config.h> <knet.h> <mach.h>
+	kimapname.x
+	kintpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kiopenks.x	ki.h kii.com kinode.com <chars.h> <config.h> <mach.h>
+	kireceive.x	ki.h kii.com kinode.com <ctype.h> <mach.h>
+	kisend.x	ki.h kii.com <mach.h>
+	kisendrcv.x	
+	kishownet.x	ki.h kinode.com <config.h> <mach.h>
+	kixnode.x	
+	kopcpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kopdir.x	ki.h kichan.com kii.com <config.h> <diropen.h> <mach.h>
+	kopdpr.x	ki.h kii.com <mach.h>
+	koscmd.x	ki.h kii.com kinode.com <chars.h> <config.h>\
+			<ctype.h> <mach.h>
+	ksaread.x	ki.h kinode.com
+	ksawait.x	ki.h kinode.com
+	ksawrite.x	ki.h kinode.com
+	ktzcls.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzfls.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzget.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktznot.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzopn.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzput.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzsek.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	ktzstt.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kzclmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzopmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzrdmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzrwmt.x	ki.h kii.com <config.h> <fio.h> <mach.h>
+	kzstmt.x	ki.h kichan.com <config.h>
+	kzwrmt.x	ki.h kichan.com kii.com <config.h> <mach.h>
+	kzwtmt.x	ki.h kichan.com <config.h> <fio.h>
+	;

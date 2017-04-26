@@ -1,0 +1,4 @@
+1. Generalize the pr_eval procedures to any number of recursions, with a limit
+   to avoid infinite loops.
+
+2. Allow any number of plot equations.

@@ -1,0 +1,133 @@
+.help ccdlist Jun87 noao.imred.ccdred
+.ih
+NAME
+ccdlist -- List CCD processing information
+.ih
+USAGE
+ccdlist images
+.ih
+PARAMETERS
+.ls images
+CCD images to be listed.  A subset of the these may be selected using the
+CCD image type parameter.
+.le
+.ls ccdtype = ""
+CCD image type to be listed.  If no type is specified then all the images
+are listed.  If an image type is specified then only images
+of that type are listed.  See \fBccdtypes\fR for a list of the package
+image types.
+.le
+.ls names = no
+List the image names only?  Used with the CCD image type parameter to make
+a list of the images of the specified type.
+.le
+.ls long = no
+Long format listing?  The images are listed in a long format containing some
+image parameters and the processing history.
+.le
+.ls ccdproc (pset)
+CCD processing parameter set.
+.le
+.ih
+DESCRIPTION
+Information from the specified input images is listed on the standard
+output.  A specific CCD image type may be selected from the input
+images by the parameter \fIccdtype\fR.  There are three list formats;
+the default one line per image format, an image name only format, and a
+multi-line long format.  The default one line format consists of the
+image name, image size, image pixel type, CCD image type, subset ID (if
+defined), processing flags, and title.  This format contains the same
+information as that produced by \fBimheader\fR as well as CCD specific
+information.  The processing flags identifying the processing operations
+performed on the image are given by the following single letter codes.
+
+.nf
+	B - Bad pixel replacement
+	O - Overscan bias subtraction
+	T - Trimming
+	Z - Zero level subtraction
+	D - Dark count subtraction
+	F - Flat field calibration
+	I - Iillumination correction
+	Q - Fringe correction
+.fi
+
+The long format has the same first line as the default format plus additional
+instrument information such as the exposure time and the full processing
+history.  In addition to listing the completed processing, the operations
+not yet done (as specified by the \fBccdproc\fR parameters) are also
+listed.
+
+The image name only format is intended to be used to generate lists of
+images of the same CCD image type.  These lists may be used as "@" file
+lists in IRAF tasks.
+.ih
+EXAMPLES
+1. To list the default format for all images:
+
+.nf
+    cl> ccdlist *.imh
+    ccd001.imh[544,512][short][unknown][V]:FOCUS L98-193
+    ccd007.imh[544,512][short][object][V]:N2968 V 600s
+    ccd015.imh[544,512][short][object][B]:N3098 B 500s
+    ccd024.imh[544,512][short][object][R]:N4036 R 600s
+    ccd045.imh[544,512][short][flat][V]:dflat 6v+blue 5s
+    ccd066.imh[544,512][short][flat][B]:dflat 6v+blue 5s
+    ccd103.imh[544,512][short][flat][R]:dflat 6v+blue 5s
+    ccd104.imh[544,512][short][zero][]:bias
+    ccd105.imh[544,512][short][dark][]:dark 3600s
+.fi
+
+These images have not been processed.
+
+2. To restrict the listing to just the object images:
+
+.nf
+    cl> ccdlist *.imh ccdtype=object
+    ccd007.imh[544,512][short][object][V]:N2968 V 600s
+    ccd015.imh[544,512][short][object][B]:N3098 B 500s
+    ccd024.imh[544,512][short][object][R]:N4036 R 600s
+.fi
+
+3. The long list for image "ccd007" is obtained by:
+
+.nf
+    cl> ccdlist ccd007 l+
+    ccd007[544,512][short][object][V]:N2968 R 600s
+	exptime = 200. darktime = 200.
+        [TO BE DONE] Overscan strip is [520:540,*]
+        [TO BE DONE] Trim image section is [3:510,3:510]
+        [TO BE DONE] Flat field correction
+.fi
+
+4. After processing the images have the short listing:
+
+.nf
+    cl> ccdlist *.imh ccdtype=object
+    ccd007.imh[508,508][real][object][V][OTF]:N2968 V 600s
+    ccd015.imh[508,508][real][object][B][OTF]:N3098 B 500s
+    ccd024.imh[544,512][short][object][R][OTF]:N4036 R 600s
+.fi
+
+The processing indicated is overscan subtraction, trimming, and flat fielding.
+
+5. The long listing for "ccd007" after processing is:
+
+.nf
+    cl> ccdlist ccd007 l+
+    ccd007[508,508][real][object][V][OTF]:N2968 R 600s
+	exptime = 200. darktime = 200.
+        Jun  2 18:18 Overscan section is [520:540,*] with mean=481.8784
+        Jun  2 18:18 Trim data section is [3:510,3:510]
+        Jun  2 18:19 Flat field image is FlatV.imh with scale=138.2713
+.fi
+
+6. To make a list file containing all the flat field images:
+
+    cl> ccdlist *.imh ccdtype=flat name+ > flats
+
+This file can be used as an @ file for processing.
+.ih
+SEE ALSO
+ccdtypes ccdgroups
+.endhelp

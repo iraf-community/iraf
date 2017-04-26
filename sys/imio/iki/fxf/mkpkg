@@ -1,0 +1,42 @@
+# Build or update the FITS kernel.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	fxfaccess.x	fxf.h
+	fxfaddpar.x	<imhdr.h> <imio.h> <mach.h> fxf.h
+	fxfclose.x	fxf.h <imhdr.h> <imio.h>
+	fxfcopy.x	<error.h>
+	fxfctype.x	fxf.h <ctype.h>
+	fxfdelete.x	<error.h> <imhdr.h> fxf.h fxfcache.com
+	fxfencode.x	fxf.h <time.h>
+	fxfexpandh.x	fxf.h fxfcache.com <fset.h> <imhdr.h> <imio.h>\
+			<mach.h> <mii.h>
+	fxfget.x	fxf.h <ctype.h>
+	fxfhextn.x	fxf.h <imhdr.h> <imio.h>
+	fxfksection.x	<error.h> fxf.h <ctotok.h> <imhdr.h> <lexnum.h>
+	fxfmkcard.x	
+	fxfnull.x	fxf.h
+	fxfopen.x	fxf.h fxfcache.com <error.h> <imhdr.h> <imio.h>\
+			fxfcache.com <finfo.h> <fset.h> <mach.h> <mii.h>\
+			<pmset.h>
+	fxfopix.x	fxf.h <fset.h> <imhdr.h> <imio.h> <error.h> <mach.h>
+	fxfpak.x	fxf.h <mach.h>
+	fxfplread.x	fxf.h <imhdr.h> <imio.h> <mach.h> <plset.h>
+	fxfplwrite.x	fxf.h <imio.h> <mach.h> <mii.h> <plset.h> <pmset.h>\
+			<imhdr.h>
+	fxfrcard.x	fxf.h <mii.h>
+	fxfrdhdr.x	fxf.h <imhdr.h> <imio.h> <mach.h>
+	fxfrename.x	<error.h> fxf.h fxfcache.com
+	fxfrfits.x	fxf.h fxfcache.com <ctype.h> <finfo.h> <fset.h>\
+			<imhdr.h> <imio.h> <imset.h> <mach.h> <time.h>
+	fxfupdhdr.x	fxf.h <fio.h> <fset.h> <imhdr.h> <imio.h>\
+			fxfcache.com <error.h> <finfo.h> <mach.h> <mii.h>\
+			<time.h>
+	fxfupk.x	fxf.h <mach.h>
+	zfiofxf.x	fxf.h <fio.h> <fset.h> <imhdr.h> <imio.h> <knet.h>\
+			<mach.h>
+	;

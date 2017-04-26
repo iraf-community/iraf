@@ -1,0 +1,80 @@
+# Make the STDGRAPH GIO graphics kernel.
+
+$checkout libstg.a lib$
+$update   libstg.a
+$checkin  libstg.a lib$
+$exit
+
+update:					# update lib$x_stdgraph.e
+	$call	relink
+	$call	install
+	;
+
+relink:					# make x_stdgraph.e in local directory
+	$omake	x_stdgraph.x
+	$link	x_stdgraph.o -lstg
+	;
+
+install:				# install in system library
+	$move	x_stdgraph.e bin$
+	;
+
+libstg.a:
+	# $set xflags = "$(xflags) -qfx"
+
+	stgcancel.x	stdgraph.com stdgraph.h <fset.h>
+	stgclear.x	stdgraph.com stdgraph.h
+	stgclose.x	stdgraph.com stdgraph.h
+	stgclws.x	stdgraph.h <ttset.h> stdgraph.com
+	stgctrl.x	stdgraph.com stdgraph.h
+	stgdeact.x	stdgraph.com stdgraph.h <gset.h> <ttset.h>
+	stgdraw.x	stdgraph.com stdgraph.h
+	stgdrawch.x	font.com font.h stdgraph.com stdgraph.h <gki.h>\
+			<gset.h> <math.h>
+	stgencode.x	stdgraph.com stdgraph.h <ctype.h>
+	stgescape.x	
+	stgfa.x		stdgraph.com stdgraph.h
+	stgfaset.x	stdgraph.com stdgraph.h <gki.h>
+	stgfilter.x	stdgraph.com stdgraph.h <ttset.h> <chars.h> <fset.h>
+	stgflush.x	stdgraph.com stdgraph.h
+	stggcell.x	
+	stggcur.x	stdgraph.com stdgraph.h
+	stggdisab.x	stdgraph.com stdgraph.h
+	stggim.x	stdgraph.com stdgraph.h <chars.h> <ctype.h> <fset.h>\
+			<mach.h> <gescape.h> <gki.h> <gim.h>
+	stggenab.x	stdgraph.com stdgraph.h
+	stggrstr.x	stdgraph.com stdgraph.h
+	stginit.x	stdgraph.com stdgraph.h <ctype.h> <gki.h> <gset.h>\
+			<mach.h>
+	stglkcur.x	stdgraph.com stdgraph.h <gset.h>
+	stgmove.x	stdgraph.com stdgraph.h
+	stgonerr.x	stdgraph.com stdgraph.h
+	stgonint.x	stdgraph.h <config.h> <xwhen.h>
+	stgopen.x	stdgraph.com stdgraph.h <gki.h> <gset.h>
+	stgopenws.x	stdgraph.com stdgraph.h <error.h> <gki.h> <ttset.h>\
+			<chars.h> <finfo.h>
+	stgoutput.x	stdgraph.com stdgraph.h
+	stgoutstr.x	stdgraph.com stdgraph.h
+	stgpcell.x	stdgraph.com stdgraph.h <gki.h>
+	stgpl.x		stdgraph.com stdgraph.h
+	stgplset.x	stdgraph.com stdgraph.h <gki.h>
+	stgpm.x		stdgraph.com stdgraph.h
+	stgpmset.x	stdgraph.com stdgraph.h <gki.h>
+	stgrcur.x	stdgraph.com stdgraph.h <chars.h> <config.h> <error.h>\
+			<fset.h> <gki.h> <gset.h> <ttset.h>
+	stgreact.x	stdgraph.com stdgraph.h <gset.h> <ttset.h>
+	stgres.x	stdgraph.com stdgraph.h <gki.h>
+	stgreset.x	stdgraph.com stdgraph.h <gset.h>
+	stgrtty.x	stdgraph.com stdgraph.h <chars.h> <fset.h>
+	stgscur.x	stdgraph.com stdgraph.h
+	stgtx.x		stdgraph.com stdgraph.h <gki.h> <gset.h> <mach.h>\
+			<math.h>
+	stgtxqual.x	stdgraph.com stdgraph.h <gset.h>
+	stgtxset.x	stdgraph.com stdgraph.h <gki.h> <gset.h>
+	stgtxsize.x	stdgraph.com stdgraph.h <gki.h>
+	stgunkown.x	
+	stgwtty.x	stdgraph.com stdgraph.h <ctype.h> <chars.h>
+	t_gkideco.x	<error.h> <gki.h>
+	t_showcap.x	stdgraph.h <ctype.h>
+	t_stdgraph.x	<error.h> <gki.h> <gset.h>
+	;

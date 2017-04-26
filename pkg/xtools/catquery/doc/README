@@ -1,0 +1,322 @@
+		CATQUERY: The Catalog and Survey Access Routines
+
+1. Introduction
+
+    The catquery package provides a set of routines for local and remote
+catalog and image survey server access. The supported catalogs and image
+surveys are described in records stored in a catalog and image survey
+configuration file respectively. The catalog and image survey records
+specify the network address, the query format, and the output format for
+each supported catalog or image display server. More detailed information
+about catalogs and image survey access and configuration files can be
+found by typing "help catalogs" and "help surveys".
+
+    The results of each catalog query are stored in memory in an IRAF spool
+file.  Calling programs can access the catalog results sequentially or randomly
+by record number. Individual fields in each record can be decoded into
+floating point, integer, or string values.
+
+The results of each image survey query are written to an image file on disk,
+currently a fits image file. IRAF image i/o routines can be used to access
+the image. There must be enough space availale on the disk to receive the
+image.
+
+
+2. The Interface Routines
+
+The package prefix is cq. The interface routines are listed below.
+
+           cq = cq_map (file, mode)
+	 ival = cq_stati (cq, param)
+	        cq_stats (cq, param, str, maxch)
+       nlines = cq_statt (cq, param, text, maxch)
+
+	catno = cq_locate (cq, name)
+	catno = cq_locaten (cq, catno, catname, maxch)
+	catno = cq_setcat (cq, name)
+	catno = cq_setcatn (cq, catno)
+
+     [ird]val = cq_fget[ird] (cq, name)
+       nelems = cq_fga[ird] (cq, name, array[ird], max_nelems)
+                cq_fgstr (cq, name, str, maxch)
+                cq_fgwrd (cq, name, wrd, maxch)
+       nlines = cq_fgtext (cq, name, text, maxch)
+         stat = cq_scan (cq)
+
+	nqpars = cq_nqpars (cq)
+	qparno = cq_gqpar (cq, name, qpname, max_qpname, qpvalue,
+	         max_qpvalue, qpunits, max_qpunits, qpformat,
+		 max_qpformat)
+	qparno = cq_gqparn (cq, qparno, qpname, max_qpname, qpvalue,
+ 	         max_qpvalue, qpunits, max_qpunits, qpformat, max_qpformat)
+	qparno = cq_sqpar (cq, name, valuestr)
+	qparno = cq_sqparn (cq, qparno, valuestr)
+
+	   res = cq_query (cq)
+	   res = cq_fquery (cq, catfile, cathdr)
+	  ival = cq_rstati (res, param)
+	         cq_rstats (res, param, str, maxch)
+	nlines = cq_rstatt (res, param, text, maxch)
+	hparno = cq_hinfo (res, name, hpvalue, max_hpvalue)
+	hparno = cq_hinfon (res, hparno, hpname, max_hpname, hpvalue,
+	         max_hpvalue)
+	nchars = cq_grecord (res, buffer, maxch, recno)
+        nchars = cq_gnrecord (res, buffer, maxch, nextrec)
+       fieldno = cq_finfo (res, name, foffset, fsize, ftype, funits,
+		 max_funits, formats, max_formats)
+       fieldno = cq_finfon (res, fieldno, fname, max_fname, foffset, fsize,
+	         ftype, funits, max_funits, formats, max_formats)
+	         cq_rclose (res)
+       nchars = cq_gval[silrd] (res, name, [silrd]val)
+       nchars = cq_gvalc (res, name, str, maxch)
+
+	 imres = cq_imquery (cq, imname)
+	 imres = cq_fimquery (cq, imname)
+	  ival = cq_istati (imres, param)
+	         cq_istats (imres, param, str, maxch)
+	nlines = cq_istatt (imres, param, text, maxch)
+	wparno = cq_winfo (imres, name, wkname, max_wkname, wvalue,
+	         max_wvalue, wtype, wunits, max_wunits)
+	wparno = cq_winfon (imres, wparno, wpname, max_wpnane, wkname,
+	         max_wkname, wvalue, max_wvalue, wtype, wunits, max_wunits)
+	kparno = cq_kinfo (imres, name, skname, max_skname, svalue,
+	         max_svalue, stype, sunits, max_sunits)
+	kparno = cq_kinfon (imres, kparno, spname, max_spname, skname,
+	         max_skname, svalue, max_svalue, stype, sunits, max_sunits)
+	         cq_imclose (imres)
+
+        cq_unmap (cq)
+
+
+3. Notes
+
+    An "include <pkg/cq.h>" statement must appear in the calling program to
+make the catquery pacakge parameter definitions visible to the calling program. 
+
+    A "-lxtools" must be included in the calling program link line to link in
+the catquery routines.
+
+    The catalog and image surveys configuration files are mapped and unmapped
+with the routines cq_map and cq_unmap.
+
+    Before making a query the calling program must set the current catalog
+or image survey with the cq_setcat or cq_setcatn routines, and format
+and set the query parameters with the cq_gqpar, cq_gqparn, and cq_sqparn
+routines. 
+
+    Remote and locate catalog queries are made with the cq_query routine.
+The routines cq_rstat[ist] are used to retrieve the catalog results parameters.
+Header parameter values and field descriptions can be retrieved with
+the cq_hinfo / cq_hinfon and cq_finfo / cq_finfon routines respectively.
+Catalog records can be accessed sequentially or randomly with the cq_gnrecord
+and cq_grecord routines. The cq_gval[csilrd] routines can be used to decode
+the record fields into floating point, integer, or string values.  The
+cq_fquery routine is used to make a catalog file emulate the results of a
+catalog query. Cq_rclose frees the catalog results descriptor.
+
+    Remote and locate image survey queries are made with the cq_imquery routine.
+The routines cq_istat[ist] are used to retrieve the survey results parameters.
+The standard wcs and image parameter descriptions can be retrieved with the
+the cq_winfo / cq_winfon and cq_kinfo / cq_kinfon routines respectively. The
+cq_fimquery routine is used to make an existing image emulate the results of
+an image survey query. Cq_imclose frees the survey results descriptor.
+
+4. Examples
+
+Example 1: Query a catalog and dump the results to a catalog file.
+
+    include <cq.h>
+
+    ....
+
+    ra = clgetd ("ra")
+    dec = clgetd ("dec")
+    width = clgetd ("width")
+
+    ....
+
+    # Open the catalog configuration file.
+    cq = cq_map ("astromz$lib/catdb.dat", READ_ONLY)
+    if (cq == NULL)
+	...
+
+    # Set the catalog.
+    catno = cq_setcat (cq, "noao@usno2")
+    if (catno == 0)
+	...
+
+    # Set the query parameters. Assume the input input units match the
+    # the expected units. The input size is a width so divide by two 
+    # if the query expects a radius.
+    nqpars = cq_nqpars (cq)
+    do i = 1, nqpars {
+	parno = cq_gqparn (cq, i, qpname, CQ_SZ_QPNAME, qpvalue,
+    	    CQ_SZ_QPVALUE, qpunits, CQ_SZ_QPUNITS, qpformats
+	    CQ_SZ_QPFORMATS)
+	if (parno != i)
+	    next
+	if (streq (qpname, "ra")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (ra)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "dec")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (dec)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "radius")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width / 2.0d0)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "width")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "xwidth")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "ywidth")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	}
+    }
+
+    # Make the query.
+    res = cq_query (cq)
+    if (res == NULL)
+	...
+
+    # Write the results to a file.
+    recptr = 0
+    while (cq_gnrecord (res, buffer, SZ_LINE, rectpr) != EOF) {
+	call fprintf (outfd, "%s")
+	    call pargstr (buffer)
+    }
+
+    # Close the query.
+    call cq_rclose (res)
+
+    # Close the database.
+    call cq_unmap (cq)
+
+
+Example 2: Repeat the previous example but only output records for
+	   which magnitude values  <= 16.0.
+
+     include <cq.h>
+
+     ...
+
+     res = cq_query (cq)
+     if (res == NULL)
+	...
+
+     nrec = cq_rstati (res, CQNRECS)
+     do i = 1, nrecs {
+	nchars = cq_gvalr (res, i, "mag1", mag)
+	if (nchars <= 0)
+	    next
+	if (mag > 16.0)
+	    next
+	nchars = cq_grecord (res, buffer, SZ_LINE, i)
+	if (nchars <= 0)
+	    next
+	call fprintf (outfd, "%s")
+	    call pargstr (buffer)
+     }
+
+     call cq_rclose (res)
+
+     ...
+
+
+Example 3: Make an image survey query and dump the results to a fits file.
+
+    include <cq.h>
+
+    ....
+
+    ra = clgetd ("ra")
+    dec = clgetd ("dec")
+    width = clgetd ("width")
+
+    ....
+
+    # Open the catalog configuration file.
+    cq = cq_map ("astromz$lib/imdb.dat", READ_ONLY)
+    if (cq == NULL)
+	...
+
+    # Set the catalog.
+    catno = cq_setcat (cq, "dss1@cadc")
+    if (catno == 0)
+	...
+
+    # Set the query parameters. Assume the input input units match the
+    # the expected units. 
+    nqpars = cq_nqpars (cq)
+    do i = 1, nqpars {
+	parno = cq_gqparn (cq, i, qpname, CQ_SZ_QPNAME, qpvalue, CQ_SZ_QPVALUE,
+	    qpunits, CQ_SZ_QPUNITS, qpformats, CQ_SZ_QPFORMATS)
+	if (parno != i)
+	    next
+	if (streq (qpname, "ra")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (ra)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "dec")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (dec)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "width")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "xwidth")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	} else if (streq (qpname, "ywidth")) {
+	    call sprintf (qpvalue, CQ_SZ_QPVALUE, qpformats)
+		call pargd (width)
+	    parno = cq_sqpars (cq, qpname, qpvalue)
+	}
+    }
+
+    # Make the query.
+    imres = cq_imquery (cq, "outimage.fits")
+    if (imres == NULL)
+	...
+
+    # Free the results structure
+    call cq_imclose (imres)
+
+    # Unmap the database
+    call cq_unmap (cq)
+
+
+
+Example 4:  Repeat the previous example but convert the dss wcs to a fits wcs.
+At_mkdss is a routine which converts a dss wcs to a fits wcs
+
+    ...
+
+    # Make the query.
+    imres = cq_imquery (cq, "outimage.fits")
+    if (imres == NULL)
+        ...
+
+    wcstype = cq_istati (imres, CQWCS)
+    if (wcstype == CQWDSS) {
+        im = immap ("outimage.fits", READ_WRITE, 0)
+        stat = at_mkdss (im, true, false)
+        if (stat == ERR)
+            ...
+        call imunmap (im)
+    }
+
+    # Free the results structure
+    call cq_imclose (imres)
+
+    ...

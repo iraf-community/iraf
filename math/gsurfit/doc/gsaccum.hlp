@@ -1,0 +1,51 @@
+.help gsaccum Aug85 "Gsurfit Package"
+.ih
+NAME
+gsaccum -- accumulate a single data point into the fit
+.ih
+SYNOPSIS
+include <math/gsurfit.h>
+
+gsaccum (sf, x, y, weight, wtflag)
+
+.nf
+pointer	sf		# surface descriptor
+real	x		# x value, xmin <= x <= xmax
+real	y		# y value, ymin <= y <= ymax
+real	z		# z value
+real	weight		# weight
+int	wtflag		# type of weighting
+.fi
+.ih
+ARGUMENTS
+.ls sf      
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+The x and y values.
+.le
+.ls z      
+Data value.
+.le
+.ls weight
+The weight assigned to the data point.
+.le
+.ls wtflag
+Type of weighting. The options are WTS_USER and WTS_UNIFORM. If wtflag
+equals WTS_USER the weight for each data point is supplied by the user.
+If wtflag equals WTS_UNIFORM the routine sets the weight to 1.
+.le
+.ih
+DESCRIPTION
+GSACCUM calculates the non-zero basis functions for the given x and
+y values, computes the contribution of each data point to the normal
+equations and sums that contribution into the appropriate arrays and
+vectors.
+.ih
+NOTES
+Checking for out of bounds x and y values and INDEF valued data points is
+the responsibility of the calling program.
+.ih
+SEE ALSO
+gsacpts, gsfit, gsrefit
+.endhelp

@@ -1,0 +1,51 @@
+        aidpars - Automatic line identification parameters and algorithm
+   autoidentify - Automatically identify lines and fit dispersion
+          bplot - Batch plots of spectra
+      calibrate - Apply extinction and flux calibrations to spectra
+      continuum - Fit the continuum in spectra
+       deredden - Apply interstellar extinction correction
+        dispcor - Dispersion correct and resample spectra
+      disptrans - Transform dispersion units and apply air correction
+         dopcor - Apply doppler corrections
+       fitprofs - Fit gaussian profiles
+       identify - Identify features in spectrum for dispersion solution
+         lcalib - List calibration file data
+         mkspec - Generate an artificial spectrum (obsolete)
+          names - Generate a list of image names from a string
+	 ndprep - Make neutral density filter calibration image
+      odcombine - Combine spectra having different wavelength ranges (new)
+     refspectra - Assign wavelength reference spectra to other spectra
+     reidentify - Automatically identify features in spectra
+      rspectext - Convert ascii text spectra to image spectra
+     sapertures - Set or change aperture header information
+         sarith - Spectrum arithmetic
+	 sbands - Bandpass spectrophotometry of spectra
+       scombine - Combine spectra having different wavelength ranges
+        scoords - Set spectral coordinates as a pixel array (1D spectra only)
+          scopy - Select and copy apertures in different spectral formats
+       sensfunc - Create sensitivity function
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
+           sfit - Fit spectra and output fit, ratio, or difference
+          sflip - Flip data and/or dispersion coordinates in spectra
+        sinterp - Interpolate a table of x,y pairs to create a spectrum
+       skytweak - Sky subtract 1D spectra after tweaking sky spectra
+          slist - List spectrum header parameters
+       specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
+          splot - Preliminary spectral plot/analysis
+       standard - Identify standard stars to be used in sensitivity calc
+       telluric - Remove telluric features from 1D spectra
+      wspectext - Convert 1D image spectra to ascii text spectra
+
+                      ADDITIONAL HELP TOPICS
+
+        package - Discussion and overview of package including sections on:
+		    package parameters, units, and interpolation
+	specwcs - Discussion and description of the spectral image formats
+		    and the dispersion world coordinate system
+      linelists - Description of the spectral line list library in
+		    the directory linelists$.
+       onedstds - Description of the spectral calibration library in the
+		    directory onedstds$: extinction, flux standards, etc.
+

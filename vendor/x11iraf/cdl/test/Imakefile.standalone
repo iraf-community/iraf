@@ -1,0 +1,39 @@
+# 
+#  IMakefile for CDL Test tasks.
+# 
+
+        CDLDIR = ../
+      INCLUDES = -I. -I$(CDLDIR)
+ LOCAL_LDFLAGS = -L$(CDLDIR)
+          LIBS =  -lcdl
+
+
+# Hack to compile under SunPRO V4 on Solaris
+#if defined (SunArchitecture)  &&  OSMajorVersion >= 5 && HasSunC
+#if OSMinorVersion <= 5
+#if !defined (i386Architecture)
+      CCOPTIONS = -Xs
+EXTRA_LDOPTIONS = -xildoff
+#endif
+#else
+      CCOPTIONS =
+EXTRA_LDOPTIONS = -xildoff
+#endif
+
+#else
+#if defined (UltrixArchitecture)
+        CCOPTIONS = -DULTRIX
+#endif
+#if defined (OSF1Architecture) && OSMajorVersion >= 4
+        CCOPTIONS = -DOSF1
+#endif
+#endif
+
+AllTarget(cdltest imdtest)
+
+NormalProgramTarget(cdltest,cdltest.o,../libcdl.a,$(LIBS),-lm)
+NormalProgramTarget(imdtest,imdtest.o,../libcdl.a,$(LIBS),-lm)
+
+depend::
+
+LintTarget()

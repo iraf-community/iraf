@@ -1,0 +1,23 @@
+# FITGAUSS5
+
+image,f,a,,,,Image
+start,i,a,,,,Starting image line
+lower,r,h,-10.,,,Lower limit of model profiles
+upper,r,h,10.,,,Upper limit of model profiles
+lines,s,h,"*",,,Images lines to be fitted
+spectra,s,h,"*",,,Spectra to be fitted
+naverage,i,h,20,1,,Number of image lines to average
+factor,r,h,.05,0,1,RMS iteration improvement stopping criteria
+track,b,h,yes,,,Track solution?
+algorithm,i,h,1,1,2,Fitting algorithm
+fit_i0,b,h,y,,,Fit spectra central intensities?
+fit_x0,b,h,y,,,Fit spectra positions?
+fit_s0,b,h,y,,,Fit spectra shape parameter 0?
+fit_s1,b,h,n,,,Fit spectra shape parameter 1?
+fit_s2,b,h,n,,,Fit spectra shape parameter 2?
+smooth_s0,b,h,no,,,Smooth parameter s0 across spectra?
+smooth_s1,b,h,no,,,Smooth parameter s1 across spectra?
+smooth_s2,b,h,no,,,Smooth parameter s2 across spectra?
+function,s,h,"spline3",,,"Smoothing function (legendre,chebyshev,spline3)"
+order,i,h,4,,,Order for smoothing function
+verbose,b,h,no,,,Print general information about the fitting?

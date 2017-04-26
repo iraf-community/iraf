@@ -1,0 +1,30 @@
+input,s,a,"",,,"List of input images"
+output,s,h,"",,,"List of output images
+
+IF NEW IMAGE"
+title,s,h,"",,,"Image title"
+ncols,i,h,512,1,,"Number of columns"
+nlines,i,h,512,1,,"Number of lines"
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
+background,r,h,1000.,0.,,"Default background (in ADU)
+
+OBJECT PARAMETERS"
+objects,s,h,"",,,"List of objects files"
+xoffset,r,h,0.,,,"X coordinate offset"
+yoffset,r,h,0.,,,"Y coordinate offset"
+star,s,h,"moffat",,,"Star"
+radius,r,h,1.,0.,,"Seeing radius/scale (pixels)"
+beta,r,h,2.5,1.01,,"Moffat parameter"
+ar,r,h,1.,0.,1.,"Axial ratio (minor/major)"
+pa,r,h,0.,,,"Position angle (degrees)"
+distance,r,h,1.,1e-6,,"Relative distance"
+exptime,r,h,1.,1e-6,,"Exposure time"
+magzero,r,h,7.,,,"Magnitude zero point
+
+NOISE PARAMETERS"
+gain,r,h,1.,1.e-9,,"Gain (electrons/ADU)"
+rdnoise,r,h,0.,0.,,"Read noise (electrons)"
+poisson,b,h,no,,,"Add Poisson noise?"
+seed,i,h,1,,,"Random number seed
+"
+comments,b,h,yes,,,"Add comments to image?"

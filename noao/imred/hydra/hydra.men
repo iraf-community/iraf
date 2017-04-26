@@ -1,0 +1,32 @@
+          apall - Extract 1D spectra (all parameters in one task)
+      apdefault - Set the default aperture parameters
+         apedit - Edit apertures interactively
+	 apfind - Automatically find spectra and define apertures
+     aprecenter - Recenter apertures
+       apresize - Resize apertures
+      apscatter - Fit and remove scattered light
+          apsum - Extract 1D spectra
+	aptrace - Trace positions of spectra
+
+          bplot - Batch plots of spectra
+      continuum - Fit the continuum in spectra
+        dispcor - Dispersion correct spectra
+	 dopcor - Doppler correct spectra
+       identify - Identify features in spectrum for dispersion solution
+       msresp1d - Create 1D response spectra from flat field and sky spectra
+     refspectra - Assign wavelength reference spectra to other spectra
+     reidentify - Automatically identify features in spectra
+     sapertures - Set or change aperture header information
+	 sarith - Spectrum arithmetic
+       scombine - Combine spectra having different wavelength ranges
+          scopy - Select and copy apertures in different spectral formats
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
+	  sflip - Flip data and/or dispersion coordinates in spectra
+          slist - List spectrum header parameters
+       specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
+          splot - Preliminary spectral plot/analysis
+
+        dohydra - Process HYDRA spectra
+	  demos - Demonstrations and tests

@@ -1,0 +1,324 @@
+.help apnormalize Sep96 noao.twodspec.apextract
+.ih
+NAME
+apnormalize -- Normalize 2D apertures by 1D functions
+.ih
+USAGE
+apnormalize input output
+.ih
+PARAMETERS
+.ls input
+List of input images to be normalized.
+.le
+.ls output
+List of output image names for the normalized input images.  If no output
+name is given then the input name is used as a root with the extension
+".norm" added.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and normalize.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing and trace
+fitting are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls normalize = yes
+Normalize the aperture spectra by a one dimensional function?
+.le
+.ls fitspec = yes
+Fit normalization spectrum interactively?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+
+.ls line = INDEF, nsum = 1
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, recentering, resizing,
+and editing operations.  For tracing this is the starting line and
+the same number of lines are summed at each tracing point.  A line of
+INDEF selects the middle of the image along the dispersion axis.
+A negative nsum selects a median rather than a sum except that
+tracing always uses a sum.
+.le
+.ls cennorm = no
+Normalize to the aperture center rather than the mean?
+.le
+.ls threshold = 10.
+All pixels in the normalization spectrum less than this value are replaced
+by this value.
+.le
+
+The following parameters control the normalization spectrum extraction.
+.ls background = "none"
+Type of background subtraction.  The choices are "none" for no
+background subtraction, "average" to average the background within the
+background regions, or "fit" to fit across the dispersion using the
+background within the background regions.  Note that the "average"
+option does not do any medianing or bad pixel checking; it is faster
+than fitting however.  Background subtraction also requires that the
+background fitting parameters are properly defined.  For the "average"
+option only the background sample regions parameter is used.
+.le
+.ls weights = "none"
+Type of extraction weighting.  Note that if the \fIclean\fR parameter is
+set then the weights used are "variance" regardless of the weights
+specified by this parameter.  The choices are:
+.ls "none"
+The pixels are summed without weights except for partial pixels at the
+ends.
+.le
+.ls "variance"
+The extraction is weighted by estimated variances of the pixels using
+a poisson noise model.
+.le
+.le
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level.  During variance weighted extractions
+wavelength points having any pixels above this value are excluded from the
+profile determination.
+.le
+.ls readnoise = 0.
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = 1
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 3., usigma = 3.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+
+The following parameters are used to fit the normalization spectrum using
+the ICFIT routine.
+.ls function = "legendre"
+Fitting function for the normalization spectra.  The choices are "legendre"
+polynomial, "chebyshev" polynomial, linear spline ("spline1"), and
+cubic spline ("spline3").
+.le
+.ls order = 1
+Number of polynomial terms or number of spline pieces for the fitting function.
+.le
+.ls sample = "*"
+Sample regions for fitting points.  Intervals are separated by "," and an
+interval may be one point or a range separated by ":".
+.le
+.ls naverage = 1
+Number of points within a sample interval to be subaveraged or submedianed to
+form fitting points.  Positive values are for averages and negative points
+for medians.
+.le
+.ls niterate = 0
+Number of sigma clipping rejection iterations.
+.le
+.ls low_reject = 3. , high_reject = 3.
+Lower and upper sigma clipping rejection threshold in units of sigma determined
+from the RMS sigma of the data to the fit.
+.le
+.ls grow = 0.
+Growing radius for rejected points (in pixels).  That is, any rejected point
+also rejects other points within this distance of the rejected point.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+.ih
+DESCRIPTION
+For each image in the input image list the two dimensional spectra
+defined by a set of apertures are normalized by a one dimensional
+normalization function derived by extracting and smoothing the spectrum
+by fitting a function with the \fBicfit\fR procedure.  The value of the
+fitting function at each point along the dispersion, divided by the
+aperture width to form a mean or scaled to the same mean as the center
+pixel of the aperture depending on the \fIcennorm\fR parameter, is
+divided into the two dimensional input aperture.  All points outside
+the apertures are set to unity.
+
+The purpose of this task is to remove a general shape from the aperture
+spectra.  If low order (order = 1 for instance) functions are used then
+only the amplitudes of the spectra are affected, shifting each aperture
+to approximately unit intensity per pixel.  If high order functions are
+used only the small spatial scale variations are preserved.  This
+is useful for making flat field images with the spectral signature of the
+continuum source removed or for producing two dimensional normalized
+spectra similar to the task \fBonedspec.continuum\fR.  For flat fields
+this algorithm retains the profile shape which may be useful for
+removing the profile response in short slit data.  However, often
+one does not want the profile of the flat fielded observation to be
+modified in which case the task \fBapflatten\fR should be used.
+
+The normalization spectrum is first extracted in the same way as is
+the one dimensional extraction in \fBapsum\fR or \fBapall\fR.  In
+particular the same parameters for selecting weighting and cleaning
+are available.  After extraction the spectrum is fit using the
+\fBicfit\fR routine.  This may be done interactively or noninteractively
+depending on the \fIinteractive\fR parameter.  The default fitting
+parameters are part of this task.  The goal of the fitting depends
+on the application.  One may be trying to simply continuum normalize,
+in which case one wants to iteratively reject and grow the rejected
+points to exclude the lines and fit the continuum with a
+moderate order function (see \fBcontinuum\fR for more discussion).  
+If one wants to simply normalize all spectra to a common flux, say to
+remove a blaze function in echelle data, then an order of 1 will
+normalize by a constant.  For flat field and profile correction of
+small slits one wants to fit the large scale shape of the
+spectrum but not fit the small bumps and wiggles due to sensitivity
+variations and fringing.
+
+The smoothed extracted spectrum represents the total flux within the
+aperture.  There are two choices for scaling to a normalization per
+pixel.  One is to divide by the aperture width, thus computing an average
+flux normalization.  In this case the peak of the spectrum will be
+greater than unity.  This is done when \fIcennorm\fR = no.  When this
+parameter has the value yes then the mean of the normalization spectrum
+is scaled to the mean of the aperture center, computed by linearly
+interpolating the two pixels about the traced center.  This will give
+values near one for the pixels at the center of the aperture in the
+final output image.
+
+Before division of each pixel by the appropriate dispersion point in
+the normalization spectrum, all pixels below the value specified by the
+\fIthreshold\fR parameter in the normalization spectrum are replaced by
+the threshold value.  This suppresses division by very small numbers.
+Finally, the pixels within the aperture are divided by the normalization
+function and the pixels outside the apertures are set to 1.
+
+The remainder of this description covers the basic steps defining the
+apertures to be used.  These steps and parameter are much the same as
+in any of the other \fBapextract\fR tasks.
+
+Aperture definitions may be inherited from those of other images by
+specifying a reference image with the \fBreferences\fR parameter.
+Images in the reference list are matched with those in the input list
+in order.  If the reference image list is shorter than the number of
+input images, the last reference image is used for all remaining input
+images.  Thus, a single reference image may be given for all the input
+images or different reference images may be given for each input
+image.  The special reference name "last" may be used to select the
+last set apertures used in any of the \fBapextract\fR tasks.
+
+If an aperture reference image is not specified or no apertures are
+found for the specified reference image, previously defined apertures
+for the input image are sought in the aperture database.  Note that
+reference apertures supersede apertures for the input image.  If no
+apertures are defined they may be created automatically, the \fIfind\fR
+option, or interactively in the aperture editor, if the
+\fIinteractive\fR and \fIedit\fR options are set.
+
+The functions performed by the task are selected by a set of flag
+parameters.  The functions are an automatic spectrum finding and
+aperture defining algorithm (see \fBapfind\fR) which is ignored if
+apertures are already defined, automatic recentering and resizing
+algorithms (see \fBaprecenter\fR and \fBapresize\fR), an interactive
+aperture editing function (see \fBapedit\fR), a spectrum position tracing
+and trace function fit (see \fBaptrace\fR), and the main function of
+this task, the one dimensional normalization of the aperture
+profiles.
+
+Each function selection will produce a query for each input spectrum if
+the \fIinteractive\fR parameter is set.  The queries are answered by
+"yes", "no", "YES", or "NO", where the upper case responses suppress
+the query for following images.  There are other queries associated
+with tracing which first ask whether the operation is to be done
+interactively and, if yes, lead to queries for each aperture.  If the
+\fIinteractive\fR parameter is not set then aperture editing,
+interactive trace fitting, and interactive spectrum shape fitting are ignored.
+.ih
+EXAMPLES
+To make a flat field image which leaves the total counts of the object
+images approximately unchanged from a quartz echelle or slitlet image:
+
+.nf
+	cl> apnormalize qtz001,qtz002 flat001,flat002
+	Yes find
+	No resize
+	No edit
+	Yes trace
+	Yes trace interactively
+	NO
+	Yes flatten
+	Yes fit interactively
+.fi
+.ih
+REVISIONS
+.ls APNORMALIZE V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+apbackground, approfile, apvariance, apfit, icfit,
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apsum
+.endhelp

@@ -1,0 +1,35 @@
+.help clrawc Sep86 imfort
+.ih
+NAME
+clrawc -- return the raw command line as a string
+.ih
+SYNOPSIS
+.nf
+subroutine clrawc (outstr, ier)
+
+character*(*)	outstr		#O receives the command line string
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIclrawc\fR procedure returns the raw command line as a string,
+i.e., all the argument strings are concatenated together with spaces
+between successive arguments.
+.ih
+RETURN VALUE
+A status of zero indicates that the task was called with a nonnull command
+string.  An error status indicates that the program was called without any
+arguments.
+
+IE_GCMDLN:	cannot read command line string
+.ih
+NOTES
+Normally it is preferable to use the \fIclarg\fR procedures to decode
+and return the values of the individual arguments.  Note that decoding
+the argument list with a list-directed read against \fIoutstr\fR is in
+violation of the Fortran 77 standard, and probably would not work anyhow,
+since the string arguments are not quoted.
+.ih
+SEE ALSO
+clnarg, clarg
+.endhelp

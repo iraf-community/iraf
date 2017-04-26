@@ -1,0 +1,36 @@
+# PLTMODEL Parameters.
+
+# Image parameters.
+ncols,i,h,2048,1,,Number of image columns
+nlines,i,h,2048,1,,Number of image lines
+ncgrid,i,h,10,1,,Number of grid columns
+nlgrid,i,h,10,1,,Number of grid lines
+
+# Linear model parameters.
+x_zero,r,h,INDEF,,,X origin in pixels
+y_zero,r,h,INDEF,,,Y origin in pixels
+xi_zero,r,h,INDEF,,,XI origin in arcseconds
+eta_zero,r,h,INDEF,,,ETA origin in arcseconds 
+scale,r,h,INDEF,,,Scale in arcseconds / pixel
+ratio,r,h,INDEF,,,Ratio of Y to Y scale
+xrot,r,h,INDEF,,,X rotation angle in degrees
+yrot,r,h,INDEF,,,Y rotation angle in degrees
+
+# Tangent point position.
+ra_tan,r,h,INDEF,,,Ra of assumed tangent point in hours
+dec_tan,r,h,INDEF,,,Dec of assumed tangent point in degrees
+
+# Tangent point error.
+dra_tan,r,h,INDEF,,,Ra error of assumed tangent point in minutes
+ddec_tan,r,h,INDEF,,,Dec error of assumed tangent point in minutes
+
+# Tilt error.
+tra,r,h,INDEF,,,Ra offset of plate normal
+tdec,r,h,INDEF,,,Dec offset of platenormal
+
+# Cubic distortion.
+q3ra,r,h,INDEF,,,Ra offset of cubic distortion center in minutes
+q3dec,r,h,INDEF,,,Dec offset of cubic distortion center in minutes
+q3,r,h,INDEF,,,Cubic distortion coefficient
+
+mode,s,h,'ql'

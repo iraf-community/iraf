@@ -1,0 +1,52 @@
+# Make the ASTUTIL package.
+
+$call	asttools
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lasttools -lxtools -lcurfit -lbev"
+
+	$update	libpkg.a
+	$omake	x_astutil.x
+	$link	x_astutil.o libpkg.a $(LIBS) -o xx_astutil.e
+	;
+
+install:
+	$move	xx_astutil.e noaobin$x_astutil.e
+	;
+
+asttools:
+	$checkout libasttools.a noaolib$
+	$update	libasttools.a
+	$checkin libasttools.a noaolib$
+	;
+
+libasttools.a:
+	@asttools
+	;
+
+libpkg.a:
+	@pdm
+
+	airmass.x	<math.h>
+	astfunc.x	astfunc.h <evvexpr.h> <imset.h> <lexnum.h> <mach.h>\
+			<time.h>
+	galactic.x	<fset.h>
+	precess.x	<fset.h>
+	t_astcalc.x	astfunc.h <ctotok.h> <ctype.h> <error.h> <evvexpr.h>\
+			<fset.h> <lexnum.h> <time.h>
+	t_asthedit.x	astfunc.h <ctotok.h> <ctype.h> <error.h> <evvexpr.h>\
+			<fset.h> <imset.h> <lexnum.h> <time.h>
+	t_asttimes.x	<error.h>
+	t_gratings.x	<error.h> <math.h>
+	t_obs.x		<error.h>
+	t_rvcorrect.x	rvcorrect.com <error.h> <time.h>
+	t_setairmass.x	<error.h> <ctype.h> <imhdr.h>
+	t_setjd.x	<error.h> <ctype.h> <imhdr.h>
+	;

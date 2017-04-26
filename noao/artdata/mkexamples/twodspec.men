@@ -1,0 +1,10 @@
+	    		TWODSPEC Menu
+
+        ecarc2d - Echelle thorium-argon slit spectrum
+        ecobj2d - Echelle object slit spectrum
+
+          lsarc - Long slit helium-neon-argon spectrum
+	  lsobj - Long slit object spectrum
+	  lsgal - Long slit galaxy spectrum
+
+     multifiber - Multifiber spectrum

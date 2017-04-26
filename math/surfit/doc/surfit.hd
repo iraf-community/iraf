@@ -1,0 +1,19 @@
+# HELP Directory for SURFIT package
+
+$surfit = "math$surfit/"
+
+iscoeff		hlp = iscoeff.hlp,		src = surfit$iscoeff.x
+iseval		hlp = iseval.hlp,		src = surfit$iseval.x
+isfree		hlp = isfree.hlp,		src = surfit$isfree.x
+isinit		hlp = isinit.hlp,		src = surfit$isinit.x
+islaccum	hlp = islaccum.hlp,		src = surfit$islaccum.x
+islfit		hlp = islfit.hlp,		src = surfit$islfit.x
+islrefit	hlp = islrefit.hlp,		src = surfit$islrefit.x
+islsolve	hlp = islsolve.hlp,		src = surfit$islsolve.x
+islzero		hlp = islzero.hlp,		src = surfit$islzero.x
+isreplace	hlp = isreplace.hlp,		src = surfit$isreplace.x
+isresolve	hlp = isresolve.hlp,		src = surfit$isresolve.x
+issave		hlp = issave.hlp,		src = surfit$issave.x
+issolve		hlp = issolve.hlp,		src = surfit$issolve.x
+isvector	hlp = isvector.hlp,		src = surfit$isvector.x
+iszero		hlp = iszero.hlp,		src = surfit$iszero.x

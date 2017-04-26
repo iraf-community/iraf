@@ -1,0 +1,22 @@
+# 
+#  IMakefile for CDL Test tasks.
+# 
+
+X11IRAFDIR = ../../
+#include <../../X11IRAF.tmpl>
+
+
+        CDLDIR = ../
+      INCLUDES = -I. -I$(CDLDIR)
+ LOCAL_LDFLAGS = -L$(CDLDIR)
+          LIBS =  -lcdl
+
+
+AllTarget(cdltest imdtest)
+
+NormalProgramTarget(cdltest,cdltest.o,../libcdl.a,$(LIBS),-lm)
+NormalProgramTarget(imdtest,imdtest.o,../libcdl.a,$(LIBS),-lm)
+
+depend::
+
+LintTarget()

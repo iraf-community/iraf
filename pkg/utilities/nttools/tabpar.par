@@ -1,0 +1,7 @@
+table,f,a,"",,,"Name of table"
+column,s,a,"",,,"Name of column"
+row,i,a,,1,,"Number of row"
+format,b,h,yes,,,"Format the value using table print format?"
+value,s,h,"",,,"Value of table element"
+undef,b,h,,,,"Is table element undefined?"
+mode,s,h,"al",,,

@@ -1,0 +1,60 @@
+.help darksub Apr86 noao.imred.generic
+.ih
+NAME
+darksub -- Scale and subtract a dark count image
+.ih
+USAGE	
+darksub input output darkimage
+.ih
+PARAMETERS
+.ls input
+List of input images from which to subtract the dark count image.
+.le
+.ls output
+List of output dark count subtracted images.  The output images may
+be the same as the input images.  The input and output image lists should
+contain the same number of images.
+.le
+.ls darkimage
+Dark count image to be scaled and subtracted from the input images.
+.le
+.ls exposure = ""
+Header parameter name from which to obtain the exposure times.
+.le
+.ls pixtype = "1"
+The pixel datatype of the dark subtracted images.  The default ("1")
+is the pixel datatype of the original image.  The other choices are
+"short", "integer", "long", "real", and "double".
+.le
+.ls verbose = yes
+Print log of operations performed.
+.le
+.ih
+DESCRIPTION
+The dark count image is scaled by the ratio of the input image exposure to the
+dark count image exposure and subtracted from each of the input images.
+The exposures are obtained from the image headers under the specified
+name.  The output images may have the same names as the input images.
+A temporary image is used for the scaled dark count image and the original
+image is not modified.  The pixel datatype of the output images is
+specified by the parameter \fIpixtype\fR.  The default ("1") uses the
+datatype of the input image.  A log of the operations performed may be
+printed on the standard output when the verbose options is specified.
+
+Note that this task can be used to subtract any type of image from a set
+of images in which the subtracted image must be scaled to a given exposure.
+.ih
+EXAMPLES
+To subtract the dark count image 'dark' from obs1, obs2, and obs3:
+
+.nf
+	cl> darksub obs1,obs2 obs1,obs2 dark exp="exposure"
+	Tue 18:50:56 08-Apr-86
+	  obs1 = obs1 - 5.0049997336067 * dark
+	Tue 18:51:05 08-Apr-86
+	  obs2 = obs2 - 5.009999733075 * dark
+.fi
+.ih
+SEE ALSO
+imarith
+.endhelp

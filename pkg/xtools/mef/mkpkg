@@ -1,0 +1,26 @@
+# MEFLIB
+
+update:
+        $checkout       libxtools.a lib$
+        $update         libxtools.a
+        $checkin        libxtools.a lib$
+        ;
+
+libxtools.a:
+        mefappfile.x    <pkg/mef.h>
+        mefclose.x      <pkg/mef.h>
+        mefcpextn.x     <mach.h> <pkg/mef.h>
+        mefdummyh.x     <pkg/mef.h>
+        mefencode.x     <ctype.h> <mach.h> <pkg/mef.h> <time.h>
+        mefget.x        <ctype.h> <pkg/mef.h>
+        mefgnbc.x       <pkg/mef.h>
+        mefgval.x       <ctype.h> <pkg/mef.h>
+        mefkfind.x      <pkg/mef.h>
+        mefksection.x   <ctotok.h> <lexnum.h> <pkg/mef.h>
+        mefldhdr.x      <ctype.h> <error.h> <mach.h> <pkg/mef.h> <mii.h>
+        mefopen.x       <pkg/mef.h>
+        mefrdhdr.x      <ctype.h> <error.h> <fset.h> <mach.h> <pkg/mef.h>
+        mefsetpl.x      <pkg/mef.h>
+        mefwrhdr.x      <error.h> <pkg/mef.h>
+        mefwrpl.x       <error.h> <pkg/mef.h>
+	;

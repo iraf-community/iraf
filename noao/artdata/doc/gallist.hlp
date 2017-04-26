@@ -1,0 +1,488 @@
+.help gallist Feb90 noao.artdata
+.ih
+TASK
+gallist -- make an artificial galaxies list
+.ih
+USAGE
+gallist gallist ngals
+.ih
+PARAMETERS
+.ls gallist
+The name of the output text file for the x and y coordinates,
+magnitudes, profile types, half-flux radii, axial ratios, and position
+angles of the artificial galaxies.  Output will be appended to this
+file if it exists.
+.le
+.ls ngals = 100
+The number of galaxies in the output galaxies list.
+.le
+.ls interactive = no
+Examine plots and change the parameters of the spatial, luminosity, and
+morphology distributions interactively.
+.le
+
+			SPATIAL DISTRIBUTION
+.ls spatial = "uniform"
+Type of spatial distribution for the galaxies.  The types are:
+.ls uniform
+The galaxies are uniformly distributed between \fIxmin\fR, \fIxmax\fR,
+\fIymin\fR, and \fIymax\fR.
+.le
+.ls hubble
+The galaxies are distributed around the center of symmetry \fIxcenter\fR and
+\fIycenter\fR according to a Hubble density law of core radius
+\fIcore_radius\fR and background density \fIbase\fR.
+.le
+.ls file
+The radial density function is contained in the text file \fIsfile\fR.
+.le
+.le
+.ls xmin = 1., xmax = 512., ymin = 1., ymax = 512.
+The range of the output coordinates in pixels.
+.le
+.ls xcenter = INDEF, ycenter = INDEF
+The coordinate of the center of symmetry for the "hubble"
+and "file" radial density functions. The default is the
+midpoint of the coordinate limits.
+.le
+.ls core_radius = 50
+The core radius of the Hubble density distribution in pixels.
+.le
+.ls base = 0.0
+The background density relative to the central density of the Hubble
+density distribution.
+.le
+.ls sseed = 2
+The initial value supplied to the random number generator used to
+generate the output x and y coordinates.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each execution.
+.le
+
+			MAGNITUDE DISTRIBUTION
+.ls luminosity = "powlaw"
+Type of luminosity distribution for the galaxies.  The types are:
+.ls uniform
+The galaxies are uniformly distributed between \fIminmag\fR and
+\fImaxmag\fR.
+.le
+.ls powlaw
+The galaxies are distributed according to a power law with coefficient
+\fIpower\fR.
+.le
+.ls schecter
+The galaxies are distributed according to a Schecter luminosity
+function with characteristic magnitude \fImstar\fR and power law exponent
+\fIalpha\fR between \fIminmag\fR and \fImaxmag\fR.
+.le
+.ls file
+The luminosity function is contained in the text file \fIlfile\fR.
+.le
+.le
+.ls minmag = -7., maxmag = 0.
+The range of output relative magnitudes.
+.le
+.ls mzero = 15.
+Magnitude zero point for Schecter luminosity function.
+.le
+.ls power = 0.6
+Coefficient for the power law magnitude distribution The default value
+of 0.6 is the Euclidean value.
+.le
+.ls alpha = -1.24
+The power law exponent of the Schecter luminosity function.
+The default value is that determined by Schecter from nearby galaxies.
+.le
+.ls mstar = -21.41
+The characteristic magnitude of the Schecter luminosity function.
+.le
+.ls lseed = 2
+The initial value supplied to the random number generator used to
+generate the output magnitudes.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each execution.
+.le
+
+			MORPHOLOGY DISTRIBUTION
+.ls egalmix = 0.4
+The fraction of the galaxies that are "ellipticals" represented
+by a de Vaucouleurs surface brightness law as opposed to "spirals"
+represented by an exponential disk surface brightness law.
+.le
+.ls ar = 0.3
+Minimum elliptical galaxy axial ratio (major/minor ratio).
+.le
+.ls eradius = 20.0
+The maximum elliptical galaxy half-flux semi-major scale radius.  This is
+the radius of an elliptical galaxy with magnitude \fIminmag\fR
+before a random factor is added.  Spiral galaxies and fainter galaxies
+are scaled from this value.
+.le
+.ls sradius = 1.0
+Ratio between half-flux scale radii of spiral and elliptical models at the
+same magnitude.  For example an elliptical galaxy with magnitude
+\fIminmag\fR will have radius \fIeradius\fR while a spiral galaxy
+of the same magnitude with have radius \fIsradius\fR * \fIeradius\fR.
+.le
+.ls absorption = 1.2
+Absorption correction for edge on spirals in magnitudes.
+.le
+.ls z = 0.05
+Minimum redshift for power law distributed galaxies.  This is the
+redshift assigned galaxies of magnitude \fIminmag\fR.  The redshifts
+are assumed proportional to the square root of the apparent luminosity;
+i.e the luminosity distance proportional to redshift.  The redshift is used
+for computing the mean apparent sizes of the galaxies
+according to (1+z)**2 / z.
+.le
+
+			USER FUNCTIONS
+.ls sfile = ""
+The name of the input text file containing the sampled spatial radial
+density
+function, one sample point per line, with the radius and relative probability
+in columns one and two respectively. The sample points need not be
+uniformly spaced or normalized.
+.le
+.ls nssample = 100
+The number of points at which the spatial density function is 
+sampled. If the spatial density function is analytic or approximated
+analytically (the "hubble" option) the function is sampled
+directly. If the function is read from a file  (the "file" option) an
+initial smoothing step is performed before sampling.
+.le
+.ls sorder = 10
+The order of the spline fits used to evaluate the integrated spatial
+density function.
+.le
+.ls lfile = ""
+The name of the input text file containing the sampled luminosity
+function, one sample point per line, with the magnitude and relative
+probability in columns one and two respectively. The sample points need
+not be uniformly spaced or normalized.
+.le
+.ls nlsample = 100
+The number of points at which the luminosity function is 
+sampled. If the luminosity function is analytic or approximated
+analytically (the "uniform", "powlaw" and "schecter" options) the
+function is sampled directly.  If it is read from a file
+(the "file" option) an initial smoothing step is performed before sampling.
+.le
+.ls lorder = 10
+The order of the spline fits used to evaluate the integrated
+luminosity function.
+.le
+
+			INTERACTIVE PARAMETERS
+.ls rbinsize = 10.
+The bin size in pixels of the plotted histogram of the radial density
+distribution.
+.le
+.ls mbinsize = 0.5
+The bin size in magnitudes of the plotted histogram of the luminosity function.
+.le
+.ls dbinsize = 0.5
+The bin size in pixels of the plotted histogram of the half-power semi-major
+axis distribution.
+.le
+.ls ebinsize = 0.1
+The bin size of the plotted histogram of the axial ratio distribution.
+.le
+.ls pbinsize = 20.
+The bin size in degrees of the plotted histogram of the position angle
+distribution.
+.le
+.ls graphics = stdgraph
+The default graphics device.
+.le
+.ls cursor = ""
+The graphics cursor.
+.le
+.ih
+DESCRIPTION
+\fBGallist\fR generates a list of x and y coordinates, magnitudes,
+morphological types, half-power radii, axial ratios, and position
+angles for a sample of \fIngals\fR galaxies based on a user selected
+spatial density function \fIspatial\fR  and luminosity function
+\fIluminosity\fR and writes (appends) the results to the text file
+\fIgallist\fR. If the \fIinteractive\fR parameter is "yes" the user can
+interactively examine plots of the spatial density function, the
+radial density function,  the luminosity function, radii, axial ratios,
+and position angle distributions and alter the parameters of the task
+until a satisfactory artificial field is generated.
+
+The spatial density function generates x and y values around a center
+of symmetry defined by \fIxcenter\fR and \fIycenter\fR within the x and
+y limits \fIxmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR according to
+the spatial density function specified by \fIspatial\fR.  The three
+supported spatial density functions are listed below where R is the
+radial distance in pixels, P is the relative spatial density, C is a
+constant, and f is the best fitting cubic spline function to the spatial
+density function R(user), P(user) supplied by the user in the text file
+\fIsfile\fR.
+
+.nf
+  uniform:  P = C
+  hubble:   P = 1.0 / (1 + R / core_radius) ** 2 + base
+  file:     P = f (R(user), P(user))
+.fi
+
+The Hubble and user spatial density functions are sampled at
+\fInssample\fR equally spaced points, and integrated to give the
+spatial density probability function at each sampled point. The
+integrated probability function is normalized and approximated by a
+cubic spline of order \fIsorder\fR.  The x and y coordinates are
+computed by randomly sampling the integrated probability function until
+\fIngals\fR galaxies which satisfy the x and y coordinate limits
+\fIxmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR are generated.
+
+The luminosity function generates relative magnitude values between
+\fIminmag\fR and \fImaxmag\fR (before absorption effects are added)
+according to the luminosity function specified by \fIluminosity\fR.
+The four supported luminosity functions are listed below where M is the
+magnitude, P is the relative luminosity function, C is a constant and f
+is the best fitting cubic spline function to the luminosity function
+M(user), P(user) supplied by the user in the text file \fIlfile\fR.
+
+.nf
+  uniform:   P = C
+  powlaw:    P = C * 10. ** (power * M)
+  schecter:  P = C * 10. ** (alpha * dM) * exp (-10. ** dM)
+  file:      P = f (M(user), P(user))
+
+  where      dM = 0.4 * (mstar - M + mzero)
+.fi
+
+The uniform distribution is not very physical but may be useful for
+testing.  The power law distribution is that expected for a homogeneous
+and isotropic distribution of galaxies.  The default value of 0.6 is
+that which can be calculated simply from Euclidean geometry.  Observations
+of faint galaxies generally show a smaller value.  The Schecter
+function provides a good approximation to a galaxy cluster when
+used in conjunction with the Hubble spatial distribution (though there
+is no mass segregation applied).  The "best fit" values for the
+parameters \fImstar\fR and \fIalpha\fR are taken from the paper by
+Schecter (Ap.J 203, 297, 1976).  The \fImzero\fR parameter is used
+to convert to absolute magnitudes.  Note that it is equivalent to
+set \fImzero\fR to zero and adjust the characteristic magnitude
+to the same relative magnitude scale or to use absolute magnitudes
+directly.
+
+The Schecter and user file distributions are sampled at \fInlsample\fR
+equally spaced points, and integrated to give the luminosity
+probability function at each sampled point. The probability function is
+normalized and approximated by a cubic spline of order \fIlorder\fR.
+The magnitudes are computed by randomly sampling the integrated
+probability function until \fIngals\fR objects which satisfy the
+magnitude limits \fIminmag\fR and \fImaxmag\fR are generated.
+
+The artificial galaxies have one of two morphological types,
+"ellipticals" with a de Vaucouleurs surface brightness law and
+"spirals" with an exponential surface brightness law. The fraction
+of elliptical galaxies is set by the parameter \fIegalmix\fR.  The
+position angles of the major axis are distributed uniformly between 0.0
+and 360.0 degrees.  The axial ratio (major to minor) of the elliptical
+models is allowed to range uniformly between 1 and \fIar\fR
+(that is E0 - E7).
+
+The spiral models have inclinations, i, ranging uniformly between 0 and
+90 degrees.  The axial ratio is then given by
+
+	a/b = sqrt (sin(i)**2 * .99 + .01)
+
+which is taken from Holmberg in Galaxies and the Universe (which
+references the work of Hubble).  Note the axial ratio is limited to
+0.1 by this formula.  An internal absorption correction is then
+made based on the inclination using the relation
+
+	dM = A * (min (10, cosecant (i)) - 1) / 9
+
+where is the absorption of an edge on galaxy relative to face on and
+the cosecant is limited to 10.  Note that this correction changes
+allows galaxies with magnitudes less than \fImaxmag\fR and alters
+the luminosity function somewhat.  Or in other words, the luminosity
+function is based on absorption corrected magnitudes.
+
+The sizes of the galaxy images are scaled from the maximum half-flux
+radius of an elliptical galaxy given by the parameter \fIeradius\fR.
+This is the radius given to an elliptical galaxy of magnitude
+\fIminmag\fR (prior to adding a random factor described below).  The
+ratio between the half-flux radii of the exponential disk and de
+Vaucouleurs models at a given total magnitude is set by the parameter
+\fIsradius\fR (note this is a fraction of \fIeradius\fR and not an
+actual radius).  This allows adjusting the relative surface brightness
+of elliptical and spiral models.
+
+The distribution of sizes is based on the apparent
+magnitude of the galaxies.  For the power law magnitude distribution
+the cosmological redshift factor for angular diameters is used.  The
+redshift/magnitude relation is assumed to be such that the redshift is
+proportional to the luminosity distance (the square root of the
+apparent luminosity).  Thus,
+
+
+.nf
+                Z = z * 10. ** (0.2 * (M - minmag))
+                Zfactor = ((1+Z)**2 / Z) / ((1+z)**2 / z)
+  ellipticals:  r = eradisus * Zfactor
+  spirals:      r = sradius * eradius * Zfactor
+.fi
+
+where z is the reference redshift at the minimum magnitude, and Z is the
+redshift at magnitude M.  For very small z the size varies as the
+luminosity distance but at larger z the images appear more extended with
+lower surface brightness.  For very deep simulations a pure luminosity
+distance relation gives faint galaxies which are too small and compact
+compared to actual observations.
+
+For the other magnitude distributions, the Schecter cluster function
+in particular where all galaxies are at the same distance, the scale radius
+obeys the following relation.
+
+.nf
+  ellipticals:  r = eradius * 10. ** ((minmag - M) / 6)
+  spirals:      r = sradius * eradius * 10. ** ((minmag - M) / 6)
+.fi
+
+This relation gives the size decreasing slightly less rapidly than that
+giving a constant surface brightness.  This relation is taken from
+Holmberg (Galaxies and the Universe).
+
+A uniform random factor of 50% is added to the sizes computed for
+the power law magnitude distribution and 20% for the other distributions.
+
+The interactive spatial plot shows the positions of the galaxies, the
+galaxy type (circles are de Vaucouleurs profiles and other types are
+diamonds), and rough size.
+.ih
+CURSORS
+The following interactive keystroke commands are available from within the
+GALLIST task.
+
+.nf
+	Gallist Keystroke Commands
+
+?	Print options
+f	Fit one or more of following 
+	    Spatial density function (SDF)
+            Luminosity  function (LF)
+	    Distribution of morphological type
+	    Diameter distribution
+	    Roundness distribution
+	    Position angle distribution 
+x	Plot the x-y spatial density function
+r	Plot the histogram of the radial density function
+m	Plot the histogram of the luminosity function
+d	Plot the histogram of the diameter values
+e	Plot the histogram of the roundness values 
+p	Plot the histogram of the position angle values
+:	Colon escape commands (see below)
+q	Exit program
+.fi
+
+The following parameters can be shown or set from within the GALLIST task.
+
+.nf
+		Gallist Colon Commands
+
+:show			Show gallist parameters
+:ngal       [value]	Number of galaxies
+
+:spatial    [string]	Spatial density function (SDF) (uniform|hubble|file) 
+:xmin       [value]	Minimum X value
+:xmax       [value]	Maximum X value
+:ymin       [value]	Minimum Y value
+:ymax       [value]	Maximum Y value
+:xcenter    [value]	X center for SDF
+:ycenter    [value]	Y center for SDF
+:core       [value]	Core radius for Hubble density function
+:base       [value]	Background density for Hubble density function
+
+:luminosity [string]	Luminosity function (LF)
+			(uniform|powlaw|schecter|file)
+:minmag     [value]	Minimum magnitude
+:maxmag     [value]	Maximum magnitude
+:mzero      [value]	Magnitude zero-point of schecter LF
+:power      [value]     Power law coefficient for powlaw LF
+:alpha      [value]	Schecter parameter
+:mstar      [value]	Characteristic mag for Schecter LF
+
+:egalmix    [value]	Elliptical/Spiral galaxy ratio
+:ar         [value]     Minimum elliptical galaxy axial ratio
+:eradius    [value]     Maximum elliptical half flux radius
+:sradius    [value]     Spiral/elliptical radius at same magnitude
+:z          [value]     Minimum redshift
+:absorption [value]     Absorption correction for spirals
+
+:lfile      [string]    Name of the LF file
+:sfile	    [string]    Name of the SDF file
+:nlsample   [value]	Number of LF sample points 
+:lorder	    [value]	Order of spline approximation to the integrated LF
+:nssample   [value]	Number of SDF sample points
+:sorder	    [value]	Order of spline approximation to the integrated SDF
+
+:rbinsize   [value]	Resolution of radial SDF histogram in pixels
+:mbinsize   [value]	Resolution of magnitude histogram in magnitudes
+:dbinsize   [value]	Resolution of diameter histogram in pixels
+:ebinsize   [value]	Resolution of roundness histogram in pixels
+:pbinsize   [value]     Resolution of position angle histogram in degrees
+.fi
+.ih
+EXAMPLES
+1. Create a galaxy cluster with a power law distribution of field galaxies
+and stars as background/foreground.
+
+.nf
+    ar> gallist galaxies.dat 100 spatial=hubble lum=schecter egal=.8
+    ar> gallist galaxies.dat 500
+    ar> starlist galaxies.dat 100
+    ar> mkobjects galaxies obj=galaxies.dat gain=3 rdnoise=10 poisson+
+.fi
+
+Note that the objects are appended to the same file.  Actually making
+the image with \fBmkobjects\fR takes about 5 minutes (2.5 min cpu) on a
+SPARCstation 1.
+
+2. Examine the distributions for a uniform spatial distribution
+and power law magnitude distribution using 1000 galaxies without
+creating a data file.
+
+.nf
+    ar> gallist dev$null 1000 inter+
+	    ... an x-y plot will appear on the screen
+	    ... type r to examine the radial density function
+	    ... type m to examine the luminosity function
+	    ... type d to examine the half-flux radii distribution
+	    ... type e to examine the axial ratio distribution
+	    ... type = to make a copy of any of the plots
+	    ... type q to quit
+.fi
+.ih
+REVISIONS
+.ls GALLIST V2.11+
+The random number seeds can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
+.ls GALLIST V2.11
+The default value for the minimum elliptical galaxy axial ratio was
+change to 0.3 to cover the range E0-E7 uniformly.
+.le
+.ih
+BUGS
+This is a first version and is not intended to produce a full model
+of galaxy fields.  Some of the relations used are empirical and
+simple minded with the aim being to produce reasonably realistic images.
+
+The spline approximation to the spatial density and luminosity
+probability functions can cause wiggles in the output spatial density
+and luminosity functions. Users can examine the results interactively
+and experiment with the spline order and number of sample points if
+they are not satisfied with the results of GALLIST. The default setup
+of 10 sample points per spline piece is generally satisfactory for the
+spatial density and luminosity functions supplied here.
+.ih
+SEE ALSO
+starlist mkobjects
+.endhelp

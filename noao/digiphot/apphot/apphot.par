@@ -1,0 +1,11 @@
+# APPHOTX package parameter file
+
+version,s,h,"May00"
+wcsin,s,h,logical,"logical|tv|physical|world",,"The input coordinates wcs"
+wcsout,s,h,logical,"logical|tv|physical",,"The output coordinates wcs"
+cache,b,h,no,,,"Cache image in memory ?"
+verify,b,h,yes,,,"Verify critical parameters ?"
+update,b,h,no,,,"Update critial parameters ?"
+verbose,b,h,no,,,"Print verbose output ?"
+graphics,s,h,stdgraph,,,"Default graphics device"
+display,s,h,stdimage,,,"Default display device"

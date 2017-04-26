@@ -1,0 +1,5 @@
+nlines,i,a,10,,,number of lines of output to generate
+ncols,i,a,1,,,number of random numbers per line
+ndigits,i,h,4,1,7,number of digits of precision
+seed,i,h,1,,,seed for the random number generator
+scale_factor,r,h,1.0,,,scale factor by which numbers are to be multiplied

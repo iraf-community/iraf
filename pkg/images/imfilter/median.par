@@ -1,0 +1,12 @@
+# Parameters for the MEDIAN task
+
+input,f,a,,,,Input images to be filtered
+output,f,a,,,,Output images
+xwindow,i,a,,,,X window size of median filter
+ywindow,i,a,,,,Y window size of median filter
+zloreject,r,h,INDEF,,,Lowside pixel value cutoff
+zhireject,r,h,INDEF,,,High side pixel value cutoff
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+verbose,b,h,yes,,,Print messages about actions taken by the task ?
+mode,s,h,'ql'

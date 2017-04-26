@@ -1,0 +1,208 @@
+LIBC -- C language binding for a portion of the IRAF VOS
+	UNIX emulator
+
+This directory contains
+
+    [1]	A subset of the routines from the UNIX stdio library.  These routines
+	emulate the equivalent UNIX routines but are interfaced to the IRAF
+	program interface.
+
+    [2]	C-callable versions of a subset of the routines from the IRAF program
+	interface.  Included are portions of the following packages:
+
+		file i/o
+		formatted i/o
+		environment
+		process control
+		terminal control
+		memory management
+		exception handling
+
+The header files "irafio.h" and "names.h" should be included in all C files
+which reference the C library.  The include files "stdio.h" and "ctype.h"
+should be used wherever they would be used in a UNIX/C system.
+
+
+IMPORTANT NOTE:
+
+    Routines marked VARARGS are machine dependent in that they assume a
+certain ordering (left to right) for the argument list.  On some machines
+the ordering may be the opposite.
+
+TODO: Rewrite these procedures to use the UNIX <varargs.h> macros.
+
+
+1. LIBC Emulation of UNIX C-Library Procedures
+
+                   syntax                              err       eof
+
+       double = asin (x)
+       double = acos (x)
+       double = atan (x)
+      double = atan2 (x, y)
+       double = atof (str)                              0.
+          int = atoi (str)                              0
+         long = atol (str)                              0
+      charp = calloc (nelems, elsize)                  NULL
+            clearerr (fp)
+        double = cos (x)
+        double = exp (x)
+              fclose (fp)                              EOF
+       FILE = fdopen (fd, modestr)                     NULL
+         bool = feof (fp)
+       bool = ferror (fp)
+              fflush (fp)                              EOF
+          ch = fgetc (fp)                              EOF
+       charp = fgets (buf, maxch, fp)                  NULL
+         fd = fileno (fp)
+        FILE = fopen (fname, modestr)                  NULL
+               fputc (ch, fp)                          EOF
+               fputs (str, fp)
+       nelem = fread (bp, szelem, nelem, fp)            0         0
+                free (buf)
+      FILE = freopen (fname, modestr, fp)              NULL
+               fseek (fp, offset, origin)              EOF
+        long = ftell (fp)
+      nelem = fwrite (bp, szelem, nelem, fp)            0         0
+           ch = getc (fp)                              EOF       EOF
+        ch = getchar ()                                EOF       EOF
+      charp = getenv (envvar)                          NULL
+        charp = gets (buf)                             NULL      NULL
+         word = getw (fp)                              EOF       EOF
+       charp = index (str, ch)                         NULL
+        double = log (x)
+      double = log10 (x)
+	  int = nint (x)
+      charp = malloc (nbytes)                          NULL
+      charp = mktemp (template)                        NULL
+              perror (prefix)
+        double = pow (x, y)
+              printf (format, argp)
+             fprintf (fp, format, argp)
+             sprintf (str, format, argp)
+             eprintf (format, argp)
+           ch = putc (ch, fp)                          EOF
+        ch = putchar (ch)                              EOF
+                puts (str)
+         word = putw (word, fp)                        EOF
+	       qsort (array, len, isize, compar)
+     charp = realloc (buf, newsize)                    NULL
+              rewind (fp)                              EOF
+      charp = rindex (str, ch)
+       nscan = scanf (format, argp)                    EOF       EOF
+      nscan = fscanf (fp, format, argp)                EOF       EOF
+      nscan = sscanf (str, format, argp)               EOF       EOF
+              setbuf (fp, buf)
+           setbuffer (fp, buf, size)
+          setlinebuf (fp)
+        double = sin (x)
+       double = sqrt (x)
+      charp = strcat (s1, s2)
+      charp = strcmp (s1, s2)
+      charp = strcpy (s1, s2)
+        int = strlen (str)
+     charp = strncat (s1, s2, n)
+     charp = strncmp (s1, s2, n)
+     charp = strncpy (s1, s2, n)
+       stat = system (cmd)
+         ch = ungetc (ch, fp)                          EOF
+
+
+
+2. System Calls
+
+All output parameters are shown as "&name" regardless of whether the actual
+parameter is a pointer.  If no ERR or EOF type is shown it is inapplicable to
+the procedure.  The error type "*" denotes an error action which will lead to
+error recovery if not caught by calling the procedure inside an "iferr".  In
+general, error actions are permitted only where errors are not expected and
+where we suspect that the programmer would ignore an error return code if one
+were used.  Fatal errors cannot be caught but "cannot happen".
+
+
+                         syntax                         err        eof
+
+       bool = c_access (fname, mode, type)               *
+   longsec = c_clktime (reftime)
+               c_close (fd)                              *
+     charp = c_cnvdate (clktime, &outstr, maxch)
+     charp = c_cnvtime (clktime, &outstr, maxch)
+  longmsec = c_cputime (reftime)
+              c_delete (fname)                          ERR
+    nchars = c_envfind (var, &outstr, maxch)             0
+    nchars = c_envgets (var, &outstr, maxch)             0
+      bool = c_envgetb (var)                           no=0
+      ival = c_envgeti (var)                             *
+             c_envputs (var, value)                      *
+             c_envlist (fd, prefix, show_redefs)         *
+             c_envmark (&envp)
+   nredefs = c_envfree (envp)
+     nscan = c_envscan (input_source)                    *
+               c_error (errcode, errmsg)                 *
+              c_erract (action)                          *
+    errcode = c_errget (&outstr, maxch)
+              c_fchdir (newdir)                         ERR
+         ch = c_filbuf (fp)                             EOF        EOF
+               c_finfo (fname, fi)                      ERR
+         ch = c_flsbuf (ch, fp)                         EOF
+               c_flush (fd)                              *
+     nchars = c_fmapfn (vfn, &osfn, maxch)               0
+       stat = c_fmkdir (newdir)				ERR
+     nchars = c_fnldir (vfn, &ldir, maxch)
+     nchars = c_fnroot (vfn, &root, maxch)
+     nchars = c_fnextn (vfn, &extn, maxch)
+      nchars = c_fpath (vfn, &osfn, maxch)		 0
+         fd = c_fredir (fd, fname, mode, type)          ERR
+               c_fseti (fd, param, value)                *
+       ival = c_fstati (fd, param)                       *
+        int = c_getpid ()
+              c_getuid (&outstr, maxch)                  *
+ os_chan = c_kimapchan (ki_chan, nodename, maxch)
+      token = c_lexnum (str, &toklen)
+     nchars = c_mktemp (root, &temp_filename, maxch)     0
+         long = c_note (fd)                              *
+           fd = c_open (fname, mode, type)              ERR
+   exit_stat = c_oscmd (cmd, infile, outfile, errfile)   *
+	     c_prchdir (pid, newdir)			ERR
+ exit_stat = c_prcldpr (job)                             *
+             c_prclose (pid)                             *
+       bool = c_prdone (job)                             *
+	    c_prenvset (pid, envvar, valuestr)		ERR
+              c_prkill (job)                            ERR
+       pid = c_propdpr (process, bkgfile)               NULL
+        pid = c_propen (process, &in, &out)             NULL
+             c_prredir (pid, stream, new_fd)            ERR
+            c_prsignal (pid, signal)                    ERR
+       nbytes = c_read (fd, &buf, maxbytes)              *         EOF
+              c_rename (old_fname, new_fname)           ERR
+      charp = c_salloc (nbytes)                        fatal
+               c_smark (&sp)                           fatal
+               c_sfree (sp)                            fatal
+       bool = c_stkcmp (p1, p2)                          *
+                c_seek (fd, offset)                     ERR
+     xcharp = c_sppstr (xstr)
+       cstr = c_strpak (sppstr, &cstr, maxch)
+     xcharp = c_strupk (str, &xoutstr, maxch)
+              c_tsleep (nseconds)
+  tty(int) = c_ttyodes (ttyname)                        ERR
+             c_ttycdes (tty)                             *
+             c_ttyseti (tty, param, value)               *
+     ival = c_ttystati (tty, param)                      *
+      bool = c_ttygetb (tty, cap)                      no=0
+      ival = c_ttygeti (tty, cap)                        0
+      fval = c_ttygetr (tty, cap)                        0.
+    nchars = c_ttygets (tty, cap, &outstr, maxch)        0
+             c_ttyputs (fd, tty, cap, afflncnt)         ERR
+             c_ttyctrl (fd, tty, cap, afflncnt)         ERR
+            c_ttyclear (fd, tty)                         *
+          c_ttyclearln (fd, tty)                         *
+             c_ttygoto (fd, tty, col, line)              *
+             c_ttyinit (fd, tty)                         *
+          c_ttyputline (fd, tty, line, map_cc)           *
+               c_ttyso (fd, tty, onoff)                  *
+              c_ungetc (fd, ch)                         ERR
+           c_ungetline (fd, str)                        ERR
+              c_vfnbrk (vfn, root, extn)
+      nbytes = c_write (fd, buf, nbytes)                 *
+               c_xwhen (vex, new_handler, old_handler)   *
+               c_xgmes (oscode, oserrmsg, maxch)

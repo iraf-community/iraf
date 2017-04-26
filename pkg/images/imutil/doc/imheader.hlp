@@ -1,0 +1,62 @@
+.help imheader Jun97 images.imutil
+.ih
+NAME
+imheader -- list header parameters for a list of images
+.ih
+USAGE
+imheader [images]
+.ih
+PARAMETERS
+.ls images
+List of IRAF images.
+.le
+.ls imlist = "*.imh,*.fits,*.pl,*.qp,*.hhh"
+The default IRAF image name template.
+.le
+.ls longheader = no
+Print verbose image header.
+.le
+.ls userfields = yes
+If longheader is set print the information in the user area.
+.le
+.ih
+DESCRIPTION
+IMHEADER prints header information in various formats for the list of IRAF
+images specified by \fIimages\fR, or by the default image name template
+\fIimlist\fR. If \fIlongheader\fR = no, the image name,
+dimensions, pixel type and title are printed. If \fIlongheader\fR = yes,
+information on the create and modify dates, image statistics and so forth
+are printed. Non-standard IRAF header information can be printed by
+setting \fIuserfields\fR = yes.
+
+.ih
+EXAMPLES
+
+1. Print the header contents of a list of IRAF fits images.
+
+.nf
+	cl> imheader *.fits
+.fi
+
+2. Print the header contents of a list of old IRAF format images in verbose
+mode.
+
+.nf
+	cl> imheader *.imh lo+
+.fi
+
+3. Print short headers for all IRAF images of all types, e.g. imh, fits etc
+in the current directory.
+
+.nf
+	cl> imheader
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imgets, hedit, hselect
+.endhelp

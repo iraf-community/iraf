@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+if [ -z "$iraf" ]; then
+    #/bin/echo ""
+    #/bin/echo "Error:  You must have the iraf env variable defined !"
+    #/bin/echo ""
+    #exit 1
+
+    iraf=`pwd`/
+fi
+
+if [ -e "$HOME/.iraf/arch" ]; then
+  if [ -n "$IRAFARCH" ]; then
+    iarch=`cat $HOME/.iraf/arch`
+    if [ "$iarch" != "$IRAFARCH" ]; then
+      /bin/echo ""
+      /bin/echo 'Error:  Your $IRAFARCH does not match $HOME/.iraf/arch,'
+      /bin/echo '        Please change $IRAFARCH or rerun install script.'
+      /bin/echo ""
+      exit 1
+    fi
+  fi
+fi
+
+c_start=`date`
+/bin/rm -f spool */spool
+
+
+$iraf/util/mkclean				# clean old binaries
+
+cd $iraf/unix					# NOVOS bootstrap
+source hlib/irafuser.sh
+sh -x mkpkg.sh 2>&1 | tee -a spool
+
+cd $iraf/					# build NOVOS
+mkpkg 2>&1 | tee -a spool
+
+cd $iraf/unix					# VOS bootstrap
+source hlib/irafuser.sh
+sh -x mkpkg.sh 2>&1 | tee -a spool
+
+cd $iraf/vendor					# build vendor libs
+make all 2>&1 | tee -a ../spool.final
+cd ../
+
+cd $iraf/					# build core system
+mkpkg 2>&1 | tee -a spool
+
+cd $iraf/noao					# build NOAO package
+export noao=`pwd`/
+mkpkg -p noao 2>&1 | tee -a ../spool.final
+
+cd $iraf/vo					# build NOAO package
+export vo=`pwd`/
+mkpkg -p vo 2>&1 | tee -a ../spool.final
+
+/bin/rm -rf bin*/pkgconfig			# misc clean up
+
+c_end=`date`
+
+
+/bin/echo ""
+/bin/echo ""
+/bin/echo ""
+/bin/echo "Start:  $c_start"
+/bin/echo "  End:  $c_end"

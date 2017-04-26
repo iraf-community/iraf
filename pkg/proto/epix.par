@@ -1,0 +1,8 @@
+image_name,s,a,,,,"image to be edited"
+xcoord,i,a,,,,"x coordinate of pixel to be edited"
+ycoord,i,a,,,,"y coordinate of pixel to be edited"
+new_value,r,a,,,,"new value for pixel"
+boxsize,i,h,3,,,"size of subraster surrounding pixel"
+ksigma,r,h,2.5,,,"pixel rejection threshold"
+edit_image,b,h,yes,,,"edit the image"
+verbose,b,h,yes,,,"print subraster and median value"

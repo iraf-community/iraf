@@ -1,0 +1,49 @@
+.help issolve Aug85 "Surfit Package"
+.ih
+NAME
+issolve -- solve the surface
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+issolve (sf, lines, nlines, ier)
+
+.nf
+pointer	sf		# surface grid descriptor
+int	lines[nlines]	# surface grid line numbers, 1 <= lines[i] <= nlines
+int	nlines		# number of lines
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface grid descriptor structure.
+.le
+.ls lines
+The line number of surface grid lines to be included in the fit.
+.le
+.ls nlines
+The number of surface grid lines to be fit.
+.le
+.ls ier      
+Error code returned by the fitting routines. The options are OK, SINGULAR,
+and NO_DEG_FREEDOM. If ier = SINGULAR the matrix is singular, ISSOLVE
+will compute a solution to the normal equations but one or more of the
+coefficients will be zero. If ier = NO_DEG_FREEDOM, too few data points
+exist for a reasonable solution to be computed. ISSOLVE returns without
+fitting the data.
+.le
+.ih
+DESCRIPTION
+ISSOLVE solves for the surface coefficients.
+An error code is
+returned by ISSOLVE if it is unable to solve the normal equations as
+formulated.
+.ih
+NOTES
+It is the responsibility of the calling program to check for out of bounds
+lines values.
+.ih
+SEE ALSO
+isinit, slzero, islfit, islrefit, islaccum, islresolve, isfree
+.endhelp

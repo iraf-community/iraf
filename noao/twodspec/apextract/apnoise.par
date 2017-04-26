@@ -1,0 +1,30 @@
+# APSIGMA
+
+input,s,a,,,,List of images to evaluate
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,"List of reference images
+"
+dmin,r,a,,,,Data minimum for sigma bins
+dmax,r,a,,,,Data maximum for sigma bins
+nbins,i,a,,1,,Number of sigma bins
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,yes,,,Recenter apertures?
+resize,b,h,yes,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,"Fit traced points interactively?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum or median
+threshold,r,h,10.,,,"Division threshold for ratio fit
+"
+background,s,h,"none","none|average|median|minimum|fit",,Background to subtract
+pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting type (fit1d|fit2d)
+clean,b,h,no,,,Detect and replace bad pixels?
+skybox,i,h,1,1,,Box car smoothing length for sky
+saturation,r,h,INDEF,,,Saturation level
+readnoise,s,h,"0.",,,Read out noise sigma (photons)
+gain,s,h,"1.",,,Photon gain (photons/data number)
+lsigma,r,h,4.,0.,,Lower rejection threshold
+usigma,r,h,4.,0.,,Upper rejection threshold

@@ -1,0 +1,127 @@
+.help joinlines Feb90 proto
+.ih
+NAME
+joinlines -- join input text files line by line.
+.ih
+USAGE
+joinlines list1 [list2]
+.ih
+PARAMETERS
+.ls list1
+List of input text files to be joined.  It is an error if a file does
+not exist.  The special file "STDIN" may be used to read from the
+terminal, redirected input, or a pipe.
+.le 
+.ls list2
+Optional second list of input text files to be combined with the
+first list.  This only applies when two lists are specified on
+the command line otherwise this parameter is ignored.
+.le
+.ls output = "STDOUT"
+Output filename.  The result of joining the input lines is appended
+to the specified file.  The special file "STDOUT" selects the standard
+output stream, which is usually the terminal but which may be redirected.
+.le
+.ls delim = " "
+The delimiter placed between joined input lines.  The default is a space
+(note that this will not be visible when viewed with \fBeparam\fR).
+.le
+.ls missing = "Missing"
+This string is substituted for missing lines when going beyond the end
+of shorter input files.
+.le
+.ls maxchars = 161
+Maximum number of characters in output lines.  Longer output lines will
+be truncated and a warning may be given.  Note that this number always
+includes the final newline character.
+.le
+.ls shortest = yes
+Stop at the end of the shortest file?  If the input files are of unequal
+number of lines then this option provides for stopping at the end
+of the shortest file or the end of the longest file.  In the latter case
+the string specified by the parameter \fImissing\fR is used for input
+from the shorter files.
+.le
+.ls verbose = yes
+Warnings are printed to the standard error stream giving the number
+of lines exceeding the maximum number of output characters, the number
+of lines exceeding the IRAF line length limit, and the number of files
+completed in case the files are of unequal length.  If verbose is no
+then no warnings are printed.
+.le
+.ih
+DESCRIPTION
+The task \fBjoinlines\fR reads lines from each of the input text files and
+joins them into one line separated by the specified delimiter.  This is useful
+for making multicolumn files from individual files.  The output may
+be directed to the standard output, the default, or appended to a
+file.
+
+The list of input files may be given in either \fIlist1\fR or with
+\fIlist2\fR.  The second list is only used if two arguments are given
+on the command line.  This feature is provided for compatibility with
+an earlier version of this task which only joined two files given separately.
+
+There is no limit to the possible number of characters per output line but
+the parameter \fImaxchars\fR may be used to truncate long lines.  This
+can be important because many IRAF tasks read files a line at a time
+with a fixed sized line buffer.  Also other tasks and host programs
+(for example UNIX/vi) have line limits as well.  If an input line
+exceeds these limits incorrect results may occur.  The IRAF limit is 
+SZ_LINE characters (see hlib$iraf.h) and so the default for the maximum 
+number of output characters is set at the current value.  One may 
+chose to go beyond this limit.
+
+If the input files do not all have the same number of lines then there
+are two courses of action.  If the \fIshortest\fR parameter is set
+then the join operation is terminated with the last line from the
+shortest file.  If it is not set then the string from the parameter
+\fImissing\fR is substituted for input from the shorter files until
+the end of the longest file is reached.  Note that the delimiter will
+still be placed between input lines even when such lines are missing.
+
+There are three types of warnings which may be produced if the verbose
+flag is set.  These are warnings for the number of lines exceeding the
+specified maximum number of characters resulting in truncated output,
+the number of lines exceeding the IRAF line buffer limit, and a warning
+when some input files are shorter than others.  The
+warnings are printed on the standard error stream so that redirection
+of the standard output will still leave the warnings on the user's
+terminal.  To redirect the warnings one must include the standard error
+stream in the redirection syntax.  See the examples for how to do
+this.
+.ih
+EXAMPLES
+1. Join the two files "names" and "titles", redirecting the output into a third
+file "personnel_file".
+
+.nf
+	cl> joinlines names titles > personnel_file
+.fi
+
+2. Join a set of magnitudes given in separate files and place the
+output in "allmags".  Separate the columns by tabs.
+
+.nf
+	cl> joinlines mags* out=allmags delim="	"
+.fi
+
+3. Join a set of files into long lines and redirect the error output
+to a log file.  Set missing lines to INDEF value.
+
+.nf
+	cl> joinlines tables* out=jointbls miss=INDEF short- ver+ >& log
+.fi
+
+4. Join the second column from the output of a program to the previous
+results.  This illustrates the use of pipes.
+
+.nf
+	cl> myprog | fields STDIN 2 | joinlines last STDIN > new
+.fi
+.ih
+BUGS
+.ih
+SEE ALSO
+fields
+.endhelp

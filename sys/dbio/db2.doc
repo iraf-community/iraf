@@ -1,0 +1,674 @@
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+                            IRAF DATABASE I/O
+                                Doug Tody
+                              November 1984
+
+
+
+
+
+1. INTRODUCTION
+
+    The  IRAF  database  i/o package (DBIO) is a library of SPP callable
+procedures used to create, modify, and access IRAF database files.   All
+access  to  these database files shall be indirectly or directly via the
+DBIO interface.  DBIO shall be  implemented  using  IRAF  file  i/o  and
+memory  management  facilities,  hence  the  package will be compact and
+portable.  The separate CL level package  DBMS  shall  be  provided  for
+interactive  database  access  and for procedural access to the database
+from within CL scripts.  The DBMS tasks will  access  the  database  via
+DBIO.
+
+Virtually  all  runtime IRAF datafiles not maintained in text form shall
+be maintained under DBIO, hence it is essential that  the  interface  be
+both  efficient  and  compact.   In  particular,  bulk data (images) and
+large catalogs shall be maintained  under  DBIO.   The  requirement  for
+flexibility  in  defining  and accessing IRAF image headers necessitates
+quite a sophisticated interface.  Catalog storage is required  primarily
+for  module  intercommunication  and output of the results of the larger
+IRAF applications packages,  but  will  also  be  useful  for  accessing
+astronomical   catalogs  prepared  outside  IRAF  (e.g.,  the  SAO  star 
+catalog).  In  short,  virtually  all  IRAF  applications  packages  are
+expected to make use of DBIO; many will depend upon it heavily.
+
+The  relationship of the DBIO and DBMS packages to each other and to the
+related standard IRAF interfaces is shown in Figure 1.1.
+
+
+                DBMS
+                        DBIO
+                                FIO
+                                MEMIO
+                                        (kernel)
+                                                (datafiles)
+
+             (cl)    |      (vos)     |     (host)
+
+
+
+                        Fig 1.1 Major Interfaces
+
+
+While images will be maintained under DBIO, access to  the  pixels  will
+continue  to  be provided by the IMIO interface.  IMIO is a higher level
+interface which will use DBIO  to  maintain  the  image  header.   Pixel
+
+
+                                  -1-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+storage  will  be  either  in  a  separate  pixel storage file or in the
+database file itself (as a one  dimensional  array),  depending  on  the
+size  of  the  image.   A  system  defined thresold value will determine
+which type of storage is used.  The relationship  of  IMIO  to  DBIO  is
+shown in Figure 1.2.
+
+
+                        IMAGES
+                                IMIO
+                                        DBIO
+                                        FIO
+                                        MEMIO
+
+                        (cl)   |    (vos)
+
+
+             Fig 1.2 Relationship of Database and Image I/O
+
+
+
+2. REQUIREMENTS
+
+    The  requirements  for the DBIO interface are driven by its intended
+usage for image and catalog storage.  It is arguable  whether  the  same
+interface  should  be used for both types of data, but development of an
+interface such as  DBIO  with  all  the  associated  DBMS  utilities  is
+expensive,  hence  we  would  prefer  to  have  to develop only one such
+interface.  Furthermore, it is desirable for the user to  only  have  to
+learn  one  such  interface.   The  primary  functional  and performance
+requirements which DBIO must meet are the following  (in  no  particular
+order).
+
+
+    [1] DBIO  shall  provide a high degree of data independence, i.e., a
+        program shall be able to  access  a  data  structure  maintained
+        under DBIO without detailed knowledge of its contents.
+    
+    [2] A  DBIO  datafile  shall  be self describing and self contained,
+        i.e.,  it  shall  be  possible  to  examine  the  structure  and 
+        contents  of  a  DBIO  datafile  without  prior knowledge of its
+        structure or contents.
+    
+    [3] DBIO shall be able to deal efficiently with  records  containing
+        up  to N fields and with data groups containing up to M records,
+        where N and M are at least sysgen configurable and are order  of
+        magnitude N=10**2 and M=10**6.
+    
+    [4] The  time  required to access an image header under DBIO must be
+        comparable to the time currently  required  for  the  equivalent
+        operation under IMIO.
+    
+
+
+
+
+                                  -2-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+    [5] It  shall  be possible for an image header maintained under DBIO
+        to contain application or user defined  fields  in  addition  to
+        the standard fields required by IMIO.
+    
+    [6] It  shall  be  possible  to  dynamically  add  new  fields to an
+        existing image header (or to any DBIO record).
+    
+    [7] It shall be possible to group similar records  together  in  the
+        database  and  to  perform global operations upon all or part of
+        the records in a group.
+    
+    [8] It  shall  be  possible  for  a  field  of  a  record  to  be  a 
+        one-dimensional array of any of the primitive types.
+    
+    [9] Variant  records (records containing variable size fields) shall
+        be supported, ideally without  penalizing  efficient  access  to
+        databases which do not contain such records.
+    
+    [A] It  shall  be possible to copy a record without knowledge of its
+        contents.
+    
+    [B] It shall be possible to  merge  (join)  two  records  containing
+        disjoint sets of fields.
+    
+    [C] It shall be possible to update a record in place.
+    
+    [D] It   shall  be  possible  to  simultaneously  access  (retrieve, 
+        update, or insert) multiple records from the same data group.
+
+
+To summarize, the primary requirements are data independence,  efficient
+access  to  both  large  and  small  databases,  and  flexibility in the
+contents of the database.
+
+
+
+3. CONCEPTUAL DESIGN
+
+    The DBIO database faciltities shall be  based  upon  the  relational
+model.   The relational model is preferred due to its simplicity (to the
+user) and due to the demonstrable fact  that  relational  databases  can
+efficiently  handle  large amounts of data.  In the relational model the
+database appears to be nothing more  than  a  set  of  TABLES,  with  no
+builtin  connections  between  separate  tables.  The operations defined
+upon these tables are based upon the relational  algebra,  which  is  in
+turn   based   upon  set  theory.   The  major  advantages  claimed  for 
+relational databases are the simplicity of the concept of a database  as
+a  collection  of  tables,  and  the  predictability  of  the relational
+operators due to their being based on a formal theoretical model.
+
+None of the requirements listed  in  section  2  state  that  DBIO  must
+implement  a  relational  database.   Most  of  our  needs can be met by
+structuring our data according to the relational data  model  (i.e.,  as
+
+
+                                  -3-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+tables),  and  providing  a  good SELECT operator for retrieving records
+from the database.  If a semirelational database is sufficient  to  meet
+our  requirements  then most likely that is what will be built (at least
+initially;  the  relational  operators  are  very  attractive  for  data 
+analysis).   DBIO  is not expected to be competitive with any commercial
+relational database; to try to make it so would probably compromise  the
+requirement  that  the  interface  be  compact.   On the other hand, the
+database requirements of IRAF are similar enough to those  addressed  by
+commercial  databases that we would be foolish not to try to make use of
+some of the same technology.
+
+
+        FORMAL RELATIONAL TERM              INFORMAL EQUIVALENTS
+
+                relation                        table
+                tuple                           record, row
+                attribute                       field, column
+                domain                          datatype
+                primary key                     record id
+
+
+A DBIO DATABASE shall consist of one or more RELATIONS  (tables).   Each
+relation  shall  contain zero or more RECORDS (rows of the table).  Each
+record shall contain one or more FIELDS (columns  of  the  table).   All
+records  in  a  relation  shall share the same set of fields, but all of
+the fields in a record need not have been assigned values.  When  a  new
+ATTRIBUTE  (column)  is  added  to an existing relation a default valued
+field is added to each current and future record in the relation.
+
+Each attribute is defined upon a particular DOMAIN,  e.g.,  the  set  of
+all  nonnegative  integer values less than or equal to 100.  It shall be
+possible to specify minimum and maximum  values  for  integer  and  real
+attributes  and  to  enumerate  the  permissible values of a string type
+attribute.  It shall be possible to  specify  a  default  value  for  an
+attribute.   If  no  default  value  is  given  INDEF  is  assumed.  One
+dimensional arrays shall be supported as attribute types; these will  be
+treated  as  atomic datatypes by the relational operators.  Array valued
+attributes shall be either fixed in size (the most  efficient  form)  or
+variant.   There  need be no special character string datatype since one
+dimensional arrays of type character are supported.
+
+Each relation shall be implemented as a separate file.  If the relations
+comprising  a  database are stored in a directory then the directory can
+be thought of as the database.  Public databases will be stored in  well
+known  public  (write  protected) directories, private databases in user
+directories.  The logical directory name of each public database will be
+the  name  of  the  database.   Physical storage for a database need not
+necessarily be allocated locally, i.e.,  a  database  may  be  centrally
+located  and  remotely  accessed if the host computer is part of a local
+area network.
+
+Locking shall be at the level of entire relations  rather  than  at  the
+record  level,  at  least in the initial implementation.  There shall be
+
+
+                                  -4-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+no support for indices in the  initial  implementation  except  possibly
+for  the  primary  key.   It should be possible to add either or both of
+these features to a future implementation  without  changing  the  basic
+DBIO  interface.   Modifications to the internal data structures used in
+database files will  likely  be  necessary  when  adding  such  a  major
+feature,  making  a  save  and  restore  operation  necessary  for  each 
+database file to convert it to the new format.  The save  format  chosen
+(e.g.  FITS  table) should be independent of the internal format used at
+a particular time on a particular host machine.
+
+Images shall be stored in  the  database  as  individual  records.   All
+image  records  shall  share  a  common  subset  of attributes.  Related
+images (image records) may be grouped together to form  relations.   The
+IRAF  image  operators  shall support operations upon relations (sets of
+images) much as the IRAF file operators support operations upon sets  of
+files.
+
+A  unary  image  operator  shall take as input a relation (set of one or
+more images), inserting the processed images into the  output  relation.
+A  binary  image  operator shall take as input either two relations or a
+relation and a record, inserting the processed images  into  the  output
+relation.   In all cases the output relation can be an input relation as
+well.  The input relation will  be  defined  either  by  a  list  or  by
+selection  using  a  theta-join  (operationally  similar  to  a filename
+template).
+
+
+
+3.1 RELATIONAL OPERATORS
+
+    DBIO  shall  support  two  basic  types  of   database   operations: 
+operations  upon  relations  and  operations  upon  records.   The basic
+relational operators are the following.  All of these operators  produce
+as output a new relation.
+
+
+    create
+        Create  a  new  base  relation  (physical  relation as stored on
+        disk) by  specifying  an  initial  set  of  attributes  and  the
+        (file)name  for the new relation.  Attributes and domains may be
+        specified via a data definition  file  or  by  reference  to  an
+        existing   relation.    A  primary  key  (limited  to  a  single 
+        attribute) should be identified.   The  new  relation  initially
+        contains no records.
+    
+    drop
+        Delete  a  (possibly  nonempty) base relation and any associated
+        indices.
+    
+    alter 
+        Add a new attribute or attributes to an existing base  relation.
+        Attributes  may  be  specified  explicitly  or  by  reference to
+        another relation.
+
+
+                                  -5-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+    select
+        Create a new relation by selecting  records  from  one  or  more
+        existing   base  relations.   Input  consists  of  an  algebraic 
+        expression defining the output relation in terms  of  the  input
+        relations  (usage  will  be similar to filename templates).  The
+        output relation need not have the same set of attributes as  the
+        input relations.  The SELECT operator shall ultimately implement
+        all the  basic  operations  of  the  relational  algebra,  i.e.,
+        select,  project,  join,  and the set operations.  At a minimum,
+        selection  and  projection   are   required   in   the   initial 
+        interface.   The  output of SELECT is not a named relation (base
+        relation), but is instead intended to be accessed by the  record
+        level operators discussed in the next section.
+    
+    edit
+        Edit  a  relation.   An  interactive  screen  editor  is entered
+        allowing  the  user  to  add,  delete,  or  modify  tuples  (not 
+        required  in  the  initial  version  of  the  interface).  Field
+        values are verified upon input.
+    
+    sort
+        Make the storage order of the records in a relation  agree  with
+        the  order defined by the primary key (the index associated with
+        the primary key is always sorted but index order need not  agree
+        with   storage  order).   In  general,  retrieval  on  a  sorted 
+        relation  is  more  efficient  than  on  an  unsorted  relation. 
+        Sorting  also eliminates deadspace left by record deletion or by
+        updates involving variant records.
+
+
+Additional  nonalgebraic  operators  are  required  for  examining   the 
+structure  and contents of relations, returning the number of records or
+attributes in a relation,  and  determining  whether  a  given  relation
+exists.
+
+The  SELECT  operator is the primary user interface to DBIO.  Since most
+of the relational power of DBIO is bound up in the SELECT  operator  and
+since  SELECT  will  be  driven  by  an  algebraic expression (character
+string) there is considerable  scope  for  future  enhancement  of  DBIO
+without affecting existing code.
+
+
+
+3.2 RECORD (TUPLE) LEVEL OPERATORS
+
+    While  the user should see primarily operations on entire relations,
+record level processing is necessary at  the  program  level  to  permit
+data  entry  and  implementation of special operators.  The basic record
+level operators are the following.
+
+
+
+
+
+
+                                  -6-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+    retrieve
+        Retrieve the next record from the relation  defined  by  SELECT.
+        While  the  tuples in a relation theoretically form an unordered
+        set, tuples will normally be returned in  either  storage  order
+        or  in  the  sort order of the primary key.  Although all fields
+        of a  retrieved  record  are  accessible,  an  application  will
+        typically have knowledge of only a few fields.
+    
+    update
+        Rewrite  the  (possibly  modified)  current record.  The updated
+        record is written back into the base table  from  which  it  was
+        read.  Not all records produced by SELECT can be updated.
+    
+    insert
+        Insert  a  new  record  into  an  output  relation.   The output
+        relation may be an input relation as well.  Records added to  an
+        output  relation  which  is also an input relation do not become
+        candidates  for  selection  until  another  SELECT  occurs.    A 
+        retrieve   followed   by  an  insert  copies  a  record  without 
+        knowledge of its contents.  A retrieve followed by  modification
+        of  selected  fields followed by an insert copies all unmodified
+        fields of the record.  The attributes of the  input  and  output
+        relations  need  not  match; unmatched output attributes take on
+        their  default  values  and  unmatched  input   attributes   are 
+        discarded.   INSERT  returns  a  pointer  to  the output record,
+        allowing  insertions  of  null  records  to   be   followed   by 
+        initialization of the fields of the new record.
+    
+    delete
+        Delete the current record.
+
+
+Additional operators are required to close or open a relation for record
+level access and to count the number of records in a relation.
+
+
+
+3.2.1 CONSTRUCTING SPECIAL RELATIONAL OPERATORS
+
+    The record level operations may be combined with SELECT in  compiled
+programs  to  implement arbitrary operations upon entire relations.  The
+basic scenario is as follows:
+
+
+    [1] The set of records to be operated upon, defined  by  the  SELECT
+        operator,  is opened as an unordered set (list) of records to be
+        processed.
+    
+    [2] The "next" record in the relation is accessed with RETRIEVE.
+    
+
+
+
+
+
+                                  -7-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+    [3] The application reads or modifies a subset of the fields of  the
+        record,  updating  modified  records  or inserting the record in
+        the output relation.
+    
+    [4] Steps [2] and [3] are repeated until  the  entire  relation  has
+        been processed.
+
+
+Examples of such operators are conversion to and from DBIO and LIST file
+formats, column extraction, mimimum or maximum of an  attribute  (domain
+algebra), and all of the DBMS and IMAGES operators.
+
+
+
+3.3 FIELD (ATTRIBUTE) LEVEL OPERATORS
+
+    Substantial  processing  of  the  contents of a database is possible
+without ever accessing the individual fields  of  a  record.   If  field
+level  access  is  required  the  record  must  first  be  retrieved  or 
+inserted.  Field level access requires knowledge of  the  names  of  the
+attributes  of  the  parent  relation,  but  not  their exact datatypes.
+Automatic type conversion occurs when field values are queried or set.
+
+
+    get 
+        Get the value of the named scalar or vector field (typed).
+    
+    put 
+        Put the value of the named scalar or vector field (typed).
+    
+    read
+        Read the named fields into an  SPP  data  structure,  given  the
+        name,  datatype,  and  length  (if  vector) of each field in the
+        output structure.  There must be  an  attribute  in  the  parent
+        relation for each field in the output structure.
+    
+    write
+        Copy  an  SPP  data structure into the named fields of a record,
+        given the name, datatype, and length (if vector) of  each  field
+        in  the  input  structure.   There  must  be an attribute in the
+        parent relation for each field in the input structure.
+    
+    access
+        Determine whether a relation has the named attribute.
+
+
+
+3.4 STORAGE STRUCTURES
+
+    The DBIO storage structures are the data structures used by DBIO  to
+maintain  relations  in  physical storage.  The primary design goals are
+simplicity and efficiency in time and space.  Most actual relations  are
+expected to fall into three classes:
+
+
+                                  -8-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+    [1] Relations  containing  only  a  single  record,  e.g.,  an image
+        stored alone in a relation.
+    
+    [2] Relations containing several dozen or several  hundred  records,
+        e.g., a collection of spectra from an observing run.
+    
+    [3] Large  relations  containing  10**5  or 10**6 records, e.g., the
+        output of an analysis program or an astronomical catalog.
+
+
+Updates and insertions are generally random access operations; retrieval
+based  on the values of several attributes requires efficient sequential
+access.  Efficient random access for relations [2] and [3] requires  use
+of  an  index.   Efficient  sequential  access  requires that records be
+accessible in storage order without reference to the index,  i.e.,  that
+records  be  chained  in  storage order.  Efficient field access where a
+record contains several dozen attributes requires something better  than
+a linear search over the attribute list.
+
+The  use  of  an  index shall be limited initially to a single index for
+the primary key.  The  primary  key  will  be  restricted  to  a  single
+attribute,  with  the  application defining the attribute to be used (in
+practice few attributes are usable  as  keys).   The  index  will  be  a
+standard  B+  tree,  with one exception: the root block of the tree will
+be maintained in dedicated storage in the datafile.  If and  only  if  a
+relation  grows  so  large  that  it  overflows  the  root  block will a
+separate index file be allocated for the  index.   This  will  eliminate
+most of the overhead associated with the index for small relations.
+
+Efficient  sequential access will be provided in either of two ways: via
+the index in index order or via the records themselves in storage order,
+depending  on  the  operation  being performed.  If an external index is
+used the leaves will be chained to permit  efficient  sequential  access
+in  index  order.   If  the  relation also happens to be sorted in index
+order  then  this  mode  of  access  will  be  very   efficient.    Link 
+information  will  also  be  stored  directly  in  the records to permit
+efficient sequential access when it is not necessary or possible to  use
+the index.
+
+Assuming  that there is at most one index associated with a relation, at
+most two files will be required to implement the relation.  The relation
+itself will have the file extension ".db".  The index file, if any, will
+have the extension ".dbi".  The root name of  both  files  will  be  the
+name of the relation.
+
+The  datafile  header  structure  will probably have to be maintained in
+binary if we are to keep the overhead of datafile access  to  acceptable
+levels  for  small  relations.   Careful  design  of  the  basic  header 
+structure should make most future refinements  to  the  header  possible
+without  modification  of  existing  databases.   The revision number of
+DBIO used to create the datafile will be saved in the header to make  at
+least detection of obsolete headers possible.
+
+
+
+                                  -9-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+3.4.1 STRUCTURE OF A BINARY RELATION
+
+    Putting  all  this  together we come up with the following structure
+for a binary relation:
+
+
+        BOF
+        relation header                         -+
+                magic                            |
+                dbio revision number             |
+                creation date                    |
+                relation name                    |
+                number of attributes             |- fixed size header
+                primary key                      |
+                record size                      |
+                domain list                      |
+                attribute list                   |
+                miscellaneous                    |
+        string buffer                            |
+        root block of index                     -+
+        record 1
+                physical record length (offset to next record)
+                logical record length (implies number of attributes set)
+                field storage
+                <gap>
+        record 2
+                ...
+        record N
+        EOF
+
+
+Vector valued fields with a fixed upper size will be stored directly  in
+the  record, prefixed by the length of the actual vector (which may vary
+from record to record).  Storage for variant fields  will  be  allocated
+outside  the  record, placing only a pointer to the data vector and byte
+count in the record itself.  Variant records are thus reduced  to  fixed
+size  records,  simplifying  record  access and making sequential access
+more efficient.
+
+Records will change size only when  a  new  attribute  is  added  to  an
+existing  relation,  followed  by  assignment into a record written when
+there were fewer attributes.  If the new record will not  fit  into  the
+physical  slot  already  allocated, the record is written at EOF and the
+original record is  deleted.   Deletion  of  a  record  is  achieved  by
+setting  the  logical  record  length to zero.  Storage is not reclaimed
+until a sort occurs, hence recovery of deleted records is possible.
+
+To minimize buffer space and memory to memory copies  when  accessing  a
+relation  it  is  desirable to work directly out of the FIO buffers.  To
+make this possible records will not be  permitted  to  straddle  logical
+block  boundaries.   A file block will typically contain several records
+followed by a gap.  The gap may be used to accomodate  record  expansion
+without  moving a record to EOF.  The size of a file block is fixed when
+
+
+                                 -10-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+the relation is created.
+
+
+
+3.4.2 THE ATTRIBUTE LIST
+
+    Efficient lookup of attribute names suggests maintenance of  a  hash
+table  in the datafile header.  There will be a fixed upper limit on the
+number of attributes permitted in a single  relation  (but  not  on  the
+number  of records).  Placing an upper limit on the number of attributes
+simplifies the software considerably and permits use  of  a  fixed  size
+header,  making  it  possible to read or update the entire header in one
+disk access.  There will also  be  an  upper  limit  on  the  number  of
+domains,  but  the domain list is not searched very often hence a linear
+search will do.
+
+All information about the decomposition of a record into  fields,  other
+than  the  logical  length  of  vector  valued  fields,  is given by the
+attribute list.  Records contain only data with no  embedded  structural
+information  other than the length of the vector fields.  New attributes
+are added to a relation by appending to the  attribute  list.   Existing
+records  are  not affected.  By comparing the logical length of a record
+to the offset for a particular field we can  tell  whether  storage  has
+been allocated for that field in the record.
+
+Domains  are used to limit the range of values a field can take on in an
+assignment, and to flag attribute comparisons which  are  likely  to  be
+erroneous   (e.g.   order   comparison  of  a  pixel  coordinate  and  a 
+wavelength).   The   domains   "bool",   "char",   "short",   etc.   are 
+predefined.   The  following  information  must  be stored for each user
+defined domain:
+
+
+        name                    may be same as attribute name
+        datatype                bool, char, short, etc.
+        physical vector length  0=variant, 1=scalar, N=vector
+        default                 default value, INDEF if not given
+        minimum                 mimimum value (ints and reals)
+        maximum                 maximum value (ints and reals)
+        enumval                 enumerated values (strings)
+
+
+The following information is required to describe each  attribute.   The
+attribute list is maintained separately from the hash table of attribute
+names and can be used to regenerate the hash table of attribute names if
+necessary.
+
+
+        name                    no embedded whitespace
+        domain                  index into domain table
+        offset                  offset in record
+
+
+
+
+                                 -11-
+DBIO (Nov84)               Database I/O Design              DBIO (Nov84)
+
+
+
+All  strings  will  will  be stored in a fixed size string buffer in the
+header area; it is the index of  the  string  which  is  stored  in  the
+domain  and attribute lists.  This eliminates the need to place an upper
+limit on the size of domain names and enumerated value lists  and  makes
+it  possible for a single attribute name string to be referenced in both
+the attribute list and the attribute hash table.
+
+
+
+4. SPECIFICATIONS

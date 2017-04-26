@@ -1,0 +1,20 @@
+# Coordinate Transformation Tasks
+
+$checkout libpkg.a ../
+$update	  libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	@igsfit
+
+	fcdbio.x	<error.h> <math/gsurfit.h> <pkg/dttext.h> <units.h>
+	fcdlist.x	<error.h> <mach.h>
+	fcfitcoords.x	<pkg/gtools.h> <pkg/igsfit.h> <pkg/xtanswer.h>
+	fcgetcoords.x	<imio.h> <mach.h> <pkg/dttext.h> <pkg/igsfit.h>
+	fcgetim.x	
+	fitcoords.x	<error.h> <pkg/igsfit.h> <pkg/xtanswer.h>
+	trsetup.x	<math.h> <math/gsurfit.h> <math/iminterp.h>
+	t_fceval.x
+	t_transform.x	transform.com <imhdr.h> <math/iminterp.h> <units.h>
+	;

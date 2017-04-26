@@ -1,0 +1,572 @@
+.help vms Nov85 "VMS/IRAF Programming Notes"
+.ce
+\fBVMS/IRAF Programming Notes\fR
+.ce
+Doug Tody
+.ce
+25 November 1985
+.sp 2
+.sh
+Preface
+
+    The purpose of this document is to serve as a guide to programming in the
+VMS version of the IRAF environment.  The discussion focuses on the
+peculiarities of the NOAO VMS/IRAF environment rather than on the basics of
+programming in IRAF; this is not an IRAF programming tutorial.  The discussion
+is intended for the practicing programmer using the NOAO/Tucson version of
+VMS/IRAF, which includes the Eunice UNIX emulator and which is embedded in
+a local network of four Vaxes and one Sun workstation.  The discussion
+describes the VMS version of IRAF as it currently exists at NOAO, with all
+its bugs and defects, hence the document will rapidly become dated.
+
+.nh
+Introduction
+
+    The foreign task interface is now working well enough in the VMS version
+of IRAF for me to recommend that IRAF software development and testing be
+done from within the IRAF environment rather than in DCL.
+All of the VMS facilities are easily and efficiently accessible,
+plus one has the many advantages of the CL, e.g.,
+multiple commands on a command line, i/o redirection, ease of
+spawning background jobs, logical directories, networking facilities etc.
+The environment provides the basic tools we are used to on our UNIX based
+systems (with help from Eunice), although the more subtle features of
+UNIX are missing (e.g., OS escapes in VI or the debugger, job control, etc.).
+
+.nh
+The NOAO VMS/IRAF Programming Environment
+.nh 2
+The USER Package
+
+    The USER package provides a way for the IRAF user to extend the IRAF
+environment by adding IRAF or foreign tasks of their own choosing.
+These extensions will normally be site dependent and will often vary from
+user to user.  In this section we describe the USER package for the IRAF
+login on the NOAO VMS systems.  The USER package is defined in the IRAF
+login.cl file (usr1:[iraf.local]login.cl), which uses VMS logical names
+defined in the IRAF login.com file (usr1:[iraf]login.com).
+
+The USER package is automatically loaded at login time since it is in the
+login.cl file.  The current contents of the package are summarized in the
+menu below ("?u" to print when in the CL).  The contents of this package
+change frequently but it is likely that the present package already contains
+the most frequently used utilities.  Note that the standard \fBsoftools\fR
+task are included for convenience.
+
+
+.ks
+.nf
+    adb      grep     mklib    ps       rlogin   ruptime  top      who
+    chmod    ls       mkpkg    purge    rpp      rwho     touch    wtar
+    diff     mail     mon      pwd      rsh      sed      update   xc
+    finger   make     od       rcp      rtar     su       vdir     xpp
+    generic  man      omake    replace  run      telnet   whereis  
+.fi
+.ke
+
+
+Many of the tasks shown here are simply foreign task definitions for the
+Eunice/UNIX tools, which are used just as they are on a UNIX system.
+Some of the others are less obvious and are described in the notes below.
+.ls 4
+.ls 10 adb
+Debug a VMS executable; short for "!run/debug".
+For example, "adb x_x" will run the VMS debugger on file "x_x.e".
+You should log in directly on the class 6 VAX rather than via \fBtelnet\fR,
+else the screen will scroll rather than be randomly updated.
+On VMS a process must be linked specially to be used with the debugger.
+To do this, add the "-x" flag to the XC command line.
+A task linked in this fashion CANNOT presently be run from the CL in the
+normal fashion, so always use the "-o" flag to give the debug executable
+a different name than the installed executable, e.g, "x_x.e".
+.le
+.ls run
+The opposite of ADB.  Runs a process linked with the debugger with DEBUG
+turned off (i.e., a VMS run/nodebug).  Will also run any normal (nondebug)
+executable.
+.le
+.ls generic
+The IRAF generic preprocessor.  Usually run explicitly on VMS since the
+Eunice MAKE has filename, etc. problems and cannot run many UNIX/IRAF
+makefiles.  Look in the UNIX makefile to get the command to feed to generic.
+.le
+.ls ls
+The Eunice/UNIX directory lister.  Used when you want to see multiple file
+versions (these are invisible in an IRAF "dir" listing),
+or when you want an "ls -lt" time sorted file listing.
+The disadvantages of LS for normal use are that it
+does not expand templates and does not unmap filenames.  Note also that
+recursive descent does not work in Eunice (at least not for me), hence commands
+like "ls -R" will hang.
+.le
+.ls mail
+Calls the VMS mail program.  Whenever possible use UNIX mail instead to send
+messages, unless you are sending mail to Nigel or some other diehard VMS type
+who reads their VMS mail frequently.
+.le
+.ls mklib
+The IRAF library maintenance utility.  Also available in the \fBsoftools\fR
+package.  Essentially equivalent capability to the UNIX version.
+A VMS manual page is appended.
+.le
+.ls mkpkg
+Make package.  Runs the "mkpkg.com" script in the current directory.
+This is the VMS/IRAF equivalent of the "make" used on a UNIX system to
+make or update a package.
+.le
+.ls mon
+Monitor system.  Equivalent to "!monitor system".  Not as useful as the
+UNIX task of the same name, but the output is prettier.
+.le
+.ls omake
+Makes an object version of a file if one does not already exist; needed because
+Make is not available on VMS.  The only alternative in VMS is "xc -c file"
+which is much slower since it always recompiles the named file.  Note that
+OMAKE does not check any include file dependencies.
+.le
+.ls ps
+The Eunice version of PS.  Contains a lot more information than the VMS
+"show sys".  The output from "ps -axu" is particularly useful.
+PS is currently about the only thing on VMS which can tell you what command
+another user is running.
+.le
+.ls purge
+The VMS purge-old-versions task.  Type "pu *.*" often when working in VMS.
+The form "pu [...]*.*" will purge all old versions in the current directory
+and below.
+.le
+.ls replace
+Replace the named module in the named LIB$ library, e.g.,
+
+	cl> replace read.x sys
+
+would recompile "read.x" and replace the object module in the library
+"lib$libsys.a", aka "iraflib:libsys.olb".  This is primarily of interest
+to systems programmers, since it works only on the system libraries in LIB$.
+NOTE: this is a dangerous utility, since it is easy to replace (insert)
+the module into the wrong library.
+.le
+.ls rtar
+The IRAF read tarfile task.  Used to unpack IRAF files from a tar tape,
+or more commonly, from a tar format disk file pushed through the Ethernet.
+A VMS manual page is appended.
+.le
+.ls telnet
+Used to log in on a remote node.  When logging onto a UNIX node from a VMS
+node, frequent <ctrl/q>'s will be necessary when using utilities like PAGE
+and VI to keep the terminal talking.
+.le
+.ls top
+Display the processes currently using the most cpu cycles.  Equivalent to
+a "!monitor proc/topcpu".  Similar to the UNIX "top" but takes no arguments
+and returns less information about the resources consumed by the processes.
+.le
+.ls update
+Update the named LIB$ system library by running MKLIB on the contents of
+the current directory.  This is like REPLACE except that it will hopefully
+find and replace all recently modified modules in the current directory.
+UPDATE is equivalent to the following sequence of VMS commands:
+
+.ks
+.nf
+	$ copy iraflib:libXXX.olb []
+	$ mklib libXXX.a
+	$ rename libXXX.olb iraflib
+.fi
+.ke
+
+Note the use of [] to signify the current directory, and the use of RENAME
+to move a file to another directory.
+.le
+.ls vdir
+The VMS directory lister.  Used when one wants to ask VMS questions about
+files, e.g., to query protections, get /full listings, etc.  The advantage
+of having this available as a foreign task (rather than just using an OS
+escape) is that the output can be redirected into a file.  For example,
+
+	cl> vdir /full [...]*.exe > _exec
+
+will save in file "_exec" a /full format directory listing of all executables
+in the current directory and below.
+.le
+.ls who
+Equivalent to a "!show users".
+.le
+.ls wtar
+The UNIX write tarfile utility.  Used to save a directory tree in a portable
+a UNIX "tar" format binary file.  Use this with the "-o" (omit binaries) flag
+to move sources back to UNIX.  For example,
+
+.ks
+.nf
+	cl> cd pkg
+	cl> wtar -of home:plarc [.plot]
+.fi
+.ke
+
+will make a tarfile "plarc" of the subdirectory "plot", assuming that HOME is
+defined as a VMS logical directory name.  Most variations on the command
+shown here do not currently work.
+A VMS manual page is appended.
+.le
+.ls xc
+The IRAF XC portable compile/link utility.  This task is also available in
+the \fBsoftools\fR package.  A VMS manual page is appended.
+.le
+.le
+
+
+The USER package described here may be extended by copying the package
+definition to your own login.cl file, then adding additional task definitions.
+
+.nh 2
+Foreign Tasks
+
+    New foreign tasks may easily be defined at run time, for example when one
+wants to capture the output of a VMS utility without having to edit a .com
+file and submit a batch job (many VMS tasks do however have a /OUTPUT switch
+which does much the same thing), or when one wants to run a foreign task
+in the background.  For example,
+
+
+.ks
+.nf
+	cl> task $vll = "$library/list/full"
+	cl> vll osfn("lib$libos.a") > _lib
+.fi
+.ke
+
+
+defines a new task VLL which uses the VMS library to list the contents of a
+library, then uses the new task to list the contents of the system library
+LIBOS, saving the output in the file "_lib".  Note the use of the string
+valued intrinsic function OSFN to generate a VMS filename for the foreign
+task.  To discard a foreign task definition (or any task definition), exit the
+package in which it was defined, or type "cl" before defining the task,
+followed by "bye" at some later time to discard everything back to the "cl".
+
+A foreign task command is parsed by the CL just like any other IRAF command,
+as is evident from the second example above.  The arguments to a foreign
+task may be arbitrary expressions; the CL reduces each such argument
+expression to a constant value and passes this value to the host system as
+a string.  Note that VMS will convert all arguments to a single case unless
+they are quoted.  For example,
+
+	cl> xc '"-cO"' file.x
+
+is the command to compile a file with optimization (the current XC default
+is to not optimize).
+Note that the first set of quotes are stripped off the by the CL, and the
+second by DCL.
+
+.nh 2
+Filenames
+
+    Avoid using the VMS meta-characters [ and $ in filenames when working
+within the IRAF environment (except in calls to foreign tasks).  To reference
+a file in an arbitrary VMS directory you must first define the VMS directory
+as an IRAF logical directory.  Directories which are frequently referenced
+should be defined in your login.cl file.
+
+
+.ks
+.nf
+	cl> set iis = sdk:[kpno.iis.prim]
+	cl> ed iis$foreign.f
+	cl> cd iis
+	cl> dir *.f
+	cl> back
+.fi
+.ke
+
+
+The example above defines a new logical directory IIS and uses it to edit a
+file therein, change to the directory, and so on.  A reference such as the
+following would fail because the system would try to do template expansion
+on the [] delimited field.
+
+	cl> page sdk:[kpno.iis.prim]foreign.for		# won't work
+
+The following should work and will work in a future version of the system,
+but does not work at present.
+
+	cl> page sdk:\[kpno.iis.prim]foreign.for
+
+The mixture of IRAF, Eunice, and VMS tasks present in the USER package can be
+confusing when it comes to filenames.
+Most references to files in the current directory
+are the same in all environments, but there are major differences
+when pathnames are involved.  To work effectively and without aggravation
+you must know what type of task you are calling and supply the appropriate
+type of filename.  This is the price we pay for having direct access to
+foreign tasks.
+
+.nh 2
+I/O Redirection and Background Execution
+
+    I/O redirection will now work on VMS/IRAF for foreign tasks as well as
+true IRAF tasks.  The input or output of a foreign task may be redirected
+on the command line; foreign tasks may be used in pipes.  This is particularly
+useful in combination with background execution, e.g.,:
+
+
+.ks
+.nf
+	cl> mkpkg >& spool &
+or
+	cl> xc -c file1.x,file2.x,file3.f >& spool &
+.fi
+.ke
+
+
+Background jobs currently run at a reduced priority on both UNIX and VMS.
+At present any IRAF background jobs will be terminated when you log out of VMS.
+Support for submission of IRAF background jobs to the VMS batch queues is
+being actively worked on and will be available in the near future.
+
+.nh 2
+Editor Interface
+
+    The NOAO VMS/IRAF editor interface currently supports the VI and EDT
+editors (Emacs is also supported but we do not have the actual editor at NOAO).
+One types "edit" or "ed" to invoke the editor; the choice of the actual
+editor to be used is controlled by the \fBeditor\fR environment variable,
+which may be set in your login file.
+
+The major limitation in the editor interface to VI is that template expansion
+is not currently supported (the template is passed to the Eunice VI but it
+is not expanded, since the UNIX shell normally does this for VI).
+The ":!" OS escape mechanism does not currently work (for all but a few
+commands) in the IRAF environment, although it does work in the Eunice cshell
+environment.  It is possible for the editor to have a different idea of the
+current default directory than IRAF; if you suspect that this is the case,
+type ":!pwd" to check and ":!cd /newdir" to fix it up.
+
+.nh 2
+Network Facilities
+
+    Network access is currently available for the class 1, 2, and 5 Vaxes
+from any other IRAF node, including the two VMS Vaxes and the Sun workstation.
+All binary and text files and the class 2 (lyra) IIS may be accessed over
+the network.  Access to VAX/8600 hosted resources from the 750's will be
+available shortly.  For example, to copy a file from lyra to the current
+directory when logged into IRAF on the 8600, any of the following equivalent
+commands would work:
+
+
+.ks
+.nf
+	cl> copy lyra!/iraf/lib/fio.h fio.h
+	cl> copy 2!/iraf/lib/fio.h .
+	cl> copy 2!lib$fio.h .
+.fi
+.ke
+
+
+Images may also be accessed over the network, provided there is a VAX at
+both ends (this restriction will be removed when the DBIO based IMIO is
+installed).
+
+
+.ks
+.nf
+	cl> set pix = 2!/tmp2/iraf/images/
+	cl> implot pix$canon
+	cl> imcopy pix$canon canon2
+.fi
+.ke
+
+
+Copying an image from the local node to a remote node does not work at
+present, even when IMDIR is defined to be on the remote node.  I have not
+yet had time to figure out why.
+
+Whenever a local process accesses a resource on a remote node the system will
+spawn a "kernel server" process on the remote node.  The kernel server
+remains connected for the life of the local process, hence there is a delay
+the first time a node is referenced (while the kernel server process is being
+spawned), but all subsequent commands execute almost as fast as on the local
+node.  For example, there is a fixed delay of several seconds when an image
+is first displayed from the 8600 on the lyra IIS, but thereafter image load
+will be quite fast, so long as the image load process remains in the process
+cache.
+
+The kernel server process must authenticate on the remote node with a login
+and a password.  By default the NOAO system currently uses the "ace" login for
+this purpose; this is adequate for most purposes but, for example, printer
+output will come out with an ACE jobname, and you will not have network write
+access to your own files and directories.  To have a fully functional network
+interface you must add the file ".irafhosts" to your host system login
+directory.  This structure of this file is very simple and is best explained
+by an example:
+
+
+.ks
+.nf
+	# Sample .irafhosts file.
+
+	aquila lyra carina 	: login1 password1
+	vela draco		: login2 password2
+	*			: login3 password3
+.fi
+.ke
+
+
+Each line in the file associates a login name and password with a set of
+hosts.  Use the "real" host names in this file (e.g., "lyra"), not the
+aliases (e.g., "2, class2").  The "*" line supplies a login and password
+for any host machine and terminates scanning of the file, hence should be
+given last.  In the simplest case, i.e., where your login name and password
+are the same on all hosts, the file may contain a single "*" type entry.
+If the file contains your password it should of course be read protected.
+For additional security the password may be given as "?" in which case you
+will be asked for the actual password whenever a kernel server is spawned.
+
+.nh
+VMS/IRAF Software Maintenance
+
+    The IRAF group currently maintains IRAF simultaneously on a UNIX 11/750
+(node \fIlyra\fR) and on the VMS cluster (including both of the nodes
+\fIdraco\fR and \fIvela\fR).  Software is written and tested on the UNIX
+11/750 and then installed and tested on the 8600, merging any bug fixes
+from the VMS testing back into the UNIX version of the system.  The UNIX 11/750
+is the primary software development system and contains the "master copy"
+of IRAF.  The 8600 is a production data processing machine and should not
+be used for routine software development (algorithm development requiring the
+speed of the 8600 is permitted, however).
+
+Each member of the IRAF group is responsible for installing and testing their
+software on the 8600.  Since the IRAF environment permits identical software
+to be run on all IRAF hosts, the procedure for doing this is quite
+straightforward.  For example, assume we want to install a new version of
+the PLOT package on the 8600.  The following sequence of commands would
+suffice to install an entire new version of the package.  Incremental changes
+are faster, but a full installation should be done occasionally to ensure
+that the same software is running on both nodes.
+
+
+.ks
+.nf
+	(login on the 8600, get into the CL)
+	cl> telnet lyra
+	    (log into lyra)
+
+	% cd plot
+	% tar -cf ~/plarc .		# make tar archive of plot
+	% rcp ~/plarc 6:		# move tarfile to node 6=draco
+	% logout			# go back to draco
+	
+	cl> cd pkg
+	cl> wtar -of usr0:[tody]plarc.bak [.plot]	# make backup
+	cl> cd plot
+	cl> !show default			# just in case...
+	cl> !del [...]*.*;*			# delete nondir files
+	cl> !set prot [...]*.*;*		# unprotect dir files
+	cl> !del [...]*.*;*			# delete directory files
+	    (repeat until all .dir files gone)
+
+	cl> rtar -xof usr0:[tody]plarc		# unpack new version
+	    (fix up mkpkg.com files, if necessary)
+	cl> mkpkg >& spool &
+	    (test everything once package is rebuilt)
+.fi
+.ke
+
+
+At present the VMS version of each package is maintained by a DCL
+"mkpkg.com" file.  This is the only machine dependent software in an
+IRAF package.  To avoid having to recover the mkpkg.com files from the
+WTAR savefile, you may wish to install the files in the UNIX version of
+the package.  The mkpkg.com files are quite simple since they just call
+the portable IRAF utilities MKLIB and XC, but hopefully we will be able
+replace the UNIX Makefiles and VMS mkpkg.com files by a single facility
+in the future.
+
+As an example, the MKPKG.COM file for the plot package is shown below.
+Note that the Makelib files, used by MKLIB to maintain the package libraries,
+are portable since MKLIB is an (bootstrap) IRAF utility.
+
+
+.ks
+.nf
+	$! Make the PLOT package (VMS)
+	$!
+	$ mklib -i libpkg.a
+	$!
+	$ omake x_plot.x
+	$ omake x_ncar.x
+	$ xc x_plot.o libpkg.a -lncar -lgks -lxtools -o x_plot.e
+	$ xc x_ncar.o libpkg.a -lncar -lgks -lxtools -o x_ncar.e
+.fi
+.ke
+
+
+Each time MKPKG is run new VMS versions of the executables will be added
+to the PLOT directory.  An occasional PURGE is necessary to remove the
+old versions.
+
+.nh 
+Debugging on VMS
+
+    Before an IRAF process can be debugged on VMS, the process must first
+be linked using the "-x" flag to XC.  For example the "x_plot.e" executable
+shown above in the example of a MKPKG.COM file would be relinked for
+debugging with the following command:
+
+	cl> xc -x x_plot.o libpkg.a -lncar -lgks -lxtools -o x_x.e
+
+Note that the new executable is NOT called "x_plot.e", in case someone tries
+to use the plot package while we are debugging it.  To debug the newly
+linked process we first check the ZZSETENV.DEF file to make sure that the
+pathnames therein are up to date; they won't be if the package was recently
+moved over from the UNIX system.
+
+Before debugging the executable make sure that you are logged in directly
+on the VMS machine; do not login remotely via \fBtelnet\fR.  Enter the
+following command to begin debugging the process:
+
+	cl> adb x_x
+
+For use in the IRAF environment the VMS debugger is run in screen mode,
+language MACRO (assembler language debugging).  Type GO to run the program
+(the IRAF main prompt will appear); type EXIT to exit the debugger when
+through debugging.  This will sometimes leave the screen in a funny state
+(a scrolling window less than the full screen may be defined).  If this
+happens, physically reset your terminal.  The initial state of the debugger
+is setup by the file "iraf$vms/init.dbg" which is referenced by the VMS logical
+name DBG$INIT (which should be defined in your VMS login.com file).
+You can change the initial state of the debugger by redefining DBG$INIT to
+reference your own initialization file.
+
+Instruction in the actual VAX/DEBUG commands is beyond the scope of this
+document; the best way to learn the debugger is to get an experienced IRAF
+programmer to give a demo.  The VMS document "Programming in VAX FORTRAN"
+is the best documentation currently available for the VMS debugger.
+
+.nh
+Comments on Performance
+
+    Process spawning and inter-process communication appear to be slow in the
+VMS operating system, compared to UNIX.  When programming in an equivalent VMS
+system (e.g., the VMS 11/750) all operations which involve process spawning
+or inter-process communication will be noticeable slow compared to UNIX.
+When programming on the VMS/8600 these operations seem to be comparable
+in speed to an 11/750 running UNIX (actual process execution is of course
+much faster on the 8600).  Large files will compile faster on VMS than on
+UNIX, but when compiling many small files the two systems are comparable.
+Linking takes about the same amount of time on the UNIX 750 and on the 8600,
+but the UNIX linker may actually be faster once the current cpu bound
+inefficiencies in the UNIX linker are corrected (UNIX may win in the end
+because of the UNIX buffer cache and the prelink facility provided by the
+UNIX linker, but if we ever get sharable libraries working on VMS then it
+may be faster).
+
+When it comes to actually executing a single scientific task, however,
+VMS is in general slightly faster than UNIX running on equivalent hardware,
+because the Fortran optimizer is slightly better, and VMS supports
+asynchronous i/o.  For these and other reasons (e.g., the availability of
+UNIX on virtually all machines, the facilities provided by UNIX for software
+development, etc.) it is best to do software development and other timesharing
+activities on UNIX, reserving VMS for production use, i.e., data processing.
+This is of course our current policy at NOAO.
+.endhelp

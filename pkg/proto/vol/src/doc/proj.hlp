@@ -1,0 +1,139 @@
+.help volumes Jan89 "Volume Rotation-Projection Algorithm"
+
+.ce
+Volume Rotation-Projection Algorithm
+.ce
+January 1989
+
+.sh
+Introduction
+
+See help for VOLUMES and PVOL for general information.  Here we describe
+the volume projection algorithm used in PVOL.
+
+.sh
+Algorithms for Collecting Object Voxels that Project onto Image Plane
+
+PVOL is a task for making successive projections through a 3d image onto
+2d images placed along a great circle around an input datacube, with varying
+degrees of translucency.  The technique of viewing successive projections
+around the input datacube causes interior features to appear to "orbit"
+the axis of datacube rotation; the apparent orbital radii generate the
+illusion of seeing in three dimensions.  We limit ourselves to parallel rather
+than perspective projections as the computations are simpler and the resulting
+images preserve distance ratios.
+
+When we are considering orthogonal projections only, the 3D problem becomes
+a 2D problem geometrically, collapsed into a plane at right angles to the
+datacube rotation axis.  Otherwise a full 3D solution would be needed.
+To keep things straight, I will use "object voxel"
+to represent voxels from the input volume image and "image pixel" to represent
+output pixels in the projection plane.
+
+In addition to the projections being parallel, we also want them centered
+and the projection plane perpendicular to the projection rays (we always want
+to be looking toward the center of the volume regardless of the rotation angle).
+Thus we will always orient the center of the projection plane perpendicular
+to the ray passing through the center of the volume for the given rotation
+angle.  
+
+Methods in the literature include back-to-front (BTF) and front-to-back (FTB)
+traversals, digital differential analyzer (DDA) techniques, and octree
+encoding.  Because of the nature of our light-transmission algorithm, we
+must choose a BTF approach.  For standard ray-tracing applications, involving
+discrete objects within the volume image space, octree techniques can be
+the most efficient, depending on the ratio of filled to un-filled space and
+number of objects.  However, for arbitrary voxel images (no explicit geometric
+surfaces included, so every voxel must be examined) simpler techniques are
+considered more efficient.  There are basically two approaches:
+[1] image-plane order:  build up the output image one line at a time by
+computing all contributing voxels, and
+[2] volume-image order:  traverse the voxels one line at a time, building
+up the output image in successive overlapping sheets.
+
+The image-plane order approach is similar to rasterizing a line segment, namely
+the projection ray through the lattice of voxels.  Examples are the incremental
+algorithm discussed in Foley and Van Dam (p. 432), implemented with
+modifications in the IRAF SGI kernel, and Bresenham's algorithm, outlined in
+the same place.  Both methods can be extended to include information from
+extra surrounding voxels, similar to anti-aliasing problems, and this may
+be necessary for effective volume projections, especially of small spatial
+resolution volumes.  This approach may not necessarily be the most efficient
+if the volume image cannot be held in memory and must be accessed randomly
+from disk.  Initially, we will code this algorithm only for the case where the
+rotation is around the X axis of the volume and the viewing direction is
+perpendicular to that axis.
+
+[Discussion of various algorithms for determining which set of voxels gets
+included along a given projection ray follows.  After this was coded, it
+became apparent that runtime was largely dominated by the voxel memory
+accesses after the voxel lists have been prepared.  Consequently, the 
+incremental algorithm is all that is now used.]
+
+The straightforward incremental algorithm would be the simplest to implement,
+though not the most efficient.  Bresenham's algorithm, extended to include
+information from fractionally pierced neighboring voxels, would be more
+efficient as it need not use any real variables, and therefore does not
+require rounding.  Both these methods choose a single ray at a time hitting
+the projection plane, and proceed along that ray, determining which voxels
+contribute, and their weights, which are proportional to the path length
+of the ray through the object voxels.  By proceeding from back to front, we are
+guaranteed that each contributing voxel from the volume succeeds any previous
+one arriving at the current output pixel.  Thus, we can use the output
+pixel to store the results of any previous light transmission and absorption
+operation, and feed that value back in to combine with the properties of
+the next contributing volume voxel.  This method fills up the image plane
+in line-sequential order.  Of course, we determine the list of object voxels
+contributing to a given line of image pixels only once per rotation.
+
+In the volume-image order approach the input voxels are traversed line by line
+in any correct BTF order; they can always be accessed band by band if that is
+the disk storage order.  This method fills up the image plane in successive
+sheets, continually updating the image pixels previously written as it goes.
+Determining which image pixel should be hit by the current object voxel
+requires a transformation matrix.  However, the information in the matrix can
+be pre-multiplied with all possible values of voxel coordinates and stored in
+a lookup table, resulting in much more efficient code than a straightforward
+matrix multiplication for each object voxel (Frieder, Gordon, and Reynolds,
+IEEE CG&A, Jan 1985, p. 52-60).  Due to the significantly increased 
+computation time, this approach should only be used when datacube projections
+are desired along any arbitrary 3D orientation.
+
+In the current implementation only rotations by PVOL around the image X
+axis are allowed.  If rotation is desired about either Y or Z, it is easy
+to first rotate the input image, then run PVOL around the new X axis.
+See D3TRANSPOSE [IMTRANS3D?] for help in rotating datacubes.
+
+.sh
+Memory Management
+
+Now we know how to construct a list of indices of input voxels in
+BTF order that impinge upon a given pixel in the projection plane.
+The original PVOL prototype used line-oriented image i/o to access
+the datacube.  Profiles showed 90% of task execution time spent in
+OS-level reads.  Various other approaches were investigated, which
+determined that actual voxel-value i/o was the most important factor
+in performance.  Since "in-core" i/o is the fastest, the problem became
+one of getting as much of the input datacube into main memory as possible.  
+
+A task maximum working set size parameter was added, and code for attempting
+to grab this much memory, then cascading down to a reasonable amount if
+the requested amount was too much (had adverse effects on PVOL or other
+processes).  Given a fixed amount of available memory smaller than that 
+required to hold the entire datacube in memory, the fastest way is to
+volume-project through successive groups of YZ slices.  A single YZ slice
+of the datacube is sufficient for projecting any and all great-circle
+orientations (360 degrees around the X axis).  The more YZ slices that
+can be held in memory, the better.  If there is room for N YZ slices at
+a time, and there are COLUMNS voxels in the X direction, then all volume
+rotations must be made in each of (COLUMNS/N) passes.  
+
+This approach sped things up by about a factor of 20 over random 
+line-oriented i/o.  For very large datacubes (order of 500 voxels on
+a side) there are on the order of 10 passes required when the task
+working set is in the 10Mb range.  Clearly available memory and/or super
+fast disk i/o, dominates volume rotations.  A general purpose workstation
+with enough main memory can apparently approach the speed of the specialized
+processors usually used in volume rendering.
+
+

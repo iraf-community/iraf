@@ -1,0 +1,30 @@
+.help cs2c6 Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slS2C6 (A, B, R, AD, BD, RD, V)
+
+     - - - - - -
+      S 2 C 6
+     - - - - - -
+
+  Conversion of position & velocity in spherical coordinates
+  to Cartesian coordinates (single precision)
+
+  Given:
+     A     r      longitude (radians)
+     B     r      latitude (radians)
+     R     r      radial coordinate
+     AD    r      longitude derivative (radians per unit time)
+     BD    r      latitude derivative (radians per unit time)
+     RD    r      radial derivative
+
+  Returned:
+     V     r(6)   Cartesian position & velocity vector
+
+  P.T.Wallace   Starlink   November 1984
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

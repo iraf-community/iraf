@@ -1,0 +1,87 @@
+.help mkimage Oct87 noao.imred.ccdred.ccdtest
+.ih
+NAME
+mkimage -- Make or modify and image with simple values
+.ih
+USAGE
+mkimage image option value [ndim dims]
+.ih
+PARAMETERS
+.ls image
+Image to create or modify.
+.le
+.ls option
+Editing option which is one of the following:
+.ls make
+Make a new image of the specified size, dimensionality, pixel type, and values.
+.le
+.ls replace
+Replace pixel values in the image.
+.le
+.ls add
+Add to the pixel values in the image.
+.le
+.ls multiply
+Multiply the pixel values in the image.
+.le
+.le
+.ls value
+Mean pixel value to be used.
+.le
+.ls ndim
+Number of dimensions when creating a new image.
+.le
+.ls dims
+Image dimensions given as a white space separated string (see the examples).
+.le
+.ls pixtype = "real"
+Pixel datatype when creating an image.  The types are "real", "short",
+"integer", "long", and "double".
+.le
+.ls slope = 0.
+Slope of pixel values per pixel.
+.le
+.ls sigma = 0.
+Gaussian noise of pixel values if not zero.
+.le
+.ls seed = 0
+Seed for random numbers.  If zero then the first time the task is
+called a seed of 1 is used and all subsequent calls while the task is in
+the process cache continue with new random numbers.
+.le
+.ih
+DESCRIPTION
+An image is created or modified using simple values.  This task is intended
+for test and demonstration purposes.  A image may be created of a specified
+size, dimensionality, and pixel datatype.  The pixel values used in creating
+or editing an image consist of a sloped plane (which repeats for dimensions
+greater than 2) with pseudo-Gaussian noise. The sloped plane is defined such
+that:
+
+   pix[i,j] = value + slope * ((ncols + nlines) / 2 - 1) + slope * (i + j)
+
+where i and j are the pixel indices (starting with 1) and ncols and nlines
+are the number of columns and lines.  The interpretation of "value" is that
+it is the mean of the plane.  The Gaussian noise is only approximately random
+for purposes of speed!
+.ih
+EXAMPLES
+1. To create an 2 dimensional real image of size 100 x 200 with all zero
+values:
+
+	cl> mkimage name make 0 2 "100 200"
+
+Note that the dimension string is quoted because of the blank separated
+values.
+
+2. To add noise with a sigma of 5:
+
+	cl> mkimage name add 0 sigma=5
+
+2. To replace a region of the image with the value 10:
+
+	cl> mkimage name[10:20,30:40] replace 10
+.ih
+SEE ALSO
+artobs, subsection
+.endhelp

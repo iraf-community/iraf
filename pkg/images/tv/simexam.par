@@ -1,0 +1,10 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+axes,b,h,yes,,,Draw axes?
+
+ncolumns,i,h,21,2,,"Number of columns"
+nlines,i,h,21,2,,"Number of lines"
+angh,r,h, -33.,,,Horizontal viewing angle (degrees)
+angv,r,h,25.,,,Vertical viewing angle (degrees)
+floor,r,h,INDEF,,,Minimum value to be plotted
+ceiling,r,h,INDEF,,,Maximum value to be plotted

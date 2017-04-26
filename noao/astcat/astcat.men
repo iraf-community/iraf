@@ -1,0 +1,23 @@
+       asttest - Run basic tests on the astcat package
+        aclist - List the supported astrometric catalogs
+       agetcat - Extract astrometry files from astrometric catalogs
+      afiltcat - Filter astrometry files derived from astrometric catalogs 
+      adumpcat - Catalog access debugging task
+
+        aslist - List the supported image surveys 
+        agetim - Extract FITS images from image surveys 
+        ahedit - Initialize the image wcs and set standard keywords
+       aimfind - Select images containing catalog objects
+       adumpim - Image survey access debugging task
+
+      aregpars - Default region parameter set
+      acatpars - Default astrometry file format parameter set 
+     afiltpars - Default astrometry file filtering parameters
+       aimpars - Default image data parameters
+      awcspars - Default image wcs parameters
+
+help ccsystems - Describe the supported celestial coordinate systems 
+ help catalogs - Describe the astrometric catalog configuration file
+  help surveys - Describe the image surveys configuration file
+   help afiles - Describe the standard astrometry file format
+

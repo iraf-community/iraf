@@ -1,0 +1,41 @@
+# APNORMALIZE
+
+input,s,a,,,,List of images to normalize
+output,s,a,,,,List of output normalized images
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,"List of reference images
+"
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,yes,,,Recenter apertures?
+resize,b,h,yes,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,Fit traced points interactively?
+normalize,b,h,yes,,,Normalize spectra?
+fitspec,b,h,yes,,,"Fit normalization spectra interactively?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum or median
+cennorm,b,h,no,,,Normalize to the aperture center?
+threshold,r,h,10.,,,"Threshold for normalization spectra
+"
+background,s,h,"none","none|average|median|minimum|fit",,Background to subtract
+weights,s,h,"none","none|variance",,Extraction weights (none|variance)
+pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting type (fit1d|fit2d)
+clean,b,h,no,,,Detect and replace bad pixels?
+skybox,i,h,1,1,,Box car smoothing length for sky
+saturation,r,h,INDEF,,,Saturation level
+readnoise,s,h,"0.",,,Read out noise sigma (photons)
+gain,s,h,"1.",,,Photon gain (photons/data number)
+lsigma,r,h,4.,0.,,Lower rejection threshold
+usigma,r,h,4.,0.,,"Upper rejection threshold
+"
+function,s,h,"legendre","chebyshev|legendre|spline1|spline3",,Fitting function for normalization spectra
+order,i,h,1,1,,Fitting function order
+sample,s,h,"*",,,Sample regions
+naverage,i,h,1,,,Average or median
+niterate,i,h,0,0,,Number of rejection iterations
+low_reject,r,h,3.,0.,,Lower rejection sigma
+high_reject,r,h,3.,0.,,High upper rejection sigma
+grow,r,h,0.,0.,,Rejection growing radius

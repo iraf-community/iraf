@@ -1,0 +1,150 @@
+# Make the VOPS vector operators library.
+
+$checkout libvops.a lib$
+$update   libvops.a
+$checkin  libvops.a lib$
+$exit
+
+# Since all of the VOPS procedures in this directory are generic, no actual
+# compilation occurs here (except for the two fft routines, which are type
+# real only).  The generic preprocessor is called to generate the type
+# specific family of operators for each generic procedure, placing the output
+# files in the subdirectories ak and lz.  Since the preprocessed sources are
+# permanently kept in the subdirectories, the generic preprocessor is only
+# required on the UNIX development system, although it may be available on
+# any other system as well.
+ 
+tfiles:
+	$set	GA   = "$$generic -k -p ak/"
+	$set	GL   = "$$generic -k -p lz/"
+	$set	ACHT = "achtc.x achts.x achti.x achtl.x achtr.x achtd.x achtx.x"
+
+	# The acht (change type) procedures are doubly generic and must be
+	# expanded twice, producing 7*7=49 files as output.
+	#
+	# We force this to be regenerated on each platform since there are
+	# differences in the generated code between 32 and 64-bit platforms.
+
+	$generic -k        -t csilrdx acht.gx
+	$generic -k -p ak/ -t csilrdx $(ACHT)
+	$delete $(ACHT)
+
+
+	# The following files are not generic hence are merely copied to the
+	# type specific directory.
+
+	$ifolder (ak/acjgx.x,  acjgx.x )   $copy acjgx.x  ak/acjgx.x	$endif
+	$ifolder (ak/afftrr.x, afftrr.x)   $copy afftrr.x ak/afftrr.x	$endif
+	$ifolder (ak/afftrx.x, afftrx.x)   $copy afftrx.x ak/afftrx.x	$endif
+	$ifolder (ak/afftxr.x, afftxr.x)   $copy afftxr.x ak/afftxr.x	$endif
+	$ifolder (ak/afftxx.x, afftxx.x)   $copy afftxx.x ak/afftxx.x	$endif
+	$ifolder (ak/aiftrr.x, aiftrr.x)   $copy aiftrr.x ak/aiftrr.x	$endif
+	$ifolder (ak/aiftrx.x, aiftrx.x)   $copy aiftrx.x ak/aiftrx.x	$endif
+	$ifolder (ak/aiftxr.x, aiftxr.x)   $copy aiftxr.x ak/aiftxr.x	$endif
+	$ifolder (ak/aiftxx.x, aiftxx.x)   $copy aiftxx.x ak/aiftxx.x	$endif
+
+	# Each of the following generic files is expanded for each of the
+	# datatypes listed in the -t flag.
+
+	$ifolder (ak/aabsi.x,  aabs.gx )    $(GA) -t  silrdx aabs.gx	$endif
+	$ifolder (ak/aaddi.x,  aadd.gx )    $(GA) -t  silrdx aadd.gx	$endif
+	$ifolder (ak/aaddki.x, aaddk.gx)    $(GA) -t  silrdx aaddk.gx	$endif
+	$ifolder (ak/aandi.x,  aand.gx )    $(GA) -t  sil    aand.gx	$endif
+	$ifolder (ak/aandki.x, aandk.gx)    $(GA) -t  sil    aandk.gx	$endif
+	$ifolder (ak/aavgi.x,  aavg.gx )    $(GA) -t  silrdx aavg.gx	$endif
+	$ifolder (ak/abavi.x,  abav.gx )    $(GA) -t  silrdx abav.gx	$endif
+	$ifolder (ak/absui.x,  absu.gx )    $(GA) -t  silrd  absu.gx	$endif
+	$ifolder (ak/abeqi.x,  abeq.gx )    $(GA) -t csilrdx abeq.gx	$endif
+	$ifolder (ak/abeqki.x, abeqk.gx)    $(GA) -t csilrdx abeqk.gx	$endif
+	$ifolder (ak/abgei.x,  abge.gx )    $(GA) -t csilrdx abge.gx	$endif
+	$ifolder (ak/abgeki.x, abgek.gx)    $(GA) -t csilrdx abgek.gx	$endif
+	$ifolder (ak/abgti.x,  abgt.gx )    $(GA) -t csilrdx abgt.gx	$endif
+	$ifolder (ak/abgtki.x, abgtk.gx)    $(GA) -t csilrdx abgtk.gx	$endif
+	$ifolder (ak/ablei.x,  able.gx )    $(GA) -t csilrdx able.gx	$endif
+	$ifolder (ak/ableki.x, ablek.gx)    $(GA) -t csilrdx ablek.gx	$endif
+	$ifolder (ak/ablti.x,  ablt.gx )    $(GA) -t csilrdx ablt.gx	$endif
+	$ifolder (ak/abltki.x, abltk.gx)    $(GA) -t csilrdx abltk.gx	$endif
+	$ifolder (ak/abnei.x,  abne.gx )    $(GA) -t csilrdx abne.gx	$endif
+	$ifolder (ak/abneki.x, abnek.gx)    $(GA) -t csilrdx abnek.gx	$endif
+	$ifolder (ak/abori.x,  abor.gx )    $(GA) -t  sil    abor.gx	$endif
+	$ifolder (ak/aborki.x, abork.gx)    $(GA) -t  sil    abork.gx	$endif
+	$ifolder (ak/aclri.x,  aclr.gx )    $(GA) -t csilrdx aclr.gx	$endif
+	$ifolder (ak/acnvi.x,  acnv.gx )    $(GA) -t  silrd  acnv.gx	$endif
+	$ifolder (ak/acnvri.x, acnvr.gx)    $(GA) -t  silrd  acnvr.gx	$endif
+	$ifolder (ak/adivi.x,  adiv.gx )    $(GA) -t  silrdx adiv.gx	$endif
+	$ifolder (ak/adivki.x, adivk.gx)    $(GA) -t  silrdx adivk.gx	$endif
+	$ifolder (ak/adoti.x,  adot.gx )    $(GA) -t  silrdx adot.gx	$endif
+	$ifolder (ak/advzi.x,  advz.gx )    $(GA) -t  silrdx advz.gx	$endif
+	$ifolder (ak/aexpi.x,  aexp.gx )    $(GA) -t  silrdx aexp.gx	$endif
+	$ifolder (ak/aexpki.x, aexpk.gx)    $(GA) -t  silrdx aexpk.gx	$endif
+	$ifolder (ak/aglti.x,  aglt.gx )    $(GA) -t csilrdx aglt.gx	$endif
+	$ifolder (ak/ahgmi.x,  ahgm.gx )    $(GA) -t csilrd  ahgm.gx	$endif
+	$ifolder (ak/ahivi.x,  ahiv.gx )    $(GA) -t csilrdx ahiv.gx	$endif
+	$ifolder (ak/aimgi.x,  aimg.gx )    $(GA) -t  silrd  aimg.gx	$endif
+	$ifolder (lz/alani.x,  alan.gx )    $(GL) -t  sil    alan.gx	$endif
+	$ifolder (lz/alanki.x, alank.gx)    $(GL) -t  sil    alank.gx	$endif
+	$ifolder (lz/alimi.x,  alim.gx )    $(GL) -t csilrdx alim.gx	$endif
+	$ifolder (lz/allni.x,  alln.gx )    $(GL) -t  silrdx alln.gx	$endif
+	$ifolder (lz/alogi.x,  alog.gx )    $(GL) -t  silrdx alog.gx	$endif
+	$ifolder (lz/alori.x,  alor.gx )    $(GL) -t  sil    alor.gx	$endif
+	$ifolder (lz/alorki.x, alork.gx)    $(GL) -t  sil    alork.gx	$endif
+	$ifolder (lz/alovi.x,  alov.gx )    $(GL) -t csilrdx alov.gx	$endif
+	$ifolder (lz/altai.x,  alta.gx )    $(GL) -t  silrdx alta.gx	$endif
+	$ifolder (lz/altmi.x,  altm.gx )    $(GL) -t  silrdx altm.gx	$endif
+	$ifolder (lz/altri.x,  altr.gx )    $(GL) -t  silrdx altr.gx	$endif
+	$ifolder (lz/aluii.x,  alui.gx )    $(GL) -t  silrd  alui.gx	$endif
+	$ifolder (lz/aluti.x,  alut.gx )    $(GL) -t csilrd  alut.gx	$endif
+	$ifolder (lz/amagi.x,  amag.gx )    $(GL) -t  silrdx amag.gx	$endif
+	$ifolder (lz/amapi.x,  amap.gx )    $(GL) -t  silrd  amap.gx	$endif
+	$ifolder (lz/amaxi.x,  amax.gx )    $(GL) -t csilrdx amax.gx	$endif
+	$ifolder (lz/amaxki.x, amaxk.gx)    $(GL) -t csilrdx amaxk.gx	$endif
+	$ifolder (lz/amedi.x,  amed.gx )    $(GL) -t csilrdx amed.gx	$endif
+	$ifolder (lz/amed3i.x, amed3.gx)    $(GL) -t csilrd  amed3.gx	$endif
+	$ifolder (lz/amed4i.x, amed4.gx)    $(GL) -t csilrd  amed4.gx	$endif
+	$ifolder (lz/amed5i.x, amed5.gx)    $(GL) -t csilrd  amed5.gx	$endif
+	$ifolder (lz/amgsi.x,  amgs.gx )    $(GL) -t silrdx  amgs.gx	$endif
+	$ifolder (lz/amini.x,  amin.gx )    $(GL) -t csilrdx amin.gx	$endif
+	$ifolder (lz/aminki.x, amink.gx)    $(GL) -t csilrdx amink.gx	$endif
+	$ifolder (lz/amodi.x,  amod.gx )    $(GL) -t  silrd  amod.gx	$endif
+	$ifolder (lz/amodki.x, amodk.gx)    $(GL) -t  silrd  amodk.gx	$endif
+	$ifolder (lz/amovi.x,  amov.gx )    $(GL) -t csilrdx amov.gx	$endif
+	$ifolder (lz/amovki.x, amovk.gx)    $(GL) -t csilrdx amovk.gx	$endif
+	$ifolder (lz/amuli.x,  amul.gx )    $(GL) -t  silrdx amul.gx	$endif
+	$ifolder (lz/amulki.x, amulk.gx)    $(GL) -t  silrdx amulk.gx	$endif
+	$ifolder (lz/anegi.x,  aneg.gx )    $(GL) -t  silrdx aneg.gx	$endif
+	$ifolder (lz/anoti.x,  anot.gx )    $(GL) -t  sil    anot.gx	$endif
+	$ifolder (lz/apkxi.x,  apkx.gx )    $(GL) -t  silrdx apkx.gx	$endif
+	$ifolder (lz/apolr.x,  apol.gx )    $(GL) -t     rd  apol.gx	$endif
+	$ifolder (lz/apowi.x,  apow.gx )    $(GL) -t  silrdx apow.gx	$endif
+	$ifolder (lz/apowki.x, apowk.gx)    $(GL) -t  silrdx apowk.gx	$endif
+	$ifolder (lz/aravi.x,  arav.gx )    $(GL) -t  silrdx arav.gx	$endif
+	$ifolder (lz/arcpi.x,  arcp.gx )    $(GL) -t  silrdx arcp.gx	$endif
+	$ifolder (lz/arczi.x,  arcz.gx )    $(GL) -t  silrdx arcz.gx	$endif
+	$ifolder (lz/argti.x,  argt.gx )    $(GL) -t  silrdx argt.gx	$endif
+	$ifolder (lz/arlti.x,  arlt.gx )    $(GL) -t  silrdx arlt.gx	$endif
+	$ifolder (lz/aseli.x,  asel.gx )    $(GL) -t csilrdx asel.gx	$endif
+	$ifolder (lz/aselki.x, aselk.gx)    $(GL) -t csilrdx aselk.gx	$endif
+	$ifolder (lz/asoki.x,  asok.gx )    $(GL) -t csilrdx asok.gx	$endif
+	$ifolder (lz/asqri.x,  asqr.gx )    $(GL) -t  silrdx asqr.gx	$endif
+	$ifolder (lz/asrti.x,  asrt.gx )    $(GL) -t csilrdx asrt.gx	$endif
+	$ifolder (lz/assqi.x,  assq.gx )    $(GL) -t  silrdx assq.gx	$endif
+	$ifolder (lz/asubi.x,  asub.gx )    $(GL) -t  silrdx asub.gx	$endif
+	$ifolder (lz/asubki.x, asubk.gx)    $(GL) -t  silrdx asubk.gx	$endif
+	$ifolder (lz/asumi.x,  asum.gx )    $(GL) -t  silrdx asum.gx	$endif
+	$ifolder (lz/aupxi.x,  aupx.gx )    $(GL) -t  silrdx aupx.gx	$endif
+	$ifolder (lz/aveqi.x,  aveq.gx )    $(GL) -t csilrdx aveq.gx	$endif
+	$ifolder (lz/awsui.x,  awsu.gx )    $(GL) -t  silrdx awsu.gx	$endif
+	$ifolder (lz/awvgi.x,  awvg.gx )    $(GL) -t  silrdx awvg.gx	$endif
+	$ifolder (lz/axori.x,  axor.gx )    $(GL) -t  sil    axor.gx	$endif
+	$ifolder (lz/axorki.x, axork.gx)    $(GL) -t  sil    axork.gx	$endif
+	;
+
+libvops.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+	$set XFLAGS = "$(XVFLAGS)"
+	@ak
+	@lz
+	@achtgen			# acht conversion matrix
+	fftr.f
+	fftx.f
+	;

@@ -1,0 +1,9 @@
+# MSSET
+
+image,f,a,,,,Image
+keyword,s,a,,,,Keyword for data to be set
+value,s,a,,,,Input value
+lines,s,h,"*",,,Images lines to be affected
+spectra,s,h,"*",,,Spectra to be affected
+read_list,b,h,no,,,Read values from a list?
+list,*s,h,,,,Input list

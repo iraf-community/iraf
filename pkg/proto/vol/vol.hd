@@ -1,0 +1,10 @@
+# Help directory for the VOL package
+
+$doc		= "vol$src/doc/"
+$im3dtran	= "vol$src/im3dtran/"
+$i2sun		= "vol$src/i2sun/"
+
+i2sun		hlp=doc$i2sun.hlp,		src=i2sun$t_i2sun.x
+im3dtran	hlp=doc$im3dtran.hlp,		src=im3dtran$t_im3dtran.x
+imjoin		hlp=doc$imjoin.hlp,		src=vol$src/t_imjoin.x
+pvol		hlp=doc$pvol.hlp,		src=vol$src/t_pvol.x

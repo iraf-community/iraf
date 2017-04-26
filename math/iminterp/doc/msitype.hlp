@@ -1,0 +1,95 @@
+.help msitype Dec98 "Image Interpolator Package"
+.ih
+NAME
+msitype -- decode an interpolant string
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+msitype (interpstr, interp_type, nsinc, nincr, pixfrac)
+
+.nf
+    char	interpstr		#I the input interpolant string
+    int		interp_type		#O interpolant type
+    int		nsinc			#O sinc interpolant width in pixels
+    int		nincr			#O sinc look-up table resolution
+    real	pixfrac	                #O sinc or drizzle pixel fraction 
+.fi
+
+.ih
+ARGUMENTS
+.ls interpstr
+The user supplied interpolant string to be decoded. The options are
+.ls nearest
+Nearest neighbor interpolation.
+.le
+.ls linear
+Bilinear interpolation
+.le
+.ls poly3
+Bicubic polynomial interpolation.
+.le
+.ls poly5
+Biquintic polynomial interpolation.
+.le
+.ls spline3
+Bicubic spline interpolation.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width will be rounded up to
+the nearest odd number.  The default sinc width is 31 by 31.
+.le
+.ls lsinc
+Look-up table sinc interpolation. Users can specify the look-up table sinc
+interpolant width by appending a width value to the interpolant string, e.g.
+lsinc51 specifies a 51 by 51 pixel wide look-up table sinc interpolant. The user
+supplied sinc width will be rounded up to the nearest odd number. The default
+sinc width is 31 by 31 pixels. Users can specify the resolution of the lookup
+table sinc by appending the look-up table size in square brackets to the
+interpolant string, e.g. lsinc51[20] specifies a 20 by 20 element sinc
+look-up table interpolant with a pixel resolution of 0.05 pixels in x and y.
+The default look-up table size and resolution are 20 by 20 and 0.05 pixels
+in x and y respectively.
+.le
+.ls drizzle
+Drizzle interpolation. Users can specify the drizzle pixel fraction by
+appending the pixel fraction value to the interpolant string in square
+brackets, e.g. drizzle[0.5] specifies a pixel fraction of 0.5 in x and y.
+The default pixel fraction is 1.0. If either of the x or y pixel
+fractions are 0.0, then both are set to 0.0. A minimum value of 0.001
+is imposed on the actual value of pixfrac.
+.le
+.le
+.ls interp_type
+The output interpolant type. The options are II_BINEAREST, II_BILINEAR,
+II_BIPOLY3, II_BIPOLY5, II_BISPLINE3, II_BISINC, II_BILSINC, and II_BIDRIZZLE
+for the nearest neighbor, linear, 3rd order polynomial, 5th order polynomial,
+cubic spline, sinc, look-up table sinc, and drizzle interpolants respectively.
+The interpolant type definitions are found in the package header file
+math/iminterp.h.
+.le
+.ls nsinc
+The output sinc and look-up table sinc interpolant width in pixels. The
+default value is 31 pixels in x and y.
+.le
+.ls nincr
+The output sinc look-up table size. Nincr = 10 implies a pixel resolution
+of 0.1 pixels in x, nincr = 20 a pixel resolution of 0.05 pixels in y, etc. The
+default value of nincr is 20.
+.le
+.ls pixfrac
+The output look-up table sinc fractional pixel shift if nincr = 1 
+in which case -0.5 <= pixfrac <= 0.5 , or the drizzle pixel
+fraction in which case 0.0 <= pixfrac <= 1.0.
+.le
+.ih
+DESCRIPTION
+The interpolant string is decoded into values suitable for the MSISINIT
+or MSIINIT routines.
+.ih
+NOTES
+.ih
+SEE ALSO
+msinit, msisinit, msifree

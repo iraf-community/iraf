@@ -1,0 +1,58 @@
+# Help directory file for the MATH package, a collection of mathematical
+# (numerical) packages.
+
+$bev		= "math$bevington/doc/"
+$curfit		= "math$curfit/doc/"
+$deboor		= "math$deboor/doc/"
+$gsurfit	= "math$gsurfit/doc/"
+$ieee		= "math$ieee/doc/"
+$iminterp	= "math$iminterp/doc/"
+$interp		= "math$interp/doc/"
+$llsq		= "math$llsq/doc/"
+$nlfit		= "math$nlfit/doc/"
+$slalib		= "math$slalib/doc/"
+$surfit		= "math$surfit/doc/"
+
+bevington	hlp = bev$bev.men,
+		sys = bev$bev.hlp,
+		pkg = bev$bev.hd
+
+curfit		hlp = curfit$curfit.men,
+		sys = curfit$curfit.hlp,
+		pkg = curfit$curfit.hd
+
+deboor		hlp = deboor$deboor.men,
+		sys = deboor$deboor.hlp,
+		pkg = deboor$deboor.hd
+
+ieee		hlp = ieee$ieee.men,
+		sys = ieee$ieee.hlp,
+		pkg = ieee$ieee.hd
+
+iminterp	hlp = iminterp$iminterp.men,
+		sys = iminterp$iminterp.hlp,
+		pkg = iminterp$iminterp.hd
+
+interp		hlp = interp$interp.men,
+		sys  = interp$interp.hlp,
+		pkg  = interp$interp.hd
+
+llsq		hlp = llsq$llsq.men,
+		sys = llsq$llsq.hlp,
+		pkg = llsq$llsq.hd
+
+nlfit		hlp = nlfit$nlfit.men,
+		sys = nlfit$nllmfit.hlp,
+		pkg = nlfit$nlfit.hd
+
+surfit		hlp = surfit$surfit.men,
+		sys = surfit$surfit.hlp,
+		pkg = surfit$surfit.hd
+
+gsurfit		hlp = gsurfit$gsurfit.men,
+		sys = gsurfit$gsurfit.hlp,
+		pkg = gsurfit$gsurfit.hd
+
+slalib		hlp = slalib$slalib.men,
+		sys = slalib$slalib.hlp,
+		pkg = slalib$slalib.hd

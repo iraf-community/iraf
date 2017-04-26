@@ -1,0 +1,14 @@
+image,s,a,,,,input image
+logofile,s,h,iraf$noao/imred/vtel/nsolcrypt.dat,,,logo file
+device,s,h,dicomed,,,plot device
+sbthresh,i,h,2,,,squibby brightness threshold
+plotlogo,b,h,yes,,,plot the logo on the image?
+verbose,b,h,no,,,give progress reports?
+forcetype,b,h,no,,,force the data type?
+magnetic,b,h,yes,,,if forcing datatype is it magnetic else 10830
+month,i,q,,,,month the observation was made
+day,i,q,,,,day the observation was made
+year,i,q,,,,year the observation was made
+hour,i,q,,,,hour the observation was made
+minute,i,q,,,,minute the observation was made
+second,i,q,,,,second the observation was made

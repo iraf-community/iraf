@@ -1,0 +1,3 @@
+files,s,h,"*.x",,,files to be tagged
+listing,b,h,no,,,list tags on standard output
+tags,b,h,yes,,,write tags database for vi

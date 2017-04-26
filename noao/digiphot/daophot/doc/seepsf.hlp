@@ -1,0 +1,101 @@
+.help seepsf May00 noao.digiphot.daophot
+.ih
+NAME
+seepsf -- convert a sampled PSF lookup table to a PSF image
+.ih
+USAGE
+seepsf psfimage image
+.ih
+PARAMETERS
+.ls psfimage
+The list of input PSF images computed by the PSF task. Each PSF image consists
+of the parameters of a 2D analytic function stored in the image header and an
+optional sampled lookup table of residuals from that fit stored in the image
+pixels.
+.le
+.ls image
+The list of output PSF images consisting of the sum of the analytic function
+and the residuals in the lookup table. There must be one output PSF image for
+each input PSF image.
+.le
+.ls dimension = INDEF
+The dimensions of the output PSF image. By default \fIimage\fR is a 2D image
+with dimensions of N by N where N = 2 * nint (psfrad / scale)  + 1 with the
+same scale as the original image from which \fIpsfimage\fR was derived.
+\fIPsfrad\fR is the PSF fitting radius stored in the \fIpsfimage\fR image
+header parameter "PSFRAD". \fIScale\fR is the image scale stored in the image
+header parameter "SCALE".
+.le
+.ls xpsf = INDEF
+The x coordinate of the output PSF. \fIXpsf\fR is only used if \fIpsfimage\fR
+was computed with the variable PSF parameter \fIvarorder\fR in the DAOPARS task
+set to > 0.
+.le
+.ls ypsf = INDEF
+The y coordinate of the output PSF. \fIYpsf\fR is only used if \fIpsfimage\fR
+was computed with the variable PSF parameter \fIvarorder\fR in the DAOPARS task
+set to > 0.
+.le
+.ls magnitude = INDEF
+The intensity scale of the output PSF. By default the intensity scale is set by
+the magnitude of the first star used by the PSF task to compute \fIpsfimage\fR.
+This parameter is stored in the keyword "PSFMAG" in \fIpsfimage\fR.
+.le
+.ih
+DESCRIPTION
+SEEPSF takes the input PSF \fIpsfimage\fR computed by the PSF task, consisting
+of the parameters of a 2D analytic function stored in the image header and an
+optional lookup table of residuals from the fit stored in the image pixels, and
+computes an output PSF, \fIimage\fR, consisting of the sum of the analytic
+function and the residuals.
+
+By default \fIimage\fR is a 2D image of dimensions N by N where N = 2 * nint
+(psfrad) + 1 and the scale of \fIimage\fR is the same as the scale of the
+original image from which \fIpsfimage\fR  was derived. If \fIdimension\fR is
+greater or less than N then the output PSF is block-averaged or subsampled with
+respect to the original image. \fIPsfrad\fR is the value of the psf radius
+parameter in the task DAOPARS used to compute \fIpsfimage\fR and is stored in
+the \fIpsfimage\fR header parameter "PSFRAD".
+
+If \fIpsfimage\fR was computed with the variable PSF parameter \fIvarorder\fR
+set to > 0, then \fIimage\fR is computed at a point (xpsf, ypsf) defined
+relative to the original image.  By default \fIimage\fR is computed at the
+centroid of the PSF defined by the \fIpsfimage\fR header parameters "XPSF"
+and "YPSF".
+
+The intensity scale of \fIimage\fR is determined by the value of \fImagnitude\fR
+relative to the magnitude of the PSF. By default the output PSF has the
+magnitude of the first PSF star stored in the \fIpsfimage\fR header parameter
+"PSFMAG".
+
+SEEPSF is most commonly used for visualizing the PSF in image scale coordinates
+and checking the form of any variability as a function of position. However
+\fIimage\fR can also be used as input to other image processing program, for
+example it might be used as the kernel in a convolution operation.
+
+.ih
+EXAMPLES
+
+1. Compute the output PSF in image scale coordinates of PSF function
+for image dev$ypix.
+
+.nf
+    da> seepsf ypix.psf.3 ypixpsf
+.fi
+
+2. Compute the output PSF in image scale coordinates of the variable
+PSF for the image m92b at position (113.63,50.48) pixels relative to the
+original image.
+
+.nf
+    da> seepsf m92b.psf.2 m92psf xpsf=113.63 ypsf=50.48
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,psf
+.endhelp

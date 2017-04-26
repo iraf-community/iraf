@@ -1,0 +1,84 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<math/curfit.h>
+
+$if (datatype == r)
+include	"curfitdef.h"
+$else
+include	"dcurfitdef.h"
+$endif
+
+# Interface Routine for external user functions
+
+# CV_B1USER - Evaluate basis functions at a single point with
+# external user routine.
+
+procedure $tcv_b1user (cv, x)
+
+pointer	cv
+PIXEL	x
+
+begin
+	if (CV_USERFNC(cv) == NULL)
+	    call error (0, "CV_USERFNC: Pointer not set")
+
+	call zcall5 (CV_USERFNC(cv), x, CV_ORDER(cv), CV_MAXMIN(cv),
+			CV_RANGE(cv), XBASIS(CV_XBASIS(cv)))
+end
+
+# CV_BUSER - Evaluate basis functions at a set of points with
+# external user routine.
+
+procedure $tcv_buser (cv, x, npts)
+
+pointer	cv
+PIXEL   x[ARB]
+int	npts
+
+int	i, j
+
+begin
+	do i = 1, npts {
+	    call $tcv_b1user (cv, x[i])
+	    do j = 1, CV_ORDER(cv)
+		BASIS(CV_BASIS(cv)-1+i + npts*(j-1)) = 
+			XBASIS(CV_XBASIS(cv)-1+j)
+	}
+end
+
+# CV_EVUSER - Evaluate user function at a set of points using present
+# coefficient values
+
+procedure $tcv_evuser (cv, x, yfit, npts)
+
+pointer	cv
+PIXEL	x[ARB],  yfit[ARB]
+int	npts
+
+int	i
+PIXEL	adot$t
+
+begin
+	do i = 1, npts {
+	    call $tcv_b1user (cv, x[i])
+	    yfit[i] = adot$t ( XBASIS(CV_XBASIS(cv)), COEFF(CV_COEFF(cv)),
+				CV_ORDER(cv))
+	}
+end
+
+# CVUSERFNC - Set external user function.
+
+$if (datatype == r)
+procedure cvuserfnc (cv, fnc)
+$else
+procedure dcvuserfnc (cv, fnc)
+$endif
+
+pointer	cv
+extern	fnc()
+
+int	locpr()
+
+begin
+	CV_USERFNC(cv) = locpr (fnc)
+end

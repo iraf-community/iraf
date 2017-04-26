@@ -1,0 +1,52 @@
+.help dbjin Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDBJI (STRING, NSTRT, DRESLT, J1, J2)
+
+     - - - - - -
+      D B J I
+     - - - - - -
+
+  Convert free-format input into double precision floating point,
+  using DFLTIN but with special syntax extensions.
+
+  The purpose of the syntax extensions is to help cope with mixed
+  FK4 and FK5 data.  In addition to the syntax accepted by DFLTIN,
+  the following two extensions are recognized by DBJIN:
+
+     1)  A valid non-null field preceded by the character 'B'
+         (or 'b') is accepted.
+
+     2)  A valid non-null field preceded by the character 'J'
+         (or 'j') is accepted.
+
+  The calling program is notified of the incidence of either of these
+  extensions through an supplementary status argument.  The rest of
+  the arguments are as for DFLTIN.
+
+  Given:
+     STRING      char       string containing field to be decoded
+     NSTRT       int        pointer to 1st character of field in string
+
+  Returned:
+     NSTRT       int        incremented
+     DRESLT      double     result
+     J1          int        DFLTIN status: -1 = -OK
+                                            0 = +OK
+                                           +1 = null field
+                                           +2 = error
+     J2          int        syntax flag:  0 = normal DFLTIN syntax
+                                         +1 = 'B' or 'b'
+                                         +2 = 'J' or 'j'
+
+  Called:  slDFLI
+
+  For details of the basic syntax, see slDFLI.
+
+  P.T.Wallace   Starlink   23 November 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

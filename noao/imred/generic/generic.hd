@@ -1,0 +1,11 @@
+# Help directory for the GENERIC package.
+
+$doc = "./doc/"
+
+background	hlp=doc$background.hlp,	src=background.cl
+darksub		hlp=doc$darksub.hlp,	src=darksub.cl
+flatten		hlp=doc$flatten.hlp,	src=flatten.cl
+flat1d		hlp=doc$flat1d.hlp,	src=flat1d.x
+normalize	hlp=doc$normalize.hlp,	src=normalize.cl
+normflat	hlp=doc$normflat.hlp,	src=normflat.cl
+revisions	sys=Revisions

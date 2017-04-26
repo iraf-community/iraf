@@ -1,0 +1,56 @@
+.help zardbf May84 "System Interface"
+.ih
+NAME
+zardbf -- asynchronous read from a binary file
+.ih
+SYNOPSIS
+.nf
+zardbf (chan, buf, maxbytes, loffset)
+
+int	chan			# OS channel assigned to file
+char	buf[maxbytes]		# output buffer
+int	maxbytes		# maximum number of bytes to read
+long	loffset			# file offset of first byte
+.fi
+.ih
+DESCRIPTION
+Initiate a read of at most \fImaxbytes\fR bytes from channel \fIchan\fR into
+the buffer \fIbuf\fR.  If the file associated with \fIchan\fR is a blocked file
+the transfer begins at the one-indexed file offset \fIloffset\fR, specified
+in units of bytes.  The file offset must be greater than or equal to 1 and
+less than or equal to the size of the file in bytes plus one.  If the file is
+a streaming file the file offset argument is ignored.  If the file is blocked
+\fIloffset\fR must be an integral multiple of the device block size,
+i.e., the transfer must be aligned on a device block boundary.
+At most \fImaxbytes\fR bytes are read.  If the physical file block is
+larger than \fImaxbytes\fR bytes the additional data is discarded.
+
+A read from a streaming file returns the next physical block in the file.
+Successive blocks may vary in size; the size of a block is fixed when the
+block is written (appended) to the file by \fBzawrbf\fR.  If \fBzawrbf\fR
+writes a block of length N bytes, the corresponding call to \fBzardbf\fR will
+return either N bytes or \fImaxbytes\fR bytes, whichever is smaller,
+discarding any additional data if \fImaxbytes\fR is less than N.
+.ih
+RETURN VALUE
+The wait primitive \fBzawtbf\fR must be called after every asynchronous read
+to get the transfer status.  ERR is returned if a read error occurs or if the
+channel number or file offset is illegal.  If the read operation is successful
+the actual number of bytes read is returned; zero is returned for a read at EOF.
+.ih
+NOTES
+The transfer is NOT guaranteed to be asynchronous and the calling program
+must not assume that \fBzardbf\fR will return immediately.
+The \fBzawtbf\fR primitive must be called and the status checked before
+another i/o request is issued to the channel.  Only a single request may
+be pending on a channel at a time.
+
+This primitive is called by the FIO routine \fBaread\fR which verifies that
+the transfer is aligned and in-bounds, that a transfer is not already in
+progress, and so on before calling \fBzardbf\fR.
+A request to read zero bytes will not be passed to \fBzardbf\fR
+and should be considered an error to avoid confusion with a read at EOF.
+.ih
+SEE ALSO
+zawtbf, zawrbf, zfiobf
+.endhelp

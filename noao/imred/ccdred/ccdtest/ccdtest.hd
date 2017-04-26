@@ -1,0 +1,6 @@
+# Help directory for the CCDTEST package.
+
+demo		hlp=demo.hlp,		src=demo.cl
+mkimage		hlp=mkimage.hlp,	src=t_mkimage.x
+artobs		hlp=artobs.hlp,		src=artobs.cl
+subsection	hlp=subsection.hlp,	src=subsection.cl

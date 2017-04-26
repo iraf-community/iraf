@@ -1,0 +1,5 @@
+# FIXPIX -- Replace bad pixels by linear interpolation
+
+images,s,a,,,,Images to be modified
+badpixels,f,a,,,,Bad pixel regions file
+verbose,b,h,no,,,Print the image name and bad regions?

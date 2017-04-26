@@ -1,0 +1,167 @@
+.help mkexamples Mar93 noao.artdata
+.ih
+NAME
+mkexamples - Make artificial data example images
+.ih
+USAGE
+mkexamples name image
+.ih
+PARAMETERS
+.ls name
+Example name (abbreviations are not allowed):
+
+.nf
+     galcluster - Galaxy cluster
+       globular - Globular cluster
+       galfield - Galaxy field
+      starfield - Starfield
+
+         henear - Helium-neon-argon spectrum (uncalibrated)
+       heneardc - Helium-neon-argon spectrum (calibrated)
+
+          ecarc - Echelle thorium-argon spectrum (uncalibrated)
+        ecarcdc - Echelle thorium-argon spectrum (calibrated)
+
+       spectrum - Absorption spectrum (calibrated)
+        echelle - Echelle absorption spectrum (calibrated)
+
+        ecarc2d - Echelle thorium-argon slit spectrum
+        ecobj2d - Echelle object slit spectrum
+
+          lsarc - Long slit helium-neon-argon spectrum
+	  lsobj - Long slit object spectrum
+
+     multifiber - Multifiber spectrum
+.fi
+.le
+.ls image
+Output image name.
+.le
+.ls oseed = 1
+Random number seed affecting object generation.  Different object seeds
+will produces different examples of objects or spectral lines or number
+of apertures/orders.  This
+usually modifies the seed parameters in \fBstarlist\fR, \fBgallist\fR,
+and \fBmk1dspec\fR.
+.le
+.ls nseed = 1
+Random number noise seed.  Different noise seeds will produce examples
+with different noise, generally of the same level but simply having
+a different pattern.  This is usually the seed parameter in
+\fBmkobjects\fR or \fBmknoise\fR.
+.le
+.ls comments = no
+Add comments to the image header describing various artificial data
+parameters?
+.le
+.ls verbose = yes
+Print message indicating image being created?
+.le
+.ls errors = yes
+Print messages if the image already exists, bad example name, or other
+errors?
+.le
+.ls list = no
+List script used to generate the example rather than create an image?
+.le
+.ih
+DESCRIPTION
+The task is intended to generate a few artificial images of various types to
+be used as examples of the artificial data package and in various
+demonstrations and test procedures for other packages.  The examples are not 
+exhaustive.  The only adjustable parameters are variations of the
+random number seeds.  Varying the noise seed allows several observations
+of the same example while varying the object seed allows several observations
+of different "fields", spectral lines, or number of apertures/orders.
+
+If the example name is not given on the command line a menu of example
+names is first printed and then a prompt for the name is given.
+The name may be a submenu or an example.  The
+names may not be abbreviated.  If desired the simple command
+script used to generate the example may be paged.  Otherwise the
+specified image will be generated.  Keep in mind that some of the
+examples (particularly those generating galaxy images) may take a
+significant amount of time.  On a SPARCstation the examples all run in
+under five minutes.  A check is made to see if the image already
+exists.  If the image exists then the task exits.  If the \fIerrors\fR
+parameter is specified an error message is printed.
+
+A reason for the error output to be turned off is in test scripts and
+demonstrations where the image will be created the first time and reused
+in further tests or demonstrations.  In such cases the verbose option is
+generally set so that the user is aware that an image is being created
+and some delay is to be expected.
+
+This task is a procedure script which selects and lists or executes
+any file in the mkexamples$ logical directory with the example name and the
+extension ".cl".  Thus, to add additional examples create a simple
+command script (not a procedure script) and place it in the mkexamples
+directory along with an entry in the menu file mkexamples$mkexamples.men.
+.ih
+EXAMPLES
+1. Create a globular cluster example.
+
+.nf
+    ar> mkexample
+	    		MKEXAMPLE Menu
+
+     galcluster - Galaxy cluster
+       globular - Globular cluster
+       galfield - Galaxy field
+      starfield - Starfield
+
+       onedspec - Menu of one dimensional spectra
+       twodspec - Menu of two dimensional spectra
+     threedspec - Menu of three dimensional spectra
+    Example name: globular
+    Image name: globular
+    Creating example globular in image globular ...
+.fi
+
+2.  Try and create the same example again.
+
+.nf
+    ar> mkexample globular globular
+    ERROR: Image globular already exists
+.fi
+
+3.  List the script which creates the globular example.
+
+.nf
+    ar> mkexample globular list+
+    # GLOBULAR - Globular cluster
+
+    file	image, dat
+
+    image = s1
+    dat = mktemp ("art")
+
+    starlist (dat, 5000, "", "", interactive=no, spatial="hubble",
+	xmin=1., xmax=512., ymin=1., ymax=512., xcenter=INDEF,
+	ycenter=INDEF, core_radius=30., base=0., sseed=i,
+	luminosity="bands", minmag=-7., maxmag=0., mzero=-4., power=0.6,
+	alpha=0.74, beta=0.04, delta=0.294, mstar=1.28, lseed=i,
+	nssample=100, sorder=10, nlsample=100, lorder=10,
+	rbinsize=10., mbinsize=0.5, graphics="stdgraph", cursor="")
+
+    mkobjects (image, output="", ncols=512, nlines=512,
+	title="Example artificial globular cluster",
+	header="artdata$stdheader.dat", background=1000., objects=dat,
+	xoffset=0., yoffset=0., star="moffat", radius=1.0, beta=2.5,
+	ar=1., pa=0., distance=1., exptime=1., magzero=7.,
+	gain=3., rdnoise=10., poisson=yes, seed=j)
+
+    delete (dat, verify=no)
+.fi
+.ih
+REVISIONS
+.ls MKEXAMPLES V2.10.3
+The examples have been expanded to include submenus.  The submenus organize
+the various types of spectra.  Additional spectral examples have been
+added.  The oseed parameter selects the number of apertures in the
+onedspec spectra and the number of orders in the echelle examples.
+.le
+.ih
+SEE ALSO
+mkobjects, mknoise, mk1dspec, mk2dspec, mkechelle
+.endhelp

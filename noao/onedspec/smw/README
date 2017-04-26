@@ -1,0 +1,6 @@
+This directory contains interface routines for the spectral world
+coordinate systems.  The interface has two functions.  The first is to
+convert various input formats, including old formats, to one of the WCS
+formats used by the ONEDSPEC package.  These are MULTISPEC, EQUISPEC, and
+NDSPEC.  The second is to split large numbers of spectra which exceed the
+limits of the MWCS for a single WCS into a number of smaller WCS.

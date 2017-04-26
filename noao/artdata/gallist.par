@@ -1,0 +1,52 @@
+# GALLIST Parameter File
+
+gallist,f,a,,,,"Output galaxies list file"
+ngals,i,a,100,,,"Number of galaxies in the output list"
+interactive,b,h,no,,,"Interactive mode?
+
+SPATIAL DISTRIBUTION"
+spatial,s,h,"uniform","uniform|hubble|file",,"Spatial density function (uniform|hubble|file)"
+xmin,r,h,1.,,,"Minimum x coordinate value"
+xmax,r,h,512.,,,"Maximum x coordinate value"
+ymin,r,h,1.,,,"Minimum y coordinate value"
+ymax,r,h,512.,,,"Maximum y coordinate value"
+xcenter,r,h,INDEF,,,"X coordinate of center of Hubble distribution"
+ycenter,r,h,INDEF,,,"Y coordinate of center of Hubble distribution"
+core_radius,r,h,50.,,,"Core radius of Hubble distribution"
+base,r,h,0.,,,"Relative background density of the Hubble distribution"
+sseed,i,h,2,,,"Seed for sampling the spatial probability function
+
+MAGNITUDE DISTRIBUTION"
+luminosity,s,h,"powlaw","uniform|powlaw|schecter|file",,"Luminosity function (uniform|powlaw|schecter|file)"
+minmag,r,h,-7.,,,"Minimum magnitude"
+maxmag,r,h,0.,,,"Maximum magnitude"
+mzero,r,h,15.,,,"Magnitude zero point"
+power,r,h,0.6,,,"Power law magnitude distribution coefficient"
+alpha,r,h,-1.24,,,"Schecter luminosity function coefficient"
+mstar,r,h,-21.41,,,"Schecter luminosity function charactersitic mangitude"
+lseed,i,h,2,,,"Seed for sampling the luminosity probability function
+
+MORPHOLOGY DISTRIBUTION"
+egalmix,r,h,0.4,,,"Percentage of elliptical galaxies"
+ar,r,h,0.3,0.3,1.,"Minimum elliptical galaxy axial ratio"
+eradius,r,h,20.,,,"Maximum elliptical half flux radius"
+sradius,r,h,1.,,,"Spiral/ellipical radius at same magnitude"
+absorption,r,h,1.2,,,"Absorption in edge on spirals (mag)"
+z,r,h,0.05,0.0001,,"Minimum redshift
+
+USER FUNCTIONS"
+sfile,f,h,"",,,"File containing spatial density function"
+nssample,i,h,100,,,"Number of spatial density function sampling points"
+sorder,i,h,10,,,"Number of spline pieces for spatial function"
+lfile,f,h,"",,,"File containing luminosity function"
+nlsample,i,h,100,,,"Number of luminosity function sampling points"
+lorder,i,h,10,,,"Number of spline pieces for luminosity probability function
+
+INTERACTIVE PARAMETERS"
+rbinsize,r,h,10.,,,"Bin size of radial density function histogram in pixels"
+mbinsize,r,h,0.5,,,"Bin size of luminosity function in magnitudes"
+dbinsize,r,h,0.5,,,"Bin size of diameter distribution function in pixels"
+ebinsize,r,h,0.1,,,"Bin size of roundness distribution function"
+pbinsize,r,h,20.,,,"Bin size of position angle distribution function in degrees"
+graphics,s,h,stdgraph,,,"Standard graphics device"
+cursor,*gcur,h,"",,,"Graphics cursor"

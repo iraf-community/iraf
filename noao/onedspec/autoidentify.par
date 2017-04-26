@@ -1,0 +1,38 @@
+# Parameters for AUTOIDENTIFY.
+
+images,s,a,,,,"Images containing features to be identified"
+crval,s,a,,,,"Approximate coordinate (at reference pixel)"
+cdelt,s,a,,,,"Approximate dispersion"
+coordlist,f,h,,,,"Coordinate list"
+units,s,h,"",,,Coordinate units
+interactive,s,h,"yes","no|yes|NO|YES",,"Examine identifications interactively?"
+aidpars,pset,h,,,,"Automatic identification algorithm parameters
+"
+section,s,h,"middle line",,,"Section to apply to two dimensional images"
+nsum,s,h,"1",,,"Number of lines/columns/bands to sum in 2D/3D images
+"
+ftype,s,h,"emission","emission|absorption",,Feature type
+fwidth,r,h,4.,,,Feature width in pixels
+cradius,r,h,5.,,,Centering radius in pixels
+threshold,r,h,0.,0.,,Feature threshold for centering
+minsep,r,h,2.,0.,,"Minimum pixel separation"
+match,r,h,-3.,,,"Coordinate list matching limit
+"
+function,s,h,"spline3","legendre|chebyshev|spline1|spline3",,"Coordinate function"
+order,i,h,1,1,,"Order of coordinate function"
+sample,s,h,"*",,,"Coordinate sample regions"
+niterate,i,h,10,0,,"Rejection iterations"
+low_reject,r,h,2.,0.,,"Lower rejection sigma"
+high_reject,r,h,2.,0.,,"Upper rejection sigma"
+grow,r,h,0.,0.,,"Rejection growing radius
+"
+dbwrite,s,h,"yes","no|yes|NO|YES",,"Write results to database?"
+overwrite,b,h,"yes",,,"Overwrite existing database entries?"
+database,f,h,database,,,"Database in which to record feature data"
+verbose,b,h,yes,,,"Verbose output?"
+logfile,s,h,"logfile",,,"List of log files"
+plotfile,s,h,"",,,"Plot file for residuals"
+graphics,s,h,"stdgraph",,,"Graphics output device"
+cursor,*gcur,h,"",,,"Graphics cursor input
+"
+query,s,q,,,," "

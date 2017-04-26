@@ -1,0 +1,107 @@
+# XT_STAT -- Compute statistics from a sample.
+#
+# The sample array will be sorted.
+
+define	NMIN	10	# Minimum number of pixels for mode calculation
+define	ZSTEP	0.01	# Step size for search for mode
+define	ZBIN	0.1	# Bin size for mode.
+
+$for (sird)
+procedure xt_stat$t (sample, nsample, frac, mean, sigma, median, mode)
+
+PIXEL	sample[nsample]			#I Sample
+int	nsample				#I Number of sample pixels
+real	frac				#I Fraction of data to use
+$if (datatype == d)
+double	mean, sigma, median, mode	#O Statistics
+$else
+real	mean, sigma, median, mode	#O Statistics
+$endif
+
+int	i, j, k, nmax
+$if (datatype == d)
+double	z1, z2, zstep, zbin
+bool	fp_equald()
+$else
+real	z1, z2, zstep, zbin
+bool	fp_equalr()
+$endif
+
+begin
+	# Sort the sample.
+	call asrt$t (sample, sample, nsample)
+
+	# Set fraction to use.
+	i = max (1, 1 + nsample * (1. - frac) / 2.)
+	j = min (nsample, 1 + nsample * (1. + frac) / 2.)
+	z1 = sample[i]
+	z2 = sample[j]
+
+	# Compute the mean and sigma.
+	call aavg$t (sample[i], j-i+1, mean, sigma)
+
+	# Compute the median.
+	median =  sample[nsample/2]
+
+	z1 = median - 2 * sigma
+	if (z1 < sample[1])
+	    i = 1
+	else {
+	    k = i
+	    do i = k, 2, -1 {
+		if (sample[i] <= z1)
+		    break
+	    }
+	}
+	z1 = sample[i]
+
+	z2 = median + 2 * sigma
+	if (z2 > sample[nsample])
+	    i = nsample
+	else {
+	    k = j
+	    do j = k, nsample-1 {
+		if (sample[j] >= z1)
+		    break
+	    }
+	}
+	z2 = sample[j]
+
+	# Compute the mode.
+
+	if (nsample < NMIN)
+	    mode = median
+
+$if (datatype == d)
+	else if (fp_equald (z1, z2))
+$else
+	else if (fp_equalr (z1, z2))
+$endif
+	    mode = z1
+
+	else {
+	    zstep = ZSTEP * sigma
+	    zbin = ZBIN * sigma
+	    $if (datatype == sil)
+	    zstep = max (1., zstep)
+	    zbin = max (1., zbin)
+	    $endif
+
+	    z1 = z1 - zstep
+	    k = i
+	    nmax = 0
+	    repeat {
+		z1 = z1 + zstep
+		z2 = z1 + zbin
+		for (; i < j && sample[i] < z1; i=i+1)
+		    ;
+		for (; k < j && sample[k] < z2; k=k+1)
+		    ;
+		if (k - i > nmax) {
+		    nmax = k - i
+		    mode = sample[(i+k)/2]
+		}
+	    } until (k >= j)
+	}
+end
+$endfor

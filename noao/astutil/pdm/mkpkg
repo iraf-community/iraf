@@ -1,0 +1,40 @@
+# PDM -- Make the Phase Dispersion Minimization package.
+
+update:
+	$checkout libpkg.a ../
+	$update   libpkg.a
+	$checkin  libpkg.a ../
+	;
+
+
+libpkg.a:
+	pdmalltheta.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmampep.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmautorang.x	pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
+	pdmbatch.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmclose.x	pdm.h <mach.h>
+	pdmcolon.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmcompare.x	pdm.h <mach.h>
+	pdmcursor.x	<fset.h> <gset.h> <math/curfit.h> pdm.h <ctype.h>\
+			<error.h> <mach.h>
+	pdmdelete.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmdplot.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmfindmin.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmfitphase.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmgdata.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmminmaxp.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmopen.x	pdm.h <mach.h>
+	pdmphase.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmpplot.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmranperm.x	<gset.h> pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
+	pdmshow.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmsignif.x	<gset.h> pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
+	pdmsort.x	pdm.h <mach.h>
+	pdmstats.x	pdm.h <ctype.h> <error.h> <mach.h>
+	pdmtheta.x	pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
+	pdmthetaran.x	pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
+	pdmtplot.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	pdmundelete.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
+	t_pdm.x         pdm.h <ctype.h> <error.h> <mach.h>
+	;
+

@@ -1,0 +1,20 @@
+# Make the IMRED package.
+
+update:
+	$echo "------------------ IMRED.BIAS ----------------------"
+	$call update@bias
+	$echo "------------------ IMRED.CCDRED --------------------"
+	$call update@ccdred
+	$echo "------------------ IMRED.CRUTIL --------------------"
+	$call update@crutil
+	$echo "------------------ IMRED.DTOI ----------------------"
+	$call update@dtoi
+	$echo "------------------ IMRED.GENERIC -------------------"
+	$call update@generic
+	$echo "------------------ IMRED.IRRED ---------------------"
+	$call update@irred
+	$echo "------------------ IMRED.QUADRED -------------------"
+	$call update@quadred
+	$echo "------------------ IMRED.VTEL ----------------------"
+	$call update@vtel
+	;

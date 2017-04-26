@@ -1,0 +1,36 @@
+.help rewind Apr92 system
+.ih
+NAME
+rewind -- rewind a previously allocated device
+.ih
+USAGE
+rewind device
+.ih
+PARAMETERS
+.ls device
+The device to be rewound.
+.le
+.ls initcache = yes
+Initialize the magtape device position cache for the device.  This causes
+the magtape i/o system to "forget" what it thinks it knows about things
+like the number of files on the tape, the amount of tape used, and so on.
+.le
+.ih
+DESCRIPTION
+\fIRewind\fR rewinds the specified device, which is most likely
+a magnetic tape, and which has been previously allocated to the user.
+
+By default \fIrewind\fR will initialize the device position cache.  When
+changing tapes, one should always either rewind or deallocate and reallocate
+the device, to force the magtape system to recompute the number of files
+on the tape and to ensure that the tape is left in a defined position.
+.ih
+EXAMPLES
+
+1. Rewind logical tape drive a.
+
+	cl> rewind mta
+.ih
+SEE ALSO
+allocate, deallocate, devstatus
+.endhelp

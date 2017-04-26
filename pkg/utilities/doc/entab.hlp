@@ -1,0 +1,30 @@
+.help entab Mar84 utilities
+.ih
+NAME
+entab -- replaces blanks by tabs and blanks
+.ih
+USAGE
+entab files
+.ih
+PARAMETERS
+.ls files
+Template specifying the files to be processed, e.g. "file" or "file*".
+.le
+.ls tablist = "9 +8"
+String containing a list of tabstops separated by blanks or commas.
+A two element string of the form "m +n" will set
+tabstops in every n columns beginning in column m.
+A null string defaults to "9 +8".
+.le
+.ih
+EXAMPLE
+Convert the file "prog.c", written using full tabstop indents, to
+an equivalent file with an initial indent of one full tabstop, 
+with 4 space indents thereafter.
+
+.nf
+	cl> detab prog.c tab='9 +4' | entab > temp
+	cl> delete prog.c
+	cl> rename temp prog.c
+.fi
+.endhelp

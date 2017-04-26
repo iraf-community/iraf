@@ -1,0 +1,70 @@
+.help t2d May89 dataio
+.ih
+NAME
+t2d -- copy files from tape to disk quickly
+.ih
+USAGE
+t2d input ofroot
+.ih
+PARAMETERS
+.ls input
+Tape file or device name, e.g. "mta1600[1]" or "mta"
+.le
+.ls files
+List of tape file numbers or ranges delimited by commas, e.g. "1-3,5-8".
+`Files' is requested only if no file number is given in `input'.
+Files will be read in ascending order, regardless of the order of the list.
+Reading will terminate if EOT is reached, thus a list such as "1-999"
+may be used to read all the files on the tape.
+.le
+.ls ofroot
+Root name to give output files.  A three digit sequence number will be appended
+to this root name for each file written if a file list is used.  If the file
+number is specifically given in the 'input' parameter, the output file will
+be named this root without an appended sequence number.
+.le
+.ls verbose = yes
+Flag to signal program that it should produce verbose output.  This means
+progress reports.
+.le
+.ls errignore = yes
+Flag to signal program that tape records that give read errors should be
+considered to have zero length.  If set to 'no', error records are considered
+to be the same length as all the other records on the tape.
+.le
+.ih
+DESCRIPTION
+T2d reads files from tape and puts them into disk files.  No formatting is
+performed so the bits and bytes are in the same order on disk as they were
+on tape.  The program uses double buffering and asynchronous i/o to speed
+things up as much as possible.
+
+When read errors are encountered one of two things can happen.  Depending
+on the value of the parameter 'errignore', the error record is either
+thrown out or considered valid data.  If 'errignore' is 'no' when an error
+is found, the input buffer is validated to the most recent 'good record'
+length and written to disk.  If 'errignore' is 'yes' when an error is
+found, the input buffer is disposed of for that record.
+.ih
+EXAMPLES
+1. To read the second image from mta at 1600 bpi, store the image into
+"image" and see verbose output the command would be:
+
+.nf
+	cl> t2d mta1600[2] image
+.fi
+
+2. To read all the files on mtb at the default speed of 1600 bpi and put
+the disk files in root001, root002, root003, etc. and turn off verbose
+output, the command would be:
+
+.nf
+	cl> t2d mtb root v-
+.fi
+
+The program will prompt the user and ask for the list of files to be read
+to which the response would be "1-999".
+.ih
+SEE ALSO
+reblock
+.endhelp

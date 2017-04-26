@@ -1,0 +1,4 @@
+input,f,a,,,,Input coordinate file
+output,f,a,,,,Output coordinate file
+fitnames,s,a,,,,Names of coordinate fits in the database
+database,f,h,database,,,Identify database

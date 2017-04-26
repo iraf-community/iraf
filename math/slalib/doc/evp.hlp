@@ -1,0 +1,66 @@
+.help evp Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slEVP (DATE, DEQX, DVB, DPB, DVH, DPH)
+
+     - - - -
+      E V P
+     - - - -
+
+  Barycentric and heliocentric velocity and position of the Earth
+
+  All arguments are double precision
+
+  Given:
+
+     DATE          TDB (loosely ET) as a Modified Julian Date
+                                         (JD-2400000.5)
+
+     DEQX          Julian Epoch (e.g. 2000.0D0) of mean equator and
+                   equinox of the vectors returned.  If DEQX .LE. 0D0,
+                   all vectors are referred to the mean equator and
+                   equinox (FK5) of epoch DATE.
+
+  Returned (all 3D Cartesian vectors):
+
+     DVB,DPB       barycentric velocity, position
+
+     DVH,DPH       heliocentric velocity, position
+
+  (Units are AU/s for velocity and AU for position)
+
+  Called:  slEPJ, slPREC
+
+  Accuracy:
+
+     The maximum deviations from the JPL DE96 ephemeris are as
+     follows:
+
+     barycentric velocity         0.42  m/s
+     barycentric position         6900  km
+
+     heliocentric velocity        0.42  m/s
+     heliocentric position        1600  km
+
+  This routine is adapted from the BARVEL and BARCOR
+  subroutines of P.Stumpff, which are described in
+  Astron. Astrophys. Suppl. Ser. 41, 1-8 (1980).  Most of the
+  changes are merely cosmetic and do not affect the results at
+  all.  However, some adjustments have been made so as to give
+  results that refer to the new (IAU 1976 'FK5') equinox
+  and precession, although the differences these changes make
+  relative to the results from Stumpff's original 'FK4' version
+  are smaller than the inherent accuracy of the algorithm.  One
+  minor shortcoming in the original routines that has NOT been
+  corrected is that better numerical accuracy could be achieved
+  if the various polynomial evaluations were nested.  Note also
+  that one of Stumpff's precession constants differs by 0.001 arcsec
+  from the value given in the Explanatory Supplement to the A.E.
+
+  P.T.Wallace   Starlink   21 March 1999
+
+  Copyright (C) 1999 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

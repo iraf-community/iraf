@@ -1,0 +1,121 @@
+#!/bin/bash
+#
+#  PKGUPDATE - Update the named packages
+
+
+pkg=""
+all=no
+list_only=no
+
+if (( $#<1 )); then
+    exit 0
+else
+    # Process cmdline flags.
+    while [ -n "$1" ]; do
+      case "$1" in
+      "-all")                          # clean all package .s
+        all=yes
+	;;
+      "-list")                         # list packages needing updating
+        list_only=yes
+	;;
+      *)
+        pkg=$1
+        break
+	;;
+      esac
+
+      shift
+   done
+fi
+
+
+bindir="`dirname $0`"                # get iraf root directory 
+irafdir=${bindir%/*}
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+REPO=`${irafdir}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
+fi
+
+/bin/echo "Updating repository data ...."
+../util/pkginit                                # init repository information
+
+# Check for a self-update.
+if [ "$pkg" == "-self" ]; then
+    /bin/echo "Updating utility scripts ...."
+    /bin/rm -f /tmp/util.tgz
+    ../util/pkgget ${REPO}/util-universal.tar.gz /tmp/util.tgz
+    (cd ../util; tar zxf /tmp/util.tgz; /bin/rm -f /tmp/util.tgz)
+    /bin/echo "Done"
+    exit 0
+fi
+ 
+# Check for a extern update.
+if [ "$pkg" == "-config" ]; then
+    /bin/echo "Updating config script ...."
+    ../util/pkgget ${REPO}/config-universal configure
+    chmod 777 configure
+    /bin/echo "Done"
+    exit 0
+fi
+ 
+
+
+# Process the requested package and any dependencies.
+pkgs=`cat .repo_pkgs`
+for ip in ${pkgs[@]}; do 
+
+  if [ -e $ip/.installed ]; then
+
+     pd=`grep $ip $ip/.installed | awk '{printf("%s\n", $1)}'`
+     rd=`grep $ip .repo_manifest | head -1 | awk '{printf("%s\n", $3)}'`
+
+     alist=`(cd $ip; ls -1 .inst*.* | sed -e "s/\.installed\.//g")`
+
+     if (( $rd>$pd )); then
+
+       # Update each installed architecture automatically.
+       for a in ${alist[@]}; do
+
+	 if [ "$list_only" == "yes" ]; then
+            printf "Package %-12s for %-8s is out of date ....\n" $ip $a
+	 else
+	    if [ "$all" == "yes" -o "$ip" == "$pkg" ]; then
+              /bin/echo "Updating package '$ip' for '$a' ...."
+              ../util/pkginst $ip
+	    fi
+	 fi
+       done
+
+     else
+	if [ "$list_only" == "yes" ]; then
+           printf "Package %-12s is current ....\n" $ip
+	elif (( $rd<=$pd )); then
+           printf "Package %-12s is current ....\n" $ip
+	fi
+     fi
+
+  else
+     printf "Package %-12s is not installed ....\n" $ip
+  fi
+
+  ${irafdir}/util/pkgenv -init
+done
+
+/bin/echo "Done"
+exit 0

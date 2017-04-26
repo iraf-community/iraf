@@ -1,0 +1,39 @@
+.help cqfimquery Mar00 "Catquery Package"
+.ih
+NAME
+cqfimquery -- return the results of an image file query
+.ih
+SYNOPSIS
+
+imres = cq_fimquery (cq, imname)
+
+.nf
+pointer	cq		# the configuration file descriptor
+char	imname		# the input image file name 
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls imname
+The file name of the image being queried.
+.le
+.ih
+DESCRIPTION
+Cq_fimquery queries an existing image and returns a results descriptor.
+Cq_fimquery is a pointer procedure which returns the results descriptor
+as its function value. NULL is returned if an error occurs in the query
+or the image does not exist.
+
+Cq_fimquery is used to make an image emulate the results of an image
+survey query.
+.ih
+NOTES
+Cq_setcat with the image survey name set to the reserved record name
+"imname@noao" must be called before any image survey query is made.
+
+.ih
+SEE ALSO
+cqimquery, cqimclose
+.endhelp

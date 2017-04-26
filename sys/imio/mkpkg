@@ -1,0 +1,106 @@
+# Update the IMIO portion of the LIBEX library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+tfiles:
+	$set GFLAGS = "-k -t silrdx -p tf/"
+	$ifolder (tf/imupkr.x, imupk.gx) $generic $(GFLAGS) imupk.gx $endif
+	$ifolder (tf/imps3r.x, imps3.gx) $generic $(GFLAGS) imps3.gx $endif
+	$ifolder (tf/imps2r.x, imps2.gx) $generic $(GFLAGS) imps2.gx $endif
+	$ifolder (tf/imps1r.x, imps1.gx) $generic $(GFLAGS) imps1.gx $endif
+	$ifolder (tf/impnlr.x, impnl.gx) $generic $(GFLAGS) impnl.gx $endif
+	$ifolder (tf/impl3r.x, impl3.gx) $generic $(GFLAGS) impl3.gx $endif
+	$ifolder (tf/impl2r.x, impl2.gx) $generic $(GFLAGS) impl2.gx $endif
+	$ifolder (tf/impl1r.x, impl1.gx) $generic $(GFLAGS) impl1.gx $endif
+	$ifolder (tf/impgsr.x, impgs.gx) $generic $(GFLAGS) impgs.gx $endif
+	$ifolder (tf/impakr.x, impak.gx) $generic $(GFLAGS) impak.gx $endif
+	$ifolder (tf/imgs3r.x, imgs3.gx) $generic $(GFLAGS) imgs3.gx $endif
+	$ifolder (tf/imgs2r.x, imgs2.gx) $generic $(GFLAGS) imgs2.gx $endif
+	$ifolder (tf/imgs1r.x, imgs1.gx) $generic $(GFLAGS) imgs1.gx $endif
+	$ifolder (tf/imgnlr.x, imgnl.gx) $generic $(GFLAGS) imgnl.gx $endif
+	$ifolder (tf/imgl3r.x, imgl3.gx) $generic $(GFLAGS) imgl3.gx $endif
+	$ifolder (tf/imgl2r.x, imgl2.gx) $generic $(GFLAGS) imgl2.gx $endif
+	$ifolder (tf/imgl1r.x, imgl1.gx) $generic $(GFLAGS) imgl1.gx $endif
+	$ifolder (tf/imggsr.x, imggs.gx) $generic $(GFLAGS) imggs.gx $endif
+	$ifolder (tf/imflsr.x, imfls.gx) $generic $(GFLAGS) imfls.gx $endif
+	;
+
+libex.a:
+	# Retranslate any recently modified generic sources.
+	$ifeq (hostid, unix)
+	    $call tfiles
+	$endif
+
+	@tf		# Update datatype expanded files.
+	@db		# Update image database interface.
+	@dbc		# Update image database interface (enhanced).
+	@iki		# Update image kernel interface.
+	@imt		# Update the image template package.
+	#imt.x	
+
+	imaccess.x	
+	imaflp.x	
+	imaplv.x	<imhdr.h> <imio.h>
+	imbln1.x	<imhdr.h> <imio.h>
+	imbln2.x	<imhdr.h> <imio.h>
+	imbln3.x	<imhdr.h> <imio.h>
+	imbtran.x	<imhdr.h> <imio.h> <imset.h>
+	imcopy.x	
+	imcssz.x	<imhdr.h> <imio.h> <plset.h>
+	imdelete.x	
+	imdmap.x	<error.h> <imhdr.h> <imio.h> <imset.h>
+	imerr.x	
+	imflsh.x	<imhdr.h> <imio.h>
+	imflush.x	<imhdr.h> <imio.h>
+	imgclust.x	
+	imggsc.x	<imhdr.h> <imio.h> <plset.h>
+	imgibf.x	<imhdr.h> <imio.h>
+	imgimage.x	
+	imgnln.x	<imhdr.h> <imio.h> <szpixtype.inc>
+	imgobf.x	<imhdr.h> <imio.h>
+	imgsect.x	
+	iminie.x	<imhdr.h> <imio.h>
+	imioff.x	<config.h> <imhdr.h> <imio.h> <mach.h> <szpixtype.inc>
+	imisec.x	<ctype.h> <imhdr.h> <imio.h> <mach.h>
+	imloop.x	<imio.h>
+	immaky.x	<error.h> <imhdr.h> <imio.h>
+	immap.x	
+	immapz.x	<error.h> <imhdr.h> <imio.h> <mach.h>
+	imnote.x	<imhdr.h> <imio.h> <szpixtype.inc>
+	imopsf.x	<fset.h> <imhdr.h> <imio.h> <plset.h> <pmset.h>
+	imparse.x	<ctype.h>
+	impmhdr.x	<ctype.h> <imhdr.h> <imio.h>
+	impmlne1.x	<imhdr.h> <imio.h>
+	impmlne2.x	<imhdr.h> <imio.h>
+	impmlne3.x	<imhdr.h> <imio.h>
+	impmlnev.x	<imhdr.h> <imio.h>
+	impmmap.x	<error.h> <imhdr.h> <imio.h> <pmset.h>
+	impmmapo.x	<imhdr.h> <imio.h> <plio.h> <pmset.h>
+	impmopen.x	<error.h> <imhdr.h> <imio.h> <pmset.h>
+	impmsne1.x	<imio.h>
+	impmsne2.x	<imio.h>
+	impmsne3.x	<imio.h>
+	impmsnev.x	<imhdr.h> <imio.h>
+	impnln.x	<imhdr.h> <imio.h> <szpixtype.inc>
+	imrbpx.x	<imhdr.h> <imio.h> <imset.h> <szpixtype.inc>
+	imrdpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szpixtype.inc>
+	imrename.x	
+	imrmbufs.x	<imio.h>
+	imsamp.x	
+	imsetbuf.x	<fset.h> <imhdr.h> <imio.h>
+	imseti.x	<fset.h> <imhdr.h> <imio.h> <imset.h>
+	imsetr.x	<imhdr.h> <imio.h> <imset.h>
+	imsinb.x	<imhdr.h> <imio.h>
+	imsslv.x	<imhdr.h> <imio.h>
+	imstati.x	<imhdr.h> <imio.h> <imset.h>
+	imstatr.x	<imhdr.h> <imio.h> <imset.h>
+	imstats.x	<imhdr.h> <imio.h> <imset.h>
+	imunmap.x	<imhdr.h> <imio.h>
+	imwbpx.x	<imhdr.h> <imio.h> <imset.h> <szpixtype.inc>
+	imwrite.x	<fset.h> <imio.h>
+	imwrpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szpixtype.inc>
+	zzdebug.x	
+	;

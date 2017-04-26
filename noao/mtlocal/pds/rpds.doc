@@ -1,0 +1,83 @@
+PDSREAD (dataio)              PDS Reader                PDSREAD (dataio)
+
+
+
+NAME
+     pdsread -- Convert Kitt Peak PDS image files to IRAF image files
+
+
+USAGE
+     pds [pds_file, file_list, iraf_file]
+
+
+DESCRIPTION
+     Kitt  Peak PDS format image data is read from the specified source,
+     either  a  disk  file  or  magnetic  tape.   The  PDS  header   may 
+     optionally  be  printed  on  the  standard  output as either a full
+     listing or a short  description.   Image  data  may  optionally  be
+     converted to an IRAF image of specified data type.
+
+
+PARAMETERS
+
+     pds_file
+         The  PDS  data source.  If the data source is a disk file or an
+         explict tape file specification of the form mt*[n] where  n  is
+         a  file  number  then  only  that  file  is  converted.  If the
+         general tape device name  is  given,  i.e.  mta,  mtb800,  etc,
+         then  the  files  specified by the files parameter will be read
+         from the tape.
+
+     file_list
+         The files  to  be  read  from  a  tape  are  specified  by  the
+         file_list  string.   The  string can consist of any sequence of
+         file numbers separated by at least one  of  whitespace,  comma,
+         or  dash.   A dash specifies a range of files.  For example the
+         string
+
+         1 2, 3 - 5,8-6
+
+         will convert the files 1 through 8.
+
+     iraf_file
+         The  IRAF  file  which  will  receive  the  PDS  data  if   the 
+         read_image  parameter  switch is set.  For tape files specified
+         by the file_list parameter the  filename  will  be  used  as  a
+         prefix  and  the file number will be appended.   Otherwise, the
+         file will be named as specified.  Thus, reading files 1  and  3
+         from  a  PDS  tape  with  a  filename  of data will produce the
+         files data1 and data3.  It is legal to use a null filename.
+
+     read_image
+         This switch determines whether PDS image data is  converted  to
+
+
+                                  -1-
+PDSREAD (dataio)              PDS Reader                PDSREAD (dataio)
+
+
+
+         an  IRAF  image  file.  This switch is set to no to obtain just
+         header  information  with  the  long_header   or   short_header 
+         switches.
+
+     long_header
+         If  this  switch  is  set the full PDS header is printed on the
+         standard output.
+
+     short_header
+         If this switch is set  only  the  output  filename,  the  title
+         string, and the image dimensions are printed.
+
+     standard_format
+         The PDS standard format has the most significant byte first.
+
+     data_type
+         The  IRAF  image  file may be of a different data type than the
+         PDS image data.  The data  type  may  be  specified  as  s  for
+         short,  l  for  long,  and r for real.  The user must beware of
+         truncation  problems  if  an   inappropriate   data   type   is 
+         specified.   If  an  incorrect  data_type  or  a null string is
+         given for this parameter then  a  default  data  type  is  used
+         which  is  the  appropriate  minimum  size  for the input pixel
+         values.

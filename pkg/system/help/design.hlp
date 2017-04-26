@@ -1,0 +1,500 @@
+.helpsys help Mar84 "Detailed Design of the Help Utility"
+.nh
+The Help Database
+
+    Help has to know where to find help files and sources for modules.
+This information is stored in two types of files.  The package list file,
+maintained in lib$ by the system manager, contains an entry for each
+installed package.  The module list file, maintained in the package
+directory by the programmer, contains the same information for each
+module in the package.  The format of a help list file is as follows:
+
+.nf
+	$defdir = pathname|ldir
+	$ldir1	= pathname|ldir
+	$ldir2	= pathname|ldir
+		    ...
+
+	name1	hlp=file, src=file, sys=file, pkg=file
+	name2	hlp=file, src=file, sys=file, pkg=file
+		    ...
+.fi
+
+Logical directories may be defined in the header area of the helpdir file
+as shown above.  These may be omitted if the package directory is already
+defined in the CL environment.  The "defdir" prefix will be added to any
+file name that does not contain an explicit logical or OS directory
+specification.  The default directory may be an OS pathname or a logical
+directory guaranteed to be defined in the CL environment at the time that
+\fBhelp\fR is run.  There should be no OS dependent file names in the
+module lists.
+
+Each module entry consists of a number of keyword equals value type
+fields.  The fields are optional and may be given in any order.  If the
+last character on the line is a comma, the list is assumed to be continued
+on the next line.  The \fBhlp\fR field is the name of the file containing the
+help block.  The \fBsrc\fR file contains the source for the named module.
+The \fBsys\fR file contains the system documentation.  The \fBpkg\fR field,
+present only in the package helpdir file, is the name of the module helpdir
+file for the package.  Although the help database is organized by
+package, the package list is linear, not a tree.
+
+If multiple entries are given for a module, the entry nearest the tail
+of the list is used.
+
+.nh
+Program Structure
+
+    If no args, print help block for the current package, otherwise expand
+the template into a list of package.module elements.  Process the help
+text for each module.  In general, the \fBlroff\fR text formatter is called
+to process all help text.  \fBLroff\fR is called with the names of two external
+procedures used to get lines of text from the input and put formatted text
+to the output.
+
+\fBLroff\fR is essentially a numerical procedure which effects a
+format conversion on a list of text lines.  Additional specialized processing
+is carried out in the input and output procedures.  Thus, when processing
+only the help text for a single section, the input procedure skips input
+lines until the desired section is detected, and returns EOF to \fBlroff\fR
+when the end of the input section is detected.  Similarly, the output
+procedure handles all the details of paginating the output on the user
+terminal.
+
+.nf
+t_help
+	clio to get params
+	salloc ctrl structure
+	ttyodes
+	get_option					[match option]
+	process_template
+		hd_open					[open helpdir]
+			open,getline,close
+			hd_putldiry
+				hd_getc
+				hd_putstr
+					realloc
+			hd_putmodule
+				hd_getc
+				hd_putstr
+					realloc
+				getline
+			hd_sort_modules
+		expand_template				[encode pat  ]
+			malloc
+			patmake
+		read_template				[get modname ]
+			hd_getname
+				hd_getldir
+			patmatch
+		print_help				[do a module ]
+			hd_findmod
+			hd_getname
+				hd_getldir
+			pr_filenames
+				hd_findmod
+				hd_getname
+					hd_getldir
+				output
+					nomore
+						clgetb
+					ttyputline
+					putline
+			pr_sourcefile
+				hd_findmod
+				hd_getname
+					hd_getldir
+				input
+					getline
+				output
+					...
+			pr_summary
+				hd_findmod
+				hd_getname
+					hd_getldir
+				getline
+				output
+					...
+			pr_helpblock			[default help]
+				find_help_block
+					getline
+					strmatch
+				pr_header
+					ttyclear
+				LROFF			[format text ]
+					input
+						getline
+					output
+						...
+		close_template
+			mfree
+		hd_close
+			mfree
+.fi
+
+.nh
+Data Structures
+
+    For simplicity, helpdir files are read into an internal buffer in
+one operation, and searching for modules, file name extraction, etc. is
+thereafter done on the buffered helpdir.  The helpdir is represented
+in memory by the following structures.
+
+.nf
+struct helpdir {
+	char	*hd_sbuf		# string buffer
+	int	hd_nextch		# index of next char in sbuf
+	int	hd_szsbuf		# size of string buffer
+	int	hd_defdir		# index of defdir str
+	int	hd_nldirs		# number of ldirs
+	int	hd_nmodules		# number of modules
+	int	hd_ldir[MAX_LDIR]	# indices of ldirs
+	struct	module hd_module[MAX_MODULES] # module names, files
+}
+
+
+struct module {
+	int	m_name			# index of module name
+	int	m_hlp			# index of help file name
+	int	m_sys			# sys help file
+	int	m_src			# source file
+	int	m_pkg			# package helpdir file
+}
+.fi
+
+All character strings are stored in the string buffer, which is initially
+allocated with malloc, and which is reallocated with realloc if it fills
+up while the helpdir is being read.  The maximum number of logical
+directory definitions and module entries are fixed when \fBhelp\fR is
+compiled.  All strings are referred to by an integer index into the
+string buffer (if the string buffer is moved by realloc, the integer
+offset does not change, whereas a char pointer would).
+
+.nh
+Semicode
+
+HELP -- The main procedure.  Expand the module list, determine the
+type of help desired, fetch the names of the doc files and call the
+appropriate routine to process the help text.
+
+.nf
+procedure help
+
+begin
+	# Get control parameters.
+	fetch and decode option string
+	if (option "param")
+	    fetch parameter name
+	fetch margin params, pagination flag, open tty descriptor,
+	    set up "ctrl" structure
+
+	# Get module template: "mod", "pack.mod", "pack.", etc.  If no
+	# args or template is null, default to "curpack.".
+
+	if (we were called with no positional arguments)
+	    template = null
+	else
+	    fetch template from cl
+
+	# Format and output the help text.  The template list consists
+	# of a series of templates delimited by commas.
+
+	for (each subtemplate in the template list)
+	    call process_template (template, ctrl)
+end
+.fi
+
+
+PROCESS_TEMPLATE -- Called with a template defining the packages and
+modules for which help is desired, and the control parameters defining
+the type of help desired.  Expand the template into a list of packages
+and modules and process the help for each module.
+
+.nf
+procedure process_template (template, ctrl)
+
+begin
+	# Open the system help directory; gives help files and name of
+	# package help directories for the individual packages.
+
+	hp_sys = hd_open (system helpdir)
+
+	# If null template, print hlp for current package.  If template
+	# not null, but no package named, make package list the current
+	# CL package search path.  Otherwise the template contains all
+	# necessary information.
+
+	if (entire template is null) {
+	    set package template to the name of the current package
+	    set module template to null
+	} else {
+	    extract package part of template, delimited by "."
+	    if (null package template)
+		set package template to CL package search path
+	}
+
+	# By the time we get here we always have a non-null template.
+	paklist = expand_template (hp_sys, pak_template)
+
+	# If package help is desired, print help on the package as if
+	# it were a module.  Otherwise, expand module template for
+	# the package and process help on each module.
+
+	while (read_template (paklist, pakname) != EOF)
+	    if (null module template)
+		call print_help (hp_sys, pakname, ctrl)
+	    else {
+		hp_pak = hd_open (package helpdir)
+		modlist = expand_template (hp_pak, mod_template)
+		while (read_template (modlist, modname) != EOF)
+		    call print_help (hp_pak, modname, ctrl)
+		close_template (modlist)
+		hd_close (hp_pak)
+	    }
+
+	close_template (paklist)
+	hl_close (hp_sys)
+end
+.fi
+
+
+EXPAND_TEMPLATE -- Expand a template into a list of module names,
+given a help directory defining the pattern matching domain.
+The permissible complexity of a help template is somewhat less than
+that of a file template.  A template consists of a list of patterns;
+there is nothing corresponding to the logical directories and list
+files used in file templates.  Examples of templates include
+
+.nf
+	(null)			package-help for the current package
+	cl.			package-help clpackage
+	cl.*			all tasks in clpackage
+	*			all tasks in the current package
+	alpha			module alpha
+.fi
+
+The simple alphanumeric string is a special type of pattern.  The string
+"cl", for example, is equivalent to "cl*" or "cl?*".  Thus template
+expansion is a simple matter of scanning through the module list of
+a help directory and extracting all names which match the pattern.
+
+
+.nf
+pointer procedure expand_template (hp, template)
+
+hp:	helpdir descriptor
+
+begin
+	allocate template descriptor, containing space for the encoded
+	    pattern, hp, and the module index.
+
+	save hp
+	encode template into descriptor; turn "*" meta-characters
+	    into "?*" if not following character class
+	set module index to zero
+
+	return (pointer to template descriptor)
+end
+.fi
+
+
+READ_TEMPLATE -- Get next module name from help directory matching the
+encoded pattern.  Return EOF when directory is exhausted.
+
+.nf
+int procedure read_template (template_descriptor, module_name)
+
+begin
+	for (index+=1;  hp_getname (hp, module_name) != 0;  index+=1) {
+	    if (pattern matches module name)
+		return
+	}
+	return (EOF)
+end
+.fi
+
+
+PRINT_HELP -- Print help documentation for the named module or parameter.
+We are called with the name of a single module; all fiddling with packages
+and templates has been performed by the time we are called.  The help
+directory is open and contains the names of the files containing the help
+source for the module.  Our main task is to determine what kind of help
+is desired and call the appropriate routine.
+
+Recall that the principal options are
+
+.nf
+       \fBoption\fR                     \fBmeaning\fR                 \fBfile\fR
+
+	help		print help block for module	   hlp
+	param		print help for single param	   hlp
+	section		print a single section		   hlp
+	files	        print file names		   ...
+	source		print source file		   src
+	sysdoc		print system documentation	   sys
+	alldoc		print all documentation		 hlp,sys
+	summary		print help block titles		 hlp,sys
+.fi
+
+
+.nf
+procedure print_help (hp, modname, ctrl)
+
+begin
+	# Handle options which do not access a help file.
+	if (option == files) {
+	    pr_filenames (hp, modname, ctrl)
+	    return
+	} else if (option == source) {
+	    get source file name from hp_getname
+	    pr_sourcefile (sourcefile, ctrl)
+	    return
+	} else if (option == summary) {
+	    # Scan hlp file and print summary of help blocks.
+	    get helpfile name from hp_getname
+	    pr_summary (helpfile, ctrl)
+	    return
+	}
+
+	# Process help block.  Processing is controlled by the
+	# "ctrl" structure.
+
+	if (option == help or alldoc) {
+	    get helpfile name from hp_getname
+	    pr_helpblock (helpfile, module, ctrl)
+	if (option == sysdoc or alldoc) {
+	    get sysdocfile name from hp_getname
+	    pr_helpblock (sysdocfile, module, ctrl)
+	}
+end
+.fi
+
+
+PR_HELPBLOCK -- Format and print a help block.  Open the help file and search
+for the named module.  Interpret block header and print help title.
+Process the remainder of the help block with lroff.
+
+.nf
+procedure pr_helpblock (helpfile, module, ctrl)
+
+begin
+	iferr (in = open help file)
+	    print warning message
+	if (find_help_block (in, module, lbuf) == not found)
+	    cannot find help block for module 'modname'
+
+	clear EOF flag in ctrl
+	initialize line counter
+
+	if (not printing just single param or section)
+	    pr_header (lbuf, ctrl)
+	if (lroff (input, ctrl, output, ctrl, ...) == ERR)
+	    print warning message
+	close help file
+end
+.fi
+
+
+INPUT -- Lroff line input procedure.  Called by Lroff to get lines of
+input text.  Function varies slightly depending on the Help option.
+If printing only single param or single section, our job is to eat all
+input which is not part of the indicated section of the help block.
+A parameter block begins with ".ls paramname" and ends with a matching
+".le" or ".ih", if the text is formatted.  Similarly, the single section
+begins with a ".ih" followed by the section name on the next line.
+
+.nf
+int procedure input (ctrl, outbuf)
+
+ctrl:	Control structure.  Contains fd of input file, and the EOF
+	flag which may be set by the \fBoutput\fR procedure if we are
+	called interactively.
+
+begin
+	# Eof flag is set after param block has been fully input,
+	# but normally before the actual end of file.
+	if (eof flag was set by user interaction)
+	    return (EOF)
+	else if (processing full help block)
+	    return (getline (infile, outbuf))
+
+	# We get here only if special processing is required to
+	# filter out all but a section of the help text.
+
+	if (first call for new file) {
+	    # Determine whether or not the help block is formatted.
+	    get first line of help block
+	    if (line is an Lroff directive)
+		formatted = true
+	    else
+		formatted = false
+	    return, passing line to Lroff
+	}
+
+	if (second call for new file) {
+	    if (single param mode) {
+		if (formatted) {
+		    eat input lines until a ".ls" directive is
+			found which contains the param name as
+			a substring.
+		} else {
+		    eat input lines until a line beginning with
+			the parameter name is found.
+		}
+	    } else if (print a single section) {
+		if (formatted) {
+		    eat input lines until ".ih\nSECNAME" is found
+		} else {
+		    eat input lines until a line beginning with the
+			parameter name or SECNAME is found.
+		}
+		put a section indent directive into line buffer
+	    }
+	    return, passing line to Lroff
+	}
+
+	# By the time we get here we are in the parameter or single
+	# section.
+	get input line
+	if (line is a .ih directive)
+	    set EOF flag
+	else if (in single param mode and have a matching .le)
+	    set EOF flag
+
+	return, passing line to Lroff
+end
+.fi
+
+
+OUTPUT -- Output a line of text to the "out" file.  If the standard output
+is redirected, put lines out as is with \fBputline\fR.  Otherwise put lines out
+to the interactive terminal with \fBttyputline\fR, which processes standout
+mode etc.  Count lines and pause between pages, if enabled by control
+flag.  Pause is implemented as a request for a CL query mode boolean
+parameter, just as in the \fBpage\fR utility.
+
+.nf
+procedure output (dev, linebuf)
+dev:	The "ctrlpar" structure, containing output file descriptor,
+	pagination flag, TTY descriptor pointer, left and right
+	margins, flag if output is redirected, and so on.
+
+begin
+	if (output is redirected) {
+	    call putline to output line without further processing
+	    return
+	}
+
+	call ttyputline to output line
+	bump line counter
+
+	# The NOMORE procedure produces a query on the user terminal,
+	# giving the user a chance to continue when they have finished
+	# reading the current screen, or of terminating the help block
+	# currently being processed.
+
+	if (output page is full)
+	    if (nomore)
+		set EOF flag for input procedure
+end
+.fi

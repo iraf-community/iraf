@@ -1,0 +1,36 @@
+.help asirestore Dec98 "Image Interpolator Package"
+.ih
+NAME
+asirestore -- restore interpolant
+.ih
+SYNOPSIS
+asirestore (asi, interpolant)
+
+.nf
+    pointer	asi		#O interpolant descriptor
+    real	interpolant[]	#I array containing interpolant
+.fi
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to the interpolant descriptor structure.
+.le
+.ls interpolant
+Array containing the interpolant. The length of interpolant can be determined
+by a call to ASIGETI.
+.le
+
+.nf
+		len_interpolant = asigeti (asi, II_ASINSAVE)
+.fi
+.ih
+DESCRIPTION
+ASIRESTORE allocates space for the interpolant descriptor and restores the
+parameters and coefficients stored in the interpolant array to a structure
+for use with ASIEVAL, ASIVECTOR, ASIDER and ASIGRL.
+.ih
+NOTES
+.ih
+SEE ALSO
+asisave
+.endhelp

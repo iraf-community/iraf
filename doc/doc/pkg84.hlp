@@ -1,0 +1,282 @@
+.help pkg84 Mar84 "IRAF Packages"
+.sh
+1. Introduction
+
+    This document summarizes the package structure of the IRAF system as
+of March 1984.  A list of all the "up" packages is first given, showing
+the package structure of IRAF starting from the root package (clpackage).
+A listing of the tasks or programs currently available in each package is
+then given, including a one-line description of the function of each task.
+
+.sh
+2. Package Organization
+
+    The leftmost column in the table below lists the currently "up" packages
+in the root package of IRAF.  Some packages contain subpackages, accessible
+only by first loading the package in the root.  Subpackages are shown indented
+one or more levels from the root.  Note that despite the tree-like logical
+organization of the packages, they are all equally accessible once loaded.
+
+.nf
+	dataio			FITS, Camera readers etc.
+	images			General image processing
+		tv		Image display load and control
+	language		The CL builtin tasks
+	lists			List processing
+	local			User stuff
+	plot			Plot package
+	softools		Programming tools
+	system			System utilities
+	utilities		General utilities
+.fi
+
+.sh
+3. Package Listings
+
+    This section is a collection of the "help package" listings of the tasks
+currently available in each installed package.  The help listing for a package
+may be duplicated in the online system using the help facilities.
+As of the release date of this document, there are only a limited number
+of manual pages online for the individual tasks.  Manual pages are now
+available for help, for all of the dataio and utilities
+programs, for tv.display, and for the contour, graph,
+and surface programs in the plot package.
+
+NOTE: to get help for one of the modules within a package, the package
+must either be loaded, or the package name must be given explicitly.
+Thus,
+
+	cl> help contour
+
+will work only if the plot package is loaded, while
+
+	cl> help plot.contour
+
+will work at any time.  The first form is ambiguous; help will search
+the set of loaded packages for all package and tasks for which the
+string "contour" is an abbreviation, and print help on all such matches.
+If no matches are found, nothing is printed; this can be confusing
+and will be fixed at some point.
+
+.ks
+.ce
+CLPACKAGE
+
+.nf
+        artdata - Artificial data generation package
+     astrometry - Astrometry package
+       database - Database manipulation package
+         dataio - Data format conversion package (RFITS, etc.)		[up]
+       digiphot - Digital stellar photometry package
+	   dtoi - Calibration of nonlinear images
+     filterphot - Filter photometry package
+          focas - Faint object classification and analysis package
+         images - General image processing package			[up]
+          imred - Image reductions package
+       language - The command language itself				[up]
+          lists - List processing package				[up]
+	  local - Local utilities package				[up]
+       nsurfbrt - Galaxy isophotal analysis package
+       onedspec - One dimensional spectral red & analysis package
+	   plot - Plot package						[up]
+       softools - Software tools package (for programming)		[up]
+         system - System utilities package				[up]
+       twodspec - Two dimensional spectral red & analysis package
+      utilities - Miscellaneous utilities package			[up]
+.fi
+.ke
+
+
+.ks
+.ce
+DATAIO
+
+.nf
+      mtexamine - Examine the structure of a magnetic tape
+        rcamera - Convert a Forth/Camera image into an IRAF image
+        reblock - Copy a binary file, optionally reblocking
+     wcardimage - Convert text files to cardimage files
+        pdsread - Convert a PDS image into an IRAF image
+     rcardimage - Convert a cardimage file into a text file
+          rfits - Convert a FITS image into an IRAF image
+.fi
+.ke
+
+
+.ks
+.ce
+IMAGES
+
+.nf
+	 imcopy - Copy an image
+       imdelete - Delete an image
+       imheader - Print an image header
+    imhistogram - Compute image histogram
+.fi
+.ke
+
+
+.ks
+.ce
+IMAGES.TV
+
+.nf
+             tv - Image display load and control package
+	  blink - Blink two frames
+	display - Load an image or image section into the display
+	  erase - Erase an image frame
+	  frame - Select the frame to be displayed
+	lumatch - Match the lookup tables of two frames
+     monochrome - Select monochrome enhancement
+    pseudocolor - Select pseudocolor enhancement
+	    rgb - Select true color mode (red, green, and blue frames)
+	 window - Adjust the contrast and dc offset of the current frame
+	   zoom - Zoom in on the image (change magnification)
+.fi
+.ke
+
+
+.ks
+.ce
+LANGUAGE
+
+.nf
+	 access - Test if a file exists
+	    bye - Exit a task or package
+	  cache - Cache parameter files, or print the current cache list
+	  chdir - Change the current working directory
+	     cl - Execute commands from the standard input
+	 defpac - Test if a package is defined
+	 defpar - Test if a parameter is defined
+        deftask - Test if a task is defined
+	 envget - Get the string value of an environment variable
+	  error - Print error code and message and abort
+	 fprint - Format and print a line into a parameter
+	  fscan - Scan a list (formatted input)
+        history - Print the last few commands entered
+	   keep - Make recent set, task, etc. declarations permanent
+	   kill - Kill a background job
+	 lparam - List the parameters of a task
+	 mktemp - Make a temporary (unique) file name
+        package - Define a new package, or print the current package names
+	  print - Format and print a line on the standard output
+	  radix - Print a number in the given radix
+       redefine - Redefine a task
+	   scan - Scan the standard input (formatted input)
+        service - Service a query from a background job
+	    set - Set an environment variable, or print environment
+	 substr - Extract a substring from a string
+	   task - Define a new task
+        unlearn - Restore the default parameters for a task or package
+	 update - Update a task's parameters (flush to disk)
+        version - Print the revision date of the CL
+	   wait - Wait for all background jobs to complete
+.fi
+.ke
+
+
+.ks
+.ce
+LISTS
+
+.nf
+	average - Compute the mean and standard deviation of a list
+	gcursor - Read the graphics cursor
+       imcursor - Read the image display cursor
+	  table - Format a list of words into a table
+	 tokens - Break a file up into a stream of tokens
+	 unique - Delete redundant elements from a list
+	  words - Break a file up into a stream of words
+.fi
+.ke
+
+
+.ks
+.ce
+PLOT
+
+.nf
+	contour - Make a contour plot of an image
+	  graph - Graph one or more image sections or lists
+	   pcol - Plot a column of an image
+	  pcols - Plot the average of a range of image columns
+	   prow - Plot a line (row) of an image
+	  prows - Plot the average of a range of image lines
+	surface - Make a surface plot of an image
+.fi
+.ke
+
+
+.ks
+.ce
+SOFTOOLS
+
+.nf
+	   make - Table driven utility for maintaining programs
+	  mklib - Make or update a library
+      mkmanpage - Make and edit a new manual page
+       xcompile - Compile and/or link a program
+	   yacc - Build an SPP language parser
+.fi
+.ke
+
+
+.ks
+.ce
+SYSTEM
+
+.nf
+       allocate - Allocate a device, i.e., magtape drive mta, mtb, ...
+	   beep - Beep the terminal
+        bugmail - Print/Post bug reports, complaints, suggestions
+	  clear - Clear the terminal screen
+    concatenate - Concatenate a list of files to the standard output
+	   copy - Copy a file, or copy a list of files to a directory
+	  count - Count the number of lines, words, and characters in a file
+     deallocate - Deallocate a previously allocated device
+         delete - Delete a file
+      devstatus - Print the status of a device (mta, mtb, tty, ...)
+      directory - List files in a directory
+      diskspace - Show how much diskspace is available
+	   edit - Edit a file
+	  files - Expand a file template into a list of files
+	   head - Print the first few lines of a file
+           help - Print online documentation
+         lprint - Print a file on the line printer device
+	  match - Print all lines in a file that match a pattern
+	   news - Page through the system news file
+	   page - Page through a file
+      pathnames - Expand a file template into a list of OS pathnames
+        protect - Protect a file from deletion
+         rename - Rename a file
+      revisions - Print/Post a revision notice for a package
+         rewind - Rewind a device
+	   sort - Sort a text file
+	    spy - Show processor status
+	   stty - Show/Set terminal characteristics
+	   tail - Print the last few lines of a file
+	    tee - Tee the standard output into a file
+	   time - Print the current time and date
+	   type - Type a file on the standard output
+      unprotect - Remove delete protection from a file
+.fi
+.ke
+
+
+.ks
+.ce
+UTILITIES
+
+.nf
+	airmass - Compute the airmass at a given elevation above the horizon
+	ccdtime	- Compute time required to observe star of given magnitude
+	  detab	- Replace tabs with tabs and blanks
+	  entab - Replace blanks with tabs and blanks
+	  lcase - Convert a file to lower case
+	precess - Precess a list of astronomical coordinates
+       translit - Replace or delete specified characters in a file
+	  ucase - Convert a file to upper case
+	  urand - Uniform random number generator
+.fi
+.ke
+.endhelp

@@ -1,0 +1,46 @@
+.help msieval Dec98 "Image Interpolation Package"
+.ih
+NAME
+msieval -- procedure to evaluate the interpolant at x and y
+.ih
+SYNOPSIS
+z = msieval (msi, x, y)
+
+.nf
+pointer		msi		#I interpolant descriptor
+real		x[4]		#I x value, 1 <= x[1-4] <= nxpix
+real		y[4]		#I y value, 1 <= y[1-4] <= nypix
+.fi
+.ih
+ARGUMENTS
+.ls msi    
+The pointer to the sequential interpolant descriptor structure.
+.le
+.ls x, y
+The single x and y values of or in the case of the drizzle interpolant
+the single quadrilateral over which the point is to be evaluated.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated from the data points in the
+case of the polynomial interpolants and the B-spline coefficients in
+the case of the spline interpolant. The polynomial interpolants
+are evaluated using Everett's central difference formula. The boundary
+extension algorithm is projection.
+
+The sinc interpolant is evaluated using an array of data points around
+the desired position. The look-up table sinc interpolant is computed
+using an a pre-computed look--up table entry. The boundary extension
+algorithm is nerest neighbor.
+
+The drizzle interpolant is computed by computing the mean value of the
+data within the user supplied quadrilateral.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility of
+the user. MSIINIT or MSISINIT and MSIFIT must be called before calling
+MSIEVAL.
+.ih
+SEE ALSO
+msivector, mrieval, mrider
+.endhelp

@@ -1,0 +1,96 @@
+\O=NOAO/IRAF V2.10EXPORT valdes@puppis Thu 09:50:51 04-Feb-93
+\T=xgtermc
+\G=xgtermc
+imred\n
+bias\n
+sections\sdemoobj,demostd,demoarc1,demoarc2\s>\sdemolist\n
+colbias\sdemoflat,@demolist\sdemoflat,@demolist\sbias=[100,*]\strim=[20:80,*]\n
+\n
+:/<-5\s\s\s\s/=(.\s=\r f\scheb\r
+f/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+N\n
+bye\n
+bye\n
+response\sdemoflat\sdemoflat[20:40,*]\sdemoflat\n
+\n
+k/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+imarith\s@demolist\s/\sdemoflat\s@demolist\n
+illum\sdemostd\sdemoillum\sbins=1\n
+\n
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+:/<-5\s\s\s\s/=(.\s=\r sample\s5:24,36:55\r
+:/<-5\s\s\s\s/=(.\s=\r f\scheb\r
+:/<-5\s\s\s\s/=(.\s=\r o\s3\r
+f/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+imarith\s@demolist\s/\sdemoillum\s@demolist\n
+iden\sdemoarc1\ssec="mid\scol"\n
+i/<-5\s\s\s\s/=(.\s=\r
+m*),'\s\s\s\s*)&/=2\r 5015\r
+m;$,9\s\s\s\s;%+/%*\r 7281\r
+l/<-5\s\s\s\s/=(.\s=\r
+f/<-5\s\s\s\s/=(.\s=\r
+d%"5!\s\s\s\s%!;$**\r
+d:7'5\s\s\s\s:845=(\r
+f/<-5\s\s\s\s/=(.\s=\r
+l/<-5\s\s\s\s/=(.\s=\r
+d/0%>\s\s\s\s/008&"\r
+f/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+reid\sdemoarc1\sdemoarc1,demoarc2\ssec="mid\scol"\snlost=5\sv+\n
+iden\sdemostd\ssec="mid\sline"\n
+m/<-;\s\s\s\s/=(-94\r 50\r
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+reid\sdemostd\sdemostd\ssec="mid\sline"\snlost=5\sv+\n
+fitcoords\scombine+\sfitname=demoarcfit\n
+demoarc1,demoarc2\n
+\n
+y/<-5\s\s\s\s/=(.\s=\r
+x/<-5\s\s\s\s/=(.\s=\r
+r/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+fitcoords\n
+demostd\n
+\n
+y/<-5\s\s\s\s/=(.\s=\r
+x/<-5\s\s\s\s/=(.\s=\r
+r/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+transform\slogfiles=STDOUT,demologfile\n
+demoobj,demostd\n
+demoobj,demostd\n
+demoarcfit,demostd\n
+background\sdemoobj,demostd\sdemoobj,demostd\n
+256\r
+:/<-5\s\s\s\s/=(.\s=\r sample\s5:24,36:55\r
+:/<-5\s\s\s\s/=(.\s=\r nav\s-20\r
+f/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+\r
+256\r
+q/<-5\s\s\s\s/=(.\s=\r
+\r
+nsum=7\n
+setairmass\sdemoobj,demostd\n
+standard\sdemostd\sdemostdfile\sap=31\n
+hz14\n
+n\n
+sensfunc\sdemostdfile\sdemosens\slogfile=demologfile\n
+\n
+q/<-5\s\s\s\s/=(.\s=\r
+calibrate\sdemoobj,demostd\sdemoobj,demostd\ssens=demosens\n
+splot\sdemostd,demoobj\n
+31\n
+y/<-5\s\s\s\s/=(.\s=\r hz14\r
+q/<-5\s\s\s\s/=(.\s=\r
+o/<-5\s\s\s\s/=(.\s=\r
+#/<-5\s\s\s\s/=(.\s=\r 1\r
+q/<-5\s\s\s\s/=(.\s=\r

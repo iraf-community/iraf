@@ -1,0 +1,30 @@
+# Help directory for the DIGIPHOT package.
+
+$apphot		= "noao$digiphot/apphot/"
+$daophot	= "noao$digiphot/daophot/"
+$photcal	= "noao$digiphot/photcal/"
+$ptools		= "noao$digiphot/ptools/"
+
+apphot		men=apphot$apphot.men,
+		hlp=..,
+		sys=apphot$apphot.hlp,
+		pkg=apphot$apphot.hd,
+		src=apphot$apphot.cl
+
+daophot		men=daophot$daophot.men,
+		hlp=..,
+		sys=daophot$daophot.hlp,
+		pkg=daophot$daophot.hd,
+		src=daophot$daophot.cl
+
+photcal		men=photcal$photcal.men,
+		hlp=..,
+		sys=photcal$photcal.hlp,
+		pkg=photcal$photcal.hd,
+		src=photcal$photcal.cl
+
+ptools		men=ptools$ptools.men,
+		hlp=..,
+		sys=ptools$ptools.hlp,
+		pkg=ptools$ptools.hd,
+		src=ptools$ptools.cl

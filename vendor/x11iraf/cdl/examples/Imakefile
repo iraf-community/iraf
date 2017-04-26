@@ -1,0 +1,36 @@
+# 
+#  IMakefile for CDL Example tasks.
+# 
+
+X11IRAFDIR = ../../
+#include <../../X11IRAF.tmpl>
+
+
+    CDEBUGFLAGS = -g
+        FCFLAGS = -g
+         CDLDIR = ../
+       INCLUDES = -I. -I$(CDLDIR)
+  LOCAL_LDFLAGS = -L$(CDLDIR)
+           LIBS =  -lcdl
+
+
+AllTarget(animate display mosaic tvmark fdisplay ftvmark)
+
+NormalFortranObjectRule()
+
+NormalProgramTarget(animate,animate.o,../libcdl.a,$(LIBS),-lm)
+NormalProgramTarget(display,display.o,../libcdl.a,$(LIBS),-lm)
+NormalProgramTarget(mosaic,mosaic.o,../libcdl.a,$(LIBS),-lm)
+NormalProgramTarget(tvmark,tvmark.o,../libcdl.a,$(LIBS),-lm)
+
+fdisplay: fdisplay.o ../libcdl.a
+	f77 -o fdisplay fdisplay.o ../libcdl.a -lm $(LDLIBS)
+
+ftvmark: ftvmark.o ../libcdl.a
+	f77 -o ftvmark ftvmark.o ../libcdl.a -lm $(LDLIBS)
+
+clean::
+	$(RM) fdisplay ftvmark
+
+DependTarget()
+LintTarget()

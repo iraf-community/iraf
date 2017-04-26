@@ -1,0 +1,74 @@
+.help tdelete Aug93 tables
+.nj
+.ih
+NAME
+tdelete -- Delete a table.
+.ih
+USAGE
+tdelete table
+.ih
+DESCRIPTION
+This task deletes tables.
+The input may be a general filename template,
+including wildcard characters, or the name of a list file
+(preceded by the "@" character) containing table names.
+
+The task checks that the file to be deleted really is a table
+before deleting it.
+In order to protect against accidental deletion of files other than tables,
+text tables may be deleted using 'tdelete' only if 'verify = yes'.
+.ih
+PARAMETERS
+.ls table [file name template]
+A list of one or more tables to be deleted.
+.le
+.ls (verify = no) [boolean]
+Prompt for confirmation before deleting?  It is possible to delete
+text tables using 'tdelete' if 'verify' is set to "yes".
+.le
+.ls (default_action = yes) [boolean]
+Default action for the verify query.  If 'default_action = yes', then the
+prompt will come back with "yes?" and striking return will proceed with
+the delete.
+.le
+.ls go_ahead = yes [boolean]
+This is a copy of 'default_action' used for prompting if 'verify = yes'.
+This parameter is set by the task, it copies the value of 'default_action',
+but cannot be directly set by the user.
+.le
+.ih
+EXAMPLES
+1. Delete a single table.
+
+.nf
+	cl> tdelete table
+.fi
+
+2. Delete several tables.
+
+.nf
+	cl> tdelete table1,table2,tab67
+	cl> tdelete *.tab,a,b,c
+
+.fi
+In the latter case, the extension is given explicitly because there may be
+other files beginning with "tab" that are not tables.
+
+3. Delete a list of tables using verify.
+
+.nf
+	cl> tdelete fits*.tab ver+
+	cl> delete table `fits1.tab' ? (yes): yes
+	cl> delete table `fits2.tab' ? (yes): yes
+	cl> delete table `fits3.tab' ? (yes): yes
+.fi
+.ih
+BUGS
+Text tables cannot be deleted by 'tdelete' unless 'verify' is set to yes.
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+delete, tcopy, trename
+.endhelp

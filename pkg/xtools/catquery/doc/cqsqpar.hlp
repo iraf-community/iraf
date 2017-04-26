@@ -1,0 +1,39 @@
+.help cqsqpar Mar00 "Catquery Package"
+.ih
+NAME
+cqsqpar -- set the value of a query parameter by name
+.ih
+SYNOPSIS
+
+parno = cq_sqpar (cq, pname, value)
+
+.nf
+pointer	cq		# the configuration file descriptor
+char	pname		# the query parameter name
+char	value		# the query parameter value
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls pname
+The name of the query parameter to be set.
+.le
+.ls value
+The new query parameter value.
+.le
+.ih
+DESCRIPTION
+Cq_sqpar sets the value of the named query parameter. Qq_sqpar is an integer 
+function which returns the sequence number of the requested parameter
+as its function value.  Zero is returned if the requested query parameter
+is not found.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before a query parameter value
+can be changed.
+.ih
+SEE ALSO
+cqnqpars, cqgpar, cqgqparn, cqsqparn
+.endhelp

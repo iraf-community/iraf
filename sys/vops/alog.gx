@@ -1,0 +1,34 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ALOG -- Compute the logarithm to the base 10 of a vector (generic).  If the
+# logarithm is undefined (x <= 0) a user supplied function is called to get
+# the function value.
+
+procedure alog$t (a, b, npix, errfcn)
+
+PIXEL	a[ARB], b[ARB]
+int	npix, i
+extern	errfcn()
+PIXEL	errfcn()
+errchk	errfcn
+
+begin
+	do i = 1, npix {
+	    $if (datatype == x)
+		if (a[i] == 0$f)
+	    $else
+		if (a[i] <= 0$f)
+	    $endif
+		    b[i] = errfcn (a[i])
+		else {
+		    # Note Fortran standard forbids log10(cplx).
+		    $if (datatype == xsi)
+			b[i] = log10 (real (a[i]))
+		    $else $if (datatype == l)
+			b[i] = log10 (double (a[i]))
+		    $else
+			b[i] = log10 (a[i])
+		    $endif $endif
+		}
+	}
+end

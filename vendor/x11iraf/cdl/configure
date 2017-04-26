@@ -1,0 +1,49 @@
+#!/bin/csh -f
+#
+#  Configuration script to produce Makefiles for various platforms.
+#  This *is not* an GNU autoconf-generated script, just a cheap imitation
+#  with minimal requirements.
+
+
+# Determine platform architecture.
+setenv OS	`uname`
+setenv OSVERSION `uname -r | cut -c1`
+
+if ($OS == "SunOS" && $OSVERSION == 5) then
+    cat Makefile.generic | \
+        sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -DSOLARIS/g' > Makefile
+    cat examples/Makefile.generic | \
+        sed -e 's/LDLIBS =/LDLIBS = -lnsl -lsocket/g' > examples/Makefile
+    cat test/Makefile.generic | \
+        sed -e 's/LDLIBS =/LDLIBS = -lnsl -lsocket/g' > test/Makefile
+else if ($OS == "OSF1") then
+    cat Makefile.generic | \
+	sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -DOSF1/g' > Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+else if ($OS == "ULTRIX") then
+    cat Makefile.generic | \
+	sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -DULTRIX/g' > Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+else if ($OS == "AUX") then
+    cat Makefile.generic | \
+	sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -DAUX/g' > Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+else if ($OS == "HP-UX") then
+    cat Makefile.generic | \
+	sed -e 's/ranlib/echo/g' | \
+	sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -D_NO_US_/g' > Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+else if ($OS == "AIX") then
+    cat Makefile.generic | \
+	sed -e 's/EXTRA_CFLAGS =/EXTRA_CFLAGS = -D_NO_US_/g' > Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+else
+    cp Makefile.generic Makefile
+    cp examples/Makefile.generic examples/Makefile
+    cp test/Makefile.generic test/Makefile
+endif

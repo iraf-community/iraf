@@ -1,0 +1,36 @@
+.help revisions Jul04 imcombine/src
+.nf
+
+This directory contains generic code used in various tasks that combine
+images.
+
+=======
+V2.13
+=======
+
+icgdata.gx
+    Fixed a problem where 3-D images were closing an image in the case
+    of many bands leading to a slow execution (10/20/06, Valdes)
+
+=======
+V2.12.3
+=======
+
+icmask.x
+iclog.x
+icombine.h
+    As a special unadvertised feature the "maskvalue" parameter may be
+    specified with a leading '<' or '>'.  Ultimately a full expression
+    should be added and documented.  (7/26/04, Valdes)
+
+icmask.x
+    Added a feature to allow masks specified without a path to be found
+    either in the current directory or the directory with the image.  This
+    is useful when images to be combined are distributed across multiple
+    directories.  (7/16/04, Valdes)
+
+========
+V2.12.2a
+========
+
+.endhelp

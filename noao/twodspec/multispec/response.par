@@ -1,0 +1,11 @@
+# RESPONSE
+
+input_image,f,a,,,,Input image to be smoothed and cleaned
+output_image,f,a,,,,Smoothed and cleaned output image
+spline_order,i,h,4,2,,Smoothing spline order
+width,i,a,1,1,,Width of smoothing region
+sigma_min,r,h,1,,,Minimum pixel sigma
+above,r,h,5,,,Upper cleaning threshold
+below,r,h,5,,,Lower cleaning threshold
+window,i,h,0,0,,Rejection window radiu
+div_threshold,r,h,1000.,,,Division threshold

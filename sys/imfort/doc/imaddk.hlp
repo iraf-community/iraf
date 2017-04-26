@@ -1,0 +1,55 @@
+.help imaddk Sep86 imfort
+.ih
+NAME
+imaddk -- add a new keyword to an image header
+.ih
+SYNOPSIS
+.nf
+subroutine imaddk (im, keyw, dtype, comm, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of the new keyword
+integer		dtype		#I keyword datatype code
+character*(*)	comm		#I comment string describing keyword
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimaddk\fR procedure is used to add a new keyword to the header of
+an existing, open image.  The datatype of the new keyword must be specified
+at creation time; the possible datatype codes for header keywords are given
+in the following table.
+
+.nf
+	1	boolean (logical)
+	2	character string
+	3,4,5	short integer, don't-care integer, long integer
+	6,7	real or double precision floating
+.fi
+
+A comment string may optionally be given to describ the keyword, i.e.,
+its function or purpose.  The comment string is printed in image header
+listings and is propagated onto FITS tapes.
+.ih
+RETURN VALUE
+A zero status is returned if there is space for the new keyword, and the
+keyword does not redefine an existing keyword.
+
+.nf
+SYS_IDBREDEF:	attempt to redefine an image header keyword
+SYS_IDBOVFL:	out of space in image header
+.fi
+.ih
+NOTES
+The precision of a keyword name is currently limited to eight characters
+(longer keyword names will be silently truncated), and all user defined
+keyword names are rendered into upper case.  This is necessary to permit
+use of the FITS image format to transport images.
+An alternative to the relatively low level \fIimaddk\fR procedure is provided
+by the \fIimakw\fR procedures, which will not add a new keyword if the named
+keyword already exists, which also set the value of the new keyword, and which
+avoid the need to use a datatype code.
+.ih
+SEE ALSO
+imdelk, imacck, imakw
+.endhelp

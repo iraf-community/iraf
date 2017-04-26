@@ -1,0 +1,54 @@
+.help msivector Dec98 "Image Interpolation Package"
+.ih
+NAME
+msivector -- evaluate the interpolant at an array of x and y points
+.ih
+SYNOPSIS
+msivector (msi, x, y, zfit, npts)
+
+.nf
+    pointer	msi		#I interpolant descriptor
+    real	x[npts/4*npts]	#I x values, 1 <= x <= nxpix
+    real	y[npts/4*npts]	#I y values, 1 <= y <= nypix
+    real	zfit[npts]	#O interpolated values
+    int		npts		#I number of points
+.fi
+.ih
+ARGUMENTS
+.ls msi    
+The pointer to the sequential interpolant descriptor
+.le
+.ls x, y
+The array of x and y values at or in the case tof the drizzle interpolant the
+array of quadrilaterals over which to evaluate the interpolant.
+.le
+.ls zfit
+The interpolated values.
+.le
+.ls npts
+The number of points.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated directly from the data points,
+The polynomial interpolants are evaluated using Everett's central difference
+formula. The spline interpolant uses the B-spline coefficients
+calculated using the MSIFIT routine. The boundary extension algorithm is
+projection.
+
+The sinc interpolant is evaluated using a array of data points around
+the point in question. The look-up table since is computed by convolving
+the data with a pre-computed look-up table entry. The boundary extension
+algorithm is nearest neighbor.
+
+The drizzle interpolant is evaluated by summing the data over the
+list of user supplied quadrilaterals.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility
+of the user. MSIINIT or MSISINIT and MSIFIT must be called before using
+MSIVECTOR.
+.ih
+SEE ALSO
+msieval, mrieval
+.endhelp

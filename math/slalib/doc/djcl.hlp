@@ -1,0 +1,34 @@
+.help djcl Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDJCL (DJM, IY, IM, ID, FD, J)
+
+     - - - - -
+      D J C L
+     - - - - -
+
+  Modified Julian Date to Gregorian year, month, day,
+  and fraction of a day.
+
+  Given:
+     DJM      dp     modified Julian Date (JD-2400000.5)
+
+  Returned:
+     IY       int    year
+     IM       int    month
+     ID       int    day
+     FD       dp     fraction of day
+     J        int    status:
+                       0 = OK
+                      -1 = unacceptable date (before 4701BC March 1)
+
+  The algorithm is derived from that of Hatcher 1984
+  (QJRAS 25, 53-55).
+
+  P.T.Wallace   Starlink   27 April 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

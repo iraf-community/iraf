@@ -1,0 +1,7 @@
+# ISTABLE Parameters
+
+infile,s,a,,,,Input file
+table,b,h,no,,,Is the file a tables file ?
+text,b,h,no,,,Is the file a text database file ?
+other,b,h,no,,,Is the file neither a tables or a text database file ?
+mode,s,h,"ql",,,Mode of task

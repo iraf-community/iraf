@@ -1,0 +1,41 @@
+.help cvreject June84 "Curfit Package"
+.ih
+NAME
+cvreject -- reject a single data point from the data set to be fit
+.ih
+SYNOPSIS
+cvreject (cv, x, y, weight)
+
+.nf
+pointer	cv		# curve descriptor
+real	x		# x value
+real	y		# y value
+real	weight		# weight value
+.fi
+.ih
+ARGUMENTS
+.ls cv    
+Pointer to the curve descriptor structure.
+.le
+.ls x   
+X value.
+.le
+.ls y
+Y value.
+.le
+.ls weight
+The weight value.
+.le
+.ih
+DESCRIPTION
+CVREJECT removes an individul data point from the data set.
+The non-zero basis functions for each x are calculated. The contribution
+of each x to the normal equations is computed and subtracted from the
+appropriate arrays and vectors.
+An array of points can be removed from the fit by repeated calls to CVREJECT
+followed by a single call to CVSOLVE to calculate a new set of coefficients.
+.ih
+NOTES
+.ih
+SEE ALSO
+.endhelp

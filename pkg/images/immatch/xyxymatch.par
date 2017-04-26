@@ -1,0 +1,36 @@
+# Parameter file for XYXYMATCH
+
+input,f,a,,,,The input lists
+reference,f,a,,,,The reference lists
+output,f,a,,,,The output matched coordinate lists
+tolerance,r,a,3,,,The matching tolerance in pixels
+
+refpoints,f,h,"",,,Optional list of reference points
+xin,r,h,INDEF,,,X origin of input list
+yin,r,h,INDEF,,,Y origin of input list
+xmag,r,h,INDEF,,,X magnification required to match input to reference list
+ymag,r,h,INDEF,,,Y magnification required to match input to reference list
+xrotation,r,h,INDEF,,,X rotation required to match input to reference list
+yrotation,r,h,INDEF,,,Y rotation required to match input to reference list
+xref,r,h,INDEF,,,X origin of reference list
+yref,r,h,INDEF,,,Y origin of reference list
+
+xcolumn,i,h,1,,,Input list column containing the x coordinate
+ycolumn,i,h,2,,,Input list column containing the y coordinate
+xrcolumn,i,h,1,,,Reference list column containing the x coordinate
+yrcolumn,i,h,2,,,Reference list column containing the y coordinate
+
+separation,r,h,9.0,,,The minimum object separation
+matching,s,h,"triangles","|tolerance|triangles|",,The matching algorithm
+nmatch,i,h,30,,,The maximum number of points for triangles algorithm
+ratio,r,h,10.0,5.0,10.0,The maximum ratio of longest to shortest side of triangle
+nreject,i,h,10,,,The maximum number of rejection iterations
+
+xformat,s,h,"%13.3f",,,The format of the output x coordinate
+yformat,s,h,"%13.3f",,,The format of the output y coordinate
+
+interactive,b,h,no,,,Interactive mode ?
+verbose,b,h,yes,,,Verbose mode ?
+icommands,*imcur,h,"",,,The image display cursor
+
+mode,s,h,ql,,,

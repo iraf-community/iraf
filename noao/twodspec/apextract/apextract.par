@@ -1,0 +1,8 @@
+# APEXTRACT Package
+
+dispaxis,i,h,2,1,2,"Dispersion axis (1=along lines, 2=along columns)"
+database,f,h,"database",,,Database
+verbose,b,h,no,,,Verbose output?
+logfile,s,h,"",,,Text log file
+plotfile,s,h,"",,,Plot file
+version,s,h,"APEXTRACT V3.0: August 1990"

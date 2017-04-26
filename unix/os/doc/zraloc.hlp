@@ -1,0 +1,45 @@
+.help zraloc May84 "System Interface"
+.ih
+NAME
+zraloc -- reallocate memory
+.ih
+SYNOPSIS
+.nf
+zraloc (buffer, nbytes, status)
+
+int	buffer			# address of buffer
+int	nbytes			# size of buffer
+int	status
+.fi
+.ih
+DESCRIPTION
+The size of the previously allocated buffer pointed to by \fIbuffer\fR is
+changed to \fInbytes\fR.  The buffer pointer must be the SPP char address
+returned by a previous call to \fBzmaloc\fR or \fBzraloc\fR.
+If necessary the buffer will be moved and the buffer pointer \fIbuffer\fR
+modified to point to the new buffer.  If the buffer is moved the contents of
+the buffer are preserved.
+.ih
+RETURN VALUE
+XERR is returned if the buffer pointer is invalid or if the buffer cannot be
+reallocated.  XOK is returned if the operation is successful.
+.ih
+NOTES
+The integer \fIbuffer\fR is a memory address in SPP char units with an
+arbitrary zero point, i.e., the type of address returned by \fBzlocva\fR.
+The high level code converts the buffer address into an offset into \fBMem\fR,
+i.e., into an SPP pointer.
+
+.nf
+	char_pointer_into_Mem = buffer - zlocva(Memc) + 1
+	Memc[char_pointer] = first char of buffer
+.fi
+
+Since the buffer address is returned in char units the buffer must be aligned
+to at least the size of a char; no greater degree of alignment is guaranteed
+nor required.  See the specifications of \fBzlocva\fR for additional information
+about addresses and address arithmetic.
+.ih
+SEE ALSO
+zmaloc, zmfree, zlocva
+.endhelp

@@ -1,0 +1,103 @@
+\hypertarget{structappMD}{
+\section{appMD Struct Reference}
+\label{structappMD}\index{appMD@{appMD}}
+}
+{\tt \#include $<$samp.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structappMD_138f7e855439b5960fedf2bfb28f473e}{
+char \textbf{name} \mbox{[}SZ\_\-LINE\mbox{]}}
+\label{structappMD_138f7e855439b5960fedf2bfb28f473e}
+
+\item 
+char \hyperlink{structappMD_fe527cb05f296f8e8b8144bf444beffd}{desc} \mbox{[}SZ\_\-DESC\mbox{]}
+\item 
+char \hyperlink{structappMD_8ff19215559267a838fe300ca4f743a7}{iconURL} \mbox{[}SZ\_\-URL\mbox{]}
+\item 
+char \hyperlink{structappMD_53945cba18e159fcdd4fb627b1d1d312}{docURL} \mbox{[}SZ\_\-URL\mbox{]}
+\item 
+char $\ast$ \hyperlink{structappMD_652f4b568b3de167fa0886613c8c6656}{descHTML}
+\item 
+int \hyperlink{structappMD_4b9f5ebb7d20beb53a7bfe192009e89a}{nkeys}
+\item 
+char $\ast$ \hyperlink{structappMD_cf4d62dbfeb28cb8c503d6a4d1598a8d}{aKey} \mbox{[}MAX\_\-MDATTRS\mbox{]}
+\item 
+char $\ast$ \hyperlink{structappMD_13ae9876a351aee3fe5b861733aff77a}{aVal} \mbox{[}MAX\_\-MDATTRS\mbox{]}
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+SAMP String datatype Application (and \hyperlink{structHub}{Hub}) metadata.
+
+Application (and \hyperlink{structHub}{Hub}) metadata. 
+
+\subsection{Field Documentation}
+\hypertarget{structappMD_cf4d62dbfeb28cb8c503d6a4d1598a8d}{
+\index{appMD@{appMD}!aKey@{aKey}}
+\index{aKey@{aKey}!appMD@{appMD}}
+\subsubsection[{aKey}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ {\bf appMD::aKey}}}
+\label{structappMD_cf4d62dbfeb28cb8c503d6a4d1598a8d}
+
+
+number of meta keys 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubClose(), samp\_\-hubDeclareMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structappMD_13ae9876a351aee3fe5b861733aff77a}{
+\index{appMD@{appMD}!aVal@{aVal}}
+\index{aVal@{aVal}!appMD@{appMD}}
+\subsubsection[{aVal}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ {\bf appMD::aVal}}}
+\label{structappMD_13ae9876a351aee3fe5b861733aff77a}
+
+
+attr keyword 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubClose(), samp\_\-hubDeclareMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structappMD_fe527cb05f296f8e8b8144bf444beffd}{
+\index{appMD@{appMD}!desc@{desc}}
+\index{desc@{desc}!appMD@{appMD}}
+\subsubsection[{desc}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf appMD::desc}}}
+\label{structappMD_fe527cb05f296f8e8b8144bf444beffd}
+
+
+name 
+
+Referenced by samp\_\-hubOpen(), and samp\_\-Metadata().\hypertarget{structappMD_652f4b568b3de167fa0886613c8c6656}{
+\index{appMD@{appMD}!descHTML@{descHTML}}
+\index{descHTML@{descHTML}!appMD@{appMD}}
+\subsubsection[{descHTML}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ {\bf appMD::descHTML}}}
+\label{structappMD_652f4b568b3de167fa0886613c8c6656}
+
+
+documentation URL \hypertarget{structappMD_53945cba18e159fcdd4fb627b1d1d312}{
+\index{appMD@{appMD}!docURL@{docURL}}
+\index{docURL@{docURL}!appMD@{appMD}}
+\subsubsection[{docURL}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf appMD::docURL}}}
+\label{structappMD_53945cba18e159fcdd4fb627b1d1d312}
+
+
+icon URL 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubDeclareMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structappMD_8ff19215559267a838fe300ca4f743a7}{
+\index{appMD@{appMD}!iconURL@{iconURL}}
+\index{iconURL@{iconURL}!appMD@{appMD}}
+\subsubsection[{iconURL}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf appMD::iconURL}}}
+\label{structappMD_8ff19215559267a838fe300ca4f743a7}
+
+
+descriptive text 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubDeclareMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structappMD_4b9f5ebb7d20beb53a7bfe192009e89a}{
+\index{appMD@{appMD}!nkeys@{nkeys}}
+\index{nkeys@{nkeys}!appMD@{appMD}}
+\subsubsection[{nkeys}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf appMD::nkeys}}}
+\label{structappMD_4b9f5ebb7d20beb53a7bfe192009e89a}
+
+
+descriptive text (HTML) 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubClose(), samp\_\-hubDeclareMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().
+
+The documentation for this struct was generated from the following files:\begin{CompactItemize}
+\item 
+\hyperlink{samp_8h}{samp.h}\item 
+\hyperlink{sampDecl_8h}{sampDecl.h}\end{CompactItemize}

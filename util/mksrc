@@ -1,0 +1,105 @@
+#!/bin/bash
+#
+#  MKSRC -- Make a pure source tree and configure the links for the 
+#  current architecture.
+
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Utility aliases.
+source $iraf/unix/hlib/util.sh
+
+if [ -z "$iraf" ]; then
+    /bin/echo ""
+    /bin/echo "Error:  You must have the iraf env variable defined !"
+    /bin/echo ""
+    exit 1
+fi
+
+
+exec=yes
+arch=`$iraf/unix/hlib/irafarch.sh`
+
+
+#=============================================================================
+# Process any command line arguments.
+#=============================================================================
+while [ -n "$1" ] ; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+	;;
+    *)
+        ERRMSG  "$0: unknown argument $1"
+	;;
+    esac
+
+    if [ -n "$2" ]; then
+        shift
+    else
+        break
+    fi
+done
+
+
+
+#----------------------------------
+# Determine platform architecture.
+#----------------------------------
+
+/bin/echo -n "Clean host directories ...."
+  if [ $exec == "yes" ]; then
+    /bin/rm -f unix/bin.*/[agm-z]*.e unix/bin.*/lib[bco]*.a >> /dev/null 2>&1
+  else
+    /bin/ls -l unix/bin.*/[agm-z]*.e unix/bin.*/lib[bco]*.a
+  fi
+/bin/echo "		Done"
+
+
+
+/bin/echo -n "Clean src directories ...."
+dirs=("local" "math" "pkg" "sys" "noao")
+for i in ${dirs[@]}; do
+  if [ $exec == "yes" ]; then
+    find $i -type f -name \*.a   -exec /bin/rm -f {} \;	    >> /dev/null 2>&1
+    find $i -type f -name \*.e   -exec /bin/rm -f {} \;	    >> /dev/null 2>&1
+    find $i -type f -name \*.o   -exec /bin/rm -f {} \;	    >> /dev/null 2>&1
+    find $i -type f -name OBJS\* -exec /bin/ls -l {} \;	    >> /dev/null 2>&1
+  else
+    find $i -type f -name \*.a   -exec /bin/ls -l {} \;
+    find $i -type f -name \*.e   -exec /bin/ls -l {} \;
+    find $i -type f -name \*.o   -exec /bin/ls -l {} \;
+    find $i -type f -name OBJS\* -exec /bin/ls -l {} \;
+  fi
+done
+/bin/echo "		Done"
+
+
+/bin/echo -n "Clean bin directories ...."
+if [ $exec == "yes" ]; then
+    /bin/rm -rf bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ] OBJS*    >>/dev/null 2>&1
+else
+    /bin/ls -l  bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ] OBJS*
+fi
+/bin/echo "		Done"
+
+
+/bin/echo -n "Cleaning spool files ...."
+if [ $exec == "yes" ]; then
+    find . -name spool\* -print -exec /bin/rm -f {} \;	    >> /dev/null 2>&1
+    find . -name _spool\* -print -exec /bin/rm -f {} \;	    >> /dev/null 2>&1
+else
+    find . -name spool\* -print
+    find . -name _spool\* -print
+fi
+/bin/echo "		Done"

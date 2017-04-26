@@ -1,0 +1,6 @@
+input,s,a,,,,"Input SDAS table name"
+output,s,a,,,,"Output SDAS table name"
+rbase,s,a,,,,"File containing expansion rules"
+debug,s,h,"",,,"File for debug output"
+verbose,b,h,no,,,"Print table names?"
+mode,s,h,"a",,,

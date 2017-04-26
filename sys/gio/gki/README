@@ -1,0 +1,84 @@
+GKI -- The graphics kernel interface.
+
+    The GKI package is used to encode and decode the GKI instructions used to
+communicate with a graphics kernel.  The kernel may be resident in the same
+process, in the CL process, or in a subprocess of the CL.  Output may also
+be spooled in a metafile.  The purposes of the GKI interface are to isolate GIO
+from the kernel, to hide the details of packing and unpacking GKI metacode
+from both GIO and the kernels, and to hide the details of the communications
+protocols required to communicate with the different types of kernels.
+
+    Before any i/o can be done on a GKI graphics stream, GKI must be informed
+of the residency of the kernel associated with the stream.  Three calls are
+provided for this purpose:
+
+	    gki_redir (stream, fd, old_type, old_fd)		[1]
+	   gki_inline (stream, dd)				[2]
+	gki_subkernel (stream, pid, epa_prpsio)			[3]
+
+Use [1] in the normal case of GIO talking to the CL or to a metafile.  The
+first call will set, rather than redirect, the FD for a stream.  Subsequent
+calls may be made to truely redirect a stream and then restore its normal
+dataflow.  Use [2] when the graphics kernel is in the same process.  The
+kernel must already have been opened with the driver for the kernel in the
+DD array.  This is the most efficient mode of operation if a high data
+bandwidth is required.  Kernel type [2] is used by GIOTR in the CL process
+to communicate with external kernels.  A slightly different protocol is
+required in this case since the input must be switched to the subprocess
+before it can read or write the graphics stream.
+
+
+			Summary Of Procedures
+
+1. Initialize GKI
+
+		      gki_redir (stream, fd, old_fd, old_type)
+	      gki_inline_kernel (stream, dd)
+		  gki_subkernel (stream, pid, prpsio_epa)
+
+
+2. Metacode interpretation
+
+     gki_fetch_next_instruction (fd, instruction)		(EOF|nwords)
+		    gki_execute (gki, dd)
+		      gki_write (fd, gki)
+
+
+3. Instructions
+
+		     gki_cancel (fd)
+		      gki_clear (fd)
+		    gki_closews (fd, device)
+	       gki_deactivatews (fd)
+		        gki_eof (fd)
+		     gki_escape (fd, fn, instruction, nwords)
+		      gki_faset (fd, ap)
+		   gki_fillarea (fd, points, npts)
+		      gki_flush (fd)
+	       gki_getcellarray (fd, m, nx, ny, x1,y1, x2,y2)
+		  gki_getcursor (fd, x, y, key, cursor)
+		     gki_getwcs (fd, wcs, len_wcs)
+		    gki_mftitle (fd, title)
+		     gki_openws (fd, device, mode)
+		      gki_plset (fd, ap)
+		      gki_pmset (fd, ap)
+		   gki_polyline (fd, points, npts)
+		 gki_polymarker (fd, points, npts)
+	       gki_putcellarray (fd, m, nx, ny, x1,y1, x2,y2)
+	       gki_reactivatews (fd)
+		  gki_setcursor (fd, x, y, cursor)
+		     gki_setwcs (fd, wcs, len_wcs)
+		       gki_text (fd, x, y, text)
+		      gki_txset (fd, ap)
+
+
+4. Instructions for encoding return values
+
+	       gki_retcellarray (fd, m, np)
+	     gki_retcursorvalue (fd, x, y, key, cursor)
+
+
+5. Initialization of the GKIPRINT kernel
+
+		    gkp_install (dd, out_fd, verbose_output)
+		      gkp_close ()

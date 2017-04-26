@@ -1,0 +1,139 @@
+.help Revisions Nov01 obsutuil
+
+sptime/t_sptime.x
+    Made the graphs all auto-scale.  (11/14/08, Valdes)
+
+sptime/t_sptime.x
+sptime/stdisperser.x
+sptime/grating.x
+sptime/specpars.par
+sptime/sptime.h
+doc/sptime.hlp
+    Added a "generic" disperser type to force using the desired wavelength
+    and dispersion without defining a grating whose mapping between
+    position on the detector and wavelength might be wrong.  Also fixed
+    a couple of typos.  (11/13/08, Valdes)
+
+=======
+V2.14.1
+=======
+
+=======
+V2.13
+=======
+
+doc/ccdtime.hlp
+ccdtime/t_ccdtime.x
+    In order to get more than five filters while not changing the parameters
+    the f1-f5 input parameters may not be a comma delimited list of
+    desired filters.  Note that whitespace is not stripped and the
+    filter must match the string in the database so "U, V" will match
+    "U" but not "V".  Instead use "U,V".  (9/21/06, Valdes)
+
+
+=======
+V2.12.3
+=======
+
+t_sptime.x
+    1. For fibers or circular aperture the area of the aperture applied to
+    the sky flux was wrong because the size was treated as a radius instead
+    of a diameter.
+    2. In computing the sky flux reported the way seeing throughput was
+    applied was wrong.  (1/5/05, Valdes)
+
+
+========
+V2.12.2a
+========
+
+grating.x
+t_sptime.x
+    Added some checks against unphysical parameters.
+    (7/7/04, Valdes)
+
+mkpkg
+    Did not follow the standard convention of building xx_obsutil.e.
+    (7/7/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+sptime/t_sptime.x
+sptime/sptime.par
+sptime/sptime.h
+    1.  Improved algorithm for handling saturation.
+    2.  Added a minimum exposure parameter.
+    (5/15/03, Valdes)
+
+starfocus/stfprofile.x
+    Limits on centroided image raster at the boundary have been removed.
+    Instead boundary reflection allows a somewhat unbiased centroid estimation
+    for sources near the edge.  (5/6/03, Valdes)
+
+starfocus/t_starfocus.x
+starfocus/starfocus.h
+starfocus/mkpkg
+    1.  Added 100 pixels of boundary reflection to allow some attempt at
+	measuring PSFs near the image edges.
+    2.  Now starting coordinates closer that a radius distance from the
+	image edge are allowed.  (5/6/03, Valdes)
+
+starfocus/stfprofile.x
+    The selection of a point to get a first estimation of the FWHM in
+    stf_fit did not check for the case of a zero value.  This could cause
+    a floating divide by zero.  (5/5/03, Valdes)
+
+starfocus/stfprofile.x
+    The subpixel evaluation involves fitting an image interpolator to a
+    subraster.  To avoid attempting to evaluate a point outside the center
+    of the edge pixels, which is a requirement of the image interpolators,
+    the interpolator is fit to the full data raster and the evaluations
+    exclude the boundary pixels.  (5/5/03, Valdes)
+
+ccdtime.par
+t_ccdtime.x
+    1.	The minimum seeing is now 0.001.
+    2.  The formating of the seeing was changed in case the seeing is set
+	less than 0.1.
+    (4/24/03, Valdes)
+
+t_sptime.x
+    The thermal background calculation was wrong.  (3/17/03, Valdes)
+
+../doc/cgiparse.hlp        +
+../../obsutil.hd
+    Added CGIPARSE task help.  (3/3/03, Valdes)
+
+sptime/t_cgiparse.x	+
+sptime/x_spectime.x
+sptime/mkpkg.x
+x_obsutil.x
+../obsutil.cl
+../obsutil.men
+    Added CGIPARSE task.  (3/3/03, Valdes)
+
+sptime/t_sptime.x
+sptime/specpars.par
+sptime/sptime.par
+sptime/sptime.h
+    See sptime/Revisions.  (3/3/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+New obsutil package installed.
+    1. STARFOCUS, PSFMEASURE, SPECFOCUS extracted from NMISC.
+    2. CCDTIME copied from ASTUTIL
+    3. SPTIME, SPECPARS extracted from SPECTIME.
+    4. FINDGAIN copied and modified from MSCFINDGAIN.
+    5. BITCOUNT, PAIRMASS copied from NLOCAL.
+    (11/14/01, Valdes)
+
+.endhelp

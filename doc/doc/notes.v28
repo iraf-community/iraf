@@ -1,0 +1,3849 @@
+System Notes File for IRAF Version 2.8.
+Begun 4 December 1988.
+-------------------------------------------
+
+local/bugs.log
+local/notes.v28
+doc/notes.v27
+unix/hlib/buglog.csh
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+	1. Incremented the system version number to V2.8ALPHA.
+	2. Moved the `notes.v26' file to doc/notes.v27.
+	3. Set up a new system notes file `notes.v28' for V2.8.
+	4. Renamed the bugs file to `bugs.log' since it is versionless.
+	(12/4)
+
+vms/os/zgcmdl.c
+	The "len" variable, input by address to lib$get_foreign, was declared
+	as an int whereas lib$get_foreign wanted a word pointer.  The library
+	routine would set only 16 bits of the int, so if the other word
+	(allocated dynamically on the stack) happened to have anything in it,
+	a nonsense string length would be seen in the "line[len] = EOS"
+	statement, causing a segmentation violation.  For some reason this
+	bug did not show up until we rebuilt the V2.7 VMS/IRAF system, but
+	it has been there all along.
+
+	I fixed this in V2.8 (IRAFX), as well as in the "frozen" (almost) V2.7
+	system.  Any IMFORT programs linked since V2.7 was released should be
+	relinked.  I will also regenerate the V2.7 shared library.  Although
+	IMFORT programs do not use the shared library and no IRAF programs
+	use ZGCMDL, we would like to have the correct version in the shared
+	library.  (12/7)
+
+dev/edt.ed
+dev/emacs.ed
+	Changed the EDITOR_CMD entries for emacs and edt from "irafemacs" and
+	"irafedt" to "emacs" and "edt".  Note that these are only default
+	command names, and different naems might have to be substituted
+	depending upon how the host editors are set up on various systems.
+	(12/13)
+
+dev/devices.hlp +
+pkg/language/language.hd
+pkg/language/language.men
+	Added a new help keyword "devices".  Typing
+
+		cl> help devices
+
+	causes information on the devices available on the local host or
+	network to be printed.  This information is contained in the file
+	dev$devices.hlp.  (12/15)
+
+unix/hlib/libc/knames.h
+vms/hlib/libc/knames.h
+	Added an entry for ACLRB, which name is used in OSB (aclrb.c), but
+	which was previously undefined, causing the name to appear in upper
+	case in libraries (at least on the unix systems).  (12/20)
+
+-------------------------
+Log of changes for the Sun/IRAF shared library facility.  This was developed
+on the 386i initially.  This log was written on 28 December and summarizes the
+revisions made during the period Tue 20 Dec to Wed 28 Dec 1988.
+
+[background]
+	Although SunOS 4.0 supports dynamic linking, mapped files, and shared
+	libraries, currently only the C compiler can generate position
+	independent code (PIC).  Sun Fortran does not currently support shared
+	libraries since it cannot yet generate PIC code.  In any case, PIC
+	code executes less efficiently than nonrelocatable code, and the
+	dynamic linking required by relocatable shared libraries slows down
+	process startup.
+
+	Our strategy is to implement the equivalent of a shared library by
+	building a *nonrelocatable* shareable image (executable process),
+	and mapping it to a fixed address in the address space of client
+	processes at process startup time.  A transfer vector is used to
+	vector procedure calls to arbitrary offsets in the shared image,
+	allowing new shared images to be installed without having to relink
+	client processes (in most cases).  The mapped file feature of SunOS
+	4.0 is the only thing essential for this scheme to work, and it is
+	the lack of the mapped file capability which has prevented us from
+	implementing a shared library up until now.
+
+	Even when (and if) Sun/Fortran eventually adds support for PIC and
+	shared libraries, the mapped image approach we have followed here
+	may still be the best choice.  Despite the slight loss of execution
+	efficiency caused by the use of position independent code, use of
+	PIC is not likely to be a serious drawback.  More serious drawbacks
+	derive from the use of global data, and dynamic linking at runtime.
+	Dynamic linking, e.g., to set the address of a global variable for
+	which the location is not known until runtime, requires the
+	modification of every text page containing code which references the
+	variable.  Aside from the obvious time penalty during process startup 
+	while this linking and page copying is taking place, modification of
+	a text page defeats shared text, increasing memory and paging
+	requirements.
+
+	Trying to avoid this problem in a relocatable shared library can be
+	very difficult, requiring modification to source code if it can be
+	done at all.  The nonrelocatable approach we have followed guarantees
+	sharing of the entire text of the shared image and does not require
+	any changes to system or applications source code (provided no
+	interfaces have been violated).  There are other advantages which
+	derive from the facility being part of the Sun/IRAF HSI, e.g., if
+	iraf is linked on an NOAO node and later installed with a different
+	root on a remote node, there is no problem locating the shared library
+	at runtime.  Furthermore, since our approach requires on the part of
+	the host system only the ability to map files to fixed addresses,
+	and the ability to specify the base address of the text segment of
+	an image at link time, it should be applicable to other (non-Sun)
+	systems which may provide these capabilities but not shared libraries.
+
+unix/as.i386/zsvjmp.s
+	After a little experimentation I found that the .SET assembler macro
+	could be used to set the value of absolute symbols.  This allows MEM
+	to be located at virtual address 0, making shared libraries possible
+	for the 386i, and improving assembly level debugging as well.
+
+unix/shlib/README
+unix/shlib/S.nm.i386		external names in 386i shared library
+unix/shlib/S.nm.mc68020		external names in Sun-3 shared library
+unix/shlib/S.ver.i386		386i shared library version number
+unix/shlib/S.ver.mc68020	Sun-3 shared library version number
+unix/shlib/Slib.c		support code
+unix/shlib/aout.c		utility to decode a.out format process headers
+unix/shlib/coff.c		utility to decode COFF format process headers
+unix/shlib/edsym.c		called by XC to edit symbol table of .e file
+unix/shlib/mkpkg		mkpkg tie-in
+unix/shlib/mkpkg.sh		called to boostrap edsym.e
+unix/shlib/mkshlib.csh		script which does it all
+unix/shlib/omit.i386		external names to be excluded from 386i shlib
+unix/shlib/omit.mc68020		external names to be excluded from Sun-3 shlib
+
+	This directory contains all the code needed to build and maintain the
+	shared library.   The shell script mkshlib.csh, normally called via
+	the mkpkg, does all the work.  This constructs a name list for the
+	shared library, generates the assembler required for the transfer
+	vector modules (V.s and S.s), and links the shared image (S.e).
+
+	When building a new shared library, mkshlib checks to see if any
+	externals have been deleted from or added to the name list of the
+	old shared library.  If any externals have been deleted, the version
+	number is incremented and any applications linked with the shared
+	library will have to be relinked.  If there were no changes to the
+	name list or new externals have been added, then the version number
+	is not incremented, and existing applications are permitted to use
+	the new shared image without having to be relinked.  The shared image
+	is linked -Bstatic, meaning that any required host library procedures 
+	are bound at link time.
+
+	Only Fortran or Fortran-like externals are permitted, i.e., exported
+	from the shared image to the client via the transfer vector.  This is
+	necessary to permit clients to be linked -Bdyamic, allowing use of
+	the host system shared libraries (otherwise name conflicts would
+	occur at link time).
+
+	The objects produced by the SHLIB code are libshare.a (the shared
+	library) and S.e (the shareable image), discussed further below.
+
+bin/S.e +
+	The shared image.  This gets mapped into the address space of any
+	process linked with the shared library.  It is also a runnable process
+	in its own right; if run directly, it prints out some information
+	about itself and exits.  The full contents (minus the omitted
+	externals) of the EX, SYS, VOPS, and OS libraries are currently
+	linked into this image; other libraries may be added in the future,
+	e.g., some of the MATH libraries.  The transfer vector module V.o,
+	located at a fixed (absolute) offset in the image, is used to vector
+	procedure calls from the client process into the shared image.
+
+lib/libshare.a
+	The shared library.  This contains several object modules, including
+	a single object S.o consisting of a short header plus a name list
+	containing all the externals exported by the shared image.  Each
+	external (i.e., VOS procedure such as 'clgeti' etc.) appears in S.o
+	as an absolute symbol, pointing to a fixed location in the transfer
+	vector in the shared image.  Note that externals appear in S.o only
+	as symbols, hence no actual executable code gets linked into the
+	client process.  To link with the shared library, XC links with
+	libshare.a instead of libex.a,libsys.a,libvops.a,libos.a.
+
+unix/os/zmain.c
+	The zmain is the main procedure for an iraf process.  The first thing
+	the zmain does now is call ZZSTRT, which is described below.  Some
+	code was moved out of the zmain into ZZSTRT, and all references to
+	global variables in the kernel had to be eliminated, since the zmain
+	is no longer linked with the kernel procedures (which are off in the
+	shared image).  Other changes included the addition of calls to ZZSETK
+	to set the values of the kernel variables, and changes to the calling
+	sequence of IRAFMN to permit the address of SYSRUK and ONENTRY to be
+	passed in the argument list, rather than being bound at link time.
+
+unix/os/zzstrt.c
+	The function of this procedure, which has been a no-op in UNIX/IRAF
+	up until now, is to perform any runtime initialization of the kernel.
+	Currently, ZZSTRT maps and initializes the shared image, sets the
+	desired IEEE exceptions (partially implemented at present), sets the
+	process working set soft limits, and sets the default values of the
+	kernel variables via the new ZZSETK procedure.
+
+	Mapping and initializing the shared image is similar to what unix
+	does during startup of a normal process.  The shared image file is
+	opened, and the header is read to determine the sizes of the text,
+	data (initialized data), and bss (unitialized data) segments.
+	IRAF uses an additional shared image header segment containing the
+	file header and the FIO common (fiocom), which has to be directly
+	accessed by the client, making it necessary to locate it at a fixed
+	address in virtual memory.
+
+	The header segment containing the FIO common is then mapped read-write
+	private, meaning that if any pages are modified the client gets a
+	private copy of the page.  The text segment of the shared image is
+	mapped read-only shared.  The data segment is mapped read-write
+	private; pages are shared until modified by the client at runtime.
+	The BSS segment is then mapped onto an arbitrary file offset (zero)
+	and promptly zeroed, causing all of the pages to belong to the client.
+	Finally, the addresses of the unix malloc, realloc, and free procedures
+	are passed into the shared image (dynamic memory allocation must be
+	in the data space of the client), and the environment pointer in the
+	shared image is set to point to the environment of the client, so that
+	the VOS will see the host environment and command line arguments seen
+	by the client.
+
+	Both ZMAIN and ZZSTRT are linked directly into each client process,
+	since they are required to map in and initialize the shared image.
+	(S.e has its own private copies, of course).
+
+unix/os/zlocpr.c
+	ZLOCPR had to be modified to deal with the transfer vector.
+	The problem is that calls to ZLOCPR in the client image and in the
+	shared image must return the same value, since equality comparisons
+	of procedure entry points are used to determine, e.g., if a
+	particular file driver is referenced.  ZLOCPR was modified to check
+	if the referenced procedure is actually a transfer vector entry,
+	returning the address of the actual procedure in the shared image
+	if so.  Since this is a host level procedure, this is done by
+	disassembling the JMP instruction in the transfer vector.
+
+unix/os/zshlib.c +
+	This object contains everything needed to link a process against the
+	standard libraries, ignoring the shared library.  Dummy shared image
+	descriptors and procedure entry points are defined so that the code
+	in ZMAIN and ZZSTRT will link properly.  At runtime, the startup code
+	determines that the shared library is not in use, skipping the map and
+	initialize operations.
+
+unix/os/zzsetk.c +
+	This new kernel procedure is used to initialize the values of all the
+	global kernel variables formerly initialized via EXTERN references in
+	the zmain.  A procedure (with transfer vector) must be used instead
+	of a series of global data references in order to be able to link
+	against the shared library.
+
+unix/boot/spp/xc.c
+	1. XC was modified to link against the shared library by default.
+	The new switch -z (as in VMS/IRAF) is used to link without using
+	the shared library.  Both the shared library and the shared image
+	may be in an IRAFULIB directory if desired.
+
+	2. If linking against the shared library, XC will by default call
+	EDSYM to edit the symbol table of the new executable, renaming the
+	symbols pointing to transfer vectors by prefixing a "V", and adding
+	new symbols to point into the shared image to the actual locations
+	of the VOS procedures referenced by the transfer vector.  This provides
+	symbols for debugging executables that used the shared image.
+
+	New XC switches:
+
+		-e	do not call edsym to do symbol editing
+		-s	strip executable (UNIX linker switch; for XC, defeats
+			    call to edsym).
+
+	edsym switches (accepted by XC):
+
+		-d	print symbol table
+		-k	do not delete "uninteresting" symbols
+		-n	do not modify any files
+		-t	omit transfer vector symbols to save some space
+		-T	delete all symbols associated with the shared library
+
+	3. The -align switch, formerly passed to the 386i linker to page
+	align the MEM common, was deleted since MEM is now assigned to
+	location zero with a .SET.
+
+sys/etc/main.x
+sys/etc/xmjbuf.x +
+	1. The calling sequence of the iraf main was modified to add sys_runtask
+	(SYSRUK) and onentry (ONENTY) as arguments, allowing a runtime rather
+	than link time reference.  This was necessary for the shared library
+	since SYSRUK and ONENTY are client symbols but are called by the iraf
+	main, which is in the shared image.  The new scheme is more flexible
+	in any case.
+	2. The new procedure XMJBUF is used to get an XCHAR pointer to the
+	zsvjmp/zdojmp context vector used by the iraf main for interrupt and
+	error recovery.  Again, a runtime procedural reference using a pointer
+	is necessary since the global data area cannot be referenced at link
+	time.  The CL uses both a custom onentry and a custom zdojmp context
+	vector in order to gain full control over command interpretation.
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/knames.h
+unix/hlib/libc/xnames.h
+	1. In libc.h, the ZJUCOM reference was deleted since the XMJBUF
+	procedure is now used to access the interpreter context vector.
+	2. Entries for the new VOS and kernel procedures were added to
+	[xk]names.h.
+
+unix/hlib/irafuser.csh
+unix/hlib/mkpkg.inc
+mkpkg	[at iraf root]
+	1. The -z flag (no shared library) was added to the HSI_XF flags in
+	irafuser.csh, so that HSI executables will not use the shared image.
+	2. The mkpkg.inc now includes a switch USE_SHLIB, which if set causes
+	mkpkg to automatically update the shared library and shared image
+	during a sysgen.  This switch does not actually determine whether the
+	shared library is *used*, since that is determined by the -z switch
+	to XC at link time.
+	3. For Sun/IRAF, the switch -/Bstatic was added to LFLAGS so that
+	the iraf executables will be statically linked, rather than using the
+	SunOS shared library (e.g., libc.a).  This was not necessary - there
+	is no conflict between the iraf and SunOS shared libraries - but was
+	done to save disk space (see CAVEATS, below).
+
+unix/mkpkg.sh
+unix/shlib/mkpkg.sh
+	Will build the edsym.e utility and install it in HBIN during a
+	bootstrap.
+
+unix/hlib/install
+	Will make a link for EDSYM in the local/bin directory.
+
+pkg/cl/main.c
+	A call to XMJBUF was added to convert to a vectored procedure reference
+	to the main interpreter context vector.
+
+sys/gio/cursor/prpsinit.x
+sys/gio/cursor/mkpkg
+sys/etc/mkpkg
+sys/etc/prfindpr.x
+sys/etc/propcpr.x
+sys/etc/prsignal.x
+sys/etc/prfilbuf.x
+sys/etc/prgline.x
+sys/etc/prupdate.x
+sys/etc/prclcpr.x
+sys/etc/prstati.x
+sys/etc/prredir.x
+sys/etc/prgredir.x
+sys/etc/prclose.x
+sys/etc/proscmd.x		[moved from gio/cursor to ETC]
+sys/etc/prpsio.x		[moved from gio/cursor to ETC]
+sys/etc/prc.com			[moved from LIB to ETC]
+sys/etc/prpsload.x +
+	Most of the "pr" prefixed files, e.g., PRPSIO, were moved from
+	gio/cursor to ETC, and the file prc.com (the PR common) was moved
+	from LIB to ETC, making it a private common.  This was necessary
+	to avoid the global data reference, which would cause the process
+	control code to fail at runtime due to the client and shared image
+	having separate copies of the PRC common (another reason to not use
+	commons!).  PRPSIO was modified to use a loadable driver to provide
+	a runtime technique for linking to the graphics pseudofile i/o
+	procedures in gio/cursor.  In addition to making the shared library
+	cleaner to implement, this collects all of the process control code
+	together in one place in the VOS (in ETC - libsys.a), avoids some
+	circular library references, and makes it possible to use LIBC/stdio
+	in applications processes without an unresolved linker reference
+	to PRPSIO (STScI has run into this).
+
+	PRPSINIT is a procedure called by the CL at startup time to load
+	the gio/cursor graphics pseudofile i/o driver into PRPSIO.
+
+lib/syserr.h
+lib/syserrmsg
+	A new error SYS_PRPSIOEPA was added, in support of the above
+	modifications.
+
+pkg/images/filters/mkpkg
+pkg/images/filters/convolve.x
+pkg/images/filters/radcnvr.x	[used to be called acnvrr.x]
+	This code contained a routine ACNVRR which redefined a VOPS library
+	procedure, causing a multiply defined linker error when linking with
+	the shared library.  The offending procedure was renamed CNV_RADCNVR
+	(radially symmetric convolve, type real).  Applications should not
+	use reserved package prefixes.
+
+unix/os/zfunc.c +
+	A set of new kernel primitives ZFUNC1, ZFUNC2, ... ZFUNC9 were added.
+	These are similar to ZCALL[1-9], but allow calling of functions by
+	their LOCPR entry point address, as has long been possible with
+	subroutines and ZCALL.
+
+CAVEATS - Shared libraries
+	Several interesting things about SunOS were learned in the process of
+	implementing the Sun/IRAF shared library.
+
+	1. Linker Bug.  There is a bug in the SunOS linker.  The size of the
+	BSS area is not being computed accurately.  For processes with a very
+	small BSS section, this can lead to a BSS size of zero being computed.
+	Normally this does not cause a problem, since a small BSS area will
+	usually fit into the last page of the data area.  In some cases,
+	however, the small BSS area is in an additional page, but since BSS
+	is zero no BSS area is allocated during process startup, causing a
+	segmentation violation when the unix code tries to set the value of
+	the BSS global variable "environ" during process startup.  I managed
+	to avoid this problem by the subtle kludge of adding the following
+	declaration to the ZZSTRT object (which is linked into every iraf
+	process):
+
+		int	BSS_kludge[256];
+
+	This provides the process with enough BSS storage (statically allocated
+	unitialized data space) to avoid having the size of the BSS segment
+	being set to zero at link time.
+
+	2. Does using the SunOS shared libraries really save space?
+	For some reason which I was not able to determine, a small iraf
+	process linked -Bdyamic (the default, i.e., use the SunOS shared
+	libraries) always has a text segment of 75-85 Kb, even though the
+	sum of all the objects therein may be much less.  It appears that
+	the linker may be incorrectly computing the size of the text segment,
+	causing it to effectively be padded out to a size considerably larger
+	than what it should be.  Linking the process -Bstatic (no SunOS
+	shared libraries) avoids the bug, yielding a much smaller executable
+	file, even though more text space is actually required due to the
+	need to link in modules from the SunOS libraries which would otherwise
+	be shared.
+
+	3. Processes with a large BSS segment execute slowly.  One thing which
+	became very clear to me while working on image execution was that
+	processes with a large BSS segment take a long time to execute.
+	The reason is that the BSS segment must be zeroed during process
+	startup.  Zeroing a large region of mapped memory involves both the
+	cpu time required to zero the storage, plus all the mapped file i/o
+	(paging) required to initialize the mapped swap file pages.  This is
+	not a big deal for processes with a BSS segment in the N*10K region,
+	but if the BSS is N*100K or N*1000K, then it can take seconds.  The
+	moral is USE DYNAMICALLY RATHER THAN STATICALLY ALLOCATED BUFFERS.
+	I am going to modify some of the system code as a result of this
+	lesson, e.g., the CL currently statically allocates about 250K of
+	combined stack and dictionary buffer space.  In applications, BSS
+	storage is most commonly found as declarations of the form
+
+		char	fname[SZ_FNAME]
+		char	line[SZ_LINE]
+	
+	and so on.  This is of no consequence for small individual programs,
+	but can add up to a lot of BSS for large packages.  The unix "size"
+	utility may be used to determine the BSS requirements of a process.
+
+unix/boot/mkpkg/tok.c
+	An unrelated bug in MKPKG was fixed, which would cause one or the
+	other of IFOLDER or IFNEWER to fail, when presented with a list of
+	files to be compared.  The bug was that IFOLDER is not equivalent
+	to !IFNEWER when more than one file must be compared.  (12/28)
+
+unix/as.i386/README
+unix/as.i386/aclrb.c
+unix/as.i386/aclrc.c
+unix/as.i386/bytmov.c
+unix/as.i386/aclrs.c
+unix/as.i386/aclri.c
+unix/as.i386/aclrl.c
+unix/as.i386/aclrr.c
+unix/as.i386/aclrd.c
+unix/as.i386/amovc.c
+unix/as.i386/amovs.c
+unix/as.i386/amovi.c
+unix/as.i386/amovl.c
+unix/as.i386/amovr.c
+unix/as.i386/amovd.c
+unix/hlib/mkpkg.sf.I386
+	In an unrelated optimization, the above zero and move procedures
+	were added to AS.  These are written to use calls to the host
+	BZERO and BCOPY functions to zero or copy blocks of memory, taking
+	advantage of the special repeat-string-op instructions provided by
+	the 80386 cpu.  (12/28)
+
+sys/ki/irafks.x
+	In the open-binary-file code, the fprintf debug message was incorrectly
+	passing arg1 rather than arg2 as the file access mode.  (12/29)
+
+unix/boot/mkpkg/tok.c
+	In the $ifeq code, strcmp() would be called with a NULL string pointer
+	if the referenced environment variable was undefined.  (1/2)(1989)
+
+---------------------
+Moved shared library stuff to tucana (Sun-3) over the period 30Dec-2Jan.
+Reworked mkshlib.csh, edsym.c, zzstrt.c etc. for the "a.out" format object
+files used on the Sun-3; these are quite different than the Sys V COFF
+object format used on the 386i.
+
+---------------------
+Moved everything back to the 386i, rebuilt the shared library, and relinked
+the system.  Merged in all recent changes from tucana.  (1/3)
+
+unix/sun/imtoolrc
+dev/grahpcap
+	Changed the X size of frame buffer configuration "imtfs" to 1144; it
+	has to be a multiple of 4 rather than 2 under SunOS 4.0.  (1/6)
+
+unix/shlib/inode.c +
+	Added a new utility to print the inodes of the listed files.  (1/6)
+
+unix/os/zzstrt.c
+	The text segment of the shared image was being mapped private, rather
+	than shared, causing over 600 Kb of swap space (roughly the size of
+	the shared image text area) to be reserved unnecessarily for every
+	process spawned.  (1/12)
+
+unix/hlib/irafuser.csh
+unix/shlib/mkshlib.csh
+unix/shlib/*.ffpa +
+	Added support to SHLIB for the ffpa version of iraf, and relinked the
+	ffpa version with the shared library.  (1/13)
+
+BSS segment test
+	Changing the CL dictionary and stack areas from BSS to DATA segment
+	arrays (to avoid runtime initialization of the large BSS area) had
+	no significant effect on CL startup time, so I left things as they
+	were.  (1/13)
+
+unix/shlib/mkshlib.csh
+	1. Modified to add support for IRAFULIB (custom libraries, for linking
+	development systems).  (1/13)
+	2. I got a "too many arguments" abort from the linker while trying to
+	link the shared library with all the new QPOE, PLIO, FMIO, etc., stuff
+	on the 386i, so I had to revise the link procedure to prelink each
+	library and then link everything in a second pass.  This is faster
+	anyhow due to the need to link twice, once to get the name list and
+	the second time to construct the final image.  (1/14)
+
+unix/boot/mkpkg/tok.c
+	Character escapes were not being handled properly in getstr().  (1/16)
+
+unix/shlib/mkpkg
+	In the mkpkg install sequence, which renames any existing bin$S.e to
+	bin$S.e.1, and bin$S.e.1 to bin$S.e.2 (to avoid deleting the shared
+	image while some process has it mapped), added some find -atime +1
+	code to delete any old S.e.* files which haven't been accessed for
+	more than a day.  (1/16)
+
+unix/boot/spp/xpp/xppcode.c
+	In the case of a redefined string define, the second define was not
+	replacing the first.  (1/23)
+
+
+LAYERED SOFTWARE ENHANCEMENTS (2/22/89)
+--------------------------------------------
+
+The following sequence of revisions we made to improve the support provided
+by IRAF for external or "layered" packages.  The idea is that an external
+package should be fully self contained with as simple an interface to the
+core system as possible, e.g., an entry in a single file.  Support for
+developing and maintaining such packages should be as good as it is for
+core system software.  Installing a package should be simple and foolproof;
+likewise deinstalling a package, and it should be possible to install an
+arbitrary collection of external packages without having them conflict with
+each other and without custom modifications to the core system.
+
+Meeting these goals requires that external packages be *self contained*,
+because if installing a package involves modifications to or additions of
+numerous files in the core system directories, deinstallation is obviously
+going to be difficult, as will updating the core system - all the custom
+modifications will be lost.  Ideally it should be possible to have a library
+containing any number of external packages in some central place, e.g.,
+on tape or on an archive server somewhere on the net, loading only those
+required at any one time onto the local IRAF system.
+
+The following series of revisions were made on the 386i development system,
+tested, and merged back into the master system.  The notes summarize what
+was modified on the 386i; additional notes will follow as things are tested
+on the Sun-3 development system.
+
+---------------------
+Begin changes to better support layered external software.  (1/28)
+
+unix/os/zgtenv.c
+sys/etc/environ.x
+sys/etc/envgets.x
+	ZGTENV, ENVFIND, and ENVGETS were changed to make it possible to
+	discriminate between undefined environment variables, and variables
+	that have a null string value.  ERR is returned if the variable does
+	not exist; 0 if exists but has a null value.  Since most programs
+	do a <= 0 test to check for valid environment definitions, this should
+	be a fairly safe change, although some programs may be affected
+	(i.e., any program that only does an == 0 test).  (1/28)
+
+sys/libc/cenvget.c
+pkg/cl/builtin.c
+	Minor changes to allow for null valued environment variables.  (1/28)
+
+sys/fio/vfntrans.x
+	Added a new feature to virtual filename translation, to provide general
+	environment symbol replacement during translation.  This was needed to
+	support multiple architectures, e.g., different version of the PKG and
+	LIB directories, but it is a general facility which will be useful
+	for multiple versions of other types of directories and files as well.
+
+	For example, one might make the following definitions:
+
+		set arch = ""
+		set bin = iraf$bin(arch)/
+		set lib = iraf$lib(arch)/
+
+	Which become iraf$bin/ and iraf$lib/ by default.  If arch is defined
+	as, for example, ".ffpa", then we have iraf$bin.ffpa/ and likewise
+	for lib.  The default case, where arch is the null string, is what
+	required the revisions discussed earlier.  (1/28)
+
+-----------------
+The following revisions were made all together over a period of a couple
+of weeks and summarized on 2/21.
+
+pkg/system/help/helpdb.x
+pkg/system/help/helpdir.x
+pkg/system/help/modlist.x
+pkg/system/help/modtemp.x
+pkg/system/help/prdir.x
+pkg/system/help/prfile.x
+pkg/system/help/prhlpblk.x
+pkg/system/help/prsummary.x
+pkg/system/help/t_help.x
+pkg/system/help/tlist.x
+pkg/system/mkhelpdb.par
+	1. The compiled help database files are now stored externally in a
+	machine independent format.
+
+	2. HELP now permits multiple compiled help database files.  The
+	parameter / environment variable `helpdb' is now a file template
+	(e.g., a comma delimited list of files) specifying the helpdb files
+	to be combined to produce the composite help database to be used
+	at runtime.  HELP takes a little longer to respond the first time
+	while it is reading and combining all the files, but once the
+	composite database has been generated in-core all is as it was before.
+	If any of the helpdb files are modified, or if new files are added,
+	the incore composite database is automatically regenerated.
+
+	It is still necessary that all package names be unique; this
+	restriction will be removed in a future implementation but it is
+	too difficult to fix in the current program.
+
+dev/help.db -
+lib/helpdb.mip +
+	The old core sytem help database file dev$help.db has been deleted
+	and replaced by the new machine independent file lib$helpdb.mip,
+	which now contains only entries for core system help modules.
+	Each external layered package (noao, local, stsdas, etc.) will
+	have its own lib/helpdb.mip.
+	
+mkpkg
+	1. All references to the noao and local packages have been removed
+	from the root mkpkg file.  Layered packages are maintained
+	independently of the core system and separate mkpkg sysgens,
+	etc, are required for each package.
+	2. The `stripall' entry has been deleted leaving only `mkpkg strip'
+	for stripping the system.
+
+noao/README
+	Completely new README for the reorganized NOAO package.
+
+noao/bin +
+noao/bin.i386 +
+	NOAO now has its own BIN directory.  For Sun/IRAF, `bin' is a
+	symbolic link to the bin directory for the architecture for which
+	the system is currently configured, bin.i386 on my development
+	system.
+
+noao/lib/helpdb.mip +		compiled help database
+noao/lib/mkpkg.inc +		global mkpkg definitions for noao
+noao/lib/mkpkg.sf.I386 +	special file lists for various architectures
+noao/lib/mkpkg.sf.SUN3 +		"
+noao/lib/mkpkg.sf.SUN4 +		"
+noao/lib/root.hd +		root help directory for the noao packages
+noao/lib/strip.noao +		stripper file for the noao directories
+
+	The above files were added to noao$lib, the global library for the
+	NOAO packages.  All files are maintained in a machine independent
+	format and may be included in distributions.  Files like the mkpkg.*
+	include machine dependent information but are easily modified or
+	extended to support new architectures - there is no better way,
+	one must have things like special file lists for different
+	architectures (if there isn't one, as in a new port, the application
+	will still sysgen but there is a real possibility of undetected
+	compiler bugs).
+
+	The helpdb.mip is machine independent as well, and should be generated
+	by the developers of an exportable package, and included in the
+	distribution.  The ".mip" extension tells the HSI utilities such as
+	WTAR that it is a machine independent file and can be included in
+	"source only" archives.  It can be generated under V2.8 with a command
+	such as
+
+	    cl> mkhelpdb helpdir=noao$lib/root.hd helpdb=noao$lib/helpdb.mip
+
+	By default, MKHELPDB will generate the core system help database.
+
+noao/mkpkg
+	Added a `mkpkg strip' entry.  Other entries will need to be added
+	in the future to support multiple architecture switching for Sun/IRAF.
+
+noao/noao.cl
+	Added the following lines to the noao.cl file:
+
+		set	noaobin = "noao$bin(arch)/"
+		package	noao, bin = noaobin$
+
+	The bin= argument to package is required to tell the CL that noao
+	has its own bin directory and is discussed below.  The `noaobin'
+	definition permits user redefinition of the noao BIN directory,
+	as well as specification of the architecture for all packages
+	via the environment variable `arch', which is defined in terms
+	of `mach', which defines the machine architecture.
+
+pkg/cl/bkg.c
+pkg/cl/builtin.c
+pkg/cl/exec.c
+pkg/cl/main.c
+pkg/cl/prcache.c
+pkg/cl/task.c
+pkg/cl/task.h
+	The CL was modified to generalize the BIN directory scheme.  Formerly
+	executables could be stored either in the package directory or in BIN.
+	The same is true now except that there can be multiple BIN directories.
+	By default bin is iraf$bin/.  This may be overridden for a package by
+	specifying the package bin directory with a bin=bindir argument to
+	the PACKAGE directive (see example above).  The new bin will be used
+	for the referenced package and all subpackages of that package, unless
+	overridden by another PACKAGE directive.  Note that no bin-path
+	searching is involved; the CL never has more than two directories to
+	look in for a given executable, since every package has a well defined,
+	unique BIN directory.
+
+sys/etc/envgets.x
+sys/etc/environ.h
+sys/etc/environ.x
+sys/etc/envscan.x
+	1. ENVFIND will now return ERR if the named variable does not exist,
+	and a string length of zero if the variable exists but has a null
+	string value.
+	2. ENVSCAN now permits newline to be escaped in the value field,
+	permitting arbitrarily long value strings.  Leading whitespace is
+	discarded in each continuation line, allowing continuation text to
+	be left justified at any arbitrary column for readibility.
+	3. ENVSCAN recognizes both SET and RESET.
+	4. ENVSCAN now supports the "set @filename" syntax for inclusion
+	of other files containing set environment definitions.  All non
+	set or reset statements are ignored.
+	5. The max size value string is increased to 512 chars.
+
+	All of these changes hold also for the HSI version of ENVSCAN
+	(see the bootlib.envinit.c notes below).
+
+sys/fio/vfntrans.x
+	General environment variable replacement is now supported within
+	virtual filenames via the syntax "(envvar)", which is replaced
+	by the value of the named environment variable "envvar".  This is
+	different from logical directory replacement which replaces
+	everything to the left of the $.  (Perhaps we should have simply
+	used the unix symbol replacement syntax in the first place, but
+	it is too late to change now).  For example,
+
+		set mach = f68881
+		set arch = .(mach)
+		set bin = iraf$bin(arch)/
+
+	This point of this facility is that it allows any field of a filename
+	to be parameterized with an environment variable.  If the named
+	variable does not exist the null string is used.
+
+sys/imio/iki/ikiopen.x
+sys/libc/cenvget.c
+	Replaced an "envfind() == 0" by "envfind() <= 0" to reflect the fact
+	that ENVFIND can now return a negative value.
+
+unix/boot/bootlib/mkpkg
+unix/boot/bootlib/bootlib.h
+unix/boot/bootlib/osfn2vfn.c
+unix/boot/bootlib/vfn2osfn.c
+	The UNIX/IRAF HSI has been modified to use VOS filename mapping,
+	to facilitate use of the zzsetenv.def and extern.pkg logical directory
+	definitions, as well as all the other semantics of general filename
+	mapping.  Note that this requires use of libsys.a (etc.), but it
+	was done in such a way that if the library does not exist, bootstrap
+	filename mapping is used.  VOS filename mapping is used only if the
+	environment variable NOVOS is not defined at HSI bootstrap time; this
+	variable is defined in the file hlib$irafuser.csh which is assumed
+	to be referenced at login time by the account of whoever is doing
+	the bootstrap (normally user iraf).
+
+	A true bootstrap is performed with VOS filename mapping disabled,
+	and then repeated once a sysgen has been performed to generate the
+	VOS system libraries.  The HSI bootstrap filename mapping facilites
+	are adequate to compile the VOS but do not support external layered
+	packages.
+
+unix/boot/bootlib/envinit.c
+	This routine is used by the HSI to read the zzsetenv.def file.
+	This cannot be done with the VOS, even when VOS filename mapping
+	is in use, because the VOS routine envscan uses FIO (the filename
+	mapping primitives are much lower level, being layered on the kernel).
+	I made all the same changes as for ENVSCAN above, so that the
+	environment variables defined in hlib$extern.pkg will be defined
+	in the HSI.
+
+unix/boot/bootlib/osfpathname.c
+	1. Modified to avoid the null filename bug that appeared in VMS/IRAF
+	long ago (VMS/IRAF also uses VOS filename mapping).
+	2. Fixed a second bug that would probably only affect UNIX/IRAF.
+	The filename ".." was not being mapped properly on UNIX/IRAF, whereas
+	it worked fine on VMS/IRAF.  This was because on UNIX/IRAF the call
+	to vfn2osfn to translate the ".." to the pathname of the previous
+	directory, whereas on VMS/IRAF all it would do is pass it on, to be
+	used in the later call to ZFSUBD.
+
+unix/boot/bootlib/ossysfile.c
+	Added support for an applications defined system library search path,
+	e.g., for XC command line -llib library references, or <file.h> global
+	include file references.  LIB, HLIB, and any other system libraries
+	are searched first, followed by any package libraries as specified
+	by the environment variable `pkglibs'.  The latter is defined in
+	extern.pkg and this mechanism is intended as a way of extending the
+	global library mechanism to support applications libraries.  There is
+	a flaw - a search path opens the possibility of file name collisions,
+	resulting in the wrong file being used.  At least this will be obvious
+	if it occurs, and the search path is the simplest mechanism in this
+	case.
+
+	This HSI level library search path mechanism should not be confused
+	with the IRAFULIB facility used in UNIX/IRAF.  Any IRAFULIB directories
+	are searched *before* the system libraries, allowing custom versions
+	of system library files for testing or development purposes.  In the
+	case of the `pkglibs' the system libraries are searched first, with the
+	full search order being the IRAFULIBs, followed by the system libraries
+	(LIB, HLIB, and also BIN, bin.`mach` etc. for Sun/IRAF), and lastly
+	the package libraries in the order in which they appear in pkglibs.
+	There should be minimal execution time penalty from adding pkglibs
+	searching, since most global file references will be satisfied early
+	in the search by a system library.
+
+unix/boot/bootlib/osgetenv.c
+	Added VOS and NOVOS cases.  The VOS case calls ENVFIND to lookup
+	environment names.  This is required to make the environment used
+	for VOS filename mapping available in the HSI utilities, e.g.,
+	in mkpkg.
+
+unix/boot/mkpkg/mkpkg
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+	All these files had to be modified to parameterize the list of
+	libraries to be used to link HSI executables.  Formerly libboot
+	and libos were being referenced explicitly, but now that the HSI
+	can be linked either VOS or NOVOS, the list can also include
+	libsys and libvops.  The parameter is the unix environment variable
+	HSI_LIBS defined in hlib$irafuser.csh.
+
+unix/hlib/clpackage.cl
+unix/hlib/clpackage.hd
+	Removed all references to local, noao, and stsdas.  External packages
+	now have their own root help directories and help database files, so
+	no entry in the clpackage.hd is required.  The external packages are
+	picked up by clpackage.cl by the following statements:
+
+		# Define the external (user-configurable) packages.
+		cl < hlib$extern.pkg
+
+	which executes the TASK statements in the extern.pkg to define the
+	external packages.  The environment variables in extern.pkg will
+	already have been defined by the zzsetenv.def @extern.pkg include,
+	so they are reset harmlessly when extern.pkg is reinterpreted by
+	the CL.
+
+unix/hlib/extern.pkg +
+unix/hlib/zzsetenv.def
+	1. Removed all references to noao, local, and stsdas from zzsetenv.def,
+	replacing these by the statement
+
+		set @hlib$extern.pkg
+
+	which includes set (actually reset) statements defining the root
+	directory of each external package.
+
+	For HELP, deleted the entries for helpdir and helpdb.  The helpdir
+	environment variable is no longer used, and helpdb has been moved
+	to extern.pkg.
+
+	2. Added the file hlib$extern.pkg, which is the sole link between the
+	core system and external packages.  To install an external package,
+	ALL that should be required is to make an entry in this file, after
+	reading the files onto disk (a mkpkg at the package root will also
+	be required if the package is distributed in source only form).
+	To deinstall a package, all one need do is comment out or delete
+	the related entries in extern.pkg, and backup and delete the external
+	package directory tree.  The core iraf system can be updated without
+	affecting external packages.
+
+	These things are possible ONLY if we strictly localize package files
+	to package trees, i.e., do not install library files and executables
+	from an external package in core system directories, do not rebuild
+	a central help database file, etc.  A further major advantage for
+	NOAO is that we can easily maintain private LOCAL packages, have
+	STSDAS on disk for our users, etc., without making modifications to
+	our export systems which would affect our distribution tapes.
+	By localizing the changes required to interface an external package
+	to a single file, we need only replace that one file to make a
+	distribution tape from one of our master systems.
+
+	For software maintenance purposes, developers should assume that ONLY
+	the root directory of their package tree is globally defined in the
+	HSI, and use only references such as "noao$lib/", "-llib", or
+	"<file.h>" in their applications (any VOS pathname relative to the
+	package root is acceptable).  Note that a package global library
+	may be set up by adding the path of the library directory (e.g.,
+	"noao$lib/") to the `pkglibs' entry in the extern.pkg.
+
+	Additional logical directories may be defined in the global package
+	mkpkg.inc and used in mkpkg files, but these logical directory names
+	will not be propagated to XC hence cannot be used in include file
+	references etc.  Additional environment variables could in principle
+	be added to the entry for the package in the extern.pkg, but I would
+	like to keep the interface as small as possible, localizing all
+	package information in the package itself as far as possible.
+
+	VMS/IRAF users should note that since XC executes in the context of
+	MKPKG in VMS/IRAF, mkpkg definitions may be propagated to XC (I
+	haven't tested this), but to make use of this side effect of how XC
+	is implemented in VMS/IRAF would be nonportable.
+
+unix/hlib/gripes.cl
+unix/hlib/gripesfile-
+	Commented out the code which appends gripes to the gripesfile, and
+	deleted the gripesfile.  We will use only electronic mail to enter
+	gripes from here on.
+
+unix/hlib/irafuser.csh
+	1. Added NOVOS and HSI_LIBS entries to define whether or not VOS file
+	name mapping is to be used in the HSI, and to list the libraries
+	to be searched to link HSI executables.  If libsys.a does not exist
+	NOVOS is automatically set, hence bootstrapping UNIX/IRAF on a source
+	only system will automatically generate the HSI without the VOS.
+	Redoing the bootstrap once the VOS is compiled will cause the HSI
+	to be rebuilt with VOS filename mapping, as may be required to compile
+	any external packages (the core system does not require VOS filename
+	mapping in the HSI).
+
+	2. Added a couple of utility command aliases.  `mkv' runs mkpkg with
+	the link flags set in such a way that the resultant executable has
+	symbols for the transfer vector entries.  This is necessary to be
+	able to see what VOS routines are being called from an application
+	when debugging (otherwise one sees an offset from vshlib_).  Perhaps
+	I should make this the default on our development system, even though
+	it almost doubles the size of the symbol table in each executable.
+
+	A second utility definition `mkz' runs mkpkg, linking without the
+	shared library (like xc -z).  These name may change but they should
+	serve to illustrate how to use the linker options for debugging.
+
+unix/hlib/libc/knames.h
+	Made several new entries.
+
+unix/hlib/login.cl
+	Added commented out commands to load the `noao' and `tv' packages.
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.I386
+unix/hlib/mkpkg.sf.OS4
+unix/hlib/mkpkg.sf.S34
+unix/hlib/mkpkg.sf.SUN3
+	1. In the mkpkg.inc, changed the FPU definition to MACH, since FPU
+	is too restrictive a name for what we use this switch for; MACH for
+	machine architecture comes closer.  Possible values of MACH are
+	f68881, ffpa etc. for Sun-3 hardware options, sparc for the Sun-4,
+	i386 for the Sun-386, vax for the VAX, and so on.  This switch is
+	used to select default compile and link flags, determine which
+	special file list to load, etc., allowing the generation of relatively
+	machine independent mkpkg definition files.
+
+unix/hlib/strip.iraf
+	1. Changed the name from stripper to strip.iraf (strip.noao etc. for
+	other packages.).  Deleted the stripall since I have never been happy
+	with what that level of stripping anyhow.  Still need to review the
+	action of the strip file to ensure that everything that can be deleted
+	is being deleted, to add something to strip executables on unix
+	systems, and so on.
+	2. Deleted all entries for the noao and local packages.  These packages
+	now have their own strip files.
+
+unix/os/zfacss.c
+	Modified to test for the null filename and return NO in that case.
+
+unix/os/zgtenv.c
+	Will now return ERR for a undefined variable, and 0 for a defined
+	variable with a null string value.
+
+unix/os/zmain.c
+unix/os/zshlib.c		[DEBUGGING POINTER]
+unix/os/zzstrt.c
+	Added a new command line switch "-w" to the zmain.  Currently this is
+	only used in Sun/IRAF.  Specifying -w causes the shared image text to
+	be mapped with write permission, allowing breakpoints to be set in
+	VOS routines.  This cannot be done by default because one has to
+	reserve swap space for the entire shared image text segment in order
+	to have write (copy on modify) permission.
+
+unix/shlib/mkpkg
+	Fixed a bug in the code used to delete old versions of the S.e shared
+	image files in BIN.
+
+--------- (end of notes transferred from 386i) ------------
+
+sys/mkpkg
+sys/fmio/* +
+lib/fmlfstat.h +
+lib/fmset.h +
+lib/syserr.h
+lib/syserrmsg
+	Installed the new VOS library FMIO.  FMIO is "File Manager I/O", and
+	is used to implement a simple binary file manager which maintains the
+	file data of so-called "lfiles" (lightweight files) inside a single
+	host binary file.  The system overhead for accessing lfiles is much
+	less than that of host files, and many lfiles can be used to store
+	a complex data structure without cluttering a host directory or
+	incurring the inefficiency of accessing host files.  FMIO is part of
+	the DFIO project and will serve as the lowest level interface within
+	DFIO; it is also used currently in the QPOE interface.  Additional
+	information is given in the README file for the interface.  (2/22)
+
+sys/mkpkg
+sys/plio/* +
+sys/pmio/* +
+lib/plio.h +
+lib/plset.h +
+lib/pmset.h +
+lib/syserr.h
+lib/syserrmsg
+	Installed the following new VOS interfaces:
+
+	    PLIO	pixel list i/o (system level - libsys)
+	    PMIO	pixel (image) mask i/o (used with IMIO - libex)
+	    MIO		masked image i/o
+
+	PLIO is a general interface for storing and manipulating
+	multidimensional integer valued rasters containing regions of
+	constant value (i.e., masks).  The masks are stored in a highly
+	compressed form, the size of the compressed mask being a function
+	of the information content of the mask.  Both pixel array and
+	range list i/o facilities are provided, as well as a set of general
+	boolean raster operators, e.g., to extract or insert subrasters,
+	AND or OR a source with a destination, do the same through a stencil,
+	draw regions of various kinds (point, line, box, circle, polygon),
+	and so on.  See the PLIO.hlp file for further information.
+
+	An interactive debug program (plio$zzdebug.x) is provided for
+	experimenting with masks.  Note that PLIO is a stand alone interface
+	and is not tied in any way to IMIO, even though the data structure
+	operated upon is similar to an image matrix.
+
+	PMIO is very similar to PLIO except that it is used to associate a
+	masks with an IMIO maintained reference image.  Currently, the PMIO
+	mask must be the same resolution as the physical reference image.
+	All coordinates input to PMIO are in the *image section coordinates*
+	of the reference image.  Hence, given a physical image and associated
+	mask, one can operate upon both through a user specified image section
+	transparently to the applications program.  This includes all PLIO 
+	style boolean rasterop operations, as well as mask pixel and range
+	list i/o.  The PMIO interface is layered upon PLIO and IMIO, and the
+	calling sequences are identical with PLIO except for the package
+	prefix, and the addition of several new PMIO specific routines.
+
+	MIO is essentially an extension of image i/o for pixel i/o through a
+	mask.  The central routines are the following:
+
+			   mio_setrange (mp, vs, ve, ndim)
+	   n|EOF = mio_[gp]lseg[silrdx] (mp, ptr, mval, v, npix)
+
+	One defines a rectangular region of the image with mio_setrange,
+	and then sequentially reads or writes line segments until all pixels
+	visible through the mask have been accessed.  This type of i/o should
+	be ideal for most image processing applications which need to operate
+	upon only those pixels visible through a region mask (e.g., a surface
+	fitting task), upon all pixels except those on a bad pixel mask (e.g.,
+	any analysis program), and so on.
+
+	PLIO (or PMIO) masks may be stored in binary files on disk, the files
+	having the extension ".pl".  The V2.8 version of IMIO has the
+	capability to treat such masks as if they were images, allowing masks
+	to be easily displayed, used in IMCALC expressions, converted to
+	image matrices and vice versa, etc.  Applications may do either pixel
+	or *range list i/o* to a mask "image" via IMIO, if MIO is not suitable
+	for some reason.
+
+	Using the current image structures, applications which use masks should
+	store the mask in a separate .pl mask file.  The mask name may either
+	be stored in the image header of the associated image(s), or passed
+	into an application as a string parameter.  (2/22)
+
+sys/symtab +
+sys/etc/symtab -
+	Moved the SYMTAB (general symbol table) package from ETC to the root
+	VOS directory.  (2/22)
+
+lib/qpset.h +
+lib/qpexset.h +
+lib/qpioset.h +
+sys/qpoe/* +
+	Installed the QPOE family of interfaces.  Although it was my original
+	intention to wait a bit to install QPOE, it has been built into the
+	development version of IMIO along with PLIO/PMIO/MIO, and it is now
+	easier and probably safer to install the whole business rather than
+	hack it apart.  All these interfaces are stable and fairly well
+	tested, and to date we have had no problems with the standard IMIO
+	portion of the new interface.  Now that the shared library facility
+	is in place on both Sun/IRAF and VMS/IRAF there is little reason to
+	worry about the increase in the size of the system libraries (which
+	is considerable, e.g,. one quarter to one third).
+
+	QPOE is a program interface implementing the Position Ordered Event
+	list object, which consists of a general header mechanism plus an
+	event list, wherein the events are little data structures, e.g.,
+	the attributes required to describe a photon detection (position,
+	energy, time, etc.).  The QPOE interfaces are the following:
+
+		QPOE	header and file access and management facilities
+		QPIO	raw and filtered event i/o
+		QPEX	event attribute filter mechanism
+		QPF	IMIO/IKI kernel for image interface to QPOE files
+
+	Due to the complexity of the data structures involved, the added
+	complexity of event attribute and region filtering, and the extreme
+	performance requirements (an event list may contain millions of
+	photons which we could like to be able to filter in seconds if
+	possible), QPOE is quite a complex interface.  QPOE is layered
+	upon FMIO and SYMTAB and the general header part of QPOE is a
+	prototype of certain parts of DFIO and the new image structures.
+
+	In fact, the QPOE header access functions are very similar to what
+	is expected to be in the new image structures as the IMIO header
+	access interface, although the implementation of the IMIO version
+	will be quite different since it be based on the more general DFIO.
+	QPOE itself will be relayered upon DFIO when the latter becomes
+	available, adding machine independence and a much more flexible
+	and data independent mechanism for storing structured data in the
+	file header.  The QPIO, QPEX, and QPF parts of QPOE are expected
+	to survive the future QPOE/DFIO upgrade largely intact.
+
+	QPOE and QPF add a new image type to the system, with .qp file
+	extension.  A QPOE image is contained in a single file.  When a
+	QPOE file is accessed as an image the interface filters and
+	samples the event list in real time, using a user defined filter,
+	block averaging factor, region mask, and so on, producing the
+	image matrix seen by applications at the IMIO level.
+
+	Further information is given in the QPOE.hlp file in the sys$qpoe
+	directory.  (2/22)
+
+sys/imio/*
+	Installed a new version of IMIO that has been in a development and
+	testing phase for some months now (it has been stable since about
+	last November).  This version adds support for PLIO mask and QPOE event
+	list images to the OIF and STF image types previously supported.
+	A number of new i/o routines have been added for mask i/o, e.g.,
+	routines to test if reqions of an image contain any nonzero mask
+	pixels, so that an application can decide whether it needs to bother
+	with the expense of mask i/o.
+			
+	Aside from these additions the interface is unchanged from what it
+	was previously, with one exception - THE CALLING SEQUENCE TO IMPARSE
+	HAS CHANGED.  This routine is supposed to be internal to the interface
+	so few applications should be affected, but it may have been
+	inadvertently used in a few applications, and these will have to
+	be searched for and modified.
+
+	All these new IMIO image types have increased the size of IMIO
+	considerably.  While this is not a serious problem if a shared library
+	facility is available, not all IRAF implementations have shared
+	libraries.  To make matters worse, we plan to add additional image
+	types in the future, e.g., FITS, maybe a compressed type, and so on.
+	Hence, when the IKI interface is revised as part of the new image
+	structures project, I plan to set things up so that the system manager
+	at a site can configure IRAF with a subset of the available image
+	kernels.  It will even be possible for a site to add custom kernels
+	for their own local image types, if desired.  (2/22)
+
+unix/boot/mkpkg/tok.c
+	Fixed a bug in the (recently added) $if code which processes <file.h>
+	file references.  This did not show up until VOS filename mapping
+	was added, since the VOS checks for null filenames.  (2/22)
+
+unix/hlib/mkpkg.inc
+	Removed the -t flag from the default link flags.  This means that
+	shared image transfer vector symbols are now left in by default,
+	making the executables larger but improving the situation for
+	debugging.  This switch will only be enabled on tucana, but those
+	making distribution tapes should be aware that space can be saved
+	by relinking or more simply, by stripping the executables (either
+	after the installation at a remote site or before making a
+	distribution tape).  I haven't measured the space penalty, but it
+	is probably only a couple of Mb for the full system.
+
+	By the way, the transfer vector symbols are the VOS procedure names
+	with a V prepended, e.g., Vclgeti_ is the transfer vector, clgeti_
+	the actual VOS procedure somewhere in the shared image.  With the
+	-t flag, a symbol such as Vclgeti would appear in the applications
+	program (while debugging) as a jmp to something like vshlib_+0x123.
+	There is of course no actual procedure Vclgeti_, this is just a
+	name generated by the shared library link editor.  (2/22)
+
+unix/shlib/mkshlib.csh
+	Fixed a bug which was causing the "zzzend" symbol to be omitted.
+	(2/22)
+
+unix/hlib/extern.pkg
+	Fixed the root pathnames for local and stsdas - we can now load
+	stsdas from the master system for the first time!! (to look at the
+	packages, at least) (2/22)
+
+unix/hlib/extern.pkg
+unix/bootlib/envinit.c
+unix/boot/mkpkg/main.c
+unix/boot/spp/xc.c
+unix/boot/spp/xpp/xppmain.c
+	The package library search path entry `pkglibs' has been deleted in
+	extern.pkg and replaced by a better scheme.  A new command line switch
+	"-p pkgname" has been added to the HSI programs mkpkg, xc, and xpp
+	(which do all logical directory manipulation, file inclusion, file
+	searching, etc., so far as I can remember).
+
+	Specifying "-p X" the HSI task command line causes:
+
+	    o	The file "X$lib/zzsetenv.def" to be loaded into the HSI
+		environment at process startup time, and
+
+	    o	In the case of mkpkg, the file "X$lib/mkpkg.inc" to be
+		automatically $include-ed, i.e., interpreted by mkpkg.
+
+	Multiple -p arguments may be specified if desired to load multiple
+	environments.  If no -p arguments are given on the command line the
+	tasks will check for the environment variable PKGENV and load the
+	environment for the named package if this variable is defined in the
+	user's environment (only a single package can be specified via PKGENV).
+
+	The default-PKGENV feature is intended for the convenience of the
+	programmer who commonly works on a single large external package
+	such as NOAO, STSDAS, etc.; the -p command line switch can always
+	be specified if some other package has to be edited.  It is also
+	easy to use CSH aliases, IRAF foreign task definitions, etc.,
+	to avoid having to type the same -p argument frequently.
+
+	These features allow major packages that have their own LIB to have
+	their own zzsetenv.def and mkpkg environment.  The standard IRAF
+	hlib$zzsetenv.def is still loaded first, of course, and it is this
+	(via the extern.pkg) which defines the package root directory.
+	Everything else should be defined in the package zzsetenv.def.  (2/23)
+
+noao/lib/zzsetenv.def +
+noao/lib/mkpkg.inc
+	1. Added the following definitions the noao mkpkg.inc.  These cause
+	the -p noao flag to be passed to XC for compiling and linking.
+
+		$set XFLAGS	= "$(XFLAGS) -p noao"
+		$set XVFLAGS	= "$(XVFLAGS) -p noao"
+		$set LFLAGS	= "$(LFLAGS) -p noao"
+
+	2. Added a zzsetenv.def file to the noao package library.  A few of
+	the definitions therein are shown below.
+
+		set	pkglibs		= noao$lib/
+		set	noaobin		= noao$bin(arch)/
+		set	digiphot	= noao$digiphot/
+		set	imred		= noao$imred/
+		set	noaolib		= noao$lib/
+
+	Defining pkglibs at the package level avoids the possibility of
+	finding somebody else's file with a system wide package library
+	search path, which could happen when pkglibs was defined in extern.pkg.
+	The noaobin and noaolib are the noao package BIN and LIB directories,
+	given unique names to avoid confusion with the corresponding core
+	system directories.
+
+	The remaining definitions define the major noao directories.  This is
+	not really necessary, but it allows one to do away with the 
+
+		include "../../file.h"
+
+	type references in large packages, using instead
+
+		include "ldir$file.h"  or  include "ldir$lib/file.h"
+
+	which is independent of the subdirectory path.  Both types of files
+	references still work and are still permitted, but the latter is
+	cleaner and probably to be preferred now that the logical directories
+	within a large suite of packages can be defined reliably at the HSI
+	level.  Note that this mechanism is intended only for files which are
+	globally referenced within a single application; files which are
+	referenced by two or more applications within a large package should
+	go into the package (e.g., noao) global library.  (2/23)
+
+noao/mkpkg
+noao/*/mkpkg (etc.)
+	All the noao mkpkg files (48 or so) were modified with a SED script
+	to replace all occurrences of "bin$" by "noaobin$", e.g., so that
+	executables will be installed in the NOAO bin.  The $include
+	noao$lib/mkpkg.inc statements added earlier were deleted, since
+	inclusion of this file is now handled by the -p flag or by defining
+	PKGENV in the user's environment.  This is just as well, since the
+	$include at the top of each mkpkg file would have been skipped
+	whenever the user called mkpkg with the name of the mkpkg-module
+	to be executed on the command line (in which case the statements
+	at the head of the mkpkg file are not executed).  (2/23)
+
+--------------
+Notes update sent to ST.  (2/23)
+
+noao/noao.cl
+noao/lib/zzsetenv.def
+	1. Deleted all the set environment definitions (to define noao
+	package directories) from the noao.cl file, replacing these by
+	the single statement
+
+		cl < "noao$lib/zzsetenv.def"
+
+	The filename has to be quoted or this won't work.
+
+	2. To the noao zzsetenv.def, added a KEEP at the end to keep the newly
+	defined environment definitions when the file is interpreted by the CL.
+	The keep is ignored when the file is read by the HSI.  (2/23)
+
+sys/fio/vfntrans.x
+	Replaced all calls to envgets by calls to envfind, to avoid a
+	brain-damaged feature of envgets (it prompts for the named variable
+	if it is not defined - I let someone talk me into putting this
+	feature in years ago).  Fetching an environment variable is a
+	fundamental, low-level operation, and if the variable is not defined
+	most applications would just like to have the appropriate error
+	status return.  In the present case, the environment fetch was
+	occurring during filename translation in MKPKG, and the program
+	was dying with a segmentation violation since I don't want to
+	fully initialize (and link in) the VOS for use in the HSI, where
+	all I want from the VOS is low level filename translation.  (2/24)
+
+pkg/cl/builtin.c
+	Fixed a problem with the new "bin=bindir" feature of the PACKAGE
+	builtin.  This was failing for packages which load dependency
+	packages in the header of the package script (the CL was getting
+	confused about just what task was executding the PACKAGE statement).
+	Hence, noao tasks such as astutil and proto would work, but mtlocal
+	(which loads dataio), imred/echelle, etc, would fail.  (2/24)
+
+pkg/system/help/helpdb.x
+pkg/system/help/helpdir.h
+	Testing exchange of binary help database files between the Sun-3 and
+	386i revealed that there were still some machine dependencies in
+	the files, namely, char data was being byte swapped improperly.
+	Some fairly extensive changes were required to fix this, and in the
+	process I converted the program to save char data on disk in byte
+	packed from use MII.  This has the additional advantage of reducing
+	the size of the helpdb files by nearly a factor of two.  (2/25)
+
+pkg/language/language.hd
+pkg/language/language.men
+pkg/system/system.hd
+pkg/system/system.men
+pkg/system/system.cl
+pkg/system/devices.cl +
+	Moved "help devices" from the language package to system, where it
+	perhaps more logically belongs.  Added a task entry as well: "devices"
+	merely does a help devices.  The actual information, of course, still
+	resides in dev$devices.hlp and must be updated by the system installer
+	to be reflect the actual devices in use at a site.  (2/26)
+
+-----------------------
+Begin VMS/IRAF HSI upgrade.  (2/26)
+
+dev/devices.hlp +		[vms/iraf]
+dev/termcap
+dev/graphcap
+dev/hosts
+	Added the devices.hlp and updated the other files from UNIX/IRAF.
+	Will delete the help.db after the portable system is upgraded.  (2/26)
+
+vms/hlib/libc/libc.h
+vms/hlib/libc/knames.h
+vms/hlib/libc/xnames.h
+vms/hlib/libc/kernel.h
+	Rebuilt from UNIX/IRAF versions.  The file kernel.h does not appear to
+	be used in the VMS/IRAF HSI but it might be useful (it contains some
+	VOS information), so I will keep it around for now.  (2/26)
+
+vms/os/mkpkg
+vms/os/mkpkg.com
+vms/os/zfunc.c +
+	Added the ZFUNC family of procedures (used to call integer functions
+	by the function entry point address) to the kernel.  (2/26)
+
+vms/boot/mkpkg/main.c
+vms/boot/mkpkg/tok.c
+vms/boot/mkpkg/mkpkg.h
+	Updated these machine indepdent files from UNIX/IRAF.  (2/26)
+
+vms/boot/spp/xpp/xppcode.c.  (2/26)
+	Updated from UNIX/IRAF - allow string define to redefine old version.
+	(2/26)
+
+vms/os/zgtenv.c
+	Modified to return ERR for a nonexistent variable, 0 for a variable
+	with a null string value.  (2/26)
+
+vms/boot/bootlib/envinit.c
+	New version from UNIX/IRAF with more general syntax, support for
+	loading package environments.  (2/26)
+
+vms/boot/bootlib/osfpathname.c
+	Although this routine would work fine for VMS/IRAF, replaced by the
+	UNIX/IRAF version which should work on both systems.  (2/26)
+
+vms/os/mkpkg
+vms/os/mkpkg.com
+vms/os/irafpath.c +
+vms/boot/bootlib/ossysfile.c
+	Implemented the same system/applications global file search mechanism
+	as is used in UNIX/IRAF.  Any user defined libraries (defined by the
+	VMS logical name IRAFULIB) are searched first, followed by the HSI
+	global directories (currently HLIB, BIN, and LIB), and lastly the
+	applications global directories, if any (defined by `pkglibs' in the
+	IRAF (normally HSI) package environment.  (2/26)
+
+vms/boot/bootlib/osgetenv.c
+	Replaced by the UNIX/IRAF version, which is now capable of accessing
+	the IRAF HSI (zzsetenv.def) environment, as well as the host
+	environment.  (2/26)
+
+vms/hlib/clpackage.cl
+vms/hlib/clpackage.hd
+vms/hlib/clpackage.men
+vms/hlib/zzsetenv.def
+	Merged in changes for use of hlib$extern.pkg to support external
+	packages.  (2/27)
+
+vms/hlib/stsdas.cl
+	Deleted.  (2/27)
+
+vms/hlib/mkpkg.sf
+	Deleted the only `noao' file reference therein.  (2/27)
+
+noao/lib/mkpkg.sf.VMS +
+	Added a special file list for VMS to the noao library.  (2/27)
+
+vms/hlib/stripall -
+vms/hlib/stripper -
+vms/hlib/strip.iraf
+	Deleted the stripall file, and renamed the stripper script to
+	strip.iraf, deleting the `noao' related entries therein.  (2/27)
+
+vms/os/zfacss.c
+	Modified to test for the null filename and return NO in that case.
+	(2/27)
+
+vms/boot/spp/xpp/xppmain.c
+	Replaced with the UNIX/IRAF version, which includes support for the
+	-p flag.  (2/27)
+
+vms/boot/spp/xc.c
+	Added support for the -p flag and PKGENV environment variable. (2/27)
+
+vms/boot/bootlib/osfn2vfn.c
+vms/boot/bootlib/vfn2osfn.c
+	Replaced (following diff/merge) with UNIX/IRAF versions.  (2/27)
+
+vms/hlib/zzsetenv.def
+	Added "set stdimcur = stdimage" to enable the interactive image
+	cursor in VMS/IRAF.  Most NOAO VMS/IRAF users will run IRAF with
+	a display that has cursor readback, but this default may not be
+	appropriate for all sites.  (2/27)
+
+------------------
+Completed upgrade of VMS/IRAF HSI.  This included all recent revisions plus
+a full diff/merge to detect any other files needing updating.  All the layered
+software enhancements should now be in place.  (This was done on tucana and
+nothing has been installed on a VMS system yet).  (2/27)
+
+pkg/system/mkhelpdb.par
+	Converted the MKHELPDB parameters helpdir and helpdb to auto rather
+	than hidden parameters, since it will now be commonplace to change
+	the values of these parameters to compile package help databases.
+	(2/27)
+
+pkg/system/helpdb.x
+	1. A bug in reading a new format helpdb file gave me the opportunity
+	to develop the ability of HELP to recover from errors reading bad
+	helpdb files.  It should now print a nice error message and proceed
+	without the offending file (formerly it would go into a loop and
+	eventually crash with a segmentation violation).
+	2. Fixed the bug, which involved reading the index of the help
+	database (the bug was probably introduced when this file was trashed
+	and reconstructed a couple of days ago).  (2/27)
+
+------------------
+Begin merge of STScI revisions.  (2/27)
+
+vms/boot/spp/xc.c
+	Added flag -u to check for undeclared variables.  Could not add the
+	-p flag (alias for -P) since -p is already used for the layered
+	software enhancements.  (2/27)
+
+sys/imio/iki/ikiopen.x
+	Removed the restriction that only the first subimage in a cluster
+	can be accessed in a newimage or newcopy operation; I can't remember
+	anymore the reason for the restriction, hopefully there wasn't a
+	good one.  (2/27)
+
+vms/os/exit.c
+	For the case of a connected subprocess, removed the check for a
+	non-OK (!=1) exit status before calling ipc_abort.  Evidently this
+	test could fail when exiting a subprocess under the debugger.
+	It should always be desirable to set EOF on the IPC stream (this
+	is what ipc_abort does) when a connected subprocess exits.  (2/27)
+
+sys/imio/imaccess.x
+	This routine was assuming that imparse would return cl_index=1 by
+	default if no cluster index was indicated in the image specification,
+	whereas the value actually returned is cl_index=0.  Changed the test
+	cl_index>1 to cl_index>0 accordingly, so that the existence test is
+	carried out by mapping the image if and only if either a section or
+	cluster index is specified.  (2/28)
+
+vms/os/zfmkcp.c
+	It was suggested here that the ZFMKCP routine not propagate the
+	template file's protections, allowing the default user file protections
+	to be used instead, as if a new file were being created (but then why
+	use ZFMKCP?).  This isn't really what we want as it makes sense for
+	a file's attributes to be retained in a copy operation, and such is
+	required by the specifications and intended use of ZFMKCP.  It is
+	probably not correct to simply copy the file attributes, however.
+	If the template file belongs to the user probably the file attributes
+	should be retained; otherwise the attributes should probably be those
+	of the template file masked by the user's protection mask.  This will
+	have to wait until I have time to look into it a bit further.  (2/28)
+
+sys/imio/imsetbuf.x
+	To the list of criteria that must be met to enable "fast" i/o (direct
+	access to the FIO buffer), added the requirement that the pixel array
+	in the pixel file be properly aligned for pointer type access.  This
+	proved necessary for the STF image format which can have the pixel
+	segment beginning at an odd-byte file offset.  In such a case, wasting
+	a byte or three to properly align things would greatly speed up image
+	access, but there is no argument that the interface should verify
+	alignment at runtime.  (2/28)
+
+sys/imio/db/imgetb.x
+	Modified to make fetching the value of a nonexistent parameter an
+	error, rather than just returning false, for consistency with the
+	other datatypes and to make it easier to disciminate between the
+	cases.  It is still possible for applications to map nonexistence
+	into false if desired, if not as convenient.
+
+	I checked all core system and NOAO code which uses imgetb to ensure
+	that it would function correctly given the changed semantics of
+	this procedure, and did not find any problems (it was only used in
+	five files).  (2/28)
+
+sys/imio/db/mkpkg
+sys/imio/db/imputr.x
+sys/imio/db/imputd.x
+	Rather than decrease the value of the precision used to encode a real
+	in IMPUTR, I modified the format to use "%0.*g", where * is passed
+	the value NDIGITS_RP (from <mach.h>) at runtime.  This makes the
+	encoded precision variable depending upon the precision of the FP
+	hardware on the host, assuming that the values in <mach.h> are
+	accurate.  The same was done for IMPUTD, except that in this case
+	it is easy for a double encoded in the full precision to exceed
+	the 20 char field width of a FITS value, so this routine is set
+	up to try an encoding of NDIGITS_DP, decreasing the precision
+	iteratively until the encoded value fits.  (2/28)
+
+sys/imio/db/imputh.x +
+	Added a new routine IMPUTH, used to write FITS-style HISTORY or
+	COMMENT cards to the image header.  It is not clear whether this
+	is exactly the capability we will want in the future, but due to
+	the importance of FITS it is likely that the new image headers
+	will contain a FITS table as a header parameter, e.g., as a place
+	to put non-keyword FITS cards (like HISTORY and COMMENT cards)
+	when a FITS tape is read.  In that case IMPUTH would probably
+	append cards to the FITS-table in the image header.  Since the
+	current headers are already FITS its current function is to append
+	cards to the header itself.  This is different than adding or
+	updating a named header parameter because these "cards" are
+	purely informative and do not have unique keyword names.  (2/28)
+
+sys/imio/iki/stf/
+	Since there were numerous minor revisions to the STF code, and this
+	interface is due for a major rewrite (or obsoletion) in the near
+	future as part of the image structures project, I merely installed
+	the ST version of STF with a few minor sytlistic changes but no
+	functional code modifications.  (2/28)
+
+Notes on other st revisions
+	All STF related revisions - dealt with below.
+	GDEV, termcap, graphcap revisions - passed on to SJ for review.
+	Shared library stuff - no action for now, the whole thing needs
+	    to be redone at some point.
+	Box vectors for imhistogram - will be obsoleted when box vector
+	    feature appears in next version of GIO, but task level feature
+	    is harmless.  We will look into including such a revised task
+	    in V2.8 as an interim solution.
+	CHPIX task is already installed in V2.7.
+	Support for TY_USHORT in IMCOPY etc. - should be supported, point
+	    passed on to LED.
+	Excelan network interface - no action for now, will be supported
+	    when network interfaces are reworked to add runtime selection
+	    of the protocol to be used to reach a particular host.
+	All revisions having to do with installation of files in LIB, DEV,
+	    etc. were ignored, as these files should go into stsdas$lib now
+	    that this is is supported.  When selected programs (e.g., IGI)
+	    migrate to the core system the necessary files will be put in
+	    LIB etc. as part of the installation process; HSI file searching
+	    will make this transparent to applications.
+	(2/28)
+
+----------------------
+Moved new VMS/IRAF HSI back to draco (main system update to follow).
+This was done by deleting the old iraf$vms directory tree, restoring the new
+tree from a source only tar tape, and rebooting.  Aside from a couple of minor
+compile time problems with the new code, the only problems encountered were
+[1] initially there was no RTAR, since I had deleted it (!), and [2] I had
+to restore hlib$libcalcomp.a before one of the SGI translators would link.
+Other than that things appears to work, so far, or at least the hlib$extern.pkg
+file is being read.  (2/28)
+
+----------------------
+Updated the machine independent IRAF directories (doc,lib,math,noao,pkg,sys)
+from UNIX/IRAF, and started a full sysgen.  This was done by deleting all
+the old directories and restoring a full tar archive from tucana (a process
+which takes HOURS on a VMS/8600, for 8000 files).  (2/28)
+
+Completed sysgen of core and noao systems on 3/2.  This was delayed due to
+the time required to fix a problem with the new HSI code, which was necessary
+before the sysgen could be performed.
+
+vms/os/irafpath.c
+	This file searches for files like "libos.a" and "libc/xnames.h" in
+	standard places like LIB and HLIB.  For VMS, I had to modify the
+	code in irafpath.c (which is internal to the system and not part of
+	the kernel interface) to deal with / subdirectory references and
+	file extension mapping.  Probably this should be done with bootlib
+	code but a system dependent routine is required to permit the HSI
+	to look for the files in peculiar places, e.g., user (IRAFULIB)
+	directories and architecture dependent directories (e.g., bin.i386
+	in Sun/IRAF).  Adding irafpath made it possible to have a portable
+	os_sysfile routine in bootlib.  (written 3/2)
+
+vms/os/zmain.c
+	Had to be modified to pass references for SYSRUK and ONENTRY to
+	the iraf main in the argument list.  (3/2)
+
+vms/boot/mkpkg/mkdebug.com
+	Added a library declaration for the VMS/C library.  (3/2)
+
+vms/hlib/mkpkg.inc
+	Added defines for MACH and USE_SHLIB.  For VMS, MACH="vms" and
+	USE_SHLIB=no, since the VMS shared library support is not tied
+	into mkpkg for automatic configuration yet.  (3/2)
+
+-----------------
+With these changes I was able to get the VMS/IRAF core system up.  There were
+a couple of compile time problems in the noao packages which I haven't dealt
+with yet and which won't be documented here.  (3/2)
+
+lib/helpdb.mip
+noao/lib/helpdb.mip
+	These help database files propagated successfully to VMS/IRAF via
+	wtar, and HELP seems happy using them on the VMS system, so the
+	HELP system now appears to indeed be machine independent.  (3/2)
+
+unix/hlib/install
+	Modified the installation/update procedure for the "imtoolrc" file.
+	Formerly this file was left alone if one was already installed,
+	to avoid clobbering any user modifications.  This is too dangerous
+	as the user is not aware that the file may need to be updated if
+	they never modified it.  On the other hand, if they modified it
+	they will certainly notice if the file is changed during an update.
+	The existing file is now copied to imtoolrc.OLD and the new one
+	installed in its place.  (This bug was discovered during a recent
+	inspection of the 4-meter Sun/IRAF installation).  (3/2)
+
+unix/boot/bootlib/ossysfile.c
+vms/boot/bootlib/ossysfile.c
+	Modified this file to add a commented out #define STANDALONE, which
+	if uncommented, will cause the file to use its own private copy of
+	the "irafpath" function, for systems that don't need a custom version
+	of irafpath.  Both Sun/IRAF and VMS/IRAF currently do have their own
+	private irafpath functions, and do implement the IRAFULIB feature
+	for software development.  The Sun/IRAF version of irafpath() is
+	more complicated, as it has to determine the names of the directories
+	to be searched based on the machine architecture (e.g., the HBINs
+	are bin.sparc, bin.mc68020, bin.i386 etc.).  (3/3)
+
+vms/boot/rmbin/mkdebug.com
+	Added a LNK$LIBRARY declaration for the VMS/C library.  (3/4)
+
+unix/hlib/libc/knames.h
+unix/boot/bootlib/vfn2osfn.c
+vms/hlib/libc/knames.h
+vms/boot/bootlib/vfn2osfn.c
+	The stubbed out version of ki_connect() in bootlib turned out to be
+	a problem, as the real procedure has the necessary side effect of
+	unpacking the resource name and stripping the node prefix, leaving
+	the resource name to be passed on to the kernel primitive on the
+	local node for a local reference.  I modified bootlib to stub out
+	ki_gethosts() instead, to ensure that networking is disabled in the
+	HSI (when linked with VOS filename mapping), and to prevent linking
+	in tons of stuff the HSI doesn't need.  Examination of the size
+	of an HSI executable relinked with the new stub indicated that the
+	desired result was still being achieved.  (3/4)
+
+	NOTES - the bootlib routines are being linked through the KI due to
+	knet being enabled in knames.h.  There is no reason for this and the
+	KI link should be removed.  In KFSUBD, the routine calls ZFGCWD for
+	a local node reference.  This is a subtle change to the semantics
+	of ZFGCWD (the KFSUBD version should be exactly equivalent), and the
+	call to ZFGCWD should be removed.  I will wait until later to do so
+	as I expect it was put there to "fix" a bug somewhere else.  (3/4)
+
+layered software enhancements test
+	I set up a dummy library and global include in noao$lib and wrote a
+	little test package which referenced these, to test <file.h> package
+	global include file references and -lXX package library references,
+	and tested this on both the Sun and VMS systems without any problems.
+	You have to remember to include the -p package flag though.  If this
+	is forgotten a mkpkg will run but will misbehave.  In the case of
+	the NOAO executables the primary symptom is that the new executable
+	will be installed as noaobinx_file.e in the package directory, rather
+	than into noaobin$x_file.e (due to noaobin being undefined).  For
+	applications that reference package global includes or libraries a
+	compile or link time error will result.  (3/4)
+
+sys/imio/db/idbpstr.x
+	1. Improved the rigour of the code which tests if the string value
+	is numeric.  Excessively long numeric sequences are now treated as
+	string values (to avoid possible arithmetic overflow), and strings
+	containing multiple tokens are classed as strings even if the first
+	token is a number.
+	2. Replaced a redundant "nint(dval)" by "lval", which has already
+	been computed at that point.  (3/4)
+
+sys/imio/imrbpx.x
+sys/imio/imwbpx.x
+	Replaced the reference to IM_NDIM by IM_NPHYSDIM.  The routines work
+	on the physical image matrix and the section transformation has been
+	taken out by the time they are called.   The use of IM_NDIM could
+	lead to a runtime error when referencing a section of lower
+	dimensionality than the physical image.  (3/4)
+
+unix/os/zgtenv.c
+vms/os/zgtenv.c
+	Increased the max length of a iraf/host/tmp pathname (SZ_VALUE)
+	from 40 to 80.  Added a check to avoid overflow of the value
+	buffer; pathnames are silently truncated if too long.  (3/4)
+
+sys/imio/iki/stf/stfwfits.x
+	Added code to check if IM_HDRFILE is the null file; if so, the
+	routine exits immediately without attempting to update the header
+	file.  This bug would cause rfits make- to fail with the default
+	image type set to STF.  (3/4)
+
+unix/boot/rmbin/rmbin.c
+vms/boot/rmbin/rmbin.c
+	In interactive mode (rmbin -i) answering no to a file-deletion
+	query would cause the scan for the directory in which the file was
+	contained to terminate.  (3/4)
+
+unix/hlib/mkpkg.sf.S34
+noao/lib/mkpkg.sf.SUN3
+	Added images/lib/ranges.x and onedspec/dispcor/ranges.x for compilation
+	with the optimizer turned off (OS-3 only presumably).  (3/4)
+
+sys/imio/db/idbpstr.x
+	Added a return(OK) after IM_LEN is set for case naxisN.  Without this
+	the routine goes on to set IM_NDIM to the same value.  I also added
+	limit checking on the N in naxisN.  (3/4)
+
+sys/imio/imioff.x
+	Added code to allow setting the minimum image line packing density
+	via an environment variable (impkden).  Formerly this was wired
+	into the code via a defined constant.  The packing density determines
+	whether image lines are padded to occupy an integral number of device
+	blocks or not.  If this can be done without wasting too much space,
+	as determined by the minimum packing density, then image lines will
+	be aligned, which is more efficient for random i/o accesses.  For
+	sequential i/o accesses it makes little difference and may even be
+	slower since the image will be larger.  (3/4)
+
+vms/os/zopcpr.c
+	Added a sys$clref(PROCEF) call to ZCLCPR (immediately after the
+	sys$waitfr(PROCEF) loop, to clear the event flag once it has been
+	seen), and to _prinit, to ensure that the flag is clear when the
+	first process is spawned.  Formerly the flag would always be true
+	after the first connected subprocess exited, causing ZCLCPR to
+	sit in a tight loop consuming lots of cpu while waiting for the
+	subprocess to exit.  (3/4)
+
+pkg/system/help/mkhelpdb.hlp
+	Updated the help page for MKHELPDB.  (3/4)
+
+------------------------------
+Updated irafx@draco.  (3/4)
+
+lib/syserr.h
+sys/etc/mkpkg
+sys/etc/envgeti.x
+sys/etc/envgetr.x
+sys/etc/envgetd.x
+	Added envget[rd] functions to go along with envgeti (I used envgetr
+	in imioff above).  Changed the SYS_ENVI error to SYS_ENVNNUM to be
+	used for all failures to interpret the values of environment variables
+	as numbers.  (3/5)
+
+vms/mkpkg.com
+	Added commands to delete any .mlb files before the bootstrap, to avoid
+	the bug where a bootstrap run on an already bootstrapped kernel
+	preserves the old .mlb files, fooling mkpkg into thinking that the
+	libraries contain more than they do (e.g., iraf networking support
+	in the kernel).  (3/5)
+
+vms/gdev/sgidev/mkpkg.com
+	Added an if(f$search...) to conditionally compile the calcomp SGI
+	translator only if the calcomp library is present in hlib.  (3/5)
+
+------------------------------
+Updated irafx@draco and started sysgen/relinks on both systems.  (3/5)
+Snapshot of prerelease V2.8 VMS/IRAF sent to ST.  (3/6)
+
+unix/boot/bootlib/tape.c
+	Modified to open the tape drive newfile=0, i.e., without moving the
+	tape.  This should make it possible to store multiple tar files on
+	a tape.  (3/6)
+
+sys/qpoe/qpiosync.x
+	Changed the second if(IO_MINEVL(io)... to if(IO_MAXEVL(io)...  (3/8)
+
+sys/qpoe/qpset.h -
+sys/qpoe/qpioset.h -
+sys/qpoe/qpexset.h -
+	Deleted these files, since the real versions are now installed in
+	LIB.  (3/8)
+
+sys/qpoe/qpiowb.x
+	The code was scanning all the events in a bucket to compute the min/max
+	values, but was not updating said values in the min/max event records.
+	(3/9)
+
+sys/qpoe/zzdebug.x
+	Added a new debug task DUMPEVL, used to dump out the QPIO event list
+	descriptor, including the field values of the min/max event records
+	for the full list.  (3/9)
+
+sys/pmio/README
+sys/plio/README
+sys/plio/plsave.x
+sys/plio/plsavef.x
+	1. In pl_save, the function value being returned was a pointer value,
+	and not the length of the encoded mask.
+	2. In pl_savef, pl_save() was being called as a subroutine with 4
+	arguments, whereas it is actually an integer function with 3 arguments.
+	I modified the calling sequence of pl_save (and pm_save) to add a
+	fourth, currently unused "flags" argument, and modified pl_savef to
+	call pl_save properly.  (3/10)
+
+sys/mkpkg
+sys/plio/mkpkg
+sys/plio/tf/mkpkg
+	Moved PLIO from libsys to libex.  Logically this is where it really
+	belongs, and the package had to be either moved or modified since
+	PLIO contains a couple of peripheral routines (pl_saveim and pl_loadim)
+	which make calls to IMIO, which would lead to a circular reference in
+	the system libraries.  The main motivation for putting PLIO in libsys
+	in the first place was because the integer vector compress/decompress
+	routines are generally useful, but perhaps a better approach if these
+	facilites are required in system code would be to add a set of short
+	and integer compress and uncompress vector primitives to ETC, giving
+	the procedures system names but probably making them equivalent to the
+	PLIO routines.  I will probably do this the first time we find we need
+	such a facility in system code.  (3/11)
+
+sys/fio/fioclean.x
+	1. Was not recognizing the F_KEEP flag (keep open after task
+	termination) in the case of a string or spool file.
+	2. In the process of fixing the above, I noticed that F_KEEP was
+	being ignored during a cleanup following abnormal task termination.
+	This would seem to render F_KEEP rather useless, so I changed it so
+	that the file remains open no matter what if F_KEEP is set.  (3/11)
+
+unix/os/zmain.c
+sys/etc/main.x
+	Modified the iraf main and zmain to make it easier to call iraf tasks
+	as host level tasks, i.e., without having to set up a command file and
+	run the process with the standard input redirected.  In the new scheme,
+	any extra arguments given on the process command line are passed into
+	the iraf main as a command buffer containing the iraf command or
+	commands to be run.  For example,
+
+	    x_system.e netstatus
+
+	would run the command `netstatus' in process x_system.e.
+
+	    x_system.e count "files=*.x"
+
+	would run the `count' task, counting all .x files in the current
+	directory.
+
+	    x_system.e count "files=*.x 4>_o"
+
+	would do the same, redirecting the output at the iraf main level to
+	the file _o.
+
+	    x_system.e 'directory @pars $nargs=0'
+
+	would run the `directory' task with the given parameter set, with
+	$nargs set to 0.  If any of the parameters to a task are omitted
+	the task will query the terminal (clin) for them in the usual way,
+	so for example
+
+	    alias count "$iraf/bin/x_system.e count files="
+
+	would make the iraf task `count' available in unix, allowing the
+	iraf template specifying the files to be counted to be either given
+	on the unix command line, or prompted for if omitted.  Given the
+	above alias, one could enter a unix command such as
+
+	    count 'cl$*.h'
+
+	After some experimentation I even managed to define a cshell alias
+	to run the prow and stdgraph tasks standalone to plot rows of iraf
+	images; the alias used was
+
+	alias prow
+	    '$iraf/bin/x_plot.e prow @prow.pars image=\!:1 row=\!:2 "6>_MC";
+	    $iraf/bin/x_stdgraph.e stdgraph @stdgraph.pars input=_MC; rm _MC'
+
+	after which one types something like the following into the cshell
+	to plow rows:
+
+		prow 'dev$pix' 101
+
+	What happens is that if extra stuff is included on the command line
+	when the task is run, the zmain concatenates it to form the command
+	file (string buffer) to be interpreted, otherwise commands are read
+	from CLIN.  (3/11)
+
+sys/imio/iki/stf/stfopen.x
+	Added the "ksection" argument.  (3/16)
+
+pkg/cl/pfiles.c
+pkg/cl/eparam.c
+	Modified the pfile code to improve the ability of the CL to detect
+	and recover from truncated pfiles.  The pfilewrite code was modified
+	to always output the "mode" parameter as the last parameter, to mark
+	the end of the parameter list.  If the "mode" parameter is not seen
+	when a uparm pfile is read by the CL, the package pfile is used
+	instead, merging the contents of the truncated pfile to recover as
+	much of the information as possible.  (3/17)
+
+unix/hlib/strip.iraf
+noao/lib/strip.noao
+	To the "-allbut" entries listing extensions of files that should not
+	be stripped, added .mip (just in case).
+
+sys/etc/envscan.x
+unix/boot/bootlib/envinit.c
+vms/boot/bootlib/envinit.c
+	Generalized to permit commented out continuation lines, e.g.,
+
+	set blah = "...\
+	#	    ...\
+		    ..."   (3/17)
+
+pkg/cl/grammar.l
+	Modified to ignore leading whitespace and comment lines when
+	processing continuation lines while accumulating a quoted string.
+	(3/17)
+
+local/*
+	Set up a default "template" local package at iraf$local.  The new
+	package is a full-fledged external package containing several sample
+	tasks.  The intent is that a user site will make a copy of the local
+	directory tree and customize it, changing the hlib$extern.pkg to point
+	to the new package.  The template package has its own LIB, BIN, package
+	environment, help database, etc.  Instructions for customizing the
+	package are provided in local$src/README.  (3/17)
+
+unix/boot/bootlib/envinit.c
+unix/boot/bootlib/osputenv.c +
+unix/boot/mkpkg/main.c
+vms/boot/bootlib/envinit.c
+vms/boot/bootlib/osputenv.c +
+vms/boot/mkpkg/main.c
+	1. Modified envinit.c to that host environment variables are allowed
+	to override the values set in the iraf and package zzsetenv.def files.
+	This is a little dangerous as unintentional redefs are possible, but
+	makes it possible to modify logical directory names while testing
+	software.
+	2. Added a new call os_putenv to bootlib.  The new routine updates
+	or sets the value of the named variable in the host environment and
+	VOS environment, if possible.
+	3. If MKPKG is called with "symbol=value" arguments these are now
+	passed to os_putenv (as well as setting the values in the mkpkg symbol
+	table), so that logical directories can be reset temporarily on the
+	command line, e.g., "mkpkg -p local local=$iraf/local/".  (3/17)
+
+pkg/images/imarith/imcthreshold.gx -> imcthresh.gx
+pkg/images/imarith/generic/imcthreshold.x -> imcthresh.x
+pkg/images/imarith/generic/mkpkg
+pkg/images/imarith/mkpkg
+	Renamed imcthreshold.gx as this source file name was longer than 14
+	characters.  (only long source file name in the entire system). (3/18)
+
+---------------
+Begin local system updates.  (3/18)
+
+unix/hlib/irafuser.csh
+	The NOVOS switch was not being done properly.  Changed from an
+	environment variable to a -DNOVOS on the HSI_CF flags list.  (3/18)
+
+unix/boot/bootlib/envinit.c
+	Added a #ifdef NOVOS case which stubs out _envinit() and causes an
+	error message to be printed if loadpkgenv() is called when the HSI
+	is compiled NOVOS.  This happens only if an external package is
+	compiled with the -p package switch before the HSI has been
+	rebuilt to use VOS filename mapping.  (3/18)
+
+unix/as.sparc/*.c +
+unix/as.i386/*.c +
+	Copied the Sun-3 versions of the unix-optimized (C) VOPS routines
+	from as.mc68020 to the Sun-4 and Sun-386i AS directories.  (3/18)
+
+unix/os/zlocpr.c
+unix/os/zzstrt.c
+unix/shlib/edsym.c
+unix/shlib/mkpkg.sh
+	These files had to be modified to move the SunOS-4 HSI back to OS-3.
+	The preprocessor directive "#elif" is evidently new in OS-4.  Added
+	#ifdef SUNOS4 directives in a couple of places to disable compilation
+	of shared library code on OS-3 systems, which cannot support shared
+	libraries.  In shlib/mkpkg.sh, added the $HSI_CF flags argument to
+	the compile command for edsym.  (3/18)
+
+	NOTE - Additional testing revealed that in addition to #elif being
+	new in OS-4, support for the OS-3 construct "#else #ifdef" has been
+	dropped in OS-4.  The only thing that works is 
+
+		#ifdef
+		#else
+		# ifdef
+		# endif
+		#endif
+
+unix/hlib/login.cl
+	Made some changes to bring the default login.cl up to date.
+	Deleted the stdgraph entry, added stdimcur, node, wcsdir, cmbuflen,
+	min_lenuserarea entries, with reasonable default values (all commented
+	out as usual), changed some device names to their typical Sun values.
+	(3/18)
+
+unix/boot/mkpkg/sflist.c
+	Corrected some confusion over gettok returning EOF versus TOK_END.
+	Evidently this only showed up with the OS-3 Sun/IRAF special file list.
+	(3/18)
+
+mkpkg
+unix/hlib/mkfloat.csh
+	The OS-3 system did a NOVOS bootstrap and system library sysgen ok,
+	but when it came to rebuilding the HSI using the VOS the HSI failed
+	to link due to the mix of fsoft and f68881 objects.  I had to rebuild
+	the HSI NOVOS and start an fsoft system library sysgen, adding fsoft
+	entries to the root mkpkg and mkfloat.csh.  Interestingly, linking
+	fsoft and f68881 was not a problem on OS-4 (it shouldn't matter anyhow
+	since none of the HSI executables use floating point).  (3/19)
+
+unix/hlib/mkfloat.csh
+noao/mkpkg
+	Modified mkfloat.csh to permit it to be used on external packages as
+	well as on the core system.  Added entries to the NOAO package mkpkg
+	to call mkfloat.csh to switch architectures.  When an external package
+	calls mkfloat the list of directories to be modified is given on the
+	command line as "-d dir1 dir2 ... dirN".  This facility is still rather
+	adhoc and should be generalized further, or replaced with a better
+	facility.  (3/19)
+
+unix/hlib/mkpkg.sf.S34
+	Added optimized as$ C sources to special files list.  (3/19)
+
+local/*
+	Finished installing the BSWAP demo task.  Set up the root mkpkg to
+	permit "mkpkg ffpa" etc. for this package.  (3/19)
+
+unix/os/irafpath.c
+	Rather than simply looking for the named file in BIN, will now check
+	IRAFBIN if the latter is defined.  (3/19)
+
+unix/hlib/cl.csh
+	Now defines the environment variable "arch" as well as IRAFBIN, before
+	running the CL.  Should be modified to define both in terms of the
+	machine type.  (3/19)
+
+noao/lib/mkpkg.sf.SUN3
+	Added proto/ir/irmatch2d.x to the special file list, to be compiled
+	with the -P flag on OS-3 to avoid an infinite iropt phase.  (3/19)
+
+pkg/system/help/help.h
+pkg/system/help/t_help.x
+pkg/system/help/helpdb.x
+	The "helpdb" file template string was being truncated to SZ_FNAME.
+	A fixed size string is still used, but the limit has been increased
+	to 512 chars which should be enough - this is a factor of 8 increase
+	and anything longer and it will take forever to load all the files
+	anyhow.  (3/20)
+
+unix/hlib/mkfloat.csh
+	Now checks to see that the old objects have been successfully archived
+	before deleting them and restoring the alternate set.  (3/20)
+
+unix/hlib/cl.csh
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+	1. The old IRAFBIN mechanism has been replaced by a similar mechanism
+	using a new environment variable IRAFARCH.  This specifies the
+	architecture of the IRAF binaries to be used, e.g., ffpa, f68881,
+	i386, sparc, and so on.  The variable "arch", which is what is
+	actually used within IRAF in pathnames such as bin = iraf$bin(arch)/,
+	is defined by the cl script as ".$IRAFARCH".  As before, IRAFARCH is
+	optional, and if not defined the script will determine the best
+	set of binaries to be used with the node on which IRAF is being run.
+
+	So, either
+
+	    o	omit the IRAFARCH definition
+	    o	or define it as f68881, ffpa, sparc, i386, etc.:
+
+		setenv IRAFARCH f68881
+
+	2. In the login.cl, commented out the "reset bin = ...".
+	3. In the zzsetenv.def, changed the definition of "bin" to 
+	iraf$bin(arch)/.  (3/20)
+
+local/lib/zzsetenv.def
+	Commented out the "set localbin = local$bin(arch)/" and replaced by
+	"set localbin = local$bin/" as the default, since by default the
+	template local package has only one BIN.  The commented out version
+	will remain to give a hint to someone customizing the package about
+	how to implement multiple architecture support.  (2/22)
+
+---------------------
+Begin update of irafx@draco.  (3/22)
+
+vms/hlib/login.cl
+vms/hlib/strip.iraf
+vms/boot/bootlib/tape.c
+vms/boot/bootlib/envinit.c
+vms/boot/bootlib/osputenv.c
+vms/boot/mkpkg/sflist.c
+	Did a diff/merge of the VMS/IRAF HSI and updated any files that had
+	not been updated since the last IRAFX update.  (3/22)
+
+vms/os/zmain.c
+	For the moment, implemented the command line feature as the null
+	string, to get the irafx update completed quickly.  (3/22)
+
+local/*
+	Replaced the customized local in the irafx VMS/IRAF by the template
+	local, plus a few files like login.com, irafks.com, etc.  All the
+	custom local stuff is gone from the template local, but is still
+	present on draco in the old frozen "iraf" system.  No doubt some
+	of the old custom local facilities will live on in the VMS/IRAF
+	kpnolocal, yet to be set up and installed.  (3/22)
+
+sys/imio/iki/qpf/qpfcopypar.x
+	This routine was setting the image header parameter "blockfactor"
+	using the qpoe global default value rather than the qpio value,
+	which may be different if a blocking factor is specified in the
+	qpoe image kernel section.  (3/22)
+
+---------------------
+irafx updated completed.
+begin 386i update.  (3/23)
+begin OS-3 ffpa sysgen.  (3/23)
+
+unix/hlib/mach.h
+	1. Changed the 'e' to 'd' in the exponent of MAX_DOUBLE.
+	2. Deleted all the INDEF defines, since these duplicate definitions
+	already present in the SPP <iraf.h>.  (3/23)
+
+unix/hlib/mkfloat.csh
+	A junk libpkg.a symbolic link caused the save-file verification to
+	abort, leaving me at first with no clue as to the reason for the
+	abort.  Modified the script to print a diff of the file lists if
+	they are different, to give some feedback on the reason for an abort
+	if the architecture change cannot be completed.  (3/24)
+
+unix/mkpkg.sh
+	Changed the "rm -f as" to "rm -rf as", so that "as", which is supposed
+	to be a symbolic link can be deleted and rebuilt even if it gets turned
+	into a real directory.  (3/24)
+
+unix/reboot +
+	Added this cshell script command to be used to reboot the HSI.
+	The purpose of the script is to ensure that hlib/irafuser.csh is
+	sourced to set up the necessary environment variables before the
+	bootstrap is attempted.  (3/24)
+
+sys/fmtio/gardwrd.x
+	Fixed a misstatement in the header comment.  (3/27)
+
+unix/shlib/mkshlib.csh
+	Added .globl entries to the V.s (transfer vector object) code, to
+	force the MEM common to location zero in the shared image.  This
+	showed up on the 386i following the recent system rebuild and was
+	a nasty bug to track down.  The SunOS memory allocator data structures
+	were being corrupted due to a memory overwrite occurring as a result
+	of different values of MEM in the client process and shared image.
+	(3/27)
+
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdrcuro.x
+	Modified imgdetwcs (an internal, restricted use routine) to return
+	the image name and title string as well as the WCS info.  (3/27)
+
+pkg/images/tv/display/imdwcs.x
+	Added a little (internal, interim, restricted use) package for
+	retrieving the WCS information for a display frame, and performing
+	coordinate transformations between display frame buffer and image
+	pixel coordinates and vice versa.  This will be used in the initial
+	versions of tasks like IMMARK which need to operate directly upon
+	the display frame buffer, but which want to work in image pixel
+	coordinates.  (3/27)
+
+pkg/images/tv/display/imdmapfr.x
+	Added a new routine imd_mapframe to the interim display interface.
+	The new routine maps the given frame of the stdimage display device
+	onto an image descriptor, displaying the frame if indicated and
+	performing all other initializations required to do image i/o to
+	the frame buffer.  (3/28)
+
+pkg/images/tv/doc/display.hlp
+pkg/images/tv/display/display.par
+	Changed the default interpolator order to 0 (replicate) for the
+	DISPLAY task.  (3/28)
+
+unix/sun/imtool.c
+	Added some graphics color table entries to IMTOOL.  The current
+	allocation of pixel values or "colors" is as follows:
+
+		  0 = white (sunview background color)
+	      1-200 = data values, windowed
+		201 = cursor color (black-white blinking)
+
+		202 = black		# IMTOOL graphics overlay colors
+		203 = white
+		204 = red
+		205 = green
+		206 = blue
+		207 = yellow (red+green)
+		208 = ? (green+blue)
+		209 = ? (red+blue)
+		  (etc.)
+
+	    218-254 = reserved for use by other windows
+		255 = black (sunview foreground color)
+
+	A frame buffer pixel with the values 202 and up will have the indicated
+	color, independent of the color enhancement or window-stretch
+	adjustment for the frame (the latter only affect the greyscale
+	pixel values 1-200).  Blinking graphics can be achieved by using
+	the cursor color, 201.  (3/28,3/30)
+
+pkg/cl/debug.c
+	Added cases for some missing opcodes (CONCAT, PRINT, etc.).  (3/29)
+
+sys/libc/cenvget.c
+pkg/cl/builtin.c
+	The CL was limited in the size of environment variable value string it
+	could handle by 80 character buffers in the LIBC environment code and
+	in the "show" command in the CL.  Increased the size of these buffers
+	to 512 as an easy fix.  Commands such as
+
+		reset helpdb = (envget("helpdb") // ",myhelpfile")
+	
+	will work as expected now.  (3/29)
+
+unix/os/zfiotx.c
+	1. When opening a file write-only or new-file, will attempt to set
+	the file mode bits only if opening a regular file (e.g., rather than
+	a terminal).
+	2. Modified ZCLSTX (ZCLSTY) to ignore the error status of fclose()
+	when closing a terminal, as an error condition is being returned for
+	some unknown reason when doing direct terminal i/o on SunOS.
+	The system error is EPERM, but this makes little sense since the
+	terminal is already open.  As far as I can tell the error, if there
+	really is one, is harmless and may as well be ignored.  (3/30)
+
+vms/boot/bootlib/osputenv.c
+	Commented out the calls to putenv() - not supported in the VMS HSI.
+	(3/31)
+
+----------------------
+Updated orion.  (4/2)
+Snapshot tape made for CTIO.  (4/3)
+Updated irafx@draco and serpens.  (4/5)
+
+noao/lib/mkpkg.inc
+	The mkpkg.sf.SUN3 special file list was being used as the default
+	for unknown systems; modified to use no special file list if the
+	system name is not in the list.  (4/5)
+
+unix/sun/imtoolrc
+dev/graphcap
+	Added three new entries:
+
+		imtfs35		full screen, 35 mm aspect ratio
+		imt128		128 sq
+		imt256		256 sq
+
+	and modified the imtgec entry to make the x width a multiple of 4,
+	as is required under SunOS-4.  (4/6)
+
+sys/imio/iki/qpf/qpf.h
+sys/imio/iki/qpf/qpfopen.x
+sys/imio/iki/qpf/zfioqp.x
+sys/qpoe/README
+sys/qpoe/mkpkg
+sys/qpoe/qpio.h
+sys/qpoe/qpiogetrg.x
+sys/qpoe/qpioopen.x
+sys/qpoe/qpioparse.x
+sys/qpoe/qpiosetrg.x
+	1. Modified the way the "rect" keyword is handled by QPIO/QPF.  The main
+	change is that the rect is now read out by QPF and used to set the
+	logical image size; if a rect is specified which references a
+	subraster of the full QPOE image matrix, IMIO will see a logical image
+	the size of the rect (scaled by the current blocking factor).
+	2. Added a new QPIO routine qpio_getrange, the complement of
+	qpio_setrange.  This is what is used by QPF to determine the rect.
+	(4/6)
+
+sys/pmio/pmnewmask.x
+	Changed the IM_LEN, used to set the size of the new mask, to IM_SVLEN.
+	The new mask must be the same size as the physical image matrix of the
+	reference image, independent of any section transformation in effect
+	for the reference image.  (4/10) 
+
+sys/imio/iki/ikirename.x
+sys/imio/iki/oif/oifrename.x
+sys/imio/iki/stf/stfrename.x
+	Modified imrename() to permit "in place" image renames, used with
+	OIF format images to move the pixel file to a new IMDIR.  STF was
+	modified to recognize and ignore an attempt to rename an image
+	in place (no need to do more since STF doesn't support IMDIR).  (4/10)
+
+---------------------------------------
+Updated orion (Sun-4), serpens (Sun-3 OS3), draco (VMS).  (4/12)
+Complete rebuild of carina (BSD VAX) in progress and nearly complete.
+IRAF/STSDAS beta release tapes cut.  (4/12)
+
+dev/graphcap
+dev/termcap
+	Added entries for dg4010pc, a PC emulator for the Data General
+	plus 4010 graphics.  Contributed by Skip Schaller.  (4/13 ShJ)
+
+sys/imio/iki/ikiaccess.x
+	As part of the recent imrename() changes, iki_access was modified
+	to return the root image name as a pathname.  This caused problems
+	on VMS/IRAF, as the pathname returned may contain $[ characters,
+	yet is passed on to the VOS routine IMMAPZ to open the image header
+	when renaming or deleting an image.  Modified iki_access to escape
+	any $[ characters in the returned pathname. (4/13)
+
+------------------------
+Begin merge of revisions from BSD VAX/IRAF update.
+
+unix/boot/bootlib/osputenv.c
+	Added #ifdef vax around the putenv() calls, to allow the same file
+	to be used for BSD/IRAF.  (4/13)
+
+unix/hlib/cl.csh
+unix/hlib/irafuser.csh
+	Isolated the calls to `mach` to a single set MACH = `mach`, to miminize
+	modifications for other systems like BSD.  Added commented out set
+	MACH = vax to serve as an example.  (4/13)
+
+unix/hlib/libc/xnames.h
+	Deleted AMOVC definition, since this is already defined in knames.h.
+	(4/13)
+
+unix/mkpkg.sh
+	Replaced three occurrences of `mach` by $MACH; the latter is defined
+	in $hlib/irafuser.csh, which is always loaded by "reboot" before the
+	mkpkg.sh is interpreted.  (4/13)
+
+unix/os/zfiobf.c
+	Added #ifndef O_RDWR around the #include <fcntl.h>.  (4/13)
+
+unix/os/zzstrt.c
+	Added #ifdef sun around the #include <mman.h>, <a.out.h>, to allow
+	compilation of this file on systems like BSD that don't use the
+	shared library facility.  (4/13)
+
+	(end of merge of BSD revisions).
+	-----------------
+
+unix/gdev/zfiogd.x
+	As an experiment, I tried adding a 10 msec delay in the ZFIOGD
+	data read/write loops, to see if this reduces the frequency of
+	the imtool/fifo related system crashes we have been experiencing
+	with the Suns.  (4/14)
+
+unix/hlib/mkpkg.sf.SUN3
+	Don't know how it happened, but the entries for the CL files did
+	not have the $(MACH) in them, and caused an f68881_used error when
+	recompiled with the ffpa binaries.  (4/14)
+
+vms/gdev/sgidev/sgi2vccp.for
+	Changed the length of the 'input_file' character string from 
+	256 to 128.  A length greater than 255 causes an error 'illegal
+	file name specification' from VMS; all other VMS SGI translators
+	use a 128 character string for 'input_file'.  (ShJ 4/21)
+
+lib/syserrmsg
+	Restored the error codes for a block of IMIO messages and deleted
+	a duplicate block of PLIO messages.  This was left from an earlier
+	attempt to insert the new system messages in sequence.  The attempt
+	was later abandoned, thinking that it will be safer to merely append
+	the new messages at the end.  (4/25)
+
+pkg/images/doc/imhistogram.hlp
+pkg/images/imhistogram.par
+pkg/images/iminfo/imhistogram.x
+	1. In response to overwhelming user demand, a "logy" switch was
+	added, making log scaling of the y axis optional.
+	2. In list output format, the bin value field is now output in the
+	same units (z1:z2) as when the plot is drawn (formerly the ordinal
+	bin number was output instead).  The value given is that of the start
+	of the bin, hence the range of each bin is [ x[i] : x[i+1] ).  (4/25)
+
+bin/x_nsppkern.e +
+bin/x_stdplot.e -
+dev/graphcap
+pkg/plot/doc/nsppkern.hlp +
+pkg/plot/nsppkern.par
+pkg/plot/plot.cl
+pkg/plot/plot.hd
+pkg/plot/plot.men
+sys/gio/sgikern/x_sgikern.x
+sys/gio/nsppkern/gktmfopen.x
+sys/gio/nsppkern/mkpkg
+sys/gio/nsppkern/t_nsppkern.x
+sys/gio/nsppkern/x_nsppkern.x
+	The following changes were made to change plot.stdplot to point to the 
+	SGI kernel rather than the NSPP (NCAR) kernel, i.e., the SGI kernel is
+	now the default STDPLOT.
+
+	1. Changed the name of the gio/nsppkern executable from x_stdplot.e
+	to x_nsppkern.e.
+	2. In the graphcap, changed all occurrences of "stdplot" in the NSPP
+	section of device entries to "nsppkern".  Changed the device names
+	from "ncar_blah" to "nspp_blah" to be consistent.  Added a new logical
+	device "nsppdefault", the default NSPPKERN output device.  For NOAO
+	this is the dicomed (see plot$nsppkern.par).
+	3. Added a manual page for the new task NSPPKERN.
+	4. Added the new task NSPPKERN to the PLOT package.  STDPLOT still
+	appears as a task but is now equivalent to SGIKERN.  In the par file
+	for nsppkern, changed the default "device" from "stdplot" to
+	"nsppdefault".
+	5. In gio/sgikern/x_sgikern.x, added a task entry "stdplot=sgikern"
+	to support the new STDPLOT task as a synonym for sgikern.
+	6. In gio/nsppkern, changed all occurrences of "stdplot" to "nsppkern".
+	This involved renaming several files and editing an error message in
+	one of the files.  (4/26)
+
+sys/vops/ahgm.gx
+	1. Deleted the nbins<2 test.
+	2. Modified the logic slightly to prevent aliasing of points in the
+	out of range interval z1-dz:z1 back into the first bin.
+	3. Broke the code into two cases, dz == 1.0 and everything else,
+	to optimize the case where the histogram is computed without scaling.
+	(4/28)
+
+pkg/images/imhistogram.x
+pkg/images/doc/imhistogram.hlp
+	1. In the case of integer data where the range z1:z2 is small (less
+	than the default histogram resolution nbins or 1024, whichever is
+	greater), the histogram resolution is now automatically adjusted to
+	match the resolution of the data, i.e., nbins is set to z2-z1+1.
+	This results in a "true" histogram and avoids the zero or high-valued
+	bins that can occur when the histogram oversamples or slightly
+	undersamples the data range.  (The histogram is also computed more
+	efficiently since dz == 1.0; see note above).
+	2. Added an "autoscale" parameter to enable this feature.
+	3. If the data resolution exceeds the histogram resolution for integer
+	data, and autoscaling is enabled, NBINS, Z1, and Z2 will be adjusted
+	as necessary to map an integral number of pixel values into each
+	histogram bin, again to avoid aliasing effects.
+	4. Added the standard system banner to the plot title, plus a line
+	giving the values of Z1, Z2, and NBINS.
+	5. Added comments to the BUGS section of the manual page to warn the
+	user about aliasing and smoothing effects.  (4/28-29).
+
+unix/hlib/mkpkg.inc
+unix/os/zlocpr.c
+unix/shlib/edsym.c
+unix/shlib/mkshlib.csh
+	Finished setting up the sparc version of shared libraries.  This was
+	just a matter of coming up with the necessary sparc assembler for the
+	transfer vector, and the ZLOCPR code to disassemble the transfer
+	vector.  This was a little harder for the Sun-4 assembler than on
+	the other Suns due to a useful feature being missing from the
+	assembler language (I had to use awk instead), and due to the extra
+	complexities of hi/lo addressing bits and the delay slot.
+
+	The orion executables are linked with the -T symbol-edit flag, which
+	omits all symbols associated with the shared library.  This saves quite
+	a bit of space in the symbol table of each executable, but may be
+	confusing if anyone happens to debug these executables.
+
+	The BIN sizes are
+
+		S.e		1.2 Mb
+		bin		3.2 Mb	(excluding S.e)
+		noao.bin	3.7 Mb
+	
+	for a total of only 8.1 Mb for the full system!  (4/29)
+
+unix/boot/xyacc/files
+	Changed the definition of the iraf root, which is evidently wired
+	into this program.  (4/30)
+
+sys/gio/nspp/portlib/*.f
+sys/gio/nspp/sysint/mkpkg
+sys/gio/nspp/sysint/packum.x
+sys/gio/nspp/sysint/nspp.com
+sys/gio/nsppkern/gktinit.x
+sys/gio/nsppkern/nspp.com
+sys/gio/nsppkern/*.f
+	Modified the NSPP interface to make byteswapping of the output
+	metacode a graphcap rather than compile time option.  Including "BS"
+	in the graphcap entry for an NSPP logical device causes the output
+	ncar metacode to be byteswapped.  (5/2)
+
+unix/os/alloc.c
+	Changed several hlib references to hbin to reflect the new directory
+	of residence of alloc.e  (5/2)
+
+dev/hosts	[tucana, orion]
+dev/uhosts	[tucana, orion]
+	Added node "omega", a new IR diskfull Sun-3.  (5/3 SRo)
+
+unix/boot/spp/xc.c
+	Added a #ifdef SUNOS4, to make linking with the shared libraries the
+	default only on OS4.  (5/5)
+
+dev/uhosts	[all available systems]
+	Updated to reflect changed internet addresses (downtown noao shuffle).
+	(5/10 SRo)
+
+unix/boot/spp/xpp/decl.c
+vms/boot/spp/xpp/decl.c
+	Added a "break;" after the error message "missing right bracket...".
+	An infinite sequence of error messages would otherwise result.  (5/10)
+
+unix/gdev/zfiogd.x
+	1. Modified both ZARDGD and ZAWRGD to timeout after an interval if
+	a transfer cannot be completed, e.g., because the server has died.
+	2. Modified ZAWRGD to tolerate writes that return a status 0 (no
+	data sent).  Formerly this could result in a 0 write status being
+	returned to the caller, which in the case tested was causing the
+	kernel server to abort while writing to IMTOOL.  (5/14)
+
+sys/ki/irafks.x
+	1. Added a new feature to the kernel server to facilitate debugging.
+	The detached process command line syntax is now used (as a bit of a
+	trick) to enable debug mode on the command line, i.e., "-d debugfile"
+	causes debug messages to be appended at runtime to "debugfile" on the
+	server.  This would be enabled by modifing the dev$hosts entry for
+	the server to add the debug arguments to the command used to start
+	the server, assuming that the network interface in use can pass
+	command line arguments on to the server (this is not required and is
+	not necessarily the case).  Relinking the server with DEBUG=YES is
+	always possible if this other technique doesn't work.
+
+	2. Added a couple of calls to flush to the debug code, used to output
+	messages logging kernel server requests when running the server in
+	debug mode.  (5/16)
+
+unix/gdev/zfiogd.x
+	Modified the amount of data sent per transfer when moving a large block
+	of data through a FIFO from 4096 to 4000 bytes.  It appears that use
+	of a transfer size of 4096 bytes, which is the same size as the FIFO
+	buffer used in the SunOS kernel, may activate a bug in the SunOS FIFO
+	code leading to premature deallocation of the FIFO kernel data buffer
+	under some circumstances.  This may cause an i/o error on the FIFO and
+	always results eventually in a panic reboot of the host system when
+	the FIFO file is closed, due to an attempt to free an already freed
+	buffer, which can cause either a kernel bus error or kmem_free panic
+	depending upon memory dynamics.  I don't know if changing the transfer
+	size to 4000 will avoid this bug but it worked in one test case.
+	(5/16)
+
+unix/sun/imtool.c
+	1. Changed the fifo i/o transfer size from 4096 to 4000.
+	2. Fixed a bug that was preventing large multi buffer fifo i/o
+	transfers from timing out in the event that the client dies during
+	a transfer.
+	3. Deleted the code which would cause IMTOOL to shut down if
+	synchronization of the data stream is lost (thereby guaranteeing
+	that things get initialized).  Users would invariably interpret
+	this as "IMTOOL crashed".  Now it should continue running, printing
+	nasty messages to the console, until either synchronization is
+	reestablished or the user manually kills and restarts IMTOOL.  (5/16)
+
+unix/sun/fifo.c +
+	Added this new debug program to the SunView support package.  It is
+	a server process like IMTOOL which emulates the IMTOOL client-server
+	command datastream, operating upon a fixed size 512 sq. frame buffer
+	maintained as an array in process memory - the window system is not
+	used, but the process looks to the client like an IMTOOL server.
+	All datastream requests received from the client are logged to the
+	stderr output.  This is used to debug datastream and FIFO i/o.
+	(5/16)
+
+unix/os/zfiobf.c
+	Changed the #ifndef O_RDWR to #ifndef O_NDELAY, since the latter is
+	what is defined in <sys/fcntl.h>.  (5/16)
+
+------------------
+Rebooted and relinked tucana, and did an incremental update of orion for
+further IMTOOL crash testing.  (5/16)
+Updated pegasus (386i).  (5/17)
+
+unix/hlib/zzsetenv.def
+	Added defs for fmio,qpoe,plio,pmio to the zzsetenv.def, since we
+	already have defs for the other system directories.  (5/18)
+
+sys/fio/fioclean.x
+	Added a call to fcanpb to cancel any pushback, in the status != OK
+	part of fio_qflush().  It is necessary to cancel any pushback before
+	messing with the i/o pointers the way fio_qflush() does.  (5/18)
+
+pkg/cl/modes.c
+	Modified the part of the image cursor read code which text encodes
+	the cursor value to use a 0.3f instead of 0.6g format to encode the
+	cursor value, since for the image cursor the range of x,y values is
+	well defined.  This was done because I was seeing occasionally
+	off-by-one integer cursor values printed out, which I suspect were
+	due to some kind of integer truncation effect (2.999 -> 2) occuring
+	during all the encode-decode steps currently involved in a cursor
+	read.  (5/24)
+
+sys/imio/imdmap.x
+	Modified to pass a flag in the image descriptor for the mapped display,
+	telling whether or not the display is a server device.  (5/24)
+
+pkg/images/tv/display/iis.com
+pkg/images/tv/display/iis.h
+pkg/images/tv/display/iisio.x
+pkg/images/tv/display/iisopn.x
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdrcuro.x
+pkg/images/tv/display/imdsetwcs.x
+pkg/images/tv/display/imdwcs.x
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/t_dcontrol.x
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/zdisplay.h
+	1. Modified the display program to support the new datastream WCS
+	feature added to IMTOOL (see below).  If this is used the WCS
+	information is passed via the datastream rather than via the old
+	WCS file in the "WCSDIR".  The datastream-WCS is enabled if the
+	device has the LC capability in the graphcap, indicating that it
+	is a server device.  The WCS file is still written to the WCSDIR
+	if the LC capability is not found.
+	2. The IMD code (imd_getwcs) was similarly modified to retrieve the
+	WCS from the server, rather than trying to read the old WCS file,
+	if the display device is a server.  (5/24)
+
+unix/sun/imtool.c
+	1. The WCS is now passed in and out via the datastream to the client,
+	rather than via the old WCS file.  This should eliminate any problems
+	with the WCS being "lost" due to concurrent process synchronization
+	problems.
+	2. The set-WCS sequence is now also used to set the frame buffer
+	configuration, and every display frame load is preceeded by a set-WCS.
+	This eliminates the bug where turning off frame erase followed by a
+	reset stdimage could cause the client and server to have different
+	notions of the frame buffer size, causing skewed images or worse.
+	The frame number is now incremented by the set-WCS rather than by
+	frame erase.
+	3. IMTOOL now opens the output datastream at startup time and keeps
+	it open permanently, like the input datastream.  This eliminates
+	possible race conditions that could lead to an open error on the
+	output datastream, possibly causing IMTOOL termination or an i/o
+	error in the client.
+
+	4. The major feature added in this version of IMTOOL is zoom (this
+	is closely related to pan which was added some time ago).  Both zoom
+	and pan are controlled by the middle mouse button.  Moving the mouse
+	to an image feature and pressing the middle mouse button causes that
+	feature to be moved (panned) to the center of the display, as before.
+	Pressing the button *again*, without moving the mouse, now causes
+	the display to be zoomed about the position of the cursor.  Each
+	time the button is pressed the zoom factor changes, until it wraps
+	back around to one.  The set of zoom factors is controlled by the
+	setup panel, with the default set being 1,2,4,8.
+
+	Zooming is very fast, even in a full screen window, so it is no
+	problem to cycle through the zoom factors to magnify a feature and
+	then return to the unzoomed image to see where the feature is, or
+	select a new region to be zoomed.  The mouse always tracks the
+	feature as the zoom factor changes, making it easy to determine
+	where a feature is when returning to the unzoomed image from a full
+	zoom somehwere in the image.
+
+	Zoom is a server feature, transparent to the client, which sees only
+	the fixed size frame buffer.  Hence a program like TVMARK can be
+	used to edit the frame buffer (draw color graphics) regardless of the
+	zoom factor.  In most cases it will be best to, for example, use the
+	smallest character font for graphics, relying upon zoom to magnify
+	the text for easier reading.
+
+	For performance reasons, zoom and pan is implemented by writing to
+	the raw frame buffer.  For the most part this is transparent to the
+	user, but since all clipping and locking is bypassed one can create
+	situations where the screen does not fully represent normal reality.
+	Redisplaying the screen, or even panning the display window slightly,
+	will normally fix this.  Such problems can be avoided by resizing
+	the display window so that it does not overlap other windows.
+	(5/24)
+
+---------------------
+Updated orion, irafx@draco.  (5/27)
+
+unix/sun/imtool.c
+	Register wasn't working with zoom; was copying the offset and zoom
+	factors for a frame but not doing other things, such as zoom the WCS.
+	(5/29)
+
+sys/imio/iki/oif/oifgpfn.x
+	This routine, used to get the pixel file pathname for an image,
+	was assuming that the header file name was a virtual filename.
+	This was no problem in the case of simple concatenatable pixel
+	file name, but in the case of a name such as HDR$pixels/, the
+	name "pixels/file.pix" was being concatenated to the root pathname
+	of the header file, producing an illegal filename for VMS, although
+	it would work for UNIX since the / is acceptable in a UNIX pathname.
+	Modified to always work with the host pathname equivalent of the
+	header file root, using zfsubd to fold in any subdirectories found
+	after the HDR$.  (5/30)
+
+sys/imio/iki/ikiaccess.x
+	In the modification to "imrename" some weeks ago, this routine was
+	modified to use the host pathname equivalent of the image name.
+	This was the reason the above bug (and others fixed earlier) were
+	discovered.  Since presumably these bugs must have been there all
+	along, since the user could easily enter a host pathname to reference
+	an image, I have been fixing the second order bugs rather than
+	modifying imaccess to avoid the host pathname.
+
+	The latest bug is in the generation of this pathname itself.  It is
+	the pathname of the root image path name which is computed, with the
+	extension stripped.  This would fail on VMS if the image name had
+	extra . delimited fields, e.g., "image.1234.imh", since with the
+	extension strippped off the pathname would be computed assuming that
+	the .1234 is the pathname.  When later the real extension was added,
+	and invalid VMS filename would result.  (5/30)
+
+sys/etc/prpsio.x
+sys/gio/cursor/gtrctrl.x
+	The following changes were made to fix the bug of the CL hanging when
+	appending to STDPLOT, or appending to a redirected graphics stream.
+
+	1. The CL would hang because output to the pseudofile i/o controller
+	was being discarded when writing to a redirected graphics stream,
+	causing the CL to ignore the GETWCS request from the applications
+	process, which would result in both processes simultaneously waiting
+	for command input.  PRPSIO was interpreting both 1) redirection to a
+	disk file, e.g, >G, and 2) redirection to a graphics kernel IPC
+	channel, e.g., when writing to STDPLOT, as redirect cases.
+	The fix was to simply remove the check for a redirected stream,
+	leaving it up to the pseudofile i/o controller to decide whether
+	to ignore the requests.
+
+	2. Modified the pseudofile i/o controller to properly handle control
+	requests for a redirected graphics stream.  In particular, PUTWCS
+	and GETWCS are handled even if the stream is redirected to a file.
+	(5/31)
+
+sys/imio/db/idbfind.x
+sys/imfort/db/idbfind.x
+	In the third case, fixed length cards and a simple keyword with no
+	metacharacters, 'recno' was not being incremented for each card,
+	causing the wrong record number to be returned.  (5/31)
+
+dev/graphcap
+dev/cacheg.dat
+dev/cachet.dat
+	Fixed a really subtle bug in the standard Tek (4012) graphcap which
+	could result in vector data not being drawn when expected.  What was
+	happening is that a vector sequence would be output as GS pt-...-pt,
+	i.e., the last thing output to the terminal was a graphics vector
+	point.  An image cursor read was then performed with the confusing
+	result: no graphics vector!  What was happening was that the terminal
+	(gterm in this case, but it could happen with any terminal) was still
+	in vector-accumulate mode, waiting for the next tek-encoded point of
+	the vector.  This is not normally a problem because most interaction
+	is via the terminal, and any other type of output to the terminal 
+	would terminate and draw the vector sequence.  The fix was to add
+	the DE (draw-end) sequence to the 4012 graphcap, to output a GS at
+	the end of each polyline draw sequence.  This is harmless but as a
+	control code, serves to terminate vector-accumulate mode.  (5/31)
+
+sys/imfort/oif.h
+sys/imfort/imrnam.x
+sys/imfort/imcrex.x
+sys/imfort/imfgpfn.x
+sys/imfort/imfdir.x +
+sys/imfort/mkpkg
+	IMFORT has been modified to permit specification of the pixel file
+	directory by the calling program.  The modifications are completely
+	upwards compatible, i.e., existing programs linked with the new
+	interface will still create pixel files in the same directory as
+	the header file, with "HDR$" in the image header.
+
+	The Fortran programmer may set or query the pixel file directory
+	using the following routines:
+
+		imsdir (dir)		# set pixel directory pathname
+		imgdir (dir)		# get pixel directory pathname
+
+	where `dir' is a Fortran character variable.  The value should
+	be either "HDR$" (the default) or a concatenatable host directory
+	pathname (i.e., trailing / required for unix).  Once set, the
+	pixel directory will be used for all subsequent image create or
+	rename operations by the calling process.
+
+	For example,
+
+		call imsdir ("/tmp3/pixels/")
+		call imcrea (image1, axlen, naxis, dtype, ier)
+		call imcrea (image2, axlen, naxis, dtype, ier)
+
+	If desired the default pixel directory may be specified in the
+	host environment as `imdir' or `IMDIR' before running the program.
+	IMFORT will check the host environment for this environment variable
+	then use "HDR$" as the default if no host definition is found.
+
+	Note that although this is similar to setting the value of `imdir'
+	in the IRAF environment, IMFORT programs are not part of the IRAF
+	environment and are not affected by changes to the IRAF `imdir'.
+	Also, since IMFORT is a host level facility and IRAF networking is
+	not supported, the network prefix (e.g., "node!") is omitted,
+	and since IMFORT programs are not necessarily used in conjunction
+	with IRAF, the ".." files are not used to protect against image
+	deletion.  (6/1)
+
+sys/imfort/clargs.x
+	Upped the size of the token buffer from SZ_FNAME to SZ_CMDLINE,
+	to avoid truncating long string tokens.  (6/1)
+
+sys/imfort/db/impstr.x
+	Modified to allocate the entire card to string values longer than
+	21 chars (for string valued cards only).  (6/1)
+
+sys/imfort/doc/TODO +
+	Added a note to document the new im[gs]dir routines the next time
+	the IMFORT docs are updated. (6/1)
+
+sys/imfort/tasks/tasks.cl
+	Changed the iraf root in this debug file from /iraf to /usr/iraf.
+	(6/1)
+
+sys/imfort/tasks/tasks.cl
+sys/imfort/tasks/mkim.f
+	Added a fifth argument "pixdir" to MKIM (in both files), and a
+	call to IMSDIR if pixdir is given on the mkim command line.
+	If it is not given on the command line, no query is generated and
+	the default is used.  Ran some tests and everything appears to be
+	working.  (6/1)
+
+unix/sun/imtool.c
+unix/sun/imtool.man
+	1. Changed the default cursor marker to "none", i.e., by default a
+	cursor read will not make a mark on the screen.  This is more
+	appropriate now that we have more programs that read the interactive
+	image cursor, and the user can still enable marking if they with.
+	2. Blinking may now be controlled manually by typing ctrl/b while
+	the mouse is in the imtool window.  This is similar to ctrl/f
+	(next frame, the "alternate" key on a Sun-3 keyboard) or ctrl/r
+	(previous frame), except that only the frames in the blink list
+	will be displayed.
+	3. The F4 key may now be used (in addition to the frame menu) to call
+	up the setup panel.  (6/2)
+
+unix/sun/imtool.c
+	Looked up a color table and further extended the set of preassigned
+	IMTOOL graphics colors.  The full set is now as follows:
+
+		  0 = sunview background color (normally white)
+	      1-200 = frame buffer data values, windowed
+		201 = cursor color (white)
+
+		202 = black
+		203 = white
+		204 = red
+		205 = green
+		206 = blue
+		207 = yellow
+		208 = cyan
+		209 = magenta
+		210 = coral
+		211 = maroon
+		212 = orange
+		213 = khaki
+		214 = orchid
+		215 = turquoise
+		216 = violet
+		217 = wheat
+
+	    218-254 = reserved for use by other windows
+		255 = black (sunview foreground color)
+
+	Normally we would not publish such magic pixel values, but at present
+	one must know these numbers to select colors for prototype display
+	editing tasks such as TVMARK.  As before, only the frame buffer pixels
+	(grelevels 1-200) are windowed, hence the graphics colors will remain
+	constant regardless of how the image is windowed.  (6/3)
+
+lib/fio.h
+lib/fset.h
+sys/fio/fseti.x
+sys/fio/fstati.x
+sys/tty/ttygsize.x
+sys/tty/ttyread.x
+unix/hlib/libc/fset.h
+unix/hlib/libc/kernel.h
+unix/hlib/libc/stdio.h
+unix/os/zfiobf.c
+unix/os/zfiotx.c
+	The following changes were made with the immediate motivation of
+	eliminating the problem of STTY, HELP, etc. hanging up indefinitely
+	when the terminal type is set to gterm but the actual terminal is
+	something different, causing the screen size query to be ignored.
+	The solution was to have the screen size query time out after a
+	reasonable interval (currently 1 second).
+
+	Unfortunately there was no easy way to implement such a timeout,
+	so I had to do it by extending FIO to support nonblocking reads when
+	reading from a terminal in raw mode.  This is a very powerful
+	facility, permitting not only things like timeouts when waiting
+	for input, but also polling of the terminal for user commands from
+	within compute intensive applications, without having to suspend
+	execution waiting for a command to be typed, permitting new types
+	of interactive user interfaces to be developed.  My main worry in 
+	supporting this in the VOS is that it may be difficult to implement
+	on some systems, but since this is not an essential capability and
+	it can be implemented in both UNIX and VMS as well as most other
+	modern systems, this is proably not a serious problem.
+
+	1. Added a new flag F_NDELAY to <fset.h>.  This is used in conjunction
+	with F_RAW to enable nonblocking reads from a terminal in raw mode.
+	For example,
+
+		call fseti (fd, F_RAW, YES)
+
+	enables conventional blocking, single character raw mode reads, and
+
+		call fseti (fd, F_RAW, YES + F_NDELAY)
+	
+	enables nonblocking raw mode input (YES, NO, and F_NDELAY are bit
+	flags).  These modes are mutually exclusive, e.g., the first call may
+	be issued while nonblocking raw mode is in effect to make the reads
+	block, and vice versa.  A call to fset(fd,F_RAW,NO) disables both
+	raw mode and F_NDELAY.
+
+	Once nonblocking raw mode is in effect one merely reads characters
+	from the terminal in the usual way, using GETC or GETCI.  EOF is
+	returned if a read is performed when no data is available for input,
+	otherwise the next character is returned from the input queue.
+	Normally one would compute for a while or call ZWMSEC to wait a few
+	milliseconds, then poll the terminal again with GETC.  If nonblocking
+	i/o is not supported for a given device or host operating system the
+	GETC call should take an error exit until F_NDELAY is cleared for the
+	stream.  Although the use of EOF looks ambiguous, there should be
+	no ambiguity for interactive applications since ctrl/d, ctrl/z, ctrl/c,
+	etc. are returned as data characters when reading from the terminal
+	in raw mode.
+
+	2. The UNIX host level terminal (and text file) driver ZFIOTX was
+	modified to implement nonblocking raw i/o.  Upon receipt of the RAWON
+	sequence to initiate raw mode, the driver will now check for a
+	following N or B character to determine if nonblocking (N) or blocking
+	(B) raw i/o is desired.
+
+	3. TTYREAD, used by ttygsize to read from the terminal in raw mode,
+	was modified to perform the read in nonblocking raw mode, possibly
+	timing out after an interval in milliseconds specified by the calling
+	program.  If the timeout interval is given as zero a normal blocking
+	read (infinite timeout interval) is performed.  TTYGSIZE was modified
+	to call ttyread with a timeout interval of 1 second, and to print a
+	warning message if the read times out or otherwise fails to return
+	a valid screen size response for some reason.  Note that the screen
+	size query is only generated if the `qs' parameter is present in the
+	termcap entry for the device.
+	(6/3)
+
+unix/hlib/login.cl
+vms/hlib/login.cl
+	Deleted the "hit return if this hangs" message recently added to
+	the template login.cl files (along with the notes file entry for
+	same), since the timeout facility described above is a better
+	solution to the problem.  (6/3)
+
+vms/os/zfioty.c
+	Modified the VMS/IRAF terminal driver to support the new nonblocking
+	raw mode read feature.  This was done by using a special QIO request
+	to query the number of characters of typeahead, performing a blocking
+	read only if data is present in the typeahead buffer.  In the case of
+	UNIX, a nonblocking read is used, i.e., the read returns immediately if
+	no data is present in the typeahead buffer.  Both techniques accomplish
+	the same thing fairly easily (a few years ago it would have been
+	quite a trick to implement this feature on either system).  (6/3)
+
+unix/hlib/cl.csh
+unix/hlib/buglog.csh
+unix/hlib/irafuser.csh
+unix/hlib/mkiraf.csh
+	Changed all occurrences of $iraf/, $hlib/, etc., to ${iraf}, ${hlib}, 
+	etc., to avoid the double // which has a history of confusing users.
+	The disadvantage is that file accesses will fail if $iraf, $hlib, etc.
+	do not end in a /, but that can already happen in some cases anyhow.
+	(6/4)
+
+unix/os/zzstrt.c
+unix/shlib/mkshlib.csh
+	The shared library facility was modified to add a word to the shared
+	image header identifying the machine architecture for which the image
+	was linked.  At process startup time, ZZSTRT checks to see if IRAFBIN
+	is defined in the process environment, and if it hasn't been defined,
+	defines IRAFBIN and possibly IRAFARCH to match the architecture of
+	the shared library with which the process was linked.  This is
+	necessary in cases such as running an iraf process (e.g., irafks.e)
+	via the network, where no IRAF environment variables will have been
+	defined, and iraf$bin may point to a different architecture BIN than
+	that of the process being run.  (6/4)
+
+unix/os/irafpath.c
+	Modified irafpath (called by the HSI utilities to locate system files)
+	to use IRAFARCH rather than IRAFBIN to locate the system BIN directory
+	for the desired architecture.  (6/4)
+
+unix/boot/bootlib/mkpkg
+unix/boot/bootlib/ossettime.c
+unix/boot/bootlib/ossymlink.c +
+	1. Added a new bootlib routine os_symlink, used to test if a file is
+	a symbolic link, and if so conditionally return the link value.
+	2. Fixed a bug in os_settime, which would prevent it from setting
+	the modify time on files restored to disk with WTAR.  It appears
+	that this feature must never have worked.  (6/4)
+
+unix/boot/rmbin/rmbin.c
+	Modified RMBIN to check for and ignore symbolic links.  Since symbolic
+	links are now used routinely as part of Sun/IRAF to implement support
+	for multiple architectures, we don't want rmbin deleting them, or
+	jumping outside a directory tree to follow links looking for files to
+	delete.  (6/4)
+
+unix/boot/rtar/rtar.c
+unix/boot/wtar/wtar.c
+	Modifed WTAR/RTAR to treat symbolic links properly, i.e., they are
+	saved in the archive as links and restored as links, rather than
+	saving or descending into files possibly outside the directory tree
+	being archived.  (6/4)
+
+unix/bin +
+unix/mkpkg.sh
+unix/os/mkpkg.sh
+unix/bootlib/mkpkg.sh
+unix/hlib/libos.a -> unix/bin/libos.a
+unix/hlib/libboot.a -> unix/bin/libboot.a
+	1. As part of the support for multiple architectures are compile time,
+	the HLIB libraries libos.a and libboot.a were moved to bin.mc68020,
+	and a symbolic link host$bin was added to point to this new BIN.
+	2. The file host$mkpkg.sh, called at the beginning of a bootstrap,
+	was modified to create the link host$bin pointing to the BIN for the
+	architecture for which the HSI is being compiled.
+	3. The os and bootlib mkpkg.sh files now move the libraries into
+	HBIN rather than HLIB to avoid clobbering the links in HLIB.  (6/4)
+
+unix/shlib/mkpkg
+lib/libmain.o -> bin/libmain.o
+lib/lib*.a -> bin/lib*.a
+bin/OBJS.arc
+	As part of the support for multiple architectures are compile time,
+	these architecture dependent files were moved from LIB to BIN for
+	the core system architecture, being replaced by ../bin symbolic
+	links in LIB.  This makes the files still appear to be in LIB,
+	allowing the mkpkg "$checkout file lib$" style commands to continue
+	to function for core system maintenance.  The use of ../bin links
+	means that the LIB links do not have to be modified when the core
+	system architecture is changed, since the BIN link suffices to
+	select the correct architecture libraries.
+
+	The OBJS.arc files no longer contain any of the LIB files, since the
+	latter now permanently reside as files in the BIN.  This automatically
+	provides the ability to link external (non core system) programs or
+	packages for any supported architecture, since the system (irafpath)
+	searched the IRAFARCH BIN and HBIN before searching LIB and HLIB.
+
+	To develop software for a given architecture one need only define
+	IRAFARCH in their UNIX environment, and compiling, linking, and
+	execution of the resultant executables will proceed as expected.
+	On Sun-3 systems one must also define FLOAT_OPTION, which should
+	have the same value as IRAFARCH.
+
+	For example, one could put the following in their .login file:
+
+	    alias setarch 'setenv IRAFARCH \!*; setenv FLOAT_OPTION \!*'
+	    setarch f68881
+
+	Then typing "setarch ffpa" before compiling a program from scratch
+	will cause an ffpa program to be compiled.  This should work for
+	IMFORT programs compiled with FC as well as IRAF/SPP programs.
+
+	An added benefit of this revision is that the OBJS.arc file is much
+	smaller, and changing the architecture of the core system, e.g.,
+	with "mkpkg ffpa" is somewhat faster.  External packages which are
+	configured to support multiple architectures should be set up the
+	same way if their LIB contains any architecture dependent files
+	(the noao LIB doesn't).  (6/4)
+
+mkpkg
+bin.pg +
+sys/mkpkg
+unix/hlib/mkpkg.inc
+unix/shlib/mkshlib.csh
+	Added a new architecture option "pg".  This provides a -pg profiled
+	version of the system libraries and objects for profiling applications
+	programs with "gprof" (will only be supported on the tucana development
+	system).  (6/5)
+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	Modified these files to configure the IEEE hardware properly for IRAF
+	programs, using the new facilities available in recent versions of
+	SunOS, i.e., ieee_flags() and ieee_handler().  By default the IEEE
+	hardware is now configured, on all Sun systems, with the invalid,
+	overflow, and divzero IEEE exceptions enabled, and with the default
+	rounding direction and precision modes (nearest, extended) in effect.
+	This configuration should ensure that all questionable floating
+	point operations are detected, and that no IEEE "funny numbers"
+	(NaN, Inf, etc.) get into the data.
+
+	If desired, one can change the default rounding direction and
+	precision (e.g., to test the numerical stability of applications)
+	by using the debugger to set a nonzero value of the variable
+	"debug_ieee" before running an executable.  The defined bitflags
+	are as follows (in octal):
+
+		0001	/* round toward nearest */
+		0002	/* round toward zero */
+		0004	/* round toward negative infinity */
+		0010	/* round toward positive infinity */
+		0020	/* round to extended precision */
+		0040	/* round to ieee double precision */
+		0100	/* round to ieee single precision */
+
+	For example,
+
+		% adb -w xx.e
+		debug_ieee?w 0o104
+
+	would set round toward negative infinity, single precision.
+	The sun-defined default at process startup is equivalent to 021.
+	(6/5+sro)
+
+pkg/images/tv/display/imdrcur.x
+	Modified to use stg_putline/stg_getline to implement i/o to the
+	terminal for colon command queries, to ensure proper interaction
+	with the graphics device when image cursor reads and graphics are
+	mixed.  It might be better, though, to deactivate the workstation
+	before reading the image cursor so that image cursor colon queries
+	are consistently handled by the text window.  In the future image
+	cursor colon queries will appear on the "status line" of the display
+	window, as for a graphics cursor colon command, but in the meantime
+	the text window is used.  (6/5)
+
+unix/hlib/libc/kernel.h
+unix/os/zfiotx.c
+unix/os/zfiopr.c
+unix/os/zfiomt.c
+unix/os/zfioks.c
+unix/os/zfiobf.c
+unix/os/zoscmd.c
+unix/os/zopdpr.c
+	1. Delete the _NFILE definition from kernel.h and changed all
+	references to this definition to use MAXOFILES instead.  A fixed
+	allocation of MAXOFILES=64 kernel file descriptors is now allocated,
+	rather than trying to set the value appropriate for the host OS,
+	which is too prone to error.
+	2. In several of the device drivers there were arrays such as
+	pr_ionbytes[fd], etc., which appeared to duplicate storage already
+	available in the kernel file descriptor array.  Changed these to
+	use the kernel file descriptors instead, e.g., zfd[fd].nbytes, since
+	once a host file descriptor is assigned to any driver it is reserved
+	and cannot be used elsewhere.
+	3. To every open procedure in the device drivers, which calls a host
+	routine to open a file descriptor, I added code to check that the
+	resultant descriptor is less than MAXOFILES, to prevent overflow of
+	the descriptor array if a given host system should happen to have
+	more per-process file descriptors than the statically allocated
+	iraf descriptor array can handle.  It would be possible to modify
+	the kernel to query the host system at startup time and dynamically
+	allocate the descriptor array, but I don't think such modifications
+	are worth the effort and risk at the present time.  (6/6)
+
+unix/boot/spp/xc.c
+	Following the recommendation of the Sun docs, changed the host library
+	link sequence in XC from "-lF77 -lI77 -lm" to "-lm -lF77 -lI77 -lm".
+	Although we could not see any difference in testing, this can
+	reportedly result in use of objects from -lm which are compiled for
+	the current floating point option, whereas the equivalent modules
+	in -lF77 are compiled for software floating point.  In all the cases
+	examined of executables linked with the standard library sequence
+	I could not find any software floating point, but there is indeed
+	only one -lF77, rather than one for each float option as in the case
+	of -lm, and it cannot hurt to try this.  (6/6)
+
+unix/os/zzstrt.c
+unix/boot/bootlib/vfn2osfn.c
+	I added a call abrupt_underflow() to ZZSTRT, called during process
+	startup to configure the IEEE hardware, among other things.  The call
+	to abrupt_underflow causes machines equipped with Weitek floating point
+	hardware to convert subnormal results or operands (numbers smaller than
+	can be represented within the machine precision) to underflow abruptly
+	to zero, rather than signalling the host cpu for recomputation via a
+	software exception handler to compute the correct IEEE value.  This is
+	contrary to the IEEE standard, but consistent the behavior of most
+	non-IEEE floating point hardware, and much faster, e.g., if software
+	recomputation is not disabled, in certain pathological cases a code
+	which normally takes 10 seconds to execute might instead take 3 hours!
+	(6/6)
+
+vms/hlib/gripes.cl
+	Changed an "iraf@lyra" to "iraf@noao".  (6/6)
+
+unix/os/zxhwen.c
+	The new IEEE stuff didn't work for the ffpa version of the system -
+	the FPE_FPA_ERROR exception was not being caught, but was instead
+	being dealt with by ieee_handler/sigfpe by an abort with core dump.
+	This exception is routinely generated during process startup to
+	initialize the hardware; it was causing ffpa executables to abort
+	with a core dump during process startup.  Upon more careful examination
+	it is evident that ieee_handler only traps some of the FPA exceptions
+	(the IEEE standard ones), with the rest all causing the default
+	action of abort with a core dump.  This is hardly what IRAF wants -
+	we want to trap all FPA exceptions - so I went back to the old
+	version of ZXWHEN, which uses SIGNAL to post an iraf handler to
+	intercept all FPE exceptions, IEEE standard or otherwise.
+
+	A call to ieee_flags in ZZSTRT is still used to enable the special
+	IEEE exceptions (divzero etc.) at startup time.  I don't think there
+	will be any problem with this, as it is clear that ieee_flags can be
+	used to just set flags in the fpu hardware, while signal/sigfpe
+	perform the complementary action of posting exception handlers.
+	The call to ieee_flags in ZZSTRT enables the IEEE exceptions and
+	posts the standard abort exception handler to catch them; a later
+	call to signal in ZXWHEN replaces the abort handler by the iraf
+	handler for the IEEE exceptions, and posts the iraf handler for the
+	remaining SIGFPE exceptions as well, including all those ignored by
+	ieee_handler. (6/7)
+
+unix/os/zxwhen.c
+	Updated the list of hardware exception codes and associated error
+	messages to include a couple new sparc codes, all the 386i codes
+	(previously omitted it appears), and a few miscellaneous codes.
+	(6/7)
+
+unix/os/alloc.c
+	This routine had a security loophole that could allow any user to
+	get read/write access to any file in /dev.  The fix, in the deallocate
+	code, was to do nothing to the file if it is already owned by root.
+	If the file is not owned by root, then it can be "deallocated" only
+	if it is owned by the user.  Since a file can be "allocated" to a
+	user only if the file is owned by root and has mode 666, it does not
+	appear that there are any security loopholes left.  (6/7)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkfloat.csh
+	Changed the statement
+
+		$set MACH = f68881		(or whatever)
+	
+	in hlib$mkpkg.inc, to
+
+		$set MACH = $(IRAFARCH)
+
+	i.e., the mkpkg architecture option now defaults to whatever the
+	user has set in their environment (or on the mkpkg command line),
+	rather than tracking the current architecture of the core system,
+	which is irrelevant for an external package if multiple architecture
+	support means anything.  Commented out the statements in mkfloat.csh
+	which edit mkpkg.inc to set the default architecture.  (6/7)
+
+noao/mkpkg
+noao/bin.pg +
+	Added a bin.pg (-pg profiled version of the noao binaries) to noao,
+	to save having to recompile entire packages if anyone should ever
+	want to profile an noao task.  Also added an entry for the i386
+	architecture to the mkpkg.  (6/7)
+
+pkg/system/references.cl +
+pkg/system/doc/references.hlp +
+pkg/system/system.cl
+pkg/system/system.men
+pkg/system/system.hd
+	Added a new task REFERENCES to the system package.  References is
+	used to search the help database for all tasks or other help modules
+	pertaining to a given topic (like the old BSD apropos).  By default
+	the entire help database is searched at runtime, but a quick-reference
+	file may be prepared and used to speed further searches if desired.
+	(6/7)
+
+pkg/system/help/t_hdbexamine.x
+	Increased the size of the "helpdb" buffer from SZ_FNAME to 256 chars,
+	to avoid truncation of the helpdb value which is now a list of files
+	rather than a single file.  (6/8)
+
+-----------------
+Updated orion (includes bug fixes below).  (6/8-9)
+
+unix/os/zfiopr.c
+	The new version of this file is failing with an apparent optimizer
+	bug on the Sun-4, though it has been in use without problem on the
+	Sun-3 for several days.  Lacking time to investigate further, and
+	since the revison was minor, I have restored the original version
+	for now.  (6/9)
+
+pkg/system/system.cl
+pkg/system/references.cl
+	1. The SYSTEM package now loads the LISTS package.
+	2. The REFERENCES task was modified to run the one-liner output
+	through sort|uniq to get rid of duplicate entries in the "help *."
+	output (these are due to a bug which it is too risky to fix this
+	close to a major release).  This also has the advantage of producing
+	a nice sorted output.  (6/9)
+
+-----------------
+Updated irafx@draco.  (6/9)
+Updated 386i.  (6/11)
+
+dev/termcap
+	Added "vt35", a 35-line vt100 emulator compatible with Apollo's
+	vtserver in a (746,700) pad.  (6/13 SRo)
+
+dev/termcap
+dev/graphcap
+dev/devices.hlp
+	Added entries as suggested by Joe Harrington, MIT Planetary Science
+	Group.  A default printer was added to graphcap, as determined
+	by the lpr program without specifying a -P argument.  Also added
+	a psdump facility, where the PostScript file is dumped to a file
+	in /tmp.  Added to termcap a default printer and a device 'enscript',
+	which prints output from the UNIX enscript program on the default
+	printer.  The default printer was added to devices.hlp.  (6/15 ShJ)
+
+dev/termcap
+dev/graphcap
+	Cleaned up XTERM entries, including submissions from Rick McGonegal
+	and Joe Harrington (chose McGonegal's model, status line in graphics
+	window, as default).  Renamed old xterm entries for kludged X10 ixterm
+	to "xterm-old".  Note for Ultrix installation guide.  New entries
+	should work with all normal, vendor-supplied X11 xterms (except for
+	brain-damaged X11R2), but not with kludged ixterm.  NOTE: Must
+	re-cache after testing, before cutting tapes!  (6/15 SRo + ShJ)
+
+vms/uis/* +
+	Added a new directory UIS off iraf$vms, containing the NEWUISDISP
+	program for displaying images under the VMS UIS window system.  (6/16)
+
+unix/os/zzstrt.c
+	Modified the startup code to redefine IRAFARCH if it is defined but
+	does not match the architecture of the executable being run, i.e.,
+	IRAFARCH is defined as f68881, but one runs $iraf/bin.ffpa/x_system.e.
+	Formerly this would cause the shared library code to attempt to use
+	the f68881 shared image with the ffpa executable, causing the process
+	to core dump.  It will work properly now, but IRAFARCH is redefined
+	for the process being run and any of its children.  (6/16)
+
+sys/tty/ttygsize.x
+sys/tty/ttyread.x
+	Made some changes to reduce the probability of the "timeout - terminal
+	type set wrong?" warning message appearing except when the terminal
+	type really is set wrong.  The warning message could be improperly
+	issued either if the timeout interval was too short, or if the read
+	was garbled (more likely), e.g., by the user typing during the read.
+	ttyread was modified to discriminate between a timeout (status 0) and
+	a garbled read (status ERR).  ttygsize was modified to increase the
+	timeout interval from 1 to 2 seconds, and to issue the timeout message
+	only if a timeout actually occurs.  Garbled reads are ignored, with
+	the expectation that a subsequent screen size query will either succeed
+	or timeout successfully and warn the user about the terminal type if
+	it is set wrong.  (6/17)
+
+pkg/images/tv/display/t_dcontrol.x
+pkg/images/tv/cv/ids/idsopen.x
+	Modified the TV tasks (cv, cvl, and everything that uses dcontrol)
+	to check if the display device is a server, and if so, exit with an
+	error message if an operation is attempted which is not currently
+	supported for the server devices such as IMTOOL.  (6/17)
+
+dev/termcap
+dev/devices.hlp
+	1. Added an alias `vmslp' for `vmsprint'.
+	2. Changed the name of the logical printer device which directs
+	output to the unix lpr program (and hence to the default PRINTER
+	device) from `dp|dpp|default' to just `lpr', since the output is
+	being directed to lpr.  The devices.hlp comments were not accurate,
+	as lpr is not restricted to Postscript devices, and a default device
+	will be selected even if PRINTER is not defined in the user environment.
+	3. Changed the device entry `udp' to `g-lpr'.  Deleted entry `sdp'.
+	There was no `vdp'.  I also noticed that for some reason the #lines
+	capability was specified as 60 lines for all the U and V entries for
+	the Apple laserwriters, but 66 for the Sun entries, so I changed all
+	entries to 66.
+	3. Changed device `uenscript' to `g-enscript'.  The problem is that
+	the U prefix cannot be used for a device unless there are also S
+	and V entries, otherwise a bad termcap will result when the termcap
+	is moved to another system and all the "=u" prefixes are changed to,
+	e.g., "=v" in the file header.  (6/18)
+
+dev/termcap
+	Changed the #lines for the imagend entries from 60 to 64.  I don't
+	know what the real device limit is, we should check on that.  (6/18)
+
+vms/hlib/zzsetenv.def
+unix/hlib/zzsetenv.def
+	Tentatively, changed the default printer to versatec and the default
+	stdplot to lw5 for draco and tucana.  For orion we should probably
+	use versatec/lw1 or maybe lw1/lw1 if most naive orion users are
+	expected to be working in the basement.  It is probably hopeless to
+	try to please everyone with these defaults; setting the defaults on
+	a per account basis in the loginuser.cl is probably the only approach
+	that can hope to provide the best defaults for each class of user.
+	Also, changed stdimage to imt512 on tucana; is still set to iism70c
+	on draco.
+
+	I think the best solution to this problem is to dynamically assign
+	output devices at login time, based on the location of the workstation,
+	e.g., people working in one of the basement labs would be assigned
+	the basement laserwriter, people working in the upstairs iraf lab
+	would be assigned the imagen near the lab, users in the staff offices
+	would get the versatec/lw5, etc.  A single entry in the login.cl which
+	would conditionally call a host task to determine the optimim default
+	output devices would do the job.
+
+	Also, we could do away with the irritating loginuser.cl file by
+	allowing a user space directly in the login.cl file, and preserving
+	this by some sort of diff/merge operation when the file is updated
+	by mkiraf.  (6/18)
+
+unix/sun/imtool.c
+	1. Fixed the problem that would cause IMTOOL to scribble outside the
+	imtool window when painting the imtool window under zoom.  This was
+	occurring because, for speed reasons, imtool writes to the raw frame
+	buffer when zooming, and if other windows (e.g., the clock) also
+	write to the frame buffer during the repaint operation, writing will
+	continue at the wrong position on the screen after the interrupt.
+	The solution is to lock the screen during the repaint operation.
+
+	2. When repainting the display window while zooming, the area of the
+	bottom of the window could be overwritten.  This would be most
+	noticeable at high zoom factors, and was due to the last block of
+	"zoom" lines being more lines than there was space left for in the
+	window.  Added logic to write a partial block if necessary to avoid
+	writing beyond the bottom of the window.  (6/18)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/iisopn.x
+pkg/images/tv/display/imdgcur.x +
+pkg/images/tv/display/imd.com +
+	The TVMARK program, when used with an IIS, would get a "cannot open
+	device" error when trying to do an image cursor read.  This was
+	occuring due to an attempt on the part of the CL and TVMARK processes
+	to simultaneously open the same physical device, due to the way the
+	interim display interface is implemented.  UNIX allows most files or
+	devices to be mutliply opened, e.g., this is ok for the IMTOOL fifos
+	and doesn't cause any conflicts, but the IIS device driver does not
+	permit more than one open at a time.  The workaround was to add a new
+	routine IMD_GCUR, which is a front end to CLGCUR which is functionally
+	equivalent and has an identical calling sequence.  This should be used
+	instead of CLGCUR in programs which directly map the display.  The
+	function of IMD_GCUR is to close the channel to the physical device,
+	call CGCUR to read the image cursor, and then reopen the device
+	channel for additional frame buffer i/o.  (6/19)
+
+sys/fio/close.x
+	Modified to not attempt to close the physical device if F_CLOSFD is
+	set on the stream and the physical device is therefore already
+	closed.  This was causing an error at IMUNMAP time in the IMD feature
+	implemented above.  (6/19)
+
+unix/hlib/utime +
+vms/hlib/utime +
+unix/hlib/install
+pkg/cl/pfiles.c
+	Modified the CL pfile read mechanism to look at the system update or
+	install time as well as the package pfile modify time, using whichever
+	event was more recent, when deciding whether to use the package pfile
+	or the user (uparm) pfile.  If the package pfile is used the user
+	pfile is scanned, preserving the user defaults for the parameters
+	which exist in both the old and new pfiles.  This fix (using hlib$utime
+	to mark the system update time) gets around a problem in the pfile
+	merge code, which would cause out of date user pfiles to be used
+	instead of the "newer" package pfiles, due to the package pfiles
+	having been modified in a different version of the system.  (6/19)
+
+pkg/images/tv/display/iispio.x
+pkg/images/tv/display/imdrcuro.x
+	1. Modified to copy the xferid field out of the IIS header before byte
+	swapping the header.  Formerly the header was being conditionally byte
+	swapped (e.g., for the IIS) before accessing the xferid field, causing
+	a read/write bit test to fail.
+	2. Modified the non-server (IIS) cursor read code to not do cursor
+	marking during cursor reads as the default, like IMTOOL.  Cursor
+	marking can be enabled by typing a ctrl/m while reading the image
+	cursor, after which subsequent ctrl/m's toggle cursor marking.  (6/19)
+
+sys/imio/iki/ikirename.x
+	Modified iki_rename (imrename) to allow the extension of an image
+	to be changed in a rename operation, provided the new extension is
+	a legal extension for the image.  This is to allow changing the
+	extension of STF images in rename operations.  (6/19)
+
+sys/fio/fntgfn.x
+	1. Fixed a bug that was preventing use of list files not in the current
+	directory, e.g., @/path/listfile.  The problem was that the code
+	which parses a template into directory prefix and file matching
+	pattern fields was being used to attempt to do the same for list
+	file names; in the case of a list file referenced by pathname,
+	only the directory prefix was being used as the list file name,
+	with the filename of the list file being taken to be the pattern.
+	The fix was to take the whole token folowing the @ to be the list
+	file name.  This prevents use of a pattern to match elements of a
+	list but that is probably not an important feature anyhow, and
+	additional syntax would have to be devised to provide this for
+	list files, due to the difficulty of telling where the list file
+	name leaves off and the pattern begins.
+
+	2. Replaced a couple of gstrcpy() calls by calls to nowhite(), to
+	strip any whitespace from filenames output by fntgfn.  (6/20)
+
+sys/vops/arav.gx
+	Now checks for a zero or near zero sigma and exits the iterative
+	rejection loop if this condition occurs, avoiding a case where an
+	infinite loop could potentially occur.  (6/20)
+
+sys/etc/qsort.x
+sys/vops/asrt.gx
+	Increased LOGPTR from 20 to 32, raising the size of the array that
+	can be sorted in a worst case scenario from 1e6 to 4e9.  (6/20)
+
+sys/vops/awvg.gx
+	Replace the statements
+
+	    mean = sum / ngpix
+	    temp = sumsq / (ngpix - 1) - sum ** 2 / (ngpix * (ngpix - 1))
+	
+	by the equivalent statements
+
+	    mean = sum / ngpix
+	    temp = (sumsq - mean * sum) / (ngpix - 1)
+
+	which should be more numerically stable.  (6/20)
+
+sys/gio/sgikern/sgipm.x
+	Corrected a logic error that would have prevented points from being
+	drawn in point polymarkers.  (6/20)
+
+unix/os/zwmsec.c
+	The code used to calculate the timer interval in seconds and
+	microseconds, originally written for maximum clarity, could result
+	in integer overflow for time intervals larger than about 35 minutes.
+	Modified these expressions to calculate the same thing avoiding
+	excessively large intermediate terms.  (6/20)
+
+unix/sun/gtermio.c
+	In an attempt to avoid the "cursor-walk" problem, where successive
+	transformations between tektronix and window coordinates cause the
+	cursor to creep to smaller values, I modified the coordinate
+	transformation code in gtermio.c to employ an integer rounding to
+	nearest scheme.  This is done by adding N/2 before dividing by N,
+	N being an integer.  I want to avoid using floating in computationally
+	intensive parts of this code, as the terminal server is sometimes
+	compiled with software floating point since it must be portable to
+	all machines in a class.  (6/20)
+
+----------------
+Updated serpens.
+Updated irafx@draco.  (6/20)
+
+unix/os/zxwhen.c
+	Added #ifdef SUNOS4 ... #endif around some new exception codes that
+	turn out to only be defined for OS-4.  (6/20)
+
+vms/hlib/zzsetenv.def
+	Updated as for Sun/IRAF - V2.8EXPORT, added fmio, qpoe, etc.
+	definitions, and so on.  (6/20)
+
+unix/hlib/mkfloat.csh
+	Added code to check if the user has IRAFARCH defined, and if so, warn
+	the user if their IRAFARCH setting does not match the architecture for
+	which a directory tree has just been configured.  (6/21)
+
+{math,pkg,sys,unix}*.c
+{math,pkg,sys,unix}*.gc
+{math,pkg,sys,unix}*.x
+{math,pkg,sys,unix}*.gx
+	Added a copyright notice to all these core system source files.
+	The notice reads as follows:  "Copyright(c) 1986 Association of
+	Universities for Research in Astronomy Inc".  We also plan to add
+	a file called COPYRIGHT later stating the terms of the copyright
+	and associated licensing agreement for the software.  The intent
+	is only to protect the software from unauthorized commercial
+	exploitation, and the copyright grants, or will grant, the right to
+	copy, modify, and redistribute the software provided the original
+	copyright notice remains intact, and the rights we grant are passed
+	on with the software.  We wish to prevent others from copyrighting
+	the software in their own name and possibly taking away the rights
+	we grant with the software.
+
+	This is not to say that we want to encourage people to modify and
+	redistribute IRAF software, we merely want them to have the legal
+	right to do so if they feel they need to.  The NOAO packages are not
+	similarly copyrighted at the present time although that may change
+	in the future.  (6/21)
+
+vms/*.c
+vms/*.x
+	Inserted the same copyright notices into the VMS/IRAF HSI source files.
+	Also updated all the {math,pkg,sys} files on VMS/IRAF to propagate
+	the copyright insertions for those files (which retain the old modify
+	dates).  (6/21)
+
+------------------
+Updated orion.  (6/22)
+
+dev/hosts
+	Updated the entries for the U of A sites.  (6/23)
+
+pkg/plot/t_gkixt.x
+	Had to restore the old version of this program, due to a bug in the
+	new version which there was inadequate time to fix.  In the process,
+	increased the built-in MAX_FRAMES limit from 500 to 2048.  (6/23)
+
+sys/gio/ncarutil/hafton.f
+	Fixed an apparent bug in the HAFTON code.  A reference off the end
+	of an array was occuring due to a limit check not being performed
+	before using an index.  This would normally go undetected although
+	it could cause the program to misbehave; it was finally discovered
+	because the out of bounds data happened to trigger a reserved operand
+	fault in the floating point unit.  (6/23)
+
+bin.f68881/libm.a +		[OS-3 only]
+bin.ffpa/libm.a +		[OS-3 only]
+unix/boot/spp/xc.c
+	XC was modified to search the IRAF directories for UNIX system
+	libraries, before passing the library reference on to the host
+	system.  This allows one to have custom versions of the host libraries
+	for IRAF, as is sometimes necessary to work around bugs in the host
+	system.
+
+	The specific case for which this was implemented was to workaround the
+	"atan2" class of bugs present in OS3: in that version of SunOS, the
+	host system trig function routines assumed that the IEEE exceptions
+	had been disabled, and would abort with, e.g., divide by zero
+	exceptions given perfectly legal inputs if the IEEE exceptions were
+	enabled.  The solution was to take the f68881 and ffpa versions of
+	the "-lm" library from SunOS-4 and put these in the bin.f68881 and
+	bin.ffpa directories in IRAF (I had to add a copy of ieee_globals.o
+	from -lc to -lm to get this to work).  XC will now use these versions
+	of the libraries instead of the host system versions if it finds them
+	in a system directory.  The BIN directories are used so that the
+	versions of the routines optimized for specific floating point hardware
+	can be used.  In IRAF for SunOS-4 we merely leave out the custom
+	libraries and the standard host libraries will be used instead. (6/23)
+
+unix/os/zzstrt.c
+	Changed the fpmode() flags (used for SunOS-3 only) slightly to reflect
+	what fpmode returns under OS-4 for our current ieee settings on that
+	system, make using ieee_flags().  The fpmode() flags are undocumented
+	so I was really only guessing when I selected the flags to be set
+	originally; now that we have ieee_flags(), which is documented,
+	we can determine the desired fpmode flags empiricially.  The result
+	was that 3 out of 4 of the flags we were setting were correct, but
+	there were a couple others that weren't being set - cannot tell
+	exactly what they do on OS-3.  (6/23)
+
+vms/hlib/install.com
+vms/hlib/install.lst
+	Replaced the old install.com, which merely runs INSTALL and feeds it
+	install commands, by a more sophisticated script (written by Nigel
+	Sharp) which checks to see if an image is already installed and
+	deinstalls it before installing the new version.  (6/23)
+
+local/.login
+local/.rootmenu
+local/.sunview
+local/.suntools
+local/.ttyswrc
+local/.defaults
+	These files, which define the SunOS window environment, were updated
+	to reflect the latest capabilities of IRAF and SunView.  The default
+	screen layout was optimized for scientific use with an image display
+	and graphics.  The text window is 32 lines, with an image window of
+	the same height alongside, and a long graphics window below, with no
+	overlap on any of the windows.  The display window is smaller than
+	512 in both dimensions and it is assumed that pan will be used to view
+	the image ("fitframe" is not recommended for normal use).  There are
+	two text windows, exactly overlaid so that an L5 may be used to toggle
+	between them.  The blue window is a cshell window and the red window
+	runs a CL.  The graphics windows associated with each text window are
+	also overlaid, and are different colors, one blue and the other
+	burgundy.  Also, just to show people how, I set up a fully-featured
+	rootmenu, and made the windows and background colored.  The .login
+	contains the new `setarch', IRAFARCH, etc., plus a switch/case to
+	setup the architecture properly on different types of workstations.
+	(6/23)
+
+dev/memacs.ed +
+	Added a new edcap file for Micro-Emacs (a commercial Emacs available
+	for Unix, VMS, and PCs).  Contributed by Bernie Simon at ST.  (6/23)
+
+----------
+Updated pegasus (386i); incremental updates of everything else (serpens,
+draco, orion, tucana).  (6/23)
+
+unix/hlib/mkpkg.sf.S34
+unix/boot/mkpkg/sflist.c
+vms/boot/mkpkg/sflist.c
+	1. Testing of IRAF for SunOS-3 revealed a bug which was traced to a
+	host Fortran compiler optimizer bugf which was caused by a file on
+	the special file list not being compiled as directed; this was due
+	to a typo in the entry for the file in mkpkg.sf.S34 (in the entry
+	for images/lib/ranges.x, there was a "...:" instead of a "...":).
+
+	2. In the process of locating the problem with the special file list
+	entry I also discovered a bug in the special file list code in MKPKG
+	itself.  The bug was the redefinition of the global string buffer
+	pointer "cp" in the special file list code.  This could cause the
+	special file list to be pruned improperly, discarding all special
+	file list entries in the case which led me to discover the bug. (6/24)
+
+-------------
+Tapes cut from serpens and draco and sent to ST for testing.  (6/24)
+
+sys/pmio/pmrop.x
+sys/pmio/pmsten.x
+	Corrected a typo: IM_LEN(PM_REFIM(pm,1)) -> IM_LEN(PM_REFIM(pm),1).
+	(6/24)
+
+unix/sun/imtool.c
+	The get-WCS function was modified slightly to prevent it from creating
+	a new frame buffer when the WCS for a nonexistent frame is queried.
+	The string "[NOSUCHFRAME]" is returned if the frame does not exist.
+	This allows use of the WCS query to determine how many frames the
+	server is currently configured for.  (6/26)
+
+unix/sun/imtool.c
+	1. Zooming during a cursor read no longer undoes the blinking round
+	cursor style used to indicate a cursor read.
+	2. Zoom factor input is checked to prevent negative or zero zoom
+	factors, and enforce the 8 zoom factor limit.  (6/27)
+
+pkg/images/tv/display/imdrcuro.x
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdwcs.x
+	A `status' argument was added to imd_getwcs and iw_open to allow one
+	to determine whether the WCS for a frame was successfully retrieved.
+	A valid WCS is always returned; the unitary WCS is returned if the
+	display WCS could not be retrieved for any reason, in which case
+	status will be ERR.  (6/27)
+
+vms/os/zxwhen.c
+	Modified to enable ctrl/c interrupt handling only for processes which
+	are flagged as type interactive by VMS (requested by ST for use of
+	iraf processes in the SOGS pipeline, following last minute checkout
+	of the semi-frozen system.)  (6/28)
+
+unix/sun/imtool.c
+	1. Modified the logic used to determine the format for the coord output
+	box.  'g' format is used for the pixel value only if the zrange is too
+	large for 'f' format.
+	2. The 0.5 pixel coordinate offset is now added only if the image was
+	loaded into the frame buffer without display task zoom.  (6/28)
+
+vms/uis/*
+	Installed a new version of the UISDISP display program for VMS/UIS.
+	This is linked with the new IMFORT and has been tested successfully
+	on both VMS-4.7 and VMS-5.  (6/28)
+
+pkg/images/display/imdgcur.x
+pkg/images/display/iisopn.x
+	Testing of imexamine revealed a subtle bug in imd_gcur.  This routine
+	closes the display channel then reopens it in order to free the device
+	for the cursor read.  It was not checking first to see if the channel
+	was still open, hence could do a close on a channel that was either
+	not open, or open by somebody else.  The routine was modified to use
+	the device open count to avoid the close/reopen if the channel is not
+	in use.  (6/28)
+
+mkpkg
+noao/mkpkg
+bin.generic +
+IRAF.SUNOS4 +
+noao/bin.generic +
+	Added an entry "generic" to the root mkpkg.  Typing "mkpkg generic"
+	sets the architecture to "generic" (bin.generic), a special case
+	which never has any binaries.  The effect is to remove all architecture
+	dependent binaries from the core system and make all the real BINs
+	equal, i.e., complete including the OBJS.arc file.  A subsequent
+	mkpkg f68881, mkpkg ffpa, mkpkg sparc, etc., may be used to configure
+	the core system (or noao system) for development for a given
+	architecture.  (6/28)
+
+unix/hlib/login.cl
+vms/hlib/login.cl
+	The template login.cl was modified to delete any old WCS files (as
+	well as MTIO lok files) at login time, to prevent the system from
+	thinking that an image loaded in some earlier session is still loaded.
+	Also, in the commented out section at the end which loads optional
+	packages, replaced the `tv' by `proto', since proto now loads TV but
+	contains important display tools of its own.
+
+unix/sun/imtool.man
+	Updated the manual page for IMTOOL (zoom, graphics colors, etc.)
+
+--------------------------
+IRAF V2.8 frozen.  Updates of all systems begun.  (6/28)

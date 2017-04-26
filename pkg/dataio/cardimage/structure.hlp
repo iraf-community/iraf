@@ -1,0 +1,139 @@
+.help cardimage Jan85 dataio
+.sh
+RCARDIMAGE Structure Chart
+
+.nf
+t_rcardimage()
+# Returns when file list is satisfied or EOT is encountered.
+
+	cardfile_to_textfile (in_fname, out_fname, nlines, ncards)
+	    
+	    fetchcard (fd, outline, ncards)
+	    # Returns number of chars read or EOF
+
+		card_to_text (fd, instring)
+		# Returns number of chars or EOF
+
+		    conversion routines
+.fi
+
+.sh
+WCARDIMAGE Structure Chart
+
+.nf
+t_wcardimage()
+# Returns when file list is satisfied.
+	
+	textfile_to_cardfile (in_file, out_fname, ncards, nlines)
+	
+		fetchline (fd, linebuf, nlines)
+		# Returns EOF or number of chars read
+
+			text_to_card (line, nchars, card)
+
+			    conversion routines
+.fi
+.sh
+RCARDIMAGE Structure Summary
+
+.ls t_rcardimage
+The main procedure reads the control parameters.
+The files to be read and converted are calculated from the specified source
+and file list. A loop trough the files determines the specific input
+and output filenames and calls CARDFILE_TO_TEXTFILE for each conversion.
+.ls cardfile_to_textfile
+The input and output files are opened. Successive card images are fetched and
+converted to text lines by FETCHCARD. If the ENTAB switch is enabled
+blanks are replaced by tabs and blanks.
+.ls fetchcard
+This procedure reads individual card images, optionally joining those
+images prefixed by an indentifying continuation string with the previous
+card image(s). If trim is enabled white space is removed. Newline and
+EOS are added.
+.ls card_to_text
+Converts a packed card image to a text image. Call the CONVERSION routines
+to convert from EBCDIC to ASCII if the ebcdic switch is set.
+.le
+.le
+.le
+.le
+.sh
+WCARDIMAGE Structure Summary
+
+.ls t_wcardimage
+The main procedure read the control parameters.
+The files to be read and converted are calculated from the specified
+source and file list. A loop through the files determines the specific
+input source names and output filenames and calls TEXTFILE_TO_CARDFILE
+for each conversion.
+.ls textfile_to_cardfile
+The input and output source files are opened. Successive text lines are
+read and converted to one or more lines card_length + 1 long by
+calls to FETCHLINE.
+.ls fetchline
+FETCHLINE fetches lines of text and splits them into pieces <=
+maxch characters long optionally prefixing the remainders with
+an identifying continuation string. If the detab switch is set
+tabs in the lines are replaced with blanks.
+.ls text_to_card
+Converts a text string into a packed card image removing the newline
+character if necessary and padding with blanks if required.
+Call the conversion routines to convert from ASCII to EBCDIC if the
+ebcdic switch is set.
+.le
+.le
+.le
+.le
+.sh
+MTEXAMINE Structure Chart
+
+.nf
+t_mtexamine ()
+# Returns when file list is satisfied
+
+	mtexamine (tape_file, dump_range, byte_chunk, field_len,
+		    vals_per_lines, output_format)
+	# Returns number of records read
+
+		bytupkl (a, b, nbytes, byte_chunk, byteswap)
+
+		dump (ptr, byte_chunk, nelems, field_len, vals_per_line,
+			output_format, max_plusint, twice_max_plusint)
+
+		    sign_convert (a, nelems, max_plusint, twice_max_plusint)
+.fi
+.sh
+MTEXAMINE Structure Summary
+.ls t_mtexamine
+T_MTEXAMINE fetches the program parameters and  calculates the
+input file list. If dump_records is yes, T_MTEXAMINE
+calculates the record list to be dumped, calculates the field length
+and number of values which can be printed on a line and checks to see that the
+data_type and output_format parameters are permitted types. For each
+file in the input list T_MTEXAMINE calls MTEXAMINE.
+.ls mtexamine
+If dump_records is no, MTEXAMINE prints the record structure of the specified
+files on the standard output. Otherwise MTEXAMINE loops through the tape
+records until it reaches a record number in the record list
+and calls dump to output the record to
+the standard output.
+.ls bytupkl 
+BYTUPKL unpacks unsigned bytes into and integer array, optionally swaps
+the bytes, and assembles byte_chunk bytes into a long integer.
+.le
+.ls dump
+DUMP prints the record on the standard output using the specified
+output format and data type. If byte_chunk is 1 the output is unsigned.
+If byte_chunk is equal to the size in bytes of a long integer, then
+the data will be printed as signed. If byte_chunk is greater than one
+and less then the length of a long the data will be signed if the
+output format is decimal and unsigned otherwise. DUMP calls twos_comp
+to do the sign conversion.
+.ls sign_convert
+SIGN_CONVERT does a twos complement sign conversion if the output format is
+decimal and byte_chunk is greater than one and less than the size of a
+long integer.
+.le
+.le
+.le
+.le

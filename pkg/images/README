@@ -1,0 +1,10 @@
+IMAGES -- General image processing tasks and utilties.
+----------------------------------------------------------
+
+imcoords	- Image world coordinate handling
+imfilter	- Filtering (tasks which modify pixel values)
+imfit		- Fitting (fitting functions to image data)
+imgeom		- Geometry (tasks which move pixels around)
+immatch		- Image matching
+imutil		- Miscellaneous image utilties
+tv		- Image display (prototype package)

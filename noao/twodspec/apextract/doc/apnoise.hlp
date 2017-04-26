@@ -1,0 +1,231 @@
+.help apnoise Sep96 noao.twodspec.apextract
+.ih
+NAME
+apnoise -- Compute and examine noise characteristics of spectra
+.ih
+USAGE
+apnoise input dmin dmax nbins
+.ih
+PARAMETERS
+.ls input
+List of input spectra to examine.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls dmin, dmax, nbins
+The noise sigma is computed in a set of bins over the specified
+range of image data numbers.
+.le
+
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing and trace
+fitting are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+
+.ls line = INDEF, nsum = 1
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, recentering, resizing,
+and editing operations.  For tracing this is the starting line and
+the same number of lines are summed at each tracing point.  A line of
+INDEF selects the middle of the image along the dispersion axis.
+A positive nsum sums the lines and a negative value takes the median.
+However, for tracing only sums are allowed and the absolute value
+is used.
+.le
+.ls threshold = 10.
+Division threshold.  If a pixel in the two dimensional normalization spectrum
+is less than this value then a flat field value of 1 is output.
+.le
+
+The following parameters control the profile and spectrum fitting.
+.ls background = "none"
+Type of background subtraction.  The choices are "none" for no
+background subtraction, "average" to average the background within the
+background regions, or "fit" to fit across the dispersion using the
+background within the background regions.  Note that the "average"
+option does not do any medianing or bad pixel checking; it is faster
+than fitting however.  Background subtraction also requires that the
+background fitting parameters are properly defined.  For the "average"
+option only the background sample regions parameter is used.
+.le
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level.  During variance weighted extractions
+wavelength points having any pixels above this value are excluded from the
+profile determination.
+.le
+.ls readnoise = "0."
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = "1."
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 3., usigma = 3.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+.ih
+CURSOR COMMANDS
+The following cursor keys and colon commands are available during the
+display of the noise sigmas and noise model.  See \fBapedit\fR for
+the commands for that mode.
+
+.nf
+?  Print command help
+q  Quit
+r  Redraw	
+w  Window the graph (see :/help)
+I  Interupt immediately
+
+:gain <value>		Check or set the gain model parameter
+:readnoise <value>	Check or set the read noise model parameter
+
+Also see the CURSOR MODE commands (:.help) and the windowing commands
+(:/help).
+.fi
+.ih
+DESCRIPTION
+\fBApnoise\fR computes the noise sigma as a function of data value
+using the same profile model used for weighted extraction and
+cosmic ray cleanning.  In particular, the residuals used in computing the
+noise sigma are the same as those during cleanning.  By looking
+at the noise sigma as a function of data value as compared to that
+predicted by the noise model based on the read out noise and gain
+parameters one can then better refine these values for proper
+rejection of cosmic rays without rejection of valid data.
+So this task can be used to check or deduce these values and also
+to adjust them to include additional sources of error such as
+flat field noise and, especially, an additional source of noise due
+to the accuracy of the profile modeling.
+
+The first part of this task follows the standard model of allowing
+one to define apertures by finding, recentering, editing, and
+tracing.  If one has previously defined apertures then these
+steps can be skipped.  Once the apertures are defined the apertures
+are internally extracted using the profile modeling (see \fBapprofile\fR)
+with the optional background subtraction, cleanning, and choices of
+profile fitting algorithm, "fit1d" or "fit2d".  But rather than
+outputing the extracted spectrum as in \fBapsum\fR or \fBapall\fR
+or various functions of the data and profile model as in \fBapfit\fR,
+\fBapnormalize\fR, or \fBapflatten\fR, the task computes the
+residuals for all points in all apertures (essentially the same
+as the difference output of \fBapfit\fR) and determines the
+sigma (population corrected RMS) as a function of model data value
+in the specified bins.  The bins are defined by a minimum and
+maximum data value (found using \fBminmax\fR, \fBimplot\fR, or
+\fBimexamine\fR) and the number of bins.
+
+The noise sigma values, with their estimated uncertainties, are then
+plotted as a function of data numer.  A curve representing the specified
+read out noise and gain is also plotted.  The user then has the
+option of varying these two parameters with colon commands.  The
+aim of this is to find a noise model which either represents the
+measure noise sigmas or at least exceeds them so that only valid
+outliers such as cosmic rays will be rejected during cleanning.
+The interactive graphical mode only has this function.  The other
+keys and colon commands are the standard ones for redrawing, windowing,
+and quitting.
+.ih
+EXAMPLES
+1.  To check that the read noise and gain parameters are reasonable for
+cleaning \fBapnoise\fR is run.  In this case it is assumed that the
+apertures have already been defined and traced.
+
+.nf
+	cl> minmax lsobj
+	    lsobj  -2.058870315551758  490.3247375488282
+	cl> apnoise lsobj 0 500 50 rece- resi- edit- trace-
+	    A graph of the noise sigma for data between 0 and 500
+	    data numbers is given with a line showing the
+	    expected value for the current read noise and gain.
+	    The read noise and gain may be varied if desired.
+	    Exit with 'q'
+.fi
+.ih
+REVISIONS
+.ls APNOISE V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+apbackground, approfile, apvariance, apfit, icfit, minmax,
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apsum
+.endhelp

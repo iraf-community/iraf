@@ -1,0 +1,64 @@
+.help gsinit Aug85 "Gsurfit Package"
+.ih
+NAME
+gsinit -- initialize surface descriptor
+.ih
+SYNOPSIS
+include <math/gsurfit.h>
+
+.nf
+gsinit (sf, surface_type, xorder, yorder, xterms, xmin, xmax,
+	ymin, ymax)
+.fi
+
+.nf
+pointer	sf		# surface descriptor
+int	surface_type	# surface function
+int	xorder		# order of function in x
+int	yorder		# order of function in y
+int	xterms		# include cross-terms? (YES/NO)
+real	xmin		# minimum x value
+real	xmax		# maximum x value
+real	ymin		# minimum y value
+real	ymax		# maximum y value
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ls surface_type
+Fitting function. Permitted values are GS_LEGENDRE and GS_CHEBYSHEV for
+Legendre and Chebyshev polynomials.
+.le
+.ls xorder, yorder
+Order of the polynomial to be fit. The order must be greater than or
+equal to 1. If xorder == 1 and yorder == 1 a constant is fit to the data.
+.le
+.ls xterms
+Set the cross-terms type? The options are GS_XNONE (the old NO option) for
+no cross terms, GS_XHALF for diagonal cross terms (new option), and GS_XFULL
+for full cross terms (the old YES option).
+.le
+.ls xmin, xmax
+Minimum and maximum x values. All the x values of interest including the
+data x values and the x values of any surface to be evaluated must
+fall in the range xmin <= x <= xmax.
+.le
+.ls ymin, ymax
+Minimum and maximum y values. All the y values of interest including the
+data y values and the y values of any surface to be evaluated must
+fall in the range ymin <= y <= ymax.
+.le
+.ih
+DESCRIPTION
+GSINIT allocates space for the surface descriptor and the arrays and vectors
+used by the numerical routines. It initializes all arrays and vectors to zero
+and returns the surface descriptor to the calling routine.
+.ih
+NOTES
+GSINIT must be the first GSURFIT routine called.
+.ih
+SEE ALSO
+gsfree
+.endhelp

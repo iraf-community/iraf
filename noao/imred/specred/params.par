@@ -1,0 +1,67 @@
+line,i,h,INDEF,,,"Default dispersion line"
+nsum,i,h,10,,,"Number of dispersion lines to sum or median"
+order,s,h,"decreasing","increasing|decreasing",,"Order of apertures"
+extras,b,h,no,,,"Extract sky, sigma, etc.?
+
+-- DEFAULT APERTURE LIMITS --"
+lower,r,h,-5.,,,"Lower aperture limit relative to center"
+upper,r,h,5.,,,"Upper aperture limit relative to center
+
+-- AUTOMATIC APERTURE RESIZING PARAMETERS --"
+ylevel,r,h,0.05,,,"Fraction of peak or intensity for resizing
+
+-- TRACE PARAMETERS --"
+t_step,i,h,10,,,"Tracing step"
+t_function,s,h,"spline3","chebyshev|legendre|spline1|spline3",,"Trace fitting function"
+t_order,i,h,3,,,"Trace fitting function order"
+t_niterate,i,h,1,0,,"Trace rejection iterations"
+t_low,r,h,3.,0.,,"Trace lower rejection sigma"
+t_high,r,h,3.,0.,,"Trace upper rejection sigma
+
+-- SCATTERED LIGHT PARAMETERS --"
+buffer,r,h,1.,0.,,Buffer distance from apertures
+apscat1,pset,h,"",,,Fitting parameters across the dispersion
+apscat2,pset,h,"",,,"Fitting parameters along the dispersion
+
+-- APERTURE EXTRACTION PARAMETERS --"
+weights,s,h,"none","none|variance",,Extraction weights (none|variance)
+pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting algorithm (fit1d|fit2d)
+lsigma,r,h,3.,,,Lower rejection threshold
+usigma,r,h,3.,,,Upper rejection threshold
+nsubaps,i,h,1,1,,"Number of subapertures
+
+-- FLAT FIELD FUNCTION FITTING PARAMETERS --"
+f_interactive,b,h,yes,,,"Fit flat field interactively?"
+f_function,s,h,"spline3",spline3|legendre|chebyshev|spline1,,"Fitting function"
+f_order,i,h,10,1,,"Fitting function order
+
+-- ARC DISPERSION FUNCTION PARAMETERS --"
+threshold,r,h,10.,0.,,"Minimum line contrast threshold"
+coordlist,f,h,linelists$idhenear.dat,,,"Line list"
+match,r,h,-3.,,,"Line list matching limit in Angstroms"
+fwidth,r,h,4.,,,"Arc line widths in pixels"
+cradius,r,h,10.,,,Centering radius in pixels
+i_function,s,h,"spline3","legendre|chebyshev|spline1|spline3",,"Coordinate function"
+i_order,i,h,3,1,,"Order of dispersion function"
+i_niterate,i,h,2,0,,"Rejection iterations"
+i_low,r,h,3.,0.,,"Lower rejection sigma"
+i_high,r,h,3.,0.,,"Upper rejection sigma"
+refit,b,h,yes,,,"Refit coordinate function when reidentifying?"
+addfeatures,b,h,no,,,"Add features when reidentifying?
+
+-- AUTOMATIC ARC ASSIGNMENT PARAMETERS --"
+select,s,h,"interp",,,"Selection method for reference spectra"
+sort,s,h,"jd",,,"Sort key"
+group,s,h,"ljd",,,"Group key"
+time,b,h,no,,,"Is sort key a time?"
+timewrap,r,h,17.,0.,24.,"Time wrap point for time sorting
+
+-- DISPERSION CORRECTION PARAMETERS --"
+linearize,b,h,yes,,,Linearize (interpolate) spectra?
+log,b,h,no,,,"Logarithmic wavelength scale?"
+flux,b,h,yes,,,"Conserve flux?
+
+-- SKY SUBTRACTION PARAMETERS --"
+combine,s,h,"average","average|median",,Type of combine operation
+reject,s,h,"avsigclip","none|minmax|avsigclip",,"Sky rejection option"
+scale,s,h,"none","none|mode|median|mean",,"Sky scaling option"

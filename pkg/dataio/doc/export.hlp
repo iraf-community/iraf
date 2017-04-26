@@ -1,0 +1,1066 @@
+.help export Oct94 dataio
+.ih
+NAME
+export -- create a binary image file from one or more IRAF images
+
+.ih
+USAGE
+export images binfiles
+
+.ih
+PARAMETERS
+
+.ls images
+The list of input IRAF images to be converted.  The list may contain
+either 2-D images  or 3-D images.
+Any number of 2-D images may be combined to a single output file, only
+one 3-D image (or section) at a time may be converted.  See the \fIBuiltin 
+Formats\fR section for notes about the number of image expressions required 
+for each builtin format and the handling of 3-D image data.  Images greater
+than three dimensions should be converted using image sections.
+.le
+.ls binfiles
+The list of output binary files to create.  If any of the builtin formats
+is selected for conversion the filename will have an extension added
+reflecting the format (if it is not already given).
+.le
+
+.ce
+OUTPUT PARAMETERS
+.ls format = "raw"
+The type of binary file to write.  If the value is "raw" then the input
+images are converted directly to a raw binary raster using the task 
+parameters.  If the value is "list" the pixel values will be written
+to the standard output after evaluation of the \fIoutbands\fR parameter in
+the same format as would appear from the \fILISTPIX\fR task.  Finally,
+the value may include any of the currently supported specific builtin formats:
+
+.nf
+	eps		- Encapsulated PostScript
+	gif		- Compuserve's GIF format
+	imh		- IRAF OIF image
+	miff		- ImageMagick MIFF format image
+	pgm		- PBMPlus PGM format image
+	ppm		- PBMPlus PPM format image
+	ras		- Sun rasterfile format
+	rgb		- SGI RGB format image
+	xwd		- X11 Window dump file
+.fi
+
+If any of these builtin formats is selected one or more of the following 
+parameters may be ignored. See the \fIBuiltin Formats\fR section for notes 
+about the formats supported by this task.
+.le
+.ls outbands = ""
+Output image band expressions to write.  This is a comma-delimited list of 
+expressions or an @-file containing the expressions.  Evaluated expressions 
+do not all need to be the same length since the output image will be padded
+to the maximum size.  See below for more information.
+.le
+.ls verbose = no                    
+Print verbose output to the screen during conversion?
+.le
+
+.ce
+RAW BINARY OUTPUT PARAMETERS
+.ls header = yes
+For raw binary file output only, prepend a header describing how the data 
+are stored?  If set to "no" then no header will be written.  If set to "yes", 
+a standard text header describing how the data were written will be 
+prepended to the output file.  Setting the \fIheader\fR parameter to the 
+reserved string "long" will write the image headers from the IRAF images
+making up the output file in the standard header.  The parameter may also
+be set to a filename that will be prepended to the output file.  This
+parameter is ignored for builtin format output. See below for a description 
+of the header layout.
+.le
+.ls outtype = ""
+Output pixel type if \fIformat\fR is set to "raw" or "list".  This is a 
+string giving the type and size of each pixel, the syntax for the outtype 
+entry is
+.nf
+
+		<type>[<nbytes>]
+where
+    type = b            # byte
+           u            # unsigned (short) integer
+           i            # signed integer
+           r            # ieee floating point
+           n            # native floating point
+
+    nbytes = 1, 2, 4, or 8
+
+.fi
+If no value for \fInbytes\fR is given the smallest size for the given type
+(i.e. 1 byte for 'b', 2 bytes for ints, 4 bytes for floating point) will
+be used.  If no value is entered at all the type of the input image is used, 
+for multiple images used to create a single binary file the type of the first 
+image is used.  This parameter is ignored for builtin format output options.
+.le
+.ls interleave = 0
+Pixel interleave type.  If the \fIoutbands\fR parameter is composite 
+(i.e. a comma-delimited list of expressions) the output file is pixel 
+interleaved and the \fIinterleave\fR parameter is ignored.  If the 
+\fIoutbands\fR parameter is a single expression the file is line-interleaved 
+when the \fIinterleave\fR value is a positive integer.  If the \fIoutbands\fR 
+is an empty string or a single expression the binary file is band interleaved 
+if this parameter is zero.  This parameter is ignored for builtin formats 
+where the pixel storage is predefined.
+.le
+.ls bswap = "no"
+Type of byte-swapping to perform on output. The default is bswap=no which
+may be abbreviated "bswap-" (similarly a value of 'yes' can be abbreviated
+"bswap+").  If disabled no byte-swapping is performed, if set all integers
+are swapped on output relative to the current machine's byte ordering.
+Values of 'i2' or 'i4' will swap only two or four byte integers respectively,
+floating point values remain unswapped.  This parameter may be used by some
+builtin formats that don't have a specified byte order.
+.le
+
+.ih
+DESCRIPTION
+	The \fIexport\fR task will convert one or more images in an
+input list to a binary raster file, a text listing of pixels values,
+or one of several specific file formats.  For general binary
+rasters, various pixel types, data interleaving, and the byte order can be
+specified.  An optional header may be added to the output file.
+Arbitrary arithmetic expressions, using both standard and custom
+functions, may be applied to the images in the
+input list before conversion allowing the user to scale intensity values,
+change image orientation, compute colormaps, or compute output pixel
+values.
+
+	The \fIformat\fR parameter controls the type of output generated:
+if set to \fIraw\fR a binary file described by the \fIouttype\fR, 
+\fIinterleave\fR, and \fIbswap\fR parameters is written with pixel values
+determined from the expressions in the 
+\fIoutbands\fR parameter.  The value of \fIouttype\fR
+defines the output pixel size and type (long or short ints, native or IEEE
+reals, see parameter description for details).  The
+\fIbswap\fR parameter can be used to set the byte order (relative to the
+current machine) of integer values, this 
+parameter is ignored for floating point pixels or builtin
+formats with a specified byte order. The \fIoutbands\fR and \fIinterleave\fR 
+parameters define the pixel storage in the binary file.  For multiple 
+\fIoutbands\fR
+expressions the data are assumed to be pixel interleaved (e.g. written 
+as { {RGB}, {RGB} ...} triplets).  For single expressions, a positive value 
+of \fIinterleave\fR indicates that the data are written in a line-interleaved
+manner (e.g. a line of R, a line of G, ...).  If \fIinterleave\fR is
+zero and \fIoutbands\fR is a single expression 
+then no interleaving is done and the image bands are written sequentially.  
+If \fIoutbands\fR is the null string, all pixels in a single input image 
+will be written to a single output file.
+Error checking is done to make sure the combination of these 
+parameters is correct.  If the \fIheader\fR parameter is "yes" a text header
+describing how the data were written will be prepended to the file, setting
+the \fIheader\fR parameter to the reserved string "long"
+will cause the image header for each input image
+to be saved in the standard header.  The \fIheader\fR parameter may also 
+be the name of a user-defined file to prepend to the output instead of the
+standard header.
+
+	If the \fIformat\fR parameter is set to "list" the pixels values 
+will be written to the screen as an ascii list of pixel coordinates 
+followed by the pixel value.   Pixel coordinates are determined using the
+same interleaving scheme as above, values are determined by evaluating
+each \fIoutbands\fR expression.
+
+	Lastly, the \fIformat\fR parameter may be any of the currently
+supported builtin formats.  See the section on \fIBuiltin Formats\fR for
+more information and the restrictions or requirements of each format.
+
+.ih
+MORE ON OUTBANDS EXPRESSIONS
+	The simplest specification for \fIoutbands\fR is a null string, 
+in which case the image is converted directly (i.e. band storage, 
+pixels converted to output type).  Arbitrary interpreted arithmetic 
+expressions using standard and custom functions and operators are also 
+supported.  If the \fIimages\fR parameter is a list of 3-D images the 
+operand names are the predefined tags b1, b2, ... bN for the bands in each 
+image, the \fIbinfiles\fR parameter must contain an equal number of 
+output files.  To convert multiple 3-D images they must either be sliced 
+to individual 2-D images (or specified as image sections) or stacked into 
+a single image.  If the \fIimages\fR parameter is a list of 2-D images 
+(or sections) the operand names are the predefined tags i1, i2, ... iN for 
+the each image in the input list, the b1, b2, etc names are also recognized.
+For more complex or 
+lengthy expressions the \fIoutbands\fR parameter may alternatively be an
+@-file containing the expressions.  Within this @-file whitespace and
+newline characters are ignored to allow expressions to be indented in a 
+readable manner.
+
+	The image operands determine which input images in the list are
+converted to which output files.  For 3-D input images one IRAF image is
+converted for each output file in the list, for 2-D images multiple images
+may be converted to a single output file.  In the latter case the list 
+pointers are updated automatically to keep track of the images.  For example,
+to convert six images to two output files, the \fIoutbands\fR expression
+should contain three images operands.  The first three images in the list
+will be used in evaluating the expressions for the first output file,
+the last three for the second file.
+
+	The image tags may be reordered in the expression but still refer to 
+e.g. band-1, band-2 and so on.  For example (where rgbim is a 512x512x3 image, 
+and rim, gim, and bim are 512x512 images),
+
+.nf
+cl> export rgbim file outtype="u2" header-                       (1)
+cl> export rgbim file outtype="u2" header- outbands="b3,b2,b1"   (2)
+cl> export rim,gim,bim file outty="u2" outbands="i3,i2,i1"       (3)
+cl> export rim,gim,bim file outty="b" outbands="gray(i1,i2,i3)"  (4)
+.fi
+
+Example (1) converts the input image pixels to a raw binary file of 
+unsigned short integers with no header written as one image band following 
+another.  In example (2) the order of the bands is reversed and the binary 
+file is stored as pixel interleaved BGR triplets of short ints.  
+Example (3) is the same as (2) except that the input images in the list 
+are reordered instead of bands within a single image. When using the image 
+tags the input list is updated to account for this, so it is allowed to have 
+more input images than output binary files.
+In example (4) the three images are converted to a single grayscale image
+before being written as byte data to the binary file.
+More complex and detailed examples are given below.
+
+Individual \fIoutbands\fR expressions are composed of operators and operands
+in general interpreted arithmetic expressions as follows:
+
+\fBOperands\fR
+.nf
+
+	iN		      	    # image list item
+	iN.param		    # image parameter
+	@"param"	    	    # parameter of 3-D image
+	bN		      	    # band within 3-D image
+
+	func()		      	    # function
+	constant	      	    # numeric constant
+.fi
+
+    The 'iN.param' and '@"param"' syntax allows an image header parameter 
+to be accessed.  For example 'i2.otime' refers to the 'otime' image 
+header parameter in the second image of a list and '@"otime"' refers to the 
+current image if the input list contains 3-D images.  They may
+be used in an outbands expression such as
+.nf
+
+    (i1*(i1.otime/i2.otime)),i2,(i3*(i3.otime/i2.otime))	(1)
+    (b1/@"otime")),(b2/@"otime"),(b3/@"otime")			(2)
+
+.fi
+to normalize the output bands by the exposure time value in the second image
+in the first example, or to normalize by the 'otime' keyword of a 3-D image
+in the second example.
+
+    In cases where a constant value is used as an outbands expression an 
+alpha channel (an extra 8-bits of constant intensity) will be created 
+consisting of that value.  For example, writing a 32-bit RGB image with an 
+alpha channel of 255 could be written using
+
+    cl> export rgbim file outtype="b1" outbands="b1,b2,b3,255"
+
+
+\fBOperators\fR
+
+The expression syntax implemented by \fIexport\fR provides the following
+set of operators:
+
+.nf
+
+        ( expr )              	    - grouping
+        + - * /               	    - arithmetic
+        **                    	    - exponentiation
+        //                    	    - concatenate
+        expr ? expr1 : expr2  	    - conditional expression
+    
+        &&                    	    - logical and
+        ||                    	    - logical or
+        !                     	    - logical not
+        <                     	    - less than
+        <=                    	    - less than or equal
+        >                     	    - greater than
+        >=                    	    - greater than or equal
+        ==                    	    - equals
+        !=                    	    - not equals
+	?=                          - substring equals
+.fi
+
+The conditional expression has the value \fIexpr1\fR if \fIexpr\fR is true,
+and \fIexpr2\fR otherwise.  Since the expression is evaluated at every pixel
+this permits pixel-dependent operations such as checking for special pixel
+values, or selection of elements from either of two vectors.  For example,
+the command
+
+        	(i1 <= 0) ? 0 : 1
+
+has the constant value zero if "i1" is less than or equal to zero, 
+and one otherwise, effectively creating a pixel mask of positive pixels.
+Conditional expressions are general expressions and may be nested or used
+anywhere an expression is permitted.
+
+The concatenation operator applies to all types of data, not just
+strings.  Concatenating two vectors results in a vector the 
+combined length of the two input vectors.  An example use of this would
+be to concatenate images side-by-side on output.
+
+
+\fBSpecial Functions\fR
+
+	In addition to the intrinsic functions already provided (see the help
+page for the \fIimexpr\fR task for a list of standard, mathematical and type
+conversion functions) there are a number of custom functions for this task:
+
+.ce
+\fBOutput Functions:\fR
+
+.nf
+       band (args)     	    	  - force band interleaved storage
+       line (args)         	  - force line interleaved storage
+      flipx (args)   	     	  - flip image in X dimension
+      flipy (args)   	     	  - flip image in Y dimension
+
+      block (val,width,height)	  - block fill area with a constant
+.fi
+
+    These functions define how the output data are written. For builtin 
+formats whose normal orientation and storage format is known these functions 
+are ignored (except where noted).  These functions may not be used as arguments to other functions (except where noted) or as single operands
+within expressions (e.g. "255 + flipx(i1)"), however their arguments may
+be expressions or (perhaps output) functions themselves.
+
+.ls band (args)
+Force band storage in the output file regardless of the value of the
+\fIinterleave\fR parameter.  This may be used to specify multiple
+expressions for each band while still forcing band storage (the default
+for multiple expressions is pixel-interleaved storage).  This function
+may be used with some builtin formats to write multiple images to the output
+file as if they were a column of images in the original. This function
+is ignored by builtin formats that do not support this scheme (i.e RGB
+format) and may be used as an argument to the \fIsetcmap()\fR, \fIpsdpi()\fR,
+and \fIpsscale()\fR functions only.
+.le
+.ls line (args)
+Force line storage in the output file regardless of the value of the
+\fIinterleave\fR parameter.  This may be used to specify multiple
+expressions for each band while still forcing line storage (the default
+for multiple expressions is pixel-interleaved storage).  This function
+is ignored by builtin formats that do not support this scheme.
+.le
+.ls flipx (args)
+Flip the image left-to-right on output.  This function may be used as an
+argument to the \fIband()\fR, \fIsetcmap()\fR, \fIpsdpi()\fR, or 
+\fIpsscale()\fR functions only.
+.le
+.ls flipy (args)
+Flip the image top-to-bottom on output.  Certain builtin formats (such as
+GIF, PGM, PPM, RAS and XWD) have their normal orientation already flipped wrt 
+to IRAF and these will automatically be flipped on output.  Using this
+function with those formats cancels the flip action, writing the image in the
+normal IRAF orientation and not the normal format orientation.
+This function may be used as an argument to the \fIband()\fR, \fIsetcmap()\fR,
+\fIpsdpi()\fR, or \fIpsscale()\fR functions only.
+.le
+.ls block (value, width, height)
+Fill an area with a constant value.  This function can be used to fill a
+vertical area between images to provide padding of a constant value.  It
+is similar to the "repl()" intrinsic function which replicates a data element
+a given number of times.
+.le
+
+
+.ce
+\fBScaling Functions:\fR
+.nf
+
+   zscale (arg [,z1, z2 [, nbins]]) - scale to a fixed number of bins
+               zscalem (arg1, arg2) - automatic scaling with filtering
+           gr[ea]y (arg1,arg2,arg3) - RGB to grayscale conversion
+          bscale (arg, zero, scale) - linearly transform intensity scale
+       gamma (arg, gamma [, scale]) - apply a gamma correction
+.fi
+
+        These functions may be used to scale the intensity values of the
+image before output in order to map image datatypes to a specified range.
+The 'args' value may be a list of image operands or expressions.  These 
+functions may be used as arguments to the output functions above
+or as operands within more complex expressions.
+
+.ls zscale (arg [,z1,z2 [,nbins]])
+Scale the pixels in a given range to a specified number of bins.  This
+function will map the input pixels within the range z1 to z2 to one of 
+'nbins' values.  Pixels less than z1 are mapped to the lowest output
+intensity value, pixels greater than z2 are mapped to the highest value.
+If no \fIz1\fR and \fIz2\fR arguments are given appropriate values will
+be computed using the same algorithm and default parameters used by 
+the \fIDISPLAY\fR task (see the help page for more information).
+If no \fInbins\fR value is given 256 bins are assumed.
+
+If the given value of z1 is greater than z2 the mappings will be inverted,
+i.e. larger pixel values will map to the lower bin numbers, smaller pixel
+values will map to larger bin numbers.  For example, to map the dev$pix
+test image to 200 colors such that there are "black" stars on a "white"
+background one could use
+.nf
+
+	zscale (b1, @"i_maxpixval", @"i_minpixval", 200)
+.fi
+.le
+.ls zscalem (arg1, arg2)
+This is a variant of the zscale operand with automatic scale calculation;
+i.e.  zscale (arg).  The first argument is the same as for zscale to select
+the pixel values.  The second argument is a boolean (true or false)
+expression selecting whether a value in the first argument is to be used in
+the calculation.  This allows limiting the automatic scale calculation to
+pixels specified in a mask or to a certain range to exclude extreme or bad
+values that would otherwise perturb the result.  Typical usages might be
+.nf
+
+	zscalem (i1, i2==0)
+	zscalem (i1, i1>0&&i1<10000)
+.fi
+where i1 are the image pixels and i2 would be pixels from the second
+input argument which defines a mask.  Note that you can't just say i2
+for a mask but must use it in an expression resulting in a true or false
+value.  Also note that the result is always in the range 0 to 255.
+.le
+.ls grey (arg1,arg2,arg3) or gray (arg1,arg2,arg3)
+Convert three image operands or expressions to a single grayscale image
+using the standard NTSC equation:
+.nf
+
+	Gray = 0.3 * arg1 + 0.59 * arg2 + 0.11 * arg3
+.fi
+.le
+.ls bscale (arg, zero, scale)
+Linearly transform the intensity scale of the image using the equation
+.nf
+
+	new[i] = (arg[i] - zero) / scale
+
+.fi
+Pixels are scaled in their input datatype prior to converting to the output
+datatype.
+.le
+.ls gamma (arg, gamma [, scale])
+Apply a gamma correction to the pixels.  Pixel values are scaled according to
+the equation
+.nf
+
+	new = scale * [ (old/scale) ** (1.0/gamma) ]
+
+.fi
+If no scale argument is given a value of 255 will be assumed.
+.le
+
+
+    \fIAdditional functions\fR are supported for specific formats:
+
+.nf
+      Function	           Description		    Formats
+      --------	           -----------		    -------
+    cmap (r,g,b [,ncols])  create 8-bit colormap    GIF,RAS,XWD,EPS
+ setcmap (args, [opts])    define a colormap        GIF,RAS,XWD,EPS
+   psdpi (args, dpi)       set dpi for output	    EPS
+ psscale (args, scale)     set scale of output	    EPS
+.fi
+
+	These functions may take as arguments some of the output functions
+named above.  For example, one can specify the dpi resolution of EPS output
+and band storage of images using something like
+.nf
+
+	psdpi(band(args), dpi)
+
+.fi
+
+.ls cmap (arg1,arg2,arg3 [, ncolors])
+Compute an 8-bit colormap from three image operands or expressions using a
+Median-Cut Algorithm and Floyd-Steinberg dithering.  The computed colormap
+is written to the header of the output file.  The resultant image 
+is an 8-bit color index into the computed colormap.  The \fIncolors\fR argument
+specifies the number of desired colors, a default value of 256 will be used
+if not provided.  This function is only
+allowed for builtin formats supporting color lookup tables and may not be
+used within another expression or function.
+.le
+.ls setcmap (args, cmap [, brightness, contrast]) 
+Define the colormap to be used on output.  This function is only supported
+for formats that support colormaps, the \fIargs\fR expressions are used to
+compute the color index values.  The \fIcmap\fR argument may either be the
+filename of a normalized colormap table (such as is used by \fIXImtool\fR)
+or one of the builtin values:
+.nf
+	aips0		- and RGB false color mapping
+	blue		- various shades of blue
+	color		- standard B/W and RGB colormap
+	grayscale	- standard grayscale
+	greyscale	- (alias for above)
+	green		- various shades of green
+	halley		- standard halley mission colormap
+	heat		- temperatures as colors
+	rainbow		- rainbow colors
+	red		- various shades of red
+	staircase	- RGB staircase
+	standard	- RGB ramps
+	overlay		- grayscale with IMDKERN overlay colors
+.fi
+
+Colormap names must be quoted with either single or double quote characters.
+The optional \fIbrightness\fR and \fIcontrast\fR arguments have default 
+values of 0.5 and 1.0 respectively corresponding to the default 
+brightness/contrast scaling of the \fIXImtool\fR display server.  
+If the cmap argument is an empty string the default Grayscale LUT will 
+be used, IRAF logical paths may be used in the filename specification. 
+.le
+.ls psdpi (args, dpi)
+Specify the dots-per-inch resolution of the output image.  The default 
+resolution is 300dpi, this may need to be reset for some printers or if
+the raster rendering produces "bands" in the output.  This function may
+only be used as an argument to the \fIpsscale()\fR function.
+.le
+.ls psscale (args, scale)
+Specify the scale of the output image.  The default value is 1.0 which 
+means that image printed on a 300dpi device is roughly the same size 
+as displayed on a typical 72dpi screen.  Scale values less than one reduce
+the image size on the page, values greater than one increase the size.  The
+scale value will automatically be adjusted if it creates an image that will
+not fit on a 8.5 inch by 11 inch page.  A scale value of 0.25 prints one
+image pixel per 300dpi printer pixel.  This function may
+only be used as an argument to the \fIpsdpi()\fR function.
+.le
+
+.ih
+EXPORT HEADER FORMAT
+	The header prepended to the binary data is ascii text consisting of
+keyword-value pairs, one per line, terminated with a newline after the
+value, beginning with the magic string 
+"format = EXPORT".  Using an ascii header allows the file format to be
+easily determined by the user with a file pager or any program reading 
+the file.
+
+Defined keywords are:
+
+.nf
+	date		    - date file was written (dd/mm/yy)
+	hdrsize		    - size of header (bytes)
+	ncols		    - no. of image columns
+	nrows		    - no. of image rows
+	nbands		    - no. of image bands
+	datatype	    - pixel type (as <type><nbytes>)
+	outbands	    - outband expression list
+	interleave	    - interleave value (same as above)
+	bswap		    - are ints swapped relative to MII format?
+	image1 		    - image names used in creating file
+	  :
+	imageN	
+	header1 '{' <header> '}'  - image headers of above
+	  :
+	headerN	'{' <header> '}'
+	end		    - terminate header
+.fi
+
+If the \fIheader\fR parameter is set to "long" the image headers for 
+each image used in creating the file is included in the output header, 
+otherwise only the image names are included.
+
+A sample (verbose) header might look like:
+
+.nf
+    format = EXPORT
+    date = '19/06/94'
+    hdrsize = 2084
+    nrows = 512
+    ncols = 512
+    nbands = 1
+    datatype = 'i2'
+    outbands = ''
+    interleave = 0
+    bswap = no
+    image1 = "dev$pix"
+    header1 = {
+    IRAF-BPX=                   16  /  DATA BITS/PIXEL
+    IRAFTYPE= 'SHORT   '            /  PIXEL TYPE
+    CCDPICNO=                   53  /  ORIGINAL CCD PICTURE NUM
+    ITIME   =                  600  /  INTEGRATION TIME (SECS)
+    	:   :		:			:
+    }
+    end
+.fi
+
+.ih
+BUILTIN FORMATS
+	While the task provides a way of writing general binary raster
+files there is still a need for converting to specific formats.  
+Implementing most formats is trivial since they usually follow the
+data model and the only "builtin" knowledge of the format is the minimal
+header required.  More complex formats such as GIF and EPS are implemented 
+as special cases.  Note that all of the builtin formats require 8-bit color
+index or 8-bits per color in RGB or RGBA files, users should be careful
+in how the datatype conversion from IRAF image types is handled. In most
+cases this can be handled with the \fIzscale()\fR or \fIzscalem\fR functions.
+
+	For each of the formats listed below the table shows the number
+of \fIoutbands\fR expressions required and the type of output file that
+can be written.  Complete examples for the most common cases are shown in
+the \fIExamples\fR section below.  The columns in the table are defined as
+.nf
+
+    #expr		- number of required \fIoutbands\fR expressions
+    Type		- RGB or 8-bit colormap (index) file
+    bitpix		- number of bits-per-pixel
+    CLT?		- does the file have a colormap?
+    Alpha?		- does the file have an alpha channel?
+    Interleaving	- type of pixel interleaving
+    Notes		- see explanation below each table
+
+.fi
+A general description and specific restrictions or requirements are given for 
+each format.  An error is generated of the input parameters do not meet the 
+requirements of the requested format.  Unless otherwise noted the values of 
+the \fIheader\fR, \fIbswap\fR and \fIinterleave\fR parameters will be ignored.
+The value of \fIouttype\fR will be set internally and is also ignored.
+
+	If the input image is 3-D and no \fIoutbands\fR expressions are
+given, then where supported each band will be written to the output file as 
+a complete image or RGB color component.  For example, a 512x512x3 image 
+will be written as a 512x1536 image with each band comprising one third 
+the height of the output image.  If the output format requires 24-bit pixels 
+then each band of the image will be written as a color component.
+
+	The currently supported builtin formats include:
+
+.ls EPS     - Encapsulated PostScript
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       no    no      none          
+
+.fi
+	The output 8-bit Encapsulated PostScript image
+centered on the page at a default scale of 1.0 at 300dpi (i.e. the image will
+appear on a 300dpi printer about the same size as displayed on a 72dpi 
+screen).  The output scale may be adjusted using 
+the \fIpsscale()\fR function, e.g. to set the output for one image pixel
+per 300 dpi printer pixel use "psscale(b1,0.25)" (one quarter the normal size
+on the page).  The output dpi resolution may be set explicitly with 
+the \fIpsdpi()\fR function, this is sometimes necessary if "bands" appear 
+in the final output image.  Color EPS files may be written as either RGB
+postscript or with a colormap applied to the data (using either the
+\fIcmap()\fR or \fIsetcmap()\fR functions).
+.le
+.ls GIF     - Compuserve's GIF format
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       yes   no      none          1
+    3      index  8       yes   no      none          2
+
+    Notes:
+	1) Colormap generation enabled using \fIsetcmap()\fR or else
+           default grayscale colormap will be used
+	2) use of \fIcmap()\fR required to generate colormap
+
+.fi
+	The output file is a GIF '87 image.  A linear colormap of 256 entries 
+will automatically be generated if only one image or expression is given for
+conversion and no colormap is specified.  
+If three images or expressions are specified a 24-to-8 bit
+conversion can be done using a Median Cut Algorithm and Floyd-Steinberg
+dithering with the required \fIcmap()\fR function.  Since the colormap 
+sizes are limited to 256 entries the maximum pixel value is assumed to 
+be 255, i.e. the output pixel size will be forced to 8-bits or less.
+.le
+.ls IMH     - IRAF image file
+	The output file is an IRAF OIF format image of the specified datatype.
+Writing the image out as another IRAF image may be used to scale or composite
+several images into a new image that can be annotated with the \fITVMARK\fR
+task before writing out the final format.
+.le
+.ls MIFF    - ImageMagick MIFF format image
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       no    no      none
+    1      index  8       yes   no      none          1,2
+    3      rgb    24      no    no      pixel         
+
+    Notes:
+	1) Colormap generation enabled using \fIsetcmap()\fR
+	2) Colormap generation enabled using \fIcmap()\fR
+
+.fi
+	The output file is a Machine Independent File Format image, with or
+without a colormap or as a 24-bit RGB image.  Although MIFF permits 64K
+colors in a colormap the task only supports 256 colors, no compression is
+used in the image.  The maximum pixel value per color is assumed to be 255.
+.le
+.ls PGM     - PBMPlus PGM format image
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       no    no      none
+    3      index  8       no    no      none          1
+
+    Notes:
+	1) Grayscale may be produce with \fIgray()\fR function
+
+.fi
+	The output file is an 8-bit raw (i.e. binary pixels) PGM image.  
+The maximum pixel value is assumed to be 255.
+.le
+.ls PPM     - PBMPlus PPM format image
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    3      rgb    24      no    no      pixel         
+
+.fi
+	The output file is an 24-bit raw (i.e. binary pixels) PPM image. 
+The maximum pixel value per color is assumed to be 255.
+.le
+.ls RAS     - Sun rasterfile format
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       no    no      none
+    1      index  8       yes   no      none          1,2
+    3      rgb    24      no    no      pixel
+    4      rgb    32      no    yes     pixel
+
+    Notes:
+	1) Colormap generation enabled using \fIsetcmap()\fR
+	2) Colormap generation enabled using \fIcmap()\fR
+
+.fi
+	The output file will be a Sun rasterfile.  The header values
+(long integers) may be byte swapped by setting the \fIbswap\fR parameter 
+to "yes" or "i4".  For 32-bit true-color rasterfiles the
+alpha channel should be specified as the first expression.  The maximum 
+pixel value is assumed to be 255.
+.le
+.ls RGB     - SGI RGB format image
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       no    no      none          
+    3      rgb    24      no    no      scanline      
+
+.fi
+	The output file will be an SGI RGB (IRIS) format image.  Although
+this format supports colormaps they are not supported by this task.
+The maximum pixel value is assumed to be 255.
+.le
+.ls XWD     - X11 Window dump file
+.nf
+
+  #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
+  -----    -----  ------  ----  ------  ------------  -----
+    1      index  8       yes   no      none          1,2,3
+    3      rgb    24      no    no      none          
+
+    Notes:
+	1) Linear grayscale colormap automatically generated
+	2) Colormap generation enabled using \fIsetcmap()\fR
+	3) Colormap generation enabled using \fIcmap()\fR
+
+.fi
+	The output file will be an X11 window dump file.
+A linear colormap of 256 entries will automatically be generated if only 
+one image or expression is given for conversion, the \fIsetcmap()\fR function
+may be used to create an alternate colormap.  If three images or expressions 
+are specified a 24-to-8 bit conversion can be done using a Median Cut 
+Algorithm and Floyd-Steinberg dithering if the \fIcmap()\fR function is 
+specified.  Header values (long integers) may be byte swapped by setting the
+task \fIbswap\fR parameter to "yes" or "i4".  The maximum pixel value is 
+assumed to be 255.
+.le
+
+.ih
+COLOR OUTPUT IMAGES
+	In theory the colormaps generated by the \fIcmap()\fR and
+\fIsetcmap()\fR functions could be written in the header for raw binary
+output and the pixel written out as color indices, but since we also
+support color index formats which are recognized widely by other packages 
+there is no need to do this.  Therefore we limit the use of colormaps to 
+the builtin formats which already support it.
+
+	The simplest type of "color" image is the familiar grayscale image.
+Pixel values represent the display gray level, although for some formats a CLT 
+(color lookup table) is required (e.g. GIF) and these pixel values are 
+actually indices into a grayscale colormap.  Most of the conversion done
+with this task will produce a grayscale image of some sort.  For "color 
+index" images the pixel values are indices into a colormap containing the 
+RGB components of the color for a pixel with that value.  Colormaps 
+usually permit at most 256 possible colors implying 8-bit pixels.
+In this task the colormap may be computed either with the \fIcmap()\fR (which 
+does a 24-to-8 bit mapping of the colors) or the \fIsetcmap()\fR function 
+(which computes the colormap from a display lookup table of colors).  
+"True color" images are those which have 24-bits of color (8-bit for each
+component) for each pixel, some true color images also contain an alpha 
+channel (an extra 8-bits of constant intensity) which may or may not be 
+used by the software displaying the image.
+
+	The \fIcmap()\fR function takes three images and computes a colormap
+using Paul Heckbert's Median Cut Algorithm ("Color Image Quantization for
+Frame Buffer Display", SIGGRAPH '82 Proceedings, pg 297) and Floyd-Steinberg 
+dithering technique.  The computed colormap is written to the file header 
+and pixel values are converted to color indices.  By default 256 colors are 
+computed but fewer colors may be requested.  This function is most useful 
+for generating pseudo-color images from three input images taken in different
+filter bands (which is required for some formats like GIF that do not 
+support 24-bit RGB).
+	
+	The \fIsetcmap()\fR function, on the other hand, can be used to
+generate a color image from a single input image and a lookup table such as
+the ones used by displays servers like XImtool.  In this case the pixel
+values are indices into a pre-defined colormap which is normalized between
+zero and one (so that it may be scaled to the desired number of colors).
+The \fIbrightness\fR argument defines the center of the transfer function, the
+default is 0.5 because it in the middle of the normalized range.  The 
+\fIcontrast\fR arguments sets the contrast of the transfer function.  For
+example, the normalized pixel values and default brightness/contrast settings
+will map the pixel values to the corresponding color in the LUT.  Changing
+the brightness to a lower value means that pixel intensities will map to lower
+values in the LUT, doubling the contrast for instance means that the LUT 
+will increment two colors for every unit pixel change.  This is what happens
+when changing a displayed image in IRAF with the mouse by moving the cursor
+left-right (changing the brightness) or up-down (changing the contrast).
+
+	An example use of this function would be if one wanted to convert an 
+IRAF image to a color rasterfile with the same colormap and intensity 
+scaling as was displayed in XImtool.  After adjusting the display the 
+brightness/contrast values could be read from the control panel and the 
+rasterfile generated using
+.nf
+
+        setcmap (b1, "aips0", 0.36, 1.2)
+
+.fi
+where the "aips0" is one of the builtin colormaps and the brightness and
+contrast arguments are those from the ximtool display.  Similarly, the
+expression
+.nf
+
+        setcmap (zscale(i1),"idl15.lut")
+
+.fi
+will save the image with the same intensity scaling and color as would be see
+by displaying it to ximtool using the default DISPLAY task settings,
+normalized XImtool brightness/contrast values and the "idl15.lut" LUT in the
+current directory.
+
+
+.ih
+EXAMPLES
+	The examples below are divided into several categories showing
+typical usage when creating various raw and builtin output files.  Note
+that the output file will have a filename extension added indicating the 
+format when converting to a builtin format.
+
+\fICreating Raw Binary Files\fR
+.nf
+
+List the pixels being one the standard output, apply a linear scale
+function first:
+
+    cl> export dev$pix "" list outbands="bscale(b1,1.0,3.2)"
+
+Convert the dev$pix test image to an 8-bit binary file with a gamma 
+correction, write the standard header:
+
+    cl> export dev$pix bfil raw header+ outty="u1" outbands="gamma(b1,1.8)"
+
+Write the three bands of an IRAF image to a pixel interleaved binary 
+file of short integers, prepend a user-defined header:
+
+    cl> export rgbim bfil raw header="hdr.txt" outty="i2" outban="b1,b2,b3"
+
+Convert three images representing RGB to a 4-color line-interleaved
+file, the IRAF images don't require scaling, create alpha channel:
+
+    cl> export rim,gim,bim bfil raw outty="u1" outban="line(i1,i2,i3,0)"
+
+Write the three bands of an IRAF image to a line-interleaved binary 
+file of short integers:
+
+    cl> export rgbim binfil raw outtype="i2" outbands="line(b1,b2,b3)"
+    cl> export rgbim binfil raw outtype="i2" outbands="" interleave=3
+
+Write the three bands of an IRAF image to a grayscale binary file using 
+a custom conversion formula.  Pixel values are truncated to 8-bits:
+
+    cl> export rgbim grey raw outty="u1" outban="(.2*b1)+(.5*b2)+(.3*b3)"
+
+.fi
+
+\fICreating Specific Formats\fR
+.nf
+
+Convert dev$pix to an 8-bit Sun rasterfile with no colormap, scale the 
+image to 8-bits using the default \fIzscale()\fR intensity mapping:
+
+    cl> export dev$pix dpix ras outbands="zscale(i1)"
+
+Apply various functions to the data before doing the same conversion:
+
+    cl> export dev$pix dpix ras outbands="zscale(log(i1))"
+    cl> export dev$pix dpix ras outbands="zscale(sqrt(i1))"
+
+Convert dev$pix to an 8-bit Sun rasterfile with no colormap, image pixel
+values are truncated to 8-bits:
+
+    cl> export dev$pix dpix ras
+
+Convert three images representing RGB to a 24-bit Sun rasterfile, assume
+the IRAF images don't require intensity scaling:
+
+    cl> export rim,gim,bim rgb ras outbands="i1,i2,i3"
+
+Create a Silicon Graphics RGB format image from a 3-D image:
+
+  cl> export rgbim bdata rgb outbands="b1,b2,b3"
+
+Convert dev$pix to an 8-bit GIF grayscale image, scale the image to map 
+only pixel values between 0 and 320:
+
+  cl> export dev$pix dpix gif outbands="zscale(i1,0.0,320.0)"
+
+Combine three images representing RGB into an 8-bit X11 window dump
+grayscale image:
+
+  cl> export rim,gim,bim gray xwd outbands="gray(i1,i2,i3)"
+
+Convert dev$pix to an Encapsulated PostScript file at half the normal scale 
+and apply a linear transformation to scale the pixel values:
+
+    cl> export dev$pix dpix eps \
+    >>>    outbands="psscale(bscale(i1,0.,0.32), 0.5)"
+
+Convert three images representing RGB to an 8-bit GIF color image with
+a computed colormap:
+
+  cl> export rim,gim,bim rgb gif outbands="cmap(i1,i2,i3)"
+
+Convert dev$pix to a color rasterfile using the builtin "heat" colormap
+and default intensity mapping:
+
+  cl> export dev$pix dpix ras outban='setcmap(zscale(i1),"heat")'
+
+Convert dev$pix to a color rasterfile using the XImtool "idl15.lut" 
+LUT file in the current directory and default intensity mapping:
+
+  cl> copy /usr/local/lib/imtoolcmap/idl15.lut .
+  cl> export dev$pix dpix ras outbands="setcmap(zscale(i1),'idl15.lut')"
+
+
+\fIAdvanced Usage\fR
+
+Given a set of DISPLAY task z1/z2 values of 10 and 320 respectively, and
+brightness/contrast values from XImtool of 0.6 and 1.2 respectively, 
+convert an image to an EPS file with the same appearance:
+
+  im> type expr
+  setcmap ( zscale (i1, 10.0, 320.0), "greyscale", 0.6, 1.2 )
+  im> export dev$pix dpix eps outbands="@expr"
+
+Concatenate two images side-by-side to a PGM file, normalize each image 
+by it's exposure time and apply a default intensity mapping:
+
+  cl> export im1,im2 two pgm \
+  >>>     outbands='(zscale(i1/i1.otime)) // (zscale(i2/i2.otime))'
+
+Convert dev$pix to a color GIF using the XImtool "idl15" LUT with a spec-
+ified brightness/contrast scale.  Map only pixel values between 5 and 300 
+to 201 output intensity values.  This should produce and image identical 
+to what one would get by displaying dev$pix to imtool, setting the same 
+brightness/contrast scale, and selecting the idl15 LUT:
+
+  cl> copy /usr/local/lib/imtoolcmap/idl15.lut .
+  cl> type expr.dat
+	setcmap (
+	    zscale(i1, 5.0, 320.0, 201),
+	    "idl15.lut", 
+	    0.41, 
+	    1.35)
+  cl> export dev$pix dpix gif outbands="@expr.dat"
+
+Combine three images representing RGB to an 8-bit Sun rasterfile with a
+computed colormap.  Scale the intensity value of each image differently.
+
+  cl> type expr.dat
+        cmap (
+            zscale (i1),
+            zscale (i2, 0.0, 1200.0),
+	    zscale (i3, -1.0, 320.0) )
+  cl> export im1,im2,im3 rgb ras outbands="@expr.dat"
+
+Do the same example but apply a gamma correction to the images:
+
+  cl> type expr.dat
+        cmap (
+            gamma (zscale(i1),        2.2),
+            gamma (zscale(i2,0,1200), 2.2),
+	    gamma (zscale(i3,-1,320), 2.2) )
+
+Write four images to a grayscale GIF file such that they are tiled in a 
+2x2 grid:
+
+  cl> export im1,im2,im3,im4 quad gif \
+  >>>        outbands="band( (i1//i2), (i3//i4) )"
+
+Do the same example but create a border of 2 gray pixels around each
+of the images and apply the AIPS0 LUT with brightness/contrast values
+to create a color image:
+
+  cl> copy /usr/local/lib/imtoolcmap/aips0.lut .
+  cl> type expr.dat
+        setcmap (
+            band( 
+                128, 128,
+                (repl (128,2) // i1// repl (128,2) // i2 // repl (128,2)), 
+                128, 128,
+                (repl (128,2) // i3// repl (128,2) // i4 // repl (128,2)),
+                128, 128 ),
+            "aips0.lut",
+            0.54,
+            1.03)
+  cl> export im1,im2,im3,im4 cquad gif outbands="@expr.dat"
+
+.fi
+
+Automatically scale an image ignoring data in a bad pixel mask (bpm), map the
+result to the greyscale part of the "overlay" color map, and apply a
+overlay pattern given by another mask (pattern).
+
+  cl> export dev$pix,bpm,pattern foo gif \
+  >>> outbands = "setcmap(i3==0?(zscalem(i1,i2==0)*200/255.):i3+203,'overlay')"
+
+
+The pattern has values of 1 and 203 is added to get it into the color map
+values of the overlay colors.  The factor of 200/255 is to scale the result
+of zscalem from the range 0-255 to the range 0-200.
+
+.ih
+NOTES
+	This task is new with V2.11.
+
+	(long int headers in RAS and XWD may cause problems on 64-bit 
+machines like the Alpha where host software expects 64-bit values.  Need to
+see if IRAF on the alpha produces 32 or 64-bit longs, either way exchanging
+images may be a problem)
+
+.ih
+BUGS
+	Output of bitmap images is currently not supported.
+.ih
+SEE ALSO
+import, tvmark, imexpr
+.endhelp

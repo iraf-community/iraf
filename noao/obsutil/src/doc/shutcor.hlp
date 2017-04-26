@@ -1,0 +1,93 @@
+.help shutcor Nov01 noao.obsutil
+.ih
+NAME
+shutcor -- shutter correction from images of varying exposure
+.ih
+SYNOPSIS
+SHUTCOR calculate the shutter correction for a detector given a
+sequence of overscan corrected images of varying durations.  Typically
+these would be flat field exposures.  The shutter correction is the
+intercept on a plot of exposure duration versus exposure level.
+.ih
+USAGE
+shutcor images
+.ih
+PARAMETERS
+.ls images
+List of overscan corrected images.  These would usually be flat
+field exposures.
+.le
+.ls section = ""
+The selected image section for the statistics.  This should be chosen
+to exclude bad columns or rows, cosmic rays, and other non-linear
+features.
+.le
+.ls center = "mode"
+The statistical measure of central tendency that is used to estimate
+the data level of each image.  This can have the values:  \fBmean\fR,
+\fBmidpt\fR, or \fBmode\fR.  These are calculated using the same
+algorithm as the IMSTATISTICS task.
+.le
+.ls nclip = 3
+Number of sigma clipping iterations.  If the value is zero then no clipping
+is performed.
+.le
+.ls lsigma = 4, usigma = 4
+Lower and upper sigma clipping factors used with the mean value and
+standard deviation to eliminate cosmic rays.
+Since \fBfindgain\fR is sensitive to the statistics of the data the
+clipping factors should be symmetric (the same both above and below the
+mean).
+.le
+.ls exposure = "exptime"
+Keyword giving the exposure time.
+.le
+.ls verbose = yes
+Verbose output?
+.le
+.ih
+DESCRIPTION
+SHUTCOR calculate the shutter correction for a detector given a
+sequence of overscan corrected images of varying durations.  Typically
+these would be flat field exposures.  The shutter correction is the
+intercept on a plot of exposure duration versus exposure level.
+
+The images must contain the keyword OVERSCAN otherwise and error will
+be given.
+
+Bad pixels should be eliminated to avoid affecting the statistics.
+This can be done with sigma clipping and/or an image section.
+The sigma clipping should not significantly affect the assumed gaussian
+distribution while eliminating outlyers due to cosmic rays and
+unmasked bad pixels.  This means that clipping factors should be
+symmetric.
+.ih
+EXAMPLES
+A sequence of flat fields with varying exposure times are taken and
+processed to subtract the overscan.
+
+.nf
+    cl> shutcor flat*
+
+    Shutter correction = 0.538 +/- 0.043 seconds
+
+    Information about the mode versus exptime fit:
+
+	   intercept        slope     (and errors)
+	    5.347105      9.933618
+	   0.4288701    0.01519613
+	
+	chi sqr:  0.2681   ftest: 419428.   correlation:      1.
+	 nr pts:      4.   std dev res: 0.422769
+	
+	x(data)     y(calc)     y(data)     sigy(data)
+	     3.      35.148     34.6725          0.
+	    12.     124.551     125.015          0.
+	    27.     273.555     273.778          0.
+	    48.     482.161     481.949          0.
+.fi
+.le
+.ih
+SEE ALSO
+imstatistics
+.endhelp

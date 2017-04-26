@@ -1,0 +1,18 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+$for (silrdx)
+
+# IMTR2 -- Generic transpose.  The arrays need not be identical.
+
+procedure imtr2$t (a, b, nx, ny)
+
+PIXEL	a[nx, ny], b[ny, nx]
+int	nx, ny, x, y
+
+begin
+	do x = 1, nx
+	   do y = 1, ny
+	       b[y, x] = a[x, y]
+end
+
+$endfor

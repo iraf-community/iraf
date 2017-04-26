@@ -1,0 +1,242 @@
+.help agetim Mar00 astcat
+.ih
+NAME
+agetim -- extract fits images from image surveys
+.ih
+USAGE
+agetim regions output
+.ih
+PARAMETERS
+.ls regions
+The source  of the extraction region definitions. The options are:
+.ls <filename>
+The name of a text file containing a list of region definitions, one
+region definition per line. The format of the regions file is described
+in detail below.
+.le
+.ls <image list>
+The list of images containing the region definition. The input images
+must have a valid FITS world coordinate system in order to be used
+for region definition.
+.le
+.ls pars
+If regions is set to the reserved keyword "pars" then a single region
+definition is read from the \fIaregpars\fR parameter set. By default a region
+ten arc minutes in size centered on coordinates ra = "00:00:00.0" and
+dec = "+00:00:00" in the query coordinate system is extracted.
+.le
+.le
+.ls images
+The list of output FITS image files. The number of output files must be equal
+to the number regions in the regions list times the number of astrometry
+catalogs in the catalog list. By default the output images are assigned names of
+the form "reg#[.sv#].#.fits" if the region definition source is "pars" or
+a file, e.g. "reg002.1.fits", or "image[.sv#].#.fits" if the region
+definition source is an image list, e.g. "image.1.fits". The image survey
+number is only inserted if there is more than one image survey
+in the image survey list.
+.le
+.ls aregpars = ""
+The region definition parameter set. The aregpars parameters define the
+extraction region center, region width, region center units, and the region
+center coordinate system. The region definition parameters are used if
+\fIregions\fR = "pars".
+.le
+.ls imsurveys = ")_.imsurveys"
+The list of input image surveys. By default the image survey name is set to the
+value of the package parameter imsurveys. 
+.le
+.ls wcsedit = no
+Convert a DSS WCS to a FITS WCS or add an approximate FITS style WCS to the
+output image headers if they don't already possess one ?  The WCS status
+of the survey images  plus approximate coordinate, scale, orientation, and
+projection information is stored in the image surveys configuration
+file \fIimdb\fR.
+.le
+.ls hdredit = no
+Add a set of standard keywords to the image header which may be required or
+useful in the later astrometric analysis steps ?  These parameters divide
+into two groups, those concerned with locating objects in an image and
+those required to transform from mean place to observed coordinates.
+Default settings for these parameters are stored in the images surveys
+configuration file.
+.le
+.ls update = no
+Update the default values of the algorithm parameters, e.g. aregpars
+on task termination ?
+.le
+.ls verbose = yes
+Print status messages on the terminal as the task proceeds ?
+.le
+.ls imdb = ")_.imdb"
+The image surveys configuration file. Imdb defaults to the value of the
+package parameter imdb. The default image surveys configuration file is
+"astcat$lib/imdb.dat".
+.le
+
+.ih
+DESCRIPTION
+
+Agetim extracts fits images from local or remote image surveys
+\fIimsurveys\fR using a list of region definitions supplied by the user
+\fIregions\fR and writes the results of each image survey query to the output
+images \fIoutput\fR.
+
+A regions definition consists of the coordinates of the field center,
+the field size, the units of the field center, and the coordinate system of
+the field center. If \fIregions\fR = "pars" these quantities are read
+from the \fIaregpars\fR parameters \fIrcra\fR, \fIrcdec\fR, \fIrcrawidth\fR,
+\fIrcdecwidth\fR \fIrcraunits\fR, \fIrcdecunits\fR., and \fIrcsystem\fR. 
+If \fIregions\fR is an input image
+list they are read from the FITS world coordinate system in the image header.
+If \fIregions\fR is a file name they are read from file whose format is
+the following.
+
+.nf
+# Optional comment
+
+ra1 dec1 xwidth1 ywidth1 [raunits1 [decunits1 [system1]]]
+ra2 dec2 xwidth2 ywidth2 [raunits2 [decunits2 [system2]]]
+... .... ....... ....... [........ [......... [.......]]]
+raN decN xwidthN ywidthN [raunitsN [decunitsN [systemN]]]
+.fi
+
+Quantities in square brackets are optional. If system is undefined the
+coordinate system defaults to the query coordinate system, i.e. if the
+catalog query expects coordinates in J2000.0 then ra and dec will be
+interpreted as though they were in the J2000.0 system. If undefined 
+the ra and dec units default to the preferred units of the coordinate
+system, i.e. hours and degrees for equatorial coordinate systems,
+and degrees and degrees for ecliptic, galactic, and supergalactic 
+coordinate systems.
+
+A sample regions file  is shown below. If the image query system is
+J2000.0 then all four regions definitions are equivalent, since J2000.0
+is assumed in examples 1 and 2, is specified in example 3, and example
+is same target as example but expressed in the B1950.0 coordinate system.
+
+.nf
+# List of targets
+
+13:29:53.27 +47:11:48.4 10.0 10.0 
+13:29:53.27 +47:11:48.4 10.0 10.0 hours degrees 
+13:29:53.27 +47:11:48.4 10.0 10.0 hours degrees J2000.0
+13:27:46.90 +47:27:16.0 10.0 10.0 hours degrees B1950.0
+.fi
+
+For each specified image survey in \fIimsurvey\fR agetim loops through the
+regions list, formats the image survey query, makes a local or remote
+connection to the image server using the image survey description in the
+image survey configuration file \fIimdb\fR, and captures the results.
+Image survey names must be of the form imsurvey@site, e.g. dss1@cadc.
+Image survey names without entries in the image survey configuration file
+are skipped.
+
+If \fIwcsedit\fR = yes  then DSS coordinate systems are converted
+into FITS coordinate systems or an approximate FITS WCS is added
+to the image using information in the image surveys configuration file.
+The quantities of interest are the values, units, and coordinates
+system of the reference point \fIwxref\fR, \fIwyref\fR, \fIwraref\fR,
+\fIwdecref\fR, \fIwraunits\fR, \fIwdecunits\fR, and \fIwsystem\fR, and the
+scale, orientation, and projection information \fIwxmag\fR, \fIwymag\fR,
+\fIwxrot\fR, \fIwyrot\fR, and \fIwproj\fR. For more information on how these
+quantities are defined in the image surveys configuration file 
+type "help imsurveys".
+
+If \fIhdredit\fR = yes then a standard set of keyword equal values
+pairs will be added to the image headers using information in the
+image surveys configuration file.  The parameters divide into two groups
+those concerned with locating stars in the image and computing accurate
+pixel centers: \fIedatamin\fR, \fIedatamax\fR, \fIegain\fR, and \fIerdnoise\fR,
+and those required for transforming mean place coordinates to observed
+plate coordinates as may be required to compute very accurate image scales,
+\fIobservat\fR, \fIesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
+\fIemjdobs\fR, \fIewavlen\fR, \fIetemp\fR, and \fIepress\fR. New keyword
+values are only added to the header if keywords of the same name do not
+already exist and if appropriate values for the keywords exists, i.e.
+"INDEF" valued parameters will not be added to the header.
+
+If \fIupdate\fR = yes the values of the \fIaregpars\fR parameters will be
+updated at task termination. If \fIverbose\fR = yes then detailed status
+reports are issued as the task executes.
+
+.ih
+EXAMPLES
+
+1. Extract data from the default image survey using the default region
+definition, display the resulting image,  and examine its header.
+
+.nf
+cl> agetim pars default
+cl> display reg001.1.fits 1 fi+
+cl> imheader reg001.1.fits lo+ | page
+.fi
+
+2. Repeat the previous example but convert the DSS WCS to a FITS WCS.
+The DSS WCS is unaltered.
+
+.nf
+cl> agetim pars default wcsedit+ 
+cl> display reg001.2.fits 1 fi+
+cl> imheader reg001.2.fits
+.fi
+
+
+3. Repeat example 2 but extract data for two surveys.
+
+.nf
+cl> agetim pars default wcsedit+ imsurveys="dss1@cadc,dss2@cadc"
+cl> display reg001.3.fits 1 fi+
+cl> imheader reg001.3.fits
+cl> display reg002.1.fits 2 fi+
+cl> imheader reg002.1.fits
+.fi
+
+4. Repeat example 2 but add the values of the standard astrometry image
+keywords if these do not already exist in the image header and are defined.
+
+.nf
+cl> agetim pars default wcsedit+ hdredit+
+cl> display reg001.4.fits 1 fi+
+cl> imheader reg001.4.fits
+.fi
+
+5. Extract images for a list of regions in a text file.  Note that the
+coordinate system and coordinate units are not specified in this regions
+list and default to those expected by the image survey query.
+
+.nf
+page regions
+00:00:00.0 -90:00:00 10.0 10.0 
+00:00:00.0 -60:00:00 10.0 10.0 
+00:00:00.0 -30:00:00 10.0 10.0 
+00:00:00.0 +00:00:00 10.0 10.0 
+00:00:00.0 +30:00:00 10.0 10.0 
+00:00:00.0 +60:00:00 10.0 10.0 
+00:00:00.0 +90:00:00 10.0 10.0 
+cl> agetim regions default
+.fi
+
+6. Run agetim on a list of images containing valid FITS WCS information.
+Note that in the following example the test image dev$pix does not
+have a FITS WCS so no data is extracted for it.
+
+.nf
+cl> page imlist
+dev$pix
+dev$ypix
+cl> agetim @imlist default
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+If output file is not a fits file, as may be the case if an error occurred
+in the network transfer, and header editing is enabled agetim will
+crash with a file seek error. The bug is due to missing error check 
+statements in the FITS kernel and will be fixed for the next release.
+.ih
+SEE ALSO
+aslist, adumpim, aregpars
+.endhelp

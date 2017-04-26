@@ -1,0 +1,181 @@
+.help phistogram Nov89 plot
+.ih
+NAME
+phistogram -- print or plot the histogram of an image or stream of values
+.ih
+USAGE
+phistogram input
+.ih
+PARAMETERS
+.ls input
+The name of the image, image subsection, or the text file containing the
+stream of values whose histogram is to be computed. \fIInput\fR may be
+the standard input "STDIN".
+.le
+.ls z1 = INDEF, z2 = INDEF
+The minimum and maximum values included in the histogram. The image or data
+minimum and maximum values are used by default.
+.le
+.ls binwidth = INDEF
+The resolution of the histogram in data units. If \fIbinwidth\fR is not defined,
+the parameters \fInbins\fR, \fIz1\fR, and \fIz2\fR determine the resolution of
+the histogram.
+.le
+.ls nbins = 512
+The number of bins in, or resolution of, the histogram. 
+The \fInbins\fR parameter is overridden if \fIbinwidth\fR is defined.
+.le
+.ls autoscale = yes
+In the case of integer image data, automatically adjust \fInbins\fR and
+\fIz2\fR to avoid aliasing effects. Data in text files is not autoscaled.
+.le
+.ls top_closed = no
+Include z2 in the top bin?  Each bin of the histogram is a subinterval
+that is half open at the top.  \fITop_closed\fR decides whether those
+pixels with values equal to z2 are to be counted in the histogram.  If
+\fBtop_closed\fR is yes, the top bin will be larger than the other bins.
+.le
+.ls hist_type = "normal"
+The type of histogram to plot or list.  The choices are "normal",
+"cumulative", "difference", or "second_difference".  The two
+"difference" options are calculated as forward differences, i.e.
+diff[n] = hist[n+1] - hist[n].
+.le
+.ls listout = no
+List instead of plot the histogram?  The list is never log scaled.
+.le
+.ls title = "imtitle"
+The plot title. If title = "imtitle", the image name and title or the
+text file name, and the 
+characteristics of the histogram are included in the title.
+.le
+.ls xlabel = "Data values", ylabel = "Counts"
+The labels for the X and Y axes.
+.le
+.ls wx1 = INDEF, wx2 = INDEF, wy1 = 0.0, wy2 = INDEF
+The range of user coordinates spanned by the plot. If either of the x axis
+limits is INDEF the histogram minimum or maximum data values
+are used.  If either of the y axis limits is INDEF,  the 
+minimum or maximum counts in the histogram is used.
+.le
+.ls logx = no, logy = yes
+Use log scaling on the x or y axes of the plot?
+.le
+.ls round = no
+Round the axes minimum and maximum values up to "nice" values?
+.le
+.ls plot_type = "line"
+The style of histogram to plot. The options are "line", "box" and "fullbox".
+If \fIplot_type\fR is "line" the histogram data points are connected by
+straight lines; if it is "box" a stepped histogram is drawn; if it is "fullbox" 
+the histogram lines are drawn to the base of the plot.
+.le
+.ls box = yes
+Draw axes at the perimeter of the plotting window?
+.le
+.ls ticklabels = yes
+Label the tick marks?
+.le
+.ls majrx = 5, minrx = 5, majry = 5, minry = 5
+Number of major tick marks on each axis and number of minor tick marks between
+major tick marks. These quantities are ignored if log scaling is in effect
+for an axis.
+.le
+.ls fill = yes
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls vx1 = 0.0, vx2 = 1.0, vy1 = 0.0, vy2 = 1.0
+The NDC coordinates (0.0:1.0) of the device plotting viewport.
+.le
+.ls append = no
+Append to an existing plot?
+.le
+.ls pattern = "solid"
+The type of line used to draw the histogram. The options are "solid",
+"dashed" "dotted", and "dotdash". \fIPattern\fR can be changed when
+appending to an existing plot.
+.le
+.ls device = "stdgraph"
+The output graphics device.
+.le
+.ih
+DESCRIPTION
+\fIPhistogram\fR computes the histogram of the IRAF image or stream
+of values in the text file specified by
+\fIinput\fR, using the parameters \fIbinwidth\fR, \fInbins\fR,
+\fIz1\fR and \fIz2\fR.
+If either \fIz1\fR or \fIz2\fR is undefined the data minimum or
+maximum values define the histogram limits.
+If \fIbinwidth\fR is undefined, \fInbins\fR
+determines the resolution of the histogram. If \fIlistout\fR = no,
+the histogram is plotted on
+the graphics device \fIdevice\fR in the style specified by
+\fIplot_type\fR.  The plot may be log scaled if \fIlogy\fR = yes (the
+default) and the input is an IRAF image.  If \fIlistout\fR = yes,
+the histogram is printed on the standard output.
+
+In addition to computing the "normal" histogram, PHISTOGRAM can also
+calculate the cumulative and the first and second difference histograms
+depending on the value of the \fIhist_type\fR parameter. The options are:
+"normal", "cumulative", "difference", and "second_difference".
+
+Each bin of the histogram is defined to be half open at the top.  This
+results in an ambiguity in deciding whether those pixels with z=z2 are
+included in the topmost bin.  This decision is left to the user via the
+\fItop_closed\fR parameter.  This is usually only of concern with integer
+image data and histograms with few bins.
+
+If \fBappend\fR is enabled, previous values for \fBbox\fR,
+\fBfill\fR, \fBround\fR, the plotting viewport (\fBvx1\fR, \fBvx2\fR, 
+\fBvy1\fR, \fBvy2\fR), and the plotting window (\fBwx1\fR, \fBwx2\fR, 
+\fBwy1\fR, \fBwy2\fR) are used.
+
+By default, the plot drawn will fill the device viewport.  Setting
+the value of \fBfill\fR  to "no" means the viewport will be adjusted so 
+that equal numbers of data values in x and y will occupy equal lengths 
+when plotted.  That is, when \fBfill = no\fR, a unity aspect ratio is 
+enforced, and plots
+appear square regardless of the device aspect ratio.  On devices with non 
+square full device viewports (e.g., the vt640), a plot drawn by
+PHISTOGRAM appears extended in the x direction unless \fBfill\fR = no.
+
+.ih
+EXAMPLES
+1. Output the histogram of an image to a file.
+
+    cl> phist M51.imh li+ nbins=100 > fits1.hst
+
+2. Plot the histogram of an image using only values from 0 to 2000.
+
+    cl> phist M31.imh nbins=100 z1=0. z2=2000.
+
+3. Ditto, but set the histogram resolution explicitly to avoid
+smoothing the histogram.
+
+    cl> phist M31.imh z1=0 z2=2000 nbins=2001
+
+4. Plot the cumulative histogram.  This is most useful for images with
+fairly flat "normal" histograms.
+
+    cl> phist R50.imh hist=cum
+
+5. Plot the histogram of a stream of values in the textfile "list".
+
+    cl> phist list
+.ih
+BUGS
+If the resolution of the histogram (number of bins) is a non-integral multiple
+of the intensity resolution of the data (number of possible intensity values),
+then \fIaliasing\fR can occur.  The effect is to cause periodic zero dropouts
+(for an oversampled histogram) or excess-valued bins (for a slightly
+undersampled histogram).  The \fIautoscaling\fR feature, if enabled, will
+adjust the histogram parameters to avoid such aliasing effects for integer
+data.  This is not possible for floating point data, however, in which case
+aliasing is certainly possible and can only be avoided by manually adjusting
+the histogram parameters.  One should also be aware that \fIsmoothing\fR of
+the histogram will occur whenever the data range exceeds the histogram
+resolution.
+.ih
+SEE ALSO
+listpixels, plot.graph, proto.mkhistogram
+.endhelp

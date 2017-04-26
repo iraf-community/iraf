@@ -1,0 +1,117 @@
+# OUTPUT PARAMETERS
+
+apertures,s,h,)apall.apertures,,,>apall.apertures
+format,s,h,)apall.format,,,>apall.format
+extras,b,h,)apall.extras,,,>apall.extras
+dbwrite,s,h,yes,,,Write to database?
+initialize,b,h,yes,,,Initialize answers?
+verbose,b,h,)_.verbose,,,"Verbose output?
+
+# DEFAULT APERTURE PARAMETERS
+"
+lower,r,h,)apall.lower,,,>apall.lower
+upper,r,h,)apall.upper,,,>apall.upper
+apidtable,s,h,)apall.apidtable,,,">apall.apidtable
+
+# DEFAULT BACKGROUND PARAMETERS
+"
+b_function,s,h,)apall.b_function,,,>apall.b_function
+b_order,i,h,)apall.b_order,,,>apall.b_order
+b_sample,s,h,)apall.b_sample,,,>apall.b_sample
+b_naverage,i,h,)apall.b_naverage,,,>apall.b_naverage
+b_niterate,i,h,)apall.b_niterate,,,>apall.b_niterate
+b_low_reject,r,h,)apall.b_low_reject,,,>apall.b_low_reject
+b_high_reject,r,h,)apall.b_high_reject,,,>apall.b_high_reject
+b_grow,r,h,)apall.b_grow,,,">apall.b_grow
+
+# APERTURE CENTERING PARAMETERS
+"
+width,r,h,)apall.width,,,>apall.width
+radius,r,h,)apall.radius,,,>apall.radius
+threshold,r,h,)apall.threshold,,,">apall.threshold
+
+# AUTOMATIC FINDING AND ORDERING PARAMETERS
+"
+nfind,i,h,)apall.nfind,,,>apall.nfind
+minsep,r,h,)apall.minsep,,,>apall.minsep
+maxsep,r,h,)apall.maxsep,,,>apall.maxsep
+order,s,h,)apall.order,,,">apall.order
+
+# RECENTERING PARAMETERS
+"
+aprecenter,s,h,)apall.aprecenter,,,>apall.aprecenter
+npeaks,r,h,)apall.npeaks,,,>apall.npeaks
+shift,b,h,)apall.shift,,,">apall.shift
+
+# RESIZING PARAMETERS
+"
+llimit,r,h,)apall.llimit,,,>apall.llimit
+ulimit,r,h,)apall.ulimit,,,>apall.ulimit
+ylevel,r,h,)apall.ylevel,,,>apall.ylevel
+peak,b,h,)apall.peak,,,>apall.peak
+bkg,b,h,)apall.bkg,,,>apall.bkg
+r_grow,r,h,)apall.r_grow,,,>apall.r_grow
+avglimits,b,h,)apall.avglimits,,,">apall.avglimits
+
+# EDITING PARAMETERS
+"
+e_output,s,q,,,,Output spectra rootname
+e_profiles,s,q,,,,Profile reference image
+
+# TRACING PARAMETERS
+t_nsum,i,h,)apall.t_nsum,,,>apall.t_nsum
+t_step,i,h,)apall.t_step,,,>apall.t_step
+t_nlost,i,h,)apall.t_nlost,,,>apall.t_nlost
+t_width,r,h,)apall.width,,,>apall.width
+t_function,s,h,)apall.t_function,,,>apall.t_function
+t_order,i,h,)apall.t_order,,,>apall.t_order
+t_sample,s,h,)apall.t_sample,,,>apall.t_sample
+t_naverage,i,h,)apall.t_naverage,,,>apall.t_naverage
+t_niterate,i,h,)apall.t_niterate,,,>apall.t_niterate
+t_low_reject,r,h,)apall.t_low_reject,,,>apall.t_low_reject
+t_high_reject,r,h,)apall.t_high_reject,,,>apall.t_high_reject
+t_grow,r,h,)apall.t_grow,,,">apall.t_grow
+
+# EXTRACTION PARAMETERS
+"
+background,s,h,)apall.background,,,>apall.background
+skybox,i,h,)apall.skybox,,,>apall.skybox
+weights,s,h,)apall.weights,,,>apall.weights
+pfit,s,h,)apall.pfit,,,>apall.pfit
+clean,b,h,)apall.clean,,,>apall.clean
+nclean,r,h,0.5,,,Maximum number of pixels to clean
+niterate,i,h,5,0,,Number of profile fitting iterations
+saturation,r,h,)apall.saturation,,,>apall.saturation
+readnoise,s,h,)apall.readnoise,,,>apall.readnoise
+gain,s,h,)apall.gain,,,>apall.gain
+lsigma,r,h,)apall.lsigma,,,>apall.lsigma
+usigma,r,h,)apall.usigma,,,>apall.usigma
+polysep,r,h,0.90,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
+nsubaps,i,h,)apall.nsubaps,,,">apall.nsubaps
+
+# ANSWER PARAMETERS
+"
+ansclobber,s,h,"no",,," "
+ansclobber1,s,h,"no",,," "
+ansdbwrite,s,h,"yes",,," "
+ansdbwrite1,s,h,"yes",,," "
+ansedit,s,h,"yes",,," "
+ansextract,s,h,"yes",,," "
+ansfind,s,h,"yes",,," "
+ansfit,s,h,"yes",,," "
+ansfitscatter,s,h,"yes",,," "
+ansfitsmooth,s,h,"yes",,," "
+ansfitspec,s,h,"yes",,," "
+ansfitspec1,s,h,"yes",,," "
+ansfittrace,s,h,"yes",,," "
+ansfittrace1,s,h,"yes",,," "
+ansflat,s,h,"yes",,," "
+ansnorm,s,h,"yes",,," "
+ansrecenter,s,h,"yes",,," "
+ansresize,s,h,"yes",,," "
+ansreview,s,h,"yes",,," "
+ansreview1,s,h,"yes",,," "
+ansscat,s,h,"yes",,," "
+anssmooth,s,h,"yes",,," "
+anstrace,s,h,"yes",,," "

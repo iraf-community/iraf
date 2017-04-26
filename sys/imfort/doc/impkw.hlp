@@ -1,0 +1,51 @@
+.help impkw Sep86 imfort
+.ih
+NAME
+impkw -- set the value of an image header keyword
+.ih
+SYNOPSIS
+.nf
+subroutine impkwb (im, keyw, bval, ier)
+subroutine impkwc (im, keyw, cval, ier)
+subroutine impkwi (im, keyw, ival, ier)
+subroutine impkwr (im, keyw, rval, ier)
+subroutine impkwd (im, keyw, dval, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of the keyword to be set
+integer		ier		#O status return
+
+logical		bval		#I logical (boolean) keyword value
+character*(*)	cval		#I character string keyword value
+integer		ival		#I integer keyword value
+real		rval		#I real keyword value
+doubleprecision	dval		#I double precision keyword value
+.fi
+.ih
+DESCRIPTION
+The \fIimpkw\fR procedures are used to set the values of existing image
+header keywords.  It is an error if the named keyword does not already
+exist; the \fIimakw\fR procedures should be used if one wants the keyword
+to be automatically added if not found, but if the keyword is known
+to exist it is preferable to use the \fIimpkw\fR procedures since they
+are more efficient and will detect misspelled keyword names and foreign
+images.  Automatic datatype conversion is provided, i.e., it is not
+necessary to know the exact datatype of a keyword to update its value.
+.ih
+RETURN VALUE
+A zero status is returned if the named keyword exists, is writable, and if
+the datatype coercion implied is permissible.
+
+.nf
+SYS_IDBKEYNF:	image header keyword not found
+SYS_IDBTYPE:	illegal header parameter data type conversion
+.fi
+.ih
+NOTES
+It is not an error to update the value of a keyword in an image opened
+for read-only access, but an error status will be returned at \fIimclos\fR or
+\fIimflsh\fR time since the header cannot be updated on disk.
+.ih
+SEE ALSO
+imacck, imakw, imgkw
+.endhelp

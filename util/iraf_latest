@@ -1,0 +1,114 @@
+#!/bin/bash
+#
+#  IRAF_LATEST - Update the system with the latest distribution files.
+
+
+opt="all"
+
+
+if (( $#<1 )); then
+    /bin/echo "Usage:  iraf_latest <opt>"
+    exit 0
+else
+    opt=$1
+fi
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Called from Makefile, set iraf root.
+if [ -e $iraf/unix/hlib/irafuser.sh ]; then
+    source $iraf/unix/hlib/irafuser.sh
+fi
+
+echo '$iraf is '$iraf
+
+
+REPO=`${iraf}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${iraf}/unix/hlib/irafarch.sh -actual`
+fi
+
+
+#/bin/echo "iraf_latest: cwd = " `pwd`
+
+# Figure out which binaries are required.
+files="patch-src.tar.gz"			# always need the source ....
+bins=""
+archs=("linux" "linux64" "macosx" "macintel")
+for b in ${archs[@]} ; do
+    if [ -e "bin.$b/x_images.e" ]; then
+	bins=`/bin/echo $bins " " $b`
+	case "$b" in
+	"linux")
+	    files=`/bin/echo "$files patch.lnux.x86.tar.gz"`
+	    ;;
+	"linux64")
+	    files=`/bin/echo "$files patch.lnux.x86_64.tar.gz"`
+	    ;;
+	"macosx")
+	    files=`/bin/echo "$files patch.macx.x86.tar.gz"`
+	    ;;
+	"macintel")
+	    files=`/bin/echo "$files patch.macx.x86_64.tar.gz"`
+	    ;;
+	esac
+    fi
+done
+/bin/echo "Updating binaries:  " $bins
+
+
+# Download the needed files to /tmp
+
+FGET="${iraf}/util/fget"
+REPO=`${iraf}/util/pkgrepo`
+for f in ${files[@]} ; do
+    /bin/echo -n "Downloading: $f"
+    ${FGET} -q -d /tmp/ $REPO/$f
+
+    if [ ! -e /tmp/$f ]; then
+	/bin/echo ""
+	/bin/echo "Error: file $REPO/$f not found, quitting"
+	exit 1
+    elif [ -z /tmp/$f ]; then
+	/bin/echo ""
+	/bin/echo "Error downloading $REPO/$f, quitting"
+	exit 1
+    fi
+
+    /bin/echo ""
+    /bin/echo -n "Unpacking ..."
+    tar zxf /tmp/$f
+    /bin/rm -f /tmp/$f
+
+    /bin/echo    " Done."
+done
+
+
+#  For the initial release, the update procedures haven't yet been defined.
+#  This script will be replaced by the working version at the first release.
+
+
+if [ $opt == "all" ]; then			# Update everything
+  if [ -e extern/.installed ]; then
+    /bin/echo "Update all external packages ..."
+    (cd extern ; make update)
+  fi
+else
+    /bin/echo "Unknown option '"$opt"'"
+    exit 1
+fi
+
+/bin/echo ""
+exit 0

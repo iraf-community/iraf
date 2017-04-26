@@ -1,0 +1,579 @@
+.help daofind May00 noao.digiphot.apphot
+.ih
+NAME
+daofind -- automatically detect objects in an image
+.ih
+USAGE
+daofind image 
+.ih
+PARAMETERS
+.ls image
+The list of images in which objects are to be detected.
+.le
+.ls output  = "default"
+The name of the results file or the results directory. If output is
+"default", "dir$default" or a directory specification then a results file
+name of the form dir$root.extension.version is constructed, where
+dir is the directory, root is the root image name, extension is "coo"
+and version is the next available version number for the file. If the
+output string is undefined then no output file is created. One output
+file is created for every input image.
+.le
+.ls starmap = ""
+The name of the image prefix and/or directory where the density enhancement
+image will be stored. If starmap is undefined or a directory,
+DAOFIND will create a temporary image which is deleted on exit from
+the program. Otherwise starmap is prefixed to the image name
+and the density enhancement image will be saved for use in a subsequent
+run of DAOFIND.
+.le
+.ls skymap = ""
+The name of the image prefix and/or directory where the mean density
+image will be stored.  If skymap is undefined or a directory, no mean density
+image is created. Otherwise skymap is prefixed to the image name
+and the mean density image will be saved on disk. Skymap is not used by
+the DAOFIND algorithms, but may be used by the user as a check on DAOFIND,
+since the sum of starmap and skymap is a type of best fit to the original 
+image.
+.le
+.ls datapars = ""
+The name of the file containing the data dependent parameters. The critical
+parameters \fIfwhmpsf\fR and \fIsigma\fR are located here.  If \fIdatapars\fR
+is undefined then the default parameter set in the user's uparm directory is
+used.
+.le
+.ls findpars = ""
+The name of the file containing the object detection parameters. The 
+parameter \fIthreshold\fR is located here. If findpars is undefined then
+the default parameter set in the user's uparm directory is used.
+.le
+.ls boundary = "nearest"
+The type of boundary extension. The choices are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the other side of the image.
+.le
+.le
+.ls constant = 0
+The constant for constant boundary extension.
+.le
+.ls interactive = no
+Interactive or batch mode?
+.le
+.ls icommands = ""
+The image display cursor or image cursor command file.
+.le
+.ls gcommands = ""
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsout = ")_.wcsout"
+The coordinate system of the output coordinates written to \fIoutput\fR. The
+image header coordinate system is used to transform from the internal "logical"
+pixel coordinate system to the output coordinate system. The output coordinate
+system options are "logical", "tv", and "physical". The image cursor coordinate
+ system is assumed to be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv  
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+The wcsout parameter defaults to the value of the package parameter of the same
+ name. The default values of the package parameters wcsin and wcsout are
+"logical" and "logical" respectively.
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls verify = ")_.verify"
+Automatically confirm the critical parameters when running in non-interactive
+mode? Verify may be set to the apphot package parameter value (the default),
+"yes", or "no".
+.le
+.ls update = ")_.update"
+Automatically update the algorithm parameters in non-interactive mode if
+verify is "yes".  Update may be set to the apphot package parameter value
+(the default), "yes", or "no".
+.le
+.ls verbose = ")_.verbose"
+Print out information about the progress of the task in non-interactive mode.
+Verbose may be set to the apphot package parameter value (the default), "yes",
+or "no".
+.le
+.ls graphics = ")_.graphics"
+The standard graphics device. Graphics may be set to the apphot package
+parameter value (the default), "yes", or "no".
+.le
+.ls display = ")_.display"
+The standard image display device.  Display may be set to the apphot package
+parameter value (the default), "yes", or "no". By default graphics overlay is
+disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables
+graphics overlay with the IMD graphics kernel.  Setting display to "stdgraph"
+enables DAOFIND to work interactively from a contour plot.
+
+.le
+
+.ih
+DESCRIPTION
+
+DAOFIND searches the IRAF images \fIimage\fR for local density maxima,
+which have a full-width half-maximum of \fIdatapars.fwhmpsf\fR and a peak
+amplitude greater than \fIfindpars.threshold\fR * \fIdatapars.sigma\fR above
+the local background, and writes a list of detected objects in the file
+\fIoutput\fR.  The detected objects are also listed on the standard output
+if the program is running in interactive mode, or in non-interactive mode
+with the \fIverbose\fR switch is turned on.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input and output image pixels are cached in memory. If
+cacheing is enabled and DAOFIND is run interactively the first measurement
+will appear to take a long time as the entire image must be read in before the
+measurement is actually made. All subsequent measurements will be very fast
+because DAOFIND is accessing memory not disk. The point of cacheing is to speed
+up random image access by making the internal image i/o buffers the same size
+as the image itself. However if the input object lists are sorted in row order
+and sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
+
+DAOFIND can be run either interactively or in batch mode by setting the
+parameter \fIinteractive\fR. In interactive mode the user can examine,
+adjust, and save algorithm parameters, and fit or refit the  entire coordinate
+list with the chosen parameter set.  The \fIverify\fR parameter can be used
+to automatically enable confirmation of the critical parameters
+\fIdatapars.fwhmpsf\fR and \fIdatapars.sigma\fR when running in
+non-interactive mode.
+
+
+.ih
+CURSOR COMMANDS
+
+.nf
+
+	     Interactive Keystroke Commands
+
+?	Print help
+:	Colon commands 
+v	Verify the critical parameters
+w	Save the current parameters
+d	Plot radial profile of star near cursor
+i	Interactively set parameters using star near cursor
+f	Find stars in the image
+spbar	Find stars in the image, output results
+q	Exit task
+
+
+		Colon Commands
+
+:show		[data/find]	List the parameters
+
+		Colon Parameter Editing Commands
+
+# Image and file name parameters
+
+:image		[string]	Image name
+:output		[string]	Output file name
+
+# Data dependent parameters
+
+:scale		[value]		Image scale (units per pixel)
+:fwhmpsf	[value]		Full width half maximum of psf (scale units)
+:emission	[y/n]		Emission feature (y), absorption (n)
+:sigma		[value]		Standard deviation of sky (counts)
+:datamin	[value]		Minimum good data value (counts)
+:datamax	[value]		Maximum good data value (counts)
+
+# Noise description parameters
+
+:noise 		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# Observation parameters
+
+:exposure	[string]	Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime		[value]		Exposure time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# Object detection parameters
+
+:nsigma		[value]		Size of Gaussian kernel (sigma) 
+:threshold	[value]		Detection intensity threshold (counts)
+:ratio		[value]		Sigmay / sigmax of Gaussian kernel
+:theta		[value]		Position angle of Gaussian kernel
+:sharplo	[value]		Lower bound on sharpness
+:sharphi	[value]		Upper bound on sharpness
+:roundlo	[value]		Lower bound on roundness
+:roundhi	[value]		Upper bound on roundness
+
+# Plotting and marking commands
+
+:mkdetections	[y/n]		Mark detections on the image display
+
+
+The following commands are available inside the interactive setup menu.
+
+ 
+                    Interactive Daofind Setup Menu
+
+	v	Mark and verify critical daofind parameters (f,s)
+
+	f	Mark and verify the full-width half-maximum of the psf
+	s	Mark and verify the standard deviation of the background
+	l	Mark and verify the minimum good data value
+	u	Mark and verify the maximum good data value
+.fi
+
+.ih
+ALGORITHMS
+
+DAOFIND approximates the stellar point spread function with an elliptical
+Gaussian function, whose sigma along the semi-major axis is 0.42466 *
+\fIdatapars.fwhmpsf\fR / \fIdatapars.scale\fR pixels, semi-minor to semi-major
+axis ratio is \fIratio\fR, and major axis position angle is \fItheta\fR.
+Using this model, a convolution kernel, truncated at \fInsigma\fR sigma,
+and normalized so as to sum to zero, is constructed.
+
+The density enhancement image \fIstarmap\fR is computed by convolving the input
+image with the Gaussian kernel. This operation is mathematically equivalent to
+fitting, in the least-squares sense, the image data at each point with a
+truncated, lowered elliptical Gaussian function. After convolution each point
+in \fIstarmap\fR contains as estimate of the amplitude of the best fitting
+Gaussian function at that point. Each point in \fIskymap\fR, if the user
+chooses to compute it, contains an estimate of the best fitting sky value
+at that point.
+
+After image convolution , DAOFIND steps through \fIstarmap\fR searching
+for density enhancements greater than \fIfindpars.threshold\fR *
+\fIdatapars.sigma\fR, and brighter than all other density enhancements within
+a semi-major axis of 0.42466 \fIfindpars.nsigma\fR * \fIdatapars.fwhmpsf\fR.
+As the program selects candidates, it computes three shape characteristics,
+sharpness and 2 estimates of roundness.  The sharpness statistic measures the
+ratio of, the difference between the height of the central pixel and the mean
+of the surrounding non-bad pixels, to the height of the best fitting Gaussian
+function at that point. The first roundness characteristic computes the ratio
+of a measure of the bilateral symmetry of the object to a measure of the
+four-fold symmetry of the object. The second roundness statistic measures the
+ratio of, the difference in the height of the best fitting Gaussian function
+in x minus the best fitting Gaussian function in y, over the average of the
+best fitting Gaussian functions in x and y. The limits on these parameters
+\fIfindpars.sharplo\fR, \fIfindpars.sharphi\fR \fIfindpars.roundlo\fR, and
+\fIfindpars.roundhi\fR, are set to weed out non-astronomical objects and
+brightness enhancements that are elongated in x and y respectively.
+
+Lastly the x and y centroids of the detected objects are computed by estimating
+the x and y positions of the best fitting 1D Gaussian functions in x and y
+respectively, a rough magnitude is estimated by computing the ratio of the
+amplitude of the best fitting Gaussian at the object position to
+\fIfindpars.threshold\fR * \fIdatapars.sigma\fR, and the object is added to
+the output coordinate file.
+
+.ih
+OUTPUT
+
+In interactive mode or in non-interactive with the verbose switch turned on
+the following quantities are written to the terminal as each object is
+detected.
+
+.nf
+	xcenter  ycenter  mag  sharpness  sround  ground id
+
+		    where
+
+	mag = -2.5 * log10 (peak density / detection threshold)
+.fi
+
+The object centers are in pixels and the magnitude estimate measures the
+ratio of the maximum density enhancement to the detection threshold. 
+Sharpness is typically around .5 to .8 for a star with a fwhmpsf similar to
+the pattern star. Both sround and ground are close to zero for a truly 
+round star. Id is the sequence number of the star in the list.
+
+In both interactive and batch mode the full output is written to the text
+file \fIoutput\fR. At the beginning of each file is a header, listing
+the current values of the parameters when the first stellar record was
+written. The parameters can subsequently be altered. 
+
+.ih
+EXAMPLES
+
+1. Run daofind interactively on dev$ypix using the image display
+and image display cursor. Set the fwhmpsf and sigma parameters
+with the graphics cursor,  radial profile plot, and the interactive
+setup key i.
+
+.nf
+	ap> display dev$ypix 1 fi+
+
+	... display the image
+
+	ap> daofind dev$ypix interactive+
+
+	... type ? to see help screen
+
+	... move display cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile or
+            accept default with a CR
+	... set the fwhmpsf and sigma using the graphics cursor and the
+	    radial profile plot
+	... typing <CR> leaves the parameters at their default values
+        ... type q to quit setup menu
+
+	... type the v key to verify the critical parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the space bar to detect stars in the image
+
+	... a 1 line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... type q to quit and q again to confirm the quit
+
+	... full output will appear in the text file ypix.coo.1
+
+.fi
+
+2. Run daofind interactively on a single image using a contour plot in place
+of the image and the graphics cursor in place of the image cursor.
+This option is only useful for those (now very few) users who have access to
+a graphics terminal but not to an image display server. Set the fwhmpsf and
+sigma parameters with the graphics cursor and radial profile plot and the
+interactive setup key i.
+
+.nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+        ap> contour dev$ypix
+
+        ... make a contour plot of dev$ypix
+
+	ap> contour dev$ypix >G ypix.plot1
+
+        ... store the contour plot of ypix in the file ypix.plot
+
+	ap> daofind dev$ypix display=stdgraph interactive+
+
+        ... type ? to see the help screen
+
+	... move graphics cursor to a setup star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile or
+            accept the default with a CR
+	... set the fwhmpsf and sigma using the graphics cursor and the
+	    radial profile plot
+	... typing <CR> leaves the parameters at their default values
+        ... type q to quit the setup menu
+
+	... type the v key to confirm the critical parameters
+
+	... type the w key to save the parameters in the parameter files
+
+        ... retype :.read ypix.plot1 to reload the contour plot
+
+	... type the space bar to detect stars in the image
+
+	... a 1 line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... full output will appear in the text file ypix.coo.2
+
+	ap> set stdimcur = <default>
+
+        ... reset the image cursor to its default value
+
+.fi
+
+
+3. Run DAOFIND interactively without using the image display cursor.
+
+.nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
+	ap> set stdimcur = text
+
+	... set the image cursor to the standard input
+
+	ap> display dev$ypix 1
+
+	... display the image
+
+	ap> daofind dev$ypix interactive+
+
+        ... type ? for help
+
+	... type "442 409 101 i" in response to the image cursor query where
+	    x and y are the coordinates of the star to be used as setup,
+	    101 is the default world coordinate system, and i enters the
+	    interactive setup menu.
+	... enter maximum radius in pixels of the radial profile or
+            type CR to accept the default
+	... set the fwhmpsf and sigma using the graphics cursor and the
+	    radial profile plot
+	... typing <CR> leaves the parameters at their default values
+        ... type q to quit the setup menu
+
+	... type the v key to verify the parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the space bar to detect stars in the image
+
+	... a 1 line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... type q to quit and q again to confirm
+
+	... full output will appear in the text file ypix.coo.3
+
+	ap> set stdimcur = <default>
+
+        ... reset the image cursor to its default value
+.fi
+
+
+4. Run daofind on a list of 3 images contained in the file imlist in batch mode.
+The program will ask the user to verify that the fwhmpsf and the threshold are
+correct before beginning execution.
+
+.nf
+	ap> type imlist
+	dev$ypix
+	dev$wpix
+	dev$pix
+
+	ap> daofind @imlist
+
+        ... the output will appear in ypix.coo.4, wpix.coo.1, pix.coo.1
+.fi
+
+
+5. Display and find stars in an image section. Write the output coordinates
+in the coordinate system of the parent image. Mark the detected stars on
+the displayed image.
+
+.nf
+        ap> display dev$ypix[150:450,150:450]
+
+        ... display the image section
+
+        ap> daofind dev$ypix[150:450,150:450] wcsout=tv
+
+        ... output will appear in ypix.coo.5
+
+        ap> tvmark 1 ypix.coo.5 col=204
+.fi
+
+
+6. Repeat example 4 but submit the job to the background  and turn off the
+verify switch.
+
+.nf
+	ap> daofind @imlist verify- &
+
+	... the output will appear in ypix.coo.6, wpix.coo.2, pix.coo.2
+.fi
+
+
+7. Use an image cursor command file to drive the daofind task. The cursor
+command file shown below sets the fwhmpsf, sigma, and threshold parameters,
+located stars in the image, updates the parameter files, and quits the task.
+
+.nf
+        ap> type cmdfile
+        : fwhmpsf 2.5
+        : sigma 5.0
+        : threshold 10.0
+        \040
+        w
+        q
+
+        ap> daofind dev$ypix icommands=cmdfile verify-
+
+        ... full output will appear in ypix.coo.7
+.fi
+
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays and set the findpars mkdetections switch to
+"yes". It may be necessary to run gflush and to redisplay the image
+to get the overlays position correctly.
+
+.ih
+SEE ALSO
+datapars, findpars
+.endhelp

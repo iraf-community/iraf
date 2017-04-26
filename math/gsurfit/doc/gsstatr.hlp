@@ -1,0 +1,34 @@
+.help gsstatr Aug85 "Gsurfit Package"
+.ih
+NAME
+gsstatr -- get real parameter
+.ih
+SYNOPSIS
+include <math/gsurfit.h>
+
+rval = gsstatr (sf, parameter)
+
+.nf
+pointer	sf		# surface descriptor
+real	parameter	# real parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+The pointer to the surface descriptor structure.
+.le
+.ls parameter
+Parameter to be returned. The options are GSXMIN, GSXMAX, GSYMIN and
+and GSYMAX. The parameter definitions are
+found in the package header file math/gsurfit.h.
+.le
+.ih
+DESCRIPTION
+The values of the integer parameters are returned. The parameters include
+the minimum and maximum x values and the minimum and maximum y values.
+.ih
+NOTES
+.ih
+SEE ALSO
+gsstati
+.endhelp

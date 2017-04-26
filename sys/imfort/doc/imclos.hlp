@@ -1,0 +1,39 @@
+.help imclos Sep86 imfort
+.ih
+NAME
+imclos -- close an image
+.ih
+SYNOPSIS
+.nf
+subroutine imclos (im, ier)
+
+integer		im		#I image descriptor of open image
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+An image opened with \fIimopen\fR or \fIimopnc\fR should be closed with
+\fIimclos\fR when the image operation is complete.  The close operation
+flushes any buffered output pixel data, updates the header if necessary,
+closes the header and pixel files, and frees any system resources
+associated with the image descriptor.
+.ih
+RETURN VALUE
+A zero status is returned if the image descriptor is valid and the header
+and pixel files could be updated and closed without any errors.
+
+.nf
+IE_CLSHDR:	error closing image header file
+IE_CLSPIX:	error closing image pixel file
+IE_UPDHDR:	error updating image header file
+IE_UPDRO:	image header modified but image was opened read only
+.fi
+.ih
+NOTES
+If an image is erroneously opened read-only by a program which updates the
+image header, no error condition will occur until the image is closed,
+hence the \fIimclos\fR status return should always be checked.
+.ih
+SEE ALSO
+imopen, imopnc
+.endhelp

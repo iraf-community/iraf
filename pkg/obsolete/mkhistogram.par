@@ -1,0 +1,7 @@
+file,s,a,,,,File name
+nbins,i,a,1,1,,Number of bins in histogram
+z1,r,h,INDEF,,,Minimum histogram intensity
+z2,r,h,INDEF,,,Maximum histogram intensity
+listout,b,h,yes,,,List instead of plot histogram
+device,s,h,"stdgraph",,,output graphics device
+mode,s,h,ql,,,

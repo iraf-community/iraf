@@ -1,0 +1,54 @@
+# SCOMBINE -- Spectrum combine parameters
+
+input,s,a,,,,List of images to combine
+output,s,a,,,,List of output images
+headers,s,h,"",,,List of header files (optional)
+bpmasks,s,h,"",,,List of bad pixel masks (optional)
+rejmasks,s,h,"",,,List of rejection masks (optional)
+nrejmasks,s,h,"",,,List of number rejected masks (optional)
+expmasks,s,h,"",,,List of exposure masks (optional)
+sigmas,s,h,"",,,List of sigma images (optional)
+logfile,s,h,"STDOUT",,,"Log file
+"
+apertures,s,h,"",,,Apertures to combine
+group,s,h,"apertures","all|images|apertures",,Grouping option
+first,b,h,no,,,Use first spectrum for dispersion?
+w1,r,h,INDEF,,,Starting wavelength of output spectra
+w2,r,h,INDEF,,,Ending wavelength of output spectra
+dw,r,h,INDEF,,,Wavelength increment of output spectra
+nw,i,h,INDEF,,,Length of output spectra
+log,b,h,no,,,"Logarithmic increments?
+"
+combine,s,h,"average","average|median|sum",,Type of combine operation
+reject,s,h,"none","none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip",,Type of rejection
+outtype,s,h,"real","short|ushort|integer|long|real|double",,Output image pixel datatype
+outlimits,s,h,"",,,Output limits (x1 x2 y1 y2 ...)
+smaskformat,s,h,"bpmspectrum","bpmpixel|bpmspectrum",,Mask format
+smasktype,s,h,"none","none|goodvalue|badvalue|goodbits|badbits",,Mask type
+smaskvalue,r,h,0,,,Mask value
+blank,r,h,0.,,,"Value if there are no pixels
+"
+scale,s,h,"none",,,Image scaling
+zero,s,h,"none",,,Image zero point offset
+weight,s,h,"none",,,Image weights
+statsec,s,h,"",,,Image section for computing statistics
+expname,s,h,"",,,"Image header exposure time keyword
+"
+lthreshold,r,h,INDEF,,,Lower threshold
+hthreshold,r,h,INDEF,,,Upper threshold
+nlow,i,h,1,0,,minmax: Number of low pixels to reject
+nhigh,i,h,1,0,,minmax: Number of high pixels to reject
+nkeep,i,h,1,,,Minimum to keep (pos) or maximum to reject (neg)
+mclip,b,h,yes,,,Use median in sigma clipping algorithms?
+lsigma,r,h,3.,0.,,Lower sigma clipping factor
+hsigma,r,h,3.,0.,,Upper sigma clipping factor
+rdnoise,s,h,"0.",,,ccdclip: CCD readout noise (electrons)
+gain,s,h,"1.",,,ccdclip: CCD gain (electrons/DN)
+snoise,s,h,"0.",,,ccdclip: Sensitivity noise (fraction)
+sigscale,r,h,0.1,0.,,Tolerance for sigma clipping scaling corrections
+pclip,r,h,-0.5,,,pclip: Percentile clipping parameter
+grow,r,h,0.,0.,,"Radius for neighbor rejection
+"
+offsets,f,h,"physical","physical"
+masktype,s,h,"none"
+maskvalue,r,h,0

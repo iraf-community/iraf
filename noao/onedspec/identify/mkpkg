@@ -1,0 +1,48 @@
+# IDENTIFY Task
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	@autoid
+
+	$ifeq (USE_GENERIC, yes)
+	    $ifolder (peaks.x, peaks.gx)
+		$generic -k peaks.gx -o peaks.x $endif $endif
+
+	idcenter.x	identify.h <smw.h>
+	idcolon.x	identify.h <error.h> <gset.h> <smw.h>
+	iddb.x		identify.h <imset.h> <math/curfit.h> <pkg/dttext.h>\
+			<smw.h> <units.h>
+	iddelete.x	identify.h
+	iddofit.x	identify.h <units.h>
+	iddoshift.x	identify.h
+	idfitdata.x	identify.h <pkg/gtools.h> <smw.h> <units.h>\
+			<math/curfit.h>
+	idgdata.x	identify.h <imhdr.h> <imio.h> <pkg/gtools.h> <smw.h>\
+			<units.h>
+	idgraph.x	identify.h <gset.h> <pkg/gtools.h> <smw.h>
+	ididentify.x	identify.h <error.h> <gset.h> <imhdr.h> <smw.h>
+	idinit.x	identify.h <gset.h> <math/curfit.h>
+	idlabel.x	
+	idlinelist.x	identify.h <error.h> <mach.h> <units.h>
+	idlog.x		identify.h <time.h>
+	idmap.x		identify.h <ctype.h> <imhdr.h> <smw.h> <units.h>
+	idmark.x	identify.h <gset.h> <smw.h>
+	idnearest.x	identify.h
+	idnewfeature.x	identify.h <mach.h>
+	idnoextn.x	
+	idpeak.x	identify.h <smw.h>
+	idrms.x		identify.h
+	idshift.x	identify.h
+	idshow.x	identify.h
+	peaks.x	
+	reidentify.x	identify.h <error.h> <gset.h> <imhdr.h>
+	t_autoid.x	identify.h <error.h> <fset.h> <gset.h> <pkg/gtools.h>\
+			<smw.h>
+	t_identify.x	identify.h <mach.h> <pkg/gtools.h>
+	t_reidentify.x	identify.h <error.h> <fset.h> <gset.h> <pkg/gtools.h>\
+			 <smw.h>
+	;

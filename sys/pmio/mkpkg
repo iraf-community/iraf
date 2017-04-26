@@ -1,0 +1,68 @@
+# Make the PM package library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+tfiles:
+	$set PFLAGS = "-k -t silrdx -p tf/"
+	$set GFLAGS = "-k -t sil -p tf/"
+	$ifolder (tf/miogli.x,  miogl.gx)  $generic $(PFLAGS) miogl.gx  $endif
+	$ifolder (tf/miopli.x,  miopl.gx)  $generic $(PFLAGS) miopl.gx  $endif
+	$ifolder (tf/pmglpi.x,  pmglp.gx)  $generic $(GFLAGS) pmglp.gx  $endif
+	$ifolder (tf/pmglri.x,  pmglr.gx)  $generic $(GFLAGS) pmglr.gx  $endif
+	$ifolder (tf/pmplpi.x,  pmplp.gx)  $generic $(GFLAGS) pmplp.gx  $endif
+	$ifolder (tf/pmplri.x,  pmplr.gx)  $generic $(GFLAGS) pmplr.gx  $endif
+	;
+
+zzdebug:
+zzdebug.e:
+	$set	XFLAGS = "$(XFLAGS) -q"
+	$omake	zzinterp.x <error.h> <ctype.h> <fset.h> <pmset.h>
+	$omake	zzdebug.x <error.h> <imhdr.h> <ctype.h> <fset.h> <pmset.h>
+	$link	zzdebug.o zzinterp.o -o zzdebug.e
+	;
+
+libex.a:
+	# Retranslate any recently modified generic sources.
+	$ifeq (hostid, unix)
+	    $call tfiles
+	$endif
+
+	# Transfer <plset.h> dependency to <pmset.h>.
+	$ifnewer (<plset.h>, <pmset.h>)
+	    $copy <pmset.h> temp.pm
+	    $move temp.pm <pmset.h>
+	$endif
+
+	@tf		# Update datatype expanded files.
+
+	mioclose.x	mio.h <pmset.h>
+	mioopen.x	mio.h <pmset.h>
+	mioopeno.x	mio.h <imhdr.h> <pmset.h>
+	mioseti.x	mio.h <pmset.h>
+	miosrange.x	mio.h <imhdr.h>
+	miostati.x	mio.h <pmset.h>
+	pmaccess.x	pmio.com <plio.h> <pmset.h>
+	pmascii.x	pmio.com <plio.h> <pmset.h>
+	pmbox.x		pmio.com <plio.h> <pmset.h>
+	pmcircle.x	pmio.com <plio.h> <pmset.h>
+	pmclear.x	pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmempty.x	pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmglls.x	pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmline.x	pmio.com <plio.h> <pmset.h>
+	pmlinene.x	pmio.com <plio.h> <imhdr.h> <pmset.h>
+	pmnewmask.x	<imhdr.h> <imio.h> <plio.h> <pmset.h>
+	pmplls.x	pmio.com <plio.h> <pmset.h>
+	pmpoint.x	pmio.com <plio.h> <pmset.h>
+	pmpolygon.x	pmio.com <plio.h> <pmset.h>
+	pmrio.x		pmio.com <plio.h> <pmset.h>
+	pmrop.x		pmio.com <plio.h> <imhdr.h> <pmset.h>
+	pmsectnc.x	pmio.com <plio.h> <pmset.h>
+	pmsectne.x	pmio.com <plio.h> <pmset.h>
+	pmseti.x	<imio.h> <plio.h> <pmset.h>
+	pmstati.x	<imio.h> <plio.h> <pmset.h>
+	pmsplane.x	pmio.com <plio.h> <pmset.h>
+	pmsten.x	pmio.com <plio.h> <imhdr.h> <pmset.h>
+	;

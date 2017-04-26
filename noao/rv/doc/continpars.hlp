@@ -1,0 +1,129 @@
+.help continpars Jan92 noao.rv
+.ih
+NAME
+continpars -- edit the continuum subtraction parameters
+.ih
+USAGE
+continpars
+.ih
+PARAMETERS
+.ls c_sample = "*"
+Lines or columns to be used in the fits.  The default value ("*") selects
+all pixels.  Type \fIhelp ranges\fR for a complete description of the
+syntax.
+.le
+.ls c_function = "spline3"
+Continuum function to be fit to the image lines or columns.  The functions are
+"legendre" (Legendre polynomial), "chebyshev" (Chebyshev polynomial),
+"spline1" (linear spline), and "spline3" (cubic spline).  The functions
+may be abbreviated.
+.le
+.ls c_interactive = "no"
+Interactively fit the continuum? If set to yes, each spectrum will be fit
+interactively as they are read into the task if the \fIfxcor.continuum\fR
+parameter requires it.  The \fIfxcor\fR keystroke commands 'o' and 't' will
+automatically fit the continuum interactively.
+.le
+.ls naverage = 1
+Number of sample points to combined to create a fitting point.
+A positive value specifies an average and a negative value specifies
+a median.
+.le
+.ls order = 1
+The order of the polynomials or the number of spline pieces.
+.le
+.ls replace = no
+Replace rejected data points with continuum fit points prior to the
+subtraction?  If set to yes, points lying outside the \fIlow_reject\fR or
+\fIhigh_reject\fR limits are replaced by the fit values prior to the 
+continuum subtraction.  This can be useful in removing emission features 
+or cosmic ray events, but great care must be taken in setting other parameters
+in order to get satisfactory results.  Adjusting the \fIgrow\fR or 
+\fIaverage\fR parameters, and using a low order function usually provide
+a good result. 
+.le
+.ls low_reject = 2.,  high_reject = 2.
+Rejection limits below and above the fit in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 1.
+When a pixel is rejected, pixels within this distance of the rejected pixel
+are also rejected.
+.le
+
+.ih
+DESCRIPTION
+The \fIcontinpars\fR pset is used to control the continuum subtraction from 
+the data.  When the \fIfxcor\fR task is run in a batch mode, 
+the parameters are used to
+automatically process the data without intervention from the user.  In an
+interactive session, the user may experiment with different parameter values by
+changing them with the allowed colon commands.
+
+Continuum subtraction is done exactly as with the \fIonedspec.continuum\fR
+task.  (Details of the operation are described in the \fIcontinuum\fR 
+documentation.)  The fit to the spectra is subtracted from the data, thus 
+producing a continuum subtracted spectrum suitable for input to the correlation
+routines.  
+
+Users who require the full ability of the \fIonedspec.continuum\fR task to
+supply another form of output spectrum, such as the ratio of the fit, or
+who wish to make use of the "clean" option, should use that task and disable
+continuum subtraction in the \fIrv\fR package tasks.  More functionality is
+planned for this pset in the future.
+
+.ih
+TASK COLON COMMANDS
+The values of the \fIcontinpars\fR pset may be changed, displayed, or updated
+from within tasks that use them by means of various colon commands.  Simply 
+typing the parameter name will have the default action of printing the current
+value of that parameter. 
+.ls :unlearn	continpars
+Reset the continpars pset parameters with their default values.
+The argument "continpars" must be present or else the command will default
+to the \fIfxcor\fR task command.
+.le
+.ls :update	continpars
+Update the continpars pset parameters with the current values.
+The argument "continpars" must be present or else the command will default
+to the \fIfxcor\fR task command.
+.le
+.ls :show	continpars
+Show the current values of the continpars pset parameters.
+The argument "continpars" must be present or else the command will default
+to the \fIfxcor\fR task command.
+.le
+
+The following parameters will be displayed if it's name it typed, and a new 
+value accepted if an argument is given.
+
+.nf
+:c_sample	[range_string]
+:naverage	[int_value]
+:c_function	[spline3|legendre|chebyshev|spline1]
+:order		[int_value]
+:low_reject	[int_value]
+:high_reject	[int_value]
+:niterate	[int_value]
+:grow		[int_value]
+.fi
+
+.ih
+EXAMPLES
+1. List the continuum parameters.
+
+.nf
+	rv> lpar continpars
+.fi
+
+2. Edit the continuum parameters
+
+.nf
+	rv> continpars
+.fi
+.ih
+SEE ALSO
+fxcor, onedspec.continuum, icfit, sfit
+.endhelp

@@ -1,0 +1,66 @@
+.help onedspec (Oct84) "Spectral Reductions"
+.ce
+Relationship Between Onedspec and Twodspec
+.ce
+Discussion
+.ce
+October 24, 1984
+.sp 3
+Two types of interactions between one dimensional and two dimensional
+spectra may be defined:
+
+.ls (1)
+Perform a one dimensional operation on the average or sum of a set
+of lines in a two dimensional image.
+.le
+.ls (2)
+Perform a one dimensional operation successively on a set of lines
+in a two dimensional image.
+.le
+
+The two functions might be combined as:
+
+.ls (3)
+Perform a one dimensional operation on the average or sum of a set
+of lines in a two dimensional image and apply the one dimensional
+result successively on a set of lines in a two dimensional image.
+.le
+
+Examples of this are dispersion solutions and flux calibrations for
+longslit spectra.
+
+     Some choices for implementation are:
+
+.ls (1)
+Use a 2-D to 1-D operator to create a 1-D spectrum by averaging or summing
+lines.
+.le
+.ls (2)
+Use an apply a 1-D arithmetic correction to a 2-D image operator.
+Alternatively, expand a 1-D correction to a 2-D correction.
+.le
+.ls (3)
+Convert the 2-D image to a group of 1-D images and provide the 1-D operators
+with the ability to perform averaging or summation.
+.le
+.ls (4)
+To perform a one dimensional operation successively on
+a set of lines first convert the two dimensional image into a group
+of one dimensional spectra.  Perform the 1-D operation on the desired
+elements of the group and then reconstruct the 2-D image from the group
+of 1-D images.
+.le
+.ls (5)
+Built separate operators for 2-D images using the 1-D subroutines.
+.le
+.ls (6)
+Provide the ability in the 1-D operators to perform the desired 2-D
+operations directly.
+.le
+
+     Options (1) and (2) are essentially what is done on the IPPS.  Option (5)
+would lessen the amount of development but increase the number of tasks
+to be written.  I find option (6) desirable because of its
+increased generality but it would require a
+further definition of the data structures allowed and the syntax.
+.endhelp

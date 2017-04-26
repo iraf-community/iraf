@@ -1,0 +1,10 @@
+# Declare the UKIRT JHK standards catalog variables
+
+catalog
+
+K		2	# K magnitude
+error(K)	3	# err K
+JK		4	# (J - K) color
+error(JK)	5	# error (J - K)
+HK		6	# (H - K) color
+error(HK)	7	# error (H - K)

@@ -1,0 +1,6 @@
+# TXRENUMBER Parameters
+
+textfiles,s,a,,,,Input apphot/daophot text database(s) to be renumbered
+idoffset,i,h,0,,,Id number offset
+id,s,h,ID,,,Id name keyword 
+mode,s,h,"ql",,,Mode of task

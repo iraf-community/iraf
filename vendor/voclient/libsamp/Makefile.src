@@ -1,0 +1,82 @@
+#///////////////////////////////////////////////////////////////////////////////
+#//
+#//
+#///////////////////////////////////////////////////////////////////////////////
+
+# primary dependencies
+
+NAME 	  = samp
+VERSION   = 1.0
+PLATFORM  = $(shell uname -s)
+HERE 	  := $(shell /bin/pwd)
+
+
+# secondary dependencies
+
+LIBBASE = lib$(NAME)
+STATICLIB = $(HERE)/$(LIBBASE).a
+SHAREDLIB = $(HERE)/$(LIBBASE).so.$(VERSION)
+
+
+# stuff that's precious to keep
+
+.PRECIOUS:	$(STATICLIB) $(SHAREDLIB)
+.KEEP_STATE:
+
+
+# includes, flags and libraries
+CC 		= gcc
+CINCS  		= -I$(HERE) -I../include -I./
+CFLAGS 		= -g -D$(PLATFORM) -m32 -Wall $(CINCS)
+LFLAGS		= -L. -L../lib
+
+DBG_LIB		=
+
+LIBS		= -lpthread -lm -lsamp $(DBG_LIB)
+
+
+# list of source and include files
+SAMP_SRCS 	= samp.c sampHub.c sampCommands.c sampHandlers.c \
+		  sampList.c sampLog.c sampMap.c sampUtil.c
+SAMP_OBJS 	= samp.o sampHub.o sampCommands.o sampHandlers.o \
+		  sampList.o sampLog.o sampMap.o sampUtil.o
+SAMP_INCS 	= samp.h
+
+TARGETS		= zztest demo
+
+
+
+# targets
+
+all:  $(TARGETS)
+
+clean:
+	/bin/rm -rf *.[aeo]
+	/bin/rm -rf $(TARGETS)
+
+everything:
+	make clean
+	make all
+	make install
+
+install: all 
+	mv $(TARGETS) ../bin/
+
+
+# Unit test programs to be built.
+
+demo: demo.o $(SAMP_OBJS) $(SAMP_INCS)
+	$(CC) $(CFLAGS) -o demo demo.o $(SAMP_OBJS) $(LFLAGS) $(LIBS)
+
+zztest: zztest.o $(SAMP_OBJS) $(SAMP_INCS)
+	$(CC) $(CFLAGS) -o zztest zztest.o $(SAMP_OBJS) $(LFLAGS) $(LIBS)
+
+
+
+
+#=======================
+# leave this stuff alone
+#=======================
+
+%.o: %.c $(SAMP_INCS)
+	$(CC) -Wall $(CINCS) $(CFLAGS) -c $< -o $@

@@ -1,0 +1,18 @@
+$for (silrdx)
+
+# TZXY3 -- Generic 3d transpose, x->z, y->x, z->y.  The arrays need not be
+# identical.
+
+procedure tzxy3$t (a, b, nx, ny, nz)
+
+PIXEL	a[nx, ny, nz], b[nz, nx, ny]
+int	nx, ny, nz, x, y, z
+
+begin
+	do x = 1, nx
+	   do y = 1, ny
+	       do z = 1, nz
+		   b[z, x, y] = a[x, y, z]
+end
+
+$endfor

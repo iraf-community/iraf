@@ -1,0 +1,26 @@
+.help gsfree Aug85 "Gsurfit Package"
+.ih
+NAME
+gsfree -- free the surface descriptor structure
+.ih
+SYNOPSIS
+gsfree (sf)
+
+.nf
+pointer	sf		# surface descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ih
+DESCRIPTION
+Frees the surface descriptor structure.
+.ih
+NOTES
+GSFREE should be called after each surface fit.
+.ih
+SEE ALSO
+gsinit
+.endhelp

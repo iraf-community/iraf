@@ -1,0 +1,51 @@
+.help islrefit Aug85 "Gsurfit Package"
+.ih
+NAME
+islrefit -- refit surface grid line  assuming old cols, w vector
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+islrefit (sf, cols, lineno, z, w)
+
+.nf
+pointer	sf			# surface grid descriptor
+int	cols[ARB]		# columns to be fit, 1 <= cols[i] <= ncols
+int	lineno			# line number of surface grid line to be fit
+real	z[ARB]			# array of data values
+real	w[ARB]			# array of weights
+.fi
+.ih
+ARGUMENTS
+.ls sf          
+Pointer to the surface grid descriptor structure.
+.le
+.ls cols
+The column numbers of the surface grid line to be added to the dataset.
+.le
+.ls lineno
+The number of the surface grid line to be added to the dataset.
+.le
+.ls z    
+Array of data values.
+.le
+.ls w    
+Array of weights.
+.le
+.ih
+DESCRIPTION
+In some applications the cols, and w values remain unchanged from fit
+to fit and only the z values vary. In this case it is redundant to
+reaccumulate the matrix and perform the Cholesky factorization for each
+succeeding surface grid line. ISLREFIT
+zeros and reaccumulates the vector on the right hand side of the matrix
+equation and performs the forward and back substitution phase to fit for
+a new coefficient vector.
+.ih
+NOTES
+It is the responsibility of the calling program to check for out of bounds
+column values and INDEF valued pixels.
+.ih
+SEE ALSO
+isinit, islfit, islaccum, islsolve, islzero, issolve, isfree
+.endhelp

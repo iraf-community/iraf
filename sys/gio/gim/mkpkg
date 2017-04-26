@@ -1,0 +1,32 @@
+# Make the GIM (graphics imaging) interface.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	gimcpras.x	<gescape.h> <gim.h> <gki.h>
+	gimcrras.x	<gescape.h>
+	gimderas.x	<gescape.h>
+	gimdsmap.x	<gescape.h>
+	gimenmap.x	<gescape.h>
+	gimfcmap.x	<gescape.h>
+	gimfmap.x	<gescape.h>
+	gimgetmap.x	<fset.h> <gescape.h> <gim.h> <gio.h> <gki.h>
+	gimimap.x	<gescape.h>
+	gimlcmap.x	<gescape.h> <gim.h> <gki.h> <mach.h>
+	gimqras.x	<fset.h> <gescape.h> <gio.h>
+	gimrasini.x	<gescape.h>
+	gimrcmap.x	<fset.h> <gescape.h> <gio.h>
+	gimref.x	<gescape.h>
+	gimrefpix.x	<gescape.h> <gim.h> <gki.h>
+	gimriomap.x	<fset.h> <gescape.h> <gio.h>
+	gimrpix.x	<fset.h> <gescape.h> <gio.h> <mach.h>
+	gimsetmap.x	<gescape.h> <gim.h> <gio.h> <gki.h> ../gpl.com
+	gimsetpix.x	<gescape.h> <gim.h> <gki.h>
+	gimsetras.x	<gescape.h>
+	gimwcmap.x	<gescape.h> <gio.h>
+	gimwiomap.x	<gescape.h> <gio.h>
+	gimwpix.x	<gescape.h> <gio.h> <mach.h> ../gpl.com
+	;

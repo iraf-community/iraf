@@ -1,0 +1,219 @@
+Directory gio$ncarutil, with subdirectories conlib, autograph and sysint, 
+contains the source code for the GKS based NCAR plotting utilities library.
+The first public release of this software was installed in IRAF 10SEP86.
+(The 3 previous installations of the NCAR Utilities were the result of NOAO
+serving as a Beta release test site.)  What follows is the Notes files from
+the installation :
+
+******************************************************************************
+Notes for installation of the NCAR GKS based plotting utilities.  This
+release marks the end of NCAR's beta testing and is the first public release
+of the new software.  The changes made at NOAO have been merged into the
+new source code; these changes have are marked with "+/- NOAO."  The IRAF
+installed NCAR library differs from the version released on tape as documented
+below.  Installation was begun September 2, 1986.  (S. Hammond)
+
+Subdirectory AUTOGRAPH --
+
+autograph/agback.f:
+    Calls blockdata agdflt as run time subroutine.
+autograph/agcurv.f:
+    Calls blockdata agdflt as run time subroutine.
+autograph/agdflt.f:
+    This is the block data, which has been completely rewritten as
+    initialization statements instead of data statements.
+autograph/agexax.f:
+    A ftn write statement has been commented out.
+autograph/agppid.f:
+    A string is written with f77upk/pstr instead of a ftn write statement.
+autograph/agrstr.f:
+    Binary read, completely commented out.
+autograph/agsave.f:
+    Binary write (opposite of agrstr.f), completely commented out.
+autograph/agscan.f:
+    Calls blockdata agdflt as run time subroutine.
+    A ftn write statement has been commented out.
+autograph/agsetp.f:
+    Calls blockdata agdflt as run time subroutine.
+autograph/agstup.f:
+    Calls blockdata agdflt as run time subroutine.
+autograph/ezmxy.f, ezmy.f, ezxy.f, ezy.f:
+    These four subroutines require identical changes:
+	Call blockdata agdflt as run time subroutine upon entering;
+	Call subroutine initag before returning.
+autograph/idiot.f:
+    Call blockdata adgflt as run time subroutine.
+    Call plotit and initut to reinitialize before returning.
+autograph/pstr.x:
+    This file is not on the distribution tape, it was written to
+    output strings that have been unpacked by f77upk.
+
+Subdirectory CONLIB --
+
+conlib/conecd.f:
+    Character variables IT and CHTMP are not used and so are commented out.
+    The FTN internal writes are rewritten as calls to encode.
+conlib/congen.f:
+    FTN internal write replaced with call to encode.
+conlib/conop1.f,conop2.f,conop3.f,conop4.f:
+    These four routines now call blockdata conbdn as run time initialization.
+conlib/conout.f, conot2.f:
+    Both these routines are no-ops in IRAF.  All statements have been commented
+    out.
+conlib/conpdv.f:
+    FTN internal write replaced with a call to encode.
+conlib/conssd.f:
+    FTN write and format statement commented out.
+conlib/contng.f:
+    FTN internal writes rewritten as calls to encode.
+
+
+Directory NCARUTIL --
+
+conran.f:
+    Changed values of iabove, ibelow and ibel2 to improve label placement.
+    Blockdata condbn rewritten as run time initialization. (conbdn.f)
+    Internal writes rewritten as calls to encode.
+
+conrec.f:
+    Value of NCRT changed from 4 to 2.
+    The contour plot labelling has been improved, with the titles being
+    centered in the current viewport, and the large spaces between
+    fields eliminated.  This change involves:
+	1. common block noaolb added; also used in spp calling routine.
+	2. Values of LNGTHS array modified.
+	3. Character*25 variable string[5] added.
+	4. Default plot position is centered on current viewport.
+    All internal writes have been replaced with calls to encode.
+    Error message concerning "overflow in STLINE" is now written only
+        to stderr, not to stdgraph as well.
+    EZCNTR no longer calls frame.
+    Block data CONBD deleted from conrec.f source, rewritten as conbd.f
+
+dashsmth.f:
+    In two places, the blockdata DASHBD is called as an initializing subroutine.
+    Subroutines kurv1s and kurv2s are used for both the dashsmth and
+    isosrf utilities.  The code is duplicated in the two fortran files.  I
+    have put it in a separate file (kurv.f) and deleted it from both original
+    locations.
+
+gridal.f:
+    In two places, blockdata GRIDT is called as an initializing subroutine.
+    All internal FTN writes changed to calls to encode.
+    FTN write and format statements for error reporting deleted - used seter.
+    Blockdata deleted from gridal.f; rewritten in gridt.f.
+
+hafton.f:
+    Blockdata hfinit rewritten and called as run time initializing subroutine.
+    One internal write rewritten as call to encode.
+    Call to FRAME removed from EZHFTN.
+
+isosrf.f:
+    Call to FRAME removed from EZISOS
+    Blockdata isosrb was rewritten as run time initialization isosrb.f
+    Source for subroutines kurv1s and kurv2s has been deleted from isosrf.f.
+    (It is shared with the dashsmth utility, and has been moved to kurv.f.)
+
+pwrity.f:
+    Blockdata PWRYBD rewritten as subroutine.
+    FTN writes and format statements commented out.
+
+pwrzs.f:
+    Common block noaovp added, so user can control viewport.  Calls to
+    plotit and set had to be changed because they assumed the full
+    viewport [1-1024] was being used for srface plots.
+
+srface.f:
+    Because user changes viewport when labelling is selected, mods had
+    to be made.  Common block noaovp has been added, and calls to set
+    and plotit no longer assume the full viewport [1-1024] is being used.
+    Blockdata SRFABD has been rewritten as a run time initialization.
+
+strmln.f:
+    The value of uvmsg changed from 1.0E+36 to 1.0E+16 in an attempt
+    to make this routine run on a VAX.
+
+threed.f:
+    Blockdata threbd rewritten as run time initialization.
+    Subroutine pwrz completely commented out.
+
+velvct.f:
+    Blockdata veldat rewritten as run time initialization.
+    FTN internal write rewritten as call to encode.
+
+
+Subdirectory SYSINT (system interface) --
+
+sysint/support.f:
+    1. The character size calculated by WTSTR is doubled to be readable
+       with the IRAF font.
+    2. Subroutines SETER and E9RIN both used FTN write statements to
+       output information.  This is now handled by passing the error 
+       message to ULIBER, where the string gets unpacked with f77upk
+       and written to stderr.
+    3. Blockdata UERRBD was rewritten as a run time initialization.
+    4. Block data UTILBD was rewritten as a run time initialization.
+       A logical flag (first) was added to insure that the internal
+       parameters were initialized only once per load; subroutine
+       utilbd can be called at several points.  An entry point 'utinit'
+       was added to reset the 'first' flag to true.
+    5. In an attempt to mimic the organization of the release tape, file
+       support.f contains the following fortran subroutines: 
+       SUBROUTINE ENCD (VALU,ASH,IOUT,NC,IOFFD)
+       SUBROUTINE ENCODE (NCHARS, FTNFMT, FTNOUT, RVAL)
+       SUBROUTINE ENTSR(IROLD,IRNEW)
+       SUBROUTINE RETSR(IROLD)
+       SUBROUTINE ERROF
+       SUBROUTINE SETER(MESSG,NERR,IOPT)
+       SUBROUTINE EPRIN
+       SUBROUTINE E9RIN(MESSG,NERR,SAVE)
+       SUBROUTINE FDUM
+       SUBROUTINE Q8QST4(NAME,LBRARY,ENTRY,VRSION)
+       INTEGER FUNCTION NERRO(NERR)
+       INTEGER FUNCTION I8SAV(ISW,IVALUE,SET)
+       SUBROUTINE WTSTR (PX,PY,CH,IS,IO,IC)
+       subroutine uerrbd
+       subroutine uliber (errcode, pkerrmsg, msglen)
+
+sysint/spps.f:
+    1. Subroutine FLUSH has been renamed MCFLSH because of a name conflict.
+    2. FRAME calls initut to initialize the 'first' flag in utilbd.
+    3. Subroutines OPNGKS and CLSGKS have been commented out.
+    4. In PLOTIT and PLOTIF the block data utilbd is called as a run time 
+       initialization subroutine.
+
+****************************************************************************
+
+gio$ncarutil/conrec.f Dec 23, 1986 S. Hammond
+        Moved the call to gsplci that set up major contours.  This
+    statement was not being executed until after the first major line
+    had been drawn, resulting in the first major line not being bold.
+
+
+***************************************************************************
+On June 1, 1987 the following copywright notice was inserted into all 
+FORTRAN files in the ncarutil directory tree.  
+
+C                                                                               
+C +-----------------------------------------------------------------+           
+C |                                                                 |           
+C |                Copyright (C) 1986 by UCAR                       |           
+C |        University Corporation for Atmospheric Research          |           
+C |                    All Rights Reserved                          |           
+C |                                                                 |           
+C |                 NCARGRAPHICS  Version 1.00                      |           
+C |                                                                 |           
+C +-----------------------------------------------------------------+           
+C                                                                               
+C                                                                               
+February 12, 1988.  During Steve Rooke's port of IRAF to the HP RISC computer
+several Fortran errors were caught by the HP compiler.  These have been
+fixed as shown:
+sys/gio/ncarutil/conbdn.f
+    The data statement at line 244 had not been commented out.  It is now.
+
+June 10, 1988.  Made a mod to conbd.f (and in the comments to conrec.f) that
+resets the point at which contour decides an image aspect ratio is "extreme".
+Previously if the image axes ratio exceeded 1:4 the contour plot was square.
+This limit was too restrictive and has been changed to 1:16.  See related 
+change in pkg$plot.vport.x.  

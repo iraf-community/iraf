@@ -1,0 +1,20 @@
+objects,f,h,"",,,"List of object spectra"
+datamax,r,h,,,,"Max data value / cosmic ray threshold"
+arcs1,f,h,"",,,"List of arc spectra"
+arcref1,f,h,"",,,"Arc reference for dispersion solution"
+arcrefs,s,h,,,,"Arc references
+"
+done,f,h,"",,,"File of spectra already done"
+logfile,f,h,"",,,"Logfile"
+redo,b,h,,,,"Redo operations?"
+update,b,h,,,,"Update spectra?"
+dispcor,b,h,,,,"Dispersion correct spectra?"
+extcor,b,h,,,,"Extinction correct spectra?"
+fluxcal1,b,h,,,,"Flux calibrate spectra?"
+newdisp,b,h,,,,
+newsens,b,h,,,,
+newarcs,b,h,,,,
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

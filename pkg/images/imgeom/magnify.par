@@ -1,0 +1,17 @@
+# Magnify parameters
+
+input,s,a,,,,Input two dimensional images
+output,s,a,,,,Output magnified images
+xmag,r,a,,,,X magnification factor
+ymag,r,a,,,,Y magnification factor
+x1,r,h,INDEF,,,X window origin relative to input image
+x2,r,h,INDEF,,,X window end point relative to input image
+dx,r,h,INDEF,0.,,X Pixel interval relative to input image
+y1,r,h,INDEF,,,Y window origin relative to input image
+y2,r,h,INDEF,,,Y window end point relative to input image
+dy,r,h,INDEF,0.,,Y Pixel interval relative to input image
+interpolation,s,h,linear,,,"Interpolation type(nearest,linear,poly3,poly5,spline3,sinc,lsinc,drizzle"
+boundary,s,h,nearest,"|nearest|constant|reflect|wrap|",,"Boundary extension type (constant,nearest,reflect,wrap)"
+constant,r,h,0.,,,Boundary extension constant
+fluxconserve,b,h,yes,,,Preserve total image flux?
+logfile,f,h,STDOUT,,,Log file

@@ -1,0 +1,13 @@
+# EXPORT Task Parameter File
+images,s,a,"",,,"The list of input iraf images"
+binfiles,s,a,"",,,"The list of output binary files"
+format,s,a,"raw",,,"The type of binary file to write { raw|list|<format> }"
+header,s,h,"yes",,,"Prepend a header describing how the data are stored?"
+outtype,s,h,"",,,"Output pixel type"
+outbands,s,h,"",,,"Output expressions"
+interleave,i,h,0,,,"Pixel interleave type"
+bswap,s,h,"no",,,"Type of byte-swapping to perform on output"
+verbose,b,h,no,,,"Verbose output during conversion?"
+
+# Mode parameter
+mode,s,h,"ql",,,"mode parameter"

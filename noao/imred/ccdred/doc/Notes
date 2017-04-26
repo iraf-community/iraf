@@ -1,0 +1,96 @@
+12/15/93:
+I have modified CCDPROC to more fully support scan table observations.  In
+combination with the ability to have the number of scan rows encoded in the
+image header automatically, this allows such data to be processed in a
+fairly foolproof and documented way.
+
+First if ccdproc.scancor=no then the NSCANROW keyword and nscan parameter
+are ignored.  For actual scanned data this may be useful to override
+things.  Otherwise the following steps are taken.  The logic is slightly
+complex so that everything is done in the right order and only as needed.
+
+The task wants to apply dark count and flat field calibration images which
+have been scanned by the same number of rows.  [Zero calibration images are
+assumed not to be scanned.  This made sense to me but if desired the zero
+images can also be treated like the darks and flats.]  This is similar to
+the way flat fields are checked for subset (filter/grating).  If the
+appropriate dark or flat has not been scanned then it is scanned in
+software; i.e. a moving average is taken over the unscanned image.
+
+The number of scan rows is determined for each object being processed from
+the NSCANROW keyword or appropriate translation in the header translation
+file.  If this keyword is not found the nscan parameter value is used;
+i.e.  it is assumed the object image has been scanned by the specified
+amount.  This allows using the software in cases where the number of scan
+rows is not encoded in the header.  In the case of dark and flat images if
+NSCANROW is not found a value of 1 (unscanned) is assumed.
+
+The set of possible calibration images (from the zero and flat parameters
+or the list of input images) is searched for one which has been scanned
+with the same number of lines as the object being processed.  If one is
+found it is processed as needed before applying to the object.  If one is
+not found then an unscanned one is sought.  It is an error if neither can
+be found.  An unscanned image is first processed as necessary (overscan,
+trim, etc.) and then scanned in software to create a new image.  The new
+image has the name of the unscanned image with the number of scan lines
+appended, for example Flat1.32.  It also has the NSCANROW keyword added as
+well as a comment indicating the image from which it was created.  This
+approach allows the calibration image to be created only once for each
+different scan format and the number of scan lines may be changed for
+different observations and the appropriate calibration made from the
+unscanned image.
+
+The following example shows how this all works.  There are four object
+images using two filters and two scan row values and unscanned
+zero, dark, and flats.
+
+cc> dir
+Dark.imh     FlatV.imh    obs019.imh   obs021.imh   pixels
+FlatB.imh    Zero.imh     obs020.imh   obs022.imh
+cc> hselect obs* $I,filter,nscanrow yes
+obs019.imh      V       24
+obs020.imh      V       32
+obs021.imh      B       24
+obs022.imh      B       32
+cc> ccdproc obs* overscan+ trim+ zerocor+ darkcor+ flatcor+ scancor+
+obs019.imh: Dec 15 17:53 Zero level correction image is Zero
+Dark.imh: Dec 15 17:53 Zero level correction image is Zero
+Dark.24.imh: Dec 15 17:53 Converted to shortscan from Dark.imh with nscan=24
+obs019.imh: Dec 15 17:53 Dark count correction image is Dark.24.imh
+FlatV.imh: Dec 15 17:53 Zero level correction image is Zero
+FlatV.imh: Dec 15 17:53 Dark count correction image is Dark.imh
+FlatV.24.imh: Dec 15 17:53 Converted to shortscan from FlatV.imh with nscan=24
+obs019.imh: Dec 15 17:53 Flat field image is FlatV.24.imh
+obs020.imh: Dec 15 17:53 Zero level correction image is Zero
+Dark.32.imh: Dec 15 17:53 Converted to shortscan from Dark.imh with nscan=32
+obs020.imh: Dec 15 17:53 Dark count correction image is Dark.32.imh
+FlatV.32.imh: Dec 15 17:53 Converted to shortscan from FlatV.imh with nscan=32
+obs020.imh: Dec 15 17:53 Flat field image is FlatV.32.imh
+obs021.imh: Dec 15 17:53 Zero level correction image is Zero
+obs021.imh: Dec 15 17:53 Dark count correction image is Dark.24.imh
+FlatB.imh: Dec 15 17:53 Zero level correction image is Zero
+FlatB.imh: Dec 15 17:53 Dark count correction image is Dark.imh
+FlatB.24.imh: Dec 15 17:53 Converted to shortscan from FlatB.imh with nscan=24
+obs021.imh: Dec 15 17:53 Flat field image is FlatB.24.imh
+obs022.imh: Dec 15 17:53 Zero level correction image is Zero
+obs022.imh: Dec 15 17:53 Dark count correction image is Dark.32.imh
+FlatB.32.imh: Dec 15 17:53 Converted to shortscan from FlatB.imh with nscan=32
+obs022.imh: Dec 15 17:53 Flat field image is FlatB.32.imh
+cc> ccdlist *.imh
+cc> ccdlist *.imh
+Dark.24.imh[96,96][real][dark][][OTZ]:
+Dark.32.imh[96,96][real][dark][][OTZ]:
+Dark.imh[96,96][real][dark][][OTZ]:
+FlatB.24.imh[96,96][real][flat][B][OTZD]:
+FlatB.32.imh[96,96][real][flat][B][OTZD]:
+FlatB.imh[96,96][real][flat][B][OTZD]:
+FlatV.24.imh[96,96][real][flat][V][OTZD]:
+FlatV.32.imh[96,96][real][flat][V][OTZD]:
+FlatV.imh[96,96][real][flat][V][OTZD]:
+Zero.imh[96,96][real][zero][][OT]:
+obs019.imh[96,96][real][object][V][OTZDF]:
+obs020.imh[96,96][real][object][V][OTZDF]:
+obs021.imh[96,96][real][object][B][OTZDF]:
+obs022.imh[96,96][real][object][B][OTZDF]:
+
+Frank

@@ -1,0 +1,38 @@
+.help galeq Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slGAEQ (DL, DB, DR, DD)
+
+     - - - - - -
+      G A E Q
+     - - - - - -
+
+  Transformation from IAU 1958 galactic coordinates to
+  J2000.0 equatorial coordinates (double precision)
+
+  Given:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  Returned:
+     DR,DD       dp       J2000.0 RA,Dec
+
+  (all arguments are radians)
+
+  Called:
+     slDS2C, slDIMV, slDC2S, slDA2P, slDA1P
+
+  Note:
+     The equatorial coordinates are J2000.0.  Use the routine
+     slGE50 if conversion to B1950.0 'FK4' coordinates is
+     required.
+
+  Reference:
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+
+  P.T.Wallace   Starlink   21 September 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

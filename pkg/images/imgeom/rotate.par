@@ -1,0 +1,24 @@
+# ROTATE Parameters
+
+# Required parameters.
+input,f,a,,,,Input data
+output,f,a,,,,Output data
+rotation,r,a,,,,Rotation angle in degrees
+
+# Transformation parameters.
+xin,r,h,INDEF,,,X origin of input image in pixels
+yin,r,h,INDEF,,,Y origin of input image in pixels
+xout,r,h,INDEF,,,X origin of output image in pixels
+yout,r,h,INDEF,,,Y origin of output image in pixels
+ncols,r,h,INDEF,,,Number of columns in the output image
+nlines,r,h,INDEF,,,Number of lines in the output image
+
+# Image interpolation parameters.
+interpolant,s,h,'linear',,,'Interpolant (nearest,linear,poly3,poly5,spline3,sinc,lsinc,drizzle)'
+boundary,s,h,'nearest',|nearest|constant|reflect|wrap|,,'Boundary extension (nearest,constant,reflect,wrap)'
+constant,r,h,0.,,,Constant for constant boundary extension 
+nxblock,i,h,512,,,X dimension of working block size in pixels
+nyblock,i,h,512,,,Y dimension of working block size in pixels
+verbose,b,h,yes,,,Print messages about the progress of the task ?
+
+mode,s,h,'ql'

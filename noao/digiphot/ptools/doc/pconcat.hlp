@@ -1,0 +1,50 @@
+.help pconcat Dec92 noao.digiphot.ptools
+.ih
+NAME
+pconcat -- concatenate a list of APPHOT/DAOPHOT databases
+.ih
+USAGE
+pconcat infiles outfile
+.ih
+PARAMETERS
+.ls infiles
+The list of APPHOT/DAOPHOT databases to be concatenated.
+.le
+.ls outfile
+The name of the output APPHOT/DAOPHOT database.
+.le
+.ls task = "TASK"
+The name of the keywords whose value is the name of the task which wrote
+the database.
+.le
+.ih
+DESCRIPTION
+PCONCAT is a simple task which accepts a list of APPHOT/DAOPHOT
+database files and concatenates them into one resultant output file.
+PCONCAT checks that all the file are indeed APPHOT/DAOPHOT
+database files and that they were all written by the same task before
+performing the concatenation.
+
+PCONCAT is a simple script which call TXCONCAT in the PTOOLS package
+if the input files are text database files or TBCONCAT in the PTOOLS package
+if the input files are STSDAS database files. TBCONCAT is itself a script
+which call the TABLES package task TMERGE to do the actual work.
+
+.ih
+EXAMPLES
+
+1. Concatenate a list of DAOPHOT package task GROUP output database files
+into a single output file.
+
+.nf
+   pt> pconcat m92r.grp.1,m92r.grp.2,m92r.grp.3 m92rall.grp.1
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txconcat,ptools.tbconcat,tables.tmerge,concatenate
+.endhelp

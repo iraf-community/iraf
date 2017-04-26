@@ -1,0 +1,22 @@
+# Help directory for the QUADRED package.
+
+$doc		= "./doc/"
+$cdoc		= "./src/ccdproc/doc/"
+$qdoc		= "./src/quad/doc/"
+
+package		hlp=doc$quad.hlp
+quadformat	hlp=doc$quadformat.hlp
+quadsplit	hlp=doc$quadsplit.hlp
+quadjoin	hlp=doc$quadjoin.hlp
+quadsections	hlp=doc$quadsections.hlp
+qstatistics	hlp=doc$qstatistics.hlp
+qhistogram	hlp=doc$qhistogram.hlp
+quadscale	hlp=doc$quadscale.hlp
+
+ccdproc		hlp=cdoc$ccdproc.hlp
+
+quadproc	hlp=qdoc$quadproc.hlp
+#quadreadout	hlp=qdoc$quadreadout.hlp
+#quadman	hlp=qdoc$quadman.hlp
+
+revisions	sys=Revisions

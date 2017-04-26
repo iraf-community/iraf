@@ -1,0 +1,5 @@
+
+This directory contains all CL-callable routines for the "system" package.
+Included are routines for file manipulation, date and time, device access,
+and so on.  Certain of these routines are machine dependent; search for 
+the string "MACHDEP" to identify such files.

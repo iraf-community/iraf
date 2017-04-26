@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+#  MKARCH - Return platform architecture.  Assumes source-only tree and
+#  that it's safe to just manually change links.
+
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+aarch=`unix/hlib/irafarch.sh -actual`
+
+if [ -e "$iraf/unix/bin.$aarch/mkpkg.e" ]; then
+    # Assume we've got a system with binaries and can use MKPKG.
+    use_mkpkg=1
+else
+    if [ -n "$IRAFARCH" -a -e "$iraf/unix/bin.$IRAFARCH/mkpkg.e" ]; then
+        use_mkpkg=1
+    else
+        # Change the links manually, but strip all binaries first.
+        use_mkpkg=0
+    fi
+fi
+
+
+# Parse the arguments.
+loop_="yes"
+while [ "$loop_" == "yes" ]; do
+    /bin/echo "Making architecture: "$arch
+
+  if [ "$#" -gt 0 ]; then
+    arch=$1
+
+    if (( "$use_mkpkg"==1 )); then
+        mkpkg $arch
+        cd noao; mkpkg -p noao $arch; cd ../
+        cd vo; mkpkg -p vo $arch; cd ../
+    else
+	$iraf/util/mkclean
+        /bin/rm -rf bin noao/bin unix/bin unix/as vo/bin
+
+        ln -s bin.$arch bin
+        cd vo; ln -s bin.$arch bin; cd ../
+        cd noao; ln -s bin.$arch bin; cd ../
+        cd unix; ln -s bin.$arch bin; cd ../
+        cd unix; ln -s as.$arch as; cd ../
+    fi
+
+    if [ "$arch" == "macintel" -o "$arch" == "linux64" ]; then
+        cd unix/hlib; \
+	     rm -f iraf.h mach.h; \
+	     ln -s iraf64.h iraf.h; \
+	     ln -s mach64.h mach.h; cd $iraf
+    else
+        cd unix/hlib; \
+	     rm -f iraf.h mach.h; \
+	     ln -s iraf32.h iraf.h; \
+	     ln -s mach32.h mach.h; cd $iraf
+    fi
+    loop_="no"
+
+  else
+    arch=$aarch
+    loop_="yes"
+  fi
+done
+
+if [ -e "$HOME/.iraf/arch" ]; then
+    echo $arch > $HOME/.iraf/arch
+fi

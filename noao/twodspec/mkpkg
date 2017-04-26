@@ -1,0 +1,10 @@
+# Make the TWODSPEC package.
+
+update:
+	$echo "---------------- TWODSPEC.APEXTRACT -----------------"
+	$call update@apextract
+	$echo "---------------- TWODSPEC.LONGSLIT ----------------"
+	$call update@longslit
+	#$echo "---------------- TWODSPEC.MULTISPEC ---------------"
+	#$call update@multispec
+	;

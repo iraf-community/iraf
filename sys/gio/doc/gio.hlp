@@ -1,0 +1,3498 @@
+.help gio Dec84 "Graphics I/O"
+.ce
+\fBGraphics I/O Design\fR
+.ce
+Doug Tody
+.ce
+December 1984
+.ce
+(revised October 1987)
+.sp 3
+.nh
+Introduction
+
+    The graphics i/o (GIO) interface is a library of SPP or Fortran callable
+procedures for interactive vector graphics.  The interface is designed primarily
+for scientific applications (graphing 1-dimensional data vectors).  Limited
+support is also provided for displaying 2-dimensional image data.  GIO is fully
+integrated into the IRAF system and is not intended for use in systems other
+than IRAF.  The principal design objectives of GIO are outlined below.
+
+.ls
+.ls o
+Simple and efficient interactive graphics.  For interactive data analysis
+applications speed is typically much more important than the quality of
+the plot.
+.le
+.ls o
+Ease of use.  The interface must be easy to use for scientific data analysis
+applications.  Ease of use for interactive graphics in scientific applications
+is considered more important than the flexibility required to produce
+publication quality graphics.
+.le
+.ls o
+Compact size.  That portion of the graphics system required for interactive
+graphics must be small enough to be linked into every process which performs
+interactive graphics.
+.le
+.ls o
+Device independence.  The interface must be device independent without
+compromising compactness and speed.  True device independence means that
+an applications program that normally uses interactive graphics can be run
+noninteractively or from a nongraphics workstation.
+.le
+.le
+
+
+IRAF needs its own graphics interface partly because no existing graphics
+interface meets all of the above requirements, and partly because we do not
+want our applications to be dependent upon any particular external graphics
+package.  The existing large graphics interfaces such as GKS and CORE are
+likely to make it easier to interface GIO to new graphics devices, but to
+be completely and directly dependent on any one such interface is unwise since
+implementations are sometimes hard to come by.  Furthermore, packages such
+as GKS and CORE were designed to serve as the kernel of a graphics system
+and are cumbersome to use directly in applications software.  GIO will serve
+as a front end to the graphics kernel, providing a higher level interface
+for applications software and isolating the IRAF applications from the kernel,
+making it possible to switch to a different kernel without rewriting the
+applications packages.
+
+.nh
+Conceptual Design
+
+    GIO is intended to be used either as a self contained interface to a
+graphics device, with GIO writing device instructions directly to the device,
+or as an interface to a more general device independent graphics kernel.
+For maximum speed in interactive applications GIO will use a special builtin
+kernel capable of driving only the interactive graphics devices in use at
+a particular site (e.g., tektronix compatible graphics terminals).
+Other devices will be driven by a device independent graphics kernel resident
+in a separate process.  GIO will select the data path to be used for a
+particular device transparently to the calling program.  Thus, the overhead
+of process initiation and IPC will be eliminated in common interactive
+applications without sacrificing device independence.  The builtin kernel
+will be table driven using a \fBtermcap\fR format graphics device database,
+allowing maximum flexibility for adapting GIO to new graphics devices.
+
+The device independent graphics kernel may be GKS, CORE, NSPP, or any other
+reasonably capable kernel.  GIO will be designed to require only a few simple
+graphics primitives at the bottom end, making it straightforward to interface
+to different graphics kernels.  Any application which requires a more
+sophisticated graphics interface than that provided by GIO may bypass GIO
+and talk directly to the underlying graphics kernel, but doing so will
+render the application usable only with that particular graphics kernel.
+
+Placing the device independent graphics kernel in a separate process makes
+it possible to use a large, sophisticated graphics kernel without linking
+enormous libraries of subroutines into applications processes.  Bugs can be
+fixed and new features and devices added without relinking applications
+processes.  In principle it is even possible to interface simultaneously
+to more than one graphics kernel, e.g., one might drive some devices with
+an NSPP kernel and others with a GKS kernel.  On a different host CORE might
+be the only thing available and GIO would have to be interfaced to CORE on
+such a host.
+
+
+.ks
+.nf
+	        __________
+	       /          \
+	       | graphics |
+	       | terminal |
+	       \__________/
+		   |  ^
+		   |  |(device codes)
+		   v  |                           _________
+		+--------+     +-----------+     /         \
+		|   CL+  |<----| graphics  |<----|         |
+		|  fast  |     |  kernel   |     | gdevice |
+		| kernel |---->|   task    |---->|         |
+		+--------+     +-----------+     \_________/
+		   |  ^                 |
+		   |  |(gki metacode)   |          (core metacode)
+		   v  |                 +--------> (nspp metacode)
+		+--------+                         (gks vdm)
+		|  user  |
+		|  task  |-----------------------> (gki metacode)
+		+--------+
+
+
+	          simple                   plotters
+	  |---  interactive ---|------     metafile    ------|
+		 graphics               special devices
+
+
+.fi
+.ce
+Figure 1. Graphics Task Structure
+.ke
+
+
+The IRAF command language (CL) is the user interface to IRAF programs and
+as such moderates all interaction with the user, including interaction via
+graphics devices.  GIO is primarily a graphics \fIoutput\fR interface;
+graphics input (other than pixel readback) is decoupled from graphics output
+and is controlled by the CL.  Often the task requesting cursor input will
+differ from that which produced the graphics.  The CL, under control of the
+user, may set the default graphics input and output devices, redirect graphics
+input and/or output to devices other than the default, and control whether
+a graphics task is used interactively or in batch mode.
+
+.nh
+Specifications
+
+    The GIO graphics output procedures draw various flavors of vectors and
+fill or color two dimensional areas.  Cursor input is a way of interacting
+with the user and is therefore handled by CLIO (the command language
+interface).  We first define important terms and define the coordinate
+systems used by GIO.  Next follows an overview of the input and output
+procedures.  Finally, we describe in detail the individual procedures and
+the interface to the graphics kernel.
+
+.nh 2
+Coordinate Systems
+
+    The full plotting surface of a device defines the domain of definition
+of the coordinate systems used by GIO.
+GIO supports up to sixteen user defined \fBworld coordinate systems\fR
+(WCS) per open device, numbered 1 through 16.
+One additional coordinate system (WCS 0) with values ranging from 0 to 1 in
+either axis is predefined for every device; this \fBnormalized device
+coordinate system\fR (NDC) spans the full plotting surface of the device.  
+
+The mapping of world coordinates to device coordinates is
+defined by a \fBwindow\fR into world space and a corresponding \fBviewport\fR
+into device space.  Each window-viewport pair defines one of the 16 world
+coordinate systems.  At \fBgopen\fR time GIO is initialized to WCS 1,
+which has both window and viewport set to NDC coordinates.  A subsequent
+call to either \fBgswind\fR or \fBgscale\fR will set the window and a
+subsequent call to \fBgsview\fR will set the viewport.  The WCS is not fixed
+to the device until a plotting operation occurs which requires use of the WCS.
+Hence, multiple calls to \fBgscale\fR to determine the range of data values
+in X and Y for a family of curves are possible before fixing the WCS to the
+device, e.g. in a call to \fBglabax\fR.
+
+A \fBviewport\fR is any rectangular plotting area lying entirely within the
+plotting area of the device.  The viewport defines the area in which data
+can be plotted, i.e., the boundary at which \fBclipping\fR will occur if
+enabled.  The viewport is the area framed by \fBglabax\fR; the tick and axis
+labels will be plotted in the area just outside the viewport.
+A square viewport need not have the same resolution in both X and Y.
+Devices with variable resolution, e.g. pen plotters, have a default
+resolution in either axis which can be overridden when the plot is drawn.
+The aspect ratio of the device is the ratio of the physical size of a
+device pixel in Y to that in X.  Most devices have an aspect ratio of
+unity, but it is common for the resolution to be different in X and Y.
+The aspect ratio of the device is available via a \fBgget\fR inquiry,
+as is the device resolution in either axis.
+
+A \fBwindow\fR is the range of world coordinates which GIO will map to the
+corresponding viewport.  The world coordinates must be cartesian and
+either linear or logarithmic (base 10) in either axis.
+There are no restrictions on the range of world coordinates other than
+those imposed by the single precision floating point hardware of the
+host computer, provided that the WCS is not degenerate
+(zero range in either axis).
+
+Most applications will use only a single WCS, hence the WCS number is not
+included explicitly in the argument lists of the GIO procedures.
+A call to \fBgset\fR is required to change to a different WCS.
+Thereafter all graphics output and cursor input will refer to the new WCS.
+Multiple WCS are useful when plotting in several distinct (nonoverlapping)
+viewports on a device, or when overplotting curves within the same viewport
+but with different world coordinate windows.
+
+.nh 2
+Graphics Output Procedures
+
+    The GIO output procedures range from \fBgplotv\fR and \fBgploto\fR,
+which can draw an entire plot with autoscaling and axis labeling in one call,
+to the polyline, polymarker, move, draw, and text drawing primitives at
+the low end.
+
+
+.ks
+.nf
+	       gplotv (v, npts, x1, x2, title)
+	       gploto (gp, v, npts, x1, x2, title)
+	    gpagefile (gp, fname, prompt)
+		
+	   gp = gopen (device, mode, fd)
+	       gclose (gp)
+	  gdeactivate (gp, flags)
+	  greactivate (gp, flags)
+	      gcancel (gp)
+	       gflush (gp)
+	       gclear (gp)
+	       gframe (gp)
+	       greset (gp, flags)
+	     gmftitle (gp, metafile_title)
+
+	        gscan (gp, text)
+	    gset[irs] (gp, param, value)
+     val = gstat[irs] (gp, param[, outstr, maxch])
+     val = gget[birs] (gp, devcap[, outstr, maxch])
+	    g[sg]view (gp, x1, x2, y1, y2)
+	    g[sg]wind (gp, x1, x2, y1, y2)
+	   g[ar]scale (gp, v, npts, axis)
+	      ggscale (gp, x, y, dx, dy)
+	       gctran (gp, x1, y1, x2, y2, wcs1, wcs2)
+	      gcurpos (gp, x, y)
+	      gescape (gp, fn, instruction, nwords)
+
+	       glabax (gp, title, xlabel, ylabel)
+	        gline (gp, x1, y1, x2, y2)
+	       gpline (gp, x, y, npts)
+	       gvline (gp, v, npts, x1, x2)
+	        gmark (gp, x, y, marktype, xsize, ysize)
+	       gpmark (gp, x, y, npts, marktype, xsize, ysize)
+	       gvmark (gp, v, npts, x1, x2, marktype, xsize, ysize)
+	       gumark (gp, x, y, npts, xcen, ycen, xsize, ysize, fill)
+	    g[ar]move (gp, x, y)
+	    g[ar]draw (gp, x, y)
+		gtext (gp, x, y, text, format)
+		gfill (gp, x, y, npts, style)
+	    g[pg]cell (gp, m, nx, ny, x1, y1, x2, y2)
+
+	        gscur (gp, x, y)
+	 stat = ggcur (gp, x, y, key)
+.fi
+.ke
+
+
+All coordinates are given in world coordinates (user coordinates)
+except the viewport coordinates and the marker sizes, which are given in
+device coordinates.  Low level graphics i/o requires that the graphics
+device first be opened with \fBgopen\fR and later closed with \fBgclose\fR.
+Several graphics devices may be open simultaneously.
+
+When a graphics device is opened with \fBgopen\fR all internal parameters
+are initialized to their default values, unless the device is opened in
+APPEND mode.  The default values of these internal parameters may be changed
+via explicit \fBgset\fR, \fBgswind\fR, \fBgscale\fR, or \fBgscan\fR calls.
+Most powerful is \fBgscan\fR, which interprets graphics commands passed
+either as an explicit string or in a text file.
+
+Much of the flexibility of GIO derives from its parameter defaulting
+mechanism.  The interface may be expanded indefinitely by adding new
+internal parameters accessed via \fBgset\fR calls, without changing the
+basic interface.
+
+.nh 2
+Graphics Input Procedures
+
+    The most commonly used type of graphics input is cursor readback.
+Two forms of cursor input are supported: cursor input via the CLIO procedure
+\fBclgcur\fR, and cursor input via the GIO procedure \fBggcur\fR.
+CLIO based cursor input should be used whenever possible, i.e., when writing
+to \fBstdgraph\fR or \fBstdimage\fR.  The advantage of cursor input via the
+CL is that input may come from a list file or the terminal as well as from
+a physical cursor read, allowing programs to be used either interactively
+or in batch mode.  Furthermore, WCS selection and conversion of NDC cursor
+coordinates to WCS and cursor mode interaction are only available with
+\fBclgcur\fR.  Programs which do not produce any graphics output may read
+the cursor via CLIO without using any part of the GIO interface.
+The lower level GIO cursor read procedure always reads the physical device
+cursor in NDC coordinates and is device dependent (it is what is called by
+\fBclgcur\fR).
+
+Cursors are implemented as abstract datatypes within the CL.  A user task
+accesses a cursor by reading the value of a CL parameter of type \fBgcur\fR
+(stdgraph cursor) or \fBimcur\fR (stdimage cursor).  Multiple cursors may
+be implemented using multiple cursor type parameters.  A cursor parameter
+is assumed to have a \fIlist\fR of values; EOF is returned when the end of
+the list is reached.  Reading the cursor automatically causes any graphics
+output to be flushed.
+
+        stat = clgcur (param, wx, wy, wcs, key, strval, maxch)
+
+The CLIO function \fBclgcur\fR reads the next cursor value from the named
+cursor parameter, returning as output arguments the cursor position in world
+coordinates, the index of the referenced WCS, the keystroke value (character
+typed) of the cursor event, and a string value if the key was ':', the
+cursor mode set option escape character.
+A cursor read sequence begins with a prompt, i.e., the cursor lights up
+or starts blinking.  The user is then free to move the cursor about;
+the cursor position is not read until a key is typed on the user terminal.
+Using a keystroke on the user terminal to terminate both \fBstdgraph\fR
+and \fBstdimage\fR cursor reads provides a rich and device independent set of
+keystroke values for identifying the action to be performed (imaging devices
+are typically very limited in this area).
+
+GIO always returns the cursor position in world coordinates, along with
+the index of the WCS selected.  Typically there will be exactly one world
+coordinate system (excluding WCS 0) and the WCS value may be ignored.
+If no world coordinate systems are defined for the device the cursor
+position will be returned in NDC coordinates with WCS=0.
+
+If multiple world coordinate systems are defined GIO will select the WCS
+closest to the position of the cursor, i.e., the cursor may lie outside the
+viewport and GIO will still return WCS coordinates.  If the cursor lies
+within two or more overlapping viewports GIO will select the WCS with the
+highest number.  The cursor read protocol will allow the user to force
+the selection of a particular viewport by first placing the cursor on a
+nonoverlapping portion of the viewport and typing a special code,
+e.g., W (see next section), and then continuing with the normal cursor read.
+If the application wishes to override the automatic WCS selection it may
+do so by calling \fBgctran\fR to transform the cursor coordinates returned
+by \fBclgcur\fR to a different world coordinate system.
+
+.nh 3
+Cursor Mode
+
+    In cursor mode, i.e., after a call to \fBclgcur\fR or after typing "=gcur",
+a number of special keystrokes shall be recognized for interactive display
+control.  All graphics output to stdgraph and stdimage is routed through the
+CL on the way to the graphics kernel.  The CL will optionally spool in an
+internal buffer all graphics instructions output to an interactive device.
+This internal buffer is emptied whenever the device screen is cleared.
+In cursor mode, special keystrokes may be used to redraw all or any portion
+of the spooled graphics, e.g., one may zoom in on a portion of the plot and
+then roam about on the plot at high magnification.  Since the spooled graphics
+vectors typically contain more information than can be displayed at normal
+magnification, zooming in on a feature may bring out additional detail
+(the maximum resolution is 32768 points in either axis).  Increasing the
+magnification will increase the precision of the cursor by the same factor.
+
+Cursor mode is implemented by performing coordinate transformation and
+clipping on each GKI instruction in the frame buffer, passing the transformed
+and clipped instructions on to the graphics kernel.
+The cursor mode operations perform a simple geometric transformation on
+the spooled graphics frame, mapping a rectangular window of the spooled
+frame onto the device screen.  The graphics frame itself is not modified,
+hence zoom out or reset and redraw will restore the original display.
+
+If the graphics frame is a typical vector plot with drawn and labeled
+axes, magnifying a portion of the plot may cause the axes to be lost.
+If this is not what is desired a keystroke is provided to draw and label
+the axes of the displayed window.  The axes will be overplotted on the
+current display and will not be saved in the frame buffer, hence they
+will be lost when the frame is redrawn.  In cursor mode the viewport is
+the full display area of the output device, hence the tick mark labels
+of the drawn axes will be drawn inside the viewport.  This form of axes
+labeling is used because it is simple and because it is appropriate for
+both vector graphics and image display output devices (and cursor mode
+must serve both).
+
+
+.ks
+.nf
+	A 			draw and label the axes of current viewport
+	B			backup over last instruction in frame buffer
+	C			print the cursor position as it moves
+	D 			draw a line by marking the endpoints
+	E			expand plot by setting window corners
+	F			set fast cursor (for HJKL)
+	H			step cursor left
+	J			step cursor down
+	K			step cursor up
+	L			step cursor right
+	M			move point under cursor to center of screen
+	P			zoom out (restore previous expansion)
+	R			redraw the screen
+	T 			draw a text string
+	U 			undo last frame buffer edit
+	V			set slow cursor (for HJKL)
+	W 			select WCS at current position of cursor
+	X			zoom in, X only
+	Y			zoom in, Y only
+	Z			zoom in, both X and Y
+	<			set lower limit of plot to the cursor y value
+	>			set upper limit of plot to the cursor y value
+	\ 			escape next character
+	:			set cursor mode options
+	:!			send a command to the host system
+	=			shorthand for :.snap (make graphics hardcopy)
+	0			reset and redraw
+       1-9			roam
+.fi
+.ce
+Figure 2. Cursor Mode Keystrokes
+.ke
+
+
+By default the cursor mode keystrokes are all upper case letters, reserving
+lower case for applications programs.  The terminal shift lock key may be
+used to simplify typing in lengthy interactive cursor mode sessions.
+The cursor motions are decoupled from roam since zoom and roam are often used
+merely to increase the precision of a cursor read.  Special keystrokes are
+provided for stepwise cursor motions to increase the speed of cursor setting
+on terminals that do not have fast cursor motions (e.g., the retro-graphics
+enhanced VT100).  The recognized keystrokes are shown in Figure 2.
+
+If the character : is typed while in cursor mode the alpha cursor will appear
+at the bottom of the screen, allowing a command line to be entered.  Commands
+which begin with a period, e.g., ":." are interpreted by the graphics system;
+any other command will terminate the cursor read, returning the character ':'
+as the key value, and the command string as the string value of the cursor
+read.  The commands recognized by the graphics system are summarized in
+figure 3.
+
+
+.ks
+.nf
+	:.axes[+-]		draw axes of viewport whenever screen is redrawn
+	:.case[+-]		enable case sensitivity for keystrokes
+	:.clear			clear alpha memory (e.g, this text)
+	:.cursor n		select cursor (0=normal,1=crosshair,2=lightpen)
+	:.gflush		flush plotter output
+	:.help			print help text for cursor mode
+	:.init			initialize the graphics system
+	:.markcur[+-]		mark cursor position after each cursor read
+	:.off [keys]		disable selected cursor mode keys
+	:.on [keys]		enable selected cursor mode keys
+	:.page[+-]		enable screen clear before printing help text
+	:.read file		fill frame buffer from a file
+	:.show			print cursor mode and graphics kernel status
+	:.snap [device]		make hardcopy of graphics display
+	:.txqual qual		set character generator quality (normal,l,m,h)
+	:.txset format		set text drawing parameters (size,up,hj,vj,etc)
+	:.xres=value		set X resolution (stdgraph only)
+	:.yres=value		set Y resolution (stdgraph only)
+	:.viewport x1 x2 y1 y2	set workstation viewport in world coordinates
+	:.write[!][+] file	save frame buffer in a spool file
+	:.zero			reset viewport and redraw frame
+.fi
+
+
+.ce
+Figure 3. Cursor Mode Commands
+.ke
+
+
+Minimum match abbreviations are permitted for cursor mode command names.
+Multiple commands may be given on one line, delimited by semicolons.
+If the CL environment variable \fBcminit\fR is defined when cursor mode is
+first entered, the string value will be interpreted as a cursor mode command
+and used for initialization.  For example, to disable the numeric keys and
+set the graphics resolution to 200 points in X and 100 points in Y, one
+could add the following \fBset\fR declaration to their "login.cl" file:
+
+	set cminit = "xres=200; yres=150; off 0-9"
+
+The numeric keypad of the terminal (if it has one) is used to roam about
+when the zoom factor is greater than one.  If the magnification is normal
+the numeric keys are not recognized as special keystrokes, i.e., typing
+a numeric key will exit cursor mode, returning the character typed to the
+applications program.  In roam mode a numeric key must be escaped to exit
+cursor mode.  The directional significance of the numeric keys in roam
+mode is obvious if the terminal has a keypad, and is illustrated below.
+
+
+.ks
+.nf
+	7   8   9	135 090 045
+
+	4   5   6	180 000 000
+
+	1   2   3	225 -90 -45
+.fi
+.ke
+
+
+There is a fixed upper limit on the size of the cursor mode frame buffer.
+If the frame data overflows the frame buffer while plotting the plot will
+still come out correctly, but only the final plotting instructions will be
+retained in the buffer.  Redisplay of the frame in cursor mode will thus
+result in only a portion of the full frame being drawn.  If this is a problem
+the user can increase the upper limit on the size of the frame buffer by
+setting the value of the environment variable \fBcmbuflen\fR, e.g.,
+
+	gflush; set cmbuflen = 512000
+
+would initialize the graphics system (freeing the old frame buffer) and set
+the upper limit on the size of the frame buffer to 512K words or 1Mb.
+
+.nh 2
+Example
+
+    At this point a brief example may help to illustrate the use of the GIO
+procedures.  The following procedure will plot a data vector (pixel array)
+and then repeatedly read the cursor, drawing a mark at successive positions
+of the cursor.  The procedure exits if the user types either the character
+'q' or EOF, e.g., <ctrl/z> or carriage return.
+
+
+.ks
+.nf
+	include	<gset.h>
+
+	# MARKPLOT -- Plot a data array and then enter a loop, drawing
+	# circles at successive cursor positions.
+
+	procedure markplot (data, npts, x1, x2)
+
+	real	data[npts]		# data vector to be plotted
+	int	npts			# length of array
+	real	x1, x2			# world X-coords of vector
+
+	pointer	gp
+	int	wcs, key
+	char	str[32]
+	real	wx, wy
+	pointer	gopen()
+	int	clgcur()
+
+	begin
+		gp = gopen ("stdgraph", NEW_FILE, STDGRAPH)
+
+		call gploto (gp, data, npts, x1, x2, "data")
+
+		while (clgcur ("points", wx, wy, wcs, key, str, 32) != EOF)
+		    if (key == 'q')
+			break
+		    else
+			call gmark (gp, wx, wy, GM_CIRCLE, 1., 1.)
+
+		call gclose (gp)
+	end
+.fi
+.ke
+
+.nh 2
+Graphics Output Devices
+
+    While the graphics output device may be specified explicitly by name,
+more often graphics output devices will be specified by one of the logical
+device names shown below.  Examples of the installation dependent device name
+associated with each logical name are also shown.
+
+
+.ks
+.nf
+	stdgraph	= "gterm"
+	stdimage	= "deanza"
+	stdplot		= "qms"
+	stdvdm		= "uparm$vdm"
+.fi
+.ke
+
+
+Interaction (via the CL) is supported only for \fBstdgraph\fR and
+\fBstdimage\fR.  The standard batch plotter device is \fBstdplot\fR,
+and the standard metafile (for spooling graphics output) is \fBstdvdm\fR.
+
+The user should not normally set the value of \fBstdgraph\fR directly with
+\fIset\fR, rather they should set the terminal type with \fIstty\fR and let
+the latter specify the value of \fBstdgraph\fR.  If the terminal specified
+is not a graphics terminal (no ":gd" capability in the termcap entry for the
+device) the value of \fBstdgraph\fR will be set to "none", otherwise
+\fBstdgraph\fR will be set to the name of the stdgraph device entry for the
+graphics terminal.
+
+The device name associated with a logical graphics output
+device must have an associated entry in the \fBgraphcap\fR file,
+a text file used to describe the characteristics of each device.
+New graphcap entries may easily be added by the user to interface to
+special graphics devices.
+System privledge is not required to modify graphcap, since the name
+of the graphcap file is taken from a CL environment variable of the
+same name (which can be redefined by the user to point to a file in a
+private directory).  The graphcap entries for the most commonly used
+devices at a given site may be precompiled by the system manager to
+eliminate the overhead of searching the graphcap file at \fBgopen\fR time.
+
+The graphcap parameters (device \fIcapabilities\fR) are too involved to
+be presented here and will be described in a later section.
+Examples of device capabilities are the device resolution, whether a frame
+advance is required before or after a plot, indication of device capabilities
+such as the ability to generate text, and the name of the executable
+graphics kernel file associated with the device.  Many additional parameters
+are defined for interactive devices.  The graphcap device capabilities
+may be inspected with the \fBgget[birs]\fR procedures, which resolve into
+calls to the TTY interface, used to access both graphcap and termcap files.
+
+The sequence of actions taken by GIO to access the graphcap entry for a
+device is summarized below.
+
+
+.ks
+.nf
+	if (standard graphics output device)
+	    get device name from environment
+
+	if (device name is actually a filename) {
+	    load graphics device descriptor using the first device entry
+		from the named graphcap format file
+	} else {
+	    get filename of graphcap file from environment
+	    load graphics device descriptor by searching the graphcap file
+		for the named device
+	}
+.fi
+.ke
+
+.nh 2
+Graphics Input Devices
+
+    The technique used to associate an input source with a graphics cursor
+is similar to that used for output devices.  A CL environment variable is
+associated with each cursor type.  The names and default values of the
+environment variables are shown below.
+
+
+.ks
+.nf
+	stdgcur		= "stdgraph"
+	stdimcur	= "stdimage"
+.fi
+.ke
+
+
+The default input source for a cursor is the graphics output device associated
+with the graphics output stream.  If the cursor device is "stdgraph" or
+"stdimage" the graphics kernel is called to read the physical device cursor
+for \fIstdgraph\fR or \fIstdimage\fR.  If the cursor device is "text"
+the cursor value is a line of text read from the user terminal.
+In this mode the user enters at least two of the fields defining
+a cursor value.  Missing fields are assigned the value zero (the user
+presumably will know that the program does not use the extra fields).
+
+
+.ks
+.nf
+	cl> set stdgcur = "text"
+	cl> = gcur
+	gcur: 345.33 23.22 1 c
+	345.33 23.22 1 c
+	cl>
+.fi
+.ke
+
+
+An example of a cursor read request entered interactively by the user,
+taking input from the terminal and sending output to the terminal,
+is shown above (the CL typed the "gcur: " query and the user entered the
+remainder of that line).  If the cursor device were "stdgraph" a real
+cursor read would occur and the equivalent interaction might appear as
+shown below.  The cursor position is returned in world coordinates,
+where the world coordinate system was defined by the last plot output to
+the device.  For an imaging device the world coordinates will typically
+be the pixel coordinates of the image section being displayed.
+
+
+.ks
+.nf
+	cl> = gcur
+	345.33 23.22 1 c
+	cl>
+.fi
+.ke
+
+
+Redirecting cursor input to the terminal is useful when working from a
+nongraphics workstation and when debugging programs.  ASCII cursor queries
+are the only type supported when running an IRAF program outside the CL.
+Cursor input may also be taken from a list file by assigning a filename
+to a cursor parameter, i.e., by assigning a list file to a list structured
+parameter and overriding query mode:
+
+
+.ks
+.nf
+	cl> gcur = filename
+	cl> = gcur
+	345.33 23.22 1 c
+	cl>
+.fi
+.ke
+
+
+This last mechanism is a standard technique used with CL list structured
+parameters and will not be discussed further here.
+
+.NH 2
+Mixed Terminal and Graphics I/O
+
+    Interactive graphics programs are normally (but not necessarily) executed
+on a graphics terminal or workstation supporting both ordinary terminal i/o
+and vector graphics.  IRAF is designed to use a single terminal for both text
+and graphics; text and graphics on separate devices is also supported but is
+not the norm.  By text we refer here to ordinary line or screen oriented
+terminal i/o (e.g., for \fIhelp\fR or \fIeparam\fR), not the use of text in
+the graphics plane to annotate plots.
+
+.NH 3
+Text and Graphics Mode
+
+    Most modern graphics terminals provide separate memory planes for text
+and graphics.  Depending upon the device, these planes may be displayed
+simultaneously, displayed alternately, or only a single memory plane may be
+available for both terminal modes, in which case a mode switch is destructive.
+The graphics device model implemented by GIO and the STDGRAPH kernel is
+flexible enough to deal with all or nearly all such devices.
+
+The normal mode for the terminal or workstation is text mode.  Activating the
+workstation causes a switch to graphics mode; deactivating the workstation
+restores the terminal to text mode.  Activation is implied whenever a device
+is opened with \fBgopen\fR, unless the AW_DEFER mode bit is set to defer the
+activate workstation until graphics i/o is actually done to the device.
+Closing the workstation automatically deactivates the workstation.  The GIO
+procedures \fBgreactivate\fR and \fBgdeactivate\fR are provided to simplify
+mode switching while a device is open on a graphics stream.
+
+Occasionally it is necessary to print out a large amount of text in response
+to a user command entered in a cursor loop while in graphics mode.  If the
+text is in a file this is done most easily by calling \fBgpagefile\fR to page
+the file in text mode, restoring graphics mode when the operation is completed.
+If the application generates the output text dynamically then the workstation
+must be explicitly deactivated and later reactivated before resuming graphics
+i/o, e.g.,
+
+.ks
+.nf
+	while (clgcur (gp, ...) != EOF) {
+	    switch (key) {
+	    case XXX:
+		call gdeactivate (gp, AW_CLEAR)
+		    <write the text to STDOUT>
+		call greactivate (gp, AW_PAUSE)
+	    case YYY:
+		...
+	    }
+	}
+.fi
+.ke
+
+The sequence shown will switch to text mode, clear the screen, output the
+text, and pause for the user to read the text before restoring graphics mode
+and initiating another cursor read.
+
+.NH 3
+Status Line I/O
+
+    The deactivate/reactivate workstation technique is fine for outputting
+large amounts of text, but is not well suited for small amounts of text,
+e.g., single line commands to interactively set internal parameters,
+output of single lines of text to prompt the user, print the value of a
+calculation or some variable, and so on.  The so-called "status line"
+interface is provided for this purpose.  Status line i/o makes it possible
+to interact directly with the user without interfering with the contents of
+the graphics frame, and without leaving graphics mode.
+
+What the status line actually is determined by the graphcap entry for the
+device and the characteristics or limitations of the actual device.
+On most devices, the status line is a single line at the bottom of the screen.
+This only works, however, if the device can dynamically erase the status line;
+if this is not possible the status "line" may actually be the entire screen,
+with successive output lines being drawn on top of the graph.
+
+To output text to the status line while in graphics mode one merely writes to
+STDOUT or STDERR in the usual way, e.g., in a call to \fBprintf\fR.  When
+newline is seen a flag is set which causes the status line to be cleared when
+the next output character is received.  Output lines may be built up in
+successive calls to output procedures, outputting a single newline to terminate
+the line and start a new one.  After a newline delimited line of text has been
+output, output of a single newline (blank line) will clear the status line.
+
+It is also possible to read from the status line.  This is most commonly done
+after writing a prompt string to the status line.  The prompt should be
+terminated with a colon (e.g., "enter value: ") rather than a newline,
+to signal to the user that input is expected, and to avoid having the
+subsequent status line read clear the prompt string.  In many cases such
+explicit prompting and decoding of the return string can be avoided by using
+the standard CLIO parameter prompting mechanism for interactive input.
+CL parameter prompts are also permitted in graphics mode, and will interact
+with the user on the status line in the expected way, without interfering
+with the graphics state of the device.
+
+When mixing status line i/o and graphics i/o one must be careful to flush any
+buffered graphics or textual output before switching modes.  In many cases the
+system will do this for you automatically, but there are exceptions where
+explicitly flushing of buffered output is necessary (e.g., STDOUT and STDERR
+are low level facilities with no knowledge of GIO, and output to one of these
+streams will not automatically cause any graphics output to be flushed).
+
+.NH 2
+User Interface Conventions
+
+    While different interactive (cursor driven) graphics programs will differ
+in many ways, there are certain operations which are common to all such
+programs.  In order to present a more consistent interface to the user,
+conventions have been defined for these common operations.
+
+.NH 3
+On Line Help
+
+    All interactive graphics programs should respond to the key '?' with a
+description of the keystrokes and colon commands recognized by the program
+(or submenu, in the case of a menu structured interface).  This is normally
+done by calling \fBgpagefile\fR to interactively page the ".key" keystrokes
+help file for the program.  The keystroke files for system programs are
+stored in the directory lib$scr; non-system programs keep their keys files
+either in the package directory, or in a global package library.
+
+.NH 3
+Cursor and Device Names
+
+    In general, applications programs should not read directly from \fBgcur\fR
+or \fBimcur\fR (the global cursor parameters), nor should the open the
+"stdgraph", "stdimage", or "stdplot" device directly by these explicit string
+values.  This works, but is inflexible.  To make it easy for the user to
+run an otherwise interactive program in batch mode, taking input from a cursor
+list file, the task should include a cursor type parameter in its parameter
+set.  Likewise, to make it easy for the user to temporarily redirect the
+output of the program to a device other than the current stdgraph, stdplot,
+etc., device, the device name should be parameterized as a string type CL
+parameter.
+
+For example, if task \fBplotit\fR  has cursor and device parameters named
+"cursor" and "device", the command
+
+	cl> plotit cursor=listfile device=qms
+
+would run the task taking cursor input from the text file "listfile", with
+stdgraph graphics output directed to the plotter device "qms".
+
+.NH 3
+Exiting an Interactive Cursor Loop
+
+    The following standards have been defined for dealing with EOF/quit in
+interactive cursor loops.
+.ls
+.ls EOF	
+End of file is indicated for a cursor list either by an actual
+end of file in the case of a true cursor list, or by typing the EOF character
+(e.g., <ctrl/z>, <ctrl/d>, or the interrupt character) in an interactive
+cursor read.  EOF on the cursor list should be taken seriously by the
+applications program, and not treated as just another key, hence it should
+not be something that the user is expected to type routinely to exit a cursor
+loop.  If a program gets EOF back as the value of \fBclgcur\fR it should exit
+immediately, without any verification queries etc, since it may well have
+been run in batch mode with input redirected to a cursor list file.
+.le
+.ls q
+The standard interactive cursor loop exit character is 'q'.  
+All interactive graphics programs should recognize this character
+and take some action to exit the cursor loop, e.g.:
+
+.ks
+.nf
+	while (clgcur (...) != EOF)
+	    switch (key) {
+	    case 'q':
+		break
+	    case ...
+.fi
+.ke
+
+The 'q' character is intended to be handled directly by the application
+program, rather than mapped into EOF by the system (like Q was, and CR and
+the gt_gcur 'q' before that in old versions of IRAF),
+to distinguish this case from a hard-EOF and to provide maximum
+flexibility in how the program treats a request from the user to exit.
+If the user would suffer from an accidental program exit then the 'q' key
+action should do something before exiting, e.g., ask that the user first
+update the database, ask that CR be hit to verify the quit, and so on.
+In general, if it would take the user more than a minute to recover after
+an accidental program exit, one should consider coding some sort of
+verification action to be executed before exiting when 'q' is typed (but not
+when EOF is seen on the list).
+.le
+.le
+
+The GIO procedure \fBgqverify\fR is provided for programming convenience in
+cases where only simple verification is desired.  Note that lightweight tasks
+or submenus which can easily be reentered should not bother even with this,
+but should simply exit.  For example:
+
+.ks
+.nf
+	case 'q':
+	    if (gqverify() == YES)
+		break
+.fi
+.ke
+
+As a more complex example, suppose the program is used to edit or
+create a database which could be lost or damaged in an accidental
+exit, if not updated first.  We do not want to update the database
+automatically because this would overwrite the former contents of
+the database.  The program might be set up as follows.
+
+.ks
+.nf
+	'q'		program prints error message on status line, e.g.,
+			  "No write since last change (:quit! overrides)"
+	:w[rite]	updates the database; q will execute silently
+	:q[uit]!	force a quit w/o an update; discard changes
+.fi
+.ke
+
+.nh 2
+Detailed Procedure Specifications
+
+    The graphics output procedures provided by GIO fall into four main
+groups.  First are the high level "plot at a time" procedures,
+used to plot entire data vectors.  Second are the control procedures,
+used to open and close a device, to flush output and clear the screen,
+and to cancel output in the event of an interrupt.
+Third are the procedures used to set and stat (inquire) the GIO
+internal parameters, e.g. to define a WCS, change pens, select axis labeling
+options, or inquire the device resolution.  Fourth and last are the output
+procedures, used to draw and label the axes of a viewport, set the cursor,
+draw lines or marks, plot text, or fill areas.
+
+.nh 3
+High Level Procedures
+.ls 4
+.tp 8
+.ls gplotv (v, npts, x1, x2, title)
+
+.nf
+real	v[npts]		# data vector
+int	npts		# number of data points
+real	x1, x2		# WC assigned v[1] and v[npts]
+char	title[ARB]	# plot title
+.fi
+
+Open GIO, clear the screen, autoscale and plot the data vector, then close GIO.
+A default viewport is used.  The axes are drawn, tick marks are selected,
+marked, and labeled, and the plot title is printed.  The data is plotted
+using solid line segments.  The X values of the data points are evenly
+distributed from X1 to X2.
+.le
+
+.tp 8
+.ls gploto (gp, v, npts, x1, x2, title)
+
+.nf
+pointer	gp		# graphics descriptor
+real	v[npts]		# data vector
+int	npts		# number of data points
+real	x1, x2		# WC assigned v[1] and v[npts]
+char	title[ARB]	# plot title
+.fi
+
+A more flexible version of \fBgplotv\fR.  The graphics device must already
+have been opened with an explicit call to \fBgopen\fR.  The explicit open
+call makes it possible to append to an existing plot or to change plotting
+options with calls to \fBgset\fR before calling \fBgploto\fR to autoscale,
+draw the axes, and plot the data vector.  Annotation of the plot via calls
+to the low level output primitives is possible before a final call to
+\fBgclose\fR to close the device and free the graphics descriptor.
+.le
+
+.tp 8
+.ls gpagefile (gp, fname, prompt)
+
+.nf
+pointer	gp		# graphics descriptor
+char	fname[ARB]	# file to be paged
+char	prompt[ARB]	# end of page prompt string
+.fi
+
+Interactively page through a file on the terminal in text mode, e.g., to
+display help text in response to the '?' standard help query key.
+The workstation is deactivated, the screen is cleared and the file is paged,
+with the usual file pager prompt being displayed at the bottom of each page
+of text.  When the pager is exited the workstation is reactivated if it was
+active when the pager was called.  If the prompt string is null the file
+name is used.
+.le
+.le
+
+.nh 3
+Control Procedures
+.ls
+.tp 8
+.ls gopen (device, mode, fd)
+
+.nf
+char	device[ARB]	# name of device to be opened
+int	mode		# access mode
+int	fd		# graphics stream to be written
+.fi
+
+The named graphics device is opened for graphics i/o.  A pointer to the GIO
+graphics descriptor assigned to the device is returned as the function value.
+The device name may be the name of one of the standard logical graphics
+devices, i.e., \fBstdgraph\fR, \fBstdimage\fR, \fBstdplot\fR, or \fBstdvdm\fR,
+or the actual name of a physical device.
+
+The only meaningful device access modes at present are NEW_FILE and APPEND.
+In NEW_FILE mode all WCS are initialized to NDC coordinates.
+Opening the stdgraph device in NEW_FILE mode causes a screen clear on the next
+call to \fIgflush\fR.  In APPEND mode the WCS are restored to the values they
+had when the device was last accessed.
+The GIO internal state variables are initialized to their default values
+at \fBgopen\fR time regardless of the access mode for the device.
+
+Opening the stdgraph device causes an implicit reactivate workstation unless
+the AW_DEFER flag (<gset.h>) is set in the access mode, e.g.,
+
+	gp = gopen (device, NEW_FILE+AW_DEFER, fd)
+
+Defer mode allows the graphics descriptor to be opened once, e.g., during task
+startup, before any graphics output is required.  This is sometimes useful in
+applications which switch back and forth between text and graphics mode often,
+by bracketing each graphics sequence with calls to \fIgreactivate\fR to enter
+graphics mode, and \fIgdeactivate\fR to return to text mode.  Defer mode may
+be combined with any normal access mode code.
+
+Graphics output will be written to the stream \fIfd\fR, which may be one
+of the standard streams STDGRAPH, STDIMAGE, or STDPLOT, or to a binary file
+opened explicitly by the user before calling \fBgopen\fR.
+.le
+
+.tp 5
+.ls gclose (gp)
+
+The graphics device associated with graphics descriptor \fBgp\fR is closed,
+freeing all resources allocated to the device.  Any buffered graphics output
+is automatically flushed before closing the device.
+.le
+
+.tp 4
+.ls gdeactivate (gp, flags)
+
+.nf
+pointer	gp		# graphics descriptor
+int	flags		# AW_CLEAR, AW_PAUSE (see <gset.h>)
+.fi
+
+The graphics workstation is deactivated, i.e., restored to the normal terminal
+(text drawing) mode, the state the terminal was in prior to \fIgopen\fR, and to
+which it will be restored after a \fIgclose\fR.  This function is intended for
+interactive graphics applications and may be may be ignored by some graphics
+kernels.  If the AW_PAUSE flag bit is set the user will be asked to type a
+key before the terminal is restored to text mode.  If the AW_CLEAR flag bit
+is set the terminal (text) screen will be cleared after the workstation is
+deactivated.
+
+.le
+
+.tp 4
+.ls greactivate (gp, flags)
+
+.nf
+pointer	gp		# graphics descriptor
+int	flags		# AW_CLEAR, AW_PAUSE (see <gset.h>)
+.fi
+
+The graphics workstation is reactivated, i.e., restored to graphics mode from
+the normal terminal (text drawing) mode.  This function is intended for
+interactive graphics applications and may be may be ignored by some graphics
+kernels.  If the AW_PAUSE flag bit is set the user will be asked to type a
+key before the terminal is restored to graphics mode.  If the AW_CLEAR flag
+bit is set the graphics frame will be cleared.
+.le
+
+.tp 4
+.ls gcancel (gp)
+
+Any buffered graphics output is discarded and any output operation currently
+in progress is aborted.  Used to recover from an interrupt.
+.le
+
+.tp 3
+.ls gflush (gp)
+
+Any buffered graphics output is flushed to the output device.
+.le
+
+.tp 4
+.ls gclear (gp)
+
+If the output device is a CRT the screen is erased (including all viewports).
+If the output device is a plotter a formfeed is issued, advancing to the next
+page of output (whether or not any graphics output has occurred).
+All WCS are initialized to NDC coordinates and the internal state of GIO
+is initialized, i.e., the state of each drawing instruction attribute packet
+is set to UNSET to force retransmission to the graphics kernel as i/o occurs,
+and the current settings of the \fIgset\fR options, e.g., line style and width,
+\fIglabax\fR options, etc., are all initialized to their default (\fBgopen\fR)
+values.
+.le
+
+.tp 4
+.ls gframe (gp)
+
+Issue a screen clear or frame advance.  This call is equivalent to \fBgclear\fR
+except that the internal state of GIO is not initialized.  An application
+might want to call \fBgframe\fR and \fBgreset\fR directly rather than using
+\fBgclear\fR, if the full initialization implied by \fBgclear\fR is not what
+is desired.
+.le
+
+.tp 4
+.ls greset (gp, flags)
+
+.nf
+pointer	gp		# graphics descriptor
+int	flags		# bitflags noting what to reset (0 is a no-op)
+.fi
+
+The \fBgreset\fR may be used to reset all or parts of the internal state of
+GIO, without actually doing any i/o to the graphics device.  The \fIflags\fR
+argument is used to specify what is to be reset.  The bitflags (defined in
+<gset.h>) are enumerated below.
+
+.nf
+	GR_RESETALL		reset everything
+	GR_RESETGIO		reset only GIO drawing parameters
+	GR_RESETWCS		reset the WCS to wcs=1, all NDC
+	GR_RESETGLABAX		reset the GLABAX parameters
+.fi
+
+A \fBgclear\fR is equivalent to a \fBgframe\fR followed by a
+greset(gp,GR_RESETALL).
+.le
+
+.tp 8
+.ls gmftitle (gp, mftitle)
+
+.nf
+pointer	gp		# graphics descriptor
+char	mftitle[ARB]	# comment (metafile title string)
+.fi
+
+Place a comment describing the graphics being generated in the output
+stream.  Useful primarily when the output is expected to be saved in a
+metafile.  No graphics is generated.
+.le
+.le
+
+.nh 3
+Set and Stat Procedures
+.ls
+.tp 8
+.ls gscan (gp, text)  [NOT YET IMPLEMENTED]
+
+.nf
+pointer	gp		# graphics descriptor
+char	text[ARB]	# graphics commands
+.fi
+
+The string \fBtext\fR, consisting of an arbitrary length sequence of
+printable ASCII graphics commands delimited by semicolons or newlines,
+is interpreted and executed by GIO.  Each GIO procedure has a corresponding
+command of the same syntax, minus the parenthesis, commas, and the argument
+\fBgp\fR.  The syntax of a \fBgset\fR command is "param=value".
+File inclusion is provided by the operator "@" followed by the filename
+of the file to be included.
+The include operator may appear anywhere a token is expected and includes
+may be nested up to some maximum depth.
+The sequence "@STDIN" is especially useful for entering commands or data
+interactively.
+.le
+
+.tp 8
+.ls gset[irs] (gp, param, value)
+
+.nf
+pointer	gp		# graphics descriptor
+int	param		# parameter to be set
+[irs]	value		# new value for parameter
+.fi
+
+Set the value of the indicated parameter.  A separate procedure is used for
+integer, real, and string valued parameters, i.e., gseti, gsetr, gsets.
+GIO parameters may be either internal state variables (e.g. the number of
+ticks on an axis) or device parameters (e.g. the number of the pen to be
+used to draw lines).
+The GIO parameters are defined in the global include file \fB<gset.h>\fR.
+.le
+
+.tp 10
+.sp
+.nf
+gstati (gp, param)
+gstatr (gp, param)
+gstats (gp, param, outstr, maxch)
+.fi
+.ls
+.nf
+pointer	gp		# graphics descriptor
+int	param		# parameter to be set
+char	outstr[maxch]	# output string
+.fi
+
+Inquire the value of the indicated GIO internal parameter.
+The integer and real functions \fBgstati\fR and \fBgstatr\fR return
+the parameter value as the function value, whereas \fBgstats\fR is
+a procedure returning the string value of a parameter as an output argument.
+The GIO parameters are defined in the global include file \fB<gset.h>\fR.
+.le
+
+.tp 11
+.sp
+.nf
+ggetb (gp, cap)
+ggeti (gp, cap)
+ggetr (gp, cap)
+ggets (gp, cap, outstr, maxch)
+.fi
+.ls
+.nf
+pointer	gp		# graphics descriptor
+char	cap[2]		# device capability
+char	outstr[maxch]	# output string
+.fi
+
+Inquire the value of the indicated graphics device capability.
+The device capability \fIcap\fR is the two character name of the capability
+as it appears in the \fIgraphcap\fR file.  Aside from the device capabilities
+required by GIO, GIO itself knows nothing about the graphcap device
+capabilities.  New capabilities may be added without modifying GIO.
+The \fBgget\fR procedures call the corresponding procedures in the TTY
+interface.  If more control over device capabilities is required than
+that provided by GIO, the TTY interface may be used directly, following a
+call to \fBgstati\fR to get the pointer to the TTY descriptor for the device.
+
+The boolean function \fBggetb\fR tests whether the device has the named
+capability.  The integer and real functions \fBggeti\fR and \fBggetr\fR return
+the capability value as the function value, or zero if the capability is
+not defined for the device.  String valued capabilities are returned by
+\fBggets\fR as an output argument; the null string is returned if the
+device does not have the indicated capability.
+.le
+
+.tp 8
+.ls g[sg]view (gp, x1, x2, y1, y2)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x1, x2		# range of NDC coordinates in X
+real	y1, y2		# range of NDC coordinates in Y
+.fi
+
+Set or get the NDC coordinates of the viewport associated with the current WCS.
+The default viewport is the full display area of the device.
+.le
+
+.tp 8
+.ls g[sg]wind (gp, x1, x2, y1, y2)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x1, x2		# range of world coordinates in X
+real	y1, y2		# range of world coordinates in Y
+.fi
+
+Set or get the world coordinates of the window associated with the current WCS.
+The default window ranges from 0 to 1 in both X and Y, i.e., the default
+window associates a normalized coordinate system with the associated viewport.
+Any window limits passed as INDEF will be ignored, i.e., those window
+parameters will not be modified.
+.le
+
+.tp 9
+.ls g[ar]scale (gp, v, npts, axis)
+
+.nf
+pointer	gp		# graphics descriptor
+real	v[npts]		# data vector window is to be scaled to
+int	npts		# length of data vector
+int	axis		# axis to be scaled (1=X, 2=Y).
+.fi
+
+Set absolute (\fIgascale\fR) or rescale (\fBgrscale\fR) the minimum and
+maximum world coordinates of the indicated axis of the current window,
+i.e., scale the window to fit a data vector.
+May be called repeatedly if overplotting several curves.  The current minimum
+and maximum values for either axis may be obtained at any time by calling
+\fBggwind\fR.  To scale the window to fit a family of curves,
+call \fBgascale\fR for the first curve and \fBgrscale\fR for the remaining
+curves, thereby computing the range in X and or Y of all curves.
+.le
+
+.tp 9
+.ls ggscale (gp, x, y, dx, dy)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# point at which scale is desired (wc)
+real	dx, dy		# scale, wcs units per ndc unit
+.fi
+
+Determine the scale in world coordinate units at the point (x,y).  Useful
+for computing the size of an object in world coordinates given its size
+in ndc coordinates, or vice versa.  An approximation is used to determine
+the scale if log scaling is in use.  Note that the scale is a function of
+position for the nonlinear coordinate systems.
+.le
+
+.tp 9
+.ls gctran (gp, x1, y1, x2, y2, wcs1, wcs2)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x1, y1		# input point in WCS1 coords
+real	x2, y2		# output point in WCS2 coords
+int	wcs1, wcs2	# input, output world coordinate systems
+.fi
+
+Transform a point in world coordinate system \fIwcs1\fR to world coordinate
+system \fIwcs2\fR.  If \fIwcs1\fR is zero the transformation is from NDC
+coordinates to WCS coordinates.  If \fIwcs2\fR is zero the transformation is
+from WCS coordinates to NDC coordinates.  Otherwise the transformation is
+between two user defined world coordinate systems.  The point need not fall
+within the viewports of the two world coordinate systems.  World coordinate
+systems which were never set are equivalent to WCS=0.
+.le
+
+.tp 9
+.ls gcurpos (gp, x, y)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# current pen position in world coordinates
+.fi
+
+Return the "current pen position" in the current world coordinate system.
+The current pen position is the position set by the last move or draw
+command.
+.le
+
+.tp 10
+.ls gescape (gp, fn, instruction, nwords)
+
+.nf
+pointer	gp		# graphics descriptor
+int	fn		# function code
+short	instruction[nwords]	# instruction sequence to be passed
+int	nwords		# length of instruction sequence
+.fi
+
+Send a device dependent instruction sequence to the graphics kernel.
+Escape functions are ignored by GIO and by graphics kernels that do
+not recognize the function code.
+.le
+.le
+
+.nh 3
+Output Procedures
+
+    Data passed to the polyline or polymarker output procedures may contain
+embedded INDEF (indefinite) values in the X, Y, or V arrays.  Indefinite valued
+points appear as gaps in the plot and are ignored when autoscaling.
+Indefinite valued pixels are not permitted in a cell array since GIO does
+not look at the values of the pixels.
+
+.ls
+.tp 9
+.ls glabax (gp, title, xlabel, ylabel)
+
+.nf
+pointer	gp		# graphics descriptor
+char	title[ARB]	# plot title
+char	xlabel[ARB]	# X axis label
+char	ylabel[ARB]	# Y axis label
+.fi
+
+Draw and label the axes of the viewport.
+If the WCS has not yet been fixed it will be fixed by this call.
+If desired, \fBglabax\fR may modify the window slightly to place
+simple values on the tick marks.  Numerous \fBgset\fR options are
+available for controlling the number and sizes of the tick marks,
+the format of tick labels, the axes on which tick labels appear,
+and so on.  If the device viewport has not yet been set and axis labeling
+is enabled, \fBglabax\fR will set a default size viewport which allows room
+for the label text outside the viewport.
+.le
+
+.tp 8
+.ls gline (gp, x1, y1, x2, y2)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x1, y1		# start of line
+real	x2, y2		# end of line
+.fi
+
+Draw a line connecting the point (x1,y1) to the point (x2,y2) (WCS coordinates).
+The linetype, linewidth, and color may be changed beforehand with a call
+to \fBgset\fR.  The relevant parameters and their possible values are shown
+below.  Linetype zero (clear) may be used to erase lines drawn with any of the
+other linetypes (device permitting).
+
+.ks
+.nf
+	G_PLTYPE	0=clear, 1=solid, 2=dashed, 3=dotted,
+			    4=dotdash, >4=device dependent
+	G_PLWIDTH	relative line width (default 1.0)
+	G_PLCOLOR	color index
+.fi
+.ke
+.le
+
+.tp 8
+.ls gpline (gp, x, y, npts)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x[npts]		# X coordinates of the line endpoints
+real	y[npts]		# Y coordinates of the line endpoints
+int	npts		# number of line endpoints
+.fi
+
+Polyline.  Draw a line connecting the points (WCS coordinates).
+The linetype, linewidth, and color may be changed beforehand with a call
+to \fBgset\fR.
+.le
+
+.tp 8
+.ls gvline (gp, v, npts, x1, x2)
+
+.nf
+pointer	gp		# graphics descriptor
+real	v[npts]		# vector to be plotted (Y values)
+int	npts		# number of line endpoints
+real	x1, x2		# range of vector in X 
+.fi
+
+Vector polyline.  Draw a polyline wherein the Y values of the polyline are
+taken from V and the X values are evenly distributed along the X-axis,
+ranging from X1 at point V[1] to X2 at point V[npts] (WCS coordinates).
+.le
+
+.tp 9
+.ls gmark (gp, x, y, marktype, xsize, ysize)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# WCS coordinates of marker
+int	marktype	# marker type
+real	xsize, ysize	# marker sizes
+.fi
+
+Mark drawing primitive.  Draw a mark of type \fImarktype\fR and size
+\fImarksize\fR at the given position in WCS coordinates.
+The marker type codes recognized are shown below and are defined in <gset.h>.
+Marktype codes may be summed to make composite marks, e.g.,
+
+	call gmark (gp, x, y, GM_PLUS+GM_CROSS, 1.)
+
+is an asterisk.  The pseudo-mark GM_FILL may be combined with GM_CIRCLE,
+GM_BOX, or GM_DIAMOND to output the mark as a filled area, using the current
+fill area attributes.  A positive \fImarksize\fR specifies the mark size in NDC
+coordinates, whereas negative signifies WCS coordinates.
+The positive marksizes 1., 2., 3., and 4. signify default size marks of
+increasing size.
+
+.ks
+.nf
+    typecode      name                symbol
+
+	0 	GM_POINT	smallest plottable point
+        1	GM_FILL		fill interior of mark
+	2	GM_BOX		square box
+        4	GM_PLUS		plus
+	8	GM_CROSS	cross
+       16	GM_DIAMOND	diamond
+       32	GM_HLINE	horizontal line
+       64	GM_VLINE	vertical line
+      128	GM_HEBAR	horizontal error bar
+      256	GM_VEBAR	vertical error bar
+      512	GM_CIRCLE	circle
+.fi
+.ke
+
+The linetype for a mark is set by the parameter G_PMLTYPE.  A mark may
+be erased (device permitting) by setting the marker linetype to clear and
+redrawing the mark.  The color index used for marks is controlled by the
+\fBgset\fR parameter G_PMCOLOR.
+.le
+
+.tp 9
+.ls gpmark (gp, x, y, npts, marktype, xsize, ysize)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x[npts]		# WCS X coordinates of markers
+real	y[npts]		# WCS Y coordinates of markers
+int	npts		# number of markers
+int	marktype	# marker type
+real	xsize, ysize	# marker sizes
+.fi
+
+Polymarker.  Plot a sequence of \fInpts\fR markers at the positions given
+by successive WCS coordinate pairs (x[i],y[i]).  All markers will be of
+the same type and size.  The significance of the marker type and size codes
+is the same as for \fBgmark\fR.
+.le
+
+.tp 9
+.ls gvmark (gp, v, npts, x1, x2, marktype, xsize, ysize)
+
+.nf
+pointer	gp		# graphics descriptor
+real	v[npts]		# WCS Y coordinates of markers
+int	npts		# number of markers
+real	x1, x2		# range of WCS X coordinates
+int	marktype	# marker type
+real	xsize, ysize	# marker sizes
+.fi
+
+Vector polymarker.  Plot a sequence of \fInpts\fR markers at the positions given
+by successive WCS coordinate pairs (x[i],y[i]), where the x[i] are evenly
+distributed from X1 at V[1] to X2 at V[npts].  All markers will be of the same
+type and size.  The significance of the marker type and size codes is the same
+as for \fBgmark\fR.
+.le
+
+.tp 11
+.ls gumark (gp, x, y, npts, xcen, ycen, xsize, ysize, fill)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x[npts],y[npts]	# normalized polyline defining marker
+int	npts		# number of points in polyline
+real	xcen, xcen	# world coordinates of center of marker
+real	xsize, ysize	# marker size in X and Y
+int	fill		# draw mark using area fill
+.fi
+
+Draw a user defined marker.  The marker is defined by the polyline (X[i],Y[i]),
+normalized to the unit square.  The marker polyline is scaled to fit the
+window defined by \fIxcen\fR, \fIycen\fR, \fIxsize\fR, and \fIysize\fR,
+where the center is always defined in world coordinates but the marker sizes
+may be defined in any of a number of ways (see \fBgmark\fR).  If \fIfill\fR
+is YES the marker will be drawn using area fill rather than as a polyline.
+.le
+
+.tp 8
+.ls g[ar]move (gp, x, y)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# WCS coordinates to move or shift
+.fi
+
+Move absolute (\fBgamove\fR) or move relative (\fBgrmove\fR),
+with the "pen up".  A move relative should be preceded by a move absolute
+to unambiguously define the "current pen position" in WCS coordinates.
+Only the move, draw, and mark primitives leave the pen in a defined position.
+Calls to \fBgset\fR may be intermixed with move and draw commands without
+affecting the current pen position.
+.le
+
+.tp 8
+.ls g[ar]draw (gp, x, y)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# WCS coordinates to move or shift
+.fi
+
+Move absolute (\fBgadraw\fR) or move relative (\fBgrdraw\fR),
+with the "pen down".  Draws a line segment.
+The type of line drawn (linetype or "pen number") defaults to solid but
+may be changed beforehand with a call to \fBgset\fR.
+Calls to \fBgset\fR may be intermixed with move and draw commands without
+affecting the current pen position.
+.le
+
+.tp 9
+.ls gtext (gp, x, y, text, format)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# WCS coordinates of text string
+char	text[ARB]	# text to be plotted
+char	format[ARB]	# text characteristics
+.fi
+
+Plot the string \fItext\fR at the position (x,y) in WCS coordinates.
+The default size, orientation, and justification of the generated string 
+may be set by a prior call to \fBgset\fR or overridden for the duration
+of the current call by the \fIformat\fR string.  A null format string
+is permtted.
+
+
+.ks
+.nf
+          keyword               values                 default
+
+        up	        degrees ccw, zero = +x          90
+        size            character size scale factor	1.0
+        path	        left,right,up,down              r
+        hjustify        normal,center,left,right	l
+        vjustify        normal,center,top,bottom        b
+	font		roman,greek,italic,bold		r
+	quality		normal,low,medium,high		n
+	color		integers greater than one	1
+.fi
+.ke
+
+
+The attributes controlling how text is generated are shown above.
+The character up vector (attribute \fIup\fR) defines the horizontal and
+vertical axes (the horizontal axis is perpendicular to the character up
+vector).  Directions left and right, up and down are relative to these axes.
+The attribute \fIpath\fR defines the direction in which characters are
+to be plotted.  The attribute \fBquality\fR makes it possible to choose
+between low or medium quality (fast) and high quality (expensive) character
+generation techniques, e.g., hardware versus software character generation.
+This attribute is normally best set to "normal" and then overridden at
+metafile translation time.
+
+The attributes are set in the format string by a semicolon delimited list of
+keyword=value constructs.  Only the first character of keyword and value
+strings is significant, i.e., keywords and values may be abbreviated to as
+little as one character if desired.  For example, the format "p=d;v=c"
+would plot characters downward in a vertical string centered at the position
+given.
+
+The default font is set by the font attribute at the beginning of each call.
+Font changes may also be signaled by placing the sequence "\fF" in the text,
+where F is one of the characters RGIB, denoting the fonts roman, greek,
+italic, and bold.  In this manner the font may change from character
+to character within a single line of text.  Additional escape sequences may
+be added to represent special symbols.
+.le
+
+.tp 10
+.ls gfill (gp, x, y, npts, style)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x[npts]		# X coordinates of polygon
+real	y[npts]		# Y coordinates of polygon
+int	npts		# number of vertices of polygon
+int	style		# type of fill
+.fi
+
+Area fill.  The points (x[i],y[i]) define a closed area which will be filled
+in the indicated \fIstyle\fR.  The recognized style codes, defined in <gset.h>,
+are:
+
+.ks
+.nf
+	0	GF_CLEAR	clear area
+	1	GF_HOLLOW	draw only outline of area
+	2	GF_SOLID	fill area with a color
+       3-6	GF_HATCH[1234]	fill area with a pattern
+       7-N			device dependent
+.fi
+.ke
+
+If the device can support multiple colors the color index for area fill may
+be set beforehand with a call to \fBgset\fR to set the parameter G_FILLCOLOR.
+.le
+
+.tp 10
+.ls gpcell (gp, m, nx, ny, x1, y1, x2, y2)
+
+.nf
+pointer	gp		# graphics descriptor
+short	m[nx,ny]	# greylevels or colors (pixels)
+int	nx, ny		# number of pixels in X and Y
+real	x1, y1		# lower left corner of output area
+real	x2, y2		# upper right corner of output area
+.fi
+
+Output a cell array.
+Map each pixel in the input array into the corresponding area
+of the output device.  For maximum efficiency the resolution of M should
+match that of the area of the output device defined by the window (x1,y1)
+and (x2,y2), otherwise M is subsampled or replicated to best fill the output
+area.  The aspect ratio of a pixel need not be preserved in the mapping.
+The pixel values (greylevels or color indices) are passed on to the kernel
+without modification.
+.le
+
+.tp 7
+.ls gscur (gp, x, y)
+
+.nf
+pointer	gp		# graphics descriptor
+real	x, y		# new cursor position
+.fi
+
+Move the device cursor to the indicated position (WCS coordinates).
+.le
+.le
+
+.nh 3
+Input Procedures
+
+    Input procedures are available for cursor and pixel input.  Inquiry of GIO
+parameters and device capabilities is handled by the \fBgstat\fR and \fBgget\fR
+procedures and is not considered graphics input.
+
+.ls
+.tp 8
+.ls clgcur (param, wx, wy, wcs, key, strval, maxch)
+
+.nf
+char	param[ARB]	# CL parameter to be input
+real	wx, wy		# world coordinates of cursor event
+int	wcs		# index of WCS selected
+int	key		# keystroke value of cursor event
+char	strval[maxch]	# string value if set option (key = ':')
+int	maxch		# max chars to be returned in strval
+.fi
+
+The next value of the list structured CL cursor type parameter \fIparam\fR
+is read and the cursor coordinates in WCS units are decoded and returned
+as output arguments, along with the WCS number and the keystroke value,
+i.e., the character typed by the user causing the cursor to be read.
+The range of keystroke values is the full ASCII character set, minus a system
+dependent subset of control codes (if a physical cursor is read, the read is
+always terminated by the user typing a key on the user terminal).
+No GIO device need be open to read the cursor.  EOF is returned as the
+function value when the end of the cursor list is reached.
+The number of output arguments successfully decoded is returned as the
+function value for a normal read.  Values not converted are set to zero.
+.le
+
+.tp 8
+.ls ggcur (gp, sx, sy, key)
+
+.nf
+pointer	gp		# graphics descriptor
+real	sx, sy		# NDC coordinates of cursor event
+int	key		# keystroke value of cursor event
+.fi
+
+The physical cursor of the graphics device associated with graphics
+descriptor \fIgp\fR is read and the cursor coordinates in NDC units are
+returned as output arguments, along with the keystroke value, i.e.,
+the character typed or button pushed causing the cursor to be read.
+On many devices the cursor read will be instantaneous (the cursor position
+will be sampled), and the keystroke value will always be zero.  The range
+of possible keystroke values is device dependent.  EOF is returned as the
+function value when the end of the cursor list is reached.  An error action
+is taken if the device is not readable.  The GIO device must have previously
+been opened with \fBgopen\fR.
+
+Use of this low level procedure is not recommended since it forces a program
+to be used interactively, operation is device dependent, and cursor mode
+interaction is not supported.  The main uses for \fBggcur\fR are cursor input
+from special graphics devices, i.e., devices other than \fBstdgraph\fR or
+\fBstdimage\fR, and continuous sampling of the cursor position on devices
+which support it.  The characteristics of the device cursors are described
+in the graphcap entry for the device.
+.le
+
+.tp 10
+.ls ggcell (gp, m, nx, ny, x1, y1, x2, y2)
+
+.nf
+pointer	gp		# graphics descriptor
+short	m[nx,ny]	# output pixel array
+int	nx, ny		# number of pixels out in X and Y
+real	x1, y1		# lower left corner of input area
+real	x2, y2		# upper right corner of input area
+.fi
+
+Input a cell array.  The cell array defined by the rectangular window
+from point (x1,y1) to (x2,y2) is read into the output array M of size
+NX columns by NY lines.
+For maximum efficiency the resolution of the output array should match
+that of the device area defined by the input window.
+If the resolution of the output array does not match that of the device
+output lines will be subsampled or replicated to best fit the output array.
+Unaddressable pixels are returned as negative values.  An error action is
+taken if the device is not readable.
+.le
+.le
+
+.nh 2
+GIO Internal Parameters
+
+    The GIO internal parameters may be set with either a \fBgset\fR or
+\fBgscan\fR call, and inspected with a \fBgstat\fR function call.
+Parameters are identified to \fBgset\fR and \fBgscan\fR by an integer
+code.  Each integer code is assigned a symbolic name of the form G_PARAM
+in the include file <gset.h>.  In input to \fBgscan\fR, parameters are
+referred to by name in lower case, without the "g_" prefix.  The parameters
+and their default values are shown below.
+
+
+.tp 5
+.nf
+        \fBparameter     default            description\fR
+
+	wcs		1	index of current WCS
+	xtran		linear	linear, log, or nlog (WCS attribute)
+	ytran		linear	linear, log, or nlog (WCS attribute)
+	clip		yes	clip at viewport boundary (WCS attribute)
+	cursor		1	current cursor number
+	pltype		1	polyline linetype
+	plwidth		1.0	polyline relative line width
+	plcolor		1	polyline color index
+	pmltype		1	polymarker linetype
+	pmcolor		1	polymarker color index
+	szmarker[1-4] (.5:2)*ch	standard marker sizes, NDC coordinates
+	fastyle		1	fill area interior style
+	facolor		1	fill area color index
+	txsize		1.0	relative character size
+	txup		90	character up vector
+	txpath		right	direction in which characters are drawn
+	txspacing	0.0	character spacing relative to height
+	txhjustify	left	horizontal justification (n,c,l,r)
+	txvjustify	bottom	vertical justification (n,c,t,b)
+	txfont		roman	text font (roman,greek,italic,bold)
+	txquality	normal	text generator precision (n,l,m,h)
+	txcolor		1	text color index
+.fi
+
+.tp 9
+.nf
+	    (axis labeling parameters)
+
+	drawtitle	yes	draw plot title if given
+	titlesize	1.0	character size for plot title
+	titlejust	center	horizontal justification of title
+	ntitlelines	1	number of lines in title block
+	aspect		0.0	aspect ratio of viewport (0=dontcare)	
+
+	    (the following are duplicated for the Y axis)
+
+	xdrawaxes	3	draw X axis 1, 2, both (3), none (0)
+	xsetaxispos	no	set world coords of X axes
+	xaxispos1	0.0	world coord of X axis 1 (default wx1)
+	xaxispos2	0.0	world coord of X axis 2 (default wx2)
+	xdrawgrid	yes	draw grid marks connecting X ticks
+	xround		no	extend WCS to end at a tick mark
+	xlabelaxis	yes	draw axis label string if given
+	xaxislabelsize	1.0	character size for X axis label
+	xdrawticks	yes	draw and label X ticks
+	xlabelticks	yes	label X ticks
+	xnmajor		6	number of major ticks in X
+	xnminor		4	number of minor ticks in X
+	xmajorlength	0.8ch	length of a major tick, X
+	xminorlength	0.4ch	length of a minor tick, X
+	xmajorwidth	1.0	linewidth of a major tick, X
+	xminorwidth	1.0	linewidth of a minor tick, X
+	xaxiswidth	1.0	linewidth of the axis
+	xticklabelsize	1.0	character size for X tick labels
+	xtickformat	""	override format for X tick labels
+.fi
+
+.tp 4
+.nf
+	    (read only variables)
+
+	tty		-	pointer to TTY graphcap descriptor
+	fd		-	file descriptor of output stream
+	devname		-	device name as passed to gopen
+.fi
+
+
+The Y axis parameters have names equivalent to those shown with the
+X prefix replaced by a Y.  If the prefix is omitted entirely then the
+parameters for both axes will be set or queried.
+The \fBglabax\fR code and parameters are built upon the GIO graphics
+primitives and may be replaced by a more sophisticated user program
+if desired.
+
+Drawing and labeling of the X and Y axes is parameterized independently
+in X and Y.  If drawing and labeling of an axis is disabled, tick drawing
+and labeling is automatically disabled.  Drawing and labeling of an axis
+may be disabled on only one side of the viewport (useful when a single viewport
+is used simultaneously for two different world coordinate systems).
+If tick drawing is disabled tick labeling is automatically disabled.
+The tick marks, if drawn, may be connected by dotted lines within the
+interior of the plot.
+
+Given the approximate number of major ticks, GIO will compute the nearest
+number of tick marks resulting in round numbers for the tick mark labels.
+If rounding is enabled the window will be enlarged to the nearest tick
+outward on either end of an axis, otherwise an axis will end at the window
+boundary, which need not fall on a tick mark.
+If linear scaling is indicated \fInminor\fR minor ticks will be drawn
+between each pair of major ticks.  If log scaling is indicated the
+\fInmajor\fR and \fInminor\fR parameters are ignored and
+major ticks will be placed at powers of ten with eight minor ticks
+(e.g., 2,3,4,5,6,7,8,9) between each pair of major ticks.
+Tick lengths are given in NDC coordinates.  The default tick lengths
+are parameterized in terms of the character height for the device.
+
+
+.nh 2
+Graphcap Parameters
+
+    Each logical graphics device accessible to GIO must have an entry
+in the \fBgraphcap\fR (graphics capabilities) file.  The name of the
+device entry in the graphcap file must agree with that specified in the
+\fBgopen\fR call when the device is opened.  Multiple logical device
+entries may be given for a single physical device, each with slightly
+different parameters.  The name of the graphcap file is parameterized
+by the CL environment variable "graphcap", making it easy for the user
+to customize or extend the graphcap file.  The graphcap entries for
+common devices may be precompiled by the system manager to eliminate
+the overhead of searching the graphcap file at run time.
+
+The format of the graphcap file is identical to that of a UNIX \fBtermcap\fR
+file, and indeed the same interface (TTY) is used to access both types of files.
+The set of capabilities defined for a graphics device is however quite
+different than that defined for a terminal.  Capabilities are typed 
+parameters referred to by a two character internal name.  The restriction to
+two characters is perhaps unfortunate but is desirable for efficiency reasons
+(as well as for compatablity with the original termcap) and may be alleviated
+at some point in the future by the use of macro defines.
+
+Graphcap parameters fall into two classes, those parameters which are
+common to all devices, and those parameters which are required only for
+devices accessed with a particular graphics kernel.  GIO is capable
+of supporting any number of quite different kernels, each of which may
+support any number of devices.  These kernels are free to add parameters
+to their graphcap entries provided they do not conflict with the standard
+parameters.  An example is the "fast" or \fBstdgraph\fR kernel, discussed
+in detail in a later section.  If a device is to be accessed by more than
+one kernel each kernel must typically have its own graphcap entry for the
+device, with selection of the graphcap entry (logical device name)
+specifying the kernel to be used.
+
+In the discussion which follows the reader is assumed to already be familiar
+with the syntax and usage of \fBtermcap\fR format files.  This is documented,
+for example, in section 5 of the UNIX manuals.  A sample termcap entry for
+the devices "vt100-nam" and "vt100-am" is included below as an example of
+a typical termcap entry.
+
+
+.tp 5
+.nf
+d1|vt100|vt100-nam|vt100 w/no am:\
+	:am@:xn@:tc=vt100-am:
+d0|vt100|vt100-am|vt100|dec vt100:\
+	:cr=^M:do=^J:nl=^J:bl=^G:co#80:li#24:cl=50\E[;H\E[2J:\
+	:le=^H:bs:am:cm=5\E[%i%d;%dH:nd=2\E[C:up=2\E[A:\
+	:ce=3\E[K:cd=50\E[J:so=2\E[7m:se=2\E[m:us=2\E[4m:ue=2\E[m:\
+	:md=2\E[1m:mr=2\E[7m:mb=2\E[5m:me=2\E[m:is=\E[1;24r\E[24;1H:\
+	:rs=\E>\E[?3l\E[?4l\E[?5l\E[?7h\E[?8h:\
+	:if=/usr/lib/tabset/vt100:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:kb=^H:\
+	:ho=\E[H:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:ta=^I:pt:sr=5\EM:vt#3:xn:\
+	:k5=\EOp:k6=\EOx:k7=\EOr:k8=\EOm:k9=\EOl:k0=\EOq:\
+	:sc=\E7:rc=\E8:cs=\E[%i%d;%dr:ks=\E[?1h\E=:ke=\E[?1l\E>:
+.fi
+
+
+Note that each device may be known by several names.  The device capabilities
+are delimited by colons, e.g., ":xx=...:yy=...:".  The special capability "tc"
+allows an entry to include another entry recursively.  Escape is represented
+as either "\E" or "^[", <ctrl/h> is "^H".  If a delay of so many milliseconds
+is required after transmission of a string, the number of milliseconds
+appears as the first few chars in an entry, e.g., "cl=50..." causes a
+delay of 50 milliseconds following a screen clear.  Numeric capabilities are
+prefaced by a sharp, e.g., ":co#80:" (screen has 80 columns).
+
+
+.nh 3
+Generic GRAPHCAP Parameters
+
+    To make the distinction between the generic and kernel graphcap parameters
+clear and to eliminate the possibility of redefinitions, the generic
+parameters have lower case names and the kernel parameters have upper case
+names.  Only the standard graphcap parameters should be accessed from within
+applications programs.  The standard parameters are listed and defined below.
+These parameters should be included in the graphcap entry for every device.
+
+.ls 4
+.ls 15 ar   real
+Aspect ratio dY/dX, i.e., the ratio of the size of the device screen in Y to
+that in X (equivalent to ys/xs).
+.le
+.ls ca   bool
+Device implements cellarray plotting in hardware, i.e, the \fIzr\fR greylevels
+are displayed by the hardware rather than emulated by software in the kernel.
+.le
+.ls ch   real
+Height in NDC units of a character of size 1.0.
+.le
+.ls co   int
+Number of columns of text displayable on the device screen at character
+size 1.0.
+.le
+.ls cw   real
+Width in NDC units of a character of size 1.0.
+.le
+.ls fa   bool
+Device implements fill area in hardware.
+.le
+.ls fs   int
+Number of fill area styles supported by the device.
+.le
+.ls in   bool
+Device supports at least one input function, i.e., cursor readback or cell
+array input.
+.le
+.ls k1   int
+Minimum possible key value in a cursor read.
+.le
+.ls k2   int
+Maximum possible key value in a cursor read.
+.le
+.ls kf   str
+Filename of the executable graphics kernel file for the device.
+If this is given as "cl", the kernel is assumed to be resident in the
+CL process.  Should be a virtual filename, e.g., "dev$x_device.e".
+See also parameter \fItn\fR.
+.le
+.ls li   int
+Number of lines of text displayable on the device screen at character
+size 1.0.
+.le
+.ls lt   int
+Number of linetypes supported by the device.
+.le
+.ls lw   int
+Number of linewidths supported by the device.
+.le
+.ls nc   int
+Number of cursors supported by the device.
+.le
+.ls nk   int
+Number of possible key values in a cursor read.
+.le
+.ls pl   bool
+Device implements polyline drawing in hardware.
+.le
+.ls pm   bool
+Device implements polymarker drawing in hardware.
+.le
+.ls ro   bool
+Device supports roam at the hardware level (used in cursor mode).
+.le
+.ls se   bool
+Device supports selective erase of portions of the screen.
+.le
+.ls tf   int
+Number of text fonts supported by the device.
+.le
+.ls th   int
+Number of text heights or sizes supported by the device.  If absent or zero
+it is assumed that characters may be freely scaled in size.  If only a number
+of discreet character sizes are available the sizes are given by the
+parameters \fItN\fR.
+.le
+.ls tn   str
+Taskname, i.e., name of the logical task within the kernel file \fIkf\fR
+to be run to exercise a kernel.
+.le
+.ls tq   int
+Number of text quality or precision levels supported by the device.
+.le
+.ls tN   real
+Sizes of the \fIth\fR possible character sizes, relative to a character
+of size 1.0 (expands to the set of parameters t1,t2,...,tN).
+.le
+.ls tx   bool
+Device implements text generation in hardware.
+.le
+.ls wc   bool
+Reading the cursor implies a wait, i.e., a cursor read is triggered by
+the user.
+.le
+.ls xr   int
+Device resolution in X.
+.le
+.ls xs   real
+Device scale in X, i.e., the width of the display area in meters.
+.le
+.ls yr   int
+Device resolution in Y.
+.le
+.ls ys   real
+Device scale in Y, i.e., the height of the display area in meters.
+.le
+.ls zo   bool
+Device supports zoom at the hardware level (used in cursor mode).
+.le
+.ls zr   int
+Device resolution in Z, i.e., the number of greylevels or colors displayable
+at each point using the cell array primitive.
+.le
+.le
+
+
+The graphcap parameters are accessed by name via \fBgget\fR calls.
+For example,
+
+	xr = ggetr (gp, "xr")
+
+would assign the value of the parameter "xr" into the local variable of
+the same name.
+
+.nh 3
+STDGRAPH Graphcap Parameters
+
+    The \fBstdgraph\fR kernel is the "fast" kernel, i.e., the graphics kernel
+resident in the CL process.  This kernel is capable of driving almost any
+modern graphics terminals given only a graphcap entry for the device,
+providing the graphics terminal is data driven and provides both character
+and vector generation in hardware.
+
+.nh 4
+Classes of Parameters
+
+    The stdgraph parameters fall into a number of classes which we shall
+describe separately.  An alphabetical summary of all parameters is given in
+a later section.
+
+The open and close workstation sequences are sent to the device whenever the
+workstation is activated (OW) or deactivated (CW), e.g., when the STDGRAPH
+kernel receives the open workstation or close workstation directive, or when
+the open workstation is explicitly deactivated and later reactivated by the
+applications program.
+
+The primary function of the open and close workstation sequences is to
+effect a mode switch from text mode to graphics mode and back again,
+but the sequences may also contain instructions used only for initialization
+or mode setting.  For example, OW might initialize user defined line types
+or enable the graphics board.  The close string CW might disable the graphics
+board and set the alpha cursor to a standard place on the screen.
+
+The graphics enable and disable strings (GE,GD) are sent to the terminal
+by the STDGRAPH kernel when status line i/o occurs.  The GD sequence should
+clear the status line, leaving the terminal in status line mode, with the
+text cursor positioned to the start of the status line.  The GE sequence
+restores the terminal to graphics mode, and is often the same as the OW
+sequence.  Note that GD should not cause the graphics frame to disappear,
+as the status line is supposed to be visible at the same time as the plot.
+
+The status line is normally the line at the bottom of the screen.  On terminals
+with separate text and graphics memories which can both be displayed at the
+same time, the status line is normally written into the text memory.  If the
+terminal has both text and graphics memories but can only display one at a time
+the graphics memory should be used, provided the status line can be erased in
+the graphics memory.  If the graphics plane must be used but erase is not
+possible, the best approach is probably to write successive lines of status
+line text on top of the plot, starting at the upper left corner and advancing
+downward for each line of output text (see the 4012 entry in dev$graphcap).
+
+The parameters X1, X2, Y1, and Y2 define the range of device coordinates
+to be output.  Normally these will span the full screen of the device,
+but in general they may define any rectangular window on the device screen.
+The fill area and font tables are array valued parameters mapping the GKI
+fill area and font indices into device codes (if the device should happen
+to support such niceties).
+
+
+.ks
+.nf
+	OW		open (reactivate) workstation
+	IF		initialization file, if OW string is large
+	CW		close (deactivate) workstation
+	GE		graphics enable (exit status line mode)
+	GD		graphics disable (enter status line mode)
+	CL		screen clear
+	LR		load registers (see "binary encoding")
+
+	X1,X2		range of device X coordinates
+	Y1,Y2		range of device Y coordinates
+.fi
+.ke
+
+
+The set attribute parameters are format strings used to encode set attribute
+commands, each of which has a single integer argument.  The format string is
+similar to a \fBprintf\fR format string with the addition of a notation for
+binary encoding (described below).
+
+
+.ks
+.nf
+	TH(i)		set text height
+	TC(i)		set text color
+	TF(i)		set text font
+	LT(i)		set line type
+	LC(i)		set line color
+	LW(i)		set line width
+	MC(i)		set marker color
+	FT(i)		set fill area type
+	FC(i)		set fill area color
+.fi
+.ke
+
+
+Polyline generation, i.e., vector drawing, is more difficult to parameterize.
+We assume that polylines, polymarkers, fill areas, etc. are all similar enough
+to be described by the same coordinate encoding format, but we allow each
+such instruction to have different head and tail strings.
+
+.ks
+.nf
+	PL		polyline flag
+	VS		move start
+	VE		move end
+	DS		draw start
+	DE		draw end
+	MS		marker start
+	ME		marker end
+	FS		fillarea start
+	FE		fillarea end
+	XY(i,j)		coord format
+.fi
+.ke
+
+
+A polyline command consists of a number of subcommands, as outlined in the
+drawing below.  The polyline is a move followed by one or more draws.
+The polyline flag PL is set to indicate that multiple coordinate pairs
+can be output between the DS and DE commands.  If PL is false (or omitted)
+each coordinate pair in the GKI polyline will be output surrounded by DS
+and DE commands.  The encoding of each coordinate pair is defined by the
+parameter XY.
+
+
+.ks
+.nf
+	set attributes if necessary
+	move start
+	    x, y
+	move end
+	draw start
+	    x, y
+		...
+	    x, y
+	draw end
+.fi
+.ke
+
+
+The polymarker and fillarea parameters are optional.  The kernel will
+emulate markers and fill area if not supported by the hardware.
+Recall that GIO handles all mark drawing except GM_POINT (point mode),
+hence sophisticated mark drawing facilities are not required.
+
+Text generation is handled by the kernel a character at a time.
+If character up is 90 degrees and the path is to the right, the kernel
+will assume that it can output a number of characters between a TS
+and a TE.  Otherwise each character will be output preceded by a TS
+and followed by a TE.  The TS parameter is a format string with two
+arguments, the device coordinates of the lower left corner of the
+character to be drawn.  The encoding of these coordinates is defined
+by the TS format string.  It is possible to perform a coordinate
+transformation using the binary encoding facilities, if such is necessary.
+If characters are not addressed at the lower left corner an offset
+may be applied to the given coordinates using the binary encoding
+facilities.
+
+
+.ks
+.nf
+	TS(i,j)		text start
+	TE		text end
+.fi
+.ke
+
+
+Cursor output is controlled by the parameter WC.
+Cursor input is initiated by output of the sequence defined by the format RC.
+RC has one integer argument, the number of the cursor to be read.
+The UC capability, if defined, will cause the cursor position to be updated
+(with WC) to the position at the last cursor read.  This is desirable if the
+device cannot maintain the cursor position, i.e., if unrelated graphics
+output commands affect the cursor position as an unwanted side effect.
+
+
+.ks
+.nf
+	UC		update cursor pos before read
+	WC(x,y,i)	write cursor 
+	RC(i)		read cursor start
+	RE		read cursor end
+	CN		cursor value length
+	CD		cursor value delimiter
+	SC		scan cursor (-> x,y,key)
+.fi
+.ke
+
+
+Following transmission of the RC sequence the kernel will read the
+response as defined by the parameters CN and CD.  At least one of CN or CD
+must be given.  If CN is given but not CD exactly CN characters will be
+read.  If CD is given then characters will be read until the delimiter string
+is matched (and until at least CN characters have been read).  If possible
+a delimiter string should be specified to permit recovery from bad cursor
+reads, e.g., when the user types something before the cursor is displayed.
+When a satisfactory cursor response string has been obtained the format SC
+will be used to decode the string into the output values X, Y, and KEY.
+The RE sequence is transmitted once the cursor read has successfully
+completed.
+
+.nh 4
+Binary Encoding
+
+    Graphics devices vary widely in the techniques used to encode numeric
+data such as a line type or color index, or the coordinate pairs of a
+polyline.  Our approach to the encoding problem is a generalization of the
+\fBprintf\fR format string.  The encoder is driven by a format string
+taken from the graphcap entry for the device.  A number of standard formats
+are recognized with encoding provided internally for these standard formats
+by the encoder.  To permit encoding of special formats the encoder provides
+a very general yet efficient RPN virtual machine capable of computing bit
+patterns according to a user supplied program embedded in the format string.
+
+A format string is a sequence of ASCII characters.  Any ASCII character,
+including all control characters, is permitted in the string.
+The significance of a character depends on the context in which it appears.
+Initially characters are simply copied to the output.  Three special
+characters are recognized in \fBcopy mode\fR (excluding the characters
+already counted as special by termcap):
+
+
+.ks
+.nf
+	'	escape next character (literal)
+	%	begin a formatted output string
+	(	begin an executable expression
+.fi
+.ke
+
+
+The encoder is a table driven interpreter which is programmed by the format
+given in the graphcap file.  Programming the encoder is rather
+like programming in assembler or microcode (its fun but easy to screw up).
+The encoder provides a set of 12 integer registers, an integer stack with a
+capacity of 50 values, and a dozen or so instructions.  It is fundamentally
+assumed that the character set is ASCII (this is guaranteed by the IRAF
+programming environment).
+
+Upon entry one or more of the registers 1 through 3 are initialized to the
+values of the input arguments, leaving the remaining registers, i.e., R4-R9
+and R0 (R10) available for general use.  Registers R11 and R12 are reserved
+for internal use.
+The interpreter is activated when an unescaped ( is encountered in the input.
+In \fBexecute mode\fR the following characters have special meanings
+(excluding :, ^, and \, which are special characters to termcap/TTY):
+
+.ks
+.nf
+	'	escape next character (recognized everywhere)
+	%	conventional formatted output
+	)	revert to copy mode
+	#nnn	push signed decimal integer number nnn
+	$ 	switch case construct
+	.	pop number from stack and place in output string
+	,	get next character from input string and push on stack
+	&	modulus (similar to AND of low bits)
+	+	add (similar to OR)
+	-	subtract (similar to AND)
+	*	multiply (shift left if pwr of 2)
+	/	divide (shift right if pwr of 2)
+	<	less than (0=false, 1=true)
+	> 	greater than (0=false, 1=true)
+	=	equals (0=false, 1=true)
+	;	branch if: <bool> <offset> ;.  The ; is at offset=0.
+       0-9	push contents of register 0 through 9
+	!N	pop stack into register N
+	!!	generate a N millisecond delay, where N is on the stack
+.fi
+.ke
+
+
+Any other character encountered in execute mode is interpreted as an integer
+number and pushed on the stack.  Hence, the character "@" is equivalent to
+"#64", i.e., octal 100.  A blank is the integer constant 40B.
+
+The output format directive % will format and output the number on the top
+of the stack, popping the stack in the process.  The format specification
+may be any legal \fBprintf\fR format.  The case construct is used to process
+set attribute commands, e.g., set linetype 0, 1, 2, text size 1, 2, 3, etc,
+and also provides a rudimentary conditional processing capability.  The branch
+if operator ; provides a rudimentary branching and looping capability.
+Beware that sequences like "^N" and "\E" compile as a single character in
+the format string.
+
+.nh 4
+Examples
+
+    As a simple example consider the encoding of the ANSI command to set
+the cursor of a nongraphics terminal.  The required sequence is the
+following:
+
+	ESC [ line ; col H
+
+Assuming that the column number is designated as X and the line number as
+Y, in registers 1 and 2 respectively, the format would be as follows
+(the quotes are not part of the format):
+
+	"\E[(2)%d;(1)%dH"
+
+Now assume that the output sequence is the same but the line and column
+numbers are one-indexed while the terminal requires zero-indexed
+coordinates:
+
+	"\E[(2#1-)%d;(1#1-)%dH"
+
+Thus far the examples have been pretty trivial and do not warrant the
+complexity of the RPN interpreter proposed here.  For our next example
+consider the encoding of a polyline coordinate pair for a Tektronix
+compatible graphics terminal and for an AED512, two quite different
+graphics terminals.  The Tektronix format for encoding an (X,Y) coordinate
+pair is as follows:
+
+
+.ks
+.nf
+	0 1 YA Y9 Y8 Y7 Y6
+	1 1 Y5 Y4 Y3 Y2 Y1
+	0 1 XA X9 X8 X7 X6
+	1 0 X5 X4 X3 X2 X1
+.fi
+.ke
+
+
+Since the Tektronix device is so common the special format %t is provided
+for encoding register 1 and 2 (X and Y) in this format, and writing out
+the result.  The format string
+
+	"%t"
+
+is all that is required.  The more general solution is provided by the
+following format.
+
+	"(2 / +.2 &`+.1 / +.1 &@+."
+
+To understand this last example one must look up the octal values of
+the characters " " (40B), "`" (140B), and "@" (100B).  The notation is
+admittedly rather cryptic but it is also concise and efficient, and works
+for a wide range of devices.
+
+Now consider the AED512 in binary mode (this is courtesy of NCAR; I do not
+have access to such a terminal).  The output encoding of a coordinate pair
+is as follows:
+
+
+.ks
+.nf
+	XA X9 X8 YB YA Y9 Y8
+	X7 X6 X5 X4 X3 X2 X1
+	Y7 Y6 Y5 Y4 Y3 Y2 Y1
+.fi
+.ke
+
+
+The format required to generate this is shown below.  Note the use of
+register 9 to store the constant 200B.  The "^N" signifies <ctrl/n>,
+i.e., 16B, used to effect a left shift of four bits.
+
+	"(#128!919/^N*29/+.19&.29&."
+
+This format could be further optimized by preloading register 9 at
+\fBopenws\fR time by moving the "(#128!9" to parameter LR.  The encoder
+registers maintain their values indefinitely.  Using LR the two parameters
+might appear in the graphcap entry as follows.
+
+	":LR=(#128!9:XY=(19/^N*29/+.19&.29&.:"
+
+The case construct makes it possible to generate output conditionally based
+on the value of an integer switch.  The syntax of a case statement is as
+follows:
+
+	$1 ... $2-5 ... $6 ... $D ... $$
+
+When the first $ is encountered the switch value is popped off the stack
+and converted into a character by addition of the constant '0' (60B).
+The interpreter will then scan forward until it finds the indicated case,
+at which point it resumes execution in case mode.  If the indicated case
+is not found scanning will stop at $D (the default case) or $$, whichever
+comes first.  When the next $ is seen the interpreter skips forward until
+it finds $$, which marks the end of the case.  Case constructs are not
+nestable.
+
+The case construct is used primarily for set attribute formats.
+For example, the GKI linetype codes are integers greater than or equal to zero,
+with case zero being the line clear and the other cases actual linetypes.
+For the VT640 there are nine possible linetypes, i.e., line clear,
+five builtin linetypes, and 3 user defined linetypes.  The strings to be
+output for the cases 0 through 5 are the following:
+
+
+.ks
+.nf
+	linetype		     string
+
+	    0			ESC / 1 d ESC `
+	    1			ESC / 0 d ESC `
+	    2			ESC / 0 d ESC a
+	    3			ESC / 0 d ESC b
+	  (etc)			     (etc)
+.fi
+.ke
+
+
+We could encode linetypes 0, 1 through 5, and everything else with the
+following format (linetype code in register 1):
+
+	"\E/(1$0)0d\E`($1-5)1d\E(1_+.$D)0d\E`($$"
+
+Note that case searching is a simple string matching operation that ignores
+operators such as ( and ).  Only $, ' (escape), and EOS are recognized when
+searching for a case.
+
+.nh 4
+Efficiency
+
+    The interpreter approach to solving the general encoding problem
+presented here is not the only solution to the problem.  Before adopting
+this approach several alternatives were considered.  One such alternative
+was the bitfield packing and unpacking scheme used by NCAR to solve the
+same problem.  The third alternative considered was to hand code a
+subroutine for each encoding required for each device.  Benchmarks run
+to compare the three alternatives yielded the following times in
+cpu seconds required to plot a 1000 point array with Tektronix encoding:
+
+
+.ks
+.nf
+	bitfields	approximately 30 seconds
+	interpreter	0.82 - 2.0 seconds
+	hand coded	0.78 seconds (mostly i/o)
+.fi
+.ke
+
+
+The time required for character output is included in the figures shown.
+The bitfields benchmark is an extrapolation from an actual timing of the
+prototype NCAR software as ported to the UNIX VAX by Cliff Stoll.
+The GBYTE and SBYTE primitives used to implement bitfields in the NCAR
+software were written in portable C by Cliff and did not use the VAX bitfield
+instructions, which would have helped significantly (but which would not
+have yielded a fair test: all IRAF target machines may not have bitfield
+instructions).  The two timings shown for the interpreter are for the "%t"
+format and the general format.  The clock time required by the hardware
+(VT100 with VT640 retrographics board) to draw the vectors was about 7 seconds.
+
+We conclude that the execution time overhead of the interpreter for encoding
+polyline points is acceptable and the use of hand coded, device dependent
+procedures is neither warranted nor desirable.  The bitfields technique
+is too inefficient to use in a production interface.
+
+.nh 4
+Decoding Cursor Input
+
+    Decoding of the cursor value string returned by the device into
+X, Y, and KEY (keystroke) values is carried out using the table driven
+interpreter for decoding rather than for encoding.  In this mode characters
+are input with "," and the decoded output values X, Y, and KEY are returned
+in registers 1 through 3.  The % format encoding operator is not used.
+If the cursor value is returned in ASCII X and Y must be converted to
+binary the hard way (e.g., "ch1 '0' - 100 * ch2 '0' - 10 * +", etc.).
+
+To verify that this scheme will work consider the cursor value returned
+by a Tektronix compatible terminal.  The return value is 6 characters,
+consisting of the character typed followed by the encoded X and Y in
+the next four characters, and lastly a CR terminator:
+
+
+.ks
+.nf
+	C7 C6 C5 C4 C3 C2 C1
+	 0  1 XA X9 X8 X7 X6
+	 0  1 X5 X4 X3 X2 X1
+	 0  1 YA Y9 Y8 Y7 Y6
+	 0  1 Y5 Y4 Y3 Y2 Y1
+	 0  0  0  1  1  0  1
+.fi
+.ke
+
+
+The required decoding format is shown below.
+
+	",!3, & *, &+!1, & *, &+!2"
+
+.nh 4
+Summary of STDGRAPH Graphcap Parameters
+
+    An alphabetical summary of the graphcap parameters used by the STDGRAPH
+kernel is given below.
+
+
+.tp 3
+.nf
+	CD		cursor value delimiter
+	CL		screen clear
+	CN		cursor response length
+	CW		close (deactivate) workstation
+	DE		draw end
+	DS		draw start
+	FC(i)		set fill area color
+	FE		fillarea end
+	FS		fillarea start
+	FT(i)		set fill area type
+	GD		graphics disable (exit status line mode)
+	GE		graphics enable (enter status line mode)
+	IF		initialization file, if OP string is large
+	LC(i)		set line color
+	LR		load registers
+	LT(i)		set line type
+	LW(i)		set line width
+	MC(i)		set marker color
+	ME		marker end
+	MS		marker start
+	OW		open (reactivate) workstation
+	PL		polyline flag
+	RC(i)		read cursor start
+	RE		read cursor end
+	SC		scan cursor (-> x,y,key)
+	TC(i)		set text color
+	TE		text end
+	TF(i)		set text font
+	TH(i)		set text height
+	TS(i,j)		text start
+	VE		move end
+	VS		move start
+	WC(x,y,i)	write cursor 
+	X1		first device X coordinate
+	X2		last device X coordinate
+	XY(i,j)		coordinate format
+	Y1		first device Y coordinate
+	Y2		last device Y coordinate
+.fi
+
+
+As a final example, the actual graphcap entry for the vt640 terminal
+(DEC VT100 with retrographics) is reproduced below.
+
+
+.ks
+.nf
+vt640|vt640g|vt100 with Retrographics:\
+    :RC=(1$2)^X\E[24;65H\E[7mLIGHT PEN READY\E[0m($$)^]\E"(1$2)5($D)4($$)g:\
+    :WC=^]%t\E/f:OW=150^]^_:CW=^X\E[24;0H\E[K:GE=150^]^_:GD=^X\E[24;0H\E[K:\
+    :lt#5:nc#2:se:CL=50^]\E^L:xr#640:yr#480:ar#.57:xs#.23:ys#.13:tc=4012:
+
+4012|tek4012|tektronix 4012:\
+    :ar#.70:ch#.0294:co#80:cw#.0125:in:k1#1:k2#127:kf=cl:li#35:\
+    :lt#5:nc#1:nk#127:pl:pm:th#4:t1#1:t2#2:t3#3:t4#4:tx:\
+    :wc:xr#1024:yr#780:xs#.20:ys#.14:\
+    :CD=^M:CN#6:LT=^]\E/(1$0)1d\E`($1-5)0d\E(1_+.$D)0d\E`($$:\
+    :MS=\034:PL:RC=\E^Z:SC=(,!3, & *, &+!1, & *, &+!2:\
+    :TH=\E(1#47+.:TS=^]%t^_:VS=^]:X1#0:X2#1023:XY=%t:Y1#0:Y2#779:\
+    :OW=^]^_:CW=(#682!2#0!1)^]%t^_:GE=^]^_:\
+    :CL=1000(#32!9)\E^L:\
+    :LR=(#32!9:GD=(9#1-!99$0#31!9$$9#22*!2#0!1)^]%t^_:
+.fi
+.ke
+
+.NH 3
+TERMCAP and GRAPHCAP
+
+    Every graphics terminal entry in the graphcap file should have a
+corresponding terminal capability entry in the termcap file.  When the user
+sets the terminal type with the \fBstty\fR task in the CL, the termcap entry
+tells whether or not the terminal supports vector graphics, and the value
+of the \fBstdgraph\fR environment variable is set to "none" for a non-graphics
+terminal, or to the graphcap name of the device for a graphics terminal.
+For a terminal to be recognized by the system as a graphics terminal the
+termcap entry must include the ":gd" capability.  If the graphcap name for
+the device is different than the termcap name then the form ":gd=gcname:"
+should be used.
+
+For example, the minimal termcap entry for the vt640 graphics terminal would
+be as follows.  Note that it makes no sense to set the terminal type to
+"vt100", since a standard vt100 does not support vector graphics.
+
+.ks
+.nf
+	vt640|Retrographics enhanced VT100:\
+	:gd:tc=vt100:
+.fi
+.ke
+
+The "gd" capability is not standard termcap, but will be ignored by non-IRAF
+programs which do not recognize the capability.
+
+.nh 2
+Graphics Kernel Interface
+
+    The graphics kernel interface (GKI) is the interface between GIO and the
+underlying graphics kernel or kernels.  The GKI is a data driven interface,
+i.e., GIO communicates with the graphics kernel via bidirectional streams
+of control instructions and data.  The functionality assumed by the GKI is
+simple enough to permit use of a variety of graphics kernels, e.g., the builtin
+GIO kernel for interactive graphics terminals, GKS, CORE, NSPP, and so on.
+To understand the level of functionality expected from the kernel we first
+summarize the functions the kernel is \fInot\fR expected to perform, i.e.,
+the functions performed by GIO before output to the kernel:
+
+.ls 4
+.ls o
+All WCS coordinate transformations and clipping at the viewport boundary.
+The kernel sees only NDC coordinates.
+.le
+.ls o
+Axis drawing and labeling.  GIO processes a \fBglabax\fR call into a
+sequence of polylines in NDC coordinates.
+.le
+.ls o
+Mark drawing.  GIO processes all mark drawing commands into polyline
+instructions.
+.le
+.ls o
+Move and draw commands.  GIO processes all absolute and relative move and draw
+commands into sequences of polyline instructions.
+.le
+.le
+
+
+The main functions of the kernel are the control and attribute set functions,
+set cursor, polyline, polymarker (GM_POINT only), text generation, fill area,
+cell array, and cursor read.  A kernel need not implement all such functions,
+but it must at least recognize and ignore the corresponding GKI instructions.
+The GKI kernel instructions are easily implemented for modern intelligent
+graphics terminals.  The fast kernel will let the terminal handle polyline
+drawing, point mode polymarker drawing, dashed lines, and character generation.
+
+The GKI format is a sequence of variable length binary control and
+output instructions.  Each instruction consists of the beginning of instruction
+sentinel (BOI), an integer binary opcode identifying the instruction,
+an integer giving the length of the instruction in metacode words,
+and an arbitrary number of parameter and data words.
+The BOI word aids in the detection of and recovery from botched instructions,
+e.g., if an interrupt occurs while writing an instruction.
+
+
+.ks
+.nf
+	 \fBfield\fR                          \fBdescription\fR
+
+	BOI		beginning of instruction (magic value = 100000B)
+	opcode		unique instruction identification code (1-27)
+	length		length of entire of instruction in metacode
+			    words (includes all four fields)
+	data		variable length part of instruction
+.fi
+
+.ce
+Figure 3. GKI Instruction Format
+.ke
+
+
+The instruction format chosen for GKI is basically a direct mapping of the
+required low level functions into binary opcodes.
+Various standard formats were considered and rejected,
+in particular the GKS VDM (virtual device metafile) format.
+GKS VDM turned out to be far to complex to be worth using at this level
+in the system.  The GKS VDI format might have been better suited,
+but I could not find any information describing this format
+(my understanding was that, although there are numerous implementations of VDI,
+there is no formal standard as yet).
+
+The GKI format may be extended at some point in the future to provide
+a binary instruction for each procedure in the GKS Fortran binding.
+This will make it possible for applications to use either GIO or GKS,
+provided a GKS kernel is available.  This will make it easier to
+import applications which are already written to use GKS (alternatively a
+mini-GKS might be built upon GIO, since the primitive functions are almost
+identical).  Since IRAF itself is transportable and it is desirable for IRAF
+applications to have full access to the IRAF i/o facilities, new IRAF
+applications are not being written with transport to another data reduction
+system in mind.  New IRAF applications will use only GIO whenever the
+facilities provided by GIO are adequate.  Applications which use only GIO
+will continue to be usable with any graphics kernel.
+
+.nh 3
+GKI Instructions
+
+    The GKI instruction stream transmitted between processes on the same or
+compatible machines will be a sequence of SPP short integer metacode words.
+The machine independent GKI metafile format will be the equivalent stream
+encoded as 16 bit twos complement signed integer metacode words, blocked 
+1440 words per block, with conversion between the internal and external
+metacode formats being provided by the IRAF MII (machine independent integer)
+interface (MII takes care of byte swapping, etc.).  GKI metafiles in MII
+format will be easily read and written by different machines, offloading most
+of the work to the graphics kernel on the reader machine.  The GKI instruction
+format is designed for maximum efficiency on modern minicomputers, i.e.,
+the internal format (SPP short integer) is an atomic datatype and no bit
+operations are required to generate or interpret metacode.
+
+NDC coordinates (0.0 to 1.0) will be represented in GKI as integers in the
+range 0-32767.  Character data will be packed one 7 bit ASCII character per
+metacode word.  Floating point is required only for certain output attributes,
+e.g., the linewidth and character height (size) scale factors.
+To avoid the problems of machine dependent floating point formats we shall
+represent the low precision real numbers by converting them to integer
+metacode words scaled according to the following relation:
+
+	I = int (R * 1E2)
+
+Specifications for the GKI metafile instructions follow.  The datatype and
+size of each field of the instruction is given in parenthesis.
+The datatype "p" denotes a coordinate pair (x,y) of type (m,m),
+where "m" denotes an NDC coordinate.
+
+The OPENWS instruction marks the start of an instruction stream or
+\fBmetafile\fR for a particular device.
+A subsequent CLOSEWS (or physical end of file) marks the end of a metafile.
+An OPENWS in APPEND mode requires that GIO recall the WCS defined when the
+device was last accessed.
+A physical file may consist of any number of independent metafiles.
+Although there is no explicit connection between OPENWS and screen clear
+(CLEARWS), a screen clear is implied for some devices when opened in
+new file mode.
+The MFTITLE instruction is optional and is provided only for documenting
+the contents of a metafile.
+
+
+.ks
+.nf
+			GKI_EOF = BOI  0 L
+		     GKI_OPENWS = BOI  1 L M N D
+		    GKI_CLOSEWS = BOI  2 L N D
+	       GKI_REACTIVATEWS = BOI  3 L
+	       GKI_DEACTIVATEWS = BOI  4 L
+		    GKI_MFTITLE = BOI  5 L N T
+		    GKI_CLEARWS = BOI  6 L
+		     GKI_CANCEL = BOI  7 L
+		      GKI_FLUSH = BOI  8 L
+		   GKI_POLYLINE = BOI  9 L N P
+		 GKI_POLYMARKER = BOI 10 L N P
+		       GKI_TEXT = BOI 11 L P N T
+		   GKI_FILLAREA = BOI 12 L N P
+	       GKI_PUTCELLARRAY = BOI 13 L LL UR NC NL P
+		  GKI_SETCURSOR = BOI 14 L CN POS
+		      GKI_PLSET = BOI 15 L LT LW CI
+		      GKI_PMSET = BOI 16 L MT MW CI
+		      GKI_TXSET = BOI 17 L UP SZ SP P HJ VJ F Q CI
+		      GKI_FASET = BOI 18 L FS CI
+		  GKI_GETCURSOR = BOI 19 L CN
+		GKI_CURSORVALUE = BOI 19 L CN POS KEY
+	       GKI_GETCELLARRAY = BOI 20 L LL UR NC NL
+		  GKI_CELLARRAY = BOI 20 L NP P
+		     GKI_ESCAPE = BOI 25 L FN N DC
+		     GKI_SETWCS = BOI 26 L N WCS
+		     GKI_GETWCS = BOI 27 L N
+.fi
+
+.ce
+The GKI Instruction Set
+.ke
+
+.nh 4
+Control Instructions
+
+    The NULL instruction is unique in that it consists of a single metacode
+word with value zero.  The BOI and length fields are omitted.  Any number
+of null words may be inserted between regular metacode instructions, e.g.,
+to pad a block of metacode to be written to an MII format metafile.
+The EOF instruction is used internally by GIO to stop metacode translation
+on a pseudofile stream, as if end of file had been encountered.
+
+The open workstation instruction should start a new frame unless the access
+mode is APPEND, in which case graphics is to be added to the last frame.
+An OPENWS implies an REACTIVATEWS.  CLOSEWS does little more than deactivate
+the workstation, since the last frame must in some sense remain open for
+APPEND mode to be possible.  Normal termination of the kernel process
+will or an open workstation in a mode other than append will cause the last
+frame to be terminated.
+
+
+.ls
+.tp 4
+GKI_EOF = BOI 0 L
+.ls
+.nf
+L(i)		3
+.fi
+.le
+
+
+.tp 6
+GKI_OPENWS = BOI 1 L M N D
+.ls
+.nf
+L(i)		5 + N
+M(i)		access mode (APPEND=4, NEW_FILE=5, TEE=6)
+N(i)		number of characters in field D
+D(Nc)		device name as in \fBgraphcap\fR file
+.fi
+.le
+
+
+.tp 5
+GKI_CLOSEWS = BOI 2 L N D
+.ls
+.nf
+L(i)		4 + N
+N(i)		number of characters in field D
+D(Nc)		device name as in \fBgraphcap\fR file
+.fi
+.le
+
+
+.tp 5
+GKI_REACTIVATEWS = BOI 3 L
+.ls
+.nf
+L(i)		3
+.fi
+.le
+
+
+.tp 5
+GKI_DEACTIVATEWS = BOI 4 L
+.ls
+.nf
+L(i)		3
+.fi
+.le
+
+
+.tp 5
+.rj (optional)
+GKI_MFTITLE = BOI 5 L N T
+.ls
+.nf
+L(i)		4 + N
+N(i)		number of characters in field T
+T(Nc)		title string identifying metafile
+.fi
+.le
+
+
+.tp 3
+GKI_CLEARWS = BOI 6 L
+.ls
+.nf
+L(i)		set to the constant 3 (no data fields)
+.fi
+.le
+
+
+.tp 3
+GKI_CANCEL = BOI 7 L
+.ls
+.nf
+L(i)		set to the constant 3 (no data fields)
+.fi
+.le
+
+
+.tp 3
+GKI_FLUSH = BOI 8 L
+.ls
+.nf
+L(i)		set to the constant 3 (no data fields)
+.fi
+.le
+.le
+
+.nh 4
+Output Instructions
+
+    All data points in the GKI output instructions have been transformed into
+NDC coordinates and clipped at the viewport boundary (if clipping is enabled).
+In the process GIO will translate any INDEF valued points by breaking large
+polylines into smaller polylines, hence the semantics of plotting polylines and
+polymarkers is quite simple at the graphics kernel level.
+
+CELLARRAY is processed into a series of one dimensional cell array instructions,
+one for each line in the two dimensional array supplied by the user.  Fewer or
+shorter lines will be output if clipping is necessary.  Arrays larger than 32767
+pixels may be output since each line is passed as a separate instruction.
+The maximum number of lines and columns in a cell array is 32767 and 32761,
+respectively (more lines can be input but they will not be resolved).
+The kernel is expected to scale cell arrays to fit the output device via some
+combination of pixel replication or subsampling, if there is not a one to one
+correspondence between cell array pixels and device pixels.
+
+.ls
+.tp 5
+GKI_POLYLINE = BOI 9 L N P
+.ls
+.nf
+L(i)		4 + N * 2
+N(i)		number of points in the polyline
+P(Np)		list of points (x,y pairs)
+.fi
+.le
+
+
+.tp 5
+GKI_POLYMARKER = BOI 10 L N P
+.ls
+.nf
+L(i)		4 + N * 2
+N(i)		number of points in the polymarker
+P(Np)		list of points (x,y pairs)
+.fi
+.le
+
+
+.tp 6
+GKI_TEXT = BOI 11 L P N T
+.ls
+.nf
+L(i)		6 + N
+P(p)		starting point of character string
+N(i)		number of characters in string T
+T(Nc)		string of N ASCII characters
+.fi
+.le
+
+
+.tp 5
+GKI_FILLAREA = BOI 12 L N P
+.ls
+.nf
+L(i)		4 + (N * 2)
+N(i)		number of points defining the polygon to be filled
+P(Np)		list of points (x,y pairs)
+.fi
+.le
+
+
+.tp 8
+GKI_PUTCELLARRAY = BOI 13 L LL UR NC NL P
+.ls
+.nf
+L(i)		9 + (N * M)
+LL(p)		coordinates of lower left corner of output area
+UR(p)		coordinates of upper right corner of output area
+NC(i)		number of columns in array
+NL(i)		number of lines in array
+P(NCNLi)	array of color indices (pixels) stored by row
+.fi
+.le
+
+
+.tp 5
+GKI_SETCURSOR = BOI 14 L CN POS
+.ls
+.nf
+L(i)		6
+CN(i)		cursor number
+POS(p)		new cursor position
+.fi
+.le
+.le
+
+.nh 4
+Set Attribute Instructions
+
+    The set polyline, polymarker, text, and fillarea instructions change
+the attributes used to generate graphics output.  These instructions need be
+issued only when one of the attributes in an instruction packet changes, i.e.,
+the kernel is assumed to remember the attributes while a device is open.
+
+.ls
+.tp 6
+GKI_PLSET = BOI 15 L LT LW CI
+.ls
+.nf
+L(i)		6
+LT(i)		linetype number
+LW(r)		linewidth scale factor
+CI(i)		polyline color index
+.fi
+.le
+
+
+.tp 6
+GKI_PMSET = BOI 16 L MT MW CI
+.ls
+.nf
+L(i)		6
+MT(i)		marktype (not used at present)
+MW(i)		marksize, NDC coords (not used at present)
+CI(i)		marker color index
+.fi
+.le
+
+
+.tp 9
+GKI_TXSET = BOI 17 L UP SZ SP P HJ VJ F Q CI
+.ls
+.nf
+L(i)		12
+UP(i)		character up vector (degrees)
+SZ(r)		character size scale factor
+SP(r)		character spacing
+P(i)		path (0,2=left,3=right,4=up,5=down)
+HJ(i)		horizontal justification
+		    (0=normal,1=center,2=left,3=right)
+VJ(i)		vertical justification
+		    (0=normal,1=center,6=top,7=bottom)
+F(i)		font (8=roman,9=greek,10=italic,11=bold)
+Q(i)		quality (0=normal,12=low,13=medium,14=high)
+CI(i)		text color index
+.fi
+.le
+
+
+.tp 5
+GKI_FASET = BOI 18 L FS CI
+.ls
+.nf
+L(i)		5
+FS(i)		fill style (0=clear,1=hollow,2=solid,3-6=hatch)
+CI(i)		fill area color index
+.fi
+.le
+.le
+
+
+The attributes for the output primitives are assumed to be set to their
+default values when OPENWS is issued.
+
+.nh 4
+Input Instructions
+
+    The primary input instruction is the cursor read instruction, used to read
+the cursor position in NDC coordinates.  The device cursor read may be either
+event driven or instantaneous.  If the cursor read is event driven a nonzero
+keystroke value may be returned, the range of possible keystroke values being
+device dependent.  The instantaneous type of cursor read is preferred at the
+GKI level since it offers the maximum flexibility (\fBclgcur\fR may then be
+used to provide an optional device independent keystroke driven cursor read).
+Devices which support both forms of cursor read may provide both as separate
+logical cursors.  The graphics kernel should return a null cursor value if
+the output device does not have a cursor.
+
+.ls
+.tp 6
+GKI_GETCURSOR = BOI 19 L CN
+.ls
+.nf
+L(i)		4
+CN(i)		cursor number
+.fi
+
+The kernel reads graphics cursor number CN and returns the keystroke value
+(if any) and the cursor position in NDC coordinates.  The cursor attributes
+are returned in the following format:
+
+	GKI_CURSORVALUE = BOI 19 L CN POS KEY
+
+where
+
+.nf
+	L(i)		7
+	CN(i)		cursor number
+	POS(r)		NDC coordinates of cursor
+	KEY(i)		keystroke value (>= 0 or EOF)
+.fi
+.le
+
+
+.tp 8
+GKI_GETCELLARRAY = BOI 20 L LL UR NC NL
+.ls
+.nf
+L(i)		9
+LL(p)		coordinates of lower left corner of input area
+UR(p)		coordinates of upper right corner of input area
+NC(i)		number of columns in output array
+NL(i)		number of lines in output array
+.fi
+
+The GETCELLARRAY instruction is the converse of the PUTCELLARRAY instruction.
+The cell array is returned in the following format:
+
+	GKI_CELLARRAY = BOI 20 L NP P
+
+where
+
+.nf
+	L(i)		4 + NP
+	NP(i)		number of pixels (0 if noread)
+	P(NPi)		array of pixels
+.fi
+.le
+
+
+(instruction codes 19-24 are reserved for future use)
+.le
+
+.nh 4
+Escape Instruction
+
+    The escape instruction is used to pass device dependent information or
+commands to the graphics kernel via GKI.  The graphics kernel will ignore
+unrecognized escape functions.  Function codes 1 through 100 are reserved
+for use by GIO.
+
+.ls
+.tp 5
+GKI_ESCAPE = BOI 25 L FN N DC
+.ls
+.nf
+L(i)		5 + N
+FN(i)		escape function code
+N(i)		number of escape data words
+DC(i)		escape data words
+.fi
+.le
+.le
+
+.nh 4
+Pseudo-GKI Instructions
+
+    Since the CL must be able to read the device cursor and convert NDC
+coordinates to WCS coordinates, the WCS must be passed to the CL when they
+are "fixed" to the device.  The most natural and efficient way to do this
+is via the GKI instruction stream, hence several additional instructions
+are used internally in GIO to communicate with the portion of GIO resident
+in the CL process.  These instructions are filtered out and executed by the
+CL process and their existence may therefore be ignored by the graphics kernels.
+
+The SETWCS instruction is used to pass WCS information to the CL process.
+The GETWCS instruction is used to recall the WCS for a device opened in APPEND
+mode (the WCS are returned in SETWCS format).  Since these instructions
+are passed only between two closely coupled processes on a single cpu,
+floating point numbers are passed in machine dependent format.
+The length of this instruction is machine dependent.
+Only the fields L and WCS are truely part of the instruction; the remaining
+fields are a binary copy of the GIO internal WCS structure.
+
+.ls
+.tp 6
+GKI_SETWCS = BOI 26 L N WCS
+.ls
+.nf
+L(i)		4 + 17 * sizeof (struct wcs)
+N(i)		length of WCS structure, words
+WCS		binary copy of the 17 WCS structures, transmitted
+		    in a single call to WRITE
+.fi
+.le
+
+
+.tp 5
+GKI_GETWCS = BOI 27 L N
+.ls
+.nf
+L(i)		4
+N(i)		maximum number of words to read
+.fi
+.le
+.le
+
+.nh 3
+Encoding GKI Instructions
+
+    The GKI instruction opcodes and fields are defined in the global include
+file lib$gki.h.  To avoid direct knowledge of the binary format of the GKI
+instructions, GIO uses a subpackage called GKI to encode the GKI instructions.
+The GKI procedures each encode and transmit a single GKI instruction on the
+output stream.  Although the GIO and GKI procedures have similar names, they
+should not be confused.  The GIO \fBgpline\fR, for example, performs conversion
+from a WCS to GKI coordinates with clipping at the viewport boundary, checking
+that the polyline attributes are up to date before transmitting the polyline
+instruction.  In contrast the GKI \fBgki_polyline\fR merely encodes and
+transmits the GKI_POLYLINE metacode instruction.
+
+The GKI procedures are self contained with the exception of the set attribute
+instructions, which reference attribute packet structures (argument \fIap\fR)
+defined in the include file gio.h.
+The GKI instruction encoding procedures are shown below.
+
+.ks
+.nf
+	     gki_openws (fd, device, mode)
+	    gki_closews (fd, device)
+       gki_reactivatews (fd, flags)
+       gki_deactivatews (fd, flags)
+	    gki_mftitle (fd, title)
+	    gki_clearws (fd)
+	     gki_cancel (fd)
+	      gki_flush (fd)
+	   gki_polyline (fd, points, npts)
+	 gki_polymarker (fd, points, npts)
+	       gki_text (fd, x, y, text)
+	   gki_fillarea (fd, points, npts)
+       gki_getcellarray (fd, m, nx, ny, x1,y1, x2,y2)
+       gki_putcellarray (fd, m, nx, ny, x1,y1, x2,y2)
+              gki_plset (fd, ap)
+              gki_pmset (fd, ap)
+	      gki_txset (fd, ap)
+              gki_faset (fd, ap)
+	  gki_setcursor (fd, x, y, cursor)
+	  gki_getcursor (fd, x, y, key, cursor)
+	     gki_escape (fd, fn, instruction, nwords)
+	     gki_setwcs (fd, wcsdata, len_wcsdata)
+	     gki_getwcs (fd, wcsdata, len_wcsdata)
+
+	     gki_fflush (fd)	# not GKI instruction; flushes GKI stream
+.fi
+.ke
+
+
+.nh 3
+Decoding GKI Instructions
+
+    The following additional procedures are provided for decoding and executing
+GKI metacode, e.g., in a graphics kernel.  In what follows, \fIinstruction\fR
+is a short integer array containing the encoded GKI instruction, and \fIdd\fR
+is the device driver table, i.e., array of \fBzlocpr\fR entry point addresses
+of the standard kernel procedures.
+
+
+.ks
+.nf
+	 stat = gki_fetch_next_instruction (fd, instruction_ptr)
+		gki_execute (instruction, dd)
+		gkp_install (dd, out_fd, verbose_output)
+.fi
+.ke
+
+
+The \fBfetch\fR procedure extracts the next instruction from the input metacode
+stream, returning a short integer pointer to the instruction as an output
+argument.  EOF is returned as the function value when end of file is detected.
+The \fBexecute\fR procedure decodes an instruction and calls a graphics device
+driver procedure to execute the instruction.  If the entry point address
+of the driver procedure is NULL \fBgki_execute\fR will ignore the corresponding
+GKI instruction.  The fields of the metacode instruction are passed to the
+driver procedure as distinct arguments, hence the device driver need not
+understand the GKI format.
+
+A standard kernel is provided for decoding GKI instructions, printing the
+decoded instructions in text form on the output stream.  The driver for this
+kernel is installed with \fBgkp_install\fR, setting the output file and
+verbose output flag in the process.
+
+.nh 3
+Example
+
+    To illustrate the use of GKI as well as the output of the GKI decoding
+kernel, consider the simple \fBgplotv\fR style plot of the following function:
+
+	y = x ** 2
+
+over the range
+
+	x = 1 to 5, y = 1 to 25
+
+The decoded GKI metacode produced by GIO to graph this function is
+shown below.  The "verbose" mode of output (shown) lists the values
+of the data points in the polyline, etc. output functions.  If verbose
+output is disabled only the statistics of the output polylines
+(computed by the decoder) will be printed.  All coordinates are printed
+in NDC units.  The redundant points appearing in the output metacode
+are expected to be filtered out by the kernel, which should not plot
+points separated by less than the device resolution in NDC units.
+
+
+.tp 4
+.nf
+open_workstation 'vt640', mode=new_file
+set_wcs nwords=352
+	 1 1. 5. 1. 25.  0.19 0.81 0.33 0.96  0 0 1
+set_polyline ltype=1, lwidth=2.00, color=1
+polyline np=3, xmin=0.19,xmax=0.19,xavg=0.19, ymin=0.33,ymax=0.37,yavg=0.34
+	0.188 0.334  0.188 0.334  0.188 0.367  
+set_text up=90, path=right, hjustify=center, vjustify=top, font=roman,
+	size=1.00, spacing=0.00, color=1, quality=normal
+text 0.19, 0.31, '1'
+polyline np=15, xmin=0.19,xmax=0.34,xavg=0.27, ymin=0.33,ymax=0.37,yavg=0.34
+	0.188 0.334  0.219 0.334  0.219 0.350  0.219 0.334  0.250 0.334  
+	0.250 0.350  0.250 0.334  0.281 0.334  0.281 0.350  0.281 0.334  
+	0.313 0.334  0.313 0.350  0.313 0.334  0.344 0.334  0.344 0.367  
+text 0.34, 0.31, '2'
+polyline np=15, xmin=0.34,xmax=0.50,xavg=0.43, ymin=0.33,ymax=0.37,yavg=0.34
+	0.344 0.334  0.375 0.334  0.375 0.350  0.375 0.334  0.406 0.334  
+	0.406 0.350  0.406 0.334  0.437 0.334  0.437 0.350  0.437 0.334  
+	0.469 0.334  0.469 0.350  0.469 0.334  0.500 0.334  0.500 0.367  
+text 0.50, 0.31, '3'
+polyline np=15, xmin=0.50,xmax=0.66,xavg=0.58, ymin=0.33,ymax=0.37,yavg=0.34
+	0.500 0.334  0.531 0.334  0.531 0.350  0.531 0.334  0.562 0.334  
+	0.562 0.350  0.562 0.334  0.593 0.334  0.593 0.350  0.593 0.334  
+	0.625 0.334  0.625 0.350  0.625 0.334  0.656 0.334  0.656 0.367  
+text 0.66, 0.31, '4'
+polyline np=15, xmin=0.66,xmax=0.81,xavg=0.74, ymin=0.33,ymax=0.37,yavg=0.34
+	0.656 0.334  0.687 0.334  0.687 0.350  0.687 0.334  0.718 0.334  
+	0.718 0.350  0.718 0.334  0.750 0.334  0.750 0.350  0.750 0.334  
+	0.781 0.334  0.781 0.350  0.781 0.334  0.812 0.334  0.812 0.367  
+text 0.81, 0.31, '5'
+polyline np=2, xmin=0.81,xmax=0.81,xavg=0.81, ymin=0.33,ymax=0.33,yavg=0.33
+	0.812 0.334  0.812 0.334  
+polyline np=77, xmin=0.78,xmax=0.81,xavg=0.81, ymin=0.33,ymax=0.96,yavg=0.65
+	0.812 0.334  0.812 0.334  0.796 0.334  0.812 0.334  0.812 0.360  
+	0.796 0.360  0.812 0.360  0.812 0.386  0.796 0.386  0.812 0.386  
+	0.812 0.412  0.796 0.412  0.812 0.412  0.812 0.438  0.779 0.438  
+	0.812 0.438  0.812 0.464  0.795 0.464  0.812 0.464  0.812 0.490  
+	0.795 0.490  0.812 0.490  0.812 0.516  0.795 0.516  0.812 0.516  
+	0.812 0.542  0.795 0.542  0.812 0.542  0.812 0.568  0.779 0.568  
+	0.812 0.568  0.812 0.594  0.795 0.594  0.812 0.594  0.812 0.620  
+	0.795 0.620  0.812 0.620  0.812 0.646  0.795 0.646  0.812 0.646  
+	0.812 0.672  0.795 0.672  0.812 0.672  0.812 0.698  0.779 0.698  
+	0.812 0.698  0.812 0.724  0.795 0.724  0.812 0.724  0.812 0.750  
+	0.795 0.750  0.812 0.750  0.812 0.776  0.795 0.776  0.812 0.776  
+	0.812 0.802  0.795 0.802  0.812 0.802  0.812 0.828  0.778 0.828  
+	0.812 0.828  0.812 0.854  0.795 0.854  0.812 0.854  0.812 0.880  
+	0.795 0.880  0.812 0.880  0.812 0.906  0.795 0.906  0.812 0.906  
+	0.812 0.932  0.795 0.932  0.812 0.932  0.812 0.958  0.778 0.958  
+	0.812 0.958  0.812 0.958  
+polyline np=15, xmin=0.19,xmax=0.22,xavg=0.19, ymin=0.33,ymax=0.44,yavg=0.38
+	0.188 0.334  0.188 0.334  0.204 0.334  0.188 0.334  0.188 0.360  
+	0.204 0.360  0.188 0.360  0.188 0.386  0.204 0.386  0.188 0.386  
+	0.188 0.412  0.204 0.412  0.188 0.412  0.188 0.438  0.221 0.438  
+set_text up=90, path=right, hjustify=right, vjustify=center, font=roman,
+	size=1.00, spacing=0.00, color=1, quality=normal
+text 0.19, 0.44, '5'
+polyline np=15, xmin=0.19,xmax=0.22,xavg=0.19, ymin=0.44,ymax=0.57,yavg=0.51
+	0.188 0.438  0.188 0.464  0.204 0.464  0.188 0.464  0.188 0.490  
+	0.204 0.490  0.188 0.490  0.188 0.516  0.204 0.516  0.188 0.516  
+	0.188 0.542  0.204 0.542  0.188 0.542  0.188 0.568  0.221 0.568  
+text 0.19, 0.57, '10'
+polyline np=15, xmin=0.19,xmax=0.22,xavg=0.19, ymin=0.57,ymax=0.70,yavg=0.64
+	0.188 0.568  0.188 0.594  0.204 0.594  0.188 0.594  0.188 0.620  
+	0.204 0.620  0.188 0.620  0.188 0.646  0.204 0.646  0.188 0.646  
+	0.188 0.672  0.204 0.672  0.188 0.672  0.188 0.698  0.221 0.698  
+text 0.19, 0.70, '15'
+polyline np=15, xmin=0.19,xmax=0.22,xavg=0.19, ymin=0.70,ymax=0.83,yavg=0.77
+	0.188 0.698  0.188 0.724  0.204 0.724  0.188 0.724  0.188 0.750  
+	0.204 0.750  0.188 0.750  0.188 0.776  0.204 0.776  0.188 0.776  
+	0.188 0.802  0.204 0.802  0.188 0.802  0.188 0.828  0.221 0.828  
+text 0.19, 0.83, '20'
+polyline np=15, xmin=0.19,xmax=0.22,xavg=0.19, ymin=0.83,ymax=0.96,yavg=0.90
+	0.188 0.828  0.188 0.854  0.204 0.854  0.188 0.854  0.188 0.880  
+	0.204 0.880  0.188 0.880  0.188 0.906  0.204 0.906  0.188 0.906  
+	0.188 0.932  0.204 0.932  0.188 0.932  0.188 0.958  0.221 0.958  
+text 0.19, 0.96, '25'
+polyline np=2, xmin=0.19,xmax=0.19,xavg=0.19, ymin=0.96,ymax=0.96,yavg=0.96
+	0.188 0.958  0.188 0.958  
+polyline np=65, xmin=0.19,xmax=0.81,xavg=0.50, ymin=0.92,ymax=0.96,yavg=0.95
+	0.188 0.958  0.188 0.958  0.188 0.925  0.188 0.958  0.219 0.958  
+	0.219 0.942  0.219 0.958  0.250 0.958  0.250 0.942  0.250 0.958  
+	0.281 0.958  0.281 0.941  0.281 0.958  0.313 0.958  0.313 0.941  
+	0.313 0.958  0.344 0.958  0.344 0.925  0.344 0.958  0.375 0.958  
+	0.375 0.941  0.375 0.958  0.406 0.958  0.406 0.941  0.406 0.958  
+	0.437 0.958  0.437 0.941  0.437 0.958  0.469 0.958  0.469 0.941  
+	0.469 0.958  0.500 0.958  0.500 0.925  0.500 0.958  0.531 0.958  
+	0.531 0.941  0.531 0.958  0.562 0.958  0.562 0.941  0.562 0.958  
+	0.593 0.958  0.593 0.941  0.593 0.958  0.625 0.958  0.625 0.941  
+	0.625 0.958  0.656 0.958  0.656 0.924  0.656 0.958  0.687 0.958  
+	0.687 0.941  0.687 0.958  0.718 0.958  0.718 0.941  0.718 0.958  
+	0.750 0.958  0.750 0.941  0.750 0.958  0.781 0.958  0.781 0.941  
+	0.781 0.958  0.812 0.958  0.812 0.924  0.812 0.958  0.812 0.958  
+set_text up=90, path=right, hjustify=center, vjustify=bottom, font=roman,
+	size=1.00, spacing=0.00, color=1, quality=normal
+text 0.50, 0.96, 'title'
+set_polyline ltype=1, lwidth=1.00, color=1
+polyline np=5, xmin=0.19,xmax=0.69,xavg=0.44, ymin=0.33,ymax=0.96,yavg=0.59
+	0.188 0.334  0.313 0.412  0.438 0.542  0.562 0.724  0.687 0.958  
+flush
+close_workstation 'vt640'
+.fi
+
+
+.nh 2
+Graphics Kernel Parameters
+
+    The translation from GKI codes to device codes should ideally be
+parameterized to permit variable device resolution, font substitution,
+and so on at translation time.  In general this is best handled by
+spooling the metacode and later processing it via an explicit call to
+a metacode translator program, using CL parameters to control the translation.
+Some control over translation may also be achieved by modifying the
+\fBgraphcap\fR entry for a device, provided the graphics kernel uses
+the graphics capability database.
+
+One of the most useful translation time parameters is the device resolution.
+On some devices, e.g. pen plotters, it is necessary to be able to change
+the device resolution at translation time to permit plotting of large vectors
+without loss of resolution.  Changing the device resolution is also a valuable
+technique for speeding up graphics when working remotely via a modem.
+
+.nh
+GKS Emulation
+
+    The basic graphics primitives provided by GIO (polyline, polymarker, etc.)
+are functionally identical to those provided by GKS (the Graphics Kernel
+System).  The basic drawing primitives of GKS are therefore easily emulated
+using GIO.  A subset of the Fortran binding of GKS has already been emulated,
+sufficient to run the NCAR utilities recently converted by NCAR for use with
+GKS.  In principle it should be possible to expand the GKS emulation to a
+full level 0b or 1b interface, although we have no plans to do so at present.

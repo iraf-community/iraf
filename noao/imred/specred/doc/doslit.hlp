@@ -1,0 +1,1201 @@
+.help doslit Feb93 noao.imred.specred
+.ih
+NAME
+doslit -- Slit spectra data reduction task
+.ih
+USAGE
+doslit objects
+.ih
+SUMMARY
+\fBDoslit\fR extracts, sky subtracts, wavelength calibrates, and flux
+calibrates simple two dimensional slit spectra which have been processed to
+remove the detector characteristics; i.e. CCD images have been bias, dark
+count, and flat field corrected.  It is primarily intended for
+spectrophotometry or radial velocities of stellar spectra with the spectra
+aligned with one of the image axes; i.e. the assumption is that extractions
+can be done by summing along image lines or columns.  The alignment does
+not have to be precise but only close enough that the wavelength difference
+across the spectrum profiles is insignificant.  The task is available
+in the \fBctioslit\fR, \fBkpnoslit\fR, \fBkpnocoude\fR, and \fBspecred\fR
+packages.
+.ih
+PARAMETERS
+.ls objects
+List of object images to be processed.  Previously processed spectra are
+ignored unless the \fIredo\fR flag is set or the \fIupdate\fR flag is set
+and dependent calibration data has changed.  If the images contain the
+keyword IMAGETYP then only those with a value of "object" or "OBJECT"
+are used and those with a value of "comp" or "COMPARISON" are added
+to the list of arcs.  Extracted spectra are ignored.
+.le
+.ls arcs = "" (at least one if dispersion correcting)
+List of arc calibration spectra.  These spectra are used to define
+the dispersion functions.  The first spectrum is used to mark lines
+and set the dispersion function interactively and dispersion functions
+for all other arc spectra are derived from it.  If the images contain
+the keyword IMAGETYP then only those with a value of "comp" or
+"COMPARISON" are used.  All others are ignored as are extracted spectra.
+.le
+.ls arctable = "" (optional) (refspectra)
+Table defining which arc spectra are to be assigned to which object
+spectra (see \fBrefspectra\fR).  If not specified an assignment based
+on a header parameter, \fIsparams.sort\fR, such as the Julian date
+is made.
+.le
+.ls standards = "" (at least one if flux calibrating)
+List of standard star spectra.  The standard stars must have entries in
+the calibration database (package parameter \fIcaldir\fR).
+.le
+
+.ls readnoise = "rdnoise", gain = "gain" (apsum)
+Read out noise in photons and detector gain in photons per data value.
+This parameter defines the minimum noise sigma and the conversion between
+photon Poisson statistics and the data number statistics.  Image header
+keywords (case insensitive) may be specified to obtain the values from the
+image header.
+.le
+.ls datamax = INDEF (apsum.saturation)
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the standard star or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
+.le
+.ls width = 5. (apedit)
+Approximate full width of the spectrum profiles.  This parameter is used
+to define a width and error radius for the profile centering algorithm.
+.le
+.ls crval = INDEF, cdelt = INDEF (autoidentify)
+These parameters specify an approximate central wavelength and dispersion.
+They may be specified as numerical values, INDEF, or image header keyword
+names whose values are to be used.
+If both these parameters are INDEF then the automatic identification will
+not be done.
+.le
+
+.ls dispcor = yes
+Dispersion correct spectra?  This may involve either defining a nonlinear
+dispersion coordinate system in the image header or resampling the
+spectra to uniform linear wavelength coordinates as selected by
+the parameter \fIsparams.linearize\fR.
+.le
+.ls extcor = no
+Extinction correct the spectra?
+.le
+.ls fluxcal = no
+Flux calibrate the spectra using standard star observations?
+.le
+.ls resize = no (apresize)
+Resize the default aperture for each object based on the spectrum profile?
+.le
+.ls clean = no (apsum)
+Detect and correct for bad pixels during extraction?  This is the same
+as the clean option in the \fBapextract\fR package.  If yes this also
+implies variance weighted extraction.  In addition the datamax parameters
+can be useful.
+.le
+.ls splot = no
+Plot the final spectra with the task \fBsplot\fR?  In quicklook mode
+this is automatic and in non-quicklook mode it is queried.
+.le
+.ls redo = no
+Redo operations previously done?  If no then previously processed spectra
+in the object list will not be processed unless required by the
+update option.
+.le
+.ls update = no
+Update processing of previously processed spectra if the
+dispersion reference image or standard star calibration data are changed?
+.le
+.ls quicklook = no
+Extract and calibrate spectra with minimal interaction?  In quicklook mode
+only the initial dispersion function solution and standard star setup are
+done interactively.  Normally the \fIsplot\fR option is set in this mode to
+produce an automatic final spectrum plot for each object.  It is
+recommended that this mode not be used for final reductions.
+.le
+.ls batch = yes
+Process spectra as a background or batch job provided there are no interactive
+steps remaining.
+.le
+.ls listonly = no
+List processing steps but don't process?
+.le
+
+.ls sparams = "" (pset)
+Name of parameter set containing additional processing parameters.  This
+parameter is only for indicating the link to the parameter set
+\fBsparams\fR and should not be given a value.  The parameter set may be
+examined and modified in the usual ways (typically with "epar sparams"
+or ":e sparams" from the parameter editor).  The parameters are
+described below.
+.le
+
+.ce
+-- GENERAL PARAMETERS --
+.ls line = INDEF, nsum = 10
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, resizing,
+editing, and tracing operations.  A line of INDEF selects the middle of the
+image along the dispersion axis.
+.le
+.ls extras = no (apsum)
+Include raw unweighted and uncleaned spectra, the background spectra, and
+the estimated sigmas in a three dimensional output image format.
+See the discussion in the \fBapextract\fR package for further information.
+.le
+
+.ce
+-- DEFAULT APERTURE LIMITS --
+.ls lower = -3., upper = 3. (apdefault)
+Default lower and upper aperture limits relative to the aperture center.
+These limits are used when the apertures are first defined.
+.le
+
+.ce
+-- AUTOMATIC APERTURE RESIZING PARAMETERS --
+.ls ylevel = 0.05 (apresize)
+Fraction of the peak to set aperture limits during automatic resizing.
+.le
+
+.ce
+-- TRACE PARAMETERS --
+.ls t_step = 10 (aptrace)
+Step along the dispersion axis between determination of the spectrum
+positions.  Note the \fInsum\fR parameter is also used to enhance the
+signal-to-noise at each step.
+.le
+.ls t_function = "spline3", t_order = 1 (aptrace)
+Default trace fitting function and order.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.  The order refers to the number of terms in the
+polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls t_niterate = 1, t_low = 3., t_high = 3. (aptrace)
+Default number of rejection iterations and rejection sigma thresholds.
+.le
+
+.ce
+-- APERTURE EXTRACTION PARAMETERS --
+.ls weights = "none" (apsum) (none|variance)
+Type of extraction weighting.  Note that if the \fIclean\fR parameter is
+set then the weights used are "variance" regardless of the weights
+specified by this parameter.  The choices are:
+.ls "none"
+The pixels are summed without weights except for partial pixels at the
+ends.
+.le
+.ls "variance"
+The extraction is weighted by the variance based on the data values
+and a poisson/ccd model using the \fIgain\fR and \fIreadnoise\fR
+parameters.
+.le
+.le
+.ls pfit = "fit1d" (apsum and approfile) (fit1d|fit2d)
+Type of profile fitting algorithm to use.  The "fit1d" algorithm is
+preferred except in cases of extreme tilt.
+.le
+.ls lsigma = 3., usigma = 3. (apsum)
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+
+.ce
+-- DEFAULT BACKGROUND PARAMETERS --
+.ls background = "fit" (apsum) (none|average|median|minimum|fit)
+Type of background subtraction.  The choices are "none" for no background
+subtraction, "average" to average the background within the background
+regions, "median" to use the median in the background regions, "minimum" to
+use the minimum in the background regions, or "fit" to fit across the
+dispersion using the background within the background regions.  Note that
+the "average" option does not do any medianing or bad pixel checking,
+something which is recommended.  The fitting option is slower than the
+other options and requires additional fitting parameter.
+.le
+.ls b_function = "legendre", b_order = 1 (apsum)
+Default background fitting function and order.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.  The order refers to the number of
+terms in the polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls b_sample = "-10:-6,6:10" (apsum)
+Default background sample.  The sample is given by a set of colon separated
+ranges each separated by either whitespace or commas.  The string "*" refers
+to all points.  Note that the background coordinates are relative to the
+aperture center and not image pixel coordinates so the endpoints need not
+be integer.  It is recommended that the background regions be examined
+and set interactively with the 'b' key in the interactive aperture
+definition mode.  This requires \fIquicklook\fR to be no.
+.le
+.ls b_naverage = -100 (apsum)
+Default number of points to average or median.  Positive numbers
+average that number of sequential points to form a fitting point.
+Negative numbers median that number, in absolute value, of sequential
+points.  A value of 1 does no averaging and each data point is used in the
+fit.
+.le
+.ls b_niterate = 1 (apsum)
+Default number of rejection iterations.  If greater than zero the fit is
+used to detect deviant fitting points and reject them before repeating the
+fit.  The number of iterations of this process is given by this parameter.
+.le
+.ls b_low_reject = 3., b_high_reject = 3. (apsum)
+Default background lower and upper rejection sigmas.  If greater than zero
+points deviating from the fit below and above the fit by more than this
+number of times the sigma of the residuals are rejected before refitting.
+.le
+
+.ce
+-- ARC DISPERSION FUNCTION PARAMETERS --
+.ls threshold = 10. (autoidentify/identify/reidentify)
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.le
+.ls coordlist = "linelists$idhenear.dat" (autoidentify/identify)
+Arc line list consisting of an ordered list of wavelengths.
+Some standard line lists are available in the directory "linelists$".
+.le
+.ls match = -3. (autoidentify/identify)
+The maximum difference for a match between the dispersion function computed
+value and a wavelength in the coordinate list.
+.le
+.ls fwidth = 4. (autoidentify/identify)
+Approximate full base width (in pixels) of arc lines.
+.le
+.ls cradius = 10. (reidentify)
+Radius from previous position to reidentify arc line.
+.le
+.ls i_function = "spline3", i_order = 1 (autoidentify/identify)
+The default function and order to be fit to the arc wavelengths as a
+function of the pixel coordinate.  The functions choices are "chebyshev",
+"legendre", "spline1", or "spline3".
+.le
+.ls i_niterate = 0, i_low = 3.0, i_high = 3.0 (autoidentify/identify)
+Number of rejection iterations and sigma thresholds for rejecting arc
+lines from the dispersion function fits.
+.le
+.ls refit = yes (reidentify)
+Refit the dispersion function?  If yes and there is more than 1 line
+and a dispersion function was defined in the initial arc reference then a new
+dispersion function of the same type as in the reference image is fit
+using the new pixel positions.  Otherwise only a zero point shift is
+determined for the revised fitted coordinates without changing the
+form of the dispersion function.
+.le
+.ls addfeatures = no (reidentify)
+Add new features from a line list during each reidentification?
+This option can be used to compensate for lost features from the
+reference solution.  Care should be exercised that misidentified features
+are not introduced.
+.le
+
+.ce
+-- AUTOMATIC ARC ASSIGNMENT PARAMETERS --
+.ls select = "interp" (refspectra)
+Selection method for assigning wavelength calibration spectra.
+Note that an arc assignment table may be used to override the selection
+method and explicitly assign arc spectra to object spectra.
+The automatic selection methods are:
+.ls average
+Average two reference spectra without regard to any
+sort or group parameters.
+If only one reference spectrum is specified then it is assigned with a
+warning.  If more than two reference spectra are specified then only the
+first two are used and a warning is given.  There is no checking of the
+group values.
+.le
+.ls following
+Select the nearest following spectrum in the reference list based on the
+sort and group parameters.  If there is no following spectrum use the
+nearest preceding spectrum.
+.le
+.ls interp
+Interpolate between the preceding and following spectra in the reference
+list based on the sort and group parameters.  If there is no preceding and
+following spectrum use the nearest spectrum.  The interpolation is weighted
+by the relative distances of the sorting parameter (see cautions in
+DESCRIPTION section).
+.le
+.ls match
+Match each input spectrum with the reference spectrum list in order.
+This overrides any group values.
+.le
+.ls nearest
+Select the nearest spectrum in the reference list based on the sort and
+group parameters.
+.le
+.ls preceding
+Select the nearest preceding spectrum in the reference list based on the
+sort and group parameters.  If there is no preceding spectrum use the
+nearest following spectrum.
+.le
+.le
+.ls sort = "jd" (setjd and refspectra)
+Image header keyword to be used as the sorting parameter for selection
+based on order.  The header parameter must be numeric but otherwise may
+be anything.  Common sorting parameters are times or positions.
+.le
+.ls group = "ljd" (setjd and refspectra)
+Image header keyword to be used to group spectra.  For those selection
+methods which use the group parameter the reference and object
+spectra must have identical values for this keyword.  This can
+be anything but it must be constant within a group.  Common grouping
+parameters are the date of observation "date-obs" (provided it does not
+change over a night) or the local Julian day number.
+.le
+.ls time = no, timewrap = 17. (refspectra)
+Is the sorting parameter a 24 hour time?  If so then the time origin
+for the sorting is specified by the timewrap parameter.  This time
+should precede the first observation and follow the last observation
+in a 24 hour cycle.
+.le
+
+.ce
+-- DISPERSION  CORRECTION PARAMETERS --
+.ls linearize = yes (dispcor)
+Interpolate the spectra to a linear dispersion sampling?  If yes the
+spectra will be interpolated to a linear or log linear sampling using
+the linear dispersion parameters specified by other parameters.  If
+no the nonlinear dispersion function(s) from the dispersion function
+database are assigned to the input image world coordinate system
+and the spectral data is not interpolated.  Note the interpolation
+function type is set by the package parameter \fIinterp\fR.
+.le
+.ls log = no (dispcor)
+Use linear logarithmic wavelength coordinates?  Linear logarithmic
+wavelength coordinates have wavelength intervals which are constant
+in the logarithm of the wavelength.
+.le
+.ls flux = yes (dispcor)
+Conserve the total flux during interpolation?  If \fIno\fR the output
+spectrum is interpolated from the input spectrum at each output
+wavelength coordinate.  If \fIyes\fR the input spectrum is integrated
+over the extent of each output pixel.  This is slower than
+simple interpolation.
+.le
+
+.ce
+-- SENSITIVITY CALIBRATION PARAMETERS --
+.ls s_function = "spline3", s_order = 1 (sensfunc)
+Function and order used to fit the sensitivity data.  The function types
+are "chebyshev" polynomial, "legendre" polynomial, "spline3" cubic spline,
+and "spline1" linear spline.  Order of the sensitivity fitting function.
+The value corresponds to the number of polynomial terms or the number of
+spline pieces.  The default values may be changed interactively.
+.le
+.ls fnu = no (calibrate)
+The default calibration is into units of F-lambda. If \fIfnu\fR = yes then
+the calibrated spectrum will be in units of F-nu.
+.le
+
+.ce
+PACKAGE PARAMETERS
+
+The following package parameters are used by this task.  The default values
+may vary depending on the package.
+.ls dispaxis = 2
+Default dispersion axis.  The dispersion axis is 1 for dispersion
+running along image lines and 2 for dispersion running along image
+columns.  If the image header parameter DISPAXIS is defined it has
+precedence over this parameter.  The default value defers to the
+package parameter of the same name.
+.le
+.ls extinction (standard, sensfunc, calibrate)
+Extinction file for a site.  There are two extinction files in the
+NOAO standards library, onedstds$, for KPNO and CTIO.  These extinction
+files are used for extinction and flux calibration.
+.le
+.ls caldir (standard)
+Standard star calibration directory.  A directory containing standard
+star data files.  Note that the directory name must end with '/'.
+There are a number of standard star calibrations directories in the NOAO
+standards library, onedstds$.
+.le
+.ls observatory = "observatory" (observatory)
+The default observatory to use for latitude dependent computations.
+If the OBSERVAT keyword in the image header it takes precedence over
+this parameter.
+.le
+.ls interp = "poly5" (nearest|linear|poly3|poly5|spline3|sinc) (dispcor)
+Spectrum interpolation type used when spectra are resampled.  The choices are:
+
+.nf
+	nearest - nearest neighbor
+	 linear - linear
+	  poly3 - 3rd order polynomial
+	  poly5 - 5th order polynomial
+	spline3 - cubic spline
+	   sinc - sinc function
+.fi
+.le
+.ls database = "database"
+Database name used by various tasks.  This is a directory which is created
+if necessary.
+.le
+.ls verbose = no
+Verbose output?  If set then almost all the information written to the
+logfile is also written to the terminal except when the task is a
+background or batch process.
+.le
+.ls logfile = "logfile"
+If specified detailed text log information is written to this file.
+.le
+.ls plotfile = ""
+If specified metacode plots are recorded in this file for later review.
+Since plot information can become large this should be used only if
+really desired.
+.le
+.ih
+ENVIRONMENT PARAMETERS
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".
+.ih
+DESCRIPTION
+\fBDoslit\fR extracts, sky subtracts, wavelength calibrates, and flux
+calibrates simple two dimensional slit spectra which have been processed to
+remove the detector characteristics; i.e. CCD images have been bias, dark
+count, and flat field corrected.  It is primarily intended for
+spectrophotometry or radial velocities of stellar spectra with the spectra
+aligned with one of the image axes; i.e. the assumption is that extractions
+can be done by summing along image lines or columns.  The alignment does
+not have to be precise but only close enough that the wavelength difference
+across the spectrum profiles is insignificant.  Extended objects requiring
+accurate geometric alignment over many pixels are reduced using the
+\fBlongslit\fR package.
+
+The task is a command language script which collects and combines the
+functions and parameters of many general purpose tasks to provide a single,
+complete data reduction path and a degree of guidance, automation, and
+record keeping.  In the following description and in the parameter section
+the various general tasks used are identified.  Further
+information about those tasks and their parameters may be found in their
+documentation.  \fBDoslit\fR also simplifies and consolidates parameters
+from those tasks and keeps track of previous processing to avoid
+duplications.
+
+The general organization of the task is to do the interactive setup steps,
+such as the reference dispersion function
+determination, first using representative calibration data and then perform
+the majority of the reductions automatically, possibly as a background
+process, with reference to the setup data.  In addition, the task
+determines which setup and processing operations have been completed in
+previous executions of the task and, contingent on the \fIredo\fR and
+\fIupdate\fR options, skip or repeat some or all the steps.
+
+The description is divided into a quick usage outline followed by details
+of the parameters and algorithms.  The usage outline is provided as a
+checklist and a refresher for those familiar with this task and the
+component tasks.  It presents only the default or recommended usage
+since there are many variations possible.
+
+\fBUsage Outline\fR
+
+.ls 6 [1]
+The images are first processed with \fBccdproc\fR for overscan,
+zero level, dark count, and flat field corrections.
+.le
+.ls [2]
+Set the \fBdoslit\fR parameters with \fBeparam\fR.  Specify the object
+images to be processed,
+one or more arc images, and one or more standard
+star images.  If there are many object, arc, or standard star images
+you might prepare "@ files".  Set the detector and data
+specific parameters.  Select the processing options desired.
+Finally you might wish to review the \fIsparams\fR algorithm parameters
+though the defaults are probably adequate.
+.le
+.ls [3]
+Run the task.  This may be repeated multiple times with different
+observations and the task will generally only do the setup steps
+once and only process new images.  Queries presented during the
+execution for various interactive operations may be answered with
+"yes", "no", "YES", or "NO".  The lower case responses apply just
+to that query while the upper case responses apply to all further
+such queries during the current execution and no further queries of that
+type will be made.
+.le
+.ls [4]
+Apertures are defined for all the standard and object images.  This is only
+done if there are no previous aperture definitions for the image.
+The highest peak is found and centered and the default aperture limits
+are set.  If the resize option is set the aperture is resized by finding
+the level which  is 5% (the default) of the peak above local background.
+If not using the quicklook option you now have the option
+of entering the aperture editing loop to check the aperture position,
+size, and background fitting parameters, and possibly add additional
+apertures.  This is step is highly recommended.
+It is important to check the background regions with the 'b'
+key.  To exit the background mode and then
+to exit the review mode use 'q'.
+
+The spectrum positions at a series of points along the dispersion are
+measured and a function is fit to these positions.  If not using the
+quicklook option the traced positions may be examined interactively and the
+fitting parameters adjusted.  To exit the interactive fitting type 'q'.
+.le
+.ls [5]
+If dispersion correction is selected the first arc in the arc list is
+extracted.  The dispersion function is defined using the task
+\fBautoidentify\fR.  The \fIcrval\fR and \fIcdelt\fR parameters are used in
+the automatic identification.  Whether or not the automatic identification
+is successful you will be shown the result of the arc line identification.
+If the automatic identification is not successful identify a few arc lines
+with with 'm' and use the 'l' line list identification command to
+automatically add additional lines and fit the dispersion function.  Check
+the quality of the dispersion function fit with 'f'.  When satisfied exit
+with 'q'.
+.le
+.ls [6]
+If the flux calibration option is selected the standard star spectra are
+processed (if not done previously).  The images are
+extracted and wavelength calibrated.  The appropriate arc
+calibration spectra are extracted and the dispersion function refit
+using the arc reference spectrum as a starting point.  The standard star
+fluxes through the calibration bandpasses are compiled.  You are queried
+for the name of the standard star calibration data file.
+
+After all the standard stars are processed a sensitivity function is
+determined using the interactive task \fBsensfunc\fR.  Finally, the
+standard star spectra are extinction corrected and flux calibrated
+using the derived sensitivity function.
+.le
+.ls [7]
+The object spectra are now automatically
+extracted, wavelength calibrated, and flux calibrated.
+.le
+.ls [8]
+The option to examine the final spectra with \fBsplot\fR may be given.
+To exit type 'q'.  In quicklook mode the spectra are plotted
+noninteractively with \fBbplot\fR.
+.le
+.ls [9]
+The final spectra will have the same name as the original 2D images
+with a ".ms" extension added.
+.le
+
+\fBSpectra and Data Files\fR
+
+The basic input consists of two dimensional slit object, standard star, and
+arc calibration spectra stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must be
+processed to remove overscan, bias, dark count, and flat field effects.
+This is generally done using the \fBccdred\fR package.  Lines of constant
+wavelength should be closely aligned with one of the image axes though a
+small amount of misalignment only causes a small loss of resolution.  For
+large misalignments one may use the \fBrotate\fR task.  More complex
+geometric problems and observations of extended objects should be handled
+by the \fBlongslit\fR package.
+
+The arc
+spectra are comparison arc lamp observations (they must all be of the same
+type).  The assignment of arc calibration exposures to object exposures is
+generally done by selecting the nearest in time and interpolating.
+However, the optional \fIarc assignment table\fR may be used to explicitly
+assign arc images to specific objects.  The format of this file is
+described in task \fBrefspectra\fR.
+
+The final reduced spectra are recorded in one, two or three dimensional IRAF
+images.  The images have the same name as the original images with an added
+".ms" extension.  Each line in the reduced image is a one dimensional
+spectrum with associated aperture, wavelength, and identification
+information.  With a single aperture the image will be one dimensional
+and with multiple apertures the image will be two dimensional.
+When the \fIextras\fR parameter is set the images will be three
+dimensional (regardless of the number of apertures) and the lines in the
+third dimension contain additional information (see
+\fBapsum\fR for further details).  These spectral formats are accepted by the
+one dimensional spectroscopy tasks such as the plotting tasks \fBsplot\fR
+and \fBspecplot\fR.
+
+\fBPackage Parameters\fR
+
+The package parameters set parameters which change
+infrequently and set the standard I/O functions.  The extinction file
+is used for making extinction corrections and the standard star
+calibration directory is used for determining flux calibrations from
+standard star observations.  The calibration directories contain data files
+with standard star fluxes and band passes.  The available extinction
+files and flux calibration directories may be listed using the command:
+.nf
+
+	cl> help onedstds
+
+.fi
+
+The extinction correction requires computation of an air mass using the
+task \fBsetairmass\fR.  The air mass computation needs information
+about the observation and, in particular, the latitude of the observatory.
+This is determined using the OBSERVAT image header keyword.  If this
+keyword is not present the observatory parameter is used.  See the
+task \fBobservatory\fR for more on defining the observatory parameters.
+
+The spectrum interpolation type is used whenever a spectrum needs to be
+resampled for linearization or performing operations between spectra
+with different sampling.  The "sinc" interpolation may be of interest
+as an alternative but see the cautions given in \fBonedspec.package\fR.
+
+The general direction in which the spectra run is specified by the
+dispersion axis parameter.  Recall that ideally it is the direction
+of constant wavelength which should be aligned with an image axis and
+the dispersion direction may not be exactly aligned because atmospheric
+dispersion.
+
+The verbose parameter selects whether to print everything which goes
+into the log file on the terminal.  It is useful for monitoring
+what the \fBdoslit\fR task does.  The log and plot files are useful for
+keeping a record of the processing.  A log file is highly recommended.
+A plot file provides a record of the apertures, traces, and extracted
+spectra but can become quite large.
+The plotfile is most conveniently viewed and printed with \fBgkimosaic\fR.
+
+\fBProcessing Parameters\fR
+
+The input images are specified by image lists.  The lists may be
+a list of explicit comma separate image names, @ files, or image
+templates using pattern matching against file names in the directory.
+To allow wildcard image lists to be used safely and conveniently the
+image lists are checked to remove extracted images (the .ms images)
+and to automatically identify object and arc spectra.  Object and arc
+images are identified by the keyword IMAGETYP with values of "object",
+"OBJECT", "comp", or "COMPARISON" (the current practice at NOAO).
+If arc images are found in the object list they are transferred to the
+arc list while if object images are found in the arc list they are ignored.
+All other image types, such as biases, darks, or flat fields, are
+ignored.  This behavior allows simply specifying all images with a wildcard
+in the object list with automatic selections of arc spectra or a
+wildcard in the arc list to automatically find the arc spectra.
+If the data lack the identifying information it is up to the user
+to explicitly set the proper lists.
+
+The arc assignment table is a file which may be used to assign
+specific arc spectra to specific object and standard star spectra.
+For more on this option see \fBrefspectra\fR.
+
+The next set of parameters describe the noise characteristics and
+spectrum characteristics.  The read out noise and gain are used when
+"cleaning" cosmic rays and when using variance or optimal weighting.  These
+parameters must be fairly accurate.  Note that these are the effective
+parameters and must be adjusted if previous processing has modified the
+pixel values; such as with an unnormalized flat field.
+The variance
+weighting and cosmic-ray cleanning are sensitive to extremely strong
+cosmic-rays; ones which are hundreds of times brighter than the
+spectrum.  The \fIdatamax\fR is used to set an upper limit for any
+real data.  Any pixels above this value will be flagged as cosmic-rays
+and will not affect the extractions.
+
+The profile width should be approximately the full width
+at the profile base.  This parameter is used for centering and tracing
+of the spectrum profiles.
+
+The approximate central wavelength and dispersion are used for the
+automatic identification of the arc reference.  They may be specified
+as image header keywords or values.  The INDEF values search the
+entire range of the coordinate reference file but the automatic
+line identification algorithm works much better and faster if
+approximate values are given.
+
+The next set of parameters select the processing steps and options.  The
+various calibration steps may be done simultaneously, that is at the same
+time as the basic extractions, or in separate executions of the task.
+Typically, all the desired operations are done at the same time.
+Dispersion correction requires at least one arc spectrum and flux
+calibration requires dispersion correction and at least one standard star
+observation.
+
+The \fIresize\fR option resets the edges of the extraction aperture based
+on the profile for each object and standard star image.  The default
+resizing is to the 5% point relative to the peak measured above the
+background.  This allows following changes in the seeing.  However, one
+should consider the consequences of this if attempting to flux calibrate
+the observations.  Except in quicklook mode, the apertures for each object
+and standard star observation may be reviewed graphically and
+adjustments made to the aperture width and background regions.
+
+The \fIclean\fR option invokes a profile
+fitting and deviant point rejection algorithm as well as a variance weighting
+of points in the aperture.  See the next section for more about
+requirements to use this option.
+
+Generally once a spectrum has been processed it will not be reprocessed if
+specified as an input spectrum.  However, changes to the underlying
+calibration data can cause such spectra to be reprocessed if the
+\fIupdate\fR flag is set.  The changes which will cause an update are a
+new arc reference image and new standard stars.  If all input spectra are to be
+processed regardless of previous processing the \fIredo\fR flag may be
+used.  Note that reprocessing clobbers the previously processed output
+spectra.
+
+The final step is to plot the spectra if the \fIsplot\fR option is
+selected.  In non-quicklook mode there is a query which may be
+answered either in lower or upper case.  The plotting uses the interactive
+task \fBsplot\fR.  In quicklook mode the plot appears noninteractively
+using the task \fBbplot\fR.  
+
+The \fIquicklook\fR option provides a simpler, less interactive, mode.
+In quicklook mode a single aperture is defined using default parameters
+without interactive aperture review or trace fitting and
+the \fIsplot\fR option selects a noninteractive plot to be
+shown at the end of processing of each object and standard star
+spectrum.  While the algorithms used in quicklook mode are nearly the same
+as in non-quicklook mode and the final results may be the same it is
+recommended that the greater degree of monitoring and review in
+non-quicklook mode be used for careful final reductions.
+
+The batch processing option allows object spectra to be processed as a
+background or batch job.  This will occur only if the interactive
+\fIsplot\fR option is not active; either not set, turned off during
+processing with "NO", or in quicklook mode.  In batch processing the
+terminal output is suppressed.
+
+The \fIlistonly\fR option prints a summary of the processing steps
+which will be performed on the input spectra without actually doing
+anything.  This is useful for verifying which spectra will be affected
+if the input list contains previously processed spectra.  The listing
+does not include any arc spectra which may be extracted to dispersion
+calibrate an object spectrum.
+
+The last parameter (excluding the task mode parameter) points to
+another parameter set for the algorithm parameters.  The default
+parameter set is called \fIsparams\fR.  The algorithm parameters are
+discussed further in the next section.
+
+\fBAlgorithms and Algorithm Parameters\fR
+
+This section summarizes the various algorithms used by the
+\fBdoslit\fR task and the parameters which control and modify the
+algorithms.  The algorithm parameters available to you are
+collected in the parameter set \fBsparams\fR.  These parameters are
+taken from the various general purpose tasks used by the \fBdoslit\fR
+processing task.  Additional information about these parameters and
+algorithms may be found in the help for the actual
+task executed.  These tasks are identified below.  The aim of this
+parameter set organization is to collect all the algorithm parameters
+in one place separate from the processing parameters and include only
+those which are relevant for slit data.  The parameter values
+can be changed from the defaults by using the parameter editor,
+.nf
+
+cl> epar sparams
+
+.fi
+or simple typing \fIsparams\fR.
+The parameter editor can also be entered when editing the \fBdoslit\fR
+parameters by typing \fI:e\fR when positioned at the \fIsparams\fR
+parameter.
+
+\fBAperture Definitions\fR
+
+The first operation is to define the extraction apertures, which include the
+aperture width, background regions, and position dependence with
+wavelength, for the input slit spectra and, if flux calibration is
+selected, the standard star spectra.  This is done only for spectra which
+do not have previously defined apertures unless the \fIredo\fR option is
+set to force all definitions to be redone.  Thus, apertures may be
+defined separately using the \fBapextract\fR tasks.  This is particularly
+useful if one needs to use reference images to define apertures for very
+weak spectra which are not well centered or traced by themselves.
+
+Initially a single spectrum is found and a default aperture defined
+automatically.  If the \fIresize\fR parameter is set the aperture width is
+adjusted to a specified point on the spectrum profile (see
+\fBapresize\fR).  If not in "quicklook" mode (set by the \fIquicklook\fR
+parameter) a query is printed to select whether to inspect and modify the
+aperture and background aperture definitions using the commands described
+for \fBapedit\fR.  This option allows adding
+apertures for other objects on the slit and adjusting
+background regions to avoid contaminating objects.  The query may be
+answered in lower case for a single spectrum or in upper case to
+permanently set the response for the duration of the task execution.  This
+convention for query responses is used throughout the task.  It is
+recommended that quicklook only be used for initial quick extractions and
+calibration and that for final reductions one at least review the aperture
+definitions and traces.
+
+The initial spectrum finding and aperture definitions are done at a specified
+line or column.  The positions of the spectrum at a set of other lines or
+columns is done next and a smooth function is fit to define the aperture
+centers at all points in the image.  In non-quicklook mode the user has the
+option to review and adjust the function fitting parameters and delete bad
+position determinations.  As with the initial aperture review there is a
+query which may be answered either in lower or upper case.
+
+The above steps are all performed using tasks from the \fBapextract\fR
+package and parameters from the \fBsparams\fR parameters.  As a quick
+summary, the dispersion direction of the spectra are determined from the
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
+line or column for finding the object position on the slit and the number
+of image lines or columns to sum are set by the \fIline\fR and \fInsum\fR
+parameters.  A line of INDEF (the default) selects the middle of the image.
+The automatic finding algorithm is described for the task
+\fBapfind\fR and is basically finds the strongest peak.  The default
+aperture size, background parameters, and resizing are described in
+the tasks \fBapdefault\fR and \fBapresize\fR and the
+parameters used are also described there.
+The tracing is done as described in \fBaptrace\fR and consists of
+stepping along the image using the specified \fIt_step\fR parameter.  The
+function fitting uses the \fBicfit\fR commands with the other parameters
+from the tracing section.
+
+\fBExtraction\fR
+
+The actual extraction of the spectra is done by summing across the
+fixed width apertures at each point along the dispersion.
+The default is to simply sum the pixels using
+partial pixels at the ends.  There is an option to weight the
+sum based on a Poisson variance model using the \fIreadnoise\fR and
+\fIgain\fR detector parameters.  Note that if the \fIclean\fR
+option is selected the variance weighted extraction is used regardless
+of the \fIweights\fR parameter.  The sigma thresholds for cleaning
+are also set in the \fBsparams\fR parameters.
+
+The cleaning and variance weighting options require knowing the effective
+(i.e. accounting for any image combining) read out noise and gain.  These
+numbers need to be adjusted if the image has been processed such that the
+intensity scale has a different origin (such as applying a separate
+background subtraction operation) or scaling (such as caused by
+unnormalized flat fielding).  These options also require using background
+subtraction if the profile does not go to zero.  For optimal extraction and
+cleaning to work it is recommended that any flat fielding be done using
+normalized flat fields (as is done in \fBccdproc\fR) and using background
+subtraction if there is any appreciable sky.  For further discussion of
+cleaning and variance weighted extraction see \fBapvariance\fR and
+\fBapprofiles\fR as well as  \fBapsum\fR.
+
+Background sky subtraction is done during the extraction based on
+background regions and parameters defined by the default parameters or
+changed during the interactive setting of the apertures.  The background
+subtraction options are to do no background subtraction, subtract the
+average, median, or minimum of the pixels in the background regions, or to
+fit a function and subtract the function from under the extracted object
+pixels.  The background regions are specified in pixels from
+the aperture center and follow changes in center of the spectrum along the
+dispersion.  The syntax is colon separated ranges with multiple ranges
+separated by a comma or space.  The background fitting uses the \fBicfit\fR
+routines which include medians, iterative rejection of deviant points, and
+a choice of function types and orders.  Note that it is important to use a
+method which rejects cosmic rays such as using either medians over all the
+background regions (\fIbackground\fR = "median") or median samples during
+fitting (\fIb_naverage\fR < -1).  The background subtraction algorithm and
+options are described in greater detail in \fBapsum\fR and
+\fBapbackground\fR.
+
+\fBDispersion Correction\fR
+
+If dispersion correction is not selected, \fIdispcor\fR=no, then the object
+spectra are simply extracted.  The extracted spectra may be plotted
+by setting the \fIsplot\fR option.  This produces a query and uses
+the interactive \fBsplot\fR task in non-quicklook mode and uses the
+noninteractive \fBbplot\fR task in quicklook mode.
+
+Dispersion corrections are applied to the extracted spectra if the
+\fIdispcor\fR processing parameter is set.  There are three basic steps
+involved; determining the dispersion functions relating pixel position to
+wavelength, assigning the appropriate dispersion function to a particular
+observation, and either storing the nonlinear dispersion function in the
+image headers or resampling the spectra to evenly spaced pixels in
+wavelength.
+
+The first arc spectrum in the arc list is used to define the reference
+dispersion solution.  It is extracted at middle of the image with no
+tracing.  Note extractions of arc spectra are not background subtracted.
+The task \fBautoidentify\fR is attempts to define the dispersion function
+automatically using the \fIcrval\fR and \fIcdelt\fR parameters.  Whether or
+not it is successful the user is presented with the interactive
+identification graph.  The automatic identifications can be reviewed and a
+new solution or corrections to the automatic solution may be performed.
+
+The arc dispersion function parameters are for \fBautoidentify\fR and it's
+related partner \fBreidentify\fR.  The parameters define a line list for
+use in automatically assigning wavelengths to arc lines, a centering width
+(which should match the line widths at the base of the lines), the
+dispersion function type and orders, parameters to exclude bad lines from
+function fits, and defining whether to refit the dispersion function as
+opposed to simply determining a zero point shift.  The defaults should
+generally be adequate and the dispersion function fitting parameters may be
+altered interactively.  One should consult the help for the two tasks for
+additional details of these parameters and the interactive operation of
+\fBautoidentify\fR.
+
+The extracted reference arc spectrum is then dispersion corrected.
+If the spectra are to be linearized, as set by the \fIlinearize\fR
+parameter, the default linear wavelength parameters are printed and
+you have the option to adjust them.  The dispersion system defined at
+this point will be applied automatically to all other spectra as they
+are dispersion corrected.
+
+Once the reference dispersion function is defined other arc spectra are
+extracted as required by the object spectra.  The assignment of arcs is
+done either explicitly with an arc assignment table (parameter
+\fIarctable\fR) or based on a header parameter such as a time.
+This assignments are made by the task
+\fBrefspectra\fR.  When two arcs are assigned to an object spectrum an
+interpolation is done between the two dispersion functions.  This makes an
+approximate correction for steady drifts in the dispersion.
+
+The tasks \fBsetjd\fR and \fBsetairmass\fR are automatically run on all
+spectra.  This computes and adds the header parameters for the Julian date
+(JD), the local Julian day number (LJD), the universal time (UTMIDDLE), and
+the air mass at the middle of the exposure.  The default arc assignment is
+to use the Julian date grouped by the local Julian day number.  The
+grouping allows multiple nights of data to be correctly assigned at the
+same time.
+
+The assigned arc spectra are then extracted using the object aperture
+definitions (but without background subtraction or cleaning) so that the
+same pixels on the detector are used.  The extracted arc spectra are then
+reidentified automatically against the reference arc spectrum.  Some
+statistics of the reidentification are printed (if not in batch mode) and
+the user has the option of examining the lines and fits interactively if
+not in quicklook mode.  The task which does the reidentification is called
+\fBreidentify\fR.
+
+The last step of dispersion correction is setting the dispersion
+of the object image from the arc images.  There are two choices here.
+If the \fIlinearize\fR parameter is not set the nonlinear dispersion
+function is stored in the image header.  Other IRAF tasks interpret
+this information when dispersion coordinates are needed for plotting
+or analysis.  This has the advantage of not requiring the spectra
+to be interpolated and the disadvantage that the dispersion
+information is only understood by IRAF tasks and cannot be readily
+exported to other analysis software.
+
+If the \fIlinearize\fR parameter is set then the spectra are resampled to a
+linear dispersion relation either in wavelength or the log of the
+wavelength using the dispersion coordinate system defined previously
+for the arc reference spectrum.
+
+The linearization algorithm parameters allow selecting the interpolation
+function type, whether to conserve flux per pixel by integrating across the
+extent of the final pixel, and whether to linearize to equal linear or
+logarithmic intervals.  The latter may be appropriate for radial velocity
+studies.  The default is to use a fifth order polynomial for interpolation,
+to conserve flux, and to not use logarithmic wavelength bins.  These
+parameters are described fully in the help for the task \fBdispcor\fR which
+performs the correction.
+
+\fBFlux Calibration\fR
+
+Flux calibration consists of an extinction correction and an instrumental
+sensitivity calibration.  The extinction correction only depends on the
+extinction function defined by the package parameter \fIextinct\fR and
+determination of the airmass from the header parameters (the air mass is
+computed by \fBsetairmass\fR as mentioned earlier).  The sensitivity
+calibration depends on a sensitivity calibration spectrum determined from
+standard star observations for which there are tabulated absolute fluxes.
+The task that applies both the extinction correction and sensitivity
+calibration to each extracted object spectrum is \fBcalibrate\fR.  Consult
+the manual page for this task for more information.
+
+Generation of the sensitivity calibration spectrum is done before
+processing any object spectra since it has two interactive steps and
+requires all the standard star observations.  The first step is tabulating
+the observed fluxes over the same bandpasses as the calibrated absolute
+fluxes.  The standard star tabulations are done after each standard star is
+extracted and dispersion corrected.  You are asked for the name of the
+standard star as tabulated in the absolute flux data files in the directory
+\fIcaldir\fR defined by the package parameters.
+The tabulation of the standard star
+observations over the standard bandpasses is done by the task
+\fBstandard\fR.  The tabulated data is stored in the file \fIstd\fR.  Note
+that if the \fIredo\fR flag is not set any new standard stars specified in
+subsequent executions of \fBdoslit\fR are added to the previous data in
+the data file, otherwise the file is first deleted.  Modification of the
+tabulated standard star data, such as by adding new stars, will cause any
+spectra in the input list which have been previously calibrated to be
+reprocessed if the \fIupdate\fR flag is set.
+
+After the standard star calibration bandpass fluxes are tabulated the
+information from all the standard stars is combined to produce a
+sensitivity function for use by \fBcalibrate\fR.  The sensitivity function
+determination is interactive and uses the task \fBsensfunc\fR.  This task
+allows fitting a smooth sensitivity function to the ratio of the observed
+to calibrated fluxes verses wavelength.  The types of manipulations one
+needs to do include deleting bad observations, possibly removing variable
+extinction (for poor data), and possibly deriving a revised extinction
+function.  This is a complex operation and one should consult the manual
+page for \fBsensfunc\fR.  The sensitivity function is saved as a one
+dimensional spectrum with the name \fIsens\fR.  Deletion of this image
+will also cause reprocessing to occur if the \fIupdate\fR flag is set.
+.ih
+EXAMPLES
+1.  The following example uses artificial data and may be executed
+at the terminal (with IRAF V2.10).  This is similar to the sequence
+performed by the test procedure "demos doslit".  The output is with
+the verbose package parameter set.  Normally users use \fBeparam\fR
+rather than the long command line.  All parameters not shown
+for \fBsparams\fR and \fBdoslit\fR are the default.
+
+.nf
+cl> demos mkdoslit
+Creating example longslit in image demoarc1 ...
+Creating example longslit in image demoobj1 ...
+Creating example longslit in image demostd1 ...
+Creating example longslit in image demoarc2 ...
+cl> doslit demoobj1 arcs=demoarc1,demoarc2 stand=demostd1 \
+>>> extcor=yes, fluxcal=yes resize=yes
+Searching aperture database ...
+Finding apertures ...
+Jan 17 15:52: FIND - 1 apertures found for demoobj1
+Resizing apertures ...
+Jan 17 15:52: APRESIZE  - 1 apertures resized for demoobj1 (-3.50, 3.49)
+Edit apertures for demostd1?  (yes):
+<Check aperture and background definitions ('b').  Exit with 'q'>
+Fit traced positions for demostd1 interactively?  (yes):  
+Tracing apertures ...
+Fit curve to aperture 1 of demostd1 interactively  (yes):
+<Exit with 'q'>
+Searching aperture database ...
+Finding apertures ...
+Jan 17 15:54: FIND - 1 apertures found for demostd1
+Resizing apertures ...
+Jan 17 15:54: APRESIZE  - 1 apertures resized for demostd1 (-3.35, 3.79)
+Edit apertures for demostd1?  (yes):
+<Exit with 'q'>
+Fit traced positions for demostd1 interactively?  (yes): n
+Tracing apertures ...
+Jan 17 15:55: TRACE - 1 apertures traced in demostd1.
+Jan 17 15:55: DATABASE - 1 apertures for demostd1 written to database
+Extract arc reference image demoarc1
+Searching aperture database ...
+Finding apertures ...
+Jan 17 15:55: FIND - 1 apertures found for demoarc1
+Jan 17 15:55: DATABASE - 1 apertures for demoarc1 written to database
+Extracting apertures ...
+Jan 17 15:55: EXTRACT - Aperture 1 from demoarc1 --> demoarc1.ms
+Determine dispersion solution for demoarc1
+<A dispersion function is automatically determined.>
+<Type 'f' to see the fit residuals>
+<Type 'd' to delete the two deviant lines>
+<Type 'f' to refit with the bad points deleted>
+<Type 'q' to quit fit and then 'q' to exit>
+demoarc1.ms.imh: w1 = 4204.18..., w2 = 7355.37..., dw = 6.16..., nw = 512
+  Change wavelength coordinate assignments? (yes|no|NO) (no): n
+Extract standard star spectrum demostd1
+Searching aperture database ...
+Jan 17 15:59: DATABASE  - 1 apertures read for demostd1 from database
+Extracting apertures ...
+Jan 17 15:59: EXTRACT - Aperture 1 from demostd1 --> demostd1.ms
+Assign arc spectra for demostd1
+[demostd1] refspec1='demoarc1 0.403'
+[demostd1] refspec2='demoarc2 0.597'
+Extract and reidentify arc spectrum demoarc1
+Searching aperture database ...
+Jan 17 15:59: DATABASE  - 1 apertures read for demostd1 from database
+Jan 17 15:59: DATABASE - 1 apertures for demoarc1 written to database
+Extracting apertures ...
+Jan 17 15:59: EXTRACT - Aperture 1 from demoarc1 --> demostd1demoarc1.ms
+
+REIDENTIFY: NOAO/IRAF V2.10BETA valdes@puppis Fri 15:59:21 17-Jan-92
+  Reference image = demoarc1.ms, New image = demostd1..., Refit = yes
+Image Data    Found     Fit Pix Shift  User Shift  Z Shift      RMS
+demo...       48/48   48/48    2.22E-4     0.00184  5.09E-7    0.225
+Fit dispersion function interactively? (no|yes|NO|YES) (yes):
+demoarc1.ms: w1 = 4211.81, w2 = 7353.58, dw = 6.148, nw = 512, log = no
+  Change wavelength coordinate assignments? (yes|no|NO): N
+demo... 48/48   48/48    2.22E-4     0.00184  5.09E-7    0.225
+Extract and reidentify arc spectrum demoarc2
+Searching aperture database ...
+Jan 17 16:01: DATABASE  - 1 apertures read for demostd1 from database
+Jan 17 16:01: DATABASE - 1 apertures for demoarc2 written to database
+Extracting apertures ...
+Jan 17 16:01: EXTRACT - Aperture 1 from demoarc2 --> demostd1demoarc2.ms
+
+REIDENTIFY: NOAO/IRAF V2.10BETA valdes@puppis Fri 16:01:54 17-Jan-92
+  Reference image = demoarc1.ms, New image = demostd1..., Refit = yes
+Image Data    Found     Fit Pix Shift  User Shift  Z Shift      RMS
+demo...       48/48   48/48    0.00302      0.0191  3.82E-6    0.244
+Dispersion correct demostd1
+demostd1.ms: ap = 1, w1 = 4204.181, w2 = 7355.375, dw = 6.16..., nw = 512
+Compile standard star fluxes for demostd1
+Star name in calibration list: hz2 <in kpnoslit package>
+demostd1.ms.imh[1]: Example artificial long slit image
+Compute sensitivity function
+Fit aperture 1 interactively? (no|yes|NO|YES) (no|yes|NO|YES) (yes):
+<Exit with 'q'>
+Sensitivity function for all apertures --> sens
+Flux and/or extinction calibrate standard stars
+[demostd1.ms.imh][1]: Example artificial long slit image
+  Extinction correction applied
+  Flux calibration applied
+Extract object spectrum demoobj1
+Searching aperture database ...
+Jan 17 16:05: DATABASE  - 1 apertures read for demoobj1 from database
+Extracting apertures ...
+Jan 17 16:05: EXTRACT - Aperture 1 from demoobj1 --> demoobj1.ms
+Assign arc spectra for demoobj1
+[demoobj1] refspec1='demoarc1 0.403'
+[demoobj1] refspec2='demoarc2 0.597'
+Extract and reidentify arc spectrum demoarc1
+Searching aperture database ...
+Jan 17 16:05: DATABASE  - 1 apertures read for demoobj1 from database
+Jan 17 16:05: DATABASE - 1 apertures for demoarc1 written to database
+Extracting apertures ...
+Jan 17 16:05: EXTRACT - Aperture 1 from demoarc1 --> demoobj1demoarc1.ms
+
+REIDENTIFY: NOAO/IRAF V2.10BETA valdes@puppis Fri 16:05:39 17-Jan-92
+  Reference image = demoarc1.ms, New image = demoobj1..., Refit = yes
+Image Data    Found     Fit Pix Shift  User Shift  Z Shift      RMS
+demo...       48/48   48/48   -2.49E-4    -0.00109  -1.1E-7    0.227
+Extract and reidentify arc spectrum demoarc2
+Searching aperture database ...
+Jan 17 16:05: DATABASE  - 1 apertures read for demoobj1 from database
+Jan 17 16:05: DATABASE - 1 apertures for demoarc2 written to database
+Extracting apertures ...
+Jan 17 16:05: EXTRACT - Aperture 1 from demoarc2 --> demoobj1demoarc2.ms
+
+REIDENTIFY: NOAO/IRAF V2.10BETA valdes@puppis Fri 16:05:42 17-Jan-92
+  Reference image = demoarc1.ms, New image = demoobj1..., Refit = yes
+Image Data    Found     Fit Pix Shift  User Shift  Z Shift      RMS
+demo...       48/48   48/48    0.00266      0.0169  3.46E-6     0.24
+Dispersion correct demoobj1
+demoobj1.ms: ap = 1, w1 = 4204.181, w2 = 7355.375, dw = 6.16..., nw = 512
+Extinction correct demoobj1
+Flux calibrate demoobj1
+[demoobj1.ms.imh][1]: Example artificial long slit image
+  Extinction correction applied
+  Flux calibration applied
+.fi
+
+2.  To redo the above:
+
+.nf
+cl> doslit demoobj1 arcs=demoarc1,demoarc2 stand=demostd1 \
+>>> extcor=yes, fluxcal=yes resize=yes redo+
+.fi
+.ih
+REVISIONS
+.ls DOSLIT V2.11
+The initial arc line identifications is done with the automatic line
+identification algorithm.
+.le
+.ls DOSLIT V2.10.3
+The usual output WCS format is "equispec".  The image format type to be
+processed is selected with the \fIimtype\fR environment parameter.  The
+dispersion axis parameter is now a package parameter.  Images will only
+be processed if the have the CCDPROC keyword.  A \fIdatamax\fR parameter
+has been added to help improve cosmic ray rejection.  The arc reference
+is no longer taken from the center of the image but using the first object
+aperture.  A bug which alphabetized the arc list was fixed.
+.le
+.ih
+SEE ALSO
+apbackground, apedit, apfind, approfiles, aprecenter, apresize, apsum,
+aptrace, apvariance, calibrate, ccdred, center1d, ctioslit, dispcor,
+echelle.doecslit, icfit, autoidentify, identify, kpnocoude, kpnoslit,
+specred, observatory, onedspec.package, refspectra, reidentify, sensfunc,
+setairmass, setjd, splot, standard
+.endhelp

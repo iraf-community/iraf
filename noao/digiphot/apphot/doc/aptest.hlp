@@ -1,0 +1,68 @@
+.help aptest Dec92 noao.digiphot.apphot
+.ih
+NAME
+aptest -- run basic tests on the apphot package tasks
+.ih
+USAGE
+aptest imname
+.ih
+PARAMETERS
+.ls imname
+The name of the output test image. The actual test image is stored in fits
+format in the APPHOT package subdirectory test. If the image already exists
+APTEST will exit with a warning message.
+.le
+.ls aplogfile = ""
+The name of the output log file. By default all the text output is logged
+in a file called \fI"imname.log"\fR. If the log file already exists APTEST will
+exit with a warning message.
+.le
+.ls applotfile = ""
+The name of the output log file. By default all the plot output is logged in
+a file called \fI"imname.plot"\fR. If the plot file already exists APTEST will
+exit with a warning message.
+.le
+.ih
+DESCRIPTION
+APTEST is a simple script which exercises each of the tasks in the APPHOT
+package in turn. At startup APTEST reads a small fits image stored in the
+APPHOT test subdirectory and creates the image \fIimname\fR in the user's
+working directory. APTEST initializes the APPHOT package by returning
+all the parameters to their default state, runs each of the APPHOT
+tasks in non-interactive mode, spools the text output to the file
+\fIaplogfile\fR, and spools the plot output from the RADPROF task to the plot
+metacode file \fIapplotfile\fR.
+.ih
+EXAMPLES
+
+1. Check to see that all the APPHOT tasks are functioning correctly.
+
+.nf
+	ap> apphot
+
+	... load the apphot package
+
+	ap> aptest testim
+
+	... run the test script
+
+	ap> lprint testim.log
+
+	... print the text output
+
+	ap> gkidir testim.plot
+
+	... list the contents of the plot file
+
+	ap> gkiextract testim.plot 1-N | stdplot
+
+	... send the plots to the plotter
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

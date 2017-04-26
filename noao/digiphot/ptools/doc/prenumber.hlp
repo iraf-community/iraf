@@ -1,0 +1,59 @@
+.help prenumber May93 noao.digiphot.ptools
+.ih
+NAME
+prenumber -- renumber an APPHOT/DAOPHOT database
+.ih
+USAGE
+renumber infile
+.ih
+PARAMETERS
+.ls infile
+The APPHOT/DAOPHOT database to be renumbered.
+.le
+.ls id = "ID"
+The name of the keyword whose value is the sequence number of the object
+.le
+.ls idoffset = 0
+An integer offset  to be added to the id numbers of the stars in
+the output renumbered photometry file. If idoffset is > 0, the output
+id numbers will run from 1 + idoffset to N + idoffset instead of from 1 to N.
+in the database.
+.le
+
+.ih
+DESCRIPTION
+PRENUMBER is a simple task which accepts an APPHOT/DAOPHOT
+database file and renumbers the objects in the file from 1 + idoffset
+to N + idoffset,
+where N is the number of objects in the database. A renumber operation is
+often performed
+after an append operation to insure that the database objects have unique id
+numbers or after a sort to put the id numbers in order.
+
+PRENUMBER is a script which executes TXRENUMBER if the APPHOT/DAOPHOT
+database is a text database or TCALC if the file is an STSDAS table
+database.
+.ih
+EXAMPLES
+
+1. Renumber a sorted NSTAR database that has been sorted on magnitude.
+
+.nf
+   pt> prenumber m92r.nst.1
+.fi
+
+2. Renumber a PHOT photometry file of extra stars so as to ensure the
+stars' id numbers are  greater than 4000.
+
+.nf
+    pt> prenumber m92r.mag.extra idoffset=4000
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txrenumber,ptools.tbrenumber,tables.tcalc
+.endhelp

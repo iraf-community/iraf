@@ -1,0 +1,36 @@
+.help tee Nov84 system
+.ih
+NAME
+tee -- tee the standard output to a file
+.ih
+USAGE
+tee file
+.ih
+PARAMETERS
+.ls file
+The name of the output file.
+.le
+.ls out_type = "text"
+The type of output file to be created, either "text" or "binary".
+.le
+.ls append = no
+If set, append to an existing file, otherwise create a new file.
+.le
+.ih
+DESCRIPTION
+\fITee\fR copies its input to both the standard output and the named file.
+Its primary use is in pipes where one wants to capture some intermediate output.
+.ih
+EXAMPLES
+
+1. The results of the \fIset\fR command are captured in the file "temp",
+and are also passed on to the "match" command.  The result is
+a "temp" file of perhaps 100 lines, with the output to the screen
+only around 5 lines.
+
+	cl> set | tee temp | match tty
+.ih
+BUGS
+Since the processes in an IRAF pipe execute serially rather than concurrently,
+the teed output will not appear until all tasks to the left have completed.
+.endhelp

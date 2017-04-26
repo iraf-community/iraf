@@ -1,0 +1,49 @@
+.help break Feb86 language
+.ih
+NAME
+break -- break out of a loop
+.ih
+USAGE
+break
+.ih
+DESCRIPTION
+The \fIbreak\fR statement is used to exit (break out of) the \fIfor\fR or
+\fIwhile\fR loop in which it is found.  In the case of nested loop constructs
+only the innermost loop is terminated.
+Unlike C usage the \fIbreak\fR statement does not break out of a switch.
+.ih
+EXAMPLES
+1. Scan a list (file), printing each list element until either the list is
+exhausted or a list element "exit" or "quit" is encountered.
+
+.nf
+	while (fscan (list, s1) != EOF) {
+	    if (s1 == "exit" || s1 == "quit")
+		break
+	    print (s1)
+	}
+.fi
+
+
+2. Sum the pixels in a two dimensional array, terminating the sum for each
+line if a negative pixel is encountered, and terminating the entire process
+when the total sum passes a predefined limit.
+
+.nf
+	total = 0
+	for (i=1;  i <= NCOLS;  i+=1) {
+	    for (j=1;  j <= NLINES;  j+=1) {
+		if (pixel[i,j] < 0)
+		    break		# exit the J loop
+		total += pixel[i,j]
+	    }
+	    if (total > NPHOT)
+		break			# exit the I loop
+	}
+.fi
+.ih
+BUGS
+.ih
+SEE ALSO
+next, while, for
+.endhelp

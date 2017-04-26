@@ -1,0 +1,9 @@
+intable1,f,a,,,,name of the first table to be joined
+intable2,f,a,,,,name of the second table to be joined
+outtable,s,a,,,,name of output table
+column1,s,a,,,,name of columns to join in first table
+column2,s,a,,,,name of columns to join in second table
+extrarows,s,h,neither,neither|first|both,,add unmatched rows from which table?
+tolerance,s,h,0.0,,,tolerance used in testing for equality
+casesens,b,h,yes,,,Case sensitivity flag
+mode,s,h,"a",,,

@@ -1,0 +1,122 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<imhdr.h>
+include	"../icombine.h"
+
+$for (sird)
+# IC_SIGMA -- Compute the sigma image line.
+# The estimated sigma includes a correction for the finite population.
+# Weights are used if desired.
+
+procedure ic_sigma$t (d, m, n, wts, npts, average, sigma)
+
+pointer	d[ARB]			# Data pointers
+pointer	m[ARB]			# Image ID pointers
+int	n[npts]			# Number of points
+real	wts[ARB]		# Weights
+int	npts			# Number of output points per line
+$if (datatype == sil)
+real	average[npts]		# Average
+real	sigma[npts]		# Sigma line (returned)
+$else
+PIXEL	average[npts]		# Average
+PIXEL	sigma[npts]		# Sigma line (returned)
+$endif
+
+int	i, j, k, n1
+real	wt, sigcor, sumwt
+$if (datatype == sil)
+real	a, sum
+$else
+PIXEL	a, sum
+$endif
+
+include	"../icombine.com"
+
+begin
+	if (dflag == D_ALL) {
+	    n1 = n[1]
+	    if (dowts) {
+		if (n1 > 1)
+		    sigcor = real (n1) / real (n1 - 1)
+		else
+		    sigcor = 1.
+		do i = 1, npts {
+		    k = i - 1
+		    a = average[i]
+		    wt = wts[Memi[m[1]+k]]
+		    sum = (Mem$t[d[1]+k] - a) ** 2 * wt
+		    do j = 2, n1 {
+			wt = wts[Memi[m[j]+k]]
+			sum = sum + (Mem$t[d[j]+k] - a) ** 2 * wt
+		    }
+		    sigma[i] = sqrt (sum * sigcor)
+		}
+	    } else {
+		if (n1 > 1)
+		    sigcor = 1. / real (n1 - 1)
+		else
+		    sigcor = 1.
+		do i = 1, npts {
+		    k = i - 1
+		    a = average[i]
+		    sum = (Mem$t[d[1]+k] - a) ** 2
+		    do j = 2, n1
+			sum = sum + (Mem$t[d[j]+k] - a) ** 2
+		    sigma[i] = sqrt (sum * sigcor)
+		}
+	    }
+	} else if (dflag == D_NONE) {
+	    do i = 1, npts
+		sigma[i] = blank
+	} else {
+	    if (dowts) {
+		do i = 1, npts {
+		    n1 = n[i]
+		    if (n1 > 0) {
+			k = i - 1
+			if (n1 > 1)
+			    sigcor = real (n1) / real (n1 -1)
+			else
+			    sigcor = 1
+			a = average[i]
+			wt = wts[Memi[m[1]+k]]
+			sum = (Mem$t[d[1]+k] - a) ** 2 * wt
+			sumwt = wt
+			do j = 2, n1 {
+			    wt = wts[Memi[m[j]+k]]
+			    sum = sum + (Mem$t[d[j]+k] - a) ** 2 * wt
+			    sumwt = sumwt + wt
+			}
+			if (sumwt > 0)
+			    sigma[i] = sqrt (sum / sumwt * sigcor)
+			else {
+			    sum = (Mem$t[d[1]+k] - a) ** 2
+			    do j = 2, n1
+				sum = sum + (Mem$t[d[j]+k] - a) ** 2
+			    sigma[i] = sqrt (sum / n1 * sigcor)
+			}
+		    } else
+			sigma[i] = blank
+		}
+	    } else {
+		do i = 1, npts {
+		    n1 = n[i]
+		    if (n1 > 0) {
+			k = i - 1
+			if (n1 > 1)
+			    sigcor = 1. / real (n1 - 1)
+			else
+			    sigcor = 1.
+			a = average[i]
+			sum = (Mem$t[d[1]+k] - a) ** 2
+			do j = 2, n1
+			    sum = sum + (Mem$t[d[j]+k] - a) ** 2
+			sigma[i] = sqrt (sum * sigcor)
+		    } else
+			sigma[i] = blank
+		}
+	    }
+	}
+end
+$endfor

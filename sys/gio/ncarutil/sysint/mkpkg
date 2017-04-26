@@ -1,0 +1,16 @@
+# Make the system interface for libncar.a.
+
+$checkout libncar.a lib$
+$update   libncar.a
+$checkin  libncar.a lib$
+$exit
+
+libncar.a:
+	support.f
+	fencode.x	<mach.h> <error.h> <ctype.h>
+	fulib.x		<error.h>
+	ishift.x	<mach.h>
+	gbytes.x
+	sbytes.x	<mach.h>
+	spps.f
+	;

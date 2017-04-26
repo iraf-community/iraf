@@ -1,0 +1,54 @@
+.help normflat Sep84 noao.imred.generic
+.ih
+NAME
+normflat -- Create a flat field by normalizing a calibration image
+.ih
+USAGE	
+normflat image flatfield
+.ih
+PARAMETERS
+.ls image
+Calibration image to be used.
+.le
+.ls flatfield
+Flat field to be created.
+.le
+.ls norm = INDEF
+Normalization factor to be used if not INDEF.  If INDEF the normalization
+factor is automatically determined.
+.le
+.ls minflat = INDEF
+Minimum data value to be used in determining the normalization and in
+creating the flat field.  Values less than or equal to this value are
+replaced with a flat field value of 1.
+.le
+.ls sample_section = "[]"
+Section of the image to be sampled in determining the normalization if
+norm = INDEF.
+.le
+.ih
+DESCRIPTION
+A flat field is created from a calibration image by normalizing the calibration
+image.  The normalization is specified with the parameter \fInorm\fR.  If the
+value of \fInorm\fR is INDEF then the normalization is determined by sampling
+the pixels in the sample section with values greater than \fIminflat\fR.
+This task differs from the task \fBnormalize\fR in that data values less
+than or equal to \fIminflat\fR are replaced with unity in the normalized
+flat field.
+.ih
+EXAMPLES
+To create a flat field from a calibration image "quartz" using pixels
+above 1000 and selecting the normalization to be 3500:
+
+	cl> normflat quartz flat norm=3500 minflat=1000
+
+To determine a normalization from the pixels above 1000 and sampling
+every fifth pixel in each dimension:
+
+.nf
+	cl> normflat quartz flat minflat=1000 sample=[*:5,*:5]
+.fi
+.ih
+SEE ALSO
+normalize
+.endhelp

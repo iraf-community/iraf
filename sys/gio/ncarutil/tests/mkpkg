@@ -1,0 +1,65 @@
+# Make the x_ncartest.e executable for testing the NCAR utilities.
+	#conraq.x	<error.h> <gset.h>
+	#conraqt.f
+	#conras.x	<error.h> <gset.h>
+	#conrast.f
+	#conrcqckt.f
+	#conrcsmtht.f
+	#conrcsprt.f
+	#dashchar.x	
+	#dashchart.f
+	#dashlinet.f
+	#dashsuprt.f
+	#ezmapg.x	<error.h> <gset.h>
+	#ezmapgt.f
+	#ezmapt.f
+	#isosrfhrt.f
+
+$update libpkg.a
+$omake	x_ncartest.x
+$link	x_ncartest.o libpkg.a -lncar -lgks -o /tmp2/newncar/x_ncartest.e
+$exit
+
+libpkg.a:
+	auto10t.f
+	autograph.x	<ctype.h> <error.h> <gset.h>
+	autographt.f
+	conran.x	<error.h> <gset.h>
+	conrant.f
+	conrec.x	<error.h> <gset.h>
+	conrect.f
+	dashsmth.x	
+	dashsmtht.f
+	ezconrec.x	<error.h> <gset.h>
+	ezhafton.x	<error.h> <gset.h>
+	ezhaftont.f
+	ezisosrf.x	<error.h> <gset.h>
+	ezsurface.x	<error.h> <gset.h>
+	ezvelvect.x	<error.h> <gset.h>
+	ezytst.x	<ctype.h> <error.h> <gset.h>
+	hafton.x	<error.h> <gset.h>
+	haftont.f
+	isosrf.x	<error.h> <gset.h>
+	isosrft.f
+	oldauto.x	<ctype.h> <error.h> <gset.h>
+	oldautot.f
+	preal.x	
+	pwrity.x	
+	pwrityt.f
+	pwrzit.f
+	pwrzs.x	
+	pwrzst.f
+	pwrztt.f
+	srfacet.f
+	srftest.x	
+	srftestd.x	
+	strmln.x	<error.h> <gset.h>
+	strmlnt.f
+	surface.x	<error.h> <gset.h>
+	threed.x	<error.h> <gset.h>
+	threed2.x	<error.h> <gset.h>
+	threed2t.f
+	threedt.f
+	velvctt.f
+	velvect.x	<error.h> <gset.h>
+	;

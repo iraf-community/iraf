@@ -1,0 +1,10 @@
+# Mkpkg special file list for SUN/IRAF, SUN 386i.
+
+# Files requiring special compilation due to host compiler bugs.
+# -------------------------------------------------------------
+
+$set	XNO	= '& "$xc -cq -/$(MACH) &"'
+$set	XO1	= '& "$xc -cq -/O1 -/$(MACH) &"'
+$set	XO2	= '& "$xc -cq -/O2 -/$(MACH) &"'
+
+$special "$(noao)twodspec/apextract/":	trltrace.x	$(XO2)

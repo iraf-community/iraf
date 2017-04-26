@@ -1,0 +1,81 @@
+Fits kernel notes / unresolved issues
+----------------------------------------------------------------------------
+
+Extraneous env variables - put in fkinit
+
+    ENV_DEFIMTYPE   "imtype"
+    ENV_FITSCACHE   "fitscache"
+
+
+Rename
+
+    minhdrlns
+
+
+Cache
+
+    hard upper limit - is this a restriction?
+    convert from common to dynamic descriptor
+    referenced:  open delete rename rfits updhdr
+
+Extensions
+    should not use imtype to set extension (this is copied from STF which
+    also has the same problem)
+
+Defaults / ksection / fkinit
+    should overwrite be allowed in fkinit? (fxfopen)
+
+check on file clobber
+
+
+----------------------------------------------------------------------------
+Extension, default image type
+
+imtype
+    The purpose of imtype is to control the types of images automatically
+    created by the system if no image extension is specified.
+
+    new image - determines default image type
+    new copy  - determines default image type if noinherit 
+    no extn   - up to kernel whether this is legal
+
+    imtype = [(oif|fxf|plf|qpf|stf) | <any-valid-extn>] [[no]inherit]
+
+    save format codes ("oif" etc) in driver descriptors
+    extensions are mapped to drivers using imextn
+
+
+imextn
+    map file extensions to image type (kernel)
+    default extension for new images of a given type
+
+    imextn = "oif:imh stf:hhh,??h fits:,fits,fit
+
+    or possibly imextn = "imh:oif hhh,??h:stf fits,fit:fit
+
+    kernels:	oif fxf plf qpf stf
+
+	     iki_extninit (imtype, def_imtype, imextn, def_imextn)
+	    iki_validextn (kernel, extn)
+     status = iki_getextn (kernel, index, extn, maxch)
+
+    Initialize extension processing stuff at iki_init time - only once when
+    the process starts up.
+
+    nextn
+    { kernel extn patbuf }
+    sbuf, sbufused
+    defimtype
+    inherit
+
+IKI - add kernel arg to:
+    access
+    copy
+    delete
+    open
+    rename
+
+
+
+
+

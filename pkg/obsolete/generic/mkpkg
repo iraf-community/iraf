@@ -1,0 +1,11 @@
+# Make generic routines.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	fixcol.x	<imhdr.h> <imset.h>
+	fixline.x	<imhdr.h> <imset.h>
+	;

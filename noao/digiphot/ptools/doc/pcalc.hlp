@@ -1,0 +1,86 @@
+.help pcalc May93 noao.digiphot.ptools
+.ih
+NAME
+pcalc - perform an arithmetic operation on a field in a list of apphot/daophot
+databases
+.ih
+USAGE
+pcalc infiles field value
+.ih
+PARAMETERS
+.ls infiles
+The APPHOT/DAOPHOT database(s) containing the field to be recomputed.
+.le
+.ls field 
+The field to be recomputed. Field must be an integer or real field
+in the input file(s).
+.le
+.ls value
+The arithmetic expression used to recompute the specified field.
+Value may be an integer or real expression but must match the data
+type of field. The functions real and int may be used to do type
+conversions.
+.le
+
+.ih
+DESCRIPTION
+
+PCALC reads in the values of the \fIfield\fR keyword 
+from a set of  APPHOT/DAOPHOT databases, replaces the old values
+with new values equal to the value of the arithmetic expression \fIvalue\fR,
+and updates the databases(s).
+
+PCALC is script task which calls TXCALC is the input file is an
+APPHOT/DAOPHOT text database or TBCLAC if APPHOT/DAOPHOT is a tables
+database.
+If the input file is a text database, the expression \fIvalue\fR consists
+of variables which are the field names
+specified by the #N keywords or the parameters specified by the
+#K keywords in the APPHOT/DAOPHOT text databases.
+Only keywords beginning with #N can actually be replaced.
+If the input file is an ST tables database, the expression \fIvalue\fR
+consists of the table column names.
+
+The supported
+arithmetic operators and functions are briefly described below.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
+
+.ih
+EXAMPLES
+
+1. Change the XCENTER and YCENTER fields to XCENTER + 5.4 and YCENTER + 10.3
+respectively in a file produced by the apphot package center task.
+
+.nf
+	pt> pcalc m92.ctr.1 xcenter "xcenter+5.4"
+	pt> pcalc m92.ctr.1 ycenter "ycenter+10.3"
+.fi
+
+2.  Add a constant to the computed magnitudes produced by nstar.
+
+.nf
+	pt> pcalc n4147.nst.2 mag "mag+3.457"
+.fi
+
+.ih
+BUGS
+TXCALC does not allow arrays in the expression field.
+
+.ih
+SEE ALSO
+ptools.tbcalc,tables.tcalc,ptools.pcalc
+.endhelp

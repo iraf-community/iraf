@@ -1,0 +1,45 @@
+.help islsolve Apr85 "Surfit Package"
+.ih
+NAME
+islsolve -- solve the equations for a surface grid line
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+islsolve (sf, lineno, ier)
+
+.nf
+pointer	sf		# surface grid descriptor
+int	lineno		# surface grid line number
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface grid descriptor structure.
+.le
+.ls lineno
+The number of the surface grid line to be added to the dataset.
+.le
+.ls ier      
+Error code returned by the fitting routines. The options are OK, SINGULAR,
+and NO_DEG_FREEDOM. If ier = SINGULAR the matrix is singular, ISLSOLVE
+will compute a solution to the normal equations but one or more of the
+coefficients will be zero. If ier = NO_DEG_FREEDOM, too few data points
+exist for a reasonable solution to be computed and ISLSOLVE returns without
+fitting the data.
+.le
+.ih
+DESCRIPTION
+ISLSOLVE computes the Cholesky factorization of the data matrix and
+solves for the coefficients
+of the x fitting function by forward and back substitution.
+An error code is
+returned by ISLSOLVE if it is unable to solve the normal equations as
+formulated.
+.ih
+NOTES
+.ih
+SEE ALSO
+isinit, islfit, islrefit, islaccum, islzero, issolve, isfree
+.endhelp

@@ -1,0 +1,125 @@
+.help imshift Dec98 images.imgeom
+.ih
+NAME
+imshift -- shift a set of images in x and y
+.ih
+USAGE
+imshift input output xshift yshift
+.ih
+PARAMETERS
+.ls input
+List of images to be transformed.
+.le
+.ls output
+List of output images.
+.le
+.ls xshift, yshift
+Fractional pixel shift in x and y such that xout = xin + xshift and
+yout = yin + yshift.
+.le
+.ls shifts_file = ""
+The name of the text file containing the shifts for each input image. If no
+file name is supplied each input image is shifted by \fIxshift\fR and
+\fIyshift\fR. Shifts are listed in the text file, 1 set of shifts per image,
+with the x and y shift in columns 1 and 2 respectively. The number of
+shifts in the file must equal the number of input images.
+.le
+.ls interp_type = "linear"
+The interpolant type use to computed the output shifted image.
+The choices are the following:
+.ls nearest
+nearest neighbor.
+.le
+.ls linear
+bilinear interpolation in x and y.
+.le
+.ls poly3
+third order interior polynomial in x and y.
+.le
+.ls poly5
+fifth order interior polynomial in x and y.
+.le
+.ls spline3
+bicubic spline.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width input by the
+user will be rounded up to the nearest odd number. The default sinc width
+is 31 by 31.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fractions in x and y
+by appending values between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0. The
+value 0.0 is increased to 0.001. Drizzle resampling with a pixel fraction
+of 1.0 in x and y is identical to bilinear interpolation.
+.le
+.le
+.ls boundary_type = "nearest"
+The choices are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate value by reflecting about the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ih
+DESCRIPTION
+
+IMSHIFT will shift an image in x and y such that:
+
+.nf
+    xout = xin + xshift
+    yout = yin + yshift
+
+.fi
+
+The output image gray levels are determined by interpolating in the input
+image at the positions of the shifted output pixels.
+IMSHIFT uses the routines in the 2-D interpolator package.
+
+.ih
+EXAMPLES
+
+1. Shift an image by (+3.2, -4.5) using a biquintic interior polynomial
+   interpolant and boundary extension.
+
+   cl> imshift vys70 vys70shift 3.2 -4.5 inter=poly5 bound=neare
+
+2. Shift an image by (-6., 1.2) using bilinear interpolation and
+   boundary extension.
+
+   cl> imshift ugc1040 ugc1040shift -6.0 1.2 bound=neare
+
+3. Shift a set of images using shifts listed in the textfile "shifts".
+
+   cl> page shifts
+
+       3.5  4.86
+       -2.  8.9
+       10.1 7.8
+
+   cl> imshift im1,im2,im3 im1.s,im2.s,im3.s shifts_file=shifts
+
+.ih
+TIMINGS
+The time required to shift a 512 by 512 real image by fractional pixel
+amounts in x and y is approximately 10, 20, 70, 120, and 120 cpu seconds for the
+nearest neighbor, bilinear, bicubic, biquintic and bicubic spline
+interpolants respectively (Vax 11/750 fpa).
+
+.ih
+BUGS
+.ih
+SEE ALSO
+shiftlines, magnify, rotate, geomap, geotran, imlintran
+.endhelp

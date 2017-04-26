@@ -1,0 +1,38 @@
+# COSMIC RAY CLEANING PACKAGE
+
+$call	relink
+$exit
+
+update:
+        $call   relink
+        $call   install
+        ;
+
+relink:
+        $update libpkg.a
+        $call   crutil
+        ;
+
+install:
+        $move   xx_crutil.e noaobin$x_crutil.e
+        ;
+
+crutil:
+        $omake  x_crutil.x
+        $link   x_crutil.o libpkg.a -lxtools -lcurfit -lgsurfit -lncar -lgks\
+                -o xx_crutil.e
+        ;
+
+libpkg.a:
+	crexamine.x	crlist.h <error.h> <gset.h> <mach.h> <pkg/gtools.h>\
+			<imhdr.h>
+	crfind.x	<math/gsurfit.h>
+	crlist.x	crlist.h <error.h> <gset.h> <pmset.h>
+	crsurface.x	
+	t_cosmicrays.x	crlist.h <error.h> <math/gsurfit.h> <imhdr.h> <gset.h>\
+			<pkg/gtools.h> <imset.h>
+	t_craverage.x	<imhdr.h> <error.h> <mach.h>
+	t_crgrow.x	<error.h> <imhdr.h>
+	t_crmedian.x	<imhdr.h> <mach.h>
+	xtmaskname.x
+	;

@@ -1,0 +1,672 @@
+.help quadproc Sept93 arcon.quad
+.ih
+NAME
+quadproc -- Process multi-readout CCD images
+.ih
+USAGE	
+quadproc images
+.ih
+PARAMETERS
+.ls images
+List of input CCD images to process.  The list may include processed
+images and calibration images.
+.le
+.ls ccdtype = ""
+CCD image type to select from the input image list.  If no type is given
+then all input images will be selected.  The recognized types are described
+in \fBccdtypes\fR.
+.le
+.ls max_cache = 0
+Maximum image caching memory (in Mbytes).  If there is sufficient memory
+the calibration images, such as zero level, dark count, and flat fields,
+will be cached in memory when processing many input images.  This
+reduces the disk I/O and makes the task run a little faster.  If the
+value is zero image caching is not used.
+.le
+.ls noproc = no
+List processing steps only?
+.le
+
+.ce
+PROCESSING SWITCHES
+.ls fixpix = yes
+Fix bad CCD lines and columns by linear interpolation from neighboring
+lines and columns?  If yes then a bad pixel file must be specified.
+.le
+.ls overscan = yes
+Apply overscan or prescan bias correction?  If yes then the overscan
+image section and the readout axis must be specified.
+.le
+.ls trim = yes
+Trim the image of the overscan region and bad edge lines and columns?
+If yes then the trim section must be specified.
+.le
+.ls zerocor = yes
+Apply zero level correction?  If yes a zero level image must be specified.
+.le
+.ls darkcor = yes
+Apply dark count correction?  If yes a dark count image must be specified.
+.le
+.ls flatcor = yes
+Apply flat field correction?  If yes flat field images must be specified.
+.le
+.ls illumcor = no
+Apply iillumination correction?  If yes iillumination images must be specified.
+.le
+.ls fringecor = no
+Apply fringe correction?  If yes fringe images must be specified.
+.le
+.ls readcor = no
+Convert zero level images to readout correction images?  If yes then
+zero level images are averaged across the readout axis to form one
+dimensional zero level readout correction images.
+.le
+.ls scancor = no
+Convert flat field images to scan mode flat field images?  If yes then the
+form of scan mode correction is specified by the parameter \fIscantype\fR.
+.le
+
+.ce
+PROCESSING PARAMETERS
+.ls readaxis = "line"
+Read out axis specified as "line" or "column".
+.le
+.ls fixfile
+File describing the bad lines and columns.  If "image" is specified then
+the file is specified in the image header or instrument translation file.
+See Section 2. of Description for further information on bad pixel files.
+.le
+.ls biassec
+Overscan bias strip image section.  If "image" is specified then the overscan
+bias section is specified in the image header or instrument translation file.
+See Section 3. of Description for further information on setting this parmeter.
+.le
+.ls trimsec
+image section for trimming.  If "image" is specified then the trim
+image section is specified in the image header or instrument translation file.
+See Section 4. of Description for further information on setting this parmeter.
+.le
+.ls zero = ""
+Zero level calibration image.  The zero level image may be one or two
+dimensional.  The CCD image type and subset are not checked for these
+images and they take precedence over any zero level calibration images
+given in the input list.
+.le
+.ls dark = ""
+Dark count calibration image.  The CCD image type and subset are not checked
+for these images and they take precedence over any dark count calibration
+images given in the input list.
+.le
+.ls flat = ""
+Flat field calibration images.  The flat field images may be one or
+two dimensional.  The CCD image type is not checked for these
+images and they take precedence over any flat field calibration images given
+in the input list.  The flat field image with the same subset as the
+input image being processed is selected.
+.le
+.ls illum = ""
+Iillumination correction images.  The CCD image type is not checked for these
+images and they take precedence over any iillumination correction images given
+in the input list.  The iillumination image with the same subset as the
+input image being processed is selected.
+.le
+.ls fringe = ""
+Fringe correction images.  The CCD image type is not checked for these
+images and they take precedence over any fringe correction images given
+in the input list.  The fringe image with the same subset as the
+input image being processed is selected.
+.le
+.ls minreplace = 1.
+When processing flat fields, pixel values below this value (after
+all other processing such as overscan, zero, and dark corrections) are
+replaced by this value.  This allows flat fields processed by \fBquadproc\fR
+to be certain to avoid divide by zero problems when applied to object
+images.
+.le
+.ls scantype = "shortscan"
+Type of scan format used in creating the CCD images.  The modes are:
+.ls "shortscan"
+The CCD is scanned over a number of lines and then read out as a regular
+two dimensional image.  In this mode unscanned flat fields are numerically
+scanned to form scanned flat fields comparable to the observations.  If
+the flat field calibration images are taken in scanned mode then
+\fIscancor\fR should be no and the processing performed in the same manner
+as in unscanned mode.
+.le
+.ls "longscan"
+In this mode the CCD is clocked and read out continuously to form a long
+strip.  Flat fields are averaged across the readout axis to
+form a one dimensional flat field readout correction image.  This assumes
+that all recorded image lines are clocked over the entire active area of the
+CCD.
+.le
+.le
+.ls nscan
+Number of scan readout lines used in short scan mode.  This parameter is used
+when the scan type is "shortscan".
+.le
+
+.ce
+OVERSCAN FITTING PARAMETERS
+.ls interactive = no
+Fit the overscan vector interactively?  If yes the overscan vector is fit
+interactively using the \fBicfit\fR package.  If no then the fitting parameters
+given below are used.
+.le
+.ls function = "legendre"
+Overscan fitting function.  The function types are "legendre" polynomial,
+"chebyshev" polynomial, "spline1" linear spline, and "spline3" cubic
+spline.
+.le
+.ls order = 1
+Number of polynomial terms or spline pieces in the overscan fit.
+.le
+.ls sample = "*"
+Sample points to use in the overscan fit.  The string "*" specified all
+points otherwise an \fBicfit\fR range string is used.
+.le
+.ls naverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls niterate = 1
+Number of rejection iterations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+.le
+.ls low_reject = 3., high_reject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+.le
+.ls grow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+.ih
+DESCRIPTION
+\fBQuadproc\fR processes CCD images to remove all "instrumental signatures" from
+the data. The operations performed are:
+.ls
+.nf
+o correct detector defects (bad lines and columns)
+o determine readout bias level using overscan and subtract it
+o trim off the overscan regions and unwanted border pixels
+o subtract zero level bias
+o subtract dark counts
+o correct for pixel-to-pixel sensitivity variations
+o correct for non-uniform iillumination
+o correct for fringing
+.fi
+.le
+.sp 1
+\fBQuadproc\fR is a cl script based on the task \fBccdproc\fR in the
+\fBccdred\fR package. It is specifically designed to deal with Arcon data
+obtained in multi-readout mode (see \fBquadformat\fR). A feature of such
+images is that each readout typically has a slightly different, DC bias
+level, gain, and readout noise. As a result both zero frames and uniformly 
+illuminated exposures show a characteristic chequer board pattern, the
+sections of the image read through each amplifier having different levels.
+In addition, there will be a separate overscan strip, used to monitor the zero
+level, for each readout. The location of these overscan strips in the raw
+frame depends on which amplifiers are used. \fBQuadproc\fR splits each 
+multi-readout image into subimages, one for each amplifier, and also calculates
+the biassec and trimsec appropriately for each. It then calls \fBccdproc\fR to
+perform the first three operations listed above. The sub-images are then glued
+back together. Finaly, \fBccdproc\fR is called a second time to perform all the
+remaining reduction steps. 
+
+\fBQuadproc\fR MUST be used for the reduction of multi-readout data up to and
+including the trimming step, and it is convenient to use it for the entire
+reduction process. However, once ALL images have been trimmed it is possible
+to finish the reductions using \fBccdproc\fR if the \fBquad\fR package is not
+available at your home institution. \fBQuadproc\fR recognizes mono-readout
+images and processes them directly using \fBccdproc\fR. If your images are a
+mixture of multi- and mono- readout use \fBquadproc\fR; if you only have
+mono-readout data use \fBccdproc\fR.
+
+\fBQuadproc\fR is identical to \fBccdproc\fR in the way it is used, and has
+exactly the same parameters; as far as possible it also behaves in the same way.
+To run it, all one has to do is set the parameters and then begin processing
+the images.  The task takes care of most of the record keeping and
+automatically does the prerequisite processing of calibration images. For
+ease of reference, the following sections provide a simple outline of how to
+use the task, together with a description of the operations performed. They 
+are taken almost verbatim from the help page for \fBccdproc\fR. If you are 
+already familiar with that task you should read sections 2., 3. and 4. below,
+which include information on the preparation of the badpixel file, and on how
+to specify \fBbiassec\fR and \fBtrimsec\fR parameters. See section 12. for a
+description of the differences between the two tasks. For a user's guide and 
+cookbook for the \fBquad\fR package see \fBguide\fR.
+.sh
+1. Parameters
+There are many parameters but they may be easily reviewed and modified using
+the task \fBeparam\fR.
+The input CCD images to be processed are given as an image list.
+Previously processed images are ignored and calibration images are
+recognized, provided the CCD image types are in the image header (see
+\fBinstruments\fR and \fBccdtypes\fR).  \fBQuadproc\fR separates multi- and
+mono-readout images in the input list and handles them accordingly.
+Therefore it is permissible to use simple image templates such as "*.imh".
+The \fIccdtype\fR parameter may be used to select only certain types of CCD
+images to process (see \fBccdtypes\fR).
+
+The processing operations are selected by boolean (yes/no) parameters.
+Because calibration images are recognized and processed appropriately,
+the processing operations for object images should be set. Any combination of
+operations may be specified. Two of the operations, \fBreadcor\fR and \fBscancor\fR, are only applicable to zero level and flat field images respectively. These
+are used for certain types of CCDs and modes of operation.
+
+The processing steps selected have related parameters which must be
+set.  These are things like image sections defining the overscan and
+trim regions and calibration images.  There are a number of parameters
+used for fitting the overscan or prescan bias section.  These are
+parameters used by the standard IRAF curve fitting package \fBicfit\fR.
+The parameters are described in more detail in the following sections.
+
+In addition to the task parameters there are package parameters
+which affect \fBquadproc\fR.  These include the instrument and subset
+files, the text and plot log files, the output pixel datatype,
+the verbose parameter for logging to the terminal, and the backup
+prefix.  These are described in \fBquad\fR.
+
+Calibration images are specified by task parameters and/or in the
+input image list.  If more than one calibration image is specified
+then the first one encountered is used. Calibration images specified by
+task parameters take precedence over calibration images in the input list.
+These images also need not have a CCD image type parameter since the task
+parameter identifies the type of calibration image.  This method is
+best if there is only one calibration image for all images
+to be processed, almost always true for zero level and dark
+count images.  If no calibration image is specified by task parameter
+then calibration images in the input image list are identified and
+used.  This requires that the images have CCD image types recognized
+by the package.  This method is useful if one may simply say "*.imh"
+as the image list to process all images or if the images are broken
+up into groups, in "@" files for example, each with their own calibration
+frames.
+.sh
+2. Fixpix
+Regions of bad lines and columns may be replaced by linear
+interpolation from neighboring lines and columns when the parameter
+\fIfixpix\fR is set.  The bad regions are specified in a bad pixel
+file.  The file consists of lines with four fields, the starting and
+ending columns and the starting and ending lines.  Any number of
+regions may be specified. Currently, the coordinates given for the bad regions
+must be those that would be applicable if the CCD was used in SINGLE READOUT
+MODE, even if multi-readout images are being reduced. A task is being written
+to aid in the preparation of an appropriate bad-pixel file given measurements
+made on a raw multi-readout image.
+
+Comment lines beginning with the character '#' may be included. If a comment
+line preceding the bad regions contains the word "untrimmed" then the
+coordinate system refers to the original format of the images; i.e.  before 
+trimming.  If an image has been trimmed previously then the trim region
+specified in the image header is used to convert the coordinates in the bad
+pixel file to those of the trimmed image.  If the file does not contain the
+word "untrimmed" then the coordinate system must match that of the image
+being corrected; i.e. untrimmed coordinates if the image has not been
+trimmed and trimmed coordinates if the image has been trimmed.
+Standard bad pixel files should always be specified in terms of the original
+format.
+
+The bad pixel file may be specified explicitly with the parameter \fIfixfile\fR
+or indirectly if the parameter has the value "image".  In the latter case
+the instrument file must contain the name of the file.
+.sh
+3. Overscan
+The portion of the image used to determine the readout bias level is specified
+with the parameter \fBbiassec\fR. This may be an explicit image section, or it
+may be set to the special value "image". In the latter case the value given in
+the image header is used.  The image header value uses the entire overscan 
+strip without allowing any margin between the data section and the bias
+section.  Because Arcon uses a DC-coupled preamplifier the transition
+between data and overscan is very sharp indeed. Nonetheless, we recommend that
+you do skip the first few pixels of the overscan strip. To decide this issue
+for yourself, use implot to plot the average of several lines from a high 
+exposure level image such as a flat field. Expand the transition region 
+between data and overscan and decide how many pixels of the overscan are
+contaminated.
+
+In the case of multi-readout images, the way in which an explicit value for
+\fBbiassec\fR must be set, is unfortunately somewhat non-intuitive.  Currently,
+the value recorded in the image header is that which would be appropriate had
+the detector been read out using a single amplifier; an explicit image section
+must be specified in the same way. \fBQuadproc\fR calculates the sections
+to use for the sub-images corresponding to each readout based on such "single
+readout" sections. To determine the section you must enter, use \fBimhead\fR
+or \fBhselect\fR to determine the value of \fBbiassec\fR stored in the image 
+header. If this is, for instance,  "[1025:1060,1:1028]" then setting 
+\fBbiassec\fR = "[1029:1060,1:1028]" would leave  a margin of 4 pixels
+(1029 - 1025).  Note that if two readouts are used in the horizontal direction 
+(quad or serial-split dual readout) the overscan strip for each amplifier is
+only half as wide as that in single readout mode. Thus in the example a 15
+pixel (36 / 2 - 3) wide strip is used for each readout.
+
+If an overscan or prescan correction is specified (\fIoverscan\fR
+parameter) then the specified image section is averaged
+along the readout axis (\fIreadaxis\fR parameter) to form a
+correction vector.  A function is fit to this vector and for each readout
+line (image line or column) the function value for that line is
+subtracted from the image line.  The fitting function is generally
+either a constant (polynomial of 1 term) or a high order function
+which fits the large scale shape of the overscan vector.  Bad pixel
+rejection is also used to eliminate cosmic ray events.  The function
+fitting may be done interactively using the standard \fBicfit\fR
+iteractive graphical curve fitting tool.  Regardless of whether the fit
+is done interactively, the overscan vector and the fit may be recorded
+for later review in a metacode plot file named by the parameter
+\fIquad.plotfile\fR.  The mean value of the bias function is also recorded in
+the image header and log file.
+
+The overscan subtraction performed by \fBquadproc\fR corrects the 
+amplifier-to-amplifier differences in the bias level, so that no
+readout structure should be visible in processed zero images. However, you
+will still see the chequer board structure in flatfield and object exposures
+(unless the sky level is zero) because of gain difference between the
+amplifiers.
+.sh
+4. Trim
+When the parameter \fItrim\fR is set the input image will be trimmed to
+the image section given by the parameter \fItrimsec\fR. This may be an explicit
+image section, or it may be set to the special value "image". In the latter
+case the value given in the image header is used.  The image header value keeps
+the entire imaging section of the CCD.
+
+In the case of multi-readout images, the way in which an explicit value for
+\fBtrimsec\fR must be set, is unfortunately somewhat non-intuitive.  Currently,
+the value recorded in the image header is that which would be appropriate had
+the detector been read out using a single amplifier; an explicit image section
+must be specified in the same way. \fBQuadproc\fR calculates the sections
+to use for the sub-images corresponding to each readout based on such "single
+readout" sections. In addition one is currently restricted to trimming exactly
+the same number of columns from each side of the CCD; there is no such 
+restriction on the number of lines which can be trimmed from the top and bottom
+edges of the image. To determine the section you must enter, use \fBimhead\fR
+or \fBhselect\fR to determine the value of \fBtrimsec\fR stored in the image
+header. If this is, for instance, "[1:1024,1:1028]" then setting
+\fBtrimsec\fR = "[10:1015,20:998]" would trim 9 columns from the left and right
+edges and 19 and 29 lines from the bottom and top edges respectively. If you
+need to perform an asymmetric trim in the horizontal direction this can be
+done, after processing, by using \fBimcopy\fR to copy the required portion of
+the image.
+
+The trim section used for science images should, of course, be the same as 
+that used for the calibration images.
+.sh
+5. Zerocor
+After the readout bias is subtracted, as defined by the overscan or prescan
+region, there may still be a zero level bias.  This level may be two
+dimensional or one dimensional (the same for every readout line).  A
+zero level calibration is obtained by taking zero length exposures;
+generally many are taken and combined.  To apply this zero
+level calibration the parameter \fIzerocor\fR is set.  In addition if
+the zero level bias is only readout dependent then the parameter \fIreadcor\fR
+is set to reduce two dimensional zero level images to one dimensional
+images.  The zero level images may be specified by the parameter \fIzero\fR
+or given in the input image list (provided the CCD image type is defined).
+
+When the zero level image is needed to correct an input image it is checked
+to see if it has been processed and, if not, it is processed automatically.
+Processing of zero level images consists of bad pixel replacement,
+overscan correction, trimming, and averaging to one dimension if the
+readout correction is specified.
+.sh
+6. Darkcor
+Dark counts are subtracted by scaling a dark count calibration image to
+the same exposure time as the input image and subtracting.  The
+exposure time used is the dark time which may be different than the
+actual integration or exposure time.  A dark count calibration image is
+obtained by taking a very long exposure with the shutter closed; i.e.
+an exposure with no light reaching the detector.  The dark count
+correction is selected with the parameter \fIdarkcor\fR and the dark
+count calibration image is specified either with the parameter
+\fIdark\fR or as one of the input images.  The dark count image is
+automatically processed as needed.  Processing of dark count images
+consists of bad pixel replacement, overscan and zero level correction,
+and trimming.
+.sh
+7. Flatcor
+The relative detector pixel response is calibrated by dividing by a
+scaled flat field calibration image.  A flat field image is obtained by
+exposure to a spatially uniform source of light such as an lamp or
+twilight sky.  Flat field images may be corrected for the spectral
+signature in spectroscopic images (see \fBresponse\fR and
+\fBapnormalize\fR), or for iillumination effects (see \fBmkillumflat\fR
+or \fBmkskyflat\fR).  For more on flat fields and iillumination corrections
+see \fBflatfields\fR.  The flat field response is dependent on the
+wavelength of light so if different filters or spectroscopic wavelength
+coverage are used a flat field calibration for each one is required.
+The different flat fields are  automatically selected by a subset
+parameter (see \fBsubsets\fR).
+
+Flat field calibration is selected with the parameter \fBflatcor\fR
+and the flat field images are specified with the parameter \fBflat\fR
+or as part of the input image list.  The appropriate subset is automatically
+selected for each input image processed.  The flat field image is
+automatically processed as needed.  Processing consists of bad pixel
+replacement, overscan subtraction, zero level subtraction, dark count
+subtraction, and trimming.  Also if a scan mode is used and the
+parameter \fIscancor\fR is specified then a scan mode correction is
+applied (see below).  The processing also computes the mean of the
+flat field image which is used later to scale the flat field before
+division into the input image.  For scan mode flat fields the ramp
+part is included in computing the mean which will affect the level
+of images processed with this flat field.  Note that there is no check for
+division by zero in the interest of efficiency.  If division by zero
+does occur a fatal error will occur.  The flat field can be fixed by
+replacing small values using a task such as \fBimreplace\fR or
+during processing using the \fIminreplace\fR parameter.  Note that the
+\fIminreplace\fR parameter only applies to flat fields processed by
+\fBquadproc\fR.
+.sh
+8. Illumcor
+CCD images processed through the flat field calibration may not be
+completely flat (in the absence of objects).  In particular, a blank
+sky image may still show gradients.  This residual nonflatness is called
+the iillumination pattern.  It may be introduced even if the detector is
+uniformly illuminated by the sky because the flat field lamp
+iillumination may be nonuniform.  The iillumination pattern is found from a
+blank sky, or even object image, by heavily smoothing and rejecting
+objects using sigma clipping.  The iillumination calibration image is
+divided into the data being processed to remove the iillumination
+pattern.  The iillumination pattern is a function of the subset so there
+must be an iillumination correction image for each subset to be
+processed.  The tasks \fBmkillumcor\fR and \fBmkskycor\fR are used to
+create the iillumination correction images.  For more on iillumination
+corrections see \fBflatfields\fR.
+
+An alternative to treating the iillumination correction as a separate
+operation is to combine the flat field and iillumination correction
+into a corrected flat field image before processing the object
+images.  This will save some processing time but does require creating
+the flat field first rather than correcting the images at the same
+time or later.  There are two methods, removing the large scale
+shape of the flat field and combining a blank sky image iillumination
+with the flat field.  These methods are discussed further in the
+tasks which create them; \fBmkillumcor\fR and \fBmkskycor\fR.
+.sh
+9. Fringecor
+There may be a fringe pattern in the images due to the night sky lines.
+To remove this fringe pattern a blank sky image is heavily smoothed
+to produce an iillumination image which is then subtracted from the
+original sky image.  The residual fringe pattern is scaled to the
+exposure time of the image to be fringe corrected and then subtracted.
+Because the intensity of the night sky lines varies with time an
+additional scaling factor may be given in the image header.
+The fringe pattern is a function of the subset so there must be
+a fringe correction image for each subset to be processed.
+The task \fBmkfringecor\fR is used to create the fringe correction images.
+.sh
+10. Readcor
+If a zero level correction is desired (\fIzerocor\fR parameter)
+and the parameter \fIreadcor\fR is yes then a single zero level
+correction vector is applied to each readout line or column.  Use of a
+readout correction rather than a two dimensional zero level image
+depends on the nature of the detector or if the CCD is operated in
+longscan mode (see below).  The readout correction is specified by a
+one dimensional image (\fIzero\fR parameter) and the readout axis
+(\fIreadaxis\fR parameter).  If the zero level image is two dimensional
+then it is automatically processed to a one dimensional image by
+averaging across the readout axis.  Note that this modifies the zero
+level calibration image.
+.sh
+11. Scancor
+CCD detectors may be operated in several modes in astronomical
+applications.  The most common is as a direct imager where each pixel
+integrates one point in the sky or spectrum.  However, the design of most CCD's
+allows the sky to be scanned across the CCD while shifting the
+accumulating signal at the same rate.  \fBQuadproc\fR provides for two
+scanning modes called "shortscan" and "longscan".  The type of scan
+mode is set with the parameter \fIscanmode\fR.
+
+In "shortscan" mode the detector is scanned over a specified number of
+lines (not necessarily at sideral rates).  The lines that scroll off
+the detector during the integration are thrown away.  At the end of the
+integration the detector is read out in the same way as an unscanned
+observation.  The advantage of this mode is that the small scale flat
+field response is averaged in one dimension over the number of lines
+scanned.  A flat field may be observed in the same way in which case
+there is no difference in the processing from unscanned imaging and the
+parameter \fIscancor\fR should be no.  However, one obtains an increase
+in the statistical accuracy of the flat fields if they are not scanned
+during the observation but digitally scanned during the processing.  In
+shortscan mode with \fIscancor\fR set to yes, flat field images are
+digitally scanned, if needed, by the specified number of scan lines
+(\fInscan\fR parameter).
+
+In "longscan" mode the detector is continuously read out to produce
+an arbitrarily long strip.  Provided data which has not passed over
+the entire detector is thrown away, the flat field corrections will
+be one dimensional.  If \fIscancor\fR is specified and the
+scan mode is "longscan" then a one dimensional flat field correction
+will be applied.  If the specified flat field (\fIflat\fR parameter)
+is a two dimensional image then when the flat field image is processed
+it will be averaged across the readout axis to form a one dimensional
+correction image.
+.sh
+12. Outline of Processing Steps
+
+Because of the special handling required for multi-readout data
+\fBquadproc\fR internally reduces the data in two stages.
+
+.ls Stage one
+The operations which may be performed in the first stage are badpixel
+correction, determination and subtraction of the readout bias level, and
+trimming. This stage is only performed if one or more of the \fBfixpix\fR,
+\fBoverscan\fR or \fBtrim\fR flags is set to yes.
+
+First, all the calibration images which will be needed are identified. Any
+which were obtained in multi-readout mode AND which have not already been
+trimmed are selected for processing during this stage. This is necessary to
+ensure that the calibration images will be reduced properly. Similarly, the
+input list is searched and all multi-readout images, which have not already
+been trimmed are selected for processing.
+
+The images selected in this way are then processed sequentially. Each is split
+into separate images one for each amplifier. The values of the trimsec and
+biassec header keywords for each of these sub-images are set as required. 
+\fBccdproc\fR is then run to correct bad pixels, determine and subtract the
+readout bias and trim each sub-image. Finaly, the pieces are glued back 
+together again to form the complete image and the header information is 
+tidied up. The resulting image is initialy created as a temporary image.
+When stage one processing is complete the original image is deleted (or
+renamed using the specified backup prefix) and the corrected image replaces
+the original image.  Using a temporary image protects the data in the
+event of an abort or computer failure.  Keeping the original image name
+eliminates much of the record keeping and the need to generate new
+image names.
+.le
+.ls Stage two
+\fBCcdproc\fR is now run a second time to process ALL input images. For those
+images which were NOT selected for processing during stage one all the selected
+processing steps are carried out during this second pass. For those which were
+selected in stage one only the remaining processing steps will be performed.
+Again the output processed image is initialy created as a temporary image.
+When stage two processing is complete the original image is deleted (or
+renamed using the specified backup prefix) and the corrected image replaces
+the original image.
+.le
+
+The following difference in the behaviour of \fBquadproc\fB and \fBccdproc\fR
+should be noted:
+.ls
+Because it is a script, and because it is reads and writes each image several
+times during processing \fBquadproc\fR is not very efficiant. This will be 
+rectified when the present prototype code is replaced by the final version.
+.le
+.ls
+If backups are enable then \fBquadproc\fR will produce two intermediate 
+images for every input image which is modified in both processing stages.
+These backup images may quickly fill up the available disk space.
+.le
+.ls
+Images may not be processed in the order they appear in the input list. Stage
+one processing is performed (if necessary) on all calibration images, then on
+all images in the input list. Any images which have already been trimmed, or
+which were taken in mono-readout mode will be skipped. Stage two processing is 
+then done sequentially on all images in the input list.
+.le
+.sh
+13. Processing Arithmetic
+The \fBquadproc\fR task has two data paths, one for real image pixel datatypes
+and one for short integer pixel datatype.  In addition internal arithmetic
+is based on the rules of FORTRAN.  For efficiency there is
+no checking for division by zero in the flat field calibration.
+The following rules describe the processing arithmetic and data paths.
+
+.ls (1)
+If the input, output, or any calibration image is of type real the
+real data path is used.  This means all image data is converted to
+real on input.  If all the images are of type short all input data
+is kept as short integers.  Thus, if all the images are of the same type
+there is no datatype conversion on input resulting in greater
+image I/O efficiency.
+.le
+.ls (2)
+In the real data path the processing arithmetic is always real and,
+if the output image is of short pixel datatype, the result
+is truncated.
+.le
+.ls (3)
+The overscan vector and the scale factors for dark count, flat field,
+iillumination, and fringe calibrations are always of type real.  Therefore,
+in the short data path any processing which includes these operations
+will be coerced to real arithmetic and the result truncated at the end
+of the computation.
+.le
+.sh
+14. In the Absence of Image Header Information
+The tasks in the \fBquad\fR package are most convenient to use when
+the CCD image type, subset, and exposure time are contained in the
+image header. This is true for all data obtained with Arcon.  The ability to
+redefine which header parameters contain this information makes it possible
+to use the package at many different observatories (see \fBinstruments\fR). 
+However, in the absence of any image header information the tasks may still
+be used effectively.  There are two ways to proceed.  One way is to use
+\fBccdhedit\fR to place the information in the image header.
+
+The second way is to specify the processing operations more explicitly
+than is needed when the header information is present.  The parameter
+\fIccdtype\fR is set to "" or to "none".  The calibration images are
+specified explicitly by task parameter since they cannot be recognized
+in the input list.  Only one subset at a time may be processed.
+
+If dark count and fringe corrections are to be applied the exposure
+times must be added to all the images.  Alternatively, the dark count
+and fringe images may be scaled explicitly for each input image.  This
+works because the exposure times default to 1 if they are not given in
+the image header.
+.ih
+EXAMPLES
+The user's \fBguide\fR presents a tutorial in the use of this task.
+
+1. In general all that needs to be done is to set the task parameters
+and enter
+
+	cl> quadproc *.imh &
+
+This will run in the background and process all images which have not
+been processed previously.
+.ih
+SEE ALSO
+quadformat, ccdproc, instruments, ccdtypes, flatfields, icfit, quad, guide,
+mkillumcor, mkskycor, mkfringecor
+.endhelp

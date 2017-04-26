@@ -1,0 +1,85 @@
+# Make the IMFORT library.
+
+$checkout libimfort.a lib$
+$update   libimfort.a
+$checkin  libimfort.a lib$
+$exit
+
+libimfort.a:
+	#$set XFLAGS	= "$XFLAGS -/DBLD_KERNEL"
+	$set XFLAGS	= "$(XFLAGS) -/DBLD_KERNEL"
+	@db
+
+	bfio.x		imfort.h <config.h> <mach.h> <fio.h>
+	clargs.x	imfort.h
+	imacck.x	imfort.h
+	imaddk.x	imfort.h
+	imakwb.x	imfort.h
+	imakwc.x	imfort.h
+	imakwd.x	imfort.h
+	imakwi.x	imfort.h
+	imakwr.x	imfort.h
+	imclos.x	imfort.h
+	imcrea.x	
+	imcrex.x	imfort.h oif.h <fio.h> <imhdr.h> <mach.h>
+	imdele.x	
+	imdelk.x	imfort.h
+	imdelx.x	imfort.h <imhdr.h> <protect.h>
+	imemsg.x	imfort.h <imhdr.h>
+	imfdir.x	oif.h
+	imfgpfn.x	oif.h
+	imflsh.x	imfort.h
+	imfmkpfn.x	imfort.h oif.h <imhdr.h>
+	imfparse.x	oif.h
+	imftrans.x	oif.h
+	imfupdhdr.x	imfort.h oif.h <imhdr.h>
+	imgkwb.x	imfort.h
+	imgkwc.x	imfort.h
+	imgkwd.x	imfort.h
+	imgkwi.x	imfort.h
+	imgkwr.x	imfort.h
+	imgl1r.x	imfort.h <imhdr.h>
+	imgl1s.x	imfort.h <imhdr.h>
+	imgl2r.x	imfort.h <imhdr.h>
+	imgl2s.x	imfort.h <imhdr.h>
+	imgl3r.x	imfort.h <imhdr.h>
+	imgl3s.x	imfort.h <imhdr.h>
+	imgs1r.x	imfort.h <imhdr.h>
+	imgs1s.x	imfort.h <imhdr.h>
+	imgs2r.x	imfort.h <imhdr.h>
+	imgs2s.x	imfort.h <imhdr.h>
+	imgs3r.x	imfort.h <imhdr.h>
+	imgs3s.x	imfort.h <imhdr.h>
+	imgsiz.x	imfort.h <imhdr.h>
+	imhcpy.x	imfort.h <imhdr.h>
+	imioff.x	oif.h <config.h> <imhdr.h> <mach.h>
+	imokwl.x	imfort.h
+	imopen.x	
+	imopnc.x	imfort.h <imhdr.h>
+	imopnx.x	imfort.h oif.h <config.h> <imhdr.h> <mach.h>
+	impixf.x	imfort.h <imhdr.h>
+	impkwb.x	imfort.h
+	impkwc.x	imfort.h
+	impkwd.x	imfort.h
+	impkwi.x	imfort.h
+	impkwr.x	imfort.h
+	impl1r.x	imfort.h <imhdr.h>
+	impl1s.x	imfort.h <imhdr.h>
+	impl2r.x	imfort.h <imhdr.h>
+	impl2s.x	imfort.h <imhdr.h>
+	impl3r.x	imfort.h <imhdr.h>
+	impl3s.x	imfort.h <imhdr.h>
+	imps1r.x	imfort.h <imhdr.h>
+	imps1s.x	imfort.h <imhdr.h>
+	imps2r.x	imfort.h <imhdr.h>
+	imps2s.x	imfort.h <imhdr.h>
+	imps3r.x	imfort.h <imhdr.h>
+	imps3s.x	imfort.h <imhdr.h>
+	imrdhdr.x	imfort.h imhv1.h imhv2.h oif.h <imhdr.h> <mach.h>
+	imrnam.x	imfort.h oif.h <imhdr.h>
+	imswap.x	imfort.h <mach.h>
+	imtypk.x	imfort.h
+	imwpix.x	imfort.h <imhdr.h> <mach.h>
+	imwrhdr.x	imfort.h imhv1.h imhv2.h oif.h <imhdr.h> <mach.h>
+	mii.x		<mii.h>
+	;

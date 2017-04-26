@@ -1,0 +1,430 @@
+.help polymark May00 noao.digiphot.apphot
+.ih
+NAME
+polymark -- create or review polygon and coordinate lists for input to the
+polyphot task
+.ih
+USAGE
+polymark image
+.ih
+PARAMETERS
+.ls images
+The list of input images used to define the polygons.
+.le
+.ls coords = "default"
+The input / output center positions file. The center positions for each
+polygonal aperture are read from or written to coords. There may more than one
+center position per polygon. Center positions are written to coords 1 center
+position per line. When the current polygon changes POLYMARK inserts a line
+containing a single ';' after the last center position. If coords is
+"default", "dir$default" or a directory specification then a center position
+file name of the form dir$root.extension.version is constructed, where dir is
+the directory, root is the root image name, extension is "coo" and version is
+the next available version of the file. 
+.le
+.ls polygons = "default"
+The name of the polygons file. The vertices of each polygon  are read from or
+written to the polygons file. The polygons file contains a list of the
+polygon vertices. Each vertex list is terminated by a line containing a  ';'
+after the last vertex. If polygons is "default", "dir$default" or a directory
+specification then an output name of the form dir$root.extension.version is
+constructed, where dir is the directory, root is the root image name, extension
+is "ver" and the version is next available version of the file. The number of
+polygon files must be equal to the number of image files.
+.le
+.ls icommands = ""
+The image cursor or image cursor command file.
+.le
+.ls gcommands = ""
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from or written
+to \fIcoords\fR and \fIpolygons\fR. The image header coordinate system is
+used to transform from the input coordinate system to the "logical" pixel
+coordinate system used internally, and from the internal "logical" pixel
+coordinate system to the output coordinate system. The input coordinate
+system options are "logical", tv", "physical", and "world". The output
+coordinate system options are "logical", "tv", and "physical". The image
+cursor coordinate system is assumed to be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls graphics = ")_.graphics"
+The standard graphics device.
+.le
+.ls display = ")_.display"
+The default display device.  Display may be set to the apphot package
+parameter value (the default), "yes", or "no.  By default graphics overlay is
+disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables
+graphics overlay with the IMD graphics kernel.  Setting display to
+"stdgraph" enables POLYMARK to work interactively from a contour plot.
+.le
+
+.ih
+DESCRIPTION
+
+POLYMARK creates and / or displays center position and polygons files
+suitable for input to POLYPHOT. For each image in the input list POLYMARK
+creates a polygons file \fIpolygons\fR and center positions file \fIcoords\fR, 
+if these do not already exist. The format of the polygons and center
+position files is described in the OUTPUT section. 
+
+Polygonal apertures are defined and drawn on the image display using
+the image display cursor and then shifted to the desired center
+using the image display cursor. At any point in the marking process
+the user may rewind the polygon and coordinate file and draw the previously
+defined polygons on the display.
+
+The coordinates read from \fIpolygons\fR or  \fIcoords\fR are assumed to be
+in coordinate system defined by \fIwcsin\fR. The options are "logical", "tv",
+"physical", and "world" and the transformation from the input coordinate
+system to the internal "logical" system is defined by the image coordinate
+system.  The simplest default is the "logical" pixel system. Users working on
+with image sections but importing pixel coordinate lists generated from the
+parent image must use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIpolygons\fR or \fIcoords\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv", and
+"physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and POLYMARK is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because POLYMARK
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
+.ih
+CURSOR COMMANDS
+
+The following interactive keystroke and colon commands are available.
+
+.nf
+	Interactive Keystroke Commands
+
+?	Print help
+:	Colon commands 
+d	Plot radial profile of star near cursor
+g	Define the current polygonal aperture
+f	Draw the current polygon on the display
+spbar	Draw the current polygon on the display, output the polygon
+r	Rewind the polygon list
+m	Draw the next polygon in the polygon list on the display
+l	Draw all the remaining polygons in the list on the display
+q	Exit
+
+	Colon commands
+
+:m [n]	Draw the next [nth] polygon in the polygon list on the display
+.fi
+
+.ih
+OUTPUT
+
+A sample polygons file and accompanying coordinates file is listed below.
+
+.nf
+	# Sample Polygons File (2 polygons)
+
+	200.5  200.5
+	300.5  200.5
+	300.5  300.5
+	200.5  300.5
+	;
+	100.4  100.4
+	120.4  100.4
+	120.4  120.4
+	100.4  120.4
+	;
+.fi
+
+.nf
+	# Sample Coordinates File (2 groups, 1 for each polygon)
+
+	123.4  185.5
+	110.4  130.4
+	150.9  200.5
+	;
+	85.6   35.7
+	400.5  300.5
+	69.5   130.5
+	;
+.fi
+
+.ih
+EXAMPLES
+
+1. Create a coordinate list and polygon file using the image display and
+image display cursor. Use polymark to both create and display the 
+polygon and polygon center lists.
+
+.nf
+	ap> display dev$ypix 1 fi+ 
+
+	... display the image
+
+	ap> polymark dev$ypix display=imdg
+
+	... type ? for an optional help page 
+
+	... type g to enter the "define a polygon" menu
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex, and repeat for each vertex
+	... type q to quit the "define a polygon" menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar to record the polygon
+	... repeat for all desired polygon centers
+
+	... type g to define the next polygon
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar
+	... repeat for all desired polygon centers
+
+	... type q to quit and q to confirm the quit
+
+	... output will appear in ypix.coo.1 and ypix.ver.1
+
+
+	ap> display dev$ypix 2 fi+ 
+
+	... display the image
+
+	ap> polymark dev$ypix coords=ypix.coo.1 polygons=ypix.ver.1 \
+	    display=imdg
+
+	... type m to mark the first polygon / polygon center on the display
+
+	... type m to mark the next polygon / polygon center on the display
+
+	... type l to mark the remaining polygons
+
+	... type q to quit and q to confirm the quit
+
+
+	ap> display dev$ypix 2 fi+ 
+
+	... redisplay the image
+
+	ap> polymark dev$ypix coords="" polygons=ypix.ver.1 \
+	    display=imdg
+
+	... type l to mark the polygon list, note that since there is
+	    no coords file the polygons are not shifted
+
+	... type q to quit and q to confirm the quit
+.fi
+
+
+2. Repeat the previous example using an image section.
+
+.nf
+	ap> display dev$ypix[150:450,150:450] 1 fi+ 
+
+	... display the image
+
+
+	ap> polymark dev$ypix[150:450,150:450]] display=imdg wcsout=tv
+
+	... type ? for an optional help page 
+
+	... type g to enter the "define a polygon" menu
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex, and repeat for each vertex
+	... type q to quit the "define a polygon" menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar to record the polygon
+	... repeat for all desired polygon centers
+
+	... type g to define the next polygon
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar
+	... repeat for all desired polygon centers
+
+	... type q to quit and q to confirm the quit
+
+	... output will appear in ypix.coo.2 and ypix.ver.2
+
+
+	ap> display dev$ypix[150:450,150:450] 2 fi+ 
+
+	... display the image
+
+
+	ap> polymark dev$ypix[150:450,150:450] coords=ypix.coo.2 \
+            polygons=ypix.ver.2 display=imdg wcsin=tv
+
+	... type m to mark the first polygon / polygon center on the display
+
+	... type m to mark the next polygon / polygon center on the display
+
+	... type l to mark the remaining polygons
+
+.fi
+
+
+3. Repeat example 1 using a contour plot instead of the image display.
+
+.nf
+	ap> show stdimcur
+
+	... record the default value of stdimcur
+
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour dev$ypix
+
+	... draw a contour plot on the screen
+
+	ap> contour dev$ypix >G ypix.plot1
+
+	... store the contour plot of dev$ypix in the file ypix.plot1
+
+	ap> polymark dev$ypix display=stdgraph
+
+	... type g to enter the define a polygon menu
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex, and repeat for each vertex
+	... type q to quit the define a polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar to record the polygon
+	... repeat for all desired polygon centers
+
+	... type g to define the next polygon
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the define a polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar
+	... repeat for all desired polygon centers
+
+	... type r to rewind the coordinate and polygon lists
+
+	... type :.read ypix.plot1 to reread the contour plot
+
+	... type l to display all the polygons ...
+
+	... type q to quit and q again to confirm the  quit
+
+	... output will appear in ypix.ver.3 and ypix.coo.3
+
+	ap> contour dev$ypix
+
+	... redraw the contour plot
+
+	ap> polymark dev$ypix coords="ypix.coo.3" polygons=ypix.ver.3 \
+	    display=stdgraph
+
+	ap> set stdimcur = <default>
+
+	... reset the value of the stdimcur parameter
+.fi
+
+.ih
+BUGS
+
+It is the responsibility of the user to make sure that the image displayed
+in the image display is the same as the image specified by the image parameter.
+
+Commands which draw to the image display are disabled by default.  To enable
+graphics overlay on the image display, set the display parameter to "imdr",
+"imdg", "imdb", or "imdy" to get red, green, blue or yellow overlays. It
+may be necessary to run gflush and to redisplay the image to get the overlays
+position correctly.
+
+There are no restrictions on the shape of the polygon but the vertices
+must be listed in order either clockwise or counterclockwise in the
+polygons file.
+
+It is not necessary to close the polygon when drawing on the display.
+POLYMARK will complete the polygon for you.
+
+.ih
+SEE ALSO
+polyphot
+.endhelp

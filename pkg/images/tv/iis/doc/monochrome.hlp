@@ -1,0 +1,18 @@
+.help monochrome Jan86 images.tv.iis
+.ih
+NAME
+monochrome -- select monochrome enhancement
+.ih
+USAGE
+monochrome
+.ih
+DESCRIPTION
+Set the display monitor to display monochrome grey levels by setting
+the lookup tables for each color gun to the same values.
+.ih
+EXAMPLES
+	cl> monochrome
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -1,0 +1,81 @@
+.help revisions Jun88 noao.twodspec
+.nf
+twodspec$multispec/peaks.x
+twodspec$multispec/t_fitfunc.x
+    The 'rank' and 'samples' pointers were being used with Memr (5/4/13, MJF)
+
+twodspec$mkpkg
+    Commented out multispec package.
+    (2/14/92, Valdes)
+
+twodspec$twodspec.cl
+twodspec$twodspec.men
+    The SETDISP  task is now defunct.  (8/28/91, Valdes)
+
+twodspec$twodspec.cl
+twodspec$twodspec.men
+twodspec$twodspec.hd
+    Commented out multispec package.  Some day it may be resurrected.
+    (8/23/90, Valdes)
+
+====
+V2.9
+====
+
+twodspec$twodspec.cl
+twodspec$twodspec.men
+    Added SETAIRMASS and OBSERVATORY tasks. (6/2/89, Valdes)
+
+twodspec$twodspec.cl
+    Reference new ONEDSPEC executable for SETDISP.  (4/7/88 Valdes)
+
+====
+V2.5
+====
+    
+noao$twodspec/apextract/*
+    Valdes, September 16, 1986
+    1.  A new version of the package has been installed.  It is very
+	different from the old version.  The user parameter files must
+	be unlearned.
+
+twodspec:  Valdes, July 21, 1986:
+    1.  The older version of APEXTRACT has been removed.
+
+=============================================
+STScI pre-release and Version 2.3 SUN release
+=============================================
+
+twodspec:  Valdes, June 20, 1986:
+    1.  New APEXTRACT installed.  This version includes background
+	subtraction and new ICFIT.  The older version is still available.
+
+twodspec:  Valdes, March 27, 1986:
+    1.  Replaced SETIMHDR with SETDISP.  This task is now used in both
+	ONEDSPEC and TWODSPEC.
+
+twodspec:  Valdes, March 21, 1986:
+    1.  New aperture extraction package APEXTRACT.  This replaces EXTRACT
+	and TRACE.
+    2.  SETIMHDR moved from LONGSLIT to TWODSPEC.  It is my intention that
+	all tasks in this package (except background which is based on a
+	script in generic) use the header parameter DISPAXIS.  This means
+	both APEXTRACT and LONGSLIT.  MULTISPEC will probably not change since
+	it is an ancient package.
+
+===========
+Release 2.2
+===========
+From Valdes February 10, 1986:
+
+1.  The weighting options have been changed.  There are only two now;
+profile and variance.
+------
+From Valdes January 10, 1986:
+
+1.  New EXTRACT and TRACE tasks replace earlier EXTRACT.
+------
+From Valdes December 31, 1985:
+
+1.  The task EXTRACT has been made a part of the TWODSPEC package.
+.endhelp

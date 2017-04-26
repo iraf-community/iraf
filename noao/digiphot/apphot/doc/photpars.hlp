@@ -1,0 +1,102 @@
+.help photpars May00 noao.digiphot.apphot
+.ih
+NAME
+photpars -- edit the photometry parameters
+.ih
+USAGE
+photpars
+.ih
+PARAMETERS
+.ls weighting = "constant"
+The type of weighting for the WPHOT task. The weighting parameter is
+ignored by the PHOT task. The options are:
+.ls constant
+Uniform weights of 1 for each pixel are used.
+.le
+.ls cone
+A conical weighting function of full width half maximum \fIfwhmpsf\fR as
+defined in the DATAPARS parameter set is used.
+.le
+.ls gauss
+A Gaussian weighting function of full width half maximum \fIfwhmpsf\fR as
+defined in the DATAPARS parameter set is used.
+.le
+.le
+.ls apertures = "3" (scale units)
+A list of aperture radii in units of the  scale parameter or the name of the
+file containing the list of aperture radii. List elements may be separated by
+whitespace or commas. A range syntax of the form ap1:apN:apstep is also
+supported. 
+.le
+.ls zmag = 25.00
+The zero point offset for the magnitude scale.
+.le
+.ls mkapert = no
+Mark the photometry apertures on the displayed image ?
+.le
+
+.ih
+DESCRIPTION
+
+The integral of the flux within the circular apertures specified by
+\fIapertures\fR is computed by summing pixels in the aperture with
+the specified weighting function \fIweighting\fR. The fraction of each pixel
+lying within the aperture is computed by an approximation and all the
+approximations are summed.  The zero point of the magnitude
+scale is determined by \fIzmag\fR.
+
+\fRApertures\fR is specified in units of the image scale. If \fIscale\fR
+is specified in units of the half-width at half-maximum of the point
+spread function the aperture per pixel  a single value of apertures
+will work well on images with differing psfs.
+
+.ih
+EXAMPLES
+
+1. List the PHOTPARS parameters.
+
+.nf
+    da> lpar photpars
+.fi
+
+2. Edit the PHOTPARS parameters.
+
+.nf
+    da> photpars
+.fi
+
+3. Edit the PHOTPARS parameters from within the PHOT task.
+
+.nf
+    da> epar phot
+
+	... edit a few phot parameters
+
+	... move to the photpars parameter and type :e
+
+	... edit the photpars parameters and type :wq
+
+	... finish editing the phot parameters and type :wq
+
+.fi
+
+4. Save the current PHOTPARS parameter set in a text file photnite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> photpars
+
+	... edit some parameters
+
+	... type ":w photnite1.par"  from within epar
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+phot,wphot,radprof
+.endhelp

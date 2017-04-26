@@ -1,0 +1,77 @@
+.help mslist Jul84 noao.twodspec.multispec
+.ih
+NAME
+mslist -- List entries in a MULTISPEC database
+.ih
+USAGE
+mslist image keyword lines spectra
+.ih
+PARAMETERS
+.ls image
+Image whose MULTISPEC database entries are to be listed.
+.le
+.ls keyword
+Keyword for the database entry to be listed.  The keywords are:
+.ls header
+List general header information.
+.le
+.ls comments
+List the comments.
+.le
+.ls samples
+List the sample image lines.
+.le
+.ls x0
+List the spectra positions for the specified sample lines and spectra.
+.le
+.ls i0
+List the model profile scales for the specified sample lines and spectra.
+.le
+.ls s0, s1, or s2
+List the gauss5 model shape parameter s0, s1, or s2 for the specified sample
+lines and spectra.
+.le
+.ls gauss5
+List the gauss5 model parameters x0, i0, s0, s1, and s2 for the specified
+sample lines and spectra.
+.le
+.ls x0 spline
+List the spline evaluation of the spectra positions for the specified
+image lines and spectra.
+.le
+.ls s0 spline, s1 spline, or s2 spline
+List the spline evaluation of the gauss5 model shape parameters s0, s1, or s2
+for the specified image lines and spectra.
+.le
+.le
+.ls lines
+Lines to be listed.  For the entries x0, i0, s0, s1, s2, and gauss5 the
+lines refer only to the sample image lines. For the spline entries the
+lines refer to the image lines at which the spline is to be evaluated.
+.le
+.ls spectra
+Spectra to be listed.
+.le
+.ls titles = no
+Print additional titles?
+.le
+.ih
+DESCRIPTION
+This task is a general MULTISPEC database listing tool.  A keyword is selected
+and the referenced data is listed.  Some entries require the specification of
+the desired sample or image lines and the desired spectra.
+.ih
+EXAMPLES
+To list the spectra positions for spectrum 3 at all the sample lines:
+
+	cl> mslist image x0 "*" 3
+
+To list the model profile scale parameter for sample line 1:
+
+	cl> mslist image i0 1 "*"
+
+To list the gauss5 model parameters for spectra 2 and 3 and sample lines 5
+and 7:
+
+	cl> mslist image gauss5 "5,7" "2-3" titles+
+.endhelp

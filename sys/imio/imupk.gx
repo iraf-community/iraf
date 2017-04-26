@@ -1,0 +1,34 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# IMUPK? -- Convert an array of pixels of datatype DTYPE into the datatype
+# specified by the IMUPK? suffix character.
+
+procedure imupk$t (a, b, npix, dtype)
+
+PIXEL	b[npix]
+int	a[npix], npix, dtype
+
+pointer	bp
+
+begin
+	switch (dtype) {
+	case TY_USHORT:
+	    call achtu$t (a, b, npix)
+	case TY_SHORT:
+	    call achts$t (a, b, npix)
+	case TY_INT:
+	    call achti$t (a, b, npix)
+	case TY_LONG:
+	    call achtl$t (a, b, npix)
+	case TY_REAL:
+	    call achtr$t (a, b, npix)
+	case TY_DOUBLE:
+	    call achtd$t (a, b, npix)
+	case TY_COMPLEX:
+	    call achtx$t (a, b, npix)
+	default:
+	    call error (1, "Unknown datatype in imagefile")
+	}
+end
+
+

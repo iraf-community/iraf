@@ -1,0 +1,36 @@
+.TH POLFIT 3M
+.SH NAME
+polfit
+.SH DESCRIPTION
+subroutine polfit.f 
+
+source
+  Bevington, pages 140-142.
+
+purpose
+  make least-squares fit to data with a polynomial curve
+    y = a(1) + a(2)*x + a(3)*x**2 + a(3)*x**3 + . . .
+
+usage 
+  call polfit (x, y, sigmay, npts, nterms, mode, a, chisqr)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  sigmay - array of standard deviations for y data points
+  npts   - number of pairs of data points
+  nterms - number of coefficients (degree of polynomial + 1)
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  a      - array of coefficients of polynomial
+  chisqr - reduced chi square for fit 
+
+subroutines and function subprograms required 
+  determ (array, norder)
+    evaluates the determinant of a symetrical
+      two-dimension matrix of order norder
+
+comments
+  valid for nterms up to 10

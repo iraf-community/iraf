@@ -1,0 +1,59 @@
+.help revisions Dec94 noao.imred.kpnocoude
+.nf
+
+=====
+V2.12
+=====
+
+imred$kpnocoude/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
+iimred$kpnocoude/doc/do3fiber.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+imred$kpnocoude/demos/mkdo3fiber.cl
+imred$kpnocoude/demos/mkdoslit.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$kpnocoude/identify.par
+    Added the new units parameter. (3/11/97, Valdes)
+
+imred$kpnocoude/kpnocoude.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$kpnocoude/sparams.par
+    Changed match from 0.2 to -3.  (4/5/96, Valdes)
+
+imred$kpnocoude/do3fiber.cl
+imred$kpnocoude/do3fiber.par
+imred$kpnocoude/params.par
+imred$kpnocoude/doc/do3fiber.hlp
+imred$kpnocoude/doc/do3fiber.ms
+    Added crval/cdelt parameters used in new version with automatic arc
+    line identification.  (4/5/96, Valdes)
+
+imred$kpnocoude/do3fiber.cl
+    The script needed to be modifed for the extra argument to proc for
+    sky alignment.  The sky alignment option is not used in DO3FIBER.
+    (7/19/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+kpnocoude$kpnocoude.cl
+kpnocoude$kpnocoude.men
+    1. Added background, illumination, response, apflatten, apnormalize.
+    2. Renamed fiber response task to "fibresponse".
+    (12/29/94, Valdes)
+
+.endhelp

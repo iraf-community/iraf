@@ -1,0 +1,707 @@
+.help xregister Dec98 images.immatch
+.ih
+NAME
+xregister -- register 1 and 2D images using X-correlation techniques
+.ih
+USAGE
+xregister input reference regions shifts
+.ih
+PARAMETERS
+.ls input
+The list of input images to be registered.
+.le
+.ls reference
+The list of reference images to which the input images are to be registered.
+The number of reference images must be one or equal to the number of input
+images.
+.le
+.ls regions
+The list of reference image region(s) used to compute the 
+x and y shifts.
+\fIRegions\fR may be: 1) a list of one or more image sections
+separated by whitespace, 2) the name of a text file containing a list
+of one or more image sections separated by whitespace and/or newlines,
+3) a string of the form "grid nx ny" defining a grid of nx by ny
+equally spaced and sized image sections spanning the entire image. Shifts are
+computed for each specified region individually and averaged to produce the
+final x and y shift.
+.le
+.ls shifts
+The name of the text file where the computed x and y shifts 
+are written. If \fIdatabasefmt\fR is "yes",  a single record containing the
+computed x and y shifts for each image region and the final average x and y
+shift is written to a text database file for each input image.
+If \fIdatabasefmt\fR = "no", a single line containing the image name and the
+final average x and y shift is written to a simple text file
+for each input image.
+.le
+.ls output = ""
+The list of output shifted images. If \fIoutput\fR is the NULL string
+then x and y shifts are computed for each input image and written to
+\fIshifts\fR but no output images are written. If \fIoutput\fR is not NULL
+then the number of output images must equal the number of input images.
+.le
+.ls databasefmt = yes
+If \fIdatabasefmt\fR is "yes" the results are written to a text database
+file, otherwise they are written to a simple text file.
+.le
+.ls records = ""
+The list of records to be written to or read from \fIshifts\fR for each
+input image. If \fIrecords\fR is NULL then the output or input record names
+are assumed to be the names of the input images. If \fIrecords\fR is not NULL
+then the record names in \fIrecords\fR are used to write / read the
+records. This parameter is useful for users
+who, wish to compute the x and y shifts using images that have been processed
+in some manner (e.g. smoothed), but apply the computed x and y shifts to the
+original unprocessed images. If more then one record
+with the same name exists in \fIshifts\fR then the most recently written
+record takes precedence. The records parameter is ignored if
+\fIdatabasefmt\fR is "no".
+.le
+.ls append = yes
+Append new records to an existing \fIshifts\fR file or start a new shifts
+file for each execution of XREGISTER? The append parameter is ignored
+if \fIdatabasefmt\fR is "no".
+.le
+.ls coords = ""
+An optional list of coordinates files containing the x and y coordinates of
+an object in the reference image on the first line and the x and y coordinates
+of the same object in the input image(s) on succeeding lines. The number
+of coordinate files must be equal to the number of reference images.
+The input coordinates are used to compute initial
+values for the x and y lags between the input image and the reference image,
+and supersede any non-zero values of \fIxlag\fR, \fIylag\fR, \fIdxlag\fR,
+and \fIdylag\fR supplied by the user.
+.le
+.ls xlag = 0, ylag = 0
+The initial x and y lags of the input image with respect to the reference
+image. Positive values imply that the input image is shifted
+in the direction of increasing x and y values with respect to the
+reference image. \fIXlag\fR and \fIylag\fR are overridden if an offset
+has been determined using the x and y coordinates in the \fIcoords\fR file.
+.le
+.ls dxlag = 0, dylag = 0
+The increment in \fIxlag\fR and \fIylag\fR to be applied to successive input
+images. If \fIdxlag\fR and \fIdylag\fR are set to INDEF then the 
+computed x and y lags for the previous image are used as the initial
+x and y lags for the current image. This option is useful for images which
+were taken as a time sequence and whose x and y the shifts increase or
+decrease in a systematic manner.
+\fIDxlag\fR and \fIdylag\fR are overridden if an offset
+has been determined using x and y coordinates in the \fIcoords\fR file.
+.le
+.ls background = none
+The default background function to be subtracted from the input
+and reference image data in each region before the
+cross-correlation function is computed. The options are:
+.ls none
+no background subtraction is done.
+.le
+.ls mean
+the mean of the reference and input image region is computed and subtracted
+from the image data.
+.le
+.ls median
+the median of the reference and input image region is computed and subtracted
+from the data.
+.le
+.ls plane
+a plane is fit to the reference and input image region and subtracted
+from the data.
+.le
+
+By default the cross-correlation function is computed in a manner
+which removes the mean intensity in the reference and input image regions 
+from the data. For many data sets this "correction"  is sufficient to
+remove first order background level effects
+from the computed cross-correlation function and  no additional
+background subtraction is required.
+.le
+.ls border = INDEF
+The width of the border region around the input and reference image data
+regions used to compute the background function if \fIbackground\fR
+is not "none". By default the entire region is used.
+.le
+.ls loreject = INDEF, ls hireject = INDEF
+The k-sigma rejection limits for removing the effects of bad data from the
+background fit.
+.le
+.ls apodize = 0.0
+The fraction of the input and reference image data endpoints in x and y
+to apodize with a
+cosine bell function before the cross-correlation function is computed.
+.le
+.ls filter = none
+The spatial filter to be applied to the reference and input image
+data before the cross-correlation function is computed. The options are:
+.ls none
+no spatial filtering is performed.
+.le
+.ls laplace
+a Laplacian filter is applied to the reference and input image data.
+.le
+.le
+.ls correlation = discrete
+The algorithm used to compute the cross-correlation function. The options
+are:
+.ls discrete
+The cross-correlation function is calculated by computing the discrete
+convolution of the reference and input image regions over the x and y 
+window of interest.  This technique is most efficient method for small
+cross-correlation function x and y search windows.
+.le
+.ls fourier
+The cross-correlation function is calculated by computing the convolution
+of the reference and input image regions  using Fourier techniques.
+This technique is the most efficient method for computing  the
+cross-correlation function for small x and y search windows.
+.le
+.ls difference
+The cross-correlation function is calculated by computing the error
+function of the reference and input images as a function of position
+in the x and y search window.
+.le
+.ls file
+No cross-correlation function is computed. Instead the previously
+computed x and y shifts are read from record \fIrecord\fR in  the text
+database file \fIshifts\fR if \fIdatabasefmt\fR is "yes", or the
+next line of a simple text file if \fIdatabasefmt\fR is "no".
+.le
+.le
+.ls xwindow = 11, ywindow = 11
+The x and y width of the cross-correlation function region
+to be computed and/or searched for peaks. The search window corresponds
+to shifts of - xwindow / 2 <= xshift <= xwindow /2  and - ywindow / 2 <=
+yshift <= ywindow / 2.  \fIXwindow\fR and \fIywindow\fR
+are automatically rounded up to the next nearest odd number.
+.le
+.ls function = centroid
+The algorithm used to compute the x and y position of the cross-correlation
+function peak.  The options are:
+.ls none
+the position of the cross-correlation function peak is set to
+x and y position of the maximum pixel.
+.le
+.ls centroid
+the position of the cross-correlation function peak is calculated
+by computing the intensity-weighted mean of the marginal profiles of
+the cross-correlation function in x and y.
+.le
+.ls sawtooth
+the position of the cross-correlation function peak is calculated
+by  convolving 1D slices in x and y through the cross-correlation function
+with a 1D sawtooth function and using the point at which the peak is
+bisected to determine the x and y position of the cross-correlation
+peak. 
+.le
+.ls parabolic
+a 1D parabola is fit to 1D slices in x and y through the cross-correlation
+function and the fitted coefficients are used to compute the peak of
+the cross-correlation function.
+.le
+.ls mark
+mark the peak of the cross-correlation function with the graphics cursor.
+This option will only work if \fIinteractive\fR = "yes".
+.le
+.le
+.ls xcbox = 5, ycbox = 5
+The width of the box centered on the peak of the cross-correlation function
+used to compute the fractional pixel x and y center.
+.le
+.ls interp_type = "linear"
+The interpolant type use to computed the output shifted image.
+The choices are the following:
+.ls nearest
+nearest neighbor.
+.le
+.ls linear
+bilinear interpolation in x and y.
+.le
+.ls poly3
+third order interior polynomial in x and y.
+.le
+.ls poly5
+fifth order interior polynomial in x and y.
+.le
+.ls spline3
+bicubic spline.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width input by the
+user will be rounded up to the nearest odd number. The default sinc width
+is 31 by 31.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fractions in x and y
+by appending values between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0. The
+value 0.0 is increased to 0.001. Drizzle resampling with a pixel fraction
+of 1.0 in x and y is identical to bilinear interpolation.
+.le
+.le
+.ls boundary_type = "nearest"
+The boundary extension algorithm used to compute the output shifted
+image.  The choices are:
+.ls nearest
+use the value of the nearest boundary pixel.
+.le
+.ls constant
+use a constant value.
+.le
+.ls reflect
+generate a value by reflecting about the boundary.
+.le
+.ls wrap
+generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0
+The default constant for constant boundary extension.
+.le
+.ls interactive = no
+Compute the cross-correlation function and the shifts for each image
+interactively using graphics cursor and optionally image cursor input.
+.le
+.ls verbose
+Print messages about the progress of the task during task execution
+in non-interactive mode.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls display = "stdimage"
+The default image display device.
+.le
+.ls gcommands = ""
+The default graphics cursor.
+.le
+.ls icommands = ""
+The default image display cursor.
+.le
+
+.ih
+DESCRIPTION
+
+XREGISTER computes the x and y shifts required to register a list of input
+images \fIinput\fR to a list of reference images \fIreference\fR using
+cross-correlation techniques. The computed x and y shifts are stored
+in the text file \fIshifts\fR, in the records \fIrecords\fR if
+\fIdatabasefmt\fR is "yes" or a single line of a simple text file
+if \fIdatabasefmt\fR is "no". One entry is made in the shifts file for
+each input image. If a non NULL list of output images
+\fIoutput\fR is supplied a shifted output image is written for each input
+image. XREGISTER is intended to solve 1D and 2D image registration problems
+where the images have the same size, the same pixel scale, are shifted
+relative to
+each other by simple translations in x and y, and contain one or more
+extended features in common that will produce a peak in the computed
+cross-correlation function.
+
+The reference image regions used to compute the cross-correlation
+function shifts are defined by the parameter
+\fIregions\fR. \fIRegions\fR may be:
+1) a list of one or more image sections, e.g.
+"[100:200,100:200] [400:500,400:500]" separated
+by whitespace, 2) the name of a text file containing a list of one or
+more image sections separated by whitespace and / or newline characters,
+or, 3) a string
+of the form "grid nx ny" specifying a grid of nx by ny
+image sections spanning the entire reference image.
+All reference image regions should be chosen so as to 
+include at least one well-defined object or feature. Cross-correlation
+functions and x and y shifts are computed independently for each
+reference image region
+and averaged to produce the final x and y shift for each input image.
+
+By default the initial x and y lags between the input and reference
+image are assumed to by 0.0 and 0.0
+respectively and each reference image region is cross-correlated
+with the identical region in the input image, e.g reference image
+region [100:200,100:200] is cross-correlated with input image
+region [100:200,100:200].
+
+Non-zero initial guesses for
+the x and y shifts for each input image can be input to XREGISTER using
+the coordinates file parameter \fIcoords\fR.
+\fICoords\fR is a simple text file containing the x
+and y coordinates of a  single
+object in the reference image in columns one and two
+of line one, and the x and y coordinates of the same object in the first
+input image in columns one and two of line two, etc. If \fIcoords\fR
+is defined there must be one coordinate file for every reference image.
+If there are fewer lines of text in \fIcoords\fR than there are 
+numbers of reference plus input images, then x and y shifts of 0.0 are
+assumed for the extra input images. For example,
+if the  user specifies a single input and reference image, sets the
+\fIregions\fR parameter to "[100:200,100:200]", and defines
+a coordinates file  which contains the numbers 
+50.0 50.0 in columns one and two of line one,  and the numbers 52.0 and 52.0
+in columns one and two of line two, then the initial x and y
+lags for the input image with respect to the reference image will be 2.0
+and 2.0 respectively, and the reference image region [100:200,100:200] will be
+cross-correlated with the input image region [102:202,102:202]. 
+
+If \fIcoords\fR is NULL, the parameters \fIxlag\fR, \fIylag\fR,
+\fIdxlag\fR, and \fIdylag\fR can be used to define initial x and y lags
+for each input image. \fIXlag\fR and \fIylag\fR define the x and y lags
+of the first input image with respect to the reference image. In the
+example above they would be set to 2.0 and 2.0 respectively. Initial
+shifts for succeeding images are computed by adding the values of the
+\fIdxlag\fR and \fIdylag\fR parameters  to the values of
+\fIxlag\fR and \fIylag\fR assumed for the previous image.
+If \fIdxlag\fR and \fIdylag\fR are 0.0 and 0.0
+the same initial x and y lag will be used for all the input
+images. If \fIdxlag\fR and \fIdylag\fR are both finite numbers then these
+numbers will be added to
+the x and y lags assumed for the previous image. If these numbers
+are both INDEF then the computed x and y lags for the previous image
+will be used to compute the initial x and y lags for the current image.
+Both options can be useful for time series images where the x and y
+shifts between successive images display some regular behavior.
+
+Prior to computing the cross-correlation function
+large mean background values and gradients should be removed
+from the input and reference image data as either
+can seriously degrade the peak of the cross-correlation
+function.  To first order XREGISTER computes the cross-correlation function
+in a manner which removes
+the effect of large mean background values from the resulting
+function. For many if not most typical data sets the user can safely leave
+the parameter \fIbackground\fR at its default value of "none" and
+achieve reasonable results. For more demanding data sets the user should
+experiment with the "mean", "median", and "plane" background fitting
+algorithms which compute and subtract, the mean value, median value, and
+a plane from the input and reference image data respectively,
+before computing the
+cross-correlation function. The region used to compute the background fitting
+function can be restricted to a border around the reference and
+input image regions by setting the \fIborder\fR parameter. Bad
+data can be rejected from the background fit by setting the \fIloreject\fR
+and \fIhireject\fR parameters.
+
+A cosine bell function can be applied to the edges of the input and
+reference image data before
+computing the cross-correlation function by setting the \fIapodize\fR
+parameter.
+
+If the \fIfilter\fR parameter is set to "laplace" instead of its default
+value of "none" then a Laplacian filter is applied to the input and
+reference image data before the cross-correlation function is computed.
+This spatial filtering operation effectively
+removes both a background and a slope from the input and reference image
+data and
+highlights regions of the image where the intensity is changing rapidly.
+The effectiveness of this filtering operation in sharpening the
+correlation peak depends on the degree to
+which the intensity in adjacent pixels is correlated.
+
+The cross-correlation function for each region is computed by
+discrete convolution, \fIcorrelation\fR = "discrete",
+Fourier convolution, \fIcorrelation\fR = "fourier", or by computing
+the error function, \fIcorrelation\fR = "difference". The x and y lag
+space in pixels around the initial x and y lag over which the cross-correlation 
+function is searched for the correlation peak, is specified by the
+\fIxwindow\fR and
+\fIywindow\fR  parameters. These parameter define a range of x and y lags from
+-xwindow / 2 to xwindow / 2 and -ywindow / 2 to ywindow / 2 respectively. For
+a given input and reference image region, the
+execution time of XREGISTER will depend strongly on both the correlation
+algorithm chosen and
+the size of the search window. In general users should use discrete
+or difference correlation for small search windows and fourier
+correlation for large search windows.
+
+The x and y lags for each input and reference image
+region are computed by computing
+the position of the peak of the cross-correlation function in the
+search window using
+one of the four centering algorithms: "none", "centroid", "sawtooth",
+and "parabolic".
+
+The computed x and y shifts for each region and the final x and y shift
+for each input image (where the computed x and y shifts are just the negative
+of the computed x and y lags) are written to the shifts file \fIshifts\fR.
+If \fIdatabasefmt\fR is "yes" each results is written in a record whose name
+is either identical to the name of the input
+image or supplied by the user via the \fIrecords\fR parameter .
+If \fIdatabasefmt\fR is "no", then a single containing the input image
+name and the computed x and y shifts is written to the output shifts file.
+
+If a list of output image names have been supplied then the x and y
+shifts will be applied to the input images to compute the output images
+using the interpolant type specified by \fIinterp_type\fR and the
+boundary extension algorithm specified by \fIboundary\fR and \fIconstant\fR. 
+
+If the \fIcorrelation\fR parameter is set to "file" then the shifts
+computed in a previous run of XREGISTER will be read from the \fIshifts\fR
+file and applied to the input images to compute the output images.
+If no record list is supplied by the user XREGISTER will for each input
+image search for
+a record whose name is the same as the input image name. If more than
+one record of the same name is found then the most recently written
+record will be used.
+
+XREGISTER does not currently trim the input images but it computes and
+prints the region over which they all overlap in the form of an image
+section. Although XREGISTER is designed for use with same sized images,
+it may be used with images of varying size.
+In this case it is possible for the calculated overlap region to be vignetted,
+as XREGISTER currently preserves the size of the input image when it shifts it.
+For example if an image is much smaller than the reference image
+it is possible for the image to be shifted outside of its own borders.
+If the smallest image is used as a reference this will not occur. If
+vignetting is detected the vignetted image section is printed on the 
+screen. Vignetting may also occur for a list of same-sized images
+if the reference image is not included in the input image list, and the
+computed shifts are all positive or negative as may occur in a time
+sequence. Choosing a reference image with  a shift which is in the
+middle of the observed range of shifts in x and y will remove this problem.
+
+In non-interactive mode the parameters are set at task startup
+and the input images are processed sequentially. If the \fIverbose\fR
+flag is set messages about the progress of the task are printed on the
+screen as the task is running.
+
+In interactive mode the user can mark the regions to be used
+to compute the cross-correlation function on the image display,
+define the initial shifts from the reference image to the input image
+on the image display, show/set the data and algorithm parameters,
+compute, recompute,  and plot the cross-correlation function, experiment
+with the various peak fitting algorithms, and overlay row and column
+plots of the input and reference images with and without the initial and / or
+computed shifts factored in.
+
+.ih
+CURSOR COMMANDS
+
+The following graphics cursor commands are currently available in
+XREGISTER.
+
+
+.nf
+		Interactive Keystroke Commands
+
+?	Print help 
+:	Colon commands
+t	Define the offset between the reference and the input image
+c	Draw a contour plot of the cross-correlation function
+x	Draw a column plot of the cross-correlation function
+y	Draw a line plot of the cross-correlation function
+r	Redraw the current plot
+f	Recompute the cross-correlation function
+o	Enter the image overlay plot submenu 
+w	Update the task parameters
+q	Exit
+
+
+		Colon Commands
+
+:mark		Mark regions on the display
+:show	        Show the current values of the parameters
+
+		Show/Set Parameters
+
+:reference	[string]    Show/set the current reference image name
+:input		[string]    Show/set the current input image name
+:regions	[string]    Show/set the regions list
+:shifts		{string]    Show/set the shifts database file name
+:coords		[string]    Show/set the current coordinates file name
+:output		[string]    Show/set the current output image name
+:records	[string]    Show/set the current database record name
+:xlag		[value]     Show/set the initial lag in x
+:ylag		[value]     Show/set the initial lag in y
+:dxlag		[value]     Show/set the incremental lag in x
+:dylag		[value]     Show/set the incremental lag in y
+:cregion	[value]	    Show/set the current region
+:background	[string]    Show/set the background fitting function
+:border		[value]     Show/set border region for background fitting
+:loreject	[value]     Show/set low side k-sigma rejection
+:hireject	[value]     Show/set high side k-sigma rejection 
+:apodize	[value]	    Show/set percent of end points to apodize
+:filter		[string]    Show/set the default spatial filter 
+:correlation	[string]    Show/set cross-correlation function 
+:xwindow	[value]     Show/set width of correlation window in x
+:ywindow	[value]     Show/set width of correlation window in y
+:function	[string]    Show/set correlation peak centering function 
+:xcbox		[value]	    Show/set the centering box width in x
+:ycbox		[value]	    Show/set the centering box width in y
+.fi
+
+
+The following submenu of image cursor commands is also available.
+
+.nf
+		Image Overlay Plot Submenu
+
+
+?	Print help
+c  	Overlay the marked column of the reference image
+	with the same column of the input image
+l  	Overlay the marked line of the reference image
+	with the same line of the input image
+x 	Overlay the marked column of the reference image
+	with the x and y lagged column of the input image
+y 	Overlay the marked line of the reference image
+	with the x and y lagged line of the input image
+v 	Overlay the marked column of the reference image
+	with the x and y shifted column of the input image
+h 	Overlay the marked line of the reference image
+	with the x and y shifted line of the input image
+q	Quit 
+
+
+		Image Overlay Sub-menu Colon Commands
+
+:c  [m] [n] 	Overlay the middle [mth] column of the reference image
+		with the mth [nth] column of the input image
+:l  [m] [n]	Overlay the middle [mth] line of the reference image
+		with the mth [nth]  line of the input image
+:x  [m] 	Overlay the middle [mth] column of the reference image
+		with the x and y lagged column of the input image
+:y  [m] 	Overlay the middle [mth] line of the reference image
+		with the x and y lagged line of the input image
+:v  [m] 	Overlay the middle [mth] column of the reference image
+		with the x and y shifted column of the input image
+:h  [m] 	Overlay the middle [mth] line of the reference image
+		with the x and y shifted line of the input image
+.fi
+
+.ih
+ALGORITHMS
+
+The cross-correlation function is computed in the following manner.
+The symbols I and R refer to the input and reference images respectively.
+
+.nf
+correlation = discrete
+
+        <I> = SUMj SUMi { I[i+xlag,j+ylag] } / (Nx * Ny)
+        <R> = SUMj SUMi { R[i,j] } / (Nx * Ny)
+     sumsqI = sqrt (SUMj SUMi { (I[i+xlag,j+ylag] - <I>) ** 2 })
+     sumsqR = sqrt (SUMj SUMi { (R[i,j] - <R>) ** 2 })
+
+	  X = SUMj SUMi { (I[i+xlag,j+ylag] - <I>) * (R[i,j] - <R>) }
+	      ----------------------------------------------------
+			 sumsqI * sumsqR
+
+
+correlation = fourier
+
+        <I> = SUMj SUMi { I[i,j] } / (Nx * Ny)
+        <R> = SUMj SUMi { R[i,j] } / (Nx * Ny)
+     sumsqI = sqrt (SUMj SUMi { (I[i,j] - <I>) ** 2 })
+     sumsqR = sqrt (SUMj SUMi { (R[i,j] - <R>) ** 2 })
+       FFTI = FFT { (I - <I>) / sumsqI } 
+       FFTR = FFT { (R - <R>) / sumsqR } 
+
+          X = FFTINV { FFTR * conj { FFTI } }
+
+
+correlation = difference
+
+        <I> = SUMj SUMi { I[i+xlag,j+ylag] } / (Nx * Ny)
+        <R> = SUMj SUMi { R[i,j] } / (Nx * Ny)
+
+	  X = SUMj SUMi { abs ((I[i+xlag,j+ylag] - <I>) - (R[i,j] - <R>)) }
+	  X = 1.0 - X / max { X }
+.fi
+
+.ih
+EXAMPLES
+
+1. Register a list of images whose dimensions are all 256 by 256 pixels
+and whose shifts with respect to the reference image are all less than
+5.0 pixels, using the discrete cross-correlation algorithm and a search
+window of 21 pixels in x and y.
+
+.nf
+	cl> xregister @inimlist refimage [*,*] shifts.db out=@outimlist \
+	    xwindow=21 ywindow=21
+.fi
+
+2. Register the previous list of images, but compute the cross_correlation
+function using boxcar smoothed versions of the input images.
+
+.nf
+	cl> xregister @binimlist brefimage [*,*] shifts.db xwindow=21 \
+	    ywindow=21
+
+	cl> xregister @inimlist refimage [*,*] shifts.db out=@outimlist \
+	    records=@binimlist correlation=file
+.fi
+
+3. Register the previous list of images but write the results to a simple
+text file instead of a text database file and do the actual shifting with
+the imshift task.
+
+.nf
+	cl> xregister @binimlist brefimage [*,*] shifts.db xwindow=21 \
+	    ywindow=21 databasefmt-
+
+	cl> fields shifts.db 2,3 > shifts
+
+	cl> imshift @inimlist @outimlist shifts_file=shifts
+.fi
+
+4. Register list of 512 by 512 pixel square solar sunspot images that were
+observed as a time series. Compute the cross-correlation function using
+Fourier techniques, a search window of 21 pixels in x and y, an initial
+shift of 10 pixels in x and 1 pixel in y, and use the computed shift of
+the previous image as the initial guess for the current image.
+
+.nf
+	cl> xregister @inimlist refimage [*,*] shifts.db out=@outimlist \
+	    xlag=10 ylag=1 dxlag=INDEF dylag=INDEF correlation=fourier \
+	    xwindow=21 ywindow=21
+.fi
+
+5. Register two 2K square images interactively using discrete cross-correlation
+and an initial search window of 15 pixels in x and y.
+
+.nf
+	cl> display refimage
+
+	cl> xregister inimage refimage [900:1100,900:1100] shifts.db \
+	    xwindow=15 ywindow=15 interactive+
+
+	    ... a contour plot of the cross-correlation function appears
+		with the graphics cursor ready to accept commands
+
+	    ... type x and y to get line and column plots of the cross-
+		correlation function at various points and c to return
+		to the default contour plot
+
+	    ... type ? to get a list of the available commands
+
+	    ... type :mark to mark a new region on the image display
+
+	    ... type f to recompute the cross-correlation function using
+		the new data
+
+	    ... increase the search window to 21 pixels in x and y
+		with the :xwindow 21 and :ywindow 21 commands
+
+	    ... type f to recompute the cross-correlation function with the
+		new search window
+
+	    ... type o to enter the image data overlay plot submenu, 
+		move the cursor to a line in the displayed reference image
+		and type l to see of plot of the line in the input and
+		reference image, type h to see a plot of the same line in
+		the reference image and the x and y shifted line in the input
+		image, type q to return to the main menu
+
+	    ... type q to quit the task, and q again to verify the previous
+	    	q command
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+rv.fxcor,proto.imalign,images.imcombine,ctio.immatch,center1d,images.imshift
+.endhelp

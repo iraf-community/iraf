@@ -1,0 +1,60 @@
+.help revisions Jul91 noao.imred.argus
+.nf
+imred$argus/doc/doargus.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+imred$argus/doc/dohdydra.hlp
+imred$argus/doc/dohdydra.ms
+    Updated for change where if both crval and cdelt are INDEF then the
+    automatic identification is not done.  (5/2/96, Valdes)
+
+imred$argus/demos/mkdoargus.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$argus/argus.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$argus/doargus.cl
+imred$argus/doargus.par
+imred$argus/params.par
+imred$argus/doc/doargus.hlp
+imred$argus/doc/doargus.ms
+    Added crval/cdelt parameters used in new version with automatic arc
+    line identification.  (4/5/96, Valdes)
+
+imred$argus/doc/doargus.hlp
+imred$argus/doc/doargus.ms
+    Describes the new header option for the aperture identification table.
+    (7/25/95, Valdes)
+
+imred$argus/argus.cl
+imred$argus/doargus.cl
+imred$argus/doargus.par
+imred$argus/doc/doargus.hlp
+imred$argus/doc/doargus.ms
+imred$argus/demos/xgdoargus.dat
+    Added sky alignment option.  (7/19/95, Valdes)
+
+imred$argus/argus.cl
+imred$argus/argus.men
+    Added APSCATTER to the package.  (6/30/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+imred$argus/argus.cl
+    Renamed the fiber response task to fibresponse. (12/31/94, Valdes)
+
+imred$argus/argus.cl
+    The task was incorrectly defined as being in the logical directory
+    msred instead of specred.  (8/24/92, Valdes)
+
+=======
+V2.10.1
+=======
+
+imred/argus/*
+    Installed (7/24/91, Valdes)
+.endhelp

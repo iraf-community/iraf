@@ -1,0 +1,8 @@
+tape_file,s,a,,,,Tape file
+file_list,s,h,1-999,,,List of file numbers
+dump_records,b,h,no,,,Dump selected records?
+rec_list,s,h,1-999,,,List of records to be dumped
+byte_chunk,i,h,1,,,Byte chunk
+swapbytes,b,h,no,,,Swap bytes?
+output_format,s,h,o,,,Dump format (c|d|o|u|x)
+mode,s,h,"ql",,,

@@ -1,0 +1,19 @@
+tbzmem.x
+    Removed debug output (5/12/14, MJF)
+
+tbyscp.x
+    The 'sbuf' pointer was being used with Memr (5/4/13, MJF)
+
+tbhanp.x
+    Quote strings in text, strip trailing spaces, and capitalize keywords
+    to be consistent with tbhpnp.  (1/7/11, Valdes)
+
+tbhpnp.x
+    Don't remove leading whitespace.  (1/7/11, Valdes)
+
+tbttyp.x
+    1.  Changes to better control the types and extensions.  The accepted
+	extensions are |tab|fits|fit|fxb|txt|dat|cat|tmp|.
+    2.  If no extensions is given the default is now text instead of STSDAS
+	table.
+    (1/7/11, Valdes)

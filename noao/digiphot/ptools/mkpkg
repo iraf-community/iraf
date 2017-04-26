@@ -1,0 +1,38 @@
+# PTOOLSX libraries
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$omake x_ptools.x
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	;
+
+linkonly:
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	$call install
+	;
+
+install:
+	$move xx_ptools.e noaobin$x_ptools.e
+	;
+
+trelink:
+	$set LIBS = "-lds -lncar -lgks -lxtools -ltbtables"
+	$set XFLAGS = "$(XFLAGS) $(XF)"
+	$set LFLAGS = "$(LFLAGS) $(LF)"
+	$update libpkg.a
+	$link x_ptools.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_ptools.e
+	;
+
+libpkg.a:
+	@pconvert
+	@pexamine
+	@ptutils
+	@txtools
+	;

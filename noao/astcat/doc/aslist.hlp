@@ -1,0 +1,60 @@
+.help aslist Feb00 astcat
+.ih
+NAME
+aslist -- list the supported image surveys
+.ih
+USAGE
+aslist catalogs
+.ih
+PARAMETERS
+.ls imsurveys
+The names of the image surveys to be listed. If surveys = "*" then
+all the image surveys in the image survey configuration file are listed.
+.le
+.ls verbose = no
+List the image survey wcs and keyword information  after the image survey
+name ?
+.le
+.ls imdb = ")_.imdb"
+The image survey configuration file. The value of imdb defaults to the value
+of the package parameter of the same name. The default image survey
+configuration file is "astcat$lib/imdb.dat".
+.le
+.ih
+DESCRIPTION
+Aslist lists the supported image surveys specified by the
+\fIimsurveys\fR parameter. If imsurveys = "*" then all the supported image
+surveys are listed, otherwise only the image survey names specified by the
+user are listed. Valid image survey names have the form imsurvey@site, e.g.
+"dss1@cadc".  If \fIverbose\fR = "yes", then the image survey wcs and
+keyword information is listed after the image survey name.
+
+The image survey names, addresses, query formats, output formats, wcs formats,
+and keyword formats, are specified in the image survey configuration file
+\fIimdb\fR. By default the image survey configuration file names defaults to
+the value of the imdb package parameters. The default image survey
+configuration file is "astcat$lib/imdb.dat".  Users can add records
+to this file or create their own configuration file.
+.ih
+EXAMPLES
+
+1. List all the image surveys in the image survey configuration file.
+
+.nf
+cl> aslist *
+.fi
+
+2. List the wcs and keyword information for the dss1@cadc image survey.
+
+.nf
+cl> aslist dss1@cadc verbose+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+aclist
+.endhelp

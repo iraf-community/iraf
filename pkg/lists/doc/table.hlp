@@ -1,0 +1,43 @@
+.help table Jan86 lists
+.ih
+NAME
+table -- format single column input into a table
+.ih
+USAGE
+table input_files
+.ih
+PARAMETERS
+.ls input_files
+List of files to be formatted, may be STDIN.
+.le
+.ls first_col = 7
+Offset to first column of table
+.le 
+.ls last_col = 0
+Offset to last column of table.  The value \fBlast_col\fR = 0 indicates 
+right margin.
+.le
+.ls ncols = 0
+Number of columns.  The value \fBncols\fR = 0 indicates maximum that will fit.
+.le
+.ls maxstrlen = 0
+Maximum string length for table entry.  The value \fBmaxstrlen\fR = 0
+indicates no limit.
+.le
+.ih
+DESCRIPTION
+Task \fBtable\fR reads a list of strings from the standard input or a 
+list of files and assembles a nicely formatted table.  If reading 
+from multiple input files, make a separate table for each.  There is no 
+fixed limit to the size of the table which can be formatted.  The table 
+is not sorted; this should be done as a separate operation if desired.
+.ih
+EXAMPLES
+1. Format a file containing names into a two column table.  The table is 
+sorted alphabetically first.
+
+	cl> sort names | table ncols=2
+.ih
+SEE ALSO
+words, tokens
+.endhelp

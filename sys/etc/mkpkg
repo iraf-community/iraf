@@ -1,0 +1,125 @@
+# Make the ETC portion of the system library libsys.a.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+generic:
+	$ifolder (gen/miireadi.x, miiread.gx) 
+		$generic -k -p gen/ -t silrd miiread.gx
+	$endif
+	$ifolder (gen/miiwritei.x, miiwrite.gx)
+		$generic -k -p gen/ -t silrd miiwrite.gx
+	$endif
+	$ifolder (gen/nmireadi.x, nmiread.gx) 
+		$generic -k -p gen/ -t silrd nmiread.gx
+	$endif
+	$ifolder (gen/nmiwritei.x, nmiwrite.gx)
+		$generic -k -p gen/ -t silrd nmiwrite.gx
+	$endif
+	;
+
+libsys.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@gen
+
+	brktime.x	<time.h>
+	btoi.x	
+	clktime.x	
+	cnvdate.x	<time.h>
+	cnvtime.x	<time.h>
+	cputime.x	
+	dtmcnv.x	<time.h> <ctype.h>
+	envgetb.x	
+	envgetd.x	<mach.h>
+	envgeti.x	<mach.h>
+	envgetr.x	
+	envgets.x	environ.h <fset.h> <knet.h>
+	envindir.x	
+	envinit.x	environ.com environ.h
+	environ.x	environ.com environ.h <knet.h>
+	envlist.x	environ.com environ.h
+	envnext.x	environ.com environ.h
+	envreset.x	environ.com environ.h <knet.h>
+	envscan.x	environ.h <ctype.h>
+	erract.x	error.com <config.h> <error.h>
+	errcode.x	error.com <error.h>
+	errget.x	error.com <error.h>
+	error.x		error.com <error.h>
+	gethost.x	
+	getpid.x	
+	getuid.x	
+	gmtcnv.x
+	gqsort.x	
+	intr.x		<xwhen.h>
+	itob.x	
+	lineoff.x	
+	locpr.x	
+	locva.x	
+	lpopen.x	<knet.h> <mach.h>
+	maideh.x	<fset.h> <xwhen.h>
+	main.x		<clset.h> <config.h> <ctype.h> <error.h> <fset.h>\
+			<knet.h> <printf.h> <xwhen.h>
+	miireadc.x	<mii.h>
+	miiwritec.x	<mii.h>
+	nmireadb.x	<nmi.h>
+	nmireadc.x	<nmi.h>
+	nmiwriteb.x	<nmi.h>
+	nmiwritec.x	<nmi.h>
+	onentry.x	<clset.h> <error.h> <fset.h> <knet.h>
+	onerror.x	<config.h> <error.h>
+	onexit.x	<config.h> <error.h>
+	oscmd.x		<clset.h> <ctype.h> <error.h> <knet.h>
+	pagefiles.x	<chars.h> <ctype.h> <error.h> <finfo.h> <fset.h>\
+			<mach.h> <ttyset.h>
+	prchdir.x	
+	prclcpr.x	prc.com <config.h>
+	prcldpr.x	prd.com <config.h> <knet.h>
+	prclose.x	prc.com <config.h> <prstat.h>
+	prdone.x	prd.com <config.h>
+	prenvfree.x	
+	prenvset.x	
+	prfilbuf.x	prc.com <config.h> <fio.h>
+	prfindpr.x	prc.com <config.h>
+	prgline.x	prc.com <config.h> <ctype.h> <fset.h>
+	prgredir.x	prc.com <config.h>
+	prkill.x	prd.com <config.h> <knet.h>
+	propcpr.x	prc.com <config.h> <fset.h> <knet.h> <prstat.h>\
+			<xwhen.h>
+	propdpr.x	prd.com <config.h> <knet.h>
+	propen.x	<knet.h>
+	proscmd.x	prc.com <config.h>
+	prpsio.x	prc.com <chars.h> <config.h> <error.h> <fio.com>\
+			<fio.h> <fset.h> <gio.h>
+	prpsload.x	prc.com <config.h>
+	prredir.x	prc.com <config.h>
+	prseti.x	prc.com <config.h> <prstat.h>
+	prsignal.x	prc.com <config.h> <knet.h>
+	prstati.x	prc.com <config.h> <prstat.h>
+	prupdate.x	prc.com <config.h> <error.h> <prstat.h>
+	psioisxt.x	<ctype.h> <gio.h>
+	psioxfer.x	
+	qsort.x	
+	sttyco.x	<ctype.h> <error.h> <ttset.h> <ttyset.h>
+	syserr.x	
+	sysid.x	
+	syspanic.x	
+	sysptime.x	<ctype.h>
+	tsleep.x	
+	ttopen.x	<fset.h>
+        urlget.x        <ctype.h> <fset.h> <mach.h>
+        votable.x
+	xalloc.x	<ctype.h> <knet.h> <xalloc.h>
+	xerfmt.x	<ctype.h>
+	xerpop.x	error.com <error.h>
+	xerpue.x	<config.h> <fio.com> <fio.h> <mach.h>
+	xerreset.x	error.com <error.h>
+	xerstmt.x	error.com <ctype.h> <error.h>
+	xerverify.x	error.com <error.h>
+	xgdevlist.x	<xalloc.h>
+	xisatty.x	<clset.h> <fset.h>
+	xmjbuf.x	<config.h>
+	xttysize.x	<clset.h>
+	xwhen.x	
+	;

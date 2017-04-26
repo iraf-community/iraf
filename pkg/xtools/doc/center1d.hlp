@@ -1,0 +1,147 @@
+.help center1d May93 xtools
+.ih
+NAME
+center1d -- One dimensional centering
+.ih
+SYNOPSIS
+.nf
+center = center1d (initial, data, npts, width, type, radius, threshold)
+
+real	initial			# Initial guess
+real	data[npts]		# Data points
+int	npts			# Number of data points
+real	width			# Feature width
+int	type			# Feature type
+real	radius			# Centering radius
+real	threshold		# Detection threshold
+.fi
+.ih
+ARGUMENTS
+.ls initial
+Initial guess for the center of the feature.
+.le
+.ls data[npts]
+Pixel data vector.
+.le
+.ls npts
+Number of points in the data vector.
+.le
+.ls width
+Width used to define the convolution function.  If the width is 1 or less
+then the nearest minimum or maximum is returned.  If the width is greater
+than 1 then a minimum with of 3 is used in the algorithm.
+.le
+.ls type
+Type of feature.  The feature types are defined in the file <xtools/center1d.h>.
+Currently the types are emission and absorption features.
+.le
+.ls radius
+Centering radius or error limit about the initial guess.
+.le
+.ls threshold
+Minimum difference between the maximum and minimum pixel value in the
+region around the initial guess allowed for detecting a feature.  For
+data which is all positive and the type is emission then the
+threshold is also used as an absolute cutoff.
+.le
+.ih
+DESCRIPTION
+If the width is 1 or less then the nearest minimum or maximum is found.
+The centering radius is still applied as is the threshold.  If the width
+is greater than 1 then a minimum width of 3 is used in the algorithm.
+
+The one dimensional position of a feature is determined by solving the equation
+
+	(1)	integral {(I-I0) f(X-XC) dX} = 0
+
+where I is the intensity at position X, I0 is the continuum intensity, X is the
+pixel coordinate, and XC is the desired feature position.  Figure 1 shows
+the range of pixels used in determining the continuum intensity, the feature
+threshold, and solving the equation.
+
+.ks
+.nf
+		      Figure 1:  Data Feature Vector
+      +-----------------------------------------------------------+
+     -|                               *                           |
+     S|                              * *                          |
+      |                              * *                          |
+     t|                             *   **                        |
+      |                             *     *                       |
+     r|                            *       *                      |
+      |                           *        *                      |
+     e|                          *          *                     |
+      |                         *            *                    |
+     n|                      *                 *              *  *|
+      |                   *                       *  *  *  *      |
+     t|             *  *                                          |
+      |       *  *                                                |
+     h|    *                                                      |
+     -| *                                                         |
+      +---------+-----------------+---------------------+---------+
+     -B        -A                 0                     A         B
+
+			        X-XC
+
+	A = radius + 0.5 width		B = radius + 1.5 width
+.fi
+.ke
+
+The range -A to A is used to determine the continuum intensity and
+the strength of the feature.  For absorption features the continuum
+intensity is the maximum point in this range while for emission
+features the continuum is set to zero.  Admittedly these are not real
+measures of the continuum but they contain the fewest assumptions
+and are tolerant of nearby contaminating features.  The feature strength
+is the difference between the maximum and minimum values.  If the feature
+strength is less than the specified detection threshold then a value of
+INDEF is returned for the feature position.
+
+.ks
+The range -B to B includes the range of allowed feature positions plus the
+half-width of the feature.  This range is used in solving equation (1).
+The convolution function f(X-XC) is a sawtooth as shown in figure 2.
+For absorption features the negative of this function is used.
+
+.nf
+		           Figure 2:  f(X-XC)
+	        +-------------------+-------------------+
+	        |                   |     *             |
+	        |                   |   *   *           |
+	        |                   | *       *         |
+             0  +-*-*-*-*-----------*-----------*-*-*-*-+
+	        |         *       * |                   |
+	        |           *   *   |                   |
+	        |             *     |                   |
+	        +-------+-----------+-----------+-------+
+	            -width/2       0         width/2
+
+		                   X-XC
+.fi
+.ke
+
+The two figures graphically define the parameter \fIwidth\fR.  Generally
+it should be set to a value near the actual width of the emission or absorption
+feature.  If the width is too wide then the center will be affected by blending
+from nearby lines while if it is too narrow the accuracy of the centering is
+decreased.  The parameter \fBradius\fR determines how far from the initial
+estimate for XC the interactive solution of (1) may go.
+Equation (1) is solved iteratively starting with the initial position.
+When successive positions agree within 0.1% of a pixel the position is
+returned.  If the position wanders further than \fIradius\fR from the
+initial guess or outside of the data vector then the procedure returns
+the value INDEF.  If more than 100 iterations are required or the corrections
+per iteration exceed the minimum correction reached after 3 further iterations
+then the solution has failed to converge and INDEF is returned.  Note that
+this latter condition may occur if the width is too small in a flat topped
+profile.
+
+This task uses the one dimensional image interpolation package \fBiminterp\fR
+in solving equation (1).
+.ih
+BUGS
+Though the algorithm does not fail if the width is made very small the
+results become unreliable.  Therefore a silent limit of 3 is imposed
+by the algorithm.  If there is ever a need to allow smaller widths
+then the procedure can be changed and the applications relinked.
+.endhelp

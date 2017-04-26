@@ -1,0 +1,1012 @@
+.help revisions Jun88 pkg.xtools
+.nf
+
+isdir.x
+    Wasn't properly detecting a directory when no trailing '/' present on 
+    input name.  made the same as the sys$fio/isdir.x  (8/11/14)
+
+inlfit/ingfit.gx
+    The 'oldwts' pointer was being used explicitly with Memr, changed to use
+    'Mem$t' so the appropriate type is used (5/4/13, MJF)
+
+rmsorted.x
+    A 64-bit problem was fixed.  (12/5/11, Valdes)
+
+catquery/cqdef.x
+catquery/cqquery.x
+catquery/cqimquery.x
+    Modified the URL access to use the new url_get() procedure as a
+    compile-time option.  This allows access to servers that may
+    redirect the URL or return some other http error. (10/5/11, MJF)
+
+fixpix/ytpmmap.x
+    The world matching was not right.  It may still have bugs but the
+    discovered problem has been fixed.  (3/3/11, Valdes)
+
+=======
+2.15.1a
+=======
+
+pkg/xtools/icfit/icdeviant.gx
+    There were two bugs related to growing.  First, the logic was wrong.
+    Second, in one place the grow parameter was treated as being in pixels
+    and in another as being in user coordinate units.
+    (6/28/10, Valdes)
+
+pkg/xtools/xtextns.x
+     Pixel list masks were not recognized as images.
+     (2/13/09, Valdes)
+
+lib/pkg/rmsorted.h
+pkg/xtools/rmmed.x
+pkg/xtools/rmsorted.x
+     Modified the running median library to allow running minimum and
+     running maximum.  An argument addition required a change in the 
+     runmed task but there was no functional change.
+     (10/29/08, Valdes)
+
+xtextns.x
+    1.  The wrong ranges package was used for the extension versions.  Calling		the correct one requires extension versions to be positive integers.
+    2.  The extension version was not being matched correctly.  This may
+    	have happened when switching to using the mef library.
+    (8/25/08, Valdes)
+
+fixpix/ytpmmap.x
+    The inefficiencies in evaluating the WCS were addressed.
+    (3/18/08, Valdes)
+
+fixpix/ytpmmap.x
+    Fixed a couple of bugs that could result in a floating point exception.
+    (3/17/08, Valdes)
+
+rmsorted.x
+    This routine was modified, including adding and argument, to
+    support the clipping of bright values.
+    (2/29/08, Valdes)
+
+rmmed.x
+    This general package of running median routines was moved from
+    images$imfilter/src.  It was enhanced by allowing clipping of
+    bright sources.  This means a new argument, nclip, is required.
+    (2/29/08, Valdes)
+
+fixpix/ytpmmap.x
+    1.	Any number of '^' characters can be in the name at any point to
+	invert or uninvert a mask.  This is needed if an application wants
+	to invert the mask specified by the user which may also include '^'.
+	This also allows strings like !^foo or ^!foo.
+    2.	The pmmatch variable may not be "world N" where N is the maximum
+	input mask value to be preserved in the output mask.  This value
+	is used to optimize the internal bit array to the smallest it
+	can be consistent with the desired value.  A value of "world"
+	is equivalent to "world 1".
+    (2/5/08, Valdes)
+
+xtbitarray.x
+    Generalized to support different number of bits per element.  The
+    value is now set by specifying a maximum value.  All values greater
+    than the maximum are set to the maximum.  (2/5/08, valdes)
+
+inlfit/innlinit.gx
+    Removed an extra argument from the nlfree$t() call (1/16/08, MJF)
+
+fixpix/ytpmmap.x
+    1.  A feature to match masks in world coordinates, but only as a
+	boolean mask, was added.
+    2.  The way the pixel mask matching is selected was generalized.
+	The matching type is specified as a string with values
+	"logical", "physical", "world", or "offset".  An application
+	may also specify an environment variable which the user may
+	use to specify the type.  If the application specifies one of
+	the types then the environment variable "pmmatch" may be used
+	to override the application.
+    (1/9/08, Valdes)
+
+xtbitarray.x	+
+mkpkg
+    This provides a package for creating an in-memory 2D bit array.
+    This can be used for large boolean masks with random access.  It
+    is being added for use with pixel mask matching in world coordinates.
+    (1/9/08, Valdes)
+
+=====
+V2.14
+=====
+
+fixpix/setfp.x	+
+    This routine transforms the input mask values into the output mask
+    values.  It allows the input mask to have two classes of bad pixels;
+    those which are interpolated and those which are not.
+
+fixpix/ytpmmap.x
+    Adds a procedure yt_mappm and internal argument to allow control of
+    the WCS matching of masks to images.  The earlier versions always
+    matched masks using the physical coordinate system.  Applications can
+    the new procedure to have some control over this.
+    (11/26/07, Valdes)
+
+t_txtcompile.x	+
+txtcompile	+
+mkpkg
+    This application compiles a text file into an SPP procedure that
+    can be called by the xt_txtopen procedure.  The application is intended
+    to be used as a host preprocessing command in mkpkg files to support
+    things like host callable applications (e.g. see syshost).  The
+    code is in xtools for savvy developers awaiting full integration.
+    (11/26/07, Valdes)
+
+xttxtfio.x	+
+mkpkg
+    The routines xt_txtopen and xt_txtclose follow the usual FIO
+    interface.  They allow calling a procedure that sets a string file as
+    if it was a read-only file.  (See the t_txtcompile.x procedure for a
+    way to create a procedure from a text file.)  The file name for this
+    special case of a procedure uses the syntax "proc:NNNNNN" where NNNNNN
+    is the value returned by locpr.  The application would construct this
+    name for the procedure it declares as extern.  The intended purpose is
+    to allow building in configuration files, including a parameter file,
+    into a host callable executable where unsatisfied parameter values
+    default to a built-in file rather than issuing a prompt (see syshost).
+    When called with an actual file normal read-only FIO is used.
+    (11/26/07, Valdes)
+
+syshost.x	+
+mkpkg
+    This routine may be used by an application to set default
+    parameter values when the executable is called directly by the
+    host.  The routine provides three files to search in order; two
+    keyword=value files and a par file.  These files, primarily the
+    par file, may be encoded as compiled procedures (see txtcompile
+    and xt_txtopen/xt_txtclose) so that the binary can be distributed
+    without any configuration files.  (11/26/07, Valdes)
+
+xtextns.x
+    Further restructuring of these routines to support binary tables.  This
+    makes use the mef routines.  (11/26/07, Valdes)
+
+=====
+V2.13
+=====
+
+catquery/cqgfields.x
+    The documentation says that the offset field in the catalog description
+    file for simple text is the field number.  However, the implementation
+    did not work this way.  The changes makes the catalog parsing work as
+    described.  (7/17/07, Valdes)
+
+xtextns.x		+
+doc/xtextns.hlp		+
+doc/xtools.hd
+mkpkg
+    Routines for expanding MEF image extensions.  The first version of
+    this functionality was developed for proto.imextensions and then
+    expanded for mscred.mscextensions.  Since then these routines have
+    been used in other tasks and so these are now being escalated to
+    generic xtools routines.  (3/20/07, Valdes)
+
+xtmaskname.x
+doc/xtmaskname.hlp	+
+doc/xtools.hd
+    The case where masktype=pl and the input name doesn't have a .pl
+    extension was wrong.  (3/19/07, Valdes)
+
+fixpix/ytfixpix.x	+
+    This version uses an internal copy of the input mask rather than
+    modifying the input mask.  (3/19/07, Valdes)
+
+fixpix/xtpmmap.x
+fixpix/ytpmmap.x	+
+fixpix/mkpkg
+doc/xtpmmap.hlp		+
+doc/xtools.hd
+    1.	Uses xt_maskname to handle mask names.
+    2.	Minor bug fixes.
+    3.	The xt_ and yt_ versions are the same but the yt_version is
+	present to allow external packages to check for the presence
+	of ytpmmap.x and if not present use their own copy of the file.
+	This allows these packages to be compiled with earlier versions.
+	Eventually the yt versions should be obsoleted.
+	(3/19/07, Valdes)
+
+xtargs.x	+
+mkpkg
+	Simple interface to parse an argument string consisting of a list
+	of whitespace separated keyword=value pairs.  (8/31/05, Valdes)
+
+=======
+V2.12.3
+=======
+
+rmsorted.x
+lib$pkg/rmsorted.h
+    This implements a sorted running median algorithm.
+    (5/12/05, Valdes)
+
+rmturlach.x
+    This implements the Turlach running median algorithm from the R package.
+    (5/12/05, Valdes)
+
+xtsample.gx
+    Utility to get a sample of pixels from an image.  (5/6/05, Valdes)
+
+xtstat.gx
+    Utility to compute a mean, sigma, median, and mode.  This is commonly
+    used with xt_sample.  (5/6/05, Valdes)
+
+fixpix/xtfp.x
+    Wrong fix was made.  (1/4/05, Valdes)
+
+fixpix/xtfp.x
+    For reasons I can't understand, the column interpolation was broken.
+    A loop over the columns was using ncols=FP_NCOLS, the number of bad pixels
+    across columns, instead of nc=IM_LEN(im,1), the number of columns in
+    the image.
+    (6/22/04, Valdes)
+
+numrecipes.x
+    Added LU decomposition.  (6/18/04, 2004)
+
+fixpix/xtpmmap.x
+    1. The routines now allow selecting whether to match masks in physical
+       coordinates or logical coordinates.  When matching in logical
+       coordinates this simply means extending or trimming the mask if
+       the sizes are not the same.
+    2. Added a new routine xt_mappm which is now the prefered routine
+       that allows selecting the matching type.  The previous xt_pmmap
+       could not be changed since it used by various tasks.
+    (6/18/04, Valdes)
+
+xtmasknames.x
+    Added routines that hand pixel mask names.  This is fairly sophisticated
+    in dealing with whether or not the user specifies file extensions,
+    image extensions, and flags.  It will produced masks in FITS extensions
+    by default.  (6/16/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+fixpix/xtpmmap.x
+    If the mask and data are offset by a fraction of a pixel it was possible
+    to get an out-of-bounds error.  (8/14/03, Valdes)
+
+fixpix/xtpmmap.x
+    The loop over the range list in xt_match should start at 2 rather
+    than 1.  (8/14/03, Valdes)
+
+fixpix/xtpmmap.x
+    Added some error checks to avoid a segmentation violation in xt_pmtext
+    when there is an error in im_pmmapo.  (9/16/02, Valdes)
+
+fixpix/xtpmmap.x
+    A common case of matching a mask to an image is where the pixel sizes
+    are the same but there are offsets and/or different sizes.  An optimized
+    mask matching based on using range lists and not calling mwcs was
+    added.  (9/12/02, Valdes)
+
+fixpix/xtpmmap.x
+    Added test for a pm pointer in xt_pmmap.  I can't remember why this
+    is was added in the version in ACE but it seems right.  (9/10/02, Valdes)
+
+fixpix/xtpmmap.x
+    In the mask matching if there is no offset or sampling difference it
+    was returning the mask unchanged even if the sizes are not the same.
+    (9/10/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+xtools$fixpix/xtpmmap.x
+    The change to IMIO for mapping bad pixel files in FITS extensions
+    resulted in a different error code when failing to open the file.
+    This code needed to be recognized by this routine in order to
+    continue on to try other possible formats.  (2/27/02, Valdes)
+
+xtools$rngranges.x
+    Further modification for INDEF range limits.  (2/4/02, Valdes)
+
+xtools$rngranges.x
+    Added missing rstr argument to 2 rng_error calls. (01/07/02, Davis)
+
+xtools$catquery/cqquery.x
+    Fixed a couple of typos in the code which detects the end of the http
+    header. (01/03/02, Davis)
+
+xtools$rngranges.x
+xtools$rngranges.xBAK +
+    Modified rng_add to handle INDEFs better.  This was the change found
+    in the nmisc version.  There are some other differences but since the
+    records of why the changes were made are missing I fixed only the
+    immediate problem found with OBSUTIL.SPECFOCUS.
+    (11/14/01, Valdes)
+
+xtools$skywcs/doc/skdecim.hlp
+xtools$skywcs/doc/skequatorial.hlp
+xtools$skywcs/doc/sklltran.hlp
+xtools$skywcs/doc/skultran.hlp
+xtools$skywcs/doc/skywcs.hlp
+xtools$catquery/doc/catquery.hlp
+xtools$catquery/doc/cqsqpar.hlp
+xtools$catquery/doc/cqsqparn.hlp
+    Fixed various formatting problems in the skywcs and catquery library
+    help pages. (19/09/01, Davis)
+
+xtools$catquery/
+    Added the prototype catalog and survey access tools to the xtools package.
+    (27/08/01, Davis)
+
+xtools$fixpix/xtpmmap.x
+    Added missing argument to mw_ctrand calls.  (6/15/01, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    Fixed problems with xt_match.  The new version is more robust and
+    correct.  A bad pixel for the reference image is the maximum of all
+    pixels in the pixel mask which fall within the reference pixel.   This
+    version still does not allow any relative rotations but does allow
+    non-integer offsets.  (4/24/01, Valdes)
+
+xtools$fixpix/xtfixpix.x
+    Added a call to pm_compress to compress the pixel mask if there are
+    more than a certain number of edits to avoid the memory inefficiency
+    in plio.  (2/2/01, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    A mask name beginning with '^' is used to invert a mask.
+    (2/1/01, Valdes)
+
+xtools$inlfit.gx
+xtools$inlfitr.x
+xtools$inlfitd.x
+xtools$inlrefit.gx
+xtools$inlreffitr.x
+xtools$inlrefitd.x
+    Added a check for the condition case where the number of data points
+    minus the number of deleted points (i.e. those with weights of 0.0)
+    is less than the number of fitting parameters. The previous checks did
+    not task into account the number of deleted points and could produce
+    solutions that were correct but non-physical (1/2/01, Davis)
+
+xtools$fixpix/xtpmmap.x
+    1. The test for matching offsets was incorrect.
+    2. The use of BPM was broken.
+    3. There was a memory leak because imunmap does not free the pl
+	pointer set with im_pmmapo (also there was an imio bug in
+	freeing the pl pointer set with im_pmmap which has now been
+	fixed).  A new procedure xt_pmunmap should be used whenever
+	xt_pmmap is used to insure any internal pointer created by
+	xt_match to match the mask to a reference image is freed.
+    (12/12/00, Valdes)
+
+xtools$skywcs/
+    Added the sky coordinates transformation tools to the xtools package.
+    (10/12/00, Davis)
+
+=========
+V2.11.3p1
+=========
+
+xtools/fixpix/xtpmmap.x
+    A mask name begining with '!' is now treated as a reference to a
+    header keyword.  (9/4/00, Valdes)
+
+xtools/fixpix/xtpmmap.x
+    When a pixel mask (overlay or bad pixel) needed to be matched to
+    the data in physical coordinates the internal generation of a
+    new mask was being done in short integers.  This would truncate
+    any masks with values greater than 16 bits.  All uses of short
+    where changed to integer.  (5/16/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+
+=======
+V2.11.3
+=======
+
+xtools$fixpix/xtfp.gx
+    The formating of the verbose pixel printing was missing a couple of
+    blanks.  (12/15/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+xtools$ranges/mkpkg
+xtools$icfit/mkpkg
+xtools$fixpix/mkpkg
+xtools$mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+xtools$inlfit/mkpkg
+    Removed an uncessary file dependency from the mkpkg file. (20/9/99, Davis)
+
+=======
+V2.11.2
+=======
+xtools$fixpix/xtpmmap.x
+    Removed extra argument to imgl1i.  (8/11/99, Valdes)
+
+xtools$imtools.x
+    fnext is a function not a subroutine.  (8/11/99, Valdes)
+
+xtools$xtanswer.x
+    Fixed incorrect number of arguments in getline call.  (8/11/99, Valdes)
+
+xtools$nlfit/inreject.x
+xtools$nlfit/inrejectr.x
+xtools$nlfit/inrejectd.x
+    Rearranged the code to remove a missing sfree statement problem
+    detected by spplint. (8/10/99, Davis)
+
+xtools$center1d.x
+    The step of finding a local maxima was not correct.  (4/19/99, Valdes)
+
+xtools$fixpix/xtfp.gx
+    If there was no column interpolation the pixel type for the allocated
+    data array was not set resulting in an error during xt_fpfree.
+    (7/20/98, Valdes)
+
+xtools$%xtimnames.x
+    Modified extension testing code to use iki_validextn.
+    (7/13/98, Valdes)
+
+xtools$fixpix/xtfp.gx
+    Fixed a bug allowing out-of-bounds reference to FP_COL.
+    (6/6/98, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    The steps to check if an image and mask have an integer relationship
+    (integer sampling and integer offsets) in their physical coordinate
+    systems could fail because real precision was not high enough
+    in MWCS transformation calls.  Changed variables and MWCS calls
+    to double.  (5/29/98, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    The XT_PMINVERT function has a bug in using the range list.
+    (4/22/98, Valdes)
+
+xtools$fixpix/xtfixpix.h
+xtools$fixpix/xtfixpix.x
+xtools$fixpix/xtfp.gx
+    The modified data buffer returned by xt_fps$t used the imgl2$t buffer
+    which might be invalidated by subsequent imio activity such as
+    impl2$t.  This was found with proto.fixpix.  The routines were modified
+    to allocate and use a separate line buffer.  Note that this only
+    applies to lines which are modified.  If the requested line does
+    not have any bad pixels to fix then the input buffer is still returned.
+    (1/29/98, Valdes)
+
+xtools$fixpix/xtfp.gx
+    When a segment of bad pixels contains a mixture of column and line
+    interpolations and the first pixel is column interpolation then the
+    line interpolations could be wrong because interpolation coefficients are
+    not initialized.  A second minor fix is that the column interpolation
+    endpoints printed in pixel listing mode could be incorrect.
+    (1/29/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+xtools$imtools.x
+     XT_MKIMTEMP was modified to append the same extension as the input
+     image when creating a temporary image name.  (10/30/97, Valdes)
+
+xtools$ranges.x
+     Returned the EOLIST marker to zero since some programs rely on this.
+     This means that zero cannot be a range element.  Added some
+     checks against a zero step size.  (8/22/97, Valdes)
+
+xtools$fixpix/xtpmmap.x
+     There was a bug in the code which gives "Warning: PLIO: reference out
+     of bounds on mask".  This was introduced with the changes to allow
+     masks and images to have different binning.  (8/21/97, Valdes)
+
+xtools$ranges.x
+xtools$doc/ranges.hlp
+    Now allows zero as a valid range element though the default for a
+    null string is still 1.  (7/15/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+xtools$fixpix/xtpmmap.x
+    Improved xt_match to match when the sampling is different.
+    (5/21/97, Valdes)
+
+xtools$obsdb.x
+    File date was changed but the code was not changed (5/7/97, Valdes)
+
+xtools$dttext.x
+    Added the new routine dtgetd to the dttext package. (1/16/97, Davis)
+
+xtools$fixpix/xtpmmap.x
+    Fixed some bugs.  (12/30/96, Valdes)
+
+xtools$mkpkg
+xtools$fixpix/	+
+    Added some new tools for dealing with masks.  (12/6/96, Valdes)
+
+xtools$center1d.x
+    When the width parameter is less than or equal to 1 pixel the algorithm
+    is supposed to return the nearest local maximum.  There was a bug
+    such that the nearest pixel to the starting point was returned
+    unless that pixel is a local minimum.  (10/24/96, Valdes)
+
+xtools$numrecipes.x
+    Modified the Poisson deviate routine to return zero for input
+    values less than or equal to zero.  (10/1/96, Valdes)
+
+xtools$xtimnames.x
+    Added "fits" and "fit" as extensions.  (7/30/96, Valdes)
+
+xtools$inlfit/ingresults.gx
+    Changed several INDEFR references to INDEF references so that INDEF
+    has the correct type (real or double) in the output .x files.
+    (18/7/96, Davis)
+
+xtools$dttext.x
+    The dtunmap procedure now returns if a null pointer is received.
+    (1/6/95, Valdes)
+
+xtools$center1d.x
+    Added a routine that allows setting some of the previously hardwired
+    parameters.  By default the routines behave as before unless
+    c1d_params is called to set the parameters.  (10/2/95, Valdes)
+
+xtools$incopy.gx
+    Changed 4 MEMP references to Mem$t references. The in_copyr and
+    in_copyd routines are not used anywhere in the system so this should
+    not be a problem. (8/2/95, Davis)
+
+xtools$rngranges.x
+    Added missing argument to rng_error calls.  (8/2/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+xtools$obsdb.x
+    Changed the "timezone" parameter to be a double instead of an integer.
+    There are non-integer timezones such as India.  (12/29/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine can still have a problem in that the tan function
+    can return a very large number triggering either an overflow in
+    the evaluation of em or in the int truncation of em as addressed
+    below.  A test is now made on the value of the tan function.
+    (9/14/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine from Numerical Recipes can try to coerce a large
+    floating point number to an integer which can cause an exception.
+    If the value is 100 or greater a Gaussian deviate is now returned.
+    (8/11/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+xtools$center1d.x
+    For EMISSION features the threshold is applied as an absolute threshold
+    if the minimum data value is above zero and as a threshold relative to the
+    minimum data value if the minimum data value is below zero.  Without
+    this change centering would fail if the data was all below zero.
+    (5/5/93, Valdes)
+
+xtools$obsdb.x
+    Fixed a couple of typos in comments.  No code changes.  (4/28/93, Valdes)
+
+xtools$rngranges.x
+    Yet another ranges package.  This ranges package allows real number
+    ranges (including negative values) and @ lists.  It is an object
+    oriented package using a pointer.
+
+    RNG_OPEN     -- Open a range string.  Return a pointer to the ranges.
+    RNG_CLOSE    -- Close range structure.
+    RNG_INDEX    -- Get ith range element.  Return EOF if index is out of range.
+    RNG_NEAREST  -- Get nearest range index and value to input value.
+		     Return the difference.
+    RNG_INRANGER -- Check if real value is within a range.
+    RNG_INRANGEI -- Check if integer value is within a range.
+    RNG_ELEMENTR -- Check if real value is an element.
+    RNG_ELEMENTI -- Check if integer value is an element.
+    RNG_ADD      -- Add a range.
+    RNG_ERROR    -- Set error flag and free memory.
+    (2/16/93, Valdes)
+
+xtools$center1d.x
+    If the initial center was more than three pixels from the true center
+    the interation would stop prematurely because of the dxcheck criterion.
+    Changed dxabs to be the full dx rather than the the limit of 1 pixel
+    per interation.  This allows the interation to step as often as
+    it needs in one pixel steps until the dx estimate begins to become
+    small.  It still preserves the checks for flipping back and forth
+    about the center and for a maximum number of times the dxabs
+    is greater than the previous minimum dxabs = dxlast.
+    (9/22/92, Valdes)
+
+=======
+V2.10.2
+=======
+
+=======
+V2.10.1
+=======
+
+lib$pkx/dttext.h
+pkg$xtools/dttext.x
+    Added a new routine, dtremap, which allows keeping the database
+    open across multiple calls and remapping when a new database file
+    is specified.  It is also optimized when switching back and forth
+    between read and append modes.  The data structure was modified
+    to record the current database and file names for checking when
+    the name changes.  (4/30/92, Valdes)
+
+pkg$xtools/obsdb.x
+    1.  Removed obsimcheck procedure.  Did not like the defaulting
+	to last set observatory if OBSERVAT not found.
+    2.  Added obsimopen procedure.  This is the procedure to call when
+	dealing with images.  It returns flags to determine whether a
+	new observatory was opened and whether the observatory was
+	define by the image header
+    3.  Added a verbose obsvopen to allow tracking what the interface is
+	doing.
+    4.  These changes made in conjunction with changes to the
+	astutil.observatory task.
+    (2/4/92, Valdes)
+
+pkg$xtools/xtimnames.x +
+    Added some tools for dealing with image kernel extensions in image names.
+    (1/22/92, Valdes)
+
+pkg$xtools/inlfit/infit.gx
+pkg$xtools/inlfit/infitr.x
+pkg$xtools/inlfit/infitd.x
+    The fit status was not being updated correctly if point were 
+    automatically rejected from the fit as opposed to being deleted.
+    (1/8/92, Davis)
+
+pkg$numrecipes.x
+    Added some fourier routines.  Note that this is still a source only
+    entry and is not part of libxtools.  (9/4/91, Valdes for MJF)
+
+pkg$numrecipes.x
+    mr = 0.1 * mr --> mr = max (EPSILONR, 0.1 * mr)	(9/2/91, Valdes)
+
+pkg$xtools/inlfit/
+    The interactive non-linear least squares fitting package used by PHOTCAL
+    was installed in XTOOLS. (8/6/91)
+
+pkg$obsdb.x +
+    New observatory database routines.  (11/6/90, Valdes)
+
+====
+V2.9
+====
+
+pkg$xtools/center1d.x
+    In the case that the position correction flipped back and forth about the
+    center no center would be found.  In this case I added a check to
+    divide the correction factor in half.  (3/13/90, Valdes)
+
+pkg$xtools/numrecipes.x +
+    Add some procedures for generating Gaussian and Possion deviates
+    as well as an implementation of the Levenberg-Marquardt nonlinear
+    chi square minimization algorithm.  These routines are either
+    direct implementations from Numerical Recipes or based on descriptions
+    in that book. (10/25/89, Valdes)
+
+pkg$xtools/dttext.x
+    Commented out the diagnostic message in dtlocate.  (7/19/89, Valdes)
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    If the centering width is less than or equal to 1 the nearest minima or
+    maxima is found.  As before, a minimum width of 3 is used if
+    the width is between 1 and 3.  (7/13/89, Valdes)
+
+===========
+Version 2.8
+===========
+
+pkg$xtools/logfiles.x
+    Added these routines to open and to close a list of logfiles.
+    (6/2/89, Seaman)
+
+pkg$xtools/ranges.x
+    Fixed a bunch of bugs in the zero handling, the MAX_INT handling and
+    that made the step notation flaky.  Made a comma a hard separator
+    between two ranges rather than mere whitespace.  (6/2/89, Seaman)
+
+pkg$xtools/xtmksections.x
+    A 2D image with second dimension length of 1 is returned without
+    an image section from xt_mk1d and xt_mksection.  (1/31/89, Valdes)
+ 
+pkg$xtools/xtsort.x
+    Added a double precision version of the three vector sorter, named
+    xt_sort3d.  It required a double precision version of xts_compared.
+    This change was to support the utilities.curfit task, which now
+    sorts its input list data before fitting.  (6/24/88 ShJ)
+
+pkg$xtools/xtsums.x
+    When the number of lines or columns is 1 and the line or column is the
+    same as a previous call and a data is null then a new vector is not read
+    causing uninitialized data to be returned.  Added l1=0 and c1=0 to fix
+    problem.  This problem appeared in proto.toonedspec.  (2/12/88 Valdes)
+
+pkg$xtools/mksection.x
+    User specified section strings of the form "column 051" are now
+    converted to [51,*] instead of [051,*]. (11/9/87 Valdes)
+
+====
+V2.5
+====
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    Valdes, April 2, 1987:
+    1.  A bug with testing the right edge of the data was fixed.  This caused
+	FPE errors on AOS/IRAF.
+    2.  The centering fails if the maximum number of iterations is reached
+	or the changes do not continue to decrease within 3 iterations of
+	the last minimum change.
+    3.  Defined parameters replaced constants used in the code.
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    Valdes, March 5, 1987:
+    1.  A silent minimum of 3 is imposed on the width parameter.  If there
+	is ever a need to allow smaller widths then the procedure can
+	be changed and the application relinked.
+    2.  The help page was modified to reflect this change.
+
+pkg$xtools/center1d.x
+    Valdes, October 29, 1986:
+    1.  The first use of threshold was only as a data range limit.
+	Now it is used to eliminate all peaks less than threshold from
+	the continuum.  This fixes ever finding weak features less
+	than threshold.
+
+pkg$xtools/center1d.x
+    Valdes, August 18, 1986:
+    1.  Added a detection threshold parameter to CENTER1D.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+cogetr.x: Valdes, July 3, 1986
+    1.  Error in initializing the procedure cogetr fixed.
+
+icfit$: Valdes, July 3, 1986
+    1.  ICFIT package replaced by a new version.
+
+=====================================
+STScI Pre-release and SUN 2.3 release
+=====================================
+
+icfit$icgfuncs.gx:  Valdes, June 18, 1986
+    1.  DCVEVAL was being called in ICGFUNCS with a real argument when
+	selecting the nonlinear plot (key 'l').  This caused an error
+	on the SUN.  Changed "real" to PIXEL.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+imt.x:  Valdes April 29, 1986
+    1.  Modified the image template package to sort wildcard expansions.
+
+icfit$icgfit.gx,icgfit2.x,icgcolon.x:  Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+    2.  Fixed problem with colon usage for ":sample" and ":function"
+
+xtools:  Valdes, March 24, 1985
+    1.  Added XT_PHISTORY to put dated history string.
+
+pkg$xtools/imtools.x:  Valdes, March 18, 1985
+    1.  XT_MKIMTEMP modified to create the temporary image header in the
+	user current directory with the prefix "tmp".
+    2.  XT_DELIMTEMP modified to call IMRENAME instead of RENAME.
+
+From Valdes March 13, 1986:
+
+1.  Added procedure dtgad (database get array double) to dttext tools.
+It's purpose is to accomodate double precisions curve fits.
+
+2.  Added COGETR procedures for efficient column access.  A help page
+is available.
+
+3.  Added XTSUMS procedures for buffered sums (both column and line).
+They are particularly useful for moving sums type of operations.  A help
+page is available
+
+4.  Added help pages for COGETR and XTSUMS procedures to help database.
+------
+From Valdes March 10, 1986:
+
+1.  Added IMTREW rewind procedure to image template tools.
+
+2.  Added IMTGIM procedure to get an image from the template by index number.
+------
+From Valdes March 5, 1986:
+
+1.  Modified dttext to allow deleting a database.
+===========
+Release 2.2
+===========
+From Valdes Feb. 8, 1986:
+
+1.  Modified XT_DELIMTEMP and DEL_IMTEMP to update the pixel header
+file so that it correctly points to the header file after the header
+file is renamed.
+------
+From Valdes Jan. 13, 1986:
+
+1.  Changes in DTTEXT.X:
+	a.  Size of OS filename in DTMAP1 extended from SZ_FNAME to
+	    SZ_PATHNAME + SZ_FNAME.
+	b.  Database directories do not allow periods in the names when
+	    created.
+2.  XTMKSECTION was computing the middle line (or column) as
+len / 2 which gave zero for an image of length 1.  Changed to
+(len + 1) / 2.
+------
+From Valdes Dec. 31, 1985:
+
+1.  A bug in imt.x due to incorrect indexing in a string has been fixed.
+------
+From Valdes Nov. 22, 1985:
+
+1.  A new procedure XT_GIDS has been added to find identifier tokens in a
+string and match the identifiers against a dictionary string.  An array
+of YES/NO values for each dictionary entry, up to a maximum of maxids,
+is returned.  This procedure is useful for parsing an option string.
+It is nice because identifiers can be abbreviated and delimiters can be
+anything which is not an identifier token (whitespace, commas, colons,
+semicolons, etc).
+-----
+From Valdes Nov. 15, 1985:
+
+1.  Added DTMAP1 to DTTEXT.X text database package.  This procedure
+takes a directory name as the database and stores or access text database
+files in the directory under the file name key.  It maps the name
+"database/key" and calls DTMAP.  This allows better organization of
+database information into subfiles of a database rather than one massive
+text file.  It calls DTMAP with the database name directly if the database
+name is a regular file and not a directory.  Thus, it is backwards
+compatible with older single file text databases.
+
+2.  Added ISDIRECTORY.  This procedure tests a virtual file name to see
+if it is a directory and returns the os pathname suitable for concatentation.
+The function value is the number of characters in the pathname which is
+0 for a nondirectory file.
+cogetr.x: Valdes, July 3, 1986
+    1.  Error in initializing the procedure cogetr fixed.
+
+icfit$: Valdes, July 3, 1986
+    1.  ICFIT package replaced by a new version.
+
+=====================================
+STScI Pre-release and SUN 2.3 release
+=====================================
+
+icfit$icgfuncs.gx:  Valdes, June 18, 1986
+    1.  DCVEVAL was being called in ICGFUNCS with a real argument when
+	selecting the nonlinear plot (key 'l').  This caused an error
+	on the SUN.  Changed "real" to PIXEL.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+imt.x:  Valdes April 29, 1986
+    1.  Modified the image template package to sort wildcard expansions.
+
+icfit$icgfit.gx,icgfit2.x,icgcolon.x:  Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+    2.  Fixed problem with colon usage for ":sample" and ":function"
+
+xtools:  Valdes, March 24, 1985
+    1.  Added XT_PHISTORY to put dated history string.
+
+pkg$xtools/imtools.x:  Valdes, March 18, 1985
+    1.  XT_MKIMTEMP modified to create the temporary image header in the
+	user current directory with the prefix "tmp".
+    2.  XT_DELIMTEMP modified to call IMRENAME instead of RENAME.
+
+From Valdes March 13, 1986:
+
+1.  Added procedure dtgad (database get array double) to dttext tools.
+It's purpose is to accomodate double precisions curve fits.
+
+2.  Added COGETR procedures for efficient column access.  A help page
+is available.
+
+3.  Added XTSUMS procedures for buffered sums (both column and line).
+They are particularly useful for moving sums type of operations.  A help
+page is available
+
+4.  Added help pages for COGETR and XTSUMS procedures to help database.
+------
+From Valdes March 10, 1986:
+
+1.  Added IMTREW rewind procedure to image template tools.
+
+2.  Added IMTGIM procedure to get an image from the template by index number.
+------
+From Valdes March 5, 1986:
+
+1.  Modified dttext to allow deleting a database.
+===========
+Release 2.2
+===========
+From Valdes Feb. 8, 1986:
+
+1.  Modified XT_DELIMTEMP and DEL_IMTEMP to update the pixel header
+file so that it correctly points to the header file after the header
+file is renamed.
+------
+From Valdes Jan. 13, 1986:
+
+1.  Changes in DTTEXT.X:
+	a.  Size of OS filename in DTMAP1 extended from SZ_FNAME to
+	    SZ_PATHNAME + SZ_FNAME.
+	b.  Database directories do not allow periods in the names when
+	    created.
+2.  XTMKSECTION was computing the middle line (or column) as
+len / 2 which gave zero for an image of length 1.  Changed to
+(len + 1) / 2.
+------
+From Valdes Dec. 31, 1985:
+
+1.  A bug in imt.x due to incorrect indexing in a string has been fixed.
+------
+From Valdes Nov. 22, 1985:
+
+1.  A new procedure XT_GIDS has been added to find identifier tokens in a
+string and match the identifiers against a dictionary string.  An array
+of YES/NO values for each dictionary entry, up to a maximum of maxids,
+is returned.  This procedure is useful for parsing an option string.
+It is nice because identifiers can be abbreviated and delimiters can be
+anything which is not an identifier token (whitespace, commas, colons,
+semicolons, etc).
+-----
+From Valdes Nov. 15, 1985:
+
+1.  Added DTMAP1 to DTTEXT.X text database package.  This procedure
+takes a directory name as the database and stores or access text database
+files in the directory under the file name key.  It maps the name
+"database/key" and calls DTMAP.  This allows better organization of
+database information into subfiles of a database rather than one massive
+text file.  It calls DTMAP with the database name directly if the database
+name is a regular file and not a directory.  Thus, it is backwards
+compatible with older single file text databases.
+
+2.  Added ISDIRECTORY.  This procedure tests a virtual file name to see
+if it is a directory and returns the os pathname suitable for concatentation.
+The function value is the number of characters in the pathname which is
+0 for a nondirectory file.
+.endhelp

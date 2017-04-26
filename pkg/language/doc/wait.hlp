@@ -1,0 +1,36 @@
+.help wait Feb86 language
+.ih
+NAME
+wait -- wait for a background job to terminate
+.ih
+USAGE
+wait [job job ...]
+.ih
+PARAMETERS
+.ls job
+A background job number, as printed when the job is submitted,
+or as given by the \fIjobs\fR command.
+.le
+.ih
+DESCRIPTION
+The \fIwait\fR task causes the CL to hibernate until a background job or
+jobs terminates.  No arguments, or a job number of 0 means to wait
+until all background jobs finish, while other arguments can be
+specified to wait for a particular job.  If a background job is
+not running the wait returns immediately.
+.ih
+EXAMPLES
+1. Wait for any background jobs to finish, beeping the terminal when done.
+
+	cl> wait;beep
+
+2. Wait for job 3 to terminate.
+
+	cl> wait 3
+.ih
+BUGS
+Deadlock is possible.
+.ih
+SEE ALSO
+jobs, kill, service
+.endhelp

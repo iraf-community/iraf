@@ -1,0 +1,17 @@
+SCOMBINE -- Combine spectra
+
+This routine is based in large part on IMCOMBINE.  The routines in the
+generic directory are identical to those in that task except that they
+only contain routines for real data.  The ic routines in this directory
+are similar though modified from IMCOMBINE.
+
+The iscombine files are for an interactive combine task based on work
+by CTIO.  Because it is limited currently to linear spectra and is not
+organized to take advantage of the IMCOMBINE options it is not installed.
+A version of this may someday be added based on the current software.
+
+
+=======
+
+This version was renamed to OSCOMBINE.  It is obsolete and may be removed
+at some future time.  (4/14/04, Valdes)

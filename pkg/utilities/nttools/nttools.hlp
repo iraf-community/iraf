@@ -1,0 +1,244 @@
+.help ttools May2000 tables
+.nj
+
+This package contains tasks for working with tables.
+Tables are files that contain data in row & column format.
+The supported table formats are FITS, STSDAS, and ASCII text.
+Different columns may have different data types,
+but all the values in one column have the same data type.
+In addition to the tabular data,
+a table may contain header parameters identified by keywords.
+
+.nf
+Each column has the following four items of information:
+    (1) a name (case insensitive),
+    (2) data type (real, double, integer, short int, boolean, or text),
+    (3) a format specification for printing the contents of the column,
+    (4) "units", a string (default is null).
+.fi
+
+For STSDAS tables the column names and units
+can be up to 20 characters in length.
+For FITS tables the limit is 68 characters.
+The default column names for ASCII tables are "c1", "c2", "c3", etc.;
+however, there is a "#c" syntax for giving explicit column definitions,
+which is described below.
+
+Header parameters may have data types of
+floating point, integer, boolean, or text.
+Header keywords are limited to eight characters (for FITS compatibility)
+and are converted to upper case.
+
+The print formats are discussed below.
+
+Here is a list of the ttools tasks organized by function:
+
+.nf
+    create a table:
+	tcreate, tedit
+
+    display contents:
+	tprint, tread, tedit, tcheck, thedit, thselect, tupar, gtedit
+
+    modify contents:
+	tedit, thedit, tupar, gtedit
+
+    information about a table:
+	tinfo, tlcol
+
+    database-like utilities:
+	tquery, tsort, tproject, tselect, tdiffer, tjoin, tmatch,
+	tmerge, tproduct, texpand
+
+    statistics, etc:
+	thistogram, tlinear, trebin, tstat
+
+    arithmetic:
+	tcalc, tunits, tintegrate
+
+    convert between table or image header parameter, cl parameter, table datum:
+	keypar, keytab, parkey, partab, tabkey, tabpar
+
+    convert columns of arrays to other formats:
+	txtable, tximage, titable, tiimage, taextract, tainsert
+
+    change column definition or table size:
+	tchcol, tchsize
+
+    miscellaneous:
+	tcopy, tdelete
+.fi
+
+ASCII text tables can be simple files
+(just data in row and column format),
+or they can have header keywords and/or explicit column definitions.
+
+Header keywords and column definitions
+in text tables have the following syntax:
+.nf
+#k keyword = value comment
+#c column_name data_type print_format units
+.fi
+
+The "#k " (or "#K ") must be the first three characters of the line,
+and the space following "k" is required.
+Header keywords can be added to any text table,
+and they do not have to precede the data.
+For a text string keyword,
+quotes around the value are needed if there is a comment,
+in order to distinguish value from comment.
+
+The "#c " (or "#C ") must be the first three characters of the line,
+and the space following "c" is required.
+All column definitions must precede the table data.
+Aside from the "#c ", the syntax is the same as
+the output from 'tlcol' or the 'tcreate.cdfile'.
+Only the column name is required,
+although in most cases you will also need to give the data type
+(the default is d, double precision).
+The print format is not used for reading the text file,
+only for displaying it or printing it out if it was modified.
+The file is read in free format,
+with whitespace (blank or tab) separated columns.
+Text string columns must be enclosed in quotes
+if they contain embedded blanks.
+
+For more information about text tables, "page tables$doc/text_tables.doc".
+
+The print format is used by such tasks as 'tprint', 'tedit', and 'tread'
+to determine how the column values are to be displayed.
+Most of the ordinary Fortran formats are supported for tables.
+Nonstandard formats should not be used for FITS tables
+for reasons of portability.
+The differences between the capabilities of Fortran formats
+and SPP formats are discussed below.
+
+Here is a list of the default print format for each data type,
+given in both SPP style and Fortran style.
+
+.nf
+default formats:
+
+	data type      SPP       Fortran
+	---------      ---       -------
+	real           %15.7g    G15.7
+	double prec    %25.16g   G25.16
+	integer        %11d      I11
+	short          %11d      I11
+	boolean        %6b       L6
+	text string    %-ns      A-n
+.fi
+
+where n for character strings is the string size as given when the
+column was defined.
+The minus sign means that the string will be left justified.
+While a format such as "A-12" is not available in standard Fortran,
+a format may be given with that syntax when using ttools tasks,
+and the format will be converted to SPP style.
+
+SPP formats (and Fortran equivalents) that are supported
+for STSDAS tables are as follows.
+
+.nf
+	SPP    Fortran      meaning
+	---    -------      -------
+	 b        L         boolean "yes" or "no"
+	 d        I         integer, displayed in decimal
+	 x        Z         integer, displayed in hexadecimal
+	 e      E or D      exponential format
+	 f        F         floating point
+	 g        G         use F or E as appropriate
+	 h        H         nn:nn:nn.n
+	 H      (none)      divide by 15, then nn:nn:nn.n
+	 m        M         nn:nn.n
+	 M      (none)      divide by 15, then nn:nn.n
+	 s        A         character string
+.fi
+
+The syntax is "%w.dC" (SPP style) or "Cw.d" (Fortran style),
+where w is the field width,
+d is the number of decimal places (or precision for g format),
+and C is the format code as given in the left column below.
+When giving a format in Fortran style,
+use the format code given in the second column;
+these are shown in upper case but may also be given in lower case.
+Note that H and M are not standard Fortran formats;
+in particular, H is not interpreted as Hollerith.
+See below for more information about H and M formats.
+
+The field width (w) may be given as a positive number,
+a negative number, or preceded by a zero.
+A negative field width means the value should be left justified in the field.
+A leading zero means the field should be padded on the left by zeroes;
+for example, "%04d" or "I04" is equivalent to the standard Fortran "I4.4".
+The d value means the number of decimal places
+for f, h, m, H or M format,
+but it means the digits of precision for g format.
+For character strings, "%s" means left justify and
+use only as much space as needed to print the value;
+"%40s" and "%-40s" mean right and justify respectively in a 40-character field.
+
+When the format is given in SPP style,
+there are two relatively new formats that are not available in Fortran.
+Specifying upper case H or M means that
+the numbers will be divided by 15 before being formatted
+using h or m format respectively.
+This is intended for converting hours to degrees.
+When two table columns contain right ascension and declination,
+both in decimal degrees,
+then appropriate formats might be,
+for example, %12.2H or %9.2M for right ascension
+and %12.1h for declination.
+This would print the right ascension in hours, minutes, seconds
+(or hours and minutes for M format) with two decimals,
+and would print the declination in degrees, minutes, seconds
+with one decimal after the seconds.
+
+Here are some examples.
+
+.nf
+	internal value    format     displayed value
+	--------------    ------     ---------------
+	2.71828           %10.4g          2.718
+	2.71828e27        %10.4g       2.718E27
+	2.71828           %10.4f         2.7183
+	2.71828           %10.4e        2.718E0
+	2.71828           %10.1h      2:43:05.8
+	2.71828           %10.1m         2:43.1
+	2.71828           %07.1m     02:43.1
+	2.71828           %10d                2
+	927               %10d              927
+	927               %-10d      927
+	927               %010d      0000000927
+	ttools            %s         ttools
+	ttools            %10s           ttools
+	ttools            %-10s      ttools
+.fi
+
+FITS and STSDAS tables can have columns that contain arrays ("3-D tables").
+That is, each cell (designated by both a column name and a row number)
+stores a 1-dimensional array of elements instead of a single value.
+
+There are four tasks that act as 3-D table translators. These tasks extract
+information from or insert information into "3-D tables".
+
+The information moved from/to a 3-D table by the tasks in this package can
+have either of two forms, regular 2-D tables or 1-dimensional images.
+Tasks 'txtable' and 'titable' perform, respectively, extractions and
+insertions of 2-D tables. Tasks 'tximage' and 'tiimage' perform, respectively,
+extractions and insertions of images.
+
+Task 'tscopy' is a variant of the 'tcopy' task.
+It performs a standard table copy
+but also supports the selector mechanism to allow copying of sections
+of columns that contain arrays.
+Type "help selectors" for further information about sections.
+
+.ih
+SEE ALSO
+.nf
+selectors
+files in tables$doc/
+.fi
+
+.endhelp

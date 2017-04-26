@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+#  IRAF_UPDATE - Update the core IRAF system with a cumulative patch.
+
+opt="all"
+all=yes
+src_only=no
+list_only=no
+core_only=no
+noao_only=no
+vo_only=no
+
+if (( $#<1 )); then
+    opt="all"
+    all=yes
+else
+
+    # Process cmdline flags.
+    while [ -n "$1" ]; do
+      case "$1" in
+      "-all")                          # clean all package .s
+          all=yes
+	  opt="all"
+	  ;;
+      "-src")                          # update only . code
+          src_only=yes
+	  opt="src"
+	  ;;
+      "-list")                         # list files needing updating
+          list_only=yes
+	  opt="list"
+
+	  /bin/echo ""
+	  util/check_update
+	  if (( $?==0 )); then
+	      /bin/echo "IRAF is up to date"
+	  else
+	      /bin/echo "An IRAF update is available"
+	  fi
+	  /bin/echo ""
+	  (cd util; ${iraf}/util/pkgupdate -list)
+	  exit 0
+	  ;;
+      "-core")                         # update only core system
+          core_only=yes
+	  opt="core"
+	  ;;
+      "-noao")                         # update only NOAO package
+          noao_only=yes
+	  opt="noao"
+	  ;;
+      "-vo")                           # update only VO package
+          vo_only=yes
+	  opt="vo"
+	  ;;
+      *)
+          /bin/echo "Error: Unknown option '"$1"', quitting."
+          exit 1
+      esac
+
+      shift
+   done
+fi
+
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Called from Makefile, iraf=true root.
+source $iraf/unix/hlib/irafuser.sh
+irafdir=$iraf
+
+
+REPO=`${irafdir}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
+fi
+
+
+#  Init the build scripts as the first update.
+#/bin/echo "Updating build scripts ...."
+#${iraf}/util/self_update
+
+
+#  Execute the update.
+/bin/echo "Updating IRAF system  ...."
+util/iraf_latest $opt
+
+if (( $? == 2 )); then
+   /bin/echo -n "Update Status:    No updates necessary"
+else if (( $? == 0 )); then
+   /bin/echo -n "Update Status:    Successful	"
+else
+   /bin/echo -n "Update Status:    Fails	"
+fi
+/bin/echo ""
+
+exit 0

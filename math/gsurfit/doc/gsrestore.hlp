@@ -1,0 +1,36 @@
+.help gsrestore Aug85 "Gsurfit Package"
+.ih
+NAME
+gsrestore -- restore fit parameters
+.ih
+SYNOPSIS
+gsrestore (sf, fit)
+
+.nf
+pointer	sf		# surface descriptor
+real	fit[ARB]	# fit array
+.fi
+.ih
+ARGUMENTS
+.ls sf   
+Pointer to the surface descriptor structure. Returned by GSRESTORE.
+.le
+.ls fit    
+Array containing the surface parameters. The size of the fit array
+can be determined by a call gsstati.
+
+.nf
+	    len_fit = gsstati (gs, GSNSAVE)
+.fi
+.le
+.ih
+DESCRIPTION
+GSRESTORE returns the surface descriptor to the calling program and
+restores the surface parameters and fit ready for use by GSEVAL or
+GSVECTOR.
+.ih
+NOTES
+.ih
+SEE ALSO
+gssave
+.endhelp

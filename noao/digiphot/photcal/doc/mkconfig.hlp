@@ -1,0 +1,451 @@
+.help mkconfig Aug91 noao.digiphot.photcal
+.ih
+NAME
+mkconfig -- create a new configuration file 
+.ih
+USAGE
+mkconfig config 
+.ih
+PARAMETERS
+.ls config
+The name of the new configuration file.
+.le
+.ls catalog
+The source of the standard star catalog format description.
+\fICatalog\fR may be one of the supported standard star
+catalogs maintained
+in the directory "photcal$catalogs/", a catalog created with
+MKCATALOG, the standard input "STDIN",
+or a file created by the user containing the catalog
+format description.
+\fICatalog\fR is not prompted for if \fItemplate\fR is "".
+.le
+.ls observations
+The source of the observations file format description.
+\fIObservations\fR may be a catalog created by MKNOBSFILE,
+MKOBSFILE, OBSFILE, or MKCATALOG, the standard input "STDIN",
+or a file created by the user containing the observations file format
+description. \fIObservations\fR is not prompted for if \fItemplate\fR is "".
+.le
+.ls transform 
+The source of the transformation equations definition.
+\fITransform\fR may be the name of one of the supported standard star
+catalogs maintained in the directory "photcal$catalogs/",
+the standard input "STDIN", or a file created by the user
+containing the transformation equations definition.
+\fITransform\fR is not prompted for if \fItemplate\fR is "".
+.le
+.ls template = ""
+The name of an existing configuration file that can be used as a template
+for the new configuration file.
+If \fItemplate\fR is the null string "", then MKCONFIG
+prompts the user for the source of the standard star catalog 
+and observations file format descriptions
+\fIcatalog\fR and \fIobservations\fR, and the source of the transformation
+equation definitions \fItransform\fR.
+If \fItemplate\fR exists,
+MKCONFIG copies \fItemplate\fR into \fIconfig\fR and enters the editor
+if \fIedit\fR is "yes".
+.le
+.ls catdir = ")_.catdir"
+The directory containing the supported standard star catalogs.
+The default parameter value  redirects \fIcatdir\fR
+to a package parameter of the same name. A list of standard
+catalogs may be obtained by printing the file "photcal$catalogs/README".
+Alternatively the user may create their own standard star catalogs 
+and standard star catalog directory.
+.le
+.ls verify = no
+Verify each new entry in the configuration file as it is entered?
+.le
+.ls edit = yes
+Enter the editor and review the new configuration file?
+.le
+.ls check = yes
+Check the new configuration file for semantic and syntax errors?
+.le
+.ls verbose = no
+Print detailed information about the results of the check step instead
+of only a short summary?
+.le
+
+.ih
+DESCRIPTION
+
+MKCONFIG is a script task which creates and/or edits the configuration
+file \fIconfig\fR. If the configuration file already
+exists MKCONFIG, quits with a warning message. If the configuration file is
+a new file, MKCONFIG either prompts the
+user for input if \fItemplate\fR = "", or copies the existing configuration
+file \fItemplate\fR into \fIconfig\fR.
+
+If \fItemplate\fR  is "", MKCONFIG prompts the user for:
+1) the source of the standard star catalog format description
+\fIcatalog\fR, which assigns names to the columns of the standard star
+catalog,
+2) the source of the observations file format description
+\fIobservations\fR, which assigns names to the columns of the observations file,
+3) and the source of the transformation equations \fItransform\fR, which
+defines the form of the transformation equations from the
+instrumental to the standard system.
+
+If \fIcatalog\fR, \fIobservations\fR, or \fItransform\fR
+are set to the standard input "STDIN", MKCONFIG prompts for input from
+the terminal, verifying the input as it is entered if \fIverify\fR is "yes". 
+
+If \fIcatalog\fR is a standard star catalog name or a file name,
+MKCONFIG searches 1) the current directory for the associated format
+description file "fcatalog.dat", 2) the directory
+\fIcatdir\fR for the format description file "fcatalog.dat",
+and 3) the current directory for a file called "catalog", in that order.
+\fICatalog\fR is usually one of the supported standard star catalogs or
+a standard star catalog created by the user with MKCATALOG. 
+
+If \fIobservations\fR is an observations file name or a file name,
+MKCONFIG searches 1) the current directory for the format
+description file "fobservations.dat", and 2)
+the current directory for a file called "observations", in that order.
+\fIObservations\fR is usually created by the user with MKNOBSFILE or MKOBSFILE.
+
+If \fItransform\fR is assigned a standard star catalog name or a file name,
+MKCONFIG searches 1) the directory
+\fIcatdir\fR for the transformation equations definition file
+"ttransform.dat", and 2)
+the current directory for a file called "transform", in that order.
+\fITransform\fR is usually one of the supported standard star catalogs or
+"STDIN".
+
+The default photometric standards directory is "photcal$catalogs/".
+A list of supported catalogs is shown below.
+The standard catalog format description files may be listed or
+printed with the commands
+"dir photcal$catalogs/f*.dat" or "lprint photcal$catalogs/f*.dat" respectively.
+The standard transformation equation definition files may be listed or
+printed with
+the commands "dir photcal$catalogs/t*.dat" or "lprint photcal$catalogs/t*.dat"
+respectively.
+
+After data entry, and if \fIedit\fR is "yes",
+MKCONFIG enters the default text editor defined by the
+IRAF environment variable \fIeditor\fR.  Small
+corrections to the configuration file may be made at this point.
+Next the configuration file is checked for semantic and syntax errors
+if \fIcheck\fR is "yes" and the results are written on the terminal. 
+
+.ih
+STANDARD CATALOG FORMAT AND TRANSFORM FILES
+
+The list of standard star catalog files, catalog format description files
+and transformation equation definitions files is presented below.
+
+.nf
+	# catalogs	# formats		# transformations
+
+	landolt.dat	flandolt.dat		tlandolt.dat
+.fi
+
+.ih
+THE CONFIGURATION FILE
+
+The \fIconfiguration file\fR is a text file which describes how the input data
+is organized in the input files, and defines the form of the transformation
+equations required to convert from the instrumental to the standard system.
+
+The input data is assumed to come from two sources,
+standard star catalogs known as \fIcatalogs\fR
+and \fIobservations\fR files.
+The \fIcatalog\fR files contain the standard indices of a set of standard
+stars, referenced in the catalog by a name called the
+matching name.
+The \fIobservations\fR files contain the instrumental magnitudes or colors of
+a subset of the standard stars and/or program stars, also referenced by a
+matching name.
+The names of the observed standard stars must match the names in the
+standard star catalog.  The matching names must be stored in column 1
+in both the catalog and observations files.
+
+The configuration file is divided up into three sections: the \fIcatalog
+section\fR which describes the format of the catalog files, the
+\fIobservations section\fR which describes the format of the observation 
+files, and the \fItransformation section\fR which defines the
+transformation equations. The catalog section must always appear before the
+observation section, and the observation section must always appear before the
+transformation section.
+
+The \fIcatalog and observations sections\fR are used to assign
+names to the columns in the input catalog and observations files. 
+These columns may later be referenced by name and the names used
+as variables in the transformation equations.
+
+The \fItransformation section\fR is used to define the
+transformation equations,
+to specify which parameters are to be varied and which are to be held constant
+during the fitting process,
+and to assign initial values to all the parameters.
+Any number of transformation equations may be defined in
+the transformation section.
+
+The transformation section may also be used to, OPTIONALLY,
+define temporary variables (the set equations), define explicitly
+the derivatives of the transformation equations to be fit with respect
+to the parameters (derivative equations
+and delta declarations), define expressions for the weights and
+errors (weight and error equations), and define an expression to be
+plotted (the plot equation).
+
+For a detailed description
+of the grammar and syntax of the configuration file type \fI"help config"\fR.
+
+The following examples show typical configuration files for two different types
+of photometric calibrations.
+
+
+\fIExample 1\fR. A sample configuration file for reducing UBV photoelectric
+photometry. Note that the instrumental magnitudes are all on the right-hand
+side of the transformation equation and that the standard magnitudes and colors
+are all
+on the left-hand side. Once the values of the transformation equation
+parameters are computed by FITPARAMS using observations of the standard stars,
+standard magnitudes and colors for the program stars can be computed simply by
+evaluating the right-hand side of the transformation equation using
+the task EVALFIT. In this type of setup the equations are fit separately
+and evaluated separately. Note also the use of the error column declarations
+in the observation section, and the use of the const statement to fix the
+values of some parameters.
+
+.nf
+# Configuration file for reducing UBV photoelectric photometry.
+
+catalog
+
+V	2		# V magnitude
+BV	3		# B - V color
+UB	4		# U - B color
+
+observation
+
+v		2		# v instrumental magnitude
+b 		3		# b instrumental magnitude
+u 		4		# u instrumental magnitude
+error(v)	5		# error in v instrumental magnitude
+error(b) 	6		# error in b instrumental magnitude
+error(u) 	7		# error in u instrumental magnitude
+X		8		# airmass		
+
+transformation
+
+fit	v1 = 0.0, v2=0.16, v3=-0.043
+const	v4 = 0.0
+VFIT:   V = v1 + v - v2 * X + v3 * (b - v) + v4 * X * (b - v)
+
+fit	b1 = 0.0, b2=0.09, b3=1.266
+const	b4 = 0.0
+BVFIT:  BV = b1 - b2 * X + b3 * (b - v) + b4 * X * (b - v)
+
+fit	u1 = 0.0, u2=0.300, u3=0.861
+const	u4 = 0.0
+UBFIT:  UB = u1 - u2 * X + u3 * (u - b) + u4 * X * (u - b)
+.fi
+
+
+\fIExample 2\fR. A sample configuration file for reducing UBV CCD photometry.
+Note that the instrumental magnitudes are all on the left-hand side of the
+transformation equations and the standard star magnitudes and colors
+are all on the right-hand
+side. Once the values of the transformation equation parameters have been
+computed by FITPARAMS using observations of the standard stars, the
+standard magnitudes and colors of the program stars
+can be computed by inverting the system of equations using the task
+INVERTFIT.
+In this type of setup the equations are fit independently, but evaluated
+as a system.
+Note also that the telescope filter slots 1, 2 and 3 were assigned to
+filters v, b and u respectively which is why MKNOBSFILE assigned the names
+m1, m2, m3 to v, b, and u respectively. The user can change these if desired.
+Note also the use of the error declaration statements in both the catalog
+and the observations section.
+
+.nf
+catalog
+
+V		2	# V magnitude
+BV		3	# B - V color
+UB		4	# U - B color
+error(V)	5	# error in V magnitude
+error(BV)	6	# error in B-V color
+error(UB)	7	# error in U-B color
+
+observation
+
+ut1		3	# ut time of filter 1 observation
+X1		4	# airmass of filter 1 observation
+m1		7	# filter 1 instrumental magnitude
+error(m1)	8	# error in filter 1 instrumental magnitude
+ut2		10	# ut time of filter 2 observation
+X2		11	# airmass of filter 2 observation
+m2	 	14	# filter 2 instrumental magnitude
+error(m2) 	15	# error in filter 2 instrumental magnitude
+ut3		17	# ut time of filter 3 observation
+X3	        18	# airmass of filter 3 observation		
+m3	 	19	# filter 3 instrumental magnitude
+error(m3) 	20	# error in filter 3 instrumental magnitude
+
+
+transformation
+
+fit   u1 = 0.0, u2=0.68, u3=0.060
+UFIT: m3 = u1 + V + BV + UB + u2 * X3 + u3 * UB
+
+fit   b1 = 0.0, b2=0.30, b3=0.010
+BFIT: m2 = b1 + V + BV + b2 * X2 + b3 * BV
+
+fit   v1 = 0.0, v2=0.15, v3=0.000
+VFIT: m3 = v1 + V + v2 * X3 + v3 * BV
+.fi
+
+.ih
+EXAMPLES
+
+1. Type in from scratch a new configuration file to reduce some UBV
+photoelectric photometry. The catalog and observations file are simple
+text files written with the user's own data acquisition software, whose
+format is known by the user.
+
+.nf
+    ph> mkconfig ubv.cfg
+
+        ... answer "STDIN" in response to the query for the catalog
+	    parameter, and enter the standard star catalog format
+	    description as prompted
+
+	... a sample input session is shown below, note that in this
+	    examine <EOF> is implemented as ^Z
+
+    ENTER THE STANDARD STAR CATALOG FORMAT DESCRIPTION
+ 
+    Enter column definition (name number, ?=help, <EOF>=quit entry): V 2
+    Enter column definition (name number, ?=help, <EOF>=quit entry): BV 3
+    Enter column definition (name number, ?=help, <EOF>=quit entry): UB 4
+    Enter column definition (name number, ?=help, <EOF>=quit entry): ^Z
+  
+	... answer "STDIN" in response to the query for the
+	    observations parameter, and enter the observations file
+	    format description as prompted
+
+	... a sample input session is shown below, note that in this
+	    example <EOF> is implemented as ^Z
+
+    ENTER THE OBSERVATIONS FILE FORMAT DESCRIPTION
+
+    Enter column definition (name number, ?=help, <EOF>=quit entry): v 2
+    Enter column definition (name number, ?=help, <EOF>=quit entry): b 3
+    Enter column definition (name number, ?=help, <EOF>=quit entry): u 4
+    Enter column definition (name number, ?=help, <EOF>=quit entry): X 5
+    Enter column definition (name number, ?=help, <EOF>=quit entry): ^Z
+
+	... answer "STDIN" in response to the query for the
+	    transform parameter, and enter the transformation
+	    equations as prompted
+
+	... a sample input session is shown below for a single equation is
+	    shown below, note that in this example <EOF> is implemented as
+	    ^Z
+
+    ENTER THE TRANSFORMATION EQUATIONS
+
+    Enter the label and functional form for EQUATION 1
+
+    Enter label (e.g. VFIT) (label, ?=help, <EOF>=quit entry): VFIT
+    Enter equation (equation, equation\=continue, ?=help, <EOF>=quit entry):
+    V = v + v1 + v2 * X + v3 * (b - v)
+
+    Enter initial values for the parameters to be fit in EQUATION 1
+
+    Enter parameter 1 (name value, ?=help, <EOF>=quit entry):v1 25.
+    Enter parameter 2 (name value, ?=help, <EOF>=quit entry):v2 -.15
+    Enter parameter 3 (name value, ?=help, <EOF>=quit entry):v3 1.06
+    Enter parameter 4 (name value, ?=help, <EOF>=quit entry):^Z
+    
+    Enter initial values for the parameters to be held constant in
+    EQUATION 1
+
+    Enter parameter1 and value (name value, ?=help, <EOF>=quit entry):^Z
+     
+    Enter the label and functional form for EQUATION 2
+
+    Enter label (e.g. VFIT) (label, ?=help, <EOF>=quit entry): BFIT 
+
+	... after the program enters the editor make any small changes
+	    required
+
+	... examine the final output for errors
+
+    ph> edit ubv.cfg
+
+	... correct any errors with the editor
+
+    ph> chkconfig ubv.cfg
+
+	... check the newly edited file for errors
+
+.fi
+
+2. Create a configuration file to reduce some JHK photometry. In this
+example the user has created a JHK standard star catalog called jhkcat
+using the task MKCATALOG, an observations file called jhkobs
+using the task MKNOBSFILE, and has decided to type in the transformation
+equations by hand using the default editor.
+
+.nf
+	ph> mkconfig jhk.cfg jhkcat jhkobs
+
+	    ... answer "STDIN" in response to the query for the
+	        transform parameter, followed by <EOF>, usually ^Z
+		to terminate prompting for the transformation equations
+
+	    ... use the editor to enter the transformation equations
+
+	    ... check the result for errors
+
+	ph> edit jhk.cfg
+
+	    ... correct errors found in previous run using the editor
+
+	ph> chkconfig jhk.cfg
+
+	    ... check the edited file for errors
+.fi
+
+3. Create a new configuration file for reducing some UBVR photometry, using 
+the UBVR standards in the landolt UBVRI standard star catalog. The standard
+star observations file "stdobs" was created with the task MKNOBSFILE.
+
+.nf
+	ph> mkconfig ubvr.cfg landolt stdobs landolt
+
+	    ... read in the catalog format description for the
+	        landolt UBVRI standards catalog
+
+	    ... read in the observations file format description
+	        created by a previous run of mknobsfile
+
+	    ... read in the sample transformation description file for the
+		landolt UBVRI system
+
+	    ... use the editor to delete any references to catalog
+	        variables that are not going to be used in the
+		transformation equations, and to edit the transformation
+		equations as desired
+
+	    ... check the result for errors
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+edit,chkconfig,mknobsfile,mkobsfile
+.endhelp

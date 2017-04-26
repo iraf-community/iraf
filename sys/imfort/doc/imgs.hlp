@@ -1,0 +1,54 @@
+.help imgs Sep86 imfort
+.ih
+NAME
+.nf
+imgs -- get (read) an image section
+.fi
+.ih
+SYNOPSIS
+.nf
+subroutine imgs1r (im, rbuf, i1,i2, ier)
+subroutine imgs1s (im, sbuf, i1,i2, ier)
+subroutine imgs2r (im, rbuf, i1,i2, j1,j2, ier)
+subroutine imgs2s (im, sbuf, i1,i2, j1,j2, ier)
+subroutine imgs3r (im, rbuf, i1,i2, j1,j2, k1,k2, ier)
+subroutine imgs3s (im, sbuf, i1,i2, j1,j2, k1,k2, ier)
+
+integer		im		#I image descriptor of open image
+real		rbuf(*)		#O output pixel buffer, type real
+integer*2	sbuf(*)		#O output pixel buffer, type short
+integer		i1, i2		#I range of columns to be extracted
+integer		j1, j2		#I range of lines to be extracted
+integer		k1, k2		#I range of bands to be extracted
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimgs\fR procedures are used to get a section (subraster) from an image.
+Procedures are provided for images of from one to three dimensions,
+of pixel type short integer or real.  The type real procedures may be
+applied to images of either type, but the type short procedures may only
+be used to access images of type short.  The output buffer must provide
+space for at least (i1-i2+1) pixels (\fIgs1\fR), ((j2-j1+1) * (i2-i1+1)) pixels
+(\fIgs2\fR), or ((k2-k1+1) * (j2-j1+1) * (i2-i1+1)) pixels (\fIgs3\fR).
+The pixels are returned in Fortran storage order.  The column index \fIi2\fR
+must be greater than or equal to \fIi1\fR, but the remaining subscripts may
+be swapped if desired.
+.ih
+RETURN VALUE
+A zero status is returned if the referenced image section is in-bounds and
+the actual pixel datatype of the image is one of the types permitted by
+the particular operator called.
+
+.nf
+IE_NOTSHORT:	imfort short integer i/o requires a type short image
+IE_PIXTYPE:	image pixel type must be short or real
+IE_RDPIX:	error reading image pixel file
+IE_XOOB:	image x coordinates out of range or out of order
+IE_YOOB:	image y coordinates out of range
+IE_ZOOB:	image z coordinates out of range
+.fi
+.ih
+SEE ALSO
+imps, imgl, impl
+.endhelp

@@ -1,0 +1,370 @@
+.help autoidentify Jan96 noao.onedspec
+.ih
+NAME
+autoidentify -- Automatically identify lines and fit dispersion
+.ih
+SUMMARY
+Spectral lines are automatically identified from a list of coordinates
+by pattern matching.  The identified lines are then used to fit a
+dispersion function which is written to a database for later use
+in dispersion calibration.  After a solution is found the identified
+lines and dispersion function may be examined interactively.
+.ih
+USAGE
+autoidentify images crval cdelt
+.ih
+PARAMETERS
+.ls images
+List of images containing one dimensional spectra in which to identify
+spectral lines and fit dispersion functions.  For two and three dimensional
+spectral and spatial data one may use an image section to select a one
+dimensional spectral vector or use the \fIsection\fR parameter.
+.le
+.ls crval, cdelt
+These parameters specify an approximate coordinate value and coordinate
+interval per pixel.  They may be specified as numerical values, INDEF, or
+image header keyword names whose values are to be used.  The coordinate
+reference value is for the pixel specified by the parameter
+\fIaidpars.crpix\fR.  The default reference pixel is INDEF which means the
+middle of the spectrum.  By default only the magnitude of the coordinate
+interval is used and the search will include both increasing and decreasing
+coordinate values with increasing pixel values.  If one or both of these
+parameters are specified as INDEF the search for a solution will be slower
+and more likely to fail.
+.le
+.ls coordlist = ""
+Coordinate list consisting of an list of spectral line coordinates.
+A comment line of the form "# units <units>", where <units> is one of the
+understood units names, defines the units of the coordinate list.  If no units
+are specified then Angstroms are assumed.
+The line list is used for both the final identifications and for the set of
+lines to use in the automatic search.  A restricted search list may be
+specified with the parameter \fIaidpars.reflist\fR.  The line list may
+contain a comment line of the form "# Spectrum <name>", where <name> is a
+filename containing a reference spectrum.  The reference spectrum will be
+used in selecting the strong lines for the automatic search.  A reference
+spectrum may also be specified with the parameter \fIaidpars.refspec\fR.
+
+Some standard line lists are available in the directory "linelists$".
+See the help topic \fIlinelists\fR for the available line lists.
+.le
+.ls units = ""
+The units to use if no database entry exists.  The units are specified as
+described in
+
+.nf
+    cl> help onedspec.package section=units
+.fi
+
+If no units are specified and a coordinate list is used then the units of
+the coordinate list are selected.  If a database entry exists then the
+units defined there override both this parameter and the coordinate list.
+.le
+.ls interactive = yes (no|yes|NO|YES)
+After automatically identifying the spectral lines and dispersion function
+review and modify the solution interactively?  If "yes" a query is given
+for each spectrum providing the choice of interactive review.  The
+query may be turned off during execution.  If "YES" the interactive review
+is entered automatically without a query.  The interactive, graphical
+review is the same as the task \fBidentify\fR with a few restriction.
+.le
+.ls aidpars = "" (parameter set)
+Parameter set for the automatic line identification algorithm.  The
+parameters are described in the help topic \fBaidpars\fR.
+.le
+
+For two and three dimensional spectral images the following parameters are
+used to select a one dimensional spectrum.
+.ls section = "middle line"
+If an image is not one dimensional or specified as a one dimensional image
+section then the image section given by this parameter is used.  The
+section defines a one dimensional spectrum.  The dispersion direction is
+derived from the vector direction.
+
+The section parameter may be specified directly as an image section or
+in one of the following forms
+
+.nf
+line|column|x|y|z first|middle|last|# [first|middle|last|#]]
+first|middle|last|# [first|middle|last|#] line|column|x|y|z
+.fi
+
+where each field can be one of the strings separated by | except for #
+which is an integer number.  The field in [] is a second designator which
+is used with three dimensional data.  Abbreviations are allowed though
+beware that 'l' is not a sufficient abbreviation.
+.le
+.ls nsum = "1"
+Number of lines, columns, or bands across the designated dispersion axis to
+be summed when the image is a two or three dimensional image.
+It does not apply to multispec format spectra.  If the image is three
+dimensional an optional second number can be specified for the higher
+dimensional axis  (the first number applies to the lower axis number and
+the second to the higher axis number).  If a second number is not specified
+the first number is used for both axes.
+.le
+
+The following parameters are used in finding spectral lines.
+.ls ftype = "emission"
+Type of spectral lines to be identified.  The possibly abbreviated choices are
+"emission" and "absorption".
+.le
+.ls fwidth = 4.
+Full-width at the base (in pixels) of the spectral lines to be identified.
+.le
+.ls cradius = 5.
+The maximum distance, in pixels, allowed between a line position
+and the initial estimate when defining a new line.
+.le
+.ls threshold = 0.
+In order for a line center to be determined the range of pixel intensities
+around the line must exceed this threshold.
+.le
+.ls minsep = 2.
+The minimum separation, in pixels, allowed between line positions
+when defining a new line.
+.le
+.ls match = -3.
+The maximum difference for a match between the line coordinate derived from
+the dispersion function and a coordinate in the coordinate list.  Positive
+values are in user coordinate units and negative values are in units of
+pixels.
+.le
+
+The following parameters are used to fit a dispersion function to the user
+coordinates.  The \fBicfit\fR routines are used and further descriptions
+about these parameters may be found under that topic.
+.ls function = "spline3"
+The function to be fit to user coordinates as a function of the pixel
+coordinates.  The choices are "chebyshev", "legendre", "spline1", or "spline3".
+.le
+.ls order = 1
+Order of the fitting function.  The order is the number of polynomial
+terms (coefficients) or the number of spline pieces.
+.le
+.ls sample = "*"
+Sample regions for fitting specified in pixel coordinates.
+.le
+.ls niterate = 10
+Number of rejection iterations.
+.le
+.ls low_reject = 3.0, high_reject = 3.0
+Lower and upper residual rejection in terms of the RMS of the fit.
+.le
+.ls grow = 0
+Distance from a rejected point in which additional points are automatically
+rejected regardless of their residuals.
+.le
+
+The following parameters control the input and output.
+.ls dbwrite = "yes"  (no|yes|NO|YES)
+Automatically write or update the database with the line identifications
+and dispersion function?  If "no" or "NO" then there is no database
+output.  If "YES" the results are automatically written to the database.
+If "yes" a query is made allowing the user to reply with "no", "yes", "NO"
+or "YES".  The negative responses do not write to the database and the
+affirmative ones do write to the database.  The upper-case responses
+suppress any further queries for any remaining spectra.
+.le
+.ls overwrite = yes
+Overwrite previous solutions in the database?  If there is a previous
+solution for the spectrum being identified this parameter selects whether
+to skip the spectrum ("no") or find a new solution ("yes").  In the later
+case saving the solution to the database will overwrite the previous
+solution.
+.le
+.ls database = "database"
+Database for reading and writing the line identifications and
+dispersion functions.
+.le
+.ls verbose = yes
+Print results of the identification on the standard output?
+.le
+.ls logfile = "logfile"
+Filename for recording log information about the identifications.
+The null string, "", may be specified to skip recording the log information.
+.le
+.ls plotfile = ""
+Filename for recording log plot information as IRAF metacode.  A
+null string, "", may be specified to skip recording the plot information.
+(Plot output is currently not implemented.)
+.le
+.ls graphics = "stdgraph"
+Graphics device for the interactive review.  The default is the standard
+graphics device which is generally a graphics terminal.
+.le
+.ls cursor = ""
+Cursor input file for the interactive review.  If a cursor file is not
+given then the standard graphics cursor is read.
+.le
+
+.ls query
+Parameter used by the program to query the user.
+.le
+.ih
+DESCRIPTION
+\fBAutoidentify\fR automatically identifies spectral lines from a list of
+spectral line coordinates (\fIcoordlist\fR) and determines a dispersion
+function.  The identified lines and the dispersion function may be reviewed
+interactively (\fIinteractive\fR) and the final results are recorded in a
+\fIdatabase\fR.
+
+Each image in the input list (\fIimages\fR) is considered in turn.  If the
+image is not one dimensional or a one dimensional section of an image then
+the parameter \fIsection\fR is used to select a one dimensional
+spectrum.  It defines the dispersion direction and central spatial
+coordinate(s).  If the image is not one dimensional or a set of one
+dimensional spectra n multispec format then the \fInsum\fR parameter
+selects the number of neighboring lines, columns, and bands to sum.
+
+This task is not intended to be used on all spectra in an image since in
+most cases the dispersion functions will be similar though possibly with a
+zero point shift.  Once one spectrum is identified the others may be
+reidentified with \fBreidentify\fR.
+
+The coordinate list of spectral lines often covers a much larger dispersion
+range than the spectra being identified.  This is true of the standard line
+lists available in the "linelists$" directory.  While the algorithm for
+identifying the lines will often succeed with a large line list it is not
+guaranteed nor will it find the solution quickly without additional
+information.  Thus it is highly desirable to provide the algorithm with
+approximate information about the spectra.  Generally this information is
+known by the observer or recorded in the image header.
+
+As implied in the previous paragraph, one may use a
+limited coordinate line list that matches the dispersion coverage of the
+spectra reasonably well (say within 100% of the dispersion range).
+This may be done with the \fIcoordlist\fR parameter or a second
+coordinate list used only for the automatic search may be specified
+with the parameter \fIaidpars.reflist\fR.  This allows using a smaller
+culled list of lines for finding the matching patterns and a large list
+with weaker lines for the final dispersion function fit.
+
+The alternative to a limited list is to use the parameters \fIcrval\fR and
+\fIcdelt\fR to specify the approximate coordinate range and dispersion
+interval per pixel.  These parameters may be given explicitly or by
+specifying image header keywords.  The pixel to which \fIcrval\fR refers is
+specified by the parameter \fIaidpars.crpix\fR.  By default this is INDEF
+which means use the center of the spectrum.  The direction in which the
+dispersion coordinates increase relative to the pixel coordinates may be
+specified by the \fIaidpars.cddir\fR parameter.  The default is "unknown"
+to search in either direction.
+
+The algorithm used to automatically identify the spectral lines and
+find a dispersion function is described under the help topic
+\fBaidpars\fR.  This topic also describes the various algorithm
+parameters.  The default parameters are adequate for most data.
+
+The characteristics of the spectral lines to be found and identified are
+set by several parameters.  The type of spectral lines, whether "emission"
+or "absorption", is set by the parameter \fIftype\fR.  For arc-line
+calibration spectra this parameter is set to "emission".  The full-width
+(in pixels) at the base of the spectral lines is set by the parameter
+\fIfwidth\fR.  This is used by the centering algorithm to define the extent
+of the line profile to be centered.  The \fIthreshold\fR parameter defines
+a minimum contrast (difference) between a line peak and the neighboring
+continuum.  This allows noise peaks to be ignored.  Finding the center of a
+possible line begins with an initial position estimate.  This may be an
+interactive cursor position or the expected position from the coordinate
+line list.  The centering algorithm then searches for a line of the
+specified type, width, and threshold within a given distance, specified by
+the \fIcradius\fR parameter.  These parameters and the centering algorithm
+are described by the help topic \fBcenter1d\fR.
+
+To avoid finding the same line multiple times, say when there are two lines
+in the line list which are blended into a single in the observation, the
+\fIminsep\fR parameter rejects any new line position found within that
+distance of a previously defined line.
+
+The automatic identification of lines includes matching a line position in
+the spectrum against the list of coordinates in the coordinate line list.
+The \fImatch\fR parameter defines how close the measured line position must
+be to a coordinate in the line list to be considered a possible
+identification.  This parameter may be specified either in user coordinate
+units (those used in the line list) by using a positive value or in pixels
+by using a negative value.  In the former case the line position is
+converted to user coordinates based on a dispersion function and in the
+latter the line list coordinate is converted to pixels using the inverse of
+the dispersion function.
+
+The dispersion function is determined by fitting a set of pixel positions
+and user coordinate identifications by least squares to a specified
+function type.  The fitting requires a function type, \fIfunction\fR, and
+the order (number of coefficients or spline pieces), \fIorder\fR.
+In addition the fitting can be limited to specified regions, \fIsample\fR,
+and provide for the rejection of points with large residuals.  These
+parameters are set in advance and used during the automatic dispersion
+function determination.  Later the fitting may be modified interactively.
+For additional discussion of these parameters see \fBicfit\fR.
+
+The output of this program consists of log information, plot information,
+and the line identifications and dispersion function.  The log information
+may be appended to the file specified by the \fIlogfile\fR parameter
+and printed to the standard output (normally the terminal) by
+setting the \fIverbose\fR parameter to yes.  This information consists
+of a banner line, a line of column labels, and results for each spectrum.
+For each spectrum the spectrum name, the number of spectral lines found,
+the dispersion coordinate at the middle of the spectrum, the dispersion
+increment per pixel, and the root-mean-square (RMS) of the residuals for
+the lines used in the dispersion function fit is recorded.  The units of
+the RMS are those of the user (line list) coordinates.  If a solution is
+not found the spectrum name and a message is printed.
+
+The line identifications and dispersion function are written to the
+specified \fIdatabase\fR.  The current format of the database is described
+in the help for \fIidentify\fR.  If a database entry is already present for
+a spectrum and the parameter \fIoverwrite\fR is "no" then the spectrum is
+skipped and a message is printed to the standard output.   After a solution
+is found and after any interactive review (see below) the results may be
+written to the database.  The \fIdbwrite\fR parameter may be specified as
+"no" or "NO" to disable writing to the database (and no queries will be
+made), as "yes" to query whether to or not to write to the database, or as
+"YES" to automatically write the results to the database with no queries.
+When a query is given the responses may be "no" or "yes" for an individual
+spectrum or "NO" or "YES" for all remaining spectra without further
+queries.
+
+After a solution is found one may review and modify the line
+identifications and dispersion function using the graphical functions of
+the \fBidentify\fR task (with the exception that a new spectrum may not be
+selected).  The review mode is selected with the \fIinteractive\fR
+parameter.  If the parameter is "no" or "NO" then no interactive review
+will be provided and there will be no queries either.  If the parameter is
+"YES" then the graphical review mode will be entered after each solution is
+found without any query.  If the parameter is "yes" then a query will be
+made after a solution is found and after any log information is written to
+the terminal.  One may respond to the query with "no" or "yes" for an
+individual spectrum or "NO" or "YES" for all remaining spectra without
+further queries.  For "yes" or "YES" the \fIidentify\fR review  mode is
+entered.  To exit type 'q'.
+.ih
+EXAMPLES
+1.  The following example finds a dispersion solution for the middle column
+of a long slit spectrum of a He-Ne-Ar arc spectrum using all the
+interactive options.
+
+.nf
+    cl> autoid arc0022 6000 6 coord=linelists$henear.dat sec="mid col"
+    AUTOIDENITFY: NOAO/IRAF IRAFX valdes@puppis Thu 15:50:31 25-Jan-96
+      Spectrum                # Found   Midpoint Dispersion        RMS
+      arc0022[50,*]                50      5790.       6.17      0.322
+    arc0022[50,*]: Examine identifications interactively?  (yes): 
+    arc0022[50,*]: Write results to database?  (yes): yes
+.fi
+
+2.  The next example shows a non-interactive mode with no queries for
+the middle fiber of an extracted multispec image.
+
+.nf
+    cl> autoid.coordlist="linelists$henear.dat"
+    cl> autoid a0003 5300 3.2 interactive- verbose- dbwrite=YES
+.fi
+.ih
+REVISIONS
+.ls AUTOIDENTIFY V2.11
+This task is new in this version.
+.le
+.ih
+SEE ALSO
+identify, reidentify, aidpars, linelists, center1d, icfit, gtools
+.endhelp

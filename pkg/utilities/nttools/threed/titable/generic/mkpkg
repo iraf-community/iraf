@@ -1,0 +1,22 @@
+# Update the generic routines.
+
+default:
+	$checkout libpkg.a ../../
+	$update   libpkg.a
+	$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	tirowsb.x	<tbset.h>
+	tirowsc.x	<tbset.h>
+	tirowsd.x	<tbset.h>
+	tirowsi.x	<tbset.h>
+	tirowsr.x	<tbset.h>
+	tirowss.x	<tbset.h>
+	tichb.x		<tbset.h>
+	tichc.x		<tbset.h>
+	tichd.x		<tbset.h>
+	tichi.x		<tbset.h>
+	tichr.x		<tbset.h>
+	tichs.x		<tbset.h>
+	;

@@ -1,0 +1,56 @@
+.help isindef Dec03 language
+.ih
+NAME
+isindef -- test whether a value or expression is INDEF
+.ih
+USAGE
+bool = isindef (expr)
+.ih 
+PARAMETERS
+.ls expr
+A script variable or boolean expression.
+.le
+.ih
+DESCRIPTION
+\fIIsindef\fR is a boolean intrinsic function returning true ("yes") if the
+\fIexpr\fR evaluates to INDEF, and false ("no") otherwise.  When \fIexpr\fR
+is a script variable or the literal string "INDEF" this function is equivalent
+to a test for equality with INDEF, i.e. "x == INDEF".  A less obvious use
+is when INDEF values are used to test for less/greater-than evaluation
+in boolean expressions which result in an INDEF value for the expression as a
+whole (rather than a boolean return) and which can cause confusion about why
+the expression apparently fails.  INDEF values in scripts may only be used to
+test for equality, otherwise the return value is indefinite and when used in
+a compound expression the entire expression is also indefinite.  The
+\fIisindef\fR function provides a way to trap such cases in scripts.  
+
+\fIIsindef\fR can only be called as a function in an expression, not as a task.
+.ih
+EXAMPLES
+1. Test variables for INDEF values:
+
+.nf
+    cl> x = INDEF
+    cl> = (x == INDEF)
+    yes
+    cl> = isindef (x)
+    yes
+    cl> = isindef (x == INDEF)
+    no
+
+        \fINote:\fR  In this last case the function returns a 'no' since
+        the evaluation of "x == INDEF" is 'yes' and not 'INDEF'.
+
+    cl> = isindef (x == INDEF || x < 0)
+    yes
+
+        \fINote:\fR  In this case the test "x < 0" is indefinite and 
+	causes the entire expression to evaluate to INDEF, and so the
+	function returns 'yes' even though the first expression is a
+	valid boolean.
+.fi
+.ih
+BUGS
+.endhelp
+.ih
+SEE ALSO

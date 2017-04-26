@@ -1,0 +1,36 @@
+.help dicoplot Dec84 noao.imred.vtel
+.ih
+NAME
+dicoplot -- Make plots of Carrington maps on the Dicomed
+.ih
+USAGE
+dicoplot input_image1 input_image2 rot_number
+.ih
+PARAMETERS
+.ls input_image1
+First image to plot on the output.
+.le
+.ls input_image2
+Second image to plot on the output.
+.le
+.ls rot_number
+Carrington rotation number.
+.le
+.ih
+DESCRIPTION
+Dicoplot produces plots on the Dicomed.
+.ih
+EXAMPLES
+1. To make a plot containing a 10830 gram and the associated weight gram where
+the carrington rotation number is 1841, the 10830 gram is "temp1",
+and the weight gram is "carweight" type:
+
+.nf
+	vt> dicoplot temp1 carweight 1841
+.fi
+
+The program gets information about the dates and longitudes from the image
+headers.
+.ih
+SEE ALSO
+.endhelp

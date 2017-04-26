@@ -1,0 +1,57 @@
+.help nlstat Feb91 "Nlfit Package"
+.ih
+NAME
+nlstat[ird] -- get an NLFIT parameter
+.ih
+SYNOPSIS
+include <math/nlfit.h>
+
+[ird]val = nlstat[ird] (nl, parameter)
+
+.nf
+pointer	nl		# curve descriptor
+int	parameter	# parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls nl     
+The pointer to the curve descriptor structure.
+.le
+.ls parameter
+Parameter to be return.  Definitions in nlfit.h are:
+
+.nf
+NLNPARAMS	integer		# Number of parameters
+NLNFPARAMS	integer         # Number of fitted parameters
+NLITMAX		integer		# Maximum number of iterations
+NLITER		integer		# Current number of iterations
+NLNPTS		integer         # Number of points
+NLSUMSQ		real/double	# Current reduced chi-squared
+NLOLDSQ		real/double     # Previous reduced chi-squared
+NLLAMBDA	real/double     # Value of lambda factor
+NLTOL		real/double	# Fitting tolerance in %chi-squared
+NLSCATTER	real/double     # Mean scatter in the fit
+.fi
+.le
+.ih
+DESCRIPTION
+The values of integer, real or double  parameters are returned.
+The parameters include the number of parameters, the number of fitted
+parameters, the maximum number of iterations, the number of iterations,
+the total number of points, the current chi-squared, the previous
+chi-squared, the lambda factor, the fitting tolerance and the fitted
+scatter term.
+.ih
+EXAMPLES
+.nf
+include <math/nlfit.h>
+
+int	nlstati()
+
+call malloc (buf, nlstati (nl, NLNPARAMS), TY_REAL)
+call nlpgetr (nl, Memr[buf], nparams)
+.fi
+.ih
+SEE ALSO
+nlpget
+.endhelp

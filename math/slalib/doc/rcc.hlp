@@ -1,0 +1,83 @@
+.help rcc Jun99 "Slalib Package"
+.nf
+
+      DOUBLE PRECISION FUNCTION slRCC (TDB, UT1, WL, U, V)
+
+     - - - -
+      R C C
+     - - - -
+
+  Relativistic clock correction:  the difference between proper time at
+  a point on the surface of the Earth and coordinate time in the Solar
+  System barycentric space-time frame of reference.
+
+  The proper time is Terrestrial Time TT;  the coordinate
+  time is an implementation of the Barycentric Dynamical Time TDB.
+
+  Given:
+    TDB   dp   coordinate time (MJD: JD-2400000.5)
+    UT1   dp   universal time (fraction of one day)
+    WL    dp   clock longitude (radians west)
+    U     dp   clock distance from Earth spin axis (km)
+    V     dp   clock distance north of Earth equatorial plane (km)
+
+  Returned:
+    The clock correction, TDB-TT, in seconds.  TDB may be considered
+    to be the coordinate time in the Solar System barycentre frame of
+    reference, and TT is the proper time given by clocks at mean sea
+    level on the Earth.
+
+    The result has a main (annual) sinusoidal term of amplitude
+    approximately 0.00166 seconds, plus planetary terms up to about
+    20 microseconds, and lunar and diurnal terms up to 2 microseconds.
+    The variation arises from the transverse Doppler effect and the
+    gravitational red-shift as the observer varies in speed and moves
+    through different gravitational potentials.
+
+  The argument TDB is, strictly, the barycentric coordinate time;
+  however, the terrestrial proper time (TT) can in practice be used.
+
+  The geocentric model is that of Fairhead & Bretagnon (1990), in its
+  full form.  It was supplied by Fairhead (private communication) as a
+  FORTRAN subroutine.  The original Fairhead routine used explicit
+  formulae, in such large numbers that problems were experienced with
+  certain compilers (Microsoft Fortran on PC aborted with stack
+  overflow, Convex compiled successfully but extremely slowly).  The
+  present implementation is a complete recoding, with the original
+  Fairhead coefficients held in a table.  To optimize arithmetic
+  precision, the terms are accumulated in reverse order, smallest
+  first.  A number of other coding changes were made, in order to match
+  the calling sequence of previous versions of the present routine, and
+  to comply with Starlink programming standards.  Under VAX/VMS, the
+  numerical results compared with those from the Fairhead form are
+  essentially unaffected by the changes, the differences being at the
+  10^-20 sec level.
+
+  The topocentric part of the model is from Moyer (1981) and
+  Murray (1983).
+
+  During the interval 1950-2050, the absolute accuracy is better
+  than +/- 3 nanoseconds relative to direct numerical integrations
+  using the JPL DE200/LE200 solar system ephemeris.
+
+  The IAU definition of TDB is that it must differ from TT only by
+  periodic terms.  Though practical, this is an imprecise definition
+  which ignores the existence of very long-period and secular effects
+  in the dynamics of the solar system.  As a consequence, different
+  implementations of TDB will, in general, differ in zero-point and
+  will drift linearly relative to one other.
+
+  References:
+    Bretagnon P, 1982 Astron. Astrophys., 114, 278-288.
+    Fairhead L & Bretagnon P, 1990, Astron. Astrophys., 229, 240-247.
+    Meeus J, 1984, l'Astronomie, 348-354.
+    Moyer T D, 1981, Cel. Mech., 23, 33.
+    Murray C A, 1983, Vectorial Astrometry, Adam Hilger.
+
+  P.T.Wallace   Starlink   10 November 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

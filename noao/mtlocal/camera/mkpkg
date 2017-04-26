@@ -1,0 +1,17 @@
+# Rcamera Library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_rcamera.x		rcamera.com <fset.h> <error.h>
+	cam_read.x		rcamera.com rcamera.h <imhdr.h> <error.h>
+	cam_rimage.x		rcamera.com rcamera.h <imhdr.h> <mach.h>
+	cam_rheader.x		rcamera.com rcamera.h <imhdr.h> <mach.h>\
+				<fset.h>	
+	cam_rpixels.x		rcamera.com <mii.h> <mach.h> <fset.h>
+	cam_keywords.x		rcamera.h <imhdr.h> <mach.h>
+	cam_longhdr.x		rcamera.h <mach.h>
+	;

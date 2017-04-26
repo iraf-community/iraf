@@ -1,0 +1,4 @@
+input,f,a,STDIN,,,input files
+startyear,r,a,1950,,,precess from year
+endyear,r,a,1984,,,precess to year
+stdepoch,r,h,0,,,standard epoch for second set of output coords (0 to skip)

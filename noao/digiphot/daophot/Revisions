@@ -1,0 +1,918 @@
+.help revisions Jan90 noao.digiphot.daophot
+.nf
+
+daophot/psf/dpfitpsf.x
+    The ":function <func>" command was not saving the new functon when
+    refitting with the 'f' keystroke.  In dp_fitpsf() the parameters are
+    reinitialized and the startup function was being reused. (4/13/10, MJF)
+
+daophot/psf/dpfitpsf.x
+    An amovi() call referenced a Memr[] array that was declared as
+    int, changed to Memi[]  (8/28/09, MJF)
+
+daophot/*.par
+    Minor changes for readability suggested by Jason Quinn, i.e. made
+    consistent use of space before question marks (12/23/08, MJF)
+
+daophot/lib/warning.dat
+    Added some blank lines for readability before the package menu 
+    (12/11/08, MJF)
+
+=======
+V2.14.1
+=======
+
+daophot/psf/dppwselmer.x
+    PSTSELECT was showing the IMAGE param as 'name' instead of 'imagename'
+    (7/8/08)
+
+daophot/daophot.hd
+    The source directories for pstselect and allstar were wrong.
+    (5/27/08, Valdes)
+
+=======
+V2.14
+=======
+
+daophot/allstar/dpcache.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
+daophot/psf.par
+    Fixed a type in the 'pstfile' prompt (11/24/07)
+
+========
+V2.12.3
+========
+
+daophot/allstar/dpalwrite.x
+    In dl_alxaccum there are conditions where the loop skips a star which
+    are not checked in the write routines when they compute the sharp
+    parameter.  When the loop is not completed the denom value is not
+    computed and defaults to zero which caused a divide by zero error
+    in computing the sharpness.  (11/18/04, Valdes)
+
+daophot/daolib/invers2.x
+daophot/daolib/mkpkg
+daophot/allstar/t_allstar.x
+daophot/allstar/dpalphot.x
+daophot/allstar/dpastar.x
+daophot/allstar.par
+    Made a small change to the matrix inversion code to avoid problems with
+    very small numbers.  This was done by translating the original fortran
+    version to SPP and then replacing small numbers by zero.  In order to
+    allow users to reproduces earlier results or if there is a problem
+    a version parameter was added to ALLSTAR.  Setting the version to 1
+    will use the old version of the inversion routine and the default of
+    2 will use the new version.  (6/18/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+daophot/daoedit/dpeconfirm.x
+daophot/daoedit/dperprofile.x
+    Added some missing sfree statements to the daophot package routines.
+
+    (19/02/02, Davis)
+
+daophot/daolib/dpppcache.x
+    Added a call setting IM_BUFFRAC to 0 to the memory caching code in the
+    daophot package tasks in order to force the imio buffer to be the size of
+    the input image.
+
+daophot/substar/dprestars.x
+    There were 3 missing arguments in the dp_tptread call which cause
+    trouble for people trying to read an input exclude file in tables
+    format.
+
+    (19/09/01, Davis)
+
+daophot/psf/dppwselmer.x
+    Changed an incorrect smark call to salloc.  This bug was introduced by
+    recent output file mods. Should not have been a problem in released code.
+
+    (19/09/01, Davis)
+
+daophot/psf/t_psf.x
+    Changed the type declaration for the clgwrd function from bool to int.
+    This bug was introduced by the wcs mods. Should not have been a problem
+    in realeased code.
+
+    (19/09/01, Davis)
+
+daophot/addstar/t_addstar.x
+    Modifed the addstar task to add a ".art" suffix to the output artificial
+    star coordinate files when the user supplies the output root name. This
+    avoids file and image name conflicts when the user includes the image
+    suffix, e.g. ".imh" in the output root name.
+
+    Davis, September 17, 2001
+
+daophot/
+    Modified all the apphot tasks to accept input coordinates in logical, tv,
+    physical, or world coordinates and to write the output coordinates in
+    logical, tv, or physical coordinates. One consequence of this is that
+    the apphot tasks will now work correctly off image sections in interactive
+    mode. Another is that users can work on image sections while preserving
+    the coordinate system of the entire image.
+
+    Davis, June 8, 2000
+
+daophot/
+    Modified all the daophot tasks to strip the directory information from
+    the input image and coordinate file names written to the output files,
+    to the terminal, and to the plot headers. The colon commands will still
+    read and write full image and coordinate file path names. This change
+    improves the likelyhood  that the full root image name will be written
+    to the output. This root image name is used by the photometric calibration
+    code to construct images sets.
+
+    Davis, June 8, 2000
+
+daophot/mkpkg
+    Modified the make procedure to pick up user compile and link flags.
+
+    Davis, June 17, 1999
+
+daophot/daolib/dpotime.x
+    Modified the code which reads the time of observation value from the image
+    header to extract the time field from the date-obs keyword if it is
+    present.
+
+    Davis, May 11, 1999
+
+daophot/daolib/dpdate.x
+    Modified the date and time photometry file keyword encoding tasks to
+    write the date and time in the proper fits format and in units of GMT.
+    Note that GMT is deactivated in digiphotx because the necessary routine
+    is not yet in the system.
+
+    Davis, May 11, 1999
+
+
+daophot/psf/dppwrtgrp.x
+    The row number in the psf star group file writing code was not being
+    correctly initialized results in an "invalid row number error" if
+    the psf task was run with daophot.text = no.
+
+    Davis May 10, 1999
+
+daophot/psf/dpgetapert.x
+daophot/allstar/dpalwrite.x
+daophot/group/dpwrtgroup.x
+daophot/doc/daopars.hlp
+    Removed the restriction on the number of stars imposed by the maxnstars
+    parameter and in the process fixed a segmentation violation that occurred
+    when the number for stars in the files was > maxnstars. Maxnstars is
+    now used only for setting the initial buffer size.
+
+    Removed the code which writes MAXNSTARS to the output photometry files.
+
+    Davis May 8, 1999
+
+daophot/psf/t_pstselect.x
+    Added a missing imtclose statement.
+
+    Davis, May 4, 1999
+
+daophot/psf/dpfitpsf.x
+    Changed the test for the radial weighting function from wt >= 1.0 to
+    wt >= 0.999998 to avoid floating point errors (division by a very small
+    number) under Linux and possibly other systems as well.
+
+    Davis, April 19, 1999
+
+daophot/peak/dppkfit.x
+daophot/nstar/dpnstarfit.x
+daophot/allstar/dpalphot.x
+    Added a check to make sure that the predicted error computation can
+    never be <= 0.0 This can happen in rare circumstances if the model
+    prediction is exactly 0, the rdnoise is 0.0 and flaterr and proferr are
+    0.0.
+
+    Davis, April 12, 1999
+
+daophot/daolib/dpnames.x
+    Modified the automatic input and output image and file naming code
+    to behave more gracefully in the case where the input images have
+    kernel sections and cluster indices and sizes.
+
+    Davis, January 17, 1999
+
+daophot/daolib/dpdate.x
+daophot/addstar/dpnaddstar.x
+daophot/addstar/dpalwrite.x
+daophot/group/dpwrtgroup.x
+daophot/nstar/dpntwrite.x
+daophot/peak/dppkwrite.x
+daophot/psf/dppwrtgrp.x
+    Modified the daophot output file writing routines to write the DATE
+    header keyword in the new Y2k format even though the output files
+    are not FITS files.
+
+    Davis, Dec 29, 1998
+
+daophot/allstar/t_allstar.x
+daophot/allstar/dpcache.x
+daophot/allstar/dpalinit.x
+    Modified the allstar task to ensure that all the output and scratch
+    images and scratch space are 2D even if the input image is greater than
+    2D to avoid a non-obvious memory error. 
+
+    Davis, Aug 3, 1998
+
+
+daophot/daophot.cl
+    Modified the package cl script to check whether the tables package is
+    already loaded before checking whether it is defined and then loading it.
+
+    Davis, Aug 1, 1998
+
+daophot/psf/t_psf.x
+    The psf task psf image list reading code was using the fntgfnb routine
+    instead of the imtgetim routine to read image names from the psf image list.
+    Although the code functioned correctly, if the input psf image list was
+    an @ file, a control character (^P) was being written into the PSFIMAGE
+    keyword value in the output *.psg.* and *.pst.* files. This caused an error
+    in the nstar, allstar, etc task photometry file reading code. 
+
+    Davis, Apr 1, 1998
+
+daophot/addstar/t_addstar.x
+daophot/allstar/t_allstar.x
+daophot/group/t_group.x
+daophot/nstar/t_nstar.x
+daophot/nstar/t_peak.x
+daophot/psf/t_pstselect.x
+daophot/psf/t_psf.x
+daophot/substar/t_substar.x
+    Modified the addstar, allstar, group, nstar, peak, pstselect, psf,
+    and substar tasks to be able to read and write default images and files 
+    from and to directories other than the current directory just as the
+    daophot tasks daofind and phot do.
+
+    Davis, Feb 14, 1998
+
+daophot/seepsf/t_seepsf.x
+daophot/seepsf/dpmkimage.x
+    Modified the seepsf task so it explicity sets the pixel type of the
+    output psf image to real to avoid a problem with stf image kernel
+    and dataless stf images.
+
+    Davis, Jan 20, 1998
+
+daophot/allstar/dpalinit.x
+    Fixed an uninitialized memory problem that was occurring on the Dec
+    ALPHA if cache=no and readnoise=0.0. This part of memory was never
+    used by the code, but was being written to a scratch image of type real,
+    which could result in an FPE if the affected memory was not a valid
+    FP number. A similar problem was fixed for the cache=yes situtation
+    awhile back.
+
+    Davis, Nov 12, 1997
+
+
+daophot/psf/dpfitpsf.x
+    Fixed a bug in the psf task that was causing the fits image kernel to
+    crash when opening a new image, but apparently did not affect the oif
+    or stf kernels in any way. 
+
+    Davis, June 23, 1997
+
+daophot/daotest.cl
+    Modified the rfits calling sequence so that the code will work
+    correctly with the new version of rfits.
+
+    Davis, May 29, 1997
+
+daophot$psf/mkpkg
+daophot$psf/dprstars.x
+daophot$psf/dpspstars.x
+daophot$psf/dpispstars.x
+    The pstselect and psf tasks were not reinitializing the psf star list
+    correctly when more than one image was being processed,  resulting in
+    psf stars on successive images which have the same ids as psf stars
+    in previous images being incorrectly rejected or include in the psf star
+    list.
+
+    Davis, Feb 21, 1997
+
+daophot$psf/dpmkpsf.x
+    The id number and magnitude arguments were reversed in the 'f' keystroke
+    command call to the routine dp_addstar. This should only cause trouble
+    if the psf star list need to be reread.
+
+    Davis, July 18, 1996
+
+daophot$doc/phot.hlp
+    Fixed a type in the ERRORS section of the phot help page.
+
+    Davis, April 11, 1996
+
+daophot$daolib/dpinit.x
+daophot$psf/dpfitpsf.x
+daophot$psf/dppsfutil.x
+    The psf task was not restoring the fit for the moffat25 and moffat15
+    functions correctly, in the event that they were chosen as the best
+    fitting analytic function. This was occurring because the constant
+    beta parameter was not being copied into and out of the save array
+    resulting in a totally incorrect look-up table being computed.
+
+    Davis, March 20, 1996
+
+daophot$psf/dpfitpsf.x
+    Modified the code which computes the analytic component of the psf
+    model to start from the same initial state in auto mode as it does
+    if a single function is specified. Peviously the initial state
+    in the auto case was the state computed by the previous function. 
+    Because the convergence criteria have a specified tolerance, the
+    resulting computed values of the analytic component functions and the
+    look-up table elements can be slightly different in the two cases.
+
+    Davis, March 18, 1996
+
+daophot$allstar/dpcache.x
+daophot$allstar/dpalmemstar.x
+
+    Modified the malloc calls to calloc calls in the dpcache routine to
+    avoid an unititialized memory FPE error than can occur if the readout
+    noise is exactly 0. As far as I am aware this has only caused a problem
+    on the Dec Alpha, but 0 readout noise situation does occur in the
+    daophot test script. Removed an extra fixmem call from the allstar
+    cleanup routine.
+
+    Davis, February 20, 1996
+
+daophot$daolib/dpgetapert.x
+daophot$nstar/dpggroup.x
+    Fixed a bug in the code which parses the input photometry or group files.
+    If the numerical field to be extracted is adjacent to another numerical
+    field and there is no white space between them, then the number
+    extracted may be a combination of the two fields, rather than the desired
+    individual field. This is most likely to occur when the id numbers are
+    large, e.g. 10003, and the image name is a number, e.g. 8649.imh.
+
+    Davis, February 20, 1996
+
+daophot$daopars.par
+daophot$daotest.cl
+daophot$lib/daophotdef.h
+daophot$lib/nstardef.h
+daophot$daolib/dpgppars.x
+daophot$daolib/dppppars.x
+daophot$daolib/dpset.x
+daophot$daolib/dpstat.x
+daophot$daolib/dpverify.x
+daophot$group/dpgconfirm.x
+daophot$group/dpmkgroup.x
+daophot$group/dpwrtgroup.x
+daophot$nstar/dpnstarfit.x
+daophot$nstar/dpntwrite.x
+daophot$allstar/dpastar.x
+daophot$allstar/dpalwrite.x
+daophot$doc/daopars.hlp
+daophot$doc/group.hlp
+    Added a new parameter mergerad to the daopars parameter set. Mergerad
+    permits the user to control the merging process. If mergerad is 0
+    object merging is turned off altogether. If mergerad is INDEF to default
+    mergeing radius is used. Otherwise the user can set the merging radius
+    to a specific value.
+
+    Changed the name of the critoverlap parameter to critsnratio to avoid
+    user confusion over the meaning to the parameter.
+
+    Davis, February 15, 1996
+
+daophot$nstar/dpnmemstar.x
+daophot$nstar/dpnstar.x
+daophot$allstar/dpalmemstar.x
+daophot$allstar/dpalphot.x
+    Modified the nstar and allstar tasks so that they allocate less memory for
+    the fitting matrices and vectors if object recentering is turned off. This
+    can make a big difference if the the maximum group size is large.
+
+    Davis, February 14, 1996
+
+daophot$nstar/dpnstarfit.x
+    Added a singular matrix check to avoid floating point operand errors
+    in the nstar task.
+
+    Davis, January 5, 1996
+
+daophot$nstar/dpggroup.x
+    The integer code array size was not being reallocated correctly in the
+    case that the size of a group is greater the the value of the maxgroup
+    parameter, causing nstar to die with a memory allocation parameter,
+
+    Davis, January 3, 1996
+
+daophot$doc/centerpars.hlp
+    Edited the centerpars help page to include a description of the new
+    INDEF-valued cthreshold option.
+
+    Davis, Sept 29, 1995
+
+daophot$lib/psfdef.h
+daophot$psf/dpfitpsf.x
+daophot$psf/dpmempsf.x
+daophot$psf/dppsfutil.x
+daophot$psf/dprstars.x
+daophot$psf/dpispstars.x
+daophot$psf/dpspstars.x
+daophot$psf/dpmkpsf.x
+daophot$psf/dpaddstar.x
+daophot$doc/psf.hlp
+    Modifed the way the magnitude of the psf is set. If matchbyid is
+    yes (the default) the magnitude of the first psf star in the psf
+    star list if any will be used; other wise the magnitude of the first
+    psf star in the input photometry file will be used as before. This
+    should help minimize photometric drift problems derived from repeated
+    iterations.
+
+    Davis, Sept 21, 1995
+
+daophot$psf/dpdelstar.x
+daophot$psf/dpsubpsf.x
+    Added a missing mfree to the dpsubpsf routine. This was not causing
+    a problem but might in a large script.
+
+    In dpdelstar the routine dp_psubrast was being called with an input
+    output variable that was never used being set to a constant. This was
+    causing a segvio on Solaris but not on SunOS.
+
+    Davis, Aug 25, 1995
+
+daophot$seepsf/dpmkimage.x
+    Seepsf was dying with an FPE error on the Dec Alpha. This was caused
+    by an array out-of-bounds error which was not detected on the Sun
+    machines.
+
+    Davis, July 18, 1995
+
+daophot$seepsf/t_seepsf.x
+daophot$seepsf/dpmkimage.x
+    The fix made to cure the previous seepsf problem broke the code for
+    pure analytic psf images.
+
+    Davis, July 3, 1995
+
+daophot$psf/dpfitpsf.x
+    Changed the illegal construct "} until (redo == false)" to
+    "} until (! redo)". This was causing problems on the IBM/RISC6000
+    compilers but was not caught by the Sun compilers.
+
+    Davis, November 16, 1994
+
+daophot$seepsf/t_seepsf.x
+daophot$seepsf/dpmkimage.x
+    The code that was computing the default size of the output psf image
+    was incorrectly using the size of psf requested by the user (default
+    radius = 11.0 pixesl) instead of the actual size of the input psf image.
+
+    Davis, October 3, 1994
+
+daophot$daoedit/t_daoedit.x
+daophot$daoedit/dpeconfirm.x
+    Made some minor modifications to the daoedit task which change the
+    image cursor mode and graphics cursor mode interact.
+
+    Davis, June 21, 1994
+
+daophot$addstar/dpnaddstar.x
+    Corrected an error in the format string for the output file.
+
+    Davis, June 20, 1994
+
+daophot$psf.par
+daophot$lib/psfdef.h
+daophot$psf/t_psf.x
+daophot$psf/t_dprstars.x
+daophot$doc/psf.hlp
+    Added a new parameter, matchbyid, to the psf task so that stars in the
+    psf star list can be matched to stars in the input photometry file
+    by id or by position.
+
+    Davis, June 20, 1994
+
+daophot$psf/dpspstars.
+    In non-interactive mode the pstselect task was writing a minimum
+    of two stars to the output file even if the requested number of
+    psf stars was one.
+
+    Davis, June 18, 1994
+
+daophot$addstar/dpartstar.x
+daophot$addstar/dpartstar.x
+    If the nimages parameter was greater than 1 and the addimage parameter
+    was set to other than the default value, the task would terminate 
+    prematurely with a "Cannot close file error"  after the first output
+    image was written. The problem was caused by addstar failing to append
+    the appropriate sequence number to the output star list.
+
+    Davis, June 13, 1994
+
+daophot$allstar/dpalwrite.x
+daophot$group/dpwrtgroup.x
+daophot$nstar/dpntwrite.x
+daophot$peak/dppkwrite.x
+daophot$psf/dppwrtgrp.x
+daophot$psf/dppwselmer.x
+daophot$select/dpgwselect.x
+    Modified all the daophot package tasks which output sky values (pstselect,
+    psf, peak, group, grpselect, nstar, allstar, pfmerge) to write the
+    values with format -%15.7g like the apphot package tasks do, instead
+    of %-12.3f/%-14.3f, to avoid precision problems with images that
+    have been "flux calibrated".
+
+    Davis, May 27, 1994
+
+daophot$nstar/dpntwrite.x
+daophot$nstar/dpalwrite.x
+    Changed the output GROUPSKY parameter name in the phot files to GRPSKY
+    to avoid a name matching conflict with the GROUP column. This was causing
+    problems in reading nstar output.
+
+    Davis, May 5, 1994
+
+daophot$daopars.par
+daophot$lib/daophotdef.h
+daophot$allstar/dpaconfirm.x
+daophot$allstar/dpalphot.x
+daophot$allstar/dpalwrite.x
+daophot$daoedit/daoedit.h
+daophot$daoedit/dpecolon.x
+daophot$daolib/dpgppars.x
+daophot$daolib/dpppars.x
+daophot$daolib/dpinit.x
+daophot$daolib/dpset.x
+daophot$daolib/dpstat.x
+daophot$daolib/dpverify.x
+daophot$nstar/dpnconfirm.x
+daophot$nstar/dpnstar.x
+daophot$nstar/dpnstarfit.x
+daophot$nstar/dpntwrite.x
+daophot$doc/allstar.hlp
+daophot$doc/daopars.hlp
+daophot$doc/nstar.hlp
+    Added a new boolean parameter, groupsky, to the daopars parameter set.
+    Groupsky determines whether the sky value for each pixel used  in the fit
+    is set to, the mean of ALL the individual sky values of the stars in the
+    group (groupsky = yes), or,  to the mean of the individual sky values of
+    only those stars for which  the pixel in question is inside the fitting
+    radius.
+
+    Davis, Dec 20, 1993
+
+daophot II installed
+    Davis, May 31, 1993
+
+    Daophot II installed.
+
+daophot$phot.par
+    Added a leading quote to the prompt string for the daophot.phot task
+    output parameter.
+
+    Davis, Mar 24, 1993
+
+daophot$daolib/dpppars.x
+    The psfrad, fitrad, and matchrad were being written to the parameter
+    set in pixel units instead of scale units when update was set to
+    yes.
+
+    Davis, Feb 16, 1993
+
+daophot$allstar/dpalinit.x
+    In crowded regions allstar would occasionally refuse to 1) fit a group
+    of bright stars or 2) fail to converge to reasonable values for a group
+    of bright stars by the time the number of iterations equaled maxiter,
+    resulting in a group of stars with very poor subtractions.
+    The problem was caused by a bug in the code which steps through the
+    stellar groups subtracting off the current best fit to produce a residuals
+    image.  Occasioanally stars which should have been subtracted from the
+    residuals image were not being subtracted.  Since the residuals image is
+    used to determine the relative errors and weights,
+    which in turn control the bad data rejection algorithm, allstar sometimes
+    refused to fit stars because the residuals were too big, or was unable
+    to converge to a reasonable fit. The bug is data dependent but is
+    more likely to be a problem if 1) the stellar detection threshold is low
+    2) the fitting radius is high producing very large groups.
+
+    Davis, Dec 23, 1992
+
+daophot$allstar/dpalphot.x
+    If 1) cache=no, or cache=yes and memory allocation failed for one of the
+    three arrays scratch, weight, or data, 2) one or more the the groups has >
+    maxgroup stars, 3) regrouping was performed and 4) the position of next
+    non-regrouped group was just right, allstar could fail with an "attempt to
+    access the scratch, weight or data pixels randomly" error. This error
+    occurrs because the regrouping process could produce groups which were out
+    of y-order with with succeeding groups which had not been regrouped, 
+    forcing an illegal non-sequential image access. The solution was to buffer
+    enough data to fit original large group.
+
+    Davis, Sept 16, 1992
+
+apphot$datapars.par
+apphot$centerpars.par
+apphot$doc/datapars.hlp
+apphot$doc/centerpars.hlp
+    Changed the units of the cthreshold parameter to sigma and moved it
+    to the centerpars parameter set.
+
+    Davis, July 7, 1992
+
+daophot$daophot.par
+    The verbose, verify, update, graphics, and display parameters were
+    added to the package parameters and the corresponding individual
+    task parameters were redirected there by default.
+
+    Davis, June 20, 1992
+
+daophot$daopars.par
+daophot$lib/warning.dat
+    Fixed errors in the definition of the psfrad and fitrad parameters in
+    the daopars parameter set. These parameters are now defined in units
+    of scale not pixels as before.
+
+    Fixed some bugs in the message printed by the daophot package if the
+    tables package is not present.
+
+    Davis, May 29, 1992
+
+daophot$daophot.men
+    Changed the entries for append, convert, dump, renumber, select, and
+    sort to entries for pappend, pconvert, pdump, prenumber, pselect,
+    and psort.
+
+    Davis, Feb 28, 1992
+
+daophot$psf/dpmkpsf.x
+    Added missing fset declaration to the mkpkg line for this routine.
+
+    Davis, Nov 20, 1991
+
+daophot$
+    Renamed the append, convert, dump, renumber, select, and sort tasks to
+    pappend, pconvert, pdump, prenumber, pselect, and psort.
+
+    Davis, Nov 11, 1991
+
+    *** Ran spplint on the daophot package.
+
+daophot$allstar/dpastar.x
+    The routines dp_gst, dp_gwt, and dp_gdc were being called as subroutines
+    instead of functions inside dp_astar. This was a recent change which
+    would not affect the old testphot.
+
+daophot/psf/dpcontpsf.x
+    Changed the last argument in the call to dp_map_viewport from NO to false
+    to fix a type mismatch. This could affect the old testphot.
+
+daophot/psf/dpnewpsf.x
+    Removed extra status argument from the call to dp_gaussfit. This could
+    have caused a problem in the old daophot.
+
+daophot/peak/dppkfit.x
+    Removed an extra argument from the mfree call. This would not cause a
+    problem in the old testphot.
+
+    Davis, Oct 3, 1991
+
+daophot$daophot.cl
+daophot$daophot.men
+daophot$daophot.hd
+daophot$daotest.cl
+    At the autotmatic package test task daotest to the daophot package.
+
+    Davis, Oct 3, 1991
+
+daophot$psf/dpsurfpsf.x
+    Removed non-required variables mode, xres, yres from this routine.
+
+    Davis, Oct 1, 1991
+
+daophot$test/fits3.fits
+    Added the fits test image to the daophot test subdirectory in preparation
+    for making a test script.
+
+    Added a test cursor input file for the psf task in preparation for 
+    making the test script.
+
+    Davis, Aug 13, 1991
+
+daophot$daolib/dpgetapert.x
+daophot$nstar/dpggroup.x
+    Modified the i/o routines which read aperture photometry and group
+    photometry format text files in order to take account of new additions
+    to the text database routines.
+
+    Davis, Aug 13, 1991
+
+daophot$
+    1. All the DAOPHOT tasks except PSF have been modified to accept lists of
+    input and output files.
+
+    2. Moved the text parameter from DAOPARS to the DAOPHOT package parameter
+    file.
+
+    3. Modified all the DAOPHOT routines so that psfrad, fitrad and matchrad
+    are defined in terms of scale.
+
+    Davis, Aug 5, 1991
+
+daophot$
+    1. Added support for a time of observation parameter to all the appropriate
+    daophot tasks.
+
+    2. Changed all the daophot file header parameters to be 23 characters long
+    instead of 15 characters.
+
+    3. Modified all the daophot tasks to strip whitespace from the filter id
+    keywords and the iraf version environment variable string.
+
+    4. Wrote an spp version of the error function routine which was originally
+    in fortran.
+
+    Davis, Aug 2, 1991
+
+daophot$allstar/
+    1. Redid the i/o of the ALLSTAR task to make the cache=no option run in
+    a finite period of time for large images.
+
+    Davis, Jun 24, 1991
+
+daophot$group/
+    1. Changed GROUP so that the groups are output in y order instead of in
+    order of the size of the group. This will help make i/o more efficient
+    in NSTAR.
+
+    Davis, Jun 18, 1991
+
+daophot$allstar/
+    1. Changed the boolean arrays inside ALLSTAR to integer arrays. These
+    use the same amount of space and are probably safer.
+
+    2. Added protection in the code for the case that the x and y position
+    of a star is INDEF or the sky value is INDEF.
+
+    3. Changed the format of the output of the verbose option in several places
+    in the code.
+
+    Davis, Jun 17, 1991
+
+daophot$nstar/
+    1. Changed the boolean arrays inside NSTAR to integer arrays. Thought
+    this was probably safer.
+
+    2. Fixed a potential problem in NSTAR wherein for groups greater than
+    the maxgroup parameter in size the old_size variable was not being
+    correctly set. This would mean that some group members could get
+    truncated from the output file.
+
+    3. Fixed a bug in verbose mode wherein stars would not be fit, their
+    magnitude would be set to INDEF, but no error message would be generated.
+    This was occurring when the new center of a star moved too close to the
+    edge of the image.
+
+    4. Also took the opportunity to do some code cleanup.
+
+    Davis, Jun 5, 1991
+
+daophot$psf/
+    1. Modified the PSF task so that potential psf stars are rejected if their
+    sky or magnitude values are INDEF.
+
+    2. Added a check so that stars with INDEF valued positions are treated as
+    stars that were not found.
+
+    3. Added a check in the code so that the same star could not be added to
+    the psf twice.
+
+    4. Found a code construct in the dp_friends() routine that
+    could trigger an optimizer bug and removed it.
+
+    5. Finally changed the code which deletes an empty psf image and group
+    file so that it would handle an output ST table correctly.
+
+    6. Did some minor code cleanup.
+
+    Davis, Jun 3, 1991
+
+daophot$peak/
+    1. Found that the main fitting task in PEAK, dp_pkfit(), was missing an
+    sfree statement. This may account for the problems with TESTPHOT on the
+    mountain. Took the opportunity afforded by this bug to do a little
+    code cleanup in peak.
+
+    2. Had to do a couple of modifications in PSF because of the mod to the
+    fitting code in PEAK. The two tasks share code. Found an extra sfree
+    statement in the main PSF loop and removed it.
+
+    3. Changed the size of the extractions box in PEAK from psfrad to
+    (psfrad + fitrad + 1). This removes any problems in the unlikely
+    event that the fitting radius is bigger than the psf radius.
+
+    Davis, Jun 1, 1991
+
+daophot$group/
+    Modified GROUP so that any stars with INDEF valued centers are not
+    written to the output file. Various code modifications were made
+    to clean up the logic of the task and make it more structured.
+
+    Davis, May 31, 1991
+
+daophot$peak/
+    Modified PEAK so that stars with undefined sky values don't cause a
+    floating operand error. Also modified PEAK so that any stars with
+    INDEF centers in the input file are not written to the output file.
+
+    Davis, May 30, 1991
+
+daophot$addstar/
+    Addstar was not incrementing the row numbers correctly when writing
+    the output star list if the output file was an ST table, resulting
+    in an output file that was missing some rows. The output image was being
+    computed correctly.
+
+    Davis, May 26, 1991
+
+daophot$
+    Added the PEXAMINE task to the daophot package.
+
+    Davis, May 24, 1991
+
+daophot$allstar/
+daophot$addstar/
+    Modified the peak and allstar tasks so that they were writing the
+    keyword IMAGE instead of IMNAME in the header. IMNAME was causing
+    problems for the preprocessors.
+
+    Davis, Apr 5, 1991
+
+daophot$
+daophot$psf/
+    1. Modified the dpppars() routine in daolib to the datamin and datamax
+    in the datapars pset are updated when the daophot fitting parameters are
+    updated.
+
+    2. Update the psf task so that the default psf image header will hold more
+    than 22 stars. The current default will be three times that. Psf will
+    still pack up on the min_lenuserarea parameter if it is the default.
+
+    Davis, Apr 1, 1991
+
+daophot$
+    1. The tasks allstar, group, nstar, peak, psf and substar were all modified
+    to include datamin and datamax in their verify routines.
+    As part of this a set of general utility routines were written and
+    stored in the file daolib/dpverify.x.
+
+    2. The io routines were consolidated into a single file for output and/or
+    another for input as appropriate. This means several files in the 
+    addstar, allstar, nstar, and peak routines have disappeared.
+
+    3. The nstar text file input routine was made for efficient by changing
+    the strmatch calls to strncmp.
+
+    Davis, Mar 30, 1991
+
+daophot$psf/
+    The psf task was writing the incorrect value of xpsf and ypsf into the
+    psf image header causing the variable psf to be evaluated at the
+    wrong position. Any task which evaluated the variable psf including
+    seepsf, group, peak, nstar, and allstar would be in error. The
+    bug was located in the file dp_writepsf.x in testphot$daophot/psf/.
+
+    Davis, Feb 1, 1991
+
+daophot$psf/
+
+    The celling for surface plots was being set to 20000 in the routine
+    dp_psfsetup in file daolib/dpinit.x causing floating point divide
+    errors in images with pixels not in the usual CCD range.
+
+    Davis, Jan 21, 1991
+
+daophot$allstar/
+    A call to dp_talwrite() was missing the chigrp argument.
+
+    Davis, March 1, 1989
+
+daophot$allstar/
+    A data dependent error could occur in allstar if the user tried to
+    write to an output ST table and the computed magnitude error was
+    less than or equal to zero.
+
+    Davis, February 28, 1989
+
+daophot$
+    All task except DAOFIND and PHOT were affected by an error in the
+    ptools$pttables/pthdrs.x file. The tasks sometimes crash on input files
+    created with append task with a memory corruption error.
+    See the ptools Revisions file for a description of the error.
+
+    Davis, January 4, 1990
+
+December 21, 1989 -- Beta Daophot Release
+.endhelp

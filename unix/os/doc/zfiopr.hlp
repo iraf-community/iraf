@@ -1,0 +1,58 @@
+.help zfiopr May84 "System Interface"
+.ih
+NAME
+zfiopr -- IPC driver
+.ih
+SYNOPSIS
+.nf
+zopnpr (osfn, mode, chan)		# ** NOT USED **
+zclspr (chan, status)			# ** NOT USED **
+zardpr (chan, buf, maxbytes, loffset)	# asynchronous read
+zawrpr (chan, buf,   nbytes, loffset)	# asynchronous write
+zawtpr (chan, status)			# wait for transfer
+zsttpr (chan, param, lvalue)		# get file/device status
+
+packed	char osfn[]
+char	buf[]
+int	mode, chan, maxbytes, nbytes, param, status
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+The IPC driver is used to read and write the inter-process communications
+channels connecting parent and child processes.  Except where noted herein,
+the specifications of the IPC driver are equivalent to those of the ordinary
+streaming binary file driver.
+
+The \fBzopnpr\fR and \fBzclspr\fR primitives are not used by the IPC driver
+and should not be supplied.  The process connect and disconnect primitives
+\fBzopcpr\fR and \fBzclcpr\fR are used to open and close the IPC channels
+to a subprocess and perform other process control functions as well.
+
+The IPC channels, like all other streaming binary files, read and write data
+blocks.  Thus, if process A calls \fBzawrpr\fR to write a binary block of length
+N bytes into an IPC channel, an N byte block will be returned by \fBzardpr\fR
+to process B at the other end of the channel.  Data blocks may be queued
+in a channel until the storage capacity of the channel is reached.
+If process A writes an N byte block and an M byte block into a channel with
+successive \fBzawrpr\fR calls, process B will read an N byte block and an M
+byte block in successive \fBzardpr\fR calls.
+
+If a process tries to write into a full channel process execution will be
+suspended until enough data has been read from the channel to permit
+completion of the write.  If a process tries to read from an empty channel
+it will be suspended until the process at the other end writes into the
+channel or until the writing process closes the channel, in which case the
+reader sees EOF.  If the IPC driver is fully asynchronous process execution
+will not be suspended until \fBzawtpr\fR is called.  The wait primitive
+returns when the data block has been written into the channel, rather than
+when the data has been read by the process at the other end.
+.ih
+NOTES
+If a process writes into a channel with no reader (the reading process has
+died, e.g., in a \fBzpanic\fR exit), the exception X_IPC will be raised in
+the writing process.  This is necessary to avoid deadlock.
+.ih
+SEE ALSO
+zfiobf, zopcpr, zclcpr, zintpr, zxwhen
+.endhelp

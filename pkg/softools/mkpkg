@@ -1,0 +1,24 @@
+# Make the SOFTOOLS package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_softools.x
+	$link	x_softools.o libpkg.a -o xx_softools.e
+	;
+
+install:
+	$move	xx_softools.e bin$x_softools.e
+
+libpkg.a:
+	memchk.x        <ctype.h>
+	mktags.x        <ctotok.h> <ctype.h> <error.h>
+	tgutil.x        <ctotok.h> <ctype.h> <error.h>
+	;

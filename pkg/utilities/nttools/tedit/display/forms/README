@@ -1,0 +1,115 @@
+The forms procedures give an example of a display handling library
+built on top of the curses routines.  The forms procedures divide the
+terminal screen into two windows, the form and prompt window.  The
+form window contains the form fields.  Each field in the form occupies
+one line on the screen with the field name on the left side of the
+line and the field value on the right side separated by an equals
+sign. If the number of fields in the form exceed the number of lines
+in the form window, a portion of the fields will be displayed, which
+the user can scroll through. The prompt window is used to read user
+input and display messages.  The first line contains a message,
+typically used to list the possible commands, and the second line
+contains the user input. 
+
+The following two procedures are used to initialize and terminate the
+form handling.  The first procedure, fm_begin, calls the keyboard and
+screen initialization routines, and initializes some global variables.
+The second procedure, fm_end, calls the keyboard and screen
+termination routines.
+
+procedure fm_begin ()
+procedure fm_end ()
+
+The next three procedures handle the form window of the screen. The
+first procedure, fm_mkform(), associates a form with a window.  The
+second procedure, fm_getform(), gets user input from the form. The
+third procedure, fm_endform(), frees the data structure associated
+with the form. 
+
+The first procedure has the following calling sequence:
+
+procedure fm_mkform (win, nfield, lenname, lenvalue, title, ftype, fname)
+
+int	win			# i: Window descriptor
+int	nfield			# i: Number of fields in form
+int	lenname			# i: Declared length of field name
+int	lenvalue		# i: Declared length of field value
+char	title[ARB]		# i: Form title
+int	ftype[ARB]		# i: Data types of fields
+char	fname[lenname,ARB]	# i: Names of fields
+
+The first argument, win, is the window descriptor. It is created by
+calling newwin(), the curses procedure which creates windows. The next
+three arguments are used to compute the size of the structure which
+holds the form. The number of fields can be greater than the height of
+the window, as the window will scroll up and down. But the combined
+length of the field name and value must be less than the width of the
+window, as it will not scroll side to side. The title is a string that
+is printed on the title bar, which is the bottom row of the form. The
+title bar also contains the help key escape sequence.  Three items of
+information are associated with each field: a type, a name, and a
+value. The type is an integer with the same meaning used by the table
+interface: a negative number if the field is a string whose magnitude
+is equal to the maximum string length or a positive integer equal to
+the spp type code if the field is not a string. The type is used to
+check the field value, the procedure will not let the user enter a
+value of a different type. Each field name is printed on a separate
+line of the form followed by an equals sign.
+
+The second procedure, fm_getform, is used to read or display the
+values associated with the fields of the form. It has the following
+calling sequence:
+
+procedure fm_getform (win, redraw, lenvalue, fvalue)
+
+int	win			# i: Window descriptor
+bool	redraw			# i: Redraw screen?
+int	lenvalue		# i: Declared length of field value
+char	fvalue[lenvalue,ARB]	# u: Values in fields
+
+The first argument is the window descriptor of the window associated
+with the form. If the second argument, redraw is set to true, the
+window is redrawn when the procedure begins, otherwise the window is
+unchanged. Redraw should set to true the first time this procedure is
+called. The last argument, fvalue, contains the values that are
+displayed on the form. The user updates these values by editing the
+form on the screen. When the user has finished updating the values,
+the modified values are returned to the calling procedure.
+
+The third procedure frees the form data structure. After freeing the
+data structure, the window should be closed by calling delwin. This
+procedure has the following calling sequence:
+
+procedure fm_clsform (win)
+
+int	win			# i: Window descriptor
+
+
+The next procedure, fm_prompt, handles the prompt window on the screen.
+It has the following calling sequence:
+
+int procedure fm_prompt (commands, message)
+
+char	commands[ARB]	# i: List of commands
+char	message[ARB]	# i: Message to print in prompt area
+
+The list of commands is a string containing the possible commands.  This
+string is formatted like the dictionary in strdic: the first character
+in the string is a command separator which appears between the commands
+in the string.  The message is displayed on the top line of the prompt
+area.  If the message is a null string, the command string is displayed
+instead.  The user enters one of the commands and presses carriage
+return.  The procedure returns the number of the command that the user
+entered if the command is legal, or beeps and displays the list of
+commands if it is not. If the list of commands is a null string, the
+procedure displays the message in the prompt area and returns a value
+of zero without looking for user input.
+
+The last procedure displays the help window. This window covers the
+entire screen. Its argument is the currently active window. It is
+passed so that the cursor can be restored to its previous position
+when the procedure is finished.
+
+procedure fm_help (win)
+
+int	win		# i: Window which currently is active

@@ -1,0 +1,485 @@
+.help tty Dec83 "Terminal Control Interface"
+.nh
+Introduction
+
+    The TTY interface is a table driven, device independent interface for
+controlling terminal and printer devices.  Devices are described either by
+environment definitions, or by an entry in the TTY database file.  The TTY
+database file is the standard Berkeley UNIX termcap terminal capability
+database file (a text file), to which we have added entries for our printer
+devices.  Accessing the UNIX termcap file directly without modification
+is sometimes awkward, but the benefits of accessing a widely used, standard
+database more than compensate for any clumsiness.
+
+When the CL starts up, the following environment variables are defined to
+describe the default terminal and printer devices.  The user may subsequently
+change the values of these variables with the SET statement or with the STTY
+program.
+
+
+.ks
+.nf
+	printer		default printer (i.e., "versatec")
+	terminal	default terminal (i.e., "vt100", "tek4012")
+	termcap		terminal/printer database filename
+	ttybaud		baud rate, default 9600
+	ttyncols	number of characters per line
+	ttynlines	number of lines per screen
+.fi
+.ke
+
+
+The variables defining the names of the default terminal and printer
+devices will normally correspond to the names of device entries in the
+termcap file.  The name of a file containing a single termcap entry
+for the device may optionally be given; the file name must contain a
+VFN or OSFN directory prefix to be recognized as a filename.  The default
+termcap file is dev$termcap.  Terminal initialization files (used to
+set tabstops) are files of the form dev$tty.tbi, where "tty" is the last
+field of the UNIX pathname in the "if" termcap entry.  If the first
+character of the "if" filename string is not a /, an IRAF VFN should
+be given.
+
+The value strings for the environment variables TTYNCOLS and TTYNLINES,
+defining the screen dimensions, are extracted from the termcap file by the
+STTY program during startup.  The screen dimensions are defined in the
+environment for two reasons: (1) efficiency (the TTY package is not needed
+to learn the screen dimensions), and (2) if a window is used, the logical
+screen dimensions may be less than the physical screen dimensions.
+Most applications programs should therefore use ENVGETI rather than TTYGETI
+to get the screen dimensions.  TTYGETI returns the physical screen dimensions
+as given in the termcap file.
+
+.nh
+Library Procedures
+
+    Before any TTY control sequences can be output, the TTY device descriptor
+must be read from the termcap file into a buffer for efficient access.
+TYODES is used to "open" the TTY descriptor; TTYCDES should be called when
+done to close the descriptor, returning all buffer space used.  If "ttyname"
+is "terminal" or "printer", the descriptor for the default terminal or printer
+is accessed.
+
+
+.ks
+.nf
+Open/Close descriptor:
+
+	tty =	ttyodes (ttyname)		# pointer ttyodes()
+		ttycdes (tty)
+.fi
+.ke
+
+
+.ks
+.nf
+Low level database access, tty control:
+
+	  int = ttygeti (tty, cap)
+	 real = ttygetr (tty, cap)
+	 bool = ttygetb (tty, cap)
+       nchars = ttygets (tty, cap, outstr, maxch)
+		ttyputs (fd, tty, ctrlstr, afflncnt)
+		ttysubi (ctrlstr, outstr, maxch, arg1, arg2)
+.fi
+.ke
+
+
+.ks
+.nf
+High level control
+
+       OK|ERR = ttyctrl (fd, tty, cap, afflncnt)
+
+		  ttyso (fd, tty, YES|NO)	# turn standout mode on|off
+		ttygoto (fd, tty, col, line)	# move cursor absolute
+NI		ttyhorz (fd, tty, from, to)	# move cursor on line
+NI		ttyvert (fd, tty, from, to)	# move cursor on column
+		ttyinit (fd, tty)		# send :is & :if, if defined
+	       ttyclear (fd, tty)		# clear screen
+	     ttyclearln (fd, tty)		# clear the current line
+	     ttyputline (fd, tty, textline, map_cc)	# put text line
+.fi
+.ke
+
+
+The TTYGET procedures are used to get capabilities from the database entry.
+If the named capability is not found, TTYGETI returns zero, TTYGETB returns
+false, and TTYGETS returns the null string.  TTYSUBI performs argument
+substitution on a control sequence containing at most two integer arguments
+(such as a cursor motion control sequence), generating an output sequence
+suitable for input to TTYPUTS.  TTYPUTS puts the control sequence to the
+output file, padding as required given the number of affected lines.
+The baud rate and pad character, used to generate padding, are evaluated at
+TTYODES time and are conveyed to TTYPUTS in the tty descriptor.
+
+TTYSO turns standout mode on or off.
+TTYCNTRL calls TTYGETS and TTYPUTS to process and output a control sequence
+(slightly less efficiently than if the control string is buffered by
+the user code).  TTYGOTO moves the cursor to the
+desired column and line.  TTYHORZ and TTYVERT move the cursor on a line
+or column, using knowledge of the terminal's capabilities to generate the
+most efficient sequence.
+
+TTYPUTLINE is like the FIO PUTLINE, except that it processes any form feeds,
+standout mode directives, and other control characters (including tabs)
+embedded in the text.  Lines longer than TTYNCOLS are broken into several
+output lines.  TTYPUTLINE is used by the help, page, type, and lprint utilities 
+to map tabs and standout mode directives for a particular output device.
+Standout mode is mapped as reverse video on most VDT's, and as underscore
+on most printers and on overstrike terminals such as the tek4012.
+
+.nh
+Implementation Notes
+
+    Of the low level routines, only TTYODES and TTYSUBI are at all complex.
+The high level routines can be fairly complex due to the logic required to
+perform a function on devices which may vary greatly in capabilities.
+
+.nh 2
+Structure
+
+.ks
+.nf
+open descriptor:
+
+	ttyodes
+	    envget[si]
+	    calloc			[alloc tty descriptor]
+	    open,close,seek		[read termcap file]
+	    tty_fetch_entry		[fetch entry from file]
+		getline,getc
+		realloc
+	    realloc
+	    tty_index_caplist		[encode, sort caplist]
+	    ttygeti			[set padchar]
+.fi
+.ke
+
+
+.ks
+.nf
+close descriptor:
+
+	ttycdes
+	    ttyctrl			[sometimes needed]
+	    mfree			[free tty descriptor]
+.fi
+.ke
+
+
+.ks
+.nf
+get integer capability:
+
+	ttygeti
+	    tty_find_capability		[binary search of caplist]
+	    ctoi
+.fi
+.ke
+
+
+.ks
+.nf
+get string capability:
+
+	ttygets
+	    tty_find_capability		[binary search caplist]
+	    tty_map_escapes		[get control string]
+.fi
+.ke
+
+
+.ks
+.nf
+perform argument substitution on control string:
+
+	ttysubi
+	    gltoc
+.fi
+.ke
+
+
+.ks
+.nf
+output control string:
+	ttyputs
+	    putc
+.fi
+.ke
+
+.nh 2
+Data Structures
+
+    The tty descriptor contains several parameters describing the most basic
+features of the device, the raw termcap entry, an encoded index into the
+termcap entry used to speed up searches, and any status variables for the
+device.  Since a fixed length array is used to index capabilities, there is
+an upper limit on the number of capabilities, but there is no limit on the
+length of a termcap entry.
+
+
+.ks
+.nf
+	struct tty_descriptor {
+		int	t_len		# length of descriptor
+		int	t_op		# offset into caplist
+		int	t_padchar	# pad character
+		int	t_baud		# baud rate, bits/sec
+		int	t_nlines	# lines per screen
+		int	t_ncols		# chars per line
+		int	t_ncaps		# number of capabilities
+		int	t_capcode	# sorted, encoded caplist
+		int	t_capindex	# indices of cap strings
+		char	caplist[ARB]	# termcap entry
+	}
+.fi
+.ke
+
+
+TTYODES "opens" the tty descriptor, i.e., allocates a descriptor,
+scans the termcap file and reads the terminal entry into the descriptor,
+expanding any tc references, and then sets the baud and padchar fields.
+There is no limit on the size of a termcap entry, unlike the UNIX
+implementation which uses a fixed size, 1024 character caplist buffer.
+
+
+.tp 10
+.nf
+procedure ttyodes (ttyname)
+
+begin
+	# Get device name or file name.
+	if (ttyname equals "terminal")
+	    ttysource = fetch environment variable "terminal"
+	else if (ttyname equals "printer")
+	    ttysource = fetch environment variable "printer"
+	else
+	    ttysource = ttyname
+
+	# Get device name AND file name.
+	if (ttysource is a filename) {
+	    file = ttysource
+	    entry = "" (first entry)
+	} else {
+	    file = fetch termcap filename from environment
+	    entry = ttysource
+	}
+
+	allocate tty descriptor structure "tty"
+	tty.len = default length of descriptor
+	tty.op = pointer to first char of caplist string
+
+	# Fetch termcap entry into tty descriptor, expanding any "tc"
+	# references to other records by rescanning the file.
+
+	fd = open (termcap file)
+	repeat {
+	    tty_fetch_entry (fd, entry, tty)
+	    if (last field of entry is a "tc") {
+		entry = value of "tc" field
+		set tty.op to overwrite tc field
+		rewind (fd)
+	    } else
+		break
+	} 
+	close (fd)
+
+	# Get pad character and baud rate and store explicitly in the
+	# descriptor, since these values are used in every TTYPUTS call.
+
+	call realloc to return unused space in tty descriptor
+	call tty_index_caplist to index the caplist for efficient
+	    searches
+	tty.baud = fetch "baud" from environment
+	tty.padchar = ttygeti (tty, "pc")
+
+	return (tty)
+end
+.fi
+
+
+Scan the termcap file until the desired entry is found.  Copy the entry
+into the caplist field of the tty descriptor.  If the caplist buffer
+overflows, reallocate a larger buffer.
+
+.nf
+procedure tty_fetch_entry (fd, entry, tty)
+
+begin
+	# Locate entry.
+	repeat {
+	    advance to next record
+	    if (at eof)
+		error: termcap entry not found
+	} until (positioned to the entry we are looking for)
+
+	# Fetch entry.
+	while (getc (fd, ch) != EOF) {
+	    if (ch equals \ and next ch is newline) {
+		throw both out
+	    } else if (ch equals newline) {
+		deposit EOS
+		return
+	    } else
+		deposit ch
+
+	    bump output pointer
+	    if (buffer is full)
+		allocate more space
+	}
+
+	error: EOF encountered while reading termcap entry
+end
+.fi
+
+
+Prepare the caplist index.  Each two-character capability name maps into
+an unique integer code.  We prepare an list of capcodes and an associated
+list of indices into the caplist, then sort the capcode list.  At runtime
+we will perform a binary search of the capcode list to find the desired
+capcode.
+
+.nf
+procedure tty_index_caplist (caplist, capcode_list, capindex_list)
+
+begin
+	for (each entry in caplist) {
+	    compute capcode
+	    if (capcode is not already in capcode_list) {
+		bump list pointer
+		if (list overflows)
+		    error: too many capabilities in termcap entry
+
+		# Termcap flags capabilities that are not available 
+		# with the char '@'.
+		if (first char of entry is '@')
+		    index = 0
+		save capcode, index in lists
+	    }
+	}
+
+	if (two or more elements in list)
+	    sort list
+end
+.fi
+
+
+Process a capability string containing arguments.  Examples of such capability
+strings are cursor motion to [x,y], and set scrolling region to [l1,l2].
+Note that arguments in the termcap database are zero-indexed by default,
+while the TTYSUBI arguments are one-indexed.  The control string given as
+input has already been processed to reduce all escape sequences to single
+characters.
+
+.nf
+procedure ttysubi (ctrlstr, outstr, maxch, arg1, arg2)
+
+ctrlstr:	device control string
+outstr:		receives processed string
+arg1,arg2:	on input, the arguments to be expanded in the control
+		    string.  on output, the difference between the
+		    input arg values and the values actually used
+		    to produce outstr; these may differ if necessary
+		    to avoid special control chars in outstr.
+
+begin
+	# Make a local copy of the arguments to make reversal easy.  Also
+	# switch to zero-indexing internally, since the termcap entry is
+	# zero-indexed.
+
+	arg[1] = arg1 - 1
+	arg1 = 0
+	arg[2] = arg2 - 1
+	arg2 = 0
+	argnum = 1
+
+	op = 1
+	for (ip=1;  ctrlstr[ip] != EOS;  ip=ip+1) {
+	    ch = ctrlstr[ip]
+	    if (ch != '%') {
+		put char in outstr, bump op
+		next
+	    }
+
+	    switch (ch)
+	    case 'd', '2', '3', '+':
+		format coord and concat to outstr
+		increment argnum
+
+	    case '.':
+		# Binary output format.  Coordinate output in binary is a
+		# problem because the OS driver may see a tab, newline, or
+		# whatever and map it into something else.  If the value of
+		# arg[argnum] corresponds to a special control character,
+		# we increment it until we have an acceptable value, leaving
+		# it up to our caller to do the rest.
+
+		while (arg[argnum] is a special control character) {
+		    increment arg[argnum]
+		    increment arg1 or arg2
+		}
+		put binary value of arg[argnum] to outstr
+		increment argnum
+
+	    case '>':
+		conditionally modify arg[argnum]
+	    case 'r':
+		swap arg[1] and arg[2]
+	    case 'i':
+		increment arg[1] and arg[2]
+	    case '%':
+		put % to outstr, bump op
+	    case 'B':
+		BCD encode next arg
+	    case 'D':
+		backwards BCD encode next arg (ugh)
+	    }
+	}
+
+	deposit EOS
+end
+.fi
+
+
+The technique used for cursor addressing depends on the characteristics
+of the terminal.  If the terminal has no cursor motion capability, we
+try to position the cursor using primitive motion commands.  Otherwise
+we use TTYSUBI to generate the cursor motion sequence.  If TTYSUBI returns
+a residual, we use primitive motion commands (up line and backspace) to go
+the rest of the way in.
+
+
+.nf
+procedure ttygoto (fd, tty, col, line)
+
+begin
+	if (tty has no cursor addressing capability) {
+	    # If possible, the calling program should keep track of the
+	    # cursor position and use primitive motion commands for
+	    # positioning when possible.  We do the best we can without
+	    # knowledge of the current position.
+
+	    # First get to a known position.
+	    goto home or lower-left, depending on which is closest to
+		desired position and on capabilities of terminal.
+
+	    # Now move to the desired position.
+	    step to desired line using ttyvert
+	    advance to desired column using ttyhorz
+
+	} else {
+	    get cursor motion control string
+	    call ttysubi to substitute in desired coordinates
+	    call ttyputs to put control string to file
+
+	    # In certain cases, ttysubi cannot get us all the way there,
+	    # and we have to step in the rest of the way.
+
+	    if (line residual)
+		call ttyhorz to adjust position within line
+	    if (col residual)
+		call ttyvert to adjust vertical position
+	}
+end
+.fi

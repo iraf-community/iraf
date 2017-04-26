@@ -1,0 +1,47 @@
+# Help directory for the SYSTEM package.
+
+$defdir	= "system$"
+$doc	= "system$doc/"
+$help	= "system$help/"
+
+allocate	hlp=doc$allocate.hlp,	 src=hlib$allocate.cl
+concatenate	hlp=doc$concatenate.hlp, src=concatenate.x
+chkupdate	hlp=doc$chkupdate.hlp, 	 src=chkupdate.x
+copy		hlp=doc$copy.hlp,	 src=copy.x
+count		hlp=doc$count.hlp,	 src=count.x
+deallocate	hlp=doc$deallocate.hlp,	 src=hlib$deallocate.cl
+delete		hlp=doc$delete.hlp,	 src=delete.x
+devices		hlp=dev$devices.hlp,	 src=devices.cl
+devstatus	hlp=doc$devstatus.hlp,	 src=hlib$devstatus.cl
+directory	hlp=doc$directory.hlp,	 src=directory.x
+diskspace	hlp=doc$diskspace.hlp,	 src=hlib$diskspace.cl
+fcache		hlp=doc$fcache.hlp,	 src=t_fcache.x
+files		hlp=doc$files.hlp,	 src=files.x
+gripes		hlp=doc$gripes.hlp,	 src=hlib$gripes.cl
+head		hlp=doc$head.hlp,	 src=head.x
+help		hlp=doc$help.hlp,	 src=help$t_help.x
+lprint		hlp=doc$lprint.hlp,	 src=lprint.x
+match		hlp=doc$match.hlp,	 src=match.x
+mkdir		hlp=doc$mkdir.hlp,	 src=mkdir.x
+mkscript	hlp=doc$mkscript.hlp,	 src=mkscript.cl
+movefiles	hlp=doc$movefiles.hlp,	 src=movefiles.x
+news		hlp=doc$news.hlp,	 src=news.cl
+netstatus	hlp=doc$netstatus.hlp,	 src=netstatus.x
+page		hlp=doc$page.hlp,	 src=page.x
+pathnames	hlp=doc$pathnames.hlp,	 src=pathnames.x
+phelp		hlp=doc$phelp.hlp,	 src=phelp.cl
+protect		hlp=doc$protect.hlp,	 src=protect.x
+references	hlp=doc$references.hlp,	 src=references.cl
+rename		hlp=doc$rename.hlp,	 src=rename.x
+revisions	hlp=doc$revisions.hlp,	 src=revisions.cl
+rewind		hlp=doc$rewind.hlp,	 src=rewind.x
+sleep		hlp=doc$sleep.hlp,	 src=sleep.x
+sort		hlp=doc$sort.hlp,	 src=sort.x
+spy		hlp=doc$spy.hlp,	 src=hlib$spy.cl
+system		hlp=doc$system.hlp,	 src=system.cl
+tail		hlp=doc$tail.hlp,	 src=tail.x
+tee		hlp=doc$tee.hlp,	 src=tee.x
+touch		hlp=doc$touch.hlp,	 src=touch.x
+type		hlp=doc$type.hlp,	 src=type.x
+urlget		hlp=doc$urlget.hlp,	 src=urlget.x
+unprotect	hlp=doc$unprotect.hlp,	 src=unprotect.x

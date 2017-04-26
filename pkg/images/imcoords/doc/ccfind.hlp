@@ -1,0 +1,596 @@
+.help ccfind Jun99 images.imcoords
+.ih
+NAME
+ccfind -- locate objects in an image given a celestial coordinate list and
+the image wcs
+.ih
+USAGE
+ccfind input output image
+.ih
+PARAMETERS
+.ls input
+The list of input celestial coordinate files. Coordinates may be entered
+by hand by setting input to "STDIN". A STDIN coordinate list is terminated
+by typing <EOF> (usually <ctrl/d> or <ctrl/z>).
+.le
+.ls output
+The list of output matched coordinate files. The computed pixel values
+are appended to the input coordinate file line and written to output. The number
+of output files must equal the number of input files. Results may be
+printed on the terminal by setting output to "STDOUT".
+.le
+.ls image
+The list of input images associated with the input coordinate files. The number
+of input images must equal the number of input coordinate files.
+.le
+.ls lngcolumn = 1, latcolumn = 2
+The input coordinate file columns containing the celestial ra / longitude and
+dec / latitude coordinates respectively.
+.le
+.ls lngunits = "", latunits = ""
+The units of the input ra / longitude and dec / latitude coordinates. The
+options are "hours", "degreees", and "radians" for ra / longitude and
+"degrees" and "radians" for dec / latitude. If lngunits and latunits are
+undefined they default to the preferred units for the coordinates
+system specified by \fIinsystem\fR, e.g. "hours" and "degrees" for
+equatorial systems and "degrees" and "degrees" for ecliptic, galactic, and
+supergalactic systems.
+.le
+.ls insystem = "j2000"
+The input celestial coordinate system. The \fIinsystem\fR parameter
+sets the preferred units for the input celestial coordinates, and
+tells CCFIND how to transform the input celestial coordinates 
+the input image celestial coordinate system. The systems of most
+interest to users are "icrs", "j2000", and "b1950".  The full set
+of options are the following:
+
+.ls equinox [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system if equinox is a
+Julian epoch, e.g. J2000.0 or 2000.0, or the equatorial mean place
+pre-IAU 1976 system (FK4) if equinox is a Besselian epoch, e.g. B1950.0
+or 1950.0. Julian equinoxes are prefixed by a J or j, Besselian equinoxes
+by a B or b. Equinoxes without the J / j or B / b prefix are treated as
+Besselian epochs if they are < 1984.0, Julian epochs if they are >= 1984.0.
+Epoch is the epoch of the observation and may be a Julian
+epoch, a Besselian epoch, or a Julian date. Julian epochs
+are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to the epoch type of
+equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The International Celestial Reference System (ICRS) where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk5 [equinox] [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system where equinox is a
+Besselian or Julian epoch e.g. B1950.0  or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0. Epoch
+is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls noefk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system but without the E-terms
+where equinox is a Besselian or Julian epoch e.g. B1950.0 or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.  If undefined epoch defaults to equinox.
+.le
+.ls apparent epoch
+The equatorial geocentric apparent place post-IAU 1976 system where
+epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.
+.le
+.ls ecliptic epoch
+The ecliptic coordinate system where epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch values < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.
+.le
+.ls galactic [epoch]
+The IAU 1958 galactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+.ls supergalactic [epoch]
+The deVaucouleurs supergalactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+
+In all the above cases fields in [] are optional with the defaults as
+described. The epoch field for the icrs, fk5, galactic, and supergalactic
+coordinate systems is only used if the input coordinates are in the
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are supplied.
+Since CCFIND does not currently support proper motions these fields are
+not required.
+.le
+.ls usewcs = no
+Use image header information to compute the input image celestial coordinate
+system ? If usewcs is "yes", the image coordinate system is read from the
+image header.  If usewcs is "no", the input image celestial coordinates
+system is defined by \fIxref\fR, \fIyref\fR, \fIxmag\fR, \fIymag\fR,
+\fIxrotation\fR, \fIyrotation\fR, \fIlngref\fR, \fIlatref\fR, 
+\fIlngrefunits\fR, \fIlatrefunits\fR, \fIrefsystem\fR, and \fIprojection\fR
+parameters respectively.
+.le
+.ls xref = INDEF, yref = INDEF
+The x and y pixel coordinates of the reference point.
+xref and yref default to the center of the image in pixel coordinates.
+.le
+.ls xmag = INDEF, ymag = INDEF
+The x and y scale factors in arcseconds per pixel.  xmag and ymag default
+to 1.0 and 1.0 arcseconds per pixel.
+.le
+.ls xrotation = INDEF, yrotation = INDEF
+The x and y rotation angles in degrees. xrotation and yrotation are
+interpreted as the rotation of the ra / longitude and dec / latitude
+coordinates with respect to the x and y axes, and default 0.0 and 0.0 degrees
+respectively. To set east to the up, down, left, and right directions,
+set xrotation to 90, 270, 180, and 0 respectively. To set north to the
+up, down, left, and right directions, set yrotation to  0, 180, 90, and 270
+degrees respectively. Any global rotation must be added to both the
+xrotation and yrotation values.
+.le
+.ls lngref = "INDEF", latref = "INDEF"
+The ra / longitude and dec / latitude of the reference point. Lngref and latref
+may be numbers, e.g 13:20:42.3 and -33:41:26, or keywords for the
+appropriate parameters in the image header, e.g. RA and DEC for NOAO
+image data. If lngref and latref are undefined they default to 0.0 and 0.0
+respectively.
+.le
+.ls lngrefunits = "", latrefunits = ""
+The units of the reference point celestial  coordinates. The options
+are "hours", "degrees", and "radians" for the ra / longitude coordinates,
+and "degrees" and "radians" for the dec /latitude coordinates.
+If lngrefunits and latrefunits are undefined they default to the preferred
+units of the reference system.
+.le
+.ls refsystem = "INDEF"
+The celestial coordinate system of the reference point. Refsystem may
+be any one of the options listed under the \fIinsystem\fR parameter, e.g.
+"b1950", or an image header keyword containing the epoch of the observation
+in years, e.g. EPOCH for NOAO data.  If refsystem is undefined
+the celestial coordinate system of the reference point defaults to the
+celestial coordinate system of the input coordinates \fIinsystem\fR.
+.le
+.ls projection = "tan"
+The sky projection geometry. The most commonly used projections in
+astronomy are "tan", "arc", "sin", and "lin". Other supported projections
+are "ait", "car", "csc", "gls", "mer", "mol", "par", "pco", "qsc", "stg",
+"tsc", and "zea".
+.le
+.ls center = yes
+Center the object pixel coordinates using an x and y marginal centroiding
+algorithm ?
+.le
+.ls sbox = 21
+The search box width in pixels. Sbox defines the region of the input image
+searched and used to compute the initial x and y marginal centroids. Users
+worried about contamination can set sbox = cbox, so that the first
+centering iteration will be the same as the others.
+.le
+.ls cbox = 9
+The centering box width in pixels. Cbox defines the region of the input
+image used to compute the final x and y marginal centroids.
+.le
+.ls datamin = INDEF, datamax = INDEF
+The minimum and maximum good data values. Values outside this range
+are exclude from the x and y marginal centroid computation.
+.le
+.ls background = INDEF
+The background value used by the centroiding algorithm. If background is
+INDEF, a value equal to the mean value of the good data pixels for
+each object is used.
+.le
+.ls maxiter = 5
+The maximum number of centroiding iterations to perform. The centroiding
+algorithm will halt when this limit is reached or when the desired tolerance
+is reached.
+.le
+.ls tolerance = 0
+The convergence tolerance of the centroiding algorithm. Tolerance is
+defined as the maximum permitted integer shift of the centering box in
+pixels from one iteration to the next.
+.le
+.ls verbose
+Print messages about actions taken by the task?
+.le
+
+.ih
+DESCRIPTION
+
+CCFIND locates the objects in the input celestial coordinate lists \fIinput\fR
+in the input images \fIimage\fR using the image world coordinate system,
+and writes the located objects to the output matched coordinates files
+\fIoutput\fR. CCFIND computes the pixel coordinates of each object by,
+1) transforming the input celestial coordinates to image celestial coordinate
+system, 2) using the image celestial coordinate system to compute the
+initial pixel coordinates, and 3) computing the final pixel coordinates
+using a centroiding algorithm. The image celestial coordinate system may
+be read from the image header or supplied by the user. The CCFIND output
+files are suitable for input to the plate solution computation task CCMAP.
+
+The input ra / longitude and dec / latitude coordinates are read from
+columns \fIlngcolumn\fR and \fIlatcolumn\fR in the input coordinate
+file respectively.
+
+The input celestial coordinate system is set by the \fIinsystem\fR parameter,
+and must be one of the following: equatorial, ecliptic, galactic, or
+supergalactic.  The equatorial coordinate systems must be one of: 1) FK4,
+the mean place pre-IAU 1976 system, 2) FK4-NO-E, the same as FK4 but without
+the E-terms, 3) FK5, the mean place post-IAU 1976 system, 4) ICRS the
+International Celestial Reference System, 5) GAPPT, the geocentric apparent
+place in the post-IAU 1976 system.
+
+The \fIlngunits\fR and \fIlatunits\fR parameters set the units of the input
+celestial coordinates. If undefined, lngunits and latunits assume sensible
+defaults for the input celestial coordinate system set by the \fIinsystem\fR
+parameter, e.g. "hours" and "degrees" for equatorial coordinates and "degrees"
+and "degrees" for galactic coordinates.
+
+If the \fIusewcs\fR parameter is "yes", the image celestial coordinate
+system is read from the image header keywords CRPIX, CRVAL, CD or CDELT/CROTA,
+RADECSYS, EQUINOX or EPOCH, and MJD-OBS or DATE-OBS, where the mathematical
+part of this transformation is shown below.
+
+.nf
+        xi = a + b * x + c * y
+       eta = d + e * x + f * y
+         b = CD1_1
+         c = CD1_2
+         e = CD2_1
+         f = CD2_2
+         a = - b * CRPIX1 - c * CRPIX2
+         d = - e * CRPIX1 - f * CRPIX2 
+       lng = CRVAL1 + PROJ (xi, eta)
+       lat = CRVAL2 + PROJ (xi, eta)
+.fi
+
+If usewcs is "no", then the image celestial coordinate system is computed
+using the values of the \fIxref\fR, \fIyref\fR, \fIxmag\fR, \fIymag\fR,
+\fIxrotation\fR, \fIyrotation\fR, \fIlngref\fR, \fIlatref\fR,
+\fIlngrefunits\fR, \fIlatrefunits\fR, \fIrefsystem\fR, and \fIprojection\fR
+supplied by the user, where the mathematical part of this transformation is
+shown below.
+
+.nf
+        xi = a + b * x + c * y
+       eta = d + e * x + f * y
+         b = xmag * cos (xrotation)
+         c = -ymag * sin (yrotation)
+         e = xmag * sin (xrotation)
+         f = ymag * cos (yrotation)
+         a = - b * xref - c * yref 
+         d = - e * xref - f * yref
+       lng = lngref + PROJ (xi, eta)
+       lat = latref + PROJ (xi, eta)
+.fi
+
+In both the above examples, x and y are the pixel coordinates, xi and eta
+are the usual projected (standard) coordinates, lng and lat are the celestial
+coordinates, and PROJ stands for the projection function,  usually
+the tangent plane projection function.
+
+Once the image celestial coordinate system is determined, CCFIND transforms
+the input celestial coordinates to the image celestial coordinate system
+using the value of the \fIinsystem\fR parameter, and either the values of
+the image header keywords RADECSYS, EQUINOX / EPOCH, and MJD-OBS / DATE-OBS
+(if \fIusewcs\fR = "yes"), or the value of the \fIrefsystem\fR parameter (if
+\fIusewcs\fR = "no"), and then transforms the image celestial coordinates
+to pixel coordinates using the inverse of the transformation functions
+shown above.
+
+If \fIcenter\fR is yes, CCFIND locates the objects in the input
+image using an  xn and y marginal centroiding algorithm. Pixels
+inside a box \fIsbox\fR pixels wide centered in the initial coordinates,
+are used to locate the objects in the image. Accurate final centering
+is done using pixels inside a region \fIcbox\fR pixels wide centered on
+these initial coordinates. Sbox should be set to a value large enough
+to locate the object, but small enough to exclude other bright sources.
+Cbox should be set to a value small enough to exclude sky values and other
+bright sources, but large enough to include the wings of point sources.
+Bad data can be excluded from the centroiding algorithm by setting
+the \fIdatamin\fR and \fIdatamax\fR parameters. If \fIbackground\fR is
+undefined then the centroiding algorithm sets the background value to
+the mean of the good data values inside the centering box.
+The centroiding algorithm iterates until the maximum number of
+iterations \fImaxiter\fR limit is reached, or until the tolerance
+criteria \fItolerance\fR is achieved.
+
+Only objects whose coordinates are successfully located in the 
+input image are written to the output coordinate file. The computed
+output pixel coordinates are appended to the input image line using
+the format parameters \fIxformat\fR and \fIyformat\fR parameters,
+whose default values are "%10.3f" and "%10.3f" respectively
+
+.ih
+FORMATS
+
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+   
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+   
+   
+Conventions for w (field width) specification:
+   
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+
+Escape sequences (e.g. "\n" for newline):
+   
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+   
+Examples
+   
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+   
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h          format as nn:nn:nn.n
+%15h        right justify nn:nn:nn.n in field of 15 characters
+%-15h       left justify nn:nn:nn.n in a field of 15 characters
+cctran.hlp-(67%)-line 268-file 1 of 1
+%12.2h      right justify nn:nn:nn.nn
+%-12.2h     left justify nn:nn:nn.nn
+   
+%H          / by 15 and format as nn:nn:nn.n
+%15H        / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H       / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H      / by 15 and right justify nn:nn:nn.nn
+%-12.2H     / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+EXAMPLES
+
+1. Locate the object in the list wpix.coords in the image wpix using
+the existing image header wcs. The input celestial coordinates file
+contains j2000 GSC catalog coordinates of 5 objects in the field.
+The image wcs is in b1950.
+
+.nf
+cl> imcopy dev$wpix wpix
+    ... copy the test image into the current directory
+
+cl> hedit wpix equinox 1950.0 add+
+    ... change the epoch keyword value to the correct number
+
+cl> type wpix.coords
+13:29:47.297  47:13:37.52
+13:29:37.406  47:09:09.18
+13:29:38.700  47:13:36.23
+13:29:55.424  47:10:05.15
+13:30:01.816  47:12:58.79
+
+cl> ccfind wpix.coords wpix.match wpix usewcs+
+
+Input File: wpix.coords  Output File: wpix.match
+    Image: wpix  Wcs: 
+Insystem: j2000  Coordinates: equatorial FK5
+    Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+Refsystem: wpix.imh logical  Projection: TAN  Ra/Dec axes: 1/2
+    Coordinates: equatorial FK4 Equinox: B1950.000
+    Epoch: B1987.25767884 MJD: 46890.00000
+Located 5 objects in image wpix
+
+cl> type wpix.match
+# Input File: wpix.coords  Output File: wpix.match
+#     Image: wpix  Wcs: 
+# Insystem: j2000  Coordinates: equatorial FK5
+#     Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+# Refsystem: wpix.imh logical  Projection: TAN  Ra/Dec axes: 1/2
+#     Coordinates: equatorial FK4 Equinox: B1950.000
+#     Epoch: B1987.25767884 MJD: 46890.00000
+
+13:29:47.297  47:13:37.52     327.504    410.379
+13:29:37.406  47:09:09.18     465.503     62.101
+13:29:38.700  47:13:36.23     442.013    409.654
+13:29:55.424  47:10:05.15     224.351    131.200
+13:30:01.816  47:12:58.79     134.373    356.327
+
+cl> ccmap wpix.match ccmap.db xcol=3 ycol=4 lngcol=1 latcol=2 ...
+.fi
+
+2. Repeat the previous example but input the image coordinate system by hand.
+The scale is known to be ~0.77 arcseconds per pixel, north is up, east is left,
+and the center of the image is near ra = 13:27:47, dec = 47:27:14 in 1950
+coordinates.
+
+.nf
+cl> ccfind wpix.coords wpix.match wpix xmag=-0.77 ymag=.77 lngref=13:27:47 \
+latref=47:27:14 refsystem=b1950.
+
+Input File: wpix.coords  Output File: wpix.match.1
+    Image: wpix  Wcs: 
+Insystem: j2000  Coordinates: equatorial FK5
+    Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+Refsystem: b1950  Coordinates: equatorial FK4
+    Equinox: B1950.000 Epoch: B1950.00000000 MJD: 33281.92346
+Located 5 objects in image wpix
+
+
+cl> type wpix.match 
+
+# Input File: wpix.coords  Output File: wpix.match
+#     Image: wpix  Wcs: 
+# Insystem: j2000  Coordinates: equatorial FK5
+#     Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+# Refsystem: b1950  Coordinates: equatorial FK4
+#     Equinox: B1950.000 Epoch: B1950.00000000 MJD: 33281.92346
+
+13:29:47.297  47:13:37.52     327.504    410.379
+13:29:37.406  47:09:09.18     465.503     62.101
+13:29:38.700  47:13:36.23     442.013    409.654
+13:29:55.424  47:10:05.15     224.351    131.200
+13:30:01.816  47:12:58.79     134.373    356.327
+.fi
+
+3. Repeat the previous example but read the ra, dec, and epoch from the
+image header keywords RA, DEC, and EPOCH. It turns out the telescope
+RA and DEC recorded in the image header are not very accurate and that
+EPOCH is 0.0 instead of 1987.26 so we will fix up the header before
+trying out the example.
+
+.nf
+cl> hedit wpix EPOCH 1987.26
+cl> hedit wpix RA '13:29:21'
+cl> hedit wpix DEC '47:15:42'
+
+cl> ccfind wpix.coords wpix.match wpix xmag=-0.77 ymag=.77 lngref=RA \
+latref=DEC refsystem=EPOCH
+
+Input File: wpix.coords  Output File: wpix.match
+    Image: wpix  Wcs: 
+Insystem: j2000  Coordinates: equatorial FK5
+    Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+Refsystem: 1987.26  Coordinates: equatorial FK5
+    Equinox: J1987.260 Epoch: J1987.26000000 MJD: 46891.21500
+Located 5 objects in image wpix
+
+# Input File: wpix.coords  Output File: wpix.match
+#     Image: wpix  Wcs: 
+# Insystem: j2000  Coordinates: equatorial FK5
+#     Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+# Refsystem: 1987.26  Coordinates: equatorial FK5
+#     Equinox: J1987.260 Epoch: J1987.26000000 MJD: 46891.21500
+
+13:29:47.297  47:13:37.52     327.504    410.379
+13:29:37.406  47:09:09.18     465.503     62.101
+13:29:38.700  47:13:36.23     442.013    409.654
+13:29:55.424  47:10:05.15     224.351    131.200
+13:30:01.816  47:12:58.79     134.373    356.327
+.fi
+
+4. Use ccfind to predict the pixel coordinate in the last example by
+turning off the object centering, and mark the predicted coordinates
+on the image display with red dots.
+
+.nf
+cl> ccfind wpix.coords wpix.match wpix xmag=-0.77 ymag=.77 lngref=RA \
+latref=DEC refsystem=EPOCH center-
+
+Input File: wpix.coords  Output File: wpix.match
+    Image: wpix  Wcs: 
+Insystem: j2000  Coordinates: equatorial FK5
+    Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+Refsystem: 1987.26  Coordinates: equatorial FK5
+    Equinox: J1987.260 Epoch: J1987.26000000 MJD: 46891.21500
+Located 5 objects in image wpix
+
+cl> type wpix.match
+
+# Input File: wpix.coords  Output File: wpix.match
+#     Image: wpix  Wcs: 
+# Insystem: j2000  Coordinates: equatorial FK5
+#     Equinox: J2000.000 Epoch: J2000.00000000 MJD: 51544.50000
+# Refsystem: 1987.26  Coordinates: equatorial FK5
+#     Equinox: J1987.260 Epoch: J1987.26000000 MJD: 46891.21500
+
+13:29:47.297  47:13:37.52     333.954    401.502
+13:29:37.406  47:09:09.18     465.338     53.175
+13:29:38.700  47:13:36.23     447.687    399.967
+13:29:55.424  47:10:05.15     226.600    125.612
+13:30:01.816  47:12:58.79     141.892    351.084
+
+cl> display wpix 1
+
+cl> fields wpix.match 3,4 | tvmark 1 STDIN col=204
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+starfind, ccxymatch, ccmap, ccsetwcs, cctran
+.endhelp

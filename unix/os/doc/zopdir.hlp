@@ -1,0 +1,34 @@
+.help zopdir May84 "System Interface"
+.ih
+NAME
+zopdir -- open a directory file
+.ih
+SYNOPSIS
+.nf
+zopdir (osfn, chan)
+
+packed	char osfn[]		# directory file name
+int	chan			# channel assigned to file
+.fi
+.ih
+DESCRIPTION
+The named directory file is opened for sequential access in READ_ONLY mode.
+.ih
+RETURN VALUE
+ERR is returned in \fIchan\fR if the named file does not exist, is not a
+directory, or cannot be accessed.  A positive nonzero magic integer is
+returned if the operation is successful.
+.ih
+NOTES
+A directory file is opened at the kernel level with \fBzopdir\fR,
+is read with \fBzgfdir\fR, and is closed with \fBzcldir\fR.
+A directory file is viewed by the high level code as a simple list of
+OS filenames; a directory file is interfaced to FIO as a text file and
+successive filenames are read by the high level code with \fBgetline\fR.
+The text file driver for a directory file is machine independent and
+serves only as an interface between FIO and the three directory access
+primitives.
+.ih
+SEE ALSO
+zgfdir, zcldir
+.endhelp

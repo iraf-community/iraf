@@ -1,0 +1,8 @@
+table,s,a,"",,,"name of table to dump"
+cdfile,s,h,"STDOUT",,,"output file for column definitions"
+pfile,s,h,"STDOUT",,,"output file for header parameters"
+datafile,s,h,"STDOUT",,,"output file for table data"
+columns,s,h,"",,,"list of columns to be dumped"
+rows,s,h,"-",,,"range of rows to print"
+pwidth,i,h,-1,-1,,"output page width"
+mode,s,h,"al",,,

@@ -1,0 +1,123 @@
+# Make the file i/o (FIO) portion of the system library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+libsys.a:
+	access.x	mmap.inc <config.h> <ctype.h> <fio.com> <fio.h>\
+			<fset.h> <knet.h>
+	aread.x		<mach.h>
+	areadb.x	<config.h> <fio.com> <fio.h> <mach.h>
+	await.x		<config.h> <fio.com> <fio.h> <mach.h>
+	awaitb.x	<config.h> <fio.com> <fio.h> <mach.h>
+	awrite.x	<mach.h>
+	awriteb.x	<config.h> <fio.com> <fio.h> <mach.h>
+	close.x		<config.h> <fio.com> <fio.h>
+	delete.x	<config.h> <error.h> <fio.h> <knet.h>
+	deletefg.x	<error.h>
+	diropen.x	<config.h> <diropen.h> <error.h> <fio.h> <fset.h>\
+			<knet.h>
+	falloc.x	<config.h> <error.h> <fio.com> <fio.h> <knet.h> <mach.h>
+        fcache.x        <ctype.h> <diropen.h> <finfo.h> <fset.h> <mach.h>
+	fcanpb.x	<config.h> <fio.com> <fio.h>
+	fchdir.x	<knet.h>
+	fclobber.x	<config.h> <fio.com> <fio.h>
+	fcopy.x		<error.h> <fset.h>
+	fdebug.x	<config.h> <fio.com> <fio.h>
+	fdevbf.x	<config.h> <fio.com> <fio.h>
+	fdevblk.x	<fset.h>
+	fdevtx.x	<config.h> <fio.com> <fio.h>
+	fdirname.x	<ctype.h> <knet.h>
+	fexbuf.x	<config.h> <fio.com> <fio.h>
+	ffault.x	<config.h> <error.h> <fio.com> <fio.h>
+	ffilbf.x	<config.h> <fio.com> <fio.h>
+	ffilsz.x	<config.h> <fio.com> <fio.h> <mach.h>
+	fflsbf.x	<config.h> <fio.com> <fio.h>
+	fgdevpar.x	<config.h> <fio.com> <fio.h> <mach.h>
+	fgetfd.x	<fio.com> mmap.inc <config.h> <fio.com> <fio.h>
+	filbuf.x	<config.h> <fio.com> <fio.h>
+	filerr.x	
+	filopn.x	<config.h> <ctype.h> <error.h> <fio.com> <fio.h>\
+			<fset.h>
+	finfo.x		<config.h> <finfo.h> <fio.com> <fio.h> <knet.h>
+	finit.x		<config.h> <error.h> <fio.com> <fio.h> <knet.h>\
+			<ttset.h>
+	fioclean.x	<config.h> <error.h> <fio.com> <fio.h> <fset.h>
+	flsbuf.x	<config.h> <fio.com> <fio.h>
+	flush.x		<config.h> <fio.com> <fio.h>
+	fmapfn.x	<config.h> <fio.h>
+	fmkbfs.x	<config.h> <fio.com> <fio.h>
+	fmkcopy.x	<config.h> <error.h> <fio.com> <fio.h> <knet.h>
+	fmkdir.x	<knet.h>
+	fmkpbbuf.x	<config.h> <fio.com> <fio.h>
+	fnextn.x	
+	fnldir.x	
+	fnroot.x	
+	frmdir.x	<knet.h>
+	fntgfn.x	<chars.h> <ctype.h> <diropen.h> <pattern.h>
+	fnullfile.x	
+	fopnbf.x	
+	fopntx.x	
+	fowner.x	<finfo.h>
+	fpathname.x	<config.h> <fio.com> <fio.h> <knet.h>
+	fputtx.x	<config.h> <fio.com> <fio.h>
+	freadp.x	<fio.com> <config.h> <fio.h>
+	fredir.x	<config.h> <fio.com> <fio.h>
+	frename.x	<config.h> <error.h> <fio.com> <fio.h> <knet.h>
+	frmbfs.x	<config.h> <fio.com> <fio.h>
+	frtnfd.x	<config.h> <fio.com> <fio.h>
+	fseti.x		<config.h> <error.h> <fio.com> <fio.h> <fset.h>\
+			<mach.h>
+	fsfopen.x	<config.h> <fio.h>
+	fstati.x	<config.h> <fio.com> <fio.h> <fset.h> <mach.h>
+	fstatl.x	<config.h> <error.h> <fio.com> <fio.h> <fset.h>
+	fstats.x	<config.h> <fio.com> <fio.h> <fset.h>
+	fstdfile.x	
+	fstrfp.x	<config.h> <fio.com> <fio.h>
+	fsymlink.x	<knet.h>
+	fsvtfn.x	<error.h>
+	fswapfd.x	<config.h> <fio.com> <fio.h>
+	funlink.x	<knet.h>
+	futime.x	<config.h> <knet.h>
+	fwatio.x	<config.h> <fio.com> <fio.h>
+	fwritep.x	<fio.com> <config.h> <fio.h>
+	fwtacc.x	<config.h> <fio.com> <fio.h> <finfo.h>
+	getc.x		<config.h> <fio.com> <fio.h>
+	getchar.x	
+	getci.x		<config.h> <fio.com> <fio.h>
+	getline.x	<config.h> <fio.com> <fio.h>
+	getlline.x	
+	glongline.x	
+	isdir.x		<ctype.h> <finfo.h>
+	mktemp.x	
+	ndopen.x	<fset.h>
+	note.x		<config.h> <fio.com> <fio.h>
+	nowhite.x	<ctype.h>
+	nullfile.x	<config.h> <fio.h>
+	open.x		<knet.h>
+	osfnlock.x	<config.h> <ctype.h> <finfo.h> <knet.h>
+	poll.x 		<poll.h> <fio.h> <fset.h> <config.h> <syserr.h>
+	protect.x	<config.h> <fio.com> <fio.h> <knet.h> <protect.h>
+	putc.x		<config.h> <fio.com> <fio.h>
+	putcc.x		<ctype.h>
+	putci.x		<config.h> <fio.com> <fio.h>
+	putline.x	<config.h> <fio.com> <fio.h> <mach.h>
+	read.x		<config.h> <fio.com> <fio.h>
+	rename.x	<error.h> <fio.h>
+	reopen.x	<config.h> <fio.com> <fio.h>
+	seek.x		<config.h> <fio.com> <fio.h>
+	stropen.x	<config.h> <fio.com> <fio.h>
+	ungetc.x	<config.h> <fio.com> <fio.h>
+	ungetci.x	<config.h> <fio.com> <fio.h>
+	ungetline.x	<config.h> <fio.com> <fio.h>
+	unread.x	<config.h> <fio.com> <fio.h>
+	vfnmap.x	<config.h> <ctype.h> <error.h> <fio.h> <knet.h>\
+			<mach.h>
+	vfntrans.x	<chars.h> <config.h> <ctype.h> <fio.h> <knet.h>
+	write.x		<config.h> <fio.com> <fio.h>
+	xerputc.x	<config.h> <fio.com> <fio.h> <mach.h>
+	zfiott.x	zfiott.com <chars.h> <ctype.h> <fio.h> <knet.h>\
+			<ttset.h>
+	;

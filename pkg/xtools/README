@@ -1,0 +1,12 @@
+
+This directory contains miscellaneous tools written in the spp language.
+While not really system routines or mathematical library routines, these
+library routines are nonetheless sufficiently general purpose to justify
+making them publically available.  Reference library "libxtools.a" (-lxtools
+on the xc command line) to access these routines.
+
+IRAF Group members are encouraged to add to the tools.  To install a new
+tool: (1) copy the .x source into the directory or subdirectory, (2) Enter
+the name of each file followed by any dependency files into the mkpkg file,
+and (3) enter the UNIX command "mkpkg". This will compile the new modules and
+add them to the "libxtools.a" library.

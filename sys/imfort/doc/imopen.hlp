@@ -1,0 +1,35 @@
+.help imopen Sep86 imfort
+.ih
+NAME
+imopen -- open an existing image
+.ih
+SYNOPSIS
+.nf
+subroutine imopen (image, acmode, im, ier)
+
+character*(*)	image		#I host image to be opened
+integer		acmode		#I access mode
+integer		im		#O receives image descriptor
+integer		ier		#O status code
+.fi
+.ih
+DESCRIPTION
+The \fIimopen\fR procedure is used to open an existing image for either
+read only access (\fIacmode\fR=1) or read write access (\fIacmode\fR=3).
+The image name must be the host system filename of the image, although
+the extension may be omitted if desired.  If the image open is successful
+an image descriptor is returned in \fIim\fR.
+.ih
+RETURN VALUE
+A nonzero status code is returned if the image does not exist or cannot
+be opened with the indicated access mode.
+
+.nf
+IE_OPEN:	cannot open image
+IE_NOTIMH:	attempt to access a non-image file as an image
+IE_OPNPIX:	cannot open pixel file
+.fi
+.ih
+SEE ALSO
+imclos, imcrea, imopnc, imdele, imrnam
+.endhelp

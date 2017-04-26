@@ -1,0 +1,19 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ALTM -- Linearly map a vector into another vector of the same datatype.
+#	b[i] = (a[i] * k1) + k2
+
+procedure altm$t (a, b, npix, k1, k2)
+
+PIXEL	a[ARB], b[ARB]
+$if (datatype == ld)
+double	k1, k2
+$else
+real	k1, k2
+$endif
+int	npix, i
+
+begin
+	do i = 1, npix
+	    b[i] = (a[i] * k1) + k2
+end

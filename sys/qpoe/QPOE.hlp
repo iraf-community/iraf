@@ -1,0 +1,1201 @@
+.help QPOE Jun90 "Quick POE Design"
+.ce
+\fBQuick-POE (Position Ordered Event File) Interface Design\fR
+.ce
+Doug Tody
+.ce
+July, 1988
+
+.NH
+Introduction
+
+    The POE (Position Ordered Event file) facility is an interface and file
+structure used to store and access the event (photon) lists generated
+by event counting detectors.  Each event is described by a unique position,
+time, energy, and possibly other parameters (e.g., polarization, position in
+other coordinate systems, or instrument related parameters).  In the case of
+an imaging event counting detector, the "image" generated consists of this list
+of discrete events, rather than the regular matrix produced by a conventional
+sampling detector.  Both types of detectors are fundamental to astronomy.
+
+The POE interface is a stand alone interface built upon the standard VOS
+interfaces DFIO (in a future release), PLIO, SYMTAB, FIO, and other lower
+level interfaces.  The POE interface may be called directly by applications
+code to create and access POE datafiles, for event file specific processing.
+In addition, an IMIO image kernel is provided so that POE files may be
+accessed as (read only) images, allowing existing IRAF image tasks to be
+used to access POE files.  The main function of the POE image kernel is to
+filter and sample the event list in real time, returning a conventional
+sampled grid (image matrix) to the high level applications code.
+The parameters controlling the filtering and sampling operations may be
+specified by the user when the image (POE file) is accessed, making runtime
+filtering of events possible in connection with any general image processing
+task.
+
+.NH 2
+Important Concepts
+    
+    The primary object dealt with by this interface is the \fIevent file\fR,
+consisting of a free format \fIfile header\fR and the main \fIevent list\fR.
+The event list is a collection of \fIevent structures\fR, e.g., photons
+hitting an imaging detector during the period of observation recorded by the
+event file.  Each event is characterized by a standard set of attributes such
+as the position of the event in detector, sky, or other coordinates, the time
+at which the event was recorded, the energy of the event, and so on, plus
+optionally additional instrument dependent attributes (in general the event
+structure cannot be fixed, and the nomenclature may vary depending upon the
+science being performed).
+
+The events may appear in the event list in any order, but since most access
+to image data tends to be spatial in nature, access will be most efficient if
+the event list is position ordered.  This is the convention chosen by QPOE
+and hence the name \fIpoe\fRfile, or \fIp\fRosition \fIo\fRrdered \fIe\fRvent
+file.  An important alternative ordering is time ordering, which preserves
+the order in which the events were originally recorded, but which requires
+a complete scan of the event list to accumulate the events in a region of
+interest during analysis.  There are cases where time ordering might be
+preferable to position ordering, e.g., for time series analysis of a long
+observation.
+
+Of fundamental importance to the analysis of data from event counting
+detectors is the concept of \fIfiltering\fR.  It is in the nature of event
+counting detectors that they are often used to observe very faint objects
+for very long periods of integration.  The total amount of data (number of
+events) may be limited, so one wants to preserve all events, but since the
+quality of the data may vary both with time and with position, it is common
+to want to reject a portion of the data.  Conversely, the analysis being
+performed may require one to examine only a portion of the data, e.g., only
+events with a certain range of energies or arrival times, occurring within a
+given region of the image.  Often the analysis will be repeated many times
+wtih different filters.
+
+Hence, most analysis of event counting data typically involves both
+\fIrejection\fR and \fIregion of interest\fR filtering.  Rejection filtering
+depends mostly upon the data itself, hence the rejection filter for an image
+is a part of the image and should be in effect by default whenever the image
+is accessed, although we would like to physically record all data and be able
+to change the rejection filter either temporarily or indefinitely if desired.
+Region of interest filtering, on the other hand, depends upon the scientific
+analysis being performed rather than upon the data, hence is highly variable
+and should be controlled by the user, independently of the data.
+
+.NH 2
+Interface Requirements
+
+    Given the description of the problem to be solved presented in the previous
+section, we can make the following observations regarding the POE interface:
+.ls 4 o
+A flexible binary file header supporting both scalar and variable length vector
+fields is essential.  Examples of vector fields include the aspect and temporal
+records (actually arrays of records, or subtables), the processing history
+(probably stored as a single variable length text buffer), and the rejection
+and region of interest filters (PLIO external format byte sequences stored as
+opaque binary arrays).
+.le
+.ls o
+In the general case the details of the event structure depend upon the
+instrument for which data is being stored.  The minimum requirement is that
+the event structure consist of a set of standard fields (x, y, time, energy)
+followed by a variable length, instrument dependent area (hence the size of
+the event structure, while fixed for a given datafile, should be allowed to
+vary depending upon the data).  Ideally all fields should be named and
+accessible for filtering, the names chosen should be variables rather than
+constants, and the set of fields used to describe an event should be allowed
+to vary depending upon the data.
+.le
+.ls o
+Runtime access to the event list, including event-attribute and spatial
+filtering, should be as efficient as possible since this is likely to be
+by far the most time consuming part of the interface.  Header access
+efficiency is much less important and is not expected to be a problem.
+.le
+.ls o
+For most efficient access the event list should be stored sorted upon some
+primary key, with an index maintained by the interface for that key,
+and used for efficient retrieval.  The minimum requirement is that the primary
+or sort key be the Y coordinate (corresponding to image lines).  Ideally it
+should be possible for the sort key to be any field of the event structure,
+or any combination of fields (e.g., Y+X, or T).  Ideally the interface itself
+should be responsible for maintaining the event list in sort order; this is
+not a requirement since writing to event files is much less common than
+reading.  Ideally it should be possible for the event list to be unordered,
+and it should be possible to transparently access the event list regardless
+of the ordering.
+.le
+.ls o
+Rejection filtering is typically required by the data, yet we wish to retain
+all the data and be able to override or replace the default rejection mask.
+The rejection filter is logically associated with the data and should be
+stored with the data.  The minimum requirement is for the interface to be able
+to store all the data plus the rejection mask, and be able to return only
+the "good" data at runtime.  The interface is not required to perform rejection
+filtering at runtime, although it would be desirable to be able to do so if
+the efficiency penalty were not too great.  Alternatively, the event list
+could be prefiltered, and the "good" and "bad" events stored in different
+places in the datafile, requiring that the entire file be rebuilt to change
+the rejection filter.
+.le
+.ls o
+Region of interest filtering is a common operation for event data, and can be
+difficult to implement efficiently, hence should be supported directly by the
+interface.  At a minimum it should be possible to filter events by defining a
+range of acceptable or unacceptable values for each of some subset of the event
+attributes (e.g., energy or time).  Ideally it should also be possible to
+specify an arbitrarily long list of ranges of acceptable values.  Ideally
+spatial filtering should be supported as well; this is required for rejection
+filtering, but is at most a desirable option for spatial region of interest
+filtering (there is nothing about spatial filtering which is unique to event
+data, hence it might be more appropriate to implement it at a higher level,
+but on the other hand it might be more efficient to implement it at the event
+i/o level since the event list is position ordered and can be very large).
+.le
+.ls o
+It should be possible to specify the various filtering options both
+transparently to applications programs (via a symbolic expression passed
+into the interface by the user as part of the file specification),
+or procedurally, via \fIset\fR-parameter calls issued by the client program.
+.le
+
+The above issues need to be adequately addressed in order to have a useful
+interface.  In the longer term there are many other considerations, e.g.,
+it is also desirable for the data format to be machine independent, and the
+data format should be flexible, to accommodate the inevitable evolutionary
+revisions as well as to accommodate data from a variety of instruments or
+projects.  The event files can be very large, hence efficiency is a major
+consideration for event i/o and filtering.
+
+.NH 
+The QPOE Interface
+.NH 2
+Implementation Strategy
+
+    A two step operation is planned for implementing the POE interface within
+IRAF.  The first step is the so called quick-POE interface.  The objective of
+quick-POE is to provide the necessary functionality so that applications
+development can proceed immediately, without waiting for the general interface
+to be developed.  Once quick-POE is in place development of the fully general
+POE interface can proceed at a more leisurely pace consistent with the plan to
+provide most of the functionality of the generalized POE interface with other
+standard IRAF facilities currently under development, most notably the datafile
+i/o interface (DFIO), a general purpose binary file record manager to be used
+in the new images structures project and elsewhere in IRAF.
+
+The main facilities provided by POE are for access to general header fields,
+access to the variable length aspect and temporal records, event list i/o,
+and event filtering.  The POE header is a type of record, and the aspect and
+temporal "records" are arrays of records (tables), as is the event list itself.
+Any record access problem involving large records commonly involves the
+related problems of indexing and selection based on a user supplied predicate
+(boolean expression or filter in our case).
+
+In the general case, we would like the POE interface to be able to support
+data from a variety of detectors or instruments, not only those used in high
+energy astrophysics but those used in optical and radio observatories as well,
+hence the details of the data structures must be allowed to vary without
+affecting the interface itself.  Ideally the POE files should be maintained
+in a machine independent format, and the applications programs using POE
+should not be affected by changes to the data format, and indeed should be
+usable directly with any of several similar data formats, or with data formats
+that evolve over time.
+
+All these observations lead us to conclude that a general implementation of
+the POE interface has much in common with the general record access problem,
+hence the association of POE with DFIO.  Quick-POE will provide much the same
+functionality at the applications level but will be less general, i.e., the
+binary record structures as seen by applications will be mapped directly onto
+external storage (the main contribution of DFIO is data independence and
+flexibility).  This means that initially the applications will be tied to
+a specific format datafile, changes to applications structures will require
+reformatting the data, and the datafiles will probably be machine dependent.
+
+This approach would be unacceptable in the long run, as the need arises to
+support a variety of instruments, but is viable for initial applications
+development provided a DFIO based implementation eventually replaces the
+initial interface.  There should be little difference in terms of functionality
+and efficiency between QPOE and POE; in fact QPOE may have the edge over POE
+in terms of efficiency, since it will be less general.  It is likely that
+applications developed for QPOE will be usable with POE with few if any
+changes, e.g., by reimplementing QPOE as a layer on top of the more general
+POE interface.  The main motivation for implementing a DFIO based POE will be
+to provide increased data independence, a machine independent binary data
+format, and the ability to support a variety of instruments with a single
+interface.
+
+Although some throw away code will have to be written to implement the QPOE
+interface, most of the complexity of the interface lies in the event filtering
+code, which should be reusable in the final interface.  Low level, custom
+(non-DFIO) selection code is required for POE due to the unusual requirements
+for region and temporal filtering, and the potentially extremely high data
+volume (>10**6 event records).  This implies that DFIO itself will have to be
+a layered interface, supporting low level access to the packed data records
+for applications with unusual efficiency requirements (it will be).  Finally,
+it is already evident that the low level file manager required by QPOE has
+much in common with the access method code planned for DFIO, hence can serve
+as a prototype for the DFIO file manager.
+
+The remainder of this document will deal only with the details of the
+QPOE interface.  The DFIO interface has already been specified,
+including a sketch of a data definition for a POE file.  See \fIThe IRAF
+Datafile I/O Interface\fR, February 1988.  The region filtering
+code in POE will make use of the Pixel List I/O (PLIO) interface, described
+in \fIThe IRAF Pixel List Package\fR, February 1988.  The latter interface
+has already been implemented, as have all other interfaces (e.g., SYMTAB)
+required by QPOE.
+
+.NH 2
+Architecture
+
+    The architecture of IRAF as it pertains to the QPOE (and POE) interface
+is summarized in the figure below.
+
+.ks
+.nf
+        IMIO
+                IKI
+                        IK-POE
+                                POE
+                                        PLIO
+                                        [DFIO]
+                                        SYMTAB
+                                        FIO
+.fi
+.ke
+
+As indicated in the figure, QPOE depends most heavily on the VOS interfaces
+PLIO (pixel list i/o), used for spatial filtering, SYMTAB (the general symbol
+table package), used to manage the file header and aspect and temporal records,
+and FIO (file i/o), used to access the binary file in
+which the QPOE data is stored (low level, unbuffered asynchronous i/o is
+used by the QPOE file manager).  The QPOE interface is accessed both directly
+by applications code, and by the IMIO interface via an image kernel, shown
+as IK-POE in the figure.  IK-POE and QPOE comprise the code to be written to
+implement the QPOE interface.
+
+The QPOE interface consists of the POE file itself, a binary data structure
+[largely] private to the QPOE interface, and a set of procedures for creating,
+writing into, and reading from POE files.  The procedures fall into several
+categories, i.e.,
+.ls 4
+.ls o
+General QPOE file management procedures.  These include routines for creating,
+deleting, renaming, opening, and closing POE files, plus set/stat routines
+for setting and querying the file parameters and interface options.
+.le
+.ls o
+General header access procedures.  These include a conventional set of keyword
+driven typed scalar get/put routines, plus get/put routines for accessing
+variable length typed and opaque binary arrays (e.g., history records and the
+aspect and temporal records).
+.le
+.ls o
+Event i/o procedures.  These are routines for initially preparing and
+subsequently reading (sequentially with seek) the main event list, e.g.,
+the raw "get next photon" routine.
+.le
+.ls o
+The selection subpackage.  Included are routines for opening and incrementally
+compiling a user supplied selection predicate (filter) input as a formatted
+text string, and for testing individual event records to see whether they
+satisfy the given expression.
+.le
+.le
+
+All binary data structures other than simple scalar variables, e.g., the
+aspect and temporal records and the event structure, are described in QPOE
+by compile time bound SPP binary data structure definitions, provided in a
+standard interface include file (\fI<qpset.h>\fR) referenced by both QPOE and
+selected applications.  When the interface is layered upon DFIO these
+structures could continue to be used, since DFIO will have the ability to
+define runtime mappings of conventional application defined structures onto
+the physical data datafile (POE file) structures.
+
+.NH 2
+Interface Specification
+
+    The quick-POE interface (QPOE, package prefix `qp') is a set of procedures
+for accessing \fIpoefiles\fR, or position ordered event files.  Each poefile
+consists of a \fBheader\fR of arbitrary size and content containing zero or
+more named scalar or variable length (opaque, typeless) fields, plus an
+\fBevent list\fR consisting of zero or more event structures.
+The event structure is fixed at compile time via a conventional SPP structure
+declaration in the include file \fB<qpset.h>\fR.
+
+.NH 3
+Interface Procedures
+
+    The QPOE procedures fall into three main categories, the primary user
+interface procedures (general datafile management, header access, and filtered
+event i/o), the low level or raw event i/o procedures, and the low level
+selection expression compile and evaluate procedures.
+
+.NH 4
+Header Access Procedures
+
+    The routines described in this section are used to create, open, or
+otherwise manipulate poefiles, to define new header parameters or query the
+existing parameter set, and to read and write the values of both scalar and
+vector parameters of various standard and poefile-specific datatypes.
+These operators are summarized in the figure below.
+
+The function of most of these procedures should be obvious.
+The \fIqp_access\fR, \fIqp_delete\fR, \fIqp_rename\fR, and \fIqp_copy\fR
+operators perform the implied operation on the named poefile.
+The poefile may be rebuilt with \fIqp_rebuild\fR, recovering any unused
+space and rendering storage for the internal data structures (logically)
+contiguous in the process (a rebuild is just a copy/rename/delete).
+
+The \fIqp_open\fR procedure must be called to open or create a poefile,
+before it can be accessed.  The NEW_FILE and NEW_COPY modes are supported
+for creating new files.  If NEW_COPY mode is specified, a reference file
+may be specified (via the descriptor \fIo_qp\fR) from which the new file
+is to inherit the header but no data (no event list).
+The \fIqp_seti\fR and \fIqp_stati\fR procedures are used to set and stat
+any parameters affecting QPOE i/o, and \fIqp_sync\fR updates an opened
+poefile on disk.
+
+The \fIqp_get\fR and \fIqp_put\fR scalar functions behave as for the other
+VOS interfaces, e.g., they will abort if the named parameter does not exist,
+or if the implied datatype conversion is illegal.  The \fIqp_add\fR 
+procedures are equivalent to the \fIqp_put\fR procedures except that they
+will create the named parameter if it does not already exist (see also
+\fIqp_addf\fR, discussed below).
+
+.nf
+         yes|no = qp_access (poefile, mode)
+                    qp_copy (poefile, newfile)
+                  qp_rename (poefile, newfile)
+                 qp_rebuild (poefile)
+                  qp_delete (poefile)
+
+               qp = qp_open (poefile, mode, o_qp)
+                    qp_seti (qp, param, ival)
+            ival = qp_stati (qp, param)
+                    qp_sync (qp)
+                   qp_close (qp)
+           
+     val = qp_get[bcsilrdx] (qp, param)
+                    qp_gstr (qp, param, outstr, maxch)
+           qp_put[bcsilrdx] (qp, param, val)
+                    qp_pstr (qp, param, strval)
+           qp_add[bcsilrdx] (qp, param, defval, comment)
+                    qp_astr (qp, param, strval, comment)
+
+              fd = qp_popen (qp, param, mode, type)
+            nelem = qp_read (qp, param, buf, nelem, first, dtype)
+                   qp_write (qp, param, buf, nelem, first, dtype)
+
+        yes|no = qp_accessf (qp, param)
+                 qp_deletef (qp, param)
+                 qp_renamef (qp, param, newname)
+                    qp_addf (qp, param, dtype, maxelem, comment, flags)
+	  nelem = qp_queryf (qp, param, dtype, maxelem, comment, flags)
+
+         list = qp_ofnl[su] (qp, template)
+          nch|EOF = qp_gnfn (list, outstr, maxch)
+                    qp_cfnl (list)
+.fi
+
+Array valued parameters may be randomly read with \fIqp_read\fR and
+written with \fIqp_write\fR; arrays may be any length, and will be
+automatically extended in a write.  The only way to shorten an array
+parameter is to copy it and delete the old parameter.  The typed read and
+write functions allow automatic type conversions, and external storage of
+the data in a machine independent form (should the interface choose to do so).
+In addition to the standard SPP types, QPOE supports the special types
+TY_EVENT, TY_ASPECT, and TY_TEMPORAL.  Finally, the type TY_OPAQUE denotes
+an array of element size SZ_CHAR, which will be copied to and from external
+storage without the data being modified in any way (note that opaque data
+is machine independent only if the application encodes it that way).
+
+Alternatively, an array valued parameter may be opened as a random access
+\fIfile\fR with \fIqp_popen\fR, and then read or written with conventional
+FIO calls.  The value of the \fItype\fR parameter must be TEXT_FILE or
+BINARY_FILE, as for a conventional file.  If the type is TEXT_FILE then
+only text data may be stored in the file, and text data will be byte packed
+on disk.  The BINARY_FILE type is equivalent to the QPOE type TY_OPAQUE.
+File i/o to a QPOE parameter is equivalent to file i/o to a conventional
+binary file in terms of both efficiency and semantics, i.e., the data is not
+modified in any way, and the "files" may be any size (the main semantic
+difference is that deleting the parameter does not immediately free the space).
+A parameter opened as a file with \fIqp_popen\fR is closed with the FIO
+\fIclose\fR routine.
+
+Although new parameters may be defined when first written to by calling one of
+the typed \fIqp_add\fR functions, the most general procedure for adding new
+parameters is \fIqp_addf\fR, which allows the datatype and vector length of
+the parameter to be explicitly specified, along with a comment describing the
+new parameter.  The procedure \fIqp_accessf\fR tests if the named parameter
+exists, and \fIqp_deletef\fR and \fIqp_renamef\fR make it possible to delete
+and rename parameters, e.g., for implementing array copy procedures.
+The \fIqp_queryf\fR procedure returns the datatype, allocated vector length,
+current vector length, and comment field of the named parameter.
+
+The field name list procedures (\fIqp_ofnl[su]\fR etc.) are used to obtain
+the names of all header parameters matching the given template; a null or "*"
+template returns the names of all header parameters.  This is the only way by
+which an application without apriori knowledge of the field names can determine
+what is in the header, e.g., to list or copy the header.
+
+.NH 4
+Filtered Event I/O Procedures
+
+    The \fBevent i/o\fR subpacke provides sequential i/o facilities for the
+main event list of the poefile.  These procedures, known as the QPIO (QPOE
+event i/o) package, provide read or write (append) access to the event list,
+optionally filtered when reading to select events spatially or by event
+attribute.
+
+Under QPOE, an event list is stored as a variable length array (i.e., as a
+named header parameter) of type \fIevent\fR.  The QPIO package takes this
+basic object and adds additional structure for more efficient i/o, e.g., events
+are blocked into large, fixed size \fIbuckets\fR of N events, the first two
+events of each bucket containing the minimum and maximum event values for that
+bucket.  If the event list is sorted an \fIindex\fR may be maintained for the
+list; this index, plus the min/max event values maintained for a bucket, are
+used to optimize basic event i/o and filtering.  During event i/o the raw
+event list may be filtered spatially or by event attribute.  All this is
+transparent to the application, which merely opens the event list parameter
+and begins reading (or writing) blocks of events.
+
+Before i/o can take place the named event list parameter is opened with
+\fIqpio_open\fR.  The selection filter to be used by QPIO may be specified
+via a selection expression passed in by the user at poefile open time (as
+part of the poefile name), at QPIO open time (as part of the parameter name),
+or in subsequent calls to \fIqp_addfilter\fR (each call incrementally modifies
+the current filter) or to \fIqp_setfilter\fR (each call replaces the affected
+portion of the current filter).  A region mask may also be specified with
+\fIqp_setmask\fR; if no mask is specified, the default rejection mask is used
+(or more precisely, its inverse).
+
+.nf
+           qpio = qpio_open (qp, param, mode)
+               qpio_mkindex (qpio, key, nelem)
+              qpio_setrange (qpio, vs, ve, ndim)
+       qpio_[add|set]filter (qpio, selexpr)
+    nchars = qpio_getfilter (qpio, outstr, maxch)
+               qpio_setmask (qpio, pl)
+          pl = qpio_getmask (qpio)
+   nev|EOF = qpio_getevents (qpio, ev, maskval, maxevents)
+             qpio_putevents (qpio, ev, nevents)
+               qpio_readpix (qpio, obuf, vs, ve, dxim, xblock, yblock)
+                 qpio_close (qpio)
+.fi
+
+Events are read sequentially with \fIqp_getevents\fR, which fills in the
+pointer array \fIev[maxevents]\fR with one or more pointers to event structs,
+returning the number of events read as the function value, or EOF when the
+event list is exhausted.  Events are returned in the order in which they are
+stored in the main event list.  If a region mask is used for spatial
+filtering, the mask value associated with the output events is returned in 
+\fImaskval\fR.  Filtering and subranges are supported only for reading;
+\fIqp_putevents\fR may only be used to append to the output poefile.
+At present, poefiles are not randomly updatable, as this would require
+runtime editing of the compressed event lists and it is not clear how useful
+such a feature would be.
+
+If less then the entire image is to be accessed then \fIqp_setrange\fR
+may be called to specify the region of the poe image from which events are
+to be read (the vector coordinates \fIvs\fR and \fIve\fR are specified
+relative to the predefined primary event coordinate system, i.e., the PO
+coordinates).  Repeated calls to \fIqp_setrange\fR may be made to access
+multiple regions of the image, or to rewind the i/o pointer for a region.
+
+An alternative to event i/o is provided by \fIqp_readpix\fR, which samples
+the event list using the current filters and blocking factor,
+generating \fInpix\fR pixels beginning with the pixel at the image coordinates
+specified by the vector \fIv\fR.  This is the routine used by the POE IMIO
+image kernel to read from a poefile.  Only integer pixels are supported.
+On output, each pixel value is a count of the number of filtered events
+mapping into that pixel.  A region mask may be used to filter the event list,
+but the ability to discriminate between different regions by the mask value
+is lost.
+
+A poefile may contain any number of event list parameters, although most
+files are expected to store only the main event list.
+As an alternative to QPIO, event-array parameters may be accessed directly
+via the normal header access parameters, e.g., \fIqp_read\fR, but i/o may be
+somewhat less efficient (due to the copyout), the bucket structure will be
+visible, and no filtering is possible.  In short, the raw event list will
+be accessed as an array, returning the min/max events in each bucket along
+with the data events.
+
+In the current implementation, the event structure is a fixed, predefined
+binary structure, and all event i/o is expressed in terms of pointers to event
+structures.  The event structure is defined in the include file
+\fB<qpset.h>\fR, discussed in the appendix.
+
+.NH 4
+Selection Subsystem Procedures
+
+    The \fBselection subsystem\fR is a facility used to perform runtime
+filtering of the event list, returning to the calling program only those
+events satisfying some user defined selection criteria.  The selection
+subsystem is driven by a selection expression provided by the user as a
+formatted string, normally at image (poefile) open time.  The selection
+expression syntax itself is independent of the procedural interface and is
+described separately in section 2.3.2.  The selection procedures are
+summarized in the figure below.
+
+.nf
+	     ex = qpex_open (qp, expr)
+    ok|err = qpex_modfilter (ex, exprlist)
+    nchars = qpex_getfilter (ex, outstr, maxch)
+	nev = qpex_evaluate (ex, i_ev, o_ev, nev)
+		 qpex_close (ex)
+.fi
+
+A selection expression, input as the string \fIexpr\fR, is compiled with
+\fIqpex_open\fR, which returns a pointer to the runtime descriptor (filter)
+for the given compiled selection expression.  If \fIexpr\fR is the null
+string the filter returned will pass all events.
+
+An active filter may be modified with \fIqpex_modfilter\fR, which combines
+the expression \fIexpr\fR into the current filter, allowing complex
+filters to be built up in several calls, or allowing an application to modify
+a base filter without knowledge of the base filter.  The expression consists
+of a list of comma delimited "attribute = exprlist" terms.  If the assignment
+is specified as "=" the term for the given attribute is replaced; if the
+assignment is "+=" the term for the given attribute is further qualified.
+A text representation for the current filter may be obtained at any time with
+\fIqpex_getfilter\fR.  The boolean function \fIqpex_evaluate\fR is called to
+test whether a specific event meets the selection criteria, i.e., to test
+whether or not \fIexpr\fR is true for the given event.
+
+Selection is normally performed transparently to the application by the QPIO
+interface, which calls the routines described in this section to create and
+apply event-attribute filters.
+
+.NH 3
+Spatial and Event Attribute Filtering
+.NH 4
+Selection Syntax
+
+    Selection expressions are used to construct \fIfilters\fR to specify the
+rejection mask and region of interest filters before reading the event list
+via QPIO.  Due to the complexity of event attribute selection, selection
+predicates are specified syntactically, i.e., as an expression input as a
+text string.  These filters may be input by the user as part of the image
+or poefile specification (object name), transparently to applications code,
+or they may be constructed by the application via calls to the QPIO or
+selection routines.  Complex or frequently referenced filters may be stored
+in text files and referenced by filename if desired.  It does not matter
+whether a filter is input all at once, or compiled incrementally.
+
+An event attribute filter consists of a set of filters for each event
+attribute.  By default, i.e., if no filter is specified, all attribute values
+are passed.  If a filter is specified for an attribute, the filter specifies
+either a bitwise mask value, or a list of acceptable values or ranges of values
+for the attribute.  An event is passed if and only if all event attribute
+filters pass the event.  If a list of acceptable values are specified, the
+list may be any length, with little impact on filtering efficiency.
+
+The basic event attribute filter syntax consists of a list of attribute
+filters, e.g.:
+
+        attribute = values [, attribute = values ...]
+
+where \fIattribute\fR is the attribute name, e.g., a position attribute,
+time, energy, and so on, and \fIvalues\fR is a mask or list of values.
+Mask values are integers prefixed by `%', e.g.,
+
+        attribute = %1003B
+
+Note that the mask may be specified in decimal (the default), octal (`b' or
+`B' suffix), or hex (`x' or `X' suffix), in accord with the usual IRAF
+conventions.  The meta-characters used in selection expressions have been
+selected to avoid or at least minimize the need to quote such expressions
+in CL commands.
+
+A specific value or list of values may be specified as a
+simple integer constant, or comma delimited list of constants, e.g.:
+
+.nf
+        attribute = 3
+or
+        attribute = 3, 5, 20X
+.fi
+
+Ranges are specified using the `:' notation, e.g.,
+
+        attribute = 3, 5, 8:11
+
+A `!' may be prepended to indicate the opposite, i.e., "everything but":
+
+.nf
+        attribute = !%14B
+or
+        attribute = 3, !1:10
+.fi
+
+Open ended ranges may be used to indicate that the range includes all values
+less than or equal to or greater than or equal to the given value, e.g.,
+
+        attribute = :100
+
+denotes all values less than or equal to 100.
+
+File inclusion or \fImacro expansion\fR is denoted by a C-like function call
+notation, e.g.,
+
+.nf
+        macro()
+or
+        macro(a,b)
+.fi
+
+Any arguments are expanded via string substitution when the text of the macro
+or include file is expanded.  Include files should have the extension ".qpm".
+Macros are permitted only if the variable \fBqpinit\fR is defined in the user's
+environment, the string value consisting if the filename of the user's QPOE
+macro file.  In a reference to a macro \fImacro\fR, QPOE will look first in
+the macro definitions file pointed to by \fIqpinit\fR for the named macro,
+then it will look for the file "\fImacro\fR.qpm" in the current directory.
+
+Parenthesis are optional and may be included to, for example, make attribute
+value lists more easily identifiable.  If a line ends in a comma or backslash
+continuation is assumed; blank lines and comment lines are ignored.
+The syntax for attributes with floating point values is identical to that
+for integers except that mask values are not allowed.
+
+.NH 4
+Region Specification
+
+    QPOE does not itself contain any syntax-level support for specifying
+region masks, e.g., via a list of include and exclude circles and other
+shapes.  The reason for this is that it is too difficult to come up with
+a sufficiently general scheme at the level of an interface like QPOE;
+there are too many ways to specify regions, hence in general such region
+specification must be done at the applications level.  QPOE does however
+include very general and efficient support for region analysis provided the
+region mask is input already encoded into a PLIO binary mask.  Since PLIO
+includes high level primitives for defining masks in terms of include and
+exclude circles, boxes, lines, polygons, etc., it is easy to extend QPOE at
+the applications level to include support for a region specification language
+tailored to the specific application.
+
+While QPOE cannot itself process a user defined region description to create
+new region masks, it is possible to \fIselect\fR from any number of region
+masks if these are prepared in advance using other systems facilities or
+applications programs.  PLIO region masks may be stored in the QPOE header
+as named parameters of type opaque binary array, or they may be stored in
+external binary files.  The region mask to be used may be specified by
+including an assignment of the form
+
+        mask=[\fIparam\fR|\fIfile\fR.pl]
+
+in the selection expression.  Unless otherwise specified, this region mask 
+will be combined with the default rejection mask for the poefile (the final
+mask will be the region mask \fIand\fR-ed with the \fInot\fR of the rejection
+mask).
+
+.NH 4
+Predefined Selection Keywords
+
+    While the syntax of a selection expression is an inherent part of the
+QPOE interface, the names of the event attributes used in selection
+expressions are logically part of the event structure, and ideally should
+be stored with the data and used by the interface only to determine the
+attribute datatypes and offsets into the event structure when the selection
+expression is compiled at runtime.  We should not really be documenting the
+specifics of the POE external data structures here, but in QPOE these data
+structures are wired into the interface, so it is appropriate to do so.
+
+The following \fIstandard event attributes\fR are defined.  Minimum match
+abbreviations are of course permitted.  The keyword \fIpi\fR is an acceptable
+alias for \fIenergy\fR (\fIpi\fR and \fIpha\fR are examples of discipline
+dependent terminology which should be associated with the data and not the
+interface).
+
+.nf
+        X               short           range in X (PO coords)
+        Y               short           range in Y (PO coords)
+        TIME            real            time event was recorded
+        ENERGY,PI       int             energy of event
+        PHA             int             pulse height
+.fi
+
+The event attributes may also be referred to using the generic notation
+[\fIsir\fR]\fIN\fR, which refers to each attribute by its datatype and
+struct offset (byte units, zero indexed) rather than by name.  For example,
+if the event attributes shown above are assumed to be shown in the order
+in which the fields are stored in the event struct, the \fItime\fR field
+could also be referred to as \fIR4\fR, and \fIpha\fR as \fII10\fR.  This
+crude but effective technique may be used to reference any private
+(nonstandard) fields of the event struct in selection expressions.
+
+The following additional, non-event keywords are defined:
+
+.nf
+        BLOCK           int             \fIqp_readpix\fR blocking factor
+        MASK            string          region mask to be used
+        FILTER          string          region filter to be used
+        REJMASK         string          rejection mask to be used
+        REJFILTER       string          rejection filter to be used
+.fi
+
+The default values for these parameters are taken from datafile header
+parameters of the same name, if such are found.  Masks are specified either
+by the name of a header parameter of type opaque binary array (containing
+an encoded PLIO mask), or by the name of a PLIO mask file, extension ".pl".
+Named filters are specified by the name of a header parameter of type char
+array, or by the name of a text file (extension ".qpf"), where in either
+case the named object contains the selection expression text.
+
+.NH 3
+Interface Set/Stat Parameters
+
+    The internal parameters for the QPOE interface, and all user accessible
+data structures, e.g., the event and other structures, are defined in the
+global system include file \fB<qpset.h>\fR.  This file should be referred to
+for up to date documentation on these definitions and structures; the
+discussion which follows may not be kept up to date.
+
+The following interface parameters may be accessed via the \fIqp_seti\fR and
+\fIqp_stati\fR procedures:
+
+.nf
+        QP_XRESOLUTION          resolution of an event x-coordinate
+        QP_YRESOLUTION          resolution of an event y-coordinate
+        QP_LENEVENT             length of an event structure
+        QP_LENINDEX             resolution of the event list index
+        QP_BUCKETSIZE           event list bucket size, nevents
+        QP_PAGESIZE             datafile page size, bytes
+        QP_CACHESIZE            number of buffers in data buffer cache
+        QP_MAXFILES             max lfiles in datafile (fixed)
+        QP_NFILES               query number of lfiles in datafile
+        QP_NPAGES               query number of pages in datafile
+        QP_FREEPAGES            query number of free pages in datafile
+.fi
+
+The parameters shown above may be set only at datafile creation time.
+The X and Y resolution parameters define the range of event x,y coordinates.
+The resolution of the event list index is set by QP_LENINDEX, and may be less
+than the full resolution of the event pixel Y-coordinate.
+The remaining parameters control how storage is physically allocated in the
+datafile and in any event lists.
+
+.NH 2
+Detailed Design
+.NH 3
+Event Attribute Filtering
+
+    The point of event-attribute filtering is to test an event to see if it
+satisfies a user defined event selection expression.  A selection expression
+may be decomposed into a list of simple, independent expressions for the
+individual event attributes; the event satisfies the full expression only
+if the value of each event attribute satisfies the associated attribute
+expression.  Currently, attribute expressions are limited to bitmasks, lists
+of acceptable values, or lists of ranges (inclusive) of acceptable values.
+
+        attr1=expr, attr2=expr, ...
+
+The highly constrained nature of event-attribute expressions makes expression
+evaluation straightforward and fast.  Expression evaluation is implemented
+by logically negating each attribute expression and testing each in turn;
+expression evaluation ends either when an attribute test fails, in which case
+the event is rejected, or when the end of the attribute expression list is
+reached, in which case the event is passed.
+
+The obvious way to implement such an expression evaluator is with a simple
+interpreter.  The expression is parsed and compiled to produce a simple
+interpreter program, using the instructions shown in the figure below.
+
+.ks
+.nf
+        \fIinstruction     arguments\fR
+
+        MSK[sir]        offset  maskval         bitwise mask test
+        EQL[sir]        offset  value           equality test
+        LEQ[sir]        offset  value           less than or equal
+        GEQ[sir]        offset  value           greater than or equal
+        RNG[sir]        offset  lowval highval  range test (inclusive)
+        LUT[sir]        offset  lut             lookup table
+        NOT                                     invert test
+        RET                                     return, pass event
+.fi
+.ke
+
+An interpreter program consists of a series of these instructions.  The
+\fIoffset\fR argument gives the offset of the event attribute (field) to
+be tested; the datatype of this field must match that of the instruction
+and of the data argument or arguments, if any.  Only event attributes for
+which restricted values were specified are tested, hence the cost of the
+evaluator depends only upon the complexity of the expression to be evaluated.
+An interpreter of this type can be coded very efficiently as a switch-case
+statement (jump table) within an optimized DO-loop.
+
+Simple attribute value tests are most efficiently coded as several \fIMSK\fR,
+\fIEQL\fR, etc., instructions.  The only case of any complexity is where the
+attribute has a long list of acceptable values or ranges of values.  This is
+most efficiently coded using a lookup table, using the \fILUT\fR instruction
+shown in the figure.  A lookup table test may be preceded by a range test to
+limit the size of the lookup table required.  For an integer or short integer
+attribute, the lookup table will be a \fIboolean\fR table containing one entry
+for each possible value of the attribute in the range spanned by the table.
+
+Use of a lookup table for floating point attributes is more difficult since
+an enormous lookup table might be required to preserve the resolution of
+the floating point numbers used to define ranges.  The solution is to employ
+an \fIinteger\fR (rather than boolean) lookup table of \fIreduced resolution\fR.
+The floating point value of the attribute to be tested is mapped into a bin of
+the lookup table.  The integer value of the table entry has one of the
+following values:
+
+.ks
+.nf
+        0               Reject all FP numbers mapping to this bin.
+        1               Accept all FP numbers mapping to this bin.
+
+        N               Some of the FP numbers mapping to this bin are
+                        legal, and some are not.  The value N is the
+                        address of a segment of interpreter code to be
+                        executed to test a FP value mapped to this bin.
+.fi
+.ke
+
+The performance of this algorithm for floating point table lookup depends
+upon the frequency with which 0 or 1 is encountered as the table value during
+lookup; if 0 or 1 is encountered most of the time, then a floating point LUT
+test is comparable in expense to an integer LUT test.  But since we already
+have to map a floating point number into an integer space of reduced
+resolution, we can easily vary the resolution of the lookup table,
+increasing the resolution of the table until the desired level of efficiency
+is reached (the interpreter execution time for case N is pretty fast in any
+case, so this is not critical).
+
+In summary, the expense of event-attribute filtering is directly proportional
+to the number of attribute tests to be performed.  An arbitrary number of
+values or ranges of values may be specified for an attribute with little if
+any affect on performance, even for floating point attributes (e.g., for
+time-tagged quality filtering).
+
+.NH 3
+Region Filtering
+
+    Region filtering is implemented in QPOE by the PLIO interface, which is
+documented elsewhere.  PLIO permits regions of arbitrary complexity to be
+described and used for event filtering, with little overhead beyond that
+already present for i/o on a large event list with no region filtering.
+This assumes only that the event list is position ordered, and that the
+region mask is specified in the PO (position ordered) coordinate system.
+This makes it possible for QPIO to use the mask to reduce the number of
+events to be examined; event attribute filtering is performed only on those
+events read through the region mask (this is similar to masked image i/o,
+i.e., the MIO package).
+
+If the event structure supports multiple coordinate systems and the region
+mask refers to a non-PO coordinate system, then the only approach is to first
+perform event-attribute filtering on the non-positional event attributes,
+then for each event passing the event-attribute filter, fetch the mask value
+corresponding to the x,y coordinates of the event.  This is still an efficient
+technique since only mask pixel lookup is required (no complicated region
+list traversal is involved), but it will be significantly less efficient than
+PO region filtering since we cannot take advantage of position ordering to
+reduce the number of events to be examined, and the overhead of accessing
+the region mask will be greater.
+
+.NH 3
+Datafile Layout and Access
+.NH 4
+File Structure
+
+    The QPOE file structure is private to the QPOE interface and is discussed
+here only for the purpose of detailing (and documenting) the design of the
+interface.  The QPOE file is a random access, dynamically extendable, binary
+file.  Under QPOE these files will be partially, but not completely, machine
+independent, hence file sharing by machines of different architectures will
+not be provided initially.  This will be rectified when management of the
+datafile is later turned over to DFIO.
+
+To provide a reasonable degree of flexibility, QPOE contains many
+variable length data structures, e.g., there may be any number of header
+parameters, including array valued parameters of arbitrary size.  New header
+parameters may be added at any time, and new data may be appended to array
+parameters at any time.  This flexibility places certain demands upon the
+low level file manager used to maintain these data structures in the datafile.
+
+All access to the physical datafile is via a low level binary
+\fIfile manager\fR.  The purpose of the file manager is to implement a
+restricted implementation of the binary file abstraction upon a single host
+level binary file.  This provides the "lightweight" binary file mechanism we
+need for QPOE.  Since the file manager is a low level facility, it is
+implemented using only the low level asynchronous i/o facilities provided
+by FIO to read and write file pages, once the file has been opened.
+
+The file manager provides routines for creating new datafiles, and for
+creating, deleting, etc., \fIlightweight files\fR (lfiles) within a datafile.
+Storage for lfiles is allocated in units of datafile \fIpages\fR.  For each
+data page in the datafile there is an entry in the datafile \fIpage table\fR.
+The page table itself is stored as an lfile (\fIlfile zero\fR) in the data
+pages.  Files at the file manager level are known only by their file number;
+association of these file numbers with file names is left up to the higher
+level code, and in the case of QPOE is done with the symbol table (which is
+also stored as an lfile).
+
+.ks
+.nf
+         +-----------------+
+           datafile header              fixed size
+         +-----------------+
+              file table                fixed size
+         +-----------------+
+                  |
+              data pages                data and page table pages
+                  |                        (arbitrarily large)
+                  v
+.fi
+.ke
+
+The page table is a vector mapping datafile pages by file offset onto lfile
+file numbers; the value of each page table entry is the file number of the
+lfile to which the page is assigned.  When the file manager opens an lfile
+it scans the page table, extracting the page numbers of the pages assigned
+to the lfile, to form a vector mapping lfile page offsets directly onto
+datafile page offsets.  New pages are always allocated at the end of the
+datafile, and new lfiles are always allocated at the end of the file table,
+hence lfile deletion will leave "holes" (unused storage) in both the datafile
+pages and file table.  A \fIrebuild\fR operation is required to reclaim the
+space occupied by these holes.  Deleted files are recoverable by merely
+revalidating their file table entries.
+
+Every variable size object managed by QPOE is stored in the datafile as a
+distinct lfile.  Since storage for lfiles is allocated in units of file pages,
+the minimum amount of storage used by a variable length object is 0 or 1 page.
+Examples of variable size objects are the SYMTAB symbol table
+used to describe the contents of the datafile header (and any other symbols
+used by QPOE), the static data storage area (used to store the values of
+scalar and static array valued header parameters), and individual variable
+length arrays.  Note that each variable length array is stored in the datafile
+as a separate lfile; if the maximum size of an array is less then the page
+size, it will be more efficient to store it as a static array.
+
+The most important example of a variable length array is the main event list
+of the poefile.  To improve i/o efficiency and speed selection, the event
+structs stored in an event list are grouped together into \fIbuckets\fR,
+as discussed earlier in section 2.3.1.2.  Each bucket will always occupy an
+integral number of file pages.  Storage for buckets is allocated contiguously
+in the datafile, and buckets are always read and written to disk in a single
+i/o transfer.
+
+The most important physical datafile parameters are hence the page size and
+the bucket size.  A larger page size can improve i/o efficiency and reduce the
+size of the page table, but can lead to significant wasted space if there are
+many variable length arrays.  Since the i/o system will move entire large
+blocks of pages to and from disk whenever possible, use of a small page is
+normally preferred.  A large bucket size improves i/o efficiency for event
+lists, but if the bucket size is too large then bucket searching takes longer,
+and selection efficiency may decrease.
+
+.NH 4
+File Manager
+
+    The function of the file manager is to map a set of lfiles onto a single
+random access host binary file.  The file manager must keep track of the size
+and type of each file, and whether or not it has been deleted.
+In addition, the file manager must maintain a page table for the entire
+datafile, noting the lfile to which each page is assigned.  While an lfile
+is open the file manager must maintain the page vector for that lfile so that
+lfile offsets may be mapped directly onto datafile offsets.
+
+The number of lfiles is fixed at datafile creation time, and lfiles are
+referred to by file number.  File number zero is the datafile page table;
+the first user lfile is number one.  A datafile with a max file count of one
+would actually contain two lfiles, counting the page table.
+
+The file manager interface is summarized in the figure below.  A new datafile
+may be created or an existing datafile opened with \fIfm_open\fR.
+If a new datafile is being created the page size and max file count may be
+changed from their default values with calls to \fIfm_seti\fR, and the values
+of these and other parameters may be queried at any time with \fIfm_stati\fR.  
+An opened datafile may be copied with \fIfm_copyo\fR, omitting deleted lfiles
+and rendering file segments contiguous.  The page size and max file count
+may be changed in a copy operation if desired.
+
+The \fIfm_access\fR, \fIfm_rename\fR, and \fIfm_delete\fR routines perform
+the indicated operation upon the named datafile.  The \fIfm_rebuild\fR
+routine rebuilds a datafile, discarding deleted structures and coalescing
+storage for objects.  This routine, as well as \fIfm_copy\fR, are built upon
+on the lower level routine \fIfm_copyo\fR,  which does the real work, and
+which allows the structural attributes of the new datafile to be specified
+in \fIfm_seti\fR cals.
+
+All i/o to lfiles is via the six routines beginning with \fIfm_lfopen\fR in
+the figure below.  These routines constitute a FIO binary file driver for
+lfiles, and may be called directly, or passed to the FIO routine \fIfopnbf\fR
+to open an lfile as a binary file (\fIfm_lfname\fR should be called first
+to construct a pseudo-filename for the lfile so that \fIfm_lfopen\fR can
+reconstruct the file manager descriptor, lfile number, and lfile type).
+Note that the lfile driver routines are unbuffered and (potentially)
+asynchronous, and that i/o must be in units of datafile pages.
+(See the buffer cache routines described in the next section for a higher
+level facility for i/o to lfiles).
+
+.nf
+        yes|no = fm_access (datafile, mode)
+                  fm_rename (datafile, newname)
+                    fm_copy (datafile, newname)
+                  fm_delete (datafile)
+                 fm_rebuild (datafile)
+
+               fm = fm_open (datafile, mode)
+                    fm_seti (fm, param, ival)
+            ival = fm_stati (fm, param)
+		   fm_debug (fm, out, what)
+                   fm_copyo (fm, fm_to)
+                    fm_sync (fm)
+                   fm_close (fm)
+
+       lfile = fm_nextlfile (fm)
+                  fm_lfname (fm, lfile, type, lfname, maxch)
+
+                  fm_lfopen (lfname, mode, lf)
+                 fm_lfstati (lf, param, ival)
+                 fm_lfaread (lf, buf, nbytes, offset, status)
+                fm_lfawrite (lf, buf, nbytes, offset, status)
+                 fm_lfawait (lf, status)
+                 fm_lfclose (lf, status)
+
+                  fm_lfstat (fm, lfile, statbuf)
+                fm_lfdelete (fm, lfile)
+              fm_lfundelete (fm, lfile)
+.fi
+
+In a sense, all lfiles exist as zero length files when the datafile is
+created, since the lfile descriptors are preallocated and the files are
+known only by number.  Lfiles become interesting when they are opened as
+files with \fIfm_lfopen\fR, and data is written into the file.  An lfile
+may be deleted with \fIfm_lfstat\fR.  All this does is set the delete bit
+in the lfile descriptor, hence a deleted lfile may later be undeleted with
+\fIfm_lfundelete\fR.  The data in a deleted lfile is not lost until the lfile
+is again opened and written into, or the datafile is rebuilt.  Information
+on a specific lfile (size, type, etc.) may be obtained with \fIfm_lfstat\fR.
+
+There is nothing about the file manager which is specific to QPOE, so it is
+implemented as a separate, standalone facility, and may be used in applications
+other than QPOE.
+
+.NH 4
+Buffer Cache
+
+    For reasons of efficiency, QPOE maintains portions of the datafile in
+memory buffers while a datafile is open.  The main QPOE descriptor, symbol
+table, and file manager descriptor and page table are maintained in special
+runtime data structures internal to the respective interfaces.  All other
+data is stored in lfiles and accessed only upon demand.  In particular,
+storage for all static (non variable length) QPOE header parameters is
+maintained in a single lfile, and storage for each variable length parameter
+is allocated in a separate lfile.
+
+Since most access to QPOE header parameters is via simple gets and puts to
+named parameters, lfile access is handled by QPOE transparently to the client
+applications program.  To avoid excessive disk i/o when randomly accessing
+the datafile, it is desirable for QPOE to maintain a cache of several lfile
+data buffers, e.g., so that accesses to a series of static parameters or
+repeated accesses to read or write different parts of an array parameter
+should incur minimal disk accesses.  This buffer cache is implemented in
+QPOE by simply opening each lfile as a file under FIO, leaving it up to FIO to
+manage the file buffer, and maintaining a LRU cache of open lfiles in QPOE.
+The number of buffers (open lfiles) is controlled by the QP_CACHESIZE
+parameter.  Since the lfile buffer cache is a general datafile related
+facility, it is implemented by the file manager.
+
+.ks
+.nf
+              fd = fm_getfd (fm, lfile, mode, type)
+                   fm_retfd (fm, lfile)
+                 fm_lockout (fm, lfile)
+                 fm_debugfd (fm, out)
+.fi
+.ke
+
+The \fIfm_getfd\fR routine maps an lfile onto a file descriptor.  A file
+descriptor is opened on the lfile only when necessary.  Once opened, an lfile
+remains in the cache until forced out by the LRU replacement algorithm,
+or the datafile is closed.  Removal of an lfile from the cache (closing the
+associated file descriptor) is permitted only after a call to \fIfm_retfd\fR;
+calling this routine does not immediately close the file, it only permits it
+to be closed.  Most calls to \fIfm_getfd\fR should return a file descriptor
+immediately, with very little overhead, with an already active file buffer,
+hence repeated calls to the cache manager and FIO may be made without
+incurring any disk accesses.
+
+Note that lfiles may be opened on file descriptors via direct calls to the
+file manager, regardless of whether these lfiles are already open in the
+buffer cache.  This allows two or more independent file buffers to be
+simultaneously active on the same lfile, but opens the possibility of loss
+of data if the buffers overlap.  If this is a problem, the routine
+\fIfm_lockoutfd\fR may be called to prevent inadvertent use of an lfile by
+the cache.  This should be followed by a call to \fIfm_retfd\fR to clear the
+lockout bit once the reason for the lockout (usually a noncached lfile open)
+is gone.  The routine \fIfm_debugfd\fR will print information on \fIout\fR
+describing the contents of the buffer cache.
+
+.tp 24
+.NH 3
+Interface Structure
+.NH 4 1
+Header Access Package (QP Routines)
+
+    The structure of the general QPOE routines (mostly header access) is
+illustrated in the figure below.
+
+.ks
+.nf
+                                +--------+
+                                |   QP   |
+                                +--------+
+                                 /      \
+                                /        \
+                        +--------+      +--------+
+                        | SYMTAB |      | BCACHE |
+                        +--------+      +--------+
+                                             |
+                                      +--------------+
+                                      | FILE MANAGER |  
+                                      +--------------+
+
+              Figure 1.  Structure of the Header Access Routines
+.fi
+.ke
+
+To fulfill a get or put header access, QPOE will access the symbol table
+(SYMTAB) to lookup the symbol name and determine the symbol datatype, nelem,
+lfile number, and lfile file offset where the value is stored.  The buffer
+cache (BCACHE) and FIO are then called to access the value of the parameter
+in the datafile.
+
+.NH 4
+Filtered Event I/O Package (QPIO)
+
+    The structure of the filtered event i/o package (QPIO) is illustrated in
+the figure below.
+
+.ks
+.nf
+                                +--------+
+                                |  QPIO  |
+                                +--------+
+                                 /   |  \       
+                      __________/    |   \__________
+                     /               |              \
+                +--------+      +--------+      +--------+
+                |  PLIO  |      |  QPEX  |      | BCACHE |
+                +--------+      +--------+      +--------+
+                                     |               |
+                                +--------+    +--------------+
+                                | SYMTAB |    | FILE MANAGER |  
+                                +--------+    +--------------+
+
+                     Figure 2.  Structure of QPIO Routines
+.fi
+.ke
+
+In the typical \fIgetevents\fR call, QPIO will call PLIO to determine the
+next region of the stored image (event list) to access, then if the event
+data is not already in a data buffer, FIO is called to read the data (bucket),
+using the event list index, an integer array valued parameter, to determine
+what bucket to read.  The events in the bucket are then examined and optionally
+filtered via calls to QPEX, returning pointers to the passed events in an
+output argument.  This process terminates when either the mask value changes
+or at least one event has been returned and a new bucket is required to 
+continue reading.

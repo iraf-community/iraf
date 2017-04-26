@@ -1,0 +1,26 @@
+.help cqunmap Mar00 "Catquery Package"
+.ih
+NAME
+cq_unmap -- unmap the catalog / survey configuration file
+.ih
+SYNOPSIS
+call cq_unmap (cq)
+
+.nf
+pointer		cq		# the configuration file descriptor
+.fi
+.ih
+ARGUMENTS
+.ls cq
+The catalog / survey configuration file descriptor.
+.le
+.ih
+DESCRIPTION
+Unmap the configuration file. 
+.ih
+NOTES
+Cq_unmap should be called when catalog / survey access is terminated.
+.ih
+SEE ALSO
+cqmap
+.endhelp

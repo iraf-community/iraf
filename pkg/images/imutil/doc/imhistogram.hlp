@@ -1,0 +1,111 @@
+.help imhistogram Nov89 images.imutil
+.ih
+NAME
+imhistogram -- print or plot the histogram of an image
+.ih
+USAGE
+imhistogram image
+.ih
+PARAMETERS
+.ls image
+The name of the image or image subsection whose histogram is to be calculated.
+.le
+.ls z1 = INDEF, z2 = INDEF
+The minimum and maximum histogram intensity.  The image minimum and maximum
+pixel values are used by default.
+.le
+.ls binwidth = INDEF
+The resolution of the histogram in counts. If \fIbinwidth\fR is not defined,
+the parameter \fInbins\fR determines the histogram resolution.
+.le
+.ls nbins = 512
+The number of bins in, or resolution of, the histogram. 
+The \fInbins\fR parameter is overridden if \fIbinwidth\fR is defined.
+.le
+.ls autoscale = yes
+In the case of integer data, automatically adjust \fInbins\fR and
+\fIz2\fR to avoid aliasing effects.
+.le
+.ls top_closed = no
+Include z2 in the top bin?  Each bin of the histogram is a subinterval
+that is half open at the top.  \fITop_closed\fR decides whether those
+pixels with values equal to z2 are to be counted in the histogram.  If
+\fBtop_closed\fR is yes, the top bin will be larger than the other bins.
+.le
+.ls hist_type = "normal"
+The type of histogram to plot or list.  The choices are "normal",
+"cumulative", "difference", or "second_difference".  The two
+"difference" options are calculated as forward differences, i.e.,
+diff[n] = hist[n+1] - hist[n].
+.le
+.ls listout = no
+List instead of plot the histogram?  The list is never log scaled.
+.le
+.ls plot_type = "line"
+The plot vector type. The options are "line" and "box".
+.le
+.ls logy = yes
+Use log scaling on the y-axis of the plot?
+.le
+.ls device = "stdgraph"
+The output graphics device.
+.le
+.ih
+DESCRIPTION
+\fIimhistogram\fR calculates the histogram of the IRAF image
+\fIimage\fR using the parameters \fInbins\fR, \fIz1\fR and \fIz2\fR.
+If either \fIz1\fR or \fIz2\fR is undefined the image minimum or
+maximum is used.  If \fIlistout\fR = no, the histogram is plotted on
+the graphics device \fIdevice\fR in the vector mode specified by
+\fIplot_type\fR.  The plot may be log scaled if \fIlogy\fR = yes (the
+default).  If \fIlistout\fR = yes, the histogram is listed on the
+standard output.
+
+In addition to producing the "normal" histogram, the task will also
+calculate cumulative and marginal (forward difference) histograms
+depending on the choice of the \fIhist_type\fR parameter (choices
+are:  "normal", "cumulative", "difference", and "second_difference").
+The plot will be labeled by the type of histogram as well as the image
+name and title and the binning parameters.
+
+Each bin of the histogram is defined to be half open at the top.  This
+results in an ambiguity deciding whether those pixels with z=z2 are
+included in the topmost bin.  This decision is left to the user via the
+\fItop_closed\fR parameter.  This is usually only important with integer
+images and histograms with few bins.
+.ih
+EXAMPLES
+1. Output the histogram of an image to a file.
+
+    cl> imhist M51.imh li+ nbins=100 > fits1.hst
+
+2. Plot the histogram of another image between the values 0 and 2000.
+
+    cl> imhist M31.imh nbins=100 z1=0. z2=2000.
+
+3. Ditto, but set the histogram resolution explicitly to avoid
+smoothing the histogram.
+
+    cl> imhist M31.imh nbins=100 z1=0 z2=2000 nbins=2001
+
+4. Plot the cumulative histogram.  This is most useful for images with
+fairly flat "normal" histograms.
+
+    cl> imhist R50.imh hist=cum
+.ih
+BUGS
+If the resolution of the histogram (number of bins) is a non-integral multiple
+of the intensity resolution of the data (number of possible intensity values),
+then \fIaliasing\fR can occur.  The effect is to cause periodic zero dropouts
+(for an oversampled histogram) or excess-valued bins (for a slightly
+undersampled histogram).  The \fIautoscaling\fR feature, if enabled, will
+adjust the histogram parameters to avoid such aliasing effects for integer
+data.  This is not possible for floating point data, however, in which case
+aliasing is certainly possible and can only be avoided by manually adjusting
+the histogram parameters.  One should also be aware that \fIsmoothing\fR of
+the histogram will occur whenever the data range exceeds the histogram
+resolution.
+.ih
+SEE ALSO
+listpixels, plot.graph, proto.mkhistogram
+.endhelp

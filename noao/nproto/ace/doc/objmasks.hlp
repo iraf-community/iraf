@@ -1,0 +1,710 @@
+.help objmasks Jan02 nproto
+.ih
+NAME
+objmasks -- detect objects in images and create masks and sky maps
+.ih
+SYNOPSIS
+.ih
+USAGE	
+objmasks images objmasks skys
+.ih
+PARAMETERS
+.ls images
+List of images or multiextension files for which object masks are desired.
+.le
+.ls objmasks
+List of object masks to be created.  This list must match the input list.
+Multiextension input files will produce multiextension mask files.  If the
+input image is writable, the name of the created mask will recorded in the
+image header.  Note that it is possible to specify a null image to
+not produce an output mask.  This might be done if the background sky
+or sky sigma maps are desired or to just see the log information.
+.le
+
+.ls omtype = "numbers" (boolean|numbers|colors|all)
+The type of encoding for the object mask values.  In all cases non-object pixels
+(that is background) have mask values of zero.  The choices for the mask
+values are "boolean", "numbers", "colors", and "all".  These are described
+in the \fIOutput Data\fR section.
+.le
+.ls skys = "", sigmas = ""
+Optional lists of input or output sky and sigma maps.  Maps are either
+constant values or images which are interpolated to the size of the input
+images.  If a list is given it must match the input \fIimages\fR list.
+If constant values or existing maps are specified then those are used
+without change.  If a new filename is given then an output file is created
+with the values computed by the task.  Multiextension input images create
+or apply the same extension names to the specified sky or sigma files.
+Constant input values apply to all extensions.  The sigma values are
+per single input image pixel.
+.le
+.ls masks = "!BPM"
+List of bad pixel masks for the input images.  Non-zero masks values are
+ignored in the object detection and are passed on to the output object
+masks based on the \fIomtype\fR parameter.  An empty list applies no bad
+pixel mask, a single mask applies to all input images, and a matching
+list matches the masks with the input image.  A mask is specified by a
+filename or by reference to a filename given by the value of a header
+keyword in the input image.  A header keyword reference is made with the
+syntax "!<keyword>" where <keyword> is the desired keyword with case
+ignored.  For multiextension files the input masks may be either a
+multiextension file with matching extension names or a directory of
+pixel list files with the extension names as filenames.
+.le
+.ls extnames = ""
+Extensions to select from multiextension files.  A null string matches all
+extension names.  Otherwise the parameter is a comma separated list of
+patterns that match the entire extension name.  Thus, an explicit list of
+extension names may be specified or the pattern matching characters '?' for
+any character or '[]' for a set of characters may be used.  The set may
+include ranges in ascii order by using hyphens; i.e. 1-3 matches the
+characters 1, 2, and 3.
+.le
+.ls logfiles = "STDOUT"
+List of output log files.  If no list is given then no output log information
+will be produced.  If only one file is specified it applies to all input
+images otherwise the list of files must match the images list.  Note that
+the special name "STDOUT" corresponds to terminal output.
+.le
+
+.ls blkstep = 1
+The mean and sigma of the background or sky pixels are determined in a
+first pass through the image.  If \fIblkstep\fR is one all lines are used.
+To skip lines in order to speed up this computation, the parameter may be
+set to a larger value to define the increment between lines.  However, the
+task will enforce a preset minimum number to insure a sufficient sample.
+.le
+.ls blksize = -10
+The background mean sky and sky sigma are determined in a set of square
+blocks from which the values are linearly interpolated to each point in the
+input image.  The size of the blocks may be specified as a number of blocks
+spanning the smaller image dimension by using a negative integer value.
+Or the size may be specified as the number of pixels across a block.
+The task will enforce a preset minimum number of pixels per block which may
+require using bigger blocks than specified.  The background determination
+algorithm is described further in the "Background Determination" section.
+.le
+
+.ls convolve = "block 3 3"
+Convolution filter to be applied prior to threshold detection.  The
+convolution filter is defined by a set of weights in a 2D array.  These
+may be specified in files or with certain forms given by special strings.
+The options are described in the "Convolution Filter" section.
+.le
+.ls hsigma = 3., lsigma = 10.
+Object pixels are identified by sigma thresholds about the mean background
+based on the estimated background sigma at each point in the image.
+The sigma factors are specified in terms of the "per pixel" sigma before
+convolution.  The \fIhsigma\fR value is the "high" or above background
+limit and the \fIlsigma\fR value is the "low" or below background limit.
+Typically detections are one-sided, such as detecting objects above
+the background, and so the thresholds need not be equal.
+.le
+.ls hdetect = yes, ldetect = no
+Identify objects as pixels which are above the background (\fIhdetect\fR)
+and below the background (\fIldetect\fR)?  If objects are detected but the
+corresponding parameter is no then the output mask will not include those
+objects.
+.le
+.ls neighbors = "8" (8|4)
+The threshold selected pixels are associated with other neighboring pixels to
+form an object.  The criterion for a neighbor being part of the
+same object is defined by this parameter.  The choices are "8" for
+pixels touching in any of the 8 directions or "4" to identify neighbors
+as only horizontal or vertically adjacent.
+.le
+.ls minpix = 6
+The minimum number of neighboring pixels which define an acceptable object.
+.le
+.ls ngrow = 2, agrow = 2.
+After an object is identified as a set of threshold detected pixels,
+additional neighboring pixels may be added to the object.  This allows
+expanding the object into the faint wings of the light distribution.  The
+additional pixels are those which touch the boundary pixels.  Pixels are
+added in multiple passes, each time extending the previous boundary.  The
+parameter \fIngrow\fR (an integer value) defines the maximum number of
+boundary extensions.  The parameter \fIagrow\fR (a real value) specifies
+the maximum increase in area (number of pixels) from the original
+detection.
+.le
+.ih
+DESCRIPTION
+\fBOBJMASKS\fR is a task for creating masks covering objects in images.
+An optional secondary product of this task is to produce background
+and sigma maps.  Objects are identified by threshold sigma detection.
+These object masks may be used by other applications to exclude the object
+data or focus on the objects.  The detection consists of determining a
+smooth, spatially variable mean background and background sigma (if no
+input maps are provided), convolving the data by an optional filter to
+optimize detection of faint sources, collecting pixels satisfying the
+detection thresholds, assigning neighboring pixels to a common object,
+applying a minimum number of pixels test to the objects, and growing
+objects to extend into the wings of the object light distribution.
+The last step is writing out the identified object pixels as a mask.
+
+1. Input Data
+
+The input data consists of one or more 2D images.  The images are assumed
+to  contain a moderately smooth background and multiple sources or
+objects.  This task is most useful for images with large numbers of small
+sources rather than one large object such as a nearby galaxy.  The input
+images, specified by the \fIimages\fR parameter, may be individual images
+(which includes images selected from multiextension files as explicit
+image extensions) or multiextension files specified by a root filename.  In
+the latter case the image extension names selected by the \fIextnames\fR
+parameter are used.
+
+Background means and sigmas (specified per image pixels) may be specified
+by "maps".  These may be constant numerical values or images.  The map
+images will be linearly interpolated to the size of the input images.
+For multi-extension input data, constant map values apply to all extensions
+and maps are also multiextension files with map images having the same
+extension names.
+
+Bad pixel masks may be associated with the input images to
+exclude pixels from the background and object determinations.  These
+bad pixels are also included in the output object masks.  The bad pixel
+masks are specified by the \fImasks\fR parameter.  This parameter may
+identify a mask by a filename or a keyword.  A single mask may be
+specified to apply to all images or a matching list of masks may be
+given.
+
+The masks are in one of the supported mask formats.  As of IRAF V2.12 this
+includes pixel list (.pl) files and FITS "type=mask" extensions.  When the
+input files are multiextension files, the selected extension names are
+appended to the specified mask filename to select masks with the same
+extension name.  If a mask file of the form "name[ext]" is not found
+the task will treat the filename as a directory of pixel list files and
+select the pixel list file with the extension name; i.e. "name/ext.pl".
+
+2. Output Data
+
+The output of this task are object masks, sky maps, sigma maps, and log
+information.  The output object masks default to mask type extensions.  If an
+extension name is not specified explicitly the default extension name
+"pl" is created.  To select a pixel list output format an explicit ".pl"
+extension must be used.
+
+When the input data are multiextension files, the output masks, mean sky
+maps, and sky sigma maps will be multiextension files with the specified
+rootnames and the same extension name as the input.
+
+The output mask values identify non-object pixels with zero.  The non-zero
+values are encoded as selected by the \fIomtype\fR parameter.  The choices
+are:
+
+.ls "boolean"
+All object and bad pixels have a mask value of one; i.e. the output masks
+consists only of the values 0 and 1.
+.le
+.ls "numbers"
+Input bad pixels values between 1 and 10 preserve their value and all
+other input mask values are mapped to 10.  The object mask pixels have
+object numbers starting with 11.  The object numbers are assigned by
+the task (roughly in order from the first line to the last line) and
+all pixels from a single object have the same unique object number.
+.le
+.ls "colors"
+Input bad pixels are mapped to output values of one.  The object numbers
+are modulo 8 plus 2; i.e. values between 2 and 9.  The purpose of this
+numbering is to allow mapping to the nine standard display colors for an
+interesting overlay with the \fBdisplay\fR task and "ocolors='+203'".
+.le
+.ls "all"
+This is the same as "numbers" except that bits 24 to 27 in the mask values
+are used for various purposes.  In particular bit 24 is set for the boundary
+pixels.  This numbering will be used in the future by special tasks.
+.le
+
+Output mean sky and sky sigma maps consist of the mean and sigma values
+in blocks as described in the "Background Determination" section.
+Therefore, the size of the map images are smaller than the input data images.
+These maps need to be interpolated to the size of the input image
+to obtain the values used for particular pixels in the data images.
+This interpolation expansion is done automatically by some tasks such
+as \fBmscred.rmfringe\fR.
+
+The log output provides information about the files, the phase of the
+processing, some of the parameters, and the convolution filter weights.
+The output begins with the task identifier ACE.  This is because this
+prototype task is a first release piece of a major package called ACE
+(Astronomical Cataloging Environment), which is under development.
+
+3. Background Determination
+
+Detection of sources in an image begins with determining the background.
+By this we mean estimating the probability distribution of the background
+pixel values at every pixel in the image.  In practice we only estimate
+the central value and width and assume a normal distribution for evaluating
+the significance of deviations from the central value.  Since we normally
+won't have a sample of values at each pixel the distribution is
+determined from a sample of nearby pixels.
+
+In this discussion the central value of a distribution is denoted by <I>.
+It is estimated by the mean or mode of the sample.  The width of the
+distribution about <I> is denoted by <S> and is estimated by the absolute
+mean residual converted to the standard deviation of a normal distribution
+with the same absolute mean residual.  The normal deviation of a value I
+from the distribution is defined as R = (I - <I>) / <S>.
+
+The background may be specified by input maps for one or both of the
+background quantities.  The maps may be constant values which apply
+to all pixels or a grid of values given in an image which are linearly
+interpolated to the full size of the input data.  For those quantities
+which are not input the following algorithm is used for computing
+a map.  The maps may be output and used as a product of this task.
+
+The background and/or sigma are estimated in two initial passes through the
+data.  The first pass algorithm fits linear functions to a subsample of
+lines using sigma clipping iteration to eliminate objects.  The subsample
+is used to speed up the algorithm and is reasonable since only linear
+functions are used.  Each sample line is block averaged in blocks of 10
+pixels and a linear function is fit by least squares to obtain an estimate
+for <I> along the line.  The fitting weights are the number of good pixels
+in each block average after elimination of bad pixels specified by the
+user in a bad pixel mask.  The absolute values of the residuals are also
+fit to produce a constant function for <S>.
+
+To exclude objects from affecting these estimates the fitting is iterated
+using sigma clipping rejection on the normal deviations R.  In the
+first iteration the fitting function for <S> is a constant and in
+subsequent steps a linear fit is used.  When the sigma clipping iteration
+rejects no more data, the remaining block averages, absolute residuals, and
+weights are used to fit a 2D plane for both <I> and <S>.  The <S> surface
+is a constant in order to avoid potential negative sigma values.
+
+This first pass algorithm is fast and produces good estimates for the
+planar approximation to the background.  The second pass divides the image
+into large, equal sized blocks, as specified by the \fIblksize\fR
+parameter, and estimates <I> and <S> in each block.  The size of the blocks
+needs to be large enough to give good estimates of the statistics though
+small enough to handle the scale of variations in the sky.  Each block is
+divided into four subblocks for independent estimates which are then
+combined into a final value for the block.  As with the first pass, the
+second pass can be speeded up by using a subsample of lines (parameter
+\fBblkstep\fR) provided some minimum number of lines per subblock is
+maintained.
+
+The background estimates in each subblock are made using histograms of the
+normal deviations R computed relative to the first pass estimates of <I>
+and <S>.  When pixels are added into the histogram the <I> and <S> used to
+compute R are accumulated into means of these quantities in order
+to convert estimates from the normalized deviation histogram back into data
+values.  The histograms are truncated at +/-2.5 and have bin widths
+determined by requiring a specified average bin population based on the
+number of pixels in the block.  Typically the bin population is of order
+500.  The histogram truncation is essentially an object-background
+discrimination.
+
+When all the pixels in a subblock have been accumulated, new estimates of
+<I> and <S> are computed.  If the number of pixels in the histogram is
+less than two-thirds of the subblock pixels the estimates are set to be
+indefinite.  This flags the subblock as too contaminated by objects to be
+used.  All subblock neighbors, which may cross the full block boundaries,
+are also rejected to minimize contamination by the wings of big galaxies
+and very bright stars.
+
+If the histogram has enough pixels, the bin populations are squared to
+emphasize the peak of the distribution and reduce the effects of the
+truncated edges of the histogram.  Because of noise and the fine binning of
+the histogram, a simple mode cannot be used and squaring the bin numbers
+helps to approach the mode with a centroid.  Squaring the bin values and
+then computing the centroid can also be thought of as a weighted centroid.
+
+Generally a mode is considered the best estimate to use for the central
+value <I> of the sky distribution.  But it is unclear how to best estimate
+the mode without an infinite number of pixels.  One could do something like
+fit a parabola to the histogram peak.  But instead we use the empirical
+relation for a skewed distribution between the mean, mode, and median;
+<I>=mean-3*(mean-median).  The mean is the weighted centroid and the median
+is obtained numerically from the histogram using linear interpolation to
+get a subbin value.
+
+The <S> values are obtained from the absolute mean residual of the
+unweighted histogram about the previously derived central value <I> of the
+histogram.  The conversion to a standard deviation is made by computing the
+ratio between the standard deviation and mean absolute deviation of a
+Gaussian distribution.  The standard value over the entire distribution
+cannot be used because the histogram is truncated.  However, it is easy to
+numerically compute the ratio with the same truncation.
+
+Once <I> and <S> are obtained in bin numbers it is converted to data
+values by using the mean and sigma of the input pixel values used
+to create the histogram.
+
+The averages of the subblock <I> and <S> values which are not indeterminate
+in each block are computed.  If any of the full blocks are indeterminate
+when all the subblocks have been eliminated as contaminated, values are
+obtained for them by interpolation from nearby blocks.  The block values
+are then linearly interpolated to get background values for every
+pixel in the input image.
+
+Note that the background pixels used in the block algorithm before
+detection are derived by simple sigma clipping of the histogram values
+around the planar background.  If an output map for either the mean
+values or the sigmas is specified then during the object detection stage
+the background and sigmas are updated using the detected sky pixels about
+the initial block sampled background.  This is a more sensitive selection
+of sky pixels since convolution filtering can exclude pixels from faint
+objects and the wings of all objects.  The new set of sky pixels are
+accumulated and used in the same way as described earlier.
+
+4. Convolution Filters
+
+In order to improve the detection of faint sources dominated by the
+background noise, the input data may be convolved to produce filtered
+values in which the noise has been suppressed.  The threshold detection
+is then performed on the filtered data values.
+
+The convolution detection filter is specified with the \fIconvolve\fR
+parameter.  There is only one convolution that can be specified and it
+applies to all input images in a list.  If a null string ("") is specified
+then no convolution is performed.  The task has been optimizations for this
+case to avoid treating this as a 1x1 convolution and to avoid extra memory
+allocations required when a convolution is done.
+
+The convolved value at pixel (i,j), denoted I'(i,j), is defined by
+
+.nf
+    I'(i,j) = sum_kl{I(m,n)*W(k,l)} / sum_kl{W(k,l)}
+.fi
+
+where I(m,n) is the unconvolved value at pixel (m,n), W(k,l) are the NX x
+NY (both must be odd) convolution weights, sum_kl is the double sum over k
+and l, and
+
+.nf
+    m' = i + k - (NX+1)/2	for k = 1 to NX
+    n' = j + l - (NY+1)/2	for l = 1 to NY
+
+    m = m' (1<=m'<=C)	m = 1-m' (m'<1)	  m = 2C-m' (m'>C)
+    n = n' (1<=n'<=L)	n = 1-n' (n'<1)	  n = 2L-n' (m'>L)
+.fi
+
+The size of the image is C x L.  The last two lines represent boundary
+reflection at the edges of the image.
+
+The sky sigma of a convolved pixel is approximated by
+
+.nf
+    sigma'(i,j) = sigma(i,j) / sum_kl{W(k,l)}
+.fi
+
+In the presence of bad pixels specified in the bad pixel mask the
+convolution weight applied to a bad pixel is set to zero.  If the central
+pixel is bad then the convolved value is also considered to be bad.  The
+sum of the weights used to normalize the convolution is then modified from
+the situation with no bad pixels.  This will correct the convolved pixel
+value for the missing data and the estimated sky sigma is appropriately
+larger.  Since there is an overhead in checking for bad pixels the
+convolution has an optimization to avoid such checks in the case where no
+bad pixel mask is specified.
+
+A convolution can be computational slow, especially for larger convolution
+kernel sizes.  The implementation of the convolution has been optimized to
+recognize bilinear symmetries or lines which are scaled versions of other
+lines.  So if possible users should chose convolutions with such symmetries
+to be most efficient.  The "block", "bilinear", and "gauss" special
+convolutions described below all have such symmetries.
+
+The \fIconvolve\fR parameter is a string with one of the following forms.
+
+.ls ""    
+There is no convolution or, equivalently, NX=1, NY=1.
+.le
+.ls @[filename]
+The weights are given in the specified file.  The format consists of lines
+of whitespace separated values.  The number of values on each line must be
+the same and defines NX and the number of lines defines NY.
+.le
+.ls block [NX] [NY]
+The weights are all the same and the convolution size is given by the
+two numbers following the word "block".  This is a moving block average
+filter.
+.le
+.ls bilinear [NX] [NY]
+The weights are the bilinear matrix product of triangular one dimensional
+matrices of sizes given by the two numbers following the word "bilinear".
+The weights are described by the matrix product relation 
+
+.nf
+    [1 ... (NX+1)/2 ... 1] * Transpose{[1 ... (NY+2)/2 ... 1]}
+.fi
+
+For example for NX=5, and NY=3 the weights would be
+
+.nf
+    1 2 3 2 1
+    2 4 6 4 2
+    1 2 3 2 1
+.fi
+.le
+.ls gauss [NX] [NY] [SX] [SY]
+The weights are bidimensional gaussian values on a grid of size NX by NY
+with sigma values SX and SY (real numbers) in units of pixel spacing.
+.le
+.ls [W(1,1)] ... [W(NX,1)], ..., [W(1,NY)] ... [W(NX,NY)]
+The weights are specified as a string of real values.  The values are
+whitespace separated within each line and the lines are delimited by
+comma.  For example
+
+.nf
+                               1 2 1
+    1 2 1, 2 3 2, 1 2 1  ==>   2 3 2
+                               1 2 1
+.fi
+.le
+
+When a logfile is defined the convolution weights are included in the
+output.
+
+5. Object Detection
+
+The detection of objects in an image is conceptually quite simple once the
+background is known.  If an input pixel, before any convolution, is
+identified in the bad pixel mask the output object mask pixel is also
+identified as bad.  Otherwise the input data is convolved as described
+previously.
+
+Each convolved pixel is compared against the expected background at that
+point and, if it is more that a specified number of convolution adjusted
+background sigma above (\fIhsigma\fR) or below (\fIlsigma\fR) the
+background, it is identified as a candidate object pixel.  Candidate object
+pixels, with the same sense of deviation, are grouped into objects on
+the basis of being connected along the four or eight neighboring directions
+as specified by the \fIneighbor\fR parameter.  The candidate object is then
+accepted if it satisfies the minimum number of pixels (\fIminpix\fR) in
+an object and the \fIhdetect\fR or \fIldetect\fR parameter selects that
+type of object.  The accepted objects are assigned sequential numbers
+beginning with 11.  The object numbers are used, as described in the
+section on the output data, to set the output object mask values.
+
+If an output mean sky or sigma map is requested, the output is that
+updated by the sky pixels identified during the detection.
+
+6. Object Growing
+
+Astronomical objects do not have sharp edges but have light distributions
+that merge into the background.  This is due not only to the nature of
+extended sources but to the atmospheric and instrument point spread function
+effects on unresolved sources.  In order to include pixels which extend
+away from the threshold detection and contain some amount of light
+apart from the background, the task provides options to extend or grow
+the object boundaries.  This is done by making multiple passes where
+pixels which have not been identified as object pixels but which neighbor
+object pixels are assigned to the object which they neighbor in any of
+the eight directions.  Each pass can be thought of as adding a ring
+of new pixels following the boundary of the object from the previous
+pass.
+
+When a non-object pixel neighbors two or more object pixels it is
+assigned to the object with the greater "flux".  The flux is the sum
+of the pixel value deviations from the background.
+
+The parameter \fIngrow\fR selects the maximum number of growing iterations.
+The parameter \fIagrow\fR selects the maximum fractional increase in
+the number  of original detected object pixels.  The number of pixels
+is called the "area"  of the object.  The growing of an object stops
+when either maximum is exceedd at the end of a growing iteration.
+.ih
+EXAMPLES
+1.  The following is a test example with default parameters that can be run
+by anyone.  An artificial galaxy field image is generated with the task
+\fBmkexample\fR (the \fBartdata\fR package is assumed to already be loaded)
+and a mask is created with \fBobjmasks\fR.  The image is displayed with
+the object mask overlayed in colors.
+
+.nf
+    np> mkexample galfield galfield
+    Creating example galfield in image galfield ...
+    np> objmasks omtype=color
+    List of images or MEF files: galfield
+    List of output object masks: gfmask
+    ACE:
+      Image: galfield - Example artificial galaxy field
+      Set sky and sigma:
+	Determine sky and sigma by surface fits:
+	  start line = 1, end line = 512, step = 51.1
+	  xorder = 2, yorder = 2, xterms = half
+	  hclip = 2., lclip = 3.
+	Determine sky and sigma by block statistics:
+	  Number of blocks: 5 5
+	  Number of pixels per block: 100 100
+	  Number of subblocks: 10 10
+	  Number of pixels per subblock: 50 50
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	422 objects detected
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: gfmask[pl,type=mask]
+    np> display galfield 1
+    z1=371.5644 z2=455.8792
+    np> display galfield 2 overlay=gfmask[pl] ocolors="+203" 
+    z1=371.5644 z2=455.8792
+.fi
+
+2.  In the first example there was no input mask.  The next example
+creates a new object mask using the first object mask as an input
+"bad pixel mask".  While this is not the usual usage of the bad pixel
+mask it does illustrate an interesting option.  Note that the mask
+values in the input mask are mapped to an output value of 1 in the
+"colors" output.  In this example the output is forced to be a pl
+file by using the explicit extension.
+
+.nf
+    np> objmasks omtype=colors mask=gfmask[pl]
+    List of images or MEF files (galfield): 
+    List of output object masks (gfmask): gfmask1.pl
+    ACE:
+      Image: galfield - Example artificial galaxy field
+      Bad pixel mask: gfmask.pl
+      Set sky and sigma:
+	Determine sky and sigma by surface fits:
+	  start line = 1, end line = 512, step = 51.1
+	  xorder = 2, yorder = 2, xterms = half
+	  hclip = 2., lclip = 3.
+	Determine sky and sigma by block statistics:
+	  Number of blocks: 5 5
+	  Number of pixels per block: 100 100
+	  Number of subblocks: 10 10
+	  Number of pixels per subblock: 50 50
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	44 objects detected
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: gfmask1.pl
+    np> display galfield 2 overlay=gfmask1 ocolors="+203" 
+    z1=371.5644 z2=455.8792
+.fi
+
+3.  The next example illustrates use with a multiextension file.  The
+example is two realizations of the galfield artificial data.
+
+.nf
+    np> mkexamples galfield mef.fits[im1]
+    Creating example galfield in image mef[im1] ...
+    np> mkexamples galfield mef[im2,append] oseed=2
+    Creating example galfield in image mef[im2,append] ...
+    np> objmasks
+    List of images or MEF files (galfield): mef
+    List of output object masks (gfmask1.pl): mefmask
+    ACE:
+      Image: mef[im1] - Example artificial galaxy field
+      Set sky and sigma:
+	Determine sky and sigma by surface fits:
+	  start line = 1, end line = 512, step = 51.1
+	  xorder = 2, yorder = 2, xterms = half
+	  hclip = 2., lclip = 3.
+	Determine sky and sigma by block statistics:
+	  Number of blocks: 5 5
+	  Number of pixels per block: 100 100
+	  Number of subblocks: 10 10
+	  Number of pixels per subblock: 50 50
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	422 objects detected
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: mefmask[im1,append,type=mask]
+    ACE:
+      Image: mef[im2] - Example artificial galaxy field
+      Set sky and sigma:
+	Determine sky and sigma by surface fits:
+	  start line = 1, end line = 512, step = 51.1
+	  xorder = 2, yorder = 2, xterms = half
+	  hclip = 2., lclip = 3.
+	Determine sky and sigma by block statistics:
+	  Number of blocks: 5 5
+	  Number of pixels per block: 100 100
+	  Number of subblocks: 10 10
+	  Number of pixels per subblock: 50 50
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	410 objects detected
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: mefmask[im2,append,type=mask]
+    np> display mef[im1] 1 over=mefmask[im1]
+    z1=371.5644 z2=455.8792
+    np> display mef[im2] 2 over=mefmask[im2]
+    z1=371.5666 z2=455.7844
+.fi
+
+4.  This example shows outputing the sky information.
+
+.nf
+    np> objmasks galfield gfmask2 sky=gfsky2
+    ACE:
+      Image: galfield - Example artificial galaxy field
+      Set sky and sigma:
+	Determine sky and sigma by surface fits:
+	  start line = 1, end line = 512, step = 51.1
+	  xorder = 2, yorder = 2, xterms = half
+	  hclip = 2., lclip = 3.
+	Determine sky and sigma by block statistics:
+	  Number of blocks: 5 5
+	  Number of pixels per block: 100 100
+	  Number of subblocks: 10 10
+	  Number of pixels per subblock: 50 50
+	Write sky map: gfsky2
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	422 objects detected
+	Update sky map: gfsky2
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: gfmask2[pl,append,type=mask]
+    np> imstat gfsky2
+    #               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+		   gfsky2        25     401.1    0.4397     400.3     401.9
+.fi
+
+5.  This examples shows specifying the sky information as constant values.
+In this case we already know that the artificial image has a
+constant background of 400 and a sigma of 10.
+
+.nf
+    np> objmasks galfield gfmask3 sky=400 sigma=10
+    ACE:
+      Image: galfield - Example artificial galaxy field
+      Set sky and sigma:
+	Use constant input sky: 400.
+	Use constant input sigma: 10.
+      Detect objects:
+	Convolution:
+	       1.      1.      1.
+	       1.      1.      1.
+	       1.      1.      1.
+	432 objects detected
+      Grow objects: ngrow = 2, agrow = 2.
+      Write object mask: gfmask3[pl,append,type=mask]
+.fi
+
+.ih
+REVISIONS
+.le
+.ih
+SEE ALSO
+.endhelp
+266c266
+< fit to produce a function for <S>.
+---
+> fit to produce a constant function for <S>.
+273c273,274
+< weights are used to fit a 2D plane for both <I> and <S>.
+---
+> weights are used to fit a 2D plane for both <I> and <S>.  The <S> surface
+> is a constant in order to avoid potential negative sigma values.
+

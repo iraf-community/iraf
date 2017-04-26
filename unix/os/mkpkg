@@ -1,0 +1,98 @@
+# Make the 4.2BSD UNIX IRAF kernel.  All modules are also dependent on the
+# header file <libc/knames.h>.
+
+$checkout libos.a hlib$
+$update	  libos.a
+$checkin  libos.a hlib$
+$exit
+
+alloc:
+	!cc -O alloc.c getproc.c -o alloc.e; chmod 4755 alloc.e;\
+	    mv -f alloc.e ../hlib
+	;
+
+libos.a:
+	$set XFLAGS = "-cd $(HSI_XF)"
+
+	$ifdef (DEBUG)
+	    $iffile (as$zsvjmp_p.s)
+		as$zsvjmp_p.s
+	    $else
+		as$zsvjmp.s
+	    $endif
+	$else
+	    as$zsvjmp.s
+	$endif
+
+	#"as$enbint.s"
+
+	# Do not put zmain.o in the library if it is linked explicitly as a .o
+	# on the host machine.  Having it in the library prevents use of the
+	# libos library in Fortran on a UNIX system as the linker will use the
+	# iraf zmain (C "main") rather than the Fortran one.
+
+	$ifeq (USE_LIBMAIN, no)
+	zmain.c		<libc/kernel.h> <libc/spp.h>
+	$endif
+
+	irafpath.c	<libc/kernel.h> <libc/spp.h>
+	gmttolst.c
+	prwait.c	<libc/kernel.h> <libc/spp.h>
+	zalloc.c	<libc/spp.h> <libc/alloc.h> <libc/kernel.h>
+	zawset.c	<libc/kernel.h> <libc/spp.h>
+	zdojmp.c	<libc/kernel.h> <libc/spp.h>
+	zcall.c		<libc/kernel.h> <libc/spp.h>
+	zfunc.c		<libc/kernel.h> <libc/spp.h>
+	zfacss.c	<libc/kernel.h> <libc/spp.h>
+	zfaloc.c	<libc/kernel.h> <libc/spp.h>
+	zfchdr.c	<libc/kernel.h> <libc/spp.h>
+	zfdele.c	<libc/kernel.h> <libc/spp.h>
+	zfgcwd.c	<libc/kernel.h> <libc/spp.h>
+	zfinfo.c	<libc/kernel.h> <libc/spp.h> <libc/finfo.h>
+	zfiobf.c	<libc/kernel.h> <libc/spp.h>
+	zfioks.c	<libc/kernel.h> <libc/spp.h>
+	zfiolp.c	<libc/kernel.h> <libc/spp.h>
+	zfiond.c	<libc/kernel.h> <libc/spp.h>
+	zfiomt.c	<libc/kernel.h> <libc/spp.h>
+	zfiopl.c	<libc/kernel.h> <libc/spp.h>
+	zfiopr.c	<libc/kernel.h> <libc/spp.h>
+	zfiosf.c			<libc/spp.h>
+	zfiotx.c	<libc/kernel.h> <libc/spp.h>
+	zfioty.c			<libc/spp.h>
+	zfmkcp.c	<libc/kernel.h> <libc/spp.h>
+	zfmkdr.c	<libc/kernel.h> <libc/spp.h>
+	zfnbrk.c	<libc/kernel.h> <libc/spp.h>
+	zfpath.c	<libc/kernel.h> <libc/spp.h>
+	zfpoll.c        <libc/kernel.h> <libc/spp.h>
+	zfprot.c	<libc/kernel.h> <libc/spp.h>
+	zfrnam.c	<libc/kernel.h> <libc/spp.h>
+	zfrmdr.c	<libc/kernel.h> <libc/spp.h>
+	zfsubd.c	<libc/kernel.h> <libc/spp.h>
+	zfutim.c        <libc/kernel.h> <libc/spp.h>
+	zfxdir.c	<libc/kernel.h> <libc/spp.h>
+	zgcmdl.c	<libc/kernel.h> <libc/spp.h>
+	zghost.c	<libc/kernel.h> <libc/spp.h>
+	zglobl.c	<libc/kernel.h> <libc/spp.h>
+	zgmtco.c	<libc/kernel.h> <libc/spp.h>
+	zgtenv.c	<libc/kernel.h> <libc/spp.h>
+	zgtime.c	<libc/kernel.h> <libc/spp.h>
+	zgtpid.c	<libc/kernel.h> <libc/spp.h>
+	zintpr.c	<libc/kernel.h> <libc/spp.h>
+	zlocpr.c	<libc/kernel.h> <libc/spp.h>
+	zlocva.c	<libc/kernel.h> <libc/spp.h>
+	zmaloc.c	<libc/kernel.h> <libc/spp.h>
+	zmfree.c	<libc/kernel.h> <libc/spp.h>
+	zopdir.c	<libc/kernel.h> <libc/spp.h>
+	zopdpr.c	<libc/kernel.h> <libc/spp.h>
+	zoscmd.c	<libc/kernel.h> <libc/spp.h> <libc/error.h>
+	zpanic.c	<libc/kernel.h> <libc/spp.h>
+	zraloc.c	<libc/kernel.h> <libc/spp.h>
+	zshlib.c
+	zwmsec.c	<libc/kernel.h> <libc/spp.h>
+	zxwhen.c	<libc/kernel.h> <libc/spp.h>
+	zzepro.c	<libc/spp.h>
+	zzexit.c	<libc/spp.h>
+	zzpstr.c	<libc/spp.h>
+	zzsetk.c	<libc/spp.h>
+	zzstrt.c
+	;

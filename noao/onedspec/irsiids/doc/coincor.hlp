@@ -1,0 +1,101 @@
+.help coincor Feb87 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+coincor -- Correct detector count rates
+.ih
+USAGE
+coincor input records
+.ih
+PARAMETERS
+.ls input
+The root file name of the input spectra.
+.le
+.ls records
+The range of spectra.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the corrected spectra.  If no root name
+is specified (specified with the null string "") then the operation
+is done in place.
+.le
+.ls start_rec = 1
+The starting record number to be appended to the root name of the
+created spectra.
+.le
+.ls ccmode = )_.ccmode
+The mode used to model the detector count rate corrections.
+In the following C(obs) is the observed count rate and C(cor) is the
+corrected count rate.
+.ls "photo"
+Photoelectric photometer with discriminator mode.  The count rate
+correction is
+
+    C(cor) = C(obs) * exp (C(obs) * deadtime)
+    
+where the parameter \fIdeadtime\fR is the representative deadtime in seconds.
+.le
+.ls "iids"
+IIDS correction given by
+
+    C(cor) = (-ln(1-C(obs)*deadtime)/deadtime)**power
+
+where \fBdeadtime\fR is a parameter related to the sweep time used to
+correct for coincidence losses and \fBpower\fR is a power law coefficient.
+.le
+.le
+.ls deadtime = )_.deadtime
+For the "photo" mode this parameter is the period, in seconds, during
+which no counts can be registered by the detector.  Note that this is
+based on a per pixel basis.  So if the discriminator dead period is of
+order 50 nanoseconds and 2000 pixels are observed per readout, the
+effective deadtime is about 10E-4 seconds.  For the "iids" mode this
+parameter defines the sweep time correction and has a value of 1.424E-3
+seconds.
+.le
+.ls power = )_.power
+The IIDS power law coefficient.  The standard value is 0.975.
+.le
+.ih
+DESCRIPTION
+The input spectra are corrected for detector count rate errors.  If no
+output root name is given then the operation is done in place.  The type
+of correction is specified by the parameter \fIccmode\fR.  The available
+modes are for a general photomultiplier with discriminator coincidence
+correction, and the NOAO IIDS.  The parameters for these modes are
+\fIdeadtime\fR and \fIpower\fR.  The exposure time, in seconds, is a
+required image header parameter (keyword = EXPOSURE).
+
+The default mode is for the NOAO IIDS.  The IIDS correction includes a
+power law correction for a nonlinear effect in the IIDS image tube chain
+which is not included by the mountain reduction software at the telescope.
+If the spectra have been coincidence corrected at the telescope
+then only the nonlinear power law correction is applied.
+
+The coincidence correction flag may take the values -1 for no correction,
+0 for the IIDS correction with \fIpower\fR = 1 (the correction
+applied by the mountain reduction software), 1 for the full IIDS
+correction, and 2 for the photomuliplier mode correction.
+.ih
+EXAMPLES
+The following example corrects a series of IIDS spectra:
+
+	cl> coincor nite1 1-250 output=nite1cc start_rec=1
+
+The following example corrects a series of spectra from the
+Lick ITS:
+
+.nf
+	cl> coincor its 1-250 output=itscc start=1 ccmode=photo \
+	>>> deadtime=2.4E-4 power=1
+.fi
+.ih
+TIME REQUIREMENTS
+\fBCoincor\fR requires approximately 1 second per spectrum of length 1024.
+.ih
+SEE ALSO
+.nf
+The \fBimred.iids\fR package is designed for reducing NOAO IIDS spectra.
+.fi
+.endhelp

@@ -1,0 +1,648 @@
+			   Kernel Interface Package
+				12-May-85 dct
+			         (21-Aug-85)
+
+
+1. Introduction
+
+    The kernel interface package (KI) isolates the IRAF virtual operating
+system (VOS) from the IRAF kernel, permitting access either to the local
+kernel or to an IRAF kernel resident on a remote host, via an IRAF kernel
+server (KS).  The KI provides access to files, peripherals and devices,
+and subprocesses irrespective of whether the resource is located on the
+local machine or on a remote node.  Since the KI is implemented on top of
+the IRAF kernel the different nodes may run different native operating systems.
+
+
+           +-----------+
+           |           |                  VOS = virtual operating system
+           |   V O S   |                   KI = kernel interface
+           |           |                   KS = kernel server
+           +-----------+
+                 |               :
+                 |
+           +-----------+         :        +-----------+
+           |           |                  |           |
+           |    K I    |=========:========|    K S    |==== (etc)
+           |           |                  |           |
+           +-----------+         :        +-----------+
+                 |                              |
+                 |               :              |
+           +-----------+                  +-----------+
+           |           |         :        |           |
+           |   local   |                  |  remote   |
+           |   kernel  |         :        |  kernel   |
+           |           |                  |           |
+           +-----------+         :        +-----------+
+   
+                                 :
+              (host1)                        (host2)
+
+
+	              Architecture of the Kernel Interface
+
+
+2. Conceptual Design
+
+    The purpose of the kernel interface is to permit access to logical files,
+devices, and subprocesses regardless of where such objects physically reside
+in a network.  This permits sharing of peripherals such as image displays and
+plotters, data sharing (centralized databases), load sharing (running of
+subprocesses on lightly loaded nodes), and makes such mundane operations as
+copying a file between two nodes possible without developing special purpose
+software and further complicating the user interface.
+
+By addressing these problems by implementation of an interface just above
+the IRAF kernel it becomes possible to remotely access nodes running different
+native operating systems, e.g., UNIX and VMS, with the IRAF kernel on each host
+system resolving the differences between file formats and filenames found
+on the different host systems.  Full access to text files and raw peripherals
+is inherent in the scheme regardless of the architecture of the host machine.
+Full access to binary datafiles is possible provided the binary format is
+machine independent, a desirable goal in any case.
+
+The kernel interface is conceived as an optional and invisible interface
+between the IRAF virtual operating system and the IRAF kernel.
+The specifications of the kernel are not affected by the KI, except for the
+addition of a new device driver for talking to remote kernel servers.  The VOS
+sees the same kernel interface whether or not the system is configured with a
+KI.
+
+A VOS call to a kernel procedure such as ZOPNBF, for example, is directed
+instead to the KI procedure KOPNBF which in turn calls either the local ZOPNBF
+or passes the call to a remote KS.  The VOS still calls the procedure "zopnbf",
+but the external name of this procedure is redefined in <config.h> as "kopnbf",
+permitted substitution of the KI merely by recompilation.  When the file is
+opened a channel descriptor is allocated within the KI telling whether the
+channel is local or remote, and if remote giving the KS address on the net,
+and giving the kernel channel number of the file on the node on which it
+resides.  The KI channel number instead of the kernel channel number is
+returned to the VOS.  Subsequent i/o requests on the channel are also processed
+by the KI, which uses the channel descriptor to determine whether the file
+is local or remote and then fulfils the request.
+
+
+3. Other Network Interfaces
+
+    The kernel interface is not intended to replace or compete with "real"
+network implmentations such as NFS or DECNET.  If the local net provides such
+facilities then remote access via the host network is equivalent to a local
+file reference.  Few such commercial networks, however, permit equivalent
+access when the different nodes run different operating systems.
+Often the type of access provided by the network is restricted in some way,
+e.g., NFS permits transparent access to remote files but not to remote devices.
+On VMS an IRAF kernel routine which accesses an i/o channel at the QIO level
+is bypassing DECNET hence can only be used to access a local device.
+The kernel server approach neatly sidesteps these problems without preventing
+use of the host networking facilities in cases were it is desirable to do so.
+
+
+4. Performance
+
+    The overhead of the KI for a local file access is one additional procedure
+call per i/o request, e.g., an additional 20-30 microseconds per i/o request.
+A remote file access requires encoding of the request as a KI instruction,
+transmission of the instruction to the remote host, decoding of the instruction
+by the remote host, a kernel access on the remote host, and in the case of a
+read request transmission of the data back to the requesting node where it is
+read out into the caller's buffer.  Handshaking is required to return the status
+value after reads and writes to a remote node, hence large transfers will
+significantly reduce the overhead involved in remote file access.  Large data
+transfers are automatically transferred in segments by the interface code,
+hence there is no builtin limit on the size of a transfer.
+
+A file open or process spawn requiring connection to a kernel server on a
+remote host is a relatively expensive procedure since it requires spawning of
+the kernel server process on the remote host.  Once a process has connected to
+a kernel server on a remote host that server will remain connected for the
+life of the local process, with the single connection providing simultaneous
+access to any number of files, devices, or child processes on the remote host.
+Each local process requires its own kernel server process on the remote node.
+
+
+5. Modifications to the Existing I/O System
+
+    As noted above, implementation of the KI should require minimal
+modifications to existing software.  The specific modifications or additions
+required appear to be the following:
+
+
+additions:
+
+	add package KI (kernel interface)
+	add source for the KS (kernel server) process
+	add KS device driver to the kernel (package OS)
+	add ZGHOST (get hostname) primitive to OS
+	add SPP and LIBC include files <knames.h> to map zroutine names
+
+
+modifications:
+
+	add reference to <knames.h> to VOS procedures which access kernel
+	finit.h: install kernel server device driver at process startup
+	modify filename mapping:
+	    do not map filenames which begin with a node name 
+	    prepend CWD to relative filenames if CWD is on a remote node (?)
+
+
+6. Filenames
+
+    Files and processes anywhere in the network may be accessed by prepending
+the node name to the VFN or OSFN of the file.  In essence we have extended
+the VFN filename syntax to support node names.  The syntax is as follows:
+
+	node "!" filename
+
+The field delimiter "!" is used because it is not used in filenames in AOS,
+UNIX, or VMS.  The delimiters ":" and "::", commonly used as node name
+delimiters in commercial networds, were intentionally not used so that network
+filenames may be specified without conflict on systems with host network
+support.  Typical filenames using this notation are shown below.
+
+	2!/dev/iis
+	1!lib$motd
+	3!dra0:[user.data]pic.db
+
+An important consideration in choosing the node delimiter character is that
+it not be necessary to quote filenames in common everyday usage.  It turns out
+that in the CL "command mode" the character ! is only recognized as a
+metacharacter when it occurs at the beginning of a command (as the OS escape),
+hence quoting of filenames containing ! will not be necessary.
+
+The strategy for resolving such filenames is as follows.  The full filename
+including the nodename is passed to the filename mapping code on the local
+machine.  If the filename includes a nodename the filename is not mapped.
+The KI receives the filename and strips off the nodename, using it to
+select the node which will execute the kernel primitive.  The remainder of
+the filename (minus the nodename) is passed to the KS on the addressed node,
+and the KS performs the filename mapping and passes the mapped filename on
+to the IRAF kernel.  Since the filename mapping is carried out by the KS on
+the remote node the filename will be mapped in the context of the remote
+machine, i.e., the mapping will depend upon the native operating system used
+on the remote node.  If the KS is itself configured with a kernel interface,
+multiple indirection is possible, permitting gateways onto other networks,
+e.g., "gateway!node!filename".
+
+There should be no penalty for using a self referential node name in a
+filename, i.e., the system should be smart enough to ignore node names
+when the node named is the local node.  This permits use of the same absolute
+network filenames in configuration tables on all nodes, without having to
+maintain different sources on the different nodes.
+
+Fully functional filename mapping requires that the IRAF environment variables
+used by a process on the local machine be propagated to the kernel server on
+the remote machine.  If this is not done then package directory references,
+etc., appearing in virtual filenames will not be resolved.  The kernel server
+will inherit all environment variables except iraf$, since logical directory
+names of the form "node!ldir$file" must be expanded relative to the iraf
+root directory on the remote node.  User defined logical directories should
+include an explicit node name to permit access from any node.
+
+
+6.1 External KI Procedures
+
+    The majority of the KI procedures are internal, since the KI interface
+is hidden behind the procedure redefinitions in <knet.h>.  Other subsystems
+of the VOS do however occasionally need access to the KI, and the following
+procedures are provided for this purpose.
+
+
+	ki_extnode - Extract (or delimit) the node name field
+	ki_mapchan - Map KI channel into OS channel (or pid) and node name
+
+   len_prefix =  ki_extnode (resource, nodename, maxch, nchars)
+       oschan =  ki_mapchan (kichan, nodename, maxch)
+
+
+The EXTNODE function is used to extract the node name from a resource name,
+e.g., to produce a simpler name as required by the low level code, or to
+propagate the node name prefix to a second resource name.  The MAPCHAN function
+is used to convert a KI channel descriptor into the corresponding OS channel
+number and node name, e.g., for output to the user (the KI channel code is
+meaningless to the user).
+
+
+7. KI Procedures
+
+    Only those procedures in the IRAF kernel which take a filename as an operand
+or which do i/o to a file (or to IPC) need be mapped by the kernel interface.
+This subset of the kernel includes all the file primitives, all the device
+drivers, and some exception handling procedures.
+
+	zfacss - determine file accessibility
+	zfaloc - allocate a file
+	zfchdr - change default directory 		(??)
+	zfdele - delete a file
+	zfgcwd - get default directory 			(??)
+	zfinfo - get directory info on a file
+	zfmkcp - make a null length copy of a file
+	zfprot - set, remove, or query file protection
+	zfrnam - rename a file
+	zopdir - open a directory
+	zgfdir - get next filename from a directory
+
+	zopdpr - open a detached process
+	zcldpr - close a detached process
+	zopcpr - open a connected subprocess
+	zclcpr - close a connected subprocess
+	zintpr - interrupt a subprocess
+
+	zfiobf - binary file driver
+	zfiolp - line printer driver
+	zfiomt - magtape driver
+	zfiopl - plotter driver
+	zfiopr - ipc driver
+	zfiosf - static file driver
+	zfiotx - text file driver
+	zfioty - terminal driver
+
+
+The basic function of a KI procedure is to determine which host is to execute
+the kernel primitive, call the local or remote kernel to execute the primitive,
+and return the results to the calling program.
+
+
+7.1 Pseudocode for a KI Procedure
+
+    Consider the common case of reading a file on a remote host.  The file
+open procedure must connect to the KS on the remote host, command the remote
+kernel to open the file, and read back the status of the open.  Whether the
+file is on the local or remote node, a channel descriptor must be set up
+to tell the KI i/o primitives how to access the file.
+
+
+# KOPNBF -- KI version of ZOPNBF (open binary file).
+
+procedure kopnbf (osfn, mode, status)
+
+begin
+	ks = get_kernel_server (osfn)
+	if (ks is the local node)
+	    call zopnbf (osfn, mode, status)
+	else {
+	    encode KI instruction for zopnbf
+	    write instruction to KS
+	    read reply from KS
+	    if (error on channel to KS)
+		return (status=ERR)
+	}
+
+	set up channel descriptor (set channel codes of KS and file)
+end
+
+
+# GET_KERNEL_SERVER -- Return a channel to the kernel server controlling
+# a virtual filename.
+
+int procedure get_kernel_server (vfn)
+
+begin
+	extract node name from vfn
+	if (no node name given)
+	    return (0)
+	else if (node is already connected)
+	    return (node channel)
+	else {
+	    connect to the KS on the remote node
+	    save channel of node in channel table
+	    return (node channel)
+	}
+end
+
+
+# KARDBF -- KI version of ZARDBF (read from a binary file).  The read will not
+# be asynchronous if the file is resident on a remote node.  The size of a
+# transfer is not limited by the maximum block of the channel.
+
+procedure kardbf (chan, buf, maxchars, offset)
+
+begin
+	if (ks[chan] == 0)
+	    call zardbf (chan, buf, maxchars, offset)
+	else {
+	    encode KI instruction for ZARDBF
+	    write KI instruction to remote kernel server
+	    read back the KI header of the response
+
+	    if (read status ok and KI status for read ok) { 
+		transfer data from channel directly into callers buffer,
+		    in blocks no larger than the channel block size
+		save channel status for KAWTBF
+	    }
+	}
+end
+
+
+7.2 Data Structures
+
+    The data structures required by the kernel interface are small and are
+statically allocated.
+
+
+7.2.1 Host Name Table
+
+    The host name table (HNT) lists all of the hosts in the network which the
+KI can access, giving for each node the node filename of the kernel server
+process on that node, and a list of aliases (node names) for the node.
+The host name table is the text file "dev$hosts".  The format of the file
+is illustrated by the following example:
+
+
+	1!/iraf/lib/irafks.e		: 1 a vax1 aquila
+	2!/iraf/lib/irafks.e		: 2 b vax2 lyra
+	3!usr1\:[irafx.lib]irafks.exe	: 3   vax3 vela
+	5!/iraf/lib/irafks.e		: 5 c vax5 carina
+	6!usr1\:[irafx.lib]irafks.exe	: 6   vax6 draco
+	11!/iraf/lib/irafks.e		: 11  sun1 petunia
+
+
+The format of an entry in this table is "server ':' aliases", where "server"
+is a machine dependent, colon delimited string to be passed to the ZFIOKS
+driver, and where the aliases are a sequence of null delimited logical names
+by which the high level code or the user can refer to the nodes.  The first
+field, e.g., "server", is limited to 80 characters, the aliases to 8 characters
+(longer names will be silently truncated, either limit may be increased if
+necessary).  Up to 8 aliases may be specified.  The alias "0" will be
+automatically added to the alias list of the local node by the KI; this alias
+is used by the high level code to force a file to be accessed on the local node.
+The local node should also include as an alias the name returned by ZGHOST.
+The maximum number of nodes is a <config.h> parameter.  The entries may appear
+in any order.  
+
+
+7.2.2 Node Descriptor Table
+
+    For each entry in the host name table there is a corresponding entry in
+the node descriptor table (NDT).  The fields of the NDT are initialized
+when the first filename containing a node reference is processed.  When a
+kernel server is opened on a node the N_KSCHAN field is set to the channel
+code returned by the kernel server device driver.
+
+
+	int	n_nnodes		# number of nodes in table
+
+	struct node_descriptor {
+		int	n_kschan	# KS i/o channel or NULL
+		int	n_local		# set to YES for the local node
+		int	n_nalias	# number of aliases for this node
+		char	n_server[64]	# netname!process
+		char	n_alias[8,8]	# aliases
+	} ndt[MAX_NODES]
+
+
+Runtime node references are satisfied by searching the NDT for the specified
+alias.  If the referenced node is the local node a NULL channel number is
+returned.  If the N_KSCHAN field of the referenced node is null a kernel
+server is spawned and the channel number of the server returned.  If a kernel
+server is already connected mapping an alias into a channel number is very
+fast (compared to a file open).  Once a server is spawned it remains connected
+until the local process shuts down.
+
+
+7.2.3 Channel Descriptor Table
+
+    Each open file or connected subprocess requires one channel descriptor
+for each i/o channel or process id.  The K_KSCHAN field will contain NULL if
+the channel resides on the local node.  Channel descriptors are allocated at
+file or device open time or process connect time and are freed at close or
+disconnect time.  If the channel is connected to a kernel server, the K_OSCHAN
+and K_PID fields will contain the OS channel number or process id of the
+resource as returned by the kernel server on the remote node.
+
+	
+	struct channel_descriptor {
+		int	k_kschan	# KS channel (NULL if local node)
+		int	k_oschan	# OS channel number or PID
+		int	k_status	# status for the ZAWAIT call
+	} cdt[MAX_CHANNELS]
+
+
+7.3 KII Instruction Format
+
+    The kernel interface instruction format (KII) is the binary encoding of
+the data blocks sent to and received from the remote kernel server to execute
+a call to a kernel procedure.  This format is machine independent, i.e.,
+it is defined in a way that is independent of the byte ordering, char size,
+etc. used by a node.  The KII format provides a machine independent interface
+for the execution of all kernel subroutines as well as for text file i/o.
+Binary data blocks passed via the binary file i/o procedures are not affected,
+hence if a machine independent binary format is desired it must be implemented
+at a level higher than the KI.
+
+The KII format selected is a fixed format to simplify encode/decode and
+packet transfer (if the transfer medium is stream oriented fixed size packets
+are simpler to extract from the stream).  For media such as Ethernet
+performance depends more upon the number of packets transferred than upon
+the size of a packet, so there is little penalty for wasted space in a fixed
+size packet.  The maximum amount of information necessary to encode a kernel
+procedure call is limited (the argument lists are never large) hence it is
+easy to set an upper bound on the packet size.  The KII packet structure is
+shown below.
+	
+	struct kii_packet {
+		int	p_opcode	# instruction opcode
+		int	p_subcode	# subcode (for device drivers)
+		int	p_arg[13]	# procedure arguments
+		int	p_sbuflen	# nchars in string buffer
+		char	p_sbuf[255]	# string buffer
+	}
+
+	sizeof (struct kii_packet) == ((16*4)+256) == 320 bytes
+
+
+The OPCODE and SUBCODE fields identify the kernel procedure to be executed.
+Each procedure argument is passed in the corresponding field of the ARG array;
+for string arguments this field contains the offset of the string value in
+the P_SBUF field.  Procedure argument N is passed in field N of the ARG array.
+P_SBUFLEN is the number of chars in the string buffer, including the EOS at
+the end of each string.
+
+Before transmission of the packet over the net the packet is encoded in
+a machine independent form.  The 16 integer fields are converted into MII
+32 bit signed integer format, and the 256 character string buffer is packed
+one byte per character (only the first SBUFLEN characters are packed).  The
+inverse transformation is performed by the kernel server on the remote node
+before accessing the contents of the packet.
+
+Most kernel procedures return a status value and/or data.  The KII packet
+structure is used both to remotely execute a kernel procedure and to return
+the status value and any scalar or string output arguments.  In the case of
+text file i/o the text data is passed in the SBUF field.  Procedures which
+return a data structure (e.g., ZFINFO) may pass the data structure as a
+sequence of ARG array elements, encode the structure in chararacter form
+in SBUF, or pass the structure in a separate packet.  In most cases a single
+packet will be used for greater efficiency and to avoid the need to
+explicitly encode the return value.
+
+The purpose of the SUBCODE field is to exploit the fact that the text and
+binary file drivers each have the same set of driver procedures, each with
+the same set of arguments.  The OPCODE field identifies the device driver
+and the SUBCODE field the driver function, e.g., OPN, ARD, AWR, AWT, etc.
+
+
+8. KS Driver
+
+    Connecting and disconnecting kernel servers, and all i/o to connected
+kernel servers, is provided by the KS driver.  To the KI in the calling
+process a KS behaves like a synchronous binary file opened for readwrite
+access.  The driver is patterned after a binary file driver, allowing the
+server process to be connected to FIO as a streaming binary file.  Normally,
+however, the driver procedures will be called directly by the KI.
+
+
+	zopnks (server, mode, chan)
+	zawrks (chan, buf, nbytes, offset)
+	zardks (chan, buf, maxbytes, offset)
+	zawtks (chan, status)
+	zsttks (chan, what, lvalue)
+	zclsks (chan, status)
+
+
+The entry points of the KS driver are shown above.  The argument SERVER is
+the network pathname of the kernel server process, e.g., "2!/iraf/lib/ks.e".
+There no requirement, however, that the named process be a kernel server
+process.  The driver will attempt to execute and set up readwrite streaming
+i/o to any process, hence the KS driver may be useful for network functions
+other than the kernel interface.
+
+
+9. Kernel Server Process
+
+    The kernel server process is an IRAF process with a standard IRAF Main
+but a special ONENTRY procedure and no task dictionary (like the CL).
+The server communicates with a KI via the binary streams CLIN and CLOUT,
+both of which are connected to a single channel in the calling process.
+The server process contains an interpreter capable of calling any kernel
+procedure which does i/o.  In addition, the kernel server contains enough
+of FIO to map filenames and read and write CLIN and CLOUT.  
+
+
+10. Filename Mapping Details
+
+    The system interface procedures used for filename mapping must be trapped
+by the KI to deal with node pathnames.  The relevant procedures are the
+following:
+
+	zfnbrk		break vfn into its component parts
+	zfchdr		change directory
+	zfgcwd		get default directory
+	zfxdir		extract directory prefix
+	zfpath		convert vfn to pathname
+	zfsubd		fold subdirectory into pathname
+
+The first routine, ZFNBRK, merely parses filenames into their component fields
+and it should be possible for the same routine to be used on all nodes without
+help from the KI.  The remaining routines are fundamental to the action of
+the KI.
+
+
+10.1 Default Directory
+
+    Normally, either the kernel or the host system keeps track of the default
+directory.  This remains the case when the KI is in use, provided the default
+directory is on the local node.  If the default directory is changed to some
+different node the following actions are taken by the KI:
+
+    [1]	Extract node prefix and save in a KI common for use during filename
+	mapping.
+
+    [2] Execute ZFCHDR on the remote node (minus the node prefix) to set
+	the node-relative default directory.
+
+All subsequent runtime file references are mapped as follows:
+
+    [1]	The default node prefix is prepended to all filenames which do
+	not include an explicit node name prefix.
+
+    [2] Normal filename mapping is performed, i.e., filename mapping is
+	disabled on the local node (since the filename has a node prefix),
+	deferring mapping to the kernel server on the remote node.
+
+All normal runtime filename mapping starts with a call to ZFXDIR.  If ZFXDIR
+returns anything the filename is assumed to be host dependent and is not mapped.
+Hence we want ZFXDIR to return the entire VFN as if it were an OSDIR name,
+if the VFN includes a node prefix and the node referenced is not the local
+node.  ZFPATH and ZFSUBD must behave similarly.
+
+
+10.2 Semicode
+
+
+procedure kfchdr (osdir, status)
+
+begin
+	server = ki_connect (osdir)
+
+	if (server == NULL) {
+	    # Directory is on the local node.
+
+	    default node = local node
+	    call zfchdr (osdir_minus_node_prefix, status)
+
+	} else {
+	    # Directory is on a remote node.
+
+	    pass zfchdr request to remote node
+	    if (request is successful)
+		default node = remote node
+	}
+end
+
+
+procedure kfgcwd (osdir, nchars)
+
+begin
+	if (default node is the local node)
+	    call zfgcwd to get default directory
+	else
+	    pass zfgcwd request to remote node
+
+	return (default_node // default_directory)
+end
+
+
+procedure zfxdir (vfn, osdir, maxch, nchars)
+
+begin
+	extract node name
+
+	if (no node name specified)
+	    node name = default node
+
+	if (node is the local node)
+	    pass the request to the local kernel
+	else
+	    return (node // vfn)
+end
+
+
+procedure zfpath (vfn, pathname, maxch, nchars)
+
+begin
+	extract node name
+
+	if (no node name specified)
+	    node name = default node
+
+	if (node is the local node) {
+	    call zfpath to compute local pathname
+	    return (node // pathname)
+	} else
+	    return (node // vfn)
+end
+
+
+procedure zfsubd (osfn, maxch, subdir, nchars)
+
+begin
+	extract node name
+
+	if (no node name specified)
+	    node name = default node
+
+	if (node is the local node) {
+	    call zfsubd to compute local pathname
+	    return (node // pathname)
+	} else
+	    return (node // vfn // "subdir/")
+end

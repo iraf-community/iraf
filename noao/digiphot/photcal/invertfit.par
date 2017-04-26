@@ -1,0 +1,13 @@
+# The INVERTFIT task parameter file
+
+observations,f,a,"",,,List of observations files
+config,f,a,"",,,Configuration file
+parameters,f,a,"",,,Fitted parameters file
+calib,f,a,"",,,Output calibrated standard indices file
+catalogs,f,h,"",,,List of standard catalog files
+errors,s,h,"obserrors","undefined|obserrors|equations",,"Error computation type (undefined,obserrors,equations)"
+objects,s,h,"all","all|program|standards",,"Objects to be fit (all,program,standards)"
+print,s,h,"",,,Optional list of variables to print
+format,s,h,"",,,Optional output format string
+append,b,h,no,,,Append output to an existing file ?
+catdir,s,h,")_.catdir",,,The standard star catalog directory

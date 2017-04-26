@@ -1,0 +1,32 @@
+# Make the LISTS package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -lds"
+
+	$update	libpkg.a
+	$omake	x_lists.x
+	$link	x_lists.o libpkg.a $(LIBS) -o xx_lists.e
+	;
+
+install:
+	$move	xx_lists.e bin$x_lists.e
+	;
+
+libpkg.a:
+	columns.x	
+	lintran.x	<ctype.h> <pattern.h>
+	rgcursor.x	
+	rimcursor.x	<mach.h> <mwset.h>
+	table.x		<ctype.h>
+	tokens.x	<ctotok.h>
+	unique.x	
+	words.x	
+	;

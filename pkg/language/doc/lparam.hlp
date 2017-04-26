@@ -1,0 +1,64 @@
+.help lparam Apr87 language
+.ih
+NAME
+lparam -- list the parameters of a task or pset
+.ih
+USAGE
+lparam pset [pset ...]
+.ih
+PARAMETERS
+.ls pset
+The name of the parameter set to be listed.
+.le
+.ih
+DESCRIPTION
+\fILparam\fR lists one or more parameter sets.  Psets are specified either by
+the name of the task with which the pset is associated, or by filename (pset
+files have the ".par" extension).  If a file type pset is listed the extension
+must be included, since it is the presence or absence of the filename
+extension which \fBlparam\fR uses to distinguish between task-psets and named
+(file) psets.
+
+Each parameter is listed on a single line with the following format:
+
+	param = value		prompt string
+
+Here "param" is the name of the parameter, "value" is the current value of
+the parameter (blank if undefined), and "prompt string" is the prompt for
+the parameter, if any.  If the parameter is hidden, then the line is enclosed
+in parentheses.  For arrays, instead of the values, a list of the
+dimensionalities is given.  The \fIeparam\fR task may be used to examine
+or edit the contents of an array.  When more than one task is listed the
+task name is prefixed to the list of each tasks parameters.
+.ih
+EXAMPLES
+1. List the parameter for the task \fIdelete\fR.  Note that the positional
+parameters are listed first, in the order in which they must be specified
+on the command line, followed by the hidden parameters.
+
+.nf
+cl> lparam delete
+        files = "temp"          list of files to be deleted
+     go_ahead = yes              ?
+      (verify = no)             verify operation before deleting each file?
+(default_acti = yes)            default delete action for verify query
+ (allversions = yes)            delete all versions of each file
+    (subfiles = yes)            delete any subfiles of each file
+        (mode = "ql")           
+.fi
+
+2. List the contents of the file pset "delete.par".  Named psets such as this
+are most commonly produced using the \fB":w filename"\fR colon command in
+\fBeparam\fR, e.g., to prepare several different versions of the parameter
+set for a task.
+
+	cl> lparam delete.par
+
+.ih
+BUGS
+You cannot list the parameters of a task that does not have a parameter
+file (e.g., all builtin tasks).
+.ih
+SEE ALSO
+eparam, dparam, cache
+.endhelp

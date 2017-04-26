@@ -1,0 +1,20 @@
+IMIO$IMFORT/ZZDEBUG -
+
+    This directory contains a set of Fortran programs used to test the IMFORT
+software, and to provide real working examples illustrating the use of the
+IMFORT interface in host Fortran programs.
+
+	hello.f		prints `hello, world!'
+	imcopy.f	copy an image
+	imdel.f		delete an image
+	imren.f		rename an image
+	keyw.f		test header keyword access
+	minmax.f	update datamin, datamax
+	mkim.f		make a test image, pix[i,j] = j * 100 + i
+	pcube.f		print a subraster, e.g., of a MKIM test image
+	phead.f		print an image header in FITS format
+	planck.f	compute the planck function
+	readim.f	test sequential read through an image
+
+To compile individual programs:		cl> fc prog.f
+To define the tasks to the CL:		cl> cl < tasks.cl (edit tasks.cl first)

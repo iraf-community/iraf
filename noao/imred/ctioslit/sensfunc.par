@@ -1,0 +1,17 @@
+standards,s,a,std,,,Input standard star data file (from STANDARD)
+sensitivity,s,a,"sens",,,Output root sensitivity function imagename
+apertures,s,h,"",,,Aperture selection list
+ignoreaps,b,h,yes,,,Ignore apertures and make one sensitivity function?
+logfile,f,h,"logfile",,,Output log for statistics information
+extinction,f,h,)_.extinction,,,Extinction file
+newextinction,f,h,"extinct.dat",,,Output revised extinction file
+observatory,s,h,)_.observatory,,,Observatory of data
+function,s,h,"spline3","chebyshev|legendre|spline3|spline1",,Fitting function
+order,i,h,6,1,,Order of fit
+interactive,b,h,yes,,,Determine sensitivity function interactively?
+graphs,s,h,"sr",,,Graphs per frame
+marks,s,h,"plus cross box",,,Data mark types (marks deleted added)
+colors,s,h,"2 1 3 4",,,Colors (lines marks deleted added)
+cursor,*gcur,h,"",,,Graphics cursor input
+device,s,h,"stdgraph",,,Graphics output device
+answer,s,q, yes,"no|yes|NO|YES",,"(no|yes|NO|YES)"

@@ -1,0 +1,296 @@
+.help lscombine Jun04 noao.twodspec.longslit
+.ih
+NAME
+lscombine -- Combine longslit images
+.ih
+USAGE
+lscombine input output
+.ih
+PARAMETERS
+.ls input
+List of input two-dimensional images to combine.  This task is typically
+used with dispersion calibrated longslit images though it will work with
+any 2D images.
+.le
+.ls output
+Output combined image.
+.le
+.ls headers = "" (optional)
+Optional output multiextension FITS file where each extension is a dataless
+headers from each input image.
+.le
+.ls bpmasks = "" (optional)
+Optional output bad pixel mask with good values of 0 and bad values of 1.
+Output pixels are marked as bad when no input pixels contributed to the
+output pixel.  The file name is also added to the output image header under
+the keyword BPM.
+.le
+.ls rejmask = "" (optional)
+Optional output mask file identifying rejected or excluded pixels.  The
+pixel mask is the size of the output image but there is one extra dimension
+with length equal to the number of input images.  Each element of the
+highest dimension is a mask corresponding to an input image with values of
+1 for rejected or excluded pixels and values of 0 for pixels which were
+used.  The order of the masks is the order of the input images and image
+header keywords, indexed by the pixel coordinate of the highest dimension
+identify the input images.  Note that the pixel positions are in the output
+pixel coordinate system.
+.le
+.ls nrejmasks = "" (optional)
+Optional output pixel mask giving the number of input pixels rejected or
+excluded from the input images.
+.le
+.ls expmasks = "" (optional)
+Optional output exposure mask giving the sum of the exposure values of
+the input images with non-zero weights that contributed to that pixel.
+Since masks are integer, the exposure values may be scaled to preserve
+dynamic range and fractional significance.  The scaling values are given in
+the header under the keywords MASKSCAL and MASKZERO.  Exposure values are
+computed from the mask values by scale * value + zero where scale is the
+value of the MASKSCAL keyword and zero is the value of the MASKZERO
+keyword.
+.le
+.ls sigma = "" (optional)
+Optional output sigma image.  The sigma is the standard deviation,
+corrected for a finite population, of the input pixel values (excluding
+rejected pixels) about the output combined pixel values.
+.le
+
+.ls logfile = "STDOUT" (optional)
+Optional output log file.  If no file is specified then no log information is
+produced.  The special filename "STDOUT" prints log information to the
+terminal.
+.le
+
+.ls interptype = "spline3"
+Image interpolation type for any resampling prior to combining.
+The allowed types are "nearest" (nearest neighbor), "linear" (bilinear),
+"poly3" (bicubic polynomial), "poly5" (biquintic polynomial), and "spline3"
+(bicubic polynomial).
+.le
+.ls x1 = INDEF, y1 = INDEF
+User coordinates of the first output column and line.  If INDEF then it
+is based on the smallest value over all the images.
+.le
+.ls x2 = INDEF, y2 = INDEF
+User coordinates of the last output column and line.  If INDEF then it
+is based on the largest value over all the images.
+.le
+.ls dx = INDEF, dy = INDEF
+User coordinate pixel interval of the output.  If INDEF then the it
+is based on smallest interval (i.e. highest dispersion) over all the images.
+.le
+.ls nx = INDEF, ny = INDEF
+Number of output pixels.  If INDEF then it is based on the values of the
+other coordinate parameters.
+.le
+
+.ls combine = "average" (average|median|sum)
+Type of combining operation performed on the final set of pixels (after
+offsetting, masking, thresholding, and rejection).  The choices are
+"average", "median", or "sum".  The median uses the average of the two central
+values when the number of pixels is even.  For the average and sum, the
+pixel values are multiplied by the weights (1 if no weighting is used)
+and summed.  The average is computed by dividing by the sum of the weights.
+If the sum of the weights is zero then the unweighted average is used.
+.le
+.ls reject = "none" (none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip)
+Type of rejection operation performed on the pixels remaining after offsetting,
+masking and thresholding.  The algorithms are described in the
+DESCRIPTION section.  The rejection choices are:
+
+.nf
+      none - No rejection
+    minmax - Reject the nlow and nhigh pixels
+   ccdclip - Reject pixels using CCD noise parameters
+  crreject - Reject only positive pixels using CCD noise parameters
+   sigclip - Reject pixels using a sigma clipping algorithm
+ avsigclip - Reject pixels using an averaged sigma clipping algorithm
+     pclip - Reject pixels using sigma based on percentiles
+.fi
+
+.le
+.ls outtype = "real" (none|short|ushort|integer|long|real|double)
+Output image pixel datatype.  The pixel datatypes are "double", "real",
+"long", "integer", unsigned short "ushort", and "short" with highest
+precedence first.  If "none" is specified then the highest precedence
+datatype of the input images is used.  When there is a mixture of
+short and unsigned short images the highest precedence become integer.
+The datatypes may be abbreviated to a single character.
+.le
+.ls outlimits = ""
+Output region limits in pixels specified as pairs of whitespace separated
+values.  The first two numbers are the limits along the first output image
+dimension, the next two numbers are the limits along the second dimension,
+and so on.  If the higher dimension limits are not specified they default
+to the full range.  Therefore, if no limits are specified then the full
+output is created.  Note that the output size is computed from all the
+input images including offsets if specified and the coordinates are
+relative to that size.
+.le
+.ls masktype = "none" (none|goodvalue)
+Type of pixel masking to use.  If "none" then no pixel masking is done
+even if an image has an associated  pixel mask.  Otherwise the
+value "goodvalue" will use any mask specified for the image under
+the BPM keyword.  The values of the mask will be interpreted as
+zero for good pixels and non-zero for bad pixels.  The mask pixels
+are assumed to be registered with the image pixels.
+.le
+.ls blank = 0.
+Output value to be used when there are no pixels.
+.le
+
+.ls scale = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
+Multiplicative image scaling to be applied.  The choices are none, multiply
+by the reciprocal of the mode, median, or mean of the specified statistics
+section, multiply by the reciprocal of the exposure time in the image header,
+multiply by the values in a specified file, or multiply by a specified
+image header keyword.  When specified in a file the scales must be one per
+line in the order of the input images.
+.le
+.ls zero = "none" (none|mode|median|mean|@<file>|!<keyword>)
+Additive zero level image shifts to be applied.  The choices are none, add
+the negative of the mode, median, or mean of the specified statistics
+section, add the values given in a file, or add the values given by an
+image header keyword.  When specified in a file the zero values must be one
+per line in the order of the input images.  File or keyword zero offset
+values do not allow a correction to the weights.
+.le
+.ls weight = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
+Weights to be applied during the final averaging.  The choices are none,
+the mode, median, or mean of the specified statistics section, the exposure
+time, values given in a file, or values given by an image header keyword.
+When specified in a file the weights must be one per line in the order of
+the input images and the only adjustment made by the task is for the number of
+images previously combined.   In this case the weights should be those
+appropriate for the scaled images which would normally be the inverse
+of the variance in the scaled image.
+.le
+.ls statsec = ""
+Section of images to use in computing image statistics for scaling and
+weighting.  If no section is given then the entire region of the input is
+sampled (for efficiency the images are sampled if they are big enough).
+When the images are offset relative to each other one can precede the image
+section with one of the modifiers "input", "output", "overlap".  The first
+interprets the section relative to the input image (which is equivalent to
+not specifying a modifier), the second interprets the section relative to
+the output image, and the last selects the common overlap and any following
+section is ignored.
+.le
+.ls  expname = ""
+Image header keyword to be used with the exposure scaling and weighting
+options.  Also if an exposure keyword is specified that keyword will be
+added to the output image using a weighted average of the input exposure
+values.
+.le
+
+.ce
+Algorithm Parameters
+.ls lthreshold = INDEF, hthreshold = INDEF
+Low and high thresholds to be applied to the input pixels.  This is done
+before any scaling, rejection, and combining.  If INDEF the thresholds
+are not used.
+.le
+.ls nlow = 1,  nhigh = 1 (minmax)
+The number of low and high pixels to be rejected by the "minmax" algorithm.
+These numbers are converted to fractions of the total number of input images
+so that if no rejections have taken place the specified number of pixels
+are rejected while if pixels have been rejected by masking, thresholding,
+or nonoverlap, then the fraction of the remaining pixels, truncated
+to an integer, is used.
+.le
+.ls nkeep = 1
+The minimum number of pixels to retain or the maximum number to reject
+when using the clipping algorithms (ccdclip, crreject, sigclip,
+avsigclip, or pclip).  When given as a positive value this is the minimum
+number to keep.  When given as a negative value the absolute value is
+the maximum number to reject.  The latter is in addition to pixels
+missing due to non-overlapping offsets, bad pixel masks, or thresholds.
+.le
+.ls mclip = yes (ccdclip, crreject, sigclip, avsigcliip)
+Use the median as the estimate for the true intensity rather than the
+average with high and low values excluded in the "ccdclip", "crreject",
+"sigclip", and "avsigclip" algorithms?  The median is a better estimator
+in the presence of data which one wants to reject than the average.
+However, computing the median is slower than the average.
+.le
+.ls lsigma = 3., hsigma = 3. (ccdclip, crreject, sigclip, avsigclip, pclip)
+Low and high sigma clipping factors for the "ccdclip", "crreject", "sigclip",
+"avsigclip", and "pclip" algorithms.  They multiply a "sigma" factor
+produced by the algorithm to select a point below and above the average or
+median value for rejecting pixels.  The lower sigma is ignored for the
+"crreject" algorithm.
+.le
+.ls rdnoise = "0.", gain = "1.", snoise = "0." (ccdclip, crreject)
+CCD readout noise in electrons, gain in electrons/DN, and sensitivity noise
+as a fraction.  These parameters are used with the "ccdclip" and "crreject"
+algorithms.  The values may be either numeric or an image header keyword
+which contains the value.  The noise model for a pixel is:
+
+.nf
+    variance in DN = (rdnoise/gain)^2 + DN/gain + (snoise*DN)^2
+    variance in e- = (rdnoise)^2 + (gain*DN) + (snoise*(gain*DN))^2
+		   = rdnoise^2 + Ne + (snoise * Ne)^2
+.fi
+
+where DN is the data number and Ne is the number of electrons.  Sensitivity
+noise typically comes from noise introduced during flat fielding.
+.le
+.ls sigscale = 0.1 (ccdclip, crreject, sigclip, avsigclip)
+This parameter determines when poisson corrections are made to the
+computation of a sigma for images with different scale factors.  If all
+relative scales are within this value of unity and all relative zero level
+offsets are within this fraction of the mean then no correction is made.
+The idea is that if the images are all similarly though not identically
+scaled, the extra computations involved in making poisson corrections for
+variations in the sigmas can be skipped.  A value of zero will apply the
+corrections except in the case of equal images and a large value can be
+used if the sigmas of pixels in the images are independent of scale and
+zero level.
+.le
+.ls pclip = -0.5 (pclip)
+Percentile clipping algorithm parameter.  If greater than
+one in absolute value then it specifies a number of pixels above or
+below the median to use for computing the clipping sigma.  If less
+than one in absolute value then it specifies the fraction of the pixels
+above or below the median to use.  A positive value selects a point
+above the median and a negative value selects a point below the median.
+The default of -0.5 selects approximately the quartile point.
+.le
+.ls grow = 0.
+Radius in pixels for additional pixel to be rejected in an image with a
+rejected pixel from one of the rejection algorithms.  This applies only to
+pixels rejected by one of the rejection algorithms and not the masked or
+threshold rejected pixels.
+.le
+.ih
+DESCRIPTION
+\fBLSCOMBINE\fR combines two-dimensional longslit images by first
+resampling them to a common world coordinate system, if not already on
+the same system, and then combining the matching pixels.  The final world
+coordinate system is specified by parameters or by looking at the maximum
+ranges and minimum intervals over the input data.
+
+Algorithmically it is a combination of the tasks \fBTRANSFORM\fR (using
+the WCS) and \fBIMCOMBINE\fR.  When executing it will generate temporary
+images ("lsc*") and masks ("mlsc*") if the images are not already on a
+common world coordinate system.  The user only need be aware of this
+in case of an unexpected abort leaving these files behind.
+
+Rather than repeat the details the user should consult the descriptions
+for \fBTRANSFORM\fR and \fBIMCOMBINE\fR ignoring parameters which are
+not part of this task.
+.ih
+EXAMPLES
+.nf
+    cl> lscombine obj* lscomb
+.fi
+.ih
+NOTES
+.ls LSCOMBINE: V2.12.3
+This is a new task in this relese.
+.le
+.ih
+SEE ALSO
+transform, imcombine. odcombine 
+.endhelp

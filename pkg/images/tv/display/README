@@ -1,0 +1,15 @@
+DISPLAY -- Prototype routines for loading and controlling the image display.
+The lower level code is device dependent.
+
+	display		loads the display
+	dcontrol	adjusts the display (frame select, window, etc.)
+
+The basic strategy is that the image display device is interfaced to IRAF 
+file i/o as a binary file.  IMIO is then used to access the image or graphics
+planes of the device as a disk resident imagefile would be referenced.
+Each image plane of each image device is a separate "imagefile", and has a
+distinct image header file in the directory "dev$".
+
+This package uses the ZFIOGD (binary graphics device) device driver, the
+source for which is in host$gdev.  It is this driver which implements physical
+i/o to the device (actually, to the host system device driver for the device).

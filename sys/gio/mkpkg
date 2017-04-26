@@ -1,0 +1,140 @@
+# Make the GIO package.
+
+$checkout libex.a lib$			# default: update libex.a
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+# UPDATE --  Relink and install all graphics kernels.
+
+update:
+	@stdgraph
+	@sgikern
+	@imdkern
+	$ifeq (USE_NSPP,    yes) @nsppkern $endif
+	$ifeq (USE_CALCOMP, yes) @calcomp  $endif
+	;
+
+
+# The following redirect sys$mkpkg to the appropriate subdirectories to
+# update the libraries therein.
+
+libcur.a:
+	@cursor
+	;
+libgks.a:
+	@gks
+	;
+libncar.a:
+	@ncarutil
+	;
+libnspp.a:
+	@nspp
+	;
+libstg.a:
+	@stdgraph
+	;
+libsgi.a:
+	@sgikern
+	;
+libimd.a:
+	@imdkern
+	;
+libgkt.a:
+	@nsppkern
+	;
+libccp.a:
+	@calcomp
+	;
+
+
+# GIO portion of LIBEX.
+
+libex.a:
+	$ifeq (USE_GENERIC, yes)
+	    $ifolder (gtickr.x, gtick.gx)
+		$generic -k -t r gtick.gx
+	    $endif
+	$endif
+
+	@glabax
+	@gki
+	@gim
+
+	aelogd.x	
+	aelogr.x	
+	elogd.x	
+	elogr.x	
+	fpequald.x	<mach.h>
+	fpequalr.x	<mach.h>
+	fpfixd.x	<mach.h>
+	fpfixr.x	<mach.h>
+	fpndgr.x	
+	fpnormd.x	<mach.h>
+	fpnormr.x	<mach.h>
+	gactivate.x	<fset.h> <knet.h> <gio.h> <gset.h>
+	gadraw.x	gpl.com <gio.h> <gki.h>
+	gamove.x	gpl.com <gio.h> <gki.h>
+	gascale.x	<gio.h>
+	gcancel.x	<gio.h>
+	gclear.x	<gio.h> <gset.h>
+	gclose.x	<gio.h>
+	gctran.x	<gio.h>
+	gcurpos.x	gpl.com <gio.h> <gki.h>
+	gdeact.x	<gio.h> <gset.h>
+	gescape.x	<gio.h>
+	gfill.x		<gio.h>
+	gflush.x	<gio.h>
+	gframe.x	<gio.h>
+	gfrinit.x	<gio.h>
+	ggcell.x	gpl.com <gio.h>
+	ggcur.x		<gio.h> <gki.h>
+	ggetb.x		<gio.h>
+	ggeti.x		<gio.h>
+	ggetr.x		<gio.h>
+	ggets.x		<gio.h>
+	ggscale.x	<gio.h>
+	ggview.x	<gio.h>
+	ggwind.x	<gio.h>
+	gline.x	
+	gmark.x		markers.inc <gio.h> <gset.h>
+	gmftitle.x	<gio.h>
+	gmprintf.x
+	gmsg.x		<gio.h> <chars.h> <fset.h> <mach.h>
+	gopen.x		<error.h> <gio.h> <gset.h> <knet.h> <gki.h>
+	gpagefile.x	<error.h> <gset.h> <gio.h>
+	gpcell.x	gpl.com <gio.h>
+	gplcache.x	gpl.com <gio.h> <gki.h>
+	gplcancel.x	gpl.com <gio.h>
+	gplflush.x	gpl.com <gio.h> <gki.h>
+	gpline.x	
+	gploto.x	
+	gplotv.x	
+	gplreset.x	gpl.com <gio.h>
+	gplstype.x	gpl.com <gio.h>
+	gpmark.x	<gio.h> <gset.h>
+	gqverify.x	<fset.h>
+	grdraw.x	<gio.h>
+	grdwcs.x	<ctype.h>
+	greact.x	<gio.h> <gset.h>
+	greset.x	<gio.h> <gset.h> <mach.h>
+	grmove.x	<gio.h>
+	grscale.x	<gio.h>
+	gscan.x	
+	gscur.x		<gio.h>
+	gseti.x	
+	gsetr.x		<gio.h> <gset.h> <mach.h>
+	gsets.x		<gio.h> <gset.h>
+	gstati.x	
+	gstatr.x	<gio.h> <gset.h> <mach.h>
+	gstats.x	<gio.h> <gset.h>
+	gsview.x	<gio.h>
+	gswind.x	<gio.h>
+	gtext.x		<gio.h>
+	gtickr.x	<mach.h>
+	gtxset.x	<ctype.h> <gio.h> <gset.h>
+	gumark.x	<gio.h> <mach.h>
+	gvline.x	
+	gvmark.x	<gio.h> <gset.h>
+	wcstogki.x	gpl.com <gio.h> <gki.h>
+	;

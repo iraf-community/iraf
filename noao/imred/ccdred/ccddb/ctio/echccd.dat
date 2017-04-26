@@ -1,0 +1,23 @@
+# ECHCCD.DAT -- Instrument file to be used with ccdred when reducing echelle
+# spectroscopic data obtained with ArCon.
+
+subset			none
+
+exptime 		exptime
+darktime		darktime
+imagetyp		imagetyp
+biassec			biassec
+datasec			datasec
+trimsec			trimsec
+fixfile			fixfile
+ 
+OBJECT			object
+DARK			dark
+"PROJECTOR FLAT"	flat
+"SKY FLAT"		flat
+COMPARISON		other
+ZERO			zero			# New software
+BIAS			zero			# Old software
+"DOME FLAT"		flat
+MASK			other
+FOCUS			object

@@ -1,0 +1,17 @@
+#!/bin/csh
+
+# SEDSCRIPT -- Script for editing/renaming the SLALIB FORTRAN routines
+
+# Make the appropriate name changes and add IRAF copyright
+foreach file (*.f)
+    echo $file
+    sed -f SED1 $file > tempfile.f
+    rm $file
+    mv tempfile.f $file
+    sed -f SED2 $file > tempfile.f
+    rm $file
+    mv tempfile.f $file
+end
+
+# Restore IRAF version of the preces.f file from a save version.
+cp precss.f.sav precss.f

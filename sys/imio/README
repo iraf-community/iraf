@@ -1,0 +1,210 @@
+Image i/o.  Coded May 1983, D. Tody.
+
+This initial implementation of IMIO, described in the ".hlp" design file,
+provides most of the functionality of the IMIO interface, but is not
+fully optimized internally.  Features include:
+
+    (1)	7 disk datatypes (ushort, silrdx).
+    (2)	6 in-core datatypes (the standard silrdx).
+    (3) Images of up to 7 dimensions are supported internally, though
+	only images of up to 3 dimensions are currently supported in the
+	interface.
+    (4)	Fully automatic multidimensional buffer allocation, resizing,
+	and deallocation.
+    (5) Arbitrary number of input buffers, allocated in a round robin
+	fashion, need not be the same size or dimension.
+    (5) Fully automatic type conversion.
+    (6) General image sections, coordinate flip, and subsampling.
+    (7) Both "compressed" and "block aligned" storage modes are
+	supported, with IMIO automatically selecting the optimal
+	choice during image creation.  The device blocksize is a
+	runtime variable.
+
+
+Planned future improvements:
+
+    (1)	Boundary extension.
+    (3) Optimization to the get/put line procedures to work directly
+	out of the FIO buffers when possible.
+    (3) Addition of the get/put pixel procedures.
+    (4) The image header is currently a simple binary file (structure).
+	Only one image header structure per header file is permitted.
+	Will be modified to use database facilities, and to permit
+	embedded image headers.
+    (5) Support for the unsigned byte disk datatype.
+
+
+FV NOTES:  I've made the following bug fixes:
+
+In imioff:
+   The setting of IM_PHYSDIM was taken outside the loop called when
+   IM_NDIM was zero.  There is was no way to set IM_PHYSDIM in the programmer
+   interface.
+
+In imhdr.h:
+   The offset to the user area IMU was changed from 603 to 613.  This was
+   a typo?
+
+In impnln:
+   The coerce statement is wrong since imgobf calls coerce to the
+   appropriate data type.
+
+In impnln:
+   There was a typo which did not set ve.
+
+------------------------
+
+Review image interface.  Device namining convention, use of explicit
+pathnames.  File read/write permissions required.  Why didn't imdopen
+work.
+
+Remove imdmap.x from system library, put in libim.a.
+
+
+Nov 84
+	Optimized line at a time i/o.  Added capability to reference directly
+into the FIO buffer.  This greatly improved the efficiency of simple image
+operations (no section, type conversion, etc.), without reducing the generality
+of the interface.
+
+
+---------------------------------------------------------------------------
+IMIO Modifications, April 1985
+
+
+1. Boundary Extension
+
+	types:		constant, nearest, reflect, wrap
+	parameters:	nbndrypix, tybndry, bndrypixval
+
+
+2. Database Access
+
+    New fields may be added to an image with IMADD.  The value of an existing
+field is set with one of the IMPUT procedures; automatic type conversion will
+be performed if necessary and permissible.  The value of an existing field is
+fetched with an IMGET procedure.  The image database interface is both forward
+and backward compatible, i.e., no changes are required to current programs and
+the same interface (ignoring minor semantic details) will be available when
+image headers are moved into DBIO.
+
+
+Functions
+
+	get,g - get the value of a field
+	put,p - set the value of a field
+	add,a - add a new field to a database
+	  acc - determine if the named field exists
+	  del - delete a field
+       gftype - get field datatype
+          gfn - get field name (matching a template)
+
+
+Procedures
+
+       value = imget[bcsilrdx] (im, "field")
+		        imgstr (im, "field", outstr, maxch)
+	       imput[bcsilrdx] (im, "field", value)
+		        impstr (im, "field", value)
+       	       imadd[bcsilrdx] (im, "field", def_value)
+		        imastr (im, "field", def_value)
+		        imaddf (im, "field", "datatype")
+	          y/n = imaccf (im, "field")
+			imdelf (im, "field")
+	       type = imgftype (im, "field")
+
+	     list = imofnl[us] (im, template)
+	   nchars/EOF = imgnfn (list, outstr, maxch)
+			imcfnl (list)
+
+
+The database interface may be used to access any field of the image header,
+including the following standard fields.  Note that the nomenclature has
+been changed slightly to make it more consistent with FITS.  Additional
+standard fields will be defined in the future.
+
+
+	  keyword     type                 description
+
+	i_naxis		i	number of axes (dimensionality)
+	i_naxis[1-7]	l	length of an axis ("i_naxis1", etc.)
+	i_pixtype	i	pixel datatype (SPP integer code)
+	i_minpixval	r	minimum pixel value
+	i_maxpixval	r	maximum pixel value
+	i_ctime		l	time of image creation
+	i_mtime		l	time of last modify
+	i_limtime	l	time when limits (minmax) were last updated
+	i_title		s	title string
+
+
+The following additional field names are recognized, but may disappear in the
+future:
+
+	i_history	s	history record (a string buffer at present)
+	i_pixfile	s	pathname of the pixel storage file
+
+
+The names of the standard fields share an "i_" prefix to reduce the possibility
+of collisions with data dependent keywords, to identify the standard fields in
+sorted listings, to allow use of pattern matching to discriminate between the
+standard fields and user fields, and so on.  The use of the "i_" prefix is
+made optional for the convenience of the interactive user, but the full name
+should always be used in compiled programs.
+
+
+3. Subfile Management (not implemented)
+
+    A subfile B of file A is a file which is logically subordinate to A but
+which is physically a separate file to the host operating system.  A subfile
+need not reside in the same directory as the main file.
+
+FIO shall provide support for subfiles as an abstract datatype.  For each
+ordinary file there shall optionally be zero or one subfile index files with
+the same root name as the main file but with the extension .zsf.  The index
+file, if present, shall list the subfiles of the main file.  The operations
+supported by FIO for subfiles shall include the following:
+
+
+	add a subfile to index and return pathname
+	delete a subfile from index and return pathname
+	get the pathname of a subfile
+	delete both index entry and physical file
+	delete a file and all subfiles
+
+
+It is important that FIO maintain the mapping of a subfile name to a physical
+file name to permit moves, copies, renames, etc. of files and their subfiles.
+Having to open the index file to get the pathname of a subfile is however
+inefficient.  To achieve both flexibility and efficiency the system packages
+IMIO and DBIO will cache the names of subfiles to eliminate most accesses to
+the index files.
+
+
+	add a subfile:
+	    add subfile to the index
+	    cache pathname
+
+	open subfile:
+	    repeat {
+		open subfile using cached pathname
+		if (file cannot be opened) {
+		    call fio to get the pathname of the subfile
+		    if (different from cached pathname) {
+			update cached pathname
+			next
+		    } else
+			error: cannot open file
+		} else {
+		    read file header and verify that this is our subfile
+		    if (not our subfile) {
+			close file
+			call fio to get the pathname of the subfile
+			if (different from cached pathname) {
+			    update cached pathname
+			    next
+			} else
+			    error: not our subfile
+		    } else
+			break			# success
+		}
+	    }

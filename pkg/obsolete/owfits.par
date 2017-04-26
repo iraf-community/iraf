@@ -1,0 +1,14 @@
+# FITS parameters
+iraf_files,s,a,,,,IRAF images
+fits_files,f,a,,,,FITS filename
+newtape,b,a,,,,Blank tape?
+make_image,b,h,yes,,,Create a FITS image?
+long_header,b,h,no,,,Print FITS header cards?
+short_header,b,h,yes,,,Print short header?
+bitpix,i,h,0,,,FITS bits per pixel
+blocking_factor,i,h,0,0,10,FITS tape blocking factor
+scale,b,h,yes,,,Scale data?
+autoscale,b,h,yes,,,Auto_scaling?
+bscale,r,a,1.0,,,FITS bscale
+bzero,r,a,0.0,,,FITS bzero
+mode,s,h,ql,,,

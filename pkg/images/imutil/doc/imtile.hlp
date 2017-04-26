@@ -1,0 +1,151 @@
+.help imtile Jan97 images.imutil
+.ih
+NAME
+imtile -- mosaic a list of same size images into a tile pattern
+.ih
+USAGE
+imtile input output nctile nltile
+.ih
+PARAMETERS
+.ls input
+The list of input image tiles to be mosaiced. The image tile list is assumed
+to be ordered by row, column, or in a raster pattern. If the image tile list
+is not in order then the files or sections tasks plus the editor must be used
+to construct an ordered image tile list. The images in the input list must
+all be the same size.
+.le
+.ls output
+The name of the output image.
+.le
+.ls nctile
+The number of image tiles to be placed along a row of the output image.
+.le
+.ls nltile
+The number of image tiles to be placed along a column of the output image.
+.le
+.ls trim_section = "[*,*]"
+The section of the input image tiles to be inserted into the output image.
+Trim_section can be used to flip and / or trim the individual image tiles
+before adding them to the mosaic. For example if we want to flip each
+image tile around the y axis before adding it to the mosaic, then
+\fItrim_section\fR should be set to "[*,-*]".
+.le
+.ls missing_input = ""
+The list of missing image tiles. For example if image tiles 3 to 5 and
+10 from a sequence of image tiles are missing then \fImissing_input\fR =
+"3-5,10". This parameter uses the IRAF ranges syntax. The number of missing
+image tiles plus the number of input image tiles must equal \fInctile\fR *
+\fInltile\fR.
+.le
+.ls start_tile = "ll"
+The position of the first input image tile placed in the output image mosaic.
+The four options are "ll" for lower left corner, "lr" for lower right corner,
+"ul" for upper left corner and "ur" for upper right corner.
+.le
+.ls row_order = yes
+Add the input image tiles to the output image in row order. If row_order is
+"no" then column order is used instead.
+.le
+.ls raster_order = no
+Add the input image tiles to the output image in a raster pattern or return
+to the start of a column or a row before adding a new image tile ?
+.le
+.ls median_section = ""
+The section of each input image tile used to compute the median value. If
+\fImedian_section\fR is the null string then the medians are not computed.
+If \fImedian_section\fR is "[*,*]" the entire input image tile is used to
+compute the median.
+.le
+.ls subtract = no
+Subtract the median value from each input image tile before placing the
+tile in the output image?
+.le
+.ls ncols = INDEF
+The number of columns in the output image. If \fIncols\fR is INDEF then
+the program will compute the number of columns using the size of the input
+image tiles, \fInctile\fR, and \fIncoverlap\fR.
+.le
+.ls nlines = INDEF
+The number of lines in the output image. If \fInlines\fR is INDEF then
+the program will compute the number of lines using the size of the input
+image tiles, \fInltile\fR and \fInloverlap\fR.
+.le
+.ls ncoverlap = -1
+The number of columns between adjacent tiles in the output image. A negative
+value specifies the amount of column space between adjacent tiles. A positive
+value specifies the amount of column overlap on adjacent tiles.
+.le
+.ls nloverlap = -1
+The number of lines between adjacent tiles in the output image. A negative
+value specifies the amount of lines space between adjacent tiles. A positive
+value specifies the amount of line overlap on adjacent tiles.
+.le
+.ls ovalue = 0.0
+The output image pixel value in regions undefined by the list of input
+image tiles.
+.le
+.ls opixtype = "r"
+The pixel type of the output image. The options are "s" (short integer),
+"i" (integer), "u" (ushort), "l" (long integer), "r" (real) and
+"d" for double precision.
+.le
+.ls verbose = yes
+Print messages about the progress of the task?
+.le
+
+.ih
+DESCRIPTION
+
+IMTILE takes the list of same size input images (image tiles) specified by
+\fIinput\fR and combines them into a tiled output image mosaic \fIoutput\fR.
+The order in which the input image tiles are placed in the output image is
+determined by the parameters \fIstart_tile\fR, \fIrow_order\fR and
+\fIraster_order\fR. The orientation of each individual image tile in the
+output image is set by the \fItrim_section\fR parameter.
+
+IMTILE uses the input image tile size, the number of image tiles, the
+\fIncoverlap\fR and \fRnloverlap\fI parameters, and the \fInctile\fR and
+\fInltile\fR parameters to compute the size of the output image. An image
+of size larger than the minimum required can be specified by setting the
+\fIncols\fR and \fInlines\fR parameters. The pixel type of the output
+image is specified by the \fIopixtype\fR parameter and undefined
+regions of the output image are assigned the value \fIovalue\fR.
+
+The median of a section of each input image tile is computed by setting
+the \fImedian_section\fR parameter,  and the computed median is subtracted
+from the input image tiles if the \fIsubtract\fR parameter is set to "yes".
+Task action messages will be printed on the standard output
+if \fIverbose\fR is set to yes.
+
+.ih
+EXAMPLES
+
+1. Mosaic a list of 64 images onto an 8 by 8 grid in column order
+starting in the upper right hand corner. Allow one blank column and row
+between each subraster.
+
+.nf
+    cl> imtile @imlist mosaic 8 8 ncoverlap=-1 nloverlap=-1 \
+        start_tile="ur" row-
+.fi
+
+2. Mosaic a list of 62 images onto an 8 by 8 grid in column order
+starting in the upper right hand corner. Allow one blank column and row
+between each subraster. Subrasters 3 and 9 in the sequence do not exist
+and are to be replaced in the output image with an unknown value of -1.0.
+
+.nf
+    cl> imtile @imlist mosaic 8 8 nxoverlap=-1 nyoverlap=-1  \
+        start_corner="ur" row- missing_input="3,9", ovalue=-1.0
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+imcombine
+.endhelp

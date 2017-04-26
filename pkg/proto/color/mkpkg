@@ -1,0 +1,20 @@
+# MKPKG file for the COLOR Package
+
+$call update
+$exit
+
+update:
+	$call update@src
+
+	$ifeq (HOSTID, vms) $purge [...] $endif
+	;
+
+relink:
+	$call relink@src
+
+	$ifeq (HOSTID, vms) $purge [...] $endif
+	;
+
+install:
+	$call install@src
+	;

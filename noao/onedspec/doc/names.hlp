@@ -1,0 +1,67 @@
+.help names Mar92 noao.onedspec
+.ih
+NAME
+names -- Generate image names from a root and a range descriptor
+.ih
+USAGE
+names input records
+.ih
+PARAMETERS
+.ls input
+The root file name for the input records to be calibrated.
+.le
+.ls records
+The range of spectra to be included in the calibration operation.
+Each range item will be appended to the root name to form an
+image file name.
+.le
+.ls append = ""
+If not a null string, this character string will be appended to
+all the generated image names. This allows for a specification of
+image sections.
+.le
+.ls check = no
+If set to yes, a check is made that each name implied by the range
+specification has at least an image header. The pixel file is not
+checked. If set to no, then all possible image names are generated
+even if no image exists.
+.le
+.ih
+DESCRIPTION
+A sequence of image names is generated from the input root file name
+and the range description by appending the possible range values to
+the root in the form "root.nnnn". At least four digits will follow the
+root.
+
+If an append string is specified, this is added to the image name as well.
+
+The generated image names are written to STDOUT, but may be redirected
+to a file for further use.
+.ih
+EXAMPLES
+The following will generate names of the form nite1.0001, nite1.0002 ...
+nite1.0010 and place the list in the file nite1.lst.
+
+.nf
+	cl> names nite1 1-10 >nite1.lst
+.fi
+
+The next example uses the append option to specify that only the
+first 512 pixels of each image (spectrum) are to used in the image name.
+
+.nf
+	cl> names nite1 1-10 append="[1:512]" >nite1.lst
+.fi
+.ih
+REVISIONS
+.ls NAMES V2.10
+This task is unchanged.
+.le
+.ih
+.ih
+BUGS
+The append option is only useful for adding image sections since it is
+added after the ONEDSPEC name is generated.  Appending other strings
+produces names such as root.0012str which are not recognized by
+the package.
+.endhelp

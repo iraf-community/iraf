@@ -1,0 +1,344 @@
+# System error message file.  Messages may appear in any order; error
+# codes must be left justified and must agree with those defined in
+# <syserr.h>.  System error codes start at 500; 1-499 are reserved for
+# applications and user programs.  It is wise to reserve a lot of extra
+# error codes for each package.
+
+# Exceptions (501-503)
+501 Access violation
+502 Arithmetic exception
+503 Interrupt
+504 Write to IPC (to a subprocess) with no reader
+
+# SYSTEM, TTY, MEMIO (550-599)
+550 ONERROR: Too many procedures to remember
+551 ONEXIT: Too many procedures to remember
+552 Environment variable not found or not integer
+553 Environment variable not found
+554 Illegal cursor coordinates passed to 'ttymov'
+555 Too many capabilities in termcap entry
+556 No entry in device capabilities file for device
+557 Attempt to set unknown parameter in ttyset
+558 Attempt to read unknown parameter in ttystat
+559 Excessive nesting in termcap; recursive tc reference?
+560 Internal error: termcap caplist index is faulty, search fails
+561 Attempt to open too many graphics devices at once
+562 Invalid or null tty descriptor
+570 Memory has been corrupted
+571 STROPEN: String not aligned with Mem
+572 Out of memory
+573 Pointer underflow
+574 Pointer overflow
+575 Attempt to free already freed pointer
+576 Attempt to free NULL pointer
+577 System stack underflow (invalid SFREE)
+578 Too many child processes
+579 Cannot open connected subprocess
+580 Process PID not found in process table
+581 Cannot send signal to child process
+582 Invalid IPC syntax or protocol
+583 Background job not found in job table
+584 Cannot kill background job
+585 Too many background jobs
+586 Cannot open detached process
+587 Prstat: unrecognized parameter code
+588 Unsolicited command input from a subprocess
+589 This stty parameter requires a numeric argument
+590 Stdgraph device not recorded in stty playback file
+591 PS_OPEN: cannot allocate descriptor
+592 Unrecognized postscript font
+593 Unrecognized postscript special font
+
+594 URL Not Found
+595 URL Permission Denied
+596 URL Internal Error
+597 URL Bad Request
+598 URL Redirection
+
+# CLIO (600-649)
+600 Task has too many psets
+601 Out of space for pset name storage
+602 EOF while reading non list structured parameter
+603 Parameter not a legal boolean (try 'yes' or 'no')
+604 Parameter not a legal character constant
+605 Parameter not a legal number
+606 Illegal argument to CLSTATUS
+607 CLSET: Attempt to set unknown option
+608 CLGWRD: No match, or ambiguous abbreviation
+609 Commands can only be sent to the CL from a connected subprocess
+
+620 Bad file name template descriptor
+621 Illegal file name template
+622 Too many concatenatable sublists in filename template
+623 Too many string replacements in filename template
+624 Cannot edit a string constant filename template
+
+# FIO (700-799)
+720 Cannot preallocate space for file
+721 AREAD transfer not aligned on a device block boundary
+722 Attempt to read out of bounds on file
+723 AWRITE transfer not aligned on a device block boundary
+724 Attempt to write out of bounds on file
+725 Cannot clobber file
+726 Operation would overwrite existing file
+727 Attempt to clobber a file which is already open
+728 Cannot delete file
+729 Attempt to delete a protected file
+730 Attempt to open file on a device not known to FIO
+731 Cannot read status of device
+732 FIO device table has overflowed
+733 Illegal file descriptor (bad fd or file not open)
+734 Illegal file access mode parameter to OPEN
+735 Illegal file type parameter to OPEN
+736 Missing AWAIT after an AREAD or AWRITE
+737 FINIT may only be called during process startup
+738 Cannot make unique temporary file name
+739 No read permission on file
+740 No write permission on file
+741 Cannot open file
+742 Cannot open device
+743 OPEN: File does not exist
+744 Cannot protect file
+745 Attempt to alter or query protection of a nonexistent file
+746 File read error
+747 Attempt to delete a nonexistent file
+748 Cannot rename file
+749 Rename would clobber existing file
+750 Illegal file access mode parameter to REOPEN
+751 Illegal file type parameter to REOPEN
+752 Seek error on file
+753 Attempt to set an unknown file parameter
+754 SYS_FSTAT
+755 Attempt to get file status for unknown parameter
+756 SYS_FSTRFILOVFL
+757 Too many open files
+758 Cannot remove file protection
+759 File write error
+760 Cannot access file
+761 Cannot open file
+762 Buffer overflow in ZMAPFN
+763 Overflow in ZMAPFN (recursion in logical name defn?)
+764 Cannot determine pathname of file
+765 Cannot determine pathname of the current working directory
+766 Can only seek to EOF on a text file opened for writing
+767 Attempt to get file status for non-integer value
+768 Cannot get info on file
+769 No write perm on directory; cannot lock file
+770 Illegal VFN database access mode
+771 Invalid checksum reading VFN mapping file
+772 Maximum filename degeneracy exceeded
+773 Long filename storage exceeded
+774 Broken directory protection lock
+775 Cannot close file
+776 Attempt to redirect an stream which is not open
+777 Attempt to redirect a stream which is already redirected
+778 Cannot change directory
+779 Cannot open directory
+780 Cannot access file
+781 Pushback buffer overflow (recursive macro?)
+782 Out of bounds or misaligned FREADP call
+783 Out of bounds or misaligned FWRITEP call
+784 Cannot make directory
+785 Cannot remove directory
+786 Directory name is too long
+787 Cannot access directory
+788 Cannot access template file or cannot make copy file
+789 Static files cannot be opened NEW_FILE - use falloc
+790 Illegal filename operand (null string)
+791 FSETI: The F_CLOSEFD option is not supported for text files
+792 FSETI: The F_CLOSEFD option cannot be used with files opened NEW_FILE
+793 FUTIME: Cannot reset file access/modify time
+794 Cannot create symlink
+795 Cannot remove symlink
+
+# IMIO (800-899)
+800 Cannot read pixel storage file
+801 Cannot update image header
+802 Illegal image access mode
+803 Image is illegally dimensioned
+804 Negative or zero length dimension
+805 New copy of a non-image
+806 Not a legal imagefile
+807 Pixel storage file is truncated
+808 Pixel subscript out of bounds
+809 Cannot read image header
+810 Cannot specify section for a new image
+811 Invalid image section
+812 Wrong number of subscripts in image section
+813 Wrong sign on step size in image section
+814 IMSET: Attempt to set unknown option
+815 IMSTAT: Attempt to read unknown option
+816 Cannot create a new image on a special image device
+817 Too many field names in image header field name template
+818 Group format images must all be the same size
+819 Range list too large to fit in image buffer
+
+820 Operation would overwrite existing image
+821 Cannot close image
+822 Cannot copy image
+823 Cannot delete image
+824 Illegal image type (extension)
+825 Cannot access image
+826 IKI image kernel table overflow
+827 Cannot open image
+828 Cannot open pixel file
+829 Cannot rename image
+830 Cannot update image header
+831 Kernel section syntax not supported for this image
+832 Ambiguous image name
+
+835 Image header parameter not found
+836 Out of space in image header
+837 Attempt to redefine an image header parameter
+838 Impossible type conversion when accessing image header parameter
+839 Cannot delete image header parameter
+840 Attempt to delete a nonexistent image parameter
+
+# GIO (850-899)
+850 Cannot read graphics cursor
+851 Cannot restore graphics world coordinate systems
+852 Entire graphics vector is indefinite
+853 Illegal axis number passed to gscale (must be x=1 or y=2)
+854 Unknown GIO parameter referenced in gset call
+855 Unknown GIO parameter referenced in gstat call
+856 Invalid graphics window: no range in X
+857 Invalid graphics window: no range in Y
+858 Cannot read cell array from graphics device
+859 I/O on uninitialized graphics stream
+860 Unknown parameter request from graphics kernel subprocess
+861 Terminal does not support vector graphics
+862 No stdimage device has been specified 
+863 No stdplot device has been specified
+864 No GIO kernel specified for graphics device
+
+# MTIO (900-949)
+900 Illegal magtape unit specification
+901 Illegal magtape access mode
+902 Magtape unit already allocated to
+903 Attempt to multiply open magtape unit
+904 Magtape unit not allocated
+905 Magtape unit allocated to someone else
+906 Current position of magtape unit is undefined
+907 Attempt to position magtape to record beyond EOF
+908 Cannot rewind device
+909 Magtape device not found
+910 Bad tapecap entry for magtape device
+
+919 PLIO: mask has been corrupted
+920 PLIO: range list overflow
+921 PLIO: bad mask save file
+922 PLIO: i/o to inactive descriptor
+923 PLIO: invalid descriptor
+924 PLIO: source raster required but not specified
+925 PLIO: reference out of bounds on mask
+926 PMIO: null reference image
+927 PMIO: mask must be the same size as reference image
+928 PLIO: stack overflow
+929 PLIO: invalid mask parameter referenced
+
+930 File does not appear to be a FMIO datafile
+931 Error closing FMIO datafile
+932 Error rebuilding FMIO datafile
+933 Error copying FMIO datafile
+934 FMIO: bad lfile number
+935 FMIO: out of lfiles
+936 FMIO: cannot open datafile
+937 FMIO: datafile too large - increase page size or MAXPTPAGES
+938 Read error on FMIO datafile
+939 FMIO: datafile appears to be truncated
+940 Write error on FMIO datafile
+941 FMIO: datafile page size not a multiple of device block size
+942 FMIO: attempt to reopen for writing an lfile already open for reading
+943 FMIO: attempt to open an lfile already open for exclusive access
+944 FMIO: lfile cache overflow
+945 FMIO: attempt to obtain a lock on an already active lfile
+
+948 QPIO: blocking factor is out of range
+949 QPIO: illegal event coordinate type
+950 QPOE: too many macro definition files in list
+951 QPOE: header parameter has bad datatype code
+952 Error reading QPOE file header
+953 QPOE: cannot read event list index
+954 QPOE: cannot parse coordinate pair key specification for index
+955 QPOE: cannot read parameter value
+956 QPIO: new event list would clobber existing header parameter
+957 QPOE: cannot build index for unordered event list
+958 QPEX: bad range specifier in event attribute filter
+959 QPEX: data buffer overflow (expanded expression too large)
+960 Maximum nesting exceeded in QPEX expression
+961 QPEX syntax error: missing left parenthesis
+962 QPEX: program buffer overflow (expression too large)
+963 QPEX syntax error: unmatched right parenthesis
+964 QPOE: array parameter index out of range
+965 QPOE: cannot parse event structure field list
+966 QPOE: probable macro recursion detected
+967 QPIO: attempt to open an nonevent parameter for event i/o
+968 QPIO: cannot read event list header
+969 QPOE: cannot access parameter value field
+970 QPIO: default index key not flagged in event struct field list
+971 QPIO: pixel mask not same size as image
+972 QPOE: attempt to open existing nonarray parameter for array i/o
+973 QPOE: attempt to use getparam to fetch value of struct type parameter
+974 QPOE: attempt to redefine an existing header parameter
+975 QPOE: unknown parameter
+976 QPIO: coordinate fields used for index must be a numeric type
+977 QPOE file does not have a default WCS
+978 QPIO expression syntax
+979 QPEX: errors encountered while compiling expression
+
+980 MWCS: too many WCS attributes
+981 MWCS: too many function calls in compiled transformation
+982 MWCS: too many function calls in WCS
+983 MWCS: cannot invert axis map
+984 MWCS: bad MWCS save buffer
+985 MWCS: too many WCS
+986 MWCS: cannot compile transformation, dependent axis has been excluded
+987 MWCS: dimension mismatch
+988 MWCS: no current default WCS
+989 MWCS: no sampled WCS has been entered
+990 MWCS: cannot compile transformation, rotated axis has been excluded
+991 MWCS: mw_seti called with bad interface parameter type code
+992 MWCS: mw_stati called with bad interface parameter type code
+993 MWCS: unknown WCS function type
+994 MWCS: attribute not found
+995 MWCS: coordinate system not defined
+996 MWCS: attempt to redefine an existing coordinate system
+997 MWCS: function driver table overflow
+998 MWCS: too many coordinate transformation (ctran) descriptors
+999 MWCS: mw_rotate can only deal with rotations between two axes
+1000 MWCS: out of storage for FITS-WCS cards
+
+1100 FXF: cannot delete multiple FITS extension file
+1101 FXF: numeric value only allowed as second term in ksection
+1102 FXF: number is not a decimal
+1103 FXF: syntax error in kernel section
+1104 FXF: string value only allowed as first term in ksection
+1105 FXF: 'ext' is ambiguous in ksection
+1106 FXF: invalid value for kernel section parameter
+1107 FXF: value for ksection parameter must be positive
+1108 FXF: to overwrite you need to specify [ext#] or [extname,extver]
+1109 FXF: to do this operation you need to specify overwrite mode
+1110 FXF: extension number not allowed with mode
+1111 FXF: overwrite not allowed with mode
+1112 FXF: extname and/or extver value already exists in extension
+1113 FXF: must specify which FITS extension
+1114 FXF: attempt to overwrite non-image extension
+1115 FXF: overwrite: cannot open temporary image
+1116 FXF: byte_short: illegal datatype
+1117 FXF: pak_data: image datatype not supported
+1118 FXF: BSCALE, BZERO not supported for floating data
+1119 FXF: inherit not permitted when PHU has NAXIS != 0
+1120 FXF: extname and/or extver value not found
+1121 FXF: EOF encountered while reading FITS file
+1122 FXF: bad FITS file NAXIS value
+1123 FXF: SIMPLE keyword value is not standard
+1124 FXF: trying to modify the FITS header of a non-IMAGE extension
+1125 FXF: setbitpix: unrecognized IRAF datatype
+1126 FXF: expanding extension is disabled, header will be truncated
+1127 FXF: upk_data: image datatype not supported
+1128 FXF: FITS image kernel abort - null driver entry point
+1129 FXF: Bad extension number combination
+1130 FXF: Fkinit extension number not equal to kernel section's
+1131 FXF: Bad extension name and extension number combination
+1132 FXF: IMAGE extension not found
+1133 FXF: Error reading mask extension

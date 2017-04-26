@@ -1,0 +1,70 @@
+.help dcmpf Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDCMF (COEFFS,XZ,YZ,XS,YS,PERP,ORIENT)
+
+     - - - - - -
+      D C M F
+     - - - - - -
+
+  Decompose an [X,Y] linear fit into its constituent parameters:
+  zero points, scales, nonperpendicularity and orientation.
+
+  Given:
+     COEFFS  d(6)      transformation coefficients (see note)
+
+  Returned:
+     XZ       d        x zero point
+     YZ       d        y zero point
+     XS       d        x scale
+     YS       d        y scale
+     PERP     d        nonperpendicularity (radians)
+     ORIENT   d        orientation (radians)
+
+  The model relates two sets of [X,Y] coordinates as follows.
+  Naming the elements of COEFFS:
+
+     COEFFS(1) = A
+     COEFFS(2) = B
+     COEFFS(3) = C
+     COEFFS(4) = D
+     COEFFS(5) = E
+     COEFFS(6) = F
+
+  the model transforms coordinates [X1,Y1] into coordinates
+  [X2,Y2] as follows:
+
+     X2 = A + B*X1 + C*Y1
+     Y2 = D + E*X1 + F*Y1
+
+  The transformation can be decomposed into four steps:
+
+     1)  Zero points:
+
+             x' = XZ + X1
+             y' = YZ + Y1
+
+     2)  Scales:
+
+             x'' = XS*x'
+             y'' = YS*y'
+
+     3)  Nonperpendicularity:
+
+             x''' = cos(PERP/2)*x'' + sin(PERP/2)*y''
+             y''' = sin(PERP/2)*x'' + cos(PERP/2)*y''
+
+     4)  Orientation:
+
+             X2 = cos(ORIENT)*x''' + sin(ORIENT)*y'''
+             Y2 =-sin(ORIENT)*y''' + cos(ORIENT)*y'''
+
+  See also slFTXY, slPXY, slINVF, slXYXY
+
+  P.T.Wallace   Starlink   14 August 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

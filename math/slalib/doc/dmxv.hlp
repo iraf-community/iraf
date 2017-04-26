@@ -1,0 +1,29 @@
+.help dmxv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDMXV (DM, VA, VB)
+
+     - - - - -
+      D M X V
+     - - - - -
+
+  Performs the 3-D forward unitary transformation:
+
+     vector VB = matrix DM * vector VA
+
+  (double precision)
+
+  Given:
+     DM       dp(3,3)    matrix
+     VA       dp(3)      vector
+
+  Returned:
+     VB       dp(3)      result vector
+
+  P.T.Wallace   Starlink   March 1986
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,1263 @@
+include	<ctotok.h>
+include	<imhdr.h>
+include	<ctype.h>
+include	<mach.h>
+include	<imset.h>
+include	<fset.h>
+include	<lexnum.h>
+include	<evvexpr.h>
+include	"gettok.h"
+
+
+# IMEXPR.X -- Image expression evaluator.
+
+define	MAX_OPERANDS	26
+define	MAX_ALIASES	10
+define	DEF_LENINDEX	97
+define	DEF_LENSTAB	1024
+define	DEF_LENSBUF	8192
+define	DEF_LINELEN	32768
+
+# Input image operands.
+define	LEN_IMOPERAND	18
+define	IO_OPNAME	Memi[$1]		# symbolic operand name
+define	IO_TYPE		Memi[$1+1]		# operand type
+define	IO_IM		Memi[$1+2]		# image pointer if image
+define	IO_V		Memi[$1+3+($2)-1]	# image i/o pointer
+define	IO_DATA		Memi[$1+10]		# current image line
+			# align
+define	IO_OP		($1+12)			# pointer to evvexpr operand
+
+# Image operand types (IO_TYPE). 
+define	IMAGE		1			# image (vector) operand
+define	NUMERIC		2			# numeric constant
+define	PARAMETER	3			# image parameter reference
+
+# Main imexpr descriptor.
+define	LEN_IMEXPR	(24+LEN_IMOPERAND*MAX_OPERANDS)
+define	IE_ST		Memi[$1]		# symbol table
+define	IE_IM		Memi[$1+1]		# output image
+define	IE_NDIM		Memi[$1+2]		# dimension of output image
+define	IE_AXLEN	Memi[$1+3+($2)-1]	# dimensions of output image
+define	IE_INTYPE	Memi[$1+10]		# minimum input operand type
+define	IE_OUTTYPE	Memi[$1+11]		# datatype of output image
+define	IE_BWIDTH	Memi[$1+12]		# npixels boundary extension
+define	IE_BTYPE	Memi[$1+13]		# type of boundary extension
+define	IE_BPIXVAL	Memr[P2R($1+14)]	# boundary pixel value
+define	IE_V		Memi[$1+15+($2)-1]	# position in output image
+define	IE_NOPERANDS	Memi[$1+22]		# number of input operands
+			# align
+define	IE_IMOP		($1+24+(($2)-1)*LEN_IMOPERAND)	# image operand array
+
+# Expression database symbol.
+define	LEN_SYM		2
+define	SYM_TEXT	Memi[$1]
+define	SYM_NARGS	Memi[$1+1]
+
+# Argument list symbol
+define	LEN_ARGSYM	1
+define	ARGNO		Memi[$1]
+
+
+# IMEXPR -- Task procedure for the image expression evaluator.  This task
+# generates an image by evaluating an arbitrary vector expression, which may
+# reference other images as input operands.
+#
+# The input expression may be any legal EVVEXPR expression.  Input operands
+# must be specified using the reserved names "a" through "z", hence there are
+# a maximum of 26 input operands.  An input operand may be an image name or
+# image section, an image header parameter, a numeric constant, or the name
+# of a builtin keyword.  Image header parameters are specified as, e.g.,
+# "a.naxis1" where the operand "a" must be assigned to an input image.  The
+# special image name "." refers to the output image generated in the last
+# call to imexpr, making it easier to perform a sequence of operations.
+
+procedure t_imexpr()
+
+double	dval
+bool	verbose, rangecheck
+pointer	out, st, sp, ie, dims, intype, outtype, ref_im
+pointer	outim, fname, expr, xexpr, output, section, data, imname
+pointer	oplist, opnam, opval, param, io, ip, op, o, im, ia, emsg
+int	len_exprbuf, fd, nchars, noperands, dtype, status, i, j
+int	ndim, npix, ch, percent, nlines, totlines, flags, mapflag
+
+real	clgetr()
+double	imgetd()
+int	imgftype(), clgwrd(), ctod()
+bool	clgetb(), imgetb(), streq(), strne()
+int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
+int	impnls(), impnli(), impnll(), impnlr(), impnld()
+int	open(), getci(), ie_getops(), lexnum(), stridxs()
+int	imgeti(), ctoi(), btoi(), locpr(), clgeti(), strncmp()
+pointer	ie_getexprdb(), ie_expandtext(), immap()
+extern	ie_getop(), ie_fcn()
+pointer	evvexpr()
+long	fstatl()
+
+string	s_nodata "bad image: no data"
+string	s_badtype "unknown image type"
+define	numeric_ 91
+define	image_ 92
+
+begin
+	# call memlog ("--------- START IMEXPR -----------")
+
+	call smark (sp)
+	call salloc (ie, LEN_IMEXPR, TY_STRUCT)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (output, SZ_PATHNAME, TY_CHAR)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (intype, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_FNAME, TY_CHAR)
+	call salloc (oplist, SZ_LINE, TY_CHAR)
+	call salloc (opval, SZ_LINE, TY_CHAR)
+	call salloc (dims, SZ_LINE, TY_CHAR)
+	call salloc (emsg, SZ_LINE, TY_CHAR)
+
+	# Initialize the main imexpr descriptor.
+	call aclri (Memi[ie], LEN_IMEXPR)
+
+	verbose = clgetb ("verbose")
+	rangecheck = clgetb ("rangecheck")
+
+	# Load the expression database, if any.
+	st = NULL
+	call clgstr ("exprdb", Memc[fname], SZ_PATHNAME)
+	if (strne (Memc[fname], "none"))
+	    st = ie_getexprdb (Memc[fname])
+	IE_ST(ie) = st
+
+	# Get the expression to be evaluated and expand any file inclusions
+	# or macro references.
+
+	len_exprbuf = SZ_COMMAND
+	call malloc (expr, len_exprbuf, TY_CHAR)
+	call clgstr ("expr", Memc[expr], len_exprbuf)
+
+	if (Memc[expr] == '@') {
+	    fd = open (Memc[expr+1], READ_ONLY, TEXT_FILE)
+	    nchars = fstatl (fd, F_FILESIZE)
+	    if (nchars > len_exprbuf) {
+		len_exprbuf = nchars
+		call realloc (expr, len_exprbuf, TY_CHAR)
+	    }
+	    for (op=expr;  getci(fd,ch) != EOF;  op = op + 1) {
+		if (ch == '\n')
+		    Memc[op] = ' '
+		else
+		    Memc[op] = ch
+	    }
+	    Memc[op] = EOS
+	    call close (fd)
+	}
+
+	if (st != NULL) {
+	    xexpr = ie_expandtext (st, Memc[expr])
+	    call mfree (expr, TY_CHAR)
+	    expr = xexpr
+	    if (verbose) {
+		call printf ("%s\n")
+		    call pargstr (Memc[expr])
+		call flush (STDOUT)
+	    }
+	}
+
+	# Get output image name.
+	call clgstr ("output", Memc[output], SZ_PATHNAME)
+	call imgimage (Memc[output], Memc[imname], SZ_PATHNAME)
+
+	IE_BWIDTH(ie) = clgeti ("bwidth")
+	IE_BTYPE(ie)  = clgwrd ("btype", Memc[oplist], SZ_LINE,
+	    "|constant|nearest|reflect|wrap|project|")
+	IE_BPIXVAL(ie) = clgetr ("bpixval")
+
+	# Determine the minimum input operand type.
+	call clgstr ("intype", Memc[intype], SZ_FNAME)
+
+	if (strncmp (Memc[intype], "auto", 4) == 0)
+	    IE_INTYPE(ie) = 0
+	else {
+	    switch (Memc[intype]) {
+	    case 'i', 'l':
+		IE_INTYPE(ie) = TY_INT
+	    case 'r':
+		IE_INTYPE(ie) = TY_REAL
+	    case 'd':
+		IE_INTYPE(ie) = TY_DOUBLE
+	    default:
+		IE_INTYPE(ie) = 0
+	    }
+	}
+
+	# Parse the expression and generate a list of input operands.
+	noperands = ie_getops (st, Memc[expr], Memc[oplist], SZ_LINE)
+	IE_NOPERANDS(ie) = noperands
+
+	# Process the list of input operands and initialize each operand.
+	# This means fetch the value of the operand from the CL, determine
+	# the operand type, and initialize the image operand descriptor.
+	# The operand list is returned as a sequence of EOS delimited strings.
+
+	opnam = oplist
+	do i = 1, noperands {
+	    io = IE_IMOP(ie,i)
+	    if (Memc[opnam] == EOS)
+		call error (1, "malformed operand list")
+
+	    call clgstr (Memc[opnam], Memc[opval], SZ_LINE)
+	    IO_OPNAME(io) = Memc[opnam]
+	    ip = opval
+
+	    # Initialize the input operand; these values are overwritten below.
+	    o = IO_OP(io)
+	    call aclri (Memi[o], LEN_OPERAND)
+
+	    if (Memc[ip] == '.' && (Memc[ip+1] == EOS || Memc[ip+1] == '[')) {
+		# A "." is shorthand for the last output image.
+		call strcpy (Memc[ip+1], Memc[section], SZ_FNAME)
+		call clgstr ("lastout", Memc[opval], SZ_LINE)
+		call strcat (Memc[section], Memc[opval], SZ_LINE)
+		goto image_
+
+	    } else if (IS_LOWER(Memc[ip]) && Memc[ip+1] == '.') {
+		# "a.foo" refers to parameter foo of image A.  Mark this as
+		# a parameter operand for now, and patch it up later.
+
+		IO_TYPE(io) = PARAMETER
+		IO_DATA(io) = ip
+		call salloc (IO_DATA(io), SZ_LINE, TY_CHAR)
+		call strcpy (Memc[ip], Memc[IO_DATA(io)], SZ_LINE)
+
+	    } else if (ctod (Memc, ip, dval) > 0) {
+		if (Memc[ip] != EOS)
+		    goto image_
+
+		# A numeric constant.
+numeric_	IO_TYPE(io) = NUMERIC
+
+		ip = opval
+		switch (lexnum (Memc, ip, nchars)) {
+		case LEX_REAL:
+		    dtype = TY_REAL
+		    if (stridxs("dD",Memc[opval]) > 0 || nchars > NDIGITS_RP+3)
+			dtype = TY_DOUBLE
+		    O_TYPE(o) = dtype
+		    if (dtype == TY_REAL)
+			O_VALR(o) = dval
+		    else
+			O_VALD(o) = dval
+		default:
+		    O_TYPE(o) = TY_INT
+		    O_LEN(o)  = 0
+		    O_VALI(o) = int(dval)
+		}
+
+	    } else {
+		# Anything else is assumed to be an image name.
+image_
+		ip = opval
+		call imgimage (Memc[ip], Memc[fname], SZ_PATHNAME)
+		if (streq (Memc[fname], Memc[imname]))
+		    call error (2, "input and output images cannot be the same")
+
+		im = immap (Memc[ip], READ_ONLY, 0)
+
+		# Set any image options.
+		if (IE_BWIDTH(ie) > 0) {
+		    call imseti (im, IM_NBNDRYPIX, IE_BWIDTH(ie))
+		    call imseti (im, IM_TYBNDRY, IE_BTYPE(ie))
+		    call imsetr (im, IM_BNDRYPIXVAL, IE_BPIXVAL(ie))
+		}
+
+		IO_TYPE(io) = IMAGE
+		call amovkl (1, IO_V(io,1), IM_MAXDIM)
+		IO_IM(io) = im
+
+		switch (IM_PIXTYPE(im)) {
+		case TY_SHORT, TY_INT, TY_LONG, TY_REAL, TY_DOUBLE:
+		    O_TYPE(o) = IM_PIXTYPE(im)
+		case TY_COMPLEX:
+		    O_TYPE(o) = TY_REAL
+		default:			# TY_USHORT
+		    O_TYPE(o) = TY_INT
+		}
+
+		O_TYPE(o) = max (IE_INTYPE(ie), O_TYPE(o))
+		O_LEN(o) = IM_LEN(im,1)
+		O_FLAGS(o) = 0
+
+		# If one dimensional image read in data and be done with it.
+		if (IM_NDIM(im) == 1) {
+		    switch (O_TYPE(o)) {
+
+		    case TY_SHORT:
+			if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (3, s_nodata)
+
+		    case TY_INT:
+			if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (3, s_nodata)
+
+		    case TY_LONG:
+			if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (3, s_nodata)
+
+		    case TY_REAL:
+			if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (3, s_nodata)
+
+		    case TY_DOUBLE:
+			if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (3, s_nodata)
+
+		    default:
+			    call error (4, s_badtype)
+		    }
+		}
+	    }
+
+
+	    # Get next operand name.
+	    while (Memc[opnam] != EOS)
+		opnam = opnam + 1
+	    opnam = opnam + 1
+	}
+
+	# Go back and patch up any "a.foo" type parameter references.  The
+	# reference input operand (e.g. "a") must be of type IMAGE and must
+	# point to a valid open image.
+
+	do i = 1, noperands {
+	    mapflag = NO	     
+	    io = IE_IMOP(ie,i)
+	    ip = IO_DATA(io)
+	    if (IO_TYPE(io) != PARAMETER)
+		next
+
+	    # Locate referenced symbolic image operand (e.g. "a").
+	    ia = NULL
+	    do j = 1, noperands {
+		ia = IE_IMOP(ie,j)
+		if (IO_OPNAME(ia) == Memc[ip] && IO_TYPE(ia) == IMAGE)
+		    break
+		ia = NULL
+	    }
+	    if (ia == NULL && (IS_LOWER(Memc[ip]) && Memc[ip+1] == '.')) {
+		# The parameter operand is something like 'a.foo' however
+		# the image operand 'a' is not in the list derived from the
+		# expression, perhaps because we just want to use a parameter
+		# from a reference image and not the image itself.  In this
+		# case map the image so we can get the parameter.
+
+	        call strcpy (Memc[ip], Memc[opval], 1)
+	        call clgstr (Memc[opval], Memc[opnam], SZ_LINE)
+		call imgimage (Memc[opnam], Memc[fname], SZ_PATHNAME)
+
+		iferr (im = immap (Memc[fname], READ_ONLY, 0)) {
+		    call sprintf (Memc[emsg], SZ_LINE,
+		        "bad image parameter reference %s")
+		        call pargstr (Memc[ip])
+		    call error (5, Memc[emsg])
+		} else 
+		    mapflag = YES
+
+	    } else if (ia == NULL) {
+		call sprintf (Memc[emsg], SZ_LINE,
+		    "bad image parameter reference %s")
+		    call pargstr (Memc[ip])
+		call error (5, Memc[emsg])
+
+	    } else
+	        im = IO_IM(ia)
+
+	    # Get the parameter value and set up operand struct.
+	    param = ip + 2
+	    IO_TYPE(io) = NUMERIC
+	    o = IO_OP(io)
+	    O_LEN(o) = 0
+
+	    switch (imgftype (im, Memc[param])) {
+	    case TY_BOOL:
+		O_TYPE(o) = TY_BOOL
+		O_VALI(o) = btoi (imgetb (im, Memc[param]))
+
+	    case TY_CHAR:
+		O_TYPE(o) = TY_CHAR
+		O_LEN(o)  = SZ_LINE
+		call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
+		call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
+
+	    case TY_INT:
+		O_TYPE(o) = TY_INT
+		O_VALI(o) = imgeti (im, Memc[param])
+
+	    case TY_REAL:
+		O_TYPE(o) = TY_DOUBLE
+		O_VALD(o) = imgetd (im, Memc[param])
+
+	    default:
+		call sprintf (Memc[emsg], SZ_LINE, "param %s not found\n")
+		    call pargstr (Memc[ip])
+		call error (6, Memc[emsg])
+	    }
+
+	    if (mapflag == YES)
+		call imunmap (im)
+	}
+
+	# Determine the reference image from which we will inherit image
+	# attributes such as the WCS.  If the user specifies this we use
+	# the indicated image, otherwise we use the input image operand with
+	# the highest dimension.
+
+	call clgstr ("refim", Memc[fname], SZ_PATHNAME)
+	if (streq (Memc[fname], "auto")) {
+	    # Locate best reference image (highest dimension).
+	    ndim = 0
+	    ref_im = NULL
+
+	    do i = 1, noperands {
+		io = IE_IMOP(ie,i)
+		if (IO_TYPE(io) != IMAGE || IO_IM(io) == NULL)
+		    next
+
+		im = IO_IM(io)
+		if (IM_NDIM(im) > ndim) {
+		    ref_im = im
+		    ndim = IM_NDIM(im)
+		}
+	    }
+	} else {
+	    # Locate referenced symbolic image operand (e.g. "a").
+	    io = NULL
+	    do i = 1, noperands {
+		io = IE_IMOP(ie,i)
+		if (IO_OPNAME(io) == Memc[fname] && IO_TYPE(io) == IMAGE)
+		    break
+		io = NULL
+	    }
+	    if (io == NULL) {
+		call sprintf (Memc[emsg], SZ_LINE,
+		    "bad wcsimage reference image %s")
+		    call pargstr (Memc[fname])
+		call error (7, Memc[emsg])
+	    }
+	    ref_im = IO_IM(io)
+	}
+
+	# Determine the dimension and size of the output image.  If the "dims"
+	# parameter is set this determines the image dimension, otherwise we
+	# determine the best output image dimension and size from the input
+	# images.  The exception is the line length, which is determined by
+	# the image line operand returned when the first line of the image
+	# is evaluated.
+
+	call clgstr ("dims", Memc[dims], SZ_LINE)
+	if (streq (Memc[dims], "auto")) {
+	    # Determine the output image dimensions from the input images.
+	    call amovki (1, IE_AXLEN(ie,2), IM_MAXDIM-1)
+	    IE_AXLEN(ie,1) = 0
+	    ndim = 1
+
+	    do i = 1, noperands {
+		io = IE_IMOP(ie,i)
+		im = IO_IM(io)
+		if (IO_TYPE(io) != IMAGE || im == NULL)
+		    next
+
+		ndim = max (ndim, IM_NDIM(im))
+		do j = 2, IM_NDIM(im) {
+		    npix = IM_LEN(im,j)
+		    if (npix > 1) {
+			if (IE_AXLEN(ie,j) <= 1)
+			    IE_AXLEN(ie,j) = npix
+			else
+			    IE_AXLEN(ie,j) = min (IE_AXLEN(ie,j), npix)
+		    }
+		}
+	    }
+	    IE_NDIM(ie) = ndim
+
+	} else {
+	    # Use user specified output image dimensions.
+	    ndim = 0
+	    for (ip=dims;  ctoi(Memc,ip,npix) > 0;  ) {
+		ndim = ndim + 1
+		IE_AXLEN(ie,ndim) = npix
+		for (ch=Memc[ip];  IS_WHITE(ch) || ch == ',';  ch=Memc[ip])
+		    ip = ip + 1
+	    }
+	    IE_NDIM(ie) = ndim
+	}
+
+	# Determine the pixel type of the output image.
+	call clgstr ("outtype", Memc[outtype], SZ_FNAME)
+
+	if (strncmp (Memc[outtype], "auto", 4) == 0) {
+	    IE_OUTTYPE(ie) = 0
+	} else if (strncmp (Memc[outtype], "ref", 3) == 0) {
+	    if (ref_im != NULL)
+		IE_OUTTYPE(ie) = IM_PIXTYPE(ref_im)
+	    else
+		IE_OUTTYPE(ie) = 0
+	} else {
+	    switch (Memc[outtype]) {
+	    case 'u':
+		IE_OUTTYPE(ie) = TY_USHORT
+	    case 's':
+		IE_OUTTYPE(ie) = TY_SHORT
+	    case 'i':
+		IE_OUTTYPE(ie) = TY_INT
+	    case 'l':
+		IE_OUTTYPE(ie) = TY_LONG
+	    case 'r':
+		IE_OUTTYPE(ie) = TY_REAL
+	    case 'd':
+		IE_OUTTYPE(ie) = TY_DOUBLE
+	    default:
+		call error (8, "bad outtype")
+	    }
+	}
+
+	# Open the output image.  If the output image name has a section we
+	# are writing to a section of an existing image.
+
+	call imgsection (Memc[output], Memc[section], SZ_FNAME)
+	if (Memc[section] != EOS && Memc[section] != NULL) {
+	    outim = immap (Memc[output], READ_WRITE, 0)
+	    IE_AXLEN(ie,1) = IM_LEN(outim,1)
+	} else {
+	    if (ref_im != NULL)
+		outim = immap (Memc[output], NEW_COPY, ref_im)
+	    else
+		outim = immap (Memc[output], NEW_IMAGE, 0)
+	    IM_LEN(outim,1) = 0
+	    call amovl (IE_AXLEN(ie,2), IM_LEN(outim,2), IM_MAXDIM-1)
+	    IM_NDIM(outim) = IE_NDIM(ie)
+	    IM_PIXTYPE(outim) = 0
+	}
+
+	# Initialize output image line pointer.
+	call amovkl (1, IE_V(ie,1), IM_MAXDIM)
+
+	percent = 0
+	nlines = 0
+	totlines = 1
+	do i = 2, IM_NDIM(outim)
+	    totlines = totlines * IM_LEN(outim,i)
+
+	# Generate the pixel data for the output image line by line, 
+	# evaluating the user supplied expression to produce each image
+	# line.  Images may be any dimension, datatype, or size.
+
+	# call memlog ("--------- PROCESS IMAGE -----------")
+
+	out = NULL
+	repeat {
+	    # call memlog1 ("--------- line %d ----------", nlines + 1)
+
+	    # Output image line generated by last iteration.
+	    if (out != NULL) {
+		op = data
+		if (O_LEN(out) == 0) {
+		    # Output image line is a scalar.
+
+		    switch (O_TYPE(out)) {
+		    case TY_BOOL:
+			Memi[op] = O_VALI(out)
+			call amovki (O_VALI(out), Memi[op], IM_LEN(outim,1))
+
+		    case TY_SHORT:
+			call amovks (O_VALS(out), Mems[op], IM_LEN(outim,1))
+
+		    case TY_INT:
+			call amovki (O_VALI(out), Memi[op], IM_LEN(outim,1))
+
+		    case TY_LONG:
+			call amovkl (O_VALL(out), Meml[op], IM_LEN(outim,1))
+
+		    case TY_REAL:
+			call amovkr (O_VALR(out), Memr[op], IM_LEN(outim,1))
+
+		    case TY_DOUBLE:
+			call amovkd (O_VALD(out), Memd[op], IM_LEN(outim,1))
+
+		    }
+
+		} else {
+		    # Output image line is a vector.
+
+		    npix = min (O_LEN(out), IM_LEN(outim,1))
+		    ip = O_VALP(out)
+		    switch (O_TYPE(out)) {
+		    case TY_BOOL:
+			call amovi (Memi[ip], Memi[op], npix)
+
+		    case TY_SHORT:
+			call amovs (Mems[ip], Mems[op], npix)
+
+		    case TY_INT:
+			call amovi (Memi[ip], Memi[op], npix)
+
+		    case TY_LONG:
+			call amovl (Meml[ip], Meml[op], npix)
+
+		    case TY_REAL:
+			call amovr (Memr[ip], Memr[op], npix)
+
+		    case TY_DOUBLE:
+			call amovd (Memd[ip], Memd[op], npix)
+
+		    }
+		}
+
+		call evvfree (out)
+		out = NULL
+	    }
+
+	    # Get the next line in all input images.  If EOF is seen on the
+	    # image we merely rewind and keep going.  This allows a vector,
+	    # plane, etc. to be applied to each line, band, etc. of a higher
+	    # dimensioned image.
+
+	    do i = 1, noperands {
+		io = IE_IMOP(ie,i)
+		if (IO_TYPE(io) != IMAGE || IO_IM(io) == NULL)
+		    next
+
+		im = IO_IM(io)
+		o  = IO_OP(io)
+
+		# Data for a 1D image was read in above.
+		if (IM_NDIM(im) == 1)
+		    next
+
+		switch (O_TYPE(o)) {
+
+		case TY_SHORT:
+		    if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF) {
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (9, s_nodata)
+		    }
+
+		case TY_INT:
+		    if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF) {
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (9, s_nodata)
+		    }
+
+		case TY_LONG:
+		    if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF) {
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (9, s_nodata)
+		    }
+
+		case TY_REAL:
+		    if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF) {
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (9, s_nodata)
+		    }
+
+		case TY_DOUBLE:
+		    if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF) {
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF)
+			    call error (9, s_nodata)
+		    }
+
+		default:
+		    call error (10, s_badtype)
+		}
+	    }
+
+	    # call memlog (".......... enter evvexpr ..........")
+
+	    # This is it!  Evaluate the vector expression.
+	    flags = 0
+	    if (rangecheck)
+		flags = or (flags, EV_RNGCHK)
+
+	    out = evvexpr (Memc[expr],
+		locpr(ie_getop), ie, locpr(ie_fcn), ie, flags)
+
+	    # call memlog (".......... exit evvexpr ..........")
+
+	    # If the pixel type and line length of the output image are
+	    # still undetermined set them to match the output operand.
+
+	    if (IM_PIXTYPE(outim) == 0) {
+		if (IE_OUTTYPE(ie) == 0) {
+		    if (O_TYPE(out) == TY_BOOL)
+			IE_OUTTYPE(ie) = TY_INT
+		    else
+			IE_OUTTYPE(ie) = O_TYPE(out)
+		    IM_PIXTYPE(outim) = IE_OUTTYPE(ie)
+		} else
+		    IM_PIXTYPE(outim) = IE_OUTTYPE(ie)
+	    }
+	    if (IM_LEN(outim,1) == 0) {
+		if (IE_AXLEN(ie,1) == 0) {
+		    if (O_LEN(out) == 0) {
+			IE_AXLEN(ie,1) = 1
+			IM_LEN(outim,1) = 1
+		    } else {
+			IE_AXLEN(ie,1) = O_LEN(out)
+			IM_LEN(outim,1) = O_LEN(out)
+		    }
+		} else
+		    IM_LEN(outim,1) = IE_AXLEN(ie,1)
+	    }
+
+	    # Print percent done.
+	    if (verbose) {
+		nlines = nlines + 1
+		if (nlines * 100 / totlines >= percent + 10) {
+		    percent = percent + 10
+		    call printf ("%2d%% ")
+			call pargi (percent)
+		    call flush (STDOUT)
+		}
+	    }
+
+	    switch (O_TYPE(out)) {
+	    case TY_BOOL:
+		status = impnli (outim, data, IE_V(ie,1))
+
+	    case TY_SHORT:
+		status = impnls (outim, data, IE_V(ie,1))
+
+	    case TY_INT:
+		status = impnli (outim, data, IE_V(ie,1))
+
+	    case TY_LONG:
+		status = impnll (outim, data, IE_V(ie,1))
+
+	    case TY_REAL:
+		status = impnlr (outim, data, IE_V(ie,1))
+
+	    case TY_DOUBLE:
+		status = impnld (outim, data, IE_V(ie,1))
+
+	    default:
+		call error (11, "expression type incompatible with image")
+	    }
+	} until (status == EOF)
+
+	# call memlog ("--------- DONE PROCESSING IMAGE -----------")
+
+	if (verbose) {
+	    call printf ("- done\n")
+	    call flush (STDOUT)
+	}
+
+	# All done.  Unmap images.
+	call imunmap (outim)
+	do i = 1, noperands {
+	    io = IE_IMOP(ie,i)
+	    if (IO_TYPE(io) == IMAGE && IO_IM(io) != NULL)
+		call imunmap (IO_IM(io))
+	}
+
+	# Clean up.
+	do i = 1, noperands {
+	    io = IE_IMOP(ie,i)
+	    o = IO_OP(io)
+	    if (O_TYPE(o) == TY_CHAR)
+		call mfree (O_VALP(o), TY_CHAR)
+	}
+
+	call evvfree (out)
+	call mfree (expr, TY_CHAR)
+	if (st != NULL)
+	    call stclose (st)
+
+	call clpstr ("lastout", Memc[output])
+	call sfree (sp)
+end
+
+
+# IE_GETOP -- Called by evvexpr to fetch an input image operand.
+
+procedure ie_getop (ie, opname, o)
+
+pointer	ie			#I imexpr descriptor
+char	opname[ARB]		#I operand name
+pointer	o			#I output operand to be filled in
+
+int	axis, i
+pointer	param, data
+pointer	sp, im, io, v
+
+bool	imgetb()
+int	imgeti()
+double	imgetd()
+int	imgftype(), btoi()
+errchk	malloc
+define	err_ 91
+
+begin
+	call smark (sp)
+
+	if (IS_LOWER(opname[1]) && opname[2] == EOS) {
+	    # Image operand.
+
+	    io = NULL
+	    do i = 1, IE_NOPERANDS(ie) {
+		io = IE_IMOP(ie,i)
+		if (IO_OPNAME(io) == opname[1])
+		    break
+		io = NULL
+	    }
+
+	    if (io == NULL)
+		goto err_
+	    else
+		v = IO_OP(io)
+
+	    call amovi (Memi[v], Memi[o], LEN_OPERAND)
+	    if (IO_TYPE(io) == IMAGE) {
+		O_VALP(o) = IO_DATA(io)
+		O_FLAGS(o) = 0
+	    }
+
+	    call sfree (sp)
+	    return
+
+	} else if (IS_LOWER(opname[1]) && opname[2] == '.') {
+	    # Image parameter reference, e.g., "a.foo".
+	    call salloc (param, SZ_FNAME, TY_CHAR)
+
+	    # Locate referenced symbolic image operand (e.g. "a").
+	    io = NULL
+	    do i = 1, IE_NOPERANDS(ie) {
+		io = IE_IMOP(ie,i)
+		if (IO_OPNAME(io) == opname[1] && IO_TYPE(io) == IMAGE)
+		    break
+		io = NULL
+	    }
+	    if (io == NULL)
+		goto err_
+
+	    # Get the parameter value and set up operand struct.
+	    call strcpy (opname[3], Memc[param], SZ_FNAME)
+	    im = IO_IM(io)
+
+	    iferr (O_TYPE(o) = imgftype (im, Memc[param]))
+		goto err_
+
+	    switch (O_TYPE(o)) {
+	    case TY_BOOL:
+		iferr (O_VALI(o) = btoi (imgetb (im, Memc[param])))
+		    goto err_
+
+	    case TY_CHAR:
+		O_LEN(o) = SZ_LINE
+		O_FLAGS(o) = O_FREEVAL
+		iferr {
+		    call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
+		    call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
+		} then
+		    goto err_
+
+	    case TY_INT:
+		iferr (O_VALI(o) = imgeti (im, Memc[param]))
+		    goto err_
+
+	    case TY_REAL:
+		O_TYPE(o) = TY_DOUBLE
+		iferr (O_VALD(o) = imgetd (im, Memc[param]))
+		    goto err_
+
+	    default:
+		goto err_
+	    }
+
+	    call sfree (sp)
+	    return
+
+	} else if (IS_UPPER(opname[1]) && opname[2] == EOS) {
+	    # The current pixel coordinate [I,J,K,...].  The line coordinate
+	    # is a special case since the image is computed a line at a time.
+	    # If "I" is requested return a vector where v[i] = i.  For J, K,
+	    # etc. just return the scalar index value.
+
+	    axis = opname[1] - 'I' + 1
+	    if (axis == 1) {
+		O_TYPE(o) = TY_INT
+		if (IE_AXLEN(ie,1) > 0)
+		    O_LEN(o) = IE_AXLEN(ie,1)
+		else {
+		    # Line length not known yet.
+		    O_LEN(o) = DEF_LINELEN
+		}
+		call malloc (data, O_LEN(o), TY_INT)
+		do i = 1, O_LEN(o)
+		    Memi[data+i-1] = i
+		O_VALP(o) = data
+		O_FLAGS(o) = O_FREEVAL
+	    } else {
+		O_TYPE(o) = TY_INT
+		#O_LEN(o) = 0
+		#if (axis < 1 || axis > IM_MAXDIM)
+		    #O_VALI(o) = 1
+		#else
+		    #O_VALI(o) = IE_V(ie,axis)
+		#O_FLAGS(o) = 0
+		if (IE_AXLEN(ie,1) > 0)
+		    O_LEN(o) = IE_AXLEN(ie,1)
+		else 
+		    # Line length not known yet.
+		    O_LEN(o) = DEF_LINELEN
+		call malloc (data, O_LEN(o), TY_INT)
+		if (axis < 1 || axis > IM_MAXDIM)
+		    call amovki (1, Memi[data], O_LEN(o))
+		else
+		    call amovki (IE_V(ie,axis), Memi[data], O_LEN(o))
+		O_VALP(o) = data
+		O_FLAGS(o) = O_FREEVAL
+	    }
+
+	    call sfree (sp)
+	    return
+	}
+
+err_
+	O_TYPE(o) = ERR
+	call sfree (sp)
+end
+
+
+# IE_FCN -- Called by evvexpr to execute an imexpr special function.
+
+procedure ie_fcn (ie, fcn, args, nargs, o)
+
+pointer	ie			#I imexpr descriptor
+char	fcn[ARB]		#I function name
+pointer	args[ARB]		#I input arguments
+int	nargs			#I number of input arguments
+pointer	o			#I output operand to be filled in
+
+begin
+	# No functions yet.
+	O_TYPE(o) = ERR
+end
+
+
+# IE_GETEXPRDB -- Read the expression database into a symbol table.  The
+# input file has the following structure:
+#
+#	<symbol>['(' arg-list ')'][':'|'=']	replacement-text
+#		
+# Symbols must be at the beginning of a line.  The expression text is
+# terminated by a nonempty, noncomment line with no leading whitespace.
+
+pointer procedure ie_getexprdb (fname)
+
+char	fname[ARB]		#I file to be read
+
+pointer	sym, sp, lbuf, st, a_st, ip, symname, tokbuf, text
+int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n
+errchk	open, getlline, stopen, stenter, ie_puttok
+int	open(), getlline(), ctotok(), stpstr()
+pointer	stopen(), stenter()
+define	skip_ 91
+
+begin
+	call smark (sp)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (text, SZ_COMMAND, TY_CHAR)
+	call salloc (tokbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (symname, SZ_FNAME, TY_CHAR)
+
+	fd = open (fname, READ_ONLY, TEXT_FILE)
+	st = stopen ("imexpr", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)
+	a_st = stopen ("args", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)
+	line = 0
+
+	while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
+	    line = line + 1
+
+	    # Replace single quotes by double quotes because things
+	    # should behave like the command line but this routine
+	    # uses ctotok which treats single quotes as character
+	    # constants.
+
+	    for (ip=lbuf; Memc[ip]!=EOS; ip=ip+1) {
+	        if (Memc[ip] == '\'')
+		    Memc[ip] = '"'
+	    }
+
+	    # Skip comments and blank lines.
+	    ip = lbuf
+	    while (IS_WHITE(Memc[ip]))
+		ip = ip + 1
+	    if (Memc[ip] == '\n' || Memc[ip] == '#')
+		next
+	
+	    # Get symbol name.
+	    if (ctotok (Memc,ip,Memc[symname],SZ_FNAME) != TOK_IDENTIFIER) {
+		call eprintf ("exprdb: expected identifier at line %d\n")
+		    call pargi (line)
+skip_		while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
+		    line = line + 1
+		    if (Memc[lbuf] == '\n')
+			break
+		}
+	    }
+
+	    call stmark (a_st, stpos)
+
+	    # Check for the optional argument-symbol list.  Allow only a
+	    # single space between the symbol name and its argument list,
+	    # otherwise we can't tell the difference between an argument
+	    # list and the parenthesized expression which follows.
+
+	    if (Memc[ip] == ' ')
+		ip = ip + 1
+
+	    if (Memc[ip] == '(') {
+		ip = ip + 1
+		n = 0
+		repeat {
+		    tok = ctotok (Memc, ip, Memc[tokbuf], SZ_FNAME)
+		    if (tok == TOK_IDENTIFIER) {
+			sym = stenter (a_st, Memc[tokbuf], LEN_ARGSYM)
+			n = n + 1
+			ARGNO(sym) = n
+		    } else if (Memc[tokbuf] == ',') {
+			;
+		    } else if (Memc[tokbuf] != ')') {
+			call eprintf ("exprdb: bad arglist at line %d\n")
+			    call pargi (line)
+			call stfree (a_st, stpos)
+			goto skip_
+		    }
+		} until (Memc[tokbuf] == ')')
+	    }
+
+	    # Check for the optional ":" or "=".
+	    while (IS_WHITE(Memc[ip]))
+		ip = ip + 1
+	    if (Memc[ip] == ':' || Memc[ip] == '=')
+		ip = ip + 1
+
+	    # Accumulate the expression text.
+	    buflen = SZ_COMMAND
+	    op = 1
+	    
+	    repeat {
+		repeat {
+		    token = ctotok (Memc, ip, Memc[tokbuf+1], SZ_COMMAND)
+		    if (Memc[tokbuf] == '#')
+			break
+		    else if (token != TOK_EOS && token != TOK_NEWLINE) {
+			if (token == TOK_STRING) {
+			    Memc[tokbuf] = '"'
+			    call strcat ("""", Memc[tokbuf], SZ_COMMAND)
+			    call ie_puttok (a_st, text, op, buflen,
+				Memc[tokbuf])
+			} else
+			    call ie_puttok (a_st, text, op, buflen,
+				Memc[tokbuf+1])
+		    }
+		} until (token == TOK_EOS)
+
+		if (getlline (fd, Memc[lbuf], SZ_COMMAND) == EOF)
+		    break
+		else
+		    line = line + 1
+
+		for (ip=lbuf;  IS_WHITE(Memc[ip]);  ip=ip+1)
+		    ;
+		if (ip == lbuf) {
+		    call ungetline (fd, Memc[lbuf])
+		    line = line - 1
+		    break
+		}
+	    }
+
+	    # Free any argument list symbols.
+	    call stfree (a_st, stpos)
+
+	    # Scan the expression text and count the number of $N arguments.
+	    nargs = 0
+	    for (ip=text;  Memc[ip] != EOS;  ip=ip+1)
+		if (Memc[ip] == '$' && IS_DIGIT(Memc[ip+1])) {
+		    nargs = max (nargs, TO_INTEG(Memc[ip+1]))
+		    ip = ip + 1
+		}
+
+	    # Enter symbol in table.
+	    sym = stenter (st, Memc[symname], LEN_SYM)
+	    offset = stpstr (st, Memc[text], 0)
+	    SYM_TEXT(sym) = offset
+	    SYM_NARGS(sym) = nargs
+	}
+
+	call stclose (a_st)
+	call sfree (sp)
+
+	return (st)
+end
+
+
+# IE_PUTTOK -- Append a token string to a text buffer.
+
+procedure ie_puttok (a_st, text, op, buflen, token)
+
+pointer	a_st			#I argument-symbol table
+pointer	text			#U text buffer
+int	op			#U output pointer
+int	buflen			#U buffer length, chars
+char	token[ARB]		#I token string
+
+pointer	sym
+int	ip, ch1, ch2
+pointer	stfind()
+errchk	realloc
+
+begin
+	# Replace any symbolic arguments by "$N".
+	if (a_st != NULL && IS_ALPHA(token[1])) {
+	    sym = stfind (a_st, token)
+	    if (sym != NULL) {
+		token[1] = '$'
+		token[2] = TO_DIGIT(ARGNO(sym))
+		token[3] = EOS
+	    }
+	}
+
+	# Append the token string to the text buffer.
+	for (ip=1;  token[ip] != EOS;  ip=ip+1) {
+	    if (op + 1 > buflen) {
+		buflen = buflen + SZ_COMMAND
+		call realloc (text, buflen, TY_CHAR)
+	    }
+
+	    # The following is necessary because ctotok parses tokens such as
+	    # "$N", "==", "!=", etc.  as two tokens.  We need to rejoin these
+	    # characters to make one token.
+
+	    if (op > 1 && token[ip+1] == EOS) {
+		ch1 = Memc[text+op-3]
+		ch2 = token[ip]
+
+		if (ch1 == '$' && IS_DIGIT(ch2))
+		    op = op - 1
+		else if (ch1 == '*' && ch2 == '*')
+		    op = op - 1
+		else if (ch1 == '/' && ch2 == '/')
+		    op = op - 1
+		else if (ch1 == '<' && ch2 == '=')
+		    op = op - 1
+		else if (ch1 == '>' && ch2 == '=')
+		    op = op - 1
+		else if (ch1 == '=' && ch2 == '=')
+		    op = op - 1
+		else if (ch1 == '!' && ch2 == '=')
+		    op = op - 1
+		else if (ch1 == '?' && ch2 == '=')
+		    op = op - 1
+		else if (ch1 == '&' && ch2 == '&')
+		    op = op - 1
+		else if (ch1 == '|' && ch2 == '|')
+		    op = op - 1
+	    }
+
+	    Memc[text+op-1] = token[ip]
+	    op = op + 1
+	}
+
+	# Append a space to ensure that tokens are delimited.
+	Memc[text+op-1] = ' '
+	op = op + 1
+
+	Memc[text+op-1] = EOS
+end
+
+
+# IE_EXPANDTEXT -- Scan an expression, performing macro substitution on the
+# contents and returning a fully expanded string.
+
+pointer procedure ie_expandtext (st, expr)
+
+pointer	st			#I symbol table (macros)
+char	expr[ARB]		#I input expression
+
+pointer	buf, gt
+int	buflen, nchars
+int	locpr(), gt_expand()
+pointer	gt_opentext()
+extern	ie_gsym()
+
+begin
+	buflen = SZ_COMMAND
+	call malloc (buf, buflen, TY_CHAR)
+
+	gt = gt_opentext (expr, locpr(ie_gsym), st, 0, GT_NOFILE)
+	nchars = gt_expand (gt, buf, buflen)
+	call gt_close (gt)
+
+	return (buf)
+end
+
+
+# IE_GETOPS -- Parse the expression and generate a list of input operands.
+# The output operand list is returned as a sequence of EOS delimited strings.
+
+int procedure ie_getops (st, expr, oplist, maxch)
+
+pointer	st			#I symbol table
+char	expr[ARB]		#I input expression
+char	oplist[ARB]		#O operand list
+int	maxch			#I max chars out
+
+int	noperands, ch, i
+int	ops[MAX_OPERANDS]
+pointer	gt, sp, tokbuf, op
+
+extern	ie_gsym()
+pointer	gt_opentext()
+int	locpr(), gt_rawtok(), gt_nexttok()
+errchk	gt_opentext, gt_rawtok
+
+begin
+	call smark (sp)
+	call salloc (tokbuf, SZ_LINE, TY_CHAR)
+
+	call aclri (ops, MAX_OPERANDS)
+	gt = gt_opentext (expr, locpr(ie_gsym), st, 0, GT_NOFILE+GT_NOCOMMAND)
+
+	# This assumes that operand names are the letters "a" to "z".
+	while (gt_rawtok (gt, Memc[tokbuf], SZ_LINE) != EOF) {
+	    ch = Memc[tokbuf]
+	    if (IS_LOWER(ch) && Memc[tokbuf+1] == EOS)
+		if (gt_nexttok (gt) != '(')
+		    ops[ch-'a'+1] = 1
+	}
+
+	call gt_close (gt)
+
+	op = 1
+	noperands = 0
+	do i = 1, MAX_OPERANDS
+	    if (ops[i] != 0 && op < maxch) {
+		oplist[op] = 'a' + i - 1
+		op = op + 1
+		oplist[op] = EOS
+		op = op + 1
+		noperands = noperands + 1
+	    }
+
+	oplist[op] = EOS
+	op = op + 1
+
+	call sfree (sp)
+	return (noperands)
+end

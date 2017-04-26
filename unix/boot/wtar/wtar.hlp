@@ -1,0 +1,89 @@
+.help wtar Oct92 softools
+.ih
+NAME
+wtar -- write TAR format archive file
+.ih
+USAGE
+wtar [-flags] [-f archive] [files]
+.ih
+ARGUMENTS
+.ls 12 -d
+Print debug messages.
+.le
+.ls 12 -o
+Omit binary files.
+.le
+.ls 12 -t
+Print the name of each file as it is written or omitted.
+.le
+.ls 12 -v
+Verbose mode; print more information about each file.
+.le
+.ls 12 -f archive
+The tar format file to be written, i.e., "stdout", a host magtape device
+name (e.g., "/dev/nrmt8" or "MSA0"), or the IRAF virtual filename of a disk
+file.  The default is the standard output.
+.le
+.ls 12 files
+The names of the files or root directories of directory trees to be written
+to the archive file.  If no files are specified "." (the directory tree
+rooted at the current directory) is assumed.
+.le
+.ih
+DESCRIPTION
+The named files and directories are written to the indicated
+UNIX "tar" format output file.  Any directories in the file list are
+recursively descended.  The named directories should be subdirectories of
+the current directory when \fIwtar\fR is called.  Binary files may be
+omitted if desired, e.g., when transporting software to a different host, or
+when making a backup of a large system which would otherwise exceed the
+capacity of a single reel of tape.  All file, directory, and magtape names
+conform to the IRAF standard.
+
+The output file is normally either a disk file (e.g., if the transport
+medium is an electronic network), or a magtape file.  If the output file is
+a magtape multiple files, i.e., wtar archives, may be written on the tape.
+The blocking factor is fixed at 10240 bytes per record.
+
+The TAR format file written by \fIwtar\fR conforms to the UNIX standard except
+that [1] no link information is preserved, [2] the user and group numbers
+may not be preserved (they are preserved in the UNIX version of \fIwtar\fR),
+and [3] some versions of \fIwtar\fR (e.g., VMS) pad text files at the end
+with extra blank lines.
+
+All \fIwtar\fR filename arguments are IRAF virtual filenames (or host
+filenames).  Magtape devices should be specified by their host (not IRAF)
+device name, e.g., "/dev/nrmt8" or "MSA0".
+.ih
+EXAMPLES
+1. Make a source-only archive of the IRAF system on the UNIX device
+/dev/nrmt8.
+
+.nf
+	cl> cd iraf
+	cl> wtar -of /dev/nrmt8
+.fi
+
+2. Archive the "uparm" directory to the VMS logical device MSA0:.
+
+	cl> wtar -f msa0 uparm
+
+3. Make a disk archive of the LIB and PKG directory trees in your home
+directory.
+
+	cl> wtar -f home$archive.tar lib pkg 
+
+4. Examine the resultant file to make sure everything worked correctly.
+
+	cl> rtar -tvf home$archive.tar
+
+
+5. Make a disk archive, using a host filename for the output file.
+
+	cl> wtar -f /tmp2/arc lib pkg sys
+
+IRAF magtape commands such as \fIrewind\fR may be used with \fIwtar\fR,
+but switching between IRAF and host device names can be confusing.
+.ih
+SEE ALSO
+rtar, rmbin

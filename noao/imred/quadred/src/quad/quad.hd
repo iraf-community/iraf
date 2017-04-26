@@ -1,0 +1,33 @@
+# Help directory for the QUAD package.
+
+$defdir		= "quad$"
+$doc 		= "quad$doc/"
+
+badpiximage	hlp=doc$badpiximage.hlp	
+ccdgroups	hlp=doc$ccdgroups.hlp
+ccdhedit	hlp=doc$ccdhedit.hlp
+ccdlist		hlp=doc$ccdlist.hlp
+combine		hlp=doc$combine.hlp
+cosmicrays	hlp=doc$cosmicrays.hlp
+darkcombine	hlp=doc$darkcombine.hlp
+flatcombine	hlp=doc$flatcombine.hlp
+mkfringecor	hlp=doc$mkfringecor.hlp
+mkillumcor	hlp=doc$mkillumcor.hlp
+mkillumflat	hlp=doc$mkillumflat.hlp
+mkskycor	hlp=doc$mkskycor.hlp
+mkskyflat	hlp=doc$mkskyflat.hlp
+quadproc	hlp=doc$quadproc.hlp
+quadscale	hlp=doc$quadscale.hlp
+qhistogram	hlp=doc$qhistogram.hlp
+qstatistics	hlp=doc$qstatistics.hlp
+setinstrument	hlp=doc$setinstrument.hlp
+zerocombine	hlp=doc$zerocombine.hlp
+
+ccdgeometry	hlp=doc$ccdgeometry.hlp
+ccdinstrument	hlp=doc$ccdinst.hlp
+ccdtypes	hlp=doc$ccdtypes.hlp
+flatfields	hlp=doc$flatfields.hlp
+guide		hlp=doc$guide.hlp
+instruments	hlp=doc$instruments.hlp
+package		hlp=doc$quad.hlp
+subsets		hlp=doc$subsets.hlp

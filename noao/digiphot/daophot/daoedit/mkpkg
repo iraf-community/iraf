@@ -1,0 +1,16 @@
+# DAOEDIT task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_daoedit.x		<imhdr.h> <gset.h> ../lib/daophotdef.h daoedit.h
+	dpecolon.x		<error.h> daoedit.h
+	dpemark.x		<ctype.h> daoedit.h
+	dpeomark.x		<gset.h>
+	dpeconfirm.x		daoedit.h
+	dperprofile.x		<mach.h> <imhdr.h> daoedit.h
+	dperplot.x		<gset.h> daoedit.h
+	;

@@ -1,0 +1,366 @@
+# APPHOT.DDF -- Data definition for apphot package output
+
+builtin catalog functions
+builtin domain statements
+
+-------------------------------------------------------------------------------
+
+# domain statements
+
+domain	bool		type=short	format="%b"
+domain	posint		type=short	format="%5d"
+domain  pixels          type=real       format="%9.3f"
+domain	fwhmpsf		type=real	format="%9.3f"
+domain  counts		type=real	format="%15.7g"
+domain	sigma		type=real	format="%15.7g"
+domain  mag		type=real	format="%7.3f"
+domain  pars		type=real	format="%15.7g"
+domain  electrons	type=short	format="%5d"
+domain	ratio		type=real	format=%15.7g"
+
+# Apphot database descriptor
+record apphot {
+    iraf		char[]		"current version of iraf"
+    host		char[]		"host machine"
+    user		char[]		"user name"
+    package		char[]		"package name"
+    version		char[]		"package version"
+}
+
+--------------------------------------------------------------------------------
+
+# History record (1 per modification of the apphot database)
+record history {
+    task		char[]		"task name"
+    date		ltime		"date dask was run"
+    firstrec		posint		"first record written by task"
+    lastrec		posint		"last record written by task"
+}
+ 
+------------------------------------------------------------------------------ 
+
+# Data dependent parameter set (>= 1 per task execution)
+record datapars {
+    fwhmpsf		pixels		"full width half max of the psf"
+    emission		bool		"emission/absorption"
+    noise model		char[]		"data noise mode"
+    threshold		counts		"intensity threshold"
+    sigma		counts		"sigma of sky pixels"
+    gain		char[]		"image gain keyword"
+    epadu		ratio		"gain electrons/adu"
+    ccread		char[]		"image readout noise keyword"
+    readnoise		electrons	"readout noise electrons"
+}
+
+# Centering algorithm parameter set (>= 1 per task execution)
+record centerpars {
+    calgorithm		char[]		"centering algoritm"
+    cboxwidth		fwhmpsf		"centering box width"
+    maxshift		fwhmpsf		"maximum shift"
+    cmaxiter		posint		"maximum number of iterations"
+    minsnratio		ratio		"minimum signal to noise ratio"
+    clean		bool		"use clean algorithm"
+    rclean		fwhmpsf		"cleaning radius"
+    rclip		fwhmpsf		"clipping radius"
+    kclean		sigma		"sigma clean"
+}
+
+# Sky fitting algorithm parameter set (>= 1 per task execution)
+record fitskypars {
+    salgorithm		char[]		"sky fitting algorithm"
+    annulus		fwhmpsf		"inner sky annulus"
+    dannulus		fwhmpsf[]	"width of inner sky annulus"
+    smaxiter		posint		"maximum number od iterations"
+    skreject		sigma		"ksigma rejection"
+    snreject		posint		"maximum number of rejections"
+    khist		sigma		"half width of histogram"
+    binsize		sigma		"binsize of histogram"
+    smooth		bool		"smooth the histogram"
+    rgrow		fwhmpsf		"region growing radius"
+    skyvalue		counts		"user supplied sky value"
+}
+
+# Photometry parameter set (>= 1 per task execution)
+record photpars {
+    weighting		char[]		"weighting scheme"
+    apertures		fwhmpsf		"list of apertures"
+    zmagnitude		mag		"magnitude zero point"
+    exposure		char[]		"image exposure time keyword"
+    itime		""		"exposure time"
+}
+
+# Polygonal photometry parameter set (>= 1 per task execution)
+record polypars {
+    zmagnitude		mag		"magnitude zero point"
+    exposure		char[]		"image exposure time keyword"
+    itime		""		"exposure time"
+}
+
+# Radial profile fitting parameters (>= 1 per task execution)
+record radprofpars {
+    radius		fwhmpsf		"maximum profile radius"
+    stepsize		fwhmpsf		"profile step size"
+    order		posint		"number of spline pieces in fit"
+    kreject		sigma		"k sigma rejection"
+    nreject		posint		"max number of rejection cycles"
+}
+
+# Point spread function modeling parameters (>= 1 per task execution)
+record psfpars {
+    function		char[]		"analytic function"
+    box			fwhmpsf		"fitting box size"
+    kreject		sigma		"sigma rejection limit"
+    nreject		posint		"max number of rejections"
+}
+
+--------------------------------------------------------------------------------
+
+# Computed center answers (1 per star)
+record center {
+
+    datapars		posint		"record id of datapars record"
+    centerpars		posint		"record id of centerpars record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    xcenter		pixels		"x center position"
+    ycenter		pixels		"y center position"
+    xshift		pixels		"x position shift"
+    yshift		pixels		"y position shift"
+    xerror		pixels		"x position error"
+    yerror		pixels		"y position error"
+    cerrcode		posint		"centering error code"
+    cerrstring		char[]		"centering error message"
+
+}
+
+# Computed fitsky answers (1 per star)
+record fitsky {
+
+    datapars		posint		"record id of datapars record"
+    fitskypars		posint		"record id of fitskyprs record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    skyvalue		counts		"sky value"
+    skysigma		counts		"standard deviation of sky"
+    skyskew		counts		"skew of sky pixels"
+    nskypix		posint		"number of sky pixels"
+    nskyreject		posint		"number of rejected pixels"
+    serrcode		posint		"sky fitting error code"
+    serrstring		char[]		"sky fitting error message"
+
+}
+
+# Computed phot answers (1 per star)
+record phot {
+
+    datapars		posint		"record id of datapars record"
+    centerpars		posint		"record id of centerpars record"
+    photpars		posint		"record id of photometry record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    xcenter		pixels		"x center position"
+    ycenter		pixels		"y center position"
+    xshift		pixels		"x position shift"
+    yshift		pixels		"y position shift"
+    xerror		pixels		"x position error"
+    yerror		pixels		"y position error"
+    cerrcode		posint		"centering error code"
+    cerrstring		char[]		"centering error message"
+
+    skyvalue		counts		"sky value"
+    skysigma		counts		"standard deviation of sky"
+    skyskew		counts		"skew of sky pixels"
+    nskypix		posint		"number of sky pixels"
+    nskyreject		posint		"number of rejected pixels"
+    serrcode		posint		"sky fitting error code"
+    serrstring		char[]		"sky fitting error message"
+
+    aperts		pixels[]	"list of apertures"
+    sums		counts[]	"list of sums"
+    areas		pixels[]	"list of areas"
+    mags		mag[]		"list of magnitudes"
+    magerrs		mag[]		"list of mag errors
+    merrcodes		posint[]	"list of errcodes
+    merrstrings		char[]		"list of error messages"
+
+}
+
+# Computed wphot answers (1 per star)
+record wphot {
+
+    datapars		posint		"record id of datapars record"
+    centerpars		posint		"record id of centerpars record"
+    fitskypars		posint		"record id of fitskypars record"
+    photpars		posint		"record id of photpars record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    xcenter		pixels		"x center position"
+    ycenter		pixels		"y center position"
+    xshift		pixels		"x position shift"
+    yshift		pixels		"y position shift"
+    xerror		pixels		"x position error"
+    yerror		pixels		"y position error"
+    cerrcode		posint		"centering error code"
+    cerrstring		char[]		"centering error message"
+
+    skyvalue		counts		"sky value"
+    skysigma		counts		"standard deviation of sky"
+    skyskew		counts		"skew of sky pixels"
+    nskypix		posint		"number of sky pixels"
+    nskyreject		posint		"number of rejected pixels"
+    serrcode		posint		"sky fitting error code"
+    serrstring		char[]		"sky fitting error message"
+
+    aperts		pixels[]	"list of apertures"
+    sums		counts[]	"list of sums"
+    areas		pixels[]	"list of areas"
+    mags		mag[]		"list of magnitudes"
+    magerrs		mag[]		"list of mag errors
+    merrcode		posint[]	"list of errcodes
+    merrstrings		char[]		"list of error messages"
+}
+
+# Computed polyphot answers (1 per star)
+record polyphot {
+
+    datapars		posint		"record id of datapars record"
+    centerpars		posint		"record id of centerpars record"
+    fitskypars		posint		"record id of fitskypars record"
+    polypars		posint		"record id of polypars record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    xcenter		pixels		"x center position"
+    ycenter		pixels		"y center position"
+    xshift		pixels		"x position shift"
+    yshift		pixels		"y position shift"
+    xerror		pixels		"x position error"
+    yerror		pixels		"y position error"
+    cerrcode		posint		"centering error code"
+    cerrstring		char[]		"centering error message"
+
+    skyvalue		counts		"sky value"
+    skysigma		counts		"standard deviation of sky"
+    skyskew		counts		"skew of sky pixels"
+    nskypix		posint		"number of sky pixels"
+    nskyreject		posint		"number of rejected pixels"
+    serrcode		posint		"sky fitting error code"
+    serrstring		char[]		"sky fitting error message"
+
+    sum			counts[]	"aperture sum"
+    area		pixels[]	"aperture area"
+    mag			mag[]		"magnitude"
+    magerr		mag[]		"magnitude error"
+    merrcode		posint[]	"error code"
+    merrstring		char[]		"error message"
+
+    polygons		char[]		"name of polygons files"
+    pid			posint		"polygon sequence number"
+    oldxmean		pixels		"original mean x of polygon"
+    oldymean		pixels		"original mean y of polygon"
+    minradius		pixels		"min sky radius to exclude polygon"
+    nver		posint		"number of vertices"
+    xvertices		pixels[]	"list of x vertices coords"
+    yvertices		pixels[]	"list of y vertices coords"
+}
+
+# Computed radprof answers (1 per star)
+record radprof {
+
+    datapars		posint		"record id of datapars record"
+    centerpars		posint		"record id of centerpars record"
+    fitskypars		posint		"record id of fitskypars record"
+    photpars		posint		"record id of photpars record"
+    radprofpars		posint		"record id of radprofpars record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    xcenter		pixels		"x center position"
+    ycenter		pixels		"y center position"
+    xshift		pixels		"x position shift"
+    yshift		pixels		"y position shift"
+    xerror		pixels		"x position error"
+    yerror		pixels		"y position error"
+    cerrcode		posint		"centering error code"
+    cerrstring		char[]		"centering error message"
+
+    skyvalue		counts		"sky value"
+    skysigma		counts		"standard deviation of sky"
+    skyskew		counts		"skew of sky pixels"
+    nskypix		posint		"number of sky pixels"
+    nskyreject		posint		"number of rejected pixels"
+    serrcode		posint		"sky fitting error code"
+    serrstring		char[]		"sky fitting error message"
+
+    aperts		pixels[]	"list of apertures"
+    sums		counts[]	"list of sums"
+    areas		pixels[]	"list of areas"
+    mags		mag[]		"list of magnitudes"
+    magerrs		mag[]		"list of mag errors
+    merrs		posint[]	"list of error codes
+    merrstrings		char[]		"list of error messages"
+
+    pfwhm		pixels		"fitted profile fwhmpsf"
+    inorm		counts		"intensity normalization factor"
+    tinorm		counts		"total intensity normalization factor"
+    errcode		posint		"error code"
+    errstring		char[]		"error message"
+    rlist		pixels[]	"radii"
+    intensities		counts[]	"fitted intensities"
+    tintensities	counts[]	"integral of fitted total intensities"
+}
+
+# Computed fitpsf answers (1 per star)
+record fitpsf {
+
+    datapars		posint		"record id of datapars record"
+    fitpsfpars		posint		"record id of fitpsf record"
+
+    image		char[]		"image name"
+    xinit		pixels		"initial x position"
+    yinit		pixels		"initial y position
+    id			posint		"sequence number in table"
+    coords		char[]		"coordinate list filename"
+    lid			posint		"sequence number in coord list"
+
+    npars		posint		"number of parameters"
+    params		pars[]		"list of parameters"
+    parerrs		pars[]		"list of parameter errors"
+
+}
+
+-------------------------------------------------------------------------------

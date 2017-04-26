@@ -1,0 +1,22 @@
+# IRMOSAIC
+
+input,f,a,,,,List of input images
+output,f,a,,,,Output image
+database,f,a,,,,Output database file
+nxsub,i,a,,,,Number of input images along the x direction
+nysub,i,a,,,,Number of input images along the y direction
+trim_section,s,h,"[*,*]",,,Input image section written to the output image
+null_input,s,h,"",,,List of missing input images
+corner,s,h,"ll",,,Position of first subraster
+direction,s,h,"row",,,Row or column order placement
+raster,b,h,no,,,Raster scan mode
+median_section,s,h,"",,,Input image section used to compute the median
+subtract,b,h,no,,,Subtract median from each input image
+nimcols,i,h,INDEF,,,The number of columns in the output image
+nimrows,i,h,INDEF,,,The number of rows in the output image
+nxoverlap,i,h,-1,,,Number of columns of overlap between input images
+nyoverlap,i,h,-1,,,Number of rows of overlap between input images
+opixtype,s,h,"r",,,Output image pixel type
+oval,r,h,0.0,,,Value of undefined output image pixels
+verbose,b,h,yes,,,Print out messages
+mode,s,h,'ql'

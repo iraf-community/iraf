@@ -1,0 +1,37 @@
+# PARAMETER FILE FOR PHISTOGRAM
+
+input,s,a,,,,The input data
+z1,r,h,INDEF,,,Minimum histogram intensity
+z2,r,h,INDEF,,,Maximum histogram intensity
+binwidth,r,h,INDEF,,,Resolution of histogram in intensity units
+nbins,i,h,512,1,,Number of bins in histogram
+autoscale,b,h,yes,,,Adjust nbins and z2 for integer data?
+top_closed,b,h,no,,,Include z2 in the top bin?
+hist_type,s,h,"normal","normal|cumulative|difference|second_difference",,"Type of histogram"
+listout,b,h,no,,,List instead of plot histogram?
+title,s,h,"imtitle",,,Title for the plot
+xlabel,s,h,"Data values",,,X-axis label
+ylabel,s,h,"Counts",,,Y-axis label
+wx1,r,h,INDEF,,,Left user x_coord if not autoscaling
+wx2,r,h,INDEF,,,Right user x_coord if not autoscaling
+wy1,r,h,0.0,,,Lower user y_coord if not autoscaling
+wy2,r,h,INDEF,,,Right user y_coord if not autoscaling
+logx,b,h,no,,,Log scale x-axis?
+logy,b,h,yes,,,Log scale y-axis?
+round,b,h,no,,,Round axes to nice values?
+plot_type,s,h,"line","line|box|fullbox",,Type of vectors to plot
+box,b,h,yes,,,Draw a box around periphery of window?
+ticklabels,b,h,yes,,,Label the tick marks?
+majrx,i,h,5,,,Number of major divisions along the X axis
+minrx,i,h,5,,,Number of minor divisions along the X axis
+majry,i,h,5,,,Number of major divisions along the Y axis
+minry,i,h,5,,,Number of minor divisions along the Y axis
+fill,b,h,yes,,,Fill viewport vs enforce unity aspect ratio
+vx1,r,h,0.0,,,Left limit of device viewport (0.0:1.0)
+vx2,r,h,1.0,,,Right limit of device viewport (0.0:1.0)
+vy1,r,h,0.0,,,Lower limit of device viewport (0.0:1.0)
+vy2,r,h,1.0,,,Upper limit of device viewport (0.0:1.0)
+append,b,h,no,,,Append to an existing plot?
+pattern,s,h,"solid","solid|dashed|dotted|dotdash",,Line pattern
+device,s,h,"stdgraph",,,Output graphics device
+mode,s,h,ql,,,

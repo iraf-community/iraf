@@ -1,0 +1,11 @@
+# IMSHIFT
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+xshift,r,a,,,,Fractional pixel shift in x
+yshift,r,a,,,,Fractional pixel shift in y
+shifts_file,f,h,"",,,Text file containing shifts for each image
+interp_type,s,h,'linear',,,'Interpolant (nearest,linear,poly3,poly5,spline3,sinc,drizzle)'
+boundary_type,s,h,'nearest',"|nearest|constant|reflect|wrap|",,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+mode,s,h,'ql'

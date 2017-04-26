@@ -1,0 +1,27 @@
+.help gszero Aug85 "Gsurfit Package"
+.ih
+NAME
+gszero -- set up for a new surface fit
+.ih
+SYNOPSIS
+gszero (sf)
+
+.nf
+pointer	sf		# surface descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface descriptor structure.
+.le
+.ih
+DESCRIPTION
+GSZERO zeros the matrix and right side of the matrix equation.
+.ih
+NOTES
+GSZERO can be used to reinitialize the matrix and right side of the
+equation to begin a new fit in accumulate mode.
+.ih
+SEE ALSO
+gsinit, gsfit, gsrefit, gsaccum, gsacpts
+.endhelp

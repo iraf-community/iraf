@@ -1,0 +1,22 @@
+# Make the STARFOCUS tasks.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$update	libpkg.a
+	$omake	x_starfocus.x
+	$link	x_starfocus.o libpkg.a -lxtools -lnlfit -liminterp -lgsurfit\
+	    -lds -o xx_starfocus.e
+	;
+
+libpkg.a:
+	stfgraph.x	starfocus.h <error.h> <gset.h> <mach.h>
+	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h>\
+			<math/nlfit.h>
+	stfprofile.x	starfocus.h <imhdr.h> <mach.h> <math.h>\
+			<math/iminterp.h> <math/nlfit.h>
+	t_starfocus.x	starfocus.h <error.h> <imhdr.h> <imset.h> <mach.h>
+	;

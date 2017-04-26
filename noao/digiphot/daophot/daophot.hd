@@ -1,0 +1,42 @@
+# Help directory for the DAOPHOT package
+
+$doc		= "./doc/"
+
+$addstar	= "daophot$addstar/"
+$allstar	= "daophot$allstar/"
+$daoedit	= "daophot$daoedit/"
+$daofind	= "apphot$daofind/"
+$group		= "daophot$group/"
+$select		= "daophot$select/"
+$nstar		= "daophot$nstar/"
+$peak		= "daophot$peak/"
+$pexamine	= "ptools$pexamine/"
+$phot		= "apphot$phot/"
+$psf		= "daophot$psf/"
+$seepsf		= "daophot$seepsf/"
+$substar	= "daophot$substar/"
+
+addstar		hlp=doc$addstar.hlp,		src=addstar$t_addstar.x
+allstar		hlp=doc$allstar.hlp,		src=allstar$t_allstar.x
+centerpars	hlp=doc$centerpars.hlp,		src=daophot$centerpars.par
+daoedit		hlp=doc$daoedit.hlp,		src=daoedit$t_daoedit.x
+daofind		hlp=doc$daofind.hlp,		src=daofind$t_daofind.x
+daopars		hlp=doc$daopars.hlp,		src=daophot$daopars.par
+daotest		hlp=doc$daotest.hlp,		src=daophot$daotest.cl
+datapars	hlp=doc$datapars.hlp,		src=daophot$datapars.par
+findpars	hlp=doc$findpars.hlp,		src=daophot$findpars.par
+fitskypars	hlp=doc$fitskypars.hlp,		src=daophot$fitskypars.par
+group		hlp=doc$group.hlp,		src=group$t_group.x
+grpselect	hlp=doc$grpselect.hlp,		src=select$t_grpselect.x
+nstar		hlp=doc$nstar.hlp,		src=nstar$t_nstar.x
+peak		hlp=doc$peak.hlp,		src=peak$t_peak.x
+pexamine	hlp=doc$pexamine.hlp,		src=pexamine$t_pexamine.x
+phot		hlp=doc$phot.hlp,		src=phot$t_phot.x
+photpars	hlp=doc$photpars.hlp,		src=daophot$photpars.par
+pfmerge		hlp=doc$pfmerge.hlp,		src=select$t_pfmerge.x
+psf		hlp=doc$psf.hlp,		src=psf$t_psf.x
+pstselect	hlp=doc$pstselect.hlp,		src=psf$t_pstselect.x
+seepsf		hlp=doc$seepsf.hlp,		src=seepsf$t_seepsf.x
+setimpars	hlp=doc$setimpars.hlp,		src=daophot$setimpars.cl
+substar		hlp=doc$substar.hlp,		src=substar$t_substar.x
+revisions	sys=Revisions

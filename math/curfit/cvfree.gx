@@ -1,0 +1,45 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+$if (datatype == r)
+include "curfitdef.h"
+$else
+include "dcurfitdef.h"
+$endif
+
+# CVFREE -- Procedure to free the curve descriptor
+
+$if (datatype == r)
+procedure cvfree (cv)
+$else
+procedure dcvfree (cv)
+$endif
+
+pointer	cv	# the curve descriptor
+
+errchk	mfree
+
+begin
+	if (cv == NULL)
+	    return
+
+	if (CV_XBASIS(cv) != NULL)
+	    call mfree (CV_XBASIS(cv), TY_PIXEL)
+	if (CV_VECTOR(cv) != NULL)
+	    call mfree (CV_VECTOR(cv), TY_PIXEL)
+	if (CV_COEFF(cv) != NULL)
+	    call mfree (CV_COEFF(cv), TY_PIXEL)
+
+	if (CV_BASIS(cv) != NULL)
+	    call mfree (CV_BASIS(cv), TY_PIXEL)
+	if (CV_LEFT(cv) != NULL)
+	    call mfree (CV_LEFT(cv), TY_INT)
+	if (CV_WY(cv) != NULL)
+	    call mfree (CV_WY(cv), TY_PIXEL)
+
+	if (CV_MATRIX(cv) != NULL)
+	    call mfree (CV_MATRIX(cv), TY_PIXEL)
+	if (CV_CHOFAC(cv) != NULL)
+	    call mfree (CV_CHOFAC(cv), TY_PIXEL)
+
+	call mfree (cv, TY_STRUCT)
+end

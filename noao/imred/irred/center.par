@@ -1,0 +1,21 @@
+# CENTER
+
+image,f,a,,,,"Input image(s)"
+coords,f,h,"",,,"Input coordinate list(s) (default: image.coo.?)"
+output,f,h,"default",,,"Output center file(s) (default: image.ctr.?)"
+plotfile,s,h,"",,,"Output plot metacode file"
+datapars,pset,h,"",,,"Data dependent parameters"
+centerpars,pset,h,"",,,"Centering parameters"
+interactive,b,h,yes,,,"Interactive mode ?"
+radplots,b,h,no,,,"Plot the radial profiles in interactive mode ?"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+wcsin,s,h,logical,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,logical,,,"The output coordinate system (logical,tv,physical)"
+cache,b,h,no,,,"Cache the input image pixels in memory ?"
+verify,b,h,yes,,,"Verify critical parameters in non-interactive mode ?"
+update,b,h,no,,,"Update critical parameters in non-interactive mode ?"
+verbose,b,h,yes,,,"Print messages in non-interactive mode ?"
+graphics,s,h,"stdgraph",,,"Graphics device"
+display,s,h,"stdimage",,,"Display device"
+mode,s,h,'ql'

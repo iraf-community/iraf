@@ -1,0 +1,167 @@
+.help revisions Jun88 noao.imred.msred
+.nf
+
+=======
+V2.12.3
+=======
+
+specred.cl
+specred.men
+    1.  Added ODCOMBINE and LSCOMBINE to the package.
+    2.  Modified SCOMBINE to point to new executable.
+    (6/21/04, Valdes)
+
+=====
+V2.12
+=====
+
+imred$specred/msresp1d.cl
+    Modified to use "imtype" rather than hardwired to "imh".  This uses
+    the same code as srcfibers$fibresponse.cl.
+    (2/29/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
+imred$specred/doc/msresp1d.hlp
+    The package was incorrect and the requirement that the unextracted
+    spectrum must be present even if the extracted spectrum is present
+    was made clearer.  (9/20/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/doslit.hlp
+imred$specred/doc/dofibers.ms
+imred$specred/doc/doslit.ms
+    Updated for change where if both crval and cdelt are INDEF then the
+    automatic identification is not done.  (5/2/96, Valdes)
+
+imred$specred/specred.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$specred/doc/doslit.hlp
+imred$specred/doc/doslit.ms
+    Updated for the addition of automatic arc line identification.  (4/9/96)
+
+imred$specred/sparams.par
+    Changed match from 10 to -3.  (4/5/96, Valdes)
+
+imred$specred/dofibers.cl
+imred$specred/dofibers.par
+imred$specred/params.par
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+imred$specred/doc/doslit.hlp
+imred$specred/doc/doslit.ms
+    Added crval/cdelt parameters used in new version with automatic arc
+    line identification.  (4/5/96, Valdes)
+
+imred$specred/doc/msresp1d.hlp
+    Added a sentence to say that extracted throughput (sky) spectra are
+    flat fielded before computing the throughput values.  (1/9/96, Valdes)
+
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+    Describes the new header option for the aperture identification table.
+    (7/25/95, Valdes)
+
+imred$specred/specred.cl
+imred$specred/dofibers.cl
+imred$specred/dofibers.par
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+    Added sky alignment option.  (7/19/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+specred/specred.cl
+specred/specred.men
+    1.  Added background, illumination, and response.
+    2.  Renamed the fiber response task to "fibresponse".
+    (12/29/94, Valdes)
+
+imred$specred/dofibers.cl
+    There was an incorrect default value for the dispaxis parameter:
+	)_dispaxis --> )_.dispaxis.  (8/24/92, Valdes)
+
+=============
+V2.10-V2.10.1
+=============
+
+imred$msred --> imred$specred
+    Renamed the package to a more generic name since it is for both
+    multiple aperture/fiber data as well as generic slit data.
+    (2/20/92, Valdes)
+
+imred$msred/msred.cl
+imred$msred/msred.hd
+    Added generic slit and fiber reduction tasks to make this a complete
+    generic package.  (2/19/92, Valdes)
+
+imred$msred/msresp1d.cl
+    Improved task to include throughput file (2/18/92, Valdes)
+
+imred$msred/msresp1d.cl +
+imred$msred/doc/msresp1d.hlp +
+imred$msred/msred.cl
+imred$msred/msred.hd
+    1.  Added new task MSRESP1D modeled after imred$src/fibers/response but
+	using APALL instead of APSCRIPT and all the connections to PARAMS.
+    2.  Added new task SKYSUB from imred$src/fibers.
+
+imred$msred/msbplot.cl -
+imred$msred/doc/msdispcor.hlp -
+imred$msred/doc/msbplot.hlp -
+imred$msred/msred.hd
+    1.  Moved help to ONEDSPEC.
+
+imred$msred/*
+    Updated to new APEXTRACT and ONEDSPEC packages.
+    (7/13/90, Valdes)
+
+====
+V2.9
+====
+
+imred$msred/msbplot.cl +
+imred$msred/doc/msbplot.hlp +
+imred$msred/msred.cl
+imred$msred/msred.men
+imred$msred/msred.hd
+    Added a version of ECBPLOT (written by Rob Seaman) to the package with
+    appropriate changes to refer to lines and apertures instead of
+    orders.  (10/27/89, Valdes)
+
+imred$msred/doc/msdispcor.hlp
+    Tried to make the description of the global parameter clearer.  Also
+    fixed an incorrect example.  (8/29/89, Valdes)
+
+====
+V2.8
+====
+
+imred$msred/apnormalize.par +
+imred$msred/msred.cl
+imred$msred/msred.men
+    Added APNORMALIZE to the package. (6/1/89, Valdes)
+
+imred$msred/standard.par
+    Removed ennumerated list.  (4/10/89, Valdes)
+
+imred$msred/* +
+imred$msred/doc/* +
+    New package specialized for reducing spectra in "multispec" format.
+    It includes new tasks for doing dispersion solutions in multispec
+    format spectra.  (3/29/89, Valdes)
+
+.endhelp

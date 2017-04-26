@@ -1,0 +1,20 @@
+# The PEXAMINE task histogram plotting task parameters
+
+nbins,i,h,10,1,,Number of bins in histogram
+z1,r,h,INDEF,,,Minimum histogram intensity
+z2,r,h,INDEF,,,Maximum histogram intensity
+top_closed,b,h,yes,,,Include z2 in the top bin?
+x1,r,h,INDEF,,,Left world X-coord if not autoscaling
+x2,r,h,INDEF,,,Right world X-coord if not autoscaling
+y1,r,h,INDEF,,,Lower world Y-coord if not autoscaling
+y2,r,h,INDEF,,,Upper world Y-coord if not autoscaling
+logy,b,h,yes,,,Log scale the y axis ?
+box,b,h,yes,,,Draw box around periphery of window ?
+ticklabels,b,h,yes,,,Label tick marks ?
+majrx,i,h,5,,,Number of major divisions along x axis
+minrx,i,h,5,,,Number of minor divisions along x axis
+majry,i,h,5,,,Number of major divisions along y axis
+minry,i,h,5,,,Number of minor divisions along y axis
+round,b,h,no,,,Round axes to nice values ?
+fill,b,h,yes,,,Fill viewport vs enforce unity aspect ratio ?
+banner,b,h,yes,,,Standard banner ?

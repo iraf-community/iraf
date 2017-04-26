@@ -1,0 +1,29 @@
+# The AGETIM parameter file.
+
+# The field center parameters.
+
+regions,s,a,"pars",,,"The regions source (pars,file,images)"
+images,s,a,"default",,,"The output image(s)"
+aregpars,pset,h,"",,,"The default field center parameters"
+
+# The image survey parameters.
+
+imsurveys,s,h,)_.imsurveys,,,"The input image survey(s)"
+
+# The image editing parameters.
+
+wcsedit,b,h,no,,,"Add a new FITS wcs to each image ?"
+#awcspars,pset,h,,,,The default wcs parameters
+hdredit,b,h,no,,,"Standardize the non-wcs image header parameters ?"
+#aimpars,pset,h,"",,,The default image header parameters
+
+# The task mode parameters.
+
+update,b,h,no,,,"Update algorithm parameters at task termination ?"
+verbose,b,h,yes,,,"Print task status messages ?"
+
+# The task configuration parameters.
+
+imdb,s,h,)_.imdb,,,"The image survey configuration file"
+
+mode,s,h,"ql",,,

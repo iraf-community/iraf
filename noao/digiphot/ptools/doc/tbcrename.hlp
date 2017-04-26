@@ -1,0 +1,50 @@
+.help tbcrename Aug91 noao.digiphot.ptools
+.ih
+NAME
+tbcrename -- rename selected columns in a list of table
+
+.ih
+USAGE
+tbcrename tables columns names
+
+.ih
+PARAMETERS
+
+.ls table
+The list of input tables files.
+.le
+.ls columns
+The list of columns separated by commas whose names are to be changed.
+.le
+.ls names
+The list of new column names separated by commas.
+.le
+
+.ih
+DESCRIPTION
+
+TBCRENAME takes a list of ST tables \fItables\fR and changes the names
+of selected columns \fIcolumns\fR to the names specified in \fInames\fR.
+If the input file is not an ST table or the column does not exist
+no action is taken. Otherwise the specified column is renamed.
+
+.ih
+EXAMPLES
+
+1. For the list of ST tables in tablelist, rename the columns "MAG,MERR"
+to "MAG[1],MERR[1]". Note the use of '\' to escape the pattern matching
+meta-character '['.
+
+.nf
+   pt> tbcrename @tablelist "MAG,MERR" "MAG\[1],MERR\[1]"
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Since the contents of the ST table are altered the user must have
+write permission on the table in order to run TBCRENAME.
+.ih
+SEE ALSO
+.endhelp

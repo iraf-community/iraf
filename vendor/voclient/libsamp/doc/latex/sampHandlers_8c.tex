@@ -1,0 +1,785 @@
+\hypertarget{sampHandlers_8c}{
+\section{sampHandlers.c File Reference}
+\label{sampHandlers_8c}\index{sampHandlers.c@{sampHandlers.c}}
+}
+Message handlers for the interface.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$time.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{sampHandlers_8c_ee07de873e18503ecd72f89d07e4c628}{
+\#define \textbf{METH\_\-DBG}~(getenv(\char`\"{}METH\_\-DBG\char`\"{})!=NULL$|$$|$access(\char`\"{}/tmp/METH\_\-DBG\char`\"{},F\_\-OK)==0)}
+\label{sampHandlers_8c_ee07de873e18503ecd72f89d07e4c628}
+
+\item 
+\hypertarget{sampHandlers_8c_ae51f9fc173a9cba2485f91d93fe8428}{
+\#define \textbf{OK\_\-Map}~samp\_\-getOKMap()}
+\label{sampHandlers_8c_ae51f9fc173a9cba2485f91d93fe8428}
+
+\item 
+\hypertarget{sampHandlers_8c_0a7803909f0c4188761ec0a533eab82e}{
+\#define \textbf{MATCH}(s)~(func\&\&strncasecmp(mtype,s,min(len,16))==0)}
+\label{sampHandlers_8c_0a7803909f0c4188761ec0a533eab82e}
+
+\item 
+\hypertarget{sampHandlers_8c_f6e89a3c178ea921d5340ce296c817cf}{
+\#define \textbf{PMATCH}(s)~(strcasecmp(mtype,s)==0)}
+\label{sampHandlers_8c_f6e89a3c178ea921d5340ce296c817cf}
+
+\item 
+\hypertarget{sampHandlers_8c_d98187ef66ebe7e9334652739715250d}{
+\#define \textbf{POPT}(s)~(s\mbox{[}0\mbox{]}?s:\char`\"{}INDEF\char`\"{})}
+\label{sampHandlers_8c_d98187ef66ebe7e9334652739715250d}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void \hyperlink{sampHandlers_8c_81222e1f3572585fa30f11a78aa08c3f}{samp\_\-setUserHandler} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, void $\ast$func)
+\begin{CompactList}\small\item\em Set the user-interface handler for the mtype. \item\end{CompactList}\item 
+void \hyperlink{sampHandlers_8c_2e8ec01a0dd96314622ae313206583db}{samp\_\-setSampHandler} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, void $\ast$func)
+\begin{CompactList}\small\item\em Set the SAMP interface handler for the mtype. \item\end{CompactList}\item 
+void $\ast$ \hyperlink{sampHandlers_8c_6bb258d378627da1aa0254fccdb6bd2c}{samp\_\-getUserHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype)
+\begin{CompactList}\small\item\em Get the User handler for the named mtype. \item\end{CompactList}\item 
+void $\ast$ \hyperlink{sampHandlers_8c_6ef18dbc5870f58d2161c9ba03a81d26}{samp\_\-getSampHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype)
+\begin{CompactList}\small\item\em Get the Samphandler for the named mtype. \item\end{CompactList}\item 
+void \hyperlink{sampHandlers_8c_23644999b70eebfe75f52c465d1ed97f}{samp\_\-execUserHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} params)
+\begin{CompactList}\small\item\em Execute the user-defined handler for the mtype. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_bea5fa0cd958545710afcf3c5da9dc15}{samp\_\-hubHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle \hyperlink{structHub}{Hub} event messages. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_16d8b8822d169107b8702ae753797923}{samp\_\-PingHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Is app alive and responding to messages? \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_2e342b672e77e012cc98a6f5506a44be}{samp\_\-StatusHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Return status of the task. \item\end{CompactList}\item 
+\hypertarget{sampHandlers_8c_1b7812ba89eebe15ad24f36a3d439a0a}{
+int \textbf{samp\_\-genericMsgHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)}
+\label{sampHandlers_8c_1b7812ba89eebe15ad24f36a3d439a0a}
+
+\item 
+int \hyperlink{sampHandlers_8c_9bd8036dd65dc4f874f39568b691a123}{samp\_\-imLoadHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle an image.load.fits message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_26f96dc6cbf72283e2ee9cb8b4619ed3}{samp\_\-tbLoadHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a generic table.load.$\ast$ message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_750c0fee0c7a99e135299c08751f288c}{samp\_\-tbLoadFITSHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a generic table.load.fits message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_144ec2329355d91022d5ea38736c0093}{samp\_\-tbLoadVOTHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a generic table.load.votable message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_d9184eb45a5bc93b5205fd5b1c6ef688}{samp\_\-tbHighlightHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a table.highlight.row message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_98d68d7091c0b7790631bb53e0ace656}{samp\_\-tbSelectHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a table.select.rowList message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_3f5632858a2b09759ffe98cd2e183cfb}{samp\_\-pointAtHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a coord.pointAt.sky message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_bc319b97b3dbea29bd79c4f723db5438}{samp\_\-specLoadHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a spectrum.load.$\ast$ message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_dd2bca8fa3bf3b4ebbf449edc6b65d85}{samp\_\-specSSAHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a spectrum.load.ssa-generic message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_c57d19afc6fa0b4bc9c7a0fd50d0f54b}{samp\_\-cmdExecHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a client.cmd.exec message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_e25a92f57babd71d43653d7fcb81025c}{samp\_\-envGetHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a client.env.set message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_0910e6b9d11cdd3111c1f18450de394a}{samp\_\-envSetHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a client.env.set message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_659c272ce881662c1826a04728dc06f6}{samp\_\-paramGetHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a client.param.set message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_071aa9e32f2e94d5b667e87cf65d2bdf}{samp\_\-paramSetHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a client.param.set message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_262bf09278c61b60b5189fef7f26d26b}{samp\_\-bibcodeHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em Handle a bibcode.load message. \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_c0bf7cf7fea362c0c82ad7bc3f267c48}{samp\_\-resLoadHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_287569451dc1bf59d1f9f6d13b56716d}{samp\_\-resConeHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_8b2300222d7b11f144eb4385412e69a5}{samp\_\-resSiapHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_866578a01c3b762435823b1b11869c42}{samp\_\-resSsapHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_ad42ca17cbaf23012ad497559ea45e4c}{samp\_\-resTapHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+int \hyperlink{sampHandlers_8c_fa207ebdc587ba5eeab60fbf79b635d4}{samp\_\-resVOSpaceHandler} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg\_\-map)
+\begin{CompactList}\small\item\em handle a voresource.loadlist message \item\end{CompactList}\item 
+\hypertarget{sampHandlers_8c_e743048f5b1f903496b2a8a2e9666367}{
+void \textbf{samp\_\-printMessage} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} sender, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} params)}
+\label{sampHandlers_8c_e743048f5b1f903496b2a8a2e9666367}
+
+\item 
+void \hyperlink{sampHandlers_8c_a8a947c24f2c9333adf4e5d7fa11d134}{samp\_\-printMap} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} name, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)
+\item 
+int \hyperlink{sampHandlers_8c_5361571754505eaefdf5739cd3e9519e}{samp\_\-nullResponse} (void $\ast$data)
+\item 
+\hypertarget{sampHandlers_8c_cc687f745f400b41c9af4f6419bf9bf8}{
+int \textbf{samp\_\-testEcho} (void $\ast$data)}
+\label{sampHandlers_8c_cc687f745f400b41c9af4f6419bf9bf8}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampHandlers_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{nullMap}
+\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampHandlers_8c_a2106c7fe3a5747178c046238fbd5d55}{nullList}
+\item 
+\hypertarget{sampHandlers_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}{
+\hyperlink{structSamp}{Samp} $\ast$ \textbf{sampP}}
+\label{sampHandlers_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}
+
+\item 
+handle\_\-t \hyperlink{sampHandlers_8c_b04b61ee02d86e15b02b861699ae7424}{sampH}
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Message handlers for the interface. 
+
+SAMPHANDLERS.C -- Message handlers for the interface.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampHandlers_8c_262bf09278c61b60b5189fef7f26d26b}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-bibcodeHandler@{samp\_\-bibcodeHandler}}
+\index{samp\_\-bibcodeHandler@{samp\_\-bibcodeHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-bibcodeHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-bibcodeHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_262bf09278c61b60b5189fef7f26d26b}
+
+
+Handle a bibcode.load message. 
+
+SAMP\_\-BIBCODEHANDLER -- Handle a bibcode.load message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_c57d19afc6fa0b4bc9c7a0fd50d0f54b}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-cmdExecHandler@{samp\_\-cmdExecHandler}}
+\index{samp\_\-cmdExecHandler@{samp\_\-cmdExecHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-cmdExecHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-cmdExecHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_c57d19afc6fa0b4bc9c7a0fd50d0f54b}
+
+
+Handle a client.cmd.exec message. 
+
+SAMP\_\-CMDEXECHANDLER -- Handle a client.cmd.exec message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), and samp\_\-getUserHandler().\hypertarget{sampHandlers_8c_e25a92f57babd71d43653d7fcb81025c}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-envGetHandler@{samp\_\-envGetHandler}}
+\index{samp\_\-envGetHandler@{samp\_\-envGetHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-envGetHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-envGetHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_e25a92f57babd71d43653d7fcb81025c}
+
+
+Handle a client.env.set message. 
+
+SAMP\_\-ENVGETHANDLER -- Handle a client.env.set message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-freeMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-newMap(), samp\_\-setHandlerReply(), samp\_\-setMapInMap(), samp\_\-setStringInMap(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_0910e6b9d11cdd3111c1f18450de394a}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-envSetHandler@{samp\_\-envSetHandler}}
+\index{samp\_\-envSetHandler@{samp\_\-envSetHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-envSetHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-envSetHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_0910e6b9d11cdd3111c1f18450de394a}
+
+
+Handle a client.env.set message. 
+
+SAMP\_\-ENVSETHANDLER -- Handle a client.env.set message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_23644999b70eebfe75f52c465d1ed97f}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-execUserHandler@{samp\_\-execUserHandler}}
+\index{samp\_\-execUserHandler@{samp\_\-execUserHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-execUserHandler}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-execUserHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em params})}}
+\label{sampHandlers_8c_23644999b70eebfe75f52c465d1ed97f}
+
+
+Execute the user-defined handler for the mtype. 
+
+SAMP\_\-EXECUSERHANDLER -- Execute the user-defined handler for the mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message-id string \item[{\em params}]Mtype parameter Map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::defaultUserFunc, Samp::handlerMode, samp\_\-getFloatFromMap(), samp\_\-getIntFromMap(), samp\_\-getListFromMap(), samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-listLen(), and SZ\_\-NAME.
+
+Referenced by samp\_\-receiveCall(), samp\_\-receiveNotification(), and samp\_\-receiveResponse().\hypertarget{sampHandlers_8c_6ef18dbc5870f58d2161c9ba03a81d26}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-getSampHandler@{samp\_\-getSampHandler}}
+\index{samp\_\-getSampHandler@{samp\_\-getSampHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-getSampHandler}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ samp\_\-getSampHandler ({\bf String} {\em mtype})}}
+\label{sampHandlers_8c_6ef18dbc5870f58d2161c9ba03a81d26}
+
+
+Get the Samphandler for the named mtype. 
+
+SAMP\_\-GETSAMPHANDLER -- Get the Samphandler for the named mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mtype}]mtype string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::nsubs, and Subs::sampFunc.
+
+Referenced by samp\_\-receiveCall(), samp\_\-receiveNotification(), and samp\_\-Subscribe().\hypertarget{sampHandlers_8c_6bb258d378627da1aa0254fccdb6bd2c}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-getUserHandler@{samp\_\-getUserHandler}}
+\index{samp\_\-getUserHandler@{samp\_\-getUserHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-getUserHandler}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ samp\_\-getUserHandler ({\bf String} {\em mtype})}}
+\label{sampHandlers_8c_6bb258d378627da1aa0254fccdb6bd2c}
+
+
+Get the User handler for the named mtype. 
+
+SAMP\_\-GETUSERHANDLER -- Get the User handler for the named mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mtype}]mtype string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::defaultUserFunc, Samp::nsubs, and Subs::userFunc.
+
+Referenced by samp\_\-bibcodeHandler(), samp\_\-cmdExecHandler(), samp\_\-envGetHandler(), samp\_\-envSetHandler(), samp\_\-execUserHandler(), samp\_\-imLoadHandler(), samp\_\-paramGetHandler(), samp\_\-paramSetHandler(), samp\_\-PingHandler(), samp\_\-pointAtHandler(), samp\_\-receiveCall(), samp\_\-receiveNotification(), samp\_\-resConeHandler(), samp\_\-resLoadHandler(), samp\_\-resSiapHandler(), samp\_\-resSsapHandler(), samp\_\-resTapHandler(), samp\_\-resVOSpaceHandler(), samp\_\-specLoadHandler(), samp\_\-specSSAHandler(), samp\_\-StatusHandler(), samp\_\-tbHighlightHandler(), samp\_\-tbLoadFITSHandler(), samp\_\-tbLoadHandler(), samp\_\-tbLoadVOTHandler(), and samp\_\-tbSelectHandler().\hypertarget{sampHandlers_8c_bea5fa0cd958545710afcf3c5da9dc15}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-hubHandler@{samp\_\-hubHandler}}
+\index{samp\_\-hubHandler@{samp\_\-hubHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-hubHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_bea5fa0cd958545710afcf3c5da9dc15}
+
+
+Handle \hyperlink{structHub}{Hub} event messages. 
+
+SAMP\_\-HUBHANDLER -- Handle \hyperlink{structHub}{Hub} event messages.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+\hypertarget{sampHandlers_8c_9bd8036dd65dc4f874f39568b691a123}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-imLoadHandler@{samp\_\-imLoadHandler}}
+\index{samp\_\-imLoadHandler@{samp\_\-imLoadHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-imLoadHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-imLoadHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_9bd8036dd65dc4f874f39568b691a123}
+
+
+Handle an image.load.fits message. 
+
+SAMP\_\-IMLOADHANDLER -- Handle an image.load.fits message.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_5361571754505eaefdf5739cd3e9519e}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-nullResponse@{samp\_\-nullResponse}}
+\index{samp\_\-nullResponse@{samp\_\-nullResponse}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-nullResponse}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-nullResponse (void $\ast$ {\em data})}}
+\label{sampHandlers_8c_5361571754505eaefdf5739cd3e9519e}
+
+
+SAMP\_\-NULLRESPONSE -- Handler to ignore async replies. 
+
+Referenced by samp\_\-hubSendShutdown(), samp\_\-notify(), and samp\_\-Reply().\hypertarget{sampHandlers_8c_659c272ce881662c1826a04728dc06f6}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-paramGetHandler@{samp\_\-paramGetHandler}}
+\index{samp\_\-paramGetHandler@{samp\_\-paramGetHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-paramGetHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-paramGetHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_659c272ce881662c1826a04728dc06f6}
+
+
+Handle a client.param.set message. 
+
+SAMP\_\-PARAMGETHANDLER -- Handle a client.param.set message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-freeMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-newMap(), samp\_\-setHandlerReply(), samp\_\-setMapInMap(), samp\_\-setStringInMap(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_071aa9e32f2e94d5b667e87cf65d2bdf}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-paramSetHandler@{samp\_\-paramSetHandler}}
+\index{samp\_\-paramSetHandler@{samp\_\-paramSetHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-paramSetHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-paramSetHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_071aa9e32f2e94d5b667e87cf65d2bdf}
+
+
+Handle a client.param.set message. 
+
+SAMP\_\-PARAMSETHANDLER -- Handle a client.param.set message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_16d8b8822d169107b8702ae753797923}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-PingHandler@{samp\_\-PingHandler}}
+\index{samp\_\-PingHandler@{samp\_\-PingHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-PingHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-PingHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_16d8b8822d169107b8702ae753797923}
+
+
+Is app alive and responding to messages? 
+
+SAMP\_\-PINGHANDLER -- Simple aliveness test function.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, and samp\_\-getUserHandler().\hypertarget{sampHandlers_8c_3f5632858a2b09759ffe98cd2e183cfb}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-pointAtHandler@{samp\_\-pointAtHandler}}
+\index{samp\_\-pointAtHandler@{samp\_\-pointAtHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-pointAtHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-pointAtHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_3f5632858a2b09759ffe98cd2e183cfb}
+
+
+Handle a coord.pointAt.sky message. 
+
+SAMP\_\-POINTATHANDLER -- Handle a coord.pointAt.sky message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getFloatFromMap(), and samp\_\-getUserHandler().\hypertarget{sampHandlers_8c_a8a947c24f2c9333adf4e5d7fa11d134}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-printMap@{samp\_\-printMap}}
+\index{samp\_\-printMap@{samp\_\-printMap}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-printMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-printMap ({\bf String} {\em name}, \/  {\bf Map} {\em map})}}
+\label{sampHandlers_8c_a8a947c24f2c9333adf4e5d7fa11d134}
+
+
+SAMP\_\-PRINTMAP -- Print the contents of a Map structure. \hypertarget{sampHandlers_8c_287569451dc1bf59d1f9f6d13b56716d}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resConeHandler@{samp\_\-resConeHandler}}
+\index{samp\_\-resConeHandler@{samp\_\-resConeHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resConeHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resConeHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_287569451dc1bf59d1f9f6d13b56716d}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESCONEHANDLER -- Handle a voresource.loadlist.cone message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-resLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_c0bf7cf7fea362c0c82ad7bc3f267c48}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resLoadHandler@{samp\_\-resLoadHandler}}
+\index{samp\_\-resLoadHandler@{samp\_\-resLoadHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resLoadHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resLoadHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_c0bf7cf7fea362c0c82ad7bc3f267c48}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESLOADHANDLER -- handle a voresource.loadlist.$\ast$ message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.
+
+Referenced by samp\_\-resConeHandler(), samp\_\-resSiapHandler(), samp\_\-resSsapHandler(), samp\_\-resTapHandler(), and samp\_\-resVOSpaceHandler().\hypertarget{sampHandlers_8c_8b2300222d7b11f144eb4385412e69a5}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resSiapHandler@{samp\_\-resSiapHandler}}
+\index{samp\_\-resSiapHandler@{samp\_\-resSiapHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resSiapHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resSiapHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_8b2300222d7b11f144eb4385412e69a5}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESSIAPHANDLER -- Handle a voresource.loadlist.siap message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-resLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_866578a01c3b762435823b1b11869c42}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resSsapHandler@{samp\_\-resSsapHandler}}
+\index{samp\_\-resSsapHandler@{samp\_\-resSsapHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resSsapHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resSsapHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_866578a01c3b762435823b1b11869c42}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESSSAPHANDLER -- Handle a voresource.loadlist.ssap message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-resLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_ad42ca17cbaf23012ad497559ea45e4c}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resTapHandler@{samp\_\-resTapHandler}}
+\index{samp\_\-resTapHandler@{samp\_\-resTapHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resTapHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resTapHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_ad42ca17cbaf23012ad497559ea45e4c}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESTAPHANDLER -- Handle a voresource.loadlist.tap message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-resLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_fa207ebdc587ba5eeab60fbf79b635d4}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-resVOSpaceHandler@{samp\_\-resVOSpaceHandler}}
+\index{samp\_\-resVOSpaceHandler@{samp\_\-resVOSpaceHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-resVOSpaceHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-resVOSpaceHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_fa207ebdc587ba5eeab60fbf79b635d4}
+
+
+handle a voresource.loadlist message 
+
+SAMP\_\-RESVOSPACEHANDLER -- Handle a voresource.loadlist.vospace message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-resLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_2e8ec01a0dd96314622ae313206583db}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-setSampHandler@{samp\_\-setSampHandler}}
+\index{samp\_\-setSampHandler@{samp\_\-setSampHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-setSampHandler}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setSampHandler (handle\_\-t {\em handle}, \/  {\bf String} {\em mtype}, \/  void $\ast$ {\em func})}}
+\label{sampHandlers_8c_2e8ec01a0dd96314622ae313206583db}
+
+
+Set the SAMP interface handler for the mtype. 
+
+SAMP\_\-SETSAMPHANDLER -- Set the SAMP interface handler for the mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em mtype}]mtype name \item[{\em func}]callback function \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::nsubs, and Subs::sampFunc.
+
+Referenced by samp\_\-Subscribe().\hypertarget{sampHandlers_8c_81222e1f3572585fa30f11a78aa08c3f}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-setUserHandler@{samp\_\-setUserHandler}}
+\index{samp\_\-setUserHandler@{samp\_\-setUserHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-setUserHandler}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setUserHandler (handle\_\-t {\em handle}, \/  {\bf String} {\em mtype}, \/  void $\ast$ {\em func})}}
+\label{sampHandlers_8c_81222e1f3572585fa30f11a78aa08c3f}
+
+
+Set the user-interface handler for the mtype. 
+
+SAMP\_\-SETUSERHANDLER -- Set the user-interface handler for the mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]user handle to samp struct \item[{\em mtype}]mtype name \item[{\em func}]callback function \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::defaultUserFunc, Samp::nsubs, and Subs::userFunc.
+
+Referenced by samp\_\-Subscribe().\hypertarget{sampHandlers_8c_bc319b97b3dbea29bd79c4f723db5438}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-specLoadHandler@{samp\_\-specLoadHandler}}
+\index{samp\_\-specLoadHandler@{samp\_\-specLoadHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-specLoadHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-specLoadHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_bc319b97b3dbea29bd79c4f723db5438}
+
+
+Handle a spectrum.load.$\ast$ message. 
+
+SAMP\_\-SPECLOADHANDLER -- Handle a spectrum.load.$\ast$ message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.
+
+Referenced by samp\_\-specSSAHandler().\hypertarget{sampHandlers_8c_dd2bca8fa3bf3b4ebbf449edc6b65d85}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-specSSAHandler@{samp\_\-specSSAHandler}}
+\index{samp\_\-specSSAHandler@{samp\_\-specSSAHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-specSSAHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-specSSAHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_dd2bca8fa3bf3b4ebbf449edc6b65d85}
+
+
+Handle a spectrum.load.ssa-generic message. 
+
+SAMP\_\-SPECSSAHANDLER -- Handle a spectrum.load.ssa-generic message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getMapFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-specLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_2e342b672e77e012cc98a6f5506a44be}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-StatusHandler@{samp\_\-StatusHandler}}
+\index{samp\_\-StatusHandler@{samp\_\-StatusHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-StatusHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-StatusHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_2e342b672e77e012cc98a6f5506a44be}
+
+
+Return status of the task. 
+
+SAMP\_\-STATUSHANDLER -- Return status of the task.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, and samp\_\-getUserHandler().\hypertarget{sampHandlers_8c_d9184eb45a5bc93b5205fd5b1c6ef688}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-tbHighlightHandler@{samp\_\-tbHighlightHandler}}
+\index{samp\_\-tbHighlightHandler@{samp\_\-tbHighlightHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-tbHighlightHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tbHighlightHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_d9184eb45a5bc93b5205fd5b1c6ef688}
+
+
+Handle a table.highlight.row message. 
+
+SAMP\_\-TBHIGHLIGHTHANDLER -- Handle a table.highlight.row message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getIntFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_750c0fee0c7a99e135299c08751f288c}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-tbLoadFITSHandler@{samp\_\-tbLoadFITSHandler}}
+\index{samp\_\-tbLoadFITSHandler@{samp\_\-tbLoadFITSHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-tbLoadFITSHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tbLoadFITSHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_750c0fee0c7a99e135299c08751f288c}
+
+
+Handle a generic table.load.fits message. 
+
+SAMP\_\-TBLOADFITSHANDLER -- Handle a generic table.load.fits message $\ast$\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-tbLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_26f96dc6cbf72283e2ee9cb8b4619ed3}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-tbLoadHandler@{samp\_\-tbLoadHandler}}
+\index{samp\_\-tbLoadHandler@{samp\_\-tbLoadHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-tbLoadHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tbLoadHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_26f96dc6cbf72283e2ee9cb8b4619ed3}
+
+
+Handle a generic table.load.$\ast$ message. 
+
+SAMP\_\-TBLOADHANDLER -- Handle a generic table.load.$\ast$ message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), and SZ\_\-NAME.
+
+Referenced by samp\_\-tbLoadFITSHandler(), and samp\_\-tbLoadVOTHandler().\hypertarget{sampHandlers_8c_144ec2329355d91022d5ea38736c0093}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-tbLoadVOTHandler@{samp\_\-tbLoadVOTHandler}}
+\index{samp\_\-tbLoadVOTHandler@{samp\_\-tbLoadVOTHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-tbLoadVOTHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tbLoadVOTHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_144ec2329355d91022d5ea38736c0093}
+
+
+Handle a generic table.load.votable message. 
+
+SAMP\_\-TBLOADVOTHANDLER -- Handle a generic table.load.votable message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-tbLoadHandler(), and SZ\_\-NAME.\hypertarget{sampHandlers_8c_98d68d7091c0b7790631bb53e0ace656}{
+\index{sampHandlers.c@{sampHandlers.c}!samp\_\-tbSelectHandler@{samp\_\-tbSelectHandler}}
+\index{samp\_\-tbSelectHandler@{samp\_\-tbSelectHandler}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{samp\_\-tbSelectHandler}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-tbSelectHandler ({\bf String} {\em sender}, \/  {\bf String} {\em mtype}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em msg\_\-map})}}
+\label{sampHandlers_8c_98d68d7091c0b7790631bb53e0ace656}
+
+
+Handle a table.select.rowList message. 
+
+SAMP\_\-TBSELECTHANDLER -- Handle a table.select.rowList message
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em sender}]sender name \item[{\em mtype}]mtype string \item[{\em msg\_\-id}]message id \item[{\em msg\_\-map}]message map struct \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::handlerMode, samp\_\-getListFromMap(), samp\_\-getStringFromMap(), samp\_\-getUserHandler(), samp\_\-listLen(), and SZ\_\-NAME.
+
+\subsection{Variable Documentation}
+\hypertarget{sampHandlers_8c_a2106c7fe3a5747178c046238fbd5d55}{
+\index{sampHandlers.c@{sampHandlers.c}!nullList@{nullList}}
+\index{nullList@{nullList}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{nullList}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} {\bf nullList}}}
+\label{sampHandlers_8c_a2106c7fe3a5747178c046238fbd5d55}
+
+
+SAMP\_\-OK Map struct \hypertarget{sampHandlers_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{
+\index{sampHandlers.c@{sampHandlers.c}!nullMap@{nullMap}}
+\index{nullMap@{nullMap}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{nullMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} {\bf nullMap}}}
+\label{sampHandlers_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}
+
+
+SAMP handle \hypertarget{sampHandlers_8c_b04b61ee02d86e15b02b861699ae7424}{
+\index{sampHandlers.c@{sampHandlers.c}!sampH@{sampH}}
+\index{sampH@{sampH}!sampHandlers.c@{sampHandlers.c}}
+\subsubsection[{sampH}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t {\bf sampH}}}
+\label{sampHandlers_8c_b04b61ee02d86e15b02b861699ae7424}
+
+
+SAMP struct pointer 

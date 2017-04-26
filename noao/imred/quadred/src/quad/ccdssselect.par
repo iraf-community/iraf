@@ -1,0 +1,4 @@
+input,s,a,"",,,Input image list
+output,s,h,"STDOUT",,,Output image list
+subset,s,h,"",,,Subset to be listed
+ccdtype,s,h,"",,,CCD image type to be listed

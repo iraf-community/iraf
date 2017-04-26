@@ -1,0 +1,41 @@
+.help msiinit Dec98 "Image Interpolation Package"
+.ih
+NAME
+msiinit -- initialize the sequential interpolant descriptor
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+msiinit (msi, interp_type)
+
+.nf
+    pointer	msi		#U interpolant descriptor
+    int		interp_type	#I interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls msi     
+Pointer to the sequential interpolant descriptor.
+.le
+.ls interp_type
+Interpolant type. The options are II_BINEAREST, II_BILINEAR, II_BIPOLY3,
+II_BIPOLY5, II_BISPLINE3, II_BISINC, II_BILSINC, and II_BIDRIZZLE, for
+nearest neighbour, bilinear, 3rd and 5th order interior polynomials, bicubic
+spline, sinc, look-up table sinc, and drizzle respectively. The interpolant
+definitions are found in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+The interpolant type is allocated and initialized. The pointer msi is
+returned by MSIINIT. The sinc interpolant width defaults to 31 pixels
+in x and y. The look-up table sinc resolution defaults to 20 resolution
+elements or 0.05 pixels in x and y. The drizzle pixel fraction defaults
+to 1.0.
+.ih
+NOTES
+MSIINIT, MSISINIT or MSIRESTORE must be called before using any other
+MSI routines.
+.ih
+SEE ALSO
+msirestore, msifree
+.endhelp

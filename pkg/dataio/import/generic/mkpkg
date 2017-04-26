@@ -1,0 +1,15 @@
+# Compile the generic sources.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	ipdb.x		../import.h ../ipfcn.h \
+				<error.h> <evvexpr.h> <imhdr.h> <mach.h>
+	ipfio.x		../import.h <fset.h> <mach.h>
+	ipobands.x	../import.h ../ipfcn.h <error.h> <evvexpr.h> \
+				<fset.h> <mach.h>
+	ipproc.x	../import.h <evvexpr.h> <imhdr.h> <mach.h>
+	;

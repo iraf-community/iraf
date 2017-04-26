@@ -1,0 +1,10 @@
+      findpeaks - Find the peaks
+    fitfunction - Fit a function to the spectra parameter values
+      fitgauss5 - Fit spectra profiles with five parameter Gaussian model
+      modellist - List data and model pixel values
+      msextract - Extract spectra
+	 mslist - List entries in a MULTISPEC database
+	 msplot - Plot a line of image and model data
+	  msset - Set entries in a MULTISPEC database
+  newextraction - Create a new MULTISPEC extraction database
+       newimage - Create a new multi-spectra image

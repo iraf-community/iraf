@@ -1,0 +1,6 @@
+# Parameters for the PFMERGE task
+
+inphotfiles,f,a,,,,"List of input photometry files to be merged"
+outphotfile,f,a,,,,"Output photometry file"
+verbose,b,h,)_.verbose,,,Print pfmerge messages?
+mode,s,h,'ql'

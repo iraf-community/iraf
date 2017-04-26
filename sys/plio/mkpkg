@@ -1,0 +1,94 @@
+# Make the PLIO package library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+tfiles:
+	$set GFLAGS = "-k -t sil -p tf/"
+	$ifolder (tf/plglpi.x,  plglp.gx)  $generic $(GFLAGS) plglp.gx  $endif
+	$ifolder (tf/plglri.x,  plglr.gx)  $generic $(GFLAGS) plglr.gx  $endif
+	$ifolder (tf/pll2pi.x,  pll2p.gx)  $generic $(GFLAGS) pll2p.gx  $endif
+	$ifolder (tf/pll2ri.x,  pll2r.gx)  $generic $(GFLAGS) pll2r.gx  $endif
+	$ifolder (tf/plp2li.x,  plp2l.gx)  $generic $(GFLAGS) plp2l.gx  $endif
+	$ifolder (tf/plp2ri.x,  plp2r.gx)  $generic $(GFLAGS) plp2r.gx  $endif
+	$ifolder (tf/plplpi.x,  plplp.gx)  $generic $(GFLAGS) plplp.gx  $endif
+	$ifolder (tf/plplri.x,  plplr.gx)  $generic $(GFLAGS) plplr.gx  $endif
+	$ifolder (tf/plpropi.x, plprop.gx) $generic $(GFLAGS) plprop.gx $endif
+	$ifolder (tf/plr2li.x,  plr2l.gx)  $generic $(GFLAGS) plr2l.gx  $endif
+	$ifolder (tf/plr2pi.x,  plr2p.gx)  $generic $(GFLAGS) plr2p.gx  $endif
+	$ifolder (tf/plrropi.x, plrrop.gx) $generic $(GFLAGS) plrrop.gx $endif
+	$ifolder (tf/plrpri.x,  plrpr.gx)  $generic $(GFLAGS) plrpr.gx  $endif
+	$ifolder (tf/plreqi.x,  plreq.gx)  $generic $(GFLAGS) plreq.gx  $endif
+	;
+
+zzdebug:
+zzdebug.e:
+	$set	XFLAGS = "$(XFLAGS) -q"
+	$omake	zzdebug.x <error.h> <ctype.h> <fset.h> <plset.h> <plio.h>
+	$link	-z zzdebug.o -o zzdebug.e
+	;
+
+libex.a:
+	# Retranslate any recently modified generic sources.
+	$ifeq (hostid, unix)
+	    $call tfiles
+	$endif
+
+	@tf		# Update datatype expanded files.
+
+	placcess.x	<plio.h> <plset.h>
+	plalloc.x	<plio.h>
+	plascii.x	<ctype.h> <plset.h>
+	plbox.x		<plio.h> <plset.h> plbox.h
+	plubox.x	<plio.h> <plset.h> plbox.h
+	plcircle.x	<plio.h> <plset.h> plcircle.h
+	plucircle.x	<plio.h> <plset.h> plcircle.h
+	plclear.x	<plio.h>
+	plclose.x	<plio.h>
+	plcmpress.x	<plio.h>
+	plcompare.x	<plio.h> <plset.h>
+	plcreate.x	
+	pldbgout.x	
+	pldebug.x	<plio.h> <plset.h>
+	plempty.x	<plio.h>
+	plemptyline.x	<plio.h>
+	plglls.x	<plio.h>
+	plgplane.x	<plio.h>
+	plgsize.x	<plio.h> <plset.h>
+	pllen.x		<plio.h>
+	plleq.x		<plio.h>
+	plline.x	<math.h> <plio.h> <plset.h>
+	pllinene.x	<plio.h> <plset.h>
+	pllnext.x	pllseg.h <plio.h>
+	plload.x	<plio.h> <plset.h>
+	plloadf.x	<plio.h> <plset.h>
+	plloadim.x	<imhdr.h> <imset.h> <plio.h> <plset.h>
+	plloop.x	<plio.h>
+	pllpr.x		<plio.h>
+	pllrop.x	<plio.h> <plset.h> pllseg.h
+	pllsten.x	<plio.h> <plset.h> pllseg.h
+	plnewcopy.x	<plio.h> <plset.h>
+	plopen.x	<plio.h> <plset.h>
+	plplls.x	<plio.h>
+	plpoint.x	<plio.h> <plset.h>
+	plpolygon.x	<plio.h> <plset.h> plpolygon.h
+	plupolygon.x	<plio.h> <plset.h> plpolygon.h
+	plregrop.x	<plio.h> <plset.h>
+	plrio.x		<plio.h>
+	plrop.x		<plio.h> <plset.h>
+	plsave.x	<plio.h> <plset.h>
+	plsavef.x	<plio.h> <plset.h>
+	plsaveim.x	<imhdr.h> <imset.h> <mach.h> <plio.h> <plset.h>
+	plsectnc.x	<plio.h> pllseg.h <plset.h>
+	plsectne.x	<plio.h> pllseg.h <plset.h>
+	plseti.x	<plio.h> <plset.h>
+	plsplane.x	<plio.h>
+	plssize.x	<plio.h> <plset.h>
+	plsslv.x	<plio.h> <plset.h>
+	plstati.x	<plio.h> <plset.h>
+	plsten.x	<plio.h> <plset.h>
+	plupdate.x	<mach.h> <plio.h> <plset.h>
+	plvalid.x	<plio.h>
+	;

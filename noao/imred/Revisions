@@ -1,0 +1,237 @@
+.help revisions Jun88 noao.imred
+.nf
+
+imred$src/doecslit/apslitproc.par
+imred$src/dofoe/apscript.par
+imred$src/doslit/apslitproc.par
+imred$src/fibers/apscript.par
+imred$src/fibers/params.par
+    Changed the default maxsep from 1000 to 100000.  Unless users reset
+    the default their expectation is that marking apertures will not
+    skip an aperture number no matter how far apart the aperturers are.
+    (2/17/09, Valdes)
+
+imred$src/fibers/skysub.cl
+imred$src/fibers/skysub.par
+    Added sum as an enumerated "combine" choice.  (8/11/08, Valdes)
+
+=======
+V2.14.1
+=======
+
+imred$irs/dispcor.par
+imred$iids/dispcor.par
+    Changed "Conserve flux" to "Conserve total flux" per user request.
+    (6/13/08)
+
+=====
+V2.12
+=====
+
+imred$quadred/	+
+imred$imred.cl
+imred$imred.par
+imred$imred.hd
+imred$imred.men
+imred$mkpkg
+    Added new package QUADRED.  (8/24/01, Valdes)
+
+imred$crutil/	+
+imred$imred.cl
+imred$imred.par
+imred$imred.hd
+imred$imred.men
+imred$mkpkg
+    Added new package CRUTIL.  (8/22/01, Valdes)
+
+imred$argus/argus.cl
+imred$argus/hydra.cl
+imred$argus/echelle.cl
+imred$argus/kpnocoude.cl
+imred$argus/specred.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$hydra/demos/xgdonessie.dat
+    Fixed playback.  (7/26/94, Valdes)
+
+imred$argus/argus.cl
+imred$argus/argus.men
+imred$ctioslit/ctioslit.cl
+imred$ctioslit/ctioslit.men
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$hydra/hydra.cl
+imred$hydra/hydra.men
+imred$iids/iids.cl
+imred$iids/iids.men
+imred$irs/irs.cl
+imred$irs/irs.men
+imred$kpnocoude/kpnocoude.cl
+imred$kpnocoude/kpnocoude.men
+imred$kpnoslit/kpnoslit.cl
+imred$kpnoslit/kpnoslit.men
+imred$specred/specred.cl
+imred$specred/specred.men
+    Added new SFLIP task to packages.  (7/18/94, Valdes)
+
+imred$doc/demos.hlp
+    Added noao.twodspec.longslit to the packages with demos.  (7/24/92, Valdes)
+
+=======
+V2.10.0
+=======
+
+imred$imred.cl
+imred$imred.men
+imred$<spectroscopy packages>
+    Removed the SETAIRMASS task definition from IMRED and added it to
+    all the spectroscopy packages.  Also added the new SETJD task to
+    the spectroscopy packages.  (1/29/92, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$ctioslit/* +
+imred$kpnocoude/* +
+imred$kpnoslit/* +
+imred$msred --> imred$specred
+imred$kpcoude/* -
+imred$foe/* -
+imred$echelle/*
+imred$src/slits/*
+    Reorganized the slit reductions packages and merged the fiber and
+    slit processing tasks into the kpnocoude package and the
+    echelle slit and FOE tasks in the echelle package.  (1/15/92, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$nessie/* -
+imred$hydra/* +
+    Changed package from NESSIE to HYDRA.  (7/26/91, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$foe/*
+    Added new package for Fiber Optic Echelle reductions.
+    (3/22/91, Valdes)
+
+imred$echelle
+imred$src/ecslits/*
+    Added new echelle slit reduction scripts and documentation.
+    (3/22/91, Valdes)
+
+imred$argus
+imred$echelle
+imred$goldcam
+imred$msred
+imred$nessie
+imred$specred
+imred$src
+    Miscellaneous minor updates.  (3/22/91, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$observatory.par -
+imred$observatory.cl -
+    Removed observatory from here and replaced it with a new version in
+    noao.  (11/6/90, Valdes)
+
+imred$imred.cl
+    1.  Changed logical directory bias to biasdir to avoid incorrect
+	interpretation of the command:
+		cl> imrename foo bias
+	to be a move to the logical directory.  Bias is a likely name to
+	be used in CCDRED which will always have bias defined.
+	(10/2/90, Valdes)
+      
+imred$doc +
+imred$imred.hd
+imred$observatory.hlp -> noao$imred/doc
+imred$tutorial.hlp -> noao$imred/doc
+imred$demos.hlp +
+    1. Created doc directory and moved above help to it.
+    2. The help for the demos task which appear in a number of packages was
+	added to the IMRED help for lack of a more obvious place to put it.
+	(9/20/90, Valdes)
+
+imred$argus +
+imred$goldcam +
+imred$kpcoude +
+imred$nessie +
+imred$specred +
+imred$specphot -
+imred$coude -
+imred$echelle
+imred$msred
+imred$iids
+imred$irs
+imred$mkpkg
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$imred.par
+    A major update of the IMRED spectroscopy packages was made.  New packages
+    were added, one was removed, COUDE was renamed to KPCOUDE, new versions
+    of ECHELLE and MSRED based on major changes to APEXTRACT and ONEDSPEC
+    were installed, and minor changes made.
+    (8-9/90, Valdes)
+
+imred$irred
+    Valdes, June 2, 1989
+    Added the SETAIRMASS task.
+
+imred$irred
+    Davis, April 1, 1989
+    1. Installed the IRRED package. At present this is simply a collection
+    of tasks useful for IR observers.
+
+imred$cryomap -
+noao$mkpkg
+noao$imred.cl
+noao$imred.men
+noao$imred.hd
+    Valdes, February 27, 1987
+    1.  The CRYOMAP (Cryogenic Camera Multi-Aperture Plate) package was
+	archived (Tape 2977 - J. Barnes) and removed.  It was never used
+	and data has not been taken with this system in many years.  The
+	APEXTRACT pacakge is better anyway.  The MULTISPEC package remains.
+    2.  The IMRED package was modified to delete the CRYOMAP package.
+
+imred$dtoi
+    Hammond, February 13. 1987
+    1. Installed the DTOI package
+
+imred$observatory.cl
+    Valdes, October 6, 1986
+    1.  The OBSERVATORY task now calls EPARAM to edit the parameters.
+    2.  The help page was modified.
+
+imred$specphot/* +
+    Valdes/Barnes, October 6, 1986
+    1.  New IMRED package called SPECPHOT added.  The focus of the package
+	is extraction of 1D spectra from 2D detectors and spectrophotometric
+	reduction of the spectra.
+      
+imred$tutor.cl +
+imred$tutor.hlp +
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+    Valdes, August 18, 1986:
+    1. Added experimental online TUTOR task.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+imred$imred.cl:  Valdes, April 30, 1986
+    1.  Removed the commands to load plot and images since this is now
+	done when the NOAO package is loaded.
+
+imred$observatory.cl:  Valdes, April 7, 1986
+    1.  Task OBSERVATORY added to contain observatory parameters.
+.endhelp

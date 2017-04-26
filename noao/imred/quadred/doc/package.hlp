@@ -1,0 +1,142 @@
+.help package Sep93 quadred
+.ih
+NAME
+quadred -- CCD reductions of images in multi-amp readout format
+.ih
+SYNOPSIS
+This package is a varient of \fBccdred\fR that operates on a
+multi-amplifier data format in which the various amplifier readouts are
+recorded in sections of a regular two-dimensional image.  The CTIO Arcon
+dual or quad readout data is an example of this format.  See help on
+\fBquadformat\fR for details.  Most tasks are the same as in the
+\fBccdred\fR package.  The difference is the version of \fBccdproc\fR in
+this package also works on the multi-amp format.  An alternative to using
+this version of \fBccdproc\fR is \fBquadproc\fR and the alternate
+calibration combining task based on this task.
+.ih
+USAGE
+quadred
+.ih
+PARAMETERS
+The following are "package" parameters.  This means that they apply to
+many of the tasks in this package.
+
+.ls pixeltype = "real real"
+Output pixel datatype and calculation datatype.  When images are processed
+or created the output pixel datatype is determined by this parameter.
+The allowed types are "short" for short integer, and "real" for real
+floating point.  The calculation datatypes are also short and real with a
+default of real if none is specified.
+.le
+.ls verbose = no
+Print log information to the standard output?
+.le
+.ls logfile = "logfile"
+Text log file.  If no filename is specified then no log file is kept.
+.le
+.ls plotfile = ""
+Log metacode plot file for the overscan bias vector fits.  If
+no filename is specified then no metacode plot file is kept.
+.le
+.ls backup = ""
+Backup prefix for backup images.  If no prefix is specified then no backup
+images are kept when processing.  If specified then the backup image
+has the specified prefix.
+.le
+.ls instrument = ""
+CCD instrument translation file.  This is usually set with \fBsetinstrument\fR.
+.le
+.ls ssfile = "subsets"
+Subset translation file used to define the subset identifier.  See
+\fBsubsets\fR for more.
+.le
+.ls graphics = "stdgraph"
+Interactive graphics output device when fitting the overscan bias vector.
+.le
+.ls cursor = ""
+Graphics cursor input.  The default is the standard graphics cursor.
+.le
+.ls version = "Version 1.0 - August 22, 2001"
+Package version.
+.le
+.ih
+DESCRIPTION
+The \fBquadred\fR package contains all basic tasks necessary for the
+reduction of CCD data in single image format.  This includes both single
+amplifier readout data and multi-amplifier data stored as sections in a
+single two-dimensional image.  One example of this type of multi-amplifier
+data is the CTIO Arcon "dual" or "quad" readout format.  The format is
+described in the help topic \fBquadformat\fR.  This package is a
+combination of two earlier packages called \fBxccdred\fR and
+\fBared.quad\fR, each of which are variants of the original \fBccdred\fR
+package.
+
+The raw data contains overscan/prescan regions in the image.  For multi-amp
+data there are multiple overscan/prescan regions.  The first steps in
+processing the data is to use the overscan/prescan regions to determine
+the amplifier bias, subtract this bias, and trim the regions out of
+the data.  Once this is done the data are just simple images.  It is
+the special step of dealing with the overscan/prescan regions with
+the multi-amp format that is different from the standard \fBccdred\fR
+package.
+
+Two methods are provided for dealing with the special format.  One is a
+special version of \fBccdproc\fR which processes the sections directly.  If
+one uses this task then the reduction steps appear identical to using the
+\fBccdred\fR package.  The other method is to use the tasks \fBquadproc\fR,
+\fBqzerocombine\fR, \fBqdarkcombine\fR, and \fBqflatcombine\fR.  The latter
+calibration combining tasks are the same as the standard versions except
+they use \fBquadproc\fR instead of \fBccdproc\fR.  The task \fBquadproc\fR
+operates internally by splitting the multiple regions into temporary single
+amplifier images, processing them with \fBccdproc\fR, and then joining the
+pieces back together.
+
+The recommended method is to use \fBccdproc\fR.  However, the \fBquadproc\fR
+related tasks have a history of usage for CTIO data and so may also be
+used.
+
+The \fBquadred\fR package itself has several parameters which are
+common to many of the tasks in the package.  When images are processed or
+new image are created the output pixel datatype is that specified by the
+parameter \fBpixeltype\fR. Note that CCD processing replaces the original
+image by the processed image so the pixel type of the CCD images may change
+during processing.  It is unlikely that real images will be processed to
+short images but the reverse is quite likely.  Processing images from short
+to real pixel datatypes will generally increase the amount of disk space
+required (a factor of 2 on most computers).
+
+The tasks produce log output which may be printed on the standard
+output (the terminal unless redirected) and appended to a file.  The
+parameter \fIverbose\fR determines whether processing information
+is printed.  This may be desirable initially, but when using background
+jobs the verbose output should be turned off.  The user may look at
+the end of the log file (for example with \fBtail\fR) to determine
+the status of the processing.
+
+The package was designed to work with data from many different observatories
+and instruments.  In order to accomplish this an instrument translation
+file is used to define a mapping between the package parameters and
+the particular image header format.  The instrument translation file
+is specified to the package by the parameter \fIinstrument\fR.  This
+parameter is generally set by the task \fBsetinstrument\fR.  The other
+file used is a subset file.  This is generally created and maintained
+by the package and the user need not do anything.  For more sophisticated
+users see \fBinstruments\fR and \fBsubsets\fR.
+
+The package has very little graphics output.  The exception is the overscan
+bias subtraction.  The bias vector is logged in the metacode plot file if
+given.  The plot file may be examined with the tasks in the \fBplot\fR
+package such as \fBgkimosaic\fR.  When interactively fitting the overscan
+vector the graphics input and output devices must be specified.  The
+defaults should apply in most cases.
+
+Because processing replaces the input image by the processed image it may
+be desired to save the original image.  This may be done by specifying a
+backup prefix with the parameter \fIbackup\fR.  For example, if the prefix
+is "orig" and the image is "ccd001", the backup image will be
+"origccd001".  The prefix may be a directory but if so it must end with '/'
+or '$' (for logical directories) and the directory must already exist.
+.ih
+SEE ALSO
+quadformat, mscred
+.endhelp

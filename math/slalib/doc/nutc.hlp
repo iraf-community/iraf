@@ -1,0 +1,33 @@
+.help nutc Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slNUTC (DATE, DPSI, DEPS, EPS0)
+
+     - - - - -
+      N U T C
+     - - - - -
+
+  Nutation:  longitude & obliquity components and mean
+  obliquity - IAU 1980 theory (double precision)
+
+  Given:
+
+     DATE        dp    TDB (loosely ET) as Modified Julian Date
+                                            (JD-2400000.5)
+  Returned:
+
+     DPSI,DEPS   dp    nutation in longitude,obliquity
+     EPS0        dp    mean obliquity
+
+  References:
+     Final report of the IAU Working Group on Nutation,
+      chairman P.K.Seidelmann, 1980.
+     Kaplan,G.H., 1981, USNO circular no. 163, pA3-6.
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

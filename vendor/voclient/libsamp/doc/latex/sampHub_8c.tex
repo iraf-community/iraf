@@ -1,0 +1,421 @@
+\hypertarget{sampHub_8c}{
+\section{sampHub.c File Reference}
+\label{sampHub_8c}\index{sampHub.c@{sampHub.c}}
+}
+Methods related to the SAMP \hyperlink{structHub}{Hub} interface.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$time.h$>$}\par
+{\tt \#include $<$pthread.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{sampHub_8c_15f13b436c106e975a91e0d343005e01}{
+\#define \textbf{HUB\_\-DBG}~(getenv(\char`\"{}HUB\_\-DBG\char`\"{})!=NULL$|$$|$access(\char`\"{}/tmp/HUB\_\-DBG\char`\"{},F\_\-OK)==0)}
+\label{sampHub_8c_15f13b436c106e975a91e0d343005e01}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{sampHub_8c_ab66aed8f93a9cd5734a8dd62e427418}{samp\_\-hubOpen} (\hyperlink{structSamp}{Samp} $\ast$sampP)
+\begin{CompactList}\small\item\em Discover and open a connection to the SAMP \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_52f471568663ac6f0116d57a9ce00f00}{samp\_\-hubClose} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Close a connection to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_a927eb8dcb67e245aeb5a8a4feeb6230}{samp\_\-hubRunning} (void)
+\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampHub_8c_e792eedc70daa9b2d010ca6cd8e57fe8}{samp\_\-getAvailableHubs} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Get a list of available Hubs. \item\end{CompactList}\item 
+\hypertarget{sampHub_8c_4b4292d136520c3d276d655e2093dd30}{
+char $\ast$ \textbf{samp\_\-getActiveHubName} (handle\_\-t handle)}
+\label{sampHub_8c_4b4292d136520c3d276d655e2093dd30}
+
+\item 
+\hypertarget{sampHub_8c_bf266e81b16f556e2f42cad5a2eb9157}{
+int \textbf{samp\_\-getActiveHub} (handle\_\-t handle)}
+\label{sampHub_8c_bf266e81b16f556e2f42cad5a2eb9157}
+
+\item 
+\hypertarget{sampHub_8c_b7ea81f81c8b5b5a6d7a323e9c98cd12}{
+int \textbf{samp\_\-hubInit} (handle\_\-t handle, char $\ast$appName, char $\ast$descr)}
+\label{sampHub_8c_b7ea81f81c8b5b5a6d7a323e9c98cd12}
+
+\item 
+int \hyperlink{sampHub_8c_2933b26ac05c440196368edad0167bdf}{samp\_\-processHubEvent} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} params)
+\begin{CompactList}\small\item\em Determine the type of \hyperlink{structHub}{Hub} event mtype. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_19f64b527fcc431541206e41f8e36132}{samp\_\-hubEvent} (\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} mtype)
+\begin{CompactList}\small\item\em Determine the type of \hyperlink{structHub}{Hub} event mtype. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_13ad32079ae1db571e3114b7bd8ba356}{samp\_\-hubRegister} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Send a Register message to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_6d4e32ed0eb19f02cc8a75f75a98deec}{samp\_\-hubUnRegister} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Send a UnRegister message to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_a704d2a0d290f2fdfb3ebfffc39adcb3}{samp\_\-hubSendShutdown} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Send a samp.app.event.shutdown message to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_2fcb0032e5ae98fff93becdb06da49f9}{samp\_\-hubSetXmlrpcCallback} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Set the client callback and send to \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_47b1a9a4627fde97f95b40b372153cf6}{samp\_\-hubPing} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Ping the \hyperlink{structHub}{Hub} to see if it is alive. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_088f1e762175d0dbc315853d06e50149}{samp\_\-hubDeclareMetadata} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Declare \char`\"{}standard\char`\"{} metadata to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampHub_8c_7be493427eac28b2a064eedd8a7d63ff}{samp\_\-hubDeclareSubscriptions} (\hyperlink{structHub}{Hub} $\ast$\hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub})
+\begin{CompactList}\small\item\em Declare mtype subscriptions to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hyperlink{structHub}{Hub} $\ast$ \hyperlink{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{hub} = (\hyperlink{structHub}{Hub} $\ast$) NULL
+\item 
+int \hyperlink{sampHub_8c_037f00cb1101b007b4bf45e8bee1bd3e}{numHubs} = 0
+\item 
+handle\_\-t \hyperlink{sampHub_8c_86b0db44d25bc3079d8d9d75e01a0ecd}{hubHandles} \mbox{[}MAX\_\-HUBS\mbox{]}
+\item 
+pthread\_\-mutex\_\-t \hyperlink{sampHub_8c_c49d9bc6850c63f257c18f2920915d9c}{samp\_\-mutex} = PTHREAD\_\-MUTEX\_\-INITIALIZER
+\item 
+\hypertarget{sampHub_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}{
+\hyperlink{structSamp}{Samp} $\ast$ \textbf{sampP}}
+\label{sampHub_8c_12abcaf1a16a8a7c2ef6358cdbf4d705}
+
+\item 
+\hypertarget{sampHub_8c_b45e068a722f83368367449cb0a5312b}{
+int \textbf{numSamps}}
+\label{sampHub_8c_b45e068a722f83368367449cb0a5312b}
+
+\item 
+\hypertarget{sampHub_8c_9ee46f73e7f3c5e99958a618b2b6ed5a}{
+handle\_\-t \textbf{sampHandles} \mbox{[}MAX\_\-SAMPS\mbox{]}}
+\label{sampHub_8c_9ee46f73e7f3c5e99958a618b2b6ed5a}
+
+\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampHub_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{nullMap}
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Methods related to the SAMP \hyperlink{structHub}{Hub} interface. 
+
+SAMPHUB.C -- Methods related to the SAMP \hyperlink{structHub}{Hub} interface.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampHub_8c_e792eedc70daa9b2d010ca6cd8e57fe8}{
+\index{sampHub.c@{sampHub.c}!samp\_\-getAvailableHubs@{samp\_\-getAvailableHubs}}
+\index{samp\_\-getAvailableHubs@{samp\_\-getAvailableHubs}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-getAvailableHubs}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} samp\_\-getAvailableHubs (handle\_\-t {\em handle})}}
+\label{sampHub_8c_e792eedc70daa9b2d010ca6cd8e57fe8}
+
+
+Get a list of available Hubs. 
+
+SAMP\_\-GETAVAILABLEHUBS -- Get a list of available Hubs
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]hub handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]List of hub handles \end{Desc}
+\hypertarget{sampHub_8c_52f471568663ac6f0116d57a9ce00f00}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubClose@{samp\_\-hubClose}}
+\index{samp\_\-hubClose@{samp\_\-hubClose}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubClose}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubClose (handle\_\-t {\em handle})}}
+\label{sampHub_8c_52f471568663ac6f0116d57a9ce00f00}
+
+
+Close a connection to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBCLOSE -- Close a connection to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]hub handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]unregister status \end{Desc}
+
+
+References appMD::aKey, appMD::aVal, Hub::meta, appMD::nkeys, samp\_\-freeHandle(), and samp\_\-hubUnRegister().
+
+Referenced by sampClose(), and sampShutdown().\hypertarget{sampHub_8c_088f1e762175d0dbc315853d06e50149}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubDeclareMetadata@{samp\_\-hubDeclareMetadata}}
+\index{samp\_\-hubDeclareMetadata@{samp\_\-hubDeclareMetadata}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubDeclareMetadata}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubDeclareMetadata ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_088f1e762175d0dbc315853d06e50149}
+
+
+Declare \char`\"{}standard\char`\"{} metadata to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-DECLAREMETADATA -- Declare \char`\"{}standard\char`\"{} metadata to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References appMD::aKey, appMD::aVal, Hub::description, appMD::docURL, appMD::iconURL, Hub::id, Hub::meta, appMD::nkeys, and Hub::privateKey.
+
+Referenced by samp\_\-DeclareMetadata(), and sampStartup().\hypertarget{sampHub_8c_7be493427eac28b2a064eedd8a7d63ff}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubDeclareSubscriptions@{samp\_\-hubDeclareSubscriptions}}
+\index{samp\_\-hubDeclareSubscriptions@{samp\_\-hubDeclareSubscriptions}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubDeclareSubscriptions}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubDeclareSubscriptions ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_7be493427eac28b2a064eedd8a7d63ff}
+
+
+Declare mtype subscriptions to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBDECLARESUBSCRIPTIONS -- Declare mtype subscriptions to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::id, Samp::nsubs, nullMap, Hub::privateKey, Hub::samp, samp\_\-freeMap(), and Subs::userFunc.
+
+Referenced by samp\_\-DeclareSubscriptions(), and sampStartup().\hypertarget{sampHub_8c_19f64b527fcc431541206e41f8e36132}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubEvent@{samp\_\-hubEvent}}
+\index{samp\_\-hubEvent@{samp\_\-hubEvent}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubEvent}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubEvent ({\bf String} {\em mtype})}}
+\label{sampHub_8c_19f64b527fcc431541206e41f8e36132}
+
+
+Determine the type of \hyperlink{structHub}{Hub} event mtype. 
+
+SAMP\_\-HUBEVENT -- Determine the type of \hyperlink{structHub}{Hub} event mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mtype}]mtype string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]\hyperlink{structHub}{Hub} event code or -1 if not found \end{Desc}
+
+
+References HUB\_\-SHUTDOWN.
+
+Referenced by samp\_\-processHubEvent().\hypertarget{sampHub_8c_ab66aed8f93a9cd5734a8dd62e427418}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubOpen@{samp\_\-hubOpen}}
+\index{samp\_\-hubOpen@{samp\_\-hubOpen}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubOpen}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t samp\_\-hubOpen ({\bf Samp} $\ast$ {\em sampP})}}
+\label{sampHub_8c_ab66aed8f93a9cd5734a8dd62e427418}
+
+
+Discover and open a connection to the SAMP \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBOPEN -- Discover and open a connection to the SAMP \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em samp}]Same structure \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]hub handle \end{Desc}
+
+
+References Hub::appId, Samp::appVer, Hub::appVer, appMD::desc, Hub::description, Samp::description, Hub::id, Hub::meta, Hub::samp, samp\_\-hubRegister(), samp\_\-hubSetXmlrpcCallback(), samp\_\-newHandle(), samp\_\-P2H(), Hub::timeout, and Hub::url.
+
+Referenced by sampInit(), and sampStartup().\hypertarget{sampHub_8c_47b1a9a4627fde97f95b40b372153cf6}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubPing@{samp\_\-hubPing}}
+\index{samp\_\-hubPing@{samp\_\-hubPing}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubPing}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubPing ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_47b1a9a4627fde97f95b40b372153cf6}
+
+
+Ping the \hyperlink{structHub}{Hub} to see if it is alive. 
+
+SAMP\_\-HUBPING -- Ping the \hyperlink{structHub}{Hub} to see if it is alive.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::id, and Hub::privateKey.
+
+Referenced by samp\_\-Ping().\hypertarget{sampHub_8c_13ad32079ae1db571e3114b7bd8ba356}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubRegister@{samp\_\-hubRegister}}
+\index{samp\_\-hubRegister@{samp\_\-hubRegister}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubRegister}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubRegister ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_13ad32079ae1db571e3114b7bd8ba356}
+
+
+Send a Register message to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUB\_\-REGISTER -- Send a Register message to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::hubId, Hub::id, Hub::privateKey, Hub::secret, and Hub::selfId.
+
+Referenced by samp\_\-hubOpen().\hypertarget{sampHub_8c_a927eb8dcb67e245aeb5a8a4feeb6230}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubRunning@{samp\_\-hubRunning}}
+\index{samp\_\-hubRunning@{samp\_\-hubRunning}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubRunning}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubRunning (void)}}
+\label{sampHub_8c_a927eb8dcb67e245aeb5a8a4feeb6230}
+
+
+SAMP\_\-HUBRUNNING -- See whether a \hyperlink{structHub}{Hub} is running. The test simply checks the existence of a \hyperlink{structHub}{Hub} lockfile. 
+
+References SZ\_\-NAME.\hypertarget{sampHub_8c_a704d2a0d290f2fdfb3ebfffc39adcb3}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubSendShutdown@{samp\_\-hubSendShutdown}}
+\index{samp\_\-hubSendShutdown@{samp\_\-hubSendShutdown}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubSendShutdown}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubSendShutdown ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_a704d2a0d290f2fdfb3ebfffc39adcb3}
+
+
+Send a samp.app.event.shutdown message to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBSENDSHUTDOWN -- Send a samp.app.event.shutdown message to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::id, Hub::privateKey, and samp\_\-nullResponse().\hypertarget{sampHub_8c_2fcb0032e5ae98fff93becdb06da49f9}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubSetXmlrpcCallback@{samp\_\-hubSetXmlrpcCallback}}
+\index{samp\_\-hubSetXmlrpcCallback@{samp\_\-hubSetXmlrpcCallback}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubSetXmlrpcCallback}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubSetXmlrpcCallback ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_2fcb0032e5ae98fff93becdb06da49f9}
+
+
+Set the client callback and send to \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBSETXMLRPCCALLBACK -- Set the client callback and send to \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::id, Hub::privateKey, and samp\_\-serverPort().
+
+Referenced by samp\_\-hubOpen().\hypertarget{sampHub_8c_6d4e32ed0eb19f02cc8a75f75a98deec}{
+\index{sampHub.c@{sampHub.c}!samp\_\-hubUnRegister@{samp\_\-hubUnRegister}}
+\index{samp\_\-hubUnRegister@{samp\_\-hubUnRegister}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-hubUnRegister}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-hubUnRegister ({\bf Hub} $\ast$ {\em hub})}}
+\label{sampHub_8c_6d4e32ed0eb19f02cc8a75f75a98deec}
+
+
+Send a UnRegister message to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-HUBUNREGISTER -- Send a UnRegister message to the \hyperlink{structHub}{Hub}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em hub}]hub struct pointer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]status \end{Desc}
+
+
+References Hub::id, and Hub::privateKey.
+
+Referenced by samp\_\-hubClose(), and samp\_\-UnRegister().\hypertarget{sampHub_8c_2933b26ac05c440196368edad0167bdf}{
+\index{sampHub.c@{sampHub.c}!samp\_\-processHubEvent@{samp\_\-processHubEvent}}
+\index{samp\_\-processHubEvent@{samp\_\-processHubEvent}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-processHubEvent}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-processHubEvent ({\bf String} {\em mtype}, \/  {\bf Map} {\em params})}}
+\label{sampHub_8c_2933b26ac05c440196368edad0167bdf}
+
+
+Determine the type of \hyperlink{structHub}{Hub} event mtype. 
+
+SAMP\_\-HUBEVENT -- Determine the type of \hyperlink{structHub}{Hub} event mtype.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mtype}]mtype string \item[{\em params}]message parameter Map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]non-zero value if a \hyperlink{structHub}{Hub} event was processed \end{Desc}
+
+
+References HUB\_\-SHUTDOWN, samp\_\-addClient(), samp\_\-hubEvent(), samp\_\-mutex, samp\_\-P2H(), samp\_\-removeClient(), sampH, and sampShutdown().
+
+Referenced by samp\_\-receiveNotification().
+
+\subsection{Variable Documentation}
+\hypertarget{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}{
+\index{sampHub.c@{sampHub.c}!hub@{hub}}
+\index{hub@{hub}!sampHub.c@{sampHub.c}}
+\subsubsection[{hub}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Hub}$\ast$ {\bf hub} = ({\bf Hub} $\ast$) NULL}}
+\label{sampHub_8c_d702b07240de0e0cf9e4b781a38317ad}
+
+
+empty List struct 
+
+Referenced by samp\_\-bibLoad(), samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-DeclareMetadata(), samp\_\-DeclareSubscriptions(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-GetMetadata(), samp\_\-imageLoadFITS(), samp\_\-notify(), samp\_\-notifyAll(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Register(), samp\_\-Reply(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), samp\_\-tableSelectRowList(), and samp\_\-UnRegister().\hypertarget{sampHub_8c_86b0db44d25bc3079d8d9d75e01a0ecd}{
+\index{sampHub.c@{sampHub.c}!hubHandles@{hubHandles}}
+\index{hubHandles@{hubHandles}!sampHub.c@{sampHub.c}}
+\subsubsection[{hubHandles}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t {\bf hubHandles}\mbox{[}MAX\_\-HUBS\mbox{]}}}
+\label{sampHub_8c_86b0db44d25bc3079d8d9d75e01a0ecd}
+
+
+No. of available hubs \hypertarget{sampHub_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}{
+\index{sampHub.c@{sampHub.c}!nullMap@{nullMap}}
+\index{nullMap@{nullMap}!sampHub.c@{sampHub.c}}
+\subsubsection[{nullMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} {\bf nullMap}}}
+\label{sampHub_8c_68bf22a5b3f2531242f5c6d6ecf2ea1e}
+
+
+SAMP handle \hypertarget{sampHub_8c_037f00cb1101b007b4bf45e8bee1bd3e}{
+\index{sampHub.c@{sampHub.c}!numHubs@{numHubs}}
+\index{numHubs@{numHubs}!sampHub.c@{sampHub.c}}
+\subsubsection[{numHubs}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf numHubs} = 0}}
+\label{sampHub_8c_037f00cb1101b007b4bf45e8bee1bd3e}
+
+
+HUB connection \hypertarget{sampHub_8c_c49d9bc6850c63f257c18f2920915d9c}{
+\index{sampHub.c@{sampHub.c}!samp\_\-mutex@{samp\_\-mutex}}
+\index{samp\_\-mutex@{samp\_\-mutex}!sampHub.c@{sampHub.c}}
+\subsubsection[{samp\_\-mutex}]{\setlength{\rightskip}{0pt plus 5cm}pthread\_\-mutex\_\-t {\bf samp\_\-mutex} = PTHREAD\_\-MUTEX\_\-INITIALIZER}}
+\label{sampHub_8c_c49d9bc6850c63f257c18f2920915d9c}
+
+
+lock so we can update struct 
+
+Referenced by samp\_\-processHubEvent().

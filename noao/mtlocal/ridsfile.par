@@ -1,0 +1,10 @@
+#Parameter file for the DUMPF IDSFILE reader
+dumpf_file,f,a,mta,,,DUMPF data source
+file_ordinal,s,a,,,,file list
+iraf_file,f,a,,,,IRAF filename
+record_numbers,s,h,"1001-9999",,,record numbers
+make_image,b,h,yes,,,create IRAF image?
+print_pixels,b,h,no,,,print_pixels?
+long_header,b,h,no,,,print complete headers?
+data_type,s,h,r,,,IRAF data type
+mode,s,h,ql,,,

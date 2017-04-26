@@ -1,0 +1,128 @@
+.help asttimes May93 astutil
+.ih
+NAME
+asttimes -- Compute UT, Julian day, epoch, and sidereal time
+.ih
+USAGE
+asttimes
+.ih
+PARAMETERS
+.ls files = ""
+List of files containing local dates and times for which the astronomical
+dates and times are desired.  If no input files are specified then task
+parameters are used.
+.le
+.ls header = yes
+Print header and observatory information to output?
+.le
+.ls observatory = ")_.observatory"
+Observatory for  which times are to be computed.  The default is a
+redirection to look in the parameters for the parent package for a value.
+The final value of this parameter may be one of the
+observatories in the observatory database, "observatory" to select the
+observatory defined by the environment variable "observatory" or the
+parameter \fBobservatory.observatory\fR, or "obspars" to select the
+current parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
+.le
+.ls year, month, day, time
+If no input files are specified then the date and time for which the
+astronomical date and time is computed are given by these parameters.
+If the year is less than 100 then the century is assumed to be 1900.
+The month is specified as an integer between 1 and 12, and the local
+time for the specified time zone is in hours (sexagesimal format is
+acceptable).
+.le
+.ls ut, epoch, jd, lmst
+If no input files are specified then the universal time, J2000 Julian epoch,
+Julian day, and local mean sidereal time (at the specified longitude)
+are recorded in these parameters for possible reference as CL
+variables.  This is in addition to the usual printed output.
+.le
+.ih
+DESCRIPTION
+The astronomical quantities of universal time, J2000 Julian epoch, Julian day,
+and local mean sidereal time at the specified observatory are computed and
+printed for the given dates and times.  To compute parameters for a
+location not specified in the observatory database use the observatory name
+"obspars" which will use the values defined by the parameters
+\fIobservatory.longitude\fR and \fIobservatory.timezone\fR.  The input
+dates and times may be taken from files containing the year, month (as an
+integer between 1 and 12), day, and local time (sexagesimal notation is
+acceptable) in the specified time zone.  If no files are specified then task
+parameters are used.  The output consists of a printed table with optional
+header and the input data and derived astronomical data.  In addition, if
+the input date and time is from the task parameters then the astronomical
+times are recorded in the user's parameter file (provided the task is not
+run as a background job).  These parameters may then be used as CL
+parameters.
+.ih
+EXAMPLES
+1. For use directly without data files set the date and time using
+the parameter editor, with explicit assignments, or on the command line:
+
+.nf
+    cl> asttimes year=1987 month=10 day=28 time=15:30 obs=kpno
+    # ASTTIMES: Observatory parameters for Kitt Peak National Observatory
+    #       timezone = 7
+    #       longitude = 111:36.0
+    ##YR MON   DAY          ZT         UT      EPOCH           JD       LMST
+    1987  10 28 WED 15:30:00.0 22:30:00.0 1987.82324 2447097.4375 17:30:31.8
+    cl> =asttimes.lmst
+    17.508823973881
+.fi
+
+2. To make a table using a CL loop:
+
+.nf
+    cl> asttimes.observatory="kpno"
+    cl> asttimes.year=1987
+    cl> asttimes.month=10
+    cl> asttimes.time=0
+    cl> for (i=10; i<16; i+=1) {
+    >>> asttimes (day=i, header=no)
+    >>> }
+    1987  10 10 SAT  0:00:00.0  7:00:00.0 1987.77219 2447078.7917  0:47:01.0
+    1987  10 11 SUN  0:00:00.0  7:00:00.0 1987.77493 2447079.7917  0:50:57.5
+    1987  10 12 MON  0:00:00.0  7:00:00.0 1987.77766 2447080.7917  0:54:54.1
+    1987  10 13 TUE  0:00:00.0  7:00:00.0 1987.78040 2447081.7917  0:58:50.7
+    1987  10 14 WED  0:00:00.0  7:00:00.0 1987.78314 2447082.7917  1:02:47.2
+    1987  10 15 THU  0:00:00.0  7:00:00.0 1987.78588 2447083.7917  1:06:43.8
+.fi
+
+In practice the output would be directed to a file:
+
+    >>> asttimes (day=i, header=no, >>"table")
+
+3. To use an input file:
+
+.nf
+    cl> asttimes f=dates > table
+    cl> type table
+    # ASTTIMES: Observatory parameters for Kitt Peak National Observatory
+    #       timezone = 7
+    #       longitude = 111:36.0
+    ##YR MON   DAY          ZT         UT      EPOCH           JD       LMST
+    1987  10 28 WED 22:00:00.0  5:00:00.0 1987.82398 2447097.7083  0:01:35.8
+    1987  10 28 WED 23:00:00.0  6:00:00.0 1987.82409 2447097.7500  1:01:45.7
+    1987  10 29 THU  0:00:00.0  7:00:00.0 1987.82421 2447097.7917  2:01:55.5
+    1987  10 29 THU  1:00:00.0  8:00:00.0 1987.82432 2447097.8333  3:02:05.4
+.fi
+.ih
+REVISIONS
+.ls ASTTIMES V2.10.3
+The epoch was changed from day of the year divided by 365.25 to the
+precise J2000 Julian epoch definition.  In addition to changing
+the output value this fixes incorrect values JD and LMST around the
+new year.
+
+The times are now always printed in the proper 24 hour interval instead
+of using negative or values greater than 24 to indicate the day difference
+with Greenwich.
+
+The header parameter now suppress printing the observatory information.
+.le
+.ih
+SEE ALSO
+observatory
+.endhelp

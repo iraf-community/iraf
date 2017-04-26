@@ -1,0 +1,58 @@
+# Makelib file for the image display interface.  An image display device is
+# accessed by high level code via the GKI interface.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	idsexpand.x	<gki.h>  ../lib/ids.h iis.h
+	iisbutton.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iiscls.x	<mach.h> iis.h iis.com <knet.h>
+	iiscursor.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iishdr.x	<mach.h> iis.h iis.com
+	iishisto.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisifm.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisio.x		<mach.h> iis.h  iis.com <knet.h>
+	iislut.x	<mach.h> iis.h ../lib/ids.h  iis.com
+	iismatch.x	<mach.h> iis.h ../lib/ids.h ../lib/ids.com
+	iisminmax.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisoffset.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisofm.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisopn.x	<mach.h> iis.h iis.com <knet.h>
+	iispack.x	../lib/ids.h
+	iispio.x	<mach.h> iis.h <knet.h> iis.com
+	iisrange.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iisrd.x		<mach.h> iis.h iis.com
+	iisscroll.x	<gki.h>  <mach.h> iis.h ../lib/ids.h iis.com
+	iissplit.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iistball.x	<mach.h> iis.h ../lib/ids.h iis.com
+	iiswr.x		<mach.h> iis.h iis.com
+	iiswt.x		<mach.h> iis.h iis.com <knet.h>
+	iiszoom.x	<mach.h> iis.h ../lib/ids.h iis.com
+	zardim.x	iis.h
+	zawrim.x
+	zawtim.x	<mach.h> iis.h  iis.com
+	zclear.x	<mach.h> ../lib/ids.h iis.h
+	zclsim.x
+	zcontrol.x	../lib/ids.h iis.h
+	zcursor_read.x	<gki.h>  <mach.h> iis.h ../lib/ids.h iis.com
+	zcursor_set.x	<gki.h>  <mach.h> iis.h ../lib/ids.h iis.com
+	zdisplay_g.x	<mach.h> iis.h ../lib/ids.h
+	zdisplay_i.x	<mach.h> iis.h ../lib/ids.h ../lib/ids.com iis.com
+	zinit.x		<mach.h> iis.h ../lib/ids.h ../lib/ids.com iis.com
+	zopnim.x
+	zreset.x	<gki.h>  <mach.h> ../lib/ids.h iis.h iis.com
+	zrestore.x	<mach.h> ../lib/ids.h iis.h
+	zsave.x		<mach.h> ../lib/ids.h iis.h
+	zseek.x		<fset.h> <mach.h> ../lib/ids.h iis.h
+
+	zsetup.x	<fset.h> <mach.h> ../lib/ids.h iis.h ../lib/ids.com\
+			iis.com
+	zsnap.x		<fset.h> <mach.h> iis.h ../lib/ids.h zsnap.com iis.com\
+			../lib/ids.com
+	zsnapinit.x	<fset.h> <mach.h> iis.h ../lib/ids.h zsnap.com iis.com\
+			../lib/ids.com
+	zsttim.x	<knet.h>
+	;

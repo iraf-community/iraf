@@ -1,0 +1,242 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# CV_EVCHEB -- Procedure to evaluate a Chebyshev polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tcv_evcheb (coeff, x, yfit, npts, order, k1, k2)
+
+PIXEL	coeff[ARB]		# 1D array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	yfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	order			# order of the polynomial, 1 = constant
+PIXEL	k1, k2			# normalizing constants
+
+int	i
+pointer	sx, pn, pnm1, pnm2
+pointer sp
+PIXEL	c1, c2
+
+begin
+	# fit a constant
+	if (order == 1) {
+	    call amovk$t (coeff[1], yfit, npts)
+	    return
+	}
+
+	# fit a linear function
+	c1 = k2 * coeff[2]
+	c2 = c1 * k1 + coeff[1]
+	call altm$t (x, yfit, npts, c1, c2)
+	if (order == 2)
+	    return
+
+	# allocate temporary space
+	call smark (sp)
+	call salloc (sx, npts, TY_PIXEL)
+	call salloc (pn, npts, TY_PIXEL)
+	call salloc (pnm1, npts, TY_PIXEL)
+	call salloc (pnm2, npts, TY_PIXEL)
+
+	# a higher order polynomial
+	call amovk$t (PIXEL(1.0), Mem$t[pnm2], npts)
+	call alta$t (x, Mem$t[sx], npts, k1, k2)
+	call amov$t (Mem$t[sx], Mem$t[pnm1], npts)
+	call amulk$t (Mem$t[sx], PIXEL(2.0), Mem$t[sx], npts)
+	do i = 3, order {
+	    call amul$t (Mem$t[sx], Mem$t[pnm1], Mem$t[pn], npts)
+	    call asub$t (Mem$t[pn], Mem$t[pnm2], Mem$t[pn], npts)
+	    if (i < order) {
+	        call amov$t (Mem$t[pnm1], Mem$t[pnm2], npts)
+	        call amov$t (Mem$t[pn], Mem$t[pnm1], npts)
+	    }
+	    call amulk$t (Mem$t[pn], coeff[i], Mem$t[pn], npts)
+	    call aadd$t (yfit, Mem$t[pn], yfit, npts)
+	}
+
+	# free temporary space
+	call sfree (sp)
+
+end
+
+# CV_EVLEG -- Procedure to evaluate a Legendre polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tcv_evleg (coeff, x, yfit, npts, order, k1, k2)
+
+PIXEL	coeff[ARB]		# 1D array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	yfit[npts]		# the fitted points
+int	npts			# number of data points
+int	order			# order of the polynomial, 1 = constant
+PIXEL	k1, k2			# normalizing constants
+
+int	i
+pointer	sx, pn, pnm1, pnm2
+pointer	sp
+PIXEL	ri, ri1, ri2
+
+begin
+
+	# fit a constant
+	if (order == 1) {
+	    call amovk$t (coeff[1], yfit, npts)
+	    return
+	}
+
+	# fit a linear function
+	ri1 = k2 * coeff[2]
+	ri2 = ri1 * k1 + coeff[1]
+	call altm$t (x, yfit, npts, ri1, ri2)
+	if (order == 2)
+	    return
+
+	# allocate temporary space
+	call smark (sp)
+	call salloc (sx, npts, TY_PIXEL)
+	call salloc (pn, npts, TY_PIXEL)
+	call salloc (pnm1, npts, TY_PIXEL)
+	call salloc (pnm2, npts, TY_PIXEL)
+
+	# a higher order polynomial
+	call amovk$t (PIXEL(1.0), Mem$t[pnm2], npts)
+	call alta$t (x, Mem$t[sx], npts, k1, k2)
+	call amov$t (Mem$t[sx], Mem$t[pnm1], npts)
+	do i = 3, order {
+	    ri = i
+	    ri1 = (PIXEL(2.0) * ri - PIXEL(3.0)) / (ri - PIXEL(1.0))
+	    ri2 = - (ri - PIXEL(2.0)) / (ri - PIXEL(1.0))
+	    call amul$t (Mem$t[sx], Mem$t[pnm1], Mem$t[pn], npts)
+	    call awsu$t (Mem$t[pn], Mem$t[pnm2], Mem$t[pn], npts, ri1, ri2)
+	    if (i < order) {
+	        call amov$t (Mem$t[pnm1], Mem$t[pnm2], npts)
+	        call amov$t (Mem$t[pn], Mem$t[pnm1], npts)
+	    }
+	    call amulk$t (Mem$t[pn], coeff[i], Mem$t[pn], npts)
+	    call aadd$t (yfit, Mem$t[pn], yfit, npts)
+	}
+
+	# free temporary space
+	call sfree (sp)
+
+end
+
+# CV_EVSPLINE1 -- Procedure to evaluate a piecewise linear spline function
+# assuming that the coefficients have been calculated.
+
+procedure $tcv_evspline1 (coeff, x, yfit, npts, npieces, k1, k2)
+
+PIXEL	coeff[ARB]		# array of coefficients
+PIXEL	x[npts]			# array of x values
+PIXEL	yfit[npts]		# array of fitted values
+int	npts			# number of data points
+int	npieces			# number of fitted points minus 1
+PIXEL	k1, k2			# normalizing constants
+
+int	j
+pointer sx, tx, azindex, aindex, index
+pointer	sp
+
+begin
+
+	# allocate the required space
+	call smark (sp)
+	call salloc (sx, npts, TY_PIXEL)
+	call salloc (tx, npts, TY_PIXEL)
+	call salloc (index, npts, TY_INT)
+
+	# calculate the index of the first non-zero coefficient
+	# for each point
+	call alta$t (x, Mem$t[sx], npts, k1, k2)
+	call acht$ti (Mem$t[sx], Memi[index], npts)
+	call aminki (Memi[index], npieces, Memi[index], npts)
+
+	# transform sx to range 0 to 1
+	azindex = sx - 1
+	do j = 1, npts {
+	    aindex = azindex + j
+	    Mem$t[aindex] = max (PIXEL(0.0), min (PIXEL(1.0), Mem$t[aindex] -
+	        Memi[index+j-1]))
+	    Mem$t[tx+j-1] = max (PIXEL(0.0), min (PIXEL(1.0), PIXEL(1.0) -
+	        Mem$t[aindex]))
+	}
+
+    	# calculate yfit using the two non-zero basis function
+	do j = 1, npts
+	    yfit[j] = Mem$t[tx+j-1] * coeff[1+Memi[index+j-1]] +
+		      Mem$t[sx+j-1] * coeff[2+Memi[index+j-1]]
+
+        # free space
+	call sfree (sp)
+
+end
+
+# CV_EVSPLINE3 -- Procedure to evaluate the cubic spline assuming that
+# the coefficients of the fit are known.
+
+procedure $tcv_evspline3 (coeff, x, yfit, npts, npieces, k1, k2)
+
+PIXEL	coeff[ARB]	# array of coeffcients
+PIXEL	x[npts]		# array of x values
+PIXEL	yfit[npts]	# array of fitted values
+int	npts		# number of data points
+int	npieces		# number of polynomial pieces
+PIXEL	k1, k2		# normalizing constants
+
+int	i, j
+pointer	sx, tx, temp, index, sp
+
+begin
+
+	# allocate the required space
+	call smark (sp)
+        call salloc (sx, npts, TY_PIXEL)
+	call salloc (tx, npts, TY_PIXEL)
+	call salloc (temp, npts, TY_PIXEL)
+	call salloc (index, npts, TY_INT)
+
+	# calculate to which coefficients the x values contribute to
+        call alta$t (x, Mem$t[sx], npts, k1, k2)
+        call acht$ti (Mem$t[sx], Memi[index], npts)
+        call aminki (Memi[index], npieces, Memi[index], npts)
+
+        # transform sx to range 0 to 1
+	do j = 1, npts {
+	    Mem$t[sx+j-1] = max (PIXEL(0.0), min (PIXEL(1.0), Mem$t[sx+j-1] -
+	        Memi[index+j-1]))
+	    Mem$t[tx+j-1] = max (PIXEL(0.0), min (PIXEL(1.0), PIXEL(1.0) -
+	        Mem$t[sx+j-1]))
+	}
+
+        # calculate yfit using the four non-zero basis function
+	call aclr$t (yfit, npts)
+        do i = 1, 4 {
+
+	    switch (i) {
+	    case 1:
+		call apowk$t (Mem$t[tx], 3, Mem$t[temp], npts)
+	    case 2:
+		do j = 1, npts {
+		    Mem$t[temp+j-1] = PIXEL(1.0) + Mem$t[tx+j-1] *
+		        (PIXEL(3.0) + Mem$t[tx+j-1] * (PIXEL(3.0) -
+			PIXEL(3.0) * Mem$t[tx+j-1]))
+		}
+	    case 3:
+		do j = 1, npts {
+		    Mem$t[temp+j-1] = PIXEL(1.0) + Mem$t[sx+j-1] *
+		        (PIXEL(3.0) + Mem$t[sx+j-1] * (PIXEL(3.0) -
+			PIXEL(3.0) * Mem$t[sx+j-1]))
+		}
+	    case 4:
+		call apowk$t (Mem$t[sx], 3, Mem$t[temp], npts)
+	    }
+
+	    do j = 1, npts
+		Mem$t[temp+j-1] = Mem$t[temp+j-1] * coeff[i+Memi[index+j-1]]
+	    call aadd$t (yfit, Mem$t[temp], yfit, npts)
+	}
+
+	# free space
+	call sfree (sp)
+
+end

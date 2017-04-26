@@ -1,0 +1,105 @@
+PDSREAD (Program Structure)                  PDSREAD (Program Structure)
+
+
+
+PDS Structure Chart
+
+t_pdsread()
+# Returns when file list is satified or if EOT is encountered.
+# Errors from called routines are trapped and printed as a warning.
+
+    read_pds
+    # Returns OK or EOF
+        
+        read_header
+        # Returns OK or EOF
+
+            init_read_pixels
+            # Returns OK
+
+            read_pixels
+            # Returns OK
+
+            decode_header
+
+                decode_text
+
+                decode_parameters
+
+            print_header
+
+        read_image
+
+            set_image_header
+
+            init_read_pixels
+
+            read_pixels
+
+
+
+
+PDSREAD Structure Summary
+
+
+t_pdsread
+    The  main  procedure  reads the control parameters.  The files to be
+    converted are calculated from the specified source  and  file  list.
+    A  loop  through  the  files  determines  the  specific input source
+    names and output filenames and calls READ_PDS for each conversion.
+
+    read_pds
+        The input source  is  opened  and  the  output  header  file  is
+
+
+                                  -1-
+PDSREAD (Program Structure)                  PDSREAD (Program Structure)
+
+
+
+        created.   If  only  the  PDS  header  is  to  be  listed then a
+        temporary image header file  is  created.   The  PDS  header  is
+        read  and  decoded  into  the  IRAF image header by READ_HEADER.
+        If make_image is true then READ_IMAGE is  called.   Finally  all
+        the  files  are  closed.   If  a temporary image header file was
+        created it is deleted.
+
+        read_header
+            The PDS header is read into an  array  of  text  and  an  an
+            array  of  parameters  using INIT_READ_PIXEL and READ_PIXEL.
+            These arrays are passed to  DECODE_HEADER  and  subsequently
+            printed  on  the standard output.  The routine returns OK or
+            EOF. Errors are returned by the error handler.
+
+            init_read_pixels
+                The pixel reading routine is initialized.
+
+            read_pixels
+                The pixels are read into a record buffer.
+
+            decode_header
+                Decodes  the  text   portion   of   the   header   using 
+                DECODE_TEXT and DECODE_PARAMETERS.
+
+                decode_text
+                    Converts  the  id  string  from  059  code  to 8 bit
+                    ASCII.
+
+                decode_parameters
+                    Decodes the PDS scan parameters.
+
+            print_header
+                If the short_header switch is set then the  image  title
+                and  size  are  printed.   If  the long_header switch is
+                set then all the header information is printed.
+
+        read_image
+            The PDS image pixels are converted to an  IRAF  image  file.
+            The  image  file  header is set using SET_IMAGE_HEADER.  The
+            lines of the image are converted one at a time.
+
+            set_image_header
+                The pixel type for the IRAF image is  set  to  the  user
+                specified  type.   If  no  type  has been specified then
+                the type is determined  from  the  number  of  bits  per
+                pixel given in pds.h.

@@ -1,0 +1,1043 @@
+.help imexamine Mar96 images.tv
+.ih
+NAME
+imexamine -- examine images using image display, plots, and text
+.ih
+USAGE
+imexamine [input [frame]]
+.ih
+PARAMETERS
+.ls input
+Optional list of images to be examined.  If specified, images are examined
+in turn, displaying them automatically.  If no images are specified the
+images currently loaded into the image display are examined.
+.le
+.ls output = ""
+Rootname for output images created with the 't' key.  If no name is specified
+then the name of the input image is used.  A three digit number is appended
+to the rootname, such as ".001", starting with 1 until no image is found with
+that name.  Thus, successive output images with the same rootname will be
+numbered sequentially.
+.le
+.ls ncoutput = 101, nloutput = 101
+Size of the output image created with the 't' key which is centered on the
+position of the cursor.
+.le
+.ls frame = 1
+During program execution, a query parameter specifying the frame to be loaded.
+May also be specified on the command line when \fIimexamine\fR is used as a
+task to display a new image, to specify the frame to be loaded.
+.le
+.ls image
+Query parameter for selecting images to be loaded.
+.le
+.ls logfile = ""
+Logfile filename in which to record output of the commands producing text.
+If no filename is given then no logfile will be kept.
+.le
+.ls keeplog = no
+Log output results initially?  Logging can be toggled interactively during
+program execution.
+.le
+.ls defkey = "a"
+Default key for cursor x-y input list.  This key is applied to input
+cursor lists which do not have a cursor key specified.  It is used
+to repetitively apply a cursor command to a list of positions typically
+obtained from another task.
+.le
+.ls autoredraw = yes
+Automatically redraw graphs after a parameter change?  If no then graphs
+are only drawn when a graph or redraw command is given.
+If yes then colon commands which modify a parameter of the last graph
+will automatically redraw the graph.  A common example of this would
+be changing the graph limits.
+.le
+.ls allframes = yes
+Use all frames for displaying images?  If set, images from the input list
+are loaded cycling through the available frames.  If not set the last frame
+loaded is reused.
+.le
+.ls nframes = 0
+Number of display frames.  When automatically loading images from the input
+list only this number of frames will be used.  This should, of course,
+not exceed the number of frames provided by the display device.
+If the number of frames is set to 0 then the task will query the display
+device to determine how many frames are currently allocated.  New frames may
+be allocated during program execution by displaying images with the 'd' key.
+.le
+.ls ncstat = 5, nlstat = 5
+The statistics command computes values from a box centered on the
+specified cursor position with the number of columns and lines
+given by these parameters.
+.le
+.ls graphcur = ""
+Graphics cursor input.  If null the standard graphics cursor is used whenever
+graphics cursor input is requested.  A cursor file in the appropriate
+format may be substituted by specifying the name of the file.
+.le
+.ls imagecur = ""
+Image display cursor input.  If null the standard image display cursor is
+used whenever image cursor input is requested.  A cursor file in the
+appropriate format may be substituted by specifying the name of the file.
+Also the image cursor may be changed to query the graphics device or
+the terminal by setting the environment parameter "stdimcur"
+to "stdgraph" or "text" respectively.
+.le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling when
+input is from images.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
+.ls xformat = "", yformat = ""
+The numerical format for the world coordinate labels in the line and column
+plots and the format for printing world coordinates.  The values may be ""
+(an empty string), %f for decimal format, %h and %H for xx:xx:xx format, and
+%m and %M for xx:xx.x format.  The upper case %H and %M convert degrees
+to hours.  Images sometimes include recommended coordinate formats as
+WCS attributes.  These are used if the format specified by these parameters
+is "".  Any other value will override the image attribute.
+.le
+
+In addition to these three reserved WCS names, the name of any user WCS
+defined for the reference image may be given.  A user world coordinate system
+may be any linear or nonlinear world system.
+.le
+.ls graphics = "stdgraph"
+Graphics output device.  Normally this is the standard graphics device
+specified by the environment variable "stdgraph".
+.le
+.ls display = "display(image='$1',frame=$2)"
+Command template used to display an image.  The image to be displayed is
+substituted for argument $1 and the frame for argument $2.  Any display task
+may be used for image display by modifying this template.
+.le
+.ls use_display = yes
+Use the image display?  Set to no to disable all interaction with the
+display device, e.g., when working at a terminal that does not provide image
+display capabilities.
+.le
+.ih
+ADDITIONAL PARAMETERS
+The various graphs and the aperture sum command have parameters defined in
+additional parameter sets.  The parameter sets are hidden tasks with
+the first character being the cursor command graph key that uses the
+parameters followed by "imexam".  The parameter sets are:
+
+.nf
+    cimexam    Parameters for column plots
+    eimexam    Parameters for contour plots
+    himexam    Parameters for histogram plots
+    jimexam    Parameters for line 1D gaussian fit plots
+    kimexam    Parameters for column 1D gaussian fit plots
+    limexam    Parameters for line plots
+    rimexam    Parameters for radial profile plots and aperture sums
+    simexam    Parameters for surface plots
+    vimexam    Parameters for vector plots (centered and endpoint)
+.fi
+
+The same  parameters dealing with graph formats occur in many of the parameter
+sets while some are specific only to one parameter set.  In the
+summary below those common to more than one parameter set are shown
+only once.  The characters in parenthesis are the graph key prefixes
+for the parameter sets in which the parameter occurs.
+
+.ls angh = -33., angv = 25.		(s)
+Horizontal and vertical viewing angles (degrees) for surface plots.
+.le
+.ls autoscale = yes			(h)
+In the case of integer data, automatically adjust \fInbins\fR and
+\fIz2\fR to avoid aliasing effects.
+.le
+.ls axes = yes				(s)
+Draw axes along edge of surface plots?
+.le
+.ls background = yes			(jkr.)
+Fit and subtract a background for aperture sums, 1D gaussian fits, and
+radial profile plots?
+.le
+.ls banner = yes 			 (cehjklrsv.)
+Add a standard banner to a graph?  The standard banner includes the
+IRAF user and host identification and time, the image name and title,
+and graph specific parameters.
+.le
+.ls beta = INDEF			(ar.)
+Beta value to use for Moffat profile fits.  If the value is INDEF
+the value will be determine as part of the fit otherwise the parameter
+will be fixed at the specified value.
+.le
+.ls boundary = "constant"		(v)
+Boundary extension for vector plots in which the averaging width might
+go outside of the image.
+.le
+.ls box = yes 				(cehjklrv.)
+Draw graph box and axes?
+.le
+.ls buffer = 5.				(r.)
+Buffer distance from object aperture of background annulus for aperture sums
+and radial profile plots.
+.le
+.ls ceiling = INDEF			(es)
+Ceiling data value for contour and surface plots.  A value of INDEF does
+not apply a ceiling.  (In contour plots a value of 0. also does not
+apply a ceiling.)
+.le
+.ls center = yes			(jkr.)
+Apply a centering algorithm for doing aperture sums, 1D gaussian fits,
+and radial profile plots?
+.le
+.ls constant = 0.			(v)
+Boundary extension constant for vector plots in which the averaging width
+might go outside of the image.
+.le
+.ls dashpat = 528			(e)
+Dash pattern for negative contours.
+.le
+.ls fill = no				(e)
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls fitplot = yes			(r.)
+Overplot the profile fit on the radial profile data?
+.le
+.ls fittype = "moffat"			(ar.)
+Profile type to fit the radial profile data?  The choices are "gaussian"
+and "moffat".
+.le
+.ls floor = INDEF			(es)
+Floor data value for contour and surface plots.  A value of INDEF does
+not apply a floor.  (In contour plots a value of 0. also does not
+apply a floor.)
+.le
+.ls interval = 0			(e)
+Contour interval.  If 0, a contour interval is chosen which places 20 to 30
+contours spanning the intensity range of the image.
+.le
+.ls iterations = 3			(ar)
+Number of iterations to adjust the fitting radius.
+.le
+.ls label= no				(e)
+Label the major contours in the contour plot?
+.le
+.ls logx = no, logy = no		(chjklrv.)
+Plot the x or y axis logarithmically?  The default for histogram plots is
+to plot the y axis logarithmically.
+.le
+.ls magzero = 25.			(r.)
+Magnitude zero point for aperture sums.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5	(cehjklrv.)
+Maximum number of major tick marks on each axis and number of minor tick marks
+between major tick marks.
+.le
+.ls marker = "box"			(chjklrv.)
+Marker to be drawn if \fBpointmode\fR = yes.  Markers are "point", "box", 
+"cross", "plus", "circle", "hebar", "vebar", "hline", "vline" or "diamond".
+.le
+.ls naverage = 1			(cjklv)
+Number of lines, columns, or width perpendicular to a vector to be averaged.
+.le
+.ls nbins = 512				(h)
+The number of bins in, or resolution of, histogram plots.
+.le
+.ls ncolumns = 21, nlines = 21		(ehs)
+Number of columns and lines used in contour, histogram, and surface plots.
+.le
+.ls ncontours = 5			(e)
+Number of contours to be drawn.  If 0, the contour interval may be specified,
+otherwise 20-30 nicely spaced contours are drawn.  A maximum of 40 contours
+can be drawn.
+.le
+.ls nhi = -1				(e)
+If -1, highs and lows are not marked.  If 0, highs and lows are marked
+on the plot.  If 1, the intensity of each pixel is marked on the plot.
+.le
+.ls pointmode = no			(chlv)
+Plot points or marks instead of lines?
+.le
+.ls pointmode = yes			(jkr.)
+Plot points or marks instead of lines?  For radial profile plots point
+mode should always be yes.
+.le
+.ls radius = 5.				(r.)
+Radius of aperture for aperture sums and centering.
+.le
+.ls round = no				(cehjklrv.)
+Extend the axes up to "nice" values?
+.le
+.ls rplot = 8.				(jkr.)
+Radius to which the radial profile or 1D profile fits are plotted.
+.le
+.ls sigma = 2.				(jk)
+Initial guess for 1D gaussian fits.  The value is in pixels even if the fitting
+is done in world coordinates.  This must be close to the true value
+for convergence.  Also the four times the initial sigma is used to define
+the distance to the background region for the initial background estimate.
+.le
+.ls szmarker = 1			(chjklrv.)
+Size of mark (except for points).  A positive size less than 1 specifies
+a fraction of the device size.  Values of 1, 2, 3, and 4 signify
+default sizes of increasing size.
+.le
+.ls ticklabels = yes			(cehjklrv.)
+Label the tick marks?
+.le
+.ls title = ""				(cehjklrsv.)
+User title.  This is independent of the standard banner title.
+.le
+.ls top_closed = no			(h)
+Include z2 in the top histogram bin?  Each bin of the histogram is a
+subinterval that is half open at the top.  \fITop_closed\fR decides whether
+those pixels with values equal to z2 are to be counted in the histogram.  If
+\fBtop_closed\fR is yes, the top bin will be larger than the other bins.
+.le
+.ls width = 5.				(jkr.)
+Width of background region for background subtraction in aperture sums,
+1D profile fits, and radial profile plots.
+.le
+.ls wcs = "physical"
+World coordinate system for axis labeling and coordinate readback.
+.le
+.ls x1 = INDEF, x2 = INDEF, y1 = INDEF, y2 = INDEF	(chjklrv.)
+Range of graph along each axis.  If INDEF the range is determined from
+the data range plus a buffer.  The default y1 for histogram plots is 0.
+.le
+.ls xformat, yformat
+Set world image coordinate formats.  Any format changes take effect on the next
+usage; i.e. there is no automatic redrawing.
+.le
+.ls xlabel, ylabel			(cehjklrv.)
+Axis labels.  Each graph type has an appropriate default.  If the label
+value is "wcslabel" then the coordinate label from the image WCS
+will be used if defined.
+.le
+.ls xorder = 0				(jk)
+Order for 1D gaussian background.  If 0 then a median is computed.  If
+1 then a constant background is fit simultaneously with the other gaussian
+parameters.  If 2 then a linear background is fit simultaneously with the
+other gaussian parameters.
+.le
+.ls xorder = 0, yorder = 0		(r.)
+If either parameter is zero then the median value of the
+background annulus is used for background subtraction in aperture sums and
+radial profile plots.  Values greater than zero define polynomial
+surface orders for background subtraction.  The orders are actually the
+number of polynomial terms.  An order of 1 is a constant an order of 2
+is a plane.
+.le
+.ls zero = 0.				(e)
+Greyscale value of the zero contour, i.e., the value of a zero point shift
+to be applied to the image data before plotting.  Does not affect the values
+of the floor and ceiling parameters.
+.le
+.ls z1 = INDEF, z2 = INDEF		(h)
+Range of pixel values to be used in histogram.  INDEF values default to
+the range in the region being histogramed.
+.le
+.ih
+DESCRIPTION
+Images are examined using an image display, various types of plots, and
+text output.  Commands are given using the image display cursor and/or
+graphics cursor.  This task brings together many of the features of the
+IRAF image display and graphics facilities with some simple image
+analysis capabilities.
+
+IMAGE DISPLAY
+
+If \fIuse_display\fR is yes the image display is used to examine images.
+When no input list is specified images may be loaded with the 'd' key,
+frames selected with 'n', 'p', and ":select", and the scaled contents
+of the display frame buffer examined if the image itself is not available.
+
+When an input list is specified the 'n', 'p', and ":select" allow
+moving about the list and new images may be added to the end of the
+list with 'd'.  Images are automatically loaded as they are selected if
+not currently loaded.  Two parameters control how the frames are
+loaded.  The \fInframes\fR parameter determines which frames are
+available.  Within the available frames images may be loaded by cycling
+through them if \fIallframes\fR is yes or in the last loaded frame
+(initially frame 1) if it is no.
+
+When reading the image cursor the frame and the name of the image in
+the frame are determined.  Therefore images may also be selected
+by changing the frame externally or if the image cursor input is
+changed from the standard image display to text or file input.
+
+The 'd' command displays an image using the template CL command given
+by parameter \fIdisplay\fR.  Usually this is the standard
+IRAF \fBtv.display\fR command though in some circumstances other commands
+like \fBplot.contour\fR may be used.  This command may be used to
+display an image even if \fIuse_display\fR is no.
+
+This task is generally intended for interactive use with an image
+display.  However it is possible to disable use of the image display
+and change the image cursor input to a graphics cursor, a file,
+or typed in by the user.  In this case an input image list is most
+appropriate but if one is missing, a query will be issued each time
+a command requiring an image is given.
+
+CURSOR INPUT
+
+Commands are given using cursor input.  Generally the image cursor is
+used to select points in the images to be examined and the key typed
+selects a particular operation.  In addition to the image cursor the
+graphics cursor is sometimes useful.  First, it gives access to the
+graphics cursor mode commands (see \fBcursors\fR) such as annotating,
+saving or printing a graph, expanding and roaming, and printing cursor
+positions.  Second, it can give a better perspective on the data for
+cursor positions than the image cursor.  And lastly, it may be needed
+when an image display is not available.  The commands 'g' and 'i'
+select between the graphics and image cursors.  Initially the image
+cursor is read.
+
+Interpretation of the graph coordinate in terms of an image coordinate
+depends on the type of graph as described below.
+
+.ls contour plot
+This gives image coordinates directly and both the x and y cursor values
+are used.
+.le
+.ls column plot
+The x cursor position gives the line coordinate and the column coordinate
+used for the plot (that specified before averaging) gives the column
+coordinate.
+.le
+.ls line plot
+The x cursor position gives the column coordinate and the line coordinate
+used for the plot (that specified before averaging) gives the line
+coordinate.
+.le
+.ls vector plot
+The x cursor position defines a column and line coordinate along the vector
+plotted.
+.le
+.ls surface plot
+No cursor information is available in this plot and the cursor position
+used to make the surface plot (the center of the surface) is used again.
+.le
+.ls histogram plot
+No cursor information is available in this plot and the cursor position
+used to make the histogram (the center of the box) is used again.
+.le
+.ls radial profile plot
+No cursor information is available in this plot and the cursor position
+used to define the center is used again.
+.le
+
+There are some special features associated with cursor input in IRAF
+which might be useful in some circumstances.  The image display cursor
+can be reset to be a text cursor, graphics cursor, or image cursor by
+setting the environment variable "stdimcur" to "text", "stdgraph",
+or "stdimage" respectively.  Text cursor input consists of the x and
+y coordinates, a frame number, and the key or colon command.  Another
+form of text input is to set the value of the cursor input parameter
+to a file containing cursor commands.  There are two special features
+dealing with text cursor input.  If only x and y are entered the default
+key parameter \fIdefkey\fR determines the command.  This is particularly
+useful if one has a list of pixel positions prepared by some other
+program.  The second feature is that for commands not requiring coordinates
+they may be left out and the command key or colon command entered.
+
+TEXT OUTPUT
+
+The following commands produce text output which may also be appended to
+a logfile.
+
+.ls a, ','
+Circular aperture photometry is performed at the position of the cursor.
+If the centering option is selected the cursor position is used as the
+initial point for computing the central moments of the marginal
+distributions in x and y.  The marginal distributions are obtained from a
+square aperture with edge dimensions of twice the aperture radius
+parameter.  Only the pixels above the mean are used in computing the
+central moments.  If the central moments are in a different pixel than that
+used for extracting the marginal distributions the computation is repeated
+using the new center.
+
+The radius of the photometry and fitting aperture is specified by the
+\fIradius\fR parameter and the \fIiteration\fR parameter.  Iteration of the
+fitting radius and printing of the final radius is only done for the 'a'
+key.  If the number of iterations is one then the radius is not adjusted.
+If it is greater than one then the direct FWHM (described) below is used to
+adjust the radius.  At each iteration the new radius is set to three times
+the direct FWHM (which is six times the radius at half-maximum).  The
+radius is printed as part of the output.
+
+If the background subtraction option is selected a concentric circular
+annulus is defined.  The inner edge is separated from the object
+aperture by a specified buffer distance and the outer edge is defined
+by a width for the annulus.  The type of background used is determined
+by the parameters \fIxorder\fR and \fIyorder\fR.  If either parameter
+is zero then a median of the background annulus is determined.
+If 1 or greater a polynomial surface of the specified number of terms
+is fit.  Typically the orders are 1 for a constant or 2 for a plane.
+The median or fitted surface values within the object aperture are then
+subtracted.
+
+The flux within the circular aperture is computed by simply summing the
+pixel values with centers within the specified radius of the center
+position.  No partial pixel adjustments are made.  If the flux is
+positive a magnitude is computed as
+
+	magnitude = magzero - 2.5 * log10 (flux)
+
+where the magnitude zero point is a user defined parameter.
+
+In addition to the flux, the second intensity moments are used to compute
+an ellipticity and position angle.  The equations defining the moments and
+related parameters are:
+
+.nf
+	Mxx = sum (x * x * I) / sum (I)
+	Myy = sum (y * y * I) / sum (I)
+	Mxy = sum (x * y * I) / sum (I)
+	e = sqrt ((Mxx - Myy) ** 2 + (2 * Mxy) ** 2) / (Mxx + Myy)
+	pa = 0.5 * atan (2 * Mxy / (Mxx - Myy))
+.fi
+
+A nonlinear least squares profile of fixed center and zero background is
+fit to the radius and flux values of the background subtracted pixels to
+determine a peak intensity and FWHM.  The profile type is set by the
+\fIfittype\fR parameter.  The choices are "gaussian" and "moffat".  If the
+profile type is "moffat" there is an additional parameter "beta".  This
+value may be specified to fix it or given as INDEF to also be determined.
+The profile equations are:
+
+.nf
+	I = Ic exp (-0.5 * (r / sigma)**2)	(fittype = "gaussian")
+	I = Ic (1 + (r / alpha)**2)**(-beta)	(fittype = "moffat")
+.fi
+
+where Ic is the peak value, r is the radius, and the parameters are
+sigma, alpha, and beta.  The sigma and alpha values are converted to
+FWHM in the reported results.
+
+Weights which are the inverse square of the pixel radius are used.  This
+has the effect of giving equal weight to all parts of the profile instead
+of being overwhelmed by the larger number of pixels are larger radii.  An
+additional weighting factor is used for pixels outside the half-maximum
+radius (as determined using the algorithm described below).  The weights
+are
+
+.nf
+	wt = exp (-(r/rhalf - 1)**2)  for r/rhalf > 1
+.fi
+
+where rhalf is the radius at half-maximum.  This has the effect
+of reducing the contribution of the profile wings.
+
+The above fit is done to the individual pixel values with a radius measured
+to the center of the pixel.  For the 'a' key two additional measurements
+are made on a azimuthally averaged radial profile with a finer sampling of
+the radial bins.  This uses the same algorithms for centering, background
+estimation, and FWHM measurement as in the task \fBpsfmeasure\fR.  The
+centering is essentially the same as described above but the background
+estimation is a mode of the sky annulus pixels.  Note that the centering
+and background subtraction are done for these measurements regardless of
+the the \fIcenter\fR and \fIbackground\fR parameters which apply only to
+the photometry and profile fitting to the individual pixel values.
+
+To form the radially smoothed profile an image interpolator function is fit
+to the region containing the object.  The enclosed flux profile (total flux
+within a particular radius) is computed.  The sampling is done at a much
+finer resolution than individual pixels.  The subsampling scheme is that
+described in \fBpsfmeasure\fR and is such that the center of the profile is
+more finely sampled than the edges of the profile.
+
+Because the image interpolator function may not be very good for narrow
+profiles a second iteration is done if the radius enclosing half the flux
+is less than two pixels.  In this second iteration an analytic, radially
+symmetric Gaussian profile is subtracted from the image raster and the
+interpolation function is fit to the residuals.  Subpixel values are then
+computed by evaluating the analytic function plus the interpolated residual
+value.
+
+There are two FWHM measurements computed using the enclosed flux
+radial profile.  One is to fit a Gaussian or Moffat profile to the
+enclosed flux profile.  The type is selected by the same \fIfittype\fR
+parameter used to select the profile to fit to the individual pixel
+values.  As with the direct fit the Moffat beta value may be fixed or
+included in the fit.  The FWHM of the fit is then printed on the
+status line, terminal output, and log file.
+
+The other FWHM measurement directly measure the FWHM independent of a
+profile model.  The derivative of the enclosed flux profile is computed.
+This derivative is the azimuthally averaged radial profile with the radial
+bin sampling mentioned above.  The peak of this profile is found and the
+FWHM is twice the radius of the profile at half the peak value.  This
+"direct FWHM" is part of the output and is also used for the iterative
+adjustment of the fitting radius as noted above.
+
+.ls a
+The output consists of the image line and column, the coordinates, the
+final radius used for the photometry and fitting, magnitude, flux, mean
+background, peak value of the profile fit, e, pa (in degrees between -90
+and +90 with 0 along the x axis), the Moffat beta value if a Moffat profile
+is fit, and three measures of the FWHM.  The coordinates are those
+specified by the \fIwcs\fR and formatted by the format parameters.  For the
+logical wcs the coordinates will be the same as the column and line
+values.  If a value is numerically undefined then INDEF is printed.  The
+FWHM values are, in order, the profile fit to the enclosed flux, the
+profile fit to the individual pixels, and the direct measurement from the
+derivative of the enclosed flux profile.  Note that except for the direct
+method, the other estimates are not really measurements of the FWHM but are
+quantities which give the correct FWHM for the specified profile type.
+.le
+.ls ','
+The output consists of the image line and column, magnitude, flux, number
+of pixels within the aperture, mean background, r (moment FWHM), e, pa (in
+degrees between -90 and +90 with 0 along the x axis), and the peak value
+and FWHM of the profile fit.  The label GFWHM indicates a Gaussian fit
+while the label MFWHM indicates a Moffat profile fit.  If a quantity is
+numerically undefined then INDEF is printed.
+.le
+
+This aperture photometry and FWHM tool is intended only for general image
+analysis and quick look measurements.  The background fitting, photometry,
+and FWHM techniques used are not intended for serious astronomical
+photometry; other packages, e.g., \fInoao.digiphot.apphot\fR, should be
+used if precise results are desired.
+.le
+.ls b
+The integer pixel coordinates defining a region of the image are printed.
+Two cursor positions are used to select the range of columns and lines.
+The output format consists of the starting and ending column
+coordinates and the starting and ending line coordinates.  This format is
+used as input by some tasks and can be used to generate image sections if
+desired.
+.le
+.ls j, k
+The fitted gaussian center, peak, sigma, full width at half maximum, and
+background at the center is computed and printed.
+.le
+.ls m
+Statistics of a rectangular region centered on the cursor position are
+computed and printed.  The size of the statistics box is set by the
+parameters \fIncstat\fR and \fInlstat\fR.  The output format consists
+of the image section, the number of pixels, the mean, the median, the
+standard deviation, the minimum, and the maximum.
+.le
+.ls x, y
+The cursor x and y coordinates and the pixel value nearest this position
+are printed.  The 'y' key may be used define a relative origin.  If
+an origin is defined (is not 0,0) then additional quantities are printed.
+These quantities are origin coordinates, the delta x and delta y distances,
+the radial distance, and the position angle (in degrees counterclockwise from
+the x axis).
+.le
+.ls z
+A 10x10 grid of pixel values is printed.  The integer coordinates are
+also printed around the grid.
+.le
+
+GRAPHICS OUTPUT
+
+The following commands produce graphics output to the specified graphics
+device (normally the graphics terminal).
+
+.ls c
+A plot of a column or average of columns is made with the line number as
+the ordinate and the pixel value as the abscissa.  The averaging number
+and various graph options are specified by the parameters from the
+\fBcimexam\fR parameter set.
+.le
+.ls e
+A contour plot of a region centered on the cursor is made.  The
+size of the region and various contouring and labeling options are
+specified by the parameters from the \fBeimexam\fR parameter set.
+.le
+.ls h
+A histogram of a region centered on the cursor is made.  The size
+of the region and various binning parameters are specified by
+the parameters from the \fBhimexam\fR parameter set.
+.le
+.ls l
+A plot of a line or average of lines is made with the column number as
+the ordinate and the pixel value as the abscissa.  The averaging number
+and various graph options are specified by the parameters from the
+\fBlimexam\fR parameter set.
+.le
+.ls r, '.'
+A radial profile plot is made.  As with 'a'/',' there are options for centering
+and background subtraction.  There are also graphics option to set the
+radius to be plotted (\fIrplot\fR) and to overplot the profile fit
+(\fIfitplot\fR).  The measurement algorithms are those described for the
+'a'/',' key and the output is the same except that there is no header line and
+the object center is given in the graph title rather than on the graphics
+status line.  The aperture sum and graph options are specified by the
+parameters from the \fBrimexam\fR parameter set.
+.le
+.ls s
+A surface plot of a region centered on the cursor is made.  The size
+of the region and various surface and labeling options are
+specified by the parameters from the \fBsimexam\fR parameter set.
+.le
+.ls u, v
+A plot of a vector defined by two cursor positions is made.  The 'u'
+plot uses the first cursor position to define the center of the vector
+and the second position to define the endpoint.  The vector is extended
+an equal distance in the opposite direction and the graph x coordinates
+are the radial distance from the center position.  The 'v' plot
+uses the two cursor positions as endpoints and the coordinates are
+the radial distance from the first cursor position.  The vector may
+be averaged over a specified number of parallel vectors.  The
+averaging number and various graph options are specified by the parameters
+from the \fBvimexam\fR parameter set.
+.le
+
+
+MISCELLANEOUS COMMANDS
+
+The following commands control useful features of the task.
+
+.ls d
+The display command given by the parameter \fIdisplay\fR is given
+with appropriate image name.  By default this loads the image
+display using the \fBtv.display\fR task.  When using an input image
+list this operation also appends new images to the list for subsequent
+'n' and 'p' commands.
+.le
+.ls f
+Redraw the last graph.  If the \fIautoredraw\fR parameter is no then
+this is used to redraw a graph after making parameter changes with
+colon commands.  If the parameter is yes then any colon command which
+affects the current plot will execute a redraw automatically.
+.le
+.ls g, i
+Cursor input may be selected to be from the graphics cursor (g) or
+image display cursor (i).
+.le
+.ls n, p
+Go to the next or previous image in the image list or display frames.
+.le
+.ls o
+Overplot the next graph.  This generally only makes sense with the
+line, column, and histogram plots.
+.le
+.ls q
+Quit the task.
+.le
+.ls t
+Output an image centered on the cursor position with name and size set
+by the \fIoutput\fR, \fIncoutput\fR and \fInloutput\fR parameters.
+Note that the cursor input might be from a contour, surface, or other
+plot as well as from the image display.
+.le
+.ls w
+Toggle output to the logfile.  If no logfile is specified this has no
+effect except to print a message.  If the logfile is specified a message
+is printed indicating that the logfile has been opened or closed.
+Every time the logfile is opened the current image name and title is
+entered as well as when the image is changed.  The logfile name may
+be set or changed by a colon command.
+.le
+.ls :select
+Select an image.  If an input image list is used the specified index
+number selects an image from the list.  If an input image list is not
+used and the image display is used then the specified display frame
+is selected.  If the new image is different from the previous image
+an identification line is inserted in the logfile if it is open.
+.le
+.ls :eparam, :unlearn
+These colon commands manipulate the various parameter sets as
+described below.
+.le
+.ls :c<#>, :l<#>
+Special colon commands to plot specific columns or lines, symbolically
+shown as <#>, rather than use a cursor position.
+.le
+.ls :<column> <line> <key>
+Special colon command syntax to explicitly give image coordinates for
+a cursor command key.
+.le
+
+COLON COMMANDS
+
+Sometimes one wants to explicitly enter the coordinates for a command.
+This may be done with a colon command having the following syntax:
+
+	:<column> <line> <key>
+
+where column and line are the coordinates and key is the command.
+If the line is not given then <column> = <line>.  For the frequently
+used line and column plots there is also the simple syntax:
+
+.nf
+	:c<column> 	or	:l<line>
+.fi
+
+with no space, e.g., ":l64".
+
+Every parameter except the input image list and the display command
+may be queried or set by a
+colon command.  In addition the parameter sets for the various graphs
+and aperture sum algorithm may be edited using the \fBeparam\fR editor
+and reinitialized to default values using the \fBunlearn\fR command.
+There are a large number of parameters as well as many graph types /
+parameter sets.  To achieve some consistency and order as well as
+simplify the colon commands several things have been done.
+
+Many parameters occur in more than one graph type.  This includes things
+like graph labeling, tickmarks, and so forth.  When issuing a colon
+command for one of these parameters the current graph type is assumed
+to be the one affected.  If the graph type is wrong or no graph has
+been made then a warning is given.
+
+If the parameter only occurs in one parameter set then the colon command
+may be used with any current graph.  However, if the parameter affects the
+current graph and the automatic redraw option is set then the graph will
+be redrawn.
+
+The eparam and unlearn commands also apply by default to the parameters
+for the current graph.  However, they may take the keystroke character
+for the graph as an argument to override this.  If the current graph
+parameters are changed and the automatic redraw option is set then
+the graph will be redrawn.
+
+The important colon commands 'x' and 'y' affect the x1, y1, x2, y2
+parameters in most of the graphs.  They are frequently used to override
+the automatic graph scaling.  If no arguments are given the window
+limits are set to INDEF resulting in plotting the full range of the
+data plus a buffer.  If two values are given then only that range of
+the data will be plotted.
+
+.ih
+COMMANDS
+
+.ce
+Cursor Keys
+
+.nf
+?	Print help
+a	Aperture sum, moment parameters, and profile fit
+b	Box coordinates for two cursor positions - c1 c2 l1 l2
+c	Column plot
+d	Load the image display
+e	Contour plot
+f	Redraw the last graph
+g	Graphics cursor
+h	Histogram plot
+i	Image cursor
+j	Fit 1D gaussian to image lines
+k	Fit 1D gaussian to image columns
+l	Line plot
+m	Statistics
+	    image[section] npixels mean median stddev min max
+n	Next frame or image
+o	Overplot
+p	Previous frame or image
+q	Quit
+r	Radial profile plot with fit and aperture sum values
+s	Surface plot
+t	Output image centered on cursor (parameters output, ncoutput, nloutput)
+u	Centered vector plot from two cursor positions
+v	Vector plot between two cursor positions
+w	Toggle write to logfile
+x	Print coordinates
+	    col line pixval [xorign yorigin dx dy r theta]
+y	Set origin for relative positions
+z	Print grid of pixel values - 10 x 10 grid
+,	Quick Gaussian/Moffat photometry
+.	Quick Gaussian/Moffat radial profile plot and fit
+.fi
+
+.ce
+Colon Commands
+
+Explicit image coordinates may be entered using the colon command syntax:
+
+	:<column> <line> <key>
+
+where column and line are the image coordinates and the key is one
+of the cursor keys.  A special syntax for line or column plots is also
+available as :c# or :l# where # is a column or line and no space is
+allowed.
+
+Other colon commands set or show parameters governing the plots and other
+features of the task.  Each graph type has it's own set of parameters.
+When a parameter applies to more than one graph the current graph is assumed.
+If the current graph is not applicable then a warning is given.  The
+"eparam" and "unlearn" commands may be used to change many parameters and
+without an argument the current graph parameters are modified while with
+the graph key as an argument the appropriate parameter set is modified.
+In the list below the graph key(s) to which a parameter applies are shown.
+
+.nf
+allframes               Cycle through all display frames to display images
+angh        s           Horizontal angle for surface plot
+angv        s           Vertical angle for surface plot
+autoredraw  cehlrsuv    Automatically redraw graph after colon command?
+autoscale   h           Adjust number of histogram bins to avoid aliasing
+axes        s           Draw axes in surface plot?
+background  jkr         Subtract background for radial plot and photometry?
+banner      cehjklrsuv  Include standard banner on plots?
+beta        ar		Moffat beta parameter (INDEF to fit or value to fix)
+boundary    uv          Boundary extension type for vector plots
+box         cehjklruv   Draw box around graph?
+buffer      r           Buffer distance for background subtraction
+ceiling     es          Data ceiling for contour and surface plots
+center      jkr         Find center for radial plot and photometry?
+constant    uv          Constant value for boundary extension in vector plots
+dashpat     e           Dash pattern for contour plot
+eparam      cehjklrsuv  Edit parameters
+fill        e           Fill viewport vs enforce unity aspect ratio?
+fitplot     r           Overplot profile fit on data?
+fittype     ar          Profile fitting type (gaussian|moffat)
+floor       es          Data floor for contour and surface plots
+interval    e           Contour interval (0 for default)
+iterations  ar          Iterations on fitting radius
+label       e           Draw axis labels for contour plot?
+logfile                 Log file name
+logx        chjklruv    Plot x axis logarithmically?
+logy        chjklruv    Plot y axis logarithmically?
+magzero     r           Magnitude zero for photometry
+majrx       cehjklruv   Number of major tick marks on x axis
+majry       cehjklruv   Number of major tick marks on y axis
+marker      chjklruv    Marker type for graph
+minrx       cehjklruv   Number of minor tick marks on x axis
+minry       cehjklruv   Number of minor tick marks on y axis
+naverage    cjkluv      Number of columns, lines, vectors to average
+nbins       h           Number of histogram bins
+ncolumns    ehs         Number of columns in contour, histogram, or surface plot
+ncontours   e           Number of contours (0 for default)
+ncoutput                Number of columns in output image
+ncstat                  Number of columns in statistics box
+nhi         e           hi/low marking option for contours
+nlines      ehs         Number of lines in contour, histogram, or surface plot
+nloutput                Number of lines in output image
+nlstat                  Number of lines in statistics box
+output			Output image root name
+pointmode   chjkluv     Plot points instead of lines?
+radius      r           Radius of object aperture for radial plot and photometry
+round       cehjklruv   Round axes to nice values?
+rplot       jkr         Radius to plot in 1D and radial profile plots
+select                  Select image or display frame
+sigma       jk          Initial sigma for 1D gaussian fits
+szmarker    chjklruv    Size of marks for point mode
+ticklabels  cehjklruv   Label ticks?
+title       cehjklrsuv  Optional title for graph
+top_closed  h           Close last bin of histogram
+unlearn     cehjklrsuv  Unlearn parameters to default values
+wcs                     World coordinate system for axis labels and readback
+width       jkr         Width of background region
+x [min max] chjklruv    Range of x to be plotted (no values for autoscaling)
+xformat			Coordinate format for column world coordinates
+xlabel      cehjklrsuv  Optional label for x axis
+xorder      jkr         X order of surface for background subtraction
+y [min max] chjklruv    Range of y to be plotted (no values for autoscaling)
+yformat			Coordinate format for line world coordinates
+ylabel      cehjklrsuv  Optional label for y axis
+yorder      r           Y order of surface for background subtraction
+z1          h           Lower intensity value limit of histogram
+z2          h           Upper intensity value limit of histogram
+zero        e           Zero level for contour plot
+.fi
+.ih
+EXAMPLES
+The following  example illustrates many of the features in a descriptive
+way using the standard image dev$pix.
+
+.nf
+  cl> imexam dev$pix nframes=2
+  [The image is loaded in the display if not already loaded]
+  <Image cursor> l          # Make a line plot
+  <Image cursor> e          # Make a contour plot
+  <image cursor> d          # Load a new image
+  image name: saga
+  display frame (1:) (1): 2
+  <Image cursor> e          # Make a contour plot
+  <Image cursor> g          # Switch to graphics cursor
+  <Graph cursor> u          # Mark the center of a vector
+  <Graph cursor> u          # Mark endpoint make a vector plot
+  <Graph cursor> i          # Go back to display
+  <Image cursor> r          # Select star and make radial plot
+  <Image cursor> :rplot 10  # Set radius of plot
+  <Image cursor> :epar      # Set radius plot parameters
+  <Image cursor> c          # Make column plot
+  <Image cursor> :100 l     # Line 100 of image 1
+  <Image cursor> :20 30 e   # Contour plot at (20,30)
+  <Image cursor> p          # Go to previous image
+  <Image cursor> n          # Go to next image
+  <Image cursor> :sel 1     # Select image 1
+  <Image cursor> :log log   # Set log file
+  <Image cursor> w          # Begin logging
+  Log file log is open
+  <Image cursor> a          # Do aperture sum on star 1
+  <Image cursor> a          # Do aperture sum on star 2
+  <Image cursor> a          # Do aperture sum on star 3
+  <Image cursor> a          # Do aperture sum on star 4
+  <Image cursor> w          # Close log file
+  Log file log is closed
+  <Image cursor> y          # Mark position of galaxy center
+  <Image cursor> x          # Print position relative to center
+  <Image cursor> x          # Print position relative to center
+  <Image cursor> s          # Make surface plot
+  <Image cursor> q          # Quit
+.fi
+.ih
+BUGS
+If an operation is interrupted, e.g., an image display or surface plot,
+\fIimexamine\fR is terminated rather than the operation in progress.
+
+When used on a workstation \fIimexamine\fR attempts to always position the
+cursor to the window (text, image, or graphics) from which input is being
+taken.  Moving the mouse manually while the program is also trying to move
+it can cause the mouse to be positioned to the wrong window, requiring that
+it be manually moved to the window from which input is currently being taken.
+
+When entering a colon command in image cursor mode, if one types too fast
+the characters typed before the mouse is moved to the input window
+will be lost.  To avoid this, pause a moment after typing the colon, before
+entering the command, and verify that the mouse has been moved to the correct
+window.  In the future colon command input will be entered without moving
+the mouse out of the image window, which will avoid the problem.
+.ih
+REVISIONS
+.ls IMEXAMINE V2.11.4
+('t'): A new cursor key to create an output image.
+.le
+.ls IMEXAMINE V2.11
+('a' and 'r'): The fit to the radial profile points now includes both a
+Gaussian and a Moffat profile.  The Moffat profile exponent parameter,
+beta, may be fixed or left free to be fit.
+
+('a' and 'r'): New estimates of the FWHM were added to the 'a' and 'r'
+keys.  These include the Moffat profile fit noted above, a direct
+measurement of the FWHM from the radially binned profile, and a Gaussian or
+Moffat fit to the radial enclosed flux profile.  The output from these keys
+was modified to include the new information.
+
+('a' and 'r'): The direct FWHM may be used to iteratively adjust the
+fitting radius to lessen the dependence on the initial fitting
+radius value.
+
+(',' and '.'): New keys to do the Gaussian or Moffat fitting without
+iteration or the enclosed flux and direct measurements.  The output
+format is the same as the previous version.
+
+('k'): Added a kimexam parameter set.
+.le
+.ih
+SEE ALSO
+cursors, eparam, unlearn, plot.*, tvmark, digiphot.*, apphot.*,
+implot, splot, imedit, radplt, imcntr, imhistogram, imstatistics, display
+psfmeasure.
+.endhelp

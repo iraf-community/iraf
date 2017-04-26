@@ -1,0 +1,2472 @@
+%!PS-Adobe-1.0
+%%Creator: devps (Pipeline Associates, Inc.)
+%%CreationDate: Tue Mar  3 16:57:09 1998
+%%Pages: (atend)
+%%DocumentFonts: (atend)
+
+/X{exch}def
+/r{rmoveto}def
+/m{moveto}def
+/l{lineto}def
+/rl{rlineto}def
+/lc{yc X xc X l st}def
+/mc{yc X xc X m}def
+/el{gs /a X def a div 1 X scale cp np a xc 2 div 0 360 arc st gr}def
+/ar{cp 7 2 roll np xc 5 1 roll atan 3 1 roll atan X arc st}def
+/sp{yc X xc X 6 2 roll yc X xc X 6 2 roll yc X xc X 6 2 roll ct}def
+/st{stroke}def
+/gs{gsave}def
+/gr{grestore}def
+/cp{currentpoint}def
+/np{newpath}def
+/ct{curveto}def
+/m0{0 0 moveto}def
+/BP{/devps-save save def m0}def
+/EP{
+clear devps-save restore
+showpage}def
+/res 10.000000 def
+/V{res neg div 792 add
+currentpoint pop X
+m}def
+/H{res div
+currentpoint X pop
+moveto}def
+/h{res div 0 r}def
+/v{res neg div 0 X r}def
+/xc{res div}def
+/yc{res neg div 792 add}def
+/S{X H show}def
+/psize 10 def
+/height 1 def
+/slant 0 def
+/FF{findfont X dup 12 div setlinewidth /psize X def
+    [psize 0 psize height mul slant sin slant cos div mul psize height mul 0 0]
+    makefont setfont}def
+/shade{gs
+ /dy X def
+ /dx X def
+ np m
+ setgray
+ 0 dy rl
+ dx 0 rl
+ 0 dy neg rl
+ dx neg 0 rl
+ closepath
+ fill
+gr}def
+1 setlinecap
+/R{/Times-Roman FF}def
+/B{/Times-Bold FF}def
+/I{/Times-Italic FF}def
+/C{/Courier FF}def
+%%EndProlog
+%%Page: 1 1
+BP
+/slant 0 def
+/height 1.000000 def
+10 R
+10 R
+480 V
+900(VXIMTOOL)S
+1448(\()S
+1497(1)S
+1563(\))S
+2787(USER COMMANDS )S
+4884(VXIMTOOL)S
+5432(\()S
+5481(1)S
+5547(\))S
+960 V
+9 B
+900(NAME)S
+1080 V
+10 R
+1260(vximtool)S
+1652(\261-)S
+1765(A)S
+1867(virtual)S
+2158(and/or)S
+2443(proxy)S
+2706(display)S
+3025(server)S
+3298(for)S
+3444(IRAF)S
+3702(IIS)S
+3854(protocol)S
+4217(clients)S
+1248 V
+9 B
+900(SYNOPSIS)S
+1368 V
+10 B
+1260(vximtool)S
+10 R
+1662([)S
+10 I
+1725(options)S
+10 R
+2050(...])S
+1488 V
+10 B
+1260(vximtool)S
+10 R
+1662(-proxy)S
+1958([)S
+10 I
+2021(options)S
+2346(...])S
+2490(server)S
+2769([)S
+2838(server)S
+10 R
+3117(...)S
+3222(])S
+1776 V
+9 B
+900(DESCRIPTION)S
+1896 V
+10 I
+1260(VXIMTOOL)S
+10 R
+1793(is)S
+1899(a)S
+1982(image)S
+2265(display)S
+2593(server)S
+2875(process)S
+3213(much)S
+3475(like)S
+10 I
+3665(XIMTOOL)S
+10 R
+4098(,)S
+4163(except)S
+4463(that)S
+4653(all)S
+4793(it)S
+4889(normally)S
+5290(does)S
+5513(is)S
+2016 V
+1260(respond)S
+1632(to)S
+1766(datastream)S
+2254(requests)S
+2637(to)S
+2770(read)S
+2996(and)S
+3195(write)S
+3455(to)S
+3588(internal)S
+3948(frame)S
+4235(bu)S
+4335 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4396(ers)S
+4567(maintained)S
+5066(as)S
+5204(arrays)S
+5502(in)S
+2136 V
+1260(memory.)S
+1682(Multiple)S
+2062(frame)S
+2329(bu)S
+2429 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2490(ers)S
+2641(and)S
+2820(frame)S
+3087(bu)S
+3187 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+3248(er)S
+3360(con\256gurations)S
+3967(are)S
+4123(supported.)S
+4607(It)S
+4703(can)S
+4876(be)S
+5005(used)S
+5223(to)S
+5336(debug)S
+2256 V
+1260(IIS)S
+1424(protocol)S
+1799(client)S
+2063(programs)S
+2482(by)S
+2624(printing)S
+2983(out)S
+3153(the)S
+3317(protocol)S
+3692(packets)S
+4033(recieved,)S
+4436(or)S
+4560(can)S
+4739(simply)S
+5053(be)S
+5188(used)S
+5412(as)S
+5536(a)S
+2376 V
+1260(dummy)S
+1602(server)S
+1881(in)S
+1995(cases)S
+2241(where)S
+2520(no)S
+2656(image)S
+2936(display)S
+3261(is)S
+3364(really)S
+3627(needed.)S
+4000(By)S
+4154(enabling)S
+4535(the)S
+10 I
+4694(-proxy)S
+10 R
+4991(\257ag)S
+5178(the)S
+5337(server)S
+2496 V
+1260(can)S
+1431(also)S
+1625(be)S
+1752(used)S
+1968(to)S
+2079(repeat)S
+2355(the)S
+2510(datastream)S
+2975(requests)S
+3335(to)S
+3446(a)S
+3522(list)S
+3677(of)S
+3792(other)S
+4029(servers,)S
+4368(e)S
+4412 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4473(ectively)S
+4821(splitting)S
+5182(the)S
+5336(image)S
+2616 V
+1260(display)S
+1579(to)S
+1687(a)S
+1761(number)S
+2096(of)S
+2209(other)S
+2444(servers.)S
+2811(See)S
+2985(below)S
+3259(for)S
+3405(details)S
+3696(on)S
+3826(using)S
+4073(the)S
+4225(program)S
+4593(in)S
+4701(this)S
+4876(manner.)S
+2856 V
+1260(The)S
+10 I
+1448(-verbose)S
+10 R
+1824(\257ag)S
+2007(will)S
+2196(log)S
+2357(all)S
+2490(datastream)S
+2955(requests)S
+3315(to)S
+3426(the)S
+3581(stderr,)S
+3866(otherwise)S
+4287(the)S
+4442(task)S
+4636(runs)S
+4841(silently)S
+5170(except)S
+5464(for)S
+2976 V
+1260(error)S
+1485(messages.)S
+1949(The)S
+2136(process)S
+2467(is)S
+2566(terminated)S
+3025(with)S
+3234(an)S
+3359(EOF)S
+3579(on)S
+3710(the)S
+3863(stdin,)S
+4114(if)S
+4206(the)S
+4359(task)S
+4551(is)S
+4649(intended)S
+5024(to)S
+5133(be)S
+5258(run)S
+5422(as)S
+5536(a)S
+3096 V
+1260(background)S
+1772(job)S
+1941(the)S
+10 I
+2104(-background)S
+10 R
+2655(\257ag)S
+2846(should)S
+3154(be)S
+3289(enabled)S
+3640(to)S
+3760(shut)S
+3969(o)S
+4019 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4122(the)S
+4286(check)S
+4560(of)S
+4685(the)S
+4849(stdin)S
+5086(and)S
+5272(avoid)S
+5536(a)S
+3216 V
+1260("waiting)S
+1634(for)S
+1783(tty)S
+1922(input")S
+2202(message)S
+2573(that)S
+2756(would)S
+3039(suspend)S
+3394(the)S
+3549(background)S
+4053(job.)S
+4269(Frame)S
+4557(bu)S
+4657 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4718(ers)S
+4867(are)S
+5021(maintained)S
+5497(as)S
+3336 V
+1260(rasters)S
+1554(in)S
+1666(memory,)S
+2058(up)S
+2192(to)S
+2305(four)S
+2506(frames)S
+2812(may)S
+3019(currently)S
+3414(be)S
+3543(de\256ned.)S
+3927(If)S
+4028(it)S
+4119(not)S
+4282(necessary)S
+4704(to)S
+4817(keep)S
+5040(the)S
+5197(displayed)S
+3456 V
+1260(images)S
+1580(in)S
+1695(memory)S
+2065(\(i.e.)S
+2257(the)S
+2416(client)S
+2675(will)S
+2868(not)S
+3033(need)S
+3258(to)S
+3373(read)S
+3581(back)S
+3806(any)S
+3987(subrasters)S
+4423(such)S
+4643(as)S
+4763(when)S
+5016(doing)S
+5281(overlay)S
+3576 V
+1260(graphics\),)S
+1690(the)S
+10 I
+1846(-noraster)S
+10 R
+2252(\257ag)S
+2436(can)S
+2608(be)S
+2736(used)S
+2953(to)S
+3066(disable)S
+3384(the)S
+3541(memory)S
+3909(rasters.)S
+4259(In)S
+4377(this)S
+4557(case)S
+4763(any)S
+4942(image)S
+5221(readback)S
+3696 V
+1260(will)S
+1446(return)S
+1714(an)S
+1838(array)S
+2072(of)S
+2185(zero)S
+2386(values.)S
+3936 V
+1260(The)S
+1448(default)S
+1758(frame)S
+2023(bu)S
+2123 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2184(er)S
+2295(size)S
+2484(is)S
+2585(512x512,)S
+2994(with)S
+3206(2)S
+3290(frames)S
+3595(de\256ned)S
+3923(initially.)S
+4324(The)S
+10 I
+4513(-con\256g)S
+10 R
+4824(and)S
+10 I
+5002(-nframes)S
+10 R
+5391(\257ags)S
+4056 V
+1260(can)S
+1437(be)S
+1570(used)S
+1792(to)S
+1909(change)S
+2230(the)S
+2391(startup)S
+2702(frame)S
+2973(bu)S
+3073 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+3134(ers)S
+3289(used.)S
+3566(The)S
+3760(frame)S
+4031(bu)S
+4131 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4192(er)S
+4308(con\256guration)S
+4880(table)S
+5113(is)S
+5219(normally)S
+4176 V
+1260(taken)S
+1507(to)S
+1616(be)S
+1741(/usr/local/lib/imtoolrc)S
+2645(but)S
+2804(can)S
+2973(be)S
+3098(overridden)S
+3561(by)S
+3692(using)S
+3941(an)S
+4067(IMTOOLRC)S
+4621(environment)S
+5158(variable,)S
+5536(a)S
+4296 V
+10 I
+1260($HOME/.imtoolrc)S
+10 R
+2029(\256le,)S
+2221(or)S
+2343(the)S
+10 I
+2504(-imtoolrc)S
+10 R
+2915(command-line)S
+3531(\257ag)S
+3719(respectively.)S
+4294(The)S
+4487(format)S
+4791(of)S
+4912(the)S
+5072(frame)S
+5342(bu)S
+5442 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+5503(er)S
+4416 V
+1260(con\256guration)S
+1823(\256le)S
+1981(is)S
+4656 V
+10 I
+1410(con\256gno)S
+1784(nframes)S
+2136(width)S
+2389(height)S
+2669([extra)S
+2943(\256elds])S
+4776 V
+10 R
+1290(e.g.)S
+4896 V
+1560(1)S
+1670(2)S
+1780(512)S
+1990(512)S
+5016 V
+1560(2)S
+1670(2)S
+1780(800)S
+1990(800)S
+5136 V
+1560(3)S
+1670(1)S
+1750(1024)S
+1980(1024)S
+2480(#)S
+2560(comment)S
+5376 V
+1260(and)S
+1434(so)S
+1553(on.)S
+1738(At)S
+1868(most)S
+2093(128)S
+2273(frame)S
+2536(bu)S
+2636 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2697(er)S
+2805(sizes)S
+3030(may)S
+3233(be)S
+3358(de\256ned,)S
+3708(each)S
+3921(con\256guration)S
+4485(may)S
+4688(de\256ne)S
+4963(up)S
+5094(to)S
+5203(4)S
+5284(frames,)S
+5496 V
+1260(con\256guration)S
+1823(numbers)S
+2197(need)S
+2415(not)S
+2573(be)S
+2697(sequential.)S
+5784 V
+9 B
+900(OPTIONS)S
+5904 V
+10 B
+1260(-background)S
+6024 V
+10 R
+1510(The)S
+1695(task)S
+1886(will)S
+2072(be)S
+2196(run)S
+2359(in)S
+2467(the)S
+2619(background)S
+3120(so)S
+3239(don't)S
+3480(listen)S
+3727(to)S
+3835(STDIN)S
+4159(for)S
+4305(an)S
+4429(EOF)S
+4648(to)S
+4756(quit)S
+4942(gracefully.)S
+6192 V
+10 B
+1260(-con\256g)S
+10 I
+1579(num)S
+6312 V
+10 R
+1510(Initial)S
+1799(frame)S
+2081(bu)S
+2181 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2242(er)S
+2369(con\256guration)S
+2952(number.)S
+3362(The)S
+3567(default)S
+3894(value)S
+4160(is)S
+4277(1,)S
+4402(indicating)S
+4852(a)S
+4947(512x512)S
+5348(frame)S
+6432 V
+1510(bu)S
+1610 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+1671(er)S
+1778(with)S
+1986(2)S
+2066(frames.)S
+2422(See)S
+2596(below)S
+2870(for)S
+3016(information)S
+3518(on)S
+3648(the)S
+3800(frame)S
+4062(bu)S
+4162 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4223(ers.)S
+6600 V
+10 B
+1260(-\256fo)S
+10 I
+1462(pipe)S
+6720 V
+10 R
+1510(Speci\256es)S
+1901(the)S
+2053(name)S
+2299(of)S
+2412(the)S
+2564(\256fo)S
+2733(pipe)S
+2936(to)S
+3045(be)S
+3170(used,)S
+3409(the)S
+10 I
+3562(i)S
+10 R
+3621(and)S
+10 I
+3796(o)S
+10 R
+3877(su)S
+3966 H
+	(f)show 10 -.5 mul h (\256)show
+10 R
+4050(xes)S
+4214(will)S
+4401(be)S
+4526(added)S
+4795(automatically.)S
+5425(The)S
+6840 V
+1510(default)S
+1817(pipe)S
+2019(names)S
+2304(will)S
+2490(be)S
+2614(/dev/imt1i)S
+3056(\(input)S
+3325(pipe\))S
+3560(and)S
+3734(/dev/imt1o)S
+4198(\(output)S
+4517(pipe\).)S
+7008 V
+10 B
+1260(-\256fo_only)S
+7128 V
+10 R
+1510(If)S
+1615(set,)S
+1790(only)S
+2007(\256fo)S
+2185(pipes)S
+2435(will)S
+2630(be)S
+2763(used)S
+2985(for)S
+3140(communication)S
+3801(with)S
+4018(a)S
+4101(client)S
+4363(program,)S
+4766(sockets)S
+5100(will)S
+5296(be)S
+5430(dis-)S
+7248 V
+1510(abled.)S
+7728 V
+900(IRAF Project)S
+2719(Last change: 18 Jun 1997)S
+5530(1)S
+7920 V
+EP
+%%Page: 2 2
+BP
+/slant 0 def
+/height 1.000000 def
+10 R
+10 R
+480 V
+900(VXIMTOOL)S
+1448(\()S
+1497(1)S
+1563(\))S
+2787(USER COMMANDS )S
+4884(VXIMTOOL)S
+5432(\()S
+5481(1)S
+5547(\))S
+960 V
+10 B
+1260(-help)S
+10 R
+1510(Print)S
+1735(a)S
+1809(summary)S
+2211(of)S
+2324(command)S
+2748(line)S
+2928(options)S
+3253(to)S
+3361(the)S
+3513(screen.)S
+1128 V
+10 B
+1260(-interactive)S
+1248 V
+10 R
+1510(Allow)S
+1792(cursor)S
+2073(value)S
+2321(strings)S
+2620(to)S
+2730(be)S
+2856(typed)S
+3110(into)S
+3299(the)S
+3454(STDIN)S
+3781(in)S
+3892(response)S
+4274(to)S
+4385(cursor)S
+4667(read)S
+4871(requests)S
+5231(from)S
+5458(the)S
+1368 V
+1510(client.)S
+1536 V
+10 B
+1260(-imtoolrc)S
+10 I
+1683(\256le)S
+1656 V
+10 R
+1510(Speci\256es)S
+1923(the)S
+2097(frame)S
+2381(bu)S
+2481 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2542(er)S
+2671(con\256guration)S
+3257(\256le)S
+3438(to)S
+3569(be)S
+3716(used.)S
+4007(See)S
+4204(below)S
+4501(for)S
+4670(information)S
+5195(on)S
+5348(frame)S
+1776 V
+1510(bu)S
+1610 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+1671(ers.)S
+1944 V
+10 B
+1260(-inet_only)S
+2064 V
+10 R
+1510(If)S
+1611(set,)S
+1782(only)S
+1995(inet)S
+2180(sockets)S
+2509(will)S
+2700(be)S
+2829(used)S
+3047(for)S
+3198(communication)S
+3855(with)S
+4068(a)S
+4147(client)S
+4404(program,)S
+4802(\256fo)S
+4976(pipes)S
+5222(and)S
+5402(unix)S
+2184 V
+1510(sockets)S
+1834(will)S
+2020(be)S
+2144(disabled.)S
+2352 V
+10 B
+1260(-noraster)S
+2472 V
+10 R
+1510(If)S
+1614(set)S
+1763(no)S
+1901(client)S
+2162(data)S
+2367(will)S
+2562(be)S
+2695(stored)S
+2978(in)S
+3095(memory,)S
+3492(and)S
+3675(image)S
+3958(readback)S
+4356(will)S
+4551(return)S
+4828(an)S
+4961(array)S
+5204(of)S
+5326(zeroes)S
+2592 V
+1510(unless)S
+1790(used)S
+2003(as)S
+2116(a)S
+2190(proxy)S
+2453(server.)S
+2760 V
+10 B
+1260(-nframes)S
+10 I
+1672(num)S
+2880 V
+10 R
+1510(Speci\256es)S
+1913(the)S
+2077(number)S
+2424(of)S
+2549(frame)S
+2823(bu)S
+2923 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2984(ers)S
+3142(to)S
+3262(con\256gure)S
+3681(at)S
+3795(startup.)S
+4164(By)S
+4323(default)S
+4642(there)S
+4883(will)S
+5081(be)S
+5217(2)S
+5309(frames)S
+3000 V
+1510(available,)S
+1925(a)S
+1999(maximum)S
+2435(of)S
+2548(4)S
+2628(frames)S
+2929(are)S
+3080(allowed.)S
+3168 V
+10 B
+1260(-port_only)S
+3288 V
+10 R
+1510(Same)S
+1770(as)S
+10 I
+1891(-inet_only)S
+10 R
+2334(option.)S
+2683(If)S
+2787(set,)S
+2961(only)S
+3177(inet)S
+3365(sockets)S
+3697(will)S
+3891(be)S
+4023(used)S
+4244(for)S
+4398(communication)S
+5058(with)S
+5275(a)S
+5358(client)S
+3408 V
+1510(program.)S
+3576 V
+10 B
+1260(-port)S
+10 I
+1506(num)S
+3696 V
+10 R
+1510(Set)S
+1670(the)S
+1825(primary)S
+2174(port)S
+2368(to)S
+2479(listen)S
+2729(on)S
+2862(for)S
+3011(client)S
+3266(connections.)S
+3831(The)S
+4019(default)S
+4329(is)S
+4429(5137)S
+4662(except)S
+4955(when)S
+5204(used)S
+5420(as)S
+5536(a)S
+3816 V
+1510(proxy)S
+1773(server)S
+2046(in)S
+2154(which)S
+2428(case)S
+2629(the)S
+2781(default)S
+3088(is)S
+3185(5136.)S
+3984 V
+10 B
+1260(-proxy)S
+4104 V
+10 R
+1510(Run)S
+1714(as)S
+1834(a)S
+1915(proxy)S
+2186(server)S
+2467(by)S
+2605(repeating)S
+3014(client)S
+3274(requests)S
+3639(to)S
+3755(each)S
+3975(of)S
+4096(the)S
+10 I
+4256(server)S
+10 R
+4543(remote)S
+4858(server)S
+5139(arguments.)S
+4224 V
+1510(See)S
+1684(the)S
+1836(section)S
+2149(on)S
+2279(proxy)S
+2542(usage)S
+2799(below)S
+3073(for)S
+3219(details.)S
+4392 V
+10 B
+1260(-verbose)S
+4512 V
+10 R
+1510(If)S
+1606(set,)S
+1772(print)S
+1991(information)S
+2493(about)S
+2745(all)S
+2875(IIS)S
+3027(packets)S
+3356(headers)S
+3690(recieved)S
+4057(to)S
+4165(the)S
+4317(STDERR)S
+4731(stream.)S
+4680 V
+10 B
+1260(-unix)S
+10 I
+1513(name)S
+4800 V
+10 R
+1510(Speci\256es)S
+1909(the)S
+2069(unix)S
+2285(domain)S
+2623(socket)S
+2916(name)S
+3170(to)S
+3286(use.)S
+3512(A)S
+3622("%d")S
+3876(in)S
+3993(the)S
+4154(\256lename)S
+4537(will)S
+4732(be)S
+4865(replaced)S
+5241(with)S
+5458(the)S
+4920 V
+1510(user)S
+1706(id.)S
+5088 V
+10 B
+1260(-unix_only)S
+5208 V
+10 R
+1510(If)S
+1607(set,)S
+1774(only)S
+1983(unix)S
+2192(domain)S
+2523(sockets)S
+2848(will)S
+3035(be)S
+3160(used)S
+3374(for)S
+3521(communication)S
+4174(with)S
+4383(a)S
+4458(client)S
+4711(program,)S
+5105(inet)S
+5286(sockets)S
+5328 V
+1510(and)S
+1684(\256fos)S
+1892(will)S
+2078(be)S
+2202(disabled.)S
+5616 V
+9 B
+900(CLIENT)S
+1272(CONNECTIONS)S
+5736 V
+10 I
+1260(VXImtool)S
+10 R
+1673(allows)S
+1964(clients)S
+2255(to)S
+2363(connect)S
+2703(in)S
+2811(any)S
+2985(of)S
+3098(the)S
+3250(following)S
+3669(ways:)S
+5904 V
+10 B
+1260(\256fo)S
+1429(pipes)S
+6024 V
+10 R
+1510(The)S
+1706(traditional)S
+2158(approach.)S
+2589(The)S
+2785(default)S
+3103(global)S
+3394(/dev/imt1[io])S
+3963(pipes)S
+4215(may)S
+4428(be)S
+4564(used,)S
+4814(or)S
+4939(a)S
+5025(private)S
+5344(set)S
+5497(of)S
+6144 V
+1510(\256fos)S
+1731(can)S
+1911(be)S
+2047(speci\256ed)S
+2444(using)S
+2703(the)S
+10 I
+2867(-\256fo)S
+10 R
+3070(command)S
+3506(line)S
+3698(argument.)S
+4172(Values)S
+4491(should)S
+4800(be)S
+4936(speci\256ed)S
+5333(as)S
+5458(the)S
+6264 V
+1510(root)S
+1701(pathname)S
+2119(to)S
+2227(a)S
+2301(pair)S
+2486(of)S
+2599(\256fo)S
+2768(pipes)S
+3009(whose)S
+3294(last)S
+3463(character)S
+3857(is)S
+3954('i')S
+4078(or)S
+4191('o',)S
+4362(these)S
+4597(characters)S
+5030(will)S
+5217(be)S
+5342(added)S
+6384 V
+1510(automatically)S
+2099(when)S
+2360(opening)S
+2727(the)S
+2894(pipes.)S
+3175(For)S
+3359(example,)S
+3767(to)S
+3890(use)S
+4068(the)S
+4234(default)S
+4555(pipes)S
+4810(the)S
+4976(path)S
+5192(would)S
+5486(be)S
+6504 V
+1510(speci\256ed)S
+1895(as)S
+2008(simply)S
+2311("/dev/imt1".)S
+2832(A)S
+2934(value)S
+3180(of)S
+3293("none")S
+3599(disables)S
+3951(this)S
+4126(connection.)S
+6672 V
+10 B
+1260(tcp/ip)S
+1535(sockets)S
+6792 V
+10 R
+1510(Clients)S
+1836(connect)S
+2188(via)S
+2352(a)S
+2438(tcp/ip)S
+2708(socket.)S
+3030(The)S
+3227(default)S
+3546(port)S
+3749(is)S
+10 I
+3858(5137)S
+10 R
+4058(,)S
+4125(or)S
+4250(a)S
+4337(custom)S
+4669(port)S
+4873(may)S
+5088(be)S
+5225(speci\256ed)S
+6912 V
+1510(using)S
+1760(the)S
+10 I
+1915(-port)S
+10 R
+2148(command)S
+2575(line)S
+2758(switch.)S
+3107(This)S
+3318(permits)S
+3650(connecting)S
+4120(to)S
+4230(the)S
+4384(server)S
+4659(over)S
+4868(a)S
+4944(remote)S
+5253(network)S
+7032 V
+1510(connection)S
+1992(anywhere)S
+2423(on)S
+2567(the)S
+2734(Internet.)S
+3174(When)S
+3457(used)S
+3685(as)S
+3813(a)S
+3902(proxy)S
+4180(server)S
+4468(the)S
+4635(default)S
+4957(port)S
+5163(number)S
+5513(is)S
+7152 V
+1510(5136)S
+1742(so)S
+1863(as)S
+1978(to)S
+2088(avoid)S
+2342(a)S
+2418(con\257ict)S
+2750(with)S
+2960(an)S
+3086(XImtool)S
+3457(running)S
+3800(on)S
+3932(the)S
+4085(same)S
+4321(machine,)S
+4715(other)S
+4951(connections)S
+5459(are)S
+7272 V
+1510(disabled)S
+1881(unless)S
+2169(otherwise)S
+2595(overridden)S
+3065(by)S
+3203(a)S
+3285(command)S
+3717(line)S
+3905(option)S
+4199(following)S
+4626(the)S
+10 I
+4787(-proxy)S
+10 R
+5086(\257ag)S
+5275(to)S
+5392(reset)S
+7752 V
+900(IRAF Project)S
+2719(Last change: 18 Jun 1997)S
+5530(2)S
+7920 V
+EP
+%%Page: 3 3
+BP
+/slant 0 def
+/height 1.000000 def
+10 R
+10 R
+480 V
+900(VXIMTOOL)S
+1448(\()S
+1497(1)S
+1563(\))S
+2787(USER COMMANDS )S
+4884(VXIMTOOL)S
+5432(\()S
+5481(1)S
+5547(\))S
+960 V
+1510(the)S
+1662(connection.)S
+2185(A)S
+2287(port)S
+2478(number)S
+2813(of)S
+2926(0)S
+3006(\(zero\))S
+3273(disables)S
+3625(this)S
+3800(connection.)S
+1128 V
+10 B
+1260(unix)S
+1480(domain)S
+1833(sockets)S
+1248 V
+10 R
+1510(Like)S
+1733(a)S
+1817(tcp/ip)S
+2085(socket,)S
+2405(but)S
+2573(limited)S
+2898(to)S
+3017(a)S
+3102(single)S
+3382(host)S
+3590(system.)S
+3934(Usually)S
+4286(faster)S
+4548(than)S
+4761(a)S
+4846(tcp/ip)S
+5115(socket,)S
+5436(and)S
+1368 V
+1510(comparable)S
+2008(to)S
+2119(a)S
+2196(\256fo.)S
+2393(By)S
+2543(default)S
+2853(each)S
+3068(user)S
+3267(gets)S
+3460(their)S
+3675(own)S
+3879(unix)S
+4089(domain)S
+4421(socket,)S
+4733(so)S
+4854(this)S
+5031(option)S
+5319(allows)S
+1488 V
+1510(multiple)S
+1882(users)S
+2125(to)S
+2241(run)S
+2413(ximtools)S
+2803(on)S
+2942(the)S
+3103(same)S
+3347(host)S
+3553(without)S
+3898(having)S
+4209(to)S
+4326(customize)S
+4770(things.)S
+5109(The)S
+5303(default)S
+1608 V
+1510(value)S
+1758(is)S
+1857("/tmp/.IMT%d",)S
+2549(other)S
+2785(sockets)S
+3110(may)S
+3313(be)S
+3438(de\256ned)S
+3763(using)S
+4011(the)S
+10 I
+4164(-unix)S
+10 R
+4400(command)S
+4825(line)S
+5006(switch.)S
+5353(Legal)S
+1728 V
+1510(values)S
+1813(should)S
+2128(be)S
+2270(speci\256ed)S
+2673(as)S
+2804(a)S
+2896(\256lename)S
+3288(to)S
+3414(be)S
+3557(used)S
+3789(for)S
+3954(the)S
+4125(socket,)S
+4454(up)S
+4603(to)S
+4730(two)S
+4929("%d")S
+5193(\256elds)S
+5459(are)S
+1848 V
+1510(allowed)S
+1856(and)S
+2030(will)S
+2216(be)S
+2340(replaced)S
+2707(by)S
+2837(the)S
+2989(userid.)S
+3288(An)S
+3440(empty)S
+3720(string)S
+3978(value)S
+4224(disables)S
+4576(this)S
+4751(connection.)S
+2016 V
+1260(By)S
+1408(default)S
+10 I
+1716(vximtool)S
+10 R
+2091(listens)S
+2378(simultaneously)S
+3015(for)S
+3162(client)S
+3415(connections)S
+3923(on)S
+4054(all)S
+4186(three)S
+4417(types)S
+4660(of)S
+4775(ports.)S
+5092(Clients)S
+5408(may)S
+2136 V
+1260(connect)S
+1614(simultaneously)S
+2264(by)S
+2408(di)S
+2486 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2547(erent)S
+2790(means)S
+3089(allowing)S
+3483(up)S
+3627(to)S
+3748(three)S
+3990(di)S
+4068 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4129(erent)S
+4371(displays)S
+4742(to)S
+4863(be)S
+5000(loading)S
+5343(at)S
+5458(the)S
+2256 V
+1260(same)S
+1495(time)S
+1703(into)S
+1889(di)S
+1967 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2028(erent)S
+2257(frames.)S
+2544 V
+9 B
+900(COMMUNICATIONS)S
+1807(PROTOCOL)S
+2664 V
+10 R
+1260(Clients)S
+1583(communicate)S
+2160(with)S
+10 I
+2377(vximtool)S
+10 R
+2760(using)S
+3016(a)S
+3099(protocol)S
+3471(developed)S
+3920(originally)S
+4348(for)S
+4503(IIS)S
+4664(\(International)S
+5247(Imaging)S
+2784 V
+1260(Systems\))S
+1659(Frame)S
+1946(Bu)S
+2063 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+2124(er)S
+2232(hardware,)S
+2658(the)S
+2811(so-called)S
+3202("IIS)S
+3396(protocol";)S
+3829(other)S
+4065(more)S
+4301(modern)S
+4637(protocols)S
+5040(will)S
+5227(likely)S
+5486(be)S
+2904 V
+1260(supported)S
+1687(in)S
+1798(the)S
+1953(future.)S
+2279(The)S
+2467(IIS)S
+2622(protocol)S
+2988(is)S
+3088(basically)S
+3476(a)S
+3553(command)S
+3981(packet)S
+4275(stream)S
+4575(with)S
+4787(a)S
+4865(header)S
+5164(describing)S
+3024 V
+1260(the)S
+1421(operation)S
+1837(to)S
+1954(be)S
+2087(performed)S
+2541(\(select)S
+2840(frame,)S
+3136(load)S
+3347(display,)S
+3700(read)S
+3910(cursor,)S
+4223(etc\),)S
+4436(and)S
+4618(an)S
+4750(optional)S
+5116(data)S
+5320(packet)S
+3144 V
+1260(containing)S
+1712(e.g.)S
+1886(pixels.)S
+2180(It)S
+2271(is)S
+2368(beyond)S
+2692(the)S
+2844(scope)S
+3101(of)S
+3214(this)S
+3390(document)S
+3815(to)S
+3924(describe)S
+4287(fully)S
+4507(the)S
+4660(details)S
+4952(of)S
+5066(the)S
+5219(protocol;)S
+3264 V
+1260(interested)S
+1688(users)S
+1933(should)S
+2240(contact)S
+10 I
+2568(iraf@noao.edu)S
+10 R
+3214(for)S
+3370(further)S
+3681(information)S
+4193(or)S
+4316(see)S
+4482(the)S
+10 I
+4643(A)S
+4743(Reference)S
+5180(Guide)S
+5463(for)S
+3384 V
+1260(the)S
+1412(IRAF)S
+1658(Client)S
+1933(Display)S
+2274(Library)S
+10 R
+2610(for)S
+2756(details.)S
+3672 V
+9 B
+900(PROXY)S
+1247(USAGE)S
+3792 V
+10 R
+1260(The)S
+10 I
+1445(vximtool)S
+10 R
+1819(may)S
+2021(also)S
+2212(be)S
+2336(used)S
+2549(as)S
+2663(a)S
+2738(proxy)S
+3002(server)S
+3276(by)S
+3407(enabling)S
+3782(the)S
+10 I
+3935(-proxy)S
+10 R
+4226(command)S
+4651(line)S
+4832(\257ag.)S
+5068(In)S
+5182(this)S
+5358(mode)S
+3912 V
+1260(the)S
+1420(program)S
+1796(acts)S
+1989(as)S
+2110(a)S
+2191(relay)S
+2427(for)S
+2580(the)S
+2739(IIS)S
+2898(datastream)S
+3367(packets,)S
+3728(sending)S
+4076(image)S
+4357(data,)S
+4585(frame)S
+4854(requests,)S
+5243(etc.)S
+5421(to)S
+5536(a)S
+4032 V
+1260(list)S
+1421(of)S
+1542(other)S
+1785(servers)S
+2105(speci\256ed)S
+2498(on)S
+2636(the)S
+2796(command)S
+3228(line.)S
+3471(The)S
+3664(e)S
+3708 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+3769(ect)S
+3923(of)S
+4045(this)S
+4229(is)S
+4335(to)S
+4452(allow)S
+4713(a)S
+4796(client)S
+5057(to)S
+5174(display)S
+5502(to)S
+4152 V
+1260(this)S
+1436(program)S
+1805(which)S
+2080(then)S
+2283(re-displays)S
+2752(to)S
+2861(each)S
+3074(of)S
+3188(the)S
+3341(other)S
+3577(named)S
+3874(servers.)S
+4241(A)S
+4343(maximum)S
+4779(of)S
+4892(8)S
+4972(servers)S
+5284(may)S
+5486(be)S
+4272 V
+1260(named,)S
+1594(they)S
+1809(may)S
+2024(be)S
+2161(either)S
+2431(on)S
+2574(the)S
+2740(local)S
+2978(host)S
+3189(or)S
+3316(a)S
+3404(remote)S
+3725(machine)S
+4107(and)S
+4295(connections)S
+4816(can)S
+4998(be)S
+5136(established)S
+4392 V
+1260(using)S
+1507(either)S
+1764(\256fos)S
+1972(or)S
+2085(sockets.)S
+2464(See)S
+2638(below)S
+2912(for)S
+3058(details)S
+3349(on)S
+3479(how)S
+3681(to)S
+3789(specify)S
+4107(the)S
+4259(server)S
+4532(connection.)S
+4632 V
+1260(The)S
+1445(current)S
+1757(implementation)S
+2415(has)S
+2578(a)S
+2652(few)S
+2831(restrictions)S
+3305(users)S
+3540(should)S
+3837(keep)S
+4055(in)S
+4163(mind:)S
+4800 V
+1620(Cursor)S
+1924(and)S
+2100(image)S
+2376(readback)S
+2767(are)S
+2920(done)S
+3146(by)S
+3278(sending)S
+3621(the)S
+3775(request)S
+10 I
+4095(only)S
+10 R
+4299(to)S
+4409(the)S
+4563(\256rst)S
+4751(server)S
+5026(named)S
+5325(on)S
+5458(the)S
+4920 V
+1620(command)S
+2049(line.)S
+2289(This)S
+2502(is)S
+2604(done)S
+2833(to)S
+2946(avoid)S
+3203(forcing)S
+3526(a)S
+3605(cursor)S
+3889(mode)S
+4146(on)S
+4281(all)S
+4416(servers)S
+4733(which)S
+5012(cannot)S
+5313(be)S
+5442(ter-)S
+5040 V
+1620(minated)S
+1973(when)S
+2220(a)S
+2295(response)S
+2675(is)S
+2773(received)S
+3141(from)S
+3366(only)S
+3576(one)S
+3752(server,)S
+4052(and)S
+4228(means)S
+4515(that)S
+4697(the)S
+4851(\256rst)S
+5039(server)S
+5314(named)S
+5160 V
+1620(should)S
+1924(be)S
+2055(the)S
+2214(one)S
+2395(used)S
+2615(to)S
+2730(control)S
+3050(interactive)S
+3507(sessions.)S
+3926(The)S
+4117(remaining)S
+4558(servers)S
+4876(however)S
+5255(can)S
+5429(still)S
+5280 V
+1620(respond)S
+1966(to)S
+2074(cursor)S
+2353(requests)S
+2710(from)S
+2934(other)S
+3169(applications)S
+3682(connected)S
+4116(to)S
+4224(that)S
+4404(server)S
+4677(on)S
+4807(another)S
+5136(channel.)S
+5448 V
+1620(All)S
+1792(named)S
+2102(servers)S
+2428(must)S
+2667(be)S
+2805(running)S
+3160(prior)S
+3398(to)S
+3520(starting)S
+3864(the)S
+4031(proxy)S
+4309(server.)S
+4652(The)S
+4852(connection)S
+5335(to)S
+5458(the)S
+5568 V
+1620(remote)S
+1934(servers)S
+2253(is)S
+2357(established)S
+2838(when)S
+3091(this)S
+3273(task)S
+3471(is)S
+3575(\256rst)S
+3768(run)S
+3937(and)S
+4117(if)S
+4214(no)S
+4350(server)S
+4629(is)S
+4732(running)S
+5079(that)S
+5265(connec-)S
+5688 V
+1620(tion)S
+1806(will)S
+1992(be)S
+2116(ignored.)S
+2506(The)S
+2691(task)S
+2882(will)S
+3068(exit)S
+3248(if)S
+3339(no)S
+3469(remote)S
+3776(servers)S
+4088(can)S
+4256(be)S
+4380(found)S
+4643(for)S
+4789(display.)S
+5856 V
+1620(Any)S
+1832(connected)S
+2276(server)S
+2559(that)S
+2749(shuts)S
+2995(down)S
+3257(while)S
+3519(the)S
+3682(proxy)S
+3956(server)S
+4240(is)S
+4348(running)S
+4700(is)S
+4808(likely)S
+5077(to)S
+5196(cause)S
+5458(the)S
+5976 V
+1620(program)S
+1988(to)S
+2096(crash)S
+2336(on)S
+2466(the)S
+2618(next)S
+2820(display.)S
+6264 V
+9 B
+900(SPECIFYING)S
+1482(THE)S
+1699(REMOTE)S
+2126(SERVER)S
+2518(CONNECTION)S
+6384 V
+10 R
+1260(The)S
+1445(syntax)S
+1736(for)S
+1882(the)S
+2034(server)S
+2307(argument)S
+2714(used)S
+2927(in)S
+3035(proxy)S
+3298(mode)S
+3550(is)S
+3647(as)S
+3760(follows:)S
+6624 V
+10 I
+1620(<domain>)S
+2086(:)S
+2149(<address>)S
+6864 V
+10 R
+1260(where)S
+1539(<domain>)S
+1988(is)S
+2092(one)S
+2273(of)S
+10 B
+2393(inet)S
+10 R
+2591(\(internet)S
+2966(tcp/ip)S
+3231(socket\),)S
+10 B
+3581(unix)S
+10 R
+3808(\(unix)S
+4056(domain)S
+4393(socket\))S
+4718(or)S
+10 B
+4838(\256fo)S
+10 R
+5014(\(named)S
+5350(pipe\).)S
+6984 V
+1260(The)S
+1445(form)S
+1669(of)S
+1782(the)S
+1934(address)S
+2263(depends)S
+2620(upon)S
+2850(the)S
+3002(domain,)S
+3357(as)S
+3470(illustrated)S
+3900(in)S
+4008(the)S
+4160(examples)S
+4567(below.)S
+7272 V
+1260(inet:5137)S
+2760(Connect)S
+3123(to)S
+3231(port)S
+3422(5137)S
+3652(on)S
+3782(the)S
+3934(local)S
+4158(host.)S
+7752 V
+900(IRAF Project)S
+2719(Last change: 18 Jun 1997)S
+5530(3)S
+7920 V
+EP
+%%Page: 4 4
+BP
+/slant 0 def
+/height 1.000000 def
+10 R
+10 R
+480 V
+900(VXIMTOOL)S
+1448(\()S
+1497(1)S
+1563(\))S
+2787(USER COMMANDS )S
+4884(VXIMTOOL)S
+5432(\()S
+5481(1)S
+5547(\))S
+960 V
+1260(inet:5137:foo.bar.edu)S
+2760(Client)S
+3055(connection)S
+3543(to)S
+3671(port)S
+3882(5137)S
+4133(on)S
+4284(internet)S
+4640(host)S
+10 I
+4858(foo.bar.edu)S
+10 R
+5319(.)S
+5425(The)S
+1080 V
+2760(dotted)S
+3040(\(numeric\))S
+3463(form)S
+3687(of)S
+3800(address)S
+4129(may)S
+4331(also)S
+4522(be)S
+4646(used.)S
+1248 V
+1260(unix:/tmp/.IMT212)S
+2760(Unix)S
+3010(domain)S
+3360(socket)S
+3665(with)S
+3893(the)S
+4066(given)S
+4339(pathname.)S
+4803(IPC)S
+5010(method,)S
+5386(local)S
+1368 V
+2760(host)S
+2957(only.)S
+1536 V
+1260(\256fo:/dev/imt1i:/dev/imt1o)S
+2760(FIFO)S
+3021(or)S
+3148(named)S
+3458(pipe)S
+3674(with)S
+3896(the)S
+4062(given)S
+4328(pathname.)S
+4815(IPC)S
+5016(method,)S
+5386(local)S
+1656 V
+2760(host)S
+2969(only.)S
+3244(Two)S
+3469(pathnames)S
+3938(are)S
+4101(required,)S
+4500(one)S
+4686(for)S
+4844(input)S
+5092(and)S
+5278(one)S
+5464(for)S
+1776 V
+2760(output,)S
+3071(since)S
+3306(FIFOs)S
+3592(are)S
+3743(not)S
+3901(bidirectional.)S
+1944 V
+1260(The)S
+1450(address)S
+1784(\256eld)S
+1997(may)S
+2204(contain)S
+2533(up)S
+2668(to)S
+2781(two)S
+2966("%d")S
+3216(\256elds.)S
+3523(If)S
+3624(present,)S
+3972(the)S
+4129(user's)S
+4402(UID)S
+4614(will)S
+4805(be)S
+4934(substituted)S
+5403(\(e.g.)S
+2064 V
+1260("unix:/tmp/.IMT%d"\).)S
+2352 V
+9 B
+900(EXAMPLES)S
+2472 V
+10 R
+1260(1\))S
+1373(Run)S
+1570(the)S
+1722(vximtool,)S
+2139(logging)S
+2475(output)S
+2761(to)S
+2869(the)S
+3021(\256le)S
+3179(named)S
+3475("spool":)S
+2712 V
+10 C
+1750(%)S
+1870(vximtool)S
+2410(-verbose)S
+2950(>&)S
+3130(spool)S
+2880 V
+10 R
+1260(2\))S
+1373(Run)S
+1570(the)S
+1722(vximtool)S
+2114(in)S
+2222(the)S
+2374(background,)S
+2900(connect)S
+3240(only)S
+3448(on)S
+3578(unix)S
+3786(sockets,)S
+4135(no)S
+4265(output:)S
+3120 V
+10 C
+1750(%)S
+1870(vximtool)S
+2410(-b)S
+2590(-unix_only)S
+3250(&)S
+3288 V
+10 R
+1260(3\))S
+1373(Don't)S
+1636(store)S
+1860(images)S
+2173(in)S
+2281(memory,)S
+2669(start)S
+2871(with)S
+3079(initial)S
+3343(1024x1024)S
+3823(frame)S
+4085(bu)S
+4185 H
+	(f)show 10 -.5 mul h (f)show
+10 R
+4246(er:)S
+3528 V
+10 C
+1750(%)S
+1870(vximtool)S
+2410(-noraster)S
+3010(-config)S
+3490(3)S
+3696 V
+10 R
+1260(4\))S
+1373(Run)S
+1570(the)S
+1722(vximtool)S
+2114(in)S
+2222(the)S
+2374(background,)S
+2900(taking)S
+3180(cursor)S
+3459(input)S
+3695(from)S
+3919(a)S
+3993(\256le:)S
+3936 V
+10 C
+1750(%)S
+1870(vximtool)S
+2410(-i)S
+2590(<)S
+2710(cursor_file)S
+3430(&)S
+4104 V
+10 R
+1260(5\))S
+1373(Run)S
+1570(as)S
+1683(a)S
+1757(proxy)S
+2020(server,)S
+2318(displaying)S
+2765(to)S
+2873(both)S
+3081(a)S
+3155(local)S
+3379(and)S
+3553(a)S
+3627(remote)S
+3934(XImtool,)S
+4328(log)S
+4486(output)S
+4772(to)S
+4880(stderr:)S
+4344 V
+10 I
+1750(...start)S
+2039(all)S
+2175(XImtool)S
+2527(servers)S
+2845(to)S
+2953(be)S
+3077(used)S
+4464 V
+10 C
+1750(%)S
+1870(vximtool)S
+2410(-v)S
+2590(-proxy)S
+3010(unix:/tmp/.IMT%d)S
+4030(inet:5137:pisces)S
+4584 V
+1750(Connected)S
+2350(to)S
+2530(server)S
+2950(on)S
+3130(unix:/tmp/.IMT359)S
+4704 V
+1750(Connected)S
+2350(to)S
+2530(server)S
+2950(on)S
+3130(inet:5137:pisces)S
+4824 V
+1750(Open)S
+2050(to)S
+2230(accept)S
+2650(input)S
+3010(on)S
+3190(inet:)S
+3550(port)S
+3850(5136)S
+5112 V
+10 R
+1260(To)S
+1407(display)S
+1732(to)S
+1846(the)S
+2004(proxy)S
+2273(server)S
+2552(the)S
+2710(client)S
+2969(should)S
+3273(connect)S
+3620(to)S
+3735(the)S
+3894(vximtool)S
+4293(on)S
+10 I
+4430(inet:5136)S
+10 R
+4813(,)S
+4875(the)S
+5034(proxy)S
+5304(in)S
+5419(turn)S
+5232 V
+1260(will)S
+1463(relay)S
+1709(data)S
+1922(to)S
+2047(the)S
+2216(servers)S
+2545(listed)S
+2809(on)S
+2956(the)S
+3125(command)S
+3566(line.)S
+3818(Note)S
+4059(that)S
+4256(in)S
+4381(this)S
+4572(last)S
+4757(example)S
+5141(any)S
+5331(cursor)S
+5352 V
+1260(requests)S
+1626(from)S
+1859(the)S
+2020(client)S
+2281(connected)S
+2724(to)S
+2841(the)S
+3002(vximtool)S
+3403(will)S
+3598(be)S
+3731(handled)S
+4086(by)S
+4225(the)S
+4386(ximtool)S
+4737(connected)S
+5180(on)S
+5319(a)S
+5402(unix)S
+5472 V
+1260(socket)S
+1554(on)S
+1693(the)S
+1854(local)S
+2087(machine)S
+2464(\(i.e.)S
+2658(the)S
+2819(\256rst)S
+3014(server)S
+3296(argument\).)S
+3800(The)S
+3994(remote)S
+4310(ximtool)S
+4661(on)S
+4800(the)S
+4960(machine)S
+5336(pisces)S
+5592 V
+1260(could)S
+1516(simultaneously)S
+2156(be)S
+2284(used)S
+2501(by)S
+2635(another)S
+2968(client)S
+3224(on)S
+3358(that)S
+3542(machine)S
+3914(connected)S
+4352(by)S
+4486(some)S
+4732(other)S
+4972(means.)S
+5317(In)S
+5435(this)S
+5712 V
+1260(case)S
+1476(it)S
+1576(will)S
+1776(only)S
+1998(display)S
+2331(images)S
+2658(coming)S
+3002(from)S
+3240(the)S
+10 I
+3406(vximtool)S
+10 R
+3794(proxy,)S
+4096(but)S
+4268(could)S
+4534(be)S
+4672(used)S
+4899(in)S
+5021(an)S
+5159(interactive)S
+5832 V
+1260(IRAF)S
+1518(session)S
+1837(running)S
+2178(on)S
+2308(pisces)S
+2582(to)S
+2690(examine)S
+3058(the)S
+3210(images.)S
+6120 V
+9 B
+900(SEE)S
+1112(ALSO)S
+6240 V
+10 R
+1260(ximtool\(1\))S
+6360 V
+10 I
+1260(A)S
+1351(Reference)S
+1779(Guide)S
+2053(for)S
+2200(the)S
+2352(IRAF)S
+2598(Client)S
+2873(Display)S
+3214(Library)S
+3550(\(CDL\))S
+6528 V
+9 B
+900(COPYRIGHT)S
+6648 V
+10 R
+1260(Copyright\(c\))S
+1806(1986)S
+2036(Association)S
+2538(of)S
+2651(Universities)S
+3164(for)S
+3310(Research)S
+3705(in)S
+3813(Astronomy)S
+4293(Inc.)S
+7680 V
+900(IRAF Project)S
+2719(Last change: 18 Jun 1997)S
+5530(4)S
+7920 V
+EP
+%%Trailer
+%%DocumentFonts: Times-Roman Times-Bold Times-Italic Courier
+%%Pages: 4
+

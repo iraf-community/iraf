@@ -1,0 +1,27 @@
+# Make the TVMARK package
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+
+libpkg.a:
+	mkbmark.x	"tvmark.h" <imhdr.h>
+	mkcolon.x	"tvmark.h" <imhdr.h> <fset.h> <error.h>
+	mkgmarks.x	<ctype.h> <lexnum.h>
+	mkgpars.x	<ctype.h> "tvmark.h"
+	mkgscur.x	<gset.h>  <fset.h>
+	mkremove.x
+	mkfind.x	<mach.h>
+	mkppars.x	<ctype.h> "tvmark.h"
+	mkmag.x		<imhdr.h>
+	mkmark.x	<imhdr.h> <fset.h> "tvmark.h"
+	mknew.x
+	mkonemark.x	<imhdr.h> "tvmark.h"
+	mkoutname.x
+	mkshow.x	"tvmark.h"
+	mktext.x	"pixelfont.inc"  "asciilook.inc"  <imhdr.h>  <mach.h>
+	mktools.x	<ctype.h> "tvmark.h"
+	t_tvmark.x	<imhdr.h>  <imset.h> <fset.h>  <gset.h>  "tvmark.h"
+	;

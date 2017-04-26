@@ -1,0 +1,3 @@
+CONLIB -- This directory contains the contents of the NCAR files concom.f and
+conterp.f, unpacked one subroutine per file.  The unpacking operation is
+necessary to permit topological ordering of the library.

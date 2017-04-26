@@ -1,0 +1,29 @@
+# Update the KEYPAR, KEYTAB, PARKEY, PARTAB, TABKEY, TABPAR task code
+# in the ttools package library
+# Author: B.Simon, 25-NOV-1987
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	addslash.x     		
+	datatype.x     		<lexnum.h> 
+	filetype.x     		filetype.h 
+	getimghdr.x    		
+	gettabdat.x    		<tbset.h> 
+	gettabhdr.x    		
+	isdouble.x		<ctype.h>  <mach.h>
+	keypar.x       		filetype.h 
+	keytab.x       		<tbset.h>  filetype.h 
+	parkey.x       		filetype.h 
+	partab.x       		<tbset.h> 
+	putimghdr.x    		
+	puttabdat.x    		<tbset.h> 
+	puttabhdr.x    		
+	tabaccess.x    		
+	tabhdrtyp.x    		<tbset.h> 
+	tabkey.x       		<tbset.h>  filetype.h 
+	tabpar.x       		<tbset.h> 
+	;

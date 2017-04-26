@@ -1,0 +1,56 @@
+# Make the NSPPKERN GIO graphics kernel.  Requires LIBNSPP.  Requires
+# a host system metacode translation task for each device.
+
+$checkout libgkt.a lib$
+$update   libgkt.a
+$checkin  libgkt.a lib$
+$call     relink
+$exit
+
+update:					# update lib$x_nsppkern.e
+	$call	relink
+	$call	install
+	;
+
+relink:					# make x_nsppkern.e in local directory
+	$omake  writeb.x <mach.h> <error.h> gkt.h gkt.com
+	$omake  x_nsppkern.x
+	$link	x_nsppkern.o writeb.o -lgkt -lnspp
+	;
+
+install:				# install in system library
+	$move	x_nsppkern.e bin$
+	;
+
+libgkt.a:
+	gktcancel.x	gkt.com gkt.h <fset.h>
+	gktclear.x	gkt.com gkt.h <mach.h>
+	gktclose.x	gkt.com gkt.h
+	gktclws.x	gkt.h gkt.com
+	gktcolor.x	gkt.com gkt.h
+	gktdrawch.x	font.com font.h gkt.h <gki.h> <gset.h> <math.h>
+	gktescape.x	
+	gktfa.x		gkt.com gkt.h
+	gktfaset.x	gkt.com gkt.h <gki.h>
+	gktflush.x	gkt.com gkt.h
+	gktfont.x	gkt.com gkt.h <gki.h> <gset.h>
+	gktgcell.x	
+	gktinit.x	gkt.com gkt.h nspp.com <ctype.h> <gki.h> <mach.h>
+	gktline.x	gkt.com gkt.h <gset.h>
+	gktmfopen.x	gkt.h <fset.h> <knet.h> <mach.h>
+	gktopen.x	gkt.com gkt.h <gki.h>
+	gktopenws.x	gkt.com gkt.h nspp.com <error.h> <gki.h> <mach.h>
+	gktpcell.x	gkt.com gkt.h <gki.h> <gset.h>
+	gktpl.x		gkt.com gkt.h <gki.h>
+	gktplset.x	gkt.com gkt.h <gki.h>
+	gktpm.x		gkt.com gkt.h <gki.h>
+	gktpmset.x	gkt.com gkt.h <gki.h>
+	gktreset.x	gkt.com gkt.h <gset.h> <gki.h>
+	gkttx.x		gkt.com gkt.h <gki.h> <gset.h> <math.h>
+	gkttxset.x	gkt.com gkt.h <gki.h> <gset.h>
+	pixel0.f
+	pixels.f
+	t_nsppkern.x	<error.h> <gki.h>
+	tran16.f
+	writeb.x	gkt.h <error.h> <mach.h> gkt.com
+	;

@@ -1,0 +1,40 @@
+RPP -- Second pass of the SPP preprocessor.
+
+    While RPP is derived from ratfor, it is not a ratfor preprocessor.
+It accepts as input the output of the first pass, XPP, and produces Fortran as
+output.  XPP and RPP together with the UNIX driver program XC make up the
+preprocessor for the IRAF SPP language.
+
+
+subdirectories:
+
+	ratlibc		Interface to the host system, written in C
+	ratlibf		Fortran version of the ratfor library (used by RPP)
+	ratlibr		Ratfor version of the ratfor library
+	rppfor		Fortran source for RPP
+	rpprat		Ratfor source for RPP
+
+
+RPP consists of the source for the program itself, the portable library
+functions, and the interface to the host system.  Everything required to
+compile and link RPP on a host system providing a C and Fortran compiler
+is included in these directories.  RPP is currently implemented as a stand
+alone (bootstrap) program, i.e. it can be compiled before IRAF itself is
+running.  While the ratfor sources for the preprocessor and the library
+are included in the distribution, a ratfor preprocessor is not necessary
+to compile RPP.  All ratfor sources are distributed already preprocessed
+into Fortran.
+
+To compile RPP on a UNIX host type "make".  If there are any problems they
+will most likely be in the interface routines, which are not (cannot be)
+completely portable.  In particular the definitions in ratlibc/ratdef.h
+should be examined to see is they are appropriate for your machine.  The
+single biggest difference between different host systems providing C and
+simple UNIX like STDIO is in the naming conventions of external identifiers.
+All C externals called from Fortran are defined in ratdef.h to make it
+easier to change the names.  RPP is a C program (it has a C main) even
+though most of the code is written in Fortran.
+
+Source for a Fortran (ratfor) version of the interface routines is provided
+in ratlibr/old.  Since XPP is currently written in C we have not bothered
+to try to use these routines.

@@ -1,0 +1,40 @@
+.help error Feb86 language
+.ih
+NAME
+error -- abort a task
+.ih
+USAGE
+error errcode errmsg
+.ih
+PARAMETERS
+.ls errcode
+An integer code identifying the error (not used at present in the CL since
+error handlers are not supported).
+.le
+.ls errmsg
+A string describing the error.
+.le
+.ih
+DESCRIPTION
+\fIError\fR may be used to force an error exit from a script.
+The error message will be displayed, and control will return to the
+most recent interactive cl.
+.ih
+EXAMPLES
+1. Abort the current task if there is an attempt to compute a negative
+square root.
+
+.nf
+	if (x < 0)
+	    error (1, "sqrt of a negative number (x=" // x // ")")
+	else
+	    y = sqrt (x)
+.fi
+.ih
+BUGS
+There is currently no way to post an error handler to receive control
+if \fIerror\fR is called.
+.ih
+SEE ALSO
+cl, bye, logout
+.endhelp

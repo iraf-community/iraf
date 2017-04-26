@@ -1,0 +1,835 @@
+.help pexamine Aug91 noao.digiphot.ptools
+.ih
+NAME
+pexamine -- interactively examine or edit a photometry catalog
+.ih
+USAGE
+pexamine input output image
+.ih
+PARAMETERS
+.ls input
+The name of the input photometry catalog. \fIInput\fR may be either an
+APPHOT/DAOPHOT text database file or an STSDAS binary table database.
+.le
+.ls output
+The name of the edited output catalog. \fIOutput\fR is either an
+APPHOT/DAOPHOT text database or an STSDAS binary table database
+depending on the file type of \fIinput\fR. If \fIoutput\fR = "" no output
+catalog is written.
+.le
+.ls image
+The name of the input image corresponding to the input photometry
+catalog. If \fIimage\fR is "" no image will be attached to PEXAMINE
+and some interactive catalog examining commands will not be available.
+All the catalog editing commands however are still available.
+.le
+.ls deletions = ""
+The name of an optional output deletions photometry catalog. \fIDeletions\fR
+is either an APPHOT/DAOPHOT text database or an STSDAS binary
+table database depending on the file type of \fIinput\fR. If \fIdeletions\fR
+is "" no deletions file is written.
+.le
+.ls photcolumns = "daophot"
+The list of standard photometry columns that are loaded when pexamine is
+run. The options are listed below.
+.ls "daophot"
+The standard columns for the DAOPHOT package. The current list is GROUP, ID,
+XCENTER, YCENTER, MSKY, MAG, MERR, CHI, SHARP and NITER.
+If any of these
+columns are multi-valued, (as in the case of magnitudes measured through
+more than one aperture), the first value is selected.
+The standard list may easily be extended at user request.
+.le
+.ls "apphot"
+The standard columns for the APPHOT package. The current list is ID,
+XCENTER, YCENTER, MSKY, MAG, and MERR.
+If any of these
+columns are multi-valued, (as in the case of magnitudes measured through
+more than one aperture), the first value is selected.
+The standard list may easily be extended at user request.
+.le
+.ls user list
+A user supplied list of standard columns.
+Column names are listed in full in either upper or
+lower case letters, separated by commas. If more than one value of
+a multi-valued column is requested
+the individual values 
+must be listed separately as in the following example
+ID, XCENTER, YCENTER, MAG[1], MERR[1], MAG[2], MERR[2].
+.le
+
+\fIPhotcolumns\fR can be changed interactively from within PEXAMINE at
+the cost of rereading the database. 
+.le
+.ls xcolumn = "mag" (magnitude), ycolumn = "merr" (magnitude error)
+The names of the two columns which define the default X-Y plot.
+\fIXcolumn\fR and \fIycolumn\fR must be listed in \fIphotcolumns\fR or
+\fIusercolumns\fR but may be changed interactively by the user.
+If either \fIxcolumn\fR or \fIycolumn\fR is a multi-valued quantity
+and more than one value is listed in \fIphotcolumns\fR or \fIusercolumns\fR
+then the desired value number must be specified explicitly in, e.g.
+MAG[2] or MERR[2].
+.le
+.ls hcolumn = "mag" (magnitude)
+The name of the column which defines the default histogram plot.
+\fIHcolumn\fR must be listed in \fIphotcolumns\fR or
+\fIusercolumns\fR but may be changed interactively by the user.
+If \fIhcolumn\fR is a multi-valued quantity and more than one value is
+listed in \fIphotcolumns\fR or \fIusercolumns\fR then the desired value
+must be specified explicitly in \fIhcolumn\fR, e.g. MAG[2].
+.le
+.ls xposcolumn = "xcenter", yposcolumn = "ycenter"
+The names of the two columns which define the X and Y coordinates in
+\fIimage\fR of the objects in the catalog. This information is
+required if the image display and image cursor are to be used to visually
+identify objects in the image with objects in the catalog or if plots
+of image data are requested. \fIXposcolumn\fR and \fIyposcolumn\fR must
+be listed in \fIphotcolumns\fR or \fIusercolumns\fR but may
+be changed interactively by the user.
+.le
+.ls usercolumns = ""
+The list of columns loaded into memory in addition to the
+standard photometry columns \fIphotcolumns\fR. The column
+names are listed in full in upper or lower case letters and separated by
+commas.
+\fIUsercolumns\fR can be changed interactively from within PEXAMINE at
+the cost of rereading the database. 
+.le
+.ls max_nstars = 3000
+The maximum number of objects that are loaded into memory at task
+startup time, beginning at object \fIfirst_star\fR. If there are more
+than \fImax_nstars\fR in the catalog only the first \fImax_nstars\fR
+objects are read in.
+.le
+.ls first_star = 1
+The index of the first object to be read out of the catalog.
+.le
+.ls match_radius = 2.0
+The tolerance in pixels to be used for matching objects in the catalog with
+objects marked on the display with the image cursor.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls gcommands = ""
+The graphics cursor. If null the standard graphics cursor is used whenever
+graphics cursor input is requested. A cursor file in the appropriate
+format may be substituted by specifying the name of the file.
+.le
+.ls icommands = ""
+The image display cursor. If null the standard image cursor is used whenever
+image cursor input is requested. A cursor file in the appropriate
+format may be substituted by specifying the name of the file.
+Also the image cursor may be changed to query the graphics device or the
+terminal by setting the environment variable "stdimcur" to "stdgraph"
+or "text" respectively.
+.le
+.ls use_display = yes
+Use the image display? Users without access to an image display should
+set \fIuse_display\fR to "no".
+.le
+
+.ih
+PLOTTING PARAMETERS
+
+PEXAMINE supports five types of plots 1) an X-Y column plot
+2) a histogram column plot 3) a radial profile plot 4) a surface
+plot and 5) a contour plot.
+Each supported plot type has its own parameter set which
+controls the appearance of the plot.
+The names of the five parameter sets are listed below.
+
+.nf
+    cntrplot	Parameters for the contour plot
+    histplot	Parameters for the column histogram plot
+    radplot	Parameters for radial profile plot
+    surfplot	Parameters for surface plot
+    xyplot	Parameters for the X-Y column plot	
+.fi
+
+The same  parameters dealing with graph formats occur in many of the parameter
+sets while some are specific only to one parameter set.  In the
+summary below those common to more than one parameter set are shown
+only once.  The characters in parenthesis are the graph key prefixes
+for the parameter sets in which the parameter occurs.
+
+.ls angh = -33., angv = 25.		(s)
+Horizontal and vertical viewing angles in degrees for surface plots.
+.le
+.ls axes = yes				(s)
+Draw axes along the edge of surface plots?
+.le
+.ls banner = yes 			 (chrsx)
+Add a standard banner to a graph?  The standard banner includes the
+IRAF user and host identification and the date and time.
+.le
+.ls box = yes 				(chrx)
+Draw graph box and axes?
+.le
+.ls ceiling = INDEF			(cs)
+Ceiling data value for contour and surface plots.  A value of INDEF does
+not apply a ceiling.  In contour plots a value of 0. also does not
+apply a ceiling.
+.le
+.ls dashpat = 528			(c)
+Dash pattern for negative contours.
+.le
+.ls fill = no (yes)			(c) (hrx)
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls floor = INDEF			(cs)
+Floor data value for contour and surface plots.  A value of INDEF does
+not apply a floor.  In contour plots a value of 0. also does not
+apply a floor.
+.le
+.ls grid = no				(rx)
+Draw grid lines at major tick marks?
+.le
+.ls interval = 0.0			(c)
+Contour interval.  If 0.0, a contour interval is chosen which places 20 to 30
+contours spanning the intensity range of the image.
+.le
+.ls label= no				(c)
+Label the major contours in the contour plot?
+.le
+.ls logx = no, logy = no		(rx) (hrx)
+Plot the x or y axis logarithmically?  The default for histogram plots is
+to plot the y axis logarithmically.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5	(chrx)
+Maximum number of major tick marks on each axis and number of minor tick marks
+between major tick marks.
+.le
+.ls marker = "box"			(rx)
+Marker to be drawn.  Markers are "point", "box", 
+"cross", "plus", "circle", "hline", "vline" or "diamond".
+.le
+.ls nbins = 512				(h)
+The number of bins in, or resolution of, histogram plots.
+.le
+.ls ncolumns = 21, nlines = 21		(cs)
+Number of columns and lines used in contour and surface plots.
+.le
+.ls ncontours = 5			(c)
+Number of contours to be drawn.  If 0, the contour interval may be specified,
+otherwise 20 to 30 nicely spaced contours are drawn.  A maximum of 40 contours
+can be drawn.
+.le
+.ls nhi = -1				(c)
+If -1, highs and lows are not marked.  If 0, highs and lows are marked
+on the plot.  If 1, the intensity of each pixel is marked on the plot.
+.le
+.ls rinner = 0, router = 8
+The inner and outer radius of the region whose radial profile is to
+be plotted.
+.le
+.ls round = no				(chrx)
+Extend the axes up to "nice" values?
+.le
+.ls szmarker = 1			(rx)
+Size of mark except for points.  A positive size less than 1 specifies
+a fraction of the device size.  Values of 1, 2, 3, and 4 signify
+default sizes of increasing size.
+.le
+.ls ticklabels = yes			(chrx)
+Label the tick marks?
+.le
+.ls top_closed = no			(h)
+Include z2 in the top histogram bin?  Each bin of the histogram is a
+subinterval that is half open at the top.  \fITop_closed\fR decides whether
+those pixels with values equal to z2 are to be counted in the histogram.  If
+\fItop_closed\fR is yes, the top bin will be larger than the other bins.
+.le
+.ls x1 = INDEF, x2 = INDEF, y1 = INDEF, y2 = INDEF	(hrx)
+Range of graph along each axis.  If INDEF the range is determined from
+the data range.  The default y1 for histogram plots is 0.
+.le
+.ls zero = 0.				(c)
+Greyscale value of the zero contour, i.e., the value of a zero point shift
+to be applied to the image data before plotting.  Does not affect the values
+of the floor and ceiling parameters.
+.le
+.ls z1 = INDEF, z2 = INDEF		(h)
+Range of pixel values to be used in histogram.  INDEF values default to
+the range in the region being histogrammed.
+.le
+
+.ih
+DESCRIPTION
+
+PEXAMINE is a general purpose tool for interactively examining and editing
+photometry catalogs produced by the APPHOT or DAOPHOT packages. It is
+intended to aid the user in assessing the accuracy of the photometry,
+in diagnosing problems with particular catalog objects,
+in searching the photometry data for relationships
+between the computed quantities, and in editing the catalog based on
+those observed relationships. PEXAMINE is intended to complement the
+more batch oriented editing facilities of the PSELECT task.
+
+PEXAMINE takes the input catalog \fIinput\fR and the corresponding
+image \fIimage\fR (if defined) and produces an output catalog of selected
+objects \fIoutput\fR (if defined) and an output catalog of deleted objects
+\fIdeletions\fR (if defined). The input catalog may be either an
+APPHOT/DAOPHOT text database or an ST binary table database.
+The file type of the output catalogs \fIoutput\fR and \fIdeletions\fR
+is the same as that of \fIinput\fR.
+
+READING IN THE DATA
+
+PEXAMINE reads the column data specified by \fIphotcolumns\fR and
+\fIusercolumns\fR for up to \fImax_nstars\fR into memory. If there are
+more than \fImax_nstars\fR in the input catalog only the data for the
+first \fImax_nstars\fR is read. The \fIphotcolumns\fR parameter
+defines the list of standard photometry columns to be loaded. If
+"daophot" or "apphot" is selected then the standard columns
+are GROUP, ID, XCENTER, YCENTER, MSKY, MAG, MERR, CHI, SHARP and NITER
+and ID, XCENTER, YCENTER, MSKY, MAG and MERR respectively.
+Otherwise the user must set \fIphotcolumns\fR to his or her own preferred
+list of standard photometry columns. Non-standard columns may also be
+specified using the parameter \fIusercolumns\fR.
+Valid column lists contain the full names of the specified columns
+in upper or lower case letters, separated by commas.
+Either \fIphotcolumns\fR or 
+\fIusercolumns\fR may be redefined interactively by the user after
+the task has started up, but only at the
+expense of rereading the data from \fIinput\fR.
+
+PEXAMINE will fail to load a specified column if that column is
+not in the photometry database, is of a datatype other than
+integer or real, or adding that column would exceed the maximum
+number of columns limit currently set at twenty. The user can
+interactively examine the list of requested and loaded standard
+photometry columns, as well as list all the columns in the input
+after the task has started up.
+
+GRAPHICS AND IMAGE COMMAND MODE
+
+PEXAMINE accepts commands either from the graphics cursor \fIgcommands\fR
+(graphics command mode) or the image display cursor \fIicommands\fR
+if available (image command mode).
+PEXAMINE starts up in graphics command mode, but all the
+interactive commands are accessible from both modes and the user can
+switch modes at any time assuming that the \fIuse_display\fR parameter
+to "yes".
+
+PEXAMINE interprets the cursor position in graphics mode
+differently from how it interprets it in image command mode.
+In graphics command mode the cursor coordinates are the position
+of the cursor in the current plot, whereas in image command mode they
+are the x and y coordinates of the cursor in the displayed image.
+For example, if the user issues a command to PEXAMINE to locate the object
+in the catalog nearest the point in the current X-Y plot marked by
+the graphics cursor, PEXAMINE does so by searching
+the data for the object whose values of \fIxcolumn\fR and \fIycolumn\fR
+most closely match those of the current cursor position.
+If the user issues a command  to PEXAMINE to locate the
+object in the catalog corresponding to the object marked on the image
+display with the image cursor,
+PEXAMINE does so by searching the data for
+the object whose values of \fIxposcolumn\fR and \fIyposcoumn\fR
+most closely match and fall within \fImatch_radius\fR of the current
+cursor position.
+
+Input to PEXAMINE is through single keystroke commands or colon
+commands. Keystroke commands are simple commands that may
+optionally use the cursor position but otherwise require no arguments.
+The PEXAMINE keystroke commands fall into three categories, basic
+commands, data examining commands and data editing commands, all
+described in detail in the following sections. Colon commands
+take an optional argument and function differently depending on
+the presence or absence of that argument. When the argument is absent
+colon commands are used to display the
+current value of a parameter or list of parameters. When the argument is
+present they change their current value to that argument.
+The basic colon commands are described in detail below. 
+
+BASIC KEYSTROKE COMMANDS
+
+These keystroke commands are used to display the help page, switch from
+graphics to image command mode and quit the task.
+
+.ls ?
+Page through the help for the PEXAMINE task
+.le
+.ls :
+Execute a PEXAMINE colon command.
+.le
+.ls g
+Change to graphics command mode. Throughout PEXAMINE graphics command mode
+is the default. All PEXAMINE commands are available in graphics command
+mode.
+.le
+.ls i
+Change to image command mode.
+All the PEXAMINE commands are available in image command mode.
+However if \fIuse_display\fR is no and the image
+cursor has not been aliased to the standard input or a text file
+image command mode is disabled.
+.le
+.ls q
+Quit PEXAMINE without writing an output catalog.
+PEXAMINE queries the user for confirmation of this option.
+.le
+.ls e
+Quit PEXAMINE and write the output catalog.
+.le
+
+DATA EXAMINING COMMANDS
+
+The data examining commands fall into two categories, those that examine
+the catalog data including 'l' (catalog listing), 'o' (object listing),
+'x' (Y column versus X column plot) and 'h' (histogram column plot)
+commands, and those which examine the image data around specific catalog
+objects including 'r' (radial profile plotting), 's' (surface plotting),
+'c' (contour plotting) and 'm' (pixel dumping). The latter group
+require that \fIimage\fR be defined. A brief summary of each data
+examining command is given below.
+.ls l
+Print out the name, datatype, and units for all the columns in the input
+catalog. The list command can be used to check the contents of the input
+catalog and/or determine why a particular column was not loaded.
+.le
+.ls o
+Print out the names and values of the stored columns of the object
+nearest the cursor. In graphics mode the current plot type must be
+X-Y. In image command mode the object nearest the cursor must also be
+no more than \fImatch-radius\fR pixels away from the image cursor to be
+found. If an object is found and the current plot type is X-Y
+the graphics cursor is moved to the position of the selected object
+in the X-Y plot.
+.le
+.ls x
+Plot the data in \fIycolumn\fR versus the data in \fIxcolumn\fR excluding
+any already deleted points and identifying objects marked for deletion
+with a cross. X-Y plotting is undefined if \fIxcolumn\fR or \fIycolumn\fR
+is undefined.
+.le
+.ls h
+Plot the histogram of the data in \fIhcolumn\fR excluding any already 
+deleted points and those marked for deletion. Histogram plotting is
+disabled if \fIhcolumn\fR is undefined.
+.le
+.ls r
+Plot the radial profile of the object nearest the cursor including
+only pixels within a distance of \fIrinner\fR and \fIrouter\fR of
+the object center. Radial profile plotting is disabled if \fIimage\fR
+or \fIxposcolumn\fR or \fIyposcolumn\fR is undefined.
+.le
+.ls s
+Plot the surface plot of the object nearest the cursor including
+only pixels within an image section \fIncols\fR by \fInlines\fR
+around the object center. Surface plotting is disabled if \fIimage\fR
+or \fIxposcolumn\fR or \fIyposcolumn\fR is undefined.
+.le
+.ls c
+Plot the contour plot of the object nearest the cursor including
+only pixels within an image section \fIncols\fR by \fInlines\fR
+around the object center. Contour plotting is disabled if \fIimage\fR
+or \fIxposcolumn\fR or \fIyposcolumn\fR is undefined.
+.le
+.ls m
+Dump the pixel values of a grid of 10 by 10 pixels around the object
+nearest the cursor. Pixel value dumping is disabled if \fIimage\fR
+or \fIxposcolumn\fR or \fIyposcolumn\fR is undefined.
+.le
+.ls p
+Replot the current graph.
+.le
+
+DATA EDITING COMMANDS
+
+Data points can be deleted from the catalog in either graphics command
+mode or image
+command mode. In graphics command mode the 
+graphics cursor and either the X-Y or histogram plot is used to delete points.
+In image command mode the image cursor and the displayed
+image are used to delete points. A data point has three possible states
+good, marked for deletion and deleted.
+Any one of the keystroke commands 'd' (delete point), '(' (delete points
+with x less than x cursor), ')' (delete points with x greater than x cursor,
+'^' (delete points with y > y cursor), 'v' (delete points with y < y cursor)
+or 'b' (delete points in a box) can be used to mark points for deletion.
+The 'f' key is used to actually delete the points and replot the data.
+In between marking the points for deletion and actually deleting the marked
+points the 't' (toggle) key can be used to undelete the last set marked.
+The full list of the data editing keystroke commands is given below.
+
+.ls z
+Undelete not just unmark all the data points replot.
+.le
+.ls f
+Delete points marked for deletion and replot. Points marked for deletion
+but not actually deleted will be written to the output catalog and not
+written to the deletions catalog.
+.le
+.ls d
+Mark the point nearest the cursor for deletion.
+.le
+.ls u
+Undelete the marked point nearest the cursor.
+.le
+.ls (
+Mark all points with x values less than the x value of the cursor for
+deletion.  In graphics command mode points can only be marked for deletion if
+the current plot type is "xyplot" or "histplot". In image command
+mode \fIxposcolumn\fR and \fIyposcolumn\fR must be defined before
+points can be marked for deletion.
+.le
+.ls )
+Mark all points with x values greater than the x value of the cursor for
+deletion.  In graphics command mode points can only be marked for deletion if
+the current plot type is "xyplot" or "histplot". In image command
+mode \fIxposcolumn\fR and \fIyposcolumn\fR must be defined before
+points can be marked for deletion.
+.le
+.ls v
+Mark all points with y values less than the y value of the cursor for
+deletion.  In graphics command mode points can only be marked for deletion if
+the current plot type is "xyplot". In image command
+mode \fIxposcolumn\fR and \fIyposcolumn\fR must be defined before
+points can be marked for deletion.
+.le
+.ls ^
+Mark all points with y values greater than the y value of the cursor for
+deletion.  In graphics command mode points can only be marked for deletion if
+the current plot type is "xyplot". In image command
+mode \fIxposcolumn\fR and \fIyposcolumn\fR must be defined before
+points can be marked for deletion.
+.le
+.ls b
+Mark all points within a box whose lower left and upper right hand corners
+are marked by the cursor for deletion.
+In graphics mode points can only be marked for deletion if the current
+plot type is "xyplot". In image command mode \fIxposcolumn\fR and
+\fIyposcolumn\fR must be defined before points can be marked for
+deletion.
+.le
+.ls t
+Toggle between marking points for deletion or undeletion. The default
+is to mark points for deletion.
+.le
+
+BASIC COLON COMMANDS
+
+All the PEXAMINE parameters can be changed interactively with colon
+commands, including those which determine which data is read in,
+which data is plotted and the parameters of each plot. A brief description
+of the basic commands is given here. The full list is given in the
+following section.
+
+.ls :photcolumns [col1,col2,...]
+Show or set the list of requested standard photometry columns and the list
+of loaded
+photometry columns. If the user supplies a new list of columns the data will be
+reread from disk.
+.le
+.ls :usercolumns [col1,col2,...]
+Show or set the list of requested user columns and the list of loaded
+user columns. If the user supplies a new list of columns the data will be
+reread from disk.
+.le
+.ls :xcolumn [colname]
+Show or set the name of the column to be plotted along the x axis of the
+X-Y plot.
+.le
+.ls :ycolumn [colname]
+Show or set the name of the column to be plotted along the y axis of the
+X-Y plot.
+.le
+.ls :hcolumn [colname]
+Show or set the name of the column to be whose histogram is to be plotted.
+.le
+.ls :eparam [cntrplot/histplot/radplot/surfplot/xyplot]
+Review or edit the list of parameters for the various plot types.
+.le
+.ls :unlearn [cntrplot/histplot/radplot/surfplot/xyplot]
+Return the list of parameters for the various plot types to their default
+values.
+.le
+.ls :x y key cmd
+Execute any defined keystroke "key" supplying the appropriate x and y
+value in place of the cursor position. In graphics command mode the x
+and y position are assumed to be the position in the current graph.
+In image command mode the x and y position are assumed to be the x and
+y coordinate in the image display.
+.le
+
+.ih
+COMMANDS
+
+.nf
+	PEXAMINE Interactive Cursor Keystroke Commands
+
+                   Basic Commands
+
+?	Print help for the PEXAMINE task
+:	PEXAMINE colon commands
+g	Activate the graphics cursor
+i	Activate the image cursor
+e	Exit PEXAMINE and save the edited catalog
+q	Quit PEXAMINE and discard the edited catalog
+
+		   Data Examining Commands
+
+l	List the name, datatype and units for all columns in the catalog 	
+o	Print out the names and values of the stored columns for the
+	    object nearest the cursor
+x	Replot the current y column versus the current x column
+h	Replot the current histogram
+r	Plot the radial profile of the object nearest the cursor
+s	Plot the surface of the object nearest the cursor
+c	Plot the contour plot of the object nearest the cursor
+m	Print the data values of the object nearest the cursor
+p	Replot the current graph
+
+                   Data Editing Commands
+
+z	Reinitialize the data by removing all deletions and replot
+d	Mark the point nearest the cursor for deletion
+u	Undelete the marked point nearest the cursor
+t	Toggle between marking points for deletion or undeletion
+(	Mark points with X < X (cursor) for deletion or undeletion
+)	Mark points with X > X (cursor) for deletion or undeletion
+v	Mark points with Y < Y (cursor) for deletion or undeletion
+^	Mark points with Y > Y (cursor) for deletion or undeletion
+b	Mark points inside a box for deletion or undeletion
+f	Actually delete the marked points and replot
+
+
+	      PEXAMINE Interactive Colon Commands
+
+:xcolumn	  [name]	     Show/set the X-Y plot X axis quantity
+:ycolumn	  [name]	     Show/set the X-Y plot Y axis quantity
+:hcolumn	  [name]	     Show/set the histogram plot quantity  
+:photcolumns	  [col1,col2,...]    Show/set the list of photometry columns
+:usercolumns	  [col1,col2,...]    Show/set the list of user columns
+:delete		  [yes/no]	     Delete or undelete points
+:eparam		  [x/h/r/s/c]	     Edit/unlearn the specified plot pset
+    or
+:unlearn
+
+
+	     PEXAMINE Interactive X-Y Plotting Commands
+
+:x1	    [value]	  Left  world x-coord if not autoscaling
+:x2 	    [value]	  Right world x-coord if not autoscaling
+:y1         [value]	  Lower world y-coord if not autoscaling
+:y2         [value]	  Upper world y-coord if not autoscaling
+:szmarker   [value]	  Marker size
+:marker [point|box|plus|cross|circle|diamond|hline|vline]    Marker type
+:logx       [yes/no]	  Log scale the x axis?
+:logy       [yes/no]      Log scale the y axis?
+:box        [yes/no]      Draw box around periphery of window?
+:ticklabels [yes/no]	  Label tick marks?
+:grid       [yes/no]	  Draw grid lines at major tick marks? 
+:majrx      [value]	  Number of major divisions along x axis
+:minrx      [value]	  Number of minor divisions along x axis
+:majry      [value]	  Number of major divisions along y axis
+:minry      [value]	  Number of minor divisions along y axis
+:round      [yes/no]      Round axes to nice values?
+:fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
+
+
+	PEXAMINE Interactive Histogram Plotting Commands
+
+:nbins	    [value]	  Number of bins in the histogram
+:z1	    [value]	  Minimum histogram intensity
+:z2	    [value]	  Maximum histogram intensity
+:top_closed [y/n]	  Include z in the top bin?
+:x1	    [value]	  Left  world x-coord if not autoscaling
+:x2	    [value]	  Right world x-coord if not autoscaling
+:y1         [value]	  Lower world y-coord if not autoscaling
+:y2         [value]	  Upper world y-coord if not autoscaling
+:logy       [yes/no]      Log scale the y axis?
+:box        [yes/no]      Draw box around periphery of window?
+:ticklabels [yes/no]	  Label tick marks?
+:majrx      [value]	  Number of major divisions along x axis
+:minrx      [value]	  Number of minor divisions along x axis
+:majry      [value]	  Number of major divisions along y axis
+:minry      [value]	  Number of minor divisions along y axis
+:round      [yes/no]      Round axes to nice values?
+:fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
+
+	PEXAMINE Interactive Radial Profile Plotting Commands
+
+:rinner	    [value]	  Inner radius of the region to be plotted
+:router	    [value]	  Outer radius of the region to be plotted
+:x1	    [value]	  Left  world x-coord if not autoscaling
+:x2 	    [value]	  Right world x-coord if not autoscaling
+:y1         [value]	  Lower world y-coord if not autoscaling
+:y2         [value]	  Upper world y-coord if not autoscaling
+:szmarker   [value]	  Marker size
+:marker [point|box|plus|cross|circle|diamond|hline|vline]    Marker type
+:logx       [yes/no]	  Log scale the x axis?
+:logy       [yes/no]      Log scale the y axis?
+:box        [yes/no]      Draw box around periphery of window?
+:ticklabels [yes/no]	  Label tick marks?
+:grid       [yes/no]	  Draw grid lines at major tick marks? 
+:majrx      [value]	  Number of major divisions along x axis
+:minrx      [value]	  Number of minor divisions along x axis
+:majry      [value]	  Number of major divisions along y axis
+:minry      [value]	  Number of minor divisions along y axis
+:round      [yes/no]      Round axes to nice values?
+:fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
+
+
+	PEXAMINE Interactive Surface Plotting Commands
+
+:ncolumns   [value]	  Number of columns to be plotted
+:nlines	    [value]	  Number of lines to be plotted
+:axes	    [yes/no]	  Draw axes?
+:angh	    [value]	  Horizontal viewing angle
+:angv	    [value]	  Vertical viewing angle
+:floor	    [value]	  Minimum value to be plotted
+:ceiling    [value]	  Maximum value to be plotted
+
+
+	PEXAMINE Interactive Contour Plotting Commands
+
+:ncolumns   [value]	  Number of columns to be plotted
+:nlines	    [value]	  Number of lines to be plotted
+:floor	    [value]	  Minimum value to be plotted
+:ceiling    [value]	  Maximum value to be plotted
+:zero	    [value]       Greyscale value of zero contour
+:ncontours   [value]	  Number of contours to be drawn
+:interval    [value]       Contour interval
+:nhi	    [value]       Hi/low marking option
+:dashpat     [value]       Bit pattern for generating dashed lines
+:label       [yes/no]      Label major contours with their values?
+:box        [yes/no]      Draw box around periphery of window?
+:ticklabels [yes/no]	  Label tick marks?
+:majrx      [value]	  Number of major divisions along x axis
+:minrx      [value]	  Number of minor divisions along x axis
+:majry      [value]	  Number of major divisions along y axis
+:minry      [value]	  Number of minor divisions along y axis
+:round      [yes/no]      Round axes to nice values?
+:fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
+.fi
+
+.ih
+EXAMPLES
+
+1. Examine and edit an APPHOT aperture photometry catalog and a DAOPHOT
+allstar catalog without either attaching the associated image or using the
+image display.
+
+.nf
+    pt> pexamine m92.mag.1 m92.mag.ed use_display-
+
+	... a plot of magnitude error versus magnitude appears on
+	    the screen and the graphics cursor comes up ready to accept
+	    commands
+
+	... the user sees a generally smooth trend of increasing
+	    magnitude error with increasing magnitude except for a
+	    single deviant point at the bright end of the plot
+
+	... the user decides to remove the deviant point using the
+	    'd' keystroke command to mark the point and the 'f'
+	    keystroke command to actually delete and replot the graph
+
+	... after examining the plot further the user decides to delete
+	    all objects for which the magnitude error is > 0.1 magnitudes
+	    using the '^' keystroke command, followed by the 'f'
+	    keystroke command to actually replot and delete the data.
+
+	... after deciding that this new plot is satisfactory the user
+	    issues the 'e' keystroke command to exit pexamine and save
+	    the good data in m92.mag.ed
+
+    pt> pexamine m92.als.1 m92.als.ed use_display-
+
+	... a plot of magnitude error versus magnitude appears on the
+	    screen and the graphics cursor comes up ready to accept
+	    commands
+
+	... after looking at the plot the user decides that what they
+	    really want to see is a plot of the goodness of fit parameter
+	    chi versus magnitude
+
+	... the user issues the colon command :ycol chi followed by 'p'
+	    keystroke command to replot the data
+
+	... the user sees a generally smooth trend of increasing
+	    chi with increasing magnitude 
+
+	... after examining the plot further the user decides to delete
+	    all objects for which the chi value  > 2.0  and the
+	    magnitude is > 25 using the '^' key and ')' keystroke
+	    commands followed by 'f' to save the deletions and replot
+	    the data
+
+	... after deciding that this new plot is satisfactory the user
+	    issues the 'e' keystroke command to exit pexamine and save
+	    the good data in m92.als.ed
+.fi
+
+2. Examine and edit a DAOPHOT allstar catalog using the subtracted image, the
+original image and the image display.
+
+.nf
+	pt> display image.sub 1
+
+	    ... display the subtracted image
+
+	pt> pexamine orionk.als.1 orionk.als.ed image xcol=mag ycol=chi
+
+	... a plot of the goodness of fit versus magnitude appears
+	    on the terminal and the graphics cursor comes up ready to
+	    accept commands
+
+	... the user notices some very anomalous chi values and decides
+	    to see if these correspond to objects which have poor
+	    subtraction on the displayed image
+
+	... the user switches to image command mode by tapping the 'i'
+	    key, moves to the first poorly subtracted object and taps
+	    the 'o' key
+
+	... a list of the values of the loaded columns including chi
+	    appears in the text window , the program switches to graphics
+	    mode and places the graphics cursor on the corresponding
+	    point in the X-Y plot
+
+	... the point in question indeed has a very high chi value
+	    and the user decides to try and investigate the reason for the
+	    anomalous value
+
+	... the user taps the 'r' key to get a radial profile of the
+	    object in the original image
+
+	... after carefully examining the profile it appears that the
+	    object's profile is too broad and that it is not a star
+
+	... the user switches back to the X-Y plot with the 'x' key,
+	    marks the point with the 'd' key and saves the deletions
+	    and replots with the 'f' key.
+
+	... the user goes back to image command mode with the 'i' key
+	    and begins investigating the next object
+
+	... finally after examining the image and making all the changes
+	    the user decides to quit and save the changes with the 'e' key
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+If the display device is on a remote resource the first image cursor
+request will cause PEXAMINE to hang. The remote resource is expecting
+the appropriate password which the user must type in to cause the 
+the image cursor to appear. The normal password prompt is
+not being issued or flushed to the terminal. The solution to the problem
+is to put the password in the .irafhosts file
+
+INDEF valued points cannot be accessed by
+PEXAMINE. INDEF valued points should be removed from the input catalog
+with PSELECT prior to entering PEXAMINE.
+
+.ih
+SEE ALSO
+ptools.pselect, ptools.txselect,ptools.tselect
+.endhelp

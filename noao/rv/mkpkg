@@ -1,0 +1,88 @@
+# MKPKG file for the RV Package
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit"
+	$update libpkg.a
+	$omake x_rv.x
+	$link -o xx_rv.e x_rv.o libpkg.a $(LIBS)
+	;
+
+install:
+	$move xx_rv.e noaobin$x_rv.e
+	;
+	
+libpkg.a:
+	@rvidlines				# Update the libraries
+
+	aplists.x	rvflags.h <smw.h> rvpackage.h
+	coloncmds.x	rvcont.h rvflags.h rvpackage.h rvsample.h \
+			<ctype.h> <error.h> <fset.h>
+	complex.x	<mach.h> <math.h>
+	contin.x	<error.h> rvcont.h rvflags.h rvpackage.h <pkg/gtools.h>
+	continpars.x	rvcomdef.h rvcont.h rvflags.h rvpackage.h
+	deblend.x	<error.h> <gset.h> <mach.h> fitcom.com rvflags.h \
+			rvpackage.h
+	fftmode.x	rvcomdef.h rvfilter.h rvflags.h rvpackage.h \
+			rvplots.h <gset.h>
+	fftutil.x	rvflags.h rvpackage.h rvplots.h <math.h>
+	filtpars.x	rvcomdef.h rvfilter.h rvflags.h rvpackage.h
+	keywpars.x	rvcomdef.h rvkeywords.h rvpackage.h
+	numrep.x	<mach.h> <math.h>
+	plotpars.x	rvcomdef.h rvflags.h rvpackage.h rvplots.h
+	prepspec.x	rvflags.h rvpackage.h rvsample.h <math.h>
+	readtlist.x	rvflags.h rvpackage.h <imhdr.h>
+	rvanplot.x	<gset.h> rvflags.h rvpackage.h <math.h>
+	rvbatch.x	rvcont.h rvflags.h rvpackage.h
+	rvcolon.x	rvcomdef.h rvflags.h rvpackage.h <gio.h> <gset.h>
+	rvcorrel.x	rvfilter.h rvflags.h rvpackage.h <math.h>
+	rvcursor.x	rvcont.h rvfilter.h rvflags.h rvpackage.h rvplots.h \
+			<fset.h> <gset.h> <pkg/gtools.h>
+	rvdatacheck.x	rvflags.h rvpackage.h rvsample.h
+	rvdrawfit.x	rvsinc.com rvflags.h rvpackage.h <gset.h>
+	rverrmsg.x	rvflags.h rvpackage.h
+	rvfftcorr.x	rvcont.h rvflags.h rvpackage.h <math.h>
+	rvfgauss.x	fitcom.com rvflags.h rvpackage.h \
+			<gset.h> <math.h> <math/nlfit.h>
+	rvfilter.x	rvfilter.h rvflags.h rvpackage.h <math.h>
+	rvfitfunc.x	fitcom.com rvflags.h rvpackage.h rvsinc.com <gset.h>
+	rvfparab.x	fitcom.com rvflags.h rvpackage.h \
+			<gset.h> <math.h> <math/nlfit.h>
+	rvfuncs.x	<mach.h> <math.h>
+	rvgetim.x	<smw.h> <units.h> rvflags.h rvkeywords.h \
+			rvpackage.h rvsample.h
+	rvimutil.x	rvflags.h rvkeywords.h rvpackage.h <imhdr.h>
+	rvinit.x	rvsinc.com rvcont.h rvflags.h rvpackage.h \
+			rvsample.h <error.h> <pkg/gtools.h>
+	rvlinefit.x	<error.h> <gset.h> <mach.h> rvflags.h rvpackage.h
+	rvparam.x	rvflags.h rvpackage.h rvsample.h <gio.h> <gset.h>
+	rvplot.x	<gset.h> rvflags.h rvpackage.h rvplots.h rvsample.h
+	rvrebin.x	<error.h> rvcont.h rvflags.h rvpackage.h
+	rvrvcor.x	rvflags.h rvkeywords.h rvpackage.h \
+			<error.h> <imio.h> <time.h>
+	rvsample.x	rvflags.h rvpackage.h rvsample.h <ctype.h> <gset.h>
+	rvsinc.x	rvsinc.com rvflags.h rvpackage.h <mach.h> <math.h>
+	rvstrings.x	rvcont.h rvfilter.h rvflags.h rvpackage.h rvplots.h
+	rvsumplot.x	<gset.h> rvflags.h rvpackage.h
+	rvutil.x	rvcomdef.h rvflags.h rvkeywords.h rvpackage.h \
+			rvsample.h <gset.h>
+	rvvfit.x	fitcom.com rvcont.h rvflags.h rvpackage.h <gset.h>
+	rvwparam.x	rvcomdef.h rvcont.h rvflags.h rvpackage.h <time.h>
+	rvwrite.x	rvcont.h rvflags.h rvkeywords.h rvpackage.h \
+			rvsample.h <imhdr.h>
+	specmode.x	rvcomdef.h rvflags.h rvpackage.h rvsample.h <gset.h>
+	splitplot.x	<gset.h> rvflags.h rvpackage.h rvplots.h rvsample.h
+	t_fxcor.x	<ctype.h> rvcomdef.h rvflags.h rvpackage.h rvsample.h \
+			<error.h> <gset.h> <imhdr.h>
+	titles.x	<gset.h> rvflags.h rvpackage.h
+	wrtccf.x	rvcont.h rvfilter.h rvflags.h rvpackage.h <imhdr.h>
+	zzdebug.x	rvcomdef.h rvflags.h rvpackage.h \
+			<gio.h> <gset.h> <error.h>
+	;

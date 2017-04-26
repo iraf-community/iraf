@@ -1,0 +1,7 @@
+# Help directory for the BIAS package.
+
+$doc = "./doc/"
+
+colbias		hlp=doc$colbias.hlp,	src=colbias.x
+linebias	hlp=doc$linebias.hlp,	src=linebias.x
+revisions	sys=Revisions

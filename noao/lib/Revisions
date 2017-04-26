@@ -1,0 +1,218 @@
+.help revisions May93 noao.lib
+.nf
+
+noao/lib/obsb.dat
+    Added entry for Helmos Observatory, Penteli, Greece.  (2/17/14(
+
+noao/lib/obsb.dat
+    Added entry for Bologna Astronomical Obs., Loiano, Italy.   (1/14/14)
+
+noao/lib/obsb.dat
+    Added entry for Obs. Haute-Provence.   (12/12/13)
+
+noaolib$obsdb.dat
+    Added entries for 'saoo' observatory (11/24/13)
+
+noaolib$obsdb.dat
+    Added entries for 'saoras' and 'terskol' observatories (4/11/13)
+
+noaolib$ccdtime/kpno.dat
+    Added data for MOSAIC1_1 provided by Jannuzi.  (9/28/11, Valdes)
+
+noaolib$smw.h
+    An earlier change to smw.h improperly added a P2R() macro to the
+    APLOW/APHIGH declarations causing tasks with 2-D data to request data
+    out of bounds.  (3/7/11, MJF)
+
+noaolib$obsdb.dat
+    Added entry for Boyden Observatory (11/20/06, MJF)
+
+noaolib$ccdtime/ctio.dat
+noaolib$ccdtime/kpno.dat
+    Added Mosaic z' based on estimated values from Arjun Dey.
+    (9/21/06, FV)
+
+noaolib$obsdb.dat
+    Added entry for Olin Observatory (7/28/06, MJF)
+
+noaolib$obsdb.dat
+    Changed the logitude for 'aries' at request of submitter (4/1/06, MJF)
+
+noaolib$obsdb.dat
+    Added OALP psupplied by Eduardo Lajus (10/28/05)
+
+noaolib$obsdb.dat
+    Added TUG and commented out TNO per user request.  (8/15/05, FV)
+
+noaolib$obsdb.dat
+    Corrected entry for FMO, added MGO at user suggestion (6/15/04, MJF)
+
+noaolib$obsdb.dat
+    Added EUO and TNO.  (4/26/04, MJF)
+
+noaolib$ccdtime/kpno.dat
+noaolib$ccdtime/kpno.datBAK	+
+    Revised file from Dick Joyce to add FLMN and remove IRIM and ONIS.
+    (3/16/04, Valdes)
+
+noaolib$obsdb.dat
+    Added SLN.  (7/17/03, Valdes)
+
+noaolib$obsdb.dat
+    Added IAO, Hanle.
+    (6/28/03, Valdes)
+
+noaolib$ccdtime/ctio.dat
+    Added andicam_ir detector and 1.3m telescope as researched by
+    Dave Bell.  (11/14/02, Valdes)
+
+noaolib$obsdb.dat
+    Added additional ESO entries supplied by Peter Weilbacher.
+    (1/30/02, Valdes)
+
+noaolib$src/igsfit.key
+    Added that 'p' works as unzoom.  (8/15/01, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for Gemini North and South.  (9/8/00, MJF)
+
+noaolib$onedstds/blackbody	+
+noaolib$onedstds/README
+    Added new data files for blackbody flux calibration.
+    (1/25/00, Valdes)
+
+noaolib$obsdb.dat
+    Corrected entry from SAAO with information provided by John Menzies.
+    (1/5/00, Valdes)
+
+noaolib$obsdb.dat
+    Added Whitin Obs upon request.  (10/14/99, Valdes)
+
+noaolib$obsdb.dat
+    Added DDSAZ and HOLI observatories upon request.  (8/5/99, Valdes)
+
+noaolib$obsdb.dat
+    Added IRTF upon request.  (7/14/99, Valdes)
+
+noaolib$ccdtime/kpno.dat
+noaolib$ccdtime/ctio.dat
+    New versions with entries set by KPNO/CTIO staff and used in the
+    Web version starting in fall of 1998.  (6/25/99, Valdes)
+
+noaolib$obsdb.dat
+    # SAAO: Submitted by James Stevens 3/25/98
+    # CASLEO:  Submitted by Jorge Federico Gonzalez 12/10/98
+    # BOSQUE: Submitted by Jorge Federico Gonzalez 12/10/98
+    # ROZHEN: Submitted by Ilian Iliev 1/19/99
+
+noaolib$onedstds/bstdscal/names.men	+
+noaolib$onedstds/bstdscal/standards.men
+noaolib$onedstds/spec16cal/names.men
+noaolib$onedstds/spec16cal/standards.men
+noaolib$onedstds/ctionewcal/standards.men
+noaolib$onedstds/READMEN
+    Added some name aliases and fixed some typo problems.
+    (9/26/98, Valdes)
+
+noaolib$obsdb.dat
+    Added Laboratorio Nacional de Astrofisica - Brazil as submitted by
+    Claudia Vilega Rodrigues.  (12/12/97, Valdes)
+
+=====
+V2.11
+=====
+
+noaolib$obsdb.dat
+    After a conversation with Craig Foltz the "mmt" entry was removed
+    and the "mmto" entry changed the name from "Multiple Mirror Telescope
+    Observatory" to "MMT Observatory" since the telescope is changing.
+    The altitude was wrong in the "mmt" entry in any case.
+    (8/20/97, Valdes)
+
+linelists$airvac.cl +
+    A script is available for converting line lists to air or vacuum.
+    (5/9/97, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated by Massey.  (5/2/97, Valdes)
+
+noaolib$scr/icgfit.key
+noaolib$scr/idicgfit.key
+    Added :fitvalue to help file.  (1/28/97, Valdes)
+
+noaolib$obsdb.dat
+    Added "flwo" and "oro" as submitted by Doug Mink.  Also changed the
+    name for the "mmt" entry as suggested by Mink.  (1/9/97, Valdes)
+
+noaolib$smw.h
+    Added a spectrum type field and dictionary of spectrum types.
+    (9/11/96, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for Apache Point and Lowell submitted by Michael
+    Ledlow (8/9/96, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated with new numbers for the Schmidt from Massey.  (3/4/96, Valdes)
+
+noaolib$obsdb.dat
+    Added an entry for Keck from Astronomical Almanac.  (2/16/96, Valdes)
+
+noaolib$obsdb.dat
+    Add an entry for Beijing XingLong Observatory submitted by
+    Biwei JIANG. (11/28/95, Valdes)
+
+noaolib$linelists/fear.dat +
+noaolib$linelists/README
+    Added a line list for FeAr comparison spectra.  (9/25/95, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated to include improved WIYN telescope values and data for S2KB.
+    The values were supplied by Massey.  (9/21/95, Valdes)
+
+noaolib$scr/icgfit.key
+noaolib$scr/idicgfit.key
+    Added 'v' key for changing weights.  (12/29/94, Valdes)
+
+noaolib$obsdb.dat
+    Added an entry for Venezuala.  (9/1/94, Valdes)
+
+noaolib$zzsetenv.def
+	Added a definition of "noao$bin(arch)/" to 'pkglibs' so that the
+	smw and asttools libraries would be picked up  by other packages
+	using '-p noao' when the package is configured generically.  
+	(1/10/94 MJF)
+
+noaolib$libasttools.a +
+    A library of astronomical tools is now an NOAO package library.
+    The source is in noao$astutil/asttools.  (8/19/93, Valdes)
+
+noaolib$ccdtime/ +
+noaolib$cctime/kpno.dat +
+noaolib$zzsetenv.def
+    Added a ccdtime directory to contain standard database files for
+    CCDTIME task.  (8/16/93, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for San Pedro Martir and Tonantzintla.  These were
+    submitted by Patrick Vielle via e-mail to IRAF.  (5/4/93, Valdes)
+
+noaolib$linelists/henearhres.dat +
+noaolib$linelists/README
+    Added a new high resolution HENEAR line list created by Daryl Willmarth.
+    (5/4/93, Valdes)
+
+noaolib$onedstds/*cal/names.men +
+noaolib$onedstds/*cal/standards.men
+    Added alternate star names in the files names.men.  These files are
+    used, if present, by a recent revision to the ONEDSPEC tasks.
+    (5/4/93, Valdes)
+
+noaolib$units.h +
+noaolib$smw.h +
+noaolib$libsmw.a -> ../bin/libsmw.a +
+noaolib$zzsetenv.def
+    Added the ONEDSPEC spectral WCS routines and include files for export
+    to the RV package and other NOAO packages.
+    (3/22/93, Valdes)
+.endhelp

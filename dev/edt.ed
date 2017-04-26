@@ -1,0 +1,37 @@
+EDITOR_ID	 \0		 edt
+EDITOR_CMD	 edt		 edt
+EDIT_INIT	 \033=		 enable_keypad  
+EDIT_TERM	 \033>		 disable_keypad 
+
+MOVE_UP	 	 \033[A		 up_arrow 	
+MOVE_DOWN	 \033[B		 down_arrow 	
+MOVE_RIGHT	 \033[C		 right_arrow 
+MOVE_LEFT	 \033[D		 left_arrow 	
+NEXT_WORD	 \033Oq		 keypad-1 	
+NEXT_LINE	 \033Op		 keypad-0
+MOVE_EOL	 \033Or		 keypad-2 	
+MOVE_BOL	 \010		 ^H or BS
+MOVE_START	 \033OP\033Ou	 gold-5 
+MOVE_END	 \033OP\033Ot	 gold-4 
+
+NEXT_PAGE        \033Ow		 keypad-7
+PREV_PAGE	 \033OP\033Ow	 gold-7
+
+SET_FWD	 	 \033Ot		 keypad-4 	
+SET_AFT	 	 \033Ou		 keypad-5 	
+TOGGLE_DIR	 \000		 undefined 	
+
+DEL_LEFT	 \177		 DEL		
+DEL_CHAR	 \033Ol		 kypd_comma 	
+DEL_WORD	 \033Om		 kypd_minus	
+DEL_LINE	 \033OS		 PF4 	
+UNDEL_CHAR	 \033OP\033Ol	 gold-comma	
+UNDEL_WORD	 \033OP\033Om	 gold-minus	
+UNDEL_LINE	 \033OP\033OS	 gold-PF4  	
+
+GET_HELP	 \033OQ		 PF2  	
+REPAINT	 	 \022		 ^R		
+EXIT_UPDATE	 \032		 ^Z		
+EXIT_NOUPDATE 	 \003		 ^C   	
+
+NOMORE_COMMANDS  \0     	none

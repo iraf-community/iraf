@@ -1,0 +1,97 @@
+.help setinstrument Oct87 noao.imred.ccdred
+.ih
+NAME
+setinstrument -- Set instrument parameters
+.ih
+USAGE	
+setinstrument instrument
+.ih
+PARAMETERS
+.ls instrument
+Instrument identification for instrument parameters to be set.  If '?'
+then a list of the instrument identifiers is printed.
+.le
+.ls site = "kpno"
+Site ID.
+.le
+.ls directory = "ccddb$"
+Instrument directory containing instrument files.  The instrument files
+are found in the subdirectory given by the site ID. 
+.le
+.ls review = yes
+Review the instrument parameters?  If yes then \fBeparam\fR is run for
+the parameters of \fBccdred\fR and \fBccdproc\fR.
+.le
+.ls query
+Parameter query if initial instrument is not found.
+.le
+.ih
+DESCRIPTION
+The purpose of the task is to allow the user to easily set default
+parameters for a new instrument.  The default parameters are generally
+defined by support personal in an instrument directory for a particular
+site.  The instrument directory is the concatenation of the specified
+directory and the site.  For example if the directory is "ccddb$" and
+the site is "kpno" then the instrument directory is "ccddb$kpno/".
+The user may have his own set of instrument files in a local directory.
+The current directory is used by setting the directory and site to the
+null string ("").
+
+The user specifies an instrument identifier.  This instrument may
+be specific to a particular observatory, telescope, instrument, and
+detector.  If the character '?' is specified or the instrument file is
+not found then a list of instruments
+in the instrument directory is produced by paging the file "instruments.men".
+The task then performs the following operations:
+.ls (1)
+If an instrument translation file with the name given by the instrument
+ID and the extension ".dat" is found then the instrument translation
+file parameter, \fIccdred.instrument\fR, is set to this file.
+If it does not exist then the user is queried again.  Note that a
+null instrument, "", is allowed to set no translation file.
+.le
+.ls (2)
+If an instrument setup script with the name given by the instrument ID
+and the extension ".cl" is found then the commands in the file are
+executed (using the command \fIcl < script\fR.  This script generally
+sets default parameters.
+.le
+.ls (3)
+If the review flag is set the task \fBeparam\fR is run to allow the user
+to examine and modify the parameters for the package \fBccdred\fR and task
+\fBccdproc\fR.
+.le
+.ih
+EXAMPLES
+1. To get a list of the instruments;
+
+.nf
+	cl> setinstrument ?
+	[List of instruments]
+
+2. To set the instrument and edit the processing parameters:
+
+	cl> setinstrument ccdlink
+	[Edit CCDRED parameters]
+	[Edit CCDPROC parameters]
+
+3. To use your own instrument translation file and/or setup script in
+your working directory.
+
+	cl> setinst.site=""
+	cl> setinst.dir=""
+	cl> setinst myinstrument
+
+To make these files see help under \fBinstruments\fR.  Copying and modifying
+system files is also straightforward.
+
+	cl> copy ccddb$kpno/fits.dat .
+	cl> edit fits.dat
+	cl> setinst.site=""
+	cl> setinst.dir=""
+	cl> setinst fits
+.fi
+.ih
+SEE ALSO
+instruments, ccdred, ccdproc
+.endhelp

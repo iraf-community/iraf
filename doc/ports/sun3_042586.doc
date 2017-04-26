@@ -1,0 +1,250 @@
+SUN/IRAF V2.3 Installation, 14 April 1986	Sun-3, software floating point
+------------------------------------------------------------------------------
+
+/usr/iraf/
+	Unpacked a source-only TAR archive made on lyra this afternoon;
+	didn't first delete anything.  Made sure we had a .login with
+	$iraf defined as the local IRAF root (/usr/iraf/).  (4/14)
+
+/usr/include/iraf.h
+	As Superuser, "ln -s unix/hlib/libc/iraf.h ."  (4/14)
+
+/usr/bin/alloc		-> $hlib/alloc.e
+/usr/bin/generic	-> $hlib/generic.e
+/usr/bin/mkpkg		-> $hlib/mkpkg.e
+/usr/bin/rmbin		-> $hlib/rmbin.e
+/usr/bin/rmfiles	-> $hlib/rmfiles.e
+/usr/bin/rtar		-> $hlib/rtar.e
+/usr/bin/wtar		-> $hlib/wtar.e
+/usr/bin/xc		-> $hlib/xc.e
+/usr/bin/cl		-> $hlib/cl.e
+	As Superuser, performed these symbolic links.  (4/14)
+
+unix/hlib/mkiraf.csh
+unix/hlib/libc/iraf.h
+	Modified IRAF root pathname, HOST definition; irafuser.csh not
+	modified, as $iraf is defined in the IRAF account .login.  (4/14)
+
+unix/hlib/mkmlist.csh
+	Changed bgrep to grep, since bgrep not available in standard
+	UNIX.  (Not important, doesn't have to work, so the efficiency
+	of bgrep on the development machine is worth the mach. dependence.)
+	(4/14)
+
+as/
+vaxas/
+mc68000/
+	Moved as/ to $iraf/vaxas/;  moved $iraf/mc68000/ishift.SUN,
+	zsvjmp.SUN to as/ishift.s, zsvjmp.s.  (Now that we have a
+	SUN-3 with 68020, the BYTPAK etc. assembler sources should also be
+	implemented).  (4/14)
+
+unix/hlib/mach.h
+unix/hlib/libc/spp.h (EPSILON)
+	Compiled osb$zzeps.f with "f77 -O -f68881 -o zzeps.e zzeps.f";
+	ran it to check hardware floating point epsilon; turned out to
+	be same as software floating point to 4 places.  Modified machine
+	epsilon and byte-swapping definitions (see unix/mc68000/README).
+	(4/14)
+
+unix/hlib/[dir]1mach.f
+	Commented out the VAX lines and uncommented the IEEE floating
+	point lines for the 68000.  (4/15)
+
+unix/hlib/mkpkg.inc
+	Modified XFLAGS to "-c -O -f68881" for our hardware floating point
+	option.  To verify that this works, I examined zzeps.e, compiled with
+	the same flags, with adb and found that, indeed, only single arguments
+	were being passed and actual floating point instructions were being
+	generated.  Set USE_CALCOMP to NO.  (4/15)
+
+unix/hlib/libc/kernel.h
+	Commented out DEBUGMEM in order to use the standard UNIX malloc rather
+	than IRAF's version.  This is necessary for some reason on the Sun for
+	SunCGI routines to be callable from SPP programs.  (4/15)
+
+unix/hlib/libc/iraf.h
+	Added definition for SUN3; the Sun IRAF kernel is still mostly 
+	identical with the VAX kernel, but zxwhen.c needs to know if it
+	is being compiled on a Sun-3.  (4/15)
+
+unix/
+	Attempted a bootstrap; had to make the following modification to 
+	get it to work:  (4/15)
+
+unix/os/zxwhen.c
+	Renamed structure vax_exception to hwx_exception; added ifdef branch
+	for SUN3 FPE traps-to-strings structure.  (The version that compiled
+	under the Sun-2 failed to compile under the Sun-3.)  (4/15)
+	
+unix/
+	Performed a bootstrap with "sh -x mkpkg.csh >& spool &".  
+	The only error showing was in bootlib/mkpkg.csh, "syntax error
+	at line 13:  `end of file' unexpected", presumably due to the
+	conditional construct, and possibly a CSHELL bug (libboot.a
+	built correctly and ended up in $hlib as it should anyway).  (4/15)
+
+unix/hlib/alloc.e
+	This file must belong to root, since it needs root permissions at
+	runtime to allocate devices.  Do the following:
+
+	% cd $hlib
+	% su
+	% /etc/chown 0 alloc.e		(4/15)
+
+-------------------------------------------
+The bootstrap is now complete.  The next step is to do a full system compile.
+
+
+	Attempted a "mkpkg >& spool &" from the root directory.  Got compiler
+	failure in fio$; "Compiler error line 0 of (null):  invalid flag
+	s...y...s...t...e...m...=" when trying to compile fowner.f.  Also
+	got similar errors in fmtio$gstrcat.f and other places.  No further
+	files from the original XC command line were compiled.  Common
+	denominator was the length of the command line to the f77 compiler.
+	Made the following change:  (4/15)
+
+unix/boot/mkpkg/host.c
+	Changed SZ_CMD from 512 to 400; this shortens the command line
+	that MKPKG constructs for XC.  Rebuilt MKPKG with "sh -x mkpkg.csh".
+	(4/15)
+
+
+	Started another sysgen.  Noticed compiler errors on the following
+	files; let the sysgen continue while fixing them.
+
+	sys/fmtio/gctod.f
+	sys/fmtio/xtoc.f
+	    These routines had to be hand-compiled without switch "-f68881".
+	    Made copies of the fortran in local/bugs, and hand-compiled
+	    each routine in its own directory.  Something to do with complex
+	    numbers?  Since it didn't look like they affected anything else,
+	    just did a "mkpkg" to load them back into libsys and let the
+	    sysgen continue.  (4/15)
+
+	sys/vops/ak/abeqkx.f
+	sys/vops/ak/abeqx.f
+	sys/vops/ak/abgekx.f
+	sys/vops/ak/abgtkx.f
+	sys/vops/ak/ablekx.f
+	sys/vops/ak/abltkx.f
+	sys/vops/ak/abnekx.f
+	sys/vops/ak/abnex.f
+	sys/vops/ak/advzx.f
+	sys/vops/lz/allnx.f
+	sys/vops/lz/alogx.f
+	sys/vops/lz/arcpx.f
+	sys/vops/lz/arczx.f
+	    Same with these routines; again, all contained complex datatypes.
+	    Hand-compiled, then a "mkpkg" from vops.  (4/16)
+
+unix/hlib/mkpkg.inc
+	Changed LFLAGS from "" to "-f68881" to get pick up the references
+	generated by the same switch during default compilation.  This may
+	cause a problem with those files hand-compiled without this switch
+	due to compiler errors.  (4/16)
+
+pkg/dataio/reblock/t_reblock.x		   line	56
+pkg/dataio/cardimage/t_wcardimage.x		39
+pkg/images/imutil/imdelete.x			43
+pkg/onedspec/t_widstape.x			65
+pkg/plot/gkiextract.x				99
+pkg/utilities/t_translit.x			41, 68
+pkg/imred/vtel/dicoplot.x			324
+pkg/imred/vtel/tcopy.x				59
+pkg/imred/vtel/vtfix.x				60
+pkg/imred/vtel/writevt.x			42
+	All these lines tested a boolean conditional against "true" or "false".
+	The Sun-3 f77 compiler refused to compile these; all were changed to
+	just the name of the boolean or !boolean as appropriate.  
+	This was only done on the Sun, since this is an experimental version;
+	mail will be sent on lyra.  (4/16)
+
+pkg/images/tv/display/iisers.x
+	No change made, since there is no need for this code on the Sun,
+	and it looked like there were non-obvious consequences in other
+	routines for changing either the values or changing shorts to ints.
+	However, note should be taken on lyra that "erase" is a short integer,
+	and it is being assigned to ERASE (in one of the local include
+	files), which has the value "32768" -- too high by one, apparently.
+
+pkg/images/tv/cv/iism70/iiscursor.x
+pkg/images/tv/cv/iism70/zclear.x
+	Also no change made, but similar problem:  the include file
+	definitions IREAD (100000B) and ERASE (32768) are being used
+	in assignments to short integers, in one case "32768+256".  (4/16)
+
+unix/boot/spp/xc.c
+	Added references for the standard Fortran libraries -lI77 and -lU77,
+	plus a reference to the temporary library $hlib/libk.a, which contains
+	several routines referenced by the Fortran compiler, but not provided
+	in any SUN library.  See below.  (4/25)
+
+unix/hlib/SUN_kludge/
+	This a temporary directory added to build the kludge library libk.a
+	so that IRAF programs can be linked on the SUN-3.  Source for the
+	following routines were added:
+
+		Fc_eq		compare complex numbers for equality
+		Fc_conv_h	convert complex to short
+		Fh_conv_c	convert short to complex
+
+	The conversion routines appear to have been overlooked by SUN, and
+	should be added to /usr/lib/libF77.a.  (4/25)
+
+unix/mkpkg.csh
+	Added a line to compile the kludge library during the bootstrap. (4/25)
+
+unix/hlib/mkpkg.inc
+	Added the flag "-f68881" to LFLAGS (the linker flags).  This is
+	necessary to get the linker to reference /lib/Mcrt1.o rather than
+	/lib/Fcrt1.o.  If this is not done and one attempts to link code
+	compiled with the -f68881 switch, an unresolved reference to
+	the external "f68881_used" will result.  (4/25)
+
+sys/osb/miiupk16.x
+sys/osb/miiupk32.x
+	Replaced by the new versions from lyra, which fix the BYTE_SWAP
+	bug.  (4/25)
+
+sys/gio/nspp/portlib/flush.f
+sys/gio/nspp/portlib/flash[13].f
+sys/gio/nsppkern/gktcancel.f
+sys/gio/nsppkern/gktclear.f
+sys/gio/nsppkern/gktclose.f
+sys/gio/ncarutil/sysint/spps.f
+	Changed the name of the NSPP routine "flush" to "mcflsh" to avoid
+	a library conflict with the Fortran FLUSH.  (4/25)
+
+pkg/images/tv/display/iisers.x
+pkg/images/tv/cv/iism70/iiscursor.x
+pkg/images/tv/cv/iism70/zclear.x
+	All these files produced a compiler bug due to a compile time
+	assignment of an unsigned short integer number 1XXXXX into a
+	short variable.  Had to change these to run time assignments to
+	get the desired truncation assignment.  (4/25)
+
+local/.login
+local/login.cl
+	Aliased XC to 'xc -f68881' since all floating point is handled that
+	way on this machine.  (4/25)
+
+unix/hlib/libc/finfo.h
+	The fi_owner field of the finfo structure was not dimensioned
+	properly, causing the storage allocated for the structure to be
+	overrun.  This was found in a call to pfileopen/filetime in the
+	CL; the finfo structure is allocated space on the stack, hence the
+	stack was being corrupted.  This was a fairly serious bug which has
+	been in the system for a long time.  (4/25)
+
+[[ The system is now up (4/25) ]]
+
+dev/pix
+dev/pix.pix
+	Moved the test image over from lyra:
+
+		wfits dev$pix /u2/tody/pix.fits		(on VAX lyra)
+		rfits lyra!/u2/tody/pix.fits		(on SUN)
+	    
+	We ought to add a dev$pix.fits file so that the test image is
+	available on source only archives.  (4/25)

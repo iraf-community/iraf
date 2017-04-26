@@ -1,0 +1,4 @@
+mode,s,h,"ql",,,
+binary_file,s,a,,,,Input file name(s)
+text_file,s,a,,,,Output file name
+verbose,b,h,yes,,,Print messages?

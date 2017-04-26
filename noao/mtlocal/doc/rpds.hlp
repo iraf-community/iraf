@@ -1,0 +1,93 @@
+.help rpds Jan87 noao.mtlocal
+.ih
+NAME
+rpds -- Convert Kitt Peak PDS image files to IRAF image files
+.ih
+USAGE
+rpds pds_file file_list iraf_file
+.ih
+PARAMETERS
+.ls pds_file
+The PDS data source. The data source may be a template specifying
+a list of disk files, e.g. pds* or a mag tape file specification of
+the form mtl*[n], e.g. "mta1600" or "mtb800[1]". The mt specifies magtape,
+l specifies the drive, a,b,c etc, * specifies the density and [n]
+the tape file number. If no tape file number is specified rpds reads
+the tape files specified by file_list.
+.le
+.ls file_list
+A string parameter containing the list of tape files to be processed.
+File_list is only requested if no tape file number is specified in pds_file.
+For example the string
+
+	"1,2,3-5,8-6"
+
+will convert files 1 through 8.
+.le
+.ls iraf_file
+The IRAF file which will receive the PDS data if the make_image
+switch is set. If multiple files are input from tape or disk, the tape file
+number or disk sequence number will be appended to the output file name.
+.le
+.ls make_image = yes
+If make_image is not set, the PDS image headers are listed on the standard
+output and no image file is created.
+.le
+.ls long_header = no
+If this switch is set the full PDS header is printed on the standard output.
+.le
+.ls short_header = yes
+If this switch is set only the output filename,
+the title string, and the image dimensions for each image are printed
+on the standard output.
+.le
+.ls datatype = "s"
+The IRAF image data type, s (short integer), i (integer), l (long integer),
+ r (real) or d (double).
+.le
+.ls tenbit = no
+Old ten bit format?
+.le
+.ls ninetrack = yes
+Ninetrack or old seven track tapes?
+.le
+.ls offset = 0
+Offset is an integer parameter which is added to the tape file number
+or disk sequence number and
+appended to the parameter iraf_file. For example if offset = 100,
+iraf_file = "pds" and file_list = "1-3" the output file names will be
+"pds101", "pds102" and "pds103" respectively, instead of "pds001", "pds002"
+and "pds003".
+.le
+.ih
+DESCRIPTION
+
+Kitt Peak PDS data is read into IRAF from either a
+list of disk files or magnetic tape.
+The PDS header may optionally be printed on the standard output as either a
+full listing or a short description.
+.ih
+EXAMPLES
+
+Convert a ninetrack PDS image tape to a set of IRAF images.
+
+.nf
+	cl> pdsread mtb1600 1-999 images
+.fi
+
+List the contents of a nintrack PDS tape on the standard output.
+
+.nf
+	cl> pdsread mtb1600 1-999 images ma-
+.fi
+
+Convert a list of pds file on disk to IRAF images.
+
+.nf
+	cl> pdsread pds* 1 images
+.fi
+
+.ih
+BUGS
+
+.endhelp

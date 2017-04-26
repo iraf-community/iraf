@@ -1,0 +1,147 @@
+				    EVEXPR
+		 Evaluating Algebraic Expressions in SPP Programs
+			      dct 17 April 1985
+
+
+
+1. Introduction
+
+    EVEXPR is a function which takes an algebraic expression as input,
+evaluates the expression, and returns the value of the expression as the
+function value.  The input expression (a character string) is parsed and
+reduced to a single value.  The operands to the expression may be either
+constants or identifiers (foreign strings).  If an identifier is encountered
+the user supplied get operand procedure is called to return the value of
+the operand.  Operands are described by the operand structure, and operands
+are passed about by a pointer to such a structure.  The value of the
+expression is returned as the function value and is a pointer to an operand
+structure.  Operands of different datatypes may be mixed in an expression
+with the usual automatic type coercion rules.  All SPP datatypes are
+supported plus the string datatype.  All SPP operators and intrinsic
+functions are recognized.
+
+
+2. Procedures
+
+	op = evexpr (expr, locpr(getop), locpr(ufcn))
+	      getop (identifier, op)
+	       ufcn (fcn, args, nargs, op)
+
+where
+
+	evexpr	The main entry point.
+	expr	A character string, the expression to be evaluated.
+	getop	A user supplied procedure which returns the value
+		  of a nonconstant operand given the NAME of the operand
+		  (a character string) as input.  If locpr(getop) is
+		  NULL only constant operands are permitted in the
+		  expression.
+	ufcn	A user supplied procedure which returns the value of
+		  a user defined function given the name of the function
+		  as the first argument (a string).  If locpr(ufcn) is
+		  NULL only the standard functions are permitted.
+	fcn	Name of the function to be evaluated.
+	args	Array of pointers to operands (the arguments to the function).
+	nargs	Number of arguments to function.
+	op	A pointer to an operand structure
+
+
+A a simple example, consider the following statement which evaluates a
+constant expression and prints the value on the standard output.
+
+
+	include	<evexpr.h>
+	pointer	o, evexpr()
+
+	o = evexpr ("sin(.5)**2 + cos(.5)**2)", NULL, NULL)
+	switch (O_TYPE(o)) {
+	case TY_INT:
+	    call printf ("result = %d\n")
+		call pargi (O_VALI(o))
+	case TY_REAL:
+	    call printf ("result = %g\n")
+		call pargr (O_VALR(o))
+	case TY_CHAR:
+	    call printf ("result = %s\n")
+		call pargstr (O_VALC(o))
+	}
+
+
+If a syntax error occurs while parsing the expression EVEXPR will take the
+error action "syntax error".  The NULL arguments could be replaced by the
+LOCPR addresses of get operand and/or user function procedures if required
+by the application.
+
+
+3. Lexical Form
+
+    The lexical form of the input expression is the same as that of SPP and
+the CL for all numeric, character, and  string constants and operators.
+Any other sequence of characters is considered an identifier and will be
+passed to the user supplied get operand function to be turned into an operand.
+
+
+4. Syntax
+
+    Parsing and evaluating of the input expression is carried out by an SPP/Yacc
+parser.  The grammar recognized by the parser is given below.
+
+
+expr	:	CONST				# numeric or string constant
+	|	IDENT				# external operand (getop)
+	|	'-' expr %prec UMINUS
+	|	expr '+'  expr
+	|	expr '-'  expr
+	|	expr '*'  expr
+	|	expr '/'  expr
+	|	expr '**' expr
+	|	expr '//' expr
+	|	'!' expr
+	|	expr '<'  expr
+	|	expr '<=' expr
+	|	expr '>'  expr
+	|	expr '>=' expr
+	|	expr '==' expr
+	|	expr '!=' expr
+	|	expr '&&' expr
+	|	expr '||' expr
+	|	IDENT '(' arglist ')'		# function call
+	|	'?' expr ':' expr		# conditional expression
+	|	'(' expr ')'
+	;
+
+arglist	:	# Empty.
+	|	arglist ',' expr
+	;
+
+
+2. Data Structures
+
+    The operand structure (size 3 su) is used to represent all operands in
+expressions and on the parser stack.  Operands are passed to and from the
+outside world by means of a pointer to an operand structure.  The caller
+is responsible for string storage of string operands passed to EVEXPR.
+EVEXPR manages string storage for temporary string operands created during
+expression evaluation, as well as storage for the final string value if
+the expression is string valued.  In the latter case the value string should
+be used before EVEXPR is again called.
+
+
+	struct operand {
+		int	type		# operand datatype
+		union {
+		bool	v_b		# boolean value
+		int	v_i		# integer value
+		real	v_r		# real value
+		char	*v_s		# string value
+		} v
+	}
+
+
+SPP equivalent (<evexpr.h>)
+
+		O_TYPE(o)		# operand datatype
+		O_VALB(o)		# boolean value
+		O_VALI(o)		# integer value (or string ptr)
+		O_VALR(o)		# real value
+		O_VALC(o)		# string value

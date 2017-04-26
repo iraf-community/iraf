@@ -1,0 +1,32 @@
+.help islzero Apr85 "Surfit Package"
+.ih
+NAME
+islzero -- set up for a new surface grid line fit
+.ih
+SYNOPSIS
+islzero (sf, lineno)
+
+.nf
+pointer	sf		# surface grid descriptor
+int	lineno		# surface grid line number
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface grid descriptor structure.
+.le
+.ls lineno
+Line number of the surface grid line fit to be zeroed.
+.le
+.ih
+DESCRIPTION
+ISLZERO zeros the appropriate arrays and vectors for the surface grid line
+number line number. The line can then be refit by calls to ISLACCUM and
+ISLSOLVE. Alternatively a single call to ISLFIT can perform the combined
+functions of ISLZERO, ISLACCUM and ISLSOLVE.
+.ih
+NOTES
+.ih
+SEE ALSO
+isinit, islfit, islrefit, islaccum, islsolve, issolve
+.endhelp

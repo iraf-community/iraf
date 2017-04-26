@@ -1,0 +1,114 @@
+.help sflip Jul94 noao.onedspec
+.ih
+NAME
+sflip -- Flip data and/or dispersion coordinates in spectra
+.ih
+USAGE
+sflip input output
+.ih
+PARAMETERS
+.ls input
+List of input images containing spectra to be flipped.
+.le
+.ls output
+Matching list of output image names for flipped spectra.
+If no list is specified then the flipped spectra will replace the input
+spectra.  If the output image name matching an input image name is the
+same then the flipped spectrum will replace the original spectrum.
+.le
+.ls coord_flip = no
+Flip the dispersion coordinates?  If yes then the relationship between the
+logical pixel coordinates and the dispersion coordinates will be reversed so
+that the dispersion coordinate of the first pixel of the output image will
+correspond to the coordinate of the last pixel in the input image and
+vice-versa for the other endpoint pixel.  The physical coordinates
+will also be flipped.  Only the coordinate system along the dispersion
+axis is flipped.
+.le
+.ls data_flip = yes
+Flip the order of the data pixels as they are stored in the image along
+the dispersion axis?  If yes then the first pixel in the input spectrum
+becomes the last pixel in the output spectrum along the dispersion
+axis of the image.
+.le
+.ih
+DESCRIPTION
+The dispersion coordinate system and/or the data in the spectra specified
+by the input list of images are flipped and stored in the matching output
+image given in the output list of images.  If the output image list is left
+blank or an output image name is the same as an input image name then the
+operation is done so that the flipped spectra in the image replace the
+original spectra.  All of the supported spectrum types are allowed; one
+dimensional images, collections of spectra in multispec format, and two and
+three dimensional spatial spectra in which one axis is dispersion.  In all
+cases the flipping affects only the dispersion axis of the image as
+specified by the DISPAXIS header keyword or the "dispaxis" parameter.  The
+parameters \fIcoord_flip\fR and \fIdata_flip\fR select whether the
+coordinate system and data are flipped.  If neither operation is selected
+then the output spectra will simply be copies of the input spectra.
+
+Flipping of the coordinate system means that the relation between
+"logical" pixel coordinates (the index system of the image array)
+and the dispersion and physical coordinate systems is reversed.
+The dispersion coordinate of the first pixel in the flipped spectrum
+will be the same as the dispersion coordinate of the last pixel
+in the original spectrum and vice-versa for the other endpoint.
+
+Flipping of the data means that the order in which the pixels are stored
+in the image file is reversed along the image axis corresponding to
+the dispersion.
+
+While flipping spectra seems simple there are some subtleties.  If
+both the coordinate system and the data are flipped then plots of
+the spectra in which the dispersion coordinates are shown will appear
+the same as in the original spectra.  In particular the coordinate
+of a feature in the spectrum will remain unchanged.  In contrast
+flipping either the coordinate system or the data will cause features
+in the spectrum to move to opposite ends of the spectrum relative
+to the dispersion coordinates.
+
+Since plotting programs often plot the dispersion axis in some standard way
+such as increasing from left to right, flipping both the dispersion
+coordinates and the data will produce plots that look identical even though
+the order of the points plotted will be reversed.  Only if the spectra are
+plotted against logical pixel coordinates will a change be evident.  Note
+also that the plotting programs themselves have options to reverse the
+displayed graph.  So if all one wants is to reverse the direction of
+increasing dispersion in a plot then physically flipping of the spectra is
+not generally necessary.
+
+Flipping of both the coordinate system and the data is also equivalent
+to using an image section with a reversed axis.  For example
+a one dimensional spectrum can be flipped in both dispersion coordinates
+and data pixel order by
+
+.nf
+    cl> imcopy spec1[-*] spec2
+.fi
+
+Higher dimensional spectra need appropriate dimensions in the image
+sections.  One advantage of \fBsflip\fR is that it will determine the
+appropriate dispersion axis itself.
+.ih
+EXAMPLES
+In the following the spectra can be one dimensional, multispec,
+long slit, or spectral data cubes.
+
+.nf
+    cl> sflip spec1 spec1f		# Flip data to new image
+    cl> sflip spec1 spec1		# Flip data to same image
+    cl> sflip spec1 spec1f coord+ data-	# Flip coordinates and not data
+    cl> sflip spec1 spec1f coord+ 	# Flip both coordinates and data
+    cl> sflip spec* f//spec*		# Flip a list of images
+.fi
+.ih
+REVISIONS
+.ls SFLIP V2.10.4
+New in this release.  Note that the V2.9 SFLIP was different in that
+it was script which simply flipped the data.  Coordinate systems were
+not handled in the same way.
+.le
+.ih
+SEE ALSO
+imcopy, scopy, dispcor, sapertures
+.endhelp

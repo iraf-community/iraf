@@ -1,0 +1,12 @@
+flat,s,a,,,,"Flat field spectrum"
+apreference,s,a,,,,"Aperture reference spectrum"
+response,s,a,,,,"Response spectrum"
+recenter,b,h,no,,,"Recenter sky apertures?"
+edit,b,h,no,,,"Edit/review sky apertures?"
+trace,b,h,no,,,"Trace sky spectra?"
+clean,b,h,no,,,"Detect and replace bad pixels?"
+fitflat,b,h,no,,,"Fit and ratio flat field spectrum?"
+interactive,b,h,yes,,,"Fit flat field interactively?"
+function,s,h,"spline3",spline3|legendre|chebyshev|spline1,,"Fitting function"
+order,i,h,20,1,,"Fitting function order"
+mode,s,h,"q",,,

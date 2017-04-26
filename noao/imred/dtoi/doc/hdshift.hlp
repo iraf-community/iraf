@@ -1,0 +1,50 @@
+.help hdshift Feb87 imred.dtoi
+.ih
+NAME
+hdshift - calculate and subtract zero point to align HD curves.
+.ih
+USAGE
+hdshift database
+.ih
+PARAMETERS
+.ls database
+Input list of databases containing density, exposure and fit information.
+.le
+.ih
+DESCRIPTION
+For each file in \fBdatabase\fR, procedure \fBhdshift\fR calculates and 
+subtracts a zero point shift to bring several related HD curves into
+alignment.  The individual shifts are calculated by elimination of the 
+first coefficient (Bevington, eqn 9-3):
+.nf
+                _      _      _               _
+           a0 = y - a1*X - a2*X**2 - ... - an*X**n
+
+.fi
+Here, the averages over y and X refer to individual \fBdatabase\fR averages; 
+the coefficients a1, ... an were previously calculated using data from all 
+\fBdatabase\fRs, in task \fIhdfit\fR, and stored in the database.  The
+a0 term is calculated individually for each database; this term represents
+the zero point shift in log exposure and will be different for each database.
+
+On output, the log exposure values in each \fBdatabase\fR have been 
+shifted to the zero point shift of the first database in the list.  The
+log exposure records are now aligned and it would be appropriate
+to run task \fIhdfit\fR on the modified \fBdatabase\fR list and
+determine the common solution.
+.ih
+EXAMPLES
+.nf
+
+Shift the curves in four databases to a common zero point.  
+
+	cl> hdshift db1,db2,db3,db4
+.fi
+.ih
+SEE ALSO
+hdfit, hdtoi
+.br
+"Averaging Photographic Characteristic Curves", John Kormendy, from
+"ESO Workshop on Two Dimensional Photometry", Edited by P. Crane and
+K.Kjar, p 69, (1980), an ESO Publication.
+.endhelp

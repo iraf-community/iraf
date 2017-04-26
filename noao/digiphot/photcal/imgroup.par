@@ -1,0 +1,6 @@
+# Parameter file for IMGROUP
+
+imlist,f,a,,,,The name of the input image list
+imsetlist,f,a,,,,The name of the output image set list
+setvalues,s,a,,,,The list of permitted set definition field values
+rename,b,h,no,,,Prompt the user for a name for each image set ?

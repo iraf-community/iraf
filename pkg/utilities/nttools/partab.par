@@ -1,0 +1,5 @@
+value,s,a,"",,,"Value of table element"
+table,f,a,"",,,"Name of table"
+column,s,a,"",,,"Name of column"
+row,i,a,,,,"Number of row"
+mode,s,h,"al",,,

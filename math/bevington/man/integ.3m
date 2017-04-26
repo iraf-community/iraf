@@ -1,0 +1,28 @@
+.TH INTEG 3M
+.SH NAME
+integ
+.SH DESCRIPTION
+subroutine integ.f
+
+source
+  Bevington, page 274.
+
+purpose
+  integrate the area beneath two data points
+
+usage
+  call integ (x, y, nterms, i1, x1, x2, sum)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  nterms - number of terms in fitting polymonial
+  i1     - first data point for fitting polynomial
+  x1     - first value of x for integration
+  x2     - final value of x for integration
+
+subroutines and function subprograms required
+  none
+
+comments
+  valid for nterms up to 10

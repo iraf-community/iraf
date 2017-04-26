@@ -1,0 +1,51 @@
+# Update the type expanded generic files in the PLIO package library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	plglpi.x	<plio.h>
+	plglpl.x	<plio.h>
+	plglps.x	<plio.h>
+	plglri.x	<plio.h> <plset.h>
+	plglrl.x	<plio.h> <plset.h>
+	plglrs.x	<plio.h> <plset.h>
+	pll2pi.x	<plio.h>
+	pll2pl.x	<plio.h>
+	pll2ps.x	<plio.h>
+	pll2ri.x	<plio.h> <plset.h>
+	pll2rl.x	<plio.h> <plset.h>
+	pll2rs.x	<plio.h> <plset.h>
+	plp2li.x	<plio.h>
+	plp2ll.x	<plio.h>
+	plp2ls.x	<plio.h>
+	plp2ri.x	<plio.h> <plset.h>
+	plp2rl.x	<plio.h> <plset.h>
+	plp2rs.x	<plio.h> <plset.h>
+	plplpi.x	<plio.h>
+	plplpl.x	<plio.h>
+	plplps.x	<plio.h>
+	plplri.x	<plio.h>
+	plplrl.x	<plio.h>
+	plplrs.x	<plio.h>
+	plpropi.x	<plio.h> <plset.h>
+	plpropl.x	<plio.h> <plset.h>
+	plprops.x	<plio.h> <plset.h>
+	plr2li.x	<plio.h> <plset.h>
+	plr2ll.x	<plio.h> <plset.h>
+	plr2ls.x	<plio.h> <plset.h>
+	plr2pi.x	<plio.h> <plset.h>
+	plr2pl.x	<plio.h> <plset.h>
+	plr2ps.x	<plio.h> <plset.h>
+	plreqi.x	<plset.h>
+	plreql.x	<plset.h>
+	plreqs.x	<plset.h>
+	plrpri.x	<plio.h> <plset.h>
+	plrprl.x	<plio.h> <plset.h>
+	plrprs.x	<plio.h> <plset.h>
+	plrropi.x	<plio.h> <plset.h> ../plrseg.h
+	plrropl.x	<plio.h> <plset.h> ../plrseg.h
+	plrrops.x	<plio.h> <plset.h> ../plrseg.h
+	;

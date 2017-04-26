@@ -1,0 +1,17 @@
+# Help directory for the RV package
+
+$doc		= "noao$rv/doc/"
+$rv		= "noao$rv/"
+$rvid		= "noao$rv/rvidlines/"
+#$astutil	= "noao$astutil/"
+
+filtpars	hlp=doc$filtpars.hlp,		src=rv$filtpars.par
+continpars  	hlp=doc$continpars.hlp,		src=rv$continpars.par
+keywpars   	hlp=doc$keywpars.hlp,		src=rv$keywpars.par
+fxcor		hlp=doc$fxcor.hlp,		src=rv$t_fxcor.x
+rvidlines	hlp=doc$rvidlines.hlp,		src=rvid$t_identify.x
+rvreidlines	hlp=doc$rvreidlines.hlp,	src=rvid$t_reidentify.x
+
+#rvcorrect	hlp=astutil$doc/rvcorrect.hlp,	src=astutil$t_rvcorrect.x
+
+revisions       sys=rv$Revisions

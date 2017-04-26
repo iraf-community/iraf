@@ -1,0 +1,9 @@
+# Make the SGI device host level translation programs [MACHDEP].
+
+$call	update
+$exit
+
+update:
+	! sh -x mkpkg.sh
+	! mv $hlib/sgi*.e $hbin
+	;

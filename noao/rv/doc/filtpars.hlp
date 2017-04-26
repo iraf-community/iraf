@@ -1,0 +1,167 @@
+.help filtpars Jan91 noao.rv
+.ih
+NAME 
+filtpars -- edit the filter function parameters
+.ih
+USAGE 
+filtpars
+.ih
+PARAMETERS
+.ls f_type = "ramp"
+Type of filter to be used.  Possible choices are
+.ls ramp
+A ramp function which begins to rise at the \fIcuton\fR wavenumber and
+reaches full value (i.e. passes the full value of the component) at the
+\fIfullon\fR wavenumber.  It begin to decline at the \fIcutoff\fR wavenumber
+and returns to zero at the \fIfulloff\fR wavenumber.
+.le
+.ls Hanning
+A Hanning function is used to attenuate the fourier components over the
+range specified by the \fIcuton\fR and \fIcutoff\fR parameters.
+.le
+.ls Welch
+A Welch function is used to attenuate the fourier components over the range
+specified by the \fIcuton\fR and \fIcutoff\fR parameters.
+.le
+.ls Square
+A standard step function which is zero outside the \fIcuton\fR and
+\fIcutoff\fR component numbers and one within those numbers.
+.le
+.le
+.ls cuton = 0
+The fourier wavenumber at which the filter begins to pass the filtered fft
+component.
+.le
+.ls cutoff = 0
+The fourier wavenumber at which the filter ceases to pass fft components.
+.le
+.ls fullon = 0
+Used only for a 'ramp' filter.  The fourier wavenumber at which the filter
+reaches full value and passes all of the data.
+.le
+.ls fulloff = 0
+Used only for a 'ramp' filter.  The fourier wavenumber at which the filter
+reaches zero value and passes none of the data.
+.le
+.ih
+DESCRIPTION 
+The filtering parameters control the type of filter to be used
+on the Fourier transformed data as well as the range in wavenumbers over
+which it will operate.  Filtering of the data may be necessary to remove
+high frequency noise or low-frequency tends not removed by continuum
+subtraction.  If the filtering is enabled, then once the data have been 
+transformed, a bandpass filter of the type chosen by the
+\fIf_type\fR parameter is applied to the Fourier components of the
+spectra.  Wavenumbers lower than that specified by the \fIcuton\fR parameter
+are set to zero and wavenumbers up to that specified by the \fIcutoff\fR
+parameter (or the \fIfulloff\fR parameter in the case of a 'ramp' filter)
+are attenuated or passed in full according to the filter chosen.   
+Since the data are assumed to be linearized in log-wavelength space, applying 
+a filter to the data in Fourier space introduces no phase shift and has 
+the same effect as smoothing the data in real space.  The data are centered 
+and zero padded in an array of length 2**N such that the number of elements 
+is greater than or equal to the number of actual data points.  This array in
+then Fourier transformed, and the resulting fft is then filtered prior
+to correlation.
+
+Filtering is enabled by turning on the \fIfxcor.filter\fR parameter and setting
+it to something other than "none".  Filtering may be done on only one of the
+two spectra or both prior to correlation.
+
+The filter choices behave as follows:
+.ls Square Filter
+The fourier components at wavenumbers between the \fIcuton\fR and \fIcutoff\fR
+wavenumbers are passed without change.  Those wavenumbers outside this region
+are set to zero.
+.le
+.ls Ramp Filter
+Fourier components below the \fIcuton\fR and above the \fIfulloff\fR 
+wavenumbers are set to zero. 
+At the \fIcuton\fR wavenumber the filter function
+begins to rise until the \fIfullon\fR wavenumber is reached.  Data in this 
+region is weighted by the slope of the filter until at the \fIfullon\fR
+wavenumber data are passed through without change.  Similarly, the filter
+begins to fall at the \fIcutoff\fR wavenumber until it completely blocks
+(i.e. zeros) the fourier components at the \fIfulloff\fR wavenumber.
+.le
+.ls Welch Filter
+Fourier components below the \fIcuton\fR and above the \fIcutoff\fR 
+wavenumbers are set to zero.  Components between these regions are weighted
+according to the equation for a Welch window.  Namely,
+.nf 
+
+						     2      
+	w(j)  = 1. - [ (j - 1/2(N-1)) / (1/2(N+1)) ] 
+		        
+		where j =  (wavenumber - cuton_wavenumber) 
+	      	      N =  (cutoff - cuton) + 1
+.fi
+.le
+.ls Hanning Filter
+Fourier components below the \fIcuton\fR and above the \fIcutoff\fR 
+wavenumbers are set to zero. Components between these regions are weighted
+according to the equation for a Hanning window.  Namely,
+.nf
+
+	w(j)  =  1/2 [ 1. - cos( (TWOPI*j) / (N-1) ) ]
+
+		where j =  (wavenumber - cuton_wavenumber) 
+	              N =  (cutoff - cuton) + 1
+.fi
+.le
+
+.ih
+TASK COLON COMMANDS
+The values of the \fIfiltpars\fR pset may be changed, displayed, or updated
+from within the Fourier mode of the \fIfxcor\fR task.  Simply 
+typing the parameter name will have the default action of printing the current
+value of that parameter. An optional value may be added to change the named
+parameter.
+.ls :update  filtpars
+Update the pset with the current values of the filter parameters.
+The argument "filtpars" must be present or else the command will default
+to the task parameters.
+.le
+.ls :unlearn  filtpars
+Reset the parameter values to their defaults.
+The argument "filtpars" must be present or else the command will default
+to the task parameters.
+.le
+.ls :show  filtpars
+Clear the screen and display all values in the filtpars pset.
+The argument "filtpars" must be present or else the command will default
+to the task default.
+.le
+.ls :filttype	[ramp|welch|hanning|square|none]
+Set or show the current value of the filter type to use
+.le
+.ls :cuton	[int_value]
+Set or show the current value of the cuton fourier component
+.le
+.ls :cutoff	[int_value]
+Set or show the current value of the cutoff fourier component
+.le
+.ls :fullon	[int_value]
+Set or show the current value of the fullon fourier component
+.le
+.ls :fulloff	[int_value]
+Set or show the current value of the fulloff fourier component
+.le
+
+.ih
+EXAMPLES
+1. List the filtering parameters.
+
+.nf
+	rv> lpar filtpars
+.fi
+
+2. Edit the filtering parameters
+
+.nf
+	rv> filtpars
+.fi
+.ih
+SEE ALSO
+fxcor
+.endhelp

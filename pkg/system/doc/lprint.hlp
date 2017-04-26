@@ -1,0 +1,65 @@
+.help lprint Nov84 system
+.ih
+NAME
+lprint -- print a file or files
+.ih
+USAGE
+lprint files
+.ih
+PARAMETERS
+.ls files
+A filename template specifying the files to be printed.
+.le
+.ls device = "printer"
+The output device.  If the value of \fIdevice\fR is the reserved string
+"printer", the name of the actual printer device is taken from the value
+of the environment variable "printer".
+.le
+.ls map_cc = yes
+If set to "yes", any unprintable characters embedded in the text are printed
+in the form "^X", where ^A is <ctrl/A> (ASCII 1), and so on.
+.le
+.ls paginate = "auto"
+If \fIpaginate\fR is set to "auto" and the standard input is not redirected,
+pages are broken and a header is printed at the top of each page.
+If \fIpaginate\fR is set to "auto" and the standard input \fIis\fR redirected,
+the input text is not paginated, allowing proper operation when \fIlprint\fR
+is used in a pipe, e.g., taking input from \fIhelp\fR.
+If "paginate" is set to "yes", pages are broken even if the input text
+is being read from STDIN.
+.le
+.ls label = "STDIN"
+If displaying a header with input from the standard input, use the
+"label" string where the filename would appear in a normal header.
+.le
+.ih
+DESCRIPTION
+The named files, or the standard input, are printed on the standard
+line printer device.  Each file is printed starting at the top of a new
+page, with a header giving the page number and the date of last modification
+for the file.  Pagination and headers are normally suppressed when reading
+input from the standard input, but may be enabled if desired.
+.ih
+EXAMPLES
+
+1. Print all files with an extension of either ".x" or ".h", followed by
+all files with the extension ".com".  Note that filename sorting occurs only
+within a comma delimited field of the filename template, hence the "*.[xh]"
+files are printed in sort order, followed by the ".com" files.
+
+	cl> lprint *.[xh],*.com
+
+2. Print the output of the \fIimstat\fR task on the versatec printer,
+paginating the output with the given label on each page.  Note that the
+command may be broken after the "pipe" character without need for
+explicit backslash continuation.
+
+.nf
+	cl> imstat nite1.* |
+	>>> lprint pag+ label="Image Statistics" device=versatec
+.fi
+
+.ih
+SEE ALSO
+type
+.endhelp

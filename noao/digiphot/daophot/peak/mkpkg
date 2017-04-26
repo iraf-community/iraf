@@ -1,0 +1,22 @@
+# PEAK task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpmempk.x	../lib/daophotdef.h	../lib/peakdef.h
+	dppeakphot.x	<imhdr.h>		<tbset.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/peakdef.h
+	dppkconfirm.x
+	dppkfit.x	<mach.h>                ../lib/daophotdef.h         \
+			../lib/peakdef.h
+	dppkwrite.x	<tbset.h>		<time.h>		    \
+			../lib/daophotdef.h     ../lib/apseldef.h           \
+			../lib/peakdef.h
+	dprrphot.x      ../lib/apseldef.h
+	t_peak.x	<fset.h>		<imhdr.h>                   \
+	                ../lib/daophotdef.h
+	;

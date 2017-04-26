@@ -1,0 +1,27 @@
+# Memory i/o (MEMIO) portion of the system library.
+
+$checkout libmemdbg.a lib$
+$update   libmemdbg.a
+$checkin  libmemdbg.a lib$
+$exit
+
+libmemdbg.a:
+	zrtadr.c
+	memlog.c
+
+	begmem.x	<mach.h>
+	calloc.x	
+	coerce.x	<szdtype.inc>
+	kmalloc.x	memdbg.com <config.h>
+	krealloc.x	memdbg.com <config.h> <mach.h>
+	malloc.x	memdbg.com <config.h>
+	malloc1.x	memdbg.com <mach.h>
+	mfree.x		memdbg.com
+	mgdptr.x	
+	mgtfwa.x	<config.h> <mach.h>
+	msvfwa.x	
+	realloc.x	memdbg.com
+	salloc.x	memdbg.com <config.h> <szdtype.inc>
+	sizeof.x	<szdtype.inc>
+	vmalloc.x	memdbg.com <config.h> <mach.h>
+	;

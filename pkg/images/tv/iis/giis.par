@@ -1,0 +1,7 @@
+input,s,a,,,,input metacode file
+device,s,h,"stdimage",,,output device
+generic,b,h,no,,,ignore remaining kernel dependent parameters
+debug,b,h,no,,,print decoded graphics instructions during processing
+verbose,b,h,no,,,"print elements of polylines, cell arrays, etc. in debug mode"
+gkiunits,b,h,no,,,print coordinates in GKI rather than NDC units
+txquality,s,h,"normal","normal|low|medium|high",,character generator quality

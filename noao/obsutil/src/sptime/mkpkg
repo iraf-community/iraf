@@ -1,0 +1,20 @@
+# Make SPECTIME.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$update	libpkg.a
+	$omake	x_spectime.x
+	$link	x_spectime.o libpkg.a -lsmw -liminterp -o xx_spectime.e
+	;
+
+libpkg.a:
+	grating.x	<error.h> <math.h>
+	stdisperser.x	sptime.h
+	t_cgiparse.x
+	t_sptime.x	sptime.h <error.h> <gset.h> <math.h> <ctype.h> <mach.h>
+	tabinterp.x	<error.h> <math/iminterp.h> <mach.h>
+	;

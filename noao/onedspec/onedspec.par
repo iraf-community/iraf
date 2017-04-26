@@ -1,0 +1,10 @@
+# Package parameter file for the ONEDSPEC package.
+
+observatory,s,h,"observatory",,,"Observatory for data"
+caldir,s,h,,,,"Standard star calibration directory"
+interp,s,h,"poly5","nearest|linear|poly3|poly5|spline3|sinc",,Interpolation type
+dispaxis,i,h,1,1,3,"Image axis for 2D/3D images"
+nsum,s,h,"1",,,"Number of lines/columns to sum for 2D/3D images"
+records,s,h,"",,,"Record number extensions
+"
+version,s,h,"ONEDSPEC: January 1996"

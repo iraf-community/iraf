@@ -1,0 +1,8 @@
+# Global environment definitions for the LOCAL packages.
+
+#set	localbin	= "local$bin(arch)/"
+set	localbin	= "local$bin/"
+set	pkgbin		= localbin$
+set	pkglibs		= local$lib/
+
+keep

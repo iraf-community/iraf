@@ -1,0 +1,25 @@
+CDL PACKAGE EXAMPLES --  This directory contains several example programs
+to demostrate usage of the Client Display library.  Programs are available
+in both C and Fortran.  These are working examples but perhaps not the most
+highly efficient code since they're meant to demonstrate how the package
+might be used.  Tasks available so far include
+
+	DISPLAY.C	- C program to display an image.  Demonstrates how
+			  to use the high level format display calls, the
+			  midlevel raw pixel display, and the lowest level
+			  raw raster display methods.
+	TVMARK.C	- C program to display and image and overlay with
+			  point marks, optional interactive marking available.
+			  Demonstrates usage of cursor reads and call for
+	 		  the various marking routines.
+	MOSAIC.C	- C program to mosaic several images on the display.
+			  Demonstrates the use of low-level raster I/O to
+			  do more complex display operations.
+
+	FDISPLAY.F	- Fortran equivalent of the DISPLAY task above.
+	FTVMARK.F	- Fortran equivalent of the TVMARK task above.
+
+Misc Files in This Directory:
+
+	DPIX.FITS	- 512x512 test image of M51
+	COORDS		- sample coordinate file for tvmark task

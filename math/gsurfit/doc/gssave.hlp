@@ -1,0 +1,39 @@
+.help gssave Aug85 "Gsurfit Package"
+.ih
+NAME
+gssave -- save parameters of the fit
+.ih
+SYNOPSIS
+call gssave (sf, fit)
+
+.nf
+pointer	sf		# surface descriptor
+real	fit[ARB]	# fit array
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface descriptor structure.
+.le
+.ls fit    
+Array containing fit parameters. The size of the fit array can be determined
+by a call to gsstati.
+.le
+
+.nf
+	    len_fit = gsstati (sf, GSNSAVE)
+.fi
+.ih
+DESCRIPTION
+GSSAVE saves the surface parameters in the real array fit. The first eight
+elements of fit contain the surface_type, xorder, yorder, xterms, xmin,
+xmax, ymin and ymax. The coefficients are stored in the remaining array
+elements.
+.ih
+NOTES
+GSSAVE does not preserve the matrices and vectors used by the fitting
+routines.
+.ih
+SEE ALSO
+gsrestore
+.endhelp

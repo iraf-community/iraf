@@ -1,0 +1,4 @@
+devlist,s,a,,,,"devices (comma delimited list)"
+termcap_file,f,a,"dev$termcap",,,"termcap filename"
+output_file,f,a,"dev$cachet.dat",,,"name of output file"
+verbose,b,h,yes

@@ -1,0 +1,4 @@
+RMFILES -- Descend a directory tree, removing or listing all the specified
+	files therein.  This is similar to the RMBIN utility, except that
+	it is not limited to removing binary files.  This task is used to
+	strip production versions of the system down to the essentials.

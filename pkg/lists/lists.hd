@@ -1,0 +1,14 @@
+# Help directory for the LISTS (list processing) package.
+
+$doc = 	"pkg$lists/doc/"
+
+average		hlp = doc$average.hlp,		src = average.cl
+columns		hlp = doc$columns.hlp,		src = columns.x
+lintran		hlp = doc$lintran.hlp,		src = lintran.x
+raverage	hlp = doc$raverage.hlp,		src = raverage.cl
+rgcursor	hlp = doc$rgcursor.hlp,		src = rgcursor.x
+rimcursor	hlp = doc$rimcursor.hlp,	src = rimcursor.x
+table		hlp = doc$table.hlp,		src = table.x
+tokens		hlp = doc$tokens.hlp,		src = tokens.x
+unique		hlp = doc$unique.hlp,		src = unique.x
+words		hlp = doc$words.hlp,		src = words.x

@@ -1,0 +1,125 @@
+1. Data Definition Language
+
+	Used to define relations and domains.
+	Table driven.
+
+
+1.1 Domains
+
+    Domains are used to save storage, format output, and verify input, as well
+as to document the structure of a database.  DBIO does not use domain
+information to verify the legality of predicates.
+
+
+	attributes of a domain:
+
+		name		domain name
+		type		atomic type
+		default		default value (none, indef, actual)
+		minimum		minimum value permitted
+		maximum		maximum value permitted
+		enumval		list of legal values
+		units		units label
+		format		default output format
+
+
+	predefined (atomic) domains:
+
+		bool
+		byte*N
+		char*N
+		int*N
+		real*N
+
+The precision of an atomic domain is specified by N, the number of bytes of
+storage to be reserved for the value.  N may be any integer value greater
+than or equal to N=1 for byte, char, and int, or N=2 for real.  The byte
+datatype is an unsigned (positive) integer.  The floating point datatype
+has a one byte (8 bit) base 2 exponent.  For example, char*1 is a signed
+byte, byte*2 is an unsigned 16 bit integer, and real*2 is a 16 bit floating
+point number.
+
+
+1.2 Groups
+
+    A group is an aggregate of two or more domains or other groups.  Groups
+as well as domains may be used to define the attributes of a relation.
+Repeating groups, i.e., arrays of groups, are not allowed (a finite number
+of named instances of a group may however be declared within a single relation).
+
+
+	attributes of a group:
+
+		name		group name as used in relation declarations
+		nelements	number of elements (attributes) in group
+		elements	set of elements (see below)
+
+	
+	attributes of each group element:
+
+		name		attribute name
+		domain		domain on which attribute is defined
+		naxis		number of axes if array valued
+		naxisN		length of each axis if array valued
+		label		column label for output tables
+
+
+1.3 Relations
+
+    A relation declaration consists of a list of the attributes forming the
+relation.  An attribute is a named instance of an atomic domain, user defined
+domain, or group.  Any group, including nested groups, may be decomposed
+into a set of named instances of domains, each of which is defined upon an
+atomic datatype, hence a relation declaration is decomposable into a linear
+list of atomic fields.  The relation is the logical unit of storage in a
+database.  A base table is an named instance of some relation.
+
+
+	attributes of a relation:
+
+		name		name of the relation
+		nattributes	number of attributes
+		atr_list	list of attributes (see below)
+		primary_key
+		title
+
+	
+	attributes of each attribute of a relation:
+
+		name		attribute name
+		domain		domain on which attribute is defined
+		naxis		number of axes if array valued
+		naxisN		length of each axis if array valued
+		label		column label for output tables
+
+
+The atomic attributes of a relation may be either scalar or array valued.
+The array valued attributes may be either static (the amount of storage is
+set in the relation declaration) or dynamic (a variable amount of storage
+is allocated at runtime).  Array valued attributes may not be used as
+predicates in queries.
+
+
+1.4 Views
+
+    A view is a logical relation defined upon one or more base tables, i.e.,
+instances of named relations.  The role views perform in a database is similar
+to that performed by base tables, but views do not in themselves occupy any
+storage.  The purpose of a view is to permit the appearance of the database
+to be changed to suit the needs of a variety of applications, without having
+to physically change the database itself.  As a trivial example, a view may
+be used to provide aliases for the names of the attributes of a relation.
+
+
+	attributes of a view:
+
+		name		name of the view
+		nattributes	number of attributes
+		atr_list	list of attributes (see below)
+
+	
+	attributes of each attribute of a view:
+
+		name		attribute name
+		mapping		name of the table and attribute to which this
+				    view attribute is mapped

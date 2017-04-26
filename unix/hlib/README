@@ -1,0 +1,13 @@
+HLIB -- Host system library.  All global library files which are machine at all
+	host system dependent are placed in this library, rather than in lib$.
+
+cllogout.cl		log out of the CL (not normally host dependent)
+clpackage.cl		contains host system dependent device names
+config.h		very host dependent
+iraf.h			potentially host dependent
+irafuser.csh		sets up UNIX/CSH environment for IRAF
+libc			the C runtime library header files (mostly portable)
+login.cl		default login.cl file (contains device names)
+mach.h			machine constants (machine dependent)
+mkiraf.csh		set up UNIX/IRAF files for a user
+zzsetenv.def		environment startup file (contains device names)

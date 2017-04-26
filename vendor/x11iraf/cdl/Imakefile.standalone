@@ -1,0 +1,97 @@
+# 
+#   Imakefile for the Client Display Library V1.8
+# 
+#   Mike Fitzpatrick, National Optical Astronomy Observatories, IRAF project.
+#   Feb 1997
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+    CDEBUGFLAGS = -g
+ EXTRA_INCLUDES = -I.
+#if defined (HPArchitecture) || defined(RsArchitecture)
+  EXTRA_DEFINES = -D_NO_US_
+#else 
+
+#   If you plan to use the ANSI function prototypes in your application
+#   you *must* edit the following to include '-DCDL_ANSIC' so the CDL
+#   is compiled with prototypes and will not promote arguments to a
+#   different type.
+
+#   EXTRA_DEFINES = -DCDL_ANSIC
+#endif
+
+#if HasLargeTmp | SystemV4
+          ARADD = ar ru
+#else
+          ARADD = ar rul
+#endif
+
+# Hack to compile under SunPRO V4 on Solaris
+#if defined (SunArchitecture)  &&  OSMajorVersion >= 5 && HasSunC
+#if OSMinorVersion <= 5
+#if !defined (i386Architecture)
+      CCOPTIONS = -Xs
+EXTRA_LDOPTIONS = -xildoff
+#endif
+#else
+      CCOPTIONS = 
+EXTRA_LDOPTIONS = -xildoff
+#endif
+
+#else
+#if defined (UltrixArchitecture)
+        CCOPTIONS = -DULTRIX
+#endif
+#if defined (OSF1Architecture) && OSMajorVersion >= 4
+        CCOPTIONS = -DOSF1
+#endif
+#endif
+
+        SUBDIRS = examples test
+        MATHLIB = -lm
+
+           SRCS = cdl.c cdlmark.c cdlfits.c cdliraf.c cdlzscale.c cdl_f77.c \
+		  cdl_spp.c eps.c comm.c imd.c
+           OBJS = cdl.o cdlmark.o cdlfits.o cdliraf.o cdlzscale.o cdl_f77.o \
+		  cdl_spp.o eps.o comm.o imd.o
+   CDL_INCLUDES = cdl.h cdlP.h cdlProto.h cdl_f77.h cdlfont.h eps.h
+
+
+World::
+	@echo "Building Release 1.8 of the IRAF Client Display Library"
+	@echo "" ; date ; echo ""
+	$(MAKE) $(MFLAGS) Makefiles
+	$(MAKE) $(MFLAGS) clean
+	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) all
+	@echo "Done." ; date ; echo ""
+
+all::	libcdl.a vximtool
+
+NormalLibraryTarget(cdl,$(OBJS))
+
+vximtool: vximtool.o
+	$(RM) vximtool
+	$(CC) -o vximtool -DHAVE_CDL vximtool.o $(LDOPTIONS) libcdl.a \
+	    $(MATHLIB) $(EXTRA_LIBRARIES)
+
+vximtool.o:
+	$(CC) -c $(CFLAGS) -DHAVE_CDL vximtool.c
+
+clean:: 
+	$(RM) vximtool vximtool.o
+
+ForceSubdirs($(SUBDIRS))
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+pristine::
+	$(MAKE) $(MFLAGS) clean
+	$(RM) -f Makefile test/Makefile examples/Makefile *spool*
+
+archive::
+	$(MAKE) $(MFLAGS) pristine
+	!tar -cvf - . | compress > ../cdl.tar.Z
+
+DependTarget()

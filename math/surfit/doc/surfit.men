@@ -1,0 +1,15 @@
+         isinit - initialize surface descriptor
+        iscoeff - get coefficients of surface
+         iseval - evaluate the surface at a point
+         isfree - free surface descriptor
+       islaccum - accumulate surface at a given line number
+         islfit - fit the surface at a given line number
+       islrefit - refit the surface at a given line number, same columns
+       islsolve - solve the surface at a given line number
+        islzero - zero the fit for a given line number
+        issolve - solve the surface
+      isreplace - restore the surface fit
+      isresolve - resolve surface, same lines
+         issave - save the surface fit
+       isvector - fit surface at a set of (x,y) values
+         iszero - zero the surface fit

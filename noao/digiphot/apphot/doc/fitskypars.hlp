@@ -1,0 +1,219 @@
+.help fitskypars May00 noao.digiphot.apphot
+.ih
+NAME
+fitskypars - edit the sky fitting algorithm parameters
+.ih
+USAGE
+fitskypars
+.ih
+PARAMETERS
+.ls salgorithm = "centroid"
+The sky fitting algorithm to be employed. The sky fitting options are:
+.ls constant
+Use a user supplied constant value \fIskyvalue\fR for the sky.
+This algorithm is useful for measuring large resolved objects on flat
+backgrounds such as galaxies or comments.
+.le
+.ls file
+Read sky values from a text file. This option is useful for importing
+user determined sky values into APPHOT.
+.le
+.ls mean
+Compute the mean of the sky pixel distribution. This algorithm is useful
+for computing sky values in regions with few background counts.
+.le
+.ls median
+Compute the median of the sky pixel distribution. This algorithm is a useful
+for computing sky values in regions with rapidly varying sky backgrounds
+and is a good alternative to "centroid".
+.le
+.ls mode
+Compute the mode of the sky pixel distribution using the computed mean and
+median.  This is the recommended algorithm for APPHOT users trying to
+measuring stellar objects in crowded stellar fields. Mode may not perform
+well in regions with rapidly varying sky backgrounds.
+.le
+.ls centroid
+Compute the intensity-weighted mean or centroid of the sky pixel histogram.
+This is the algorithm recommended for most APPHOT users. It is reasonably
+robust in rapidly varying and crowded regions.
+.le
+.ls gauss
+Fit a single Gaussian function to the sky pixel histogram using non-linear
+least-squares techniques.
+.le
+.ls ofilter
+Compute the sky using the optimal filtering algorithm and a triangular
+weighting function and the histogram of the sky pixels.
+.le
+.ls crosscor
+Compute the sky value using the cross-correlation function of the sky pixel
+histogram and a Gaussian noise function with a sigma equal to the
+computed sigma of the sky pixel distribution.
+.le
+.ls histplot
+Mark the peak of the histogram of the sky pixels on a plot of the histogram.
+This algorithm is useful for making careful interactive sky measurements
+for a small number of objects in complicated regions or for checking the
+behavior of other sky algorithms.
+.le
+.ls radplot
+Mark the sky value on a radial distribution plot of the sky pixels.
+This algorithm is useful for making careful interactive sky measurements
+for a small number of objects in complicated regions or for checking the
+behavior of other sky algorithms.
+.le
+.le
+.ls annulus = 10.0  (scale units)
+The inner radius of the annular sky fitting region in units of the DATAPARS
+scale parameter.
+.le
+.ls dannulus = 10.0  (scale units)
+The width of the annular sky fitting region in units of the DATAPARS
+scale parameter.
+.le
+.ls skyvalue
+The constant for constant sky subtraction.
+.le
+.ls smaxiter = 10
+The maximum number of iterations performed by the sky fitting algorithm.
+\fISmaxiter\fR is required by the "gauss" and "ofilter" sky fitting algorithms.
+.le
+.ls sloclip = 0.0 (percent)
+The low-side clipping factor in percentage points of the total number of
+sky pixels.
+.le
+.ls shiclip = 0.0 (percent)
+The high-side clipping factor in percentage points of the total number of
+sky pixels.
+.le
+.ls snreject = 50
+The maximum number of pixel rejection cycles.
+.le
+.ls sloject = 3.0
+The ksigma low-side clipping factor for the pixel rejection  phase of the
+sky fitting algorithm. \fIsloreject\fR is in units of the computed sky
+sigma.
+.le
+.ls shiject = 3.0
+The ksigma high-side clipping factor for the pixel rejection  phase of the
+sky fitting algorithm. \fIshireject\fR is in units of the computed sky
+sigma.
+.le
+.ls khist = 3.0 
+The ksigma clipping factor for computing the histogram of the sky pixels.
+\fIKhist\fR is in units of the computed sky sigma.
+The computed histogram will be 2.0 * khist * sigma wide.
+.le
+.ls binsize = 0.10
+The width of a single bin of the histogram of sky values.
+\fIBinsize\fR is in units of the computed sky sigma.
+.le
+.ls smooth = no
+Boxcar smooth the histogram before computing a sky value ?
+.le
+.ls rgrow = 0.0  (scale units)
+The region growing radius for pixel rejection in the sky region, in units
+of the DATAPARS \fIscale\fR parameter. When a bad sky pixel is detected,
+all pixels within rgrow / scale will be rejected. If rgrow is 0.0
+region growing is not performed.
+.le
+.ls mksky = no
+Mark the sky annulus on the displayed image ? 
+.le
+.ih
+DESCRIPTION
+The sky fitting algorithm parameters control the action of the sky fitting
+algorithms. The default parameter settings should give reasonable results in
+the majority of cases.  Several of the sky fitting parameters scale with
+image scale, \fIscale\fR which is data dependent. \fIScale\fR is defined in
+the DATAPARS parameter set.
+
+Sky pixels in an annular region of inner radius \fIannulus / scale\fR pixels
+and a width of \fIdannulus / scale\fR pixels are extracted from the IRAF image.
+If the \fIscale\fR parameter is defined in terms of the number of half-width
+at half-maximum of the point spread function per pixel, then single values of
+annulus and dannulus will work well for images with different seeing and
+detector characteristics.
+
+Pixels outside of the good data range specified by \fIdatamin\fR and
+\fIdatamax\fR are rejected from the sky pixel distribution. After bad
+data rejection \fIPloclip\fR and \fIphiclip\fR percent pixels are rejected
+from the low and high sides of the sorted pixel distribution before any
+sky fitting is done.
+
+Sky values are computed using the sky fitting algorithm specified by
+\fIsalgorithm\fR. The default value is "centroid". If \fIsalgorithm\fR
+= "mean", "median" or "mode", the sky value is computed directly from the
+array of sky pixels.  The remaining sky fitting algorithms use the histogram
+of the object sky pixels. The computed histogram is \fIkhist\fR * sigma wide
+with a bin width of \fIbinsize\fR * sigma  where sigma is the computed
+standard deviation of the sky pixels for each object. If \fIsmooth\fR = yes,
+boxcar smoothing is performed on the computed histogram before sky fitting.
+The mode of the histogram is  computed using, a non-linear least squares
+fit to a Gaussian (salgorithm = "gauss"), optimal filtering of the histogram
+(salgorithm = "ofilter"), computing the intensity weighted mean of the
+histogram (salgorithm = "centroid"), or by cross-correlation techniques 
+(salgorithm = "crosscor").
+
+Two interactive methods of fitting sky are also available. If \fIsalgorithm\fR
+is "radplot" or "histplot", the user must interactively set the value of the
+sky using a radial profile or a histogram profile plot.
+
+Pixels which deviate from the sky value by more than \fIkreject\fR times the
+computed sky sigma are rejected from the fit. If \fIrgrow\fR > 0, pixels
+within a radius of rgrow / scale of the rejected pixel are also rejected from
+the fit. The rejection procedure iterates until no further pixels are rejected,
+all pixels are rejected, or the maximum number of rejection cycles
+\fIsnreject\fR iterations is reached.
+
+.ih
+EXAMPLES
+1. List the sky fitting parameters.
+
+.nf
+	ap> lpar fitskypars
+.fi
+
+2. Edit the sky fitting parameters.
+
+.nf
+	ap> fitskypars
+.fi
+
+3. Edit the FITSKYPARS parameters from within the PHOT task.
+
+.nf
+    da> epar phot
+
+	... edit a few phot parameters
+
+	... move to the fitskypars parameter and type :e
+
+	... edit the fitskypars parameters and type :wq
+
+	... finish editing the phot parameters and type :wq
+.fi
+
+4. Save the current FITSKYPARS parameter set in a text file skynite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> fitskypars
+
+	... edit some parameters
+
+	... type ":w skynite1.par"  from within epar
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+radprof,fitsky,phot,wphot,polyphot
+.endhelp

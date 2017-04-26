@@ -1,0 +1,92 @@
+.help procedure Feb86 language
+.ih
+NAME
+procedure -- declare a new CL procedure
+.ih
+SYNTAX
+.nf
+\fBprocedure\fR proc_name [( [req_par, ...] )]
+
+<query mode parameter declarations>
+<hidden parameter declarations>
+
+\fBbegin\fR
+	<local variable declarations>
+	<executable statements>
+\fBend\fR
+.fi
+.ih
+ELEMENTS
+.ls proc_name
+The name of the procedure.  In the case of a procedure script,
+the script file should have the same name.
+.le
+.ls req_par
+A required (query mode) parameter for the procedure.
+Hidden parameters must be declared in the declarations section but do
+not appear in the argument list.
+.le
+.ih
+DESCRIPTION
+The \fIprocedure\fR statement is used to declare a new CL procedure.
+In the current CL, procedures are permitted only in ".cl" script files,
+and there may be only one procedure per file.  The \fIprocedure\fR statement
+must be the first non-comment statement in the script file.  Any parameters
+which appear in the procedure argument list must be declared in the parameter
+declarations section as well and will default to mode "auto".  Parameters not
+in the required parameter list will default to mode "hidden".
+The order of positional parameters is the order in which the parameters
+appear in the argument list.
+.ih
+EXAMPLES
+1. Declare a no-op procedure.
+
+.nf
+procedure noop
+begin
+end
+.fi
+
+2. A more complex procedure (hlib$devstatus.cl).
+
+.nf
+# DEVSTATUS -- Print status info for the named device.
+
+procedure devstatus (device)
+
+string	device	{ prompt = "device for which status is desired" }
+bool	verbose = no
+
+string	logname, hostname
+struct	*devlist
+string	dev
+
+begin
+	dev = device
+	_devstatus (dev)
+
+	if (verbose) {
+	    # Print UNIX device status, too.
+
+	    devlist = "dev$devices"
+	    while (fscan (devlist, logname, hostname) != EOF) {
+		if (logname == dev) {
+		    print ("ls -l /dev/", hostname) | cl
+		    break
+		}
+	    }
+	    devlist = ""
+	}
+end
+.fi
+.ih
+BUGS
+CL procedures can only be placed in script files, they cannot currently
+be typed in interactively.  Procedures cannot be precompiled.  A procedure
+cannot return a function value.  Arguments are passed only by value, not
+by reference.  Procedure interpretation (and expression evaluation) is
+currently rather slow.
+.ih
+SEE ALSO
+declarations, task
+.endhelp

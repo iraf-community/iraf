@@ -1,0 +1,2 @@
+This directory contains test routines for the NCAR utilities.  The files
+ending with "t.f" are the NCAR supplied fortran test routines. 

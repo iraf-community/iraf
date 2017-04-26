@@ -1,0 +1,125 @@
+# Formatted i/o (FMTIO) portion of the system library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+tfiles:
+	$ifnewer (evvexpr.gy, evvexpr.y)
+	    $generic -k evvexpr.gy -o evvexpr.y
+	$endif
+
+	$ifnewer (evvexpr.y, evvexpr.x)
+	    $ifeq (HOSTID, unix)
+		$echo "fmtio/evvexpr.x is out of date; rebuilding with XYACC:"
+		!(xyacc evvexpr.y; mv -f ytab.x evvexpr.x)
+	    $else
+		$echo "fmtio/evvexpr.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+
+	$ifnewer (evexpr.y, evexpr.x)
+	    $ifeq (HOSTID, unix)
+		$echo "fmtio/evexpr.x is out of date; rebuilding with XYACC:"
+		!(xyacc evexpr.y; mv -f ytab.x evexpr.x)
+	    $else
+		$echo "fmtio/evexpr.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+	;
+
+libsys.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	cctoc.x	escchars.inc <chars.h> <ctype.h>
+	chdeposit.x	
+	chfetch.x	
+	chrlwr.x	<ctype.h>
+	chrupr.x	<ctype.h>
+	clprintf.x	<printf.h>
+	clscan.x	scan.com
+	ctocc.x		escchars.inc <ctype.h>
+	ctod.x		<ctype.h> <mach.h>
+	ctoi.x		<ctype.h>
+	ctol.x		<ctype.h>
+	ctor.x		<mach.h>
+	ctotok.x	tokdata.inc <chars.h> <lexnum.h> <ctotok.h> <ctype.h>
+	ctowrd.x	<chars.h> <ctype.h>
+	ctox.x		<ctype.h>
+	dtcscl.x	
+	dtoc.x		<ctype.h> <printf.h>
+	dtoc3.x		<ctype.h> <mach.h> <printf.h>
+	eprintf.x	<printf.h>
+	evexpr.x	evexpr.com <ctype.h> <evexpr.h> <lexnum.h> <mach.h>
+	evvexpr.x	evvexpr.com <ctype.h> <evvexpr.h> <lexnum.h>\
+			<mach.h> <math.h>
+	fmterr.x	
+	fmtinit.x	fmt.com <printf.h>
+	fmtread.x	fmt.com <printf.h>
+	fmtsetcol.x	<ctype.h> <printf.h>
+	fmtstr.x	<ctype.h>
+	fpradv.x	<chars.h> <ctype.h> <printf.h> fmt.com
+	fprfmt.x	<ctype.h> <printf.h> fmt.com
+	fprintf.x	<printf.h>
+	fprntf.x	<printf.h> fmt.com
+	fscan.x		scan.com
+	gargb.x		scan.com <ctype.h>
+	gargc.x		scan.com
+	gargd.x		scan.com
+	gargi.x		<mach.h>
+	gargl.x		<mach.h>
+	gargr.x	
+	gargrad.x	scan.com
+	gargs.x		<mach.h>
+	gargstr.x	scan.com
+	gargtok.x	scan.com
+	gargwrd.x	scan.com
+	gargx.x		scan.com
+	gctod.x		<chars.h> <ctype.h> <lexnum.h>
+	gctol.x		<ctype.h>
+	gctox.x		<chars.h> <ctype.h> <lexnum.h>
+	gltoc.x		<ctype.h> <mach.h>
+	gstrcat.x	
+	gstrcpy.x	
+	itoc.x		<ctype.h> <mach.h>
+	lexnum.x	lexdata.inc <ctype.h> <lexnum.h> <mach.h>
+	ltoc.x	
+	nscan.x		scan.com
+	parg.x		<ctype.h> <mach.h> <printf.h> fmt.com
+	pargb.x		<printf.h>
+	pargstr.x	<printf.h> fmt.com
+	pargx.x		<ctype.h> <mach.h> <printf.h> fmt.com
+	patmatch.x	<chars.h> <ctype.h> <pattern.h>
+	printf.x	<printf.h>
+	resetscan.x	scan.com
+	scanc.x		scan.com
+	sprintf.x	<printf.h>
+	sscan.x		scan.com
+	strcat.x	
+	strcmp.x	
+	strcpy.x	
+	strdic.x	<ctype.h>
+	streq.x	
+	strge.x	
+	strgt.x	
+	stridx.x	
+	stridxs.x	
+	strldx.x	
+	strldxs.x	
+	strle.x	
+	strlen.x	
+	strlt.x	
+	strlwr.x	<ctype.h>
+	strmac.x	<ctype.h>
+	strmatch.x	<ctype.h> <pattern.h>
+	strncmp.x	
+	strne.x	
+	strsearch.x	
+	strsrt.x	
+	strtbl.x	
+	strupr.x	<ctype.h>
+	xevgettok.x	<lexnum.h> <ctype.h> <evexpr.h>
+	xvvgettok.x	<lexnum.h> <ctype.h> <mach.h> <math.h> <evexpr.h>
+	xtoc.x	
+	;

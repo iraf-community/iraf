@@ -1,0 +1,6 @@
+# TXSORT Parameters
+
+textfiles,s,a,,,,Input apphot/daophot text database(s) to be sorted
+field,s,a,MAG,,,Field to be sorted on
+ascend,b,h,yes,,,Sort in increasing value order?
+mode,s,h,"ql",,,Mode of task

@@ -1,0 +1,145 @@
+# APSCRIPT
+
+input,s,a,,,,List of input images
+output,s,h,"",,,List of output spectra
+apertures,s,h,"",,,Apertures
+scatter,s,h,"",,,List of scattered light images (optional)
+references,s,h,"",,,List of aperture reference images
+profiles,s,h,"",,,"List of aperture profile images
+"
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,yes,,,Recenter apertures?
+resize,b,h,yes,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,Fit the traced points interactively?
+extract,b,h,yes,,,Extract spectra?
+review,b,h,yes,,,Review extractions?
+subtract,b,h,yes,,,Subtract scattered light?
+smooth,b,h,yes,,,Smooth scattered light along the dispersion?
+fitscatter,b,h,yes,,,Fit scattered light interactively?
+fitsmooth,b,h,yes,,,"Smooth the scattered light interactively?
+"
+line,i,h,)params.line,,,>params.line
+nsum,i,h,)params.nsum,,,>params.nsum
+buffer,r,h,)params.buffer,,,">params.buffer
+
+# OUTPUT PARAMETERS
+"
+format,s,h,"multispec",,,Extracted spectra format
+extras,b,h,)params.extras,,,"Extract sky, sigma, etc.?"
+dbwrite,s,h,"YES",,,Write to database?
+initialize,b,h,no,,,Initialize answers?
+verbose,b,h,no,,,"Verbose output?
+
+# DEFAULT APERTURE PARAMETERS
+"
+lower,r,h,)params.lower,,,>params.lower
+upper,r,h,)params.upper,,,>params.upper
+apidtable,s,h,"",,,"Aperture ID table (optional)
+
+# DEFAULT BACKGROUND PARAMETERS
+"
+b_function,s,h,"legendre","chebyshev|legendre|spline1|spline3",,Background function
+b_order,i,h,1,,,Background function order
+b_sample,s,h,"-10:-6,6:10",,,Background sample regions
+b_naverage,i,h,-3,,,Background average or median
+b_niterate,i,h,0,0,,Background rejection iterations
+b_low_reject,r,h,3.,0.,,Background lower rejection sigma
+b_high_reject,r,h,3.,0.,,Background upper rejection sigma
+b_grow,r,h,0.,0.,,"Background rejection growing radius
+
+# APERTURE CENTERING PARAMETERS
+"
+width,r,h,5.,0.,,Profile centering width
+radius,r,h,10.,,,Profile centering radius
+threshold,r,h,10.,0.,,"Detection threshold for profile centering
+
+# AUTOMATIC FINDING AND ORDERING PARAMETERS
+"
+nfind,i,h,,,,Number of apertures to be found automatically
+minsep,r,h,1.,,,Minimum separation between spectra
+maxsep,r,h,100000.,,,Maximum separation between spectra
+order,s,h,)params.order,,,"Order of apertures
+
+# RECENTERING PARAMETERS
+"
+aprecenter,s,h,"",,,Apertures to use in recentering
+npeaks,r,h,0.5,,,Select brightest peaks
+shift,b,h,yes,,,"Use average shift instead of recentering?
+
+# RESIZING PARAMETERS
+"
+llimit,r,h,INDEF,,,Lower aperture limit relative to center
+ulimit,r,h,INDEF,,,Upper aperture limit relative to center
+ylevel,r,h,)params.ylevel,,,>params.ylevel
+peak,b,h,yes,,,Is ylevel a fraction of the peak?
+bkg,b,h,yes,,,"Subtract background in automatic width?"
+r_grow,r,h,0.,,,Grow limits by this factor
+avglimits,b,h,no,,,"Average limits over all apertures?
+
+# EDITING PARAMETERS
+"
+e_output,s,q,,,,Output spectra rootname
+e_profiles,s,q,,,,"Profile reference image
+
+# TRACING PARAMETERS
+"
+t_nsum,i,h,)params.nsum,,,>params.nsum
+t_step,i,h,)params.t_step,,,>params.t_step
+t_nlost,i,h,3,1,,Number of consecutive times profile is lost before quitting
+t_width,r,h,5.,0.,,Profile centering width
+t_function,s,h,)params.t_function,,,>params.t_function
+t_sample,s,h,"*",,,Trace sample regions
+t_order,i,h,)params.t_order,,,>params.t_order
+t_naverage,i,h,1,,,Trace average or median
+t_niterate,i,h,)params.t_niterate,,,>params.t_niterate
+t_low_reject,r,h,)params.t_low,,,>params.t_low
+t_high_reject,r,h,)params.t_high,,,>params.t_high
+t_grow,r,h,0.,0.,,"Trace rejection growing radius
+
+# EXTRACTION PARAMETERS
+"
+background,s,h,"none","none|average|median|minimum|fit",,Background to subtract
+skybox,i,h,1,,,Box car smoothing length for sky
+weights,s,h,)params.weights,,,>params.weights
+pfit,s,h,)params.pfit,,,>params.pfit
+clean,b,h,no,,,Detect and replace bad pixels?
+nclean,r,h,0.5,,,Maximum number of pixels to clean
+niterate,i,h,5,0,,Number of profile fitting iterations
+saturation,r,h,INDEF,,,Saturation level
+readnoise,s,h,"0.",,,Read out noise sigma (photons)
+gain,s,h,"1.",,,Photon gain (photons/data number)
+lsigma,r,h,)params.lsigma,,,>params.lsigma
+usigma,r,h,)params.usigma,,,>params.usigma
+polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
+nsubaps,i,h,1,1,,"Number of subapertures per aperture
+
+# ANSWER PARAMETERS
+"
+ansclobber,s,h,"NO",,," "
+ansclobber1,s,h,"NO",,," "
+ansdbwrite,s,h,"YES",,," "
+ansdbwrite1,s,h,"NO",,," "
+ansedit,s,h,"NO",,," "
+ansextract,s,h,"NO",,," "
+ansfind,s,h,"NO",,," "
+ansfit,s,h,"NO",,," "
+ansfitscatter,s,h,"NO",,," "
+ansfitsmooth,s,h,"NO",,," "
+ansfitspec,s,h,"NO",,," "
+ansfitspec1,s,h,"NO",,," "
+ansfittrace,s,h,"NO",,," "
+ansfittrace1,s,h,"NO",,," "
+ansflat,s,h,"NO",,," "
+ansnorm,s,h,"NO",,," "
+ansrecenter,s,h,"NO",,," "
+ansresize,s,h,"NO",,," "
+ansreview,s,h,"NO",,," "
+ansreview1,s,h,"NO",,," "
+ansscat,s,h,"NO",,," "
+ansskyextract,s,h,"NO",,," "
+anssmooth,s,h,"NO",,," "
+anstrace,s,h,"NO",,," "

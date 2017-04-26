@@ -1,0 +1,7 @@
+# Help directory for the ARGUS package.
+
+$doc		 = "./doc/"
+
+doargus		hlp=doc$doargus.hlp
+
+revisions	sys=Revisions

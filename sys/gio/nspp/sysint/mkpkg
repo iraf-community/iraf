@@ -1,0 +1,24 @@
+# Make the system interface modules for libnspp.a.
+
+$checkout libnspp.a lib$
+$update   libnspp.a
+$checkin  libnspp.a lib$
+$exit
+
+libnspp.a:
+	encd.f
+	encode.f
+	erprt77.f
+	fencode.x	<ctype.h> <error.h> <mach.h>
+	fulib.x		<error.h>
+	intt.x		<nspp.h>
+	ishift.x	<mach.h>
+	loc.x		<mach.h>
+	mcswap.x	
+	ncgchr.x	
+	ncpchr.x	
+	packum.x	<mach.h> <nspp.h> nspp.com
+	perror.x	
+	q8qst4.f
+	uliber.f
+	;

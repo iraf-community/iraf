@@ -1,0 +1,79 @@
+.help mrider Dec98 "Image Interpolation Package"
+.ih
+NAME
+mrider -- calculate the derivatives at x and y
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+.nf
+mrider (x, y, datain, nxpix, nypix, len_datain, der, nxder, nyder, len_der,
+	interp_type)
+.fi
+
+.nf
+real	x[4]			#I x value, 1. <= x[1-4] <= nxpix
+real	y[4]			#I y value, 1. <= y[1-4] <= nypix
+real	datain[len_datain, ARB]	#I data array	
+int	nxpix			#I number of data pixels in x
+int	nypix			#I number of data pixels in y
+int	len_datain		#I length of datain, len_datain >= nxpix
+real	der[len_der, ARB]	#O derivative array
+int	nxder			#I x order of the derivatives
+int	nyder			#I y order of the derivatives
+int	len_der			#I row length of der, len_der >= nxder
+int	interp_type		#I interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x, y
+The single x and y points or in the case of the drizzle interpolant the
+single quadrilateral at / over which the derivatives are to be evaluated.
+The quadrilateral vertices may be stored in clock-wise or counter-clockwise
+order.
+.le
+.ls datain
+Array of data values.
+.le
+.ls nxpix, nypix
+The number of data values in the x and y directions
+.le
+.ls len_datain
+The row length of the datain array. Len_datain must be >= nxpix.
+.le
+.ls der
+The derivative array. Der[1,1] equals the function value at x and y and
+der[2,1], der[1,2] are the first derivatives with respect to x and y
+respectively.
+.le
+.ls nxder, nyder
+The number of the derivatives in x and y to be returned. MRIDER checks
+that the requested number of derivatives is sensible. The sinc interpolants
+return the interpolant value and all the first and second order derivatives.
+The drizzle interpolant returns the interpolant value and the first
+derivative in x and y.
+.le
+.ls len_der
+The row length of the derivative array. Len_der must be >= nxder.
+.le
+.ls interp_type
+Interpolant type. The options are II_BINEAREST, II_BILINEAR, II_BIPOLY3,
+II_BIPOLY5, II_BISPLINE3, II_SINC / II_LSINC, and II_DRIZZLE. The look-up
+table sinc is not supported and defaults to the sinc interpolant. The
+interpolant width is 31 pixels. The drizzle pixel fraction is 1.0. The
+interpolant type definitions are found in the package header file
+math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+MRIDER is useful for evaluating the function and derivatives at a few
+widely spaced points in a data array without the storage space required
+by the sequential version. 
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the
+responsibility of the user.
+.ih
+SEE ALSO
+msider
+.endhelp

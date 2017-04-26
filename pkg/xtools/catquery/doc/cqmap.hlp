@@ -1,0 +1,33 @@
+.help cqmap Mar00 "Catquery Package"
+.ih
+NAME
+cq_map -- map the catalog / survey configuration file
+.ih
+SYNOPSIS
+cq = cq_map (file, mode)
+
+.nf
+char		file		# the catalog / survey configuration file
+int		mode		# the file access mode 
+.fi
+.ih
+ARGUMENTS
+.ls file
+The name of the catalog / survey configuration file.
+.le
+.ls mode
+The configuration file access mode. At present only READ_ONLY is supported.
+.le
+.ih
+DESCRIPTION
+Cq_map maps the record structure of the catalog / survey configuration file.
+Cq_map is a pointer function which returns the configuration file descriptor
+to the calling program.
+.ih
+NOTES
+Cq_map returns a NULL configuration file descriptor if an error occurs in
+the mapping process.
+.ih
+SEE ALSO
+cqunmap
+.endhelp

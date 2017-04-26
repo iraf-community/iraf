@@ -1,0 +1,23 @@
+# TXTOOLS tasks
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_txconcat.x	../../lib/ptkeysdef.h  <fset.h>  <error.h>
+	t_txdump.x
+	ptxdump.x       <fset.h>  <error.h>  <evexpr.h> ../../lib/ptkeysdef.h
+	t_txcalc.x	<fset.h>
+	ptxcalc.x	../../lib/ptkeysdef.h	<error.h>		\
+			<ctype.h>		<evexpr.h>
+	t_txrenumber.x	<fset.h>
+	ptrenumb.x	../../lib/ptkeysdef.h
+	t_txsort.x	<fset.h>
+	ptsortnum.x	<ctype.h>		../../lib/ptkeysdef.h
+	ptqsort.x
+	t_txselect.x	<fset.h>
+	ptxselect.x	../../lib/ptkeysdef.h	<error.h>		\
+			<ctype.h>		<evexpr.h>
+	;

@@ -1,0 +1,356 @@
+.help mkimsets Apr94 noao.digiphot.photcal
+.ih
+NAME
+mkimsets -- create an image set file from the observations for input
+to MKNOBSFILE OR OBSFILE
+.ih
+USAGE
+mkimsets imlist idfilters imsets 
+.ih
+PARAMETERS
+.ls imlist
+The file(s) containing all the image names and filter ids associated with
+the observations.
+\fIImlist\fR is a list of APPHOT/DAOPHOT databases if \fIinput\fR =
+"photfiles", a list of images if \fIinput\fR = "images", or the name
+of a user text file if \fIinput\fR = "user".
+The default input is a list of APPHOT/DAOPHOT databases.
+.le
+.ls idfilters
+The ids of the filters, separated by whitespace or
+commas, which define a complete observation.
+The order in which the filter ids are listed in the string \fIidfilters\fR
+determines the order in which the image names associated with each observation
+are written in \fIimsets\fR.
+.le
+.ls imsets
+The name of the output image set file which lists each observation of
+each star field, assigns a name
+to each observation, and specifies which images belong to the same
+observation of that star field.
+.le
+.ls imobsparams = ""
+The name of the output image list file containing the image name,
+the filter id,
+and the quantities specified by \fIfields\fR, for each
+unique image referenced in \fIimlist\fR.
+\fIImobsparams\fR includes changes made by the user if \fIedit\fR is
+"yes". If \fIimobsparams\fR is "" the output image list
+is not saved.
+.le
+.ls input = photfiles
+The source of the information used to create the image set file.
+The options are:
+.ls photfiles
+Extract the image list from the APPHOT/DAOPHOT 
+databases containing
+the photometry. This option uses the PTOOLS task DUMP to extract
+the image name, the filter id, the exposure time, the airmass,  the
+time of observation, and
+other user selected fields \fIfields\fR from the database files.
+.le
+.ls images
+Extract the image list from the headers of the images containing
+the objects measured
+with APPHOT or DAOPHOT. This option uses the IMAGES task HSELECT to extract
+the image name, the filter id \fIfilter\fR, and other user selected
+fields \fIfields\fR from the image headers. Useful additional fields
+might be the image title and the time of the observation.
+.le
+.ls user
+Extract the image list from a user created file which has the
+image name in the first column, the filter id in the column
+\fIfilter\fR, and 
+other useful information in the columns specified by \fIfields\fR.
+.le
+.le
+.ls filter
+The filter id keyword.
+\fIFilter\fR is always the APPHOT/DAOPHOT database keyword "IFILTER"
+if \fIinput\fR is "photfiles",
+the image header keyword which defines the filter id if \fIinput\fR is
+"images", or the number of the column
+containing the filter id, if \fIinput\fR is "user".
+.le
+.ls fields = ""
+The list of additional fields, besides the image name and filter id,
+to be extracted from \fIimlist\fR, separated by whitespace or commas.
+If \fIinput\fR is "photfiles" \fIfields\fR is a list of APPHOT/DAOPHOT
+keywords including "itime,xairmass"; if \fIinput\fR is "images"
+\fIfields\fR is a list of image
+header keywords; if \fIinput\fR is "user" \fIfields\fR is a list of the
+column numbers defining the fields to be extracted from the user file.
+\fIFields\fR may include any quantities, for example airmass, image title, or
+the time of the observation, which aid the user in the interactive
+image name grouping process.
+.le
+.ls sort = ""
+Sort the extracted image list in order of the value of the quantity \fIsort\fR.
+\fISort\fR must be one of the fields
+\fI"image"\fR, \fIfilter\fR, or \fIfields\fR if \fIinput\fR
+is "images" or "photfiles", or the column number in the user file of the
+field to be sorted on if \fIinput\fR is "user".
+\fISort\fR is used to reorder the image list 
+before entering the editor.
+.le
+.ls edit = yes
+Edit the extracted image name list interactively, checking that the images
+belonging to a single observation are adjacent to one another in the list,
+and that the filter ids are present and match those in \fIidfilters\fR.
+For each observation there must be an image name for every filter
+in \fIidfilters\fR.
+Missing set members must be assigned the image name "INDEF" for undefined
+and the filter id of the missing observation.
+.le
+.ls rename = yes
+Enter new names for each observation of each field interactively.
+If \fIrename\fR is "no", default names
+of the form "OBS1", "OBS2", ..., "OBSN" are assigned. If \fIrename\fR is "yes",
+MKIMSETS prints each image set
+on the terminal and prompts the user for the new name.
+Images sets containing a single standard star observation should be assigned
+the name of the standard star in the standard star catalog.
+.le
+.ls review = yes
+Review and edit \fIimsets\fR to check that the image set names are correct
+and that the images names have been properly grouped into sets.
+.le
+.ih
+DESCRIPTION
+MKIMSETS is a script task which takes as input a list of
+the image names and filter ids, \fIimlist\fR, associated
+with objects whose magnitudes have been measured with APPHOT, DAOPHOT,
+or a user program, and produces the image set file \fIimsets\fR 
+required as input by the preprocessor tasks MKNOBSFILE or OBSFILE.
+MKIMSETS is used in conjunction with MKNOBSFILE OR OBSFILE to combine many
+individual digital photometry measurements, for example standard star
+measurements,
+into a single observations file. The source of the input image list is
+a list of IRAF images if \fIinput\fR is "images",
+a list of APPHOT or DAOPHOT database files if \fIinput\fR is "photfiles",
+or a user supplied text file if \fIinput\fR is "user".
+
+The output image set file \fIimsets\fR lists each observation of
+each star field, assigns a name supplied by the user
+to each observation, and specifies which images belong to the same
+observation of that star field.
+In the case of image sets which contain a single standard star measurement,
+the image set name should
+match the name of the standard star in the standard star catalog.
+
+The optional output image observing parameters file \fIimobsparams\fR
+lists each unique image in \fIimlist\fR, its
+filter id \fIfilter\fR, and other user specified fields \fIfields\fR.
+\fIImobsparams\fR may be edited by
+the user, and used by the preprocessor tasks MKNOBSFILE or OBSFILE
+to correct erroneous or undefined values of
+filter id, exposure time, airmass and time of observation in the input
+databases.  By default \fIimobsparams\fR is not written.
+
+After task initialization, MKIMSETS extracts each unique image name,
+the corresponding filter id stored in column \fIfilter\fR,
+and the corresponding values of the user defined fields \fIfields\fR,
+from the input list \fIimlist\fR, and writes the resulting image list
+in tabular form to a temporary file.
+The temporary image list file contains the image name in column 1,
+the value of \fIfilter\fR in column 2, and the values of
+any additional fields in succeeding columns in the order they were
+specified in \fIfields\fR.
+
+If \fIsort\fR is one of the extracted
+fields "image", \fIfilter\fR, or \fIfields\fR, MKIMSETS sorts the image
+list based on the values of \fIsort\fR, before writing the results to the
+the temporary image list file.
+
+If \fIedit\fR is "yes", the user enters the text editor and edits the
+temporary image list interactively.
+The image list must be arranged so that members of each image set are
+adjacent to each other in the image list.
+Missing images may be represented by
+an INDEF in column 1, the appropriate filter id in column 2, and
+INDEF in any other columns.
+The edit step is necessary if the image names are not in any logical
+order in \fIimlist\fR for \fIinput\fR = "images",
+do not occur in any logical order in the APPHOT/DAOPHOT 
+databases for \fIinput\fR = "photfiles", or are not listed logically
+in \fIimlist\fR for \fIinput\fR = "user".
+At this point MKIMSETS saves the temporary image list in the text file
+\fIimobsparams\fR, if \fIimobsparams\fR is defined.
+
+After the initial edit, MKIMSETS groups the images in the temporary image list,
+by using the filter ids in \fIidfilters\fR, and assuming that the image
+names are in logical order.
+If \fIrename\fR is "yes", MKIMSETS prompts the user for the name of each 
+image set. Otherwise the default names OBS1, OBS2, ..., OBSN are
+assigned.
+If \fIreview\fR is "yes", MKIMSETS enters the editor, permitting the user
+to review \fIimsets\fR and interactively
+correct any mistakes.
+Image sets are written to \fIimsets\fR, 1 set
+per line with the image set name in column 1, a colon in column 2,
+followed by, in filter order and separated by whitespace, the names of the
+images of that field, for that  observation.
+
+.ih
+EXAMPLES
+
+1. Create an image set file from a list of APPHOT databases which
+contain UBV observations of 5 standard stars. The UBV filters are
+identified in the APPHOT databases by the filters ids "1","2", "3" 
+respectively. There is one database file
+for each star measured. Since data for each of the stars was taken
+sequentially and the images were read sequentially off tape, the user
+requests MKIMSETS to sort the extracted data by image name. Note that
+the time of observation field was undefined in the input data sets.
+
+.nf
+	ph> mkimsets *.mag.* "1,2,3" jan10.stdim sort="image"
+
+	   ... MKIMSETS constructs the image list and sorts on
+	       the image name
+
+	   ... MKIMSETS enters the editor and lists the first few
+	       lines of the intermediate image list file
+
+	   im001  1  3.0  1.150 INDEF
+	   im002  2  2.0  1.150 INDEF
+	   im003  3  2.0  1.140 INDEF
+	   im004  1  6.0  1.300 INDEF
+	   im005  2  4.0  1.300 INDEF
+	   im006  3  2.0  1.300 INDEF
+	   im007  1  5.0  1.263 INDEF
+	   im008  3  1.0  1.270 INDEF
+	   im009  2  3.0  1.270 INDEF
+	   im010  1  2.0  1.030 INDEF
+	   im011  3  10.0  1.030 INDEF
+	   im012  1  30.0  1.093 INDEF
+	   im013  2  20.0  1.110 INDEF
+	   im014  3  10.0  1.110 INDEF
+
+	   ... the user notices that standard 4 is missing a B
+	       observation and that the observations of standard 3
+	       are out of order and edits the file as follows
+
+	   im001  1  3.0  1.150 INDEF
+	   im002  2  2.0  1.150 INDEF
+	   im003  3  2.0  1.140 INDEF
+	   im004  1  6.0  1.300 INDEF
+	   im005  2  4.0  1.300 INDEF
+	   im006  3  2.0  1.300 INDEF
+	   im007  1  5.0  1.263 INDEF
+	   im009  2  3.0  1.270 INDEF
+	   im008  3  1.0  1.270 INDEF
+	   im010  1  2.0  1.030 INDEF
+	   INDEF  2  INDEF  INDEF INDEF
+	   im011  3  10.0  1.030 INDEF
+	   im012  1  30.0  1.093 INDEF
+	   im013  2  20.0  1.110 INDEF
+	   im014  3  10.0  1.110 INDEF
+
+	   ... the user quits the editor
+
+	   ... MKIMSETS groups the image list prompting for a
+	       name for each image set
+
+	   ... MKIMSETS enters the editor, displays the first few
+	       lines of the imsets file, and allows the user to
+	       correct any mistakes
+
+	   STD1 :    im001  im002  im003
+	   STD2 :    im004  im005  im006
+	   STD3 :    im007  im009  im008
+	   STD4 :    im010  INDEF  im011
+	   STD5 :    im012  im013  im014
+
+	   ... quit the editor
+.fi
+
+
+2. Create the image set file from the list of IRAF images associated with
+the APPHOT databases in example 1.  The images contain the image
+header keyword "f1pos" which specifies the filter id and which may assume
+the values "1,2,3" where "1,2,3" stand for "U,B,V". 
+Since the data for the individual stars was taken sequentially the user
+requests MKIMSETS to print out value of the sidereal time stored in the
+image header keyword "ST", and to sort on that
+parameter. The image title is also printed out as an image grouping
+aid to the user. It is placed last in the fields parameter because  any
+internal blanks in the title would otherwise confuse the sorting routine.
+
+.nf
+	ph> mkimsets *.imh "1,2,3" jan10.stdim input="images" \
+	    filter="f1pos" fields="ST,i_title" sort="ST"
+
+	   ... MKIMSETS constructs the image list and sorts on
+	       the column containing the sidereal time
+
+	   ... MKIMSETS enters the editor and lists the first
+	       few lines of the temporary image list file, the sidereal
+	       time is in column 3 and the image title containing
+	       some blanks is in column 4
+
+	   im001  1  12:30:50.2   STD1 U filter
+	   im002  2  12:35:40.1   STD1 B
+	   im003  3  12:40:16.2   STD1 v filter
+	   im004  1  12:50:50.2   STD2
+	   im005  2  12:55:40.1   STD2 B
+	   im006  3  12:59:58.2   STD2 V
+	   im007  1  13:10:50.2   STD3 U
+	   im008  3  13:15:40.1   STD3 V
+	   im009  2  13:20:16.2   STD3 B
+	   im010  1  13:30:50.2   STD4 u
+	   im011  3  13:40:40.1   STD4 V
+	   im012  1  13:50:50.2   STD5 U
+	   im013  2  13:55:40.1   STD5 B
+	   im014  3  13:59:58.2   STD5 V
+
+	   ... the user notices that standard 4 is missing a B
+	       observation and that the observations of standard 3
+	       are out of order and edits the file as follows
+
+	   im001  1  12:30:50.2   STD1 U filter
+	   im002  2  12:35:40.1   STD1 B
+	   im003  3  12:40:16.2   STD1 v filter
+	   im004  1  12:50:50.2   STD2
+	   im005  2  12:55:40.1   STD2 B
+	   im006  3  12:59:58.2   STD2 V
+	   im007  1  13:10:50.2   STD3 U
+	   im009  2  13:20:16.2   STD3 B
+	   im008  3  13:15:40.1   STD3 V
+	   im010  1  13:30:50.2   STD4 u
+	   INDEF  2  INDEF        INDEF
+	   im011  3  13:40:40.1   STD4 V
+	   im012  1  13:50:50.2   STD5 U
+	   im013  2  13:55:40.1   STD5 B
+	   im014  3  13:59:58.2   STD5 V
+
+	   ... the user quits the editor
+
+	   ... MKIMSETS groups the edited image list prompting for a
+	       name for each image set
+
+	   ... MKIMSETS enters the editor, displays the first few
+	       lines of the image set file and permits the
+	       user to correct any mistakes
+
+	   STD1 :    im001  im002  im003
+	   STD2 :    im004  im005  im006
+	   STD3 :    im007  im009  im008
+	   STD4 :    im010  INDEF  im011
+	   STD5 :    im012  im013  im014
+
+	   ... quit the editor
+
+	   ... note that MKIMSETS did not save the output image list
+
+.fi
+
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+images.hselect,ptools.dump,mknobsfile,mkobsfile
+.endhelp

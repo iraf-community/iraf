@@ -1,0 +1,13 @@
+# CALIBRATE parameter file
+
+input,s,a,,,,Input spectra to calibrate
+output,s,a,,,,Output calibrated spectra
+extinct,b,h,yes,,,Apply extinction correction?
+flux,b,h,yes,,,Apply flux calibration?
+extinction,s,h,)_.extinction,,,Extinction file
+observatory,s,h,)_.observatory,,,Observatory of observation
+ignoreaps,b,h,yes,,,Ignore aperture numbers in flux calibration?
+sensitivity,s,h,"sens",,,Image root name for sensitivity spectra
+fnu,b,h,no,,,Create spectra having units of FNU?
+airmass,r,q,,1.,,Airmass
+exptime,r,q,,,,Exposure time (seconds)

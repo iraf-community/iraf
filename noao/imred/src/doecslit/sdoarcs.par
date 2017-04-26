@@ -1,0 +1,8 @@
+spec,f,a,"",,,
+arcref,f,a,"",,,
+reextract,b,a,,,,
+arcap,b,a,,,,
+logfile,f,a,"",,,
+batch,b,a,,,,
+fd,*struct,h,"",,,
+mode,s,h,"q",,,

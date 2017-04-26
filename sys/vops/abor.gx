@@ -1,0 +1,23 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ABOR -- Compute the bitwise boolean 'or' of two vectors (generic).
+
+procedure abor$t (a, b, c, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+$if (datatype == i)
+int	or()
+$else
+PIXEL	or$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		c[i] = or (a[i], b[i])
+	    $else
+		c[i] = or$t (a[i], b[i])
+	    $endif
+	}
+end

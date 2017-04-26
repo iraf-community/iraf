@@ -1,0 +1,10 @@
+# The MKPKG file for the mkimsets subdirectory.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_imgroup.x   <fset.h>  <ctotok.h>
+	;

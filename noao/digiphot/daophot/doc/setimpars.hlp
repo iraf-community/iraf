@@ -1,0 +1,165 @@
+.help setimpars May00 noao.digiphot.daophot
+.ih
+NAME
+setimpars -- save / restore the daophot parameters for a particular image
+.ih
+USAGE
+setimpars image restore update
+.ih
+PARAMETERS
+.ls image
+The image for which the daophot parameters are to be saved or restored.
+.le
+.ls restore
+If restore = yes, parfile is "", and the file "image.pars" exists, SETIMPARS
+sets the current algorithm parameters by reading in the file "image.pars". If
+parfile is not "", then restore is automatically assumed to be yes.
+.le
+.ls update
+If update = yes, SETIMPARS saves the new current values of the DAOPHOT algorithm
+parameters in the file \fIimage.pars\fR and any previously existing file of the same name is overwritten.
+.le
+.ls review = no
+Review and/or edit the values of the parameters in the parameter sets DATAPARS,
+FINDPARS, CENTERPARS, FITSKYPARS, PHOTPARS, and DAOPARS by calling up the EPAR
+task for each of the named parameter sets in turn?
+.le
+.ls parfile
+The name of the input file containing the values of the DAOPHOT algorithm
+parameters to be restored. If defined \fIparfile\fR must have been written
+by SETIMPARS.  If parfile is null (""), SETIMPARS searches for a file named
+\fIimage.pars\fR in the user's current directory. If no file is found, the
+DAOPHOT algorithm parameters are restored from the files \fIdatapars\fR,
+\fIfindpars\fR, \fIcenterpars\fR, \fIfitskypars\fR, \fIphotpars\fR, and
+\fIdaopars\fR.
+.le
+.ls datapars = ""
+The name of the file containing the DATAPARS parameter values. Datapars must be
+a named DATAPARS parameter set file written by the EPAR task, or "" in which
+case the default DATAPARS parameter set in the user's uparm directory is used.
+If the parameter \fIunlearn\fR is "yes" and datapars is "", DATAPARS is
+unlearned.
+.le
+.ls findpars = ""
+The name of the file containing the FINDPARS parameter values. Findpars
+must be a named FINDPARS parameter set file written by the EPAR task, or ""
+in which case the default FINDPARS parameter set in the user's uparm
+directory is used. If the parameter \fIunlearn\fR is "yes" and findpars
+is "", FINDPARS is unlearned.
+.le
+.ls centerpars = ""
+The name of the file containing the CENTERPARS parameter values.  Centerpars
+must be a named CENTERPARS parameter set file written by the EPAR task, or ""
+in which case the default CENTERPARS parameter set in the user's uparm
+directory is used. If the parameter \fIunlearn\fR is "yes" and centerpars
+is "", CENTERPARS is unlearned.
+.le
+.ls fitskypars = ""
+The name of the file containing the FITSKYPARS parameter values. Fitskypars
+must be a named FITSKYPARS parameter set file written by the EPAR task, or ""
+in which case the default FITSKYPARS parameter set in the user's uparm
+directory is used. If the parameter \fIunlearn\fR is "yes" and fitskypars
+is "", FITSKYPARS is unlearned.
+.le
+.ls photpars = ""
+The name of the file containing the PHOTPARS parameter values. Photpars must be
+a named PHOTPARS parameter set file written by the EPAR task, or "" in which
+case the default PHOTPARS parameter set in the user's uparm directory is used.
+If the parameter \fIunlearn\fR is "yes" and photpars is "", PHOTPARS is
+unlearned.
+.le
+.ls daopars = ""
+The name of the file containing the DAOPARS parameter values. Daopars must be a
+named DAOPARS parameter set file written by the EPAR task, or "" in which case
+the default DAOPARS parameter set in the user's uparm directory is used. If the
+parameter \fIunlearn\fR is "yes" and daopars is "", DAOPARS is unlearned.
+.le
+.ls unlearn = no
+Return the values of the parameters in the parameter sets DATAPARS, FINDPARS,
+CENTERPARS, FITSKYPARS, PHOTPARS, and DAOPARS to their default values?
+.le
+.ih
+DESCRIPTION
+
+SETIMPARS saves and restores the DAOPHOT task and algorithm parameters for the
+image \fIimage\fR. On startup SETIMPARS initializes all the DAOPHOT package
+input and output coordinates and photometry file names, input and output images,
+and input and output plot files to their default values or \fIimage\fR whichever
+is appropriate. Next SETIMPARS reads in the values of the algorithm parameters
+from \fIparfile\fR if it is defined, or from the file \fIimage.pars\fR if it
+exists and \fIrestore\fR is "yes", or from the named parameter set files
+\fIdatapars\fR, \fIfindpars\fR, \fIcenterpars\fR, \fIfitskypars\fR,
+\fIphotpars\fR, and \fIdaopars\fR if they exist, or from the default parameters
+sets in the user's uparm directory. If \fIunlearn\fR is "yes", these default
+parameter sets are unlearned.
+
+If \fIreview\fR is "yes", the user can review and or edit the newly set
+algorithm parameters in DATAPARS, FINDPARS, CENTERPARS, FITSKYPARS, PHOTPARS,
+and DAOPARS using the IRAF EPAR task.
+
+If \fIupdate\fR is "yes", SETIMPARS saves the new current values of the DAOPHOT
+algorithm parameters DATAPARS, FINDPARS, CENTERPARS, FITSKYPARS, PHOTPARS, and
+DAOPARS in the file \fIimage.pars\fR. Any previously existing file of the same
+name is overwritten.
+
+.ih
+EXAMPLES
+
+1. Save the current values of the daophot task and algorithm parameters for
+the image m92v.
+
+.nf
+	da> setimpars m92v no yes
+
+	    ... m92v parameters are saved in m92v.pars
+.fi
+
+2. Make some minor alterations in the current values of the m92v algorithm
+parameters and save the new parameters set.
+
+.nf
+	da> setimpars m92v no yes
+
+	    ... m92v parameters are saved in new version of m92v.pars
+.fi
+
+3. Begin work on the image m92b. Initialize the values of the daophot task
+and algorithm parameters for m92b using those stored for m92v. After doing
+some preliminary editing and reductions for m92b, save the parameters,
+and return to work on m92v.
+
+.nf
+	da> setimpars m92b yes no parfile=m92v.pars
+
+	    ... current parameters for m92v are set using saved
+		m92v parameters
+
+	da> daoedit m92b
+
+	    ... edit the parameters as necessary for the new image
+
+	da> daofind m92b
+
+	    ... find the stars in m92b
+
+	da> phot m92b
+
+	    ... do the initial photometry for stars in m92b
+
+	da> setimpars m92b no yes
+
+	    ... current m92b parameters are saved in m92b.pars
+
+	da> setimpars m92v yes no
+
+	    ... m92v parameters are restored from m92v.pars
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+daoedit,datapars,findpars,centerpars,fitskypars,photpars,daopars
+.endhelp

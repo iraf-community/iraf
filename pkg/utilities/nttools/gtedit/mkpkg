@@ -1,0 +1,19 @@
+# GTEDIT task
+$checkout libpkg.a ../
+$update libpkg.a
+$checkin libpkg.a ../
+$exit
+
+libpkg.a:
+	gtdelete.x	<gio.h>
+	gtdodel.x	<tbset.h>
+	gthinfo.x	<tbset.h>
+	gtplot.x	<config.h> <ctype.h> <error.h> <fset.h> <gset.h> \
+			<imhdr.h> <mach.h> <xwhen.h> <tbset.h>
+	gtrdxycol.x	<error.h> <tbset.h>
+	gtupdate.x
+	gtwrdata.x	<gset.h> <tbset.h>
+	gtwrhead.x	<gset.h> <tbset.h>
+	t_gtedit.x	<config.h> <ctype.h> <error.h>  \
+			<imhdr.h> <mach.h> <xwhen.h> <tbset.h>
+	;

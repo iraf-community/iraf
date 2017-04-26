@@ -1,0 +1,36 @@
+# MKPKG file for the EXPORT task
+
+$call update
+$exit
+
+update:
+	$checkout libpkg.a ../
+	$update   libpkg.a
+	$checkin  libpkg.a ../
+	;
+
+generic:
+        $set    GEN = "$$generic -k"
+        $ifolder (generic/exobands.x, exobands.gx)
+            $(GEN) exobands.gx -o generic/exobands.x $endif
+        $ifolder (generic/exraster.x, exraster.gx)
+            $(GEN) exraster.gx -o generic/exraster.x $endif
+	;
+
+libpkg.a:
+        $ifeq (USE_GENERIC, yes) $call generic $endif
+
+	@generic			# compile the generic format code
+	@bltins				# compile the builtin format code
+	
+	exbltins.x	exbltins.h export.h <mach.h>
+	excmap.x	cmaps.inc export.h <lexnum.h>
+	exhdr.x		export.h <error.h> <fset.h> <imhdr.h> \
+				<imio.h> <mach.h> <time.h>
+	expreproc.x	exfcn.h cmaps.inc export.h <ctype.h> <error.h>
+	exrgb8.x	export.h <imhdr.h>
+	exzscale.x	export.h <error.h> <evvexpr.h>
+	t_export.x	export.h <ctype.h> <error.h> <evvexpr.h> \
+				<fset.h> <imhdr.h> <mach.h>
+	zzedbg.x	exbltins.h export.h <evvexpr.h>
+	;

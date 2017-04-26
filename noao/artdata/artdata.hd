@@ -1,0 +1,19 @@
+# Help directory for the ARTDATA package.
+
+$defdir		= "noao$artdata/"
+$doc		= "noao$artdata/doc/"
+$lists		= "noao$artdata/lists/"
+$mkexamples	= "noao$artdata/mkexamples/"
+
+gallist		hlp=doc$gallist.hlp,    src=lists$t_gallist.x
+mk1dspec	hlp=doc$mk1dspec.hlp,	src=t_mk1dspec.x
+mk2dspec	hlp=doc$mk2dspec.hlp,	src=t_mk2dspec.x
+mkechelle	hlp=doc$mkechelle.hlp,	src=t_mkechelle.x
+mkexamples	hlp=doc$mkexamples.hlp,	src=mkexamples$mkexamples.cl
+mkheader	hlp=doc$mkheader.hlp,	src=t_mkheader.x
+mknoise		hlp=doc$mknoise.hlp,	src=t_mknoise.x
+mkobjects	hlp=doc$mkobjects.hlp,	src=t_mkobjects.x
+mkpattern	hlp=doc$mkpattern.hlp,	src=t_mkpattern.x
+starlist	hlp=doc$starlist.hlp,   src=lists$t_starlist.x
+
+revisions	sys=Revisions

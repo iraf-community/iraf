@@ -1,0 +1,61 @@
+.help imcntr Dec85 proto
+.ih
+NAME
+imcntr -- locate the center of a stellar image
+.ih
+USAGE
+imcntr input x_init y_init
+.ih
+PARAMETERS
+.ls input
+The list of images which contain the star to be centered.
+.le
+.ls x_init
+The approximate column coordinate as a starting point for the centering.
+.le
+.ls y_init
+The approximate line (row) coordinate as a starting point for the centering.
+.le
+.ls cboxsize = 5
+The size of the extraction box to be used during the centering process.
+.le
+.ih
+DESCRIPTION
+Given the approximate coordinates of the center of an object, (x_init, y_init),
+IMCNTR will compute a more accurate center using the algorithms described in
+the Kitt Peak publication "Stellar Magnitudes from Digital Images" under
+the Mountain Photometry Code section. Briefly, this algorithm computes
+the sum of all the rows and the sum of all the columns in the extraction
+box. These are called "marginal distributions". The center in x (column
+value) is then the center of gravity of the row marginal, and the center
+in y is the center of gravity of the column marginal.
+If the resultant x or y center value deviates from the original input
+approximate starting points by more than 1 pixel, the process is repeated
+once more around the new center. Only one iteration is attempted to
+avoid runaway if a bright star is nearby.
+
+Because the centers are computed independently for x and y, the result
+may be considered inferior to a true two-dimensional centering algorithm.
+Nevertheless, in practice the results appear to be very usable.
+
+The value for the box size should be an odd value. If chosen too large,
+nearby objects will affect the result. If too small, the center will be
+poorly defined.
+.ih
+EXAMPLES
+1. The following example locates the center of a star near (123, 234)
+in 3 images.
+.sp 1
+.nj
+.nf
+cl> imcntr m92red,m92blu,m92grn 123 234
+.fi
+.ju
+.ih
+BUGS
+The routine will probably fail if the desired object is within 2 or 3 pixels
+of the image boundary.
+.ih
+SEE ALSO
+pradprof
+.endhelp

@@ -1,0 +1,7 @@
+# PHOTPARS Parameter File
+
+weighting,s,h,constant,"|constant|cone|gauss|",,Photometric weighting scheme for wphot
+apertures,s,h,"3.",,,List of aperture radii in scale units
+zmag,r,h,25.,,,Zero point of magnitude scale
+mkapert,b,h,no,,,Draw apertures on the display
+mode,s,h,'ql'

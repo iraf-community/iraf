@@ -1,0 +1,226 @@
+.help imsurfit Feb88 images.imfit
+.ih
+NAME
+imsurfit -- fit a surface function to an image
+.ih
+USAGE	
+imsurfit input, output, xorder, yorder
+.ih
+PARAMETERS
+.ls input
+List of images to be fit.
+.le
+.ls output
+Output image(s) of \fItype_output\fR.
+.le
+.ls xorder
+The order in x of the polynomials (1 = constant) or the number of polynomial
+pieces for the bicubic spline.
+.le
+.ls yorder
+The order in y of the polynomials (1 = constant) or the number of polynomial
+pieces for the bicubic spline.
+.le
+.ls cross_terms = yes
+Cross terms for the polynomials. For example, if \fIxorder\fR = 2 and
+\fIyorder\fR = 2
+then a function of the form z = a + b * x + c * y + d * x * y will be fit.
+.le
+.ls function = "leg"
+Functional for of surface to be fit to the image. The available functions
+(with minimum match abbreviation) are:
+.ls legendre
+.le
+.ls chebyshev
+.le
+.ls spline3
+.le
+.ls spline1
+.le
+.le
+.ls type_output = "fit"
+The type of output image.  The allowed types (with minimum match abbreviation)
+are:
+.ls clean
+The input image with deviant pixels in the good regions replaced by the
+fitted value.
+.le
+.ls fit  
+An image created from the surface fits to the image.
+.le
+.ls residual
+The difference of the input image and the fitted image.
+.le
+.ls response
+The ratio of the input image to the fitted image.
+All fitted (denominator) pixels below \fIdiv_min\fR are given a value of 1.
+.le
+.le
+.ls xmedian = 1, ymedian = 1
+The x and y dimensions of the box used for median processing.
+If \fIxmedian\fR > 1 or \fIymedian\fR is > 1,
+then the median is calculated for each box and used in the surface
+fit instead of the individual pixels.
+.le
+.ls median_percent = 50.
+If the number of pixels in the median box is less than \fImedian_percent\fR *
+\fIxmedian\fR * \fIymedian\fR the box will be omitted from the fit.
+.le
+.ls upper = 0., lower = 0.
+The number of sigma  limits for pixel rejection. If \fIupper\fR > 0. or
+\fIlower\fR > 0. and median processing is turned off,
+pixel rejection is enabled.
+.le
+.ls ngrow = 0
+The radius in pixels for region growing.
+Pixels within a distance of \fIngrow\fR pixels of
+a rejected pixel are also rejected.
+.le
+.ls niter = 0
+The maximum number of iterations in the rejection cycle.
+Rejection will be terminated if the number of rejected pixels is zero
+or the number of iterations equals \fIniter\fR.
+.le
+.ls regions = "all"
+The available options (with minimum match abbreviation) are:
+.ls all
+All points in the image are fit.
+.le
+.ls rows
+The fit is performed on the image rows specified by \fIrows\fR.
+.le
+.ls columns
+The fit is performed on the image columns specified by \fIcolumns\fR.
+.le
+.ls border
+The fit is performed on a border around the image whose width is specified
+by \fIborder\fR.
+.le
+.ls sections
+The fit is performed on image sections listed in the file specified
+by \fIsections\fR.
+.le
+.ls circle
+The fit is performed on a circular region whose parameters are specified by
+\fIcircle\fR.
+.le
+.ls invcircle
+The fit is performed on a region exterior to the circular region whose
+parameters are specified by \fIcircle\fR.
+.le
+.le
+.ls rows = "*"
+When \fIregion_type\fR = 'rows', the string parameter \fIrows\fR specifies
+the rows to be fit.
+.le
+.ls columns = "*"
+When \fIregion_type\fR = 'columns', the string parameter \fIcolumns\fR
+specifies the columns to be fit.
+.le
+.ls border = "50"
+When \fIregion_type\fR = 'border', the
+string parameter \fIborder\fR specifies the width of the border to be fit.
+.le
+.ls sections = ""
+When \fIregion_type\fR = 'sections', the
+string parameter \fIsections\fR is the name of the  file containing the list of
+image sections to be fit, where \fISections\fR may be the standard
+input (STDIN).
+The sections must be listed one per line in the following form: x1 x2 y1 y2.
+.le
+.ls circle = ""
+The string parameter \fIcircle\fR lists the parameter needed to specify
+the circle in the following format: xcenter ycenter radius. The three
+parameters must be integers.
+.le
+.ls div_min = INDEF
+When \fItype_output\fR = 'response' all divisions in which the fitted value
+is below \fIdiv_min\fR are set to the value 1.
+.le
+.ih
+DESCRIPTION
+A surface is fit to selected portions of the input image.
+The user may elect to fit the whole image, \fIregion_type\fR = 'all',
+selected rows, \fIregion_type\fR = 'rows', selected columns,
+\fIregion_type\fR = 'columns', a
+border around the image, \fIregion_type\fR = 'border' or image sections, 
+\fIregion_type\fR = 'sections'. If the sections  option is enabled the user
+must supply the name of the file containing a list of sections,
+\fIsections\fR = 'list', or enter them from the standard input. In either case
+the sections must be listed one per line in the following form: x1 x2 y1 y2.
+
+The parameter \fIsurface_type\fR may be a
+"legendre" polynomial, "chebyshev" polynomial,
+a cubic spline ("spline3") or a linear spline ("spline1").
+The order of the polynomials is selected in both x and y.
+Cross terms for the polynomial surfaces are optional.
+For the cubic spline the parameters \fIxorder\fR and \fIyorder\fR specify
+the number of polynomial pieces to be fit to the surface in
+each direction.
+
+The output image may be the fitted image, the difference between the
+input and the fitted image, the ratio of the input to the fitted image
+or the input image with deviant pixels in the fitted regions replaced
+with the fitted values, according to whether \fItype_output\fR =
+'fit', 'residual',
+'response' or 'clean'. If \fItype_output\fR = 'response' then pixels in the
+fitted image with values < \fIdiv_min\fR are replaced by 1.
+If \fItype_output\fR =
+'clean' then at least one of \fIupper\fR or \fIlower\fR must be > 0.
+
+Pixel rejection is enabled if median processing is turned off,
+\fIniter\fR > 0,
+and at least one of the parameters \fIupper\fR and \fIlower\fR is > 0.
+Region growing
+can be turned on by setting \fIngrow\fR > 0, in which case all pixels within
+a radius ngrow of a deviant pixel will be rejected.
+
+.ih
+EXAMPLES
+1. To create a smoothed version of an image:
+
+.nf
+	cl> imsurfit m74 m74smooth 5 10 function=spline3
+.fi
+
+2. To create a smoothed version of an image using median processing:
+
+.nf
+	cl> imsurfit m74 m74med 5 10 function=spline3 \
+	>>> xmed=5 ymed=5
+.fi
+
+3. To subtract a constant background from an image:
+
+.nf
+	cl> imsurfit abell30 abell30bck 1 1 function=leg \
+	>>> type=resid
+.fi
+
+4. To make a ratio image using signals above 1000 units:
+
+.nf
+	cl> imsurfit n7006 n7006ratio 20 20 function=spline3 \
+	>>> type=response div_min=1000
+.fi
+
+.ih
+TIMINGS
+Fitting and subtracting a constant from a 512 by 512 IRAF image requires
+~35 cpu seconds. Approximately 130 cpu seconds are required to fit a
+second degree polynomial in x and y (including cross-terms) to a
+100 pixel wide border around a 512 by
+512 IRAF image, and to subtract the fitted image from the input image.
+To produce a smooth 512 by 512 IRAF image using a 10 by 10 bicubic spline
+requires ~300 cpu seconds. Timings refer to a VAX 11/750 + fpa.
+
+.ih
+NOTES
+The surface fitting code uses the IRAF SURFIT math routines,
+which have been optimized for image fitting .
+The routines which fit selected portions
+of the image, perform pixel rejection and region growing, and create and
+maintain a list of rejected pixels utilize the ranges and pixlist packages
+of routines currently maintained in the images directory. These will be
+replaced by more general ranges and image masking routines in the future.
+.endhelp

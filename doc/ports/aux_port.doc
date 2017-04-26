@@ -1,0 +1,978 @@
+Begin IRAF port to Macintosh A/UX 2.0, 26Jan91.
+-----------------------------------------------
+
+unix/as
+unix/as.mac		+
+unix/bin
+unix/bin.mac		+
+unix/hlib/irafuser.csh
+	Set up a new "mac" architecture.  (01/26)
+
+unix/hlib/libc/iraf.h
+	Set the iraf root to point to /u1/iraf.  (01/26)
+
+unix/as.mac/ishift.s
+unix/as.mac/zsvjmp.s
+	Modified for the GNU assembler (GAS).  (01/26)
+
+unix/hlib/*.csh
+	Modified for A/UX.  (01/26)
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Checked that LEN_JMPBUF was large enough to handle the setjmp
+	buffer used by A/UX.  (01/26)
+
+unix/boot/bootlib/mkpkg.sh
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/spp/rpp/mkpkg.sh
+unix/boot/spp/rpp/ratlibc/mkpkg.sh
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+unix/boot/xyacc/mkpkg.sh
+unix/gdev/sgidev/mkpkg.sh
+unix/os/mkpkg.sh
+unix/shlib/mkpkg.sh
+	Changed all occurrences of "cc" to "$CC" and all occurrences of
+	"f77" to "$F77".  Changed all occurrences of "ranlib" to $RANLIB.
+	(01/26)
+
+unix/hlib/irafuser.csh
+	Added definitions for CC, F77, and RANLIB (set to "echo ranlib" for
+	A/UX, which uses COFF).  For the first attempt to compile the system
+	I am using gcc and the Absoft A/UX Fortran compiler.  Later I would
+	like to try f2c (Fortran to C translator) with gcc as an alternative
+	to the Absoft Fortran.  Early tests indicate that this should work,
+	and may produce better optimized code than the Absoft compiler.  I
+	have already verified that the A/UX f77 cannot be used to build iraf
+	- there were serious problems just trying to compile the files in
+	one directory.  (01/26)
+
+-------
+Begin bootstrap.  For this I have the GCC flags set to fairly restrictive
+values, enabling some optional warning messages, to flush out any
+questionable coding constructs.  GCC is also an ANSI C compiler, which may
+mean additional problems.  (01/26)
+
+unix/os/mkpkg.sh
+	GCC doesn't echo the filename (as in "file.c:") during compiles,
+	which I found annoying, so I changed the mkpkg.sh to use the Bourne
+	shell FOR construct to compile each file separately.  (01/26)
+
+unix/setarch.sh
+	The A/UX version of "test" does not have the -h flag to test for
+	symbolic links, so the existing script did not work.  Still trying
+	to a portable way to do this, I changed the script to use the
+	construct:  if [ "`ls -d as`" = "as" ]; then ...  (01/26)
+
+unix/os/alloc.c
+	1. The file header comment section contained the sequence "for the
+	/dev/* entries...".  The "/*" would cause a warning from gcc that
+	there might be a comment buried in another comment, which can cause
+	a comment to terminate prematurely.  In this case it was harmless
+	and indeed there was no error, but I changed the text to eliminate
+	the warning.
+	2. Moved the #include <sys/types.h> to before the #include <utmp.h>,
+	as the A/UX version of the latter requires the former.  (01/26)
+
+unix/os/getproc.c
+	1. Had to add
+
+	    #ifdef AUX
+	    #include <sys/mmu.h>
+	    #include <sys/page.h>
+	    #include <sys/region.h>
+	    #endif
+
+	before the #include <sys/proc.h>, to get the latter to compile.
+
+	2. In the A/UX nlist facility n_name is an array rather than a
+	pointer to char, so entries such as
+
+	    nl[0].n_name = "_proc";
+
+	had to be changed to
+
+	    strcpy (nl[0].n_name, "_proc");			(01/26)
+
+unix/os/prwait.c
+	In pr_getipc(), deleted unused variables error_code, error_status,
+	waitpid.  (01/26)
+
+unix/os/zalloc.c
+	1. In ZDVALL, deleted unused variable x_status.
+	2. Deleted unused variable i in loggedin().  (01/26)
+
+unix/os/zfioks.c
+	1. Deleted the old, commented out code for rcmd(), as variables
+	defined for this were being reported as unused.  Added a comment
+	explaining that rcmd and friendly-host authentication cannot be
+	used without making the process suid root.
+	2. Added #ifdef SYSV support for SysV termio.  Terminal driver
+	ioctls are used in this routine to set raw mode for the password
+	prompts.
+	3. GCC was complaining that the setjmp/longjmp used in zardks,
+	zawrks could cause certain register variables to become undefined
+	(op and nbytes in zardks, ofd in zawrks), so I changed the storage
+	class from register to auto for these variables.  (01/26)
+
+unix/os/zfiolp.c
+	I had to change the declaration
+
+	    static PKCHAR xnullstr[1] = XEOS;
+	to
+	    static PKCHAR xnullstr[1] = { XEOS };
+
+	(PKCHAR=short and XEOS=0) or GCC would complain about an invalid
+	initializer.  Must be a feature of the ANSI C syntax.  (01/26)
+
+unix/os/zfiotx.c
+unix/hlib/libc/kernel.h
+	1. Modified to add #ifdef SYSV support for SysV terminal i/o.
+	2. GCC complained about some functions which were used (default
+	storage class extern) and later declared static; added static
+	declarations for these functions to the file header to eliminate
+	these (harmless) warning messages.  (01/27)
+
+unix/os/zfxdir.c
+	Deleted unused local variable "ch".  (01/27)
+
+unix/os/zgcmdl.c
+	Deleted unused local variable "ev".  (01/27)
+
+unix/os/zgcmdl.c
+	Produced a coupld of "/* within comment" warning messages due an
+	example of some <iraf.h> code in the header comment.  Changed /* in
+	the example to /@ to avoid the (harmless) warning.  (01/27)
+
+unix/os/zgtime.c
+	Had to #ifndef SYSV the #include <sys/timeb.h> as this file does
+	not exist on SysV systems.  (01/27)
+
+unix/os/zmain.c
+	Deleted unused local variables "junk" and "wsetsize".  (01/27)
+
+unix/os/zwmsec.c
+	Added "static" to explicitly specify the storage class in the first
+	declarations of "napmsx", which is declared static in the source
+	given later in the file.  (01/27)
+
+unix/os/zxwhen.c
+	1. The system dependent definition "fcancel" would not work for A/UX;
+	added a #ifdef AUX version.
+	2. GCC did not realize that the call to kernel_panic in zxwhen was
+	an exit, and would warn that the value of variable "vex", used later
+	in the procedure, could be unitialized.  Added a statement to init
+	this to null to avoid the warning message.
+	3. In zxgmes, the char pointer to the returned error message was
+	not being initialized if no error had occurred.  Modified to return
+	the null string in this case.  (01/27)
+
+unix/os/zzstrt.c
+	Added #ifdef SUNOS4 conditionals around certain declarations which
+	are used only the #ifdef SUNOS4 code which follows, to avoid unused
+	variable warnings.  (01/27)
+
+unix/boot/bootlib/envinit.c
+	Deleted the unused variable "osfn" in loadpkgenv.  (01/27)
+
+unix/boot/bootlib/bootlib.h
+	Deleted the commented out #define NOVOS definition, which causes
+	a /* in comment warning and doesn't need to be in this file anyhow.
+	(01/27)
+
+unix/boot/bootlib/osfcopy.c
+	1. Deleted the unused variable "binary_file".
+	2. Added a return at the end of the function, to guarantee that
+	a function value was returned.  (01/27)
+
+unix/boot/bootlib/ostime.c
+	Modified with #ifdef SYSV for SysV.  This whole business needs to
+	be redone sometime to provide rigorously correct time primitives
+	for iraf.  (01/27)
+
+unix/boot/bootlib/vfn2osfn.c
+	Local variable "first_time" defined but never used.  (01/27)
+
+unix/boot/generic/generic.c
+	1. In copy_comment(), added an entry time initializer for the
+	local variable "flag".
+	2. GCC complained about the variable "ch" in evaluate_expr() possibly
+	being used before being initialized.  This looked harmless in this
+	case, but I added a global initializer to eliminate the warning
+	message.  (01/27)
+
+unix/boot/mkpkg/host.c
+	Deleted a couple of unused "exit_status" variables.  (01/27)
+
+unix/boot/mkpkg/host.c
+	Deleted unused variable "ip" in search_mkpkgfile().  (01/27)
+
+unix/boot/mkpkg/mkpkg
+unix/boot/mkpkg/mkpkg.h
+unix/boot/mkpkg/scanlib.c
+	1. Added a #include "mkpkg.h" to scanlib.c.  This file includes extern.h
+	which references a structure defined in mkpkg.h.
+	2. Deleted unused local variable "key" in h_scanlibrary().  (01/27)
+	3. Replaced the MAX_SYMBOLS definition in scanlib.c by MAX_LIBFILES,
+	as there is also a MAX_SYMBOLS in mkpkg.h which means something
+	quite different.  (01/29)
+
+unix/boot/mkpkg/sflist.c
+	In sf_scanlist, the GCC static analysis indicated that variable "tail"
+	could possibly be used without being initialized.  Added code to
+	initialize tail=head before scanning the list.  (01/27)
+
+unix/boot/mkpkg/tok.c
+	1. In do_if(), in the event of a syntax error the local variable "bval"
+	could be used without being initialized.  Once again probably harmless
+	but it makes GCC complain.
+	2. Unused variable "ch" in do_call().
+	3. Module do_include() was not returning an exit status in all
+	cases.  (01/27)
+
+unix/boot/rmfiles.c
+	1. Unused variable "i" in main().
+	2. Another warning from GCC static analysis suggesting that local
+	variable "fp" might be being used before being initialized (definitely
+	not in this case, but I added an initializer to avoid the message).
+	(01/27)
+
+unix/boot/wtar/wtar.c
+	Unused variable "op" in putheader().  (01/27)
+
+unix/boot/spp/xc.c
+	1. Unused variable "cmdbuf" in main().
+	2. Variable "append" in sys() could be used before being
+	initialized.  (01/27)
+
+unix/boot/spp/xpp/xppcode.c
+	1. Unused variable "irafdefs" in do_include().
+	2. parse_task_statement() did not return a function value in all cases.
+	3. accum() did not return a function value in all cases.
+	4. Unused variable "digit" in charcon().  Function did not return
+	a value in all cases.
+	5. Variable "value" not initialized in all cases (when an error
+	occurs, but it causes a warning message).  (01/27)
+
+unix/boot/spp/xpp/decl.c
+	Local variable "sp" was not being initialized in all cases (i.e.,
+	when an error occurred).  (01/27)
+
+unix/boot/spp/rpp/ratlibc/getlin.c
+	The local variable "c" was not being initialized in all cases.  (01/27)
+
+unix/mkpkg.sh
+	Commented out the SHLIB build code, as there is no shared library
+	support for Mac/IRAF yet.  (01/27)
+
+unix/gdev/sgidev/sgidispatch.c
+	Deleted unused local variables "maxch" and "status".  (01/27)
+
+--------------------------
+Second bootstrap attempt.  (01/27)
+
+unix/os/gmttolst.c
+	Added #ifdef SYSV support.  (01/27)
+
+unix/os/mkpkg.sh
+	Changed the "rm alloc.o" to "rm -f alloc.o", as the .o file is
+	not being left behind on this system, using GCC.  (01/27)
+
+unix/os/zfioks.c
+unix/hlib/irafuser.csh
+	GCC still warns that longjmp could clobber the values of several
+	local variables in this routine.  Evidently this is a feature of
+	ANSI C.  The values of automatic variables not declared "volatile"
+	are not guaranteed to be preserved in a longjmp.  Added a -DANSI
+	to irafuser.csh and some #ifdef ANSI code to zfioks.c to provide
+	the necessary (but not non-ANSI backwards compatible) definitions.
+	(01/27)
+
+unix/os/zfiotx.c
+	Another longjmp warning, this time in ZGETTX.  Variable "op" might
+	not be saved over a longjmp.  In this case I was able to avoid the
+	problem merely by moving the op initialization statement to after
+	the setjmp.  (01/27)
+
+unix/os/zfiopl.c
+	In zclspl, another case of an array aggregate initializer "= val;"
+	having to be changed to "= { val };" when initializing an array of
+	length 1.  (01/27)
+
+unix/os/zoscmd.c
+	Modified so that if SYSV is defined, "fork" is used instead of 
+	the BSD-ism "vfork".  (01/27)
+
+-------------------------
+Third bootstrap attempt.
+
+unix/boot/spp/rpp/ratlibf/*.f
+unix/boot/spp/rpp/rppfor/*.f
+	The Fortran compiler I am using (Absoft) is case sensitive by default
+	and does not append an underscore to symbol names.  For testing
+	purposes it would be most useful to have the Fortran names occupy
+	the same name space as the C library names, so I translated the
+	contents of all the above files to lower case.  (01/27)
+
+	[In retrospect this wasn't the best way to do this, the Fortran
+	compiler has a switch which does it more simply.  (01/29)]
+
+unix/boot/spp/rpp/ratlibc/ratdef.h
+	Removed the trailing underscore from the names of the Fortran
+	routines.  (01/27)
+
+unix/hlib/libc/knames.h
+unix/hlib/libc/xnames.h
+	Edited to remove the trailing underscore from all names.  (01/27)
+
+unix/boot/spp/rpp/ratlibr/defs
+unix/boot/spp/rpp/rpprat/defs
+	It probably doesn't matter, but these directories both have a copy
+	of the "defs" file and the files should be the same, but they aren't.
+	The version in rpprat has been changed to increase the size of
+	various size limiting buffers.  The fortran sources should be
+	regenerated using compatible defs files.  (01/28)
+
+unix/boot/spp/rpp/mkpkg.sh
+	RPP failed to link in the first bootstrap attempt.  To fix this
+	it was necessary to modify the $CC link command in the mkpkg.sh,
+	as follows:
+
+	    $CC $HSI_CF -t rpp.o librpp.a libf.a libc.a -lf77 -o rpp.e
+
+	The -t flag had to be added to avoid warnings about the inconsistent
+	sizes for the cdsmem common (see "defs", above).  The -lf77 had to
+	be added for the Absoft compiler, as evidently it uses library
+	functions for a few simple things like ABS that some RPP code
+	references.  (01/28)
+
+unix/boot/mkpkg/host.c
+	Added a #ifdef SYSV to the code which calls RANLIB, since this is
+	not used on SYSV (COFF) systems.  (01/28)
+
+unix/os/irafpath.c
+	Added a #ifdef AUX conditional to search the "unix/bin.mac" directory
+	for Mac/IRAF system files.  (01/28)
+
+unix/spp/rpp/rppfor/poicod.f
+	The HSI bootstrap completed successfully, although some things are
+	probably still not working correctly.  XC now runs but in my very
+	first compile test I ran into a nasty problem in the third party
+	Absoft Fortran compiler.  The compiler complains about the following
+	statement in fio$areadb.x being out of order:
+
+		memi(fp+15) = 0
+
+	Evidently it thinks this array assignment is a statement function
+	or something.  I was further able to isolate the problem with the
+	following source:
+
+	    subroutine areadb (fd)
+	    integer fd
+	    integer Memi(1)
+	    real    Memr(1)
+	    equivalence (Memi, Memr)
+	    common /Mem/ Memi
+	    save
+		memi(fd+15) = 0
+	    end
+
+	The compiler barfs on a syntax error on line 8 of this file, the
+	lone assignment statement.  With a little further testing I was
+	able to establish that this is due to case sensitivity in the
+	compiler!  Changing the memi to Memi causes the problem to go away.
+	To fix the problem in RPP I had to replace the file poicod.f by
+	a version that uses "mem" rather than "Mem" in the data strings.
+	(01/28)
+
+unix/hlib/libc/libc.h
+	The Absoft compiler prefixes the names of Fortran commons with C
+	(e.g., "Cfiocom", "Cmem", etc.) and omits the trailing underscore
+	as in C.  Modified libc.h to reflect the above naming scheme.  (01/28)
+
+---------------------------------
+Started first core system sysgen.  (01/28)
+
+sys/plio/plr2l.gx
+sys/plio/plp2l.gx
+sys/plio/pllsten.x
+sys/plio/pllrop.x
+	The Absoft Fortran compiler could not handle the following type of
+	statement in these files:
+
+	    ll_out[op] = M_DH + -dv
+
+	It was necessary to place parens around the (-dv) to avoid the
+	problem.  (01/29)
+
+unix/hlib/iraf.h
+unix/boot/spp/xpp/decl.c
+	1. There were a lot of problems in PLIO in the initial sysgen due to
+	the use of bitwise boolean intrinsics in these files.  The Absoft
+	compiler does have some bitwise functions but 1) they are typed,
+	not generic functions, and 2) a function which takes two short
+	integer arguments as input can return an integer result (contrary
+	to the documentation).  Also, this is not a problem but a comment,
+	but the compiler generates function calls for the bitwise operators,
+	which is rather inefficient.  The only way I could come up with to
+	work around these limitations was to define the bitwise intrinsics
+	in hlib$iraf.h as follows:
+
+		define	and	iand(int($1),int($1))
+		define	or	ior(int($1),int($1))
+		define	not	jnot(int($1))
+		define	xor	ieor(int($1),int($2))
+
+	2. Unfortunately the argument expansion in the above definitions
+	would cause problems with functions that declare the bitwise
+	intrinsics, i.e., that contains statements such as "int and()".
+	It was necessary to modify decl.c to add special processing for
+	function declarations so that any declarations of the bitwise
+	intrinsics could be omitted.  This may be a generally useful
+	addition as special processing of intrinsic functions might be
+	required on any system.  (01/29)
+
+sys/mwcs/mwtransd.x
+	This file also contained a "foo + -bar" construct requiring
+	parenthesis to get by the Absoft parser.  (01/29)
+
+sys/imfort/imemsg.x
+	This file contained four Fortran escapes (error message strings)
+	which ran over the 72 character line limit of Fortran, causing the
+	Absoft compiler to complain.  (01/29)
+
+unix/hlib/mkpkg.inc
+	Added the following default compile time flags:
+
+	    -f		Fold all symbol names to lower case.  This is needed
+			for some of the Fortran sources.
+
+	    -k		Restore all registers when a procedure returns.
+			This is necessary if Fortran modules are to be
+			called from C code.
+
+	Mac/IRAF also needs the -z link flag.  (01/29)
+
+sys/gio/nspp/portlib/gridal.f
+	The equivalence on line 4 was incorrect (or at least ill-advised)
+	due to a dimension error.  The code "mfmtx(1),ifmt(1))" should
+	have been "mfmtx(1),ifmt(1,1))".  (01/29)
+
+sys/gio/nspp/portlib/z8zpbd.f
+sys/gio/nspp/portlib/z8zpii.f
+	The Absoft compiler didn't want to permit use of DATA to initialize 
+	variables in common so I had to move all the remaining DATA
+	statements out of z8zpbd.f into run time initialization statements
+	in z8zpbd.f  (01/29)
+
+unix/boot/spp/xc.c
+	1. The routine printargs() was printing one more argument then there
+	was, due to a <= that should have been a < in a FOR loop.
+	2. Modified XC to use GCC for linking.  (01/29)
+
+-----------------------
+This took care of all the problems with the sysgen up to the attempt to
+link the first task.  Trying to build the system task, there was a file
+that did not compile.  Inexplicably the system hang twice requiring a
+reboot, once while linking and the other time while trying to do a mkpkg
+on the system task (the system hand requiring a reboot in my first attempt
+to link an iraf task!).  No idea why this happening.  (01/29)
+
+The above problem was due to the rebuilding of XC after the first sysgen.
+libsys.a and libvops.a existed this time so XC was not built NOVOS, which
+was no good as the entire kernel needs to be consistent one way or the
+other, and I haven't done runtime checks of the iraf libraries yet anyhow.
+(01/30)
+
+unix/hlib/mkfloat.csh
+	The tar -x flags are "tar -xpf" for BSD systems, and "tar -xof" for
+	SysV systems.  Added a new SET at the top to document the dependency
+	and set the value to -xof for AUX.  (01/30)
+
+unix/hlib/irafuser.csh
+unix/hlib/fc.csh
+unix/hlib/cl.csh
+	Set up two different architectures for Mac/IRAF.  These are the
+	following:
+
+		mf2	Absoft MacFortran II binaries
+		f2c	F2C/GCC binaries
+
+	F2C is a publically available Fortran to C translator, and GCC is
+	the GNU C compiler.  These can be combined to yield an interesting
+	Fortran compiler constructed from only publically available sources.
+	This is particularly interesting since we are already using GCC
+	as our C compiler for A/UX.  Initially I am building with the Absoft
+	compiler but I plan to try F2C/GCC later.  (01/30)
+
+mkpkg
+noao/mkpkg
+bin.generic		+
+	Edited the root mkpkg file to add entries "mf2" and "f2c" for setting
+	the bin.mf2 and bin.f2c architectures.  Deleted all the Sun
+	architecture entries.  Added a bin.generic subdirectory.  (01/30)
+
+pkg/system/help/lroff/textout.x
+	Modified to eliminate the ENTRY point.  (01/30)
+
+-----------------------
+First successful iraf process link on A/UX - xx_system.e  (01/30)
+
+unix/hlib/iraf.h
+unix/hlib/libc/xnames.h
+	The Absoft compiler does not append an underscore to function names
+	hence SPP/Fortran function names occupy the same name space as C
+	names.  Probably there are a number of SPP procedure names which
+	redefine standard C library or other host system names (this has also
+	been a problem with VMS/IRAF so fixing that system will be another
+	benefit of dealing with this here).  The first such name collision
+	found is GETPID.  Since the SPP getpid was calling the host getpid
+	an infinite loop would result.  This is probably what was causing
+	the system to hang up when XC was run earlier.  (01/30)
+
+	Summary of redefined names (to be added to as I locate them):
+
+		getpid
+
+	All such name collisions are handled by remapping the name in iraf.h
+	and libc/xnames.h.
+
+unix/boot/spp/xc.c
+unix/hlib/mkpkg.inc
+	Modified XC to use CC for linking (I was using GCC) and change the
+	"-/t" link flag in mkpkg.inc to "-/Wl,-t", which instructs CC to
+	hand off the flag -t to the linker.  (01/30)
+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	Digging into the A/UX internals to see how A/UX handles the IEEE
+	exceptions I find that a function "initfpu" is called during process
+	startup.  It turns out though, that this function is a no-op!
+	From the assembler it appears that the current version is initfpu(){}.
+	Must be a placeholder for a future version of A/UX when it will be
+	done "right".  No changes to zzstrt/zxwhen yet until I figure out
+	how...  (01/30)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.MF2
+	Uh oh...  Absoft compiler bug, and a troublingly simple one.  The
+	memio$sizeof.x procedure is only one line long:
+
+	    return (ty_size[dtype])
+
+	but the Absoft compiler with default optimization enabled is
+	eliminating most of the code and producing something which does
+	not even use the ty_size array.  Added the file to the mkpkg
+	special file list to be compiled without optimization.  (01/30)
+
+--------
+unix/hlib/mkpkg.sf.MF2
+	On March 27 I finally got a few more hours to play with this port;
+	looked into the next runtime bug in x_system.e.  It turned out to
+	be necessary to recompile file fio$fgetfd.x without optimization.
+	Once again, the bug was disturbing as it did not look like an
+	especially subtle bug.  It looked like the compiler was allocating
+	the same location on the stack in two places and the second reference
+	would overwrite the first.  After working around this one, I tried
+	running x_system.e and it failed again with another startup bug,
+	still trying to execute all the code in clopen.x.  It begins to
+	look bad for the Absoft compiler; if we can't get any further than
+	this I suspect the system will be riddled with optimizer bugs.  (3/29)
+
+--------
+I think it is time to give up on the Absoft compiler, at least for now, and
+try F2C instead.  (4/3)
+
+unix/hlib/irafuser.csh
+unix/hlib/mkpkg.sf.F2C			+
+	Configured for F2C architecture.  (4/3)
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/xnames.h
+unix/hlib/libc/knames.h
+unix/boot/spp/rpp/ratlibc/ratdef.h
+unix/as.mac/zsvjmp.s
+	Restored the trailing underscores, since F2C adheres to this
+	convention.  (4/3)
+
+unix/hlib/iraf.h
+	Commented out the definitions for and,or,not,xor, since F2C uses
+	the SPP versions (which came originally from UNIX f77).  (4/3)
+
+sys/fmtio/ctotok.x
+	Local variable numch never used (this is old code so I don't know
+	why no other compiler has found this).  (4/3)
+
+sys/fmtio/evexpr.y
+sys/fmtio/evexpr.x
+	The second argument (a debug flag) to yyparse (xev_parse) is a
+	boolean, but xev_parse was being called elsewhere with an integer
+	argument.  Changed to a boolean since the Y*cc code contains many
+	if (yydebug) constructs.  (4/3)
+
+sys/etc/main.x
+	FREDIR is a subroutine but was being called as a function in one
+	place in this file.  (4/3)
+
+sys/tty/ttyputl.x
+	This file contained a statement  call putci (fd, "_")  which was
+	incorrect, since the argument "_" is type char but is supposed to
+	be integer.  (4/3)
+
+sys/gio/gopen.x
+	The pointer array graphcap_file was not being used.  (4/3)
+
+sys/pmio/pmplls.x
+	The second call to pl_plls was missing the ll_depth argument.  (4/3)
+
+sys/qpoe/qpppar.x
+	The second call to qp_sizeof was missing an argument.  (4/3)
+
+sys/imfort/bfio.x
+	There was an extra "status" argument to one of the calls to
+	zsttbf.  (4/3)
+
+unix/boot/spp/xc.c
+	Built the CC link time flag "-Wl,-t" directly into XC, since it
+	is needed to link iraf programs and is too much of a nusiance to
+	have to type when XC is used manually.  The flag turns off a linker
+	warning message warning about inconsistent lengths for commons.
+	(4/3)
+
+sys/gio/ncarutil/conran.f
+	Local variable LNGTHS not used.  (4/3)
+
+pkg/plot/crtpict/t_crtpict.x
+	A call to gardwrd was missing the maxch argument. (4/3)
+
+unix/hlib/install
+	1. Had trouble with the $hbin/sgi2* $hlib/sgi2* stuff in MODEFILES.
+	The second did not expand to anything and the string "$hlib/sgi2*"
+	was left in MODEFILES with the * unexpanded, causing problems later
+	when appended to a directory prefix.  Since there are not supposed
+	to be any executables in hlib anyhow I deleted the second reference.
+	2. In the code which checks the MODEFILES, I added a test to see
+	if the file exists as named, before looking for it in each of the
+	directories.  Referencing a nonexistent directory can cause the
+	script to bomb on A/UX (it shouldn't, but it does - a bug in csh).
+	3. Had to change /etc/chown to /bin/chown.  (4/3)
+
+pkg/plot/getdata.x
+	The statement if(nxrows) was incorrect as nxrows is integer.  (4/3)
+
+pkg/xtools/intrp.f
+unix/hlib/mkpkg.sf.F2C
+unix/as/intrp.c			+
+	F2C failed to produce correct C code for this file (which contains
+	multiple ENTRY points).  Hand edited the C version and added it to
+	the special file list.  (4/3)
+
+pkg/dataio/fits/fits_wpixels.x
+unix/hlib/mkpkg.sf.F2C
+unix/as/fits_wpixels.c		+
+	Same bug as above.  (4/3)
+
+pkg/plot/t_graph.x
+	Variable window declared but not used.  (4/3)
+
+pkg/plot/t_velvect.x
+	Variable nset declared but not used.  (4/3)
+
+sys/fmio/fmlfundel.x
+	The two calls to fmio_bind and fmio_errck were both lacking the
+	fm argument.  (5/3)
+
+sys/ki/kireceive.x
+	A call to strcpy was missing an argument.  (5/3)
+
+sys/imio/imopsf.x
+	The call to pl_ssize had an extra unused argument.  (5/3)
+
+sys/etc/pagefiles.x
+	ttyctrl, which is an integer function, was being called as a
+	subroutine.  (5/3)
+
+sys/gio/gopen.x
+	Local string variable graphcap never used.  (5/3)
+
+sys/imio/iki/oif/oifclose.x
+sys/imio/iki/oif/oifdelete.x
+	The integer function protect() was being called as a subroutine.
+	(5/3)
+
+sys/plio/plglr.gx
+	The routine pl_rangerop was being called incorrectly.  (5/3)
+
+sys/plio/plprop.gx
+	The VOPS routine argt (replace if greater than) was being
+	called incorrectly in three places.  (5/3)
+
+sys/plio/plascii.x
+	The subroutine pl_glpi() was being called as a function.  (5/3)
+
+sys/plio/pldebug.x
+	The integer function pl_l2ri() was being called as a subroutine.
+	(5/3)
+
+sys/pmio/pmglp.gx
+	The routine pl_pixrop was being called incorrectly.  (5/3)
+
+sys/qpoe/qpioopen.x
+	A call to syserr was being made where syserrs was intended.  (5/3)
+
+unix/os/zzstrt.c
+	Added a call to "setcompat (COMPAT_BSD)" to be executed upon
+	process startup.  This tells the kernel to use BSD semantics
+	when executing system calls.  This fixed a problem I was having
+	with ZWMSEC, which would result in the process being killed
+	with a SIGALRM when the interval timer interrupted, even though
+	a signal handler had been posted earlier with sigvec.  (5/4)
+
+unix/os/zzstrt.c
+	Here is another problem that, like the previous one, was very
+	indirect and hence difficult to track down.  The time-task feature
+	of iraf, e.g., "$imstat dev$pix", when run for the first time
+	in a new process, would return a clock time such as "-416:+0"
+	instead of "0:13" or whatever.  Thereafter it would be ok, until
+	the process was restarted.  This turned out to be due to the
+	clock time returned by the first call to ZGTIME being wrong.
+	The eventual solution was to add a call to TZSET to zzstrt to
+	initialize the SysV time stuff before any time calculations
+	take place.  What I suspect was happening is that in gmt_to_lst
+	I was accessing "timezone", which is a global data variable in
+	SysV, but the value was being changed sometime later in an
+	indirect call to TZSET.  Using a global variable for something
+	like this that is evidently not constant is a very questionable
+	feature of SVID (unless it is a bug in A/UX).  (5/5)
+
+unix/hlib/mkpkg.sf.F2C
+	It turns out that the A/UX version of bcopy does not work (is
+	destructive) for overlapping arrays, so I had to remove all the
+	entries for amov$t and bytmov from the special file list.  This
+	problem showed up as a segmentation violation in HELP.  (5/5)
+
+	All three of these last bugs were very difficult to track down -
+	essentially, in each case I eventually just guessed what it might
+	be, after tracking the problem down to a region of code.
+
+math/curfit/cvpower.gx
+	Changed a "amovk$t(INDEFR,...)" to "amovk$t(INDEF,...)".  The former
+	causes a real to be passed where a double is expected.  (5/6)
+
+sys/gio/cursor/grccmd.x
+	External pr_psio() declared but never used.  (5/6)
+
+sys/gio/stdgraph/stgclws.x
+	External std_onerror() declared but never used.  (5/6)
+
+sys/libc/qsort.c
+	The static function qst() was being used before being declared,
+	resulting in an extern/static declaration inconsistency.  (5/6)
+
+math/gsurfit/gs_f1deval.gx
+	In the line:   call amulk$t (Mem$t[sx], 2., Mem$t[sx], npts)
+	The real constant "2." was changed to the generic form "2$f".  (5/6)
+
+sys/ki/irafks.x
+        The "task irafks = onentry" was incorrect since ONENTRY is an integer
+        function.  This was harmless since the purpose of the task statement
+        was merely to get an iraf main, but I set up a dummy t_irafks task
+        to avoid the type clash.  (5/6)
+
+pkg/cl/bkg.c
+	Static function bkg_close() used before being declared static.
+	Added a static function declaration to the file header.  (5/6)
+
+pkg/cl/debug.c
+	Same as above, function dd_f().  (5/6)
+
+pkg/cl/edcap.c
+	Same as above, function map_escapes().  (5/6)
+
+pkg/cl/pfiles.c
+	Same as above, function mapname().  (5/6)
+
+pkg/cl/cl.x
+	Same problem as in irafks, above.  ONENTRY is a function and should
+	not be referenced as a subroutine in the task statement.  Added a
+	dummy t_cl procedure to avoid the type clash.  (5/6)
+
+unix/hlib/login.cl
+	The line
+	
+	    if (access ("home$loginuser.cl") cl < "home$loginuser.cl"
+
+	causes the following statement to be ignored if the IF is true.
+	This is a CL bug, but for now the workaround is to add a null
+	statement ; to the line following the IF.  (5/6)
+
+pkg/cl/gram.c
+	dumpparams() modified to write to t_out instead of t_stdout.
+	ccdphot related experiment.  (6/21)
+
+------------------
+Rebuilt HSI with VOS facilities.  (7/19)
+Started build of NOAO packages.  (7/20)
+
+unix/hlib/irafuser.csh
+	Added "-Wl,-t" to the HSI_CF flags.  This gets rid of a linker
+	warning about xercom changing size.  (7/20)
+
+--------------------
+System upgraded to V2.10.  Started with the SunOS version of the system
+from tucana, merged A/UX stuff back in, which many minor changes.  (10/01)
+
+unix/hlib/irafuser.csh
+	Added -traditional to the GCC flags, to avoid some problems
+	in the A/UX system includes, probably introduced in the upgrade to
+	A/UX 2.0.1.  (10/02)
+
+lib/libex.a
+	After the sysgen I had to do a "ar ts" on this file to regenerate
+	the symbol table; not clear why this library and no other.  Until
+	the reason is clear, no action.  (10/02)
+
+	[This appears to be a bug in AR; it is failing to properly generate
+	[the symbol table for very large libraries.  A manual "ar ts" seems
+	[to fix the problem, but this bug will cause problems with a sysgen.]
+
+sys/gio/ncarutil/pwrity.f
+	Unused variable LEN on line 335.  (10/02)
+
+sys/gio/ncarutil/pwrzi.f
+sys/gio/ncarutil/pwrzs.f
+sys/gio/ncarutil/pwrzt.f
+	Variables HIGH,WIDE,WHITE, and LNGTH not used (same problem in
+	all three files).  (10/02)
+
+math/gsurfit/mkpkg
+	Contained a statement $ifeq (USE_GENERIC, YES) which was incorrect,
+	as a lower case "yes" is required since $ifeq uses a simple string
+	comparison.  (10/02)
+
+math/nlfit/nlzero.gx
+	Multiple problems; two calls to aclr had an extra argument, but
+	invalid pointer references too.  (10/02)
+
+mkpkg
+	The special file list wasn't being used; this was traced to the
+	use of a symbol link to the iraf root directory.  One cannot
+	reference the iraf root via a link or directory path comparisons
+	will fail.  (10/03)
+
+sys/fio/fntgfn.x
+	A pattern such as "*%" would match all filenames, a potentially
+	disastrous feature if used, say, to delete host filenames containing
+	the % character.  % is dangerous because it is just another character
+	in a unix filename, but in iraf it is one of the the pattern
+	matching metachacters (substring editing).  The filename template
+	code was modified to 1) require at least two unescaped % characters
+	in a pattern for the % to be recognized as a metacharacter, and
+	2) to allow the % character to be escaped (the code was supposed
+	to do this but it was only partially implemented).  (10/14)
+
+----------------------------------------------------------------------
+Summer 1992 - Mac system upgraded to A/UX 3.0.  New versions of F2C and GCC
+installed.  V2.10 upgrade resumed Oct 13-14 1992.  There were a number of
+minor changes most of which are probably not worth recording here.  The
+main changes were to "f77" and "xc".  f77 is a script in /usr/local/bin
+which calls f2c and gcc to act as a Fortran compiler.  This was tuned to
+improve the integration of f2c and gcc.  XC was modified to support gcc
+better, e.g. omit .o files from compiles to avoid annoying gcc warnings,
+use gcc rather than cc for linking, search the right directories, etc.
+The new version of GCC (2.2.1) is quite a bit changed from what I used
+last year.  I had to make one bug fix to cpp to get source level debugging
+to work for .f files compiled with f77/f2c/gcc.
+
+diff/merged the HSI and did a fresh bootstrap, pretty routine.  (10/13)
+installed and built tables and noao.  (10/13-14)
+diff/merged the DEV directory.  (10/14)
+
+unix/hlib/install
+	Changed the code which checks the ownership and permissions of alloc.e.
+	On a/ux, ls -l prints the group by default, and this was causing the
+	old string comparison to fail.  (11/21/92)
+
+unix/os/zfioks.c
+unix/os/zfiotx.c
+	Changed some TCSETAF ioctl's to TCSETAW ioctl's.  The TCSETAF ioctl
+	claims to flush the output buffer before changing the terminal driver
+	settings, but output data was being lost.  Using TCSETAW appears to
+	avoid this problem.   (01/13 1993)
+
+unix/hlib/iraf.h
+unix/hlib/libc/spp.h
+	Changed the values of INDEFR and INDEFD to the following.
+
+	    INDEFR	3.4e38 
+	    INDEFD	1.7d308
+
+	and IS_INDEFR and IS_INDEFD were changed to
+
+	    IS_INDEFR	(($1) > 3.3e38)
+	    IS_INDEFD	(($1) > 1.6d308)
+
+	This was necessary as the floating point equality tests used to
+	check for INDEF were failing using F2C/GCC.  (01/15 1993)
+
+math/iminterp/arbpix.x
+math/interp/arbpix.x
+noao/astutil/t_setairmass.x
+noao/digiphot/photcal/evaluate/phprint.x
+noao/mtlocal/cyber/cykeywords.x
+noao/mtlocal/cyber/t_ridsfile.x
+noao/onedspec/ecidentify/ecline.x
+noao/onedspec/irsiids/t_bswitch.x
+noao/onedspec/irsiids/t_flatdiv.x
+noao/onedspec/irsiids/t_flatfit.x
+noao/onedspec/irsiids/t_sums.x
+noao/twodspec/apextract/peaks.x
+noao/twodspec/multispec/fitclean.x
+noao/twodspec/multispec/fitsmooth.x
+noao/twodspec/multispec/intgauss5.x
+noao/twodspec/multispec/peaks.x
+noao/twodspec/multispec/solve.x
+noao/twodspec/multispec/t_fitfunc.x
+pkg/bench/xctest/lintran.x
+pkg/images/lib/sigl2.x
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/iis/src/sigl2.x
+pkg/lists/lintran.x
+pkg/plot/crtpict/sigl2.x
+pkg/proto/t_imscale.x
+sys/clio/clgeti.x
+sys/clio/clgetl.x
+sys/clio/clgetr.x
+sys/clio/clgets.x
+sys/clio/clglpi.x
+sys/clio/clglpl.x
+sys/clio/clglpr.x
+sys/clio/clglps.x
+sys/clio/clputi.x
+sys/gio/calcomp/t_calcomp.x
+	The above files were modified to replace "equals-INDEF" style
+	constructs with "IS_INDEF" constructs.  (01/15)
+
+unix/hlib/install
+	Added a number of "rm -f $TEMP" statements to delete any old $TEMP
+	files before attempting to create new ones.  (2/01)
+
+unix/os/zzstrt.c
+        Added #ifdef AUX code to enable the IEEE exceptions in the 68882.
+        There is no A/UX support for this so it had to be done in assembler
+        by writing to the FP control register.  (3/09 1993)
+
+unix/os/zxwhen.c
+        Added #ifdef AUX code to decode SIGFPE and print error messages
+        appropriate to the exception.  There is no A/UX support for this so
+        it was necessary to write assembler to read the FP status register
+        and test which exception occurred.  (3/09)

@@ -1,0 +1,11 @@
+# SEEPSF task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpmkimage.x	<imhdr.h>		../lib/daophotdef.h
+ 	t_seepsf.x	<fset.h>
+	;

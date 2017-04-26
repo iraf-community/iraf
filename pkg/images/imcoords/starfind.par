@@ -1,0 +1,25 @@
+# STARFIND
+
+image,f,a,,,,Input image
+output,f,a,default,,,Output star list
+hwhmpsf,r,a,1.0,,,HWHM of the PSF in pixels
+threshold,r,a,100.0,0.0,,Detection threshold in ADU
+datamin,r,h,INDEF,,,Minimum good data value in ADU
+datamax,r,h,INDEF,,,Maximum good data value in ADU
+fradius,r,h,2.5,1.0,,Fitting radius in HWHM
+sepmin,r,h,5.0,1.0,,Minimum separation in HWHM
+npixmin,i,h,5,5,,Minimum number of good pixels above background
+maglo,r,h,INDEF,,,Lower magnitude limit
+maghi,r,h,INDEF,,,Upper magnitude limit
+roundlo,r,h,0.0,0.0,,Lower ellipticity limit
+roundhi,r,h,0.2,0.0,1.0,Upper ellipticity limit
+sharplo,r,h,0.5,,,Lower sharpness limit
+sharphi,r,h,2.0,,,Upper sharpness limit
+wcs,s,h,"",,,"World coordinate system (logical,physical,world)"
+wxformat,s,h,"",,,The x axis world coordinate format
+wyformat,s,h,"",,,The y axis world coordinate format
+boundary,s,h,nearest,"|nearest|constant|reflect|wrap",,"Boundary extension (nearest,constant,reflect,wrap)"
+constant,r,h,0.0,,,Constant for constant boundary extension
+nxblock,i,h,INDEF,,,X dimension of working block size in pixels
+nyblock,i,h,256,,,Y dimension of working block size in pixels
+verbose,b,h,no,,,Print messages about the progress of the task

@@ -1,0 +1,36 @@
+.help asigetr Dec98 asigetr.hlp
+.ih
+NAME
+asigetr -- fetch an asi integer parameter
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+value = asigetr (asi, param)
+
+.nf
+    pointer	asi		#I interpolant descriptor
+    int		param		#I parameter
+.fi
+.ih
+ARGUMENTS
+.ls asi      
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls param
+The parameter to be fetched. The choices are: II_ASIBADVAL the undefined
+pixel value for the drizzle interpolant. The parameter definitions are
+contained in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+ASIGETR is used to set the value of undefined drizzle interpolant pixels.
+Undefined pixels are those for which the interpolation coordinates do not
+overlap the input coordinates, but are still, within the boundaries of the input
+image, a situation which may occur when the pixel fraction is < 1.0.
+.ih
+NOTES
+.ih
+SEE ALSO
+asiinit, asisinit, asigeti
+.endhelp

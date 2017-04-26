@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE VOTABLE SYSTEM "http://us-vo.org/xml/VOTable.dtd">
+
+<VOTABLE>
+  <RESOURCE type="results">
+  <PARAM value="202.468,47.1947"         name="INPUT:POS">
+    <DESCRIPTION>Center of image to be generated</DESCRIPTION></PARAM>
+  <PARAM value="0.1"        name="INPUT:SIZE">
+    <DESCRIPTION>Size of image in degrees, use 0 to get default</DESCRIPTION></PARAM>
+  <PARAM value="Image/FITS,Image/JPEG"      name="INPUT:FORMAT">
+    <DESCRIPTION>Output format requested</DESCRIPTION></PARAM>
+  <PARAM value="300,300"      name="INPUT:NAXIS">
+    <DESCRIPTION>Number of pixels in image, use 0 to get default sized pixels (SIZE>0)</DESCRIPTION></PARAM>
+  <PARAM value="Tan"  name="INPUT:PROJ">
+    <DESCRIPTION>Map Projection</DESCRIPTION></PARAM>
+  <PARAM value="ICRS" name="INPUT:CFRAME">
+    <DESCRIPTION>Coordinate system</DESCRIPTION></PARAM>
+  <PARAM value="2000" name="INPUT:EQUINOX">
+    <DESCRIPTION>Equinox (for FK4 and FK5)</DESCRIPTION></PARAM>
+  <PARAM value="Clip"     name="INPUT:INTERPOLATION">
+    <DESCRIPTION>Sampler: NN, LI, Clip, Lanczos, Spline</DESCRIPTION></PARAM>
+  <PARAM         name="INPUT:big">
+    <DESCRIPTION>Include very large images</DESCRIPTION></PARAM>
+  <PARAM       name="INPUT:small">
+    <DESCRIPTION>Include small (less than 5x5 pixel) images</DESCRIPTION></PARAM>
+    
+  <TABLE>
+    
+    <FIELD name="Survey"      ucd="VOX:Image_Title"    datatype="char"   arraysize="*"/>
+    <FIELD name="Ra"          ucd="POS_EQ_RA_MAIN"     datatype="double"/>
+    <FIELD name="Dec"         ucd="POS_EQ_DEC_MAIN"    datatype="double"/>
+    <FIELD name="Dim"         ucd="VOX:Image_Naxes"    datatype="int"/>
+    <FIELD name="Size"        ucd="VOX:Image_Naxis"    datatype="int"    arraysize="*"/>
+    <FIELD name="Scale"       ucd="VOX:Image_Scale"    datatype="double" arraysize="*"/>
+    <FIELD name="Format"      ucd="VOX:Image_Format"   datatype="char"   arraysize="*"/>
+    <FIELD name="PixFlags"    ucd="VOX:Image_PixFlags" datatype="char"   arraysize="*"/>
+    <FIELD name="URL"         ucd="VOX:Image_AccessReference" datatype="char" arraysize="*"/>
+    <FIELD name="LogicalName" ucd="VOX:LogicalName"    datatype="char"   arraysize="*"/>
+    <DATA>
+    <TABLEDATA>
+<TR><TD>dss</TD><TD>202.468</TD><TD>47.1947</TD><TD>2</TD><TD>300 300</TD><TD>-3.333333333333334E-4 3.333333333333334E-4</TD><TD>image/fits</TD><TD>F</TD><TD><![CDATA[http://skyview.gsfc.nasa.gov/cgi-bin/images?position=202.468%2C47.1947&survey=dss&pixels=300%2C300&sampler=Clip&size=0.10000000000000002%2C0.10000000000000002&projection=Tan&coordinates=J2000.0&return=FITS]]></TD>
+<TD>1</TD></TR>
+<TR><TD>dss</TD><TD>202.468</TD><TD>47.1947</TD><TD>2</TD><TD>300 300</TD><TD>-3.333333333333334E-4 3.333333333333334E-4</TD><TD>image/jpeg</TD><TD>F</TD><TD><![CDATA[http://skyview.gsfc.nasa.gov/cgi-bin/images?position=202.468%2C47.1947&survey=dss&pixels=300%2C300&sampler=Clip&size=0.10000000000000002%2C0.10000000000000002&projection=Tan&coordinates=J2000.0&nofits=1&quicklook=jpeg&return=jpeg]]></TD>
+<TD>1</TD></TR>
+</TABLEDATA></DATA></TABLE>
+<INFO name="QUERY_STATUS" value="OK" />
+</RESOURCE></VOTABLE>

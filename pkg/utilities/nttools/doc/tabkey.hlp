@@ -1,0 +1,68 @@
+.help tabkey Nov91 tables
+.ih
+NAME
+tabkey -- Copy a table element to a header keyword.
+.ih
+USAGE
+tabkey table column row output keyword
+.ih
+DESCRIPTION
+This task copies the value of a table element to a header 
+keyword in either a table
+or an image. If the table element and the header keyword are of different
+data types, this task will convert the type.
+An error will occur if any attempt is made
+to copy an undefined table element to a header keyword. If the value of
+the task parameter 'add' is "yes", the task will allow you to add a new
+keyword to the header, otherwise, adding a new keyword will cause an
+error.
+.ih
+PARAMETERS
+.ls table [file name]
+Name of table containing the element to be copied.  The particular element
+is defined by the 'column' and 'row' parameters.
+.le
+.ls column [string]
+Name of column. (Column names are not case sensitive.)
+.le
+.ls row [integer, min=1, max=INDEF]
+Row number.
+.le
+.ls output [file name]
+Name of the file with the header keyword whose value is to be changed.
+.le
+.ls keyword [string]
+Name of header keyword. (Header keyword names are not case sensitive.)
+.le
+.ls (add = no) [boolean]
+Allow new keywords to be added to the header?
+If 'add = no', then only existing header keywords can be modified--an error
+will occur if a keyword is specified that does not already exist.
+.le
+.ih
+EXAMPLES
+1. Copy the first component name (i.e., row 1 of column 'COMPNAME'
+from the file 'graph.tab' to the header of the
+table 'thruput.tab'.  If the keyword does not already exist, then add
+it:
+
+.nf
+tt> tabkey graph.tab COMPNAME 1 thruput.tab COMPNAME add+
+.fi
+
+2. Copy the date of the tenth observation (i.e., row 10 of column 'DATE')
+from the file 'schedule.tab' to the
+header keyword 'DATE' in 'image.hhh'. The keyword 'DATE' must already exist:
+
+.nf
+tt> tabkey schedule.tab DATE 10 image.hhh date
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+keypar, keytab, parkey, partab, tabpar
+.endhelp

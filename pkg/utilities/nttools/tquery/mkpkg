@@ -1,0 +1,13 @@
+# Update the tquery application code in the ttools package library
+# Author: B.Simon, 21-DEC-87
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	doquery.x      		
+	tquery.x		<tbset.h>       		
+	wquery.x       		<tbset.h> 
+	;

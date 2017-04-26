@@ -1,0 +1,22 @@
+# The FITPARAMS parameter file
+
+observations,f,a,"",,,List of observations files
+catalogs,f,a,"",,,List of standard catalog files
+config,f,a,"",,,Configuration file
+parameters,f,a,"",,,Output parameters file
+weighting,s,h,"uniform","|uniform|photometric|equations|",,"Weighting type (uniform,photometric,equations)"
+addscatter,b,h,yes,,,Add a scatter term to the weights ?
+tolerance,r,h,3.0e-5,0.0,,Fit convergence tolerance
+maxiter,i,h,15,4,,Maximum number of fit iterations
+nreject,i,h,0,0,,Number of rejection iterations
+low_reject,r,h,3.0,0.0,,Low sigma rejection factor
+high_reject,r,h,3.0,0.0,,High sigma rejection factor
+grow,r,h,0.0,0.0,,Rejection growing radius
+interactive,b,h,yes,,,Solve fit interactively ?
+logfile,f,h,"STDOUT",,,Output log file
+log_unmatched,b,h,yes,,,Log any unmatched stars ?
+log_fit,b,h,no,,,Log the fit parameters and statistics ?
+log_results,b,h,no,,,Log the results ?
+catdir,s,h,")_.catdir",,,The standard star catalog directory
+graphics,s,h,"stdgraph",,,Output graphics device
+cursor,*gcur,h,"",,,Graphics cursor input

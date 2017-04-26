@@ -1,0 +1,75 @@
+.help mkhelpdb Feb89 softools
+.ih
+NAME
+mkhelpdb -- update the help database
+.ih
+USAGE
+mkhelpdb helpdir helpdb
+.ih
+PARAMETERS
+.ls helpdir = "lib$root.hd"
+The filename of the root help directory file (".hd" file) defining the
+help tree to be updated.  By convention this is \fIroot.hd\fR in some
+directory.
+.le
+.ls helpdb = "lib$helpdb.mip"
+The filename of the help database file to be written.  By convention this
+is \fIhelpdb.mip\fR in some directory (the ".mip" signifies that the file
+format is machine independent).
+.le
+.ls verbose = no
+If this switch is enabled, \fImkhelpdb\fR will print a detailed description
+of the help database as it is being compiled.  A more concise summary listing
+only the packages and the number of help modules in each package is printed
+by default.
+.le
+.ih
+DESCRIPTION
+The \fImkhelpdb\fR task descends a tree of help directory (".hd") files and
+compiles a binary help database from the information therein.  The help
+database is used to speed global searches when help is requested for a
+module, the ".hlp" file for which might be anywhere in the system.
+The help database defines the packages and modules in the help database,
+and stores the filenames of the associated help files.  No actual help text
+is stored in the help database, only sufficient index information to find
+the help files when the \fIhelp\fR task is run.  The help directory files
+are text files which define the packages and modules in the help database.
+The format of these files is self explanatory hence is documented by example
+only.
+
+By default, \fImkhelpdb\fR recompiles the standard IRAF help database,
+although any other similar database may be recompiled by changing the values
+of the parameters \fIhelpdir\fR and \fIhelpdb\fR.  The standard
+IRAF help database is rooted in the file \fBlib$root.hd\fR.
+
+The help database must be updated whenever a new help module (e.g., manual
+page) is added, deleted, or renamed.  It is also necessary for sites receiving
+a source only version of IRAF to run \fImkhelpdb\fR to rebuild the help
+database once the system is up, since the database is a binary file and
+is not included in a source only distribution.  It is not necessary to rerun
+\fImkhelpdb\fR when an existing manual page is edited, since only index
+information is stored in the database.
+
+The \fIhelp\fR utilities make use of the following types of files.  Examples
+of these files will be found throughout the IRAF directories.
+
+.nf
+	.hd		help directory file (tree structured)
+	.hlp		manual page
+	.men		package menu (module listing)
+.fi
+.ih
+EXAMPLES
+1. Update the standard IRAF help database.
+
+.nf
+	cl> softools
+	so> mkhelpdb helpdir=lib$root.hd helpdb=lib$helpdb.mip
+.fi
+
+2. Update the NOAO package help database.
+
+	so> mkhelpdb helpdir=noao$lib/root.hd helpdb=noao$lib/helpdb.mip
+.ih
+SEE ALSO
+hdbexamine, help

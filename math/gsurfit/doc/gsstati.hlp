@@ -1,0 +1,35 @@
+.help gsstati Aug85 "Gsurfit Package"
+.ih
+NAME
+include <math/gsurfit.h>
+
+gsstati -- get integer parameter
+.ih
+SYNOPSIS
+ival = gsstati (sf, parameter)
+
+.nf
+pointer	sf		# surface descriptor
+int	parameter	# integer parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+The pointer to the surface descriptor structure.
+.le
+.ls parameter
+Parameter to be returned. The options are GSTYPE, GSXORDER, GSYORDER,
+GSNXCOEFF, GSNYCOEFF, and GSNSAVE. The parameter definitions are
+found in the package header file math/gsurfit.h.
+.le
+.ih
+DESCRIPTION
+The values of the integer parameters are returned. The parameters include
+the surface_type, the x and y orders, the number of x and y coefficients
+and the length of the buffer required by GSSAVE.
+.ih
+NOTES
+.ih
+SEE ALSO
+gsstatr
+.endhelp

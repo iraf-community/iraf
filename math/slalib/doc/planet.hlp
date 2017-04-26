@@ -1,0 +1,130 @@
+.help planet Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPLNT (DATE, NP, PV, JSTAT)
+
+     - - - - - - -
+      P L N T
+     - - - - - - -
+
+  Approximate heliocentric position and velocity of a specified
+  major planet.
+
+  Given:
+     DATE      d      Modified Julian Date (JD - 2400000.5)
+     NP        i      planet (1=Mercury, 2=Venus, 3=EMB ... 9=Pluto)
+
+  Returned:
+     PV        d(6)   heliocentric x,y,z,xdot,ydot,zdot, J2000
+                                           equatorial triad (AU,AU/s)
+     JSTAT     i      status: +1 = warning: date out of range
+                               0 = OK
+                              -1 = illegal NP (outside 1-9)
+                              -2 = solution didn't converge
+
+  Called:  slPLNE
+
+  Notes
+
+  1  The epoch, DATE, is in the TDB timescale and is a Modified
+     Julian Date (JD-2400000.5).
+
+  2  The reference frame is equatorial and is with respect to the
+     mean equinox and ecliptic of epoch J2000.
+
+  3  If an NP value outside the range 1-9 is supplied, an error
+     status (JSTAT = -1) is returned and the PV vector set to zeroes.
+
+  4  The algorithm for obtaining the mean elements of the planets
+     from Mercury to Neptune is due to J.L. Simon, P. Bretagnon,
+     J. Chapront, M. Chapront-Touze, G. Francou and J. Laskar
+     (Bureau des Longitudes, Paris).  The (completely different)
+     algorithm for calculating the ecliptic coordinates of Pluto
+     is by Meeus.
+
+  5  Comparisons of the present routine with the JPL DE200 ephemeris
+     give the following RMS errors over the interval 1960-2025:
+
+                      position (km)     speed (metre/sec)
+
+        Mercury            334               0.437
+        Venus             1060               0.855
+        EMB               2010               0.815
+        Mars              7690               1.98
+        Jupiter          71700               7.70
+        Saturn          199000              19.4
+        Uranus          564000              16.4
+        Neptune         158000              14.4
+        Pluto            36400               0.137
+
+     From comparisons with DE102, Simon et al quote the following
+     longitude accuracies over the interval 1800-2200:
+
+        Mercury                 4"
+        Venus                   5"
+        EMB                     6"
+        Mars                   17"
+        Jupiter                71"
+        Saturn                 81"
+        Uranus                 86"
+        Neptune                11"
+
+     In the case of Pluto, Meeus quotes an accuracy of 0.6 arcsec
+     in longitude and 0.2 arcsec in latitude for the period
+     1885-2099.
+
+     For all except Pluto, over the period 1000-3000 the accuracy
+     is better than 1.5 times that over 1800-2200.  Outside the
+     period 1000-3000 the accuracy declines.  For Pluto the
+     accuracy declines rapidly outside the period 1885-2099.
+     Outside these ranges (1885-2099 for Pluto, 1000-3000 for
+     the rest) a "date out of range" warning status (JSTAT=+1)
+     is returned.
+
+  6  The algorithms for (i) Mercury through Neptune and (ii) Pluto
+     are completely independent.  In the Mercury through Neptune
+     case, the present SLALIB implementation differs from the
+     original Simon et al Fortran code in the following respects.
+
+     *  The date is supplied as a Modified Julian Date rather
+        than a Julian Date (MJD = JD - 2400000.5).
+
+     *  The result is returned only in equatorial Cartesian form;
+        the ecliptic longitude, latitude and radius vector are not
+        returned.
+
+     *  The velocity is in AU per second, not AU per day.
+
+     *  Different error/warning status values are used.
+
+     *  Kepler's equation is not solved inline.
+
+     *  Polynomials in T are nested to minimize rounding errors.
+
+     *  Explicit double-precision constants are used to avoid
+        mixed-mode expressions.
+
+     *  There are other, cosmetic, changes to comply with
+        Starlink/SLALIB style guidelines.
+
+     None of the above changes affects the result significantly.
+
+  7  For NP=3 the result is for the Earth-Moon Barycentre.  To
+     obtain the heliocentric position and velocity of the Earth,
+     either use the SLALIB routine slEVP or call slDMON and
+     subtract 0.012150581 times the geocentric Moon vector from
+     the EMB vector produced by the present routine.  (The Moon
+     vector should be precessed to J2000 first, but this can
+     be omitted for modern epochs without introducing significant
+     inaccuracy.)
+
+  References:  Simon et al., Astron. Astrophys. 282, 663 (1994).
+               Meeus, Astronomical Algorithms, Willmann-Bell (1991).
+
+  P.T.Wallace   Starlink   27 May 1997
+
+  Copyright (C) 1997 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

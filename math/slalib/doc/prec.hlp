@@ -1,0 +1,53 @@
+.help prec Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPREC (EP0, EP1, RMATP)
+
+     - - - - -
+      P R E C
+     - - - - -
+
+  Form the matrix of precession between two epochs (IAU 1976, FK5)
+  (double precision)
+
+  Given:
+     EP0    dp         beginning epoch
+     EP1    dp         ending epoch
+
+  Returned:
+     RMATP  dp(3,3)    precession matrix
+
+  Notes:
+
+     1)  The epochs are TDB (loosely ET) Julian epochs.
+
+     2)  The matrix is in the sense   V(EP1)  =  RMATP * V(EP0)
+
+     3)  Though the matrix method itself is rigorous, the precession
+         angles are expressed through canonical polynomials which are
+         valid only for a limited time span.  There are also known
+         errors in the IAU precession rate.  The absolute accuracy
+         of the present formulation is better than 0.1 arcsec from
+         1960AD to 2040AD, better than 1 arcsec from 1640AD to 2360AD,
+         and remains below 3 arcsec for the whole of the period
+         500BC to 3000AD.  The errors exceed 10 arcsec outside the
+         range 1200BC to 3900AD, exceed 100 arcsec outside 4200BC to
+         5600AD and exceed 1000 arcsec outside 6800BC to 8200AD.
+         The SLALIB routine slPREL implements a more elaborate
+         model which is suitable for problems spanning several
+         thousand years.
+
+  References:
+     Lieske,J.H., 1979. Astron.Astrophys.,73,282.
+      equations (6) & (7), p283.
+     Kaplan,G.H., 1981. USNO circular no. 163, pA2.
+
+  Called:  slDEUL
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

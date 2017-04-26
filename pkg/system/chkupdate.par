@@ -1,0 +1,5 @@
+interval,i,h,0,,,Days between update checks (-1 to disable or 0 for always)
+ref_file,s,h,"iraf$.release_date",,,reference file for times
+release,s,h,)_.release,,,IRAF release version
+baseurl,s,h,"http://iraf.noao.edu/ftp",,,base URL to release timestamp directory
+verbose,b,h,yes,,,verbose output flag

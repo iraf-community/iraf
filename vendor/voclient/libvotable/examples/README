@@ -1,0 +1,15 @@
+
+This directory contains example programs using the libvotable interface.
+These tasks are meant to be useful and tutorial in how to use the API to
+do common things.
+
+Current Tasks:
+
+    votconcat		Concatenate RESOURCES into a single VOTable
+    votcomp		Remove pretty-print whitespace from a VOTable
+    votdump		Dump a VOTable in another format
+    votget		Extract image access references and download
+    votlint		Check a VOTable for correctness
+    votinfo		Print information about the structure of a VOTable
+    votpos		Extract position information from a VOTable
+    votsplit		Split RESOURCEs from a VOTable to single VOTables

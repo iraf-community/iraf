@@ -1,0 +1,66 @@
+# STRIP.IRAF -- Rmfiles command script, used to strip the IRAF system down to
+# its bare essentials (for a production version of the system).  The RMFILES
+# program which reads this must be run from the IRAF root directory.
+
+  unix/as.linux		-all
+  unix/as.linux64	-all
+  unix/as.i386		-all
+  unix/as.mc68020	-all
+  unix/as.rs6000	-all
+  unix/as.sparc		-all
+  unix/as.ssol		-all
+  unix/as.vax		-all
+  unix/boot		-allbut .hlp .hd
+  unix/gdev		-all
+  unix/os		-all
+  unix/mc68000		-all
+  unix/portkit		-all
+  unix/shlib		-all
+  unix/sun		-all
+
+  dev			-only .dat
+  doc			-allbut .hlp
+  math			-all
+  pkg			-allbut .hlp .hd .men .cl .par .key .dat .mip
+  pkg/bench		-all
+  sys			-all
+
+-file unix/hlib/libcalcomp.a
+-file pkg/dataio/fits/structure.hlp
+-file pkg/images/imcalc/Imcalc.hlp
+-file pkg/images/tv/iis/ids/doc/Imdis.hlp
+-file pkg/images/tv/doc/Tv.hlp
+-file pkg/lists/doc/Lcalc.hlp
+-file pkg/lists/doc/Lists.hlp
+-file pkg/system/doc/Sys.hlp
+-file pkg/system/doc/Sys_intro.hlp
+-file pkg/system/help/design.hlp
+-file tags
+
+-file bin.alpha/OBJS.arc.Z
+-file bin.ddec/OBJS.arc.Z
+-file bin.f2c/OBJS.arc.Z
+-file bin.f68881/OBJS.arc.Z
+-file bin.ffpa/OBJS.arc.Z
+-file bin.hp300/OBJS.arc.Z
+-file bin.hp700/OBJS.arc.Z
+-file bin.hp800/OBJS.arc.Z
+-file bin.i386/OBJS.arc.Z
+-file bin.irix/OBJS.arc.Z
+-file bin.mips/OBJS.arc.Z
+-file bin.rs6000/OBJS.arc.Z
+-file bin.sf2c/OBJS.arc.Z
+
+-file bin.sparc/OBJS.arc.Z
+-file bin.ssun/OBJS.arc.Z
+
+-file bin.redhat/OBJS.arc.Z
+-file bin.linux/OBJS.arc.Z
+-file bin.linux64/OBJS.arc.Z
+-file bin.macosx/OBJS.arc.Z
+-file bin.macintel/OBJS.arc.Z
+-file bin.cygwin/OBJS.arc.Z
+-file bin.freebsd/OBJS.arc.Z
+-file bin.sunos/OBJS.arc.Z
+-file bin.linuxppc/OBJS.arc.Z
+

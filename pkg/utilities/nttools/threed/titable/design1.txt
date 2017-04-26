@@ -1,0 +1,224 @@
+
+
+             Design of 3-D table insertion task
+             ----------------------------------
+
+
+ Author: I. Busko
+
+
+ Revision history:
+ 12/16/96  -  First version.
+
+
+
+
+1. Specifications / requirements:
+
+This task will perform the inverse operation performed by task txtable.
+It will insert (in the tainsert task sense) one or more 2-D tables into 
+rows of a 3-D table. Alternatively, it will create a 3-D table from the
+2-D input tables. Each column in the input 2-D table is inserted as an 
+array into a single cell at the specified row in the output table. 
+Additional scalar columns, stored in the headers of the input table by 
+txtable, will also be processed.
+
+This design proposes a first, non-sophisticated version of the task. The
+emphasis is on simplicity rather than providing support for all possible
+situations. For instance, what to do if the size of a given column in one 
+of the input tables is larger than the corresponding array size in an 
+existing output table ? Throw away extra elements ? Resize output table ? 
+But what rules to follow in order to fill back the now resized arrays ? This 
+design will solve problems like these by resorting to the simplest (from the 
+code viewpoint) solution (in this case, just ignore the extra elements).
+
+If the output table does not exist, the first input table in the list
+will define both the column information for the output table, as well as
+its maximum array size. Columns in the input and output table will be
+matched by column name. If a given column in an input table does not exist 
+in a previously existing output table, it will be ignored.
+
+The task will be named "titable" following a former proposal for naming
+the 3-D table utilities.
+
+
+
+2. Language:
+
+SPP, to allow the use of the generic datatype compiling facility, and to
+reuse significant amounts of code already developed for txtable, tximage
+and tainsert.
+
+
+
+3. Task parameters:
+
+Name     Type                  What
+
+input    file list/template   list of 2D table names with optional 
+                               row/column bracket selectors.
+output   file name            3-D table name with no row/column selectors
+                               (modified in place or created from scratch).
+row      int                   row in output table where to begin insertion.
+
+
+
+4. Data structures:
+
+The main data structures are two pointer-type column descriptor arrays, in 
+the sense defined by the tcs_ routines in the selector library. One array 
+is associated with the output table, and the other array is associated 
+with the current input table. 
+
+The output table array is sized to store column information from both the 
+actual columnar data in the input tables, as well as any scalar data 
+stored in the input table headers by the txtable task. If the output table 
+already exists, it will define the array size and contents completely. 
+If it is being created by the task, the first input table in the list will 
+define the size and content of the output descriptor array. Thus if other 
+tables in the input list have additional columns (both physical or in the 
+form of header-stored scalars), these additional columns will be ignored.
+
+
+
+5. Code structure:
+
+The listing below shows only the most important subroutines; lower-level 
+functions such as decoding header keywords are not explicited.
+
+The first section deals with creating the main column descriptor array
+for the output table. If the table does not exist, column information
+must be read from the input table columns themselves AND from eventual
+scalar columns stored in the header by txtable.
+
+The second section scans the input list and performs the actual insertion
+operation. Again, a separate piece of code exists for the cases where a
+physical column exists in the input table, or an header-stored scalar
+instead. The innermost loop takes care of reading only the selected rows 
+from the input table.
+
+- Read task parameters (clget).
+- Alloc work memory (malloc, calloc).
+- Strip output name from eventual bracket selectors (rdselect).
+- Open input list (imtopen).
+- If output table already exists (access).
+   **> Procedure TIUPDATE:
+     - Open output table (tbtopn).
+     - Create array of column pointers from output table (malloc, tcs_open).
+   **> End TIUPDATE.
+- Else
+   **> Procedure TINEW:
+      - Get first table name from input list (imtgetim).
+      - Check if it is a table (whatfile). Exit if not.
+      - Break name into bracketed selectors (rdselect).
+      - Open input table (tbtopn).
+      - Get its total (selected and unselected) number of rows (tbpsta).
+
+      - Scalars in input table are signaled by TCTOTAL keyword in input table 
+        header. Look for it (tbhfkr) and increase number of output columns by 
+        the value of TCTOTAL.
+
+      - Create array of column pointers from input column selector and TCTOTAL
+        info (malloc, tcs_open).
+      - If no columns were matched, and no TCTOTAL keyword was found, exit.
+      - Open output table (no STDOUT allowed) (tbtopn).
+      **> Procedure TISETC:
+         - Loop over input column pointer array, if it exists.
+            - Copy column information from input to output (tbcinf, tbcdef), 
+               setting the output array size to be the input number of rows.
+         - End loop.
+         - Loop over all possible keyword sets (from 1 to TCTOTAL).
+            - Look for TCD_xxx keyword (tbhfkr).
+            - If found: 
+               - Decode TCD keyword into column data (name, datatype, format)
+               - Create scalar column in output table's column array (tbcdef).
+            - End if.
+         - End loop.
+      **> End TISETC:
+      - Create output table (tbtcre).
+      - Close input table (tbtclo).
+      - Rewind input list (imtrew).
+   **> End TINEW:
+- End if.
+- Initialize row counter with "row" parameter value (clgeti). Set flag if row
+  parameter is negative or INDEF.
+**> Procedure TINSERT:
+   - Loop over input list (imtlen).
+      - Get table name (imtgetim).
+      - Check if it is a table (whatfile). Skip and warn user if not.
+      - Break name into bracketed selectors (rdselect).
+      - Open input table (tbtopn).
+      - Look for ORIG_ROW keyword (tbhfkr). If found, and if "row" parameter
+        is negative or INDEF, supersede row counter with keyword value.
+      - Find how many rows were requested by row selector (trsopen, trseval,
+        trsclose).
+      - Create array of column pointers from column selector. If no columns 
+        were matched, exit (malloc, tcs_open).
+      **> Procedure TICOPY:
+         - Loop over output table column pointers.
+            - Get column info from output table (tcs_column, tbcinf)
+            - loop over input table column pointers.
+               - Get column info from input table (tcs_column, tbcinf)
+               - If column names match:
+                  **> Procedure TICC:
+                     - Get output array size (tcs_totsize).
+                     - Choose the minimum in between this array size and the
+                       number of rows selected from input table. If less rows 
+                       than array elements, warn user.
+                     - Get data types of both input and output columns
+                       (tcs_intinfo).
+                       If character-type, get string size too.
+                     **> Procedure TIROWS (generic data type):
+                        - Alloc buffer of appropriate type and with size 
+                          given by the minimum size computed above (malloc).
+                        - Copy selected rows from input table into buffer 
+                          (trsopen, trseval, tbcgt, trsclose).
+                        - Copy buffer into designated row/column (tbapt).
+                        - If output exists and array is larger than buffer:
+                           - Set remaining elements to INDEF.
+                        - End if.
+                        - Free buffer (mfree).
+                     **> End TIROWS.
+                  **> End TICC.
+               - Else (no match), look for scalar data in input header:
+                  **> Procedure TIHC:
+                     - Look for TCTOTAL keyword (tbhfkr). If found:
+                        - Loop over all possible keyword sets (from 1 to 
+                          TCTOTAL).
+                           - Look for TCD_xxx keyword (tbhfkr).
+                           - Decode TCD keyword to extract column name.
+                           - If column name from header matches with output 
+                             column name:
+                              - Look for TCV_xxx keyword (tbhfkr). If found: 
+                                 **> Procedure TIWRSC (generic data type):
+                                    - Write scalar data (tbcpt).
+                                 **> End TIWRSC.
+                              - Else
+                                 - Warn user that input table header is 
+                                   corrupted.
+                              - End if.
+                           - End if.
+                        - End loop.
+                     - End if.
+                  **> End TIHC.
+               - End if.
+            - End loop.
+         - End loop.
+      **> End TICOPY.
+      - Free input table's array of column pointers (tcs_close, mfree).
+      - Close input table (tbtclo).
+      - Bump output row counter.
+   - End loop.
+**> End TINSERT:
+- Free output table's array of column pointers (tcs_close, mfree).
+- Close output table (tbtclo).
+- Close input list (imtclose).
+- Free work memory (mfree).
+
+
+
+
+
+
+
+

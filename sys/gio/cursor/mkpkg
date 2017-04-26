@@ -1,0 +1,57 @@
+# Make the CURSOR package.
+
+$checkout libcur.a lib$
+$update   libcur.a
+$checkin  libcur.a lib$
+$exit
+
+libcur.a:
+	# $set xflags = "$(xflags) -qfx"
+
+	giotr.x		gtr.com gtr.h <config.h> <gio.h> <gki.h> <xwhen.h>
+	grcaxes.x	grc.h gtr.com gtr.h <gio.h> <gset.h>
+	grcclose.x	grc.h gtr.h <gio.h>
+	grccmd.x	grc.h gtr.h <ctype.h> <fset.h> <gio.h> <gki.h>\
+			<gset.h> <mach.h> <ttyset.h>
+	grcinit.x	grc.h <gio.h>
+	grcopen.x	grc.h gtr.com gtr.h <gio.h> <gki.h>
+	grcpl.x		gtr.h <gio.h> <gki.h> <gset.h> grc.h
+	grcread.x	gtr.h <fset.h> <gio.h>
+	grcredraw.x	grc.h <gio.h>
+	grcscr.x	gtr.com gtr.h <gio.h> <gki.h>
+	grcstatus.x	grc.h gtr.com gtr.h <gio.h>
+	grctext.x	gtr.h <gio.h> <gki.h> <gset.h> grc.h
+	grcwarn.x	
+	grcwcs.x	grc.h gtr.h <gio.h> <gki.h> <mach.h>
+	grcwrite.x	grc.h gtr.h <fset.h> <gio.h>
+	gtrbackup.x	gtr.com gtr.h <gio.h> <gki.h> <gset.h>
+	gtrconn.x	
+	gtrctrl.x	gtr.com gtr.h <fset.h> <gio.h> <gki.h> <gset.h>\
+			<prstat.h> <config.h>
+	gtrdelete.x	gtr.h <gio.h> <gki.h>
+	gtrdiscon.x	<gio.h>
+	gtrfetch.x	gtr.h <gio.h> <gki.h>
+	gtrframe.x	gtr.h <gio.h> <gki.h>
+	gtrgflush.x	gtr.com gtr.h <error.h> <gio.h>
+	gtrgtran.x	gtr.com gtr.h <gio.h> <gki.h>
+	gtrgtty.x	gtr.h <gio.h> <gki.h>
+	gtrinit.x	gtr.com gtr.h <gio.h> <gki.h> <gset.h>
+	gtropenws.x	gtr.com gtr.h <config.h> <error.h> <fio.h> <prstat.h>\
+			<fset.h> <gio.h> <gki.h>
+	gtrpage.x	gtr.h <gio.h> <gset.h>
+	gtrptran.x	gtr.com gtr.h <gio.h> <gki.h> <mach.h>
+	gtrrcur.x	<gki.h>
+	gtrredraw.x	gtr.h <gio.h>
+	gtrreset.x	gtr.com gtr.h <error.h> <gio.h>
+	gtrset.x	gtr.com gtr.h <gio.h> <gki.h>
+	gtrstatus.x	gtr.com gtr.h <fset.h> <gio.h>
+	gtrtrunc.x	gtr.h <gio.h> <gki.h>
+	gtrundo.x	gtr.com gtr.h <gio.h> <gki.h> <gset.h>
+	gtrwaitp.x	grc.h gtr.h <error.h> <fset.h> <gio.h> <ttyset.h>
+	gtrwcur.x	<gki.h>
+	gtrwritep.x	gtr.com <error.h> <gio.h> <gki.h> gtr.h
+	gtrwstran.x	gtr.com gtr.h <gio.h> <gki.h> <mach.h>
+	gtrwsclip.x
+	prpsinit.x
+	rcursor.x	grc.h gtr.com gtr.h <ctype.h> <gio.h> <gki.h> <ttset.h>
+	;

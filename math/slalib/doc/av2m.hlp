@@ -1,0 +1,37 @@
+.help av2m Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slAV2M (AXVEC, RMAT)
+
+     - - - - -
+      A V 2 M
+     - - - - -
+
+  Form the rotation matrix corresponding to a given axial vector.
+
+  (single precision)
+
+  A rotation matrix describes a rotation about some arbitrary axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector supplied to this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.
+
+  Given:
+    AXVEC  r(3)     axial vector (radians)
+
+  Returned:
+    RMAT   r(3,3)   rotation matrix
+
+  If AXVEC is null, the unit matrix is returned.
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+
+  P.T.Wallace   Starlink   June 1989
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,34 @@
+.help zfaloc May84 "System Interface"
+.ih
+NAME
+zfaloc -- preallocate space for a binary file
+.ih
+SYNOPSIS
+.nf
+zfaloc (osfn, nbytes, status)
+
+packed	char osfn[]		# host filename
+long	nbytes			# file size in bytes
+int	status
+.fi
+.ih
+DESCRIPTION
+Create and allocate storage for a file of the indicated size.  The actual amount
+of storage allocated will be the requested size rounded up to an integral
+number of device blocks.  Contiguous storage will be allocated if possible.
+File data is unitialized.
+.ih
+RETURN VALUE
+ERR is returned if the file cannot be created or if the requested amount of
+storage cannot be allocated.  OK is returned if there are no errors.
+.ih
+BUGS
+On some systems it is necessary to physically write to a file to allocate
+storage; preallocation of file storage is very expensive on such systems and
+should be avoided.  On other systems storage will appear to have been
+allocated but physical storage will not be allocated until file blocks are
+accessed at run time.
+.ih
+SEE ALSO
+A discussion of the static file driver and imagefile access.
+.endhelp

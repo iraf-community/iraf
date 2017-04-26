@@ -1,0 +1,42 @@
+.help gkidir Jan86 plot
+.ih
+NAME
+gkidir -- print directory of plots within the named metacode file
+.ih
+USAGE
+gkidir input
+.ih
+PARAMETERS
+.ls input
+The metacode file or files to be examined.
+.le
+.ih
+DESCRIPTION
+Task \fBgkidir\fR examines GKI metacode files, and prints a directory of
+the plots contained in each input file.  Each plot is listed with its
+size and an identifying title string.  The title string is the MFTITLE
+string if given, or else the longest GTEXT string found (hopefully the
+plot title), or else the string "(no title)".  The output format is as
+follows:
+.nf
+
+	file1: 
+	    [1] (1234 words)	title_string
+	    [2] (78364 words)	title_string
+
+	file2:
+	    [1] (874 words)	title_string
+		.
+		.
+		.
+
+.fi
+.ih
+EXAMPLES
+1. List the plots in the GKI metacode file "file":
+
+    cl> gkidir file
+.ih
+SEE ALSO
+gkiextract
+.endhelp

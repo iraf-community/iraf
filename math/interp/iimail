@@ -1,0 +1,213 @@
+From tody Wed Apr 20 18:50:45 1983
+Date: 20 Apr 1983 18:50-MST
+To: vesa
+Subject: ii comments
+Cc: tody
+
+I read through "tnotes1", and felt that enough information was conveyed
+to explain how the asi___ routines work, and how to use them.  It is
+good documentation for the package, though some sections are probably
+to technical for the general user, and should probably be moved to an
+appendix in the final documentation.
+
+I only have one minor suggestion, and that is that there seems little
+reason to abbreviate NEAR, REFL, and PROJ, since only three characters
+are saved in each case, and the other parameter names are all spelled out.
+
+I also looked at the code for ASIFIT.  I noticed that the recursion
+relations for the cubic spline are coded inline.  I suspect that this
+is actually LESS efficient than using a separate procedure, due to
+the complex coeff offset expressions appearing in the inner loops
+(unless the Fortran compiler does a very good job of optimizing loops).
+
+By using a separate procedure, for example, the statement
+
+	coeff[COFF+i] = coeff[off2+i] * (coeff[COFF+i] - coeff[COFF+i-1])
+
+can be converted to something like
+
+	bcoeff[i] = acoeff[i] * (bcoeff[i] - bcoeff[i-1])
+
+where in the main routine, there is a procedure call something like the
+following:
+
+	call fit_bspline3 (coeff[COFF], coeff[off2], ...)
+
+In other words, the routines that actually do the work do not need to
+know that everything is saved in a single coeff array.  This simplifies
+the code, as well as making it run faster on some machines.  The technique
+has an additional advantage: by isolating the compute bound code into
+a separate (small) procedure, it becomes easy to hand optimize that procedure
+in assembler, should we wish to do so.
+
+From tody Wed Apr 20 19:48:51 1983
+Date: 20 Apr 1983 19:48-MST
+To: vesa
+Subject: first benchmarks
+Cc: tody
+
+I ran some preliminary benchmarks on the asi code, assuming no bad pixels.
+The benchmark routine is in math/interp.  Results:
+
+512 by 512 image interpolation, no bad pixels, using ASIEVA:
+
+	nearest		47 (cpu seconds)
+	linear		22
+	poly3		50
+	poly5		89
+	spline3		94
+
+This is quite encouraging.  I expect that these timings can be decreased by
+a factor of from 3 to 5, given a good Fortran compiler (the current UNIX
+compiler is very poor), and possibly hand optimising critical sections of
+the code in assembler.
+
+The nearest neighbor timings don't make any sense (that should be the
+fastest interpolant).  Are you using sqrt, or something like that?
+The spline timings are worse than I expected, compared to poly3.  May
+be due to complex offset expressions, which F77 does not optimize.
+
+From tody Fri Feb 18 14:10:36 1983
+To: vesa
+Subject: x code
+Cc: tody
+
+
+We want to make IRAF source code as readable as possible, therefore there
+is a (currently unofficial) standard for ".x" code.  Your code is pretty
+close to the standard, but here are some things to consider:
+
+    (1)	It is preferable to enclose large blocks of documentation in
+	.help .. .endhelp sections, rather than making each line a comment.
+	This has two advantages: (1) it is awkward to edit text set off with
+	a # on each line, and (2) the help utilities can only extract
+	source code documentation which is set in help blocks.  It is not
+	necessary to use text formatter commands in help blocks, i.e.,
+	you can simply type it in as it will appear on the terminal.
+
+	In the same vein, it is better to put the discussion of the input
+	and output parameters in the help text, rather than in the
+	declarations section of the procedure.  Placing each input and
+	output parameter on a single line, followed at the right by a short
+	comment, gets the job done without cluttering up the declarations
+	section.  More extensive comments should be placed in the help text.
+
+
+    (2)	It is mostly up to the programmer to decide where to put whitespace
+	to make the structure of a program clearest.  Whitespace should
+	be inserted in a statement to make the important logical components
+	of the statement stand out.
+
+	In particular, there should be a space after every keyword, before
+	the left parenthesis.  If the statement is compound, the left brace
+	should be set off from the right paren by a space.  In short
+	expressions, operators should be set off by whitespace.
+
+	Adding whitespace between a function name and the left paren is
+	optional, as is whitespace between the elements of an argument list
+	(after commas).
+
+	Blank lines should be used to set off sections of code, just as
+	blank lines are used to separate paragraphs of text.
+
+	It is possible to overcomment code, making it hard to read.  If
+	more than a third of the lines in a procedure are comments, the
+	code is probably overcommented.  Place detailed discussion of the
+	algorithm in the help text.
+
+
+    (3)	Indenting structures by full tab stops is acceptable, but 4 space
+	indents are preferred (the code rapidly runs off the right side of
+	the screen if full tab indents are used, encouraging use of too
+	short identifiers and omission of whitespace).  The autoindent
+	feature of VI makes this easy (in .login file: 'set ai sw=4').
+
+
+    (4)	The standard form of the if .. else construct is
+	
+		if (expr) {
+		    stmt
+		} else {
+		    stmt
+
+	or (if "stmt" is several lines, and whitespace is desired)
+		
+		if (expr) {
+		    stmt
+
+		} else {
+		    stmt
+		
+	rather than
+
+		if (expr) {
+		    stmt
+		}
+		else {
+		    stmt
+
+From tody Fri Feb 18 15:21:33 1983
+Date: 18 Feb 1983 15:21-MST
+To: vesa
+Subject: spec changes
+Cc: tody
+
+
+Now that Garth, Harvey, Steve and others have had a chance to comment on the
+specs for the interpolator routines, it is time to make the final revisions
+to the specifications.  Often ones perspective on a problem changes when one
+actually begins coding, and even the most carefully prepared specifications
+need to be changed.  Please feel free to suggest further changes.
+
+
+Modifications
+
+    (1) Everyone wanted the interpolators to be able to generate estimated
+	values to replace indefinites (as an option).
+
+    (2)	Steve wanted sinc function interpolation added to the set of 
+	interpolators.  I would also like to try this for undersampled
+	CCD data.  A fairly high "order" (basis function size) seems
+	justified for this interpolant.
+
+    (3)	A surface integration routine is desired (MSIGRL).
+
+
+SET Routines
+
+    I think we should generalize the form of the "set" routines to permit
+options such as (1), and others we may wish to add in the future (such
+as telling the interpolator not to check for indefinites in the data).
+
+Set routines are also used in the FIO, IMIO, VSIO, and GIO packages in
+the program interface.  For example, in FIO, the number of buffers for a
+file could be set by a call of the form
+
+	call fset (fd, NBUFFERS, 2)
+
+The form of a set call is therefore
+
+	call ___set (object, parameter, value)
+
+i.e.,
+
+	call asiset (coeff, II_INTERPOLANT, II_DIVDIF3)
+	call asiset (coeff, II_TYBNDRY, II_NEAREST)
+	call asiset (coeff, II_REPLACE_INDEFS, YES)
+
+Note that the prefix "II_" must be added to all Image Interpolation
+defined parameters and parameter values.  This is unattractive, but necessary
+to avoid redefinitions of identifiers in other packages, such as IMIO (IMIO
+has the same boundary extension options as II).
+
+
+Surface Integration
+
+    I suggest the following calling sequence for the surface integration
+routine:
+
+	integral = msigrl (x, y, npts, coeff)
+
+where the surface to be integrated is defined by the closed curve {x[i],y[i]},
+where 1 <= i <= npts, defined by the caller.
+

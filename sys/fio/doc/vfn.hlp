@@ -1,0 +1,1028 @@
+.help vfn Jul84 "Virtual Filename Mapping"
+.ce
+\fBVirtual Filename Mapping Package\fR
+.ce
+Detailed Design
+.ce
+Doug Tody
+.ce
+July 1984
+.sp 2
+.NH
+Introduction
+
+    This document presents the detailed design of the filename mapping
+code, used by FIO to map virtual filenames (VFN's) to host operating system
+filenames (OSFN's) and back again.  A description of the filename mapping
+algorithm is given in \fIThe Reference Manual for the IRAF System Interface\fR,
+May 1984.  The purpose of this document is more to design the software than
+to document the design, hence much is omitted.  The discussion concentrates
+on those aspects of the problem which were least-understood at the time of
+the design.
+
+.sh
+Primary Functions
+
+.nf
+	map vfn->osfn
+	map osfn->vfn
+.fi
+
+.sh
+Functions for accessing the vfnmap file
+
+.nf
+	open and optionally lock vfnmap file
+	close and unlock vfnmap file
+
+	add entry to vfnmap
+	delete entry from vfnmap
+	lookup entry in vfnmap
+.fi
+
+.sh
+Mapping Functions
+
+.nf
+	extract OSDIR prefix
+	extract LDIR prefix
+	expand LDIR
+	fold subdir into OSDIR
+	encode filename via escape sequence encoding
+	decode encoded filename
+	squeeze filename
+	map filename extension
+.fi
+
+
+.nh
+VFN Virtual Filename Mapping Package
+
+    The VFN package is used to map and unmap virtual filenames and to add and
+delete virtual filenames from the VFN database.  A distinct open operation is
+required for each vfn to be accessed.  Any number of vfn's may be simultaneously
+open for reading, but only \fIone\fR vfn may be opened for writing.
+The mapping file is not physically opened unless the escape sequence encoded
+filename is degenerate.  It is intended that the vfn will be opened for only
+a brief period of time to minimize the amount of time that the mapping file
+is locked.  The mapping file is locked only if the vfn is degenerate and the
+access mode is VFN_WRITE.  The recognized vfn access modes are VFN_READ,
+VFN_WRITE, and VFN_UNMAP (for reading directories).
+
+
+.ks
+.nf
+	vp =	 vfnopen (vfn, mode)
+		vfnclose (vp, update)
+	stat =    vfnmap (vp, osfn)
+	stat =	  vfnadd (vp, osfn)
+	stat =    vfndel (vp, osfn)
+	stat =	vfnunmap (vp, osfn, vfn)
+
+	stat =    fmapfn (vfn, osfn)	[=:vfnopen/RO,vfnmap,vfnclose]
+.fi
+.ke
+
+
+A distinction is made between mapping the filename and opening and closing
+the vfn to permit efficient and secure error recovery.  The mapping file is
+not updated on disk until the physical file operation (create, delete, etc)
+has succeeded.  If the operation fails \fBvfnclose\fR is called with NO_UPDATE
+and the mapping file is not touched.  The the vfn was opened VFN_READ the
+update flag is ignored.  No vfn disk data structures will be modified
+if a vfn is closed with NO_UPDATE set.  If updating is enabled, ".zmd"
+dependency files may be created or deleted, the mapping file may be created,
+deleted, or updated.
+
+The procedure \fBvfnmap\fR returns ERR if the vfn is degenerate but no entry
+could be found in the mapping file, i.e., if the file does not exist.
+A status value of OK does not, however, imply that the file exists.
+\fBVfnadd\fR returns ERR if the vfn is degenerate and an entry already
+exists in the mapping file.  If the status return is OK and the vfn is
+degenerate then a new entry has been added to the mapping file.
+\fBVfndel\fR returns ERR if the vfn is degenerate but no entry
+could be found in the mapping file.  \fIOsfn\fR is returned as a packed string.
+The output buffer should be dimensioned SZ_PATHNAME.
+
+.nh
+Semicode for Selected FIO Procedures
+
+    The RO class procedures call FMAPFN to map the VFN of an existing file
+into an OSFN.  These operations are straightforward since the vfn database
+is not affected.
+
+.ks
+.nf
+	access, fchdir, finfo, fpath, fprot:	RO operations
+	falloc, open/NF, fmkcopy:		RW=ADD procedures
+	delete					RW=DEL procedure
+	rename					RW=DEL+ADD
+.fi
+.ke	
+
+
+.nf
+# FALLOC -- Create a new file and allocate uninitialized storage.  Open/NF and
+# make copy are similar operations hence the semicode is not shown.
+
+procedure falloc (vfn, size)
+
+begin
+	# Map filename and determine if a file already exists with the
+	# same name.
+	vp = vfnopen (vfn, VFN_WRITE)			# LOCK
+	if (vfnadd (vp, osfn) == ERR)
+	    existing_file = yes
+	else {
+	    call zfacss to see if file exists
+	    existing_file = yes if file exists
+	}
+
+	# If file exists and clobber is enabled, try to delete the file.
+	# If filename is degenerate, entry is either already in mapping file
+	# (if file exists), or has been added.
+
+	if (existing_file)
+	    iferr {
+		if (file clobber enabled)
+		    delete file
+		else
+		    error ("falloc would clobber file 'vfn'")
+	    } then {
+		vfnclose (vp, NO_UPDATE)
+		erract (EA_ERROR)
+	    }
+
+	# Allocate the new file and update the filename mapping database.
+
+	call ZFALOC to allocate the file
+	if (failure) {
+	    vfnclose (vp, NO_UPDATE)
+	    error ("cannot allocate file 'vfn'")
+	} else
+	    vfnclose (vp, UPDATE)			# UNLOCK
+end
+
+
+# DELETE -- Delete a file and all subfiles.  A subfile is a file which is
+# logically part of the parent file but which is physically a separate file
+# at the kernel level.  An example is the pixel storage file associated with
+# an image.  Whenever a file is deleted all subfiles must be deleted as well.
+# The subfiles need not reside in the same directory as the main file.
+# Subfile information is maintained in a separate, "invisible" file for each
+# file having subfiles.  The subfile list file has the same vfn as the main
+# file with the extension ".sfl" appended.  If the vfn already had an extension
+# it is retained in the root of the new filename.  For example, the vfn of the
+# subfile list file for "data.db" would be "data.db.sfl".
+
+procedure delete (vfn)
+
+begin
+	# Delete the main file
+	fdelpf (vfn)
+
+	# Delete any subfiles.  Print warning message if a subfile appears
+	# in the list but cannot be deleted.
+	
+	ifnoerr (fd = fsf_open (vfn, READ_ONLY)) {
+	    while (getline (fd, subfilename, SZ_FNAME) != EOF)
+		iferr (fdelpf (subfilename))
+		    call erract (EA_WARN)
+	    close (fd)
+	}
+end
+
+
+# FDELPF -- Delete a single physical file.  Check if the file is protected
+# and do not try to delete the file if it is protected.  If file cannot be
+# deleted, determine why and print appropriate error message, and do not update
+# the mapping file.
+
+procedure fdelpf (vfn)
+
+begin
+	vp = vfnopen (vfn, VFN_WRITE)			# LOCK
+	if (vfndel (vp, osfn) == ERR) {
+	    vfnclose (vp, NO_UPDATE)
+	    error ("attempt to delete a nonexistent file (vfn)")
+	} 
+
+	call ZFPROT to check for file protection
+	if (file is protected) {
+	    vfnclose (vp, NO_UPDATE)
+	    error ("attempt to delete a protected file (vfn)")
+	}
+		
+	call ZFDELE to delete the file
+	if (failure) {
+	    vfnclose (vp, NO_UPDATE)
+	    call ZFACCS to determine if file exists
+	    if (no such file)
+		error ("attempt to delete a nonexistent file (vfn)")
+	    else
+		error ("cannot delete file 'vfn'")
+	}
+
+	vfnclose (vp, UPDATE)				# UNLOCK
+end
+
+
+# RENAME -- Rename a file.  A file may be renamed within a single directory
+# or may be moved to another directory by the rename operation.  Note that
+# we may only have one VFN opened for writing at a time.
+
+procedure rename (oldvfn, newvfn)
+
+begin
+	# Delete old filename from VFN database.
+	vp = vfnopen (oldvfn, VFN_WRITE)
+	if (vfndel (vp, oldosfn) == ERR) {
+	    vfnclose (vp, NO_UPDATE)
+	    error ("attempt to rename a nonexistent file (vfn)")
+	} else
+	    vfnclose (vp, UPDATE)
+
+	# Add new filename to VFN database.
+	vp = vfnopen (newvfn, VFN_WRITE)
+	if (vfnadd (vp, newosfn) == ERR) {
+	    vfnclose (vp, NO_UPDATE)
+	    error ("cannot create new file 'vfn'")
+	} else
+	    vfnclose (vp, UPDATE)
+	
+	# Rename the physical file.
+	call ZFRNAM to rename the file
+
+	# Patch up VFN database if the rename operation fails.  If the rename
+	# fails then most likely the OSFN's were short and no mapping file
+	# access was involved (else we would have had an abort above), but
+	# then the calls cost almost nothing so make them anyhow.
+
+	if (rename fails) {
+	    # Restore old filename.
+	    vp = vfnopen (oldvfn, VFN_WRITE)
+	    vfnadd (vp, oldosfn)
+	    vfnclose (vp, UPDATE)
+
+	    # Delete new filename.
+	    vp = vfnopen (newvfn, VFN_WRITE)
+	    vfndel (vp, newosfn)
+	    vfnclose (vp, UPDATE)
+
+	    error ("cannot rename file (oldvfn -> newvfn)")
+	}
+end
+.fi
+
+.nh
+Locking and Concurrency Considerations
+
+    A locking mechanism is necessary to prevent two or more processes from
+simultaneously modifying a mapping file.  The dimensions of the problem are
+as follows:
+
+.ls
+.ls [1]
+Mutual exclusion must be guaranteed.  The period of time during which a process
+opens and reads the mapping file, modifies it, and updates the file on disk
+is the critical section.  The locking protocol must guarantee that only one
+process can be in the critical section at a time.  A read-only access of the
+mapping file is not a critical section, but we must guarantee that the file
+is not in the process of being written when such a read occurs.
+.le
+.ls [2]
+Deadlock must either be prevented or it must be detected and broken.
+Deadlock will eventually occur if a process is permitted to simultaneously
+access more than one mapping file.  Deadlock will occur if process A locks
+directory D1 and process B locks D2, then B tries to lock D1 and A tries to
+lock D2.
+.le
+.ls [3]
+Lockout will occur if a process dies while in the critical section, thus
+failing to remove the lock.
+.le
+.le
+
+
+On a system which provides file locking, i.e., which forbids a process
+access to a file which is open with write permission by another process,
+the host OS guarantees mutual exclusion and protection from lockout.
+Unfortunately many UNIX systems (and probably some other systems as well)
+do not provide file locking.  The scheme discussed in this section is
+awkward but provides secure locking on such systems.  The file locking
+facilities discussed herein are designed to make use of host system file
+locking if available.  The discussion is oriented towards the problems
+of providing locking on systems which do not provide locking at the kernel
+level, i.e., in \fBzopnbf\fR.
+
+.nh 2
+Mutual Exclusion
+
+    Mutual exclusion can be guaranteed by use of a \fBsemaphore\fR.
+The transportability requirement makes it very difficult to implement a
+general semaphore, but a binary semaphore is possible using a null length
+file in the same directory as the mapping file.  To implement a semaphore
+we must test and set the lock all in the same operation, to prevent
+interleaving of the operations by two processes simultaneously trying to
+set a lock (i.e., process A tests for a lock and finds none, B tests for a
+lock and finds none, A sets a lock, B sets a lock, and mutual exclusion is
+violated).
+
+A suitable binary semaphore can be implemented by \fIdeleting\fR the lock
+file to set the lock, rather than by testing for the lock (no lock file)
+and then creating the lock file to set the lock.  We assume that the delete
+operation will return error for an attempt to delete a nonexistent file.
+Thus if the lock file can be successfully deleted, the lock has been tested
+and found to be absent and the directory has been locked, all in one
+indivisible kernel operation.
+
+
+.ks
+.nf
+	# Gain exclusive access to a file.  The file must have an
+	# associated lockfile which is deleted while a process has
+	# the file locked.
+
+	while (delete (lockfile) == ERR)
+	    ;
+
+
+	# Give up exclusive access to a file.
+	create (lockfile)
+.fi
+.ke
+
+
+The above is a bit simplistic because the file itself may not exist,
+in which case there will be no lockfile, and the process may not have
+delete permission for the lockfile if there is one.  The point here is
+that the OS kernel guarantees that only one process will be allowed
+to successfully delete the lockfile, hence the deletion operation can
+serve to gain exclusive access to a file.  The problem of lockout, wherein
+the lockfile gets lost, is dealt with later.
+
+Locking the directory is necessary whenever the mapping file is to be modified.
+While it is not necessary to lock the directory to read the mapping file,
+by not doing so we run the risk of trying to read while the file is being
+written to (permissible on some systems, an error condition on others).
+The simplest solution to this problem is to lock the file for all accesses,
+including reads as well as writes.  The problem with this approach is that
+it precludes read access on directories for which a process does not have
+write permission (preventing generation of the lock file).  This is not
+acceptable.  Our solution is to include a \fBchecksum\fR in the mapping file.
+If the file exists but cannot be opened for reading and a lock exists on the
+directory, we will wait until the lock is lifted to read the file.  If the
+checksum is in error the read will be repeated until a valid checksum is
+obtained.
+
+.nh 2
+Deadlock
+
+    Deadlock can be avoided by the simple expedient of permitting a process to
+lock only one directory at a time.  The only time a process needs to lock
+more than one directory is when renaming a file with a long, degenerate name
+from one directory to another.  Deadlock is unlikely but would certainly
+occur at infrequent intervals.  Locking only one directory at a time is
+inefficient (because separate references are needed to map the filename
+and to edit the mapping file), but it does not matter since lock file
+accesses are expected to be infrequent (few mapped filenames are degenerate).
+Detection of and breaking of deadlock is possible but not worth the trouble.
+Thus we shall avoid the problem of deadlock entirely by permitting a process
+to lock only a single directory at a time, for only a brief period of time.
+
+.nh 2
+Lockout
+
+    At this point we have a solution which guarantees mutual exclusion and the
+avoidance of deadlock nearly 100% of the time.  The only problem remaining
+is \fBlockout\fR.  It is not possible to prevent lockout since we cannot
+guarantee that a process (or the computer) will not die while in a critical
+section, preventing removal of the lock.
+
+The obvious way to implement automatic recovery from lockout is to add a
+provision for timeout.  While we cannot guarantee that the time spent
+in a critical section will be less than some absolute amount (because of
+variable load conditions, swapping, the time required to delete a very
+large file, etc.), we can say that the time spent in a critical section will
+rarely be larger than some number on the order of one second.  In a worst
+case situation where several processes are heavily accessing a directory
+it could take an arbitrarily long time for a particular process to gain a
+lock on the directory, but this is very unlikely.
+
+If a process times out while waiting we must either abort or proceed to break
+the lock.  This may be done by creating a new lockfile as if the transaction
+had been completed.  There is a hidden bug, however -- if two or
+more processes timeout simultaneously, the following scenario might occur:
+
+
+.kf
+.nf
+	A times out
+	B times out
+	A breaks the lock
+	A enters wait loop and places a new lock,
+	    entering the critical section
+	B breaks the lock set by A
+	B enters wait loop and places a new lock,
+	    entering the critical section
+	[...mutual exclusion is violated...]
+.fi
+.ke
+
+
+No matter how unlikely this scenario might be, it prevents us from using the
+simple technique to break the lock.  Breaking the lock appears to be another
+critical section, so perhaps we can use another semaphore to protect the lock
+(we ignore the complications of checking for write permission on the directory,
+which should be dealt with when the lock is set).
+
+Even if a semaphore is used concurrency
+can still be a problem, as another process may timeout and break the lock
+shortly after the first process has done so; this can happen because the
+section between timeout and the test for permission to break the lock is
+interruptable.  To get around this we apply an additional constraint
+that the lock can only be broken if it has been in place for a specified
+interval of time which is much larger than the timeout interval.  This suffices
+to recover from a process crash and prevents two processes from breaking
+the lock at almost the same time.
+
+
+.ks
+.nf
+	# Try to set a lock on the directory.  If we timeout, try to get
+	# permission to break the lock; only one process is permitted to
+	# break the lock, and the lock can only be broken once in a
+	# specified interval of time.  The timelock files are normally
+	# created whenever the directory is locked.
+
+	repeat {
+	    while (delete (lockfile) == ERR)
+		if (timeout)
+		    if (delete (timelock1) != ERR) {
+			get creation date of timelock2
+			if (timelock2 is an old file) {
+			    create (lockfile)
+			    delete (timelock2); create (timelock2)
+			    create (timelock1)
+			} else
+			    create (timelock1)
+		    }
+	} until (lock is established)
+
+	# Back to normal.
+	carry out transaction
+	create (lockfile)
+.fi
+.ke
+
+
+Lockout is still possible if the process or the computer dies in the interval
+between deletion and creation of timelock1, but the chances of that happening
+are very remote because the interval is short and it only occurs during
+recovery from lockout.  An additional check should perhaps be provided to
+detect this unlikely circumstance and break the lock without further ado
+if timelock1 somehow gets permanently deleted.  The mapping file can be
+checkpointed when this occurs to minimize the risk.
+
+.nh 2
+Rollback
+
+    Unfortunately, automatic lockout detection and recovery brings with it
+the possibility that the lock will be broken when a process takes an abnormally
+long time to complete a transaction.  This might happen when a heavily loaded
+system has begun swapping processes, or when a background job with a
+very low priority accesses a directory.  We must be able to detect that the
+lock has been broken and \fIrollback\fR the transaction, i.e., obtain a new
+lock and try again, repeating the unsuccessful transaction.
+
+Timeouts leading to improper breaking of the lock are not a problem if the
+host system provides file locking for files opened for writing.  After placing
+the lock on a directory a process will open the mapping file with readwrite
+permission and all other processes will be locked out until the transaction
+completes.  Unfortunately file locking is not provided on all systems (e.g.,
+many versions of UNIX do not provide file locking).
+
+Secure protection from a broken lock is difficult because if we check that
+the lock is still in place and then perform the update, another process may
+break the lock immediately after we check that the lock is in place and
+before the update occurs.  About the best we can do is check the creation time
+on timelock2 immediately before updating, updating only if the timelock has
+not been touched since we created it at lock time.  If the lock has been
+broken our timelock file will have been deleted and the transaction must be
+rolled back.  If a lot of time remains on the lock we go ahead and perform
+the update, otherwise a new timelock2 is written, providing a time equal to
+the minimum lifetime of a lock in which to update the file.
+
+
+.ks
+.nf
+	perform transaction upon MFD (in memory)
+
+	# Determine if the lock is still in place and likely to remain
+	# in place until the update is completed.
+
+	repeat {
+	    get creation date of timelock2
+	    if (not the timelock we set at vfn_wait time)
+		rollback transaction
+	    else if (not much time left on lock)
+		rollback transaction
+	    else
+		break
+	}
+
+	# Update and remove the lock.
+
+	update the mapping file
+	close (mapping file)
+
+	get creation date of timelock2
+	if (not our timelock)
+	    bad news: warn user
+
+	create (lockfile)
+.fi
+.ke
+
+.nh 2
+File Locking Facilties
+
+    From the above code fragments it appears that the lockfile approach
+to file locking will work on any machine on which it is an error to delete
+a nonexistent file.  The next step is to encapsulate all this in file
+locking primitives which will use the host OS file locking facilities if
+any, otherwise the lockfile techniques we have developed.  A set of file
+locking primitives are presented below.  These are low level routines
+with fairly restrictive semantics, and are not intended to be used in other
+than system code.
+
+
+.ks
+.nf
+	time =	    osfn_lock (osfn)
+	nsec =	osfn_timeleft (osfn, time)
+	nsec =	  osfn_unlock (osfn, time)
+.fi
+.ke
+
+
+A file is locked with the \fBosfn_lock\fR primitive, which returns when
+it has successfully placed a lock on the file \fIosfn\fR.  The lock is
+guaranteed to remain in place for at least \fItimeout\fR seconds, where
+\fItimeout\fR is a system constant.
+On some systems the file may not actually be locked until it is opened
+with write access.  If the file does not exist or cannot be locked
+\fBerror\fR is called.  If the file is already locked but the lock has
+expired \fBosfn_lock\fR will break the old lock and return when it has
+set a new one.
+
+The primitive \fBosfn_timeleft\fR returns the number of seconds remaining
+on the lock on file \fIosfn\fR.  ERR is returned if the file is no longer
+locked or if the file is currently locked by another user.
+
+A lock is removed with \fBosfn_unlock\fR.  The number of seconds remaining
+on the lock at the time it was removed is returned as the function value.
+ERR is returned if the file was no longer locked or had been locked by
+another user when \fBosfn_unlock\fR was called.
+
+
+.nf
+# OSFN_LOCK -- Lock the named OSFN, i.e., gain exclusive write access
+# to a file.  Only the process gaining the lock on a file may write
+# to it, but there is no guarantee that another process may not read
+# a locked file.  On some systems the file will not actually be locked
+# until it is opened with write permission.  If multiple files exist
+# in a directory with the same root but different extensions, only one
+# can be locked at a time.
+
+long procedure osfn_lock (osfn)
+
+begin
+	# Even if file locking is provided by the OS we must determine
+	# if the file is write protected.  If the file is not write
+	# protected but cannot be opened for writing our caller will
+	# conclude that the file is locked by another process.
+
+	if (file locking is handled by the OS)
+	    if (file osfn is write protected)
+		error ("no write permission on file 'osfn'")
+	    else
+		return (clktime)
+
+	# Generate filenames.
+	basename = osfn minus any extension
+	lockfile  = strpak (basename // ".lok")
+	timelock1 = strpak (basename // ".tl1")
+	timelock2 = strpak (basename // ".tl2")
+
+	# If the lockfile can be deleted (usual case) then we have
+	# little to do.
+	if (delete (lockfile) == OK)
+	    goto setlock_
+
+	# If the lockfile cannot be deleted check that the file itself
+	# exists and that we have delete permission on the directory.
+
+	if (file 'osfn' does not exist)
+	    error ("attempt to lock a nonexistent file (osfn)")
+	if (no delete permission on directory)
+	    error ("cannot delete file (lockfile)")
+
+	# The file exists and all the necessary permissions are granted,
+	# hence someone else has the file locked and we must wait.
+
+	repeat {
+	    for (nsec=0;  nsec < timeout_period;  nsec=nsec+1)
+		if (delete (lockfile) == OK)
+		    goto setlock_
+	    if (delete (timelock1) == OK) {
+		get creation date of timelock2
+		if (timelock2 is an old file or does not exist) {
+		    create (lockfile)
+		    delete (timelock2); create (timelock2)
+		    create (timelock1)
+		} else
+		    create (timelock1)
+	    } else if (continual failure to delete timelock1)
+		create (timelock1)
+	}
+
+setlock_
+	delete (timelock2)
+	create (timelock2)
+
+	return (creation time of timelock2)
+end
+
+
+# OSFN_TIMELEFT -- Determine if a file is still locked, and if so, how
+# much time remains on the lock.  TIME is the time value returned when
+# the file was locked.  All time values are in units of seconds.
+
+int procedure osfn_timeleft (osfn, time)
+
+begin
+	if (file locking is handled by the OS)
+	    return (big number)
+
+	basename  = osfn minus any extension
+	lockfile  = strpak (basename // ".lok")
+	timelock2 = strpak (basename // ".tl2")
+
+	if (lockfile exists)
+	    return (ERR)
+	else if (cannot get file info on timelock2)
+	    return (ERR)
+	else if (timelock2.create_time != time)
+	    return (ERR)
+	else {
+	    timeleft = max (0, timeout_period - (clktime - time)
+	    return (timeleft)
+	}
+end
+
+
+# OSFN_UNLOCK -- Release the lock on a file and return the number of
+# seconds that were left on the lock.  ERR is returned if the file is
+# no longer locked or if the lock is not the one originally placed
+# on the file.
+
+int procedure osfn_unlock (osfn, time)
+
+begin
+	timeleft = osfn_timeleft (osfn, time)
+
+	if (timeleft != ERR) {
+	    basename = osfn minus any extension
+	    lockfile = strpak (basename // ".lok")
+	    create (lockfile)
+	}
+
+	return (timeleft)
+end
+.fi
+
+.nh
+VFN Package Data Structures
+
+    A process may have only a single VFN open with write permission at any
+one time to eliminate the possibility of deadlock (section 4).  Any number
+of VFN's may be open for read-only access, e.g., when recursively descending
+a directory tree.  Most VFN accesses do not involve a reference to a mapping
+file.  Since the mapping file is infrequently referenced, separate descriptors
+are used for the VFN and the mapping file.  The VFN descriptor is called the
+VFD and the mapping file descriptor the MFD.
+
+The MFD is only allocated if a mapping file is referenced, i.e., if the OSFN
+is long.  Before allocating a new MFD we must search the list of open VFN's
+to see if the mapping file has already been opened and assigned a MFD.  Every
+VFN must have its own VFD.  To prevent having to MALLOC a
+VFD every time a filename is mapped, one VFD will always be allocated (after
+the first file reference).  Thus, for a simple filename mapping where the
+OSFN is short, no MALLOC or other kernel calls will be required, i.e., the only
+expense will be the string operations required to map the filename.
+
+
+.ks
+.nf
+# VFN Descriptor
+
+struct vfd {
+	struct	mfd *v_mfd		# ptr to mapping file descr.
+	int	v_acmode		# access mode
+	int	v_len_osdir		# length of v_osdir string
+	int	v_len_root		# length of v_root string
+	int	v_len_extn		# length of v_extn string
+	char	v_vfn[33]		# original VFN, minus LDIR
+	char	v_osdir[33]		# OS directory name
+	char	v_root[33]		# encoded root filename
+	char	v_extn[33]		# encoded and mapped extension
+}
+.fi
+.ke
+
+
+.ks
+.nf
+# Mapping File Descriptor.  The length of the descriptor is adjusted as 
+# necessary to provide storage for the filename pairs.
+
+struct mfd {
+	long	m_locktime		# clktime when lock set
+	int	m_fd			# file descriptor
+	int	m_nfiles		# number of files in map list
+	int	m_lastop		# last operation performed
+	int	m_modified		# was database modified
+	char	m_vfnmap[]		# OSFN of mapping file
+	int	m_checksum		# checksum of m_fnmap
+	char	m_fnmap[nfiles*34*2]	# vfn/osfn pairs
+}
+.fi
+.ke
+
+.nh
+Semicode for Parts of the VFN Package
+
+.nf
+# VFNOPEN -- Open that part of the VFN database associated with a particular
+# VFN.  Allocate VFD descriptor, map but do not squeeze VFN to long OSFN.
+
+pointer procedure vfnopen (vfn, mode)
+
+begin
+	if (first_time) {
+	    permanently allocate a VFD
+	    nvfn_open = 0
+	    first_time = false
+	}
+
+	# Allocate and initialize VFD.
+	if (no VFN's open) {
+	    use preallocated VFD
+	    increment count of open VFN's
+	} else
+	    allocate a new VFD
+
+	call fbrkfn to break VFN into OSDIR, ROOT, and EXTN fields
+
+	return (pointer to VFD)
+end
+
+
+# VFNCLOSE -- Close a VFN and optionally update the VFN database.  An update
+# is performed only if the mapping file is open with write permission,
+# a modify transaction has occurred, and updating is enabled.
+
+procedure vfnclose (vp, update)
+
+begin
+	# If the mapping file was not used or if it was not modified we
+	# just return the buffers and quit.
+
+	mfp = vp.mfp
+	if (mfp == NULL) {
+	    if (nvfn_open > 1)
+		mfree (vp, TY_STRUCT)
+	    return
+	} else if (mfp.m_modified == NO || update == NO_UPDATE) {
+	    mfree (mfp, TY_STRUCT)
+	    if (nvfn_open > 1)
+		mfree (vp, TY_STRUCT)
+	    return
+	}
+
+	# If we get here the mapping file is open with write permission,
+	# a transaction has been performed which modified the database,
+	# and we were called with updating enabled.  Rollback (repeat)
+	# the transaction if the lock has been broken or if there is not
+	# enough time remaining on the lock.
+
+	while (osfn_timeleft (mfp.m_vfnmap, mfp.m_locktime) < xx) {
+	    osfn_unlock (mfp.m_vfnmap, mfp.m_locktime)
+	    switch (mfp.lastop) {
+	    case VFN_ADD:
+		vfnadd (vp, junkstr)
+	    case VFN_DEL:
+		vfndel (vp, junkstr)
+	    }
+	}
+
+	# Update and close the mapping file.
+	compute checksum and store in the mapping file
+	rewrite mapping file to disk
+	close (mapping file)
+
+	if (osfn_unlock (mfp.m_vfnmap, mfp.m_locktime) == ERR)
+	    warn ("broken file protect lock in directory 'vp.v_osdir'")
+
+	mfree (mfp, TY_STRUCT)
+	if (nvfn_open > 1)
+	    mfree (vp, TY_STRUCT)
+end
+
+
+# VFNMAP -- Map and pack the VFN into an OSFN, but do not modify the
+# database.  The mapping file is accessed only if the filename is
+# degenerate.
+
+int procedure vfnmap (vp, osfn)
+
+begin
+	# If the OSFN is short or long but still unique within directory,
+	# then it is not necessary to access the mapping file.
+
+	if (root is longer than permitted by host system) {
+	    squeeze root
+	    if (squeezed root filename is unique within directory) {
+		concatenate and pack osfn
+		return (OK)
+	    }
+	}
+
+	# If we get here then the squeezed filename is degenerate, i.e.,
+	# not unique within the directory.  It is necessary to read the
+	# mapping file to learn what OSFN has been assigned to the file.
+
+	mfp = allocate and init mapping file descriptor
+	mfp.m_vfnmap = strpak (osdir // "zzvfnmap.vfn")
+
+	# Open or create the mapping file.  Create must precede lock
+	# as lock will abort if the file to be locked does not exist.
+	# If opening existing file READ_WRITE, lock first to determine
+	# if we have write perm on file, then keep trying to open file
+	# until open succeeds (if OS level file locking is in use the
+	# open will return ERR as long as another process has the
+	# file open for writing).
+
+	switch (vp.v_acmode) {
+	case VFN_WRITE:
+	    if (no mapping file created yet) {
+		create a new mapping file
+		time = osfn_lock (mfp.m_vfnmap)
+	    } else {
+		time = osfn_lock (mfp.m_vfnmap)
+		repeat {
+		    open mapping file for READ_WRITE access
+		    sleep (1)
+		} until (open succeeds)
+	    }
+	default:
+	    open mapping file for READ_ONLY access
+	}
+
+	# Read mapping file into descriptor.  Increase default size of
+	# descriptor if necessary to read entire file.  Repeat the
+	# read if the checksum is invalid, indicating that a write
+	# was in progress when we read.
+
+	maxch = default buffer size for the filename map
+	repeat {
+	    repeat {
+		read maxch chars into mfp.m_checksum
+		if (nchars_read >= maxch) {
+		    increase size of descriptor
+		    maxch = maxch + increase in storage
+		}
+	    } until (nchars_read < maxch)
+	    compute checksum
+	} until (checksum == mfp.m_checksum)
+
+	if (nchars_read == EOF)
+	    mfp.m_nfiles = 0
+	else
+	    mfp.m_nfiles = max (0, (nchars - SZ_INT) / SZ_FNMAP_PAIR)
+
+	search mfp.m_fnmap for filename vp.vfn
+	if (not found)
+	    status = ERR
+	else {
+	    status = OK
+	    pack osfn to output argument
+	}
+
+	if (access_mode != VFN_WRITE)
+	    close mapping file
+
+	return (status)
+end
+
+
+# VFNADD -- Map a VFN to an OSFN and add an entry for the VFN to the
+# database if the OSFN is degenerate.
+
+procedure vfnadd (vp, osfn)
+
+begin
+	# If VFNMAP does not return ERR then the file already exists.
+	# We return ERR if the file already exists.
+
+	if (vfnmap (vp, osfn) != ERR)
+	    return (ERR)
+	else if (short osfn)
+	    return (OK)
+
+	if (osfn is degenerate) {
+	    generate a unique new_osfn
+	    create degeneracy flag file osfn // ".zmd"
+	    osfn = strpak (new_osfn)
+	}
+
+	add vfn,osfn pair to vp.mfp.m_fnmap
+	mfp.m_lastop = VFN_ADD
+
+	return (OK)
+end
+
+
+# VFNDEL -- Map a VFN to an OSFN and delete the entry for the VFN from
+# the database if the OSFN is degenerate.  Do not delete the degeneracy
+# flag file if no longer degenerate, because even though the OSFN is
+# no longer degenerate the OSFN reflects the former degeneracy of the
+# file, and we do not want to rename the file.
+
+procedure vfnadd (vp, osfn)
+
+begin
+	# If VFNMAP returns ERR then the file does not exist.
+	# We return ERR if the file does not exist.
+
+	if (vfnmap (vp, osfn) == ERR)
+	    return (ERR)
+	else if (short osfn)
+	    return (OK)
+
+	delete vfn,osfn pair to vp.mfp.m_fnmap
+	mfp.m_lastop = VFN_DEL
+
+	return (OK)
+end
+
+
+# FBRKFN -- Transform a VFN into an OSDIR, an escape sequence encoded and
+# extension mapped root OS filename ROOT, and an extension EXTN.  The root
+# may be longer than permitted by the host OS, i.e., squeezing is not done
+# here.
+
+procedure fbrkfn (vfn, osdir, lenosdir, root, lenroot, extn, lenextn)
+
+begin
+	# If the VFN begins with an OSDIR prefix it is assumed to be an OSFN
+	# and no mapping is performed.
+
+	call ZFXDIR to extract osdir prefix, if any
+	if (osdir prefix found) {
+	    copy remainder of vfn to root
+	    return
+	}
+
+	osdir = null_string
+	root = null_string
+	extn = null_string
+
+	# Process the directory and filename fields.  In the case of a simple
+	# filename the first pass performs the escape sequence encoding of the
+	# filename directly into root, and we return after possibly mapping
+	# the extension.
+
+	repeat {
+	    extract next field into root and extn with escape sequence encoding
+	    if (delimiter == '$')
+		if (osdir == null_string) {
+		    osdir = recursively expand ldir
+		    if (ldir not found)
+			error ("logical directory 'ldir' not found")
+		} else
+		    error ("illegal $ delimiter in filename 'vfn'")
+	    } else if (delimiter == '/')
+		fold field, a subdirectory, into osdir
+	} until (delimiter == EOS)
+
+	# At this point we have osdir, root, and extn strings, any of which may
+	# be null.  If more than one "." delimited extn string was encountered
+	# during escape sequence encoding, or if the maximum extn length was
+	# exceedd, then that extn will already have been incorporated into the
+	# root.
+
+	if (extn != null_string)
+	    map filename extension
+end

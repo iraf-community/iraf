@@ -1,0 +1,287 @@
+.help cvl Jul87 images.tv.iis
+.ih
+NAME
+cvl -- load images in image display
+.ih
+USAGE
+cvl image frame
+.ih
+PARAMETERS
+.ls image
+Image to be loaded.
+.le
+.ls frame
+Display frame to be loaded.
+.le
+.ls erase = yes
+Erase frame before loading image?
+.le
+.ls border_erase = no
+Erase unfilled area of window in display frame if the whole frame is not
+erased?
+.le
+.ls select_frame = yes
+Display the frame to be loaded?
+.le
+.ls fill = no
+Interpolate or block average the image to fit the display window?
+.le
+.ls zscale = yes
+Apply an automatic intensity mapping algorithm when loading the image?
+.le
+.ls contrast = 0.25
+Contrast factor for the automatic intensity mapping algorithm.
+.le
+.ls zrange = yes
+If not using the automatic mapping algorithm (\fIzscale = no\fR) map the
+full range of the image intensity to the full range of the display?
+.le
+.ls nsample_lines = 5
+Number of sample lines to use in the automatic intensity mapping algorithm.
+.le
+.ls xcenter = 0.5, ycenter = 0.5
+Horizontal and vertical centers of the display window in normalized
+coordinates measured from the left and bottom respectively.
+.le
+.ls xsize = 1, ysize = 1
+Horizontal and vertical sizes of the display window in normalized coordinates.
+.le
+.ls xmag = 1., ymag = 1.
+Horizontal and vertical image magnifications when not filling the display
+window.  Magnifications greater than 1 map image pixels into more than 1
+display pixel and magnifications less than 1 map more than 1 image pixel
+into a display pixel.
+.le
+.ls z1, z2
+Minimum and maximum image intensity to be mapped to the minimum and maximum
+display levels.  These values apply when not using the automatic or range
+intensity mapping methods.
+.le
+.ls ztrans = "linear"
+Transformation of the image intensity levels to the display levels.  The
+choices are:
+.ls "linear"
+Map the minimum and maximum image intensities linearly to the minimum and
+maximum display levels.
+.le
+.ls "log"
+Map the minimum and maximum image intensities linearly to the range 1 to 1000,
+take the logarithm (base 10), and then map the logarithms to the display
+range.
+.le
+.ls "none"
+Apply no mapping of the image intensities (regardless of the values of
+\fIzscale, zrange, z1, and z2\fR).  For most image displays, values exceeding
+the maximum display value are truncated by masking the highest bits.
+This corresponds to applying a modulus operation to the intensity values
+and produces "wrap-around" in the display levels.
+.le
+.ls "user"
+User supplies a look up table of intensities and their corresponding
+greyscale values.  
+.le
+.le
+.ls lutfile = ""
+Name of text file containing the look up table when \fIztrans\fR = user.
+The table should contain two columns per line; column 1 contains the
+intensity, column 2 the desired greyscale output.
+.le
+.ih
+DESCRIPTION
+The specified image is loaded into the specified frame of the standard
+image display device ("stdimage").  For devices with more than one
+frame it is possible to load an image in a frame different than that
+displayed on the monitor.  An option allows the loaded frame to become
+the displayed frame.  The previous contents of the frame may be erased
+(which can be done very quickly on most display devices) before the
+image is loaded.  Without erasing, the image replaces only those pixels
+in the frame defined by the display window and spatial mapping
+described below.  This allows displaying more than one image in a
+frame.  An alternate erase option erases only those pixels in the
+defined display window which are not occupied by the image being
+loaded.  This is generally slower than erasing the entire frame and
+should be used only if a display window is smaller than the entire
+frame.
+
+The image is mapped both in intensity and in space.  The intensity is
+mapped from the image pixel values to the range of display values in
+the device.  Spatial interpolation maps the image pixel coordinates
+into a part of the display frame called the display window.  Many of
+the parameters of this task are related to these two transformations.
+
+A display window is defined in terms of the full frame.  The lower left
+corner of the frame is (0, 0) and the upper right corner is (1, 1) as viewed on
+the monitor.  The display window is specified by a center (defaulted to the
+center of the frame (0.5, 0.5)) and a size (defaulted to the full size of
+the frame, 1 by 1).  The image is loaded only within the display window and
+does not affect data outside the window; though, of course, an initial
+frame erase erases the entire frame.  By using different windows one may
+load several images in various parts of the display frame.
+
+If the option \fIfill\fR is selected the image is spatially interpolated
+to fill the display window in its largest dimension (with an aspect
+ratio of 1:1).  When the display window is not automatically filled
+the image is scaled by the magnification factors (which need not be
+the same) and centered in the display window.  If the number of image
+pixels exceeds the number of display pixels in the window only the central
+portion of the image which fills the window is loaded.  By default
+the display window is the full frame, the image is not interpolated
+(no filling and magnification factors of 1), and is centered in the frame.
+The spatial interpolation algorithm is described in the section
+MAGNIFY AND FILL ALGORITHM.
+
+There are several options for mapping the pixel values to the display
+values.  There are two steps; mapping a range of image intensities to
+the full display range and selecting the mapping function or
+transformation.  The mapping transformation is set by the parameter
+\fIztrans\fR.  The most direct mapping is "none" which loads the image
+pixel values directly without any transformation or range mapping.
+Most displays only use the lowest bits resulting in a wrap-around
+effect for images with a range exceeding the display range.  This is
+sometimes desirable because it produces a contoured image which is not
+saturated at the brightest or weakest points.  This transformation is
+also the fastest.  Another transformation, "linear", maps the selected
+image range linearly to the full display range.  The logarithmic
+transformation, "log", maps the image range linearly between 1 and 1000
+and then maps the logarithm (base 10) linearly to the full display
+range.  In the latter transformations pixel values greater than
+selected maximum display intensity are set to the maximum display value
+and pixel values less than the minimum intensity are set to the minimum
+display value.
+
+Methods for setting of the range of image pixel values, \fIz1\fR and
+\fIz2\fR, to be mapped to the full display range are arranged in a
+hierarchy from an automatic mapping which gives generally good result
+for typical astronomical images to those requiring the user to specify
+the mapping in detail.  The automatic mapping is selected with the
+parameter \fIzscale\fR.  The automatic mapping algorithm is described
+in the section ZSCALE ALGORITHM and has two parameters,
+\fInsample_lines\fR and \fIcontrast\fR.
+
+When \fIztrans\fR = user, a look up table of intensity values and their
+corresponding greyscale levels is read from the file specified by the
+\fIlutfile\fR parameter.  From this information, a piecewise linear
+look up table containing 4096 discrete values is composed.  The text
+format table contains two columns per line; column 1 contains the
+intensity, column 2 the desired greyscale output.  The greyscale values
+specified by the user must match those available on the output device.
+Task \fIshowcap\fR can be used to determine the range of acceptable
+greyscale levels.  When \fIztrans\fR = user, parameters \fIzscale\fR,
+\fIzrange\fR and \fIzmap\fR are ignored.
+
+If the zscale algorithm is not selected the \fIzrange\fR parameter is
+examined.  If \fIzrange\fR is yes then \fIz1\fR and \fIz2\fR are set to
+the minimum and maximum image pixels values, respectively.  This insures
+that the full range of the image is displayed but is generally slower
+than the zscale algorithm (because all the image pixels must be examined)
+and, for images with a large dynamic range, will generally show only the
+brightest parts of the image.
+
+Finally, if the zrange algorithm is not selected the user specifies the
+values of \fIz1\fR and \fIz2\fR directly.
+.ih
+ZSCALE ALGORITHM
+The zscale algorithm is designed to display the image values near the median
+image value without the time consuming process of computing a full image
+histogram.  This is particularly useful for astronomical images which
+generally have a very peaked histogram corresponding to the background
+sky in direct imaging or the continuum in a two dimensional spectrum.
+
+A subset of the image is examined.  Approximately 600 pixels are
+sampled evenly over the image.  The number of lines is a user parameter,
+\fInsample_lines\fR.  The pixels are ranked in brightness to
+form the function I(i) where i is the rank of the pixel and I is its value.
+Generally the midpoint of this function (the median) is very near the peak
+of the image histogram and there is a well defined slope about the midpoint
+which is related to the width of the histogram.  At the ends of the
+I(i) function there are a few very bright and dark pixels due to objects
+and defects in the field.  To determine the slope a linear function is fit
+with iterative rejection;
+
+	I(i) = intercept + slope * (i - midpoint)
+
+If more than half of the points are rejected
+then there is no well defined slope and the full range of the sample
+defines \fIz1\fR and \fIz2\fR.  Otherwise the endpoints of the linear
+function are used (provided they are within the original range of the
+sample):
+
+.nf
+	z1 = I(midpoint) + (slope / contrast) * (1 - midpoint)
+	z2 = I(midpoint) + (slope / contrast) * (npoints - midpoint)
+.fi
+
+As can be seen, the parameter \fIcontrast\fR may be used to adjust the contrast
+produced by this algorithm.
+.ih
+MAGNIFY AND FILL ALGORITHM
+The spatial interpolation algorithm magnifies (or demagnifies) the
+image along each axis by the desired amount.  The fill option is a
+special case of magnification in that the magnification factors are set
+by the requirement that the image just fit the display window in its
+maximum dimension with an aspect ratio (ratio of magnifications) of 1.
+There are two requirements on the interpolation algorithm; all the
+image pixels must contribute to the interpolated image and the
+interpolation must be time efficient.  The second requirement means that
+simple linear interpolation is used.  If more complex interpolation is
+desired then tasks in the IMAGES package must be used to first
+interpolate the image to the desired size before loading the display
+frame.
+
+If the magnification factors are greater than 0.5 (sampling step size
+less than 2) then the image is simply interpolated.  However, if the
+magnification factors are less than 0.5 (sampling step size greater
+than 2) the image is first block averaged by the smallest amount such
+that magnification in the reduced image is again greater than 0.5.
+Then the reduced image is interpolated to achieve the desired
+magnifications.  The reason for block averaging rather than simply
+interpolating with a step size greater than 2 is the requirement that
+all of the image pixels contribute to the displayed image.  If this is
+not desired then the user can explicitly subsample using image
+sections.  The effective difference is that with subsampling the
+pixel-to-pixel noise is unchanged and small features may be lost due to
+the subsampling.  With block averaging pixel-to-pixel noise is reduced
+and small scale features still contribute to the displayed image.
+.ih
+EXAMPLES
+For the purpose of these examples we assume a display with four frames,
+512 x 512 in size, and a display range of 0 to 255.  Also consider two
+images, image1 is 100 x 200 with a range 200 to 2000 and image2 is
+2000 x 1000 with a range -1000 to 1000.  To load the images with the
+default parameters:
+
+.nf
+	cl> cvl image1 1
+	cl> cvl image2 2
+.fi
+
+The image frames are first erased and image1 is loaded in the center of
+display frame 1 without spatial interpolation and with the automatic intensity
+mapping.  Only the central 512x512 area of image2 is loaded in display frame 2
+
+To load the display without any intensity transformation:
+
+	cl> cvl image1 1 ztrans=none
+
+The next example interpolates image2 to fill the full 512 horizontal range
+of the frame and maps the full image range into the display range.  Note
+that the spatial interpolation first block averages by a factor of 2 and then
+magnifies by 0.512.
+
+	cl> cvl image2 3 fill+ zscale-
+
+The next example makes image1 square and sets the intensity range explicitly.
+
+	cl> cvl image1 4 zscale- zrange- z1=800 z2=1200 xmag=2
+
+The next example loads the two images in the same frame side-by-side.
+
+.nf
+	cl> cvl.xsize=0.5
+	cl> cvl image1 fill+ xcen=0.25
+	cl> cvl image2 erase- fill+ xcen=0.75
+.fi
+.ih
+SEE ALSO
+display, magnify
+.endhelp

@@ -1,0 +1,172 @@
+.help revisions Jun88 pkg.xtools.gtools
+.nf
+=====
+V2.12
+=====
+
+pkg$xtools/gtools/gtlabax.x
+    Added workaround to avoid GUI message.  (2/1/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+pkg$xtools/gtools/gtcolon.x
+    Corrected definition of btoi.  (8/11/99, Valdes)
+
+pkg$xtools/gtools/gtreset.x
+    This routine was declared as a function rather than a subroutine
+    as it should be.  (7/21/99, Valdes)
+
+pkg$xtools/gtools/gtlabax.x
+    Gmsg call is only made if there is a GUI.  (7/14/99, Valdes)
+
+*
+pkg$xtools/gtools/gthelp.x -
+pkg$xtools/gtools/gtpage.x -
+    New version with access to most of the GIO parameters and with
+    GUI messages.  (5/11/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+=====
+V2.11
+=====
+lib$pkg/gtools.h
+pkg$xtools/gtools/gtools.h
+pkg$xtools/gtools/gtcolon.x
+pkg$xtools/gtools/gtset.x
+pkg$xtools/gtools/gtget.x
+pkg$xtools/gtools/gtlabax.x
+pkg$xtools/gtools/gtinit.x
+pkg$xtools/gtools/gtools.hlp
+    Added GTDRAWTITLE, GTDRAWXLABELS, and GTDRAWYLABELS to control the
+    three label components as blocks and independent of the user or
+    application settings of the title parameters and label parameters.
+    The help and key files were updated.
+    (4/26/96, Valdes)
+
+=========
+V2.10.4p2
+=========
+
+pkg$xtools/gtools/gtascale.x
+    The case with gt==NULL was not correct.  (8/16/95, Valdes)
+
+lib$pkg/gtools.h
+pkg$xtools/gtools/gtools.h
+pkg$xtools/gtools/gtget.x
+pkg$xtools/gtools/gtset.x
+pkg$xtools/gtools/gtwindow.x
+pkg$xtools/gtools/gtcopy.x
+pkg$xtools/gtools/gtinit.x
+pkg$xtools/gtools/gtswind.x
+pkg$xtools/gtools/gtcolon.x
+pkg$xtools/gtools/gtascale.x
+    Two new parameters, GTXFLIP and GTYFLIP, were added.  These boolean
+    parameters can be set to flip vectors plotted with the gtools
+    functions.  In the gt_window functions flips are now done using
+    these new parameters rather than explicitly setting the plot
+    limits.  Previously this meant that any use of the flip would
+    not allow autoscaling; that is a new graph with different limits
+    would only cover the fixed limits.  It also mean that the 'a'
+    window function would reset the flip.  (12/8/93, Valdes)
+
+pkg$xtools/gtools/gtplot.x
+    The gio color marks are drawn using the G_PLCOLOR rather than G_PMCOLOR
+    so the code was change to work appropriately. (11/11/93, Valdes)
+
+===========
+V2.10.3Beta
+===========
+
+pgk$xtools/gtools/gtools.hlp
+pgk$xtools/gtools/gtinit.x
+pgk$xtools/gtools/gtcolon.x
+pgk$xtools/gtools/Revisions
+pgk$xtools/gtools/gtvplot.x
+pgk$xtools/gtools/gtset.x
+pgk$xtools/gtools/gtplot.x
+pgk$xtools/gtools/gtget.x
+pgk$xtools/gtools/gtcopy.x
+pgk$xtools/gtools/gtools.h
+    Added color option.  (10/29/92, Valdes)
+
+pkg$xtools/gtools/gtcolon.x
+    The :/parameters case was resetting the subtitle string.
+    (12/28/90, Valdes, diagnosed by Jeff Munn)
+
+pkg$xtools/gtools/gtget.x
+    When the sysid option was added the gtgets routine was not modified
+    to return the setting.  This has been added.  (7/12/90, Valdes)
+
+pkg$xtools/gtools/gtget.x
+    When the histogram type was added the gtgets routine was not modified
+    to return this type.  This has been added.  (6/28/90, Valdes)
+
+====
+V2.9
+====
+
+pkg$xtools/gtools
+    1.  Added new colon command :/sysid to turn off system ID banner.
+    2.  Added new colon command :/type hist to plot histogram type lines.
+    (10/5/89, Valdes)
+
+pkg$xtools/gtools/gtascale.x
+    Made a trivial change, a temp variable is now used for switching two
+    variables, to work around an optimizer bug on Sun3/OS4/f68881.
+    (9/21/89, Valdes)
+
+====
+V2.8
+====
+
+pkg$xtools/gtools/gtascale.x +
+    Added a procedure to complement GSCALE to scale data only within
+    a GTOOLS window.  (11/30/87 Valdes)
+
+pkg$xtools/gtools/gtvplot.x +
+    Added a vector version of GT_PLOT.  (11/5/87 Valdes)
+
+====
+V2.5
+====
+
+pkg$xtools/gtools/*.x
+    Valdes, February 17, 1987
+    1.  Requires GIO changes.
+    2.  Eliminated GT_PAGE, GT_HELP, GT_WAITPAGE.
+    3.  Argument change to GT_COLON.
+
+pkg$xtools/gtools/gtset.x
+    Valdes, January 30, 1987
+    1.  In gtsets if the specified value string is not recognized an
+	error message is printed to STDERR.
+
+pkg$xtools/gtools/gthelp.x
+pkg$xtools/gtools/gtwindow.x
+pkg$xtools/gtools/gtcolon.x
+    Valdes, January 13, 1987
+    1.  GT_HELP now calls the system PAGEFILE procedure.  This procedure
+	should now be obsolete.
+    2.	Modified GT_WINDOW and GT_COLON to call PAGEFILE instead of GT_HELP.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+From Valdes Oct 29, 1985:
+
+Added call to gmftitle in gtlabax.  This insures that graphics written to
+a metacode file can use the metacode tools locate graphics.
+.endhelp

@@ -1,0 +1,61 @@
+# Make the LOCAL package.
+
+$call	update@src
+$exit
+
+update:
+	$call update@src
+	;
+
+# STRIP -- Strip the LOCAL package directories of all sources and other files
+# not required to run the system, or for user programming.
+
+strip:
+	!rmfiles -f lib/strip.local
+	;
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+	    | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+# SUN/IRAF multiple architecture support.
+# ----------------------------------------
+
+showfloat:				# show current float option
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+f68881:					# install f68881 binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh f68881 -d $(DIRS)
+	;
+ffpa:					# install ffpa binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh ffpa -d $(DIRS)
+	;
+fswitch:				# install fswitch binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh fswitch -d $(DIRS)
+	;
+fsoft:					# install fsoft binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh fsoft -d $(DIRS)
+	;
+sparc:					# install sparc binaries
+	$verbose off
+	$set DIRS = "lib src"
+	!$(hlib)/mkfloat.csh sparc -d $(DIRS)
+	;

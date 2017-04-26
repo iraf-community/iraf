@@ -1,0 +1,49 @@
+#  Parameter file for the FXCOR task
+
+# Input parameters
+objects,s,a,,,,"List of object spectra"
+templates,s,a,,,,"List of template spectra"
+apertures,s,h,"*",,,"Apertures to be used"
+cursor,*gcur,h,"",,,"Graphics input cursor
+"
+# Data preparation parameters
+continuum,s,h,"both","object|template|both|none",,"Continuum subtract spectra?"
+filter,s,h,"none","object|template|both|none",,"Fourier filter the spectra?"
+rebin,s,h,"smallest","smallest|largest|object|template",,"Rebin to which dispersion?"
+pixcorr,b,h,no,,,"Do a pixel-only correlation?"
+osample,s,h,"*",,,"Object regions to be correlated ('*' => all)"
+rsample,s,h,"*",,,"Template regions to be correlated"
+apodize,r,h,0.2,0.0,0.5,"Apodize end percentage
+"
+# Fitting function parameters
+function,s,h,"gaussian","parabola|gaussian|lorentzian|center1d|sinc",,"Function to fit correlation"
+width,r,h,INDEF,,,"Width of fitting region in pixels"
+height,r,h,0.0,,,"Starting height of fit"
+peak,b,h,no,,,"Is height relative to ccf peak?"
+minwidth,r,h,3.,3.,,"Minimum width for fit"
+maxwidth,r,h,21.,,,"Maximum width for fit"
+weights,r,h,1.,,,"Power defining fitting weights"
+background,r,h,0.0,,,"Background level for fit"
+window,r,h,INDEF,,,"Size of window in the correlation plot"
+wincenter,r,h,INDEF,,,"Center of peak search window
+"
+# Output parameters
+output,f,h,"",,,"Root spool filename for output"
+verbose,s,h,"long","short|long|nolog|nogki|txtonly|stxtonly",,"Verbose output to spool file?"
+imupdate,b,h,no,,,"Update the image header?"
+graphics,s,h,"stdgraph",,,"Graphics output device
+"
+# Control parameters
+interactive,b,h,yes,,,"Interactive graphics?"
+autowrite,b,h,yes,,,"Automatically record results?"
+autodraw,b,h,yes,,,"Automatically redraw fit results?"
+ccftype,s,h,"image","image|text",,"Output type of ccf
+"
+# PSET parameters
+observatory,s,h,"kpno",,,"Observation location database"
+continpars,pset,h,"",,,"Continuum processing parameters"
+filtpars,pset,h,"",,,"Filter parameters pset"
+keywpars,pset,h,"",,,"Header keyword translation pset
+"
+# Mode parameter
+mode,s,h,"ql"

@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+#  MKPROTO -- Generate the VOS prototype definitions.
+
+
+vos_dir="sys"
+math_dir=""
+xtools_dir="pkg/xtools"
+ds_dir="pkg/images/tv/display pkg/images/tv/wcslab"
+
+#vosdirs="$vos_dir $math_dir $ds_dir"
+vosdirs="$vos_dir $math_dir $xtools_dir $ds_dir"
+
+curdir=`pwd`
+tproto=/tmp/_vosproto.$$
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+for d in ${vosdirs[@]}; do
+
+    # Process each of the subdirectories.
+    #
+    sdirs=`find $d -type d -print`
+    for sd in ${sdirs[@]}; do
+
+	# Skip the IMFORT library and any documentation directories
+	fname=${sd##*/}
+	if [ $fname != "doc" -a -n "`/bin/echo $sd | egrep -e imfort`" -a \
+			        -n "`/bin/echo $sd | egrep -e osb`"    -a \
+			        -n "`/bin/echo $sd | egrep -e memdbg`" -a \
+			        -n "`/bin/echo $sd | egrep -e nspp`" ]; then
+
+	    cd $sd					# go to subdirectory
+
+	    nf=`ls -1 | egrep -e "\.f" | wc -l`	# nfiles to process
+	    nx=`ls -1 | egrep -e "\.x" | wc -l`	# nfiles to process
+
+	    /bin/echo "Processing: "$nx"	"$nf"	"$sd
+	    if (( $nf>0 -o $nx>0 )); then
+
+		# Skip any files beginning with the letters 'zz', e.g. test
+		# files like zzdebug.x
+
+	 	fils=( `/bin/ls -1 [a-z][a-y]*.[xf]` )
+	 	for f in ${fils[@]}; do
+		    if [ $f != "intrp.f" -a   \
+		 	 $f != "xtpmmap.x" -a \
+		 	 $f != "ytpmmap.x" ]; then
+	                    xc -c -/P $f >> /dev/null 2>&1	# make prototype
+		    else
+		        /bin/echo "    Skipping  " $f
+		    fi
+		done
+
+	        egrep -h ^extern *.P >> $tproto		# save prototypes
+	        /bin/rm -f *.[oP]    >> /dev/null 2>&1	# clean up
+	    fi
+	    cd $curdir				# back to top
+	else
+            /bin/echo "    Skipping  " $sd
+	fi
+    done
+done
+
+# Sort the prototype file, exclude certain symbols which are duplicates 
+# in the VOS but harmless because they occur in places that never conflict,
+# e.g. the stdgraph and imd kernels.
+
+cat $tproto 		| \
+    egrep -v arbpix_ 	| \
+    egrep -v imdgeg_ 	| \
+    egrep -v stxset_ 	| \
+    egrep -v stxpas_ 	| \
+    egrep -v dgt_ 	| \
+    egrep -v sgt_ 	| \
+    egrep -v asider_ 	| \
+    egrep -v asifit_ 	| \
+    egrep -v bndsol_ 	| \
+    egrep -v ffa_ 	| \
+    egrep -v ffs_ 	| \
+    egrep -v fft842_ 	| \
+    egrep -v avdrs_ 	| \
+    egrep -v asigrl_ 	| \
+    egrep -v smooth_ 	| \
+    egrep -v sigl2 	| \
+    egrep -v sigm2 	| \
+    egrep -v impcom_ 	| \
+    egrep -v intrp 	| \
+    egrep -v srch 	| \
+    egrep -v codim 	| \
+    egrep -v mrsole 	| \
+    egrep -v mreval 	| \
+    egrep -v \ icg 	| \
+    egrep -v iclisd 	| \
+    egrep -v gscr 	| \
+    egrep -v imdcom 	| \
+    egrep -v getrot 	| \
+    egrep -v gtplot 	| \
+    egrep -v xev 	| \
+    egrep -v ceps 	| \
+    egrep -v sgt 	| \
+    egrep -v sgt 	| \
+    egrep -v U_fp 	| \
+    sort >$iraf/unix/hlib/libc/vosproto.h	
+
+#  sigl2* and sigm2* removed because of multiple uses in apps
+#  impcom removed because imio$dbc/impcom.x conflicts with plot$t_implot.x 
+#	use of 'impcom' as a common
+#  intrp*  removed because it's use is xtools$ was commented out
+#  srch*  removed because it's use is xtools$ was commented out
+#  mrsole/mreval removed because of duplicate use (splot$deblend.x and
+#  	xtools$numrecipes)
+#  icguag removed duplicate use in noao$imred/dtoi

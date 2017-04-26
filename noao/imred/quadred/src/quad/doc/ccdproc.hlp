@@ -1,0 +1,720 @@
+.help ccdproc Oct90 noao.imred.ccdred
+.ih
+NAME
+ccdproc -- Process CCD images
+.ih
+USAGE	
+ccdproc images
+.ih
+PARAMETERS
+.ls images
+List of input CCD images to process.  The list may include processed
+images and calibration images.
+.le
+.ls ccdtype = ""
+CCD image type to select from the input image list.  If no type is given
+then all input images will be selected.  The recognized types are described
+in \fBccdtypes\fR.
+.le
+.ls max_cache = 0
+Maximum image caching memory (in Mbytes).  If there is sufficient memory
+the calibration images, such as zero level, dark count, and flat fields,
+will be cached in memory when processing many input images.  This
+reduces the disk I/O and makes the task run a little faster.  If the
+value is zero image caching is not used.
+.le
+.ls noproc = no
+List processing steps only?
+.le
+
+.ce
+PROCESSING SWITCHES
+.ls fixpix = yes
+Fix bad CCD lines and columns by linear interpolation from neighboring
+lines and columns?  If yes then a bad pixel file must be specified.
+.le
+.ls overscan = yes
+Apply overscan or prescan bias correction?  If yes then the overscan
+image section and the readout axis must be specified.
+.le
+.ls trim = yes
+Trim the image of the overscan region and bad edge lines and columns?
+If yes then the data section must be specified.
+.le
+.ls zerocor = yes
+Apply zero level correction?  If yes a zero level image must be specified.
+.le
+.ls darkcor = yes
+Apply dark count correction?  If yes a dark count image must be specified.
+.le
+.ls flatcor = yes
+Apply flat field correction?  If yes flat field images must be specified.
+.le
+.ls illumcor = no
+Apply iillumination correction?  If yes iillumination images must be specified.
+.le
+.ls fringecor = no
+Apply fringe correction?  If yes fringe images must be specified.
+.le
+.ls readcor = no
+Convert zero level images to readout correction images?  If yes then
+zero level images are averaged across the readout axis to form one
+dimensional zero level readout correction images.
+.le
+.ls scancor = no
+Convert flat field images to scan mode flat field images?  If yes then the
+form of scan mode correction is specified by the parameter \fIscantype\fR.
+.le
+
+.ce
+PROCESSING PARAMETERS
+.ls readaxis = "line"
+Read out axis specified as "line" or "column".
+.le
+.ls fixfile
+File describing the bad lines and columns.  If "image" is specified then
+the file is specified in the image header or instrument translation file.
+.le
+.ls biassec
+Overscan bias strip image section.  If "image" is specified then the overscan
+bias section is specified in the image header or instrument translation file.
+.le
+.ls trimsec
+image section for trimming.  If "image" is specified then the trim
+image section is specified in the image header or instrument translation file.
+.le
+.ls zero = ""
+Zero level calibration image.  The zero level image may be one or two
+dimensional.  The CCD image type and subset are not checked for these
+images and they take precedence over any zero level calibration images
+given in the input list.
+.le
+.ls dark = ""
+Dark count calibration image.  The CCD image type and subset are not checked
+for these images and they take precedence over any dark count calibration
+images given in the input list.
+.le
+.ls flat = ""
+Flat field calibration images.  The flat field images may be one or
+two dimensional.  The CCD image type is not checked for these
+images and they take precedence over any flat field calibration images given
+in the input list.  The flat field image with the same subset as the
+input image being processed is selected.
+.le
+.ls illum = ""
+Iillumination correction images.  The CCD image type is not checked for these
+images and they take precedence over any iillumination correction images given
+in the input list.  The iillumination image with the same subset as the
+input image being processed is selected.
+.le
+.ls fringe = ""
+Fringe correction images.  The CCD image type is not checked for these
+images and they take precedence over any fringe correction images given
+in the input list.  The fringe image with the same subset as the
+input image being processed is selected.
+.le
+.ls minreplace = 1.
+When processing flat fields, pixel values below this value (after
+all other processing such as overscan, zero, and dark corrections) are
+replaced by this value.  This allows flat fields processed by \fBccdproc\fR
+to be certain to avoid divide by zero problems when applied to object
+images.
+.le
+.ls scantype = "shortscan"
+Type of scan format used in creating the CCD images.  The modes are:
+.ls "shortscan"
+The CCD is scanned over a number of lines and then read out as a regular
+two dimensional image.  In this mode unscanned flat fields are numerically
+scanned to form scanned flat fields comparable to the observations.  If
+the flat field calibration images are taken in scanned mode then
+\fIscancor\fR should be no and the processing performed in the same manner
+as in unscanned mode.
+.le
+.ls "longscan"
+In this mode the CCD is clocked and read out continuously to form a long
+strip.  Flat fields are averaged across the readout axis to
+form a one dimensional flat field readout correction image.  This assumes
+that all recorded image lines are clocked over the entire active area of the
+CCD.
+.le
+.le
+.ls nscan
+Number of scan readout lines used in short scan mode.  This parameter is used
+when the scan type is "shortscan".
+.le
+
+
+.ce
+OVERSCAN FITTING PARAMETERS
+.ls interactive = no
+Fit the overscan vector interactively?  If yes the overscan vector is fit
+interactively using the \fBicfit\fR package.  If no then the fitting parameters
+given below are used.
+.le
+.ls function = "legendre"
+Overscan fitting function.  The function types are "legendre" polynomial,
+"chebyshev" polynomial, "spline1" linear spline, and "spline3" cubic
+spline.
+.le
+.ls order = 1
+Number of polynomial terms or spline pieces in the overscan fit.
+.le
+.ls sample = "*"
+Sample points to use in the overscan fit.  The string "*" specified all
+points otherwise an \fBicfit\fR range string is used.
+.le
+.ls naverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls niterate = 1
+Number of rejection iterations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+.le
+.ls low_reject = 3., high_reject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+.le
+.ls grow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+.ih
+DESCRIPTION
+\fBCcdproc\fR processes CCD images to correct and calibrate for
+detector defects, readout bias, zero level bias, dark counts,
+response, iillumination, and fringing.  It also trims unwanted
+lines and columns and changes the pixel datatype.  It is efficient
+and easy to use; all one has to do is set the parameters and then
+begin processing the images.  The task takes care of most of the
+record keeping and automatically does the prerequisite processing
+of calibration images.  Beneath this simplicity there is much that
+is going on.  In this section a simple description of the usage is
+given.  The following sections present more detailed discussions
+on the different operations performed and the order and logic
+of the processing steps.  For a user's guide to the \fBccdred\fR
+package see \fBguide\fR.  Much of the ease of use derives from using
+information in the image header.  If this information is missing
+see section 13.
+
+One begins by setting the task parameters.  There are many parameters
+but they may be easily reviewed and modified using the task \fBeparam\fR.
+The input CCD images to be processed are given as an image list.
+Previously processed images are ignored and calibration images are
+recognized, provided the CCD image types are in the image header (see
+\fBinstruments\fR and \fBccdtypes\fR).  Therefore it is permissible to
+use simple image templates such as "*.imh".  The \fIccdtype\fR parameter
+may be used to select only certain types of CCD images to process
+(see \fBccdtypes\fR).
+
+The processing operations are selected by boolean (yes/no) parameters.
+Because calibration images are recognized and processed appropriately,
+the processing operations for object images should be set.
+Any combination of operations may be specified and the operations are
+performed simultaneously.  While it is possible to do operations in
+separate steps this is much less efficient.  Two of the operation
+parameters apply only to zero level and flat field images.  These
+are used for certain types of CCDs and modes of operation.
+
+The processing steps selected have related parameters which must be
+set.  These are things like image sections defining the overscan and
+trim regions and calibration images.  There are a number of parameters
+used for fitting the overscan or prescan bias section.  These are
+parameters used by the standard IRAF curve fitting package \fBicfit\fR.
+The parameters are described in more detail in the following sections.
+
+In addition to the task parameters there are package parameters
+which affect \fBccdproc\fR.  These include the instrument and subset
+files, the text and plot log files, the output pixel datatype,
+the amount of memory available for calibration image caching,
+the verbose parameter for logging to the terminal, and the backup
+prefix.  These are described in \fBccdred\fR.
+
+Calibration images are specified by task parameters and/or in the
+input image list.  If more than one calibration image is specified
+then the first one encountered is used and a warning is issued for the
+extra images.  Calibration images specified by
+task parameters take precedence over calibration images in the input list.
+These images also need not have a CCD image type parameter since the task
+parameter identifies the type of calibration image.  This method is
+best if there is only one calibration image for all images
+to be processed.  This is almost always true for zero level and dark
+count images.  If no calibration image is specified by task parameter
+then calibration images in the input image list are identified and
+used.  This requires that the images have CCD image types recognized
+by the package.  This method is useful if one may simply say "*.imh"
+as the image list to process all images or if the images are broken
+up into groups, in "@" files for example, each with their own calibration
+frames.
+
+When an input image is processed the task first determines the processing
+parameters and calibration images.  If a requested operation has been
+done it is skipped and if all requested operations have been completed then
+no processing takes place.  When it determines that a calibration image
+is required it checks for the image from the task parameter and then
+for a calibration image of the proper type in the input list.
+
+Having
+selected a calibration image it checks if it has been processed by
+looking for the image header flag CCDPROC.  If it is not present then
+the calibration image is processed.  When any image has been processed
+the CCDPROC flag is added.  For images processed directly by \fBccdproc\fR
+the individual processing flags are checked even if the CCDPROC flag is
+present.  However, the automatic processing of the calibration images is
+only done if the CCDPROC flag is absent!  This is to make the task more
+efficient by not having to check every flag for every calibration image
+for every input image.  Thus, if additional processing
+steps are added after images have been partially reduced then input images
+will be processed for the new steps but calibration images will not be
+processed automatically.
+
+After the calibration images have been identified, and processed if
+necessary, the images may be cached in memory.  This is done when there
+are more than two input images (it is actually less efficient to
+cache the calibration images for one or two input images) and the parameter
+\fImax_cache\fR is greater than zero.  When caching, as many calibration
+images as allowed by the specified memory are read into memory and
+kept there for all the input images.  Cached images are, therefore,
+only read once from disk which reduces the amount of disk I/O.  This
+makes a modest decrease in the execution time.  It is not dramatic
+because the actual processing is fairly CPU intensive.
+
+Once the processing parameters and calibration images have been determined
+the input image is processed for all the desired operations in one
+step; i.e. there are no intermediate results or images.  This makes
+the task efficient.  The corrected image is output as a temporary image
+until the entire image has been processed.  When the image has been
+completely processed then the original image is deleted (or renamed
+using the specified backup prefix) and the corrected image replaces
+the original image.  Using a temporary image protects the data in the
+event of an abort or computer failure.  Keeping the original image name
+eliminates much of the record keeping and the need to generate new
+image names.
+.sh
+1. Fixpix
+Regions of bad lines and columns may be replaced by linear
+interpolation from neighboring lines and columns when the parameter
+\fIfixpix\fR is set.  The bad regions are specified in a bad pixel
+file.  The file consists of lines with four fields, the starting and
+ending columns and the starting and ending lines.  Any number of
+regions may be specified.  Comment lines beginning with the character
+'#' may be included.  If a comment line preceding the bad regions
+contains the word "untrimmed" then the coordinate system refers to the
+original format of the images; i.e.  before trimming.  If an image has
+been trimmed previously then the trim region specified in the image
+header is used to convert the coordinates in the bad pixel file to
+those of the trimmed image.  If the file does not contain the word
+"untrimmed" then the coordinate system must match that of the image
+being corrected; i.e. untrimmed coordinates if the image has not been
+trimmed and trimmed coordinates if the image has been trimmed.
+Standard bad pixel files should always be specified in terms of the
+original format.
+
+The bad pixel file may be specified explicitly with the parameter \fIfixfile\fR
+or indirectly if the parameter has the value "image".  In the latter case
+the instrument file must contain the name of the file.
+.sh
+2. Overscan
+If an overscan or prescan correction is specified (\fIoverscan\fR
+parameter) then the image section (\fIbiassec\fR parameter) is averaged
+along the readout axis (\fIreadaxis\fR parameter) to form a
+correction vector.  A function is fit to this vector and for each readout
+line (image line or column) the function value for that line is
+subtracted from the image line.  The fitting function is generally
+either a constant (polynomial of 1 term) or a high order function
+which fits the large scale shape of the overscan vector.  Bad pixel
+rejection is also used to eliminate cosmic ray events.  The function
+fitting may be done interactively using the standard \fBicfit\fR
+iteractive graphical curve fitting tool.  Regardless of whether the fit
+is done interactively, the overscan vector and the fit may be recorded
+for later review in a metacode plot file named by the parameter
+\fIccdred.plotfile\fR.  The mean value of the bias function is also recorded in
+the image header and log file.
+.sh
+3. Trim
+When the parameter \fItrim\fR is set the input image will be trimmed to
+the image section given by the parameter \fItrimsec\fR.  This trim
+should, of course, be the same as that used for the calibration images.
+.sh
+4. Zerocor
+After the readout bias is subtracted, as defined by the overscan or prescan
+region, there may still be a zero level bias.  This level may be two
+dimensional or one dimensional (the same for every readout line).  A
+zero level calibration is obtained by taking zero length exposures;
+generally many are taken and combined.  To apply this zero
+level calibration the parameter \fIzerocor\fR is set.  In addition if
+the zero level bias is only readout dependent then the parameter \fIreadcor\fR
+is set to reduce two dimensional zero level images to one dimensional
+images.  The zero level images may be specified by the parameter \fIzero\fR
+or given in the input image list (provided the CCD image type is defined).
+
+When the zero level image is needed to correct an input image it is checked
+to see if it has been processed and, if not, it is processed automatically.
+Processing of zero level images consists of bad pixel replacement,
+overscan correction, trimming, and averaging to one dimension if the
+readout correction is specified.
+.sh
+5. Darkcor
+Dark counts are subtracted by scaling a dark count calibration image to
+the same exposure time as the input image and subtracting.  The
+exposure time used is the dark time which may be different than the
+actual integration or exposure time.  A dark count calibration image is
+obtained by taking a very long exposure with the shutter closed; i.e.
+an exposure with no light reaching the detector.  The dark count
+correction is selected with the parameter \fIdarkcor\fR and the dark
+count calibration image is specified either with the parameter
+\fIdark\fR or as one of the input images.  The dark count image is
+automatically processed as needed.  Processing of dark count images
+consists of bad pixel replacement, overscan and zero level correction,
+and trimming.
+.sh
+6. Flatcor
+The relative detector pixel response is calibrated by dividing by a
+scaled flat field calibration image.  A flat field image is obtained by
+exposure to a spatially uniform source of light such as an lamp or
+twilight sky.  Flat field images may be corrected for the spectral
+signature in spectroscopic images (see \fBresponse\fR and
+\fBapnormalize\fR), or for iillumination effects (see \fBmkillumflat\fR
+or \fBmkskyflat\fR).  For more on flat fields and iillumination corrections
+see \fBflatfields\fR.  The flat field response is dependent on the
+wavelength of light so if different filters or spectroscopic wavelength
+coverage are used a flat field calibration for each one is required.
+The different flat fields are  automatically selected by a subset
+parameter (see \fBsubsets\fR).
+
+Flat field calibration is selected with the parameter \fBflatcor\fR
+and the flat field images are specified with the parameter \fBflat\fR
+or as part of the input image list.  The appropriate subset is automatically
+selected for each input image processed.  The flat field image is
+automatically processed as needed.  Processing consists of bad pixel
+replacement, overscan subtraction, zero level subtraction, dark count
+subtraction, and trimming.  Also if a scan mode is used and the
+parameter \fIscancor\fR is specified then a scan mode correction is
+applied (see below).  The processing also computes the mean of the
+flat field image which is used later to scale the flat field before
+division into the input image.  For scan mode flat fields the ramp
+part is included in computing the mean which will affect the level
+of images processed with this flat field.  Note that there is no check for
+division by zero in the interest of efficiency.  If division by zero
+does occur a fatal error will occur.  The flat field can be fixed by
+replacing small values using a task such as \fBimreplace\fR or
+during processing using the \fIminreplace\fR parameter.  Note that the
+\fIminreplace\fR parameter only applies to flat fields processed by
+\fBccdproc\fR.
+.sh
+7. Illumcor
+CCD images processed through the flat field calibration may not be
+completely flat (in the absence of objects).  In particular, a blank
+sky image may still show gradients.  This residual nonflatness is called
+the iillumination pattern.  It may be introduced even if the detector is
+uniformly illuminated by the sky because the flat field lamp
+iillumination may be nonuniform.  The iillumination pattern is found from a
+blank sky, or even object image, by heavily smoothing and rejecting
+objects using sigma clipping.  The iillumination calibration image is
+divided into the data being processed to remove the iillumination
+pattern.  The iillumination pattern is a function of the subset so there
+must be an iillumination correction image for each subset to be
+processed.  The tasks \fBmkillumcor\fR and \fBmkskycor\fR are used to
+create the iillumination correction images.  For more on iillumination
+corrections see \fBflatfields\fR.
+
+An alternative to treating the iillumination correction as a separate
+operation is to combine the flat field and iillumination correction
+into a corrected flat field image before processing the object
+images.  This will save some processing time but does require creating
+the flat field first rather than correcting the images at the same
+time or later.  There are two methods, removing the large scale
+shape of the flat field and combining a blank sky image iillumination
+with the flat field.  These methods are discussed further in the
+tasks which create them; \fBmkillumcor\fR and \fBmkskycor\fR.
+.sh
+8. Fringecor
+There may be a fringe pattern in the images due to the night sky lines.
+To remove this fringe pattern a blank sky image is heavily smoothed
+to produce an iillumination image which is then subtracted from the
+original sky image.  The residual fringe pattern is scaled to the
+exposure time of the image to be fringe corrected and then subtracted.
+Because the intensity of the night sky lines varies with time an
+additional scaling factor may be given in the image header.
+The fringe pattern is a function of the subset so there must be
+a fringe correction image for each subset to be processed.
+The task \fBmkfringecor\fR is used to create the fringe correction images.
+.sh
+9. Readcor
+If a zero level correction is desired (\fIzerocor\fR parameter)
+and the parameter \fIreadcor\fR is yes then a single zero level
+correction vector is applied to each readout line or column.  Use of a
+readout correction rather than a two dimensional zero level image
+depends on the nature of the detector or if the CCD is operated in
+longscan mode (see below).  The readout correction is specified by a
+one dimensional image (\fIzero\fR parameter) and the readout axis
+(\fIreadaxis\fR parameter).  If the zero level image is two dimensional
+then it is automatically processed to a one dimensional image by
+averaging across the readout axis.  Note that this modifies the zero
+level calibration image.
+.sh
+10. Scancor
+CCD detectors may be operated in several modes in astronomical
+applications.  The most common is as a direct imager where each pixel
+integrates one point in the sky or spectrum.  However, the design of most CCD's
+allows the sky to be scanned across the CCD while shifting the
+accumulating signal at the same rate.  \fBCcdproc\fR provides for two
+scanning modes called "shortscan" and "longscan".  The type of scan
+mode is set with the parameter \fIscanmode\fR.
+
+In "shortscan" mode the detector is scanned over a specified number of
+lines (not necessarily at sideral rates).  The lines that scroll off
+the detector during the integration are thrown away.  At the end of the
+integration the detector is read out in the same way as an unscanned
+observation.  The advantage of this mode is that the small scale flat
+field response is averaged in one dimension over the number of lines
+scanned.  A flat field may be observed in the same way in which case
+there is no difference in the processing from unscanned imaging and the
+parameter \fIscancor\fR should be no.  However, one obtains an increase
+in the statistical accuracy of the flat fields if they are not scanned
+during the observation but digitally scanned during the processing.  In
+shortscan mode with \fIscancor\fR set to yes, flat field images are
+digitally scanned, if needed, by the specified number of scan lines
+(\fInscan\fR parameter).
+
+In "longscan" mode the detector is continuously read out to produce
+an arbitrarily long strip.  Provided data which has not passed over
+the entire detector is thrown away, the flat field corrections will
+be one dimensional.  If \fIscancor\fR is specified and the
+scan mode is "longscan" then a one dimensional flat field correction
+will be applied.  If the specified flat field (\fIflat\fR parameter)
+is a two dimensional image then when the flat field image is processed
+it will be averaged across the readout axis to form a one dimensional
+correction image.
+.sh
+11. Processing Steps
+The following describes the steps taken by the task.  This detailed
+outline provides the most detailed specification of the task.
+
+.ls 5 (1)
+An image to be processed is first checked that it is of the specified
+CCD image type.  If it is not the desired type then go on to the next image.
+.le
+.ls (2)
+A temporary output image is created of the specified pixel data type
+(\fBccdred.pixeltype\fR).  The header parameters are copied from the
+input image.
+.le
+.ls (3)
+If trimming is specified and the image has not been trimmed previously,
+the trim section is determined.
+.le
+.ls (4)
+If bad pixel replacement is specified and this has not been done
+previously, the bad pixel file is determined either from the task
+parameter or the instrument translation file.  The bad pixel regions
+are read.  If the image has been trimmed previously and the bad pixel
+file contains the word "untrimmed" then the bad pixel coordinates are
+translated to those of the trimmed image.
+.le
+.ls (5)
+If an overscan correction is specified and this correction has not been
+applied, the overscan section is averaged along the readout axis.  If
+trimming is to be done the overscan section is trimmed to the same
+limits.  A function is fit either interactively or noninteractively to
+the overscan vector.  The function is used to produce the overscan
+vector to be subtracted from the image.  This is done in real
+arithmetic.
+.le
+.ls (6)
+If the image is a zero level image go to processing step 12.
+If a zero level correction is desired and this correction has not been
+performed, find the zero level calibration image.  If the zero level
+calibration image has not been processed it is processed at this point.
+This is done by going to processing step 1 for this image.  After the
+calibration image has been processed, processing of the input image
+continues from this point.
+The processed calibration image may be
+cached in memory if it has not been previously and if there is enough memory.
+.le
+.ls (7)
+If the image is a dark count image go to processing step 12.
+If a dark count correction is desired and this correction has not been
+performed, find the dark count calibration image.  If the dark count
+calibration image has not been processed it is processed at this point.
+This is done by going to processing step 1 for this image.  After the
+calibration image has been processed, processing of the input image
+continues from this point.  The ratio of the input image dark time
+to the dark count image dark time is determined to be multiplied with
+each pixel of the dark count image before subtracting from the input
+image.
+The processed calibration image may be
+cached in memory if it has not been previously and if there is enough memory.
+.le
+.ls (8)
+If the image is a flat field image go to processing step 12.  If a flat
+field correction is desired and this correction has not been performed,
+find the flat field calibration image of the appropriate subset.  If
+the flat field calibration image has not been processed it is processed
+at this point.  This is done by going to processing step 1 for this
+image.  After the calibration image has been processed, processing of
+the input image continues from this point.  The mean of the image
+is determined from the image header to be used for scaling.  If no
+mean is found then a unit scaling is used.
+The processed calibration image may be
+cached in memory if it has not been previously and if there is enough memory.
+.le
+.ls (9)
+If the image is an iillumination image go to processing step 12.  If an
+iillumination correction is desired and this correction has not been performed,
+find the iillumination calibration image of the appropriate subset.
+The iillumination image must have the "mkillum" processing flag or the
+\fBccdproc\fR will abort with an error.  The mean of the image
+is determined from the image header to be used for scaling.  If no
+mean is found then a unit scaling is used.  The processed calibration
+image may be
+cached in memory if it has not been previously and there is enough memory.
+.le
+.ls (10)
+If the image is a fringe image go to processing step 12.  If a fringe
+correction is desired and this correction has not been performed,
+find the fringe calibration image of the appropriate subset.
+The iillumination image must have the "mkfringe" processing flag or the
+\fBccdproc\fR will abort with an error.  The ratio of the input
+image exposure time to the fringe image exposure time is determined.
+If there is a fringe scaling in the image header then this factor
+is multiplied by the exposure time ratio.  This factor is used
+for scaling.  The processed calibration image may be
+cached in memory if it has not been previously and there is enough memory.
+.le
+.ls (11)
+If there are no processing operations flagged, delete the temporary output
+image, which has been opened but not used, and go to 14.
+.le
+.ls (12)
+The input image is processed line by line with trimmed lines ignored.
+A line of the input image is read.  Bad pixel replacement and trimming
+is applied to the image.  Image lines from the calibration images
+are read from disk or the image cache.  If the calibration is one
+dimensional (such as a readout zero
+level correction or a longscan flat field correction) then the image
+vector is read only once.  Note that IRAF image I/O is buffered for
+efficiency and accessing a line at a time does not mean that image
+lines are read from disk a line at a time.  Given the input line, the
+calibration images, the overscan vector, and the various scale factors
+a special data path for each combination of corrections is used to
+perform all the processing in the most efficient manner.  If the
+image is a flat field any pixels less than the \fIminreplace\fR
+parameter are replaced by that minimum value.  Also a mean is
+computed for the flat field and stored as the CCDMEAN keyword.
+.le
+.ls (13)
+The input image is deleted or renamed to a backup image.  The temporary
+output image is renamed to the input image name.
+.le
+.ls (14)
+If the image is a zero level image and the readout correction is specified
+then it is averaged to a one dimensional readout correction.
+.le
+.ls (15)
+If the image is a flat field image and the scan mode correction is specified
+then the correction is applied.  For shortscan mode a
+modified two dimensional image is produced while for longscan mode a
+one dimensional average image is produced.
+.le
+.ls (16)
+The processing is completed and either the next input image is processed
+beginning at step 1 or, if it is a calibration image which is being
+processed for an input image, control returns to the step which initiated
+the calibration image processing.
+.le
+.sh
+12. Processing Arithmetic
+The \fBccdproc\fR task has two data paths, one for real image pixel datatypes
+and one for short integer pixel datatype.  In addition internal arithmetic
+is based on the rules of FORTRAN.  For efficiency there is
+no checking for division by zero in the flat field calibration.
+The following rules describe the processing arithmetic and data paths.
+
+.ls (1)
+If the input, output, or any calibration image is of type real the
+real data path is used.  This means all image data is converted to
+real on input.  If all the images are of type short all input data
+is kept as short integers.  Thus, if all the images are of the same type
+there is no datatype conversion on input resulting in greater
+image I/O efficiency.
+.le
+.ls (2)
+In the real data path the processing arithmetic is always real and,
+if the output image is of short pixel datatype, the result
+is truncated.
+.le
+.ls (3)
+The overscan vector and the scale factors for dark count, flat field,
+iillumination, and fringe calibrations are always of type real.  Therefore,
+in the short data path any processing which includes these operations
+will be coerced to real arithmetic and the result truncated at the end
+of the computation.
+.le
+.sh
+13. In the Absence of Image Header Information
+The tasks in the \fBccdred\fR package are most convenient to use when
+the CCD image type, subset, and exposure time are contained in the
+image header.  The ability to redefine which header parameters contain
+this information makes it possible to use the package at many different
+observatories (see \fBinstruments\fR).  However, in the absence of any
+image header information the tasks may still be used effectively.
+There are two ways to proceed.  One way is to use \fBccdhedit\fR
+to place the information in the image header.
+
+The second way is to specify the processing operations more explicitly
+than is needed when the header information is present.  The parameter
+\fIccdtype\fR is set to "" or to "none".  The calibration images are
+specified explicitly by task parameter since they cannot be recognized
+in the input list.  Only one subset at a time may be processed.
+
+If dark count and fringe corrections are to be applied the exposure
+times must be added to all the images.  Alternatively, the dark count
+and fringe images may be scaled explicitly for each input image.  This
+works because the exposure times default to 1 if they are not given in
+the image header.
+.ih
+EXAMPLES
+The user's \fBguide\fR presents a tutorial in the use of this task.
+
+1. In general all that needs to be done is to set the task parameters
+and enter
+
+	cl> ccdproc *.imh &
+
+This will run in the background and process all images which have not
+been processed previously.
+.ih
+TIME REQUIREMENTS
+.nf
+o SUN-3, 15 MHz 68020 with 68881 floating point hardware (no FPA)
+o 8 Mb RAM, 2 Fuji Eagle disks.
+o Input images = 544 x 512 short
+o Output image = 500 x 500 real
+o Operations are overscan subtraction (O), trimming to 500x500 (T),
+  zero level subtraction (Z), dark count scaling and subtraction (D),
+  and flat field scaling and subtraction (F).
+o UNIX statistics
+  (user, system, and clock time, and misc. memory and i/o statistics):
+
+[OTF] One calibration image and 9 object images:
+No caching:  110.6u 25.5s 3:18 68% 28+ 40K 3093+1645io   9pf+0w
+Caching:     111.2u 23.0s 2:59 74% 28+105K 2043+1618io   9pf+0w
+
+[OTZF] Two calibration images and 9 object images:
+No caching:  119.2u 29.0s 3:45 65% 28+ 50K 4310+1660io   9pf+0w
+Caching:     119.3u 23.0s 3:07 75% 28+124K 2179+1601io   9pf+0w
+
+[OTZDF] Three calibration images and 9 object images:
+No caching:  149.4u 31.6s 4:41 64% 28+ 59K 5501+1680io  19pf+0w
+Caching:     151.5u 29.0s 4:14 70% 27+227K 2346+1637io 148pf+0w
+
+[OTZF] 2 calibration images and 20 images processed:
+No caching:  272.7u 63.8u 8:47 63% 28+ 50K 9598+3713io  12pf+0w
+Caching:     271.2u 50.9s 7:00 76% 28+173K 4487+3613io  51pf+0w
+.fi
+.ih
+SEE ALSO
+.nf
+instruments, ccdtypes, flatfields, icfit, ccdred, guide, mkillumcor,
+mkskycor, mkfringecor
+.endhelp

@@ -1,0 +1,49 @@
+.help quadsplit Aug01 noao.imred.quadred
+.ih
+NAME
+quadsplit -- Split quadformat data into single amplifier images
+.ih
+USAGE
+quadsplit input
+.ih
+PARAMETERS
+.ls input
+Image name of \fIquadformat\fR image to be split.  This task does not
+allow a list of input names.
+.le
+.ls output = ""
+Output root name to which the AMPLIST amplifier identifiers will be
+appended to form the split images.  If no output name is given then
+the input name is used as the root name.
+.le
+.ls clobber = yes
+Clobber any existing images?
+.le
+.ih
+DESCRIPTION
+Images in "quadformat" (see help topic \fBquadformat\fR) are separated
+into images containing data from only one amplifier.  The output images
+have a common root name and then an extension given by the amplifier
+labels in the AMPLIST keyword.  The output root name may be specified
+or default to the input name.
+
+In addition to producing the individual images keywords, are added that
+are understood by the standard \fBccdproc\fR task for single amplifier
+CCD reductions.
+
+The task \fBquadjoin\fR may be used to rejoin images that were split
+by this task.
+.ih
+EXAMPLES
+1. To spit an image:
+
+.nf
+    qu> quadsplit quad0072
+    qu> dir quad0072*
+    quad0072.11.imh     quad0072.21.imh     quad0072.imh        
+    quad0072.12.imh     quad0072.22.imh     
+.fi
+.ih
+SEE ALSO
+quadformat, quadjoin
+.endhelp

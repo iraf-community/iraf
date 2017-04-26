@@ -1,0 +1,38 @@
+.help dm2av Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDMAV (RMAT, AXVEC)
+
+     - - - - - -
+      D M A V
+     - - - - - -
+
+  From a rotation matrix, determine the corresponding axial vector.
+  (double precision)
+
+  A rotation matrix describes a rotation about some arbitrary axis.
+  The axis is called the Euler axis, and the angle through which the
+  reference frame rotates is called the Euler angle.  The axial
+  vector returned by this routine has the same direction as the
+  Euler axis, and its magnitude is the Euler angle in radians.  (The
+  magnitude and direction can be separated by means of the routine
+  slDVN.)
+
+  Given:
+    RMAT   d(3,3)   rotation matrix
+
+  Returned:
+    AXVEC  d(3)     axial vector (radians)
+
+  The reference frame rotates clockwise as seen looking along
+  the axial vector from the origin.
+
+  If RMAT is null, so is the result.
+
+  P.T.Wallace   Starlink   24 December 1992
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

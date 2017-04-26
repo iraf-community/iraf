@@ -1,0 +1,3 @@
+quadproc,pset,h,,,,CCD processing parameters
+only_param,b,h,no,,,Only return calibration images from parameters
+check,b,h,yes,,,Complain if any calibration images are unspecified

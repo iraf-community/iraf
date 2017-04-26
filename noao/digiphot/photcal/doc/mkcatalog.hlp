@@ -1,0 +1,220 @@
+.help mkcatalog Aug91 noao.digiphot.photcal
+
+.ih
+NAME
+mkcatalog -- create or edit a catalog, usually but not necessarily
+a standard star catalog
+.ih
+USAGE
+mkcatalog catalog
+.ih
+PARAMETERS
+.ls catalog
+The name of the new output catalog to be created or a previously existing
+catalog to be edited.
+.le
+.ls review = no
+Review any pre-existing entries?
+.le
+.ls verify = no
+Verify each new entry?
+.le
+.ls edit = yes
+Enter edit mode after entering all the values?
+.le
+.ih
+DESCRIPTION
+
+MKCATALOG is a script task which permits the user to create or edit
+the catalog \fIcatalog\fR, usually but not necessarily, a standard star
+catalog.  MKCATALOG has two modes of operation, entry mode and edit mode.
+In entry mode MKCATALOG prompts the user for input.
+In edit mode MKCATALOG calls up the default editor specified by
+the IRAF environment variable \fIeditor\fR.
+
+If \fIcatalog\fR is a new catalog, MKCATALOG prompts the user for 
+the name of the object id column, the names of the data columns,
+the names of the error columns (these are optional), and the widths
+of the columns. Typing the end-of-file character <EOF>,
+usually ^Z or ^D, terminates column definition
+and places the user in entry mode.
+In entry mode MKCATALOG prompts the user for the object ids and data values.
+Entering carriage return, <CR>, after MKCATALOG prompts for a new object id
+writes a blank line to the output catalog.
+Entering <CR> after MKCATALOG prompts for any other column
+value writes INDEF (the IRAF undefined value) in that column of the
+output catalog.
+Entry mode is terminated by typing <EOF> in response to a query for
+a new object id.  The user may verify each new
+entry by setting the parameter \fIverify\fR to "yes".
+
+Each new catalog created by MKCATALOG has an associated format
+description file listing the column names and numbers associations defined by
+the user. This file, referenced by its parent catalog name, can be
+used as input to the MKCONFIG task.
+The actual name of the format description file on disk is constructed by
+prepending the catalog name \fIcatalog\fR with the string "f" and
+appending the string ".dat". For example if a new catalog 
+called "UBVcat" is created by MKCATALOG, a format description
+file called "fUBVcat.dat" will also be created. Any pre-existing format
+description file of that name, which does not have an associated catalog
+file, will be deleted.
+
+If the catalog \fIcatalog\fR exists and was created with MKCATALOG,
+MKCATALOG reads
+the number of columns, the column names, and column widths from the
+header of the catalog, and enters entry mode positioned at the end
+of the file. If the parameter \fIreview\fR = "yes", then the user can
+review and verify existing catalog entries before entering new ones.
+When entry mode is terminated MKCATALOG enters edit mode
+in the usual way. 
+
+If \fIcatalog\fR exists but was not created with MKCATALOG, MKCATALOG
+enters edit mode immediately.
+
+If \fIcatalog\fR is a standard star catalog, the user should be aware
+that the object ids he/she has typed in, are those against which the object
+ids in the standard star observations files will be matched by the
+fitting task FITPARAMS.
+Normally the user is expected to edit the object ids in the standard
+star observations
+files to match those in the standard star catalog.
+For example, the PHOTCAL APPHOT/DAOPHOT pre-processor tasks MKNOBSFILE
+and MKOBSFILE, produce observations files whose object ids
+are of the form "field-#", where "field" is the name
+of the observed field and "#" is a sequence number, which is defined
+only if there is more than one observed star in the field.
+In this scheme the id of the  the fourth observed star in the field "M92"
+is "M92-4". If this star is actually the standard star "IX-10" in
+\fIcatalog\fR, the user must change the object id in the observations file
+to "IX-10". Alternatively the user can set up the naming
+convention in \fIcatalog\fR itself, to match  the naming
+convention of MKNOBSFILE
+or MKOBSFILE by assigning the standard stars names like "field-#" and
+subsequently measuring the standard stars in the same order as they
+appear in the catalog.  In this scheme star, "M92-4" in
+the observations file would also be "M92-4" in the standard star 
+catalog, and no editing would be required. This technique is most useful
+for standard sequences in clusters.
+
+THE MKCATALOG TASK AND THE ENTIRE PHOTCAL PACKAGE IMPOSE THE FOLLOWING
+RESTRICTIONS
+ON BOTH STAR ID NAMES AND THE COLUMN ID NAMES THAT MAY BE ASSIGNED, AND ON
+THE FORMAT OF EACH FIELD.
+
+Object id names must be composed of characters in the set [a-z,A-Z,0-9,+,-,_].
+Other characters may be included as part of the user id, but 
+will be ignored by the PHOTCAL id matching code. Object id names are
+case insensitive. To the id matching code the name "BD+61_305" is the
+same as "bd+61_305".
+
+Column names must be composed of characters in the set [a-z,A-Z,0-9]
+and the first character of the column name must be a letter of the alphabet.
+This means for example, that an individual column cannot be assigned the
+name "B-V", since "B-V" will be interpreted as an arithmetic expression not
+as a variable, by the PHOTCAL equation parsing routines.
+"B-V" may be replaced with something like "BV" or "BMV".
+MKCATALOG will complain if the user tries to enter an illegal column name.
+Column names are case sensitive. Column "BV" is not the same as 
+column "bv".
+
+Whitespace  is not permitted in either the object ids or in the column
+values. MKCATALOG will truncate any id or column value at the first
+whitespace encountered. The column widths entered by the user are used
+solely to determine
+the maximum width of each field (excess characters will be truncated)
+and to align the columns for ease of
+visual inspection by the user. The column widths are not used by the 
+PHOTCAL catalog reading code.
+
+.ih
+EXAMPLES
+
+1. Create a new standard star catalog containing the 3 photometric indices
+V, B-V, and U-B and their respective errors. Note that MKCATALOG supplies
+default names of the form "error(name)" for the error columns where "name"
+is the name of the previous column. Users are strongly urged to use the
+default names since they simplify the use of the statistical weighting
+scheme in the FITPARAMS task. If no error information is available
+error column entry can be skipped by typing <-> in response to the query
+for an error column name.
+
+.nf
+ph> mkcatalog UBVcat
+
+... enter the column names, error column names and widths as prompted
+    and shown below, note that the end-of-file character <EOF> is
+    actually ^Z in this case
+
+Enter the id column name (name, <CR>=ID, <EOF>=quit entry): 
+    Enter width of id column (width, <CR>=15): 
+Enter a name for column 2 (name, <CR>=COL2, <EOF>=quit entry): V
+    Enter width of column 2 (width, <CR>=10): 
+Enter a name for error column 3 (name, <CR>=error(V), <->=skip): 
+    Enter width of column 3 (width, <CR>=10): 
+Enter a name for column 4 (name, <CR>=COL4, <EOF>=quit entry): BV
+    Enter width of column 4 (width, <CR>=10): 
+Enter a name for error column 5 (name, <CR>=error(BV), <->=skip): 
+    Enter width of column 5 (width, <CR>=10): 
+Enter a name for column 6 (name, <CR>=COL6, <EOF>=quit entry): UB
+    Enter width of column 6 (width, <CR>=10): 
+Enter a name for error column 7 (name, <CR>=error(UB), <->=skip): 
+    Enter width of column 7 (width, <CR>=10): 
+Enter a name for column 8 (name, <CR>=COL8, <EOF>=quit entry): ^Z
+
+
+Catalog UBVcat in file UBVcat has 7 columns
+	Column 1:  ID             
+	Column 2:  V         
+	Column 3:  error(V)  
+	Column 4:  BV        
+	Column 5:  error(BV) 
+	Column 6:  UB        
+	Column 7:  error(UB) 
+
+
+... note that the <EOF> character terminates column definition
+
+... enter values for each defined column as prompted
+
+... type <EOF> to terminate entry mode
+
+... review the entries with the editor
+.fi
+
+
+2. Add new entries to the file created in example 1.
+
+.nf
+ph> mkcatalog UBVcat
+
+... enter new values as prompted
+
+... type <EOF> to terminate entry mode
+
+... review the catalog with the editor
+.fi
+
+
+3. Edit an existing catalog created with a foreign program.
+
+.nf
+ph> mkcatalog VRI.usr
+
+... review the catalog with the editor
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+The longest line permitted by an editor varies from editor to
+editor. Users should be aware that it may not be possible to use
+edit mode on very long text lines.
+
+.ih
+SEE ALSO
+photcal$catalogs/README,mknobsfile,mkobsfile,mkconfig
+.endhelp

@@ -1,0 +1,16 @@
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	icaclip.x	../icombine.com ../icombine.h
+	icaverage.x	../icombine.com ../icombine.h <imhdr.h>
+	iccclip.x	../icombine.com ../icombine.h
+	icgrow.x	../icombine.com ../icombine.h
+	icmedian.x	../icombine.com ../icombine.h
+	icmm.x		../icombine.com ../icombine.h
+	icpclip.x	../icombine.com ../icombine.h
+	icsclip.x	../icombine.com ../icombine.h
+	icsort.x	
+	;

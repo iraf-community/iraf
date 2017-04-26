@@ -1,0 +1,569 @@
+.help utilities May83 "IRAF System Utilities"
+.sh
+Basic IRAF System Utilities
+
+    A number of standard utilities are available as part of the IRAF
+user interface.  These utilities, most of which operate on files, are
+summarized later in this document.  A general discussion of files in
+the IRAF system follows.  The reader is assumed to have some familiarity
+with the IRAF command language (CL).
+
+
+.sh
+Virtual File Names
+
+    File names may be specified in a machine independent fashion, or with
+OS dependent pathnames.  A Virtual File Name (VFN) has the following form:
+
+
+.nf
+	ldir$root.extn
+
+where
+
+	ldir		logical directory or device name
+	root		root or base file name
+	extn		extension denoting the type of file
+.fi
+
+
+The LDIR and EXTN fields are optional.  The ROOT and EXTN fields may contain
+up to 20 characters selected from the set [a-zA-Z0-9_.+-#].  The EXTN field
+may not exceed three characters.  The EXTN field is separated from the ROOT
+by the character "." (dot).  If the ROOT field contains one or more occurrences
+of the dot character, the final dot delimited field is understood to be
+the extension.
+
+Logical directories are defined in the CL, using the SET command to associate
+an OS dependent pathname with a keyword in the environment table.  Logical
+directory prefixes are recursively expanded.
+
+A number of standard logical directories and devices are defined by the CL
+at startup time.  Additional logical directories are defined by applications
+packages upon entry, and become undefined when dictionary space is reclaimed
+on exit from the package.  The user may override environment definitions at
+will, by issuing SET commands to redefine environment variables.
+
+
+.sh
+File List Templates
+
+    Whenever it makes sense, the IRAF utilities are set up to process a list
+of files, rather than a single file.  In the descriptions of the standard
+utilities in the next section, "files" is a template or pattern specifying
+a list of files to be processed in some way.  The template is a string type
+parameter to the CL, which is expanded by a procedure (CLGFIL) in the
+compiled systems or applications task into an EOF terminated list of files.
+
+A template may consist of one or more file names, directory names,
+list file names, or patterns.  List elements are delimited by commas.
+A list file is denoted by prepending the character "@" to the pathname
+of the list file.  A pattern may be applied to the contents of either
+a list file or a directory.  The pattern is separated from the list file
+or directory name by the character "$".  A pattern all by itself is
+applied to the current directory.  Either logical or OS dependent
+pathnames may be used.
+
+A list element may refer only to a single directory.  Thus, one cannot
+specify a pattern such as "*/*.x", as is possible in UNIX.
+
+Some examples of templates follow:
+
+.nf
+	file
+	"file1, file2"
+	"*.x"
+	"[A-Z]*, *.com, ../$, ../fio/$*.x, lib$*.h, file, @list$*.vs"
+	"sia1:[iraf.lib]$*.h, uparm$cl_*.par"
+.fi
+
+The magic filenames "STDIN", "STDOUT", and "STDERR" have a special
+meaning.  Passing one of these special filenames to a task causes
+the named stream to be "reopened", transparently to the applications
+program.  Thus, for example, one can reference "STDIN" in a template,
+and the applications program will read from the standard input when
+it opens the corresponding file in the template.
+
+For example,
+
+	cl> concat "file1, @STDIN, STDIN, file2", > ofile
+
+concatenates the file "file1", the contents of the files named in the
+standard input (until the first EOF), the contents of the standard input
+itself (until the second EOF), and the contents of the file "file2",
+placing the output in the file "ofile".
+
+
+.sh
+File Protection and Clobber
+
+    The IRAF file interface (FIO) provides file protection and synchronization
+facilities, under control of user definable environment variables.
+
+File "clobber" refers to the overwriting of an existing file when a new
+file of the same name is created as an output file.  If "clobber" is
+defined as "no" in the environment, an IRAF task will abort if a new file
+would clobber an existing file.  If file clobber is enabled, FIO will try
+to overwrite the old file, and will abort if it cannot do so.
+
+	cl> set clobber = "yes"
+
+More explicit file protection is provided by the CL commands PROTECT and
+UNPROTECT.  A protected file cannot be deleted, accidentally or otherwise,
+until the protection has been removed with the UNPROTECT command or system
+call.
+
+A final form of file protection is provided to prevent a file from being
+clobbered which is already open by a task.  Thus, "COPY file,file" will
+abort when FIO discovers that "file" is already opened for reading.  This
+holds even if file clobber is enabled.
+
+
+.sh
+File Synchronization
+
+    File synchronization is useful when a process requires exclusive access
+to a file which is already open for exclusive access by another process.  
+When this situation occurs, the second task may abort with a message stating
+that it cannot access the file, or the task may wait for the file to become
+available.  File waiting is especially important for batch processes.
+
+	cl> set file_wait = "yes"
+
+The file wait option is controlled by the "file_wait" variable in the
+environment.  If file waiting is enabled, and a process finds that it
+has to wait to access a file, a warning message will be printed on the
+standard error output before the affected process goes to sleep.
+
+
+
+.sh
+Description of the Standard Utility Routines
+
+    Most of the system utilities are set up to read from either the
+standard input or a list of files.  If not reading from the standard
+input, and the input file template is not given on the command line,
+a prompt will be issued for the input file list.  If the output is a
+single file or directory, and output is not redirected, a prompt will
+be issued for the output file.
+
+The following list of system utilities is expected to adequately meet
+the needs of both general users and programmers.  Most notably missing
+are file editing facilities and the X-compiler.  These will be added
+to the system utilities package at some point in the future.  Other more
+specialized utilities and tools, such as are needed for general image
+processing, graphics, database management, magtape i/o, and so on, will
+be provided in the form of new packages in the months to come.
+
+.ks
+.ls 4 ALLOCATE device
+
+Allocate a device (e.g., a tape drive).  The standard logical tape
+drive names will probably be "mt0" and "mt1".
+.le
+.ke
+
+.ks
+.ls CLEAR
+
+Clear the terminal screen.
+.le
+.ke
+
+.ks
+.ls COLUMNS [files] [, c = "1,3,5-8"]
+
+Breaks the named file or files (or the standard input) up into a stream
+of words, written one word per line on the standard output.  A "word"
+is any whitespace delimited sequence of characters, or a quoted string.
+
+The hidden parameter COLUMNS may be used to extract only a particular column,
+or any list of columns, from each line.  If the list contains only the
+element "0" (the default) all columns are extracted, and placed on separate
+output lines.  If multiple columns are specified, only those columns given
+in the list are extracted, and all extracted columns from an input line
+appear together on a single output line.  If the last element in the list
+is "0", all remaining columns in the input line are extracted and placed
+on the output line.
+
+.nf
+Hidden params:
+    columns		string	["0"]	List of columns.
+.fi
+.le
+.ke
+
+.ks
+.ls CONCATENATE [files] [,output_file]
+
+Concatenate the input files to the output file.  If no input file is
+given, the standard input is used.  If no output file is given, the
+standard output is used.
+
+.nf
+hidden params:
+    otype		string	["*"]	text or binary output file
+    append		yes/no	[no]	append to output file
+.fi
+.le
+.ke
+
+.ks
+.ls COPY [file | files] [,output_file | directory]
+
+Copy the input file to the output file, or copy each file in the
+input list to the directory given as the second argument.
+
+.nf
+hidden params:
+    otype		string	["*"]	text or binary output file
+    append		yes/no	[no]	append to output file
+.fi
+.le
+.ke
+
+.ks
+.ls COUNT [files]
+
+Count the number of lines, words, and characters in each file
+in the input list.  Print the totals for each file and for all files.
+.le
+.ke
+
+.ks
+.ls DEALLOCATE device
+
+Deallocate a previously allocated device (e.g., a tape drive).
+.le
+.ke
+
+.ks
+.ls DELETE [files]
+
+Delete the named files.  A warning message is printed if a file
+cannot be deleted.  It is not considered an error to attempt to
+delete a file which does not exist.  Protected files cannot be
+deleted.
+.le
+.ke
+
+.ks
+.ls DIRECTORY [files] [,op=string]
+
+Tabulate information on all files matching the template given as the
+first argument on the standard output.  If no template is given, the
+contents of the current directory are displayed.
+
+.nf
+hidden params:
+    option	   string ["c"]	    1	one-column format
+				    a	use time of last access
+				    c	n-column format
+				    l	long format
+				    s	add size in Kb
+				    t	time sort
+				    r	reverse sort
+
+e.g.: "dir op=l"	(show current directory, long form)
+      "dir '*.x',op=lt"	(all ".x" files in cwd, long form)
+.fi
+.le
+.ke
+
+.ks
+.ls DISKSPACE
+
+Summarize the amount of disk space available on the local system.
+This command and its output are machine dependent.  This command
+may not be available on all systems.
+.le
+.ke
+
+.ks
+.ls ECHO [arglist]
+
+Echo any arguments on the standard output.
+.le
+.ke
+
+.ks
+.ls HEAD [files]
+
+Print the first few lines of each of the named files on the standard
+output.  A brief header is printed to identify each file.
+
+.nf
+hidden params:
+    nlines		int	[8]	number of lines to print
+.fi
+.le
+.ke
+
+.ks
+.ls HELP [task(s)]
+
+Retrieve documentation for the named task(s) from the help database,
+and format it on the standard output.  If no task name is given, the
+tasks comprising the current package are summarized, one line per task
+(task name followed by a brief description).  Help may be obtained for
+multiple tasks by supplying a template.  Tasks not in the current
+package search path may be referenced by specifying the pathname to
+the task ("package.task").
+
+.nf
+Hidden params:
+    option	string	[h] 	h	full help text
+				u	usage section only
+				p	program documentation
+				s	source code
+				f	give file names
+
+    file	fname	[""]	file containing help text
+    lmargin	int	[1]
+    rmargin	int	[75]
+    page	yes/no	[yes]	paginate output
+    nlpp	int	[24]	number of lines per page
+.fi
+.le
+.ke
+
+.ks
+.ls LCASE [file]
+
+Copy the named file or the standard input (a text stream) to the
+standard output, converting all alphabetic characters to lower case.
+.le
+.ke
+
+.ks
+.ls MANPAGE [task(s)]
+
+Print "manual pages" for each of the named tasks.  Manual pages are
+produced by breaking the help text for a task up into successive
+pages delimited by formfeed characters.  Each page has a header and
+a page number.  To print manual pages, the output of MANPAGE should
+be piped to PRINT ("manpage task(s) | print").
+
+.nf
+Hidden params:
+    lmargin		int	[1]	left margin
+    rmargin		int	[72]	right margin
+    nlpp		int	[60]	number of lines per page
+    first_page		int	[1]	first page to be printed
+    last_page		int	[0]	last page to be printed
+    file		fname	[""]	file containing help text
+.fi
+.le
+.ke
+
+.ks
+.ls MATCH pattern [,files] [,rev+]
+
+Search each file for the given pattern.  Copy a line to the standard
+output if the pattern can be matched.  Match against the standard input
+if no files are named.
+
+.nf
+hidden params:
+    reverse		yes/no	[n]	print lines NOT matched
+.fi
+.le
+.ke
+
+.ks
+.ls PAGE [files]
+
+The named files (or the standard input) are displayed a page at a
+time on the standard output.
+
+.nf
+Query mode params:
+    continue		y/n	[y]	query mode param, used to
+					provide the pause at the
+					end of each page, or to
+					exit early.
+hidden params:
+    nlpp		int	[24]	number of lines per page
+
+.fi
+.le
+.ke
+
+.ks
+.ls PRINT [files]
+
+The named files (or the standard output) are printed on the standard
+line printer device.  If a list of files are to be printed, each
+file is printed started on a new page, and file pages are broken and
+printed with numbered headers.  If PRINT is reading from its standard
+input, the input stream is copied to the printer without pagination.
+
+The input stream may contain ASCII standard control characters (e.g.
+formfeed), which will be processed if necessary prior to transmission
+to the output device.
+
+.nf
+hidden params:
+    page		yes/no	[no]	paginate the standard input
+    nlpp		int	[60]	number of lines per page
+    szline		int	[132]	maximum line length
+    device		string		name of printer device
+.fi
+.le
+.ke
+
+.ks
+.ls PROTECT [files]
+
+Protect the named files from deletion or clobber, accidental or
+otherwise.  It is not considered an error to attempt to protect
+a file which is already protected.  Protecting a file only prevents
+deletion of the file: write permission is not withdrawn.
+.le
+.ke
+
+.ks
+.ls RENAME [file | files] [,output_file | directory]
+
+Rename a file, or move each file in the input list to the directory
+given as the second argument.
+.le
+.ke
+
+.ks
+.ls SORT [files] [,options]
+
+Sort and merge the text files named in the list, or sort the standard
+input if no list.
+
+.nf
+hidden params:
+    numeric		yes/no	[n]	numeric sort
+    reverse		yes/no	[n]	reverse the sense of the sort
+    column		integer	[1]	column to be sorted
+    whitespace		yes/no	[y]	ignore leading whitespace
+.fi
+.le
+.ke
+
+.ks
+.ls SPY [v+]
+
+Get information on who is using the system, what they are up to, how
+much cpu time, etc., they have used, and so on.  This command, and the
+information it gives, are machine dependent.  This command may not be
+available on all systems.
+
+.nf
+hidden params:
+    verbose		yes/no	[no]	get more information
+.fi
+.le
+.ke
+
+.ks
+.ls TABLE [files]
+
+The input, consisting of a list of words, one word per line, is read
+into a buffer in memory, and organized into a table which is printed
+on the standard output.  The size of the table which can be formatted
+is limited by the amount of available buffer space.
+
+.nf
+Hidden params:
+    ncols		int	[0]	desired number of columns
+    lmargin		int	[1]	left margin of table
+    rmargin		int	[75]	right margin of table
+    maxch		int	[0]	max chars to print from each
+					word or string in the input.
+.fi
+.le
+.ke
+
+.ks
+.ls TAIL [files]
+
+Print the last few lines of each of the named files on the standard output.
+
+.nf
+hidden params:
+    nlines		int	[8]	number of lines to print
+.fi
+.le
+.ke
+
+.ks
+.ls TEE [files]
+
+Copy the standard input to the standard output, as well as to each
+of the named files.
+
+.nf
+hidden params:
+    otype		string	["*"]	text or binary output file
+    append		yes/no	[n]	append to the named files
+.fi
+.le
+.ke
+
+.ks
+.ls TIME
+
+Print the current time and date.
+.le
+.ke
+
+.ks
+.ls TYPE [files]
+
+Copy the named files to the standard output.  A brief header is
+printed at the beginning of each file, identifying the file.
+.le
+.ke
+
+.ks
+.ls UCASE [file]
+
+Copy the named file or the standard input (a text stream) to the
+standard output, converting all alphabetic characters to upper case.
+.le
+.ke
+
+.ks
+.ls UNPROTECT [files]
+
+Remove delete protection from the named files.  It is not considered
+an error to attempt to remove protection from a file which is not
+protected.
+.le
+.ke
+
+
+
+.sh
+CL Directives
+
+.ks
+.ls CHDIR directory
+
+Change the current working directory.  CHDIR without any arguments
+prints the name of the current working directory on the standard
+output.
+.le
+.ke
+
+.ks
+.ls SET [param [= value_string]]
+
+Set the value of an environment variable.  If the variable is not
+already defined, it becomes defined.  If the variable is already
+defined, the old value is (temporarily and silently) overridden.
+A variable defined or redefined with SET is discarded when CL
+dictionary space is reclaimed.
+
+SET without any arguments displays the current environment.
+.le
+.ke
+
+(etc.)
+.endhelp

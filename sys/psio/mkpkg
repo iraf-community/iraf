@@ -1,0 +1,29 @@
+# Make the PSIO interface library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+
+zzdebug:
+zzdebug.e:
+        $set    XFLAGS = "$(XFLAGS) -q"
+        $omake  zzdebug.x psio.h <psset.h> <time.h>
+        $link   zzdebug.o -o zzdebug.e
+        ;
+
+libsys.a:
+        psbreak.x       psio.h <psset.h>
+        pscenter.x      psio.h
+        psclose.x       psio.h
+        psdeposit.x     psio.h <ctype.h>
+        psfont.x        psio.h <psset.h>
+        psjustify.x     psio.h
+        psopen.x        psio.h <psset.h>
+        psoutput.x      psio.h <ctype.h> <psset.h>
+        pspos.x 	psio.h
+        psprolog.x      psio.h
+        pssetup.x       psio.h <psset.h>
+        pswidth.x       psio.h font.com <ctype.h> <psset.h>
+	;

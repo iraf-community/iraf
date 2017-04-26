@@ -1,0 +1,167 @@
+.help afiltcat Mar00 astcat
+.ih
+NAME
+afiltcat -- filter astrometry files
+.ih
+USAGE
+afiltcat input output
+.ih
+PARAMETERS
+.ls input
+The list of input astrometry files. Astrometry files may be created by
+other astcat tasks, e.g. agetcat, in which case they are preceded by a
+header describing the format of the input astrometry file, or by
+other IRAF or user tasks in which case the \fIacatpars\fR parameter set
+must be used to describe them.
+.le
+.ls output 
+The list of output astrometry files. The number of output astrometry files
+must be equal to the number of input astrometry files. If the output file
+name equals the input file name then the original astrometry file is
+overwritten.
+.le
+.ls acatpars = ""
+The default input astrometry file format parameters. The acatpars parameters
+are used only if the input astrometry file does not have a header. Type
+"help acatpars" for a detailed description of the acatpars parameters.
+.le
+.ls catalogs = "filename@noao"
+The dummy input catalog name. Afiltcat task users should leave this
+parameter at its default setting.
+.le
+.ls standard = yes
+Output a standard astrometry file ? If standard = yes then a header describing
+the format of the output astrometry file is written to the output file.
+Astcat package tasks use this information to decode the astrometry file. If
+standard = no, no header is written and astcat tasks must use the acatpars
+parameters to decode the astrometry file.
+.le
+.ls filter = yes
+Filter rather than copy the input astrometry file to the output astrometry
+file ?
+.le
+.ls afiltpars = ""
+The astrometry file filtering parameter set. Afiltpars parameters permit the
+user to sort the output on a field or field expression, select or reject
+catalog records using a boolean expression, select or reject fields
+to output, add new fields to the output that are expressions of existing
+fields, and perform simple coordinate transformations.
+.le
+.ls update = no
+Update the default values of the algorithm parameter sets, e.g. acatpars and
+afiltpars, on task termination ?
+.le
+.ls verbose = yes
+Print status messages on the terminal as the task proceeds ?
+.le
+.ls catdb = ")_.catdb"
+The catalog configuration file. Catdb defaults to the value of the
+package parameters catdb. The default catalog configuration file is
+"astcat$lib/catdb.dat".
+.le
+
+.ih
+DESCRIPTION
+
+Afiltcat filters the list of input astrometry files \fIinput\fR
+and writes the results to the output files \fIoutput\fR. The number of input
+astrometry files must equal the number of output astrometry files.
+
+The format of the input astrometry files is defined by the file header
+if the file was written by an astcat package task, or by the
+\fIacatpars\fR parameter set. The acatpars parameters \fIftype\fR and
+\fIcsystem\fR define the input astrometry file type and coordinate system.
+The position, size, and units of the standard astrometry file fields
+the associated error fields are defined by the parameters:
+\fIid\fR, \fIra\fR, \fIdec\fR, \fIpmra\fR, \fIpmdec\fR, \fIcatsystem\fR,
+\fIequinox\fR, \fIepoch\fR, \fIpx\fR, \fIrv\fR, \fImag\fR, \fIcolor\fR,
+\fIxp\fR, \fIyp\fR, \fIxc\fR, \fIyc\fR, and \fIimag\fR, and:
+ \fIera\fR, \fIedec\fR,
+\fIepmra\fR, \fIepmdec\fR, \fIepx\fR, \fIerv\fR, \fIemag\fR, \fIecolor\fR,
+\fIexc\fR, \fIeyc\fR, \fIeimag\fR.  More detailed information on astrometry
+files and the acatpars parameters can be found by typing "help files"
+and "help acatpars".
+
+If \fIfilter\fR = yes, the input astrometry file is filtered before being
+written to the outputfile. The filtering parameters are defined by the
+filtering parameter set \fIafiltpars\fR.
+The afilterpars parameters permit the user to sort the query results by setting
+the sort field parameter \fIfsort\fR, select or reject
+catalog records by setting the selection expression parameter \fIfexpr\fR,
+select or reject fields for output by setting the output field
+list parameter \fIafields\fR, and change the coordinate system, units,
+and format of the output coordinates by setting the \fIfosystem\fR,
+\fIforaunits\fR, \fIfodecunits\fR, \fIforaformat\fR, and \fIfodecformat\fR
+parameters. A more detailed description of the filtering
+parameters can be obtained by typing "help afiltpars".
+
+If \fIstandard\fR = yes a header is written to the output file which
+defines the contents and format of the output astrometry file. The astcat
+tasks use this header to decode the astrometry files. If the header is
+missing or has been modified by non-astcat tasks the user must set
+standard = no, and use the \fIacatpars\fR parameters to define the
+astrometry file format. Most non-astcat tasks will interpret the catalog
+header as documentation and skip it.
+
+If \fIupdate\fR = yes the values of the \fIacatpars\fR and \fIafiltpars\fR
+parameters are updated at task termination. If \fIverbose\fR = yes
+then detailed status reports are issued as the task executes.
+
+.ih
+EXAMPLES
+
+1. Sort the input astrometry file using the value of the magnitude field.
+
+.nf
+cl> page reg001.cat.1
+... examine catalog header to determine name of magnitude field
+cl> afiltcat reg001.cat.1 reg001.cat.2 fsort=mag1
+.fi
+
+2. Repeat example 1 but only output records for which mag1 <= 16.0.
+
+.nf
+cl> afiltcat reg001.cat.1 reg001.cat.3 fsort=mag1 fexpr="mag1 <= 16.0"
+.fi
+
+3. Repeat example 2 but since the input astrometry file has 2 magnitude
+columns output a new color field equal to "mag2 - mag1".
+
+.nf
+cl> afiltcat reg001.cat.1 reg001.cat.4 fsort=mag1 fexpr="mag1 <= 16.0" \
+fields="f[*],mag2-mag1"
+.fi
+
+4. Repeat example 1 but overwrite the input astrometry file.
+
+.nf
+cl> page reg001.cat.1
+... examine catalog header to determine name of magnitude field
+cl> afiltcat reg001.cat.1 reg001.cat.1 fsort=mag1
+.fi
+
+
+5. Filter a list of input astrometry files by extracting columns 1-4
+but reversing the order of fields 3 and 4.  Overwrite the input files.
+
+.nf
+cl> afiltcat @inlist @inlist fields="f[1-2],f4,f3"
+.fi
+
+6. Repeat the previous example for a list of text files which have no catalog
+headers but contain the ras and decs in hours and degrees in J2000
+coordinates of a list of source  in columns 1 and 2 of a simple text file.
+
+.nf
+cl> afiltcat @inlist @inlist ftype="stext" csystem=j2000 ra="1 hours" \
+    dec="2 degrees" mag="3-4" fields="f[1-2],f4,f3"
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+aclist, agetcat, acatpars, afiltpars
+.endhelp

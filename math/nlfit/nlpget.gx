@@ -1,0 +1,18 @@
+$if (datatype == r)
+include "nlfitdefr.h"
+$else
+include "nlfitdefd.h"
+$endif
+
+# NLPGET - Retreive parameter values
+
+procedure nlpget$t (nl, params, nparams)
+
+pointer	nl			# pointer to the nlfit structure
+PIXEL	params[ARB]		# parameter array
+int	nparams			# the number of the parameters
+
+begin
+	nparams = NL_NPARAMS(nl)
+	call amov$t (PARAM(NL_PARAM(nl)), params, nparams)
+end

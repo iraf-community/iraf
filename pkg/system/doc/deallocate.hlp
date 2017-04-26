@@ -1,0 +1,34 @@
+.help deallocate Jan86 system
+.ih
+NAME
+deallocate -- deallocate a device
+.ih
+USAGE
+deallocate device
+.ih
+PARAMETERS
+.ls device
+The device to be deallocated.
+.le
+.ls rewind = yes
+Rewind the device before deallocating?
+Ignored for devices other than magtape.
+.le
+.ih
+DESCRIPTION
+Deallocate a previously allocated device.  The CL will print an error
+message if one attempts to logout while devices are still allocated,
+but if \fIlogout\fR is typed several times you will be allowed to logout
+with the devices still allocated.  The CL does not automatically
+deallocate devices upon logout.
+.ih
+EXAMPLES
+
+1. Deallocate logical magtape drive B.
+
+	cl> dealloc mtb
+
+.ih
+SEE ALSO
+allocate, devstatus, file dev$devices, dev$tapecap
+.endhelp

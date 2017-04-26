@@ -1,0 +1,6 @@
+# SFLIP parameter file
+
+input,s,a,,,,Input spectra to flip
+output,s,a,,,,Output flipped spectra
+coord_flip,b,h,no,,,Flip coordinate system?
+data_flip,b,h,yes,,,Flip data?

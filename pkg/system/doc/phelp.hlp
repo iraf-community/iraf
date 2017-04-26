@@ -1,0 +1,61 @@
+.help phelp Mar90 system
+.ih
+NAME
+phelp -- page the output of the HELP task
+.ih
+USAGE
+phelp template
+.ih
+PARAMETERS
+The \fIphelp\fR parameters are the same as for \fIhelp\fR except that
+the \fIpage\fR and \fInlpp\fR parameters are omitted.
+.ih
+DESCRIPTION
+The \fIphelp\fR task is a front end to \fIhelp\fR which spools the output
+of \fIhelp\fR in a scratch file, then calls the file pager \fIpage\fR to
+view the output text.  The advantage is that while \fIhelp\fR pages its
+output, one can only move forward through the output text.  By using
+\fIphelp\fR it is possible to randomly scan the spooled help text, e.g.,
+skipping forward to get a quick overview and then backing up to read the
+details more carefully.  This capability is especially useful when viewing
+large multipage help pages, or when viewing a number of related help pages
+all at once.
+.ih
+EXAMPLES
+1. Page the help page for the \fImkpkg\fR task.
+
+    cl> phelp mkpkg
+
+2. View the help pages for all the tasks in the IMAGES package.
+
+    cl> phelp images.*
+
+When viewing multiple help pages as in this last example, note that the
+'N' and 'P' keystrokes in the pager may be used to move to the next or
+previous help page.  "." will return to the first help page (the start
+of the spooled help text) and 'G' will skip to the end of file.  Type '?'
+while in the pager to get a summary of the most often used keystrokes.
+
+3. Format and page the Lroff (IRAF HELP) format document "MWCS.hlp" in
+the system directory "mwcs".
+
+.nf
+    cl> cd mwcs
+    cl> phelp MWCS.hlp fi+
+.fi
+
+In this case the text being viewed is not part of the on-line help system,
+but is a technical document describing one of the IRAF programming interfaces.
+Any .hlp file may be viewed in this way.
+.ih
+TIME REQUIREMENTS
+\fIphelp\fR is not quite as fast as \fIhelp\fR since it must fully format
+the help text into a temporary file before the file can be viewed.  For
+small help pages, or to view only the first few screens of a help page,
+the \fIhelp\fR task will be faster.
+.ih
+BUGS
+.ih
+SEE ALSO
+page, help, references
+.endhelp

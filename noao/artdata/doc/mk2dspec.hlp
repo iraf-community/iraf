@@ -1,0 +1,207 @@
+.help mk2dspec Aug90 noao.artdata
+.ih
+NAME
+mk2dspec -- Make/add 2D spectra using 1D spectra templates
+.ih
+USAGE
+mk2dspec input
+.ih
+PARAMETERS
+.ls input
+Spectra to create or modify.
+.le
+.ls output = ""
+Output spectra when modifying input spectra.  If no output spectra are
+given then existing spectra in the input list are modified directly.
+If an output list is given then it must match in number the input list.
+.le
+.ls models = ""
+List of model parameter files.  If the list of model files is shorter than the
+list of input images then the last model file is reused.  The model
+parameter files contain lines giving one dimensional spectrum template
+name, intensity scale, type of cross dispersion profile, profile
+width in the center line, change of width per line, profile position
+in the center line, and change of position per line (see the DESCRIPTION
+section).
+.le
+.ls comments = yes
+Include comments recording task parameters in the image header?
+.le
+
+WHEN CREATING NEW SPECTRA
+.ls title = ""
+Image title to be given to the spectra.  Maximum of 79 characters.
+.le
+.ls ncols = 100, nlines = 512
+Number of columns and lines.
+.le
+.ls header = "artdata$stdheader.dat"
+Image or header keyword data file.  If an image is given then the image header
+is copied.  If a file is given then the FITS format cards are copied.
+This only applies to new images.   The data file consists of lines
+in FITS format with leading whitespace ignored.  A FITS card must begin
+with an uppercase/numeric keyword.  Lines not beginning with a FITS
+keyword such as comments or lower case are ignored.  The user keyword
+output of \fBimheader\fR is an acceptable data file.  See \fBmkheader\fR
+for further information.
+.le
+.ih
+DESCRIPTION
+This task creates or modifies two dimensional spectra by taking one
+dimensional spectra, convolving them with a spatial profile across the
+dispersion, and adding them into two dimensional images.  The one
+dimensional spectra may be real data or artificial data created with
+the task \fBmk1dspec\fR.  No noise is included but may be added with
+the task \fBmknoise\fR.  The spatial profile is fully subsampled and
+may vary in width and position along the dispersion axis.  The spatial
+axis is along the first dimension and the dispersion is along the
+second dimension.
+
+For new images a set of header keywords may be added by specifying an
+image or data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+If a data file is specified lines beginning with FITS keywords are
+entered in the image header.  Leading whitespace is ignored and any
+lines beginning with words having lowercase and nonvalid FITS keyword
+characters are ignored.  In addition, comments may be added to
+the image header recording the model file name and the contents of the
+model file.
+
+The spatial profile models are specified in one or more model parameter
+files.  These files contain lines giving a one dimensional spectrum template
+name, intensity scale, type of cross dispersion profile, profile
+width in the center line, change of width per line, profile position
+in the center line, and change of position per line.  More specifically:
+
+.ls <template name>
+The one dimensional spectrum template is any one dimensional IRAF image.
+If the spectrum template length is less than the two dimensional spectrum,
+the profile extends only over that number of lines and, if it is longer,
+then only the first part of the spectrum is used.
+.le
+.ls scale
+The template spectrum is scaled by this parameter to define the
+total flux for the two dimensional profile.
+.le
+.ls <profile type>
+The spatial profiles are identified by two keywords, "gaussian"
+or "slit".  The profiles are defined by the following formulae,
+
+.nf
+    gaussian:   I(x) = exp (-ln(2) * (2*(x-xc)/fwhm)**2)
+        slit:   I(x) = exp (-ln(2) * (2*(x-xc)/fwhm)**10)
+.fi
+
+where x is the column coordinate, xc is the profile center, and
+fwhm is the full width at half maximum.  The "gaussian" profile
+is the usual gaussian specified in terms of a FWHM.  The "slit"
+profile is one which is relatively flat and then rapidly drops
+to zero.  The profile is normalized to unit integral so that
+the total flux across the profile is given by the scaled
+1D spectrum flux.
+.le
+.ls fwhm, dfwhm
+The full width at half maximum and derivative with line number.  The fwhm is
+defined for the middle of the image.  The FWHM as a function
+of line, l, is,
+
+	fwhm + (l - nlines/2) * dfwhm
+.le
+.ls center, dcenter
+The profile center and derivative with line number.  The center is
+defined for the middle of the image.  The center as a function
+of line, l, is,
+
+	center + (l - nlines/2) * dcenter
+.le
+
+The provision for having the spectra tilted relative to the columns is
+useful for understanding undersampling effects.  However, note that the
+spectral lines are not perpendicular to the dispersion but are always
+aligned with the image lines.
+.ih
+EXAMPLES
+1. Create an artificial multifiber spectrum:
+
+.nf
+	cl> type multifiber.dat
+	arc 4 gauss 3 0 20 .01
+	spec1 .5 gauss 3 0 30 .01
+	spec2 .4 gauss 3 0 40 .01
+	spec3 .9 gauss 3 0 50 .01
+	spec4 .2 gauss 3 0 60 .01
+	spec5 .6 gauss 3 0 70 .01
+	spec6 1 gauss 3 0 80 .01
+	spec7 1 gauss 3 0 90 .01
+	cl> mk1dspec arc cont=0 peak=500 nl=30
+	cl> mk1dspec spec1 nlines=99 seed=1
+	cl> mk1dspec spec2 nlines=80 seed=2
+	cl> mk1dspec spec3 nlines=45 seed=3
+	cl> mk1dspec spec4 nlines=95 seed=4
+	cl> mk1dspec spec5 nlines=66 seed=5
+	cl> mk1dspec spec6 nlines=90 seed=6
+	cl> mk1dspec spec7 nlines=85 seed=7
+	cl> mk2dspec multifiber model=multifiber.dat
+.fi
+
+In this example artificial one dimensional spectra are generated with
+\fBmk1dspec\fR.
+
+2. Create an artificial multislit spectrum:
+
+.nf
+	cl> type multislit.dat
+	arc 10 slit 18 0 120 .01
+	sky 2.5 slit 18 0 140 .01
+	sky 2.5 slit 18 0 160 .01
+	sky 2.5 slit 18 0 180 .01
+	sky 2.5 slit 18 0 200 .01
+	sky 2.5 slit 18 0 220 .01
+
+	spec1 .05 gauss 3 0 140 .01
+	spec2 .2 gauss 4 0 161 .01
+	spec3 .1 gauss 3 0 179 .01
+	spec4 .1 gauss 3 0 200 .01
+	spec5 .15 gauss 4 0 220 .01
+	cl> mk1dspec sky peak=1 nl=100
+	cl> mk2dspec multislit model=multislit.dat nc=400
+.fi
+
+Note how two spectra are overlaid to provide a sky spectrum with a
+narrower object spectrum.
+
+3. Create an artificial long slit spectrum:
+
+.nf
+	cl> type longslit.dat
+	sky 22 slit 160 0 220 .01 
+	spec5 .05 gauss 3 0 140 .01
+	spec1 .05 gauss 3 0 190 .01
+	spec4 .5 gauss 3 0 220 .01
+	spec2 2 gauss 40 0 220 .01
+	spec5 .1 gauss 3 0 240 .01
+	spec1 .02 gauss 3 0 290 .01
+	cl> mk2dspec longslit model=longslit.dat nc=400
+.fi
+
+Note how objects are overlaid on a long slit sky spectrum.  The width
+of the spec2 spectrum is wider simulating a galaxy spectrum.
+
+4. To include noise use the task \fBmknoise\fR:
+
+.nf
+	cl> mk2dspec longslit model=longslit.dat nc=400
+	cl> mknoise longslit rdnoise=10 gain=2 poisson+ ncos=100
+.fi
+
+5. Use a real long slit spectrum and add an object with an artificial spectrum:
+
+.nf
+	cl> mk1dspec artspec1d nlines=50
+	cl> mk2dspec ls005 out=ls005new model=STDIN
+	artspec1d 1 gauss 5 0 125 0
+	[EOF]
+.fi
+.ih
+SEE ALSO
+mk1dspec, mknoise, mkheader
+.endhelp

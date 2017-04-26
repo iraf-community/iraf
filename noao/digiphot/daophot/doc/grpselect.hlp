@@ -1,0 +1,73 @@
+.help grpselect May00 noao.digiphot.daophot
+.ih
+NAME
+grpselect -- select groups from a group file by group size
+.ih
+USAGE
+grpselect ingroupfile outgroupfile min_group max_group
+.ih
+PARAMETERS
+.ls ingroupfile
+The list of input group files. Ingroupfile must have been written by the
+DAOPHOT PSF, GROUP, or NSTAR tasks. Ingroupfile may be an APPHOT/DAOPHOT text
+database or an STSDAS table.
+.le
+.ls outgroupfile
+The list of output group files. There must be one output group file for every
+input group file. Outgroupfile has the same file type as \fIingroupfile\fR.
+.le
+.ls min_group
+The minimum group size to select from the input group file(s).
+.le
+.ls max_group
+The maximum group size to select from the input group file(s).
+.le
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task? Verbose may be set to the value
+of the daophot package parameter (the default), "yes", or "no".
+.le
+.ih
+DESCRIPTION
+GRPSELECT creates a new GROUP file \fIoutgroupfile\fR by selecting groups from
+the input GROUP file \fIingroupfile\fR within a range of group sizes specified
+by \fImin_group\fR and \fImax_group\fR. If \fIingroupfile\fR is a DAOPHOT text
+database, \fIoutgroupfile\fR is a text database. Conversely if \fIingroupfile\fR
+is a DAOPHOT STSDAS table database, \fIoutgroupfile\fR is an STSDAS table 
+database.
+
+A typical use for GRPSELECT is to create a new database containing only groups
+which are less than the value of the \fImaxgroup\fR parameter in the DAOPARS
+task for direct input into the NSTAR task.  The remaining stars in the larger
+groups are reduced by running GRPSELECT once more, selecting only groups
+greater than \fImaxgroup\fR, rerunning GROUP on the output with a less
+stringent value of the DAOPARS parameter task \fIcritovlap\fR to reduce the
+group sizes and inputting the result into NSTAR.
+
+.ih
+EXAMPLES
+
+1. Select groups with between 1 and 70 stars from the GROUP task output file
+ypix.grp.1 and write them into a new file named ypixsmall.grp.
+
+.nf
+    da> grpselect ypix.grp.1 ypixsmall.grp 1 70
+
+.fi
+
+2. Select groups larger than 70 from the same input group file and rerun
+group with a new value of the critoverlap parameter on the results. 
+
+.nf
+    da> grpselect ypix.grp.1 ypixlarge.grp 71 400
+    da> group dev$ypix ypixlarge.grp ypix.psf.1 default crit=5.0
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+group
+.endhelp

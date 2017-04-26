@@ -1,0 +1,308 @@
+\hypertarget{sampMap_8c}{
+\section{sampMap.c File Reference}
+\label{sampMap_8c}\index{sampMap.c@{sampMap.c}}
+}
+(Internal) Interface to support the Map structure  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{sampMap_8c_9985b96289047cafc24f2adbfeed977f}{samp\_\-newMap} ()
+\begin{CompactList}\small\item\em Create a new Map object. \item\end{CompactList}\item 
+void \hyperlink{sampMap_8c_fe80438de542c6657d623993360b37d1}{samp\_\-freeMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)
+\begin{CompactList}\small\item\em Free the given Map object. \item\end{CompactList}\item 
+\hypertarget{sampMap_8c_1c99f7146ad3acd3e381a02d5df1234f}{
+int \textbf{samp\_\-getMapSize} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)}
+\label{sampMap_8c_1c99f7146ad3acd3e381a02d5df1234f}
+
+\item 
+\hypertarget{sampMap_8c_4c8a1b402743b52f2837e97cf41e9e34}{
+char $\ast$ \textbf{samp\_\-getMapKey} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, int index)}
+\label{sampMap_8c_4c8a1b402743b52f2837e97cf41e9e34}
+
+\item 
+\hypertarget{sampMap_8c_7dcdf07dd7f3252f3bf2dd5002c62251}{
+char $\ast$ \textbf{samp\_\-getMapVal} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, int index)}
+\label{sampMap_8c_7dcdf07dd7f3252f3bf2dd5002c62251}
+
+\item 
+void \hyperlink{sampMap_8c_b9b2157de89369eb5cd95bfe804eb89a}{samp\_\-setStringInMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key, char $\ast$value)
+\begin{CompactList}\small\item\em Set a string in a Map (append). \item\end{CompactList}\item 
+void \hyperlink{sampMap_8c_f102490efe1b92d99b67f244dc498c7b}{samp\_\-setMapInMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map1, char $\ast$key, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map2)
+\begin{CompactList}\small\item\em Set a Map in a Map (append). \item\end{CompactList}\item 
+void \hyperlink{sampMap_8c_362c2f670c98dd6a3ef69debd1871604}{samp\_\-setListInMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key, \hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list)
+\begin{CompactList}\small\item\em Set a List in a Map (append). \item\end{CompactList}\item 
+void \hyperlink{sampMap_8c_c22ec42dbf9a01c9b4e00cf011e7eb9d}{samp\_\-setIntInMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key, int value)
+\begin{CompactList}\small\item\em Set a Int in a Map (append). \item\end{CompactList}\item 
+void \hyperlink{sampMap_8c_0f07ae542f5b317311b3799bd96a88fd}{samp\_\-setFloatInMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key, float value)
+\begin{CompactList}\small\item\em Set a string in a Map (append). \item\end{CompactList}\item 
+char $\ast$ \hyperlink{sampMap_8c_96ca606e0e7da659c3dc0a30846bcd66}{samp\_\-getStringFromMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key)
+\begin{CompactList}\small\item\em Get a string from the Map. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampMap_8c_525e8ffdfa32867f392f2c1340215453}{samp\_\-getMapFromMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key)
+\begin{CompactList}\small\item\em Get a Map from the Map. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampMap_8c_31ddb90cf2184ae0151b9e7ec8c1a51f}{samp\_\-getListFromMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key)
+\begin{CompactList}\small\item\em Get a LIST from the Map. \item\end{CompactList}\item 
+int \hyperlink{sampMap_8c_210fc0eba30abddf1bdc2e780d58072c}{samp\_\-getIntFromMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key)
+\begin{CompactList}\small\item\em Get a integer from the Map. \item\end{CompactList}\item 
+float \hyperlink{sampMap_8c_b0d3768990294554a298c4057b3b315d}{samp\_\-getFloatFromMap} (\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map, char $\ast$key)
+\begin{CompactList}\small\item\em Get a float from the Map. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+(Internal) Interface to support the Map structure 
+
+SAMPMAP.C -- (Internal) Interface to support the Map structure
+
+map = samp\_\-newMap () samp\_\-freeMap (Map map)
+
+nelem = samp\_\-getMapSize (Map map) key = samp\_\-getMapKey (Map map, int index) val = samp\_\-getMapVal (Map map, int index)
+
+samp\_\-setStringInMap (Map map, char $\ast$value) samp\_\-setMapInMap (Map map1, Map map2) samp\_\-setListInMap (Map map, List list) samp\_\-setIntInMap (Map map, int ival) samp\_\-setFloatInMap (Map map, float rval)
+
+str = samp\_\-getStringFromMap (Map map, char $\ast$key) map = samp\_\-getMapFromMap (Map map, char $\ast$key) list = samp\_\-getListFromMap (Map map, char $\ast$key) ival = samp\_\-getIntFromMap (Map map, char $\ast$key) rval = samp\_\-getFloatFromMap (Map map, char $\ast$key)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampMap_8c_fe80438de542c6657d623993360b37d1}{
+\index{sampMap.c@{sampMap.c}!samp\_\-freeMap@{samp\_\-freeMap}}
+\index{samp\_\-freeMap@{samp\_\-freeMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-freeMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-freeMap ({\bf Map} {\em map})}}
+\label{sampMap_8c_fe80438de542c6657d623993360b37d1}
+
+
+Free the given Map object. 
+
+SAMP\_\-FREEMAP -- Free the given Map object
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]Map object to free \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-envGetHandler(), samp\_\-hubDeclareSubscriptions(), samp\_\-paramGetHandler(), and samp\_\-Ping().\hypertarget{sampMap_8c_b0d3768990294554a298c4057b3b315d}{
+\index{sampMap.c@{sampMap.c}!samp\_\-getFloatFromMap@{samp\_\-getFloatFromMap}}
+\index{samp\_\-getFloatFromMap@{samp\_\-getFloatFromMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-getFloatFromMap}]{\setlength{\rightskip}{0pt plus 5cm}float samp\_\-getFloatFromMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key})}}
+\label{sampMap_8c_b0d3768990294554a298c4057b3b315d}
+
+
+Get a float from the Map. 
+
+SAMP\_\-GETFLOATFROMMAP -- Get a float from the Map
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]floating point value \end{Desc}
+
+
+Referenced by samp\_\-execUserHandler(), and samp\_\-pointAtHandler().\hypertarget{sampMap_8c_210fc0eba30abddf1bdc2e780d58072c}{
+\index{sampMap.c@{sampMap.c}!samp\_\-getIntFromMap@{samp\_\-getIntFromMap}}
+\index{samp\_\-getIntFromMap@{samp\_\-getIntFromMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-getIntFromMap}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-getIntFromMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key})}}
+\label{sampMap_8c_210fc0eba30abddf1bdc2e780d58072c}
+
+
+Get a integer from the Map. 
+
+SAMP\_\-GETINTFROMMAP -- Get a integer from the Map
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]integer value \end{Desc}
+
+
+Referenced by samp\_\-execUserHandler(), and samp\_\-tbHighlightHandler().\hypertarget{sampMap_8c_31ddb90cf2184ae0151b9e7ec8c1a51f}{
+\index{sampMap.c@{sampMap.c}!samp\_\-getListFromMap@{samp\_\-getListFromMap}}
+\index{samp\_\-getListFromMap@{samp\_\-getListFromMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-getListFromMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} samp\_\-getListFromMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key})}}
+\label{sampMap_8c_31ddb90cf2184ae0151b9e7ec8c1a51f}
+
+
+Get a LIST from the Map. 
+
+SAMP\_\-GETLISTFROMMAP -- Get a LIST from the Map
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]handle to List value \end{Desc}
+
+
+Referenced by samp\_\-execUserHandler(), and samp\_\-tbSelectHandler().\hypertarget{sampMap_8c_525e8ffdfa32867f392f2c1340215453}{
+\index{sampMap.c@{sampMap.c}!samp\_\-getMapFromMap@{samp\_\-getMapFromMap}}
+\index{samp\_\-getMapFromMap@{samp\_\-getMapFromMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-getMapFromMap}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} samp\_\-getMapFromMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key})}}
+\label{sampMap_8c_525e8ffdfa32867f392f2c1340215453}
+
+
+Get a Map from the Map. 
+
+SAMP\_\-GETMAPFROMMAP -- Get a Map from the Map
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]handle to Map value \end{Desc}
+
+
+Referenced by samp\_\-execUserHandler(), samp\_\-resConeHandler(), samp\_\-resLoadHandler(), samp\_\-resSiapHandler(), samp\_\-resSsapHandler(), samp\_\-resTapHandler(), samp\_\-resVOSpaceHandler(), samp\_\-specLoadHandler(), and samp\_\-specSSAHandler().\hypertarget{sampMap_8c_96ca606e0e7da659c3dc0a30846bcd66}{
+\index{sampMap.c@{sampMap.c}!samp\_\-getStringFromMap@{samp\_\-getStringFromMap}}
+\index{samp\_\-getStringFromMap@{samp\_\-getStringFromMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-getStringFromMap}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ samp\_\-getStringFromMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key})}}
+\label{sampMap_8c_96ca606e0e7da659c3dc0a30846bcd66}
+
+
+Get a string from the Map. 
+
+SAMP\_\-GETSTRINGFROMMAP -- Get a string from the Map
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]string value from Map \end{Desc}
+
+
+Referenced by samp\_\-bibcodeHandler(), samp\_\-cmdExecHandler(), samp\_\-envGetHandler(), samp\_\-envSetHandler(), samp\_\-execUserHandler(), samp\_\-imLoadHandler(), samp\_\-paramGetHandler(), samp\_\-paramSetHandler(), samp\_\-resConeHandler(), samp\_\-resLoadHandler(), samp\_\-resSiapHandler(), samp\_\-resSsapHandler(), samp\_\-resTapHandler(), samp\_\-resVOSpaceHandler(), samp\_\-specLoadHandler(), samp\_\-specSSAHandler(), samp\_\-tbHighlightHandler(), samp\_\-tbLoadFITSHandler(), samp\_\-tbLoadHandler(), samp\_\-tbLoadVOTHandler(), and samp\_\-tbSelectHandler().\hypertarget{sampMap_8c_9985b96289047cafc24f2adbfeed977f}{
+\index{sampMap.c@{sampMap.c}!samp\_\-newMap@{samp\_\-newMap}}
+\index{samp\_\-newMap@{samp\_\-newMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-newMap}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t samp\_\-newMap (void)}}
+\label{sampMap_8c_9985b96289047cafc24f2adbfeed977f}
+
+
+Create a new Map object. 
+
+SAMP\_\-NEWMAP -- Create a new Map object
+
+\begin{Desc}
+\item[Returns:]handle to new Map \end{Desc}
+
+
+Referenced by samp\_\-envGetHandler(), samp\_\-getNullMap(), samp\_\-getOKMap(), samp\_\-paramGetHandler(), and sampInit().\hypertarget{sampMap_8c_0f07ae542f5b317311b3799bd96a88fd}{
+\index{sampMap.c@{sampMap.c}!samp\_\-setFloatInMap@{samp\_\-setFloatInMap}}
+\index{samp\_\-setFloatInMap@{samp\_\-setFloatInMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-setFloatInMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setFloatInMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key}, \/  float {\em value})}}
+\label{sampMap_8c_0f07ae542f5b317311b3799bd96a88fd}
+
+
+Set a string in a Map (append). 
+
+SAMP\_\-SETFLOATINMAP -- Set a Float in a Map (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \item[{\em value}]value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampMap_8c_c22ec42dbf9a01c9b4e00cf011e7eb9d}{
+\index{sampMap.c@{sampMap.c}!samp\_\-setIntInMap@{samp\_\-setIntInMap}}
+\index{samp\_\-setIntInMap@{samp\_\-setIntInMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-setIntInMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setIntInMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key}, \/  int {\em value})}}
+\label{sampMap_8c_c22ec42dbf9a01c9b4e00cf011e7eb9d}
+
+
+Set a Int in a Map (append). 
+
+SAMP\_\-SETINTINMAP -- Set a Int in a Map (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \item[{\em value}]value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampMap_8c_362c2f670c98dd6a3ef69debd1871604}{
+\index{sampMap.c@{sampMap.c}!samp\_\-setListInMap@{samp\_\-setListInMap}}
+\index{samp\_\-setListInMap@{samp\_\-setListInMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-setListInMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setListInMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key}, \/  {\bf List} {\em list})}}
+\label{sampMap_8c_362c2f670c98dd6a3ef69debd1871604}
+
+
+Set a List in a Map (append). 
+
+SAMP\_\-SETLISTINMAP -- Set a List in a Map (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \item[{\em list}]handle to List object to set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampMap_8c_f102490efe1b92d99b67f244dc498c7b}{
+\index{sampMap.c@{sampMap.c}!samp\_\-setMapInMap@{samp\_\-setMapInMap}}
+\index{samp\_\-setMapInMap@{samp\_\-setMapInMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-setMapInMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setMapInMap ({\bf Map} {\em map1}, \/  char $\ast$ {\em key}, \/  {\bf Map} {\em map2})}}
+\label{sampMap_8c_f102490efe1b92d99b67f244dc498c7b}
+
+
+Set a Map in a Map (append). 
+
+SAMP\_\-SETMAPINMAP -- Set a Map in a Map (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map1}]handle to Map object \item[{\em key}]Map key \item[{\em map2}]handle to Map object to set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-envGetHandler(), samp\_\-getOKMap(), samp\_\-paramGetHandler(), and sampInit().\hypertarget{sampMap_8c_b9b2157de89369eb5cd95bfe804eb89a}{
+\index{sampMap.c@{sampMap.c}!samp\_\-setStringInMap@{samp\_\-setStringInMap}}
+\index{samp\_\-setStringInMap@{samp\_\-setStringInMap}!sampMap.c@{sampMap.c}}
+\subsubsection[{samp\_\-setStringInMap}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setStringInMap ({\bf Map} {\em map}, \/  char $\ast$ {\em key}, \/  char $\ast$ {\em value})}}
+\label{sampMap_8c_b9b2157de89369eb5cd95bfe804eb89a}
+
+
+Set a string in a Map (append). 
+
+SAMP\_\-SETSTRINGINMAP -- Set a string in a Map (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em map}]handle to Map object \item[{\em key}]Map key \item[{\em value}]Map value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-envGetHandler(), samp\_\-getOKMap(), samp\_\-paramGetHandler(), and sampInit().

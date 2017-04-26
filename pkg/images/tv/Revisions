@@ -1,0 +1,996 @@
+.help revisions Jun88 images.tv
+.help revisions Nov93 nmisc
+.nf
+
+tv/imedit/epstatistics.x
+    The 'x', 'y', and 'z' pointers were declared as TY_INT instead of TY_REAL
+    (5/4/13, MJF)
+
+imexamine/imexam.h
+    The coordinates arrays in the main structure were improperly indexed
+    with the P2R macro (2/10/11, MJF)
+
+imexamine/t_imexam.x
+    Removed some accidental code that was causing the frame number to
+    be prompted for.  (12/4/08, MJF)
+
+display/t_display.x
+    The change of 8/16/07 results in the ocolors parameter being used
+    in place of the bpcolors parameter.
+    (8/26/08, Valdes)
+
+display/dspmmap.x
+    This was originally a copy of the code from xtools.  This is now a
+    simple interface calling yt_mappm.  This supports the new WCS
+    pixel mask matching.
+    (1/9/08, Valdes)
+
+=============
+V2.12.4-V2.14
+=============
+
+doc/bpmedit.hlp
+doc/imedit.hlp
+imedit/bpmedit.cl
+imedit/bpmedit.key
+imedit/epcolon.x
+imedit/epix.h
+imedit/epmask.x
+imedit/epreplace.gx
+imedit/epreplace.x
+imedit/epsetpars.x
+imedit/imedit.key
+    Added new parameters to specify a range of values that may be modified.
+    This is mainly useful with bpmedit to selected mask values to be
+    modified.  (11/16/07, Valdes)
+
+
+display/maskcolor.x
+display/t_display.x
+display/ace.h
+display/mkpkg
+doc/display.hlp
+    The overlay colors may now be set with expressions as well as with
+    the earlier syntax.  (8/16/07, Valdes)
+
+
+imedit/bpmedit.cl	+
+doc/bpmedit.hlp		+
+./imedit/bpmedit.key	+
+tv.cl
+tv.hd
+    A new script task for editing masks using imedit as the editing
+    engine was added.  (8/9/07, Valdes)
+
+imedit/t_imedit.x
+imedit/epgcur.x
+./imedit/epreplace.gx	+
+./imedit/imedit.key	+
+doc/imedit.hlp
+mkpkg
+tv.cl
+    1.	A new option to do vector constant replacement was added.  This is
+	particularly useful for editing bad pixel masks.
+    2.  New options '=', '<', and '>' to replace all pixels with values
+    	==, <=, or >= to the value at the cursor with the constant value
+	was added.  This is useful for editing object masks.
+    3.	The '?' help page is now set by an environment variable rather than
+    	hardcoded to a file in lib$src.  The environment variable is
+	imedit_help and is set in tv.cl to point to the file in the
+	source directory.
+    (8/9/07, Valdes)
+
+pkg/images/tv/display/maskcolor.x
+    There was an error that failed to parse the color string as required.
+    (8/10/07, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    Buffers were allocated as TY_SHORT but used and TY_INT.  (8/9/07, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/maskcolors.x
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/display/sigm2.x
+pkg/images/tv/doc/display.x
+    1. Overlay masks are now read as integer to preserve dynamic range.
+    2. Mapped color values less than 0 are transparent.
+    3. A color name of transparent is allowed.
+    (4/10/07, Valdes)
+
+=======
+V2.12.2
+=======
+
+pkg/images/tv/display/t_display.x
+    The image may be specified as a template provided it match only one
+    image.  (9/11/03, Valdes)
+
+pkg/images/tv/imexamine/stfmeasure.x
+    The selection of a point to get a first estimation of the FWHM in
+    stf_fit did not check for the case of a zero value.  This could cause
+    a floating divide by zero.  (5/5/03, Valdes)
+
+pkg/images/tv/imexamine/stfmeasure.x
+    The subpixel evaluation involves fitting an image interpolator to a
+    subraster.  To avoid attempting to evaluate a point outside the center
+    of the edge pixels, which is a requirement of the image interpolators,
+    the interpolator is fit to the full data raster and the evaluations
+    exclude the boundary pixels.  (5/5/03, Valdes)
+
+pkg/images/tv/imexamine/iegnfr.x
+    The test for the number of frames needed to check imd_wcsver to avoid
+    trying to use more than four frames with DS9.  (1/24/03, Valdes)
+
+pkg/images/tv/imexamine/t_imexam.x
+    Added some missing braces so that if a display is not used it doesn't
+    check for the number of frames to use.  This is only cosmetic at this
+    time.  (1/24/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+pkg/images/tv/doc/display.hlp
+    Clarified what "non-zero" means in the context of masks and images
+    used as masks.  (7/29/02, Valdes)
+
+pkg/images/tv/display/t_display.x
+    Removed an unused extern declaration for ds_errfcn() which was causing
+    a link failure on the alpha (6/12/02, MJF)
+
+pkg/images/tv/tvmark/mktools.x
+pkg/images/tv/tvmark/mkoutname.x
+    Fixed a bug in the default output image name code that would result in
+    hidden images with names like .snap.1, .snap.2, etc being written
+    if the display image name included a kernel or pixel section.
+    Davis (3/21/02)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdmapping.x
+    Added a check for the image name being "dev$pix" and if so prevented
+    this from being expanded to the full node!prefix pathname.  Previously
+    the WCS would be written with a path like 'tucana!/iraf/iraf/dev/pix'
+    and would trigger an ambiguous image name error in clients like IMEXAM
+    which need to readback the image name with a WCS query. (3/4/02, MJF)
+
+pkg/images/tv/imexamine/iegimage.x
+    When imexmaine fails to map the image name returned by the display
+    server it uses the frame buffer.  Previously there was no warning
+    message about failing to map the image.  Now there is a warning.
+    This is only given once until there is no error or the error message
+    changes either by going to a new frame buffer or doing a new display.
+    (3/4/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+pkg/images/tv/imexamine/t_imexam.x
+    When the frame buffer is used as the image source (when the image name
+    in the display frame cannot be mapped) the final imunmap would
+    attempt to unmap the same descriptor twice.  (3/1/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+    The 'p' was not properly updated for the multiple WCS changes.
+    (2/26/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+    The changes to support multiple WCS per frame involved keeping track of
+    the full WCS frame id (i.e. 101) rather than just the frame number.
+    There was a minor error in this bookkeeping when incrementing the
+    the next display frame to be used.  (2/19/02, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    The routine to compute the maximum value as the interpolated quantity
+    was incorrect because the size of the input and output arrays were
+    treated as the same when they are not.  This is used for overlay
+    display which produced the symptom of horizontal lines.  (2/5/02, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Added the feature that the bad pixel mask or overlay mask may be
+    specified by a keyword value with the syntax !<keyword>.  This is
+    important for multiextension files where various masks are set
+    as keywords.  The new task OBJMASKS also writes the object mask name
+    that is created for an image in the header.  Use of !objmask then
+    allows the object mask to be used for the bad pixel mask (to set
+    the scaling using only sky pixels) and for overlay.  (2/5/02, Valdes)
+
+pkg/images/tv/imedit/epimcopy.x
+    Added a missing TY_USHORT branch to the image copy routines.
+    (10/10/01, LED)
+
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdputwcs.x
+pkg/images/tv/display/imdsetwcs.x
+    Modified to allow read/write of the additional mapping information
+    during WCS i/o.  If the iis_version flag is non-zero and a valid mapping
+    exists, the set/put wcs routines will automatically format the WCS text
+    to include this information, otherwise it writes the old WCS text.  If
+    iis_version is non-zero and a server query returns mapping information
+    this will be stored in the iis common for later retrieval by the
+    imd_getmapping() routine.  (06/21/01, MJF)
+
+pkg/images/tv/display/imdwcsver.x
+	Removed 'frame' number argument form the procedure.  The procedure
+    will now map frame one if no connection is already opened and query the
+    WCS.  Returns non-zero if the server is capable of using the new mapping
+    structures.  Required to be called explicitly by programs using mappings
+    to initialize the imd interface for this functionality.  (06/21/01, MJF)
+
+pkg/images/tv/display/t_display.x
+	Removed earlier addition of ds_setwcs() function since this is now
+    handled by the standard imd_putwcs() interface.  Mapping information
+    is set prior to the WCS write with imd_setmapping().  (06/21/01, MJF)
+
+pkg/images/tv/display/mkpkg
+	Updated dependencies (06/21/01, MJF)
+
+pkg/images/tv/display/imdmapping.x		+
+	New routines imd_[sg]etmapping() allow a program to set the
+    mapping to be sent with the next imd_putwcs() call, or retrieve the
+    mapping info sent by the server with the last wcs query.  The calls
+    are no-ops if the connected server doesn't know about the new
+    mappings, imd_getmapping() is an integer function which returns
+    non-zero if a valid mapping is available.  A new imd_query_map() is
+    available to return the mapping information for a given WCS number.
+    The intent is that the mapping can be obtained for a wcs returned by a
+    cursor read, e.g. to get the image name associated with the mapping.
+    (6/21/01, MJF)
+
+pkg/images/tv/display/iis.com
+	Added new variables to the IIS common to hold the mapping
+    information for each WCS write.  In order to preserve the imd interfaces
+    it was necessary to save the mappings in the common, along with a flag
+    indicating whether the connected server can use them. (06/21/01, MJF)
+
+pkg/images/tv/display/iisopn.x
+    Added initialization of the iis_version value at device open time
+    (6/21/01, MJF)
+
+pkg/images/tv/display/gwindow.h
+    Removed struct element W_WCSVER added earlier, no longer needed.
+    (6/21/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Replaced call to alogr with direct call to log10 to avoid having to
+    define and error function for the vops operator.  (6/15/01, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    Removed extra arguments in amaxr call.  (6/15/01, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Added missing arguments to mw_ctrand.  (6/15/01, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Fixed problems with ds_match.  The new version is more robust and
+    correct.  A bad pixel for the displayed image is the maximum of all
+    pixels in the pixel mask which fall within the display pixel.   This
+    version still does not allow any relative rotations but does allow
+    non-integer offsets.  (4/24/01, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdwcsver.x
+pkg/images/tv/display/iis.h
+    Compatability fixes for the new WCS strings and "old" servers.  The
+    WCS version query is now carried out with a read request using the old
+    WCS data size (320) to avoid blocked reads from old servers not sending
+    the 1024-char data.  imd_getwcs() was modified to query the server for
+    the version before the actual wcs query and the request is made with the
+    appropriate size.  In the case of a WCS query the IIS 'x' register is
+    used to signal that the new format is being used, the WCS version is
+    passed back if the 'y' register is non-zero.  Neither of these registers
+    was used by the old protocol, the new ximtool checks these registers and
+    responds by using the correct WCS buffer size.  (03/12/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Removed the code which stripped the path-prefix and section from
+    the image name displayed in the title string.  This was originally
+    done to save space but confuses tasks like IMEXAM which rely on
+    this to map the image.  (02/26/01, MJF)
+
+pkg/images/tv/display/iis.h	
+    Somehow the SZ_WCSTEXT value got reset to 320, this was causing
+    a problem with TVMARK redrawing the display.  Reset to 1024.
+    (02/26/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Changes to detect and use new WCS strings (12/04/00, MJF)
+
+pkg/images/tv/display/gwindow.h
+    Added struct element W_WCSVER (12/04/00, MJF)
+
+pkg/images/tv/display/iis.h
+    Added definitions for 16-frame support, increased the size of
+    the SZ_WCSTEXT to 1024 (12/04/00, MJF)
+
+pkg/images/tv/display/mkpkg 
+pkg/images/tv/display/imdwcsver.x     	+
+    Added a routine which does a WCS query with the X register set
+    to check whether the server can handle the new WCS strings.  If
+    the reply is "version=<num>" we use the new stuff, otherwise it's
+    a no-op and we use the old format strings. (12/04/00, MJF)
+
+pkg/images/tv/display/t_display.x
+    Fixed an off-by-one error in WCS sent to the display when the display
+    buffer is smaller than the image.  (9/5/00, Valdes)
+
+pkg/images/tv/imexamine/t_imexam.x
+pkg/images/tv/imexamine/timexam.x	+
+pkg/images/tv/imexamine/iecolon.x
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/imexamine.par
+pkg/images/tv/doc/imexamine.hlp
+lib/scr/imexamine.key
+    Added new key 't' to ouput an image section centered on the cursor.
+    (9/2/00, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Masks were being copied internally in short which would truncate masks
+    having larger values.  (5/16/00, Valdes)
+
+=========
+V2.11.3p2
+=========
+
+pkg/images/tv/imedit/t_imedit.x
+pkg/images/tv/imedit/epimcopy.x
+    Added some errchks.  In particular, even though the output and working
+    images can be mapped without an error there could be an error in the
+    first I/O as when the imdir directory is not available/writeable.
+    (1/18/00, Valdes)
+
+pkg/images/tv/imedit/t_imedit.x
+    The use of a temporary image causes the output image type to be
+    set by "imtype" instead of any explicit extension.  Changed to
+    use the xt_mkimtemp routine which tries to create a temporary image
+    of the desired output image type.  (10/1/99, Valdes)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/wcslab/mkpkg
+pkg/images/tv/imedit/mkpkg
+pkg/images/tv/imexamine/mkpkg
+    Added some missing file dependencies and removed some unecessary ones
+    from the package mkpkg files.
+    (9/21/99 LED)
+
+pkg/images/tv/wcslab/wcslab.h
+    Added an entry for tnx to the list of supported projection types.
+    tnx image sometimes produced garbled plots, especially for ra ~0.0.
+    (9/17/99 LED)
+
+pkg/images/tv/wcslab/t_wcslab.x
+pkg/images/tv/wcslab/wcslab.x
+    Fixed a couple of bugs in the wcslab task that were causing it to fail with
+    the message "ERROR: MWCS: coordinate system not defined (physical)" on the
+    Dec Alpha when the usewcs parameter was set to yes, and on Sun systems when
+    the input image was undefined. The problems were a bad call to the
+    routine mw_swtype in the routine wl_decode_ctype and a missing check
+    for the image = "" case. (8/28/99 LED)
+
+=======
+V2.11.2
+=======
+
+images$tv/display/sigm2.x
+    An argument to sigm2_setup was being changed by the routine and this
+    changed argument was then incorrectly used by the calling program.
+    The argument was made input only.  (6/15/99, Valdes)
+
+images$tv/imexamine/iepos.x
+    The output of the 'x' and 'y' keys was not being written to the log
+    file because of a typo.  (5/7/99, Valdes)
+
+images$tv/display/t_display.x
+    Added checks for a data range of zero, or which rounds to zero for
+    short data, to avoid floating divide by zero errors.  Rather than
+    resort to a unitary transformation in this case the requested
+    data range minimum is decreased by one and the maximum is increased
+    by one.  (8/11/98, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    The logic in STF_FIT for determining the points to fit and the point
+    to use for the initial width estimate was faulty allowing some bad
+    cases to get through.  (7/31/98, Valdes)
+
+images$tv/imedit/epix.h
+images$tv/imedit/t_imedit.x
+images$tv/imedit/epcolon.x
+images$tv/doc/imedit.hlp
+    The temporary editing buffer image was made into a unique temporary
+    image rather than the fixed name of "epixbuf".  (6/30/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+images$tv/imexamine/iepos.x
+     Added missing argument in fprintf call.  (8/29/97, Valdes)
+
+images$tv/display/dspmmap.x
+     There was a bug in the code which gives "Warning: PLIO: reference out
+     of bounds on mask".  This was introduced with the changes to allow
+     masks and images to have different binning.  (8/21/97, Valdes)
+
+images$tv/imexamine/ieqrimexam.x	+
+images$tv/imexamine/t_imexam.x
+images$tv/imexamine/iegcur.x
+images$tv/imexamine/iecolon.x
+images$tv/doc/imexamine.hlp
+lib/scr/imexamine.key
+    Added two new keystrokes, ',' and '.', that do what 'a' and 'r' do
+    except they don't do the enclosed flux and direct FWHM measurements nor
+    iterate on the fitting radius.  Also the output format is the same as
+    the previous version of IMEXAM.  (6/12/97, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    1.  The background is now set to zero if there are no background points.
+    2.  Fixed an error recovery bug (attempting to free a pointer which
+	was not set).
+    (6/11/97, Valdes)
+
+images$tv/imexamine/ierimexam.x
+    The background widths needed to be passed to the PSF measuring routines
+    even if the background is turned off for the fitting in the 'a' and 'r'
+    keys.  (6/11/97, Valdes)
+
+images$tv/doc/display.hlp
+    Added some more information about the colors.  (5/30/97, Valdes)
+
+images$tv/display/dspmmap.x
+    Improved to allow different binning between masks and images.
+    (5/21/97, Valdes)
+
+images$tv/display/zscale.x
+    Fixed to work with 1D images.  (5/21/97, Valdes)
+
+images$tv/display/zscale.x
+images$tv/display/dspmmap.x
+    1. Now works with higher dimensional images (displays the first band)
+       and with image sections.
+    2. Now ignores error when the image has an unknown WCS type.  The
+       WCS is mapped to determine the physical coordinate transformation
+       for use with masks but this failed when someone imported an image
+       with the CAR projection type. (4/30/97, Valdes)
+
+images$tv/doc/imexamine.hlp
+    Reversed the order of the version and task in the revisions section.
+    (4/22/97, Valdes)
+
+images$tv/tvmark/mkmark.x
+    Made sure that object the label was set to "" in the call to the
+    mk_onemark procedure inside the a keystroke command. The lack
+    of initialization was causing tvmark to fail when the coordinates
+    file did not exist at task startup time and the label parameter
+    was set to "yes". (4/17, LED)
+
+images$tv/imedit/epgsfit.x
+    The earlier change failed to setup the x/y arrays for the surface fitting.
+    This was fixed.  (4/15/97, Valdes)
+
+images$tv/imexamine/iejimexam.x
+images$tv/imexamine/iecolon.x
+images$tv/kimexam.par +
+images$tv/doc/imexamine.hlp
+images$tv/tv.cl
+    Added a pset for the 'k' key rather than sharing with the 'j' key.  This
+    was confusing to users since it was the only key without it's own pset.
+    Also there may be some reason to have the fitting parameters be
+    different along lines and columns.  (4/11/97, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$doc/imexamine.hlp
+    The log output for 'a' or 'r' has one line per measurement as in
+    previous versions.  The standard output, however, uses two lines to
+    print nicely on 80 column windows.  (4/1/97, Valdes)
+
+images$tv/rimexam.par
+images$tv/doc/imexamine.hlp
+    Changed the zero point of the magnitude scale from 30.0 to 25.0.
+    (3/31/97, Davis)
+
+images$tv/display.par
+images$tv/display/t_display.x
+images$tv/display/zscale.x
+images$tv/display/sigm2.x	+
+images$tv/display/maskcolor.x	+
+images$tv/display/dspmmap.x	+
+images$tv/display/display.h
+images$tv/display/gwindow.h
+images$tv/display/mkpkg
+images$tv/doc/display.hlp
+    1.  Improved the structure of DISPLAY.
+    2.  Fixed coordinate system errors.
+    3.  Added parameters to display bad pixel masks and overlay masks.
+    4.  The z scaling sampling may use a pixel mask or image section.
+    5.  The z scaling excludes bad pixels.
+    (3/20/97, Valdes)
+
+images$tv/display/imdmapfr.x
+images$tv/display/imdputwcs.x +
+    Added two routines to hide knowledge of the channel structure and
+    other details from the calling routines.  (12/11/96, Valdes)
+
+images$tv/display/iishdr.x
+images$tv/display/iisers.x
+    Replaces SPP int -> short assignments by calls to achtiu because of
+    overflow problems with some VMS fortran compilers.
+    (12/6/96, Valdes as reported by Zarate)
+
+images$tv/display/t_display.x
+    1.  Fixed numerous problems with the coordinate system.
+    2.  Fixed a bug in how ztrans=log was done.
+    (12/5/96, Valdes)
+
+images$tv/display/sigm2.x	+
+    Added a version of the spatial interpolation routines that allows masks
+    to interpolate the input across bad pixels. (12/5/96, Valdes)
+
+images$tv/imedit/epgsfit.x
+images$tv/imedit/epcolon.x
+images$tv/doc/imedit.hlp
+images$tv/imedit/imedit.par
+    Added a median background if the xorder or yorder is zero.
+    (11/22/96, Valdes)
+
+wcslab$t_wcslab.x
+doc$wcslab.hlp
+    Added an "overplot" option to append to a plot but with a different
+    viewport.  (11/06/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+    No change but the date got updated.  (10/14/96, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    Fixed bug in evaluation of enclosed flux profile in which the scaled
+    radius was used for the gaussian subtraction stage instead of pixels.
+    This does not currently affect IMEXAM because the scale is fixed
+    at 1.  (8/29/96, Valdes)
+
+images$tv/doc/imexamine.hlp
+    Removed reference to pset for kimexam.  (5/31/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/imexamine/stfmeasure.x
+    Fixed incorrect datatype declaration "real np" -> "int np" in various
+    related places.  (4/9/96, Valdes)
+
+images$tv/imedit/epsearch.x
+images$tv/imedit/epgcur.x
+    1.  The search algorithm produced incorrect results if part of the aperture
+    	was off the edge (negative image coordinates).
+    2.  The rounding was incorrect when part of the aperture was off the
+	edge (negative image coordinates).
+    3.  A floating operand error occurs when a key is given without
+	coordinates.
+    (3/26/96, Valdes)
+
+images$tv/imexamine/iecolon.x
+images$tv/imexamine/starfocus.h
+images$tv/imexamine/stfmeasure.x
+images$tv/imexamine/ierimexam.x
+images$tv/rimexam.par
+images$doc/imexamine.hlp
+lib$scr/imexamine.key
+    The radial profile fitting and width measurements now have an option to
+    use a Gaussian or Moffat profile model.  The model is selected by a
+    new "fittype" parameter.  A new "beta" parameter may be specified as
+    INDEF to be determined from the fit or have a fixed value.  The Moffat
+    profile model does better in producing consistent FWHM values so
+    this is the default.  There is also a new "iterations" parameter
+    to allow iteratively adjusting the fitting radius.
+    The STARFOCUS code used to compute other parameters was updated to
+    use a Moffat model and a new method for measuring the FWHM directly
+    from the radially average profile.  (3/22/96, Valdes)
+
+images$tv/rimexam.par
+images$tv/doc/imexamine.hlp
+    Changed the defaults to radius=5, buffer=5, width=5.  A related change
+    is being made to STARFOCUS, PSFMEASURE, KPNOFOCUS to attempt to
+    produce similar values by default.  (3/13/96, Valdes)
+
+images$tv/imexamine/iejimexam.x
+images$tv/jimexam.par
+images$tv/doc/imexamine.hlp
+    Bug 330: There were several errors in this which only show up when
+    using a world WCS.  The parameter prompt and help now indicate the
+    initial sigma value is in pixels even when fitting in world
+    coordinates.  (2/27/96, Valdes)
+
+images$tv/imexamine/iemw.x
+    The inverse WCS function was incorrect and is fixed.  (2/27/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/imexamine/stfmeasure.x +
+images$tv/imexamine/starfocus.h +
+images$tv/imexamine/mkpkg
+images$tv/doc/imexamine.hlp
+lib$src/imexamine.key
+    New FWHM estimates based on the enclosed flux and a direct measurement
+    were added to the 'a' and 'r' keys.  The weights for the Gaussian
+    fit were modified to reduce the influence of pixels outside the
+    half-maximum radius.  The ? help and help page were revised to
+    described the new output and algorithms.  (11/9/95+12/8/95+3/14/96, Valdes)
+
+images$tv/imedit/t_imedit.x
+images$doc/imedit.hlp
+    The 'j', 'k', 'n', and 'u' keys were added to those recorded in the
+    logfile.  (4/11/95, Valdes)
+
+images$doc/imexamine.hlp
+    Fixed a typo in the equation for ellipticity.  (4/10/95, Valdes)
+
+images$tv/imexamine/iejimexam.x
+    Fixed a pointer addressing error found by Zarate.  (2/16/95, Valdes)
+
+images$tv/imexamine/iecolon.x
+images$tv/doc/imexamine.imh
+lib$src/imexamine.key
+    1.	The "label" parameter was incorrectly attributed to the surface plot
+	instead of the contour plot.
+    2.  The "axes" parameter for the surface plot was missing in the code
+	though noted in the help.
+    3.	Updated the help and key file to show the label parameter belongs
+	to the e plot and to show the axes parameter.
+    (11/8/94, Valdes)
+
+images$tv/tvmark/mkmark.x
+    Replaced a seek to EOF call with a flush call in the the tvmark task add
+    object procedure. On SunOS systems the seek to EOF was apparently forcing
+    the flush while on Solaris systems it was not, resulting in the added
+    objects never being written to the coordinate file.
+    (10/3/94, Davis)
+
+images$tv/imexamine/ierimexam.x
+    World coordinates printed in the 'r' profile graph are now formated.
+    (8/2/94, Valdes)
+
+images$tv/wcslab/wcslab.x
+    Fixed an initialization bug in wcslab that was causing the axis labels
+    of the plot to be drawn incorrectly the first time wcslab was run. 
+    This was only a bug under 2.10.3
+    (26/7/94 Davis)
+
+images$tv/imexamine/iestatistics.x
+    Changed the statistics routine to compute quantities in double precision.
+    (3/10/93, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/doc/imexamine.hlp
+    The simple gaussian fitting was inadequate and gave biased answers.
+    Replaced this algorithm with NLFIT version.  It is still just a two
+    parameter fit with the center and sky being determined and then fixed
+    as before.  (3/2/93, Valdes)
+
+images$tv/wcslab/wcslab.h
+images$tv/wcslab/wcs_desc.h
+images$tv/wcslab/wcslab.x
+images$tv/wcslab/wlwcslab.x
+    Removed a dependency on the file gio.h from the wcslab task.
+		(2/11/93 LED)
+
+images$tv/wcslab/wcs_desc.h
+images$tv/wcslab/wcslab.h
+images$tv/wcslab/wcslab.x
+images$tv/wcslab/wlwcslab.x
+    Removed several dependences on the file gio.h which were no longer
+    required. There is still one remaining dependency. (2/11/93, Davis)
+
+images$tv/wcslab/wcslab.x
+    Fixed a bug in the axis mapping code in wcslab which was causing the
+    task to fail in some circumstances if the input image was a section
+    of a higher dimensioned parent image. (1/28/93, Davis)
+
+=======
+V2.10.2
+=======
+
+images$imexamine/iejimexam.x
+    Changed aint to nint.  (8/10/92, Valdes)
+
+images$imexamine/iegdata.x
+    For some reason (typo?) the test for out-of-bounds pixels was such that
+    a single column or line at the edge of the image was considered out of
+    bounds.  The >= test was changed to >.  (7/31/92, Valdes)
+
+=======
+V2.10.1
+=======
+
+=======
+V2.10.0
+=======
+
+=======
+V2.10
+=======
+
+images$*imexam.par
+images$imexamine/*
+images$doc/imexamine.e
+    Made modifications to use coordinate formating in graphs and in
+    cursor readback.  Also the WCS label will be used if label="wcslabel".
+    Two paramters were added to the main PSET, xformat and yformat.
+    (4/10/92, Valdes)
+
+images$tv/wcslab.x
+    Wcslab was failing if an image larger than the frame buffer was
+    displayed with fill=no.
+    (3/25/92, Davis)
+
+images$tv/imexamine/iemw.x
+    The logical coordinate of an excluded axis is 1 and not axval+1.
+    (3/9/92, Valdes)
+
+images$tv/wcslab/wlwcslab.x
+    Replaced the routine wl_unused_wcs which searched for an unused wcs
+    with some code to save and replace the current wcs.
+
+    (2/18/92, Davis)
+
+images$tv/
+    Moved all the .keys files from the noao$lib/scr/ and proto$tvmark/ 
+    directories to the iraf$lib/scr/ directory.
+
+    (1/29/92, Davis)
+
+images$tv/wcslab/
+    Added the new task WCSLAB developed at ST by Jonathan Eisenhammer
+    and modified at NOAO to the TV package.
+
+    (1/24/92, Davis)
+
+images$tv/
+    
+    New version of the TV package created.
+
+    The IMEDIT, IMEXAMINE, and TVMARK tasks were removed from the old
+    NOAO.PROTO package and added to the IMAGES.TV package. See below
+    for list of previous revisions to these tasks.
+
+    The IIS dependent tasks BLINK, CV, CVL, ERASE, FRAME, LUMATCH,
+    MONOCHROME, PSEUDOCOLOR, RGB, WINDOW and ZOOM were removed from
+    the TV package and placed in the new subpackage TV.IIS.
+
+    The directory structure of the IIS package was modified.
+
+    (1/24/92, Davis)
+
+======================
+Package reorganization
+======================
+
+noao$proto/
+proto$imexamine/ievimexam.x
+    Corrected an error in the column limits computation in the routine
+    ie_get_vector that caused occasional glitches in vectors plotted
+    using the 'v' key. This bug may also explain occasional unrepeatable
+    bus errors which occurred after using the 'v' key. (12/11/91, Davis)
+
+proto$imedit/epcolon.x
+    Two calls to pargr changed to pargi.  (11/13/91, Valdes)
+
+proto$tvmark/t_tvmark.x
+proto$tvmark/mkcolon.x
+    Removed extra argument to mk_sets() calls. (11/13/91, Davis)
+
+proto$tvmark/mkppars.x
+    Changed two clputi calls to clputb calls. (11/13/91, Davis)
+
+proto$jimexam.par
+proto$proto.cl
+proto$mkpkg
+proto$imexamine/iejimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/t_imexam.x
+proto$imexamine/iegcur.x
+proto$imexamine/mkpkg
+proto$doc/imexamine.hlp
+noao$lib/scr/imexamine.key
+    Added new options for fitting 1D gaussians to lines and columns.
+    (9/2/91, Valdes)
+
+proto$imexamine/iemw.x +
+proto$imexamine/iecimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/iegimage.x
+proto$imexamine/ielimexam.x
+proto$imexamine/iepos.x
+proto$imexamine/ierimexam.x
+proto$imexamine/imexam.h
+proto$imexamine/mkpkg
+proto$imexamine/t_imexam.x
+proto$imexamine.par
+proto$doc/imexamine.hlp
+    Modified IMEXAMINE to use WCS information in axis labels and coordinate
+    readback.  (8/13/91, Valdes)
+
+proto$tvmark/mkonemark.x
+    Moved the two salloc routines to the top of the mk_onemark routine
+    where they cannot be called more than once.
+    (7/22/91, Davis)
+
+proto$tvmark.par
+    Modified the description of the pointsize parameter.
+    (7/17/91, Davis)
+
+proto$imexamine/iesimexam.x
+    Add code for checking and warning if data is all constant, all above the
+    specified ceiling, or all below the specified floor when making surface
+    plots.  (10/3/90, Valdes)
+
+proto$imedit/epmask.x
+    Added some protective changes so that if a radius of zero with a circular
+    aperture is used then round off will be less likely to cause missing
+    the pixel.  (9/23/90, Valdes)
+
+proto$tvmark/tvmark.key
+proto$tvmark/mkmark.x
+proto$tvmark/doc/tvmark.hlp
+    At user request changed the 'd' keystroke command  which marks an object
+    with a dot to the '.' and the 'u' keystroke command which deletes a
+    point to 'd'. (9/14/90 Davis)
+
+====
+V2.9
+====
+
+noao$proto/imedit/epgcur.x
+    Valdes, June 6, 1990
+    The fixpix format input was selecting interpolation across the longer
+    dimension instead of the shorter.  This meant that complete columns
+    or lines did not work at all.
+
+====
+V2.8
+====
+
+noao$proto/imexamine/t_imexam.x
+    Valdes, Mar 29, 1990
+    Even when use_display=no the task was trying to check the image display
+    for the name.  This was fixed by adding a check for this flag in the
+    relevant if statement.
+
+noao$proto/imexamine/ievimexam.x
+    Valdes, Mar 22, 1990
+    The pset was being closed without indicating this in the data structure.
+    The clcpset statement was removed.
+
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 15, 1990
+    The EOF condition was being screwed up for two keystroke commands leading
+    to a possible infinite loop when using a cursor file input.  The fix
+    is to change the "nitems=nitems+clgcur" incrementing to simply
+    "nitems=clgcur".
+
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 9, 1990
+    1. The surfit pointer was incorrectly declared as real in ep_bg causing the
+    'b' key to do nothing.  This appears to be SPARC dependent.
+    2. Fixed some more problems with cursor strings having missing coordinates
+    causing floating overflow errors.
+
+noao$proto/imexamine/iecolon.x
+    Valdes, Feb 16, 1990
+    Fixed a mistake in the the datatype of a parg call.
+
+noao$proto/imedit.par
+noao$proto/imedit/epcolon.x
+noao$proto/imedit/epmask.x
+    Valdes, Jan 17, 1990
+    1. Fixed typo in prompt string for y background order.
+    2. Wrong datatype in clput for order parameters resulting in setting
+       the user parameter file value to 0.
+    3. Bug fix in epmask.  The following is the correct line:
+       line 130:    call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
+
+noao$proto/imedit/epdisplay.x
+    Valdes, Jan 7, 1990
+    Added initialization to the zoom state.  Without the intialization
+    starting IMEDIT without display and then turning display on followed by
+    a 'r' would cause an error (very obscure but found in a demo).
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mkmark.x
+noao$proto/tvmark/tvmark.key
+noao$proto/doc/tvmark.hlp
+    Valdes, Jan 4, 1990
+    Added filled rectangle command 'f'.
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mktools.x
+noao$proto/tvmark/mkshow.x
+noao$proto/tvmark/mkcolon.x
+noao$proto/tvmark/mkfind.x
+noao$proto/tvmark/mkremove.x
+    Davis, Dec 12, 1989
+    1. Tvmark has been modified to permit deletion as well as addition of
+    objects to the coordinate file. Objects to be deleted are marked
+    with the cursor and must be within a given tolerance of an
+    object in the coordinate list to be deleted.
+    2. The help screen no longer comes up in the text window when the task
+    is invoked for the sake of uniformity with all other IRAF tasks.
+    3. The coordinate file is opened read_only in batch mode. In interactive
+    mode a warning message is issued if the user tries to append or delete
+    objects from a file which does not have write permission and no action
+    is taken.
+
+noao$proto/imexamine/t_imexam.x
+noao$proto/imexamine/iegimage.x
+    Valdes, Nov 30, 1989
+    The default display frame when not using an input list was changed from
+    0 to 1.
+
+noao$proto/imeidt/epgcur.x
+    Valdes, Oct 30, 1989
+    1. There was no check against INDEF cursor coordinates.  Such coordinates
+    will occur when reading a previous logfile output and cursor input
+    where the shorthand ":command" is used.  The actual error occured when
+    attempting to add 0.5 to INDEF.
+
+noao$proto/imedit/epstatistics.x
+noao$proto/imedit/epmove.x
+noao$proto/imedit/epgsfit.x
+noao$proto/imedit/epnoise.x
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/t_imedit.x
+    Valdes, Aug 17, 1989
+    1. Added errchk to main cursor loop to try and prevent loss of the
+       user's changes if an error occurs.
+    2. If no background points are found an error message is now printed
+       instead of aborting.
+
+noao$proto/tvmark/mkbmark.x
+    Davis, Aug 4, 1989
+    Modified tvmark so that drawing to the frame buffer is more efficient
+    in batch mode. This involved removing a number of imflush calls
+    which were unnecessarily flushing the output buffer to disk and
+    recoding the basic routines which draw concentric circles and rectangles.
+
+===========
+Version 2.8
+===========
+
+noao$proto/imexamine/* +
+noao$proto/imexamine.par +
+noao$proto/?imexam.par +
+noao$proto/doc/imexamine.hlp +
+noao$proto/proto.cl
+noao$proto/proto.men
+noao$proto/proto.hd
+noao$proto/x_proto.x
+noao$proto/mkpkg
+noao$lib/scr/imexamine.key
+    Valdes, June 13, 1989
+    New task IMEXAMINE added to the proto package.
+
+noao$proto/tvmark/
+    Davis, June 6, 1989
+    Fixed a bug in tvmark wherein circles were not being drawn if they
+    were partially off the image in the x dimension.
+
+noao$proto/tvmark/
+    Davis, June1, 1989
+    A labeling capability has been added to tvmark. If the label parameter
+    is turned on tvmark will label objects with the string in the third
+    column of the coordinate file.
+
+noao$proto/tvmark/
+    Davis,  May 25, 1989
+    The problem reported by phil wherein TVMARK would go into an infinite
+    loop if it encountered a blank line has been fixed.
+
+noao$proto/tvmark
+    Davis,  May 22, 1989
+    The new task TVMARK was added to the proto package.
+
+noao$proto/imedit/
+    Davis,  May 22, 1989
+    The new task IMEDIT was added to the proto package.
+
+======================
+Package reorganization
+======================
+
+===========
+Release 2.2
+===========
+.endhelp

@@ -1,0 +1,13 @@
+iraf_files,s,q,,,,Images to be written
+refim,s,q,,,,Reference image to get date and time from
+ref,b,h,no,,,Find the date and time in a reference image
+x,i,h,10,,,X position of text in image
+y,i,h,10,,,Y position of text in image
+xmag,i,h,2,,,Text magnification factor in x direction
+ymag,i,h,2,,,Text magnification factor in y direction
+val,i,h,-10000,,,Value to use to write text in images
+setbgnd,b,h,yes,,,Set the pixels in the image behind the text
+bgndval,i,h,10000,,,Value to use in background of text
+date,b,h,yes,,,Write the date into the images
+time,b,h,yes,,,Write the time into the images
+text,s,q,,,,Text string to write into image

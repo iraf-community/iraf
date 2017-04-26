@@ -1,0 +1,8 @@
+images,s,a,,,,Images to be operated upon
+commands,f,a,,,,File of commands
+table,f,h,"",,,File of values
+colnames,s,h,"",,,Column names in table file
+prompt,s,h,"asthedit> ",,,Prompt for STDIN commands
+update,b,h,yes,,,Update image header?
+verbose,b,h,no,,,Verbose output?
+oldstyle,b,h,no,,,Use old style format?

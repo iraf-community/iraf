@@ -1,0 +1,28 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ARGT -- Replace if greater than.  If A[i] is greater than CEIL replace by
+# NEWVAL.
+
+procedure argt$t (a, npix, ceil, newval)
+
+PIXEL	a[ARB]
+int	npix
+PIXEL	ceil, newval
+int	i
+$if (datatype == x)
+real	abs_ceil
+$endif
+
+begin
+	$if (datatype == x)
+	abs_ceil = abs (ceil)
+	$endif
+
+	do i = 1, npix
+	    $if (datatype == x)
+	    if (abs (a[i]) > abs_ceil)
+	    $else
+	    if (a[i] > ceil)
+	    $endif
+		a[i] = newval
+end

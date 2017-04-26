@@ -1,0 +1,54 @@
+# Update the xtools library.
+# Author: Phil Hodge, 16-NOV-1988
+# Modified to include similar.x : B.Simon 14-Mar-1989
+# Modified to include group template expansion routines : B.Simon 14-Feb-1990
+# Modified to include word.x and vex*.x : B.Simon 21-May-1990
+# Modified to include copyimg.x: B.Simon 02-Mar-1992
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+
+libpkg.a:
+	@od
+	@sp_util
+	@wcslab
+	changt.x	
+	checkdim.x	<imhdr.h>
+	cif.x		"cif.h"
+	clgnone.x
+	copyimg.x	<imhdr.h>
+	errxit.x
+	fbuild.x
+	fparse.x	
+	grmimy.x	<imhdr.h>
+	isblank.x	<ctype.h>
+	lubksb.f       		
+	lubksd.f
+	ludcmd.x
+	ludcmp.x       	
+	postexit.x	<clset.h>
+	savgol.x	
+	sbuf.x		"sbuf.h"
+	sgcone.x		
+	similar.x
+	strjust.x	<ctype.h>
+	stxgetcoord.x	<imhdr.h> <mwset.h> <math.h>
+	tpbreak.x	
+	tpclose.x	"template.h"
+	tpcount.x	"template.h"
+	tpfetch.x	"template.h"
+	tpgroup.x	<ctype.h>  <imio.h>
+	tpimtype.x	<ctype.h>  "template.h"
+	tpopen.x	"template.h"
+	tpparse.x	<imio.h>
+	vexcompile.x	<lexnum.h>  <ctype.h>  <fset.h>  "vex.h"  "vex.com" 
+	vexeval.x	"vex.h"
+	vexfree.x	"vex.h"
+	vexfunc.x	<mach.h>  "vex.h"
+	vexstack.x	"vex.h"
+	word.x
+	xtwcs.x        	<imhdr.h> <math.h> 
+	;

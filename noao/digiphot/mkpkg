@@ -1,0 +1,14 @@
+# Make the DIGIPHOT package.
+
+update:
+	$echo "---------------- DIGIPHOT.LIB ---------------------"
+	$call update@lib
+	$echo "---------------- DIGIPHOT.APPHOT ------------------"
+	$call update@apphot
+	$echo "---------------- DIGIPHOT.DAOPHOT -----------------"
+	$call update@daophot
+	$echo "---------------- DIGIPHOT.PHOTCAL -----------------"
+	$call update@photcal
+	$echo "---------------- DIGIPHOT.PTOOLS ------------------"
+	$call update@ptools
+	;

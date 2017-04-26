@@ -1,0 +1,26 @@
+.help nlfree Feb91 "Nlfit Package"
+.ih
+NAME
+nlfree -- free the curve descriptor structure
+.ih
+SYNOPSIS
+nlfree[rd] (nl)
+
+.nf
+pointer	nl	# curve descriptor
+.fi
+.ih
+ARGUMENTS
+.ls nl     
+Pointer to the curve descriptor structure.
+.le
+.ih
+DESCRIPTION
+Frees the curve descriptor structure.
+.ih
+NOTES
+NLFREE should be called after each curve fit.
+.ih
+SEE ALSO
+nlinit
+.endhelp

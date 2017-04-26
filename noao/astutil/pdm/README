@@ -1,0 +1,9 @@
+ASTUTIL.PDM -- This directory contains the sources for the PDM program.
+
+PDM finds periods in light curve data by a method called
+Phase Dispersion Minimization.
+
+Reference:
+
+Stellingwerf, R. F., 1978, "Period Determination by Phase Dispersion
+    Minimization", The Astrophysical Journal, 224, pp. 953-960.

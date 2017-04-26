@@ -1,0 +1,327 @@
+include <ctype.h>
+include <mach.h>
+include <math.h>
+include <math/gsurfit.h>
+
+define GEO_LINEAR       1               # Linear transformation only
+define GEO_DISTORTION   2               # Distortion correction only
+define GEO_GEOMETRIC    3               # Full transformation
+
+$for (rd)
+
+# GEO_LINIT -- Initialize the linear part of the transformation.
+
+$if (datatype == r)
+procedure geo_linitr (sx1, sy1, sx2, sy2)
+$else
+procedure geo_linitd (sx1, sy1, sx2, sy2)
+$endif
+
+pointer	sx1, sy1	#I/O pointers to the linear x and y  surfaces
+pointer	sx2, sy2	#I/O pointer to the distortion x and y surfaces
+
+PIXEL	xmag, ymag, xrot, yrot, xref, yref, xout, yout, xshift, yshift
+$if (datatype == r)
+real	clgetr(), gseval()
+$else
+double	clgetd(), dgseval()
+$endif
+
+begin
+	# Initialize the surfaces.
+$if (datatype == r)
+	call gsinit (sx1, GS_POLYNOMIAL, 2, 2, GS_XNONE, -MAX_REAL, MAX_REAL,
+	    -MAX_REAL, MAX_REAL)
+	call gsinit (sy1, GS_POLYNOMIAL, 2, 2, GS_XNONE, -MAX_REAL, MAX_REAL,
+	    -MAX_REAL, MAX_REAL)
+$else
+	call dgsinit (sx1, GS_POLYNOMIAL, 2, 2, GS_XNONE, double (-MAX_REAL),
+	    double (MAX_REAL), double (-MAX_REAL), double (MAX_REAL))
+	call dgsinit (sy1, GS_POLYNOMIAL, 2, 2, GS_XNONE, double (-MAX_REAL),
+	    double (MAX_REAL), double (-MAX_REAL), double (MAX_REAL))
+$endif
+	sx2 = NULL
+	sy2 = NULL
+
+	# Get the magnification parameters.
+	xmag = clget$t ("xmag")
+	if (IS_$INDEF$T(xmag))
+	    xmag = PIXEL(1.0)
+	ymag = clget$t ("ymag")
+	if (IS_$INDEF$T(ymag))
+	    ymag = PIXEL(1.0)
+
+	# Get the rotation parameters.
+	xrot = clget$t ("xrot")
+	if (IS_$INDEF$T(xrot))
+	    xrot = PIXEL(0.0)
+	xrot = -DEGTORAD(xrot)
+	yrot = clget$t ("yrot")
+	if (IS_$INDEF$T(yrot))
+	    yrot = PIXEL(0.0)
+	yrot = -DEGTORAD(yrot)
+
+	# Set the magnification and rotation coefficients.
+	call geo_rotmag$t (sx1, sy1, xmag, ymag, xrot, yrot)
+
+	# Compute the origin of the reference coordinates.
+	xref = clget$t ("xref")
+	if (IS_$INDEF$T(xref))
+	    xref = PIXEL(0.0)
+	yref = clget$t ("yref")
+	if (IS_$INDEF$T(yref))
+	    yref = PIXEL(0.0)
+
+	# Compute the corresponding input coordinates.
+	xout = clget$t ("xout")
+	if (IS_$INDEF$T(xout))
+$if (datatype == r)
+	    xout = gseval (sx1, xref, yref)
+$else
+	    xout = dgseval (sx1, xref, yref)
+$endif
+	yout = clget$t ("yout")
+	if (IS_$INDEF$T(yout))
+$if (datatype == r)
+	    yout = gseval (sy1, xref, yref)
+$else
+	    yout = dgseval (sy1, xref, yref)
+$endif
+
+	# Set the shifts.
+	xshift = clget$t ("xshift")
+	yshift = clget$t ("yshift")
+$if (datatype == r)
+	if (IS_$INDEF$T(xshift))
+	    xshift = xout - gseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yshift))
+	    yshift = yout - gseval (sy1, xref, yref)
+$else
+	if (IS_$INDEF$T(xshift))
+	    xshift = xout - $tgseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yshift))
+	    yshift = yout - $tgseval (sy1, xref, yref)
+$endif
+	call geo_xyshift$t (sx1, sy1, xshift, yshift)
+end
+
+
+# GEO_SFREE -- Free the x and y surface fitting descriptors.
+
+$if (datatype == r)
+procedure geo_sfreer (sx1, sy1, sx2, sy2)
+$else
+procedure geo_sfreed (sx1, sy1, sx2, sy2)
+$endif
+
+pointer	sx1, sy1	#I/O pointers to the linear x and y  surfaces
+pointer	sx2, sy2	#I/O pointer to the distortion x and y surfaces
+
+begin
+$if (datatype == r)
+        call gsfree (sx1)
+        call gsfree (sy1)
+        if (sx2 != NULL)
+	    call gsfree (sx2)
+        if (sy2 != NULL)
+	    call gsfree (sy2)
+$else
+        call dgsfree (sx1)
+        call dgsfree (sy1)
+        if (sx2 != NULL)
+	    call dgsfree (sx2)
+        if (sy2 != NULL)
+	    call dgsfree (sy2)
+$endif
+end
+
+
+# GEO_SINIT --  Read the surface fits from the database file and make
+# any requested changes.
+
+procedure geo_sinit$t (dt, record, geometry, sx1, sy1, sx2, sy2)
+
+pointer	dt			#I pointer to database file produced by geomap
+char	record[ARB]		#I the name of the database record
+int	geometry		#I the type of geometry to be computed
+pointer	sx1, sy1		#O pointers to the linear x and y surfaces
+pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
+
+int	i, rec, ncoeff, junk
+PIXEL	xmag, ymag, xrot, yrot, xref, yref, xout, yout, xshift, yshift
+pointer	newsx1, newsy1, xcoeff, ycoeff
+int	dtlocate(), dtscan(), dtgeti()
+PIXEL	clget$t()
+$if (datatype == r)
+errchk	gsrestore
+$else
+errchk	dgsrestore
+$endif
+
+begin
+	# Locate record.
+	rec = dtlocate (dt, record)
+
+	# Get linear part of fit.
+	ncoeff = dtgeti (dt, rec, "surface1")
+	call malloc (xcoeff, ncoeff, TY_PIXEL)
+	call malloc (ycoeff, ncoeff, TY_PIXEL)
+	do i = 1, ncoeff {
+	    junk = dtscan (dt)
+	    call garg$t (Mem$t[xcoeff+i-1])
+	    call garg$t (Mem$t[ycoeff+i-1])
+	}
+
+	# Restore linear part of fit.
+$if (datatype == r)
+	call gsrestore (sx1, Mem$t[xcoeff])
+	call gsrestore (sy1, Mem$t[ycoeff])
+$else
+	call dgsrestore (sx1, Mem$t[xcoeff])
+	call dgsrestore (sy1, Mem$t[ycoeff])
+$endif
+
+	# Get geometric transformation.
+	xmag = clget$t ("xmag")
+	ymag = clget$t ("ymag")
+	xrot = clget$t ("xrotation")
+	yrot = clget$t ("yrotation")
+	xout = clget$t ("xout")
+	yout = clget$t ("yout")
+	xref = clget$t ("xref")
+	yref = clget$t ("yref")
+	xshift = clget$t ("xshift")
+	yshift = clget$t ("yshift")
+
+	# Get set to adjust linear part of the fit.
+$if (datatype == r)
+	call gscopy (sx1, newsx1)
+	call gscopy (sy1, newsy1)
+$else
+	call dgscopy (sx1, newsx1)
+	call dgscopy (sy1, newsy1)
+$endif
+
+	if (geometry == GEO_DISTORTION)
+	    call geo_rotmag$t (newsx1, newsy1, PIXEL(1.0), PIXEL(1.0),
+	        PIXEL(0.0), PIXEL(0.0))
+	 else if (! IS_$INDEF$T(xmag) || ! IS_$INDEF$T(ymag) || 
+		! IS_$INDEF$T(xrot) || ! IS_$INDEF$T(yrot))
+	    call geo_drotmag$t (dt, rec, newsx1, newsy1, xmag, ymag,
+		    xrot, yrot)
+	call geo_dxyshift$t (dt, rec, newsx1, newsy1, xout, yout, xref, yref,
+	    xshift, yshift)
+$if (datatype == r)
+	call gssave (newsx1, Mem$t[xcoeff])
+	call gssave (newsy1, Mem$t[ycoeff])
+$else
+	call dgssave (newsx1, Mem$t[xcoeff])
+	call dgssave (newsy1, Mem$t[ycoeff])
+$endif
+
+	# Get distortion part of fit.
+	ncoeff = dtgeti (dt, rec, "surface2")
+	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
+	    geometry == GEO_DISTORTION)) {
+
+	    call realloc (xcoeff, ncoeff, TY_PIXEL)
+	    call realloc (ycoeff, ncoeff, TY_PIXEL)
+	    do i = 1, ncoeff {
+		junk = dtscan (dt)
+		call garg$t (Mem$t[xcoeff+i-1])
+		call garg$t (Mem$t[ycoeff+i-1])
+	    }
+
+	    # Restore distortion part of fit.
+$if (datatype == r)
+	    iferr {
+	        call gsrestore (sx2, Mem$t[xcoeff])
+	    } then {
+		call mfree (sx2, TY_STRUCT)
+		sx2 = NULL
+	    }
+	    iferr {
+	        call gsrestore (sy2, Mem$t[ycoeff])
+	    } then {
+		call mfree (sy2, TY_STRUCT)
+		sy2 = NULL
+	    }
+$else
+	    iferr {
+	        call dgsrestore (sx2, Mem$t[xcoeff])
+	    } then {
+		call mfree (sx2, TY_STRUCT)
+		sx2 = NULL
+	    }
+	    iferr {
+	        call dgsrestore (sy2, Mem$t[ycoeff])
+	    } then {
+		call mfree (sy2, TY_STRUCT)
+		sy2 = NULL
+	    }
+$endif
+
+	} else {
+	    sx2 = NULL
+	    sy2 = NULL
+	}
+
+	# Redefine the linear surfaces.
+$if (datatype == r)
+	call gsfree (sx1)
+	call gscopy (newsx1, sx1)
+	call gsfree (newsx1)
+	call gsfree (sy1)
+	call gscopy (newsy1, sy1)
+	call gsfree (newsy1)
+$else
+	call dgsfree (sx1)
+	call dgscopy (newsx1, sx1)
+	call dgsfree (newsx1)
+	call dgsfree (sy1)
+	call dgscopy (newsy1, sy1)
+	call dgsfree (newsy1)
+$endif
+
+	# Cleanup.
+	call mfree (xcoeff, TY_PIXEL)
+	call mfree (ycoeff, TY_PIXEL)
+end
+
+
+# GEO_DO_TRANSFORM -- The linear transformation is performed in this procedure.
+# First the coordinates are scaled, then rotated and translated.  The
+# transformed coordinates are returned.
+
+procedure geo_do_transform$t (x, y, xt, yt, sx1, sy1, sx2, sy2)
+
+PIXEL	x, y			# initial positions
+PIXEL	xt, yt			# transformed positions
+pointer	sx1, sy1		# pointer to linear surfaces
+pointer	sx2, sy2		# pointer to distortion surfaces
+
+$if (datatype == r)
+real	gseval()
+$else
+double	dgseval()
+$endif
+
+begin
+$if (datatype == r)
+	xt = gseval (sx1, x, y)
+	if (sx2 != NULL)
+	    xt = xt + gseval (sx2, x, y)
+	yt = gseval (sy1, x, y)
+	if (sy2 != NULL)
+	    yt = yt + gseval (sy2, x, y)
+$else
+	xt = dgseval (sx1, x, y)
+	if (sx2 != NULL)
+	    xt = xt + dgseval (sx2, x, y)
+	yt = dgseval (sy1, x, y)
+	if (sy2 != NULL)
+	    yt = yt + dgseval (sy2, x, y)
+$endif
+end
+
+$endfor

@@ -1,0 +1,148 @@
+.help aprecenter Sep96 noao.twodspec.apextract
+.ih
+NAME
+aprecenter -- Recenter apertures automatically
+.ih
+USAGE
+aprecenter input
+.ih
+PARAMETERS
+.ls input
+List of input images in which apertures are to be recentered.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+.ls interactive = no
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing is
+disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = no
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+
+.ls line = INDEF
+The dispersion line (line or column perpendicular to the dispersion axis) to
+be used in recentering the spectra.  A value of INDEF selects the middle of the
+image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value takes a sum
+and a negative values selects a median.
+.le
+.ls aprecenter = ""
+List of apertures to be used in shift calculation.
+.le
+.ls npeaks = INDEF
+Select the specified number of apertures with the highest peak values
+to be recentered.  If the number is INDEF all apertures will be selected.
+If the value is less than 1 then the value is interpreted as a fraction
+of total number of apertures.
+.le
+.ls shift = yes
+Use the median shift from recentering the selected apertures to apply to
+all apertures.  The recentering is then a constant shift for all apertures.
+The median is the average of the two central values for an even number
+of apertures.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters are taken from the
+task \fBapdefault\fR, automatic aperture finding parameters are taken
+from \fBapfind\fR, and parameters used for centering and editing the
+apertures are taken from \fBapedit\fR.
+
+When this operation is performed from the task \fBapall\fR all parameters
+except the package parameters are included in that task.
+.ih
+DESCRIPTION
+For each image in the input image list, the aperture center positions
+are redefined by centering at the specified dispersion line using the
+\fBcenter1d\fR algorithm with centering parameters from \fBapedit\fR.
+Normally this is done when inheriting apertures from an aperture
+reference image.  The recentering does not change the "trace" of the
+aperture but simple adds a shift across the dispersion axis.
+
+There are a several recentering options.  Each selected aperture may be
+recentered independently.  However, if some or all of the spectra are
+relatively weak this may actually be worse than using the reference
+apertures defined by strong spectra or flat fields in the case of
+fibers or aperture masks.  One may select a subset of apertures to be
+used in calculating shift.  This is done with a the \fIaprecenter\fR
+list of aperture numbers (see
+\fBranges\fR for the syntax) and/or by selecting a specific number or
+fraction of the apertures with the strongest peak values.  The list
+selection is done first and the strongest remaining apertures are used
+to satisfy the \fBnpeaks\fR value.  Though some or all of the apertures
+may be recentered independently the most common case of recentering
+reference apertures is to account for detector shifts.  In this case
+one expects that any shift should be common to all apertures.  The
+\fIshift\fR parameter allows using the new centers for all selected
+apertures to compute a median shift to be added to ALL apertures.  Using
+a median shift for all apertures is the default.
+
+The \fIfind\fR parameter allows automatically finding apertures if none
+are defined for the image or by a reference image.  Since the purpose
+of this task is to recenter reference apertures it is usually the case
+that reference images are used and apertures are not defined by this
+task.  One case in which the apertures from the image itself might be
+recentered is if one wants to use a different dispersion line.  The
+\fIresize\fR parameter may be used to adjust the widths in a variety
+of ways based on the spectra profiles specific to each image.  The
+aperture positions and any other parameters may also be edited with the
+aperture editing function if selected by the \fIapedit\fR parameter and
+the task is run interactively.  The recentering algorithm may be run
+from the aperture editor using the 'g' keystroke.
+
+If the task is interactive the user is queried whether to perform
+various steps on each image.  The queries may be answered with one of
+the four values "yes", "no", "YES" and "NO", where an upper case
+response suppresses all further queries to this question.
+
+The aperture recentering algorithm may be selected from nearly every task
+in the package.
+.ih
+EXAMPLES
+	cl> aprecenter newimage reference=flat
+.ih
+REVISIONS
+.ls APRECENTER V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+center1d, ranges, apfind, apresize, apedit, apall
+.endhelp

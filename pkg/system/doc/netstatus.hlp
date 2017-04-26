@@ -1,0 +1,44 @@
+.help netstatus Feb86 system
+.ih
+NAME
+netstatus -- print the status of the local network
+.ih
+USAGE
+netstatus
+.ih
+PARAMETERS
+None.
+.ih
+DESCRIPTION
+\fINetstatus\fR prints the status of the local network as perceived by the
+system process x_system.e (the network status may differ for each subprocess).
+The status output identifies the local node, lists all nodes in the local
+network, and lists all the aliases (recognized names) for each node.
+A message will be printed if networking is disabled on the local machine.
+The local network is defined by the table files "dev$hosts", "dev$uhosts",
+and "dev$hostlogin".
+.ih
+EXAMPLES
+
+.nf
+cl> netstatus
+Local node `draco' (5), default node `draco', 12 nodes in local network
+
+    NODE SERVER NREFS STATUS  ALIASES
+       1      0     0  00000  aquila vax1 a 1 class1 plot print
+       2      0     0  00000  lyra vax2 b 2 class2
+       3      0     0  00000  vela vax3 3 v class3
+       4      0     0  00000  carina vax5 c 5 class5
+       5      0     0  00000  draco vax6 6 d class6 0
+       6      0     0  00000  tucana sun1 t
+       7      0     0  00000  hydra sun2 h
+       8      0     0  00000  mensa pc1 m
+       9      0     0  00000  pictor pc2
+      10      0     0  00000  octans sun3 o
+      11      0     0  00000  pavo mvax1 p
+      12      0     0  00000  volans lsi1
+.fi
+
+.ih
+SEE ALSO
+.endhelp

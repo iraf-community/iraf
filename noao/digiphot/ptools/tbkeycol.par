@@ -1,0 +1,5 @@
+# TKEYCOL Parameters
+
+tables,s,a,,,,Input apphot/daophot tables databases
+keywords,s,a,"",,,Table keywords to be copied to table columns
+mode,s,h,"ql",,,Mode of task

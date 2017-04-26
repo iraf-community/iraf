@@ -1,0 +1,144 @@
+.help revisions Jun88 noao.imred.dtoi
+.nf
+
+imred$dtoi/selftest.x
+	The 'lut' was declared as TY_INT instead of TY_REAL (5/4/13)
+
+imred$dtoi/spolist.x
+	A TY_INT pointer was being used with Memr[] (4/20/13)
+
+=======
+V2.16
+=======
+
+imred$dtoi/hdtoi.x
+	The hd_fogcalc() procedure was being called with too few arguments
+	(7/12/09, MJF)
+
+=======
+V2.14.1
+=======
+
+imred$dtoi/hdicfit/mkpkg
+	Added missing dependencies.  (12/13/01, MJF)
+
+imred$dtoi/mkpkg
+	Added missing dependencies.  (10/11/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+imred$dtoi/doc/hdfit.hlp
+imred$dtoi/doc/hdshift.hlp
+imred$dtoi/doc/hdtoi.hlp
+imred$dtoi/doc/spotlist.hlp
+	Fixed minor formating problems.  (4/22/99, Valdes)
+
+imred$dtoi/hdicggraph.x
+imred$dtoi/hdicebars.x
+	Replace direct access to GTOOLS structure with GTOOLS interface.
+	(12/18/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+imred$dtoi/spotlist.x	7 Sept, 1989 SRo
+	In Suzanne's absence, removed the divide by nfog fog images in
+	hd_fogcalc() after a bug report by Steve Majewski that when multiple
+	fog images are used, the resultant fog values are too low by 1/nfog.
+	The total_pix accumulator is already a total for all images.  Should
+	be verified by Suzanne on her return.
+
+imred$dtoi/hdicfit/hdicgdelte.x  17 April, 1989 ShJ
+	Procedure icg_dl1 was declared as an integer procedure, although
+	it does not return a function values and was not being called
+	as a function.  
+
+imred$dtoi/hdicfit/hdicgcolon.x  27 March, 1989 ShJ
+	Changed only a comment line, to point out that the :ebars command
+	switches the meaning of the error bars between representing 
+	standard deviations or weights.  
+
+imred$dtoi/spotlist.x 11 May, 1988 ShJ
+	Added parameter "option", which selects a mean or median calculation
+	of spot densities and the fog value.  Previously, only a mean 
+	calculation was available.  The choice of "option" is written to
+	the database.  
+
+imred$dtoi/hd_aravr.x  11 May, 1988 ShJ
+	This is a new file, modified from the vops version only in that it
+	puts an upper limit on the number of iterations allowed in the
+	procedure of 10.  This should avoid the problem reported by
+	Steve Majewski of nearly saturated pixels "hanging"; they actually
+	were oscillating endlessly in the mean rejection calculation.
+
+imred$dtoi/hdtoi.x 11 May, 1988 ShJ
+	Added parameter "option", which selects a mean or median calulcation
+	of the fog value, in those cases where the user supplies a fog 
+	image, rather than a fog value.  Previously, only a mean calculation
+	was available.  This newly calculated value of fog is now also
+	written to the database.
+
+imred$dtoi/hdtoi.x 5 April, 1988 ShJ
+	Modified the way in which hdtoi scales intensities to the "ceiling"
+	parameter.  A maximum intensity is calculated, using cveval to
+	evaluate the transformed value of the maximum density above fog.
+	The fog value subtracted is hdtoi.fog, which may or may not
+	equal the value of fog written by spotlist into the database.
+	Previously, the program was incorrectly subtracting the spotlist
+	fog value from the maximum density when calculating the maximum
+	intensity and so the scale factor to represent saturated intensities
+	as "ceiling". 
+
+imred$dtoi/hdicgundel.x	25 March, 1988  ShJ
+	Procedures icg_u1d and icg_undeleted in this source file were
+	declared as functions but not returning a value.  They were not
+	being called as functions, and are now not declared as functions.
+
+imred$dtoi/database.x	14 March, 1988	ShJ
+	Added procedure to put a double precision value:  ddb_putd().
+
+imred$dtoi/spotlist.x	14 March, 1988	ShJ
+	Added code for additional input parameter: "maxad", the maximum
+	allowed input value, i.e., the AD units in a saturated pixel.  From
+	this value and the "scale" parameter, spotlist calculates the
+	maximum permissable density, and writes this to the database as a
+	double precision value. 
+
+imred$dtoi/hdfit.x	14 March, 1988	ShJ
+	Parameter "maxden" was removed, as this value is now calculated
+	precisely by spotlist and can be read from the database.
+
+imred$dtoi/spotlist.par
+imred$dtoi/hdfit.par
+imred$dtoi/doc/spotlist.hlp
+imred$dtoi/doc/hdfit.hlp	14 March, 1988	ShJ
+	Modified help pages and parameter files for spotlist and hdfit to
+	support the above changes to the user interface.
+
+imred$dtoi/hdtoi.x	11 March, 1988	ShJ
+	Bug fixed in hd_aptrans().  The equations for the k75 and k50 
+	transformations were incorrect, having a '*' where a '+' should
+	have been.  Also, the strncmp procedure was only checking the first 
+	character to distinguish between transformation types, in which
+	case k75 and k50 would not be resolved.
+
+imred$dtoi/hdfit.x	10 March, 1988	ShJ
+	Repaired an error in incrementing an offset into the output
+	arrays in hd_rdloge.   This error was seen only when more than
+	two databases contributed input values to be fit.  This was
+	a trivial arithmetic error that had been overlooked due to
+	insufficient testing.  This bug would produce a memory error
+	as values were written into unallocated locations.
+
+imred$dtoi/hdicfit/hdic.com	9 March, 1988	ShJ
+	Reordered the values in the common block, as the largest double
+	precision value was following the integers.  The SUN-4 compiler
+	gave warning of this, then padded the double value.  Also at this
+	time file hdicgundelete.x was renamed to hdicgundel.x to avoid
+	problems associated with filenames longer than 14 characters.  The 
+	hdicfit library was completely rebuilt at this time, to insure the
+	new object module would be retrieved.
+.endhelp

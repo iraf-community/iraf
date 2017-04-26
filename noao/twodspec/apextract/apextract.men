@@ -1,0 +1,23 @@
+          apall - Extract 1D spectra (all parameters in one task)
+      apdefault - Set the default aperture parameters and apidtable
+        apdemos - Various tutorial demonstrations
+         apedit - Edit apertures interactively
+	 apfind - Automatically find spectra and define apertures
+	  apfit - Fit 2D spectra and output the fit, difference, or ratio
+      apflatten - Remove overall spectral and profile shapes from flat fields
+        apnoise - Compute and examine noise characteristics of spectra
+         apmask - Create and IRAF pixel list mask of the apertures
+    apnormalize - Normalize 2D apertures by 1D functions
+     aprecenter - Recenter apertures
+       apresize - Resize apertures
+      apscatter - Fit and subtract scattered light
+          apsum - Extract 1D spectra
+	aptrace - Trace positions of spectra
+
+		ADDITIONAL HELP TOPICS
+
+   apbackground - Background subtraction algorithms
+     approfiles - Profile determination algorithms
+     apvariance - Extractions, variance weighting, cleaning, and noise model
+	 extras - Information about the extra information in 3D images
+        package - Package parameters and general description of package

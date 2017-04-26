@@ -1,0 +1,82 @@
+.help set,reset Apr87 language
+.ih
+NAME
+.nf
+  set -- set the value of an IRAF environment variable
+reset -- reset (overwrite) the value of an IRAF environment variable
+.fi
+.ih
+USAGE
+.nf
+set [varname = valuestring]
+reset [varname = valuestring]
+.fi
+.ih
+PARAMETERS
+.ls varname
+The environment variable to be defined or set.
+.le
+.ls valuestring
+The new string value of the environment variable.
+.le
+.ih
+DESCRIPTION
+The CL maintains a list of environment variables, each of which consists
+of a keyword = value pair.  The \fIset\fR and \fIreset\fR operators are used
+to define new environment variables, or to set new values for old environment
+variables.  The two operators are equivalent with the exception that if the
+named environment variable is already defined, \fIset\fR will push a new,
+temporary value for the variable, whereas \fIreset\fR will overwrite the most
+recent definition of the variable.  Environment variables may be examined
+using the \fIshow\fR task or the \fIenvget\fR intrinsic function.
+
+A particular use for the environment variables is in the definition
+of IRAF logical names for directories.  If an environment variable is set to
+a string corresponding to a system-dependent directory name,
+then the environment variable may then be used within the CL to
+refer to that directory.
+
+For example,
+
+.nf
+	set	testdir = "/usr/iraf/testdir"		# Unix
+	set	testdir = "dua2:[iraf.testdir]"		# VMS
+	task	tst1 = testdir$tst1.cl
+.fi
+
+New IRAF logicals may be defined in terms or existing IRAF logical names,
+i.e., logical names are recursively expanded.
+
+.nf
+	set	subdir1 = testdir$subdir1/
+	task	tst2 = subdir1$tst2.e
+.fi
+
+If the \fIset\fR command is entered without any arguments the current
+environment list is printed in the reverse of the order in which the
+definitions were made.  If a variable has been redefined both the
+final and original definition are shown.   The \fIshow\fR command can be
+used to show only the current value.
+.ih
+EXAMPLES
+1. Define the data directory "dd" on a remote node, and call \fIimplot\fR
+to make plots of an image which resides in the remote directory.
+
+.nf
+	cl> set dd = lyra!/u2/me/data
+	cl> implot dd$picture
+.fi
+
+2. Temporarily change the value of the variable \fIprinter\fR.  The new
+value is discarded when the \fIbye\fR is entered.
+
+.nf
+	cl> cl
+	cl> set printer = qms
+		...
+	cl> bye
+.fi
+.ih
+SEE ALSO
+show, envget
+.endhelp

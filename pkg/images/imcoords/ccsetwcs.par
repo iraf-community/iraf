@@ -1,0 +1,28 @@
+# Parameters for the COOWCS task
+
+# Input and output files and images
+images,f,a,,,,The input images
+database,f,a,,,,The input database file
+solutions,f,a,"",,,The input plate solutions
+
+# The celestial coordinate system parameters
+xref,r,h,INDEF,,,The x reference pixel
+yref,r,h,INDEF,,,The y reference pixel
+xmag,r,h,INDEF,,,The x axis scale in arcsec / pixel
+ymag,r,h,INDEF,,,The y axis scale in arcsec / pixel
+xrotation,r,h,INDEF,,,The x axis rotation angle in degrees
+yrotation,r,h,INDEF,,,The y axis rotation angle in degrees
+lngref,r,h,INDEF,,,The ra / longitude reference coordinate in lngunits
+latref,r,h,INDEF,,,The dec / latitude reference coordinate in latunits
+lngunits,s,h,"",,,The ra / longitude reference coordinate units
+latunits,s,h,"",,,The dec / latitude reference coordinate units
+transpose,b,h,no,,,Transpose the computed image wcs ?
+projection,s,h,"tan",,,The sky projection geometry
+coosystem,s,h,"j2000",,,The celestial coordinate system
+
+# Output and graphics mode parameters
+update,b,h,yes,,,Update the image world coordinate system ?
+pixsystem,s,h,"logical","|logical|physical|",,The input pixel coordinate system
+verbose,b,h,yes,,,Print messages about actions taken by the task ?
+
+mode,s,h,'ql'

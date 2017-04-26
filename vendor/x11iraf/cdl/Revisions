@@ -1,0 +1,361 @@
+
+cdl.h
+	Added missing procedure declarations for cdl_isFITS(), cdl_isIRAF(),
+	and cdl_markPointLabel().  (12/12/02)
+
+cdlzscal.c
+	Added a missing <stdlib.h>  (12/12/02)
+
+=============
+V1.8 Released
+=============
+
+cdl.c				**** INTERFACE CHANGE ****
+imd.c				**** INTERFACE CHANGE ****
+cdl.h				**** INTERFACE CHANGE ****
+cdl_spp.c			**** INTERFACE CHANGE ****
+cdl_spp.h			**** INTERFACE CHANGE ****
+cdl_f77.c			**** INTERFACE CHANGE ****
+cdl_77.h			**** INTERFACE CHANGE ****
+cdlspp.h			**** INTERFACE CHANGE ****
+	Added new interface routines for the set/get/query mapping calls.
+	See the detailed Revisions notes for specifics (8/4/01)
+
+imd.c
+comm.c
+cdlP.h
+cdlProto.h
+	Added a new com_wcsVersion() routine to query server for the
+	WCS version (i.e. new XImtool mapping support) (6/14/01)
+
+eps.c
+	Made certain variables static, other lint cleanups (6/14/01)
+
+cdlzscale.c
+	Changed to handle the case of a very small slope produced by the
+	fitting rejection (5/31/01)
+
+cdlfits.c
+	Minor change to variable names. (5/30/01)
+
+imd.c
+        Fixed a minor bug where the last line of a display was being left
+        off due to an incorrect indexing of the last block being written
+        in imd_writeSubRaster().  (4/17/01)
+
+Imakefile
+        Incremented version to 1.8 (4/17/01)
+
+comm.c
+	Fixed a bug in reading octal cursor values (e.g. space) (11/20/2000)
+
+cdlzscale.c
+        Added a '#include "cdl.h"' so the ANSI_FUNC was defined (11/17/2000)
+
+cdlmark.c
+	Fixed a bug in the selection of BOX markers for deletion (10/27/2000)
+
+cdl_f77.c
+	Fixed a bug preventing cfreadiraf() from getting the pixels
+	correctly (5/23/2000)
+
+cdliraf.c
+	Fixed a bug in getting the V2 image title (5/23/2000)
+
+
+=============
+V1.7 Released
+=============
+
+cdl.c				**** INTERFACE CHANGE ****
+	Modified the behavior of cdl_getFrame() to do a sampling cursor
+	read to get the frame buffer from the server.  If the value returned
+	is zero (as from SAOimage) the current value of the frame number in
+	the CDL is returned.  (3/29/00)
+
+cdl.[ch]			**** INTERFACE CHANGE ****
+imd.c				**** INTERFACE CHANGE ****
+comm.c				**** INTERFACE CHANGE ****
+cdlProto.h			**** INTERFACE CHANGE ****
+cdl_f77.[ch]			**** INTERFACE CHANGE ****
+cdl_spp.c			**** INTERFACE CHANGE ****
+examples/tvmark.c		**** INTERFACE CHANGE ****
+test/cdltest.c			**** INTERFACE CHANGE ****
+test/imdtest.c			**** INTERFACE CHANGE ****
+	Modified the cdl_readCursor() routine to have a new 'wcs' argument
+	to return the WCS of the cursor read.  This is to allow applications
+	to get the frame number of the read from the wcs (i.e. wcs is
+	coded as "frame * 100 + wcs".   (3/29/00)
+
+imd.c
+	Fixed a bug in the drawing of markers where the start coord for
+	the subraster is (1,1).  When writing out the subraster the
+	routine was incorrectly deciding that the frame buffer did not
+	need to be readback to edit the subraster.  (3/14/00)
+
+examples/mosaic.c
+	Added an ability to display raw images of the same size per user
+	request (2/19/99)
+
+cdl.c
+cdlmark.c
+	Removed duplicate <stdlib.h> includes (1/5/99)
+
+comm.c
+	Fixed a readWCS call so it correctly gets the frame requested,
+	now it's always getting frame 1. (1/4/99)
+
+imd.c
+	Closed the file descriptors in imd_close().  This was preventing
+	the CDL from reconnecting properly and leaving the server in a 
+	read hang.  (1/4/99)
+
+cdl_f77.c
+	Modified the CDF_READ* wrappers to use a temporary buffer in the
+	actual call to the CDL C routines since fortran passes in static
+	arrays which cannot be reallocated by the low-level C code.  The
+	data is moved from the temp buffer to the input buffer after the
+	call. (1/2/99)
+
+cdl_f77.[ch]
+cdl_spp.[ch]
+	Fixed some errors in the binding code not finding certain procedures.
+	(10/28/98)
+
+cdlfits.c
+	Changed bscale/bzero to double to avoid an overflow (10/13/98)
+
+cdlmark.c
+	Added an offset to the circle coordinate calculation to assure
+	circle is centered. (10/13/98)
+
+cdl.c
+	Fixed a bug in the zscale of real and double data.  (6/3/98)
+
+cdlzscale.c
+	Fixed a bug in floatCompare causing the sort to fail when the range
+	of data is <1.0  (6/2/98)
+
+imd.c
+	Modified debug output so individual writes are only printed when
+	verbose output requested.  (6/1/98)
+
+cdl.c
+cdl.h
+	Modified the zscale code to behave more like the V2.11 code in
+	determining z1/z2.  If the number of sample lines isn't explicitly
+	set then the sample is derived evenly from the entire image as though
+	with an image section, otherwise the old method is used.  The default
+	number of sample points was increased to 1000.  (6/1/98)
+
+imd.c
+	Fixed a bug in the image display code causing garbage values
+	for some image sizes (3/16/98)
+
+cdlfits.c
+	Removed col 30 restriction from logical keywords  (3/16/98)
+
+=============
+V1.6 Released
+=============
+
+Imakefile
+Makefile.generic
+	Misc platform bug fixes. (3/3/98)
+
+doc/cdlref.ms
+	Updated with latest changes. (3/1/98)
+
+cdl_spp.[ch] 
+	Misc small bug fixes. (3/1/98)
+
+cdl.h
+Imakefile
+Makefile.generic
+	Updated version number to 1.6 (2/28/98)
+
+cdlP.h
+cdlmark.c
+cdlspp.h
+cdl_f77.[ch]
+cdl_spp.[ch]
+        Finished implementation of dashed line type for all markers (2/18/98)
+
+cdlmark.c
+        Finished implementation of hollow/shadow line type for all markers
+        (2/13/98)
+
+cdlmark.c
+        Fixed a bug in the marker deletetion code (2/13/98)
+
+All sources
+	Numerous changes to all sources to provide ANSI C function prototypes
+	and to separate the public and private declarations.  For ANSI use
+	CDL_ANSIC must be defined prior to the "#include <cdl.h>". (1/16/98)
+
+cdl_f77.[ch]
+cdl_spp.[ch]
+cdlspp.h
+cdlftn.inc
+cdlmark.c
+cdl.h
+	Added new routines cdl_setLineWidth() and cdl_setTextWidth() and
+	hooked them into marker code.  Also added a new BOLD font type
+	which maintain current font but increases the width. (1/5/98)
+
+imd.c
+	Fixed a bug in computing the WCS for images larger than the FB (1/1/98)
+	
+imd.c
+	Changed the subraster code so it would do a read when writing as
+	subraster the full width of the FB. (1/1/98)
+
+cdliraf.c			**** INTERFACE CHANGE ****
+cdlfits.c			**** INTERFACE CHANGE ****
+cdl_f77.c 			**** INTERFACE CHANGE ****
+cdl_spp.c			**** INTERFACE CHANGE ****
+	Changed the cdl_readXXX() calls to return the title string (1/1/98)
+
+cdliraf.c
+cdlfits.c
+examples/display.c
+	Fixed a bug in writing the name/title to the WCS (12/31/97)
+
+cdl.h
+cdl.c
+imd.c
+	Fixed a bug where the z1/z2 values weren't being properly loaded by
+	the cdl_displayPix procedure when zscaling. (12/29/97)
+
+cdl.h
+imd.h
+	Included cdl.h in the imd.h file so there is only one structure
+	definition of the IMD struct.  Cleaned up duplicate defines. (11/13/97)
+
+cdlmark.c
+cdlfont.h
+cdl_f77.[ch]
+cdl_spp.[ch]
+	Added a new routine cdl_setFont() which can be used to choose be-
+	tween a set of new fonts. (9/9/97)
+
+cdliraf.c
+	Modified to handle new V2 OIF format images. (6/6/97)
+
+cdlmark.c
+	Fixed up the text presentation a bit by making the default size
+	a little larger for clarity, added proportional spacing for thin
+	chars like 'i' and 'l', and fixed a bug in the subregion size (6/4/97)
+
+configure			+
+Makefile.generic		+
+examples/ Makefile.generic	+
+test/ Makefile.generic		+
+	Added a generalized set of makefiles for sites w/out Imake (4/27/97)
+
+eps.c
+	Fixed a minor bug in axis labeling.  (4/27/97)
+
+cdliraf.c
+cdlfits.c
+	Initialized z1/z2 values in display procedures (4/25/97)
+
+cdl.c
+cdlmark.c
+	The DLHead/DLtail structures were being accessed as one-indexed
+	arrays, changed so they're zero-index and won't overflow the
+	allocation. (4/25/97)
+
+comm.c
+	Fixed a bug where the fbconfig was being passed in incorrectly in
+	a clear-frame request.  Caused a "shifted buffer" effect on SAOimage
+	in subsequent calls to the display example. (4/24/97)
+
+comm.c
+doc/cdlref.ms
+doc/cdlref.ps
+	Fixed a bug in the encoding of the frame number as it's passed to
+	the server, caused display to frames 3-4 to fail. Updated docs.
+	(4/22/97)
+
+cdl.c
+	Removed the imd_setWCS() call from the cdl_open() procedure to
+	avoid reinitialize the frame buffers in the server.  This would
+	erase previously displayed frames  e.g. in the display example
+	when using an FB larger than the default.  (4/13/97)
+
+cdl.c
+cdl_f.c
+doc/cdlref.ms
+doc/cdlref.ps
+	Changed the behavior of the cdl_open() procedure (C and F77) to check
+	automatically for the IMTDEV variable if passed a NULL arg.  Also
+	fixed a bug in the fortran interface string stripping procedure intro-
+	duced by the earlier bug fix.  (3/29/97)
+
+cdl_f.c
+	Fixed bug in string passing.  Fortran appends a 'hidden' string
+	length argument that was not being used and strings were being
+	truncated or assumed to be a certain length improperly.  Also
+	modified CDF_OPEN to handle an empty string properly (the ftn
+	getenv procedure doesn't always return a NULL, just an empty
+	string). (3/27/97)
+
+examples/fdisplay.f
+examples/ftvmark.f
+	Modified to show use of IMTDEV environment variable for making
+	the server connection. (3/27/97)
+
+eps.c
+	Added a grestore to the prolog to workaround a bug on Digital
+	Printerserver 17 printers.  (3/27/97)
+
+cdlfits.c
+	Fixed a bug in the reading of FITS files with BSCALE/BZERO (3/18/97)
+
+cdl_f.c
+	Removed an errant cdl arg to CDF_CLOSE (3/12/97)
+
+imd.c
+eps.c
+cdl.h
+comm.c
+test/imdtest.c
+	Ifdef'd uchar typedef for AIX systems. (3/12/97)
+
+cdliraf.c
+examples/display.c
+	Ifdef'd <sys/types.h> include for lseek on Ultrix systems (3/12/97)
+
+cdliraf
+comm.c
+	SAOimage assumes that a ClearFrame request passes the fbconfig
+	number in the tid field of the packet, XImtool doesn't.  This
+	is also what IRAF does so the FEEDBACK unit now also passes in
+	the fbconfig as well.  (2/28/97)
+
+cdl.c
+comm.c
+	Added debugging output to print each header packet for comm 
+	interface. (2/28/97)
+
+cdliraf.c
+	Fixed one bug causing a segvio for odd sized images, fixed another
+	affecting image with padding in the pixels. (2/27/97)
+
+examples/display.c
+	Enabled -fbconfig flag for iraf format (2/27/97)
+
+cdl.c
+	Changed a debug print so 'imtdev' isn't printed directly if it's
+	NULL, causes a segvio on Sol2.5 systems.  (2/27/97)
+
+examples/Imakefile
+	Needed to add "-lnsl -lsocket" for Solaris linking. (2/27/97)
+
+Imakefile
+	Added a "HasSunC" check for Solaris check since the extra flags are
+	only needed by SunPRO compilers, not GCC.  (2/26/97)
+
+------------------------------------------------------------------------------
+V1.0 Beta released.  (2/26/97)

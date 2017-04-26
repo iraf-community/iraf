@@ -1,0 +1,33 @@
+include	"../lib/mctable.h"
+
+
+$for (csilrdxp)
+# MCT_CLEAR - Clear all table values with given value. Do not reset any
+# table counter.
+
+procedure mct_clear$t (table, value)
+
+pointer	table			# table descriptor
+PIXEL	value			# value
+
+begin
+	# Check pointer and magic number
+	if (table == NULL)
+	    call error (0, "mct_clear: Null table pointer")
+	if (MCT_MAGIC (table) != MAGIC)
+	    call error (0, "mct_clear: Bad magic number")
+
+	# Check table type
+	if (MCT_TYPE (table) != TY_PIXEL)
+	    call error (0, "mct_clear: Wrong table type")
+
+	# Move value to data buffer
+	$if (datatype == p)
+	call amovki (value, Memi[MCT_DATA (table)],
+		     MCT_MAXROW (table) * MCT_MAXCOL (table))
+	$else
+	call amovk$t (value, Mem$t[MCT_DATA (table)],
+		     MCT_MAXROW (table) * MCT_MAXCOL (table))
+	$endif
+end
+$endfor

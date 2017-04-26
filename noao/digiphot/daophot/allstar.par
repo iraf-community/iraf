@@ -1,0 +1,19 @@
+# Parameters for the ALLSTAR task
+
+image,f,a,,,,"Image corresponding to photometry"
+photfile,f,a,default,,,"Input photometry file (default: image.mag.?)"
+psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
+allstarfile,f,a,"default",,,"Output photometry file (default: image.als.?)"
+rejfile,f,a,"default",,,"Output rejections file (default: image.arj.?)" 
+subimage,f,a,"default",,,"Subtracted image (default: image.sub.?)" 
+datapars,pset,h,"",,, Data dependent parameters
+daopars,pset,h,"",,,Psf fitting parameters
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+wcspsf,s,h,)_.wcspsf,,,"The psf coordinate system (logical,tv,physical)"
+cache,b,h,yes,,,Cache the data in memory?
+verify,b,h,)_.verify,,,Verify critical allstar parameters?
+update,b,h,)_.update,,,Update critical allstar parameters?
+verbose,b,h,)_.verbose,,,Print allstar messages?
+version,i,h,2,1,2,Version
+mode,s,h,'ql'

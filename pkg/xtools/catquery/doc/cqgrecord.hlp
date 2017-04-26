@@ -1,0 +1,46 @@
+.help cqgrecord Mar00 "Catquery Package"
+.ih
+NAME
+cqgrecord -- get a record from the catalog results
+.ih
+SYNOPSIS
+
+stat = cq_grecord (res, buf, maxch, recno)
+
+.nf
+pointer	res		# the results descriptor
+char	buf		# the output buffer
+int	maxch		# the maximum size of the output buffer
+int	recno		# the record to be fetched
+.fi
+.ih
+ARGUMENTS
+.ls res    
+The results descriptor.
+.le
+.ls buf
+The buffer containing the returned record.
+.le
+.ls maxch
+The maximum size of the output buffer.
+.le
+.ls recptr
+The sequence number of the record to be fetched. Recptr should be set to
+to initialize sequential reading of all the catalog results.
+.le
+.ih
+DESCRIPTION
+Cq_grecord returns the requested record. Cq_grecord is an integer function
+which returns BOF, the number of characters in the record, or EOF as
+its function value.
+.ih
+NOTES
+In most cases allocating a buffer size that is SZ_LINE chars long
+will be adequate to hold the output record. If the integer results parameter
+CQRECSIZE is defined, i.e. non-zero, then an output buffer  CQRECSIZE chars
+long can be allocated.
+
+.ih
+SEE ALSO
+cqgnrecord
+.endhelp

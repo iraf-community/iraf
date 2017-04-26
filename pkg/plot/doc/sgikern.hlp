@@ -1,0 +1,178 @@
+.help sgikern Feb87 plot
+.ih
+NAME
+sgikern -- simple graphics interface (SGI) kernel
+.ih
+USAGE
+sgikern input
+.ih
+PARAMETERS
+.ls input
+The list of input metacode files.
+.le
+.ls device = "sgimc"
+The name of the logical or physical graphics device for which SGI metacode
+is to be generated.
+.le
+.ls generic = no
+The remaining parameters are ignored when \fBgeneric\fR = yes.
+.le
+.ls debug = no
+If \fBdebug\fR = yes, the graphics instructions are decoded and printed
+during processing.
+.le
+.ls verbose = no
+If \fBverbose\fR = yes, the elements of polylines, cell arrays, etc. will
+be printed in debug mode.
+.le
+.ls gkiunits = no
+By default, coordinates are printed in NDC rather than GKI units.
+.le
+.ih
+DESCRIPTION
+Task \fIsgikern\fR translates GKI metacode into a much simpler format and
+then calls up a host system task to dispose of the intermediate file to a
+plotter device.  The SGI kernel can generate as output either an SGI metacode
+file, used to drive laser plotters and pen plotters, or a bitmap file, used
+to drive raster graphics devices.  Both types of files have a very simple
+format, making it straightforward to implement interfaces for new devices.
+
+The SGI/SGK \fBmetacode format\fR is a sequence of 16 bit integer values encoded
+in the machine independent MII format (twos complement, most significant byte
+first).  The SGI kernel reduces all IRAF plotting instructions to only four
+SGK metacode instructions, i.e.:
+
+
+.ks
+.nf
+	opcode  arguments                description
+
+	   1      0    0		start a new frame
+	   2      X    Y                move to (x,y)
+	   3      X    Y                draw to (x,y)
+	   4      W    0                set line width (>= 1)
+.fi
+.ke
+
+
+All coordinates are specified in GKI NDC units in the range 0-32767.  Note that
+all metacode instructions are the same length.  All text generation, line type
+emulation, mark drawing, etc., is done in the higher level IRAF software.
+The metacode file is a standard IRAF random access (non record structured)
+binary file.
+
+The \fBbitmap format\fR written by the SGK is even simpler than the metacode
+format.  Output consists either of a single binary raster file containing one
+or more bitmaps with no embedded header information, or a set of binary files
+with the same root name and the extensions .1, .2, etc., each of which contains
+a single bitmap.  All bitmaps the same size.  The size is specified in the
+graphcap entry for the device and may be passed to the host dispose task on
+the foreign task command line if desired.  Page offsets may also be passed on
+the command line, e.g., to position the plot on the plotter page.
+
+The following graphcap fields apply to both metacode and bitmap devices.
+
+.ks
+.nf
+	DD	host command to dispose of metacode file ($F)
+	DB	have the kernel print debug messages during execution
+	RM	boolean; if present, SGK will delete metacode file
+	MF	multiframe count (max frames per job)
+	NF	store each frame in a new file (one frame/file)
+	RO	rotate plot (swap x and y)
+	YF	y-flip plot (flip y axis) (done after rotate)
+.fi
+.ke
+
+The following additional fields are defined for bitmap devices.
+
+.ks
+.nf
+	BI	boolean; presence indicates a bitmapped or raster device
+	LO	width in device pixels of a line of size 1.0
+	LS	difference in device pixels between line sizes
+	PX	physical x size of bitmap as stored in memory, bits
+	PY	physical y size of bitmap, i.e., number of lines in bitmap
+	XO,YO	origin of plotting window in device pixels
+	XW,YW	width of plotting window in device pixels
+	NB	number of bits to be set in each 8 bit byte output
+	BF	bit-flip each byte in bitmap (easier here than later)
+	BS	byte swap the bitmap when output (swap every two bytes)
+	WS	word swap the bitmap when output (swap every four bytes)
+.fi
+.ke
+
+The multiframe count (MF) limits the number of frames per job, where a job
+refers to the dispose command submitted to the host to process the frames.
+If the new file flag (NF) is absent, all frames will be stored in the same
+physical file (this holds for both metacode and bitmap frames).  If the new
+file flag (NF) is set, each frame will be stored in a separate file, with
+the N files having the names $F.1, $F.2, ... $F.N, where $F is the unique
+(root) filename generated from the template given in the DD string.  The $F
+is replaced by the root filename, rather than by a list of all the filenames,
+to keep the OS command to a reasonable length and to permit the use of host
+file templates to perform operate upon the full set of files (and to avoid
+having to choose between spaces and commas to delimit the filenames).
+For example, if MF=8 and NF=yes, then "$F.[1-8]" will match the file set
+on a UNIX host.  The template "$F.*" is less precise but would also work.
+
+The values of graphcap device capability fields may also be substituted
+symbolically when building up the dispose command.  If the sequence
+$(\fICC\fR) is encountered in the dispose command template, the string
+value of the capability \fICC\fR will be substituted.  For example, given
+the sequence "-w $(xr)" and the graphcap capability entry ":xr#1024:",
+the output sequence would be "-w 1024".  This feature is particularly
+useful when several high level device entries include (via "tc=device")
+a generic device entry.  The DD string in the generic entry may substitute
+the values of device parameters defined differently in the high level
+entries; this avoids the need to duplicate an almost identical DD string
+in several device entries.
+
+The output raster will consist of PY lines each of length PX bits.  If PX is
+chosen to be a multiple of 8, there will be PX/8 bytes per line of the output
+raster.  Note that the values of PX and PY are arbitrary and should be chosen
+to simplify the code of the translator and maximize efficiency.  In particular,
+PX and PY do not in general define the maximum physical resolution of the
+device, although if NB=8 the value of PX will typically approximate the
+physical resolution in X.  If there are multiple bitmap frames per file,
+each frame will occupy an integral number of SPP char units of storage in the
+output file, with the values of any extra bits at the end of the bitmap being
+undefined (a char is 16 bits on most IRAF host machines).
+
+The plot will be rasterized in a logical window XW one-bit pixels wide and YW
+pixels high.  The first YO lines of the output raster will be zero, with the
+plotting window beginning at line YO+1.  The first XO bits of each output line
+will be zeroed, with the plotting window beginning at bit XO+1.  The bytes in
+each output line may be bit-flipped if desired, and all of the bits in each
+output byte need not be used for pixel data.  If the bit packing factor NB is
+set to 8 the plotting window will map into XW bits of storage of each output
+line.  If fewer than 8 bits are used in each output byte more than XW physical
+bits of storage will be used, e.g., if NB=4, XW*2 bits of storage are required
+for a line of the plotting window.  The unused bits are set to zero.  The
+translator can later "or" a mask into the zeroed bits, flip the data bits,
+or perform any other bytewise operation using simple lookup table mapping
+techniques.
+
+The DD entry consists of three fields delimited by commas, i.e., the device
+name, including node name (not used at present for this kernel), the VOS
+root filename to be used to make a temporary file to contain the output (note
+that this is NOT a host filename), and lastly the command to be sent to the
+host system to dispose of the output metacode file or bitmap file to the
+plotter device.
+.ih
+EXAMPLES
+1. Convert the GIO/GKI metacode file "dev$mc" into an SGI format metacode file.
+
+    cl> sgikern dev$mc device=sgimc
+
+2. The same GIO/GKI metacode file read in the previous example ("dev$mc") can
+be plotted on the SGI device "qms_sgi".
+
+    cl> sgikern dev$mc device=qms_sgi
+.ih
+SEE ALSO
+"The IRAF Simple Graphics Interface (SGI)", August 1986
+.br
+sgidecode, stdgraph, stdplot
+.endhelp
+

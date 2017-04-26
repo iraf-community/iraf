@@ -1,0 +1,47 @@
+# Make the PROTO package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$call	relink@color
+	$call	relink@vol
+
+	$update	libpkg.a
+	$omake	x_proto.x
+	$link	x_proto.o libpkg.a -lxtools -liminterp -o xx_proto.e
+	;
+
+install:
+	$call	install@color
+	$call	install@vol
+
+	$move	xx_proto.e bin$x_proto.e
+	;
+
+libpkg.a:
+	epix.x		<imhdr.h>
+	fields.x	<ctype.h>
+	interp.x	<fset.h>
+	intrp.f
+	t_binfil.x	<mach.h> <error.h> <imhdr.h>
+	t_bscale.x	<ctype.h> <error.h> <imhdr.h> <mach.h>
+	t_fixpix.x	<error.h> <imhdr.h> <imset.h> <pmset.h>
+	t_hfix.x	<ctype.h> <error.h> <imhdr.h> <imio.h>
+	t_imext.x	<error.h> <syserr.h> <imhdr.h> <imset.h> <mach.h> \
+			<ctype.h>
+	t_imcntr.x	<imhdr.h>
+	t_imscale.x	<imhdr.h> <mach.h>
+	t_joinlines.x	
+	t_mask2text.x	<imhdr.h>
+	t_mkglbhdr.x	<error.h> <imhdr.h>
+	t_suntoiraf.x	<mach.h> <error.h> <imhdr.h>
+	t_text2mask.x	<imhdr.h>
+	@masks
+	@maskexpr
+	;

@@ -1,0 +1,399 @@
+This directory contains the source for the NSPP/GIO kernel, the interface
+between GIO and the old Ncar system plot package and associated metacode
+translators.
+
+Special graphcap entries used by this kernel:
+
+	MF		maximum frame count per metafile
+	FS		frame advance req'd at start of metafile
+	FE		frame advance req'd at end of metafile
+
+Rev 1.0 installed in March 1985.
+----------------------------------------------------------------------------
+
+Differences between Rev 1.0 and Rev 1.1 of the NSPP/GIO kernel.
+Collated at installation of Rev 1.1 on 24 April 1985.
+----------------------------------------------------------------------------
+
+gktclose.x
++ diff gktclose.x ../nsppkern.old/gktclose.x 
+12,13d11
+< 	call frame
+< 	call gkt_flush
++ echo gktclosews.x 
+gktinit.x
++ diff gktinit.x ../nsppkern.old/gktinit.x 
+49a50,59
+> 	# get the window offsets
+> 
+> 	g_xoff = ttygeti (tty, "XO")
+> 	if (g_xoff < 0)
+> 	    g_xoff = 0
+> 	g_yoff = ttygeti (tty, "YO")
+> 	if (g_yoff < 0)
+> 	    g_yoff = 0
+> 
+> 
+112d121
+< 	GKT_PIXREP(g_kt)     = btoi (ttygetb (tty, "pr"))
+gktopenws.x
++ diff gktopenws.x ../nsppkern.old/gktopenws.x 
+98,104c98,99
+< 	if (mode == NEW_FILE) {
+< 	    # Frame call only if NEW_FILE and not first time open with
+< 	    # this device.  This prevents frame before first data.
+< 	    if (!need_open)
+< 	        call frame
+< 	    call gkt_reset
+< 	}
+---
+> 	if (mode == NEW_FILE)
+> 	    call frame()
++ echo gktpcell.x 
+gktpcell.x
++ diff gktpcell.x ../nsppkern.old/gktpcell.x 
+8a9
+> 
+12c13
+< procedure gkt_putcellarray (m, nc, nr, ax1,ay1, ax2,ay2)
+---
+> procedure gkt_putcellarray (m, nc, nr, x1,y1, x2,y2)
+17,18c18,19
+< int	ax1, ay1		# lower left corner of output window
+< int	ax2, ay2		# upper right corner of output window
+---
+> int	x1, y1			# lower left corner of output window
+> int	x2, y2			# upper right corner of output window
+20d20
+< int	x1,y1,x2,y2		# device coordinates
+22c22
+< int	nx, ny, y
+---
+> int	nx, ny
+28c28
+< bool	ca, use_orig, new_row, pr
+---
+> bool	ca, use_orig, new_row
+31,32d30
+< real	delta_y
+< int	xrep, yrep
+43c41
+< 	# Determine if can do real cell array.  If not, use character
+---
+> 	# determine if can do real cell array.  If not, use character
+49d46
+< 	pr = false
+53d49
+< 	    pr = (GKT_PIXREP(g_kt) != 0)
+65,66c61
+< 	# Input arguments (ax, ay) refer to corners of put cell array;
+< 	# we need corners of the corresponding device array.
+---
+> 	# find out how many real pixels we have to fill
+68,73c63,66
+< 	x1 = ax1
+< 	x2 = ax2
+< 	y1 = ay1
+< 	y2 = ay2
+< 	call adjust(x1,x2,xres)
+< 	call adjust(y1,y2,yres)
+---
+> 	px1 = real(x1)/GKI_MAXNDC
+> 	py1 = real(y1)/GKI_MAXNDC
+> 	px2 = real(x2)/GKI_MAXNDC
+> 	py2 = real(y2)/GKI_MAXNDC
+75,79c68,69
+< 	# Find out how many real pixels we have to fill
+< 	px1 = real(x1)/(GKI_MAXNDC+1)
+< 	py1 = real(y1)/(GKI_MAXNDC+1)
+< 	px2 = real(x2)/(GKI_MAXNDC+1)
+< 	py2 = real(y2)/(GKI_MAXNDC+1)
+---
+> 	nx = int( (px2 - px1) * (xres-1.0) + 1.5 )
+> 	ny = int( (py2 - py1) * (yres-1.0) + 1.5 )
+81,90c71
+< 	nx = int( px2 * xres ) - int( px1 * xres ) + 1
+< 	ny = int( py2 * yres ) - int( py1 * yres ) + 1
+< 
+< 	if ( ny > 1)
+< 	     delta_y = (real(y2) - real(y1))/ny
+< 	else {
+< 	     delta_y = 0.
+< 	}
+< 
+< 	# If too many data points in input, set skip.  If skip is close
+---
+> 	# if too many data points in input, set skip.  If skip is close
+92,93c73,74
+< 	# Set block replication factors - will be > 1.0 if too few input points.
+< 	# Cannot set to 1.0 if "close" enough, since, if > 1.0, we don't have
+---
+> 	# set block replication factors - will be > 1.0 if too few input points.
+> 	# cannot set to 1.0 if "close" enough, since, if > 1.0, we don't have
+110c91,101
+< 	# Allocate storage for a row of pixels.  This is quite inefficient
+---
+> 
+> 	# try for the simplest case: 1:1 match with input data
+> 
+> 	if ( ca && (nx == nc) && (ny == nr) ) {
+> 	    call pixels( real(x1)/GKI_MAXNDC, real(y1)/GKI_MAXNDC,
+> 		nx, ny, m)
+> 	    call sfree(sp)
+> 	    return
+> 	}
+> 
+> 	# allocate storage for a row of pixels.  This is quite inefficient
+113d103
+< 	# need nx+1 in case nx odd ... pixels() wants to pad output.
+115,116c105
+< 	call salloc ( cell, nx+1, TY_SHORT)
+< 	Mems[cell + nx] = 0
+---
+> 	call salloc ( cell, nx, TY_SHORT)
+118c107
+< 	# Initialize counters
+---
+> 	# initialize counters
+125c114
+< 	# See if we can use original data ... no massaging
+---
+> 	# see if we can use original data ... no massaging
+128c117
+< 	# Note that if blockx > 1.0, skip_x must be 1.0, and vv
+---
+> 	# note that if blockx > 1.0, skip_x must be 1.0, and vv
+138,152c127
+< 	# If device can pixel replicate, use that feature where we can
+< 	if( pr) {
+< 	    if( (skip_x == 1.0) && ( int(blockx) == blockx) ) {
+< 		 xrep = int(blockx)
+< 		 use_orig = true
+< 		 nx = nc
+< 	    } else
+< 		 xrep = 1
+< 	    if( (skip_y == 1.0) && ( int(blocky) == blocky) ) {
+< 		 yrep = int(blocky)
+< 		 ny = 1
+< 	    } else
+< 		 yrep = 1
+< 	}
+< 	call pixel0(1,0,xrep,0,1,yrep)
+---
+> 	# do it
+154c129
+< 	# Do it
+---
+> 	for (i = 1;  i <= ny;  i = i + 1) {
+156c131
+< 	for ( i = 1; i <= ny ; i = i + 1) {
+---
+> 	    # Build the row data.
+158,159d132
+< 	    # Build the row data
+< 
+161c134
+< 		if ( skip_x == 1.0) {
+---
+> 		if ( skip_x == 1.0)
+163c136
+< 		} else {
+---
+> 		else {
+181d153
+< 		y = y1 + ((i - 1)*delta_y + 0.5)
+183,184c155,159
+< 		        call pixels( px1, real(y)/GKI_MAXNDC,
+< 			    nx, 1, m[element])
+---
+> 		    if ( i == 1 )
+> 		        call pixelr( real(x1)/GKI_MAXNDC, real(y1)/GKI_MAXNDC,
+> 			    nx, ny, m[element])
+> 		    else
+> 		        call pixeli( 0., 0., nx, 1, m[element])
+186c161,165
+< 		        call pixels( px1, real(y)/GKI_MAXNDC, nx, 1, Mems[cell])
+---
+> 		    if ( i == 1 )
+> 		        call pixelr( real(x1)/GKI_MAXNDC, real(y1)/GKI_MAXNDC,
+> 			    nx, ny, Mems[cell])
+> 		    else
+> 		        call pixeli( 0., 0., nx, 1, Mems[cell])
+188,189c167
+< 	    }   
+< 	    else
+---
+> 	    } else
+192c170
+< 	    # Advance a row
+---
+> 	    # Advance a row.
+206c184
+< 	# All done, restore text parameters and release storage
+---
+> 	# all done, restore text parameters and release storage
+209c187
+< 	    call restoretx (txsave,tx)
+---
+> 	    call restoretx(txsave,tx)
+212a191
+> 
+218d196
+< pointer savep, txp
+219a198
+> pointer savep, txp
+254a234
+> 
+258d237
+< pointer savep, txp
+259a239
+> pointer savep, txp
+263c243
+< 	# Restore values
+---
+> 	# restore values
+283a264
+> 
+287c268,269
+< procedure fakepc (indata, outdata, nx,  scale)
+---
+> procedure fakepc( indata, outdata, nx,  scale)
+> 
+298c280
+< data cdata /' ', '.', ':', '|', 'i', 'l', 'J', 'm', '#', 'S', 'B', EOS/
+---
+> data	cdata /' ', '.', ':', '|', 'i', 'l', 'J', 'm', '#', 'S', 'B', EOS/
+330,374d311
+< end
+< 
+< # ADJUST -- round/truncate putcell array corners to device coordinates
+< # move up lower bound if it is above center point of device cell,
+< # move down upper bound if below.  Don't allow bounds to go beyond
+< # resolution or below zero.  Do not allow bounds to cross.  Part of the
+< # assumptions behind all this is that putcells will be continguous and
+< # rows/columns must not be plotted twice.
+< 
+< procedure adjust ( lower, upper, res)
+< 
+< int	lower, upper
+< real	res
+< 
+< real	factor
+< real	low, up
+< 
+< begin
+< 	factor = res/(GKI_MAXNDC+1)
+< 	low = real(lower) * factor
+< 	up  = real(upper) * factor
+< 
+< 	# if boundaries result in same row, return
+< 	if ( int(low) == int(up) )
+< 	    return
+< 
+< 	# if low is in upper half of device pixel, round up
+< 	if ( (low - int(low)) >= 0.5 ) {
+< 	    low = int(low) + 1
+< 	    # don't go to or beyond upper bound
+< 	    if ( low < up ) {
+< 	        # ... 0.2 just for "rounding protection";
+< 		lower = (low + 0.2)/factor
+< 	        # if now reference same cell, return
+< 		if ( int(low) == int(up) )
+< 		    return
+< 	    }
+< 	}
+< 
+< 	# if "up" in bottom half of pixel, drop down one.  Note that
+< 	# due to two "==" tests above, upper will not drop below lower.
+< 	# 0.2 means drop partway down into pixel below; calling code will
+< 	# truncate.
+< 	if ( (up - int(up)) < 0.5 )
+< 	    upper = real(int(up) - 0.2)/factor
++ echo gktpl.x 
+gktpl.x
++ diff gktpl.x ../nsppkern.old/gktpl.x 
+51,52c51,52
+< 	x = p[1]
+< 	y = p[2]
+---
+> 	x = p[1] + g_xoff
+> 	y = p[2] + g_yoff
+58,59c58,59
+< 	    x = p[i]
+< 	    y = p[i+1]
+---
+> 	    x = p[i] + g_xoff
+> 	    y = p[i+1] + g_yoff
+gktpm.x
++ diff gktpm.x ../nsppkern.old/gktpm.x 
+48,49c48,49
+< 	x = p[1]
+< 	y = p[2]
+---
+> 	x = p[1] + g_xoff
+> 	y = p[2] + g_yoff
+63,64c63,64
+< 	    x = p[i]
+< 	    y = p[i+1]
+---
+> 	    x = p[i] + g_xoff
+> 	    y = p[i+1] + g_yoff
++ echo gktpmset.x 
+gkttx.x
++ diff gkttx.x ../nsppkern.old/gkttx.x 
+109,110c109,110
+< 		call pwrity (real(x)/GKI_MAXNDC,
+< 			real(y)/GKI_MAXNDC, Memc[pstring], seglen,
+---
+> 		call pwrity (real(x+g_xoff)/GKI_MAXNDC,
+> 			real(y+g_yoff)/GKI_MAXNDC, Memc[pstring], seglen,
+_____________________________________________________________________________
+
+25Apr85	gktpl.x
+	Call to optn to set line width changed to set option "inten" instead
+	of "spot size", which was not changing the line width.
+
+26Apr85 gktpm.x
+	Same change as one to gktpl.x
+
+	Character size as used in gkttx.x is a floating point number, but
+	NCAR pwry.f uses an integer value -- the conversion was causing
+	centering errors as gkttx.x would calculate a "path length" for
+	the text based on one size, and pwry.f would use a different size
+	to generate the text.  Changed pwry.f to use a floating point
+	size as an input variable, changed gkttx.x to send same.
+
+	gktpcell.x
+	Moved pixel0 call inside the "if (pr) {" statment, where it should
+	have been.
+
+	graphcap
+	Added  "pr" capablility flag to dicomed entry.  Changed character
+	height to reflect the 9 to 8 ratio that pwry uses.
+
+
+---------------------------------------------------------------------------
+Rev 1.2 10 May 1985 Dct.
+
+Fairly extensive modifications made to minimize the number of frame calls
+and metafiles generated.  Redundant CLEAR calls or clear calls immediately
+after open workstation are ignored.  Multiple frames are permitted in a
+metafile (formerly the metafile was disposed after each frame).  Graphcap
+parameters were added to control automatic frame advances at the beginning
+and end of metafiles.
+
+---------------------------------------------------------------------------
+Rev 1.3 1 June 1985 Dct.
+
+[1] Fixed a bug in polymarker; was drawing polylines.
+
+[2] Replaced the old character generation code by all new code, using the stroke
+table from the NCAR/GKS code.  Replaced "pwry.f" by the much simpler
+"gktdrawch.x".  Largely copied the stdgraph "stgtx.x", including the clipping
+logic therein.
+
+17-Aug-85 Dct.
+	Added support for the new DD graphcap parameter, used to pass device
+	dependent information to the device driver.  This information was
+	formerly encoded in a table at compile time, with the table defined
+	in <libc/kernel.h>.

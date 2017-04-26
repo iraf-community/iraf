@@ -1,0 +1,47 @@
+.help velvect Sep85 plot
+.ih
+NAME
+velvect -- two dimensional velocity field plot
+.ih
+USAGE
+velvect uimage vimage
+.ih
+PARAMETERS
+.ls uimage
+Name of image containing u components of the velocity field.
+.le
+.ls vimage 
+Name of image containing v components of the velocity field.
+.le
+.ls device = stdgraph
+Output device for plot.
+.le
+.ls title = "imtitle"
+Title to be centered over the plot.  By default, it will be the title
+from the image header of the \fBuimage\fR.
+.le
+.ls append = no
+Append to an old plot?
+.le
+.ls verbose = yes
+Print warning messages?
+.le
+.ih
+DESCRIPTION
+Task \fIvelvect\fR draws a representation of a two-dimensional velocity
+field by drawing arrows from each data location.  The length of the arrow
+is proportional to the strength of the field at that location and the direction
+of the arrow indicates the direction of the flow at that location.  The
+two images \fIuimage\fR and \fIvimage\fR contain the velocity field to be
+plotted.  The vector at the point (i,j) has:
+
+.nf
+    magnitude = sqrt (uimage(i,j)**2 + vimage(i,j)**2)
+    direction = atan2 (vimage(i,j), uimage(i,j))
+.fi
+.ih
+EXAMPLES
+1. Make a vector plot from the two images "crab.blue" and "crab.red".
+
+    cl> velvect crab.blue crab.red
+.endhelp

@@ -1,0 +1,11 @@
+# Update the tproduct application code in the ttools package library
+# Author: B.Simon, 25-NOV-1987
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	tproduct.x     		<tbset.h> 
+	;

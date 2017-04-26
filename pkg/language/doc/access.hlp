@@ -1,0 +1,48 @@
+.help "access,imaccess" Feb86 language
+.ih
+NAME
+access -- test whether a file exists
+.ih
+USAGE
+bool = access (filename)
+bool = imaccess (imagename)
+.ih 
+PARAMETERS
+.ls filename
+The name of the file whose existence is to be tested.
+.le
+.ls imagename
+The name of the image whose existence is to be tested.
+.le
+.ih
+DESCRIPTION
+\fIAccess\fR is a boolean intrinsic function returning true ("yes") if the
+named file exists.  \fIAccess\fR can only be called as a function in an
+expression, not as a task.
+.ih
+EXAMPLES
+1. Type a file if it exists.
+
+.nf
+    if (access ("lib$motd"))
+	type ("lib$motd")
+    else
+	error (11, "File not found")
+.fi
+
+2. Tell if a file and an image exists.
+
+.nf
+	cl> = access ("lib$motd")
+	cl> = imaccess ("dev$pix")
+.fi
+
+
+.ih
+BUGS
+An optional second argument should be added to test whether the named file
+can be accessed for reading or writing.
+.endhelp
+.ih
+SEE ALSO
+directory

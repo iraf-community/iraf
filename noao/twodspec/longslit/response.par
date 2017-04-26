@@ -1,0 +1,18 @@
+# RESPONSE -- Determine response calibrations
+
+calibration,s,a,,,,Longslit calibration images
+normalization,s,a,,,,Normalization spectrum images
+response,s,a,,,,Response function images
+interactive,b,h,yes,,,Fit normalization spectrum interactively?
+threshold,r,h,INDEF,,,Response threshold
+
+sample,s,h,"*",,,Sample of points to use in fit
+naverage,i,h,1,,,Number of points in sample averaging
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+low_reject,r,h,0.,0.,,Low rejection in sigma of fit
+high_reject,r,h,0.,0.,,High rejection in sigma of fit
+niterate,i,h,1,0,,Number of rejection iterations
+grow,r,h,0.,0.,,Rejection growing radius
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

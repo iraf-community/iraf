@@ -1,0 +1,696 @@
+.help revisions May91 noao.digiphot.photcal
+.nf
+
+io/iocat.x
+io/ioobs.x
+    Added some necessary P2R macros for symtab usage (4/2/12, MJF)
+
+lib/lexer.h
+lib/prstruct.h
+    Added necessary P2R macros for 64-bit systems (9/8/10, MJF)
+
+
+=======
+V2.12.2
+=======
+
+photcal/photcal.cl
+photcal/photcal.hd
+photcal/photcal.men
+    Typo changes referencing PHTOCALX fixed (11/11/03 MJF)
+
+photcal/photcal.par
+    Fixed reference to photcalx$ in 'catdir' default value (11/11/03 MJF)
+
+photcal/doc/obsfile.hlp
+    OBSFILE expects "incolumns" to have 10 numbers and not 9 and specified
+    in the help file.  The extra column is for an object ID.  This may
+    have been added in Aug. 2001 judging from the last modify date of
+    the include defining the structure.  (1/24/03, Valdes)
+
+    In the descriptions of the catalog files, the first catalog in the
+    list "Elias" has the wrong filename for the formats and templates
+    file.  Currently they are flandolt.dat and and tlandolt.dat, which
+    should be felias.dat and telias.dat.
+    (9/13/02, Valdes, Warner)
+
+=======
+V2.12.1
+=======
+
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+photcal/obsfile.par
+photcal/doc/obsfile.hlp
+photcal/doc/mkobsfile.hlp
+photcal/doc/mknobsfile.hlp
+    Declarations for the missing wrap parameter were added to the obsfile,
+    mknobsfile, and mkobsfile tasks. Descriptions of the wrap parameter
+    were added to the obsfile, mknobsfile, and mkobsfile task help pages.
+		
+    (Davis, May 29, 2002)
+
+
+photcal$mkobsfile/phagrow.x
+    Added a missing sfree statement.
+
+    (Davis, February 19, 2002)
+
+photcal$mkobsfile/mkpkg
+    Added a missing "../lib/obsfile.h" dependency to the mkpkg phsort.x
+    declaration.
+
+    (Davis, December 13, 2001)
+
+photcal/fitparams/mkpkg
+photcal/fitparams/fttrneqs.x
+    Modified the interactiving fitting code so that the plots are automatically
+    autoscaled when a new equation is fit. 
+
+    (Davis, October 9, 2000)
+
+photcal/mkimsets/t_imgroup.x
+    Modifed the imgroup task to write out the image root names minus
+    the directory specification if any to the output image sets file.
+
+    (Davis, April 25, 2000)
+
+photcal/mkimsets.cl
+    The mkimsets script was leaving a temporary file in tmp$ if the review
+    parameter was set to yes. This did not cause any trouble but might fill
+    up the tmp$ area after a while.
+
+    (Davis, April 24, 2000)
+
+photcal/*/mkpkg
+    Added some missing file dependencies and removed some unecessary ones.
+
+    (Davis, September 20, 1999)
+
+photcal/catalogs/nlandolt.dat
+    Replaced the existing catalog which was an early version I got off a tape
+    given to us by Arlo Landolt with a new version in which the positions
+    are upgraded to agree with the table as published in the literature.
+
+    (Davis, May 10, 1999)
+
+photcal/photcal.cl
+    Modified the package cl script to check and see if the tables package is
+    already loaded before checking to see whether it is defined and then
+    loading it.
+
+    (Davis, August 1, 1998)
+
+photcal/evaluate/phinvert.x
+photcal/evaluate/phminv.f
+    Modified the inversion routines to fit systems of equations which are
+    singular more robustly, by forcing the appropriate columns in the
+    inversion matrix to 0, and trying to fit the system in the least squares
+    sense. 
+
+    (Davis, Novemeber 12, 1997)
+
+
+photcal$mkapfile.cl
+    Modified the way the mkapfile script handles the tdump pwidth parameter
+    to work around a change made to the tables.ttools.tdump task. The solution
+    is not ideal because it leaves the value of tdump.pwidth.p_max
+    modified but the parameter value is not changed.
+
+    (Davis, August 15, 1997)
+
+photcal/mkobsfile/t_obsfile.x
+photcal/mkobsfile/mkpkg
+photcal/mkimsets/t_imgroup.x
+    Fixed a bug in the filter id parsing code that was causing filter ids
+    that began with non-alphabetic characters [a-z][A-Z] to be incorrectly
+    parsed, e.g 1U,1B,1V became 1, U, 1B, 1, V instead of 1U, 1B, 1V as
+    intended.
+    (Davis, 6/12/97)
+
+photcal/catalogs/README
+photcal/catalogs/ukirt.dat
+photcal/catalogs/fukirt.dat
+photcal/catalogs/tukirt.dat
+photcal/mkconfig/catlist.key
+    Installed the UKIRT JHK standards list in the photcal package.
+    (Davis, 6/25/96)
+
+photcal/evaluate/phinvert.x
+    Modified the numerical inversion routines to avoid a floating point
+    precision problem on the Linux system. This precision problem would
+    cause the code to go into an infinite loop on some objects.
+    (Davis, 5/7/96)
+
+photcal/mkobsfile/phagrow.x
+photcal/mkobsfile/phaigrow.x
+    Modified the mkapfile/apfile task curve of growth fitting code to avoid
+    going into an infinite loop while fitting the seeing radius parameter RO
+    for an image. If RO cannot be fit after a reasonable number of attempts,
+    RO is set to INDEF and a cannot converge message is issued to the user.
+    The infinite loop situation can arise if there is bad data in the input
+    file, where bad data in this sense means one or more curve of growths
+    for object which are not stars, e.g cosmic rays and in some cases
+    galaxies. Modified the plotting and output routines to deal with the
+    INDEF RO case in a sensible manner.
+    (Davis, 1/29/96)
+
+photcal/mkapfile.cl
+    Added some missing commas to the column template string sent to the pdump
+    task when the input photometry files are ST tables, abug which resulted in
+    the first 1-9 apertures not being written to the output file, and either
+    a fit did not converge message in non-interactive mode or a floating
+    divide by zero error message in interactive mode.
+    (Davis, 10/6/95)
+
+photcal/mkobsfile/t_apfile.x
+photcal/mkobsfile/t_obsfile.x
+photcal/mkobsfile/t_phimtable.x
+    Modified the obsfile task (and as a result the mk(n)obsfile script task
+    as well) to accept long (> 161 characters) lines in the input text
+    files. The change avoids problems with the ttools task tdump used to extract
+    the fields of interest: image name, x, y, magnitude, magnitude and error,
+    exposure time, airmass, filter, and time of observation from ST tables
+    and which due to the internal formatting can exceed the default size of
+    an iraf image line.
+    (Davis, 10/6/95)
+
+photcal/mkobsfile/apfile.key
+    Added a description of the 'b' key to the mkapfile/apfile key file.
+    (Davis, 6/22/95/95)
+
+photcal/apfile.par
+photcal/mkapfile.cl
+photcal/lib/apfile.h
+photcal/doc/apfile.hlp
+photcal/doc/mkapfile.hlp
+photcal/mkobsfile/t_apfile.x
+photcal/mkobsfile/phagrow.x
+photcal/mkobsfile/phaitable.x
+    Added to suuport for reading the time of observation from the input
+    photometry files and/or the observing parameters file and writing it
+    to the output magnitudes file.
+    (Davis, 4/28/95)
+
+photcal/mkobsfile/phaimtable.x
+    Due to a typo mkapfile/pfile were not writing the filter id that was read
+    from the input photometry files into the output mag file correctly.
+    (Davis, 4/28/95)
+    
+photcal/mkobsfile/t_apfile.x
+photcal/mkobsfile/phagrow.x
+photcal/mkobsfile/phaigrow.x
+    Modified the mkapfile/apfile tasks so that objects with good data
+    in only one aperture are not included in the fit but are included in
+    output magnitudes file.
+    (Davis, 4/27/95)
+
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+    Reversed the order in which the itime and otime columns were read from the
+    input photometry files to avoid a problem with INDEF otimes being read
+    from allstar/nstar/peak photometry files.
+    (Davis, 3/21/95)
+
+photcal/mkobsfile/phmatch.x
+    The time of observations and airmass columns were switched on output
+    if matching by position was turned off, resulting in airmass being
+    written to the otime column and vice versa.
+
+    (Davis, 2/9/95)
+
+photcal/mkapfile.cl
+    A reference was being made to a tdump parameter outside of the loop
+    for processing ST binary tables files causing an "unknown task tdump"
+    error for users which do not have the tables package defined.
+
+    (Davis, 10/13/94)
+
+photcal/mkapfile.cl
+    A "> file" was being used instead if an ">> file" resulting in an error
+    when there was more than one file in the input list and the script
+    was unable to append to the output file.
+
+    (Davis, 10/13/94)
+
+photcal/mkobsfile/phmatch.x
+    Fixed a bug in the filter matching code that was causing stars in an
+    image which was the sole image in its set to be omitted from the output
+    file, if tolerance > 0 and the image was not the last one in the image
+    set.
+
+    (Davis, 21/6/94)
+
+photcal/obsfile.par
+photcal/mkphotcors.par
+photcal/mkimsets.cl
+photcal/mkobsfile.cl
+photcal/mknobsfile.cl
+photcal/lib/obsfile.h
+photcal/mkobsfile/t_obsfile.x
+photcal/mkobsfile/t_mkphotcors.x
+photcal/mkobsfile/phimtable.x
+photcal/mkobsfile/phmatch.x
+photcal/doc/obsfile.hlp
+photcal/doc/mkobsfile.hlp
+photcal/doc/mknobsfile.hlp
+photcal/doc/mkphotcors.hlp
+photcal/doc/mkimsets.hlp
+    Added support for picking up the time of observation to the photcal
+    preprocessor tasks obsfile/mknobsfile/mkobsfile.
+
+    (Davis, 4/4/94)
+
+photcal/evaluate/t_invertfit.x
+photcal/evaluate/phinvert.x
+    In cases where the user has not defined any set equations, invertfit will
+    pass a 2D array with a zero valued first dimension to a numerical
+    subroutine.  Although this array is never accessed and the invertfit
+    appears to run correctly on most unix machines, invertfit under VMS
+    produces an adjustable array dimension error.
+
+    (Davis, 1/18/94)
+
+photcal/fitparams/ftweights.x
+    Fixed a bug in the fitparams weighting=photerrors scheme. Fitparams
+    was not correctly assigning errors to catalog and/or observations
+    variables defined in the set equations.
+
+    (Davis, 8/8/93)
+
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+photcal/obsfile.par
+photcal/mkobsfile/t_obsfile.x
+photcal/doc/mknobsfile.hlp
+photcal/doc/mkobsfile.hlp
+photcal/doc/obsfile.hlp
+    Added a minmagerr parameter to the mknobsfile, mkobsfile, and obsfile
+    tasks.
+
+    (Davis, 7/31/93)
+
+photcal/catalogs/README
+photcal/catalogs/odewahn.dat
+photcal/catalogs/fodewahn.dat
+photcal/catalogs/todewahn.dat
+photcal/catalogs/porter.dat
+photcal/catalogs/fporter.dat
+photcal/catalogs/tporter.dat
+photcal/mkconfig/catlist.key
+    Installed two new photometry catalogs in photcal, the odewahn BVR cluster
+    standards catalog, and the porter compendium of cluster UBVRI standards.
+
+    (Davis, 4/21/93)
+
+photcal/
+    Installed two new tasks from computing the aperture corrections
+    MKAPFILE which uses apphot/daophot output as input, and APFILE
+    which uses a user's text file as input.
+
+    (Davis, 4/18/93)
+
+photcal/mkobsfile/phmatch.x
+    The position matching algorithm was failing in the case that: 1) there
+    were multiple matches on the same star and 2) the closest match was
+    not the first candidate found. The code was correctly matching to the
+    closest star but forgetting to unset the match index for the previous
+    candidate, confusing the indexing scheme, and resulting in stars being
+    left out of the output file.
+
+    (Davis, 4/2/93)
+
+photcal/mkobsfile/t_obsfile.x
+photcal/mkobsfile/phimtable.x
+    The obsfile task was not decoding the image names correctly from the
+    obsparams file when obsfile was called from the cl directly, instead
+    of from the script tasks mknobsfile and mkobsfile. Since obsfile
+    could not match the image names in the obsparams file with those in the
+    imsets file it simply ignored the contents of obsparams. This problem
+    was masking a second potential problem with normalization since the
+    code was not testing for INDEF exposure times.
+
+    (Davis, 3/1/93)
+
+photcal/mkimsets.cl
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+    Modified the mkimsets, mknobsfile, and mkobsfile script tasks so that
+    they can deal the new pdump expression parameter.
+
+    (Davis, 25/2/93)
+
+photcal/fitparams
+    The fitparams task could produce incorrect weights, chi, and fitted
+    parameter error estimates in the case that weighting=photometric and
+    nreject > 1. This was occuring because the weight array was not being
+    reinitialized correctly after each interation in the rejection cycle.
+    The actual problem was in the inlfit package routine inlfit$inreject.gx.
+
+    (Davis, 12/17/92)
+
+photcal/mkcatalog/t_catalog.x
+photcal/mkcatalog/phrecord.x
+photcal/io/ioobs.x
+    Added some missing sfree calls.
+
+    (Davis, 9/2/92)
+
+photcal/lib/warning.dat
+    Added a newline to the end of the message printed by the photcal
+    loader when the tables package is not available.
+
+    (Davis, 5/29/92)
+
+photcal/evaluate/t_invertfit.x
+photcal/evaluate/t_phcheck.x
+photcal/evaluate/phinvert.x
+photcal/evalaute/pherrors.x
+    Modified the invertfit task so that it can invert a set of equations
+    for which one or more observations is missing if the remaining
+    number of equations is greater or equal to the number of catalog
+    variables to be solved for.
+
+    (Davis, 4/17/92)
+
+photcal/mkobsfile/phmatch.x
+    Modified the preprocessor routines to write out the x and y values
+    as measured in the original data frames instead of the shifted
+    values.
+
+    (Davis, 2/19/92)
+
+photcal/mkobsfile/phimtable.x
+    Modified the code which reads in the x and y shifts from the
+    standard input to accept the syntax "xshift,yshift" as well
+    as the syntax "xshift yshift". 
+
+    (Davis, 1/8/92)
+
+photcal/catalogs/landolt.dat
+    Replaced the catalog landolt.dat with a new version containing the
+    the mean errors of the standard indices instead of the standard
+    deviations of the standard indices.
+
+    (Davis, 1/2/92)
+
+photcal/fitparams.par
+photcal/evalfit.par
+photcal/invertfit.par
+photcal/fitparams/t_fitparams.x
+photcal/evaluate/t_evalfit.x
+photcal/evaluate/t_invertfit.x
+photcal/doc/fitparams.hlp
+photcal/doc/evalfit.hlp
+photcal/doc/invertfit.hlp
+photcal/io/iocat.x
+    Modified the fitparams, evalfit, and invertfit tasks to use the
+    standard star catalog directory if the users sets the catalog
+    parameter to one of the standard catalogs.
+
+    (Davis, 2/1/92)
+
+photcal/catalogs/tlandolt.dat
+photcal/doc/mkconfig.hlp
+photcal/doc/config.hlp
+    Changed the values of the transformation equations zero points:
+    u1, b1, v1, r1, i1 to 0.0 from values like 25.0. The new values are
+    more consistent with typical apphot and daophot output, although
+    these number will always be chip/telescope dependent.
+
+    Changed the values of the color terms: u3, b3, v3, r3, i3 to 
+    0.0 to more closely correspond with reality.
+
+    (Davis, 2/1/92)
+
+photcal/mkimsets/t_imgroup.x
+    Added declarations for <fset.h> and <ctotok.h> to t_imgroup.x
+
+    (Davis, 20/11/91)
+
+photcal/
+    Changed all references to dump in the photcal scripts to pdump.
+
+    (Davis, 11/11/91)
+
+    *** Ran spplint on the photcal package.
+
+photcal/mkconfig/t_config.x
+    The routine ph_rcolnumber was being declared as a boolean instead
+    of an int inside the routines ph_rcsection and ph_rosection.
+
+    The boolean routine ph_isident was being declared everywhere as an
+    integer.
+
+photcal/parser/prtable.x
+    The routine pr_incol was declared as a function but called as a
+    subroutine.
+
+photcal/parser/prput.x
+    The routine mct_getp was being called instead of mct_putp inside the
+    routine pr_psym. It appears that this routine was not actually used
+    so this does not seem to matter.
+
+photcal/mctable/mctindef.x
+    Amovkc and amovks were being called with the integer constants INDEFS
+    and '\000' instead of short (INDEFS) and char ('\000'). This bug would
+    affect test versions of photcal.
+
+photcal/evaluate/phinvert.tx
+    The determinant det was declared as an integer variable in ph_accum instead
+    of a real. This was "almost" harmless because det was being computed
+    as real and simply passed into the calling routine where it was interpreted
+    as real. However one test was being done on det inside the ph_accum
+    routine which might fail. This was not a problem in the test version of
+    the code, but a bug introduced by my last minute changes.
+
+    (Davis, 10/4/91)
+
+photcal/invertfit.par
+photcal/evaluate/t_invertfit.x
+photcal/evaluate/phinvert.x
+photcal/evaluate/pherrors.x
+photcal/doc/invertfit.hlp
+photcal/evalfit.par
+photcal/evaluate/t_evalfit.x
+
+    1. Improved the convergence criteria of the invertfit routines by
+    increasing the maximum number of iterations, testing the determinant
+    of the curvature matrix and quitting if it is < 1.0 e-20, making
+    sure that the parameter increments never are less than abs(.01),
+    and terminating the fit if the rms starts to increase. These changes
+    are not terribly important for the usual linear systems of
+    photometric equations but are important for trying to invert higher
+    order systems.
+
+    2. Made catalog a hidden parameter in invertfit.
+
+    3. Made catalog a hidden parameter in evalfit.
+
+    4. Improved the help pages for invertfit and evalfit.
+
+    (Davis, 10/8/91)
+
+photcal/mkconfig.cl
+photcal/mkconfig/t_config.x
+photcal/doc/mkconfig.hlp
+
+    1. Made template a hidden parameter with a default values of "".
+
+    2. Made extensive modifications to the prompts to mprove the clarity
+    of the task.
+
+    3. Removed the options parameter. It caused to many headaches in the
+    script.
+
+    4. Made extensive modifications to the help page.
+
+    (Davis, 24/7/91)
+
+photcal/mkobsfile/phmatch.x
+    1. The number of objects to be output was being computed incorrectly in the
+    case that tolerance <= 0.0 and allfilters=yes.
+
+    2. In some circumstances the preprocessor was computing the number of
+    matched objects incorrectly resultings in a few dummy objects with
+    undefined or incorrect data being written at the end of the real data. 
+
+    3. If data from the same image existed in two different files and those
+    files were not in order in the input list then the pre-processor
+    would erroneously correct for the exposure time resulting in incorrect
+    magnitudes in the observations file.
+
+    (Davis, 19/7/91)
+
+photcal/evaluate/t_invertfit.x
+photcal/evaluate/phinvert.x
+photcal/evaluate/pherrors.x
+photcal/evaluate/phminv.f
+photcal/evaluate/phcheck.f
+    1. Modified invertfit to be able to deal with set equations which contain
+    references to catalog variables which were not themselves referenced
+    in the transformation equations.
+
+    2. Tightened the convergence criteria for doing the inversion. 
+
+    (Davis, 8/7/91)
+
+photcal/mkobsfile/phimtable.x
+    1. The code which reads in the images sets from the standard input has
+    been modified to prompt only for the image name, not the image filter.
+    If the filter id is defined in the database it will be used, otherwise
+    filter ids will be assigned to the images in the order in which they
+    occur in the parameter idfilters. The code which reads in filter id,
+    exposure time, and airmass from the optional observing parameters file
+    will now always prompt for a filter id.
+
+    (Davis, 8/7/91)
+
+photcal/mkobsfile/t_obsfile.x
+    1. Fixed a bug in the pre-processor tasks (mknobsfile, obsfile, mkobsfile)
+    wherein the pre-processors would crash if an image name was referenced
+    in more than one image set. This bug was not in the original pre-processor
+    but crept in when the sorting algorithm was re-done. Checking for
+    duplicate image names has been removed from the sorting step and
+    placed in the matching step where it belongs.
+
+    (Davis, 8/7/91)
+
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+    1. Added the parameters verify and verbose to the mknobsfile task.
+
+    2. Added the parameter verbose to the mkobsfile task.
+
+    (Davis, 6/7/91)
+
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+photcal/obsfile.par
+photcal/mkobsfile/t_obsfile.x
+photcal/doc/mknobsilfe.hlp
+photcal/doc/obsilfe.hlp
+    1. Removed the format parameter from the mknobsfile, obsfile and
+    mkobsfile tasks.  The format description file is always assigned a
+    default name based on the name of the observations file. Any pre-existing
+    format file without an existing observations file will be deleted if a
+    new catalog of the same name is requested.
+
+    2. Clarified the documentation for mknobsfile by emphasizing the
+    circumstances under which it is the preprocessor of choice. Switch the
+    order of examples 2 and 3, to reflect likely-hood of use.
+
+    3. Clarified the documentation for obsfile by emphasizing the circumstances
+    under which it is the preprocessor of choice.
+
+    (Davis, 5/7/91)
+
+photcal/mkimsets.cl
+photcal/imgroup.par
+photcal/mkimsets/t_imgroup.x
+photcal/mkimsets/imlist.key
+photcal/mkimsets/imgroup.key
+photcal/doc/mkimsets.hlp
+
+    1. Changed the mode of the mkimsets task parameter from auto to hidden.
+
+    2. Changed the name of the mkimsets task parameter label to rename.
+
+    3. Changed the name of the mkimsets task parameter check to review.
+
+    4. Changed all the references to identifier in the mkimsets .hlp file
+    to name.
+
+    5. Modified the .key files and the documentation appropriately.
+
+    (Davis, 4/7/91)
+
+photcal/mkcatalog.cl
+photcal/catalog.par
+photcal/mkcatalog/t_catalog.x
+photcal/doc/mkcatalog.hlp
+    1. Removed the format parameter from the mkcatalog and catalog tasks.
+    The format description file is always assigned a default name 
+    based on the name of the catalog. Any pre-existing format file without
+    and existing catalog will be deleted if a new catalog of the same
+    name is requested.
+
+    2. Removed the title parameter and modified the task to write the file
+    name to the catalog title keyword. The task will complain if the file
+    name is not the same as the title keyword if the user tries to add
+    new records to an existing catalog. This will only happen if the
+    user has renamed the catalog or copied it to another file.
+
+    3. The code was modified to prompt for the error columns and to supply
+    a default name of the form "error(name)" if a carriage return
+    character was issued.
+
+    4. The documentation was modified to explain how the default naming scheme
+    of the preprocessors works. The examples were changed to use upper
+    case letters for the standard photometric indices. A note of explanation
+    was added regarding the EOF and CR characters (end-of-file and
+    carriage return)
+
+    (Davis 4/7/91)
+
+photcal/mkobsfile/phmatch.x
+    Fixed a bug in the matching code where stars which were not matched
+    in the first filter would not be written to the observations files.
+
+    (Davis 24/6/91)
+
+photcal/photcal.par
+    Changed the definition of the catalog directory from "newphotred$catalogs/"
+    to "photcal$catalogs/".
+
+    (Davis 20/6/91)
+
+photcal/inlfit/ingcolon.gx
+    INLFIT was not recognizing the full colon command "tolerance". It would
+    accept tol.
+
+    (Davis 19/6/91)
+
+photcal/mctable/mctput.gx
+    Test for the legal column limits had an && instead of an || expression.
+
+    (Davis 19/6/91)
+
+photcal/evaluate/phprint.x
+    The evalfit and invertfit programs were crashing with an error if
+    a symbol that was defined in the configuration file was included
+    in the print string.
+
+    (Davis 11/6/53)
+
+photcal/evaluate/invertfit.x
+    Added a protection against a zero divide error which can occur if
+    the fit is perfect.
+
+    (Davis 11/6/53)
+
+photcal/fitparams/fttrneq.x
+    Changed an erroneous call to amovkr to the correct call to amovr. This
+    fixed a bug which occurred when a user tried to quit the task
+    but changed their mind at the last minute.
+
+    (Davis 20/5/91)
+
+photcal/mctable/mctput.gx
+    Table space was being reallocated as type real no matter what the
+    data type of the table. This did not matter in previous versions
+    of photcal but became a problem when the star id facility was added
+    to inlfit.
+
+    (Davis 30/5/91)
+
+photcal/fitparams/ftweights.x
+    The routines for computing the weights were crashing if there were
+    INDEF values in the observations.
+
+    (Davis 20/5/91)
+
+    Beta release of photcal to selected sites. (Davis 20/5/91)
+
+.fi
+.endhelp

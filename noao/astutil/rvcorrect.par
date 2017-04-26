@@ -1,0 +1,26 @@
+files,s,h,"",,,List of files containing observation data
+images,s,h,"",,,List of images containing observation data
+header,b,h,yes,,,Print header?
+input,b,h,no,,,Print input data?
+imupdate,b,h,no,,,"Update image header with corrections?
+"
+
+epoch,r,h,INDEF,,,Epoch of observation coordinates (years)
+observatory,s,h,)_.observatory,,,Observatory
+vsun,r,h,20.,,,Solar velocity (km/s)
+ra_vsun,r,h,18.,0.,24.,Right ascension of solar velocity (hours)
+dec_vsun,r,h,30.,-90.,90.,Declination of solar velocity (degrees)
+epoch_vsun,r,h,1900.,,,"Epoch of solar coordinates (years)
+"
+
+year,i,h,,,,Year of observation
+month,i,h,,1,12,Month of observation (1-12)
+day,i,h,,1,31,Day of observation
+ut,r,h,,0.,24.,UT of observation (hours)
+ra,r,h,,0.,24.,Right ascension of observation (hours)
+dec,r,h,,-90.,90.,Declination of observation (degrees)
+vobs,r,h,0.,,,"Observed radial velocity"
+
+hjd,r,h,,,,Helocentric Julian Day (output)
+vhelio,r,h,,,,Helocentric radial velocity (km/s) (output)
+vlsr,r,h,,,,Local standard or rest radial velocity (km/s) (output)

@@ -1,0 +1,27 @@
+.help unprotect Nov84 system
+.ih
+NAME
+unprotect -- remove file protection
+.ih
+USAGE
+unprotect files
+.ih
+PARAMETERS
+.ls files
+A template specifying the file or files from which delete protection is
+to be removed.
+.le
+.ih
+DESCRIPTION
+\fIUnprotect\fR removes delete protection from the named files.
+A "protected" file cannot be deleted or clobbered.
+.ih
+EXAMPLES
+
+1. Remove file protection from the listed files.
+
+	cl> unprotect alpha,beta,gamma.x,*.db
+.ih
+SEE ALSO
+protect, delete
+.endhelp

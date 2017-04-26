@@ -1,0 +1,726 @@
+.help revisions Aug90 pkg.plot
+.nf
+pkg/plot/crtpict/calchgms.x
+    The 'ibuf pointer was being used with Memr (5/4/13, MJF)
+
+pkg/plot/hgpline.x		+
+pkg/plot/t_prows.x
+pkg/plot/t_pcols.x
+pkg/plot/t_graph.x
+pkg/plot/t_pvector.x
+pkg/plot/initmarker.x
+pkg/plot/mkpkg
+pkg/plot/graph.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pvector.par
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/pvector.hlp
+    Added a feature where marker types of "lhist" or "bhist" draw line
+    or box histograms when not in point mode.  In point mode these
+    values default to box and when not in point mode any other value
+    defaults to connected lines.  (8/13/08, Valdes)
+
+=======
+V2.13
+=======
+
+pkg/plot/t_implot.x
+    Added a check that the image exists to avoid a bus error caused by
+    using a null pointer otherwise (8/15/06, MJF)
+
+=======
+V2.12.2
+=======
+
+pkg/plot/t_implot.x
+pkg/doc/implot.hlp
+lib/scr/implot.key
+    The "image" parameter may now be a list and the 'm' and 'n' keys
+    are used to move through the image.  This is an alternate, and
+    more convenient, version of the 'i' key.
+    (10/29/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+    Added parameters "az1" and "az2" to select a range of azimuths for
+    the profile.  (9/13/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+pkg/plot/crtpic/t_crtpict.x
+pkg/plot/crtpic/plotimage.x
+pkg/plot/t_graph.x
+pkg/plot/t_implot.x
+    Fixed various missing/extra argument and function/subroutine mismatch
+    problems found by running spplint on the code. (9/19/01, Davis)
+
+pkg/plot/doc/contour.hlp
+    Clarified the use of the 'fill' parameter in the example when overlaying
+    contours to an image display. (08/10/01, MJF)
+
+pkg/plot/mkpkg
+    Added some missing file dependencies to the mkpkg file. (21/9/99, Davis)
+
+=======
+V2.11.2
+=======
+
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/surface.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+pkg/plot/t_implot.x
+    If glabax is called with log axis scaling then it will reset the
+    graph limits which invalidates the previously saved limits from
+    ggwind.  Therefore ggwind was moved to follow the glabax call.
+    (1/26/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+pkg/plot/phistogram.x
+    Phistogram was producing a segmentation violation error for text file input
+    due to an error in the bug fix described below. (4/10/97, Davis)
+
+pkg/plot/phistogram.x
+    Fixed a bug in the phistogram tasks which could produce invalid floating
+    point operation errors if the input image contained pixel values outside
+    the legal integer range. (7/31/97, Davis)
+
+pkg/plot/t_implot.x
+    The coordinate to be evaluated for dimensions greater than 2 was not
+    being defined causing an FPE (Dec Alpha) or possible errors on other
+    platforms.  The initialization was added.  (4/3/97, Valdes)
+
+pkg$plot/t_graph.x
+pkg$plot/graph.par
+pkg$plot/doc/graph.hlp
+    Added parameters "ltypes" and "colors" to specify a list of line types
+    and colors when doing multiple data sets.  (5/13/96 & 8/21/96, Valdes)
+
+pkg$plot/t_implot.x
+    When the vector being plotted was constant the 'l' and 'c' keys selecting
+    lines/columns from the right plot axis did not work.  The code was
+    fixed for this case. (3/27/96, Valdes)
+
+=======
+V2.10.4
+=======
+
+pkg$plot/t_gkixt.x
+    Increased the size of the index array from 2048 to 8192 to accomodate
+    very large metacode files.  (3/22/95  MJF)
+
+pkg$plot/t_implot.x
+pkg$plot/pltwcs.x
+    When trying to plot a column of a 1D image the physical axis was
+    being set to zero and then used inapproprriately as a pointer offset
+    causing an error on the Dec Alpha port.  The axis now defaults to
+    1 and also the task now beeps when attempting a column plot rather
+    than plotting.  (2/16/95, Valdes)
+
+pkg$plot/t_surface.x
+    The surface task no longer calls error when the input array is unsuitable
+    for plotting (constant valued, entirely below floor or above ceiling).
+    The surf_limits procedure was modified to call eprintf and then return an
+    error value to the calling program, which terminates the task quietly.
+    This less drastic error exit will allow [e.g., IRAF test] scripts to
+    continue after calling SURFACE with an invalid input image.  (ShJ 6/23/94)
+
+pkg$plot/implot.hlp -
+    This junk copy was deleted.  The actual file is doc/implot.hlp.
+    (2/2/94, Valdes)
+
+pkg$plot/t_implot.x
+pkg$plot/implot.par
+pkg$plot/doc/implot.hlp
+    The step for the j/k keys may now be set by a task parameter.
+    (2/2/94, Valdes)
+
+pkg$plot/t_graph.x
+    The marker sizes were given the wrong sign when inputing the size from
+    a list.  The size must be negative.  (8/21/93, Valdes)
+
+pkg$plot/phistogram.x
+    Fixed a bug in the way phistogram was binning real data read in from
+    a list or image that was causing to create one less bin than required
+    to hold the data. (26/6/93, Davis)
+
+pkg$plot/phistogram.x
+    Fixed a bug in the way the the phistogram task was handling input
+    redirected from the standard input STDIN. (5/20/93, Davis)
+
+pkg$plot/t_implot.x
+pkg$plot/pltwcs.x
+pkg$plot/impprofile.x +
+pkg$plot/impstatus.x +
+pkg$plot/doc/implot.hlp
+lib$scr/implot.key
+    Add a profile analysis command, 'p', with a scrolling status line.
+    (8/31/92, Valdes)
+
+pkg$plot/t_implot.x
+    Changed an incorrect real array index to an int.  (7/21/92, Valdes)
+
+=======
+V2.10.0
+=======
+
+=======
+V2.10
+=======
+
+pkg$plot/t_pradprof.x
+    The new pradprof task was using the file name template expansion routines
+    instead of the image name template expansion routines producing an error
+    if the input image name was an image section. (6/23/92, Davis)
+
+pkg$plot/t_implot.x
+    There was some ambiguity with the averaging option.  This has been defined
+    that if an averaging size is set then selecting a single line or
+    column with 'l', 'c', :l, :c will make the selected line be the center
+    of the averaging region instead of the lower limit.  (4/23/92, Valdes)
+
+pkg$plot/t_pcol.x
+pkg$plot/t_implot.x
+pkg$plot/t_graph.x
+pkg$plot/t_pcols.x
+pkg$plot/t_prows.x
+pkg$plot/pltwcs.x
+pkg$plot/graph.par
+pkg$plot/prow.par
+pkg$plot/prows.par
+pkg$plot/pcol.par
+pkg$plot/pcols.par
+pkg$plot/doc/graph.hlp
+pkg$plot/doc/implot.hlp
+pkg$plot/doc/prow.hlp
+pkg$plot/doc/prows.hlp
+pkg$plot/doc/pcol.hlp
+pkg$plot/doc/pcols.hlp
+    1. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to define and set
+       a coordinate format in plots.  This allows graphs to be
+       made in DD:MM:SS and related formats.
+    2. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to use any WCS attribute
+       coordinate format found in the images.
+    3. Added xformat and yformat parameters to GRAPH, PROW(S), and PCOL(S) to
+       define coordinate plot formats.  This allows having a format when a
+       format attribute in not found in the images, to override a format
+       attribute, and to allow setting the format in simple text input.
+       For example, GRAPH can plot formated RA and DEC from a list of
+       input RA and DEC coordinates.
+    4. Added a ":f format" to IMPLOT to allow specifying/overriding the
+       WCS attribute format.
+    5.  Added <space> as a key in IMPLOT to print coordinate and pixel
+       value information:
+	   line=256, column=142, coordinate=13:27:55.6, value=222.
+    (4/9/92, Valdes)
+
+pkg$plot/pltwcs.x
+pkg$plot/t_prows.x
+pkg$plot/t_pcols.x
+pkg$plot/t_graph.x
+	The logical coordinates used for coordinate evaluations when
+	using an image section were incorrectly set.  (3/9/92, Valdes)
+
+pkg$plot/pltwcs.x
+pkg$plot/t_graph.x
+	Modified plt_wcs to take as input the wcs name in order to
+	set an appropriate wcs label for the wcs instead of using
+	the world wcs in all cases.
+	(3/4/92, Valdes)
+
+pkg$plot/t_pvector.x
+	In image pixel buffer column limits were being incorrectly computed
+	in some cases result in glitches in the output vector.
+	(12/11/91 Davis)
+
+pkg/plot/t_graph.x
+pkg/plot/graph.par
+pkg/plot/doc/graph.hlp
+	An overplot parameter has been added to allow multiple plots with
+	different axes and viewports.  (10/23/91, Valdes)
+
+pkg/plot/doc/pvector.hlp
+	Corrected the examples showing usage the center/theta.  Also 
+	added a note to the theta parameter notes explaining that is
+	set the center must be specified with a certain syntax as shown
+	in the examples.  Reported by Tom Duvall  (10/8/91  MJF)
+
+pkg/plot/crtpict/calchgms.x
+	Changed the declarations for the variables min_val and max_val in
+	the procedure crt_user_hgram from int to short. (10/5/91, Davis)
+
+pkg/plot/phistogram.x
+	Corrected some type mismatch problems in calls to gset.
+	(10/3/91 Davis)
+
+pkg/plot/t_implot.x
+	The use of overlapping multiple graphics WCS, one for the user and
+	one for the image columns and rows, would result in erroneous
+	coordinates using the C key and later =gcur.  The task was modified
+	to have the same functional behaviour but work only with one
+	graphics WCS.  (9/12/91, Valdes)
+
+pkg/plot/t_prow.x
+pkg/plot/t_prows.x
+pkg/plot/t_pcol.x
+pkg/plot/t_pcols.x
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+	Modified to have a wcs parameter and plot using the specified
+	wcs.  The xlabel parameter includes a special word to select
+	the WCS label in the image.  (9/12/91, Valdes)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+        Pradprof was orignally installed on 8/16/91, but had to be
+	reinstalled on 8/26/91 after a major disk crash.  (8/26/91 LED)
+
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	Phistogram was originally installed on 8/14/91, but had to be 
+	reinstalled on 8/26/91 after a major disk crash.  (8/26/91 LED)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+	Added a new task pradprof to the plot package. (8/16/91 LED)
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	Added a new task phistogram to the plot package. Phistogram takes
+	input from either an image or a list and permits full control over
+	the plotting parameters. The histogram computation is done in
+	and identical manner to the imhistogram task.  (8/14/91 LED)
+
+pkg/plot/t_implot.x
+pkg/plot/t_graph.x
+pkg/plot/implot.par
+pkg/plot/graph.par
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/graph.hlp
+	Added a "wcs" parameter to select using image WCS information for
+	coordinates and labels.  (FV 8/12/91)
+
+pkg/plot/t_implot.x
+	Corrected the comment on line 892 (ShJ 8/12/91):
+
+# IMP_SETPIXELCOORDS -- Set wcs 2 to the pixel coordinate system of the image.
+should read
+# IMP_SETPIXELCOORDS -- Set wcs 1 to the pixel coordinate system of the image.
+                                ^
+pkg/plot/t_surface.x
+	Default values for floor and ceiling were changed from 0.0 to INDEF.
+	The default task behavior is the same, plotting from i_datamin to
+	i_datamax, but the value of 0.0 is now interpreted as a valid data 
+	value rather than a flag to trigger CONREC's automatic limit algorithm.
+	At the same time, a coding error that forced you to set both floor
+	and ceiling (you couldn't set just one or the other) was removed.
+	(ShJ 8/5/91)
+
+pkg/plot/t_contour.x
+	Default values for floor and ceiling were changed from 0.0 to INDEF.
+	A test was added to detect a constant valued field.  A call to
+	gamove was added before the final gclose, to fix the WCS to the 
+	device.  All plotting in the NCAR code is done in NDC space (with 
+	conrec parameter nset = 1).  Without the additional call to
+	gamove, plots drawn with perim- would not report cursor positions 
+	in WCS units, since all plotting had been done in NDC space.  (ShJ 8/5)
+
+pkg/plot/surface.par
+pkg/plot/contour.par
+pkg/plot/doc/surface.hlp
+pkg/plot/doc/contour.hlp
+	These help and manual pages were modified to reflect the new default 
+	values of floor and ceiling.	(ShJ 8/5/91)
+
+pkg/plot/t_prow[s].x
+pkg/plot/t_pcol[s].x
+	Removed the call to clputi for defining upper limits for the input
+	row/col number.  This was done for two reasons:  [1] it duplicated
+	other code in the task that checks that the input limits are valid
+	and [2] these tasks could be used with epar when a larger image
+	is plotted after a smaller image; the smaller image limits remain
+	in the par file and prevent the user from setting a parameter outside
+	the range of the smaller image.	(ShJ 8/5/91)
+
+pkg$plot/t_pvector.x
+	Corrected line #45 which had the wrong number of arguments in a call
+	to error, resulting in a segmentation violation instead of the intended
+	error message if the condition being detected occurred.	(ShJ 1/25/91)
+
+pkg$plot/doc/pvector.hlp
+	Clarified documentation regarding the resampling spacing.  (SRo 8/31/90)
+
+pkg$plot/t_pvector.x
+	Added checks for wx1/wx2 and wy1/wy2 parameters allow plotting on
+	an inverse scale when not autoscaling.  Suggested by Tetsuo Aoki
+	at CRL.  (MJF 8/9/90)
+
+pkg$plot/t_surface.x
+	procedure surf_limits was modified to avoid an arithmetic exception
+	for images with values entirely above ceiling or below floor.  This
+	modification was coded by Phil Hodge at ST.	(ShJ 4/4/90)
+
+pkg$plot/getdata.x
+	procedure plt_getdata was completely rewritten to remove the call
+	to imparse and any built-in dependency on knowledge of image 
+	section notation.  				(ShJ 4/4/90)
+
+pkg$plot/t_contour.x, t_surface.x, t_hafton.x
+	were modified to call plt_getdata with its new calling sequence.
+							(ShJ 4/4/90)
+pkg$plot/t_pcol.x, t_pcols.x
+pkg$plot/t_prow.x, t_prows.x
+	The dependency of these routines on knowledge of image section
+	notation has been removed.  Previously an image section name would
+	be built using the column limits input by the user.  The data are
+	now extracted from the image with procedure plt_gcols and plt_grows. 
+	Code was also cleaned up to make use of single graphics procedure. 
+	(MJF 4/3/90)
+
+pkg$plot/doc/pvector.hlp
+pkg$plot/t_pvector.x, pvector.par
+	Implemented output options to PVECTOR task allowing computed
+	vector to be output as an image or text file  (MJF 4/3/90)
+
+pkg$plot/doc/surface.hlp
+	Clarified floor and ceiling parmeters in surface manual page.  
+							(ShJ 3/1/90)
+pkg$plot/t_gkimos.x
+	Added a call to flush the gki metacode stream before closing it
+	when interactive=no.  Without this, the stdgraph terminal would
+	remain in graphics mode when gkimosaic terminated.  (ShJ 3/8/89)
+
+pkg$plot/t_pvector.x
+	Fixed bug causing vectors near theta=0 to fail.  (FV 15/6/89)
+
+pkg$plot/t_gkimos.x
+	Duplicate definition of MAX_FRAMES removed.  A new option was
+	added to cursor mode, 'r', to redraw the current screen with any 
+	new parameters that may have been set.  Functionally equivalent
+	to skip -NX*NY and hitting the space bar. 
+
+	Error handling is improved.  GKIMOSAIC was failing when the
+	WCSDIR information couldn't be decoded.  (ShJ 24/5/89)
+
+pkg$plot/t_gkixt.x
+	Added dynamic reallocation of index buffer for metacode files
+	with more then MAX_FRAMES.   (ShJ 24/5/89)
+
+pkg$plot/t_graph.x
+	Fixed up setting the marker size when the marker type is either
+	vertical or horizontal eror bars.  Previously, both xsize and
+	ysize were being set equal to the user indicated size.  Now only
+	the dimension that represents the error gets set; the other
+	dimension is drawn at NDC size 1.0.  (ShJ 24/5/89)
+
+pkg$plot/t_contour.x
+	Axes were not being drawn properly when parameter 'perimeter' was
+	set to no.  This was due to a missing nset=-1 statement which has
+	now been added (line 171).  Variable nset is passed in a common
+	block to the NCAR conrec code.  (ShJ 24/5/89)
+
+pkg$plot/getdata.x, t_contour.x, t_surface.x, t_hafton.x
+	Added support for subsampling or block averaging of image sections.
+	The contour, surface and hafton tasks were not doing this correctly.
+	The mod was coded by Zolt Levay of STScI.  (ShJ 18/7/88)
+
+pkg$plot/vport.x
+	Changed the value of 'ext' from 0.25 to 0.0625  This is the ratio
+	of axes lengths beyond which contour will make the output viewport
+	square.  The limit of 1:4 was too restrictive; the limit of 1:16 is
+	also arbitrary but not as restrictive.  This change was also made in
+	gio$ncarutil/conbd.f; this code is used instead of vport.x when
+	parameter 'perimeter' = no (which is not the default).  (ShJ 10/6/88)
+
+pkg$plot/initmarker.x
+	Marker types 'hline', 'vline' and 'diamond' were added to the list
+	of possible marker types in point mode.  (ShJ 24/3/88)
+
+pkg$plot/initmarker.x
+pkg$plot/graph.x
+	Marker types 'hebar' and 'vebar' were added to the list of possible
+	marker types in point mode.  Parameter 'szmarker' should be set
+	to 0.0 for the third column of an input list to be interpreted
+	as marker sizes in WCS units.  A duplicate copy of procedure
+	init_marker existed in graph.x and it has been deleted.  (ShJ 23/3/88)
+	
+pkg$plot/vport.x
+	Modified the viewport setting code to accomodate both landscape
+	and portrait mode devices when compensating for non-unity aspect
+	ratios.  (e.g., fill=no in contour).   Previously, only landscape 
+	mode was considered.  This mod suggested by Zolt Levay at STScI.  
+	(ShJ 16/12/87)
+
+	if (aspect_ratio < 1.0)
+	    # Landscape
+	    xdis = xdis * aspect_ratio
+	else if (aspect_ratio > 1.0)
+	    # Portrait
+	    ydis = ydis / aspect_ratio
+------
+
+pkg$plot/crtpict/t_crtpict.x
+pkg$plot/crtpict/tform_image.x
+pkg$plot/crtpict/crtpict.h
+	Whether or not an annotated perimeter is drawn around the image
+	portion of a crtpict is now controlled by the cl parameter
+	'perimeter'.  Default value is yes.  (ShJ 20/8/87)
+
+pkg$plot/crtpict/drawgraph.x
+pkg$plot/crtpict/plot_hgrams.x
+	The crtpict task now prints z1 and z2 (the range of input
+	intensities mapped to output values) on the final print as
+	well as to STDOUT.  The z1, z2, zmin and zmax values are
+	now output in `%g' format, not `%.2f' format, which will 
+	prevent truncation to 0.0 of very small values.  (SeH 23/4/87)
+
+pkg$plot/graph.x	S. Hammond April 23, 1987
+	A bug in the graph task, which prevented users from setting the 
+	window when the values being plotted were very small (1E-7 or so), 
+	has been fixed.  The task previously would insist on autoscaling
+	the y axis in this case.
+
+pkg$plot/contour.x	S. Hammond March 9, 1987
+	The NCAR contour task was relinked with libncar to pick up a revision 
+	in procedure STLINE which increased the size of a work array.  The
+	error about "work array overflow in STLINE, picture incomplete"
+	should be seen much less frequently now, as the buffer which
+	stores starting points of contours at a given level was increased
+	in size from 500 to 5000.
+
+pkg$plot/crtpict/map_image.x	S. Hammond March 6, l987
+
+	This procedure was using an incorrect test for finding images
+	with no range in the data.  It was comparing the difference 
+	between z1 and z2 to EPSILONR; it should have been testing z1 and z2 
+	for equality.  The result of this error was that images containing
+	only small valued pixels (<= e-8 or so) would be mapped entirely
+	to a single grey level.  The error has been fixed.
+
+pkg$plot/gkimosaic.x 	S. Hammond 	Feb 25, 1987
+
+	The interactive help facility for task gkimosaic (keystroke '?')
+	was modified to work properly with the newly installed gio mods for 
+	activating and deactivating workstations.
+
+pkg$plot/graph.x	S. Hammond	Feb 25, 1987
+
+	Task graph would hang when the input file was STDIN, a byproduct of the
+	recent gio mods for activating and deactivating workstations.  This
+	has been fixed.  Another bug was also fixed: the marker size read
+	from the third column of an input list now controls the marker size
+	on the plot as described in the graph manual page.
+
+----------------------------------------------------------------------------
+
+From: Hammond    Dec 23, 1986
+Task: contour   (gio$ncarutil/conrec.f)
+
+	The ncar executable was relinked to pick up a mod to conrec.f
+	in libncar.a.  The polyline width was not being set until after
+	the first contour line had been drawn, and so the first major
+	contour line would not be drawn in bold font.  
+
+--------------------------------------------------------------------------
+
+From: Hammond	 Oct 28, 1986
+Task: graph     (pkg$plot/graph.x)
+
+	A bug that prevented axes from being drawn properly when the
+	lower window limit exceeded the upper limit has been fixed.
+	That is, setting wy1 > wy2 now works.
+
+_________________________________________________________________________
+
+From: Hammond	Oct 24, 1986
+Task: crtpict, contour  (pkg$plot/perim.x)
+
+	The perimeter drawing procedure has been modified to 
+	calculate the label increments and perimeter spacing
+	independently in x and y.  This was not being done
+	previously, and images which differ greatly in x and y
+	dimension would produce unpleasing plots.
+
+_______________________________________________________________________
+
+From: Hammond	Jul 21, 1986
+Task: gkimosaic
+
+	An additional interactive command was added to gkimosaic.  A
+	command summary is printed with the keystroke '?'.
+
+_______________________________________________________________________
+
+From: Hammond	Jun 25, 1986
+Task: gkimosaic
+
+    Task gkimosaic has been modified to allow interactive browsing
+    through a metacode file.  Keystrokes are available to skip
+    forward or backward through a file, and to interactively
+    change the number of plots per page and the rotate and fill 
+    options after each page of plots.  See the revised manual page
+    for a complete description.  The WCS information for the individual 
+    plots is preserved for cursor readback.
+
+________________________________________________________________________
+
+From: Hammond	Jun 18, 1986
+Task: gkidir, gkiextract
+
+	1.  Long strings in GKI_MFTITLE instructions were causing
+	    memory overwrite errors in tasks gkidir and gkiextract; 
+	    the problem has been fixed.
+
+	2.  Tasks gkidir and gkiextract have been modified to filter 
+	    out blank frames.
+____________________________________________________________________________
+
+From: Hammond	Jun 12, 1986
+Task: prow, prows, pcol, pcols
+
+      These four tasks have been modified to use the standard parameter
+      names for window and viewport coordinates within the plot package.
+      Window (user) coordinates are referred to as wx1, wx2, wy1, and wy1;  
+      viewport (NDC) coordinates are referred to as vx1, vx2, vy1 and 
+      vy2. Default values for these parameters have changed - see 
+      the revised manual pages.  A 0 range in window coordinates implies 
+      autoscaling; a 0 range in viewport coordinates indicates automatic 
+      viewport placement by "glabax".
+
+      An additional parameter ("fill") has been added.  By default,
+      the plot drawn will fill the specified device viewport.  Setting the
+      value of fill to "no" means equal numbers of data values in x
+      and y will occupy equal physical lengths when plotted.  That is,
+      a unity aspect ratio is enforced when fill = no.
+
+_____________________________________________________________________________
+
+From: Hammond	Jun 12, 1986
+Task: graph
+
+   Several changes have been made to task graph.  
+   
+   1. First, to standardize parameter names within the plot package, 
+      the viewport coordinates are referred to as vx1, vx2, vy1 
+      and vy2; window coordinates are referred to as wx1, wx2, wy1, 
+      and wy2.  Default values for these parameters have changed - see 
+      the revised manual page.  A 0 range in window coordinates implies 
+      autoscaling; a 0 range in viewport coordinates indicates automatic 
+      viewport placement by glabax.
+
+   2. Image templates are now understood in the input list.
+
+   3. An additional parameter ("fill") has been added.  By default,
+      the plot drawn will fill the specified device viewport.  Setting
+      the value of fill to "no" means equal numbers of data values in x
+      and y will occupy equal physical lengths when plotted.  That is,
+      a unity aspect ratio is enforced when fill = no.
+
+________________________________________________________________________
+
+From: Hammond	Jun 12, 1986
+Task: contour, hafton
+
+1. To standardize parameter names within the plot package, both these
+   tasks now refer to the device viewport plotting coordinates 
+   as vx1, vx2, vy1 and vy2. 
+
+__________________________________________________________________________
+
+From: Hammond	Apr 17, 1986
+Task: gkiextrct
+
+1.  A (boolean == false) construct in source file t_gkiextract.x has been
+    changed to (! boolean).
+
+___________________________________________________________________________
+
+From: Hammond	Mar31, 1986
+Task: crtpict
+
+1. Crtpict now checks the values returned by the automatic windowing
+   algorithm (ztrans=auto) to make sure they are not equal.  The window
+   limits, z1 and z2, are equal to each other when there is no range 
+   of intensity in the input image.  This was not being checked previously,
+   and could result in floating divide by zero down the line.
+
+_________________________________________________________________________
+
+From: Rooke	Mar27, 1986
+Task: calcomp
+
+1. Changed default value for parameter LWOVER from "no" to "yes"; users
+   feel it is more important to get plots out quickly than to have bold
+   text, axes, and axis labels and ticks.  Calcomp line width simulation
+   in lwtype=ntracing draws each line 5 times for medium quality and 9
+   times for high quality.  Now must explicitly run CALCOMP standalone
+   on spooled metacode to get bold text etc.
+_________________________________________________________________________
+
+From: Hammond	Mar19, 1986
+Task: Contour, Surface, Hafton
+
+1. The string "subsampled image ... being contoured" has been replaced
+   with "subsampled image ... being plotted".  This message is printed
+   when an image is subsampled rather than block averaged on input.  
+   (The source file changed is plot$get_data.x)
+__________________________________________________________________________
+
+From: Hammond	Mar19, 1986
+Task: gkidir, gkiextract
+
+1. These tasks no longer truncate the GKI_MFTITLE string when printing
+   output metacode titles.  It used to do this to insure that the
+   output string would fit on one line, but a unique title string was
+   not always being printed.
+__________________________________________________________________________
+
+From: Hammond 	Jan. 9, 1986
+Task: Hafton
+
+1. Hafton now allows for user control of the plotting viewport.
+
+---------------------------------------------------------------------------
+
+From: Hammond  	December 5, 1985
+Task: Graph, Contour
+
+1. Graph was ignoring a request for log scaling in y, this has been fixed.
+
+2. Under some conditions, Contour will automatically scale the values it
+   chooses for contour labels.  When this happens, the label under the
+   plot now says so and reports the scaling factor.
+.endhelp

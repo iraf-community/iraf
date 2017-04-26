@@ -1,0 +1,599 @@
+.help help Oct01 system
+.ih
+NAME
+help -- print online documentation for the named modules or packages
+.ih
+USAGE
+help [template]
+.ih
+PARAMETERS
+.ls template
+A string listing the modules or packages for which help is desired.
+Each list element may be a simple name or a pattern matching template.
+Abbreviations are permitted.  If \fItemplate\fR is omitted a long format
+menu will be printed for the current package, listing each task (or
+subpackage) and describing briefly what it is.
+.le
+.ls file_template = no
+If this switch is set the template is interpreted as a filename matching
+template, and all help blocks found in the named files are output.  The help
+database is not searched, hence manual pages can be printed or documents
+may be formatted without entering the files into a help database.
+In other words, "help file.hlp fi+" makes it possible to use \fIhelp\fR as
+a conventional text formatter.
+.le
+.ls all = no
+Print help for all help modules matching \fItemplate\fR, rather than only the
+first one found.
+.le
+.ls parameter = "all"
+If the value of this parameter is not "all", only the help text
+for the given parameter will be printed.
+.le
+.ls section = "all"
+If the value of this parameter is not "all", only the help text for the
+given section (e.g. "usage", "description", "examples") will be printed.
+.le
+.ls option = help
+The option parameter specifies the type of help desired, chosen from
+the following:
+.ls help
+Print the full help block for the named module.
+.le
+.ls source
+Print the source code for the module (which often contains additional
+detailed comments).
+.le
+.ls sysdoc
+Print the technical system documentation for the named module.
+.le
+.ls directory
+Print a directory of all help blocks available for the named package.
+.le
+.ls alldoc
+Print all help blocks in the file containing the help block for
+the named procedure (i.e., both the user and system documentation).
+.le
+.ls files
+Print the names of all help files associated with the named modules or
+packages.
+.le
+.ls summary
+Print only the titles and sizes of help blocks in referenced help files.
+The contents of the blocks are skipped.  Titles are printed for \fIall\fR
+help blocks found in the file containing the help block for the named module.
+.le
+.le
+.ls page = yes
+Pause after every page of output text.  Turning this off for large documents
+speeds up output considerably.
+.le
+.ls nlpp = 59
+The number of lines per page if output is redirected, e.g., to \fIlprint\fR.
+.le
+.ls lmargin = 1
+Left margin on output.
+.le
+.ls rmargin = 72
+Right margin on output.
+.le
+.ls search = no
+If enabled the 
+.hr #l_template template
+is interpreted as a search string and the task
+is started with the search panel open with the results of the search.  The
+.hr #l_file_template file_template
+parameter is ignored with search turned on.
+.le
+.ls home = ""
+The home page for the task.  If not set and no 
+.hr #l_template template
+is specified
+the task will start with the online help in the main window, otherwise it
+may be set to a filename to be displayed when the task starts.  This file
+may contain a text help block which will be formatted before display,  or
+it may be a valid HTML file.  See below for a description of the format of
+a homepage file which provides links to tasks.
+.le
+.ls printer = "printer"
+Default hardcopy printer name. If the \fIvalue\fR of the parameter is the
+reserved string "printer", the actual device is the value of the CL
+environment variable \fIprinter\fR.
+.le
+.ls showtype = no
+Add task-type suffix in package menus?
+.le
+.ls quickref = "uparm$quick.ref"
+Name of the quick-reference file used for searching.  This file is created
+the first time the task is run in GUI mode or whenever it doesn't exist, 
+or when any help database file has been updated.
+.le
+.ls uifname = "lib$scr/help.gui"
+The user interface file.   This file is what defines the look and behavior
+of all the graphical user interface elements.   Experts may create variants
+of this file.
+.le
+.ls helpdb = "helpdb"
+The filename of the help database to be searched.  If the \fIvalue\fR of the
+parameter is the reserved string "helpdb", the actual filename is the value
+of the CL environment variable \fIhelpdb\fR.
+.le
+.ls device = "terminal"
+Output device if the standard output is not redirected.  Allowable values
+include:
+.ls terminal
+If the \fIvalue\fR of
+the parameter is the reserved string "terminal",  the actual device name is
+the value of the CL environment variable \fIterminal\fR.  
+.le
+.ls text
+Output the formatted help page as plain text.
+.le
+.ls gui
+Invoke the GUI for browsing the help system.  This option will only work if
+the \fIstdgraph\fR environment variable is set the \fIxgterm\fR, and the
+user is running IRAF from an \fIXGterm\fR window.
+.le
+.ls html
+Output the formatted help page as HTML text.
+.le
+.ls ps (or postscript)
+Output the formatted help page as postscript.
+.le
+.le
+.ih
+BASIC USAGE
+Despite the complex appearing hidden parameters, \fBhelp\fR is easy to use
+for simple tasks.  \fBHelp\fR is most commonly used to get help on the current
+package, and to get help on a program named in a CL menu.  To get help on
+the current package one need only type \fBhelp\fR without any arguments.
+For example, if the current package is \fBplot\fR, the command and its output
+might appear as follows:
+
+.nf
+	pl> help
+		contour - Make a contour plot of an image
+		  graph - Graph one or more image sections or lists
+		   pcol - Plot a column of an image
+		  pcols - Plot the average of a range of image columns
+		   prow - Plot a line (row) of an image
+		  prows - Plot the average of a range of image lines
+		surface - Make a surface plot of an image
+	pl>
+.fi
+
+To get help on a module one supplies the module name as an argument,
+
+	pl> help graph
+
+and the manual page for the \fBplot.graph\fR program will be printed on the
+terminal.  To get a hardcopy of the manual page on the printer, the output
+may be redirected to the line printer, as follows:
+
+	pl> help graph | lprint
+.ih
+DESCRIPTION
+The function of the \fBhelp\fR program is to perform a depth first search
+of the help database \fIhelpdb\fR, printing help for all packages and modules
+matching the template.  By default the standard IRAF help database is searched,
+but any other help database may be searched if desired.  A help database is
+precompiled with the \fBmkhelpdb\fR program to speed up runtime searches for
+help modules.  The standard IRAF help database contains the documentation and
+source for all CL programs and system and math library procedures installed
+in IRAF.
+
+A help template is a string type parameter to the CL.  The form of a template
+is a list of patterns delimited by commas, i.e.,
+
+	"pattern1, pattern2, ..., patternN"
+
+The form of a pattern is
+
+	package_pattern.module_pattern
+
+If the "." is omitted \fImodule_pattern\fR is assumed.  The standard pattern
+matching meta-characters, i.e., "*?[]", are permitted in patterns.
+Simple patterns are assumed to be abbreviations.
+
+.ih
+GUI OPERATION
+
+The GUI component of the task is a front-end to the IRAF 
+.hr system.help \fBhelp\fR
+task which provides on-the-fly conversion of help documents to HTML for
+presentation in the GUI or formatted PostScript for hardcopy.  
+The GUI is started by setting the 
+.hr #l_device \fIdevice\fR
+parameter to the special value \fIgui\fR, it is only available when using
+an XGterm window to start IRAF and assuming the \fIstdgraph\fR environment
+variable is set to \fRxgterm\fR.
+
+Help pages may be loaded on the command line, through use of a
+file browser, or by navigating the help databases using a familiar CL
+package menu scheme.   It also features a search capability similar to the 
+.hr system.references \fBreferences\fR
+task and a complete history mechanism. 
+
+When invoked with no command line arguments the task starts as a browser
+and the user is presented with a GUI that has the toplevel CL package menu
+in the upper navigation window.  The main display window below will contain
+any help page specified in the 
+.hr #l_template template
+parameter or loaded on
+the command line by specifying the 
+.hr #l_template template
+and 
+.hr #l_file_template file_template
+parameters. If the 
+.hr #l_search search
+parameter is enabled the 
+.hr #l_template template
+is taken to be a search phrase and the database is searched for tasks
+matching the keyword and the GUI will appear with the search panel mapped
+so the user can select the task help to
+view.  When no 
+.hr #l_template template
+is given the main display window will start with the page specified by the 
+.hr #l_home home
+parameter, this can be a user-defined HTML file giving links to specific tasks
+(see below for details) or if 
+.hr #l_home home
+is empty the display will contain the online help for the task.
+
+The first time the task is run, or whenever the help database is updated,
+a quick reference file (specified by the task 
+.hr #l_quickref quickref 
+parameter) and package menu file will be created in the user's \fIuparm\fR
+directory to speed up help searching and subsequent startups of the task.
+
+.ih
+NAVIGATING THE HELP SYSTEM
+When run as a GUI browser \fIHELP\fR works very much like any WWW browser.
+The top panel is a list widget that will always contain a CL package listing,
+at startup this will be the toplevel \fI"Home"\fR package menu one would see
+when first logging into the CL containing the core system packages, NOAO
+package, and any site-specific external package, or in the case of starting
+with a specific task it will be the parent package for the task.  Additionally,
+system documents for the 
+.hr os \fBos\fR
+HSI routines and the 
+.hr sys.imfort \fBimfort\fR
+and
+.hr math \fBmath\fR
+interfaces will be available in the \fIHome\fR package although
+these are programmatic interfaces and not tasks which can be executed.
+
+New packages or task help pages are loaded by selecting an item from the 
+package menu list using the left mouse button.  If the requested item is a 
+package, the menu listing will change as though the package were loaded in
+the CL, and the help display panel will contain a listing of the package
+tasks with a one-line description for each task such as would be seen with 
+a \fI"help <package>"\fR command using the standard task.  New items may then
+be selected using either the menu list or links in the display panel.  If the
+item is a task, the help page for the task will appear in the display panel.
+In either case new pages may be selected from the menu listing.  
+
+Specific help documents may also be requested by entering the task/package
+name in the \fBTopic\fR text widget above the menu list.  As when selecting
+from the package menu list, items selected this way will cause the menu
+list to change to the package menu for the parent package if the item is a
+task (displaying the help page in the display panel) or the package menu
+if the item is a package (displaying the one-liner package listing in the
+display panel).
+
+Using the \fBBack\fR button will revert to the previous page in the history
+list which will either be the previously loaded package or help page.
+Similarly, selecting the \fBForward\fR button will move the next page further
+down in the history list, either button will become insensitive when the 
+end of the list on either end is reached.  Selecting the \fBUp\fR button will
+cause the browser to immediately jump up the previous package, skipping 
+over any help pages that were loaded in between.  The \fBHome\fR button will
+cause the default homepage (either the user-defined page if specified by the
+task \fIhome\fR parameter or the online help) to be displayed.  Browsing
+in this way can also be done using the navigation menu created by hitting
+the right mouse button while in the main display panel.
+
+Users can also jump to specific pages in the history list using the
+\fBHistory\fR button on the main menubar.   The right column of the menu
+will indicate whether the item is a task, package, internal link or a text
+file.  The history list is truncated at about 40 entries in the menu but
+the user may work back incrementally by selecting the last item of the 
+menu, after which the History button will display the previous 40 entries.
+The history list may be cleared except for the current page by selecting
+the \fIClear History\fR menu item.
+
+.ih
+BROWSING A HELP DOCUMENT
+Once a help page is loaded the middle menubar above the display panel
+will change to activate widgets based on the position within the history
+list and options available for a particular page.  The left-most group
+of buttons are the standard navigation buttons described above.
+The middle group of buttons contains the \fBSections\fR and
+\fBParameters\fR buttons which are used to browse within a help document.
+The \fISections\fR button is a menu listing all of the sections found
+within a help page, allowing the user to jump to a specific section
+rather than scrolling through the entire document. The \fISections\fR
+menu is also available using the middle mouse button from the
+main display area.  The \fIParameters\fR button is similarly a menu
+listing of all task parameter help sections found within the document.
+Both or either of these buttons will become insensitive when no section
+or parameter information is found in the document.
+
+The right-most group of buttons represent the various help options available
+for each page.  The default is to get the task help, however help pages
+may have an associated \fBsource\fR file or \fBsysdoc\fR (e.g. if the task is
+a CL script there may be a pointer to the script source itself, or a package
+may have a general overview document listed as the system document).  Once
+a help page is loaded these buttons will change become sensitive if that option
+is available, simply select the button to view the option.  Selecting the
+\fBFiles\fR button will bring up a panel listing all the files associated
+with a particular help topic.  When a help topic is selected and an option is
+defined but the file does not exist, the options button will display a yellow
+diamond icon even if the button is insensitive, a green icon indicates the
+currently selected option.  This feature may be disabled by selecting the
+"Show missing files" item from the main menubar \fBOptions\fR menu.
+
+.ih
+SEARCHING
+Searching the help database is done by selecting the \fBSearch\fR button
+from the main menubar to bring up the search panel.  Users may then enter 
+one or more keywords into the \fBTopic\fR field at the bottom of the panel
+and initiate the search with either a carriage return or hitting the
+\fISearch\fR button just beside it.  The panel will then show a list of all
+tasks and packages which match the search phrase along with a one-line
+description of the task.  Help pages may be displayed by selecting either the
+task or package link with the left mouse button, in both case the package
+menu list on the main help window will be updated to list the package
+contents allowing other tasks from that package to be selected in the normal
+way.
+
+By default the exact phrase entered in the topic window will be used for the
+search.  This can be relaxed by toggling the  "Require exact match" button
+at the top of the panel.  For example,  to search for all tasks matching
+\fIeither\fR the keyword "flat" or "field" turn off the exact match
+toggle and the search will return not only tasks matching "flat field" but 
+also any task description containing only one of the words such as the
+VELVECT task which plots velocity \fIfield\fRs.
+
+Within a help document itself one can search for a string by selecting
+the \fBFind\fR button from the main menubar to bring up a panel used to
+enter the search string.  When the text is entered the main display 
+window will reposition itself and highlight the text found within the
+document.  Searches can be repeated and will wrap around the document
+automatically, searches can be done either forward or backward through
+the text and may be case insensitive.
+
+.ih
+USER_DEFINED HOME PAGES
+By default the \fIhelp\fR GUI will start with the online help page displayed
+in the main help window.  The user can change this by setting the task
+\fBhome\fR parameter to be a path to any valid file.  This file may be plain
+text, a help document in LROFF format which will be converted to HTML for
+display, or a native HTML document.
+
+HTML files may contain URLs of the form
+.nf
+	\fB<a href=\fI[package.]task\fB>\fIurl_text\fB</a>
+.fi
+
+where \fIurl_text\fR is the text to appear in the window and the URL itself
+consists of an optional package and task name delimited by a period.  For
+example, to create a link to the 
+.hr onedspec.splot \fBsplot\fR
+task in a document one would use the URL
+.nf
+	\fB<a href=onedspec.splot>splot</a>\fR
+.fi
+
+In this way users can create a homepage which serves as a \fI"bookmark"\fR
+file or index of shortcuts to the most commonly accessed help pages.
+
+.ih
+LOADING FILES
+Text files may be loaded on the command line when starting the task by
+specifying the filename and setting the
+.hr #l_file_template file_template
+task parameter.  The named file
+will be searched for a \fI.help\fR LROFF directing indicating it contains
+a help block that will be converted to HTML for display.  If no help
+block is found the file will be displayed as-is, meaning existing
+HTML documents can be loaded and will be formatted correctly.
+
+Once the task is running users may load a file by selecting the \fBOpen
+File...\fR menu item from the main menubar \fBFile\fR menu or the
+right-mouse-button menu from within the main display area.  This will
+open a file browser allowing users to change directories by using the
+navigation buttons at the top of the panel, or selecting items from the
+leftmost directory listing.  Selecting a file on the rightmost list will
+cause it to be loaded and automatically formatted if it contains a help
+block.  The file list may be filtered to select only those files matching
+a particular template by changing the \fBFilter\fR box at the top of
+the panel.  Filenames or directories may be entered directly using the
+\fBSelection\fR box at the bottom of the panel.
+
+.ih
+SAVING FILES
+Once a file has been loaded in the browser it may be saved to disk as 
+either \fIsource\fR (i.e. the original LROFF file if that was converted
+for the display, or whatever file is currently displayed regardless of
+format), \fItext\fR to save formatted plain text such as that produced
+by the standard \fBhelp\fR task, \fIHTML\fR to save the converted HTML
+used in the display, or \fIPostScript\fR to save formatted PostScript of
+the document such as that sent to the printer using the \fBPrint\fR 
+button.  Not all options will be available depending on the format of the
+input text, unavailable options will be insensitive in the GUI.
+
+The \fBSave\fR panel is opened by selecting the \fBSave As...\fR menu
+item from the  main menubar \fBFile\fR menu or the right-mouse-button
+menu from within the main display area.   The file browser operates the
+same as when loading images, the only difference is that file selection 
+simply defines the filename to be used and does not cause the save to
+occur automatically.  Users can overwrite existing files by selecting the
+\fIOptions\fR toggle at the bottom of the panel.
+
+.ih
+HARDCOPY OUTPUT AND SAVING DISK FILES.
+Help pages may be output to any configured IRAF printer by selecting the
+main menubar \fBPrint\fR button to bring up the print panel.  Task help pages
+will be converted to formatted PostScript and may be sent to either a
+printer or saved to disk depending on the selection made in the printer 
+panel.  If the printer name is set to the special value \fI"printer"\fR then
+the device named by the CL \fIprinter\fR environment variable will be used.
+When saving to disk files the default action is to save to a filename whose
+name is the task name plus a ".ps" extension.  Either of these are changeable
+within the GUI as is the default page size to be used when generating the
+PostScript.
+
+The main menubar \fBFile\fR button can also be used to bring up the file
+browser in order to save the current document to disk.  Help pages may be
+saved as either the origin LROFF source for the file, formatted text as you
+would get from the standard help task, HTML as is displayed in the GUI, or
+formatted PostScript.  The choice of formats is dictated by the type of file
+being displayed (e.g. you cannot save PostScript of a program source).
+
+.ih
+LROFF DIRECTIVE EXTENSIONS FOR HTML
+To better support HTML links within documents and to other help pages two
+new directives have been added to the LROFF text formatter.  These are
+\fB.hr\fR to specify a link (an HTML \fIHREF\fR directive) and \fB.hn\fR
+to specify a name (an HTML \fINAME\fR directive).  The syntax for these are
+as follows:
+.nf
+
+	\fB.hn\fI <name>\fR
+	\fB.hr\fI <link> <text> \fR
+.fi
+
+where \fI<name>\fR is the destination name of an internal link, \fI<link>\fR
+is the URL of the link to be created, and \fI<text>\fR is the text to be
+displayed in the HTML.  The URL syntax is either a '#' character followed
+by a destination name, a simple \fItask\fR name or \fIpackage\fR name,
+or a \fIpackage.task\fR pair giving a more precise task.  For internal links
+the current document is repositioned so the name is at the top of the display,
+for task help links new help pages will be loaded in the browser.  
+
+These directives are ignored when converting the LROFF to either formatted
+plain text or PostScript.
+
+.hn examples_target
+.ih
+GUI EXAMPLES
+1) Start \fIhelp\fR as a GUI browser:
+.nf
+
+	cl> help dev=gui
+.fi
+
+2) Begin by searching for the phrase 'gauss', tasks and packages may be
+selected from the search panel which will appear when the task starts:
+.nf
+
+	cl> help gauss dev=gui search+
+.fi
+
+3) Load an LROFF help page in the browser at startup
+.nf
+
+	cl> help mytask.hlp dev=gui file+
+.fi
+
+.ih
+EXAMPLES
+
+1. Print the help text for the program \fIdelete\fR in the package
+\fIsystem\fR (output will be directed to the terminal):
+
+.nf
+	cl> help system.delete
+or
+	cl> help delete
+or
+	cl> help del
+.fi
+
+2. Print the help text on the line printer:
+.nf
+
+	cl> help delete | lprint
+.fi
+
+3. Print help for the current package:
+.nf
+
+	cl> help
+.fi
+
+4. Print the usage section of all modules in the package \fBimages\fR:
+.nf
+
+	cl> help images.* section=usage
+.fi
+
+5. Print a directory of all help blocks in the packages \fBclpackage\fR
+and \fBclio\fR (and any others whose names begin with the string "cl"):
+.nf
+
+	cl> help cl* op=dir
+.fi
+
+6. Print a directory of each package in the database (useful for getting an
+overview of the contents of a help database):
+.nf
+
+	cl> help * op=dir
+.fi
+
+7. Print the source for all of the string utilities in the system library
+package \fBfmtio\fR:
+.nf
+
+	cl> help fmtio.str* op=source
+.fi
+
+8. Find all tasks that delete something:
+.nf
+
+	cl> help * | match delete
+.fi
+
+9. Print the manual pages for the \fIhelp\fR and \fIlprint\fR tasks on the
+default printer device:
+.nf
+
+	cl> help help,lprint | lpr
+.fi
+
+10. Capture the manual page for task \fIhedit\fR in a text file, in a form
+suitable for printing on any device.
+.nf
+
+	cl> help hedit dev=text > hedit.txt
+.fi
+
+11. Print the manual page for task \fIhedit\fR as a Postscript file. 
+.nf
+
+	cl> help hedit dev=ps | lprint
+.fi
+
+.ih
+BUGS
+On some systems, typing the next command keystroke before the end-of-page
+prompt is printed may result in the character being echoed (messing up the
+output) and then ignored when raw mode is enabled for the prompt.
+
+.ih
+SEE ALSO
+.hr system.references references
+,
+.hr system.phelp phelp
+,
+.hr system.mkhelpdb mkhelpdb
+,
+.hr system.hdbexamine hdbexamine
+,
+.hr system.mkmanpage mkmanpage
+,
+.hr system.lroff lroff
+, the online task help documents.
+.endhelp

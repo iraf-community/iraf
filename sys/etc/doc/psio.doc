@@ -1,0 +1,275 @@
+.help pr_psio
+.nf __________________________________________________________________________
+PR_PSIO -- Pseudofile i/o for a process.  Process an i/o request for the
+specified pseudofile stream of the specified process.  Called either to read
+command input from the CLIN of a process, or to process a read or write
+request to a pseudofile of a process.
+
+
+1. Introduction
+
+    Pseudofile i/o in a multiprocess configuration, e.g., for the graphics
+streams, is quite complex and difficult to explain briefly.  I have tried to
+cover the major points here but warn the reader that it is not going to be easy
+to understand the flow of data and control involved.  The problem is a difficult
+one due to the nature of the IPC protocol and the complexity of the three
+process architecture required when an external graphics kernel is used.  The
+discussion herein is not complete but should as least give the reader some
+idea of what is going on.
+
+
+2. Pseudofile I/O
+
+    While a task is running the CL will be reading command input from the task.
+This read eventually resolves into a call to PR_PSIO on the CLIN for the
+process.  When pseudofile i/o occurs, e.g., the process writes to STDOUT or
+STDERR, an XMIT or XFER directive will be seen in the CLIN input from the
+process.  If we are directed to XMIT to an ordinary file our task is relatively
+easy, i.e., we read the data block from CLIN and write it to the output file.
+A directive to read from the standard input is also easy, i.e., we read from
+the standard input of the parent (assuming i/o is not redirected) and write
+the data block to the CLOUT of the process preceded by a count of the number
+of chars.
+
+
+2.1 I/O to a Graphics Stream
+
+    If we are directed to read or write a graphics stream our task is somewhat
+more difficult.  The standard graphics streams STDGRAPH, STDIMAGE, and STDPLOT
+differ from other pseudofiles in that the streams are both readable and
+writable, provided all data is used up before switching modes.  A graphics
+stream may be connected to a file if output is being spooled, to the builtin
+STDGRAPH kernel if the graphics device is the graphics terminal, or to a
+graphics kernel resident in an external subprocess.
+
+If a graphics stream is redirected to a spool file we merely copy output to
+the file and reading is forbidden.  If output is to an external graphics
+kernel but is unfiltered (no workstation transformation, e.g., for STDPLOT),
+we merely copy data blocks on to the subprocess but the protocol involved
+is nontrivial.  If output is to the builtin STDGRAPH kernel or to an
+external interactive kernel, output must be filtered through GIOTR before
+being written to the local or remote graphics kernel.  Graphics input is
+also possible and is handled similarly but without need to call GIOTR.
+
+Before reading or writing a graphics stream GIO will send a special directive to
+PR_PSIO to connect a kernel to the stream.  This directive is passed to PR_PSIO
+via an XMIT to the special pseudofile PSIOCONTROL.  The data passed in the
+XMIT call will be the GKI control instruction to be executed by PSIO.  There
+are currently three such directives, i.e., OPENWS, SETWCS, and GETWCS.  Each
+such directive is included in the normal metacode stream as well, but by
+writing to a special pseudofile we avoid the need to have PR_PSIO scan each
+metacode stream for control instructions, a fairly expensive operation if a
+lot of data is involved.
+
+
+2.1.1 Graphics Stream Dataflow
+
+    A frame buffer is associated with each graphics stream in the parent
+process.  If graphics output (metacode) is being filtered, each output record
+is appended to the frame buffer and then GIOTR is called to filter the new
+instructions.  GIOTR writes the filtered metacode stream either directly to
+the builtin kernel or to the graphics output pseudofile stream of the parent
+process.
+
+Output to the builtin kernel is easy to understand: GIOTR merely calls the
+kernel to execute the transformed instruction.  If output is to an external
+kernel we unfortunately cannot simply write to the kernel because we require
+that the graphics kernel task be a conventional task callable from either
+the CL or by the graphics system, i.e., by PL_PSIO.  We must buffer the
+transformed output metacode and pass it on to the kernel process only when
+requested to do so by an XFER command from the kernel.
+
+This buffering is done in a somewhat tricky way which makes it look like we
+are writing to a simple file, and which allows us to use conventional READ and
+WRITE calls to access the graphics stream.  GIOTR, if not writing to the
+builtin kernel, will write to one of the three graphics streams of the parent
+process, i.e., to STDGRAPH, STDIMAGE, or STDPLOT.  The graphics stream of the
+parent is logically connected to the same stream in the kernel process.  We
+arrange things such that data may be written or read into the FIO buffer
+associated with the stream, but the buffer will never actually be flushed,
+since this would cause the contents to appear as garbage on the user terminal.
+
+The sequence of events for an XMIT to STDGRAPH with an external kernel is as
+follows:
+
+	
+	The parent process (CL) blocks, waiting for a read on the IPC
+	    channel to the graphics task.
+
+	Graphics task writes to stdgraph.
+	FIO flushes stdgraph buffer through IPC channel.
+
+	PR_PSIO (in the parent) sees XMIT to stdgraph.
+	Parent reads data record from IPC channel, appending the
+	    data record to the frame buffer for the stream.
+
+	PR_PSIO calls GIOTR to process the new metacode.
+	GIOTR writes the transformed metacode instructions to the stdgraph
+	    stream of the parent and returns control to PR_PSIO.
+
+	PR_PSIO rewinds the stdgraph buffer in preparation for a read and
+	    stacks the pending XMIT request and directs its command input
+	    to the IPC of the kernel process.
+
+	The kernel process sends zero or more XMIT or XFER requests to
+	    the parent to read or write pseudofile streams other than
+	    stdgraph.
+	The kernel process sends an XFER request to the parent to read
+	    from stdgraph.
+	The parent reads the data record from the stdgraph FIO buffer
+	    and passes it on to the kernel, completing the XFER request
+	    of the kernel as well as the original XMIT request of the
+	    graphics task.
+
+	The parent process (CL) blocks, waiting for a read on the IPC
+	    channel to the graphics task.
+
+
+The sequence of operations for an XFER request from the graphics task is
+as follows.
+
+	The parent process (CL) blocks, waiting for a read on the IPC
+	    channel to the graphics task.
+
+	The parent receives an XFER request from the graphics task.
+	If there is any data in the stdgraph buffer the parent returns
+	    that to the graphics task, otherwise the PR_PSIO procedure
+	    pushes an XFER request and redirects its input to the
+	    graphics kernel.
+
+	The kernel process sends zero or more XMIT or XFER requests to
+	    the parent to read or write pseudofile streams other than
+	    stdgraph.
+	The kernel process sends an XMIT request to the parent to write
+	    to stdgraph.
+	The parent reads the data block from the IPC channel to the kernel
+	    and writes it to stdgraph, completing the XMIT request.
+
+	The parent pops the XFER request and copies the data in the stdgraph
+	    buffer to the graphics task, completing the original XFER request.
+
+	The parent process (CL) blocks, waiting for a read on the IPC
+	    channel to the graphics task.
+
+
+In summary, the principal data buffers involved in pseudofile i/o to a graphics
+stream are the frame buffer, used by GIOTR to spool the metacode instructions
+for a graphics frame, and the FIO buffer for the graphics stream, used to
+pass data between XMIT/XFER request pairs from cooperating processes at
+opposite ends of a graphics stream.
+
+
+3. Summary
+
+    The actual code required to implement all this is probably easier to
+understand than the English description.  To summarize the justification for
+the complexity of the scheme we have adopted:
+
+    [1] The graphics kernel task is a conventional CL callable task with
+	parameters etc., usable to process metacode from a metafile or from
+	a pipe as well as callable by PR_PSIO.  The conventional IPC protocol
+	is used in the graphics kernel task.  Other tasks may be resident in
+	the same process, saving disk and memory.
+
+    [2] The graphics kernel may read STDIN and write STDOUT and STDERR while
+	processing metacode, allowing access to the graphics terminal via the
+	CL process, output of debugging information during operation, and
+	output of error messages during operation.
+.endhelp ______________________________________________________________________
+
+
+# PR_PSIO -- Process an i/o request for the specified pseudofile stream
+# of the specified process.
+
+procedure pr_psio (pid, active_fd)
+
+pid	process id
+fd	process stream for which i/o is requested
+
+begin
+	in = pr.clin
+	fd = active_fd
+	clear stack
+
+	# Process i/o requests from the subprocess until a request is received
+	# and processed for pseudofile FD.
+
+	repeat {
+	    while (filbuf (in) != EOF) {
+		determine type of request and destfd
+
+		if (xmit request to stream destfd) {
+		    if (graphics filtering enabled) {
+			read data record and append to frame buffer
+			call giotr to filter output to destfd
+		    } else {
+			read data record from process
+			write record to destfd
+		    }
+		    if (destination is a process) {
+			rewind destfd buffer for read
+			push (fd)
+			push (in)
+			push (xmit)
+			fd = destfd
+			in = newpr.clin
+			next
+		    }
+
+		} else if (xfer request from stream destfd) {
+		    if (destfd is a process and buffer is empty) {
+			push (fd)
+			push (in)
+			push (xfer)
+			fd = destfd
+			in = newpr.clin
+			next
+		    } else {
+			read data record from destfd
+			write data record to process
+		    }
+
+		} else if (gio directive) {
+		    if (open workstation)
+			connect a kernel process to a graphics stream
+		    else if (setwcs)
+			save wcs for the stream
+		    else if (getwcs)
+			write wcs data to the process
+
+		} else {
+		    destfd = CLIN
+		    if (fd != CLIN)
+			error: unsolicited command input from the subprocess
+		}
+
+		if (destfd == fd) {
+		    if (stack not empty) {
+			pop (request)
+			pop (in)
+			pop (fd)
+			if (request == xfer) {
+			    read data record from fd
+			    write data record to process owning "in"
+			}
+		    } else
+			break
+		}
+	    }
+	} until (stack is empty)
+end
+
+
+
+File routing:
+
+    Each pseudofile in a subprocess is associated with a stream in the parent
+process.  A subprocess pseudofile may map to a real file or to a parent
+pseudofile.  When a subprocess is connected as a graphics kernel graphics
+i/o will be via any one of the standard graphics streams STDGRAPH etc.,
+with said graphics stream connected to the same stream in the parent.
+The subprocess streams STDIN, STDOUT, and STDERR are by default connected
+to the same streams in the parent, allowing the subprocess to access the
+terminal, output error messages, and so on.  A graphics kernel will be able
+to access the standard i/o streams even while connected as a subprocess
+to filter GKI metacode.

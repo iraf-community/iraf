@@ -1,0 +1,55 @@
+.help cvinit Jun84 "Curfit Package"
+.ih
+NAME
+cvinit -- initialise curve descriptor
+.ih
+SYNOPSIS
+include <math/curfit.h>
+
+cvinit (cv, curve_type, order, xmin, xmax)
+
+.nf
+pointer		cv		# curve descriptor
+int		curve_type	# the fitting function
+int		order		# order of the fit
+real		xmin		# minimum x value
+real		xmax		# maximum x value
+.fi
+.ih
+ARGUMENTS
+.ls cv      
+Pointer to the curve descriptor structure.
+.le
+.ls curve_type
+Fitting function.
+Permitted values are LEGENDRE and CHEBYSHEV, for Legendre and
+Chebyshev polynomials and SPLINE3 and SPLINE1 for a cubic spline
+and linear spline with uniformly spaced
+break points.
+.le
+.ls order
+Order of the polynomial to be fit or the number of polynomial pieces
+to be fit by a cubic spline. Order must be greater than or equal to one.
+If curve_type is set to LEGENDRE or CHEBYSHEV and order equals one, a constant
+term is fit to the data.
+.le
+.ls xmax, xmin
+Minimum and maximum x values. All x values of interest
+including the data x values and the x values of any curve to be evaluated
+must fall in the range xmin <= x <= xmax. Checking for out of bounds x
+values is the responsibility of user.
+.le
+.ih
+DESCRIPTION
+Allocate space for the curve descriptor structure and the arrays and
+vectors used by the numerical routines. Initialize all arrays and vectors
+to zero. Return the
+curve descriptor to the calling routine.
+.ih
+NOTES
+CVINIT must be the first CURFIT routine called. CVINIT returns if an
+illegal curve type is requested.
+.ih
+SEE ALSO
+cvfree
+.endhelp

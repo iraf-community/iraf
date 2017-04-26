@@ -1,0 +1,14 @@
+# Parameter file for the DEBUG task
+
+lexcode,b,h,no,,,Debug lexer code
+parcode,b,h,no,,,Debug parser code
+parvars,b,h,no,,,Dump parser variables
+partable,b,h,no,,,Dump parser tables
+fitcode,b,h,no,,,Debug fitcoeffs code
+photcode,b,h,no,,,Debug photproc code
+iocode,b,h,no,,,Debug i/o code
+cattable,b,h,no,,,Dump catalog data table
+obstable,b,h,no,,,Dump catalog observations table
+reftable,b,h,no,,,Dump reference equation table
+wtstable,b,h,no,,,Dump weight table
+nlfit,b,h,no,,,Dump NLFIT structure

@@ -1,0 +1,161 @@
+.help mkscript Nov85 system
+.ih
+NAME
+mkscript -- make a script for a command sequence to be run in batch
+.ih
+USAGE	
+mkscript script task submit
+.ih
+PARAMETERS
+.ls script
+Script file name.  Commands will be successively added to this file.
+.le
+.ls task   
+Task name of command to be added to the script.  If given on the command
+line then only commands for this task may be added to the script.
+If not given on the command line then the task will query for a task
+name for each new command.  Currently the task name must not be abbreviated.
+.le
+.ls submit
+Submit the completed script as a background job as the last act of the task?
+If not given on the command line the task will query before submitting the
+script.
+.le
+.ls append = no
+Append new commands to an existing script file?
+If no the file will be deleted first.   If \fIverify\fR = yes
+the user will be asked to confirm the deletion.
+.le
+.ls hidden = yes
+Include hidden parameters in each command?
+.le
+.ls verify = yes
+Verify each command, any file deletions, and the final script?
+.le
+.ls logfile = "script.log"
+Script log file name.  When the script is submitted as a background job
+by this task any command and error output is directed to this file.
+.le
+.ih
+DESCRIPTION
+A command script is created consisting of a number of commands to be
+executed sequentially.  The task assumes the responsibility of formatting
+the command and placing it in the script file.  The user sets the
+parameter values using the parameter editor \fBeparam\fR.  As an optional
+final stage the task will optionally submit the script as a background job.
+
+The sequence of steps are outline as follows:
+.ls (1)
+If the script already exists and \fIappend\fR = no the script file
+is deleted.  When \fIverify\fR = yes the deletion is verified with the
+user.
+.le
+.ls (2)
+If the task is not specified on the command line then the user
+is queried for a task name.
+.ls (2a)
+The task must be loaded.  If it has not been loaded a message is printed
+and the task query is repeated.
+.le
+.le
+.ls (3)
+\fBEparam\fR is now invoked to allow the user to set the task
+parameters.
+.le
+.ls (4)
+If \fIverify\fR = yes the command is printed and the user is asked if the
+command is ok.  If ok the command is added to the script.
+.le
+.ls (5)
+The user is asked if another command is to be added to the script.  While
+the response is yes steps 2 to 5 are repeated.
+.le
+.ls (6)
+If \fIverify\fR = yes the script is paged and the user is asked if the
+script is ok.  If not ok the script is deleted, with user confirmation,
+and steps 2 to 6 are repeated.
+.le
+.ls (7)
+If the submit parameter is not specified on the command line the user
+is asked if the script should be submitted as a background job.
+.le
+
+The parameter \fIhidden\fR is important for the following reason.  If
+the hidden parameters are not explicitly included in the script commands
+then the values of the hidden parameters will be those in the parameter
+file at the time of execution.  Thus, in changes in the hidden parameters
+with \fBeparam\fR or explicit changes may produce unexpected results.
+However, if the hidden parameters are never changed then the commands
+are more readable when the hidden parameters are not included.
+.ih
+EXAMPLES
+One of the most common usages in data reductions is to create repeated
+commands with different input data or parameters.
+
+.nf
+cl> mkscript script.cl transform
+
+[\fIeparam\fR is called to set the parameter values for \fItransform\fR]
+
+transform ("n1r.008", "n1r.008a", "disp012,distort,disp013",
+database="identify.db", interptype="spline3", x1=1., x2=256., dx=1.,
+nx=256., xlog=no, y1=4300., y2=6300., dy=INDEF, ny=800., ylog=no,
+flux=yes, logfiles="STDOUT,logfile")
+
+Is the command ok? (yes):
+Add another command? (yes):
+
+[\fIeparam\fR is called again for task \fItransform\fR]
+
+transform ("n1r.010", "n1r.010a", "disp013,distort",
+database="identify.db", interptype="spline3", x1=1., x2=256., dx=1.,
+nx=256., xlog=no, y1=4300., y2=6300., dy=INDEF, ny=800., ylog=no,
+flux=yes, logfiles="STDOUT,logfile")
+
+Is the command ok? (yes):
+Add another command? (yes): no
+
+[The script is paged]
+
+Is the script ok? (yes):
+Submit the script as a background job? (yes):
+Script script.cl submitted at:
+Fri 10:32:57 01-Nov-85
+[1]
+.fi
+
+To combine several tasks:
+
+.nf
+cl> mkscript script.cl ver- sub- hid-
+Task name of command to be added to script: response
+
+[\fIeparam\fR is called for \fIresponse\fR and parameter values are set]
+
+Add another command? (yes):
+Task name of command to be added to script: imarith
+...
+Add another command? (yes): no
+.fi
+
+To run the command script as a foreground job:
+
+cl> cl < script.cl
+
+To run the command script as a background job:
+
+cl> cl < script.cl >& logfile &
+
+Note that the output including possible error output is redirected to a logfile.
+.ih
+BUGS
+The current implementation is preliminary.  It is done with a script which
+makes it seem somewhat slow.  The most important bug is that the command
+formatter is based on the output of \fBlparam\fR.  If a task parameter
+name exceeds 12 characters it is truncated by \fBlparam\fR and is then
+also truncated by the command formatter.  The script will then fail when
+executed!  Also the task name may not be abbreviated.
+.ih
+SEE ALSO
+eparam
+.endhelp

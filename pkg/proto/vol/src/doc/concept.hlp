@@ -1,0 +1,177 @@
+.help volumes
+
+[OUT OF DATE (Jan 89); this is an original pre-design document]
+
+.ce
+Conceptual Model for 2D Projections of Rotating 3D Images
+
+Consider the problem of visualizing a volume containing emissive and
+absorptive material.  If we had genuine 3D display tools, we could imagine
+something like a translucent 3D image display that we could hold in our
+hand, peer into, and rotate around at will to study the spatial distribution
+of materials inside the volume.
+
+Lacking a 3D display device, we can resort to 2D projections of the interior
+of the volume.  In order to render absorptive material, we need a light
+source behind the volume; this light gets attenuated by absorption as it
+passes through the volume toward the projection plane.  In the general case
+light emitted within the volume contributes positively to the projected
+light intensity, but it also gets attenuated by absorbing material between
+it and the projection plane.  At this point the projection plane has a range
+of intensities representing the combined absorption and emission of material
+along columns through the volume.  But looking at a single 2D projection,
+there would be no way to determine how deep in the original volume a particular
+emitting or absorbing region lay.  One way around this is to cause the volume
+to rotate, making a series of 2D projections.  Playing the projections back
+as a movie gives the appearance of seeing inside a translucent rotating
+volume.
+
+Modelling the full physics of light transmission, absorption, refraction,
+etc. with arbitrary projective geometries would be quite computationally
+intensive and could rival many supercomputer simulations.  However, it is
+possible to constrain the model such that an effective display can be
+generated allowing the viewer to grasp the essential nature of the spatial
+relationships among the volume data in reasonable computational time.  This
+is called volume visualization, which can include a range of display
+techniques approximating the actual physics to varying extents.  There is
+some debate whether visualization problems can best be attacked by simplified
+direct physical models or by different models, such as ones that might better
+enhance the \fBperception\fR of depth.  We will stick with direct physical
+models here, though simplified for computer performance reasons.
+
+For computational purposes we will constrain the projection to be orthogonal,
+i.e. the light source is at infinity, so the projection rays are all parallel.
+With the light source at infinity behind the volume (a datacube), we need not
+model reflection at all.  We will also ignore refraction (and certainly
+diffraction effects).
+
+We can now determine a pixel intensity on the output plane by starting
+at the rear of the column of voxels (volume elements) that project from
+the datacube onto that pixel.  At each successive voxel along that column
+we will attenuate the light we started with by absorption, and add to it
+any light added by emission.  If we consider emission (voxel intensity)
+alone, the projection would just be the sum of the contributing intensities.
+Absorption alone would simply decrease the remaining transmitted light
+proportionally to the opacity of each of the voxels along the column.
+Since we are combining the effects of absorption and emission, the ratio
+of the intensity of the original incident light to that of the interior
+voxels is important, so we will need a beginning intensity.
+
+The opacities have a physical meaning in the model.  However, we are more
+interested here in visualizing the volume interior than in treating it as
+a pure physical model, so we add an opacity transformation function.  This
+allows us to generate different views of the volume interior without having
+to modify all the raw opacity values in the datacube.  For maximum flexibility
+we would like to be able to modify the opacity function interactively, e.g.
+with a mouse, but this would amount to computing the projections in real
+time and is not likely at present.
+
+.nf
+
+Let:	i     = projected intensity before considering the current
+	        voxel
+	i'    = intensity of light after passing through the current
+	        voxel
+	I0    = initial light intensity (background iillumination
+		before encountering the volume)
+	Vo    = opacity at the current voxel, range 0:1 with
+	        0=transparent, 1=opaque
+	Vi    = intensity at the current voxel
+	f(Vo) = function of the opacity at the current voxel,
+		normalized to the range 0:1
+	g(Vi) = function of the voxel's intensity, normalized
+		to the range 0:1
+
+Then:	i' = i * (1 - f(Vo)) + g(Vi)
+		[initial i = Imax, then iterate over all voxels in path]
+
+.fi
+
+We want to choose the opacity and intensity transformation functions in such
+a way that we can easily control the appearance of the final projection.
+In particular, we want to be able to adjust both the opacity and intensity
+functions to best reveal the interior details of the volume during a
+rotation sequence.  For example, we might want to eliminate absorption
+"noise" so that we can see through it to details of more interest, so we
+need a lower opacity cutoff.  Likewise, we would want an upper opacity
+cutoff above which all voxels would appear opaque.  We will need the same
+control over intensity.
+
+.nf
+Let:	o1   = lower voxel opacity cutoff
+	o2   = upper voxel opacity cutoff
+	t1   = lower transmitted intensity cutoff
+	t2   = upper transmitted intensity cutoff
+	i1   = lower voxel intensity cutoff
+	i2   = upper voxel intensity cutoff
+	Imax = output intensity maximum for int transform function
+.fi
+
+Now all we need is the form of the opacity and intensity functions between
+their input cutoffs.  A linear model would seem to be useful, perhaps with
+logarithmic and exponential options later to enhance the lower or upper
+end of the range.  f(Vo) is constrained to run between 0 and 1, because
+after being subtracted from 1.0 it is the intensity attenuation factor
+for the current voxel.
+
+.nf
+
+		Opacity Transformation Function f(Vo):
+
+	        { Vo < o1       : 	    0.0		    }
+	        {					    }
+	        { o1 <= Vo < o2 : (t2 - (Vo - o1)(t2 - t1)) }
+	        {		  (	---------	  ) }
+	f(Vo) = {		  (	(o2 - o1)	  ) }
+	        {		  ------------------------- }
+	        {			    I0	    }
+	        {					    }
+	        { o2 <= Vo      : 	    1.0		    }
+
+
+backg. int.  I0-|
+		|
+	     t2-|------			Transmitted Intensity
+		|        `		as function of opacity
+	        |           `		(ignoring independent
+i * (1 - f(Vo))-|..............`	voxel intensity contri-
+                |               . `	bution)
+    		|               .    `
+		|               .       `
+	     t1-|		.	  |
+		|		.	  |
+		+____________________________________________
+		       |        |         |
+		       o1	Vo 	  o2
+			   Voxel Opacity
+
+       ------------------------------------------------------------
+
+		Intensity Transformation Function g(Vi):
+
+		{ Vi < i1       :    0.0
+		{
+		{ i1 <= Vi < i2 : (Vi - i1) * Imax
+		{		  ---------
+	g(Vi) = {		  (i2 - i1)
+		{
+		{ i2 <= Vi	:    Imax
+		{
+		{
+		{
+
+
+	        |
+		|
+	   Imax-|                       ---------------------
+		|                    /
+	  g(Vi)-|................./
+      		|              /  .
+		|           /     .
+		|        /        .
+	    0.0	+___________________________________________
+		     |            |     |
+		     i1	          Vi    i2
+			Voxel Intensity
+.fi
+

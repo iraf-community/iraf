@@ -1,0 +1,39 @@
+.help head Nov84 system
+.ih
+NAME
+head -- print the first few lines of the specified files
+.ih
+USAGE
+head files
+.ih
+PARAMETERS
+.ls files
+The list of files to be dealt with, quite possibly given as
+a template, such a "image*".
+.le
+.ls nlines = 12
+The number of lines to be printed.
+.le
+.ih
+DESCRIPTION
+\fIHead\fR prints, on the standard output, the first \fInlines\fR of each
+file that matches the given file list.  If the file list has more than one
+name in it, a short header precedes each listing.
+.ih
+EXAMPLES
+
+1. Print the first 12 lines of each help file in the current directory.
+
+	cl> head *.hlp
+
+2. Print the first line of each help file.
+
+	cl> head *.hlp nl=1
+
+3. Print the most recently defined \fIset\fR environment definitions.
+
+	cl> set | head
+.ih
+SEE ALSO
+tail, page
+.endhelp

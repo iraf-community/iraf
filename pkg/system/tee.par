@@ -1,0 +1,3 @@
+tee_file,s,a,,,,name of file into which STDOUT is to be copied
+out_type,s,h,"text",,,type of output file (text|binary)
+append,b,h,no,,,append to output file?

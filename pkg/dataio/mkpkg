@@ -1,0 +1,33 @@
+# Make the DATAIO package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools"
+	$update	libpkg.a
+	$omake	x_dataio.x
+	$link	x_dataio.o libpkg.a $(LIBS) -o xx_dataio.e
+	;
+
+install:
+	$move	xx_dataio.e bin$x_dataio.e
+	;
+
+libpkg.a:
+	@lib
+	@export
+	@import
+	@imtext
+	@reblock
+	@fits
+	@bintext
+	@mtexamine
+	@cardimage
+	@t2d
+	;

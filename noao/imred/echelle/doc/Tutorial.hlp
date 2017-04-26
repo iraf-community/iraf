@@ -1,0 +1,184 @@
+.help Tutorial Aug86 "Echelle Tutorial"
+.ih
+TOPICS
+The echelle tutorial consists of a number of different topics.  To obtain help
+on a particular topic type "tutor topic" where the topic is one of the
+following:
+
+.nf
+			TOPICS
+
+         topics - List of topics
+       overview - An overview of the echelle reduction process
+	 dataio - Reading and writing data tapes
+        tracing - Tracing the positions of the orders
+     extraction - Extracting one or two dimensional spectra
+     references - Additional references
+	    all - Print all of the tutorial
+.fi
+
+The topics are kept brief and describe the simplest operations.  More
+sophisticated discussions are available for all the tasks in the printed
+documentation and through the on-line \fBhelp\fR facility; i.e. "help taskname".
+.ih
+OVERVIEW
+The \fBechelle\fR package provides for the extraction of the orders from
+two dimensional echelle images into one dimensional spectra.  After extraction
+the one dimensional spectra are wavelength and flux calibrated.  The usual
+flow of the reductions is
+.ls (1)
+Read data from tape.
+.le
+.ls (2)
+Set the dispersion axis in the image headers using the task \fBsetdisp\fR.
+This is required by many of the tasks which follow.
+.le
+.ls (3)
+Trace one or more images to define the positions of the orders within the
+two dimensional format.
+.le
+.ls (4)
+Extract the orders into one dimensional spectra.
+.le
+.ls (5)
+Use arc calibration spectra to determine wavelength solutions.
+.le
+.ls (6)
+Apply the wavelength solutions to the other spectra and rebin the spectra
+into linear or logarithmic wavelength intervals.
+.le
+.ls (7)
+Determine flux calibrations using standard star observations.
+.le
+.ls (8)
+Apply the flux calibrations to the other object spectra.
+.le
+.ls (9)
+Save the reductions as FITS images and make plots of the spectra.
+.le
+
+There are many variations on these steps possible with the great flexibility
+of the reduction tools at your disposal.  The most important one to mention
+is that the orders may be extracted as two dimensional strips in order to
+apply more complex geometric distortion corrections using the \fBlongslit\fR
+package.
+.ih
+DATAIO
+To read CCD Camera format tapes use \fBrcamera\fR from the \fBmtlocal\fR
+package.  FITS format tapes are read and written with \fBrfits\fR and
+\fBwfits\fR from the \fBdataio\fR package.  Remember you need to
+\fBallocate\fR the tape drive before you can read or write tapes and
+you should \fBdeallocate\fR the tapes when you are through with the
+tape drive.
+
+.nf
+	ec> allocate mta
+	ec> deallocate mta
+	ec> rcamera mta 1-99 ech datatype=r >rcam.log &
+	ec> rfits mta 1-99 ech datatype=r >rfits.log &
+	ec> wfits mta spectra*
+.fi
+.ih
+TRACING
+The positions of the orders across the image dispersion axis as a function
+of position along the dispersion axis are determined by the task \fBtrace\fR.
+There are three steps in tracing an image; defining the initial positions of
+the orders at one point along the dispersion, automatically determining
+the positions at other points in steps from the starting point, and fitting
+smooth curves to the positions as a function of dispersion position.  The
+first and last steps are interactive, at least initially.  After the first
+image other images may be traced noninteractively.
+
+Select an image with narrow, strong profiles and run trace:
+
+	ec> trace imagename
+
+When you are asked if you want to edit the apertures respond with "yes".
+The central cut across the dispersion is graphed.  Position the cursor
+over the first order to be traced and type 'm'.  Adjust the width of the
+extraction aperture with the 'l', 'u', or 'y' keys or specify the lower
+and upper widths explicitly with ":lower value" or ":upper value".
+If background subtraction is to be used type 'b' and set the background
+fitting parameters (see the \fBbackground\fR tutorial)
+Now mark the remaining orders with the 'm' key.  The widths of the
+previous aperture are preserved for each new aperture.  When you are
+satisfied with the marked apertures type 'q'.
+
+The positions of the orders are now traced in steps from the initial point.
+Once the positions have been traced you are asked whether to fit the
+traced apertures interactively.  Respond with "yes".  You will now be
+asked specifically if the first aperture is to be fit.  Respond with "yes"
+again.  The traced positions are graphed along with a fitted curve.  You now
+have many options for adjusting the fit.  The most important one is the
+order which is set by typing ":order value", where value is the desired
+order, and then 'f' to refit the data.  For full information of the
+options see the help for \fBicfit\fR.  When you are satisfied type 'q'.
+
+You are then prompted for the next order.  The previous fitting parameters
+will be used so at this point you may want to just answer "NO" to skip
+the interactive fitting of the other traced orders, though the graphs of the
+fit will still be displayed.
+
+You now have several options about how to define the positions of the
+orders in your other images.
+
+.ls (1)
+You may apply the tracing to all other observations with no
+further tracing.  This is done by specifying the traced image
+as the "reference" in the extraction process.
+.le
+.ls (2)
+You may maintain the same shape of the traces and correct for
+shifts in the positions of the orders across the dispersion
+by recentering each aperture.  This is done
+with the task \fBapedit\fR or the editing switch during extraction
+using the first traced image as the reference.  The apertures are
+recenter using the 'c' key.
+.le
+.ls (3)
+Finally, you may retrace other images either from scratch or
+using the first traced image as the initial reference.  In the latter
+case the tracing may be done noninteractively as a batch process.
+.le
+.ih
+EXTRACTION
+There are two types of extraction; to one dimensional spectra or
+to two dimensional strips.  The second type of extraction is accomplished
+by the task \fBstripextract\fR in the \fBtwodspec.apextract\fR package
+and is used if further reductions using the \fBlongslit\fR package are
+desired.  Normally, however, one ignores the small geometric distortion
+in which curves of constant wavelength differ slightly from the image
+dispersion axis.
+
+Extraction of the traced echelle orders is performed by the task
+\fBsumextract\fR.  The pixels within each aperture at each point along
+the dispersion axis are summed to produce one dimensional spectra, one
+for each order and each extracted image.  The sum may be weighted
+in two ways; "profile" or "variance" weighting.  The variance weighting
+may require that you know the CCD readout noise and photon/ADU conversion.
+For a description of the weights see the help for \fBsumextract\fR
+or the paper "The APEXTRACT Package".  The spectra may also be cleaned
+of cosmic rays and bad pixels at the same time and have a background
+subtracted.  The background subtraction parameters must be set when
+defining the apertures or later using the apedit mode in \fBapedit\fR,
+\fBtrace\fR, or \fBsumextract\fR.  See the tutorial on \fBbackground\fR
+for further information.
+
+Once the extraction parameters have been set simply type
+
+	ec> sumextract images
+
+where images is the list of images to be extracted.  If each image has
+not been traced then a traced reference image should be given.
+One may correct for shifts relative to the traced image by setting the
+switch to edit the apertures and then recentering each aperture before
+extracting.  If there is no aperture editing then the extractions may
+be done as a background or batch process.
+.ih
+REFERENCES
+.ls (1)
+Pilachowski, C. and J. V. Barnes, \fINotes on the IRAF for Reduction of
+Echelle/CCD Data\fR, NOAO Central Computer Services, 1986.  This document
+is also available in the \fBIRAF User Handbook , Vol. 2B -- NOAO Cookbooks\fR.
+.le
+.endhelp

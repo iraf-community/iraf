@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+export 	PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/5bin:/usr/ucb:/etc:/usr/etc:$PATH:/usr/local/bin:/opt/local/bin:/local/bin:/home/local/bin
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Utility aliases.
+source $iraf/unix/hlib/util.sh
+
+if [ ! -n "$iraf" ]; then
+    /bin/echo ""
+    /bin/echo "Error:  You must have the iraf env variable defined !"
+    /bin/echo ""
+    exit 1
+fi
+
+exec=yes
+arch=`$iraf/unix/hlib/irafarch.sh -actual`
+
+
+#=============================================================================
+# Process any command line arguments.
+#=============================================================================
+while [ -n "$1" ]; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+	;;
+    *)
+        ERRMSG "$0: unknown argument $1"
+	;;
+    esac
+
+    if [ -n "$2" ]; then
+        shift
+    else
+        break
+    fi
+done
+
+
+
+#----------------------------------
+# Determine platform architecture.
+#----------------------------------
+
+mach=`$iraf/unix/hlib/irafarch.sh -actual`
+hmach=`$iraf/unix/hlib/irafarch.sh -actual`
+
+/bin/echo "mach = " $mach
+/bin/echo "hmach = " $hmach
+
+make generic
+
+/bin/echo -n "Making $arch binary distribution ...."
+  make generic
+  if [ $exec == "yes" ]; then
+    tar czf ../${arch}-bin.tar.gz bin.$arch */bin.$arch extern/*/bin.$arch
+  else
+    /bin/echo "tar czf ../${arch}-bin.tar.gz bin.$arch */bin.$arch extern/*/bin.$arch"
+  fi
+/bin/echo "		Done"
+
+exit 0

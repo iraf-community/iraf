@@ -1,0 +1,75 @@
+LOCAL -- Locally added tasks and packages.
+
+    The LOCAL package is a place to put locally added tasks and packages
+without modifying the standard IRAF system (and thereby complicating future
+updates and so on).  The LOCAL provided with the distributed system is a
+template package provided to make it as easy as possible for user sites to
+set up their own custom LOCAL packages.
+
+To create a custom LOCAL package:
+
+    [1] Copy the template package directory tree (iraf$local) to a new
+	directory somewhere outside the iraf directories.  DO NOT MODIFY
+	THE TEMPLATE LOCAL, CREATE AN EXTERNAL COPY AND MODIFY THAT INSTEAD.
+	This is necessary to ensure that your custom local is unaffected by
+	updates to the core IRAF system.
+
+    [2]	Edit the pathame of local in the "reset local = ..." statement in the
+	IRAF file hlib$extern.pkg, replacing the "iraf$local/" by the host
+	pathname of the root directory of your custom LOCAL.  Be sure to
+	include the trailing / on UNIX systems, or escape $ and [ on VMS
+	systems.  All references to LOCAL will now refer to your custom
+	version of LOCAL, rather than to the template version provided with
+	the distributed system.
+
+To add a new task to LOCAL:
+
+    [1] Add the source and parameter file if any to this directory, e.g.,
+	mytask.x, mytask.par.
+
+    [2] Add the name of the new task to x_local.x.  Any number of tasks may
+	be added to the package in this way.
+
+		task	pavg	= t_pavg,
+			mytask	= t_mytask
+
+    [3] Add the manual page for the task to the `doc' subdirectory, e.g.,
+	file doc/mytask.hlp.  Add entries for the new task to local.hd
+	(so that HELP can find the new manual page) and local.men (so that
+	the task will be listed when `help local' is entered).  Load the
+	softools package and run `mkhelpdb' to recompile the help database
+	else HELP will not know about the new manual page.
+
+	cl> mkhelpdb local$lib/root.hd local$lib/helpdb.mip
+
+    [4] Add an entry for all source files to the library member list in
+	the mkpkg file in this directory.  List any include files referenced
+	in the source file to the right of the source file name.
+		
+		libpkg.a:
+			pavg.x		<imhdr.h>
+			mytask.x
+			;
+
+    [5] Add an entry for the new task in local.cl, so that the CL will
+	know about the new task when the LOCAL package is loaded.  Prefix
+	the task name with a dollar sign ($mytask) if the new task does
+	not have an associated parameter (.par) file.
+
+		task	pavg,
+			mytask	= "local$src/x_local.e"
+
+    [6] Enter the command `mkpkg -p local' to compile and link the new package
+	executable `x_local.e'.  After testing the new task, install the new
+	package executable in bin$ with the command `mkpkg -p local install'.
+
+You should now be able to load the LOCAL package in the CL, and run the new
+task, or get help for any of the LOCAL package tasks.
+
+Any number of tasks may be added to your custom LOCAL package in this fashion.
+Host programs and IMFORT programs may also be added, modifying the task
+statements and mkpkg compile/link instructions appropriately (if used).
+Subpackages should be used to group like tasks if the LOCAL grows large
+enough.  For more information on program development in IRAF, refer to the
+SOFTOOLS package help pages for xc, mkpkg, etc., the SPP/VOS technical
+documentation, the IMFORT manual, and so on.

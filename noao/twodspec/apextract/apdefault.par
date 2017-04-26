@@ -1,0 +1,14 @@
+# APDEFAULT
+
+lower,r,h,-5.,,,Lower aperture limit relative to center
+upper,r,h,5.,,,Upper aperture limit relative to center
+apidtable,s,h,"",,,"Aperture ID table
+"
+b_function,s,h,"chebyshev","chebyshev|legendre|spline1|spline3",,Background function
+b_order,i,h,1,1,,Background function order
+b_sample,s,h,"-10:-6,6:10",,,Background sample regions
+b_naverage,i,h,-3,,,Background average or median
+b_niterate,i,h,0,0,,Background rejection iterations
+b_low_reject,r,h,3.,0.,,Background lower rejection sigma
+b_high_reject,r,h,3.,0.,,Background upper rejection sigma
+b_grow,r,h,0.,0.,,Background rejection growing radius

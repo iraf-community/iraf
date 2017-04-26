@@ -1,0 +1,1558 @@
+.help revisions Jun88 noao.twodspec.apextract
+.nf
+
+approfile.x
+     When an aperture goes off the edge of an image there was an error
+     which allowed the imio data buffer from the image to go out of bounds.
+     (3/12/13, MJF)
+
+aptrace.x
+     The line1/line2 variables weren't being initialized to zero in the
+     ap_ctrace() procedure.  This woule lead to old values from a previous
+     run of the task being reused.  (2/6/13, MJF)
+
+=======
+V2.16.1
+=======
+
+approfile.x
+     Fixed a bug in the Marsh algorithm causing segfaults on 64-bit
+     platforms (Buglog 583)  (3/5/12, Valdes)
+
+apall.par
+     Changed the default for maxsep from 1000 to 100000.  This is because
+     the default is when the user doesn't want to skip apertures and it is
+     strange when the id jumps in the (rare) case that two apertures are
+     marked with a separation of more than 1000.  (2/17/09, Valdes)
+
+apedit.x
+    The 's' key now works on the current aperture rather than the nearest.
+    (10/7/08, Valdes)
+
+apcolon.x
+    The "all" mode was missing with :center.  (10/7/08, Valdes)
+
+apall1.par
+apfit1.par
+apnoise1.par
+apnorm1.par
+apscat1.par
+apparams.dat
+    When the apertures parameter was added in 1996 the :apertures and
+    :parameters commands were broken because of missing references in
+    the associated hidden psets.  (10/7/08, Valdes)
+
+=======
+V2.14.1
+=======
+
+========
+V2.12.2a
+========
+
+apextract.x
+    When using APFIT to output the difference the IMIO buffer which was
+    assumed to be static was invalidated because of I/O needed to create
+    the difference.  A special case was added to handle this case.
+    (7/7/04, Valdes)
+
+apcveval.x	+
+apedit.x
+apextract.x
+apfind.x
+apfindnew.x
+apfit.x
+apgmark.x
+apgscur.x
+apmask.x
+apnoise.x
+apprint.x
+approfile.x
+aprecenter.x
+apresize.x
+apskyeval.x
+apupdate.x
+apvalues.x
+apvariance.x
+apnearest.x
+apscatter.x
+aptrace.x
+mkpkg
+    Added an interface routine to CVEVAL to avoid calling it with
+    independent variables outside the range of the fit.  The fit range
+    may be short because of tracing problems.  So the profile shift
+    is now extended from the end points of the fitted range.
+    (5/21/04, Valdes)
+
+apupdate.x
+apdefault.x
+apfind.x
+aptrace.x
+apedit.x
+apcolon.x
+    Modified to check for inappropriate INDEF values in the "lower"
+    and "upper" aperture settings.  (3/26/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+apextract.x
+    The edge weighting interpolation buffer space, interpbuf,  was
+    increased by one pixel.  This makes the data buffer wider so that
+    interpolation avoids using boundary extension except in cases where the
+    aperture actually approaches the image edge.  Note that this change
+    results in an improvement in the extracted spectra over the previous
+    release where wraparound boundary extension was used.  This also means
+    extractions will not be identical between the versions.
+    (1/23/04, Valdes)
+
+apextract.x
+    The new routine ap_asifit was not correct.  (1/22/04, Valdes)
+
+apextract.x
+approfile.x
+apvariance.x
+    A problem related to the change of 10/21/03 is when the trace goes
+    far outside the data buffer.  This could result in the number of points
+    specified for asifit being too small for the interpolation function.
+    An interface routine, ap_asifit, was added to do all the checks related
+    to using asifit for evaluating the edge pixels.  (12/10/03, Valdes)
+
+===========
+V2.12.2BETA
+===========
+
+apextract.x
+    The output name based on the input name for multiextension images
+    produces a multiextension output with the same extension description.
+    (12/3/03, Valdes)
+
+apgetim.x
+    1.	Restored ability to use image sections which was lost in the change
+	on 7/13/98 for V2.11.2.
+    2.	Support for multiextension data was added.  This consists of using
+	a standard name based on EXTNAME and EXTVER and without the
+	file type extension.  Note that this means that image names specified
+	by index will be converted to extension name and extension version.
+    (12/3/03, Valdes)
+
+apextract.x
+approfile.x
+apvariance.x
+    The call to asifit was specifying too many points to fit, a whole line
+    in the data buffer, because the data vector may be offset from the first
+    column of the data buffer.  This could cause a segmentation violation.
+    (10/21/03, Valdes)
+
+
+apwidth.cl
+    Script to compute aperture widths from database.  This was written
+    for a user and is saved here though it is not currently defined by
+    default.  (12/2/02, Valdes)
+
+apflat1.par
+    The indirect reference needs to be spelled out without abbreviation to
+    be "apflatten" instead of "apflat".  (11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+apextract.x
+approfile.x
+apvariance.x
+    Modified to handle edge pixels by interpolation.  (6/19/02, Valdes)
+
+=====
+V2.12
+=====
+
+apgraph.x
+apgmark.x
+    When there is just one aperture the background regions are marked
+    in apedit and in plotfile output.  (9/21/01, Valdes)
+
+doc/apall.hlp
+    The help page was indicating the extra information output was the
+    variance rather than the sigma.  (8/19/00, Valdes)
+
+apextract.x
+    The checking for the maximum number of apertures that fit in the allocated
+    memory (the "do j = i, napsex" loop) was incorrect because i was used
+    instead of the loop index j.  (3/20/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
+approfile.x
+    In the previous change to the weights in the Horne algorithm
+    the behavior when all data is rejected (say because the background
+    is set wrong and all data is below the background) the weights
+    would be set to MAX_REAL/10 which would cause CVFIT to fail.
+    (3/13/00, Valdes)
+
+apall1.par
+apdebug.par
+apfit1.par
+apnoise1.par
+apnorm1.par
+apparams.par
+    Reduced the polysep parameter.  (1/26/00, Valdes)
+
+apextractbak.x	-
+mkpkg
+    Removed this second old copy which was accidentally introduced into
+    mkpkg as well resulting in multiple copies of the same procedures
+    in the library in V2.11.3beta.  (12/9/99, Valdes)
+
+doc/apflatten.hlp
+    Removed extraneous parameters not actually in task parameter set.
+    (10/21/99, Valdes)
+
+mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+apextract.x
+    Added a keyword SUBAP when using echelle output with subapertures.
+    (3/26/99, Valdes)
+
+apflatten.par
+apflat1.par
+    Removed background subtraction as an option.  (12/11/98, Valdes)
+
+apskyeval.x
+    If the background sample region does not have explicit regions then
+    the xmin/xmax region is used for the background.  (12/11/98, Valdes)
+
+apfit.x
+    Added errchk for ic_fit and ic_gfit.  (12/8/98, Valdes)
+
+apflat1.par
+    Reduced the polysep because it can go wrong.  (12/8/98, Valdes)
+
+apextract.x
+    Added check to fix cases with the lower and upper aperture limits
+    are reversed.
+    (7/13/98, Valdes)
+
+apgetim.x
+    Changed to call xtools routine that strips extensions.
+    (7/13/98, Valdes)
+
+approfile.x
+    In the Horne algorithm the weights for rejected points were set to zero
+    to eliminate them from the fit.  But if large regions are rejected
+    this leaves the fit unconstrained and can lead to bad results.  A
+    change was made to set the weights for the rejected points to 1/10
+    of the minimum weight for the good data.
+    (2/6/98, Valdes)
+
+apextract.x
+    For "echelle" format with "extras" the header was not setup properly
+    resulting in WCSDIM=2 instead of 3.  (2/6/98, Valdes)
+
+apids.x
+    1.  Fix bug in IDS structure which pointed outside of allocated memory.
+    2.  Variables ra/dec in ap_gids were being used both as pointers and
+	double.  The ra/dec pointer usage was removed.
+    3.	The realloc step at the end of ap_gids had the wrong check so it
+	would never be done.
+    (1/13/98, Valdes)
+
+=======
+V2.11.1
+=======
+=====
+V2.11
+=====
+
+doc/apsum.hlp
+doc/apsum.hlp
+    Added missing task name in revisions section.  (4/22/97, Valdes)
+
+apextract.x
+    Removed calls to impl from inside amove in order to error check them.
+    (1/24/97, Valdes)
+
+t_apall.x
+    1.  Added errchk for ap_dbwrite.
+    2.  Made writing the aplast file optional.
+    3.  It is a warning if the plot file can't be written.
+    (1/24/97, Valdes)
+
+apextract.x
+    The step where the data is multplied by the gain was multiplying
+    outside the data if dispaxis=1.  If the there are enough apertures
+    and the aperture widths decrease then it is possible to get
+    mulitplications of gain**naps which can cause a floating overflow.
+    This was fixed.  (11/12/96, Valdes)
+
+apertures.h
+t_apall.x
+aptrace.x
+apresize.x
+apalloc.x
+apextract.x
+apselect.x
+aprecenter.x
+apall.par
+apall1.par
+apfit1.par
+apflat1.par
+apnorm1.par
+apparams.par
+apnoise1.par
+apdebug.par
+apfit.par
+apflatten.par
+apmask.par
+apnoise.par
+apnormalize.par
+apresize.par
+apscatter.par
+apsum.par
+aptrace.par
+apedit.par
+apfind.par
+aprecenter.par
+mkpkg
+doc/apextract.hlp
+doc/apextras.hlp
+doc/apedit.hlp
+doc/apall.hlp
+doc/apfind.hlp
+doc/apresize.hlp
+doc/apsum.hlp
+doc/aptrace.hlp
+doc/apfit.hlp
+doc/apflatten.hlp
+doc/apmask.hlp
+doc/apnoise.hlp
+doc/apnormalize.hlp
+doc/aprecenter.hlp
+doc/apscatter.hlp
+    Added a new parameter "apertures" to select a subset of the apertures
+    to resize, recenter, trace, extract, etc.  The parameter "apertures"
+    which applied to the recentering was changed to "aprecenter".
+    (9/5/96, Valdes)
+
+apedit.key
+    Alphabetized the summary command lists.  (9/3/96, Valdes)
+
+apextract.x
+    1. Onedspec output format is now allowed when nsubaps is greater than 1.
+    2. Echelle format outputs all orders for a each subapertures in
+       separate files.
+    (4/3/96, Valdes)
+
+apmw.x
+apextract.x
+    The WCS for strip extraction was wrong.  (1/31/96, Valdes)
+
+apmw.x
+    An error in computing the WCS transformation now prints a more informative
+    message indicating the final extracted spectrum will be in pixel units.
+    (1/4/96, Valdes)
+
+apids.x
+apedit.x
+    Changed the behavior of the 'i' and 'o' keys with regard to the beam
+    numbers.  These keys will now assign a beam number from the apid table
+    for the selected aperture as well as all other apertures.  Previously
+    the beam number was not changed which resulted in a new aperture
+    number with a beam number that did not agree with the apid table.
+    (10/27/95, Valdes)
+
+doc/apextras.hlp +
+apextract.men
+apextract.hd
+    Added a help topic on the "extras" information.  (9/5/95, Valdes)
+
+apimmap.x
+    If the image header dispersion axis is unreasonable a warning is
+    printed and the "dispaxis" parameter is used instead.  (8/2/95, Valdes)
+
+apids.x
+apmw.x
+doc/apall.hlp
+doc/apdefault.hlp
+doc/apedit.hlp
+doc/apfind.hlp
+    Modified to allow aperture ID table to be from an image header
+    under the keywords SLFIBnnn.  The extracted image will have
+    these keywords deleted.  (7/25/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+apscatter.x
+    When not smoothing along the dispersion there was a bug that when
+    the number of points being fit across the disperision changed
+    ICFIT was not reset causing an error "Range descriptor undefined".
+    The routine now reset the "new" flag when the number of points
+    changes.  (5/3/95, Valdes)
+
+t_apall.x
+    Using the same input and output image name in APSCATTER was still
+    not right.  (2/24/95, Valdes)
+
+apscatter.x
+    Made the output image datatype be at least real.  (2/23/95, Valdes)
+
+apextract.x
+    For normalization the weights were not forced causing the gain to
+    default to 0.  The change of 12/31/94 also fixed this by setting the
+    gain to 1.  The file was touched but not changed.  (1/27/95, Valdes)
+
+apextract.x
+apskyeval.x
+    Made the query for the readnoise only occur if needed.  Previously
+    the query was made in the sky step even if the sky error estimate
+    was not needed.  (12/31/94, Valdes)
+
+apedit.x
+    Needed to set clobber and review options so they are queried during
+    interactive extraction.  (10/28/94, Valdes)
+
+apimmap.x
+apgetim.x
+apgetdata.x
+apextract.x
+apmw.x
+    1.	If a 3D image is given then a warning is printed and the first plane
+	is used and the other planes are ignored.
+    2.  Various fixes to allow image sections to be used.
+    (10/12/94, Valdes)
+
+aptrace.x
+    An uninitialized memory problem was fixed.  (9/19/94, Valdes/Zarate)
+
+apicset.x
+    Fixed type mismatch in min/max function calls.  (6/13/94, Valdes/Zarate)
+
+apextract.x
+    Changed BANDID name for raw spectrum to "raw".  (5/3/94, Valdes)
+
+apvariance.x
+doc/apvariance.hlp
+doc/apall.hlp
+doc/apsum.hlp
+    The correction to bring the weighted and unweighted total fluxes to the
+    same value (called the bias factor) can produce odd values in special
+    cases; such as slitlets where only part of the image contains real
+    spectrum.  This could result in variance spectra with flux scaling
+    errors to the extreme of a negative (inverted) spectrum.  The bias
+    factor is now logged.  If the two total fluxes differ by more than a
+    factor of 2 a warning (which always appears on the standard output) is
+    given with the fluxes and the bias factor.  If the bias factor is
+    negative a warning is given and the bias factor is ignored.
+    (5/1/94, Valdes)
+
+doc/aptrace.hlp
+    Fixed typo in description of Legendre basis functions.  (4/1/94, Valdes)
+
+apextract.x
+doc/apextract.hlp
+    Added output BANDID keywords to document the various output data.
+    (2/4/94, Valdes)
+
+apnoise.x	+
+apnoise1.par	+
+apnoise.par	+
+apnoise.key	+
+doc/apnoise.hlp	+
+apextract.x
+t_apall.x
+x_apextract.x
+apextract.hd
+apextract.men
+apextract.cl
+mkpkg
+    A new task for computing the noise sigma as a function of data value
+    was added.  This allows checking the noise model parameter and
+    can be used as a diagnostic of the profile modeling.  (8/28/93, Valdes)
+
+apfit.x
+apextract.x
+    There were some additional problems with gain parameter dependencies
+    in the difference, fit, and normalization output functions.
+    (8/27/93, Valdes)
+
+apgetdata.x
+aptrace.x
+apedit.par
+apfind.par
+apfit.par
+apflatten.par
+apmask.par
+apnormalize.par
+aprecenter.par
+apresize.par
+apscatter.par
+apsum.par
+aptrace.par
+apall.par
+apall.hlp
+apedit.hlp
+apfind.hlp
+apflatten.hlp
+apmask.hlp
+apfit.hlp
+apnormalize.hlp
+aprecenter.hlp
+apresize.hlp
+apscatter.hlp
+apsum.hlp
+aptrace.hlp
+    The nsum parameter may be negative to select a median rather than
+    a sum of lines/columns.  The parameter files had to be modified to
+    remove the minimum range limit and the help files modified to
+    document the new option.  (8/10/93, Valdes)
+
+===========
+V2.10.3beta
+===========
+
+doc/apall.hlp
+doc/apsum.hlp
+    The format parameter description was added.  (6/24/93, Valdes)
+
+apfind.x
+apfindnew.x
+    Removed the threshold in peak finding requiring peaks to be above zero.
+    This works with the change to center1d to allow finding of apertures
+    when the data is negative.  (5/5/93, Valdes)
+
+apfit.x
+    Added CCDMEAN=1. to output image in the normalization, flattening routines.
+    (4/16/93, Valdes)
+
+apextract.par
+*.par
+apgetim.x
+    Moved the "dispaxis" parameter to a package paraemter.
+    (3/8/93, Valdes)
+
+approfile.x
+    The profile was not cleared when saturated pixels are found.  This
+    could cause NaNs to get into the data with the result that
+    cvfit could produce garbage.
+    (3/4/93, Valdes)
+
+debug.par
+apparams.par
+apnorm1.par
+apflat1.par
+apfit1.par
+apall1.par
+    1.  Changed the default "fit2d" polynomial parameters to polyorder=10,
+	polysep=0.95.
+    2.  Changed the default "niterate" from 2 to 5.
+    (3/3/93, Valdes)
+
+approfile.x
+doc/approfiles.hlp
+    For the "fit1d" algorithm I doubled the order it uses to fit
+    parallel to the disperison.  The order is still computed based
+    on the tilt of the spectrum and the order used for the tracing
+    but now that number is doubled.  (2/26/93, Valdes)
+
+apscatter.x
+    Revised the algorithm to keep the cross-dispersion fits in memory
+    rather than writing them to disk as an image.  This speeds things
+    up in the case of slow I/O.  (2/23/93, Valdes)
+
+t_apall.x
+apscatter.x
+    1.  The temporary file name was not being passed to apscatter by
+	t_apall resulting in use of the name ".imh" which is hidden.
+    2.  Increased the column buffering size from 512*100 to 500000.
+    (2/5/93, Valdes)
+
+apextract.x
+    imaccf was being used as a boolean when it should be an int.
+    (12/13/92, Valdes)
+
+debug.par
+    A DPAR parameter file for use with debugging.  (1/12/92, Valdes)
+
+apmw.x
+apextract.x
+    Rewrote this to allow extractions of an arbitrary number of apertures.
+    Previously this was limited by MWCS.  The output format is now
+    EQUISPEC. (1/12/92, Valdes)
+
+aprecenter.x
+    This routine was incorrectly selecting the apertures to be used.
+    is_in_range (Memi[ranges], i) --> is_in_range (Memi[ranges], AP_ID(aps[i]))
+    (1/8/93, Valdes and Hill)
+
+doc/apbackground.hlp
+    In responding to a concern about the 'b' key showing a fit even though
+    the background type was "median" I added a paragraph explaining this.
+    (1/8/93, Valdes)
+
+t_apall.x
+    The dispersion smoothing was turned off in noninteractive mode regardless
+    of the task parameter.  This has been fixed.
+    (12/8/92, Valdes)
+
+t_apall.x
+    Added error check for ap_plot.
+    (10/14/92, Valdes)
+
+apextract.x
+    1. When the dispersion axis is 1 the data buffer may contain garbage
+       because of using a malloc and because not all of this buffer is
+       necessarily used.  Later the multiplication by the gain can cause
+       an arithmetic exception.  The mallocs were replaced by callocs.
+    2. Added errchks for the impl[123]r routines.
+    (9/10/92, Valdes)
+
+mkpkg
+apextract.x
+apmw.x		+
+    1. Separated out the MWCS routines into another file.
+    2. Added an apmw_saveim procedure to produce simple 1D format as is done
+       in the ONEDSPEC package.
+    (8/24/92, Valdes)
+
+apskyeval.x
+    When doing the fitted background variable roundoff among machines led
+    to using different background points and, hence, gave noticibly different
+    results.  The background points are now rounded to the nearest 1000th of
+    a pixel which will produce the same background points on all machines.
+    (8/19/92, Valdes)
+
+apnorm1.x
+    Added missing t_nlost parameter.  (8/10/92, Valdes)
+
+aptrace.x
+    There was an incorrect order in checking for failed traces which ends
+    up referencing uninitialized memory.  This bug has been there for a
+    long time (V2.8-V2.10) but only showed up during testing on the
+    SGI port.  (7/31/92, Valdes)
+
+The following set of changes concern the treatment of the background sample
+regions and min/max fitting limits.  There was also a change in ICFIT
+to check the min/max fitting limits and increase them if the sample region
+is extended beyond the initial fitting limits.
+
+--------
+
+apdefault.x
+	Now calls AP_ICSET with the image limits rather than the aperture
+	limits as required by the change to that routine.  (7/30/92, Valdes)
+
+apedit.x
+    1.  The default aperture is reset after a colon command just in case
+        one of the default aperture parameters has changed.  This is
+        slightly inefficient but the alternative is a more complex
+        AP_COLON to determine if a parameter relates to the default
+        aperture.
+    2.  Now calls AP_ICSET after fitting to apply the constraint that the
+        fitting limits pass under the aperture.  (7/30/92, Valdes)
+
+apicset.x
+    1.  The input background limits for a new aperture (called
+	by AP_DEFAULT) are now the maximum limits defined by the image size
+	rather than the minimum limits defined by the aperture.
+    2.  If a null default sample is given it is mapped to "*".
+    3.  A sample with "*" will map to the maximum limits.
+    4.  Allow the input and output pointers to be the same in order
+	for the constraint that the fitting region pass under the
+	aperture can be applied.  (7/30/92, Valdes)
+
+--------
+
+doc/apall.hlp doc/apsum.hlp doc/apbackground.hlp
+    The documentation of the "median" and "minimum" options for the
+    background parameter needed to be added.  (7/14/92, Valdes)
+
+apextract.x
+    The profile array needed to be corrected for the gain.  This makes a
+    difference for the output formats that use the fitted profile
+    (tasks APFLATTEN, APFIT: formats fit, ratio, diff, flat).
+    (7/9/92, Valdes)
+
+apfit1.par
+    Was missing t_nlost.  (7/9/92, Valdes)
+
+apparams.par
+apnorm1.par
+apflat1.par
+apfit1.par
+apall1.par
+    Replace prompt pfiT with pfit as it should be.  (7/9/92, Valdes)
+
+=======
+V2.10.2
+=======
+
+apextract.x
+    The WCS for the 3D images was changed to produce a WCSDIM of 3.
+    (6/30/92, Valdes)
+
+=======
+V2.10.1
+=======
+
+=======
+V2.10.0
+=======
+
+apextract.x
+    1. The axis array which was set by a data statement was actually
+       modified in the routine causing an improper WCS type to be
+       set.
+    2. If no coordinate label and/or units are found they are now set based
+       on DC-FLAG.  Before calibrated long slit spectra ended up with the
+       right wavelength coordinates but a label of Pixel and no units.
+       (5/20/92, Valdes)
+
+apall1.par
+apparams.par
+apfit1.par
+apflat1.par
+apnorm1.par
+    The e_profile prompt contained a new line.  This was removed.
+    (5/18/92, Valdes)
+
+doc/apexv210.ms +
+doc/revisions.v3.ms -
+    Revisions summary document.  (5/11/92, Valdes)
+
+apcolon.x
+apedit.key
+doc/apedit.hlp
+    Added t_nlost to the list of colon commands.  (5/11/92, Valdes)
+
+apgetim.x
+    Added the qp and pl extensions to those stripped.  (5/8/92, Valdes)
+
+apextract.x
+    Added error checking such that if there is a problem with reading the
+    input image WCS and warning is printed and pixel coordinates are set
+    in the output image.  (5/8/92, Valdes)
+
+=====
+V2.10
+=====
+
+apextract.x
+    For a single aperture using MULTISPEC WCS a dummy axis mapping was added
+    to make the image appear to be the first line of a parent 2D image.
+    (4/27/92, Valdes)
+
+approfile.x
+    Added a maximum order for the aphorne fitting function.  (4/24/92, Valdes)
+
+apextract.x
+    Added a error check trap to clean up and free memory in case of an
+    error.  (4/24/92, Valdes)
+
+t_apall.x
+apdb.x
+apedit.x
+apcolon.x
+apfind.x
+apfindnew.x
+apertures.h
+    Made the number of apertures dynamic.  There is no longer a maximum
+    number of apertures allowed.  (3/18/92, Valdes)
+
+t_apall.x
+    Length of format string declared as SZ_FNAME but used as SZ_LINE.
+    Change declaration to SZ_LINE.  (3/12/92, MJF)
+
+apextract.x
+    Now the output extension is added only if the output name is the
+    same as the input name.  Thus, if someone used <image>.ms as an
+    output name they won't get <image>.ms.ms.  (2/12/92, Valdes)
+
+apvariance.x
+apskyeval.x
+approfile.x
+apextract.x
+appars.x
+    Trapped errors from getting the read noise and gain from the image header
+    to produce a meaningful warning message.  (2/10/92, Valdes)
+
+apedit.x
+apfind.x
+t_apall.x
+apids.x
+    1. Added code to ignore negative beam numbers during extraction.
+    2. Negative beam numbers are only generated if an explicit assignment
+       is made in the aperture id table or with 'j'; i.e. beam numbers
+       generated by adding or subtracting will not have a negative beam.
+    (2/10/92, Valdes)
+
+apids.x
+apedit.x
+    Modified to not allow apertures numbers < 1.  (1/22/92, Valdes)
+
+t_apall.x
+x_apextract.x
+    Added new entry point, apslitproc, for the slit processing tasks.
+    (1/15/92, Valdes)
+
+apfind.x
+apall.par
+apfind.par
+    If nfind < 0 then the specified number of evenly spaced apertures are
+    defined.  (1/14/92, Valdes)
+
+apextract.x
+apsum.par
+apnormalize.par
+apflatten.par
+apfit.par
+apall.par
+apparams.par
+apnorm1.par
+apflat1.par
+apfit1.par
+apall1.par
+doc/apsum.hlp
+doc/approfiles.hlp
+doc/apnormalize.hlp
+doc/apflatten.hlp
+doc/apfit.hlp
+doc/apall.hlp
+    1.  Replaced the "maxtilt" criteria for choosing the profile fitting
+    algorithm with an explicit "pfit" parameter.
+    2.  The parameter files were modified to remove "maxtilt", add
+    "pfit", and change the default "polyorder" parameter for the
+    fit2d algorithm from 4 to 6.
+    3.  The "pfit" parameter is redirected from the hidden parameter files
+    to the user parameter files allowing the users to select the profile
+    fitting algorithm.
+    (1/8/92, Valdes)
+
+t_apall.x
+apdb.x
+    1.  Added special strings for the reference parameter.  If the reference
+    parameter is "OLD" then only input images with existing database
+    entries are processed.  If the reference is "NEW" then only input
+    images without existing databse entries are processed.
+    2.  Added a new procedure, ap_dbaccess, to simply check for the presence
+    of a database file.  This is used for the above change.
+    (1/2/92, Valdes)
+
+aptrace.x
+apall.par
+aptrace.par
+apparams.par
+apall1.par
+doc/apall.hlp
+doc/aptrace.hlp
+    A new parameter has been added to set the number of steps which may
+    be lost during tracing.  (9/5/91, Valdes)
+
+apextract.x
+    Changed ap_setdisp to ap_wcs.  This routine uses MWCS and sets the
+    WCS to multispec.  (8/29/91, Valdes)
+
+apextract.x
+    Modified so that profile image is used in place of input image for
+    determining the profile and eliminated the use of a disk profile file.
+    This is inefficient if the same profile image is used for many input
+    images but it is much easier for the user to understand.
+    (8/27/91, Valdes)
+
+apvariance.x
+    The subaperture extraction did not work because of a typo.
+    (8/27/91, Valdes)
+
+apextract.x
+    The profile image capability had several bugs which were fixed.
+    (8/27/91, Valdes)
+
+approfile.x
+    Fixed another division by zero problem in ap_horne.  (8/27/91, Valdes)
+
+approfile.x
+    Failed to clear profile in the case the spectrum was negative.
+    (5/30/91, Valdes)
+
+apertures.h
+    Increased the maximum number of aperture from 100 to 1000.
+    (4/29/91, Valdes)
+
+apdefault.x
+apicset.x
+    The default aperture was setting the background fitting range to
+    the full image range rather than range covered by the sample region.
+    This could cause singular solution errors in some cases.
+    (3/27/91, Valdes)
+
+apfind.x
+    Allowed still finding the specified number if some apertures (up to
+    2) fail for some reason such as too near the edge.  This is done by
+    setting the number of candidates to nfind+2. (3/26/91, Valdes)
+
+aprecenter.x
+doc/aprecenter.hlp
+    When using the shift option the shift is now the median (including
+    averaging of central 2 shifts for even number of peaks) instead of
+    the average.  (3/26/91, Valdes)
+
+appars.x
+apall1.par
+apfit1.par
+apflat1.par
+apnorm1.par
+apparams.par
+    In order to allow writing to redirected parameters rather than overwrite
+    the redirection string a kluge was added using the prompt string.
+    The apput procedures check the prompt string for the first character
+    ">" and if present write to the parameter given in the rest of the
+    string.  All the hidden parameter files with redirected parameters
+    had to be changes.  (3/26/91, Valdes)
+
+apextract.par
+apall.par apall1.par
+apsum.par apdefault.par apparams.par
+apfit.par apfit1.par
+apflatten.par apflatten1.par
+apnormalize.par apnorm1.par
+    1.  Moved format parameter from package parameters to
+	APALL and APSUM.
+    2.  Moved dispaxis parameter from package parameters to APDEFAULT.
+    3.  Added new background types.
+    (3/21/91, Valdes)
+
+t_apall.x
+    Allow scattered light correction to be run by APSCRIPT.
+    (3/21/91, Valdes)
+
+apscatter.x
+    Moved CLIO call for anssmooth out of loop to a single call using a
+    procedure variable.
+    (3/21/91, Valdes)
+
+apextract.x
+apskyeval.x
+    Aded new background functions median and minimum.
+    (3/21/91, Valdes)
+
+=================================
+V3 of APEXTRACT Installed 8/23/90
+=================================
+
+apextract$exsum.x
+    Added a test for the existence of output images before extractions and
+    a query to select whether to clobber spectra or not.  (8/9/89, Valdes)
+
+apextract$exmvsum.x
+apextract$exfit.x
+    1.  The moving average for profile images did not work correctly.  It
+	subtracted the line moving out of the moving average but failed to
+	add in the line moving into the average.  This caused the profile
+	to depart more and more from the data as the extraction procedes
+	through the image.
+    2.  The moving average for profile images actually used naverage + 1
+	instead of naverage becuase in this case the line being extract is
+	also included in the average.
+    3.  The fitting of the model to the data had a funny behavior when the
+	model had negative values and variance weight was used.  The
+	negative values are now excluded from the fitting calculation in
+	this case.  Note that the model is supposed to not contain negative
+	values.  Also note that if variance weighting is not used then the
+	negative values are used in straight least-squares fitting.
+	(8/8/89, Valdes)
+
+apextract$apicset.x
+apextract$apedit.x
+apextract$apupdate.x
+    The region over which the background fitting is defined has been extended
+    to require overlapping the aperture. (7/31/89, Valdes)
+
+apextract$apcolon.x
+    Added gdeactivate/greactivate calls when using EPARAM.  (6/14/89, Valdes)
+
+apextract$apextract.x
+    If reference apertures are used without change (no recenter, edit, or
+    retrace) then the apertures were not written to the database.  This has
+    been changed to write (or query if interactive) the apertures if
+    dbwrite=yes.  (5/19/89, Valdes)
+
+apextract$exio.h
+apextract$exio.x
+apextract$exsum.x
+    1.  The maximum number of simultaneous extractions was increased from
+	20 to 50.
+    2.  The amount of buffering used for column access (dispaxis=1) was
+	increased from 100K pixels to 1M chars.  (5/12/89, Valdes)
+
+apextract$doc/apsum.hlp
+    Added a sentence about the proper alignment of echelle spectra.
+    (5/8/89, Valdes)
+
+apextract$t_apscatter.x +
+apextract$apscatter.par +
+apextract$apscat1.par +
+apextract$apscat2.par +
+apextract$doc/apscatter.hlp +
+apextract$mkpkg
+apextract$x_apextract.x
+apextract$apextract.cl
+apextract$apextract.men
+apextract$apextract.hd
+imred$echelle/apscatter.par +
+imred$echelle/apscat1.par +
+imred$echelle/apscat2.par +
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+    Added a new task, APSCATTER, to fit and subtract scattered light.
+    It includes two hidden psets, APSCAT1 and APSCAT2.  (3/3/89, Valdes)
+
+apextract$apnormalize.par
+imred$echelle/apnormalize.par
+    Input image parameter name needed to be changed from "images" to "input".
+    (2/28/89, Valdes)
+
+apextract$exio.x
+    Added errchk for imgeti related to getting DISPAXIS keyword which
+    might be missing.  (2/28/89, Valdes)
+
+apextract$exsum.x
+    Changed usage of CRPIX keyword to real from integer.  (1/25/89, Valdes)
+
+apextract$apgmark.x
+    The size of the aperture labels now decreases with increasing number
+    of apertures.  (1/24/89, Valdes)
+
+apextract$t_apnorm.x
+apextract$apnormalize.par
+imred$echelle/apnormalize.par
+apextract$doc/apnormalize.hlp
+    Changed parameter names "lowreject" to "low_reject" and "highreject"
+    to "high_reject" to be consistent with other ICFIT tasks.
+    (1/24/89, Valdes)
+
+apextract$aprecenter.x
+    The progress information was not using the verbose parameter.
+    (1/23/89, Valdes)
+
+apextract$apedit.x
+    Fixed bug causing 'i' info to only be visibly momentarily.
+    (12/16/88 Valdes)
+
+apextract$t_apnorm.x
+    When fitting the normalization spectrum interactively any deleted
+    points would be remembered in the following apertures.  Deleted points
+    are now cleared after interactive fitting.  (12/15/88 Valdes)
+
+apextract$apedit.x
+    Fixed a minor bug in the 's' option (center + wx --> wx) (12/15/88 Valdes)
+
+apextract$*.x
+apextract$apio.par
+apextract$doc/apio.hlp
+    Removed the beep option. (12/8/88 Valdes)
+
+apextract$exgmodaps.x
+    The temporary apertures array and number of apertures were not being
+    initialized correctly causing a segmentation violation every time
+    the program was run. Added an n = 0 statement and initialized all the
+    pointers to NULL. (10/13/88 Davis)
+
+apextract$exmvsum.x
+    When cleaning and using a moving average the replacement of the bad pixel
+    in a data profile back in the moving average was in error leading to 
+    bad results and possible memory corruption.  (10/9/88 Valdes)
+
+apextract$exfit.x
+apextract$exmvsum.x
+    1.  The sigma clipping test now uses the variance relation for testing the
+	residuals.
+    2.  A bug was causing the length of the profile image to be incorrectly
+	referenced leading to an out of bounds error.
+
+apextract$apedit.x
+apextract$exapsum.x
+    1.  After doing a ":line" new apertures were defined with the old line
+	as the aperture center.  This made tracing fail.
+	Now after changing the line the default aperture is updated and
+	the apeture center is explicitly set every time.
+    2.  In a rare circumstance a divide by zero error occured for the fitted
+	background.  This is now checked.  (7/19/88 Valdes)
+
+noao$lib/scr/apedit.key
+apextract$apedit.x
+    1.  Deleted a reference to :nfind in the cursor help.
+    2.  After deleting a background defintion it was no longer possible
+	to define a new one.  Now an attempt to define backgrounds
+        after they have been deleted is initialized to the default again.
+        (7/1/88 Valdes)
+
+apextract$exsum.x
+    Fixed a bug in blocking overwriting of existing echelle format spectra.
+    Fixed a minor bug in writing the aperture info to the header of a 1D
+    format sky spectrum.  (6/16/88 Valdes)
+
+apextract$apgmark.x
+    Labels are not written outside of graph range.  (5/20/88 Valdes)
+
+apextract$apedit.x
+apextract$exgraph.x
+noao$lib/scr/apedit.key
+    Added 'I' interrupt.  (4/20/88 Valdes)
+
+apextract$exio.x
+    EX_UNMAP when using column access was free a buffer supplied by
+    IMIO causing a memory corruption error on VMS.  (3/30/88)
+
+apextract$exgmodaps.x
+    Model apertures where not being match up correctly resulting in a
+    warning message.  (3/22/88 Valdes)
+
+apextract$exsum.x
+apextract$exstrip.x
+apextract$exrecen.x
+    Added iferr statements for asifit.  Without this the task crashed
+    when an aperture went off the edge.  (3/10/88 Valdes)
+
+apextract$* Major changes:
+	o Use profile template image
+	o Don't interpolate data profile before cleaning
+	o New background option
+	o Integrate apertures
+	o Restructure code
+	o And much more
+    (3/1/88 Valdes)
+
+==============
+APEXTRACT V2.0
+==============
+
+apextract$excextract.x -
+apextract$exlextract.x -
+    Removed these unused procedures. (1/5/88 Valdes)
+
+apextract$excstrip.x
+apextract$exlstrip.x
+    Free curfit pointer if ic_fit returns an error. (1/5/88 Valdes)
+
+apextract$excsum.x
+apextract$exlsum.x
+    Set background to zero if ic_fit returns an error. (1/5/88 Valdes)
+
+    Original:
+	iferr (call ic_fit (AP_IC(aps[i]), cv, Memr[x],
+	    Memr[bufin], Memr[w], ncols, YES, YES, YES, YES))
+	    ;
+
+    New:
+	iferr {
+	    call ic_fit (AP_IC(aps[i]), cv, Memr[x],
+	        Memr[bufin], Memr[w], ncols, YES, YES, YES, YES)
+	    call ex_apbkg (cv, ncols, center, low, high,
+	        skyout[line,i])
+	} then
+	    skyout[line,i] = 0.
+
+apextract$exapsum.x
+    Added check for no data in sum. (1/5/88 Valdes)
+
+    In procedure ex_apsum:
+	a = max (0.5, center + lower)
+	b = min (npts + 0.5, center + upper)
+
+	if (a >= b) {			<-- ADD
+	    sum = 0.			<-- ADD
+	    return			<-- ADD
+	}
+
+    In procedure ex_apbkg:
+	a = max (0.5, center + lower)
+	b = min (npts + 0.5, center + upper)
+
+	if (a >= b) {			<-- ADD
+	    bkg = 0.			<-- ADD
+	    return			<-- ADD
+	}
+
+apextract$apnormalize.x
+    There was no error checking on ap_dbread which caused misleading errors
+    (apio package not found).  This was fixed by updating the logic to be the
+    same as in apextract.x.  A quick fix for outside sites is to add an
+    errchk for ap_dbread.  (12/18/87 Valdes)
+
+apextract$apedit.x
+apextract$apgscur.x
+    When first entering APEDIT with apertures defined the first attempt to
+    point the cursur at the first aperture uses an indefinite y value since
+    no cursor read has yet taken place.  The choices are to set it to some
+    arbitrary value, some percentage level on screen, or do nothing.  I
+    chose to do nothing.  Thus, the cursor will not point at the current
+    aperture in this case but it will leave the cursor position unchanged.
+    (12/17/87 Valdes)
+
+apextract$apio.par
+apextract$exsum.x
+apextract$exoutsum.x
+apextract$apedit.x
+    Added new parameter "format" to APIO pset.  Added new output formats for
+    echelle and multispectra data consisting of a single 2D image.  Added new
+    information in header.  Old format is called "onedspec".
+
+    Removed debugging print statement.  When it was put in I don't know.
+    (12/17/87 Valdes)
+
+apextract$apextract.x
+    An error was introduced with the change of 11/9/87 such that the error
+    when a database file does not exists was no longer being trapped.  This
+    was intended for reference images but was not intended for creating new
+    database files.  An iferr was added.
+
+apextract$t_apnormalize.x
+apextract$trtrace.x
+apextract$exstrip.x
+apextract$exsum.x
+    ERRCHK declarations for IMGETI were added to detect a missing DISPAXIS.
+    Failing to catch this error caused misleading error messages and
+    other fatal errors. (11/9/87 Valdes)
+
+apextract$apextract.x
+apextract$apdb.x
+    An error reading apertures for a specified reference image is now
+    printed instead of assuming there are no reference apertures.
+    (11/9/87 Valdes)
+
+apextract$exfit.x
+    Changed the variance formula from
+	V = v0 + v1 * abs (S + B)
+    to
+	V = v0 + v1 * max (0, S + B)		if v0 > 0
+	V = v1 * max (1, S + B)			if v0 = 0
+    (11/9/87 Valdes; see also 8/6/87)
+
+apextract$t_apnormalize.x
+    When normalizing more than 20 apertures some of the apertures
+    were being lost in the output image.  This was fixed to only
+    fill between the apertures on the first set of apertures.
+
+    Normalizing when DISPAXIS=1 did not work.  There were a number of
+    errors.  This task was never tested with data in this orientation.
+    (9/22/87 Valdes)
+
+apextract$exfit.x
+apextract$apsum.par
+apextract$apstrip.par
+apextract$doc/apsum.hlp
+apextract$doc/apstrip.hlp
+    When computing the variance for doing variance weighting the
+    intensity could be negative.  An absolute value was added to
+    correct this.
+
+    Make defaults for naverage=100 and nclean=2 because people have
+    been using inadequate number of lines for low signal-to-noise
+    data and because of interpolation even an 1 pixel cosmic ray
+    expands to two pixels.  (8/6/87 Valdes)
+
+====
+V2.5
+====
+
+apextract$apio.par
+apextract$apio.x
+apextract$t_apnormalize.x
+apextract$exsum.x
+apextract$exstrip.x
+apextract$apfindnew.x
+apextract$apfind.x
+apextract$apextract.x
+apextract$apedit.x
+apextract$trtrace.x
+apextract$trltrace.x
+apextract$trctrace.x
+apextract$exgraph.x
+apextract$doc/apio.hlp
+    Valdes, May 19, 1987
+    1.  Added the parameter "verbose" to the APIO pset to allow turning off
+	log information to the terminal.
+    2.  Made changes to minimize switching between text and graphics mode.
+	With verbose=no there should be essentially no mode switching.  This
+	was done for terminals in which such switches is either annoying
+	or slow.
+
+apextract$mkpkg
+apextract$apcvset.x
+apextract$t_apnormalize.x
+apextract$trtrace.x
+apextract$exsum.x
+apextract$exstrip.x
+apextract$apgetdata.x
+apextract$apimmap.x +
+    Valdes, April 24, 1987
+    1.  Protection against using an image which is not 2 dimensional was added.
+
+apextract$apedit.x
+apextract$apextract.x
+apextract$apsum.par
+apextract$exapsum.x
+apextract$excsum.x
+apextract$exgprofs.x
+apextract$exlsum.x
+apextract$exoutsum.x
+apextract$exsum.x
+apextract$doc/apsum.hlp
+    Valdes, April 11, 1987
+    1.  Added additional option to APSUM to output the subtracted sky
+	background spectra when doing background subtraction.
+
+apextract$apextract.hd
+apextract$apextract.men
+apextract$apextract.par
+apextract$apgetim.x
+apextract$apnormalize.par
+apextract$mkpkg
+apextract$t_apnormalize.x +
+apextract$x_apextract.x
+apextract$doc/apnormalize.hlp +
+    Valdes, April 3, 1987
+    1.  New task APNORMALIZE installed.
+
+apextract$*x
+    Valdes, February 17, 1987
+    1.  Required GIO changes.
+
+apextract$apio.h
+apextract$exgraph.x
+apextract$apio.x
+apextract$excextract.x
+apextract$apextract.tar
+apextract$trltrace.x
+apextract$trctrace.x
+apextract$exlextract.x
+apextract$applot.x
+apextract$apedit.x
+    Valdes, February 13, 1987
+    1.	I've made a number of modifications to the APEXTRACT package to
+	correct problems in the way graphics and text are mixed.  The
+	main change was to make the graphics open very local to the
+	procedure doing the graphics.  Previously the graphics device
+	was opened at the beginning of the logical task and remained
+	open until the end.  This was done since the integrated nature
+	of the package has many procedures which may do graphics.  This
+	has the bad side effects that for the first graphics open of
+	the process the terminal enters graphics mode (graphics screen
+	on SUN and clear screen on VT640) well before any graphics is
+	performed and text I/O is a problem.  Putting GOPEN and GCLOSE
+	immediately around the code that does graphics fixed almost all
+	the problems.  The only time that text output is now done when
+	the graphics terminal is open is for '?' and ':show' type of
+	commands.  The only remaining problem is the page wait problem
+	associated with '?' occuring before a cursor read rather than
+	immediately after the text output causing the last written
+	status line to become confused with the page wait prompt.
+
+apextract$apfind.par
+    Valdes, February 12, 1987
+    1.  The parameter apfind.nfind was changed back to hidden in order
+	for apsum to work in the background.  Note the PSET mechanism
+	would fix this by allowing nfind to be specified on the command
+	line.
+
+apextract$apio.par
+    Valdes, February 9, 1987
+    1.  New users rarely look at or know about the log files produced by
+	the package tasks.  These files (particularly graphics) take up
+	a lot of space.  Therefore the default is now not to log
+	text or graphics output.
+
+apextract$apedit.x
+apextract$apsort.x
+apextract$exapsum.x
+apextract$trltrace.x
+apextract$trctrace.x
+apextract$doc/apedit.hlp
+noao$lib/scr/apedit.key
+    Valdes, February 2, 1987
+    1.  Added a new edit option, 'o', to reorder the aperture id and beam
+	numbers sequentially.  This is useful after apertures have been
+	deleted and added interactively.
+    2.  If the aperture went completely off the image (ie there is no
+	overlap of even part of the aperture with the image) a random value
+	was given the aperture sum because the value was not intialize to
+	zero.  It is now initialize to zero.
+    3.  There is now a requirement that more than three points be traced
+	before a trace will be fit.
+
+apextract$trltrace.x
+apextract$trctrace.x
+apextract$apgetdata.x
+    Valdes, January 30, 1987
+    1.  The middle line (default) was not calculated correctly.  
+    2.  The tracing would sometimes run beyond the end of the image.  The
+	value of this traced point is suspect.  It was found because there
+	would be a point off the end of the ICFIT graph which was set to
+	be the size of the image.
+    3.  Just in case a traced point is right at the edge I made the default
+	window for fitting the trace extend half a step beyond the edges
+	of the image.
+
+apextract$exsum.x
+apextract$exstrip.x
+    Valdes, January 30, 1987
+    1.  Skip Schaller (Steward) reported a problem with running out of memory
+	with an input list of 20 images.  Also when the user deleted input
+	images after they were processed but before the list was finished
+	(to reduce memory) the memory was not actually freed until the process
+	actually finished.  I found that the input images
+	where not being closed! (Sorry about this really stupid error.)
+	This may not be all the problem but it is probable since IMIO
+	maintains large buffers.
+
+apextract$apcolon.x
+    Valdes, January 15, 1987
+    1.  Replaced dictionary string and numeric case by macros for readability.
+
+apextract$apfind.par
+    Valdes, December 19, 1986
+    1.  Change the default NFIND parameter in APFIND to auto mode.
+
+apextract$apnearest.x
+    Valdes, December 12, 1986
+    1.  It is possible for more than one aperture to be equidistant from
+	the cursor, particularly when more than one aperture is defined for
+	the same feature.  This is ambiguous for those commands which operate on
+	the nearest aperture.  The modification will query the user if it
+	is found that there is more than one aperture at the same distance
+	from the cursor.
+
+apextract$peaks.x
+    Valdes, October 10, 1986
+    1.  VMS adjustable array dimension error found.  Replaced declaration
+	dimension by ARB since the passed dimension value may be zero.
+
+apextract$*
+    Valdes, September 16, 1986
+    1.  A new version of the package has been installed.  It is very
+	different from the old version.  The user parameter files must
+	be unlearned.
+
+====================
+New Package Released
+====================
+
+apextract$: Valdes, July 19, 1986
+    1.  APEDIT and TRACE modified to include a detection threshold parameter
+	for profile centering.
+    2.  The help pages were updated.
+
+apextract$apedit.x, apvalue.x: Valdes, July 17, 1986
+    1.  A bug was found that appears if you edit the apertures of a
+	previously traced image.  The center moves with use of 'l' or
+	'u'.  This is due to an inconsistency between whether the aperture
+	center is before or after the traced shift is added.  Changes
+	to APVALUE.X and the calls to it in APEDIT.X fix this.
+
+apextract$: Valdes, July 15, 1986
+    1.  TRACE had a bug when trying to specify an explicit starting
+	line to edit and trace from.  This was fixed.
+    2.  EXCEXTRACT.X, EXLEXTRACT.X, and EXGPROFS.X were modified to
+	check for errors from background fitting.  This arose when
+	trying to get the background for a spectrum which has gone
+	off the edge of the image.
+
+apextract$apedit.x, apsort.x : Valdes, July 9, 1986
+    1.  When changing the aperture number the apertures are sorted and
+	then the wrong aperture could become the current aperture if
+	another aperture exists with the same aperture number.  This was
+	fixed so that the sorting returns the correct current aperture
+	after sorting.  Also apindex.x is no longer needed.
+
+apextract$apedit.x: Valdes, July 7, 1986
+    1.  The 'd' delete key now does nothing if no apertures are defined.
+	Previously it would cause a failure of the task.
+
+apextract$apedit.x:  Valdes, July 7, 1986
+    1.  Added redraw and window commands.
+    2.  Help page and '?' menu updated.
+
+apextract$apedit.x:  Valdes, July 3, 1986
+    1.  APEDIT modified to use new ICFIT package.
+
+apextract$apgetim.x:  Valdes, July 1, 1986
+    1.  New procedure to strip the image extension.  This is necessary
+	to create proper database files and to avoid having two legal
+	names for images in the database.
+
+apextract$exapstrip.x:  Valdes, July 1, 1986
+    1.  Simple strip extraction without profile modeling interpolated
+	the data so that the lower edge of the aperture was centered
+	on the first pixel.  This is inconsistent with the other extractions
+	which put the center of the aperture at the center of a pixel.
+	This has been fixed.
+
+apextract:  Valdes, June 30, 1986:
+    1.  TRACE was not correctly initializing the new ICFIT package.
+	In particular the task parameters "function" and "order" had no
+	effect and when multiple files were used the last set parameters
+	were not retained.  Changes to t_trace.x, trctrace.x, trltrace.x.
+
+=====================================
+STScI Pre-release and SUN 2.3 Release
+=====================================
+
+apextract:  Valdes, June 20, 1986:
+    1.  New APEXTRACT installed.  This version includes background
+	subtraction and new ICFIT.
+
+apextract:  Valdes, June 2, 1986
+    1.  Another round of name changes.  EDITAPS -> APEDIT,
+	EXTRACT1 -> SUMEXTRACT, EXTRACT2 -> STRIPEXTRACT.
+
+apextract:  Valdes, May 16, 1986
+    1.  Renamed APDEFINE to EDITAPS.
+    2.  Moved parameters used in editing the apertures from EXTRACT1 and
+	EXTRACT2.  These are now obtained from EDITAPS regardless of which
+	task calls apedit.
+    3.  Added parameters "cradius", "cwidth", "ctype", "lower", and "upper"
+	to EDITAPS.  The first parameters control profile centering and the
+	last parameters set the default aperture limits.
+    1.  Added new keys.  'c' center current aperture of profile near the cursor.
+	'm' mark and center aperture on profile near the cursor.  's' shift
+	the center of the current aperture to the cursor position.  The change
+	allows centering of profiles using CENTER1D.
+
+apextract$extract.x:  Valdes, May 13, 1986
+    1.  EXTRACT has been broken up into two tasks; EXTRACT1 and EXTRACT2.
+	EXTRACT1 extracts weighted summed 1D spectra.  EXTRACT2 extracts
+	2D apertures corrected for shifts across the dispersion.
+
+apextract:  Valdes, April 23, 1986
+    1.  Modified EXTRACT to only warn about an existing output image.
+	This allows adding a new aperture without needing to delete
+	old apertures or reextract previous extractions.
+
+apextract:  Valdes, April 21, 1986
+    1.  All procedures which pass the number of current apertures as an
+	argument and then dimension the array with this number
+	were modified by dimensioning the array as dimension
+	APS_MAXAPS or ARB.  This was done because the number of apertures
+	might be zero.  This is a fatal error on VMS/VAX though not on UNIX/VAX.
+
+apextract:  Valdes, March 27, 1986
+    1.  Modified EXTRACT (exsum.x and exwt.x) to update the dispersion image
+	header parameters.  In particular if the input dispersion axis is 2
+	then the header parameters must be reset to dispersion axis 1.
+
+===========
+Release 2.2
+===========
+.endhelp

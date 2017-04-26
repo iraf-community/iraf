@@ -1,0 +1,5 @@
+This subdirectory contains test data for the installer/maintainer of
+the apphot package. The files beginning with fits contain test images
+of both real and artificial data. There are also some coordinate files
+supplied for these images. Eventually there will be some apphot demos
+which can be run to automatically test new releases of the software etc.

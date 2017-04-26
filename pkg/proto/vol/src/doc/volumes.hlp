@@ -1,0 +1,56 @@
+.help volumes Jan89 "Volumes Package"
+
+***** NOTE:  This is just a suggested package organization and will
+*****        definitely NOT be the final one chosen.
+
+.ce
+Volume or 3d Image Applications in IRAF
+.ce
+January 1989
+
+.sh
+Introduction
+
+The Volumes package collects tasks related to manipulating and displaying
+volume images (3d images, or datacubes).  Although all IRAF images can be
+multidimensional (currently up to 7 dimensions), not all applications tasks
+are equipped to handle images of dimension greater than 2.  Examples of
+tasks that are so equipped are IMARITH, IMSTATISTICS, BLKAVG, and DISPLAY
+for looking at arbitrary 2d sections of higher dimensional images.
+
+Volumes applications include tasks for manipulating the orientation of
+a 3d image, joining 3d images, projections of datacube contents
+onto 2d images, and tasks related to viewing a datacube or its projections
+as a movie.
+
+.ih
+Datacube Manipulation Tasks
+
+D3TRANSPOSE	3d transpose, any axis to any other axis
+IMJOIN		join 2 or more 3d images together along specified axis
+IMCOPY
+BLKAVG
+IMSLICE
+
+.ih
+Datacube Generation Tasks
+
+BINTOIM		[not in VOLUMES; probably still PROTO after upgrade to 3d?]
+POINTOIM	convert n-dimensional point data into volumes in datacube
+MANDEL4		4d Mandelbrot set generator
+
+.ih
+Volume Projection Tasks
+
+PVOL		project volume contents onto series of 2d images
+SLICEVOL*	"cubetool" -- slice off faces of datacube rendered from
+		    arbitrary angle w/translucency
+
+.ih
+Movie-Related Tasks
+
+IMTOSUN		convert datacube or list of 2d images into Sun rasterfiles
+IMTOVID		(script) record set of 2d images onto panasonic video recorder
+CUBETOVID	(script) record sliced from databube onto video recorder
+
+* = [not yet implemented] 

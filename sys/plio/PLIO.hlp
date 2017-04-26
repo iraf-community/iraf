@@ -1,0 +1,1341 @@
+.help PLIO Feb88 "Pixel List Package Design"
+.ce
+\fBThe IRAF Pixel List Package\fR
+.ce
+and
+.ce
+\fBIMIO Extensions to Support Image Masks\fR
+.ce
+Doug Tody
+.ce
+February, 1988
+.ce
+(Revised June 1988)
+
+
+.NH
+Introduction
+
+    The pixel list package is a general package for flagging individual pixels
+or regions of an image, to mark some subset of the pixels in an image.
+This may be done to flag bad pixels, or to identify those regions of an image
+to be processed by some applications program.  When the pixel list package is
+used to flag the bad pixels in an image we call this a \fBbad pixel mask\fR,
+or BPM.  When used to identify the regions of an image to be processed (or
+ignored), we call the list a \fBregion mask\fR.
+
+A pixel list may be viewed conceptually as either a list or an image; the list
+is merely the compressed form of a virtual \fBmask image\fR.  Storing a mask
+image as a list has two major advantages.
+.ls
+.ls [1]
+Storage efficiency.  Simple masks may be stored very compactly, e.g., as small
+arrays stored directly in an image header, or in a separate mask file or
+database.
+.le
+.ls [2]
+Runtime efficiency.  Storing a mask in list form has the advantage that one
+can determine very quickly whether or not a given region of the image (e.g.,
+an image line) contains any pixels in the mask.  The alternative, given a
+fully populated mask image (or flagging the pixels directly in the data image),
+requires that one examine every pixel in the mask image, which is very
+inefficient for simple masks.
+.le
+.le
+
+The pixel list technique for implementing image masks is the most efficient
+choice only for simple or moderately complex masks.  As a mask image increases
+in complexity there eventually comes a point where it would be simpler and
+more efficient to use a conventional raster image to store the mask.
+For example, if one wishes to associate a flag value (such as a weight) with
+every pixel in an image, and the flag values vary rapidly in value across the
+image, a separate image should probably be used (except that other forms of
+data compression may be possible; the IRAF \fInoise function package\fR
+addresses one aspect of this problem).
+
+The pixel list related software is subdivided into two parts, the pixel list
+package itself, and the extensions to IMIO to make use of the pixel list
+package.  The pixel list package in itself is independent of IMIO and may be
+used separately.
+
+.NH
+IMIO Support for Pixel Lists
+
+    Most image applications tend to fall into two classes, the simple pointwise
+transformation operators, and the more cpu intensive image analysis operations.
+The simple operators usually operate upon the whole image (no mask required)
+and may ignore the presence of bad pixels in the image, provided reasonable
+artificial values have been provided for the bad pixels so that arithmetic
+problems do not occur, and provided we keep track of the locations of the
+bad pixels (by propagating the bad pixel lists), so that the bad pixel
+information is available to subsequent image analysis programs.
+
+The image analysis operators, on the other hand, must know the locations of
+the bad pixels in order to exclude them from the fit.  The analysis is also
+often performed only upon specified regions of the image, as indicated by some
+sort of image mask.  Most image analysis algorithms are fairly cpu intensive,
+hence as long as we can access the bad pixel list and region mask reasonably
+efficiently, we would prefer a simple interface, e.g., for every buffer of
+input image data read, an associated buffer the same size and dimensionality
+as the input image data buffer, containing the bad pixel or region mask flag
+values.
+
+In general, if pixel lists are to be used with images, either IMIO must
+provide direct support for pixel lists or the pixel list package must duplicate
+much of the functionality of IMIO.  This is because the pixel list must
+be defined in terms of the physical image, whereas an applications
+program accessing an image via IMIO may be operating upon some user specified
+section of the image.  To support applications transparent sectioning, boundary
+extension, multiple input buffers, and so on, support for pixel lists must
+be integrated into IMIO.
+
+.NH 2
+Mask Images
+
+    These considerations lead us to make it possible for a pixel list to appear
+to an application as a special type of image called a \fImask image\fR, even
+though the mask may be stored as a pixel list internally, and accessed or
+queried directly as a list if desired.  If whenever we read a block of data
+from the data image, we read an equivalent block of data from the mask image,
+it is evident that whatever we come up with for reading from the mask image is
+going to have to look an awful lot like IMIO.  Given the complexities of image
+section transformations, automatic buffer allocation strategies, and so on,
+the simplest solution is to just go ahead and use IMIO to access the virtual
+mask image.  This leads us to the interface shown in the figure below.
+These routines represent an extension to IMIO to support pixel lists.  The
+conventional IMIO routines, used to access the mask "pixels", are not shown.
+
+The mask image may be opened by name with \fIim_pmmap\fR, or an already opened
+pixel mask, perhaps the result of some computation done by the applications
+program, may be opened with \fIim_pmmapo\fR.  Alternatively, if the mask is
+stored (or will be stored in the case of a new mask) in a pixel list file
+(".pl" extension), the mask may be opened with a conventional \fIimmap\fR call.
+This last option is especially powerful, since it allows all image tasks to
+access masks as if they were conventional images, e.g., one can DISPLAY or
+IMCOPY a stored mask.
+
+.ks
+.nf
+		  im = im_pmmap (maskname, mode, ref_im|NULL)
+		 im = im_pmmapo (pm, ref_im)
+
+		         imseti (im, IM_RLIO, YES|NO)
+		         imseti (im, IM_PMDES, pm)
+		   pm = imstati (im, IM_PMDES)
+
+	   bool = im_pmlne[123] (im[, lineno[, bandno]])
+	   bool = im_pmsne[123] (im, x1, x2[, y1, y2[, z1, z2]])
+	       bool = im_pmlnev (im, v)
+	       bool = im_pmsnev (im, vs, ve, ndim)
+.fi
+.ke
+
+The \fImode\fR argument to \fIim_pmmap\fR  specifies both the access mode for
+the mask, and any standard transformations to be performed upon the mask before
+i/o takes place (if an existing mask is to be read).  NEW_FILE mode is used to
+create a new mask; READ_ONLY to read an existing mask, and READ_WRITE to modify
+an existing mask.  The mode-transformation flags currently supported are
+INVERT_MASK, which performs a PIX_NOT operation on the input mask, and
+BOOLEAN_MASK, which converts an integer input mask to boolean.  Any more
+complex mask transformations or combinations must be performed explicitly
+by the calling program via calls to the PMIO or PLIO routines, mapping the
+resultant mask onto an image descriptor with \fIim_pmmapo\fR.
+
+If a reference image \fIref_im\fR is specified at open time,
+then the mask image will inherit any image section, boundary extension, etc.
+in effect for the reference image.  Inheritance occurs when the first i/o
+to the mask image takes place.  The reserved names "BPM" and "EMPTY",
+respectively (must be upper case), denote the bad pixel mask
+for the reference image, or an empty mask the size of the reference image.
+If the reference image does not have a bad pixel mask, BPM and EMPTY are
+equivalent.  Note that separate image descriptors are used for the data
+(reference) image and any mask images.  Multiple mask images may be associated
+with the same reference image.
+
+Normal IMIO calls, e.g., \fIimgs2i\fR, are used to access the mask "pixels".
+Since it is common for a mask to be empty over large regions of an image,
+a set of boolean functions are provided for testing whether regions of the
+mask are nonempty, allowing a program to avoid the expense of image mask i/o
+and subseqent testing of the mask pixel values if not needed.
+The boolean functions \fIim_pmlne\fR (line not empty) and \fIim_pmsne\fR
+(section not empty) and their more general variants \fIim_pmlnev\fR and
+\fIim_pmsnev\fR test whether the specified region of the mask image contains
+any nonzero mask pixels.  The calling sequences of these routines are patterned
+after the corresponding IMIO pixel i/o routines, e.g., \fIim_pmlne2\fR is
+intended for use with the \fIimgl2\fR routines, and \fIim_pmlnev\fR is
+intended for use with the \fIimgnl\fR routines.
+
+By default, mask image i/o operates on data buffers containing arrays of
+pixels, as for a conventional data image.  When i/o takes place, the interface
+automatically converts between pixel format and the compressed line list format
+in which the mask is stored internally.  An alternative format for the mask
+data is \fBrange list\fR format, enabled by setting the \fIIM_RLIO\fR parameter
+to YES in an \fIimseti\fR call.  Range list i/o works identically to pixel i/o,
+except that the "pixel arrays" returned by IMIO (or input to IMIO) are range
+list structures, as defined in \fB<plset.h>\fR and discussed in section 3.3.4.
+
+Range list i/o at the IMIO level is fully general, i.e., the section
+transformation, if any, is applied transparently to the calling program,
+and the full range of IMIO i/o routines may be used.
+If the data buffer is a multidimensional subraster, each line of the subraster
+will be a separate range list, and the physical length in pixels of each line
+of the subraster will be as for a pixel subraster.
+On a read, if the length of the encoded range list exceeds the subraster
+line length in pixels, and i/o error will occur.  Such an i/o error cannot
+occur when i/o is restricted to lines or line segments (1D buffers),
+since IMIO will automatically allocate a data buffer large enough to hold
+the worst case (longest) range list.  Range list overflow errors are
+unlikely even for subrasters, however, since the range list format is
+normally much more compact than the equivalent pixel array (except for
+very small subrasters or very complex masks).
+
+.NH 2
+Masked Image I/O (MIO)
+
+    The mask image i/o routines discussed in the previous section provide a
+fully generalized means for directly accessing a mask as an separate entity,
+independent of the associated reference data image.  Two separate image
+descriptors are required, and two parallel but separate sets of calls to the
+IMIO routines.  In many applications, however, a mask is used only to specify
+those regions of the data image to be analyzed or processed.  We want to
+access those regions of the image visible through the mask, but are not
+otherwise interested in the mask itself.  The \fBmasked image i/o\fR (MIO)
+interface is designed for such applications.
+
+The MIO interface is summarized in the figure below.  A named mask may be
+opened on a previously opened image with the \fImio_open\fR procedure.
+As for \fIim_pmopen\fR, the reserved names "BPM" and "EMPTY", respectively,
+denote the bad pixel mask for the image, or an empty mask the size of the
+image.  If the image does not have a bad pixel mask, an empty mask will be
+opened.
+
+The \fIflags\fR argument, if nonzero, specifies an operation be performed
+upon the input mask to generate the mask to be used to access the data image.
+The currently supported flags are INVERT_MASK and BOOLEAN_MASK.  For example,
+when the mask is a bad pixel mask, INVERT_MASK would cause MIO to access only
+that portion of the image which is \fInot\fR covered by the bad pixel mask,
+i.e., the "good" region of the image.  BOOLEAN_MASK is used to convert an
+integer mask into a boolean mask.  Note that in the case of inversion of an
+integer mask, the PIX_NOT operation merely complements the mask pixel values,
+hence will not affect the \fIregion\fR covered by the mask.  To invert an
+integer mask in the region sense, use INVERT_MASK+BOOLEAN_MASK.
+
+.ks
+.nf
+		  mp = mio_open (maskname, flags, im)
+		 mp = mio_openo (pm, im)
+	      value = mio_stati (mp, param)
+		       mio_seti (mp, param, value)
+		   mio_setrange (mp, vs, ve, ndim)
+   n|EOF = mio_[gp]lseg[silrdx] (mp, ptr, mval, v, npix)
+		      mio_close (mp)
+.fi
+.ke
+
+More general mask transformations must be carried out by the user using the
+PMIO package to directly compute the desired mask, the mapping the mask onto
+an image descriptor with \fImio_openo\fR.  For example, given as input a bad
+pixel mask and a region mask, one could compute the mask specifying all pixels
+in the region mask but not in the bad pixel mask.  Any general mask may be
+computed in this way.
+
+An MIO application will not normally need to access the mask directly, but
+if such access is required the mask descriptor may be obtained with a call
+to \fImio_stati\fR to fetch the value of the parameter \fIP_PMDES\fR.
+Similarly, the image descriptor may be queried as parameter \fIP_IMDES\fR,
+and either parameter may be set with the corresponding call to \fImio_seti\fR.
+
+Successive calls to a get or put line segment procedure, e.g.,
+\fImio_glsegr\fR (get line segment real), return line segments from the data
+image until all the data present in the area outlined by the mask has been
+accessed, at which time EOF is returned as the function value.
+Each line segment is returned along with a vector \fIv\fR specifying the
+line of the image from which the segment is taken and the index of the first
+pixel of the current line segment within the line, a count \fInpix\fR of the
+number of pixels in the line segment, and the mask value \fImval\fR for the
+current line segment (e.g., 1 for a boolean mask).  Each line segment
+corresponds to a region of constant nonzero value (\fImval\fR) in the mask.
+Line segments are returned sequentially in storage order.
+
+By default, the entire region of the image visible through the mask will be
+accessed.  To access only a portion of the image, the \fIimio_setrange\fR
+procedure may be called before performing any i/o to specify the starting and
+ending vector coordinates \fIvs\fR and \fIve\fR of the region to be accessed.
+Multiple calls may be made on the same MIO descriptor to access multiple
+regions of the data image, or to "rewind" a given region of the image.
+
+.NH 2
+Mask Image Storage
+
+    As we shall see in the discussion of the pixel list package, the pixel
+list package is designed to permit a list to be stored anywhere, e.g.,
+in a binary file, in a database, as an array in an image header,
+or merely as a temporary array in memory.  When the new image structures
+become available storing the masks in the image header or in a global database
+will probably be the best approach, but in the meantime the simplest solution
+is to store each pixel list or mask in a small binary file.  This approach has
+the advantage of being independent of the particular image format used (none
+of which are currently capable of storing the pixel list directly in any case).
+
+If desired, the name of the mask file may be stored in the image header
+as a simple string valued parameter.  Alternatively, the mask name may be
+input as a parameter when a task is run.  A single mask may be associated
+with several images, or several masks may be used with the same image.
+The approach to be followed for a particular program is up to the programmer
+or package designer.
+
+The bad pixel mask is a special case, since it has a well defined logical
+meaning for an image, unlike the region masks which are application specific.
+The most straightforward approach is to use a single boolean mask for the
+bad pixel list, using the optional header keyword \fIBPM\fR to store the
+mask name, which should normally be the image name plus the pixel list file
+extension "\fI.pl\fR".  An integer BPM could also be used, but most applications
+would treat it as a boolean mask, treating any pixel with a nonzero value as
+a bad pixel.
+
+Any additional information required to describe the bad pixels is application
+specific, and may be stored in any of several ways, e.g., as a set of boolean
+masks, in an integer mask, using flag bits or reserved values to describe each
+pixel or region, in a separate fully populated weight image, or using the noise
+function package.  Most IRAF applications will probably use the BPM plus a
+noise function, with the noise function being stored either as
+a one-dimensional noise model or as a separate uncertainty image, transparently
+to the application.  The combination of a one-dimensional noise model plus a
+compressed bad pixel list should provide an efficient and flexible solution
+to the pixel variance problem for most applications.
+
+.NH 2
+Example
+
+    Open a data image and the associated mask image, and sum the pixels within
+the area indicated by the mask.
+
+.nf
+    include <pmset.h>
+
+    task    sum = t_sum
+.fi
+
+.tp 6
+.nf
+    # SUM -- Sum the image pixels lying within the given mask.
+
+    procedure t_sum()
+
+    char    image[SZ_FNAME]              # input data image
+    char    mask[SZ_FNAME]               # image mask
+
+    int     npix, mval, totpix, m_flags
+    long    v[PM_MAXDIM]
+    pointer im, mp, pp
+    real    sum
+
+    bool    clgetb()
+    real    asumr()
+    int     mio_glsegr()
+    pointer immap(), mio_open()
+
+    begin
+	    call clgstr ("image", image, SZ_FNAME)
+	    call clgstr ("mask", mask, SZ_FNAME)
+	    m_flags = 0
+	    if (clgetb ("invert"))
+		m_flags = INVERT_MASK
+
+	    im = immap (image, READ_ONLY, 0)
+	    mp = mio_open (mask, m_flags, im)
+
+	    sum = 0;  totpix = 0
+	    while (mio_glsegr (mp, pp, mval, v, npix) != EOF) {
+		sum = sum + asumr (Memr[pp], npix)
+		totpix = totpix + npix
+	    }
+
+	    call mio_close (mp)
+	    call imunmap (im)
+
+	    call printf ("%d pixels, sum=%g, mean=%g\n")
+		call pargi (totpix)
+		call pargr (sum)
+		if (totpix > 0)
+		    call pargr (sum / totpix)
+		else
+		    call pargr (INDEF)
+    end
+.fi
+
+A more complex application might use the spatial information provided by
+\fIv\fR and \fInpix\fR, or the flag values provided by \fImval\fR (for an
+integer mask).  For example, a surface fitting routine would accumulate each
+line segment into a least squares matrix, using the coordinate information
+provided as well as the pixel values.
+
+.NH 2
+The Pixel Mask Package (PMIO)
+
+    We have thus far discussed two quite different interfaces, i.e., the use
+of IMIO to do pixel i/o to a mask mapped as a virtual mask image, and the MIO
+interface, used to access the portion of a data image visible through a mask.
+The next step is to define the interface used to access the mask object
+directly as a \fImask\fR, independently of the use of masks for image i/o.
+
+.nf
+	    pm = pm_newmask (ref_im, depth)
+
+	       pm = pm_open (bufptr|NULL)
+	     pm = pm_create (naxes, axlen, depth)
+	    pm = pm_newcopy (pm)
+		   pm_close (pm)
+
+		pm_[sg]size (pm, naxes, alxen, depth)
+		    pm_seti (pm, param, value)
+	   value = pm_stati (pm, param)
+		   pm_debug (pm, outfd, maxcol, flags)
+	    bool = pm_empty (pm)
+		pm_compress (pm)
+		   pm_clear (pm)
+
+		    pm_load (pm, bufptr)
+	   nwords = pm_save (pm, bufptr, buflen)
+		   pm_loadf (pm, fname, title, maxch)
+		   pm_savef (pm, fname, title, save_flags)
+	   pm_[load|save]im (pm, imname[, save_flags])
+
+	    ptr = pm_access (pm, v)
+     bool = pm_linenotempty (pm, v)
+     bool = pm_sectnotempty (pm, vs, ve, ndim)
+	  pm[gp]l[lrp][sil] (pm, v, buf, b_depth, npix, rop)
+
+	  pm_[set|get]plane (pm, v)
+		   pm_point (pm, x, y, rop)
+		  pm_circle (pm, x, y, r, rop)
+		     pm_box (pm, x1,y1, x2,y2, rop)
+		    pm_line (pm, x1,y1, x2,y2, width, rop)
+		 pm_polygon (pm, x, y, npts, rop)
+
+		     pm_rop (pm_src, vs, pm_dst, vs, vn, rop)
+		 pm_stencil (pm_src, vs, pm_dst, vs, pm_stl, vs, vn, rop)
+.fi
+
+There are two variants on this lowest level interface, known as PMIO (pixel
+mask i/o) and PLIO (pixel list i/o).  These two interfaces are equivalent
+with one difference: PMIO can accept a reference image and inherit the section
+transformation of the reference image, allowing the mask to be accessed in
+the coordinate system of the reference image, while PLIO is a stand alone
+interface, implemented independently of IMIO without any ties to IMIO.
+PMIO is implemented as a thin layer upon PLIO, with ties to IMIO to access
+the section transformation for the reference image.
+
+The PMIO interface is shown in the figure above.
+With the exception of the additional routine \fIpm_newmask\fR, used to create
+a new, empty mask the same size as a reference image, the PMIO routines are
+identical to the corresponding PLIO routines except for the \fIpm\fR package
+prefix, and the implied section transformation.  Indeed, if no reference image
+is specified or if the section transformation is unitary (the reference image
+was opened without an image section), the two interfaces are identical.
+Hence the discussion of PLIO in the next section will serve to document PMIO
+as well.
+
+To use PMIO, merely include \fB<pmset.h>\fR rather than \fI<plset.h>\fR,
+and set the reference image with a call to \fIpm_seti\fR, e.g.,
+
+	call pm_seti (pm, P_REFIM, ref_im)
+
+This step can be skipped if \fIpm_newmask\fR or \fIpm_newcopy\fR is used to
+create a new mask, as the reference image will be inherited by the new mask.
+
+Programs which use PMIO to access a mask may also use the low level line,
+range, and pixel list routines discussed in section 3.1 (\fBpl_rangerop\fR etc.)
+on lists returned by PMIO, since PMIO will have already transformed the data
+into the coordinate system of the reference image.
+
+In general, the PMIO interface should be used in preference to PLIO whenever
+the mask to be accessed is logically associated with some data image or images.
+The region description and logical region processing capabilities of PLIO are
+very powerful in their own right, however, and PLIO should be used directly by
+applications which do not consider the mask to be merely an overlay for a data
+image.  An example would be any application which operates upon a 2-dimensional
+data structure other than an image (e.g., region filtering in the POE image
+kernel).
+
+.NH
+The Pixel List Package (PLIO)
+
+    A pixel list is a way of representing an N-dimensional image matrix which
+is well suited for applications where the represented image is sparse, or
+consists of a moderate number of arbitrarily shaped regions.  Routines are
+provided for creating new lists, for writing to or reading from lists,
+for storing or retrieving lists, and for performing various types of
+operations upon entire lists to make new lists.  The full set of routines
+in the package are summarized in the figure below.
+
+A pixel list, like an image, has a fixed dimensionality and size which is
+determined at list creation time for the lifetime of the list.  New lists
+are created with \fIpl_create\fR, which returns a pointer to an empty list.
+The \fIdepth\fR parameter specifies the depth of the list in bits, i.e.,
+the number of bits per pixel, in the range 1-27.  A boolean list has a depth
+of 1 bit.  In the current implementation the boolean mask is handled as a
+degenerate case of an integer mask, i.e., an integer mask which happens to
+have mask values in the range 0-1.
+
+An existing list is accessed by opening a descriptor with \fIpl_open\fR and
+loading the list into the runtime descriptor structure, either by specifying
+a non-NULL buffer pointer \fIbufptr\fR, or by calling one of the \fIpl_load\fR
+functions after opening a null descriptor.
+
+.ks
+.nf
+	       pl = pl_open (bufptr|NULL)
+	     pl = pl_create (naxes, axlen, depth)
+	    pl = pl_newcopy (pl)
+		   pl_close (pl)
+
+		pl_[sg]size (pl, naxes, axlen, depth)
+		    pl_seti (pl, param, value)
+	   value = pl_stati (pl, param)
+		   pl_debug (pl, outfd, maxcol, flags)
+	    bool = pl_empty (pl)
+		pl_compress (pl)
+		   pl_clear (pl)
+
+		    pl_load (pl, bufptr)
+	   nwords = pl_save (pl, bufptr, buflen)
+		   pl_loadf (pl, fname, title, maxch)
+		   pl_savef (pl, fname, title, save_flags)
+	   pl_[load|save]im (pl, imname[, save_flags])
+
+	    ptr = pl_access (pl, v)
+     bool = pl_linenotempty (pl, v)
+     bool = pl_sectnotempty (pl, vs, ve, ndim)
+	  pl[gp]l[lrp][sil] (pl, v, buf, b_depth, npix, rop)
+
+	  pl_[set|get]plane (pl, v)
+		   pl_point (pl, x, y, rop)
+		  pl_circle (pl, x, y, r, rop)
+		     pl_box (pl, x1,y1, x2,y2, rop)
+		    pl_line (pl, x1,y1, x2,y2, width, rop)
+		 pl_polygon (pl, x, y, npts, rop)
+
+		     pl_rop (pl_src, vs, pl_dst, vs, vn, rop)
+		 pl_stencil (pl_src, vs, pl_dst, vs, pl_stl, vs, vn, rop)
+.fi
+.ke
+
+Pixel lists are stored externally as opaque binary byte arrays.
+The function \fIpl_save\fR will encode a pixel list as a byte array and store
+it in the indicated buffer, resizing the buffer if necessary.
+If \fIbufptr\fR is NULL a new buffer will be allocated, overwriting the NULL.
+The \fIpl_load\fR function performs the inverse function.
+The \fIf\fR suffixed functions are provided for convenience when storing
+lists in small binary files.  The \fIim\fR suffixed functions create masks
+out of actual data images, and vice versa.  In the most general case, a list
+is encoded into an array in memory and then stored away by the applications
+wherever they wish, e.g., as an array parameter in an image header when the
+new image structures become available.
+
+Pixel list i/o is provided via the \fIpl[gp]l[lrp][sil]\fR family of functions,
+which read, write, or edit (via the \fIrop\fR) lines or line segments of masks.
+The naming convention is as follows:
+
+.ks
+.nf
+	 pl		package prefix
+	[gp]		get or put
+	 l		line segment
+	[lrp]		as a line list, range list, or pixel array
+	[sil]		in an array of type short, int, or long
+.fi
+.ke
+
+For example, \fIplglps\fR would get a line from a mask image as a fully
+populated array of type short.  For maximum efficiency, since this is a low
+level interface, the data is read from or copied into a user allocated buffer,
+rather than having the pixel list package control the buffer.
+
+The functions \fIplgll[sil]\fR return the packed line list for the indicated
+line or line segment.  This is the copy-out form of access with the least
+overhead, but requires that the application have knowledge of the internal
+line list format.
+
+Alternatively, if it is only desired to read from a list, accessing the list
+in the internal format, the internal list for an image line may be directly
+accessed by pointer with the \fIpl_access\fR function.  This is the most
+efficient form of access.  The variant \fIpl_linenotempty\fR is similar except
+that the NULL pointer is returned if the indicated line of the list is empty,
+providing an efficient and convenient way to perform the empty test on mask
+image lines.
+
+The functions \fIplglr[sil]\fR are similar to the get line list form of access,
+but instead of returning the encoded list-list in the internal format,
+it returns a simple array of ranges of absolute pixel indices and associated
+mask values.  This is the recommended way of accessing the mask as a list
+structured object, since it does not require knowledge of the internal packed
+line list format.  For example, to print line \fIv\fR of the mask on descriptor
+\fIpl\fR as a series of range lists:
+
+.ks
+.nf
+	int	buf[3,1024], n, i, plglri()
+
+	n = plglri (pl, v, buf, 0, axlen[1], 0)
+	do i = 1, n {
+	    call printf ("range at %d, %d pixels, mask value = %o\n")
+		call pargi (buf[1,i]);  call pargi (buf[2,i])
+		call pargi (buf[3,i])
+	}
+.fi
+.ke
+
+These routines require that the depth in bits of the output line or range
+list or pixel array be specified.  This is necessary to avoid generating
+numbers the size of the machine integer when inverting a mask (PIX_NOT),
+e.g., if the mask depth is 8 bits, the complement of a 0 pixel should be 377,
+not 37777777777.  The depth argument may also be used to convert an integer
+mask to a boolean mask, or vice versa (using the PIX_VALUE field of the
+rasterop discussed in the next section).  If \fIb_value\fR is zero, clipping
+of the output values is disabled.  This would be appropriate, for example,
+when simply reading from a mask without modifying the pixel values.
+
+New pixel lists may be created by having the application prepare the packed
+line lists externally, inserting them directly into the pixel list structure
+with a \fIput\fR routine.  This is generally inadvisable, however, because
+the packed line list format is considered internal to the PLIO package.
+A better alternative is to input the mask data as a populated array or
+as a range list, letting the PL package manage the internal line list.
+
+A more convenient approach to creating or modifying masks for most applications
+is to define the mask by specifying a series of include and exclude standard
+region types (circles, boxes, lines, points, or polygons),
+using the block of routines beginning with \fIpl_setplane\fR in the figure.
+Note that these are two dimensional
+operators; they are provided for convenience even though the pixel list
+package can support images of any dimension (if the image has three or more
+dimensions \fIpl_setplane\fR may be used to specify the plane to be operated
+upon).  The most general routine is \fIpl_polygon\fR, which may be used to
+operate upon the pixels in the interior of any general polygon.  All of the
+region drawing operators will permit regions to extend beyond the boundary
+of the mask, clipping as necessary at the boundary.
+
+.NH 2
+Pixel, Line, and Range List Routines
+
+    Most of the N dimensional region or mask oriented PMIO and PLIO routines
+eventually result in calls to the low level pixel, line, and range rasterop
+routines and format conversion routines shown in the figure below.  These
+routines form the functional core of the PLIO package and will often be
+responsible for most of the execution time of routines which use PLIO.
+
+There are two main classes of routines.  The \fIpl_pixrop\fR, \fIpl_linerop\fR,
+and \fIpl_rangerop\fR routines perform the general raster operation on pixel
+arrays, line lists, and range lists.  The \fIpl_linestencil\fR routine performs
+the stencil rasterop operation upon line lists; currently only a list list
+version is available since this is a rarely used routine.  Lastly, a set of
+six routines are provided for converting between any two of the three formats,
+e.g., line list to range list or pixel array and vice versa, omitting the
+like-to-like conversions.  For example, \fIpl_p2ri\fR would convert a pixel
+array to a range list, both of type integer.
+
+.ks
+.nf
+		 pl_linerop (ll_src, xs, src_maxval,
+			     ll_dst, ds, dst_maxval, ll_out, npix, rop)
+	     pl_linestencil (ll_src, xs, src_maxval, ll_dst, ds, dst_maxval,
+			     ll_stn, xs, ll_out, npix, rop)
+
+	     pl_pixrop[sil] (px_src, xs, src_maxval,
+			     px_dst, ds, dst_maxval, npix, rop)
+	   pl_rangerop[sil] (rl_src, xs, src_maxval,
+			     rl_dst, ds, dst_maxval, rl_out, npix, rop)
+
+    n = pl_[lrp]2[lrp][sil] (op_src, xs, op_dst, npix)
+.fi
+.ke
+
+Note that these low level routines
+specify the mask depth as a maximum pixel value, rather than taking the depth
+in bits as the high level PMIO and PLIO routines do, and that there are no
+\fI"pm_"\fR versions of these routines - the one set of routines may be used
+with both PLIO and PMIO.
+
+.NH 2
+Rasterops
+
+    The argument \fIrop\fR in the circle, box, and other routines discussed
+in the previous sections is called a \fBrasterop\fR, and specifies the bitwise
+operation to be performed to generate the destination operand.  Much of the
+generality and conciseness of the pixel list package is due to the rasterop
+abstraction, which is patterned after a similar construct used by the Sun
+Microsystems \fISunview\fR interface to specify operations upon \fIpixrects\fR,
+which are logically similar to PLIO masks.
+
+The rasterop defines the operation to be performed to generate the destination
+mask, in terms of bitwise boolean operations performed upon the input source
+and destination masks.  Rasterops are constructed via a series of bitwise
+\fIand\fR and \fIor\fR operations, using the following macro defines:
+
+.ks
+.nf
+	PIX_SRC			  specifies the source mask
+	PIX_DST			  specifies the destination mask
+	PIX_NOT(op)		  inverts the operand mask
+	PIX_VALUE(value)	  specifies the bitplanes to be set
+.fi
+.ke
+
+Examples of some of the possible operations (out of a total of 16 possible
+operations) are shown below.  This table is reproduced from the SunView
+Pixrect Reference Manual.
+
+.ks
+.nf
+	     \fIRasterop\fR			     \fIDescription\fR
+
+	PIX_SRC			  copy source to destination
+	PIX_DST			  no-op
+	PIX_SRC | PIX_DST	  paint (OR source to destination)
+	PIX_SRC & PIX_DST	  mask (AND of source and destination)
+	PIX_NOT(PIX_SRC)&PIX_DST  erase (AND destination with negation
+				    of source)
+	PIX_NOT(PIX_DST)	  invert area (negate the existing
+				    values)
+	PIX_SRC ^ PIX_DST	  inverting paint (XOR of source and
+				    destination)
+.fi
+.ke
+
+Here, the |&^ denote the SPP \fIor\fR, \fIand\fR, and \fIxor\fR intrinsic
+functions, which must be used to construct actual rasterop expressions in SPP,
+e.g.:
+
+	PIX_NOT(PIX_SRC) | PIX_DST | PIX_VALUE(v)
+
+would actually be written as
+
+	or (PIX_NOT(PIX_SRC), PIX_DST) + PIX_VALUE(v)
+
+The following additional macros are defined to deal with the more common
+cases of setting or clearing a region.
+
+.ks
+.nf
+	PIX_SET			  (PIX_SRC | PIX_NOT(PIX_SRC))
+	PIX_CLR			  (PIX_SRC & PIX_NOT(PIX_SRC))
+.fi
+.ke
+
+As a simple example, consider the case of specifying a region mask as a series
+of include and exclude circles and boxes.  This is trivial for a boolean mask:
+an include circle or box is specified by the rasterop PIX_SET, and an exclude
+by PIX_CLR.  In the equivalent operation upon an integer mask this would cause
+any mask values which had already been set to be replaced, hence it might be
+desirable to use a PIX_SRC|PIX_DST rasterop instead, to OR the bits of the new
+flag values into those of any flag values already set.  Similarly, when using
+\fIpl_ltop\fR to unpack a line list into a pixel array, the PIX_SRC|PIX_DST
+rasterop might be specified to OR the mask segment into an existing pixel
+array.
+
+General bitwise boolean operations upon masks are provided by the \fIpl_rop\fR
+and \fIpl_stencil\fR operators, which operate upon entire masks or rectangular
+subregions of masks.  The \fIpl_rop\fR operator combines the source and
+destination masks to produce a new mask; \fIpl_stencil\fR performs the same
+operation, but only in the regions specified by the stencil mask,
+which must be a boolean mask.  The input mask may be NULL (depending upon
+the rasterop specified), or the source and destination masks may be the same.
+
+The equivalent operators for line lists, range lists, and pixel arrays are
+the \fIpl_S2D\fR family of routines, where \fIS=D=[lrp]\fR for a line list,
+range list, or pixel array rop.  The routine \fIpl_linestencil\fR implements
+the stencil operation for a line list.
+
+As noted above, when operating upon integer masks (\fIdepth\fR > 1), the
+PIX_VALUE macro is used to specify the flag value for the indicated region.
+For example, the following rasterop would set all the pixels in a region to
+the same value:
+
+	PIX_VALUE(value)
+
+to OR in the new value instead of replacing any existing flag values:
+
+	PIX_VALUE(value) | PIX_DST
+
+If a boolean mask is to be written to an integer mask, PIX_VALUE specifies
+the flag value to be used for the regions set to 1 in the input boolean mask.
+For example, one might wish to combine a set of 8 boolean masks to form a
+single 8 bit deep integer mask, with each bit in the integer mask corresponding
+to one of the input boolean masks (001 = mask 1, 002 = mask 2, 040 = mask 3,
+etc.).  This could be done using the rasterop shown above, incrementing
+PIX_VALUE in each operation to specify the bitplane to be set.
+
+.NH 3
+Rasterop Expression Evaluation
+
+    As mentioned above, there are sixteen possible ways to combine the source
+and destination masks subject to the four possible boolean operations
+(\fIand\fR, \fIor\fR, \fIxor\fR, and \fInot\fR).
+More precisely, although numerous bitwise expressions can be constructed, many
+of these are equivalent, and there are only sixteen fundamental operations.
+These are summarized in the following table.
+
+.nf
+		Operation			      Opcode
+
+	PIX_CLR 		      			00
+	PIX_SET						17
+
+	PIX_SRC						14
+	PIX_DST						12
+
+	PIX_NOT(PIX_SRC)				03
+	PIX_NOT(PIX_DST)				05
+
+	PIX_SRC & PIX_DST				10
+	PIX_SRC | PIX_DST				16
+	PIX_SRC ^ PIX_DST				06
+
+	PIX_SRC & PIX_NOT(PIX_DST)			04
+	PIX_SRC | PIX_NOT(PIX_DST)			15
+	PIX_NOT(PIX_SRC) & PIX_DST			02
+	PIX_NOT(PIX_SRC) | PIX_DST			13
+
+	PIX_NOT (PIX_SRC & PIX_DST)			07
+	PIX_NOT (PIX_SRC | PIX_DST)			01
+	PIX_NOT (PIX_SRC ^ PIX_DST)			11
+.fi
+
+As an example of the redundancy of arbitrary rasterop expressions,
+compare the following with the equivalent expressions (same opcode)
+in the table above.
+
+.ks
+.nf
+	PIX_NOT(PIX_SRC) & PIX_NOT(PIX_DST)		01
+	PIX_NOT(PIX_SRC) ^ PIX_NOT(PIX_DST)		06
+	PIX_NOT(PIX_SRC) | PIX_NOT(PIX_DST)		07
+	PIX_NOT(PIX_SRC) ^ PIX_DST			11
+	PIX_SRC ^ PIX_NOT(PIX_DST)			11
+.fi
+.ke
+
+Any number of additional logically redundant expressions may be constructed.
+The programmer should not worry about simplifying logical expressions,
+but should choose instead whatever expression is clearest for their particular
+application, letting the interface handle expression optimization internally.
+
+Of the sixteen possible fundamental operations, there are four trivial
+operations (\fIclr\fR, \fIset\fR, \fIsrc\fR, \fIdst\fR),
+seven composite operations, and four primary operations, namely,
+\fIand\fR, \fIor\fR, \fIxor\fR, and \fInot\fR (two cases of the latter).
+The composite operations are all implementable as two primary
+operations in sequence.  PIX_NOT is implemented by actual inversion of the
+list rather than as a mode flag, to avoid complications when the list is read.
+
+.NH 3
+Rasterop Encoding
+
+    The rasterop argument specifies the bitwise boolean operation to be
+performed, and optionally the pixel value to be used (in the case of an
+integer mask).  Both are specified as a single integer value, packed as
+shown in the figure below.
+
+.ks
+.nf
+	+--+-------------+--------+
+	|32|31          5|4      1|
+	+--+-------------+--------+
+	|  | pixel value | opcode |
+	+--+----------------------+
+.fi
+.ke
+
+The following is an example of a typical rasterop (note that since the pixel
+value field has a reserved range of bits which is zero prior to expression
+evaluation, the "+" operator is equivalent to the \fIor\fR intrinsic function).
+
+	or(PIX_SRC, PIX_NOT(PIX_DST)) + PIX_VALUE(pix_value)
+
+Note that the width of the pixel value field in the rasterop constrains the
+effective mask depth to be 27 bits or less, if full generality is desired in
+rasterop operations.  Masks of up to 31 bits (the minimum unsigned precision
+of a \fIlong\fR) can be stored and accessed, but rasterops using PIX_VALUE
+are limited to 27 bits.
+
+.NH 2
+Pixel List Data Structures
+
+    A pixel list consists of an array of pointers to the \fIline lists\fR
+forming the mask.  There is one pointer for each image line; if the pointer
+is NULL, no mask values are set on the associated image line.  N-dimensional
+images are easily handled by an N-1 dimensional array of line pointers.
+
+Each line list consists of a series of offsets and mask pixel values
+(the pixel values are normally omitted for a boolean mask).
+The offsets specify the number of pixels for which the mask has the same value.
+This line list format has the following two significant advantages over the
+alternative technique of specifying a list of ranges using absolute pixel
+coordinates:
+.ls
+.ls [1]
+A higher degree of data compression is possible.  If absolute pixel
+coordinates are used in the list, the list must be an array of 32 bit
+integer values in order to avoid a builtin limit on the size of the image
+which can be represented.  By using offsets, list elements as small as
+one byte are possible.
+.le
+.ls [2]
+A list composed of offsets is invariant with respect to translation.
+For example, when extracting a subraster of an image, one can extract the
+corresponding segment of each line list and perhaps edit the first element,
+and the remainder of the list may be used without change.
+.le
+.le
+
+When describing regular regions such as boxes it will often be the case that
+successive lines of the mask are equivalent, in which case multiple line list
+pointers may point to the same line list.  Hence, the line lists will provide
+good compression of regular objects in any two dimensional plane of the mask.
+This technique can be extended to higher dimensions if desirable, without
+affecting the line list data structures visible to an application.
+
+.NH 3
+Line List Encoding
+
+    A good compromise between storage efficiency and efficiency of runtime
+access, while keeping things simple, is achieved if we maintain the compressed
+line lists as variable length arrays of type short integer (16 bits per list
+element), regardless of the mask depth.  A line list consists of a series of
+simple \fIinstructions\fR which are executed in sequence to reconstruct a line
+of the mask.  Each 16 bit instruction consists of the sign bit (not used at
+present), a three bit \fIopcode\fR, and twelve bits of data, i.e.:
+
+.ks
+.nf
+	+--+-----------+-----------------------------+
+	|16|15       13|12                          1|
+	+--+-----------+-----------------------------+
+	|  |   opcode  |            data             |
+	+--+-----------------------------------------+
+.fi
+.ke
+
+The significance of the data depends upon the instruction.  The instructions
+currently implemented are summarized in the table below.
+
+.ks
+.nf
+     Instruction     Opcode           Description
+
+        ZN            00 	Output N zeros
+        HN            04 	Output N high values
+        PN            05 	Output N-1 zeros plus one high value
+	SH	      01	Set high value, absolute
+        IH,DH         02,03	Increment or decrement high value
+        IS,DS         06,07	Like IH-DH, plus output one high value
+.fi
+.ke
+
+In order to reconstruct a mask line, the application executing these
+instructions is required to keep track of two values,
+the \fIcurrent high value\fR and the \fIcurrent position\fR in the output line.
+The detailed operation of each instruction is as follows:
+.ls 4
+.ls 8 ZN
+Zero the next N (=\fIdata\fR) output pixels.
+.le
+.ls HN
+Set the next N output pixels to the current high value.
+.le
+.ls PN
+Zero the next N-1 output pixels, and set pixel N to the current high value.
+.le
+.ls SH
+Set the high value (absolute rather than incremental), taking the high 15 bits
+from the next word in the instruction stream, and the low 12 bits from the
+current data value.
+.le
+.ls IH,DH
+Increment (IH) or decrement (DH) the current high value by the \fIdata\fR
+value.  The current position is not affected.
+.le
+.ls IS,DS
+Increment (IS) or decrement (DS) the current high value by the \fIdata\fR
+value, and \fIstep\fR, i.e., output one high value.
+.le
+.le
+
+The high value is assumed to be set to 1 at the beginning of a line, hence
+the IH,DH and IS,DS instructions are not normally needed for boolean masks.
+If the length of a line segment of constant value or the difference between
+two successive high values exceeds 4096 (12 bits), then multiple instructions
+are required to describe the segment or intensity change.
+
+The performance of this encoding is very good for typical masks consisting
+of isolated high or low values or extended regions at the same level.
+The worst case performance occurs when successive pixels have different values.
+Even in this case the encoding will only require one word (16 bits) per mask
+pixel, provided either the delta intensity change between pixels is usually
+less than 12 bits, or the mask represents a zero floored step function of
+constant height.  The worst case cannot exceed npix*2 words provided the mask
+depth is 24 bits or less.
+
+.NH 3
+Example: Line List Encoding
+
+    As a simple example, consider the following line of a boolean mask.
+The set pixels are 1, 4, 8 through 11, and so on, shown as \fIindex list\fR
+in the figure.  The corresponding \fIoffset list\fR (line list encoding)
+is also shown.  Note that both encodings require the same amount of space,
+assuming 16 bits per list element in both cases; the index list would require
+twice as much space if 32 bit list elements were used.
+
+.ks
+.nf
+	Index list:	1, 4, 8-11, 15, 23-39		7 words
+	Offset list:	P1 P3 Z3 H4 P4 Z7 H17		7 words
+
+	Inverted I-L:	2-3, 5-7, 12-14, 16-22		8 words
+	Inverted O-L:	Z1 H2 Z1 H3 Z4 H3 Z1 H7		8 words
+.fi
+.ke
+
+The bottom half of the figure shows the encodings for the inverted lists,
+i.e., the lists which would be produced by a PIX_NOT rasterop operation.
+Since both encodings reflect only the points in a line where level changes
+occur, the information content and list size of the normal and inverted
+lists are comparable.  The encoding for an integer mask would be equivalent
+except for the addition of occasional SH or SL instructions to set the high
+value.
+
+.NH 3
+Line List Structure
+
+    The full line list structure consists of a header describing the line
+list entry in the PLIO descriptor, plus the LL encoding of the line, as
+illustrated below.  This information is internal to the PLIO package and
+should not be used in applications code.  [The LL header was generalized
+in Aug2000 to permit larger masks; see plio.h]
+
+.ks
+.nf
+	define	LL_START	4
+	struct linelist {
+		short	nref		# number of lines pointing here
+		short	blen		# length of buffer containing list
+		short	len		# encoded linelist length, words
+		short	ll[]		# encoded pixel data
+	}
+.fi
+.ke
+
+The linelist encoding includes any trailing zeros, i.e., executing of the
+encoded instructions will regenerate the entire mask line.
+
+.NH 3
+Range List Structure
+
+    The range list structure provides applications programs with a list
+representation of a mask, for cases where it would be inefficient or
+inconvenient to access the mask as a pixel array.  Range lists are not
+used to store masks in external storage, hence data compression is not an
+issue, nor is machine independence.
+
+.ks
+.nf
+	rtype = short|int|long
+	struct rangelist {
+		rtype	x		# x coordinate of first pixel
+		rtype	n		# number of pixels in range
+		rtype	v		# pixel value
+	}
+
+	int	rl[3,ARB]		# typical range list array decl
+.fi
+.ke
+
+The range list structure is defined in <plset.h>, e.g. (refer to the actual
+file for more reliable documentation for these definitions):
+
+.ks
+.nf
+	RL_FIRST	# first data range entry in list
+	RL_LENELEM	# size of each element of list (i.e., 3)
+	RL_MAXLEN	# maximum range list length (arg=pl)
+
+	RL_LEN		# physical length of range list	(RL_LEN(rl))
+	RL_AXLEN	# length of mask image line (RL_AXLEN(rl))
+	RLI_LEN		# RL_LEN for rl = ptr to int
+	RLI_AXLEN	# RL_AXLEN  "     "     "
+	RLS_LEN		# RL_LEN for rl = ptr to int
+	RLS_AXLEN	# RL_AXLEN  "     "     "
+
+	RL_X		# use as RL_X(rl,i), rl = range list array
+	RL_N		# Npix field of range list array element
+	RL_V		# Value field of range list array element
+
+	RL_XOFF		# offset of xstart field 
+	RL_NOFF		# offset of npix field
+	RL_VOFF		# offset of value field
+.fi
+.ke
+
+The range list is represented as a simple two dimensional integer or
+short integer array.  The first line of the two dimensional array is
+used as the \fBrange list header\fR, and is used to store the \fIlen\fR
+and \fIaxlen\fR parameters describing the encoded mask line.  Each
+subsequent entry defines a range \fInpix\fR of mask image pixels,
+starting at pixel \fIx\fR (absolute pixel coordinates), all of which
+have the value \fIvalue\fR.  Only nonzero ranges are stored.
+Note that the \fIlen\fR field defines the entire length of the structure,
+including the header range and data ranges.
+
+.NH 3
+Example: A Small Mask
+
+    A complete example of a small mask (75 columns by 40 lines) is shown below.
+This mask and the sample output were prepared by the PLIO debug interpreter,
+file \fIzzdebug.x\fR in the PLIO source directory.
+
+.nf
+40 .1111111..............................................................22222
+39 .1111111..............................................................22222
+38 .1111111...............................................................2222
+37 .1111111...............................................................2222
+36 .1111111............................................................4......
+35 .1111111.....................11111111111111111111111111...........4444.....
+34 .1111111.....................11111111111111111111111111........44444444....
+33 .1111111......................1111111111111111111111111......44444444......
+32 .1111111......................1111111111111111111111111...44444444.........
+31 .1111111......................1111111111111111111111111.44444444...........
+30 .1111111...........4..........1111111111111111111111115444444..............
+29 .1111111...........4..........11111111111111111111155554444................
+28 .1111111...........4..........111111111111111111155555544..................
+27 .1111111...........4..........1111111111111111555555551....................
+26 .1111111.....................11111111111111155555555111....................
+25 .1111111.....................11111111111115555555111111....................
+24 ............................1111111111155444444.1111111....................
+23 ...........................111111111155544444....111111....................
+22 ..............1...........1111111155555444........11111....................
+21 ........................1111111155555554..........11111....................
+20 ........................111111555555511...........11111....................
+19 ........................111555555551111...........11111....................
+18 ........................155555555111111...........11111....................
+17 ......................445555551111111111.........111111....................
+16 ....................444455551111111111111.......1111111....................
+15 ..................4444445111111111111111111111111111111....................
+14 ...............44444444.1111111111111111111111111111111....................
+13 .............44444444......................................................
+12 ..........44444444.........................................................
+11 ........44444444...........................................................
+10 .........4444........................22222.................................
+ 9 ..........4.........................2222222..............22222.............
+ 8 ....................................2222222.............2222222............
+ 7 ....................................2222222.............2222222............
+ 6 .....................................22222..............2222222............
+ 5 11111111111111111111.....................................22222.............
+ 4 11111111111111111111.......................................................
+ 3 11111111111111111111.......................................................
+ 2 11111111111111111111.......................................................
+ 1 11111111111111111111.......................................................
+   123456789012345678901234567890123456789012345678901234567890123456789012345
+            1         2         3         4         5         6         7     
+.fi
+
+This first figure shows the mask itself, output graphically as a character
+matrix.  This is an integer mask wherein the integer value of each pixel is
+the ASCII value of the character shown.  The mask was created by \fIor\fR-in
+a number of regions together, using a different mask value for each region.
+The result in areas where the regions intersect is a new mask pixel value.
+
+The figure below shows the internal data structures used to represent the
+previous mask.  Both the line list and range list representations of the
+mask are shown.  The size of the packed line list is 582 words, 189 of which
+are free (no longer used due to updates), hence the packed line list size
+would be 393 words following a call to \fIpl_compress\fR to compress the mask.
+
+.nf
+    Mask 1EECD naxes=2 [75,40] maxval=177 plane=[75,40]
+    max buffered line size 1024, max actual line size 16
+    40 lines total, 40 are nonempty, mask is nonempty
+    llbp=42AF5, len=1190, op=583, free=189, nupdates=35
+
+    Index at 1EFF1 containing 40 lines:
+	 4     4     4     4    17    26    35    35   166   177   187
+       194   201   208   218   228   241   254   266   554   292   568
+       319   333   347   360   492   507   523   539   423   435   447
+       459   471   483   148   148   157   157
+
+    Line list containing 40 lines:
+    [1:4]      IH48(49) H20 Z55 (75,49)
+    [5]        IH48(49) H20 IH1(50) Z37 H5 Z13 (75,50)
+    [6]        IH49(50) Z37 H5 Z14 H7 Z12 (75,50)
+    [7:8]      IH49(50) Z36 H7 Z13 H7 Z12 (75,50)
+    [9]        IH51(52) P11 DH2(50) Z25 H7 Z14 H5 Z13 (75,50)
+    [10]       IH51(52) Z9 H4 DH2(50) Z24 H5 Z33 (75,50)
+    [11]       IH51(52) Z8 H8 Z59 (75,52)
+    [12]       IH51(52) Z10 H8 Z57 (75,52)
+    [13]       IH51(52) Z13 H8 Z54 (75,52)
+    [14]       IH51(52) Z15 H8 DH3(49) Z1 H31 Z20 (75,49)
+    [15]       IH51(52) Z18 H6 IS1(53) DH4(49) H30 Z20 (75,49)
+    [16]       IH51(52) Z20 H4 IH1(53) H4 DH4(49) H13 Z7 H7 Z20 (75,49)
+    [17]       IH51(52) Z22 H2 IH1(53) H6 DH4(49) H10 Z9 H6 Z20 (75,49)
+    [18]       IH48(49) P25 IH4(53) H8 DH4(49) H6 Z11 H5 Z20 (75,49)
+    [19]       IH48(49) Z24 H3 IH4(53) H8 DH4(49) H4 Z11 H5 Z20 (75,49)
+    [20]       IH48(49) Z24 H6 IH4(53) H7 DH4(49) H2 Z11 H5 Z20 (75,49)
+    [21]       IH48(49) Z24 H8 IH4(53) H7 DS1(52) DH3(49) Z10 H5 Z20
+	       (75,49)
+    [22]       IH48(49) P15 Z11 H8 IH4(53) H5 DH1(52) H3 DH3(49) Z8 H5
+	       Z20 (75,49)
+    [23]       IH48(49) Z27 H10 IH4(53) H3 DH1(52) H5 DH3(49) Z4 H6 Z20
+	       (75,49)
+    [24]       IH48(49) Z28 H11 IH4(53) H2 DH1(52) H6 DH3(49) Z1 H7 Z20
+	       (75,49)
+    [25]       IH48(49) Z1 H7 Z21 H13 IH4(53) H7 DH4(49) H6 Z20 (75,49)
+    [26]       IH48(49) Z1 H7 Z21 H15 IH4(53) H8 DH4(49) H3 Z20 (75,49)
+    [27]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H16 IH4(53) H8
+	       DS4(49) Z20 (75,49)
+    [28]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H19 IH4(53) H6
+	       DH1(52) H2 Z18 (75,52)
+    [29]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H21 IH4(53) H4
+	       DH1(52) H4 Z16 (75,52)
+    [30]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H24 IS4(53)
+	       DH1(52) H6 Z14 (75,52)
+    [31]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z1 H8 Z11 (75,52)
+    [32]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z3 H8 Z9 (75,52)
+    [33]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z6 H8 Z6 (75,52)
+    [34]       IH48(49) Z1 H7 Z21 H26 IH3(52) Z8 H8 Z4 (75,52)
+    [35]       IH48(49) Z1 H7 Z21 H26 IH3(52) Z11 H4 Z5 (75,52)
+    [36]       IH48(49) Z1 H7 IH3(52) P61 Z6 (75,52)
+    [37:38]    IH48(49) Z1 H7 IH1(50) Z63 H4 (75,50)
+    [39:40]    IH48(49) Z1 H7 IH1(50) Z62 H5 (75,50)
+
+    Line list containing 40 lines:
+    [1:4]      1-20(49)
+    [5]        1-20(49) 58-62(50)
+    [6]        38-42(50) 57-63(50)
+    [7:8]      37-43(50) 57-63(50)
+    [9]        11(52) 37-43(50) 58-62(50)
+    [10]       10-13(52) 38-42(50)
+    [11]       9-16(52)
+    [12]       11-18(52)
+    [13]       14-21(52)
+    [14]       16-23(52) 25-55(49)
+    [15]       19-24(52) 25(53) 26-55(49)
+    [16]       21-24(52) 25-28(53) 29-41(49) 49-55(49)
+    [17]       23-24(52) 25-30(53) 31-40(49) 50-55(49)
+    [18]       25(49) 26-33(53) 34-39(49) 51-55(49)
+    [19]       25-27(49) 28-35(53) 36-39(49) 51-55(49)
+    [20]       25-30(49) 31-37(53) 38-39(49) 51-55(49)
+    [21]       25-32(49) 33-39(53) 40(52) 51-55(49)
+    [22]       15(49) 27-34(49) 35-39(53) 40-42(52) 51-55(49)
+    [23]       28-37(49) 38-40(53) 41-45(52) 50-55(49)
+    [24]       29-39(49) 40-41(53) 42-47(52) 49-55(49)
+    [25]       2-8(49) 30-42(49) 43-49(53) 50-55(49)
+    [26]       2-8(49) 30-44(49) 45-52(53) 53-55(49)
+    [27]       2-8(49) 20(52) 31-46(49) 47-54(53) 55(49)
+    [28]       2-8(49) 20(52) 31-49(49) 50-55(53) 56-57(52)
+    [29]       2-8(49) 20(52) 31-51(49) 52-55(53) 56-59(52)
+    [30]       2-8(49) 20(52) 31-54(49) 55(53) 56-61(52)
+    [31]       2-8(49) 31-55(49) 57-64(52)
+    [32]       2-8(49) 31-55(49) 59-66(52)
+    [33]       2-8(49) 31-55(49) 62-69(52)
+    [34]       2-8(49) 30-55(49) 64-71(52)
+    [35]       2-8(49) 30-55(49) 67-70(52)
+    [36]       2-8(49) 69(52)
+    [37:38]    2-8(49) 72-75(50)
+    [39:40]    2-8(49) 71-75(50)
+.fi
+
+The line list and range list tables shown consist of two columns, the first
+listing the range of mask lines pointing to the line or range list shown to
+the right (a sequence of identical mask lines will point to the same encoded
+line list).  Each instruction which changes the mask pixel value is followed
+by the new current mask value in parenthesis.  Zero ranges are omitted in
+the range list format.  The "pl_circle" regions appear as ellipses since
+a printed character does not have a unit aspect ratio.
+
+.NH 3
+Pixel List Descriptor
+
+    For runtime access to a mask we require, for an N dimensional mask, an
+N-1 dimensional array of line list pointers, plus the line lists themselves.
+Multiple line list pointers may point to the same encoded line list.
+All line pointers are valid at all times, i.e., NULL pointers are not
+permitted, even for empty mask lines.  Initially, all line pointers will
+point to the same entry, the encoded line list representation of an empty
+line, i.e., a line of zeros (i.e., the single instruction ZN where N=axlen[1]).
+
+.ks
+.nf
+	struct pldes {
+		int	pl_magic	# magic / version no.
+		int	pl_private1	# used by PMIO (ref_im)
+		int	pl_private2	# used by PMIO (mapxy flag)
+		int	pl_maxline	# max encoded line lentgh
+		int	pl_maxval	# mask depth as max pixel value
+		int	pl_naxes	# number of axes
+		int	pl_axlen[7]	# axis lengths
+		int	pl_plane[7]	# current plane for pl_setplane
+		int	pl_llbp		# line list bufptr
+		int	pl_llop		# next location in llbuf
+		int	pl_lllen	# current llbuf length
+		int	pl_llfree	# amount of free space in list
+		int	pl_llnupdates	# line list has been modified
+		int	pl_llinc	# llbuf increment on overflow
+		int	pl_nlp		# number of line pointers
+		int	pl_lp[]		# array of line pointers
+	}
+.fi
+.ke
+
+The main descriptor, which is a dynamically allocated data structure, is a
+fixed size descriptor, the size of which depends upon the dimensionality and
+size of the mask.  A single additional dynamically allocated buffer of type
+\fIshort\fR is used to store the encoded line lists.  The size of this buffer
+may vary at runtime as the mask is edited.  New line lists, or edited line
+lists which increase in size, are inserted at the end of the buffer.
+As existing line lists are freed a count of the amount of free space is
+kept in \fIpl_llfree\fR.  If the percent of free space reaches a predetermined
+level garbage collection is possible by copying the list, otherwise the line
+list buffer is reallocated to increase its size.  The line pointers \fIpl_lp\fR
+are actually offsets into \fIllbuf\fR, rather than true pointers.
+
+.NH 3
+External Storage Format
+
+    A mask is stored externally as a variable length array of 32 bit MII
+integers (the stored mask header) followed by two variable length arrays of
+16 bit MII integers, packed in the following format:
+
+.ks
+.nf
+	struct pl_extern {
+		int	ple_magic	# magic / version no.
+		int	ple_naxes	# mask dimensionality
+		int	ple_axlen[7]	# length of each axis
+		int	ple_llop	# output pointer into llbuf
+		int	ple_lllen	# llbuf length, words
+		int	ple_nlp		# number of line pointers (lines)
+		int	ple_nlpx	# length of compressed index
+		int	ple_exlen	# length of full pl_extern struct
+		int	ple_flags	# flag bits
+		int	ple_maxline	# saved pl_maxline
+		int	ple_maxval	# saved pl_maxval
+		short	ple_pkindex[]	# packed line list index array
+		short	ple_llbuf[]	# line list buffer
+	}
+.fi
+.ke
+
+The \fIpl_compress\fR function is applied before a mask is encoded
+into the external storage format, to eliminate the unused space in the line
+list buffer which occurs during dynamic updates to the runtime list structure.
+The line list index, containing one integer entry for each line in the mask
+in the runtime format, is compressed using \fIpl_p2li\fR, storing in the
+external representation the compressed array encoded as a line list in
+\fIple_pkindex\fR.  This is especially important for large masks, as otherwise
+the index array could be by far the biggest contributor to the size of the
+mask when encoded into its external format.
+
+No format conversions are required other than decoding the compressed line list
+index and possibly byte swapping, hence accessing a stored list is very fast.
+Further data compression is possible when packing the list for storage, but it
+is not clear if this is justified.

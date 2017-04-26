@@ -1,0 +1,15 @@
+
+								8/30/11
+LIBSAMP:
+
+    - Flesh out unit tests in zztest.c
+    - Thread-lock option in interface mtype handlers or leave it to 
+      the app?
+    - F77/SPP wrappers
+    - Swig bindings
+    - Better Hub discovery....a watcher thread to auto-connect?
+    - Need to return error code from user handlers?
+
+IRAF CL:
+
+    - 

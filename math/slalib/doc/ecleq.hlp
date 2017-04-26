@@ -1,0 +1,31 @@
+.help ecleq Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slECEQ (DL, DB, DATE, DR, DD)
+
+     - - - - - -
+      E C E Q
+     - - - - - -
+
+  Transformation from ecliptic coordinates to
+  J2000.0 equatorial coordinates (double precision)
+
+  Given:
+     DL,DB       dp      ecliptic longitude and latitude
+                           (mean of date, IAU 1980 theory, radians)
+     DATE        dp      TDB (loosely ET) as Modified Julian Date
+                                              (JD-2400000.5)
+  Returned:
+     DR,DD       dp      J2000.0 mean RA,Dec (radians)
+
+  Called:
+     slDS2C, slECMA, slDIMV, slPREC, slEPJ, slDC2S,
+     slDA2P, slDA1P
+
+  P.T.Wallace   Starlink   March 1986
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

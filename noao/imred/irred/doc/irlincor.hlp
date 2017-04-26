@@ -1,0 +1,81 @@
+.help irlincor Nov94 irred
+.ih
+NAME
+irlincor -- Correct IR imager frames for non-linearity.
+.ih
+USAGE
+irlincor input output
+.ih
+PARAMETERS
+.ls input
+The list of images to be corrected for non-linearity
+.le
+.ls output
+The list of corrected output images
+.le
+
+.ls coeff1 = 1.0
+The first coefficient of the correction function
+.le
+
+.ls coeff2 = 0.0
+The second coefficient of the correction function
+.le
+
+.ls coeff3 = 0.0
+The third coefficient of the correction function
+.le
+
+.ih
+DESCRIPTION
+The IR imager frames specified by \fIinput\fR, which may be a general image
+template including wild cards or an @list, are corrected for non-linearity
+on a pixel by pixel basis and written to \fIoutput\fR. The number of output
+images must match the number input. The pixel type of the output image(s) will
+match that of the input image(s), however, internally all calculations are 
+performed as type real. The correction is performed assuming 
+that the non-linearity can be represented by the following simple relationship:
+.nf
+
+ADU' = ADU * [ coeff1 + coeff2 * (ADU / 32767) + coeff3 * (ADU / 32767)**2 ]
+
+.fi
+The coefficients which occur in this expression are specified by the
+parameters \fIcoeff1\fR, \fIcoeff2\fR and \fIcoeff3\fR. Their values are 
+derived from periodic instrumental calibrations and are believed to be
+fairly constant. The  default values specify a \fBnull\fR correction.
+You should consult \fBJay Elias\fR for the latest values.
+Note that the coefficients are expressed in terms of ADU normalised to the
+maximum possible value 32767, in order that their values can be input
+more easily.
+.ih
+EXAMPLES
+1. Correct input to output using the default values for the coefficients (not a very rewarding operation!)
+
+.nf
+	cl> irlincor input output
+
+.fi
+
+2. Correct a list of images in place using specified values for the coefficients
+
+.nf
+	cl> irlincor @list @list coeff1=1.0 coeff2=0.1 coeff3=0.01
+
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+AUTHORS
+The IRLINCOR task was originally written by Steve Heathcote as part of the
+CTIO package. 
+.ih
+BUGS
+The form of the correction equation is currently experimental;
+a higher order polynomial or a different functional form could be accommodated
+very easily if required.
+It may be advisable to carry out the calculations in double precision.
+.ih
+SEE ALSO
+onedspec.coincor, proto.imfunction
+.endhelp

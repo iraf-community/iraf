@@ -1,0 +1,27 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ARLT -- Replace if less than.  If A[i] is less than FLOOR replace by NEWVAL.
+
+procedure arlt$t (a, npix, floor, newval)
+
+PIXEL	a[ARB]
+int	npix
+PIXEL	floor, newval
+int	i
+$if (datatype == x)
+real	abs_floor
+$endif
+
+begin
+	$if (datatype == x)
+	abs_floor = abs (floor)
+	$endif
+
+	do i = 1, npix
+	    $if (datatype == x)
+	    if (abs (a[i]) < abs_floor)
+	    $else
+	    if (a[i] < floor)
+	    $endif
+		a[i] = newval
+end

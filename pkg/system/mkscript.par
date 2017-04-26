@@ -1,0 +1,17 @@
+script,s,a,script.cl,,,Script file name
+task,s,a,,,,Task name of command to be added to script
+submit,b,a,yes,,,Submit the script as a background job?
+
+append,b,h,no,,,Append new to existing script?
+hidden,b,h,yes,,,Include hidden parameters in command?
+verify,b,h,yes,,,Verify each command?
+logfile,f,h,script.log,,,Script log file name
+
+# Script query parameters and variables.
+
+cok,b,a,yes,,,Is the command ok?
+sok,b,a,yes,,,Is the script ok?
+more,b,a,yes,,,Add another command?
+
+scrpt,s,h
+ltask,s,h

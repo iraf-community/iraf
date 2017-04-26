@@ -1,0 +1,126 @@
+\hypertarget{xrMethod_8c}{
+\section{xrMethod.c File Reference}
+\label{xrMethod_8c}\index{xrMethod.c@{xrMethod.c}}
+}
+Procedures used to implement service methods.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$pthread.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrMethod_8c_fd17d6523458171c461ec52cfdc8e5bf}{
+int \textbf{xr\_\-getIntFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_fd17d6523458171c461ec52cfdc8e5bf}
+
+\item 
+\hypertarget{xrMethod_8c_629c9b4d6c54d7ab538b2c5f8425cdc7}{
+double \textbf{xr\_\-getDoubleFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_629c9b4d6c54d7ab538b2c5f8425cdc7}
+
+\item 
+\hypertarget{xrMethod_8c_ad2cb91bee58471541cbc1e13e15bb49}{
+char $\ast$ \textbf{xr\_\-getStringFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_ad2cb91bee58471541cbc1e13e15bb49}
+
+\item 
+\hypertarget{xrMethod_8c_1c8373e2c0eefaf7b2e6b4ca94a2da6a}{
+int \textbf{xr\_\-getBoolFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_1c8373e2c0eefaf7b2e6b4ca94a2da6a}
+
+\item 
+\hypertarget{xrMethod_8c_eac7cee2311a73460c0efef8900eaf21}{
+char $\ast$ \textbf{xr\_\-getDatetimeFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_eac7cee2311a73460c0efef8900eaf21}
+
+\item 
+\hypertarget{xrMethod_8c_5c5550b2638fc659ac4dfcaee93efe9f}{
+int \textbf{xr\_\-getStructFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_5c5550b2638fc659ac4dfcaee93efe9f}
+
+\item 
+\hypertarget{xrMethod_8c_cb86939d091f84f38bc4667d6743f1c2}{
+int \textbf{xr\_\-getArrayFromParam} (void $\ast$data, int index)}
+\label{xrMethod_8c_cb86939d091f84f38bc4667d6743f1c2}
+
+\item 
+\hypertarget{xrMethod_8c_ef29028ab01447278d7d8d9a4a184bfd}{
+void \textbf{xr\_\-setIntInResult} (void $\ast$data, int val)}
+\label{xrMethod_8c_ef29028ab01447278d7d8d9a4a184bfd}
+
+\item 
+\hypertarget{xrMethod_8c_c6a0afcb035ce34e542deabb1969c9af}{
+void \textbf{xr\_\-setDoubleInResult} (void $\ast$data, double val)}
+\label{xrMethod_8c_c6a0afcb035ce34e542deabb1969c9af}
+
+\item 
+\hypertarget{xrMethod_8c_8c22956ecbb0686498867c47a82d622f}{
+void \textbf{xr\_\-setBoolInResult} (void $\ast$data, int val)}
+\label{xrMethod_8c_8c22956ecbb0686498867c47a82d622f}
+
+\item 
+\hypertarget{xrMethod_8c_997cb322b75cdb71927031eb83e13737}{
+void \textbf{xr\_\-setStringInResult} (void $\ast$data, char $\ast$val)}
+\label{xrMethod_8c_997cb322b75cdb71927031eb83e13737}
+
+\item 
+\hypertarget{xrMethod_8c_80a322811cfa99150c308a71a278b7dc}{
+void \textbf{xr\_\-setDatetimeInResult} (void $\ast$data, char $\ast$val)}
+\label{xrMethod_8c_80a322811cfa99150c308a71a278b7dc}
+
+\item 
+\hypertarget{xrMethod_8c_9dda1067e5c9932640fe182211477cf4}{
+void \textbf{xr\_\-setStructInResult} (void $\ast$data, int snum)}
+\label{xrMethod_8c_9dda1067e5c9932640fe182211477cf4}
+
+\item 
+\hypertarget{xrMethod_8c_531a1db989582d0e483a02683a96149c}{
+void \textbf{xr\_\-setArrayInResult} (void $\ast$data, int anum)}
+\label{xrMethod_8c_531a1db989582d0e483a02683a96149c}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrMethod_8c_a7596b7e160449a059d38f2116faa7ab}{
+int \textbf{xr\_\-errstat} = 0}
+\label{xrMethod_8c_a7596b7e160449a059d38f2116faa7ab}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Procedures used to implement service methods. 
+
+XRMETHOD.C
+
+These are procedures used to implement the service methods, e.g. to get input parameters and create result values.
+
+Public procedures:
+
+xr\_\-initCaller (void $\ast$data) // not used xr\_\-closeCaller (void $\ast$data) // not used
+
+xr\_\-getIntFromParam (void $\ast$data, int index) // Input Parameters xr\_\-getDoubleFromParam (void $\ast$data, int index) xr\_\-getStringFromParam (void $\ast$data, int index) xr\_\-getBoolFromParam (void $\ast$data, int index) xr\_\-getDatetimeFromParam (void $\ast$data, int index) s = xr\_\-getStructFromParam (void $\ast$data, int index) a = xr\_\-getArrayFromParam (void $\ast$data, int index)
+
+xr\_\-setIntInResult (void $\ast$data, int val) // Scalar Results xr\_\-setDoubleInResult (void $\ast$data, double val) xr\_\-setBoolInResult (void $\ast$data, int bval) xr\_\-setStringInResult (void $\ast$data, char $\ast$val) xr\_\-setDatetimeInResult (void $\ast$data, char $\ast$date) xr\_\-setStructInResult (void $\ast$data, int snum) xr\_\-setArrayInResult (void $\ast$data, int anum)
+
+Private procedures:
+
+env = xr\_\-callerGetEnv (void $\ast$data) // not used name = xr\_\-callerGetName (void $\ast$data) // not used host = xr\_\-callerGetHost (void $\ast$data) // not used param = xr\_\-callerGetParam (void $\ast$data) // not used info = xr\_\-callerGetInfo (void $\ast$data) // not used
+
+val = xr\_\-getParam (\hyperlink{structCaller}{Caller} $\ast$c, int index) // not used
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}

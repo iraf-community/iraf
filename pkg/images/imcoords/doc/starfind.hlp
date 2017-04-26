@@ -1,0 +1,304 @@
+.help starfind May97 images.imcoords
+.ih
+NAME
+starfind -- automatically detect stellar objects in a list of images
+.ih
+USAGE
+starfind image output hwhmpsf threshold
+.ih
+PARAMETERS
+.ls image
+The list of input images. The input images must be two-dimensional.
+.le
+.ls output
+The list of output object files. The number of output files must equal the
+number of input images. If output is "default", or "dir$default", or a
+directory specification then a default name of the form
+dir$root.extension.version is constructed, where dir$ is the directory name,
+root is the root image name, extension is "obj", and version is the next
+available version number.
+.le
+.ls hwhmpsf
+The half-width half-maximum of the image PSF in pixels.
+.le
+.ls threshold
+The detection threshold above local background in ADU.
+.le
+.ls datamin = INDEF, datamax = INDEF
+The minimum and maximum good data values in ADU. Datamin and datamax
+default to the constants -MAX_REAL and MAX_REAL respectively.
+.le
+.ls fradius = 2.5 (hwhmpsf)
+The fitting radius in units of hwhmpsf. Fradius defines the size
+of the Gaussian kernel used to compute the density enhancement image, and
+the size of the image region used to do the moment analysis.
+.le
+.ls sepmin = 5.0 (hwhmpsf)
+The minimum separation for detected objects in units of hwhmpsf.
+.le
+.ls npixmin = 5
+The minimum area of the detected objects in pixels.
+.le
+.ls maglo = INDEF, maghi = INDEF
+The minimum and maximum magnitudes of the detected objects. Maglo and maghi
+default to the constants -MAX_REAL and MAX_REAL respectively.
+.le
+.ls roundlo = 0.0,  roundhi = 0.2
+The minimum and maximum ellipticity values of the detected objects, where
+ellipticity is defined as 1 - b / a, and a and b are the semi-major and
+semi-minor axis lengths respectively.
+.le
+.ls sharplo = 0.5, sharphi = 2.0
+The minimum and maximum sharpness values of the detected objects, where
+sharpness is defined to be the ratio of the object size to the
+hwhmpsf parameter value.
+.le
+.ls wcs = ""
+The world coordinate system.  The options are:
+.ls "     "
+The world coordinate system is undefined. Only logical (pixel) coordinates
+are printed.
+.le
+.ls logical
+The world coordinate system is the same as the logical (pixel) coordinate
+system,  but two sets of identical logical (pixel) coordinates are printed.
+.le
+.ls physical
+The world coordinate system is the same as the logical (pixel) coordinate
+system of the parent image if any.
+.le
+.ls world
+The world coordinate system of the image if any.
+.le
+.le
+.ls wxformat = "", wyformat = ""
+The output format for the x and y axis world coordinates. If wxformat and
+wyformat are undefined then: 1) the value of the wcs format attribute is
+used if the output wcs is "world" and the attribute is defined, 2) "%9.3f"
+is used if the output wcs is "logical" or "physical", and "%11.8g" is used
+if the output wcs is "world". If the input image is a sky projection image and
+the x and y axes are ra and dec respectively, then the formats "%12.2H" and
+"%12.1h" will print the world coordinates in hours and degrees respectively.
+.le
+.ls boundary = "nearest"
+The boundary extension type. The choices are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the other side of the image.
+.le
+.le
+.ls constant = 0.0
+The constant for constant boundary extension.
+.le
+.ls nxblock = INDEF, nyblock = 256
+The working block size. If undefined nxblock and nyblock default
+to the number of columns and rows in the input image respectively.
+.le
+.ls verbose = no
+Print messages about the progress of the task ?
+.le
+
+.ih
+DESCRIPTION
+
+STARFIND searches the input images \fIimage\fR for local density maxima
+with half-widths at half-maxima of ~ \fIhwhmpsf\fR and peak amplitudes
+greater than ~ \fIthreshold\fR above the local background, and writes
+the list of detected objects to \fIoutput\fR.
+
+STARFIND is a modified version of the DAOPHOT package DAOFIND algorithm.
+However STARFIND is intended for use with the IMAGES package image matching
+and image coordinates tasks and is therefore configured somewhat differently
+than the version used in the photometry packages.
+
+.ih
+ALGORITHMS
+
+STARFIND assumes that the point spread function can be approximated by a radial
+Gaussian function whose sigma is 0.84932 * \fIhwhmpsf\fR pixels. STARFIND uses
+this model to construct a convolution kernel which is truncated at
+max (2.0, \fIfradius * hwhmpsf\fR) pixels and normalized to zero power.
+
+For each point in the image density enhancement values are computed by
+convolving the input image with the radial Gaussian function. This operation
+is mathematically equivalent to fitting the image data at each point, in the
+least-squares sense, with a truncated, lowered, radial Gaussian function.
+After the convolution each density enhancement value is an estimate of
+the amplitude of the best fitting radial Gaussian function at that point.
+If \fIdatamin\fR and \fIdatamax\fR are defined then bad data is ignored,
+i.e. rejected from the fit, during the computation of the density enhancement
+values. Out of bounds image pixels are evaluated using the boundary extension
+algorithm parameters \fIboundary\fR and \fIconstant\fR. Out of
+bounds density enhancement values are set to zero.
+
+After the convolution, STARFIND steps through the density enhancement
+image searching for density enhancements greater then \fIthreshold\fR
+and brighter than any density enhancements within a radius of
+\fIsepmin * hwhmpsf\fR pixels. For each potential detection the
+local background is estimated and used, along with the values of
+\fIdatamin\fR and \fIdatamax\fR, to estimate the position (Xc and Yc),
+size (Area and Hwhm), shape (E and Sharp), orientation (Pa), and
+brightness (Mag) of each object using the second order moments analysis
+shown below.
+
+.nf
+   I0 = sum (I)
+    N = sum (1.0)
+    if (N <= 0)
+        Sky = maxdata - maxden
+    else
+        Sky = I0 / N
+
+   M0 = sum (I - Sky)
+   Mx = sum (X * (I - Sky))
+   My = sum (Y * (I - Sky))
+
+   Xc = Mx / M0
+   Xc = My / M0
+  Mag = -2.5 * log10 (M0)
+ Area = N
+
+  Mxx = sum ((X - Xc) * (X - Xc) * (I - Sky))
+  Mxy = sum ((X - Xc) * (Y - Yc) * (I - Sky))
+  Myy = sum ((Y - Yc) * (Y - Yc) * (I - Sky))
+
+ Hwhm = sqrt (log (2) * (Mxx + Myy))
+    E = sqrt ((Mxx - Myy) ** 2 + 4 * Mxy ** 2) / (Mxx + Myy))
+   Pa = 0.5 * atan (2 * Mxy / (Mxx - Myy))
+Sharp = Hmhw / Hwhmpsf 
+.fi
+
+The sums are computed using pixels which lie within \fIfradius * hwhmpsf\fR of
+the maximum density enhancement, and whose values are within the good data
+limits defined by \fIdatamin\fR and \fIdatamax\fR, and which are above the local
+background estimate (Sky).
+
+Objects whose magnitude, roundness, and sharpness characteristics are outside
+the values defined by \fImaglo\fR, \fImaghi\fR, \fIroundlo\fR, \fIroundhi\fR,
+\fIsharplo\fR, and \fIsharphi\fR and whose total areas is less than
+\fInpixmin\fR pixels are rejected from the list.
+
+If \fIwcs\fR parameter is defined, the world coordinates as well as
+the pixel coordinates of the detected objects are computed and printed
+using the formats defined by \fIwxformat\fR and \fIwyformat\fR.
+
+To minimize the memory requirements and increase efficiency, STARFIND
+is configured to operate on data blocks that are \fInxblock * nyblock\fR
+in size. To keep the image i/o operation to a minimum nxblock is set
+to INDEF and defaults to the number of columns in the input image.
+Setting both parameter to INDEF will force STARFIND to perform the
+whole operation in memory.
+
+.ih
+FORMATS
+
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+ 
+
+Conventions for w (field width) specification:
+ 
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+ absent, 0      use as much space as needed (D field sets precision)
+ 
+Escape sequences (e.g. "\n" for newline):
+ 
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+ 
+Examples
+ 
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+ 
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h          format as nn:nn:nn.n
+%15h        right justify nn:nn:nn.n in field of 15 characters
+%-15h       left justify nn:nn:nn.n in a field of 15 characters
+%12.2h      right justify nn:nn:nn.nn
+%-12.2h     left justify nn:nn:nn.nn
+ 
+%H          / by 15 and format as nn:nn:nn.n
+%15H        / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H       / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H      / by 15 and right justify nn:nn:nn.nn
+%-12.2H     / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+EXAMPLES
+
+1. Find stellar objects with peak values greater than 100 counts above
+local background in the test image dev$wpix whose fwhm is ~2.5 pixels.
+
+.nf
+cl> starfind dev$wpix default 1.25 100.
+cl> display dev$wpix 1 fi+
+cl> tvmark 1 wpix.obj.1 col=204 
+.fi
+
+2. Repeat the previous example but tell starfind to compute and print
+world coordinates in hours and degrees as well as pixel coordinates.
+
+.nf
+cl> starfind dev$wpix default 1.25 100. wcs=world wxf="%12.2H"\
+    wyf="%12.1h"
+cl> display dev$wpix 1 fi+
+cl> tvmark 1 wpix.obj.1 col=204 
+.fi
+
+.ih
+TIME REQUIREMENTS
+Starfind requires approximately 8 CPU seconds to search a 512 by  512
+image  using  a   7 by 7 pixel convolution kernel (SPARCStation2).
+		
+.ih
+BUGS
+
+.ih
+SEE ALSO
+imcentroid, apphot.daofind, daophot.daofind
+.endhelp

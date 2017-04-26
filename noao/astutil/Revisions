@@ -1,0 +1,631 @@
+.help revisions Jun88 noao.astutil
+.nf
+
+t_astcalc.x
+doc/astcalc.hlp
+    The $D variable was changed from the old MM/DD/YY format to the post-Y2K
+    YYYY-MM-DD format.  (4/6/10, MJF)
+
+asttools/refrac.x
+    A development routine for refraction correction from apparent to
+    observed place.  As noted in the comments, this seems to be correct
+    to first order but I don't have complete confidence that I've done
+    this correctly.  It would be useful to have an independent test.
+    (7/2/08, Valdes)
+
+t_rvcorrect.x
+    If a UT time is part of the date keyword it is used in preference to
+    the UT keyword.  This makes use of UTMIDDLE, with the previous change,
+    consistent.  (12/10/07, Valdes)
+
+t_setairmass.x
+    The UTMIDDLE keyword will now always be in date format.  This fixes
+    a problem with changes of the date and insures other tasks which
+    use UTMIDDLE in place of DATE-OBS will used the correct time.
+    (12/10/07, Valdes)
+
+=====
+V2.14
+=====
+
+=======
+V2.12.2
+=======
+
+astutil.cl
+t_ccdtime.x     -
+ccdb.x          -
+ccdtime.par     -
+mkpkg
+    CCDTIME was moved to the OBSUTIL package in V2.12.  But the version in
+    ASTUTIL was retained.  The change here was to have the ASTUTIL version
+    point to the OBSUTIL version so that there is only one source,
+    parameter file, and executable.  (4/28/03, Valdes)
+
+=====
+V2.12
+=====
+
+t_rvcorrect.x
+    If imupdate=no then the image is now opened READ_ONLY.  Previously
+    the image was always opened READ_WRITE requiring the user to have
+    write permission on the image.  (12/14/01, Valdes)
+
+t_setairmass.x
+    Previously if DATE-OBS included the UT then that time was used and
+    it was not possible to specify an alternate UT.  Now the UT keyword
+    has precedence over DATE-OBS.  To allow the keyword for UT to point
+    to DATE-OBS for the time the UT keyword may be specified in either
+    data/time format or as hours.
+
+    The UTMIDDLE output option will now be written in the same format as
+    the keyword used for the input UT.
+    (9/20/01, Valdes)
+
+t_rvcorrect.x
+    Previously if DATE-OBS included the UT then that time was used and
+    it was not possible to specify an alternate UT.  Now the UT keyword
+    has precedence over DATE-OBS.  To allow the keyword for UT to point
+    to DATE-OBS for the time the UT keyword may be specified in either
+    data/time format or as hours.
+    (9/20/01, Valdes)
+
+pdm/pdmtheta.x
+    The procedure that bins the data would compute negative bins leading
+    to memory corruption when the input x values are not sorted.  I made
+    a fix to this which solves the immediate problem.  I didn't figure
+    out the code enough to know if there is any other assumption about the
+    input data being sorted.  (2/22/01, Valdes)
+
+t_rvcorrect.x
+    Task now checks if a file specified in the "files" parameter is actually
+    and image and prints a warning.  See buglog 477.  (1/31/01, Valdes)
+
+pdm/TODO	+
+    Added a TODO file for suggestions for further work.
+    (12/11/00, Valdes)
+
+setairmass.par
+setairmass.hlp
+t_setairmass.x
+airmass.x
+mkpkg
+    The image header keyword parameters ra, dec, equinox, st, ut,
+    and the scale height parameter were added to the setairmass task. In
+    the previous version of the task ra, dec, equinox, st and ut were
+    hardwired to "RA", "DEC", "EPOCH", "ST", and "UT", and the scale
+    parameter was hardwired to 750.0. (10/31/00, Davis)
+
+t_ccdtime.x
+doc/ccdtime.hlp
+    It is now an error if time<0, time>10-000, abs(mag)>40, snr<0 or
+    snr>100000.  (8/24/00, Valdes)
+
+astfunc.x
+    There was a typo in the opcode for CLPUT.  It was 10 instead of 20.
+    This resulted in not branching to the I/O function evaluator and
+    giving a "requires 1 argument" error.
+    (6/29/00, Valdes)
+
+doc/setairmass.hlp
+    Made it clear that DATE-OBS means UT date.  (6/21/00, Valdes)
+
+========
+V2.11.3p1
+========
+
+t_setairmass.x
+    Moved erract call before imunmap to avoid an incorrect error string
+    (about isodate) being printed.  (10/21/99, Valdes)
+
+astfunc.x
+t_rvcorrect.x
+    Added missing time.h dependencies.  (10/11/99, Valdes)
+
+asttools/mkpkg
+    Added missing dependency for astgalactic.x.  (10/11/99, Valdes)
+
+t_astcalc.x
+    There was an extra READ_ONLY immap when processing a list of images.
+    Therefore when using a long list of STF format images where a file
+    descriptor is opened and not closed until imunmap it was possible to
+    run out of file descriptors.  This was not a problem with imh
+    or fits formats.  (8/31/99, Valdes)
+
+t_rvcorrect.x
+astfunc.x
+    The dates in old FITS format incorrectly are adding 1900 to the year
+    where the 1900 is already added by the parsing routine.
+    (8/30/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+t_asthedit.x
+t_astcalc.x
+astfunc.x
+doc/asthedit.hlp
+doc/astcalc.hlp
+    The epoch, julday, and mst functions now take either the old or new
+    FITS style date strings.  The time argument is optional and if it is
+    not specified the time from the date string is used and if neither time
+    is present a value of 0h is used.  New internal variables $GMD, $GMT,
+    and $GMDT for the current time Greenwich time are defined.
+    (5/19/99, Valdes)
+
+t_rvcorrect.x
+t_setairmss.x
+t_setjd.x
+doc/rvcorrect.hlp
+doc/setairmass.hlp
+doc/setjd.hlp
+doc/keywpars.hlp
+    Converted to use dtm_decode.  Documentation updated.
+    (5/19/99, Valdes)
+
+astcalc.par
+asthedit.par
+asttimes.par
+doc/asttimes.hlp
+galactic.par
+galactic.x
+keywpars.par
+precess.par
+precess.x
+rvcorrect.par
+setairmass.par
+setjd.par
+    These files were checked for Y2K correctness.  No changes were required.
+    (5/19/99, Valdes)
+
+asttools/*
+    All routines checked for Y2K correctness.  No changes were required.
+    The README file had the following statement added:
+
+    Y2K:
+	Most routines work in Julian days or epochs.  If they have an input
+	year it is converted to one of these forms by calling
+	ast_date_to_julday.  This is the only routine that has a Y2K
+	connection.  It assumes two digit years are 20th century.  These
+	routines are Y2K correct.
+
+    (5/19/99, Valdes)
+
+doc/pdm.hlp
+    Added a journal reference to the algorithm.  (4/26/99, Valdes)
+
+astfunc.x
+    The imdel function name was incorrectly set as imde.  (4/22/99, Valdes)
+
+doc/galactic.hlp
+doc/asthedit.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+doc/ccdtime.hlp
+    In the formula for r(sky) was pixel area term was in the wrong place.
+    (3/9/99, Valdes)
+
+t_rvcorrect.x
+    Improved error catching.  (3/5/99, Valdes)
+
+t_rvcorrect.x
+    Added code the catch a bad DATE-OBS keyword and print an informative
+    error (2/21/99 MJF)
+
+t_ccdtime.x
+    For the case where SNR is very large and a time is specified the
+    iteration on the magnitude might not complete.  The iteration is now
+    capped at 100 and the test for convergence is now normalized.
+    (11/6/98, Valdes)
+
+t_ccdtime.x
+doc/ccdtime.hlp
+    1.  The calculation of exposure time given a SNR was changed from an
+	interative solution to an analytic solution.
+    2.  The times are printed to 0.01s.
+    3.  The photometry aperture is now the rounded-up integer with a minimum
+	of 9 pixels.
+    (9/8/98, Valdes)
+
+t_ccdtime.x
+ccddb.x
+doc/ccdtime.hlp
+    1.	The database keywords can now be index by reference to the telescope,
+	filter, and/or telescope.
+    2.  A new filter keyword, "extinction", was added to specify the
+	extinction.
+    3.	The extinction is now used to fixe the previous incorrect behavior
+	that used 1 mag/airmass extinction.  The old results are preserved
+	by making the default extinction be 1 if missing.  However the
+	database files should be updated to have correct extinctions.
+    (8/19/98, Valdes)
+
+rvcorrect.par
+        Removed the KEYPARS pset from the parameter file.  The pset is
+        still available to the task, but it's presence interferes with
+        the task when used in CL mode since the 'ut' parameter is no
+        longer queried and the pset value is used, resulting in an 
+        illegal number error when getting the value (4/22/98 MJF)
+
+t_setjd.x
+    The ctod function was incorrectly declared double.  (3/10/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+pdm/pdmdelete.x
+    The statement "r2min = MAX_DOUBLE" was changed to "r2min=MAX_REAL"
+    since r2min is declared and used as real.  (10/6/97, Valdes)
+
+=====
+V2.11
+=====
+
+pdm/pdmtheta.x
+pdm/pdmthetaran.x
+pdm/t_pdm.x
+doc/pdm.hlp
+pdm.par
+    1.	The theta calculation was incorrect when there is less than 100 input
+	data points.  In that case overlapping bins are used and the
+	calculation failed to account for this.
+    2.  Removed the debug option.
+    3.  Updated help including documentation of the "pluspoint" parameter.
+    (10/1/96, Valdes)
+
+t_setjd.x
+setjd.hlp
+    Improved error checking and interpretation of the epoch keyword.
+    If an epoch keyword is specified and the keyword is not found
+    or can't be interpreted it is an error.  If the epoch is an unlikely
+    value a warning is printed.  If the epoch begins with B or J (case
+    insensitive) that is ok.  (8/30/96, Valdes)
+
+rvcorrect.par
+doc/rvcorrect.par
+	Forgot to add the keywpars pset declaration.  (8/26/96  MJF)
+
+astfunc.x
+    Added btoi function "iresult = btoi (O_VALC(args[1])=='y'..."
+    (6/3/96, Tody)
+
+astradius.cl	+
+astradius.dat	+
+doc/astradius.hlp +
+astutil.cl
+astutil.men
+astutil.hd
+    A new script task, ASTRADIUS, was written that is based on ASTCALC.
+    It finds and prints all images from an image list that have coordinates
+    within a specified radius of a specified coordinate.  (1/24/96, Valdes)
+
+t_astcalc.x	+
+astcalc.par	+
+x_astutil.x
+astutil.cl
+astutil.men
+astutil.hd
+mkpkg
+doc/astcalc.hlp	+
+    A new task, ASTCALC, was written that uses a greatly enhanced syntax
+    from that of the original t_asthedit.  It includes assignment statements,
+    simple conditional statements, and expressions without assignment.
+    Variables are implemented with a symbol table.  Image, text file,
+    and CL parameter I/O is done with function calls in the
+    expression evaluator.
+    (1/24/96, Valdes)
+
+t_asthedit.x
+asthedit.par
+mkpkg
+doc/asthedit.hlp
+    The task ASTHEDIT was revised to use a greatly enhanced syntax.  
+    Internally it is significantly different but functionally it
+    is similar.  A new parameter, update, was added to allow images
+    to be used which are read-only or not to be modified.  The
+    task allows a null image list so that it can be used as a calculator.
+    (1/24/96, Valdes)
+
+astfunc.x	+
+astfunc.h	+
+    The function evaluator from t_asthedit.x was extracted to a separate
+    file.  The set of functions was increased, primarily with the
+    addition of I/O functions for printing, imio, fio, clio, fmtio,
+    and errors.  These functions are organized in a subfunction
+    procedure. (1/24/96, Valdes)
+
+airmass.x
+t_setairmass.x
+    Moved the airmass procedure from t_setairmass.x to airmass.x.
+    (1/23/96, Valdes)
+
+astutil$t_obs.x
+astutil$t_asttimes.x
+astutil$observatory.par
+    Modified to allow non-integer timezones.  (12/29/94, Valdes)
+
+astutil$t_setjd.x
+    Added an extra digit to the printed output to give times to a second.
+    (6/4/94, Valdes)
+
+astutil$t_asthedit.x
+    Modified this to use the evvexpr package rather than the evexpr package
+    since the former includes double precision datatypes necessary to
+    maintain precision on some astronomical quantities.  (4/22/94, Valdes)
+
+astutil$ccddb.x
+astutil$doc/ccdtime.hlp
+    1.	The code would not work with database entries containing whitespace.
+    2.	The help was not correct in describing how the number of pixels used
+	in the photometry is calculated from the seeing FWHM.
+    (4/5/94, Valdes)
+
+astutil$t_ccdtime.x
+    Modified CCDTIME to use a plate scale instead of the f/ratio and to
+    include an airmass term.  (10/23/93, Valdes)
+
+astutil$mkpkg
+astutil$asttools/mkpkg
+    The ASTTOOLS routines are now an NOAO package library which can be
+    referenced as -lasttools.  (8/19/93, Valdes)
+
+astutil$t_ccdtime.x	+
+astutil$ccddb.x		+
+astutil$ccdtime.x	-
+astutil$ccdtime.par
+astutil$doc/ccdtime.hlp
+astutil$astutil.men
+astutil$mkpkg
+    Revised CCDTIME to use a telescope/filter/detector database and to
+    compute and print additional information.  (8/16/93, Valdes)
+
+astutil$t_asttimes.x
+    1.	The times are now always printed in the proper 24 hour interval.
+    2.	Also the fix to asttimes.x fixes incorrect values produced around
+	the new year.
+    3.  The header parameter also suppress printing the observatory info.
+	(5/27/93, Valdes)
+
+astutil$asttools/asttimes.x
+    The epoch was changed from day of the year divided by 365.25 to the
+    precise J2000 Julian epoch definition.  This also has the effect
+    of fixing incorrect values of JD and LMST around the new year.
+    (5/27/93, Valdes)
+
+astutil$t_rvcorrect.x
+astutil$keywpars.par		+
+astutil$doc/keywpars.hlp	+
+    Added a pset KEYWPARS which is a duplicate of the RV package version,
+    updated the RVCORRECT task to make use of this instead of using hard-
+    wired image header keywords.  Previously it was possible that the astutil
+    version of RVCORRECT would compute a heliocentric correction different
+    from what was found by the RV package when working from image headers.
+    Eventually other tasks should be modified to make use of this pset.
+    (5/12/93, MJF)
+
+astutil$t_asthedit.x
+astutil$asthedit.par
+astutil$doc/asthedit.hlp
+astutil$x_astutil.x
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    ASTHEDIT is a new task which edits image headers of astronomical images.
+    In includes functions for airmass, astronomical times, precession, etc.
+    (3/30/93, Valdes)
+
+astutil$t_rvcorrect.x
+    A typo in the clgstr call in the rvc_images procedure resulted in the
+    input observatory name being truncated at 2 characters.  Instead
+    of TY_CHAR for the lenght of the string it needs to be SZ_FNAME.
+    (2/1/93, Valdes)
+
+=======
+V2.10.2
+=======
+
+astutil$astutil.par
+astutil$asttimes.par
+astutil$rvcorrect.par
+astutil$setairmass.par
+astutil$setjd.par
+astutil$doc/asttimes.hlp
+astutil$doc/rvcorrect.hlp
+astutil$doc/setairmass.hlp
+astutil$doc/setjd.hlp
+    Observatory parameter redirected to package parameter.
+    (2/6/92, Valdes)
+
+astutil$t_rvcorrect.x
+astutil$t_setairmass.x
+astutil$t_setjd.x
+    Modified to use obsimopen.  (2/4/92, Valdes)
+
+astutil$t_obs.x
+astutil$observatory.par
+astutil$doc/obs.hlp
+    New version of this task.  (2/4/92, Valdes)
+
+astutil$t_setjd.x +
+astutil$setjd.par +
+astutil$doc/setjd.hlp +
+astutil$mkpkg
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    Added task to set Julian dates in image headers.
+    (1/29/92, Valdes)
+
+asttools$asttimes.x
+asttools$asthjd.x
+    1.  Added additional conversions from date to JD and back from
+	Numerical Receipes without having to go through the epoch.
+    2.  Added HJD from JD without needing to go through the epoch.
+    (1/29/92, Valdes)
+
+astutil$t_setairmass.x
+astutil$setairmass.par
+astutil$doc/setairmass.hlp
+    1.  Changed the default action to update the image headers.
+    2.  Added an update field to the show listing.
+    3.  A warning is printed if show=no and update=no since this is a noop.
+    (11/5/91, Valdes)
+
+astutil$t_setairmass.x
+    The hour angle was slightly incorrect because universal time, from
+    the exposure time, was used instead of siderial time in computing the
+    midpoint.  (8/26/91, Seaman)
+
+astutil$asttools/*.x
+    Coerced all constants with many significant digits to double precision.
+    (6/24/91, Valdes)
+
+astutil$asttools/asthjd.x
+    The dummy argument t was changed to lt as declared.  (6/24/91, Valdes)
+
+astutil$t_gratings.x
+astutil$gratings.par
+astutil$doc/gratings.hlp
+astutil$mkpkg
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    Added a new task to compute grating parameters. (3/13/91, Valdes)
+
+astutil$t_setairmass.x
+astutil$t_rvcorrect.x
+astutil$t_asttimes.x
+astutil$setairmass.par
+astutil$rvcorrect.par
+astutil$astttimes.par
+astutil$doc/setairmass.hlp
+astutil$doc/rvcorrect.hlp
+astutil$doc/astttimes.hlp
+    Updated to use observatory parameter.  (11/19/90, Valdes)
+
+astutil$t_obs.x +
+astutil$x_astutil.x
+astutil$mkpkg
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    1.  A new version of the observatory task based on an observatory database
+    using the new interface obsdb.x in xtools was added to the astutil
+    executable.
+    2.  The observatory help was revised and moved to astutil.
+    3.  The observatory task itself is defined in noao and was removed
+    from the astutil package definitions.
+    (11/6/90, Valdes)
+
+astutil$t_asttimes.x
+    Added a modulus operations to convert any zone to the range -12 to 12.
+    (9/28/90, Valdes)
+
+astutil$t_asttimes.x
+    Changed the procedure times to ast_times to avoid a name conflict in the
+    HPUX port.  This is a better name anyway.  (9/8/90, Valdes)
+
+astutil$asttimes.par
+    Removed the range limits on the zone.  Zones east of Greenwich need to
+    be negative to obtain the correct dates.  (6/15/90, Valdes)
+
+astutil$doc/galactic.hlp
+    Corrected comment about epoch of galactic coordinates.  Added an example
+    showing how to get galactic coordinates for images containing
+    equitorial coordinates.  (5/23/90, Valdes)
+
+====
+V2.9
+====
+
+astutil$setairmass.par
+astutil$t_setairmass.x
+    The task now precesses the coordinates to the epoch of the
+    observation.  (2/2/90, Seaman)
+
+astutil$astutil.hd
+    The path to the sources to PDM was not defined correctly.
+    Changed src=pdm/t_pdm.x to src=pdm$t_pdm.x. (1/28/90 Lytle)
+
+astutil$t_setairmass.x +
+astutil$setairmass.par +
+astutil$doc/setairmass.hlp +
+astutil$x_astutil.x
+astutil$mkpkg
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    Added a new task to compute and update airmass and universal time
+    in image headers based on the exposure.  (5/19/89, Valdes)
+
+astutil$asttools/asttimes.x
+    The leap year was not handled correctly for the centuries in
+    ast_day_of_year.  (5/11/89, Valdes)
+
+astutil$rvcorrect.par
+astutil$t_rvcorrect.x
+astutil$doc/rvcorrect.hlp
+     Added 'imupdate' parameter to make updating image headers with
+     computed corrections an option.  (5/5/89, Fitzpatrick)
+
+astutil$galactic.x
+astutil$galactic.par
+astutil$doc/galactic.hlp
+astutil$asttools/astgaltoeq.x +
+    GALACTIC now can transform in either direction.  (2/14/89, Valdes)
+
+noao$astutil/t_rvcorrect.x
+noao$astutil/doc/rvcorrect.hlp
+    Changed the keywords and output when using images.  The observed
+    velocity must now be VOBS.  The output is HJD, VHELIO, VLSR, and
+    VSUN (a record of the Sun's velocity used for VLSR).  (12/14/88 Valdes)
+
+noao$astutil/asttools/ast_galactic.x
+    The galactic task was not precessing the input coordinates before
+    computing the galactic coordinates.
+
+    I changed the single precision defined constants to double precision
+    and the in line constant 15 to 15.0d0.
+    (9/15/88 Davis)
+
+noao$astutil/astvorbit.x
+noao$astutil/astvbary.x
+noao$astutil/asthjd.x
+    The calls to AST_COORD needed double precision arguments.  (7/26/88 Valdes)
+
+noao$astutil/astutil.cl
+    Added OBSERVATORY task to this package.  (4/12/88 Valdes)
+
+noao$astutil/galactic.x
+    The double precision variables lii and bii where being printed with
+    PARGR which gives wrong results on the SUNS. (11/6/87 Valdes)
+
+noao$astutil/*
+noao$astutil/t_asttimes.x +
+noao$astutil/asttimes.par +
+noao$astutil/doc/asttimes.help +
+noao$astutil/t_rvcorrect.x +
+noao$astutil/rvcorrect.par +
+noao$astutil/doc/rvcorrect.help +
+noao$astutil/asttools/* +
+    The package was reorganized to put algorithm procedures in the subdirectory
+    asttools.  A README file describes the contents of this directory.
+
+    New tasks ASTTIMES and RVCORRECT have been added for computing astronomical
+    dates and times and radial velocity corrections.  Tools used by these
+    tasks were added to the asttools library.
+    (10/29/87)
+
+noao$astutil/precess.x
+    Replaced use of preces.f with new ast_precess.x.  This also involved
+    changing years to double precession internally. (10/28/87 Valdes)
+
+noao$astutil/Revisions
+    Valdes, May 26, 1987
+    1.  Revisions file started.
+
+    Lytle, May 28, 1987
+    2. Installed PDM in astutil.
+.endhelp

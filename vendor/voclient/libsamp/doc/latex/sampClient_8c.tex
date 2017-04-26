@@ -1,0 +1,246 @@
+\hypertarget{sampClient_8c}{
+\section{sampClient.c File Reference}
+\label{sampClient_8c}\index{sampClient.c@{sampClient.c}}
+}
+\hyperlink{structClient}{Client} callable methods.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void \hyperlink{sampClient_8c_c73788ae17493c4042948f6b861ddd74}{samp\_\-notify} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recipId, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Make a notify() call to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampClient_8c_f48228224c20ddaf8b4b4ce39fa6ec16}{samp\_\-notifyAll} (handle\_\-t handle, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Make a notifyAll() call to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} \hyperlink{sampClient_8c_68d7703657197a3d9256729cf2971033}{samp\_\-call} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recipId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-tag, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Make a call() call to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampClient_8c_66d67a1ba0dff1f6dab68f74299f500a}{samp\_\-callAll} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-tag, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Make a callAll() call to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampClient_8c_6780568b9e9dfae5b361c2b2e52c16ed}{samp\_\-callAndWait} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} recipId, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-tag, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} msg)
+\begin{CompactList}\small\item\em Make a callAndWait() call to the \hyperlink{structHub}{Hub}. \item\end{CompactList}\item 
+int \hyperlink{sampClient_8c_ae0a6eaf06027e28ade8865196f1e2c6}{samp\_\-Reply} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} msg\_\-id, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} response)
+\begin{CompactList}\small\item\em Reply to a message. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} \hyperlink{sampClient_8c_0a996f4e24693c2eacba579ecbceedbb}{samp\_\-clientName} (handle\_\-t handle, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} pubId)
+\begin{CompactList}\small\item\em Get the \hyperlink{structClient}{Client} name from a pubic-id. \item\end{CompactList}\item 
+int \hyperlink{sampClient_8c_91aeabe77e920fc1924b1cdc4f088e64}{samp\_\-setErr} (handle\_\-t handle, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} resp)
+\begin{CompactList}\small\item\em Set the error response string. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} \hyperlink{sampClient_8c_4946a754670217dbdbc83cca92217022}{samp\_\-getErr} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Get the error response string. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+\hyperlink{structClient}{Client} callable methods. 
+
+SAMPCLIENT.C -- \hyperlink{structClient}{Client} callable methods.
+
+samp\_\-notify (handle, recipId, msg\_\-map) list = samp\_\-notifyAll (handle, msg\_\-map) str = samp\_\-call (handle, recipId, tag, msg\_\-map) map = samp\_\-callAll (handle, msg\_\-tag, msg\_\-map) map = samp\_\-callAndWait (handle, recipId, msg\_\-tag, msg\_\-map) stat = samp\_\-Reply (handle, msg\_\-id, resp\_\-map)
+
+str = samp\_\-clientName (handle, pubId) stat = samp\_\-setErr (handle, resp\_\-map) str = samp\_\-getErr (handle)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/11 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampClient_8c_68d7703657197a3d9256729cf2971033}{
+\index{sampClient.c@{sampClient.c}!samp\_\-call@{samp\_\-call}}
+\index{samp\_\-call@{samp\_\-call}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-call}]{\setlength{\rightskip}{0pt plus 5cm}{\bf String} samp\_\-call (handle\_\-t {\em handle}, \/  {\bf String} {\em recipId}, \/  {\bf String} {\em msg\_\-tag}, \/  {\bf Map} {\em msg})}}
+\label{sampClient_8c_68d7703657197a3d9256729cf2971033}
+
+
+Make a call() call to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-CALL -- Make a call() call to the \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recipId}]recipient ID \item[{\em msg\_\-tag}]message tag \item[{\em msg}]message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]message ID \end{Desc}
+
+
+References Samp::debug, Samp::errortxt, Samp::hub, hub, Hub::id, Hub::privateKey, samp\_\-app2id(), and Samp::trace.
+
+Referenced by samp\_\-sendMsg().\hypertarget{sampClient_8c_66d67a1ba0dff1f6dab68f74299f500a}{
+\index{sampClient.c@{sampClient.c}!samp\_\-callAll@{samp\_\-callAll}}
+\index{samp\_\-callAll@{samp\_\-callAll}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-callAll}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-callAll (handle\_\-t {\em handle}, \/  {\bf String} {\em msg\_\-tag}, \/  {\bf Map} {\em msg})}}
+\label{sampClient_8c_66d67a1ba0dff1f6dab68f74299f500a}
+
+
+Make a callAll() call to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-CALLALL -- Make a callAll() call to the \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em msg\_\-tag}]message tag \item[{\em msg}]message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::debug, Samp::errortxt, Samp::hub, hub, Hub::id, Hub::privateKey, samp\_\-setErr(), and Samp::trace.
+
+Referenced by samp\_\-Ping(), and samp\_\-sendMsg().\hypertarget{sampClient_8c_6780568b9e9dfae5b361c2b2e52c16ed}{
+\index{sampClient.c@{sampClient.c}!samp\_\-callAndWait@{samp\_\-callAndWait}}
+\index{samp\_\-callAndWait@{samp\_\-callAndWait}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-callAndWait}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-callAndWait (handle\_\-t {\em handle}, \/  {\bf String} {\em recipId}, \/  {\bf String} {\em msg\_\-tag}, \/  {\bf Map} {\em msg})}}
+\label{sampClient_8c_6780568b9e9dfae5b361c2b2e52c16ed}
+
+
+Make a callAndWait() call to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-CALLANDWAIT -- Make a callAndWait() call to the \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recipId}]recipient ID \item[{\em msg\_\-tag}]message tag \item[{\em msg}]message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::debug, Samp::errortxt, Samp::hub, hub, Hub::id, Hub::privateKey, samp\_\-app2id(), samp\_\-setErr(), Hub::timeout, and Samp::trace.
+
+Referenced by samp\_\-Ping(), and samp\_\-sendMsg().\hypertarget{sampClient_8c_0a996f4e24693c2eacba579ecbceedbb}{
+\index{sampClient.c@{sampClient.c}!samp\_\-clientName@{samp\_\-clientName}}
+\index{samp\_\-clientName@{samp\_\-clientName}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-clientName}]{\setlength{\rightskip}{0pt plus 5cm}{\bf String} samp\_\-clientName (handle\_\-t {\em handle}, \/  {\bf String} {\em pubId})}}
+\label{sampClient_8c_0a996f4e24693c2eacba579ecbceedbb}
+
+
+Get the \hyperlink{structClient}{Client} name from a pubic-id. 
+
+SAMP\_\-CLIENTNAME -- Get the \hyperlink{structClient}{Client} name from a pubic-id.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em pubId}]public ID \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]declared application name \end{Desc}
+\hypertarget{sampClient_8c_4946a754670217dbdbc83cca92217022}{
+\index{sampClient.c@{sampClient.c}!samp\_\-getErr@{samp\_\-getErr}}
+\index{samp\_\-getErr@{samp\_\-getErr}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-getErr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf String} samp\_\-getErr (handle\_\-t {\em handle})}}
+\label{sampClient_8c_4946a754670217dbdbc83cca92217022}
+
+
+Get the error response string. 
+
+SAMP\_\-GETERR -- Get the error response string.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Error text string \end{Desc}
+
+
+References Samp::errortxt.\hypertarget{sampClient_8c_c73788ae17493c4042948f6b861ddd74}{
+\index{sampClient.c@{sampClient.c}!samp\_\-notify@{samp\_\-notify}}
+\index{samp\_\-notify@{samp\_\-notify}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-notify}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-notify (handle\_\-t {\em handle}, \/  {\bf String} {\em recipId}, \/  {\bf Map} {\em msg})}}
+\label{sampClient_8c_c73788ae17493c4042948f6b861ddd74}
+
+
+Make a notify() call to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-NOTIFY -- Make a notify() call to the \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em recipId}]recipient ID \item[{\em msg}]message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::hub, hub, Hub::id, Hub::privateKey, samp\_\-app2id(), and samp\_\-nullResponse().
+
+Referenced by samp\_\-sendMsg().\hypertarget{sampClient_8c_f48228224c20ddaf8b4b4ce39fa6ec16}{
+\index{sampClient.c@{sampClient.c}!samp\_\-notifyAll@{samp\_\-notifyAll}}
+\index{samp\_\-notifyAll@{samp\_\-notifyAll}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-notifyAll}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} samp\_\-notifyAll (handle\_\-t {\em handle}, \/  {\bf Map} {\em msg})}}
+\label{sampClient_8c_f48228224c20ddaf8b4b4ce39fa6ec16}
+
+
+Make a notifyAll() call to the \hyperlink{structHub}{Hub}. 
+
+SAMP\_\-NOTIFYALL -- Make a notifyAll() call to the \hyperlink{structHub}{Hub}
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em msg}]message map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::debug, Samp::errortxt, Samp::hub, hub, Hub::id, Hub::privateKey, and Samp::trace.
+
+Referenced by samp\_\-sendMsg().\hypertarget{sampClient_8c_ae0a6eaf06027e28ade8865196f1e2c6}{
+\index{sampClient.c@{sampClient.c}!samp\_\-Reply@{samp\_\-Reply}}
+\index{samp\_\-Reply@{samp\_\-Reply}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-Reply}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-Reply (handle\_\-t {\em handle}, \/  {\bf String} {\em msg\_\-id}, \/  {\bf Map} {\em response})}}
+\label{sampClient_8c_ae0a6eaf06027e28ade8865196f1e2c6}
+
+
+Reply to a message. 
+
+SAMP\_\-REPLY -- Reply to a message. All we do here is send the reply message, we require that the response Map already be defined.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em msg\_\-id}]message ID \item[{\em response}]response map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::hub, hub, Hub::id, Hub::privateKey, and samp\_\-nullResponse().
+
+Referenced by samp\_\-receiveCall().\hypertarget{sampClient_8c_91aeabe77e920fc1924b1cdc4f088e64}{
+\index{sampClient.c@{sampClient.c}!samp\_\-setErr@{samp\_\-setErr}}
+\index{samp\_\-setErr@{samp\_\-setErr}!sampClient.c@{sampClient.c}}
+\subsubsection[{samp\_\-setErr}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-setErr (handle\_\-t {\em handle}, \/  {\bf Map} {\em resp})}}
+\label{sampClient_8c_91aeabe77e920fc1924b1cdc4f088e64}
+
+
+Set the error response string. 
+
+SAMP\_\-SETERR -- Set the error response string/code.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]samp struct handle \item[{\em resp}]Response map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]SAMP\_\-OK or SAMP\_\-ERR \end{Desc}
+
+
+References Samp::errortxt.
+
+Referenced by samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-Ping(), and samp\_\-sendMsg().

@@ -1,0 +1,60 @@
+.help smat Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slSMAT (N, A, Y, D, JF, IW)
+
+     - - - - -
+      S M A T
+     - - - - -
+
+  Matrix inversion & solution of simultaneous equations
+  (single precision)
+
+  For the set of n simultaneous equations in n unknowns:
+     A.Y = X
+
+  where:
+     A is a non-singular N x N matrix
+     Y is the vector of N unknowns
+     X is the known vector
+
+  SMATRX computes:
+     the inverse of matrix A
+     the determinant of matrix A
+     the vector of N unknowns
+
+  Arguments:
+
+     symbol  type dimension           before              after
+
+       N      int                 no. of unknowns       unchanged
+       A      real  (N,N)             matrix             inverse
+       Y      real   (N)              vector            solution
+       D      real                       -             determinant
+     * JF     int                        -           singularity flag
+       IW     int    (N)                 -              workspace
+
+  *  JF is the singularity flag.  If the matrix is non-singular,
+    JF=0 is returned.  If the matrix is singular, JF=-1 & D=0.0 are
+    returned.  In the latter case, the contents of array A on return
+    are undefined.
+
+  Algorithm:
+     Gaussian elimination with partial pivoting.
+
+  Speed:
+     Very fast.
+
+  Accuracy:
+     Fairly accurate - errors 1 to 4 times those of routines optimized
+     for accuracy.
+
+  Note:  replaces the obsolete slSMATRX routine.
+
+  P.T.Wallace   Starlink   10 September 1990
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,5 @@
+# Parameter file for WCSCOPY
+
+images,f,a,,,,"List of input images"
+refimages,f,a,,,,"List of reference images"
+verbose,b,h,yes,,,"Print messages about actions taken ?"

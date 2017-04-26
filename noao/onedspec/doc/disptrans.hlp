@@ -1,0 +1,193 @@
+.help disptrans Aug94 noao.onedspec
+.ih
+NAME
+disptrans -- Transform dispersion units and apply air correction
+.ih
+USAGE
+disptrans input output units
+.ih
+PARAMETERS
+.ls input
+List of dispersion calibrated input spectra to be dispersion transformed.
+.le
+.ls output
+List of output dispersion transformed spectra.  If given the input names
+(or a null list), each input spectrum will be replaced by the transformed
+output spectrum.
+.le
+.ls units
+Output dispersion units.  A wide range of dispersion units may be
+specified and they are described in the UNITS section.
+.le
+.ls error = 0.01
+Maximum error allowed in the output dispersion transformation expressed
+as a pixel error; that is, the equivalent pixel shift in the output
+dispersion function corresponding to the maximum difference between
+the exact transformation and the dispersion function approximation.
+The smaller the allowed error the higher the order of dispersion
+function used.
+.le
+.ls linearize = no
+Resample the spectrum data to linear increments in the output dispersion
+system?  If no then the output dispersion function is stored in the
+spectrum header and if yes the spectrum is resampled into the same
+number of pixels over the same dispersion range but in even steps
+of the output dispersion units.
+.le
+.ls verbose = yes
+Print a log of each spectrum transformed to the standard output?
+.le
+
+.ls air = "none" (none|air2vac|vac2air)
+Apply an air to vacuum or vacuum to air conversion?  It is the
+responsibility of the user to know whether the input dispersion
+is in air or vacuum units and to select the appropriate conversion.
+The conversion types are "none" for no conversion, "air2vac" to
+convert from air to vacuum, and "vac2air" to convert from vacuum
+to air.
+.le
+.ls t = 15, p = 760, f = 4
+Temperature t in degrees C, pressure p in mmHg, and water vapour pressure f
+in mmHg for the air index of refraction.
+.le
+
+OTHER PARAMETERS
+
+.ls interp = "poly5" (nearest|linear|poly3|poly5|spline3|sinc)
+Spectrum interpolation type used when spectra are resampled.  The choices are:
+
+.nf
+	nearest - nearest neighbor
+	 linear - linear
+	  poly3 - 3rd order polynomial
+	  poly5 - 5th order polynomial
+	spline3 - cubic spline
+	   sinc - sinc function
+.fi
+.le
+.ih
+DESCRIPTION
+The dispersion function in the input spectra, y = f(x) where x is the
+pixel coordinate and y is the input dispersion coordinate, is
+transformed to y' = g(x) where y' is in the new dispersion units.  This is done
+by evaluating the input dispersion coordinate y at each pixel, applying an
+air to vacuum or vacuum to air conversion if desired, and applying the
+specified unit transformation y' = h(y).  Since the transformations are
+nonlinear functions and the output dispersion function must be expressed in
+polynomial form, the function g(x) is determined by fitting a cubic spline
+to the set of x and y' values.  The lowest number of spline pieces is used
+which satisfies the specified error.  Note that this error is not a random
+error but difference between the smooth fitted function and the smooth
+dispersion function in the header.  As a special case, the first
+fit tried is a linear function.  If this satisfies the error condition
+then a simpler dispersion description is possible.  Also this is
+appropriate for dispersion units which are simply related by a
+scale change such as Angstroms to nanometers or Hertz to Mev.
+
+The error condition is that the maximum difference between the exact or
+analytic (the air/vacuum conversion is never exact) transformation and the
+fitted function value at any pixel be less than the equivalent shift in
+pixel coordinate evaluated at that point.  The reason for using an error
+condition in terms of pixels is that it is independent of the dispersion of
+the spectra and the resolution of spectra is ultimately limited by the
+pixel sampling.
+
+After the new dispersion function is determined the function is either
+stored in the coordinate system description for the spectrum or used to
+resample the pixels to linear increments in the output dispersion units.
+The resampling is not done if the new dispersion function is already linear
+as noted above.  The sampling uses the mean value over the input spectrum
+covered by an output spectrum pixel (it is flux per unit dispersion element
+preserving as opposed to flux/counts preserving).  The linear sampling
+parameters are limited to producing the same number of output pixels as
+input pixels over the same range of dispersion.  If one wants to have more
+control over the resampling then the \fIlinearize\fR parameter should be
+set to no and the task \fBdispcor\fR used on the output spectrum.
+
+Note that an alternative to using this task is to do the original
+dispersion calibration (based on calibration spectra) with IDENTIFY
+and DISPCOR in the desired units.  However, currently the standard
+lines lists are in Angstroms.  There are, however, linelists for
+He-Ne-Ar, Th-Ar, and Th in vacuum wavelengths.
+.ih
+UNITS
+The dispersion units are specified by strings having a unit type from the
+list below along with the possible preceding modifiers, "inverse", to
+select the inverse of the unit and "log" to select logarithmic units. For
+example "log angstroms" to select the logarithm of wavelength in Angstroms
+and "inv microns" to select inverse microns.  The various identifiers may
+be abbreviated as words but the syntax is not sophisticated enough to
+recognized standard scientific abbreviations except for those given
+explicitly below.
+
+.nf
+	   angstroms - Wavelength in Angstroms
+	  nanometers - Wavelength in nanometers
+	millimicrons - Wavelength in millimicrons
+	     microns - Wavelength in microns
+	 millimeters - Wavelength in millimeters
+	  centimeter - Wavelength in centimeters
+	      meters - Wavelength in meters
+	       hertz - Frequency in hertz (cycles per second)
+	   kilohertz - Frequency in kilohertz
+	   megahertz - Frequency in megahertz
+	    gigahertz - Frequency in gigahertz
+	         m/s - Velocity in meters per second
+	        km/s - Velocity in kilometers per second
+	          ev - Energy in electron volts
+	         kev - Energy in kilo electron volts
+	         mev - Energy in mega electron volts
+
+	          nm - Wavelength in nanometers
+	          mm - Wavelength in millimeters
+	          cm - Wavelength in centimeters
+	           m - Wavelength in meters
+	          Hz - Frequency in hertz (cycles per second)
+	         KHz - Frequency in kilohertz
+	         MHz - Frequency in megahertz
+	         GHz - Frequency in gigahertz
+		  wn - Wave number (inverse centimeters)
+.fi
+
+The velocity units require a trailing value and unit defining the
+velocity zero point.  For example to transform to velocity relative to
+a wavelength of 1 micron the unit string would be:
+
+.nf
+	km/s 1 micron
+.fi
+.ih
+AIR/VACUUM CONVERSION
+The air to vacuum and vacuum to air conversions are obtained by multiplying
+or dividing by the air index of refraction as computed from the
+formulas in Allen's Astrophysical Quantities (p. 124 in 1973 edition).
+These formulas include temperature, pressure, and water vapour terms
+with the default values being the standard ones.
+.ih
+EXAMPLES
+1. Convert a spectrum dispersion calibrated in Angstroms to electron
+volts and resample to a linear sampling.
+
+.nf
+    cl> disptrans spec1 evspec1 ev linear+
+    evspec1: Dispersion transformed to ev.
+.fi
+
+2. Apply an air to vacuum correction to an echelle spectrum using the
+default standard temperature and pressure.  Don't resample but rather use
+a nonlinear dispersion function.
+
+.nf
+    cl> disptrans highres.ec vac.ec angs air=air2vac
+    vac.ec: Dispersion transformed to angstroms in vacuum with
+      t = 15. C, p = 760. mmHg, f = 4. mmHg.
+.fi
+.ih
+REVISIONS
+.ls DISPTRANS V2.10.4
+New task with this release.
+.le
+.ih
+SEE ALSO
+dispcor, identify, scopy, dopcor
+.endhelp

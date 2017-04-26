@@ -1,0 +1,6 @@
+url,s,q,"",,,"URL (http) to retrieve"
+fname,s,q,"",,,"Output file name"
+use_cache,b,h,yes,,,"Use previously cached file?"
+extn,s,h,"",,,"Filename extn for cached file"
+verbose,b,h,no,,,"Use verbose output?"
+cache,s,h,"cache$",,,"Cache directory"

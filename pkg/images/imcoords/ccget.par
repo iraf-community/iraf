@@ -1,0 +1,36 @@
+# Parameters for the CCGET task
+
+# Input and output files and images
+input,f,a,,,,The input catalog file(s)
+output,f,a,,,,The output catalog file(s) 
+
+# The user field parameters.
+lngcenter,s,a,"00:00:00.0",,,Ra / Longitude of field center
+latcenter,s,a,"00:00:00",,,Dec / Latitude of field center
+lngwidth,r,a,1.0,0.0,360.0,Ra / Longitude field width in degrees
+latwidth,r,a,1.0,0.0,180.0,Dec / Latitude field width in degrees
+fcsystem,s,h,"",,,The field center celestial coordinate system
+fclngunits,s,h,"",,,Ra / Longitude units of field center
+fclatunits,s,h,"",,,Dec / Latitude units of field center
+
+# The input catalog file parameters
+colaliases,s,h,"",,,Input catalog column aliases
+lngcolumn,s,h,"c2",,,Column containing the ra / longitude
+latcolumn,s,h,"c3",,,Column containing the dec / latitude 
+catsystem,s,h,"j2000",,,Catalog celestial coordinate system
+catlngunits,s,h,"",,,Catalog ra / longitude units
+catlatunits,s,h,"",,, Catalog dec / latitude units
+
+# The output catalog file parameters
+outsystem,s,h,"",,,Output celestial coordinate system
+olngunits,s,h,"",,,Output ra / longitude units
+olatunits,s,h,"",,, Ouput dec / latitude units
+olngformat,s,h,"",,,Output ra / longitude format
+olatformat,s,h,"",,, Ouput dec / latitude format
+exprs,s,h,"c[*]",,,The list of output column expressions
+formats,s,h,"",,,The optional output formats string
+
+# Output and graphics mode parameters
+verbose,b,h,yes,,,Print messages about progress of task ?
+
+mode,s,h,'ql'

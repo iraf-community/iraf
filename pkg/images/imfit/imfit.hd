@@ -1,0 +1,10 @@
+# Help directory for the IMFIT package
+
+$doc		= "images$imfit/doc/"
+$src		= "images$imfit/src/"
+
+fit1d		hlp=doc$fit1d.hlp,		src=src$fit1d.x
+imsurfit        hlp=doc$imsurfit.hlp,   	src=src$t_imsurfit.x
+lineclean       hlp=doc$lineclean.hlp,  	src=src$t_lineclean.x
+revisions	sys=Revisions
+

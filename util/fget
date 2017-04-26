@@ -1,0 +1,184 @@
+#!/bin/bash
+#
+#  FGET -- Download a URL.
+#
+#  Usage:     fget [-h] [-n] [-q | -v] url
+#
+#  Where	-n	no-op flag
+#		-q 	suppress output
+#		-v 	verbose output
+#		-d 	set download directory
+#		-o 	set output filename
+#		-h 	this message
+#
+#  Example:
+#	% fget -q ftp://iraf.noao.edu/iraf/extern/foo-linux.tar.gz
+#
+# ----------------------------------------------------------------------------
+
+
+export PATH=../util:/sbin:/usr/sbin:/bin:/usr/bin:$PATH:/usr/local/bin:/opt/local/bin:/local/bin
+
+
+##############################################################################
+# START OF MACHDEP DEFINITIONS.
+##############################################################################
+
+# MACHDEP definitions which may be reset below.
+
+
+# Find the iraf root directory.
+if [ -n "$iraf" ]; then
+  iraf=""
+  files=("~/.iraf.h" "~/.iraf/iraf.h" "/usr/include/iraf.h")
+  for f in ${files[@]}; do
+     # $iraf is defined, use a well-known path for the system
+     if [ -e $f ]; then
+       i=`egrep IRAF $f | egrep \#define | sed -e 's/"//g'  | awk '{print $3}'`
+       iraf=${i}
+       break
+     fi
+  done
+fi
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Determine platform architecture.
+arch=`$iraf/unix/hlib/irafarch.sh`
+
+
+##############################################################################
+# END OF MACHDEP DEFINITIONS.
+##############################################################################
+
+#=============================================================================
+# Declarations and initializations.
+#=============================================================================
+
+exec=yes
+verb=no
+url=""
+fname=""
+ddir=""
+
+
+# Process cmdline flags.
+while [ -n "$1" ] ; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+        ;;
+    "-q")                            # be quiet
+        verb=no
+        quiet=yes
+        ;;
+    "-v")                            # be chatty
+        verb=yes
+        quiet=no
+        ;;
+    "-h")                            # print help summary
+        _Usage
+	;;
+    "-d")                            # set download directory
+        ddir=$2
+	shift
+        ;;
+    "-o")                            # set output file name
+        fname=$2
+	shift
+        ;;
+    *)
+        url=$1
+        ;;
+    esac
+
+    if [ "$2" == "" ]; then
+        break
+    else
+        shift
+    fi
+done
+
+
+#  Error checks.
+if [ -z "$url" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "ERROR: URL not specified"
+   fi
+   exit 1
+fi
+
+# Get the download filename.  Delete an existing copy of the file
+if [ -z $fname ]; then
+    fname=${url##*/}
+fi
+if [ -e "$fname" ]; then
+    /bin/rm -f $fname
+fi
+
+# Ensure URL is an HTTP protocol.
+prot=`echo $url | cut -c1-3`
+if [ "$prot" == "ftp" ]; then
+  u=`echo $url | sed -e 's;ftp://iraf.noao.edu/iraf;http://iraf.noao.edu/ftp;'`
+  url=$u
+fi
+
+#  Do it.
+if [ "$exec" == "yes" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Downloading "$url" ...."
+   fi
+
+   args="url='$url' fname='${ddir}${fname}' cache='/tmp' verbose=no extn='' use_cache=no"
+   if [ "$verb" == "no" ]; then
+      $iraf/bin.$arch/x_system.e urlget ${args} \$nargs=2  >> /dev/null 2>&1
+   else
+      $iraf/bin.$arch/x_system.e urlget ${args} \$nargs=2
+   fi
+
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "done"
+   fi
+fi
+
+
+#  Verify we have the file.
+if [ ! -e ${url##*/} ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Error downloading file '"$fname"'"
+   fi
+   exit 1
+else
+   if (( $#>1 )); then
+      mv ${url##*/} $2
+   fi
+fi
+
+#  Normal exit.
+exit 0
+
+
+
+#=============================================================================
+# Usage
+#=============================================================================
+
+_Usage() {
+    /bin/echo "Usage: fget [-h] [-n] [-q | -v] url"
+    /bin/echo ""
+    /bin/echo "    where -n          # no execute"
+    /bin/echo "          -q          # suppress output"
+    /bin/echo "          -v          # verbose output"
+    /bin/echo "          -h          # this message"
+
+    exit 0
+}

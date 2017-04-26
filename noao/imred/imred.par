@@ -1,0 +1,5 @@
+# IMRED package parameter file
+
+keeplog,b,h,no,,,Keep log of processing?
+logfile,f,h,"imred.log",,,Log file
+version,s,h,"IMRED V3: August 2001"

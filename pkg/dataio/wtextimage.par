@@ -1,0 +1,8 @@
+# Parameter file for t_wtextimage, IRAF image to text file converter
+
+input,f,a,,,,Input image file
+output,f,a,,,,Output text file
+header,b,h,yes,,,Print header information?
+pixels,b,h,yes,,,Print pixel values?
+format,s,h,"",,,Pixel format <w.d[defgz]>
+maxlinelen,i,h,80,1,322,Maximum line length output

@@ -1,0 +1,10 @@
+task	newextraction	= t_new_extraction,
+	findpeaks	= t_find_peaks,
+	mslist		= t_ms_list,
+	msset		= t_ms_set,
+	fitfunction	= t_fit_function,
+	modellist	= t_model_list,
+	fitgauss5	= t_fit_gauss5,
+	msextract	= t_msextract,
+	newimage	= t_new_image,
+	msplot

@@ -1,0 +1,92 @@
+# 
+#   Imakefile for the Client Display Library V1.8
+# 
+#   Mike Fitzpatrick, National Optical Astronomy Observatories, IRAF project.
+#   Feb 1997
+
+X11IRAFDIR = ../
+#include <../X11IRAF.tmpl>
+
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+
+#    CDEBUGFLAGS = -g
+ EXTRA_INCLUDES = -I.
+#if defined (HPArchitecture) || defined(RsArchitecture)
+  EXTRA_DEFINES = -D_NO_US_
+#else 
+
+#   If you plan to use the ANSI function prototypes in your application
+#   you *must* edit the following to include '-DCDL_ANSIC' so the CDL
+#   is compiled with prototypes and will not promote arguments to a
+#   different type.
+
+#   EXTRA_DEFINES = -DCDL_ANSIC
+#endif
+
+#if HasLargeTmp | SystemV4
+          ARADD = ar ru
+#else
+          ARADD = ar rul
+#endif
+
+
+        SUBDIRS = 
+        MATHLIB = -lm
+
+           SRCS = cdl.c cdlmark.c cdlfits.c cdliraf.c cdlzscale.c cdl_f77.c \
+		  cdl_spp.c eps.c comm.c imd.c
+           OBJS = cdl.o cdlmark.o cdlfits.o cdliraf.o cdlzscale.o cdl_f77.o \
+		  cdl_spp.o eps.o comm.o imd.o
+   CDL_INCLUDES = cdl.h cdlP.h cdlProto.h cdl_f77.h cdlfont.h eps.h
+        HEADERS = cdl.h cdlspp.h cdlftn.inc
+
+World::
+	@echo "Building Release 1.8 of the IRAF CLient Display Library"
+	@echo "" ; date ; echo ""
+	$(MAKE) $(MFLAGS) Makefiles
+	$(MAKE) $(MFLAGS) clean
+	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) all
+	@echo "Done." ; date ; echo ""
+
+all::	libcdl.a
+
+NormalLibraryTarget(cdl,$(OBJS))
+
+LinkFileList(linklibs,libcdl.a,X11irafLibDir,CDLDir)
+
+DependTarget()
+
+
+#if InstallLibraries
+install:: libcdl.a
+	@(set -x; $(RM) X11irafLibDir/libcdl.a)
+	@(set -x; $(CP) -p libcdl.a X11irafLibDir/libcdl.a)
+#endif
+
+includes::
+	MakeDir(X11irafIncDir)
+	@(set -x; for i in $(HEADERS); do \
+		$(RM) X11irafIncDir/$$i; \
+		$(CP) -p CDLDir/$$i X11irafIncDir/$$i; \
+	done)
+
+#if InstallIncludes
+install::
+	@(set -x; for i in $(HEADERS); do \
+	        $(RM) X11irafIncDir/$$i; \
+	done)
+	for i in $(HEADERS); do \
+	    (set -x; $(CP) -p $$i $(DESTDIR)$(X11IRAFDIR)/include); \
+	done
+#endif
+
+
+pristine::
+	$(MAKE) $(MFLAGS) clean
+	$(RM) -f Makefile test/Makefile examples/Makefile *spool*
+
+archive::
+	$(MAKE) $(MFLAGS) pristine
+	!tar -cvf - . | compress > ../cdl.tar.Z
+

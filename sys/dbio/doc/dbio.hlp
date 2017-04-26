@@ -1,0 +1,413 @@
+.help dbio Oct83 "Database I/O Specifications"
+.ce
+Specifications of the IRAF DBIO Interface
+.ce
+Doug Tody
+.ce
+October 1983
+.ce
+(revised November 1983)
+
+.sh
+1. Introduction
+
+    The IRAF database i/o interface (DBIO) shall provide a limited but
+highly extensible and efficient database capability for IRAF.  DBIO datafiles
+will be used in IRAF to implement image headers and to store the output
+from analysis programs.  The simple structure of a DBIO datafile, and the
+self describing nature of the datafile, should make it easy to address the
+problems of developing a query language, providing a CL interface, and
+transporting datafiles between machines.
+
+.sh
+2. Database Structure: the Data Dictionary
+
+    An IRAF datafile, database file, or "data dictionary" is a set of
+records, each of which must have a unique name within the dictionary,
+but which may be defined in any time order and stored in the datafile
+in any sequential order.  Each record in the data dictionary has the
+following external attributes:
+
+.ls 4
+.ls 12 name
+The name of the record: an SPP style identifier, not to exceed 28
+characters in length.  The name must be unique within the dictionary.
+.le
+.ls aliases
+A record may be known by several names, i.e., several distinct dictionary
+entries may actually point to the same physical record.  The concept is
+similar to the "link" attribute of the UNIX file system.  The number
+of aliases or links is immediately available, but determination of the
+actual names of all the aliases requires a search of the entire dictionary.
+.le
+.ls datatype
+One of the eight primitive datatypes ("bcsilrdx"), or a user defined,
+fixed format structure, made up of primitive-type fields.  In the case
+of a structure, the structure is defined by a C-style structure declaration
+given as a char type record elsewhere in the dictionary.  The "datatype"
+field of a record is one of the strings "b", "c", "s", etc. for the
+primitive types, or the name of the record defining the structure.
+.le
+.ls value
+The value of the dictionary entry is stored in the datafile in binary form
+and is allocated a fixed amount of storage per record element.
+.le
+.ls length
+Each record in the dictionary is potentially an array.  The length field
+gives the number of elements of type "datatype" forming the record.
+New elements may be added by writing to "record_name[*]".
+.le
+.le
+
+
+The values of these attributes are available via ordinary DBIO read
+requests (but writing is not allowed).  Each record in the dictionary
+automatically has the following (user accessible) fields associated with it:
+
+
+.ks
+.nf
+	r_type		char[28]	("b", "c",.. or record name)
+	r_nlinks	long		(initially 1)
+	r_len		long		(initially 1)
+	r_ctime		long		time of record creation 
+	r_mtime		long		time of last modify
+.fi
+.ke
+
+
+Thus, to determine the number of elements in a record, one would make the
+following function call:
+
+	nelements = dbgeti (db, "record_name.r_len")
+
+
+.sh
+2.1 Records and Fields
+
+    The most complicated reference to an entry in the data dictionary occurs
+when a record is structured and both the record and field of the record are
+arrays.  In such a case, a reference will have the form:
+
+.nf
+	"record[i].field[j]"		most complex db reference
+.fi
+
+Such a reference defines a unique physical offset in the datafile.
+Any DBIO i/o transfer which does not involve an illegal type conversion
+may take place at that offset.  Normally, however, if the field is an array,
+the entire array will be transferred in a single read or write request.
+In that case the datafile offset would be specified as follows:
+
+	"record[i].field"
+
+.sh
+3. Basic I/O Procedures
+
+    The basic i/o procedures are patterned after FIO and CLIO, with the
+addition of a string type field ("reference") defining the offset in the
+datafile at which the transfer is to take place.  Sample reference fields
+are given in the previous section.  In most cases, the reference field
+is merely the name of the record or field to be accessed, i.e., "im.ndim",
+"im.pixtype", and so on.  The "dbset" and "dbstat" procedures are used
+to set or inspect DBIO parameters affecting the operation of DBIO itself,
+and do not perform i/o on a datafile.
+
+
+.ks
+.nf
+		    db = dbopen (file_name, access_mode)
+			dbclose (db)
+
+		     dbset[ils] (db, parameter, value)
+	      val = dbstat[ils] (db, parameter)
+
+	  val = dbget[bcsilrdx] (db, reference)
+		dbput[bcsilrdx] (db, reference, value)
+
+			 dbgstr (db, reference, outstr, maxch)
+			 dbpstr (db, reference, string)
+
+       nelems = dbread[csilrdx] (db, reference, buf, maxelems)
+	       dbwrite[csilrdx] (db, reference, buf, nelems)
+.fi
+.ke
+
+
+A new, empty database is created by opening with access mode NEW_FILE.
+The get and put calls are functionally equivalent to those used by
+the CL interface, down to the "." syntax used to reference fields.
+The read and write calls are complicated by the need to be ignorant
+about the actual datatype of a record.  Hence we have added a type
+suffix, with the implication that automatic type conversion will take
+place if reasonable.  This also eliminates the need to convert to and
+from chars in the fourth argument, and avoids the need for a 7**2 type
+conversion matrix.
+
+
+.sh
+4. Other DBIO Procedures
+
+    A number of special purpose routines are provided for adding and
+deleting dictionary entries, making links to create aliases, searching
+a dictionary of unknown content, and so on.  The calls are summarized
+below:
+
+
+.ks
+.nf
+	      stat = dbnextname (db, previous, outstr, maxch)
+	         y/n = dbaccess (db, record_name, datatypes)
+
+		        dbenter (db, record_name, type, nreserve)
+			 dblink (db, alias, existing_record)
+		       dbunlink (db, record_name)
+.fi
+.ke
+		
+
+The semantics of these routines are explained in more detail below:
+
+.ls 4
+.ls 12 dbnextname
+Returns the name of the next dictionary entry.  If the value of the "previous"
+argument is the null string, the name of the first dictionary entry is returned.
+EOF is returned when the dictionary has been exhausted.
+.le
+.ls dbaccess
+Returns YES if the named record exists and has one of the indicated datatypes.
+The datatype string may consist of any of the following: (1) one or more
+primitive type characters specifying the acceptable types, (2) the name of
+a structure definition record, or (3) the null string, in which case only
+the existence of the record is tested.
+.le
+.ls dbenter
+Used to make a new entry in the dictionary.  The "type" field is the name
+of one of the primitive datatypes ("b", "c", etc.), or in the case of a
+structure, the name of the record defining the structure.  The "nreserve"
+field specifies the number of elements of storage to be initially allocated
+(more elements can always be added later).  If nreserve is zero, no storage
+is allocated, and a read error will result if an attempt is made to read
+the record before it has been written.  Storage allocated by dbenter is
+initialized to zero.
+.le
+.ls dblink
+Enter an alias for an existing entry.
+.le
+.ls dbunlink
+Remove an alias from the dictionary.  When the last link is gone,
+the record is physically deleted and storage may be reclaimed.
+.le
+.le
+
+
+.sh
+5. Database Access from the CL
+
+    The self describing nature of a datafile, as well as its relatively
+simple structure, will make development of CL callable database query
+utilities easy.  It shall be possible to access the contents of a datafile
+from a CL script almost as easily as one currently accesses the contents
+of a parameter file.  The main difference is that a separate process must be
+spawned to access the database, but this process may contain any number of
+database access primitives, and will sit in the CL process cache if frequently
+used.  The "onexit" call and F_KEEP FIO option in the program interface allow
+the query task to keep one or more database files open for quick access,
+until the CL disconnects the process.
+
+The ability to access the contents of a database from a CL script is crucial
+if we are to be able to have data independent applications package modules.
+The intention is that CL callable applications modules will not be written
+for any particular instrument, but will be quite general.  At the top level,
+however, we would like to have a "canned" program which knows a lot about
+an instrument, and which calls the more general package routines, passing
+instrument specific parameters.
+
+This top level routine should be a CL script to provide maximum
+flexibility to the scientist using the system at the CL level.  Use of a
+script is also required if modules from different packages are to be called
+from a single high level module (anything else would imply poorly
+structured code).
+This requires that we be able to store arbitrary information in
+image headers, and that this information be available in CL scripts.
+DBIO will provide such a capability.
+
+
+    In addition to access from CL scripts, we will need interactive access
+to datafiles at the CL level.  The DBIO interface makes it easy to
+provide such an interface.  The following functions should be provided:
+.ls 4
+.ls o
+List the contents of a datafile, much as one would list the contents of
+a directory.  Thus, there should be a short mode (record name only), and
+a long mode (including type, length, nlinks, date of last modify, etc.).
+A one name per line mode would be useful for creating lists.  Pattern
+matching would be useful for selecting subsets.
+.le
+.ls o
+List the contents of a record or list of records.  List the elements of
+an array, possibly for further processing by the LISTS package.  In the
+case of a record which is an array of structures, print the values of
+selected fields as a table for further processing by the LISTS utilities.
+And so on.
+.le
+.ls o
+Edit a record.
+.le
+.ls o
+Delete a record.
+.le
+.ls o
+Copy a record or set of records, possibly between two different datafiles.
+.le
+.ls o
+Copy an array element or range of array elements, possibly between two
+different records or two different records in different datafiles.
+.le
+.ls o
+Compress a datafile.  DBIO probably will not reclaim storage online.
+A separate compress operation will be required to reclaim storage in
+heavily edited datafiles, and to consolidate fragmented arrays.
+.le
+.ls o
+And more I'm sure.
+.le
+.le
+
+.sh
+6. DBIO and Imagefiles
+
+    As noted earlier, DBIO will be used to implement the IRAF image header
+structure.  An IRAF imagefile is composed of two parts: the image header
+structure, and the pixel storage file.  Only the name of the pixel storage
+file for an image will be kept in the image header; the pixel storage file
+is always a separate file, which indeed usually resides on a different
+filesystem.  The pixel storage file is often far larger than the image
+header, though the reverse may be true in the case of small one dimensional
+spectra or other small images.  The DBIO format image header file is
+usually not very large and will normally reside in the user's directory
+system.  The pixel storage file is created and managed by IMIO transparently
+to the user and to DBIO.
+
+
+.ks
+.nf
+                      applications program
+
+
+
+                                   IMIO
+
+
+
+			 DBIO
+
+
+
+				    FIO
+
+
+            Structure of a program which accesses images
+.fi
+.ke
+
+
+It shall be possible for an single datafile to contain any number of
+image header structures.  The standard image header shall be implemented
+as a regular DBIO structured record, defined in a structure declaration
+file in the system library directory "lib$".
+
+.sh
+7. Transportability
+
+    The datafile is a essential part of the IRAF, and it is essential that
+we be able to transport datafiles between machines.  The self describing
+nature of datafiles makes this straightforward, provided programmers do
+not store structures in the database in binary.  Binary arrays, however,
+are fine, since they are completely defined.
+
+A datafile must be transformed into a machine independent form for transport
+between machines.  The independence of the records in a datafile, and the simple
+structure of a record, should make transmission of a datafile in tabular
+form (ASCII card image) straightforward.  We shall use the tables extension
+to FITS to transport DBIO datafiles.  A simple unstructured record can
+be represented in the form 'keyword = value' (with some loss of information),
+while a structured record can be represented as a FITS table, given the
+restriction of the fields of a record to the primitive types.
+
+.sh
+8. Implementation Strategies
+
+    Each data dictionary shall consist of a single random access file, the
+"datafile".  The dictionary shall be indexed by a B-tree containing the
+28 character packed name of each record and a 4 byte integer giving the offset
+of either the next block in the B-tree, or of the "inode" structure describing
+the record, for a total of 32 bytes per index entry.  If a record has several
+aliases, each will have a separate entry in the index and all will point to
+the same inode structure.  The size of a B-tree block shall be variable (but
+fixed for a given datafile), and in the case of a typical image header, shall
+be chosen large enough so that the index for the entire image header can be
+contained in a single B-tree block.  The entries within an index block shall
+be maintained in sorted order and entries shall be located by a binary search.
+
+Each physical record or array of records in the datafile shall be described
+by a unique binary inode structure.  The inode structure shall define the
+number of links to the record, the datatype, size, and length of the record, 
+the dates of creation and last modify, the offset of the record in the
+datafile (or the offset of the index block in the case of an array of records),
+and so on.  The inode structures shall be stored in the datafile as a
+contiguous array of records; the inode array may be stored at any offset in
+the datafile.  Overflow of the inode array will be handled by moving the
+array to the end of the file and doubling its size.
+
+New records shall be added to the datafile by appending to the end of the file.
+No attempt shall be made to align records on block boundaries within the
+datafile.  When a record is deleted space will not be reclaimed, i.e.,
+deletion will leave an invisible 'hole' in the datafile (a utility will be
+available for compacting fragmented datafiles).  Array structured records
+shall in general be stored noncontiguously in the datafile, though
+DBIO will try to avoid excessive fragmentation.  The locations of the sections
+of a large array of records shall be described by a separately allocated index
+block.
+
+DBIO will probably make use of the IRAF file i/o (FIO) buffer cache feature to
+access the datafile.  FIO permits both the number and size of the buffers
+used to access a file to be set by the caller at file open time.
+Furthermore, the FIO "reopen" call can be used to establish independent
+buffer caches for the index and inode blocks and for the data records,
+so that heavy data array accesses do not flush out the index blocks, even
+though both are stored in the same file.  Given the sophisticated buffering
+capabilities of FIO, DBIO need only make FIO seek and read/write calls to access
+both inode and record data, explicitly buffering only the B-tree index block
+currently being searched.
+
+On a virtual machine a single FIO buffer the size of the entire datafile can
+be allocated and mapped onto the file, to take advantage of virtual memory
+without compromising transportability.  DBIO would still use FIO seek, read,
+and write calls to access the file, but no FIO buffer faults would occur
+unless the file were extended.  The current FIO interface does not provide
+this feature but it can easily be added in the future without modification
+to the FIO interface, if it is proved that there is anything to be gained.
+
+By carefully configuring the buffer cache for a file, it should be possible
+to keep the B-tree index block and inode array for a moderate size datafile
+buffered most of the time, limiting the number of disk accesses required to
+access a small record to much less than one on the average, without limiting
+the ability of DBIO to access very large dictionaries.  For example, given
+a dictionary of one million entries and a B-tree block size of 128 entries
+(4 KB), only 4 disk accesses would be required to access a primitive record
+in the worst case (no buffer hits).  Very small datafiles, i.e. most image
+headers, would be completely buffered all of the time.
+
+The B-tree index scheme, while very efficient for random record access,
+is also well suited to sequential accesses ("dbnextname()" calls).  A
+straightforward dictionary copy operation using dbnextname, which steps
+through the records of a dictionary in alphabetical order, would
+automatically transpose the dictionary into the most efficient form for
+future alphabetical or clustered accesses, reclaiming storage and
+consolidating fragmented arrays in the process.
+
+The DBIO package, like FIO and IMIO, will dynamically allocate all buffer
+space needed to access a datafile at runtime.  The number of datafiles
+which can be simultaneously accessed by a single program is limited primarily
+by the maximum number of open files permitted a process by the OS.

@@ -1,0 +1,65 @@
+.help zfiomt May84 "System Interface"
+.ih
+NAME
+zfiomt -- magtape driver primitives
+.ih
+SYNOPSIS
+.nf
+zzopmt (drive, density, mode, oldrec, oldfile, newfile, chan)
+zzclmt (chan, mode, nrecords, nfiles, status)
+zzrdmt (chan, buf, maxbytes)
+zzwrmt (chan, buf, nbytes)
+zzwtmt (chan, nrecords, nfiles, status)
+zzrwmt (chan, status)
+
+int	drive, density, mode, oldrec, oldfile, newfile, chan
+int	nfiles, maxbytes, nbytes, nrecords, nfiles, status
+char	buf[]
+.fi
+.ih
+DESCRIPTION
+Magnetic tape is interfaced to FIO as a streaming binary file.
+The conventional set of six binary file driver routines (suffix "mt") are
+used, but due to the complexity of the driver the machine dependence has
+been further concentrated into the six primitives shown above.  The standard
+driver routines are machine independent and are included in the standard
+distribution.
+
+Since the magtape primitives are unique, separate manual pages are provided
+for each primitive.  The most complex primitive is \fBzzopmt\fR, which opens
+a single file on a magtape device.  To maximize the machine and device
+independence of magtape i/o, only a single file may be accessed per open.
+Aside from the rewind primitive \fBzzrwmt\fR there are no explicit tape
+positioning commands.  The tape is positioned ready to read or write the
+first record of a file by \fBzzopmt\fR, and thereafter the tape moves only
+when it is read or written.  All magtape i/o is sequential, and a file may
+be opened for reading or for writing but not for both.
+.ih
+RETURN VALUES
+The \fIchan\fR and \fIstatus\fR parameters are identical to those for any
+other streaming binary file.  Magtape i/o is unique in that the high level
+code is charged with keeping track of the position of the tape at all times.
+The \fInrecords\fR and \fInfiles\fR return values tell the high level code
+how much the tape was moved each time a primitive is called.
+.ih
+NOTES
+To IRAF programs a magtape is a sequence of zero or more files separated
+by end of file marks (filemarks, EOF) with an end of tape mark (tapemark, EOT)
+following the last file on the tape.  Each file consists of one or more
+data blocks.  Successive data blocks may vary in size; very short blocks
+and odd size blocks (block size not commensurate with the size of an SPP char)
+can cause problems.  The high level code tries hard to deal with odd size
+blocks and such but success is not guaranteed.  A tapemark is a double end
+of file mark.  As far as the i/o system is concerned tapes are unlabeled
+and files do not have headers; everything but filemarks and tapemarks is data.
+
+There is no explicit provision for multivolume sets.  It is assumed that either
+the host system or the kernel will provide the necessary functionality to deal
+with multivolume sets.  We assume that if physical end of tape is encountered
+while reading or writing a tape block the process of informing the operator to
+mount the new volume, rereading or rewriting the block, etc., will be performed
+transparently to the high level code.
+.ih
+SEE ALSO
+zfiobf, mtopen
+.endhelp

@@ -1,0 +1,34 @@
+# Update the txtable application code in the threed package library.
+# Author: I.Busko, 22-Nov-1996
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+# This module is called from the threed mkpkg.
+generic:
+	$ifnfile (generic/txthvi.x)
+	$generic -k -p generic/ -t bcsird txthv.gx
+	$endif
+	$ifolder (generic/txthvi.x, txthv.gx)
+	$generic -k -p generic/ -t bcsird txthv.gx
+	$endif
+	$ifnfile (generic/txtcpti.x)
+	$generic -k -p generic/ -t bcsird txtcpt.gx
+	$endif
+	$ifolder (generic/txtcpti.x, txtcpt.gx)
+	$generic -k -p generic/ -t bcsird txtcpt.gx
+	$endif
+	;
+
+libpkg.a:
+	@generic
+	txtable.x	<error.h>
+	txtone.x	<tbset.h>
+	txtcpy.x	<tbset.h>
+	txtcpyco.x
+	txtcpysc.x
+	txthc.x	
+	;
+

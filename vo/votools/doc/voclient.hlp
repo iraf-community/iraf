@@ -1,0 +1,22 @@
+.help voclient Mar12 votools
+.ih
+NAME
+voclient -- The VO Client / IRAF Interface
+
+.ih
+INTRODUCTION
+
+.ih
+DESCRIPTION
+
+
+.ih
+EXAMPLES
+
+.ih
+REVISIONS
+.le
+.ih
+SEE ALSO
+conecaller, siapcaller, datascope, registry, vizier
+.endhelp

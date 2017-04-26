@@ -1,0 +1,9 @@
+# HEALPIXWCS
+
+row,i,h,,,,Map row
+lng,r,h,,,,Longitude
+lat,r,h,,,,Latitude
+nside,i,h,512,,,Resolution parameter
+cunits,s,h,"degrees","hourdegree|degrees|radians",,Coordinate units
+maptype,s,h,"nest","nest|ring",,Map type
+direction,s,h,"ang2row","ang2row|row2ang",,Conversion direction

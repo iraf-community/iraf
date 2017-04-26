@@ -1,0 +1,110 @@
+.help raverage May07 lists
+.ih
+NAME
+raverage -- running average, standard deviation, and envelope
+.ih
+USAGE
+raverage input nwin
+.ih
+PARAMETERS
+.ls input
+Input one or two column list of numbers.  Any line that can't be read
+as one or two numbers is ignored which means comments are allowed.  The
+special name "STDIN" may be used to read the numbers from the standard
+input pipe or redirection.
+.le
+.ls nwin
+The number of values in the running average window.
+.le
+.ls sort = no
+Numerically sort the first column of the input list by increasing value?
+This is done in an temporary file and the
+actual input file is not modified.
+.le
+.ls nsig = 0
+The number of standard deviations below and above the average for the
+envelope columns.  If the value is greater than zero two extra columns
+are output formed by subtracting and adding this number of standard
+deviations to the average value.  If the value is zero then the
+columns not be written.
+.le
+.ls fd1, fd2
+Internal parameters.
+.le
+.ih
+DESCRIPTION
+This task computes the running average and standard deviation of a
+one or two column list.  For a one column list the ordinal value is
+added.  Note that the ordinal is only for the lines that are successfully
+read so any comments are not counted.  So the internal list is always
+two columns.
+
+The input may be a physical file or the standard input.  The standard
+input is specified by the special name "STDIN".  All the input values
+are read and stored in a temporary file prior to computing the output.
+A temporary file is also used if the input is to be numerically sorted
+by increasing value of the first column.  Note that the sorting is done
+before adding the implied ordinal for one column lists.
+
+The output has four or six columns depending on whether \fInsig\fR is
+zero or greater than zero.
+
+.nf
+    average1 average1 stddev number [lower upper]
+
+    average1 - the running average of the first column
+    average2 - the running average of the second column
+      stddev - standard deviation of the second column
+      number - number of values in the statistic
+       lower - optional lower envelope value
+       upper - optional upper envelope value
+.fi
+
+The "number" of values may be less than the window if the window size is
+larger than the list.
+
+The number of lines will generally be less than the input because there is
+no boundary extension.  In other words the first output value is computed
+after the first \fInwin\fR values have been read and the last output value
+is computed when the end of the list is reached.
+
+The envelope columns are computed when \fInsig\fR is greater than zero.
+The values are
+
+.nf
+    lower = average2 - nsig * stddev
+    upper = average2 + nsig * stddev
+.fi
+
+In many cases the data is intended to represent a scatter plot and one
+wants to show the trend and envelope as a function of the first column.
+This is where the sorting and envelope options are useful.
+.ih
+EXAMPLES
+1.  Compute the running average with a window of 100 values on the list of
+numbers in file "numbers".
+.nf
+	
+	cl> raverage numbers 100
+.fi
+
+2.  Do this using the standard input.  In this example use random numbers.
+
+.nf
+    cl> urand 100 1 | raverage STDIN 90
+.fi
+
+3.  Make a scatter plot of a two column list with the trend and envelope
+overplotted.
+
+.nf
+	cl> fields numbers 1,3 | graph point+
+	cl> fields numbers 1,3 | raverage STDIN 100 sort+ nsig=3 > tmp
+	cl> fields tmp 1,2 | graph append+
+	cl> fields tmp 1,5 | graph append+
+	cl> fields tmp 1,6 | graph append+
+.fi
+.ih
+SEE ALSO
+average, boxcar
+.endhelp

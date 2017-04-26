@@ -1,0 +1,14 @@
+# SINTERP parameter file
+
+tbl_file,f,a,,,,File containing table of x-y pairs
+input,f,a,STDIN,,,input for x-interpolant values
+image,s,a,,,,Image name to create
+order,i,h,5,1,,Order of fit
+x1,r,a,0.0,,,First point in range of generated curve
+x2,r,h,0.0,,,Last point in range of generated curve
+dx,r,h,0.0,,,Interval between generated points
+npts,i,h,0,,,Number of points to generate
+curve_gen,b,h,no,,,Generate a curve between specified limits
+make_image,b,h,no,,,Create IRAF spectral image
+tbl_size,i,h,1024,200,,Maximum space to allocate for table
+interp_mode,s,h,"chebyshev",,,By (line|curve|legen|cheby|spline3|spline1)

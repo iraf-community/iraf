@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+#  SELF_UPDATE - Update the update scripts.
+
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+source $iraf/unix/hlib/irafuser.sh
+
+cd $iraf/util
+
+REPO=`${iraf}/util/pkgrepo`
+if [ -n "$IRAFARCH" ]; then
+    arch=$IRAFARCH
+else
+    arch=`${iraf}/unix/hlib/irafarch.sh -actual`
+fi
+
+
+/bin/echo -n "Updating utility scripts ...."
+
+# Delete any existing downloads.
+if [ -e /tmp/util.tgz ]; then
+    /bin/rm -f /tmp/util.tgz
+fi
+
+# Get the latest script distribution.
+./fget -o /tmp/util.tgz ${REPO}/util-universal.tar.gz
+
+# Go to iraf root, unpack and clean up.  Using the IRAF root gives us
+# the chance to update the toplevel Makefile or other build scripts in
+# the system, e.g. in the 'vendor' directory.
+(cd ../; tar zxf /tmp/util.tgz; /bin/rm -f /tmp/util.tgz )
+
+# Edit the current IRAF path into the scripts.
+cd $iraf/unix/hlib
+pfiles=("cl.sh" "cl.csh" "ecl.sh" "ecl.csh" "vocl.sh" "vocl.csh" "setup.sh" "setup.csh" "mkiraf.sh" "mkiraf.csh")
+d_iraf="/iraf/iraf/"
+TEMP="/tmp/iraf_update.$$"
+/bin/rm -f $TEMP
+
+for file in ${pfiles[@]}; do
+    sed -e "s+$d_iraf+$iraf+" $file > $TEMP
+    mv $TEMP $file
+done
+cd $iraf
+/bin/echo "Done"
+
+exit 0

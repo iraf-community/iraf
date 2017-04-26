@@ -1,0 +1,5 @@
+PLF -- Partial, IKI mini-driver for the pixel list (PLIO) image format.
+
+Only part of the IKI routines are implemented here.  The open/close, header
+access, and i/o functions are handled as a special case directly in the
+IMIO code (see the impm*.x routines, and im[rd|wr]px.x).

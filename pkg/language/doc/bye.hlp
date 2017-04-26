@@ -1,0 +1,26 @@
+.help bye Feb86 language
+.ih
+NAME
+bye -- terminate task execution
+.ih
+USAGE
+bye
+.ih
+DESCRIPTION
+The \fIbye\fR command terminates the task from which it is executed.
+This is exactly equivalent to the CL reading end of file (EOF) when
+executing a task.
+.ih
+EXAMPLES
+1. The most common usage of \fIbye\fR occurs when it is typed by the user to
+exit a package; in this case, \fIbye\fR terminates the package script task.
+
+.nf
+	cl> plot
+	pl> bye
+	cl>
+.fi
+.ih
+SEE ALSO
+clbye, return
+.endhelp

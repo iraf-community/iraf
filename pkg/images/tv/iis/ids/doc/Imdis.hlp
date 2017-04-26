@@ -1,0 +1,793 @@
+.help imdis Dec84 "Image Display I/O"
+.ce
+\fBImage display I/O Design\fR
+.ce
+Richard Wolff
+.ce
+May 1985
+.sp 1
+.nh
+Introduction
+
+    The image display i/o interface uses the features of the GIO interface
+to provide for the reading and writing of images and for the control of
+the various subunits of a typical image display device.  The cell array
+calls of GIO are used for the image data, while the text and polyline
+functions handle the text and line generation.  Cursor reads are also
+done with standard GIO calls.  However, all the other display functions
+are implemented through a series of GIO escape sequences, which are
+described in this document.
+.sp
+.nh
+Escape sequences
+
+    Each sequence is described here, giving first a line with the count
+of the number of words in the escape "instruction", followed by the data.
+Since most of the data items might be more rationally considered arrays,
+they are so indicated here.  This means that in most cases, the number of
+words in the escape instruction cannot be determined until run-time; an
+indication of this is the use of "sizeof(arrays)" to indicate the number
+of words in all the pseudo arrays.
+.sp
+Escape 10  --  reset
+.ls
+.tp 5
+1 hard/medium/soft
+.ls
+.nf
+hard		Clear image and graphics planes
+medium		reset all (lookup) tables to linear
+soft		reset scroll, zoom, cursor, alu, etc.
+.fi
+.le
+.le
+.sp
+This sequence is used to preform various reset commands.  These are not
+done at GKOPENWS time because the user will not necessarily want to
+upset the existing display when the image kernel is started up.
+.sp
+Escape 11  --  set image plane
+.ls
+.tp 4
+sizeof(arrays) IFA IBPL
+.ls
+.nf
+IFA(i)		image frame array
+IBPL(i)		image bit plane array
+.fi
+.le
+.le
+.sp
+This sequence is essentially a header to the getcell/putcell calls.  It
+identifies both the frame(s) and bit plane(s) to be read or written.  IFA
+is an array of (short) integers, each of which specifies a plane (using
+one indexing), the last element of the array being the integer IDS_EOD
+to flag the End Of Data.  IDS_EOD is a defined to be (-2).  IBPL represents
+the bit planes that are to be read or written for all the frames in IFA.
+The data is IBPL is terminated with IDS_EOD.  If the first element of IFA (or
+IBPL) is IDS_EOD, all image frames (all bit planes) are involved in the I/O.
+All "array" data are expected to be terminated with IDS_EOD, and the general
+convention is maintained that IDS_EOD with no preceding data implies all
+"frames", "colors", or whatever.
+.sp
+Escape 12  --  set graphics plane
+.ls
+.tp 4
+sizeof(arrays) GFA GBPL
+.ls
+.nf
+GFA(i)		graphics frame array
+GBPL(i)		graphics bit plane array
+.fi
+.le
+.le
+.sp
+This sequence is identical to escape 11, but refers to graphics planes
+instead of image planes.  Generally, each graphics bit plane will refer to
+a particular color, or perhaps, to a particular image plane.  But there is
+no enforced correspondence between graphics planes and image planes or colors.
+The GFA specifies a set of graphics planes, and is probably unnecessary as the
+bitplane array carries adequate information.  Including it, however, retains
+symmetry with escape 11.  Thus, GFA cannot be omitted, for otherwise the
+kernel would not know where GBPL started, but is set to IDS_EOD, and the
+kernel can then find and ignore it.
+.sp
+Escape 13  --  display image
+.ls
+.tp 6
+1+sizeof(arrays) ON/OFF IFA ICOLOR IQUAD
+.ls
+.nf
+ON/OFF		turn frame on or off
+IFA(i)		image frame array
+ICOLOR(i)	image color array
+IQUAD(i)	image quadrant array (for split screen mode)
+.fi
+.le
+.le
+.sp
+The specified image planes are all to be displayed in all the colors given
+by ICOLOR.  If ICOLOR(1) is IDS_EOD, a full color display is implied.
+The quadrant value specifies which quadrant the frames are
+to appear in--this is needed only when the split screen mode is in effect;
+otherwise, IQUAD[1] = IDS_EOD.
+.sp
+Escape 14  --  display graphics
+.ls
+.tp 6
+1+sizeof(arrays) ON/OFF GBPL GCOLOR GQUAD
+.ls
+.nf
+ON/OFF		turn referenced planes on or off
+GBPL(i)		graphics bit plane array
+GCOLOR(i)	graphics color array
+GQUAD(i)	graphics quadrant array (for split screen mode)
+.fi
+.le
+.le
+.sp
+This sequence is identical to escape 13, except for the substitution of
+a bitplane array for frames, since graphics are usually treated bit by bit.
+[With the IIS systems, for instance, this call requires manipulation of
+the color-graphics lookup table.]
+.sp
+Escape 15  --  save device state
+.ls
+.tp 5
+1+sizeof(arrays) FD IFA GFA
+.ls
+.nf
+FD		file descriptor for save file
+IFA(i)		image frame array
+GFA(i)		graphics frame array
+.fi
+.le
+.le
+.sp
+Saves the specified image frames and graphics planes and all the device
+dependent status information in the file referenced by FD.  Not implemented
+in the Kernel (yet).
+.sp
+Escape 16  --  restore device state
+.ls
+.tp 5
+1+sizeof(arrays) FD IFA GFA
+.ls
+.nf
+FD		file descriptor for restore file
+IFA(i)		image frame array
+GFA(i)		graphics frame array
+.fi
+.le
+.le
+.sp
+Restores the specified image frames and graphics planes and all the device
+dependent status information from the file referenced by FD.  Not implemented
+in the Kernel (yet).
+.sp
+Escape 17  --  control
+.ls
+.tp 9
+4+sizeof(arrays) REG RW N FRAME COLOR OFFSET DATA
+.ls
+.nf
+REG(i)		control register or function
+RW(i)		read or write (write is 0, read 1, wait/read is 2)
+N(i)		Number of data values
+FRAME(i)	frame array
+COLOR(i)	color array
+OFFSET(i)	offset or other datum
+DATA(Ni)	array of data
+.fi
+.le
+.le
+.sp
+Escape 18 is a very general sequence for writing any device
+control register.  Such "registers" include such generally available
+capabilities as look-up tables, as well as specifics, such as min/max
+registers. The upper level code may have to consult an "imagecap"
+file to determine what it can request.
+
+FRAME, OFFSET, and COLOR, may not be needed for a particular operation,
+but these arrays cannot be omitted; rather, use a one element array with
+the value IDS_EOD.  Should additional information be needed for an operation,
+it can be transmitted in DATA.
+.sp
+.nh
+Examples
+
+.sp
+To clear all frames, one would issue the following sequence
+.ls
+.tp 4
+.nf
+GKI_ESCAPE  11  IFA[1] = IDS_EOD  IBPL[1] = IDS_EOD
+GKI_CLEARWS
+GKI_ESCAPE  12  IFA[1] = IDS_EOD  IBPL[1] = IDS_EOD
+GKI_CLEARWS
+.fi
+.le
+.sp
+To write an image to frame 2 ( IIS internal frame number 1 )
+.ls
+.tp 2
+.nf
+GKI_ESCAPE  11  IFA[1] = 2  IFA[2] = IDS_EOD  IBPL[1] = IDS_EOD
+GKI_PCELL   data
+.fi
+.le
+.sp
+To activate frame 1 in red and green
+.ls
+.tp 2
+.nf
+GKI_ESCAPE  13  IFA[1] = 1  IFA[2] = IDS_EOD  ICOLOR[1] = IDS_RED
+		ICOLOR[2] = IDS_GREEN  ICOLOR[3] = IDS_EOD
+		IQUAD[1] = IDS_EOD
+.fi
+.le
+.sp
+.bp
+.nh
+Defines
+
+This section presents the value and intended use of each of the various
+defined constants.  This list is likely to expand.
+
+.nf
+define	IDS_EOD         (-2)		# flag for end of data
+
+define	IDS_RESET	10		# escape 10
+define	IDS_R_HARD	 0		# hard reset
+define	IDS_R_MEDIUM	 1		# medium
+define	IDS_R_SOFT	 2
+define	IDS_R_SNAPDONE	 3		# end snap
+
+define	IDS_SET_IP	11		# escape 11
+define	IDS_SET_GP	12		# escape 12
+define	IDS_DISPLAY_I	13		# escape 13
+define	IDS_DISPLAY_G	14		# escape 14
+define	IDS_SAVE	15		# escape 15
+define	IDS_RESTORE	16		# escape 16
+
+# max sizes
+
+define	IDS_MAXIMPL	16		# maximum number of image planes
+define	IDS_MAXGRPL	16		# maximum number of graphics planes
+define	IDS_MAXBITPL	16		# maximum bit planes per frame
+define	IDS_MAXGCOLOR	 8		# maximum number of colors (graphics)
+define	IDS_MAXDATA   8192		# maximum data structure in display
+
+define	IDS_RED		 1
+define	IDS_GREEN	 2
+define	IDS_BLUE	 3
+define	IDS_YELLOW	 4
+define	IDS_RDBL	 5
+define	IDS_GRBL	 6
+define	IDS_WHITE	 7
+define	IDS_BLACK	 8
+
+define	IDS_QUAD_UR	 1		# upper right quad.: split screen mode
+define	IDS_QUAD_UL	 2
+define	IDS_QUAD_LL	 3
+define	IDS_QUAD_LR	 4
+
+define	IDS_CONTROL	17		# escape 17
+define	IDS_CTRL_LEN	 6
+define	IDS_CTRL_REG	 1		# what to control
+define	IDS_CTRL_RW	 2		# read/write field in control instr.
+define	IDS_CTRL_N	 3		# count of DATA items
+define	IDS_CTRL_FRAME	 4		# pertinent frame(s)
+define	IDS_CTRL_COLOR	 5		#   and color
+define	IDS_CTRL_OFFSET	 6		# generalized "register"
+define	IDS_CTRL_DATA	 7		# data array
+
+define	IDS_WRITE	 0		# write command
+define	IDS_READ	 1		# read command
+define	IDS_READ_WT	 2		# wait for action, then read
+define	IDS_OFF		 1		# turn whatever off
+define	IDS_ON		 2
+define	IDS_CBLINK	 3		# cursor blink
+define	IDS_CSHAPE	 4		# cursor shape
+
+define	IDS_CSTEADY	 1		# cursor blink - steady (no blink)
+define	IDS_CFAST	 2		# cursor blink - fast
+define	IDS_CMEDIUM	 3		# cursor blink - medium
+define	IDS_CSLOW	 4		# cursor blink - slow
+
+define	IDS_FRAME_LUT	 1		# look-up table for image frame
+define	IDS_GR_MAP	 2		# graphics color map...lookup table per
+					# se makes little sense for bit plane
+define	IDS_INPUT_LUT	 3		# global input lut
+define	IDS_OUTPUT_LUT	 4		# final lut
+define	IDS_SPLIT	 5		# split screen coordinates
+define	IDS_SCROLL	 6		# scroll coordinates
+define	IDS_ZOOM	 7		# zoom magnification
+define	IDS_OUT_OFFSET	 8		# output bias
+define	IDS_MIN		 9		# data minimum
+define	IDS_MAX		10		# data maximum
+define	IDS_RANGE	11		# output range select
+define	IDS_HISTOGRAM	12		# output data histogram
+define	IDS_ALU_FCN	13		# arithmetic feedback function
+define	IDS_FEEDBACK	14		# feedback control
+define	IDS_SLAVE	15		# auxiliary host or slave processor
+
+define	IDS_CURSOR	20		# cursor control - on/off/blink/shape
+define	IDS_TBALL	21		# trackball control - on/off
+define	IDS_DIGITIZER	22		# digitizer control - on/off
+
+define	IDS_BLINK	23		# for blink request
+define	IDS_SNAP	24		# snap function
+define	IDS_MATCH	25		# match lookup tables
+
+# snap codes ... just reuse color codes from above.
+define	IDS_SNAP_RED	 IDS_RED	# snap the blue image
+define	IDS_SNAP_GREEN	 IDS_GREEN	# green
+define	IDS_SNAP_BLUE	 IDS_BLUE	# blue
+define	IDS_SNAP_RGB	 IDS_BLACK	# rgb image --- do all three
+define	IDS_SNAP_MONO	 IDS_WHITE	# do just one
+
+# cursor parameters
+
+define	IDS_CSET	128		# number of cursors per "group"
+
+define	IDS_CSPECIAL	4097		# special "cursors"
+			# must be > (IDS_CSET * number of cursor groups)
+define	IDS_CRAW	IDS_CSPECIAL	# raw cursor read
+define	IDS_BUT_RD	4098		# "cursor number" for read buttons cmd
+define	IDS_BUT_WT	4099		# wait for button press, then read
+define	IDS_CRAW2	4100		# a second "raw" cursor
+.fi
+.nh
+Explanation
+
+    Most of the control functions of an image display do not fit within
+the standard GIO protocols, which is why the escape function is provided.
+However, image displays exhibit a wide range of functionality, and some
+balance must be achieved between code portability/device independence and
+use of (possibly peculiar) capabilities of a particular device.  The control
+functions (such as IDS_FRAME_LUT, IDS_CURSOR, IDS_SLAVE) "selected" here
+are, for the most part, general functions, but the code was written with
+the IIS Model 70 at hand (and in mind), and some "defines" reflect this.
+
+    The model of the display is a device with some number of image frames,
+each of which has associated with it an INPUT look-up table, used for
+scaling or bit selection as data is written into the image frame;
+a FRAME look-up table for each of the three primary colors, used to
+alter the video stream from the image frame; combining logic that sums the
+output of the various FRAME tables, forming three data streams, one for
+each color; an OUTPUT look-up table that forms a final transformation
+on each color prior to the data being converted to analog form; and
+possibly, bias (OUT_OFFSET) and RANGE scaling applied somewhere in the
+data stream (most likely near the OUTPUT look-up tables).
+
+    Each image plane can be SCROLLed and ZOOMed independently (though
+of course, not all devices can do this), and there may be SPLIT screen
+capability, with the possibility of displaying parts of four images
+simultaneously.
+
+    Hooks have been provided in case there is a ALU or FEEDBACK hardware,
+or there is a SLAVE processor, but use of these functions is likely to
+be quite device dependent.  The IIS can return to the user the MINimum
+and MAXimum of a color data stream, and can also run a histogram on
+selected areas of the display:  There are "defines" pointing to these
+functions, but their use is not yet specified and there is not yet
+a clean way, within the GIO protocols, for reading back such data.
+
+    Three functions that not so hardware oriented have "defines":
+BLINK, MATCH and SNAP.  The first is used if the hardware supports
+blink.  MATCH allows the kernel code to copy look-up tables---something
+the upper level code could do were there a well defined mechanism for
+reading non-image data back.  SNAP is used to set-up the kernel so that
+a subsequent set of get_cellarray calls can be used to return a data
+stream that represents the digital data arriving at the
+digital-to-analog converters:  the kernel mimics the hardware and so
+provides a digital snapshot of the image display screen.
+
+    Images are loaded by a series of put_cellarray calls, preceded
+by one IDS_SET_IP escape to configure the kernel to write the put_cell
+data into the correct image planes (and optionally, specific bit planes).
+The graphics planes are written to in the same manner, except that
+IDS_SET_GP is used.  It is not guaranteed that the SET_IP and SET_GP
+are independent, and so the appropriate one should be given before
+each put_cell sequence.  Put_cells can be done for any arbitrary
+rectangular array; they are turned into a series of writes to a
+sequence of image rows by the GIO interface code.
+
+    Calls to put_cell require the mapping of pixel coordinates
+to NDC, which is made more complex than one might first
+guess by the fact that the cell array operations are specified
+by *inclusive* end points...See the write-up in "Note.pixel".
+
+    Images planes are erased by the standard GIO gclear call, which
+must be preceded by a SET_IP (or SET_GP for graphics).  This is
+perceived as reasonably consistent with the image loading as erasure
+is loading with zeros, but presumably can be done far more efficiently
+in most devices than with a series of put_cell calls.
+
+    Images planes are turned on and off with IDS_DISPLAY_I, and graphics
+planes with IDS_DISPLAY_G.  Color and quadrant information must be
+supplied as mentioned in the descriptions for escapes 13 and 14.
+
+    The look-up tables are specified to the lower level code by giving
+the end points of the line segments which describe the table function.
+The end points are specified in NDC.  This makes for a
+simple, and device independent, upper level code.  However, there is no
+obvious (to the writer at least) code to invert the process, and return
+end points for the simplest line segments that would describe a given
+look-up table.  (Moreover, there is no mechanism to return such information
+to the upper level.)  Therefore, the kernel code is asymmetric, in that
+writes to the tables are fed data in the form of end points, but reads from
+the tables (needed for the kernel implementation of SNAP) return the
+requested number data values as obtained from the hardware.
+
+    The control sequence for the ZOOM function requires, in addition to
+the usual frame/color information, a zoom power followed by the GKI
+coordinates of the pixel to be placed at the screen center.  Likewise,
+the SCROLL and SPLIT screen functions require GKI center coordinates.
+
+    The OFFSET and RANGE sequences provide for bias and scaling of the
+image data.  Where they take effect is not specified.  Offset requires
+a signed number to be added to the referenced data; range is specified
+by a small integer which selects the "range" of the data.
+
+    Control of hardware cursors, trackballs, etc is provided:  CURSOR
+can be used to select cursor shape, blink rate, etc.  Devices such as
+(trackball) buttons are interrogated as if they are cursors, with a
+cursor number that is greater than to IDS_CSPECIAL.  The "key" value
+returned by a "read" call to devices such as the trackball buttons will
+be zero if no button was pressed or some positive number to represent
+the activated device.  Any "read" may be instructed to return
+immediately (IDS_READ) or wait for some action (IDS_READ_WT); for
+buttons, there are special IDS_BUT_RD/IDS_BUT_WT.
+
+    Cursors are read and written through the standard GIO interface.
+The cursor number ranges from 1 up through IDS_CSPECIAL-1.  Each
+frame has a set of set of cursors associated with it: frame n has
+cursors numbered n, IDS_CSET+n, 2*IDS_CSET+n, etc.  Currently,
+IDS_CSPECIAL is 4097, and IDS_CSET is 128, so there can be 128
+different frames, each with 32 cursors.  The coordinates associated
+with a given cursor, and hence frame, are NDC for the pixel on which
+the cursor is positioned.  If a frame is not being displayed, a cursor
+read for that frame will return NDC for the pixel that would appear at
+the current cursor position if the frame were enabled.  Note that the
+NDC used in the cursor_set and cursor_read calls are relative to
+the image planes in the display device; the fact the image data may
+have come from a much larger user "world" is not, and can not be,
+of any concern to the kernel code.
+
+    Cursor 0 is special, and is not associated with a particular frame;
+rather, the kernel is allowed to choose which frame to associate with
+each cursor zero read or write.  The IIS code picks the lowest numbered
+frame that is on (being displayed).  With split screen activated, a
+frame can be "on" and not be seen; for cursor zero, what matters is
+whether the frame video is active, not whether the split position
+happens to be hiding the frame.  The "key" value returned by the cursor
+read routine is the frame number selected by the kernel.  Cursor
+IDS_CSPECIAL is also unusual, since it refers to the screen coordinates
+and returns NDC for the screen.  It is referred in the code as IDS_CRAW
+(a "raw" cursor) and is needed for positioning the cursor at specific
+points of the screen.
+
+    The MATCH function requires that the frame and color information
+of the control escape sequence point to the reference table; the
+tables to be changed are given in the "data" part with the (IDS_EOD
+terminated) frame sequence preceding the color information.  The RW
+field specifies which type of look-up table is to be changed.
+.sp
+.nh
+Interface Routines
+
+    The routines listed here are those used to implement the video
+control package, and are found in the file "cvutil.x".
+Arguments relating to image frames, image colors, display quadrants,
+offset, range, and look-up table data are short integer arrays,
+terminated by IDS_EOD.  Cursor position (x and y) are NDC (hence, real).
+All other arguments are integers.
+
+.ls cvclearg (frame, color)
+Clears (erases) the given color (or colors) in the graphics frame given
+by the argument "frame".  For the IIS display, the "frame" argument
+is not relevant, there being only one set of graphics frames.
+.le
+.ls cvcleari (frames)
+Clears (erases) all bits in the given image display frames.
+.le
+.ls cv_rdbut
+Reads the buttons on whatever device the kernel code associates with
+this call, and returns an integer representing the button most recently
+pressed.  If none pressed, returns zero.
+.le
+.ls cv_wtbut
+Same as cv_rdbut, but if no button pressed, waits until one is.  This
+routine will, therefore, always return a non-zero (positive) integer.
+.le
+.ls cv_rcur (cnum, x, y)
+Reads the cursor "cnum" returning the NDC coordinates in x and y.  The
+mapping of cursor number to frame is described in the preceding
+section: for cursors with numbers below IDS_CSET (128), the cursor
+refers to the frame (cnum equal 5 means frame 5).
+.le
+.ls cv_scur (cnum, x, y)
+Sets the cursor to the NDC given by x and y for the frame referenced by
+cnum.
+.le
+.ls cv_scraw (x, y)
+Sets the "raw cursor" to position (x,y).
+.le
+.ls cv_rcraw (x, y)
+Reads the "raw cursor" position in (screen) NDC.
+.le
+.ls cvcur (cmd)
+Turns the cursor on (cmd is IDS_ON) or off (IDS_OFF).
+.le
+.ls cvdisplay (instruction, device, frame, color, quad)
+Turns on ("instruction" equals IDS_ON) image plane ("device" equals
+IDS_DISPLAY_I) frame (or frames) in specified colors and quadrants.
+Turn them off if "instruction" equals IDS_OFF.  Manipulates graphics
+planes instead if "device" equals IDS_DISPLAY_G.
+.le
+.ls cvmatch (type, refframe, refcolor, frames, color)
+Copies the reference frame and reference color into the given frames
+and color.  For the IIS, "type" is either IDS_FRAME_LUT, referring to the
+look-up tables associated with each frame, or IDS_OUTPUT_LUT, referring
+to the global Output Function Memory tables.
+.le
+.ls cvoffset (color, data)
+Sets the offset constants for the specified colors to values given in
+"data"; if there are more colors given than corresponding data items,
+the kernel will reuse the last data item as often as necessary.
+.le
+.ls cvpan (frames, x, y)
+Moves the given frames so that the NDC position (x,y) is at the center
+of the display.
+.le
+.ls cvrange (color, range)
+Scales the output for the given colors; if there are more colors given
+than corresponding range items, the kernel will reuse the last data item
+as often as necessary.  Range is a small number which specifies which
+range the data is to be "put" in.  For the IIS, there are only 4 useful
+values (1,2,4, and 8); the kernel will map the requested value to the
+next smallest legitimate one.
+.le
+.ls cvreset (code)
+Resets the part of the display referenced by "code".  For the IIS, a code
+of IDS_R_HARD refers to (erasing) the image and graphics planes, IDS_R_MEDIUM
+resets the various look-up tables, and IDS_R_SOFT resets the various registers
+(such as zoom, scroll, range, split screen, and so forth).
+.le
+.ls cvsnap (filename, snap_color)
+Creates an IRAF image file, named "filename", which represents the image
+display video output for the specified color (IDS_SNAP_RED, IDS_SNAP_MONO,
+etc).  "filename" is a "char" array.  The image is of the full display,
+though, since the data is obtained from the kernel line by line via
+get_cellarray calls, partial snapshots can be implemented easily.
+.le
+.ls cvsplit (x,y)
+Sets the split screen point at NDC position (x,y).
+.le
+.ls cvtext (x, y, text, size)
+Writes the given text at NDC position (x,y) in the specified size.
+Currently, font and text direction are set to NORMAL.
+.le
+.ls cvwhich (frame)
+Tells which frames are on.  In the current implementation, this relies
+on reading cursor 0:  in this special case, the cursor variable passed
+to ggcur() is changed by the kernel to reflect which frame it selected
+(or ERR if no frame is active).
+.le
+.ls cvwlut (device, frames, color, data, n)
+Writes the look-up tables associated with "frames" and "color".  "device"
+is IDS_FRAME_LUT or IDS_OUTPUT_LUT.  The data to be written is given as
+a series of line segments, and hence is described as a series of GKI
+(x,y) pairs representing the line end points.  For connected lines,
+the first pair gives the first line segment starting coordinates, and all
+following pairs the endpoints.  The variable "n" gives the number of
+values in "data"; there is no terminating IDS_EOD.
+.le
+.ls cvzoom (frames, power, x, y)
+Zooms, to the given power, the specified frames with each frame
+centered, after the zoom, at the given NDC position.
+.le
+
+    The following two support routines are included in the interface
+package.
+.ls cv_move (in, out)
+Copies the short array "in" into the short array "out", up to and
+including a trailing IDS_EOD.  This procedure returns the number of
+items copied.
+.le
+.ls cv_iset (frames)
+Implements the image display escape sequence, with the bitplane
+argument to that escape sequence set to "all".
+.le
+.ls cv_gset (colors)
+Implements the graphics display escape sequence, with the image
+argument to that escape sequence set to "all".
+.le
+.sp
+.nh
+Example
+
+    The following code is used to pan (scroll) the image in response
+to a changing cursor position.  It is assumed that the "frame" array
+consists of a list of frames to be panned together, terminated, as
+is almost everything in this code, by IDS_EOD.
+.nf
+
+# Pan subroutine
+
+procedure pansub (frames)
+
+short	frames[ARB]			# frames to pan
+
+int	button
+int	cnum, cv_rdbut()
+real	x,y, xc, yc
+real	oldx, oldy
+
+begin
+	button = cv_rdbut()		# clear buttons by reading them
+	call eprintf ("Press any button when done\n")
+
+	# Where is cursor now?
+	# cv_rcraw uses the "RAW CURSOR" which reads and writes in
+	# screen (NDC) coordinates instead of image NDC.
+
+	call cv_rcraw (xc,yc)
+
+	# Pixel to NDC transformation is discussed in the file 
+	# "Note.pixel"
+
+	x = x_screen_center_in_NDC
+	y = y_screen_center_in_NDC
+
+	call cv_scraw (x, y)	# put cursor at screen center
+
+	# Select a cursor---at least one per frame (conceptually at least)
+
+	cnum = frames[1]
+
+	# If cnum == IDS_EOD, the calling code did not select a frame.  So,
+	# if cnum is 0, the kernel will select an active frame as the
+	# one to use when mapping NDC cursor positions to screen
+	# coordinates.
+
+	if (cnum == IDS_EOD)
+	    cnum = 0
+
+	# Determine NDC at screen center (where cursor was moved to)
+	# for frame of interest
+	call cv_rcur (cnum, x, y)
+
+	# Restore cursor to original position
+	call cv_scraw (xc, yc)
+
+	repeat {
+	    oldx = xc
+	    oldy = yc
+	    repeat {
+	        call cv_rcraw (xc, yc)
+	        button = cv_rdbut()
+	    } until ( (xc != oldx) || (yc != oldy) || (button > 0))
+	    # Determine change and reflect it about current screen
+	    # center so image moves in direction cursor moves.
+	    x = x - (xc - oldx)
+	    y = y - (yc - oldy)
+	    # If x or y are <0 or > 1.0, add or subtract 1.0
+	    "adjust x,y"
+	    call cvpan (frames, x, y)
+	} until (button > 0)
+end
+.fi
+    [The call to cvpan may in fact need to be a series of calls, with
+the array "frames" specifying one frame at a time, and (x,y) being the
+new cursor position for that particular frame, so that differently panned
+frames retain their relative offsets.]
+    The cursor and button routines are given here.
+.nf
+
+# CV_RDBUT -- read button on trackball (or whatever)
+# if none pressed, will get zero back
+
+int procedure cv_rdbut()
+
+int	oldcnum
+real	x, y
+int	button
+int	gstati
+
+include "cv.com"
+
+begin
+	oldcnum = gstati (cv_gp, G_CURSOR)
+	call gseti (cv_gp, G_CURSOR, IDS_BUT_RD)
+	call ggcur (cv_gp, x, y, button)
+	call gseti (cv_gp, G_CURSOR, oldcnum)
+	return(button)
+end
+
+# CV_RCUR -- read cursor.  The cursor read/set routines do not restore
+# the cursor number...this to avoid numerous stati/seti calls that
+# usually are not needed.
+
+procedure cv_rcur (cnum, x, y)
+
+int	cnum
+real	x,y
+int	junk
+
+include	"cv.com"
+
+begin
+	call gseti (cv_gp, G_CURSOR, cnum)
+	call ggcur (cv_gp, x, y, junk)
+end
+
+# CV_SCUR -- set cursor
+
+procedure cv_scur (cnum, x, y)
+
+int	cnum
+real	x,y
+
+include "cv.com"
+
+begin
+	call gseti (cv_gp, G_CURSOR, cnum)
+	call gscur (cv_gp, x, y)
+end
+
+# CV_SCRAW -- set raw cursor
+
+procedure cv_scraw (x, y)
+
+real	x,y
+
+begin
+	call cv_scur (IDS_CRAW, x, y)
+end
+.fi
+
+    The routine cv_move copies its first argument to the second up through
+the required IDS_EOD termination, returning the number of items copied.
+"cv_stack" is a pointer to a pre-allocated stack area that is used to
+build the data array passed to the GIO escape function.
+
+.nf
+# cvpan -- move the image(s) around
+
+procedure cvpan (frames, x, y)
+
+short	frames[ARB]
+real	x,y					# position in NDC
+int	count, cv_move()
+
+include	"cv.com"
+
+begin
+	Mems[cv_stack] = IDS_SCROLL		# Control Unit
+	Mems[cv_stack+1] = IDS_WRITE		# Read/Write
+
+	# Three is the number of data items (two coordinates) plus the
+	# terminating IDS_EOD.  In many escape sequences, this number
+	# must be determined from the data rather than known in advance.
+
+	Mems[cv_stack+2] = 3
+
+	# Move the frame data, which is of "unknown" length
+
+	count = cv_move (frames, Mems[cv_stack+3])
+
+	# Color is unimportant here, but the color data must exist.  The
+	# simplest solution is to use IDS_EOD by itself.
+
+	Mems[cv_stack+3+count] = IDS_EOD	# default to all colors
+	Mems[cv_stack+4+count] = 1		# (unused) offset
+	Mems[cv_stack+5+count] = x * GKI_MAXNDC
+	Mems[cv_stack+6+count] = y * GKI_MAXNDC
+	Mems[cv_stack+7+count] = IDS_EOD	# for all frames
+	call gescape (cv_gp, IDS_CONTROL, Mems[cv_stack], count+8)
+end
+.fi
+.endhelp

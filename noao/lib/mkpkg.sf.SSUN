@@ -1,0 +1,13 @@
+# Mkpkg special file list for SUN/IRAF, Solaris
+
+$set	XNO	= '& "$xc -cq -/libmil -p noao &"'
+
+$special "$(noao)onedspec/":		t_standard.x	$(XNO) ;
+
+
+# The following need to be linked nonshared to avoid the 268 MB memory limit
+# in the shared Sun/IRAF library implementation.
+
+$set NONSHARE = '& "LFLAGS = -z -/Bstatic -p noao -p tables"'
+$special "digiphot$daophot/":             xx_daophot.e  $(NONSHARE) ;
+

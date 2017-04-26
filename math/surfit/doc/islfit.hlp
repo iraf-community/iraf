@@ -1,0 +1,67 @@
+.help islfit Apr85 "Surfit Package"
+.ih
+NAME
+islfit -- fit a surface grid line
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+islfit (sf, cols, lineno, z, w, npts, wtflag, ier)
+
+.nf
+pointer	sf		# surface grid descriptor
+real	cols[npts]	# array of column numbers, 1 <= cols[i] <= ncols
+int	lineno		# number of surface grid line to be added
+real	z[npts]		# data values
+real	w[npts]		# weight array
+int	npts		# number of data points, npts <= ncols
+int	wtflag		# type of weighting
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface grid descriptor structure.
+.le
+.ls cols
+The column numbers of surface grid points to be added to the dataset.
+.le
+.ls lineno
+The line number of the surface grid line to be added to the dataset.
+.le
+.ls z      
+Array of data values.
+.le
+.ls w
+Array of weights.
+.le
+.ls npts
+Number of data points.
+.le
+.ls wtflag
+Type of weighting. The options are SF_USER and SF_UNIFORM. If wtflag =
+SF_USER individual weights for each data point are supplied by the calling
+program and points with zero-valued weights are not included in the fit.
+If wtflag = SF_UNIFORM, all weights are assigned values of 1.
+.le
+.ls ier     
+Error code for the fit. The options are OK, SINGULAR and NO_DEG_FREEDOM.
+If ier = SINGULAR, the numerical routines will compute a solution but one
+or more of the coefficients will be zero. If ier = NO_DEG_FREEDOM there
+were too few data points to solve the matrix equations and the routine
+returns without fitting the data.
+.le
+.ih
+DESCRIPTION
+ISLFIT zeroes the appropriate arrays and vectors,
+computes the contribution of each data point to the normal equations
+in x and accumulates it into the appropriate array and vector elements.  The
+x coefficients are stored for later use by ISSOLVE.
+.ih
+NOTES
+Checking for out of bounds col values and INDEF values pixels is the
+responsibility of the user.
+.ih
+SEE ALSO
+isinit, islrefit, islaccum, islsolve, islzero, issolve, isfree
+.endhelp

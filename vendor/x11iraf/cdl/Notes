@@ -1,0 +1,171 @@
+/*
+ * CDL -- Client Display Library.  This package provides a general interface
+ * for client applications to do IRAF-like image display and interaction.
+ * It is layered upon other interfaces for handling basic display, cursor
+ * and frame buffer operations, and low-level server communications.  
+ *
+ *           cdl = cdl_open  (imtdev)
+ *           cdl_displayPix  (cdl, pix, nx, ny, bitpix, frame, fbconfig, zscale)
+ *           cdl_readCursor  (cdl, sample, &x, &y, &key)
+ *            cdl_setCursor  (cdl, x, y, wcs)
+ *           cdl_clearFrame  (cdl)
+ *                cdl_close  (cdl)
+ *
+ *          cdl_displayIRAF  (cdl, fname, band, frame, fbconfig, zscale)
+ *               cdl_isIRAF  (fname)
+ *             cdl_readIRAF  (fname, band, &pix, &nx, &ny, &bitpix);
+ *
+ *          cdl_displayFITS  (cdl, fname, frame, fbconfig, zscale)
+ *               cdl_isFITS  (fname)
+ *             cdl_readFITS  (fname, &pix, &nx, &ny, &bitpix);
+ *
+ *        cdl_computeZscale  (cdl, pix, nx, ny, bitpix, &z1, &z2)
+ *          cdl_zscaleImage  (cdl, &pix, nx, ny, bitpix, z1, z2)
+ *
+ *             cdl_printPix  (cdl, cmd, pix, nx, ny, annotate)
+ *       cdl_printPixToFile  (cdl, fname, pix, nx, ny, annotate)
+ *
+ *            cdl_readImage  (cdl, &pix, &nx, &ny)
+ *      cdl_readFrameBuffer  (cdl, &pix, &nx, &ny)
+ *        cdl_readSubRaster  (cdl, lx, ly, nx, ny, &pix)
+ *       cdl_writeSubRaster  (cdl, lx, ly, nx, ny, pix)
+ *  
+ *             cdl_selectFB  (cdl, nx, ny, &fb, &fb_w, &fb_h, &nframes, reset)
+ *          cdl_setFBConfig  (cdl, configno)
+ *          cdl_getFBConfig  (cdl, &configno, &w, &h, &nframes)
+ *         cdl_lookupFBSize  (cdl, configno, &w, &h, &nframes)
+ *
+ *         cdl_[set|get]WCS  (cdl, name, title, a, b, c, d, tx, ty, z1, z2, zt)
+ *       cdl_[set|get]Frame  (cdl, frame)
+ *      cdl_[set|get]ZTrans  (cdl, ztrans)
+ *      cdl_[set|get]ZScale  (cdl, z1, z2)
+ *      cdl_[set|get]Sample  (cdl, nsample)
+ * cdl_[set|get]SampleLines  (cdl, nlines)
+ *    cdl_[set|get]Contrast  (cdl, contrast)
+ *        cdl_[set|get]Name  (cdl, imname)
+ *       cdl_[set|get]Title  (cdl, imtitle)
+ *
+ *
+ *   GRAPHICS OVERLAY ROUTINES:
+ *   --------------------------
+ *             cdl_mapFrame  (cdl, frame)
+ *            cdl_markPoint  (cdl, x, y, number, size, type, color)
+ *             cdl_markLine  (cdl, xs, ys, xe, ye, color)
+ *              cdl_markBox  (cdl, lx, ly, ux, uy, fill, color)
+ *         cdl_markPolyline  (cdl, xpts, ypts, npts, color)
+ *          cdl_markPolygon  (cdl, xpts, ypts, npts, fill, color)
+ *           cdl_markCircle  (cdl, x, y, radius, fill, color)
+ *       cdl_markCircAnnuli  (cdl, x, y, radius, nannuli, sep, color)
+ *          cdl_markEllipse  (cdl, x, y, xrad, yrad, ang, fill, color)
+ *      cdl_markEllipAnnuli  (cdl, x, y, xrad, yrad, ang, nannuli, sep, color)
+ *             cdl_markText  (cdl, x, y, str, size, angle, color)
+ *
+ *              cdl_setFont  (cdl, type)
+ *
+ *      cdl_beginDisplayList (cdl)
+ *        cdl_endDisplayList (cdl)
+ *       cdl_drawDisplayList (cdl)
+ *
+ *           cdl_deleteMark  (cdl, x, y)
+ *         cdl_clearOverlay  (cdl)
+ *        cdl_redrawOverlay  (cdl)
+ *
+ *
+ *	Client applications begin with a cdl_open() call to initialize the
+ * interface.  The "imtdev" argument is used to specify a connection at device
+ * open time, or if NULL the procedure will attempt to first connect on a unix
+ * socket or fifo pipe if that fails.  The syntax for the imtdev argument is
+ * as follows:
+ *              	<domain> : <address>
+ *
+ * where <domain> is one of "inet" (internet tcp/ip socket), "unix" (unix
+ * domain socket) or "fifo" (named pipe).   The form of the address depends
+ * upon the domain, see the IMD interface code comments or documentation
+ * for examples.
+ *
+ *	The library assumes a logical coordinate system that has the image or
+ * raster origin in the lower-left corner. All I/O routines should be passed
+ * or will return a pixel pointer set to the LL corner of the raster, all
+ * cursor positions will similarly use this coordinate system.  Initially the
+ * [0,0] origin is defined as the LL of the frame buffer, this will remain
+ * the case until the WCS is redefined either explicitly through a cdl_setWCS()
+ * call or by using one of the high level cdl_display*() procedures to display
+ * an image smaller that the current frame buffer.  Applications wishing to
+ * retain this initial origin or those wanting to explicitly place the image
+ * in the frame buffer should use the cdl_writeSubRaster() for display.  This
+ * is to allow cursor and subraster positions to be specified in image coord-
+ * inates more easily.  Negative positions are allowed and will either refer 
+ * to empty pixels if the frame buffer is larger than the image, or pixels 
+ * outside the frame buffer boundaries.  Raster I/O requests will be clipped
+ * to the frame buffer endpoints, a request completely outside the frame buffer
+ * is an error.
+ *
+ *	The high-level display routines cdl_displayIRAF() and cdl_displayFITS()
+ * can be used to display images directly by name.  A WCS will automatically
+ * be defined for each image after the optional zscaling hass been computed.  
+ * Applications wishing to define their own WCS need to call cdl_setWCS()
+ * after the display call to redefine the default WCS.
+ */
+
+------------------------------------------------------------------------------
+
+/*
+ *  IMAGE DISPLAY -- The image display interface is responsible for actually
+ *  displaying an image to the server, for reading back a raster from the
+ *  server, and cursor positioning.  This is a mid-level interface for 
+ *  handling the steps necessary for image display operations without dealing
+ *  directly with the details of communicating with the server.
+ *
+ *           imd = imd_open  (imtdev)
+ *         imd_displayImage  (imd, pix, nx, ny, frame, fbconfig, comp_wcs)
+ *           imd_readCursor  (imd, sample, &x, &y, &key)
+ *         imd_[set|get]WCS  (imd, name, title, a, b, c, d, tx, ty, z1, z2, zt)
+ *                imd_close  (imd)
+ *
+ *     Low Level Procedures
+ *     --------------------
+ *           imd_writeImage  (imd, pix, nx, ny, lx, ly)
+ *            imd_readImage  (imd, &pix, &nx, &ny)
+ *      imd_readFrameBuffer  (imd, &pix, &nx, &ny)
+ *             imd_setFrame  (imd, frame)
+ *          imd_setFBConfig  (imd, configno)
+ *          imd_getFBConfig  (imd, &configno, &width, &height, &nframes))
+ *              imd_setName  (imd, name)
+ *             imd_setTitle  (imd, title)
+ *            imd_setCursor  (imd, x, y, wcs)
+ *           imd_clearFrame  (imd)
+ *       imd_writeSubRaster  (imd, lx, ly, nx, ny, pix)
+ *        imd_readSubRaster  (imd, lx, ly, nx, ny, &pix)
+ *
+ *      We leave it to the higher level procedures to handle Z-scale trans-
+ *  formations, spatial scaling, and high level image I/O.  All display pixels
+ *  are assumed to be scaled to 8-bits already.
+ */
+
+------------------------------------------------------------------------------
+
+/*
+ *  COMMUNICATIONS INTERFACE -- The communications interface handles all the
+ *  low-level communications with the server.  It implements only the subset
+ *  of the IIS protocol used by XImtool, SAOtng and SAOimage, not the entire
+ *  IIS protocol.  It may be swapped out for another protocol in the future
+ *  without affecting the tasks which use it as long as the basic steps re-
+ *  quired for image display are the same.
+ *  
+ *            com_writeData  (fd, x, y, pix, nx, ny)
+ *             com_readData  (fd, x, y, &pix, &nx, &ny)
+ *           com_readCursor  (fd, sample, &x, &y, &key)
+ *            com_setCursor  (fd, x, y, wcs)
+ *          com_setFBConfig  (fd, configno)
+ *             com_setFrame  (fd, frame)
+ *             com_writeWCS  (fd, name, a, b, c, d, tx, ty, z1, z2, zt)
+ *              com_readWCS  (fd, &name, &a, &b, &c, &d, &tx, &ty,
+ *  				  &z1, &z2, &zt)
+ *           com_eraseFrame  (fd)
+ * 
+ *	We do not actually display images here, all we do is send the individual
+ *  set frame, write a data chunk, etc commands.  The caller is responsible for
+ *  coordinating these calls into a legal sequence for image display.
+ *	All routines return 0 if successfull and 1 otherwise.
+ */
+

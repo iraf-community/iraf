@@ -1,0 +1,75 @@
+# CLIO portion of the system library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+libsys.a:	
+	clcache.x	clio.com <clio.h> <ctype.h>
+	clclose.x	<config.h>
+	clcmd.x		<clset.h>
+	clcmdw.x	<clset.h>
+	clcpset.x	
+	clepset.x	clpset.h <clio.h>
+	clgcur.x	<ctype.h>
+	clgetb.x	
+	clgetc.x	
+	clgetd.x	
+	clgeti.x	
+	clgetl.x	
+	clgetr.x	
+	clgets.x	
+	clgetx.x	
+	clgfil.x	<fset.h>
+	clgkey.x	<clset.h> <ctype.h>
+	clglpb.x	
+	clglpc.x	
+	clglpd.x	
+	clglpi.x	
+	clglpl.x	
+	clglpr.x	
+	clglps.x	
+	clglpx.x	
+	clglstr.x	
+	clgpset.x	clpset.h
+	clgpseta.x	clpset.h
+	clgpsetb.x	clpset.h
+	clgpsetc.x	clpset.h
+	clgpsetd.x	clpset.h
+	clgpseti.x	clpset.h
+	clgpsetl.x	clpset.h
+	clgpsetr.x	clpset.h
+	clgpsets.x	clpset.h
+	clgpsetx.x	clpset.h
+	clgstr.x	
+	clgwrd.x	
+	cllpset.x	clpset.h
+	clopen.x	<config.h> <fset.h> <knet.h> <ttset.h>
+	clopset.x	clpset.h
+	clppset.x	clpset.h
+	clppseta.x	clpset.h
+	clppsetb.x	clpset.h
+	clppsetc.x	clpset.h
+	clppsetd.x	clpset.h
+	clppseti.x	clpset.h
+	clppsetl.x	clpset.h
+	clppsetr.x	clpset.h
+	clppsets.x	clpset.h
+	clppsetx.x	clpset.h
+	clpsetnm.x	clpset.h
+	clpstr.x	
+	clputb.x	
+	clputc.x	<ctype.h>
+	clputd.x	
+	clputi.x	
+	clputr.x	
+	clputx.x	
+	clreqpar.x	<clset.h>
+	clseti.x	clio.com <clio.h> <clset.h>
+	clstati.x	clio.com <clio.h> <clset.h>
+	gexfls.x	
+	rdukey.x	<ctype.h> <fset.h> <ttset.h>
+	zfiocl.x	clio.com <clio.h> <config.h> <ctype.h> <fio.h>\
+			<fset.h> <knet.h> <mach.h>
+	;

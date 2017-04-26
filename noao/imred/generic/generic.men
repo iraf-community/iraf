@@ -1,0 +1,6 @@
+     background - Fit and subtract a line or column background
+	darksub - Scale and subtract a dark count image
+         flat1d - Make flat field by fitting a 1D func. to the lines or columns
+        flatten - Flatten images using a flat field
+      normalize - Normalize images
+       normflat - Create a flat field by normalizing and replacing low values

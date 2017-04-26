@@ -1,0 +1,7 @@
+catalog,s,a,"",,,"The astrometric catalog"
+output,s,a,"",,,"The query results file"
+ra,s,a,"00:00:00.0",,,"The field center ra / longitude"
+dec,s,a,"+00:00:00",,,"The field center dec / latitude"
+size,s,a,15.0,,,"The field size"
+catdb,s,h,")_.catdb",,,"The catalog configuration file"
+mode,s,h,"ql",,,

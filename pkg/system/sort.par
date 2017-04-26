@@ -1,0 +1,5 @@
+input_file,s,a,,,,file to be sorted
+column,i,h,0,,,column to be sorted (if nonzero)
+ignore_whitespace,b,h,no,,,ignore leading whitespace
+numeric_sort,b,h,no,,,sort numerically rather than alphabetically
+reverse_sort,b,h,no,,,reverse the sense of the sort

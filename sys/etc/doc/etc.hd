@@ -1,0 +1,29 @@
+# Help directory for the ETC (miscellaneous system stuff) package.
+
+$etc	= "sys$etc/"
+
+brktime		hlp = brktime.hlp,		src = etc$brktime.x
+btoi		hlp = btoi.hlp,			src = etc$btoi.x
+clktime		hlp = clktime.hlp,		src = etc$clktime.x
+cnvdate		hlp = cnvdate.hlp,		src = etc$cnvdate.x
+cnvtime		hlp = cnvtime.hlp,		src = etc$cnvtime.x
+cputime		hlp = cputime.hlp,		src = etc$cputime.x
+envgetb		hlp = envget.hlp,		src = etc$envgetb.x
+envgeti		hlp = envget.hlp,		src = etc$envgeti.x
+envgets		hlp = envget.hlp,		src = etc$envgets.x
+erract		hlp = erract.hlp,		src = etc$erract.x
+errcode		hlp = errcode.hlp,		src = etc$errcode.x
+error		hlp = error.hlp,		src = etc$error.x
+getuid		hlp = getuid.hlp,		src = etc$getuid.x
+itob		hlp = itob.hlp,			src = etc$itob.x
+lpopen		hlp = lpopen.hlp,		src = etc$lpopen.x
+main		hlp = main.hlp,			src = etc$main.x
+onerror		hlp = onerror.hlp,		src = etc$onerror.x
+onexit		hlp = onexit.hlp,		src = etc$onexit.x
+oscmd		hlp = oscmd.hlp,		src = etc$oscmd.x
+qsort		hlp = qsort.hlp,		src = etc$qsort.x
+sys_ptime	hlp = sys_ptime.hlp,		src = etc$sys_ptime.x
+syserr		hlp = syserr.hlp,		src = etc$syserr.x
+tsleep		hlp = tsleep.hlp,		src = etc$tsleep.x
+urand		hlp = urand.hlp,		src = etc$urand.x
+xwhen		hlp = xwhen.hlp,		src = etc$xwhen.x

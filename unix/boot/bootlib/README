@@ -1,0 +1,53 @@
+BOOTLIB -- C callable file primitives used by the bootstrap utilities.
+
+This is a somewhat adhoc interface consisting of a collection of low level
+functions required by the bootstrap utilities.  As far as possible these
+use the iraf kernel, but occasionally non-kernel facilities are required or
+desirable.  The purpose of this interface is to isolate the machine dependence
+of the bootstrap utilities from the bulk of the code, making it easier to
+maintain IRAF on different hosts, as well as to make it easier to port IRAF
+to a new host.  No attempt has been made to specify this interface carefully;
+it is not necessary since only a limited number of programs use the routines.
+
+Partial list of functions (grows sporadically):
+
+	char *	     vfn2osfn (vfn, mode)		# Map filenames
+	char *	     osfn2vfn (osfn)
+
+	      fd = os_diropen (dir)			# Read directories
+		  os_dirclose (fd)
+		     os_gfdir (fd, fname, maxch)
+
+	bool	    os_access (fname, mode, type)	# General file
+		     os_chdir (dir)
+		     os_close (fd)
+		       os_cmd (cmd)
+		     os_close (fd
+		 os_createdir (dirname, mode)
+		os_createfile (fname, mode, type)
+		    os_delete (fname)
+		     os_fcopy (oldfile, newfile)
+		 os_fpathname (vfn, pathname, maxch)
+	long	     os_fdate (file)
+	char *      os_getenv (ennvar)
+		 fd = os_open (fname, mode, type)
+		  os_setfmode (fname, mode)
+		  os_setowner (fname, uid, gid)
+		  os_setmtime (fname, mtime)
+		   os_sysfile (fname, outstr, maxch)
+		      os_read (fd, buf, nbytes)
+		     os_write (fd, buf, nbytes)
+
+	       fd = tape_open (fname, mode)		# Tape or disk file
+		   tape_close (fd)
+		    tape_read (fd, buf, nbytes)
+		   tape_write (fd, buf, nbytes)
+
+
+Tasks which use this library must also use the kernel library (libos.a).
+Tasks which use full filename mapping will also need libsys.a and libvops.a,
+however the system can be bootstrapped with simpler filename mapping and
+then the utilities relinked with full filename mapping, once the system
+libraries have been generated.  Note that no VOS level i/o is used (only
+kernel level i/o functions are used), hence an IRAF main is not required
+to initialize the VOS i/o system.

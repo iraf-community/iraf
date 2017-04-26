@@ -1,0 +1,43 @@
+images,s,a,"",,,List of CCD images to correct
+ccdtype,s,h,"",,,CCD image type to correct
+max_cache,i,h,0,0,,Maximum image caching memory (in Mbytes)
+noproc,b,h,no,,,"List processing steps only?
+"
+fixpix,b,h,yes,,,Fix bad CCD lines and columns?
+overscan,b,h,yes,,,Apply overscan strip correction?
+trim,b,h,yes,,,Trim the image?
+zerocor,b,h,yes,,,Apply zero level correction?
+darkcor,b,h,no,,,Apply dark count correction?
+flatcor,b,h,yes,,,Apply flat field correction?
+illumcor,b,h,no,,,Apply illumination correction?
+fringecor,b,h,no,,,Apply fringe correction?
+readcor,b,h,no,,,Convert zero level image to readout correction?
+scancor,b,h,no,,,"Convert flat field image to scan correction?
+"
+readaxis,s,h,"line","column|line",, Read out axis (column|line)
+fixfile,s,h,"",,,File describing the bad lines and columns
+biassec,s,h,"",,,Overscan strip image section
+trimsec,s,h,"",,,Trim data section
+zero,s,h,"",,,Zero level calibration image
+dark,s,h,"",,,Dark count calibration image
+flat,s,h,"",,,Flat field images
+illum,s,h,"",,,Illumination correction images
+fringe,s,h,"",,,Fringe correction images
+minreplace,r,h,1.,,,Minimum flat field value
+scantype,s,h,"shortscan","shortscan|longscan",,Scan type (shortscan|longscan)
+nscan,i,h,1,1,,"Number of short scan lines
+"
+interactive,b,h,no,,,Fit overscan interactively?
+function,s,h,"legendre",,,Fitting function
+order,i,h,1,1,,Number of polynomial terms or spline pieces
+sample,s,h,"*",,,Sample points to fit
+naverage,i,h,1,,,Number of sample points to combine
+niterate,i,h,1,0,,Number of rejection iterations
+low_reject,r,h,3.,0.,,Low sigma rejection factor
+high_reject,r,h,3.,0.,,High sigma rejection factor
+grow,r,h,0.,0.,,"Rejection growing radius
+"
+verbose,b,h,)_.verbose,,,Print log information to the standard output?
+logfile,f,h,)_.logfile,,,Text log file
+backup,s,h,)_.backup,,,Backup directory or prefix
+output,s,h,"",,,Not used

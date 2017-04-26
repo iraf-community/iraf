@@ -1,0 +1,23 @@
+This directory contains notes on the various IRAF ports.  Most of these
+files do not contain an up-to-date record of the current ports, but rather
+these are historical notes taken during each port.  The name of the host
+operating system is contained in each filename, while most files contain
+the relevant dates of ports or upgrades inside them.  Some of this material
+may be of use to persons contemplating future ports.
+
+Conventions:
+
+    aos		AOSVS  (Data General MV/10000)
+    ctio	Cerro Tololo Interamerican Observatory
+    isi		Integrated Systems; Jupiter workstation at IPAC
+    nso		National Solar Observatory
+    st		Space Telescope Science Institute
+    sun		Sun Microsystems
+    sun2	SUN-2 hardware, SUN V2.0
+    sun3	SUN-3 hardware, SUN V3.0
+    v22		IRAF V2.2 (etc.)
+
+Where different files would otherwise have the same name, they are
+distinguished by the date of the last modification to the system that
+was part of the original "notes" file.  For example, "sun3_062486.doc"
+is the "notes" file as it existed on a Sun-3 on June 24, 1986.

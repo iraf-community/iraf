@@ -1,0 +1,13 @@
+# FITS parameters
+fits_file,f,a,mta,,,FITS data source
+file_list,s,a,,,,File list
+iraf_file,f,a,,,,IRAF filename
+make_image,b,h,yes,,,Create an IRAF image?
+long_header,b,h,no,,,Print FITS header cards?
+short_header,b,h,yes,,,Print short header?
+datatype,s,h,"",,,IRAF data type
+blank,r,h,0.0,,,Blank value
+scale,b,h,yes,,,Scale the data?
+oldirafname,b,h,no,,,Use old IRAF name in place of iraf_file?
+offset,i,h,0,,,Tape file offset
+mode,s,h,ql,,,

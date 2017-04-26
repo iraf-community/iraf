@@ -1,0 +1,20 @@
+.help module date package
+.ih
+NAME
+module -- description
+.ih
+USAGE
+module args
+.ih
+PARAMETERS
+.ih
+DESCRIPTION
+.ih
+EXAMPLES
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

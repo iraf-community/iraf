@@ -1,0 +1,26 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+$if (datatype == r)
+include "curfitdef.h"
+$else
+include "dcurfitdef.h"
+$endif
+
+# CVCOEFF -- Procedure to fetch the number and magnitude of the coefficients.
+
+$if (datatype == r)
+procedure cvcoeff (cv, coeff, ncoeff)
+$else
+procedure dcvcoeff (cv, coeff, ncoeff)
+$endif
+
+pointer	cv		# curve descriptor
+PIXEL	coeff[ARB]	# the coefficients of the fit
+int	ncoeff		# the number of coefficients
+
+begin
+	ncoeff = CV_NCOEFF(cv)
+
+	# fetch coefficients
+	call amov$t (COEFF(CV_COEFF(cv)), coeff, ncoeff)
+end

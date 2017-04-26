@@ -1,0 +1,813 @@
+.help radprof May00 noao.digiphot.apphot
+.ih
+NAME
+radprof -- compute the radial profile of an object
+.ih
+USAGE
+radprof image radius step
+.ih
+PARAMETERS
+.ls image
+The name of the image containing the objects to be measured.
+.le
+.ls radius, step
+The size and resolution of the computed radial profile in scale units which is
+equal to radius * \fIscale\fR  and step * \fIscale\fR in pixels.
+.le
+.ls coords = ""
+The list of text files containing initial coordinates for the objects to
+be centered. Objects are listed in coords one object per line with the
+initial coordinate values in columns one and two. The number of coordinate
+files must be zero, one, or equal to the number of images.  If coords is
+"default", "dir$default", or a directory specification then a coords file name
+of the form dir$root.extension.version is constructed and searched for,
+where dir is the directory, root is the root image name, extension is "prf"
+and version is the next available version number for the file.
+.le
+.ls output = ""
+The name of the results file or results directory.
+If output is "default", "dir$default" or a directory specification then an
+output file name of the form dir$root.extension.version is constructed, where
+dir is the directory, root is the root image name, extension is "prf" and
+version is the next available version of the file. If output is undefined,
+then no output file is created. If output is defined, the number of output files
+is either 1 or the same as the number of input images.
+.le
+.ls plotfile = ""
+The name of the file containing radial profile plots of the stars written
+to the output file. If plotfile is defined then a radial profile plot
+is written to plotfile every time a record is written to \fIoutput\fR.
+The user should be aware that this can be a time consuming operation.
+.le
+.ls datapars = ""
+The name of the file containing the data dependent parameters. The critical
+parameters \fIfwhmpsf\fR and \fIsigma\fR are located here. If \fIdatapars\fR
+is undefined then the default parameter set in uparm directory is used.
+.le
+.ls centerpars = ""
+The name of the file containing the centering parameters. The critical
+parameters \fIcalgorithm\fR and \fIcbox\fR are located here.
+If \fIcenterpars\fR is undefined then the default parameter set in
+uparm directory is used.
+.le
+.ls fitskypars = ""
+The name of the text file containing the sky fitting parameters. The critical
+parameters \fIsalgorithm\fR, \fIannulus\fR, and \fIdannulus\fR are located here.
+If \fIfitskypars\fR is undefined then the default parameter set in uparm
+directory is used.
+.le
+.ls photpars = ""
+The name of the file containing the photometry parameters. The critical
+parameter \fIapertures\fR is located here.  If \fIphotpars\fR is undefined
+then the default parameter set in uparm directory is used.
+.le
+.ls order = 5
+The number of pieces in the spline fit.
+.le
+.ls nreject = 1
+The maximum number of rejection cycles.
+.le
+.ls kreject = 3.0
+The k-sigma rejection limit for the radial profile fit.
+.le
+.ls interactive = yes
+Run the task interactively ?
+.le
+.ls radplots = yes
+If \fIradplots\fR is "yes" and RADPROF  is run in interactive mode, a radial
+profile of each star is plotted on the screen after the star is measured.
+.le
+.ls icommands = ""
+The image cursor or image cursor command file.
+.le
+.ls gcommands = ""
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIcoords\fR and
+of the output coordinates written to \fIoutput\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", "tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical parameters in non-interactive mode ? Verify may be set to
+the apphot package parameter value (the default), "yes", or "no".
+.le
+.ls update = ")_.update"
+Update the critical parameter in non-interactive mode if verify is yes ?
+Update may be set to the apphot package parameter value (the default), "yes",
+or "no".
+.le
+.ls verbose = ")_.verbose"
+Print messages on the screen in non-interactive mode ? Verbose may be set
+to the apphot package parameter value (the default), "yes", or "no".
+
+.le
+.ls graphics = ")_.graphics"
+The default graphics device.  Graphics may be set to the apphot package
+parameter value (the default), "yes", or "no.
+.le
+.ls display = ")_.display"
+The default display device. Display may be set to the apphot package
+parameter value (the default), "yes", or "no. By default graphics overlay
+is disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy"
+enables graphics overlay with the IMD graphics kernel.  Setting display to
+"stdgraph" enables RADPROF to work interactively from a contour plot.
+.le
+
+.ih
+DESCRIPTION
+
+The radial profiles of objects in the image \fIimage\fR are computed
+the object center out to the radius \fIradius * scale\fR, in steps of
+\fIstep * scale\fR pixels, and plotted. The initial positions are
+read from the image cursor or the text file \fIcoords\fR.
+
+The coordinates read from \fIcoords\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and RADPROF is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because RADPROF
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
+
+RADPROF can be run either interactively or in batch mode by setting the
+interactive switch to yes. In interactive mode starting x and y coordinates
+can either be read directly from the image cursor or read from the text
+file specified by \fIcoords\fR. In interactive mode the results are
+plotted on the terminal. In batch mode the estimated positions
+are read from the text file \fIcoords\fR or the image cursor parameter
+\fIicommands\fR is redirected to a text file containing a list of cursor
+commands.
+
+.ih
+CURSOR COMMANDS
+
+The RADPROF cursor commands are listed below.
+
+.nf
+	Interactive Keystroke Commands
+
+?	Print help
+:	Colon commands
+v	Verify the critical parameters
+w	Store the current parameters
+d	Plot radial profile of current star
+i	Interactively set parameters using current star
+c	Fit center of current star
+t	Fit sky around the cursor position
+a       Average sky values fit around several cursor positions
+s	Fit sky around the current star 
+p	Fit star using current sky
+o	Fit star using current sky, output results
+f	Fit current star
+spbar	Fit current star, output results
+m	Move to next star in coordinate list
+n	Fit next star in coordinate list, output results
+l	Fit remaining stars in coordinate list, output results	
+r	Rewind the coordinate list
+e	Print error messages
+q	Exit task
+
+
+	Colon Commands
+
+:show	[data/center/sky/fit]	List the parameters
+:m [n]	Move to next [nth] object in coordinate list
+:n [n]	Fit next [nth] object in coordinate list, output results
+
+
+	Colon Parameter Editing Commands
+
+# Image and file name parameters
+
+:image		[string]	Image name
+:coords		[string]	Coordinate file name
+:output		[string]	Output file name
+
+# Data dependent parameters
+
+:scale		[value]		Image scale (units per pixel)
+:fwhmpsf	[value]		Full-width half-maximum of psf (scale units)
+:emission	[y/n]		Emission features (y), absorption (n)
+:sigma		[value]		Standard deviation of sky (counts)
+:datamin	[value]		Minimum good pixel value (counts)
+:datamax	[value]		Maximum good pixel value (counts)
+
+# Noise parameters
+
+:noise		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# Observing parameters
+
+:exposure	[value]		Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime		[value]		Integration time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# Centering algorithm parameters
+
+:calgorithm	[string]	Centering algorithm
+:cbox		[value]		Width of the centering box (scale units)
+:cthreshold	[value]		Centering intensity threshold (sigma)
+:cmaxiter	[value]		Maximum number of iterations
+:maxshift	[value]		Maximum center shift (scale units)
+:minsnratio	[value]		Minimum S/N ratio for centering
+:clean		[y/n]		Clean subraster before centering
+:rclean		[value]		Cleaning radius (scale units)
+:rclip		[value]		Clipping radius (scale units)
+:kclean		[value]		Clean K-sigma rejection limit (sigma)
+
+# Sky fitting algorithm parameters
+
+:salgorithm	[string]	Sky fitting algorithm
+:skyvalue	[value]		User supplied sky value (counts)
+:annulus	[value]		Inner radius of sky annulus (scale units)
+:dannulus	[value]		Width of sky annulus (scale units)
+:khist		[value]		Sky histogram extent (+/- sigma)
+:binsize	[value]		Resolution of sky histogram (sigma)
+:sloclip	[value]		Low-side clipping factor in percent
+:shiclip	[value]		High-side clipping factor in percent
+:smaxiter	[value]		Maximum number of iterations
+:smooth		[y/n]		Lucy smooth the sky histogram
+:snreject	[value]		Maximum number of rejection cycles
+:sloreject	[value]		Low-side pixel rejection limits (sky sigma)
+:shireject	[value]		High-side pixel rejection limits (sky sigma)
+:rgrow		[value]		Region growing radius (scale units)
+
+# Photometry parameters
+
+:apertures	[string]	List of apertures (scale units)
+:zmag		[value]		Zero point of magnitude scale
+
+# Profile fitting parameters
+
+:radius		[value]		Maximum profile radius (scale units)
+:step		[value]		Step size for computed profile (scale units)
+:order		[value]		Number of spline pieces in fit
+:kreject	[value]		K-sigma rejection for fit (fit sigma)
+:nreject	[value]		Maximum number of rejection cycles
+
+# Marking and plotting parameters
+
+:mkcenter	[y/n]		Mark computed centers on display
+:mksky		[y/n]		Mark the sky annuli on the display
+:mkapert	[y/n]		Mark apertures on the display
+:radplot	[y/n]		Plot the radial profile
+
+
+
+The following commands are available from inside the interactive setup menu.
+
+
+                    Interactive Radprof Setup Menu
+
+	v	Mark and verify the critical parameters (f,c,s,a,d,r,w,x)
+
+	f	Mark and verify the psf full-width half-maximum
+	s	Mark and verify the standard deviation of the background
+	l	Mark and verify the minimum good data value
+	u	Mark and verify the maximum good data value
+
+	c	Mark and verify the centering box width
+	n	Mark and verify the cleaning radius
+	p	Mark and verify the clipping radius
+
+	a	Mark and verify the inner radius of the sky annulus
+	d	Mark and verify the width of the sky annulus
+	g	Mark and verify the region growing radius
+
+	r	Mark and verify the photometry aperture radii
+	w	Mark and verify the radius of the radial profile
+	x	Mark and verify the step size of radial profile
+.fi
+
+.ih
+ALGORITHMS
+
+Prior to computing the radial profile of the star, RADPROF computes the
+center, estimates a sky value, and does aperture photometry on the star
+using the parameters in the DATAPARS, CENTERPARS, FITSKYPARS, and
+PHOTPARS tasks.
+
+Next the radial and intensity coordinates of all the pixels inside
+\fIradius * scale\fR are computed using the calculated center and sky
+values and fit to a least squares cubic spline of order \fIorder\fR with
+optional bad data rejection.  The fit is interpolated at intervals of
+\fIstep_size * scale\fR to derive the output profile and estimate the
+full width at half maximum of the object. The fit noise model parameters
+are defined in DATAPARS.
+
+.ih
+OUTPUT
+
+In interactive mode the following quantities are printed on the standard
+output as each object is measured.  Error is a simple string which
+indicates whether an error was encountered in the
+the centering algorithm, the sky fitting algorithm, the photometry
+algorithm or the spline fitting algorithm respectively.
+Mag and merr are the magnitudes and errors in
+aperture N and xcenter, ycenter and msky are the
+x and y centers and the sky value respectively.
+Pfwhm is the fitted full width half maximum of the fitted radial profile.
+
+.nf
+    image  xcenter  ycenter  msky  pfwhm  mag[N]  merr[N] iers
+.fi
+
+In both interactive and batch mode full output is written to the text file
+\fIoutput\fR. At the beginning of each file is a header listing the
+current values of the parameters when the first stellar record was written.
+These parameters can be subsequently altered. For each star measured the
+following record is written
+
+.nf
+	image  xinit  yinit  id  coords  lid
+	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
+	   msky  stdev  sskew  nsky  nsrej  sier  serror
+	   itime  xairmass  ifilter  otime
+	   rapert  sum  area  flux mag  merr  pier  perr
+	   pfwhm  inorm  tinorm  rier  rerror
+	   pradius  intensity  tintensity
+.fi
+
+Image and coords are the name of the image and coordinate file respectively.
+Id and lid are the sequence numbers of stars in the output and coordinate
+files respectively. Cier and cerror are the error code and accompanying
+error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
+and xerr, yerr are self explanatory and output in pixel units. The sense of
+the xshift and yshift definitions is the following.
+
+.nf
+	xshift = xcenter - xinit
+	yshift = ycenter - yinit
+.fi
+
+Sier and serror are the error code and accompanying error message respectively.
+Msky, stdev and sskew are the best estimate of the sky value (per pixel),
+standard deviation and skew respectively. Nsky and nsrej are the number of
+sky pixels and the number of sky pixels rejected respectively.
+
+Itime is the exposure time, xairmass is self-evident, filter is an id
+string specifying the filter used during the observation and otime is
+a string containing the time of observation in whatever units the user
+has defined.
+
+Rapert, sum, area and flux are the radius of the aperture in pixels, the total
+number of counts including sky in the aperture, the area of the aperture in
+square pixels, and the total number of counts in the aperture excluding sky.
+Mag and merr are the magnitude and error in the magnitude in the aperture
+(see below).
+
+.nf
+	flux = sum - area * msky
+	 mag = zmag - 2.5 * log10 (flux) + 2.5 * log10 (itime)
+	merr = 1.0857 * error / flux
+       error = sqrt (flux / epadu + area * stdev**2 +
+	       area**2 * stdev**2 / nsky)
+.fi
+
+Pier and perror are photometry error code and accompanying error message.
+
+Pfwhm is the full width at half intensity of the fitted profile. Inorm and
+tinorm are the normalization factors for the fitted radial profile and the
+fitted total intensity profile respectively. Rier and rerror are the spline
+fitting error code and accompanying error message. Pradius, intensity
+and tintensity are the computed radii, intensity and total intensity
+values at each radial step.
+
+
+.ih
+ERRORS
+
+If the object centering was error free then the field cier will be zero.
+Non-zero values of cier flag the following error conditions.
+
+.nf
+	0        # No error
+	101      # The centering box is off image
+	102      # The centering box is partially off the image
+	103      # The S/N ratio is low in the centering box
+	104      # There are two few points for a good fit
+	105      # The x or y center fit is singular
+	106      # The x or y center fit did not converge
+	107      # The x or y center shift is greater than maxshift
+	108      # There is bad data in the centering box
+.fi
+
+If all goes well during the sky fitting process then the error code sier
+will be 0. Non-zero values of sier flag the following error conditions.
+
+.nf
+	0         # No error
+	201       # There are no sky pixels in the sky annulus
+	202       # Sky annulus is partially off the image
+	203       # The histogram of sky pixels has no width
+	204       # The histogram of sky pixels is flat or concave
+	205       # There are too few points for a good sky fit
+	206       # The sky fit is singular
+	207       # The sky fit did not converge
+	208       # The graphics stream is undefined
+	209       # The file of sky values does not exist
+	210       # The sky file is at EOF
+	211       # Cannot read the sky value correctly
+	212       # The best fit parameter are non-physical
+.fi
+
+If no error occurs during the measurement of the magnitudes then pier is
+0. Non-zero values of pier flag the following error conditions.
+
+.nf
+	0        # No error
+	301      # The aperture is off the image
+	302      # The aperture is partially off the image
+	303      # The sky value is undefined
+	305      # There is bad data in the aperture
+.fi
+
+If no error occurs during the profile fitting then rier is 0.
+Non-zero values of rier flag the following error conditions.
+
+.nf
+	0       # No error
+	901     # The profile region is off the image
+	902     # The profile region is partially off the image
+	903	# There are too few points in the profile
+	904	# The fit is singular
+	905     # The sky value is undefined
+.fi
+
+.ih
+EXAMPLES
+
+1. Compute the radial profiles for a few  stars in dev$ypix using the
+display and the image cursor. Setup the task parameters using the
+interactive setup menu defined by the i key command.
+
+.nf
+	ap> display dev$ypix 1 fi+
+
+	... display the image
+
+	ap> radprof dev$ypix 7.0 0.5 
+
+	... type ? to print a short help page
+
+	... move the image cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile or
+	    CR to accept the default value
+	... set the fwhmpsf, centering radius, inner and outer sky
+    	    annuli, apertures, sigma, profile radius and step size
+	    using the graphics cursor and the stellar radial profile
+	    plot
+	... typing <CR> leaves everything at the default value
+	... type q to quit the setup menu
+
+	... type the v key to verify the parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... move the image cursor to the star of interest and tap
+	    the space bar
+
+	... type :order 3 to change the spline order and see if the
+	     fit improves, if it does type w
+
+	... a radial profile plot will appear on the graphics terminal
+
+	... type q to quit and q to confirm the quit
+
+	... by default radprof does not create an output file
+.fi
+
+2. Compute the radial profiles for a few  stars in dev$ypix using a contour
+plot and the graphics cursor. Setup the task parameters using the interactive
+setup menu defined by the i key command. This option is only useful for
+those users (now very few) who do not have access to an image display server
+but do have access to a graphics terminal. 
+
+.nf
+	ap> show stdimcur
+
+	... determine the default value of stdimcur
+
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour dev$ypix 
+
+	... make a contour plot of dev$ypix
+
+	ap> contour dev$ypix  >G ypix.plot1
+
+	... store the contour plot of dev$ypix in ypix.plot1
+
+	ap> radprof dev$ypix 7.0 0.5
+
+	... type ? to print the help page
+
+	... move graphics cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile or
+	    hit CR to accept the default value
+	... set the fwhmpsf, centering radius, inner and outer sky annuli,
+	    apertures, sigma, profile radius and step size using the
+	    graphics cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+	... type q to quit the setup menu
+
+	... type the v key to verify the parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... type :.read ypix.plot1 to reload the contour plot
+
+	... move the graphics cursor to the star of interest and tap
+	    the space bar
+
+	... a radial profile plot will appear on the graphics terminal
+
+	... repeat the above sequence for each additional star
+
+	... type q to quit and q to confirm the quit
+
+	... by default radprof does not create an output file
+.fi
+
+3. Setup and run RADPROF interactively on a list of objects temporarily
+overriding the fwhmpsf, sigma, cbox, annulus, dannulus, apertures,
+radius, and step  parameters determined in examples 1 or 2.
+
+.nf
+        ap> daofind dev$ypix fwhmpsf=2.6 sigma=25.0 verify-
+
+        ... make a coordinate list
+
+        ... the output will appear in the text file ypix.coo.1
+
+        ap> radprof dev$ypix 7.0 0.5 fwhmpsf=2.6 sigma=5.0 cbox=7.0 \
+            annulus=10.0 dannulus=5.0 apertures=5.0 coords=ypix.coo.1
+
+        ... type ? for optional help
+
+
+        ... move the graphics cursor to the stars and tap space bar
+
+                                or
+
+        ... select stars from the input coordinate list with m / :m #
+            and measure with spbar
+
+        ... measure stars selected from the input coordinate list
+            with n / n #
+
+        ... a one line summary of results will appear on the standard output
+            for each star measured
+
+        ... type q to quit and q again to confirm the quit
+
+        ... by default radprof does not create an output file
+.fi
+
+4. Display and fit some stars in an image section and write the output
+coordinates in the coordinate system of the parent image.
+
+.nf
+        ap> display dev$ypix[150:450,150:450] 1
+
+        ... display the image section
+
+        ap> radprof dev$ypix[150:450,150:450] 7.0 0.5 output=default \
+            wcsout=tv 
+
+        ... move cursor to stars and type spbar
+
+        ... type q to quit and q again to confirm quit
+
+        ... output will appear in ypix.prf.1
+
+        ap> pdump ypix.prf.1 xc,yc yes | tvmark 1 STDIN col=204
+.fi
+
+
+5. Run RADPROF in batch mode using the coordinate file and the previously
+saved parameters. Save the text and plot output. 
+
+.nf
+	ap> radprof dev$ypix 7. 0.5 coords=ypix.coo.1 output="default" \
+	    plotfile=ypix.rplots inter- verify-
+
+	... output will appear in m92.prf.2 and ypix.rplots
+
+	ap> gkidir ypix.rplots
+
+	... get a listing of the plots in ypix.rplots
+
+	ap> gkiextract ypix.rplots 1-3 | stdplot dev=lw16
+
+	... extract plots 1-3 and plot them on device lw16
+.fi
+
+6. Repeat example 5 but assume that the input coordinates are ra and dec
+in degrees and degrees, turn off verification, and submit the task to to
+the background.
+
+.nf
+        ap> display dev$ypix 1
+
+        ap> rimcursor wcs=world > radec.coo
+
+        ... move to selected stars and type any key
+
+        ... type ^Z to quit
+
+        ap> radprof dev$ypix 7.0 0.5 coords=radec.coo output=default \
+            plotfile=ypix.rplots2 wcsin=world verify- inter- &
+
+        ... output will appear in ypix.prf.3, plots will appear in
+            ypix.rplots2
+
+        ap> pdump ypix.prf.3 xc,yc yes | tvmark 1 STDIN col=204
+
+        ... mark the stars on the display
+.fi
+
+
+7. Run RADPROF interactively without using the image display.
+
+.nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
+        ap> set stdimcur = text
+
+        ... set the image cursor to the standard input
+
+        ap> radprof dev$ypix 7.0 0.5 coords=ypix.coo.1
+
+        ... type ? for optional help
+
+        ... type :m 3 to set the initial coordinates to those of the
+            third star in the list
+
+        ... type i to enter the interactive setup menu
+        ... enter the maximum radius in pixels for the radial profile or
+            accept the default with a CR
+        ... type v to enter the default menu
+        ... set the fwhmpsf, centering radius, inner and outer sky annuli,
+            apertures, and sigma using the graphics cursor and the
+            stellar radial profile plot
+        ... typing <CR> after the prompt leaves the parameter at its default
+            value
+        ... type q to quit the setup menu
+
+        ... type r to rewind the coordinate list
+
+        ... type n to measure the next star
+
+        ... a one line summary of the answers will appear on the standard
+            output for each star measured
+
+        ... type q to quit followed by q to confirm the quit
+
+	... by default no output file is written
+
+        ap> set stdimcur = <default>
+
+        ... reset the value of stdimcur
+.fi
+
+8. Use a image cursor command file to drive the RADPROF task. The cursor
+command file shown below sets the cbox, annulus, dannulus, and apertures
+parameters computes the centers, sky values, magnitudes, and readial profiles
+for 3 stars, updates the parameter files, and quits the task.
+
+.nf
+        ap> type cmdfile
+        : cbox 9.0
+        : annulus 12.0
+        : dannulus 5.0
+        : apertures 5.0
+        442 410 101 \040
+        349 188 101 \040
+        225 131 101 \040
+        w
+        q
+
+        ap> radprof dev$ypix 7.0 0.5 icommands=cmdfile  \
+	    plotfile=ypix.rplots3 verify-
+
+        ... by default no output file is written, plots will appear in
+	    ypix.rplots3
+.fi
+
+
+.ih
+BUGS
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays and set the centerpars mkcenter switch to
+"yes", the fitskypars mksky switch to"yes", or the photpars mkapert
+witch to "yes". It may be necessary to run gflush and to redisplay the image
+to get the overlays position correctly.
+
+.ih
+SEE ALSO
+datapars, centerpars, fitskypars, photpars
+.endhelp

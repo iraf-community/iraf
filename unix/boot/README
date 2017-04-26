@@ -1,0 +1,19 @@
+BOOT -- Bootstrap utilities for building and maintaining IRAF.  The utilities
+in this package are implemented at the host system level, sometimes with
+assistance from the iraf kernel or other libraries.  All utilites are host
+system callable, regardless of how they are implemented.
+
+Major directories:
+
+	mkpkg		- package/library maintenance utility
+	spp		- compiler for the SPP language
+	rmbin		- seek out and destroy all binaries in a directory tree
+	rtar		- tar file reader
+	wtar		- tar file writer
+	bootlib		- system interface for the bootstrap utilities
+
+Others:
+
+	xyacc		- SPP/Yacc
+	generic		- generic preprocessor
+	vfn		- old boot-boot version of vfn2osfn (not currently used)

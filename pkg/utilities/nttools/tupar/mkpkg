@@ -1,0 +1,12 @@
+# Update the tupar application code in the ttools package library
+# Author: HODGE, 2-FEB-1988
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	tupar.x        		<fset.h> <error.h> <tbset.h> "tupar.h"
+	tuinstr.x        	<ctype.h> <tbset.h> "tupar.h"
+	;

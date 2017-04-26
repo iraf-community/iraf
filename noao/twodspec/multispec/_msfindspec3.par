@@ -1,0 +1,6 @@
+# _MSFINDSPEC3 -- Refine the model and fit a position function.
+
+image,f,a,,,,Image
+width,r,a,10,,,Width of spectra
+naverage,i,a,20,1,,Number of lines to average
+verbose,b,a,no,,,Verbose output?

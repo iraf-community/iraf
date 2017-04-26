@@ -1,0 +1,51 @@
+# Make the UTILITIES package
+
+$call	relink
+$exit
+
+update:
+	@nttools
+
+	$call	relink
+	$call	install
+	;
+
+relink:
+	@nttools
+
+	$set	LIBS = "-lxtools -lcurfit -lbev -lgsurfit"
+
+	$update	libpkg.a
+	$omake	x_utilities.x
+	$link	x_utilities.o libpkg.a $(LIBS) -o xx_utilities.e
+	;
+
+install:
+	$move	xx_utilities.e bin$x_utilities.e
+	;
+
+generic:
+	$set	GEN = "$$generic -k"
+	$ifolder (curfit.x, curfit.gx) $(GEN) curfit.gx -o curfit.x $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	curfit.x	curfit.h <fset.h> <imhdr.h> <pkg/gtools.h>\
+			<math/curfit.h>
+	decod_tablst.x	<ctype.h>
+	t_lcase.x	
+	pfregres.f
+	pffctn.x
+	t_split.x	<mach.h>
+	t_curfit.x	<ctype.h> <error.h> <fset.h> <imhdr.h> <pkg/gtools.h>\
+			<pkg/xtanswer.h>
+	t_detab.x	
+	t_entab.x	
+	t_polyfit.x	<fset.h>
+	t_surfit.x	<imhdr.h> <error.h> <math/gsurfit.h>
+	t_translit.x	<chars.h> <ctype.h> <pattern.h> <fset.h>
+	t_ucase.x	
+	t_urand.x	
+	;

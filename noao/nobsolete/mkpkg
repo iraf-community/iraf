@@ -1,0 +1,23 @@
+# Make the NOBSOLETE package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_nobsolete.x
+	$link	x_nobsolete.o libpkg.a -o xx_nobsolete.e
+	;
+
+install:
+	$move	xx_nobsolete.e noaobin$x_nobsolete.e
+	;
+
+libpkg.a:
+	t_badpixim.x	<ctype.h> <imhdr.h>
+	;

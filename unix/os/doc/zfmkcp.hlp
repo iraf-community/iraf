@@ -1,0 +1,40 @@
+.help zfmkcp May84 "System Interface"
+.ih
+NAME
+zfmkcp -- make a zero length copy of a file
+.ih
+SYNOPSIS
+.nf
+zfmkcp (osfn, new_osfn, status)
+
+packed	char osfn[]			# name of original file
+packed	char new_osfn[]			# name of new file
+int	status
+.fi
+.ih
+DESCRIPTION
+A zero length file is created which inherits all the machine dependent
+attributes (so far as is possible) of the original file.  No file data
+is copied.  The new file need not reside in the same directory as the
+original file.
+.ih
+RETURN VALUE
+ERR is returned if the original file cannot be accessed, if the new file
+cannot be created, or if the file cannot be accessed as either a text or binary
+file.  OK is returned if the operation is successful.
+.ih
+NOTES
+The newly created file is normally opened for writing as a text or binary
+file immediately after creation with \fBzfmkcp\fR.  The IRAF system has
+no knowledge of the machine dependent attributes of a file, e.g., execute
+permission, cross-directory links, special permissions, and so on.
+
+FIO ensures that a file will not already exist named \fInew_osfn\fR when
+\fBzfmkcp\fR is called.  If such a file exists and file clobber is enabled,
+FIO will delete the file before calling \fBzfmkcp\fR.  If file clobber
+is disabled and a file already exists with the new name, FIO will take an
+error action.
+.ih
+SEE ALSO
+zopnbf, zopntx
+.endhelp

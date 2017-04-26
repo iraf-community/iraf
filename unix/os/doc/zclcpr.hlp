@@ -1,0 +1,33 @@
+.help zclcpr May84 "System Interface"
+.ih
+NAME
+zclcpr -- close or disconnect a connected subprocess
+.ih
+SYNOPSIS
+.nf
+zclcpr (pid, exit_status)
+
+int	pid			# process id (a magic integer)
+int	exit_status		# termination code from process
+.fi
+.ih
+DESCRIPTION
+Disconnect a subprocess previously connected with \fBzopcpr\fR,
+i.e., close the IPC channels and wait for the subprocess to terminate.
+Control does not return until the child process has terminated.
+
+If the child process attempts to write to the parent after the IPC channels
+have been closed the X_IPC exception will be raised in the child process.
+If the child attempts to read from the parent after the parent has
+disconnected, the child will see EOF on the read and will shutdown.
+.ih
+RETURN VALUE
+The integer termination code of the child process is returned in
+\fIexit_status\fR.  A status of OK (zero) indicates normal termination.
+ERR is returned for an illegal \fIpid\fR.
+If the child terminates abnormally, i.e., if a panic exit occurs, the positive
+integer error code of the error which caused process termination is returned.
+.ih
+SEE ALSO
+zopcpr, zintpr, zxwhen
+.endhelp

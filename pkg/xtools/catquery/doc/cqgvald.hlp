@@ -1,0 +1,40 @@
+.help cqgvald Mar00 "Catquery Package"
+.ih
+NAME
+cqgvald -- get a catalog results field as a double precision value
+.ih
+SYNOPSIS
+
+nchars = cq_gvald (res, recno, fname, dval)
+
+.nf
+pointer	res		# the results descriptor
+int	recno		# the record number
+char	fname		# the field name
+double	dval		# the returned field value
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The results descriptor.
+.le
+.ls recno
+The record number.
+.le
+.ls fname
+The field name.
+.le
+.ls dval
+The returned double precision value.
+.le
+.ih
+DESCRIPTION
+Cq_gvald returns the requested field as a double precision value.
+Cq_gvald is an integer function which returns the number of characters
+that were successfully decoded as its function value. Zero is returned
+if the requested field could not be decoded.
+
+.ih
+SEE ALSO
+cqgval[csilr]
+.endhelp

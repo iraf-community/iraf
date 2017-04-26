@@ -1,0 +1,24 @@
+.help bffsiz Sep86 imfort.bfio
+.ih
+NAME
+bffsiz -- get the size in chars of a binary file
+.ih
+SYNOPSIS
+.nf
+integer function bffsiz (fd)
+
+integer		fd		#I BFIO file descriptor of open file
+.fi
+.ih
+DESCRIPTION
+The \fIbffsiz\fR function is used to query the size in SPP char units of
+storage of a binary file previously opened with \fIbfopen\fR.  This is useful,
+for example, when writing at the end of file, since the BFIO write function
+requires an absolute file offset as input.
+.ih
+RETURN VALUE
+The current size of the file in chars is returned as the function value.
+.ih
+SEE ALSO
+bfbsiz, bfchan
+.endhelp

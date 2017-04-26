@@ -1,0 +1,2219 @@
+.help spbasic
+.sh
+One Dimensional Package - Basic Operators
+
+.sh
+INTRODUCTION
+
+     The IRAF One Dimensional Package is intended to provide the basic
+tools required to reduce, analyze, and display data having a
+single dimension. This primarily refers to spectra, but may have
+applicability to time series photometry, or any other
+source of data which can be considered a simple vector.
+All such data will be referred to as spectra in the following discussion.
+Furthermore, the spectrum vector is assumed to be equally spaced
+along the independent variable (wavelength, channel, frequency,
+wavenumber,...). For the purposes of discussion, the independent
+variable will be referred to as wavelength but may be any of the
+possible physical transformations.
+
+     Spectra are to be stored as 2 dimensional IRAF floating point images
+having a single line
+and are therefore limited to lengths smaller than or equal to the
+largest representable positive integer. For 32 bit machines, this
+is about 2 billion points, so that disk space will likely be the
+operational limit.  The precision and dynamic range  for each pixel
+will be determined by the local machine.
+The second dimension of the spectrum is spatial, and therefore
+represents a special case of the long slit spectroscopic mode.
+
+     Each spectrum will, by default, be stored as a separate image
+file.  Alternatively, an association
+can be declared for a related set of spectra
+through a "data group" mechanism. A data group can be defined to
+contain any number of related spectra so that an operation can
+be specified for the group. For example, one can group a single
+night of IIDS spectra into a group labeled JAN28, and then
+wavelength linearize JAN28. This helps minimize
+the user interaction which would otherwise be repetitive, and
+also reduces the user bookkeeping required.
+
+     Data input to the package is provided through the DATAIO
+package. Tape readers will be provided for FITS, IIDS and IRS mountain
+formats, Text ("card-image"),  REDUCER and PDS. The descriptor fields
+included in these formats will be mapped into standard IRAF
+image header fields when possible. Special fields will be
+added to the image header to represent instrument
+related parameters.
+
+     Data output to tape (for visitor take home) will be
+either in FITS or text format.
+
+     A variety of graphics display options will be provided
+for both interactive use and for hardcopy generation.
+Scale expansion and contraction, labeling, multiple spectra
+plots, and axis limit specification are to be included in the
+options.
+
+     Specific reduction scripts will be provided to efficiently
+process raw data from the Kitt Peak instruments IIDS and IRS.
+
+
+.sh
+SCOPE OF SPECIFICATIONS
+
+This paper specifies the command format, parameters, and
+operations for the Basic contents of the One Dimensional
+Spectral Package. The Basic functions are those comprising the
+minimum set to reduce a large variety of spectra.
+More complicated operators and analysis functions
+are described in a companion paper on Intermediate Functions.
+Major projects in spectral analysis will be considered at
+a later date in the Advanced function set.
+
+The primary functions within the Basic operator set are:
+
+.ls 4 Transport
+Primarily magtape readers for the common tape formats. Included
+are FITS, IIDS/IRS, REDUCER, PDS, and Card-image formats.
+Tape writers will be initially limited to FITS and Card-image.
+.le
+.ls 4 Mathematical
+Add, subtract, multiply, divide spectra by spectra or constants.
+Apply functional operators such as log, exp, sqrt, sin, cos.
+Weighted sums and averages of spectra.
+.le
+.ls 4 Reduction operators
+Line identification, dispersion solution, flux calibration,
+coincidence correction, atmospheric extinction correction,
+flat fielding.
+.le
+.ls 4 Plotting
+Terminal package to expand, overplot, annotate plots. Hard
+copy package for printer/plotters.
+.le
+.ls 4 Utilities
+Header examination and modification. List, copy, delete spectra.
+Define, add, delete entries in a data group.
+.le
+.ls 4 Artificial spectra
+Generate ramps, Gaussian and Voigt lines, noise.
+.le
+
+These functions will be considered in detail in the following
+discussion.
+
+.ks
+A summary of the commands is given below:
+
+.nf
+rfits       -- Convert FITS data files to IRAF data files
+riids       -- Convert IIDS mountain tape format to IRAF data files
+rreducer    -- Convert Reducer format tape to IRAF data files
+rpds        -- Convert a PDS format tape to IRAF data files
+rtext       -- Convert a card-image text file to an IRAF image file
+wfits       -- Convert IRAF data files to FITS data format
+wtext       -- Convert an IRAF image file to a card-image text file
+.sp 1
+coin_cor    -- Correct specified spectra for photon coincidence
+line_list   -- Create a new line list, or modify an existing one
+mlinid      -- Manually identify line features in a spectrum
+alinid      -- Automatically locate spectral features in a spectrum
+disp_sol    -- Determine the dispersion relation for a set of spectra
+disp_cor    -- Linearize spectra having dispersion relation coefficients
+cr_flat     -- Create a flat field spectrum
+flt_field   -- Correct spectra for pixel-to-pixel variations
+std_star    -- Define the standard stars to be used for solving the 
+               extinction and system sensitivity functions
+crext_func  -- Create an extinction function from a set of observations
+crsens_func -- Create system sensitivity function
+ext_cor     -- Extinction correct specified spectra
+sens_cor    -- Correct the specified spectra for system sensitivity
+.fi
+.ju
+.ke
+
+.bp
+.sh
+TRANSPORT - INPUT
+
+Although the primary data input source for the near future
+will be magtape, direct links from other computers will
+be a likely source of input. The IRAF DATAIO package
+treats magtape as simple bit streams so that alternate
+input devices (e.g. disk, ethernet, phone lines) can also
+be accommodated with no programming modifications.
+
+This section describes the different formats to be made
+available in the initial release of the Spectroscopic
+package. Additional formats may be added if needed.
+
+In general, the following information will be copied to
+the standard image header: length of spectrum, title, 
+abscissa units, brightness units, reference pixel
+abscissa value and increment, right ascension and declination
+of telescope.
+
+Non-standard header parameters include but are not limited to:
+integration time, UT and LST of the observation, airmass (or 
+zenith distance), processing history, and comments.
+
+.sh
+FITS
+.ih
+NAME
+rfits -- Convert FITS data files to IRAF data files
+.ih
+USAGE
+rfits [source, filename, files]
+.ih
+DESCRIPTION
+FITS data is read from the specified source.
+The FITS header may optionally be printed on the standard
+output as either a full listing or a short description.  Image data may
+optionally be converted to an IRAF image of specified data type.
+
+Eventually all data from the mountain will be in FITS format,
+with the exception of time-critical data transfer projects
+and special applications. The IRAF FITS reader will
+copy the data to disk for most applications.
+
+.ih
+PARAMETERS
+.ls 4 fits_source
+The FITS data source.  If the data source is a disk file or an explicit tape file
+specification of the form mt*[n] where n is a file number then only that file
+is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,
+then the files specified by the files parameter will be read from the tape.
+.le
+.ls filename
+The IRAF file which will receive the FITS data if the make_image parameter
+switch set.  For tape files specified by the files parameter the filename
+will be used as a prefix and the file number will be appended.   Otherwise,
+the file will be named as specified.  Thus,
+reading files 1 and 3 from a FITS tape with a filename of data will produce
+the files data1 and data3.  It is legal to use a null filename.  However,
+converting a source without a file number and with a null filename will cause
+a default file fits to be created.
+.le
+.ls files
+The files to be read from a tape are specified by the files string.  The
+string can consist of any sequence of file numbers separated by
+at least one of whitespace, comma, or dash.
+A dash specifies a range of files.  For example the string
+
+1 2, 3 - 5,8-6
+
+will convert the files 1 through 8.
+.le
+.ls print_header
+If this switch is set header information is printed on the standard output
+output. (default = yes)
+.le
+.ls short_header
+This switch controls the format of the header information printed when the
+print_header switch is set.
+When the short_header switch is set only the output filename,
+the FITS OBJECT string, and the image dimensions are printed.
+Otherwise, the output filename is followed by the full FITS header.
+(default = yes)
+.le
+.ls bytes_per_record
+The FITS standard record size is 2880 bytes which is the default for this
+parameter.  However, non-standard FITS tapes with different record sizes can
+be read by setting the appropriate size.
+.le
+.ls make_image
+This switch determines whether FITS image data is converted to an IRAF image
+file.  This switch is set to no to obtain just header information with the
+print_header switch. (default = yes)
+.le
+.ls data_type
+The IRAF image file may be of a different data type than the FITS image data.
+The data type may be specified as s for short, l for long, and r for real.
+The user must beware of truncation problems if an inappropriate data type is
+specified.  If the FITS keywords BSCALE and BZERO are found then the image
+data is scaled appropriately.  In this case the real data type may be most
+appropriate.
+.le
+.sh
+For spectroscopic applications, the parameter data_type would be
+specified as r for real, and the filename would probably be assigned
+as the "group" name as well. (see section on data groups.)
+
+
+.sh
+IIDS/IRS
+.ih
+NAME
+riids -- Convert IIDS mountain tape format to IRAF data files
+.ih
+USAGE
+riids [source, filename, form, records]
+.ih
+DESCRIPTION
+IIDS/IRS mountain format data is read from the specified source.
+The header may be printed
+on the standard output either in short form, label only, or a long
+form containing telescope and time information, processing flags,
+and wavelength solution values.
+
+Either raw or "mountain reduced" tapes can be specified with the
+parameter form.
+
+The IIDS format is destined for extinction. A FITS format will
+replace the current tape format, but an interim period will exist
+for which this tape reader must exist.
+.ih
+PARAMETERS
+.ls 4 iids_source
+The data source, either magtape or a data stream (e.g. disk file).
+The current IIDS tape format produces tapes having only a single
+file. If the source is a magtape, the general tape specification
+mt*[n], should either have n specified as 1, or [n] should not be present.
+.le
+.ls 4 filename
+The IRAF file which will contain the data if the make_image parameter
+is set. The filename will be used as a prefix and the record number
+will be used as the suffix. Thus reading records 1 through 100 from
+an IIDS tape with a file name of 'blue' will produce 100 files having
+names blue1, blue2, ..., blue100. A null filename will default to 'iids'.
+.le
+.ls 4 form
+This string parameter defines the tape to be either 'new' or 'red'.
+The 'new' designation refers to tapes made after January 1977, and
+'red' refers to mountain reduced tapes. (default = 'red')
+.le
+.ls 4 records
+The records specified by this string parameter will be copied to disk.
+The syntax is identical to that for the files parameter of the FITS reader.
+.le
+.ls 4 print_header
+If this switch is set, header information is printed on the standard
+output. (default = yes)
+.le
+.ls 4 short_header
+If this switch is set, only the filename and label information will be printed
+if the print_header switch is also set. If set to 'no', the long form
+will be printed. (default = yes)
+.le
+.ls 4 make_image
+See definition of this parameter under FITS.
+.le
+
+
+.sh
+REDUCER
+
+REDUCER tapes require several considerations beyond the
+previous simple formats. The spectra actually consist of
+many spectra having lengths of 4096 but slightly different
+spectral sampling. Thus, the reader can create many small
+independent spectra, or interpolate the data onto a common
+spectral scale to create a single large spectrum.
+The latter alternative seems to be more generally useful,
+unless the interpolation process introduces significant errors.
+Probably the initial reader will provide both options.
+   
+A second consideration is the 60 bit word length conversion.
+The IRAF images are limited to 32 bit reals on most 32 bit machines.
+Some loss of precision and dynamic range will result while reading REDUCER
+format data.
+   
+Also, there may be a considerable number (~100) of non-standard header
+elements. These can be handled in a normal fashion, and tools
+will be provided to extract or modify these elements as needed.
+New elements may be added as well.
+
+.ih
+NAME
+rreducer -- Convert Reducer format tape to IRAF data files
+.ih
+USAGE
+rreducer [source, filename, files]
+.ih
+DESCRIPTION
+REDUCER format data is read from the specified source.
+The header may be printed on the standard output either in short form
+consisting of the 80 character ID field, or a long form containing some
+selection (to be agreed upon) of the many header elements.
+
+Either a single long spectrum requiring interpolation
+to match the spectral characteristics of the first data block, or
+multiple short spectra having individual spectral parameters can
+be specified with the hidden parameter, interp.
+Interpolation is performed via a fifth order polynomial.
+
+Subsets of the spectrum can be selected with the blocks string
+parameter. This specifies which blocks in the file are to be extracted.
+
+.ih
+PARAMETERS
+.ls 4 reducer_source
+The data source, either magnetic tape or a data stream (e.g. disk
+file). See the definition of fits_source above for a description
+of how this parameter interacts with the files parameter.
+.le
+.ls 4 filename
+The filename which will contain the data.
+See the definition of this parameter under FITS.
+If no name is given, the default of 'reducer' will be used.
+.le
+.ls 4 files
+The files to be read from tape are given by the files string. See
+the description of this parameter under FITS.
+.le
+.ls 4 print_header
+If this switch is set header information will be printed on the
+standard output. (default = yes)
+.le
+.ls 4 short_header
+If this switch is set only the filename and the first 60 characters
+of the 80 character ID field will be printed if the print_header
+switch is also set. If set to no, the long form of the header
+will be printed, containing selected elements of the 100 word
+header record. (default = yes)
+.le
+.ls 4 make_image
+See the definition of this parameter under FITS.
+.le
+.ls 4 interp
+If this switch is set, a single long spectrum is produced. If
+set to no, multiple spectra will be generated, one for each
+header-data block. The resulting filenames will have suffixes
+of '.1' , '.2' ... '.n'. For example, if the given filename is
+fts and the tape file is 2, the resulting spectrum will be
+fts2 if interp is set to yes, but will be fts2.1, fts2.2, and
+fts2.3 if there are 3 header-data block sets and interp is set
+to no. (default = yes).
+.le
+.ls 4 blocks
+This string parameter allows selected extraction of the
+specified header-block sets, rather than the entire spectrum.
+Thus subsets of the spectrum may be extracted. The parameter
+specifies the starting block and ending block within a tape file.
+If an end-of-file is found prior to exhaustion of the
+specification, reading is terminated.
+For example, the string '12 19' specifies that the eight sets
+starting with the twelfth block are to be extracted to
+form the spectrum. (default = '1 32767', or all)
+.le
+
+
+.sh
+PDS
+
+Tapes from the new PDS 11/23 system will be either FITS or
+old format PDS 9 track tapes. This reader will accept the
+old format tapes which are based on the PDP 8 character set
+and either 10 or 12 bit format.
+
+.ih
+NAME
+rpds -- Convert a PDS format tape to IRAF data files
+.ih
+USAGE
+rpds [source, filename, files]
+.ih
+DESCRIPTION
+PDS format data is read from the specified source. The header
+may be printed on the standard output either in short form
+consisting of the 40 character ID field, filename, and size,
+or in long form including raster parameters and origin.
+
+Because PDS data is limited to no more than 12 bit data, the output image
+will be short integers if the number of lines ("scans") implies
+two dimensional data. If one dimensional data is implied, the
+output image will be converted to reals.
+.ih
+PARAMETERS
+.ls 4 pds_source
+The data source, either magtape or a data stream. See the definition
+of fits_source above for a description of how this parameter interacts
+with the files parameter.
+.le
+.ls 4 filename
+If no filename is given, the default of 'pds' will be used.
+.le
+.ls 4 files
+See the definition of this parameter under FITS.
+.le
+.ls 4 print_header
+If this switch is set, header information will be printed on the
+standard output. (default = yes).
+.le
+.ls 4 short_header
+If this switch is set, only the filename, size, and the 40 character ID
+field will be printed if the print_header switch is also set.
+If set to no, the long form of the header will be printed
+containing the full information block (delta X, delta Y, scan type,
+speed, origin, corner, travel). (default = yes)
+.le
+.ls 4 make_image
+See the definition of this parameter under FITS. (default = yes)
+.le
+.ls 4 data_type
+Specifies the IRAF image file output data type. Normally one
+dimensional PDS data (NSCANS=1) will be stored as real and
+two dimensional PDS data (NSCANS>1) will be stored as short.
+The data type may be specified as s (short), l (long), or r
+(real).
+.le
+
+
+.sh
+TEXT (Read Card-Image)
+
+Card-image tapes are probably the most portable form of data transport.
+Unlike FITS, there is no standard for internally documenting the
+contents of the text file. Header information is essentially
+lost. This makes card-image data transfer a relatively unattractive
+format.
+
+
+.ih
+NAME
+rtext -- Convert a card-image text file to an IRAF image file.
+.ih
+USAGE
+rtext [source, filename, files, ncols, nlines, label]
+.ih
+DESCRIPTION
+The card-image text file specified by the source parameter is 
+converted to an IRAF image file. The file is read in a free form
+mode (values separated by spaces) converting data along lines (1-ncols) first.
+No header information is stored except for the image size and
+the label.
+
+If additional header information is to be stored, the standard
+image header utility must be used.
+
+Pixel values exactly equal to some constant will be assumed to be blanks
+if the blank switch is set to yes. The flag value for blanks can be
+set with the blank_value parameter.
+
+.ih
+PARAMETERS
+.ls 4 text_source
+The input data source. See the definition of this parameter under FITS.
+.le
+.ls 4 filename
+The IRAF file which will contain the image data if the make_image
+switch is set. If no filename is given, the default of 'text'
+will be used.
+.le
+.ls 4 files
+See the definition of this parameter under FITS.
+.le
+.ls 4 ncols
+The number of columns of data which describe the image extent.
+.le
+.ls 4 nlines
+The number of lines (or 'rows') of data which describe the image extent.
+For one dimensional spectra, this parameter will be 1.
+.le
+.ls 4 label
+This string parameter becomes the image identification label.
+Up to 80 characters may be stored.
+.le
+.ls 4 print_header
+If this switch is set, header information consisting of the filename,
+image label, and image size will be printed on the standard output.
+(default = yes)
+.le
+.ls 4 make_image
+If this switch is set, an IRAF image will be created. (default = yes)
+.le
+.ls 4 data_type
+The IRAF image may be either s (short), l (long), or r (real).
+(default = r)
+.le
+.ls 4 card_length
+The number of columns on the "card" in the card-image file.
+(default = 80)
+.le
+.ls 4 blank_value
+The value used to flag blank pixels if the blank switch is set to yes.
+(default = -32767)
+.le
+.ls 4 blank
+If this switch is set to yes, any pixel having exactly the value
+specified by the parameter blank_value will be flagged as a blank
+pixel. If set to no, all pixel values are assumed to be valid.
+.le
+
+
+.bp
+.sh
+TRANSPORT - OUTPUT
+
+The primary format for take away tapes will eventually be FITS.
+Because many facilities currently cannot read FITS format,
+the card-image format will also be provided.
+
+.sh
+FITS
+.ih
+NAME
+wfits -- Convert IRAF data files to FITS data format
+.ih
+USAGE
+wfits [destination, filename, files]
+.ih
+DESCRIPTION
+Data is read from the specified filename(s) and written to the
+destination, usually a magnetic tape specification. 
+A short header consisting of the filename, size, and label
+may optionally be printed on the standard output.
+
+The data will be automatically scaled to either 16 or 32 bit integer format
+(BITPIX = 16 or 32) depending on the number of bits per pixel in the
+image data, unless the bitpix parameter is specified
+otherwise. The scaling parameters may be forced to
+exactly represent the original data (BSCALE = 1.0, BZERO = 0.0)
+by setting the scale switch to no.
+
+If only the header information is to be copied to the destination,
+the write_image parameter can be set to no. If this is the case,
+then the NAXIS FITS keyword will be assigned the value of 0;
+otherwise the value for
+NAXIS will be taken from the IRAF image header.
+
+Each non-standard header element will be written into the FITS file
+in a form to be determined. These elements may be entered as FITS
+COMMENT records, or perhaps added to the file as FITS "special
+records".
+
+Other keywords will be written following standard FITS specifications.
+A few special cases will be set as follows:
+
+.ls 4 NAXISn
+The NAXIS1, NAXIS2, ... NAXISn values will be taken from the
+image header
+.le
+.ls 4 OBJECT
+The first 60 characters of the image label will be used.
+.le
+.ls 4 BLANK
+Blank pixels will be written to tape having the IRAF value for
+indefinite appropriate to 8, 16, or 32 bit integers.
+.le
+.ls 4 ORIGIN = 'KPNO IRAF'
+.le
+
+.ih
+PARAMETERS
+.ls 4 fits_destination
+The data destination, usually a magnetic tape, but may be a disk
+file or STDOUT. If magtape,
+the tape should be specified with a file number of either 1
+or "eot". The file number refers to the file which will be written.
+Thus a file number of 2 would overwrite file 2. If the tape already
+has data written on it, the safest specification would be "eot".
+This forces the tape to be positioned between the double end-of-tape
+marks prior to writing.
+.le
+.ls 4 filename
+The IRAF filename providing the root for the source name. The files
+string, if given, will be used as the suffix for the file names
+to be written to tape. For example, if the filename is given as
+"image", and the files string is "1 -5", then files image1, image2,
+image3, image4, and image5 will be written to the destination
+in FITS format. If the files string is empty, only the specified
+filename will be converted.
+.le
+.ls 4 files
+See the definition of this parameter under the FITS reader.
+.le
+.ls 4 print_header
+If this switch is set, a short header will be printed on the
+standard output for each image converted. (default = yes)
+.le
+.ls 4 write_image
+If this switch is set to no, only header information will be
+written to the destination, but no image data.
+By using this parameter,
+one can generate a FITS tape containing header information only
+and may be used as a means for examining the IRAF image header
+or for generating a table of contents on a tape prior to writing
+the data. (default = yes)
+.le
+.ls 4 bitpix
+This parameter must be either 8, 16, or 32 to specify the
+allowable FITS pixel sizes.
+.le
+.ls 4 scale
+If this switch parameter is set to no, the FITS scaling
+parameters BSCALE and BZERO will be set to 1.0 and 0.0
+respectively. The data will be copied as it appears in the
+original data, with possible loss of dynamic range.
+Values exceeding the maximum value implied by the bitpix
+parameter will be set to the maximum representable value.
+(default = yes)
+.le
+
+
+.sh
+TEXT (Write Card-Image)
+
+Although this format is easily readable by the destination
+machine, there is no real standard for encoding information,
+neither the image data itself nor the descriptive parameters.
+
+.ih
+NAME
+wtext -- Convert an IRAF image file to a card-image text file
+.ih
+USAGE
+wtext [destination, filename, files]
+.ih
+DESCRIPTION
+Data is read from the specified filename(s) and written to
+the destination, usually a magnetic tape. The data will be
+blank padded, ASCII in a format consistent with the data type
+of the image pixels, (integer or floating point).
+A short header description, consisting of the filename
+being converted and the image label, may optionally be printed
+on the standard output.
+
+The column length of the "card" may be changed from the default
+of 80 using the card_length parameter, and the field width
+to be allocated for each data element may be changed from the
+default of 10 columns by setting the field_width parameter.
+
+If the data are integers, the equivalent of the FORTRAN format
+I<field_width> will be used;
+if the data are reals, the equivalent of the FORTRAN format
+1P<n>E<field_width>.3
+will be used, where n is the number of elements which can
+be output into one card length. For the default values of
+card_length = 80, and field_width = 10, n will be 8. (1P8E10.3).
+
+Several cards may be written as a single "block" for
+improving the efficiency on magtape. Reasonable efficiency (80 percent)
+is attained with a blocking factor of 50, but this value
+may be modified by changing the parameter blocking_factor.
+If the last block is unfilled, it will be truncated to the
+minimum number of card images required to flush the data.
+
+A legitimate value must be defined to represent blank pixels.
+The parameter blank_value is used to define this value and
+defaults to -32767.
+
+.ih
+PARAMETERS
+.ls 4 text_destination
+See the definition for fits_destination for a description of this
+parameter.
+.le
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 print_header
+If this switch is set, a short header is printed for each
+file converted. (default = yes)
+.le
+.ls 4 card_length
+The number of columns on the "card" to be generated. (default = 80)
+.le
+.ls 4 field_width
+The number of columns on the "card" to be allocated for each pixel value.
+(default = 10)
+.le
+.ls 4 blocking_factor
+The number of card images to be written as a single blocked record.
+(default = 50)
+.le
+.ls 4 blank_value
+The value to be assigned to blank pixels for the purpose of
+representing them on the card image. (default = -32767)
+.le
+.bp
+
+
+.sh
+MATHEMATICAL OPERATORS
+
+Because spectra are stored as IRAF images, the standard image
+calculator utility provides the basic arithmetic services.
+For example, to create a spectrum (called spavg) which is the average of two
+other spectra (sp1 and sp2), one can enter the command:
+.ls 8 cl>imcalc "spavg = (sp1 + sp2) / 2"
+.le
+
+Other arithmetic operations are performed in a similar fashion.
+The general form of the command string is
+output_image = expression where "expression" may consist of:
+.ls 8 1. Spectra or segments of spectra
+A segment of a spectrum is specified by the notation spectrum[x1:x2]
+where x1 and x2 are pixel indices along the spectrum. For example,
+to create a spectrum which is the difference of the first 100
+pixels of two other spectra, the following command would be used:
+.ls 16 cl> imcalc "spdiff = sp1[1:100] - sp2[1:100]"
+.le
+An option to specify wavelength delineated segments may be added
+if this appears generally feasible.
+.le
+.ls 8 2. Numeric constants
+.le
+.ls 8 3. Data group names
+If an operation is performed on a data group, the output
+will be a new data group containing spectra which have been
+individually treated by the specified calculation.
+For example, if JAN28 is a group containing 100 congruent spectra
+and response is the instrumental response as a function of
+wavelength as determined from a set of standards, then
+the after the following command is entered:
+.ls 16 cl> imcalc "JAN28X = JAN28 * response"
+.le
+
+a new data group will be generated containing 100 spectra which
+have been calibrated for the instrument response. The new spectra will
+be given names JAN28X1 through JAN28X100.
+.le
+.ls 8 4. Intrinsic functions
+.ks
+The following intrinsic functions are to be provided:
+
+.nf
+    abs      atan2    cos      int      min      sin       
+    acos     ceil     cosh     log      mod      sinh      
+    aimag    char     double   log10    nint     sqrt      
+    asin     complex  exp      long     real     tan       
+    atan     conjug   floor    max      short    tanh      
+.fi
+.ke
+.le
+
+Expression elements are to be
+separated by arithmetic and boolean operators (+,-,*,/,**,<,>,<=,=>,==,!,!=). 
+The boolean operators provide a means to generate masks.
+
+Rules governing operations on non-congruent spectra are not yet fully defined.
+.bp
+
+.sh
+REDUCTION OPERATORS
+
+Most of the reduction operators discussed in this section are
+intended for spectra of the IIDS/IRS class, although they
+are sufficiently general to accommodate data obtained with
+the CryoCam (either multi-aperture or long-slit mode), Echelle,
+Coude Feed, and photographic (PDS) instruments. Some 
+application to FTS data is also feasible.
+
+It is intended that many of these operators will never be
+directly executed by users, but that they will be driven by
+CL command scripts tuned for individual instruments.
+In some cases the scripts will be fairly elaborate and extensive
+to lead new users through the reduction phase along a reliable
+path.
+
+It will no doubt be necessary to either modify some
+of these operators, or create more specific operators for
+certain other instruments. These operators should be considered
+a sample of what will eventually be available in this package. 
+
+The basic path which most spectroscopic data follows is:
+
+.ls 4 1.
+Coincidence Correction.
+.ls
+Many detectors can respond to incoming photevents at a limited
+rate. Once an event occurs, the detector cannot respond for some
+instrument dependent period, or dead-time. If events occur during
+this period, they will not be counted. If the event rate
+does not greatly exceed the detector limits, the uncounted events
+can be corrected for statistically.
+
+For many detectors, the coincidence correction is a well
+determined function and can be applied to the raw data
+to produce a reasonably corrected spectrum.
+.le
+.le
+.ls 4 2.
+Wavelength linearization.
+.ls
+Few instruments produce spectra having pixel to pixel wavelength
+differences which are constant across the entire spectrum.
+For subsequent reduction and analysis purposes, it is
+desirable to rectify the spectra. This is done by mapping the spectrum
+from the non-linear wavelength coordinate to a linear one.
+It is also desirable to provide a means of forcing the mapping
+to a grid which is common to many observations, and in some cases,
+to observations acquired with other instruments as well.
+
+The processes required for the mapping are outlined below.
+
+.le
+.ls 4 a.
+Manually identify a small number of spectral features having
+known wavelengths thereby creating a table of wavelength as
+a function of pixel number.
+.le
+.ls 4 b.
+Compute estimated relationship between wavelength and pixel number
+.le
+.ls 4 c.
+Automatically locate many features found in a user definable line list.
+Optionally locate additional features from other spectra using an alternate
+line list. (This allows spectra from several different sources to be used
+for the wavelength calibration, such as arc lamps, night/day sky.)
+.le
+.ls 4 d.
+Compute improved relationship between wavelength and pixel number.
+.le
+.ls 4 e.
+Perform 2.c. and 2.d. for all other spectral entries in the wavelength
+calibration data group.
+.le
+.ls 4 f.
+Compute relationship for wavelength as a function of pixel number and time (or
+zenith distance, or some other flexure parameter) as deduced from 2.e.
+.le
+.ls 4 g.
+Apply inverse of wavelength function to a data group. This requires
+interpolation of the data at pixels having fixed steps in wavelength.
+The start wavelength and the step size must be user definable.
+The interpolation may be via a polynomial of a user specified order (typically
+1 to 5), or a more sophisticated interpolator. The linearization
+in wavelength may also be a simple rebinning of the data to exactly preserve
+photon statistics.
+.le
+.le
+.ls 4 3.
+Field flattening.
+.ls
+Pixel to pixel sensitivity variations and other small scale
+fluctuations are removed by dividing the object spectra by the spectrum of
+a continuum source. The latter spectrum should have a very high
+signal-to-noise ratio so as not to introduce additional uncertainties
+into the data.
+
+If the spectrum of the continuum source has much low frequency
+modulation,
+it may be necessary to filter these variations before the division is performed.
+Otherwise fluctuations not characteristic
+of the instrument response may be introduced, and may be difficult to remove
+during the subsequent flux calibration process.
+.le
+.le
+.ls 4 4.
+Sky Subtraction
+.ls
+Except for extremely bright sources, all spectra require that the
+spectrum of the night sky be removed. In some cases, sky will
+be the dominant contributor to the raw spectrum.
+Sky subtraction is a simple subtraction operation and can be
+accomplished with the image calculator tools.
+.le
+.le
+.ls 4 5.
+Extinction Correction
+.ls
+The effects of the Earth's atmosphere produce a wavelength dependent
+reduction of flux across the spectrum. The extinction function
+is approximately known from extensive photometric measurements
+obtained at the observatory over a period of many years. But on
+any given night this function may deviate from the average, sometimes
+significantly. If the spectroscopic observer has acquired the necessary
+data, it is possible to solve for the extinction function directly.
+
+Therefore, it should be possible for the user to either derive the
+extinction function, input a user-defined function, or use the
+standard average function and subsequently correct spectra for the
+effects of the atmosphere as described by that function and the effective
+observing airmass. (Note that because  exposures may be quite long, the
+effective airmass must be calculated as a function
+of position on the sky.)
+.le
+.le
+.ls 4 6.
+Flux Calibration (Correction for Instrument Response)
+.ls
+By observing objects having known wavelength dependent flux
+distributions, it is possible to determine the sensitivity
+variations of the instrument as a function of wavelength.
+Usually several standards are observed for each group of data
+and these must be averaged together after corrections for
+"grey shift" variations (wavelength independent flux reductions
+such as those introduced by thin clouds).
+
+Although the actual flux of the standards is generally known only
+for a limited selection of wavelengths, the instrument response
+usually varies smoothly between those wavelengths and a smooth
+interpolator generally provides satisfactory calibration values
+at intermediate wavelengths.
+
+In some cases, the system sensitivity response may be known
+from other observations, and the user will be allowed to directly
+enter the sensitivity function.
+.le
+.le
+
+The above reduction path is primarily tuned to IIDS/IRS style data.
+Other instruments may require additional or alternate steps.
+It may be necessary for multiaperture Cryocam spectra, for example,
+to undergo an additional hole to hole sensitivity correction
+based on the total sky flux through each hole.
+
+The tasks performing the procedures outlined above will be described
+in more detail in the following discussion.
+
+.sh
+COINCIDENCE CORRECTION
+.ih
+NAME
+coin_cor -- Correct specified spectra for photon coincidence
+.ih
+USAGE
+coin_cor [filename, files, destination, dead_time]
+.ih
+DESCRIPTION
+The spectra specified by the root filename and the files parameter
+are corrected for photon counting losses due to detector dead-time.
+The corrected spectra are written to filenames having the root
+specified by the destination.
+
+The correction, if typical of photomultiplier discriminators,
+is usually of the form:
+
+.br
+         Co(i) = C(i) exp[C(i) dt],
+.br
+         dt = t/T,
+.br
+
+where Co(i) is the corrected count at pixel i, C(i) is the raw count,
+t is the detector/discriminator dead-time, and T is the
+exposure time at pixel i.
+
+Clearly, the correction factor can become extremely large when the
+count rate, C(i)/T, is large compared with the dead-time, t.
+The above formula cannot be expected to
+exactly remove the effects of undetected photo-events when
+large corrections are required.
+
+The exposure time will be read from the image header.
+If no value exists, or if the value is less than or equal to
+zero, a request from standard input will be issued for this parameter.
+
+Because each detector may have unique coincidence properties,
+this routine may be package dependent.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 destination
+The IRAF filename providing the root for the name of the result
+spectra. The files parameter, if specified, will be used for the
+suffix. If the filename parameter is actually a data group name,
+the destination name will be used to create a new data group
+containing spectra having IRAF filenames with the destination
+group name as a root and a suffix starting with 1 and incremented for
+each converted spectrum.
+.le
+.ls 4 dead_time
+The value of this parameter, in seconds, represents the detector
+dead-time.
+.le
+.ls 4 print_header
+If this switch is set, a short header will be printed on the
+standard output for each spectrum corrected. (default = yes)
+.le
+.ls 4 exposure
+This parameter should be entered into the image header. If not
+present or not realistic, a request is made from standard input.
+.le
+
+.sh
+WAVELENGTH LINEARIZATION
+
+A package of routines is required to perform the operations
+leading to linearized data. These include:
+.ls 4 1. Spectral line list definition and editing facility
+.le
+.ls 4 2. Manual line identifier using graphics cursor.
+.le
+.ls 4 3. Automatic line identifier using preliminary identifications
+from manual identifier and locating lines from the predefined list.
+.le
+.ls 4 4. Computation of dispersion relationship as a function of
+pixel coordinate and a flexure parameter, probably zenith distance.
+.le
+.ls 4 5. Linearization of spectra according to dispersion relation.
+Correction can be to either a linear or logarithmic dispersion in
+the pixel coordinate.
+.le
+
+Perhaps the most critical aspect of determining the dispersion
+relation is the algorithm for locating spectral line centers.
+A variety of techniques are available, and some testing will
+be required before adopting a standard scheme. Probably several
+algorithms will be available and switch selectable at the command
+level.
+
+.sh
+LINE LIST PREPARATION
+.ih
+NAME
+line_list -- Create a new line list, or modify an existing one
+.ih
+USAGE
+line_list [filename, option]
+.ih
+DESCRIPTION
+The line list specified by the IRAF filename parameter will be
+either created, listed, or modified according to the option
+given. The IRAF database facility will be used to manage the
+line list file.
+
+Each entry within the list will contain an identification tag (e.g. HeII)
+a reference value (e.g. wavelength, frequency, wavenumber), and a weighting
+value such as 1.0 or 2.0 to be used later in the least-squares fitting.
+An optional descriptive header may be associated with the line list.
+(e.g. "HeII arc from 3500 to 11,000A")
+
+Either the header, entry identifier or value may be changed
+if the modify option is specified. Deletion or addition of
+entries is also possible with the appropriate option flags
+specifications.
+.ih
+PARAMETERS
+
+.ls 4 filename
+The IRAF filename to be assigned to the line list. The list will
+referenced by this name thereafter.
+.le
+.ls 4 option
+This string parameter determines the action of the line list task.
+If no option is specified, the default action is to list the
+specified line list on the standard output if the line list
+exists; if it does not exist, a new line list will be created
+with the given name.
+.ls 4 = create
+The identifications and values for the line list are read from
+the standard input on a record by record basis. Each input
+record contains data for one line according to the format:
+.br
+.ls 4 identification value
+.le
+.le
+.ls 4 = header
+A descriptive header is read from the standard input.
+.le
+.ls 4 = list (default)
+The line list is listed on the standard output.
+.le
+.ls 4 = add
+Additional entries to the list are read from the standard input.
+.le
+.ls 4 = delete
+The entries defined by the values read from the standard input
+are deleted from the line list. The entries deleted will be those
+having values nearest the entered value, unless the absolute
+difference from the listed value is too large. For example, one
+can enter 5015 to delete the helium line at 5015.675, but entering
+5014 would result in an error message that no match could be found.
+.le
+.ls 4 = id
+The entries defined by values entered as for delete will be modified.
+Input is expected in the format:
+.br
+approxvalue  newidentifier
+.le
+.ls 4 = value
+As for option = id except that the input format contains
+the newvalue instead of the newidentifier.
+.le
+.ls 4 = weight
+As for option = id except that the nput format contains the newweight
+instead of the newidentifier.
+.le
+.le
+
+.sh
+MANUAL LINE IDENTIFICATION
+
+This routine provides the option of manually identifying the locations
+of spectral features by either setting a graphics cursor interactively,
+or by entering a list of feature positions.
+
+The primary uses for this routine are to identify features of known
+wavelength in preparation for a dispersion solution, and also to
+identify features in linearized spectra for velocity measurements.
+
+.ih
+NAME
+mlinid -- Manually identify line features in a spectrum
+.ih
+USAGE
+mlinid [filename, files]
+.ih
+DESCRIPTION
+A list file is created for each of
+the spectra specified by the IRAF filename parameter and files string
+containing the locations of spectral features and their associated
+reference value (e.g. wavelength, frequency, wavenumber).
+If invoked as an interactive task from a graphics terminal,
+the spectra will be displayed and cursor input requested to ascertain
+the approximate position of the feature. An improved position will
+be obtained via one of the line centering algorithms, and
+a request will be made for the reference value of the feature.
+The requests continue until EOF is detected.
+The name of the created list file is added to the spectral image
+header.
+
+Positions of features are given in the coordinate system defined
+by the standard image header entries CRPIX and CDELT
+defining the reference pixel and the
+pixel to pixel distance. For raw spectra these values simply define
+the pixel position of the feature. For dispersion corrected spectra
+these values define the position of the feature in wavelength units.
+
+If invoked as a background task, or from a non-graphics terminal,
+additional requests for the cursor x-coordinate  and intensity
+will be made from the standard input.
+
+The procedure is repeated for all specified spectra.
+
+Because the dispersion solution may be a function of an additional
+instrument dependent parameter (e.g. zenith distance),
+the driving package script can indicate the header entry to be
+used as the second parameter. Values for this parameter, if present,
+will be written to the output list file.
+.ih
+PARAMETERS
+
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 cur (x,y)
+This is a list structured parameter of type "graphics cursor".
+The list contains the approximate values of the pixel
+coordinate for the spectral features to be identified
+and the intensity value of the continuum at the feature. If the
+task is invoked from a graphics terminal in an interactive mode,
+values for this parameter will be read from the terminal's
+graphics cursor.
+.le
+.ls 4 value
+This is a list structured parameter containing the reference values
+for the spectral features to be identified. If the task is invoked in
+an interactive mode, the user will be prompted for these values.
+.le
+.ls 4 center_option
+This string parameter controls which algorithm is to be used during
+the improved centering phase of the process. (default = cg)
+.ls 4 = cg
+This specifies a center of gravity algorithm defined as the
+first moment of the intensity above the continuum level
+across the spectral feature.
+The integrals are evaluated using the trapezoidal rule and
+the intensity will be weighted by the square root of the intensity
+if the switch parameter cgweight is set to yes. The integral
+is evaluated from the approximate position defined by x cursor position
+plus and minus the number of pixels specified by the parameter
+cgextent.
+.ls 4 cgweight
+This switch defines whether a weighted moment is used in the
+center of gravity centering algorithm. (default = yes)
+.le
+.ls 4 cgextent
+This integer parameter defines the limits of the integrals in the
+center of gravity centering algorithm. The integral extends from
+the approximate position minus the extent to the approximate position
+plus the extent in units of pixels. (default = 5).
+.le
+.le
+.ls 4 = parabola
+This specifies that the centering algorithm is to be a parabolic
+fit to the central 3 pixels. The improved center is taken as the
+center of the parabola. The central 3 pixels are defined as the
+most extreme local pixel plus and minus one pixel. The most extreme
+local pixel is that pixel nearest the approximate center having the
+greatest deviation from the local average value of the spectrum. The
+extent of "local" is taken as plus and minus the parameter parextent.
+.ls 4 parextent
+This integer parameter defines the extent in units of pixels
+of the search for a local extreme pixel. (default = 3)
+.le
+.le
+.ls 4 = gauss
+(This algorithm will not be implemented in the initial system release.)
+This specifies that the centering algorithm is to be a Gaussian
+fit to the region near the approximate center. The fit is
+made to a region specified by the parameter gextent. Because
+this is a three parameter non-linear least-squares fit
+(center, width, peak intensity), it is likely to
+be slow. It may also produce poor results with noisy data
+although centering on high signal to noise data should be
+excellent.
+.ls 4 gextent
+This integer parameter specifies the extent in pixels of the Gaussian fit.
+It may be necessary to include a significant region of continuum.
+(default = 9)
+.le
+.le
+.ls 4 = none
+If this option is chosen, no improvement to the approximate center
+will be made. This may be useful for asymmetric and weak features
+where the other techniques can be systematically incorrect.
+.le
+.ls 4 second_order
+This string parameter defines the name of the image header entry to be
+used as the second order correction parameter in the dispersion
+solution. Values for this parameter, if present, are read from the image header
+and written to the output list file. Examples of values are zenith_distance,
+sidereal_time, instr_temp. (default = none)
+.le
+
+.sh
+AUTOMATIC LINE IDENTIFICATION
+
+This task allows a user to locate a set of spectral features defined
+in a previously prepared list.
+
+.ih
+NAME
+alinid -- Automatically locate spectral features in a spectrum
+.ih
+USAGE
+alinid [filename, files, mfilename, mfiles, list]
+.ih
+DESCRIPTION
+A list file is created for each of the spectra specified by the
+IRAF filename and files parameters. The file will contain
+the positions of the features defined in the line list file
+specified by the list parameter. The name of the list file
+will be added to the spectral image header.
+
+A preliminary estimate of the
+relationship of feature position as a function of feature
+wavelength is obtained from the list file(s) created by the
+task MLINID and defined by the parameters mfilename and mfiles. 
+A single preliminary estimate may be applied to a number of
+spectra by specifying a null mfiles string. Otherwise,
+a one-to-one correspondence is assumed between preliminary
+list files and spectra. If the entry for mfilename is also null,
+the linear dispersion relation for the pixel coordinate contained
+in the image header will be used. This provides the option
+of locating features in linearized spectra.
+
+The initial position estimate is improved using one of the centering
+algorithms defined by the center_option parameter and then
+written to a list file. Also written to the list file will be
+the feature's reference value (e.g. wavelength), weight,
+identification string, and the acceptability of the line.
+Acceptibility is noted as either accepted, set, deleted, or not
+found (see below).
+
+If the task is invoked from a graphics terminal as an interactive
+task, the interact switches may be set to yes.
+Then each spectrum will
+be displayed in segments expanded about each feature with the
+automatically defined center marked. The user can then accept
+the given position, mark a new center, or declare the line
+unacceptable.
+
+If the display switch is set, the spectrum is displayed
+and the features marked.
+
+If the task is invoked as a background task, or if the
+user terminal is non-graphics, then the display and interact
+switches cannot assume values of yes.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS
+.le
+.ls 4 files
+See the definition of this parameter under RFITS
+.le
+.ls 4 mfilename
+The root for the spectra names used to define the preliminary
+relationship between spectral feature coordinate and reference
+value. The mfiles string parameter is used to define the
+suffix of the spectral name. If this parameter is null, the
+preliminary relationship is assumed to be linear and defined
+by the standard image header entries CRPIX and CDELT.
+.le
+.ls 4 mfiles
+This string parameter serves the same purpose for mfilename
+as the files parameter serves for filename. Note that if this
+parameter is null, the single spectrum defined by mfilename
+is used to define the preliminary relationship for all
+spectra defined by filename and files.
+.le
+.ls 4 list
+This parameter specifies the IRAF file name containing the
+spectral line list to be scanned for features. (See the
+task LINE_LIST)
+.le
+.ls 4 interact
+If this switch is set to yes and the task is invoked interactively
+from a graphics terminal, the spectrum will be displayed on the
+terminal. Each feature will be marked with its computed center
+and the user can type one of the following single keystrokes:
+.ls 4 a
+to accept the displayed position
+.le
+.ls 4 s
+to set the cursor to the desired position
+.le
+.ls 4 d
+to delete the displayed feature from the line list during this
+invocation of the task
+.le
+.ls 4 b
+to reset the operational mode to a "batch" environment where
+no display or interaction is desired
+.le
+.ls 4 p
+to reset the operational mode to a "passive" environment where
+the spectra are displayed and marked, but no interaction is desired
+.le
+.le
+.ls 4 display
+If this switch is set to yes, and the task is invoked from
+a graphics terminal, the spectrum will be displayed and the
+identified lines marked for the user's inspection. No
+interaction is allowed unless the interact switch is also set to yes.
+(default = yes)
+.le
+.ls 4 center_option
+See the description of this parameter under MLINID.
+.le
+.ls 4 second_order
+See the description of this parameter under MLINID.
+.le
+
+.sh
+DISPERSION SOLUTION
+
+After several spectral features have been identified, either
+manually with MLINID or automatically with ALINID, the relationship
+between feature reference value and pixel coordinate can be calculated.
+The dispersion relation may require a second order correction
+to account for variations as a function of some additional
+parameter, such as zenith distance or time of day.
+
+.ih
+NAME
+disp_sol -- Determine the dispersion relation for a set of spectra.
+.ih
+USAGE
+disp_sol [filename, files, order, global]
+.ih
+DESCRIPTION
+The list files containing the postions and reference values for
+features in the specified spectra are combined to solve for the
+dispersion relation by a polynomial least-squares fit to the lists.
+The solution can include a second order
+correction parameter which is also contained in the list file.
+
+The solution takes the form of a polynomial in the pixel
+coordinate having the specified order. The second order
+is also fit by a polynomial. (The choice of a polynomial
+applies to the initial release. Additional forms, selectable by
+parameter, of the solution may be available later.)
+The polynomial coefficients are stored in the spectral image header
+if the store_coeffs switch is set to yes and the spectrum does not already
+contain a solution. If a solution already exists, the user is
+asked for confirmation to overwrite the solution, unless the overwrite
+switch is set to yes.
+
+If filename is the name of a data group, all line list files for
+spectra in that data group are combined into the solution.
+
+If invoked as an interactive task from a graphics terminal,
+a representation of the solution will be displayed and the user
+will be allowed to alter the weights of the line entries.
+If invoked from a non-graphics terminal, the representation
+will be in a tabular format (also available at a graphics terminal)
+for inspection and alteration. If invoked as a background task,
+an attempt will be made to reject discrepant points.
+
+The solution is made using all available line lists combined
+into a single data set if the global switch is set to yes.
+If global is set to no, each spectrum is treated as an
+independent data set.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 order
+The order of the polynomial for a least-squares fit to the
+dispersion solution. If the specified order exceeds the number
+of free parameters, the order will be reset to the maximum
+allowable. (default = 1 --> linear).
+.le
+.ls 4 global
+This switch determines if the data from all the specified spectra are
+to be treated as a single large data set. This is appropriate if the
+data represent a single congruent "setup". But if the data represent
+several different configurations, such as for multiaperture data,
+the global switch should be set to no. Note that if global is no, then
+no second order parameter solution is possible.
+.le
+.ls second_order
+This parameter specifies the order for the fit to the second
+order parameter. The limit described for the order parameter
+applies. (default = 0 --> no second parameter solution).
+.le
+.ls 4 interact
+If this switch is set to yes and the task is invoked interactively
+from a graphics terminal, the residuals of the solution will be displayed
+on the terminal. The user can type one of the following keystrokes:
+.ls 4 a
+to accept the current solution. The parameters of the fit
+are written into the headers of the spectra contributing to the fit.
+.le
+.ls 4 e
+to exit without saving the solution
+.le
+.ls 4 w
+to reset the weight of the point near the cursor positioned by the user.
+The user is then prompted for the new weight which may be set to zero
+to delete the point from the solution.
+.le
+.ls 4 t
+to display the solution parameters in tabular form
+.le
+.ls 4 o
+to specify a new order for the solution
+.le
+.ls 4 s
+to specify a new order for the second order parameter solution
+.le
+.ls 4 b
+to revert to batch mode to process the remainder of the solutions.
+This is only meaningful if the global switch is set to no.
+.le
+.ls 4 p
+to revert to passive mode as for ALINID. This is only meaningful
+if the global switch is set to no
+.le
+.le
+.ls 4 store_coeffs
+If this switch is set to yes, the dispersion solution polynomial
+coefficients will be written into the image header as special
+header elements. Otherwise, the solution is discarded. (default = yes)
+.le
+.ls 4 overwrite
+If this switch is set to yes, any existing dispersion solution contained
+in the image header will be overwritten without any request for confirmation
+from the user. If set to no, the user is asked if overwriting of the solution
+is acceptable. If no prior solution exists, this switch has no meaning.
+(default = no)
+.le
+
+.sh
+DISPERSION CORRECTION
+
+After the dispersion relation has been determined, the spectra
+are usually re-binned to create spectra having a linear
+relationship with wavelength. Although this is not always
+done, nor is it always desirable, subsequent processing
+is often simplified greatly by having to deal with only
+linearized data.
+
+.ih
+NAME
+disp_cor -- Linearize spectra having dispersion relation coefficients
+.ih
+USAGE
+disp_cor [filename, files, destination, option]
+.ih
+DESCRIPTION
+The spectra specified by the root filename and the files parameter
+are corrected for deviations from a linear wavelength relationship.
+The corrected spectra are written to filenames having the root
+specified by the destination parameter.
+
+The correction is performed by solving for the inverse relationship
+of pixel number as a function of equal increments in the wavelength.
+The new starting wavelength and increment are optionally specified
+by the parameters start and increment. If not specified, the current
+wavelength of the first pixel will be taken as the starting wavelength
+and the increment will be chosen to exactly fill the length of the
+current spectrum. The spectrum will be padded with INDEF on either
+end if the specified parameters request a larger spectral window than
+actually exists.
+
+The actual re-binning can be performed using one of several algorithms.
+The most efficient minimally smoothing algorithm to be available in the
+initial release is the fifth order polynomial interpolation.
+The most efficient count preserving algorithm is the simple partial-pixel
+summer.
+
+The interpolation can be either linear in wavelength or in the logarithm
+of wavelength. The latter is useful for subsequent radial velocity
+analyses. The choice is specified by the logarithm switch.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS
+.le
+.ls 4 destination
+See the definition of this parameter under COIN_COR.
+.le
+.ls 4 option
+This parameter specifies the algorithm to be used for the
+re-binning operation. The initial release will contain the
+following options:
+.ls 4 = linear
+to use a linear interpolation
+.le
+.ls 4 = poly
+to use a fifth order polynomial
+.le
+.ls 4 = sinc
+to use a sinc function interpolator
+.le
+.ls 4 = sum
+to use partial pixel summation
+.le
+.le
+.ls 4 start
+This parameter specifies the wavelength at which the corrected
+spectrum is to begin. The wavelength of the first pixel will
+be assigned this value. This parameter, combined with the increment
+parameter, allows data taken on different nights
+or with different instruments to be forced to be congruent.
+(default = value at first pixel)
+.le
+.ls 4 increment
+This parameter specifies the pixel to pixel wavelength (or logarithm of
+wavelength) increment
+that is to be used during the linearization process.
+(default = [wavelength at last pixel minus wavelength at first pixel]
+divided by [number of points in spectrum - 1])
+.le
+.ls 4 logarithm
+If this switch is set to yes, the linearization occurs with equal
+increments in the logarithm of wavelength. Otherwise, equal
+increments of wavelength are used. (default = no)
+.le
+.ls 4 print_header
+See the definition of this parameter for COIN_COR.
+.le
+
+.sh
+FIELD FLATTENING
+
+Most detectors exhibit variations in sensitivity across the field
+of interest. These are removed by dividing all observations by
+the spectrum of a smooth continuous source, such as an incandescant
+lamp. In order that these lamps, which usually have a low color
+temperature, produce sufficient energy in the blue and ultraviolet,
+they are often enclosed in a quartz rather than a glass bulb.
+Thus, the field flattening operation is often referred to as
+"quartz division".
+
+The operation is of marginal value unless the continuum source is
+observed properly. First, a very high signal-to-noise ratio per
+pixel is required. For certain detectors and applications this
+may not be possible in a reasonable amount of time. Second, the
+continuum source should not have any significant variations
+across small regions of the spectrum (high frequency "bumps").
+Otherwise the division will add these variations into the spectrum.
+
+There are basically two aspects to flat fielding spectra. The first
+is the removal of pixel-to-pixel sensitivity variations. The second
+is a more global pattern due to non-uniform iillumination and
+spatial and wavelength sensitivity variations across the detector.
+
+The very high frequency pixel-to-pixel variations are easily handled
+by a straightforward division of the observations by the continuum
+spectrum.
+
+The second problem is usually postponed in one-dimensional data
+reductions and included in the
+solution for the system sensitivity by observing standard stars.
+This aspect of the problem is adequately handled in this fashion
+and no special operators are provided in this package.
+
+If the continuum source exhibits large low frequency variations
+across the spectrum, it may be desirable to filter these.
+This is most easily done by fitting a moderately high order
+polynomial through the spectrum, and then dividing the polynomial
+representation into the original continuum spectrum. The result
+is a flat spectrum having an average value of unity and
+containing only the pixel-to-pixel sensitivity variations.
+
+Finally, it should be noted that the field flattening operation
+is most properly performed prior to the wavelength linearization
+of the spectra because the linearization process can smooth
+pixel-to-pixel variations.
+
+Flat fielding consists of two logical operations. The first
+is the solution for a continuum spectrum with the low frequency
+variations removed (CR_FLAT). It is assumed that multiple observations
+of the continuum source have been already averaged (using the
+image calculator program, for example).
+
+The second operation is the actual field flattening of the object
+spectra (FLT_FIELD).
+
+.ih
+NAME
+cr_flat -- Create a flat field spectrum
+.ih
+USAGE
+cr_flat [filename, destination]
+.ih
+DESCRIPTION
+The continuum spectrum specified by filename is corrected for
+low frequency spectral variations. Several algorithms may be
+available. The initial release will contain only a polynomial
+fitting technique. A fourier filtering algorithm may be added
+at a later date.
+
+The spectrum is fit by a polynomial in the pixel coordinate
+and the polynomial is divided into the original spectrum.
+Discrepant pixels may be rejected and the solution re-iterated.
+
+If invoked as an interactive task from a graphics terminal, the
+resultant spectrum is displayed and the user may alter the
+solution parameters if the interact switch is set to yes.
+If invoked from a non-graphics terminal, sufficient information
+concerning the fit is written to the terminal to allow
+the user to judge the quality of the fit and then alter the
+solution parameters.
+
+If invoked as a background task, or if the interact switch is set
+to no, default parameters will be assumed.
+
+The parameters of the fit are added to the image header for
+the corrected spectra.
+.ih
+PARAMETERS
+.ls 4 filename
+The IRAF filename containing the spectrum of the continuum
+source. If this is a data group name, then all spectra
+in the group will be corrected.
+.le
+.ls 4 destination
+The IRAF filename into which the resultant corrected
+spectrum is written. If the source filename is a data group,
+then the destination will be a new data group containing
+the names of the corrected spectra. The names will be
+assigned using the destination as a root name, and the
+ordinal of the spectrum in the list as a suffix.
+.le
+.ls 4 option
+This string parameter specifies the algorithm to be used
+in the correction process. Currently only option = poly
+is recognized.
+.le
+.ls 4 order
+This integer parameter specifies the initial order of the
+polynomial fit. (default = 8)
+.le
+.ls 4 reject
+This parameter specifies the number of standard deviations
+beyond which pixels are to be rejected. If the task
+is interactive, pixel rejection is performed only on command.
+If invoked as a background task, rejection is iterated 
+until no further pixels are rejected, or until the iteration
+count has been attained (see parameter niter). (default = 2.2)
+.le
+.ls 4 niter
+This integer parameter specifies the number of iterations
+to be performed in background mode. It may be set to 0 to
+specify no pixel rejection. (default = 2).
+.le
+.ls 4 interact
+If this switch is set to yes and the task is invoked as
+an interactive task, the user can alter the fit parameters
+order, reject, and niter. If at a graphics terminal, the resultant
+spectrum is displayed and the user can command the operation
+with the following single keystrokes:
+.ls 4 a
+to accept the solution
+.le
+.ls 4 o
+to change the order of the fit
+.le
+.ls 4 r
+to reset the reject parameter
+.le
+.ls 4 n
+to reset the niter parameter
+.le
+.ls 4 b
+to reset the operational mode to a batch environment
+.le
+.ls 4 p
+to reset the operational mode to a passive environment
+.le
+.le
+
+If at a non-graphics terminal, the fit parameters are
+written to the terminal so that the user may assess the quality
+of the fit. A request for one of the interactive commands
+is then issued and the user may proceed as if on a graphics
+terminal.
+.le
+
+.ih
+NAME
+flt_field -- Correct spectra for pixel-to-pixel variations
+.ih
+USAGE
+flt_field [filename, files, flatname, destination]
+.ih
+DESCRIPTION
+The spectra specified by the IRAF filename parameter and the files
+string are divided by the flat field spectra specified by
+the parameter flatname. If filename and flatname are data group names,
+the division is performed on a one-for-one basis.
+
+This operation is little more than a simple division. An image
+header entry is added indicating that flattening by the
+appropriate spectrum has been performed.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 flatname
+This string parameter sepcifies the name of the flat field
+spectrum, or spectra if a data group name.
+It is not necessary that the flat field spectra be corrected
+for low frequency spectral variations.
+It is required that the spectra be congruent with the spectra
+to be flattened; that is, all spectra must have the same
+length, reference pixel, and pixel-to-pixel increment.
+.le
+.ls 4 destination
+See the definition of this parameter under COIN_COR.
+.le
+.ls 4 print_header
+See the definition of this parameter under COIN_COR.
+.le
+
+.sh
+EXTINCTION CORRECTION/FLUX CALIBRATION
+
+At each wavelength (lambda) along the spectrum, the observed
+flux (fobs) must be corrected for extinction (k) due to the
+Earth's atmosphere and the system sensitivity (S) to obtain
+a true flux (f) above the atmosphere.
+.sp 1
+fobs(lambda) = f(lambda) * exp{-z[k(lambda)+C]} * S(lambda)
+.sp 1
+where z is the path through the Earth's atmosphere during the
+observation and C is an optional "grey" opacity term.
+
+For most observations, the standard extinction function is adequate,
+but occasionally the additive term is beneficial. In rare cases,
+the observer has acquired sufficient high quality data to
+determine the extinction function across the spectral region
+of interest. And in other cases, the user may have a priori
+knowledge of the extinction function.
+
+Observations of standard stars are used to determine
+either the additive constant or a new extinction function,
+and the system sensitivity.
+The two operations, determining the extinction parameters
+and the system sensitivity curve, are therefore intimately
+related.
+
+The process breaks down into four basic operations:
+.ls 4 1.
+Define the standard stars and their observations. (STD_STAR)
+.le
+.ls 4 2.
+Define the extinction solution option and solve for the extinction
+additive term or complete function if necessary. (CREXT_FUNC)
+.le
+.ls 4 3.
+Determine the system sensitivity function. (CRSENS_FUNC)
+.le
+.ls 4 4.
+Remove the effects of the extinction and the system sensitivity
+from the observations. (EXT_COR, SENS_COR)
+.le
+
+These will be described below in more detail.
+
+.ih
+NAME
+std_star -- Define the standard stars to be used for solving the extinction and
+system sensitivity functions.
+.ih
+USAGE
+std_star [fnamelist, filelist, namelist, std_file]
+.ih
+DESCRIPTION
+The spectra defined by the list of filenames and associated files
+contained in the string list parameters fnamelist and filelist
+are compared with the standard flux measurements for the stars
+listed in the string list parameter namelist. The resultant
+table of ratios as a function of wavelength are saved in the
+IRAF file specified by the std_file parameter.
+
+All spectra must be wavelength linearized. The star names given
+in namelist must be in a form similar to that in the IIDS Reduction
+manual. If a star name cannot be matched to the standards contained
+in a calibration file, the user is prompted for additional
+information. The calibration file containing the list of reference
+flux values is specified by the calib_file parameter.
+.ih
+PARAMETERS
+.ls 4 fnamelist
+This is a list structured parameter containing the IRAF filenames
+associated with the spectra for each of the standard stars contained
+in the list of starnames defined by the list structured parameter
+namelist. Both these parameters must have the same number of elements.
+The filename specifications are defined as in RFITS.
+.le
+.ls 4 fileslist
+This is also a list structured parameter having the same number of
+elements as fnamelist although some may be null.
+The entries are defined as in RFITS.
+.le
+.ls 4 namelist
+This is also a list structured parameter having the same number
+of elements as fnamelist. All elements must exist and have a
+form to be decided on, but probably similar to that given in the IIDS
+Reduction manual, page 36. For example, a typical star name might
+be BD+8 2015, or HILTNER 102. Case will not be significant.
+.le
+.ls 4 std_file
+This string parameter defines the IRAF filename in which the
+results from the standard star observations are stored.
+This file will be used to contain further calibration information
+such as the extinction and sensitivity function for the
+current set of observations.
+.le
+.ls 4 calib_file
+This string parameter defines which of several calibration
+data files are to be accessed for the comparison of the
+observational data to the standard fluxes. Separate tools
+to examine, modify, and create these files are available
+in the utilities package. (default = onedspec$iids.cal)
+.le
+.ls 4 print_header
+If this parameter is set to yes, an informative header
+is listed on the standard output as the standard stars are processed
+(default = yes).
+.le
+
+.ih
+NAME
+crext_func -- Create an extinction function from a set of observations
+.ih
+USAGE
+crext_func [std_file, option]
+.ih
+DESCRIPTION
+The user may specify via the option parameter which of the four
+extinction solutions is to be used. These are:
+.sp 1
+.ls 4 1.
+Adopt standard extinction function (option = standard).
+.le
+.ls 4 2.
+Solve for an additive constant (option = additive).
+.le
+.ls 4 3.
+Solve for extinction function (option = new_function).
+.le
+.ls 4 4.
+Input a tabular extinction function consisting of extinction
+values at specified wavelengths (option = input).
+.le
+.sp 1
+If the first or last options are chosen, the std_file may be empty.
+If the second option is chosen, several observations at
+differing air masses must be included in the file specified by std_file.
+If the third option is chosen,
+at least two standard stars must be included in the list of observations.
+
+The derived extinction function is added to the IRAF file specified
+by the std_file parameter by creating a new spectrum containing the
+function and adding the spectrum name to the std_file.
+The new spectrum will adopt a name having a root from the
+name std_file and a suffix of ".ext". The spectrum is created by
+a spline interpolation through the extinction values.
+
+If invoked as an interactive task from a graphics terminal, the
+derived extinction function  is displayed. The user may interactively
+alter the derived extinction values using the graphics cursor.
+If invoked from a non-graphics terminal, the user may alter the
+values by specifying the wavelength and new extinction value
+from the standard input. Interaction may be suppressed by setting the
+interact switch to no.
+
+.ih
+PARAMETERS
+.ls 4 std_file
+See the definition of this parameter under STD_STAR.
+.le
+.ls 4 option
+This parameter specifies which aspects of the extinction solution
+are to be computed. See description section for CREXT_FUNC.
+.le
+.ls 4 interact
+If this switch is set the user may alter the derived extinction values.
+If invoked from a graphics terminal and interact is set to yes, the
+following single keystroke commands may be typed:
+.ls 4 a
+to accept the current solution
+.le
+.ls 4 m
+to modify the extinction value at the cursor wavelength position (cursor-x)
+to the cursor extinction value position (cursor-y).
+.le
+.ls 4 i
+to insert a new wavelength-extinction value pair at the current
+crosshair position.
+.le
+.ls 4 d
+to delete the wavelength-extinction value pair at the current
+cursor wavelength position.
+.le
+.le
+
+.ih
+NAME
+crsens_func -- Create system sensitivity function.
+.ih
+USAGE
+crsens_func [std_file, option]
+.ih
+DESCRIPTION
+The standard star data and extinction function contained in the
+IRAF file specified by the std_file parameter are used to
+compute the system sensitivity as a function of wavelength.
+The derived function is written to the file specified by
+std_file.
+
+There must be at least one standard star observation contained
+in the std_file, unless the parameter option = input.
+This allows the user to enter any function in the
+form of wavelength-sensitivity pairs.
+
+If option = shift, a "grey" shift is applied to all observations
+necessary to bring relatively faint values up to the brightest
+to account for possible cloud variations.
+
+If invoked as an interactive task from a graphics terminal,
+and the interact switch is set to yes, the sensitivity values
+from each standard are plotted with any "grey" shift correction
+added. The user may delete or add new points as desired using
+the cursor. If invoked from a non-graphics terminal, a tabular
+list of the solution is presented and additions or deletions
+may be entered through the standard input.
+
+The final function written to the std_file is simply the name of a new
+spectrum derived from a spline fit to the sensitivity
+if the spline switch is set to yes. If spline = no, a linear
+interpolation between sensitivity points will be used.
+The sensitivity spectrum name will be taken from the file name
+given to std_file and with the suffix ".sen".
+.ih
+PARAMETERS
+.ls 4 std_file
+See the definition of this parameter under STD_STAR.
+.le
+.ls 4 option
+This parameter can assume the following string values:
+.ls 4 = input
+to indicate that the sensitivity function is to be entered as
+wavelength-sensitivity pairs. 
+.le
+.ls 4 = shift
+to force a "grey" shift between all standard star spectra to
+account for clouds. This is actually a multiplicative factor
+across each of the affected spectra.
+.le
+.le
+.ls 4 spline
+This switch parameter determines if a spline fit is to be made
+between the sensitivity points (spline = yes), or a linear
+fit (spline = no). (default = yes).
+.le
+.ls 4 interact
+If invoked as an interactive task, the user may alter the sensitivity
+function values. If at a graphics terminal, the sensitivity curve
+is displayed first for each star in the solution. The user may
+add or delete values for any or all stars at a given wavelength.
+Subsequently, the derived average curve is displayed and the user
+may further modify the solution. The following keystrokes are
+available from the graphics terminal:
+.ls 4 a
+to accept the current displayed data (solution).
+.le
+.ls 4 d
+to delete the value at the cross-hairs. If several values
+are very close together, an expanded display is presented.
+.le
+.ls 4 i
+to insert the sensitivity value of the y-cursor at the wavelength position.
+.le
+.ls 4 c
+to "create" new sensitivity values at the wavelength position of the
+x-cursor. Normally sensitivity values are computed only at pre-defined
+wavelengths specified in the calib_file. Additional values
+may be computed by interpolation of the standard star fluxes
+from the calib_file. The name of the calib_file and the spectra
+in the current solution are taken from the std_file.
+.le
+.le
+
+.ih
+NAME
+ext_cor -- Extinction correct specified spectra
+.ih
+USAGE
+ext_cor [filename, files, std_file, destination]
+.ih
+DESCRIPTION
+The spectra specified by the filename and files parameters
+are corrected for atmospheric extinction according to the
+extinction correction function pointed to by the function
+name in std_file. The resulting new spectra are created with the
+root of the destination parameter and having suffixes of
+1 through n corresponding to the n spectra corrected.
+If filename is a data group name, a new data group will be created having
+the name given by the destination parameter.
+
+The correction has the form:
+.sp 1
+f(lambda) = fobs(lambda) / 10**{-z[a(lambda) + C]}
+.sp 1
+where:
+.ls 4 f(lambda) = the flux at wavelength lambda above the Earth's atmosphere.
+.le
+.ls 4 fobs(lambda) = the flux observed through the atmosphere
+.le
+.ls 4 z = the path length through the atmosphere is units of air masses
+(= 1 at the zenith)
+.le
+.ls 4 a(lambda) = the extinction function at wavelength lambda
+in magnitudes per airmass.
+.le
+.ls 4 C = the additive constant, if any, in magnitudes per airmass.
+.le
+.sp 1
+For each spectrum, the zenith distance must be present in the image header.
+This is assumed to be correct for the beginning of the observation.
+For short exposures, this is adequate for the correction, but for
+long exposures, an effective air mass must be calculated over the
+integration. To do so requires knowledge of the altitude and azimuth
+of the telescope (or equivalantly RA, Dec, and sidereal time).
+If these are not present, the approximate air mass calculation will be used
+based solely on the available zenith distance. If the zenith distance
+is not present, user input is requested.
+
+The air mass is calculated according to the following equation for a given
+telescope position (based on Allen p.125,133):
+.sp 1
+z = sqrt{[q sin (alt)]**2 + 2q + 1} - q sin(alt)
+.sp 1
+where:
+.ls 4 q
+= atmospheric scale height (approx = 750).
+.le
+.ls 4 alt
+= telescope altitude
+.le
+.sp 1
+If the telescope traverses a significant distance in elevation during
+the integration, an effective correction can be computed as:
+.sp 1
+f(lambda)a = f(lambda)obs*T / integral{10**[-z(t)(a(lambda) + c)]}dt
+.sp 1
+where the integral is over the integration time, T.
+
+This expression can then be evaluated numerically at each wavelength.
+Because this is a time-consuming operation, the switch effective_cor
+can be set to no and then a simplified correction scheme will be used.
+This will be to compute a midpoint airmass if sufficient information
+is available, or simply to use the header airmass otherwise.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 std_file
+See the definition of this parameter under STD_STAR.
+.le
+.ls 4 destination
+See the definition of this parameter under COIN_COR.
+.le
+.ls 4 effective_cor
+If this switch is set to yes, the procedure to compute an effective
+corrective term averaged over the integration time will be used.
+Although a slow process, this method is more accurate than
+simply using the correction at any given time of the integration
+such as the midpoint. If set to no, a midpoint zenith distance
+will be computed and used if sufficient header information
+exists. (default = no).
+.le
+.ls 4 print_header
+See the definition of this parameter for COIN_COR.
+.le
+
+.ih
+NAME
+sens_cor -- Correct the specified spectra for system sensitivity
+variations across the spectrum.
+.ih
+USAGE
+sens_cor [filename, files, std_file, destination]
+.ih
+DESCRIPTION
+The spectra specified by the filename and files parameters are
+corrected for instrumental sensitivity by the 
+function pointed to by the spectrum name contained in std_file.
+The resulting spectra are stored according to the destination parameter.
+Filename may be a data group name. If so, then destination will be
+a new data group containing the names of the corrected spectra.
+
+This correction is a simple vector multiplcation.
+.ih
+PARAMETERS
+.ls 4 filename
+See the definition of this parameter under RFITS.
+.le
+.ls 4 files
+See the definition of this parameter under RFITS.
+.le
+.ls 4 std_file
+See the definition of this parameter under STD_STAR.
+.le
+.ls 4 destination
+See the definition of this parameter under COIN_COR.
+.le
+.ls 4 print_header
+See the definition of this parameter under COIN_COR.
+.le
+.endhelp

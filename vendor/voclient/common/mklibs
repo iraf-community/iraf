@@ -1,0 +1,99 @@
+#!/bin/csh -f
+
+#set top = `(chdir .. ; pwd)`
+set p = `pwd`
+set top = $p:h
+
+setenv CC 	"gcc"
+setenv CXX 	"g++"
+
+setenv PLATFORM `uname -s`
+setenv PLMACH   `uname -m`
+
+
+if ($PLATFORM == "Darwin") then
+   if ( $?IRAFARCH ) then
+       if ( "$IRAFARCH" == "macintel" ) then
+           setenv CFLAGS   '-m64 -mmacosx-version-min=10.4'
+           setenv LDFLAGS  '-m64 -mmacosx-version-min=10.4'
+           setenv LADD     '-m64 -mmacosx-version-min=10.4'
+       else
+           setenv CFLAGS   '-arch i386 -m32 -mmacosx-version-min=10.4'
+           setenv LDFLAGS  '-arch i386 -m32 -mmacosx-version-min=10.4'
+           setenv LADD     '-arch i386 -m32 -mmacosx-version-min=10.4'
+       endif
+   endif
+   set	build_curl	= 1
+else
+   setenv CFLAGS   "-O2"
+   set	build_curl	= 1
+endif
+
+
+set	build_cfitsio	= 0
+
+
+
+echo "Building support libraries ...."
+echo "  (Using toplevel directory '"$top/"' ....)"
+
+# Global options.
+set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
+
+#echo "    Cleaning files ...."
+#./mkclean
+
+if ($build_cfitsio == 1) then
+    echo "    Building CFITSIO libs ...."
+    (cd cfitsio ; ./mklibs)
+
+else
+  if ( (! (-e lib/libcfitsio.a)) && (-e ../../bin/libcfitsio.a)) then
+      ln -s ../../bin/libcfitsio.a lib/libcfitsio.a
+  endif
+endif
+
+
+
+
+if ($build_curl == 1) then
+
+  echo -n "    Building CURL libs ...."
+  set	opts = "$gopts \
+		--disable-ftp \
+		--disable-file \
+		--disable-ldap \
+		--disable-ldaps \
+		--disable-proxy \
+		--disable-dict \
+		--disable-telnet \
+		--disable-tftp \
+		--disable-manual \
+		--disable-ipv6 \
+		--disable-ares \
+		--disable-sspi \
+		--disable-crypto-auth \
+		--without-krb4 \
+		--without-ssl \
+		--without-zlib \
+		--without-libssh2 \
+		--without-gnutls \
+		--without-nss \
+		--without-ca-path \
+		--without-libidn"
+  (chdir curl ;  \
+    ./configure $opts  				 >& _spool ; \
+    make clean 					>>& _spool ; \
+    make 					>>& _spool ; \
+    make install				>>& _spool)
+  #cp -rp curl/lib/libcurl.*a ../lib/
+  cp -rp curl/include/* ../include/
+  #/bin/rm -rf lib include share bin
+  #(chdir curl ; make clean			>>& _spool)
+  echo "done"
+
+else
+  if ( (! (-e lib/libcurl.a)) && (-e ../../bin/libcurl.a)) then
+      ln -s ../../bin/libcurl.a lib/libcurl.a
+  endif
+endif

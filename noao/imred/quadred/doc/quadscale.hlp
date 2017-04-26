@@ -1,0 +1,37 @@
+.help quadscale Aug01 noao.imred.quadred
+.ih
+NAME
+quadscale -- Scale amplifier sections by separate gains
+.ih
+USAGE
+quadscale input output
+.ih
+PARAMETERS
+.ls input
+Input image in \fBquadformat\fR to be scaled.
+.le
+.ls output
+Output scaled image in \fBquadformat\fR.
+.le
+.ls gain11 = 1., gain12 = 1., gain21 = 1., gain22 = 1.
+Gain factors for each quadrant.
+.le
+.ls operation = "multiply" (multiply|divide)
+The operation to apply with the gains.
+.le
+.ih
+DESCRIPTION
+This task multiplies or divides by gain factors for each amplifier in
+\fBquadformat\fR.
+.ih
+EXAMPLES
+
+1. To multiply by different gain factors.
+
+.nf
+    qu> quadscale quad0072 test gain11=1.2 gain12=1.3 gain21=1.4
+.fi
+.ih
+SEE ALSO
+quadformat
+.endhelp

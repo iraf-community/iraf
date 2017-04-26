@@ -1,0 +1,152 @@
+.help thistogram Mar94 tables
+.nj
+.ih
+NAME
+thistogram -- Make a histogram of a table column.
+.ih
+USAGE
+thistogram intable outtable column
+.ih
+DESCRIPTION
+This task generates a histogram of the values in a column.
+The histogram may be written to STDOUT or to a table.
+If there is more than one table in the input list then a separate histogram
+is generated for each table.
+If there is more than one input table and the histogram of the values
+in all the tables combined is needed, then the tables should first be
+merged using the 'tmerge' task with the 'option' parameter set to "append".
+
+If x1 and x2 are the lower and upper limits of a particular bin,
+a value X will be included in the bin if x1 <= X < x2.
+Note that this also applies to the upper limit ('highval') of the last bin.
+
+There are six interrelated parameters
+having to do with the number of bins, bin width, and bin locations.
+Any number of these may be specified as long as the values are consistent.
+As a minimum, only one value is required, either 'nbins' or 'dx'.
+The task computes what it doesn't have
+based on the parameters that were specified,
+or based on the minimum and maximum data values
+in the table column if necessary.
+If the minimum (maximum) column data value is used,
+that value will normally be reduced (increased) a bit
+before being used as 'lowval' ('highval')
+to ensure that the value is included in the range.
+The relationships between the parameters is as follows:
+
+.nf
+    dx = (highval - lowval) / nbins
+    dx = (chigh - clow) / (nbins - 1)
+    clow = lowval + dx / 2
+    chigh = highval - dx / 2
+.fi
+.ih
+PARAMETERS
+.ls intable [file name template]
+A list of input tables.
+A histogram will be generated for one column in the table;
+the same column name is used for each table in the list.
+The name of the column is specified using the 'column' parameter,
+.le
+.ls outtable = STDOUT [file name template]
+Output tables or STDOUT.
+If the value of this parameter is "STDOUT"
+then the histogram will be written to the standard output
+preceded by a header line (beginning with "#")
+that gives the number of rows included in the histogram
+and the name of the table.
+If 'outtable' is passed a file name,
+then the number of names must match the number of file names in 'intable',
+and the histogram of each input table 
+will be written to an output table of the specified name.
+.le
+.ls column [string]
+Column name in input tables that will be used to generate the histogram.
+Only the values in the column with this name will be used.
+The same column name is used for each input table.
+.le
+.ls (nbins = 100) [integer, min=1]
+Number of bins in the histogram.
+Normally either 'nbins' or 'dx' (or both) must be given.
+You could also give both 'lowval' and 'clow',
+or both 'chigh' and 'highval',
+since the bin width can be computed from these.
+.le
+.ls (lowval = INDEF) [real]
+Lower limit for histogram.
+Values below 'lowval' will not be used in generating the histogram.
+If 'lowval = INDEF', then the minimum value in the table column will be used.
+.le
+.ls (highval = INDEF) [real]
+Upper limit for histogram.
+Values equal to or greater than 'highval' will not be used in generating
+the histogram.
+If 'highval = INDEF', then the maximum value in the table column will be used.
+.le
+.ls (dx = INDEF) [real]
+Bin width.
+.le
+.ls (clow = INDEF) [real]
+Value at the center of the first bin.
+.le
+.ls (chigh = INDEF) [real]
+Value at the center of the last bin.
+.le
+.ls (rows = -) [string]
+Range of rows to use for generating the histogram.
+The default "-" means that all rows are used.
+(Type "help xtools.ranges" for more information.)
+.le
+.ls (outcolx = value) [string]
+Column name for bin centers.
+If the output is written to a table rather than to STDOUT, then 'outcolx'
+is the column name containing the bin centers.
+This column will be double precision.
+.le
+.ls (outcoly = counts) [string]
+Column name for histogram values.
+If the output is written to a table then 'outcoly' is the column name
+containing the number of counts in the bin.
+This column will be of integer data type.
+.le
+.ih
+EXAMPLES
+1.  Generate a histogram of the values in the 'flux' column in every table
+whose name begins with "hr"; put all the histograms in the ASCII file
+'hist.lis'.
+
+.nf
+	tt> thistogram hr*.tab STDOUT flux > hist.lis
+.fi
+
+2.  Generate the same histograms as in the previous example, but put the
+results in tables rather than displaying them on the terminal screen. 
+One output file is produced for each input table; for example,
+the histogram for an input table 'hr465.tab' would be put in 'hr465h.tab'.
+
+.nf
+	tt> thistogram hr*.tab hr*%%h%.tab flux
+.fi
+
+3.  Plot the histogram of column 'V' in 'bs.tab':
+
+.nf
+	tt> thistogram bs STDOUT V | sgraph (crvstyle="pseudohist")
+.fi
+
+4.  Plot the same histogram as in the previous example,
+but set the spacing between bins to be 0.1.
+
+.nf
+	tt> thistogram bs STDOUT V nbins=INDEF dx=0.1 | \\
+	>>>   sgraph (crvstyle="pseudohist")
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+ranges
+.endhelp

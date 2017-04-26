@@ -1,0 +1,89 @@
+
+convolve.x
+    An amovki() call was mistakenly used as amovi() (6/3/13, MJF)
+
+convolve.x
+    The 'bpbuf' pointer was declared as TY_REAL instead of TY_INT (5/4/13)
+
+objs.h
+    Added P2R for 64-bit systems.
+
+skyfit.x
+    If a complete line is exceptionally deviant from the true sky it
+    will bias the sky surface.  As a quick fix for the possibly common
+    case that the first or last lines are high due to charge transfer
+    effects, the lines to use was changed to start and end a half step
+    from the ends.  This is only a quick fix and a more sophisticated
+    solutions is needed.  (10/17/02, Valdes)
+
+skyblock.x
+    There was another bug in interp2.  (10/17/02, Valdes)
+
+skyblock.x
+    There was a bug in interp2.  (9/30/02, Valdes)
+
+convolve.x
+    Fixed error when reference image does not overlap target image on
+    the right.  (9/23/02, Valdes)
+
+detect.x
+    The flux comparison in difference detection used sigma normalized
+    fluxes.  This was changed to unnormalized fluxes which is done
+    by using the same sigmas for the target and reference images.
+    (9/23/02, Valdes)
+
+t_acedetect.x
+pars.x
+diffdetect.pars
+    Made changes for diffdetect.  (9/23/02, Valdes)
+
+t_acedetect.x
+    Switched over to the xtools version of xt_pmmap.
+    (9/10/02, Valdes)
+
+t_acedetect.x
+skyblock.x
+omwrite.x
+    If DATASEC is present then it is automatically applied to the
+    image.  It is also deleted from the output sky and mask since
+    they will be the size of the data section.  (9/10/02, Valdes)
+
+skyfit.x
+    The sigma fit is now always a constant.  (8/6/02, Valdes)
+
+skyblock.x
+    Fixed a type mismatch in a min() function.  (6/13/02, Valdes)
+
+=====
+V2.12
+=====
+
+skyblock.x
+    Changed algorithm for updating sky to do in place updates so that
+    extensions might be used.  (12/21/01, Valdes)
+
+detect.x
+    The number of sky block lines was being wrong in using nc instead of nl.
+    (12/21/01, Valdes)
+
+t_acedetect.x
+    The check on the number of catalog definitions files did not allow
+    just one file when there was input list.  (12/20/01, Valdes)
+
+t_acedetect.x
+    The default catalog output is now STSDAS.  (5/7/01, Valdes)
+
+mim.x
+    When deleting the image name returned from imstats any image section
+    needed to be stripped.  (5/7/01, Valdes)
+
+mim.x
+convolve.x
+skyfit.x
+skyimages.x
+    Added error checking for calls to mim_glr.  (5/7/01, Valdes)
+
+catdefine.x
+    The reference to acesrc$ was replaced with ace$src/ in order to run
+    standalone without additional environment definitions.  (5/7/01, Valdes)
+

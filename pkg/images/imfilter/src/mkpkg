@@ -1,0 +1,43 @@
+# Library for the IMAGES IMFILTER Subpackage Tasks
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+        aboxcar.x
+        boxcar.x        <error.h> <imhdr.h> <imset.h>
+        convolve.x      <error.h> <imhdr.h> <imset.h>
+        fmd_buf.x       <imhdr.h>
+        fmd_hist.x
+        fmd_maxmin.x    <mach.h> <imhdr.h> <imset.h>
+        fmedian.x       fmedian.h <imhdr.h> <imset.h>
+        fmode.x         fmode.h <imhdr.h> <imset.h>
+        frmedian.x      frmedian.h <imhdr.h> <imset.h>
+        frmode.x        frmode.h <imhdr.h> <imset.h>
+        med_buf.x
+        median.x        median.h <imhdr.h> <imset.h>
+        med_sort.x
+        med_utils.x     <math.h>
+        mode.x          mode.h <imhdr.h> <imset.h>
+        radcnv.x
+        rmedian.x       rmedian.h <imhdr.h> <imset.h>
+        rmode.x         rmode.h <imhdr.h> <imset.h>
+	runmed.x	<fset.h> <imhdr.h> <imio.h>
+        t_boxcar.x      <error.h> <imhdr.h>
+        t_convolve.x    <error.h> <imhdr.h> <mach.h> <ctype.h>
+        t_fmedian.x     fmedian.h <error.h>
+        t_fmode.x       fmode.h <error.h>
+        t_frmedian.x    frmedian.h <imhdr.h> <error.h>
+        t_frmode.x      frmode.h <imhdr.h> <error.h>
+        t_gauss.x       <error.h> <imhdr.h> <imset.h> <math.h>
+        t_gradient.x    <error.h> <imhdr.h> <math.h>
+        t_laplace.x     <error.h> <imhdr.h> <math.h>
+        t_median.x      median.h <error.h> <mach.h>
+        t_mode.x        mode.h <error.h> <mach.h>
+        t_rmedian.x     rmedian.h <imhdr.h> <error.h> <mach.h>
+        t_rmode.x       rmode.h <mach.h> <imhdr.h> <error.h>
+	t_runmed.x
+        xyconvolve.x    <error.h> <imhdr.h> <imset.h>
+	;

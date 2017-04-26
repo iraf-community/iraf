@@ -1,0 +1,71 @@
+# mctable mkpkg file (Mon Jan 21 14:53:01 CST 1991)
+
+$checkout	libpkg.a ../
+$update		libpkg.a
+$checkin	libpkg.a ../
+$exit
+
+generic:
+	$set	GEN = "$$generic -k -t csilrdxp"
+
+	$ifnewer (mctclear.gx, mctclear.x)
+	    $generic -k -o mctclear.x mctclear.gx
+	$endif
+	$ifnewer (mctcopy.gx, mctcopy.x)
+	    $generic -k -o mctcopy.x mctcopy.gx
+	$endif
+	$ifnewer (mctget.gx, mctget.x)
+	    $generic -k -o mctget.x mctget.gx
+	$endif
+	$ifnewer (mctput.gx, mctput.x)
+	    $generic -k -o mctput.x mctput.gx
+	$endif
+	$ifnewer (mctrestore.gx, mctrestore.x)
+	    $generic -k -o mctrestore.x mctrestore.gx
+	$endif
+	$ifnewer (mctsget.gx, mctsget.x)
+	    $generic -k -o mctsget.x mctsget.gx
+	$endif
+	$ifnewer (mctsput.gx, mctsput.x)
+	    $generic -k -o mctsput.x mctsput.gx
+	$endif
+
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	mctalloc.x	"../lib/mctable.h"
+	mctclear.x	"../lib/mctable.h"
+	mctcopy.x	"../lib/mctable.h"
+	mctfree.x	"../lib/mctable.h"
+	mctget.x	"../lib/mctable.h"
+	mctgetbuf.x	"../lib/mctable.h"
+	mctgetrow.x	"../lib/mctable.h"
+	mctindef.x	"../lib/mctable.h"
+	mctmaxcol.x	"../lib/mctable.h"
+	mctmaxrow.x	"../lib/mctable.h"
+	mctncols.x	"../lib/mctable.h"
+	mctnrows.x	"../lib/mctable.h"
+	mctput.x	"../lib/mctable.h"
+	mctreset.x	"../lib/mctable.h"
+	mctrestore.x	"../lib/mctable.h"
+	mctrew.x	"../lib/mctable.h"
+	mctsave.x	"../lib/mctable.h"
+	mctsget.x	"../lib/mctable.h"
+	mctshrink.x	"../lib/mctable.h"
+	mctsput.x	"../lib/mctable.h"
+	mcttype.x	"../lib/mctable.h"
+	;
+
+zzdebug:
+	$ifeq (USE_GENERIC, yes)
+	    $ifnewer (zzdebug.gx, zzdebug.x)
+	        $generic -k -o zzdebug.x zzdebug.gx
+	    $endif
+	$endif
+
+	$omake  zzdebug.x
+	$link   zzdebug.o ../../libpkg.a -o zzdebug.e
+	$delete	zzdebug.o
+	;

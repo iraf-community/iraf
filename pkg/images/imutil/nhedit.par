@@ -1,0 +1,14 @@
+images,s,a,,,,Images to be operated upon
+fields,s,a,,,,fields to be edited
+value,s,a,.,,,value expression
+comment,s,a,'.',,,Keyword comment
+comfile,s,h,"",,,Command file
+after,s,h,"",,,keyword name to insert after
+before,s,h,"",,,keyword name to insert before
+update,b,h,yes,,,Update image header?
+add,b,h,no,,,add rather than edit fields
+addonly,b,h,no,,,add only if field does not exist
+delete,b,h,no,,,delete rather than edit fields
+rename,b,h,no,,,rename field names
+verify,b,h,yes,,,verify each edit operation
+show,b,h,yes,,,print record of each edit operation

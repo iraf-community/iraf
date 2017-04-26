@@ -1,0 +1,51 @@
+.help imgsiz Sep86 imfort
+.ih
+NAME
+imgsiz -- determine the size and datatype of an open image
+.ih
+SYNOPSIS
+.nf
+subroutine imgsiz (im, axlen, naxis, dtype, ier)
+
+integer		im		#I image descriptor of open image
+integer		axlen(7)	#O length of each axis
+integer		naxis		#O number of axes (dimensionality)
+integer		dtype		#O pixel datatype
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimgsiz\fR procedure is called to determine the dimensionality, size,
+and datatype of an open image, i.e., the physical attributes of the pixel
+array.  Upon output, \fIaxlen\fR will contain the length of each axis of
+the image, where \fIaxlen(1)\fR is the number of pixels in each image line
+(the number of columns), \fIaxlen(2)\fR is the number of lines in each band
+of the image, \fIaxlen(3)\fR is the number of bands, and so on.
+Seven array elements are returned regardless of the actual dimensionality of
+the image; the lengths of the excess axes are set to one.  The logical
+dimensionality of the image is returned in \fInaxis\fR.  A code identifying
+the datatype of the pixels is returned in \fIpixtype\fR; the range of possible
+pixel datatypes is enumerated in the table below.
+
+.nf
+	3	short integer (usually 16 bits signed)
+	4	integer (generally the same as long integer)
+	5	long integer (usually 32 bits signed)
+	6	single precision floating (real)
+	7	double precision floating
+	8	complex
+       11	unsigned short (16 bits unsigned)
+.fi
+
+Note that although the image storage format may support all of these datatypes,
+IMFORT is currently only capable of accessing images of type short or real.
+.ih
+RETURN VALUE
+A zero status is returned for any valid open image, i.e., provided the image
+descriptor given is valid.
+
+IE_MAGIC:	illegal imfort image descriptor
+.ih
+SEE ALSO
+imgkwi, imcrea
+.endhelp

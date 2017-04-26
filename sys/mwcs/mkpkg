@@ -1,0 +1,120 @@
+# Make the MWCS interface.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+generic:
+	$set G = "$$generic -k -p gen/ -t rd"
+	$ifolder (gen/mwc1tranr.x, mwc1tran.gx)	$(G) mwc1tran.gx	$endif
+	$ifolder (gen/mwc2tranr.x, mwc2tran.gx)	$(G) mwc2tran.gx	$endif
+	$ifolder (gen/mwctranr.x, mwctran.gx)	$(G) mwctran.gx		$endif
+	$ifolder (gen/mwgctranr.x, mwgctran.gx)	$(G) mwgctran.gx	$endif
+	$ifolder (gen/mwltranr.x, mwltran.gx)	$(G) mwltran.gx		$endif
+	$ifolder (gen/mwmmulr.x, mwmmul.gx)	$(G) mwmmul.gx		$endif
+	$ifolder (gen/mwv1tranr.x, mwv1tran.gx)	$(G) mwv1tran.gx	$endif
+	$ifolder (gen/mwv2tranr.x, mwv2tran.gx)	$(G) mwv2tran.gx	$endif
+	$ifolder (gen/mwvmulr.x, mwvmul.gx)	$(G) mwvmul.gx		$endif
+	$ifolder (gen/mwvtranr.x, mwvtran.gx)	$(G) mwvtran.gx		$endif
+	;
+
+zzdebug:
+zzdebug.e:
+	$checkout libex.a lib$
+	$update   libex.a
+	$checkin  libex.a lib$
+
+	$omake zzdebug.x <mwset.h> imwcs.h
+	$link -z zzdebug.o
+	;
+
+libex.a:
+	# $set xflags = "$(xflags) -qfx"
+	$ifeq (USE_GENERIC, yes)  $call generic  $endif
+	@gen
+
+	iwcfits.x	imwcs.h
+	iwctype.x	imwcs.h <ctype.h>
+	iwewcs.x	imwcs.h mwcs.h <ctype.h> <imhdr.h> <imio.h> <math.h>
+	iwfind.x	imwcs.h
+	iwgbfits.x	imwcs.h
+	iwparray.x	imwcs.h
+	iwpstr.x	imwcs.h
+	iwrfits.x	imwcs.h mwcs.h <imhdr.h> <imio.h> <ctype.h>
+	iwsaxmap.x	mwcs.h <imhdr.h> <imio.h>
+	mwallocd.x	mwcs.h
+	mwallocs.x	mwcs.h
+	mwclose.x	mwcs.h <error.h>
+	mwctfree.x	mwcs.com mwcs.h
+	mwfindsys.x	mwcs.h
+	mwflookup.x	mwcs.com mwcs.h
+	mwgaxlist.x	mwcs.h
+	mwgaxmap.x	mwcs.h
+	mwgltermd.x	mwcs.h
+	mwgltermr.x	mwcs.h
+	mwgsys.x	mwcs.h
+	mwgwattrs.x	mwcs.h
+	mwgwsampd.x	mwcs.h
+	mwgwsampr.x	mwcs.h
+	mwgwtermd.x	mwcs.h
+	mwgwtermr.x	mwcs.h
+	mwinvertd.x	
+	mwinvertr.x	
+	mwload.x	mwcs.h mwsv.h <error.h> <mach.h>
+	mwloadim.x	imwcs.h mwcs.h <error.h> <imhdr.h> <imio.h>
+	mwlu.x		<mach.h>
+	mwmkidmd.x	
+	mwmkidmr.x	
+	mwnewcopy.x	mwcs.h
+	mwnewsys.x	mwcs.h
+	mwopen.x	mwcs.h <error.h>
+	mwopenim.x	<imhdr.h> <imio.h>
+	mwrefstr.x	mwcs.h
+	mwrotate.x	mwcs.h
+	mwsave.x	mwcs.h mwsv.h <mach.h>
+	mwsaveim.x	imwcs.h mwcs.com mwcs.h <imhdr.h> <imio.h> <mach.h>
+	mwsaxmap.x	mwcs.h
+	mwscale.x	mwcs.h
+	mwsctran.x	mwcs.com mwcs.h <error.h> <mach.h>
+	mwsdefwcs.x	mwcs.h <mwset.h>
+	mwseti.x	mwcs.h <mwset.h>
+	mwshift.x	mwcs.h
+	mwshow.x	mwcs.h <imio.h>
+	mwsltermd.x	mwcs.h
+	mwsltermr.x	mwcs.h
+	mwssys.x	mwcs.h
+	mwstati.x	mwcs.h <mach.h> <mwset.h>
+	mwswattrs.x	mwcs.h
+	mwswsampd.x	mwcs.h
+	mwswsampr.x	mwcs.h
+	mwswtermd.x	mwcs.h
+	mwswtermr.x	mwcs.h
+	mwswtype.x	mwcs.h <ctype.h>
+	mwtransd.x	mwcs.h
+	mwtransr.x	
+	wfait.x		mwcs.h <math.h>
+	wfarc.x		mwcs.h <math.h>
+	wfcar.x		mwcs.h <math.h>
+	wfcsc.x		mwcs.h <math.h>
+	wfdecaxis.x	mwcs.h
+	wfgls.x		mwcs.h <math.h>
+	wfgsurfit.x
+	wfinit.x	mwcs.com mwcs.h
+	wfmer.x		mwcs.h <math.h>
+	wfmol.x		mwcs.h <math.h>
+	wfmspec.x	mwcs.h <imhdr.h>
+	wfpar.x		mwcs.h <math.h>
+	wfpco.x		mwcs.h <math.h>
+	wfqsc.x		mwcs.h <math.h>
+	wfsamp.x	mwcs.h
+	wfsin.x		mwcs.h <math.h>
+	wfstg.x		mwcs.h <math.h>
+	wftan.x		mwcs.h <math.h>
+	wftnx.x		mwcs.h <math.h>
+	wftpv.x		mwcs.h <math.h>
+	wftsc.x		mwcs.h <math.h>
+	wfzea.x		mwcs.h <math.h>
+	wfzpn.x		mwcs.h <math.h>
+	wfzpx.x		mwcs.h <math.h>
+	;

@@ -1,0 +1,3027 @@
+# XHELP.GUI -- Graphics user interface for the IRAF help browser.
+
+reset-server
+appInitialize xhelp XHelp {
+
+XHelp*objects:\
+	toplevel        Layout          helpLayout\
+	helpLayout	Group		menubarGroup\
+	helpLayout	Paned		helpPanes\
+	menubarGroup	Layout		menubarLayout\
+	menubarLayout	MenuButton	fileButton\
+	menubarLayout	MenuButton	optionsButton\
+	menubarLayout	Command		printButton\
+	menubarLayout	Command		findButton\
+	menubarLayout	Command		searchButton\
+	menubarLayout	MenuButton	historyButton\
+	menubarLayout	Command		helpButton\
+	menubarLayout	Command		quitButton\
+\
+	helpPanes	Group		topicGroup\
+	topicGroup	Layout		topicLayout\
+	topicLayout	Label		topicLabel\
+	topicLayout	Command		reloadButton\
+	topicLayout	Frame		topicFrame\
+	topicFrame	AsciiText	topicEntry\
+	topicLayout	Command		topicClear\
+	topicLayout	Frame		listFrame\
+	listFrame	Viewport	listView\
+	listView	List		topicList\
+\
+	helpPanes	Group		outputGroup\
+	outputGroup	Layout		outputLayout\
+	outputLayout	Command		htbButton\
+	outputLayout	Command		htfButton\
+	outputLayout	Command		htuButton\
+	outputLayout	Command		hthButton\
+	outputLayout	MenuButton	secButton\
+	outputLayout	MenuButton	parButton\
+        outputLayout    TextToggle      hlpOpt\
+        outputLayout    TextToggle      srcOpt\
+        outputLayout    TextToggle      sysOpt\
+        outputLayout    TextToggle      filOpt\
+	outputLayout	Frame		helpFrame\
+	helpFrame	HTML		helpText\
+\
+\
+        toplevel        TopLevelShell   printShell\
+        printShell      Layout          prntLayout\
+        prntLayout      Group           printGroup\
+        prntLayout      Group           printCmdGroup\
+\
+        printGroup      Layout          printLayout\
+        printLayout     Label           toLabel\
+        printLayout     TextToggle      toPrinter\
+        printLayout     TextToggle      toFile\
+        printLayout     Label           printLabel\
+        printLayout     Frame           printFrame\
+        printFrame      AsciiText       printEntry\
+        printLayout     Label           pageLabel\
+        printLayout     TextToggle      pageLetter\
+        printLayout     TextToggle      pageLegal\
+        printLayout     TextToggle      pageA4\
+        printLayout     TextToggle      pageB5\
+\
+        printCmdGroup   Layout          printCmdLayout\
+        printCmdLayout  Command         printOkay\
+        printCmdLayout  Command         printDismiss\
+\
+\
+        toplevel        TopLevelShell   searchShell\
+        searchShell     Group           searchGroup\
+        searchGroup     Layout          searchLayout\
+        searchLayout    Label           resLabel\
+	searchLayout	Frame		resFrame\
+	resFrame	HTML		resList\
+        searchLayout    Label           searchLabel\
+        searchLayout    Frame           searchFrame\
+        searchFrame     AsciiText       searchEntry\
+        searchLayout    Command         searchClear\
+        searchLayout    Command         searchOkay\
+        searchLayout    Label           searchStatus\
+        searchLayout    TextToggle      exactMatch\
+        searchLayout    Command         searchHelp\
+        searchLayout    Command         searchDismiss\
+\
+\
+        toplevel        TransientShell  findShell\
+        findShell       Layout          fsLayout\
+        fsLayout        Group           findGroup\
+        fsLayout        Group           findCmdGroup\
+\
+        findGroup       Layout          findLayout\
+        findLayout      Label           findLabel\
+        findLayout      Frame           findFrame\
+        findFrame       AsciiText       findEntry\
+        findLayout      TextToggle      findDir\
+        findLayout      TextToggle      findCase\
+\
+        findCmdGroup    Layout          findCmdLayout\
+        findCmdLayout   Command         findOkay\
+        findCmdLayout   Command         findClear\
+        findCmdLayout   Command         findDismiss\
+\
+\
+        toplevel        TopLevelShell   fileShell\
+        fileShell       Layout          flist\
+        flist           Group           flGroup\
+        flGroup         Layout          flFrame\
+        flFrame        	Label           flistLabel\
+        flFrame         Frame           flistFrame\
+        flistFrame      AsciiText       flistText\
+        flFrame        	Label           flpkgLabel\
+        flFrame        	Label           flpkgVal\
+        flFrame         Command         flDismiss\
+\
+\
+        toplevel        TopLevelShell   fileBrowser\
+        fileBrowser     Layout          fbLayout\
+        fbLayout        Group           fnavGroup\
+        fbLayout        Group           fbCmdGroup\
+        fbLayout        Parameter       directory\
+\
+        fnavGroup       Layout          fnavLayout\
+        fnavLayout     	Command         fnavHome\
+        fnavLayout     	Command         fnavUp\
+        fnavLayout     	Command         fnavRoot\
+        fnavLayout     	Command         fnavRescan\
+        fnavLayout     	Label           filterLabel\
+        fnavLayout     	Frame           filterFrame\
+        filterFrame     AsciiText       filterEntry\
+        fnavLayout      Command         filterClear\
+        fnavLayout     	Group      	dirGroup\
+        dirGroup        Frame           dirFrame\
+        dirFrame        Viewport        dirView\
+        dirView         List            dirList\
+        fnavLayout     	Group           fileGroup\
+        fileGroup       Frame           fgFrame\
+        fgFrame         Viewport        fileView\
+        fileView        List            fileList\
+        fnavLayout     	Label           curdirLabel\
+        fnavLayout     	Label           curdirVal\
+        fnavLayout     	Label           fnameLabel\
+        fnavLayout     	Frame           fnameFrame\
+        fnameFrame      AsciiText       fnameEntry\
+        fnavLayout     	Command         fnameClear\
+\
+	fnavLayout      Group           fmtGroup\
+	fmtGroup        Layout          fmtLayout\
+	fmtLayout       Label           fmtLabel\
+	fmtLayout       TextToggle      fmtSrc\
+	fmtLayout       TextToggle      fmtText\
+	fmtLayout       TextToggle      fmtHTML\
+	fmtLayout       TextToggle      fmtPS\
+	fmtLayout       Label           owLabel\
+	fmtLayout       TextToggle      overwrite\
+\
+        fbCmdGroup   	Layout          fbCmdLayout\
+        fbCmdLayout  	Command         fbcOkay\
+        fbCmdLayout  	Command         fbcHelp\
+        fbCmdLayout  	Command         fbcDismiss\
+\
+\
+        toplevel        TopLevelShell   doc_source\
+        doc_source      Layout          srcLayout\
+        srcLayout       Frame           srcMenuFrame\
+        srcMenuFrame    Layout          srcMenuBar\
+        srcMenuBar      Command         srcDismiss\
+        srcLayout       Frame           srcFrame\
+        srcFrame        AsciiText       srcText\
+\
+\
+        toplevel        TopLevelShell   hlpShell\
+        hlpShell        Layout          hlpLayout\
+        hlpLayout       Group           hlpMenuGroup\
+        hlpMenuGroup    Layout          hlpMenu\
+        hlpMenu   	Command         hlpBack\
+        hlpMenu   	Command         hlpForward\
+        hlpMenu   	Command         hlpHome\
+        hlpMenu   	Command         hlpTutorial\
+        hlpMenu   	Command         hlpDismiss\
+        hlpLayout       Frame           hlpTextFrame\
+        hlpTextFrame    HTML            hlpText\
+        hlpLayout       Label           hfLabel\
+        hlpLayout       Frame           hfFrame\
+        hfFrame         AsciiText       hfEntry\
+        hlpLayout       Command         hfFind\
+        hlpLayout       Command         hfClear\
+        hlpLayout       TextToggle      hfDir\
+        hlpLayout       TextToggle      hfCase\
+        hlpShell        Parameter       help\
+\
+\
+        toplevel        TransientShell  warning\
+        warning         Layout          warn\
+        warn            Frame           warnFrame\
+        warnFrame       Layout          WFlayout\
+        WFlayout        Icon            warnIcon\
+        WFlayout        TextBox         warnText\
+        warn            Frame           warnBtnFrame\
+        warnBtnFrame    Command         warnDismiss\
+\
+\
+        toplevel        TopLevelShell   tclShell\
+        tclShell        Layout          tclLayout\
+        tclLayout       Group           tclCmdGroup\
+        tclCmdGroup     Layout          tclCmd\
+        tclCmd          Command         tclClear\
+        tclCmd          Command         tclExecute\
+        tclCmd          Toggle          tclLogging\
+        tclCmd          Command         tclDismiss\
+        tclLayout       Frame           tclFrame\
+        tclFrame        AsciiText       tclEntry\
+\
+\
+        toplevel        Parameter       xhelp\
+        xhelp           Parameter       textout\
+        xhelp           Parameter       alert\
+        xhelp           Parameter       apropos\
+        xhelp           Parameter       pkglist\
+        xhelp           Parameter       helpres\
+        xhelp           Parameter       helpfiles\
+        xhelp           Parameter       printer\
+        xhelp           Parameter       curpack\
+        xhelp           Parameter       curtask\
+        xhelp           Parameter       history\
+        xhelp           Parameter       showtype\
+        xhelp           Parameter       type
+
+
+
+    !-------------------------------------------------------
+    ! Define some global resources for the main	menu panels.
+    !-------------------------------------------------------
+    *shadowWidth:			1
+    *background:			gray75
+    *Arrow.width:			16
+    *Arrow.height:			25
+    *Text*height:			21
+    *Command.height:			21
+    *Command.highlightThickness:	1
+    *Command.internalHeight:     	4
+    *MenuButton.height:			21
+    *MenuButton.highlightThickness:	1
+    *Label.borderWidth:			0
+    *Label.shadowWidth:			0
+    *TextButton.shadowWidth:		0
+    *TextButton.highlightThickness:	1
+    *TextToggle*borderWidth:		0
+    *TextToggle.highlightThickness:	0
+    *Toggle.highlightThickness:		1
+    *Group.shrinkToFit:			True
+
+    *Arrow.foreground:			gray72
+    *Arrow.background:			gray72
+    *Text*background:			gray72
+    *AsciiText*background:		gray72
+    *TextBox.background:		gray72
+    *MultiList*background:		gray72
+    *List*background:			gray72
+    *Slider2d*thumbColor:		gray75
+
+
+    !-------------------------------------------------------------
+    ! Define resources to take advantage of the	3D scrollbar look.
+    !-------------------------------------------------------------
+    *Scrollbar*background:		gray75
+    *Scrollbar*width:			15
+    *Scrollbar*height:			15
+    *Scrollbar*shadowWidth:		1
+    *Scrollbar*cursorName:		top_left_arrow
+    *Scrollbar*pushThumb:		true
+
+
+    !----------------------------------------
+    ! Menu resources giving a shadow effect.
+    !----------------------------------------
+    *SmeBSB.leftMargin:			10
+    *SmeBSB.rightMargin:		5
+    *SmeBSB.shadowWidth:		2
+    *SmeBSB*background:			SteelBlue
+    *SimpleMenu*background:		gray77
+    *SimpleMenu.borderWidth:		2
+    *SimpleMenu.borderColor:		Black
+    *SimpleMenu.shadowWidth:		2
+    *SimpleMenu.line1.foreground:	gray51
+    *SimpleMenu.line2.foreground:	gray91
+    *SimpleMenu.line3.foreground:	gray51
+    *SimpleMenu.line4.foreground:	gray91
+    *SimpleMenu.line5.foreground:	gray51
+    *SimpleMenu.line6.foreground:	gray91
+    *SimpleMenu.line7.foreground:	gray51
+    *SimpleMenu.line8.foreground:	gray91
+    *SimpleMenu.line9.foreground:	gray51
+    *SimpleMenu.line10.foreground:	gray91
+    *SimpleMenu.line11.foreground:	gray51
+    *SimpleMenu.line12.foreground:	gray91
+    *SimpleMenu.line13.foreground:	gray51
+    *SimpleMenu.line14.foreground:	gray91
+    *SimpleMenu.line15.foreground:	gray51
+    *SimpleMenu.line16.foreground:	gray91
+    *SimpleMenu.line17.foreground:	gray51
+    *SimpleMenu.line18.foreground:	gray91
+    *SimpleMenu.line19.foreground:	gray51
+    *SimpleMenu.line20.foreground:	gray91
+    *SimpleMenu.line21.foreground:	gray51
+    *SimpleMenu.line22.foreground:	gray91
+    *SimpleMenu.line23.foreground:	gray51
+    *SimpleMenu.line24.foreground:	gray91
+    *SimpleMenu.line25.foreground:	gray51
+    *SimpleMenu.line26.foreground:	gray91
+    *SimpleMenu.line27.foreground:	gray51
+    *SimpleMenu.line28.foreground:	gray91
+    *SimpleMenu.line29.foreground:	gray51
+    *SimpleMenu.line30.foreground:	gray91
+
+
+    !----------------------------------------
+    ! Define the default fonts to be used.
+    !----------------------------------------
+    *font: 				-adobe-times-medium-r-normal-*-14-*-*-*
+    *Command.font:                      -adobe-times-bold-i-normal-*-12-*-*-*
+    *MenuButton.font:                   -adobe-times-bold-i-normal-*-12-*-*-*
+    *Toggle.font:                       -adobe-times-bold-i-normal-*-12-*-*-*
+    *Label.font:                        -adobe-times-bold-i-normal-*-12-*-*-*
+    *TextToggle.font:                   -adobe-times-bold-i-normal-*-12-*-*-*
+    *Group*SimpleMenu*font:            	7x13
+    *HTML*SimpleMenu*font:             	7x13
+
+    *HTML.plainFont:                    -*-fixed-medium-r-*-*-13-*-*-*
+    *HTML.listingFont:                  -*-fixed-medium-r-*-*-13-*-*-*
+    *HTML.font: 			-adobe-times-medium-r-normal-*-14-*-*-*
+    *HTML.boldFont:                     -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.plainboldFont:                -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.fixedboldFont:                -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.header1Font:                  -adobe-times-bold-r-normal-*-18-*-*-*
+    *HTML.header2Font:                  -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.header3Font:                  -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.header4Font:                  -adobe-times-bold-r-normal-*-14-*-*-*
+    *HTML.header5Font: 			-adobe-times-medium-i-normal-*-12-*-*-*
+    *HTML.header6Font:                  -adobe-times-bold-r-normal-*-10-*-*-*
+    *HTML.anchorUnderlines:             0
+    *HTML.visitedAnchorUnderlines:      0
+    *HTML.anchorColor:                  blue
+    *HTML.visitedAnchorColor:           red3
+    *HTML*background:			gray72
+    *HTML*Scrollbar.background:		gray75
+    *HTML*Scrollbar*width:		15
+    *HTML*Scrollbar*height:		15
+
+
+    !---------------------------
+    ! Set the default resources.
+    !---------------------------
+    *xhelp.title:                               IRAF Help Browser V1.0 - DEV
+    *xhelp.geometry:                            +0+0
+    *xhelp.width:                               625
+    *xhelp.minWidth:                            580
+    *xhelp.minheight:                           450
+    *xhelp.height:                              850
+
+    *helpLayout.geometry:			600x700+0+0
+    *helpLayout*borderWidth:			0
+    *helpLayout*Group.shrinkToFit:		True
+    *helpLayout*Frame.frameType:		sunken
+    *helpLayout*Frame.frameWidth:		1
+    *helpLayout*Command.internalHeight:		2
+    *helpLayout*MenuButton.internalHeight:	2
+    *helpLayout*Label*highlightThickness:	0
+    *helpLayout*List*shadeSurplus:		False
+    *helpLayout*List.internalWidth:             10
+    *helpLayout*Viewport.allowVert:             True
+    *helpLayout*Viewport.forceBars:             True
+    *helpLayout.width:				600
+    *helpLayout.layout: vertical { \
+    	menubarGroup < +inf -inf * > \
+	-1 \
+	horizontal { \
+	    -1 \
+	    helpPanes < +inf -inf * +inf -inf > \
+	    -1 \
+	} \
+	-1 \
+    }
+    *helpLayout*SimpleMenu.shadowWidth:		2
+    *helpLayout*SimpleMenu.borderColor:		Black
+    *helpLayout*SimpleMenu.borderWidth:		2
+
+    *menubarGroup.label:
+    *menubarGroup.outerOffset:			0
+    *menubarGroup.innerOffset:			5
+    *menubarGroup.frameType:			raised
+    *menubarGroup.frameWidth:			2
+    *menubarGroup*Command.shadowWidth:		0
+    *menubarGroup*MenuButton.shadowWidth:	0
+    *menubarLayout.layout: horizontal { \
+	fileButton     5 \
+	optionsButton  5 \
+	printButton    5 \
+    	findButton     5 \
+    	searchButton   5 \
+	historyButton  5 \
+    	10 < +inf -inf > \
+    	helpButton     5 \
+    	quitButton       \
+    }
+    *fileButton.label:				File
+    *fileButton.menuName:			fileMenu
+    *optionsButton.label:			Options
+    *optionsButton.menuName:			optsMenu
+    *printButton.label:				Print
+    *findButton.label:				Find
+    *searchButton.label:			Search
+    *historyButton.label:			History
+    *historyButton.menuName:			historyMenu
+    *helpButton.label:				Help
+    *quitButton.label:				Quit
+
+    *topicGroup.label:
+    *topicGroup.outerOffset:			2
+    *topicGroup.innerOffset:			2
+    *topicGroup*frameType:			chiseled
+    *topicGroup.frameWidth:			2
+    *topicGroup*Label.shadowWidth:		0
+    *topicGroup*Label.borderWidth:		1
+    *topicGroup*Label.highlightThickness:	1
+    *topicGroup*Viewport.useRight:		True
+    *topicGroup*Viewport.useBottom:		True
+    *topicLayout.layout: vertical { \
+    	2 < +2 -2 > \
+        horizontal { \
+    	    3 < +3 -3 > \
+    	    topicLabel 2 topicFrame < +inf * > \
+	    2 \
+	    topicClear 5 reloadButton \
+    	    1 \
+        } \
+    	4 \
+        horizontal { \
+	    vertical { \
+    	        -1 \
+    	        listFrame < +inf -inf * +inf -inf > \
+    	        -1 \
+	    } \
+        } \
+    	2 < +2 -2 > \
+    }
+    *reloadButton.label:			Reload
+    *topicLabel.label:				Topic:
+    *topicLabel.justify:			right
+    *topicEntry*width:                         	100
+    *topicEntry*editType:                      	edit
+    *topicEntry*font:                      	7x13
+    *topicEntry*displayCaret:                 	True
+    *topicClear.label:				Clear
+
+    *topicList.font:				7x13
+    *topicList.width:				500
+    *topicList.height:				100
+    *topicList.columnSpacing:			20
+    *topicList.verticalList:			True
+    !*topicList.defaultColumns:			6
+    !*topicList.forceColumns:			True
+
+    *outputGroup.label:
+    *outputGroup.outerOffset:			2
+    *outputGroup.innerOffset:			2
+    *outputGroup*frameType:			chiseled
+    *outputGroup.frameWidth:			2
+    *outputGrout*TextToggle*on:            	0
+    *outputGroup*TextToggle.frameWidth:         2
+    *outputGroup*TextToggle.frameType:          chiseled
+    *outputGroup*TextToggle.location:           0 0 65 25
+    *outputGroup*TextToggle.leftMargin:      	4
+    *outputLayout.layout: vertical { \
+	2 \
+	horizontal { \
+	    5 \
+	    htbButton 2 htfButton 2 htuButton 2 hthButton 2 \
+            10 < +inf -10 > \
+	    secButton 2 parButton     \
+            10 < +inf -10 > \
+	    hlpOpt -2 srcOpt -2 sysOpt 4 filOpt \
+	    5 \
+	} \
+	2 \
+	horizontal { \
+	    2 \
+	    helpFrame < +inf -inf * +inf -inf > \
+	    2 \
+	} \
+    }
+    *htbButton.label:		 		Back
+    *htbButton.sensitive:		 	False
+    *htfButton.label:		 		Forward
+    *htfButton.sensitive:		 	False
+    *htuButton.label:		 		Up
+    *htuButton.sensitive:		 	False
+    *hthButton.label:		 		Home
+    *printButton.label:				Print
+    *secButton.label:				Sections
+    *secButton.menuName:			secMenu
+    *parButton.label:				Parameters
+    *parButton.menuName:			parMenu
+    *hlpOpt*label:            			Help
+    *hlpOpt*on:            			1
+    *hlpOpt*onIcon:            			diamond1s
+    *hlpOpt*offIcon:            		diamond0s
+    *hlpOpt*highlightColor:            		green
+    *srcOpt*label:            			Source
+    *srcOpt*on:            			0
+    *srcOpt*onIcon:            			diamond1s
+    *srcOpt*offIcon:            		diamond0s
+    *srcOpt*highlightColor:            		green
+    *sysOpt*label:            			Sysdoc
+    *sysOpt*on:            			0
+    *sysOpt*onIcon:            			diamond1s
+    *sysOpt*offIcon:            		diamond0s
+    *sysOpt*highlightColor:            		green
+    *filOpt*label:            			Files
+    *filOpt*on:            			0
+    *filOpt*onIcon:            			square1s
+    *filOpt*offIcon:            		square0s
+    *filOpt*highlightColor:            		yellow
+
+    *helpText.width:				650
+    *helpText.height:				620
+    *helpText.anchorUnderlines:                 1
+    *helpText.visitedAnchorUnderlines:          1
+    *helpText.verticalScrollOnRight:            true
+    *helpText.translations:  			\
+            <Btn2Down>:  popup(secMenu)         \n\
+              <Btn2Up>:  popdown(secMenu)       \n\
+            <Btn3Down>:  popup(navMenu)         \n\
+              <Btn3Up>:  popdown(navMenu)       \n
+
+    *helpText*navMenu.foreground:          	Black
+    *helpText*navMenu.background:          	gray75
+    *helpText*secMenu.foreground:          	Black
+    *helpText*secMenu.background:          	gray75
+
+
+    !--------------------------+
+    ! Printer Shell resources. |
+    !--------------------------+
+    *printShell.title:                          Printer Selection
+    *printShell.width:                          300
+    *printShell.height:                         177
+    *printShell.minHeight:                      177
+    *printShell.maxHeight:                      177
+    *printShell*borderWidth:                    0
+    *printShell*Group.frameType:                chiseled
+    *printShell*Group.frameWidth:               2
+    *printShell*Group.innerOffset:              5
+    *printShell*Group.outerOffset:              2
+    *printShell*Command.internalheight:		4
+    *printShell*Text*editType:                  edit
+    *printShell*Text*height:                    25
+    *printShell*TextToggle.frameWidth:          0
+    *printShell*Group.label:
+    *prntLayout.layout: vertical { \
+        printGroup < +inf -inf * > \
+        printCmdGroup < +inf -inf * > \
+    }
+
+    *printLayout*location:            		0 0 70 25
+    *printLayout*offIcon:             		diamond0s
+    *printLayout*onIcon:              		diamond1s
+    *printLayout*highlightColor:      		yellow
+    *printLayout*Label.height:			35
+    *printLayout*Label.justify:			right
+    *printLayout*TextToggle.frameWidth:         0
+    *printLayout*TextToggle.leftMargin:         8
+    *printLayout*TextToggle*highlightColor:     yellow
+    *printLayout*TextToggle*onIcon:             square1s
+    *printLayout*TextToggle*offIcon:            square0s
+    *printLayout*TextToggle*alignment:		left
+    *printLayout.layout: vertical { \
+	0 < +0 >\
+	horizontal { toLabel 10 toPrinter 10 toFile 10 } \
+	5 < +inf -5 > \
+	horizontal { \
+            printLabel 5 printFrame < +inf -inf * > -1 \
+	} \
+	5 < +inf -5 > \
+	horizontal { \
+	    vertical { pageLabel 10 } \
+            12 \
+	    horizontal { \
+	        vertical { pageLetter -3  pageLegal } \
+		10 \
+	        vertical { pageA4     -3  pageB5 } \
+	    } \
+	} \
+	0 < +0 >\
+    }
+    *toLabel.label:                          	Print to:
+    *toPrinter.label:                           Printer
+    *toPrinter.on:                              True
+    *toFile.label:                              File
+    *printLabel.label:                          Printer:
+    *printFrame.frameType:                      sunken
+    *printFrame.frameWidth:			1
+    *printEntry*string:                     	printer
+    *pageLabel.label:				Page Size:
+    *pageLetter.label:				Letter
+    *pageLetter.on:				1
+    *pageLegal.label:				Legal
+    *pageA4.label:				A4
+    *pageB5.label:				B5
+
+    *printCmdLayout.layout: horizontal { \
+	3 \
+        printOkay 20 < +inf -20 > printDismiss \
+	3 \
+    }
+    *printOkay.label:                           Print
+    *printDismiss.label:                        Dismiss
+
+
+    !-------------------------+
+    ! File Browser resources. |
+    !-------------------------+
+    *fileBrowser.width:               		450
+    *fileBrowser.height:               		375
+    *fileBrowser.title:               		Open a New File...
+    *fileBrowser*borderWidth:               	0
+    *fileBrowser*Group.frameType:           	chiseled
+    *fileBrowser*Group.frameWidth:          	2
+    *fileBrowser*Group.innerOffset: 		3
+    *fileBrowser*Group.outerOffset:		3
+    *fileBrowser*Group.label:				
+
+    *fbLayout.layout: vertical { \
+	2 \
+        fnavGroup < +inf -inf * +inf -inf > \
+	-2 \
+	horizontal { \
+	    -5 \
+            fbCmdGroup < +inf -inf * > \
+	    -5 } \
+	-3 \
+    }
+
+    *fnavGroup*Frame.frameType:           	sunken
+    *fnavGroup*Frame.frameWidth:          	1
+    *fnavGroup*Text*editType:			edit
+    *fnavGroup*Text*height:			25
+    *fnavGroup*Text*font:			7x13
+    *fnavGroup*List.verticalList:              	True
+    *fnavGroup*List.defaultColumns:            	1
+    *fnavGroup*List.forceColumns:              	True
+    *fnavGroup*List.font:              		7x13
+    *fnavGroup*Label.justify:			left
+    *fnavGroup*Viewport.allowVert:             	True
+    *fnavGroup*Viewport.allowHoriz:            	False
+    *fnavGroup*Viewport.forceBars:             	True
+    *fnavGroup*Viewport.useRight:              	True
+    *fnavGroup*Group.outerOffset:		7
+    *fnavGroup*Group.innerOffset:		3
+    *fnavLayout.layout: vertical { \
+	5 \
+	vertical { \
+	    -1 \
+	    horizontal { \
+		5 \
+	        fnavHome   < +inf -inf * > 2 \
+	        fnavUp     < +inf -inf * > 2 \
+	        fnavRoot   < +inf -inf * > 2 \
+	        fnavRescan < +inf -inf * >   \
+		10 \
+	        filterLabel 2 filterFrame < +inf -inf * > \
+		2 \
+		filterClear \
+		5 \
+	    } \
+	    3 \
+	} \
+	5 \
+	horizontal { \
+	    -5 \
+	    dirGroup < +inf -inf * +inf - inf  > \
+	    -8 \
+	    fileGroup < +inf -inf * +inf - inf  > \
+	    -5 \
+	} \
+	-3 \
+	horizontal { \
+	    curdirLabel 5 curdirVal < +inf -inf * > 5 } \
+	5 \
+	horizontal { \
+	    fnameLabel 2 fnameFrame < +inf -inf * > 2 fnameClear 5\
+	} \
+	7 \
+	fmtGroup < +inf -inf * > \
+	-3 \
+    }
+    *fileBrowser*fnavGroup*dirGroup.label:	Directories
+    *fileBrowser*fnavGroup*fileGroup.label:	Files
+    *fileBrowser*fnavGroup*dirGroup.innerOffset:	3
+    *fileBrowser*fnavGroup*fileGroup.innerOffset:	3
+    *fileBrowser*fnavGroup*dirGroup.outerOffset:	7
+    *fileBrowser*fnavGroup*fileGroup.outerOffset:	7
+    *fileBrowser*fnavGroup*dirGroup.font:		7x13bold
+    *fileBrowser*fnavGroup*fileGroup.font:		7x13bold
+
+    *filterLabel.label:				Filter
+    *filterClear.label:				Clear
+    *curdirLabel.label:				Directory:
+    *curdirVal.label:				
+    *curdirVal.font:				7x13
+    *fnameLabel.label:				Selection\ \ 
+    *fnameClear.label:				Clear
+    *fnavHome.label:				Home
+    *fnavUp.label:				Up
+    *fnavRoot.label:				Root
+    *fnavRescan.label:				Rescan
+
+    *fmtGroup*Group.outerOffset:                3
+    *fmtGroup*Group.innerOffset:                3
+    *fmtLayout*TextToggle.frameWidth:           0
+    *fmtLayout*TextToggle.leftMargin:           4
+    *fmtLayout*TextToggle.alignment:		left
+    *fmtLayout*TextToggle*highlightColor:       yellow
+    *fmtLayout*TextToggle*onIcon:               square1s
+    *fmtLayout*TextToggle*offIcon:              square0s
+    *fmtLayout.layout: vertical { \
+	horizontal { 5 fmtLabel 10 fmtSrc 3 fmtText 3 fmtHTML 3 fmtPS 5 } \
+	horizontal { 50 owLabel 10 overwrite 5 < +inf > } \
+    }
+    *fmtLabel.label:                            Save As Format:
+    *fmtSrc.label:                              Source
+    *fmtSrc.on:                                 1
+    *fmtSrc.location:                           0 0 65 22
+    *fmtText.label:                             Text
+    *fmtText.location:                          0 0 65 22
+    *fmtHTML.label:                             HTML
+    *fmtHTML.location:                          0 0 65 22
+    *fmtPS.label:                               PostScript
+    *fmtPS.location:                            0 0 100 22
+    *owLabel.label:                             Options:
+    *overwrite.label:                       Allow overwrite of existing files?
+    *overwrite.location:                        0 0 200 22
+
+    *fbCmdLayout.outerOffset:			0
+    *fbCmdLayout.layout: horizontal { \
+	5 \
+	vertical { 2 fbcOkay 2 } \
+        20 < +inf -20 > \
+	vertical { 2 fbcHelp 2 } \
+	2 \
+	vertical { 2 fbcDismiss 2 } \
+	5 \
+    }
+    *fbcOkay.label:		 		Okay
+    *fbcHelp.label:		 		Help
+    *fbcDismiss.label:		 		Dismiss
+
+
+    !-----------------------+
+    ! Find Shell resources. |
+    !-----------------------+
+    *findShell.title:                           Find within a document...
+    *findShell.width:                           365
+    *findShell.height:                          130
+    *findShell*borderWidth:                     0
+    *findShell*Group.frameType:                 chiseled
+    *findShell*Group.frameWidth:                2
+    *findShell*Group.innerOffset:               5
+    *findShell*Group.outerOffset:               2
+    *findShell*Command.internalheight:		4
+    *findShell*Text*editType:                   edit
+    *findShell*Text*height:                     25
+    *findShell*TextToggle.frameWidth:           0
+    *findShell*Group.label:
+    *fsLayout.layout: vertical { \
+        findGroup    < +inf -inf * > \
+        findCmdGroup < +inf -inf * > \
+    }
+
+    *findLayout*location:            		0 0 120 25
+    *findLayout*offIcon:             		diamond0s
+    *findLayout*onIcon:              		diamond1s
+    *findLayout*highlightColor:      		yellow
+    *findLayout*Label.height:			35
+    *findLayout*Label.justify:			right
+    *findLayout*TextToggle.frameWidth:          0
+    *findLayout*TextToggle.leftMargin:          4
+    *findLayout*TextToggle*highlightColor:      yellow
+    *findLayout*TextToggle*onIcon:              square1s
+    *findLayout*TextToggle*offIcon:             square0s
+    *findLayout.layout: vertical { \
+	5 \
+	horizontal { \
+            findLabel 7 findFrame < +inf -inf * > -1 \
+	} \
+	5 \
+	horizontal { \
+            20 < +inf -20 > \
+            findDir 10 findCase \
+            20 < +inf -20 > \
+	} \
+    }
+    *findLabel.label:                           Find:
+    *findFrame.frameType:                       sunken
+    *findFrame.frameWidth:			1
+    *findEntry*string:                     	
+    *findDir.label:				Find Backwards
+    *findCase.label:				Case Sensitive
+
+    *findCmdLayout.layout: horizontal { \
+	3 \
+        findOkay \
+        20 < +inf -20 > \
+        findClear \
+        20 < +inf -20 > \
+        findDismiss \
+	3 \
+    }
+    *findOkay.label:                            Find
+    *findClear.label:                           Clear
+    *findDismiss.label:                         Dismiss
+
+
+    !-------------------------------------------+
+    ! Set the document source viewer resources. |
+    !-------------------------------------------+
+    *doc_source.title:                        	Page source
+    *doc_source.width:                          575
+    *doc_source.height:                         450
+    *srcLayout*borderWidth:                     0
+    *srcLayout.layout:  vertical { \
+        srcMenuFrame < +inf -inf * > \
+	-2 \
+        srcFrame < +inf -inf * +inf -inf > \
+	-2 \
+    }
+
+    *srcMenuBar.layout: 	horizontal { 50 < +inf -inf > srcDismiss 5 }
+    *srcMenuFrame.height:                       40
+    *srcMenuFrame.outerOffset:                  0
+    *srcMenuFrame.innerOffset:                  5
+    *srcMenuFrame.frameType:                    chiseled
+    *srcMenuFrame.frameWidth:                   2
+    *srcFrame.frameType:                     	sunken
+    *srcFrame.frameWidth:                    	1
+    *srcFrame.outerOffset:                    	5
+    *srcText*scrollVertical:                 	always
+    *srcText*scrollHorizontal:               	always
+    *srcText*Scrollbar.width:			15
+    *srcText*Scrollbar.height:			15
+    *srcText*background:			gray75
+    *srcText*font:				7x13
+    *srcText*editType:                       	read
+    *srcText*displayCaret:			False
+    *srcDismiss.label:                         	Dismiss
+    *srcDismiss.width:                         	150
+
+
+    !-------------------------+
+    ! Search Shell resources. |
+    !-------------------------+
+    *searchShell.title:                         Search for a topic...
+    *searchShell.width:                         600
+    *searchShell.height:                        250
+    *searchShell*borderWidth:                   0
+    *searchShell*Viewport.allowVert:            True
+    *searchShell*Viewport.allowHoriz:           True
+    *searchShell*Viewport.useBottom:            True
+    *searchShell*Viewport.useRight:           	False
+    *searchShell*Viewport.forceBars:            True
+    *searchGroup.frameType:               	chiseled
+    *searchGroup.frameWidth:              	2
+    *searchGroup.innerOffset:             	7
+    *searchGroup.outerOffset:             	7
+    *searchGroup.highlightThickness:		0
+    *searchGroup.label:                             
+    *searchLayout.layout: vertical { \
+	horizontal { \
+            45 < +45 -45 > \
+            resLabel < +inf -inf * > \
+            5 < +inf -inf > \
+            exactMatch    \
+	} \
+	2 < +2 - 2 > \
+        resFrame < +inf -inf * +inf -inf > \
+	5 < +5 - 5 > \
+	horizontal { \
+            searchLabel 5 searchFrame \
+	    5 \
+            searchClear 2 searchOkay    \
+            5 < +inf -inf > \
+            searchStatus    \
+            5 < +inf -inf > \
+            searchHelp  2 searchDismiss \
+	} \
+    }
+    *resLabel.label: Task            Package         Description
+    *resLabel.justify:				left
+    *resFrame.frameType:			sunken
+    *resFrame.frameWidth:			1
+    *resList.font:				7x13
+    *resList.width:				100
+    *resList.height:				100
+    *resList.marginWidth:			5
+    *resList.marginHeight:			5
+
+    *searchLabel.label:                         Topic:
+    *searchFrame.frameType:                     sunken
+    *searchFrame.frameWidth:                    1
+    *searchEntry*font:                      	7x13
+    *searchEntry*displayCaret:                 	True
+    *searchEntry*editType:                      edit
+    *searchEntry*height:                        25
+    *searchEntry*width:                         150
+    *searchClear.label:                         Clear
+    *searchOkay.label:                          Search
+    *searchStatus.label:                        
+    *exactMatch.label:                       	Require Exact Match
+    *exactMatch*on:                             1
+    *exactMatch*onIcon:                         diamond1s
+    *exactMatch*offIcon:                        diamond0s
+    *exactMatch*highlightColor:                 green
+    *exactMatch.frameWidth:         		2
+    *exactMatch.frameType:          		chiseled
+    *exactMatch.location:           		0 0 150 25
+    *exactMatch.leftMargin:         		4
+    *searchHelp.label:                       	Help
+    *searchDismiss.label:                       Dismiss
+
+
+    !----------------
+    !  Help Window.
+    !----------------
+    *hlpShell.title:                           Help
+    *hlpShell.width:                           500
+    *hlpShell.height:                          620
+    *hlpLayout*borderWidth:                    0
+    *hlpLayout*Frame*frameType:                sunken
+    *hlpLayout*Frame*frameWidth:               1
+   
+    *hlpMenuGroup.label:		
+    *hlpMenuGroup.outerOffset:			0
+    *hlpMenuGroup.innerOffset:			0
+    *hlpLayout.layout: vertical { \
+        hlpMenuGroup < +inf -inf * > \
+	-3 \
+        hlpTextFrame < +inf -inf * +inf -inf > \
+	horizontal { \
+	    5 \
+	    hfLabel 5 hfFrame < +inf -inf *> \
+	    2 \
+	    hfFind 2 hfClear 5 hfDir 5 hfCase \
+	    5 \
+	} \
+	2 \
+    }
+    *hlpLayout*TextToggle*location:             0 0 90 25
+    *hlpLayout*TextToggle*offIcon:              diamond0s
+    *hlpLayout*TextToggle*onIcon:               diamond1s
+    *hlpLayout*TextToggle*highlightColor:       yellow
+    *hlpLayout*TextToggle*frameType:		chiseled
+    *hlpLayout*TextToggle*frameWidth:		2
+    *hfEntry*editType:                      	edit
+    *hfEntry*font:                      	7x13
+    *hfEntry*displayCaret:                 	True
+    *hfLabel.label:				Find: 
+    *hfFind.label:				Find
+    *hfClear.label:				Clear
+    *hfDir.label:				Backwards
+    *hfCase.label:				Caseless
+    *hfCase.on:					true
+
+    *hlpMenu*Command.internalHeight:     	4
+    *hlpMenu*Command.highlightThickness: 	1
+    *hlpMenu*Command.height: 			20
+    *hlpMenu.layout: vertical { \
+        5 \
+        horizontal { \
+            5 \
+            hlpBack 2 hlpForward 2 hlpHome 2 hlpTutorial \
+            20 < +inf -20 > \
+            hlpDismiss \
+            5 \
+        } \
+        5 \
+    }
+    *hlpBack.label:                             Back
+    *hlpBack.sensitive:                         False
+    *hlpForward.label:                          Forward
+    *hlpHome.label:                             Home
+    *hlpTutorial.label:                         Tutorial
+    *hlpTutorial.sensitive:                     false
+    *hlpDismiss.label:                          Dismiss
+ 
+    *hlpTextFrame.outerOffset:			2
+    *hlpText.width:                             500
+    *hlpText.height:                            500
+    *hlpText.anchorUnderlines:                  1
+    *hlpText.visitedAnchorUnderlines:           1
+    *hlpText.verticalScrollOnRight:             true
+
+
+    !------------------+
+    ! File List dialog.
+    !------------------+
+    *fileShell.title:                          	Help Files
+    *fileShell.geometry:                        500x165
+    *fileShell*borderWidth:                     0
+    *fileShell*Command.width:                   90
+    *fileShell*Command.height:                  30
+    *fileShell*Frame.frameType:                 sunken
+    *fileShell*Frame.frameWidth:                1
+    *fileShell*Frame.innerOffset:               1
+    *fileShell*Text*font:			7x13
+    *flist.layout: vertical { \
+        1 \
+        horizontal { 1 flGroup < +inf -inf * +inf -inf> 1 } \
+        1 \
+    }
+
+    *flGroup.frameType:               		chiseled
+    *flGroup.frameWidth:              		2
+    *flGroup.innerOffset:             		5
+    *flGroup.outerOffset:             		5
+    *flGroup.label:                             
+    *flFrame.layout: vertical { \
+        5 \
+        horizontal { \
+            13 \
+            flistLabel < +inf -inf * > \
+            5 < +inf -5 > \
+        } \
+        2 \
+        horizontal { 1 flistFrame < +inf -inf * +inf -inf > 1 } \
+        7 \
+        horizontal { \
+            5 \
+            flpkgLabel 2 flpkgVal < +inf -inf * > \
+            5 < +inf -5 > \
+            flDismiss \
+            5 \
+        } \
+    }
+    *flDismiss.label:                           Dismiss
+    *flistLabel.label:    	     	Option       Status        Filename
+    *flistLabel.justify:			left
+    *flpkgLabel.label:    			Task: 
+    *flpkgLabel.justify:			left
+    *flpkgVal.label:				(Undefined)
+    *flpkgVal.justify:				left
+    *flpkgVal*font:				7x13
+    *flistText.label:
+    *flistText.scrollVertical:			Never
+    *flistText.scrollHorizontal:		whenNeeded
+    *flistText*displayCaret:			False
+    *flistText*editType:			edit
+
+
+    !----------------+
+    ! WARNING dialog.
+    !----------------+
+    *warning.geometry:                          +400+300
+    *warning*borderWidth:                       0
+    *warning*TextBox.frameWidth:                0
+    *warning*Command.width:                  	90
+    *warning*Command.height:                 	30
+    *warning*Frame.frameType:                 	sunken
+    *warning*Frame.frameWidth:                	1
+    *warning*Frame.innerOffset:                 3
+    *warn.layout: vertical { \
+        5 \
+        horizontal { \
+            5 \
+            warnFrame < +inf * +inf > \
+            5 \
+        } \
+        5 \
+        horizontal { \
+            5 < +inf -5 > \
+            warnBtnFrame \
+            5 < +inf -5 > \
+        } \
+        5 \
+    }
+
+    *WFlayout.layout: horizontal { \
+        5 \
+        vertical { \
+            5 < +inf -5 > \
+            warnIcon \
+            5 < +inf -5 > \
+        } \
+        5 \
+        warnText < +inf -inf * +inf -inf > \
+        5 \
+    }
+    *warnIcon.location:                         0 0 40 40
+    *warnIcon.image:                            WARNING
+    *warnText.label:                            generic warning text
+    *warnText.width:                            270
+    *warnText.height:                           60
+    *warnText*background:			gray75
+    *warnDismiss.label:                         Dismiss
+
+    !--------------------------
+    ! Define a Debug Tcl shell.
+    !--------------------------
+    *tclShell.width:				550
+    *tclShell.height:				180
+    *tclShell.title:				TCL Command Entry Shell
+    *tclLayout*borderWidth:			0
+    *tclLayout*Frame.frameType:			sunken
+    *tclLayout*Frame.frameWidth:		1
+    *tclLayout.layout:	vertical { \
+        tclCmdGroup   < +inf -inf * > \
+        tclFrame < +inf -inf * +inf -inf> \
+    }
+    *tclEntry*editType:				edit
+    *tclEntry*type:				string
+    *tclEntry*scrollVertical:			Always
+    *tclEntry*scrollHorizontal:			whenNeeded
+
+    *tclCmdGroup.label:		
+    *tclCmdGroup.outerOffset:			0
+    *tclCmdGroup.innerOffset:			0
+    *tclCmd.layout: vertical { \
+        5 \
+        horizontal { \
+            5 \
+            tclClear   3 tclExecute   \
+            10 < +inf -10>    \
+            tclLogging 3 tclDismiss   \
+            5 \
+        } \
+        5 \
+    }
+    *tclClear.label:				Clear
+    *tclExecute.label:				Execute
+    *tclLogging.label:				Enable Logging
+    *tclDismiss.label:				Dismiss
+}
+
+
+
+################################################################################
+
+createObjects
+
+# Define Bitmaps and Pixmaps to be used.
+createBitmap null 16 16 {
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+
+createBitmap check 16 16 {
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x60,
+   0x00, 0x30, 0x00, 0x18, 0x00, 0x0c, 0x08, 0x06, 0x18, 0x03, 0xb0, 0x01,
+   0xe0, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00}
+
+createBitmap arrow 16 16 {
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x0c, 0x00, 0x14, 0xf8, 0x27,
+   0x08, 0x40, 0xf8, 0x27, 0x00, 0x14, 0x00, 0x0c, 0x00, 0x04, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+
+activate
+
+################################################################################
+
+
+################################################################################
+# Global variables. |
+################################################################################
+set version		"IRAF Help GUI V1.0"	;# version string
+set curpack		""			;# current values
+set curtask		""
+set helpType		"package"		;# type of help to get
+set helpOption		"help"			;# help option param
+set fileManaged 	0			;# is fileShell mapped?
+set pkgList		{ }
+set visited(0)		empty
+
+set listOrient		1 			;# options
+set showType		0
+set showFiles		1
+set exactMatch		1
+
+set MAX_MENU_SIZE	40			;# what it says it is
+
+# History array initialization.
+set HPkg(0) 		{Home}			;# package
+set HOpt(0) 		{help}			;# option
+set HTask(0) 		{Home}			;# task
+set HUrl(0) 		{}			;# url
+set HType(0) 		{task}			;# type (task|package|file)
+set HFile(0) 		{}			;# filename
+set htop		0			;# top of array
+set hcurrent		0			;# current page
+
+# Panel mapping flags.
+set search_mapped	0			;# searchShell mapped?
+
+
+################################################################################
+#   Utility Callbacks  
+################################################################################
+
+#  Procedures for sending client cursor commands.
+proc GKey { key args } { send client gkey $key   }
+proc GCmd { args }     { send client gcmd $args  }
+
+#  Procedures to test True/False strings in resources.
+proc true  { v } \
+   { expr { $v=="true"  || $v=="True"  || $v=="TRUE"  || $v==1 || $v=="yes" } }
+proc false { v } \
+   { expr { $v=="false" || $v=="False" || $v=="FALSE" || $v==0 || $v=="no"  } }
+
+#  No-op procedure for text widgets with no callbacks to swallow newline.
+proc noop { args } { }
+
+#  Common functions.
+proc min { a b } { expr {($a < $b) ? $a : $b} }
+proc max { a b } { expr {($a > $b) ? $a : $b} }
+
+
+#--------------------+
+# Debugging options. |
+#--------------------+
+set debug		0			;# debug flag
+send tclLogging set state [min 1 $debug]
+
+
+################################################################################
+# Initialize. |
+################################################################################
+proc Init args {
+    global history curpack curtask debug
+    global secMenuDescription parMenuDescription 
+    global HPkg HTask HUrl HOpt HFile HType
+
+    if {$debug == 1} { send tclShell map }
+
+    # Reinitialize global vars in case of a restart.
+    set curpack	   ""
+    set curtask	   ""
+    set helpType   "package"
+    set helpOption "help"
+
+    # Initialize the entry strings.
+    send printEntry set string ""
+    send topicEntry set string ""
+
+    # Initialize the various lists.
+    send topicList   setList "{ }"    resize
+
+    send secButton set sensitive False
+    send parButton set sensitive False
+    editMenu secMenu secButton $secMenuDescription
+    editMenu parMenu parButton $parMenuDescription
+
+} ; #send server postActivateCallback Init
+
+
+
+# Create the Navigation Menu.
+set navMenuDescription {
+    { "Back       "   f.exec 	{ Back 	  } 
+	      sensitive {([send htbButton isSensitive]==1) ? "true" : "false" }
+    }
+    { "Forward    "   f.exec 	{ Forward }
+	      sensitive {([send htfButton isSensitive]==1) ? "true" : "false" }
+    }
+    { "Up         "   f.exec 	{ Up	  }
+	      sensitive {([send htuButton isSensitive]==1) ? "true" : "false" }
+    }
+    { "Home       "        f.exec    { Home    } }
+    {                      f.dblline      	 }
+    { "Reload     "        f.exec    { Reload  } }
+    { "Open File... "      f.exec    { Open    } }
+    { "Save As...   "      f.exec    { SaveAs  } }
+    { "View Page Source  " f.exec    { srcOpen } }
+    {                      f.dblline             }
+    { "Find...    "        f.exec    { Find    } }
+    { "Search...  "        f.exec    { Search  } }
+    { "Print...   "        f.exec    { Print   } }
+} ; createMenu navMenu helpText $navMenuDescription
+
+# Create the default Section Menu.
+set secMenuDescription {
+    { " Top of Page       " f.exec    { send helpText gotoId 0 } }
+    {                       f.dblline          }
+    { "                   " f.exec    { noop } }
+    { " No Sections Found " f.exec    { noop } }
+    { "                   " f.exec    { noop } }
+} ; createMenu secMenu secButton $secMenuDescription
+
+# Create the default Parameter Menu.
+set parMenuDescription {
+    { " No Parameters Found" f.exec  { noop } }
+} ; createMenu parMenu parButton $parMenuDescription
+
+
+# Initialize.
+Init
+
+
+################################################################################
+# Menubar command callbacks.
+################################################################################
+
+# File Menu
+set fileMenuDescription {
+    { " Open File... "      f.exec {  Open    } }
+    { " Save As...   "      f.exec {  SaveAs  } }
+    { " Print...     "      f.exec {  Print   } }
+    {                       f.dblline      	   }
+    { " Reload...    "      f.exec {  Reload  } }
+    { " View Page Source  " f.exec {  srcOpen } }
+    { " Search...    "      f.exec {  Search  } }
+    { " Find...      "      f.exec {  Find    } }
+    {                       f.dblline       	}
+    { " Help         "      f.exec {  Help 	 } }
+    { " Quit         "      f.exec {  Quit 	 } }
+} ; createMenu fileMenu fileButton $fileMenuDescription
+
+
+# History Menu
+set historyMenuDescription {
+    { " Back         "	f.exec { Back	 }
+	      sensitive {([send htbButton isSensitive]==1) ? "true" : "false" }
+    }
+    { " Forward      "	f.exec { Forward }
+	      sensitive {([send htfButton isSensitive]==1) ? "true" : "false" }
+    }
+    { " Up           "	f.exec { Up  	 }
+	      sensitive {([send htuButton isSensitive]==1) ? "true" : "false" }
+    }
+    { " Home         "	f.exec { Home	 } }
+    {             	f.dblline   	   }
+    { " Clear History"  f.exec { histClear } }
+    {             	f.dblline   	   }
+} ; createMenu historyMenu historyButton $historyMenuDescription
+
+
+# Options Menu
+set optsMenuDescription {
+    { " Show task type          "  f.exec { setOpts showType  } 
+				bitmap {($showType==1)? "check" : "null"} }
+    { " Show missing files      "  f.exec { setOpts showFiles } 
+				bitmap {($showFiles==1)? "check" : "null"} }
+    {                  		     f.dblline   }
+    { " Vertical task listing   "  f.exec { setOpts verticalList True }
+				bitmap {($listOrient==1)? "check" : "null"}
+					    }
+    { " Horizontal task listing "  f.exec { setOpts verticalList False }
+				bitmap {($listOrient==0)? "check" : "null"}
+					    }
+    {                       	f.dblline       	}
+    { " Tcl Command Shell       "  f.exec {  tclOpen } }
+} ; createMenu optsMenu optionsButton $optsMenuDescription
+
+
+proc setOpts { opt args } {
+    global optsMenuDescription
+    global listOrient showType showFiles
+    global HTask HPkg HOpt hcurrent
+
+    switch $opt {
+	showType	{ set showType   [expr { ($showType == 1) ? 0 : 1 } ]
+			  GCmd type $showType
+			  set h $hcurrent
+			  GCmd help $HTask($h) $HPkg($h) $HOpt($h)
+			}
+	showFiles	{ set showFiles  [expr { ($showFiles == 1) ? 0 : 1 } ]
+			}
+	verticalList	{ set listOrient [expr { ($args == "False") ? 0 : 1 } ]
+			  send topicList set verticalList $args 
+			}
+    }
+    editMenu optsMenu optionsButton $optsMenuDescription
+}
+
+proc Print args {
+    send printShell map
+} ; send printButton addCallback Print
+
+proc Find { args } { 
+    send findShell popup
+} ; send findButton addCallback Find
+
+proc Search { args } { 
+    global search_mapped
+
+    send searchShell map
+    set search_mapped 1
+} ; send searchButton addCallback Search
+
+proc Reload args {
+    global HPkg HType HUrl HOpt HTask HFile hcurrent
+
+    if { $HType($hcurrent) == "file"} {
+        if {[info exists HFile($hcurrent)] == 1} {
+	    GCmd directory open $HFile($hcurrent)
+        } else { 
+	    setAlert param old [format "HFile param at %d not found" $hcurrent]
+        }
+    } else {
+        loadHistItem $hcurrent $HPkg($hcurrent) $HTask($hcurrent) \
+   	     $HOpt($hcurrent) $HType($hcurrent) $HUrl($hcurrent)
+    }
+} ; send reloadButton addCallback Reload
+
+proc Help args {
+    send hlpShell map
+} ; send helpButton addCallback Help
+
+proc Open args {
+    send fmtGroup unmap
+    send fmtGroup set height 0
+    send fbcOkay set label Load
+    send fileBrowser map
+}
+
+proc SaveAs args {
+    global format
+
+    # Reset the default format every time we open.
+    send $format set on 0
+    set format fmtSrc
+    send $format set on 1
+
+    # If there's no filename specified set one as a default.
+    setDefaultFname
+    
+    send fmtGroup map
+    send fmtGroup set height 65
+    send fbcOkay set label Save
+    send fileBrowser map
+}
+
+proc Quit args {
+    GCmd quit
+    deactivate unmap 
+}; send quitButton addCallback Quit
+
+
+
+################################################################################
+# Callbacks for client state variables (UI parameter objects).  When the
+# client's state changes it updates a UI parameter to reflect the change.
+# This produces a callback to one or more of the callbacks defined below,
+# used to update the GUI to reflect the changing state of the client.
+################################################################################
+
+proc setShowType { param old new } {
+    global showType listOrient showFiles optsMenuDescription
+    set showType $new
+    editMenu optsMenu optionsButton $optsMenuDescription
+}; send showtype addCallback setShowType
+
+proc setTopics { param old new } {
+    global pkgList
+    set pkgList $new
+    send topicList setList $new resize
+}; send pkglist addCallback setTopics
+
+proc appendHist { param old new } {
+    global helpType helpOption curtask curpack
+
+    if {$new == "package"} {
+        #addHistRecord $curpack $curpack "" $helpOption "" $helpType
+        addHistRecord $curpack $curpack "" $helpOption "" "package"
+    } elseif {$new == "append"} {
+        # We've got a result of some kind and all of the values have been
+        # set, so create a history record.
+        if {$curpack != "" && $curtask != ""} {
+            addHistRecord $curpack $curtask "" $helpOption "" $helpType
+        }
+    }
+}; send history addCallback appendHist
+
+proc setCurpack { param old new } {
+    global curpack
+
+    if { $new != [getPkgName $curpack] } {
+        if { $curpack != "" && \
+	     $curpack != "clpackage" && \
+	     [string match "root*" $new] != 1} {
+                 set curpack [ format "%s.%s" $curpack $new]
+	         send htuButton set sensitive true
+        } else {
+            set curpack $new
+        }
+    }
+}; send curpack addCallback setCurpack
+
+
+proc setCurtask { param old new } {
+    global curtask curpack helpType
+
+    if {$helpType == "package"} {
+       send topicEntry set string $curpack
+    } else {
+       send topicEntry set string [ format "%s.%s" $curpack $new ]
+    }
+   
+    # Update the printer dialog so the filename defaults to the curtask.
+    if { [send toFile get on] } {
+	if {$HType($hcurrent) == "file" || [send srcOpt get on] == 1} {
+            send printEntry set string [format "%s" [fileSource] ]
+	} else {
+            send printEntry set string [format "%s.ps" $new]
+	}
+    } else {
+        send printEntry set string "printer"
+    }
+    set curtask $new
+}; send curtask addCallback setCurtask
+
+
+proc getPkgName { pkg } {
+    set last [ string last "." $pkg ]
+    if { $last > -1 } {
+        return [ string range $pkg [incr last] end ]
+    } else {
+        return $pkg
+    }
+}
+
+proc getParentName { pkg } {
+    set last [ string last "." $pkg ]
+    if { $last > -1 } {
+        set root [ string range $pkg 0 [incr last -1] ]
+    } else {
+        set root $pkg
+    }
+    return [getPkgName $root]
+}
+
+
+# Topic list selection callback.
+proc topicSelect { widget event args } {
+    global htop hcurrent curpack curtask helpOption helpType
+    global visited
+
+    # If we're currently positioned somewhere in the middle of the 
+    # history menu, push the current page to the history list before
+    # getting the next result.
+    if {$htop != $hcurrent} {
+        addHistRecord $curpack $curtask "" $helpOption "" $helpType
+	send htbButton set sensitive True
+	send htuButton set sensitive True
+    }
+
+    set item [string trimright [send topicList getItem itemno] "."]
+    send topicList getItem itemno
+    if { $itemno != "none" } {
+	GCmd help $item $curpack $helpOption
+        set visited($item) 1
+    }
+} ; send topicList addEventHandler topicSelect buttonReleaseMask
+
+proc listViewResize { args } {
+    global pkglist
+    send topicList setList $pkglist resize
+} ; send listView addEventHandler listViewResize ResizeRedirectMask
+
+
+# Get help for a specific topic from the topic entry widget.
+proc getTopicHelp { widget mode topic args } {
+    global curpack helpOption
+
+    if { [string match "*\.*" $topic] == 1} {
+	set pkglist [ split $topic "." ]
+	set pack [lindex $pkglist [expr {[llength $pkglist] - 2}] ]
+	set task [lindex $pkglist [expr {[llength $pkglist] - 1}] ]
+	set curpack $pack
+        GCmd help $task $curpack $helpOption
+    } else {
+	set curtask ""
+	set curpack ""
+        GCmd help $topic $curpack $helpOption
+    }
+} ; send topicEntry addCallback getTopicHelp
+
+proc topicClear { args } {
+    send topicEntry set string ""
+} ; send topicClear addCallback topicClear
+
+
+
+################################################################################
+# Help text and HTML processing procedures. 
+################################################################################
+
+proc setHelpResult { param old new } {
+    global helpType helpOption curtask curpack
+    global secMenuDescription parMenuDescription
+    global pkgList debug
+
+    # Debug status
+    if {$debug == 1} {
+	send tclEntry append \
+	    [format "helpres: type=%1.1s opt=%4.4s curtask=%s curpack=%s\n" \
+	    $helpType $helpOption $curtask $curpack ]
+	print [format "helpres: type=%1.1s opt=%4.4s curtask=%s curpack=%s\n" \
+	    $helpType $helpOption $curtask $curpack ]
+    }
+
+    if { [string match "*<HTML>*" $new] == 1} {
+	# Strip the header table.
+	if {[ string match "*TABLE*" $new] == 1 } {
+            set new_start [expr [string first "</TABLE>" $new] + 12]
+            set text [ filterBraces [string range $new $new_start end] ]
+	} else {
+	    set text [ filterBraces $new ]
+	}
+
+	# Got HTML directly from the client.
+	send helpText setText [format "<HTML><BODY>\n%s" $text ]
+
+	# Save the source for the viewer
+	set docSrc \
+	    [ format "<HTML><BODY>\n%s\n</BODY></HTML>\n" $text]
+
+	# Parse the file for menu items.
+	setSectionMenu   $new
+	setParameterMenu $new
+
+    } else {
+	# Disable help page content buttons for plain text.
+        send parButton set sensitive False
+        send secButton set sensitive False
+        editMenu secMenu secButton $secMenuDescription
+        editMenu parMenu parButton $parMenuDescription
+
+	# Filter plaintext .men files into something with links, otherwise
+	# unescape the curly braces used to pass the text through Tcl.
+	if {$helpType == "package"} {
+	    set str [ filterLinks [ filterTcl $new ] ]
+	} else {
+	    set str [ filterTcl $new ]
+	}
+	
+	# Load the results
+	send helpText setText "<HTML><BODY><PRE>\n$str\n</PRE></BODY></HTML>"
+
+	# Save the source for the viewer
+	set docSrc \
+	    [ format "<HTML><BODY><PRE>\n%s\n</PRE></BODY></HTML>\n" $str]
+    }
+    send helpText retestAnchors
+    send srcText set string $docSrc
+
+    # See which files associated with this topic are available.  We turn off
+    # the option toggles first so they can be reset as needed by the client.
+    if {$helpOption != "sysdoc"} {send sysOpt "set sensitive False ; set on 0" }
+    if {$helpOption != "source"} {send srcOpt "set sensitive False ; set on 0" }
+
+    if {$helpType == "package"} {
+        set parent [getParentName $curpack]
+	if {$parent == "clpackage" || [string match "root*" $parent] == 1} {
+            GCmd files $curtask "clpackage"
+	} else {
+            GCmd files $curtask $parent
+	}
+    } else {
+        GCmd files $curtask [string range $curpack \
+		[expr {[string last "." $curpack ] + 1}] end]
+    }
+
+    # Highlight the package list item.
+    for {set i 0} {$i < [llength $pkgList]} {incr i} {
+	if {[lindex $pkgList $i] == $curtask } {
+	    send topicList highlight $i
+ 	    break
+	}
+    }
+    printHistStack "helpres "
+
+}; send helpres addCallback setHelpResult
+
+
+# Set an arbitrary TextToggle widget highlight color.
+proc setOptColor { widget color args } {
+    send $widget "set on 1 ; \
+		  set offIcon diamond0s ; \
+     		  set highlightColor $color ; \
+    		  set background gray75 ; \
+		  set onIcon diamond1s ; \
+     		  set highlightColor $color ; \
+    		  set background gray75"
+}
+
+
+# Set the file options for the files that were found to be valid (i.e.
+# they're listed in the files output and actually exist).
+proc setHelpFileOpts { param old new } {
+    global helpType helpOption curtask curpack
+    global showFiles
+
+    set opt  [lindex $new 0]
+    set val  [lindex $new 1]
+    if {$opt != "file"} { set stat [lindex $new 2] }
+
+    # Set the option toggles according to valid files.
+    if {$opt == "sys" && $stat == 0} { 
+        send sysOpt set sensitive True
+    } elseif {$opt == "sys" && $stat == 1 && $showFiles == 1} { 
+        setOptColor sysOpt yellow
+    }
+    if {$opt == "src" && $stat == 0} { 
+        send srcOpt set sensitive True
+    } elseif {$opt == "src" && $stat == 1 && $showFiles == 1} { 
+        setOptColor srcOpt yellow
+    }
+
+    # Update the help files panel text.
+    if {$opt == "file"} {
+        set pkg [ string trimright $val ":"]
+        send flpkgVal set label [ format "%s" $pkg ]
+	send toplevel set title [format "XHelp: %s" $pkg ]
+        send flistText set string ""
+    } else {
+        send flistText append [ format " %5.5s    %-7.7s %s\n" \
+	    $opt \
+	    [ expr { ($stat == 0) ? "Okay" : "Error" }] \
+	    $val]
+    }
+
+} ; send helpfiles addCallback setHelpFileOpts
+
+
+# Process an HREF link selection.  URLs are assumed to be of the form
+#
+#		<pkgname>.<task>
+#		<task>
+#		'#'<hname>
+#
+# If an internal link is found as in the last case we ignore any defined 
+# package/task given, otherwise load the selected page.
+
+proc textAnchorSelected {widget cbtype event text href args} {
+    global HPkg HType HUrl HOpt HTask HFile hcurrent htop
+    global curpack helpOption visited
+
+    set visited($href) 1
+    send helpText retestAnchors
+
+    if {[string match "*#*" $href] == 1} {
+	set link [string range $href [expr [string first "#" $href] + 1] end ]
+	set HUrl($hcurrent) $link
+	send helpText gotoId [ send helpText anchorToId $link ]
+    } else {
+        if { [string match "*\.*" $href] == 1} {
+            set pack [lindex [split $href "."] 0]
+            set task [lindex [split $href "."] 1]
+            set curpack $pack
+            GCmd help $task $curpack $helpOption
+
+        } else {
+            GCmd help $href $curpack $helpOption
+        }
+    }
+
+    if {$hcurrent <= $htop} {
+	set h $hcurrent
+    	addHistRecord $HPkg($h) $HTask($h) $HUrl($h) $HOpt($h) \
+	    HFile($h) $HType($h)
+    }
+
+}; send helpText addCallback textAnchorSelected anchor
+
+
+# Remove only the escaped curly braces.  Used to filter HTML text passed to
+# the GUI with escapes in it.
+
+proc filterBraces { istr args } {
+    if {$istr != ""} {
+        regsub -all {(\\\{)} $istr "\{"   v1
+        regsub -all {(\\\})} $v1   "\}"   results
+        return $results
+    }
+}
+
+# Remove the backslash escapes from source files, escape special chars for
+# presentation on an HTML widget.
+
+proc filterTcl { istr args } {
+    if {$istr != ""} {
+        regsub -all {(\\\{)} $istr "\{"   v1
+        regsub -all {(\\\})} $v1   "\}"   v2
+        regsub -all {(\<)}   $v2   "\\&lt;" v3
+        regsub -all {(\>)}   $v3   "\\&gt;" results
+        return $results
+    }
+}
+
+
+# Scan a plaintext doc to see if maybe this is a package help menu.  We use
+# some assumption that most of the lines will be of the form "task '-' desc"
+# then parse the file resetting all of the 'task' names as HREFs for other
+# tasks. 
+
+proc filterLinks { istr args } {
+
+    set lines [split $istr "\n"]
+    set blank " "
+    set results { }
+    lappend results ""
+    foreach i $lines {
+	set line [string trimleft [detab $i] ]
+        if {[regexp {(^[a-zA-Z0-9\ \_\(\)]+[\+|\-]*)} $line arg] == 1 &&
+	    ([string match "*\-*" $arg] == 1 ||
+	     [string first "\*" $line] > 0 || 
+	     [string match "*\+*" $arg] == 1) } {
+
+	    set task [string trim [string trimright $arg "-+"] ]
+	    set l [string first "-" $line]
+	    if {$l == -1} {
+		set l [string first "+" $line]
+	        if {$l == -1} {
+		    set l [string first "\*" $line]
+	        }
+	    }
+	    set desc [ string range $line $l end ]
+
+	    # We now have the task name and the description string, format
+	    # on output with the HREF defined.
+	    set nblanks [expr 13 - [string length $task] ]
+	    set fmtstr [format "%%%ds<A HREF=\"%%s\">%%s</A> %%s\n" $nblanks ]
+	    set ostr [format $fmtstr $blank $task $task $desc]
+
+	    lappend results $ostr
+
+	} elseif {[regexp {(^[a-zA-Z0-9\_]+\.[a-zA-Z0-9\_]+\:$)} $i val] == 1} {
+
+	    # Break out the task and package names.
+	    regsub -all {[\.:]} $i " " val
+	    scan $val "%s %s" parent child
+
+	    # Format a URL and append the results.
+	    if { [ string match "*root*" $parent] == 0} {
+	       set ref [format "<A HREF=\"%s\">%s</A>.<A HREF=\"%s\">%s</A>:\n"\
+		    $parent $parent $child $child ]
+	    } else {
+	       set ref [format "%s.<A HREF=\"%s\">%s</A>:\n"\
+		    $parent $child $child ]
+	    }
+	    lappend results $ref
+
+	} else {
+	    set nblanks [expr [string length $i] - [string length $line] ]
+	    set fmtstr [format "%%%ds%%s\n" $nblanks ]
+	    lappend results [format $fmtstr $blank $line ]
+	}
+    }
+    return [ join $results ]
+}
+
+
+# Generated a list of the lines and create the section menu.
+
+proc setSectionMenu { text args } {
+    global secMenuDescription
+
+    # Break out the table of contents from the string.  Note we're hard-
+    # wired here into the form of the comment string used to contain the
+    # section name.
+    set l [expr [string first "<! Contents: " $text] + 12]
+    if {$l == 0} { return }
+    set s [string range $text $l end]
+    set r [expr [string first ">" $s] - 4]
+    set t [string range $s 0 $r]
+    set lst [split $t '\'']
+
+    # Now take the list generated and create the menu.
+    set items { }
+    lappend items " \"Top of Page\" f.exec \{ send helpText gotoId 0 \}"
+    lappend items " f.dblline "
+    foreach i $lst {
+	if {$i != " "} { 
+	    set i [ string trimright $i ]
+	    regsub -all {[ ,.():;]} [string tolower $i] _ url
+	    lappend items "   \" $i  \" f.exec \{ jumpToName #s_$url \}"
+	}
+    }
+
+    if { [llength $items] == 3 } {
+       send secButton set sensitive False
+       editMenu secMenu secButton $secMenuDescription
+    } else {
+       editMenu secMenu secButton $items
+       send secButton set sensitive True
+    }
+}
+
+
+# Generated a list of the lines and create the parameter menu.
+proc setParameterMenu { text args } {
+    global parMenuDescription
+    set items { }
+    foreach i [split $text "\n"] {
+        if {[string match "\<\! Sec*PARAMETERS*Level=0*" $i] == 1} {
+    	    set l [expr [string first "Line='" $i] + 6]
+    	    set s [string range $i $l end]
+    	    set r [expr [string first "\'" $s] - 1]
+    	    set t [string range $s 0 $r]
+	    regsub -all {[\	]} $t " " d		;# remove tabs
+	    regsub -all {[\"]} $d "\\\"" entry
+
+    	    set l [expr [string first "Label='" $i] + 7]
+    	    set s [string range $i $l end]
+    	    set r [expr [string first "\'" $s] - 1]
+    	    set t [string range $s 0 $r]
+
+	    lappend items " \"$entry\" f.exec \{ jumpToName #l_$t \}"
+	}
+    }
+
+    if { [llength $items] == 0 } {
+       send parButton set sensitive False
+       editMenu parMenu parButton $parMenuDescription
+    } else {
+       editMenu parMenu parButton $items
+       send parButton set sensitive True
+    }
+}
+
+
+# Position the page to the requested href name.
+proc jumpToName { name } {
+    global curtask curpack helpType helpOption
+
+    send helpText gotoId [send helpText anchorToId $name]
+    send helpText retestAnchors
+
+    # Now add a history record for the jump
+    addHistRecord $curpack $curtask $name $helpOption "" $helpType
+}
+
+
+# Utility routine to 'detab' a line and preserve format.
+proc detab {str {tablen 8}} {
+    set a 0
+    set i [string first "\t" $str]
+    while {$i != -1} {
+        set m { }
+        set j $i
+        while {[incr j] % $tablen} { append m { } }
+        set str [string range $str $a \
+	    [expr {$i-1}]]$m[string range $str [incr i] end]
+        set i [string first "\t" $str]
+    }
+    return $str
+}
+
+
+################################################################################
+# Navigation and History Callbacks 
+################################################################################
+
+# Go back one page.
+proc Back args {
+    global curtask curpack helpType helpOption
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+
+    incr hcurrent -1
+    if {$hcurrent >= 0} {
+	set item $HTask($hcurrent)
+        set pkg  $HPkg($hcurrent)
+        set type $HType($hcurrent)
+	set h 	 $hcurrent
+
+	if { $item == "Home" } {
+	    loadHomePage
+	} else {
+    	    if { $HType($h) == "file"} {
+        	if {[info exists HFile($h)] == 1} {
+		    loadHistItem $h pkg $HFile($h) help file
+        	} else { 
+	    	    setAlert param old \
+			[format "HFile param at %d not found" $hcurrent]
+        	}
+    	    } else {
+	        loadHistItem $h $HPkg($h) $HTask($h) $HOpt($h) \
+		    $HType($h) $HUrl($h)
+	    }
+	}
+
+	if {$hcurrent == 0} {
+	    send htbButton set sensitive False
+	    send htuButton set sensitive False
+	}
+	if {$hcurrent >= 0} {
+	    send htfButton set sensitive True 
+	    send htuButton set sensitive True
+	}
+    } else {
+	set hcurrent 0
+    }
+    editHistoryMenu
+    printHistStack "Back "
+} ; send htbButton addCallback Back
+
+
+# Go forward one page.
+proc Forward args {
+    global curtask curpack helpType helpOption
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+
+    incr hcurrent
+    if {$hcurrent <= $htop} {
+	set item $HTask($hcurrent)
+        set pkg  $HPkg($hcurrent)
+        set type $HType($hcurrent)
+	set h 	 $hcurrent
+
+	if { $item == "Home" } {
+	    loadHomePage
+	} else {
+    	    if { $HType($h) == "file"} {
+        	if {[info exists HFile($h)] == 1} {
+		    loadHistItem $h pkg $HFile($h) help file
+        	} else { 
+	    	    setAlert param old \
+			[format "HFile param at %d not found" $hcurrent]
+        	}
+    	    } else {
+	        loadHistItem $h $HPkg($h) $HTask($h) $HOpt($h) \
+		    $HType($h) $HUrl($h)
+	    }
+	}
+
+	if {$hcurrent == $htop } {
+	    send htfButton set sensitive False
+	    send htbButton set sensitive True
+	} else {
+	    send htbButton set sensitive True
+	}
+    } else {
+	incr hcurrent -1
+    }
+    editHistoryMenu
+    printHistStack "Forward "
+} ; send htfButton addCallback Forward
+
+
+# Go up to previous package, skipping over pages inbetween.
+proc Up args {
+    global curtask curpack helpType helpOption
+    global HPkg HType HUrl HOpt HTask htop hcurrent
+
+    # From the current page go back until we find a package
+    if {$HType($hcurrent) == "package"} {
+	set i [expr {$hcurrent-1} ] 
+    } else {
+	set i $hcurrent
+    }
+    while {$HType($i) != "package" && $i >= 0} { 
+	incr i -1
+    }
+
+    # Found package, go get it.
+    set hcurrent $i
+    if {$i == 0} {
+	loadHomePage				;# push a history record??
+    } else {
+        GCmd load $HTask($i) [getPkgName $HPkg($i)] $HOpt($i)
+    }
+
+    set curtask    $HTask($hcurrent) 		;# update the state of things
+    set curpack    $HPkg($hcurrent)
+    set helpOption $HOpt($hcurrent)
+    set helpType   $HType($hcurrent)
+
+    send topicEntry set string $curpack 	;# update topic entry string
+
+    if {$hcurrent == 0} {			;# adjust navigation buttons
+        send htbButton set sensitive False
+        send htuButton set sensitive False
+    }
+    if {$hcurrent >= 0} {
+        send htfButton set sensitive True 
+        send htuButton set sensitive True
+    }
+    editHistoryMenu
+    printHistStack "Forward "
+} ; send htuButton addCallback Up
+
+
+# Go straight to the homepage.
+proc Home args {
+    global curtask curpack helpType helpOption
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+
+    # Load the homepage.
+    loadHomePage
+
+    # A Home command jumps over everything in the history list but we
+    # need to push a history record for it anyway.
+    addHistRecord $HPkg(0) $HTask(0) $HUrl(0) $HOpt(0) $HFile(0) $HType(0)
+
+    send topicEntry set string ""
+    set curtask ""
+    set curpack ""
+    set helpType "package"
+    set helpType "help"
+} ; send hthButton addCallback Home
+
+
+# Load the homepage.
+proc loadHomePage { args } {
+    global curtask curpack version showType
+
+    GCmd help Home
+
+    # Clean up.
+    set curtask ""
+    set curpack ""
+    send topicEntry set string ""
+    send toplevel set title $version
+}
+
+# Clear all the history information.
+proc histClear args {
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+    global visited
+
+    # Clear the visited anchors list.
+    foreach i [array names visited] {
+	unset visited($i)
+    }
+
+    # Clear the history stack.
+    for { set i [expr {$htop -1}] } { $i >= 0 } { incr i -1 } {
+	catch {
+	    unset HType($i)
+	    unset HOpt($i)
+	    unset HTask($i)
+	    unset HPkg($i)
+	    unset HUrl($i)
+	    unset HFile($i)
+	}
+    }
+
+    # Reinitialize, but save the current page as the new history stack.
+    catch {
+        set HPkg(0)     $HPkg($htop)	;# package
+        set HOpt(0)     $HOpt($htop)	;# option
+        set HTask(0)    $HTask($htop)	;# task
+        set HUrl(0)     $HUrl($htop)	;# url
+        set HType(0)    $HType($htop)	;# type
+        set HFile(0)    $HFile($htop)	;# filename
+    }
+    set htop	    0
+    set hcurrent    0
+
+    # Update navigation options and history menu.
+    send htbButton set sensitive False
+    send htfButton set sensitive False
+    send htuButton set sensitive False
+    editHistoryMenu
+}
+
+
+# Push an item on the history stack.
+proc addHistRecord { pkg task url opt file type } {
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+    global helpType helpOption
+    global historyMenuDescription
+
+    # Push a new history record to the top of the stack and make that the
+    # current record.
+    incr htop
+    set HPkg($htop) $pkg
+    set HTask($htop) $task
+    set HUrl($htop) $url
+    set HOpt($htop) $opt
+    set HFile($htop) [ expr {($file == "") ? "none" : $file } ]
+    set HType($htop) $type
+    set hcurrent $htop
+
+    # Activate the Back button.
+    if {$hcurrent == 1} { 
+	send htbButton set sensitive True 
+	if {$type == "package"} {
+	    send htuButton set sensitive True 
+	}
+    }
+
+    # Edit the history menu.
+    editHistoryMenu
+    printHistStack "addHistRecord"
+}
+
+
+# Edit the history menu to reflect the current state.
+proc editHistoryMenu { args } {
+    global HPkg HType HUrl HOpt HTask htop hcurrent
+    global helpType helpOption
+    global historyMenuDescription
+    global navMenuDescription
+    global MAX_MENU_SIZE
+
+    set items $historyMenuDescription
+    set nitems 0
+    if {$htop > $MAX_MENU_SIZE} {
+        set nstart [ min $htop [expr {$hcurrent + 3}] ]
+    } else {
+        set nstart $htop
+    }
+    for { set i $nstart } { $i >= 0 } { incr i -1 } {
+	set pkg  $HPkg($i)
+	set task $HTask($i)
+	set type $HType($i)
+	set opt  $HOpt($i)
+	set url  $HUrl($i)
+        if {$pkg != "" || $type == "file"} {
+	    if {$type == "task"} {
+		if {$url == ""} {
+		    set entry [format "%-22.22s %4s" $task \
+		    	[menuItemType $type $url $opt ] ]
+		} else {
+		    set entry [format "%-22.22s %4s" \
+			[ format "%s (%s)" $task [string trimleft $url "#"] ] \
+		    	    [menuItemType $type $url $opt ] ]
+		}
+	    } elseif {$type == "package"} {
+		set entry [format "%-22.22s %4s" [getPkgName $pkg] \
+		    [menuItemType $type $url $opt ] ]
+	    } elseif {$type == "file"} {
+		upvar #0 HFile file
+		set entry [format "%s" $file($i) ]
+	    } else {
+		setAlert param old [format "Unknown help type: %s" $type]
+	    }
+	   
+	    if {$type == "file"} {
+                lappend items " \" $entry \" f.exec \{ \
+		    loadHistItem $i pkg $entry help file \} \
+		    bitmap \{\($i==$hcurrent\) ? \"arrow\" : \"null\" \} "
+	    } else {
+                lappend items " \" $entry \" f.exec \{ \
+		    loadHistItem $i [getPkgName $pkg] $task $opt $type $url \} \
+		    bitmap \{\($i==$hcurrent\) ? \"arrow\" : \"null\" \} "
+	    }
+	}
+
+	incr nitems 1
+	if {$nitems > $MAX_MENU_SIZE} {
+            lappend items "f.dblline"
+            lappend items " \"    History truncated... \" f.exec \{ \} "
+	    break
+	}
+    }
+    editMenu historyMenu historyButton $items
+
+    # Edit the navigation menu to get the sensitivities right for
+    # the current state.
+    editMenu navMenu helpText $navMenuDescription
+}
+
+
+# Utility routine to set the history item entry type.
+proc menuItemType { type url opt } {
+    if {$url != ""} {
+	return [format "Link"]
+    }
+
+    switch $opt {
+      "help"     { return [format "%s" [expr {($type=="task")?"Task":"Pkg"} ]] }
+      "source"   { return [format "(src)"] }
+      "sysdoc"   { return [format "(sys)"] }
+    }
+}
+
+
+# Load a particular page/link from the history list.
+proc loadHistItem { itemno pkg task opt type args } {
+    global HPkg HType HUrl HOpt HTask htop hcurrent
+    global curtask curpack helpType helpOption hcurrent
+    global version
+
+    # Load the requested page. Check whether we just need to jump to
+    # the current page.
+    if {$task == "Home"} {
+	loadHomePage
+
+    } elseif {$type == "file"} {
+	GCmd directory open $task
+
+    } elseif {$itemno == $hcurrent || \
+       ($pkg  != $curpack    || \
+	$task != $curtask    || \
+	$type != $helpType   || \
+	$opt  != $helpOption) } {
+    	    GCmd load $task $pkg $opt
+    }
+
+    # If the history item included an internal link, jump to it.  The
+    # 'args' value will either be the URL or an empty string.
+    if {$args != ""} {
+        send helpText gotoId [send helpText anchorToId $args]
+        send helpText retestAnchors
+    }
+
+    # Update the topic entry string.
+    if { $type == "task" } {
+       send topicEntry set string [ format "%s.%s" $pkg $task ]
+    } elseif { $type == "file" } {
+       send topicEntry set string $task
+    } else {
+       send topicEntry set string $pkg
+    }
+
+    # Change the options button if needed.
+    if {$HOpt($itemno) != $helpOption} {
+	send [ getOptWidget $helpOption ] set on 0
+	setOptColor [ getOptWidget $HOpt($itemno) ] green
+    }
+
+    # Update the current entry.
+    set hcurrent $itemno
+
+    if { $type != "file" } {
+        set curtask    $HTask($hcurrent)
+        set curpack    $HPkg($hcurrent)
+        set helpOption $HOpt($hcurrent)
+        set helpType   $HType($hcurrent)
+    } else {
+        set helpOption "help"
+        set helpType   "file"
+    }
+
+    # Tweak the navigation buttons.
+    if {$hcurrent == 0} {
+        send htbButton set sensitive False
+        send htuButton set sensitive False
+    }
+    if {$hcurrent >= 0} {
+        send htfButton set sensitive True 
+        send htuButton set sensitive True
+    }
+    if {$hcurrent == $htop } {
+        send htfButton set sensitive False
+        send htbButton set sensitive True
+    }
+
+    # Edit the history menu.
+    editHistoryMenu
+}
+
+# Initialize the history menu.
+editHistoryMenu
+
+# Given the option type return the widget name.
+proc getOptWidget { opt } {
+    switch $opt {
+        "help"     { return "hlpOpt" }
+        "source"   { return "srcOpt" }
+        "sysdoc"   { return "sysOpt" }
+    }
+}
+
+# Debug utility to print the history stack.
+proc printHistStack { where args } {
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+    global debug
+
+    # Print the stack...
+    if {$debug > 0} {
+        print "_______________________________________________________________"
+        print $where
+        for { set i $htop } { $i >= 0 } { incr i -1 } {
+	    if {$HType($i) == "file"} {
+		upvar #0 HFile file
+            	print [format "%3s%d: type=%1.1s file=%s\n"\
+	            [ expr {($i==$hcurrent) ? ">>>" : "---"} ] \
+	            $i $HType($i) $file($i) ]
+	    } else {
+            	print [format "%3s%d: type=%1.1s opt=%4.4s task=%s pack=%s\n"\
+	            [ expr {($i==$hcurrent) ? ">>>" : "---"} ] \
+	            $i $HType($i) $HOpt($i) $HTask($i) $HPkg($i) $HUrl($i) ]
+	    }
+        }
+    }
+}
+
+# Test whether an anchor has been visited.
+proc testAnchor {widget cbtype href} {
+    global visited
+    return [info exists visited($href)]
+}
+send hlpText  addCallback testAnchor testAnchor
+send helpText addCallback testAnchor testAnchor
+send resList  addCallback testAnchor testAnchor
+
+
+################################################################################
+# Options Menu 
+################################################################################
+
+proc setType { param old new }  {
+    global helpType
+    set helpType [string tolower $new ]
+} ; send type addCallback setType
+
+proc selectOption { widget type value args } {
+    global curtask curpack helpOption
+
+    if { $curtask != "" } { 
+        foreach i { hlpOpt srcOpt sysOpt } { send $i set on 0 }
+        setOptColor $widget green
+        send $widget set on 1
+        switch $widget {
+	    hlpOpt   { set helpOption help
+		       send fmtText setSensitive true 
+		       send fmtPS setSensitive true 
+		     }
+	    srcOpt   { set helpOption source
+		       send fmtText setSensitive false 
+		       send fmtPS setSensitive false 
+		     }
+	    sysOpt   { set helpOption sysdoc
+		       send fmtText setSensitive true 
+		       send fmtPS setSensitive true 
+		     }
+        }
+	GCmd help $curtask [getParentName $curpack] $helpOption
+    }
+}; foreach i {hlpOpt srcOpt sysOpt } { send $i addCallback selectOption }
+
+proc toggleFileOption { args } {
+    if { [ send filOpt get on] == 1 } { 
+	send fileShell map
+    } else { 
+	send fileShell unmap
+    }
+} ; send filOpt addCallback toggleFileOption
+
+send flDismiss addCallback "send fileShell unmap ; send filOpt set on 0"
+
+
+################################################################################
+#  Procedure used by the printer prompt box. 
+################################################################################
+
+proc setPrinterName { param old new } {
+    send printEntry set string $new
+}; send printer addCallback setPrinterName
+
+set page_size	pageLetter
+
+proc pageRadio { widget type state args } {
+    global page_size
+
+    if {$state == 0} {
+	# Don't allow a button to be turned off.
+	send $widget set on 1
+    } else {
+	send $page_size set on 0
+	set page_size $widget
+    }
+} 
+foreach w {pageLetter pageLegal pageA4 pageB5} { send $w addCallback pageRadio }
+
+proc toPrinterToggle args {
+    global curtask HType hcurrent
+    if { [send toPrinter get on] } {
+	send toFile set on False
+	send printLabel set label "Printer: "
+        send printEntry set string "printer"
+    } else {
+	send toFile set on True
+	send printLabel set label "File Name: "
+	if {$HType($hcurrent) == "file" || [send srcOpt get on] == 1} {
+            send printEntry set string [format "%s" [fileSource] ]
+	} else {
+            send printEntry set string [format "%s.ps" $curtask]
+	}
+    }
+} ; send toPrinter addCallback toPrinterToggle
+
+proc toFileToggle args {
+    global curtask HType hcurrent
+    if { [send toFile get on] } {
+	send toPrinter set on False
+	send printLabel set label "File Name: "
+	if {$HType($hcurrent) == "file" || [send srcOpt get on] == 1} {
+            send printEntry set string [format "%s" [fileSource] ]
+	} else {
+            send printEntry set string [format "%s.ps" $curtask]
+	}
+    } else {
+	send toPrinter set on True
+	send printLabel set label "Printer: "
+        send printEntry set string "printer"
+    }
+} ; send toFile addCallback toFileToggle
+
+proc doPrintOkay { args } {
+    global curtask curpack HType hcurrent
+
+    set device [ send printEntry get string ]
+    if { [send toPrinter get on] } {
+        GCmd print $curtask $curpack $device
+    } else {
+	if {$HType($hcurrent) == "file" || [send srcOpt get on] == 1} {
+            GCmd directory save [fileSource] $fname 1 source
+	} else {
+            GCmd directory save [fileSource] $fname 1 postscript
+	}
+    }
+    send printShell unmap
+}
+send printOkay addCallback doPrintOkay
+send printEntry addCallback doPrintOkay
+
+send printDismiss addCallback "send printShell unmap "
+
+
+################################################################################
+#  Procedures used by the fileBrowser.
+################################################################################
+
+# File browsing globals
+set curdir	""				;# current directory
+set pattern	"*"				;# filename template
+set format	"fmtSrc"			;# SaveAs format
+
+
+# Browser selection callback.
+proc browserSelect { widget event args } {
+    global curdir helpOption
+
+    set opt [expr {$widget == "dirList" ? "dirlist" : "loadfile"}]
+    set item [send $widget getItem itemno]
+    send $widget getItem itemno
+    set mode [send fbcOkay get label]
+
+    if { $itemno != "none" } {
+        if { $mode == "Load"} {
+	    if {$opt != "dirlist"} {
+    	        addHistRecord "" "" "" help [format "%s%s" $curdir $item] "file"
+	    }
+            GCmd directory $opt $item
+	    send flistText set string [format "  file    Okay    %s%s\n" \
+		$curdir $item]
+        } else {
+	    if {$opt == "dirlist"} {
+                GCmd directory $opt $item
+	    } else {
+	        send fnameEntry set string [format "%s%s" $curdir $item]
+	    }
+        }
+    }
+}
+send dirList  addEventHandler browserSelect buttonReleaseMask
+send fileList addEventHandler browserSelect buttonReleaseMask
+
+
+# Client callback.
+proc browserListing { param old new } {
+    global curdir pattern
+
+    set option [ lindex $new 0 ]
+    switch $option {
+	dirlist	    { set list [lindex $new 1]
+		      send dirList  setList $list resize
+		    }
+	filelist    { set list [lindex $new 1]
+		      send fileList setList $list resize
+		    }
+	template    { set pattern [lindex $new 1]
+		      send filterEntry set string $pattern
+		    }
+	curdir      { set curdir [lindex $new 1]
+		      send curdirVal set label $curdir
+		    }
+	selection   { send fnameEntry set string [lindex $new 1] }
+    }
+} ; send directory addCallback browserListing
+
+
+# Set the filename matching template.
+proc setTemplate { widget mode pattern args } {
+    GCmd directory template $pattern
+} ; send filterEntry addCallback setTemplate
+
+
+# get the filename of the currently displayed page.
+proc fileSource { args } {
+    global helpOption
+
+    set str [ send flistText get string ]
+
+    set fname ""
+    for {set i 0} {$i < [llength $str]} {incr i 3} {
+        set j [expr {$i + 2} ]
+	if {($helpOption == "source" && [lindex $str $i] == "src") ||
+	    ($helpOption == "sysdoc" && [lindex $str $i] == "sys") ||
+	    ($helpOption == "help" && [lindex $str $i] == "hlp") ||
+	    ($helpOption == "file" && [lindex $str $i] == "file")} {
+	        set fname [lindex $str $j]
+		break
+        }
+    }
+    return $fname
+}
+
+# Open a specific file, either to load a new page or save the current page.
+proc openFile { widget args } {
+    global curdir helpOption
+
+    set fname [send fnameEntry get string]
+
+    if {$fname == ""} {
+	setAlert param old "No filename specified"
+    } else {
+        if { [send fbcOkay get label] == "Load"} {
+    	    addHistRecord "" "" "" "" [format "%s%s" $curdir $fname] "file"
+            GCmd directory open $fname
+	    send flistText set string [format " file    Okay    %s\n" $fname]
+        } else {
+	    set page 	[fileSource]
+	    set ow [send overwrite get on]
+	    if {[send fmtSrc get on] == 1} {
+                GCmd directory save $page $fname $ow source
+	    } elseif {[send fmtText get on] == 1} {
+                GCmd directory save $page $fname $ow text
+	    } elseif {[send fmtHTML get on] == 1} {
+                GCmd directory save $page $fname $ow html
+	    } elseif {[send fmtPS get on] == 1} {
+                GCmd directory save $page $fname $ow postscript
+	    }
+        }
+    }
+} ; send fbcOkay addCallback openFile
+
+
+# Make the SaveAs formats a radio box.
+proc fmtRadio { widget type state args } {
+    global format
+
+    if {$state == 0} {
+	# Don't allow a button to be turned off.
+	send $widget set on 1
+    } else {
+	send $format set on 0
+	set format $widget
+    }
+
+    # If there's no filename specified set one as a default.
+    setDefaultFname
+
+} ; foreach w {fmtSrc fmtText fmtHTML fmtPS} { send $w addCallback fmtRadio }
+
+
+# Set a default filename based on the selected format and task name
+proc setDefaultFname args {
+    global format curtask curdir
+
+    set fname [send fnameEntry get string]
+    if {$curtask != ""} {
+        switch $format {
+	    fmtSrc  { send fnameEntry \
+			set string [format "%s%s" $curdir $curtask]  }
+	    fmtText { send fnameEntry \
+			set string [format "%s%s.txt" $curdir $curtask]  }
+	    fmtHTML { send fnameEntry \
+			set string [format "%s%s.html" $curdir $curtask] }
+	    fmtPS   { send fnameEntry \
+			set string [format "%s%s.ps" $curdir $curtask]   }
+        }
+    }
+}
+
+proc browserHelp args {
+    if { [send fbcOkay get label] == "Load"} {
+	showHelp lfiles
+    } else {
+	showHelp sfiles
+    }
+} ; send fbcHelp addCallback browserHelp
+
+send fnavHome 	 addCallback "GCmd directory home"
+send fnavUp   	 addCallback "GCmd directory up"
+send fnavRoot 	 addCallback "GCmd directory root"
+send fnavRescan  addCallback "GCmd directory rescan"
+send fnameClear  addCallback "send fnameEntry set string \"\""
+send filterClear addCallback "send filterEntry set string \"\""
+send fbcDismiss  addCallback "send fileBrowser unmap"
+
+
+
+################################################################################
+# Procedures used by the find box. 
+################################################################################
+
+proc doFindOkay args {
+    set dir     forward
+    set case    caseless
+    set phrase  [send findEntry get string]
+
+    if { $phrase != "" } {
+	if { [send findDir get on] }  { set dir backward  }
+	if { [send findCase get on] } { set case caseSensitive }
+
+	if { [send helpText searchText $phrase start end $dir $case] > 0 } { 
+	    set elid   [lindex [lindex $start 0] 0]
+	    set id     [max 1 [expr $elid - 10] ]
+
+	    send helpText gotoId $id
+	    send helpText setSelection $start $end
+	} else {
+            send warnText set label "Search string not found."
+            send warning map
+	}
+    } else {
+        send warnText set label "Warning: No search phrase entered."
+        send warning map
+    }
+} ; foreach w { findOkay findEntry } { send $w addCallback doFindOkay }
+
+send findClear   addCallback { send findEntry set string "" }
+send findDismiss addCallback { send findShell popdown	    }
+
+
+################################################################################
+# Procedures used by the apropos prompt box. 
+################################################################################
+
+proc doSearchOkay args {
+    set phrase  [send searchEntry get string]
+    if { $phrase != "" } {
+	send searchStatus set label "Searching..."
+        GCmd search [send exactMatch get on] $phrase
+    } else {
+        send warnText set label "Warning: No search phrase entered."
+        send warning map
+    }
+} ; foreach w { searchOkay searchEntry } { send $w addCallback doSearchOkay }
+
+proc searchResults { param old new } {
+    global search_mapped
+
+    if {$search_mapped == 0} {
+	Search
+    }
+    send resList setText $new
+    send resList retestAnchors
+    send searchStatus set label ""
+} ; send apropos addCallback searchResults
+
+# Selection callback.
+proc searchAnchorSelected {widget cbtype event text href args} {
+    global helpOption helpType curpack curtask
+    global visited
+
+    # Break out the task and package names.
+    set pack [lindex [split $href "."] 0]
+    set task [lindex [split $href "."] 1]
+
+    # Set the state and load the page.
+    if {$helpOption != "help"} {
+	send [getOptWidget $helpOption] set on 0
+	setOptColor hlpOpt green
+    }
+    set curtask    $task
+    set curpack    $pack
+    set helpOption "help"
+    set helpType   [expr {($pack == $task) ? "package" : "task"}]
+    GCmd load $curtask $curpack $helpOption
+
+    # Add the history record, one for the package and one for the task.
+    addHistRecord $curpack $curpack "" $helpOption "" "package"
+    if {$pack != $task} {
+        addHistRecord $curpack $curtask "" $helpOption "" "task"
+    }
+    send htbButton set sensitive True 
+    send htuButton set sensitive True 
+    editHistoryMenu
+    printHistStack "searchAnchorSelected"
+
+    # Update the topic entry string.
+    if { $task == $pack } {
+       send topicEntry set string $pack
+    } else {
+       send topicEntry set string [ format "%s.%s" $pack $task ]
+    }
+
+    set visited($href) 1
+    send resList retestAnchors
+
+} ; send resList addCallback searchAnchorSelected anchor
+
+proc doSearchClear args {
+    send searchEntry set string ""
+} ; send searchClear addCallback doSearchClear
+
+proc doSearchDismiss args {
+    global search_mapped
+
+    set search_mapped 0
+    send searchShell unmap
+} ; send searchDismiss addCallback doSearchDismiss
+
+send searchHelp addCallback { showHelp search }
+
+
+################################################################################
+#     Define procedures for the help panel    
+################################################################################
+
+# Stuff for keeping track of visited anchors.
+set h_links 		{ 0 }
+set h_linkIndex 	  0
+
+proc getHelpText { param old new } {
+    send hlpText setText $new
+}; send help addCallback getHelpText
+
+proc anchorSelected {widget cbtype event text href args} {
+    global visited h_links h_linkIndex
+    set anchID [send hlpText anchorToId $href]
+    set visited($href) 1
+    if {$h_linkIndex == 0} {
+	send hlpBack set sensitive True
+        if {[lindex $h_links 1] != $anchID} {
+	    set h_links { 0 }
+	    send hlpForward set sensitive False
+        } 
+    } 
+    if {$h_linkIndex > 0 && \
+	[lindex $h_links [expr $h_linkIndex + 1]] != $anchID} {
+	    #set h_links [lrange $h_links 0 $h_linkIndex]
+	    set pos [send hlpText positionToId 0 0]
+	    set h_links [lreplace $h_links $h_linkIndex end $pos]
+    }
+    if {[lindex $h_links [expr $h_linkIndex + 1]] != $anchID} {
+        lappend h_links $anchID
+        incr h_linkIndex
+    } else {
+        send hlpForward set sensitive False
+        incr h_linkIndex
+    }
+    if {$h_linkIndex == [expr [llength $h_links] - 1]} {
+	send hlpForward set sensitive False
+    }
+    send hlpText gotoId $anchID
+    send hlpText retestAnchors
+}; send hlpText addCallback anchorSelected anchor
+
+
+# Callbacks to position forwards and backwards in link list.
+proc hlpForward args {
+    global h_links h_linkIndex
+    incr h_linkIndex
+    if {$h_linkIndex <= [llength $h_links]} {
+        set anchID [lindex $h_links $h_linkIndex] 
+        send hlpText gotoId $anchID
+        send hlpText retestAnchors
+	if {$h_linkIndex == [expr [llength $h_links] - 1]} {
+	    send hlpForward set sensitive False
+	    send hlpBack set sensitive True
+	} else {
+	    send hlpBack set sensitive True
+	}
+    } else {
+	incr h_linkIndex -1
+    }
+}; send hlpForward addCallback hlpForward
+
+proc hlpBack args {
+    global h_links h_linkIndex
+    incr h_linkIndex -1
+    if {$h_linkIndex >= 0} {
+        set anchID [lindex $h_links $h_linkIndex] 
+        send hlpText gotoId $anchID
+        send hlpText retestAnchors
+	if {$h_linkIndex == 0} { send hlpBack set sensitive False   }
+	if {$h_linkIndex >= 0} { send hlpForward set sensitive True }
+    } else {
+        incr h_linkIndex 1
+    }
+}; send hlpBack addCallback hlpBack
+
+proc hlpHome args {
+    global h_links h_linkIndex
+    set h_links { 0 }
+    set h_linkIndex  0
+    send hlpText gotoId 0
+    send hlpForward set sensitive False
+    send hlpBack set sensitive False
+}; send hlpHome addCallback hlpHome
+
+proc hlpTutorial args {
+    showHelp tutorial
+}; send hlpTutorial addCallback hlpTutorial
+send hlpTutorial unmap				;# NO TUTORIAL AT THE MOMENT
+
+proc showHelp {name args} {
+    anchorSelected widget cbtype event text #$name
+    send hlpShell map
+}
+
+proc hlpFind args {
+    set phrase  [send hfEntry get string]
+    set dir  forward
+    set case caseless
+
+    if { $phrase != "" } {
+	if { [send hfDir get on] }  { set dir backward  }
+	if { [send hfCase get on] } { set case caseSensitive  }
+	if {[send hlpText searchText $phrase start end $dir $case ] > 0} { 
+	    set elid   [lindex [lindex $start 0] 0]
+	    set id     [max 1 [expr $elid - 10] ]
+	    send hlpText gotoId $id
+	    send hlpText setSelection $start $end
+	} else {
+            send warnText set label "Search string not found."
+            send warning map
+	}
+    } else {
+        send warnText set label "Warning: No search phrase entered."
+        send warning map
+    }
+} ; foreach w { hfEntry hfFind } { send $w addCallback hlpFind }
+
+send hfClear addCallback { send hfEntry set string "" }
+
+send hlpDismiss addCallback "send hlpShell unmap"
+
+
+################################################################################
+#  Document source viewer procedures. 
+################################################################################
+
+proc srcOpen { args } { send doc_source map } 
+send srcDismiss addCallback "send doc_source unmap"
+
+
+################################################################################
+#  Define some TCL debug procedures 
+################################################################################
+
+proc tclOpen {} { send tclShell map }
+
+proc tclCommandClear { widget args } { 
+    send tclEntry set string "" 
+} ; send tclClear addCallback tclCommandClear
+
+proc tclCommandExecute { widget args } { \
+	send server [send tclEntry {get string}] 
+} ; send tclExecute addCallback tclCommandExecute
+
+proc tclCommand { widget mode command args } { 
+    send server $command 
+} ; send tclEntry addCallback tclCommand
+
+proc tclToggleLogging args {
+    global debug
+    if { [ send tclLogging get state] } { 
+        set debug 1 
+        send tclLogging set label "Disable Logging"
+    } else { 
+        set debug 0 
+        send tclLogging set label "Enable Logging"
+    }
+} ; tclToggleLogging
+send tclLogging addCallback tclToggleLogging
+
+send tclDismiss addCallback	"send tclShell unmap"
+
+# Connect the 'textout' parameter so it appends messages from
+# the client to the Tcl text window.
+proc tclLogMessages { param old new } {
+    global debug
+    if {$debug == 1} { send tclEntry append [format "%s\n" $new ] }
+} ; send textout addCallback tclLogMessages
+
+
+################################################################################
+# Warning dialog.  This pops up a dialog box with the given warning message.
+################################################################################
+
+proc warnOkay {widget args} {
+    global curpack curtask
+
+    set label [send warnText get label]
+    if {[string match "No*" $label ] == 1} {
+	set topic [send topicEntry get string]
+	set last [string last "." $topic ]
+        send topicEntry set string [ string range $topic 0 [ incr last -1 ] ]
+    }
+    send warning unmap
+}; send warnDismiss addCallback warnOkay
+
+
+# The parameter "alert" is used to forward alerts from the client.  The 
+# special 'dismiss' value can be used to shut down the alert from the
+# client, the special "pop" value pops the last history elements from the
+# stack (used in case of an error loading a file).
+
+proc setAlert {param old new} {
+    global HPkg HType HUrl HOpt HTask HFile htop hcurrent
+
+    if {$new == "dismiss"} {
+        send warning unmap
+    } elseif {$new == "pop"} {
+        catch {
+            unset HType($hcurrent)
+            unset HOpt($hcurrent)
+            unset HTask($hcurrent)
+            unset HPkg($hcurrent)
+            unset HUrl($hcurrent)
+            unset HFile($hcurrent)
+        }
+        incr hcurrent -1
+    } else {
+        send searchStatus set label ""
+        send warnText set label $new
+        send warning map
+    }
+}; send alert addCallback setAlert
+
+

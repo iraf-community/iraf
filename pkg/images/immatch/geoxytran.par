@@ -1,0 +1,28 @@
+# Parameter set for the GEOXYTRAN Task
+
+input,s,a,,,,Input coordinate files to be transformed
+output,s,a,,,,Output transformed coordinate files
+database,f,a,,,,The GEOMAP database file
+transforms,s,a,,,,Names of the coordinate transforms in the database
+
+geometry,s,h,"geometric",|linear|geometric|,,'Transformation type (linear,geometric)'
+direction,s,h,"forward","forward|backward",,Transformation direction (forward|backward)
+xref,r,h,INDEF,,,X input origin in reference units
+yref,r,h,INDEF,,,Y input origin in reference units
+xmag,r,h,INDEF,,,X scale in output units per reference unit
+ymag,r,h,INDEF,,,Y scale in output units per reference unit
+xrotation,r,h,INDEF,,,X axis rotation in degrees
+yrotation,r,h,INDEF,,,Y axis rotation in degrees
+xout,r,h,INDEF,,,X output origin in output units
+yout,r,h,INDEF,,,Y output origin in output units
+xshift,r,h,INDEF,,,X origin shift in output units
+yshift,r,h,INDEF,,,Y origin shift in output units
+
+xcolumn,i,h,1,1,100,Input column containing the x coordinate
+ycolumn,i,h,2,1,100,Input column containing the y coordinate
+calctype,s,h,"real",|real|double|,,Data type for evaluation coordinates
+xformat,s,h,"",,,Output format of the x coordinate
+yformat,s,h,"",,,Output format of the y coordinate
+min_sigdigits,i,h,7,,,Minimum precision of output x and y coordinates
+
+mode,s,h,'ql'

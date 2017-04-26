@@ -1,0 +1,133 @@
+.help flatcombine Aug91 noao.imred.ccdred
+.ih
+NAME
+flatcombine -- Combine and process flat field images
+.ih
+USAGE
+flatcombine input
+.ih
+PARAMETERS
+.ls input
+List of flat field images to combine.  The \fIccdtype\fR parameter
+may be used to select the flat field images from a list containing all
+types of data.
+.le
+.ls output = "Flat"
+Output flat field root image name.  The subset ID is appended.
+.le
+.ls combine = "average" (average|median)
+Type of combining operation performed on the final set of pixels (after
+rejection).  The choices are
+"average" or "median".  The median uses the average of the two central
+values when the number of pixels is even.
+.le
+.ls reject = "avsigclip" (none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip)
+Type of rejection operation.  See \fBcombine\fR for details.
+.le
+.ls ccdtype = "flat"
+CCD image type to combine.  If no image type is given then all input images
+are combined.
+.le
+.ls process = yes
+Process the input images before combining?
+.le
+.ls subsets = yes
+Combine images by subset parameter?  If yes then the input images are
+grouped by subset parameter and each group combined into a separate output
+image.  The subset identifier is appended to the output and sigma image
+names.  See \fBsubsets\fR for more on the subset parameter.  This is generally
+used with flat field images.
+.le
+.ls delete = no
+Delete input images after combining?  Only those images combined are deleted.
+.le
+.ls clobber = no
+Clobber existing output images?
+.le
+.ls scale = "mode" (none|mode|median|mean|exposure)
+Multiplicative image scaling to be applied.  The choices are none, scale
+by the mode, median, or mean of the specified statistics section, or scale
+by the exposure time given in the image header.
+.le
+.ls statsec = ""
+Section of images to use in computing image statistics for scaling.
+If no section is given then the entire region of the image is
+sampled (for efficiency the images are sampled if they are big enough).
+.le
+
+.ce
+Algorithm Parameters
+.ls nlow = 1,  nhigh = 1 (minmax)
+The number of low and high pixels to be rejected by the "minmax" algorithm.
+.le
+.ls nkeep = 1
+The minimum number of pixels to retain or the maximum number to reject
+when using the clipping algorithms (ccdclip, crreject, sigclip,
+avsigclip, or pclip).  When given as a positive value this is the minimum
+number to keep.  When given as a negative value the absolute value is
+the maximum number to reject.  This is actually converted to a number
+to keep by adding it to the number of images.
+.le
+.ls mclip = yes (ccdclip, crreject, sigclip, avsigcliip)
+Use the median as the estimate for the true intensity rather than the
+average with high and low values excluded in the "ccdclip", "crreject",
+"sigclip", and "avsigclip" algorithms?  The median is a better estimator
+in the presence of data which one wants to reject than the average.
+However, computing the median is slower than the average.
+.le
+.ls lsigma = 3., hsigma = 3. (ccdclip, crreject, sigclip, avsigclip, pclip)
+Low and high sigma clipping factors for the "ccdclip", "crreject", "sigclip",
+"avsigclip", and "pclip" algorithms.  They multiply a "sigma" factor
+produced by the algorithm to select a point below and above the average or
+median value for rejecting pixels.  The lower sigma is ignored for the
+"crreject" algorithm.
+.le
+.ls rdnoise = "0.", gain = "1.", snoise = "0." (ccdclip, crreject)
+CCD readout noise in electrons, gain in electrons/DN, and sensitivity noise
+as a fraction.  These parameters are used with the "ccdclip" and "crreject"
+algorithms.  The values may be either numeric or an image header keyword
+which contains the value.
+.le
+.ls pclip = -0.5 (pclip)
+Percentile clipping algorithm parameter.  If greater than
+one in absolute value then it specifies a number of pixels above or
+below the median to use for computing the clipping sigma.  If less
+than one in absolute value then it specifies the fraction of the pixels
+above or below the median to use.  A positive value selects a point
+above the median and a negative value selects a point below the median.
+The default of -0.5 selects approximately the quartile point.
+See \fBcombine\fR for further details.
+.le
+.ls blank = 1.
+Output value to be used when there are no pixels.
+.le
+.ih
+DESCRIPTION
+The flat field images in the input image list are combined.  If there
+is more than one subset (such as a filter or grating) then the input
+flat field images are grouped by subset and an combined separately.
+The input images may be processed first if desired.  However if all
+zero level bias effects are linear then this is not necessary and some
+processing time may be saved.  The original images may be deleted
+automatically if desired.  The output pixel datatype will be real.
+
+This task is a script which applies \fBccdproc\fR and \fBcombine\fR.  The
+parameters and combining algorithms are described in detail in the help for
+\fBcombine\fR.  This script has default parameters specifically set for
+flat field images and simplifies the combining parameters.  There are other
+combining options not included in this task.  For these additional
+features, such as thresholding, offseting, masking, and projecting, use
+\fBcombine\fR.
+.ih
+EXAMPLES
+1. The image data contains four flat field images for three filters.
+To automatically select them and combine them as a background job
+using the default combining algorithm:
+
+    cl> flatcombine ccd*.imh&
+
+The final images are "FlatV", "FlatB", and "FlatR".
+.ih
+SEE ALSO
+ccdproc, combine, subsets
+.endhelp

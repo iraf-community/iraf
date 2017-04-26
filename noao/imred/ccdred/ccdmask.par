@@ -1,0 +1,12 @@
+image,f,a,,,,Input image
+mask,f,a,,,,Output pixel mask
+ncmed,i,h,7,1,,Column box size for median level calculation
+nlmed,i,h,7,1,,Line box size for median level calculation
+ncsig,i,h,15,10,,Column box size for sigma calculation
+nlsig,i,h,15,10,,Line box size for sigma calculation
+lsigma,r,h,6.,,,Low clipping sigma
+hsigma,r,h,6.,,,High clipping sigma
+ngood,i,h,5,1,,Minimum column length of good pixel seqments
+linterp,i,h,2,1,,Mask value for line interpolation 
+cinterp,i,h,3,1,,Mask value for column interpolation 
+eqinterp,i,h,2,1,,Mask value for equal interpolation

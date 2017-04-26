@@ -1,0 +1,71 @@
+.help zmaloc May84 "System Interface"
+.ih
+NAME
+zmaloc -- allocate memory
+.ih
+SYNOPSIS
+.nf
+zmaloc (buffer, nbytes, status)
+
+int	buffer			# address of buffer
+int	nbytes			# size of buffer
+int	status
+.fi
+.ih
+DESCRIPTION
+An uninitialized region of memory at least \fInbytes\fR in size is dynamically
+allocated.  The address of the newly allocated buffer in units of SPP chars
+is returned in \fIbuffer\fR.
+.ih
+RETURN VALUE
+XERR is returned in \fIstatus\fR if the buffer cannot be allocated.
+XOK is returned if the operation is successful.
+.ih
+NOTES
+The integer \fIbuffer\fR is a memory address in SPP char units with an
+arbitrary zero point, i.e., the type of address returned by \fBzlocva\fR.
+The high level code converts the buffer address into an offset into \fBMem\fR,
+i.e., into an SPP pointer.
+
+.nf
+	char_pointer_into_Mem = buffer - zlocva(Memc) + 1
+	Memc[char_pointer] = first char of buffer
+.fi
+
+Since the buffer address is returned in char units the buffer must be aligned
+to at least the size of a char; no greater degree of alignment is guaranteed
+nor required.  See the specifications of \fBzlocva\fR for additional information
+about addresses and address arithmetic.
+
+If the host system does not provide buffer management primitives (heap
+management facilities), but can dynamically allocate memory to a process,
+it will be necessary to build a memory allocator.  This is normally done
+by dynamically changing the top of the process address space.  The region
+between the highest address allocated at process creation time and the
+current top of the process address space is the region used by the heap.
+A simple and adequate heap management technique is to implement the heap
+as a circular singly linked list of buffers.  Each buffer is preceded by
+a pointer to the next buffer and a flag telling whether or not the buffer
+is currently allocated.  Successive unused buffers are periodically collected
+together into a single large buffer to minimize fragmentation.  A buffer is
+allocated by searching around the circular list for either the first fit
+or the best fit.  If an unused buffer of sufficient size is not found,
+additional physical memory is allocated to the process and linked into the
+list.
+
+On a system which cannot dynamically allocate memory to a process it will be
+necessary to statically allocate a large \fBMem\fR common.  The heap
+management algorithm described above will work just as effectively for a
+static array as for a dynamic region.  If a heap manager has to be coded for
+more than one machine we should add a semi-portable version to the system
+(all current IRAF target machines provide heap management facilities at the
+host level so we have not coded a portable memory allocator).
+
+Dynamic memory allocation may be used in the kernel implementation as well
+as in the portable system and applications code.  In general it is necessary
+to use the same memory allocator in both the kernel and the high level
+code to avoid trashing memory.
+.ih
+SEE ALSO
+zmfree, zraloc, zlocva
+.endhelp

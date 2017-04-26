@@ -1,0 +1,51 @@
+.help zfiosf May84 "System Interface"
+.ih
+NAME
+zfiosf -- static file driver
+.ih
+SYNOPSIS
+.nf
+zopnsf (osfn, mode, chan)		# open static file
+zclssf (chan, status)			# close static file
+zardsf (chan, buf, maxbytes, loffset)	# asynchronous read
+zawrsf (chan, buf,   nbytes, loffset)	# asynchronous write
+zawtsf (chan, status)			# wait for transfer
+zsttsf (chan, param, lvalue)		# get file/device status
+
+packed	char osfn[]
+char	buf[]
+int	mode, chan, maxbytes, nbytes, param, status
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+The static file driver is used to randomly access binary files which do not
+change in size once created, hence the term static.  Except where noted
+herein, the specifications of the static file driver are equivalent to those
+of the ordinary random access binary file driver.
+
+A static binary file is created by the kernel primitive \fBzfaloc\fR,
+hence \fBzopnsf\fR cannot be used to create a new file (NEW_FILE mode is not
+supported).  The asynchronous read and write primitives behave conventionally
+except that writing at EOF or overwriting EOF is not permitted.
+.ih
+NOTES
+The static file driver should provide the lowest possible level of binary
+file i/o for maximum efficiency.  Since the file size is known at file creation
+time it is often possible to allocate a contiguous file.  Given a contiguous or
+nearly contiguous file which does not change in size it is sometimes possible
+to bypass the host files system once the file has been created, i.e., to
+map the \fBzfiosf\fR primitives directly into calls to the disk driver on the
+host machine.
+
+On a virtual memory machine it may also be possible to map the static file
+into virtual memory, i.e., defer i/o until the file data is actually used.
+If a virtual memory interface is implemented \fBzardsf\fR will remap pages
+of memory, \fBzawrsf\fR will update pages of memory, \fBzawtsf\fR will do
+nothing but return status, and \fBzclssf\fR will update and unmap any
+mapped pages and close the file.  See the reference manual for further
+discussion of static file implementation strategies.
+.ih
+SEE ALSO
+zfiobf, manual pages for the binary file driver
+.endhelp

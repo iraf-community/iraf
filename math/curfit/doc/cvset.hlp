@@ -1,0 +1,56 @@
+.help cvset Nov84 "Curfit Package"
+.ih
+NAME
+cvset -- input fit parameters derived external to CURFIT
+.ih
+SYNOPSIS
+include <math/curfit.h>
+
+cvset (cv, curve_type, xmin, xmax, coeff, ncoeff)
+
+.nf
+pointer	cv		# pointer to curve descriptor
+int	curve_type	# functional form of the curve to be fitted
+real	xmin, xmax	# minimum and maximum x values
+real	coeff[ncoeff]	# coefficient array
+int	ncoeff		# number of coefficients
+.fi
+.ih
+ARGUMENTS
+.ls cv    
+Pointer to curve descriptor structure. Returned by CVSET.
+.le
+.ls curve_type
+Type of curve to be input. Must be one of LEGENDRE, CHEBYSHEV, SPLINE3
+or SPLINE1.
+.le
+.ls xmin, xmax
+The minimum and maximum data or fitted x values. The Legendre and
+Chebyshev polynomials are assumed to be normalized over this range.
+For the cubic and linear spline functions, the data range (xmax - xmin) is
+divided into (ncoeff - 3) and (ncoeff - 1) evenly spaced polynomial pieces
+respectively.
+.le
+.ls coeff
+Array containing the coefficients. Must have at least 7 + order
+elements, where order has the same meaning as the order parameter set in CVINIT.
+.le
+.ls ncoeff
+The number of coefficients. For polynomial functions, ncoeff
+equals 1 plus the order of the polynomial, e.g. a second order
+polynomial curve will have three coefficients. For the cubic
+and linear spline the number of polynomial pieces fit are
+(ncoeff - 3) and (ncoeff - 1) respectively.
+.le
+.ih
+DESCRIPTION
+CVSET returns cv the pointer to the curve descriptor and
+stores the curve parameters  in the CURFIT structure ready for
+use by CVEVAL or CVVECTOR.
+.ih
+NOTES
+The splines are assumed to have been fit in the least squares sense.
+.ih
+SEE ALSO
+cvsave
+.endhelp

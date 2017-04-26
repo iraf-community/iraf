@@ -1,0 +1,35 @@
+.help cvsave Aug84 "Curfit Package"
+.ih
+NAME
+cvsave -- save parameters of fit
+.ih
+SYNOPSIS
+call cvsave (cv, fit)
+
+.nf
+pointer	cv		# curve descriptor
+real	fit[]		# array containing the fit parameters
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+The pointer to the curve descriptor structure.
+.le
+.ls fit  
+Array containing the fit parameters.
+Fit must contain at least 7 + order elements, where order is the order of the
+fit as set in CVINIT.
+.le
+.ih
+DESCRIPTION
+CVSAVE saves the curve parameters in the real array fit.
+The first four elements of fit contain the curve_type, order, xmin and xmax.
+The coefficients are stored in the remaining array elements.
+.ih
+NOTES
+CVSAVE does not preserve the matrices and vectors used by the fitting
+routines.
+.ih
+SEE ALSO
+cvrestore
+.endhelp

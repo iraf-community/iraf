@@ -1,0 +1,29 @@
+.help sep Jun99 "Slalib Package"
+.nf
+
+      REAL FUNCTION slSEP (A1, B1, A2, B2)
+
+     - - - -
+      S E P
+     - - - -
+
+  Angle between two points on a sphere (single precision)
+
+  Given:
+     A1,B1    real    spherical coordinates of one point
+     A2,B2    real    spherical coordinates of the other point
+
+  (The spherical coordinates are RA,Dec, Long,Lat etc, in radians.)
+
+  The result is the angle, in radians, between the two points.  It
+  is always positive.
+
+  Called:  slCS2C
+
+  P.T.Wallace   Starlink   April 1985
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

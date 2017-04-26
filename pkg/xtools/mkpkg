@@ -1,0 +1,80 @@
+# XTOOLS Programming tools library.
+
+update:
+	$checkout libxtools.a lib$
+	$update	  libxtools.a
+	$checkin  libxtools.a lib$
+	$purge    lib$
+	;
+
+txtcompile:
+	$omake	t_txtcompile.x
+	$link	t_txtcompile.o -lxtools -o xx_txtcompile.e
+	$move	xx_txtcompile.o bin$x_txtcompile.e
+	;
+
+generic:
+	$set GEN = "$$generic -k"
+	$ifolder (xtsample.x, xtsample.gx)
+	    $(GEN) xtsample.gx -o xtsample.x $endif
+	$ifolder (xtstat.x, xtstat.gx)
+	    $(GEN) xtstat.gx -o xtstat.x $endif
+	;
+
+libxtools.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	@ranges		# Range tools "1:10,5:20,30"
+	@gtools		# Graphics tools
+	@icfit		# Interactive curfit package
+	@inlfit		# Interactive non-linear least-squares package
+	@fixpix		# Mask and pixel fixing routines
+	@skywcs		# Sky coordinates transformation routines
+	@catquery	# Catalog and survey access routines
+	@mef		# MEF handling routines
+
+	center1d.x	<math/iminterp.h> <pkg/center1d.h>
+	clgcurfit.x	<math/curfit.h>
+	clginterp.x	<math/iminterp.h>
+	clgsec.x	<ctype.h> <imhdr.h> <mach.h>
+	cogetr.x	cogetr.h <imhdr.h>
+	dttext.x	<ctotok.h> <ctype.h> <error.h> <finfo.h> <fset.h>\
+			<pkg/dttext.h> <time.h>
+	extrema.x	
+	getdatatype.x	
+	gstrdetab.x	
+	gstrentab.x	
+	gstrsettab.x	
+	imtools.x	<ctype.h> <imhdr.h>
+	intrp.f
+	isdir.x		<ctype.h> <finfo.h>
+	peaks.x	
+	ranges.x	<ctype.h> <mach.h>
+	rmmed.x		<pkg/rmsorted.h> <mach.h>
+	rmsorted.x	<pkg/rmsorted.h>
+	rmturlach.x	<mach.h>
+	rngranges.x	<ctype.h> <mach.h>
+	obsdb.x		<error.h> <imset.h>
+	strdetab.x	
+	strentab.x	
+	syshost.x	<clset.h> <ctotok.h>
+	xt21imsum.x	<imhdr.h>
+	xtanswer.x	<pkg/xtanswer.h>
+	xtargs.x	<ctotok.h>
+	xtbitarray.x	<mach.h>
+	xtextns.x       <ctype.h> <error.h> <mach.h> <pkg/mef.h>
+	xtgids.x	<ctotok.h>
+	xtimleneq.x	<imhdr.h>
+	xtimnames.x
+	xtimtgetim.x	
+	xtlogfiles.x
+	xtmaskname.x	
+	xtmksection.x	<imhdr.h>
+	xtphistory.x	<imhdr.h>
+	xtsample.x	<imhdr.h>
+	xtsort.x	
+	xtstat.x
+	xtstripwhite.x	<ctype.h>
+	xtsums.x	
+	xttxtfio.x
+	;

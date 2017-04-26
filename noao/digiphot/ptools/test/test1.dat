@@ -1,0 +1,133 @@
+#K IRAF       = NOAO/IRAFV2.10BETA      version    %-23s     
+#K USER       = davis                   name       %-23s     
+#K HOST       = tucana                  computer   %-23s     
+#K DATE       = 10-04-91                mm-dd-yr   %-23s     
+#K TIME       = 07:57:32                hh:mm:ss   %-23s     
+#K PACKAGE    = apphot                  name       %-23s     
+#K TASK       = phot                    name       %-23s     
+#
+#K SCALE      = 1.                      units      %-23.7g   
+#K FWHMPSF    = 2.                      scaleunit  %-23.7g   
+#K EMISSION   = yes                     switch     %-23b     
+#K DATAMIN    = INDEF                   counts     %-23.7g   
+#K DATAMAX    = INDEF                   counts     %-23.7g   
+#K EXPOSURE   = ""                      keyword    %-23s     
+#K AIRMASS    = ""                      keyword    %-23s     
+#K FILTER     = ""                      keyword    %-23s     
+#K OBSTIME    = ""                      keyword    %-23s     
+#
+#K NOISE      = poisson                 model      %-23s     
+#K THRESHOLD  = 30.                     counts     %-23.7g   
+#K CTHRESHOLD = 0.                      counts     %-23.7g   
+#K SIGMA      = 10.                     counts     %-23.7g   
+#K GAIN       = ""                      keyword    %-23s     
+#K EPADU      = 1.                      e-/adu     %-23.7g   
+#K CCDREAD    = ""                      keyword    %-23s     
+#K READNOISE  = 0.                      e-         %-23.7g   
+#
+#K CALGORITHM = none                    algorithm  %-23s     
+#K CBOXWIDTH  = 5.                      scaleunit  %-23.7g   
+#K MAXSHIFT   = 1.                      scaleunit  %-23.7g   
+#K CMAXITER   = 10                      number     %-23d     
+#K MINSNRATIO = 1.                      number     %-23.7g   
+#K CLEAN      = no                      switch     %-23b     
+#K RCLEAN     = 1.                      scaleunit  %-23.7g   
+#K RCLIP      = 2.                      scaleunit  %-23.7g   
+#K KCLEAN     = 3.                      sigma      %-23.7g   
+#
+#K SALGORITHM = mode                    algorithm  %-23s     
+#K ANNULUS    = 6.                      scaleunit  %-23.7g   
+#K DANNULUS   = 12.                     scaleunit  %-23.7g   
+#K SMAXITER   = 10                      number     %-23d     
+#K SKREJECT   = 3.                      sigma      %-23.7g   
+#K SNREJECT   = 50                      number     %-23d     
+#K KHIST      = 3.                      sigma      %-23.7g   
+#K BINSIZE    = 0.1                     sigma      %-23.7g   
+#K SMOOTH     = no                      switch     %-23b     
+#K RGROW      = 0.                      scaleunit  %-23.7g   
+#K SKYVALUE   = 0.                      counts     %-23.7g   
+#
+#K WEIGHTING  = constant                model      %-23s     
+#K APERTURES  = 3.0,5.0                 scaleunit  %-23s     
+#K ZMAG       = 25.                     zeropoint  %-23.7g   
+#
+#N IMAGE               XINIT     YINIT     ID   COORDS                 LID     \
+#U imagename           pixels    pixels    ##   filename               ##      \
+#F %-23s               %-10.2f   %-10.2f   %-5d %-23s                  %-5d     
+#
+#N XCENTER  YCENTER    XSHIFT  YSHIFT  XERR    YERR    CIER CERROR             \
+#U pixels   pixels     pixels  pixels  pixels  pixels  ##   cerrors            \
+#F %-12.2f  %-11.2f    %-8.2f  %-8.2f  %-8.2f  %-8.2f  %-5d %-13s               
+#
+#N MSKY           STDEV          SSKEW          NSKY   NSREJ SIER SERROR       \
+#U counts         counts         counts         npix   npix  ##   serrors      \
+#F %-18.7g        %-15.7g        %-15.7g        %-7d   %-6d  %-5d %-13s         
+#
+#N ITIME          XAIRMASS       IFILTER                OTIME                  \
+#U timeunit       number         name                   timeunit               \
+#F %-18.7g        %-15.7g        %-23s                  %-23s                   
+#
+#N RAPERT   SUM            AREA           MAG    MERR    PIER PERROR           \
+#U scale    counts         pixels         mag    mag     ##   perrors          \
+#F %-12.2f  %-15.7f        %-15.7f        %-7.3f %-6.3f  %-5d %-13s             
+#
+testim                 41.05     4.01      1    testim.coo.1           1       \
+   41.05    4.01       0.00    0.00    INDEF   INDEF   0    No_error           \
+   101.2498       10.10408       3.265505       422    10    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     4177.432       28.38464       17.212 0.055 0    No_error          *\
+   5.00     0.             0.             INDEF  INDEF 302  Out_of_bounds     * 
+testim                 23.05     7.01      2    testim.coo.1           2       \
+   23.05    7.01       0.00    0.00    INDEF   INDEF   0    No_error           \
+   100.046        10.3039        5.156589       599    26    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     3729.583       28.38464       17.627 0.078 0    No_error          *\
+   5.00     9275.692       79.08551       17.163 0.083 0    No_error          * 
+testim                 18.01     7.98      3    testim.coo.1           3       \
+   18.01    7.98       0.00    0.00    INDEF   INDEF   0    No_error           \
+   99.18147       9.960084       4.406289       624    27    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     3848.674       28.38741       17.465 0.066 0    No_error          *\
+   5.00     9254.844       79.12583       17.129 0.078 0    No_error          * 
+testim                 25.99     22.00     4    testim.coo.1           4       \
+   25.99    22.00      0.00    0.00    INDEF   INDEF   0    No_error           \
+   100.8048       10.62133       5.339536       839    57    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     4807.073       28.38794       16.777 0.040 0    No_error          *\
+   5.00     10242.03       79.1264        16.612 0.053 0    No_error          * 
+testim                 35.99     22.00     5    testim.coo.1           5       \
+   35.99    22.00      0.00    0.00    INDEF   INDEF   0    No_error           \
+   101.8237       10.81446       5.27525        836    32    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     5733.314       28.38794       16.366 0.030 0    No_error          *\
+   5.00     11055.33       79.12638       16.308 0.041 0    No_error          * 
+testim                 8.00      22.96     6    testim.coo.1           6       \
+   8.00     22.96      0.00    0.00    INDEF   INDEF   0    No_error           \
+   98.55382       9.745545       -1.86605       642    15    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     5121.953       28.38596       16.584 0.033 0    No_error          *\
+   5.00     10346.71       79.10844       16.484 0.045 0    No_error          * 
+testim                 30.96     25.04     7    testim.coo.1           7       \
+   30.96    25.04      0.00    0.00    INDEF   INDEF   0    No_error           \
+   101.0168       10.24696       1.970369       865    39    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     4406.198       28.38385       17.032 0.048 0    No_error          *\
+   5.00     10425.96       79.07048       16.532 0.048 0    No_error          * 
+testim                 21.06     26.07     8    testim.coo.1           8       \
+   21.06    26.07      0.00    0.00    INDEF   INDEF   0    No_error           \
+   100.5127       10.64676       6.194943       841    65    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     3008.981       28.37686       19.512 0.409 0    No_error          *\
+   5.00     8254.723       78.98734       18.753 0.346 0    No_error          * 
+testim                 28.96     33.93     9    testim.coo.1           9       \
+   28.96    33.93      0.00    0.00    INDEF   INDEF   0    No_error           \
+   101.6732       10.37004       5.42453        845    61    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     3637.463       28.37949       17.809 0.090 0    No_error          *\
+   5.00     8691.696       79.00822       17.953 0.164 0    No_error          * 
+testim                 35.99     41.97     10   testim.coo.1           10      \
+   35.99    41.97      0.00    0.00    INDEF   INDEF   0    No_error           \
+   101.5544       10.21878       4.627132       673    19    0    No_error     \
+   1.             INDEF          INDEF                  INDEF                  \
+   3.00     5199.237       28.38675       16.588 0.034 0    No_error          *\
+   5.00     10383.58       79.12172       16.573 0.050 0    No_error          * 

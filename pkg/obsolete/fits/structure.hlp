@@ -1,0 +1,363 @@
+.help fits Apr84 "Program Structure"
+.sh
+RFITS Structure Chart
+
+.nf
+t_rfits ()
+# Returns when file list is satisfied or if EOT is encountered
+# Errors from called routines are trapped and printed as a warning.
+
+	read_fits (fitsfile, iraffile)
+	# Returns OK or EOF
+
+		read_header (fits_fd, fits, im)
+		# Returns OK or EOF
+
+	    		decode_fits_card (fits, im, card)
+			# Returns YES or NO
+
+				get_fits_string (card, str, maxchar)
+
+		read_image (fits_fd, fits, im)
+		# Invokes error handler if EOF is encountered
+
+			set_image_header (fits, im)
+
+			set_coords (im)
+			# sets the coordinate transformations to a 1 to 1
+			# mapping
+
+			init_read_pixels (npix_record, bitpix, lsbf, spp_type)
+			# Returns OK
+
+			put_imageline (im, bufptr, v, pixel_type)
+			# Outputs line to image
+
+			read_pixels (fd, buffer, npix)
+			# Returns EOF or the number of pixels converted
+
+			map_blanks (a, blanks, im)
+
+			scale_line (line, bufptr, npix, bscale, bzero,
+				    pixel_type)
+			# Converts the pixels to the output data type after
+			# applying bscale and bzero to the data
+
+			change_line(line, bufptr, npix, pixel_type)
+			# Changes the FITS integers to the output pixel_type
+			# without scaling.
+.fi
+
+.sh
+RFITS Structure Summary
+
+.ls 4 t_rfits
+The main procedure reads the control parameters.
+The files to be read and converted are calculated from the specified source
+and file list.  A loop through
+the files determines the specific input source names and output filenames
+and calls READ_FITS for each conversion.
+.ls read_fits
+The input source is opened and the output image header file is created.
+If only the FITS header is to be listed then a temporary image header file
+is created.  The FITS header is read and decoded into the IRAF image
+header by READ_HEADER.  If the image is to be read then MAKE_IMAGE is
+called.  Finally, all files are closed.  If a temporary image header file
+was created it is deleted.
+.ls read_header
+Some initialization is done on the IRAF header.
+The FITS header cards are read one at a time.  If EOF is encountered
+then EOF is returned.  If a long header listing has been specified then
+the card is printed.  The card is passed to DECODE_FITS_CARD.  If
+DECODE_FITS_CARD returns YES for the END card then the loop exits.  If a
+short header listing has bee specified then the title and image size
+is printed.  The routine returns OK if the header was successfully
+interpreted or EOF if encountered.  All other errors are returned
+via the error handler.
+.ls decode_fits_card
+A series of STRMATCHes are made against the recognized FITS keywords.
+If a match is found the possible actions are:
+.ls
+Convert a value to the IRAF image header.  The conversions are defined in
+fits.h
+.le
+.ls
+Invoke an error condition
+.le
+.ls
+Return a YES status if the keyword is END
+.le
+
+Otherwise, the card is concatenated to the User Area of the IRAF image
+header.  If the keyword was not END then NO is returned.
+.ls get_fits_string
+The string field for a keyword with a string value is extracted.  The
+leading and trailing quotes are removed as well as trailing blanks.
+The EOS is marked by either ', /, or the end of the card.
+.le
+.le
+.le
+.ls read_image
+The FITS image pixels are converted to an IRAF image file.
+The image file header is set.
+The lines of the image are converted one at a time.
+Each line is checked for blank values.
+When all the image data has been read the number of blank pixels encounter
+is printed (unless the value is zero).
+.ls set_image_header
+The pixel type for the IRAF image is set to the user specified type.
+If no type has been specified then the type is determined from the number
+of bits per pixel given in the FITS header.
+.le
+.ls set_coords
+Sets the coordinate transformation parameters to a 1 to 1 transformation.
+.le
+.ls init_read_pixels
+The pixel reading routine is initialized.  The parameters are the number
+of pixels per record, the number of bits per pixel which must be a
+valid MII type, a byte order flag, and the SPP data type to be converted
+to.  In the FITS reader the byte order is specified to be most significant
+byte first and the SPP data type is TY_LONG.
+.le
+.ls put_imageline
+Put_imageline outputs a single line of the FITS image to the IRAF image.
+.le
+.ls read_pixels
+The pixels are read into a record buffer.  Data conversion is accomplished
+with the MII routines since FITS format is the same as MII format.  The
+specified number of pixels is returned in the specified buffer.
+.le
+.ls map_blanks
+Pixels having the blank value as given in the FITS header are added into
+the bad pixel count in the image header.  This routine will someday handle
+mapping of bad pixels in a more detailed manner.
+.le
+.ls scale_line
+The FITS integers from tape are converted to the output IRAF data type by
+applying the FITS scaling parameters BSCALE and BZERO.
+.le
+.ls change_line
+The FITS integers are converted directly to the output IRAF data type
+without scaling (BSCALE = 1.0 and BZERO = 0.0).
+.le
+.le
+.le
+
+.sh
+WFITS Structure Chart
+
+.nf
+t_wfits()
+# Returns when the input file list is satisfied.
+# Errors from called routines are trapped, an error message is issued and
+# wfits terminates.
+
+	wrt_fits (iraf_file, fits_file)
+
+		data_limits (im)
+
+		wrt_header (im, fits, fits_fd)
+
+			set_bitbix (bitpix, pixtype, data_bitpix)
+
+			iraf_type (pixtype, pixstring)
+
+			set_scale (fits_bitpix, datamax, datamin, bscale, bzero)
+
+				tape_limits (fits_bitpix, tapemax, tapemin)
+
+			set_blank (fits_bitpix, blank, blankstr)
+
+			init_wrt_pixels (npix_record, spp_type, mii_type)
+
+			init_card_encode (im, fits)
+			# Returns YES
+
+			card_encode (im, fits, card)
+			# Returns YES if valid FITS card
+
+				get_standard_card (cardno, im, fits, axisno,
+						   card
+				# Returns YES or NO
+
+				get_option_card (im, fits, optiono, card)
+				# Returns YES or NO
+
+				get_coord_card (im, coordno, coordaxis, card)
+				# Returns YES or NO
+
+				get_history_card (im, histptr, card)
+				# Returns YES or NO
+
+				get_end_card (card)
+				# Returns YES or NO
+
+			wrt_pixels (fits_fd, card, len_card)
+
+			wrt_last_record (fits_fd)
+
+		wrt_image (im, fits, fits_fd)
+
+			init_wrt_pixels (npix_record, spp_type, mii_type)
+
+			get_image_line (im, bufptr, v, pixtype)
+			# Returns EOF or number of pixels in a line
+
+			scale_line (bufptr, long_array, npix, bscale, bzero,
+				    pixtype)
+
+			long_line (bufptr, long_array, npix, pixtype)
+
+			map_blanks (im, long_array, blank)
+
+			wrt_pixels (fits_fd, long_array, npix)
+
+			wrt_last_record (fits_fd)
+.fi
+.sh
+WFITS Structure Summary
+
+.ls t_wfits
+The main procedure reads the control parameters. The files to be read and
+converted are calculated from the specified source and file list. A loop
+through the files determines the specific input source names and output
+file names and calls WRT_FITS for each file conversion. Write errors are trapped
+and cause termination of the program.
+.ls wrt_fits
+The input source is opened. If the make_image switch is set the output
+destination is opened. The IRAF image header parameters are encoded into
+the FITS header and both header and pixels are written to the output
+destination.
+DATA_LIMITS is called if the autoscale switch is enabled and the IRAF image
+data maximum and minimum values are unknown or the image has been modified
+since they were last calculated.
+If the make_image switch is turned off the FITS header is printed
+on the standard output and a temporary output file is created. Finally
+all the files are closed. If a temporary file was created it is deleted.
+.ls data_limits
+DATA_LIMITS calculates the minimum and maximum data values in an IRAF image.
+The calculation is made only if these values are
+undefined or the image has been modified since the last values were
+calculated.
+.le
+.ls wrt_header
+Some initialization is done on the FITS header. The appropriate FITS bitpix,
+bzero and bscale factors, and the tape value for blank pixels are calculated
+for each image.
+The FITS header cards are encoded one at a time. If a long_header listing
+has been specified then the FITS card is printed on the standard output.
+If a short_header listing
+is specified then the title and image size only are printed. Encoding terminates
+when the FITS END keyword is encountered. Partial header records are filled
+with blanks before being written to the output destination.
+.ls set_bitpix
+The value of the FITS bitpix is calculated. If the user given bitpix is
+not a valid FITS bitpix, SET_BITPIX uses the precision of the IRAF image data
+to set bitpix.
+.le
+.ls iraf_type
+The IRAF datatype value is set to either INTEGER, FLOATING or COMPLEX.
+.le
+.ls set_scale
+The bscale and bzero values are calculated from the IRAF minimum and maximum
+data values and the FITS bitpix.
+.ls tape_limits
+The maximum and minimum FITS integer values are calculated from the FITS bitpix.
+.le
+.le
+.ls set_blank
+The FITS integer value for a blank pixel is calculated from the FITS bitpix.
+.le
+.ls init_wrt_pixels
+The pixel writing routine is initialized. The parameters are the number of
+pixels per record, the spp_type and the number of bits per pixel which
+must be a valid mii type. For ASCII header card images the number of pixels
+per record is normally 2880 and the bits per pixel is 8. The spp type is
+always TY_CHAR.
+.le
+.ls init_card_encode
+The card encoding procedure is initialized. The number of standard keyword,
+optional keywords, coordinate transformation keywords, and history keywords
+are calculated.
+.le
+.ls card_encode
+An eighty character FITS format string is created for each permitted
+FITS keyword.
+.ls get_standard_card
+The minimum required FITS header parameters, SIMPLE, BITPIX, NAXIS and NAXIS#
+are encode into FITS cards.
+.le
+.ls get_option_card
+A set of optional FITS  parameters are encoded into FITS cards.
+At present the permitted keywords are BSCALE, BZERO, BUNIT, BLANK
+OBJECT, ORIGIN, DATE, IRAFMAX, IRAFMIN, IRAF-B/P, and IRAFTYPE.
+The BLANK card is only encoded if the number of bad pixels in the 
+IRAF image header is nonzero. BUNIT and OBJECT cards are only encoded if
+if the appropriate strings in the IRAF image header are defined.
+.le
+.ls get_coord_card
+The coordinate transformation parameters are encoded into FITS header cards.
+.le
+.ls get_history_card
+The IRAF history string is encoded into FITS header card(s). A maximum of
+seven HISTORY cards are currently permitted by imio.
+.le
+.ls get_end_card
+The FITS end card in encoded.
+.le
+.le
+.ls wrt_pixels
+The FITS card images are read into a record buffer. When the buffer is
+full data conversion is accomplished using the mii routines since FITS
+format is the same as mii format. After data conversion the record
+buffer is written to the output destination.
+.le
+.ls wrt_last_record
+The last partially filled header record is padded with blanks and written to
+the output destination.
+.le
+.le
+.ls wrt_image
+The IRAF image pixels are converted to FITS image format. The lines of the
+IRAF image are converted one at a time. Each line is scaled (if scaling is
+enabled and appropriate) and the IRAF pixels are converted to long integers.
+WRT_PIXELS is called to convert the integers to the appropriate FITS
+output type using the MII routines.
+.ls init_wrt_pixels
+The pixel writing routine is initialized. The parameters are the number of
+pixels per output record, the spp type and the number of FITS bits per pixel
+which must be a valid mii type. The number of pixels per output record is
+2880, 1440 or 720 for FITS bitpix of 8, 16 or 32 respectively. The spp type
+is always TY_LONG.
+.le
+.ls get_image_line
+A single IRAF image line is read into an internal buffer.
+.le
+.ls scale_line
+The IRAF image line is scaled by the FITS BSCALE and
+BZERO scaling factors and converted to long integers.
+SCALE_LINE is called if the scale switch is set.
+.le
+.ls long_line
+The IRAF image data values are converted directly to long integers.
+LONG_LINE is called if scaling switch is turned off.
+.le
+.ls map_blanks
+This function will eventually map IRAF blank pixels to the appropriate
+FITS integer for blanks. Implementation of this function is will occur
+after the imio mods.
+.le
+.ls wrt_pixels
+The scaled IRAF image lines are read into a record buffer. When the buffer is
+full data conversion is accomplished using the MII routines since FITS
+format is the same as mii format. After data conversion the record
+buffer is written to the output destination.
+.le
+.ls wrt_last_record
+The last partially full data record is padded with zeros and written to the
+output destination.
+.le
+.le
+.le
+.le
+.endhelp

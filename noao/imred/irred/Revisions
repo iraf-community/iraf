@@ -1,0 +1,61 @@
+.help revisions Jun88 noao.imred.irred
+.nf
+irred$irred.cl
+    The IRLINCOR task was mistakenly declared using 'x_irred.x' instead
+    of 'x_irred.e'.  Works fine under the CL but broke Pyraf  (1/18/07, MJF)
+
+irred$center.par
+irred$doc/center.hlp
+    Updated the center task parameter file to support the new cache, wcsin,
+    and wcsout parameters.
+
+    Added a copy of the center task help page so it is accessible even
+    if apphot is not loaded. Center1d gets picked up instead in that case.
+
+    Davis, April 8, 2001
+
+irred$mosproc.cl
+    Changed the outtype parameter setting in the imcombine task call from
+    "" to "real". Added default values for the rejmask, nkeep, and snoise
+    parameters.
+
+    Davis, January 18, 1999
+
+irred$irred.cl
+irred$irred.hd
+irred$irred.men
+irred$mkpkg
+irred$irlincor.par
+irred$x_irred.x
+irred$t_irlincor.x
+irred$doc/irlincor.hlp
+    Added the ctio.irlincor package task to the irred package.
+
+irred$irred.cl
+irred$mosproc.cl
+    1. The irred cl script was modified to reference nproto instead of proto.
+    2. The irred script was modified to load the core proto package in order to
+       pick up the bscale task.
+    3. The references to the apselect task were replace by references to the
+       txdump task.
+    4. The bscale.par file was removed since one cannot have private copies
+       of .par files across package boundaries.
+    5. Replaced the obsolete version of datapars.par with the new version.
+    6. Replaced the obsolate versions of irmosaic.par, iralign.par,
+       irmatch1d.par, and irmatch2d.par with new ones.
+
+    Davis, January 25, 1992
+
+irred$mosproc.cl
+    1. Replaced the call to imcombine with a call to the new imcombine.
+
+    Davis, January 25, 1992
+
+    
+irred$
+    The IRRED package was added to the imred package menu. The current
+    tasks are bscale, center, irmosaic, iralign, irmatch1d, and irmatch2d,
+    mosproc, and txdump.
+    Davis, April 1, 1989
+
+.endhelp

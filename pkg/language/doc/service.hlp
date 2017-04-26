@@ -1,0 +1,43 @@
+.help service Feb86 language
+.ih
+NAME
+service -- respond to a parameter request from a bkg job
+.ih
+USAGE
+service [job]
+.ih
+PARAMETERS
+.ls job
+A background job number (defaults to 1).
+.le
+.ih
+DESCRIPTION
+When a background job requires input from the terminal (e.g. if it queries
+for a parameter), the job enters a stopped state, and a message is
+displayed on the terminal.  At the user's convenience, he should respond
+with a \fIservice\fR command specifying the appropriate job number.  The
+\fIjobs\fR command can also be used to see what jobs require attention.
+
+After entering the \fIservice\fR command, any prompt sent by the background
+job is displayed, and the user may return a single line
+of input to the background task.  Should more lines be needed several
+\fIservice\fR calls may be necessary.  The user may service jobs in
+any order, regardless of how the requests from the background jobs were
+received.
+.ih
+EXAMPLE
+1. Respond to a parameter request from job 3.
+
+	cl> service 3
+.ih
+BUGS
+If one never responds to a request for service from a background job, the job
+will eventually time out and abort.  In principle it is possible to service
+queued background jobs as well as interactive (subprocess) background jobs,
+but in practice the request for service never reaches the terminal (and thus
+the user), hence all parameters should be specified before submitting a job
+to execute in a queue.
+.ih
+SEE ALSO
+jobs, kill
+.endhelp

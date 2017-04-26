@@ -1,0 +1,5 @@
+input,f,a,"",,,metacode source file
+frames,s,ql,"1-99",,,ranges of frames to extract
+verify,b,h,no,,,verify operation before extracting each frame?
+go_ahead,b,q,yes,,," ?"
+default_action,b,h,yes,,,default extract action for verify query

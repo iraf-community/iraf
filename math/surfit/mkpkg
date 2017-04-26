@@ -1,0 +1,29 @@
+# Surface fitting tools library.
+
+$checkout libsurfit.a lib$
+$update   libsurfit.a
+$checkin  libsurfit.a lib$
+$exit
+
+libsurfit.a:
+	iscoeff.x	surfitdef.h
+	iseval.x	surfitdef.h <math/surfit.h>
+	isfree.x	surfitdef.h
+	isinit.x	surfitdef.h <math/surfit.h>
+	islaccum.x	surfitdef.h <math/surfit.h>
+	islfit.x	surfitdef.h <math/surfit.h>
+	islrefit.x	surfitdef.h <math/surfit.h>
+	islsolve.x	surfitdef.h <math/surfit.h>
+	islzero.x	surfitdef.h
+	isreplace.x	surfitdef.h <math/surfit.h>
+	isresolve.x	surfitdef.h <math/surfit.h>
+	issave.x	surfitdef.h <math/surfit.h>
+	issolve.x	surfitdef.h <math/surfit.h>
+	isvector.x	surfitdef.h <math/surfit.h>
+	iszero.x	surfitdef.h
+	sf_b1eval.x	
+	sf_beval.x	
+	sf_f1deval.x	
+	sf_feval.x	
+	sfchomat.x	surfitdef.h <mach.h> <math/surfit.h>
+	;

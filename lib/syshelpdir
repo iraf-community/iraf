@@ -1,0 +1,85 @@
+# IRAF System help directory.  Each package installed in the system must
+# have an entry here for HELP to be able to print help for the package.
+# Library packages should be entered in the Help database as well as CL
+# packages.  The help database is linear -- packages do not nest.
+
+# Define Package Directories (these defs are not recursive!).
+
+$artdata	= "pkg$artdata/"
+$astrometry	= "pkg$astrometry/"
+$dbms		= "pkg$dbms/"
+$dataio		= "pkg$dataio/"
+$digiphot	= "pkg$digiphot/"
+$dtoi		= "pkg$dtoi/"
+$filterphot	= "pkg$filterphot/"
+$focas		= "pkg$focas/"
+$images		= "pkg$images/"
+$imred		= "pkg$imred/"
+$language	= "pkg$language/"
+$lists		= "pkg$lists/"
+$local		= "pkg$local/"
+$surfphot	= "pkg$surfphot/"
+$onedspec	= "pkg$onedspec/"
+$plot		= "pkg$plot/"
+$softools	= "pkg$softools/"
+$system		= "pkg$system/"
+$twodspec	= "pkg$twodspec/"
+$utilities	= "pkg$utilities/"
+
+$tv		= "pkg$images/tv/"
+$xtools		= "pkg$xtools/"
+$os		= "sys$os/"
+
+
+# Define help files for the packages.
+
+clpackage	men=lib$clpackage.menu,			hlp=..,
+		pkg=lib$syshelpdir
+dataio		men=dataio$dataio.menu,			hlp=..,
+ 		pkg=dataio$dataio.hd
+images		men=images$images.menu,			hlp=..,
+ 		pkg=images$images.hd
+language	men=language$language.menu,		hlp=..,
+ 		pkg=language$language.hd
+lists		men=lists$lists.menu,			hlp=..,
+ 		pkg=lists$lists.hd
+local		men=local$local.menu,			hlp=..,
+ 		pkg=local$local.hd
+plot		men=plot$plot.menu,			hlp=..,
+ 		pkg=plot$plot.hd
+softools	men=softools$softools.menu,		hlp=..,
+ 		pkg=softools$softools.hd
+system		men=system$system.menu,			hlp=..,
+ 		pkg=system$system.hd
+utilities	men=utilities$utilities.menu,		hlp=..,
+		pkg=utilities$utilities.hd
+
+os		pkg=os$os.hd
+tv		men=tv$tv.menu,				hlp=..,
+		pkg=tv$tv.hd
+
+# artdata	men=artdata$artdata.menu,
+# 		pkg=artdata$artdata.hd
+# astrometry	men=astrometry$astrometry.menu,
+# 		pkg=astrometry$astrometry.hd
+# dbms		men=dbms$dbms.menu,
+# 		pkg=dbms$dbms.hd
+# digiphot	men=digiphot$digiphot.menu,
+# 		pkg=digiphot$digiphot.hd
+# dtoi		men=dtoi$dtoi.menu,
+# 		pkg=dtoi$dtoi.hd
+# filterphot	men=filterphot$filterphot.menu,
+# 		pkg=filterphot$filterphot.hd
+# focas		men=focas$focas.menu,
+# 		pkg=focas$focas.hd
+# imred		men=imred$imred.menu,
+# 		pkg=imred$imred.hd
+# surfphot	men=surfphot$surfphot.menu,
+# 		pkg=surfphot$surfphot.hd
+# onedspec	men=onedspec$onedspec.menu,
+# 		pkg=onedspec$onedspec.hd
+# twodspec	men=twodspec$twodspec.menu,
+# 		pkg=twodspec$twodspec.hd
+
+# pi
+# xtools

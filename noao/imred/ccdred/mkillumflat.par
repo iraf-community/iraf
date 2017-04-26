@@ -1,0 +1,12 @@
+input,s,a,,,,Input CCD flat field images
+output,s,a,,,,Output images (same as input if none given)
+ccdtype,s,h,"flat",,,CCD image type to select
+xboxmin,r,h,5,0.,,Minimum smoothing box size in x at edges
+xboxmax,r,h,0.25,0.,,Maximum smoothing box size in x
+yboxmin,r,h,5,0.,,Minimum moothing box size in y at edges
+yboxmax,r,h,0.25,0.,,Maximum moothing box size in y
+clip,b,h,yes,,,Clip input pixels?
+lowsigma,r,h,2.5,0.,,Low clipping sigma
+highsigma,r,h,2.5,0.,,High clipping sigma
+divbyzero,r,h,1.,,,Result for division by zero
+ccdproc,pset,h,,,,CCD processing parameters

@@ -1,0 +1,42 @@
+.help revisions Jun88 noao.imred.quadred
+.nf
+
+ccdproc/ccdcache.x
+    The 'bufs' pointer was declared as TY_REAL instead of TY_SHORT (5/4/13)
+
+quad/qproc.cl
+quad/quad.cl
+quad/quadjoin.x
+quad/quadproc.cl
+quad/setinstrument.cl
+quad/qccdproc.par	+
+../quadred.cl
+../quadred.men
+    When using quadproc the latest CCDPROC is used with the alias QCCDPROC.
+    This is to allow using the line-by-line overscan function.  Other features
+    in CCDPROC would also be available.  It was too hard to update the
+    quad version of CCDPROC.  (3/12/08, Valdes)
+
+=====
+V2.14
+=====
+
+=======
+V2.12.1
+=======
+
+quad/qproc.cl
+    For some reason the quadsplit call was commented out.  So when quadproc
+    is run the pieces are not split and then the quadjoin call results in
+    a divide by zero error.  The call was uncommented.  Due to my lack
+    of understanding with QUAD and that multipiece CCDPROC is used which
+    does not support trims, the quadsplit with trimming is not used.
+    (7/5/02, Valdes)
+
+=====
+V2.12
+=====
+
+New package consisting of XCCDRED and ARED.QUAD was added.
+
+.endhelp

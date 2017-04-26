@@ -1,0 +1,27 @@
+# Make the LROFF line-oriented text formatter.
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	breakline.x	lroff.com lroff.h words.com <chars.h>
+	center.x	lroff.com lroff.h <chars.h>
+	dols.x		lroff.com lroff.h <chars.h> <error.h>
+	getarg.x	lroff.h <chars.h>
+	indent.x	lroff.com lroff.h
+	input.x		lroff.com lroff.h <chars.h> <ctype.h>
+	justify.x	lroff.com lroff.h <chars.h>
+	lroff.x		lroff.com lroff.h <chars.h> <ctype.h>
+	lroff2html.x	lroff.com lroff.h <ctype.h>
+	lroff2ps.x	lroff.com lroff.h <psset.h> <ctype.h>
+	nextcmd.x	lroff.h <ctype.h>
+	nofill.x	lroff.com lroff.h
+	output.x	lroff.com lroff.h <chars.h> <mach.h>
+	rawcopy.x	lroff.com lroff.h
+	section.x	lroff.com lroff.h <chars.h> <ctype.h>
+	skiplines.x	lroff.h
+	textlen.x	lroff.h <chars.h>
+	textout.x	lroff.com lroff.h words.com <chars.h>
+	;

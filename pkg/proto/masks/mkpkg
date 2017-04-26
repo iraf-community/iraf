@@ -1,0 +1,23 @@
+# Make the protype masks tasks MIMSTAT
+
+$checkout       libpkg.a ../
+$update         libpkg.a
+$checkin        libpkg.a ../
+$exit
+
+libpkg.a:
+	t_mimstat.x	<mach.h> <imhdr.h> <imset.h> <pmset.h> "mimstat.h"
+	mstcache.x	<imhdr.h> <imset.h>
+
+	t_rskysub.x	<imhdr.h> "rskysub.h"
+	rsstats.x	<mach.h> <imhdr.h> <imset.h> <pmset.h> "mimstat.h" \
+			"rskysub.h"
+	rsmmean.x	<imhdr.h> <imset.h> <pmset.h> "rskysub.h"
+	rsmean.x	<imhdr.h> "rskysub.h"
+	rsscache.x	<imhdr.h> <imset.h>
+	rsreject.x	<imhdr.h> <imset.h>
+	rsfnames.x
+
+	mimstat.x	<mach.h> "mimstat.h"
+	mptools.x	<ctype.h> <imhdr.h> <imset.h> <pmset.h> 
+	;

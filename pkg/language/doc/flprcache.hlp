@@ -1,0 +1,62 @@
+.help flprcache Feb86 language
+.ih
+NAME
+flprcache -- flush the process cache
+.ih
+USAGE
+flprcache process
+.ih
+PARAMETERS
+.ls process
+Either the task number as printed by \fIprcache\fR, or the name of one
+of the tasks in the process.  If no process is named, all processes
+are flushed from the cache (unless they are locked in the cache).
+.le
+.ih
+DESCRIPTION
+When an executable task is first run, the CL spawns the associated executable
+file as a subprocess and then runs the task.  When the task completes the
+process does not exit, rather it remains connected to the CL as a subprocess,
+but becomes idle waiting for another command from the CL.  The set of such
+idle processes forms what is referred to as the CL "process cache".
+The purpose of the process cache is to minimize the overhead required to
+run a task; the first time a task is called response is slow since the
+process has to be executed, but thereafter response is fast provided the
+process remains in the cache.
+
+The \fIflprcache\fR command flushes the process cache, terminating
+the connected subprocesses therein.  If an argument is specified only the
+specific cache slot is cleared, otherwise all cache slots are flushed.
+Processes which have been "locked" in the cache with \fIprcache\fR are
+not flushed unless explicitly named.
+.ih
+EXAMPLES
+1. Run \fIprcache\fR to get the process slot number, then flush the process
+by slot number.
+
+	cl> flpr 5
+
+2. Flush all idle processes which are not locked in the cache.
+
+	cl> flpr
+
+3. Flush the "x_system.e" process by naming the "directory" task, which
+is contained in that process.  Lock a fresh copy of the process in the cache.
+This initializes the process, and may be necessary if a system task is
+interrupted at the wrong time.
+
+	cl> flpr dir; prc dir
+.ih
+BUGS
+In some circumstances the CL may believe that a process in the
+process cache is running when this is not the case.  The CL will
+not attempt to communicate with a running process, and will be
+unable to kill the process.  If this happens the CL will hang up
+during logout and will have to be interrupted, causing a panic abort
+(this is harmless since the CL is then restarted).
+The user may eventually be required to kill the sub-process using
+operating system facilities.
+.ih
+SEE ALSO
+prcache
+.endhelp

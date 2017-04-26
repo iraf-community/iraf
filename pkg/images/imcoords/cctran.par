@@ -1,0 +1,28 @@
+# Parameter set for the CCTRAN Task
+
+input,s,a,,,,The input coordinate files
+output,s,a,,,,The output coordinate files
+database,f,a,,,,The input database file
+solutions,s,a,,,,The input plate solutions
+geometry,s,h,"geometric","|linear|geometric|",,"Transformation type (linear,geometric)"
+forward,b,h,yes,,,Transform x / y to ra / dec (yes) or vice versa (no) ?
+
+xref,r,h,INDEF,,,The X reference pixel
+yref,r,h,INDEF,,,The Y reference pixel
+xmag,r,h,INDEF,,,The X axis scale in arcsec per pixel
+ymag,r,h,INDEF,,,The Y axis scale in arcsec per pixel
+xrotation,r,h,INDEF,,,The X axis rotation angle in degrees
+yrotation,r,h,INDEF,,,The Y axis rotation angle in degrees
+lngref,r,h,INDEF,,,The ra / longitude reference coordinate in lngunits	
+latref,r,h,INDEF,,,The dec / latitude reference coordinate in latunits
+lngunits,s,h,"",,,The input / output ra / longitude reference coordinate units
+latunits,s,h,"",,,The input / output dec / latitude reference coordinate units
+projection,s,h,"tan",,,The sky projection geometry
+
+xcolumn,i,h,1,1,100,Input column containing the x / ra / longitude coordinate
+ycolumn,i,h,2,1,100,Input column containing the y / dec / latitude coordinate
+lngformat,s,h,"",,,Output format of the ra / longitude / x coordinate
+latformat,s,h,"",,,Output format of the dec / latitude / y coordinate
+min_sigdigits,i,h,7,,,Minimum precision of the output coordinates
+
+mode,s,h,'ql'

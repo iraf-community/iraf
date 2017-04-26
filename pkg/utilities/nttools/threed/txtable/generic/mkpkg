@@ -1,0 +1,22 @@
+# Update the generic routines.
+
+default:
+	$checkout libpkg.a ../../
+	$update   libpkg.a
+	$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	txtcptb.x
+	txtcptc.x
+	txtcptd.x
+	txtcpti.x
+	txtcptr.x
+	txtcpts.x
+	txthvb.x
+	txthvc.x
+	txthvd.x
+	txthvi.x
+	txthvr.x
+	txthvs.x
+	;

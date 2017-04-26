@@ -1,0 +1,271 @@
+\hypertarget{structSamp}{
+\section{Samp Struct Reference}
+\label{structSamp}\index{Samp@{Samp}}
+}
+{\tt \#include $<$samp.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structSamp_f372ba3fd5ff2d8c8ec06bd33403ca9e}{
+char \textbf{appName} \mbox{[}SZ\_\-NAME\mbox{]}}
+\label{structSamp_f372ba3fd5ff2d8c8ec06bd33403ca9e}
+
+\item 
+char \hyperlink{structSamp_df7c497b6dbffc08e8ef5d7edd4ee97e}{appVer} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+char \hyperlink{structSamp_d672d7d425e8180b93c7ca2229d1acd8}{description} \mbox{[}SZ\_\-NAME\mbox{]}
+\item 
+char \hyperlink{structSamp_62629ad2155a2a1a7676e32ef9fb9ffd}{errortxt} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+\hyperlink{structappMD}{appMD} \hyperlink{structSamp_0884021074d1ed14342187005e0b78e7}{meta}
+\item 
+pthread\_\-t \hyperlink{structSamp_e7db0cac0c4ad61c9ed7f3d344b623cf}{svrThread}
+\item 
+int($\ast$ \hyperlink{structSamp_eb399d3fb381bee752b5747ff4cb9a9b}{defaultUserFunc} )(char $\ast$sender, char $\ast$msgid, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)
+\item 
+\hypertarget{structSamp_60d87008915bca91796cbdf77537e5f0}{
+\hyperlink{structSubs}{Subs} \textbf{subs} \mbox{[}MAX\_\-SUBS\mbox{]}}
+\label{structSamp_60d87008915bca91796cbdf77537e5f0}
+
+\item 
+int \hyperlink{structSamp_36f4cfae3407b8961e57a77abca7d599}{nsubs}
+\item 
+\hyperlink{structClient}{Client} \hyperlink{structSamp_2cc1f00b9e4bae456e0e72b90147df7b}{clients} \mbox{[}MAX\_\-CLIENTS\mbox{]}
+\item 
+int \hyperlink{structSamp_97ef8ad57159f4b6c4fcd93a12853b69}{nclients}
+\item 
+int \hyperlink{structSamp_69b05b2fa1ab19729d81659ad64387a0}{serverTid}
+\item 
+int \hyperlink{structSamp_8849cb13cbedae805b4e35327bc449e2}{serverPort}
+\item 
+\hyperlink{structHub}{Hub} $\ast$ \hyperlink{structSamp_14811ec2253a6e2e75a8ec863c4150b0}{hub}
+\item 
+handle\_\-t \hyperlink{structSamp_03918136809ece7e60de4e30c64b6224}{hubHandle}
+\item 
+int \hyperlink{structSamp_723b2538cfd65122c49783b36a7d30b5}{hubThreadID}
+\item 
+int \hyperlink{structSamp_32402da48b11693c13252edbdca7673c}{active}
+\item 
+int \hyperlink{structSamp_c8eee2b56f226f59d814fd1baa751b77}{mapClients}
+\item 
+int \hyperlink{structSamp_30ca22535582e7bf6416627d1cd46525}{msgMode}
+\item 
+int \hyperlink{structSamp_14f6ed59a947504d37bd8cdd1f2f8e8d}{handlerMode}
+\item 
+FILE $\ast$ \hyperlink{structSamp_79f2ee1f48cb40edaf9b63ccdbb6942f}{logfd}
+\item 
+int \hyperlink{structSamp_d8469d2447cd872101fb83d92f85049e}{debug}
+\item 
+int \hyperlink{structSamp_981b01bd09deddb039db3567825bd653}{verbose}
+\item 
+int \hyperlink{structSamp_25ddaf846639c7c67ea651a578b804ad}{trace}
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+SAMP application description. By default this describes our app by may be used to store information about other apps in the network as well. 
+
+\subsection{Field Documentation}
+\hypertarget{structSamp_32402da48b11693c13252edbdca7673c}{
+\index{Samp@{Samp}!active@{active}}
+\index{active@{active}!Samp@{Samp}}
+\subsubsection[{active}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::active}}}
+\label{structSamp_32402da48b11693c13252edbdca7673c}
+
+
+\hyperlink{structHub}{Hub} thread id 
+
+Referenced by samp\_\-hubActive(), sampShutdown(), and sampStartup().\hypertarget{structSamp_df7c497b6dbffc08e8ef5d7edd4ee97e}{
+\index{Samp@{Samp}!appVer@{appVer}}
+\index{appVer@{appVer}!Samp@{Samp}}
+\subsubsection[{appVer}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Samp::appVer}}}
+\label{structSamp_df7c497b6dbffc08e8ef5d7edd4ee97e}
+
+
+application name 
+
+Referenced by samp\_\-hubOpen(), samp\_\-Metadata(), and samp\_\-setAppVersion().\hypertarget{structSamp_2cc1f00b9e4bae456e0e72b90147df7b}{
+\index{Samp@{Samp}!clients@{clients}}
+\index{clients@{clients}!Samp@{Samp}}
+\subsubsection[{clients}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Client} {\bf Samp::clients}}}
+\label{structSamp_2cc1f00b9e4bae456e0e72b90147df7b}
+
+
+number of subscriptions 
+
+Referenced by samp\_\-addClient(), samp\_\-app2id(), samp\_\-envGet(), samp\_\-id2app(), samp\_\-listClients(), samp\_\-mapClients(), samp\_\-paramGet(), samp\_\-removeClient(), samp\_\-sendMsg(), and sampStartup().\hypertarget{structSamp_d8469d2447cd872101fb83d92f85049e}{
+\index{Samp@{Samp}!debug@{debug}}
+\index{debug@{debug}!Samp@{Samp}}
+\subsubsection[{debug}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::debug}}}
+\label{structSamp_d8469d2447cd872101fb83d92f85049e}
+
+
+log file descriptor 
+
+Referenced by samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-notifyAll(), sampDebug(), and sampLog().\hypertarget{structSamp_eb399d3fb381bee752b5747ff4cb9a9b}{
+\index{Samp@{Samp}!defaultUserFunc@{defaultUserFunc}}
+\index{defaultUserFunc@{defaultUserFunc}!Samp@{Samp}}
+\subsubsection[{defaultUserFunc}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ {\bf Samp::defaultUserFunc})(char $\ast$sender, char $\ast$msgid, {\bf Map} map) (char $\ast$ {\em sender}, \/  char $\ast$ {\em msgid}, \/  {\bf Map} {\em map})}}
+\label{structSamp_eb399d3fb381bee752b5747ff4cb9a9b}
+
+
+server thread number default user handler 
+
+Referenced by samp\_\-execUserHandler(), samp\_\-getUserHandler(), samp\_\-receiveCall(), samp\_\-receiveNotification(), samp\_\-receiveResponse(), and samp\_\-setUserHandler().\hypertarget{structSamp_d672d7d425e8180b93c7ca2229d1acd8}{
+\index{Samp@{Samp}!description@{description}}
+\index{description@{description}!Samp@{Samp}}
+\subsubsection[{description}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Samp::description}}}
+\label{structSamp_d672d7d425e8180b93c7ca2229d1acd8}
+
+
+application version 
+
+Referenced by samp\_\-getMetadata(), samp\_\-hubOpen(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structSamp_62629ad2155a2a1a7676e32ef9fb9ffd}{
+\index{Samp@{Samp}!errortxt@{errortxt}}
+\index{errortxt@{errortxt}!Samp@{Samp}}
+\subsubsection[{errortxt}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Samp::errortxt}}}
+\label{structSamp_62629ad2155a2a1a7676e32ef9fb9ffd}
+
+
+application description 
+
+Referenced by samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-envGet(), samp\_\-getErr(), samp\_\-GetMetadata(), samp\_\-notifyAll(), samp\_\-paramGet(), and samp\_\-setErr().\hypertarget{structSamp_14f6ed59a947504d37bd8cdd1f2f8e8d}{
+\index{Samp@{Samp}!handlerMode@{handlerMode}}
+\index{handlerMode@{handlerMode}!Samp@{Samp}}
+\subsubsection[{handlerMode}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::handlerMode}}}
+\label{structSamp_14f6ed59a947504d37bd8cdd1f2f8e8d}
+
+
+(a)synch message mode 
+
+Referenced by samp\_\-bibcodeHandler(), samp\_\-cmdExecHandler(), samp\_\-envGetHandler(), samp\_\-envSetHandler(), samp\_\-execUserHandler(), samp\_\-imLoadHandler(), samp\_\-paramGetHandler(), samp\_\-paramSetHandler(), samp\_\-PingHandler(), samp\_\-pointAtHandler(), samp\_\-resConeHandler(), samp\_\-resLoadHandler(), samp\_\-resSiapHandler(), samp\_\-resSsapHandler(), samp\_\-resTapHandler(), samp\_\-resVOSpaceHandler(), samp\_\-setCallByRef(), samp\_\-specLoadHandler(), samp\_\-specSSAHandler(), samp\_\-StatusHandler(), samp\_\-tbHighlightHandler(), samp\_\-tbLoadFITSHandler(), samp\_\-tbLoadHandler(), samp\_\-tbLoadVOTHandler(), and samp\_\-tbSelectHandler().\hypertarget{structSamp_14811ec2253a6e2e75a8ec863c4150b0}{
+\index{Samp@{Samp}!hub@{hub}}
+\index{hub@{hub}!Samp@{Samp}}
+\subsubsection[{hub}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Hub} $\ast$ {\bf Samp::hub}}}
+\label{structSamp_14811ec2253a6e2e75a8ec863c4150b0}
+
+
+samp server port 
+
+Referenced by samp\_\-bibLoad(), samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-DeclareMetadata(), samp\_\-DeclareSubscriptions(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-GetMetadata(), samp\_\-GetRegisteredClients(), samp\_\-GetSubscribedClients(), samp\_\-imageLoadFITS(), samp\_\-Metadata(), samp\_\-notify(), samp\_\-notifyAll(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Ping(), samp\_\-Register(), samp\_\-Reply(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-setAppVersion(), samp\_\-setTimeout(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), samp\_\-tableSelectRowList(), samp\_\-UnRegister(), sampClose(), and sampStartup().\hypertarget{structSamp_03918136809ece7e60de4e30c64b6224}{
+\index{Samp@{Samp}!hubHandle@{hubHandle}}
+\index{hubHandle@{hubHandle}!Samp@{Samp}}
+\subsubsection[{hubHandle}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t {\bf Samp::hubHandle}}}
+\label{structSamp_03918136809ece7e60de4e30c64b6224}
+
+
+\hyperlink{structHub}{Hub} connection 
+
+Referenced by sampClose(), sampShutdown(), and sampStartup().\hypertarget{structSamp_723b2538cfd65122c49783b36a7d30b5}{
+\index{Samp@{Samp}!hubThreadID@{hubThreadID}}
+\index{hubThreadID@{hubThreadID}!Samp@{Samp}}
+\subsubsection[{hubThreadID}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::hubThreadID}}}
+\label{structSamp_723b2538cfd65122c49783b36a7d30b5}
+
+
+\hyperlink{structHub}{Hub} handle alias \hypertarget{structSamp_79f2ee1f48cb40edaf9b63ccdbb6942f}{
+\index{Samp@{Samp}!logfd@{logfd}}
+\index{logfd@{logfd}!Samp@{Samp}}
+\subsubsection[{logfd}]{\setlength{\rightskip}{0pt plus 5cm}FILE $\ast$ {\bf Samp::logfd}}}
+\label{structSamp_79f2ee1f48cb40edaf9b63ccdbb6942f}
+
+
+CBR / CBV for user handlers 
+
+Referenced by sampLog().\hypertarget{structSamp_c8eee2b56f226f59d814fd1baa751b77}{
+\index{Samp@{Samp}!mapClients@{mapClients}}
+\index{mapClients@{mapClients}!Samp@{Samp}}
+\subsubsection[{mapClients}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::mapClients}}}
+\label{structSamp_c8eee2b56f226f59d814fd1baa751b77}
+
+
+is interface active 
+
+Referenced by sampStartup().\hypertarget{structSamp_0884021074d1ed14342187005e0b78e7}{
+\index{Samp@{Samp}!meta@{meta}}
+\index{meta@{meta}!Samp@{Samp}}
+\subsubsection[{meta}]{\setlength{\rightskip}{0pt plus 5cm}{\bf appMD} {\bf Samp::meta}}}
+\label{structSamp_0884021074d1ed14342187005e0b78e7}
+
+
+last msh error string 
+
+Referenced by samp\_\-getMetadata(), samp\_\-Metadata(), and samp\_\-printMetadata().\hypertarget{structSamp_30ca22535582e7bf6416627d1cd46525}{
+\index{Samp@{Samp}!msgMode@{msgMode}}
+\index{msgMode@{msgMode}!Samp@{Samp}}
+\subsubsection[{msgMode}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::msgMode}}}
+\label{structSamp_30ca22535582e7bf6416627d1cd46525}
+
+
+map other clients
+
+is interface active 
+
+Referenced by samp\_\-sendMsg(), samp\_\-setASyncMode(), samp\_\-setCallMode(), samp\_\-setMsgMode(), samp\_\-setNotifyMode(), and samp\_\-setSyncMode().\hypertarget{structSamp_97ef8ad57159f4b6c4fcd93a12853b69}{
+\index{Samp@{Samp}!nclients@{nclients}}
+\index{nclients@{nclients}!Samp@{Samp}}
+\subsubsection[{nclients}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::nclients}}}
+\label{structSamp_97ef8ad57159f4b6c4fcd93a12853b69}
+
+
+samp clients 
+
+Referenced by samp\_\-addClient(), samp\_\-app2id(), samp\_\-envGet(), samp\_\-id2app(), samp\_\-listClients(), samp\_\-mapClients(), samp\_\-paramGet(), samp\_\-removeClient(), samp\_\-sendMsg(), and sampStartup().\hypertarget{structSamp_36f4cfae3407b8961e57a77abca7d599}{
+\index{Samp@{Samp}!nsubs@{nsubs}}
+\index{nsubs@{nsubs}!Samp@{Samp}}
+\subsubsection[{nsubs}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::nsubs}}}
+\label{structSamp_36f4cfae3407b8961e57a77abca7d599}
+
+
+message subscriptions 
+
+Referenced by samp\_\-getSampHandler(), samp\_\-getUserHandler(), samp\_\-hubDeclareSubscriptions(), samp\_\-setSampHandler(), samp\_\-setUserHandler(), samp\_\-Subscribe(), and samp\_\-Unsubscribe().\hypertarget{structSamp_8849cb13cbedae805b4e35327bc449e2}{
+\index{Samp@{Samp}!serverPort@{serverPort}}
+\index{serverPort@{serverPort}!Samp@{Samp}}
+\subsubsection[{serverPort}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::serverPort}}}
+\label{structSamp_8849cb13cbedae805b4e35327bc449e2}
+
+
+samp server threadId \hypertarget{structSamp_69b05b2fa1ab19729d81659ad64387a0}{
+\index{Samp@{Samp}!serverTid@{serverTid}}
+\index{serverTid@{serverTid}!Samp@{Samp}}
+\subsubsection[{serverTid}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::serverTid}}}
+\label{structSamp_69b05b2fa1ab19729d81659ad64387a0}
+
+
+number of samp clients \hypertarget{structSamp_e7db0cac0c4ad61c9ed7f3d344b623cf}{
+\index{Samp@{Samp}!svrThread@{svrThread}}
+\index{svrThread@{svrThread}!Samp@{Samp}}
+\subsubsection[{svrThread}]{\setlength{\rightskip}{0pt plus 5cm}pthread\_\-t {\bf Samp::svrThread}}}
+\label{structSamp_e7db0cac0c4ad61c9ed7f3d344b623cf}
+
+
+metadata 
+
+Referenced by sampShutdown().\hypertarget{structSamp_25ddaf846639c7c67ea651a578b804ad}{
+\index{Samp@{Samp}!trace@{trace}}
+\index{trace@{trace}!Samp@{Samp}}
+\subsubsection[{trace}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::trace}}}
+\label{structSamp_25ddaf846639c7c67ea651a578b804ad}
+
+
+verbose flag
+
+debug flag 
+
+Referenced by samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-notifyAll(), samp\_\-receiveCall(), samp\_\-receiveNotification(), samp\_\-receiveResponse(), sampStartup(), and sampTrace().\hypertarget{structSamp_981b01bd09deddb039db3567825bd653}{
+\index{Samp@{Samp}!verbose@{verbose}}
+\index{verbose@{verbose}!Samp@{Samp}}
+\subsubsection[{verbose}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Samp::verbose}}}
+\label{structSamp_981b01bd09deddb039db3567825bd653}
+
+
+debug flag 
+
+Referenced by sampClose(), sampDebug(), sampShutdown(), sampStartup(), and sampVerbose().
+
+The documentation for this struct was generated from the following files:\begin{CompactItemize}
+\item 
+\hyperlink{samp_8h}{samp.h}\item 
+\hyperlink{sampDecl_8h}{sampDecl.h}\end{CompactItemize}

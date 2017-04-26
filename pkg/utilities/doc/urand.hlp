@@ -1,0 +1,41 @@
+.help urand Mar84 utilities
+.ih
+NAME
+urand -- uniform random number generator
+.ih
+USAGE
+urand nlines ncols
+.ih
+PARAMETERS
+.ls nlines
+The number of lines of output to be generated.
+.le
+.ls ncols
+The number of random numbers per output line.
+.le
+.ls ndigits = 4
+Number of digits of precision in each random number.
+.le
+.ls scale_factor = 1.0
+Factor by which the numbers are to be scaled (multiplied).
+.le
+.ls seed = 1
+Seed for the random number generator.  If the value is "INDEF" then
+the clock time (integer seconds since 1980) is used as the seed
+value giving different random numbers for different executions.
+.le
+.ih
+DESCRIPTION
+The system random number generator is called to generate a sequence of
+random numbers in list form.  By default, the random numbers will
+be uniformly distributed over the range 0 to 1.  The number of lines
+of output, number of columns (random numbers) per line, and number of
+significant digits in each number may all be set by the caller.
+.ih
+EXAMPLES
+Generate a sequence of 100 random numbers and graph them on the graphics
+terminal in point plot mode.  Autoscaling is turned off so that the plot
+will be scaled to the rand 0-1 (the \fBgraph\fR defaults) in both axes.
+
+	cl> urand 100 2 | graph po+ xa- ya-
+.endhelp

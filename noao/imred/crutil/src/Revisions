@@ -1,0 +1,155 @@
+.help revisions Nov99 crutil
+.nf
+crexamine.x
+    The CR_WT struct element was allocated as TY_REAL but was being used as
+    a Memi array, leading to a segfault on 64-bit systems (4/7/14, MJF)
+
+t_cosmicrays.x
+    A pointer to a an array of pointers was used in one place as a real.  This
+    is an error when integer and real arrays are not of the same size; i.e.
+    on 64-bit architectures.  (8/2/12, Valdes)
+
+=======
+V2.16.1
+=======
+
+t_craverage.x
+    The pointer for the input mask buffer when using the same mask for both
+    input and output was not being read to include the edge lines which are
+    used during the computation resulting in a segmentation violation.
+    (11/24/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+t_craverage.x
+    To grow an output mask create by the task requires closing the new mask
+    and reopening it READ_WRITE.  (10/23/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+t_craverage.x
+t_crmedian.x
+    The mask name may be !<keyword>.  (3/22/02, Valdes)
+
+xtmaskname.x	+
+t_craverage.x
+t_crmedian.x
+t_crgrow.x
+mkpkg
+    Modified to allow FITS mask extensions.  (3/22/02, Valdes)
+    
+mkpkg
+    Added missing mkpkg depencies for several source files. (12/13/01, MJF)
+
+============================
+CRUTIL V1.5: August 22, 2001
+============================
+
+crcombine.cl
+crcombine.par
+../doc/crcombine.hlp
+    Modified to use new version of IMCOMBINE.  (8/22/01, Valdes)
+
+noao$imred/crutil/	+
+    Installed package into the NOAO.IMRED package.  (8/22/01, Valdes)
+
+t_craverage.x
+    The nrej features was done wrong for nrej of 1 or 2. (5/3/01, Valdes)
+
+t_craverage.x
+    1.  The amov and aclr calls were using the wrong buffer start.
+    2.  Added missing imtclose calls.
+    3.  The growing needed to be moved outside the block buffering.
+    (10/4/00, Valdes as diagnosed by Davis)
+
+t_craverage.x
+craverage.par
+../doc/craverage.hlp
+    Added an nrej parameter to excluded additional pixels from the average.
+    This is needed to deal with cosmic rays which are bigger than one
+    pixel or very nearby additional cosmic rays.  (9/13/00, Valdes)
+
+========================
+CRUTIL V1.4: Jan 6, 2000
+========================
+
+t_crmedian.x
+    The calculation of the sigma would reference uninitialized data if
+    the image size was not a multiple of the sigma block size.
+    (1/6/00, Valdes)
+
+t_craverage.x
+    The indexing of the pixels to use for the sigma calculation was wrong.
+    (1/6/00, Valdes)
+
+t_craverage.x	+
+craverage.par	+
+x_crutil.e
+mkpkg
+../crutil.cl
+../crutil.men
+../crutil.hd
+    New task that finds cosmic rays against an average excluding the candidate
+    pixel.  It also detects objects and prevents cosmic rays being detected
+    in them (i.e. the cores of stars).  (11/30/99, Valdes)
+
+t_crgrow.x
+crgrow.par
+    1.	Broke main grow loop into a subroutine that can be called by other
+	tasks.
+    2.  Added inval and outval parameters to allow selecting mask values.
+    (11/30/99, Valdes)
+
+========================
+CRUTIL V1.3: Oct 19, 1999
+========================
+
+crnebula.cl
+    The rin and rout parameters were not being used and instead
+    the default values were hardwired.  (10/19/99, Valdes)
+
+========================
+CRUTIL V1.2: Sep 4, 1998
+========================
+
+t_crmedian.x
+    On images with more than about 500K pixels the median operation is
+    done in overlapping blocks of lines.  The amount of overlap is
+    half of the line median size "lmed".  The bug is that on output
+    the overlap regions end up being zero.  The output i/o is now done
+    in non-overlapping blocks.  (9/4/98, Valdes)
+
+=====================
+CRUTIL V1.1: May 1998
+=====================
+
+crexamine.x
+cosmicrays.key	+
+cosmicrays.hlp
+    The graphical deletion and undeletion of candidates now includes the
+    keys 'e' and 'v' to delete and undelete from a marked rectangular
+    region.  Also the key file was moved to the source directory.
+    (Valdes/Shopbell 5/15/98)
+
+cosmicrays.par
+    Fixed type in "crmasks" parameter name.
+    (Valdes/Shopbell 5/15/98)
+
+===========
+CRUTIL V1.0
+===========
+    
+New package created April 24, 1998.
+
+=======
+V2.11.1
+=======
+.endhelp

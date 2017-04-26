@@ -1,0 +1,28 @@
+# Make the NPROTO package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set LIBS="-lxtools -liminterp -lcurfit -lgsurfit -lds"
+	$update	libpkg.a
+	$omake	x_nproto.x
+	$link	x_nproto.o libpkg.a $(LIBS) -o xx_nproto.e
+	;
+
+install:
+	$move	xx_nproto.e noaobin$x_nproto.e
+	;
+
+libpkg.a:
+	@ace
+	@ir
+	t_binpairs.x	
+	t_linpol.x	<imhdr.h> <error.h>
+	t_slitpic.x	<ctype.h> <imhdr.h> slitpic.h
+	;

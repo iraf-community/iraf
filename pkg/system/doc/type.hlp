@@ -1,0 +1,43 @@
+.help type Nov84 system
+.ih
+NAME
+type -- type a file or files on the standard output
+.ih
+USAGE
+type input_files
+.ih
+PARAMETERS
+.ls input_files
+A template specifying the file or files to be typed.
+.le
+.ls map_cc = yes
+If set, output any non-printing control characters in the input text in
+a printable form, e.g., ctrl/c (ASCII 3) would be output as ^C.
+.le
+.ls device = "terminal"
+The output device, defaulting to the user's terminal.  If the special device
+"text" is named, any standout mode control characters embedded in the text
+will cause the enclosed text to be output in upper case.
+.le
+.ih
+DESCRIPTION
+\fIType\fR copies the named files (or the files selected by
+the file template) to the standard output.
+If there is more than one file in the input list, a header naming the file
+to be printed will precede each output file.
+.ih
+EXAMPLES
+
+1. Type all files in the current directory with the extension ".x" on the
+standard output.  Do not pause between files or pages (unlike \fIpage\fR).
+
+	cl> type *.x
+
+2. Capture the manual page for task \fIhedit\fR in a text file, in a form
+suitable for printing on any device.
+
+	cl> help hedit | type dev=text > hedit.doc
+.ih
+SEE ALSO
+page, head, tail, concatenate, lprint
+.endhelp

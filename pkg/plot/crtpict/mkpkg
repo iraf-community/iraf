@@ -1,0 +1,24 @@
+# Makelib file for CRTPICT contributions to the plot package library.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	calchgms.x	crtpict.h <imhdr.h> wdes.h
+	crtulut.x	crtpict.h <ctype.h> <error.h>
+	drawgraph.x	crtpict.h <gset.h> <imhdr.h> <time.h> wdes.h
+	drawgrey.x	crtpict.h wdes.h <gset.h> <imhdr.h> <mach.h>
+	mapimage.x	crtpict.h wdes.h <error.h> <gset.h> <imhdr.h> <mach.h>
+	minmax.x	<imhdr.h>
+	plothgms.x	crtpict.h <gset.h> <imhdr.h> <mach.h> wdes.h
+	plotimage.x	crtpict.h wdes.h <mach.h>
+	setxform.x	crtpict.h wdes.h <imhdr.h> <mach.h>
+	sigl2.x		<error.h> <imhdr.h>
+	t_crtpict.x	crtpict.h <fset.h> <gset.h> <imhdr.h> <mach.h> <error.h>
+	tweakndc.x	
+	xformimage.x	crtpict.h wdes.h <gset.h> <imhdr.h> <mach.h>
+	xyscale.x	crtpict.h wdes.h <error.h> <imhdr.h> <mach.h>
+	zscale.x	<imhdr.h>
+	;

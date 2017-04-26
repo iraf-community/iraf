@@ -1,0 +1,23 @@
+# CCD.DAT -- Instrument file to be used with ccdred when reducing spectroscopic
+# data obtained with ArCon.
+
+subset			none
+
+exptime 		exptime
+darktime		darktime
+imagetyp		imagetyp
+biassec			biassec
+datasec			datasec
+trimsec			trimsec
+fixfile			fixfile
+ 
+FOCUS			object
+OBJECT			object
+DARK			dark
+"PROJECTOR FLAT"	flat
+"SKY FLAT"		flat
+COMPARISON		object
+ZERO			zero			# New software
+BIAS			zero			# Old software
+"DOME FLAT"		flat
+MASK			other

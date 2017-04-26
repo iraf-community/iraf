@@ -1,0 +1,117 @@
+
+		hub = samp_hubOpen  ()
+		     samp_hubClose  ()
+
+
+In Applications using SAMP:
+
+    	   samp = sampInit  (name, descr)		// initialize interface
+    	         sampClose  (samp)
+
+      samp_setSubscription  (samp, mtype)		// subscribe to msgs
+     samp_setMTypeCallback  (samp, mtype, method)	// set callback
+
+
+    Hub Calls:
+
+	samp_Register (samp)
+	samp_DeclareMetadata (samp)
+
+	samp_UnRegister (samp)
+
+
+----------------------
+
+
+
+Naming Conventions:
+
+Methods used to talk to the API in an app:
+
+	       samp_<FUNC>  (samp, .....)		// namng convention
+          samp_setMetadata  (samp, key, val)
+    val = samp_getMetadata  (samp, key)
+
+
+List Types
+           list = samp_newList  ()
+                 samp_freeList  (list)
+
+          samp_setStringInList  (list, str)
+             samp_setMapInList  (list, map)
+            samp_setListInList  (list1, list2)
+
+  str = samp_getStringFromList  (list, index)
+     map = samp_getMapFromList  (list, index)
+   list = samp_getListFromList  (list, index)
+
+
+Map Types
+             map = samp_newMap  ()
+                  samp_freeMap  (map)
+
+           samp_setStringInMap  (map, key, char *value)
+              samp_setMapInMap  (map1, key, Map map2)
+             samp_setListInMap  (map, key, List list)
+
+   str = samp_getStringFromMap  (map, key)
+      map = samp_getMapFromMap  (map, key)
+    list = samp_getListFromMap  (map, key)
+
+
+
+Methods used in client Callbacks:
+
+               samp_Reply  (samp, char *msgId, Map response)
+
+	       [ Map mathods to create response ]
+
+Methods used to send/receive message from the Hub:
+
+	               samp_hub<FUNC>  (samp, .....)	//  hubID is internal
+
+              stat = samp_hubRegister  (samp)
+            stat = samp_hubUnRegister  (samp)
+       stat = samp_hubDeclareMetadata  (samp)
+            map = samp_hubGetMetadata  (samp)
+
+         samp_hubDeclareSubscriptions  (samp, subscripMap)
+       map = samp_hubGetSubscriptions  (samp)
+  list = samp_hubGetRegisteredClients  (samp, mtype)
+
+
+Methods used to send/receive message from another app:
+
+	    samp_app<FUNC>  (samp, appId, .....)	//  appID required
+
+                 list = samp_notify  (samp, recip, msgMap)
+              list = samp_notifyAll  (samp, msgMap)
+
+                    str = samp_call  (samp, recip, msg_tag, msgMap)
+                 str = samp_callAll  (samp, msg_tag, msgMap)
+             map = samp_callAndWait  (samp, recip, msg_tag, msgMap)
+
+[is msg_tag the mtype??]
+
+
+Sending Messages by MType (Low-level)
+
+
+Sending Messages by MType (Hi-level)
+
+                   stat = samp_Ping  (samp, appName|"hub")
+
+                   stat = samp_Ping  (samp, recip)
+              samp_tableLoadVotable  (samp, recip, url, tableId, name)
+                 samp_tableLoadFits  (samp, recip, url, tableId, name)
+             samp_tableHighlightRow  (samp, recip, tableId, url, row)
+            samp_tableSelectRowList  (samp, recip, tableId, url, rowList)
+  
+                 samp_imageLoadFits  (samp, recip, url, imageId, name)
+  
+               samp_coordPointAtSky  (samp, recip, ra, dec)
+            samp_specLoadSSAGeneric  (samp, recip, url, meta, specId, name)
+
+
+
+

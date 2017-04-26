@@ -1,0 +1,64 @@
+.help chpixtype Jun88 images.imutil
+.ih
+NAME
+chpixtype -- change the pixel type of an image
+.ih
+USAGE
+chpixtype input output newpixtype
+.ih
+PARAMETERS
+.ls input
+The list of input images.
+.le
+.ls output
+The list of output images. If the output image list is the same as the input
+image list then the original images are overwritten.
+.le
+.ls newpixtype
+The pixel type of the output image. The options are: "ushort", "short",
+"int", "long", "real", "double" and "complex".
+.le
+.ls oldpixtype = "all"
+The pixel type of the input images to be converted. By default all the
+images in the input list are converted to the pixel type specified by
+newpixtype. The remaining options are "ushort", "short", "int", "long",
+"real", "double" and "complex" in which case only those images of the
+specified type are converted.
+.le
+.ls verbose = yes
+Print messages about actions performed.
+.le
+
+.ih
+DESCRIPTION
+
+The list of images specified by \fIinput\fR and pixel type \fIoldpixtype\fR 
+are converted to the pixel type specified by \fInewpixtype\fR and written
+to the list of output images specified by \fIoutput\fR.
+
+Conversion from one pixel type to another is direct and may involve both
+loss of precision and dynamic range. Mapping of floating point numbers
+to integer numbers is done by truncation. Mapping of complex numbers
+to floating point or integer numbers will preserve the real part of the
+complex number only.
+
+.ih
+EXAMPLES
+
+1. Convert a list of images to type real, overwriting the existing images.
+
+        im> chpixtype nite1*.imh nite1*.imh real
+
+2. Convert only those images in imlist1 which are of type short to type real.
+   Imlist1 and imlist2 are text files containing the list of input and
+   output images respectively. The image names are listed 1 per line.
+
+        im> chpixtype @imlist1 @imlist2 real old=short
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imarith
+.endhelp

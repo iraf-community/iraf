@@ -1,0 +1,168 @@
+.help findgain Nov01 noao.obsutil
+.ih
+NAME
+findgain -- calculate the gain and readout noise of a CCD
+.ih
+SYNOPSIS
+FINDGAIN uses Janesick's method for determining the gain and read noise
+in a CCD from a pair of dome flat exposures and a pair of zero frame
+exposures (zero length dark exposures).
+.ih
+USAGE
+findgain flat1 flat2 zero1 zero2
+.ih
+PARAMETERS
+.ls flat1, flat2
+First and second dome flats.
+.le
+.ls zero1, zero2
+First and second zero frames (zero length dark exposures).
+.le
+.ls section = ""
+The selected image section for the statistics.  This should be chosen
+to exclude bad columns or rows, cosmic rays and other blemishes, and
+the overscan region.  The flat field iillumination should be constant
+over this section.
+.le
+.ls center = "mean"
+The statistical measure of central tendency that is used to estimate
+the data level of each image.  This can have the values:  \fBmean\fR,
+\fBmidpt\fR, or \fBmode\fR.  These are calculated using the same
+algorithm as the IMSTATISTICS task.
+.le
+.ls nclip = 3
+Number of sigma clipping iterations.  If the value is zero then no clipping
+is performed.
+.le
+.ls lsigma = 4, usigma = 4
+Lower and upper sigma clipping factors used with the mean value and
+standard deviation to eliminate cosmic rays.
+Since \fBfindgain\fR is sensitive to the statistics of the data the
+clipping factors should be symmetric (the same both above and below the
+mean) and should not bias the standard deviation.  Thus the values should
+not be made smaller than around 4 sigma otherwise the gain and readnoise
+estimates will be affected.
+.le
+.ls binwidth = 0.1
+The bin width of the histogram (in sigma) that is used to estimate the
+\fBmidpt\fR or \fBmode\fR of the data section in each image.
+The default case of center=\fBmean\fR does not use this parameter.
+.le
+.ls verbose = yes
+Verbose output?
+.le
+.ih
+DESCRIPTION
+FINDGAIN uses Janesick's method for determining the gain and read noise
+in a CCD from a pair of dome flat exposures and a pair of zero frame
+exposures (zero length dark exposures).
+The task requires that the flats and zeros be unprocessed and uncoadded so
+that the noise characteristics of the data are preserved.  Note, however,
+that the frames may be bias subtracted if the average of many zero frames
+is used, and that the overscan region may be removed prior to using this
+task.
+
+Bad pixels should be eliminated to avoid affecting the statistics.
+This can be done with sigma clipping and/or an image section.
+The sigma clipping should not significantly affect the assumed gaussian
+distribution while eliminating outlyers due to cosmic rays and
+unmasked bad pixels.  This means that clipping factors should be
+symmetric and should have values four or more sigma from the mean.
+.ih
+ALGORITHM
+The formulae used by the task are:
+
+.nf
+    flatdif = flat1 - flat2
+
+    zerodif = zero1 - zero2
+
+       gain = ((mean(flat1) + mean(flat2)) - (mean(zero1) + mean(zero2))) /
+	      ((sigma(flatdif))**2 - (sigma(zerodif))**2 )
+
+   readnoise = gain * sigma(zerodif) / sqrt(2)
+.fi
+
+where the gain is given in electrons per ADU and the readnoise in
+electrons.  Pairs of each type of comparison frame are used to reduce
+the effects of gain variations from pixel to pixel.  The derivation
+follows from the definition of the gain (N(e) = gain * N(ADU)) and from
+simple error propagation.  Also note that the measured variance
+(sigma**2) is related to the exposure level and read-noise variance
+(sigma(readout)**2) as follows:
+
+.nf
+     variance(e) = N(e) + variance(readout)
+.fi
+
+Where N(e) is the number of electrons (above the zero level) in a
+given duration exposure.
+
+In our implementation, the \fBmean\fR used in the formula for the gain
+may actually be any of the \fBmean\fR, \fBmidpt\fR (an estimate of the
+median), or \fBmode\fR as determined by the \fBcenter\fR parameter.
+For the \fBmidpt\fR or \fBmode\fR choices only, the value of the
+\fBbinwidth\fR parameter determines the bin width (in sigma) of the
+histogram that is used in the calculation.  \fBFindgain\fR uses the
+\fBimstatistics\fR task to compute the statistics.
+.ih
+EXAMPLES
+To calculate the gain and readnoise within a 100x100 section:
+
+.nf
+    ms> findgain flat1 flat2 zero1 zero2 section="[271:370,361:460]"
+.fi
+
+To calculate the gain and readnoise using the mode to estimate the data
+level for each image section:
+
+.nf
+    ms> findgain.section="[271:370,361:460]"
+    ms> findgain flat1 flat2 zero1 zero2 center=mode
+.fi
+
+The effects of cosmic rays can be seen in the following example using
+artificial noise created with the \fBartdata.mknoise\fR package.  The
+images have a gain of 5 and a readnoise of 10 with 100 cosmic rays added
+over the 512x512 images.  The zero level images have means of zero and the
+flat field images have means of 1000.  The first execution uses the default
+clipping and the second turns off the clipping.
+
+.nf
+    cl> findgain flat1 flat2 zero1 zero2
+    FINDGAIN:
+      center = mean, binwidth = 0.1
+      nclip = 3, lclip = 4., uclip = 4.
+
+      Flats      = flat1 &  flat2
+      Zeros      = zero1 &  zero2
+      Gain       =  5.01 electrons per ADU
+      Read noise = 10.00 electrons
+    cl> findgain flat1 flat2 zero1 zero2 nclip=0
+    FINDGAIN:
+      center = mean, binwidth = 0.1
+      nclip = 0, lclip = 4., uclip = 4.
+
+      Flats      = flat1  &  flat2
+      Zeros      = zero1  &  zero2
+      Gain       =  2.86 electrons per ADU
+      Read noise = 189.5 electrons
+.fi
+
+.ih
+BUGS
+The image headers are not checked to see if the frames have been
+processed.
+
+There is no provision for finding the "best" values and their errors
+from several flats and zeros.
+.ih
+REVISIONS
+.ls FINDGAIN - V2.12
+New task derived from MSCFINDGAIN.  This makes use of the new clipping
+feature in IMSTATISTICS.
+.le
+.ih
+SEE ALSO
+imstatistics
+.endhelp

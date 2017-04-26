@@ -1,0 +1,624 @@
+  
+VOTPARSE -- VOTable parser API.  This interface allows a VOTable to read
+read or created from a number of calling languages.  XML parsing is done
+using a SAX parser on input, when creating new VOTables the API is used
+to populate the VOTable structure before writing the final output.
+
+We attempt to implement all aspects of the VOTable v1.2 specification and
+remain compatible with earlier versions to the extent possible.
+
+
+
+  Public Interface:
+  -----------------
+
+             vot = vot_openVOTABLE  (str|fname)
+	          vot_closeVOTABLE  (vot)
+
+             res = vot_getRESOURCE  (vot|res)
+                tab = vot_getTABLE  (res)
+              field = vot_getFIELD  (tab)
+
+                data = vot_getDATA  (tab)
+
+          tdata = vot_getTABLEDATA  (data)		// data elements
+                    tr = vot_getTR  (tdata)
+                    td = vot_getTD  (tr)
+               bin = vot_getBINARY  (data)
+                fits = vot_getFITS  (data)
+
+              group = vot_getGROUP  (vot|res|tab|group)
+          fldref = vot_getFIELDRef  (group)
+          parref = vot_getPARAMRef  (group)
+
+
+	 desc = vot_getDESCRIPTION  (handle)
+	      param = vot_getPARAM  (handle)
+	        info = vot_getINFO  (handle)
+            stream = vot_getSTREAM  (bin|fits)
+
+               val = vot_getVALUES  (field|param|info)
+                  min = vot_getMIN  (val)
+                  max = vot_getMAX  (val)
+               opt = vot_getOPTION  (val)
+
+                link = vot_getLINK  (res|info|param|field|table)
+
+	       sys = vot_getCOOSYS  (vot)		// backwards compat.
+
+
+              handle = vot_newNode  (parent, type)
+                    vot_attachNode  (parent, handle)
+                    vot_deleteNode  (handle)
+
+    Output Routines:
+
+		  vot_writeVOTable  (vot, fd)
+		     vot_writeHTML  (vot, fd)
+	   vot_writeDelimitedTable  (vot, fd, delim)			 w
+
+
+    Convenience Functions:
+
+	    str = vot_getTableCell  (tdata, row, col)
+
+	          n = vot_getNRows  (tdata)
+	          n = vot_getNCols  (tdata)
+
+            type = vot_getDATAType  (data)
+
+                 str = vot_getAttr  (handle, attr)
+                stat = vot_setAttr  (handle, attr, value)
+
+                str = vot_getValue  (handle)
+                str = vot_setValue  (handle, value)
+
+               len = vot_getLength  (handle)
+             len = vot_getNumberOf  (handle, type)
+
+           handle = vot_findByAttr  (parent, type, attr, value)
+        handle[] = vot_findInGroup  (group, TY_FIELD|TY_PARAM)
+
+
+     Low-level Interface (Private?):
+
+              handle = vot_getNext  (handle)
+           handle = vot_getSibling  (handle)
+             handle = vot_getChild  (handle)
+       handle = vot_getChildOfType  (handle, type)
+            handle = vot_getParent  (handle)
+
+                type = vot_valueOf  (handle)
+
+
+------------------------------------------------------------------------------
+
+Data Structures
+---------------
+
+
+#define TY_VOTABLE       1
+#define TY_RESOURCE      2
+#define TY_FIELD         3
+#define TY_PARAM         4
+#define TY_INFO          5
+#define TY_ROW           6
+#define TY_DATA          7
+#define TY_VALUES        8
+#define TY_STREAM        9
+#define TY_LINK         10
+#define TY_FIELDREF     11
+#define TY_PARAMREF     12
+#define TY_OPTION       13
+#define TY_MIN          14
+#define TY_MAX          15
+#define TY_FITS         16
+#define TY_TABLE        17
+#define TY_GROUP        18
+#define TY_COOSYS       19
+
+
+#define	MAX_ATTRS	11
+#define	SZ_ATTR_NAME	16
+#define SZ_ATTR_VALUE	64
+
+
+typedef unsigned int 	handle_t;
+
+
+typedef struct {
+    char    name[SZ_ATTR_NAME];		/* attribute name	*/
+    char    value[SZ_ATTR_VALUE];	/* attribute value	*/
+
+} Attr, *AttrP;
+
+
+typedef struct {
+    char    type;			/* node type		*/
+
+    void    *next;			/* sibling node		*/
+    void    *child;			/* child nodes		*/
+    void    *child_last;		/* last child node	*/
+    void    *parent;			/* parent node		*/
+
+    char    *data;			/* value string		*/
+
+    Attr    attr[MAX_ATTRS];		/* attribute array	*/
+    int	    nattrs;			/* number of attributes	*/
+
+}  Node, *NodeP;
+
+
+    - 	Need to keep track of last child so we can easily append new tags
+    - 	The 'data' string is any text in the xml element, e.g. given
+
+		<TD>yada yada yada</TD>
+
+      	the 'data' string is then 'yada yada yada'
+    - 	structs should be calloc'd to initialize to NULL
+
+
+
+------------------------------------------------------------------------------
+
+Notes:
+------
+
+  -	The 'handle' is an opaque reference to the node that is meant to
+	be language-neutral.  In reality it is just the pointer to the Node
+	struct cast as an integer.  Note that on 64-bit platforms, bindings 
+	will require the handle to be typed as a 'long'value. 
+
+  -     The vot_openVOTable() is used both for reading and writing VOTables.
+	The read, the argument may a string which is a filename to be read or
+	a literal string assumed to be the VOTable document itself.  If
+	passed a NULL pointer, a new document structure will be created and
+	we assume we'll write it out later.
+
+  -	The various vot_get<Tag>() functions in reality only return the single
+	handle of the specified type, or a NULL if not found.  This node 
+	is required to be a child of the argument (parent) node.  
+
+	    vot_getFIELD (handle_t parent)
+	    {
+	        Node *ip = (handle_t) NULL;:
+	        Node *p = (Node *) parent;
+	        Node *c = p->child;
+	        int ptype = p->type;
+
+		if (ptype != TY_TABLE)		// check for valid parent
+		    fprintf (stderr, "Invalid node for FIELDs\n");
+
+	        for (ip=c; ip; ip = ip->next)
+		    if (ip->type == TY_FIELD)
+		        break;
+
+	        return ((handle_t) ip);
+	    }
+
+
+  -	A call to vot_getNext() returns the next sibling of the same type as 
+	the arg.  In contrast, vot_getSibling() returns the next sibling node
+	regardless of type.
+	    
+	    vot_getNext (handle_t tag)
+	    {
+	        Node *ip:
+	        Node *np = (Node *) tag;
+	        int type = p->type;
+
+	        for (ip=np->next; ip; ip = ip->next)
+		    if (ip->type == np->type)
+		        return ((handle_t) ip);
+
+	        return ((handle_t) NULL);
+	    }
+
+	    vot_getSibling (handle_t tag)
+	    {
+	        Node *np = (Node *) tag;
+
+	        return ((handle_t) np->next);
+	    }
+
+  -	vot_newNode() creates an empty node structure, other calls are used
+	to populate the attributes, values, or child nodes.   OTOH, methods
+ 	like vot_attachNode() / vot_deleteNode() use handles that can refer
+	to sub-trees.  This makes it easy to refer to e.g. an entire RESOURCE
+	and then attach it to a new document or delete entirely.  The 
+	methods that care of adusting the child/next pointers.
+
+	vot_newNode  (handle_t parent, int type)
+	{
+	    Node *np = (Node *) calloc (1, sizeof (Node));
+	    np->type = type;
+	    return ((handle_t) np);;
+	}
+                    
+	vot_attachNode  (handle_t parent, handle_t node)
+	{
+	    Node *p = (Node *) parent, 
+		 *n = (Node *) node,
+		 *last = p->child_last;
+
+	    if (p->child)
+	        last->next = n;			// append existing children
+	    else
+		p->child = n;			// make an only child
+	    p->child_last = n			// update parent
+	}
+                    
+	vot_deleteNode  (handle_t node)
+	{
+	    Node *n = (Node *) node,
+		 *p = n->parent,
+		 *last = p->child_last,
+		 *prev = (Node *) NULL;
+
+	    if (p->child == n) {		// node is first child
+	        p->child = n->next;
+
+	    } else {
+	        // Find the previous sibling node
+		for (prev=p->child; prev->next != n; prev=prev->next)
+		    ;
+
+		prev->next = n->next;
+		if (p->child_last == n)		//update parent
+		    p->child_last = prev;
+	    }
+
+	    vot_freeNode (n);			// free the node sub-tree
+	}
+
+	
+	The vot_freeNode() method would need to walk the tree in a
+	depth-first manner to free the Node strucutres.  The vot_closeVOTable()
+	then is simply a call to this on the root node
+
+
+
+  -	Fortran bindings should use the subroutine model to avoid having to
+	declare numerous functions. E.g.
+
+	The C method
+
+              field = vot_getFIELD  (tab)
+
+	is used in Fortran as
+
+		call getFIELD (tab, field)
+
+	Implementation of the wrapper is then simply
+
+	    void getFIELD (handle_t parent, handle_t *field)
+	    {
+                 *field = vot_getFIELD (parent);
+	    }
+
+
+	Methods that pass strings need to take into account the hidden length
+	parameter used in fortran.  E.g.
+
+	The C method
+                valueStr = vot_getAttr (handle, attr)
+
+	is used in Fortran as
+
+		call getAttr (handle, attr, valueStr)
+
+	However, the implementation is
+		
+	    void getAttr (handle_t parent, char *a, char *v, int alen, int vlen)
+	    {
+                 *v = vot_getAttr (parent, a);
+	    }
+
+	The 'alen' and 'vlen' args are added by the Fortran compiler to pass
+	in the length of the string.  In some cases we may also want to pass
+	in the max length of a result string so we don't overflow a buffer,
+	or else return the length of the string we found.  Since Fortran is
+	call-by-address in either of these cases the length becomes a pointer
+	declaration.
+
+
+
+------------------------------------------------------------------------------
+
+
+PseudoCode:
+-----------
+
+
+1) Read a VOTable, processing each RESOURCE in the file.  Note we don't
+   handle *nested* RESOURCEs here.
+
+
+    vot = vot_openVOTable (fname)
+
+    // loop over RESOURCES
+    res = vot_getRESOURCE (vot, i);
+    printf ("Table has toplevel %d RESOURCE elements\n", 
+	vot_getLength (res));
+
+    while ( res ) { 
+
+	tab = vot_getTABLE (res)
+
+	// Print column info
+	for (field=vot_getFIELD(tab); field; field=vot_getNext(field)) {
+	    strcpy (col[i].name, vot_getAttr (field, "name") 
+	    strcpy (col[i].ucd,  vot_getAttr (field, "ucd") 
+	}
+
+	//  Get the data element
+	data = vot_getDATA (tab)
+
+	switch (vot_getDataType (data))
+	case TY_TABLEDATA:
+	    //  Get data stored as a TABLEDATA xml block
+            tdata = vot_getTABLEDATA (data) 
+
+	    if (use_direct) {
+	        // Get the table data cells by direct index
+		tr = vot_getTR(tdata)
+		nrows = vot_getLength (tr)
+		ncols = vot_getLength (vot_getTD(tr))
+	        for (l=0; l < nrows ; l++) {
+	            for (m=0; m < ncols; m++) {
+	    	        str = vot_getTableCell (tdata, l, m)
+
+	    } else {
+	        // Get the table data cells by looping over rows/cols
+	        for (tr=vot_getTR (tdata); tr; tr=vot_getNext(tr))
+	            for (td=vot_getTD(tr); td; td=vot_getNext(td))
+			str = vot_getValue (td);
+	    }
+	    break
+
+	case TY_BINARY:
+	    // Get data stored as inline binary.  If the encoding of
+	    // the stream is base64 read the sequence of bytes and decode.
+            bin = vot_getBINARY (data) 
+	    stream = vot_getSTREAM (bin)
+	    if (strcmp ("base64", vot_getAttr(stream, "encoding") == 0)
+	        str = vot_getValue (stream)
+	    break
+
+	case TY_FITS:
+	    // Read FITS data.  Assumes a particular extension of an 
+	    // MEF is available for download at the given href.
+            fits = vot_getFITS (data) 
+	    extnum = vot_getAttr (fits, "extnum")	// get extension no.
+
+	    stream = vot_getSTREAM (fits)
+	    href = vot_getAttr (stream, "href")
+
+	    ....download the FITS file ....
+
+	    break
+	default:	
+	    error (0, "Invalid table DATA type.")
+	}
+
+	res = vot_getNext(res)				// get next resource
+    }
+
+    vot_closeVOTable (vot)
+
+
+
+
+2)  Print all the PARAM elements in a table with a single RESOURCE
+
+    a)  Use the low-level interface dealing with document structure
+
+        res = vot_getRESOURCE (vot)
+        for (p = vot_getChild (res); p; p = vot_getSibling (p)) {
+	    if (vot_typeOf (p) == TY_PARAM)
+	        printf ("PARAM  name=%s  value=%s\n", 
+	            vot_getAttr(p, "name"), vot_getAttr(p, "value"))
+        }
+
+    b)  Use the common hi-level interface
+
+        res = vot_getRESOURCE (vot)
+        for (p = vot_getPARAM (res); p; p = vot_getNext (p)) {
+	    printf ("PARAM  name=%s  value=%s\n", 
+	        vot_getAttr(p, "name"), vot_getAttr(p, "value"))
+        }
+
+
+
+
+3)  Check a VOTable to see if it is an error return
+
+    a)  SCS-only (Preferred) Method - INFO as a child of VOTABLE
+
+        vot = vot_openVOTable (fname)
+	if ((info = vot_getINFO (vot)) {
+	    if (strcsecmp (vot_getAttr (info, "name"), "error") == 0)
+		return ((errMsg = vot_getAttr (info, "value")))
+ 	} else
+	    return ("file is okay")
+
+
+    b)  Alternate Method - PARAM as a child of RESOURCE "allowed" for SCS,
+	required for other DAL services.  For SCS, the name/id are different,
+	later DAL services use 'QUERY_STATUS'.
+
+        vot = vot_openVOTable (fname)
+	res = vot_getRESOURCE (vot)
+	param = vot_getPARAM (res)
+	info = vot_getINFO (res)
+
+	if (strcasecmp(vot_getAttr (param, "name"), "error") == 0) {
+	    // SCS alternate method where PARAM defines value the error string
+	    return (vot_getAttr (param, "value"))
+	    
+	} else if (strcasecmp(vot_getAttr(info,"name"),"QUERY_STATUS") == 0) {
+	    // All-other DAL methods where and INFO of the RESOURCE defines
+	    // a QUERY_STATUS of the result.
+	    if ( ((val = vot_getAttr (info, "value")), "OK") == 0)
+		return (NULL);				// no error
+	    else
+		return (vot_getValue (info))		// return error message
+	}
+
+
+	NOTES:  We should make this an interface convenience.  A real
+	    error will be a minimal VOTable error return we can parse, but
+	    DAL2 services like TAP may experience overflow where we don't see
+	    an error result until a max-records/timeout is reached and the
+	    error INFO is at the end of the output.  In this last case the
+	    error INFO isn't seen until after table data.  To be real, we
+	    need to then search all INFO children of the RESOURCE rather than
+	    just the first one shown in the above.
+
+
+
+4)  Create a new VOTable from computed values
+
+	vot = vot_openVOTable (NULL)			// initialize
+
+	res = vot_newNode (vot, TY_RESOURCE)		// create empty resource
+	vot_setAttr (res, "id", "newTable")		// set table name
+
+
+	desc = vot_newNode (vot, TY_DESCRIPTION)	// set description
+	vot_setValue (desc, "This is a test description")
+
+	tab = vot_newNode (res, TY_TABLE)		// create a TABLE
+	for (i=0; i < 10; i++) {
+	    f = vot_newNode (tab, TY_FIELD)
+	    sprintf (colname, "col%d", i)
+	    vot_setAttr (f, "name", colname)
+	    vot_setAttr (f, "id", colname)
+		:		:
+	}
+
+	data = vot_newNode (tab, TY_DATA)		// create a DATA
+	tdata = vot_newNode (data, TY_TABLEDATA)	// create a TABLEDATA
+
+	for (i=0; i < nrows; i++) {
+	    tr = vot_newNode (tdata, TY_TR)		// create a row
+	    for (j=0; j < ncols; j++) {
+	        td = vot_newNode (tr, TY_TD)		// create a col
+	        vot_setValue (td, (char *)data[i,j])
+	    }
+	}
+
+	info = vot_newNode (tab, TY_INFO)		// create a DATA
+	vot_setAttr (info, "id", "STATUS")
+	vot_setAttr (info, "value", "OK")
+
+
+	vot_writeVOTable (vot, stdout)			// write it out
+
+
+
+4-A)  Create a new VOTable from computed values (Alternate Method)
+
+	vot = vot_openVOTable (NULL)			// initialize
+
+	res = vot_newRESOURCE (vot)			// create empty resource
+	vot_setAttr (res, "id", "newTable")		// set table name
+
+							// set description
+	desc = vot_newDESCRIPTION (vot, "This is a test description")
+
+	tab = vot_newTABLE (res)			// create a TABLE
+	for (i=0; i < 10; i++) {
+	    f = vot_newFIELD (tab)
+	    sprintf (colname, "col%d", i)
+	    vot_setAttr (f, "name", colname)
+	    vot_setAttr (f, "id", colname)
+		:		:
+	}
+
+	data = vot_newDATA (tab)			// create a DATA
+	tdata = vot_newTABLEDATA (data)			// create a TABLEDATA
+
+	for (i=0; i < nrows; i++) {
+	    tr = vot_newTR (tdata)			// create a row
+	    for (j=0; j < ncols; j++) {
+	        td = vot_newTD (tr)			// create a col
+	        vot_setValue (td, (char *)data[i,j])
+	    }
+	}
+
+	info = vot_newINFO (tab)			// create a DATA
+	vot_setAttr (info, "id", "STATUS")
+	vot_setAttr (info, "value", "OK")
+
+
+	vot_writeVOTable (vot, stdout)			// write it out
+
+
+5)  Concatenate the RESOURCEs from two input table to a new output table
+
+	vot1 = vot_openVOTABLE ("file1.xml")		// open input tables
+	vot2 = vot_openVOTABLE ("file2.xml")
+
+	res1 = vot_getRESOURCE (vot1)			// get resources
+	res2 = vot_getRESOURCE (vot2)
+
+	vot3 = vot_openVOTABLE (NULL)			// open output table
+
+	vot_attachNode (vot3, vot1)			// add resources
+	vot_attachNode (vot3, vot2)
+
+	vot_writeVOTable (vot2, stdout)			// write it out
+
+	vot_closeVOTABLE (vot1)				// clean up
+	vot_closeVOTABLE (vot2)
+	vot_closeVOTABLE (vot3)
+
+
+6)  Extract all the values in the columns specified by a GROUP
+
+        vot = vot_openVOTable (fname)
+	res = vot_getRESOURCE (vot)
+	tab = vot_getTABLE (res)
+
+	// Look for the GROUP by name
+	for (group=vot_getGROUP(res); group; group=vot_getNext(group))
+	    if (strcasecmp (vot_getAttr(group,"name"), "CoolStuff") == 0)
+		break;
+
+	// Gather the column numbers for the FIELDs in the GROUP
+	for (fref=vot_getFIELDRef(group); fref; fref=vot_getNext(fref)) {
+	    // Get the field references
+	    ref = vot_getAttr (fref, "ref")
+
+	    // Find the FIELD with the referenced ID attribute, 
+	    field = vot_findByAttr (tab, TY_FIELD, "ID", ref)
+
+	    // Convert to a column number to extract
+	    fp = vot_getField (tab)			// start FIELD
+	    colnum = -1
+	    while (fp && fp != field) {
+		colnum++;				// 0-indexed list
+		fp = vot_getNext (fp)
+	    }
+
+	    cols[numInGroup++] = colnum
+	}
+
+	//  Print out the data in selected columns
+	data = vot_getDATA (tab)
+	tdata = vot_getTABLEDATA (data)
+	tr = vot_getTR(tdata)
+	nrows = vot_getLength (tr)
+
+	for (i=0; i < nrows ; i++) {
+	    for (j=0; j < numInGroup; j++)
+	    	printf ("%s  ", vot_getTableCell (tdata, i, cols[j])
+	    printf ("\n")
+	}
+
+
+
+
+
+

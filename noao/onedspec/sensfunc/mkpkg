@@ -1,0 +1,38 @@
+# SENSFUNC
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	sfadd.x		sensfunc.h <gset.h>
+	sfapertures.x	sensfunc.h
+	sfcgraph.x	sensfunc.h <gset.h>
+	sfcolon.x	sensfunc.h <error.h> <gset.h>
+	sfcolors.x	sensfunc.h <gset.h>
+	sfcomposite.x	sensfunc.h
+	sfdata.x	sensfunc.h
+	sfdelete.x	sensfunc.h <gset.h>
+	sfeout.x	<ctype.h> <error.h> <mach.h> <math/curfit.h>
+	sfextinct.x	sensfunc.h <pkg/gtools.h>
+	sffit.x		sensfunc.h <math/curfit.h>
+	sfginit.x	sensfunc.h <gset.h>
+	sfgraph.x	sensfunc.h <error.h> <gset.h> <math/curfit.h>
+	sfimage.x	sensfunc.h <smw.h> <gset.h> <math/curfit.h>
+	sfmarks.x	sensfunc.h <gset.h>
+	sfmove.x	sensfunc.h <gset.h>
+	sfnearest.x	sensfunc.h <gset.h> <mach.h>
+	sfoutput.x	sensfunc.h <imhdr.h> <mach.h>
+	sfreset.x	sensfunc.h
+	sfrms.x		sensfunc.h
+	sfsensfunc.x	sensfunc.h <error.h> <gset.h> <mach.h>
+	sfshift.x	sensfunc.h
+	sfstats.x	sensfunc.h
+	sfstds.x	sensfunc.h
+	sftitle.x	sensfunc.h
+	sfundelete.x	sensfunc.h <gset.h>
+	sfvstats.x	sensfunc.h
+	sfweights.x	sensfunc.h
+	t_sensfunc.x	sensfunc.h
+	;

@@ -1,0 +1,11 @@
+This directory contains the source for the SDAS table I/O routines.  All
+procedure names begin with "tb".  The next letter usually gives some idea of
+the kind of object the procedure deals with (t - table, r - row, c - column,
+p - parameter, h - header parameter).  Procedures beginning with "tbx", "tby",
+"tbf" or "tbz" are lower-level routines for row-ordered tables, column-ordered
+tables, FITS tables or text tables respectively.
+
+The top-level procedures are listed in calls.doc in the doc subdirectory.
+
+A description of the file format of a table is given by fileformat.doc in
+the doc subdirectory.

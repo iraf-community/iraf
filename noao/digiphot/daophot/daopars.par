@@ -1,0 +1,25 @@
+# The DAOPHOT fitting parameters
+
+function,s,h,"gauss",,,"Form of analytic component of psf model"
+varorder,i,h,0,-1,2,"Order of empirical component of psf model"
+nclean,i,h,0,,,Number of cleaning iterations for computing psf model
+saturated,b,h,no,,,"Use wings of saturated stars in psf model computation?"
+matchrad,r,h,3.0,0.0,,"Object matching radius in scale units"
+psfrad,r,h,11.0,0.0,,"Radius of psf model in scale units"
+
+fitrad,r,h,3.0,0.0,,"Fitting radius in scale units"
+recenter,b,h,yes,,,"Recenter stars during fit?"
+fitsky,b,h,no,,,"Recompute group sky value during fit?"
+groupsky,b,h,yes,,,"Use group rather than individual sky values?"
+sannulus,r,h,0.0,,,"Inner radius of sky fitting annulus in scale units"
+wsannulus,r,h,11.0,,,"Width of sky fitting annulus in scale units"
+flaterr,r,h,0.75,0.0,100.0,"Flat field error in percent"
+proferr,r,h,5.0,0.0,100.0,"Profile error in percent"
+maxiter,i,h,50,1,100,"Maximum number of fitting iterations"
+clipexp,i,h,6,0,8,"Bad data clipping exponent"
+cliprange,r,h,2.5,0.0,10.0,"Bad data clipping range in sigma"
+mergerad,r,h,INDEF,0.0,,"Critical object merging radius in scale units"
+critsnratio,r,h,1.0,0.0,,"Critical S/N ratio for group membership"
+maxnstar,i,h,10000,,50000,"Maximum number of stars to fit"
+maxgroup,i,h,60,,100,"Maximum number of stars to fit per group"
+mode,s,h,"ql",,,

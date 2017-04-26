@@ -1,0 +1,55 @@
+.help imdelete Dec85 images.imutil
+.ih
+NAME
+imdelete -- delete a list of images
+.ih
+USAGE
+imdelete images
+.ih
+PARAMETERS
+.ls images
+List of images to be deleted.
+.le
+.ls go_ahead 
+Delete the image?
+.le
+.ls verify = no
+Verify the delete operation for each image.
+.le
+.ls default_action = yes
+The default action for the verify query.
+.le
+.ih
+DESCRIPTION
+IMDELETE takes as input a list of IRAF images specified by \fIimages\fR and
+deletes both the header and pixel files. In \fIverify\fR mode IMDELETE
+queries the user for the appropriate action to be taken for each IRAF image.
+
+If the \fIimages\fR parameter is a URL, it will be accessed and put into 
+the file cache, then immediately deleted.  To simply remove a file from
+the cache, use the \fIfcache\fR command instead.
+.ih
+EXAMPLES
+1. Delete a list of images
+
+.nf
+    cl> imdelete fits*
+.fi
+
+2. Delete a list of images using verify
+
+.nf
+    cl> imdel fits* ver+
+    cl> Delete file \fI'fits1'\fR ? (yes): yes
+    cl> Delete file \fI'fits2'\fR ? (yes): yes
+    cl> Delete file \fI'fits3'\fR ? (yes): yes
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imcopy, fcache
+.endhelp

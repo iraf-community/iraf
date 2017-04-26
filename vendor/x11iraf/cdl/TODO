@@ -1,0 +1,34 @@
+								2/2/98
+
+	- Need a better fill area algorithm
+	- Log scaling seems to be "off"
+	- Would be nice to be able to create an overlay plane in memory
+	  before display to speed display of a large number of markers.
+DONE	- Need a tile image procedure?
+DONE	- selectFB should find the minimal residual size FB rather than
+	  simply the first one larger than the image
+DONE	- Check for memory leaks
+DONE	- Write example tasks
+DONE	- Documentation
+DONE	- Clean up header files
+DONE	- Fortran interface
+DONE	- Clean up procedure decls, find the void procs
+	- if not doing a scale need to set up a simple type conversion
+DONE	- be able to rotate text?
+	- load/save display list procedure?
+DONE	- SPP interface
+	- register multiple servers for output?
+DONE	- fix iraf I/O for V2 image formats
+DONE	- use better fonts and proportional spacing?
+DONE	- sub/superscripting, inline font changes
+DONE	- greek font
+	- mosaic example has bug with sampling odd sized images
+DONE	- segvio with missing imtoolrc file
+	- displaying 32x4 image shows a "fifth" row
+DONE	- ANSI func prototypes
+DONE	- polyline width option
+DONE	- polyline style option
+DONE	- "hollow" line type to show lines as it crosses intensities
+	- FITS extension support
+	- hbar/vbar point types should have complimentary diagonal types
+	- need better WCS support

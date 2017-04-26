@@ -1,0 +1,84 @@
+.help rtextimage Oct93 dataio
+.ih
+NAME
+rtextimage -- convert a text file to an IRAF image
+.ih
+USAGE
+rtextimage input output
+.ih
+PARAMETERS
+.ls input
+A list of text files containing image pixels and optional header.  Most likely
+the output from \fIrcardimage\fR, see examples below.
+.le
+.ls output
+The output IRAF image name.  If more than one text file is being
+read, the ordinal of the text file in \fBinput\fR 
+is appended to \fIoutput\fR to generate a unique image name.
+.le
+.ls otype = ""
+The data type of the output IRAF image pixels.  If left unset and the IRAFTYPE
+keyword is found in the FITS header, output pixels will be of type IRAFTYPE.
+If IRAFTYPE appears more than once in the FITS header, the last value of 
+IRAFTYPE is used.  If left unset and the IRAFTYPE keyword is not provided in
+the FITS header, the output data type is determined from the pixels themselves.
+.le
+.ls header = yes
+If \fBheader\fR = yes, \fIrtextimage\fR will attempt to read a FITS
+header at the beginning of each text file.  
+.le
+.ls pixels = yes
+Read the pixel values from the input text file.  If no then the
+output image is initialized to zero pixel values.
+.le
+.ls nskip = 0
+The number of lines to skip before reading pixels.  This is used to
+skip over a non-standard header and is important only when \fBheader\fR = no.  
+.le
+.ls dim = ""
+A string listing the dimension of each axis.  The number of dimensions listed
+equals the number of image dimensions.  This information must be entered unless
+it can be read from a FITS header.
+.le
+.ih
+DESCRIPTION
+Text files are converted to IRAF images files with procedure
+\fBrtextimage\fR.  The text file consists of an optional header optionally
+followed by the pixel values.  If no pixel values are read the image is
+initialized to all zero pixel values.  If pixel values a given they are
+read in FITS order, that is, the leftmost subscript varies most rapidly.
+The number of image dimensions and the length of each dimension must either
+be read from a FITS header or supplied by the user.  Internally,
+\fBrtextimage\fR determines the format (integer or floating point) of the
+pixels in the text file by reading the first one and assuming all others
+are the same.
+.ih
+EXAMPLES
+1. Read a file written by \fIwtextimage\fR from the magtape file "mta[1]" into
+the IRAF image "picture".
+
+    cl>  rcard mta[1] | rtext out=picture
+
+2. Read a series of text files with no headers preceding the pixels.  The 
+text files were previously read from tape with task \fBrcardimage\fR. 
+The two dimensional images are 512 by 320 pixels, and will be named 
+crab001, crab002, crab003, etc.
+
+    cl> rtext text.* crab header- dim=512,320
+
+
+3. Read a file with a non-standard header.  The header is 5 cardimages long.
+
+    cl> rcard mta[5] | rtext out=spect.1 head- nskip=5 dim=1024
+.ih
+TIME REQUIREMENTS
+Task \fIrtextimage\fR requires about 145 cpu seconds to write a 512 square
+image (integer or real) from a text file.  
+.ih
+BUGS
+The text file being read cannot have lines longer than SZ_LINE characters
+(see hlib$iraf.h).
+.ih
+SEE ALSO
+rcardimage, wtextimage
+.endhelp

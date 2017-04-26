@@ -1,0 +1,8 @@
+# Parameters for the IMREPLACE task.
+
+images,s,a,,,,Images to be edited
+value,r,a,,,,Replacement pixel value
+imaginary,r,h,0.,,,Imaginary component for complex
+lower,r,h,INDEF,,,Lower limit of replacement window
+upper,r,h,INDEF,,,Upper limit of replacement window
+radius,r,h,0.,,,Replacement radius

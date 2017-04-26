@@ -1,0 +1,36 @@
+.help cvcoeff Jun84 "Curfit Package"
+.ih
+NAME
+cvcoeff -- get the number and values of the coefficients
+.ih
+SYNOPSIS
+cvcoeff (cv, coeff, ncoeff)
+
+.nf
+pointer	cv		# curve descriptor
+real	coeff[]		# the coefficient array
+int	ncoeff		# the number of coefficients
+.fi
+.ih
+ARGUMENTS
+.ls pointer
+Pointer to the curve descriptor.
+.le
+.ls coeff
+Array of coefficients.
+.le
+.ls ncoeff
+The number of coefficients.
+.le
+.ih
+DESCRIPTION
+CVCOEFF fetches the coefficient array and the number of coefficients from the
+curve descriptor structure.
+.ih
+NOTES
+The variable ncoeff is only equal to the order specified in CVINIT if the
+curve_type is LEGENDRE or CHEBYSHEV. If curve_type is SPLINE3 then
+ncoeff = order + 3. If curve_type is SPLINE1 then ncoeff = order + 1.
+.ih
+SEE ALSO
+.endhelp

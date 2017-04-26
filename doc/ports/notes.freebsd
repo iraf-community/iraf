@@ -1,0 +1,215 @@
+FreeBSD/IRAF (PC-IRAF) port
+Tue Jul 16 18:38:15 MST 1996
+-------------------------------------------------------------------------------
+FreeBSD lepus 2.2-960612-SNAP FreeBSD 2.2-960612-SNAP
+Gateway P5-166, 64 MB RAM, 2 GB disk, Matrox MGA, 21" Vivitron
+HP DAT, SMC PCI-bus 10 Mb/s Ethernet
+
+This port to FreeBSD is being done using IRAF V2.11DEVELOP and the Linux HSI.
+The goal is to produce a single version of IRAF which can run on both Linux
+and FreeBSD, using separate architectures for each.
+-------------------------------------------------------------------------------
+
+mkpkg
+noao/mkpkg
+	Added "freebsd" architecture.  (7/16)
+
+bin.freebsd				+
+noao/bin.freebsd			+
+	Added "bin.freebsd" bindirs.  (7/16)
+
+unix/hlib/motd
+	This IRAF release will be called "PC-IRAF" rather than FreeBSD/IRAF,
+	since the intent is to support all PC-IRAF operating systems as
+	architectures.  (7/16)
+
+unix/hlib/irafuser.csh
+	1. Now supports both Linux and FreeBSD.
+	2. Compile flags are -O -DBSD -w -Wunused.
+	3. Link flags -static -lcompat.   Currently using the compatibility
+	library -lcompat for rexec (and ftime).  BSD doesn't like rexec but
+	there doesn't appear to be much of any alternative.  (7/16)
+
+unix/hlib/cl.csh
+unix/hlib/fc.csh
+unix/hlib/install
+	Modified to autosense the system type and to support both Linux and
+	FreeBSD.  (7/16)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.FBSD
+	Added support for FreeBSD.  (7/16)
+
+unix/as.freebsd/zsvjmp.s
+	Using the Linux (i386) version of this file; the only difference is
+	that the jump point is _setjmp for BSD, ___setjmp for Linux.  (7/16)
+
+unix/os/irafpath.c
+	Added "freebsd".  (7/16)
+
+unix/os/zfaloc.c
+unix/os/zfiobf.c
+unix/os/zfioks.c
+unix/os/zfiotx.c
+	Added <unistd.h>, lseek type changed to off_t.  This appears to be
+	the new standard.  (7/16)
+
+unix/os/zxwhen.c
+	Extensive changes/additions for BSD.  FreeBSD appears to have fairly
+	complete exception handling facilities (including the IEEE exceptions).
+	Linux was weak in this area.  (7/16)
+
+unix/boot/mkpkg/host.c
+	BSD does not use ELF, but does use ranlib.  Symbolic link resolution
+	appears to be required.  (7/16)
+
+unix/boot/spp/xc.c
+	Since both BSD and Linux are GNU/F2C-based XC is very similar for
+	both systems.  Minor changes to support FreeBSD, such as adding
+	-lcompat to the host libraries, and disabling the ELF/aout stuff
+	except for Linux.  (7/16)
+
+unix/boot/spp/xpp/xppcode.c
+	Changed "warn" to a static function.  BSD has a library function
+	called warn, caused linker conflicts.  (7/16)
+
+pkg/dataio/fits/fits_wheader.x
+pkg/images/filters/median.x
+pkg/images/imarith/icscale.x
+pkg/images/tv/imexamine/iepos.x
+pkg/xtools/gtools/gtcolon.x
+pkg/xtools/inlfit/ingresults.gx
+	Assorted bugs detected at compile time by F2C.  (not sure the warnings
+	are getting disabled).  (7/16)
+
+sys/imfort/bfio.x
+	In zfaloc, the first arg to strpak was changed from fname (a Fortran
+	character variable which was incorrect) to sppname.  (7/17)
+
+noao/artdata/lists/stcolon.x
+	Variable lumfuncs not used.  (7/17)
+
+noao/digiphot/daophot/psf/dpmkpsf.x
+	dp_addstar called incorrectly.  (7/17)
+
+noao/onedspec/dispcor/dcio.x
+	Variable axis never used.  (7/17)
+
+noao/onedspec/identify/idshift.x
+	Function/subroutine confusion.  (7/17)
+
+noao/onedspec/sensfunc/sfoutput.x
+	Variable axis never used.  (7/17)
+
+noao/onedspec/splot/getimage.x
+	gt_setr called with an integer value.  (7/17)
+
+noao/onedspec/t_fitprofs.x
+	pargi called with boolean argument.  (7/17)
+
+noao/rv/rvfgauss.x
+	A couple of _old varables were declared but never used.  (7/17)
+
+noao/twodspec/apextract/apids.x
+	Variables ra, dec declared double but used as both pointers and
+	doubles.  (7/17)
+
+noao/twodspec/longslit/transform/t_transform.x
+	Variable axis not used.  (7/17)
+
+noao/imred/ccdred/src/t_ccdmask.x
+	Procedure cm_mask called with wrong arguments.  (7/17)
+
+noao/imred/ccdred/ccdtest/t_mkimage.x
+	Variable pixtypes not used.  (7/17)
+
+noao/imred/dtoi/hdicfit/hdicebars.x
+noao/imred/dtoi/hdicfit/hdicfit.h
+noao/imred/dtoi/hdicfit/hdicgfit.x
+noao/imred/dtoi/hdicfit/hdicggraph.x
+	Various type related problems.  (7/17)
+
+dev/hosts
+	Updated entry for lepus, which is no longer an A/UX system.  (7/19)
+
+unix/boot/mkpkg/host.c
+unix/boot/mkpkg/main.c
+unix/boot/mkpkg/mkpkg.h
+unix/boot/mkpkg/scanlib.c
+	Various mods to support source code debugging.  Mkpkg now supports
+	the -x flag.  If this is seen -x will be added to all flag defines
+	(XFLAGS, XVFLAGS, LFLAGS).  Mkpkg, whenever a library is referenced,
+	will check for a debug version of the library.  For example if the
+	library is libsys.a the debug version is libsys_p.a.  Calling mkpkg
+	as "mkpkg -x" automatically causes the _p.a versions of all libraries
+	to be updated, creating them and doing a full recompile if necessary,
+	without having to edit any mkpkg or mkpkg.inc files to modify the
+	compile/link flags.  The normal and debug versions of all libraries
+	are maintained independently.  (7/20)
+
+unix/boot/spp/xc.c
+	XC was also modified to support debugging via the -x switch.  Defining
+	the -x switch causes it to be passed on to xpp, rpp, and f77 which
+	is necessary to compile for debuging.  The -x switch also causes XC
+	to look for _p.a (debug) versions of any libraries.  For example,
+	if the command line is "-x libpkg.a -lstg" then XC will look for
+	libpkg_p.a and libstg_p.a, falling back on the normal versions of
+	the libraries if the debug versions are not found.  (7/20)
+
+unix/hlib/f77.sh
+	If the -x switch is given the intermediate C file is edited to replace
+	any "file.f" references with "file.x".  (7/20)
+
+unix/boot/spp/rpp/rpprat/common
+unix/boot/spp/rpp/rpprat/errchk.r
+unix/boot/spp/rpp/rpprat/initkw.r
+unix/boot/spp/rpp/rpprat/outdon.r
+unix/boot/spp/rpp/rpprat/ratfor.r
+	RPP was modified to generate "#line file.x" statements in the output
+	Fortran code to support source code debugging.  This is done only if
+	the -x flag is set.  F2C supports #line but most Fortran compilers
+	do not.  (7/20)
+
+unix/boot/spp/rpp/rpprat/Makefile
+	Added a call to sed to workaround a ratfor bug (generates an
+	unreachable statement).  This makes "make fort" fully automatic.
+	This is used to generate the .f files from the .r files.  (7/20)
+
+--------------------------
+The PC-IRAF (FreeBSD) HSI was erased in a botched rdist update from tucana.
+Reloaded from a 3-Sep-96 backup tape.  Tue Oct 29 16:05:37 MST 1996
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--

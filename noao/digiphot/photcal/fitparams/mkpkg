@@ -1,0 +1,16 @@
+# The MKPKG file for the FITPARAMS task.
+
+$checkout	libpkg.a ../
+$update		libpkg.a
+$checkin	libpkg.a ../
+$exit
+
+libpkg.a:
+	fteval.x	"../lib/parser.h" "fteval.com" <error.h>
+	ftindef.x	"../lib/parser.h" "../lib/fitparams.h" <error.h>
+	ftref.x		"../lib/parser.h" <error.h>
+	fttrneq.x	<pkg/inlfit.h> <math/nlfit.h> <error.h> <pkg/gtools.h> \
+			<pkg/xtanswer.h> "../lib/parser.h" "../lib/fitparams.h" 
+	ftweights.x	"../lib/preval.h" "../lib/parser.h"
+	t_fitparams.x	"../lib/parser.h" "../lib/fitparams.h"
+	;

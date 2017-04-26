@@ -1,0 +1,91 @@
+.help selectors Nov96 tables
+.ih
+NAME
+selectors -- Table row/column selector syntax.
+.ih
+BASIC SYNTAX
+Selectors are appended to table names using a bracket notation. The
+construct "[c:......]" appended to a table name tells that a column
+selector exists. In a similar way, the construct "[r:......]" indicates
+a row selector.
+.ih
+COLUMN SELECTOR
+The basic structure of a column selector is a list of column patterns 
+separated by commas. The column pattern is either a column name, a file 
+name containing a list of column names, or a pattern using the usual IRAF 
+pattern matching syntax. For example, the string
+.nf
+	[c:a[1-9], b, time*, @column.lis]
+.fi
+
+would be expanded as the column names a1 through a9, b, any column
+name beginning with "time", and all the column names in the file
+column.lis. If the column list is entirely whitespace, all columns are
+selected. If the first non-white character is the negation character (~), 
+the selected columns will include all columns not matched by the list. 
+The negation character only has this meaning at the beginning of the list.
+.ih
+ROW SELECTOR
+Rows are selected according to a qpoe filter. The filter is evaluated
+at each table row, and the row is selected if the filter is true.
+
+For sake of an example, suppose we have a star catalog with the
+columns Name, Ra, Dec, V, B-V, and U-B. The simplest sort of filter is
+the equality test. The name of the column appears on the left of an
+equals sign and the column value appears on the right. For example,
+[name=eta_uma]. (The brackets in this and the following example are
+not actually part of the filter.)  Column numbers can be used in place
+of the column name.  This is especially useful for ascii
+tables. Values can be either numbers or strings. It is usually not
+necessary to place strings in quotes.  However, any string (including
+a column name) contains embedded blanks or characters significant to
+the qpoe filter, such a equal signs, commas, or colons, it should be
+placed in quotes.
+
+Ranges of values can be specified by giving the endpoints of the
+ranges separated by a colon. For example, [r:v=10:15] selects all rows
+with visual magnitude between 10 and 15.  Ranges include their
+endpoints. Ranges can also be used with strings as well as
+numbers. Ranges can also be one sided. The filter [r:dec=80:] selects
+all rows with declination greater than or equal to eighty degress and
+the filter [r:dec=:-40] selects all declinations less than or equal to
+forty degrees south. A filter can contain a list of single values and
+ranges. The values in the list should be enclosed in parentheses. For
+example, [r:name=(eta_uma,alpha_lyr)] or [r:b-v=(-1:0,0.5:1)]. 
+
+Individual values or ranges can be negated by placing a ! in front of
+them. For example, [r:name=!eta_uma] selects every row except the star
+named eta_uma and [r:ra=!0:6] selects all rows except those with right
+ascension between zero and six hours. An entire list can be negated by
+placing a ! in front of the column name or the parentheses enclosing
+the list. The filters [r:!name=(eta_uma,alpha_lyr)] and
+[r:name=!(eta_uma,alpha_lyr)] and [r:name=(!eta_uma,!alpha_lyr)] are all
+equivalent.
+
+Filters can test more than one column in a table. The individual tests
+are separated by commas or semicolons. All tests in the filter must
+succeed for the filter to be accepted. For example,
+[r:ra=1.3:1.4,dec=40:42] selects a rectangular region in the catalog. A
+range of row numbers can also be selected by placing the word row on
+the left side of the equals sign. For example, [r:row=10:20] selects
+rows from ten to twenty inclusive and [r:row=50:] selects all rows from
+fifty on. Row selection can be combined with any other test in a
+filter.  A filter, can also be placed in an include file, for example
+[r:@filter.lis]. Include files can be a part of a larger expression 
+and include files can contain other files, up to seven levels deep.
+.ih
+EXAMPLES
+.nf
+1. "[c:WAVELENGTH,FLUX]"        selects columns named "WAVELENGTH" and 
+                                "FLUX"
+
+2. "[r:WAVELENGTH=(4000:5000)]" selects all rows in which the WAVELENGTH
+                                column assumes values in between 4000 and 
+                                5000.
+
+3. "[c:FLUX][r:row=(25:30)]"    selects column FLUX and all rows from 25 
+                                to 30.
+.fi
+.ih
+SEE ALSO
+.endhelp

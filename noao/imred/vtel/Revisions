@@ -1,0 +1,209 @@
+This is the vacuum telescope package revisions file.
+
+mkpkg
+    Added some missing file dependencies and removed unnecessary ones from
+    the mkpkg file. (9/30/99, Davis)
+
+doc/dicoplot.hlp
+doc/readvt.hlp
+doc/unwrap.hlp
+doc/pimtext.hlp
+    Fixed minor formating problems.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+May 16, 1989 by Dyer Lytle mods to 'readvt', 'syndico', and 'mscan'
+
+Fixed readvt to work with tape drives over the network [(if (mtfile(...].
+Modified syndico to take advantage of the disk-center info in the image
+header.
+
+Modified mscan to be much faster by taking out the geometrical correction.
+Also simplified it by removing the date/time pimtext call.  Also made it
+create only the images needed.  Also made it have a short file name option.
+Also made it work on tape drives over the net.
+
+
+June 5, 1988 by Dyer Lytle modification to PUTSQIB
+
+PUTSQIB had code in it for triming the limb as well as merging the two
+images.  I simplified the program to just make the merge.  The task TRIM
+can be used to trim the limb, and do a better job of it at that.
+
+September 29, 1987 by Dyer Lytle add SYNDICO to package
+
+Added this new program for makeing dicomed prints of daily
+grams 18 cm across.
+
+July 17, 1987 by Dyer Lytle fix bug in numeric.x
+
+There was a bug in the way an error flag was being set that made
+the program fail with a 'divide by zero' error on some data sets.
+
+June 8, 1987  by Dyer Lytle  Overhaul of the package
+
+Major modifications were made to the code to make it conform to IRAF
+standards.  Dynamic memory allocation replaced fixed memory allocation
+in many places.  Readvt was modified to accept templates for input
+and output file names.  New structures were provided for the vacuum
+telescope header, the tapeio buffer, and to reduce the argument count
+for the subroutine 'numeric'.  Vtfix was dropped from the package
+since 'readvt' was modified to check for long records by doing its
+own buffering.  Unwrap was updated to a new, more general and powerful
+version.  A major bug was found and fixed in 'rmap' which was causing
+the total mapped pixel count to be off by about 20%.
+
+June 10, 1986  by Dyer Lytle  Modification of PIMTEXT
+
+Pimtext was modified to allow the user to magnify the text in x and/or y
+and to get the date and/or time from a reference image if desired.
+
+May 21, 1986  by Dyer Lytle  Addition of PIMTEXT to package
+
+Pimtext was added to the vacuum telescope package.  This program allows
+the user to insert text directly into images.  The default action of the
+program is to look up the date and time in the image headers and insert
+this information in the lower left corner of each image.  The user can
+modify the parameters to write any text string.
+
+May 15, 1986  by Dyer Lytle  Modification to Mscan
+
+Mscan was modified to write the date and time into the images using
+a pixel font.  A hidden argument controls this option.  The characters
+are written into the image itself to speed up the moviemaking process.
+Various hidden parameters were added to allow the user to specify
+things about the text such as postition, pixel value, background fill,
+and background value.
+
+May 7, 1986  by Dyer Lytle  Modification to Makeimages and Destreak5
+
+Makeimages and Destreak5 were modified to accept as another argument
+the input scratch disk on which the input files are to be expected.
+
+February 19, 1986  by Dyer Lytle  Modification to Fitslogr
+
+Rfits was changed to produce a short header by default instead of
+a long header.  I changed fitslogr to force the long header it needs.
+
+February 6, 1986  by Dyer Lytle  Modification to Dicoplot
+
+Dicoplot was plotting all of the dates in the input image header
+file.  Sometimes, this list includes dates which should appear
+off the plot, before the zero or after the 360 degree marks.
+The modification involved teaching the program to dump these
+extra dates instead of putting them on the plots.
+
+January 30, 1986  by Dyer Lytle  Modification to vtfix
+
+Vtfix was originally set up to correct extra long records on
+vacuum telescope tapes.  It looked to record lengths of 10242
+bytes and truncated them to 10240 bytes.  Today I found a tape
+with lots of different record lengths all larger than 10240 so
+I modified vtfix to look for records with lengths longer than
+10240 bytes and truncate them to 10240.
+
+January 29, 1986  by Dyer Lytle  Modification to makehelium.
+
+Makehelium was modified to automatically delete the absolute
+value image output from RMAP since this image is junk anyway.
+
+January 29, 1986  by Dyer Lytle  Bug fix and mods to dicoplot.
+
+Dicoplot had a bug which caused the Ratio (POLARITY) images to
+come out zero.  This was corrected.  Also some of the constants
+in GREYMAP were changed to increase the contrast in the weights
+image and in the abs. flux image.  The greyscale as drawn on the
+images was modified to not have white boxes around each grey level
+and to have the number associated with each grey level printed on the
+plot.
+
+January 28, 1986  by Dyer Lytle  Modifications to mscan.
+
+Mscan was using too much memory when processing large images.
+This was causing a lot of page fault errors on VMS.  A modification
+was made to mscan to use fixed size subrasters, decreasing the
+memory needs drastically.
+
+January 20, 1986  by Dyer Lytle  Modifications to readss4.x.
+
+Readss4, which is a subroutine called by mscan to read type 4
+sector scans was set up to add the average field to each pixel
+of the output image.  This was found to be useful only in the
+special case of type 4 intensity scans and was removed.
+"It wasn't a BUG, it was a FEATURE!"
+
+January 20, 1986  by Dyer Lytle  Modifications to destreak.x.
+
+Destreak was set up to use a temporary image for data storage
+between the two destreaking passes.  The temporary image was
+hardwired into the name "tempim".  This was found to unacceptable
+since two or more destreaking jobs run at the same time would have
+a collision at "tempim".  The temporary image was made into an input
+parameter.
+
+January 20, 1986  by Dyer Lytle  Modifications to CL scripts.
+
+The CL scripts makeimages.cl, makehelium.cl, destreak5.cl, and
+writetape.cl were modified to check for the existence of each file
+before it tries to use it.  An error message is output if an image
+cannot be accessed.
+
+January 20, 1986  by Dyer Lytle  Modification to vtblink.cl
+
+Vtblink was modified so that the command "stat" can be entered to the
+"next image" prompt and the script will list which images are loaded
+into which IIS memory plane.
+
+January 20, 1986  by Dyer Lytle  Modification to merge.x
+
+Merge was not set up to handle the differences between the magnetogram
+reduction and the 10830 reduction.  Magnetogram data has three(3) images
+per day and 10830 data has two(2) images per day.  The extra image for
+magnetogram data is the absolute value immage.  Merge was designed to
+expect all three images and to produce four(4) output images.  When
+10830 data is input merge should expect two input images per day and
+only produce two output images.  This modification was made.
+Also the output images were set up such that the data and absolute
+value images were output without being divided by the weight image.
+This was changed since no information is lost by doing this division
+since the weight image is also saved.  Merge was also restructured
+quite a bit but is still a mess and needs rewriting, but it works.
+
+January 20, 1986  by Dyer Lytle  Modification to rmap.x
+
+Rmap was changed to calculate the average field, the average absolute
+field, and the total number of pixels for each gram reduced.
+These parameters are stored in the reduced data image header as
+MEAN_FLD, MEANAFLD, and NUM_PIX.
+
+January 10, 1986  by Dyer Lytle  Bug fix in tcopy.
+
+Tcopy was reporting errors incorrectly.  The record number identified
+with the error was one less than the actual error record.
+
+January 10, 1986  by Dyer Lytle  Modification to decodeheader.x.
+
+Changed the format used by decodeheader to print out the date and time,
+the format was of variable width depending on the size of the number printed.
+The new format has fixed length fields.
+
+January 9, 1986   by Dyer Lytle   Modification to merge.
+
+Merge was modified to expect the images in the textfile 'mergelist' to be in the
+order (data, abs value, weights) instead of (data, weights, abs value).
+
+January 3, 1986   by Dyer Lytle   Correction to dicoplot.
+
+Dicoplot had, for some integer expressions, TRUE/FALSE instead of YES/NO.
+This works fine on the UNIX system but was found to fail on VMS.
+
+January 3, 1986   by Dyer Lytle   Correction to mscan.
+
+Mscan was not reading type one(1) area scans properly.  The error occurred
+in readss1 where a temporary array was being salloced with the wrong length.
+The correction involved replacing "ny" by "2*ny".
+Also, readss1 and readss3 had a rather contrived error recovery mechanism built
+in, I removed this and will add a more general and reliable error procedure
+based on the fset(VALIDATE) call in a later revision.

@@ -1,0 +1,61 @@
+.help unlearn Feb86 language
+.ih
+NAME
+unlearn -- restore initial defaults for parameters
+.ih
+USAGE
+unlearn name [name ...]
+.ih
+PARAMETERS
+.ls name
+An IRAF task or package name.
+.le
+.ih
+DESCRIPTION
+Normally when a task terminates the values of the query mode task parameters
+used are stored in the parameter file on disk, appearing as the new defaults
+the next time the task is run.  The \fIunlearn\fR command instructs the CL
+to forget any task parameters it might have learned and to use the initial
+default values the next time the task is run.  If a tasks parameters have
+been cached, then they are removed from the parameter cache.
+
+If a package name is specified all the tasks in the package are unlearned.
+.ih
+EXAMPLES
+1. Unlearn the parameters for the delete and plot.graph tasks.
+
+	cl> unlearn delete plot.graph
+
+2. Unlearn the parameters for all tasks in the \fIdataio\fR package.
+
+	cl> unlearn dataio
+
+3. To unlearn the parameters for all tasks in the system, log out of the
+CL and run \fImkiraf\fR, or enter the following:
+
+.nf
+	cl> chdir uparm
+	cl> delete *.par
+.fi
+.ih
+BUGS
+It is possible for the parameter set for a task to become corrupted,
+e.g., if the CL is interrupted while it is updating the parameter file on
+disk, causing a truncated file to be written.  If this should occur one
+will get error messages complaining about illegal arguments or parameters
+not found when the task is run.  The fix is to "unlearn" the parameters
+for the task.
+
+When the CL fetches the parameters for a task, it checks to see if the
+system defaults have been updated more recently than the user's copy of
+the parameter set, and uses the system copy if it is more recent, after
+printing a message to warn the user.  This is done by comparing the file
+dates for the system and user parameter sets.  On VMS, it is easy for the
+modify date of the system copy of the parameter set to become updated
+even though the file data has not been modified, causing an annoying warning
+message to be printed when the task is later run.  Should this occur,
+the best solution is to unlearn all affected parameter sets.
+.ih
+SEE ALSO
+cache, update, lparam, eparam
+.endhelp

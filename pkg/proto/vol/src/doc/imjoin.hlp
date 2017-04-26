@@ -1,0 +1,76 @@
+.help imjoin Jan89 images
+.ih
+NAME
+imjoin -- join input images into output image along specified axis
+.ih
+USAGE
+imjoin input output 
+.ih
+PARAMETERS
+.ls input
+Input images or @file
+.le
+.ls output
+Output joined image
+.le
+.ls joindim = 1
+Image dimension along which the input images will be joined.
+.le
+.ls outtype = ""
+Output image datatype.  If not specified, defaults to highest precedence
+input image datatype.
+.le
+
+.ih
+DESCRIPTION
+
+IMJOIN concatenates a set of input images into a single output image,
+in a specified dimension only.  For example, it can join a set of one
+dimensional images into a single, long one dimensional image, or a
+set of one dimensional images into a single two dimensional image.
+IMJOIN may be used to piece together datacubes into larger
+datacubes, either in x, y, or z; likewise with higher dimensional images.
+
+For joining a set of 1 or 2 dimensional images in both x and y at the same
+time, see IMMOSAIC.  For stacking images of any dimension into an image
+of the next higher dimension, see IMSTACK.  Although IMJOIN can also
+stack a set of images into a single higher dimensional image, IMSTACK
+is more efficient for that operation.  In most cases, IMJOIN must keep
+all input images open at the same time, while IMSTACK does not (there may
+be limitations on the number of files that can be kept open at one time).
+Use IMJOIN primarily when joining a set of images along any dimension that
+is not the next higher one from that of the input images.
+
+.ih
+EXAMPLES
+
+.nf
+1.  Join a list of one dimensional spectra into a single long image.
+
+    cl> imjoin @inlist output 1
+
+2.  Join three datacubes along the z direction.
+
+    cl> imjoin c1,c2,c3 fullxcube 3
+
+.fi
+
+.ih
+TIMINGS
+
+Join 10 5000 column type short spectra into one 50000 column image:
+6 seconds on a diskless Sun-3.  
+
+Join 2 512*512 images:  28 seconds on diskless Sun-3.  Join 2 50*50*50
+datacubes in x, y, or z:  15 seconds.
+
+.ih
+BUGS
+
+There may be limitations on the number of input images that can be handled
+in one execution on some systems.
+
+.ih
+SEE ALSO
+immosaic, imstack, imslice
+.endhelp

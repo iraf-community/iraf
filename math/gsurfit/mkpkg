@@ -1,0 +1,111 @@
+# General surface fitting tools library.
+
+$checkout libgsurfit.a lib$
+$update   libgsurfit.a
+$checkin  libgsurfit.a lib$
+$exit
+
+zzdebug:
+	$update libgsurfit.a
+	$omake zzdebug.x
+	$link	zzdebug.o libgsurfit.a -o zzdebug
+	;
+
+tfiles:
+	$set GEN = "$$generic -k -t rd"
+
+	$ifolder (gs_b1evalr.x, gs_b1eval.gx)	$(GEN)	gs_b1eval.gx	$endif
+	$ifolder (gs_bevalr.x, gs_beval.gx)	$(GEN)	gs_beval.gx	$endif
+	$ifolder (gs_chomatr.x, gs_chomat.gx)	$(GEN)	gs_chomat.gx	$endif
+	$ifolder (gs_f1devalr.x, gs_f1deval.gx)	$(GEN)	gs_f1deval.gx	$endif
+	$ifolder (gs_fevalr.x, gs_feval.gx)	$(GEN)	gs_feval.gx	$endif
+	$ifolder (gs_fderr.x, gs_fder.gx)	$(GEN)	gs_fder.gx	$endif
+	$ifolder (gs_devalr.x, gs_deval.gx)	$(GEN)	gs_deval.gx	$endif
+	$ifolder (gsaccumr.x, gsaccum.gx)	$(GEN)	gsaccum.gx	$endif
+	$ifolder (gsacptsr.x, gsacpts.gx)	$(GEN)	gsacpts.gx	$endif
+	$ifolder (gsaddr.x, gsadd.gx)		$(GEN)	gsadd.gx	$endif
+	$ifolder (gscoeffr.x, gscoeff.gx)	$(GEN)	gscoeff.gx	$endif
+	$ifolder (gscopyr.x, gscopy.gx)		$(GEN)	gscopy.gx	$endif
+	$ifolder (gsderr.x, gsder.gx)		$(GEN)	gsder.gx	$endif
+	$ifolder (gserrorsr.x, gserrors.gx)	$(GEN)	gserrors.gx	$endif
+	$ifolder (gsevalr.x, gseval.gx)		$(GEN)	gseval.gx	$endif
+	$ifolder (gsfitr.x, gsfit.gx)		$(GEN)	gsfit.gx	$endif
+	$ifolder (gsfreer.x, gsfree.gx)		$(GEN)	gsfree.gx	$endif
+	$ifolder (gsgcoeffr.x, gsgcoeff.gx)	$(GEN)	gsgcoeff.gx	$endif
+	$ifolder (gsinitr.x, gsinit.gx)		$(GEN)	gsinit.gx	$endif
+	$ifolder (gsrefitr.x, gsrefit.gx)	$(GEN)	gsrefit.gx	$endif
+	$ifolder (gsrejectr.x, gsreject.gx)	$(GEN)	gsreject.gx	$endif
+	$ifolder (gsrestorer.x, gsrestore.gx)	$(GEN)	gsrestore.gx	$endif
+	$ifolder (gssaver.x, gssave.gx)		$(GEN)	gssave.gx	$endif
+	$ifolder (gsscoeffr.x, gsscoeff.gx)	$(GEN)	gsscoeff.gx	$endif
+	$ifolder (gssolver.x, gssolve.gx)	$(GEN)	gssolve.gx	$endif
+	$ifolder (gsstatr.x, gsstat.gx)		$(GEN)	gsstat.gx	$endif
+	$ifolder (gssubr.x, gssub.gx)		$(GEN)	gssub.gx	$endif
+	$ifolder (gsvectorr.x, gsvector.gx)	$(GEN)	gsvector.gx	$endif
+	$ifolder (gszeror.x, gszero.gx)		$(GEN)	gszero.gx	$endif
+	;
+
+libgsurfit.a:
+
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	gs_b1evalr.x	
+	gs_bevalr.x	
+	gs_chomatr.x	gsurfitdef.h <mach.h> <math/gsurfit.h>
+	gs_f1devalr.x	
+	gs_fevalr.x	<math/gsurfit.h>
+	gs_fderr.x	<math/gsurfit.h>
+	gs_devalr.x	
+	gsaccumr.x	gsurfitdef.h <math/gsurfit.h>
+	gsacptsr.x	gsurfitdef.h <math/gsurfit.h>
+	gsaddr.x	gsurfitdef.h <math/gsurfit.h>
+	gscoeffr.x	gsurfitdef.h
+	gscopyr.x	gsurfitdef.h <math/gsurfit.h>
+	gsderr.x	gsurfitdef.h <math/gsurfit.h>
+	gserrorsr.x	gsurfitdef.h <mach.h>
+	gsevalr.x	gsurfitdef.h <math/gsurfit.h>
+	gsfitr.x	gsurfitdef.h <math/gsurfit.h>
+	gsfreer.x	gsurfitdef.h
+	gsgcoeffr.x	gsurfitdef.h <math/gsurfit.h>
+	gsinitr.x	gsurfitdef.h <math/gsurfit.h>
+	gsrefitr.x	gsurfitdef.h <math/gsurfit.h>
+	gsrejectr.x	gsurfitdef.h <math/gsurfit.h>
+	gsrestorer.x	gsurfitdef.h <math/gsurfit.h>
+	gssaver.x	gsurfitdef.h <math/gsurfit.h>
+	gsscoeffr.x	gsurfitdef.h <math/gsurfit.h>
+	gssolver.x	gsurfitdef.h <math/gsurfit.h>
+	gsstatr.x	gsurfitdef.h <math/gsurfit.h>
+	gssubr.x	gsurfitdef.h <math/gsurfit.h>
+	gsvectorr.x	gsurfitdef.h <math/gsurfit.h>
+	gszeror.x	gsurfitdef.h <math/gsurfit.h>
+
+	gs_b1evald.x	
+	gs_bevald.x	
+	gs_chomatd.x	dgsurfitdef.h <mach.h> <math/gsurfit.h>
+	gs_f1devald.x	
+	gs_fevald.x	<math/gsurfit.h>
+	gs_fderd.x	<math/gsurfit.h>
+	gs_devald.x	
+	gsaccumd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsacptsd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsaddd.x	dgsurfitdef.h <math/gsurfit.h>
+	gscoeffd.x	dgsurfitdef.h
+	gscopyd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsderd.x	dgsurfitdef.h <math/gsurfit.h>
+	gserrorsd.x	dgsurfitdef.h <mach.h>
+	gsevald.x	dgsurfitdef.h <math/gsurfit.h>
+	gsfitd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsfreed.x	dgsurfitdef.h
+	gsgcoeffd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsinitd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsrefitd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsrejectd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsrestored.x	dgsurfitdef.h <math/gsurfit.h>
+	gssaved.x	dgsurfitdef.h <math/gsurfit.h>
+	gsscoeffd.x	dgsurfitdef.h <math/gsurfit.h>
+	gssolved.x	dgsurfitdef.h <math/gsurfit.h>
+	gsstatd.x	dgsurfitdef.h <math/gsurfit.h>
+	gssubd.x	dgsurfitdef.h <math/gsurfit.h>
+	gsvectord.x	dgsurfitdef.h <math/gsurfit.h>
+	gszerod.x	dgsurfitdef.h <math/gsurfit.h>
+	;

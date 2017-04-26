@@ -1,0 +1,921 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include <fset.h>
+include <error.h>
+include <mach.h>
+include <math.h>
+include <math/gsurfit.h>
+include "../../../lib/geomap.h"
+
+define	GM_REAL		1	# computation type is real
+define	GM_DOUBLE	2	# computation type is double
+
+$for (r)
+
+# T_GEOMAP -- Procedure to calculate the transformation required to transform
+# the coordinate system of a reference image to the coordinate system of
+# an input image. The transformation is of the following form.
+#
+#		xin = f (xref, yref)
+#		yin = g (xref, yref)
+
+procedure t_geomap ()
+
+bool	verbose, interactive
+double	xmin, xmax, ymin, ymax, reject
+int	geometry, function, calctype, nfiles, list, in, reclist, nrecords
+int	xxorder, xyorder, xxterms, yxorder, yyorder, yxterms, maxiter
+int	reslist, nresfiles, res
+pointer	sp, in_name, str, out, fit, gd, graphics
+real	rxmin, rxmax, rymin, rymax
+
+bool	clgetb()
+double	clgetd()
+int	clgeti(), clgwrd(), clplen(), errget(), imtopenp(), imtlen()
+int	imtgetim()
+pointer	clpopnu(), clgfil(), dtmap(), gopen(), open()
+
+errchk	geo_mapr(), geo_mapd()
+
+begin
+	# Get working space.
+	call smark (sp)
+	call salloc (in_name, SZ_FNAME, TY_CHAR)
+	call salloc (graphics, SZ_FNAME, TY_CHAR)
+	call salloc (str, max(SZ_LINE, SZ_FNAME), TY_CHAR)
+
+	# Get input data file(s).
+	list = clpopnu ("input")
+	nfiles = clplen (list)
+
+	# Open database output file.
+	call clgstr ("database", Memc[str], SZ_FNAME)
+	out = dtmap (Memc[str], APPEND)
+
+	# Get minimum and maximum reference values.
+	xmin = clgetd ("xmin")
+	if (IS_INDEFD(xmin))
+	    rxmin = INDEFR
+	else
+	    rxmin = xmin
+	xmax = clgetd ("xmax")
+	if (IS_INDEFD(xmax))
+	    rxmax = INDEFR
+	else
+	    rxmax = xmax
+	ymin = clgetd ("ymin")
+	if (IS_INDEFD(ymin))
+	    rymin = INDEFR
+	else
+	    rymin = ymin
+	ymax = clgetd ("ymax")
+	if (IS_INDEFD(ymax))
+	    rymax = INDEFR
+	else
+	    rymax = ymax
+
+	# Get the records list.
+	reclist = imtopenp ("transforms")
+	nrecords = imtlen (reclist)
+	if ((nrecords > 0) && (nrecords != nfiles)) {
+	    call eprintf (
+	    "The number of records is not equal to the number of input files")
+	    call clpcls (list)
+	    call dtunmap (out)
+	    call imtclose (reclist)
+	    call sfree (sp)
+	    return
+	}
+
+	# Get the results file list.
+	reslist = clpopnu ("results")
+	nresfiles = clplen (reslist)
+	if (nresfiles > 1 && nresfiles !=  nfiles) {
+	    call eprintf ("Error: there are too few results files\n")
+	    call clpcls (list)
+	    call dtunmap (out)
+	    call imtclose (reclist)
+	    call clpcls (reslist)
+	    call sfree (sp)
+	    return
+	}
+
+	# Get the surface fitting parameters.
+	geometry = clgwrd ("fitgeometry", Memc[str], SZ_LINE, GM_GEOMETRIES)
+	function = clgwrd ("function", Memc[str], SZ_LINE, GM_FUNCS)
+	xxorder = clgeti ("xxorder")
+	xyorder = clgeti ("xyorder")
+	xxterms = clgwrd ("xxterms", Memc[str], SZ_LINE, GM_XFUNCS) - 1
+	yxorder = clgeti ("yxorder")
+	yyorder = clgeti ("yyorder")
+	yxterms = clgwrd ("yxterms", Memc[str], SZ_LINE, GM_XFUNCS) - 1
+	maxiter = clgeti ("maxiter")
+	reject = clgetd ("reject")
+	calctype = clgwrd ("calctype", Memc[str], SZ_LINE, ",real,double,")
+
+	# Get the graphics parameters.
+	verbose = clgetb ("verbose")
+	interactive = clgetb ("interactive")
+	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
+
+	# Flush standard output on newline.
+	call fseti (STDOUT, F_FLUSHNL, YES)
+
+	# Initialize the fit structure.
+	call geo_minit (fit, GM_NONE, geometry, function, xxorder, xyorder,
+	    xxterms, yxorder, yyorder, yxterms, maxiter, reject)
+
+	# Loop over the files.
+	while (clgfil (list, Memc[in_name], SZ_FNAME) != EOF) {
+
+	    # Open text file of coordinates.
+	    in = open (Memc[in_name], READ_ONLY, TEXT_FILE)
+
+	    # Open the results files.
+	    if (nresfiles <= 0)
+		res = NULL
+	    else if (clgfil (reslist, Memc[str], SZ_FNAME) != EOF)
+		res = open (Memc[str], NEW_FILE, TEXT_FILE)
+
+	    # Set file name in structure.
+	    if (nrecords > 0) {
+		if (imtgetim (reclist, GM_RECORD(fit), SZ_FNAME) != EOF)
+		    ;
+	    } else
+	        call strcpy (Memc[in_name], GM_RECORD(fit), SZ_FNAME)
+
+	    if (verbose && res != STDOUT) {
+	        call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
+	        call printf ("\nCoordinate list: %s  Transform: %s\n")
+		    call pargstr (Memc[str])
+		    call pargstr (GM_RECORD(fit))
+		if (res != NULL) 
+	            call fstats (res, F_FILENAME, Memc[str], SZ_FNAME)
+		else
+		    call strcpy ("", Memc[str], SZ_FNAME)
+	        call printf ("    Results file: %s\n")
+		    call pargstr (Memc[str])
+		call flush (STDOUT)
+	    }
+	    if (res != NULL) {
+	        call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
+	        call fprintf (res, "\n# Coordinate list: %s  Transform: %s\n")
+		    call pargstr (Memc[str])
+		    call pargstr (GM_RECORD(fit))
+		if (res != NULL) 
+	            call fstats (res, F_FILENAME, Memc[str], SZ_FNAME)
+		else
+		    call strcpy ("", Memc[str], SZ_FNAME)
+	        call fprintf (res, "#     Results file: %s\n")
+		    call pargstr (Memc[str])
+		call flush (STDOUT)
+	    }
+
+	    if (interactive) {
+	        gd = gopen (Memc[graphics], NEW_FILE, STDGRAPH)
+	    } else
+	        gd = NULL
+
+	    iferr { 
+		if (calctype == GM_REAL) 
+	            call geo_mapr (gd, in, out, res, fit, rxmin, rxmax, rymin,
+		        rymax, verbose)
+		else
+		    call geo_mapd (gd, in, out, res, fit, xmin, xmax, ymin,
+		        ymax, verbose)
+	    } then {
+		if (verbose && res != STDOUT) {
+		    call printf ("Error fitting coordinate list: %s\n")
+		        call pargstr (Memc[in_name])
+		    call flush (STDOUT)
+		    if (errget (Memc[str], SZ_LINE) == 0)
+			;
+		    call printf ("\t%s\n")
+			call pargstr (Memc[str))
+		}
+		if (res != NULL) {
+		    call fprintf (res, "# Error fitting coordinate list: %s\n")
+		        call pargstr (Memc[in_name])
+		    call flush (STDOUT)
+		    if (errget (Memc[str], SZ_LINE) == 0)
+			;
+		    call fprintf (res, "#     %s\n")
+			call pargstr (Memc[str))
+		}
+	    }
+
+	    call close (in)
+	    if (nresfiles == nfiles)
+	        call close ( res)
+
+	    if (gd != NULL)
+	        call gclose (gd)
+	}
+
+	# Close up.
+	call geo_free (fit)
+	if (nresfiles < nfiles)
+	    call close ( res)
+	call dtunmap (out)
+	call imtclose (reclist)
+	call clpcls (list)
+	call sfree (sp)
+end
+
+$endfor
+
+$for (rd)
+
+# GEO_MAP -- Procedure to calculate the coordinate transformations
+
+procedure geo_map$t (gd, in, out, res, fit, xmin, xmax, ymin, ymax, verbose)
+
+pointer	gd			#I the graphics stream
+int	in			#I the input file descriptor
+pointer	out			#I the output file descriptor
+int	res			#I the results file descriptor
+pointer	fit			#I pointer to fit parameters
+PIXEL	xmin, xmax		#I max and min xref values
+PIXEL	ymin, ymax		#I max and min yref values
+bool	verbose			#I verbose mode
+
+int	npts, ngood
+pointer	sp, str, xref, yref, xin, yin, wts, xfit, yfit, xerrmsg, yerrmsg
+pointer	sx1, sy1, sx2, sy2
+PIXEL	mintemp, maxtemp
+
+PIXEL	asum$t()
+int	geo_rdxy$t()
+errchk	geo_fit$t, geo_mgfit$t()
+
+begin
+	# Get working space.
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
+
+	# Initialize pointers.
+	xref = NULL
+	yref = NULL
+	xin = NULL
+	yin = NULL
+	wts = NULL
+
+	# Read in data and check that data is in range.
+	npts = geo_rdxy$t (in, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
+	if (npts <= 0) {
+	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
+	    call printf ("Coordinate list: %s has no data in range.\n")
+		call pargstr (Memc[str])
+	    call sfree (sp)
+	    return
+	}
+
+	# Compute the mean of the reference and input coordinates.
+	GM_XOREF(fit) = double (asum$t (Mem$t[xref], npts) / npts)
+	GM_YOREF(fit) = double (asum$t (Mem$t[yref], npts) / npts)
+	GM_XOIN(fit) = double (asum$t (Mem$t[xin], npts) / npts)
+	GM_YOIN(fit) = double (asum$t (Mem$t[yin], npts) / npts)
+
+	# Set the reference point for the projections to INDEF.
+	GM_XREFPT(fit) = INDEFD
+	GM_YREFPT(fit) = INDEFD
+
+	# Compute the weights.
+	call malloc (xfit, npts, TY_PIXEL)
+	call malloc (yfit, npts, TY_PIXEL)
+	call malloc (wts, npts, TY_PIXEL)
+	call amovk$t (PIXEL(1.), Mem$t[wts], npts)
+
+	# Determine the x max and min.
+	if (IS_$INDEF$T(xmin) || IS_$INDEF$T(xmax)) {
+	    call alim$t (Mem$t[xref], npts, mintemp, maxtemp)
+	    if (! IS_$INDEF$T(xmin))
+		GM_XMIN(fit) = double (xmin)
+	    else
+		GM_XMIN(fit) = double (mintemp)
+	    if (! IS_$INDEF$T(xmax))
+		GM_XMAX(fit) = double (xmax)
+	    else
+		GM_XMAX(fit) = double (maxtemp)
+	} else {
+	    GM_XMIN(fit) = double (xmin)
+	    GM_XMAX(fit) = double (xmax)
+	}
+
+	# Determine the y max and min.
+	if (IS_$INDEF$T(ymin) || IS_$INDEF$T(ymax)) {
+	    call alim$t (Mem$t[yref], npts, mintemp, maxtemp)
+	    if (! IS_$INDEF$T(ymin))
+		GM_YMIN(fit) = double (ymin)
+	    else
+		GM_YMIN(fit) = double (mintemp)
+	    if (! IS_$INDEF$T(ymax))
+		GM_YMAX(fit) = double (ymax)
+	    else
+		GM_YMAX(fit) = double (maxtemp)
+	} else {
+	    GM_YMIN(fit) = double (ymin)
+	    GM_YMAX(fit) = double (ymax)
+	}
+
+	# Initalize surface pointers.
+	sx1 = NULL
+	sy1 = NULL
+	sx2 = NULL
+	sy2 = NULL
+
+	# Fit the data.
+	if (gd != NULL) {
+	    iferr {
+	        call geo_mgfit$t (gd, fit, sx1, sy1, sx2, sy2, Mem$t[xref],
+	            Mem$t[yref], Mem$t[xin], Mem$t[yin], Mem$t[wts], npts,
+		    Memc[xerrmsg], Memc[yerrmsg], SZ_LINE)
+	    } then {
+		call gdeactivate (gd, 0)
+		call mfree (xfit, TY_PIXEL)
+		call mfree (yfit, TY_PIXEL)
+		call mfree (wts, TY_PIXEL)
+		call geo_mmfree$t (sx1, sy1, sx2, sy2)
+		call sfree (sp)
+		call error (3, "Too few points for X or Y fits.")
+	    }
+	    call gdeactivate (gd, 0)
+	    if (verbose && res != STDOUT) {
+		call printf ("Coordinate mapping status\n")
+		call flush (STDOUT)
+	    }
+	    if (res != NULL) {
+		call fprintf (res, "# Coordinate mapping status\n")
+	    }
+	} else {
+	    if (verbose && res != STDOUT) {
+		call printf ("Coordinate mapping status\n    ")
+		call flush (STDOUT)
+	    }
+	    if (res != NULL) {
+		call fprintf (res, "# Coordinate mapping status\n#     ")
+	    }
+	    iferr {
+	        call geo_fit$t (fit, sx1, sy1, sx2, sy2, Mem$t[xref],
+		    Mem$t[yref], Mem$t[xin], Mem$t[yin], Mem$t[wts], npts,
+		    Memc[xerrmsg], Memc[yerrmsg], SZ_LINE)
+	    } then {
+		call mfree (xfit, TY_PIXEL)
+		call mfree (yfit, TY_PIXEL)
+		call mfree (wts, TY_PIXEL)
+		call geo_mmfree$t (sx1, sy1, sx2, sy2)
+		call sfree (sp)
+		call error (3, "Too few points for X or Y fits.")
+	    }
+	    if (verbose && res != STDOUT) {
+		call printf ("%s  %s\n")
+		    call pargstr (Memc[xerrmsg])
+		    call pargstr (Memc[yerrmsg])
+		call flush (STDOUT)
+	    }
+	    if (res != NULL) {
+		call fprintf (res, "%s  %s\n")
+		    call pargstr (Memc[xerrmsg])
+		    call pargstr (Memc[yerrmsg])
+		call flush (STDOUT)
+	    }
+	}
+	ngood = GM_NPTS(fit) - GM_NWTS0(fit)
+	if (verbose && res != STDOUT) {
+	    call printf ("    Xin and Yin fit rms: %0.7g  %0.7g\n")
+	    if (ngood <= 1) {
+		call pargd (0.0d0)
+		call pargd (0.0d0)
+	    } else {
+		call pargd (sqrt (GM_XRMS(fit) / (ngood - 1)))
+		call pargd (sqrt (GM_YRMS(fit) / (ngood - 1)))
+	    }
+	    call geo_show$t (STDOUT, fit, sx1, sy1, NO)
+	}
+	if (res != NULL) {
+	    call fprintf (res, "#     Xin and Yin fit rms: %0.7g  %0.7g\n")
+	    if (ngood <= 1) {
+		call pargd (0.0)
+		call pargd (0.0)
+	    } else {
+		call pargd (sqrt (GM_XRMS(fit) / (ngood - 1)))
+		call pargd (sqrt (GM_YRMS(fit) / (ngood - 1)))
+	    }
+	    call geo_show$t (res, fit, sx1, sy1, YES)
+	}
+
+	# Compute and print the fitted x and y values.
+	if (res != NULL) {
+	    call geo_eval$t (sx1, sy1, sx2, sy2, Mem$t[xref], Mem$t[yref],
+		Mem$t[xfit], Mem$t[yfit], npts)
+	    call geo_plist$t (res, fit, Mem$t[xref], Mem$t[yref], Mem$t[xin],
+		Mem$t[yin], Mem$t[xfit], Mem$t[yfit], Mem$t[wts], npts)
+	}
+
+	# Free the data
+	if (xref != NULL)
+	    call mfree (xref, TY_PIXEL)
+	if (yref != NULL)
+	    call mfree (yref, TY_PIXEL)
+	if (xin != NULL)
+	    call mfree (xin, TY_PIXEL)
+	if (yin != NULL)
+	    call mfree (yin, TY_PIXEL)
+	if (xfit != NULL)
+	    call mfree (xfit, TY_PIXEL)
+	if (yfit != NULL)
+	    call mfree (yfit, TY_PIXEL)
+	if (wts != NULL)
+	    call mfree (wts, TY_PIXEL)
+
+	# Output the data.
+	call geo_mout$t (fit, out, sx1, sy1, sx2, sy2)
+
+	# Free the space and close files.
+	call geo_mmfree$t (sx1, sy1, sx2, sy2)
+	call sfree (sp)
+end
+
+
+define	GEO_DEFBUFSIZE	1000	# default data buffer sizes
+
+# GEO_RDXY -- Read in the data points.
+
+int procedure geo_rdxy$t (fd, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
+
+int	fd			# the input file descriptor
+pointer	xref			# the x reference coordinates
+pointer	yref			# the y reference coordinates
+pointer	xin			# the x coordinates
+pointer	yin			# the y coordinates
+PIXEL	xmin, xmax		# the range of the x coordinates
+PIXEL	ymin, ymax		# the range of the y coordinates
+
+int	npts, bufsize
+int	fscan(), nscan()
+
+begin
+	bufsize = GEO_DEFBUFSIZE
+	call malloc (xref, bufsize, TY_PIXEL)
+	call malloc (yref, bufsize, TY_PIXEL)
+	call malloc (xin, bufsize, TY_PIXEL)
+	call malloc (yin, bufsize, TY_PIXEL)
+
+	npts = 0
+	while (fscan (fd) != EOF) {
+
+	    # Decode the data.
+	    call garg$t (Mem$t[xref+npts])
+	    call garg$t (Mem$t[yref+npts])
+	    call garg$t (Mem$t[xin+npts])
+	    call garg$t (Mem$t[yin+npts])
+	    if (nscan() < 4)
+		next
+
+	    # Check the data limits.
+	    if (! IS_$INDEF$T(xmin)) {
+	        if (Mem$t[xref+npts] < xmin)
+		    next
+	    }
+	    if (! IS_$INDEF$T(xmax)) {
+	        if (Mem$t[xref+npts] > xmax)
+		    next
+	    }
+	    if (! IS_$INDEF$T(ymin)) {
+	        if (Mem$t[yref+npts] < ymin)
+		    next
+	    }
+	    if (! IS_$INDEF$T(ymax)) {
+		if (Mem$t[yref+npts] > ymax)
+		    next
+	    }
+
+	    npts = npts + 1
+	    if (npts >= bufsize) {
+		bufsize = bufsize + GEO_DEFBUFSIZE
+		call realloc (xref, bufsize, TY_PIXEL)
+		call realloc (yref, bufsize, TY_PIXEL)
+		call realloc (xin, bufsize, TY_PIXEL)
+		call realloc (yin, bufsize, TY_PIXEL)
+	    }
+	}
+
+	if (npts <= 0) {
+	    call mfree (xref, TY_PIXEL)
+	    call mfree (yref, TY_PIXEL)
+	    call mfree (xin, TY_PIXEL)
+	    call mfree (yin, TY_PIXEL)
+	    xref = NULL
+	    yref = NULL
+	    xin = NULL
+	    yin = NULL
+	} else if (npts < bufsize) {
+	    call realloc (xref, npts, TY_PIXEL)
+	    call realloc (yref, npts, TY_PIXEL)
+	    call realloc (xin, npts, TY_PIXEL)
+	    call realloc (yin, npts, TY_PIXEL)
+	}
+
+	return (npts)
+end
+
+
+# GEO_EVAL -- Evalute the fit.
+
+procedure geo_eval$t (sx1, sy1, sx2, sy2, xref, yref, xi, eta, npts)
+
+pointer sx1, sy1                #I pointer to linear surfaces
+pointer sx2, sy2                #I pointer to higher order surfaces
+PIXEL   xref[ARB]               #I the x reference coordinates
+PIXEL   yref[ARB]               #I the y reference coordinates
+PIXEL   xi[ARB]                 #O the fitted xi coordinates
+PIXEL   eta[ARB]                #O the fitted eta coordinates
+int     npts                    #I the number of points
+
+pointer sp, temp
+
+begin
+        call smark (sp)
+        call salloc (temp, npts, TY_PIXEL)
+
+$if (datatype == r)
+        call gsvector (sx1, xref, yref, xi, npts)
+$else
+        call dgsvector (sx1, xref, yref, xi, npts)
+$endif
+        if (sx2 != NULL) {
+$if (datatype == r)
+            call gsvector (sx2, xref, yref, Mem$t[temp], npts)
+$else
+            call dgsvector (sx2, xref, yref, Mem$t[temp], npts)
+$endif
+            call aadd$t (Mem$t[temp], xi, xi, npts)
+        }
+$if (datatype == r)
+        call gsvector (sy1, xref, yref, eta, npts)
+$else
+        call dgsvector (sy1, xref, yref, eta, npts)
+$endif
+        if (sy2 != NULL) {
+$if (datatype == r)
+            call gsvector (sy2, xref, yref, Mem$t[temp], npts)
+$else
+            call dgsvector (sy2, xref, yref, Mem$t[temp], npts)
+$endif
+
+            call aadd$t (Mem$t[temp], eta, eta, npts)
+        }
+
+        call sfree (sp)
+end
+
+
+# GEO_MOUT -- Write the output database file.
+
+procedure geo_mout$t (fit, out, sx1, sy1, sx2, sy2)
+
+pointer	fit		#I pointer to fitting structure
+int	out		#I pointer to database file
+pointer	sx1, sy1	#I pointer to linear surfaces
+pointer	sx2, sy2	#I pointer to distortion surfaces
+
+int	i, npts, ncoeff
+pointer	sp, str, xcoeff, ycoeff
+PIXEL	xrms, yrms, xshift, yshift, xscale, yscale, xrot, yrot
+$if (datatype == r)
+int	gsgeti()
+$else
+int	dgsgeti()
+$endif
+int	rg_wrdstr()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
+	# Compute the x and y fit rms.
+	#npts = max (0, GM_NPTS(fit) - GM_NREJECT(fit) - GM_NWTS0(fit))
+	npts = max (0, GM_NPTS(fit) - GM_NWTS0(fit))
+        xrms = max (0.0d0, GM_XRMS(fit))
+        yrms = max (0.0d0, GM_YRMS(fit))
+        if (npts > 1) {
+            xrms = sqrt (xrms / (npts - 1))
+            yrms = sqrt (yrms / (npts - 1))
+        } else {
+            xrms = 0.0d0
+            yrms = 0.0d0
+        }
+
+	# Print title.
+	call dtptime (out)
+	call dtput (out, "begin\t%s\n")
+	    call pargstr (GM_RECORD(fit))
+
+	# Print the x and y mean values.
+	call dtput (out, "\txrefmean\t%g\n")
+	    call pargd (GM_XOREF(fit))
+	call dtput (out, "\tyrefmean\t%g\n")
+	    call pargd (GM_YOREF(fit))
+	call dtput (out, "\txmean\t\t%g\n")
+	    call pargd (GM_XOIN(fit))
+	call dtput (out, "\tymean\t\t%g\n")
+	    call pargd (GM_YOIN(fit))
+
+	# Print some of the fitting parameters.
+	if (rg_wrdstr (GM_FIT(fit), Memc[str], SZ_FNAME, GM_GEOMETRIES) <= 0)
+	    call strcpy ("general", Memc[str], SZ_FNAME)
+	call dtput (out, "\tgeometry\t%s\n")
+	    call pargstr (Memc[str])
+	if (rg_wrdstr (GM_FUNCTION(fit), Memc[str], SZ_FNAME, GM_FUNCS) <= 0)
+	    call strcpy ("polynomial", Memc[str], SZ_FNAME)
+	call dtput (out, "\tfunction\t%s\n")
+	    call pargstr (Memc[str])
+
+	# Output the geometric parameters.
+	call geo_lcoeff$t (sx1, sy1, xshift, yshift, xscale, yscale, xrot, yrot)
+	call dtput (out, "\txshift\t\t%g\n")
+	    call parg$t (xshift)
+	call dtput (out, "\tyshift\t\t%g\n")
+	    call parg$t (yshift)
+	call dtput (out, "\txmag\t\t%g\n")
+	    call parg$t (xscale)
+	call dtput (out, "\tymag\t\t%g\n")
+	    call parg$t (yscale)
+	call dtput (out, "\txrotation\t%g\n")
+	    call parg$t (xrot)
+	call dtput (out, "\tyrotation\t%g\n")
+	    call parg$t (yrot)
+
+	# Out the rms values.
+	call dtput (out, "\txrms\t\t%g\n")
+	    call parg$t (PIXEL(xrms))
+	call dtput (out, "\tyrms\t\t%g\n")
+	    call parg$t (PIXEL(yrms))
+
+	# Allocate memory for linear coefficients.
+$if (datatype == r)
+	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
+$else
+	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
+$endif
+	call calloc (xcoeff, ncoeff, TY_PIXEL)
+	call calloc (ycoeff, ncoeff, TY_PIXEL)
+
+	# Output the linear coefficients.
+$if (datatype == r)
+	call gssave (sx1, Mem$t[xcoeff])
+	call gssave (sy1, Mem$t[ycoeff])
+$else
+	call dgssave (sx1, Mem$t[xcoeff])
+	call dgssave (sy1, Mem$t[ycoeff])
+$endif
+	call dtput (out, "\tsurface1\t%d\n")
+	    call pargi (ncoeff)
+	do i = 1, ncoeff {
+	    call dtput (out, "\t\t\t%g\t%g\n")
+		call parg$t (Mem$t[xcoeff+i-1])
+		call parg$t (Mem$t[ycoeff+i-1])
+	}
+
+	call mfree (xcoeff, TY_PIXEL)
+	call mfree (ycoeff, TY_PIXEL)
+
+	# Allocate memory for higer order coefficients.
+	if (sx2 == NULL)
+	    ncoeff = 0
+	else
+$if (datatype == r)
+	    ncoeff = gsgeti (sx2, GSNSAVE)
+$else
+	    ncoeff = dgsgeti (sx2, GSNSAVE)
+$endif
+	if (sy2 == NULL)
+	    ncoeff = max (0, ncoeff)
+	else
+$if (datatype == r)
+	    ncoeff = max (gsgeti (sy2, GSNSAVE), ncoeff)
+$else
+	    ncoeff = max (dgsgeti (sy2, GSNSAVE), ncoeff)
+$endif
+	call calloc (xcoeff, ncoeff, TY_PIXEL)
+	call calloc (ycoeff, ncoeff, TY_PIXEL)
+
+	# Save the coefficients.
+$if (datatype == r)
+	call gssave (sx2, Mem$t[xcoeff])
+	call gssave (sy2, Mem$t[ycoeff])
+$else
+	call dgssave (sx2, Mem$t[xcoeff])
+	call dgssave (sy2, Mem$t[ycoeff])
+$endif
+
+	# Output the coefficients.
+	call dtput (out, "\tsurface2\t%d\n")
+	    call pargi (ncoeff)
+	do i = 1, ncoeff {
+	    call dtput (out, "\t\t\t%g\t%g\n")
+		call parg$t (Mem$t[xcoeff+i-1])
+		call parg$t (Mem$t[ycoeff+i-1])
+	}
+
+	# Cleanup.
+	call mfree (xcoeff, TY_PIXEL)
+	call mfree (ycoeff, TY_PIXEL)
+	call sfree (sp)
+end
+
+
+# GEO_PLIST -- Print the input, output, and fitted data and the residuals.
+
+procedure geo_plist$t (fd, fit, xref, yref, xin, yin, xfit, yfit, wts, npts)
+
+int     fd                      #I the results file descriptor
+pointer fit                     #I pointer to the fit structure
+PIXEL   xref[ARB]               #I the input x coordinates
+PIXEL   yref[ARB]               #I the input y coordinates
+PIXEL   xin[ARB]                #I the input ra / longitude coordinates
+PIXEL   yin[ARB]                #I the input dec / latitude coordinates
+PIXEL   xfit[ARB]               #I the fitted ra / longitude coordinates
+PIXEL   yfit[ARB]               #I the fitted dec / latitude coordinates
+PIXEL   wts[ARB]                #I the weights array
+int     npts                    #I the number of data points
+
+int     i, index
+pointer sp, fmtstr, twts
+
+begin
+        # Allocate working space.
+        call smark (sp)
+        call salloc (fmtstr, SZ_LINE, TY_CHAR)
+        call salloc (twts, npts, TY_PIXEL)
+
+        # Compute the weights.
+        call amov$t (wts, Mem$t[twts], npts)
+        do i = 1, GM_NREJECT(fit) {
+            index = Memi[GM_REJ(fit)+i-1]
+            if (wts[index] > PIXEL(0.0))
+                Mem$t[twts+index-1] = PIXEL(0.0)
+        }
+
+        # Print banner.
+        call fprintf (fd, "\n# Input Coordinate Listing\n")
+        call fprintf (fd, "#     Column 1: X (reference) \n")
+        call fprintf (fd, "#     Column 2: Y (reference)\n")
+        call fprintf (fd, "#     Column 3: X (input)\n")
+        call fprintf (fd, "#     Column 4: Y (input)\n")
+        call fprintf (fd, "#     Column 5: X (fit)\n")
+        call fprintf (fd, "#     Column 6: Y (fit)\n")
+        call fprintf (fd, "#     Column 7: X (residual)\n")
+        call fprintf (fd, "#     Column 8: Y (residual)\n\n")
+
+        # Create the format string.
+        call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %s %s  %s %s\n")
+$if (datatype == r)
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+	    call pargstr ("%9.7g")
+$else
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+	    call pargstr ("%16.14g")
+$endif
+
+	# Print the data.
+	do i = 1, npts {
+	    call fprintf (fd, Memc[fmtstr])
+		call parg$t (xref[i])
+		call parg$t (yref[i])
+		call parg$t (xin[i])
+		call parg$t (yin[i])
+           if (Mem$t[twts+i-1] > 0.0d0) {
+                call parg$t (xfit[i])
+                call parg$t (yfit[i])
+                call parg$t (xin[i] - xfit[i])
+                call parg$t (yin[i] - yfit[i])
+            } else {
+                call parg$t (INDEF)
+                call parg$t (INDEF)
+                call parg$t (INDEF)
+                call parg$t (INDEF)
+            }
+
+	}
+
+        call fprintf (fd, "\n")
+
+	call sfree (sp)
+
+end
+
+# GEO_SHOW -- Print the coordinate mapping parameters.
+
+procedure geo_show$t (fd, fit, sx1, sy1, comment)
+
+int     fd                      #I the output file descriptor
+pointer	fit			#I pointer to the fit structure
+pointer sx1, sy1                #I pointer to linear surfaces
+int     comment                 #I comment the output ?
+
+PIXEL   xshift, yshift, a, b, c, d
+PIXEL   xscale, yscale, xrot, yrot
+pointer sp, str
+bool    fp_equal$t()
+
+begin
+        # Allocate temporary space.
+        call smark (sp)
+        call salloc (str, SZ_LINE, TY_CHAR)
+
+        # Compute the geometric parameters.
+        call geo_gcoeff$t (sx1, sy1, xshift, yshift, a, b, c, d)
+
+        if (comment == NO) {
+            call fprintf (fd, "Coordinate mapping parameters\n")
+        } else {
+            call fprintf (fd, "# Coordinate mapping parameters\n")
+        }
+
+        if (comment == NO) {
+	    call fprintf (fd,
+		"    Mean Xref and Yref: %0.7g  %0.7g\n")
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
+	    call fprintf (fd,
+		"    Mean Xin and Yin: %0.7g  %0.7g\n")
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
+            call fprintf (fd,
+                "    X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
+                call parg$t (xshift)
+                call parg$t (yshift)
+        } else {
+	    call fprintf (fd,
+		"#     Mean Xref and Yref: %0.7g  %0.7g\n")
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
+	    call fprintf (fd,
+		"#     Mean Xin and Yin: %0.7g  %g0.7\n")
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
+            call fprintf (fd,
+                "#     X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
+                call parg$t (xshift)
+                call parg$t (yshift)
+        }
+
+        # Output the scale factors.
+        xscale = sqrt (a * a + c * c)
+        yscale = sqrt (b * b + d * d)
+        if (comment == NO) {
+            call fprintf (fd,
+            "    X and Y scale: %0.7g  %0.7g  (xin / xref  yin / yref)\n")
+                call parg$t (xscale)
+                call parg$t (yscale)
+        } else {
+            call fprintf (fd,
+        "#     X and Y scale: %0.7g  %0.7g  (xin / xref  yin / yref)\n")
+                call parg$t (xscale)
+                call parg$t (yscale)
+        }
+
+        # Output the rotation factors.
+        if (fp_equal$t (a, PIXEL(0.0)) && fp_equal$t (c, PIXEL(0.0)))
+            xrot = PIXEL(0.0)
+        else
+            xrot = RADTODEG (atan2 (-c, a))
+        if (xrot < PIXEL(0.0))
+            xrot = xrot + PIXEL(360.0)
+        if (fp_equal$t (b, PIXEL(0.0)) && fp_equal$t (d, PIXEL(0.0)))
+            yrot = PIXEL(0.0)
+        else
+            yrot = RADTODEG (atan2 (b, d))
+        if (yrot < PIXEL(0.0))
+            yrot = yrot + PIXEL(360.0)
+        if (comment == NO) {
+            call fprintf (fd,
+            "    X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
+                call parg$t (xrot)
+                call parg$t (yrot)
+        } else {
+            call fprintf (fd,
+            "#     X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
+                call parg$t (xrot)
+                call parg$t (yrot)
+        }
+
+	call sfree (sp)
+end
+
+$endfor

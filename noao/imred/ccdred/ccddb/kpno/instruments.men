@@ -1,0 +1,12 @@
+direct          Current headers for Sun plus CCDPROC setup for direct CCD
+specphot        Current headers for Sun plus CCDPROC setup for spectropho-
+                  tometry, ie GoldCam, barefoot CCD
+hydra           WIYN Hydra with Arcon
+foe             Current headers for Sun plus CCDPROC setup for FOE
+fibers          Current headers for Sun plus CCDPROC setup for fiber array
+coude           Current headers for Sun plus CCDPROC setup for Coude
+cyrocam         Current headers for Sun plus CCDPROC setup for Cryo Cam
+echelle         Current headers for Sun plus CCDPROC setup for Echelle
+kpnoheaders     Current headers with no changes to CCDPROC parameters
+fits	        Mountain FITS header prior to Aug. 87 (?)
+camera		Mountain CAMERA header for IRAF Version 2.6 and earlier

@@ -1,0 +1,12 @@
+# BLKAVG -- Block average or sum on n-dimensional images.
+
+input,s,a,,,,Input images
+output,s,a,,,,Output block averaged images
+option,s,h,average,"average|sum",,Type of operation
+b1,i,a,1,1,,blocking factor in dimension 1 (x or column)
+b2,i,a,1,1,,blocking factor in dimension 2 (y or line)
+b3,i,a,1,1,,blocking factor in dimension 3 (z or band)
+b4,i,a,1,1,,blocking factor in dimension 4
+b5,i,a,1,1,,blocking factor in dimension 5
+b6,i,a,1,1,,blocking factor in dimension 6
+b7,i,a,1,1,,blocking factor in dimension 7

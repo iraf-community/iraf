@@ -1,0 +1,129 @@
+.help lineclean May85 images.imfit
+.ih
+NAME
+lineclean -- replace deviant pixels in image lines
+.ih
+USAGE	
+.nf
+lineclean input output
+.fi
+.ih
+PARAMETERS
+.ls input
+Input images to be cleaned.
+.le
+.ls output
+Output cleaned images.  The number of output images must be the same as the
+number of input images.
+.le
+.ls sample = "*"
+Columns to be used in fitting the cleaning function.
+.le
+.ls naverage = 1
+Number of sample points to combined to create a fitting point.
+A positive value specifies an average and a negative value specifies
+a median.
+.le
+.ls function = spline3
+Cleaning function to be fit to the image lines.  The functions are:
+.ls legendre
+Legendre polynomial of the specified order.
+.le
+.ls chebyshev
+Chebyshev polynomial of the specified order.
+.le
+.ls spline1
+Linear spline of the specified number of pieces.
+.le
+.ls spline3
+Cubic spline of the specified number of pieces.
+.le
+.le
+.ls order = 1
+The order of the polynomials or the number of spline pieces.
+.le
+.ls low_reject = 2.5, high_reject = 2.5
+Rejection limits below and above the fit in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 1.
+When a pixel is rejected, pixels within this distance of the rejected pixel
+are also rejected.
+.le
+.ls graphics = "stdgraph"
+Graphics output device for interactive graphics.
+.le
+.ls cursor = "stdgcur"
+Graphics cursor input.
+.le
+.ih
+DESCRIPTION
+A one dimensional function is fit to each line of the input images.
+The function may be a legendre polynomial, chebyshev polynomial,
+linear spline, or cubic spline of a given order or number of spline pieces.
+If \fIlow_reject\fR and/or \fIhigh_reject\fR are greater than zero the sigma
+of the residuals between the fitted points and the fitted function is computed
+and those points whose residuals are less than \fI-low_reject\fR * sigma
+and greater than \fIhigh_reject\fR * sigma are excluded from the fit.
+Points within a distance of \fIgrow\fR pixels of a rejected pixel are also
+excluded from the fit.  The function is then refit without the rejected points.
+This rejection procedure may be iterated a number of times given by the
+parameter \fIniterate\fR.  Finally, the
+rejected points in the input image are replaced by the fitted values
+to create the output image lines.
+
+The output image may exist in which case a section in the input image is
+applied to the output image.  Thus, a section on the input image causes only
+that part of the output image to be cleaned.  If the output image does not
+exist it is first created by making a copy of the full (without a section)
+input image.
+
+The points fit are determined by selecting a sample of columns specified by
+the parameter \fIsample\fR and taking either the average or median of
+the number of points specified by the parameter \fInaverage\fR.
+The type of averaging is selected by the sign of the parameter and the number
+of points is selected by the absolute value of the parameter.
+The sample points are specified relative to any image section.
+
+The fitting parameters (\fIsample, naverage, function, order, low_reject,
+high_reject, niterate, grow\fR)
+may be adjusted interactively if the parameter \fIinteractive\fR is yes.
+Lines from the image are selected to be fit with the \fBicfit\fR package.
+For images of greater than two dimensions sets of numbers giving the
+2nd, 3rd, etc. coordinates are entered.
+The image lines are specified relative to any image section.
+When an end-of-file or no line is given then the last selected fitting
+parameters are used on each line of the image.  This step is repeated for
+each image in the input list.  The interactive options are described
+in the help information \fBicfit\fR.
+.ih
+EXAMPLES
+1. To clean pixels deviating by more than 2.5 sigma:
+
+	cl> lineclean image cleanimage
+
+If the interactive flag is set then a prompt for an image line is
+printed:
+
+	image: Fit line = 100
+
+For a one or two dimensional image the line number is entered (1 for a one
+dimensional image).  For a three dimensional image two numbers are entered.
+For example:
+
+	image: Fit line = 10 2
+
+for line 10 of the second image plane.
+
+The selected line is graphed and the interactive options for setting and
+fitting the line are used.  Data points marked with diamonds indicate
+points to be replaced by the fitted value.  Exiting with 'q' or return
+prompts for another line.  When the fitting parameters are suitably set
+then respond with end-of-file or return to fit all the lines of the image
+and create the output image.
+.ih
+SEE ALSO
+fit1d, xtools.icfit, imsurfit
+.endhelp

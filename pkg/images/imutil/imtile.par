@@ -1,0 +1,21 @@
+# IMTILE
+
+input,f,a,,,,List of input image tiles
+output,f,a,,,,Output tiled image
+nctile,i,a,,,,Number of input tiles in the output column direction
+nltile,i,a,,,,Number of input tiles in the output line direction
+trim_section,s,h,"[*,*]",,,Input tile section 
+missing_input,s,h,"",,,List of missing image tiles
+start_tile,s,h,"ll",,,Position in output image of first input tile
+row_order,b,h,yes,,,Insert input tiles in row order ?
+raster_order,b,h,no,,,Insert input tiles in raster scan order ?
+median_section,s,h,"",,,Input tile section used to compute the median
+subtract,b,h,no,,,Subtract the median pixel value from each input tile ?
+ncols,i,h,INDEF,,,The number of columns in the output image
+nlines,i,h,INDEF,,,The number of lines in the output image
+ncoverlap,i,h,-1,,,Number of columns of overlap between adjacent tiles
+nloverlap,i,h,-1,,,Number of lines of overlap between adjacent tiles
+opixtype,s,h,"r",,,Output image pixel type
+ovalue,r,h,0.0,,,Value of undefined output image pixels
+verbose,b,h,yes,,,Print messages about progress of the task ?
+mode,s,h,'ql'

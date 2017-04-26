@@ -1,0 +1,10 @@
+	    DOC - General IRAF Documentation
+
+    expressions - Standard expression syntax in IRAF tasks
+        pmmatch - Pixel mask matching
+
+       -- Old Historical Documents --
+       biblio84 - Summary of IRAF documentation (circa 1984)
+         crib83 - Cribsheet for the Program Interface (circa 1983)
+	  pkg84 - Package structure (circa 1984
+	  spp83 - SPP reference manual (circa 1984)

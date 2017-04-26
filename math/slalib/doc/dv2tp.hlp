@@ -1,0 +1,42 @@
+.help dv2tp Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDVTP (V, V0, XI, ETA, J)
+
+     - - - - - -
+      D V T P
+     - - - - - -
+
+  Given the direction cosines of a star and of the tangent point,
+  determine the star's tangent-plane coordinates.
+
+  (double precision)
+
+  Given:
+     V         d(3)    direction cosines of star
+     V0        d(3)    direction cosines of tangent point
+
+  Returned:
+     XI,ETA    d       tangent plane coordinates of star
+     J         i       status:   0 = OK
+                                 1 = error, star too far from axis
+                                 2 = error, antistar on tangent plane
+                                 3 = error, antistar too far from axis
+
+  Notes:
+
+  1  If vector V0 is not of unit length, or if vector V is of zero
+     length, the results will be wrong.
+
+  2  If V0 points at a pole, the returned XI,ETA will be based on the
+     arbitrary assumption that the RA of the tangent point is zero.
+
+  3  This routine is the Cartesian equivalent of the routine slDSTP.
+
+  P.T.Wallace   Starlink   27 November 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

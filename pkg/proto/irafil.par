@@ -1,0 +1,9 @@
+# Parameter file for IRAFIL - Convert binary bit string to IRAF image file
+
+input,s,a,,,,Files to convert
+nrows,i,a,,1,,Number of rows in image
+ncols,i,a,,1,,Number of columns in image
+bits,i,h,16,8,16,Number of bits per pixel
+signed,b,h,yes,,,Is bit 16 a sign bit
+tb_flip,b,h,no,,,Flip image top to bottom during generation
+skip,i,h,0,0,,Number of header bytes to skip prior to pixels

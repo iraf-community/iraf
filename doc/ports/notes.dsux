@@ -1,0 +1,282 @@
+Begin port to DECstation 3100.  23 July 1989.
+Start with source only archive of VAX/Ultrix system.
+[note - rsh/tar hung up mysteriously while loading files onto decstation,
+[and had to be restarted].
+--------------------------
+
+unix/as.mips +
+unix/bin.mips +
+	Created AS and BIN directories for Dec/MIPS.  (7/23)
+
+unix/as.mips/zsvjmp.s
+	Prepared a dummy version of zsvjmp for the moment.  All this does is
+	set the output status value to zero.  (prepared by using the compiler
+	to generate the assembler source for a small C program).  (7/23)
+
+unix/boot/spp/xc.c
+	It appears that for some reason, the MIPS C compiler or linker will
+	not accept a file with a .e extension as the output (-o) file.
+	Had to modify XC to output a .E file temporarily, which is renamed
+	to .e after the link.  (7/23)
+
+unix/mkpkg.sh
+unix/os/mkpkg.sh
+unix/shlib/mkpkg.sh
+unix/boot/bootlib/mkpkg.sh
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/spp/rpp/mkpkg.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+unix/boot/xyacc/mkpkg.sh
+unix/gdev/sgidev/mkpkg.sh
+unix/bin.mips/fixnames +
+	Modified all the mkpkg.sh files to generate .E files.  Added a
+	fixnames script to bin.mips to rename any .E files therein to .e,
+	and added code the the root mkpkg.sh to call fixnames at the
+	end of the bootstrap.  (7/23)
+
+unix/hlib/cl.csh
+unix/hlib/mkiraf.csh
+unix/hlib/install
+unix/hlib/libc/iraf.h
+	1. Modified the iraf root pathnames in these files.
+	2. In the install, also deleted the entries for edsym.e to avoid
+	an error message during the install.  (7/23)
+
+unix/hlib/extern.pkg
+	Commented out the stsdas entries.  (7/23)
+
+unix/hlib/mkpkg.inc
+unix/hlib/irafuser.csh
+unix/hlib/mkpkg.sf.MIPS
+	Set MACH to MIPS.  Added a case for machine type MIPS.  Added an
+	empty special file list.  (7/23)
+
+unix/hlib/motd
+	Modified to say DECstation/IRAF.  (7/23)
+
+unix/os/zxwhen.c
+	Added a #ifdef mips section with some hardware exception codes for
+	the MIPS.  (7/23)
+
+--------------------
+Start bootstrap.  (7/23)
+
+unix/hlib/irafuser.csh
+	Linking of RPP produced a "gp relocation out of range" error message.
+	It was necessary to compile with "-G 0" (no global variables indexed
+	by global pointer) in order to get this to go away.  (7/23)
+
+unix/boot/bootlib/mkpkg.sh
+	Modified to mv libboot.a to $hbin (../../bin) rather than $hlib,
+	since the libboot.a in $hlib is a symbolic link.  (7/23)
+
+--------------------
+Start sysgen.  (7/23)
+
+unix/as/gkiprint.o +
+unix/hlib/mkpkg.sf.MIPS
+	The file gkiprint.x would fail with a slew (like, 700) syntax and
+	other errors.  There was nothing wrong with the code and the few
+	workarounds I tried had no effect.  I finally managed to compile
+	the file by breaking it up into half a dozen pieces, compiling each
+	separately, and linking the resultant objects into a single large
+	object gkiprint.o.  Since this bug will probably go away before long
+	I merely placed the manually generated object file in AS, and made
+	an entry in the special file list to use this object.  (7/23)
+
+unix/as/imsetr.f +
+unix/hlib/mkpkg.sf.MIPS
+	In this case the file imsetr.f would cause the first pass of f77
+	to core dump (not an optimizer problem).  I had to hack the fortran
+	code to workaround the bug, placing the hacked file in AS.  The
+	offending statement was:
+
+               memi(im+33) = and (memi(+33) , not(1 ))
+
+	the following version is ok:
+
+               i = not(1)
+               memi(im+33) = and (memi(+33) , i)
+
+	The bug must have something to do with the bit intrinsics.  (7/23)
+
+unix/as/fseti.f +		# FIO
+unix/as/fmfcache.f +		# FMIO
+unix/as/fmlfbrd.f +
+unix/as/fmlfbwr.f +
+unix/as/fmlfcopy.f +
+unix/as/fmlfundel.f +
+unix/hlib/mkpkg.sf.MIPS
+	Modified to work around the same compiler bug as above.  The NOT of
+	any compile time integer constant used in an expression seems to
+	always cause a core dump.  (7/23)
+
+unix/boot/spp/xc.c
+unix/hlib/mkpkg.inc
+	1. In the first sysgen, x_images.e failed to link with a "gp relocation
+	out of range" type problem.  Recompiling the IMAGES package libpkg.a
+	with -G 0 fixed the problem.
+	2. Passing this flag through XC, however, was not possible without
+	a code change to XC, as there was no way to pass two consecutive
+	arguments such as "-G 0".  In order to support this XC was modified
+	to permit flags of the form "-/#flag", which are passed as "flag".
+	This is similar to "-/flag" which is passed as "-flag", except that
+	it allows flags with no "-" to be passed.  Hokey, but backwards
+	compatible and it solves the problem.  (7/23)
+
+-----------------
+Started sysgen of NOAO packages.  (7/23)
+
+noao/lib/database.o +
+noao/lib/mkpkg.inc
+noao/lib/mkpkg.sf.MIPS
+	The database.x file in DTOI would cause the compiler to become
+	terminally confused, as with gkiprint above.  Manually constructed
+	the database.o object, placed the latter in noao$lib, and modified
+	the NOAO special file list to use this object rather than try to
+	compile the file.  (7/24)
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Set the size of the ZDOJMP jump buffer to 84 (83 ints for the jmp_buf
+	buffer plus 1 for the address of the status variable).  (7/24)
+
+unix/as.mips/zsvjmp.s
+	Wrote and installed the real zsvjmp.s.  (7/24)
+
+-------------------
+Sysgen/relink with new zsvjmp.
+Everything appears to work now.  (7/24)
+
+bin.mips
+noao/bin.mips
+	Stripped the BINS to save disk space, as it appeared that the symbol
+	table information is unusually large on the decstation.  (7/25)
+
+				Normal		Stripped
+
+	core system bin		  21.5		   16.0
+	noao bin		  18.0		   12.3
+				-------		--------
+				  39.5		   28.3		
+
+unix/as/zsvjmp.s
+	Modified slightly to eliminate a delay slot.  This failed to work
+	at first and I eventually discovered that the reason was that the
+	*assembler* was modifying my assembler code, reordering the
+	instructions and inserting nop's in delay slots, producing invalid
+	code!  I had to add a "noreorder" directive to get it to leave the
+	code alone.  (7/25)
+
+unix/os/zxwhen.c
+	As a first step in testing exception handling I tried the following
+	in the CL:
+
+		cl> = 5 / 0
+	
+	This caused the CL to core dump on the uncaught signal SIGTRAP.
+	On all other unix systems thus far, integer divide by zero has been
+	mapped to SIGFPE, but on the MIPS it is a trap.  Modified zxwhen.c
+	to map SIGTRAP onto the VOS exception class X_ARITH.  (7/25)
+
+unix/os/zzstrt.c
+	Added the following #ifdef mips code to zzstrt, to enable the overflow,
+	invalid, and divzero IEEE exceptions:
+
+		set_fpc_csr (get_fpc_csr() | 07000);
+
+	The {set|get}_fpc_csr() routines appear to be undocumented but I
+	found them anyhow by searching the symbol tables of the host libraries
+	in /usr/lib.  (7/25)
+
+	[LATER] Well, enabling the IEEE exceptions works, but somehow this
+	is making the software misbehave in a way I do not yet understand
+	and do not have time to look into right now.  Completely unrelated
+	things like "stty vt100", "imheader dev$pix" fail mysteriously with
+	the IEEE trap enable bits set in the FPU context and status register.
+	This doesn't make any sense and we will have to do without the IEEE
+	traps for now.  Possibly this is due to a bug in the OS which will
+	go away in the next release.
+
+unix/hlib/mkfloat.csh
+	The code in this script which lists the tar archive back with
+	"tar -tf", to verify that a good archive has been generated before
+	deleting the files, does not work on the DECstation.  The problem
+	is that tar -tf produces different output here than on the other
+	systems; the directories are listed as files in addition to the files.
+	I had to change the
+
+		tar -tf
+	to
+		tar -tf | grep -v '/$'
+
+	to get things to work.  (7/26)
+
+
+unix/bin.mips
+noao/bin.generic
+bin.generic
+	Stripped all the executables (HSI, IRAF, NOAO).
+	Made IRAF and NOAO generic. (7/26)
+
+
+Summary of various problems encountered.
+-------------------
+
+	fortran compiler core dumps
+	c compiler core dumps
+	cannot -o to a .e file
+	rsh|tar hung once
+	NO ADB!!
+	dbx dies occasionally with internal error: stack overflow
+	2 user limit on logins - prevents even having two windows
+	    open from Sun with a different rlogin session in each.
+	System is very fast single user; much slower if anything else
+	    is running on the machine (memory too small?).
+	System crashed on first day of testing with 2 users busy doing things.
+	    (there did not seem to be a system message file).
+	Some routines which use floating point produce different results on
+	    the MIPS than on other systems.  Examples thus far are the FITS
+	    programs, and IMHISTOGRAM.  No doubt more will be discovered.
+	IEEE exception handling is not working currently.
+
+
+----------------
+V2.8BETA system frozen and archived.  (7/26)
+
+----------------
+Begin upgrade to V2.9ALPHA, 6 DEC 1989.
+Working with newly arrived IRAF DECstation 3100!
+
+	Installed the V2.8ALPHA HSI.
+	Merged in all relevant V2.9 modifications to the HSI.
+
+unix/boot/spp/xc.c
+	Changed the syntax "-/#foo" -> "foo" to "-//foo" -> "foo" for
+	escaping command line arguments to XC.  (1/6)
+
+----------------
+Started a bootstap. (1/6)
+
+mkpkg
+	Extended the mkpkg summary filter in the root mkpkg to filter out
+	the great number of "local variable iyy never used" warning messages
+	produced by the MIPS compiler.  (1/6)
+
+pkg/plot/t_graph.x
+	This file contained a routine im_projection equivalent to a routine
+	of the same name in file improject.x, resulting in two externals of
+	the same name in the package library.  (1/7)
+
+unix/boot/spp/xc.c
+	To avoid a circular reference problem in the DS3100 Fortran libraries,
+	which causes an undefined symbols "s_abort" problem when linking some
+	programs, added a second search of libF77 to the end of the XC host
+	library link list, after the -lm.  (1/7)

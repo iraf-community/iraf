@@ -1,0 +1,11 @@
+input,s,a,,,,Input CCD images
+output,s,h,"",,,Output fringe images (same as input if none given)
+ccdtype,s,h,"",,,CCD image type to select
+xboxmin,r,h,5,0.,,Minimum smoothing box size in x at edges
+xboxmax,r,h,0.25,0.,,Maximum smoothing box size in x
+yboxmin,r,h,5,0.,,Minimum moothing box size in y at edges
+yboxmax,r,h,0.25,0.,,Maximum moothing box size in y
+clip,b,h,yes,,,Clip input pixels?
+lowsigma,r,h,2.5,0.,,Low clipping sigma
+highsigma,r,h,2.5,0.,,High clipping sigma
+ccdproc,pset,h,,,,CCD processing parameters

@@ -1,0 +1,36 @@
+# Make the IKI/STF interface (STScI SDAS/GEIS group format images)
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	#$set XFLAGS = "$(XFLAGS) -qfx"
+	#$set XFLAGS = "$(XFLAGS) -/pg"
+
+	stfaccess.x	stf.h
+	stfaddpar.x	<imhdr.h> <imio.h> <mach.h> stf.h
+	stfclose.x	stf.h <imhdr.h> <imio.h>
+	stfcopy.x	stf.h <error.h>
+	stfcopyf.x	stf.h
+	stfctype.x	stf.h <ctype.h>
+	stfdelete.x	stf.h <error.h> <imhdr.h>
+	stfget.x	stf.h <ctype.h>
+	stfhextn.x	stf.h <imhdr.h> <imio.h>
+	stfiwcs.x	stf.h <imhdr.h>
+	stfmerge.x	stf.h <imhdr.h> <imio.h> <mach.h>
+	stfmkpfn.x	stf.h
+	stfnewim.x	stf.h <imhdr.h> <imio.h> <mach.h>
+	stfopen.x	stf.h <error.h> <imhdr.h> <imio.h>
+	stfopix.x	stf.h <fset.h> <imhdr.h> <imio.h> <mach.h>
+	stfordgpb.x	stf.h <mach.h>
+	stfrdhdr.x	stf.h <finfo.h> <imhdr.h> <imio.h> <mach.h>
+	stfreblk.x	stf.h <imhdr.h> <imio.h>
+	stfrename.x	stf.h <error.h>
+	stfrfits.x	stf.h <ctype.h> <finfo.h> <fset.h> <imhdr.h> <imio.h>
+	stfrgpb.x	stf.h <imhdr.h> <imio.h> <mach.h>
+	stfupdhdr.x	stf.h <imhdr.h> <imio.h>
+	stfwfits.x	stf.h <error.h> <fio.h> <imhdr.h> <imio.h>
+	stfwgpb.x	stf.h <error.h> <imhdr.h> <imio.h> <mach.h>
+	;

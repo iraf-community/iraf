@@ -1,0 +1,53 @@
+.help zalocd Aug85 "System Interface"
+.ih
+NAME
+zalocd -- set, remove, or query device allocation
+.ih
+SYNOPSIS
+.nf
+zalocd (device, action, status)
+
+packed	char device[ARB]	# device 1
+int	action			# operation to be performed
+int	status
+.fi
+.ih
+DESCRIPTION
+The named logical device is either allocated or deallocated, or the device
+allocation status is queried, depending upon the value of the \fIaction\fR
+argument.
+
+.nf
+	DEALLOCATE_DEVICE	0
+	ALLOCATE_DEVICE		1
+	QUERY_ALLOCATION	2
+.fi
+
+By allocating a device we mean that [1] the device is reserved for use by the
+owner of the process issuing the request, and [2] the device is readied for
+opening by the process issuing the request, or by a subprocess of the process
+issuing the request.  If the device is a tape drive the drive should be
+mounted foreign (unlabeled) and the density should be set if so indicated
+in the 
+
+It is not an error to attempt to allocate a device which is already allocated,
+nor is it an error to attempt to deallocate a device which is not currently
+allocated.
+.ih
+RETURN VALUE
+OK is returned if a set_protection or remove_protection operation is
+successful.  YES (protected) or NO (not protected) is returned in response
+to a query.  ERR is returned if the named file does not exist or if
+the operation cannot be performed.
+.ih
+NOTES
+FIO will query for file protection before attempting to delete a file.
+If the host system does not provide file protection facilities they can
+often be faked by creating a hidden file in the same directory; the existence
+of the file will indicate that the file is protected.  If the hidden file
+technique is used, the hidden file should not be seen when the directory
+is read by the high level code.
+.ih
+SEE ALSO
+zfdele
+.endhelp

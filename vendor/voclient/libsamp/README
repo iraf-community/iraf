@@ -1,0 +1,249 @@
+
+							August 23, 2011
+
+			SAMP Library v1.0
+			-----------------
+
+
+    This directory contains the source code for the SAMP interface library.
+This library provides methods for sending messages from client applications,
+as well as for installing user-functions that will be called in response
+to an application receiving messages from another client using the Simple
+Applications Messaging Protocol (SAMP, for details see the specification
+at http://www.ivoa.net/Documents/SAMP/index.html).
+
+    The interface is written in C, later versions will include bindings for
+additional languages.  Applications written using this library will require
+a separate SAMP 'Hub' to be available, e.g. either as a standalone Hub or
+one running as part of another SAMP-enabled application (TOPCAT, Aladin,
+etc provide built-in Hubs).
+
+
+Application Organization
+------------------------
+
+    A client application will need to open/close the SAMP interface as
+well as start/stop the messaging.  These two things are separate in order
+to allow an application to continue running if a hub is not available,
+and to allow an application to choose when/how messaging with other
+clients is appropriate.  Once the interface is opened, an application
+must declare some metadata about itself (author, name, etc) and subscribe
+to messages of interest (e.g. image/table load, command execution, etc).
+The message subscription is also where the user-defined callbacks for each
+message type are declared.  On startup of messaging, this information is
+transmitted to the Hub as part of the client registration,  and a server
+is started on a separate thread to listen for incoming messages and to
+invoke the user callbacks when a message comes in.
+
+In pseudocode, this would look something like
+
+    main (argc, argv)
+    {
+	int samp = sampInit (name, descr)	/* open interface	*/
+
+						/* declare app metadata	*/
+	samp_Metadata (samp, "author.email", "Will E Coyote");
+	samp_Metadata (samp, "author.name", "rascal@acme.com");
+
+						/* subscribe to msgs	*/
+	samp_Subscribe (samp, "image.load.fits", img_handler);
+	samp_Subscribe (samp, "table.load.fits", tbl_handler);
+
+	sampStartup (samp)			/* start messaging	*/
+
+
+		.....application is free to do other things
+		     at this point.  Messages will be handled by
+		     the methods installed during the subscription
+		     in a separate processing thread.
+
+
+	if (sampShutdown (samp) < 0)        /* stop messaging    	*/
+            fprintf (stderr, "SAMP shutdown fails\n");
+    	sampClose (samp);			/* close interface	*/
+    }
+
+
+    The img_handler() and tbl_handler() procedures are the user-supplied
+functions that will be called when a message of a particular message type
+(mtype) is received.  The required function arguments will depend on the
+mtype of the message and are detailed below, the interface also provides
+low-level methods that can be used to parse the message directly by
+knowledgeable applications.
+
+    It is important to keep in mind that the message handlers are running
+in a separate thread, particularly if they will affect the state of global
+data in the main application.  In some cases, the message handler will
+be completely autonomous in its actions while in others the receipt
+of a message will trigger an event that the application must handle
+(e.g. to update a GUI or change the context of the data processing).
+The application using this interface is responsible for implementing the
+code necessary to properly handle messages.
+
+
+
+Sending A Message
+-----------------
+
+    Low-level methods in the interface allow an application to construct
+and then send messages using a particular messaging pattern.  In most cases,
+application developers will prefer to use the higher level interfaces that
+lets the interface handle the details of message delivery.
+
+    The hi-level methods all take the SAMP structure handle and a string
+containing the name of the recipient as the first two arguments, remaining
+arguments depend on the message type being sent.  The recipent name may
+be the reserved string "all" to broadcast the message to all clients
+subscribed to that message, or the name of a particular application in the
+case of a targeted message.  The application name in this case is allowed to 
+be either the 'public' name displayed by the Hub (e.g. 'c1', 'c2' etc) or
+the common name of the application (e.g. 'topcat') declared by the app
+itself.  Messages will be delivered using whichever message pattern has
+been set in the interface (the default is to use asynchronous messaging).
+
+A summary of the high-level procedures currently implemented includes:
+
+       samp_tableLoadVOTable  (handle, recip, url, tableId, name)
+          samp_tableLoadFITS  (handle, recip, url, tableId, name)
+      samp_tableHighlightRow  (handle, recip, tableId, url, row)
+     samp_tableSelectRowList  (handle, recip, tableId, url, rows[])
+
+          samp_imageLoadFITS  (handle, recip, url, imageId, name)
+        samp_coordPointAtSky  (handle, recip, ra, dec)
+
+     samp_specLoadSSAGeneric  (handle, recip, url, meta_map, specId, name)
+                samp_cmdExec  (handle, recip, cmd)
+                 samp_envGet  (handle, recip, name)
+                 samp_envSet  (handle, recip, name, value)
+               samp_paramGet  (handle, recip, name)
+               samp_paramSet  (handle, recip, name, value)
+                samp_bibLoad  (handle, recip, bibcode)
+           samp_resourceLoad  (handle, recip, type, resList[])
+
+The one low-level method provided to send a message is
+
+                samp_sendMsg  (handle, recip, Map msg_map)
+
+See the detailed interface documentation for a complete description of each
+procedure.
+
+
+
+Receiving A Message 
+-------------------
+
+    Applications can receive a message by subscribing to a particular
+message type and installing a "handler" function associated with that
+mtype.  For example, the line
+
+    samp_Subscribe (samp, "image.load.fits", img_handler);
+
+would subscribe the application to the 'image.load.fits' mtype, and when
+this message is received the user-defined 'img_handler' function is
+invoked.  The handler function itself would be written as something like
+
+    void img_handler (char *url, char *imId, char *name) {
+        .....do something useful with the URL and id/name arguments
+    }
+
+In principle, the handler method signatures will follow the high-level
+calling functions described above (minus the initial 'handle' and 'recip'
+arguments).  Specifically, they should be:
+
+    MType			    Signature
+    -----			    ---------
+
+    samp.app.ping                   func (sender)
+    samp.app.status                 func (sender)
+    
+    table.load.votable              func (url, [table-id] [name])
+    table.load.fits                 func (url, [table-id] [name])
+    table.highlight.row             func (url, table-id row)
+    table.select.rowList            func (url, table-id row-list[])
+    image.load.fits                 func (url, [image-id] [name])
+    coord.pointAt.sky               func (ra, dec)
+    bibcode.load                    func (bibcode)
+    
+    client.env.get                  func (name, value, maxch)
+    client.env.set                  func (name, value)
+    
+    client.param.get                func (name, value, maxch)
+    client.param.set                func (name, value)
+    
+    spectrum.load.ssa-generic       func (url, meta, [spectrum-id], [name])
+    voresource.loadlist             func ([type], [name], id_map)
+    
+Arguments in square brackets are optional in the sense that they may be
+NULL strings and may not be defined in the original message.  Handler
+functions are called from internal handlers in the interface itself which
+are responsible for unpacking the message and sending any needed reply.
+Lower-level interface procedures (not described here) are available for
+applications that wish to interact more directly with the sender of a
+message, or to take some non-trivial action in response to an error event,
+notification, etc.
+
+    Applications are free to subscribe to the administrative messages
+(e.g. hub notifications) and override the built-in handlers, however these
+will generally be handled by the interface on behalf of the application
+automatically.
+    
+    
+    
+Example Programs
+----------------
+
+    The interface distribution comes with a 'zztest.c' test application 
+meant to exercise various methods of the interface.  This is a largely
+undocumented unit test program intended only for development, users 
+should instead look at the programs in the 'examples' directory.
+Current examples include:
+
+
+      snoop         Print all messages available to a client application
+      send          Send a message of a specific mtype to one or more apps
+
+
+Examples:
+
+  1)  Print out messages received by a client application:
+
+        % snoop                             print all available messages
+        % snoop -m image.load.fits          print only the one mtype
+        % snoop -s topcat                   only message from 'TOPCAT'
+
+  2)  Print the usage of the 'send' (or 'snoop') application:
+
+	% send -h
+
+  3)  Broadcast a message to all clients subscribed to a mtype:
+
+	% send image.load.fits http://foo.edu/bar.fits testId testName
+
+  4)  Send a message to a specific app (c4) using synchronous message pattern:
+
+	% send -r c4 -p sync client.env.get HOME
+
+  5)  Send a client multiple messages from a single connection:
+
+	% cat msgs.txt
+	client.cmd.exec show noao
+	client.cmd.exec imstat dev$pix
+	client.cmd.exec imstat dev$pix[*,1:10]
+	client.cmd.exec imstat dev$pix[*,10:20]
+	client.cmd.exec imstat dev$pix[*,20:30]
+	% send -r iraf -f msgs.txt
+
+      The  message text file must containt the mtype as the first value, the
+      remainder of the line are the arguments specific to that mtype.
+
+
+Note that each of these examples assumes an already-running Hub.  A
+standalone hub is provided in the 'jsamp' directory included in the
+distribution.  To start a hub from the toplevel directory:
+
+	% java -jar jsamp/jsamp-1.3.jar hub
+
+This should be done before trying the above example.  Note that applications
+such as Topcat or Aladin have a builtin Hub that can also be used.
+
+

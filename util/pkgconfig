@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+#  PKGCONFIG -- Re-create the system Makefile to take into account new
+#  packages.
+
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+/bin/echo "Initializing repository data ...."
+$iraf/util/pkginit				# init repository information
+if (( $? == 1 )); then
+   exit
+fi
+
+# Create the template Makefile.
+/bin/echo "Creating system makefile ...."
+cat << MAKE_TEMP_END		> Makefile
+#
+#  Makefile for IRAF external package installation/maintenance.
+#
+# ---------------------------------------------------------------------------
+
+# Compiler Flags.
+
+RELEASE		= `cat ../.version`
+        
+all:: update
+
+# Update recent changes from the repository.
+update::
+	@./configure
+	@../util/pkgupdate -all
+
+# Install all available packages for this platform.
+install_all::
+	@../util/pkgall
+
+# List packages available on the repository.
+list::
+	@cat .repo_pkgs
+
+# Clean the IRAF tree of binaries for the currently configured arch.
+init::
+	@../util/pkgclean -init
+
+# Remove all package code but leave the structure in place.
+clean::
+	@../util/pkgclean -all
+
+# Restore the dynamic package directory to its distribution state.
+distclean::
+	@../util/pkgclean -init
+
+# Check to see which installed packages could be updated.
+check::
+	@../util/pkgupdate -list
+
+# Update recent changes from the repository.
+self_update::
+	@../util/pkgupdate -self
+	@./configure
+
+
+MAKE_TEMP_END
+
+echo "Setup Complete."
+
+
+
+# For each package we have, append a makefile entry.
+pkg=`cat .repo_pkgs`
+for p in ${pkg[@]} ; do
+
+   # Create template makefile entries for each package
+   /bin/echo "${p}::"					>> Makefile
+   /bin/echo "	@../util/pkginst $p"			>> Makefile
+   /bin/echo "clean_${p}::"				>> Makefile
+   /bin/echo "	@../util/pkgclean $p"			>> Makefile
+   /bin/echo "update_${p}::"				>> Makefile
+   /bin/echo "	@../util/pkgupdate $p"			>> Makefile
+   /bin/echo ""						>> Makefile
+
+   # Create the directory
+   if [ -e "$p" ]; then
+      /bin/rm -rf $p
+   fi
+   mkdir $p
+done
+
+/bin/echo ""
+exit 0

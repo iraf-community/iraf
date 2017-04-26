@@ -1,0 +1,1645 @@
+System Notes File for IRAF Version 2.14.
+Begun with V2.14 code freeze 03 Dec 2007.
+-------------------------------------------
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+    Changed version to V2.14DEV Dec2007  (12/07/07 MJF)
+
+
+pkg/images/immatch/src/geometry/t_geomap.gx
+    Changed the output precision of the rotation angles from 3 to 5
+    decimal places.  (1/14/08, MJF)
+
+unix/os/gmttolst.c
+    On MacOSX systems the GMT offset includes the DST if it is in effect
+    and so added an ifdef so it wasn't added an extra time.  This was causing
+    the time in Chile to be off by an hour as of this fix (i.e. DST in effect
+    in Chile)  (1/14/08, MJF)
+
+sys/imio/imloop.x
+    Earlier changes to this routine were only partially correct and
+    fail for the case of a 1-D image section by truncating the last two
+    pixels of the section.  This caused "black stripes" in e.g. XREGISTER
+    or otherwise bogus pixel values that lead in some cases to FPE errors.
+    This version is the latest one believed to be correct, note that because
+    of the scope of the problem a new set of binaries needed to be released
+    for V2.14.  (1/14/08, MJF)
+
+pkg/xtools/inlfit/innlinit.gx
+    Removed an extra argument from the nlfree$t() call (1/16/08, MJF)
+
+images/lib/rgtransform.x
+image/immatch/src/listmatch/t_xyxymatch.x
+    Changed the name of the rg_intersect() function to rg_intersection()
+    to avoid a possible conflict with an xtools procedure of the same
+    name.  (1/16/08, MJF)
+
+images/tv/display/zzdebug.x
+    Added missing argument to sigl2_setup() call (1/16/08, MJF)
+
+images/tv/wcslab/wcslab.x
+    Pointer arrays were being allocated with TY_BOOL, changed to TY_INT
+    (1/16/08, MJF)
+
+sys/pmio/pmglp.gx
+    Removed extra argument from pl_pixrop$t() call (1/16/08, MJF)
+
+sys/fmtio/evexpr.y
+    Removed extra arguments to aclrc() calls (1/16/08, MJF)
+
+pkg/plot/crtpict/t_crtpict.x
+    Added missing argument to gscan() call (1/17/08, MJF)
+
+pkg/data/import/t_import.x
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/immatch/src/psfmatch/rgpsfm.x
+pkg/images/imutil/src/t_imtile.x
+pkg/images/tv/imexamine/t_imexam.x
+pkg/proto/t_bscale.x
+pkg/system/help/helpdir.x
+sys/plio/placcess.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+    Fixed various procedure type declaration problems (1/21/08, MJF)
+
+sys/imio/iki/fxf/fxfcache.com
+    Moved the rf_time/rf_mtime arrays to a separate common to avoid alignment
+    problems on 64-bit compilers  (1/21/08, MJF)
+
+sys/imfort/mii.x
+sys/imfort/imrdhdr.x
+sys/imfort/imwrhdr.x
+    Prefixed the MII procedures with a 'i_' to avoid a potential clash with
+    the etc$ version of the procedures.  (1/21/08, MJF)
+
+unix/boot/spp/xc.c
+    Fixed a typo in a variable name used for Sun (1/23/08, MJF)
+
+pkg/images/imcoords/src/t_ccfind.x
+    When using a ZPN projection, the transform code in mwcs tries to
+    reference the parent image to get the PV matrix keywords.  This task
+    called sk_decwcs() to open the WCS, but for an image it then unmapped
+    the image.  When the task later uses the 'mw' pointer to transform coords
+    the ZPN reference to the parent image is invalid and results in a
+    segfault.  Changed the code to call sk_decim() directly and operate on
+    the currently open image instead.  (1/23/08, MJF)
+
+pkg/dataio/doc/export.hlp
+pkg/dataio/doc/import.hlp
+pkg/dataio/doc/rcardimage.hlp
+pkg/dataio/doc/reblock.hlp
+pkg/dataio/doc/rtextimage.hlp
+pkg/dataio/doc/t2d.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/dataio/doc/export.hlp
+pkg/dataio/doc/import.hlp
+pkg/dataio/doc/rcardimage.hlp
+pkg/dataio/doc/reblock.hlp
+pkg/dataio/doc/rtextimage.hlp
+pkg/dataio/doc/t2d.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/language/doc/chdir.hlp
+pkg/language/doc/cursors.hlp
+pkg/language/doc/eparam.hlp
+pkg/language/doc/error.hlp
+pkg/language/doc/flprcache.hlp
+pkg/language/doc/for.hlp
+pkg/language/doc/intro.hlp
+pkg/language/doc/next.hlp
+pkg/language/doc/package.hlp
+pkg/language/doc/prcache.hlp
+pkg/language/doc/proc.hlp
+pkg/language/doc/scan.hlp
+pkg/language/doc/set.hlp
+pkg/language/doc/strings.hlp
+pkg/language/doc/stty.hlp
+pkg/language/doc/switch.hlp
+pkg/language/doc/unlearn.hlp
+pkg/language/doc/update.hlp
+pkg/language/doc/which.hlp
+pkg/lists/doc/Lcalc.hlp
+pkg/lists/doc/raverage.hlp
+pkg/lists/doc/rgcursor.hlp
+pkg/lists/doc/unique.hlp
+pkg/plot/doc/contour.hlp
+pkg/plot/doc/crtpict.hlp
+pkg/plot/doc/gkidecode.hlp
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/hafton.hlp
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/phistogram.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pvector.hlp
+pkg/plot/doc/sgidecode.hlp
+pkg/plot/doc/sgikern.hlp
+pkg/plot/doc/showcap.hlp
+pkg/plot/doc/surface.hlp
+pkg/proto/doc/binfil.hlp
+pkg/proto/doc/bscale.hlp
+pkg/proto/doc/epix.hlp
+pkg/proto/doc/fixpix.hlp
+pkg/proto/doc/hfix.hlp
+pkg/proto/doc/imalign.hlp
+pkg/proto/doc/imcentroid.hlp
+pkg/proto/doc/imextensions.hlp
+pkg/proto/doc/imfunction.hlp
+pkg/proto/doc/imreplace.hlp
+pkg/proto/doc/mimstat.hlp
+pkg/proto/doc/mskregions.hlp
+pkg/proto/doc/rskysub.hlp
+pkg/proto/doc/suntoiraf.hlp
+pkg/proto/doc/wcsedit.hlp
+pkg/proto/doc/wcsreset.hlp
+    Checked in numerous spelling corrections found by Jason Quinn using
+    automated tools (2/5/08, MJF)
+
+sys/mwcs/mwc2tran.gx
+sys/mwcs/mwltran.gx
+sys/mwcs/mwv2tran.gx
+    Allow the input and output vectors to be the same for a linear rotated
+    tranformation.  Since other transformations allow this and it was
+    not clear what should be allowed this change is put in for protection.
+    In fact at least one bug is attributed to this mistake so this change
+    is to catch cases which may be undiagnosed in other applications.
+    (2/12/08, Valdes)
+
+math/gsurfit/gs_deval.gx
+math/iminterp/mrider.x
+math/iminterp/mrieval.x
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/tv/imexamine/ievimexam.x
+pkg/plot/t_pvector.x
+pkg/dataio/import/iplistpix.x
+pkg/images/imutil/src/listpixels.x
+noao/astcat/src/attools/atcathdr.x
+noao/digiphot/apphot/fitpsf/apsffit.x
+noao/digiphot/apphot/phot/apmag.x
+noao/digiphot/apphot/phot/apremag.x
+noao/digiphot/apphot/wphot/apwmag.x
+noao/digiphot/apphot/wphot/apwremag.x
+noao/digiphot/daophot/allstar/dpcache.x
+noao/onedspec/odcombine/t_odcombine.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
+pkg/images/imutil/doc/imstack.hlp
+pkg/images/imutil/doc/imheader.hlp
+pkg/images/imutil/doc/sections.hlp
+pkg/images/imutil/doc/imrename.hlp
+pkg/images/imutil/doc/hselect.hlp
+pkg/images/imutil/doc/imtile.hlp
+pkg/images/imutil/doc/imexpr.hlp
+pkg/images/imutil/doc/imsum.hlp
+pkg/images/imutil/doc/imhistogram.hlp
+pkg/images/imutil/doc/imfunction.hlp
+pkg/images/imutil/doc/hedit.hlp
+pkg/images/imutil/doc/imarith.hlp
+pkg/images/imutil/doc/imstat.hlp
+pkg/images/tv/doc/display.hlp
+pkg/images/tv/doc/Tv.hlp
+pkg/images/tv/doc/imexamine.hlp
+pkg/images/tv/doc/tvmark.hlp
+pkg/images/tv/doc/wcslab.hlp
+pkg/images/tv/doc/imedit.hlp
+pkg/images/tv/iis/doc/window.hlp
+pkg/images/tv/iis/doc/blink.hlp
+pkg/images/tv/iis/doc/ids/doc/Imdis.hlp
+pkg/images/tv/iis/doc/cvl.hlp
+pkg/images/tv/doc/bpmedit.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/xyxymatch.hlp
+pkg/images/immatch/doc/psfmatch.hlp
+pkg/images/immatch/doc/gregister.hlp
+pkg/images/immatch/doc/skymap.hlp
+pkg/images/immatch/doc/imcentroid.hlp
+pkg/images/immatch/doc/geotran.hlp
+pkg/images/immatch/doc/wcsxymatch.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/doc/imcombine.hlp
+pkg/images/immatch/doc/skyxymatch.hlp
+pkg/images/immatch/doc/linmatch.hlp
+pkg/images/immatch/doc/wcscopy.hlp
+pkg/images/immatch/doc/sregister.hlp
+pkg/images/immatch/doc/geoxytran.hlp
+pkg/images/immatch/doc/xregister.hlp
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/imfit/doc/fit1d.hlp
+pkg/images/imfit/doc/imsurfit.hlp
+pkg/images/imcoords/doc/wcsedit.hlp
+pkg/images/imcoords/doc/ccget.hlp
+pkg/images/imcoords/doc/mkcwwcs.hlp
+pkg/images/imcoords/doc/skyctran.hlp
+pkg/images/imcoords/doc/ccxymatch.hlp
+pkg/images/imcoords/doc/imcctran.hlp
+pkg/images/imcoords/doc/ccsetwcs.hlp
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/doc/wcsreset.hlp
+pkg/images/imcoords/doc/starfind.hlp
+pkg/images/imcoords/doc/ccstd.hlp
+pkg/images/imcoords/doc/wcsctran.hlp
+pkg/images/imcoords/doc/ccfind.hlp
+pkg/images/imcoords/doc/cctran.hlp
+pkg/images/imcoords/doc/mkcwcs.hlp
+pkg/images/imfilter/doc/rmedian.hlp
+pkg/images/imfilter/doc/rmode.hlp
+pkg/images/imfilter/doc/gradient.hlp
+pkg/images/imfilter/doc/boxcar.hlp
+pkg/images/imfilter/doc/fmode.hlp
+pkg/images/imfilter/doc/convolve.hlp
+pkg/images/imfilter/doc/laplace.hlp
+pkg/images/imfilter/doc/gauss.hlp
+pkg/images/imfilter/doc/frmode.hlp
+pkg/images/imfilter/doc/runmed.hlp
+pkg/images/imgeom/doc/imshift.hlp
+pkg/images/imgeom/doc/magnify.hlp
+pkg/images/imgeom/doc/imlintran.hlp
+pkg/images/imgeom/doc/rotate.hlp
+pkg/obsolete/doc/orfits.hlp
+pkg/obsolete/doc/oimcombine.hlp
+pkg/obsolete/doc/owfits.hlp
+pkg/softools/doc/mkttydata.hlp
+pkg/softools/doc/mkmanpage.hlp
+pkg/softools/doc/mktags.hlp
+pkg/system/doc/head.hlp
+pkg/system/doc/type.hlp
+pkg/system/doc/diskspace.hlp
+pkg/system/doc/gripes.hlp
+pkg/system/doc/devstatus.hlp
+pkg/system/doc/Sys.hlp
+pkg/system/doc/files.hlp
+pkg/system/doc/Sys_intro.hlp
+pkg/system/doc/help.hlp
+pkg/system/doc/news.hlp
+pkg/system/doc/lprint.hlp
+pkg/system/doc/references.hlp
+pkg/utilities/doc/surfit.hlp
+pkg/utilities/doc/urand.hlp
+pkg/utilities/doc/split.hlp
+pkg/utilities/doc/polyfit.hlp
+pkg/xtools/doc/xtpmmap.hlp
+pkg/xtools/doc/inlfit.hlp
+pkg/xtools/doc/center1d.hlp
+pkg/xtools/doc/ranges.hlp
+pkg/xtools/doc/xtextns.hlp
+$iraf/doc/doc/expressions.hlp
+$iraf/doc/doc/spp83.hlp
+$iraf/doc/doc/pkg84.hlp
+$iraf/doc/doc/news.v28.hlp
+$iraf/doc/doc/biblio84.hlp
+$iraf/doc/doc/crib83.hlp
+$iraf/doc/packages.hlp
+$iraf/doc/news.v29.hlp
+$iraf/doc/vmsprog.hlp
+$iraf/doc/vmsiraf.hlp
+$iraf/doc/aosvsiraf.hlp
+$iraf/doc/news.old.hlp
+$iraf/doc/v211revs.hlp
+$iraf/doc/suniraf.hlp
+$iraf/doc/unixiraf.hlp
+$iraf/doc/pac_toc.hlp
+$iraf/doc/v212revs.hlp
+$iraf/doc/spp_toc.hlp
+    Another batch of documentation fixes from Jason Quinn.  The
+    IMCOMBINE help was modified more recently and merged by hand.
+    (2/18/08 MJF)
+
+unix/os/mkpkg.sh
+    The architecture test was being done with '==' instead of '=' (4/16/08, MJF)
+
+unix/boot/bootlib/ostime.c
+    Modified to support timezones on Solaris x86.  (2/19/08, MJF)
+
+unix/boot/spp/xc.c
+    Fixed a missing '#else' to compile for Solaris x86 (2/19/08, MJF)
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-solaris.h		+
+    Changes needed for Solaris x86 (2/19/08, MJF)
+
+sys/plio/mkpkg
+sys/plio/plbox.x
+sys/plio/plbox.h			+
+sys/plio/plubox.x			+
+sys/plio/plcircle.x
+sys/plio/plcircle.h			+
+sys/plio/plucircle.x			+
+sys/plio/plpolygon.x
+sys/plio/plpolygon.h			+
+sys/plio/plupolygon.x			+
+sys/tty/mkpkg
+sys/tty/ttygdes.x
+sys/tty/gttyload.x			+
+pkg/images/imutil/src/mkpkg
+pkg/images/imutil/src/imexpr.x
+pkg/images/imutil/src/iegsym.x		+
+pkg/proto/maskexpr/mkpkg
+pkg/proto/maskexpr/peregfuncs.x
+pkg/proto/maskexpr/peregfuncs.h		+
+pkg/proto/maskexpr/peregufcn.x		+
+pkg/proto/maskexpr/mskexpand.x
+pkg/proto/maskexpr/megsym.x		+
+pkg/softools/mkpkg
+pkg/softools/mktags.x
+pkg/softools/tgutil.x			+
+    Broke out functions used as extern to separate files.  GCC 3.4.3 cannot 
+    compile these files because of a bug that see 'extern int func()' and 
+    'int func()' as different types.  (2/20/08, MJF)
+
+unix/bin.sunos/f2c.h
+    In the end the above changes weren't strictly required.  A workaround
+    is to equivalence the 'int' and 'integer' types in the f2c.h file as
+    was done (but never documented) for the Cygwin port.  For things like
+    the fmtio$evexpr.y file it wasn't possible to break out the gettok()
+    to a new file since it returned values generated by macros written 
+    during the xyacc stage.  (2/20/08, MJF)
+
+unix/hlib/install
+    Fixed a typo where 'copy' command should be 'cp' (2/20/08, MJF)
+
+pkg/ecl/gram.c
+pkg/ecl/operand.h
+pkg/ecl/binop.c
+    Implemented a new strdic(str,dicstr) builtin function.  The first character
+    of 'dicstr' will be used as a delimiter to define a dictionary string, i.e.
+    a set of string values like "|foo|bar|rab|oof|".  The function returns
+    the index of the 'str' that occurs in the dictionary, or zero if not
+    found.  'str' may be a substring of the dictionary string for a match
+    to be made.  For example
+
+	cl> =strdic ("bar", "|foo|bar|rab|oof|")
+	2
+	cl> s1 = "FOO"
+	cl> =strdic (strlwr(s1), "|foo|bar|rab|oof|")
+	1
+
+    The second example shows how to do a case-insensitive match against
+    the dictionary.  (3/12/08, MJF)
+
+pkg/ecl/binop.c
+    Fixed a bug in strstr() where a call like  strstr("th","testthis")
+    would fail to find the string.  Pointer was being incremented incorrectly.
+    (4/3/08, MJF)
+
+
+sys/imfort/mii.x
+    An earlier change to this file to clarify procedure names inadvertantly
+    added the prefix the MII routines in the osb$ directory, leading to 
+    unresolved references when actually linking a program (4/16/08, MJF)
+
+unix/hlib/clpackage.men
+sys/fmtio/doc/fmtio.men
+pkg/obsolete/obsolete.men
+pkg/xtools/skywcs/doc/skywcs.men
+pkg/xtools/doc/xtools.men
+pkg/lists/lists.men
+pkg/language/language.men
+pkg/images/immatch/immatch.men
+noao/artdata/mkexamples/onedspec.men
+noao/onedspec/onedspec.men
+noao/imred/argus/demos/demos.men
+noao/imred/ctioslit/demos/demos.men
+noao/imred/echelle/demos/demos.men
+noao/imred/hydra/demos/demos.men
+noao/imred/kpnocoude/demos/demos.men
+noao/imred/kpnoslit/demos/demos.men
+noao/twodspec/longslit/demos/demos.men
+noao/imred/quadred/quadred.men
+noao/imred/iids/iids.men
+noao/imred/iids/irs.men
+noao/imred/irs/irs.men
+noao/artdata/mkexamples/onedspec.men
+noao/onedspec/onedspec.men
+noao/digiphot/photcal/photcal.men
+noao/astutil/astutil.men
+noao/astcat/astcat.men
+noao/imred/specred/specred.men
+    Fixed some typos in help menus found by Jason Quinn (4/20/08, MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Added some additional errchks (5/12/08, NZ/MJF)
+
+sys/ki/ki.com
+    Increased the size of SZ_SBUF from 255 to 1023 to permit more string
+    storage in instructions using long pathnames.  (5/13/08, MJF)
+
+sys/ki/ki.com
+    Backed out of the change.  (5/14/08, MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Modified to use a shorter temp file name as a workaround to some pipeline
+    problems caused by long KI pathnames. (5/14/08, NZ/MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Fixed a problem affecting the number of pad lines corrupting images.
+    (5/23/08, NZ/MJF)
+
+pkg/cl/param.c
+pkg/ecl/param.c
+    Fixed a bug in detecting ambiguous parameters (7/8/08, MJF)
+
+unix/boot/spp/xc.c
+    Forced the mode of a binary to be 0755 to avoid the problem on some
+    linux systems where binaries aren't group/world readable by default 
+    (7/31/08, MJF)
+
+pkg/plot/hgpline.x              +
+pkg/plot/t_prows.x
+pkg/plot/t_pcols.x
+pkg/plot/t_graph.x
+pkg/plot/t_pvector.x
+pkg/plot/initmarker.x
+pkg/plot/mkpkg
+pkg/plot/graph.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pvector.par
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/pvector.hlp
+    Added a feature where marker types of "lhist" or "bhist" draw line
+    or box histograms when not in point mode.  In point mode these
+    values default to box and when not in point mode any other value
+    defaults to connected lines.  (8/13/08, Valdes)
+
+sys/imio/iki/fxfopix.x
+sys/imio/iki/fxfupdhdr.x
+    Changes to the header updates of temporary files.  Related to earlier
+    fixes made for padlines problems and long KI filenames (8/13/08, Valdes)
+
+pkg/bench/bench.hlp
+images/immatch/doc/geomap.hlp
+images/immatch/doc/geotran.hlp
+noao/digiphot/apphot/doc/center.hlp
+noao/digiphot/apphot/doc/centerpars.hlp
+noao/digiphot/apphot/doc/daofind.hlp
+noao/digiphot/apphot/doc/datapars.hlp
+noao/digiphot/apphot/doc/fitpsf.hlp
+noao/digiphot/apphot/doc/fitsky.hlp
+noao/digiphot/apphot/doc/fitskypars.hlp
+noao/digiphot/apphot/doc/pexamine.hlp
+noao/digiphot/apphot/doc/phot.hlp
+noao/digiphot/apphot/doc/polymark.hlp
+noao/digiphot/apphot/doc/polyphot.hlp
+noao/digiphot/apphot/doc/qphot.hlp
+noao/digiphot/apphot/doc/radprof.hlp
+noao/digiphot/apphot/doc/ucache.hlp
+noao/digiphot/apphot/doc/wphot.hlp
+noao/digiphot/daophot/doc/addstar.hlp
+noao/digiphot/daophot/doc/allstar.hlp
+noao/digiphot/daophot/doc/centerpars.hlp
+noao/digiphot/daophot/doc/daoedit.hlp
+noao/digiphot/daophot/doc/daofind.hlp
+noao/digiphot/daophot/doc/daopars.hlp
+noao/digiphot/daophot/doc/daotest.hlp
+noao/digiphot/daophot/doc/datapars.hlp
+noao/digiphot/daophot/doc/group.hlp
+noao/digiphot/daophot/doc/grpselect.hlp
+noao/digiphot/daophot/doc/nstar.hlp
+noao/digiphot/daophot/doc/peak.hlp
+noao/digiphot/daophot/doc/pexamine.hlp
+noao/digiphot/daophot/doc/phot.hlp
+noao/digiphot/daophot/doc/psf.hlp
+noao/digiphot/daophot/doc/pstselect.hlp
+noao/digiphot/daophot/doc/substar.hlp
+noao/digiphot/photcal/doc/apfile.hlp
+noao/digiphot/photcal/doc/config.hlp
+noao/digiphot/photcal/doc/evalfit.hlp
+noao/digiphot/photcal/doc/fitparams.hlp
+noao/digiphot/photcal/doc/inlfit.hlp
+noao/digiphot/photcal/doc/invertfit.hlp
+noao/digiphot/photcal/doc/mkapfile.hlp
+noao/digiphot/photcal/doc/mkcatalog.hlp
+noao/digiphot/photcal/doc/mkconfig.hlp
+noao/digiphot/photcal/doc/mkimsets.hlp
+noao/digiphot/photcal/doc/mknobsfile.hlp
+noao/digiphot/photcal/doc/mkobsfile.hlp
+noao/digiphot/photcal/doc/mkphotcors.hlp
+noao/digiphot/photcal/doc/obsfile.hlp
+noao/digiphot/photcal/doc/pcintro.hlp
+noao/digiphot/ptools/doc/pconvert.hlp
+noao/digiphot/ptools/doc/pdump.hlp
+noao/digiphot/ptools/doc/pexamine.hlp
+noao/digiphot/ptools/doc/pselect.hlp
+noao/digiphot/ptools/doc/pttest.hlp
+noao/digiphot/ptools/doc/tbselect.hlp
+noao/digiphot/ptools/doc/tbsort.hlp
+noao/digiphot/ptools/doc/txselect.hlp
+noao/artdata/doc/gallist.hlp
+noao/artdata/doc/mk1dspec.hlp
+noao/artdata/doc/mk2dspec.hlp
+noao/artdata/doc/mkechelle.hlp
+noao/artdata/doc/mkexamples.hlp
+noao/artdata/doc/mknoise.hlp
+noao/artdata/doc/mkobjects.hlp
+noao/artdata/doc/mkpattern.hlp
+noao/artdata/doc/starlist.hlp
+noao/astcat/doc/aslist.hlp
+noao/astcat/doc/aimfind.hlp
+noao/astcat/doc/ahedit.hlp
+noao/astcat/doc/agetim.hlp
+noao/astcat/doc/agetcat.hlp
+noao/astcat/doc/afiltpars.hlp
+noao/astcat/doc/adumpim.hlp
+noao/astcat/doc/acatpars.hlp
+noao/astutil/doc/astcalc.hlp
+noao/astutil/doc/asthedit.hlp
+noao/astutil/doc/asttimes.hlp
+noao/astutil/doc/ccdtime.hlp
+noao/astutil/doc/galactic.hlp
+noao/astutil/doc/gratings.hlp
+noao/astutil/doc/keywpars.hlp
+noao/astutil/doc/obs.hlp
+noao/astutil/doc/pdm.hlp
+noao/astutil/doc/rvcorrect.hlp
+noao/astutil/doc/setairmass.hlp
+noao/astutil/doc/setjd.hlp
+    More documentation typo corrections from Jason Quinn (8/18/08, MJF)
+
+pkg/images/x_images.x
+pkg/images/imutil/imutil.cl
+pkg/images/imutil/imutil.hd
+pkg/images/imutil/imutil.men
+pkg/images/imutil/nhedit.par        	+
+pkg/images/imutil/doc/nhedit.hlp    	+
+pkg/images/imutil/src/nhedit.x      	+
+pkg/images/imutil/src/getcmd.x      	+
+pkg/images/imutil/src/mkpkg
+    Installed the NHEDIT task (HEDIT with comments) (8/19/08, MJF)
+
+unix/hlib/irafuser.csh
+    Added a -DPOSIX to HSI_CF for freebsd systems (8/19/08, MJF)
+
+unix/os/zgtime.c
+    Had to ifdef the type declaration of time() to be compatible w/ 
+    FreeBSD 6.3 (8/19/08, MJF)
+
+unix/os/zfioks.c
+    FreeBSD doesn't define IPPORT_USERRESERVED  (8/19/08, MJF)
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-freebsd.h		+
+    Usual varargs fun for the FreeBSD build (8/19/08, MJF)
+
+local/notes.v212
+    Moved the the $iraf/doc directory (8/19/08, MJF)
+
+unix/hlib/buglog.csh
+    Fixed the script to once again worl (8/22/08, MJF)
+
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+unix/hlib/login.cl
+pkg/cl/cl.par
+pkg/ecl/cl.par
+    Changed version to V2.14.1 (9/8/08)
+
+pkg/ecl/errs.c
+pkg/ecl/builtin.c
+pkg/ecl/clmodes.h
+    Added a 'beep' capability to the 'erract' variable (9/8/08, MJF)
+
+unix/boot/mkpkg/scanlib.c
+    Initialized a variable to fix a problem on FreeBSD systems where 
+    garbage was causing library files to be read incorrectly. (9/8/09, MJF)
+
+pkg/ecl/mkpkg
+    Fixed a problem for 'sparc' systems in doing a 'mkpkg update) (9/15/08, MJF)
+
+------------------------------------------------------
+System Frozen for V2.14.1 Patch         (9/15/08)
+------------------------------------------------------
+
+fio/fmkbfs.x
+imio/iki/fxf/fxfopen.x
+    Added error checks to catch and pass on error in memory allocation
+    (basically MFULL).  (10/15/08, Valdes)
+
+unix/os/zmaloc.c
+unix/os/zraloc.c
+    Added check for negative IRAF pointer.
+    (10/23/08, Valdes)
+
+sys/plio/plcmpress.x
+sys/plio/plupdate.x
+     Extra checking for a null pointer which might occur when memory
+     allocation fails (memory full).  (10/23/08, Valdes)
+
+sys/imio/iki/fxf/fxfplread.x
+     The heuristic to determine whether the earlier (incorrect) byte
+     size was used was wrong.  This heuristic gives a wrong answer with
+     very small or sparse masks.  (10/28/08, Valdes)
+
+lib/pkg/rmsorted.h
+pkg/xtools/rmmed.x
+pkg/xtools/rmsorted.x
+pkg/images/imfilter/src/runmed.x
+     Modified the running median library to allow running minimum and
+     running maximum.  An argument addition required a change in the
+     runmed task but there was no functional change.  The files are noted
+     here because of the include file being in a system directory.
+     (10/29/08, Valdes)
+
+sys/fmtio/evvexpr.x
+    The checking for compatible datatypes for mod, min, max, and median
+    functions used the argument pointer rather than the dereferenced
+    operand type resuling in an "incompatible types" error message.
+    (11/3/08, Valdes)
+
+sys/ki/kfmkcp.x
+    The set of combinations of from and to files did not include a case
+    where both files are remote (e.g. from node A do "move B!file C!file").
+    This would result in the error
+        Warning: Cannot access template file or cannot make copy file
+    Added the missing case which is an obvious combination of the other
+    cases.  (12/2/08, Valdes)
+
+sys/gio/gki/gkiwesc.x
+    Fixed two calls to amovs() that were using ARB as the size for the
+    move instead of the hdrlen/datalen being passed in.  (12/3/08, MJF)
+
+pkg/images/tv/imexamine/t_imexam.x
+    Removed some accidental code that was causing the frame number to
+    be prompted for.  (12/4/08, MJF)
+
+
+pkg/dataio/lib/mkpkg
+    The getdatatype.x and ranges.x files were duplicates of those in the
+    XTOOLS library which is linked in dataio.  These files should be the
+    versions actually linked in the binary, making XTOOLS unnecessary, but
+    I think the intent was to use XTOOLS.  The getdatatype.x is identical
+    but there are slight changes in ranges.x.  These files were left in
+    place in case there are problems found but the binary should now be
+    using the XTOOLS versions.  (12/5/08, MJF)
+
+pkg/language/language.hd
+pkg/language/language.men
+pkg/language/doc/imaccess.hlp	+
+    Added a missing help page for the imaccess() function (12/18/08, MJF)
+
+sys/fmtio/ctod.x
+    Modified to allow a space to be used to delimit sexagesimal values.
+    Multiple spaces are allowed to preceed/follow the string as well as
+    be used between values. (2/24/09, MJF)
+
+sys/gio/ncarutil/conrec.f
+sys/gio/ncarutil/srface.f
+sys/gio/ncarutil/threed.f
+sys/imio/dbc/imputextf.x
+    Minor changes needed to compile using G77 (2/27/09, MJF)
+
+sys/fmtio/ctod.x
+    Minor bug fix to catch case where the input value may begin with one of
+    the characters allowed for sexagesimal.  In order to allow the function
+    to be used to scan values up to the first non-number character we need
+    need to be sure the input doesn't begin with a stop character and then try
+    to convert anyway.  (3/18/09, MJF)
+
+pkg/language/doc/fprint.hlp
+    Minor cleanup of the help page. (3/26/09, MJF)
+
+pkg/ecl/param.c
+    Modified to allow literal strings beginning with a paren (e.g. ")" 
+    and ") test") to be handled without the normal parameter indirection.  
+    Also changed to allow a '\' to be used to escape indirection for strings
+    that begin with a paren and might otherwise be confused (3/26/09, MJF)
+
+pkg/language/language.hd
+pkg/language/language.men
+pkg/language/doc/which.hlp
+pkg/language/doc/access.hlp
+pkg/language/doc/defpac.hlp
+    Minor cleanup to provide help for whereis/defvar/imaccess (3/27/09, MJF)
+
+pkg/ecl/builtin.c
+    Fixed a segfault when trapping errors from CL functions (3/27/09, MJF)
+
+pkg/images/immatch/doc/xyxymatch.hlp
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/immatch/doc/geotran.hlp
+pkg/images/immatch/doc/geoxytran.hlp
+pkg/images/immatch/doc/gregister.hlp
+    Readability corrections from Jason Quinn (4/6/09, MJF)
+
+noao/astcat/doc/catalogs.hlp
+noao/digiphot/apphot/doc/datapars.hlp
+noao/digiphot/apphot/doc/radprof.hlp
+noao/digiphot/daophot/doc/addstar.hlp
+noao/digiphot/daophot/doc/allstar.hlp
+noao/digiphot/daophot/doc/datapars.hlp
+noao/digiphot/daophot/doc/group.hlp
+noao/digiphot/daophot/doc/nstar.hlp
+noao/digiphot/daophot/doc/peak.hlp
+noao/digiphot/daophot/doc/phot.hlp
+noao/digiphot/daophot/doc/pstselect.hlp
+noao/digiphot/daophot/doc/substar.hlp
+noao/digiphot/ptools/doc/tbdump.hlp
+noao/imred/ccdred/doc/guide.hlp
+noao/imred/quadred/src/quad/doc/guide.hlp
+noao/imred/vtel/doc/mscan.hlp
+noao/imred/vtel/doc/rmap.hlp
+noao/onedspec/doc/specwcs.hlp
+pkg/images/imcoords/doc/ccxymatch.hlp
+pkg/images/imfilter/doc/frmode.hlp
+pkg/images/immatch/doc/linmatch.hlp
+pkg/images/immatch/doc/xregistry.hlp
+pkg/images/immatch/doc/imcombine.hlp
+pkg/images/immatch/doc/geomap.hlp
+pkg/proto/doc/mimstat.hlp
+pkg/proto/doc/rskysub.hlp
+pkg/xtools/catquery/doc/catalogs.hlp
+pkg/xtools/skywcs/doc/skdecwstr.hlp
+    Fixed missing quote messing up HTML translation (4/14/09, MJF)
+
+pkg/images/immatch/src/linmatch/rgltools.x
+    Arrays were being initialized with INDEF values using amov() procedures
+    instead of amovk.  (4/24/09, MJF)
+
+unix/hlib/cl.csh
+    Merged the Sun/IRAF and PC/IRAF cl.csh files (6/3/09, MJF)
+
+pkg/plot/crtpict/t_crtpict.x
+    Fixed a typo (open (STDIN,...) to open("STDIN", ...)) (6/23/09, MJF)
+
+pkg/plot/t_hafton.x
+pkg/plot/crtpict/minmax.x
+    Fixed bad type checking on min/max value (6/23/09, MJF)
+
+sys/osb/f77upk.f
+sys/osb/f77pak.f
+    Added checks that the last char never exceeds maxch (6/23/09, MJF)
+
+pkg/plot/t_graph.x
+    Fixed ggeti() calls that should be gstati() (6/25/09, MJF)
+
+pkg/images/imutil/src/t_imstat.x
+pkg/obsolete/t_oimstat.x
+pkg/proto/masks/mimstat.x
+    fntopnb() was being called as fntopenb()  (7/1/09, MJF)
+
+pkg/proto/t_fixpix.x
+    Fixed an IS_INDEF that should be IS_INDEFI (7/8/09, MJF)
+
+pkg/proto/t_bscale.x
+    The altax() procedure was incorrectly being called with complex() 
+    arguments when scaling a TY_COMPLEX image (7/8/09, MJF)
+
+pkg/proto/t_hfix.x
+    The imtopenp procedure was incorrectly being used as imtopnp (7/9/09, MJF)
+
+pkg/utilities/t_curfit.x
+    The arcz[rd]() procedure was being called with an error function that 
+    had an argument rather than the function name itself.  Additionally,
+    in the case of CF_INSTRUMENTAL a separate function was required to 
+    explicitly return 0.0.  (7/9/09, MJF)
+
+plg/images/immatch/src/linmatch/rglscale.x
+    A bounds check was incorrectly being done against the number of columns
+    rather than the number of lines  (7/10/09, MJF)
+
+noao/mtlocal/cyber/t_ridsfile.x
+    Fixed minor error in calling procedures. (7/11/09, MJF)
+
+noao/imred/dtoi/hdtoi.x
+    The hd_fogcalc() proc was called with too few args (7/12/09, MJF)
+
+pkg/fmtio/evvexpr.gy
+    The absolute value function for a scalar was wrong.  Instead of the
+    absolute value, the negative of the value was returned.  (7/14/09, FV)
+    (Made change to evvexpr.gy, MJF)
+
+pkg/ecl/history.c
+    The string returned by readline() was never freed (7/15/09, MJF)
+
+math/bevington/chifit.f
+math/bevington/curfit.f
+math/bevington/fderiv.f
+math/bevington/gradls.f
+math/bevington/gridls.f
+math/bevington/regres.f
+    Added 'external' declarations for the user-supplied functn()
+    procedure to shut up compiler warnings. (7/17/09, MJF)
+
+unix/boot/bootlib/osfiletype.c
+    Added a few extra extensions to the lists of know src/bin and made
+    the comparison case insensitive. (7/20/09, MJF)
+
+sys/fmtio/ctod.x
+    An earlier change to allow conversion of sexagesimal values in various
+    formats allowed for a space-delimited string.  However, this fails when
+    e.g. parsing WAT keywords containing coefficients.  Changed to disallow
+    spaces as delimiters (8/12/09, MJF)
+
+pkg/ecl/readline/readline.c
+    Fixed problem in that the readline() procedure returns malloc'd pointer
+    of the result, but we can't free it in the calling procedure because
+    libc free() is expecting an SPP pointer.  Changed the routine to return
+    a static buffer, and free'd the pointer in the readline() procedure
+    itself which is compiled without iraf libc.  (8/12/09, MJF)
+
+unix/hlib/libc/ctype.h
+    Modified to cast the char to int to avoid compiler warnings (8/14/09, MJF)
+
+sys/libc
+    Updated completely with a new version that uses ANSI C prototypes.  Code
+    was also cleaned up to remove all compiler warnings. Done as part of
+    64-bit port.  (8/14/09, MJF)
+
+unix/lib/libc/libc.h
+    Updated with new LIBC prototype definitions. (8/14/09, MJF)
+
+pkg/cl/errs.c
+pkg/cl/clprintf.c
+pkg/ecl/errs.c
+pkg/ecl/clprintf.c
+    Removed use of USE_STDARG ifdef's.  We no longer need to support the 
+    <varargs.h> since all modern systems now use <stdarg.h>. (8/14/09, MJF)
+
+unix/hlib/libc/iraf.h
+unix/hlib/libc/varargs.h		-
+unix/hlib/libc/varargs-bsd.h		-
+unix/hlib/libc/varargs-linuxppc.h	-
+     Removed use of <varargs.h> from the system.  (8/14/09, MJF)
+
+noao/lib/obsdb.dat
+    Added entry for Lulin Observatory (Taiwan) from Mike Yang (8/19/09, MJF)
+
+pkg/cl/mkpkg
+pkg/ecl/mkpkg
+    Removed extraneous <varargs.h> dependencies.  (8/25/09, MJF)
+
+pkg/obsolete/icstat.gx
+noao/imred/ccdred/src/icstat.gx
+    Fixed type problems for asum() (8/25/09, MJF)
+
+pkg/cl/mkpkg
+pkg/cl/param.h
+pkg/ecl/mkpkg
+pkg/ecl/param.h
+    Increased the SZ_MAXLIN (max param file line size) from 132 to 512.
+    Also removed unneeded dependencies on varargs.h from the mkpkg 
+    (10/12/09, MJF)
+
+pkg/images/imfilter/src/fmedian.h
+pkg/images/imfilter/src/fmedian.x
+pkg/images/imfilter/src/fmode.h
+pkg/images/imfilter/src/fmode.x
+pkg/images/imfilter/src/frmedian.h
+pkg/images/imfilter/src/frmedian.x
+pkg/images/imfilter/src/frmode.h
+pkg/images/imfilter/src/frmode.x
+pkg/images/imfilter/src/med_buf.x
+pkg/images/imfilter/src/median.h
+pkg/images/imfilter/src/mode.h
+pkg/images/imfilter/src/rmedian.h
+pkg/images/imfilter/src/rmedian.x
+pkg/images/imfilter/src/rmode.h
+pkg/images/imfilter/src/rmode.x
+    A pointer allocated as TY_REAL was being freed as TY_INT (11/26/09, MJF)
+
+pkg/ecl/param.c
+    Backed out of earlier change that broke indirection. (12/11/09, MJF)
+
+pkg/images/imfit/src/fit1d.x
+pkg/images/imfit/fit1d.par
+pkg/images/imfit/doc/fit1d.hlp
+    Added a new parameter, bpm, to use a bad pixel mask to exclude data
+    from the fitting.   (2/10/10, Valdes)
+
+------------------------------------------------------
+Merged 64-bit port notes		(3/1/10)
+------------------------------------------------------
+
+
+mkpkg
+noao/mkpkg
+local/.login
+bin.linux64                      +
+bin.linux64/IB.LNUX.X86_64       +
+noao/bin.linux64                 +
+noao/bin.linux64/NB.LNUX.X86_64  +
+unix/as.linux64                  +
+unix/bin.linux64                 +
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf.LNUX64	 +
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+unix/os/irafpath.c
+    Set up 'linux64' architecture dirs/paths for port, added a '-DLINUX64'
+    to HSI_CF.  (4/20/09, MJF))
+
+
+bin.redhat	-> bin.linux
+noao/bin.redhat	-> bin.linux
+unix/as.redhat	-> as.linux
+unix/bin.redhat	-> bin.linux
+unix/hlib/irafuser.csh 
+    Removed the 'redhat' directories and consolidated into a single 'linux'
+    architecture.  In order to maintain compatability with external packages
+    we retain the 'redhat' architecture in paths, the idea being that an
+    extpkg can still use redhat, but in the core system the links resolve to
+    the linux directory to saisfy the path.  (4/20/09, MJF)
+
+sys/libc/scanf.c
+sys/libc/printf.c
+sys/libc/eprintf.c
+sys/libc/sprintf.c
+pkg/cl/errs.c
+pkg/cl/clprintf.c
+pkg/ecl/errs.c
+pkg/ecl/clprintf.c
+unix/hlib/libc/stdarg.h
+    Removed the ifdef'd USE_STDARG code.  The <varargs.h> is no longer
+    routinely used and support it problematic.  (7/13/09, MJF)
+
+unix/hlib/libc/libc.h
+    Declared XERPSH/XERPOP for use in all procedures. (7/13/09, MJF)
+
+unix/hlib/libc/ctype.h
+    Cast the subscripts to (int) to avoid -Wall warnings. (7/13/09, MJF)
+
+sys/libc
+    Major changes to make ANSI C and clean compile. (7/13/09, MJF)
+
+unix/hlib/libc.h
+    Added prototype declarations for libc procedure. (7/13/09, MJF)
+
+pkg/cl/clprintf.c
+pkg/ecl/clprintf.c
+    Declared eprintf() void to match libc prototype. (7/13/09, MJF)
+
+pkg/libc/stgio.c
+    Added a maxch arg to c_stggetline().  This is only used in cl$modes.c
+    (and ecl$modes.c) and a 3rd arg is supplied.  (7/13/09, MJF)
+
+unix/hlib/libc/kernel.h
+    Added <stdlib.h>, <unistd.h>, <sys/types.h> and <string.h> definition to
+    get system prototypes (e.g. for the glibc strcmp()) (8/14/09, MJF)
+
+unix/hlib/libc/iraf.h
+unix/hlib/libc/varargs.h                -
+unix/hlib/libc/varargs-bsd.h            -
+unix/hlib/libc/varargs-linuxppc.h       -
+    Removed use of <varargs.h> from the system.  (8/14/09, MJF)
+
+unix/bin.redhat/f2c.h
+unix/hlib/libc/kproto.h
+unix/hlib/libc/vosproto.h
+    System prototypes ....... (8/24/09, MJF)
+
+unix/hlib/f77.sh
+    Added a '-P' flag to allow F2C to produce function prototypes in
+    files with '.P' extensions.  We'll use this in building the system
+    library prototype files which have changed since the last time they
+    were generated and are in need of automation (8/24/09, MJF)
+
+unix/os/zgtime.c
+    Modified to use more modern CLOCKS_PER_SEC vs CLK_TCK (9/23/09, MJF)
+
+sys/nmemio			+
+    New version of MEMIO interface supporting pointer bounds checking.
+
+lib/syserr.h
+lib/syserrmsg
+    Added new codes for pointer under and overflow. ()
+
+unix/boot/xyacc/debug/ytab.x
+noao/obsutil/src/sptime/tabinterp.x
+noao/obsutil/src/sptime/grating.x
+noao/imred/vtel/destreak.x
+noao/artdata/t_mk2dspec.x
+noao/artdata/mktemplates.x
+noao/onedspec/t_sapertures.x
+noao/onedspec/t_tweak.x
+noao/onedspec/dispcor/dcio.x
+pkg/lists/lintran.x
+pkg/images/imutil/src/imexpr.x
+pkg/images/tv/display/imdwcs.x
+pkg/images/tv/wcslab/wlutil.x
+pkg/images/tv/wcslab/wllabel.x
+pkg/images/tv/wcslab/wlwcslab.x
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/xtools/rmmed.x
+pkg/xtools/rmturlach.x
+pkg/xtools/rngranges.x
+pkg/bench/xctest/lintran.x
+sys/nmemio/zzfoo.x
+sys/qpoe/zzdebug.x
+sys/qpoe/gen/qpexcoder.x
+sys/qpoe/gen/qpexparser.x
+sys/qpoe/qpmacro.x
+math/curfit/cverrorsr.x
+math/nlfit/nlerrorsr.x
+math/iminterp/asifit.x
+math/gsurfit/gserrorsr.x
+    Modified to add P2R/P2P macros on Memr as neded.
+
+tables/lib/stxtools/xtwcs.x
+tables/lib/stxtools/sp_util/sprote.x
+tables/lib/stxtools/wcslab/wllabel.x
+tables/lib/stxtools/wcslab/wlwcslab.x
+tables/pkg/tbplot/igi/igi.h
+tables/pkg/fitsio/stwfits/wfits.h
+tables/pkg/fitsio/strfits/rfits.h
+tables/pkg/tobsolete/r49fits/rfits.h
+tables/lib/stxtools/wcslab/wcs_desc.h
+tables/lib/gilib/gi.h
+    Modified to add P2R/P2P macros on Memr as neded.
+
+./noao/mtlocal/cyber/rrcopy/rrcopy.h
+./noao/mtlocal/cyber/cyber.h
+./noao/obsutil/src/starfocus/starfocus.h
+./noao/obsutil/src/sptime/sptime.h
+./noao/obsutil/src/specfocus/specfocus.h
+./noao/imred/ccdred/src/ccdred.h
+./noao/imred/ccdred/src/generic/ccdred.h
+./noao/imred/quadred/src/ccdproc/ccdred.h
+./noao/imred/quadred/src/ccdproc/generic/ccdred.h
+./noao/imred/vtel/numeric.h
+./noao/imred/dtoi/hdicfit/hdicfit.h
+./noao/artdata/lists/starlist.h
+./noao/digiphot/photcal/lib/obsfile.h
+./noao/digiphot/photcal/lib/prstruct.h
+./noao/digiphot/photcal/lib/lexer.h
+./noao/digiphot/photcal/lib/apfile.h
+./noao/digiphot/daophot/lib/psfdef.h
+./noao/digiphot/daophot/lib/daophotdef.h
+./noao/digiphot/apphot/lib/radprofdef.h
+./noao/digiphot/apphot/lib/fitpsfdef.h
+./noao/digiphot/apphot/lib/finddef.h
+./noao/digiphot/apphot/lib/polyphotdef.h
+./noao/digiphot/apphot/lib/noisedef.h
+./noao/digiphot/apphot/lib/centerdef.h
+./noao/digiphot/apphot/lib/photdef.h
+./noao/digiphot/apphot/lib/fitskydef.h
+./noao/digiphot/apphot/lib/apphotdef.h
+./noao/rv/rvplots.h
+./noao/rv/rvidlines/identify.h
+./noao/rv/rvsample.h
+./noao/rv/rvpackage.h
+./noao/rv/rvcont.h
+./noao/astcat/lib/aimparsdef.h
+./noao/astutil/pdm/pdm.h
+./noao/nproto/ace/acesky.h
+./noao/nproto/ace/cat.h
+./noao/nproto/ace/gwindow.h
+./noao/nproto/ace/ace.h
+./noao/nproto/ace/skyfit.h
+./noao/nproto/ace/grow.h
+./noao/nproto/ace/split.h
+./noao/nproto/ace/detect.h
+./noao/nproto/ace/objs.h
+./noao/nproto/ace/skyblock.h
+./noao/nproto/ir/iralign.h
+./noao/onedspec/specplot.h
+./noao/onedspec/irsiids/idsmtn.h
+./noao/onedspec/ecidentify/ecidentify.h
+./noao/onedspec/identify/autoid/autoid.h
+./noao/onedspec/identify/identify.h
+./noao/onedspec/sensfunc/sensfunc.h
+./noao/onedspec/dispcor/dispcor.h
+./noao/lib/smw.h
+./noao/lib/units.h
+./noao/lib/funits.h
+./noao/twodspec/multispec/ms.h
+./noao/twodspec/apextract/apertures.h
+./pkg/obsolete/oimstat.h
+./pkg/obsolete/fits/wfits.h
+./pkg/images/imutil/src/imtile.h
+./pkg/images/imutil/src/imstat.h
+./pkg/images/imfit/src/imsurfit.h
+./pkg/images/imcoords/src/starfind.h
+./pkg/images/tv/tvmark/tvmark.h
+./pkg/images/tv/imexamine/imexam.h
+./pkg/images/tv/imexamine/starfocus.h
+./pkg/images/tv/iis/src/gwindow.h
+./pkg/images/tv/iis/lib/ids.h
+./pkg/images/tv/imedit/epix.h
+./pkg/images/tv/display/gwindow.h
+./pkg/images/tv/wcslab/wcs_desc.h
+./pkg/images/imfilter/src/median.h
+./pkg/images/imfilter/src/fmedian.h
+./pkg/images/imfilter/src/frmode.h
+./pkg/images/imfilter/src/fmode.h
+./pkg/images/imfilter/src/frmedian.h
+./pkg/images/imfilter/src/mode.h
+./pkg/images/imfilter/src/rmode.h
+./pkg/images/imfilter/src/rmedian.h
+./pkg/images/immatch/src/xregister/xregister.h
+./pkg/images/immatch/src/psfmatch/psfmatch.h
+./pkg/images/immatch/src/geometry/geotran.h
+./pkg/images/immatch/src/linmatch/linmatch.h
+./pkg/xtools/icfit/icfit.h
+./pkg/xtools/inlfit/inlfitdef.h
+./pkg/xtools/gtools/gtools.h
+./pkg/plot/crtpict/wdes.h
+./pkg/plot/crtpict/crtpict.h
+./pkg/proto/maskexpr/peregfuncs.h
+./pkg/proto/masks/mimstat.h
+./pkg/proto/masks/rskysub.h
+./pkg/dataio/fits/wfits.h
+./pkg/dataio/export/export.h
+./sys/psio/psio.h
+./sys/mwcs/imwcs.h
+./sys/imio/iki/oif/imhv1.h
+./sys/imio/iki/oif/imhv2.h
+./sys/imio/iki/fxf/fxf.h
+./sys/imio/iki/qpf/qpf.h
+./sys/plio/plcircle.h
+./sys/imfort/imhv1.h
+./sys/imfort/imhv2.h
+./sys/gio/sgikern/sgi.h
+./sys/gio/imdkern/imd.h
+./sys/gio/calcomp/ccp.h
+./sys/gio/stdgraph/stdgraph.h
+./sys/gio/glabax/glabax.h
+./sys/gio/nsppkern/gkt.h
+./sys/qpoe/qpoe.h
+./sys/qpoe/qpex.h
+./sys/qpoe/qpio.h
+./math/surfit/surfitdef.h
+./math/curfit/curfitdef.h
+./math/nlfit/nlfitdefr.h
+./math/iminterp/im1interpdef.h
+./math/iminterp/im2interpdef.h
+./math/gsurfit/gsurfitdef.h
+./lib/imio.h
+./lib/evexpr.h
+./lib/imhdr.h
+./lib/gio.h
+./lib/evvexpr.h
+./lib/pkg/rmsorted.h
+    Modified to add P2R/P2P macros on Memr as neded.
+
+unix/boot/xyacc/debug/ytab.x
+noao/obsutil/src/sptime/tabinterp.x
+noao/obsutil/src/sptime/grating.x
+noao/artdata/t_mk2dspec.x
+noao/artdata/mktemplates.x
+noao/onedspec/t_sapertures.x
+noao/onedspec/t_tweak.x
+noao/onedspec/dispcor/dcio.x
+pkg/lists/lintran.x
+pkg/images/imutil/src/imexpr.x
+pkg/images/tv/display/imdwcs.x
+pkg/images/tv/wcslab/wlwcslab.x
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/bench/xctest/lintran.x
+sys/qpoe/qpmacro.x
+math/curfit/cverrorsr.gx
+math/nlfit/nlerrorsr.gx
+math/iminterp/asifit.x
+math/gsurfit/gserrorsr.gx
+    Added P2R macros where needed (11/23/09)
+
+lib/gio.h
+lib/imio.h
+lib/imhdr.h
+    Added P2R macros where needed (11/23/09)
+
+unix/gdev/sgidev/mkpkg.sh
+unix/gdev/sgidev/sgi2svg.c
+    Added SVG translator.
+
+sys/plio/plload.x
+sys/plio/plsave.x
+sys/imfort/imioff.x
+sys/imfort/imopnx.x
+sys/imfort/imrdhdr.x
+sys/imfort/imwrhdr.x
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/oif/oifopix.x
+sys/imio/iki/oif/oifrdhdr.x
+sys/imio/iki/oif/oifwrhdr.x
+sys/imio/iki/stf/stfrdhdr.x
+sys/imio/iki/stf/stfreblk.x
+sys/imio/iki/fxf/fxf.h
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfrfits.x
+    Uses of SZ_STRUCT in computing sizes were converted to SZ_MII_INT
+
+sys/libc/fgets.c
+    Modified to ignore '\r' used in DOS-style text files.  Also now handles a
+    missing '\n' at the EOF as can sometimes happen with emacs-edited files.
+
+
+noao/onedspec/odcombine/src/xtimmap.gx
+noao/onedspec/odcombine/srcwt/xtimmap.gx
+noao/twodspec/longslit/lscombine/src/xtimmap.gx
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+    A pointer (Memi[ims+index-1]) wasn't being reset to NULL when 
+    freed, leading to a segfault when run a second time from the cache.
+
+osb/bitfields.c
+    Added masks to accomodate 64-bit int sizes.  Fixed a FDV problem
+    seen in NCAR tasks (e.g. contour)
+
+pkg/plot/t_implot.x
+    The impcom common block was being confused in the linker with the
+    impcom.o object (imio$dbc) in libex.a.  Fixed implot bus error.
+
+lib/gio.h
+    Modified GP_WCSPTR to be properly aligned.
+
+lib/szpixtype.inc		+
+    Added an equivalent to szdtype.inc for use with pixel-based applications.
+    The idea is that pixels will continue to be 32-bit ints regardless of
+    the platform.
+
+imcssz.x
+imflsh.x
+imggsc.x
+imgnln.x
+imgobf.x
+imnote.x
+impnln.x
+imrbpx.x
+imrdpx.x
+imwbpx.x
+imwrpx.x
+    Changed use of ty_size[] to pix_size[]
+
+imioff.x
+imsetbuf.x
+iki/fxf/fxfopix.x
+iki/fxf/fxfpak.x
+iki/fxf/fxfupk.x
+iki/fxf/zfiofxf.x
+iki/qpf/zfioqp.x
+iki/stf/stfnewim.x
+iki/stf/stfopix.x
+iki/stf/stfrdhdr.x
+    Changed use of sizeof(IM_PIXTYPE(im)) to pix_size[IM_PIXTYPE(im)]
+
+lib/nmi.h
+sys/etc/nmiread.gx
+sys/etc/nmireadb.x
+sys/etc/nmireadc.x
+sys/etc/nmiwrite.gx
+sys/etc/nmiwriteb.x
+sys/etc/nmiwritec.x
+    Added a new Native Machine Integer (NMI) interface.  This is similar to
+    the MII interface but is meant for use with external binary files that
+    don't require a (possible) byte-swap.  The main point of this is to 
+    provide a means to write native 32-bit ints distinguished from 64-bit
+    long.
+
+sys/osb/nmilen.x
+sys/osb/nminelem.x
+sys/osb/nmipak.x
+sys/osb/nmipak16.x
+sys/osb/nmipak32.x
+sys/osb/nmipak8.x
+sys/osb/nmipakd.x
+sys/osb/nmipakr.x
+sys/osb/nmipksize.x
+sys/osb/nmiupk.x
+sys/osb/nmiupk16.x
+sys/osb/nmiupk32.x
+sys/osb/nmiupk8.x
+sys/osb/nmiupkd.x
+sys/osb/nmiupkr.x
+    Support routines for the NMI interface.
+
+sys/fmtio/evexpr.gy
+sys/fmtio/evvexpr.gy
+sys/fmtio/xevgettok.x
+sys/fmtio/xvvgettok.x
+    Broke out the xev_gettok() procedure into a new file.  Newer GCC
+    compilers were complainint about the data type.
+
+sys/imio/dbc/imdcom.x		-
+sys/imio/dbc/imdrmcom.x		+
+    Renamed the file containing the imdrmcom() procedure.  This was causing
+    confusion with the 'imdcom' common block in the linker.
+
+unix/os/mkproto
+    Added utility script to generate IRAF kernel prototypes.
+
+unix/gdev/sgidev/sgi2svg.x	+
+    Added new SGI driver for SVG graphics.
+
+unix/boot/spp/rpp/test.r	+
+    Added new test file for RPP driver.
+
+unix/boot/spp/xpp/xpp.l
+unix/boot/spp/xpp/xppcode.c
+    Attempt to try to manage new use of Memr[] macros, but one known to
+    break backward compatibility.  A use such as "Memr[$1+N]" is obviously
+    part of a structure definition, so we automatically add a P2R() macro
+    so it reads "Memr[P2R($1+N)]" when being passed to RPP.  This properly
+    aligns the struct on 64-bit platforms and is a no-op on 32-bit.  
+	The complication is a simple case of "Memr[$1]" which may be either 
+    the first element of a structure or a utility macro for a TY_REAL array.
+    In this case, we output an error indicating that a P2P or P2R macro is
+    required to resolve any ambiguity.
+    	There are similar examples for 2-D arrays that aren't as easily parsed,
+    but since we can't trap them generally we can't do much to automatically
+    'fix' the macro.
+	The overall utility of this change is questionable and may be pulled
+    from a later release.
+
+sys/osb/abs.c
+    Added an abs() function to avoid type conflicts between int/long.
+
+sys/osb/i32to64.c
+sys/osb/i64to32.c
+    Imported int 32/64 pack/unpack from IRAF64 code.  Note these are 
+    MACHDEP on Intel byte order!
+
+sys/osb/urand.c
+sys/osb/imul32.c
+    The urand() algorithm relies on 32-bit overflow to work properly.  Needed
+    to add an 'imul32' function to do the multiplication with overflow.
+
+sys/osb/ipak32.c
+sys/osb/iupk32.c
+    Added pak/unpak for 32-bit integers. 
+
+pkg/images/imutil/src/t_chpix.x
+    Added an imflush() to the output image.
+
+pkg/plot/t_implot.x
+    Renamed the 'impcom' to 'implcom' to avoid a symbol name clash in the
+    linker.
+
+lib/gio.h
+sys/gio/cursor/gtr.h
+    Increased the size of the WCS buffer.  The size was previously calculated
+    as being 17 structure elements by assuming the SZ_INT was 2.  Increased
+    to accomodate 64-bit sizes and will live with the wasted space.
+
+local/iraf_test.tar.gz
+    Added the "images test scripts" to the main distribution.  These require
+    stty playback and so require the old CL to run.  To use these, unpack
+    in a clean directory and begin with "stty playback=test.images", 
+    successive tests will be run automatically.
+
+pkg/system/bench.cl
+    Added benchmark script to core distribution.
+
+pkg/cl/proto.h
+pkg/ecl/proto.h
+    Function prototypes for the CL code.
+
+unix/hlib/libc/kproto32.h
+unix/hlib/libc/kproto64.h
+unix/hlib/libc/vosproto.h
+    Kernel prototype files.  These are somewhat massaged by hand to remove
+    duplicate symbol names that cause errors but provide 98% coverage until
+    this can be addressed.
+
+unix/hlib/iraf.h ->
+unix/hlib/mach.h ->
+unix/hlib/iraf32.h
+unix/hlib/mach32.h
+unix/hlib/iraf64.h
+unix/hlib/mach64.h
+    Added 32 and 64-bit definitions of the files defining primary data types.
+    Compilation is actually done using symlinks to the appropriate version in
+    hbin$ directory.  The hlib$ versions are likewise a symlink that points to
+    the correct version when the architecture is set.
+
+/util				+
+/Makefile			+
+    Top-level makefle and utility scripts for building the system.  Makefile
+    targets are
+
+		all		alias for 'update'
+		sysgen		do a complete sysgen
+		update		update system since last sysgen
+		updatex		update with debugging flags enabled
+		src		clean system of current binaries
+		clean		clean system of current binaries
+		pristine	clean system of all binaries
+		tables		compile the TABLES package
+		noao		compile the NOAO package
+		summary		print core/noao/tables spool file summaries
+		showarch	show currently configure arch
+		<arch>		reconfigure for named architecture
+
+unix/hlib/mkpkg.sf.LNUX64
+    Special files list for new arch.
+
+unix/hlib/irafarch.csh
+    Utility script to determine proper platform architecture name.
+
+sys/osb/bitfieds.c
+    Added extra masks to accomodate 64-bit integers.
+
+pkg/xtools/ranges/rgfree.x
+    Added a check for a null pointer around the mfree.  There were cases in
+    the ICFIT code that this was being called with a NULL pointer and would
+    trigger an error on newer libc, it seemed safest to allow the previous
+    behavior but just protect against it.
+
+sys/pmio/zzinterp.x
+    pm_create() was being called with too many arguments.
+
+unix/hlib/libc/libc.h
+    Added libc prototype definitions for automatic checking.  This is also
+    where we look at the vosproto.h
+
+
+
+------------------------------------------------------
+V2.15-ALPHA release			(3/2/10)
+------------------------------------------------------
+
+math/nlfit.gh
+     A leftover definition of P2R was causing problems.
+
+sys/nmemio/minit.x
+     Calls to fmkbfs() to create initialize the I/O buffers were not taking
+     into account that subsequent calls to the task in the prcache would
+     already have an i/o buffer.  This was causing leading nulls to appear
+     in the stdout stream (e.g. redirection or scan-from-pipe) as well as
+     just output to appear in the CL stdout.  Commented out the code until
+     it is better understood.  The intent was to ensure that when reporting
+     memory usage we wouldn't see some arbitrary base value but could ensure
+     that memory allocated by an app was accounted for completely.
+
+noao/imred/ccdred/src/cosmic/crsurface.x
+noao/imred/crutil/src/crsurface.x
+pkg/images/tv/imedit/epsurface.x
+pkg/images/tv/imexamine/iesimexam.x
+pkg/plot/t_surface.x
+    There is apparenty a bug in the NCAR ezsrfc() routine that reaches beyond
+    the defined 'work' area (said to be twice the size of the data raster).
+    This was originally increased to be 4*data in the SURFACE task, but the
+    routine is called elsewhere and was failing in e.g. IMEXAM.  Increased
+    the size for all instances but will need to track this down.
+    Pragmatically this can be ignored on modern systems as a minor waste of
+    space, it is much harder to debug the login of the NCAR code.
+
+sys/libc/cfredir.c
+unix/hlib/libc/libc.h
+unix/hlib/libc/xnames.h
+    Added a wrapper for frediro() from FIO to redirect open streams (7/5/10)
+
+bin.ipad			+
+noao/bin.ipad			+
+unix/as.ipad			+
+unix/bin.ipad			+
+hlib/install
+hlib/irafarch.csh
+hlib/irafuser.csh
+hlib/mkpkg.inc
+os/zmain.c
+os/zopdir.c
+os/zzepro.c
+os/irafpath.c
+    Minor changes necessary for iPad port. (8/7/10)
+
+noao/lib/obsdb.dat
+    Added obsdb entry for Jack C. Davis Obs (8/31/10)
+
+unix/os/zgtime.c
+    Fixed a bug in the time calculation caused by a change in most systems
+    in the definition of clock ticks (8/31/10)
+
+unix/hlib/login.cl
+    Added dummy definition for 'imclobber'. (9/17/10)
+
+sys/imio/iki/fxf/fxfrfits.x
+    If the DATE keyword doesn't specify a time, the IM_CTIME is calculated
+    with INDEF values, leading to overflow (9/25/10)
+
+extern/tables/pkg/fitsio/strfits/fits_rpixels.x
+    The size of the 'spp' pointer was increased to avoid overflow.
+
+noao/artdata/lists/stplot.x
+noao/obsutil/src/ccdtime/ccddb.x
+noao/mtlocal/camera/cam_keywords.x
+noao/onedspec/odcombine/srcwt/icombine.x
+pkg/images/immatch/src/linmatch/rgldelete.x
+    Fixed various cases where Mem array were used as 'mem' (10/28/10)
+
+pkg/utilities/bases.cl		+
+pkg/utilities/utilities.cl
+pkg/utilities/utilities.hd
+pkg/utilities/utilities.men
+    Imported the BASES task from the NLOCAL extpkg (10/29/10)
+
+pkg/cl/exec.c
+pkg/ecl/exec.c
+    Modified the findexe() procedure to allow use of compatable binaries.
+    For example, on linux64 we can use 32-bit linux/redhat binaries, on
+    macintel we might be able to use macosx.  This also allows the system
+    to use external packages following the older architecture names without
+    change, e.g. on 32-bit systems where the arch is now 'linux', packages
+    with only 'redhat' binaries will be used automatically.  (10/30/10)
+
+unix/os/zgtenv.c
+    Modified to allow a $HOME/.iraf.h file to be searched for if the system
+    <iraf.h> cannot be found.  This supports a "personal installation" of
+    IRAF on machines where users don't have root permission for a normal
+    install.  The KI code will also pick up these definitions, and we allow
+    the personal file to override the system default so give users the 
+    option of running a private version.  (10/30/10)
+
+pkg/mkpkg
+pkg/tbtables			+
+    The TABLES v3.12 version of libtbtables.a (ported to 64-bit) is now 
+    included in the core system.  (11/4/10)
+
+pkg/utilities/mkpkg
+pkg/utilities/utilities.cl
+pkg/utilities/utilities.hd
+pkg/utilities/utilities.men
+pkg/utilities/utilities.par
+pkg/utilities/nttools		+
+    Imported the TABLES.TOOLS package as a new NTTOOLS package that is 
+    loaded with UTILITIES.  The KEYSELECT task is no longer available,
+    other TABLES libraries (e.g. stxtools/display) we also imported to
+    support specific tasks but are not generally exposed.  The new package
+    name is to avoid a potential name collision when a standalone TABLES
+    package is also installed.  (11/4/10)
+ 
+
+noao/digiphot/ptools/mkpkg
+noao/digiphot/daophot/mkpkg
+noao/digiphot/ptools/ptools.cl
+noao/digiphot/daophot/daophot.cl
+noao/digiphot/photcal/photcal.cl
+    Removed dependency on TABLES external package (11/4/10)
+
+noao/digiphot/ptools/pttest.cl
+    Changed the check for the TABLES package to look for NTTOOLS (11/4/10)
+
+unix/gdev/sgidev/sgi2gif.c
+    Fixed an error where fclose called twice on same descriptor. (11/8/10)
+
+pkg/system/help/helpdb.x
+pkg/system/help/helpdir.x
+    Fixed a segvio problem in MKHELPDB on 64-bit systems, also fixed a
+    problem with reading the helpdb.mip created on 'other' systems (11/13/10)
+
+lib/helpdb.mip
+noao/lib/helpdb.mip
+    Rebuilt the help databases. (11/16/10)
+
+immatch/src/imcombine/src/ichdr.x
+    The step that stripped any directory from the image name for the $I
+    value of the imcmb parameter failed for extensions.  (11/17/10, Valdes)
+
+misc help pages
+    Some 227 help pages were updated to correct spelling mistakes (including
+    in one case the word 'misspelled'.  (11/17/10)
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+    Changed the version to V2.15RELEASED.  (11/18/90)
+
+unix/hlib/clpackage.cl
+unix/hlib/zzsetenv.def
+unix/hlib/extpkg.cl		+
+iraf/extern			+
+iraf/extern/configure		+
+iraf/extern/README		+
+    Installed the 'dynamic package loading' mechanism.  This feature 
+    operates in concert with a 'repository' of files maintained on the
+    ftp archive.  The scheme is that external packages are built to be
+    complete for a particular architecture, unpacking these in the 
+    iraf$extern directory constitutes an installed package.  The CLPACKAGE
+    script was modified to automatically declare any package in this
+    directory.
+	To bootstrap the system, a configure script downloads the repository
+    manifest from the server and creates skeleton directories for packages
+    available on that platform.  Installing a package is then just a matter
+    of typing "make fitsutil" to download and unpack the package.  Dependenc-
+    ies are likewise downloaded automatically, scripts in the iraf$util 
+    directory and hand-crafting of the repository do all the heavy lifting.
+    Packages may be kept automatically up to date with a "make update"
+    command to compare the install dates with the contents of the repository.
+    The Makefile is generated automatically by the conigure script, more
+    details are available in the README file.
+    (11/19/10)
+    
+
+-------------------------------------------------
+System Frozen for Final Build
+Sat Nov 20 23:54:45 MST 2010
+-------------------------------------------------
+
+------------------------------------------
+V2.15 EXPORT release (November 21, 2010)
+------------------------------------------
+

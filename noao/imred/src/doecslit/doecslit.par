@@ -1,0 +1,28 @@
+objects,s,a,"",,,"List of object spectra"
+apref,f,h,"",,,"Aperture reference spectrum"
+arcs,s,h,"",,,"List of arc spectra"
+arctable,f,h,"",,,"Arc assignment table (optional)"
+standards,s,h,"",,,"List of standard star spectra
+"
+readnoise,s,h,"0.",,,"Read out noise sigma (photons)"
+gain,s,h,"1.",,,"Photon gain (photons/data number)"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
+norders,i,h,10,,,"Number of orders"
+width,r,h,5.,,,"Width of profiles (pixels)
+"
+dispcor,b,h,yes,,,"Dispersion correct spectra?"
+extcor,b,h,no,,,"Extinction correct spectra?"
+fluxcal,b,h,no,,,"Flux calibrate spectra?"
+resize,b,h,no,,,"Resize object apertures?"
+clean,b,h,no,,,"Detect and replace bad pixels?"
+trace,b,h,yes,,,"Trace object spectra?"
+background,s,h,"none",none|scattered|average|median|minimum|fit,,"Background to subtract"
+splot,b,h,no,,,"Plot the final spectra?"
+redo,b,h,no,,,"Redo operations if previously done?"
+update,b,h,no,,,"Update spectra if cal data changes?"
+quicklook,b,h,no,,,"Approximate quicklook reductions?"
+batch,b,h,no,,,"Extract objects in batch?"
+listonly,b,h,no,,,"List steps but don\'t process?
+"
+sparams,pset,h,"",,,"Algorithm parameters"
+mode,s,h,"ql",,,

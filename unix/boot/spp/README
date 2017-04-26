@@ -1,0 +1,43 @@
+These directories contain the source code for the UNIX version of the compiler
+for the IRAF subset preprocessor language (SPP).  In its current implementation
+the compiler consists of the following modules:
+
+	xc.e		main program (like cc)
+	xpp.e		first pass (written in Lex and C)
+	rpp.e		second pass (written in ratfor)
+
+files:
+	xpp		subdirectory containing XPP
+	rpp		subdirectory containing RPP
+	xc.c		the XC compiler/linker
+
+runtime files:
+	lib$xc.e	installed UNIX xc compiler
+	lib$xpp.e	installed first pass
+	lib$rpp.e	installed second pass
+
+
+This implementation of the SPP preprocessor (kludgy though it may be) should be
+portable to any host computer supporting C and Fortran compilers.  A Ratfor
+compiler and runtime library is no longer required.  XPP does contain some
+machine dependencies in its internal tables describing the host Fortran
+compiler, and these should be reviewed.  RPP has a C language interface to the
+host machine which contains knowledge of how the host system permits C and
+Fortran to be mixed in the same program.  Hopefully all machine dependence
+has been concentrated in the two files xpp/xppcode.c and rpp/ratlibc/ratdef.h.
+
+This version of the preprocessor no longer knows about pathnames other than
+those defined in the C include file "iraf.h", which is also used by the
+CL and all other C files in IRAF.  The "iraf.h" file is the only file used
+by IRAF which does not reside in the IRAF directories (although a copy appears
+in lib$libc and we make a symbolic link to it on our 4.2BSD UNIX system).
+XC has to know the root directory of IRAF to reference important files in
+iraf$lib.  The root directory may be set on the command line with the "-r"
+(root) argument; if "-r ospathname" is omitted the default is the value of
+IRAFDIR given in "iraf.h"
+
+On our UNIX development system we have the executables (xc.e, xpp.e, etc.)
+linked into both the source directory and the IRAF library lib$.  Hence when
+any of these executables are relinked, the new versions do not have to
+be installed.  If your system does not support links you will need to copy
+the executable to lib$ after compilation.

@@ -1,0 +1,29 @@
+.TH FCHISQ 3M
+.SH NAME
+fchisq
+.SH DESCRIPTION
+function fchisq.f
+
+source
+  Bevington, page 194.
+
+purpose
+  evaluate reduced chi square for fit of data 
+    fchisq = sum ((y-yfit)**2 / sigma**2) / nfree
+
+usage 
+  result = fchisq (y, sigmay, npts, nfree, mode, yfit)
+
+description of parameters
+  y      - array of data points
+  sigmay - array of standard deviations for data points
+  npts   - number of data points
+  nfree  - number of degrees of freedom
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  yfit   - array of calculated values of y
+
+subroutines and function subprograms required 
+  none

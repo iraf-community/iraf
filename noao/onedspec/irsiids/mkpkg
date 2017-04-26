@@ -1,0 +1,22 @@
+# IRS/IIDS Tasks
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	coincor.x	
+	conversion.x	
+	getnimage.x	<mach.h>
+	t_addsets.x	<error.h> <imhdr.h>
+	t_bswitch.x	<smw.h> <error.h> <imhdr.h> <mach.h> <time.h>
+	t_coefs.x	<error.h>
+	t_coincor.x	<error.h> <imhdr.h>
+	t_flatdiv.x	<error.h> <imhdr.h>
+	t_flatfit.x	<gset.h> <imhdr.h> <math/curfit.h>
+	t_slist1d.x	<error.h> <fset.h> <imhdr.h> <smw.h>
+	t_subsets.x	<error.h> <imhdr.h>
+	t_sums.x	<error.h> <imhdr.h>
+	t_widstape.x	<error.h> <imhdr.h> <mach.h> <smw.h>
+	;

@@ -1,0 +1,67 @@
+.help gripes Mar86 system
+.ih
+NAME
+gripes -- send gripes or suggestions to the system
+.ih
+USAGE
+gripes subject
+.ih
+PARAMETERS
+.ls subject
+The subject of the gripe; any string, usually the name of package or task
+to which the gripe refers.
+.le
+.ls verbose = yes
+Print instructions on how to enter text whenever \fIgripes\fR is run.
+.le
+.ih
+DESCRIPTION
+The \fBgripes\fR task is used to post complaints, suggestions, or any other
+formal or informal comments regarding the IRAF system.  Each gripe is
+appended to the system gripesfile "hlib$gripesfile", a public file which
+can be read by anyone by simply typing "page hlib$gripesfile" within IRAF.
+Use \fBtail\fR instead of \fBpage\fR to read only the most recent gripes.
+A copy of each gripe is also sent immediately to one or members of the IRAF
+group via electronic mail, to insure that the gripe gets read promptly (this
+feature is not available on all host systems).
+
+Gripe text is read from the standard input.  A line containing only a period
+terminates the gripe, as does the end of file character (e.g., <ctrl/z>).
+If the line containing only "~e" is entered a text editor will be called up
+to edit the text of the gripe.
+
+Users are encouraged to use the gripe facility at will.  Be assured that
+someone will at least read the gripe, although there is no guarantee that
+any action will be taken.  In many cases there will be no response from the
+system, but nonetheless the gripe will be seen and it may well influence
+the direction in which the system evolves.  Do not avoid posting gripes for 
+fear that you do not understand something about the system; if enough users
+find some aspect of the system or a program confusing then that is more
+than sufficient reason for a gripe.
+.ih
+EXAMPLES
+
+1.  The user has discovered some nasty features of the \fIimdelete\fR task
+and enters the following gripe.  Note the use of the "." to terminate
+the text.
+
+.nf
+	cl> gripe
+	Subject: image deletion
+	Enter text of gripe.  Type <eof> or '.' to quit:
+
+	IMDEL * will delete non image files as well as images!
+	It should be possible to delete images with the normal
+	DELETE command.
+	.
+	cl>
+.fi
+.ih
+BUGS
+There is currently no provision for communicating gripes from a remote site
+back to the site that wrote the software, unless some person manually mails
+a gripe (or the accumulated gripesfile).
+.ih
+SEE ALSO
+news
+.endhelp

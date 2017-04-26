@@ -1,0 +1,708 @@
+# Semi-code for curfit.h
+
+# define the permitted types of curves
+
+define	CHEBYSHEV	1
+define	LEGENDRE	2
+define	L2SPLINE4	3
+
+# define the weighting flags
+
+define	NORMAL		1	# user enters weights
+define	UNIFORM		2	# equal weights, weight 1.0
+define	SPACING		3	# weigth proportional to spacing of data points
+
+define	SPLINE_ORDER	4
+
+# set up the curve fitting structure
+
+define	LEN_CVSTRUCT
+
+struct curfit {
+
+define	CV_TYPE		Memi[]		# Type of curve to be fitted
+define	CV_ORDER	Memi[]		# Order of the fit
+define	CV_NPIECES	Memi[]		# Number of polynomial pieces, spline
+define	CV_NCOEFF	Memi[]		# Number of coefficients
+define	CV_XMAX		Memr[]		# Maximum x value
+define	CV_XMIN		Memr[]		# Minimum x value
+define	CV_RANGE	Memr[]		# Xmax minus xmin
+define	CV_MAXMIN	Memr[]		# Xmax plus xmin
+define	CV_SPACING	Memr[]		# Knot spacing for splines
+define	CV_YNORM	Memr[]		# Norm of the Y vector
+define	CV_NPTS		Memi[]		# Number of data points
+
+define	CV_MATRIX	Memi[]		# Pointer to original matrix
+define	CV_CHOFAC	Memi[]		# Pointer to Cholesky factorization
+define	CV_BASIS	Memi[]		# Pointer to basis functions
+define	CV_VECTOR	Memi[]		# Pointer to  vector
+define	CV_COEFF	Memi[]		# Pointer to coefficient vector
+define	CV_LEFT		Memi[]		#
+
+}
+
+# matrix and vector element definitions
+
+define	MATRIX		Memr[$1+($2-1)*NCOEFF(cv)]	# Matrix element
+define	CHOFAC		Memr[$1+($2-1)*NCOEFF(cv)]	# Triangular matrix
+define	VECTOR		Memr[$1+$2]			# Right side
+define	COEFF		Memr[$1+$2]			# Coefficient vector
+define	LEFT		Memi[$1+$2]
+
+# matrix and vector definitions
+
+define	MAT		Memr[$1]
+define	CHO		Memr[$1]
+define	VECT		Memr[$1]
+define	COF		Memr[$1]
+
+# semi-code for the initialization procedure
+
+include "curfit.h"
+
+# CVINIT --  Procedure to set up the curve  descriptor.
+
+procedure cvinit (cv, curve_type, order, xmin, xmax)
+
+pointer	cv		# pointer to curve descriptor structure
+int	curve_type	# type of curve to be fitted
+int	order		# order of curve to be fitted, or in the case of the
+			# spline the number of polynomial pieces to be fit
+real	xmin		# minimum value of x
+real	xmax		# maximum value of x
+
+begin
+	# allocate space for the curve descriptor
+	call smark (sp)
+	call salloc (cv, LEN_CVSTRUCT, TY_STRUCT)
+
+	if (order < 1)
+	    call error (0, "CVINIT: Illegal order.")
+
+	if (xmax <= xmin)
+	    call error (0, "CVINIT: xmax <= xmin.")
+
+	switch (curve_type) {
+	case CHEBYSHEV, LEGENDRE:
+	    CV_ORDER(cv) = order
+	    CV_NCOEFF(CV) = order
+	    CV_RANGE(cv) = xmax - xmin
+	    CV_MAXMIN(cv) = xmax + xmin
+	case L2SPLINE4:
+	    CV_ORDER(cv) = SPLINE_ORDER
+	    CV_NCOEFF(cv) = order + SPLINE_ORDER - 1
+	    CV_NPIECES(cv) = order
+	    CV_SPACING(cv) = (xmax - xmin) / order
+	default:
+	    call error (0, "CVINIT: Unknown curve type.")
+	}
+
+	CV_TYPE(cv) = curve_type
+	CV_XMIN(cv) = xmin
+	CV_XMAX(cv) = xmax
+
+	# allocate space for the matrix and vectors
+	call calloc (CV_MATRIX(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_REAL)
+	call calloc (CV_CHOFAC(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_REAL)
+	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_REAL)
+	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
+
+	# initialize pointer to basis functions to null
+	CV_BASIS(cv) = NULL
+
+	CV_NPTS(cv) = 0
+	CV_YNORM(cv) = 0.
+end
+
+# semi-code for cvaccum
+
+include "curfit.h"
+
+# CVACCUM -- Procedure to add a single point to the data set.
+
+procedure cvaccum (cv, x, y, w, wtflag)
+
+pointer	cv		# curve descriptor
+real	x		# x value
+real	y		# y value
+real	w		# weight of the data point
+int	wtflag		# type of weighting desired
+
+begin
+	# calculate the weights
+	switch (wtflag) {
+	case UNIFORM:
+	    w = 1.0
+	case NORMAL, SPACING: 		# problem spacing
+	default:
+	    w = 1.0
+	}
+
+	# caculate all non-zero basis functions for a given data point
+	switch (CV_TYPE(cv)) {
+	case CHEBYSHEV:
+	    left = 1
+	    call chebyshev (cv, x, basis)
+	case LEGENDRE:
+	    left = 1
+	    call legendre (cv, x, basis)
+	case L2SPLINE4:
+	    call l2spline4 (cv, x, left, basis)
+	}
+
+	# accumulate into the matrix
+	leftm1 = left - 1
+	vptr = CV_VECTOR(cv) - 1
+	do i = 1, CV_ORDER(cv) {
+	    bw = basis[i] * w
+	    jj = leftm1 + i
+	    mptr = CV_MATRIX(cv) + jj - 1
+	    VECTOR(vptr, jj) = VECTOR(vptr, jj) + bw * y
+	    ii = 1
+	    do j = i, CV_ORDER(cv) {
+		MATRIX(mptr, ii) = MATRIX(mptr, ii) + basis[j] * bw
+		ii = ii + 1
+	    }
+	}
+
+	CV_NPTS(cv) = CV_NPTS(cv) + 1
+	CV_YNORM(cv) = CV_YNORM(cv) + w * y * y
+end
+
+# semi-code for cvreject
+
+include "curfit.h"
+
+# CVREJECT -- Procedure to subtract a single datapoint from the data set
+# to be fitted.
+
+procedure cvreject (cv, x, y, w)
+
+pointer	cv		# curve fitting image descriptor
+real	x		# x value
+real	y		# y value
+real	w		# weight of the data point
+
+begin
+	# caculate all type non-zero basis functions for a given data point
+	switch (CV_TYPE(cv)) {
+	case CHEBYSHEV:
+	    left = 1
+	    call chebyshev (cv, x, basis)
+	case LEGENDRE:
+	    left = 1
+	    call legendre (cv, x, basis)
+	case L2SPLINE4:
+	    call l2spline4 (cv, x, left, basis)
+	}
+
+	# subtract the data point from the matrix
+	leftm1 = left - 1
+	vptr = CV_VECTOR(cv) - 1
+	do i = 1, CV_ORDER(cv) {
+	    bw = basis[i] * w
+	    jj = leftm1 + i
+	    mptr = CV_MATRIX(cv) + jj - 1
+	    VECTOR(vptr, jj) = VECTOR(vptr, jj) - bw * y
+	    ii = 1
+	    do j = i, CV_ORDER(cv) {
+		MATRIX(mptr, ii) = MATRIX(mptr, ii) - basis[j] * bw
+		ii = ii + 1
+	    }
+	}
+
+	CV_NPTS(cv) = CV_NPTS(cv) - 1
+	CV_NORM(cv) = CV_NORM(cv) - w * y * y
+end
+
+# semi-code for cvsolve
+
+include "curfit.h"
+
+# CVSOLVE -- Procedure to  solve a matrix equation of the form Ax = B.
+# The Cholesky factorization of matrix A is calculated in the first
+# step, followed by forward and back substitution to solve for the vector
+# x.
+
+procedure cvsolve (cv, ier)
+
+pointer	cv 		# pointer to the image descriptor structure
+int	ier		# ier = 0, everything OK
+			# ier = 1, matrix is singular
+
+begin
+	# solve matrix by adapting Deboor's bchfac.f and bchslv.f routines
+	# so that the original matrix and vector are not destroyed
+
+	call chofac (MAT(CV_MATRIX(cv)), CV_ORDER(cv), CV_NCOEFF(cv),
+		     CHO(CV_CHOFAC(cv)), ier)
+	call choslv (CHO(CV_CHOFAC(cv)), CV_ORDER(cv), CV_NCOEFF(cv),
+		     VECT(CV_VECTOR(cv)), COF(CV_COEFF(cv)))
+end
+
+# semi-code for cvfit
+
+include "curfit.h"
+
+# CVFIT -- Procedure to fit a curve to an array of data points x and y with
+# weights w.
+
+procedure cvfit (x, y, w, npts, wtflag, ier)
+
+real	x[npts]		# array of abcissa
+real	y[npts]		# array of ordinates
+real	w[npts]		# array of weights
+int	wtflag		# type of weighting
+int	ier
+
+begin
+	# calculate weights
+	switch (wtflag) {
+	case UNIFORM:
+	    call amovkr (1., w, npts)
+	case SPACING:
+	    w[1] = x[2] - x[1]			# check for npts > 1
+	    do i = 2, npts - 1
+		w[i] = x[i+1] - x[i-1]
+	    w[npts] = x[npts] - x[npts-1]
+	case NORMAL:
+	default:
+	    call amovkr (1., w, npts)
+	}
+
+	# accumulate data points
+	do i = 1, npts {
+
+	    CV_NPTS(cv) = CV_NPTS(cv) + 1
+
+	    # calculate the norm of the Y vector
+	    CV_YNORM(cv) = CV_YNORM(cv) + w[i] * y[i] * y[i]
+
+	    # calculate non zero basis functions
+	    switch (CV_TYPE(cv)) {
+	    case CHEBYSHEV:
+		left = 1
+		call chebyshev (cv, x, basis)
+	    case LEGENDRE:
+		left = 1
+		call legendre (cv, x, basis)
+	    case L2SPLINE4:
+		call l2spline4 (cv, x, left, basis)
+	    }
+
+	    # accumulate the matrix
+	    leftm1 = left - 1
+	    vptr = CV_VECTOR(cv) - 1
+	    do i = 1, CV_ORDER(cv) {
+	        bw = basis[i] * w
+	        jj = leftm1 + i
+		mptr = CV_MATRIX(cv) + jj - 1
+	        VECTOR(vptr, jj) = VECTOR(vptr, jj) + bw * y
+	        ii = 1
+	        do j = i, CV_ORDER(cv) {
+		    MATRIX(mptr, ii) = MATRIX(mptr, ii) + basis[j] * bw
+		    ii = ii + 1
+	        }
+	    }
+	}
+
+	# solve the matrix
+	ier = 0
+	call chofac (MAT(CV_MATRIX(cv)), CV_ORDER(cv), CV_NCOEFF(cv),
+		     CHO(CV_CHOFAC(cv)), ier)
+	call choslv (CHO(CV_CHOFAC(cv)), CV_ORDER(cv), CV_NCOEFF(cv),
+		     VECT(CV_VECTOR(cv)), COF(CV_COEFF(cv)))
+end
+
+# semi-code for cvrefit
+
+include "curfit.com"
+
+# CV_REFIT -- Procedure to refit the data assuming that the x and w values do
+# not change.
+
+procedure cvrefit (cv, x, y, w, ier)
+
+pointer	cv
+real	x[ARB]
+real	y[ARB]
+real	w[ARB]
+int	ier
+
+begin
+	# if first call to refit then calculate and store the basis
+	# functions
+
+	vcptr = CV_VECTOR(cv) - 1
+	do i = 1, NCOEFF(cv)
+	    VECTOR(vcptr+i) = 0.
+
+	CV_YNORM(cv) = 0.
+	lptr = CV_LEFT(cv) - 1
+	bcptr = CV_BASIS(cv) - CV_NPTS(cv)
+
+	if (CV_BASIS(cv) == NULL) {
+
+	    call calloc (CV_BASIS(cv), CV_NPTS(cv)*CV_ORDER(cv), TY_REAL)
+	    call calloc (CV_LEFT(cv), CV_NPTS(cv), TY_INT)
+
+	    do l = 1, CV_NPTS(cv) {
+		bptr = bcptr + l * CV_NPTS(cv)
+		switch (CV_TYPE(cv)) {
+		case LEGENDRE:
+		    LEFT(lptr+l) = 1
+		    call legendre (cv, x, BASIS(bptr))
+		case CHEBYSHEV:
+		    LEFT(lptr+l) = 1
+		    call chebyshev (cv, x, BASIS(bptr))
+		case L2SPLINE4:
+		    call l2spline4 (cv, x, LEFT(lptr+l), BASIS(bptr))
+		}
+	    }
+	}
+
+	# reset vector to zero
+
+	# accumulate right side of the matrix equation
+	do l = 1, CV_NPTS(cv) {
+
+	    CV_YNORM(cv) = CV_YNORM(cv) + w[l] * y[l] * y[l]
+	    leftm1 = LEFT(lptr+l) - 1
+	    bptr = bcptr + l * CV_NPTS(cv) 
+
+	    do i = 1, CV_ORDER(cv) {
+		vptr = vcptr + leftm1 + i
+		VECTOR(vptr) = VECTOR(vptr) + BASIS(bptr) * w[l] * y[l]
+	    }
+	}
+
+	# solve the matrix
+	call choslv (CHOFAC(CV_CHOFAC(cv)), CV_ORDER(cv), CV_NCOEFF(CV),
+		    VECTOR(CV_VECTOR(cv)), COEFF(CV_COEFF(cv)))
+end
+
+# semi-code for cvcoeff
+
+# CVCOEFF -- Procedure to fetch the number and magnitude of the coefficients.
+
+procedure cvcoeff (cv, coeff, ncoeff)
+
+pointer	cv		# pointer to the curve fitting descriptor
+real	coeff[ncoeff]	# the coefficients of the fit
+int	ncoeff		# the number of coefficients
+
+begin
+	ncoeff = CV_NCOEFF(cv)
+	cptr = CV_COEFF(cv) - 1
+	do i = 1, ncoeff
+	    coeff[i] = COEFF(cptr, i)
+end
+
+# semi-code for cvvector
+
+include "curfit.h"
+
+# CVVECTOR -- Procedure to evaluate the fitted curve
+
+procedure cvvector (cv, x, npts, yfit)
+
+pointer	cv		# pointer to the curve descriptor structure
+real	x[npts]		# data x values
+int	npts		# number of data points
+real	yfit[npts]	# the fitted y values
+
+begin
+	do l = 1, npts {
+
+	    # calculate the non-zero basis functions
+	    switch (CV_TYPE(cv) {
+	    case LEGENDRE:
+		left = 1
+		call legendre (cv, x[l], XBASIS(CV_XBASIS(cv)))
+	    case CHEBYSHEV:
+		left = 1
+		call chebyshev (cv, x[l], XBASIS(CV_XBASIS(cv)))
+	    case L2SPLINE4:
+		call l2spline4 (cv, x[l], left, XBASIS(CV_XBASIS(cv)))
+	    }
+
+	    sum = 0.0
+	    leftm1 = left - 1
+	    cptr = CV_COEFF(cv) - 1
+	    xptr = CV_XBASIS(cv) - 1
+
+	    do i = 1, CV_NCOEFF(cv) {
+		jj = leftm1 + i
+		sum = sum + XBASIS(xptr + i) * COEFF(cptr + jj)
+	    }
+	}
+end
+
+# semi-code for cveval
+
+include "curfit.h"
+
+# CVEVAL -- Procedure to evaluate curve at a given x
+
+real procedure cveval (cv, x)
+
+pointer	cv		# pointer to image descriptor structure
+real	x		# x value
+
+int	left, leftm1, i
+pointer	cptr, xptr
+real	sum
+
+begin
+	switch (CV_TYPE(cv)) {
+	case CHEBYSHEV:
+	    left = 1
+	    call chebyshev (cv, x, XBASIS(CV_XBASIS(cv)))
+	case LEGENDRE:
+	    left = 1
+	    call legendre (cv, x, XBASIS(CV_XBASIS(cv)))
+	case L2SPLINE4:
+	    call l2spline4 (cv, x, left, XBASIS(CV_XBASIS(cv)))
+	}
+
+	sum = 0.
+	leftm1 = left - 1
+	cptr = CV_COEFF(cv) - 1
+	xptr = CV_XBASIS(cv) - 1
+	do i = 1, CV_NCOEFF(cv) {
+	    jj = leftm1 + i
+	    sum = sum + XBASIS(xptr + i) * COEFF(cptr + jj)
+	}
+
+	return (sum)
+end
+
+# semi-code for cverrors
+
+include "curfit.h"
+
+# CVERRORS -- Procedure to calculate the standard deviation of the fit and the
+# standard deviations of the coefficients
+
+procedure cverrors (cv, rms, errors)
+
+pointer	cv		# curve descriptor
+real	rms		# standard deviation of data with respect to fit
+real	errors[ARB]	# errors in coefficients
+
+begin
+	# calculate the variance
+	rms = CV_YNORM(cv)
+	cptr = CV_COEFF(cv) - 1
+	vptr = CV_VECTOR(cv) - 1
+	do i = 1, CV_NCOEFF(cv)
+	    rms = rms - COEFF(cptr, i) * VECTOR(vptr, i)
+	rms = rms / (CV_NPTS(cv) - CV_NCOEFF(cv))
+
+	# calculate the standard deviations
+	do i = 1, CV_NCOEFF(cv) {
+	    do j = 1, CV_NCOEFF(cv)
+		cov[j] = 0.
+	    cov[i] = 1.
+	    call choslv (CHO(CV_CHOFAC(cv)), CV_ORDER(cv),
+	    		CV_NCOEFF(cv), cov, cov)
+	    errors[i] = sqrt (cov[i] * rms)
+	}
+
+	rms = sqrt (rms)
+end
+
+# semi-code for CVFREE
+
+# CVFREE -- Procedure to free the curve descriptor
+
+procedure cvfree (cv)
+
+pointer	cv
+
+begin
+	call sfree (cv)
+end
+
+include "curfit.h"
+
+# LEGENDRE -- Procedure to calculate the Legendre functions.
+
+procedure legendre (cv, x, basis)
+
+pointer	cv
+real	x
+real	basis[ARB]
+
+begin
+	# normalize to the range x = -1. to 1.
+	xnorm = (2. * x - CV_MAXMIN(cv)) / CV_RANGE(cv)
+
+	b[1] = 1.0
+	if (CV_ORDER(cv) == 1)
+	    return
+
+	b[2] = xnorm
+	if (CV_ORDER(cv) == 2)
+	    return
+
+	do i = 3, CV_ORDER(cv) {
+	    ri = i
+	    b[i] = ((2.*ri-3.)*xnorm*b[i-1] - (ri-2.)*b[i-2]) / (ri-1.)
+	}
+end
+
+# CHEBYSHEV -- Procedure to calculate Chebyshev polynomials.
+
+procedure chebyshev (cv, x, basis)
+
+real	x
+int	order
+real	basis[ARB]
+
+begin
+	# normalize to the range -1. to 1.
+	xnorm = (2. * x - CV_MAXMIN(cv)) / CV_RANGE(cv)
+
+	b[1] = 1.
+	if (CV_ORDER(cv) == 1)
+	    return
+
+	b[2] = xnorm
+	if (CV_ORDER(cv) == 2)
+	    return
+
+	do i = 3, CV_ORDER(cv) {
+	    ri = i
+	    b[i] = 2.*xnorm*b[i-1] - b[i-2]
+	}
+end
+
+define	NPTS_SPLINE	401	# Number of points in the spline lookup table 
+define	INTERVALS	100	# Number of intervals per spline knot
+
+# L2SPLINE4 -- Procedure to calculate the cubic spline functions
+
+procedure (cv, x, left, basis)
+
+pointer	cv
+real	x
+int	left
+real	basis[ARB]
+
+real	table[NPTS_SPLINE]
+
+# data table containing the spline
+include "table.dat"
+
+begin
+	xnorm = (x - CV_XMIN(cv)) / CV_SPACING(cv)
+	temp = min (int (xnorm), npieces - 1)
+	left = temp +  1
+	xnorm = xnorm - temp
+
+	near = int ((1. - xnorm + 0.5) * INTERVALS) + 1
+	basis[1] = table[near]
+	near = table[near] + INTERVALS
+	basis[2] = table[near]
+	near = table[near] + INTERVALS
+	basis[3] = table[near]
+	near = table[near] + INTERVALS
+	basis[4] = table[near]
+end
+
+# CHOFAC -- Routine to calculate the Cholesky factorization of a banded
+# matrix.
+
+procedure chofac (matrix, nbands, nrows, matfac, ier)
+
+real	matrix[nbands, nrows]
+int	nbands
+int	nrows
+real	matfac[nbands, nrows]
+int	ier
+
+begin
+	ier = 0
+
+	if (nrows == 1) {
+	    if (matrix[1,1] .gt. 0.)
+	        matfac[1,1] = 1./matrix[1,1]
+	    return
+	}
+
+		
+	# copy matrix into matfac
+	do n = 1, nrows {
+	    do j = 1, nbands
+		matfac[j,n] = matrix[j,n]
+	}
+
+	do n = 1, nrows {
+
+	    # test to see if matrix is singular
+	    if (matfac[1,n] + matrix[1,n] <= matrix[1,n]) {
+		do j = 1, nbands
+		    w[j,n] = 0.
+		ier = 1
+		next
+	    }
+
+	    matfac[1,n] = 1./matfac[1,n]
+	    imax = min (nbands - 1, nrows - n)
+	    if (imax < 1)
+		next
+
+	    jmax = imax
+	    do i = 1, imax {
+		ratio = matfac[i+1,n] * matfac[1,n]
+		do j = 1, jmax
+		    matfac[j,n+i] = matfac[j,n+i] - matfac[j+i,n] * ratio
+		jmax = jmax - 1
+		matfac[i+1,n] = ratio
+	    }
+	}
+end
+
+# CHOSLV -- Solve the matrix whose Cholesky factorization was calculated in
+# CHOFAC.
+
+procedure choslv (matfac, nbands, nrows, vector, coeff)
+
+real	matfac[nbands,nrows]
+int	nbands
+int	nrows
+real	vector[nrows]
+real	coeff[nrows]
+
+begin
+	if (nrows == 1) {
+	    coeff[1] = vector[1] * matfac[1,1]
+	    return
+	}
+
+	# copy vector to coefficients
+	do i = 1, nrows
+	    coeff[i] = vector[i]
+
+	# forward substitution
+	nbndm1 = nbands - 1
+	do n = 1, nrows {
+	    jmax = min (nbndm1, nrows - n)
+	    if (jmax < 1)
+		next
+	    do j = 1, jmax
+		coeff[j+n] = coeff[j+n] - matfac[j+1,n] * b[n]
+	}
+
+	# back substitution
+	for (n = nrows; n > 0; n = n - 1) {
+	    coeff[n] = coeff[n] * matfac[1,n]
+	    jmax = min (nbndm1, nrows - 1)
+	    if (jmax >= 1) {
+		do j = 1, jmax
+		    coeff[n] = coeff[n] - matfac[j+1,n] * coeff[j+n]
+	    }
+	}
+
+end

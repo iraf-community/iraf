@@ -1,0 +1,85 @@
+
+Notes on RFITS program.
+
+General Comments --
+    The code is well structured, modular, and the identifiers are well
+    chosen for the most part, with some exceptions.  I liked the file list
+    technique, and have incorporated it into the card image reader I wrote
+    to test MTIO.
+
+    On the critical side, the code is not sufficiently well commented.
+    A few comments explaining the general approach are needed; the use
+    of the record buffer, the placement of unrecognized keywords in the
+    image header, and so on are important things that can only be derived
+    at present by a very detailed analysis of the code.  Functionally the
+    program has some serious limitations as noted below.
+
+
+Detailed Comments --
+
+On functionality:
+
+    (1) Keywords BUNIT, BLANK, DATE, DATE_OBS, ORIGIN, CRVALn, CRPIXn,
+	etc., etc. should all be recognized.  Many of these have direct
+	complements in the image header and it is merely a matter of
+	mapping the value directly.  Without doing so we cannot save
+	and restore IRAF images in FITS tape form without serious loss
+	of information.
+
+	Our intention is eventually to map nonstandard FITS keywords
+	by name into the user fields.  A similar table driven mapping
+	of the standard fields might therefore be desirable.  This
+	would also make the reader more robust and easier to modify to
+	read nonstandard or future (extended) formats.
+
+    (2) Something should be done about indefinite pixels.  It is easy to
+	check for FITS BLANK value and map into the appropriate INDEF.
+	This function should be encapsulated in a separate procedure,
+	because it will have to be modified when we add bad pixel lists
+	to IMIO.
+
+    (3)	BITPIX=32 is not really implemented.  Eight bits of precision lost
+	is too much.  Also, SIMPLE='F' should not result in an irrecoverable
+	abort; a subsequent program may be able to recover the data if it
+	can at least be read into an imagefile.  For similar reasons, it
+	would be best if it were possible to move pixels to disk without
+	conversion.  Doing everything in real forces binary conversion of
+	the pixels, as well as causing the loss of precision for type long.
+
+
+On coding:
+
+    (1)	Error checking is only partially implemented.  As a rule, low level
+	procedures should "errchk" all subprocedures which perform i/o, so
+	that the higher level procedures can decide whether or not they want
+	to catch errors (makes code easier to modify, i.e., to add an error
+	handler in the future).
+
+    (2)	The stack should be unchanged upon exit from a procedure.  SALLOC is
+	used improperly in several places (noted on listing).
+
+    (3)	The constants defining the FITS standard should be parameterized in
+	an include file with comments, or in an external lookup table.  I do
+	not know what GROUPS, PCOUNT, GCOUNT are, and I had to think a bit to
+	figure out what the 11, 29, etc. were.  The exact version of the
+	standard implemented by the program should be defined all in one
+	place, so that others can see what version of the standard is
+	implemented without having to read and understand the whole program,
+	and to make it easier to modify the program to read future and
+	nonstandard "FITS" files.  Also numbers like "11", "29" etc. are
+	inherently hard to understand.  Even "80" may have to be changed
+	to read a nonstandard or improperly written format.
+
+    (4) Defined expressions should be enclosed in parenthesis to guarantee
+	that they are evaluated properly.  The definitions of SZB_BIT,
+	SZ_UBYTE, etc. do not work if enclosed in parenthesis.  This is
+	very tricky; if I were to inherit the program, I would have "fixed"
+	those definitions at first sight by adding parens, just to be safe,
+	and then the code would no longer work.  Use of integer division
+	in expressions where the operands of unknown size is bad.
+    
+    (5) The "8" in the definition of SZB_BIT is machine dependent.  I have
+	added an NBITS_BYTE definition to iraf.h.  Do not let machine
+	dependence creep into code!!
+
+    (6) I have added WRDSWP and ACHTB_ to the system libraries.

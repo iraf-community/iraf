@@ -1,0 +1,84 @@
+.help packages Sep83 "IRAF Package Structure"
+.ce
+Contents
+
+.rj 1
+1. Introduction
+
+.rj 1
+2. Top Level Packages
+
+.rj 1
+3. Notes on Individual Packages
+.in 5
+.rj 2
+3.1  Package ARTDATA
+.rj 3
+3.2  Package ASTROMETRY
+.rj 3
+3.3  Package DATABASE
+.rj 3
+3.4  Package DATAIO
+.rj 5
+3.5  Package DIGIPHOT
+.rj 6
+3.6  Package DTOI
+.rj 7
+3.7  Package FILTERPHOT
+.rj 8
+3.8  Package FOCAS
+.rj 8
+3.9  The HELP Utility
+.rj 9
+3.10 Package IMAGES
+.in 5
+.rj 9
+3.10.1  Image display load
+.rj 10
+3.10.2  Display control
+.rj 11
+3.10.3  Image graphics (plotting)
+.rj 13
+3.10.4  The image calculator
+.rj 15
+3.10.5  Grayscale mapping operators
+.rj 16
+3.10.6  Geometric transformation operators
+.rj 18
+3.10.7  Filtering operators
+.rj 19
+3.10.8  Background or bias fitting and removal
+.rj 19
+3.10.9  Image editing operators
+.in -5
+.rj 20
+3.11 Package IMRED
+.rj 22
+3.12 Package LANGUAGE
+.rj 22
+3.13 Package LISTS
+.rj 23
+3.14 Package ONEDSPEC
+.rj 25
+3.15 Package SOFTOOLS
+.rj 26
+3.16 Package NSURFBRT (to be renamed)
+.rj 27
+3.17 Package SYSTEM
+.rj 28
+3.18 Package TWODSPEC
+.in 5
+.rj 28
+3.18.1  The MULTISLIT package
+.rj 29
+3.18.2  The LONGSLIT package
+.in -5
+.rj 31
+3.19 Package UTILITIES
+.rj 31
+3.20 Special Packages
+.in -5
+
+.rj 32
+4. Correspondence of existing KPNO software to IRAF Packages
+.endhelp

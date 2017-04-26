@@ -1,0 +1,27 @@
+.help unique Jan86 lists
+.ih
+NAME
+unique -- remove repeated adjacent lines from a file
+.ih
+USAGE
+unique files
+.ih
+PARAMETERS
+.ls files
+List of files to be processed.
+.le
+.ih
+DESCRIPTION
+Task \fBunique\fR reads the input comparing adjacent lines.  The second and
+successive copies of a line are removed; the remainder is passed on to the
+standard output.  
+.ih
+EXAMPLES
+Remove repeated names from a list.  Note the input file has been sorted 
+alphabetically so repeated names are adjacent.  
+
+	cl> sort names | unique > names.final
+.ih
+SEE ALSO
+sort
+.endhelp

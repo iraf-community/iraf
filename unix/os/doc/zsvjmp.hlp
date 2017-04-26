@@ -1,0 +1,65 @@
+.help zsvjmp,zdojmp May84 "System Interface"
+.ih
+NAME
+zsvjmp, zdojmp -- non-local goto
+.ih
+SYNOPSIS
+.nf
+include	<config.h>
+
+zsvjmp (jumpbuf, status)		# save context for jump
+zdojmp (jumpbuf, status)		# restore context and jump
+
+int	jumpbuf[LEN_JUMPBUF]		# context saved by \fBzsvjmp\fR
+int	status				# code returned by \fBzsvjmp\fR
+.fi
+.ih
+DESCRIPTION
+These primitives are used principally to restart interpreters (e.g. the IRAF
+Main and the CL) following an error abort.
+When an error occurs deep in a procedure calling sequence and the interpreter
+(a higher level procedure) must be restarted, the hardware stack or stacks
+and registers must be restored to their earlier state.
+
+The \fBzdojmp\fR primitive restores the context of the procedure which
+originally called \fBzsvjmp\fR, causing control to return from \fBzsvjmp\fR
+as if it had just been called.  The calling procedure must not itself have
+returned in the interim.
+.ih
+RETURN VALUE
+The integer code \fIstatus\fR is zero the first time \fBzsvjmp\fR returns,
+i.e., when \fBzsvjmp\fR is called by the main procedure to initialize
+\fIjumpbuf\fR.  When \fBzdojmp\fR is subsequently called to "goto" the
+main procedure it should be called with a nonzero \fIstatus\fR to tell
+the main procedure that it has been reentered at the point immediately
+following the call to \fBzsvjmp\fR.
+.ih
+NOTES
+Only the hardware stack and registers are restored by \fBzdojmp\fR.
+Buffers which have been allocated since the first call to \fBzsvjmp\fR
+will still be allocated, newly posted exception handlers will still be
+posted, and so on.  It is up to the high level code to clean up following
+error restart.
+.ih
+EXAMPLE
+Procedure A, the main (highest level) procedure, calls \fBzsvjmp\fR to
+save its context for a subsequent restart, then calls procedure B.
+Procedure B calls procedure C which directly or indirectly calls
+\fBzdojmp\fR.  The \fIjumpbuf\fR storage area is global.
+
+.ks
+.nf
+A:	call zsvjmp (jumpbuf, status)
+ 99	if (status == error_code)
+	    we were called from C
+	call B
+
+B:	call C
+
+C:	call zdojmp (jumpbuf, error_code)	[e.g., goto 99]
+.fi
+.ke
+.ih
+SEE ALSO
+A discussion of the IRAF Main and error recovery.
+.endhelp

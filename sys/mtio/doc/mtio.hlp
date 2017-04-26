@@ -1,0 +1,814 @@
+.help mtio Aug83 "Magnetic Tape I/O"
+.sh
+1. Introduction
+
+    This document describes the Magnetic Tape I/O (MTIO) package,
+i.e., the interface by which IRAF programs access magnetic tapes.
+Included are the requirements and specifications for the package,
+and a discussion of the interface between MTIO and FIO.
+
+.sh
+2. MTIO Requirements
+.ls 4
+.ls (1)
+The machine independent part of the MTIO package shall be written in
+the SPP language in compliance with the standards and conventions of IRAF.
+.le
+.ls (2)
+The MTIO package shall provide a single interface to all magtape
+devices on all IRAF target machines.
+.le
+.ls (3)
+MTIO shall interface to FIO, making it possible to read and write a magtape
+file via the FIO interface in a device independent fashion.
+.le
+.ls (4)
+All functions shall take an error action if a hardware error occurs,
+or if an illegal function is requested.
+No hardware exception or trap shall occur while accessing a magtape
+file via MTIO which is not caught by MTIO and converted into an
+IRAF error action.
+.le
+.ls (5)
+All error actions shall be defined symbolically in the system error
+code file <syserr.h>.  The MTIO error messages shall have the
+form SYS_MT<function>, i.e., SYS_MTOPEN.  The error message strings
+shall be placed in the system error message file, "syserrmsg".
+.le
+.ls (6)
+The MTIO code shall be divided into a machine independent part and
+a machine dependent part.  All machine independent function and error
+checking shall be done in the machine independent part, to minimize
+the size and complexity of the machine dependent part, and therefore
+maximize the transportability of the package.
+.le
+.ls (7)
+MTIO shall interface to FIO by implementing the standard FIO binary file
+z-routines ZOPNMT, ZCLSMT, ZARDMT, ZAWRMT, ZAWTMT, and ZSTTMT.
+The specifications for these routines are given elsewhere.
+.le
+
+.sh
+3. MTIO Specifications
+
+    A magtape file is opened with MTOPEN and then accessed as a binary
+file via the device independent FIO interface.  Upon input, FIO merges
+all tape records together into a binary byte stream.  Upon output,
+FIO writes records equal in size to the FIO buffers, unless FLUSH or
+CLOSE is called, causing a partially filled buffer to be flushed to tape.
+The data within a tape file may not be randomly accessed; only sequential
+accesses are permitted.  When i/o is complete, CLOSE should be called
+to close the file and return all buffer space.
+
+	fd = mtopen (filename, access_mode, buf_size)
+
+The format of a nonblank magnetic tape consists of beginning-of-tape (BOT),
+followed by zero or more files, followed by end-of-tape (EOT).
+Each file consists of one or more records, followed by a tape mark (EOF).
+EOT is defined as two consecutive tape marks, i.e., as a file containing
+zero records.  MTIO knows nothing about labeled tapes.
+
+Tape records need not all be the same length, but for transportability
+reasons records should be an integral number of computer words in length,
+and very short records should be avoided (short records are used by some
+operating systems for special purposes).  The term "computer word"
+is not well defined; the size of a tape record in bytes should be evenly
+divisible by 2, 4, or 8, where the transportability increases with the
+size of the divisor.  To avoid loss of data when reading a tape,
+the FIO buffer must be at least as large as the longest record on the tape.
+
+.sh
+3.1 Opening a Magtape
+
+    MTOPEN opens a file on the named magtape device.  The following
+device naming convention determines the tape drive and density:
+
+	mt[a-z][800|1600|6250]
+
+The letter in the second field determines which drive is to be used,
+and the third field, which is optional, determines the density.
+If the density is not specified, a system or drive dependent default
+density will be selected.  Thus, to access a file on drive A at 1600 bpi,
+one would open the file "mta1600".
+
+The significance of the terms "drive A", "drive B", etc., is installation
+dependent, and need not imply distinct physical drives.  A tape drive may
+have to be allocated before it can be opened by MTIO; MTIO does not attempt
+to allocate devices.
+
+The device name may optionally be followed by a subscript specifying
+the index of the file to which the tape is to be positioned.
+Thus, opening "mta[3]" causes device A to be opened with the default
+density, positioned to BOF of the third file on the tape.
+The field N, as in "mta[N]" may have the following values:
+
+.ls 4
+.ls 12 absent
+If the entire subscript is absent, or if N is absent the tape is opened
+at the current position, i.e., the tape is not physically moved.
+.le
+.ls N >= 1
+If an integer number greater than or equal to 1 (one) is given,
+the tape is opened positioned to that file.
+.le
+.ls N == EOT
+If the file number is given as "EOT" or as "eot", the tape is opened
+positioned at EOT.
+.le
+.le
+
+If called with a non "mt"-prefixed file name, MTOPEN assumes that the file
+is a regular disk resident binary file, and attempts to open the named
+file.  A program which normally reads directly from a magtape device may
+therefore be used to read from a regular binary file, or from the
+standard input (the special file "STDIN").
+
+The following access modes are recognized by MTOPEN:
+.ls 4
+.ls 12 READ_ONLY
+The device is opened for reading, positioned to the beginning of
+a file, BOT, EOT, or to the "current position".
+Any attempt to write to the device will cause an error.
+.le
+.ls WRITE_ONLY
+The device is opened for writing, positioned to the beginning of a file,
+BOT, EOT, or to the "current position".  When the file is subsequently
+closed, a new EOT mark will be written.  Existing tape files may be overwritten.
+.le
+.ls APPEND
+The device is opened for writing, positioned at the end of tape (EOT).
+Append mode must not be used with blank tapes.  Note that the significance
+of APPEND mode is different for MTOPEN than for a regular file open;
+the tape is to be extended by adding a new file, whereas in FIO it is
+the file itself which is extended.
+.le
+.ls NEW_TAPE
+The device is opened for writing, positioned at BOT.  Any existing
+data on the tape is overwritten.  Recommended mode for blank tapes.
+.le
+.le
+
+FIO can read any tape with a maximum record size less than or equal
+to the buffer size.  In buffered mode, FIO normally writes records equal
+in size to the FIO internal buffers.  Smaller records may be written if
+FLUSH or CLOSE is called; records of any size may be written in unbuffered
+mode.
+
+The third argument to MTOPEN is used to set the FIO buffer size.
+If the buffer size is given as zero, a default value is used.
+The default value chosen depends on the mode of access and upon the
+maximum record size permitted by the host system.  MTOPEN will automatically
+allocate the maximum size FIO buffer if the tape is opened for reading.
+The FIO buffer size may be changed in an FSET call anytime before
+the first buffered i/o on the file.
+
+.sh
+3.2 Ordinary I/O to a Magtape Device
+
+    Seeks are not permitted on magtape files.  A tape may be opened for
+reading or for writing, but not for both at the same time.  A magtape
+device is much like the standard input and output; STDIN is read only,
+STDOUT is write only, and seeking is not permitted on either.  STDIN
+differs from ordinary files in that data may continue to be read after
+an EOF; the same is true of magtape files.  If a read returning EOF is
+followed by another read on a magtape device, the second read will
+access the first record of the next file.  Once EOT is reached, every
+read will return EOF.  There is no way to advance beyond EOT on a read.
+An EOF mark may only be written by closing the tape (see next section).
+
+.sh
+3.3 Closing a Magtape
+
+    The CLOSE function is called either explicitly by the user task,
+or implicilty by the IRAF main upon normal or abnormal task termination.
+If the file was opened for writing, CLOSE flushes the output buffer and
+writes an EOT mark at the current position.  A file opened for writing
+is left positioned ready to write the first record of the next file on
+the tape (i.e., after the EOF of the file just written).  A file opened
+for reading, if closed immediately after reading EOF, is left positioned
+ready to read or write the first record of the next file on the tape.
+
+.sh
+3.4 Bytes and Records
+
+    Upon input, the size of a record will be rounded up to an integral
+number of "chars".  No data will be lost, but one or more extra bytes of
+data may be added.  A tape conversion program which must deal with
+odd-sized records must know the size of tape records to properly extract
+the data.  FIO cannot write odd-sized records.
+
+The binary i/o routines do not transform the data in any way,
+including byte swapping.  If byte swapping is necessary, the conversion
+program must do the byte swapping explicitly.  The predefined machine
+constants BYTE_SWAP and WORD_SWAP indicate whether byte or word swapping
+is necessary on the local machine (word swapping refers to the two 16 bit
+words in a long integer).  Floating point data should not be stored in
+binary on tape, unless the tape is to be read only by the machine which
+wrote it.
+
+Routines are available elsewhere in the PI for manipulating bytes.
+The routines BYTMOV, BYTSWP, and BYTPAK are particularly useful for cracking
+foreign tapes.
+
+.sh
+3.5 Low level I/O to a Magtape
+
+    The asynchronous, unbuffered FIO routines AREAD, AWRITE, and AWAIT
+may be used to perform record i/o on a magtape.  A single tape record
+is read or written by each call; the FIO buffer is not used.  AWAIT must
+be called after each read or write, before initiating the next i/o transfer.
+Although in general it is unwise to mix buffered and unbuffered i/o on
+the same file, it is safe to perform one or more unbuffered transfers
+immediately after opening a file, before performing any buffered i/o.
+
+If an application must do something peculiar, like write an odd-sized
+record, the MTIO z-routines may be called directly.  The z-routines transfer
+data in units of machine bytes.
+
+.sh
+3.6 CL level tape commands
+
+    The four routines ALLOCATE, DEALLOCATE, REWIND and MTSTATUS will be
+available at the CL level.  A tape drive ("mta", "mtb", etc.) must be
+explicitly allocated before it can be accessed with MTOPEN.
+A drive may be allocated to only one user at a time.  MTIO keeps track
+of the position of an allocated tape; once a drive has been allocated,
+the tape must not be manually positioned by the user.  Tapes can be
+changed without reallocating the drive provided REWIND is first used to
+rewind the tape.  DEALLOCATE automatically rewinds the tape before
+deallocating the drive.  MTSTATUS tells whether or not a particular drive
+has been allocated, and if so, gives the name of the owner, the density,
+whether not the device is physically open, and so on.
+
+.sh
+3.6 Example
+
+    The following program reads an ASCII card image file from the
+input tape and converts it to an ordinary text stream, which is written
+to the standard output.  This program is insensitive to the number of
+cards per tape record, and may be used to read card image disk files
+as well as tape files.
+
+The following CL commands might be entered to read the second card image
+file on the 800 bpi input tape into file "myfile", converting to lower case:
+
+.ks
+.nf
+	cl> allocate mta
+	cl> rcardimage "mta800[2]" | lcase > myfile
+.fi
+.ke
+
+
+The source for the program "rcardimage" follows:
+
+
+.ks
+.nf
+# RCARDIMAGE -- CL callable task which reads a card image
+# file, writing the converted cards to the standard output.
+
+procedure rcardimage()
+
+char	filename[SZ_FNAME]
+int	input, mtopen()
+
+begin
+	call clgstr ("filename", filename, SZ_FNAME)
+	input = mtopen (filename, READ_ONLY, 0)
+	call read_card_image_file (input, STDOUT)
+	call close (input)
+end
+.fi
+.ke
+
+
+
+.ks
+.nf
+define	SZ_CARD		80
+
+# READ_CARD_IMAGE_FILE -- Read the named card image file, convert
+# to a regular character stream, and write to the output file.
+
+procedure read_card_image_file (input, output)
+
+int	input, output			# input, output files
+char	cardbuf[SZ_CARD]		# raw card
+char	linebuf[SZ_CARD+1]		# add 1 char for newline
+int	last_char
+int	read()
+errchk	read, putline
+
+begin
+	# Read successive cards until EOF is reached.  Unpack the
+	# card, strip trailing whitespace, and write the processed
+	# line to the output file.
+
+	while (read (input, cardbuf, SZ_CARD) != EOF) {
+	    call chrupk (cardbuf, 1, linebuf, 1, SZ_CARD)
+
+	    # Strip trailing whitespace, add newline.
+	    last_char = 0
+	    for (ip=1;  ip <= SZ_CARD;  ip=ip+1)
+		if (! IS_WHITE (linebuf[ip]))
+		    last_char = ip
+
+	    linebuf[last_char+1] = '\n'
+	    linebuf[last_char+2] = EOS
+
+	    call putline (output, linebuf)
+	}
+end
+.fi
+.ke
+.endhelp
+
+
+.helpsys mtio Nov83 "MTIO Interface Detailed Design"
+.sh
+Strategies for Interfacing MTIO 
+
+    The specifications for MTIO have been kept as simple as possible for maximum
+machine independence.  There is only one high level call, MTOPEN, which is
+used to open the device; it does little more than call FIO.   Thereafter
+everything is done through the six FIO z-routines:
+
+.nf
+	zopnmt (filespec, access_mode; channel|ERR)
+	zclsmt (channel)
+	zardmt (channel, buffer, maxbytes, one_indexed_byte_offset)
+	zawrmt (channel, buffer,   nbytes, one_indexed_byte_offset)
+	zawtmt (channel; nbytes|ERR)
+	zsttmt (channel, parameter; long_value)
+.fi
+
+These z-routines may be written in any language so long as they are SPP (i.e.,
+Fortran) callable.  The "filespec" argument is a packed string.  The access
+modes and ERR code are system constants defined in <iraf.h>.  Channel may be
+anything you wish.  The file offsets will always be zero since the magtape
+device is a streaming (sequential) device.
+
+Be sure that the z-routines, if written partially in the SPP language, do not
+make calls to high level program interface routines, especially any which do
+i/o.  Doing so violates the reentrancy restrictions of the SPP language (and
+of Fortran).  It may also lead to problems with the way libraries are searched.
+More explicitly, any calls to error or iferr, to any of the FIO routines, or to
+any of the printf or scan routines are absolutely forbidden.  It is ok to use
+the string primitives (because they do not do any i/o or call error), but it
+is best to avoid even those if possible.  It is perfectly all right to call
+other z-routines provided they do not directly or indirectly call you back
+(none will call mtio).
+
+.sh
+Virtual Device Model
+
+    Though in general the z-routines may have to be completely rewritten for
+a new OS, in fact many systems have functionally similar primitive magtape
+interfaces.  If your system can be described by the model defined below,
+the "z?*.x" files in this directory can be used unchanged, and all you need to
+provide are the equivalents of the "zz" prefixed files.
+
+    Basically, the model requires that the zz-routine which opens the magtape
+be capable of positioning the tape to the first record of any file, given the
+file number to which the tape is positioned at open time.  The high level MTIO
+interface code is charged with keeping track of the position of the tape at
+all times, including while the tape is closed.  The high level code does not
+explicitly move the tape, though it does implicitly move it during open and when
+it commands an i/o operation.  The high level code assumes nothing about tape
+motions; all zz-primitives return status values stating how many records or
+files the tape moved in the last operation.  Thus, the details of the function
+of a zz-routine can vary depending on the system, without requiring
+modifications to the z-routines.
+
+.ls 4
+.ls (1)
+The following open/close primitives are required.  ZZOPMT opens a tape
+drive positioned ready to read or write the first record of the specified
+file.
+.ls zzopmt (drive,density,acmode, oldrec,oldfile; newfile; oschan|ERR)
+.br
+.ls 10 drive
+Logical drive number (1,2,3,...).
+.le
+.ls density
+Drive density.  A positive integer, i.e., 800, 1600 or 6250.  A value
+of zero implies that an OS default density is to be selected.
+.le
+.ls acmode
+Access mode.  Read_only or write_only.  Modes new_file and append are
+dealt with by the "newfile" file number parameter.
+.le
+.ls oldrecord
+The number of the record to which we are currently positioned in the
+oldfile.  We have to know this to know whether or not the file has to
+be rewound.  The first record is number one.
+.le
+.ls oldfile
+The number of the file to which the tape is currently positioned.
+.le
+.ls newfile
+The number of the file to be opened, where 1 specifies that the tape is
+to be rewound.  If newfile <= 0, open at EOT.  On output, contains the
+actual file number of the new file; this may differ from the requested
+value if EOT is encountered.  It is not an error (as far as the zz-routine
+is concerned) to attempt to position to a file beyond EOT.
+.le
+.ls oschan
+The channel number by which the file is to be referred in calls to the
+other zz-routines, or ERR if the file cannot be opened.  ZZOPMT should
+set oschan IMMEDIATELY AFTER PHYSICALLY OPENING THE DEVICE, so that the
+error recovery code can close the file if an interrupt occurs.
+.le
+.le
+
+.ls 4 zzclmt (oschan, access_mode; nfile)
+Close tape.  Write a new EOT at the current position if writing.
+Returns the file number increment (in the event that a file mark or two
+has to be written).
+.le
+.le
+
+.ls (2)
+The following i/o primitives are required.
+.ls zzrdmt (oschan, buf, maxbytes)
+Initiate a read of up to maxbytes bytes from the next tape
+record into buffer buf.  It is not an error if fewer than "maxbytes"
+bytes are read; in fact maxbytes will normally be larger than the largest
+record on the tape.  In general it is difficult to tell if the tape record
+was larger than maxbytes; the user code should select a large maxbytes and
+consider it an error if the full maxbytes are read.  If EOF is encountered,
+return a zero byte count in the next call to zzwtmt.
+.le
+.ls zzwrmt (oschan, buf, nbytes)
+Initiate a write of "nbytes" bytes to the tape.  It is an error
+if all data is not written.
+.le
+.ls zzwtmt (oschan; nbytes|ERR, nrecord, nfile)
+Wait for i/o to complete, and return the number of bytes read or
+written in the last transfer; return 0 if we read a tape mark.
+Keep returning the same thing in redundant calls.  If an error
+occurs the error status should be cleared when the next i/o
+transfer is initiated.  Return nrecord=1 for each tape record read,
+but not for file marks.  Return nfile=1 if a filemark is skipped.
+A read of 0 bytes signifies that EOF was seen, but does not necessarily
+imply that a tape mark has been skipped.
+.le
+.le
+.le
+
+.sh
+Program Structure
+
+    The drive must be allocated before MTOPEN is called; MTOPEN verifies
+that the drive has been allocated and then calls FIO to install the magtape
+device and open the desired file on the drive.  Allocating a file involves
+a call to the OS to allocate and/or mount the device, followed by creation
+of the device lock file in the dev$ directory.  The lock file is used to
+indicate that the drive has been allocated, and to keep track of the tape
+position when the drive is closed.
+
+
+.ks
+.nf
+	mtopen
+		mt_parse_filespec
+		mt_get_tape_position
+			various FIO routines
+		fopnbf
+			zopnmt
+				zzopmt
+			zsttmt
+		fset			[to set buffer size]
+
+	    
+	    	Structure of the MTOPEN Procedure
+.fi
+.ke
+
+
+The ZCLSMT procedure is called by CLOSE to close a file opened with MTOPEN.
+CLOSE may be called by the user, by the IRAF main if the task completes w/o
+closing the file, or during error recovery.  An error occurring during MTOPEN
+may result in a call to CLOSE.  We do not have to worry about reentrancy here
+because none of the MTIO z-routines called by ZOPNMT call error (they will
+return an ERR status to FOPNBF and therefore terminate before ZCLSMT is called).
+
+
+.ks
+.nf
+	close
+		zclsmt
+			mt_update_lockfile
+				smark,salloc,sfree
+				fvfn_to_osfn
+				mktemp
+				zopntx
+				zputtx
+				zclstx
+				zfdele
+				zfrnam
+				fatal
+			zzclmt
+
+
+	    	Structure of the ZCLSMT procedure
+.fi
+.ke
+
+
+The i/o procedures keep track of the number of records read or written and
+ensure that we do not read past EOF or EOT.  We need to keep track of the
+number of records written so that we can detect a null file write.
+
+
+.ks
+.nf
+	aread				awrite
+		zardmt				zawrmt
+			zzrdmt				zzwrmt
+
+
+	await
+		zawtmt
+			zzwtmt
+	
+
+		Structure of the I/O Procedures
+.fi
+.ke
+
+
+The final routine is the ZSTTMT status procedure.  This routine is self
+contained, except that access to the MTIO common is required to get the
+access mode (which determines the default buffer size).
+
+
+.sh
+Semicode
+
+    We do as much of the work in MTOPEN as we can, since it is the only
+high level, machine independent routine we have (we can call anything in this
+routine without reentrancy problems).  We check that the drive has been
+allocated (to us), allocate an mtio device descriptor, check that the same
+drive has not been reopened, parse the filespec and save the pieces in the
+descriptor (for later use by ZOPNMT), read in the current tape position from
+the lock file, and then call fopnbf which in turn calls ZOPNMT to open the
+drive and position to the desired file.
+
+
+.tp 8
+.nf
+int procedure mtopen (filespec, access_mode, bufsize)
+
+begin
+	if (file not mt-prefixed) {
+	    call open to open regular binary file
+	    return (file descriptor returned by open)
+	}
+
+	get mtio device descriptor slot but do not allocate it yet
+	if (slots all taken)
+	    error: magtape device multiply opened (filespec)
+	call mt_parse_filespec to break out drivename, density,
+	    filenumber and set up mtio device descriptor
+	if (drive is already open)
+	    error: magtape device multiply opened (filespec)
+	check that the named drive has been allocated to us
+	if (drive not allocated to us)
+	    error: magtape not allocated (filespec)
+	decode lock file to get old position of drive, save in
+	    device descriptor
+
+	call fopnbf to install the magtape device and open file
+	if (bufsize is nonzero)
+	    call fset to set non-default FIO buffer size
+
+	return (file descriptor)
+end
+.fi
+
+
+ZOPNMT is passed a mostly initialized magtape file descriptor in the mtio
+common by MTOPEN.  The "filespec" string is not actually used by ZOPNMT.
+We physically open the file and set up the remaining fields in the tape file
+descriptor.  NOTE: if an interrupt occurs during the call to ZZOPMT,
+ZCLSMT will be called to perform error recovery.  If this happens the
+position of the tape is undefined.
+
+
+.ks
+.nf
+procedure zopnmt (filespec, access_mode; chan|ERR)
+
+[we are passed the mtio file descriptor in the mtio common]
+
+begin
+	set flag for ZCLSMT in case we are interrupted
+	call ZZOPMT to open tape positioned to the beginning of the
+	    indicated file.
+
+	if (cannot open tape)
+	    return (chan = ERR)
+	if (actual file < requested file)
+	    if (reading)
+		set at-eof flag and at_eot flag, so that reads return EOF
+	    else {
+		call zzclmt to close device
+		return (mtchan = ERR)
+	    }
+
+	save oschan in descriptor
+	save actual file number in descriptor
+	initialize the remaining descriptor fields
+
+	return (chan = mtio descriptor index)
+end
+.fi
+.ke
+
+
+Opening a file for writing and then immediately closing it poses problems.
+There is no way to write a zero-length file on an unlabeled tape.  We cannot
+just write a tape mark because that might mean writing a spurious double
+tapemark (false EOT) in the middle of the tape.  We could just ignore the
+request and not write any file, but that is not quite right either (if a
+disk file is opened for writing and then immediately closed, a file is
+still created).  We compromise by writing a single short record containing
+the packed ASCII character string "NULLFILE".  The actual length of the
+physical nullfile record is machine dependent.
+
+We may or may not need to bump the file counter when the file is closed;
+the OS tells us which.  If we have just written a file and ZZCLMT must
+write a tape mark, for example, we might be left positioned before EOT,
+between the tape marks, or (unlikely) after the tape marks.
+
+If an error (i.e., console interrupt) occurs while the tape is being
+positioned by ZZOPMT, we will be called by the error recovery system
+with a garbage mtchan argument.  We must be able to detect this type
+of call and modify the lock file, marking the position of the tape
+as UNDEFINED.  The next open call will then automatically rewind the
+tape, ensuring accurate positioning.  In a normal close we write out
+a lockfile identifying the file and record to which the tape is positioned.
+
+
+.ks
+.nf
+procedure zclsmt (mtchan)
+
+begin
+	if (error recovery in progress for ZOPNMT)
+	    mark current position as undefined
+	else {
+	    if (file was opened for writing but nothing was written)
+		write out "null file" short record
+
+	    call zzclmt (oschan, access_mode; nfiles)
+	    file += nfiles
+	    if (nfiles > 0)
+		record = 1
+	}
+	    
+	call mt_update_lockfile to save tape status, position
+	deallocate the mtio device descriptor slot
+end
+.fi
+.ke
+
+
+Ignore all read requests once EOF or EOT has been reached.  The only operation
+possible at that point is to close the device; there is no rewind or backskip
+function for a streaming device.  We do not "know" what would happen if we
+called ZZRDMT after reaching EOF; this is OS dependent, and we do not want
+to require any particular behavior (some systems would return the first
+record of the next file, others would keep returning EOF).
+
+
+.ks
+.nf
+procedure zardmt (mtchan, buf, maxbytes, offset)
+
+begin
+	if (not at EOF or EOT)
+	    call zzrdmt (oschan, buf, maxbytes)
+end
+.fi
+.ke
+
+
+We cannot hit EOF or EOT on a write, so merely post the request and return.
+Ignore the "offset" parameter since magtape is a streaming device.
+
+
+.ks
+.nf
+procedure zawrmt (mtchan, buf, nbytes, offset)
+
+begin
+	call zzwrmt (oschan, buf, nbytes)
+end
+.fi
+.ke
+
+
+FIO insures that ZAWTMT is called once and only once after every asynchronous
+i/o read or write request.  Once we hit EOF or EOT on a read, we return
+EOF (nchars = 0) on every subsequent request until the file is closed.
+After each real data transfer we update the record,file counters as
+directed by the OS.
+
+
+.ks
+.nf
+procedure zawtmt (mtchan; status)
+
+begin
+	if (reading and at EOF or EOT)
+	    return (status = 0)
+
+	call zzwtmt (oschan, nchars, nrecords_skipped, nfiles_skipped)
+	if (nfiles_skipped > 0) {
+	    set at-EOF flag
+	    record = 1
+	}
+	
+	file += nfiles_skipped			# keep track of position
+	record += nrecords_skipped
+	nrecords += nrecords_skipped		# count records rd|wr
+
+	status = nchars
+end
+.fi
+.ke
+
+.sh
+Error Recovery
+
+    Error recovery during magtape operations is tricky since we are trying
+to keep track of the position of the drive.  If an error occurs while the
+tape is being positioned by ZZOPMT we must detect the condition and mark the
+position of the tape as indefinite (forcing a rewind on the next open).
+If an interrupt occurs while positioning to EOT for a write, we do not
+want ZZCLMT to write the new EOT mark somewhere in the middle of the tape,
+truncating the tape.
+
+    Interrupts or other errors while reading or writing are comparatively
+harmless.  Interrupting a write results in a short but otherwise normal
+file on the tape; interrupting a read leaves us positioned to some
+arbitrary record within the file (harmless).  Conceivably a read
+could be interrupted just as we were reading a tape mark, causing the
+file position to be lost.  We have not protected against this.
+
+.sh
+Data Structures
+
+    The mtio device descriptor structure describes the status of each magtape
+device in use.  The maximum number of magtape files which can be open at one
+time is the maximum number of tape drives.  Only one file can be open on each
+drive at a time.
+
+
+.ks
+.nf
+	struct mtiodes {
+		int	mt_drive	# 1,2, etc. (c.t. a,b,...)
+		int	mt_density	# 0,800,1600,6250, etc.
+		int	mt_oldfile	# file number at open time
+		int	mt_oldrecord	# record number at open time
+		int	mt_file		# file being accessed (0=EOT)
+		int	mt_record	# next record to be accessed
+		int	mt_nrecords	# nrecords read/written
+		int	mt_acmode	# access mode
+		int	mt_oschan	# OS channel number
+		int	mt_ateof	# true when at EOF
+		int	mt_ateot	# true when at EOT
+	} mtiocom[MAX_TAPES]
+.fi
+.ke
+
+
+When a device is allocated, a lock file is created in the system logical device
+directory "dev$".  For example, the lock file for magtape unit A is the
+file "dev$mta.lok".  This is a human readable text file; it is typed out on
+the terminal when the user types "devstatus mta".  The lock file is updated
+when the drive is closed and deleted when the drive is deallocated.  The drive
+is automatically deallocated when the user logs out of the CL.
+
+
+.ks
+.nf
+Sample Lock File:
+
+    # Magtape unit 'mta' allocated to 'user' Sun 20:06:13 27-Nov-83
+    current file = 4
+    current record = 1
+    72 records read, EOF seen
+.fi
+.ke
+
+
+The preliminary comments are written when the lock file is created, i.e.,
+when the device is allocated.  Any number of comment lines are permitted.
+They are merely copied when ZCLSMT updates the lock file.  The remaining
+records are written by ZCLSMT to record the current position of the tape,
+and to inform the user of the device status.

@@ -1,0 +1,78 @@
+.help tbsort Aug91 noao.digiphot.ptools
+.ih
+NAME
+tbsort -- sort an APPHOT/DAOPHOT STSDAS table database on one or more columns
+.ih
+USAGE
+tbsort table columns
+.ih
+PARAMETERS
+.ls table
+The list of APPHOT/DAOPHOT table databases to be sorted in-place.
+All tables are sorted on the same column or columns.
+.le
+.ls columns
+The list of columns to sort on.  A column template consists of a list of
+either column names, or column patterns containing the usual pattern matching
+meta-characters.  The names or patterns are separated by commas or white space.
+The list can be placed in a file and the name of the file preceeded by a
+'@' can be given in place of the column template.
+.le
+.ls ascend = yes
+If \fIascend\fR = yes, the table is sorted in ascending value order, with the
+first
+row containing the smallest value of the sorted column.  Otherwise, the table
+is sorted in descending order, with the largest value first.
+.le
+.ls casesens = yes
+If \fIcasesens\fR = yes, sorts on character columns are case sensitive,
+with upper case letters preceding lower case in the sort.
+Otherwise, the sort is case insensitive.
+.le
+.ih
+DESCRIPTION
+TBSORT sorts an APPHOT/DAOPHOT STSDAS table database.
+TBSORT operates in place so
+a copy of the unsorted table must be made with the TABLES
+package TCOPY task in order to preserve the original table.
+The column or columns to sort on are specified by the parameter
+\fIcolumns\fR, which is a list of column names or column name patterns
+separated by
+commas.  The most significant column name is the first in the list. Subsequent
+columns are used to break ties.  There are two flags, \fIascend\fR
+and \fIcasesens\fR.  If \fIascend\fR is yes,
+the first row in the output table holds the smallest value if
+the sorted column is numeric or the first string in alphabetic order if the
+sorted column is a character string.  If \fIcasesens\fR is yes,
+upper case characters
+precede lower case characters in sort order.  Otherwise, case is not significant
+in determining the sort order.  No precedes yes when sorting a boolean column
+in ascending order.  Null table elements always are last in the sort, regardless
+of whether \fIascend\fR is yes or no. 
+
+TBSORT is identical  to the TABLES package sort with the exception that
+it has its own copy of the default parameter set so that users
+can modify the parameters independently of the TBSORT task in TABLES.
+.ih
+EXAMPLES
+
+1. Sort the output of the DAOPHOT ALLSTAR task in increasing order of
+magnitude.
+
+.nf
+   pt> tbsort m92.al.1 MAG
+.fi
+
+2. Sort the output of the DAOPHOT task NSTAR in increasing order of
+the y position.
+
+.nf
+   pt> tbsort m92.nst.1 YCENTER
+.fi
+
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txsort,ptools.psort,tables.tbsort
+.endhelp

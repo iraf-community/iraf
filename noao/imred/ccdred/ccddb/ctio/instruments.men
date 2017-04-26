@@ -1,0 +1,9 @@
+cfccd_f1	- Cassegrain focus CCD direct subset=filter1
+cfccd_f2	- Cassegrain focus CCD direct subset=filter2
+cfccd_both	- Cassegrain focus CCD direct subset=filters
+csccd		- Cassegrain focus spectroscopy
+echccd		- Echelle spectroscopy
+nfccd		- Newtonian focus CCD direct (Schmidt)
+pfccd_f1	- Prime focus CCD direct subset=filter1
+pfccd_f2	- Prime focus CCD direct subset=filter2
+pfccd_both	- Prime focus CCD direct subset=filters

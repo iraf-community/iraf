@@ -1,0 +1,681 @@
+.help install Aug86 "VMS/IRAF Installation Guide"
+.sp 3
+.ce
+\fBVMS/IRAF Installation and Maintenance Guide\fR
+.ce
+(draft)
+
+.ce
+Doug Tody
+.ce
+February 22, 1986
+.ce
+(revised August 17, 1986 for VMS/IRAF V2.3)
+
+.nh
+Introduction
+
+    The initial port of IRAF to VMS was carried out primarily by Fred
+Rommelfanger and Jay Travisano at STScI beginning in the fall of 1984.
+Fred and Jay implemented the VMS/IRAF kernel and are the real experts on the
+functioning of that part of the system, although VMS/IRAF is now supported
+solely by NOAO.  The VMS version of IRAF was installed on the NOAO VAX-8600,
+which runs VAX/VMS, in the fall of 1985.  Much work has been done on both
+the UNIX and VMS versions of the system since that time, and the VAX 8600
+running VMS/IRAF is now the primary data processing facility at NOAO/Tucson.
+All IRAF software development continues to be done on UNIX/IRAF, with new
+software continually moving from UNIX/IRAF to VMS/IRAF at weekly or even
+daily intervals.
+
+The distribution tape is a snapshot of our local VMS/IRAF system.
+The device and system configuration tables come configured for our system,
+hence will have to be modified as part of the installation process.
+These modifications are discussed in detail in this document.  To simplify
+the installation process as well as future upgrades, we have tried to isolate
+the site dependent files to the minimum number of directories, i.e.,
+DEV, HLIB, and LOCAL.
+
+.nh
+System Installation
+
+    Version 2.3 of VMS/IRAF has already been installed at a number of early
+test sites with little trouble.  An installation typically takes about an hour,
+perhaps longer if relinking is necessary.  Interfacing new graphics terminals
+or image displays can take much longer, of course, and we will only touch
+upon such matters in this draft version of the installation guide.
+
+.ls [1] \fBSystem Configuration\fR
+
+Login as SYSTEM and run the AUTHORIZE utility to create an account for
+a user named IRAF.  Select a disk device with sufficient free space for the
+system (see [2] below).  If necessary, the system can be stripped after
+installation to save space, but the full amount of space will be needed
+during installation.  Set the IRAF login directory to [IRAF] for now (we will
+need to change it later).  Do not worry about VMS quotas and
+privileges yet; this is not a concern during installation and is discussed
+in a later section.  In this and all the following examples, names like
+DISK:, TAPE:, etc. denote site dependent device names which you must supply
+values for.
+
+.ks
+.nf
+	$ run sys$system:authorize
+	UAF> (etc)
+.fi
+.ke
+
+Add the following statement to the system SYLOGIN.COM file, making the
+appropriate substitution for DISK.
+
+	$ IRAF :== "@DISK:[IRAF.VMS.HLIB]IRAFUSER.COM"
+
+In pre-V2.3 versions of VMS/IRAF it was necessary to define a system or
+job logical name for each disk an IRAF user might need to access which
+did not contain the $ character, since $ is the logical directory
+meta-character in IRAF virtual filenames.  This step is no longer necessary
+as the $ can be escaped with backslash in IRAF virtual filenames, e.g.,
+"usr\$0:[iraf...]".  The MKIRAF script will automatically insert the escape
+characters when building the LOGIN.CL file; do not escape the $ characters
+in logical name definitions in IRAFUSER.COM.
+.le
+
+.ls [2] \fBRead the BACKUP Tape\fR
+
+Login as IRAF (you will get a LOGIN.COM not found message which you should
+ignore) and run the VMS BACKUP utility to read the BACKUP tape provided.
+The tape contains approximately 6600 files in 240 directories, for a total
+of 41 Mb or 81,200 blocks (including binaries).
+
+.ks
+.nf
+	$ mount/foreign TAPE:
+	$ set default DISK:[iraf]
+	$ backup/rew TAPE:iraf.bck/select=[iraf...] [...]
+.fi
+.ke
+
+It typically takes half an hour or so to read the tape on a lightly loaded
+system.
+.le
+
+.ls [3] \fBEdit the Files that Describe the Host System\fR
+
+As far as possible, we have tried to condense knowledge of the host system
+into a few text files which are read at run time by IRAF.  The following
+files must be edited before the system can be run.
+
+.ls 4 [IRAF.VMS.HLIB]IRAFUSER.COM
+This file defines the VMS logical names and symbols needed to run IRAF.
+The site dependent ones are grouped at the beginning of the file.
+.ls 10 IRAFDISK
+Set to the name of the disk the [IRAF] directory is on.
+.le
+.ls 10 IMDIRDISK
+Set to the name of a public scratch device.  The MKIRAF script will try to
+create the default user image storage directories on this disk, e.g.,
+IMDIRDISK:[USER].  All potential IRAF users should have write permission
+and quota on this device.  If this is not possible on your system, comment
+out the definition and add one instead to the LOGIN.COM file of each IRAF
+user, so that each user can have a private IMDIRDISK, or simply edit the
+entry for IMDIR in the LOGIN.CL file created when MKIRAF is run.
+
+A public scratch device is used because this is where bulk image data
+will be stored by default.  It is often
+desirable for this to be on a different disk than that used for user
+logins, to minimize the amount of disk that has to be backed up on tape,
+and to permit a different quota and file expiration date policy to be used
+for large datafiles than is used for the small, relatively long lived files
+normally kept on the user disk.
+.le
+.ls 10 TEMPDISK
+Set to the name of a public scratch device and create a public directory
+[IRAFTMP] on this device.
+The device may be the same as is used for IMDIRDISK if desired.
+The IRAF logical directory "tmp$" (known as IRAFTMP in the IRAFUSER.COM file)
+is defined as TEMPDISK:[IRAFTMP].
+The IRAF system will create temporary files in this directory at runtime.
+These files are always deleted immediately after use (unless a task aborts),
+hence any files in "tmp$" older than a day or so are garbage and should be
+deleted.  It is best if "tmp$" points to a public directory which is cleaned
+periodically, e.g., whenever the system is booted, so that junk temporary
+files do not accumulate.
+.le
+.ls 10 FAST,BATCH,SLOW
+These are the logical names of the standard IRAF logical batch queues.
+They should be redefined to reference the queues used on your machine,
+e.g., the standard VMS batch queue SYS$BATCH.
+.le
+.le
+
+.ls 4 [IRAF.VMS.HLIB.LIBC]IRAF.H
+This file (often referred to as <iraf.h>) is required to compile any of the
+C source files used in IRAF.  Most sites will not need to recompile the C
+sources and indeed may not even have the DEC C compiler, but the file is
+also used by the runtime system in some cases to resolve logical names,
+hence must be edited and installed.  Change the following directory names
+as required for your system, referencing only system wide logical names in
+the new directory pathnames.
+.ls 10 HOST
+Set to the fully resolved pathname of the directory IRAFDISK:[IRAF.VMS].
+.le
+.ls 10 IRAF
+Set to the fully resolved pathname of the directory IRAFDISK:[IRAF].
+.le
+.ls 10 TMP
+Set to the fully resolved pathname of the directory TEMPDISK:[IRAFTMP].
+.le
+
+These directory definitions are referenced only if logical name translation
+fails for some reason, as often happens on VMS systems for various reasons.
+It is therefore essential that only system wide logical names be used in
+these directory pathnames.  Do not use job or process logicals.  Do not
+change the order in which the entries appear, or otherwise alter the syntax -
+the kernel code which scans <iraf.h> is very strict about the syntax.
+.le
+
+.ls 4 [IRAF.LOCAL]LOGIN.COM
+We recommend that the login directory for the IRAF account be [IRAF.LOCAL],
+rather than the usual [IRAF], to provide a place to keep all the miscellaneous
+files required locally to maintain the system, without cluttering up the
+standard system.  This will simplify the installation of future updates since
+it makes it obvious what is part of the standard system and what has been
+added locally, and having all the local stuff in a separate directory will
+make it easier to ensure that it is not lost when the next version of the
+system is installed.
+
+The default LOGIN.COM will therefore be found in [IRAF.LOCAL].  The LOGIN.COM
+file should contain a call to the newly defined IRAF command to define the
+IRAF logicals at login time (or when a batch job is submitted).  Depending
+on when the distribution tape was made, the LOGIN.COM that comes with the
+system may reference either IRAF or IRAFX.  If the latter is the case, change
+the reference to IRAF.  The remainder of the file mostly consists of site
+dependent stuff used here, and can be changed if desired (it should be
+harmless to leave it in).
+.le
+
+
+The following files should now be edited to define the default terminal,
+printer, editor, and so on for your system.  Any part of this can be left
+until later if desired.
+
+.ls 4 [IRAF.VMS.HLIB]ZZSETENV.DEF
+This file contains the name of the default editor, the default names of all
+the standard devices, and a number of other definitions which are not site
+dependent and which can therefore be ignored.  To be accessible by the IRAF
+system, each local device named must also have an entry in the TERMCAP file
+(terminals and printers) or GRAPHCAP file (graphics terminals and image
+displays) in [IRAF.DEV].  There must also be an "editor.ED" file in
+[IRAF.DEV] for the named editor; EDT, EMACS, and VI are currently supported.
+Edit the string to the right of the equals sign for the following entries.
+Sample values are shown.
+
+.ks
+.nf
+	set editor	= "vi"
+	set printer	= "imagen"
+	set stdgraph	= "vt640"
+	set stdimage	= "iism70l"
+	set stdplot	= "versatec"
+	set terminal	= "vt640"
+.fi
+.ke
+
+For example, you may wish to change the default editor to "edt", the default
+printer to "vmsprint", the default image display to "iism75", and the default
+terminal to "vt100".  Note that only the IIS model 70 and 75 image displays
+are directly supported by the current system.  Display code is also available
+for the DeAnza displays from STScI (NOAO will also support the device in the
+near future).  The complex issues of the graphics and display interfaces are
+discussed more fully in a later section.
+.le
+
+.ls 4 [IRAF.DEV]DEVICES
+This file contains a list of the allocatable devices (primarily tape drives)
+for the local system.  It should be obvious how to change it by reading the
+comments in the file and studying the current values, which are for our system.
+.le
+
+.ls 4 [IRAF.DEV]TERMCAP
+There must be entries in this file for all host local terminal and printer
+devices you wish to access from IRAF.  The printer is easy, since the
+"vmsprint" entry provided should work on any VMS system.  To prepare entries
+for other devices, simply copy the "vmsprint" entry and change the queue name
+from SYS$PRINT to the name of the queue for the new printer.  Any number of
+these entries may be placed in the termcap file.  If you have a new terminal
+which has no entry in the termcap file provided, a new entry will have to be
+added (termcap is widely used, so it is highly likely that someone somewhere
+will already have written it).  A copy of the UNIX manual page documenting
+the termcap database is appended in case you need it.
+.le
+
+.ls 4 [IRAF.DEV]GRAPHCAP
+There must be entries in this file for all graphics terminals, batch plotters,
+and image displays accessed by IRAF programs.  Weird graphics terminals will
+need a new entry.  The IRAF file "sys$gio/doc/gio.hlp" contains docs for
+graphcap.  A printed copy of this document is available upon request, however
+once IRAF is up you may find it easier to generate your own copy using HELP,
+as follows:
+
+.nf
+	cl> cd sys$gio/doc
+	cl> help gio.hlp fi+ | lprint
+.fi
+
+The manual page for the SHOWCAP task should also be printed since this utility
+is useful for generating new graphcap entries.  More focused documentation
+will be available eventually.  Telephone consultation is available for those
+who need it.  We ask that new graphcap entries be sent back to us so that we
+may include them in the master graphcap file for other sites to use.
+.le
+
+The DEV directory also contains a number of files (HOSTS, HOSTLOGIN, and UHOSTS)
+used by the IRAF network software.  We depend upon the networking capabilities
+of IRAF heavily at NOAO to access image displays, printers, files, etc. resident
+upon remote nodes.  We expect that most sites will not need this capability
+initially, hence documentation of the networking software will be left for
+later.  For sites which do have a local TCP/IP based network (we do not yet
+support DECNET) all that is necessary to enable networking is to edit the
+three networking files in the DEV directory, and install IRAF on the other
+nodes.  It does not matter what native operating system runs on the remote
+nodes, so long as it runs IRAF as well.
+.le
+
+.ls 4 [4] \fBComplete the System Configuration\fR
+
+Login again as SYSTEM, run AUTHORIZE, and change the login directory for
+the IRAF account to [IRAF.LOCAL].  Next, copy the IRAF.H file to the system
+library, ensuring that the file has read permission for the world.
+
+.ks
+.nf
+	$ set default sys$library
+	$ copy DISK:[iraf.vms.hlib.libc]iraf.h []
+	$ set prot=(w:r) iraf.h
+.fi
+.ke
+
+This is the last part of the system installation procedure requiring
+SYSTEM privilege, excepting the adjustment of the authorized quotas for
+the IRAF account and any other accounts which will be using IRAF.
+.le
+
+.ls 4 [5] \fBRelink the System (if necessary)\fR
+
+The prelinked executables supplied on the distribution tape should
+execute on most systems without need to relink.  If you run a different
+version of IRAF than we do, however, it may be necessary to relink all
+or part of the system.  If you requested a "you relink" version of the system,
+read on, otherwise you can probably skip to the next section.
+
+There are two different sets of executables in the system, the so-called
+"bootstrap utilities", and the regular system executables.  The bootstrap
+utilities are required to relink the system and hence must be linked first.
+If you received a "you relink" distribution you can skip this step, since the
+bootstrap utilities are included on these tapes as well.  Even if you did
+not receive a you-relink distribution you should be able to skip this step,
+as we were told by DEC that if we linked the bootstrap executables in such
+and such a way (/NOSYSSHR link option), they would run on older versions of
+VMS.  Hopefully this is true, otherwise you must either rebootstrap the
+system yourself, or upgrade to a more recent version of VMS.
+
+The bootstrap utilities are written in C, and the DEC C compiler is required
+to compile or link these utilities.  The C compiler is NOT required to run
+the prelinked binaries.  To recompile and link the bootstrap utilities, i.e.,
+to "bootstrap" IRAF, enter the following commands.
+
+.nf
+	$ set default [iraf.vms]
+	$ set verify
+	$ @rmbin
+	$ @mkpkg
+.fi
+
+The bootstrap should take 30 to 45 minutes on an unloaded 11/780.  Once the
+bootstrap utilities have been relinked and installed in HLIB, the main system
+may be relinked.  We assume that there is nothing wrong with the system
+object libraries and that we only need to relink.  If this assumption is false
+the system (excluding the [IRAF.VMS...] directories) can be stripped of all
+.OLB, .MLB, .OBJ, and .EXE files and the procedure outlined below will
+automatically recompile the libraries as well, but of course this will take
+much longer than a relink.
+
+Once the system has been bootstrapped all system maintenance is done with
+the MKPKG utility.  Documentation for this and the other SOFTOOLS utilities
+may be found in the IRAF User's Guide, and is also available in the online
+system via HELP.  The bootstrap utilities differ from most IRAF software in
+that they can be run either from DCL or from the IRAF CL.  The following DCL
+commands may be entered to relink (or recompile and relink) the main IRAF
+system.  Note that in this case MKPKG is a DCL foreign task, not a .COM file,
+hence there is no @.
+
+.nf
+	$ set default [iraf]
+	$ mkpkg
+.fi
+
+A full system relink will take around 30 minutes.  A full system compile and
+relink takes about 20 hours on our UNIX 11/750 (single user), and probably
+almost as long on a VMS 11/780.  The file [IRAF.VMS.HLIB]MKPKG.INC may be
+edited to disable compilation of any parts of the system that will not be
+used at your site.
+.le
+
+.nh
+Login to IRAF and Run the Test Procedure
+
+    Congratulations!  You should now have a functional IRAF system.
+At this point it would probably be wise to read the CL User's Guide,
+if you have not already done so.  Before starting the CL you should
+probably do what a regular user would do, i.e., run MKIRAF to initialize
+the IRAF environment, and then edit the LOGIN.CL file created by MKIRAF
+as desired.  
+
+.nf
+	$ set default [iraf.local]
+	$ mkiraf
+.fi
+
+Once the IRAF environment is configured one need only enter the CL command
+to start up the CL.  After a bit IRAF should print the message of the day
+and the root menu, and issue the "cl> " prompt.  This assumes that the IRAF
+command is referenced in the LOGIN.COM file; if this is not the case, IRAF
+must be entered first to define CL and the other VMS logical names and
+symbols used by IRAF.
+
+	$ cl
+
+Once in the CL, you will probably have magtape and printer access, are likely
+to have graphics terminal access, and very possibly will not have either
+image display access or graphics plotter access.  If the graphics terminal
+capability is ready the next step is to run the IRAF test procedure to
+verify that all is working well, as well as try out a few of the many tasks
+in the system.  If the graphics terminal is not up yet, there is probably
+not point in running the test procedure.  To run the test procedure, read
+the documentation in volume 1A of the IRAF User's Guide and follow the
+instructions therein.  You may also wish to run some of the benchmarks
+described in the benchmarks paper distributed with V2.3, to make sure that
+your VMS system (or user quotas and working set) is/are configured properly
+for efficient execution of IRAF programs.
+
+.nh
+VMS Quotas and Privileges Required to Run IRAF
+
+    The only special privilege required by IRAF is TMPMBX, which is probably
+already standard on your system.  Systems with DECNET capabilities should
+also give their users NETMBX privilege, although it is not required to run
+IRAF.  No other privileges are required or useful for normal activities.
+
+Although privileges are no problem for VMS/IRAF, it is absolutely essential
+that the IRAF user have sufficient VMS quota, and that the system tuning
+parameters be set correctly, otherwise IRAF will not be able to function
+correctly.  If a quota is exceedd, or if the system runs out of some
+limited resource, the affected VMS system service will return an error code
+to IRAF and the operation will fail (this usually happens when trying to
+spawn a connected subprocess).
+
+We are still trying to determine the best minimum recommended quota values.
+The current recommendations are summarized below.
+
+.nf
+	BYTLM		30000
+	PGFLQUOTA	15000
+	PRCLM		10
+	WSEXTENT	2048
+.fi
+
+Please note that these are MINIMUM values.  Larger values for PGFLQUOTA and
+WSEXTENT may be desirable, depending upon expected usage and system resources.
+
+In addition to sufficient per user authorized quota, the system tuning
+parameters must be set to provide enough dynamically allocatable global
+pages and global sections to handle the expected load.  If these parameters
+are set too small, process connects will fail intermittently, usually when
+the system load is high.  Each subprocess needs about 10 global pages when
+activated.  With IRAF in heavy use (i.e., a dozen simultaneous users) this
+can easily reach a requirement for several hundred additional global pages.
+Each installed image and subprocess also needs at least one, usually two,
+global sections.  The system parameters on our 8600 (which is probably a
+worst case example) are currently set to GBLPAGES = 14000 and GBLSECTIONS
+= 220.  Don't despair, though; our little UNIX 11/750 can handle up to ten
+IRAF users with only 5 Mb of memory, provided they aren't all doing heavy
+image processing. 
+
+.nh
+Tuning Considerations
+
+    There are three things that are commonly done to tune VMS/IRAF for a
+particular host system:
+
+.nf
+	o  Install the executables to permit shared memory
+	o  Precompile selected TERMCAP and GRAPHCAP entries
+	o  Strip the system to reduce disk consumption
+.fi
+
+.nh 2
+Installing Executable Images
+
+    VMS/IRAF does not yet implement shared libraries.  The system manager must
+"install" executable images if the pages comprising the read only PSECT's of
+these images are to be shared amongst all processes currently executing the
+same image.  This is not necessary if only one person will be using IRAF at
+a time, but becomes increasingly important as the number of user increases,
+or if even a single user begins submitting a lot of batch jobs to run
+concurrently.  This problem is, of course, not unique to IRAF (except that
+the images are rather large, e.g., often several hundred Kb).
+
+The procedure for installing images is quite simple, however it will fail
+if there are insufficient global pages available in the system.  The number
+of global pages required to install an image is typically about 60 percent
+of the size of the image in disk blocks.
+
+Only the VMS system manager can install images.  Images installed interactively
+must be reinstalled whenever the system is booted; to permanently install
+images, the system startup file must be edited.  The procedure followed to
+install an image is quite simple, e.g., login as SYSTEM and enter the following
+commands to install the CL.EXE and X_SYSTEM.EXE images, and any others
+expected to be used enough to be worth installing.
+
+.nf
+	$ run sys$system:install
+	INSTALL> DISK:[iraf.bin]cl		/open/header/shared
+	INSTALL> DISK:[iraf.bin]x_system	/open/header/shared
+		(etc.)
+.fi
+
+Alternatively, one can run the INSTALL.COM DCL script in the HLIB directory.
+The main IRAF executables all reside in the [IRAF.BIN] directory.
+
+.nh 2
+Precompiling TERMCAP and GRAPHCAP Entries
+
+    Precompilation of a termcap or graphcap entry is a technique used to
+speed runtime access of the entry for that device.  If the entry is not
+precompiled the termcap or graphcap file must be physically opened and
+scanned at runtime to read the desired entry.  This causes a noticeable
+delay of as much as a second when clearing the terminal screen or plotting
+a graph, hence it is usually worthwhile to cache the entries for commonly
+used video and graphics terminals.  It is not worthwhile for printers,
+plotters, and image displays.
+
+The system comes with selected termcap and graphcap entries already
+precompiled.  To see which devices are precompiled, page the cache data
+files, DEV$CACHET.DAT (for termcap) and DEV$CACHEG.DAT (for graphcap).
+To cache a different set of entries one must regenerate these files with the
+MKTTYDATA task in the SOFTOOLS package, and then do a full sysgen with the
+MKPKG utility.  Detailed instructions are given in the manual page for
+MKTTYDATA.
+
+.nh 2
+Stripping the System to Reduce Disk Consumption
+
+    If the system is to be installed on multiple cpus, or on a particularly
+small host like a MicroVax, it may be necessary or desirable to strip the
+system of all non-runtime files to save disk space.  This equates to deleting
+all the sources and all the reference manuals and other documentation,
+excluding the online manual pages.  A special utility called RMFILES (in the
+SOFTOOLS package, of course) is provided for this purpose.  It is not
+necessary to run RMFILES directly to strip the system.  The preferred
+technique is to enter the commands given below.  The example is for DCL for
+consistency with the rest of this document, but this could be done from
+within the CL as well.
+
+.nf
+	$ set default [iraf]
+	$ mkpkg strip
+.fi
+
+This will preserve all runtime files, permitting use of the standard runtime
+system as well as user software development.  The size of the system is reduced
+from about 41 Mb (megabytes) to around 19 Mb.  One can optionally enter the
+command "mkpkg stripall" to delete the system libraries as well, but this
+saves only another couple of Mb and a full sysgen (20 cpu hours) or a tape
+reload will be required to regain the capability to link user programs with
+the IRAF libraries, or relink the IRAF executables.
+
+.nh
+Interfacing to New Graphics Devices
+
+    There are three types of graphics devices that concern us here.
+These are the graphics terminals, graphics plotters, and image displays.
+The topic of interfacing to these devices has already been discussed in
+the letter which was sent out with the IRAF questionnaire, hence the
+discussion given here will be brief.
+
+.nh 2
+Graphics Terminals
+
+    The IRAF system as distributed is capable of talking to just about any
+conventional graphics terminal, using the STDGRAPH graphics kernel supplied
+with the system.  All one need do to interface to a new graphics terminal
+is add a new graphcap entry for the device.  This can take anywhere from
+a few hours to a few days, depending on one's level of expertise, and the
+perversity of the device in question.  We are willing to help out if
+necessary, as noted in the letter mentioned earlier.
+
+The fancy bit mapped, high resolution graphics displays common on "workstations"
+like the MicroVax and the Sun cannot be driven (acceptably) by the existing
+STDGRAPH graphics kernel.  We are actively developing new graphics kernels
+for these devices, and they should be available later this year.
+
+.nh 2
+Graphics Plotters
+
+    The current IRAF system comes with three graphics kernels usable to drive
+graphics plotters.  The STDGRAPH kernel can in principle be used to make
+plots on many devices by using a Tek graphcap entry, redirecting the Tek
+drawing instructions into a file, and using the Tek emulation software that
+comes with most plotters to generate the plot.  A more streamlined interface
+is possible but is not yet available [V2.3 - see the discussion of the new
+SGI interface in the paper "The IRAF Simple Graphics Interface"].
+
+The supplied STDPLOT kernel is used to generate NCAR metacode and can be
+interfaced to an NCAR metacode translator at the host system level to get
+excellent plots on the Versatec, Printronix, Trilog, and other similar
+devices if NCAR metacode translators are available.  This is the kernel
+we currently depend upon most heavily at NOAO for plotter output.
+Unfortunately, the host level NCAR metacode translators are not included in
+the standard IRAF distribution but are required for a plot.  The necessary
+software is however in the public domain, and will be available at a later
+date.  Sites which already have the Ray Bovet "McVax" package are already
+very close to having plotter output using this kernel.  A little software
+twiddling remains to be done to make the connection for VAX/VMS (we do all
+our plotting on UNIX here), but this is a matter of a few hours and the
+software should be available shortly.  Contact us for more information.
+
+The remaining possibility with the current system is the CALCOMP kernel.
+Many sites will have a Calcomp or Versaplot library (or Calcomp compatible
+library) already available locally.  It should be possible to copy this
+library to the HLIB directory and relink the Calcomp graphics kernel to
+get output using on any devices supported by the library.  The following
+commands should suffice to install the calcomp library, and relink and 
+install the Calcomp graphics kernel:
+
+.nf
+	$ set default [iraf.vms.hlib]
+	$ copy mycalcomplibrary.olb libcalcomp.olb
+	$ set default [iraf.sys.gio.calcomp]
+	$ mkpkg update
+.fi
+
+A graphcap entry may also be required.
+
+[NOTE, August 1986]: A new graphics kernel called the SGI kernel is now
+available.  In many cases this will greatly simply the process of interfacing
+to a new plotter device.  Documentation should have been included with the
+V2.3 distribution kit.  See also [VMS.GDEV.SGIDEV]README).
+
+.nh 2
+Image Displays
+
+    The IRAF system as currently supported directly supports only the
+IIS model 70 and 75 image displays.  Comparable software is available from
+STScI for the DeAnza displays; requests for this software should be
+directed to Sammy Kijilner or Jay Travisano at STScI.  We are expecting
+to take delivery of a MicroVax with bit mapped graphics display and
+DeAnza IP5000 image display any day now, hence these devices will soon
+be supported by NOAO, too.
+
+We cannot do much to help sites with other image displays until the new
+IRAF display interface is completed.  This is scheduled to be worked on
+this spring, and should be available this summer.  The new interface and
+associated TV package software will be a great improvement over what is
+currently available; the current interface is very minimal, and does not
+even support cursor readback, although it is fine for image display.
+
+In the meantime, the best approach is to use the new IMFORT interface
+and whatever non-IRAF display software you currently have to construct
+an interim display program.  The IMFORT library provides host system Fortran
+or C programs with access to IRAF images.  The only documentation
+currently available for IMFORT is the README file in the directory
+[IRAF.SYS.IMIO.IMFORT].  Sample Fortran programs and a VMS .COM file
+showing how to link are given in the same directory.
+
+.nh
+The IRAF Directory Structure
+
+    The current IRAF directory structure (new directories are constantly
+being added) is documented in the Appendix.  The main branches of the tree
+are the following.
+
+.nf
+	bin	- installed executables
+	dev	- device tables (termcap, graphcap, etc.)
+	doc	- assorted IRAF manuals
+	lib	- the system library; object libraries, global files
+	local	- your login directory
+	math	- sources for the mathematical libraries
+	pkg	- the IRAF applications packages
+	sys	- the virtual operating system (VOS)
+	vms	- the VMS system interface (kernel + bootstrap utilities)
+.fi
+
+If you will be working with the system much at the system level, it will be
+well worthwhile to spend some time exploring these directories and gaining
+familiarity with the system.
+
+.nh
+Relinking or Updating IRAF Packages
+
+    Should it be necessary to fix a bug in one of the applications packages,
+it is very easy to recompile and relink the package and install the new
+executable.  After editing the affected files, enter any of the following
+commands (this is normally done from within the CL):
+
+.nf
+	mkpkg		Makes an executable in the package directory
+	mkdebug		Same, but with the debugger linked in
+	mkpkg install	Used after "mkpkg" (but not mkdebug!) to
+			    install the new executable in BIN.
+	mkpkg udpate	Relinks the new executable and installs it in
+			    BIN all in one shot.
+.fi
+
+If extensive revisions are contemplated, a copy of the entire package should
+be made and moved out of the system, and that version of the package modified,
+rather than modifying the standard package, which will only make updating the
+system more difficult.  It will be necessary to delete or replace the installed
+executables in BIN before the revised ones can be used.  The directory name
+in the TASK declaration for the package in HLIB$CLPACKAGE.CL is all one must
+modify to use the local version of the package rather than the standard one.
+.endhelp

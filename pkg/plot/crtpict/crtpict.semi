@@ -1,0 +1,263 @@
+# Semicode for the CRTPICT replacement.  Input to the procedure
+# is an IRAF image; output is a file of metacode instructions, 
+# essentially x,y,z for each pixel on the dicomed.  The image intensities
+# are scaled to the dynamic range of the dicomed.  The image
+# is also scaled spatially, either expanded or reduced.  
+
+struct dicomed {
+	
+	# These constants refer to the full dicomed plotting area and will
+	# be read from the graphcap entry for "dicomed".
+
+	int	di_xr	4096	# x resolution
+	int	di_yr	4096	# y resolution
+	int	di_xs	1	# starting x
+	int	di_xe	4096	# ending x
+	int	di_ys	1	# starting y
+	int	di_ye	4096	# ending y
+	int	di_zmin	1	# minimum grey scale value
+	int	di_zmax	254	# maximum grey scale value
+
+	# These constants refer to the dicomed area accessed by crtpict.
+	# They will be stored in file crtpict.h.
+
+	int	crtpict_xr	2059	# x resolution
+	int	crtpict_yr	2931	# y resolution
+	int	crtpict_xs	886	# starting x
+	int	crtpict_xe	2944	# ending x
+	int	crtpict_ys	875	# starting y
+	int	crtpict_ye	3805	# ending y
+}
+
+# The cl parameters that are read_only will be stored in this structure:
+
+struct cl_params {
+
+	bool	fill
+	char	ztrans
+	char	device
+	int	nsample_lines
+	real	xmag
+	real	ymag
+	real	contrast
+	real	z1
+	real	z2
+	real	z1out
+	real	z2out
+	real	greyscale_window
+	real	image_window
+	real	graphics_window
+}
+
+t_crtpict (image_name)
+
+begin
+	cl_params = allocate space for read_only cl_parameters
+
+	# First, get the parameters necessary to calculate z1, z2.
+	if (ztrans = "auto")
+	    get contrast, nsample_lines
+	if (ztrans = "min_max") {
+	    get z1, z2
+	    if (z1 == z2) {
+		get contrast
+		if (abs (contrast) != 1)
+		    get nsample_lines
+	    }
+	}
+
+	# Get parameters necessary to compute the spatial transformation.
+	if (fill) = no {
+	    get xmag, ymag 
+	    if (xmag or ymag < 0)
+		convert them to fractional magnification factors
+	}
+
+	# If the output has been redirected, input is read from the named
+	# command file.  If not, each image name in the input template is
+	# assumed to be preceded by the command "plot".
+	
+	if (output has been redirected) {
+	    redir = true
+	    cmd = open command file
+	}
+
+	# Loop over commands until EOF
+	repeat {
+	    if (redir) {
+		command = get next command from cmd file
+		if (command = EOF)
+		    break
+		if (command != plot) {
+		    reset WCS so gscan coordinates are plotted properly
+		    call gscan (command)
+		} else 
+		    image = image to be plotted
+	    } else {
+		image = next name from expanded template
+		if (image = EOF)
+		    break
+	    }
+
+	    im = open image file
+	    gp = open new graphics descriptor
+
+	    if (user specified output name) {
+	        generate unique output name
+	        call gredir (output name)
+	    }
+		
+	    call plot_image (gp, im, cl_params)
+	}
+
+	close image
+	close gp
+end
+
+
+define	NSTEPS 16
+
+procedure plot_image (gp, im, cl_params)
+
+begin
+	wdes = allocate space for window descriptor as in DISPLAY
+	call establish_transform (gp, im, cl_params, wdes)
+
+	if (cl_params.image_fraction > 0.0)
+	    call transform_image (gp, im, wdes)
+
+	if (cl_params.greyscale_fraction > 0.0)
+	    call draw_greyscale	 (gp, cl_params, NSTEPS)
+
+	if (cl_params.graphics_fraction > 0.0) 
+	    call draw_graphics	 (gp, im, cl_params)
+
+	free (wdes)
+
+
+procedure establish_transform (gp, im, cl_params, wdes)
+
+begin
+	# Procedure xy_scale calculates and stores the spatial
+	# transformation fields of structure wdes
+
+	call xy_scale (gp, cl_params, im, wdes)
+
+	# Now for the intensity to greyscale mapping.  Values z1 and z2,
+	# the intensities that map to the lowest and highest greyscale
+	# levels, are also calculated and stored in the wdes structure. 
+
+	w1 = W_WC(wdes, 1)
+	W_ZT(w1) = W_UNITARY
+
+	if (ztrans = "min_max") {
+	    W_ZT(w1) = W_LINEAR
+	    if (cl_param.z1 != cl_param.z2) {
+		# Use values set by user
+		z1 = cl_param.z1
+		z2 = cl_param.z2
+	    } else {
+		# Use image min and max unless the user has set the contrast
+		# parameter to alter the slope of the transfer function.
+		if (cl_params.contrast == 1) {
+		    z1 = im.im_min
+		    z2 = im.im_max
+		} else if (cl_params.contrast == -1) {
+		        z1 = im.im_max
+		        z2 = im.im_min
+		} else 
+		    call zscale (im, z1, z2, contrast, SAMPLE_SIZE, len_stdline)
+	    }
+	}
+
+	if (ztrans = "auto") {
+	    W_ZT(w1) = W_LINEAR
+	    # Calculate optimum z1 and z2 from image mode
+	    call zscale (im, z1, z2, contrast, SAMPLE_SIZE, len_stdline)
+	}
+
+	W_ZS(w1) = z1
+	W_ZE(w1) = z2
+end
+
+
+procedure xy_scale (gp, cl_params, im, wdes)
+
+begin
+	if (fill) {
+	    # Find the number of device pixels per image pixel required to 
+	    # scale the image to fit the device window.
+	    xscale = scaling factor in x dimension
+	    yscale = scaling factor in y dimension
+
+	    # Preserve the aspect ratio
+	    if (image is longer in x than y)
+		yscale = xscale
+	    else
+		xscale = yscale
+	} else {
+	    # Use the magnification factors specified by the user.
+	    xscale = cl_params.xmag
+	    yscale = cl_params.ymag
+	}
+
+	# The (NDC) device coordinates of the image viewport are stored
+	# as world coordinate system 0.
+	w0 = W_WC(wdes, 0)
+	W_XS(w0) = NDC coord of left edge of viewport
+	W_XE(w0) = NDC coord of right edge of viewport
+	W_YS(w0) = NDC coord of lower edge of viewport
+	W_YE(w0) = NDC coord of upper edge of viewport
+	W_XRES(w0) = number of elements in plotting area x dimension
+	W_YRES(w0) = number of elements in plotting area y dimension
+
+	# The pixel coordinates of the window are stored as world
+	# coordinate system 1.
+	w1 = W_WC(wdes, 1)
+	W_XS(w1) = image column plotted at left edge of window
+	W_XE(w1) = image column plotted at right edge of window
+	W_YS(w1) = image row plotted at lower edge of window
+	W_YE(w1) = image row plotted at upper edge of window
+end
+
+
+procedure draw_greyscale (gp, cl_params, NSTEPS)
+
+begin
+	# The (NDC) device coordinates of the greyscale_window:
+	gs_x1 = crtpict_xs / di_xr
+	gs_x2 = crtpict_x2 / di_xr
+	gs_y1 = im_y2 / di_yr
+	gs_y2 = gs_y1 + ((crtpict_yr * cl_params.greyscale_fraction) / di_yr)
+
+	# Set the viewport and window mapping
+	call gsview (gp, gs_x1, gs_x2, gs_y1, gs_y2)
+	call gswind (gp, 1, NSTEPS, 1, 1)
+
+	# Fill and output greyscale array
+	do i = 1, NSTEPS
+	    grey_levels[i] = grey level 
+
+	call gcell (gp, grey_levels, NSTEPS, 1, 1, 1, NSTEPS, 1)
+end
+
+
+define	NVALUES	256
+
+procedure draw_graphics (gp, im, cl_params)
+
+begin
+	# The (NDC) device coordinates of the graphics viewport:
+	gr_x1 = crtpict_xs / di_xr
+	gr_x2 = crtpict_xe / di_xr
+	gr_y1 = crtpict_ys / di_yr
+	gr_y2 = gr_y1 + ((crtpict_yr * cl_params.graphics_fraction) / di_yr)
+
+	# Set the viewport and window coordinates
+	call gsview (gp, gr_x1, gr_x2, gr_y1, gr_y2)
+	call gswind (gp, 1, crtpict_xr, 1, gr_yr)
+
+	call gtext (for id string, nrows, ncols etc.)
+	call generate_histograms (im, NVALUES)
+	call gploto (?) to plot histograms
+end

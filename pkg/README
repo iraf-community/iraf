@@ -1,0 +1,18 @@
+These directories contain the source, documentation, and default parameter
+files for all IRAF system packages.
+
+	cl		The command language
+	dataio		Data format conversions (FITS, card image, etc.)
+	dbms		Database management utilities
+	images		General image processing and display
+	language	CL language stuff (task, kill, set, etc.)
+	lists		List processing utilities
+	obsolete	Obsolete tasks to be phased out
+	plot		General plotting utilities
+	proto		Prototype tasks
+	softools	Software tools
+	system		System utilities (files etc.)
+	utilities	Miscellaneous utilities
+
+	xtools		Applications tools library
+	bench		Benchmarks package (not an installed package)

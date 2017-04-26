@@ -1,0 +1,75 @@
+#!/bin/csh -f
+
+set p = `pwd`
+set top = $p:h
+
+setenv CC 	"gcc"
+setenv CXX 	"g++"
+
+set	build_cfitsio	= 1
+set	build_readline	= 1		# not needed in v2.16.1 and beyond
+set	build_voclient	= 1
+
+
+echo "Building support libraries ...."
+echo "  (Using toplevel directory '"$top/"' ....)"
+
+# Global options.
+set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
+
+#echo "    Cleaning files ...."
+#./mkclean
+
+
+
+####################################################################
+####   CFITSIO Library
+####################################################################
+if ($build_cfitsio == 1) then
+
+  echo -n "    Building CFITSIO libs ...."
+  set	opts = "$gopts --bindir=$top/bin --libdir=$top/bin"
+  (chdir cfitsio ;  \
+    ./configure $opts  				 >& _spool ; \
+    make clean 					>>& _spool ; \
+    make 					>>& _spool ; \
+    make install 				>>& _spool)
+  (chdir cfitsio ;  make clean 			>>& _spool )
+  echo "done"
+
+endif
+
+
+
+####################################################################
+####   READLINE Library
+####################################################################
+if ($build_readline == 1) then
+
+  echo -n "    Building Readline libs ...."
+  set	opts = "$gopts --bindir=../../bin --libdir=../../bin"
+  (chdir readline ; mkpkg ; make clean 		>& _spool)
+  echo "done"
+
+endif
+
+
+
+####################################################################
+####   VOClient Library
+####################################################################
+if ($build_voclient == 1) then
+
+  echo -n "    Building VOClient libs ...."
+
+  (chdir voclient ; \
+	make all 			>>& _spool ; \
+	cp lib/libVO.a  ../../bin/ 	>>& _spool ; \
+	cp voclient.jar ../../vo/java/ 	>>& _spool ; \
+	cp voclientd    ../../vo/java/ 	>>& _spool ; \
+	make clean 		 	>>& _spool   )
+  echo "done"
+
+endif
+
+

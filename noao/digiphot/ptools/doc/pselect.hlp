@@ -1,0 +1,130 @@
+.help pselect Aug91 noao.digiphot.ptools
+.ih
+NAME
+pselect - select records from an APPHOT/DAOPHOT database
+.ih
+USAGE
+pselect infiles outfiles expr
+.ih
+PARAMETERS
+.ls infiles
+The APPHOT/DAOPHOT databases containing the records from which the
+selection is to be made.
+.le
+.ls outfiles
+The output APPHOT/DAOPHOT databases containing the selected records.
+.le
+.ls expr
+The boolean expression to be evaluated.  The expression
+is evaluated once for each record.  If \fIexpr\fR = yes,
+a copy is made of the input file.
+.le
+
+.ih
+DESCRIPTION
+PSELECT selects a subset of the records
+from an APPHOT/DAOPHOT database or a list of databases 
+and writes the new records out to another database or list of
+databases.
+
+The output records are selected on the basis of an input boolean
+expression \fIexpr\fR whose variables are in the case of text
+databases the field names
+specified by the #N keywords or the parameters specified by the
+#K keywords and in the case of an STSDAS table database the
+column names.
+If after substituting the values associated
+with a particular record into the field name variables the
+expression evaluates
+to yes, that record is included in the output database.
+
+The supported
+operators and functions are briefly described below. A detailed description
+of the boolean expression evaluator and its syntax can be found
+in the manual page for the IMAGES package HEDIT task.
+
+The following logical operators can be used in the boolean expression. 
+
+.nf
+	equal		  ==	not equal		!=
+	less than	  <	less than or equal	<=
+	greater than	  >	greater than or equal	>=
+	or		  ||	and			&&
+	negation	  !	pattern match		?=
+	concatenation	  //
+.fi
+
+The pattern match character ?=  takes a
+string expression as its first argument and a pattern as its second argument.
+The result is yes if the pattern is contained in the string expression.
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters are listed below. 
+
+.nf
+	beginning of string	^	end of string		$
+	one character		?	zero or more characters	*
+	white space		#	escape character	\
+	ignore case		{	end ignore case		}
+	begin character class	[	end character class	]
+	not, in char class	^	range, in char class	-
+.fi
+
+The boolean expression may also include arithmetic operators and functions.
+The following arithmetic operators and functions are supported.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
+
+.ih
+EXAMPLES
+
+1. Select the records from the output of the APPHOT CENTER task for
+which 100. <= XCENTER <= 200. and 300. <= YCENTER <= 400.
+
+.nf
+    pt> pselect m92.ctr.3 m92out \
+	"XCE >= 100. && XCE <= 200. && YCE >= 300. && YCE <= 400."
+.fi
+
+2. Select the records from the output of the APPHOT PHOT task for which
+the first magnitude is not equal to INDEF. In the case of the
+an STSDAS table database it may be necessary to escape the
+leading square bracket.
+
+.nf
+    pt> pselect n4147.mag.3 n4147out "MAG[1] != INDEF"
+
+			or
+
+    pt> pselect n4147.mag.3 n4147out "MAG\[1] != INDEF"
+.fi
+
+3. Select the records from the output of the DAOPHOT ALLSTAR task
+for which CHI <= 5.0 and MERR <= .10 magnitudes.
+
+.nf
+    pt> pselect m92b.al.2 m92out "CHI <= 5.0 && MERR <= 1.0"
+.fi
+
+.ih
+BUGS
+Array valued fields in text databases are not allowed in the expression
+field.
+
+.ih
+SEE ALSO
+images.hedit,ptools.tbselect,tables.tselect,ptools.txselect
+.endhelp

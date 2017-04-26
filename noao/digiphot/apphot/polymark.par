@@ -1,0 +1,13 @@
+# POLYMARK
+
+image,f,a,,,,"The input image(s)"
+coords,f,h,"default",,,"The output coordinate file(s) (default: image.coo.?)"
+polygons,f,h,"default",,,"The output polygons file(s) (default: image.ver.?)"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the input image pixels ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
+mode,s,h,'ql'

@@ -1,0 +1,60 @@
+.help islaccum Apr85 "Surfit Package"
+.ih
+NAME
+islaccum -- accumulate a surface grid line into the fit
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+islaccum (sf, cols, lineno, z, w, npts, wtflag)
+
+.nf
+pointer	sf		# surface grid descriptor
+int	cols[npts]	# column values, 1 <= col[i] <= ncols
+int	lineno		# number of line, 1 <= lineno <= nlines 
+real	z[npts]		# surface values on lineno at cols
+real	w[npts]		# array of weights
+int	npts		# number of surface values, npts <= ncols
+int	wtflag		# type of weighting desired
+.fi
+.ih
+ARGUMENTS
+.ls sf      
+Pointer to the surface grid descriptor structure.
+.le
+.ls cols
+The column numbers of surface grid points on line lineno to be added to the
+dataset.
+.le
+.ls lineno
+The line number of the surface grid line to be added to the data set.
+.le
+.ls z      
+The data values.
+.le
+.ls w
+The array of weights for the data points.
+.le
+.ls npts
+The number of surface grid values on line number lineno to be added to the
+data set.
+.le
+.ls wtflag
+Type of weighting. The options are SF_USER and SF_UNIFORM. If wtflag
+equals SF_USER the weight for each data point is supplied by the user
+and points with zero-valued weights are not included in the fit.
+If wtflag equals SF_UNIFORM the routine sets the weights to 1.
+.le
+.ih
+DESCRIPTION
+ISLACCUM computes the contribution of each data point to the normal
+equations in x, sums that contribution into the appropriate arrays and
+vectors and stores these intermediate results for use by ISLSOLVE.
+.ih
+NOTES
+Checking for out of bounds col values and INDEF valued data points is
+the responsibility of the calling program.
+.ih
+SEE ALSO
+isinit, islfit, islrefit, islsolve, islzero, issolve, isfree
+.endhelp

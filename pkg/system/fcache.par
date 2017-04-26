@@ -1,0 +1,9 @@
+cmd,s,a,,,,cache command
+pattern,s,h,"*",,,filename pattern
+src,s,h,"",,,file or url to cache
+fname,s,h,"",,,cache filename
+extn,s,h,"",,,cache filename extension
+age,i,h,-1,,,file age (in days) to purge
+verbose,b,h,no,,,print verbose output?
+wait,b,h,yes,,,block on operation?
+cache,s,h,"cache$",,,cache directory

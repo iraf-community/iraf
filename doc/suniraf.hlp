@@ -1,0 +1,199 @@
+.help install Aug86 "SUN/IRAF Installation Notes"
+.sp 3
+.ce
+\fBSUN/IRAF Addition to UNIX/IRAF Installation Guide\fR
+.ce
+(draft)
+
+.ce
+Steve Rooke
+.ce
+August 19, 1986
+
+.nh
+Introduction
+
+     This document should be used in conjunction with the \fBUNIX/IRAF
+Installation Guide\fR (Doug Tody, March 13, 1986) to install IRAF
+on SUN-2 and SUN-3 systems.  Since the VAX/UNIX and SUN/UNIX systems are
+currently so similar, a separate guide does
+not seem warranted.  As of June 1986, there are sufficient hardware options
+and operating system versions available on SUNs that many SUN installations
+will have to recompile the entire system unless they have an identical
+machine to one of ours.  See Section 2.1 of the \fBInstallation Guide\fR.
+
+Our normal procedure in our own SUN installations is to unpack an archive of
+our master VAX/UNIX system, and then to edit certain files, perform a
+bootstrap, inspect the spooled output, and proceed to a full compile and
+link sysgen.  All files we modify in the IRAF directory system, plus any
+external file links, are logged
+into a file called \fBnotes\fR in $iraf/local/.
+These \fBnotes\fR files are archived in $iraf/doc/ports/ as
+"sun[23]_(date).doc".  The installer may wish to do the same (keep a
+\fBnotes\fR file of modifications to files in the IRAF directory system
+in $iraf/local/) for their own information.  One reason for doing this 
+might be to assist the installer in the next upgrade, as a reminder of
+which files needed to be modified in $iraf/dev/ and $iraf/unix/hlib/, for
+example.
+
+The SUN distribution tapes were archived from either a SUN/UNIX V2.x or V3.0
+system that already has all the modifications from the VAX/UNIX master
+system as documented in "$iraf/doc/ports/sun[23]_062486.doc".  Consequently,
+the installation consists of the usual steps described in the Guide, with
+minor differences relating to SUN f77 compiler bugs.
+
+In the rest of this addition, we will follow the \fBInstallation Guide\fR
+instructions beginning in its section 2.1.1, noting any special steps required
+for the SUN.
+
+.nh
+Installing the System
+
+     Since this is our first SUN release, it is quite possible that we will
+want to log on to your system at some point to investigate problems.
+Consequently, it helps if you retain the IRAF account after the installation,
+so that we can use it and have write permission in the IRAF directories.
+Note that the full system as of June 1986 requires about 48 Mb on a SUN
+rather than the 45 mentioned in the Guide.  If the whole system is built
+with software floating point, it will take about 50 Mb.
+
+Note that after unpacking the archive (section 2.1.2), there will be a file
+"$iraf/local/notes" from our most recent NOAO SUN/IRAF installation.  If
+you desire to keep a record of your installation, delete or rename this file
+so that you may create your own.  If, due to hardware or operating system
+version differences, you have to do anything special during the installation,
+we would then know exactly where to look later on.
+
+Follow the instructions in the Guide in sections 2.1.1 through 2.1.4.  There
+should be no differences for a SUN installation up to section 2.2 of the Guide.
+
+.nh 2
+Compiling and Linking
+
+     Note the first paragraph in section 2.2 of the Guide.  If it is
+necessary to bootstrap the system, go to the Guide's section 2.4.  Since there
+is almost no floating point in the bootstrap utilities, both the SUN-2 and
+SUN-3 distributions should bootstrap exactly as in the Guide.  Be sure
+to inspect the spool file before proceeding.
+
+Now that you have the bootstrap utilities, you are ready to relink and/or
+compile the full IRAF system.  Before doing so, it is necessary to inspect
+the file $iraf/unix/hlib/mkpkg.inc.  This is where you edit in the appropriate
+floating point switches for the SUN compiler and linker.  If you received
+a "you-relink" distribution and you have the identical hardware options as
+on the system from which we made the tape (just look at the XFLAGS and
+LFLAGS switches in mkpkg.inc), you should be able to relink directly.
+Otherwise, you will have to recompile the full system as well with the
+different floating-point switches.
+
+If you are able simply to relink, just follow the instructions in Guide
+section 2.2.  If you have to recompile, in addition to editing mkpkg.inc,
+you will need to pre-compile certain routines to defeat either optimizer
+bugs or complex datatype bugs.  The routines that need to be
+hand-compiled differ depending on whether you are operating SUN/UNIX V2.x or
+V3.0.  A shell script is provided for pre-compiling these routines.
+
+Read section 2.3 of the \fBInstallation Guide\fR.  If you need to strip
+the binary files do so now ("% rmbin ...").  Then follow the instructions
+below before completing the steps in Guide section 2.3.  
+
+.nh 3
+SUN/UNIX Fortran Compiler Bugs
+
+     There are two kinds of bugs in the SUN/UNIX V3.0 f77 compiler --
+optimization and complex datatype-compare expressions.  The latter problem
+has apparently existed in all versions of the f77 compiler since SUN/UNIX V2.0.
+SUN/UNIX V2.x systems have their own fortran optimizer bugs.
+To work around these bugs, we pre-compile the necessary routines with the
+appropriate compiler switches (which are not the ones used during a sysgen).
+The object modules so compiled will then be loaded automatically into their
+libraries during the sysgen.
+
+Before carrying out an IRAF sysgen, first execute the shell script
+$iraf/unix/hlib/SUN_kludge/precomp.csh.  Note that if you
+need to strip the binary files, that must be done first, otherwise the
+pre-compiled object files will be lost before the sysgen.  In the shell
+script, the "-f68881" floating point hardware switch is assumed, but replace
+it with the correct one for your own system if it is different.
+
+If you plan on compiling SPP programs outside of the IRAF CL, directly
+with the XC compiler rather than through MKPKG, you may wish to define
+an alias in your account .login file to pick up the correct floating-point
+hardware switch.  This can keep you from accidentally forgetting to use
+the same switch with which the rest of the IRAF routines were compiled.
+(You may subsequently re-execute precomp.csh safely, because it un-aliases
+xc).  If you use MKPKG, either from the CL or from UNIX, it
+will use by default the XFLAGS and LFLAGS switches in
+$iraf/unix/hlib/mkpkg.inc.
+
+.nf
+	alias xc '$hlib/xc.e -f68881'
+
+.fi
+
+You are now ready to perform the sysgen, i.e. continue on in section
+2.3 of the Guide with the "% mkpkg >& spool &" step.  
+
+.nh
+Interactive Graphics on the SUN
+
+     Our SunCGI vector graphics kernel is not yet ready for the SUN,
+due to problems integrating IRAF into the window system.  That leaves
+two ways to use IRAF graphics utilities until we distribute a graphics
+upgrade, hopefully later in the summer.  
+
+.nh 2
+Separate Graphics Terminal 
+
+     The most effective way to use IRAF graphics at present is not to
+use the SUN monitor at all, but rather to use one of the many supported
+graphics terminals attached to a SUN, either hardwired or through a
+local network.  In this case the relevant sections of the \fBInstallation
+Guide\fR apply directly.
+
+.nh 2
+Tektool Window
+
+     If it is not possible to attach a graphics terminal to your SUN, you
+will have to resort to a Tektool Window.  This Suntools Tektronix 4014
+terminal emulator will allow you to do limited graphics applications work,
+but it has several problems.  The most obvious is that nothing can be
+erased without redrawing the whole window -- which, however, is quite fast on a 
+SUN-3.  However, testing shows that it has some bugs -- data points are 
+sometimes
+drawn outside of the axis borders and occasional vectors go astray.
+We note that simply dumping a binary file with correct Tek 4014 instructions
+in it reproduces the same bugs, so we believe the problem is in the Tektool
+emulator.  We do not recommend using a Tektool
+Window at present, and if you must do so, be aware that there are known
+bugs.
+
+Tektool must be invoked with the command-line switch "-s gc" or else you
+will not be able to read the cursor.  Once in the CL, you must tell the
+IRAF graphics system you are using a Tek 4014 terminal.  The following
+steps will suffice:
+
+.nf
+	% suntools
+	% tektool -s gc
+	% cl
+	cl> set terminal = 4014
+	cl> set stdgraph = 4014
+
+.fi
+
+The "set" commands, of course, may be edited into your "login.cl" file
+if you expect to use the SUN monitor as your default terminal.
+
+.nh 
+Conclusion
+
+     Our SUN experience is only with SUN-2's running SUN/UNIX V2.0 with
+software floating point and SUN-3's running V3.0 with the MC68881 floating
+point board.  In each case we experienced minor problems with the Fortran
+optimizer or complex-compare operations, some of which were compile-time
+and some run-time problems.  If you compile with different floating-point
+switches you may encounter new bugs at compile-time (easy to detect) or
+run-time (harder).  Feel free to contact us for advice if you have any
+difficulties.  Contacts are listed in the IRAF Newsletter.
+.endhelp

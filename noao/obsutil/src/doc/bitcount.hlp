@@ -1,0 +1,80 @@
+.help bitcount Mar93 noao.obsutil
+.ih
+NAME
+bitcount - accumulate the bit statistics for a list of images
+.ih
+USAGE
+bitcount images
+.ih
+PARAMETERS
+.ls images
+A list of image names whose bit statistics will be counted.  The
+statistics can either be reported for each individual image (the
+default) or as a grand total over all the images.
+.le
+.ls grandtotal = no
+If \fIgrandtotal\fR = yes, accumulate a grand total over all the
+images.  If \fIgrandtotal\fR = no (the default), report the statistics
+individually for each image in turn.
+.le
+.ls leftzeroes = yes
+If \fIleftzeroes\fR = yes, leftmost zeroes are counted into the
+statistics (the default).  If \fIleftzeroes\fR = no, leftmost zeroes
+(those past the most significant digit for each individual pixel)
+are omitted from the statistics.
+.le
+.ls verbose = yes
+If \fIverbose\fR = no, only the raw bit counts will be reported.
+.le
+.ih
+DESCRIPTION
+\fIBitcount\fR will report the absolute and relative proportions
+of zeroes and ones populating each bit plane of a list of images.
+This is useful for diagnosing problems with a CCD's A/D converter,
+especially when an input image is supplied that contains a linear
+ramp in exposure across the range of the A/D.
+
+The statistics for the list of images can be accumulated either
+individually for each image, or as a grand total over all of the
+images depending on the value of the \fIgrandtotal\fR parameter.
+A single linear exposure ramp can be mimiced by a grand total
+over a list of progressively more exposed images.  Care should
+be taken to arrange that the exposures sample all parts of the
+A/D's range.
+
+The \fIleftzeroes\fR parameter is used to correct a problem seen
+with the ctio.bitstat task.  Bitstat under-reports zeroes for the
+more significant bits since only pixels with values greater than
+the bit being currently counted participate in that count.  The
+severity and precise nature of this problem depends on the exposure
+level of a particular test image.  \fILeftzeroes\fR may be set to
+"no" if there is some reason to restore this behavior.
+
+The \fIverbose\fR parameter may be set to "no" in order to pass
+the raw bit counts on to some other task.
+.ih
+EXAMPLES
+To report the bit statistics for a test exposure ramp:
+
+.nf
+    nl> bitcount testramp
+.fi
+
+To accumulate a grand total over a list of images:
+
+.nf
+    nl> bitcount a001*.imh grandtotal+
+.fi
+.ih
+BUGS
+A warning will be issued when accumulating a grand total over a list
+of images whose datatypes vary.  In this case, the totals for each bit
+will be correct - to the extent that some images may not populate some
+bits - but the datatype of the final image in the list will control the
+range of bitplanes included in the output report.  The interpretation
+of the most significant bit as a sign bit will also depend on the
+datatype of this final image.
+.ih
+SEE ALSO
+imstatistics, ctio.bitstat
+.endhelp

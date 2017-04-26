@@ -1,0 +1,63 @@
+.help mkms Jan03 noao.nproto
+.ih
+NAME
+mkms -- make multispec format from 1D arrays with associated bands
+.ih
+USAGE
+mkms output spectra raw background sigma
+.ih
+PARAMETERS
+.ls output
+Name of output multispec image.
+.le
+.ls spectra
+List of primary 1D spectra to be included in multispec image.
+.le
+.ls raw
+List of 1D raw or secondary spectra.  If none specify "" otherwise
+the list must match the list of primary spectra.
+.le
+.ls background
+List of 1D background spectra.  If none specify "" otherwise
+the list must match the list of primary spectra.
+.le
+.ls sigma
+List of 1D sigma spectra.  If none specify "" otherwise
+the list must match the list of primary spectra.
+.le
+.ih
+DESCRIPTION
+MKMS creates a multispec format from 1D spectra.  Unlike SCOPY it
+can include associated spectra.  There can be any number of primary 1D
+spectra and the associated spectra are optional.  However, when
+associated spectra are specified the list must match the primary spectra
+list and the arrays must have the same number of pixels and dispersion
+as the primary spectrum.  The different spectra may have different
+dispersions.
+
+This is a simple script using SCOPY and IMSTACK.  It has minimal error
+checking.  In particular, if the set of input is not consistent the
+task will abort with an error leaving temporary files behind.
+.ih
+EXAMPLES
+1. To create an image with one spectrum and each of the associated types:
+
+.nf
+    cl> mkms out.ms spec rawspec bkgspec sigspec
+.fi
+
+2. To create an image with three primary spectra and error arrays:
+
+.nf
+    cl> mkms out.ms spec1,spec2,spec3 "" "" err1,err2,err3
+.fi
+
+.ih
+REVISIONS
+.ls MKMS V2.12.2
+This prototype task added for this release.
+.le
+.ih
+SEE ALSO
+scopy, imstack
+.endhelp

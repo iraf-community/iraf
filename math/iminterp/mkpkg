@@ -1,0 +1,53 @@
+# Image interpolator tools library.
+
+$checkout libiminterp.a ../
+$update   libiminterp.a
+$checkin  libiminterp.a ../
+$exit
+
+libiminterp.a:
+	arbpix.x	<math.h> im1interpdef.h <math/iminterp.h>
+	arider.x	im1interpdef.h <math/iminterp.h>
+	arieval.x	im1interpdef.h <math/iminterp.h>
+	asider.x	im1interpdef.h <math/iminterp.h>
+	asieval.x	im1interpdef.h <math/iminterp.h>
+	asifit.x	im1interpdef.h <math/iminterp.h>
+	asifree.x	im1interpdef.h
+	asigeti.x	im1interpdef.h <math/iminterp.h>
+	asigetr.x	im1interpdef.h <math/iminterp.h>
+	asigrl.x	im1interpdef.h <math/iminterp.h>
+	asiinit.x	im1interpdef.h <math/iminterp.h>
+	asisinit.x	im1interpdef.h <math/iminterp.h>
+	asirestore.x	im1interpdef.h <math/iminterp.h>
+	asisave.x	im1interpdef.h <math/iminterp.h>
+	asitype.x	im1interpdef.h <math/iminterp.h>
+	asivector.x	im1interpdef.h <math/iminterp.h>
+	ii_1dinteg.x	im1interpdef.h <math/iminterp.h>
+	ii_bieval.x	<math.h>	
+	ii_cubspl.f
+	ii_eval.x	<math.h>	
+	ii_greval.x	<math.h> <math/iminterp.h>
+	ii_pc1deval.x	<math.h> im1interpdef.h
+	ii_pc2deval.x	<math.h>	
+	ii_polterp.x	im1interpdef.h
+	ii_sinctable.x	<math.h>
+	ii_spline.x	
+	ii_spline2d.x	
+	mrider.x	im2interpdef.h <math/iminterp.h>
+	mrieval.x	im2interpdef.h <math/iminterp.h>
+	msider.x	im2interpdef.h <math/iminterp.h>
+	msieval.x	im2interpdef.h <math/iminterp.h>
+	msifit.x	im2interpdef.h <math/iminterp.h>
+	msifree.x	im2interpdef.h
+	msigeti.x	im2interpdef.h <math/iminterp.h>
+	msigetr.x	im2interpdef.h <math/iminterp.h>
+	msigrid.x	im2interpdef.h <math/iminterp.h>
+	msigrl.x	im2interpdef.h <math/iminterp.h> <mach.h>
+	msiinit.x	im2interpdef.h <math/iminterp.h>
+	msisinit.x	im2interpdef.h <math/iminterp.h>
+	msirestore.x	im2interpdef.h <math/iminterp.h>
+	msisave.x	im2interpdef.h <math/iminterp.h>
+	msisqgrl.x	im2interpdef.h <math/iminterp.h> <mach.h>
+	msivector.x	im2interpdef.h <math/iminterp.h>
+	msitype.x	im2interpdef.h <math/iminterp.h>
+	;

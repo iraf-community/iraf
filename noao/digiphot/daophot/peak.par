@@ -1,0 +1,17 @@
+# Parameters for the PEAK task
+
+image,f,a,,,,"Image corresponding to photometry"
+photfile,f,a,default,,,"Input photometry file (default: image.mag.?)"
+psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
+peakfile,f,a,"default",,,"Output photometry file (default: image.pk.?)"
+rejfile,f,a,"default",,,"Output rejections file (default: image.rej.?)"
+datapars,pset,h,"",,,Data dependent parameters
+daopars,pset,h,"",,,Psf fitting parameters
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+wcspsf,s,h,)_.wcspsf,,,"The psf coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the input image pixels in memory?"
+verify,b,h,)_.verify,,,Verify critical peak parameters?
+update,b,h,)_.update,,,Update critical peak parameters?
+verbose,b,h,)_.verbose,,,Print peak messages?
+mode,s,h,'ql'

@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+#  CHECK_UPDATE -- Check to see if an update is available.  Return $status=1
+#  if a patch is available.
+#
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Called from Makefile, set iraf root.
+source $iraf/unix/hlib/irafuser.sh
+
+
+REPO=`${iraf}/util/pkgrepo`
+if [ -n $IRAFARCH ]; then
+    arch=$IRAFARCH
+else
+    arch=`${iraf}/unix/hlib/irafarch.sh -actual`
+fi
+
+
+# Check to see if a patch file is available.
+
+/bin/rm -f /tmp/_rdate /tmp/_pdate
+
+FGET="${iraf}/util/fget"
+${FGET} -q -o /tmp/_rdate http://iraf.noao.edu/ftp/v216/PCIX/.release_date
+${FGET} -q -o /tmp/_pdate http://iraf.noao.edu/ftp/v216/PCIX/.patch_release
+
+if [ -e /tmp/_rdate ]; then
+    rdate=`cat /tmp/_rdate`
+else
+    /bin/echo "cannot get rdate"
+    exit 0
+fi
+if [ -e /tmp/_pdate ]; then
+    pdate=`cat /tmp/_pdate`
+else
+    echo "cannot get pdate"
+    exit 0
+fi
+
+
+if [ -e ${iraf}/.patch_release ]; then
+    ipdate=`/bin/ls -l --time-style=+%s ${iraf}/.patch_release | awk '{ print ($6) }'`
+else
+    ipdate=0
+fi
+
+if [ "$1" == "-d" ]; then			# Debug
+  /bin/echo " rdate = " $rdate
+  /bin/echo " pdate = " $pdate
+  /bin/echo "ipdate = " $ipdate
+fi
+
+if (( $rdate>$pdate )); then			# New Release
+    exit 1
+fi
+
+
+if (( $pdate==0 )); then
+    exit 0				
+elif (( $pdate>$ipdate && $ipdate!=0 )); then	# Patch newer than installed
+    exit 1
+fi
+
+
+exit 0						# No update available

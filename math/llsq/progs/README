@@ -1,0 +1,5 @@
+
+This directory contains both Fortran and IRAF preprocessor programs
+demonstrating the use of the Lawson-Hanson llsq procedures.  The Fortran
+programs have not been modified to reflect the removal of Fortran i/o
+from the library procedures as installed in the IRAF llsq.a library.

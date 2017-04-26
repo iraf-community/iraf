@@ -1,0 +1,243 @@
+
+.help multispec Nov82 "Multispec Specifications"
+.ce
+Comments on Multispec Package Specifications
+.ce
+November 8, 1983
+
+
+
+    The basic package structure and the decomposition of the package into
+tasks looks good.  The requirements for both general operators and canned
+procedures are addressed well.  I got the impression that you have a pretty
+clear idea of what you want to do (which is the thing I am most looking for
+when I read a specs document), but I confess to having to reread the document
+several times to figure out what you have in mind.  Your writing style is
+very terse and leaves much up to the reader!
+
+Most of my comments have to do with details.  These are presented in the
+order in which they occurred while reading the document.  These comments
+apply only to the specs document.  I have started going over the algorithms
+paper, mostly when I could not understand a section of the specs document,
+but I have not finished it yet.
+
+.sh
+General Comments
+.ls 4
+.ls (1)
+When eventually we write the user documentation, the nomenclature
+should be carefully explained up front.  Users will tend to confuse
+image lines and spectral lines, but there is little we can do about
+that other than to make the distinction clear.  The term "band" is
+confusing because it normally refers to the third dimension of an
+image and that is not how it is used here.  A better term might be
+"swath".  In what follows I will continue to use the term band, but
+it is definitely not too late to change.
+.le
+.ls (2)
+It seems to me that the concept of a band or swath is a detail of how
+the algorithm works and should not have such a prominent place in the
+user interface to the package.  Several of the routines require that
+image coordinates be entered in units of band number and column.
+This introduces an unnecessary coupling between two input parameters
+and forces the user to convert from line number to band number.  The
+result will be that the user will be reluctant to change the number
+of lines per band (I'll bet that you have kept this a constant in
+using the prototype).  My inclination would be to have the user enter
+all coordinates in units of lines and columns, and have the program
+select the nearest band depending on the band width parameter.
+The band width could then be easily changed depending on the data,
+without need to respecify the region of the image to be processed.
+.le
+.ls (3)
+Routines all over the system will have an option for printing extra
+information, i.e., a verbose mode of execution.  I think we should
+standardize on the name of this parameter.  "Verbose" seems to me
+more descriptive than "print", and is consistent with UNIX terminology.
+.le
+.le
+
+.sh
+Pages 3,4
+.ls
+.ls (1)
+Functions for extracting spectra.  I assume "strips of constant
+width" means aperture sum out to a specified x-radius from the
+center of a spectra.  Can the radius be specified in fractional
+pixels, and if so, does the routine do fractional pixel interpolation.
+What happens if there are blank pixels in the aperture?
+
+If extraction is based on the model, I gather that you are still
+summing data pixel values, using a weight for each spectra based
+on the modeled contribution of each spectra to the data pixel.  In
+other words we are still taking an aperture sum, but with allowances
+for crowding.  This has the disadvantage that if we sum way out into
+the wings, we will be adding noise to the aperture sum, degrading signal
+to noise.
+
+Extraction based on integration of the model rather than
+the data should be available as another extraction procedure; this may
+yield better photometric results.  I would eventually like to compare
+the two approaches with artificial data.  Also by integrating the model
+there is no need to "clean" (I assume that deviant pixels are detected
+and rejected when the model is fitted, or the model will not be
+accurate).  Blank pixels should be recognized and ignored when fitting
+the model.
+.le
+
+.ls (2)
+I gather that all extracted spectra for an image are put into a single
+imagefile.  This is fine, even desirable, as long as it is ok if all
+spectra share the same header, and as long as all we want to output
+is intensity versus wavelength.  If it is desired to also output the
+signal to noise or whatever than another scheme may be needed.
+.le
+.ls (3)
+The text file output form ('c'pg.4) should be engineered with the idea
+that the user will take the data away in cardimage form.  From the
+description it sounds like there is one pixel (wavelength bin) per
+line in the text file.  This has its advantages, but is not what one
+wants for a cardimage file, which always writes 80 chars per line.
+Also, the detailed technical specs should give some details about
+such a format; it is a major part of the user interface and people
+will want to know what this format is going to look like.  In a way
+it is more important to specify formats like this than the calling
+sequences of the tasks, because it is harder to change after the
+package is released, and other program are written to read the
+text format spectra.
+.le
+.ls (4)
+To item 3.2 (2) (on uncertainty estimates) I would add "as a function
+of position along the spectrum".
+.le
+.le
+
+.sh
+4.1 Basic Programs
+.ls
+.ls (1)
+Evidently there is a datafile associated with each image.  What is
+the function of the datafile?  Is it transparent to the user?  How
+much is stored in the image header and how much in the datafile?
+.le
+.ls (2)
+The distinction between "line_list" and "model_list" is confusing.
+Does "line_list" print the sum of the models for all the spectra
+a each column?  Please specify the form of the output for this
+procedure in more detail.  The line_list and model_list procedures
+are natural candidates for use with the "lists" utilities for
+extracting columns, plotting one column against another, etc. I
+could not tell whether or not this would work well from the info
+given.
+.le
+.ls (3)
+"ap_plate":  "The identifications for the spectra ... is recorded."
+Is recorded where?  In the datafile?  Is this information essential
+to the operation of multispec, or is it merely passed on through
+multispec?
+.le
+.ls (4)
+"find_background":  Might be more aptly named "fit_background".
+I would expect "find" to mean find which regions of the image are
+background and which are spectra.  Find is spatial, fit is grayscale.
+
+We need to decide whether we want to specify polynomials in IRAF by
+the order (0,1,2, etc.) or by the number of coefficients or terms.
+It seems to me that people are most used to talking about second,
+third, fifth etc. order polynomials and that we might better specify
+polynomials with an "order" parameter rather than a "terms" param.
+
+Buffer radius or diameter?  I would assume radius, but it is not
+clear from the docs.  What is being "searched"?  Shouldn't that read
+"bands to be fitted".  The "colummns" parameter should permit a list
+of ranges of columns; I couldn't tell whether this was the case
+from the specs.  Cursor input may be desirable here.
+
+Blank pixels should be detected and ignored when fitting the
+background.  Are deviant pixels detected and rejected?  This is
+generally a desirable option in a bkg fit.  You may be able to
+decompose this routine (internally) into a find_background and
+a fit_background, making use of the Images background fitting
+routines, though these generate an image as output rather than the
+coeff of the fitted functions.  I wuld guess that you are storing
+the bkg coeff for each band in the datafile from the description,
+and that the fit is strictly one-dimensional.
+
+If only a limited number of bands are fitted, what do you do about
+the other bands if the bkg fit is one-dimensional?  Is the user
+req'd to use the same bands range when they do the extraction?
+.le
+
+.ls (5)
+"find_spectra".  It is not clear how this routine uses cursor input.
+Perhaps you should have a gcur type parameter.  Reading cursor
+coordinates from the standard input may be the way to go, but you
+should explain how this is going to work.
+.le
+.ls (6)
+"line_list".  One output line per image line?  One or more spectra
+per output line?  Output should be suitable for further processing
+with the LISTS package utilities (i.e., getcol, and the graphics
+utility which will plot or overplot lists).  The specs should
+specify the form of the output.
+.le
+.ls (7)
+I assume that the extraction procedures extract spectra which
+are put somewhere.  Where, in the datafile?  If the image is
+to be cleaned, it would be safer to write a new output image,
+or at least to rename the original.  It is strange to have these
+two quite different functions in the same module.
+.le
+.ls (8)
+"model_fit".  The range of modeling options is impressive, good
+stuff.  However, there must be something better than magic integer
+numbers for specifying the model to be fitted.  Perhaps the
+strings  "i, ip, ipw, ipw2, ipw3, ipw4", where 'i' is for intensity,
+'p' for position, and 'w' for width.
+
+How are the "initial parameters" specified?
+.le
+.ls (9)
+"model_list".  Again, I can only guess from the description what the
+output will look like.  It sounds like it might be best to have
+this routine print data for only one spectra at a time, particularly
+if the lists package is to be used for analysis.  It might be good
+to have the line number in the output somewhere, especially if the
+wavelength information is not available.
+.le
+.le
+
+.sh
+4.2 Scripts
+.ls
+.ls (1)
+It sounds like there is no easy alternative to an automatic search
+for the line centers.  This is best as long as it works, but the
+users will want easy way to use the cursor available as an option.
+A script such as this can easily use the line plot routine Images
+to make a plot and generate a list of line centers, without even
+requiring find_spectra to be able to access the cursor (and perhaps
+it should not if the script can do it).  The graphics cursor should
+be used here rather than the image cursor.
+.le
+.le
+
+.sh
+5. Example
+.ls
+.ls (1)
+The rcamera example is in error.  Rcamera, as implemented, has only
+three query mode params, while you show four in the example.
+I believe the ranges string should be quoted and should be the second
+argument.
+
+The last command should be "to_onedspec", not "onedspec".
+.le
+.ls (2)
+5.(5): It seems strange to make the user manually count 50 spectra
+by examining a plot.  If the program automatically finds centers,
+this should not be necessary; if the user interactively marks centers,
+it is not necessary.
+.le
+.le
+.endhelp

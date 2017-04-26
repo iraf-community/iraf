@@ -1,0 +1,5 @@
+# GENERIC package parameter file.
+
+keeplog,b,h,)imred.keeplog,,,Keep log of processing?
+logfile,f,h,)imred.logfile,,,Log file
+version,s,h,"May 1985"

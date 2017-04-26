@@ -1,0 +1,41 @@
+/* XPM */
+static char * crab[] = {
+/* crab pixmap
+ * width height ncolors chars_per_pixel */
+"28 28 6 2 ",
+".  c SkyBlue 	 m white 	 s s_SkyBlue ",
+"x  c orange 	 m black 	 s s_orange ",
+"*  c #ff72c2 	 m black 	 s s_#ff72c2 ",
+"+  c SteelBlue 	 m white 	 s s_SteelBlue ",
+"G  c black 	 m black 	 s s_black ",
+"a  c LightGrey 	 m white 	 s s_LightGrey ",
+/* pixels */
+". . . . . . * * * * . . . . . . . . . * * * * . . . . . ",
+". . . . + * x x * . . . . . . . . . . + * x x * . . . . ",
+". . . + * x x * . . . . . . . . . . . . + * x x * . . . ",
+". . + * x * . . . * . . . . . . . . . * . . + * x * . . ",
+". . + * x * . . + * . . . . . . . . + * . . + * x * . . ",
+". . + * x * . + * * . . . . . . . . + * * . + * x * . . ",
+". . + * x * + * * . . . . . . . . . . + * * + * x * . . ",
+". . + * x * * * . . . . . . . . . . . . + * * x x * . . ",
+". . . + * x * . . + * . . . . . . + * . . + * x * . . . ",
+". . . + * x . . + * . + * * . * * . + * . . + x * . . . ",
+". . . . + x . . + * . + * * . * * . + * . . + x . . . . ",
+". . . . + x . . . + * + * * * * * + * . . . + x . . . . ",
+". . . . + * x . . + * * * * * * * * * . . + x * . . . . ",
+". . . . . + * x * * * * x x x x x * * * * x * . . . . . ",
+". . . . + + + * * x x x x x x x x x x x x * . . . . . . ",
+". . + + * x x x x x x x x x x x x x x x x x x * x . . . ",
+". + * x x a + * * x x x x x x x x x x x * * a G * x * . ",
+"+ * x . . . + * * x x x x x x x x x x x * * G . . . x * ",
+". . . . . . + * * x x x x x x x x x x x * * . . . . . . ",
+". . . . . + * * x x x x x x x x x x x x x * * . . . . . ",
+". . . + * x x x * x x x x x x x x x x x * x x x * . . . ",
+". . + * x a a + * * x x x x x x x x x * * a a a x * . . ",
+". + * x G G G + * * x x x x x x x x x * * a G G G x * . ",
+". + * G . . . + * x * x x x x x x x * x * a G . . . * . ",
+". . . . . . + * x a * * * x x x * * * a x * G . . . . . ",
+". . . . . + * x a G a a * * * * * a a G a x * G . . . . ",
+". . . . . + x a G . G G a a a a a G G . G G x a G . . . ",
+". . . . . + x a G . . . G G G G G . . . . . x a G . . . "
+} ;

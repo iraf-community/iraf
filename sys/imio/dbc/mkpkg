@@ -1,0 +1,36 @@
+# Update the image header database interface.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	imakbc.x
+	imakbci.x
+	imakdc.x
+	imakdci.x
+	imakic.x
+	imakici.x
+	imaklc.x
+	imaklci.x
+	imakrc.x
+	imakrci.x
+	imaksc.x
+	imaksci.x
+	imastrc.x
+	imastrci.x
+	imgcom.x        idbc.h <ctype.h>
+	iminfi.x        idbc.h <fset.h> <imhdr.h> <imio.h>
+	impcom.x        idbc.h
+	impkbc.x
+	impkdc.x        <mach.h>
+	impkic.x
+	impklc.x
+	impkrc.x        <mach.h>
+	impksc.x
+	imdrmcom.x      idbc.h
+	impstrc.x       idbc.h
+	imputextf.x     idbc.h <ctype.h> <imhdr.h> <imio.h>
+	imputhi.x       idbc.h <fset.h> <imhdr.h> <imio.h>
+	;

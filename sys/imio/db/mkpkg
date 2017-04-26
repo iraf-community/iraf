@@ -1,0 +1,44 @@
+# Update the image header database interface.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	idbcard.x	idb.h <imhdr.h> <imio.h>
+	idbfind.x	idb.h <imhdr.h> <imio.h>
+	idbfstr.x	<ctype.h>
+	idbgstr.x	idb.h <ctype.h> <imhdr.h>
+	idbkwlu.x	<ctype.h> <imhdr.h>
+	idbpstr.x	idb.h <ctype.h> <imhdr.h> <mach.h>
+	imaccf.x	
+	imaddb.x	
+	imaddd.x	
+	imaddf.x	idb.h <fset.h> <imhdr.h> <imio.h>
+	imaddi.x	
+	imaddl.x	
+	imaddr.x	
+	imadds.x	
+	imastr.x	
+	imdelf.x	idb.h <imhdr.h>
+	imgetb.x	idb.h
+	imgetc.x	
+	imgetd.x	idb.h
+	imgeti.x	
+	imgetl.x	
+	imgetr.x	
+	imgets.x	
+	imgftype.x	idb.h <ctype.h>
+	imgnfn.x	idb.h <ctype.h> <imhdr.h> <imio.h>
+	imgstr.x	idb.h <ctype.h>
+	impstr.x	idb.h
+	imputb.x	
+	imputd.x	<mach.h>
+	imputh.x	idb.h <ctype.h> <imhdr.h> <imio.h>
+	imputi.x	
+	imputl.x	
+	imputr.x	<mach.h>
+	imputs.x	
+	imrenf.x	idb.h <imhdr.h>
+	;

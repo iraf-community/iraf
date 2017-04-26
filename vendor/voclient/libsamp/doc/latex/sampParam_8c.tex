@@ -1,0 +1,215 @@
+\hypertarget{sampParam_8c}{
+\section{sampParam.c File Reference}
+\label{sampParam_8c}\index{sampParam.c@{sampParam.c}}
+}
+(Internal) Interface to Param objects.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{sampDecl_8h_4c5a7aff173725461e76e5f0183d7ed8}{Param} \hyperlink{sampParam_8c_8750d9db641826f700973dae3fcdc920}{samp\_\-newParam} ()
+\begin{CompactList}\small\item\em Create a new Param object. \item\end{CompactList}\item 
+void \hyperlink{sampParam_8c_5a6fbf3ac37164268afae80c35666c5e}{samp\_\-freeParam} (\hyperlink{sampDecl_8h_4c5a7aff173725461e76e5f0183d7ed8}{Param} param)
+\begin{CompactList}\small\item\em Free the given Msg object. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_4c5a7aff173725461e76e5f0183d7ed8}{Param} \hyperlink{sampParam_8c_d8c5669be313874fef1c484643683f49}{samp\_\-paramInit} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg)
+\begin{CompactList}\small\item\em Get number of Params. \item\end{CompactList}\item 
+\hypertarget{sampParam_8c_62c2d0b887252730fd6f7bdaa7211403}{
+void \textbf{samp\_\-addStringParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, char $\ast$keyw, \hyperlink{sampDecl_8h_2efe6d463d80744789f228f5dc4baa39}{String} val)}
+\label{sampParam_8c_62c2d0b887252730fd6f7bdaa7211403}
+
+\item 
+void \hyperlink{sampParam_8c_e3e90c84dd6b1a08d8af18ca9e168b37}{samp\_\-addMapParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, char $\ast$keyw, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} val)
+\begin{CompactList}\small\item\em Add a parameter to the Param. \item\end{CompactList}\item 
+void \hyperlink{sampParam_8c_24f72c4ed033ed2f219b420e491b3c0f}{samp\_\-addListParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, char $\ast$keyw, \hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} val)
+\begin{CompactList}\small\item\em Add a parameter to the Param. \item\end{CompactList}\item 
+void \hyperlink{sampParam_8c_6897da75444209fc1819042bde906aa6}{samp\_\-addIntParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, char $\ast$keyw, int val)
+\begin{CompactList}\small\item\em Add a $<$SAMP int$>$=\char`\"{}\char`\"{}$>$ parameter to the Param. \item\end{CompactList}\item 
+void \hyperlink{sampParam_8c_d297770f4ab1338697d69b2705d6c1d9}{samp\_\-addFloatParam} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg, char $\ast$keyw, float val)
+\begin{CompactList}\small\item\em Add a $<$SAMP float$>$=\char`\"{}\char`\"{}$>$ parameter to the Param. \item\end{CompactList}\item 
+int \hyperlink{sampParam_8c_7680995e5d4f26ea3d91bf72c9c72e51}{samp\_\-paramLen} (\hyperlink{sampDecl_8h_eb3d03dd240212c044285bdd522e3b2b}{Msg} msg)
+\begin{CompactList}\small\item\em Get number of Params. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+(Internal) Interface to Param objects. 
+
+SAMPPARAM.C -- (Internal) Interface to Param objects.
+
+param = samp\_\-newParam () samp\_\-freeParam (Param param)
+
+param = samp\_\-paramInit (Msg msg); samp\_\-addStringParam (Msg msg, char $\ast$keyw, String val) samp\_\-addListParam (Msg msg, char $\ast$keyw, List val) samp\_\-addMapParam (Msg msg, char $\ast$keyw, Map val) N = samp\_\-paramLen (Msg msg)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/11 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampParam_8c_d297770f4ab1338697d69b2705d6c1d9}{
+\index{sampParam.c@{sampParam.c}!samp\_\-addFloatParam@{samp\_\-addFloatParam}}
+\index{samp\_\-addFloatParam@{samp\_\-addFloatParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-addFloatParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-addFloatParam ({\bf Msg} {\em msg}, \/  char $\ast$ {\em keyw}, \/  float {\em val})}}
+\label{sampParam_8c_d297770f4ab1338697d69b2705d6c1d9}
+
+
+Add a $<$SAMP float$>$=\char`\"{}\char`\"{}$>$ parameter to the Param. 
+
+SAMP\_\-ADDFLOATPARAM -- Add a $<$SAMP float$>$=\char`\"{}\char`\"{}$>$ parameter to the Param.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \item[{\em keyw}]map keyword \item[{\em val}]floating point value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References samp\_\-paramInit().
+
+Referenced by samp\_\-coordPointAtSky(), and samp\_\-sendGeneric().\hypertarget{sampParam_8c_6897da75444209fc1819042bde906aa6}{
+\index{sampParam.c@{sampParam.c}!samp\_\-addIntParam@{samp\_\-addIntParam}}
+\index{samp\_\-addIntParam@{samp\_\-addIntParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-addIntParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-addIntParam ({\bf Msg} {\em msg}, \/  char $\ast$ {\em keyw}, \/  int {\em val})}}
+\label{sampParam_8c_6897da75444209fc1819042bde906aa6}
+
+
+Add a $<$SAMP int$>$=\char`\"{}\char`\"{}$>$ parameter to the Param. 
+
+SAMP\_\-ADDINTPARAM -- Add a $<$SAMP int$>$=\char`\"{}\char`\"{}$>$ parameter to the Param.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \item[{\em keyw}]map keyword \item[{\em val}]integer value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References samp\_\-paramInit().
+
+Referenced by samp\_\-sendGeneric(), and samp\_\-tableHighlightRow().\hypertarget{sampParam_8c_24f72c4ed033ed2f219b420e491b3c0f}{
+\index{sampParam.c@{sampParam.c}!samp\_\-addListParam@{samp\_\-addListParam}}
+\index{samp\_\-addListParam@{samp\_\-addListParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-addListParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-addListParam ({\bf Msg} {\em msg}, \/  char $\ast$ {\em keyw}, \/  {\bf List} {\em val})}}
+\label{sampParam_8c_24f72c4ed033ed2f219b420e491b3c0f}
+
+
+Add a parameter to the Param. 
+
+SAMP\_\-ADDLISTPARAM -- Add a List parameter to the Param.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \item[{\em keyw}]map keyword \item[{\em val}]value list \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References samp\_\-paramInit().
+
+Referenced by samp\_\-tableSelectRowList().\hypertarget{sampParam_8c_e3e90c84dd6b1a08d8af18ca9e168b37}{
+\index{sampParam.c@{sampParam.c}!samp\_\-addMapParam@{samp\_\-addMapParam}}
+\index{samp\_\-addMapParam@{samp\_\-addMapParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-addMapParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-addMapParam ({\bf Msg} {\em msg}, \/  char $\ast$ {\em keyw}, \/  {\bf Map} {\em val})}}
+\label{sampParam_8c_e3e90c84dd6b1a08d8af18ca9e168b37}
+
+
+Add a parameter to the Param. 
+
+SAMP\_\-ADDMAPPARAM -- Add a Map parameter to the Param.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \item[{\em keyw}]map keyword \item[{\em val}]value map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References samp\_\-paramInit().
+
+Referenced by samp\_\-resourceLoad(), and samp\_\-specLoadSSAGeneric().\hypertarget{sampParam_8c_5a6fbf3ac37164268afae80c35666c5e}{
+\index{sampParam.c@{sampParam.c}!samp\_\-freeParam@{samp\_\-freeParam}}
+\index{samp\_\-freeParam@{samp\_\-freeParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-freeParam}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-freeParam ({\bf Param} {\em param})}}
+\label{sampParam_8c_5a6fbf3ac37164268afae80c35666c5e}
+
+
+Free the given Msg object. 
+
+SAMP\_\-FREEPARAM -- Free the given Param object
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em param}]Param object to free \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampParam_8c_8750d9db641826f700973dae3fcdc920}{
+\index{sampParam.c@{sampParam.c}!samp\_\-newParam@{samp\_\-newParam}}
+\index{samp\_\-newParam@{samp\_\-newParam}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-newParam}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Param} samp\_\-newParam (void)}}
+\label{sampParam_8c_8750d9db641826f700973dae3fcdc920}
+
+
+Create a new Param object. 
+
+SAMP\_\-NEWPARAM -- Create a new Param object
+
+\begin{Desc}
+\item[Returns:]handle to new Param \end{Desc}
+
+
+Referenced by samp\_\-bibLoad(), samp\_\-cmdExec(), samp\_\-coordPointAtSky(), samp\_\-envGet(), samp\_\-envSet(), samp\_\-imageLoadFITS(), samp\_\-paramGet(), samp\_\-paramSet(), samp\_\-Ping(), samp\_\-resourceLoad(), samp\_\-sendGeneric(), samp\_\-specLoadSSAGeneric(), samp\_\-tableHighlightRow(), samp\_\-tableLoadFITS(), samp\_\-tableLoadVOTable(), and samp\_\-tableSelectRowList().\hypertarget{sampParam_8c_d8c5669be313874fef1c484643683f49}{
+\index{sampParam.c@{sampParam.c}!samp\_\-paramInit@{samp\_\-paramInit}}
+\index{samp\_\-paramInit@{samp\_\-paramInit}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-paramInit}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Param} samp\_\-paramInit ({\bf Msg} {\em msg})}}
+\label{sampParam_8c_d8c5669be313874fef1c484643683f49}
+
+
+Get number of Params. 
+
+SAMP\_\-PARAMINIT -- Get number of Params.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-addFloatParam(), samp\_\-addIntParam(), samp\_\-addListParam(), and samp\_\-addMapParam().\hypertarget{sampParam_8c_7680995e5d4f26ea3d91bf72c9c72e51}{
+\index{sampParam.c@{sampParam.c}!samp\_\-paramLen@{samp\_\-paramLen}}
+\index{samp\_\-paramLen@{samp\_\-paramLen}!sampParam.c@{sampParam.c}}
+\subsubsection[{samp\_\-paramLen}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-paramLen ({\bf Msg} {\em msg})}}
+\label{sampParam_8c_7680995e5d4f26ea3d91bf72c9c72e51}
+
+
+Get number of Params. 
+
+SAMP\_\-PARAMLEN -- Get number of Params.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em msg}]handle to Msg object \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}

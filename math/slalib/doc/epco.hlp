@@ -1,0 +1,40 @@
+.help epco Jun99 "Slalib Package"
+.nf
+
+      DOUBLE PRECISION FUNCTION slEPCO (K0, K, E)
+
+     - - - - -
+      E P C O
+     - - - - -
+
+  Convert an epoch into the appropriate form - 'B' or 'J'
+
+  Given:
+     K0    char    form of result:  'B'=Besselian, 'J'=Julian
+     K     char    form of given epoch:  'B' or 'J'
+     E     dp      epoch
+
+  Called:  slEPB, slEJ2D, slEPJ, slEB2D
+
+  Notes:
+
+     1) The result is always either equal to or very close to
+        the given epoch E.  The routine is required only in
+        applications where punctilious treatment of heterogeneous
+        mixtures of star positions is necessary.
+
+     2) K0 and K are not validated.  They are interpreted as follows:
+
+        o  If K0 and K are the same the result is E.
+        o  If K0 is 'B' or 'b' and K isn't, the conversion is J to B.
+        o  In all other cases, the conversion is B to J.
+
+        Note that K0 and K won't match if their cases differ.
+
+  P.T.Wallace   Starlink   5 September 1993
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,15 @@
+# The Cyber rcopy format reader RRCOPY makes the following contributions
+# to the dataio package library:
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	rcrbits.x	../pow.inc <error.h> <imhdr.h> <mach.h> rrcopy.h
+	rcrheader.x	<error.h> <imhdr.h> <mach.h> rrcopy.h
+	rcrimage.x	rrcopy.h <error.h> <imhdr.h> <mach.h>
+	rrcopy.x	<mach.h> rrcopy.h
+	t_rrcopy.x	rrcopy.h <error.h> <imhdr.h> <mach.h>
+	;

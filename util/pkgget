@@ -1,0 +1,177 @@
+#!/bin/bash
+#
+#  PKGGET -- Download the specified URL to the current directory.  We use 
+#  a command specific to the system we're on.  We assume the URL has been 
+#  properly escaped in the argument list.
+#
+#  Usage:     pkgget [-h] [-n] [-v] url
+#
+#  Where	-n	no-op flag
+#		-v 	verbose output
+#		-h 	this message
+#
+#  Example:
+#	% pkgget -q ftp://iraf.noao.edu/iraf/extern/foo-linux.tar.gz
+#
+# ----------------------------------------------------------------------------
+
+
+export 	PATH=../util:$PATH
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source ../unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+
+# Utility aliases.
+source ${iraf}/unix/hlib/util.sh
+
+
+
+##############################################################################
+# START OF MACHDEP DEFINITIONS.
+##############################################################################
+
+# MACHDEP definitions which may be reset below.
+VERSION=`cat ../.version`
+
+
+#----------------------------------
+# Determine platform architecture.
+#----------------------------------
+
+UNAME=""
+if [ -e /usr/bin/uname ]; then
+    uname_cmd=/usr/bin/uname
+    UNAME=`/usr/bin/uname | tr '[A-Z]' '[a-z]'`
+elif [ -e /bin/uname ]; then
+    uname_cmd=/bin/uname
+    UNAME=`/bin/uname | tr '[A-Z]' '[a-z]'`
+else
+    WARNING  "No 'uname' command found to determine architecture."
+    exit 1
+fi
+
+case $UNAME in 
+    "linux" | "linux64")
+	dlcmd="/usr/bin/wget"
+	;;
+    "darwin" | "macosx" | "macintel" | "ipad")		    # Mac OSX/iOS
+        #dlcmd="/usr/bin/ftp -A"
+        dlcmd="/usr/bin/ftp"
+	;;
+
+    # Other architectures to be added here
+
+    *)      
+	ERRMSG  "Unable to determine platform architecture."
+	exit 1
+	;;
+esac
+
+# If we don't have a download command installed, use our own .....
+if [ ! -e $dlcmd ]; then
+    dlcmd=`dirname $0`/fget
+fi
+
+##############################################################################
+# END OF MACHDEP DEFINITIONS.
+##############################################################################
+
+#=============================================================================
+# Declarations and initializations.
+#=============================================================================
+
+exec=yes
+verb=no
+url=""
+
+
+# Process cmdline flags.
+while [ -n "$1" ]; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+	;;
+    "-v")                            # be chatty
+        verb=yes
+        quiet=no
+	;;
+    "-h")                            # print help summary
+    	/bin/echo "Usage: pkgget [-h] [-n] [-q | -v] url"
+    	/bin/echo ""
+    	/bin/echo "    where -n          # no execute"
+    	/bin/echo "          -q          # suppress output"
+    	/bin/echo "          -v          # verbose output"
+    	/bin/echo "          -h          # this message"
+	exit 0
+	;;
+
+    *)
+        url=$1
+        break
+    esac
+
+    if [ -n "$2" ];  then
+        shift
+    else
+        break
+    fi
+done
+
+
+#  Error checks.
+if [ -z "$url" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "ERROR: URL not specified"
+   fi
+   exit 1
+fi
+
+
+#  Do it.
+if [ "$exec" == "yes" ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Downloading "$url" ...."
+   fi
+
+   if [ "$verb" == "no" ]; then
+      $dlcmd ${url} 	>> /dev/null 2>&1
+   else
+      $dlcmd $url
+   fi
+
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "done"
+   fi
+fi
+
+
+#  Verify we have the file.
+if [ ! -e ${url##*/} ]; then
+   if [ "$verb" == "yes" ]; then
+      /bin/echo "Error downloading file '"${url##*/}"'"
+   fi
+   exit 1
+
+else
+   if (( $#>1 )); then
+      mv ${url##*/} $2
+   fi
+fi
+
+#  Normal exit.
+exit 0
+
+
+
+#=============================================================================
+# Usage
+#=============================================================================

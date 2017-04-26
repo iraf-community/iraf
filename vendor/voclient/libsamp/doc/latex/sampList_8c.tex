@@ -1,0 +1,301 @@
+\hypertarget{sampList_8c}{
+\section{sampList.c File Reference}
+\label{sampList_8c}\index{sampList.c@{sampList.c}}
+}
+(Internal) interface to support the List structure.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{sampList_8c_b5375a6478dccefe7df2b48416604b29}{samp\_\-newList} ()
+\begin{CompactList}\small\item\em Create a new List object. \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_b162ae9b9f98da80f6bb5c34b5cbcbf6}{samp\_\-freeList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list)
+\begin{CompactList}\small\item\em Free the given List object. \item\end{CompactList}\item 
+int \hyperlink{sampList_8c_c260afb0cbf19b427e3eba96a2341e52}{samp\_\-listLen} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list)
+\begin{CompactList}\small\item\em Get number of elements in a List. \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_5b69180b036e58528c98b1cf5a42825a}{samp\_\-setStringInList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, char $\ast$value)
+\begin{CompactList}\small\item\em Set a string in a List (append). \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_ea188bb711f3b5549d11204b0ff2da08}{samp\_\-setMapInList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)
+\begin{CompactList}\small\item\em Set a Map in a List (append). \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_0ff97d44e62b7c88a046a29324552400}{samp\_\-setListInList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list1, \hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list2)
+\begin{CompactList}\small\item\em Set a List in another List (append). \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_a803bead8b452de6e1d08b8b3b9e8828}{samp\_\-setIntInList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int ival)
+\begin{CompactList}\small\item\em Set an Int in a List (append). \item\end{CompactList}\item 
+void \hyperlink{sampList_8c_18d586491620a63b3a4d6c3667ee2aa5}{samp\_\-setFloatInList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, float rval)
+\begin{CompactList}\small\item\em Set a Float in a List (append). \item\end{CompactList}\item 
+char $\ast$ \hyperlink{sampList_8c_2d1cd41c4583ac300aaa2d50ad3f76ed}{samp\_\-getStringFromList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int index)
+\begin{CompactList}\small\item\em Get a string from the List. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} \hyperlink{sampList_8c_33ca96ee3a8e7d26356c7b66f469da74}{samp\_\-getMapFromList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int index)
+\begin{CompactList}\small\item\em Get a Map from the List. \item\end{CompactList}\item 
+\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} \hyperlink{sampList_8c_1ec1ddadb4e889792b6fa7df6f6c3125}{samp\_\-getListFromList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int index)
+\begin{CompactList}\small\item\em Get a List from the List. \item\end{CompactList}\item 
+\hypertarget{sampList_8c_1174e001b2d16ed0aa1b317cfc883af1}{
+int \textbf{samp\_\-getIntFromList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int index)}
+\label{sampList_8c_1174e001b2d16ed0aa1b317cfc883af1}
+
+\item 
+float \hyperlink{sampList_8c_4e8339b2b3f5ff1a58cebb74eddca9e6}{samp\_\-getFloatFromList} (\hyperlink{sampDecl_8h_39f9d235896a8fd920f319105eb82791}{List} list, int index)
+\begin{CompactList}\small\item\em Get a Float from the List. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+(Internal) interface to support the List structure. 
+
+SAMPLIST.C -- (Internal) interface to support the List structure.
+
+list = samp\_\-newList () samp\_\-freeList (List list) len = samp\_\-listLen (List list)
+
+samp\_\-setStringInList (List list, char $\ast$value) samp\_\-setMapInList (List list, Map map) samp\_\-setListInList (List list1, List list2) samp\_\-setIntInList (List list, int val) samp\_\-setFloatInList (List list, float val)
+
+str = samp\_\-getStringFromList (List list, int index) map = samp\_\-getMapFromList (List list, int index) list = samp\_\-getListFromList (List list, int index) ival = samp\_\-getIntFromList (List list, int index) rval = samp\_\-getFloatFromList (List list, int index)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]7/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampList_8c_b162ae9b9f98da80f6bb5c34b5cbcbf6}{
+\index{sampList.c@{sampList.c}!samp\_\-freeList@{samp\_\-freeList}}
+\index{samp\_\-freeList@{samp\_\-freeList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-freeList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-freeList ({\bf List} {\em list})}}
+\label{sampList_8c_b162ae9b9f98da80f6bb5c34b5cbcbf6}
+
+
+Free the given List object. 
+
+SAMP\_\-FREELIST -- Free the given List object
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-mapClients(), and samp\_\-tableSelectRowList().\hypertarget{sampList_8c_4e8339b2b3f5ff1a58cebb74eddca9e6}{
+\index{sampList.c@{sampList.c}!samp\_\-getFloatFromList@{samp\_\-getFloatFromList}}
+\index{samp\_\-getFloatFromList@{samp\_\-getFloatFromList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-getFloatFromList}]{\setlength{\rightskip}{0pt plus 5cm}float samp\_\-getFloatFromList ({\bf List} {\em list}, \/  int {\em index})}}
+\label{sampList_8c_4e8339b2b3f5ff1a58cebb74eddca9e6}
+
+
+Get a Float from the List. 
+
+SAMP\_\-GETFLOATFROMLIST -- Get a Float from the List
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em index}]List index containing the desired value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]int value \end{Desc}
+\hypertarget{sampList_8c_1ec1ddadb4e889792b6fa7df6f6c3125}{
+\index{sampList.c@{sampList.c}!samp\_\-getListFromList@{samp\_\-getListFromList}}
+\index{samp\_\-getListFromList@{samp\_\-getListFromList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-getListFromList}]{\setlength{\rightskip}{0pt plus 5cm}{\bf List} samp\_\-getListFromList ({\bf List} {\em list}, \/  int {\em index})}}
+\label{sampList_8c_1ec1ddadb4e889792b6fa7df6f6c3125}
+
+
+Get a List from the List. 
+
+Get an Int from the List.
+
+SAMP\_\-GETLISTFROMLIST -- Get a List from the List
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em index}]List index containing the List \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]List handle\end{Desc}
+SAMP\_\-GETINTFROMLIST -- Get an Int from the List
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em index}]List index containing the desired value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]int value \end{Desc}
+\hypertarget{sampList_8c_33ca96ee3a8e7d26356c7b66f469da74}{
+\index{sampList.c@{sampList.c}!samp\_\-getMapFromList@{samp\_\-getMapFromList}}
+\index{samp\_\-getMapFromList@{samp\_\-getMapFromList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-getMapFromList}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Map} samp\_\-getMapFromList ({\bf List} {\em list}, \/  int {\em index})}}
+\label{sampList_8c_33ca96ee3a8e7d26356c7b66f469da74}
+
+
+Get a Map from the List. 
+
+SAMP\_\-GETMAPFROMLIST -- Get a Map from the List
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em index}]List index containing the Map \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Map handle \end{Desc}
+\hypertarget{sampList_8c_2d1cd41c4583ac300aaa2d50ad3f76ed}{
+\index{sampList.c@{sampList.c}!samp\_\-getStringFromList@{samp\_\-getStringFromList}}
+\index{samp\_\-getStringFromList@{samp\_\-getStringFromList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-getStringFromList}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ samp\_\-getStringFromList ({\bf List} {\em list}, \/  int {\em index})}}
+\label{sampList_8c_2d1cd41c4583ac300aaa2d50ad3f76ed}
+
+
+Get a string from the List. 
+
+SAMP\_\-GETSTRINGFROMLIST -- Get a string from the List
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em index}]List index containing the string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]character string \end{Desc}
+
+
+Referenced by samp\_\-mapClients().\hypertarget{sampList_8c_c260afb0cbf19b427e3eba96a2341e52}{
+\index{sampList.c@{sampList.c}!samp\_\-listLen@{samp\_\-listLen}}
+\index{samp\_\-listLen@{samp\_\-listLen}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-listLen}]{\setlength{\rightskip}{0pt plus 5cm}int samp\_\-listLen ({\bf List} {\em list})}}
+\label{sampList_8c_c260afb0cbf19b427e3eba96a2341e52}
+
+
+Get number of elements in a List. 
+
+SAMP\_\-LISTLEN -- Get number of elements in a List.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-execUserHandler(), samp\_\-GetRegisteredClients(), samp\_\-GetSubscribedClients(), samp\_\-mapClients(), and samp\_\-tbSelectHandler().\hypertarget{sampList_8c_b5375a6478dccefe7df2b48416604b29}{
+\index{sampList.c@{sampList.c}!samp\_\-newList@{samp\_\-newList}}
+\index{samp\_\-newList@{samp\_\-newList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-newList}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t samp\_\-newList (void)}}
+\label{sampList_8c_b5375a6478dccefe7df2b48416604b29}
+
+
+Create a new List object. 
+
+SAMP\_\-NEWLIST -- Create a new List object
+
+\begin{Desc}
+\item[Returns:]handle to List object \end{Desc}
+
+
+Referenced by samp\_\-GetRegisteredClients(), samp\_\-GetSubscribedClients(), samp\_\-tableSelectRowList(), and sampInit().\hypertarget{sampList_8c_18d586491620a63b3a4d6c3667ee2aa5}{
+\index{sampList.c@{sampList.c}!samp\_\-setFloatInList@{samp\_\-setFloatInList}}
+\index{samp\_\-setFloatInList@{samp\_\-setFloatInList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-setFloatInList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setFloatInList ({\bf List} {\em list}, \/  float {\em rval})}}
+\label{sampList_8c_18d586491620a63b3a4d6c3667ee2aa5}
+
+
+Set a Float in a List (append). 
+
+SAMP\_\-SETFLOATINLIST -- Set a Float in a List (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list1}]List object handle \item[{\em rval}]Float value to be appended \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampList_8c_a803bead8b452de6e1d08b8b3b9e8828}{
+\index{sampList.c@{sampList.c}!samp\_\-setIntInList@{samp\_\-setIntInList}}
+\index{samp\_\-setIntInList@{samp\_\-setIntInList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-setIntInList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setIntInList ({\bf List} {\em list}, \/  int {\em ival})}}
+\label{sampList_8c_a803bead8b452de6e1d08b8b3b9e8828}
+
+
+Set an Int in a List (append). 
+
+SAMP\_\-SETINTINLIST -- Set an Int in a List (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list1}]List object handle \item[{\em ival}]Integer value to be appended \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-tableSelectRowList().\hypertarget{sampList_8c_0ff97d44e62b7c88a046a29324552400}{
+\index{sampList.c@{sampList.c}!samp\_\-setListInList@{samp\_\-setListInList}}
+\index{samp\_\-setListInList@{samp\_\-setListInList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-setListInList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setListInList ({\bf List} {\em list1}, \/  {\bf List} {\em list2})}}
+\label{sampList_8c_0ff97d44e62b7c88a046a29324552400}
+
+
+Set a List in another List (append). 
+
+SAMP\_\-SETLISTINLIST -- Set a List in another List (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list1}]List object handle \item[{\em list2}]List to be appended \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampList_8c_ea188bb711f3b5549d11204b0ff2da08}{
+\index{sampList.c@{sampList.c}!samp\_\-setMapInList@{samp\_\-setMapInList}}
+\index{samp\_\-setMapInList@{samp\_\-setMapInList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-setMapInList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setMapInList ({\bf List} {\em list}, \/  {\bf Map} {\em map})}}
+\label{sampList_8c_ea188bb711f3b5549d11204b0ff2da08}
+
+
+Set a Map in a List (append). 
+
+SAMP\_\-SETMAPINLIST -- Set a Map in a List (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em map}]Map object to be set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{sampList_8c_5b69180b036e58528c98b1cf5a42825a}{
+\index{sampList.c@{sampList.c}!samp\_\-setStringInList@{samp\_\-setStringInList}}
+\index{samp\_\-setStringInList@{samp\_\-setStringInList}!sampList.c@{sampList.c}}
+\subsubsection[{samp\_\-setStringInList}]{\setlength{\rightskip}{0pt plus 5cm}void samp\_\-setStringInList ({\bf List} {\em list}, \/  char $\ast$ {\em value})}}
+\label{sampList_8c_5b69180b036e58528c98b1cf5a42825a}
+
+
+Set a string in a List (append). 
+
+SAMP\_\-SETSTRINGINLIST -- Set a string in a List (append)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em list}]List object handle \item[{\em value}]string value to set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+Referenced by samp\_\-GetRegisteredClients(), and samp\_\-GetSubscribedClients().

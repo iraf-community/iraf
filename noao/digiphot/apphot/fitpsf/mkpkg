@@ -1,0 +1,44 @@
+# FITPSF Task Routines
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbfitpsf.x	<fset.h>		../lib/apphot.h         \
+			../lib/display.h
+	apfbuf.x	<imhdr.h>		../lib/apphotdef.h	\
+			../lib/fitpsfdef.h	 ../lib/fitpsf.h
+	apfitpsf.x	<ctype.h>		<gset.h>		\
+			../lib/apphot.h		../lib/display.h	\
+			../lib/fitpsf.h		<imhdr.h>
+	apppfpars.x	../lib/display.h        ../lib/fitpsf.h
+	apgpfpars.x	../lib/display.h	../lib/fitpsf.h         \
+			../lib/noise.h
+	appfconfirm.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/fitpsf.h
+	appferrors.x	../lib/fitpsf.h
+	apppsf.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
+			../lib/fitpsf.h		../lib/apphot.h
+	appsfshow.x	../lib/display.h	../lib/fitpsf.h
+	appfradsetup.x
+	apsfcolon.x	../lib/display.h	../lib/fitpsf.h         \
+			../lib/apphot.h	        ../lib/noise.h
+	apsfelgauss.x	<math.h>		../lib/fitpsf.h         \
+			<math/nlfit.h>		../lib/noise.h
+	apsffree.x	../lib/apphotdef.h	../lib/fitpsfdef.h
+	apsfinit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
+			../lib/fitpsf.h
+	apsffit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
+			../lib/noisedef.h	../lib/fitpsf.h         \
+			../lib/apphot.h          <mach.h>
+	apsfmoments.x	<math.h>		../lib/fitpsf.h
+	apsfradgauss.x  ../lib/fitpsf.h		<math/nlfit.h>   	\
+			../lib/noise.h
+	apsfrefit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
+			../lib/fitpsf.h		../lib/noisedef.h       \
+			../lib/apphot.h         <mach.h>
+	t_fitpsf.x	<fset.h>		<gset.h>		\
+			../lib/apphot.h		<imhdr.h>
+	;

@@ -1,0 +1,4 @@
+table,f,a,,,,Input table
+columns,s,h," ",,,List of columns to edit
+silent,b,h,no,,,Don't ring bell?
+mode,s,h,al

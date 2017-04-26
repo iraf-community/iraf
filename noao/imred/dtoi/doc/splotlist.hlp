@@ -1,0 +1,81 @@
+.help spotlist May88 imred.dtoi
+.ih
+NAME
+spotlist -- calculate densities of calibration spots 
+.ih
+USAGE
+spotlist spots fogs database
+.ih
+PARAMETERS
+.ls spots
+List of image files containing the calibration data.
+.le
+.ls fogs
+List of image files containing fog spots.
+.le
+.ls database
+Name for output database.
+.le
+.ls scale = 0.00151			# (4.65 / 3071.)
+The scale factor to convert values in the image files to densities, such
+that scale = density / input_value.
+.le
+.ls maxad = 3071
+The maximum A/D value, that is, the input value corresponding to a
+saturated pixel.
+.le
+.ls option= "mean"
+Option for calculating densities can be either "mean" or "median".
+.le
+.ls sigma = 3.0
+Rejection criteria for iteratively calculating mean density.
+.le
+.ih
+DESCRIPTION
+Task \fIspotlist\fR reads calibration spot images and calculates their
+density and standard deviation.  Three records are entered in the
+database: density, standard deviation and number of unrejected pixels.
+Each record contains as many entries as calibration spots.
+
+All input values are multiplied by the \fBscale\fR parameter to convert
+them to densities.  The value of \fBscale\fR is not critical to the 
+reductions, it is provided so that \fIspotlist\fR output can be in the 
+familiar units of density.  The default value of \fBscale\fR is correct
+for NOAO PDS data written to a PDS format tape.  If a FITS format tape was 
+written, \fBscale\fR = 0.0001893.  These values are appropriate for the PDS 
+with its new 15-bit logarithmic A to D converter.  The value of \fBscale\fR
+used is also entered in the database.
+
+Parameter \fBmaxad\fR is the integer input value that represents a
+saturated pixel.  This value is used by \fIspotlist\fR to accurately
+calculate the density of a saturated pixel, which is then entered in the
+database.  This value of "maxden" will later be used by task \fIhdfit\fR
+to normalize the independent variable vector, and by task \fIhdtoi\fR to
+scale the intensity range precisely to a user specified value.
+
+A fog level is calculated from image \fBfogs\fR, and entered into
+the database file.  If more than one image is given for \fBfogs\fR, 
+a single fog value is calculated from all fog pixels.  The fog level
+is calculated but not subtracted in this procedure.  The fog images to be 
+averaged should be the same size.  An entry for the fog level is made
+in the database.
+
+The \fBspots\fR files are assumed to be ordered such that they are either
+monotonically increasing or decreasing in density, with no omitted spots
+between the first and last measured.  The calculated density can be
+calculated two ways; the algorithm used is selected by the \fBoption\fR
+parameter.  The density is either the mean spot value after pixels more
+than the specified number of sigma from the mean value have been rejected,
+or the median value of all the spot pixels.  
+.ih
+EXAMPLES
+Calculate mean densities of calibration spots which had previously been
+read in from a FITS format tape.  The database "db1" will be created.
+
+.nf
+	cl> spotlist spots* fogspot db1 scale=1.893e-4
+.fi
+.ih
+SEE ALSO
+dematch, hdfit, hdtoi
+.endhelp

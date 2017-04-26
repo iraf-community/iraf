@@ -1,0 +1,11 @@
+# Update the ttranspose application code in the ttools package library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	ttranspose.x		<error.h> <tbset.h> 
+	ttrflip.x
+	;

@@ -1,0 +1,122 @@
+# INLFIT mkpkg file
+
+$checkout	libxtools.a lib$
+$update		libxtools.a
+$checkin	libxtools.a lib$
+$exit
+
+generic:
+	$set	GEN = "$$generic -k -t rd"
+	$ifnewer (inget.gx, inget.x)
+	    $generic -k -o inget.x inget.gx
+	$endif
+	$ifnewer (input.gx, input.x)
+	    $generic -k -o input.x input.gx
+	$endif
+
+	$ifnewer (indump.gx,      indumpr.x)	$(GEN) indump.gx $endif
+
+	$ifnewer (incopy.gx,      incopyr.x)	$(GEN) incopy.gx $endif
+	$ifnewer (infree.gx,      infreer.x)	$(GEN) infree.gx $endif
+	$ifnewer (ininit.gx,      ininitr.x)	$(GEN) ininit.gx $endif
+	$ifnewer (innlinit.gx,    innlinitr.x)	$(GEN) innlinit.gx $endif
+
+	$ifnewer (indeviant.gx,   indeviantr.x)	$(GEN) indeviant.gx $endif
+	$ifnewer (inerrors.gx,    inerrorsr.x)	$(GEN) inerrors.gx $endif
+	$ifnewer (infit.gx,       infitr.x)	$(GEN) infit.gx $endif
+	$ifnewer (inlimit.gx,     inlimitr.x)	$(GEN) inlimit.gx $endif
+	$ifnewer (inrefit.gx,     inrefitr.x)	$(GEN) inrefit.gx $endif
+	$ifnewer (inreject.gx,    inrejectr.x)	$(GEN) inreject.gx $endif
+	$ifnewer (inrms.gx,       inrmsr.x)	$(GEN) inrms.gx $endif
+
+	$ifnewer (ingaxes.gx,     ingaxesr.x)	$(GEN) ingaxes.gx $endif
+	$ifnewer (ingcolon.gx,    ingcolonr.x)	$(GEN) ingcolon.gx $endif
+	$ifnewer (ingdata.gx,     ingdatar.x)	$(GEN) ingdata.gx $endif
+	$ifnewer (ingdelete.gx,   ingdeleter.x)	$(GEN) ingdelete.gx $endif
+	$ifnewer (ingerrors.gx,   ingerrorsr.x)	$(GEN) ingerrors.gx $endif
+	$ifnewer (ingfit.gx,      ingfitr.x)	$(GEN) ingfit.gx $endif
+	$ifnewer (inggraph.gx,    inggraphr.x)	$(GEN) inggraph.gx $endif
+	$ifnewer (ingnearest.gx,  ingnearestr.x) $(GEN) ingnearest.gx $endif
+	$ifnewer (ingparams.gx,   ingparamsr.x)	$(GEN) ingparams.gx $endif
+	$ifnewer (ingresults.gx,  ingresultsr.x) $(GEN) ingresults.gx $endif
+	$ifnewer (ingshow.gx,     ingshowr.x)	$(GEN) ingshow.gx $endif
+	$ifnewer (inguaxes.gx,    inguaxesr.x)	$(GEN) inguaxes.gx $endif
+	$ifnewer (ingucolon.gx,   ingucolonr.x)	$(GEN) ingucolon.gx $endif
+	$ifnewer (ingundelete.gx, ingundeleter.x) $(GEN) ingundelete.gx $endif
+	$ifnewer (ingvars.gx,     ingvarsr.x) $(GEN) ingvars.gx $endif
+	$ifnewer (ingvshow.gx,    ingvshowr.x)	$(GEN) ingvshow.gx $endif
+	;
+
+libxtools.a:
+
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	incopyd.x	<pkg/inlfit.h>   "inlfitdef.h"
+	incopyr.x	<pkg/inlfit.h>   "inlfitdef.h"
+	indeviantd.x	<mach.h>
+	indeviantr.x	<mach.h>
+	indumpd.x	<pkg/inlfit.h>    "inlfitdef.h"
+	indumpr.x	<pkg/inlfit.h>	  "inlfitdef.h"
+	inerrorsd.x	<pkg/inlfit.h>    <math/nlfit.h>
+	inerrorsr.x	<pkg/inlfit.h>    <math/nlfit.h>
+	infitd.x	<pkg/inlfit.h>    <math/nlfit.h>
+	infitr.x	<pkg/inlfit.h>    <math/nlfit.h>
+	infreed.x	"inlfitdef.h"
+	infreer.x	"inlfitdef.h"
+	ingaxesd.x	<pkg/inlfit.h> <pkg/gtools.h>
+	ingaxesr.x	<pkg/inlfit.h> <pkg/gtools.h>
+	ingcolond.x	<pkg/inlfit.h> <error.h> <gset.h>
+	ingcolonr.x	<pkg/inlfit.h> <error.h> <gset.h>
+	ingdatar.x	<pkg/inlfit.h>
+	ingdatad.x	<pkg/inlfit.h>
+	ingdefkey.x	<pkg/inlfit.h> "inlfitdef.h"
+	ingdeleted.x	<gset.h> <mach.h> <pkg/gtools.h>
+	ingdeleter.x	<gset.h> <mach.h> <pkg/gtools.h>
+	ingerrorsd.x	<pkg/inlfit.h> <math/nlfit.h>
+	ingerrorsr.x	<pkg/inlfit.h> <math/nlfit.h>
+	inget.x	        <pkg/inlfit.h> "inlfitdef.h"
+	ingfitd.x	<pkg/inlfit.h> <math/nlfit.h> <error.h> <mach.h>\
+			<pkg/gtools.h>
+	ingfitr.x	<pkg/inlfit.h> <math/nlfit.h> <error.h> <mach.h>\
+			<pkg/gtools.h>
+	inggetlabel.x	<pkg/inlfit.h>
+	inggraphd.x	<pkg/inlfit.h> <math/nlfit.h> <gset.h>\
+			<pkg/gtools.h>
+	inggraphr.x	<pkg/inlfit.h> <math/nlfit.h> <gset.h>\
+			<pkg/gtools.h>
+	ingnearestd.x	<mach.h> <pkg/gtools.h>
+	ingnearestr.x	<mach.h> <pkg/gtools.h>
+	ingparamsd.x	<pkg/inlfit.h> <math/nlfit.h> <pkg/gtools.h>
+	ingparamsr.x	<pkg/inlfit.h> <math/nlfit.h> <pkg/gtools.h>
+	ingresultsr.x	<pkg/inlfit.h>
+	ingresultsd.x	<pkg/inlfit.h>
+	ingshowd.x	<pkg/inlfit.h>
+	ingshowr.x	<pkg/inlfit.h>
+	inguaxesd.x	<pkg/inlfit.h> <math/nlfit.h>
+	inguaxesr.x	<pkg/inlfit.h> <math/nlfit.h>
+	ingucolond.x	
+	ingucolonr.x	
+	ingufit.x	
+	ingundeleted.x	<gset.h> <mach.h> <pkg/gtools.h>
+	ingundeleter.x	<gset.h> <mach.h> <pkg/gtools.h>
+	ingvarsr.x	<pkg/inlfit.h>
+	ingvarsd.x	<pkg/inlfit.h>
+	ingvshowd.x	<pkg/inlfit.h>
+	ingvshowr.x	<pkg/inlfit.h>
+	ininitd.x	<pkg/inlfit.h> "inlfitdef.h"
+	ininitr.x	<pkg/inlfit.h> "inlfitdef.h"
+	inlimitd.x	<pkg/inlfit.h>
+	inlimitr.x	<pkg/inlfit.h>
+	inlstrext.x	<ctype.h>
+	inlstrwrd.x	
+	innlinitd.x	"inlfitdef.h"
+	innlinitr.x	"inlfitdef.h"
+	input.x	        <pkg/inlfit.h> "inlfitdef.h"
+	inrefitd.x	<pkg/inlfit.h> <math/nlfit.h>
+	inrefitr.x	<pkg/inlfit.h> <math/nlfit.h>
+	inrejectd.x	<pkg/inlfit.h>
+	inrejectr.x	<pkg/inlfit.h>
+	inrmsd.x	
+	inrmsr.x	
+	ingtitle.x	<pkg/gtools.h>
+	;

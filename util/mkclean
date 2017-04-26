@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+#  MKSRC -- Make a pure source tree and configure the links for the 
+#  current architecture.
+
+
+export 	PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/5bin:/usr/ucb:/etc:/usr/etc:$PATH:/usr/local/bin:/opt/local/bin:/local/bin:/home/local/bin
+
+# Initialize the $iraf and environment.
+if [ -z "$iraf" ]; then
+  if [ -e "$HOME/.iraf/setup.sh" ]; then
+    source $HOME/.iraf/setup.sh
+  else
+    source unix/hlib/setup.sh
+  fi
+else
+    source $iraf/unix/hlib/setup.sh
+fi
+
+# Utility aliases.
+source $iraf/unix/hlib/util.sh
+
+if [ ! -n "$iraf" ];  then
+    /bin/echo ""
+    /bin/echo "Error:  You must have the iraf env variable defined !"
+    /bin/echo ""
+    exit 1
+fi
+
+exec=yes
+arch=`$iraf/unix/hlib/irafarch.sh`
+
+
+#=============================================================================
+# Process any command line arguments.
+#=============================================================================
+while [ -n "$1" ]; do
+    case "$1" in
+    "-n")                            # no execute
+        exec=no
+	;;
+    *)
+        ERRMSG  "$0: unknown argument $1"
+	;;
+    esac
+
+    if [ -n "$2" ]; then
+        shift
+    else
+        break
+    fi
+done
+
+
+#----------------------------------
+# Determine platform architecture.
+#----------------------------------
+
+mach=`$iraf/unix/hlib/irafarch.sh -actual`
+hmach=`$iraf/unix/hlib/irafarch.sh -actual`
+
+/bin/echo "mach = " $mach
+/bin/echo "hmach = " $hmach
+
+/bin/echo -n "Clean host directories ...."
+if [ $exec == "yes" ]; then
+    /bin/rm -f unix/bin.$arch/[agm-z]*.e unix/bin.$arch/lib[bco]*.a >> /dev/null  2>&1
+else
+    /bin/ls -l unix/bin.$arch/[agm-z]*.e unix/bin.$arch/lib[bco]*.a
+fi
+/bin/echo "		Done"
+
+
+/bin/echo -n "Clean src directories ...."
+pats=("local" "math" "pkg" "sys" "noao/[adfimnorst]*")
+for i in ${pats[@]} ; do
+  if [ $exec == "yes" ]; then
+    find $i -type f -name \*.a -exec /bin/rm -f {} \;	>> /dev/null 2>&1
+    find $i -type f -name \*.e -exec /bin/rm -f {} \;	>> /dev/null 2>&1
+    find $i -type f -name \*.o -exec /bin/rm -f {} \;	>> /dev/null 2>&1
+  else
+    find $i -type f -name \*.a -exec /bin/ls -l {} \;
+    find $i -type f -name \*.e -exec /bin/ls -l {} \;
+    find $i -type f -name \*.o -exec /bin/ls -l {} \;
+  fi
+done
+/bin/echo "		Done"
+
+
+/bin/echo -n "Clean '$arch' bin directories ...."
+if [ $exec == "yes" ]; then
+    /bin/rm -rf bin.$arch/lib[a-z]*.a 			>> /dev/null 2>&1
+    /bin/rm -rf bin.$arch/*.[eoZ] 			>> /dev/null 2>&1
+    /bin/rm -rf noao/bin.$arch/*.[aeoZ] 		>> /dev/null 2>&1
+else
+    /bin/ls -l  bin.$arch/lib[a-z]*.a 			>> /dev/null 2>&1
+    /bin/ls -l  bin.$arch/*.[aeoZ] 			>> /dev/null 2>&1
+    /bin/ls -l  noao/bin.$arch/*.[aeoZ] 		>> /dev/null 2>&1
+fi
+/bin/echo "		Done"
+
+
+/bin/echo -n "Cleaning spool files ...."
+if [ $exec == "yes" ]; then
+    find . -name spool\* -print -exec /bin/rm -f {} \;	>> /dev/null 2>&1
+else
+    find . -name spool\* -print 
+fi
+/bin/echo "		Done"
+
+exit 0

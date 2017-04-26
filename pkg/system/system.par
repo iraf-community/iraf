@@ -1,0 +1,5 @@
+# Package parameter file for SYSTEM.
+
+version,s,h,"12-Nov-83"
+release,s,h,)cl.release,,,IRAF release version
+mode,s,h,ql

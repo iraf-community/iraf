@@ -1,0 +1,9 @@
+input,f,a,,,,metacode input
+device,s,h,"stdgraph",,,output device
+output,f,h,,,,name of binary output file
+nx,i,h,2,,,number of plots in x direction
+ny,i,h,2,,,number of plots in y direction
+rotate,b,h,no,,,rotate axes? 
+fill,b,h,no,,,fill viewport vs preserve aspect ratio
+interactive,b,h,yes,,,
+cursor,*gcur,h,"",,,

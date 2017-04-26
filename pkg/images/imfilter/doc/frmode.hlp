@@ -1,0 +1,197 @@
+.help frmode May95 images.imfilter
+.ih
+NAME
+frmode -- quantize and ring modal filter a list of images
+.ih
+USAGE
+frmode input output rinner router
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output
+List of filtered images. The number of input images must be the same as the
+number of output images. If the input image name equals the output image name
+the filtered image replaces the original image.
+.le
+.ls rinner, router
+The inner and outer semi-major axes of the ring filter in pixels. If rinner
+is set to 0.0 then the ring filter becomes a circular filter.
+.le
+.ls ratio = 1.0
+The ratio of the semi-minor axis to the semi-major axis of the ring filter.
+If ratio is 1.0 the ring filter is circularly symmetric.
+.le
+.ls theta = 0.0
+The position angle of the major axis of the ring filter. Theta is measured
+in degrees counter-clockwise from the x axis and must be between 0 and 180
+degrees.
+.le
+.ls hmin = -32768, hmax = 32767
+The histogram quantization parameters. Hmin and hmax define the minimum
+and maximum permitted values for the integer representation of the input image.
+The default values are those suitable for the 16 bit twos complement data
+produced by current CCDs. Hmin and hmax should be chosen so as to
+minimize the space required to store the image histogram.
+.le
+.ls zmin = INDEF, zmax = INDEF
+The data quantization parameters. Zmin and zmax default to the minimum and
+maximum pixel values in the input image. Pixel values from zmin to zmax
+are linearly mapped to integers from hmin to hmax.
+If zmin = hmin and zmax = hmax, the image pixels are converted directly to
+integers.  Image values less than or greater than
+zmin or zmax will default to hmin and hmax respectively.
+.le
+.ls zloreject = INDEF, zhireject = INDEF
+The minimum and maximum good pixel values. Zloreject and zhireject default
+to zmin and zmax in the input data or hmin and hmax in the integer
+representation of the input image.
+.le
+.ls unmap = yes
+Frmode rescales the integer values to numbers between zmin and zmax
+by default. If the user wishes to preserve the mode of the quantized images,
+the \fIunmap\fR parameter should be set to no.
+.le
+.ls boundary = "nearest"
+The type of boundary extension. The options are:
+.ls nearest
+Use the value of the nearest pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Reflect pixel values around the boundary.
+.le
+.ls wrap
+Wrap pixel values around the boundary.
+.le
+.le
+.ls constant = 0.
+The value for constant valued boundary extension.
+.le
+.ls verbose = yes
+Print messages about actions taken by the task ?
+.le
+
+.ih
+DESCRIPTION
+
+FRMODE takes a list of input images \fIinput\fR and produces a set of filtered
+output images \fIoutput\fR. The filter consists of a sliding 
+circular / elliptical or annular circular / elliptical window whose size
+and orientation is determined by the \fIrinner\fR, \fIrouter\fR, \fIratio\fR,
+and \fItheta\fR parameters.  The center pixel of the window is replaced by
+the mode of the pixels in the window, where the mode is defined as follows.
+
+.nf
+	mode = 3. * median - 2. * mean
+.fi
+
+The median of a sequence of numbers is defined to be the value of the
+(n + 1) / 2 number in the ordered sequence. Out of bounds pixel references
+are handled by setting the parameter boundary. The principal function of
+the circular / elliptical filters is to smooth an image using a 
+circularly / elliptically symmetric filter. The principal function of the
+circular / elliptical ring filter is to remove objects from the image
+which have a scale length or rinner and replace them with an estimate of
+the local background value.
+
+If \fIzmin\fR = \fIhmin\fR and \fIzmax\fR = \fIhmax\fR,
+FRMODE converts the image pixels directly to integers.
+This operation may result in truncation of the pixel values of the
+input image is not an integer image.
+Otherwise the input image values from zmin to zmax are linearly mapped to
+integer values from hmin to hmax.
+The histogram, median, and number of pixels less
+than the median are computed for the first window position. These
+quantities are updated as the median filter moves one position and
+the mode is computed.  The \fIunmap\fR parameter is normally set
+so as to restore the output pixel values to the range defined by
+zmin and zmax, but may be turned off if the user wishes to
+examine the quantized pixels.
+The precision of the mode in integer space and pixel space
+is 1.0 and (zmax - zmin) / (hmax - hmin) respectively.
+
+The \fIzloreject\fR and \fIzhireject\fR parameters may be used to reject
+bad data from the modal filtering box.  If no good
+data is left in the filtering box, then the mode is set to zloreject
+if the majority of the pixels are less than zloreject, or to zhireject
+if the majority of pixels are greater than zhireject.
+
+.ih
+REFERENCES
+
+A description of the fast median algorithm used here can be found in
+"Topics in Applied Physics: Two-Dimensional Digital Signal Processing II:
+Transforms and Median Filters", Volume 43, 1981, Springer-Verlag,
+edited by T.S. Huang, page 209.
+
+The properties of the ring median filter and its application to
+astronomical data analysis problems is summarized in the
+article "A Ring Median Filter  for Digital Images" (Secker, J., 1995,
+PASP, 107, 496-501) and references therein.
+
+.ih
+EXAMPLES
+
+1. Modal filter a 16 bit CCD image using a circular ring filter with an
+inner radius of 4 pixels and a width of 1 pixel.
+
+.nf
+   im> frmode input output 4.0 5.0 hmin=-32768 hmax=32767 zmin=-32768. \
+   >>> zmax=32767.
+.fi
+
+2. Modal filter a KPNO PDS image using a circular filter of outer radius
+3.0.
+
+.nf
+   im> frmode input output 0.0 3.0 hmin=0 hmax=4095 zmin=0. zmax=4095.
+.fi
+
+3. Modal filter an 8 bit image using the same filter as example 2.
+
+.nf
+   im> frmode input output 0.0 3.0 hmin=0 hmax=255 zmin=0. zmax=255.
+.fi
+
+4. Modal filter an image with real values from 0.0 to 1.0 with a precision
+of .003 and leave the output pixels in integer format. Use a ring filter
+of inner radius 5.0 and width 0.5 pixels.
+
+.nf
+   im> frmode input output 5.0 0.5 unmap- hmin=0 hmax=1000 zmin=0. \
+   >>> zmax=1.
+.fi
+
+5. Modal filter the test image dev$pix rejecting any pixels < 5 or
+greater than 19935 from the mode computing process using a circular
+filter of outer radius 5.0.
+
+.nf
+    im> frmode dev$pix output 0.0 5.0 hmin=-1 hmax=20000 zmin=-1.0 \
+    >>> zmax=20000 zloreject=5 zhireject=20000
+.fi
+
+.ih
+TIME REQUIREMENTS
+It requires approximately 39 and 27 CPU seconds to modal filter a
+512 by 512 square integer image with a circular filter of radius 5 pixels
+and a ring filter of inner and outer radii of 4.0 and 5.0 pixels
+respectively (SPARCStation2).
+
+.ih
+BUGS
+This technique is most suitable for integer data and data which has not
+been calibrated. For non-integer data the calculated median is an
+approximation only.
+
+If the  dynamic range of the data defined by hmin and hmax is large the
+memory requirements can become very large.
+
+.ih
+SEE ALSO
+mode, rmode, fmode
+.endhelp

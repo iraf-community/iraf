@@ -1,0 +1,103 @@
+.help hselect May85 images.imutil
+.ih
+NAME
+hselect - extract keyword values from images satisfying a selection expression
+.ih
+USAGE
+hselect images fields expr
+.ih
+PARAMETERS
+.ls images
+Images forming the set from which selected images are to be drawn.
+.le
+.ls fields
+Comma separated list of keywords or keyword patterns to be extracted
+from each selected image.  The list elements are matched against the
+set of keywords in the header except for those beginning with "$" which
+are special values or explicit checks for keywords that might be missing.
+.le
+.ls expr
+The boolean expression to be used as the selection criteria.  The expression
+is evaluated independently for each image.
+.le
+.ls missing = "INDEF"
+Output value for missing keywords.  Note that this will only occur when the
+fields are specified with leading "$".
+.le
+.ih
+DESCRIPTION
+The function of \fIhselect\fR is to extract keyword values from a subset
+of images satisfying a boolean selection expression.  The resultant table
+of keyword values is output in list form, suitable for further analysis
+or for use to generate a list of images to be processed by another task.
+
+The form of the boolean expression \fIexpr\fR is fully documented in the
+manual page for the \fIhedit\fR task.  In the case of \fIhselect\fR task,
+however, the expression need not be parenthesized to be evaluated as an
+expression.
+
+The keywords whose values are to be output are specified by the \fIfields\fR
+parameter.  This is a comma delimited list of keywords and patterns.  The
+keywords and patterns are matched against the set of keywords in the image.
+Of particular importance is that explicit keywords, that is without any
+wildcard, are matched against the header and so if the keyword is not in the
+header then the keyword value is not output.  If one wants to explicitly
+output a place holder for a missing keyword use a leading $; e.g. $mykey.
+If the keyword is absent then the value given by the \fImissing\fR
+parameter will be output.  This is useful when scanning the output.
+
+In addition to escaping the keyword matching, the leading $ character is
+also used to select special values such as "$I" for the name of the current
+image.  See \fBhedit\fR for more on the special values and pattern syntax.
+.ih
+EXAMPLES
+1. Compute the mean exposure time for all the images in a database.  Note that
+the argument "yes" is a trivial case of a general boolean expression and
+hence need not be quoted.
+
+	cl> hselect n1.* exp yes | average
+
+2. Print the name, length of axes 1 and 2, and title of all two dimensional
+images in a database.
+
+
+.nf
+	cl> hselect n1.* $I,naxis[12],title 'naxis == 2'
+	n1.0001	512	512	quartz
+	n1.0002 512	512	"dome flat"
+	n1.0005 384	800	"ngc 3127 at 45 degrees"
+	cl>
+.fi
+
+
+3. Produce an image name list for use to drive another task.  The selection
+criterion is all images for which the value of the parameter "q-flag"
+has the value 1.  Note carefully the use of quotes.  If the @ operator
+is unfamiliar read the manual page for \fIhedit\fR.
+
+	cl> hselect n1.* $I '@"q-flag" == 1' > imlist
+
+If the parameter "q-flag" were instead named "qflag", the following
+simpler expression would suffice.
+
+	cl> hselect n1.* $I 'qflag == 1' > imlist
+
+4.  Scan a set of keyword and allow for missing keywords.
+
+.nf
+	cl> hselect pix $I,$exptime,$airmass yes missing=INDEF |
+	>>> scan (s1, x, y)
+.fi
+
+Note that when checking for missing values the missing value must be
+of the appropriate type or else you need to use string variables or
+nscan to check.  The default missing value is "INDEF" which can be
+scanned into both string and numerical variables.
+.ih
+BUGS
+Since individual image headers are currently stored as separate files,
+selection from a large database is quite slow.
+.ih
+SEE ALSO
+hedit, imgets, imheader
+.endhelp

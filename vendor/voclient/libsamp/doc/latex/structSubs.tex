@@ -1,0 +1,48 @@
+\hypertarget{structSubs}{
+\section{Subs Struct Reference}
+\label{structSubs}\index{Subs@{Subs}}
+}
+{\tt \#include $<$samp.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structSubs_e34561f0e9c8805dcb19fe4f91ea3e3e}{
+char \textbf{mtype} \mbox{[}SZ\_\-LINE\mbox{]}}
+\label{structSubs_e34561f0e9c8805dcb19fe4f91ea3e3e}
+
+\item 
+int($\ast$ \hyperlink{structSubs_14364d5a161adc47732c39b96e8156f0}{userFunc} )(void $\ast$p)
+\item 
+int($\ast$ \hyperlink{structSubs_c4eca724f23609bb7ab9640c39c1001b}{sampFunc} )(char $\ast$sid, char $\ast$sender, char $\ast$msgid, \hyperlink{sampDecl_8h_39a90bc041db57e1a6ba736ba91eee30}{Map} map)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Message subscription. 
+
+\subsection{Field Documentation}
+\hypertarget{structSubs_c4eca724f23609bb7ab9640c39c1001b}{
+\index{Subs@{Subs}!sampFunc@{sampFunc}}
+\index{sampFunc@{sampFunc}!Subs@{Subs}}
+\subsubsection[{sampFunc}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ {\bf Subs::sampFunc})(char $\ast$sid, char $\ast$sender, char $\ast$msgid, {\bf Map} map) (char $\ast$ {\em sid}, \/  char $\ast$ {\em sender}, \/  char $\ast$ {\em msgid}, \/  {\bf Map} {\em map})}}
+\label{structSubs_c4eca724f23609bb7ab9640c39c1001b}
+
+
+user handler function samp handler function 
+
+Referenced by samp\_\-getSampHandler(), samp\_\-setSampHandler(), and samp\_\-Unsubscribe().\hypertarget{structSubs_14364d5a161adc47732c39b96e8156f0}{
+\index{Subs@{Subs}!userFunc@{userFunc}}
+\index{userFunc@{userFunc}!Subs@{Subs}}
+\subsubsection[{userFunc}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ {\bf Subs::userFunc})(void $\ast$p) (void $\ast$ {\em p})}}
+\label{structSubs_14364d5a161adc47732c39b96e8156f0}
+
+
+mtype string 
+
+Referenced by samp\_\-getUserHandler(), samp\_\-hubDeclareSubscriptions(), samp\_\-setUserHandler(), and samp\_\-Unsubscribe().
+
+The documentation for this struct was generated from the following files:\begin{CompactItemize}
+\item 
+\hyperlink{samp_8h}{samp.h}\item 
+\hyperlink{sampDecl_8h}{sampDecl.h}\end{CompactItemize}

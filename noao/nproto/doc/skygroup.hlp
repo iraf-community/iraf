@@ -1,0 +1,131 @@
+.help skygroup Feb06 noao.nproto
+.ih
+NAME
+skygroup -- Group a list containing RA and Dec into spatial sublists
+.ih
+SYNOPSIS
+A list with RA and Dec in the first two columns followed by user data
+is grouped into sublist based on spatial proximity.  A separation parameter
+defines the grouping by looking for gaps in both RA and Dec that are
+bigger than the specified amount.  The output sublists may or may not
+include the RA and Dec columns.  A typical example of user data might be
+image names.
+.ih
+USAGE	
+skygroup input output
+.ih
+PARAMETERS
+.ls input
+Input tabular text file containing RA and Dec in the first two whitespace
+separated columns and user data in the remaining columns.  The RA may
+be in hours or degrees while the Dec must be in degrees.  The RA values
+must lie in the range 0h to 24h or 0d to 360d and the Dec values
+must lie in the range -90d to 90d.
+.le
+.ls output
+Output root filename.  The root filename itself will contain a list of
+the sublists.  The sublists will have _NNN appended to the root name
+where NNN is a three digit number.  If there are more than 999 sublists
+the number of digits will increase.  A check is made for any pre-existing
+filenames with this root, sequence pattern, and optional extension and
+an error will result if any are found.
+.le
+.ls extn = ""
+Optional output extension.  This string is appended to the output files
+noted previously.  Note that an period must be given explicitly if a
+".XXX" style extension is desired.
+.le
+.ls sep = 60 (arcsec)
+The maximum separation in arcseconds in RA and Dec, applied separately, which
+defines the start of a new group.
+.le
+.ls raunit = "hr" (hr|deg)
+The input RA unit where "hr" is hours and "deg" is degrees.
+.le
+.ls keepcoords = yes
+Keep the input coordinate columns in the output lists?  If no then only
+the user data will be placed in the output lists.  This option allows
+taking a list of RA, Dec, and filenames and producing only lists of
+filenames to be used as @files.
+.le
+.ls raformat = "%.2h", decformat = "%.1h"
+The format for printing the RA and Dec in the output lists if
+\fIkeepcoords\fR is yes.  See the help for \fBprintf\fR for the formats.
+Note that the raformat may be given in %H format to convert input RA
+in degrees into output hours.  The default produces sexagesimal format
+keeping the RA in the same units as the input.
+.le
+.ih
+DESCRIPTION
+This task groups a list of user data with RA and Dec coordinates
+into sublists where all points in a group have at least one member with
+celestial distance in RA or Dec separately less than or equal to the
+specified separation.  In other words, groups are defined by gaps in RA
+and Dec.
+
+The input format is a text table where each line consists of an RA,
+a Dec, and arbitrary user data.  Whitespace separates these three parts.
+The RA and Dec have certain restrictions on units and ranges as described
+in the parameters.  However, the RA may be given either in hours or degrees
+and may be output in hours if given in degrees.
+
+The output is a set of sublists as well as a file containing the set
+of sublist filenames.  The sublists contain the input user data with
+or without the input coordinates.
+
+The grouping algorithm is summarized as follows.  The input list is
+sorted by declination.  The declination ordered list is traversed
+to form groups with consecutive declination intervals less than or
+equal to the specified separation.  These groups are then
+sorted in RA and these are traversed to form the final groups with
+consecutive RA intervals less than or equal to the specified separation.
+Note that the RA intervals are actually computed by \fBskysep\fR and
+make use of both the RA and Dec.
+
+A challenge is dealing with the wrap around in RA at the zero meridian.
+This is handled by duplicating points near 0 beyond 24h or 360d.  This is
+the reason the input is required to only be in a specific range.  This
+duplication can result in entries appearing in more than one output group.
+A merging step handles this situation.
+.ih
+EXAMPLES
+1. A set of images is to be grouped based on their FITS tangent point
+coordinates.  Note this make most sense when the tangent point pixel
+coordinates are the same in the image.  The image will then be grouped
+to find those that overlap by some amount.  If the images have 10 arc
+minute fields of view and we want to group those that overlap by at least
+50% then the separation parameter should be something like 5 arc minutes.
+We want to the output to a list of only the file names which will then
+be passed on to an image stacking program.
+
+.nf
+    cl> hselect *.fits crval1,crval2,title yes > coords
+    cl> skygroup coords group extn=".lis" sep=300 rau=deg keep-
+    cl> type group.lis
+    group_001.lis
+    group_002.lis
+    ...
+    cl> type group_001.lis
+    obj4325.fits
+    obj4329.fits
+    ...
+    cl> count @group.lis
+    cl> count @group
+	  1       3      85 group_001.lis
+	  2       6     170 group_002.lis
+	102     306    8670 group_003.lis
+	133     399   11438 group_004.lis
+	 31      93    2666 group_005.lis
+	  7      21     595 group_006.lis
+	  5      15     425 group_007.lis
+	281     843   24049 Total
+.fi
+
+The CRVAL values are for the RA and Dec world axes respectively.  Because
+the FITS reference values must be in degrees the input RA unit is specified
+as degrees.  Because we want only the output file names we use keepcoords=no.
+The output lists will be group_001.lis, group_002.lis, etc.
+.ih
+SEE ALSO
+skysep, astradius, astcalc
+.endhelp

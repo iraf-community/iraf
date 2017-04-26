@@ -1,0 +1,8 @@
+# The cl parameters for task spotlist in the dtoi package
+spots,f,a,,,,List of image files containing spot data
+fogs,f,a,,,,List of images containing fog spots
+database,f,a,,,,Name of output database file
+scale,r,h,0.00151,,,Input value to density scale factor
+maxad,i,h,3071,,,Integer A/D value of saturated pixel
+sigma,r,h,3.0,,,Rejection criteria when determining mean density
+option,s,h,mean,"mean|median",,Choice of algorithm (mean or median)

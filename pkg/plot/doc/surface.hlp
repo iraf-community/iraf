@@ -1,0 +1,95 @@
+.help surface Aug91 plot
+.ih
+NAME
+surface -- draw a three dimensional perspective plot of a surface
+.ih
+USAGE
+surface image
+.ih
+PARAMETERS
+.ls image
+Image or image section to be plotted.
+.le
+.ls floor = INDEF
+Data values below \fBfloor\fR are clipped.  If \fBfloor = INDEF\fR, the data
+minimum is used for the floor.
+.le
+.ls ceiling = INDEF
+Data values above \fBceiling\fR are clipped.  If \fBceiling = INDEF\fR, the
+data maximum is used for the ceiling.
+.le
+.ls angh = -33.0
+Horizontal viewing angle, degrees.
+.le
+.ls angv = 25.0
+Vertical viewing angle, degrees.
+.le
+.ls device = "stdgraph"
+Output device (\fBstdgraph\fR, \fBstdplot\fR, or the name of a physical
+device).
+.le
+.ls title = "imtitle"
+A title string is centered above the plot.  The user can specify a title
+string; the default is the image title.
+.le
+.ls label = no
+The axes are drawn and the corner points of the plotting area are labeled 
+if \fBlabel\fR = yes.
+.le
+.ls xres = 64, yres = 64
+The input image is block averaged or subsampled to this resolution.
+.le
+.ls preserve = yes
+If \fBpreserve\fR = yes, the aspect ratio of the image is preserved when
+achieving the resolution specified by \fBxres\fR and \fByres\fR.
+.le
+.ls subsample = no
+The resolution specified by \fBxres\fR, \fByres\fR is achieved by block
+averaging unless \fBsubsample\fR = yes.
+.le
+.ih
+DESCRIPTION
+\fBSurface\fR draws a pseudo-three dimensional perspective of an image
+section.  Hidden lines are removed.  The surface may be viewed from any
+angle.  Subsampling or block averaging is used to achieve the resolution
+specified.  A labeled perimeter is optionally drawn around the plot.
+
+To speed up the plot, the resolution of the image can be decreased to
+\fBxres\fR by \fByres\fR.  When \fBpreserve\fR = yes, \fBsurface\fR 
+automatically reduces the image in both directions by the same factor, which
+is the larger of [ncolumns / xres or nlines / yres].  If the
+aspect ratio is not being preserved, the x and y dimensions are independently
+reduced to the specified resolution.
+No reduction is done if
+\fBxres\fR and \fByres\fR = 0, if the input image is an image section, or if
+the image is smaller than \fBxres\fR by \fByres\fR.
+.ih
+EXAMPLES
+1. Surface plot of a 512 square image.  With the default values of \fBxres\fR
+and \fByres\fR, the image would be block averaged by a factor of 8 in x and y.
+
+    cl> surface crab.5009
+
+2. Look at the bottom of the surface, but subsample rather that block average
+to decrease resolution and speed things up.  Also, the output device will
+be the plotter, and the job will run in the background:
+
+    cl> surface crab.5009 angv=-30 subsample+ device=stdplot &
+
+3. Surface plot of band 4 of an image cube.  Since the image is specified using
+image section notation, no block averaging or subsampling will be done.
+
+    cl> surface cube[*,*,4]
+.ih
+TIME REQUIREMENTS
+The time required by \fIsurface\fR depends on image size and resolution.
+A surface plot of a
+512 square image block averaged to 64 square requires 30 cpu seconds.  The
+same image subsampled would take 23 seconds to plot.  
+.ih
+BUGS
+It should be possible to input the surface in list form. 
+.ih
+SEE ALSO
+contour, graph
+.endhelp
