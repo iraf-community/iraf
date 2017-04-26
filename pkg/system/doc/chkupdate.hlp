@@ -7,7 +7,7 @@ USAGE
 chkupdate
 .ih
 PARAMETERS
-.ls interval = 10
+.ls interval = 0
 Number of days between updates checks.  A value less than zero will disable
 the checks entirely, a value of zero will cause a check to be made with 
 each login.

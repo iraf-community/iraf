@@ -31,8 +31,6 @@ begin
 	names = clgetb ("names")
 	lformat = clgetb ("long")
 	call clgstr ("instrument", Memc[image], SZ_FNAME)
-        if (Memc[image] == EOS)
-            call error (1, "No 'instrument' translation file specified.")
 	call hdmopen (Memc[image])
 
 	# List each iamge.

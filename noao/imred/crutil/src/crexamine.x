@@ -267,7 +267,7 @@ begin
 	    if (index != NULL)
 		nearest = Memi[index+nearest]
 	    Memi[CR_FLAG(cr)+nearest-1] = ALWAYSYES
-	    Memi[CR_WT(cr)+nearest-1] = -1
+	    Memr[CR_WT(cr)+nearest-1] = -1
 	    call gscur (gp, x2, y2)
 	    call gseti (gp, G_PMLTYPE, 0)
 	    y2 = Memr[CR_RATIO(cr)+nearest-1]
@@ -331,7 +331,7 @@ begin
 		else
 		    j = i
 		Memi[CR_FLAG(cr)+j-1] = ALWAYSYES
-		Memi[CR_WT(cr)+j-1] = -1
+		Memr[CR_WT(cr)+j-1] = -1
 		call gscur (gp, x1, y1)
 		call gseti (gp, G_PMLTYPE, 0)
 		y1 = Memr[CR_RATIO(cr)+j-1]
@@ -391,7 +391,7 @@ begin
 	    if (index != NULL)
 		nearest = Memi[index+nearest]
 	    Memi[CR_FLAG(cr)+nearest-1] = ALWAYSNO
-	    Memi[CR_WT(cr)+nearest-1] = 1
+	    Memr[CR_WT(cr)+nearest-1] = 1
 	    call gscur (gp, x2, y2)
 
 	    call gseti (gp, G_PMLTYPE, 0)
@@ -456,7 +456,7 @@ begin
 		else
 		    j = i
 		Memi[CR_FLAG(cr)+j-1] = ALWAYSNO
-		Memi[CR_WT(cr)+j-1] = 1
+		Memr[CR_WT(cr)+j-1] = 1
 		call gscur (gp, x1, y1)
 		call gseti (gp, G_PMLTYPE, 0)
 		y1 = Memr[CR_RATIO(cr)+j-1]

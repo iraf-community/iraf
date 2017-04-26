@@ -79,8 +79,6 @@ begin
 	call clgstr ("instrument", Memc[inst], SZ_FNAME)
 	call clgstr ("ssfile", Memc[ssfile], SZ_FNAME)
 	level = clgwrd ("parameters", Memc[image], SZ_FNAME, LEVELS)
-        if (Memc[image] == EOS)
-            call error (1, "No 'parameters' file value specified.")
 	call hdmopen (Memc[inst])
 	ncmd = NEXT
 	update = false

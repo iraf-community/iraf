@@ -1,5 +1,26 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+
+t_ccdgroups.x
+t_ccdhedit.x
+t_ccdinst.x
+t_ccdlist.x
+t_ccdproc.x
+t_combine.x
+t_mkfringe.x
+t_mkillumcor.x
+t_mkillumft.x
+t_mkskycor.x
+t_mkskyflat.x
+hdrmap.x
+    Backed out of previous change to detect NULL instrument files.  The code
+    is intended to continue if there is no instrument translation, however
+    the previous error was happening because the symtab pointer wasn't being
+    initialized properly.  Changed so that the empty filename is trapped in
+    the hdmopen() with a simple initialization and return, reverting to the
+    old behavior and avoiding the error messages about an empty instrument
+    file.  (12/11/13 MJF)
+
 t_ccdgroups.x
 t_ccdhedit.x
 t_ccdinst.x

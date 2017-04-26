@@ -160,12 +160,12 @@ datatype double) because the numerical constants are real numbers.
 and create a short pixel datatype resultant image:
 
 .nf
-	cl> imarith image1 / image2 image3 pixtype=real  \
-	>>> calctype=short title="Ratio of image1 and image2"
+	cl> imarith image1 / image2 image3 pixtype=short  \
+	>>> calctype=real title="Ratio of image1 and image2"
 .fi
 
 5. To divide several images by calibration image using the image pixel type of
-the numerator images to determine the pixel type of the calibration images
+the numerator images to determine the pixel type of the calibrated images
 and the calculation arithmetic type:
 
 .nf

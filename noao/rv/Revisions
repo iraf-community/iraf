@@ -1,6 +1,9 @@
 .help revisions May92 noao.rv
 .nf
 
+wrtccf.x
+	Fixed scaling issue with CCF output image (3/26/15)
+
 rvrvcor.x
 	Modified so UTMIDDLE now properly accepts a DATE-OBS-like
 	timestamp.  Also modified so the date is properly incremented

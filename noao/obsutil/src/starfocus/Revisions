@@ -1,5 +1,10 @@
 .help revisions Nov01 obsutil
 .nf
+starfocus.h
+    Changed the boundary extension from reflect to nearest to avoid
+    a case where the star appears in the boundary reflection and causes
+    problems.  (9/19/14, Valdes)
+
 t_starfocus.x
 starfocus.par
 psfmeasure.par

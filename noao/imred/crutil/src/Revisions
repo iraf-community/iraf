@@ -1,5 +1,9 @@
 .help revisions Nov99 crutil
 .nf
+crexamine.x
+    The CR_WT struct element was allocated as TY_REAL but was being used as
+    a Memi array, leading to a segfault on 64-bit systems (4/7/14, MJF)
+
 t_cosmicrays.x
     A pointer to a an array of pointers was used in one place as a real.  This
     is an error when integer and real arrays are not of the same size; i.e.

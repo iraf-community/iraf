@@ -37,8 +37,6 @@ begin
 	listin = imtopenp ("input")
 	listout = imtopenp ("mkskycor.output")
 	call clgstr ("instrument", Memc[input], SZ_FNAME)
-        if (Memc[input] == EOS)
-            call error (1, "No 'instrument' translation file specified.")
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
 	call cal_open (NULL)

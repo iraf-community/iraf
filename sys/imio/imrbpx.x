@@ -94,7 +94,11 @@ begin
 		step = xstep
 
 	    # Perform the boundary extension.
-	    ncp = sz_pixel
+            if ((imtyp == TY_INT || imtyp == TY_LONG) && SZ_INT != SZ_INT32)
+                ncp = sz_pixel * 2
+	    else
+	        ncp = sz_pixel
+
 	    call aclrc (pixval, 8)
 	    if ((i == 2 && !oob) || btype == BT_REFLECT || btype == BT_WRAP)
 		call imrdpx (im, obuf[op], npix, v1, step)
@@ -105,11 +109,8 @@ begin
 		else
 		    call imrdpx (im, pixval, 1, v1, step)
 
-	    	if ((imtyp == TY_INT || imtyp == TY_LONG) && 
-		    SZ_INT != SZ_INT32) {
-	            	call iupk32 (pixval, pixval, 2) 
-			ncp = sz_pixel * 2
-		}
+	    	if ((imtyp == TY_INT || imtyp == TY_LONG) && SZ_INT != SZ_INT32)
+	            call iupk32 (pixval, pixval, 2) 
 		
 		# Fill the output array.
 		off = op - 1

@@ -654,6 +654,7 @@ if [ "$lbin" == "" ]; then
     fi
   done
 fi
+bindir=$lbin
 
 
 
@@ -1003,7 +1004,7 @@ for file in ${pfiles[@]}; do
             RM $TEMP >& /dev/null
 	fi
     else
-        if (( "$err_seen"=0 )); then
+        if (( "$err_seen"==0 )); then
             DO_FAIL
             err_seen=1
             err_count=$(( err_count+1 ))
@@ -1236,6 +1237,7 @@ if (( "$do_system"==1 )); then
         fi
     else
         if [ "$exec" == "yes" ]; then
+            RM -f $file1
             ln -s $file2 $file1
         fi
     fi
@@ -1265,6 +1267,7 @@ else			# else of 'do_system'
         fi
     else
         if [ "$exec" == "yes" ]; then
+            RM -f $file1
             ln -s $file2 $file1
         fi
     fi
@@ -1403,6 +1406,7 @@ if [ -e "$file1" ]; then
     fi
 else
     if [ "$exec" == "yes" ]; then
+        RM -f $file1
         ln -s $file2 $file1
     fi
 fi
@@ -1429,6 +1433,7 @@ if [ -e "$file1" ]; then
     fi
 else
     if [ "$exec" == "yes" ]; then
+        RM -f $file1
         ln -s $file2 $file1
     fi
 fi
@@ -1494,7 +1499,7 @@ else
     file1=$HOME/.imtoolrc
     ECHO -n 'Creating $HOME/.imtoolrc link ...                              '
 fi
-RM -f $file1
+/bin/rm -f $file1
 file2=$iraf/dev/imtoolrc
 
 
@@ -1575,6 +1580,9 @@ if [ "$do_system" == 0 ]; then
   cfiles=("$HOME/.cshrc $HOME/.tcshrc $HOME/.login")
   bfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
 
+  if [ ! -e $HOME/.cshrc ]; then
+      touch $HOME/.cshrc
+  fi
   for file in ${cfiles[@]}; do
     if [ -e "$file" ]; then
 	if [ "$exec" == "yes" ]; then
@@ -1603,6 +1611,9 @@ if [ "$do_system" == 0 ]; then
     fi
   done
 
+  if [ ! -e $HOME/.bashrc ]; then
+      touch $HOME/.bashrc
+  fi
   for file in ${bfiles[@]}; do
     if [ -e "$file" ]; then
 	if [ "$exec" == "yes" ]; then

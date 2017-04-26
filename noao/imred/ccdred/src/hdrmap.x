@@ -86,7 +86,11 @@ include	"hdrmap.com"
 
 begin
 	# Create an empty symbol table.
-	stp = stopen (fname, LEN_INDEX, LEN_STAB, SZ_SBUF)
+	if (fname[1] == EOS) {
+	     stp = NULL
+	     return
+	} else
+	     stp = stopen (fname, LEN_INDEX, LEN_STAB, SZ_SBUF)
 
 	# Return if file not found.
 	iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {

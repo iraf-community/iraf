@@ -41,6 +41,14 @@ begin
 	    isdir = (FI_TYPE(file_info) == FI_DIRECTORY)
 
 	    if (isdir) {
+ 		# Ensure a trailing '/' to the pathname.
+		nchars = strlen (Memc[fname])
+		if (Memc[fname+nchars-1] != '/') {
+	    	    Memc[fname+nchars] = '/'
+	    	    Memc[fname+nchars+1] = EOS
+		}
+
+		call aclrc (pathname, maxch)
 		call fdirname (Memc[fname], pathname, maxch)
 		nchars = strlen (pathname)
 	    }

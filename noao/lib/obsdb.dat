@@ -569,3 +569,34 @@ observatory = "terskol"
        latitude = 43:16:22.0 
        altitude = 3100. 
        timezone = -4 
+
+# Submitted by user 11/24/13 
+observatory = "soao"
+       name = "Sobaeksan Optical Astronomy Observatory"
+       longitude = 231:32:32.64
+       latitude = 36:56:03.88
+       altitude = 1378.
+       timezone = -9
+
+# Submitted by nmasdiana@gmail.com 12/12/13
+       name = "Observatoire de Haute-Provence"
+       longitude = 354.2900
+       latitude = 43.94
+       altitude = 650.
+       timezone = 1
+
+# Submitted by G. Altavilla 1/14/14:  Bologna Astronomical Obs., Loiano, Italy.
+observatory = "loiano"
+       name = "1.52m G.D. Cassini Telescope"
+       longitude = 348:39:58
+       latitude =  44:15:33
+       altitude = 785
+       timezone = -1
+
+# Submitted by Alceste Bonanos 2/17/14
+observatory = "helmos"
+       name = "Helmos Observatory"
+       longitude = 22.1961
+       latitude = 37.9844
+       altitude = 2340
+       timezone = -2

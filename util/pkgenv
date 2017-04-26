@@ -10,7 +10,7 @@ for p in ${files[@]} ; do
 
     if [ -e $p/.installed ]; then
 	cat $p/.installed 			>> .installed
-	/bin/echo "re$p	="`pwd`"/$p/"		>> .zzsetenv.def
+	/bin/echo "reset $p	="`pwd`"/$p/"	>> .zzsetenv.def
     fi
 done
 /bin/echo "keep"				>> .zzsetenv.def

@@ -179,6 +179,7 @@ errchk 	imgetd()
 
 begin
 	code = OK
+	time = 0
 	if (rv_parse_date (rv, im, KW_DATE_OBS(rv), is_obj, day, month, year,
 	    time, flags) == ERR_RVCOR) {
 	        code = ERR_RVCOR
@@ -243,6 +244,9 @@ begin
 	                code = ERR_RVCOR
 			ut_start = 0.0d0
 		}
+	    } else {
+	        call rv_err_comment (rv, "ERROR: Missing time keyword.", "")
+		ut_start = 0.0d0
 	    }
 
 	    iferr (int_time = imgetd (im, KW_EXPTIME(rv))) {

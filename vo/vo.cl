@@ -1,5 +1,6 @@
 #{ VO -- VO Client Application Package
 
+
 # Load dependent packages.
 nproto
 astutil
@@ -12,12 +13,7 @@ if (deftask ("astcat"))
 else
     ;
 
-# This package requires FITS image type and various kernel parameters.
-reset imtype = "fits"
-if (defvar ("fkinit"))
-    set fkinit = envget ("fkinit") // ",append,padlines=10,cachesize=60"
-else
-    set fkinit = "append,padlines=10,cachesize=60"
+
 
 # Initialize the VOClient
 #vocinit
@@ -38,7 +34,16 @@ set	votools		= "vo$votools/"
 # Set the local package environment.
 set	clobber		= yes
 set	imclobber	= yes
-set	imtype		= "fits"
+
+# This package requires FITS image type and various kernel parameters.
+show imtype | scan (s1)
+if (substr (s1,1,4) != "fits") 
+    set	imtype		= "fits,test"
+;
+if (defvar ("fkinit"))
+    set fkinit = envget ("fkinit") // ",append,padlines=10,cachesize=60"
+else
+    set fkinit = "append,padlines=10,cachesize=60"
 
 
 # Compiled tasks.

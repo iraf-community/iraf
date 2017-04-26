@@ -69,8 +69,6 @@ begin
 	    word_width = tbbwrd (buf, ip, Memc[word], SZ_LINE,
 			width, precision, datatype, fcode)
 
-call eprintf ("tbzmem:  word_width=%d  colnum=%d  NCOLS=%d\n")
-  call pargi (word_width) ; call pargi (colnum) ; call pargi (TB_NCOLS(tp))
 	    if (word_width > 0) {
 
 		colnum = colnum + 1

@@ -77,31 +77,31 @@ PUT() {
 } ; export PUT
 
 PROMPT() {
-    BOLD_ON; ECHO -n $1; BOLD_OFF; ECHO -n " (yes): "
+    BOLD_ON; ECHO -n "$1"; BOLD_OFF; ECHO -n " (yes): "
 } ; export PROMPT
 
 PROMPT_N() {
-    BOLD_ON; ECHO -n $1; BOLD_OFF; ECHO -n " (no): "
+    BOLD_ON; ECHO -n "$1"; BOLD_OFF; ECHO -n " (no): "
 } ; export PROMPT_N
 
 MSG() {
-    ECHO -n "   "; BOLD_ON; ECHO -n "***  "; BOLD_OFF; ECHO $1
+    ECHO -n "   "; BOLD_ON; ECHO -n "***  "; BOLD_OFF; ECHO "$1"
 } ; export MSG
 
 MSGB() {
-    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";ECHO $1; BOLD_OFF
+    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";ECHO "$1"; BOLD_OFF
 } ; export MSGB
 
 MSGN() {
-    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";BOLD_OFF; ECHO -n $1
-} ; export MSGB
+    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";BOLD_OFF; ECHO -n "$1"
+} ; export MSGN
 
 MSGBN() {
-    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";ECHO -n $1; BOLD_OFF
-} ; export MSGB
+    ECHO -n "   ";BOLD_ON;ECHO -n "***  ";ECHO -n "$1"; BOLD_OFF
+} ; export MSGBN
 
 ERRMSG() {
-    ECHO -n "   ";BOLD_ON;ECHO -n "ERROR: "  ;BOLD_OFF; ECHO $1
+    ECHO -n "   ";BOLD_ON;ECHO -n "ERROR: "  ;BOLD_OFF; ECHO "$1"
 } ; export ERRMSG
 
 WARNING() {

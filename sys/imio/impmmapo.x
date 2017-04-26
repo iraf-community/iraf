@@ -38,6 +38,7 @@ begin
 
 	# Set up the image descriptor.
 	IM_NDIM(im) = naxes
+	IM_NPHYSDIM(im) = IM_NPHYSDIM(ref_im)
 	IM_PIXTYPE(im) = TY_INT
 	call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
 

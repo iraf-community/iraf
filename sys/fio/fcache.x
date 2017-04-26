@@ -653,8 +653,9 @@ int	maxch					#i size of output string
 int	fd, len
 char	dotfile[SZ_PATHNAME], cfname[SZ_PATHNAME]
 char	dirname[SZ_PATHNAME], root[SZ_FNAME], line[SZ_LINE]
+long	file_info[LEN_FINFO]
 
-int	access(), fnldir(), fnroot(), open(), strlen(), getline()
+int	access(), fnldir(), fnroot(), open(), strlen(), getline(), finfo()
 
 begin
 	# Be sure the input file exists, if so the get the root part of
@@ -685,10 +686,14 @@ begin
 	    call pargstr (root)
 
 	if (access (dotfile, 0, 0) == YES) {
-	    fd = open (dotfile, READ_ONLY, TEXT_FILE)
-	    if (getline (fd, line) == EOF)
-	        call aclrc (out, maxch)
-	    call close (fd)
+	    if (finfo (dotfile, file_info) != ERR) {
+		if (FI_TYPE(file_info) == FI_REGULAR) {
+	            fd = open (dotfile, READ_ONLY, TEXT_FILE)
+	            if (getline (fd, line) == EOF)
+	            	call aclrc (out, maxch)
+	            call close (fd)
+		}
+	    }
 	} else
 	    call aclrc (line, SZ_LINE)
 

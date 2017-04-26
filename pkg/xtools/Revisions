@@ -1,6 +1,10 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+isdir.x
+    Wasn't properly detecting a directory when no trailing '/' present on 
+    input name.  made the same as the sys$fio/isdir.x  (8/11/14)
+
 inlfit/ingfit.gx
     The 'oldwts' pointer was being used explicitly with Memr, changed to use
     'Mem$t' so the appropriate type is used (5/4/13, MJF)

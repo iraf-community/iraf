@@ -15,7 +15,11 @@ begin
 
 	switch (b) {
 	case 0:
-	    call amovk$t (1$f, c, npix)
+	    $if (datatype == x)
+	        call amovk$t ((1.0,1.0), c, npix)
+	    $else
+	        call amovk$t (1$f, c, npix)
+	    $endif
 	case 1:
 	    call amov$t (a, c, npix)
 	case 2:

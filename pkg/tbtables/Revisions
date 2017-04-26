@@ -1,3 +1,6 @@
+tbzmem.x
+    Removed debug output (5/12/14, MJF)
+
 tbyscp.x
     The 'sbuf' pointer was being used with Memr (5/4/13, MJF)
 

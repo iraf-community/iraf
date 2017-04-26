@@ -1,4 +1,7 @@
 
+vo.cl
+    Modified to preserve the 'imtype' if options are added. (10/21/14)
+
 votools/t_vodata.x
     The vod_tinfo() procedure was being declared as an int func (10/8/13)
 

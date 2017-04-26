@@ -52,8 +52,6 @@ begin
 	# There must be a least one image in order to continue.
 
 	call clgstr ("instrument", Memc[output], SZ_FNAME)
-        if (Memc[output] == EOS)
-            call error (1, "No 'instrument' translation file specified.")
 	call hdmopen (Memc[output])
 	call cmb_images (images, extns, subsets, nimages, nsubsets)
 	if (nsubsets == 0)

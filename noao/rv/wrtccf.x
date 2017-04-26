@@ -76,6 +76,7 @@ procedure wrt_ccf_image (rv)
 pointer	rv					#I RV struct pointer
 
 pointer	sp, x, im, buf, bp
+int	npts
 
 pointer	immap(), impl1r()
 double	rv_shift2vel()
@@ -99,6 +100,7 @@ begin
 	IM_PIXTYPE(im) = TY_REAL
 	IM_NDIM(im) = 1
 	IM_LEN(im,1) = RV_CCFNPTS(rv)
+	npts = RV_CCFNPTS(rv)
 	call sprintf (IM_TITLE(im), SZ_IMTITLE, "Correlation Function")
 
 	# Now dump the data into the image
@@ -110,14 +112,19 @@ begin
 	call imastr (im, "template", RIMAGE(rv))
 	call imaddi (im, "npts", RV_CCFNPTS(rv))
 	if (RV_DCFLAG(rv) != -1) {
+	    #call imaddr (im, "crval1", 
+	    #	real(rv_shift2vel(rv,real(-(RV_CCFNPTS(rv)/2)))))
+	    #call imaddr (im, "crval1", real (RV_VCOR(rv)))
 	    call imaddr (im, "crval1", 
-		real(rv_shift2vel(rv,real(-(RV_CCFNPTS(rv)/2)))))
+	    	real(rv_shift2vel(rv,real(RV_SHIFT(rv)))))
 	    call imaddr (im, "cdelt1", RV_DELTAV(rv))
+
 	} else {
 	    call imaddr (im, "crval1", real(-RV_CCFNPTS(rv))/2.)
 	    call imaddr (im, "cdelt1", 1.)
 	}
-	call imaddi (im, "crpix1", 1)
+	#call imaddi (im, "crpix1", 1)
+	call imaddr (im, "crpix1", ((npts/2+1)+RV_SHIFT(rv)))
 	call imastr (im, "ctype1", "velocity")
 	call imastr (im, "cunit1", "km/s")
 	call nam_filtype (rv, Memc[bp])
@@ -158,7 +165,7 @@ begin
 	call smark (sp)
 	call salloc (x, npts, TY_REAL)
 
-	# Sret up X-axis
+	# Set up X-axis
 	if (RV_DCFLAG(rv) != -1) {
             do i = 1, npts 
                 Memr[x+i-1] = real (rv_shift2vel(rv,WRKPIXX(rv,i)))

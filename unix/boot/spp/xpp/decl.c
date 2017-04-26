@@ -13,7 +13,7 @@
 #define	SZ_SBUF		4096		/* max chars in proc. decls.	*/
 #endif
 #define	SZ_TOKEN	63		/* max chars in a token		*/
-#define	MAX_SYMBOLS	300		/* max symbol table entries	*/
+#define	MAX_SYMBOLS	900		/* max symbol table entries	*/
 #define	SPMAX		(&sbuf[SZ_SBUF-1])
 #define	UNDECL		0
 

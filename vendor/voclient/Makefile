@@ -81,7 +81,7 @@ install:
 	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 clean:
-	(cd common      ; make distclean)
+	(cd common      ; make clean)
 	(cd libvotable  ; make clean)
 	(cd libsamp     ; make clean)
 	(cd libvoclient ; make clean)
