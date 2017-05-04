@@ -130,6 +130,7 @@ export HSI_CF="-I${HOME}/.iraf/ $HSI_CF"
 export HSI_FF="-I${HOME}/.iraf/ $HSI_FF"
 export HSI_LF="-I${HOME}/.iraf/ $HSI_LF"
 export HSI_XF="-I${HOME}/.iraf/ $HSI_XF"
+export XC_CFLAGS="-I${HOME}/.iraf/"
 
 
 # The following determines whether or not the VOS is used for filename mapping.
