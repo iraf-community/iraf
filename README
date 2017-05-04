@@ -14,12 +14,12 @@ contents of this directory include:
     bin.macosx		32-bit Mac OSX (Intel) binaries
     bin.macintel	64-bit Mac OSX (Intel) binaries
     dev			IRAF Device definition files
-    doc			IRAF System Documentation
+    doc			IRAF System Documentation, release notes, etc
     extern		External Packages
     include		Top-level vendor include files
     install		IRAF installation script
     lib			IRAF include files and libraries
-    local		IRAF 'local' package, release notes, etc
+    local		IRAF local packages
     math		IRAF 'math' library packages
     mkpkg		Top-level IRAF mkpkg build file
     noao		NOAO External Package
