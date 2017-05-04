@@ -32,7 +32,7 @@
 
 iraf="`/bin/echo ${iraf}/ | tr -s '/'`"
 
-helpfile="${iraf}local/help.log"
+helpfile="${iraf}doc/help.log"
 arcfile="/u1/ftp/iraf/v216/help.log"
 tmpfile="/tmp/help."
 lokfile="/tmp/help.lok"

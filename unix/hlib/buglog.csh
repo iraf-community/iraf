@@ -31,7 +31,7 @@
 
 unalias	rm set find echo sleep tail sed cmp echo cat mail
 
-set	bugfile	= "${iraf}local/bugs.log"
+set	bugfile	= "${iraf}doc/bugs.log"
 set	arcfile	= "/u1/ftp/iraf/v214/bugs.log"
 set	tmpfile	= "/tmp/bug."
 set	lokfile = "/tmp/bug.lok"
