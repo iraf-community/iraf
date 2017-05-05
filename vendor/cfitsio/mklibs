@@ -1,26 +1,23 @@
-#!/bin/csh -f
+#!/bin/sh
 
-#set top = `(chdir .. ; pwd)`
-set top = `pwd`
+top=`pwd`
 
-setenv CC 	"gcc"
-setenv CXX 	"g++"
+export CC=gcc
+export CXX=g++
 
 
-if ($?PLMACH) then
-  if ($PLMACH == "macosx") then
-    setenv CFLAGS "-mmacosx-version-min=10.5 -DDarwin"
-  endif
-endif
+if [ "$PLMACH" = "macosx" ] ; then
+   export CFLAGS="-mmacosx-version-min=10.5 -DDarwin"
+fi
 
 echo "  (Using toplevel directory '"$top"' ....)"
 
 # Global options.
-set	gopts = "--prefix=$top --exec-prefix=$top --disable-shared"
+gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 
-./configure $gopts  				 >& _spool
-make clean 					>>& _spool
-make 						>>& _spool
+./configure $gopts  				 > _spool 2>&1
+make clean 					>> _spool 2>&1
+make 						>> _spool 2>&1
 
 cp   libcfitsio.a ../voclient/lib
 mv   libcfitsio.a ../../lib
@@ -28,4 +25,3 @@ cp   fitsio*.h longnam.h ../../include
 
 make clean
 echo "done"
-
