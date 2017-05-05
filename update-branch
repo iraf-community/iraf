@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+branches="
+  add-travis-ci
+  remove-java-classes
+  Cleanup-external
+  Remove-doswin
+  Cleanup-local
+  move_documentation_to_doc
+  Remove-test-tar
+  Further-cleanup
+  fix-no-iraf-root
+  Dont-remove-sticky-bit-for-tmp
+  Cleanup-generated-files
+  xc-NOVOS
+  fix-osb-symlinks
+  replace-numerical-recipes
+  use-sh-in-mklibs
+"
+git checkout -f branch-merger-base
+git branch -D merge-all
+git checkout -b merge-all
+
+for b in $branches ; do
+    git merge --no-edit $b
+done
