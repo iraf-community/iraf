@@ -1,3 +1,4 @@
+include	<math.h>
 include	<error.h>
 include	<gset.h>
 
@@ -789,31 +790,34 @@ end
 # GASDEV -- Return a normally distributed deviate with zero mean and unit
 # variance.  The method computes two deviates simultaneously.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# Copyright(c) 2017 Anastasia Galkin
+# Reference: G. E. P. Box and Mervin E. Muller, A Note on the Generation of
+#            Random Normal Deviates, The Annals of Mathematical Statistics
+#            (1958), Vol. 29, No. 2 pp. 610–611
 
 real procedure gasdev (seed)
 
-long	seed		# Seed for random numbers
+long	seed
 
-real	v1, v2, r, fac, urand()
-int	iset
-data	iset/0/
+int	count
+data	count/0/
+
+real	u1, u2, x
+real	urand()
 
 begin
-	if (iset == 0) {
-	    repeat {
-	        v1 = 2 * urand (seed) - 1.
-	        v2 = 2 * urand (seed) - 1.
-	        r = v1 ** 2 + v2 ** 2
-	    } until ((r > 0) && (r < 1))
-	    fac = sqrt (-2. * log (r) / r)
-
-	    iset = 1
-	    return (v1 * fac)
+	if (count == 0) {
+		repeat {
+			u1 = 2 * urand (seed) - 1.
+		} until (u1 > 0)
+		repeat {
+			u2 = 2 * urand (seed) - 1.
+		} until (u1 > 0)
+		x = sqrt(-2 * log(u1)) * cos(2*PI*u2);
+		count = 1
 	} else {
-	    iset = 0
-	    return (v2 * fac)
+		x = sqrt(-2 * log(u1)) * sin(2*PI*u2);
+		count = 0
 	}
+	return (x)
 end
