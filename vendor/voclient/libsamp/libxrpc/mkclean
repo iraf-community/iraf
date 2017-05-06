@@ -1,43 +1,43 @@
-#!/bin/csh -f
+#!/bin/sh
 
-set top = `(chdir .. ; pwd)`
+top=`(cd .. ; pwd)`
 
 echo "Cleaning support libraries ...."
 
-/bin/rm -f bin/* lib/*.a lib/build/*.o share/*	>& /dev/null
-/bin/rm -f */_spool 				>& /dev/null
+/bin/rm -f bin/* lib/*.a lib/build/*.o share/*	> /dev/null 2>&1
+/bin/rm -f */_spool 				> /dev/null 2>&1
 
 
 echo -n "    Cleaning CURL libs ...."
-(chdir curl ;  \
-    find . -name .libs -exec /bin/rm -rf {} \;  >& /dev/null ; \
-    find . -name .deps -exec /bin/rm -rf {} \;  >& /dev/null ; \
-    find . -name curl.list -exec rm -rf {} \;   >& /dev/null ; \
-    find . -name Makefile -exec rm -rf {} \;    >& /dev/null ; \
-    find . -name libcurl.la -exec rm -rf {} \;  >& /dev/null ; \
+(cd curl ;  \
+    find . -name .libs -exec /bin/rm -rf {} \;  > /dev/null 2>&1 ; \
+    find . -name .deps -exec /bin/rm -rf {} \;  > /dev/null 2>&1 ; \
+    find . -name curl.list -exec rm -rf {} \;   > /dev/null 2>&1 ; \
+    find . -name Makefile -exec rm -rf {} \;    > /dev/null 2>&1 ; \
+    find . -name libcurl.la -exec rm -rf {} \;  > /dev/null 2>&1 ; \
     /bin/rm -f config.status curl-config libcurl.pc ;\
-    make clean maintainer-clean-am 		>>& _spool )
+    make clean maintainer-clean-am 		>> _spool 2>&1 )
 echo "done"
 
 
 
 echo -n "    Cleaning XMLRPC-C libs ...."
-foreach i (xmlrpc-c-1*)
-    (chdir $i ; make clean ; make distclean		>>& _spool )
-end
+for i in xmlrpc-c-1* ; do
+    (cd $i ; make clean ; make distclean	 ) >> _spool 2>&1
+done
 echo "done"
 
 # Real clean
-find . -name \*.a -print -exec /bin/rm -f {} \;		>& /dev/null
-find . -name \*.o -print -exec /bin/rm -f {} \;		>& /dev/null
-find . -name \*.so -print -exec /bin/rm -f {} \;	>& /dev/null
-find . -name \*.so.\* -print -exec /bin/rm -f {} \;	>& /dev/null
-find . -name \*.dylib -print -exec /bin/rm -f {} \;	>& /dev/null
-find . -name \*.dSym -print -exec /bin/rm -rf {} \;	>& /dev/null
-find . -name \*spool\* -print -exec /bin/rm -f {} \;	>& /dev/null
-find . -name \*.log -print -exec /bin/rm -f {} \;	>& /dev/null
-find . -name srcdir -exec /bin/rm -f {} \;		>& /dev/null
-find . -name blddir -exec /bin/rm -f {} \;		>& /dev/null
+find . -name \*.a -print -exec /bin/rm -f {} \;		> /dev/null 2>&1
+find . -name \*.o -print -exec /bin/rm -f {} \;		> /dev/null 2>&1
+find . -name \*.so -print -exec /bin/rm -f {} \;	> /dev/null 2>&1
+find . -name \*.so.\* -print -exec /bin/rm -f {} \;	> /dev/null 2>&1
+find . -name \*.dylib -print -exec /bin/rm -f {} \;	> /dev/null 2>&1
+find . -name \*.dSym -print -exec /bin/rm -rf {} \;	> /dev/null 2>&1
+find . -name \*spool\* -print -exec /bin/rm -f {} \;	> /dev/null 2>&1
+find . -name \*.log -print -exec /bin/rm -f {} \;	> /dev/null 2>&1
+find . -name srcdir -exec /bin/rm -f {} \;		> /dev/null 2>&1
+find . -name blddir -exec /bin/rm -f {} \;		> /dev/null 2>&1
 
 
 exit 0
