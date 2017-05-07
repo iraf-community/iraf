@@ -60,9 +60,6 @@ ifeq ($(PLATFORM),Darwin)
 else
     CLIBS       =  $(LIBCURL) -lm -lc -lpthread -lrt
     CARCH       = 
-    ifeq ($(PLMACH),x86_64)
-        LFLAGS	= -L/usr/lib64 $(LFLAGS)
-    endif
 endif
 
 #CLIBS           = $(LIBCURL) -lm -lpthread -lc
