@@ -1,11 +1,11 @@
-#!/bin/csh -f
+#!/bin/sh
 #
 #  MKBASE -- Create the base library.
 
-if (-e ../common/expat/.libs/libexpat.a) then
+if [ -f ../common/expat/.libs/libexpat.a ] ; then
     cp ../common/expat/.libs/libexpat.a $1
 
 else
     (cd ../common ; make expat)
     cp ../common/expat/.libs/libexpat.a $1
-endif
+fi
