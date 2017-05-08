@@ -18,6 +18,8 @@ branches="
   fix-osb-symlinks
   replace-numerical-recipes
   use-sh-in-mklibs
+  no-lib64
+  build-vendor-libs-before-VOS
 "
 git checkout -f branch-merger-base
 git branch -D merge-all
