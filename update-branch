@@ -20,6 +20,7 @@ branches="
   no-lib64
   build-vendor-before-novos
   linux64-zvsjmp
+  vo-dir-structure
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
