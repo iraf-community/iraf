@@ -19,7 +19,7 @@ branches="
   replace-numerical-recipes
   use-sh-in-mklibs
   no-lib64
-  build-vendor-libs-before-VOS
+  build-vendor-before-novos
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
