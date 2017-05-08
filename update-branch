@@ -19,6 +19,7 @@ branches="
   use-sh-in-mklibs
   no-lib64
   build-vendor-before-novos
+  linux64-zvsjmp
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
