@@ -26,5 +26,6 @@ git branch -D merge-all || true
 git checkout -b merge-all
 
 for b in $branches ; do
+    echo "******************" $b "******************" 
     git merge --no-edit $b
 done
