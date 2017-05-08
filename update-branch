@@ -22,7 +22,7 @@ branches="
   build-vendor-libs-before-VOS
 "
 git checkout -f branch-merger-base
-git branch -D merge-all
+git branch -D merge-all || true
 git checkout -b merge-all
 
 for b in $branches ; do
