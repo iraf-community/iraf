@@ -15,9 +15,6 @@
 #include "version.h"
 
 #include <curl/curl.h>
-#if(defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_7)
-#include <curl/types.h>
-#endif
 #include <curl/easy.h>
 
 #include "curlversion.h"
