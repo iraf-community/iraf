@@ -33,7 +33,7 @@ if [ $build_cfitsio = 1 ] ; then
      make clean 	     ; \
      make 	     ; \
      make install     ; \
-     make clean        ) >> _spool 2>&1
+     make clean        ) | tee -a _spool 2>&1
     echo "done"
 
 fi
@@ -47,7 +47,7 @@ if [ $build_readline = 1 ] ; then
 
     echo -n "    Building Readline libs ...."
     opts="$gopts --bindir=../../bin --libdir=../../bin"
-    (cd readline ; mkpkg ; make clean ) > _spool 2>&1
+    (cd readline ; mkpkg ; make clean ) | tee -a _spool 2>&1
     echo "done"
 
 fi
@@ -66,7 +66,7 @@ if [ $build_voclient = 1 ] ; then
      cp lib/libVO.a  ../../bin/      ; \
      cp voclient.jar ../../vo/java/  ; \
      cp voclientd    ../../vo/java/  ; \
-     make clean 		        ) >> _spool 2>&1
+     make clean 		        ) | tee -a _spool 2>&1
     echo "done"
 
 fi

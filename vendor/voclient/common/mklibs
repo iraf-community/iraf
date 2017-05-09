@@ -80,11 +80,11 @@ if [ $build_curl = 1 ] ; then
      ./configure $opts  	 ; \
      make clean 		 ; \
      make 		 ; \
-     make install	) >> _spool 2>&1
+     make install	) | tee -a _spool 2>&1
     #cp -rp curl/lib/libcurl.*a ../lib/
     cp -rp curl/include/* ../include/
     #/bin/rm -rf lib include share bin
-    #(cd curl ; make clean ) >> _spool 2>&1
+    #(cd curl ; make clean ) | tee -a _spool 2>&1
     echo "done"
 
 else

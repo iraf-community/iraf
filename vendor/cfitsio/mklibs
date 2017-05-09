@@ -15,9 +15,9 @@ echo "  (Using toplevel directory '"$top"' ....)"
 # Global options.
 gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 
-./configure $gopts  				 > _spool 2>&1
-make clean 					>> _spool 2>&1
-make 						>> _spool 2>&1
+./configure $gopts  			       | tee _spool 2>&1
+make clean 				       | tee -a _spool 2>&1
+make 					       | tee -a _spool 2>&1
 
 cp   libcfitsio.a ../voclient/lib
 mv   libcfitsio.a ../../lib

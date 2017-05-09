@@ -16,14 +16,14 @@ echo -n "    Cleaning CURL libs ...."
     find . -name Makefile -exec rm -rf {} \;    > /dev/null 2>&1 ; \
     find . -name libcurl.la -exec rm -rf {} \;  > /dev/null 2>&1 ; \
     /bin/rm -f config.status curl-config libcurl.pc ;\
-    make clean maintainer-clean-am 		>> _spool 2>&1 )
+    make clean maintainer-clean-am 		| tee -a _spool 2>&1 )
 echo "done"
 
 
 
 echo -n "    Cleaning XMLRPC-C libs ...."
 for i in xmlrpc-c-1* ; do
-    (cd $i ; make clean ; make distclean	 ) >> _spool 2>&1
+    (cd $i ; make clean ; make distclean	 ) | tee -a _spool 2>&1
 done
 echo "done"
 

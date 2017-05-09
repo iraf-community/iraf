@@ -66,9 +66,9 @@ if [ $build_curl = 1 ] ; then
     (cd curl ;  \
      ./configure $opts ; \
      make 	      ; \
-     make install      ) >> _spool 2>&1
+     make install      ) | tee -a _spool 2>&1
     echo "done"
-    #make clean		>> _spool 2>&1;
+    #make clean		| tee -a _spool 2>&1;
 
 fi
 
@@ -105,7 +105,7 @@ if [ $build_xmlrpc = 1 ] ; then
      make clean $curdir 	   ; \
      make $curdir 	   ; \
      make install $curdir   ; \
-     make distclean $curdir )  >> _spool 2>&1
+     make distclean $curdir )  | tee -a _spool 2>&1
     echo "done"
 
 
