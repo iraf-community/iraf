@@ -1,0 +1,140 @@
+#!/bin/sh
+
+# Doctest-alike IRAF test script. This will take text files with
+# MarkDown syntax, extract all code lines (enclosed with ```), execute
+# the lines that start with cl> or similar and compare the other lines
+# with the output of the IRAF shells (cl, ecl, vocl).
+#
+# Copyright: 2017 Ole Streicher
+# License: as IRAF
+#
+
+# IRAF shells to be tested
+IRAF_SHELLS="cl.e ecl.e vocl.e"
+
+# Test scripts
+TEST_FILES=${iraf}/test/*.md
+
+failure_file=$(mktemp)
+
+
+# Run one test. If a failure happens, the full message will be appended to
+# the $failure_file.
+#
+# Parameters:
+#
+#  - Executable of IRAF shell
+#  - Commands to be executed
+#  - Expected result string
+#  - Test script reference (file name and line number)
+#
+run_test () {
+    local CL="$1"
+    local command="$2"
+    local result="$3"
+    local src="$4"
+    local cmd_file=$(mktemp)
+    printf "%b\nlogout\n" "$command" > "$cmd_file"
+    res_file=$(mktemp)
+    printf "%b\n" "$result" > "$res_file"
+    clres_file=$(mktemp)
+    "${CL}" -f "$cmd_file" > "$clres_file" 2>&1
+    diff_file=$(mktemp)
+    diff -uw "$res_file" "$clres_file" > "$diff_file"
+    if [ -s $diff_file ] ; then
+	cat >> $failure_file <<EOF
+
+=================== Failure in $src with $(basename $CL) ===================
+
+Expected
+========
+$(cat $res_file)
+
+Output
+======
+$(cat $clres_file)
+
+Diff
+====
+$(cat $diff_file | tail -n +3)
+EOF
+	printf "F"
+    else
+	printf "."
+    fi
+    rm -f $cmd_file $res_file $clres_file $diff_file
+}
+
+# Run all tests for a given IRAF shell and test script
+#
+# Parameters:
+#
+#  - Executable of IRAF shell
+#  - File name for test script
+#
+run_tests () {
+    CL="$1"
+    FILE="$2"
+    in_code=0   # detect whether we are in a code section
+    command=''  # collected commands
+    result=''   # collected expected results
+    lineno=0    # line counter
+    cat "$FILE" | while read line ; do
+	lineno=$(expr $lineno + 1)
+	if [ "$in_code"  = 1 ] ; then
+	    if echo "$line" | grep -q '^```$' ; then
+		# we are at the end of a code section, so let's execute the test
+		run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}"
+		command=''
+		result=''
+		in_code=0
+	    elif echo "$line" | egrep -q '^[a-z]+> ' ; then
+		# We are in a code line that contains a command.
+		# First add a command to print the full line so that
+		# it appears in the output. Then add the command itself
+		# And add the command to to the expected results.
+		cmd=$(echo "$line" | sed 's/^[a-z]*> //')
+		if [ "$command" ] ; then
+		    command="${command}\nprint '${line}'"
+		    result="${result}\n${line}"
+		else
+		    command="print '${line}'"
+		    result="${line}"
+		fi
+		command="${command}\n${cmd}"
+	    else
+		# We are in a code line that contains the response from IRAF.
+		# Just add it to the expected results.
+		result="${result}\n${line}"
+	    fi
+	elif echo "$line" | grep -q '^```$' ; then
+	    # A new code section started. Store the next line number for
+	    # reference
+	    l_start=$(expr $lineno + 1)
+	    in_code=1
+	fi
+    done
+    echo
+}
+
+for CL in $IRAF_SHELLS ; do
+    if [ -x "${iraf}/bin/${CL}" ] ; then
+	for t in $TEST_FILES ; do
+	    tmp_dir=$(mktemp -d)
+	    printf "%b" "$(basename ${t}) @ ${CL} "
+	    cd "$tmp_dir" ; run_tests "${iraf}/bin/${CL}" "${t}"
+	    rm -rf "${tmp_dir}"
+	done
+    else
+	echo "IRAF shell $CL not found"
+	stat "${iraf}/bin/${CL}" >> "$failure_file" 2>&1
+    fi
+done
+
+if [ -s "$failure_file" ] ; then
+    cat "$failure_file"
+    rm -f "$failure_file"
+    exit 1
+fi
+
+rm -f "$failure_file"

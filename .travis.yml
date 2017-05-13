@@ -33,8 +33,4 @@ before_script:
 
 script:
   - source unix/hlib/setup.sh
-  - test -x unix/bin.${IRAFARCH}/xc.e
-  - test -x unix/bin.${IRAFARCH}/mkpkg.e
-  - test -x bin.${IRAFARCH}/cl.e
-  - test -x bin.${IRAFARCH}/ecl.e
-  - test -x bin.${IRAFARCH}/vocl.e
+  - ./test/run_tests
