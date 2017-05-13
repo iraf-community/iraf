@@ -59,8 +59,4 @@ before_script:
   - make sysgen
 
 script:
-  - ls $(for e in cl ecl irafks vocl ; do  echo bin.${IRAFARCH}/${e}.e  ; done) > /dev/null
-  - ls $(for e in color dataio images imdkern lists mkttydata ncar nttools obsolete plot proto sgikern softools stdgraph system tv utilities vol ; do echo bin.${IRAFARCH}/x_${e}.e ; done) > /dev/null
-  - ls $(for e in alloc f2c generic mkpkg rmbin rmfiles rpp rtar sgi2gif sgi2svg sgi2uapl sgi2ueps sgi2uhpgl sgi2uhplj sgi2uimp sgi2uptx sgi2uqms sgi2xbm sgidispatch wtar xc xpp xyacc ; do echo unix/bin.${IRAFARCH}/${e}.e ; done) > /dev/null
-  - ls $(for a in bev c cfitsio cur curfit deboor ds ex gks gsurfit imc imd imfort iminterp interp llsq memdbg ncar nlfit readline sgi slalib stg surfit sys tbtables VO vops xtools ; do echo bin.${IRAFARCH}/lib${a}.a; done) > /dev/null
-  - ls $(for a in boot f2c os ; do echo unix/bin.${IRAFARCH}/lib${a}.a ; done) > /dev/null
+  - ./test/run_tests
