@@ -21,6 +21,7 @@ branches="
   build-vendor-before-novos
   linux64-zvsjmp
   vo-dir-structure
+  align-on-128bit-boundaries
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
