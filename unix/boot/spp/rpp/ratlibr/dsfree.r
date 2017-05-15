@@ -5,7 +5,7 @@ include	defs
    subroutine dsfree (block)
    pointer block
 
-   DS_DECL(Mem, 1)
+   DS_DECL(Mem, MEMSIZE)
 
    pointer p0, p, q
 

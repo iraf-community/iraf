@@ -1,6 +1,6 @@
       integer function mktabl (nodsiz)
       integer nodsiz
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer st
       integer dsget

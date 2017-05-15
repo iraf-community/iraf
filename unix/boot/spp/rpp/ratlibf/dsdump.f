@@ -1,6 +1,6 @@
       subroutine dsdump (form)
       integer form
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer p, t, q
       t = 2
