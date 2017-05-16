@@ -23,6 +23,7 @@ branches="
   vo-dir-structure
   align-on-128bit-boundaries
   fix-fortran-declarations
+  fix-i386-alloc
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
