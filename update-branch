@@ -25,6 +25,7 @@ branches="
   fix-fortran-declarations
   fix-i386-alloc
   fix-ar-flag
+  fix-32bit-offset
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
