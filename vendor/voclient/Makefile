@@ -44,7 +44,7 @@ all:
 	(cd voapps      ; make all  ; make install)
 	(cd libvo       ; make all  ; make install)
 	cp voclient.jar voclientd bin/
-	/bin/rm -rf bin/curl* lib/pkgconfig
+	/bin/rm -rf lib/pkgconfig
 	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 libs:
@@ -77,7 +77,7 @@ install:
 	(cd voapps      ; make install)
 	(cd libvo       ; make install)
 	cp voclient.jar voclientd bin/
-	/bin/rm -rf bin/curl* lib/pkgconfig
+	/bin/rm -rf lib/pkgconfig
 	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 clean:

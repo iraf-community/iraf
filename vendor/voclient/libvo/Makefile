@@ -74,7 +74,6 @@ lib: objs $(INCS)
 	ar x ../lib/libVOTable.a
 	ar x ../lib/libVOClient.a
 	ar x ../lib/libVOApps.a
-	(if [ "$(PLATFORM)" != "Darwin" ]; then ar x ../lib/libcurl.a; fi)
 	chmod 644 *.o
 	ar rv libVO.a *.o
 	/bin/rm -f *.o __*

@@ -8,19 +8,6 @@ echo "Cleaning support libraries ...."
 /bin/rm -f */_spool 				>& /dev/null
 
 
-echo -n "    Cleaning CURL libs ...."
-(chdir curl ;  \
-    find . -name .libs -exec /bin/rm -rf {} \;  >& /dev/null ; \
-    find . -name .deps -exec /bin/rm -rf {} \;  >& /dev/null ; \
-    find . -name curl.list -exec rm -rf {} \;   >& /dev/null ; \
-    find . -name Makefile -exec rm -rf {} \;    >& /dev/null ; \
-    find . -name libcurl.la -exec rm -rf {} \;  >& /dev/null ; \
-    /bin/rm -f config.status curl-config libcurl.pc ;\
-    make clean maintainer-clean-am 		>>& _spool )
-echo "done"
-
-
-
 echo -n "    Cleaning XMLRPC-C libs ...."
 foreach i (xmlrpc-c-1*)
     (chdir $i ; make clean ; make distclean		>>& _spool )
