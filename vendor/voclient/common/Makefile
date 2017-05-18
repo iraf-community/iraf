@@ -34,7 +34,7 @@ endif
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
-all::	expat cfitsio curl
+all::	expat curl
 
 libs::
 	(/bin/csh -f mklibs)
@@ -46,9 +46,6 @@ curl::
 expat::
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
 
-cfitsio::
-	(cd cfitsio ; /bin/csh -f mklibs)
-
 apps:
 
 install:
@@ -59,12 +56,10 @@ install:
 clean:
 	(if [ "${PLATFORM}" != "Darwin" ]; then (cd curl ; make clean); fi)
 	(cd expat     	; make clean)
-	(cd cfitsio   	; make clean)
 
 distclean:
 	(if [ "${PLATFORM}" != "Darwin" ]; then (cd curl ; make distclean); fi)
 	(cd expat     	; make distclean)
-	#(cd cfitsio   	; make distclean)
 
 
 

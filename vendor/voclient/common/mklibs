@@ -30,28 +30,8 @@ else
 endif
 
 
-set	build_cfitsio	= 0
-
-
-
 echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top/"' ....)"
-
-# Global options.
-set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
-
-#echo "    Cleaning files ...."
-#./mkclean
-
-if ($build_cfitsio == 1) then
-    echo "    Building CFITSIO libs ...."
-    (cd cfitsio ; ./mklibs)
-
-else
-  if ( (! (-e lib/libcfitsio.a)) && (-e ../../bin/libcfitsio.a)) then
-      ln -s ../../bin/libcfitsio.a lib/libcfitsio.a
-  endif
-endif
 
 
 
