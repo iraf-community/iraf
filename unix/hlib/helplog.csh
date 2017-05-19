@@ -31,7 +31,7 @@
 
 unalias	rm set find echo sleep tail sed cmp echo cat mail
 
-set	helpfile = "${iraf}local/help.log"
+set	helpfile = "${iraf}doc/help.log"
 set	arcfile	= "/u1/ftp/iraf/v212/help.log"
 set	tmpfile	= "/tmp/help."
 set	lokfile = "/tmp/help.lok"
