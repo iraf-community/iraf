@@ -982,9 +982,6 @@ BOLD_OFF
 
 # Edit the $iraf pathname in the .login file for user 'iraf'.
 if (( $do_system==0 )); then
-  ECHO -n "Editing the iraf user .login/.cshrc paths ...                  "
-  pfiles=("$iraf/local/.cshrc $iraf/local/.login")
-else
   ECHO -n "Editing the user .login/.cshrc paths ...                       "
   if [ "$SHELL" == "/bin/sh" ]; then
    pfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
