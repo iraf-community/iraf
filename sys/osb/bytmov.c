@@ -1,1 +1,1 @@
-/iraf/iraf/unix/as/bytmov.c
+../../unix/as/bytmov.c
