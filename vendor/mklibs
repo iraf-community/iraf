@@ -1,21 +1,20 @@
-#!/bin/csh -f
+#!/bin/sh
 
-set p = `pwd`
-set top = $p:h
+top=`pwd`
 
-setenv CC 	"gcc"
-setenv CXX 	"g++"
+export CC=gcc
+export CXX=g++
 
-set	build_cfitsio	= 1
-set	build_readline	= 1		# not needed in v2.16.1 and beyond
-set	build_voclient	= 1
+build_cfitsio=1
+build_readline=1 # not needed in v2.16.1 and beyond
+build_voclient=1
 
 
 echo "Building support libraries ...."
-echo "  (Using toplevel directory '"$top/"' ....)"
+echo "  (Using toplevel directory '"$top"' ....)"
 
 # Global options.
-set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
+gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 
 #echo "    Cleaning files ...."
 #./mkclean
@@ -25,51 +24,49 @@ set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
 ####################################################################
 ####   CFITSIO Library
 ####################################################################
-if ($build_cfitsio == 1) then
+if [ $build_cfitsio = 1 ] ; then
 
-  echo -n "    Building CFITSIO libs ...."
-  set	opts = "$gopts --bindir=$top/bin --libdir=$top/bin"
-  (chdir cfitsio ;  \
-    ./configure $opts  				 >& _spool ; \
-    make clean 					>>& _spool ; \
-    make 					>>& _spool ; \
-    make install 				>>& _spool)
-  (chdir cfitsio ;  make clean 			>>& _spool )
-  echo "done"
+    echo -n "    Building CFITSIO libs ...."
+    opts="$gopts --bindir=$top/bin --libdir=$top/bin"
+    (cd cfitsio ;  \
+     ./configure $opts; \
+     make clean 	     ; \
+     make 	     ; \
+     make install     ; \
+     make clean        ) | tee -a _spool 2>&1
+    echo "done"
 
-endif
+fi
 
 
 
 ####################################################################
 ####   READLINE Library
 ####################################################################
-if ($build_readline == 1) then
+if [ $build_readline = 1 ] ; then
 
-  echo -n "    Building Readline libs ...."
-  set	opts = "$gopts --bindir=../../bin --libdir=../../bin"
-  (chdir readline ; mkpkg ; make clean 		>& _spool)
-  echo "done"
+    echo -n "    Building Readline libs ...."
+    opts="$gopts --bindir=../../bin --libdir=../../bin"
+    (cd readline ; mkpkg ; make clean ) | tee -a _spool 2>&1
+    echo "done"
 
-endif
+fi
 
 
 
 ####################################################################
 ####   VOClient Library
 ####################################################################
-if ($build_voclient == 1) then
+if [ $build_voclient = 1 ] ; then
 
-  echo -n "    Building VOClient libs ...."
+    echo -n "    Building VOClient libs ...."
 
-  (chdir voclient ; \
-	make all 			>>& _spool ; \
-	cp lib/libVO.a  ../../bin/ 	>>& _spool ; \
-	cp voclient.jar ../../vo/java/ 	>>& _spool ; \
-	cp voclientd    ../../vo/java/ 	>>& _spool ; \
-	make clean 		 	>>& _spool   )
-  echo "done"
+    (cd voclient ; \
+     make all 		        ; \
+     cp lib/libVO.a  ../../bin/      ; \
+     cp voclient.jar ../../vo/java/  ; \
+     cp voclientd    ../../vo/java/  ; \
+     make clean 		        ) | tee -a _spool 2>&1
+    echo "done"
 
-endif
-
-
+fi

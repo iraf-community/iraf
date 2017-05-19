@@ -37,17 +37,17 @@ CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 all::	expat cfitsio curl
 
 libs::
-	(/bin/csh -f mklibs)
+	(./mklibs)
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
 
 curl::
-	(/bin/csh -f mklibs)
+	(./mklibs)
 
 expat::
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
 
 cfitsio::
-	(cd cfitsio ; /bin/csh -f mklibs)
+	(cd cfitsio ; ./mklibs)
 
 apps:
 

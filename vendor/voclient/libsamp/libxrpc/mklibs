@@ -1,34 +1,31 @@
-#!/bin/csh -f
+#!/bin/sh
 
-#set top = `(chdir .. ; pwd)`
-set top = `pwd`
+top=`pwd`
 
-setenv CC 	"gcc"
-setenv CXX 	"g++"
+export CC=gcc
+export CXX=g++
 
-setenv PLATFORM	`uname -s`
-setenv PLMACH	`uname -m`
+export PLATFORM=`uname -s`
+export PLMACH=`uname -m`
 
-set	build_curl	= 0
-set	build_xmlrpc	= 1
+build_curl=0
+build_xmlrpc=1
 
 
-if ($PLATFORM == "Darwin") then
-   if ( $?IRAFARCH ) then
-       if ( "$IRAFARCH" == "macintel" ) then
-   	   setenv CFLAGS   '-m64 -mmacosx-version-min=10.4'
-   	   setenv LDFLAGS  '-m64 -mmacosx-version-min=10.4'
-           setenv LADD     '-m64 -mmacosx-version-min=10.4'
-       else
-   	   setenv CFLAGS   '-arch i386 -m32 -mmacosx-version-min=10.4'
-   	   setenv LDFLAGS  '-arch i386 -m32 -mmacosx-version-min=10.4'
-           setenv LADD     '-arch i386 -m32 -mmacosx-version-min=10.4'
-       endif
-   endif
+if [ "$PLATFORM" = "Darwin" ] ; then
+    if [ "$IRAFARCH" = "macintel" ] ; then
+	export CFLAGS='-m64 -mmacosx-version-min=10.4'
+	export LDFLAGS='-m64 -mmacosx-version-min=10.4'
+        export LADD='-m64 -mmacosx-version-min=10.4'
+    else
+	export CFLAGS='-arch i386 -m32 -mmacosx-version-min=10.4'
+	export LDFLAGS='-arch i386 -m32 -mmacosx-version-min=10.4'
+        export LADD='-arch i386 -m32 -mmacosx-version-min=10.4'
+    fi
 else
-    setenv CFLAGS   "-O2"
-endif
-   
+    export CFLAGS="-O2"
+fi
+
 
 
 
@@ -36,103 +33,102 @@ echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top"' ....)"
 
 # Global options.
-set	gopts = "--prefix=$top --exec-prefix=$top --disable-shared"
+gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 
 #echo "    Cleaning files ...."
 #./mkclean
 
-#if ( $build_curl == 1 || (! -e ../../lib/libcurl.a) ) then
-if ( $build_curl == 1 ) then
+if [ $build_curl = 1 ] ; then
 
-  echo -n "    Building CURL libs ...."
-  set	opts = "$gopts \
-		--disable-ftp \
-		--disable-file \
-		--disable-ldap \
-		--disable-ldaps \
-		--disable-proxy \
-		--disable-dict \
-		--disable-telnet \
-		--disable-tftp \
-		--disable-manual \
-		--disable-ipv6 \
-		--disable-ares \
-		--disable-sspi \
-		--disable-crypto-auth \
-		--without-krb4 \
-		--without-ssl \
-		--without-zlib \
-		--without-libssh2 \
-		--without-gnutls \
-		--without-nss \
-		--without-ca-path \
-		--without-libidn"
-  (chdir curl ;  \
-    ./configure $opts	 			 >& _spool ; \
-    make 					>>& _spool ; \
-    make install 				>>& _spool )
-  echo "done"
-    #make clean 					>>& _spool ; \
+    echo -n "    Building CURL libs ...."
+    opts = "$gopts \
+	--disable-ftp \
+	--disable-file \
+	--disable-ldap \
+	--disable-ldaps \
+	--disable-proxy \
+	--disable-dict \
+	--disable-telnet \
+	--disable-tftp \
+	--disable-manual \
+	--disable-ipv6 \
+	--disable-ares \
+	--disable-sspi \
+	--disable-crypto-auth \
+	--without-krb4 \
+	--without-ssl \
+	--without-zlib \
+	--without-libssh2 \
+	--without-gnutls \
+	--without-nss \
+	--without-ca-path \
+	--without-libidn"
+    (cd curl ;  \
+     ./configure $opts ; \
+     make 	      ; \
+     make install      ) | tee -a _spool 2>&1
+    echo "done"
+    #make clean		| tee -a _spool 2>&1;
 
-endif
+fi
 
-#chdir lib/build
+#cd lib/build
 #ar x ../libcurl.a
 #/bin/rm -f ../libcurl.a
-#foreach i (*)
+#for i in * ; do
 #     mv $i curl_$i
-#end
+#done
 #ar r ../libcurl.a *.o
 #ranlib ../libcurl.a
-#chdir ../../
+#cd ../../
 
 
 
-setenv CC 	"gcc -g -ggdb -O0"
-setenv CXX 	"g++ -g -ggdb -O0"
+export CC="gcc -g -ggdb -O0"
+export CXX="g++ -g -ggdb -O0"
 
-if ($build_xmlrpc == 1) then
+if [ $build_xmlrpc = 1 ] ; then
 
-echo -n "    Building XMLRPC-C libs ...."
-  set	opts = "$gopts \
-		--enable-curl-client \
-		--disable-wininet-client \
-		--disable-libwww-client \
-		--disable-cplusplus \
-		--disable-cgi-server"
-		#--disable-abyss-threads \
+    echo -n "    Building XMLRPC-C libs ...."
+    opts="$gopts \
+	--enable-curl-client \
+	--disable-wininet-client \
+	--disable-libwww-client \
+	--disable-cplusplus \
+	--disable-cgi-server"
+	#--disable-abyss-threads \
 # was 32
 # was 38
-  (chdir xmlrpc-c-1.16.29 ;  \
-    setenv curdir "CURDIR=`pwd`" 			   ; \
-    ./configure $opts		 		 >& _spool ; \
-    make clean $curdir 				>>& _spool ; \
-    make $curdir 				>>& _spool ; \
-    make install $curdir 			>>& _spool ; \
-    make distclean $curdir			>>& _spool )
-echo "done"
+    (cd xmlrpc-c-1.16.29 ;  \
+     export curdir="CURDIR=`pwd`"  ; \
+     ./configure $opts	   ; \
+     make clean $curdir 	   ; \
+     make $curdir 	   ; \
+     make install $curdir   ; \
+     make distclean $curdir )  | tee -a _spool 2>&1
+    echo "done"
 
 
 
-# Clean up.
-/bin/rm -rf lib/*.la lib/*.so.* lib/*.so lib/pkgconfig
+    # Clean up.
+    /bin/rm -rf lib/*.la lib/*.so.* lib/*.so lib/pkgconfig
 
-# Now build the combined library.
-chdir lib/build
-ls ../lib*.a
-    foreach i (../lib*.a)
-	set lname = `echo $i | sed -e 's/lib//g' -e 's/\.a//' -e 's/xmlrpc_//g' -e 's/server_//g' | cut -c4-`
+    # Now build the combined library.
+    mkdir lib/build
+    cd lib/build
+    ls ../lib*.a
+    for i  in ../lib*.a ; do
+	lname=`echo $i | sed -e 's/lib//g' -e 's/\.a//' -e 's/xmlrpc_//g' -e 's/server_//g' | cut -c4-`
 
         ar x $i
-	foreach j (*.o)
+	for j in *.o ; do
 	    mv $j ${lname}_$j
 	    chmod 444 ${lname}_$j
-	end
+	done
         ar r ../../libxrpc.a *.o
         ranlib ../../libxrpc.a
 	/bin/rm -f *.o
-    end
+    done
 
-endif		# build_xmlrpc
+fi		# build_xmlrpc
 
-chdir ../..

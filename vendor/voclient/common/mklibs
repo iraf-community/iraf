@@ -1,36 +1,31 @@
-#!/bin/csh -f
+#!/bin/sh
 
-#set top = `(chdir .. ; pwd)`
-set p = `pwd`
-set top = $p:h
+top=`(cd .. ; pwd)`
+#top=`pwd`
 
-setenv CC 	"gcc"
-setenv CXX 	"g++"
+export CC="gcc"
+export CXX="g++"
 
-setenv PLATFORM `uname -s`
-setenv PLMACH   `uname -m`
+export PLATFORM=`uname -s`
+export PLMACH=`uname -m`
 
 
-if ($PLATFORM == "Darwin") then
-   if ( $?IRAFARCH ) then
-       if ( "$IRAFARCH" == "macintel" ) then
-           setenv CFLAGS   '-m64 -mmacosx-version-min=10.4'
-           setenv LDFLAGS  '-m64 -mmacosx-version-min=10.4'
-           setenv LADD     '-m64 -mmacosx-version-min=10.4'
-       else
-           setenv CFLAGS   '-arch i386 -m32 -mmacosx-version-min=10.4'
-           setenv LDFLAGS  '-arch i386 -m32 -mmacosx-version-min=10.4'
-           setenv LADD     '-arch i386 -m32 -mmacosx-version-min=10.4'
-       endif
-   endif
-   set	build_curl	= 1
+if [ "$PLATFORM" = "Darwin" ] ; then
+    if [ "$IRAFARCH" = "macintel" ] ; then
+	export CFLAGS='-m64 -mmacosx-version-min=10.4'
+	export LDFLAGS='-m64 -mmacosx-version-min=10.4'
+	export LADD='-m64 -mmacosx-version-min=10.4'
+    else
+	export CFLAGS='-arch i386 -m32 -mmacosx-version-min=10.4'
+	export LDFLAGS='-arch i386 -m32 -mmacosx-version-min=10.4'
+        export LADD='-arch i386 -m32 -mmacosx-version-min=10.4'
+    fi
 else
-   setenv CFLAGS   "-O2"
-   set	build_curl	= 1
-endif
+    export CFLAGS="-O2"
+fi
 
-
-set	build_cfitsio	= 0
+build_curl=1
+build_cfitsio=0
 
 
 
@@ -38,62 +33,62 @@ echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top/"' ....)"
 
 # Global options.
-set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
+gopts="--prefix=$top/ --exec-prefix=$top/ --disable-shared"
 
 #echo "    Cleaning files ...."
 #./mkclean
 
-if ($build_cfitsio == 1) then
+if [ $build_cfitsio = 1 ] ; then
     echo "    Building CFITSIO libs ...."
     (cd cfitsio ; ./mklibs)
 
 else
-  if ( (! (-e lib/libcfitsio.a)) && (-e ../../bin/libcfitsio.a)) then
-      ln -s ../../bin/libcfitsio.a lib/libcfitsio.a
-  endif
-endif
+    if [ ! -e lib/libcfitsio.a -a -e ../../bin/libcfitsio.a ] ; then
+	ln -s ../../bin/libcfitsio.a lib/libcfitsio.a
+    fi
+fi
 
 
 
 
-if ($build_curl == 1) then
+if [ $build_curl = 1 ] ; then
 
-  echo -n "    Building CURL libs ...."
-  set	opts = "$gopts \
-		--disable-ftp \
-		--disable-file \
-		--disable-ldap \
-		--disable-ldaps \
-		--disable-proxy \
-		--disable-dict \
-		--disable-telnet \
-		--disable-tftp \
-		--disable-manual \
-		--disable-ipv6 \
-		--disable-ares \
-		--disable-sspi \
-		--disable-crypto-auth \
-		--without-krb4 \
-		--without-ssl \
-		--without-zlib \
-		--without-libssh2 \
-		--without-gnutls \
-		--without-nss \
-		--without-ca-path \
-		--without-libidn"
-  (chdir curl ;  \
-    ./configure $opts  				 >& _spool ; \
-    make clean 					>>& _spool ; \
-    make 					>>& _spool ; \
-    make install				>>& _spool)
-  #cp -rp curl/lib/libcurl.*a ../lib/
-  cp -rp curl/include/* ../include/
-  #/bin/rm -rf lib include share bin
-  #(chdir curl ; make clean			>>& _spool)
-  echo "done"
+    echo -n "    Building CURL libs ...."
+    opts="$gopts \
+    	--disable-ftp \
+	--disable-file \
+	--disable-ldap \
+	--disable-ldaps \
+	--disable-proxy \
+	--disable-dict \
+	--disable-telnet \
+	--disable-tftp \
+	--disable-manual \
+	--disable-ipv6 \
+	--disable-ares \
+	--disable-sspi \
+	--disable-crypto-auth \
+	--without-krb4 \
+	--without-ssl \
+	--without-zlib \
+	--without-libssh2 \
+	--without-gnutls \
+	--without-nss \
+	--without-ca-path \
+	--without-libidn"
+    (cd curl ;  \
+     ./configure $opts  	 ; \
+     make clean 		 ; \
+     make 		 ; \
+     make install	) | tee -a _spool 2>&1
+    #cp -rp curl/lib/libcurl.*a ../lib/
+    cp -rp curl/include/* ../include/
+    #/bin/rm -rf lib include share bin
+    #(cd curl ; make clean ) | tee -a _spool 2>&1
+    echo "done"
 
 else
-  if ( (! (-e lib/libcurl.a)) && (-e ../../bin/libcurl.a)) then
-      ln -s ../../bin/libcurl.a lib/libcurl.a
-  endif
-endif
+    if [ ! -e lib/libcurl.a -a -e ../../bin/libcurl.a ] ; then
+	ln -s ../../bin/libcurl.a lib/libcurl.a
+    fi
+fi
