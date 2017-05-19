@@ -1,6 +1,0 @@
-#! /bin/csh
-# -- Used to massage FWF widgets to fit the OBM directory structure.
-
-foreach i (`grep -l Xfwf *.[ch]`)
-    echo $i; sed -f FWFSED $i > temp; mv temp $i
-end
