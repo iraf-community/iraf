@@ -1,7 +1,7 @@
       integer function stlu (symbol, node, pred, st)
       integer symbol (100)
       integer node, pred, st
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer hash, i, j, nodsiz
       nodsiz = mem (st)
