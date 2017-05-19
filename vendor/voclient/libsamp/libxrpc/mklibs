@@ -8,7 +8,6 @@ export CXX=g++
 export PLATFORM=`uname -s`
 export PLMACH=`uname -m`
 
-build_curl=0
 build_xmlrpc=1
 
 
@@ -37,51 +36,6 @@ gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 
 #echo "    Cleaning files ...."
 #./mkclean
-
-if [ $build_curl = 1 ] ; then
-
-    echo -n "    Building CURL libs ...."
-    opts = "$gopts \
-	--disable-ftp \
-	--disable-file \
-	--disable-ldap \
-	--disable-ldaps \
-	--disable-proxy \
-	--disable-dict \
-	--disable-telnet \
-	--disable-tftp \
-	--disable-manual \
-	--disable-ipv6 \
-	--disable-ares \
-	--disable-sspi \
-	--disable-crypto-auth \
-	--without-krb4 \
-	--without-ssl \
-	--without-zlib \
-	--without-libssh2 \
-	--without-gnutls \
-	--without-nss \
-	--without-ca-path \
-	--without-libidn"
-    (cd curl ;  \
-     ./configure $opts ; \
-     make 	      ; \
-     make install      ) | tee -a _spool 2>&1
-    echo "done"
-    #make clean		| tee -a _spool 2>&1;
-
-fi
-
-#cd lib/build
-#ar x ../libcurl.a
-#/bin/rm -f ../libcurl.a
-#for i in * ; do
-#     mv $i curl_$i
-#done
-#ar r ../libcurl.a *.o
-#ranlib ../libcurl.a
-#cd ../../
-
 
 
 export CC="gcc -g -ggdb -O0"
