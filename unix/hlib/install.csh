@@ -1949,13 +1949,6 @@ endif
 
 
 
-# Allow deletion of files in /tmp - needed for multiuser tape allocation.
-echo -n "Reset /tmp sticky bit setting ...				"
-if ($exec == yes) then
-    chmod -t /tmp
-endif
-DO_OK
-
 # Initialize permissions of tape devices.
 if ($do_tapes) then
 echo -n "Setting tape device permissions ...				"
