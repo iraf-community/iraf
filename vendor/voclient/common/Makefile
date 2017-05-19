@@ -34,17 +34,13 @@ endif
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
-all::	expat cfitsio
+all::	expat
 
 libs::
-	(./mklibs)
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
 
 expat::
 	(cd expat ; ./configure --prefix=${HERE}/../; \ make ; make installlib)
-
-cfitsio::
-	(cd cfitsio ; ./mklibs)
 
 apps:
 
@@ -54,11 +50,9 @@ install:
 
 clean:
 	(cd expat     	; make clean)
-	(cd cfitsio   	; make clean)
 
 distclean:
 	(cd expat     	; make distclean)
-	#(cd cfitsio   	; make distclean)
 
 
 
