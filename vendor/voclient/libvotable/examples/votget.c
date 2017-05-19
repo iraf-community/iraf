@@ -62,7 +62,6 @@ main (int argc, char **argv)
 #include <pthread.h>
 
 #include <curl/curl.h>
-#include <curl/types.h>
 #include <curl/easy.h>
 
 #include "votParse.h"
