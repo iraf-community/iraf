@@ -3,7 +3,6 @@
 set -e
 
 branches="
-  add-travis-ci
   remove-java-classes
   Cleanup-external
   Remove-doswin
@@ -15,17 +14,19 @@ branches="
   Dont-remove-sticky-bit-for-tmp
   Cleanup-generated-files
   fix-osb-symlinks
-  replace-numerical-recipes
+  add-travis-ci
   use-sh-in-mklibs
   no-lib64
   build-vendor-before-novos
   linux64-zvsjmp
   vo-dir-structure
+  remove-include-curl-types-h
   align-on-128bit-boundaries
   fix-fortran-declarations
   fix-i386-alloc
   fix-ar-flag
   fix-32bit-offset
+  remove-x11iraf
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
