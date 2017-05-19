@@ -1,6 +1,6 @@
 #!/bin/sh
 
-top=`pwd`
+top=`cd ..; pwd`
 
 export CC=gcc
 export CXX=g++
