@@ -7,16 +7,16 @@ matrix:
   include:
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux64
+      env: IRAFARCH=linux64 LINUXDIST=trusty
     - os: linux
       dist: precise
-      env: IRAFARCH=linux64
+      env: IRAFARCH=linux64 LINUXDIST=precise
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux
+      env: IRAFARCH=linux LINUXDIST=trusty
     - os: linux
       dist: precise
-      env: IRAFARCH=linux
+      env: IRAFARCH=linux LINUXDIST=precise
     - os: osx
       env: IRAFARCH=macintel
     - os: osx
