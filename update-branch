@@ -24,9 +24,9 @@ branches="
   align-on-128bit-boundaries
   fix-fortran-declarations
   fix-i386-alloc
-  fix-ar-flag
   fix-32bit-offset
   remove-x11iraf
+  fix-scanlib-date-check
 "
 git checkout -f branch-merger-base
 git branch -D merge-all || true
