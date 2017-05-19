@@ -1,0 +1,36 @@
+addons:
+  apt:
+    packages:
+      - gcc-multilib
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      env: IRAFARCH=linux64
+    - os: linux
+      dist: precise
+      env: IRAFARCH=linux64
+    - os: linux
+      dist: trusty
+      env: IRAFARCH=linux
+    - os: linux
+      dist: precise
+      env: IRAFARCH=linux
+    - os: osx
+      env: IRAFARCH=macintel
+    - os: osx
+      env: IRAFARCH=macosx
+
+
+language: c
+
+before_script:
+  - build_tmp=`mktemp -d`
+  - ./install -v --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir --root `pwd` < /dev/null || true
+  - make ${IRAFARCH}
+  - make sysgen
+
+script:
+  - source unix/hlib/setup.sh
+  - ./test/run_tests
