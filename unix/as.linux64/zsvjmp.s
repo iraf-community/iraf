@@ -18,11 +18,9 @@
 # of one longword containing the address of the STATUS variable, followed
 # by the "jmp_buf" used by setjmp/longjmp.
 #
-# This file contains the FreeBSD (x86) version of ZSVJMP.
-# Modified to remove leading underscore for ELF (Jan99).
  
-        #.globl	_zsvjmp_
         .globl	zsvjmp_
+	.type   zsvjmp_, @function
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -33,10 +31,8 @@
 	# advantage is that references to NULL pointers are likely to cause a
 	# memory violation.
 
-	#.globl	mem_
-	#mem_	=	0
-	.globl	_mem_
-	_mem_	=	0
+	.globl  _mem_
+	_mem_   =       0
 
 zsvjmp_:
 	# %rsi ... &status  %rdi ... &jumpbuf
@@ -44,5 +40,6 @@ zsvjmp_:
 	movl    $0, (%rsi)      # zero the value of status
 	addq    $8, %rdi        # change point to &jmpbuf[1]
 	movl    $0, %esi        # change arg2 to zero
-	jmp     __sigsetjmp     # let sigsetjmp do the rest
+	jmp     __sigsetjmp@PLT # let sigsetjmp do the rest
 
+	.section        .note.GNU-stack,"",@progbits
