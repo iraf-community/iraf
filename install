@@ -741,7 +741,7 @@ BINDIRS="$hbin $hlib $fbin $host"
 
 
 # The following file lists are partially system dependent.
-PATHFILES="mkiraf.${extn} libc/iraf.h cl.${extn} ecl.${extn} vocl.${extn} setup.sh setup.csh"
+PATHFILES="mkiraf.${extn} libc/iraf.h cl.${extn} ecl.${extn} vocl.${extn} setup.sh setup.csh libc/libc.h"
 MODEFILES="cl.${extn} fc.${extn} mkiraf.${extn} mkfloat.${extn} mkmlist.${extn} $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.${extn}"
 LINKFILES="ecl.${extn} cl.${extn} vocl.${extn} mkiraf.${extn} mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
 LINKCMDS=(ecl cl vocl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
