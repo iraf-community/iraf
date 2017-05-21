@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 
 /* MEMLOG -- SPP callable routines for logging MEMIO debug messages and
  * user application messages in sequence to the mem.log file.
@@ -23,20 +24,19 @@ static 	int number = 0;
 #define	LOG_MALLOC	0001
 #define	LOG_SALLOC	0002
 
-static void memput();
+static void memput(char *);
 
 
 /* MEMLOG -- User routine to log a message in sequence to the memio debug
  * log file.
  */
-memlog_ (message)
-XCHAR	*message;
+void memlog_ (XCHAR *message)
 {
 	register XCHAR *ip;
 	register char *op;
 	char	p_message[1024];
 
-	for (ip=message, op=p_message;  *op++ = *ip++;  )
+	for (ip=message, op=p_message;  (*op++ = *ip++);  )
 	    ;
 	memput (p_message);
 }
@@ -44,8 +44,7 @@ XCHAR	*message;
 
 /* MEMLEV -- Set the logging level.
  */
-memlev_ (level)
-int	*level;
+void memlev_ (int *level)
 {
 	loglevel = *level;
 }
@@ -54,9 +53,7 @@ int	*level;
 /* MEMLOG1 -- User routine to log a message in sequence to the memio debug
  * log file.
  */
-memlo1_ (format, arg1)
-XCHAR	*format;
-int	*arg1;
+void memlo1_ (XCHAR *format, int *arg1)
 {
 	register XCHAR *ip;
 	register char *op;
@@ -64,7 +61,7 @@ int	*arg1;
 	char	message[1024];
 
 	/* Output user message. */
-	for (ip=format, op=p_format;  *op++ = *ip++;  )
+	for (ip=format, op=p_format;  (*op++ = *ip++);  )
 	    ;
 	sprintf (message, p_format, *arg1);
 	memput (message);
@@ -74,10 +71,7 @@ int	*arg1;
 /* MEMLOG2 -- User routine to log a message in sequence to the memio debug
  * log file.
  */
-memlo2_ (format, arg1, arg2)
-XCHAR	*format;
-int	*arg1;
-int	*arg2;
+void memlo2_ (XCHAR *format, int *arg1, int *arg2)
 {
 	register XCHAR *ip;
 	register char *op;
@@ -85,7 +79,7 @@ int	*arg2;
 	char	message[1024];
 
 	/* Output user message. */
-	for (ip=format, op=p_format;  *op++ = *ip++;  )
+	for (ip=format, op=p_format;  (*op++ = *ip++);  )
 	    ;
 	sprintf (message, p_format, *arg1, *arg2);
 	memput (message);
@@ -95,9 +89,7 @@ int	*arg2;
 /* MEMLOGS -- User routine to log a message in sequence to the memio debug
  * log file.
  */
-memlos_ (format, strarg)
-XCHAR	*format;
-XCHAR	*strarg;
+void memlos_ (XCHAR *format, XCHAR *strarg)
 {
 	register XCHAR *ip;
 	register char *op;
@@ -106,9 +98,9 @@ XCHAR	*strarg;
 	char	message[1024];
 
 	/* Output user message. */
-	for (ip=format, op=p_format;  *op++ = *ip++;  )
+	for (ip=format, op=p_format;  (*op++ = *ip++);  )
 	    ;
-	for (ip=strarg, op=p_strarg;  *op++ = *ip++;  )
+	for (ip=strarg, op=p_strarg;  (*op++ = *ip++);  )
 	    ;
 	sprintf (message, p_format, p_strarg);
 	memput (message);
@@ -117,9 +109,7 @@ XCHAR	*strarg;
 
 /* MEMPUT -- Log a message in sequence to the memio debug log file.
  */
-static void
-memput (message)
-char	*message;
+static void memput (char *message)
 {
 	/* Open logfile. */
 	if (fp == NULL) {
@@ -142,11 +132,8 @@ char	*message;
 
 /* ZMEMLG -- Used internally by the MEMIO routines.
  */
-zmemlg_ (addr, retaddr, action, class, format, arg1, arg2)
-int	*addr, *retaddr;
-int	*action, *class;
-XCHAR	*format;
-int	*arg1, *arg2;
+void zmemlg_ (int *addr, int *retaddr, int *action, int *class,
+	      XCHAR *format, int *arg1, int *arg2)
 {
 	register XCHAR *ip;
 	register char *op;
@@ -156,7 +143,7 @@ int	*arg1, *arg2;
 	if (!(loglevel & *class))
 	    return;
 
-	for (ip=format, op=p_format;  *op++ = *ip++;  )
+	for (ip=format, op=p_format;  (*op++ = *ip++);  )
 	    ;
 	s_action[0] = *action;
 	s_action[1] = '\0';
