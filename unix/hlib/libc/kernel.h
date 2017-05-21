@@ -48,10 +48,11 @@
  * convert host pointer addresses (in bytes) to/from iraf pointer values
  * in units of XCHAR.
  *
- * The address LOC needs to be not negative, so a possibly remaining
- * most significant bit is masked out.
+ * The address LOC needs to be not negative, so we explicitly cast it
+ * into an unsigned before rightshifting. Hopefully (!) this will
+ * shift in a zero...
  */
-#define	ADDR_TO_LOC(addr) 	((((XINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1)) & ~(1 << (8*sizeof(XINT)-1)))
+#define	ADDR_TO_LOC(addr) 	(((unsigned XINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
 #define	LOC_TO_ADDR(loc,type)   ((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
 
 
