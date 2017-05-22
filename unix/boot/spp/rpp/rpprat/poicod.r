@@ -9,14 +9,14 @@ include COMMON_BLOCKS
 string	spointer XPOINTER
 
 # Fortran declarations for the MEM common.
-string	p1	"logical Memb(1)"
-string	p2	"integer*2 Memc(1)"
-string	p3	"integer*2 Mems(1)"
-string	p4	"integer Memi(1)"
-string	p5	"integer Meml(1)"
-string	p6	"real Memr(1)"
-string	p7	"double precision Memd(1)"
-string	p8	"complex Memx(1)"
+string	p1	"logical Memb(60000)"
+string	p2	"integer*2 Memc(60000)"
+string	p3	"integer*2 Mems(60000)"
+string	p4	"integer Memi(60000)"
+string	p5	"integer Meml(60000)"
+string	p6	"real Memr(60000)"
+string	p7	"double precision Memd(60000)"
+string	p8	"complex Memx(60000)"
 string	p9	"equivalence (Memb, Memc, Mems, Memi, Meml, Memr, Memd, Memx)"
 string	pa	"common /Mem/ Memd"
 
