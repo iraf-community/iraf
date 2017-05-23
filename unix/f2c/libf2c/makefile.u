@@ -16,12 +16,12 @@
 CC = cc
 SHELL = /bin/sh
 CFLAGS = -O -w $(HSI_CF)
+LDFLAGS = $(HSI_LF)
 
 # compile, then strip unnecessary symbols
 .c.o:
 	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
-	ld -r -x -o $*.xxx $*.o
-	mv $*.xxx $*.o
+
 ## Under Solaris (and other systems that do not understand ld -x),
 ## omit -x in the ld line above.
 ## If your system does not have the ld command, comment out
@@ -86,15 +86,15 @@ libf2c.a: $(OFILES)
 ## arrange for $DYLD_LIBRARY_PATH to include the directory containing libf2c.so.
 
 libf2c.so: $(OFILES)
-	$(CC) -shared -o libf2c.so $(OFILES)
+	$(CC) $(LDFLAGS) -shared -o libf2c.so $(OFILES)
 
 ### If your system lacks ranlib, you don't need it; see README.
 
 f77vers.o: f77vers.c
-	$(CC) -c f77vers.c
+	$(CC) $(CFLAGS) -c f77vers.c
 
 i77vers.o: i77vers.c
-	$(CC) -c i77vers.c
+	$(CC) $(CFLAGS) -c i77vers.c
 
 # To get an "f2c.h" for use with "f2c -C++", first "make hadd"
 hadd: f2c.h0 f2ch.add

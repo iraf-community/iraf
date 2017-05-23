@@ -40,6 +40,10 @@ else
         CFLAGS_COMMON = -DNDEBUG -arch i386 -m32 -mmacosx-version-min=10.4
         LADD += -m32 -arch i386
     endif
+    ifeq ($(IRAFARCH),linux)
+        CFLAGS_COMMON = -m32
+        LADD += -m32
+    endif
 endif
 CXXFLAGS_COMMON = -DNDEBUG
 

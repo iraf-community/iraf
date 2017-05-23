@@ -26,7 +26,12 @@ ifeq  ($(PLATFORM), "Darwin")
         CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
     endif
 else
-    CARCH	= 
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+	    CFITSIO_CFLAGS= -m32
+        endif
+    endif
 endif
 
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
@@ -34,7 +39,7 @@ LIBS		= -lm -lc -lpthread
 
 
 all:
-	(./mklibs)
+	./mklibs
 
 libs:
 
@@ -48,7 +53,7 @@ clean:
 
 
 cfitsio:
-	(cd cfitsio   ; ./configure --libdir=../../bin; make ; make install)
+	(cd cfitsio   ; ./configure --libdir=../../bin CFLAGS="$CFITSIO_CFLAGS" ; make ; make install)
 
 voclient:
 	(cd voclient  ; make World)

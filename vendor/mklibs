@@ -9,6 +9,9 @@ build_cfitsio=1
 build_readline=1 # not needed in v2.16.1 and beyond
 build_voclient=1
 
+if [ "$IRAFARCH" = "linux" ] ; then
+    CARCH=-m32
+fi
 
 echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top"' ....)"
@@ -27,7 +30,7 @@ gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 if [ $build_cfitsio = 1 ] ; then
 
     echo -n "    Building CFITSIO libs ...."
-    opts="$gopts --bindir=$top/bin --libdir=$top/bin"
+    opts="$gopts --bindir=$top/bin --libdir=$top/bin CFLAGS=$CARCH"
     (cd cfitsio ;  \
      ./configure $opts; \
      make clean 	     ; \

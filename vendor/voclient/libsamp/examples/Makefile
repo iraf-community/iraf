@@ -39,7 +39,11 @@ ifeq ("$(PLATFORM)", "Darwin")
     endif
 else
     CLIBS       = -lm -lc -lpthread -lcurl
-    CARCH       = -D$(PLATFORM)
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
 endif
 
 #CARCH   	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4

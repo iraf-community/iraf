@@ -22,7 +22,14 @@ if [ "$PLATFORM" = "Darwin" ] ; then
         export LADD='-arch i386 -m32 -mmacosx-version-min=10.4'
     fi
 else
-    export CFLAGS="-O2"
+    if [ "$IRAFARCH" = "linux" ] ; then
+	export CFLAGS='-m32 -O2'
+	export LDFLAGS='-m32'
+        export LADD='-m32'
+	XMLRPC_HOST_ARCH="i386-unknown-linux-gnu"
+    else
+	export CFLAGS="-O2"
+    fi
 fi
 
 

@@ -29,7 +29,11 @@ ifeq  ($(PLATFORM), "Darwin")
         CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
     endif
 else
-    CARCH	= 
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
 endif
 
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./

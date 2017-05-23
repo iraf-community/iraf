@@ -40,7 +40,11 @@ ifeq ($(PLATFORM),Darwin)
     endif
     PYFLAGS 	= -dynamiclib -I/usr/include/python$(PYVER)/ -lpython$(PYVER)
 else
-    CARCH       =
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
     PYFLAGS 	= -DLINUX
 endif
 

@@ -35,7 +35,11 @@ ifeq ($(PLATFORM), "Darwin")
     endif
 else
     CLIBS       = -lm -lc -lpthread
-    CARCH       =
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
 endif
 
 CFLAGS          = -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./

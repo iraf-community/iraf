@@ -47,7 +47,11 @@ ifeq ($(PLATFORM),Darwin)
     endif
 else
     CLIBS       = -lm -lc -lcurl -lpthread
-    CARCH       =
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
 endif
 
 CLIBS           = -lm -lc -lcurl -lpthread -lm

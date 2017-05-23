@@ -47,7 +47,11 @@ ifeq ($(PLATFORM),Darwin)
         endif
     endif
 else
-    CARCH       = 
+    ifdef IRAFARCH
+        ifeq ($(IRAFARCH),linux)
+            CARCH = -m32
+        endif
+    endif
 endif
 
 #CFLAGS   = -O2 -DDEBUG -D$(PLATFORM)
