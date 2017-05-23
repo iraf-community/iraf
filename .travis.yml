@@ -1,22 +1,44 @@
-addons:
-  apt:
-    packages:
-      - gcc-multilib
 
 matrix:
   include:
     - os: linux
       dist: trusty
       env: IRAFARCH=linux64 LINUXDIST=trusty
+      addons:
+        apt:
+          packages:
+            - flex
+            - byacc
     - os: linux
       dist: precise
       env: IRAFARCH=linux64 LINUXDIST=precise
+      addons:
+        apt:
+          packages:
+            - flex
+            - byacc
     - os: linux
       dist: trusty
       env: IRAFARCH=linux LINUXDIST=trusty
+      addons:
+        apt:
+          packages:
+            - flex
+            - byacc
+            - gcc-multilib
+            - libcurl4-gnutls-dev:i386
+            - libncurses5-dev:i386
     - os: linux
       dist: precise
       env: IRAFARCH=linux LINUXDIST=precise
+      addons:
+        apt:
+          packages:
+            - flex
+            - byacc
+            - gcc-multilib
+            - libcurl4-gnutls-dev:i386
+            - libncurses5-dev:i386
     - os: osx
       env: IRAFARCH=macintel
     - os: osx
