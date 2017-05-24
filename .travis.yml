@@ -28,6 +28,7 @@ matrix:
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
             - libncurses5-dev:i386
+            - libexpat1-dev:i386
     - os: linux
       dist: precise
       env: IRAFARCH=linux LINUXDIST=precise
@@ -39,6 +40,7 @@ matrix:
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
             - libncurses5-dev:i386
+            - libexpat1-dev:i386
     - os: osx
       env: IRAFARCH=macintel
     - os: osx
