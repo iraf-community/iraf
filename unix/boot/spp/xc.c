@@ -1454,16 +1454,15 @@ iraflib (char *libref)
 
 	strcpy (savename, libref);
 
-	/* If dbgout is enabled try the debug library first, but fall back
-	 * to the normal library if thie debug library is not found.
-	 */
-again:
 	if (strncmp (libref, "-l", 2) == 0) { 
 	    sprintf (libname, "lib%s.a", libref+2);
 	    libref = libname;
-	} else
-	    strcpy (libname, libref);
+	}
 
+	/* If dbgout is enabled try the debug library first, but fall back
+	 * to the normal library if the debug library is not found.
+	 */
+again:
 	/* Position IP to EOS. */
 	for (ip=libref;  *ip;  ip++)
 	    ;
