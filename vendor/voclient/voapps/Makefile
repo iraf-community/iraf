@@ -111,7 +111,7 @@ TARGETS	    = $(F77_TASKS) $(SPP_TASKS) $(C_TASKS)
 
 SRCS	    = $(C_SRCS) $(F77_SRCS) $(SPP_SRCS) 
 OBJS	    = $(C_OBJS) $(F77_OBJS) $(SPP_OBJS) 
-HOST_LIBS   = $(LIBCURL) $(LFLAGS) -lcfitsio $(CLIBS)
+HOST_LIBS   = -lexpat $(LIBCURL) $(LFLAGS) -lcfitsio $(CLIBS)
 LIBS        = lib$(NAME).a -lVOTable -lVOClient -lsamp $(HOST_LIBS)
 
 

@@ -99,7 +99,6 @@ apps:
 ####################################
 
 .BASE:
-	(./mkbase $(HERE)/lib$(NAME).a)
 	touch .BASE
 
 lib: objs
