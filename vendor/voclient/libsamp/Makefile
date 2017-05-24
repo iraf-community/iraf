@@ -73,6 +73,7 @@ all:	.BASE lib install
 World:	.BASE lib apps install
 
 install: .BASE lib apps
+	mkdir -p $(LIBDIR) $(INCDIR)
 	cp lib$(NAME).a $(LIBDIR)
 	cp $(INCS) $(INCDIR)
 	/bin/rm -rf *.o

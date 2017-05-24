@@ -67,18 +67,18 @@ INCS_PRIV	= votParseP.h
 LIBS		= lib$(NAME).a
 
 
-all:	.BASE lib apps install
+all:	lib apps install
 
-World:	.BASE lib apps install
+World:	lib apps install
 
-install: .BASE lib apps
+install: lib apps
 	cp $(LIBS) $(LIBDIR)
 	cp $(INCS) $(SPP_INCS) $(INCDIR)
 
 objs:	$(OBJS) $(SPP_OBJS)
 
 clean:
-	/bin/rm -f *.o *.a *.e *.so .BASE __*
+	/bin/rm -f *.o *.a *.e *.so __*
 	/bin/rm -f SWIG* libvot* php_libvot.h
 	/bin/rm -f votParseJava.[co]
 	/bin/rm -f votParsePerl.[co]
@@ -101,10 +101,6 @@ apps:
 ####################################
 #  LIBVOTABLE dependency libraries.
 ####################################
-
-.BASE:
-	(./mkbase $(HERE)/lib$(NAME).a)
-	touch .BASE
 
 lib: objs
 	ar rv lib$(NAME).a $(OBJS) $(SPP_OBJS)

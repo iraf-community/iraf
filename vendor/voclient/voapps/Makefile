@@ -107,13 +107,13 @@ TARGETS	    = $(F77_TASKS) $(SPP_TASKS) $(C_TASKS)
 
 SRCS	    = $(C_SRCS) $(F77_SRCS) $(SPP_SRCS) 
 OBJS	    = $(C_OBJS) $(F77_OBJS) $(SPP_OBJS) 
-HOST_LIBS   = -lcurl $(LFLAGS) -lcfitsio $(CLIBS)
+HOST_LIBS   = -lexpat -lcurl $(LFLAGS) -lcfitsio $(CLIBS)
 LIBS        = lib$(NAME).a -lVOTable -lVOClient -lsamp $(HOST_LIBS)
 
 
 
-all:
-	(make c_progs)
+all: c_progs
+	mkdir -p $(LIBDIR) $(BINDIR)
 	cp lib$(NAME).a $(LIBDIR)
 	cp $(TARGETS) $(BINDIR)
 

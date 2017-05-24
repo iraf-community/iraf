@@ -41,7 +41,6 @@ LIBS		= -lm -lc -lpthread
 
 
 all:
-	(cd common      ; make all  ; make install)
 	(cd libsamp     ; make all  ; make install)
 	(cd libvotable  ; make all  ; make install)
 	(cd libvoclient ; make all  ; make install)
@@ -52,7 +51,6 @@ all:
 	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 libs:
-	(cd common      ; make libs)
 	(cd libvotable  ; make libs)
 	(cd libsamp     ; make libs)
 	(cd libvoclient ; make libs)
@@ -60,21 +58,18 @@ libs:
 	(cd libvo       ; make libs)
 
 apps:
-	(cd common      ; make apps)
 	(cd libvotable  ; make apps)
 	(cd libsamp     ; make apps)
 	(cd libvoclient ; make apps)
 	(cd voapps      ; make apps)
 
 examples:
-	(cd common      ; make examples)
 	(cd libvotable  ; make examples)
 	(cd libsamp     ; make examples)
 	(cd libvoclient ; make examples)
 	(cd voapps      ; make examples)
 
 install:
-	(cd common      ; make install)
 	(cd libvotable  ; make install)
 	(cd libsamp     ; make install)
 	(cd libvoclient ; make install)
@@ -85,7 +80,6 @@ install:
 	/bin/rm -rf lib/*.dylib lib/*.la lib/*.so
 
 clean:
-	(cd common      ; make clean)
 	(cd libvotable  ; make clean)
 	(cd libsamp     ; make clean)
 	(cd libvoclient ; make clean)
