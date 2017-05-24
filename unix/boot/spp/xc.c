@@ -1461,7 +1461,6 @@ again:
 	if (strncmp (libref, "-l", 2) == 0) { 
 	    sprintf (libname, "lib%s.a", libref+2);
 	    libref = libname;
-	    goto again;
 	} else
 	    strcpy (libname, libref);
 
