@@ -35,7 +35,7 @@ ifeq ("$(PLATFORM)", "Darwin")
     ifeq  ("$(PLMACH)", "macintel")
         CARCH   = -m64 -mmacosx-version-min=10.5
     else
-        CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+        CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
     endif
 else
     CLIBS       = -lm -lc -lpthread -lcurl
@@ -46,7 +46,7 @@ else
     endif
 endif
 
-#CARCH   	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+#CARCH   	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
 CLIBS           = -lm -lc -lcurl -lpthread
 CFLAGS          = -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 

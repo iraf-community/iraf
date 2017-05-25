@@ -811,7 +811,7 @@ passflag:		    mkobject = YES;
 	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "i386";
 	    	    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.5";
 	        } else if (strcmp (irafarch, "macintel") == 0) {
 	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "x86_64";
@@ -893,7 +893,7 @@ passflag:		    mkobject = YES;
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.5";
                 } else if (strcmp (irafarch, "macintel") == 0) {
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "x86_64";
@@ -1006,7 +1006,7 @@ passflag:		    mkobject = YES;
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.5";
                 } else if (strcmp (irafarch, "macintel") == 0) {
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "x86_64";
@@ -1091,7 +1091,7 @@ passflag:		    mkobject = YES;
                 arglist[nargs++] = "-arch";
                 arglist[nargs++] = "i386";
                 arglist[nargs++] = "-m32";
-	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
+	    	arglist[nargs++] = "-mmacosx-version-min=10.5";
             } else if (strcmp (irafarch, "macintel") == 0) {
                 arglist[nargs++] = "-arch";
                 arglist[nargs++] = "x86_64";
