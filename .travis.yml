@@ -19,7 +19,7 @@ matrix:
             - byacc
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux LINUXDIST=trusty
+      env: IRAFARCH=linux OS_VERS=trusty
       addons:
         apt:
           packages:
@@ -31,7 +31,7 @@ matrix:
             - libexpat1-dev:i386
     - os: linux
       dist: precise
-      env: IRAFARCH=linux LINUXDIST=precise
+      env: IRAFARCH=linux OS_VERS=precise
       addons:
         apt:
           packages:
@@ -43,22 +43,22 @@ matrix:
             - libexpat1-dev:i386
     - os: osx
       osx_image: xcode8.3
-      env: IRAFARCH=macintel OSXVERS=yosemite
+      env: IRAFARCH=macintel OS_VERS=sierra
     - os: osx
       osx_image: xcode7.3
-      env: IRAFARCH=macintel OSXVERS=elcapitan
+      env: IRAFARCH=macintel OS_VERS=elcapitan
     - os: osx
       osx_image: xcode6.4
-      env: IRAFARCH=macintel OSXVERS=sierra
+      env: IRAFARCH=macintel OS_VERS=yosemite
     - os: osx
       osx_image: xcode8.3
-      env: IRAFARCH=macosx OSXVERS=yosemite
+      env: IRAFARCH=macosx OS_VERS=sierra
     - os: osx
       osx_image: xcode7.3
-      env: IRAFARCH=macosx OSXVERS=elcapitan
+      env: IRAFARCH=macosx OS_VERS=elcapitan
     - os: osx
       osx_image: xcode6.4
-      env: IRAFARCH=macosx OSXVERS=sierra
+      env: IRAFARCH=macosx OS_VERS=yosemite
 
 
 language: c
