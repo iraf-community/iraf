@@ -49,7 +49,7 @@ cd $iraf/vendor                                 # build vendor libs
 make all 2>&1 | tee -a ../spool.final
 cd ../
 
-cd $iraf/					# build NOVOS
+cd $iraf/sys					# build NOVOS
 mkpkg 2>&1 | tee -a spool
 
 cd $iraf/unix					# VOS bootstrap
