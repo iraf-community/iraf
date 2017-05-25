@@ -42,9 +42,23 @@ matrix:
             - libncurses5-dev:i386
             - libexpat1-dev:i386
     - os: osx
-      env: IRAFARCH=macintel
+      osx_image: xcode8.3
+      env: IRAFARCH=macintel OSXVERS=yosemite
     - os: osx
-      env: IRAFARCH=macosx
+      osx_image: xcode7.3
+      env: IRAFARCH=macintel OSXVERS=elcapitan
+    - os: osx
+      osx_image: xcode6.4
+      env: IRAFARCH=macintel OSXVERS=sierra
+    - os: osx
+      osx_image: xcode8.3
+      env: IRAFARCH=macosx OSXVERS=yosemite
+    - os: osx
+      osx_image: xcode7.3
+      env: IRAFARCH=macosx OSXVERS=elcapitan
+    - os: osx
+      osx_image: xcode6.4
+      env: IRAFARCH=macosx OSXVERS=sierra
 
 
 language: c
