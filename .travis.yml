@@ -7,7 +7,7 @@ matrix:
       addons:
         apt:
           packages:
-            - flex
+            - flex-old
             - byacc
     - os: linux
       dist: precise
@@ -15,7 +15,7 @@ matrix:
       addons:
         apt:
           packages:
-            - flex
+            - flex-old
             - byacc
     - os: linux
       dist: trusty
@@ -23,7 +23,7 @@ matrix:
       addons:
         apt:
           packages:
-            - flex
+            - flex-old
             - byacc
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
@@ -35,7 +35,7 @@ matrix:
       addons:
         apt:
           packages:
-            - flex
+            - flex-old
             - byacc
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
