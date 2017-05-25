@@ -1,9 +1,8 @@
-
 matrix:
   include:
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux64 LINUXDIST=trusty
+      env: IRAFARCH=linux64 OS_VERS=trusty
       addons:
         apt:
           packages:
@@ -11,7 +10,7 @@ matrix:
             - byacc
     - os: linux
       dist: precise
-      env: IRAFARCH=linux64 LINUXDIST=precise
+      env: IRAFARCH=linux64 OS_VERS=precise
       addons:
         apt:
           packages:
@@ -48,18 +47,11 @@ matrix:
       osx_image: xcode7.3
       env: IRAFARCH=macintel OS_VERS=elcapitan
     - os: osx
-      osx_image: xcode6.4
-      env: IRAFARCH=macintel OS_VERS=yosemite
-    - os: osx
       osx_image: xcode8.3
       env: IRAFARCH=macosx OS_VERS=sierra
     - os: osx
       osx_image: xcode7.3
       env: IRAFARCH=macosx OS_VERS=elcapitan
-    - os: osx
-      osx_image: xcode6.4
-      env: IRAFARCH=macosx OS_VERS=yosemite
-
 
 language: c
 
