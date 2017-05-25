@@ -133,12 +133,7 @@ ipc_:
 		 * root menu].
 		 */
 		jobcode = getpid();
-#if defined(SYSV) || (defined(MACH64) && defined(MACOSX) || defined(IPAD))
-		setpgrp ();
-#else
-		setpgrp (0, jobcode);
-#endif
-
+		setpgid (0, jobcode);
 		freopen ("/dev/null", "r", stdin);
 		prtype = PR_DETACHED;
 		ZLOCPR (ZGETTX, &driver);
