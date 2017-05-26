@@ -55,21 +55,11 @@ extern	char	yytchar, *yysptr, yysbuf[];
 extern	int	yylineno;
 
 #define U(x) x
-/*
-#define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):getc(yyin))==10\
-?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
-#define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
-*/
 
-extern int   input();
-extern void  yyunput();
+extern int   yy_input(void);
+extern void  yy_unput(char ch);
 extern void  d_codegen (register FILE *fp);
 extern void  d_runtime (char *text);
-
-extern char *yytext_ptr;
-#define unput(c) yyunput( c, (yytext_ptr)  )
-
-
 
 int	context = GLOBAL;		/* lexical context variable	*/
 extern	int hbindefs, foreigndefs;
@@ -170,9 +160,9 @@ void
 skipnl (void)
 {
 	int c;
-	while ((c=input()) != '\n')
+	while ((c=yy_input()) != '\n')
 	    ;
-	unput ('\n');
+	yy_unput ('\n');
 }
 
 
@@ -418,7 +408,7 @@ int	st_nstr = 0;
  * strings.  The name must be upper case or the table will not be searched.
  *
  * N.B.: we are called by the lexical analyser with 'define name "' in
- * yytext.  The next input() will return the first char of the string.
+ * yytext.  The next yy_input() will return the first char of the string.
  */
 void
 str_enter (void)
@@ -540,11 +530,11 @@ macro_redef (void)
 	/*  Modify value.
 	 */
 	op = value;
-        while ( (ch = input()) != EOF ) {
+        while ( (ch = yy_input()) != EOF ) {
 	    if (ch == '\n') {
 		break;
 	    } else if (ch == '#') {		/* eat a comment	*/
-		while ((ch = input()) != '\n')
+		while ((ch = yy_input()) != '\n')
 		    ;
 		break;
 
@@ -724,7 +714,7 @@ do_type (int type)
 	if (context & (BODY|DEFSTMT)) {
 	    switch (type) {
 	    case XTY_BOOL:
-		for (ch=input();  ch == ' ' || ch == '\t';  ch=input())
+		for (ch=yy_input();  ch == ' ' || ch == '\t';  ch=yy_input())
 		    ;
 		if (ch != '(')
 		    error (XPP_SYNTAX, "Illegal boolean expr");
@@ -764,10 +754,10 @@ do_char (void)
 {
 	char	ch;
 
-	for (ch=input();  ch != ',' && ch != ']';  ch=input())
+	for (ch=yy_input();  ch != ',' && ch != ']';  ch=yy_input())
 	    if (ch == '\n' || ch == EOS) {
 		error (XPP_SYNTAX, "Missing comma or ']' in char declaration");
-		unput ('\n');
+		yy_unput ('\n');
 		return;
 	    } else
 		output (ch);
@@ -802,21 +792,21 @@ skip_helpblock (void)
 	}
 	*/
 
-	while ( (ch = input()) != EOF ) {
+	while ( (ch = yy_input()) != EOF ) {
 	    if (ch == '.') {		/* check for ".endhelp"		*/
-		ch = input ();
+		ch = yy_input();
 		if (ch == 'e' || ch == 'E') {
-		    for (ch = input() ; ch != '\n' && ch != EOS;  ch=input())
+		    for (ch = yy_input() ; ch != '\n' && ch != EOS;  ch=yy_input())
 	    	        ;
 		    break;
 		} else
-		    for (ch = input() ; ch != '\n' && ch != EOS;  ch=input())
+		    for (ch = yy_input() ; ch != '\n' && ch != EOS;  ch=yy_input())
 	    	        ;
 	
 	    } else if (ch == '\n') {	/* skip line			*/
 		;
 	    } else {
-		for (ch=input();  ch != '\n' && ch != EOS;  ch=input())
+		for (ch=yy_input();  ch != '\n' && ch != EOS;  ch=yy_input())
 	    	    ;
 	    }
 	    if (istkptr == 0)
@@ -886,7 +876,7 @@ parse_task_statement (void)
 	    ch = nextch();
 	    if (ch == ',') {
 		if ((ch = nextch()) != '\n')
-		    unput (ch);
+		    yy_unput (ch);
 	    } else if (ch == '\n') {
 		linenum[istkptr]++;
 		ntasks++;			/* end of task statement */	
@@ -936,7 +926,7 @@ get_task (char *task_name, char *proc_name, int maxch)
 	    if (get_name (proc_name, maxch) == ERR)
 		return (ERR);
 	} else {
-	    unput (ch);
+	    yy_unput (ch);
 	    strncpy (proc_name, task_name, maxch);
 	}
 
@@ -954,10 +944,10 @@ get_name (char *outstr, int maxch)
 	register char ch, *op;
 	register int nchars;
 
-	unput ((ch = nextch()));	/* skip leading whitespace	*/
+	yy_unput ((ch = nextch()));	/* skip leading whitespace	*/
 
 	for (nchars=0, op=outstr;  nchars < maxch;  nchars++) {
-	    ch = input();
+	    ch = yy_input();
 	    if (isalpha(ch)) {
 		if (isupper(ch))
 		    *op++ = tolower(ch);
@@ -967,7 +957,7 @@ get_name (char *outstr, int maxch)
 		*op++ = ch;
 	    } else {
 		*op++ = EOS;
-		unput (ch);
+		yy_unput (ch);
 		return (nchars > 0 ? XOK : ERR);
 	    }
 	}
@@ -984,9 +974,9 @@ nextch (void)
 {
 	register char ch;
 
-	while ((ch = input()) != EOF) {
+	while ((ch = yy_input()) != EOF) {
 	    if (ch == '#') {			/* discard comment */
-		while ((ch = input()) != '\n')
+		while ((ch = yy_input()) != '\n')
 		    ;
 		return (ch);
 	    } else if (ch != ' ' && ch != '\t')
@@ -1015,9 +1005,9 @@ put_dictionary (void)
 	/* Discard anything found on line after the TN$DECL, which is only
 	 * recognized as the first token on the line.
 	 */
-	while (input() != '\n')
+	while (yy_input() != '\n')
 	    ;
-	unput ('\n');
+	yy_unput ('\n');
 
 	/* Output the data statements required to initialize the DP array.
 	 * These statements are spooled into the output buffer and not output
@@ -1075,9 +1065,9 @@ put_interpreter (void)
 	char	lbuf[SZ_LINE];
 	int	i;
 
-	while (input() != '\n')		/* discard rest of line */
+	while (yy_input() != '\n')		/* discard rest of line */
 	    ;
-	unput ('\n');
+	yy_unput ('\n');
 
 	for (i=0;  i < ntasks;  i++) {
 	    sprintf (lbuf, "\tif (streq (task, dict(dp(%d)))) {\n", i+1);
@@ -1385,15 +1375,15 @@ do_string (
 	    *sp++ = ch;
 
 	    /* Get rest of string name identifier. */
-	    while ((ch = input()) != EOF) {
+	    while ((ch = yy_input()) != EOF) {
 		if (isalnum(ch) || ch == '_') {
 		    *sp++ = ch;
 	    	    sbuf_check();
 		} else if (ch == '\n') {
 sterr:		    error (XPP_SYNTAX, "String declaration syntax");
-		    while (input() != '\n')
+		    while (yy_input() != '\n')
 			;
-		    unput ('\n');
+		    yy_unput ('\n');
 		    return;
 		} else {
 		    *sp++ = EOS;
@@ -1418,12 +1408,12 @@ sterr:		    error (XPP_SYNTAX, "String declaration syntax");
 		 */
 		op = yytext;
 		*op++ = delim;
-		while ((ch = input()) != EOF)
+		while ((ch = yy_input()) != EOF)
 		    if (isalnum(ch) || ch == '_')
 			*op++ = ch;
 		    else
 			break;
-		unput (ch);
+		yy_unput (ch);
 		*op = EOS;
 
 		/* Fetch body of string into yytext.
@@ -1495,7 +1485,7 @@ do_hollerith (void)
 	int	len;
 
 	/* Read the string into strbuf. */
-	for (op=strbuf, len=0;  (*op = input()) != '"';  op++, len++)
+	for (op=strbuf, len=0;  (*op = yy_input()) != '"';  op++, len++)
 	    if (*op == '\n' || *op == EOF)
 		break;
 	if (*op == '\n')
@@ -1554,24 +1544,24 @@ traverse (char delim)
 	char	*index();
 
 
-	for (op=yytext;  (*op = input()) != EOF;  op++) {
+	for (op=yytext;  (*op = yy_input()) != EOF;  op++) {
 	    if (*op == delim) {
-		if ((*op = input()) == EOF)
+		if ((*op = yy_input()) == EOF)
 		    break;
 		if (*op == delim)
 		    continue;		/* double quote convention; keep one */
 		else {
-		    unput (*op);
+		    yy_unput (*op);
 		    break;			/* normal exit		*/
 		}
 
 	    } else if (*op == '\n') {		/* error recovery exit	*/
-		unput ('\n');
+		yy_unput ('\n');
 		xpp_warn ("Newline while processing string");
 		break;
 
 	    } else if (*op == '\\') {
-		if ((*op = input()) == EOF) {
+		if ((*op = yy_input()) == EOF) {
 		    break;
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
@@ -1580,9 +1570,9 @@ traverse (char delim)
 		    *op = esc_val[cp-esc_ch];
 		} else if (isdigit (*op)) {	/* '\0DD' octal constant */
 		    *op -= '0';
-		    while (isdigit (ch = input()))
+		    while (isdigit (ch = yy_input()))
 			*op = (*op * 8) + (ch - '0');
-		    unput (ch);
+		    yy_unput (ch);
 		} else {
 		    ch = *op;			/* unknown escape sequence, */
 		    *op++ = '\\';		/* leave it alone.	    */
@@ -1728,12 +1718,12 @@ int_constant (char *string, int base)
 	    break;
 
 	case CHARCON:
-	    while ((p[i] = input()) != EOF) {
+	    while ((p[i] = yy_input()) != EOF) {
 		if (p[i] == '\n') {
 	    	    error (XPP_SYNTAX, "Undelimited character constant");
 	    	    return;
 		} else if (p[i] == '\\') {
-	    	    p[++i] = input();
+	    	    p[++i] = yy_input();
 	    	    i++;
 	    	    continue;
 		} else if (p[i] == '\'')
