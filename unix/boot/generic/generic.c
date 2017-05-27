@@ -18,7 +18,7 @@
 
 #define	input		lex_input
 #define	unput		lex_unput
-extern	char yytext[];
+extern	char *yytext;
 extern	int  yyleng;
 extern	FILE *yyin;
 extern	FILE *yyout;
@@ -44,11 +44,6 @@ char	xtype_string[SZ_FNAME+1];
 char	type_char;
 int	pass_output = 1;
 int	clobber = NO;
-
-extern long  k_ftell (FILE *cx_i);
-extern FILE *k_fopen (char *fname, char *mode);
-extern int   k_fseek (FILE *cx_i, long offset, int type);
-extern int   k_fclose (FILE *cx_i);
 
 extern int   yylex (void);
 extern int   lex_input (void);
@@ -136,7 +131,7 @@ int main (int argc, char *argv[])
  
 	for (n=0;  n < nfiles;  n++) {
 	    strcpy (input_file, files[n]);
-	    yyin = k_fopen (input_file, "r");
+	    yyin = fopen (input_file, "r");
 	    if (yyin == NULL) {
 		fprintf (stderr, "Cannot open input file '%s'\n", input_file);
 		continue;
@@ -218,10 +213,10 @@ int main (int argc, char *argv[])
 		yylex();	/* do it */
 
 		fclose (fp);
-		k_fseek (yyin,0L,0);
+		fseek (yyin,0L,0);
 	    }
 
-	    k_fclose (yyin);
+	    fclose (yyin);
 	}
 
 	exit (OSOK);
@@ -525,7 +520,7 @@ init_:
 	fp->f_prevtype = type_char;
 	strcpy (fp->f_types, types);
 	fp->f_curtype = fp->f_types;
-	fp->f_fpos = k_ftell (yyin);
+	fp->f_fpos = ftell (yyin);
 
 	type_char = *(fp->f_curtype)++;
 	set_type_string (type_char);
@@ -549,7 +544,7 @@ do_endfor (void)
 	fp = &forstk[forlev];
 	if ((type_char = *(fp->f_curtype)++) != EOS) {
 	    set_type_string (type_char);
-	    k_fseek (yyin, fp->f_fpos, 0);
+	    fseek (yyin, fp->f_fpos, 0);
 	} else {
 	    type_char = fp->f_prevtype;
 	    set_type_string (type_char);
