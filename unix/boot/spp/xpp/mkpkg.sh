@@ -1,7 +1,7 @@
 # Make the first pass (XPP) of the SPP language compiler.
 
 if [ ! -f lexyy.c -o xpp.l -nt lexyy.c ] ; then
-    lex	-l -o lexyy.c -t xpp.l
+    lex	-o lexyy.c -t xpp.l
 fi
 
 $CC -c $HSI_CF	xppmain.c xppcode.c decl.c lexyy.c
