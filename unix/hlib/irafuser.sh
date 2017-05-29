@@ -126,11 +126,11 @@ esac
 # Prepend a user <iraf.h> file to the compile flags in case we don't
 # install as root.
 #
-export HSI_CF="-I${HOME}/.iraf/ $HSI_CF"
-export HSI_FF="-I${HOME}/.iraf/ $HSI_FF"
-export HSI_LF="-I${HOME}/.iraf/ $HSI_LF"
-export HSI_XF="-I${HOME}/.iraf/ $HSI_XF"
-export XC_CFLAGS="-I${HOME}/.iraf/"
+export HSI_CF="-I${iraf}include $HSI_CF"
+export HSI_FF="-I${iraf}include $HSI_FF"
+export HSI_LF="-I${iraf}include $HSI_LF"
+export HSI_XF="-I${iraf}include $HSI_XF"
+export XC_CFLAGS="-I${iraf}include"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

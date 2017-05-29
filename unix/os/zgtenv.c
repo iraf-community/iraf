@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <libgen.h>
 #define import_spp
 #define	import_kernel
 #define	import_knames
@@ -11,7 +12,6 @@
 
 static char *_ev_scaniraf (char *envvar);
 static int   _ev_loadcache (char *fname);
-static int   _ev_streq (char *s1, char *s2, int n);
 
 
 /* ZGTENV -- Get the value of a host system environment variable.  Look first
@@ -55,22 +55,17 @@ ZGTENV (
  */
 
 #define	TABLE		"/usr/include/iraf.h"	/* table file		*/
-#define	DELIM		"/* ###"		/* delimits defs area	*/
 #define	NENV		3			/* n variables		*/
 #define	SZ_NAME		10
 #define	SZ_VALUE	80
 
 struct	env {
-	char	ev_name[SZ_NAME+1];
-	char	ev_value[SZ_VALUE+1];
+	char	*ev_name;
+	char	*ev_value;
 };
 
 int	ev_cacheloaded = 0;
-struct	env ev_table[NENV] = {
-	{ "host",		""},
-	{ "iraf",		""},
-	{ "tmp",		""}
-};
+struct	env ev_table[NENV];
 
 
 /* SCANIRAF -- If the referenced environment variable is a well known standard
@@ -118,13 +113,6 @@ _ev_scaniraf (char *envvar)
 	int	i;
 
 
-	for (i=0;  i < NENV;  i++)
-	    if (strcmp (ev_table[i].ev_name, envvar) == 0)
-		break;
-
-	if (i >= NENV)
-	    return (NULL);
-
 	if (!ev_cacheloaded) {
 	    if (_ev_loadcache (TABLE) == ERR)
 		return (NULL);
@@ -132,114 +120,75 @@ _ev_scaniraf (char *envvar)
 		ev_cacheloaded++;
 	}
 
+	for (i=0;  i < NENV;  i++)
+	    if (strcmp (ev_table[i].ev_name, envvar) == 0)
+		break;
+
+	if (i >= NENV)
+	    return (NULL);
+
 	return (ev_table[i].ev_value);
 }
 
 
-/* _EV_LOADCACHE -- Scan <iraf.h> for the values of the standard variables.
- * Cache these in case we are called again (they do not change so often that we
- * cannot cache them in memory).  Any errors in accessing the table probably
- * indicate an error in installing IRAF hence should be reported immediately.
+/* _EV_LOADCACHE -- Follow the link <iraf.h> to the path of the IRAF
+ * installation.  Cache these in case we are called again (they do not
+ * change so often that we cannot cache them in memory).  Any errors
+ * in accessing the table probably indicate an error in installing
+ * IRAF hence should be reported immediately.
  */
 static int
 _ev_loadcache (char *fname)
 {
-	register char	*ip, *op;
-	register FILE	*fp;
-	register int	n;
-
-	static  char   *home, hpath[SZ_PATHNAME+1];
-	static	char	delim[] = DELIM;
-	char	lbuf[SZ_LINE+1];
-	int	len_delim, i;
-
+        static  char   *home, hpath[SZ_PATHNAME+1], *rpath, *lpath;
 
 	if ((home = getenv ("HOME"))) {
-	    memset (hpath, 0, SZ_PATHNAME);
-	    sprintf (hpath, "%s/.iraf.h", home);
-	    if ((fp = fopen (hpath, "r")) == NULL) {
-		/*  No personal $HOME/.iraf.h file, try the system request.
-		 */
-		if ((fp = fopen (fname, "r")) == NULL) {
-	            fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
-	            return (ERR);
-	    	}
+	    sprintf (hpath, "%s/.iraf/iraf.h", home);
+	    if ((rpath = realpath(hpath, NULL)) == NULL) {
+	      if ((rpath = realpath(fname, NULL)) == NULL) {
+		    fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
+		    return (ERR);
+		}
 	    }
 	} else {
 	    /*  We should always have a $HOME, but try this to be safe.
 	     */
-	    if ((fp = fopen (fname, "r")) == NULL) {
+	  if ((rpath = realpath(fname, NULL)) == NULL) {
 	        fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
-	        return (ERR);
+		return (ERR);
 	    }
 	}
 
-	len_delim = strlen (delim);
-	while (fgets (lbuf, SZ_LINE, fp) != NULL) {
-	    if (strncmp (lbuf, delim, len_delim) == 0)
-		break;
+	ev_table[0].ev_name = "host";
+	lpath = strdup(dirname(rpath));
+	free(rpath);
+	rpath = strdup(dirname(lpath));
+	free(lpath);
+	ev_table[0].ev_value = strdup(dirname(rpath));
+	free(rpath);
+	ev_table[0].ev_value = realloc(ev_table[0].ev_value,
+				       strlen(ev_table[0].ev_value) + 2);
+	strcat(ev_table[0].ev_value, "/");
+
+	ev_table[1].ev_name = "iraf";
+	rpath = strdup(ev_table[0].ev_value);
+	ev_table[1].ev_value = strdup(dirname(rpath));
+	free(rpath);
+	ev_table[1].ev_value = realloc(ev_table[1].ev_value,
+				       strlen(ev_table[1].ev_value) + 2);
+	strcat(ev_table[1].ev_value, "/");
+
+	ev_table[2].ev_name = "tmp";
+	ev_table[2].ev_value = getenv("TMPDIR");
+	if (ev_table[2].ev_value == NULL) {
+	  ev_table[2].ev_value = P_tmpdir;
 	}
-
-	/* Extract the values of the variables from the table.  The format is
-	 * rather rigid; in particular, the variables must be given in the
-	 * table in the same order in which they appear in the in core table,
-	 * i.e., alphabetic order.
-	 */
-	for (i=0;  i < NENV;  i++) {
-	    if (fgets (lbuf, SZ_LINE, fp) == NULL)
-		goto error;
-	    if (strncmp (lbuf, "#define", 7) != 0)
-		goto error;
-
-	    /* Verify the name of the variable.  */
-	    ip = ev_table[i].ev_name;
-	    if (!_ev_streq (lbuf+8, ip, strlen(ip)))
-		goto error;
-
-	    /* Extract the quoted value string.  */
-	    for (ip=lbuf+8;  *ip++ != '"';  )
-		;
-	    op = ev_table[i].ev_value;
-	    for (n=SZ_VALUE;  --n >= 0 && (*op = *ip++) != '"';  op++)
-		;
-	    *op = EOS;
+	ev_table[2].ev_value = strdup(ev_table[2].ev_value);
+	if (ev_table[2].ev_value[strlen(ev_table[2].ev_value)-1] != '/') {
+	  ev_table[2].ev_value = realloc(ev_table[2].ev_value,
+					 strlen(ev_table[2].ev_value) + 2);
+	  strcat(ev_table[2].ev_value, "/");
 	}
-
-	if (fgets (lbuf, SZ_LINE, fp) == NULL)
-	    goto error;
-	if (strncmp (lbuf, delim, len_delim) != 0)
-	    goto error;
-
-	fclose (fp);
+	
 	return (OK);
-error:
-	fprintf (stderr, "os.zgtenv: error scanning `%s'\n", fname);
-	fclose (fp);
-	return (ERR);
-}
-
-
-#define	to_lower(c)        ((c)+'a'-'A')
-
-/* EV_STREQ -- Compare two strings for equality, ignoring case.  The logical
- * names are given in upper case in <iraf.h> since they are presented as
- * macro defines.
- */
-static int
-_ev_streq (char *s1, char *s2, int n)
-{
-	register int	ch1, ch2;
-
-	while (--n >= 0) {
-	    ch1 = *s1++;
-	    if (isupper (ch1))
-		ch1 = to_lower(ch1);
-	    ch2 = *s2++;
-	    if (isupper (ch2))
-		ch2 = to_lower(ch2);
-	    if (ch1 != ch2)
-		return (0);
-	}
-
-	return (1);
 }
