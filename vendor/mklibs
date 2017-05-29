@@ -14,14 +14,14 @@ if [ "$IRAFARCH" = "linux" ] ; then
 elif [ "$IRAFARCH" = "macintel" ] ; then
     CARCH="-m64 -mmacosx-version-min=10.5"
 elif [ "$IRAFARCH" = "macosx" ] ; then
-    CARCH="-arch i386 -arch ppc -m32 -mmacosx-version-min=10.5"
+    CARCH="-m32 -mmacosx-version-min=10.5"
 fi
 
 echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top"' ....)"
 
 # Global options.
-gopts="--prefix=$top --exec-prefix=$top --disable-shared"
+gopts="--prefix=$top --exec-prefix=$top"
 
 #echo "    Cleaning files ...."
 #./mkclean
@@ -34,9 +34,9 @@ gopts="--prefix=$top --exec-prefix=$top --disable-shared"
 if [ $build_cfitsio = 1 ] ; then
 
     echo -n "    Building CFITSIO libs ...."
-    opts="$gopts --bindir=$top/bin --libdir=$top/bin CFLAGS=$CARCH"
+    opts="$gopts --bindir=$top/bin --libdir=$top/bin"
     (cd cfitsio ;  \
-     ./configure $opts; \
+     ./configure $opts CFLAGS="$CARCH"; \
      make clean 	     ; \
      make 	     ; \
      make install     ; \
@@ -53,7 +53,7 @@ fi
 if [ $build_readline = 1 ] ; then
 
     echo -n "    Building Readline libs ...."
-    opts="$gopts --bindir=../../bin --libdir=../../bin"
+    opts="$gopts  --disable-shared --bindir=../../bin --libdir=../../bin"
     (cd readline ; mkpkg ; make clean ) | tee -a _spool 2>&1
     echo "done"
 
