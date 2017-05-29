@@ -462,7 +462,7 @@ done
 if [ "$imdir" == "" ]; then
 
   if (( $do_system==0 )); then
-      d_imdir="$HOME/.iraf/imdir/"
+      d_imdir="$HOME/.iraf/imdir"
   elif [ -d "$o_imdir" ]; then
       d_imdir=$o_imdir
   elif [ -d "/iraf" ]; then
@@ -528,7 +528,7 @@ fi
 if [ "$cache" == "" ]; then
 
   if (( $do_system==0 )); then
-      d_cache="$HOME/.iraf/cache/"
+      d_cache="$HOME/.iraf/cache"
   elif [ -d "/iraf" ]; then
       d_cache="/iraf/cache"
   elif [ -d "/home/iraf" ]; then
