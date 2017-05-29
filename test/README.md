@@ -184,3 +184,4 @@ The following tests are available so far:
  * [Preliminary Test Procedure for IRAF](testproc.md): basic functionality,
    mainly from the test procedure document written by Jeanette Barnes and 
    her "Beginner's Guide to Using IRAF",
+ * [Programming interface](programming.md) for basic CL and SPP functionality,
