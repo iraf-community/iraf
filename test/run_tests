@@ -83,7 +83,7 @@ run_tests () {
     result=''   # collected expected results
     filename='' # File name to read in
     lineno=0    # line counter
-    cat "$FILE" | while read line ; do
+    cat "$FILE" | while read -r line ; do
 	lineno=$(expr $lineno + 1)
 	if [ "$in_code"  = 1 ] ; then
 	    if echo "$line" | grep -q '^```$' ; then
@@ -98,7 +98,7 @@ run_tests () {
 		in_code=0
 	    elif [ "$filename" ] ; then
 		# We are in a code line that is to be stored in a file
-		echo "$line" >> "$filename"
+		printf "%s\n" "$line" >> "$filename"
 	    elif echo "$line" | egrep -q '^[a-z>]+> ' ; then
 		# We are in a code line that contains a command.
 		# First add a command to print the full line so that

@@ -88,7 +88,7 @@ File: `hello.x`
 task hello = t_hello_world
 procedure t_hello_world ()
 begin
-    call printf ("Hello,world!\\\\n")
+    call printf ("Hello,world!\n")
 end
 ```
 
