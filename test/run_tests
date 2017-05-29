@@ -12,6 +12,9 @@
 # IRAF shells to be tested
 IRAF_SHELLS="cl.e ecl.e vocl.e"
 
+export arch=".$IRAFARCH"
+export IRAFBIN=${iraf}bin$arch/
+
 # Test scripts
 TEST_FILES=${iraf}/test/*.md
 
@@ -73,27 +76,35 @@ EOF
 #  - File name for test script
 #
 run_tests () {
-    CL="$1"
+    local CL="$1"
     FILE="$2"
     in_code=0   # detect whether we are in a code section
     command=''  # collected commands
     result=''   # collected expected results
+    filename='' # File name to read in
     lineno=0    # line counter
     cat "$FILE" | while read line ; do
 	lineno=$(expr $lineno + 1)
 	if [ "$in_code"  = 1 ] ; then
 	    if echo "$line" | grep -q '^```$' ; then
-		# we are at the end of a code section, so let's execute the test
-		run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}"
+		# we are at the end of a code section,
+		# so let's execute the test if there was one
+		if [ "$command" ] ; then
+		    run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}"
+		fi
 		command=''
 		result=''
+		filename=''
 		in_code=0
-	    elif echo "$line" | egrep -q '^[a-z]+> ' ; then
+	    elif [ "$filename" ] ; then
+		# We are in a code line that is to be stored in a file
+		echo "$line" >> "$filename"
+	    elif echo "$line" | egrep -q '^[a-z>]+> ' ; then
 		# We are in a code line that contains a command.
 		# First add a command to print the full line so that
 		# it appears in the output. Then add the command itself
 		# And add the command to to the expected results.
-		cmd=$(echo "$line" | sed 's/^[a-z]*> //')
+		cmd=$(echo "$line" | sed 's/^[a-z>]*> //')
 		if [ "$command" ] ; then
 		    command="${command}\nprint '${line}'"
 		    result="${result}\n${line}"
@@ -112,6 +123,12 @@ run_tests () {
 	    # reference
 	    l_start=$(expr $lineno + 1)
 	    in_code=1
+	elif echo "$line" | egrep -q '^File: `.+`$' ; then
+	    # There is some file content printed out in the next block.
+	    # Just prepare to save it.
+	    filename="$(echo $line | cut '-d`' -f2)"
+	else
+	    filename=""
 	fi
     done
     echo
