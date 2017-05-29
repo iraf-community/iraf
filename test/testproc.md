@@ -132,6 +132,30 @@ HISTORY '08-04-92'            /
 
 Note that the pixels are short integers (=16 bits).
 
+Print the same, but without the user fields:
+
+```
+cl> imhead dev$pix l+ u-
+dev$pix[512,512][short]: m51  B  600s
+No bad pixels, min=-1., max=19936.
+Line storage mode, physdim [512,512], length of user area 1621 s.u.
+Created Mon 23:54:13 31-Mar-1997, Last modified Sun 16:37:53 12-Mar-2006
+Pixel file "HDR$pix.pix" [ok]
+'KPNO-IRAF'           /
+'31-03-97'            /
+```
+
+Check the parameter settings for `imhead`:
+
+```
+cl> lpar imhead
+       images =                 image names
+      (imlist = "*.imh,*.fits,*.pl,*.qp,*.hhh") default image names
+  (longheader = no)             print header in multi-line format
+  (userfields = yes)            print the user fields (instrument parameters)
+        (mode = "ql")           
+```
+
 It would be useful to generate two more copies of this image but with
 different pixel types - one with 32-bit floating point pixels (called
 `real`s) and one with 64-bit double precision floating point pixels
