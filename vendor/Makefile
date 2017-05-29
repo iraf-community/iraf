@@ -20,16 +20,15 @@ INCDIR    	:= ../lib/
 CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR) -I./
 ifeq  ($(PLATFORM), "Darwin")
-    ifeq  ($(PLATFORM), "x86_64")
+    ifeq  ($(IRAFARCH), "macintel")
         CARCH	= -m64 -mmacosx-version-min=10.5
     else
-        CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
+        CARCH	= -arch i386 -m32 -mmacosx-version-min=10.5
     endif
 else
     ifdef IRAFARCH
         ifeq ($(IRAFARCH),linux)
             CARCH = -m32
-	    CFITSIO_CFLAGS= -m32
         endif
     endif
 endif
@@ -53,7 +52,7 @@ clean:
 
 
 cfitsio:
-	(cd cfitsio   ; ./configure --libdir=../../bin CFLAGS="$CFITSIO_CFLAGS" ; make ; make install)
+	(cd cfitsio   ; ./configure --libdir=../../bin CFLAGS="$CARCH" ; make ; make install)
 
 voclient:
 	(cd voclient  ; make World)

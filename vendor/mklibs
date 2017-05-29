@@ -9,8 +9,16 @@ build_cfitsio=1
 build_readline=1 # not needed in v2.16.1 and beyond
 build_voclient=1
 
-if [ "$IRAFARCH" = "linux" ] ; then
-    CARCH=-m32
+if [ $PLATFORM = "Darwin" ] ; then
+    if [ "$IRAFARCH" = "macintel" ] ; then
+        CARCH	= -m64 -mmacosx-version-min=10.5
+    else
+        CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
+    fi
+else
+    if [ "$IRAFARCH" = "linux" ] ; then
+	CARCH=-m32
+    fi
 fi
 
 echo "Building support libraries ...."
