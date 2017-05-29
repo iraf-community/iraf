@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Allow a previously defined $iraf to be used.
-if [ -n $iraf ]; then
+if [ -z "$iraf" ]; then
     export iraf=/iraf/iraf/
 fi
 

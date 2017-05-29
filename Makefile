@@ -15,6 +15,7 @@ AS 		= gcc -c -x assembler
 AR 		= ar clq
 CP 		= cp -p
 
+export  iraf     = $(shell pwd)/
 
 all:: update
 
