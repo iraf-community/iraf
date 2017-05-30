@@ -9,24 +9,10 @@
  * has been duplicated for each case.
  */
 
+#undef	output
 extern	char	*type_string;
 extern	char	xtype_string[];
 extern	char	type_char;
-
-void  outstr (char *s);
-void  output_indef (char ch);
-void  output_upper (char *s);
-void  pass_through (void);
-void  output (char ch);
-void  make_float (char type_ch);
-void  do_for (void);
-void  do_endfor (void);
-void  do_if (void);
-void  do_else (void);
-void  do_endif (void);
-void  copy_line (void);
-void  copy_string (void);
-void  copy_comment (void);
 
 %}
 
@@ -84,15 +70,13 @@ $INDEF				outstr ("INDEF");
 
 \#				copy_line();
 ^\%				copy_line();
-.|\n				outstr(yytext);
 
 %%
 
 
 /* LEX_INPUT -- Make input() callable as a function from the .c code.
  */
-int
-lex_input(void)
+lex_input()
 {
 	return (input());
 }
@@ -100,8 +84,8 @@ lex_input(void)
 
 /* LEX_UNPUT -- Make unput() callable as a function from the .c code.
  */
-void
-lex_unput (int ch)
+lex_unput (ch)
+int	ch;
 {
 	unput (ch);
 }
