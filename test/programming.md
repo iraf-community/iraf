@@ -113,3 +113,122 @@ cl> task $hello = hello.e
 cl> hello
 Hello, world!
 ```
+
+## The `generic` preprocessor
+
+The `generic` preprocessor is used to translate generic source code (code
+written to work for any datatype) into type dependent source code,
+suitable for compilation and insertion into a library.  The generic source
+is translated for each datatype, producing a type dependent copy of the
+source code for each datatype.
+
+One way to operate `generic` is to embed `$for` and `$endfor`
+directives into the source file. The example is taken from the
+`sys/vops` subdir:
+
+File: `aabs.gx`
+```
+$for (dr)
+procedure aabs$t (a, b, npix)
+PIXEL	a[ARB], b[ARB]
+int	npix, i
+begin
+	do i = 1, npix
+	    b[i] = abs(a[i])
+end
+$endfor
+```
+
+which produces the following single output file:
+
+```
+cl> softools
+cl> generic aabs.gx -o aabs.x
+cl> dir aabs*
+aabs.gx aabs.x 
+cl> type aabs.x
+
+procedure aabsd (a, b, npix)
+double	a[ARB], b[ARB]
+int	npix, i
+begin
+	do i = 1, npix
+	    b[i] = abs(a[i])
+end
+
+procedure aabsr (a, b, npix)
+real	a[ARB], b[ARB]
+int	npix, i
+begin
+	do i = 1, npix
+	    b[i] = abs(a[i])
+end
+
+```
+
+One may also specify the types on the command line of `generic`, like
+for this input file:
+
+File: `alim.gx`
+```
+procedure alim$t (a, npix, minval, maxval)
+PIXEL   a[ARB], minval, maxval, value
+int     npix, i
+begin
+        minval = a[1]
+        maxval = a[1]
+        do i = 1, npix {
+            value = a[i]
+            $if (datatype == x)
+                if (abs(value) < abs(minval))
+                    minval = value
+                else if (abs(value) > abs(maxval))
+                    maxval = value
+            $else
+                if (value < minval)
+                    minval = value
+                else if (value > maxval)
+                    maxval = value
+            $endif
+        }
+end
+```
+
+It produces one output file per type:
+
+```
+cl> softools
+cl> generic -t  silrdx alim.gx
+cl> dir alim*
+alim.gx   alimd.x   alimi.x   aliml.x   alimr.x   alims.x   alimx.x   
+cl> type alimi.x
+procedure alimi (a, npix, minval, maxval)
+int   a[ARB], minval, maxval, value
+int     npix, i
+begin
+        minval = a[1]
+        maxval = a[1]
+        do i = 1, npix {
+            value = a[i]
+            if (value < minval)
+                minval = value
+            else if (value > maxval)
+                maxval = value
+        }
+end
+cl> type alimr.x
+procedure alimr (a, npix, minval, maxval)
+real   a[ARB], minval, maxval, value
+int     npix, i
+begin
+        minval = a[1]
+        maxval = a[1]
+        do i = 1, npix {
+            value = a[i]
+                if (value < minval)
+            minval = value
+                else if (value > maxval)
+            maxval = value
+        }
+end
+```
