@@ -19,8 +19,10 @@ relink:
 
 	$ifeq (hostid, unix)
 	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex -t grammar.l | sed -f lex.sed > lexyy.c
+# lexyy.c cannot be re-created in the moment due to lex incompatibilities
+# with modern lex implementations.
+#		$echo "rebuilding lexyy.c"
+#		!lex -t grammar.l | sed -f lex.sed > lexyy.c
 	    $endif
 	    $ifolder (ytab.c,  grammar.y)
 		$echo "rebuilding ytab.c"

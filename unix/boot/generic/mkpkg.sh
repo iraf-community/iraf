@@ -3,7 +3,10 @@
 # constructs in the LEX code, and the filename lex.yy.c is changed to lexyy.c
 # for portability reasons.
 
-find tok.l -newer lexyy.c -exec rm lexyy.c \;
+# lexyy.c cannot be re-created in the moment due to lex incompatibilities
+# with modern lex implementations.
+#find tok.l -newer lexyy.c -exec rm lexyy.c
+
 if test -f lexyy.c; then\
     $CC -c $HSI_CF -w lexyy.c;\
 else\
