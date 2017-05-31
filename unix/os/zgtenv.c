@@ -65,7 +65,11 @@ struct	env {
 };
 
 int	ev_cacheloaded = 0;
-struct	env ev_table[NENV];
+struct	env ev_table[NENV] = {
+	{ "host",		""},
+	{ "iraf",		""},
+	{ "tmp",		""}
+};
 
 
 /* SCANIRAF -- If the referenced environment variable is a well known standard
@@ -113,19 +117,19 @@ _ev_scaniraf (char *envvar)
 	int	i;
 
 
-	if (!ev_cacheloaded) {
-	    if (_ev_loadcache (TABLE) == ERR)
-		return (NULL);
-	    else
-		ev_cacheloaded++;
-	}
-
 	for (i=0;  i < NENV;  i++)
 	    if (strcmp (ev_table[i].ev_name, envvar) == 0)
 		break;
 
 	if (i >= NENV)
 	    return (NULL);
+
+	if (!ev_cacheloaded) {
+	    if (_ev_loadcache (TABLE) == ERR)
+		return (NULL);
+	    else
+		ev_cacheloaded++;
+	}
 
 	return (ev_table[i].ev_value);
 }
@@ -146,7 +150,7 @@ _ev_loadcache (char *fname)
 	    sprintf (hpath, "%s/.iraf/iraf.h", home);
 	    if ((rpath = realpath(hpath, NULL)) == NULL) {
 	      if ((rpath = realpath(fname, NULL)) == NULL) {
-		    fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
+		    fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
 		    return (ERR);
 		}
 	    }
@@ -154,23 +158,23 @@ _ev_loadcache (char *fname)
 	    /*  We should always have a $HOME, but try this to be safe.
 	     */
 	  if ((rpath = realpath(fname, NULL)) == NULL) {
-	        fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
+	        fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
 		return (ERR);
 	    }
 	}
 
-	ev_table[0].ev_name = "host";
+	/* host */
 	lpath = strdup(dirname(rpath));
 	free(rpath);
 	rpath = strdup(dirname(lpath));
 	free(lpath);
-	ev_table[0].ev_value = strdup(dirname(rpath));
+	ev_table[0].ev_value = strdup(dirname(rpath)); 
 	free(rpath);
 	ev_table[0].ev_value = realloc(ev_table[0].ev_value,
 				       strlen(ev_table[0].ev_value) + 2);
 	strcat(ev_table[0].ev_value, "/");
 
-	ev_table[1].ev_name = "iraf";
+	/* iraf */
 	rpath = strdup(ev_table[0].ev_value);
 	ev_table[1].ev_value = strdup(dirname(rpath));
 	free(rpath);
@@ -178,7 +182,7 @@ _ev_loadcache (char *fname)
 				       strlen(ev_table[1].ev_value) + 2);
 	strcat(ev_table[1].ev_value, "/");
 
-	ev_table[2].ev_name = "tmp";
+	/* tmp */
 	ev_table[2].ev_value = getenv("TMPDIR");
 	if (ev_table[2].ev_value == NULL) {
 	  ev_table[2].ev_value = P_tmpdir;
