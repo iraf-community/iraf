@@ -12,8 +12,15 @@
 # IRAF shells to be tested
 IRAF_SHELLS="cl.e ecl.e vocl.e"
 
-export arch=".$IRAFARCH"
-export IRAFBIN=${iraf}bin$arch/
+if [ -z "$iraf" ] ; then
+    export iraf=$(cd ..; pwd)/
+fi
+if [ -z "$IRAFARCH" ] ; then
+    export IRAFARCH=$(${iraf}unix/hlib/irafarch.sh)
+fi
+
+export arch=.${IRAFARCH}
+export IRAFBIN=${iraf}bin${arch}/
 
 # Test scripts
 TEST_FILES=${iraf}/test/*.md
@@ -135,16 +142,16 @@ run_tests () {
 }
 
 for CL in $IRAF_SHELLS ; do
-    if [ -x "${iraf}/bin/${CL}" ] ; then
+    if [ -x "${IRAFBIN}${CL}" ] ; then
 	for t in $TEST_FILES ; do
 	    tmp_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
 	    printf "%b" "$(basename ${t}) @ ${CL} "
-	    cd "$tmp_dir" ; run_tests "${iraf}/bin/${CL}" "${t}"
+	    cd "$tmp_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
 	    rm -rf "${tmp_dir}"
 	done
     else
 	echo "IRAF shell $CL not found"
-	stat "${iraf}/bin/${CL}" >> "$failure_file" 2>&1
+	stat "${IRAFBIN}${CL}" >> "$failure_file" 2>&1
     fi
 done
 
