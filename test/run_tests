@@ -13,7 +13,7 @@
 IRAF_SHELLS="cl.e ecl.e vocl.e"
 
 if [ -z "$iraf" ] ; then
-    export iraf=$(cd ..; pwd)/
+    export iraf=$(cd $(dirname $0)/..; pwd)/
 fi
 if [ -z "$IRAFARCH" ] ; then
     export IRAFARCH=$(${iraf}unix/hlib/irafarch.sh)
@@ -21,6 +21,7 @@ fi
 
 export arch=.${IRAFARCH}
 export IRAFBIN=${iraf}bin${arch}/
+export PATH=$HOME/.iraf/bin:${PATH}
 
 # Test scripts
 TEST_FILES=${iraf}/test/*.md

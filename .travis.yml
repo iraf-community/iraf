@@ -62,5 +62,4 @@ before_script:
   - make sysgen
 
 script:
-  - source unix/hlib/setup.sh
   - ./test/run_tests
