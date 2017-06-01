@@ -569,7 +569,9 @@ void  copy_line (void);
 void  copy_string (void);
 void  copy_comment (void);
 
-#line 573 "lexyy.c"
+static long scan_position = 0;
+#define YY_USER_ACTION scan_position += yyleng;
+#line 575 "lexyy.c"
 
 #define INITIAL 0
 
@@ -790,10 +792,10 @@ YY_DECL
 		}
 
 	{
-#line 35 "tok.l"
+#line 37 "tok.l"
 
 
-#line 797 "lexyy.c"
+#line 799 "lexyy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -853,47 +855,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 37 "tok.l"
+#line 39 "tok.l"
 outstr (type_string);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 38 "tok.l"
+#line 40 "tok.l"
 outstr (xtype_string);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 39 "tok.l"
+#line 41 "tok.l"
 output_indef (type_char);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 40 "tok.l"
+#line 42 "tok.l"
 ECHO;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 41 "tok.l"
+#line 43 "tok.l"
 output_upper ("SZ_");
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 42 "tok.l"
+#line 44 "tok.l"
 output_upper ("TY_");
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 43 "tok.l"
+#line 45 "tok.l"
 outstr ("PIXEL");
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 44 "tok.l"
+#line 46 "tok.l"
 outstr ("INDEF");
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 46 "tok.l"
+#line 48 "tok.l"
 {
 					yytext[strlen(yytext)-5] = '\0';
 					output_upper (yytext);
@@ -901,7 +903,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 51 "tok.l"
+#line 53 "tok.l"
 {	if (isupper (type_char))
 					    output (tolower (type_char));
 					else
@@ -910,7 +912,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 56 "tok.l"
+#line 58 "tok.l"
 {	if (islower (type_char))
 					    output (toupper (type_char));
 					else
@@ -919,121 +921,121 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 62 "tok.l"
+#line 64 "tok.l"
 pass_through();
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 63 "tok.l"
+#line 65 "tok.l"
 make_float (type_char);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 65 "tok.l"
+#line 67 "tok.l"
 do_if();
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 66 "tok.l"
+#line 68 "tok.l"
 do_else();
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 67 "tok.l"
+#line 69 "tok.l"
 do_endif(); 
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 68 "tok.l"
+#line 70 "tok.l"
 do_for(); 
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 69 "tok.l"
+#line 71 "tok.l"
 do_endfor(); 
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 70 "tok.l"
+#line 72 "tok.l"
 do_if();
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 71 "tok.l"
+#line 73 "tok.l"
 do_else();
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 72 "tok.l"
+#line 74 "tok.l"
 do_endif(); 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 73 "tok.l"
+#line 75 "tok.l"
 do_for(); 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 74 "tok.l"
+#line 76 "tok.l"
 do_endfor(); 
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 76 "tok.l"
+#line 78 "tok.l"
 output ('$');
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 77 "tok.l"
+#line 79 "tok.l"
 copy_comment();
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 78 "tok.l"
+#line 80 "tok.l"
 copy_string();
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 80 "tok.l"
+#line 82 "tok.l"
 ECHO;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 81 "tok.l"
+#line 83 "tok.l"
 ECHO;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 82 "tok.l"
+#line 84 "tok.l"
 ECHO;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 83 "tok.l"
+#line 85 "tok.l"
 ECHO;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 85 "tok.l"
+#line 87 "tok.l"
 copy_line();
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 86 "tok.l"
+#line 88 "tok.l"
 copy_line();
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 87 "tok.l"
+#line 89 "tok.l"
 outstr(yytext);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 89 "tok.l"
+#line 91 "tok.l"
 ECHO;
 	YY_BREAK
-#line 1037 "lexyy.c"
+#line 1039 "lexyy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2037,7 +2039,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 89 "tok.l"
+#line 91 "tok.l"
 
 
 
@@ -2047,7 +2049,8 @@ void yyfree (void * ptr )
 int
 lex_input(void)
 {
-	return (input());
+    scan_position++;
+    return (input());
 }
 
 
@@ -2056,6 +2059,17 @@ lex_input(void)
 void
 lex_unput (int ch)
 {
-	unput (ch);
+    scan_position--;
+    unput (ch);
+}
+
+long lex_tell (void) {
+    return scan_position;
+}
+
+void lex_seek (long fpos) {
+    YY_FLUSH_BUFFER;
+    fseek (yyin, fpos, SEEK_SET);
+    scan_position = fpos;
 }
 

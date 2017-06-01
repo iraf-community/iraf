@@ -48,6 +48,8 @@ int	clobber = NO;
 extern int   yylex (void);
 extern int   lex_input (void);
 extern void  lex_unput (int ch);
+extern long lex_tell (void);
+extern void lex_seek (long fpos);
 
 
 char *make_typed_filename (char *template, char type_char);
@@ -520,7 +522,7 @@ init_:
 	fp->f_prevtype = type_char;
 	strcpy (fp->f_types, types);
 	fp->f_curtype = fp->f_types;
-	fp->f_fpos = ftell (yyin);
+	fp->f_fpos = lex_tell();
 
 	type_char = *(fp->f_curtype)++;
 	set_type_string (type_char);
@@ -544,7 +546,7 @@ do_endfor (void)
 	fp = &forstk[forlev];
 	if ((type_char = *(fp->f_curtype)++) != EOS) {
 	    set_type_string (type_char);
-	    fseek (yyin, fp->f_fpos, 0);
+	    lex_seek (fp->f_fpos);
 	} else {
 	    type_char = fp->f_prevtype;
 	    set_type_string (type_char);

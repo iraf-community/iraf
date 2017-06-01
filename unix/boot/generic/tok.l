@@ -28,6 +28,8 @@ void  copy_line (void);
 void  copy_string (void);
 void  copy_comment (void);
 
+static long scan_position = 0;
+#define YY_USER_ACTION scan_position += yyleng;
 %}
 
 W	[ \t]
@@ -94,7 +96,8 @@ $INDEF				outstr ("INDEF");
 int
 lex_input(void)
 {
-	return (input());
+    scan_position++;
+    return (input());
 }
 
 
@@ -103,5 +106,16 @@ lex_input(void)
 void
 lex_unput (int ch)
 {
-	unput (ch);
+    scan_position--;
+    unput (ch);
+}
+
+long lex_tell (void) {
+    return scan_position;
+}
+
+void lex_seek (long fpos) {
+    YY_FLUSH_BUFFER;
+    fseek (yyin, fpos, SEEK_SET);
+    scan_position = fpos;
 }

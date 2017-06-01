@@ -8,6 +8,6 @@
 #fi
 
 $CC -c $HSI_CF	generic.c yywrap.c lexyy.c
-$CC $HSI_LF	generic.o lexyy.o chario.o yywrap.o $HSI_LIBS -o generic.e
+$CC $HSI_LF	generic.o lexyy.o yywrap.o $HSI_LIBS -o generic.e
 mv -f		generic.e ../../hlib
 rm		*.o
