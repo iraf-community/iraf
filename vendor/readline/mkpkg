@@ -5,7 +5,7 @@ $exit
 
 libs:
 	$ifeq (IRAFARCH, macosx) then
-	    !(./configure --disable-dynamic --enable-static")
+	    !(./configure --disable-dynamic --enable-static CFLAGS="-m32")
 	    !make libreadline.a | tee spool
 	    !mv libreadline.a ../../bin
 	$else $ifeq (IRAFARCH, macintel) then
