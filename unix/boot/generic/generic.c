@@ -215,7 +215,7 @@ int main (int argc, char *argv[])
 		yylex();	/* do it */
 
 		fclose (fp);
-		fseek (yyin,0L,0);
+		lex_seek (0L);
 	    }
 
 	    fclose (yyin);
