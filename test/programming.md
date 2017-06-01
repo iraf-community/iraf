@@ -92,23 +92,12 @@ begin
 end
 ```
 
-Compile it:
+Compile it, declare and run as an IRAF task
+
 
 ```
 cl> softools
 cl> xc hello.x
-hello.x:
-   sys_runtask:
-   t_hello_world:
-hello.f:
-   sysruk:
-   thelld:
-link:
-```
-
-Declare and run an IRAF task
-
-```
 cl> task $hello = hello.e
 cl> hello
 Hello, world!
