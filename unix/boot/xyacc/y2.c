@@ -31,6 +31,7 @@
 #include "dextern.h"
 #include <stdio.h>
 
+char *os_getenv (char *envvar);
 
 #define	IDENTIFIER 257
 
@@ -60,7 +61,7 @@ char *infile;			/* input file name              */
 static int numbval;		/* value of an input number     */
 static int toksize = NAMESIZE;
 static char *tokname;		/* input token name             */
-char *parser = PARSER;		/* location of common parser    */
+char *parser;			/* location of common parser    */
 
 static void finact (void);
 static char *cstash (char *);
@@ -193,6 +194,10 @@ setup (argc, argv)
     foutput = NULL;
     fdefine = NULL;
     i = 1;
+
+    parser = strdup (os_getenv ("iraf"));
+    parser = realloc (parser, strlen (parser) + strlen ("lib/yaccpar.x") + 1);
+    strcat(parser, "lib/yaccpar.x");
 
     tokname = (char *) malloc (sizeof (char) * toksize);
     tokset = (TOKSYMB *) malloc (sizeof (TOKSYMB) * ntoksz);

@@ -351,11 +351,6 @@ extern char *parser;
 #define	ZAPFILE(x) (void)unlink(x)
 #endif
 
-#ifndef PARSER
-#define	PARSER "/iraf/iraf/lib/yaccpar.x"
-#endif
-
-
 
 /*
  * Lint is unable to properly handle formats with wide strings
