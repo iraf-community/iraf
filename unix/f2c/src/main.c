@@ -644,10 +644,6 @@ main(int argc, char **argv)
 
 	if(inilex( copys(file_name) ))
 		done(1);
-	if (filename0) {
-		fprintf(diagfile, "%s:\n", file_name);
-		fflush(diagfile);
-		}
 
 	procinit();
 	if(k = yyparse())

@@ -460,13 +460,9 @@ startproc(Extsym *progname, int Class)
 	entries = p;
 
 	procclass = Class;
-	fprintf(diagfile, "   %s", (Class==CLMAIN ? "MAIN" : "BLOCK DATA") );
 	if(progname) {
-		fprintf(diagfile, " %s", progname->fextname);
 		procname = progname->cextname;
 		}
-	fprintf(diagfile, ":\n");
-	fflush(diagfile);
 }
 
 /* subroutine or function statement */
@@ -528,10 +524,6 @@ entrypt(int Class, int type, ftnint length, Extsym *entry, chainp args)
 
 	if(Class != CLENTRY)
 		puthead( procname = entry->cextname, Class);
-	else
-		fprintf(diagfile, "       entry ");
-	fprintf(diagfile, "   %s:\n", entry->fextname);
-	fflush(diagfile);
 	q = mkname(entry->fextname);
 	if (type == TYSUBR)
 		q->vstg = STGEXT;

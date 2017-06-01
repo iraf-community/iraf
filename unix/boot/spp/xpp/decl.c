@@ -103,12 +103,6 @@ int	dtype;			/* procedure type (0 if subr)	*/
 
 
 
-	/* Print procedure name to keep the user amused in case the file
-	 * is large and the machine slow.
-	 */
-	fprintf (stderr, "   %s:\n", name);
-	fflush (stderr);
-
 	strncpy (procname, name, SZ_FNAME);
 	proctype = dtype;
 	nextch = sbuf;

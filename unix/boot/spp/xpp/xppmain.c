@@ -123,10 +123,6 @@ int main (int argc, char *argv[])
 	     */
 	    for (i=1;  argv[i] != NULL;  i++)
 		if (isxfile (argv[i])) {
-		    if (nfiles > 1) {
-			fprintf (stderr, "%s:\n", argv[i]);
-			fflush (stderr);
-		    }
 
 		    /* Open source file.
 		     */
