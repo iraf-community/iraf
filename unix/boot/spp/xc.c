@@ -1281,10 +1281,6 @@ passflag:		    mkobject = YES;
 	}
 	arglist[nargs] = NULL;
 
-	if (ncomp) {
-	    fprintf (stderr, "link:\n");
-	    fflush (stderr);
-	}
 	if (debug)
 	    printargs (linker, arglist, nargs);
 
@@ -1551,11 +1547,6 @@ xtof (char *file)
 	lxfiles[nxfiles++] = file;
 	if (nxfiles > MAXFILE)
 	    fatal ("too many files");
-
-	if (nfileargs > 1 || mkobject) {
-	    fprintf (stderr, "%s:\n", file);
-	    fflush (stderr);
-	}
 
 	if (!xpp_path[0])
 	    if (os_sysfile (XPP, xpp_path, SZ_PATHNAME) <= 0)
