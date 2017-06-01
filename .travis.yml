@@ -3,24 +3,15 @@ matrix:
     - os: linux
       dist: trusty
       env: IRAFARCH=linux64 OS_VERS=trusty
-      addons:
-        apt:
-          packages:
-            - bison
     - os: linux
       dist: precise
       env: IRAFARCH=linux64 OS_VERS=precise
-      addons:
-        apt:
-          packages:
-            - bison
     - os: linux
       dist: trusty
       env: IRAFARCH=linux OS_VERS=trusty
       addons:
         apt:
           packages:
-            - bison
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
             - libncurses5-dev:i386
@@ -31,7 +22,6 @@ matrix:
       addons:
         apt:
           packages:
-            - bison
             - gcc-multilib
             - libcurl4-gnutls-dev:i386
             - libncurses5-dev:i386
