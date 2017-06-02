@@ -11,7 +11,7 @@ include	<fio.h>
 # driver subroutines must be named explicitly in the case statements in
 # each generic driver subroutine.
 
-define	DEVICES		"|iism70|iism75|imtool|"
+define	DEVICES		"|imtool|"
 define	DEF_OSDEV_1	"unix:/tmp/.IMT%d"
 define	DEF_OSDEV_2	"fifo:/dev/imt1i:/dev/imt1o"
 define	IMTDEV		"IMTDEV"
@@ -23,10 +23,8 @@ define	MAXBYTES	4000		# fifo transfer size, bytes
 define	MAXTRYS		50		# fifo timeout
 define	DELAY		10		# fifo i/o interval, msec
 
-define	IISM70		1		# IIS Model 70 image display
-define	IISM75		2		# IIS Model 75 image display
-define	IMTOOL		3		# IMTOOL-type display server
-define	NDEVICES	3
+define	IMTOOL		1		# IMTOOL-type display server
+define	NDEVICES	1
 
 
 # ZOPNGD -- Open a binary graphics device.  The format of the DEVINFO string
@@ -144,13 +142,6 @@ begin
 
 	# Try to physically open the device.  [ADD NEW DEVICES HERE].
 	switch (dev) {
-	case IISM70:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
-	    call zopm70 (Memc[pkfname], mode, oschan)
-	case IISM75:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
-	    call zopm75 (Memc[pkfname], mode, oschan)
-
 	case IMTOOL:
 	    if (Memc[osdev] == EOS) {
 		# Supply default value.
@@ -206,10 +197,6 @@ begin
 	}
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zclm70 (gd_oschan[chan], status)
-	case IISM75:
-	    call zclm75 (gd_oschan[chan], status)
 	case IMTOOL:
 	    call zclsnd (gd_oschan[chan], status)
 	default:
@@ -240,11 +227,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zrdm70 (gd_oschan[chan], buf, maxbytes, offset)
-	case IISM75:
-	    call zrdm75 (gd_oschan[chan], buf, maxbytes, offset)
-
 	case IMTOOL:
 	    # Nothing special here, except that we can only move 4096 bytes at
 	    # a time through the pipe to the display server.  Some provision
@@ -308,11 +290,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zwrm70 (gd_oschan[chan], buf, nbytes, offset)
-	case IISM75:
-	    call zwrm75 (gd_oschan[chan], buf, nbytes, offset)
-
 	case IMTOOL:
 	    nwrote = 0
 	    ntries = 0
@@ -368,10 +345,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zwtm70 (gd_oschan[chan], status)
-	case IISM75:
-	    call zwtm75 (gd_oschan[chan], status)
 	case IMTOOL:
 	    status = gd_status[chan]
 	default:
@@ -396,11 +369,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zstm70 (gd_oschan[chan], what, lvalue)
-	case IISM75:
-	    call zstm75 (gd_oschan[chan], what, lvalue)
-
 	case IMTOOL:
 	    switch (what) {
 	    case FSTT_FILSIZE:
