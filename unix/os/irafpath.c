@@ -71,63 +71,23 @@ char *fname;			/* simple filename, no dirs */
 	/* Look first in HBIN.
 	 */
 	strcpy (pathname, (char *)hostdir);
-	strcat (pathname, "bin.");
+	strcat (pathname, "bin");
 
-#ifdef LINUXPPC
-	strcat (pathname, "linuxppc");
-#else
-#ifdef CYGWIN
-	strcat (pathname, "cygwin");
-#else
 #ifdef LINUX64
-	strcat (pathname, "linux64");
-#else
-#ifdef REDHAT
-	strcat (pathname, "redhat");
+	strcat (pathname, ".linux64");
 #else
 #ifdef LINUX
-	strcat (pathname, "linux");
+	strcat (pathname, ".linux");
 #else
-#ifdef BSD
-	strcat (pathname, "freebsd");
-#else
-#ifdef IPAD
-	strcat (pathname, "ipad");
+#ifdef MACINTEL
+	strcat (pathname, ".macintel");
 #else
 #ifdef MACOSX
-	/* Setup for cross-compilation, default to 'macintel'.
-	 */
-        if ((irafarch = getenv("IRAFARCH"))) {
-            if (strcmp (irafarch, "macosx") == 0) 
-		strcat (pathname, "macosx");
-            else if (strcmp (irafarch, "macintel") == 0) 
-		strcat (pathname, "macintel");
-            else 
-		strcat (pathname, "macosx");
-        } else
-	    strcat (pathname, "macintel");
-#else
-#ifdef SOLARIS
-#ifdef X86
-	strcat (pathname, "sunos");
-#else
-	strcat (pathname, "ssol");
-#endif
-#else
-#ifdef sparc
-	strcat (pathname, "sparc");
-#else
+	strcat (pathname, ".macosx");
 #endif
 #endif
 #endif
 #endif
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-
 	strcat (pathname, "/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)

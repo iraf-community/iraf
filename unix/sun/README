@@ -1,5 +1,0 @@
-GTERM  -- Graphics terminal emulator.
-IMTOOL -- Image display server.
-
-See gterm.man, imtool.man for detailed documentation.
-This software is installed by the $iraf/unix/hlib/install script.

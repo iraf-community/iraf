@@ -144,13 +144,6 @@ begin
 
 	# Try to physically open the device.  [ADD NEW DEVICES HERE].
 	switch (dev) {
-	case IISM70:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
-	    call zopm70 (Memc[pkfname], mode, oschan)
-	case IISM75:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
-	    call zopm75 (Memc[pkfname], mode, oschan)
-
 	case IMTOOL:
 	    if (Memc[osdev] == EOS) {
 		# Supply default value.
@@ -206,10 +199,6 @@ begin
 	}
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zclm70 (gd_oschan[chan], status)
-	case IISM75:
-	    call zclm75 (gd_oschan[chan], status)
 	case IMTOOL:
 	    call zclsnd (gd_oschan[chan], status)
 	default:
@@ -240,11 +229,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zrdm70 (gd_oschan[chan], buf, maxbytes, offset)
-	case IISM75:
-	    call zrdm75 (gd_oschan[chan], buf, maxbytes, offset)
-
 	case IMTOOL:
 	    # Nothing special here, except that we can only move 4096 bytes at
 	    # a time through the pipe to the display server.  Some provision
@@ -308,11 +292,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zwrm70 (gd_oschan[chan], buf, nbytes, offset)
-	case IISM75:
-	    call zwrm75 (gd_oschan[chan], buf, nbytes, offset)
-
 	case IMTOOL:
 	    nwrote = 0
 	    ntries = 0
@@ -368,10 +347,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zwtm70 (gd_oschan[chan], status)
-	case IISM75:
-	    call zwtm75 (gd_oschan[chan], status)
 	case IMTOOL:
 	    status = gd_status[chan]
 	default:
@@ -396,11 +371,6 @@ begin
 	# [ADD NEW DEVICES HERE].
 
 	switch (gd_dev[chan]) {
-	case IISM70:
-	    call zstm70 (gd_oschan[chan], what, lvalue)
-	case IISM75:
-	    call zstm75 (gd_oschan[chan], what, lvalue)
-
 	case IMTOOL:
 	    switch (what) {
 	    case FSTT_FILSIZE:

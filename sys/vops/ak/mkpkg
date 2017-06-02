@@ -187,12 +187,12 @@ libvops.a:
 	achtxs.x	
 	achtxx.x	
 	acjgx.x	
-	aclrc.x	
-	aclrd.x	
-	aclri.x	
-	aclrl.x	
-	aclrr.x	
-	aclrs.x	
+	aclrc.c	
+	aclrd.c	
+	aclri.c	
+	aclrl.c	
+	aclrr.c	
+	aclrs.c	
 	aclrx.x	
 	acnvd.x	
 	acnvi.x	

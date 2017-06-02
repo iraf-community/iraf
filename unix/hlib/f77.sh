@@ -45,7 +45,7 @@ s=/tmp/stderr_$$
 t=/tmp/f77_$$
 #CC=${CC_f2c:-'/usr/bin/cc -m486'}
 CC=${CC_f2c:-'gcc'}
-CFLAGS=${CFLAGS:-"-I${iraf}unix/bin.${IRAFARCH}"}
+CFLAGS=${CFLAGS:-"-I${iraf}unix/f2c/libf2c"}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}

@@ -1,4 +1,0 @@
-AS -- Routines specially optimized (not necessary in assembler) for the local
-host machine.  This is done without compromising the portability of the system
-(see hlib$mkpkg.sf.*).
-
