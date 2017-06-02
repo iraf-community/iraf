@@ -153,9 +153,9 @@ libvops.a:
 	amodl.x	
 	amodr.x	
 	amods.x	
-	amovc.x	
-	amovd.x	
-	amovi.x	
+	amovc.c	
+	amovd.c	
+	amovi.c	
 	amovkc.x	
 	amovkd.x	
 	amovki.x	
@@ -163,9 +163,9 @@ libvops.a:
 	amovkr.x	
 	amovks.x	
 	amovkx.x	
-	amovl.x	
-	amovr.x	
-	amovs.x	
+	amovl.c	
+	amovr.c	
+	amovs.c	
 	amovx.x	
 	amuld.x	
 	amuli.x	

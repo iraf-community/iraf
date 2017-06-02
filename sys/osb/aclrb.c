@@ -6,13 +6,11 @@
 #include <iraf.h>
 
 /* ACLRB -- Clear a block of memory.
+ * [Specially optimized for Sun/IRAF].
  */
-void
-ACLRB (XCHAR *a, XINT *nbytes)
+ACLRB (a, n)
+XCHAR	*a;
+XINT	*n;
 {
-	register char	*p;
-	register int	n;
-
-	for (p=(char *)a, n = *nbytes;  --n >= 0;  )
-	    *p++ = 0;
+	memset ((char *)a, 0, *n);
 }
