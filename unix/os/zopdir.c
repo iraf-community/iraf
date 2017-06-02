@@ -134,7 +134,7 @@ ZOPDIR (PKCHAR *fname, XINT *chan)
 	dp->entry = 0;
 	dp->dir = dir;
 
-#if (defined(REDHAT) || defined(LINUX) || defined(MACOSX) || defined (IPOD))
+#if (defined(LINUX) || defined(MACOSX))
 	fd = dirfd(dir);
 #else
 	fd = dir->dd_fd;		/* MACHDEP */

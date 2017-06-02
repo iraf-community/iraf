@@ -979,9 +979,6 @@ passflag:		    mkobject = YES;
 #endif
 #ifdef LINUX
 	arglist[nargs++] = "-DLINUX";
-#ifdef REDHAT
-	arglist[nargs++] = "-DREDHAT";
-#endif
 #ifdef LINUXPPC
 	arglist[nargs++] = "-DLINUXPPC";
 #endif
