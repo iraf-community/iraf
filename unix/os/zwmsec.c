@@ -61,10 +61,7 @@ ZWMSEC (XINT *msec)
 	if (setitimer (ITIMER_REAL, itp, &oitv) < 0)
 	    return (XERR);
 
-#ifndef SOLARIS
 	omask = sigblock(0);
-#endif
-
 	itp->it_value.tv_usec = (*msec % 1000) * 1000;
 	itp->it_value.tv_sec  = (*msec / 1000);
 
@@ -88,11 +85,7 @@ ZWMSEC (XINT *msec)
 	(void) setitimer (ITIMER_REAL, itp, (struct itimerval *)0);
 
 	while (!ringring)
-#ifdef SOLARIS
-	    sigpause (SIGALRM);
-#else
 	    sigpause (omask &~ mask(SIGALRM));
-#endif
 
 	signal (SIGALRM, sv_handler);
 	(void) setitimer (ITIMER_REAL, &oitv, (struct itimerval *)0);

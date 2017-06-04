@@ -4,22 +4,8 @@
 #include <stdio.h>
 #include <signal.h>
 
-#ifdef CYGWIN
-#  include <mingw/fenv.h>
-#else
 #ifdef LINUX
 #  include <fpu_control.h>
-#else
-# ifdef BSD
-#  include <floatingpoint.h>
-# endif
-#endif
-#endif
-
-#ifdef SOLARIS
-# include <sys/siginfo.h>
-# include <sys/ucontext.h>
-# include <ieeefp.h>
 #endif
 
 #ifdef MACOSX
@@ -27,31 +13,10 @@
 #include <fenv.h>
 #endif
 
-#ifdef LINUXPPC
-#define MACUNIX
-#endif
-
 #ifdef MACOSX
 #ifndef MACINTEL
 #define MACUNIX
 #endif
-
-/* The following are needed for OS X 10.1 for backward compatability.  The
- * signal sa_flags are set to use them to get signal handling working on
- * 10.2 and later systems.
- */
-#ifdef OLD_MACOSX
-#ifndef SA_NODEFER
-#define SA_NODEFER      0x0010  /* don't mask the signal we're delivering */
-#endif
-#ifndef SA_NOCLDWAIT
-#define SA_NOCLDWAIT    0x0020  /* don't keep zombies around */
-#endif
-#ifndef SA_SIGINFO
-#define SA_SIGINFO      0x0040  /* signal handler with SA_SIGINFO args */
-#endif
-#endif
-
 #endif
 
 #define import_spp
@@ -76,21 +41,13 @@ int debug_sig = 0;
 #ifdef LINUX
 # define	fcancel(fp)
 #else
-# ifdef BSD
-# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
 # ifdef MACOSX
 # define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
-# ifdef SOLARIS
-# define	fcancel(fp)     ((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
-#endif
-#endif
 #endif
 #endif
 
 
-#if (defined(MACOSX) && defined(OLD_MACOSX))
+#if (defined(MACOSX))
 void ex_handler ( int, int, struct sigcontext * );
 #else
 void ex_handler ( int, siginfo_t *, void * );
@@ -333,31 +290,12 @@ SIGFUNC	handler;
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-#if (defined(MACOSX) && defined(OLD_MACOSX))
-
-void
-ex_handler (unix_signal, info, scp)
-int unix_signal;
-#ifdef OLD_MACOSX
-void *info;
-#else
-siginfo_t *info;
-#endif
-#ifdef MACINTEL
-ucontext_t *scp;
-#else
-struct sigcontext *scp;
-#endif
-
-#else
-
 void
 ex_handler (
   int  	    unix_signal,
   siginfo_t *info,
   void      *ucp
 )
-#endif
 {
 	XINT  next_epa, epa, x_vex;
 	int   vex;
@@ -376,7 +314,7 @@ ex_handler (
 	/* Reenable/initialize the exception handler.
 	 */
 
-#if defined(MACOSX) || defined(CYGWIN)
+#if defined(MACOSX)
         /* Clear the exception bits (ppc and x86). */
         feclearexcept (FE_ALL_EXCEPT);
 #else
@@ -416,11 +354,6 @@ ex_handler (
 #endif
 #endif
 
-
-#ifdef SOLARIS
-        fpsetsticky (0x0);
-	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
-#endif
 
 	/* If signal was SIGINT, cancel any buffered standard output.  */
 	if (unix_signal == SIGINT) {

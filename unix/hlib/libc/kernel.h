@@ -10,8 +10,6 @@
 #include <sys/types.h>
 #include <string.h>
 
-
-
 #ifndef NOKNET
 #define	NOKNET			/* no networking desired in kernel	*/
 #endif
@@ -86,12 +84,7 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
-
-#ifdef AUX
-#define SIGFUNC sigfunc_t
-#else
 typedef	void  (*SIGFUNC)();
-#endif
 
 typedef	void  (*PFV)();
 #ifdef MACH64
@@ -100,11 +93,6 @@ typedef	long  (*PFI)();
 typedef	int   (*PFI)();
 #endif
 
-
-#ifdef SOLARIS
-#define bzero(a,n)	memset(a,0,n)
-#define bcopy(a,b,n)	memmove(b,a,n)
-#endif
 
 extern	char *irafpath();
 

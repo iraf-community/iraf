@@ -16,22 +16,10 @@
 #ifdef MACOSX
 #include "stdarg-osx.h"
 #else
-#ifdef __CYGWIN__
-#include "stdarg-cygwin.h"
-#else
 #ifdef LINUX
 #include "stdarg-linux.h"
 #else
-#ifdef SOLARIS
-#include "stdarg-solaris.h"
-#else
-#ifdef BSD
-#include "stdarg-freebsd.h"
-#else
 #include <stdarg.h>
-#endif
-#endif
-#endif
 #endif
 #endif
 

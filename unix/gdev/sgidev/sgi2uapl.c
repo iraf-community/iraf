@@ -9,10 +9,6 @@
 #include <time.h>
 #include <pwd.h>
 
-#ifdef SOLARIS
-#include <sys/systeminfo.h>
-#endif
-
 #define	import_spp
 #define	import_error
 #include <iraf.h>
@@ -527,12 +523,7 @@ make_label (void)
 	struct	passwd *pw;
 	time_t	clock;
 
-#ifdef SOLARIS
-	sysinfo (SI_HOSTNAME, hostname, 32);
-#else
 	gethostname (hostname, 32);
-#endif
-
 	clock = time(0);
 	pw = getpwuid (getuid());
 	strcpy (username, pw->pw_name);

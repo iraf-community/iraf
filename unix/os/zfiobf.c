@@ -665,14 +665,8 @@ vm_largefile (long nbytes)
 int
 vm_directio (int fd, int flag)
 {
-#ifdef SOLARIS
-	/* Currently direct i/o is implemented only for Solaris. */
-	if (vm_debug > 1)
-	    fprintf (stderr, "vmclient (%s): directio=%d\n", vm_client, flag);
-	return (directio (fd, flag));
-#else
+	/* Direct i/o is implemented only for Solaris. */
 	return (-1);
-#endif
 }
 
 
