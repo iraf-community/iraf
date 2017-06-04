@@ -8,7 +8,7 @@ $exit
 
 libboot.a:
 	$set XFLAGS = "-c $(HSI_XF)"
-	$iffile (as$bytmov.s)  as$bytmov.s  $else  _bytmov.c  $endif
+	bytmov.c
 	osamovb.c
 
 	index.c
