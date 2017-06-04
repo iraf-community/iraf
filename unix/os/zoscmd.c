@@ -13,20 +13,10 @@
 #define import_spp
 #include <iraf.h>
 
-#ifdef LINUX
-#define	USE_SIGACTION
-#endif
-
 static	int lastsig;
 extern	int pr_onint();
 
-#ifdef SYSV
-#define	vfork	fork
-#else
-#  ifdef sun
-#  include <vfork.h>
-#  endif
-#endif
+/* #define	vfork	fork */
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -51,11 +41,7 @@ ZOSCMD (
 	struct	rlimit rlim;
 	int	maxfd, fd, pid;
 	char	*getenv();
-#ifdef USE_SIGACTION
 	struct sigaction oldact;
-#else
-	SIGFUNC	old_sigint;
-#endif
 
 	extern  int _u_fmode();
 
@@ -75,11 +61,7 @@ ZOSCMD (
 	} else if ((shell = getenv ("SHELL")) == NULL)
 	    shell = sh;
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, NULL, &oldact);
-#else
-	old_sigint = (SIGFUNC) signal (SIGINT, SIG_IGN);
-#endif
 
 	/* Vfork is faster if we can use it.
 	 */
@@ -169,17 +151,6 @@ ZOSCMD (
 	pr_enter (pid, 0, 0);
 	lastsig = 0;
 
-#ifndef SYSV
-	/* This doesn't appear to work on SysV systems, I suspect that wait()
-	 * is not being reentered after the signal handler below.  This could
-	 * probably be fixed by modifying the signal handling but I am not
-	 * sure the parent needs to intercept errors in any case, so lets
-	 * try really ignoring errors in the parent instead, on SYSV systems.
-	 */
-	if (old_sigint != SIG_IGN)
-	    signal (SIGINT, (SIGFUNC) pr_onint);
-#endif
-
 	*status = pr_wait (pid);
 
 	/* If the OS command was interrupted, ignore its exit status and return
@@ -191,11 +162,7 @@ ZOSCMD (
 	if (lastsig == SIGINT)
 	    *status = SYS_XINT;
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, &oldact, NULL);
-#else
-	signal (SIGINT, old_sigint);
-#endif
 
 	return (XOK);
 }

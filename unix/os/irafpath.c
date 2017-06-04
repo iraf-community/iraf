@@ -73,19 +73,20 @@ char *fname;			/* simple filename, no dirs */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin");
 
-#ifdef LINUX64
+#ifdef __linux__
+#ifdef __x86_64__
 	strcat (pathname, ".linux64");
-#else
-#ifdef LINUX
+#endif
+#ifdef __i386__
 	strcat (pathname, ".linux");
-#else
-#ifdef MACINTEL
+#endif
+#endif
+#ifdef __APPLE__
+#ifdef __x86_64__
 	strcat (pathname, ".macintel");
-#else
-#ifdef MACOSX
+#endif
+#ifdef __i386__
 	strcat (pathname, ".macosx");
-#endif
-#endif
 #endif
 #endif
 	strcat (pathname, "/");

@@ -566,7 +566,7 @@ macro_redef (void)
 
 	outstr ("Memr(");
 	if (strcmp (value, "$1") == 0) {
-#if defined(MACH64) && defined(AUTO_P2R)
+#ifdef AUTO_P2R
 	    char *emsg[SZ_LINE];
 	    int strict = 0;
 #endif
@@ -577,7 +577,7 @@ macro_redef (void)
 	     *  a struct.  In this case, print a warning so it can be checked
 	     *  manually and just pass it through.
 	     */
-#if defined(MACH64) && defined(AUTO_P2R)
+#ifdef AUTO_P2R
 	    memset (emsg, 0, SZ_LINE);
 	    sprintf (emsg, 
 		"Error in %s: line %d: ambiguous Memr for '%s' needs P2R/P2P", 
@@ -605,7 +605,7 @@ macro_redef (void)
 		fname[istkptr], linenum[istkptr]);
 	    fprintf (stderr, "adding P2R macro for '%s'\n", name);
 	     */
-#if defined(MACH64) && defined(AUTO_P2R)
+#ifdef AUTO_P2R
 	    if (value[0] == '$') {
 	        outstr ("P2R(");
 	        outstr (value);

@@ -64,7 +64,7 @@ ZPANIC (
 	/* Terminate process with a core dump if the debug_sig flag is set.
 	 */
 	if (debug_sig) {
-#ifdef LINUX
+#ifdef __linux__
 	    signal (SIGABRT, SIG_DFL);
 	    kill (getpid(), SIGABRT);
 #else

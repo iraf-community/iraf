@@ -5,12 +5,12 @@
 #include <iraf.h>
 
 extern	char *environ[];
-#ifdef	MACOSX
+#ifdef	__APPLE__
 extern  char ***_NSGetArgv();
 extern  int *_NSGetArgc();
 #endif
 
-#ifdef LINUX
+#ifdef __linux__
 extern	char **xargv;		/* defined in getarg(3f); requires libU77! */
 extern	int xargc;
 #else
@@ -35,7 +35,7 @@ ZGCMDL (
 	register int   n;
 	char	**argv;
 
-#ifdef	MACOSX
+#ifdef	__APPLE__
 	argv = *_NSGetArgv();
 	xargc = *_NSGetArgc();
 	xargv = argv;

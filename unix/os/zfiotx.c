@@ -9,14 +9,9 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef LINUX
-#define USE_SIGACTION
-#endif
-
-#ifdef SYSV
 #include <termios.h>
-#else
-#include <sgtty.h>
+#ifndef __linux__
+#define IUCLC 0 /* IUCLC is linux specific and does not exist on POSIX */
 #endif
 
 #ifndef O_NDELAY
@@ -73,13 +68,8 @@ struct ttyport {
 	unsigned device;		/* tty device number		*/
 	int flags;			/* port flags			*/
 	char redraw;			/* redraw char, sent after susp	*/
-#ifdef SYSV
 	struct termios tc;		/* normal tty state		*/
 	struct termios save_tc;		/* saved rawmode tty state	*/
-#else
-	struct sgttyb tc;		/* normal tty state		*/
-	struct sgttyb save_tc;		/* saved rawmode tty state	*/
-#endif
 };
 
 
@@ -88,14 +78,9 @@ struct ttyport {
 extern	int errno;
 static	jmp_buf jmpbuf;
 static	int tty_getraw = 0;	/* raw getc in progress */
-#ifdef USE_SIGACTION
 static	struct sigaction sigint, sigterm;
 static	struct sigaction sigtstp, sigcont;
 static	struct sigaction oldact;
-#else
-static	SIGFUNC	sigint, sigterm;
-static	SIGFUNC	sigtstp, sigcont;
-#endif
 static	void  tty_rawon(), tty_reset(), uio_bwrite();
 static	void  tty_onsig(), tty_stop(), tty_continue();
 
@@ -110,20 +95,6 @@ static	void  tty_onsig(), tty_stop(), tty_continue();
  */
 struct ttyport ttyports[MAXOTTYS];
 struct ttyport *lastdev = NULL;
-
-/* Omit this for now; it was put in for an old Linux libc bug, and since libc
- * is completely different now the need for it has probably gone away.
- *
- * #ifdef LINUX
- * #define FCANCEL
- * #endif
- */
-#ifdef FCANCEL
-/* The following definition has intimate knowledge of the STDIO structures. */
-#define	fcancel(fp)	( \
-    (fp)->_IO_read_ptr = (fp)->_IO_read_end = (fp)->_IO_read_base,\
-    (fp)->_IO_write_ptr = (fp)->_IO_write_end = (fp)->_IO_write_base)
-#endif
 
 
 /* ZOPNTX -- Open or create a text file.  The pseudo-files "unix-stdin", 
@@ -414,7 +385,6 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 	     * because ctrl/s ctrl/q is disabled in raw mode, and that can
 	     * cause sporadic protocol failures.
 	     */
-#ifdef USE_SIGACTION
             sigint.sa_handler = (SIGFUNC) tty_onsig;
             sigemptyset (&sigint.sa_mask);
             sigint.sa_flags = SA_NODEFER;
@@ -424,10 +394,6 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
             sigemptyset (&sigterm.sa_mask);
             sigterm.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigterm, &oldact);
-#else
-	    sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)tty_onsig);
-	    sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)tty_onsig);
-#endif
 	    tty_getraw = 1;
 
 	    /* Async mode can be cleared by other processes (e.g. wall),
@@ -447,13 +413,8 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 		fcancel (fp);
 #endif
 
-#ifdef USE_SIGACTION
 	    sigaction (SIGINT, &oldact, NULL);
 	    sigaction (SIGTERM, &oldact, NULL);
-#else
-	    signal (SIGINT,  sigint);
-	    signal (SIGTERM, sigterm);
-#endif
 	    tty_getraw = 0;
 
 	    /* Clear parity bit just in case raw mode is used.
@@ -743,7 +704,6 @@ tty_rawon (
 	kfp = &zfd[fd];
 
 	if (!(port->flags & KF_CHARMODE)) {
-#ifdef SYSV
 	    struct  termios tc;
 
 	    tcgetattr (fd, &port->tc);
@@ -765,29 +725,12 @@ tty_rawon (
 	    tc.c_cc[VLNEXT] = 0;
 
 	    tcsetattr (fd, TCSADRAIN, &tc);
-#else
-	    struct  sgttyb tc;
-
-	    ioctl (fd, TIOCGETP, &tc);
-	    port->flags |= KF_CHARMODE;
-	    port->tc = tc;
-
-	    /* Set raw mode in the terminal driver. */
-	    if ((flags & KF_NDELAY) && !(kfp->flags & KF_NDELAY))
-		tc.sg_flags |= (RAW|TANDEM);
-	    else
-		tc.sg_flags |= CBREAK;
-	    tc.sg_flags &= ~(ECHO|CRMOD);
-
-	    ioctl (fd, TIOCSETN, &tc);
-#endif
 	    /* Set pointer to raw mode tty device. */
 	    lastdev = port;
 
 	    /* Post signal handlers to clear/restore raw mode if process is
 	     * suspended.
 	     */
-#ifdef USE_SIGACTION
             sigtstp.sa_handler = (SIGFUNC) tty_stop;
             sigemptyset (&sigtstp.sa_mask);
             sigtstp.sa_flags = SA_NODEFER;
@@ -797,10 +740,6 @@ tty_rawon (
             sigemptyset (&sigcont.sa_mask);
             sigcont.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigcont, &oldact);
-#else
-	    sigtstp = (SIGFUNC) signal (SIGTSTP, (SIGFUNC)tty_stop);
-	    sigcont = (SIGFUNC) signal (SIGCONT, (SIGFUNC)tty_continue);
-#endif
 	}
 
 	/* Set any file descriptor flags, e.g., for nonblocking reads. */
@@ -827,14 +766,6 @@ tty_reset (
 {
 	register struct	fiodes *kfp;
 	register int fd;
-#ifdef SYSV
-	/*
-	struct termios tc;
-	int i;
-	*/
-#else
-	struct	sgttyb tc;
-#endif
 
 	if (!port)
 	    return;
@@ -842,20 +773,9 @@ tty_reset (
 	fd = port->chan;
 	kfp = &zfd[fd];
 
-#ifdef SYSV
 	/* Restore saved port status. */
 	if (port->flags & KF_CHARMODE)
 	    tcsetattr (fd, TCSADRAIN, &port->tc);
-#else
-	if (ioctl (fd, TIOCGETP, &tc) == -1)
-	    return;
-
-	if (!(port->flags & KF_CHARMODE))
-	    port->tc = tc;
-
-	tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	ioctl (fd, TIOCSETN, &tc);
-#endif
 	port->flags &= ~KF_CHARMODE;
 	if (lastdev == port)
 	    lastdev = NULL;
@@ -865,13 +785,8 @@ tty_reset (
 	    kfp->flags &= ~KF_NDELAY;
 	}
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, &oldact, NULL);
 	sigaction (SIGTERM, &oldact, NULL);
-#else
-	signal (SIGTSTP, sigtstp);
-	signal (SIGCONT, sigcont);
-#endif
 }
 
 
@@ -904,16 +819,11 @@ tty_stop (
 	/*
         register struct fiodes *kfp = port ? &zfd[fd] : NULL;
 	*/
-#ifdef SYSV
 	struct termios tc;
-#else
-	struct sgttyb tc;
-#endif
 
 	if (!port)
 	    return;
 
-#ifdef SYSV
 	tcgetattr (fd, &port->save_tc);
 	tc = port->tc;
 
@@ -923,14 +833,6 @@ tty_stop (
 	tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
 
 	tcsetattr (fd, TCSADRAIN, &tc);
-#else
-	if (ioctl (fd, TIOCGETP, &tc) != -1) {
-	    port->save_tc = tc;
-	    tc = port->tc;
-	    tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	    ioctl (fd, TIOCSETN, &tc);
-	}
-#endif
 
 	kill (getpid(), SIGSTOP);
 }
@@ -952,11 +854,7 @@ tty_continue (
 	if (!port)
 	    return;
 
-#ifdef SYSV
 	tcsetattr (port->chan, TCSADRAIN, &port->save_tc);
-#else
-	ioctl (port->chan, TIOCSETN, &port->save_tc);
-#endif
 	if (tty_getraw && port->redraw)
 	    longjmp (jmpbuf, port->redraw);
 }

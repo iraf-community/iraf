@@ -4,16 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#ifdef LINUX
-/* Necessary to get DIR.dd_fd on Linux systems. */
-#define DIRENT_ILLEGAL_ACCESS
-#endif
-
-#ifdef POSIX
 #include <dirent.h>
-#else
-#include <sys/dir.h>
-#endif
 
 
 #define	import_kernel
@@ -134,12 +125,7 @@ ZOPDIR (PKCHAR *fname, XINT *chan)
 	dp->entry = 0;
 	dp->dir = dir;
 
-#if (defined(LINUX) || defined(MACOSX))
 	fd = dirfd(dir);
-#else
-	fd = dir->dd_fd;		/* MACHDEP */
-#endif
-
 	zfd[fd].fp = (FILE *)dp;
 
 	*chan = fd;
@@ -215,19 +201,11 @@ _getfile (DIR *dir, char *outstr, int maxch)
 	register char *ip, *op;
 	register int n;
 	int status;
-#ifdef POSIX
 	register struct	dirent *dp;
-#else
-	register struct	direct *dp;
-#endif
 
 	for (dp = readdir(dir);  dp != NULL;  dp = readdir(dir))
 	    if (dp->d_ino != 0) {
-#ifdef POSIX
 		n = strlen (dp->d_name);
-#else
-		n = (dp->d_namlen < maxch) ? dp->d_namlen : maxch;
-#endif
 		status = n;
 		for (ip=dp->d_name, op=outstr;  --n >= 0;  )
 		    *op++ = *ip++;

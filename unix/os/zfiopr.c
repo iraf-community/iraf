@@ -16,13 +16,7 @@
 #include <iraf.h>
 
 extern	int errno;		/* error code returned by the kernel	*/
-#ifdef SYSV
-#define	vfork	fork
-#else
-#  ifdef sun
-#  include <vfork.h>
-#  endif
-#endif
+/* #define	vfork	fork */
 
 extern void pr_enter (int pid, int inchan, int outchan);
 
@@ -236,11 +230,7 @@ ZARDPR (
 	register int fd, nbytes;
 	int	record_length, status;
 	short	temp;
-#ifdef POSIX
 	sigset_t sigmask_save, set;
-#else
-	int	sigmask_save;
-#endif
 
 	fd = *chan;
 	op = (char *)buf;
@@ -311,14 +301,10 @@ ZARDPR (
 	 * entire record.  This is implemented as a critical section to
 	 * prevent corruption of the IPC protocol when an interrupt occurs.
 	 */
-#ifdef POSIX
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
 	sigprocmask (SIG_BLOCK, &set, &sigmask_save);
-#else
-	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
-#endif
 
 	while (nbytes > 0) {
 	    switch (status = read (fd, op, nbytes)) {
@@ -358,11 +344,7 @@ for (nc=0; nc < 30; nc++) {
 	    if (read (fd, &temp, 1) <= 0)
 		break;
 reenab_:
-#ifdef POSIX
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
-#else
-	sigsetmask (sigmask_save);
-#endif
 
 	return (XOK);
 }
@@ -381,11 +363,7 @@ ZAWRPR (
 {
 	register int fd;
 	short	temp;
-#ifdef POSIX
 	sigset_t sigmask_save, set;
-#else
-	int	sigmask_save;
-#endif
 
 	fd = *chan;
 
@@ -408,14 +386,10 @@ ZAWRPR (
 
 	/* Write IPC block header.
 	 */
-#ifdef POSIX
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
 	sigprocmask (SIG_BLOCK, &set, &sigmask_save);
-#else
-	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
-#endif
 
 	temp = IPC_MAGIC;
 	write (fd, &temp, 2);
@@ -432,12 +406,7 @@ ZAWRPR (
 	if (ipc_out > 0)
 	    write (ipc_out, (char *)buf, (int)*nbytes);
 
-#ifdef POSIX
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
-#else
-	sigsetmask (sigmask_save);
-#endif
-
 	if (debug_ipc) {
 /*
 char ch, *bp = buf, nc=0;

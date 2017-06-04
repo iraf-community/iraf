@@ -6,8 +6,7 @@
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
 
-#ifndef MACH64
-
+#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
 
 /* alloc.c */
 extern int main(int argc, char *argv[]);
@@ -254,7 +253,7 @@ extern void mdump_(int *buf, int *nbytes);
 
 
 
-#else
+#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
 
 
 
@@ -492,5 +491,8 @@ extern int zzstop_(void);
 extern void ready_(void);
 extern void mdump_(long *buf, long *nbytes);
 
+#else
+
+#error "No data model: need either LP64 or ILP32"
 
 #endif

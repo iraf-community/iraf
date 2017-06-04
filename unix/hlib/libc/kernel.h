@@ -83,7 +83,7 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 typedef	void  (*SIGFUNC)();
 
 typedef	void  (*PFV)();
-#ifdef MACH64
+#ifdef __LP64__
 typedef	long  (*PFI)();
 #else
 typedef	int   (*PFI)();

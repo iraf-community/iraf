@@ -4,12 +4,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifdef SYSV
-#include <time.h>
-#else
-#include <sys/time.h>
-#include <sys/timeb.h>
-#endif
 #include <utime.h>
 
 #define	import_kernel

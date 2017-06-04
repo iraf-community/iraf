@@ -40,7 +40,7 @@
 #define	SZ_PKGENV	256
 #define DEF_PKGENV	"iraf"
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
 #define	LINKER		"cc"			/* Linking utility */
 #else
@@ -68,7 +68,7 @@
 #define IRAFLIB5	"libVO.a"
 #define IRAFLIB6	"libcfitsio.a"
 
-#ifdef LINUX
+#ifdef __linux__
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
@@ -86,7 +86,7 @@ char *opt_flags[] = { "-O",			/*  0  */
 int  nopt_flags	   = 1;				/* No. optimizer flags */
 
 #else
-#ifdef MACOSX
+#ifdef __APPLE__
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
@@ -129,11 +129,11 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #endif
 #endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define	F_STATIC	"-static"
 #define	F_SHARED	"-shared"
 #else
-#ifdef LINUX
+#ifdef __linux__
 #define	F_STATIC	"-Wl,-Bstatic"
 #define	F_SHARED	"-Wl,-Bdynamic"
 #endif
@@ -683,27 +683,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef MACOSX
-	if (useg95 == 0) {
-	    if ((irafarch = os_getenv("IRAFARCH"))) {
-	        if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "ppc";
-		    */
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "i386";
-	    	    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-	        } else if (strcmp (irafarch, "macintel") == 0) {
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "x86_64";
-	    	    arglist[nargs++] = "-m64";
-		}
-	    }
-	}
-#endif
-#if (defined(LINUX) && !defined(MACH64))
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 
@@ -729,7 +709,7 @@ passflag:		    mkobject = YES;
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
 	    status = run (f77comp, arglist);
-#ifdef LINUX
+#ifdef __linux__
 	/* This kludge is to work around a bug in the F2C based F77 script
 	 * on Linux, which returns an exit status of 4 when successfully
 	 * compiling a Fortran file.
@@ -754,28 +734,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef MACOSX
-	if (useg95 == 0) {
-	    if ((irafarch = os_getenv("IRAFARCH"))) {
-                if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
-                    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-                } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "x86_64";
-                    arglist[nargs++] = "-m64";
-                }
-
-	    }
-	}
-#endif
-#if (defined(LINUX) && !defined(MACH64))
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 
@@ -810,7 +769,7 @@ passflag:		    mkobject = YES;
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
 	    status = run (f77comp, arglist);
-#ifdef LINUX
+#ifdef __linux__
 	    /* This kludge is to work around a bug in the F2C based F77 script
 	     * on Linux, which returns an exit status of 4 when successfully
 	     * compiling a Fortran file.
@@ -829,41 +788,8 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
 
-#ifdef MACH64
-	arglist[nargs++] = "-DMACH64";		/* needed for zmain.c */
-#endif
-#ifdef LINUX64
-	arglist[nargs++] = "-DLINUX64";		/* needed for zmain.c */
-#endif
-#if (defined(LINUX) && !defined(MACH64))
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
-#endif
-#ifdef LINUX
-	arglist[nargs++] = "-DLINUX";
-	arglist[nargs++] = "-DPOSIX";
-#endif
-
-#ifdef MACOSX
-	arglist[nargs++] = "-DMACOSX";
-	if (useg95 == 0) {
-	    if ((irafarch = os_getenv("IRAFARCH"))) {
-                if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
-                    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-                } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "x86_64";
-                    arglist[nargs++] = "-m64";
-                }
-
-	    }
-	}
 #endif
 
 	if (optimize) {
@@ -912,36 +838,14 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
-#ifdef MACOSX
-	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
-            if (strcmp (irafarch, "macosx") == 0) {
-		/*
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "ppc";
-		*/
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "i386";
-                arglist[nargs++] = "-m32";
-	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
-            } else if (strcmp (irafarch, "macintel") == 0) {
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "x86_64";
-                arglist[nargs++] = "-m64";
-            }
-	}
-#endif
-
-#if (defined(LINUX) && !defined(MACH64))
-	arglist[nargs++] = "-Wl,--defsym,mem_=0";
-#endif
-#if (defined(LINUX) && !defined(MACH64))
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 	arglist[nargs++] = "-o";
 
 	if (link_nfs) {
 	    sprintf (tempfile, "/tmp/T_%s.XXXXXX", outfile);
-#ifdef LINUX
+#ifdef __linux__
 	    mkstemp (tempfile);
 #else
 	    mktemp (tempfile);
@@ -1144,7 +1048,6 @@ addflags (char *flag, char *arglist[], int *p_nargs)
 		    link_static = 1;
 	        } else if (strcmp (lflag, F_SHARED) == 0) {
 		    link_static = 0;
-#if defined(LINUX) || defined(MACOSX)
 	        } else if ((strcmp (lflag, "-lf2c") == 0) || 
 	    	    (strcmp (lflag, "-lcompat") == 0)) {
 		        /* Use the IRAF version of libf2c.a or libcompat.a,
@@ -1154,7 +1057,6 @@ addflags (char *flag, char *arglist[], int *p_nargs)
 		        *p_nargs = nargs;
 		        return (1);
 	        }
-#endif
 	        arglist[nargs++] = fs;
 	    }
 
@@ -1273,9 +1175,6 @@ xtof (char *file)
 {
 	static  char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
 	char	cmdbuf[SZ_CMDBUF], fname[SZ_FNAME];
-#if defined(LINUX64) || defined(MACH64)
-	char    iraf_h[SZ_PATHNAME];
-#endif
 
 
 	lxfiles[nxfiles++] = file;
@@ -1304,21 +1203,10 @@ xtof (char *file)
 	}
 
 
-	/* Include a custom 64-bit iraf.h file.
-	 */
-#if defined(LINUX64) || defined(MACH64)
-	memset (iraf_h, 0, SZ_PATHNAME);
-
-	if (os_sysfile ("iraf.h", iraf_h, SZ_PATHNAME) <= 0)
-	    strcpy (iraf_h, "iraf.h");
-	strcat (cmdbuf, " -h ");
-	strcat (cmdbuf, iraf_h);
-#else
 	if (foreigndefs) {
 	    strcat (cmdbuf, " -h ");
 	    strcat (cmdbuf, foreign_defsfile);
 	}
-#endif
 
 	errflag |= sys (cmdbuf);
 	chdot (file, 'r');
