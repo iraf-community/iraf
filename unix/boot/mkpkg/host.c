@@ -196,7 +196,7 @@ h_updatelibrary (
 
 	for (npass=0; nleft > 0; npass++) {
 
-#if defined(MACOSX) && defined(__ILP32__)
+#if defined(__APPLE__) && defined(__ILP32__)
 	    if (npass > 0) {
 	        /* For FAT libraries we need to use libtool to update.
 	         */
@@ -245,7 +245,7 @@ h_updatelibrary (
 	    ndone += nfiles;
 	    nleft -= nfiles;
 
-#if defined(MACOSX) && defined(__ILP32__)
+#if defined(__APPLE__) && defined(__ILP32__)
 	    h_rebuildlibrary (lname);
 #endif
 	}

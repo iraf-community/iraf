@@ -40,7 +40,7 @@
 #define	SZ_PKGENV	256
 #define DEF_PKGENV	"iraf"
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
 #define	LINKER		"cc"			/* Linking utility */
 #else
@@ -837,25 +837,6 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = linker;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
-
-#ifdef MACOSX
-	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
-            if (strcmp (irafarch, "macosx") == 0) {
-		/*
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "ppc";
-		*/
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "i386";
-                arglist[nargs++] = "-m32";
-	    	arglist[nargs++] = "-mmacosx-version-min=10.5";
-            } else if (strcmp (irafarch, "macintel") == 0) {
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "x86_64";
-                arglist[nargs++] = "-m64";
-            }
-	}
-#endif
 
 #if (defined(__linux__) && defined(__ILP32__))
 	arglist[nargs++] = "-Wl,--defsym,mem_=0";

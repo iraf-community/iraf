@@ -11,7 +11,7 @@
 #include <ctype.h>
 #include <pwd.h>
 
-#ifndef MACOSX
+#ifdef __linux__
 #include <sys/mtio.h>
 #endif
 
@@ -284,7 +284,7 @@ struct mtdesc {
 
 /* Tape drives aren't supported on Mac systems currently.
 */
-#ifndef MACOSX
+#ifdef __linux__
 
 /* Device flag table. */
 static struct mtchar {

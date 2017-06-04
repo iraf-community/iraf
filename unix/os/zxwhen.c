@@ -118,7 +118,7 @@ struct	_hwx {
 	char	*v_msg;			/* Descriptive error message	*/
 };
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #ifdef  FPE_INTDIV
 #undef  FPE_INTDIV
 #endif
@@ -255,7 +255,7 @@ SIGFUNC	handler;
 	long status;
 
 	sigemptyset (&sig.sa_mask);
-#ifdef MACOSX
+#ifdef __APPLE__
 	sig.sa_handler = (SIGFUNC) handler;
 #else
 	sig.sa_sigaction = (SIGFUNC) handler;
