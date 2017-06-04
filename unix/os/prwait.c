@@ -31,10 +31,6 @@ struct proctable {
 
 extern int errno;
 
-#ifdef MACOSX
-#define POSIX
-#endif
-
 
 /* PR_ENTER -- Make a new entry in the process table.  Something is very wrong
  * if the table overflows.
@@ -70,11 +66,7 @@ pr_wait (int pid)
 	int	error_code;
 	pid_t	waitpid;
 	struct	proctable *pr_findpid();
-#ifdef POSIX
 	int	exit_status;
-#else
-	union	wait exit_status;
-#endif
 
 
 	/* Lookup process in table.  Return ERR if there is no entry.
@@ -104,11 +96,7 @@ pr_wait (int pid)
 		    /* The integer argument to exit() is returned in the
 		     * wait struct defined in <sys/wait.h>.
 		     */
-#ifdef POSIX
 		    error_code = WEXITSTATUS(exit_status);
-#else
-		    error_code = exit_status.w_T.w_Retcode;
-#endif
 		    pr->pr_exit_status = error_code ? error_code : XOK;
 
 		    if (waitpid == pid) {

@@ -16,9 +16,7 @@
 #include <iraf.h>
 
 #define	QUANTUM		6
-#ifdef SYSV
-#define	vfork	fork
-#endif
+/* #define	vfork	fork */
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -60,11 +58,7 @@ ZOPDPR (
 	 * the process to 4, 6 or whatever the QUANTUM is).  If an absolute
 	 * priority is specified it is used without scaling.
 	 */
-#ifdef SYSV
-	curpri = nice (0);
-#else
 	curpri = getpriority (PRIO_PROCESS, 0);
-#endif
 
 	for (ip=(char *)queue;  isspace (*ip);  ip++)
 	    ;
@@ -124,12 +118,7 @@ ZOPDPR (
 	    for (fd=3;  fd < min(MAXOFILES,maxfd);  fd++)
 		fcntl (fd, F_SETFD, 1);
 
-#ifdef SYSV
-	    /* nice (0, priority * 2); */
-	    nice ( priority * 2);
-#else
 	    setpriority (PRIO_PROCESS, 0, priority);
-#endif
 
 	    /* Since we used vfork we share memory with the parent until the
 	     * call to execl(), hence we must not close any files or do

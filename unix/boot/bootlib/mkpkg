@@ -11,8 +11,6 @@ libboot.a:
 	bytmov.c
 	osamovb.c
 
-	index.c
-	rindex.c
 	envinit.c
 
 	osaccess.c	bootlib.h

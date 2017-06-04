@@ -175,8 +175,7 @@ h_updatelibrary (
 	 * Update the library.
 	 * ---------------------
 	 */
-#if defined(LINUX) || defined(BSD) || defined(MACOSX)
-#if defined(MACOSX) && !defined(MACH64)
+#if defined(__APPLE__) && defined(__ILP32__)
 	/* For FAT libraries we need to use libtool to update.
 	 */
 	if (access (lname, F_OK) == 0)
@@ -185,9 +184,6 @@ h_updatelibrary (
 	    sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
 #else
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
-#endif
-#else
-	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, libfname);
 #endif
 
 	/* Compute offset to the file list and initialize loop variables.
@@ -200,7 +196,7 @@ h_updatelibrary (
 
 	for (npass=0; nleft > 0; npass++) {
 
-#if defined(MACOSX) && !defined(MACH64)
+#if defined(MACOSX) && defined(__ILP32__)
 	    if (npass > 0) {
 	        /* For FAT libraries we need to use libtool to update.
 	         */
@@ -249,7 +245,7 @@ h_updatelibrary (
 	    ndone += nfiles;
 	    nleft -= nfiles;
 
-#if defined(MACOSX) && !defined(MACH64)
+#if defined(MACOSX) && defined(__ILP32__)
 	    h_rebuildlibrary (lname);
 #endif
 	}

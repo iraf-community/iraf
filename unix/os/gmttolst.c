@@ -2,16 +2,7 @@
  */
 
 #include <sys/types.h>
-#ifdef SYSV
 #include <time.h>
-#else
-#include <sys/time.h>
-#include <sys/timeb.h>
-#endif
-
-#ifdef MACOSX
-#include <time.h>
-#endif
 
 #define	SECONDS_1970_TO_1980	315532800L
 static	long get_timezone();
@@ -32,11 +23,9 @@ time_t	gmt;
 	/* Correct for daylight savings time, if in effect */
 	gmtl = (long)gmt;
 
-#ifndef MACOSX
 	/* Mac systems already include the DST offset in the GMT offset */
 	if (localtime(&gmtl)->tm_isdst)
 	    time_var += 60L * 60L;
-#endif
 
 	return (time_var - SECONDS_1970_TO_1980);
 }
@@ -48,20 +37,7 @@ time_t	gmt;
 static long
 get_timezone()
 {
-#ifdef SYSV
 	extern	long timezone;
 	tzset();
 	return (timezone);
-#else
-#ifdef MACOSX
-	struct tm *tm;
-	time_t clock = time(NULL);
-	tm = localtime (&clock);
-	return (-(tm->tm_gmtoff));
-#else
-	struct timeb time_info;
-	ftime (&time_info);
-	return (time_info.timezone * 60);
-#endif
-#endif
 }

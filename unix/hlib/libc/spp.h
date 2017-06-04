@@ -77,14 +77,15 @@
 #define	XCHAR		short
 #endif
 
-#ifdef MACH64
-#define	XINT		long 		/*  ILP64  */
+#ifdef __LP64__
+#define	XINT		long
 #define	XLONG		long
 #define	XSTRUCT		long
 #define	XPOINTER	long
 #define	XBOOL		long	
-#else
-#define	XINT		int 		/*  ILP32  */
+#endif
+#ifdef __ILP32__
+#define	XINT		int
 #define	XLONG		int
 #define	XSTRUCT		int
 #define	XPOINTER	int

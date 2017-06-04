@@ -2,16 +2,7 @@
  */
 
 #include <sys/types.h>
-#ifdef SYSV
 #include <time.h>
-#else
-#include <sys/time.h>
-#include <sys/timeb.h>
-#endif
-
-#ifdef MACOSX
-#include <time.h>
-#endif
 
 #define	SECONDS_1970_TO_1980	315532800L
 static	long os_timezone();
@@ -72,15 +63,9 @@ os_itime (long unix_time)
 static long
 os_timezone()
 {
-#if defined(SYSV) || defined(MACOSX)
 	struct tm *tm;
 	time_t clock;
 	clock = time(NULL);
 	tm = gmtime (&clock);
 	return (-(tm->tm_gmtoff));
-#else
-	struct	timeb time_info;
-	ftime (&time_info);
-	return (time_info.timezone * 60);
-#endif
 }

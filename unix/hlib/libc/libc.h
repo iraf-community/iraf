@@ -11,10 +11,11 @@
 #endif
 
 #define	XCHAR		short
-#ifdef MACH64
+#ifdef __LP64__
 #define	XINT		long
 #define	XLONG		long
-#else
+#endif
+#ifdef __ILP32__
 #define	XINT		int
 #define	XLONG		int
 #endif

@@ -4,20 +4,8 @@
 #include <stdio.h>
 #include <signal.h>
 
-#ifdef LINUX
-#  include <fpu_control.h>
-#endif
-
-#ifdef MACOSX
 #include <math.h>
 #include <fenv.h>
-#endif
-
-#ifdef MACOSX
-#ifndef MACINTEL
-#define MACUNIX
-#endif
-#endif
 
 #define import_spp
 #define	import_kernel
@@ -38,10 +26,10 @@
  */
 int debug_sig = 0;
 
-#ifdef LINUX
+#ifdef __linux__
 # define	fcancel(fp)
 #else
-# ifdef MACOSX
+# ifdef __APPLE__
 # define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
 #endif
 #endif
@@ -295,10 +283,6 @@ ex_handler (
 	XINT  next_epa, epa, x_vex;
 	int   vex;
 
-#ifndef LINUX64
-	extern  int sfpucw_();
-#endif
-
 	last_os_exception = unix_signal;
         last_os_hwcode = info ? info->si_code : 0;
 
@@ -309,46 +293,9 @@ ex_handler (
 	/* Reenable/initialize the exception handler.
 	 */
 
-#if defined(MACOSX)
-        /* Clear the exception bits (ppc and x86). */
+        /*  Clears the exception-occurred bits in the FP status register.
+         */
         feclearexcept (FE_ALL_EXCEPT);
-#else
-#ifdef LINUX
-	/* setfpucw (0x1372); */
-	{
-#ifdef MACUNIX
-	/* This is for Linux on a Mac, e.g., LinuxPPC (not MacOSX). */
-	    int fpucw = _FPU_IEEE;
-
-	    /*
-	    if (unix_signal == SIGFPE)
-		kernel_panic ("unrecoverable floating exception");
-	    else
-		sfpucw_ (&fpucw);
-	    if (unix_signal == SIGPIPE && !ignore_sigint)
-		sigset (SIGINT, (SIGFUNC) ex_handler);
-	     */
-
-	    sfpucw_ (&fpucw);
-#else
-#ifdef LINUX64
-            /*
-            XINT fpucw = 0x336;
-            SFPUCW (&fpucw);
-            */
-            fpu_control_t cw = 
-                (_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_ZM | _FPU_MASK_DM);
-            _FPU_SETCW(cw);
-
-#else
-	    int fpucw = 0x336;
-	    sfpucw_ (&fpucw);
-#endif
-#endif
-	}
-#endif
-#endif
-
 
 	/* If signal was SIGINT, cancel any buffered standard output.  */
 	if (unix_signal == SIGINT) {
@@ -403,25 +350,3 @@ ZXGMES (
 
 	return (XOK);
 }
-
-
-#ifdef LINUX64
-
-int
-gfpucw_ (XINT *xcw)
-{
-        fpu_control_t cw;
-        _FPU_GETCW(cw);
-        *xcw = cw;
-        return cw;
-}
-
-int
-sfpucw_ (XINT *xcw)
-{
-        fpu_control_t cw = *xcw;
-        _FPU_SETCW(cw);
-        return cw;
-}
-
-#endif

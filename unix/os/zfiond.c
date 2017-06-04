@@ -14,10 +14,10 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#ifdef LINUX
+#ifdef __linux__
 #include <sys/time.h>
 #endif
-#ifdef MACOSX
+#ifdef __APPLE__
 #include <sys/select.h>
 #endif
 
@@ -517,13 +517,9 @@ ZOPNND (
 
                 if (s_np->flags & F_NODELAY) {
 		    struct timeval timeout;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		    fd_set readfds;
                     FD_ZERO (&readfds);
                     FD_SET (s, &readfds);
-#else
-		    int readfds = (1 << s);
-#endif
                     timeout.tv_sec = 0;
                     timeout.tv_usec = 0;
                     if (select (MAXSEL, &readfds, NULL, NULL, &timeout)) {
@@ -688,13 +684,9 @@ ZARDND (
 	register XCHAR *op;
 	int nbytes, maxread;
 	struct timeval timeout;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	fd_set readfds;
 	FD_ZERO (&readfds);
 	FD_SET (np->datain, &readfds);
-#else
-	int readfds;
-#endif
 
 	/* Determine maximum amount of data to be read. */
 	maxread = (np->flags & F_TEXT) ? *maxbytes/sizeof(XCHAR) : *maxbytes;
@@ -705,12 +697,8 @@ ZARDND (
 	 * end writes any data.  This happens even though fcntl is called to
 	 * restore blocking i/o after the open.
 	 */
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	FD_ZERO (&readfds);
 	FD_SET (np->datain, &readfds);
-#else
-	readfds = (1 << np->datain);
-#endif
         if ((np->flags & F_NODELAY) && np->datain < MAXSEL) {
 	     timeout.tv_sec = 0;
 	     timeout.tv_usec = 0;

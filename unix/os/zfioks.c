@@ -19,13 +19,9 @@
 #include <time.h>
 #include <pwd.h>
 
-#ifdef SYSV
 #include <termios.h>
-#else
-#include <sgtty.h>
-#endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define	USE_RCMD 1
 #include <unistd.h>
 #endif
@@ -128,25 +124,13 @@ extern	int save_prtype;
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
 
-#ifdef POSIX
 #define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
-#else
-#define	SELWIDTH	32		/* number of bits for select	  */
-#endif
 
 #define	KS_RETRY	"KS_RETRY"	/* number of connection attempts  */
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
 
 #define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#ifdef LINUX
 #define	RSH		"rsh"		/* typical names are rsh, remsh   */
-#else
-#ifdef SYSV
-#define	RSH		"remsh"		/* typical names are rsh, remsh   */
-#else
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
-#endif
-#endif
 
 #define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
 #define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
@@ -365,11 +349,7 @@ ZOPNKS (
 	    struct  timeval timeout;
 	    int     check, fromlen, req_port;
 	    int     nsec, fd, sig;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	    fd_set  rfd;
-#else
-	    int     rfd;
-#endif
 	    int     once_only = 0;
 	    int     detached = 0;
 	    int     unauth = 0;
@@ -480,12 +460,8 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 	    for (;;) {
 		timeout.tv_sec = nsec;
 		timeout.tv_usec = 0;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		FD_ZERO(&rfd);
 		FD_SET(s,&rfd);
-#else
-		rfd = (1 << s); 
-#endif
 		status = 0;
 
 		/* Wait until either we get a connection, or a previously
@@ -514,12 +490,8 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 
 		/* Find out where the connection is coming from. */
 		fromlen = sizeof (from);
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		if (getpeername (fd, (struct sockaddr *)&from, 
 		    (socklen_t *)&fromlen) < 0) {
-#else
-		if (getpeername (fd, &from, (socklen_t *)&fromlen) < 0) {
-#endif
 		    fprintf (stderr, "in.irafksd: getpeername failed\n");
 		    exit (3);
 		}
@@ -1231,11 +1203,7 @@ int	*alport;
 
 	for (;;) {
 	    sin.sin_port = htons((u_short)*alport);
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) >= 0) {
-#else
-	    if (bind(s, (caddr_t)&sin, sizeof (sin)) >= 0) {
-#endif
 		return (s);
 	    }
 	    if (errno != EADDRINUSE) {
@@ -1297,11 +1265,7 @@ int	fd;
 	register int value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	fd_set  rfd;
-#else
-	int     rfd;
-#endif
 	char	ch;
 
 	jmpset++;
@@ -1311,12 +1275,8 @@ int	fd;
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	FD_ZERO(&rfd);
 	FD_SET(fd,&rfd);
-#else
-	rfd = (1 << fd); 
-#endif
 
 	/* Read and accumulate a decimal integer.  Timeout if the client
 	 * does not respond within a reasonable period.
@@ -2020,12 +1980,7 @@ static char *ks_getpass (char *user, char *host)
 	static	char password[SZ_NAME];
 	char    prompt[80];
 	int	tty, n;
-#ifdef SYSV
 	struct  termios tc, tc_save;
-#else
-	struct  sgttyb ttystat;
-	int     sg_flags;
-#endif
 
 	if ((tty = open ("/dev/tty", 2)) == ERR)
 	    return (NULL);
@@ -2033,7 +1988,6 @@ static char *ks_getpass (char *user, char *host)
 	sprintf (prompt, "Password (%s@%s): ", user, host);
 	write (tty, prompt, strlen(prompt));
 
-#ifdef SYSV
 	tcgetattr (tty, &tc);
 	tc_save = tc;
 	 
@@ -2049,22 +2003,11 @@ static char *ks_getpass (char *user, char *host)
 	tc.c_cc[VLNEXT] = 0;
 
 	tcsetattr (tty, TCSADRAIN, &tc);
-#else
-	ioctl (tty, TIOCGETP, &ttystat);
-	sg_flags = ttystat.sg_flags;
-	ttystat.sg_flags &= ~ECHO;
-	ioctl (tty, TIOCSETP, &ttystat);
-#endif
 
 	n = read (tty, password, SZ_NAME);
 	write (tty, "\n", 1);
 
-#ifdef SYSV
 	tcsetattr (tty, TCSADRAIN, &tc_save);
-#else
-	ttystat.sg_flags = sg_flags;
-	ioctl (tty, TIOCSETP, &ttystat);
-#endif
 
 	close (tty);
 

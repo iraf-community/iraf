@@ -6,7 +6,7 @@
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
 
-#ifndef MACH64
+#ifdef __ILP32__
 
 
 /* alloc.c */

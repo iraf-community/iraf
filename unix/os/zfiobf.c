@@ -385,7 +385,7 @@ int _u_fmode (int mode)
  */
 #include <signal.h>
 
-#ifdef LINUX
+#ifdef __linux__
 #define USE_SIGACTION
 #endif
 
@@ -398,7 +398,7 @@ int _u_fmode (int mode)
 #define	SZ_CMDBUF	  2048
 #define	SZ_CNAME	  32
 
-#ifdef MACOSX
+#ifdef __APPLE__
 static int vm_enabled 	  = 0;
 static int vm_dioenabled  = 1;
 #else

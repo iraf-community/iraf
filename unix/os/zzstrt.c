@@ -8,17 +8,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifdef LINUX
-# include <fpu_control.h>
-#endif
-
-#ifdef MACOSX
 #include <math.h>
 #include <fenv.h>
-#ifndef MACINTEL
-#define MACUNIX
-#endif
-#endif
 
 #define	import_spp
 #define	import_kernel
@@ -55,9 +46,6 @@ int
 ZZSTRT (void)
 {
 	XINT	wsetsize=0L, junk;
-#ifndef LINUX64
-	extern  void sfpucw_();
-#endif
 	extern  int  spp_debug();
 
 
@@ -77,47 +65,12 @@ ZZSTRT (void)
 	/* Dummy routine called to indicate that mapping is complete. */
 	ready_();
 
-#if defined(MACOSX)
         /*  Clears the exception-occurred bits in the FP status register.
          */
         feclearexcept (FE_ALL_EXCEPT);
-#else
 
-#if defined(LINUX)
-	/* Enable the common IEEE exceptions.  Newer Linux systems disable
-	 * these by default, the usual SYSV behavior.
-	 */
-
-	/* Old code; replaced by SFPUCW in as$zsvjmp.s 
-	    asm ("fclex");
-	    setfpucw (0x1372);
-	 */
-	{   
-	    /* 0x332: round to nearest, 64 bit precision, mask P-U-D. */
-#ifdef MACUNIX
-	    int fpucw = _FPU_IEEE;
-#else
-	    int fpucw = 0x332;
-#endif
-#ifdef LINUX64
-            /*
-            XINT fpucw = 0x332;
-            SFPUCW (&fpucw);
-            */
-            fpu_control_t cw = 
-                (_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_DM);
-            _FPU_SETCW(cw);
-#else
-	    sfpucw_ (&fpucw);
-#endif
-	}
-#endif
-#endif
-
-#ifdef SYSV
 	/* Initialize the time zone data structures. */
 	tzset();
-#endif
 
 	/* Place a query call to ZAWSET to set the process working set limit
 	 * to the IRAF default value, in case we did not inherit a working set

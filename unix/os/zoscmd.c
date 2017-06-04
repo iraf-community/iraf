@@ -13,20 +13,14 @@
 #define import_spp
 #include <iraf.h>
 
-#ifdef LINUX
+#ifdef __linux__
 #define	USE_SIGACTION
 #endif
 
 static	int lastsig;
 extern	int pr_onint();
 
-#ifdef SYSV
-#define	vfork	fork
-#else
-#  ifdef sun
-#  include <vfork.h>
-#  endif
-#endif
+/* #define	vfork	fork */
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -168,17 +162,6 @@ ZOSCMD (
 	 */
 	pr_enter (pid, 0, 0);
 	lastsig = 0;
-
-#ifndef SYSV
-	/* This doesn't appear to work on SysV systems, I suspect that wait()
-	 * is not being reentered after the signal handler below.  This could
-	 * probably be fixed by modifying the signal handling but I am not
-	 * sure the parent needs to intercept errors in any case, so lets
-	 * try really ignoring errors in the parent instead, on SYSV systems.
-	 */
-	if (old_sigint != SIG_IGN)
-	    signal (SIGINT, (SIGFUNC) pr_onint);
-#endif
 
 	*status = pr_wait (pid);
 
