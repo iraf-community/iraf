@@ -9,8 +9,6 @@
 
 /* Compile time definitions (for C #ifdefs).
  */
-/* #define BSDUNIX */
-/* #define SUNOS4 */
 
 #define D_iraf
 #endif

@@ -46,12 +46,7 @@ int debug_sig = 0;
 #endif
 #endif
 
-
-#if (defined(MACOSX))
-void ex_handler ( int, int, struct sigcontext * );
-#else
 void ex_handler ( int, siginfo_t *, void * );
-#endif
 
 static long setsig();
 static int ignore_sigint = 0;

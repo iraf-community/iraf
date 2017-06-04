@@ -128,10 +128,6 @@ extern	int save_prtype;
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
 
-#ifdef BSD
-#define IPPORT_USERRESERVED	5000
-#endif
-
 #ifdef POSIX
 #define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
 #else
@@ -142,7 +138,7 @@ extern	int save_prtype;
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
 
 #define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#if (defined(BSD) | defined(LINUX))
+#ifdef LINUX
 #define	RSH		"rsh"		/* typical names are rsh, remsh   */
 #else
 #ifdef SYSV

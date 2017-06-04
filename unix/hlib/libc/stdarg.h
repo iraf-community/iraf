@@ -13,14 +13,10 @@
 #ifndef D_stdarg
 
 
-#ifdef MACOSX
-#include "stdarg-osx.h"
-#else
-#ifdef LINUX
-#include "stdarg-linux.h"
+#ifdef __GNUC__
+#include "stdarg-gcc.h"
 #else
 #include <stdarg.h>
-#endif
 #endif
 
 

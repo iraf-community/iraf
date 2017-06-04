@@ -9,13 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef sun
-#include <sundev/tmreg.h>
-#include <sundev/xtreg.h>
-#include <sundev/arreg.h>
-#endif
-
-
 /*
  * TAPE.C -- Magtape test program (for most UNIX systems).
  *
@@ -439,34 +432,7 @@ pstatus (void)
 {
 	char	obuf[512];
 
-
-#ifdef sun
-	static	struct mt_tape_info info[] = MT_TAPE_INFO;
-	struct	mt_tape_info *tp;
-	struct	mtget mt;
-	char	*tn;
-
-	if (verbose) {
-	    if (ioctl (tape, MTIOCGET, &mt) != 0)
-		sprintf (obuf, "MTIOCGET ioctl fails\n");
-	    else {
-		for (tn="unknown", tp=info;  tp->t_type;  tp++)
-		    if (tp->t_type == mt.mt_type) {
-			tn = tp->t_name;
-			break;
-		    }
-
-		sprintf (obuf,
-	    "status %d (%d) file=%d block=%d resid=%d [ds=0x%x er=0x%x] %s\n",
-		    status, errno, mt.mt_fileno, mt.mt_blkno,
-		    mt.mt_resid, mt.mt_dsreg, mt.mt_erreg, tn);
-	    }
-	} else
-	    sprintf (obuf, "status %d (%d)\n", status, errno);
-#else
 	sprintf (obuf, "status %d (%d)\n", status, errno);
-#endif
-
 	output (obuf);
 	fflush (stdout);
 }

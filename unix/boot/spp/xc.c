@@ -841,7 +841,6 @@ passflag:		    mkobject = YES;
 #ifdef LINUX
 	arglist[nargs++] = "-DLINUX";
 	arglist[nargs++] = "-DPOSIX";
-	arglist[nargs++] = "-DSYSV";
 #endif
 
 #ifdef MACOSX

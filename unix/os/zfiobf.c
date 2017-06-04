@@ -748,11 +748,7 @@ vm_initialize (void)
 	if (vm_enabled && !vm_dioenabled)
 	    vm_connect();
 
-#ifdef SUNOS
-	on_exit (vm_shutdown, NULL);
-#else
 	atexit (vm_shutdown);
-#endif
 	vm_initialized++;
 }
 

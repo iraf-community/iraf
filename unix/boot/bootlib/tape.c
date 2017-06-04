@@ -229,34 +229,12 @@ os_mtname (
   char	*osdev 		/* receives host system drive name */
 )
 {
-#ifdef VMS
-	register char	*ip;
-	char	drive[SZ_FNAME+1];
-#endif
-
 	/* Ignore any "mt." prefix.  This is for backwards compatibility,
 	 * to permit old-style names like "mt.MUA0:".
 	 */
 	if (!strncmp (fname, "mt.", 3) || !strncmp (fname, "MT.", 3))
 	    fname += 3;
 
-#ifdef VMS
-	/* Resolve a possible logical device name. */
-	if (strchr (fname, '['))
-	    strcpy (drive, fname);
-	else
-	    _tranlog (fname, drive);
-
-	/* If the resolved name ends with a colon it is a device name,
-	 * which we assume to be a tape device.
-	 */
-	for (ip=drive;  *ip;  ip++)
-	    ;
-	if (*(ip-1) == ':') {
-	    strcpy (osdev, drive);
-	    return (1);
-	}
-#else
 	/* For unix systems we assume anything beginning with /dev is a
 	 * tape device.
 	 */
@@ -264,7 +242,6 @@ os_mtname (
 	    strcpy (osdev, fname);
 	    return (1);
 	}
-#endif
 
 	strcpy (osdev, fname);
 	return (0);

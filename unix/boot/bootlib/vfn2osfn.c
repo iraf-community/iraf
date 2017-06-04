@@ -138,10 +138,3 @@ int  KI_GETHOSTS() { return (0); }
 void KI_SEND(){}
 void KI_RECEIVE(){}
 #endif
-
-#ifdef SUNOS
-/* Stub out the following too, since there is no floating point in the HSI. */
-ieee_flags(){}
-ieee_handler(){}
-abrupt_underflow_(){}
-#endif

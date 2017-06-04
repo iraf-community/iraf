@@ -118,7 +118,6 @@ struct sockaddr_in {
 	char	sin_zero[8];
 };
 
-#if !defined(vax)
 /*
  * Macros for number representation conversion.
  */
@@ -126,7 +125,6 @@ struct sockaddr_in {
 #define	ntohs(x)	(x)
 #define	htonl(x)	(x)
 #define	htons(x)	(x)
-#endif
 
 #ifdef KERNEL
 extern	struct domain inetdomain;

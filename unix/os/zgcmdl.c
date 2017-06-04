@@ -10,11 +10,6 @@ extern  char ***_NSGetArgv();
 extern  int *_NSGetArgc();
 #endif
 
-#ifdef LINUXPPC
-#define xargc	f__xargc
-#define xargv	f__xargv
-#endif
-
 #ifdef LINUX
 extern	char **xargv;		/* defined in getarg(3f); requires libU77! */
 extern	int xargc;

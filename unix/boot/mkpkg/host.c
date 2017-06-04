@@ -17,16 +17,6 @@
 #include "extern.h"
 #include "../bootProto.h"
 
-#ifdef LINUX
-#  undef SYSV
-#  undef i386
-#  define GNUAR
-#else
-#  ifdef BSD
-#    undef SYSV
-#  endif
-#endif
-
 /*
  * HOST.C -- [MACHDEP] Special host interface routines required by the MKPKG
  * utility.
@@ -277,10 +267,6 @@ h_rebuildlibrary (
     char  *library 		/* filename of library	*/
 )
 {
-#ifdef SYSV
-	/* Skip the library rebuild if COFF format library. */
-	return (OK);
-#else
 	char cmd[SZ_LINE+1];
 	char libfname[SZ_PATHNAME+1];
 	char *libpath;
@@ -299,7 +285,6 @@ h_rebuildlibrary (
 	    return (os_cmd (cmd));
 	else
 	    return (OK);
-#endif
 }
 
 
