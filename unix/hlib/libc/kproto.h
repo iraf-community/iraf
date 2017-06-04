@@ -6,7 +6,7 @@
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
 
-#ifdef __ILP32__
+#if defined (__ILP32__)
 
 
 /* alloc.c */
@@ -254,7 +254,7 @@ extern void mdump_(int *buf, int *nbytes);
 
 
 
-#else
+#elif defined (__LP64__)
 
 
 
@@ -492,5 +492,8 @@ extern int zzstop_(void);
 extern void ready_(void);
 extern void mdump_(long *buf, long *nbytes);
 
+#else
+
+#error "No data model: need either __LP64__ or __ILP32__"
 
 #endif
