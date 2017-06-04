@@ -18,11 +18,6 @@
 #include "mkpkg.h"
 #include "extern.h"
 
-#ifdef  OLD_MACOSX
-#define AR_EFMT1	1
-#endif
-
-
 /*
  * SCANLIB.C -- Routines to scan a 4.2BSD UNIX archive file and create a
  * symbol table naming the files in the archive and their dates.

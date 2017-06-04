@@ -22,15 +22,7 @@ os_putenv (
 	sprintf (buf, "%s=%s", name, value);
 	if ( (env = (char *) malloc (strlen(buf) + 1)) ) {
 	    strcpy (env, buf);
-#ifdef ultrix
 	    putenv (env);			/* must keep env around. */
-#else
-#ifdef vax
-	    setenv (name, value, 1);
-#else
-	    putenv (env);			/* must keep env around. */
-#endif
-#endif
 	}
 }
 
@@ -58,15 +50,7 @@ os_putenv (
 	sprintf (buf, "%s=%s", name, value);
 	if ( (env = (char *) malloc (strlen(buf) + 1)) ) {
 	    strcpy (env, buf);
-#ifdef ultrix
-	    putenv (env);
-#else
-#ifdef vax
-	    setenv (name, value, 1);
-#else
 	    putenv (env);			/* must keep env around. */
-#endif
-#endif
 	}
 }
 #endif

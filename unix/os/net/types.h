@@ -20,12 +20,6 @@ typedef	unsigned long	u_long;
 typedef	unsigned short	ushort;		/* sys III compat */
 typedef unsigned int	u_sock;		/* TCP/IP */
 
-#ifdef vax
-typedef	struct	_physadr { int r[1]; } *physadr;
-typedef	struct	label_t	{
-	int	val[14];
-} label_t;
-#endif
 typedef	struct	_quad { long val[2]; } quad;
 typedef	long	daddr_t;
 typedef	char *	caddr_t;

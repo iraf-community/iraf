@@ -19,12 +19,6 @@
 #define	import_knames
 #include <iraf.h>
 
-#if defined(LINUX) || defined(BSD)
-# ifdef SOLARIS
-#  undef SOLARIS
-# endif
-#endif
-
 /*
  * XC -- Main entry point of the XC compiler front-end used by the IRAF
  * system.
@@ -78,33 +72,9 @@
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
-#ifndef LINUXPPC
-#ifndef LINUX64
-		    "",				/*  3  -lcompat */
-#endif
-#else
-		    "-lg2c",			/*  3  */
-#endif
-		    "-lpthread",		/*  4  */
-		    "-lm",			/*  5  */
-		    "-lrt",			/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O",			/*  0  */
-		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
-
-#else
-#ifdef BSD
-char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
-		    "-lf2c",			/*  1  */
-		    "-lm",			/*  2  */
-		    "-lcompat",			/*  3  */
-		    "",				/*  4  */
-		    "",				/*  5  */
+		    "-lpthread",		/*  3  */
+		    "-lm",			/*  4  */
+		    "-lrt",			/*  5  */
 		    "",				/*  6  */
 		    "",				/*  7  */
 		    "",				/*  8  */
@@ -140,42 +110,6 @@ char *opt_flags[] = { "-O3",			/*  0  */
 int  nopt_flags	   = 0;				/* No. optimizer flags */
 
 #else
-#ifdef SOLARIS
-char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
-		    "-lf2c",			/*  1  */
-		    "-lm",			/*  2  */
-		    "-lsocket",			/*  3  */
-		    "-lnsl",			/*  4  */
-		    "-lintl",			/*  5  */
-		    "-ldl",			/*  6  */
-		    "-lelf",			/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O",			/*  0  */
-		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
-
-#else
-#ifdef CYGWIN
-char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
-		    "-lf2c",			/*  1  */
-		    "-lm",			/*  2  */
-		    "-lcompat",			/*  3  */
-		    "",				/*  4  */
-		    "",				/*  5  */
-		    "",				/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O",			/*  0  */
-		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
-
-#else
 char *fortlib[] = { "-lU77",			/*  0  (host progs) */
 		    "-lm",			/*  1  */
 		    "-lF77",			/*  2  */
@@ -194,14 +128,7 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 
 #endif
 #endif
-#endif
-#endif
-#endif
 
-#ifdef BSD
-#define	F_STATIC	"-static"
-#define	F_SHARED	"-shared"
-#else
 #ifdef MACOSX
 #define	F_STATIC	"-static"
 #define	F_SHARED	"-shared"
@@ -209,12 +136,6 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #ifdef LINUX
 #define	F_STATIC	"-Wl,-Bstatic"
 #define	F_SHARED	"-Wl,-Bdynamic"
-#else
-#ifdef SOLARIS
-#define	F_STATIC	"-Wl,-Bstatic"
-#define	F_SHARED	"-Wl,-Bdynamic"
-#endif
-#endif
 #endif
 #endif
 
@@ -228,24 +149,8 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #define ispfile(str)	(getextn(str) == 'P')	/* func prototypes	*/
 
 
-#ifdef SOLARIS
-#ifdef X86
 int	usesharelib = NO;
 int	noedsym = YES;
-#else
-int	usesharelib = YES;
-int	noedsym = NO;
-#endif
-
-#else
-#ifdef SHLIB
-int	usesharelib = YES;
-int	noedsym = NO;
-#else
-int	usesharelib = NO;
-int	noedsym = YES;
-#endif
-#endif
 
 int	stripexe 	= NO;
 int	notvsym 	= NO;
@@ -268,11 +173,7 @@ int	nolibc 		= NO;
 int	usef2c 		= YES;
 int	useg95 		= NO;
 int	userincs	= NO;
-#ifdef LINUXPPC
-int	useg2c 		= YES;
-#else
 int	useg2c 		= NO;
-#endif
 int	host_c_main 	= NO;
 
 char	ccomp[SZ_FNAME] 	= CCOMP;
@@ -334,7 +235,6 @@ static void  rmfiles (void);
 static void  fatalstr (char *s1, char *s2);
 static void  fatal (char *s);
 
-static int   isv13 (void);
 static char *findexe (char *prog, char *dir);
 
 
@@ -363,9 +263,7 @@ main (int argc, char *argv[])
 
 	/* Initialization. */
 	ZZSTRT();
-	isv13();
 
-#if defined(LINUX) || defined(BSD) || defined(X86) || defined(MACOSX)
 	if (os_sysfile ("f77.sh", f77comp, SZ_FNAME) < 0) {
 	    strcpy (f77comp, "f77");
 	    usef2c = 0;
@@ -373,9 +271,6 @@ main (int argc, char *argv[])
 	    usef2c = 1;
 	if (os_sysfile ("f2c.e", tempfile, SZ_FNAME) > 0)
 	    strcpy (f2cpath, tempfile);
-#else
-	strcpy (f77comp, "f77");
-#endif
 
 	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
 
@@ -578,8 +473,7 @@ main (int argc, char *argv[])
 		case 'C':
 		    /* Link a host program which has a C main.  We may need
 		     * to tweak the command line as a special case here since
-		     * we normally assume Fortran sources.  This is currently
-		     * only needed for host C programs under LinuxPPC.
+		     * we normally assume Fortran sources.
 		     */
 		    host_c_main++;
 		    break;
@@ -776,17 +670,6 @@ passflag:		    mkobject = YES;
 	}
 
 
-#ifdef sun
-	/* Determine if any special architecture dependent compilation flags
-	 * are needed.  For the Sun V1.3 compiler, since FLOAT_OPTION is no
-	 * longer supported, we look for IRAFARCH and generate the -f68881
-	 * or -ffpa compiler switches automatically if we are compiling on a
-	 * Sun-3 and no -/f* has already been specified on the command line.
-	 */
-	if (!floatoption[0] && (irafarch = os_getenv("IRAFARCH")))
-	    if (irafarch[0] == 'f')
-		sprintf (floatoption, "-%s", irafarch);
-#endif
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,
 	 * because we do not want to use the UNIX "-u" flag (requires that
@@ -823,18 +706,7 @@ passflag:		    mkobject = YES;
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-m32";
 #endif
-#if (defined(BSD))
-	arglist[nargs++] = "-m32";
-#endif
 
-#ifdef LINUXAOUT
-	arglist[nargs++] = "-b";
-	arglist[nargs++] = "i486-linuxaout";
-#endif
-#ifdef sun
-	if (floatoption[0])
-	    arglist[nargs++] = floatoption;
-#endif
         if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	        arglist[nargs++] = opt_flags[i];
@@ -906,18 +778,7 @@ passflag:		    mkobject = YES;
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-m32";
 #endif
-#if (defined(BSD))
-	arglist[nargs++] = "-m32";
-#endif
 
-#ifdef LINUXAOUT
-        arglist[nargs++] = "-b";
-	arglist[nargs++] = "i486-linuxaout";
-#endif
-#ifdef sun
-	if (floatoption[0])
-	    arglist[nargs++] = floatoption;
-#endif
         if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	       arglist[nargs++] = opt_flags[i];
@@ -979,16 +840,7 @@ passflag:		    mkobject = YES;
 #endif
 #ifdef LINUX
 	arglist[nargs++] = "-DLINUX";
-#ifdef LINUXPPC
-	arglist[nargs++] = "-DLINUXPPC";
-#endif
 	arglist[nargs++] = "-DPOSIX";
-	arglist[nargs++] = "-DSYSV";
-#endif
-
-#ifdef BSD
-	arglist[nargs++] = "-m32";
-	arglist[nargs++] = "-DBSD";
 #endif
 
 #ifdef MACOSX
@@ -1014,24 +866,6 @@ passflag:		    mkobject = YES;
 	}
 #endif
 
-#ifdef SOLARIS
-	arglist[nargs++] = "-DSOLARIS";
-#ifdef X86
-	arglist[nargs++] = "-DX86";
-#endif
-	arglist[nargs++] = "-DPOSIX";
-	arglist[nargs++] = "-DSYSV";
-#endif
-
-#ifdef LINUXAOUT
-        arglist[nargs++] = "-b";
-	arglist[nargs++] = "i486-linuxaout";
-#endif
-
-#ifdef sun
-	if (floatoption[0])
-	    arglist[nargs++] = floatoption;
-#endif
 	if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	        arglist[nargs++] = opt_flags[i];
@@ -1097,33 +931,11 @@ passflag:		    mkobject = YES;
 	}
 #endif
 
-#ifdef SOLARIS
-	arglist[nargs++] = "-Wl,-t";
-#endif
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-Wl,--defsym,mem_=0";
 #endif
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-m32";
-#endif
-#if (defined(BSD))
-	arglist[nargs++] = "-m32";
-	arglist[nargs++] = "-L/usr/lib32";
-	arglist[nargs++] = "-B/usr/lib32";
-#endif
-#ifdef NEED_GCC_SPECS
-	{   char gcc_specs[SZ_PATHNAME];
-	    static char cmd[SZ_CMDBUF];
-
-	    if (os_sysfile ("gcc-specs", gcc_specs, SZ_PATHNAME) < 0)
-		arglist[nargs++] = "/iraf/iraf/unix/bin/gcc-specs";
-	    sprintf (cmd, "-specs=%s", gcc_specs);
-	    arglist[nargs++] = cmd;
-	}
-#endif
-#ifdef LINUXAOUT
-        arglist[nargs++] = "-b";
-	arglist[nargs++] = "i486-linuxaout";
 #endif
 	arglist[nargs++] = "-o";
 
@@ -1167,56 +979,6 @@ passflag:		    mkobject = YES;
 		link_static = 0;
 	}
 
-#ifdef sun
-	/* Need to pass -f<float> to CC for the C libraries. */
-	if (floatoption[0])
-	    arglist[nargs++] = floatoption;
-
-	/* If we are using the V1.3 Sun Fortran compiler, the V1.3 "f77"
-	 * should be a symbolic link pointing to the BIN directory for the
-	 * new compiler.  Construct the path to this directory and put it
-	 * out as a -Ldir flag on the link line to ensure that the library
-	 * is searched for linking.
-	 */
-	if (isv13()) {
-	    char    libpath[SZ_PATHNAME];
-	    char    dir[SZ_PATHNAME], *path;
-	    char    *pp, *ip, *op, *s;
-	    int     n;
-
-	    path = findexe ("f77", dir);
-
-	    strcpy (libpath, "-L");
-	    strcpy (libpath+2, dir);
-	    for (op=libpath;  *op;  op++)
-		;
-	    if ((n = readlink (path, op, 128)) > 0) {
-		op[n] = EOS;
-
-		for (ip=op;  *ip;  ip++)
-		    if (*ip == '/')
-			op = ip;
-		*op = EOS;
-
-		/* Search, e.g., /usr/lang/SC0.0/ffpa first if Sun-3. */
-		if (floatoption[0]) {
-		    s = floatoption + 1;
-		    *op = '/';
-		    strcpy (op+1, s);
-		    strcpy (libp, libpath);
-		    libp += strlen (pp = libp) + 1;
-		    arglist[nargs++] = pp;
-		}
-
-		/* Search /usr/lang/SC0.0 (or whatever). */
-		*op = EOS;
-		strcpy (libp, libpath);
-		libp += strlen (pp = libp) + 1;
-		arglist[nargs++] = pp;
-	    }
-	}
-#endif
-
 	/* File to link. */
 	for (i=0;  i < nfiles;  i++)
 	    arglist[nargs++] = lfiles[i];
@@ -1224,17 +986,7 @@ passflag:		    mkobject = YES;
 	/* Libraries to link against.
 	 */
 	if (hostprog) {
-#ifdef LINUXPPC
-	    /* LinuxPPC (YellowDog anyway) requires this library to resolve
-	     * the MAIN__ generated by the fortran program statement into
-	     * the 'main'.
-	     */
-	    if (host_c_main == 0)
-	        arglist[nargs++] = "-lfrtbegin";
-#else
-	    if (!isv13())
-		arglist[nargs++] = mkfname (fortlib[0]);
-#endif
+	  arglist[nargs++] = mkfname (fortlib[0]);
 	} else
 	    arglist[nargs++] = mkfname (LIBMAIN);
 
@@ -1259,23 +1011,17 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = hlibs[i];
 
 	/* The remaining system libraries depend upon which version of
-	 * the SunOS compiler we are using.  The V1.3 compilers use only
-	 * -lF77 and -lm.
+	 * the SunOS compiler we are using. 
 	 */
-	if (isv13()) {
-	    addflags (fortlib[2], arglist, &nargs);
-	    addflags (fortlib[4], arglist, &nargs);
-	} else {
-	    addflags (fortlib[1], arglist, &nargs);
-	    addflags (fortlib[2], arglist, &nargs);
-	    addflags (fortlib[3], arglist, &nargs);
-	    addflags (fortlib[4], arglist, &nargs);
-	    addflags (fortlib[5], arglist, &nargs);
-	    addflags (fortlib[6], arglist, &nargs);
-	    addflags (fortlib[7], arglist, &nargs);
-	    addflags (fortlib[8], arglist, &nargs);
-	    addflags (fortlib[9], arglist, &nargs);
-	}
+	addflags (fortlib[1], arglist, &nargs);
+	addflags (fortlib[2], arglist, &nargs);
+	addflags (fortlib[3], arglist, &nargs);
+	addflags (fortlib[4], arglist, &nargs);
+	addflags (fortlib[5], arglist, &nargs);
+	addflags (fortlib[6], arglist, &nargs);
+	addflags (fortlib[7], arglist, &nargs);
+	addflags (fortlib[8], arglist, &nargs);
+	addflags (fortlib[9], arglist, &nargs);
 	arglist[nargs] = NULL;
 
 	if (ncomp) {
@@ -1398,7 +1144,7 @@ addflags (char *flag, char *arglist[], int *p_nargs)
 		    link_static = 1;
 	        } else if (strcmp (lflag, F_SHARED) == 0) {
 		    link_static = 0;
-#if defined(LINUX) || defined(BSD) || defined(X86) || defined(MACOSX)
+#if defined(LINUX) || defined(MACOSX)
 	        } else if ((strcmp (lflag, "-lf2c") == 0) || 
 	    	    (strcmp (lflag, "-lcompat") == 0)) {
 		        /* Use the IRAF version of libf2c.a or libcompat.a,
@@ -1407,21 +1153,6 @@ addflags (char *flag, char *arglist[], int *p_nargs)
 		        arglist[nargs++] = mkfname (lflag);
 		        *p_nargs = nargs;
 		        return (1);
-	        }
-#endif
-#ifdef SOLARIS
-	        else if (strcmp (lflag, "-ldl") == 0) {
-		    /* This beastie has to be linked dynamic on Solaris, but
-		     * we don't want to have to know this everywhere so we do
-		     * it automatically there.
-		     */
-		    if (link_static)
-		        arglist[nargs++] = F_SHARED;
-		    arglist[nargs++] = fs;
-		    if (link_static)
-		        arglist[nargs++] = F_STATIC;
-		    *p_nargs = nargs;
-		    return (1);
 	        }
 #endif
 	        arglist[nargs++] = fs;
@@ -1857,48 +1588,6 @@ fatal (char *s)
 	fprintf (stderr, "Fatal compiler error: %s\n", s);
 	fflush (stderr);
 	done (1);
-}
-
-
-/* ISV13 -- Test if we are using the version 1.3 Sun Fortran compiler.
- * There is no simple, reliable way to do this.  The heuristic used is
- * to first locate the "f77" we will use, then see if there is a file
- * named "f77-1.3*" in the same directory.
- */
-static int
-isv13 (void)
-{
-	static	int v13 = -1;
-	struct	dirent *dp;
-	char	dir[SZ_PATHNAME];
-	char	*name;
-	DIR	*dirp;
-
-return (0);
-#ifdef SOLARIS
-	return (v13 = 0);
-#else
-
-	if (v13 != -1)
-	    return (v13);
-
-	if (findexe ("f77", dir) && (dirp = opendir(dir)) != NULL) {
-	    while ((dp = readdir(dirp))) {
-		/* Actually, we don't want to be too picky about the
-		 * version number of this won't work for future versions,
-		 * so just match up to the version number.
-		 */
-		name = dp->d_name;
-		if (!strncmp (name, "f77-1.3", 4) && isdigit(name[4])) {
-		    closedir (dirp);
-		    return (v13 = 1);
-		}
-	    }
-	    closedir (dirp);
-	}
-
-	return (v13 = 0);
-#endif
 }
 
 

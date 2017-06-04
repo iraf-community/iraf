@@ -11,22 +11,8 @@
 #include <ctype.h>
 #include <pwd.h>
 
-#ifdef _AIX
-#include <sys/tape.h>
-#define	MTIOCTOP	STIOCTOP
-#define	MTBSF		STRSF
-#define	MTBSR		STRSR
-#define	MTFSF		STFSF
-#define	MTFSR		STFSR
-#define	MTREW		STREW
-#define	MTWEOF		STWEOF
-#define	mtop		stop
-#define	mt_op		st_op
-#define	mt_count	st_count
-#else
 #ifndef MACOSX
 #include <sys/mtio.h>
-#endif
 #endif
 
 /* Define if status logging to sockets is desired. */
@@ -1789,11 +1775,7 @@ static void zmtdbgclose (struct mtdesc *mp)
 	    }
 
 	    if (sigpipe && nsockets <= 0) {
-#ifdef AUX
-		signal (SIGPIPE, (sigfunc_t)sigpipe);
-#else
 		signal (SIGPIPE, sigpipe);
-#endif
 		sigpipe = (SIGFUNC) NULL;
 		nsockets = 0;
 	    }

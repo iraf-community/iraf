@@ -30,9 +30,6 @@ os_utime (long iraf_time)
 {
 	struct	tm *localtime();
 	time_t	time_var, lst;
-#ifdef AUX
-	long	lstl;
-#endif
 
 	lst = (time_t)iraf_time;
 	
@@ -40,12 +37,7 @@ os_utime (long iraf_time)
 	time_var = lst + os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
-#ifdef AUX
-	lstl = (long)lst;
-	if (localtime(&lstl)->tm_isdst)
-#else
 	if (localtime(&lst)->tm_isdst)
-#endif
 	    time_var += 60L * 60L;
 
 	return ((long)time_var + SECONDS_1970_TO_1980);
@@ -60,9 +52,6 @@ os_itime (long unix_time)
 {
 	struct	tm *localtime();
 	time_t	time_var, gmt;
-#ifdef AUX
-	long	gmtl;
-#endif
 
 	gmt = (time_t)unix_time;
 	
@@ -70,12 +59,7 @@ os_itime (long unix_time)
 	time_var = gmt - os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
-#ifdef AUX
-	gmtl = (long)gmt;
-	if (localtime(&gmtl)->tm_isdst)
-#else
 	if (localtime(&gmt)->tm_isdst)
-#endif
 	    time_var -= 60L * 60L;
 
 	return ((long)time_var - SECONDS_1970_TO_1980);
@@ -88,15 +72,6 @@ os_itime (long unix_time)
 static long
 os_timezone()
 {
-#ifdef CYGWIN
-	extern	long _timezone;
-	return (_timezone);
-#else
-#if defined(SOLARIS) && defined(X86)
-	extern	long timezone;
-	return (timezone);
-
-#else
 #if defined(SYSV) || defined(MACOSX)
 	struct tm *tm;
 	time_t clock;
@@ -107,7 +82,5 @@ os_timezone()
 	struct	timeb time_info;
 	ftime (&time_info);
 	return (time_info.timezone * 60);
-#endif
-#endif
 #endif
 }

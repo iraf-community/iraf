@@ -5,14 +5,7 @@
 #define NORLIMIT
 #endif
 
-#ifndef CYGWIN
 #ifdef LINUX
-#undef NORLIMIT
-#endif
-#endif
-
-#ifdef SOLARIS
-#define RLIMIT_RSS RLIMIT_VMEM
 #undef NORLIMIT
 #endif
 

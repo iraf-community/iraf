@@ -4,10 +4,6 @@
 #include <math.h>
 #include <fenv.h>
 #endif
-#ifdef CYGWIN
-#include <math.h>
-#include <mingw/fenv.h>
-#endif
 
 #define import_spp
 #define import_knames
@@ -15,11 +11,7 @@
 
 
 
-#if (defined(MACOSX) && defined(OLD_MACOSX))
-void ex_handler ( int, int, struct sigcontext * );
-#else
 void ex_handler ( int, siginfo_t *, void * );
-#endif
 
 
 /*
@@ -27,7 +19,7 @@ void ex_handler ( int, siginfo_t *, void * );
  */
 
 /* NOTE: Following is also picked up by Mac/Intel. */
-#if ( (defined(MACOSX) || defined(CYGWIN)) && !defined(IPAD))
+#ifdef MACOSX
 
 int macosx_sigmask = (FE_DIVBYZERO|FE_OVERFLOW|FE_INVALID);
 

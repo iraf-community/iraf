@@ -7,15 +7,7 @@
 
 #define	SZ_FBUF		512		/* File i/o buffer size		*/
 
-#ifdef VMS
-#define	rindex	strrchr 
-struct	timeval {
-	long	tv_sec;
-	long	tv_usec;
-};
-#else
 #include <sys/time.h>
-#endif
 
 
 # ifdef FINIT

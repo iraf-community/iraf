@@ -167,22 +167,6 @@ d_declaration (int dtype)
 	while ((token = d_gettok(tokstr,SZ_TOKEN)) != '\n') {
 	    if (isalpha(token)) {
 
-#ifdef CYGWIN
-	        {   if (strncmp ("procedure", tokstr, 9) == 0) { 
-/*
-      			extern char *yytext;
-      			pushcontext (PROCSTMT);
-      			d_gettok (yytext, SZ_TOKEN-1);
-      			d_newproc (yytext, dtype);
-*/
-      			pushcontext (PROCSTMT);
-      			d_gettok (tokstr, SZ_TOKEN-1);
-      			d_newproc (tokstr, dtype);
-                	return (1);
-              	    }
-	        }
-#endif
-
 		/* Enter argument or variable name into the symbol table.
 		 * If symbol is already in table it must be an argument
 		 * or we have a multiple declaration.

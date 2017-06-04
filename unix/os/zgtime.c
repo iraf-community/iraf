@@ -26,11 +26,7 @@ ZGTIME (
 )
 {
 	struct	tms t;
-#ifdef BSD
-	time_t	time();
-#else
 	long	time();
-#endif
 	time_t	gmt_to_lst();
 	long	cpu, clkfreq;
 

@@ -356,93 +356,6 @@ putstr (char *s)
  * K_GETC keeps a count of the file position.  (the k_ stands for kludge).
  */
 
-#ifdef vms
-
-int
-k_getc (register struct context *cx)
-{
-	register int	ch;
-
-	cx->fpos++;
-	if (debug > 3) {
-	    if ((ch = getc (cx->fp)) > 0)
-		printf ("%5d %03o %c\n", cx->fpos, ch, ch > 040 ? ch : 040);
-	    return (ch);
-	} else
-	    return (getc (cx->fp));
-}
-
-char *
-k_fgets (
-  char	*obuf,
-  int	maxch,
-  register struct context *cx
-)
-{
-	register int	ch, n;
-	register char	*op;
-
-	for (op=obuf, n=maxch;  --n >= 0;  )
-	    if ((ch = k_getc(cx)) < 0)
-		return (NULL);
-	    else {
-		*op++ = ch;
-		if (ch == '\n')
-		    break;
-	    }
-
-	return (obuf);
-}
-
-int
-k_fseek (
-  register struct context *cx,
-  long	offset,
-  int	type
-)
-{
-	register FILE	*fp = cx->fp;
-	register int	ch;
-
-	if (debug > 1)
-	    printf ("seek (%s, %ld, %d)\n", cx->mkpkgfile, offset, type);
-	    
-	if (type == 0) {
-	    fseek (fp, 0L, 0);
-	    cx->fpos = 0;
-
-	    while (cx->fpos < offset && (ch = getc(fp)) != EOF) {
-		if (debug > 1)
-		    fputc (ch, stdout);
-		cx->fpos++;
-	    }
-
-	    if (debug > 1)
-		printf ("[]\n");
-
-	    return (0);
-	}
-
-	if (fseek (fp, offset, type) == ERR)
-	    return (ERR);
-	else {
-	    cx->fpos = ftell (fp);
-	    return (0);
-	}
-}
-
-long
-k_ftell (register struct context *cx)
-{
-	if (debug > 1) {
-	    printf ("ftell returns %d\n", cx->fpos);
-	    fflush (stdout);
-	}
-	return (cx->fpos);
-}
-
-#else
-
 int
 k_getc (struct	context *cx)
 {
@@ -474,5 +387,3 @@ k_ftell (struct context *cx)
 {
 	return (ftell (cx->fp));
 }
-
-#endif

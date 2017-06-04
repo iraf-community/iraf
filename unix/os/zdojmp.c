@@ -28,7 +28,7 @@ ZDOJMP (XINT *jmpbuf, XINT *status)
         register void *jb = (XINT **)jmpbuf+1;
 
         *status_ptr = stat;
-#if (defined(LINUX) || defined(CYGWIN))
+#ifdef LINUX
         siglongjmp (jb, stat);
 #else
         longjmp (jb, stat);

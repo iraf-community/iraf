@@ -1503,12 +1503,7 @@ do_hollerith (void)
 	else
 	    *op = EOS;				/* delete delimiter */
 
-#ifdef F77
 	sprintf (outbuf, "\'%s\'", strbuf);
-#else
-	sprintf (outbuf, "%dH%s", i, strbuf);
-#endif
-
 	outstr (outbuf);
 }
 

@@ -4,10 +4,8 @@
 #include <unistd.h>
 #include <iraf.h>
 
-#ifndef VMS
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
 
 /* OS_SYMLINK -- Determine if a file is a symbolic link.
  */
@@ -18,7 +16,6 @@ os_symlink (
   int	maxch 
 )
 {
-#ifndef VMS
 	struct	stat fi;
 	int	n;
 
@@ -29,7 +26,6 @@ os_symlink (
 			valbuf[n] = '\0';
 		return (1);
 	    }
-#endif
 
 	return (0);
 }
