@@ -26,7 +26,6 @@ export HSI_CF="${XC_CFLAGS}"
 export HSI_XF="-g -Inolibc -/Wall -/O2"
 export HSI_FF="-g -DBLD_KERNEL -O2"
 export HSI_LF=""
-export HSI_LIBS="-lm"
 export HSI_F77LIBS=""
 export HSI_LFLAGS=""
 export HSI_OSLIBS=""
@@ -47,7 +46,7 @@ if [ -f ${iraf}lib/libsys.a ]; then
 	export	HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
 else
 	export	HSI_CF="$HSI_CF -DNOVOS"
-	export	HSI_LIBS="${hlib}libboot.a ${hlib}libos.a"
+	export	HSI_LIBS="${hlib}libboot.a ${hlib}libos.a -lm"
 fi
 
 export HSI_LIBS="$HSI_LIBS $HSI_OSLIBS"
