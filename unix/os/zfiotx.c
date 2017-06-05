@@ -9,10 +9,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifdef __linux__
-#define USE_SIGACTION
-#endif
-
 #include <termios.h>
 #ifndef __linux__
 #define IUCLC 0 /* IUCLC is linux specific and does not exist on POSIX */
@@ -82,14 +78,9 @@ struct ttyport {
 extern	int errno;
 static	jmp_buf jmpbuf;
 static	int tty_getraw = 0;	/* raw getc in progress */
-#ifdef USE_SIGACTION
 static	struct sigaction sigint, sigterm;
 static	struct sigaction sigtstp, sigcont;
 static	struct sigaction oldact;
-#else
-static	SIGFUNC	sigint, sigterm;
-static	SIGFUNC	sigtstp, sigcont;
-#endif
 static	void  tty_rawon(), tty_reset(), uio_bwrite();
 static	void  tty_onsig(), tty_stop(), tty_continue();
 
@@ -394,7 +385,6 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 	     * because ctrl/s ctrl/q is disabled in raw mode, and that can
 	     * cause sporadic protocol failures.
 	     */
-#ifdef USE_SIGACTION
             sigint.sa_handler = (SIGFUNC) tty_onsig;
             sigemptyset (&sigint.sa_mask);
             sigint.sa_flags = SA_NODEFER;
@@ -404,10 +394,6 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
             sigemptyset (&sigterm.sa_mask);
             sigterm.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigterm, &oldact);
-#else
-	    sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)tty_onsig);
-	    sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)tty_onsig);
-#endif
 	    tty_getraw = 1;
 
 	    /* Async mode can be cleared by other processes (e.g. wall),
@@ -427,13 +413,8 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 		fcancel (fp);
 #endif
 
-#ifdef USE_SIGACTION
 	    sigaction (SIGINT, &oldact, NULL);
 	    sigaction (SIGTERM, &oldact, NULL);
-#else
-	    signal (SIGINT,  sigint);
-	    signal (SIGTERM, sigterm);
-#endif
 	    tty_getraw = 0;
 
 	    /* Clear parity bit just in case raw mode is used.
@@ -750,7 +731,6 @@ tty_rawon (
 	    /* Post signal handlers to clear/restore raw mode if process is
 	     * suspended.
 	     */
-#ifdef USE_SIGACTION
             sigtstp.sa_handler = (SIGFUNC) tty_stop;
             sigemptyset (&sigtstp.sa_mask);
             sigtstp.sa_flags = SA_NODEFER;
@@ -760,10 +740,6 @@ tty_rawon (
             sigemptyset (&sigcont.sa_mask);
             sigcont.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigcont, &oldact);
-#else
-	    sigtstp = (SIGFUNC) signal (SIGTSTP, (SIGFUNC)tty_stop);
-	    sigcont = (SIGFUNC) signal (SIGCONT, (SIGFUNC)tty_continue);
-#endif
 	}
 
 	/* Set any file descriptor flags, e.g., for nonblocking reads. */
@@ -809,13 +785,8 @@ tty_reset (
 	    kfp->flags &= ~KF_NDELAY;
 	}
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, &oldact, NULL);
 	sigaction (SIGTERM, &oldact, NULL);
-#else
-	signal (SIGTSTP, sigtstp);
-	signal (SIGCONT, sigcont);
-#endif
 }
 
 

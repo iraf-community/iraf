@@ -13,10 +13,6 @@
 #define import_spp
 #include <iraf.h>
 
-#ifdef __linux__
-#define	USE_SIGACTION
-#endif
-
 static	int lastsig;
 extern	int pr_onint();
 
@@ -45,11 +41,7 @@ ZOSCMD (
 	struct	rlimit rlim;
 	int	maxfd, fd, pid;
 	char	*getenv();
-#ifdef USE_SIGACTION
 	struct sigaction oldact;
-#else
-	SIGFUNC	old_sigint;
-#endif
 
 	extern  int _u_fmode();
 
@@ -69,11 +61,7 @@ ZOSCMD (
 	} else if ((shell = getenv ("SHELL")) == NULL)
 	    shell = sh;
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, NULL, &oldact);
-#else
-	old_sigint = (SIGFUNC) signal (SIGINT, SIG_IGN);
-#endif
 
 	/* Vfork is faster if we can use it.
 	 */
@@ -174,11 +162,7 @@ ZOSCMD (
 	if (lastsig == SIGINT)
 	    *status = SYS_XINT;
 
-#ifdef USE_SIGACTION
 	sigaction (SIGINT, &oldact, NULL);
-#else
-	signal (SIGINT, old_sigint);
-#endif
 
 	return (XOK);
 }

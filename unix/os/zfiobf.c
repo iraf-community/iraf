@@ -385,10 +385,6 @@ int _u_fmode (int mode)
  */
 #include <signal.h>
 
-#ifdef __linux__
-#define USE_SIGACTION
-#endif
-
 #define	DEF_ACCESSVAL	  1
 #define	ENV_VMPORT	  "VMPORT"
 #define	ENV_VMCLIENT	  "VMCLIENT"
@@ -819,11 +815,7 @@ static int
 vm_write (int fd, char *buf, int nbytes)
 {
 	int status;
-#ifdef USE_SIGACTION
 	struct sigaction oldact;
-#else
-	SIGFUNC oldact;
-#endif
 
 	if (vm_debug > 1) {
 	    fprintf (stderr, "vmclient (%s):: %s", vm_client, buf);
@@ -831,15 +823,9 @@ vm_write (int fd, char *buf, int nbytes)
 		fprintf (stderr, "\n");
 	}
 
-#ifdef USE_SIGACTION
         sigaction (SIGPIPE, NULL, &oldact);
 	status = write (fd, buf, nbytes);
         sigaction (SIGPIPE, &oldact, NULL);
-#else
-	oldact = (SIGFUNC) signal (SIGPIPE, SIG_IGN);
-	status = write (fd, buf, nbytes);
-        signal (SIGPIPE, oldact);
-#endif
 
 	if (vm_debug && status < 0)
 	    fprintf (stderr,
