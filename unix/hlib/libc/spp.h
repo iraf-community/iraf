@@ -77,13 +77,13 @@
 #define	XCHAR		short
 #endif
 
-#if (sizeof(long) == 8 && sizeof(void *) == 8) /* LP64 */
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
 #define	XINT		long
 #define	XLONG		long
 #define	XSTRUCT		long
 #define	XPOINTER	long
 #define	XBOOL		long	
-#elif (sizeof(int) == 4 && sizeof(void *) == 4) /* ILP32 */
+#elif (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
 #define	XINT		int
 #define	XLONG		int
 #define	XSTRUCT		int

@@ -6,7 +6,7 @@
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
 
-#if (sizeof(int) == 4 && sizeof(void *) == 4) /* ILP32 */
+#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
 
 /* alloc.c */
 extern int main(int argc, char *argv[]);
@@ -253,7 +253,7 @@ extern void mdump_(int *buf, int *nbytes);
 
 
 
-#elif (sizeof(long) == 8 && sizeof(void *) == 8) /* LP64 */
+#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
 
 
 
