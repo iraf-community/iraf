@@ -77,20 +77,20 @@
 #define	XCHAR		short
 #endif
 
-#if defined (__LP64__)
+#if (sizeof(long) == 8 && sizeof(void *) == 8) /* LP64 */
 #define	XINT		long
 #define	XLONG		long
 #define	XSTRUCT		long
 #define	XPOINTER	long
 #define	XBOOL		long	
-#elif defined (__ILP32__)
+#elif (sizeof(int) == 4 && sizeof(void *) == 4) /* ILP32 */
 #define	XINT		int
 #define	XLONG		int
 #define	XSTRUCT		int
 #define	XPOINTER	int
 #define	XBOOL		int
 #else
-#error "No data model: need either __LP64__ or __ILP32__"
+#error "No data model: need either LP64 or ILP32"
 #endif
 
 #define	PKCHAR		XCHAR

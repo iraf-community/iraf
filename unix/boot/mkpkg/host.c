@@ -175,16 +175,7 @@ h_updatelibrary (
 	 * Update the library.
 	 * ---------------------
 	 */
-#if defined(__APPLE__) && defined(__ILP32__)
-	/* For FAT libraries we need to use libtool to update.
-	 */
-	if (access (lname, F_OK) == 0)
-	    sprintf (cmd, "%s %s %s %s", LIBTOOL, "-a -T -o", lname, lname);
-	else
-	    sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
-#else
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
-#endif
 
 	/* Compute offset to the file list and initialize loop variables.
 	 * Since the maximum command length is limited, only a few files
@@ -195,18 +186,6 @@ h_updatelibrary (
 	ndone = 0;
 
 	for (npass=0; nleft > 0; npass++) {
-
-#if defined(__APPLE__) && defined(__ILP32__)
-	    if (npass > 0) {
-	        /* For FAT libraries we need to use libtool to update.
-	         */
-	        if (access (lname, F_OK) == 0)
-	            sprintf (cmd, "%s %s %s %s", LIBTOOL, "-a -T -o", 
-			lname, lname);
-	        else
-	            sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
-	    }
-#endif
 
 	    /* Add as many filenames as will fit on the command line.  */
 	    nfiles = add_objects (cmd, SZ_CMD, &flist[ndone], nleft,
@@ -245,9 +224,6 @@ h_updatelibrary (
 	    ndone += nfiles;
 	    nleft -= nfiles;
 
-#if defined(__APPLE__) && defined(__ILP32__)
-	    h_rebuildlibrary (lname);
-#endif
 	}
 
 	return (exit_status);
