@@ -1,123 +1,95 @@
-# ZSVJMP.S -- MacOS X version, September 2001, March 2002.
+	.file	"zsvjmp.s"
 
-.file	 "zsvjmp.s"
+# ZSVJMP, ZDOJMP -- Set up a jump (non-local goto) by saving the processor
+# registers in the buffer jmpbuf.  A subsequent call to ZDOJMP restores
+# the registers, effecting a call in the context of the procedure which
+# originally called ZSVJMP, but with the new status code.  These are Fortran
+# callable procedures.
+#
+#		zsvjmp (jmp_buf, status)	# (returns status)
+#		zdojmp (jmp_buf, status)	# (passes status to zsvjmp)
+#
+# These routines are directly comparable to the UNIX setjmp/longjmp, except
+# that they are Fortran callable kernel routines, i.e., trailing underscore,
+# call by reference, and no function returns.  ZSVJMP requires an assembler
+# jacket routine to avoid modifying the call stack, but relies upon setjmp
+# to do the real work.  ZDOJMP is implemented as a portable C routine in OS,
+# calling longjmp to do the restore.  In these routines, JMP_BUF consists
+# of one longword containing the address of the STATUS variable, followed
+# by the "jmp_buf" used by setjmp/longjmp.
+#
+# This file contains the OS X Intel (x86) version of ZSVJMP.
+# Modified to remove leading underscore for ELF (Jan99).
+ 
+        .globl	_zsvjmp_
+        .globl	_sfpucw_
+        .globl	_gfpucw_
+        .globl	_gfpusw_
 
-	# ZSVJMP -- SPP callable SETJMP.
-.text
-	.align	2
-	.globl	_zsvjmp_
+	# The following has nothing to do with ZSVJMP, and is included here
+	# only because this assembler module is loaded with every process.
+	# This code sets the value of the symbol MEM (the VOS or Fortran Mem
+	# common) to zero, setting the origin for IRAF pointers to zero
+	# rather than some arbitrary value, and ensuring that the MEM common
+	# is aligned for all datatypes as well as page aligned.  A further
+	# advantage is that references to NULL pointers are likely to cause a
+	# memory violation.
+
+	.globl	mem_
+	mem_	=	0
+	.globl	_mem_
+	_mem_	=	0
+
+	.text
 _zsvjmp_:
-	# R3 = buf, R4 = &status
-	li	r11,0			; r11 = 0
-	stw	r11,0(r4)		; set *status to zero
-	stw	r4,0(r3)		; store &status in buf[0]
-	addi	r3,r3,4			; reference buf[1] for setjmp
-	b	L_setjmp$stub
-L2:
-	lwz	r1,0(r1)
-	lwz	r0,8(r1)
-	mtlr	r0
-	lmw	r30,-8(r1)
-	blr
+	movl	4(%esp), %edx	# &jmpbuf to EDX
+	movl	8(%esp), %eax	# &status to EAX
+	movl	%eax, (%edx)	# store value-of &status in &jmpbuf[0]
+	movl	$0, (%eax)	# zero the value of status
+	addl	$4, %edx	# change stack to point to &jmpbuf[1]
+	movl	%edx, 4(%esp)
+	jmp	L_setjmp$stub
+	leave
+	ret
+_gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)
+	pushl   %ebp
+	movl    %esp,%ebp
+	subl    $0x4,%esp
+	movl    0x8(%ebp), %eax
+	fnstcw  0xfffffffe(%ebp)
+	movw    0xfffffffe(%ebp), %dx
+	movl    %edx,(%eax)
+	movl    %ebp, %esp
+	popl    %ebp
+	ret
 
-	# The setjmp code is only available in a dynamic library on 10.1.
-.picsymbol_stub
+_sfpucw_:				# Set fpucw:  sfpucw_ (&new_fpucw)
+	pushl   %ebp
+	movl    %esp,%ebp
+	subl    $0x4,%esp
+	movl    0x8(%ebp), %eax
+	movl    (%eax), %eax
+	andl    $0xf3f, %eax
+	fclex
+	movw    %ax, 0xfffffffe(%ebp)
+	fldcw   0xfffffffe(%ebp)
+	leave  
+	ret    
+
+_gfpusw_:				# Get fpusw:  gfpusw_ (&cur_fpusw)
+	pushl   %ebp
+	movl    %esp,%ebp
+	subl    $0x4,%esp
+	movl    0x8(%ebp), %eax
+	fstsw   0xfffffffe(%ebp)
+	movw    0xfffffffe(%ebp), %dx
+	movl    %edx,(%eax)
+	movl    %ebp, %esp
+	popl    %ebp
+	ret
+
+	.section __IMPORT,__jump_table,symbol_stubs,self_modifying_code+pure_instructions,5
 L_setjmp$stub:
-        .indirect_symbol _setjmp
-        mflr	r0
-        bcl	20,31,L1$pb
-L1$pb:
-        mflr	r11
-        addis	r11,r11,ha16(L1$lz-L1$pb)
-        mtlr	r0
-        lwz	r12,lo16(L1$lz-L1$pb)(r11)
-        mtctr	r12
-        addi	r11,r11,lo16(L1$lz-L1$pb)
-        bctr
-.lazy_symbol_pointer
-L1$lz:
-        .indirect_symbol _setjmp
-        .long dyld_stub_binding_helper
-.text
-.Lfe1:
-
-	# Set the address of the MEM common to zero.
-	.globl   _mem_
-	_mem_ = 0
-
-
-	# GFPSCR -- Return the contents of the PowerPC FPSCR register.
-.text
-	.align 2
-.globl _gfpscr_
-_gfpscr_:
-	stmw	r30,-8(r1)
-	stwu	r1,-48(r1)
-	mr	r30,r1
-	mflr	r0
-	bcl	20,31,L2$pb
-L2$pb:
-	mflr	r31
-	mtlr	r0
-
-	mffs	f0
-	stfd	f0, 16(r30)
-	lwz	r0, 20(r30)
-	mr	r3, r0
-
-	b	L3
-L3:
-	lwz	r1,0(r1)
-	lmw	r30,-8(r1)
-	blr
-
-
-	# SFPSCR -- Set the contents of the PowerPC FPSCR register.
-.text
-	.align 2
-.globl _sfpscr_
-_sfpscr_:
-	stmw	r30,-8(r1)
-	stwu	r1,-48(r1)
-	mr	r30,r1
-	mflr	r0
-	bcl	20,31,L4$pb
-L4$pb:
-	mflr	r31
-	mtlr	r0
-
-	lis	r0, 0xfff8
-	stw	r0, 16(r30)
-	lwz	r0, 0(r3)
-	stw	r0, 20(r30)
-	lfd	f0, 16(r30)
-	mtfsf	255, f0
-
-	b	L5
-L5:
-	lwz	r1,0(r1)
-	lmw	r30,-8(r1)
-	blr
-
-
-	# GXER -- Return the contents of the PowerPC XER register.
-.text
-	.align 2
-.globl _gxer_
-_gxer_:
-	stmw	r30,-8(r1)
-	stwu	r1,-48(r1)
-	mr	r30,r1
-	mflr	r0
-	bcl	20,31,L3$pb
-L3$pb:
-	mflr	r31
-	mtlr	r0
-
-	mfspr	r3,1
-
-	b	L4
-L4:
-	lwz	r1,0(r1)
-	lmw	r30,-8(r1)
-	blr
+	.indirect_symbol _setjmp
+	hlt ; hlt ; hlt ; hlt ; hlt
+	.subsections_via_symbols
