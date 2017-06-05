@@ -14,6 +14,9 @@
 #endif
 
 #include <termios.h>
+#ifndef __linux__
+#define IUCLC 0 /* IUCLC is linux specific and does not exist on POSIX */
+#endif
 
 #ifndef O_NDELAY
 #include <fcntl.h>
