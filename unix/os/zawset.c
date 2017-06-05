@@ -1,16 +1,10 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#ifdef __linux__
-#undef NORLIMIT
-#endif
-
 #include <stdio.h>
 #include <unistd.h>
-#ifndef NORLIMIT
 #include <sys/time.h>
 #include <sys/resource.h>
-#endif
 
 #define	import_kernel
 #define	import_knames
@@ -47,10 +41,8 @@ ZAWSET (
 	int debug = (getenv(ENV_DEBUG) != NULL);
 	char *s, *getenv();
 
-#ifndef NORLIMIT
 	unsigned int working_set_size;
 	struct rlimit rlp;
-#endif
 
 
 	/* Get the page size in kilobytes. */
@@ -96,13 +88,6 @@ ZAWSET (
 	    fprintf(stderr,"zawset: physmem=%dm, maxworkset=%dm max_wss=%dm\n",
 		physmem / KB, maxworkset / MB, max_wss / MB);
 
-#ifdef NORLIMIT
-	if (*best_size == 0)
-	    *old_size = *new_size = defworkset;
-	else
-	    *new_size = *old_size = min (max_wss, *best_size);
-	*max_size = max_wss;
-#else
 	getrlimit (RLIMIT_RSS, &rlp);
 	if (debug)
 	    fprintf (stderr, "zawset: starting rlimit cur=%ldm, max=%ldm\n",
@@ -133,7 +118,6 @@ ZAWSET (
 	    fprintf (stderr, "zawset: adjusted rlimit cur=%ldm, max=%ldm\n",
 		(long)(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
 		(long)(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
-#endif
 	if (debug)
 	    fprintf (stderr, "zawset: best=%ldm old=%ldm new=%ldm max=%ldm\n",
 		(long)*best_size/MB, (long)*old_size/MB, 

@@ -14,13 +14,6 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#ifdef __linux__
-#include <sys/time.h>
-#endif
-#ifdef __APPLE__
-#include <sys/select.h>
-#endif
-
 #include <errno.h>
 #include <stdio.h>
 

@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#ifdef __linux__
-/* Necessary to get DIR.dd_fd on Linux systems. */
-#define DIRENT_ILLEGAL_ACCESS
-#endif
-
 #include <dirent.h>
 
 

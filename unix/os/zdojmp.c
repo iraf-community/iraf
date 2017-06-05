@@ -15,24 +15,10 @@
 void
 ZDOJMP (XINT *jmpbuf, XINT *status)
 {
-#ifdef DOJMP_ORIG
-	register int stat = *status ? *status : 1;
-	register long *jb = (long *)jmpbuf;
-
-	*((int *)jb[0]) = stat;
-	longjmp (&jb[1], stat);
-
-#else
 	register int stat = *status ? *status : 1;
         register XINT *status_ptr = ((XINT **)jmpbuf)[0];
         register void *jb = (XINT **)jmpbuf+1;
 
         *status_ptr = stat;
-#ifdef __linux__
         siglongjmp (jb, stat);
-#else
-        longjmp (jb, stat);
-#endif
-
-#endif
 }
