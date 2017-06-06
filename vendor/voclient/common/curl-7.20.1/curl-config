@@ -136,18 +136,18 @@ while test $# -gt 0; do
 	   CURLLIBDIR=""
 	fi
 	if test "Xyes" = "Xyes"; then
-	  echo ${CURLLIBDIR}-lcurl -arch i386 -m32 -mmacosx-version-min=10.4  
+	  echo ${CURLLIBDIR}-lcurl -m32  
 	else
-	  echo ${CURLLIBDIR}-lcurl -arch i386 -m32 -mmacosx-version-min=10.4 
+	  echo ${CURLLIBDIR}-lcurl -m32 
 	fi
 	;;
 
     --static-libs)
-	echo ${exec_prefix}/lib/libcurl.a -arch i386 -m32 -mmacosx-version-min=10.4  
+	echo ${exec_prefix}/lib/libcurl.a -m32  
 	;;
 
     --configure)
-      echo " '--prefix=/iraf/iraf/vendor/voclient/' '--exec-prefix=/iraf/iraf/vendor/voclient/' '--disable-shared' '' '--disable-ftp' '' '--disable-file' '' '--disable-ldap' '' '--disable-ldaps' '' '--disable-proxy' '' '--disable-dict' '' '--disable-telnet' '' '--disable-tftp' '' '--disable-manual' '' '--disable-ipv6' '' '--disable-ares' '' '--disable-sspi' '' '--disable-crypto-auth' '' '--without-krb4' '' '--without-ssl' '' '--without-zlib' '' '--without-libssh2' '' '--without-gnutls' '' '--without-nss' '' '--without-ca-path' '' '--without-libidn' 'build_alias=' 'host_alias=' 'target_alias=' 'CC=gcc' 'CFLAGS=-arch i386 -m32 -mmacosx-version-min=10.4' 'LDFLAGS=-arch i386 -m32 -mmacosx-version-min=10.4'"
+      echo " '--prefix=/iraf/iraf/vendor/voclient/' '--exec-prefix=/iraf/iraf/vendor/voclient/' '--disable-shared' '' '--disable-ftp' '' '--disable-file' '' '--disable-ldap' '' '--disable-ldaps' '' '--disable-proxy' '' '--disable-dict' '' '--disable-telnet' '' '--disable-tftp' '' '--disable-manual' '' '--disable-ipv6' '' '--disable-ares' '' '--disable-sspi' '' '--disable-crypto-auth' '' '--without-krb4' '' '--without-ssl' '' '--without-zlib' '' '--without-libssh2' '' '--without-gnutls' '' '--without-nss' '' '--without-ca-path' '' '--without-libidn' 'build_alias=' 'host_alias=' 'target_alias=' 'CC=gcc' 'CFLAGS=-m32' 'LDFLAGS=-m32'"
     ;;
 
     *)

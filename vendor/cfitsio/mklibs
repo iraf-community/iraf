@@ -9,7 +9,7 @@ setenv CXX 	"g++"
 
 if ($?PLMACH) then
   if ($PLMACH == "macosx") then
-    setenv CFLAGS "-mmacosx-version-min=10.5 -DDarwin"
+    setenv CFLAGS "-DDarwin"
   endif
 endif
 

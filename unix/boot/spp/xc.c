@@ -804,17 +804,8 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
 	        if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "ppc";
-		    */
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "i386";
 	    	    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
 	        } else if (strcmp (irafarch, "macintel") == 0) {
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "x86_64";
 	    	    arglist[nargs++] = "-m64";
 		}
 	    }
@@ -886,17 +877,8 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
                 } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "x86_64";
                     arglist[nargs++] = "-m64";
                 }
 
@@ -999,17 +981,8 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
                 } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "x86_64";
                     arglist[nargs++] = "-m64";
                 }
 
@@ -1084,17 +1057,8 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
             if (strcmp (irafarch, "macosx") == 0) {
-		/*
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "ppc";
-		*/
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "i386";
                 arglist[nargs++] = "-m32";
-	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
             } else if (strcmp (irafarch, "macintel") == 0) {
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "x86_64";
                 arglist[nargs++] = "-m64";
             }
 	}

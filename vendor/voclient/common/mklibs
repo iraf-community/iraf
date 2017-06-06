@@ -14,13 +14,13 @@ setenv PLMACH   `uname -m`
 if ($PLATFORM == "Darwin") then
    if ( $?IRAFARCH ) then
        if ( "$IRAFARCH" == "macintel" ) then
-           setenv CFLAGS   '-m64 -mmacosx-version-min=10.4'
-           setenv LDFLAGS  '-m64 -mmacosx-version-min=10.4'
-           setenv LADD     '-m64 -mmacosx-version-min=10.4'
+           setenv CFLAGS   '-m64'
+           setenv LDFLAGS  '-m64'
+           setenv LADD     '-m64'
        else
-           setenv CFLAGS   '-arch i386 -m32 -mmacosx-version-min=10.4'
-           setenv LDFLAGS  '-arch i386 -m32 -mmacosx-version-min=10.4'
-           setenv LADD     '-arch i386 -m32 -mmacosx-version-min=10.4'
+           setenv CFLAGS   '-m32'
+           setenv LDFLAGS  '-m32'
+           setenv LADD     '-m32'
        endif
    endif
    set	build_curl	= 1

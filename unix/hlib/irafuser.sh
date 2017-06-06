@@ -34,10 +34,10 @@ case "$MACH" in
     ;;
 
   "macosx")
-    export HSI_CF="-O -DMACOSX -Wall -Wunused -arch i386 -m32 -mmacosx-version-min=10.4"
-    export HSI_XF="-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386"
-    export HSI_FF="-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
-    export HSI_LF="-arch i386 -m32 -mmacosx-version-min=10.4"
+    export HSI_CF="-O -DMACOSX -Wall -Wunused -m32"
+    export HSI_XF="-Inolibc -/DMACOSX -w -/Wunused -/m32"
+    export HSI_FF="-O -m32 -DBLD_KERNEL"
+    export HSI_LF="-m32"
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
     export HSI_OSLIBS=""

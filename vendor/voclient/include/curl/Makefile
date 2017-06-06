@@ -81,8 +81,8 @@ AUTOMAKE = ${SHELL} "/iraf/iraf/vendor/voclient/common/curl/missing" --run autom
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -arch i386 -m32 -mmacosx-version-min=10.4 -g0 -O2 -Wno-system-headers
-CONFIGURE_OPTIONS = " '--prefix=/iraf/iraf/vendor/voclient/' '--exec-prefix=/iraf/iraf/vendor/voclient/' '--disable-shared' '' '--disable-ftp' '' '--disable-file' '' '--disable-ldap' '' '--disable-ldaps' '' '--disable-proxy' '' '--disable-dict' '' '--disable-telnet' '' '--disable-tftp' '' '--disable-manual' '' '--disable-ipv6' '' '--disable-ares' '' '--disable-sspi' '' '--disable-crypto-auth' '' '--without-krb4' '' '--without-ssl' '' '--without-zlib' '' '--without-libssh2' '' '--without-gnutls' '' '--without-nss' '' '--without-ca-path' '' '--without-libidn' 'build_alias=' 'host_alias=' 'target_alias=' 'CC=gcc' 'CFLAGS=-arch i386 -m32 -mmacosx-version-min=10.4' 'LDFLAGS=-arch i386 -m32 -mmacosx-version-min=10.4'"
+CFLAGS = -m32 -g0 -O2 -Wno-system-headers
+CONFIGURE_OPTIONS = " '--prefix=/iraf/iraf/vendor/voclient/' '--exec-prefix=/iraf/iraf/vendor/voclient/' '--disable-shared' '' '--disable-ftp' '' '--disable-file' '' '--disable-ldap' '' '--disable-ldaps' '' '--disable-proxy' '' '--disable-dict' '' '--disable-telnet' '' '--disable-tftp' '' '--disable-manual' '' '--disable-ipv6' '' '--disable-ares' '' '--disable-sspi' '' '--disable-crypto-auth' '' '--without-krb4' '' '--without-ssl' '' '--without-zlib' '' '--without-libssh2' '' '--without-gnutls' '' '--without-nss' '' '--without-ca-path' '' '--without-libidn' 'build_alias=' 'host_alias=' 'target_alias=' 'CC=gcc' 'CFLAGS=-m32' 'LDFLAGS=-m32'"
 CPP = gcc -E
 CPPFLAGS = 
 CROSSCOMPILING_FALSE = 
@@ -129,7 +129,7 @@ INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
 IPV6_ENABLED = 
 KRB4_ENABLED = 
 LD = /usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld
-LDFLAGS = -arch i386 -m32 -mmacosx-version-min=10.4
+LDFLAGS = -m32
 LIBCURL_LIBS = 
 LIBOBJS = 
 LIBS = 
