@@ -4,40 +4,23 @@
 #include <sys/types.h>
 #include <time.h>
 
-#define	SECONDS_1970_TO_1980	315532800L
-static	long get_timezone();
-
 /* GMT_TO_LST -- Convert gmt to local standard time, epoch 1980.
  */
 time_t
 gmt_to_lst (gmt)
 time_t	gmt;
 {
-	struct	tm *localtime();
-	time_t	time_var;
-	long	gmtl;
+	struct	tm epoch;
+	time_t	epoch_sec;
+
+	epoch.tm_sec = 0;
+	epoch.tm_min = 0;
+	epoch.tm_hour = 0;
+	epoch.tm_mday = 1;
+	epoch.tm_mon = 0;
+	epoch.tm_year = 80;
+	epoch.tm_isdst = 0;
+	epoch_sec = mktime(&epoch);
 	
-	/* Subtract seconds westward from GMT */
-	time_var = gmt - get_timezone();
-
-	/* Correct for daylight savings time, if in effect */
-	gmtl = (long)gmt;
-
-	/* Mac systems already include the DST offset in the GMT offset */
-	if (localtime(&gmtl)->tm_isdst)
-	    time_var += 60L * 60L;
-
-	return (time_var - SECONDS_1970_TO_1980);
-}
-
-
-/* _TIMEZONE -- Get the local timezone, measured in seconds westward
- * from Greenwich, ignoring daylight savings time if in effect.
- */
-static long
-get_timezone()
-{
-	extern	long timezone;
-	tzset();
-	return (timezone);
+	return (gmt - epoch_sec);
 }

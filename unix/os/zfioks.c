@@ -124,6 +124,10 @@ extern	int save_prtype;
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
 
+#ifndef IPPORT_USERRESERVED
+#define IPPORT_USERRESERVED 5000
+#endif
+
 #define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
 
 #define	KS_RETRY	"KS_RETRY"	/* number of connection attempts  */

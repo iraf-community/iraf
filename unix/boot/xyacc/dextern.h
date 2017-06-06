@@ -36,12 +36,6 @@
 #include <ctype.h>
 #include <memory.h>
 #include <string.h>
-#ifdef __linux__
-#include <malloc.h>
-#include <values.h>
-#else
-#include <malloc/malloc.h>
-#endif
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -53,9 +47,6 @@ extern "C" {
 	/*  MANIFEST CONSTANT DEFINITIONS */
 #if u3b || u3b15 || u3b2 || vax || uts || sparc
 #define	WORD32
-#endif
-#ifdef __linux__
-#include <libintl.h>
 #endif
 
 	/* base of nonterminal internal numbers */
