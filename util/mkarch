@@ -38,6 +38,7 @@ while [ "$loop_" == "yes" ]; do
 
   if [ "$#" -gt 0 ]; then
     arch=$1
+    nbits=$(IRAFARCH=$arch $iraf/unix/hlib/irafarch.sh -nbits)
 
     if (( "$use_mkpkg"==1 )); then
         mkpkg $arch
@@ -47,6 +48,7 @@ while [ "$loop_" == "yes" ]; do
 	$iraf/util/mkclean
         /bin/rm -rf bin noao/bin unix/bin unix/as vo/bin
 
+        mkdir -p bin.$arch vo/bin.$arch noao/bin.$arch unix/bin.$arch
         ln -s bin.$arch bin
         cd vo; ln -s bin.$arch bin; cd ../
         cd noao; ln -s bin.$arch bin; cd ../
@@ -54,7 +56,7 @@ while [ "$loop_" == "yes" ]; do
         cd unix; ln -s as.$arch as; cd ../
     fi
 
-    if [ "$arch" == "macintel" -o "$arch" == "linux64" ]; then
+    if [ "$nbits" = "64" ]; then
         cd unix/hlib; \
 	     rm -f iraf.h mach.h; \
 	     ln -s iraf64.h iraf.h; \
