@@ -26,12 +26,14 @@
  */
 int debug_sig = 0;
 
-#ifdef __linux__
-# define	fcancel(fp)
+
+/* If the OS allows, cancel any buffered output. If the OS doesn't, 
+ * do nothing.
+ */
+#ifdef __APPLE__
+#define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
 #else
-# ifdef __APPLE__
-# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#endif
+#define	fcancel(fp)
 #endif
 
 void ex_handler ( int, siginfo_t *, void * );
