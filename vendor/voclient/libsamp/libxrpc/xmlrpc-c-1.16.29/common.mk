@@ -33,11 +33,11 @@ GCC_CXX_WARNINGS = $(GCC_WARNINGS) -Woverloaded-virtual -Wsynth
 #
 CFLAGS_COMMON = -DNDEBUG
 ifeq ($(IRAFARCH),macintel)
-    CFLAGS_COMMON = -DNDEBUG -m64 -mmacosx-version-min=10.5
+    CFLAGS_COMMON = -DNDEBUG -m64
     LADD += -m64
 else
     ifeq ($(IRAFARCH),macosx)
-        CFLAGS_COMMON = -DNDEBUG -arch i386 -m32 -mmacosx-version-min=10.5
+        CFLAGS_COMMON = -DNDEBUG -m32
         LADD += -m32 -arch i386
     endif
     ifeq ($(IRAFARCH),linux)

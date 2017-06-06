@@ -88,13 +88,14 @@ case freebsd:
     breaksw
 
 case macosx:
-    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch i386 -m32 -mmacosx-version-min=10.5"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386"
-    setenv HSI_FF "-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.5"
-    setenv HSI_LF "-arch i386 -m32 -mmacosx-version-min=10.5"
+    setenv HSI_CF "-O -DMACOSX -w -Wunused -m32"
+    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32"
+    setenv HSI_FF "-O -m32 -DBLD_KERNEL"
+    setenv HSI_LF "-m32"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
+    setenv MACOSX_DEPLOYMENT_TARGET "10.5"
     set    mkzflags = "'lflags=-z'"
     breaksw
 
@@ -106,6 +107,7 @@ case macintel:
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
+    setenv MACOSX_DEPLOYMENT_TARGET "10.5"
     set    mkzflags = "'lflags=-z'"
     breaksw
 

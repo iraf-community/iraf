@@ -34,15 +34,15 @@ CINCS  	    = -I$(HERE) -I../ -I../../include -I../../../../include -L../../lib/
 
 ifeq ($(PLATFORM),Darwin)
     ifeq  ($(PLMACH),x86_64)
-        CARCH   = -m64 -mmacosx-version-min=10.5
+        CARCH   = -m64
     else
-        CARCH   = -arch i386 -m32 -mmacosx-version-min=10.5
+        CARCH   = -m32
     endif
     ifdef IRAFARCH
         ifeq ($(IRAFARCH),macintel)
-            CARCH = -m64 -mmacosx-version-min=10.5
+            CARCH = -m64
         else
-            CARCH = -arch i386 -m32 -mmacosx-version-min=10.5
+            CARCH = -m32
         endif
     endif
 else

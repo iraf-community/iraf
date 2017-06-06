@@ -24,9 +24,9 @@ CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR) -I./
 ifeq  ($(PLATFORM), "Darwin")
     ifeq  ($(PLATFORM), "x86_64")
-        CARCH	= -m64 -mmacosx-version-min=10.5
+        CARCH	= -m64
     else
-        CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
+        CARCH	= -m32
     endif
 else
     ifdef IRAFARCH

@@ -28,7 +28,7 @@ CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
 CLIBS		= -lm -lc -lcurl -lpthread
-CARCH		= -m64 -mmacosx-version-min=10.5
+CARCH		= -m64
 
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 

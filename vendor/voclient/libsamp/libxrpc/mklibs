@@ -13,13 +13,13 @@ build_xmlrpc=1
 
 if [ "$PLATFORM" = "Darwin" ] ; then
     if [ "$IRAFARCH" = "macintel" ] ; then
-	export CFLAGS='-m64 -mmacosx-version-min=10.5'
-	export LDFLAGS='-m64 -mmacosx-version-min=10.5'
-        export LADD='-m64 -mmacosx-version-min=10.5'
+	export CFLAGS='-m64'
+	export LDFLAGS='-m64'
+        export LADD='-m64'
     else
-	export CFLAGS='-arch i386 -m32 -mmacosx-version-min=10.5'
-	export LDFLAGS='-arch i386 -m32 -mmacosx-version-min=10.5'
-        export LADD='-arch i386 -m32 -mmacosx-version-min=10.5'
+	export CFLAGS='-m32'
+	export LDFLAGS='-m32'
+        export LADD='-m32'
     fi
 else
     if [ "$IRAFARCH" = "linux" ] ; then

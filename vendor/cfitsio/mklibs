@@ -7,7 +7,7 @@ export CXX=g++
 
 
 if [ "$PLMACH" = "macosx" ] ; then
-   export CFLAGS="-mmacosx-version-min=10.5 -DDarwin"
+   export CFLAGS="-DDarwin"
 fi
 
 echo "  (Using toplevel directory '"$top"' ....)"
