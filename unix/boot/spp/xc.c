@@ -43,9 +43,13 @@
 #ifdef __APPLE__
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
 #define	LINKER		"cc"			/* Linking utility */
+#define	F_STATIC	"-static"
+#define	F_SHARED	"-shared"
 #else
 #define	CCOMP		"gcc"			/* C compiler (also .s etc.) */
 #define	LINKER		"gcc"			/* Linking utility */
+#define	F_STATIC	"-Wl,-Bstatic"
+#define	F_SHARED	"-Wl,-Bdynamic"
 #endif
 #define	F77COMP		"f77"			/* Fortran compiler */
 #define	DEBUGFLAG	'g'			/* host flag for -x */
@@ -68,76 +72,26 @@
 #define IRAFLIB5	"libVO.a"
 #define IRAFLIB6	"libcfitsio.a"
 
-#ifdef __linux__
-char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
-		    "-lf2c",			/*  1  */
-		    "-lm",			/*  2  */
-		    "-lpthread",		/*  3  */
-		    "-lm",			/*  4  */
-		    "-lrt",			/*  5  */
-		    "-lcurl",			/*  6  */
-		    "-lexpat",			/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O",			/*  0  */
-		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
-
-#else
-#ifdef __APPLE__
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
 		    "-lcurl",			/*  3  */
 		    "-lexpat",			/*  4  */
-		    "",				/*  5  */
-		    "",				/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O3",			/*  0  */
-		    0};				/* EOF */
-
-/* As of Dec2007 there remains an unexplained optimizer bug in
-** the system which has the effect of disabling FPE handling on
-** Mac Intel/PPC systems.  For the moment, we'll disable the optimization
-** until this is better understood or fixed in future GCC versions.
-*/
-int  nopt_flags	   = 0;				/* No. optimizer flags */
-
-#else
-char *fortlib[] = { "-lU77",			/*  0  (host progs) */
-		    "-lm",			/*  1  */
-		    "-lF77",			/*  2  */
-		    "-lI77",			/*  3  */
-		    "-lm",			/*  4  */
-		    "-lcurl",			/*  5  */
-		    "-lexpat",			/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
-
-char *opt_flags[] = { "-O",			/*  0  */
-		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
-
-#endif
-#endif
-
-#ifdef __APPLE__
-#define	F_STATIC	"-static"
-#define	F_SHARED	"-shared"
-#else
 #ifdef __linux__
-#define	F_STATIC	"-Wl,-Bstatic"
-#define	F_SHARED	"-Wl,-Bdynamic"
+		    "-lpthread",		/*  5  */
+		    "-lrt",			/*  6  */
+#else
+		    "",				/*  5  */
+		    "",				/*  6  */		    
 #endif
-#endif
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O2",			/*  0  */
+		    0};				/* EOF */
+
+int  nopt_flags	   = 1;				/* No. optimizer flags */
 
 #define isxfile(str)	(getextn(str) == 'x')
 #define isffile(str)	(getextn(str) == 'f')
@@ -709,14 +663,6 @@ passflag:		    mkobject = YES;
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
 	    status = run (f77comp, arglist);
-#ifdef __linux__
-	/* This kludge is to work around a bug in the F2C based F77 script
-	 * on Linux, which returns an exit status of 4 when successfully
-	 * compiling a Fortran file.
-	 */
-	if (status == 4)
-	    status = 0;
-#endif
 	    errflag += status;
 	}
 
@@ -769,14 +715,6 @@ passflag:		    mkobject = YES;
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
 	    status = run (f77comp, arglist);
-#ifdef __linux__
-	    /* This kludge is to work around a bug in the F2C based F77 script
-	     * on Linux, which returns an exit status of 4 when successfully
-	     * compiling a Fortran file.
-	     */
-	    if (status == 4)
-		status = 0;
-#endif
 	    errflag += status;
 	}
 
@@ -838,9 +776,6 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
-#if (defined(__linux__) && __SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4)
-	arglist[nargs++] = "-Wl,--defsym,mem_=0";
-#endif
 #if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
 	arglist[nargs++] = "-m32";
 #endif
@@ -848,11 +783,7 @@ passflag:		    mkobject = YES;
 
 	if (link_nfs) {
 	    sprintf (tempfile, "/tmp/T_%s.XXXXXX", outfile);
-#ifdef __linux__
 	    mkstemp (tempfile);
-#else
-	    mktemp (tempfile);
-#endif
 	} else
 	    sprintf (tempfile, "T_%s", outfile);
 	arglist[nargs++] = tempfile;
