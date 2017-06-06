@@ -195,9 +195,31 @@ case "$MNAME" in
         fi
         ;;
 
-    "freebsd") 					# FreeBSD
-        mach="freebsd"
-        hmach="freebsd"
+    "freebsd"|"freebsd64") 					# FreeBSD
+        if [ -n "$IRAFARCH" ]; then
+            mach="$IRAFARCH"
+            hmach="$IRAFARCH"
+	    if [ "$mach" == "freebsd64" ]; then
+		nbits=64
+	    fi
+	else 
+            if [ "$MNAME_M" == "amd64" ]; then		# Linux x86_64
+                mach="freebsd64"
+                hmach="freebsd64"
+	        nbits=64
+            else					# Linux
+                mach="freebsd"
+                hmach="freebsd"
+	        nbits=32
+            fi
+        fi
+	tapecaps=0
+	tapes=0
+	pipes=0
+        ;;
+    "gnu"|"hurd") # GNU HURD
+        mach="hurd"
+        hmach="hurd"
 	tapecaps=0
 	tapes=0
 	pipes=0
