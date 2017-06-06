@@ -40,7 +40,7 @@
 #define	SZ_PKGENV	256
 #define DEF_PKGENV	"iraf"
 
-#ifdef __APPLE__
+#if (defined (__APPLE__) || defined (__freebsd__))
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
 #define	LINKER		"cc"			/* Linking utility */
 #define	F_STATIC	"-static"
@@ -78,7 +78,7 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lm",			/*  2  */
 		    "-lcurl",			/*  3  */
 		    "-lexpat",			/*  4  */
-#ifdef __linux__
+#if (defined (__linux__) || defined (__gnu_hurd__))
 		    "-lpthread",		/*  5  */
 #else
 		    "",				/*  5  */
