@@ -211,7 +211,7 @@ case "$MNAME" in
 	    tapes=0
 	    pipes=0
 	else
-	    ECHO  'Unable to determine platform architecture for ($MNAME).'
+	    ECHO  "Unable to determine platform architecture for ($MNAME)."
 	    exit 1
 	fi
 	;;
