@@ -33,10 +33,9 @@ CINCS           = -I$(INCDIR)  -I.
 
 ifeq ($(PLATFORM),Darwin)
     ifeq  ($(PLMACH),x86_64)
-        CARCH   = -m64 -mmacosx-version-min=10.5
+        CARCH   = -m64
     else
-        #CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.5
-        CARCH   = -mmacosx-version-min=10.5
+        CARCH   = -m32
     endif
     PYFLAGS 	= -dynamiclib -I/usr/include/python$(PYVER)/ -lpython$(PYVER)
 else

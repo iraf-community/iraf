@@ -12,9 +12,9 @@ build_voclient=1
 if [ "$IRAFARCH" = "linux" ] ; then
     CARCH="-m32"
 elif [ "$IRAFARCH" = "macintel" ] ; then
-    CARCH="-m64 -mmacosx-version-min=10.5"
+    CARCH="-m64"
 elif [ "$IRAFARCH" = "macosx" ] ; then
-    CARCH="-m32 -mmacosx-version-min=10.5"
+    CARCH="-m32"
 fi
 
 echo "Building support libraries ...."
