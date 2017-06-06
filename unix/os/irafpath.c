@@ -72,22 +72,34 @@ irafpath (char *fname)
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin");
 
-#ifdef __linux__
-#ifdef __x86_64__
-	strcat (pathname, ".linux64");
-#endif
-#ifdef __i386__
-	strcat (pathname, ".linux");
-#endif
-#endif
-#ifdef __APPLE__
-#ifdef __x86_64__
+#if defined( __APPLE__) /* These have special rules */
+
+#if defined (__x86_64__)
 	strcat (pathname, ".macintel");
-#endif
-#ifdef __i386__
+#elif defined (__i386__)
 	strcat (pathname, ".macosx");
 #endif
+
+#else /* ! __APPLE__ */
+
+#if defined (__linux__)
+	strcat (pathname, ".linux");
+#elif defined( __freebsd__)
+	strcat (pathname, ".freebsd");
+#elif defined( __hurd__)
+	strcat (pathname, ".hurd");
+#else
+	strcat (pathname, ".unknown");
 #endif
+
+#if defined (__i386__)
+	/* append nothing */
+#elif defined (__x86_64__)
+	strcat (pathname, "64");
+#endif
+
+#endif /* ! __APPLE__ */
+
 	strcat (pathname, "/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)

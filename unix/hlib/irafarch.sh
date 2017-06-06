@@ -101,6 +101,17 @@ else
          fi
          ;;
 
+     "freebsd")
+	 if [ "$nbits" = 64 ] ; then
+             mach="freebsd64"
+         else
+             mach="freebsd"
+         fi
+         ;;
+     "gnu"|"hurd") # GNU HURD
+         mach="hurd"
+         ;;
+
     *)
 	ECHO  "Unable to determine platform architecture for ($MNAME)."
 	exit 1
