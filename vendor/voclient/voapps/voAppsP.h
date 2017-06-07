@@ -8,6 +8,7 @@
  *  @brief      Internal declarations for the VOClient Package applications.
  */
 
+#include <unistd.h>
 
 #ifndef SZ_LINE
 #define SZ_LINE                4096
