@@ -79,6 +79,8 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, ".macintel");
 #elif defined (__i386__)
 	strcat (pathname, ".macosx");
+#elif defined (__ppc__)
+	strcat (pathname, ".macppc");
 #endif
 
 #else /* ! __APPLE__ */

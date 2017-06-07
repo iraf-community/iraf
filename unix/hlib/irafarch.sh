@@ -126,7 +126,7 @@ fi
 
 # Determine parameters for each architecture.
 case "$MNAME" in
-     "darwin"|"ipad"|"macosx"|"macintel")		# Mac OS X
+     "darwin"|"ipad"|"macosx"|"macintel"|"macppc")		# Mac OS X
         if [ -n "$IRAFARCH" ]; then
             mach="$IRAFARCH"
             hmach="$IRAFARCH"
@@ -141,6 +141,10 @@ case "$MNAME" in
             elif [ "$MNAME_M" == "x86" -o "$MNAME_M" == "i386" ]; then
                 mach="macosx"
                 hmach="macosx"
+		nbits=32
+            elif [ "$MNAME_M" == "power_macintosh" -o "$MNAME_M" == "ppc" ]; then
+                mach="macppc"
+                hmach="macppc"
 		nbits=32
             else
                 mach="ipad"				# iOS Device
