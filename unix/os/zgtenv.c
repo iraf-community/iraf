@@ -146,19 +146,22 @@ _ev_loadcache (char *fname)
 {
         static  char   *home, hpath[SZ_PATHNAME+1], *rpath, *lpath;
 
+	rpath = malloc(SZ_PATHNAME+1);
 	if ((home = getenv ("HOME"))) {
 	    sprintf (hpath, "%s/.iraf/iraf.h", home);
-	    if ((rpath = realpath(hpath, NULL)) == NULL) {
-	      if ((rpath = realpath(fname, NULL)) == NULL) {
+	    if ((realpath(hpath, rpath)) == NULL) {
+                if ((realpath(fname, rpath)) == NULL) {
 		    fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
+		    free(rpath);
 		    return (ERR);
 		}
 	    }
 	} else {
 	    /*  We should always have a $HOME, but try this to be safe.
 	     */
-	  if ((rpath = realpath(fname, NULL)) == NULL) {
+	  if ((realpath(fname, rpath)) == NULL) {
 	        fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
+		free(rpath);
 		return (ERR);
 	    }
 	}
