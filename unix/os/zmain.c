@@ -27,9 +27,9 @@ extern	int sh_debug;
 
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
-static	int ipc_in = 0, ipc_out = 0;
-static	int ipc_isatty = NO;
-static	int prtype;
+static	XINT ipc_in = 0, ipc_out = 0;
+static	XINT ipc_isatty = NO;
+static	XINT prtype;
 char	*getenv();
 
 
