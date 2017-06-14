@@ -152,11 +152,11 @@ case "$MNAME" in
 	pipes=0
         ;;
 
-    "redhat"|"linux"|"linux64")
+    "redhat"|"linux"|"linux64"|"linuxs390x")
         if [ -n "$IRAFARCH" ]; then
             mach="$IRAFARCH"
             hmach="$IRAFARCH"
-	    if [ "$mach" == "linux64" ]; then
+	    if [ "$mach" == "linux64" -o "$mach" == "linuxs390x" ]; then
 		nbits=64
 	    fi
 	    if [ "$mach" == "linuxs390x" ]; then
@@ -166,6 +166,10 @@ case "$MNAME" in
             if [ "$MNAME_M" == "x86_64" ]; then		# Linux x86_64
                 mach="linux64"
                 hmach="linux64"
+	        nbits=64
+            elif [ "$MNAME_M" == "s390x" ]; then
+                mach="linuxs390x"
+                hmach="linuxs390x"
 	        nbits=64
             else					# Linux
                 mach="linux"
