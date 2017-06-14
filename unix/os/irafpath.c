@@ -97,6 +97,8 @@ char *fname;			/* simple filename, no dirs */
 	/* append nothing */
 #elif defined (__x86_64__)
 	strcat (pathname, "64");
+#elif defined (__s390x__)
+	strcat (pathname, "s390x");
 #endif
 
 #endif /* ! __APPLE__ */
