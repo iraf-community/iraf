@@ -28,7 +28,7 @@ ZFUTIM (
 {
 	struct	stat osfile;
 	struct	utimbuf time;
-	int	offset = 0;
+	XINT	offset = 0;
 	int	stat(), utime();
 
 	extern  int ZGMTCO ();
