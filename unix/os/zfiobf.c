@@ -756,7 +756,8 @@ vm_connect (void)
 {
 	XINT acmode = READ_WRITE;
 	char osfn[SZ_FNAME];
-	int fd, status = 0;
+	XINT fd;
+	int status = 0;
 
 	extern int ZOPNND();
 
