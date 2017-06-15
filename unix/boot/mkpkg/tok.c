@@ -1193,7 +1193,10 @@ getcmd (
 
 
 	otop = &cmd[maxch];
-	strcpy (cmd, prefix);
+
+	if (cmd != prefix)
+	    strcpy (cmd, prefix);
+	
 	for (op=cmd;  *op;  op++)
 	    ;
 
