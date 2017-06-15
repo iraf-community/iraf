@@ -47,7 +47,7 @@ before_script:
   - build_tmp=`mktemp -d -t irafbuild.XXXXXXXXX`
   - ./install -v --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir --root `pwd` < /dev/null || true
   - make ${IRAFARCH}
-  - make sysgen
+  - timeout 2400s make sysgen || true
 
 script:
   - ./test/run_tests
