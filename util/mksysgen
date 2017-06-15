@@ -59,13 +59,13 @@ sh -x mkpkg.sh 2>&1 | tee -a spool
 cd $iraf/					# build core system
 mkpkg 2>&1 | tee -a spool
 
-cd $iraf/noao					# build NOAO package
-export noao=`pwd`/
-mkpkg -p noao 2>&1 | tee -a ../spool.final
+#cd $iraf/noao					# build NOAO package
+#export noao=`pwd`/
+#mkpkg -p noao 2>&1 | tee -a ../spool.final
 
-cd $iraf/vo					# build NOAO package
-export vo=`pwd`/
-mkpkg -p vo 2>&1 | tee -a ../spool.final
+#cd $iraf/vo					# build NOAO package
+#export vo=`pwd`/
+#mkpkg -p vo 2>&1 | tee -a ../spool.final
 
 /bin/rm -rf bin*/pkgconfig			# misc clean up
 
