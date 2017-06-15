@@ -11,7 +11,7 @@
 #endif
 
 typedef	int	jmp_buf[LEN_JUMPBUF];
-static	int	u_jmpstat;
+static	XINT	u_jmpstat;
 
 #define	setjmp(e)	(ZSVJMP((e),&u_jmpstat),u_jmpstat)
 #define	longjmp(e,v)	(u_jmpstat=(v),ZDOJMP((e),&u_jmpstat))
