@@ -41,6 +41,8 @@ matrix:
 
 language: c
 
+cache: ccache
+
 before_script:
   - build_tmp=`mktemp -d -t irafbuild.XXXXXXXXX`
   - ./install -v --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir --root `pwd` < /dev/null || true
