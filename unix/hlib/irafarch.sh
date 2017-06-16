@@ -4,11 +4,12 @@
 #
 #  Usage:       irafarch
 #		irafarch -set [<arch>] [opts]
-#               irafarch [ -hsi | -nbits ]
+#               irafarch [ -hsi | -nbits | -endian ]
 #
 #	-mach		print the iraf architecture name [default]
 #	-hsi		print the HSI arch
 #	-nbits		print number of bits in an int (32 or 64)
+#	-endian		print endianness of platform (big or little)
 #
 #	-actual		print actual architecture name regardless of IRAFARCH
 #	-set <arch>	manually reset the iraf environment architecture
@@ -106,6 +107,11 @@ else
 	;;
     esac
 fi
+if [ "$(echo -n I | od -to2 | awk 'FNR==1{ print substr($2,6,1)}')" = "0" ] ; then
+    endian="big"
+else
+    endian="little"
+fi
 
 ##############################################################################
 # END OF MACHDEP DEFINITIONS.
@@ -121,6 +127,9 @@ else
 	;;
     "-nbits")
 	ECHO $nbits
+	;;
+    "-endian")
+	ECHO $endian
 	;;
     "-set")
 	if [ -n $2 ]; then
