@@ -44,7 +44,13 @@ install:
 
 language: c
 
-cache: ccache
+cache:
+  ccache: true
+  directories:
+    - $HOME/.ccache
+
+git:
+  depth: 3
 
 before_script:
   - build_tmp=`mktemp -d -t irafbuild.XXXXXXXXX`
