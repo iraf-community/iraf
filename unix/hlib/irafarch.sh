@@ -4,11 +4,12 @@
 #
 #  Usage:       irafarch
 #		irafarch -set [<arch>] [opts]
-#               irafarch [ -hsi | -nbits | -pipe | -tapecap | -tape ]
+#               irafarch [ -hsi | -nbits | -endian | -pipe | -tapecap | -tape ]
 #
 #	-mach		print the iraf architecture name [default]
 #	-hsi		print the HSI arch
 #	-nbits		print number of bits in an int (32 or 64)
+#	-endian		print endianness of platform (big or little)
 #	-pipe		does platform support display fifo pipes?
 #	-tapecap	does platform require tapecap changes?
 #	-tape		does platform support tape drives?
@@ -26,6 +27,7 @@
 
 hmach="INDEF"
 nbits=32
+endian="little"
 pipes=1
 shlibs=0
 tapecaps=0
@@ -104,6 +106,7 @@ fi
 # Set some common defaults for most platforms
 shlib=0				# no shared lib support
 nbits=32			# 32-bit architecture
+endian="little"
 tapecaps=1			# platform supports tapecaps
 tapes=1				# platform support tape drives
 pipes=1				# supports display fifo pipes
@@ -142,7 +145,6 @@ case "$MNAME" in
             else
                 mach="ipad"				# iOS Device
                 hmach="ipad"
-		nbits=32
             fi
 	fi
 	tapecaps=0
@@ -157,6 +159,9 @@ case "$MNAME" in
 	    if [ "$mach" == "linux64" ]; then
 		nbits=64
 	    fi
+	    if [ "$mach" == "linuxs390x" ]; then
+		endian="big"
+	    fi
 	else 
             if [ "$MNAME_M" == "x86_64" ]; then		# Linux x86_64
                 mach="linux64"
@@ -165,7 +170,6 @@ case "$MNAME" in
             else					# Linux
                 mach="linux"
                 hmach="linux"
-	        nbits=32
             fi
         fi
         ;;
@@ -240,6 +244,9 @@ else
 	;;
     "-nbits")
 	ECHO $nbits
+	;;
+    "-endian")
+	ECHO $endian
 	;;
     "-pipes")
 	ECHO $pipes

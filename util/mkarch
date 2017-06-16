@@ -39,6 +39,7 @@ while [ "$loop_" == "yes" ]; do
   if [ "$#" -gt 0 ]; then
     arch=$1
     nbits=$(IRAFARCH=$arch $iraf/unix/hlib/irafarch.sh -nbits)
+    endian=$(IRAFARCH=$arch $iraf/unix/hlib/irafarch.sh -endian)
 
     if (( "$use_mkpkg"==1 )); then
         mkpkg $arch
@@ -66,6 +67,11 @@ while [ "$loop_" == "yes" ]; do
 	     rm -f iraf.h mach.h; \
 	     ln -s iraf32.h iraf.h; \
 	     ln -s mach32.h mach.h; cd $iraf
+    fi
+    if [ "$endian" = "big" ]; then
+        ( cd unix/hlib; ln -sf swapbe.h swap.h )
+    else
+        ( cd unix/hlib; ln -sf swaple.h swap.h )
     fi
     loop_="no"
 
