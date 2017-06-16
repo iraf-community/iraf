@@ -22,13 +22,6 @@ define	NBITS_LONG	64		# nbits in a long
 define	EPSILONR	(1.192e-7)	# smallest E such that 1.0 + E > 1.0
 define	EPSILOND	(2.220d-16)	# double precision epsilon
 define	EPSILON		EPSILONR
-
-# Is byte swapping needed for a 2 or 4 byte MII integer or a 4 or 8 byte
-# IEEE floating to convert to or from MII format on this machine?
-
-define	BYTE_SWAP2	YES
-define	BYTE_SWAP4	YES
-define	BYTE_SWAP8	YES
-define	IEEE_SWAP4	YES
-define	IEEE_SWAP8	YES
 define	IEEE_USED	YES
+
+include <swap.h>

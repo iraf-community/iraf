@@ -87,7 +87,6 @@ define	SZ_STRUCT32	2
 # Indefinite values.
 define	INDEFS		(-32767)
 define	INDEFL		(-2147483647)
-#define	INDEFL		(-9223372036854775807)
 define	INDEFI		INDEFL
 define	INDEFR		1.6e38
 define	INDEFD		1.6d308
