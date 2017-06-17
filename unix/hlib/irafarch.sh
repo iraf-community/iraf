@@ -156,7 +156,7 @@ case "$MNAME" in
 	pipes=0
         ;;
 
-    "redhat"|"linux"|"linux64"|"linuxs390x")
+    "redhat"|"linux"|"linux64"|"linuxs390x"|"linuxarm")
         if [ -n "$IRAFARCH" ]; then
             mach="$IRAFARCH"
             hmach="$IRAFARCH"
@@ -175,6 +175,10 @@ case "$MNAME" in
                 mach="linuxs390x"
                 hmach="linuxs390x"
 	        nbits=64
+		endian="big"
+            elif [ "$MNAME_M" = "armhf" -o "$MNAME_M" = "armv7l" ]; then
+                mach="linuxarm"
+                hmach="linuxarm"
             else					# Linux
                 mach="linux"
                 hmach="linux"
