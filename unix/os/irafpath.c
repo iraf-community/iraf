@@ -92,9 +92,7 @@ irafpath (char *fname)
 	strcat (pathname, ".unknown");
 #endif
 
-#if defined (__i386__)
-	/* append nothing */
-#elif defined (__x86_64__)
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
 	strcat (pathname, "64");
 #endif
 
