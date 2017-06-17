@@ -637,7 +637,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 
@@ -680,7 +680,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 
@@ -726,7 +726,7 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
 
-#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 
@@ -776,7 +776,7 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
-#if (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
+#ifdef __i386__
 	arglist[nargs++] = "-m32";
 #endif
 	arglist[nargs++] = "-o";
