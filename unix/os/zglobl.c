@@ -16,4 +16,4 @@ struct	fiodes zfd[MAXOFILES];
 char	os_process_name[SZ_PROCNAME];
 PKCHAR	osfn_bkgfile[SZ_PATHNAME/sizeof(PKCHAR)+1];
 int	save_prtype = 0;
-char	oscwd[SZ_PATHNAME+1];
+char	oscwd[SZ_PATHNAME+1] = "";
