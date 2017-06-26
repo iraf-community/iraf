@@ -109,4 +109,11 @@ define vx_getIntValue   	vgival
 define vx_getRealValue   	vgrval
 define vx_setAttr   		vsetar
 define vx_getAttr   		vgetar
-define vx_writeXML   		vwritl
+define vx_writeXML   		vwrxml
+define vx_writeHTML   		vwrhtl
+define vx_writeSHTML  		vwrshl
+define vx_writeASV   		vwrasv
+define vx_writeBSV   		vwrbsv
+define vx_writeCSV   		vwrcsv
+define vx_writeTSV   		vwrtsv
+define vx_writeFITS		vwrfis
