@@ -124,6 +124,7 @@
 #define VX_WRITEBSV   		vwrbsv
 #define VX_WRITECSV   		vwrcsv
 #define VX_WRITETSV   		vwrtsv
+#define VX_WRITEFITS		vwrfis
 #define VX_SETWARN   		vswarn
 
 #else
@@ -216,6 +217,7 @@
 #define VX_WRITEBSV   		vwrbsv_
 #define VX_WRITECSV   		vwrcsv_
 #define VX_WRITETSV   		vwrtsv_
+#define VX_WRITEFITS		vwrfis_
 #define VX_SETWARN   		vswarn_
 
 #endif
@@ -316,6 +318,7 @@ void 	  VX_WRITEASV (handle_t *elem, XCHAR *fname);
 void 	  VX_WRITEBSV (handle_t *elem, XCHAR *fname);
 void 	  VX_WRITECSV (handle_t *elem, XCHAR *fname);
 void 	  VX_WRITETSV (handle_t *elem, XCHAR *fname);
+void 	  VX_WRITEFITS (handle_t *elem, XCHAR *fname);
 void 	  VX_SETWARN (int *value);
 
 
@@ -1665,6 +1668,23 @@ VX_WRITETSV (handle_t *elem, XCHAR *fname)
     char *_fname = spp2c (fname, spplen (fname));
 
     vot_writeTSV (*elem, _fname, 1);
+
+    free ((char *) _fname);
+}
+
+
+/** VX_WRITEFITS
+ *
+ *  @brief		Write the XML as FITS file
+ *  @param[in]  elem 	A handle the root Element.
+ *  @param[in]  fname 	Output file name
+ */
+void
+VX_WRITEFITS (handle_t *elem, XCHAR *fname)
+{
+    char *_fname = spp2c (fname, spplen (fname));
+
+    vot_writeFITS (*elem, _fname);
 
     free ((char *) _fname);
 }
