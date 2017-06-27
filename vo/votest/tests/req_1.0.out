@@ -1,9 +1,0 @@
-------------------------------------------------------------------
-Req  1:  Users shall be able to use a VOTable in places where
-	 tasks accept tabular data in other formats (ASCII files,
-	 FITS bintables, .tab files, etc) for input.
-------------------------------------------------------------------
-Demonstration of the general use of VOTables is done using the
-various individual 'votable' test scripts for access.
-
-

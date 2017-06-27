@@ -42,13 +42,11 @@ while [ "$loop_" == "yes" ]; do
     if (( "$use_mkpkg"==1 )); then
         mkpkg $arch
         cd noao; mkpkg -p noao $arch; cd ../
-        cd vo; mkpkg -p vo $arch; cd ../
     else
 	$iraf/util/mkclean
-        /bin/rm -rf bin noao/bin unix/bin unix/as vo/bin
+        /bin/rm -rf bin noao/bin unix/bin unix/as
 
         ln -s bin.$arch bin
-        cd vo; ln -s bin.$arch bin; cd ../
         cd noao; ln -s bin.$arch bin; cd ../
         cd unix; ln -s bin.$arch bin; cd ../
         cd unix; ln -s as.$arch as; cd ../

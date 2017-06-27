@@ -1,6 +1,0 @@
-input,s,a,,,,Input VOTable names
-output,s,a,,,,Output file names
-format,s,a,,,,Output format
-header,b,h,yes,,,Header?
-verbose,b,h,yes,,,Verbose?
-mode,s,h,"al"

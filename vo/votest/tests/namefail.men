@@ -1,5 +1,0 @@
-
-#   Name Failure Tests -- Tests of the file IRAF file error handling
-
-       namefail_001 -- Test for name failure
-
