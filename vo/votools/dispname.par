@@ -1,3 +1,0 @@
-frame,i,q,,1,,"Display frame number"
-name,s,h,"",,,"Name of the displayed image (output)"
-verbose,b,h,no,,,"Print name to STDOUT?"
