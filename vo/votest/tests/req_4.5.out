@@ -1,7 +1,0 @@
-------------------------------------------------------------------
-Req  4.5:  Users shall be able to select which data returned by a
-	   DAL service query is to be downloaded to local disk.
-------------------------------------------------------------------
-http://skyview.gsfc.nasa.gov/cgi-bin/images?position=204.253829%2C-29.865761&survey=dss2b&pixels=300%2C300&sampler=Clip&size=0.10000000000000002%2C0.10000000000000002&projection=Tan&coordinates=J2000.0&return=FITS                           
-http://skyview.gsfc.nasa.gov/cgi-bin/images?position=204.253829%2C-29.865761&survey=dss2r&pixels=300%2C300&sampler=Clip&size=0.10000000000000002%2C0.10000000000000002&projection=Tan&coordinates=J2000.0&return=FITS                           
-http://skyview.gsfc.nasa.gov/cgi-bin/images?position=204.253829%2C-29.865761&survey=dss2ir&pixels=300%2C300&sampler=Clip&size=0.10000000000000002%2C0.10000000000000002&projection=Tan&coordinates=J2000.0&return=FITS                          

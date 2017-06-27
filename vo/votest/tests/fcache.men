@@ -1,9 +1,0 @@
-
-#   FCache Tests -- Tests of the file IRAF file cache interface.
-
-       fcache_001 -- Initialize the cache
-       fcache_002 -- Add local file
-       fcache_003 -- Add URL
-       fcache_004 -- Delete local entry
-       fcache_005 -- Delete URL entry
-

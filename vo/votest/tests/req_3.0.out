@@ -1,9 +1,0 @@
-------------------------------------------------------------------
-Req  3.:   Users shall be able to query the VO Registry using the
-           keyword-search services provided by the VO Directory
-	   service.
-------------------------------------------------------------------
-These requirements are demonstrated specifically by the test scripts
-and more generally by the REGISTRY task itself.
-
-
