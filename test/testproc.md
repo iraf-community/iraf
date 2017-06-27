@@ -233,16 +233,16 @@ image.short.fits[512,512][short]: m51  B  600s
 VOTables are internally converted to FITS binary tables.
 
 ```
-cl> tinfo iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+cl> tinfo iraf$vendor/libvotable/examples/data/sia_m51.xml
+# iraf$vendor/libvotable/examples/data/sia_m51.xml
    2 rows written to table
   10 columns defined
   59 header parameters written to table
   71 records allocated for header parameters
   10 space allocated for column descriptors
 table type:  fits
-cl> tlcol iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+cl> tlcol iraf$vendor/libvotable/examples/data/sia_m51.xml
+# iraf$vendor/libvotable/examples/data/sia_m51.xml
 Survey           CH*3         %-3s ""
 Ra               D         %25.16g ""
 Dec              D         %25.16g ""

@@ -853,7 +853,6 @@ done
 #       1) Editing the $iraf path into system files
 #       2) Creating the <iraf.h> link
 #       3) Creating the system command links
-#          Install VOClient Code
 #       4) Creating the image directory (imdir)
 #       5) Creating the cache directory (cache)
 #       6) Tape setup (modes on alloc.e and /dev tape devices)
@@ -1367,72 +1366,6 @@ if [ "$exec" == "yes" ]; then
 fi
 DO_OK
 
-
-
-#=============================================================================
-# Install the VOClient Daemon code.
-#=============================================================================
-
-NEWLINE
-BOLD_ON
-ECHO "                      Installing VOClient Code"
-ECHO "                      ------------------------"
-BOLD_OFF
-
-
-ECHO -n "Creating 'voclientd' symlink ...                               "
-file1=$lbin/voclientd
-file2=$iraf/vo/java/voclientd
-
-err_seen=0
-if [ -e "$file1" ]; then
-    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
-        if [ "$exec" == "yes" ]; then
-            RM $file1
-            ln -s $file2 $file1
-        fi
-    fi
-else
-    if [ "$exec" == "yes" ]; then
-        RM -f $file1
-        ln -s $file2 $file1
-    fi
-fi
-if [ "$exec" == "no" ]; then
-    DO_OK
-elif [ "$err_seen" == 0 -a -e "$file1" ]; then
-    DO_OK
-else
-    DO_FAIL
-    err_count=$(( err_count++ ))
-fi
-
-ECHO -n "Creating 'voclient.jar' symlink ...                            "
-file1=$lbin/voclient.jar
-file2=$iraf/vo/java/voclient.jar
-
-err_seen=0
-if [ -e "$file1" ]; then
-    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
-        if [ "$exec" == "yes" ]; then
-            RM $file1
-            ln -s $file2 $file1
-        fi
-    fi
-else
-    if [ "$exec" == "yes" ]; then
-        RM -f $file1
-        ln -s $file2 $file1
-    fi
-fi
-if [ "$exec" == "no" ]; then
-    DO_OK
-elif [ "$err_seen" == 0 -a -e "$file1" ]; then
-    DO_OK
-else
-    DO_FAIL
-    err_count=$(( err_count++ ))
-fi
 
 
 #=============================================================================

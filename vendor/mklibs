@@ -7,7 +7,7 @@ export CXX=g++
 
 build_cfitsio=1
 build_readline=1 # not needed in v2.16.1 and beyond
-build_voclient=1
+build_libvotable=1
 
 if [ "$IRAFARCH" = "linux" ] ; then
     CARCH="-m32"
@@ -62,17 +62,14 @@ fi
 
 
 ####################################################################
-####   VOClient Library
+####   VO related Libraries
 ####################################################################
-if [ $build_voclient = 1 ] ; then
+if [ $build_libvotable = 1 ] ; then
 
-    echo -n "    Building VOClient libs ...."
+    echo -n "    Building VOTABLE lib ...."
 
-    (cd voclient ; \
-     make all 		        ; \
-     cp lib/libVO.a  ../../bin/      ; \
-     cp voclient.jar ../../vo/java/  ; \
-     cp voclientd    ../../vo/java/  ; \
+    (cd libvotable ; \
+     make all CARCH=$CARCH	        ; \
      make clean 		        ) | tee -a _spool 2>&1
     echo "done"
 
