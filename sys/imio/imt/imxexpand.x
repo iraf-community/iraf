@@ -486,40 +486,6 @@ begin
 end
 
 
-# IMX_FETCH -- Fetch the urls from the list.
-
-procedure imx_fetch (urls, istemp)
-
-char	urls[ARB]				#I file of URLS to download
-bool	istemp					#i is input file temporary?
-
-char	osfn[SZ_PATHNAME]
-char	url_osfn[SZ_PATHNAME]
-
-int	n, envgets()
-char	nthreads[SZ_FNAME]
-
-begin
-	# Get the host pathname of the cache directory.
-	call fmapfn ("cache$", osfn, SZ_PATHNAME)
-	call strupk (osfn, osfn, SZ_PATHNAME)
-
-	call fmapfn (urls, url_osfn, SZ_PATHNAME)
-	call strupk (url_osfn, url_osfn, SZ_PATHNAME)
-
-	n = envgets ("vo_nthreads", nthreads, SZ_FNAME)
-
-	# voget -B -C -D cache$ -b url -N <N> [-t] <infile>
-	if (istemp) {
-	    call vx_voget (10, "-B", "-C", "-D", osfn, "-b", "url", 
-	        "-N", nthreads, "-t", url_osfn)
-	} else {
-	    call vx_voget (10, "-B", "-C", "-D", osfn, "-b", "url", 
-	        "-N", nthreads, "-B", url_osfn)
-	}
-end
-
-
 # IMX_VOTABLE -- Read a VOTable, extracting the column of access references
 # as the image list.
 
@@ -568,10 +534,6 @@ begin
 	call mfree (ranges, TY_INT)
 	call votclose (vot)			# close the files
 	call close (tfd)
-
-	# Close the temp file and pre-fetch the data if needed.
-	if (envgetb ("vo_prefetch"))
-	    call imx_fetch (tfile, true)
 
 	return (exp)
 end
@@ -750,9 +712,6 @@ begin
 
 	call mfree (ranges, TY_INT)
 	call close (fd)
-
-	if (envgetb ("vo_prefetch"))
-	    call imx_fetch (input, false)
 
 	return (exp)
 end
