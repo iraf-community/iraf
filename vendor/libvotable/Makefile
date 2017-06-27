@@ -8,11 +8,7 @@
 
 NAME       	 = VOTable
 VERSION    	 = 1.1
-PLATFORM  	:= $(shell uname -s)
-PLMACH  	:= $(shell uname -m)
-HERE      	:= $(shell /bin/pwd)
-BINDIR    	:= ../bin/
-LIBDIR    	:= ../lib/
+LIBDIR    	:= ../../bin/
 INCDIR    	:= ../include/
 
 
@@ -25,29 +21,9 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 
 # includes, flags and libraries
 CC 	  	= gcc
-CINCS  	  	= -I$(INCDIR)  -I. -I../../../include
-ifeq ($(PLATFORM),Darwin)
-    ifeq ($(PLMACH),x86_64)
-	CARCH	= -m64
-    else
-	CARCH	= -m32
-    endif
-    ifdef IRAFARCH
-        ifeq ($(IRAFARCH),macintel)
-	    CARCH = -m64
-        else
-	    CARCH = -m32
-	endif
-    endif
-else
-    ifdef IRAFARCH
-        ifeq ($(IRAFARCH),linux)
-            CARCH = -m32
-        endif
-    endif
-endif
+CINCS  	  	= -I$(INCDIR)  -I. -I../../include
 
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./ -DHAVE_CFITSIO
+CFLAGS 		= -g -Wall $(CARCH) $(CINCS) -L./ -DHAVE_CFITSIO
 CLIBS		= -lm -lc -lpthread 				-lcfitsio
 
 
