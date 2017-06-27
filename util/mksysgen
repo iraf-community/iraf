@@ -45,10 +45,6 @@ cd $iraf/unix					# NOVOS bootstrap
 source hlib/irafuser.sh
 sh -x mkpkg.sh 2>&1 | tee -a spool
 
-cd $iraf/vendor                                 # build vendor libs
-make all 2>&1 | tee -a ../spool.final
-cd ../
-
 cd $iraf/sys					# build NOVOS
 mkpkg 2>&1 | tee -a spool
 
@@ -56,6 +52,10 @@ cd $iraf/unix/boot				# VOS bootstrap
 source ../hlib/irafuser.sh
 sh -x mkpkg.sh 2>&1 | tee -a spool
 mv $hlib/*.e $hbin
+
+cd $iraf/vendor                                 # build vendor libs
+make all 2>&1 | tee -a ../spool.final
+cd ../
 
 cd $iraf/					# build core system
 mkpkg 2>&1 | tee -a spool
