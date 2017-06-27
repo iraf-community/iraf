@@ -69,7 +69,7 @@
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
-#define IRAFLIB5	"libVO.a"
+#define IRAFLIB5	"libVOTable.a"
 #define IRAFLIB6	"libcfitsio.a"
 #define IRAFLIB7	"liblapack.a"
 
