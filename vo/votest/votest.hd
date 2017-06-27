@@ -1,8 +1,0 @@
-# Help directory for the VOTEST package.
-
-$doc 		= "./doc/"
-$src 		= "./"
-
-revisions	sys=Revisions
-
-votest		hlp=doc$votest.hlp,		src=votest$votest.cl

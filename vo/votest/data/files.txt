@@ -1,4 +1,0 @@
-data$sif.fits
-http://iraf.noao.edu/votest/sif.fits
-file:///iraf/iraf/vo/votest/data/sif.fits
-file:///localhost/iraf/iraf/vo/votest/data/sif.fits

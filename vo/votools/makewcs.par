@@ -1,3 +1,0 @@
-infiles,f,a,,,,Input image names
-verbose,b,h,YES,,,Verbose?
-mode,s,h,"al"
