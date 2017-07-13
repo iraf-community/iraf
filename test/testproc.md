@@ -228,6 +228,32 @@ image.real.fits[512,512][real]: m51 real
 image.sect.fits[101,101][real]: m51  B  600s
 image.short.fits[512,512][short]: m51  B  600s
 ```
+## Accessing a VOTable
+
+VOTables are internally converted to FITS binary tables.
+
+```
+cl> tinfo iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+   2 rows written to table
+  10 columns defined
+  59 header parameters written to table
+  71 records allocated for header parameters
+  10 space allocated for column descriptors
+table type:  fits
+cl> tlcol iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
+Survey           CH*3         %-3s ""
+Ra               D         %25.16g ""
+Dec              D         %25.16g ""
+Dim              I            %11d ""
+Size             I[2]         %11d ""
+Scale            D[2]      %25.16g ""
+Format           CH*10       %-10s ""
+PixFlags         CH*1         %-1s ""
+URL              CH*229     %-229s ""
+LogicalName      CH*1         %-1s ""
+```
 
 # Plotting data
 
@@ -313,6 +339,7 @@ imt512
 cl> set stdimage=imt800
 cl> set stdimage=iism70v
 ```
+
 ## Displaying IRAF images
 
 The `DISPLAY` task is the main task used for displaying images, but
@@ -436,11 +463,11 @@ Hopefully all went well to this point. Let's clean things up a bit.
 
 ```
 cl> dir
-image.dbl.fits      image.sect.fits     inlist              
-image.real.fits     image.short.fits    uparmimlminmax.par  
+image.dbl.fits      image.sect.fits     inlist              uparmntstinfo.par
+image.real.fits     image.short.fits    uparmimlminmax.par
 cl> imdelete image.*
 cl> dir
-inlist              uparmimlminmax.par  
+inlist              uparmimlminmax.par  uparmntstinfo.par
 ```
 
 Remember that if you want to delete any images you just use the task
