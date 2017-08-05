@@ -392,7 +392,7 @@ main (int argc, char *argv[])
 
 		case 'r':
 		    /* Not used anymore */
-		    if ((arg = argv[++i]) == EOS)
+		    if ((arg = argv[++i]) == NULL)
 			i--;
 		    break;
 
@@ -441,7 +441,7 @@ main (int argc, char *argv[])
 
 		default:
 		    if (strcmp (&arg[1], "Nh") == 0) {
-			if ((arg = argv[++i]) == EOS)
+			if ((arg = argv[++i]) == NULL)
 			    i--;
 			else {
 			    foreigndefs++;
