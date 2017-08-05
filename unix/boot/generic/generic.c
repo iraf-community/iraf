@@ -179,7 +179,7 @@ int main (int argc, char *argv[])
 		    }
 
 		    if (ip == NULL && strlen(types) > 1)
-			strcat (ip, "$t");
+			strcat (template, "$t");
 		}
 
 		if (genfname[0] == EOS || strlen (types) > 1)
