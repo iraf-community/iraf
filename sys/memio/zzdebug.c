@@ -35,9 +35,8 @@ static integer c__2 = 2;
 static integer c__1023 = 1023;
 static integer c_b46 = 999999999;
 
-integer sysruk_(task, cmd, rukarf, rukint)
-shortint *task, *cmd;
-integer *rukarf, *rukint;
+integer 
+sysruk_ (shortint *task, shortint *cmd, integer *rukarf, integer *rukint)
 {
     /* Initialized data */
 
@@ -215,7 +214,8 @@ L100:
     return ret_val;
 } /* sysruk_ */
 
-/* Subroutine */ integer tstack_()
+/* Subroutine */ integer 
+tstack_ (void)
 {
     /* Initialized data */
 
@@ -267,7 +267,8 @@ L111:
 #undef memb
 
 
-/* Subroutine */ integer trealc_()
+/* Subroutine */ integer 
+trealc_ (void)
 {
     /* Initialized data */
 

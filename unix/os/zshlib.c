@@ -15,4 +15,5 @@ unsigned USHLIB[3] = { 0, 0, 0 };	/* actual length does not matter */
 unsigned VSHLIB[3] = { 0, 0, 0 };
 unsigned VSHEND;
 
-void VLIBINIT(){}
+void 
+VLIBINIT (void){}

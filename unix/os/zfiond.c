@@ -154,7 +154,7 @@ static	jmp_buf jmpbuf;
 static	int jmpset = 0;
 static	int recursion = 0;
 extern	int errno;
-static	int getstr();
+static	int getstr(char **ipp, char *obuf, int maxch, int delim);
 
 static void nd_onsig (int sig, int *arg1, int *arg2);
 

@@ -1039,7 +1039,7 @@ void  process_task_statement (void);
 void  do_include (void);
 int   yywrap (void);
 int   yy_input (void);
-void  yy_unput (char ch);
+void  yy_unput (int ch);
 
 
 #line 1046 "lex.yy.c"
@@ -2676,9 +2676,8 @@ void yyfree (void * ptr )
  * space, and the type spec begins a function declaration; save the datatype
  * code for d_newproc().
  */
-void
-typespec (typecode)
-int	typecode;
+void 
+typespec (int typecode)
 {
 	if (context & DECL)
 	    d_declaration (typecode);
@@ -2698,8 +2697,8 @@ int	typecode;
  * sysruk.x file as an include file.  Special macros therein are
  * replaced by the taskname dictionary as processing continues.
  */
-void
-process_task_statement()
+void 
+process_task_statement (void)
 {
         char    ch;
 
@@ -2751,8 +2750,8 @@ process_task_statement()
  * statement, push the current input file on a stack, and open the new file.
  * System include files are referenced as "<file>", other files as "file".
  */
-void
-do_include()
+void 
+do_include (void)
 {
 	char    *p, delim, *rindex();
 	char    hfile[SZ_FNAME+1], *op;
@@ -2883,8 +2882,8 @@ do_include()
  * nonzero when the stack is empty, i.e., when we reach the end of the
  * main file.
  */
-int
-yywrap()
+int 
+yywrap (void)
 {
 	/* The last line of a file is not necessarily newline terminated.
 	 * Output a newline just in case.
@@ -2918,8 +2917,8 @@ yywrap()
 
 /* YY_INPUT -- Get a character from the input stream.
  */
-int
-yy_input ()
+int 
+yy_input (void)
 {
 	return (input());
 }
@@ -2927,9 +2926,8 @@ yy_input ()
 
 /* YY_UNPUT -- Put a character back into the input stream.
  */
-void
-yy_unput (ch)
-char	ch;
+void 
+yy_unput (int ch)
 {
 	unput(ch);
 }

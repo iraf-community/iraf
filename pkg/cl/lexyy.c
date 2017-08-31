@@ -28,7 +28,8 @@ struct yysvf {
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
 # define YYNEWLINE 10
-lex_yylex(){
+int 
+lex_yylex (void){
 int nstr; extern int yyprevious;
 while((nstr = yylook()) >= 0)
 yyfussy: switch(nstr){
@@ -231,8 +232,8 @@ fprintf(yyout,"bad switch yylook %d",nstr);
  * Quotes may be included in the string by escaping them, or by means of
  * the double quote convention.
  */
-traverse (delim)
-char	delim;
+int 
+traverse (int delim)
 {
 	register char *op, *cp, ch;
 	static	char *esc_ch  = "ntfr\\\"'";
@@ -724,7 +725,8 @@ char *yysptr = yysbuf;
 int *yyfnd;
 extern struct yysvf *yyestate;
 int yyprevious = YYNEWLINE;
-yylook(){
+int 
+yylook (void){
 	register struct yysvf *yystate, **lsp;
 	register struct yywork *yyt;
 	struct yysvf *yyz;
@@ -872,8 +874,8 @@ yylook(){
 # endif
 		}
 	}
-yyback(p, m)
-	int *p;
+int 
+yyback (int *p, int m)
 {
 if (p==0) return(0);
 while (*p)
@@ -884,14 +886,15 @@ while (*p)
 return(0);
 }
 	/* the following are only used in the lex library */
-yyinput(){
+int 
+yyinput (void){
 	return(input());
 	}
-yyoutput(c)
-  int c; {
+int 
+yyoutput (int c) {
 	output(c);
 	}
-yyunput(c)
-   int c; {
+int 
+yyunput (int c) {
 	unput(c);
 	}

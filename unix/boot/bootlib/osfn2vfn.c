@@ -36,8 +36,10 @@ osfn2vfn (
  * the IRAF one.  No attempt is made to map OS directory names into IRAF
  * logical directory names; this is a local directory operation only.
  */
-char *osfn2vfn (osfn)
-char	*osfn;			/* input OS filename	*/
+char *
+osfn2vfn (
+    char *osfn			/* input OS filename	*/
+)
 {
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XCHAR	x_vfn[SZ_PATHNAME+1];

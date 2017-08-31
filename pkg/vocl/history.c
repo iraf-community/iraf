@@ -1267,7 +1267,8 @@ putlog (
 
 /*  POLLINIT -- Initialize the input polling mechanism.
 */
-pollInit ()
+int 
+pollInit (void)
 {
     /* Allocate the structure. */
     if (poll_fd == NULL)

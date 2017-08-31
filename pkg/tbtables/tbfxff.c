@@ -40,7 +40,8 @@ void FTDREC_U (fitsfile **fptr, int *keypos, int *status) {
 	ffdrec (*fptr, *keypos, status);
 }
 
-void FTCMSG_U() {
+void 
+FTCMSG_U (void) {
 
 	ffcmsg();
 }

@@ -113,10 +113,12 @@ XINT	*chan;			/* receives channel code (socket)	*/
  * public login provides sufficient priviledge for most operations but will
  * not provide write access to the user's files on the remote node.
  */
-ks_getlogin (node, username, password)
-char	*node;			/* node we wish a login for	*/
-char	*username;		/* receives the login name	*/
-char	*password;		/* receives the login password	*/
+int 
+ks_getlogin (
+    char *node,			/* node we wish a login for	*/
+    char *username,		/* receives the login name	*/
+    char *password		/* receives the login password	*/
+)
 {
 	char	fname[SZ_FNAME+1];
 	char	uname[SZ_FNAME+1];
@@ -155,12 +157,14 @@ char	*password;		/* receives the login password	*/
  * considered too dangerous, the password "?" may be given in the table and a 
  * runtime query will result - this will fail if one is no longer logged in.
  */
-ks_scanlogin (fname, node, uname, username, password)
-char	*fname;			/* table file			*/
-char	*node;			/* node name			*/
-char	*uname;			/* user login on local node	*/
-char	*username;		/* receives user login name	*/
-char	*password;		/* receives user password	*/
+int 
+ks_scanlogin (
+    char *fname,			/* table file			*/
+    char *node,			/* node name			*/
+    char *uname,			/* user login on local node	*/
+    char *username,		/* receives user login name	*/
+    char *password		/* receives user password	*/
+)
 {
 	char	*ip;
 	char	lbuf[SZ_LINE+1];
@@ -243,9 +247,11 @@ char	*password;		/* receives user password	*/
 /* KS_GETWORD -- Get the next whitespace or : delimited word from the
  * input string.
  */
-ks_getword (ip, obuf)
-char	**ip;			/* pointer into input buffer	*/
-char	*obuf;			/* receives name		*/
+int 
+ks_getword (
+    char **ip,			/* pointer into input buffer	*/
+    char *obuf			/* receives name		*/
+)
 {
 	register char	*cp, *op;
 	register int	n;
@@ -391,10 +397,12 @@ XLONG	*loffset;		/* not used				*/
 /* PR_ONSIG -- Catch a signal and make it look like a write error on the
  * server i/o channel.
  */
-pr_onsig (sig, code, scp)
-int	sig;			/* signal which was trapped	*/
-int	code;			/* subsignal code (vax)		*/
-struct	sigcontext *scp;	/* not used			*/
+int 
+pr_onsig (
+    int sig,			/* signal which was trapped	*/
+    int code,			/* subsignal code (vax)		*/
+    struct sigcontext *scp	/* not used			*/
+)
 {
 	if (sig == SIGPIPE && recursion++ == 0)
 	    ku_error ("kernel server process has died");

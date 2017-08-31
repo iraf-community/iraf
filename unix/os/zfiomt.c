@@ -334,9 +334,9 @@ static struct mtchar {
 };
 
 
-static	int zmtgetfd();
-static	int zmtbsr(), zmtbsf(), zmtfsr(), zmtfsf();
-static	int zmtclose(), zmtfpos(), zmtrew();
+static	int zmtgetfd(register struct mtdesc *mp);
+static	int zmtbsr(int fd, int nrecords), zmtbsf(int fd, int nfiles), zmtfsr(int fd, int nrecords), zmtfsf(int fd, int nfiles);
+static	int zmtclose(int fd), zmtfpos(register struct mtdesc *mp, int newfile), zmtrew(int fd);
 
 static int zmtopen (char *dev, int u_acmode);
 static int zmtclose (int fd);
@@ -992,8 +992,7 @@ ZZRWMT (
  * it can be skipped if it is not necessary to move the tape.
  */
 static int
-zmtgetfd (mp)
-register struct	mtdesc *mp;
+zmtgetfd (register struct mtdesc *mp)
 {
 	register int fd;
 

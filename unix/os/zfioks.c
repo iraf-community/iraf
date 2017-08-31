@@ -164,11 +164,11 @@ static	int parent = -1;
 static	SIGFUNC old_sigcld;
 static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
-static	int ks_getresvport(), ks_rexecport();
-static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
-static	void dbgsp(), dbgmsg(), dbgmsgf(char *fmt, ...);
-static	char *ks_getpass();
-static	void ks_onsig(), ks_reaper();
+static	int ks_getresvport(int *alport), ks_rexecport(void);
+static	int ks_socket(char *host, u_long addr, int port, char *mode), ks_geti(int fd), ks_puti(int fd, int ival), ks_getlogin(char *hostname, char *loginname, char *password, struct ksparam *ks);
+static	void dbgsp(int pid), dbgmsg(char *msg), dbgmsgf(char *fmt, ...);
+static	char *ks_getpass(char *user, char *host);
+static	void ks_onsig(int sig, int *arg1, int *arg2), ks_reaper(int sig, int *arg1, int *arg2);
 
 static int ks_getlogin (char *hostname, char *loginname, char *password,
   				struct ksparam *ks);
@@ -1117,11 +1117,7 @@ ZSTTKS (
  * to the remote socket at the given address.
  */
 static int
-ks_socket (host, addr, port, mode)
-char	*host;
-u_long	addr;
-int	port;
-char	*mode;
+ks_socket (char *host, u_long addr, int port, char *mode)
 {
 	struct	sockaddr_in sockaddr;
 	struct	hostent *hp;
@@ -1174,8 +1170,7 @@ failed:
  * output argument.
  */
 static int
-ks_getresvport (alport)
-int	*alport;
+ks_getresvport (int *alport)
 {
 	struct	sockaddr_in sin;
 	int	s;
@@ -1210,7 +1205,7 @@ int	*alport;
 /* KS_REXECPORT -- Return the port for the rexec system service.
  */
 static int
-ks_rexecport()
+ks_rexecport(void)
 {
 	register struct servent *sv;
 	static	int port = 0;
@@ -1229,9 +1224,7 @@ ks_rexecport()
  * ascii string.
  */
 static int
-ks_puti (fd, ival)
-int	fd;
-int	ival;
+ks_puti (int fd, int ival)
 {
 	char	obuf[SZ_FNAME];
 
@@ -1244,8 +1237,7 @@ int	ival;
  * string, base decimal, from the given stream.
  */
 static int
-ks_geti (fd)
-int	fd;
+ks_geti (int fd)
 {
 	register int value = 0;
 	struct  timeval timeout;
@@ -1320,8 +1312,7 @@ char	*outstr;
 
 /* KS_MSG -- Print debugging messages.
  */
-static void dbgsp (pid)
-int	pid;
+static void dbgsp (int pid)
 {
 	int i, nsp = ((parent > 0) ? (pid - parent) : 0);
 	for (i=0; i < nsp; i++)
@@ -1329,8 +1320,7 @@ int	pid;
 }
 
 static void
-dbgmsg (msg)
-char    *msg;
+dbgmsg (char *msg)
 {
 	dbgmsgf("%s", msg);
 }

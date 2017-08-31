@@ -39,8 +39,8 @@ char	*mode;
 
 /* KU_FCLOSE -- Close a text file.
  */
-ku_fclose (fd)
-int	fd;
+int 
+ku_fclose (int fd)
 {
 	XINT	chan=fd, status;
 
@@ -53,10 +53,7 @@ int	fd;
  * this procedure are like the unix FGETS.
  */
 char *
-ku_fgets (obuf, maxch, fd)
-char	*obuf;
-int	maxch;
-int	fd;
+ku_fgets (char *obuf, int maxch, int fd)
 {
 	register XCHAR	*ip;
 	register char	*op;
@@ -82,10 +79,12 @@ int	fd;
 /* KU_GPASSWD -- Read a line from the terminal in raw mode (no echo), e.g.,
  * when reading a password.
  */
-ku_gpasswd (prompt, passwd, maxch)
-char	*prompt;		/* user prompt string		*/
-char	*passwd;		/* receives password		*/
-int	maxch;
+int 
+ku_gpasswd (
+    char *prompt,		/* user prompt string		*/
+    char *passwd,		/* receives password		*/
+    int maxch
+)
 {
 	XCHAR	text[SZ_LINE+1], ch;
 	XINT	mode=READ_WRITE, chan, status, nchars;
@@ -136,12 +135,14 @@ int	maxch;
 /* KU_MKFNAME -- Make an OSFN, given a logical directory name (either "iraf"
  * or "home"), a subdirectory name, and a filename.
  */
-ku_mkfname (ldir, subdir, fname, osfn, maxch)
-char	*ldir;			/* logical directory name	*/
-char	*subdir;		/* subdirectory			*/
-char	*fname;			/* filename			*/
-char	*osfn;			/* receives pathname		*/
-int	maxch;
+int 
+ku_mkfname (
+    char *ldir,			/* logical directory name	*/
+    char *subdir,		/* subdirectory			*/
+    char *fname,			/* filename			*/
+    char *osfn,			/* receives pathname		*/
+    int maxch
+)
 {
 	PKCHAR	pkname[SZ_PATHNAME+1];
 	PKCHAR	temp[SZ_FNAME+1];
@@ -168,8 +169,7 @@ int	maxch;
  * a pointer to the encoded numeric string.
  */
 char *
-ku_itoc (num)
-int	num;
+ku_itoc (int num)
 {
 	register int	dig, n;
 	register char	*op;
@@ -187,10 +187,12 @@ int	num;
 
 /* KU_BCOPY -- Copy a byte array.
  */
-ku_bcopy (a, b, nbytes)
-char	*a;			/* input byte array			*/
-char	*b;			/* output byte array			*/
-int	nbytes;			/* number of bytes to move		*/
+int 
+ku_bcopy (
+    char *a,			/* input byte array			*/
+    char *b,			/* output byte array			*/
+    int nbytes			/* number of bytes to move		*/
+)
 {
 	register char	*ip, *op;
 	register int	n = nbytes;
@@ -212,8 +214,8 @@ int	nbytes;			/* number of bytes to move		*/
 
 /* KU_SLEEP -- Suspend process execution.
  */
-ku_sleep (nseconds)
-int	nseconds;
+int 
+ku_sleep (int nseconds)
 {
 	int	mseconds = nseconds*1000;
 
@@ -224,8 +226,8 @@ int	nseconds;
 /* KU_ERROR -- [MACHDEP] Print an error message somewhere where the user can
  * see it (but do not abort or interrupt execution).
  */
-ku_error (message)
-char	*message;
+int 
+ku_error (char *message)
 {
 	write (2, message, strlen(message));
 	write (2, "\n", 1);
@@ -241,10 +243,12 @@ char	*message;
  * On other systems, e.g., VMS, the ZGTENV mechanism can be used to define
  * the user's home directory.
  */
-ku_mapdir (ldir, osfn, maxch)
-char	*ldir;			/* logical directory name	*/
-char	*osfn;			/* receives filename		*/
-int	maxch;
+int 
+ku_mapdir (
+    char *ldir,			/* logical directory name	*/
+    char *osfn,			/* receives filename		*/
+    int maxch
+)
 {
 	PKCHAR	pkname[SZ_FNAME+1];
 	PKCHAR	valstr[SZ_PATHNAME+1];

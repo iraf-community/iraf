@@ -94,8 +94,8 @@ ZWMSEC (XINT *msec)
 }
 
 
-static void
-napmsx()
+static void 
+napmsx (void)
 {
 	ringring = 1;
 }

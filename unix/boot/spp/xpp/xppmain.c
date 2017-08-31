@@ -201,8 +201,7 @@ isxfile (char *fname)
 /* DOTTOR -- Change the extension of the named file to ".r".
  */
 char *
-dottor (fname)
-char	*fname;
+dottor (char *fname)
 {
 	static	char rfname[SZ_PATHNAME+1];
 	char	*ip, *op, *lastdot;

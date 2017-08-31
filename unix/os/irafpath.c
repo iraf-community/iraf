@@ -22,8 +22,8 @@ extern	char *getenv();
  * the system files, e.g., for testing purposes.
  */
 char *
-irafpath (fname)
-char *fname;			/* simple filename, no dirs */
+irafpath (char *fname)
+            			/* simple filename, no dirs */
 {
 	static	char pathname[SZ_PATHNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];

@@ -38,7 +38,7 @@ int debug_sig = 0;
 
 void ex_handler ( int, siginfo_t *, void * );
 
-static long setsig();
+static long setsig(int code, SIGFUNC handler);
 static int ignore_sigint = 0;
 
 
@@ -249,9 +249,7 @@ ZXWHEN (
 /* SETSIG -- Post an exception handler for the given exception.
  */
 static long
-setsig (code, handler)
-int code;
-SIGFUNC	handler;
+setsig (int code, SIGFUNC handler)
 {
 	struct sigaction sig;
 	long status;

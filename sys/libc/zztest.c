@@ -8,13 +8,15 @@
 #define import_xwhen
 #include <iraf.h>
 
-thello_()
+int 
+thello_ (void)
 {
 	fputs ("hello, world\n", stdout);
 }
 
 
-tprint_()
+int 
+tprint_ (void)
 {
 	char	buf[128];
 
@@ -23,7 +25,8 @@ tprint_()
 }
 
 
-tcopy_()
+int 
+tcopy_ (void)
 {
 	FILE	*in, *out;
 	int	ch;
@@ -41,7 +44,8 @@ tcopy_()
 }
 
 
-tscan_()
+int 
+tscan_ (void)
 {
 	char	buf[SZ_LINE];
 	char	str[SZ_LINE];
@@ -68,16 +72,19 @@ tscan_()
 }
 
 
-onint (code, old_handler)
-int	*code;			/* NOTUSED */
-int	*old_handler;
+int 
+onint (
+    int *code,			/* NOTUSED */
+    int *old_handler
+)
 {
 	write (2, "\7", 1);
 	*old_handler = 0;
 }
 
 
-tgettk_()
+int 
+tgettk_ (void)
 {
 	XCHAR	fname[SZ_FNAME+1];
 	char	token[SZ_LINE+1], delim;

@@ -3,8 +3,8 @@
 
 /* NTOHL -- [MACHDEP] Convert a long integer in net format to host format.
  */
-ntohl (lword)
-long	lword;
+int 
+ntohl (long lword)
 {
 	register char *ip, *op;
 	static	long hostw, netw;

@@ -8,9 +8,11 @@
 /* AMOVL -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-AMOVL (a, b, n)
-XLONG	*a, *b;
-XINT	*n;
+AMOVL (
+  XLONG	*a,
+  XLONG	*b,
+  XINT	*n
+)
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

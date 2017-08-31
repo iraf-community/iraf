@@ -3,8 +3,8 @@
 
 /* NTOHS -- [MACHDEP] Convert a short integer in net format to host format.
  */
-ntohs (word)
-short	word;
+int 
+ntohs (int word)
 {
 	register char *wp;
 	static	short w;

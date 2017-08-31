@@ -8,9 +8,10 @@
 /* ACLRR -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-ACLRR (a, n)
-XREAL	*a;
-XINT	*n;
+ACLRR (
+  XREAL	*a,
+  XINT	*n
+)
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 }

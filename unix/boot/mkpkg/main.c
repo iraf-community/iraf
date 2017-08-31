@@ -68,7 +68,8 @@ extern  int  do_mkpkg (struct context *cx, int islib);
 
 
 
-void zzpause () { printf ("ready ...."); (void) getc(stdin); }
+void 
+zzpause (void) { printf ("ready ...."); (void) getc(stdin); }
 
 
 /* MAIN -- Entry point of mkpkg.e

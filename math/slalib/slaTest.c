@@ -54,7 +54,8 @@
 
 #if HAVE_FC_MAIN
 void FC_MAIN ( void );
-void FC_MAIN ( ) {}
+void 
+FC_MAIN (void) {}
 #endif
 
 

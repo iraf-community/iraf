@@ -3,8 +3,8 @@
 
 /* HTONS -- [MACHDEP] Convert a short integer in host format to net format.
  */
-htons (word)
-short	word;
+int 
+htons (int word)
 {
 	register char *wp;
 	static	short w;

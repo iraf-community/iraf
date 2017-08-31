@@ -3,8 +3,8 @@
 
 /* HTONL -- [MACHDEP] Convert a long integer in host format to net format.
  */
-htonl (lword)
-long	lword;
+int 
+htonl (long lword)
 {
 	register char *ip, *op;
 	static	long hostw, netw;

@@ -9,8 +9,7 @@
  * so that it can be replaced by a user exit procedure.
  */
 int
-exit_ (code)
-XINT *code;
+exit_ (long int *code)
 {
 	exit (*code);
 	return (XOK);

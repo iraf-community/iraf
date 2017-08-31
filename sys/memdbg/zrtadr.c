@@ -8,7 +8,8 @@
  * and normally written in assembler.
  */
 
-zrtadr_()
+int 
+zrtadr_ (void)
 {
 	return (0);
 }
