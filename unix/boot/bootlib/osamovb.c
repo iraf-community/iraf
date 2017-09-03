@@ -17,12 +17,14 @@ os_amovb (
 {
 	XCHAR	*a_wp, *b_wp;
 	XINT	a_off, b_off;
+	XINT	n_wp;
 
 	extern void BYTMOV();
 
 
 	a_wp = (XCHAR *)a;
 	b_wp = (XCHAR *)b;
+	n_wp = nbytes;
 
 	/* The following offsets can be something other than one if the
 	 * buffers are not word aligned.
@@ -30,5 +32,5 @@ os_amovb (
 	a_off = a - (char *)a_wp + 1;
 	b_off = b - (char *)b_wp + 1;
 	
-	BYTMOV (a_wp, &a_off, b_wp, &b_off, &nbytes);
+	BYTMOV (a_wp, &a_off, b_wp, &b_off, &n_wp);
 }
