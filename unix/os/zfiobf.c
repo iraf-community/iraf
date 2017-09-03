@@ -794,7 +794,8 @@ vm_connect (void)
 static void
 vm_shutdown (void)
 {
-	int status;
+	XINT status;
+	XINT fd = vm_server;
 	extern  int  ZCLSND();
 
 	if (vm_server) {
@@ -802,7 +803,7 @@ vm_shutdown (void)
 		fprintf (stderr,
 		    "vmclient (%s): shutdown server connection\n", vm_client);
 	    vm_write (vm_server, "bye\n", 4);
-	    ZCLSND (&vm_server, &status);
+	    ZCLSND (&fd, &status);
 	}
 	vm_server = 0;
 }
