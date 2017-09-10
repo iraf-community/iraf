@@ -40,7 +40,7 @@ if [ $build_cfitsio = 1 ] ; then
      make clean 	     ; \
      make 	     ; \
      make install     ; \
-     make clean        ) | tee -a _spool 2>&1
+     make distclean        ) | tee -a _spool 2>&1
     echo "done"
 
 fi
@@ -54,7 +54,7 @@ if [ $build_readline = 1 ] ; then
 
     echo -n "    Building Readline libs ...."
     opts="$gopts  --disable-shared --bindir=../../bin --libdir=../../bin"
-    (cd readline ; mkpkg ; make clean ) | tee -a _spool 2>&1
+    (cd readline ; mkpkg ) | tee -a _spool 2>&1
     echo "done"
 
 fi

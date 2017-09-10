@@ -25,7 +25,7 @@ libs:
 	    !make libreadline.a | tee spool
 	    !mv libreadline.a ../../bin
 	$endif
-	!make clean
+	!make distclean
 	!rm -rf Makefile *spool*
 	;
 
