@@ -69,7 +69,7 @@ case "$MACH" in
 
   "linux64")
     export HSI_CF="-g -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -m64"
-    export HSI_XF="-g -Inolibc -w -/m64 -/Wunused"
+    export HSI_XF="-x -Inolibc -w -/m64 -/Wunused"
     export HSI_FF="-g -m64 -DBLD_KERNEL"
     export HSI_LF="-m64 "
     export HSI_F77LIBS=""
