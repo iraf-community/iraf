@@ -102,6 +102,31 @@ cl> hello
 Hello, world!
 ```
 
+## SPP debugging info
+
+This is a test for [#98](https://github.com/iraf/iraf-v216/pull/98).
+
+XC is able to keep the line number of the main file, for
+debugging. This is done with the `-x` flag:
+
+```
+cl> softools
+cl> xc -x -f hello.x
+cl> system
+cl> tail hello.f nlines=22 | head nlines=11
+      subroutine thelld ()
+      integer*2 st0001(14)
+      save
+      integer iyy
+      data (st0001(iyy),iyy= 1, 8) / 72,101,108,108,111, 44,119,111/
+      data (st0001(iyy),iyy= 9,14) /114,108,100, 33, 10, 0/
+#line 5 "hello.x"
+         call xprinf(st0001)
+100      call zzepro
+         return
+      end
+```
+
 ## The `generic` preprocessor
 
 The `generic` preprocessor is used to translate generic source code (code
