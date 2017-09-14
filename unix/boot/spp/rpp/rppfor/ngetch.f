@@ -81,6 +81,7 @@
       linect (level) = n - 1
 23006 continue
 23004 continue
+      if (.not.(linect (level) .gt. 0))goto23003
       linect (level) = linect (level) + 1
 23003 continue
       goto 23001

@@ -13,7 +13,7 @@
 
     # If dbgout is enabled output the "#line" statement.
     if (dbgout == YES) {
-	if (body == YES | dbglev != level) {
+	if ((body == YES | dbglev != level) & linect (level) > 0) {
 	    op = 1
 	    for (ip=1;  s_line(ip) != EOS;  ip=ip+1) {
 		obuf(op) = s_line(ip)
