@@ -23,7 +23,7 @@ export	RANLIB=ranlib
 
 export XC_CFLAGS="-I${iraf}include ${CFLAGS} -g -Wall -O2"
 export HSI_CF="${XC_CFLAGS}"
-export HSI_XF="-g -Inolibc -/Wall -/O2"
+export HSI_XF="-x -Inolibc -/Wall -/O2"
 export HSI_FF="-g -DBLD_KERNEL -O2"
 export HSI_LF=""
 export HSI_F77LIBS=""

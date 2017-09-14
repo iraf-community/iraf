@@ -812,6 +812,7 @@ skip_helpblock (void)
 	    if (istkptr == 0)
 	        linenum[istkptr]++;
         }
+	linenum[istkptr]++;
 }
 
 
@@ -878,7 +879,6 @@ parse_task_statement (void)
 		if ((ch = nextch()) != '\n')
 		    yy_unput (ch);
 	    } else if (ch == '\n') {
-		linenum[istkptr]++;
 		ntasks++;			/* end of task statement */	
 		break;
 	    } else
@@ -1143,7 +1143,6 @@ begin_code (void)
 	setcontext (BODY);
 	d_runtime (text);  outstr (text);
 	outstr ("begin\n");
-	linenum[istkptr]++;
 
 	/* Initialization. */
 	nbrace = 0;
