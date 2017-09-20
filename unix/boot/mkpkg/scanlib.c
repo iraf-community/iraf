@@ -37,7 +37,6 @@ int	mlb_op = 0;			/* index into string buffer	*/
 int	mlb_index[MAX_LIBFILES];	/* sbuf indices for each symbol	*/
 long	mlb_fdate[MAX_LIBFILES];	/* file date of each module	*/
 int	mlb_modified;			/* modified flag		*/
-char	*mlb_filename();
 
 struct	dbentry {			/* module entry on disk		*/
 	long	fdate;
@@ -252,8 +251,8 @@ err:
 long
 h_ardate (char *fname)
 {
-	extern	char *makeobj();
-	long	mlb_getdate();
+	extern	char *makeobj(char *fname);
+	long	mlb_getdate(char *modname);
 
 	return (mlb_getdate (makeobj (fname)));
 }

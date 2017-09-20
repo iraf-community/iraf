@@ -61,8 +61,16 @@ static	XLONG offset = 0;
 
 static  int os_mtname (char *fname, char *osdev);
 
-extern  int ZZOPMT(), ZOPNBF(), ZCLSBF(), ZZCLMT();
-extern  int ZARDBF(), ZAWTBF(), ZZRDMT(), ZZWTMT(), ZAWRBF(), ZZWRMT();
+extern  int ZZOPMT(PKCHAR *device, XINT *acmode, PKCHAR *devcap, XINT *devpos, XINT *newfile, XINT *chan);
+extern	int ZOPNBF(PKCHAR *osfn, XINT *mode, XINT *chan);
+extern	int ZCLSBF(XINT *fd, XINT *status);
+extern	int ZZCLMT(XINT *chan, XINT *devpos, XINT *o_status);
+extern  int ZARDBF(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
+extern	int ZAWTBF(XINT *fd, XINT *status);
+extern	int ZZRDMT(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
+extern	int ZZWTMT(XINT *chan, XINT *devpos, XINT *o_status);
+extern	int ZAWRBF(XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
+extern	int ZZWRMT(XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
 
 
 
@@ -76,7 +84,7 @@ tape_open (
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	chan;
-	extern  char *vfn2osfn();
+	extern  char *vfn2osfn(char *vfn, int new);
 
 
 	if (strcmp (fname, "stdin") == 0) {

@@ -38,7 +38,7 @@ struct dir {
 
 static	int _getfile(DIR *dir, char *outstr, int maxch);
 static	int d_compar(char *a, char *b);
-static	void d_qsort(char *base, int n, int size, int (*compar) (/* ??? */));
+static	void d_qsort(char *base, int n, int size, int (*compar) (char *a, char *b));
 static	char *sbuf;
 static	int *soff;
 static	int nentries;
@@ -259,7 +259,7 @@ d_compar (char *a, char *b)
 #undef max
 #endif
 
-static  int (*qcmp)();			/* the comparison routine */
+static  int (*qcmp)(char *a, char *b);	/* the comparison routine */
 static  int qsz;			/* size of each record */
 static  int thresh;			/* THRESHold in chars */
 static  int mthresh;			/* MTHRESHold in chars */
@@ -270,7 +270,7 @@ static	void d_qst(char *base, char *max);
  * Sound simple? It's not...
  */
 static void
-d_qsort (char *base, int n, int size, int (*compar)())
+d_qsort (char *base, int n, int size, int (*compar)(char *a, char *b))
 {
 	register char c, *i, *j, *lo, *hi;
 	char	*min, *max;

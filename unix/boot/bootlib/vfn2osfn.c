@@ -15,7 +15,7 @@
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
-extern	char	*os_getenv();
+extern	char	*os_getenv(char *envvar);
 
 
 #ifdef NOVOS
@@ -85,7 +85,7 @@ vfn2osfn (
 	PKCHAR	upkvfn[SZ_PATHNAME+1];
 	int	err;
 
-        extern  void  _envinit();
+        extern  void  _envinit(void);
 
 
 

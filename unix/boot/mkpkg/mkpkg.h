@@ -105,24 +105,19 @@ struct	sfile {
 
 /* External functions.
  */
-struct	sfile	*sf_dirsearch(), *sf_filesearch();
-struct	context *push_context();
-struct	context *pop_context();
-char	*vfn2osfn();
-char	*os_getenv();
-char	*mklower();
-char	*getargs();
-char	*makeobj();
-char	*getsym();
-char	*putstr();
-/*
-char	*malloc();
-char	*calloc();
-*/
-long	os_fdate();
-long	m_fdate();
-char	*index();
-char	*k_fgets();
+struct	sfile	*sf_dirsearch(char *dirname), *sf_filesearch(struct sfile *sflist, char *stname);
+struct	context *push_context(register struct context *cx, char *module, char *newdir, char *fname);
+struct	context *pop_context(register struct context *cx);
+char	*vfn2osfn(char *, int);
+char	*os_getenv(char *);
+char	*mklower(char *s);
+char	*getargs(register struct context *cx);
+char	*makeobj(char *fname);
+char	*getsym(char *name);
+char	*putstr(char *s);
+long	os_fdate(char *);
+long	m_fdate(char *fname);
+char	*k_fgets(char *op, int maxch, register struct context *cx);
 
 
 /*****************************************************************************/

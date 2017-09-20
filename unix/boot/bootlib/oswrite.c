@@ -19,7 +19,7 @@ os_write (
 	register XCHAR	*op, *otop;
 	register int	ch, n;
 	XINT	nchars, status, xfd=fd;
-	extern  int ZPUTTX();
+	extern  int ZPUTTX(XINT *fd, XCHAR *buf, XINT *nchars, XINT *status);
 
 
 	if (osfiletype == BINARY_FILE)

@@ -156,7 +156,6 @@ static char *getblock (int in);
 
 
 
-char	*getblock();
 
 
 /* MAIN -- "rtar [xtvlef] [names]".  The default operation is to extract all

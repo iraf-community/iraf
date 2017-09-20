@@ -35,7 +35,12 @@
  * during file creation and deletion.
  */
 
-extern int  ZOPNBF(), ZCLSBF (), ZARDBF (), ZAWRBF (), ZAWTBF (), ZSTTBF ();
+extern	int ZARDBF (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
+extern	int ZAWRBF (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
+extern	int ZAWTBF (XINT *fd, XINT *status);
+extern	int ZCLSBF (XINT *fd, XINT *status);
+extern	int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
+extern	int ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue);
 
 
 /* ZOPNSF -- Open a static file.  Only RO, WO, and RW modes are permitted

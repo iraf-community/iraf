@@ -23,8 +23,8 @@ ZGTIME (
 )
 {
 	struct	tms t;
-	time_t	time();
-	time_t	gmt_to_lst();
+	time_t	time(void);
+	time_t	gmt_to_lst(time_t gmt);
 	long	cpu, clkfreq;
 
 

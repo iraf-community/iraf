@@ -14,7 +14,7 @@
 #include <iraf.h>
 
 static	int lastsig;
-extern	int pr_onint();
+extern	int pr_onint(int usig, int *hwcode, int *scp);
 
 /* #define	vfork	fork */
 
@@ -43,7 +43,7 @@ ZOSCMD (
 	char	*getenv();
 	struct sigaction oldact;
 
-	extern  int _u_fmode();
+	extern  int _u_fmode(int mode);
 
 
 	cmd  = (char *)oscmd;

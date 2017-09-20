@@ -412,12 +412,12 @@ static char vm_client[SZ_CNAME+1];
 
 extern char *getenv();
 extern char *realpath();
-static void vm_initialize();
-static void vm_shutdown();
-static void vm_identify();
-static int vm_write();
-static int vm_connect();
-static int getstr();
+static void vm_initialize(void);
+static void vm_shutdown(void);
+static void vm_identify(void);
+static int vm_write(int fd, char *buf, int nbytes);
+static int vm_connect(void);
+static int getstr(char **ipp, char *obuf, int maxch, int delim);
 
 
 
@@ -759,7 +759,7 @@ vm_connect (void)
 	XINT fd;
 	int status = 0;
 
-	extern int ZOPNND();
+	extern int ZOPNND(PKCHAR *pk_osfn, XINT *mode, XINT *chan);
 
 
 	/* Already connected? */
@@ -796,7 +796,7 @@ vm_shutdown (void)
 {
 	XINT status;
 	XINT fd = vm_server;
-	extern  int  ZCLSND();
+	extern  int  ZCLSND(XINT *fd, XINT *status);
 
 	if (vm_server) {
 	    if (vm_debug)

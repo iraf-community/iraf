@@ -18,7 +18,7 @@ os_createfile (
 	static	XINT xmode = NEW_FILE;
 	PKCHAR	*osfn = (PKCHAR *) vfn2osfn (fname, 1);
 	XINT	chan;
-	extern  int ZOPNTX();
+	extern  int ZOPNTX(PKCHAR *osfn, XINT *mode, XINT *chan);
 
 
 	if (bdebug)

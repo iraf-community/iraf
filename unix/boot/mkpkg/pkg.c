@@ -705,7 +705,7 @@ up_to_date (
 )
 {
 	long	armod_date, newest_date, date;
-	long	h_ardate();
+	long	h_ardate(char *fname);
 	char	*fname;
 	int	old, i;
 
@@ -765,7 +765,7 @@ int
 open_mkpkgfile (register struct context *cx)
 {
 	register char	*fname = cx->mkpkgfile;
-	struct	context *find_mkpkgfile();
+	struct	context *find_mkpkgfile(struct context *head_cx, char *mkpkgfile, int level);
 	struct	context *ax;
 	
 	if (strcmp (fname, "stdin") == 0 || strcmp (fname, "STDIN") == 0) {
@@ -792,7 +792,7 @@ open_mkpkgfile (register struct context *cx)
 void
 close_mkpkgfile (register struct context *cx)
 {
-	struct context *find_mkpkgfile();
+	struct context *find_mkpkgfile(struct context *head_cx, char *mkpkgfile, int level);
 
 	if (cx->fp != stdin)
 	    if (find_mkpkgfile (cx->prev, cx->mkpkgfile, cx->level) == NULL)
@@ -832,7 +832,7 @@ search_mkpkgfile (register struct context *cx)
 {
 	char	word1[SZ_FNAME+1], word2[SZ_FNAME+1];
 	char	*prev, *curr, *temp;
-	int	tok, gettok();
+	int	tok, gettok(register struct context *cx, char *outstr, int maxch);
 
 	if (debug) {
 	    printf ("search_mkpkgfile (file=%s, library=%s)\n",

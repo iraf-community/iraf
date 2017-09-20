@@ -55,7 +55,7 @@ ZDVALL (
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 
-	extern int ZOSCMD ();
+	extern int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
 
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
@@ -188,7 +188,7 @@ u_allocstat (
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 	XINT	x_status;
 
-	extern int ZOSCMD();
+	extern int ZOSCMD(PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
 
 
 	/* Syntax: $host/hlib/alloc.e -s aliases

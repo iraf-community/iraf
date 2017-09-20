@@ -39,7 +39,7 @@ void
 pr_enter (int pid, int inchan, int outchan)
 {
 	register struct proctable *pr;
-	struct	proctable *pr_findpid();
+	struct	proctable *pr_findpid(int pid);
 
 	extern  int kernel_panic (char *msg);
 
@@ -65,7 +65,7 @@ pr_wait (int pid)
 	register struct proctable *pr;
 	int	error_code;
 	pid_t	waitpid;
-	struct	proctable *pr_findpid();
+	struct	proctable *pr_findpid(int pid);
 	int	exit_status;
 
 
@@ -116,7 +116,7 @@ int
 pr_getipc (int pid, int *inchan, int *outchan)
 {
 	register struct proctable *pr;
-	struct	proctable *pr_findpid();
+	struct	proctable *pr_findpid(int pid);
 
 
 	/* Lookup process in table.  Return ERR if there is no entry.

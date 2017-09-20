@@ -187,7 +187,7 @@ int
 ZCLCPR (XINT *pid, XINT *exit_status)
 {
 	int	inchan, outchan;
-	extern  int pr_getipc(), pr_wait();
+	extern  int pr_getipc(int pid, int *inchan, int *outchan), pr_wait(int pid);
 
 
 	if (pr_getipc ((int)*pid, &inchan, &outchan) == ERR)

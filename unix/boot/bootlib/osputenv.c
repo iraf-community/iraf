@@ -38,7 +38,7 @@ os_putenv (
 	XCHAR	x_name[SZ_FNAME+1];
 	XCHAR	x_value[SZ_VALUE+1];
 	char	buf[SZ_VALUE], *env;
-	extern  void ENVRESET();
+	extern  void ENVRESET(XCHAR *key, XCHAR *value);
 
 
 	/* Set the VOS environment. */

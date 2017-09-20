@@ -21,7 +21,7 @@ int	verbose;		/* print names of deleted files		*/
 int	execute;		/* permission to delete files		*/
 int	debug;			/* print debugging info			*/
 
-extern	char *vfn2osfn();
+extern	char *vfn2osfn(char *, int);
 
 
 extern int  ZZSTRT (void);

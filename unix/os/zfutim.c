@@ -31,7 +31,7 @@ ZFUTIM (
 	XINT	offset = 0;
 	int	stat(), utime();
 
-	extern  int ZGMTCO ();
+	extern  int ZGMTCO (XINT  *gmtcor);
 
 
 	/* Get UNIX file info.

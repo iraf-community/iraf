@@ -18,7 +18,9 @@ os_fpathname (
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XINT	x_maxch = SZ_PATHNAME, x_nchars;
 
-	extern  int ZFGCWD(), ZFSUBD(), ZFPATH();
+	extern  int ZFGCWD(PKCHAR *outstr, XINT *maxch, XINT *status);
+	extern	int ZFSUBD(XCHAR  *osdir, XINT *maxch, XCHAR *subdir, XINT *nchars);
+	extern	int ZFPATH(XCHAR *osfn, XCHAR *pathname, XINT *maxch, XINT  *nchars);
 
 
 	if (vfn[0])

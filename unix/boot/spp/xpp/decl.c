@@ -63,9 +63,6 @@ static	int  proctype;			/* procedure type if function	*/
 static	struct symbol sym[MAX_SYMBOLS];	/* symbol table			*/
 static	int nsym = 0;			/* number of symbols		*/
 
-struct	symbol *d_enter();
-struct	symbol *d_lookup();
-
 extern  void error (int errcode, char *errmsg);
 extern  void xpp_warn (char *warnmsg);
 extern  int  yy_input (void);

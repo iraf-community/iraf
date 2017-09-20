@@ -33,7 +33,7 @@ ZFMKCP (
 	int	fd, mode;
 	XINT	prot;
 
-	extern  int ZFPROT();
+	extern  int ZFPROT(PKCHAR *fname, XINT *action, XINT *status);
 
 
 	/* Get directory information for the old file.  Most of the file

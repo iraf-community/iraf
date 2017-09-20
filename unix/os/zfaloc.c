@@ -29,7 +29,7 @@ ZFALOC (
 	int	fd;
 	off_t	lseek();
 	extern	char *getenv();
-	extern  int  _u_fmode();
+	extern  int  _u_fmode(int mode);
 
 
 	if ((fd = creat ((char *)fname, _u_fmode(FILE_MODEBITS))) == ERR) {

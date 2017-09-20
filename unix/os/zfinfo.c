@@ -25,7 +25,7 @@ ZFINFO (
 	struct	stat osfile;
 	struct	_finfo *fs;
 	struct	passwd *getpwuid();
-	time_t	gmt_to_lst();
+	time_t	gmt_to_lst(time_t gmt);
 	int	stat();
 
 	/* Get UNIX file info.

@@ -1029,7 +1029,7 @@ extern	int context;			/* lexical context flags	*/
 extern  int ntasks;
 static	int dtype;			/* set if typed procedure	*/
 
-extern  char *vfn2osfn();
+extern  char *vfn2osfn(char *vfn, int new);
 extern  void skipnl (void);
 
 

@@ -16,7 +16,7 @@ os_subdir (
 	static	XCHAR x_path[SZ_PATHNAME+1];
 	XCHAR	x_subdir[SZ_FNAME+1];
 	XINT	x_maxch = SZ_PATHNAME, x_nchars;
-	extern  int ZFSUBD();
+	extern  int ZFSUBD(XCHAR *osdir, XINT *maxch, XCHAR *subdir, XINT *nchars);
 
 
 	os_strupk (dir,    x_path,   SZ_PATHNAME);

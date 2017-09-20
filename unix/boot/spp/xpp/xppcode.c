@@ -35,7 +35,7 @@
  */
 
 
-extern	char *vfn2osfn();
+extern	char *vfn2osfn(char *, int);
 
 /* Escape sequence characters and their binary equivalents.
  */
@@ -327,8 +327,8 @@ findkw (void)
 void
 mapident (void)
 {
-	int     i, findkw();
-	char	*str_fetch();
+	int     i, findkw(void);
+	char	*str_fetch(register char *strname);
 	register char *ip, *op;
 
 	/* If not keyword and not defined string, output as is.  The first
@@ -1336,7 +1336,7 @@ do_string (
 	register char ch, *ip;
 	register struct string *s;
 	int	readstr = 1;
-	char    *str_uniqid();
+	char    *str_uniqid(void);
 
 	/* If we run out of space for string storage, print error message,
 	 * dump string decls out early, clear buffer and continue processing.
@@ -1401,7 +1401,7 @@ sterr:		    error (XPP_SYNTAX, "String declaration syntax");
 	    if (!(delim == '"' || delim == '\'')) {
 		register char *ip, *op;
 		int	ch;
-		char	*str_fetch();
+		char	*str_fetch(register char *strname);
 
 		/* Fetch name of defined macro into yytext.
 		 */
@@ -1691,7 +1691,7 @@ void
 int_constant (char *string, int base)
 {
 	char    decimal_constant[SZ_NUMBUF], *p;
-	long    accum(), value;
+	long    accum(int base, char **strp), value;
 	int     i;
 
 	p = string;
