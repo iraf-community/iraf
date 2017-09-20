@@ -86,7 +86,6 @@ ZFPROT (
 static int
 chk_prot (char *fname, char *link_name)
 {
-	int	access();
 	struct	stat file1, file2;
 
 	if (access(link_name,0) == ERR)

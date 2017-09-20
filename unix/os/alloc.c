@@ -102,7 +102,6 @@ alloc (
 {
 	register int ruid, mode, i;
 	register struct file *fp;
-	struct	passwd *getpwuid();
 	int	rgid;
 
 	if (findsfs (argv) == 0)

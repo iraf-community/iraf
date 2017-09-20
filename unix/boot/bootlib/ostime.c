@@ -19,7 +19,6 @@ static	long os_timezone(void);
 long
 os_utime (long iraf_time)
 {
-	struct	tm *localtime();
 	time_t	time_var, lst;
 
 	lst = (time_t)iraf_time;
@@ -41,7 +40,7 @@ os_utime (long iraf_time)
 long
 os_itime (long unix_time)
 {
-	struct	tm *localtime();
+	struct	tm *localtime(const time_t *);
 	time_t	time_var, gmt;
 
 	gmt = (time_t)unix_time;

@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -23,7 +24,6 @@
 unsigned int defworkset = SZ_DEFWORKSET;
 unsigned int maxworkset = SZ_MAXWORKSET;
 static unsigned int max_wss = 0;
-extern char *getenv();
 
 
 /* ZAWSET -- Adjust or query the "working set", i.e., the maximum amount of
@@ -39,7 +39,7 @@ ZAWSET (
 {
 	int physmem=0, kb_page;
 	int debug = (getenv(ENV_DEBUG) != NULL);
-	char *s, *getenv();
+	char *s;
 
 	unsigned int working_set_size;
 	struct rlimit rlp;

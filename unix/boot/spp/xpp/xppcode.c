@@ -1535,7 +1535,6 @@ void
 traverse (char delim)
 {
 	register char *op, *cp, ch;
-	char	*index();
 
 
 	for (op=yytext;  (*op = yy_input()) != EOF;  op++) {
@@ -1560,7 +1559,7 @@ traverse (char delim)
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
 		    continue;
-		} else if ((cp = index (esc_ch, *op)) != NULL) {
+		} else if ((cp = strchr (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
 		} else if (isdigit (*op)) {	/* '\0DD' octal constant */
 		    *op -= '0';
@@ -1659,7 +1658,7 @@ int
 charcon (char *string)
 {
 	register char *ip, ch;
-	char	*cc, *index();
+	char	*cc;
 	char    *nump;
 
 	ip = string + 1;		/* skip leading apostrophe	*/
@@ -1668,7 +1667,7 @@ charcon (char *string)
 	/* Handle '\c' and '\0dd' notations.
 	 */
 	if (ch == '\\') {
-	    if ((cc = index (esc_ch, *ip)) != NULL) {
+	    if ((cc = strchr (esc_ch, *ip)) != NULL) {
 		return (esc_val[cc-esc_ch]);
 	    } else if (isdigit (*ip)) {
 		nump = ip;

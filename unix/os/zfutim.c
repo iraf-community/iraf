@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <utime.h>
 
 #define	import_kernel
@@ -29,7 +30,6 @@ ZFUTIM (
 	struct	stat osfile;
 	struct	utimbuf time;
 	XINT	offset = 0;
-	int	stat(), utime();
 
 	extern  int ZGMTCO (XINT  *gmtcor);
 

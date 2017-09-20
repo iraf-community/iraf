@@ -93,7 +93,7 @@ ZDVOWN (
 {
 	register int	uid;
 	char	*dev, devname[SZ_FNAME+1];
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw;
 	struct	stat fi;
 
 
@@ -150,7 +150,7 @@ int
 loggedin (int uid)
 {
 	struct	utmpx ubuf;
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw;
 	FILE	*ufp;
 
 	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {

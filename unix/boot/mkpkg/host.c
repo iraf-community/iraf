@@ -808,7 +808,6 @@ resolvefname (char *fname)
 {
 	static char pathname[SZ_LIBPATH];
 	char relpath[SZ_LIBPATH];
-	extern char *strrchr();
 
 	strcpy (pathname, fname);
 	while (os_symlink (pathname, relpath, SZ_LIBPATH)) {

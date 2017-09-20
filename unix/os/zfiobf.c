@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 # ifndef O_NDELAY
@@ -186,7 +187,6 @@ ZARDBF (
 	register int fd;
 	off_t fileoffset;
 	int aligned;
-	off_t lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];
@@ -236,7 +236,6 @@ ZAWRBF (
 	register int fd;
 	register struct	fiodes *kfp;
 	off_t fileoffset;
-	off_t lseek();
 	int aligned;
 
 	fd = *chan;
@@ -410,8 +409,6 @@ static int dio_threshold  = DEF_DIOTHRESH;
 static int vm_port 	  = DEF_VMPORT;
 static char vm_client[SZ_CNAME+1];
 
-extern char *getenv();
-extern char *realpath();
 static void vm_initialize(void);
 static void vm_shutdown(void);
 static void vm_identify(void);

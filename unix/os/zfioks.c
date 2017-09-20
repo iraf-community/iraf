@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/types.h>
@@ -154,9 +155,6 @@ int	debug_ks = 0;			/* print debug info on stderr	  */
 char	debug_file[64] = "";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
-extern	uid_t getuid();
-extern	char *getenv();
-extern	char *strerror();
 static	jmp_buf jmpbuf;
 static	int jmpset = 0;
 static	int recursion = 0;

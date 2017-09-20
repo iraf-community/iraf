@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -30,7 +31,6 @@ static	char osfn_bkgfile[SZ_PATHNAME];
 static	XINT ipc_in = 0, ipc_out = 0;
 static	XINT ipc_isatty = NO;
 static	XINT prtype;
-char	*getenv();
 
 
 /* MAIN -- UNIX Main routine for IRAF processes.  The process is a C process
