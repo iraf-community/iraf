@@ -413,6 +413,7 @@ do_include()
 	 * first line of include file.
 	 */
 	unput ('\n');
+	linenum[istkptr-1] -= 1;
 
 	yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
         BEGIN(INITIAL);
