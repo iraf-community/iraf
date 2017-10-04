@@ -185,3 +185,5 @@ The following tests are available so far:
    mainly from the test procedure document written by Jeanette Barnes and 
    her "Beginner's Guide to Using IRAF",
  * [Programming interface](programming.md) for basic CL and SPP functionality,
+ * Test from the examples in several packages:
+    - [`lists`](lists.md),
