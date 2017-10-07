@@ -279,9 +279,9 @@ begin
 		# the pushback stack is empty (end of VFN).
 
 		pbsp = pbsp - 1				# pop old ip off stk
-		ip = pb_stack[pbsp]
 		if (pbsp == 0)				# --- all done
 		    break
+		ip = pb_stack[pbsp]
 
 	    } else if (ch == ESCAPE) {
 		# Escaped characters are passed straight to the output.
