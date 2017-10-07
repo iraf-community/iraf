@@ -33,7 +33,7 @@ define	done_		99
 
 begin
 	# Initialize strings.
-	call aclrc (baseurl, SZ_LINE)
+	call aclrc (baseurl, SZ_FNAME)
 	call aclrc (release, SZ_LINE)
 	call aclrc (ref_file, SZ_LINE)
 	call aclrc (chkfile, SZ_LINE)
