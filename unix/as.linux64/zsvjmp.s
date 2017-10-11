@@ -31,8 +31,8 @@
 	# advantage is that references to NULL pointers are likely to cause a
 	# memory violation.
 
-	.globl  _mem_
-	_mem_   =       0
+	.globl  mem_
+	mem_   =       0
 
 zsvjmp_:
 	# %rsi ... &status  %rdi ... &jumpbuf
