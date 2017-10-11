@@ -8,7 +8,7 @@ $set	SITEID		= noao		# site name
 
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"	        # default XC link flags
+$set	LFLAGS		= "-Nz -/no-pie" # default XC link flags
 
 $set	USE_LIBMAIN	= yes		# update lib$libmain.o (root object)
 $set	USE_KNET	= yes		# use the KI (network interface)
