@@ -13,7 +13,7 @@ matrix:
         apt:
           packages:
             - gcc-multilib
-            - libcurl4-gnutls-dev:i386
+            - libcurl4-openssl-dev:i386
             - libncurses5-dev:i386
             - libexpat1-dev:i386
     - os: linux
@@ -23,7 +23,7 @@ matrix:
         apt:
           packages:
             - gcc-multilib
-            - libcurl4-gnutls-dev:i386
+            - libcurl4-openssl-dev:i386
             - libncurses5-dev:i386
             - libexpat1-dev:i386
     - os: osx
