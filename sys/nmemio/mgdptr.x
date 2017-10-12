@@ -23,6 +23,8 @@ begin
 	bufadr = fwa + (5 * SZ_INT)
 
 	modulus = mod (bufadr - fwa_align, sz_align)
+	if (modulus < 0)
+	    modulus = modulus + sz_align
 	if (modulus != 0)
 	    bufadr = bufadr + (sz_align - modulus)
 
