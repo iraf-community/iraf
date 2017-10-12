@@ -12,14 +12,21 @@ pointer	p
 include	<szdtype.inc>
 
 begin
-	p = ptr - 1
 	if (type1 == TY_CHAR) {
-	    return (p / ty_size[type2] + 1)
+	    if (ptr > 0) {
+		return ((ptr - 1) / ty_size[type2] + 1)
+	    } else {
+		return (ptr / ty_size[type2])
+	    }
 	} else if (type2 == TY_CHAR) {
-	    return (p * ty_size[type1] + 1)
+	    return ((ptr - 1) * ty_size[type1] + 1)
 	} else {
-	    p = p * ty_size[type1]				# ptr to char
+	    p = (ptr - 1) * ty_size[type1]			# ptr to char
 	    n = ty_size[type2]
-	    return (((p + n-1) / n) + 1)
+	    if (p > 0) {
+		return ((p + n-1) / n + 1)
+	    } else {
+		return (p / n + 1)
+	    }
 	}
 end
