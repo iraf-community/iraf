@@ -26,10 +26,6 @@ include "nmemio.com"
 begin
 	# Check for NULL or already-freed pointers.  We only invoke an error 
 	# rather than sys_panic to allow for recovery.
-	if (ptr < 0) {
-	    call merror ("Attempt to free already freed pointer")
-	    return 
-	}
 	if (mdebug > 0 && ptr == NULL) {
 	    call merror ("Attempt to free NULL pointer")
 	    return 
@@ -90,7 +86,6 @@ begin
 	        call mgc_update (ptr)
 	    if (mcollect >= 0)
 	        nfree = nfree + 1
-	    ptr   = - ptr
 	    ptr   = NULL
 	}
 end
