@@ -44,6 +44,7 @@ begin
 	nleaked	  = 0
 	nalloc	  = 0
 	nfree	  = 0
+	bmax      = 0
 
 	in_task	  = 1
 end
