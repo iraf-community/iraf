@@ -6,8 +6,8 @@ include <mach.h>
 #  MGC Interface - Simple memory garbage collector interface.  Our strategy
 #  here is simply to store the pointer and its type (so we can dereference to
 #  a host pointer).  As pointers are allocated they are saved here, and when
-#  freed the pointer value is made negative to indicate it is invalid and
-#  that slot is available for later reuse.
+#  freed the pointer value is set to NULL to indicate it is invalid and that
+#  slot is available for later reuse.
 #	When a task completes, we run through the buffer looking for un-freed
 #  pointers and manually reclaim the space.  This is not especially clever but
 #  we are only used (presumably by developers) when requested so normal use
@@ -64,7 +64,7 @@ procedure mgc_save (ptr, dtype)
 pointer	ptr					#i pointer to save
 int	dtype					#i pointer type
 
-int	i, bmax
+int	i
 
 include "nmemio.com"
 
@@ -72,13 +72,14 @@ begin
 	if (mcollect <= 0 || mgc == NULL)
 	    return
 
-	bmax = SZ_GC_BUFFER - 1
-	for (i=0; i < bmax; i=i+1) {
-	    if (GC_PTR(mgc,i) <= 0) {
-		# Space is re-used if negative, otherwise first free slot.
+	for (i=0; i < SZ_GC_BUFFER - 1; i=i+1) {
+	    if (GC_PTR(mgc,i) == NULL) {
+		# Either already freed slot, or the first free one
 		GC_PTR(mgc,i) = ptr
 		GC_TYPE(mgc,i) = dtype
-
+		if (bmax < i) {
+		    bmax = i
+		}
 		if (mdebug > 0) {
 		    call eprintf ("save %d: ptr 0x%x\n")
 		        call pargi (i); call pargi (GC_PTR(mgc,i))
@@ -101,7 +102,7 @@ procedure mgc_update (ptr)
 
 pointer	ptr					#i pointer to save
 
-int	i, bmax
+int	i
 
 include "nmemio.com"
 
@@ -115,18 +116,15 @@ begin
 	    call pargi (mcollect)
 	}
 
-	bmax = SZ_GC_BUFFER - 1
 	do i = 0, bmax {
 	    if (GC_PTR(mgc,i) == ptr) {
 		if (in_task > 0 && mdebug > 0) {
 	  	    call eprintf ("update  %d:  0x%x  %d\n")
 	    	    call pargi (i); call pargi (GC_PTR(mgc,i)); call pargi (ptr)
 		}
-	        GC_PTR(mgc,i) = (- ptr)
+	        GC_PTR(mgc,i) = NULL
 		return
 	    }
-	    if (GC_PTR(mgc,i) == NULL)
-		return
 	}
 end
 
@@ -137,7 +135,7 @@ int procedure mgc_getindex (ptr)
 
 pointer	ptr					#i pointer to save
 
-int	i, bmax
+int	i
 
 include "nmemio.com"
 
@@ -145,12 +143,9 @@ begin
 	if (mcollect <= 0 || mgc == NULL)
 	    return
 
-	bmax = SZ_GC_BUFFER - 1
 	do i = 0, bmax {
 	    if (abs (GC_PTR(mgc,i)) == ptr)
 		return (i)
-	    if (GC_PTR(mgc,i) == NULL)
-		return (NULL)
 	}
 
 	return (NULL)
@@ -163,7 +158,7 @@ int procedure mgc_gettype (ptr)
 
 pointer	ptr					#i pointer to save
 
-int	i, bmax
+int	i
 
 include "nmemio.com"
 
@@ -171,12 +166,9 @@ begin
 	if (mcollect <= 0 || mgc == NULL)
 	    return
 
-	bmax = SZ_GC_BUFFER - 1
 	do i = 0, bmax {
 	    if (abs (GC_PTR(mgc,i)) == ptr)
 		return (GC_TYPE(mgc,i))
-	    if (GC_PTR(mgc,i) == NULL)
-		return (NULL)
 	}
 
 	return (NULL)
@@ -187,7 +179,7 @@ end
 
 procedure mgc_collect ()
 
-int	i, bmax, nchars
+int	i, nchars
 pointer	bp
 
 int	sizeof ()
@@ -200,9 +192,8 @@ begin
 	    return
 	mcollect = -1
 
-	bmax = SZ_GC_BUFFER - 1
 	do i = 0, bmax {
-	    if (GC_PTR(mgc,i) > 0) {
+	    if (GC_PTR(mgc,i) != NULL) {
 		if (mdebug > 0) {
 		    call eprintf ("collect %d: recovering ptr 0x%x\n")
 		        call pargi (i); call pargi (GC_PTR(mgc,i))
@@ -216,7 +207,6 @@ begin
 
 		call mfree (GC_PTR(mgc,i), GC_TYPE(mgc,i))
 
-	    } else if (GC_PTR(mgc,i) == NULL)
-		return
+	    }
 	}
 end

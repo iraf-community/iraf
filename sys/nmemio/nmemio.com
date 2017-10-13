@@ -17,10 +17,11 @@ int 	nfree				# total number of frees
 int	mdebug				# debugging memory use in tasks?
 int	in_task				# in task or iraf main?
 
+int	bmax                            # current maximum number of pointers
 pointer	mgc				# garbage collection buffer
 
 #  Debug common
 common	/nmemio/ mclear, mwatch, mcollect, mreport, lsentinal, usentinal,
 		 mem_used, max_alloc, nleaked, leaked, nalloc, nfree, 
-		 mdebug, in_task, mgc
+		 mdebug, in_task, bmax, mgc
 
