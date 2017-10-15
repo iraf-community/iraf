@@ -28,8 +28,8 @@ libvops.a:
 
 	# The following contain machine dependent constants.
 	hlib$i1mach.f
-	hlib$d1mach.f
-	hlib$r1mach.f
+	d1mach.c
+	r1mach.c
 
 	# The following should normally be optimized in assembler (see the
 	# special file list in "hlib$mkpkg.sf").
