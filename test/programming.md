@@ -124,6 +124,65 @@ cl> tail hello.f nlines=22 | head nlines=11
       end
 ```
 
+Some limits are defined by the `R1MACH` and `D1MACH` functions. We
+just test some very basic properties of these numbers:
+
+File: `machtest.x`
+```
+task machtest = t_machtest
+procedure t_machtest ()
+real r1mach()
+double d1mach()
+int i
+int failures
+begin
+
+# Check that all values are positive numbers
+
+    failures = 0
+    do i=1, 5 {
+        if (! (r1mach(i) == r1mach(i))) {
+            call printf("R1MACH(%d) is not a number\n")
+	         call pargi(i)
+            failures = failures + 1
+        } else if (r1mach(i) <= 0) {
+            call printf("R1MACH(%d) is not positive\n")
+	         call pargi(i)
+            failures = failures + 1
+	}
+    }
+    call printf("\n")
+    do i=1, 5 {
+        if (! (d1mach(i) == d1mach(i))) {
+            call printf("D1MACH(%d) is not a number\n")
+	         call pargi(i)
+            failures = failures + 1
+        } else if (d1mach(i) <= 0) {
+            call printf("D1MACH(%d) is not positive\n")
+	         call pargi(i)
+            failures = failures + 1
+	}
+    }
+    if (failures == 0) {
+        call printf("Simple consistency check passed.\n")
+    } else {
+        call printf("Simple consistency check has %d failures\n")
+        call pargi(failures)
+    }
+end
+```
+Running this should give:
+
+```
+cl> softools
+cl> xc machtest.x
+cl> task $machtest = machtest.e
+cl> machtest
+
+Simple consistency check passed.
+```
+
+
 ## The `generic` preprocessor
 
 The `generic` preprocessor is used to translate generic source code (code
