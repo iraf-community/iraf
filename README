@@ -11,8 +11,8 @@ contents of this directory include:
     bin.generic		Generic architecture (should always be empty)
     bin.linux		32-bit Linux binaries
     bin.linux64		64-bit Linux binaries
-    bin.macintel	32-bit Mac OSX (Intel) binaries
-    bin.macosx		64-bit Mac OSX (Intel) binaries
+    bin.macosx		32-bit Mac OSX (Intel) binaries
+    bin.macintel	64-bit Mac OSX (Intel) binaries
     dev			IRAF Device definition files
     doc			IRAF System Documentation
     extern		External Packages
