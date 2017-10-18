@@ -10,7 +10,8 @@
 #
 
 # IRAF shells to be tested
-IRAF_SHELLS="cl.e ecl.e vocl.e"
+#IRAF_SHELLS="cl.e ecl.e vocl.e"
+IRAF_SHELLS="ecl.e"
 
 if [ -z "$iraf" ] ; then
     export iraf=$(cd $(dirname $0)/..; pwd)/
