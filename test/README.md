@@ -187,3 +187,8 @@ The following tests are available so far:
  * [Programming interface](programming.md) for basic CL and SPP functionality,
  * Test from the examples in several packages:
     - [`lists`](lists.md),
+    - [`images.imcoords`](images.imcoords.md)
+    - [`images.imfilter`](images.imfilter.md)
+    - [`images.imfit`](images.imfit.md)
+    - [`images.imgeom`](images.imgeom.md)
+    - [`images.immatch`](images.immatch.md)
