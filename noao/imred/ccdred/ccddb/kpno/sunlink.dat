@@ -1,8 +1,0 @@
-subset		filters
-
-DARK		dark
-BIAS		zero
-OBJECT		object
-'DOME FLAT'	flat
-'PROJECTOR FLAT' flat
-'COMPARISON'	comp

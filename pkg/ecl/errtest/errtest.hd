@@ -1,9 +1,0 @@
-# Help directory for the CLERR (CL error recovery test) package.
-
-$clerr		= "./"
-
-# Define help files for the packages.
-
-clerr		men = clerr$clerr.men,
-		pkg = clerr$clerr.hd,
-		src = clerr$clerr.cl

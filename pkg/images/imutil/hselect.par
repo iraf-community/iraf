@@ -1,4 +1,0 @@
-images,s,a,,,,images from which selection is to be drawn
-fields,s,a,,,,fields to be extracted
-expr,s,a,,,,boolean expression governing selection
-missing,s,h,"INDEF",,,Value for missing keywords

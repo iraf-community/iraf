@@ -1,5 +1,0 @@
-# MKPKG for the IMUTIL Package
-
-libpkg.a:
-	@src
-	;

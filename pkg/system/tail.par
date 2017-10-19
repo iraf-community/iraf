@@ -1,2 +1,0 @@
-input_files,s,a,,,,list of files to be printed
-nlines,i,h,12,,,number of lines to print from each file

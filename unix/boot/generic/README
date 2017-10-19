@@ -1,3 +1,0 @@
-GENERIC -- The generic preprocessor is a simple task used to process generic
-	   code into type specific code.  A different copy of the code is output
-	   for each datatype.

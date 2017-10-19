@@ -1,5 +1,0 @@
-# Root help directory for the package.  This dummy package is
-# necessary in order to have `package' appear as a module in some package,
-# so that the user can type "help <package>" (with `package' given as a task).
-
-_vo		pkg = vo$lib/rootpackage.hd

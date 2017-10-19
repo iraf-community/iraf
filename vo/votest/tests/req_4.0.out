@@ -1,8 +1,0 @@
-------------------------------------------------------------------
-Req  4:  Users shall be able to access all DAL services supported
-         by the underlying VOClient interface (SCS/SIA/SSA in Y1).
-------------------------------------------------------------------
-Demonstration of the general data query and access is done via the
-DAL test scripts.
-
-

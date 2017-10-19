@@ -1,4 +1,0 @@
-update:
-	$call update@ccdproc
-	$call update@quad
-	;

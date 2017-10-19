@@ -1,5 +1,0 @@
-# MKPKG for the IMFIT Package
-
-libpkg.a:
-	@src
-	;

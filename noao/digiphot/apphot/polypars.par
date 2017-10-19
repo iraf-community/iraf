@@ -1,4 +1,0 @@
-# Polyphot photometry parameters
-
-zmag,r,h,25.0,,,Zero point of magnitude scale
-mkpolygon,b,h,no,,,Draw polygon on the image display
