@@ -128,16 +128,6 @@ else
 fi
 
 
-# Recent linux systems display a problem in how pointer addresses 
-# interact with the stack and can result in a segfault.  Remove the
-# stacksize limit for IRAF processes until this is better understood.
-if [ "$IRAFARCH" == "redhat" -o \
-     "$IRAFARCH" == "linux64" -o \
-     "$IRAFARCH" == "linux" ]; then
-	ulimit -s unlimited
-fi
-
-
 # Just run the CL if IRAFARCH already defined.
 if [ -n "$IRAFARCH" ]; then
     if [ -z $IRAFARCH ]; then
