@@ -54,7 +54,22 @@ Test options: `decimals=2`
 cl> copy noao$artdata/numrecipes.x .
 cl> copy noao$artdata/gammln.c .
 cl> softools
-cl> xc -I$iraf/include test-gasdev.x numrecipes.x gammln.c
+cl> xc test-gasdev.x numrecipes.x
+test-gasdev.x:
+   sys_runtask:
+   t_gasdev:
+numrecipes.x:
+   gammln:
+   poidev:
+   gasdev:
+test-gasdev.f:
+   sysruk:
+   tgasdv:
+numrecipes.f:
+   gammln:
+   poidev:
+   gasdev:
+link:
 cl> task $test_gasdev = test-gasdev.e
 cl> test_gasdev
 Mean     = 0.0004794365668388
@@ -111,7 +126,22 @@ the result of the original NR code.
 Test options: `decimals=1`
 ```
 cl> softools
-cl> xc -x -I$iraf/include test-poidev.x numrecipes.x gammln.c
+cl> xc -x test-poidev.x numrecipes.x
+test-poidev.x:
+   sys_runtask:
+   t_poidev:
+numrecipes.x:
+   gammln:
+   poidev:
+   gasdev:
+test-poidev.f:
+   sysruk:
+   tpoidv:
+numrecipes.f:
+   gammln:
+   poidev:
+   gasdev:
+link:
 cl> task $test_poidev = test-poidev.e
 cl> for ( x = 0.7; x < 60; x*=1.55)  test_poidev(x)
      xm |       mean |   variance |       skew |   kurtosis
@@ -153,7 +183,22 @@ the result of the original NR code.
 Test options: `decimals=4`
 ```
 cl> softools
-cl> xc -x -I$iraf/include test-gammln.x gammln.c
+cl> xc -x test-gammln.x numrecipes.x
+test-gammln.x:
+   sys_runtask:
+   t_gammln:
+numrecipes.x:
+   gammln:
+   poidev:
+   gasdev:
+test-gammln.f:
+   sysruk:
+   tgammn:
+numrecipes.f:
+   gammln:
+   poidev:
+   gasdev:
+link:
 cl> task $test_gammln = test-gammln.e
 cl> for ( x = 0.23; x < 10; x += 0.667)  test_gammln(x)
 gammln(0.23) = 1.376194
@@ -227,7 +272,18 @@ the result of the original NR code.
 Test options: `decimals=4`
 ```
 cl> softools
-cl> xc test-ran2.x
+cl> xc test-ran2.x daoran.x
+test-ran2.x:
+   sys_runtask:
+   t_ran2:
+daoran.x:
+   daoran:
+test-ran2.f:
+   sysruk:
+   tran2:
+daoran.f:
+   daoran:
+link:
 cl> task $test_ran2 = test-ran2.e
 cl> test_ran2
 Mean     = 0.0000018238614310
@@ -265,6 +321,31 @@ the result of the original NR code.
 cl> copy noao$astutil/asttools/asttimes.x .
 cl> softools
 cl> xc -/Wno-shift-op-parentheses test-jd.x asttimes.x
+test-jd.x:
+   sys_runtask:
+   t_jd:
+asttimes.x:
+   ast_date_to_epoch:
+   ast_epoch_to_date:
+   ast_day_of_year:
+   ast_day_of_week:
+   ast_julday:
+   ast_date_to_julday:
+   ast_julday_to_date:
+   ast_mst:
+test-jd.f:
+   sysruk:
+   tjd:
+asttimes.f:
+   astdah:
+   astepe:
+   astdar:
+   astdak:
+   astjuy:
+   astday:
+   astjue:
+   astmst:
+link:
 cl> task $test_jd = test-jd.e
 cl> for (x = 2450123.7; x < 2450123.7 + 35; x += 2.13)  test_jd(jd=x)
 JD (2450123.70) = 1996/02/10 +  4.80
@@ -448,6 +529,27 @@ end
 cl> copy pkg$utilities/nttools/stxtools/lu* .
 cl> softools
 cl> xc -x test_ludecompose.x lubksb.f  lubksd.f  ludcmd.x  ludcmp.x
+test_ludecompose.x:
+   sys_runtask:
+   eval_ludecompose:
+   t_ludecompose:
+ludcmd.x:
+   ludcmd:
+ludcmp.x:
+   ludcmp:
+lubksb.f:
+   lubksb:
+lubksd.f:
+   lubksd:
+test_ludecompose.f:
+   sysruk:
+   evalle:
+   tludee:
+ludcmd.f:
+   ludcmd:
+ludcmp.f:
+   ludcmp:
+link:
 cl> task $test_ludecompose = test_ludecompose.e
 cl> test_ludecompose
 Original matrix:
@@ -546,7 +648,24 @@ end
 ```
 cl> copy noao$rv/numrep.x .
 cl> softools
-cl> xc -x test_realfft.x numrep.x -lfftpack
+cl> xc -x test_realfft.x numrep.x
+test_realfft.x:
+   sys_runtask:
+   eval_realfft:
+   t_realfft:
+numrep.x:
+   four1:
+   realft:
+   twofft:
+test_realfft.f:
+   sysruk:
+   evalrt:
+   trealt:
+numrep.f:
+   four1:
+   realft:
+   twofft:
+link:
 cl> task $test_realfft = test_realfft.e
 cl> test_realfft
 FFT input    1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
@@ -617,7 +736,24 @@ end
 Test options: `decimals=3`
 ```
 cl> softools
-cl> xc -x test_twofft.x numrep.x -lfftpack
+cl> xc -x test_twofft.x numrep.x
+test_twofft.x:
+   sys_runtask:
+   eval_twofft:
+   t_twofft:
+numrep.x:
+   four1:
+   realft:
+   twofft:
+test_twofft.f:
+   sysruk:
+   evaltt:
+   ttwoft:
+numrep.f:
+   four1:
+   realft:
+   twofft:
+link:
 cl> task $test_twofft = test_twofft.e
 cl> test_twofft
 in 1   1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
