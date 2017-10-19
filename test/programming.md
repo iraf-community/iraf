@@ -97,6 +97,13 @@ Compile it, declare and run as an IRAF task
 ```
 cl> softools
 cl> xc hello.x
+hello.x:
+   sys_runtask:
+   t_hello_world:
+hello.f:
+   sysruk:
+   thelld:
+link:
 cl> task $hello = hello.e
 cl> hello
 Hello, world!
@@ -112,6 +119,8 @@ debugging. This is done with the `-x` flag:
 ```
 cl> softools
 cl> xc -x -f hello.x
+   sys_runtask:
+   t_hello_world:
 cl> system
 cl> tail hello.f nlines=22 | head nlines=11
       subroutine thelld ()
@@ -183,6 +192,13 @@ Running this should give:
 ```
 cl> softools
 cl> xc machtest.x
+machtest.x:
+   sys_runtask:
+   t_machtest:
+machtest.f:
+   sysruk:
+   tmacht:
+link:
 cl> task $machtest = machtest.e
 cl> machtest
 
@@ -224,6 +240,9 @@ defined variable `gval` and vice versa:
 ```
 cl> softools
 cl> xc test_equiv.x
+test_equiv.f:
+   sysruk:
+   tequiv:
 cl> task $test_equiv = test_equiv.e
 cl> test_equiv
 Should be zero: 0
@@ -266,6 +285,13 @@ integers. Compile it, declare the task in (e)cl and run it:
 ```
 cl> softools
 cl> xc otest.x
+otest.x:
+   sys_runtask:
+   t_otest:
+otest.f:
+   sysruk:
+   totest:
+link:
 cl> task $otest = otest.e
 cl> otest
 1 == 1.
@@ -322,6 +348,13 @@ restores them (and therefore goes back to the place where `ZSVJMP was called).
 ```
 cl> softools
 cl> xc -w jmptest.x
+jmptest.x:
+   sys_runtask:
+   t_jmptest:
+jmptest.f:
+   sysruk:
+   tjmptt:
+link:
 cl> task $jmptest = jmptest.e
 cl> jmptest
 status = 0, step = 0
