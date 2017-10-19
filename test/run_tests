@@ -45,16 +45,32 @@ run_test () {
     local command="$2"
     local result="$3"
     local src="$4"
+    local options="$5"
+    local skip=$(echo "$options" | tr \  \\n | grep ^skip)
+    local xfail=$(echo "$options" | tr \  \\n | grep ^xfail)
+    local archs=$(echo "$options" | tr \  \\n | grep ^arch= | cut -d= -f2)
+    local digits=$(echo "$options" | tr \  \\n | grep ^digits= | cut -d= -f2)
+    if [ "$skip" ] ; then
+	printf "s"
+	return
+    fi
+    if [ "$archs" -a -z "$(echo $archs | tr , \\n | grep ^$IRAFARCH\$)" ] ; then
+	printf "a"
+	return
+    fi
     local cmd_file=$(mktemp -t iraftest.XXXXXXXXX)
     printf "%b\nlogout\n" "$command" > "$cmd_file"
     res_file=$(mktemp -t iraftest.XXXXXXXXX)
-    printf "%b\n" "$result" > "$res_file"
+    printf "%b\n" "$result" > "$res_file" 2>&1
     clres_file=$(mktemp -t iraftest.XXXXXXXXX)
     "${CL}" -f "$cmd_file" > "$clres_file" 2>&1
     diff_file=$(mktemp -t iraftest.XXXXXXXXX)
-    diff -uw "$res_file" "$clres_file" > "$diff_file"
+    diff_floatingpoint "$res_file" "$clres_file" "$digits" > "$diff_file"
     if [ -s $diff_file ] ; then
-	cat >> $failure_file <<EOF
+	if [ "$xfail" ] ; then
+	    printf "x"
+	else
+	    cat >> $failure_file <<EOF
 
 =================== Failure in $src with $(basename $CL) ===================
 
@@ -70,11 +86,35 @@ Diff
 ====
 $(cat $diff_file | tail -n +3)
 EOF
-	printf "F"
+	    printf "F"
+	fi
     else
 	printf "."
     fi
     rm -f $cmd_file $res_file $clres_file $diff_file
+}
+
+# Diff two files, with an optionally given floating point precision
+# (in relevant digits)
+#
+# Parameters:
+#
+#  - first file
+#  - second file
+#  - relevant digits (optional)
+#
+diff_floatingpoint () {
+    local file1="$1"
+    local file2="$2"
+    local digits="$3"
+    if [ -z "$digits" ] ; then
+	diff -uw "$file1" "$file2"
+    else
+	perl -pe 's/(-?\d+\.\d+)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file1" > "$file1".fp
+	perl -pe 's/(-?\d+\.\d+)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file2" > "$file2".fp
+	diff -uw "$file1".fp "$file2".fp
+	rm -f "$file1".fp "$file2".fp
+    fi
 }
 
 # Run all tests for a given IRAF shell and test script
@@ -91,6 +131,7 @@ run_tests () {
     command=''  # collected commands
     result=''   # collected expected results
     filename='' # File name to read in
+    options=''  # Test options
     lineno=0    # line counter
     cat "$FILE" | while read -r line ; do
 	lineno=$(expr $lineno + 1)
@@ -99,11 +140,12 @@ run_tests () {
 		# we are at the end of a code section,
 		# so let's execute the test if there was one
 		if [ "$command" ] ; then
-		    run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}"
+		    run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}" "$options"
 		fi
 		command=''
 		result=''
 		filename=''
+		options=''
 		in_code=0
 	    elif [ "$filename" ] ; then
 		# We are in a code line that is to be stored in a file
@@ -136,8 +178,12 @@ run_tests () {
 	    # There is some file content printed out in the next block.
 	    # Just prepare to save it.
 	    filename="$(echo $line | cut '-d`' -f2)"
+	elif echo "$line" | egrep -q '^Test options: `.+`$' ; then
+	    # Special test options
+	    options="$(echo $line | cut '-d`' -f2)"
 	else
 	    filename=""
+	    options=""
 	fi
     done
     echo
