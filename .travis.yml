@@ -59,4 +59,5 @@ script:
   - export iraf=$(pwd)/
   - export host=$(pwd)/unix/
   - export tmp=/tmp/
+  - if [ $IRAFARCH = linux ]; then ulimit -s unlimited ; fi
   - ./test/run_tests
