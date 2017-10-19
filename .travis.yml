@@ -39,24 +39,24 @@ matrix:
       osx_image: xcode7.3
       env: IRAFARCH=macosx OS_VERS=elcapitan
 
-install:
-  - if [ $TRAVIS_OS_NAME = osx ]; then brew install ccache; PATH=/usr/local/opt/ccache/libexec:$PATH ; fi
-
 language: c
-
-cache:
-  ccache: true
-  directories:
-    - $HOME/.ccache
 
 git:
   depth: 3
 
 before_script:
   - build_tmp=`mktemp -d -t irafbuild.XXXXXXXXX`
+  - if [ $IRAFARCH = linux64 ]; then DARCH=lnux.x86_64 ; fi
+  - if [ $IRAFARCH = linux ]; then DARCH=lnux.x86 ; fi
+  - if [ $IRAFARCH = macintel ]; then DARCH=macx.x86_64 ; fi
+  - if [ $IRAFARCH = macosx ]; then DARCH=macx.x86 ; fi
+  - URL=http://iraf.noao.edu/iraf/ftp/iraf/v216/PCIX/iraf.$DARCH.tar.gz
+  - curl $URL | tar xz
   - ./install -v --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir --root `pwd` < /dev/null || true
-  - make ${IRAFARCH}
-  - make sysgen
+  - for d in . unix vo noao ; do rm -f $d/bin ;  ln -s bin.${IRAFARCH} $d/bin; done
 
 script:
+  - export iraf=$(pwd)/
+  - export host=$(pwd)/unix/
+  - export tmp=/tmp/
   - ./test/run_tests
