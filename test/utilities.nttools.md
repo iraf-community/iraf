@@ -409,6 +409,9 @@ The input is the text file "in", and the output is to be displayed on
 the screen.  Each of the three operations ("t", "h", "v") and some
 combinations are illustrated.
 
+This does not work on the binary distribution which as some debug output.
+
+Test options: `xfail`
 ```
 cl> ttranspose ttranspose.in STDOUT t
 ttranspose.in --> STDOUT
