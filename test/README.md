@@ -172,6 +172,9 @@ The following tests are available so far:
    mainly from the test procedure document written by Jeanette Barnes and 
    her "Beginner's Guide to Using IRAF",
  * [Programming interface](programming.md) for basic CL and SPP functionality,
- * [Tests from the examples in the `lists` package](lists.md),
- * [Tests from the examples in the `images.imcoords` package](images.imcoords.md)
- * [Tests from the examples in the `images.imfilter` package](images.imfilter.md)
+ * Test from the examples in several packages:
+    - [`lists`](lists.md),
+    - [`images.imcoords`](images.imcoords.md)
+    - [`images.imfilter`](images.imfilter.md)
+    - [`images.imfit`](images.imfit.md)
+    - [`images.imgeom`](images.imgeom.md)
