@@ -14,14 +14,14 @@ cl> imstat pix.box
 
 ## convolve - Convolve a list of 1 or 2-D images with a rectangular filter
 
-Convolve an image with the above kernel using string entry mode and
-wrap around boundary extension.
+Convolve an image with a kernel using string entry mode and wrap
+around boundary extension.
 
 ```
-cl> convolve dev$pix pix.cnv "-1. -1. -1.; 0. 0. 0.; 1. 1. 1." bound=wrap
+cl> convolve dev$pix pix.cnv "1. 1. 1.; 1. 0. 1.; 1. 1. 1." bound=wrap
 cl> imstat pix.cnv
 #               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
-              pix.cnv    262144     -0.25     237.5   -32469.    30691.
+              pix.cnv    262144     860.5     804.5   -30822.    32055.
 ```
 
 ## fmedian - Quantize and box median filter a list of 1D or 2D images
@@ -99,9 +99,9 @@ neighbor boundary extension.
 
 ```
 cl> gradient dev$pix pix.odeg 180
-cl> imstat pix.odeg
-#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
-             pix.odeg    262144 -5.569E-4     42.85    -6983.     6529.
+cl> imstat pix.odeg fields="image,npix,stddev,min,max"
+#               IMAGE      NPIX    STDDEV       MIN       MAX
+             pix.odeg    262144     42.85    -6983.     6529.
 ``` 
 
 ## laplace - Laplacian filter a list of 1 or 2-D images
@@ -111,9 +111,9 @@ neighbor boundary extension.
 
 ```
 cl> laplace dev$pix pix.lap laplace=xyall
-cl> imstat pix.lap
-#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
-              pix.lap    262144  -0.06058     77.22   -20349.     4191.
+cl> imstat pix.lap fields="image,npix,stddev,min,max"
+#               IMAGE      NPIX    STDDEV       MIN       MAX
+              pix.lap    262144     77.22   -20349.     4191.
 ```
 
 ## median - Median box filter a list of 1D or 2D images
