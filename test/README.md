@@ -174,3 +174,4 @@ The following tests are available so far:
  * [Programming interface](programming.md) for basic CL and SPP functionality,
  * [Tests from the examples in the `lists` package](lists.md),
  * [Tests from the examples in the `images.imcoords` package](images.imcoords.md)
+ * [Tests from the examples in the `images.imfilter` package](images.imfilter.md)
