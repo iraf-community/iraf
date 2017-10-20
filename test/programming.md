@@ -114,8 +114,9 @@ Hello, world!
 This is a test for [#98](https://github.com/iraf/iraf-v216/pull/98).
 
 XC is able to keep the line number of the main file, for
-debugging. This is done with the `-x` flag:
+debugging. This is done with the `-x` flag (known to fail on 2.16.1):
 
+Test options: `xfail`
 ```
 cl> softools
 cl> xc -x -f hello.x
@@ -187,8 +188,10 @@ begin
     }
 end
 ```
-Running this should give:
 
+Running this should give (known to fail on 2.16.1):
+
+Test options: `xfail`
 ```
 cl> softools
 cl> xc machtest.x
@@ -235,8 +238,9 @@ end
 ```
 
 In that example, setting `ival` should not affect the independently
-defined variable `gval` and vice versa:
+defined variable `gval` and vice versa (known to fail on 2.16.1):
 
+Test options: `xfail`
 ```
 cl> softools
 cl> xc test_equiv.x
@@ -282,6 +286,7 @@ All this code does is to allocate a temporary array with four
 integers, fill each position with its index, and then print out the
 integers. Compile it, declare the task in (e)cl and run it:
 
+Test options: `xfail`
 ```
 cl> softools
 cl> xc otest.x
