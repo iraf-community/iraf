@@ -17,6 +17,9 @@ cl> imstat pix.box
 Convolve an image with a kernel using string entry mode and wrap
 around boundary extension.
 
+See https://github.com/iraf/iraf-v216/issues/109
+
+Test options: `xfail`
 ```
 cl> convolve dev$pix pix.cnv "1. 1. 1.; 1. 0. 1.; 1. 1. 1." bound=wrap
 cl> imstat pix.cnv
