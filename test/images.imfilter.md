@@ -107,8 +107,10 @@ cl> imstat pix.odeg fields="image,npix,stddev,min,max"
 ## laplace - Laplacian filter a list of 1 or 2-D images
 
 Convolve an image with the Laplacian filter xyall using nearest
-neighbor boundary extension.
+neighbor boundary extension. The result quality is a bit bad, so we
+limit the precision to one digit.
 
+Test options: `digits=1`
 ```
 cl> laplace dev$pix pix.lap laplace=xyall
 cl> imstat pix.lap fields="image,npix,stddev,min,max"
