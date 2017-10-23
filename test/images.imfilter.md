@@ -27,6 +27,16 @@ cl> imstat pix.cnv
               pix.cnv    262144     860.5     804.5   -30822.    32055.
 ```
 
+```
+cl> chpixtype dev$pix rpix real
+Image: dev$pix (short) -> Image: rpix (real)
+cl> convolve rpix rpix.cnv "1. 1. 1.; 1. 0. 1.; 1. 1. 1." bound=wrap
+cl> imstat rpix.cnv
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+             rpix.cnv    262144     866.5     942.5      230.    90232.
+```
+
+
 ## fmedian - Quantize and box median filter a list of 1D or 2D images
 
 Median filter the test image dev$pix rejecting any pixels < 5 or
