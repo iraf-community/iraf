@@ -22,11 +22,11 @@ C       find length of the input real character string
 
 C       construct the format statement to read the character string
         if (nleng .le. 9)then
-                write(iform,1000)nleng
-1000            format('(F',I1,'.0)')
+                write(iform,1000)nleng, '\0'
+1000            format('(F',I1,'.0)',A)
         else
-                write(iform,1001)nleng
-1001            format('(F',I2,'.0)')
+                write(iform,1001)nleng, '\0'
+1001            format('(F',I2,'.0)',A)
         end if
 
         read(cval,iform,err=900)val
