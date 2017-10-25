@@ -17,11 +17,11 @@ C       find length of the input integer character string
 
 C       construct the format statement to read the character string
         if (nleng .le. 9)then
-                write(iform,1000)nleng
-1000            format('(I',I1,')')
+                write(iform,1000)nleng, '\0'
+1000            format('(I',I1,')',A)
         else
-                write(iform,1001)nleng
-1001            format('(I',I2,')')
+                write(iform,1001)nleng, '\0'
+1001            format('(I',I2,')',A)
         end if
 
         read(cval,iform,err=900)ival
