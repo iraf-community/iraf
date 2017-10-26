@@ -83,7 +83,7 @@ cl> imstat zero
 
 ## tcopy - Copy tables.
 
-Test options: `digits=7`
+Test options: `decimals=7`
 ```
 cl> tcopy startable startable.fits
 # startable -> startable.fits
@@ -135,7 +135,7 @@ HISTORY  t   Created Thu 08:48:13 26-Oct-2017
   3   20.     21.  22.    23.    24. ""
 ```
 
-Test options: `digits=7`
+Test options: `decimals=7`
 ```
 cl> tcopy startable.fits startable2
 # startable.fits -> startable2
@@ -217,7 +217,7 @@ cl> match "#k HISTORY" outfile stop=yes
 
 ## tdump - Dump the contents of a table to an ASCII file.
 
-Test options: `digits=7`
+Test options: `decimals=7`
 ```
 cl> tdump startable
 STARno           I             %5d  ""

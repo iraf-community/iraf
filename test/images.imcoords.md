@@ -108,7 +108,7 @@ Wcs mapping status
 
 ## ccsetwcs - Create an image celestial wcs from the ccmap plate solution
 
-Test options: `digits=5`
+Test options: `decimals=5`
 ```
 cl> ccsetwcs pix coords.db pix 
 Image: pix  Database: coords.db  Solution: pix
@@ -173,7 +173,7 @@ cl> cctran coords STDOUT coords.db coords xcol=3 ycol=4 lngformat=%0.3h latforma
 
 ## hpctran - Convert between HEALPix row and spherical coordinate
 
-Test options: `digits=7`
+Test options: `decimals=7`
 ```
 cl> hpctran lng=50.12 lat=-33.45
 2298092 50.12 -33.45000000000001
@@ -181,7 +181,7 @@ cl> hpctran lng=50.12 lat=-33.45
 
 ## imcctran - Transform image header from one celestial wcs to another
 
-Test options: `digits=5`
+Test options: `decimals=5`
 ```
 cl> imcctran pix j1975.0
 INPUT IMAGE: pix
@@ -198,7 +198,7 @@ Crval1,2: 202:27:01.9, 47:11:53.4 -> 202:11:14.9, 47:19:37.0 dd:mm:ss.s
 
 ## mkcwcs - Make or update a simple celestial wcs
 
-Test options: `digits=5`
+Test options: `decimals=5`
 ```
 cl> mkcwcs new ra=1:20:23.1 dec=-12:11:13 scale=0.25
 cl> imheader new l+ | match ^CTYPE
@@ -228,7 +228,7 @@ WCSDIM  =                    2
 
 ## mkcwwcs - Make or update a simple celestial/wavelength 3D wcs
 
-Test options: `digits=5`
+Test options: `decimals=5`
 ```
 cl> mkcwwcs new3d ra=1:20:23.1 dec=-12:11:13 wave=5500.  scale=0.25 wscale=1.23
 cl> imheader new3d l+ | match ^CTYPE

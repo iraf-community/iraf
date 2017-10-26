@@ -72,7 +72,7 @@ direct string comparison of expected and actual output. To deal with
 this, the required accuracy can be set by preceding the code block
 with a line containing the required accuracy. For example:
 
-Test options: `digits=7`
+Test options: `decimals=7`
 ```
 cl> =1.0/3.0
 0.33333331
