@@ -192,3 +192,4 @@ The following tests are available so far:
     - [`images.imfit`](images.imfit.md)
     - [`images.imgeom`](images.imgeom.md)
     - [`images.immatch`](images.immatch.md)
+    - [`utilities.nttools`](utilities.nttools.md)
