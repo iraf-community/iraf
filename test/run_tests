@@ -110,8 +110,8 @@ diff_floatingpoint () {
     if [ -z "$digits" ] ; then
 	diff -uw "$file1" "$file2"
     else
-	perl -pe 's/(-?\d+\.\d+)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file1" > "$file1".fp
-	perl -pe 's/(-?\d+\.\d+)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file2" > "$file2".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file1" > "$file1".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${digits}'f%s", $1, $2)/ge' < "$file2" > "$file2".fp
 	diff -uw "$file1".fp "$file2".fp
 	rm -f "$file1".fp "$file2".fp
     fi
