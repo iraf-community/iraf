@@ -179,3 +179,5 @@ The following tests are available so far:
     - [`images.imfit`](images.imfit.md)
     - [`images.imgeom`](images.imgeom.md)
     - [`utilities.nttools`](nttools.md)
+ * [Regression test](numerical-recipes.md) for the replacement of Numerical
+   Recipes code

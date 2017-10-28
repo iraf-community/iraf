@@ -1,0 +1,490 @@
+# Test of Numerical Recipes functions (and their replacements)
+
+Historically, IRAF contains a number of files that contain code from
+the book "Numerical Recipes" (NR). The code from this book is not free
+(neither as in Free Beer, nor as in Free Speech), and so it is
+required to replace this code to make IRAF truly Open Source.
+
+These tests written to ensure that code replacing Numerical Recipes
+code will get the same results.
+
+## Simple functions and random numbers
+
+### GASDEV: normally distributed deviate of zero mean and unit var
+
+We test the statistical momentums for the distribution.
+
+File: `test-gasdev.x`
+```
+task test_gasdev = t_gasdev
+procedure t_gasdev ()
+real gasdev()
+double x, y
+double m[4]
+int i,j,n
+begin
+	n=20000000
+	do j=1, 4 {
+		m[j] = 0
+	}
+	do i=1, n {
+	    x = gasdev(0)
+		y = 1
+		do j=1, 4 {
+		    y = y * x
+			m[j] = m[j] + y
+	    }
+	}
+	call printf("Mean     = %f\n")
+	call pargd(abs(m[1]/n))
+	call printf("Variance = %f\n")
+	call pargd(m[2]/n)
+	call printf("Skew     = %f\n")
+	call pargd(abs(m[3]/n))
+	call printf("Kurtosis = %f\n")
+	call pargd(m[4]/n)
+end
+```
+
+Compile it, declare and run as an IRAF task. The following numbers are
+the result of the original NR code.
+
+Test options: `decimals=2`
+```
+cl> copy noao$artdata/numrecipes.x .
+cl> softools
+cl> xc test-gasdev.x numrecipes.x
+cl> task $test_gasdev = test-gasdev.e
+cl> test_gasdev
+Mean     = 0.0004794365668388
+Variance = 1.0000408915199221
+Skew     = 0.0013315610063655
+Kurtosis = 3.0004513785393642
+```
+
+### POIDEV: Poisson deviates for a given mean
+
+File: `test-poidev.x`
+```
+task test_poidev = t_poidev
+procedure t_poidev ()
+real poidev()
+real x, y, xm
+real clgetr()
+double m[4]
+int i,j,n, start
+data start/0/
+begin
+    xm=clgetr("xm")
+	n=1000000
+	do j=1, 4 {
+		m[j] = 0
+	}
+	do i=1, n {
+	    x = poidev(xm,0) - xm
+		y = 1
+		do j=1, 4 {
+		    y = y * x
+			m[j] = m[j] + y
+	    }
+	}
+	if (start == 0) {
+		call printf("     xm |       mean |   variance |       skew |   kurtosis\n")
+		call printf("--------|------------|------------|------------|------------\n")
+		start = 1
+	}
+	call printf("%7.1f | %10.4f | %10.4f | %10.4f | %10.4f\n")
+	call pargr(xm)
+	call pargd(xm + m[1]/n)
+	call pargd(m[2]/n)
+	call pargd(m[3]/n)
+	call pargd(m[4]/n)
+end
+```
+
+Compile it, declare and run as an IRAF task. The following numbers are
+the result of the original NR code.
+
+Test options: `decimals=2`
+```
+cl> softools
+cl> xc -x test-poidev.x numrecipes.x
+cl> task $test_poidev = test-poidev.e
+cl> for ( i = -1; i < 30; i+=2)  test_poidev(i/2.0)
+     xm |       mean |   variance |       skew |   kurtosis
+--------|------------|------------|------------|------------
+   -0.5 |     0.0000 |     0.2500 |     0.1250 |     0.0625
+    0.5 |     0.4994 |     0.4992 |     0.4979 |     1.2443
+    1.5 |     1.5002 |     1.5041 |     1.5143 |     8.3393
+    2.5 |     2.4990 |     2.4994 |     2.5036 |    21.2696
+    3.5 |     3.5015 |     3.5104 |     3.5508 |    40.6212
+    4.5 |     4.5042 |     4.4978 |     4.5768 |    65.4975
+    5.5 |     5.5014 |     5.4948 |     5.4843 |    96.0890
+    6.5 |     6.5020 |     6.5092 |     6.4698 |   133.0264
+    7.5 |     7.4999 |     7.5038 |     7.6774 |   177.2280
+    8.5 |     8.5015 |     8.4993 |     8.6282 |   226.2072
+    9.5 |     9.5003 |     9.5091 |     9.6242 |   281.6827
+   10.5 |    10.4985 |    10.5028 |    10.3879 |   341.3161
+   11.5 |    11.5032 |    11.5049 |    11.6535 |   408.2523
+   12.5 |    12.5005 |    12.4857 |    12.4353 |   478.2899
+   13.5 |    13.4978 |    13.4837 |    13.2168 |   557.7109
+   14.5 |    14.5096 |    14.5111 |    15.0703 |   647.6903
+```
+
+### GAMMLN: natural log of gamma function
+
+File: `test-gammln.x`
+```
+task test_gammln = t_gammln
+procedure t_gammln ()
+real gammln()
+real x, y
+real clgetr()
+begin
+    x = clgetr("x")
+	y = gammln(x)
+	call printf("gammln(%4.2f) = %.6f\n")
+	call pargr(x)
+	call pargr(y)
+end
+```
+
+Compile it, declare and run as an IRAF task. The following numbers are
+the result of the original NR code.
+
+Test options: `decimals=5`
+```
+cl> softools
+cl> xc -x test-gammln.x numrecipes.x
+cl> task $test_gammln = test-gammln.e
+cl> for ( x = 0.23; x < 10; x += 0.667)  test_gammln(x)
+gammln(0.23) = 1.376194
+gammln(0.90) = 0.068650
+gammln(1.56) = -0.116568
+gammln(2.23) = 0.114094
+gammln(2.90) = 0.601105
+gammln(3.57) = 1.273372
+gammln(4.23) = 2.090656
+gammln(4.90) = 3.027074
+gammln(5.57) = 4.064579
+gammln(6.23) = 5.189871
+gammln(6.90) = 6.392745
+gammln(7.57) = 7.665116
+gammln(8.23) = 9.000430
+gammln(8.90) = 10.393257
+gammln(9.57) = 11.839035
+cl> test_gammln(20)
+gammln(20.0) = 39.339886
+cl> test_gammln(80)
+gammln(80.0) = 269.291107
+cl> test_gammln(200)
+gammln(200.0) = 857.933655
+```
+
+### DAORAN: random number generator RAN2
+
+File: `test-ran2.x`
+```
+task test_ran2 = t_ran2
+procedure t_ran2 ()
+real daoran()
+double x, y
+double m[4]
+int i,j,n
+begin
+	n=20000000
+	do j=1, 4 {
+		m[j] = 0
+	}
+	do i=1, n {
+	    x = daoran(0)
+		if (x < 0 | x >= 1) {
+			call printf("Outlyer: %g\n")
+			call pargd(x)
+	    }
+		x = x - 0.5
+		y = 1
+		do j=1, 4 {
+		    y = y * x
+			m[j] = m[j] + y
+	    }
+	}
+	call printf("Mean     = %f\n")
+	call pargd(abs(m[1]/n))
+	call printf("Variance = %f\n")
+	call pargd(m[2]/n)
+	call printf("Skew     = %f\n")
+	call pargd(abs(m[3]/n))
+	call printf("Kurtosis = %f\n")
+	call pargd(m[4]/n)
+end
+```
+
+Compile it, declare and run as an IRAF task. The following numbers are
+the result of the original NR code.
+
+Test options: `decimals=4`
+```
+cl> copy noao$digiphot/daophot/daolib/daoran.x .
+cl> softools
+cl> xc test-ran2.x daoran.x
+cl> task $test_ran2 = test-ran2.e
+cl> test_ran2
+Mean     = 0.0000018238614310
+Variance = 0.0833325982276019
+Skew     = 0.0000003118007337
+Kurtosis = 0.0124998479272606
+```
+
+### AST_JULDAY_TO_DATE: Convert Julian date to calendar date
+
+File: `test-jd.x`
+```
+task test_jd = t_jd
+procedure t_jd ()
+double jd
+int year, month, day
+double t
+double clgetd()
+begin
+    jd = clgetd("jd")
+	call ast_julday_to_date(jd, year, month, day, t)
+	call printf("JD (%.2f) = %d/%02d/%02d + %5.2f\n")
+	call pargd(jd)
+	call pargi(year)
+	call pargi(month)
+	call pargi(day)
+	call pargd(t)
+end
+```
+
+Compile it, declare and run as an IRAF task. The following numbers are
+the result of the original NR code.
+
+```
+cl> copy noao$astutil/asttools/asttimes.x .
+cl> softools
+cl> xc -/Wno-shift-op-parentheses test-jd.x asttimes.x
+cl> task $test_jd = test-jd.e
+cl> for (x = 2450123.7; x < 2450123.7 + 35; x += 2.13)  test_jd(jd=x)
+JD (2450123.70) = 1996/02/10 +  4.80
+JD (2450125.83) = 1996/02/12 +  7.92
+JD (2450127.96) = 1996/02/14 + 11.04
+JD (2450130.09) = 1996/02/16 + 14.16
+JD (2450132.22) = 1996/02/18 + 17.28
+JD (2450134.35) = 1996/02/20 + 20.40
+JD (2450136.48) = 1996/02/22 + 23.52
+JD (2450138.61) = 1996/02/25 +  2.64
+JD (2450140.74) = 1996/02/27 +  5.76
+JD (2450142.87) = 1996/02/29 +  8.88
+JD (2450145.00) = 1996/03/02 + 12.00
+JD (2450147.13) = 1996/03/04 + 15.12
+JD (2450149.26) = 1996/03/06 + 18.24
+JD (2450151.39) = 1996/03/08 + 21.36
+JD (2450153.52) = 1996/03/11 +  0.48
+JD (2450155.65) = 1996/03/13 +  3.60
+JD (2450157.78) = 1996/03/15 +  6.72
+```
+
+## Matrix operations
+
+### LU decomposition of a square matrix
+
+These subroutines are going to be replaced by LAPACK routines
+
+File: `test_ludecompose.x`
+```
+task test_ludecompose = t_ludecompose
+
+procedure eval_ludecompose (x, y, ndim)
+double x[ndim, ndim]
+double y[ndim]
+int ndim, i, j, istat
+double d
+pointer sp, ix, m_in, m_out, y_in
+begin
+    call smark(sp)
+    call salloc(ix, ndim, TY_INT)
+    call salloc(m_out, ndim*ndim, TY_DOUBLE)
+    call salloc(m_in, ndim*ndim, TY_DOUBLE)
+    call salloc(y_in, ndim, TY_DOUBLE)
+    call achtdd(x, Memd[m_in], ndim*ndim)
+    call achtdd(y, Memd[y_in], ndim)
+
+# Test MW_LUDECOMPOSE and MW_INVERTD
+
+    call printf("Original matrix:\n")
+    do i = 1, ndim {
+        call printf("%d  ")
+	call pargi(i)
+	do j = 1, ndim {
+	    call printf(" %6.3f")
+	    call pargd(x[j, i])
+	}
+	call printf("\n")
+    }
+    call mw_invertd(Memd[m_in], Memd[m_out], ndim)
+    call printf("Inverted matrix:\n")
+    do i = 1, ndim {
+        call printf("%d  ")
+	call pargi(i)
+	do j = 1, ndim {
+	    call printf(" %6.3f")
+	    call pargd(Memd[m_out + (j-1) + (i-1)*ndim])
+	}
+	call printf("\n")
+    }
+    call mw_ludecompose(Memd[m_in], Memi[ix], ndim)
+    call printf("Decomposed matrix (MW_LUDECOMPOSE):\n")
+    do i = 1, ndim {
+        call printf("%d %d")
+	call pargi(i)
+	call pargi(Memi[ix+i-1])
+	do j = 1, ndim {
+	    call printf(" %6.3f")
+	    call pargd(Memd[m_in + (j-1) + (i-1)*ndim])
+	}
+	call printf("\n")
+    }
+
+    call printf("solve [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargd(y[j])
+    }
+    call mw_lubacksub(Memd[m_in], Memi[ix], Memd[y_in], ndim)
+    call printf("] ==> [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargd(Memd[y_in + (j-1)])
+    }
+    call printf("]\n")
+
+    call achtdd(x, Memd[m_in], ndim*ndim)
+    call ludcmd(Memd[m_in], ndim, ndim, Memi[ix], d, istat)
+    call printf("Decomposed matrix (LUDCMD):\n")
+    do i = 1, ndim {
+        call printf("%d %d")
+	call pargi(i)
+	call pargi(Memi[ix+i-1])
+	do j = 1, ndim {
+	    call printf(" %6.3f")
+	    call pargd(Memd[m_in + (j-1) + (i-1)*ndim])
+	}
+	call printf("\n")
+    }
+
+    call achtdd(y, Memd[y_in], ndim)
+    call printf("solve [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargd(y[j])
+    }
+    call lubksd(Memd[m_in], ndim, ndim, Memi[ix], Memd[y_in])
+    call printf("] ==> [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargd(Memd[y_in + (j-1)])
+    }
+    call printf("]\n")
+
+    call salloc(m_in, ndim*ndim, TY_REAL)
+    call achtdr(x, Memr[m_in], ndim*ndim)
+    call ludcmp(Memr[m_in], ndim, ndim, Memi[ix], d)
+    call printf("Decomposed matrix (LUDCMB):\n")
+    do i = 1, ndim {
+        call printf("%d %d")
+	call pargi(i)
+	call pargi(Memi[ix+i-1])
+	do j = 1, ndim {
+	    call printf(" %6.3f")
+	    call pargr(Memr[m_in + (j-1) + (i-1)*ndim])
+	}
+	call printf("\n")
+    }
+    call salloc(y_in, ndim, TY_REAL)
+    call achtdr(y, Memr[y_in], ndim)
+    call printf("solve [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargd(y[j])
+    }
+    call lubksb(Memr[m_in], ndim, ndim, Memi[ix], Memr[y_in])
+    call printf("] ==> [")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(Memr[y_in + (j-1)])
+    }
+    call printf("]\n")
+
+    call sfree(sp)
+end
+
+procedure t_ludecompose ()
+double x1[2,2], y1[2]
+data x1 /2., 8., 1., 7./
+data y1 /4., 1./
+double x2[3,3], y2[3]
+data x2 /4., 5., -2., 7., -1., 2., 3., 1., 4./
+data y2 /1., 3., 2./
+begin
+    call eval_ludecompose(x1, y1, 2)
+    call eval_ludecompose(x2, y2, 3)
+end
+```
+
+```
+cl> copy pkg$utilities/nttools/stxtools/lu* .
+cl> softools
+cl> xc -x test_ludecompose.x lubksb.f  lubksd.f  ludcmd.x  ludcmp.x
+cl> task $test_ludecompose = test_ludecompose.e
+cl> test_ludecompose
+Original matrix:
+1    2.000  8.000
+2    1.000  7.000
+Inverted matrix:
+1    1.167 -1.333
+2   -0.167  0.333
+Decomposed matrix (MW_LUDECOMPOSE):
+1 2  8.000  0.250
+2 2  7.000 -0.750
+solve [  4.000  1.000] ==> [  4.500 -5.000]
+Decomposed matrix (LUDCMD):
+1 2  8.000  0.250
+2 2  7.000 -0.750
+solve [  4.000  1.000] ==> [  4.500 -5.000]
+Decomposed matrix (LUDCMB):
+1 2  8.000  0.250
+2 2  7.000 -0.750
+solve [  4.000  1.000] ==> [  4.500 -5.000]
+Original matrix:
+1    4.000  5.000 -2.000
+2    7.000 -1.000  2.000
+3    3.000  1.000  4.000
+Inverted matrix:
+1    0.039  0.143 -0.052
+2    0.143 -0.143  0.143
+3   -0.065 -0.071  0.253
+Decomposed matrix (MW_LUDECOMPOSE):
+1 2  5.000  0.800 -0.400
+2 2 -1.000  7.800  0.205
+3 3  1.000  2.200  3.949
+solve [  1.000  3.000  2.000] ==> [  0.338 -0.429  0.883]
+Decomposed matrix (LUDCMD):
+1 2  5.000  0.800 -0.400
+2 2 -1.000  7.800  0.205
+3 3  1.000  2.200  3.949
+solve [  1.000  3.000  2.000] ==> [  0.338 -0.429  0.883]
+Decomposed matrix (LUDCMB):
+1 2  5.000  0.800 -0.400
+2 2 -1.000  7.800  0.205
+3 3  1.000  2.200  3.949
+solve [  1.000  3.000  2.000] ==> [  0.338 -0.429  0.883]
+```
+
+## Fast Fourier transform
+
+### TWOFFT: complex FFTs of two input real arrays
+
+### REALFT: FFT of a set of 2N real valued data points
+
