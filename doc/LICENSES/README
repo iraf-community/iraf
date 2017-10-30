@@ -5,5 +5,5 @@ to third-party sources in the IRAF system:
     GPL					For the math$slalib and ecl$readline
     OpenSolaris_License-CDDL.pdf	For the XYACC parser (boot$xyacc)
     UCAR				For NCAR graphics
-
+    ERFA				For ast_julday_to_date in noao$astutil/asttools/asttimes.x
 
