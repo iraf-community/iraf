@@ -6,4 +6,4 @@ to third-party sources in the IRAF system:
     OpenSolaris_License-CDDL.pdf	For the XYACC parser (boot$xyacc)
     UCAR				For NCAR graphics
     ERFA				For ast_julday_to_date in noao$astutil/asttools/asttimes.x
-
+    LLSQ				For math$llsq
