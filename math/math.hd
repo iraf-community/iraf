@@ -5,7 +5,6 @@ $bev		= "math$bevington/doc/"
 $curfit		= "math$curfit/doc/"
 $deboor		= "math$deboor/doc/"
 $gsurfit	= "math$gsurfit/doc/"
-$ieee		= "math$ieee/doc/"
 $iminterp	= "math$iminterp/doc/"
 $interp		= "math$interp/doc/"
 $llsq		= "math$llsq/doc/"
@@ -24,10 +23,6 @@ curfit		hlp = curfit$curfit.men,
 deboor		hlp = deboor$deboor.men,
 		sys = deboor$deboor.hlp,
 		pkg = deboor$deboor.hd
-
-ieee		hlp = ieee$ieee.men,
-		sys = ieee$ieee.hlp,
-		pkg = ieee$ieee.hd
 
 iminterp	hlp = iminterp$iminterp.men,
 		sys = iminterp$iminterp.hlp,
