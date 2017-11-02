@@ -5,6 +5,7 @@
 	   ieee - IEEE signal processing routines
        iminterp	- IRAF image interpolation package
 	 interp - Old 1D image interpolation routines
+	 lapack - Numerical linear algebra package
 	   llsq - Lawson's & Hanson's linear least squares package
 	  nlfit - IRAF Levenberg-Marquardt non-linear least squares package
 	 slalib - Starlink positional astronomy library

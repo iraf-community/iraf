@@ -71,6 +71,7 @@
 #define IRAFLIB4	"libos.a"
 #define IRAFLIB5	"libVO.a"
 #define IRAFLIB6	"libcfitsio.a"
+#define IRAFLIB7	"liblapack.a"
 
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
@@ -836,6 +837,7 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (IRAFLIB6);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
+		arglist[nargs++] = mkfname (IRAFLIB7);
 		arglist[nargs++] = mkfname (IRAFLIB2);
 		arglist[nargs++] = mkfname (IRAFLIB3);
 		arglist[nargs++] = mkfname (IRAFLIB4);

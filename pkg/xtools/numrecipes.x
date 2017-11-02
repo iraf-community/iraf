@@ -475,7 +475,6 @@ end
 ################################################################################
 # LU Decomosition
 ################################################################################
-define	TINY	(1E-20)		# Number of numerical limit
 
 # Given an N x N matrix A, with physical dimension N, this routine
 # replaces it by the LU decomposition of a rowwise permutation of
@@ -486,90 +485,21 @@ define	TINY	(1E-20)		# Number of numerical limit
 # respectively.  This routine is used in combination with LUBKSB to
 # solve linear equations or invert a matrix.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the LU decomposition routine provided by LAPACK.
 
 procedure ludcmp (a, n, np, indx, d)
 
-real	a[np,np]
-int	n
-int	np
-int	indx[n]
-real	d
+real	a[np,np]	# io: input a, output decomposed a
+int	n		# i: logical size of a is n x n
+int	np		# i: space allocated for a
+int	indx[n]		# o: index to be used by xt_lubksb
+real	d		# o: +1 or -1
 
-int	i, j, k, imax
-real	aamax, sum, dum
-pointer	vv
+int	istat
 
 begin
-	# Allocate memory.
-	call malloc (vv, n, TY_REAL)
-	
-	# Loop over rows to get the implict scaling information.
-	d = 1.
-	do i = 1, n {
-	    aamax = 0.
-	    do j = 1, n {
-	        if (abs (a[i,j]) > aamax)
-		    aamax = abs (a[i,j])
-	    }
-	    if (aamax == 0.) {
-	    	call mfree (vv, TY_REAL)
-	        call error (1, "Singular matrix")
-	    }
-	    Memr[vv+i-1] = 1. / aamax
-	}
-
-	# This is the loop over columns of Crout's method.
-	do j = 1, n {
-	    do i = 1, j-1 {
-	        sum = a[i,j]
-		do k = 1, i-1
-		    sum = sum - a[i,k] * a[k,j]
-		a[i,j] = sum
-	    }
-
-	    aamax = 0.
-	    do i = j, n {
-	        sum = a[i,j]
-		do k = 1, j-1
-		    sum = sum - a[i,k] * a[k,j]
-		a[i,j] = sum
-		dum = Memr[vv+i-1] * abs (sum)
-		if (dum >= aamax) {
-		    imax = i
-		    aamax = dum
-		}
-	    }
-
-	    if (j != imax) {
-	        do k = 1, n {
-		    dum = a[imax,k]
-		    a[imax,k] = a[j,k]
-		    a[j,k] = dum
-		}
-		d = -d
-		Memr[vv+imax-1] = Memr[vv+j-1]
-	    }
-	    indx[j] = imax
-
-	    # Now, finally, divide by the pivot element.
-	    # If the pivot element is zero the matrix is signular (at
-	    # least to the precission of the algorithm.  For some
-	    # applications on singular matrices, it is desirable to
-	    # substitute TINY for zero.
-
-	    if (a[j,j] == 0.)
-	        a[j,j] = TINY
-	    if (j != n) {
-	        dum = 1. / a[j,j]
-		do i = j+1, n
-		    a[i,j] = a[i,j] * dum
-	    }
-	}
-
-	call mfree (vv, TY_REAL)
+	d = 1.0
+	call sgetrf(n, n, a, np, indx, istat)
 end
 
 
@@ -583,9 +513,7 @@ end
 # possiblity that B will begin with many zero elements, so it is
 # efficient for use in matrix inversion.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the LU decomposition routine provided by LAPACK.
 
 procedure lubksb (a, n, np, indx, b)
 
@@ -595,31 +523,10 @@ int	np
 int	indx[n]
 real	b[n]
 
-int	i, j, ii, ll
-real	sum
+int	status
 
 begin
-	ii = 0
-	do i = 1, n {
-	    ll = indx[i]
-	    sum = b[ll]
-	    b[ll] = b[i]
-	    if (ii != 0) {
-	        do j = ii, i-1
-		    sum = sum - a[i,j] * b[j]
-	    } else if (sum != 0.)
-	        ii = i
-	    b[i] = sum
-	}
-
-	do i = n, 1, -1 {
-	    sum = b[i]
-	    if (i < n) {
-	        do j = i+1, n
-		    sum = sum - a[i,j] * b[j]
-	    }
-	    b[i] = sum / a[i,i]
-	}
+	call sgetrs('N', n, 1, a, np, indx, b, n, status)
 end
 
 

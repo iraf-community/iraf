@@ -23,6 +23,7 @@ mathgen:
 	$call nlfit
 	$call slalib
 	$call surfit
+	$call lapack
 	$purge lib$
 	;
 
@@ -93,6 +94,13 @@ surfit:
 	$checkin  libsurfit.a lib$
 	;
 
+lapack:
+	$echo "-------------- LIBLAPACK ----------------"
+	$checkout liblapack.a lib$
+	$update   liblapack.a
+	$checkin  liblapack.a lib$
+	;
+
 libbev.a:				# Bevington routines
 	@bevington
 	;
@@ -135,4 +143,8 @@ libslalib.a:				# Starlink positional astronomy library
 
 libsurfit.a:				# Surface fitting on an even grid
 	@surfit
+	;
+
+liblapack.a:				# Linear algebra package subset
+	@lapack
 	;

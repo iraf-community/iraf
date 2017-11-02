@@ -75,6 +75,7 @@ bin$libimd.a
 bin$libimfort.a
 bin$libiminterp.a
 bin$libinterp.a
+bin$liblapack.a
 bin$libllsq.a
 bin$libmemdbg.a
 bin$libncar.a
