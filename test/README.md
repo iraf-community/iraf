@@ -100,7 +100,7 @@ test, of if the test is known to never return.
 
 Test options: `skip`
 ```
-cl> notreturn
+cl> while (1==1) i=1
 ```
 
 #### Testing only specified archs
@@ -180,6 +180,7 @@ In this case, the exit status of the test script is 1.
 The following tests are available so far:
 
  * This file, containing the self-test for the basic unit test functionality,
+ * [Check the IRAF tree for generated files](files.md)
  * [Preliminary Test Procedure for IRAF](testproc.md): basic functionality,
    mainly from the test procedure document written by Jeanette Barnes and 
    her "Beginner's Guide to Using IRAF",
