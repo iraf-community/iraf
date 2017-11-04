@@ -7,7 +7,6 @@ cl> dir bin$*.e ncol=1
 bin$cl.e
 bin$ecl.e
 bin$irafks.e
-bin$vocl.e
 bin$x_color.e
 bin$x_dataio.e
 bin$x_images.e
@@ -59,7 +58,7 @@ host$bin/xyacc.e
 
 ```
 cl> dir bin$*.a ncol=1
-bin$libVO.a
+bin$libVOTable.a
 bin$libbev.a
 bin$libc.a
 bin$libcfitsio.a
