@@ -139,7 +139,7 @@ README.md @ ecl.e ...xs.s
 Without errors, the return status is 0. If there is an error, then the
 expected, the actual output and their difference are printed:
 
-Test options: `skip`
+File: `printed on stdout`
 ```
 =================== Failure in README.md:66 with ecl.e ===================
 
