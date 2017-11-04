@@ -9,10 +9,6 @@
 # License: as IRAF
 #
 
-# IRAF shells to be tested
-#IRAF_SHELLS="cl.e ecl.e vocl.e"
-IRAF_SHELLS="ecl.e"
-
 if [ -z "$iraf" ] ; then
     export iraf=$(cd $(dirname $0)/..; pwd)/
 fi
@@ -24,11 +20,58 @@ export arch=.${IRAFARCH}
 export IRAFBIN=${iraf}bin${arch}/
 export PATH=$HOME/.iraf/bin:${PATH}
 
+TEST_FILES=""
+IRAF_SHELLS=""
+verbose=0
+
+while getopts "h?vc:" opt; do
+    case "$opt" in
+    h|\?)
+	echo 'Run the IRAF test suite. See iraf$test/README.md for details.'
+	echo
+        echo 'Usage:'
+	echo '    run_tests [-h] [-v] [-c CL.e]... [TEST.md]...'
+	echo
+	echo 'Arguments:'
+	echo '    -h       this help'
+	echo '    -v       verbose output'
+	echo '    -c CL.e  use CL.e as IRAF shell (may be given several times)'
+	echo '    TEST.md  run test script TEST.md (may be given several times)'
+	echo
+	echo 'If no IRAF shell is specified, ecl.e is used.'
+	echo 'If no test scripts are specified, all test scripts under iraf$test'
+	echo 'are executed.'
+        exit 0
+        ;;
+    v)  verbose=1
+        ;;
+    c)  IRAF_SHELLS="$IRAF_SHELLS $OPTARG"
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
+
+# IRAF shells to be tested
+if [ -z "$IRAF_SHELLS" ] ; then
+    IRAF_SHELLS="ecl.e"
+fi
+
 # Test scripts
-TEST_FILES=${iraf}/test/*.md
+for f in $@ ; do
+    if [ $(echo $f | cut -c1) != "/" ] ; then
+	f=$(pwd)/$f
+    fi
+    TEST_FILES="$TEST_FILES $f"
+done
+
+if [ -z "$TEST_FILES" ] ; then
+    TEST_FILES=${iraf}test/*.md
+fi
 
 failure_file=$(mktemp -t iraftest.XXXXXXXXX)
-
 
 # Run one test. If a failure happens, the full message will be appended to
 # the $failure_file.
@@ -69,6 +112,7 @@ run_test () {
     if [ -s $diff_file ] ; then
 	if [ "$xfail" ] ; then
 	    printf "x"
+	    return
 	else
 	    cat >> $failure_file <<EOF
 
@@ -87,9 +131,11 @@ Diff
 $(cat $diff_file | tail -n +3)
 EOF
 	    printf "F"
+	    return
 	fi
     else
 	printf "."
+	return
     fi
     rm -f $cmd_file $res_file $clres_file $diff_file
 }
@@ -140,6 +186,10 @@ run_tests () {
 		# we are at the end of a code section,
 		# so let's execute the test if there was one
 		if [ "$command" ] ; then
+		    if [ "$verbose" = 1 -a -n "$headline" ] ; then
+			printf "\n    %s: " "$headline"
+			headline=""
+		    fi
 		    run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}" "$options"
 		fi
 		command=''
@@ -181,19 +231,22 @@ run_tests () {
 	elif echo "$line" | egrep -q '^Test options: `.+`$' ; then
 	    # Special test options
 	    options="$(echo $line | cut '-d`' -f2)"
+	elif echo "$line" | egrep -q '^#' ; then
+	    # Head line
+	    headline="$(echo $line | sed s/^#*\ //)"
 	else
 	    filename=""
 	    options=""
 	fi
     done
-    echo
+    printf "\n"
 }
 
 for CL in $IRAF_SHELLS ; do
     if [ -x "${IRAFBIN}${CL}" ] ; then
 	for t in $TEST_FILES ; do
 	    tmp_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
-	    printf "%b" "$(basename ${t}) @ ${CL} "
+	    printf "%b" "${CL}: $(basename ${t})"
 	    cd "$tmp_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
 	    rm -rf "${tmp_dir}"
 	done
