@@ -246,7 +246,7 @@ for CL in $IRAF_SHELLS ; do
     if [ -x "${IRAFBIN}${CL}" ] ; then
 	for t in $TEST_FILES ; do
 	    tmp_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
-	    printf "%b" "${CL}: $(basename ${t})"
+	    printf "%b: %b " "${CL}" "$(basename ${t})"
 	    cd "$tmp_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
 	    rm -rf "${tmp_dir}"
 	done
