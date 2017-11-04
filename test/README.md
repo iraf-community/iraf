@@ -119,9 +119,17 @@ comma.
 
 ### Running tests
 
-To run, just the script `test/run_test` needs to be executed. For each
-Markdown file, it will print the file name, and the result of each
-test as one character per executed code block:
+To run, just the script `test/run_test` needs to be executed. It has the
+following options:
+
+ * `-h` - this help
+ * `-v` - verbose output
+ * `-c CL.e` - use `CL.e` as IRAF shell (may be given several times)
+ * `TEST.md` - run test script `TEST.md` (may be given several times)
+
+If no further options are given, all markdown files in `test` are executed
+with the `ecl.e` IRAF shell. For each Markdown file, it will print the file
+name, and the result of each test as one character per executed code block:
 
   * `.` test passed,
   * `F` test failed,
@@ -131,9 +139,10 @@ test as one character per executed code block:
 
 As an example, the output for this file is
 
-Test options: `skip`
+File: `printed on stdout`
 ```
-README.md @ ecl.e ...xs.s
+$ ./test/run_tests test/README.md
+ecl.e: README.md ...xs.
 ```
 
 Without errors, the return status is 0. If there is an error, then the
@@ -141,6 +150,9 @@ expected, the actual output and their difference are printed:
 
 File: `printed on stdout`
 ```
+$ ./test/run_tests test/README.md
+ecl.e: README.md ..Fxs.
+
 =================== Failure in README.md:66 with ecl.e ===================
 
 Expected
