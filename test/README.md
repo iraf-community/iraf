@@ -122,10 +122,10 @@ comma.
 To run, just the script `test/run_test` needs to be executed. It has the
 following options:
 
- * `-h` - this help
- * `-v` - verbose output
- * `-c CL.e` - use `CL.e` as IRAF shell (may be given several times)
- * `TEST.md` - run test script `TEST.md` (may be given several times)
+ * `-h` this help
+ * `-v` verbose output
+ * `-c CL.e` use `CL.e` as IRAF shell (may be given several times)
+ * `TEST.md` run test script `TEST.md` (may be given several times)
 
 If no further options are given, all markdown files in `test` are executed
 with the `ecl.e` IRAF shell. For each Markdown file, it will print the file
@@ -191,6 +191,7 @@ The following tests are available so far:
     - [`images.imfilter`](images.imfilter.md)
     - [`images.imfit`](images.imfit.md)
     - [`images.imgeom`](images.imgeom.md)
+    - [`images.immatch`](images.immatch.md)
     - [`utilities.nttools`](nttools.md)
  * [Regression test](numerical-recipes.md) for the replacement of Numerical
    Recipes code
