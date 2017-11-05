@@ -194,8 +194,8 @@ int
 votget (int argc, char **argv, size_t *reslen, void **result)
 {
     char **pargv, optval[SZ_FNAME];
-    char  *iname = NULL, ch;
-    int    samp = 0, pos = 0, stat = OK;
+    char  *iname = NULL;
+    int    samp = 0, pos = 0, stat = OK, ch;
 
 
     /*  Initialize. 
