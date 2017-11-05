@@ -290,6 +290,17 @@ JD (2450157.78) = 1996/03/15 +  6.72
 
 ### LU decomposition of a square matrix
 
+`MW_LUDECOMPOSE`, `LUDCMD`, `LUDCMP`: Replace an NxN matrix A by the LU
+decomposition of a rowwise permutation of the matrix.  The LU decomposed
+matrix A and the permutation index IX are output.  The decomposition is
+performed in place.
+
+`MW_LUBACKSUB`, `LUBKSD`, `LUBKSB`: Solves the set of N linear equations
+`A*X=B`.  Here A is input, not as the matrix A but rather as its LU
+decomposition, determined by the routine mw_ludecompose.  IX is input as the
+permutation vector as returned by `MW_LUDECOMPOSE` & Co.  B is input as the
+right hand side vector B, and returns with the solution vector X.
+
 These subroutines are going to be replaced by LAPACK routines
 
 File: `test_ludecompose.x`
@@ -484,7 +495,132 @@ solve [  1.000  3.000  2.000] ==> [  0.338 -0.429  0.883]
 
 ## Fast Fourier transform
 
-### TWOFFT: complex FFTs of two input real arrays
-
 ### REALFT: FFT of a set of 2N real valued data points
 
+`realfft` Calculates the Fourier Transform of a set of 2N real valued data
+points.  Replaces this data by the positive frequency half of it's complex
+Fourier Transform.  The real valued first and last components of the complex
+transform are returned as elements DATA(1) and DATA(2) respectively.  N must
+be an integer power of 2.  This routine also calculates the inverse transform
+of a complex array if it is the transform of real data.  (Result in this case
+must be multiplied by 1/N). A forward transform is perform for `isign == 1`,
+otherwise the inverse transform is computed.
+
+File: `test_realfft.x`
+```
+task test_realfft = t_realfft
+
+procedure eval_realfft(x, ndim)
+int ndim
+real x[ndim]
+int j
+begin
+    call printf("FFT input  ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j])
+    }
+    call realfft(x, ndim/2, 1)
+    call printf("\nFFT output ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j])
+    }
+    call realfft(x, ndim/2, -1)
+    call printf("\nInverse    ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j]/(ndim/2))
+    }
+    call printf("\n")
+end
+
+procedure t_realfft ()
+real x[8]
+data x /1.0, 2.0, 1.0, -1.0, 1.5, 1.0, 0.5, 1.0/
+begin
+    call eval_realfft(x, 8)
+end
+```
+
+```
+cl> copy noao$rv/numrep.x .
+cl> softools
+cl> xc -x test_realfft.x numrep.x
+cl> task $test_realfft = test_realfft.e
+cl> test_realfft
+FFT input    1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+FFT output   7.000  1.000  1.621 -0.207  1.000  3.000 -2.621 -1.207
+Inverse      1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+```
+
+### TWOFFT: complex FFTs of two input real arrays
+
+Given two real input arrays, each of length N, this routine calls `cc_four1()`
+and returns two complex output arrays, FFT1 and FFT2, each of complex length N
+(i.e. real length 2*N), which contain the discrete Fourier transforms of the
+respective `DATA`s.  As always, N must be an integer power of 2.
+
+File: `test_twofft.x`
+```
+task test_twofft = t_twofft
+
+procedure eval_twofft(x1, x2, ndim)
+int ndim
+real x1[ndim], x2[ndim]
+int j
+pointer sp, y1, y2
+
+begin
+    call smark(sp)
+    call salloc(y1, 2*ndim, TY_REAL)
+    call salloc(y2, 2*ndim, TY_REAL)
+
+    call printf("in 1 ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x1[j])
+    }
+    call printf("\nin 2 ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x2[j])
+    }
+    call twofft(x1, x2, Memr[y1], Memr[y2], ndim)
+    call printf("\nout 1")
+    do j = 1, ndim, 2 {
+        call printf(" %6.3f + %6.3fi,")
+        call pargr(Memr[y1 + (j-1)])
+        call pargr(Memr[y1 + j])
+    }
+    call printf("\nout 2")
+    do j = 1, ndim, 2 {
+        call printf(" %6.3f + %6.3fi,")
+        call pargr(Memr[y2 + (j-1)])
+        call pargr(Memr[y2 + j])
+    }
+    call printf("\n")
+
+    call sfree(sp)
+end
+
+procedure t_twofft ()
+real x1[8]
+real x2[8]
+data x1 /1.0, 2.0, 1.0, -1.0, 1.5, 1.0, 0.5, 1.0/
+data x2 /0.9, 7.5, 6.5, 5.0, 7.5, 5.2, 5.1, 7.7/
+begin
+    call eval_twofft(x1, x2, 8)
+end
+```
+
+```
+cl> softools
+cl> xc -x test_twofft.x numrep.x
+cl> task $test_twofft = test_twofft.e
+cl> test_twofft
+in 1   1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+in 2   0.900  7.500  6.500  5.000  7.500  5.200  5.100  7.700
+out 1  7.000 +  0.000i,  1.621 + -0.207i,  1.000 +  3.000i, -2.621 + -1.207i,
+out 2 45.400 +  0.000i, -3.064 +  1.117i, -3.200 +  0.000i, -10.14 + -1.683i,
+```
