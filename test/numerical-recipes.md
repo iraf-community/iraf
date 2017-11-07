@@ -588,16 +588,24 @@ begin
     }
     call twofft(x1, x2, Memr[y1], Memr[y2], ndim)
     call printf("\nout 1")
-    do j = 1, ndim, 2 {
+    do j = 1, 2*ndim { # Avoid spurious "-" sign in 0.000 output
+        if (abs(Memr[y1 + j - 1]) < 5e-5) {
+            Memr[y1 + j - 1] = 0
+        }
+        if (abs(Memr[y2 + j - 1]) < 5e-5) {
+            Memr[y2 + j - 1] = 0
+        }
+    }
+    do j = 1, ndim {
         call printf(" %6.3f + %6.3fi,")
-        call pargr(Memr[y1 + (j-1)])
-        call pargr(Memr[y1 + j])
+        call pargr(Memr[y1 + 2*j-2])
+        call pargr(Memr[y1 + 2*j-1])
     }
     call printf("\nout 2")
-    do j = 1, ndim, 2 {
+    do j = 1, ndim {
         call printf(" %6.3f + %6.3fi,")
-        call pargr(Memr[y2 + (j-1)])
-        call pargr(Memr[y2 + j])
+        call pargr(Memr[y2 + 2*j-2])
+        call pargr(Memr[y2 + 2*j-1])
     }
     call printf("\n")
 
@@ -621,6 +629,6 @@ cl> task $test_twofft = test_twofft.e
 cl> test_twofft
 in 1   1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
 in 2   0.900  7.500  6.500  5.000  7.500  5.200  5.100  7.700
-out 1  7.000 +  0.000i,  1.621 + -0.207i,  1.000 +  3.000i, -2.621 + -1.207i,
-out 2 45.400 +  0.000i, -3.064 +  1.117i, -3.200 +  0.000i, -10.14 + -1.683i,
+out 1  7.000 +  0.000i,  1.621 + -0.207i,  1.000 +  3.000i, -2.621 + -1.207i,  1.000 +  0.000i, -2.621 +  1.207i,  1.000 + -3.000i,  1.621 +  0.207i,
+out 2 45.400 +  0.000i, -3.064 +  1.117i, -3.200 +  0.000i, -10.14 + -1.683i, -5.400 +  0.000i, -10.14 +  1.683i, -3.200 + 0.000i, -3.064 + -1.117i,
 ```
