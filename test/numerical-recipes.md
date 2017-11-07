@@ -546,7 +546,7 @@ end
 ```
 cl> copy noao$rv/numrep.x .
 cl> softools
-cl> xc -x test_realfft.x numrep.x
+cl> xc -x test_realfft.x numrep.x -lfftpack
 cl> task $test_realfft = test_realfft.e
 cl> test_realfft
 FFT input    1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
@@ -617,7 +617,7 @@ end
 Test options: `decimals=3`
 ```
 cl> softools
-cl> xc -x test_twofft.x numrep.x
+cl> xc -x test_twofft.x numrep.x -lfftpack
 cl> task $test_twofft = test_twofft.e
 cl> test_twofft
 in 1   1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000

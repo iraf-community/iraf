@@ -68,6 +68,7 @@ bin$libcurfit.a
 bin$libdeboor.a
 bin$libds.a
 bin$libex.a
+bin$libfftpack.a
 bin$libgks.a
 bin$libgsurfit.a
 bin$libimc.a

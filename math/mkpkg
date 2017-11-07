@@ -24,6 +24,7 @@ mathgen:
 	$call slalib
 	$call surfit
 	$call lapack
+	$call fftpack
 	$purge lib$
 	;
 
@@ -101,6 +102,13 @@ lapack:
 	$checkin  liblapack.a lib$
 	;
 
+fftpack:
+	$echo "-------------- LIBFFTPACK ----------------"
+	$checkout libfftpack.a lib$
+	$update   libfftpack.a
+	$checkin  libfftpack.a lib$
+	;
+
 libbev.a:				# Bevington routines
 	@bevington
 	;
@@ -147,4 +155,8 @@ libsurfit.a:				# Surface fitting on an even grid
 
 liblapack.a:				# Linear algebra package subset
 	@lapack
+	;
+
+libfftpack.a:				# Fast Fourier transformation package
+	@fftpack
 	;
