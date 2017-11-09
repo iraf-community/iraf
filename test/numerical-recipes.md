@@ -36,11 +36,11 @@ begin
 	    }
 	}
 	call printf("Mean     = %f\n")
-	call pargd(abs(m[1]/n))
+	call pargd(m[1]/n)
 	call printf("Variance = %f\n")
 	call pargd(m[2]/n)
 	call printf("Skew     = %f\n")
-	call pargd(abs(m[3]/n))
+	call pargd(m[3]/n)
 	call printf("Kurtosis = %f\n")
 	call pargd(m[4]/n)
 end
@@ -210,11 +210,11 @@ begin
 	    }
 	}
 	call printf("Mean     = %f\n")
-	call pargd(abs(m[1]/n))
+	call pargd(m[1]/n)
 	call printf("Variance = %f\n")
 	call pargd(m[2]/n)
 	call printf("Skew     = %f\n")
-	call pargd(abs(m[3]/n))
+	call pargd(m[3]/n)
 	call printf("Kurtosis = %f\n")
 	call pargd(m[4]/n)
 end
@@ -588,14 +588,6 @@ begin
     }
     call twofft(x1, x2, Memr[y1], Memr[y2], ndim)
     call printf("\nout 1")
-    do j = 1, 2*ndim { # Avoid spurious "-" sign in 0.000 output
-        if (abs(Memr[y1 + j - 1]) < 5e-5) {
-            Memr[y1 + j - 1] = 0
-        }
-        if (abs(Memr[y2 + j - 1]) < 5e-5) {
-            Memr[y2 + j - 1] = 0
-        }
-    }
     do j = 1, ndim {
         call printf(" %6.3f + %6.3fi,")
         call pargr(Memr[y1 + 2*j-2])
@@ -622,6 +614,7 @@ begin
 end
 ```
 
+Test options: `decimals=3`
 ```
 cl> softools
 cl> xc -x test_twofft.x numrep.x
