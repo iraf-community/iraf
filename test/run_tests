@@ -72,6 +72,7 @@ if [ -z "$TEST_FILES" ] ; then
 fi
 
 failure_file=$(mktemp -t iraftest.XXXXXXXXX)
+summary_file=$(mktemp -t iraftest.XXXXXXXXX)
 
 # Run one test. If a failure happens, the full message will be appended to
 # the $failure_file.
@@ -94,10 +95,12 @@ run_test () {
     local archs=$(echo "$options" | tr \  \\n | grep ^arch= | cut -d= -f2)
     local decimals=$(echo "$options" | tr \  \\n | grep ^decimals= | cut -d= -f2)
     if [ "$skip" ] ; then
+        echo "skipped" >> "$summary_file"
 	printf "s"
 	return
     fi
     if [ "$archs" -a -z "$(echo $archs | tr , \\n | grep ^$IRAFARCH\$)" ] ; then
+        echo "skipped" >> "$summary_file"
 	printf "a"
 	return
     fi
@@ -112,6 +115,7 @@ run_test () {
     if [ -s $diff_file ] ; then
 	if [ "$xfail" ] ; then
 	    printf "x"
+	    echo "xfailed" >> "$summary_file"
 	    return
 	else
 	    cat >> $failure_file <<EOF
@@ -130,10 +134,12 @@ Diff
 ====
 $(cat $diff_file | tail -n +3)
 EOF
+	    echo "failed" >> "$summary_file"
 	    printf "F"
 	    return
 	fi
     else
+        echo "passed" >> "$summary_file"
 	printf "."
 	return
     fi
@@ -156,8 +162,8 @@ diff_floatingpoint () {
     if [ -z "$decimals" ] ; then
 	diff -uw "$file1" "$file2"
     else
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge' < "$file1" > "$file1".fp
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge' < "$file2" > "$file2".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file1" > "$file1".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file2" > "$file2".fp
 	diff -uw "$file1".fp "$file2".fp
 	rm -f "$file1".fp "$file2".fp
     fi
@@ -255,6 +261,8 @@ for CL in $IRAF_SHELLS ; do
 	stat "${IRAFBIN}${CL}" >> "$failure_file" 2>&1
     fi
 done
+
+printf "Test summary:$(sort $summary_file | uniq -c | sed ':a;N;$!ba;s/\n */, /g')\n"
 
 if [ -s "$failure_file" ] ; then
     cat "$failure_file"
