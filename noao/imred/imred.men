@@ -14,4 +14,3 @@
        kpnoslit - KPNO low/moderate dispersion slits (Goldcam, RCspec, Whitecam)
 	quadred - CCD reductions for QUAD amplifier data
         specred - Generic slit and fiber spectral reduction package
-	   vtel - NSO Solar vacuum telescope image reductions

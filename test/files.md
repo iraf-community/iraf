@@ -127,7 +127,6 @@ noao$bin/x_quad.e
 noao$bin/x_quadred.e
 noao$bin/x_rv.e
 noao$bin/x_scombine.e
-noao$bin/x_vtel.e
 ```
 
 ```
