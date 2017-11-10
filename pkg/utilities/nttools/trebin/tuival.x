@@ -35,7 +35,6 @@ double	y			# o: the interpolated value
 #--
 double	x			# independent variable
 double	x1, x2			# beginning and end of output pixel
-double	dy			# an estimate of the error of interpolation
 int	klo, khi		# indexes within xa that bracket x
 int	npts			# number of points in interval
 
@@ -97,8 +96,8 @@ begin
 	    call tuhunt (xa, n, x, klo)
 	    klo = max (klo, 2)
 	    klo = min (klo, n-2)
-	    # Pass tuiep3 the four points at klo-1, klo, klo+1, klo+2.
-	    call tuiep3 (xa[klo-1], ya[klo-1], x, y, dy)
+	    # Pass tuiepn the four points at klo-1, klo, klo+1, klo+2.
+	    call tuiepn (4, xa[klo-1], ya[klo-1], x, y)
 
 	case I_SPLINE:
 

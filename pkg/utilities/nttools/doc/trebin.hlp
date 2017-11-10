@@ -246,10 +246,6 @@ but it will not modify any scalar column that gives the effective array size.
 .ih
 REFERENCES
 This task was written by Phil Hodge.
-The following Numerical Recipes subroutines are used by this task:
-TUCSPL, TUHUNT, TUIEP3, and TUISPL.
-Numerical Recipes was written by W.H. Press, B.P. Flannery,
-S.A. Teukolsky, and W.T. Vetterling.
 .ih
 SEE ALSO
 Type "help tables opt=sys" for a higher-level description of the 'tables'
