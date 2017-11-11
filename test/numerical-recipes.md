@@ -625,3 +625,83 @@ in 2   0.900  7.500  6.500  5.000  7.500  5.200  5.100  7.700
 out 1  7.000 +  0.000i,  1.621 + -0.207i,  1.000 +  3.000i, -2.621 + -1.207i,  1.000 +  0.000i, -2.621 +  1.207i,  1.000 + -3.000i,  1.621 +  0.207i,
 out 2 45.400 +  0.000i, -3.064 +  1.117i, -3.200 +  0.000i, -10.14 + -1.683i, -5.400 +  0.000i, -10.14 +  1.683i, -3.200 + 0.000i, -3.064 + -1.117i,
 ```
+
+## Interpolation routines for `trebin`
+
+This covers `tucspl`, `tuispl`, `tuhunt`, and `tuispl`.
+
+These are just the [`trebin` test in `nttools`](nttools.md), with an
+extended resolution:
+
+File: `rebin.tbl`
+```
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+453.02   5.873
+464.60  17.939
+603.04  39.843
+625.08  68.326
+647.27  44.617
+723.45  68.226
+730.31  36.557
+764.82  42.797
+784.33   2.650
+862.67  38.502
+```
+
+### TUCSPL/TUISPL: Spline interpolation
+
+```
+cl> trebin rebin.tbl rebspl.tbl lambda 450. 550. 10. function=spline
+rebin.tbl --> rebspl.tbl
+cl> type rebspl.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+450.00  INDEF
+460.00 13.514
+470.00 22.065
+480.00 26.780
+490.00 28.293
+500.00 27.306
+510.00 24.524
+520.00 20.653
+530.00 16.395
+540.00 12.456
+550.00  9.540
+cl> trebin rebin.tbl rebsplu.tbl lambda 860. 870. 10. function=spline
+rebin.tbl --> rebsplu.tbl
+cl> type rebsplu.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+860.00 33.545
+870.00  INDEF
+```
+
+### TUIEP3: Poly3 interpolation
+
+
+```
+cl> trebin rebin.tbl rebpol.tbl lambda 450. 550. 10. function=poly3
+rebin.tbl --> rebpol.tbl
+cl> type rebpol.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+450.00  INDEF
+460.00 13.681
+470.00 22.107
+480.00 27.688
+490.00 30.876
+500.00 32.122
+510.00 31.879
+520.00 30.599
+530.00 28.733
+540.00 26.734
+550.00 25.052
+cl> trebin rebin.tbl rebpolu.tbl lambda 860. 870. 10. function=poly3
+rebin.tbl --> rebpolu.tbl
+cl> type rebpolu.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+860.00 22.331
+870.00  INDEF
+```

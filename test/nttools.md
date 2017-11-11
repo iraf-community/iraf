@@ -295,6 +295,100 @@ table type:  fits
 
 ## trebin - Resample a table to uniform spacing.
 
+This task resamples tables. The grid on which to interpolate an input
+table may be specified either by a table giving explicit values or by
+start, end, and step values for uniform spacing. The column names in
+the output table will be the same as in the input table.
+
+This is out input file. The numbers are just randomly chosen.
+
+File: `rebin.tbl`
+```
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+453.02   5.873
+464.60  17.939
+603.04  39.843
+625.08  68.326
+647.27  44.617
+723.45  68.226
+730.31  36.557
+764.82  42.797
+784.33   2.650
+862.67  38.502
+```
+
+There are four different functions for interpolation: nearest, linear,
+poly3, spline.
+
+```
+cl> trebin rebin.tbl rebnr.tbl lambda 460. 860. 50. function=nearest
+rebin.tbl --> rebnr.tbl
+cl> type rebnr.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+460.00 17.939
+510.00 17.939
+560.00 39.843
+610.00 39.843
+660.00 44.617
+710.00 68.226
+760.00 42.797
+810.00  2.650
+860.00 38.502
+```
+
+```
+cl> trebin rebin.tbl reblin.tbl lambda 460. 860. 50. function=linear
+rebin.tbl --> reblin.tbl
+cl> type reblin.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+460.00 13.146
+510.00 25.122
+560.00 33.033
+610.00 48.838
+660.00 48.562
+710.00 130.32
+760.00 52.715
+810.00 14.398
+860.00 37.280
+```
+
+```
+cl> trebin rebin.tbl rebspl.tbl lambda 460. 860. 50. function=spline
+rebin.tbl --> rebspl.tbl
+cl> type rebspl.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+460.00 13.514
+510.00 24.524
+560.00  8.351
+610.00 52.234
+660.00 49.286
+710.00 106.62
+760.00 41.834
+810.00 -26.03
+860.00 33.545
+```
+
+```
+cl> trebin rebin.tbl rebpol.tbl lambda 460. 860. 50. function=poly3
+rebin.tbl --> rebpol.tbl
+cl> type rebpol.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+460.00 13.681
+510.00 31.879
+560.00 24.140
+610.00 53.145
+660.00 56.902
+710.00 102.17
+760.00 38.854
+810.00 -51.35
+860.00 22.331
+```
+
 ## tselect - Create a new table from selected rows of a table.
 
 ## tsort - Sort a table.
