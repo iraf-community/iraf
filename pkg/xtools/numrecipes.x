@@ -3,7 +3,6 @@
 include	<math.h>
 include	<mach.h>
 
-# GAMMLN -- Return natural log of gamma function.
 # POIDEV -- Returns Poisson deviates for a given mean.
 # GASDEV -- Return a normally distributed deviate of zero mean and unit var.
 # MR_SOLVE -- Levenberg-Marquardt nonlinear chi square minimization.
@@ -12,36 +11,6 @@ include	<mach.h>
 # TWOFFT -- Returns the complex FFTs of two input real arrays.
 # REALFT -- Calculates the FFT of a set of 2N real valued data points.
 #     FOUR1 -- Computes the forward or inverse FFT of the input array.
-
-
-# GAMMLN -- Return natural log of gamma function.
-# Argument must greater than 0.  Full accuracy is obtained for values
-# greater than 1.  For 0<xx<1, the reflection formula can be used first.
-#
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
-
-real procedure gammln (xx)
-
-real	xx		# Value to be evaluated
-
-int	j
-double	cof[6], stp, x, tmp, ser
-data	cof, stp / 76.18009173D0, -86.50532033D0, 24.01409822D0,
-		-1.231739516D0,.120858003D-2,-.536382D-5,2.50662827465D0/
-
-begin
-	x = xx - 1.0D0
-	tmp = x + 5.5D0
-	tmp = (x + 0.5D0) * log (tmp) - tmp
-	ser = 1.0D0
-	do j = 1, 6 {
-	    x = x + 1.0D0
-	    ser = ser + cof[j] / x
-	}
-	return (tmp + log (stp * ser))
-end
 
 
 # POIDEV -- Returns Poisson deviates for a given mean.

@@ -52,8 +52,9 @@ the result of the original NR code.
 Test options: `decimals=2`
 ```
 cl> copy noao$artdata/numrecipes.x .
+cl> copy noao$artdata/gammln.c .
 cl> softools
-cl> xc test-gasdev.x numrecipes.x
+cl> xc -I$iraf/include test-gasdev.x numrecipes.x gammln.c
 cl> task $test_gasdev = test-gasdev.e
 cl> test_gasdev
 Mean     = 0.0004794365668388
@@ -110,7 +111,7 @@ the result of the original NR code.
 Test options: `decimals=1`
 ```
 cl> softools
-cl> xc -x test-poidev.x numrecipes.x
+cl> xc -x -I$iraf/include test-poidev.x numrecipes.x gammln.c
 cl> task $test_poidev = test-poidev.e
 cl> for ( x = 0.7; x < 60; x*=1.55)  test_poidev(x)
      xm |       mean |   variance |       skew |   kurtosis
@@ -152,7 +153,7 @@ the result of the original NR code.
 Test options: `decimals=4`
 ```
 cl> softools
-cl> xc -x test-gammln.x numrecipes.x
+cl> xc -x -I$iraf/include test-gammln.x gammln.c
 cl> task $test_gammln = test-gammln.e
 cl> for ( x = 0.23; x < 10; x += 0.667)  test_gammln(x)
 gammln(0.23) = 1.376194
