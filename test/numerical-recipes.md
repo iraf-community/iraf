@@ -181,11 +181,14 @@ gammln(200.0) = 857.933655
 
 ### DAORAN: random number generator RAN2
 
+The DAORAN random number generator is going to be replaced by the
+URAND random number generator by D.Knuth.
+
 File: `test-ran2.x`
 ```
 task test_ran2 = t_ran2
 procedure t_ran2 ()
-real daoran()
+real urand()
 double x, y
 double m[4]
 int i,j,n
@@ -195,7 +198,7 @@ begin
 		m[j] = 0
 	}
 	do i=1, n {
-	    x = daoran(0)
+	    x = urand(0)
 		if (x < 0 | x >= 1) {
 			call printf("Outlyer: %g\n")
 			call pargd(x)
@@ -223,9 +226,8 @@ the result of the original NR code.
 
 Test options: `decimals=4`
 ```
-cl> copy noao$digiphot/daophot/daolib/daoran.x .
 cl> softools
-cl> xc test-ran2.x daoran.x
+cl> xc test-ran2.x
 cl> task $test_ran2 = test-ran2.e
 cl> test_ran2
 Mean     = 0.0000018238614310
