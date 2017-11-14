@@ -118,6 +118,9 @@
 #define alloca malloc
 #endif
 
+/* Random number generators for various distributions */
+#include "simplerng.h"
+
    /*  Shrink the initial stack depth to keep local data <32K (mac limit)  */
    /*  yacc will allocate more space if needed, though.                    */
 #define  FFINITDEPTH   100
@@ -1652,10 +1655,8 @@ case 49:
 case 50:
 #line 492 "eval.y"
 { if (FSTRCMP(ffvsp[-1].str,"RANDOM(") == 0) {  /* Scalar RANDOM() */
-                     srand( (unsigned int) time(NULL) );
                      ffval.Node = New_Func( DOUBLE, rnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
 		  } else if (FSTRCMP(ffvsp[-1].str,"RANDOMN(") == 0) {/*Scalar RANDOMN()*/
-		     srand( (unsigned int) time(NULL) );
 		     ffval.Node = New_Func( DOUBLE, gasrnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
                   } else {
                      fferror("Function() not supported");
@@ -1767,12 +1768,10 @@ case 54:
 		     ffval.Node = New_Func( TYPE(ffvsp[-1].Node),  /* Force 1D result */
 				    max1_fct, 1, ffvsp[-1].Node, 0, 0, 0, 0, 0, 0 );
 		  else if (FSTRCMP(ffvsp[-2].str,"RANDOM(") == 0) { /* Vector RANDOM() */
-                     srand( (unsigned int) time(NULL) );
                      ffval.Node = New_Func( 0, rnd_fct, 1, ffvsp[-1].Node, 0, 0, 0, 0, 0, 0 );
 		     TEST(ffval.Node);
 		     TYPE(ffval.Node) = DOUBLE;
 		  } else if (FSTRCMP(ffvsp[-2].str,"RANDOMN(") == 0) {
-		     srand( (unsigned int) time(NULL) ); /* Vector RANDOMN() */
 		     ffval.Node = New_Func( 0, gasrnd_fct, 1, ffvsp[-1].Node, 0, 0, 0, 0, 0, 0 );
 		     TEST(ffval.Node);
 		     TYPE(ffval.Node) = DOUBLE;
@@ -1815,7 +1814,6 @@ case 54:
 		     else if (FSTRCMP(ffvsp[-2].str,"CEIL(") == 0)
 			ffval.Node = New_Func( 0, ceil_fct, 1, ffvsp[-1].Node, 0, 0, 0, 0, 0, 0 );
 		     else if (FSTRCMP(ffvsp[-2].str,"RANDOMP(") == 0) {
-		       srand( (unsigned int) time(NULL) );
 		       ffval.Node = New_Func( 0, poirnd_fct, 1, ffvsp[-1].Node, 
 				      0, 0, 0, 0, 0, 0 );
 		       TYPE(ffval.Node) = LONG;
@@ -3452,6 +3450,13 @@ void Evaluate_Parser( long firstRow, long nRows )
 {
    int     i, column;
    long    offset, rowOffset;
+   static int rand_initialized = 0;
+
+   /* Initialize the random number generator once and only once */
+   if (rand_initialized == 0) {
+     simplerng_srand( (unsigned int) time(NULL) );
+     rand_initialized = 1;
+   }
 
    gParse.firstRow = firstRow;
    gParse.nRows    = nRows;
@@ -4864,114 +4869,6 @@ This (commented out) algorithm uses the Low of Cosines, which becomes
   return 2.0*atan2(sqrt(a), sqrt(1.0 - a)) / deg;
 }
 
-
-
-
-
-
-static double ran1()
-{
-  static double dval = 0.0;
-  double rndVal;
-
-  if (dval == 0.0) {
-    if( rand()<32768 && rand()<32768 )
-      dval =      32768.0;
-    else
-      dval = 2147483648.0;
-  }
-
-  rndVal = (double)rand();
-  while( rndVal > dval ) dval *= 2.0;
-  return rndVal/dval;
-}
-
-/* Gaussian deviate routine from Numerical Recipes */
-static double gasdev()
-{
-  static int iset = 0;
-  static double gset;
-  double fac, rsq, v1, v2;
-
-  if (iset == 0) {
-    do {
-      v1 = 2.0*ran1()-1.0;
-      v2 = 2.0*ran1()-1.0;
-      rsq = v1*v1 + v2*v2;
-    } while (rsq >= 1.0 || rsq == 0.0);
-    fac = sqrt(-2.0*log(rsq)/rsq);
-    gset = v1*fac;
-    iset = 1;
-    return v2*fac;
-  } else {
-    iset = 0;
-    return gset;
-  }
-
-}
-
-/* lgamma function - from Numerical Recipes */
-
-float gammaln(float xx)
-     /* Returns the value ln Gamma[(xx)] for xx > 0. */
-{
-  /* 
-     Internal arithmetic will be done in double precision, a nicety
-     that you can omit if five-figure accuracy is good enough. */
-  double x,y,tmp,ser;
-  static double cof[6]={76.18009172947146,-86.50532032941677,
-			24.01409824083091,-1.231739572450155,
-			0.1208650973866179e-2,-0.5395239384953e-5};
-  int j;
-  y=x=xx;
-  tmp=x+5.5;
-  tmp -= (x+0.5)*log(tmp);
-  ser=1.000000000190015;
-  for (j=0;j<=5;j++) ser += cof[j]/++y;
-  return (float) -tmp+log(2.5066282746310005*ser/x);
-}
-
-/* Poisson deviate - derived from Numerical Recipes */
-static long poidev(double xm)
-{
-  static double sq, alxm, g, oldm = -1.0;
-  static double pi = 0;
-  double em, t, y;
-
-  if (pi == 0) pi = ((double)4)*atan((double)1);
-
-  if (xm < 20.0) {
-    if (xm != oldm) {
-      oldm = xm;
-      g = exp(-xm);
-    }
-    em = -1;
-    t = 1.0;
-    do {
-      em += 1;
-      t *= ran1();
-    } while (t > g);
-  } else {
-    if (xm != oldm) {
-      oldm = xm;
-      sq = sqrt(2.0*xm);
-      alxm = log(xm);
-      g = xm*alxm-gammaln( (float) (xm+1.0));
-    }
-    do {
-      do {
-	y = tan(pi*ran1());
-	em = sq*y+xm;
-      } while (em < 0.0);
-      em = floor(em);
-      t = 0.9*(1.0+y*y)*exp(em*alxm-gammaln( (float) (em+1.0) )-g);
-    } while (ran1() > t);
-  }
-
-  /* Return integer version */
-  return (long int) floor(em+0.5);
-}
-
 static void Do_Func( Node *this )
 {
    Node *theParams[MAXSUBS];
@@ -5046,9 +4943,9 @@ static void Do_Func( Node *this )
 
 	 case poirnd_fct:
 	    if( theParams[0]->type==DOUBLE )
-	      this->value.data.lng = poidev(pVals[0].data.dbl);
+	      this->value.data.lng = simplerng_getpoisson(pVals[0].data.dbl);
 	    else
-	      this->value.data.lng = poidev(pVals[0].data.lng);
+	      this->value.data.lng = simplerng_getpoisson(pVals[0].data.lng);
 	    break;
 
 	 case abs_fct:
@@ -5303,14 +5200,14 @@ static void Do_Func( Node *this )
 	    break;
 	 case rnd_fct:
 	   while( elem-- ) {
-	     this->value.data.dblptr[elem] = ran1();
+	     this->value.data.dblptr[elem] = simplerng_getuniform();
 	     this->value.undef[elem] = 0;
 	    }
 	    break;
 
 	 case gasrnd_fct:
 	    while( elem-- ) {
-	       this->value.data.dblptr[elem] = gasdev();
+	       this->value.data.dblptr[elem] = simplerng_getnorm();
 	       this->value.undef[elem] = 0;
 	    }
 	    break;
@@ -5321,7 +5218,7 @@ static void Do_Func( Node *this )
 		while( elem-- ) {
 		  this->value.undef[elem] = (pVals[0].data.dbl < 0);
 		  if (! this->value.undef[elem]) {
-		    this->value.data.lngptr[elem] = poidev(pVals[0].data.dbl);
+		    this->value.data.lngptr[elem] = simplerng_getpoisson(pVals[0].data.dbl);
 		  }
 		} 
 	      } else {
@@ -5331,7 +5228,7 @@ static void Do_Func( Node *this )
 		    this->value.undef[elem] = 1;
 		  if (! this->value.undef[elem]) {
 		    this->value.data.lngptr[elem] = 
-		      poidev(theParams[0]->value.data.dblptr[elem]);
+		      simplerng_getpoisson(theParams[0]->value.data.dblptr[elem]);
 		  }
 		} /* while */
 	      } /* ! CONST_OP */
@@ -5341,7 +5238,7 @@ static void Do_Func( Node *this )
 		while( elem-- ) {
 		  this->value.undef[elem] = (pVals[0].data.lng < 0);
 		  if (! this->value.undef[elem]) {
-		    this->value.data.lngptr[elem] = poidev(pVals[0].data.lng);
+		    this->value.data.lngptr[elem] = simplerng_getpoisson(pVals[0].data.lng);
 		  }
 		} 
 	      } else {
@@ -5351,7 +5248,7 @@ static void Do_Func( Node *this )
 		    this->value.undef[elem] = 1;
 		  if (! this->value.undef[elem]) {
 		    this->value.data.lngptr[elem] = 
-		      poidev(theParams[0]->value.data.lngptr[elem]);
+		      simplerng_getpoisson(theParams[0]->value.data.lngptr[elem]);
 		  }
 		} /* while */
 	      } /* ! CONST_OP */
