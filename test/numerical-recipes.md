@@ -76,7 +76,7 @@ int i,j,n, start
 data start/0/
 begin
     xm=clgetr("xm")
-	n=1000000
+	n=1500000
 	do j=1, 4 {
 		m[j] = 0
 	}
@@ -93,42 +93,39 @@ begin
 		call printf("--------|------------|------------|------------|------------\n")
 		start = 1
 	}
+	# To avoid accuracy problems with different magnitudes of the value,
+	# we normalize all expected values for the moments to 1.0.
 	call printf("%7.1f | %10.4f | %10.4f | %10.4f | %10.4f\n")
 	call pargr(xm)
-	call pargd(xm + m[1]/n)
-	call pargd(m[2]/n)
-	call pargd(m[3]/n)
-	call pargd(m[4]/n)
+	call pargd((xm + m[1]/n) / xm) # expected: xm
+	call pargd((m[2]/n) / xm)      # expected: xm
+	call pargd((m[3]/n) / xm)      # expected: xm
+	call pargd((m[4]/n) / (xm * (1+3*xm))) # expected: xm*(1+3*xm)
 end
 ```
 
 Compile it, declare and run as an IRAF task. The following numbers are
 the result of the original NR code.
 
-Test options: `decimals=2`
+Test options: `decimals=1`
 ```
 cl> softools
 cl> xc -x test-poidev.x numrecipes.x
 cl> task $test_poidev = test-poidev.e
-cl> for ( i = -1; i < 30; i+=2)  test_poidev(i/2.0)
+cl> for ( x = 0.7; x < 60; x*=1.55)  test_poidev(x)
      xm |       mean |   variance |       skew |   kurtosis
 --------|------------|------------|------------|------------
-   -0.5 |     0.0000 |     0.2500 |     0.1250 |     0.0625
-    0.5 |     0.4994 |     0.4992 |     0.4979 |     1.2443
-    1.5 |     1.5002 |     1.5041 |     1.5143 |     8.3393
-    2.5 |     2.4990 |     2.4994 |     2.5036 |    21.2696
-    3.5 |     3.5015 |     3.5104 |     3.5508 |    40.6212
-    4.5 |     4.5042 |     4.4978 |     4.5768 |    65.4975
-    5.5 |     5.5014 |     5.4948 |     5.4843 |    96.0890
-    6.5 |     6.5020 |     6.5092 |     6.4698 |   133.0264
-    7.5 |     7.4999 |     7.5038 |     7.6774 |   177.2280
-    8.5 |     8.5015 |     8.4993 |     8.6282 |   226.2072
-    9.5 |     9.5003 |     9.5091 |     9.6242 |   281.6827
-   10.5 |    10.4985 |    10.5028 |    10.3879 |   341.3161
-   11.5 |    11.5032 |    11.5049 |    11.6535 |   408.2523
-   12.5 |    12.5005 |    12.4857 |    12.4353 |   478.2899
-   13.5 |    13.4978 |    13.4837 |    13.2168 |   557.7109
-   14.5 |    14.5096 |    14.5111 |    15.0703 |   647.6903
+    0.7 |     0.9986 |     0.9998 |     1.0006 |     1.0014
+    1.1 |     0.9991 |     1.0007 |     1.0007 |     1.0012
+    1.7 |     1.0000 |     1.0009 |     1.0026 |     1.0021
+    2.6 |     1.0006 |     1.0011 |     1.0055 |     1.0013
+    4.0 |     1.0000 |     0.9988 |     0.9925 |     0.9951
+    6.3 |     1.0004 |     1.0019 |     1.0155 |     1.0040
+    9.7 |     1.0000 |     1.0004 |     1.0056 |     1.0011
+   15.0 |     0.9999 |     1.0006 |     1.0010 |     0.9995
+   23.3 |     1.0001 |     1.0013 |     1.0101 |     1.0027
+   36.1 |     1.0001 |     0.9997 |     1.0120 |     1.0041
+   56.0 |     0.9999 |     1.0001 |     0.9719 |     1.0023
 ```
 
 ### GAMMLN: natural log of gamma function
@@ -152,7 +149,7 @@ end
 Compile it, declare and run as an IRAF task. The following numbers are
 the result of the original NR code.
 
-Test options: `decimals=5`
+Test options: `decimals=4`
 ```
 cl> softools
 cl> xc -x test-gammln.x numrecipes.x
