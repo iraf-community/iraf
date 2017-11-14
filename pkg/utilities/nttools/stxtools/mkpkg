@@ -30,9 +30,7 @@ libpkg.a:
 	ludcmd.x
 	ludcmp.x       	
 	postexit.x	<clset.h>
-	savgol.x	
 	sbuf.x		"sbuf.h"
-	sgcone.x		
 	similar.x
 	strjust.x	<ctype.h>
 	stxgetcoord.x	<imhdr.h> <mwset.h> <math.h>
