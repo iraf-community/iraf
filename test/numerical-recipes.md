@@ -52,7 +52,6 @@ the result of the original NR code.
 Test options: `decimals=2`
 ```
 cl> copy noao$artdata/numrecipes.x .
-cl> copy noao$artdata/gammln.c .
 cl> softools
 cl> xc test-gasdev.x numrecipes.x
 test-gasdev.x:
@@ -233,7 +232,7 @@ File: `test-ran2.x`
 ```
 task test_ran2 = t_ran2
 procedure t_ran2 ()
-real urand()
+real daoran()
 double x, y
 double m[4]
 int i,j,n
@@ -243,7 +242,7 @@ begin
 		m[j] = 0
 	}
 	do i=1, n {
-	    x = urand(0)
+	    x = daoran(0)
 		if (x < 0 | x >= 1) {
 			call printf("Outlyer: %g\n")
 			call pargd(x)
@@ -271,6 +270,7 @@ the result of the original NR code.
 
 Test options: `decimals=4`
 ```
+cl> copy noao$digiphot/daophot/daolib/daoran.x .
 cl> softools
 cl> xc test-ran2.x daoran.x
 test-ran2.x:
