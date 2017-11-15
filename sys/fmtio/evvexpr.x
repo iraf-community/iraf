@@ -4450,7 +4450,7 @@ end
 
 define	YYNPROD		39
 define	YYLAST		303
-# line	1 "/iraf/iraf/lib/yaccpar.x"
+# line	1 "/home/pi/git/olebole/iraf-v216/lib/yaccpar.x"
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 # Parser for yacc output, translated to the IRAF SPP language.  The contents

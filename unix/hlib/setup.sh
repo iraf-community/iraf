@@ -2,7 +2,7 @@
 
 # Allow a previously defined $iraf to be used.
 if [ -z "$iraf" ]; then
-    export iraf=/iraf/iraf/
+    export iraf=/home/pi/git/olebole/iraf-v216/
 fi
 
 # Allow a previously defined $IRAFARCH to be used.

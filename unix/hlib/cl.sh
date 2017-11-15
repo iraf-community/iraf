@@ -45,7 +45,7 @@ case "$nm" in
 esac
 
 # Determine IRAF root directory (value set in install script).
-d_iraf="/iraf/iraf/"
+d_iraf="/home/pi/git/olebole/iraf-v216/"
 if [ -n $iraf ]; then
     if [ ! -e $iraf ]; then
         echo "Warning: iraf=$iraf does not exist \(check .cshrc or .login\)"
