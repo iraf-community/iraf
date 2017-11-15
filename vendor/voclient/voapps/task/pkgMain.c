@@ -51,8 +51,8 @@ static struct option long_opts[] = {
  */
 int main (int argc, char *argv[])
 {
-    char **pargv, optval[SZ_FNAME], ch;
-    int    pos = 0;
+    char **pargv, optval[SZ_FNAME];
+    int    pos = 0, ch;
 
 
     /* Process arguments.

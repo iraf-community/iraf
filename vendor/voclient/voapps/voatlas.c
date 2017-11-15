@@ -123,10 +123,10 @@ static void Tests (char *input);
 int 
 voatlas (int argc, char **argv, size_t *reslen, void **result)
 {
-    char **pargv, optval[SZ_FNAME], ch;
+    char **pargv, optval[SZ_FNAME];
     char  *iname = NULL, *oname = NULL, *dlname = NULL;
     char   tmp[SZ_FNAME], buf[SZ_FNAME];
-    int    i=1, status = OK, apos = 0, samp = -1, naxis = 512;
+    int    i=1, status = OK, apos = 0, samp = -1, naxis = 512, ch;
 
 
     /*  Initialize.
