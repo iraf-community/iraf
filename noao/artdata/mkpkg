@@ -29,6 +29,7 @@ libpkg.a:
 	mktemplates.x	mktemplates.com <error.h> <imhdr.h> <math.h>\
 			<math/iminterp.h>
 	numrecipes.x	<math.h>
+	gammln.c
 	t_mk1dspec.x	<error.h> <imhdr.h>
 	t_mk2dspec.x	<error.h> <imhdr.h> <math/iminterp.h>
 	t_mkechelle.x	<error.h> <imhdr.h> <math.h>

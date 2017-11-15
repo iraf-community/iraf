@@ -71,7 +71,9 @@ if [ -z "$TEST_FILES" ] ; then
     TEST_FILES=${iraf}test/*.md
 fi
 
-failure_file=$(mktemp -t iraftest.XXXXXXXXX)
+base_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
+failure_file=${base_dir}/failures.txt
+summary_file=${base_dir}/summary.txt
 
 # Run one test. If a failure happens, the full message will be appended to
 # the $failure_file.
@@ -94,24 +96,27 @@ run_test () {
     local archs=$(echo "$options" | tr \  \\n | grep ^arch= | cut -d= -f2)
     local decimals=$(echo "$options" | tr \  \\n | grep ^decimals= | cut -d= -f2)
     if [ "$skip" ] ; then
+        echo "skipped" >> "$summary_file"
 	printf "s"
 	return
     fi
     if [ "$archs" -a -z "$(echo $archs | tr , \\n | grep ^$IRAFARCH\$)" ] ; then
+        echo "skipped" >> "$summary_file"
 	printf "a"
 	return
     fi
-    local cmd_file=$(mktemp -t iraftest.XXXXXXXXX)
+    local cmd_file="${base_dir}/cmd"
     printf "%b\nlogout\n" "$command" > "$cmd_file"
-    res_file=$(mktemp -t iraftest.XXXXXXXXX)
+    res_file="${base_dir}/expected"
     printf "%b\n" "$result" > "$res_file" 2>&1
-    clres_file=$(mktemp -t iraftest.XXXXXXXXX)
+    clres_file="${base_dir}/output"
     "${CL}" -f "$cmd_file" > "$clres_file" 2>&1
-    diff_file=$(mktemp -t iraftest.XXXXXXXXX)
+    diff_file="${base_dir}/diff"
     diff_floatingpoint "$res_file" "$clres_file" "$decimals" > "$diff_file"
     if [ -s $diff_file ] ; then
 	if [ "$xfail" ] ; then
 	    printf "x"
+	    echo "xfailed" >> "$summary_file"
 	    return
 	else
 	    cat >> $failure_file <<EOF
@@ -130,10 +135,12 @@ Diff
 ====
 $(cat $diff_file | tail -n +3)
 EOF
+	    echo "failed" >> "$summary_file"
 	    printf "F"
 	    return
 	fi
     else
+        echo "passed" >> "$summary_file"
 	printf "."
 	return
     fi
@@ -156,8 +163,8 @@ diff_floatingpoint () {
     if [ -z "$decimals" ] ; then
 	diff -uw "$file1" "$file2"
     else
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge' < "$file1" > "$file1".fp
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge' < "$file2" > "$file2".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file1" > "$file1".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file2" > "$file2".fp
 	diff -uw "$file1".fp "$file2".fp
 	rm -f "$file1".fp "$file2".fp
     fi
@@ -245,10 +252,11 @@ run_tests () {
 for CL in $IRAF_SHELLS ; do
     if [ -x "${IRAFBIN}${CL}" ] ; then
 	for t in $TEST_FILES ; do
-	    tmp_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
+	    test_dir="${base_dir}/testroot"
+	    mkdir -p "${test_dir}"
 	    printf "%b: %b " "${CL}" "$(basename ${t})"
-	    cd "$tmp_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
-	    rm -rf "${tmp_dir}"
+	    cd "$test_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
+	    rm -rf "${test_dir}"
 	done
     else
 	echo "IRAF shell $CL not found"
@@ -256,10 +264,13 @@ for CL in $IRAF_SHELLS ; do
     fi
 done
 
+printf "Test summary:$(sort $summary_file | uniq -c | sed ':a;N;$!ba;s/\n */, /g')\n"
+
 if [ -s "$failure_file" ] ; then
     cat "$failure_file"
-    rm -f "$failure_file"
+    rm -rf "${base_dir}"
     exit 1
 fi
 
-rm -f "$failure_file"
+rm -rf "${base_dir}"
+exit 0

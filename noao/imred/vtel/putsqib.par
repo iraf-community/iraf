@@ -1,3 +1,0 @@
-image,s,q,,,,Data image to merge with squibby brightness image
-sqibimage,s,q,,,,Squibby brightness image
-merged,s,q,,,,New image to contain the merged image

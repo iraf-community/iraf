@@ -68,6 +68,7 @@ bin$libcurfit.a
 bin$libdeboor.a
 bin$libds.a
 bin$libex.a
+bin$libfftpack.a
 bin$libgks.a
 bin$libgsurfit.a
 bin$libimc.a
@@ -75,6 +76,7 @@ bin$libimd.a
 bin$libimfort.a
 bin$libiminterp.a
 bin$libinterp.a
+bin$liblapack.a
 bin$libllsq.a
 bin$libmemdbg.a
 bin$libncar.a
@@ -97,3 +99,38 @@ host$bin/libf2c.a
 host$bin/libos.a
 ```
 
+## NOAO packages
+
+```
+cl> dir noao$bin/*.e ncol=1
+noao$bin/x_apextract.e
+noao$bin/x_apphot.e
+noao$bin/x_artdata.e
+noao$bin/x_astcat.e
+noao$bin/x_astutil.e
+noao$bin/x_bias.e
+noao$bin/x_ccdred.e
+noao$bin/x_crutil.e
+noao$bin/x_daophot.e
+noao$bin/x_dtoi.e
+noao$bin/x_generic.e
+noao$bin/x_irred.e
+noao$bin/x_longslit.e
+noao$bin/x_mtlocal.e
+noao$bin/x_nobsolete.e
+noao$bin/x_nproto.e
+noao$bin/x_obsutil.e
+noao$bin/x_onedspec.e
+noao$bin/x_photcal.e
+noao$bin/x_ptools.e
+noao$bin/x_quad.e
+noao$bin/x_quadred.e
+noao$bin/x_rv.e
+noao$bin/x_scombine.e
+```
+
+```
+cl> dir noao$bin/*.a ncol=1
+noao$bin/libasttools.a
+noao$bin/libsmw.a
+```

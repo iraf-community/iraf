@@ -3,7 +3,6 @@
 include	<math.h>
 include	<mach.h>
 
-# GAMMLN -- Return natural log of gamma function.
 # POIDEV -- Returns Poisson deviates for a given mean.
 # GASDEV -- Return a normally distributed deviate of zero mean and unit var.
 # MR_SOLVE -- Levenberg-Marquardt nonlinear chi square minimization.
@@ -11,119 +10,91 @@ include	<mach.h>
 #     MR_INVERT -- Solve a set of linear equations using Householder transforms.
 # TWOFFT -- Returns the complex FFTs of two input real arrays.
 # REALFT -- Calculates the FFT of a set of 2N real valued data points.
-#     FOUR1 -- Computes the forward or inverse FFT of the input array.
-
-
-# GAMMLN -- Return natural log of gamma function.
-# Argument must greater than 0.  Full accuracy is obtained for values
-# greater than 1.  For 0<xx<1, the reflection formula can be used first.
-#
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
-
-real procedure gammln (xx)
-
-real	xx		# Value to be evaluated
-
-int	j
-double	cof[6], stp, x, tmp, ser
-data	cof, stp / 76.18009173D0, -86.50532033D0, 24.01409822D0,
-		-1.231739516D0,.120858003D-2,-.536382D-5,2.50662827465D0/
-
-begin
-	x = xx - 1.0D0
-	tmp = x + 5.5D0
-	tmp = (x + 0.5D0) * log (tmp) - tmp
-	ser = 1.0D0
-	do j = 1, 6 {
-	    x = x + 1.0D0
-	    ser = ser + cof[j] / x
-	}
-	return (tmp + log (stp * ser))
-end
 
 
 # POIDEV -- Returns Poisson deviates for a given mean.
 # The real value returned is an integer.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
-#
-# Modified to return zero for input values less than or equal to zero.
+# Copyright(c) 2017 Anastasia Galkin
+# References:
+#   for lambda <= 30: Donald E. Knuth (1969). Seminumerical
+#                     Algorithms. The Art of Computer Programming,
+#                     Volume 2. Addison Wesley.
+#   for lambda  > 30: A. C. Atkinson (1978), The Computer Generation
+#                     of Poisson Random Variables, Journal of the
+#                     Royal Statistical Society Series C (Applied
+#                     Statistics) Vol. 28, No. 1. (1979) (pp 29-35)
 
 real procedure poidev (xm, seed)
 
 real	xm		# Poisson mean
 long	seed		# Random number seed
 
-real	oldm, g, em, t, y, ymin, ymax, sq, alxm, gammln(), urand(), gasdev()
-data	oldm /-1./
-
+real	c, beta, alpha, k, x, p, e, n, u, lhs, rhs, v, r,y
+real	urand(), log(), exp(), gammln()
 begin
-	if (xm <= 0)
-	    em = 0
-	else if (xm < 12) {
-	    if (xm != oldm) {
-		oldm = xm
-		g = exp (-xm)
+    if (xm < 0.) {
+        return 0.0
+    } else if (xm < 30.) {
+	x = 0.
+ 	p = 1.
+ 	e = exp(-xm)
+ 	while (p > e) {
+ 	    r = urand(seed)
+	    p = p * r
+ 	    x = x + 1.
+	}
+ 	return x - 1.
+    } else {
+        c = 0.767 - 3.36 / xm
+ 	beta = PI / sqrt(3. * xm)
+ 	alpha = beta * xm
+ 	k = log(c) - xm - log(beta)
+	repeat {
+	    u = urand(seed)
+	    x = (alpha - log((1. - u) / u)) / beta
+	    n = int(x + 0.5)
+	    if (n >= 0.) {
+	        v = urand(seed)
+		y = alpha - beta * x
+		lhs = y + log(v / (1. + exp(y)) ** 2)
+		rhs = k + n * log(xm) - gammln(n + 1.)
 	    }
-	    em = 0
-	    for (t = urand (seed); t > g; t = t * urand (seed))
-		em = em + 1
-	} else if (xm < 100) {
-	    if (xm != oldm) {
-		oldm = xm
-		sq = sqrt (2. * xm)
-		ymin = -xm / sq
-		ymax = (1000 - xm) / sq
-		alxm = log (xm)
-		g = xm * alxm - gammln (xm+1.)
-	    }
-	    repeat {
-		repeat {
-	            y = tan (PI * urand(seed))
-		} until (y >= ymin)
-	        em = int (sq * min (y, ymax) + xm)
-	        t = 0.9 * (1 + y**2) * exp (em * alxm - gammln (em+1) - g)
-	    } until (urand(seed) <= t)
-	} else
-	    em = xm + sqrt (xm) * gasdev (seed)
-	return (em)
+	} until (lhs <= rhs)
+	return n
+    }
 end
 
 
 # GASDEV -- Return a normally distributed deviate with zero mean and unit
 # variance.  The method computes two deviates simultaneously.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# Copyright(c) 2017 Anastasia Galkin
+# Reference: G. E. P. Box and Mervin E. Muller, A Note on the Generation of
+#            Random Normal Deviates, The Annals of Mathematical Statistics
+#            (1958), Vol. 29, No. 2 pp. 610–611
 
 real procedure gasdev (seed)
 
-long	seed		# Seed for random numbers
+long	seed
 
-real	v1, v2, r, fac, urand()
-int	iset
-data	iset/0/
+int	count
+data	count/0/
+
+real	u1, u2, x
+real	urand()
 
 begin
-	if (iset == 0) {
-	    repeat {
-	        v1 = 2 * urand (seed) - 1.
-	        v2 = 2 * urand (seed) - 1.
-	        r = v1 ** 2 + v2 ** 2
-	    } until ((r > 0) && (r < 1))
-	    fac = sqrt (-2. * log (r) / r)
-
-	    iset = 1
-	    return (v1 * fac)
+	if (count == 0) {
+	        u1 = 1. - urand (seed)
+ 	        u2 = urand (seed)
+		x = sqrt(-2 * log(u1)) * cos(2*PI*u2);
+		count = 1
 	} else {
-	    iset = 0
-	    return (v2 * fac)
+		x = sqrt(-2 * log(u1)) * sin(2*PI*u2);
+		count = 0
 	}
+	return (x)
 end
 
 
@@ -298,12 +269,9 @@ end
 # TWOFFT - Given two real input arrays DATA1 and DATA2, each of length
 # N, this routine calls cc_four1() and returns two complex output arrays,
 # FFT1 and FFT2, each of complex length N (i.e. real length 2*N), which
-# contain the discrete Fourier transforms of the respective DATAs.  As
-# always, N must be an integer power of 2.
+# contain the discrete Fourier transforms of the respective DATAs.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the routines provided by FFTPACK
 
 procedure twofft (data1, data2, fft1, fft2, N)
 
@@ -311,39 +279,26 @@ real	data1[ARB], data2[ARB]	# Input data arrays
 real	fft1[ARB], fft2[ARB]	# Output FFT arrays
 int	N			# No. of points
 
-int	nn3, nn2, jj, j
-real	rep, rem, aip, aim
-
+int j
+pointer sp, wsave
 begin
-	nn2 = 2  +  N  +  N
-	nn3 = nn2  +  1
+    call smark(sp)
+    call salloc(wsave, 4*N+15, TY_REAL)
+    call cffti(N, Memr[wsave])
 
-	jj = 2
-	for (j=1; j <= N; j = j  +  1) {
-	    fft1[jj-1] = data1[j]	# Pack 'em into one complex array
-	    fft1[jj] = data2[j]
-	    jj = jj  +  2
-	}
-
-	call four1 (fft1, N, 1)		# Transform the complex array
-	fft2[1] = fft1[2]
-	fft2[2] = 0.0
-	fft1[2] = 0.0
-	for (j=3; j <= N + 1; j = j  +  2) {
-	    rep = 0.5 * (fft1[j]  +  fft1[nn2-j])
-	    rem = 0.5 * (fft1[j] - fft1[nn2-j])
-	    aip = 0.5 * (fft1[j + 1]  +  fft1[nn3-j])
-	    aim = 0.5 * (fft1[j + 1] - fft1[nn3-j])
-	    fft1[j] = rep
-	    fft1[j+1] = aim
-	    fft1[nn2-j] = rep
-	    fft1[nn3-j] = -aim
-	    fft2[j] = aip
-	    fft2[j+1] = -rem
-	    fft2[nn2-j] = aip
-	    fft2[nn3-j] = rem
-	}
-
+    do j=1, N {
+        fft1[2*j-1] = data1[j]
+        fft1[2*j] = 0.0
+        fft2[2*j-1] = data2[j]
+        fft2[2*j] = 0.0
+    }
+    call cfftf(N, fft1, Memr[wsave])
+    call cfftf(N, fft2, Memr[wsave])
+    do j=1, N {
+        fft1[2*j] = -fft1[2*j]
+        fft2[2*j] = -fft2[2*j]
+    }
+    call sfree(sp)
 end
 
 
@@ -357,153 +312,48 @@ end
 # multiplied by 1/N). A forward transform is perform for isign == 1, other-
 # wise the inverse transform is computed.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the routines provided by FFTPACK
 
 procedure realft (data, N, isign)
 
-real 	data[ARB]	# Input data array & output FFT
+real	data[ARB]	# Input data array & output FFT
 int	N		# No. of points
-int 	isign		# Direction of transfer
+int	isign		# Direction of transfer
 
-double	wr, wi, wpr, wpi, wtemp, theta	# Local variables
-real	c1, c2, h1r, h1i, h2r, h2i
-real	wrs, wis
-int	i, i1, i2, i3, i4 
-int	N2P3
-
+pointer sp, wsave
+real last
+int j
 begin
-					# Initialize
-	theta = PI/double(N)
-	c1 = 0.5
-	
-	if (isign == 1) {
-	  c2 = -0.5
-	  call four1 (data,n,1)		# Forward transform is here
-	} else {
-	  c2 = 0.5
-	  theta = -theta
-	} 
+    call smark(sp)
+    call salloc(wsave, 4*N+15, TY_REAL)
+    call rffti(2*N, Memr[wsave])
 
-	wtemp = sin (0.5 * theta)
-	wpr = -2.0d0 * wtemp * wtemp
-	wpi = dsin (theta)
-	wr = 1.0D0  +  wpr
-	wi = wpi
-	n2p3 = 2*n + 3
+    if (isign == 1) {
+        call rfftf(2*N, data, Memr[wsave])
+        last = data[2*N]
+        do j=2*N-1,3,-2 {
+            data[j+1] = -data[j]
+            data[j] = data[j-1]
+        }
+        data[2] = last
+    } else {
+        data[1] = data[1]/2.0
+        last = data[2]/2.0
+        do j=2,2*N-2,2 {
+            data[j] = data[j+1]/2.0
+            data[j+1] = -data[j+2]/2.0
+        }
+        data[2*N] = last
+        call rfftb(2*N, data, Memr[wsave])
+    }
+    call sfree(sp)
 
-	for (i=2; i<=n/2; i = i  +  1) {
-	  i1 = 2 * i - 1
-	  i2 = i1 + 1
-	  i3 = n2p3 - i2
-	  i4 = i3 + 1
-	  wrs = sngl (wr)
-	  wis = sngl (wi)
-	  			# The 2 transforms are separated out of Z
-	  h1r = c1 * (data[i1] + data[i3])	
-	  h1i = c1 * (data[i2] - data[i4])
-	  h2r = -c2 * (data[i2] + data[i4])
-	  h2i = c2 * (data[i1] - data[i3])
-				# Here they are recombined to form the true
-				# transform of the original real data.
-	  data[i1] = h1r + wr*h2r - wi*h2i
-	  data[i2] = h1i + wr*h2i + wi*h2r
-	  data[i3] = h1r - wr*h2r + wi*h2i
-	  data[i4] = -h1i + wr*h2i + wi*h2r
-
-	  wtemp = wr		# The reccurrence
-	  wr = wr * wpr - wi * wpi + wr
-	  wi = wi * wpr + wtemp * wpi + wi
-	}
-
-	if (isign == 1) {
-	  h1r = data[1]
-	  data[1] = h1r + data[2]
-	  data[2] = h1r - data[2]
-	} else {
-	  h1r = data[1]
-	  data[1] = c1 * (h1r + data[2])
-	  data[2] = c1 * (h1r - data[2])
-	  call four1 (data,n,-1)
-	}
-
-end
-
-
-# FOUR1 -  Replaces DATA by it's discrete transform, if ISIGN is input
-# as 1; or replaces DATA by NN times it's inverse discrete Fourier transform
-# if ISIGN is input as -1.  Data is a complex array of length NN or, equiv-
-# alently, a real array of length 2*NN.  NN *must* be an integer power of
-# two.
-#
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
-
-procedure four1 (data, nn, isign)
-
-real	data[ARB]	# Data array (returned as FFT)
-int	nn		# No. of points in data array
-int	isign		# Direction of transform
-
-double 	wr, wi, wpr, wpi		# Local variables
-double	wtemp, theta
-real 	tempr, tempi
-int	i, j, istep
-int	n, mmax, m
-
-begin
-	n = 2 * nn
-	j = 1
-	for (i=1; i<n; i = i  +  2) {
-	  if (j > i) {				# Swap 'em
-	    tempr = data[j]
-	    tempi = data[j+1]
-	    data[j] = data[i]
-	    data[j+1] = data[i+1]
-	    data[i] = tempr
-	    data[i+1] = tempi
-	  }
-	  m = n / 2
-	  while (m >= 2 && j > m) {
-	    j = j - m
-	    m = m / 2
-	  }
-	  j = j + m
-	}
-	mmax = 2
-	while (n > mmax) {
-	  istep = 2 * mmax
-	  theta = TWOPI / double (isign*mmax)
-	  wtemp = dsin (0.5*theta)
-	  wpr = -2.d0 * wtemp * wtemp
-	  wpi = dsin (theta)
-	  wr = 1.d0
-	  wi = 0.d0
-	  for (m=1; m < mmax; m = m  +  2) {
-	    for (i=m; i<=n; i = i  +  istep) {
-		j = i + mmax
-		tempr = real (wr) * data[j] - real (wi) * data[j+1]
-		tempi = real (wr) * data[j + 1] + real (wi) * data[j]
-		data[j] = data[i] - tempr
-		data[j+1] = data[i+1] - tempi
-		data[i] = data[i] + tempr
-		data[i+1] = data[i+1] + tempi
-	    }
-	    wtemp = wr
-	    wr = wr * wpr - wi * wpi + wr
-	    wi = wi * wpr + wtemp * wpi + wi
-	  } 
-	  mmax = istep
-	}
 end
 
 
 ################################################################################
 # LU Decomosition
 ################################################################################
-define	TINY	(1E-20)		# Number of numerical limit
 
 # Given an N x N matrix A, with physical dimension N, this routine
 # replaces it by the LU decomposition of a rowwise permutation of
@@ -514,90 +364,21 @@ define	TINY	(1E-20)		# Number of numerical limit
 # respectively.  This routine is used in combination with LUBKSB to
 # solve linear equations or invert a matrix.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the LU decomposition routine provided by LAPACK.
 
 procedure ludcmp (a, n, np, indx, d)
 
-real	a[np,np]
-int	n
-int	np
-int	indx[n]
-real	d
+real	a[np,np]	# io: input a, output decomposed a
+int	n		# i: logical size of a is n x n
+int	np		# i: space allocated for a
+int	indx[n]		# o: index to be used by xt_lubksb
+real	d		# o: +1 or -1
 
-int	i, j, k, imax
-real	aamax, sum, dum
-pointer	vv
+int	istat
 
 begin
-	# Allocate memory.
-	call malloc (vv, n, TY_REAL)
-	
-	# Loop over rows to get the implict scaling information.
-	d = 1.
-	do i = 1, n {
-	    aamax = 0.
-	    do j = 1, n {
-	        if (abs (a[i,j]) > aamax)
-		    aamax = abs (a[i,j])
-	    }
-	    if (aamax == 0.) {
-	    	call mfree (vv, TY_REAL)
-	        call error (1, "Singular matrix")
-	    }
-	    Memr[vv+i-1] = 1. / aamax
-	}
-
-	# This is the loop over columns of Crout's method.
-	do j = 1, n {
-	    do i = 1, j-1 {
-	        sum = a[i,j]
-		do k = 1, i-1
-		    sum = sum - a[i,k] * a[k,j]
-		a[i,j] = sum
-	    }
-
-	    aamax = 0.
-	    do i = j, n {
-	        sum = a[i,j]
-		do k = 1, j-1
-		    sum = sum - a[i,k] * a[k,j]
-		a[i,j] = sum
-		dum = Memr[vv+i-1] * abs (sum)
-		if (dum >= aamax) {
-		    imax = i
-		    aamax = dum
-		}
-	    }
-
-	    if (j != imax) {
-	        do k = 1, n {
-		    dum = a[imax,k]
-		    a[imax,k] = a[j,k]
-		    a[j,k] = dum
-		}
-		d = -d
-		Memr[vv+imax-1] = Memr[vv+j-1]
-	    }
-	    indx[j] = imax
-
-	    # Now, finally, divide by the pivot element.
-	    # If the pivot element is zero the matrix is signular (at
-	    # least to the precission of the algorithm.  For some
-	    # applications on singular matrices, it is desirable to
-	    # substitute TINY for zero.
-
-	    if (a[j,j] == 0.)
-	        a[j,j] = TINY
-	    if (j != n) {
-	        dum = 1. / a[j,j]
-		do i = j+1, n
-		    a[i,j] = a[i,j] * dum
-	    }
-	}
-
-	call mfree (vv, TY_REAL)
+	d = 1.0
+	call sgetrf(n, n, a, np, indx, istat)
 end
 
 
@@ -611,9 +392,7 @@ end
 # possiblity that B will begin with many zero elements, so it is
 # efficient for use in matrix inversion.
 #
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
+# This routine simply calls the LU decomposition routine provided by LAPACK.
 
 procedure lubksb (a, n, np, indx, b)
 
@@ -623,31 +402,10 @@ int	np
 int	indx[n]
 real	b[n]
 
-int	i, j, ii, ll
-real	sum
+int	status
 
 begin
-	ii = 0
-	do i = 1, n {
-	    ll = indx[i]
-	    sum = b[ll]
-	    b[ll] = b[i]
-	    if (ii != 0) {
-	        do j = ii, i-1
-		    sum = sum - a[i,j] * b[j]
-	    } else if (sum != 0.)
-	        ii = i
-	    b[i] = sum
-	}
-
-	do i = n, 1, -1 {
-	    sum = b[i]
-	    if (i < n) {
-	        do j = i+1, n
-		    sum = sum - a[i,j] * b[j]
-	    }
-	    b[i] = sum / a[i,i]
-	}
+	call sgetrs('N', n, 1, a, np, indx, b, n, status)
 end
 
 

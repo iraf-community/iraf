@@ -55,6 +55,7 @@ CORE_SOURCES = 	buffers.c cfileio.c checksum.c drvrfile.c drvrmem.c \
 		pliocomp.c fits_hcompress.c fits_hdecompress.c zuncompress.c zcompress.c \
 		adler32.c crc32.c inffast.c inftrees.c trees.c zutil.c \
 		deflate.c infback.c inflate.c uncompr.c \
+		simplerng.c
 
 SOURCES = ${CORE_SOURCES} @F77_WRAPPERS@
 

@@ -253,8 +253,8 @@ static void Tests (char *input);
 int
 vosamp (int argc, char **argv, size_t *reslen, void **result)
 {
-    char **pargv, optval[SZ_FNAME], ch, *env_proxy = NULL;
-    int	   i, pos = 0, len = 0;
+    char **pargv, optval[SZ_FNAME], *env_proxy = NULL;
+    int	   i, pos = 0, len = 0, ch;
     time_t expiry;
 
 

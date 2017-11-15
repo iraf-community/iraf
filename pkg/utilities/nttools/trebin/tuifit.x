@@ -22,8 +22,6 @@ double	ya[ARB]			# o: array of dependent-variable values
 double	y2[ARB]			# o: used only by spline interpolation
 int	n			# o: size of xa, ya, y2 arrays
 #--
-pointer sp
-pointer work			# scratch for spline fit
 int	k			# loop index
 
 begin
@@ -52,10 +50,7 @@ begin
 
 	case I_SPLINE:
 	    if (n >= 4) {
-		call smark (sp)
-		call salloc (work, n, TY_DOUBLE)
-		call tucspl (xa, ya, n, Memd[work], y2)
-		call sfree (sp)
+		call tucspl (xa, ya, n, y2)
 	    } else {
 		n = 0
 	    }

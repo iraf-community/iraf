@@ -222,8 +222,8 @@ static void  sess_printClients (void);
 int
 main (int argc, char **argv)
 {
-    char  **pargv, optval[SZ_FNAME], ch;
-    int	    i, rc, pos = 0;
+    char  **pargv, optval[SZ_FNAME];
+    int	    i, rc, pos = 0, ch;
 
 
 

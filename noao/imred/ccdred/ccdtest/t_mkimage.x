@@ -1,4 +1,5 @@
 include	<imhdr.h>
+include <math.h>
 
 define	OPTIONS		"|make|replace|add|multiply|"
 define	MAKE		1	# Create a new image
@@ -172,8 +173,12 @@ end
 
 
 # MKSIGMA -- A sequence of random numbers of the specified sigma and
-# starting seed is generated.  The random number generator is modeled after
-# that in Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
+# starting seed is generated.
+#
+# Copyright(c) 2017 Anastasia Galkin
+# Reference: G. E. P. Box and Mervin E. Muller, A Note on the Generation of
+#            Random Normal Deviates, The Annals of Mathematical Statistics
+#            (1958), Vol. 29, No. 2 pp. 610–611
 
 procedure mksigma (sigma, seed, rannums, nnums)
 
@@ -183,22 +188,20 @@ real	rannums[nnums]	# Random numbers
 int	nnums		# Number of random numbers
 
 int	i
-real	v1, v2, r, fac, urand()
+real	v1, v2, u1, u2, urand(), sqrt()
 
 begin
 	if (sigma > 0.) {
 	    for (i=1; i<=nnums; i=i+1) {
-		repeat {
-		    v1 = 2 * urand (seed) - 1.
-		    v2 = 2 * urand (seed) - 1.
-		    r = v1 ** 2 + v2 ** 2
-		} until ((r > 0) && (r < 1))
-		fac = sqrt (-2. * log (r) / r) * sigma
-		rannums[i] = v1 * fac
+	        u1 = 1. - urand (seed)
+ 	        u2 = urand (seed)
+		v1 = sqrt(-2 * log(u1)) * cos(2*PI*u2)
+		rannums[i] = v1 * sigma
 		if (i == nnums)
 		    break
+		v2 = sqrt(-2 * log(u1)) * sin(2*PI*u2)
 		i = i + 1
-		rannums[i] = v2 * fac
+		rannums[i] = v2 * sigma
 	    }
 	}
 end

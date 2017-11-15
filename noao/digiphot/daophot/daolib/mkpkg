@@ -36,7 +36,6 @@ libpkg.a:
 	dpwparam.x
 	dpwcs.x		<imio.h>                ../lib/daophotdef.h
 	bicubic.x
-	daoran.x
 	erf.x
 	invers.f
 	invers2.x

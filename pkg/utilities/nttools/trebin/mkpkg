@@ -11,16 +11,16 @@ libpkg.a:
 	tnamgio.x
 	tnaminit.x
 	trebin.x		<error.h> <tbset.h>
-	tucspl.f
+	tucspl.x
 	tudcol.x		<tbset.h>
 	tugcol.x		<error.h> <tbset.h>
 	tugetput.x		<tbset.h>
-	tuhunt.f
-	tuiep3.f
+	tuhunt.x
+	tuiepn.x
 	tuifit.x		trebin.h
 	tuinterp.x		<error.h> <tbset.h>
 	tuiset.x		trebin.h
-	tuispl.f
+	tuispl.x
 	tuival.x		trebin.h
 	tutrim.x
 	tuxget.x		<tbset.h>

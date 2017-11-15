@@ -208,7 +208,7 @@ int	iseed[ARB]			# random number seed array
 int	ix, iy
 pointer	psffit
 real	dx, dy, dxsq, dysq, radsq, dvdx, dvdy, value, err
-real	dp_usepsf(), dp_nrml(), daoran()
+real	dp_usepsf(), dp_nrml(), urand()
 
 begin
 	psffit = DP_PSFFIT(dao)
@@ -226,7 +226,7 @@ begin
 			Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
 			DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
 			xfrom_psf, yfrom_psf, dvdx, dvdy)
-		    err = daoran (iseed[mod(ix+iy,3)+1])
+		    err = urand (iseed[mod(ix+iy,3)+1])
 		    err = sqrt (max (0.0, value / gain)) * dp_nrml (err)
 		    subin[ix,iy] = subin[ix,iy] + value + err
 		}
@@ -252,12 +252,12 @@ real	minmag		# minimum magnitude
 real	mwide		# the magnitude range
 int	iseed[ARB]	# seed array for random number genrator
 
-real	daoran()
+real	urand()
 
 begin
-	x = xmin + daoran (iseed[1]) * xwide
-	y = ymin + daoran (iseed[2]) * ywide
-	mag = minmag + daoran (iseed[3]) * mwide
+	x = xmin + urand (iseed[1]) * xwide
+	y = ymin + urand (iseed[2]) * ywide
+	mag = minmag + urand (iseed[3]) * mwide
 end
 
 
@@ -269,13 +269,13 @@ int	seed			# initial seed value
 int	iseed[ARB]		# the seed array
 
 int	idum
-real	daoran()
+real	urand()
 
 begin
 	idum = seed
-	iseed[1] = int (524288.* daoran (idum)) + 1
-	iseed[2] = int (524288.* daoran (idum)) + 1
-	iseed[3] = int (524288.* daoran (idum)) + 1
+	iseed[1] = int (524288.* urand (idum)) + 1
+	iseed[2] = int (524288.* urand (idum)) + 1
+	iseed[3] = int (524288.* urand (idum)) + 1
 end
 
 

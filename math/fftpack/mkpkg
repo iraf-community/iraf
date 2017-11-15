@@ -1,0 +1,32 @@
+# LFFTPACK library routines
+
+$checkout libfftpack.a lib$
+$update   libfftpack.a
+$checkin  libfftpack.a lib$
+$exit
+
+libfftpack.a:
+	cfftb1.f
+	cfftb.f
+	cfftf1.f
+	cfftf.f
+	cffti1.f
+	cffti.f
+	cosqb.f
+	cosqf.f
+	cosqi.f
+	cost.f
+	costi.f
+	rfftb1.f
+	rfftb.f
+	rfftf1.f
+	rfftf.f
+	rffti1.f
+	rffti.f
+	sinqb.f
+	sinqf.f
+	sinqi.f
+	sint1.f
+	sint.f
+	sinti.f
+	;

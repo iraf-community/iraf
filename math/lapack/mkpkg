@@ -1,0 +1,30 @@
+# LAPACK library routines
+
+$checkout liblapack.a lib$
+$update   liblapack.a
+$checkin  liblapack.a lib$
+$exit
+
+liblapack.a:
+	dgemm.f
+	dger.f
+	dgetf2.f
+	dgetrf.f
+	dgetrs.f
+	dlaswp.f
+	dscal.f
+	dswap.f
+	dtrsm.f
+	idamax.f
+	isamax.f
+	lsame.f
+	sgemm.f
+	sger.f
+	sgetf2.f
+	sgetrf.f
+	sgetrs.f
+	slaswp.f
+	sscal.f
+	sswap.f
+	strsm.f
+	;

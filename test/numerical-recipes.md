@@ -36,11 +36,11 @@ begin
 	    }
 	}
 	call printf("Mean     = %f\n")
-	call pargd(abs(m[1]/n))
+	call pargd(m[1]/n)
 	call printf("Variance = %f\n")
 	call pargd(m[2]/n)
 	call printf("Skew     = %f\n")
-	call pargd(abs(m[3]/n))
+	call pargd(m[3]/n)
 	call printf("Kurtosis = %f\n")
 	call pargd(m[4]/n)
 end
@@ -52,8 +52,9 @@ the result of the original NR code.
 Test options: `decimals=2`
 ```
 cl> copy noao$artdata/numrecipes.x .
+cl> copy noao$artdata/gammln.c .
 cl> softools
-cl> xc test-gasdev.x numrecipes.x
+cl> xc -I$iraf/include test-gasdev.x numrecipes.x gammln.c
 cl> task $test_gasdev = test-gasdev.e
 cl> test_gasdev
 Mean     = 0.0004794365668388
@@ -76,7 +77,7 @@ int i,j,n, start
 data start/0/
 begin
     xm=clgetr("xm")
-	n=1000000
+	n=1500000
 	do j=1, 4 {
 		m[j] = 0
 	}
@@ -93,42 +94,39 @@ begin
 		call printf("--------|------------|------------|------------|------------\n")
 		start = 1
 	}
+	# To avoid accuracy problems with different magnitudes of the value,
+	# we normalize all expected values for the moments to 1.0.
 	call printf("%7.1f | %10.4f | %10.4f | %10.4f | %10.4f\n")
 	call pargr(xm)
-	call pargd(xm + m[1]/n)
-	call pargd(m[2]/n)
-	call pargd(m[3]/n)
-	call pargd(m[4]/n)
+	call pargd((xm + m[1]/n) / xm) # expected: xm
+	call pargd((m[2]/n) / xm)      # expected: xm
+	call pargd((m[3]/n) / xm)      # expected: xm
+	call pargd((m[4]/n) / (xm * (1+3*xm))) # expected: xm*(1+3*xm)
 end
 ```
 
 Compile it, declare and run as an IRAF task. The following numbers are
 the result of the original NR code.
 
-Test options: `decimals=2`
+Test options: `decimals=1`
 ```
 cl> softools
-cl> xc -x test-poidev.x numrecipes.x
+cl> xc -x -I$iraf/include test-poidev.x numrecipes.x gammln.c
 cl> task $test_poidev = test-poidev.e
-cl> for ( i = -1; i < 30; i+=2)  test_poidev(i/2.0)
+cl> for ( x = 0.7; x < 60; x*=1.55)  test_poidev(x)
      xm |       mean |   variance |       skew |   kurtosis
 --------|------------|------------|------------|------------
-   -0.5 |     0.0000 |     0.2500 |     0.1250 |     0.0625
-    0.5 |     0.4994 |     0.4992 |     0.4979 |     1.2443
-    1.5 |     1.5002 |     1.5041 |     1.5143 |     8.3393
-    2.5 |     2.4990 |     2.4994 |     2.5036 |    21.2696
-    3.5 |     3.5015 |     3.5104 |     3.5508 |    40.6212
-    4.5 |     4.5042 |     4.4978 |     4.5768 |    65.4975
-    5.5 |     5.5014 |     5.4948 |     5.4843 |    96.0890
-    6.5 |     6.5020 |     6.5092 |     6.4698 |   133.0264
-    7.5 |     7.4999 |     7.5038 |     7.6774 |   177.2280
-    8.5 |     8.5015 |     8.4993 |     8.6282 |   226.2072
-    9.5 |     9.5003 |     9.5091 |     9.6242 |   281.6827
-   10.5 |    10.4985 |    10.5028 |    10.3879 |   341.3161
-   11.5 |    11.5032 |    11.5049 |    11.6535 |   408.2523
-   12.5 |    12.5005 |    12.4857 |    12.4353 |   478.2899
-   13.5 |    13.4978 |    13.4837 |    13.2168 |   557.7109
-   14.5 |    14.5096 |    14.5111 |    15.0703 |   647.6903
+    0.7 |     0.9986 |     0.9998 |     1.0006 |     1.0014
+    1.1 |     0.9991 |     1.0007 |     1.0007 |     1.0012
+    1.7 |     1.0000 |     1.0009 |     1.0026 |     1.0021
+    2.6 |     1.0006 |     1.0011 |     1.0055 |     1.0013
+    4.0 |     1.0000 |     0.9988 |     0.9925 |     0.9951
+    6.3 |     1.0004 |     1.0019 |     1.0155 |     1.0040
+    9.7 |     1.0000 |     1.0004 |     1.0056 |     1.0011
+   15.0 |     0.9999 |     1.0006 |     1.0010 |     0.9995
+   23.3 |     1.0001 |     1.0013 |     1.0101 |     1.0027
+   36.1 |     1.0001 |     0.9997 |     1.0120 |     1.0041
+   56.0 |     0.9999 |     1.0001 |     0.9719 |     1.0023
 ```
 
 ### GAMMLN: natural log of gamma function
@@ -152,10 +150,10 @@ end
 Compile it, declare and run as an IRAF task. The following numbers are
 the result of the original NR code.
 
-Test options: `decimals=5`
+Test options: `decimals=4`
 ```
 cl> softools
-cl> xc -x test-gammln.x numrecipes.x
+cl> xc -x -I$iraf/include test-gammln.x gammln.c
 cl> task $test_gammln = test-gammln.e
 cl> for ( x = 0.23; x < 10; x += 0.667)  test_gammln(x)
 gammln(0.23) = 1.376194
@@ -183,11 +181,14 @@ gammln(200.0) = 857.933655
 
 ### DAORAN: random number generator RAN2
 
+The DAORAN random number generator is going to be replaced by the
+URAND random number generator by D.Knuth.
+
 File: `test-ran2.x`
 ```
 task test_ran2 = t_ran2
 procedure t_ran2 ()
-real daoran()
+real urand()
 double x, y
 double m[4]
 int i,j,n
@@ -197,7 +198,7 @@ begin
 		m[j] = 0
 	}
 	do i=1, n {
-	    x = daoran(0)
+	    x = urand(0)
 		if (x < 0 | x >= 1) {
 			call printf("Outlyer: %g\n")
 			call pargd(x)
@@ -210,11 +211,11 @@ begin
 	    }
 	}
 	call printf("Mean     = %f\n")
-	call pargd(abs(m[1]/n))
+	call pargd(m[1]/n)
 	call printf("Variance = %f\n")
 	call pargd(m[2]/n)
 	call printf("Skew     = %f\n")
-	call pargd(abs(m[3]/n))
+	call pargd(m[3]/n)
 	call printf("Kurtosis = %f\n")
 	call pargd(m[4]/n)
 end
@@ -225,9 +226,8 @@ the result of the original NR code.
 
 Test options: `decimals=4`
 ```
-cl> copy noao$digiphot/daophot/daolib/daoran.x .
 cl> softools
-cl> xc test-ran2.x daoran.x
+cl> xc test-ran2.x
 cl> task $test_ran2 = test-ran2.e
 cl> test_ran2
 Mean     = 0.0000018238614310
@@ -289,6 +289,17 @@ JD (2450157.78) = 1996/03/15 +  6.72
 ## Matrix operations
 
 ### LU decomposition of a square matrix
+
+`MW_LUDECOMPOSE`, `LUDCMD`, `LUDCMP`: Replace an NxN matrix A by the LU
+decomposition of a rowwise permutation of the matrix.  The LU decomposed
+matrix A and the permutation index IX are output.  The decomposition is
+performed in place.
+
+`MW_LUBACKSUB`, `LUBKSD`, `LUBKSB`: Solves the set of N linear equations
+`A*X=B`.  Here A is input, not as the matrix A but rather as its LU
+decomposition, determined by the routine mw_ludecompose.  IX is input as the
+permutation vector as returned by `MW_LUDECOMPOSE` & Co.  B is input as the
+right hand side vector B, and returns with the solution vector X.
 
 These subroutines are going to be replaced by LAPACK routines
 
@@ -484,7 +495,213 @@ solve [  1.000  3.000  2.000] ==> [  0.338 -0.429  0.883]
 
 ## Fast Fourier transform
 
-### TWOFFT: complex FFTs of two input real arrays
-
 ### REALFT: FFT of a set of 2N real valued data points
 
+`realfft` Calculates the Fourier Transform of a set of 2N real valued data
+points.  Replaces this data by the positive frequency half of it's complex
+Fourier Transform.  The real valued first and last components of the complex
+transform are returned as elements DATA(1) and DATA(2) respectively.  N must
+be an integer power of 2.  This routine also calculates the inverse transform
+of a complex array if it is the transform of real data.  (Result in this case
+must be multiplied by 1/N). A forward transform is perform for `isign == 1`,
+otherwise the inverse transform is computed.
+
+File: `test_realfft.x`
+```
+task test_realfft = t_realfft
+
+procedure eval_realfft(x, ndim)
+int ndim
+real x[ndim]
+int j
+begin
+    call printf("FFT input  ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j])
+    }
+    call realfft(x, ndim/2, 1)
+    call printf("\nFFT output ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j])
+    }
+    call realfft(x, ndim/2, -1)
+    call printf("\nInverse    ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x[j]/(ndim/2))
+    }
+    call printf("\n")
+end
+
+procedure t_realfft ()
+real x[8]
+data x /1.0, 2.0, 1.0, -1.0, 1.5, 1.0, 0.5, 1.0/
+begin
+    call eval_realfft(x, 8)
+end
+```
+
+```
+cl> copy noao$rv/numrep.x .
+cl> softools
+cl> xc -x test_realfft.x numrep.x -lfftpack
+cl> task $test_realfft = test_realfft.e
+cl> test_realfft
+FFT input    1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+FFT output   7.000  1.000  1.621 -0.207  1.000  3.000 -2.621 -1.207
+Inverse      1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+```
+
+### TWOFFT: complex FFTs of two input real arrays
+
+Given two real input arrays, each of length N, this routine calls `cc_four1()`
+and returns two complex output arrays, FFT1 and FFT2, each of complex length N
+(i.e. real length 2*N), which contain the discrete Fourier transforms of the
+respective `DATA`s.  As always, N must be an integer power of 2.
+
+File: `test_twofft.x`
+```
+task test_twofft = t_twofft
+
+procedure eval_twofft(x1, x2, ndim)
+int ndim
+real x1[ndim], x2[ndim]
+int j
+pointer sp, y1, y2
+
+begin
+    call smark(sp)
+    call salloc(y1, 2*ndim, TY_REAL)
+    call salloc(y2, 2*ndim, TY_REAL)
+
+    call printf("in 1 ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x1[j])
+    }
+    call printf("\nin 2 ")
+    do j = 1, ndim {
+        call printf(" %6.3f")
+        call pargr(x2[j])
+    }
+    call twofft(x1, x2, Memr[y1], Memr[y2], ndim)
+    call printf("\nout 1")
+    do j = 1, ndim {
+        call printf(" %6.3f + %6.3fi,")
+        call pargr(Memr[y1 + 2*j-2])
+        call pargr(Memr[y1 + 2*j-1])
+    }
+    call printf("\nout 2")
+    do j = 1, ndim {
+        call printf(" %6.3f + %6.3fi,")
+        call pargr(Memr[y2 + 2*j-2])
+        call pargr(Memr[y2 + 2*j-1])
+    }
+    call printf("\n")
+
+    call sfree(sp)
+end
+
+procedure t_twofft ()
+real x1[8]
+real x2[8]
+data x1 /1.0, 2.0, 1.0, -1.0, 1.5, 1.0, 0.5, 1.0/
+data x2 /0.9, 7.5, 6.5, 5.0, 7.5, 5.2, 5.1, 7.7/
+begin
+    call eval_twofft(x1, x2, 8)
+end
+```
+
+Test options: `decimals=3`
+```
+cl> softools
+cl> xc -x test_twofft.x numrep.x -lfftpack
+cl> task $test_twofft = test_twofft.e
+cl> test_twofft
+in 1   1.000  2.000  1.000 -1.000  1.500  1.000  0.500  1.000
+in 2   0.900  7.500  6.500  5.000  7.500  5.200  5.100  7.700
+out 1  7.000 +  0.000i,  1.621 + -0.207i,  1.000 +  3.000i, -2.621 + -1.207i,  1.000 +  0.000i, -2.621 +  1.207i,  1.000 + -3.000i,  1.621 +  0.207i,
+out 2 45.400 +  0.000i, -3.064 +  1.117i, -3.200 +  0.000i, -10.14 + -1.683i, -5.400 +  0.000i, -10.14 +  1.683i, -3.200 + 0.000i, -3.064 + -1.117i,
+```
+
+## Interpolation routines for `trebin`
+
+This covers `tucspl`, `tuispl`, `tuhunt`, and `tuispl`.
+
+These are just the [`trebin` test in `nttools`](nttools.md), with an
+extended resolution:
+
+File: `rebin.tbl`
+```
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+453.02   5.873
+464.60  17.939
+603.04  39.843
+625.08  68.326
+647.27  44.617
+723.45  68.226
+730.31  36.557
+764.82  42.797
+784.33   2.650
+862.67  38.502
+```
+
+### TUCSPL/TUISPL: Spline interpolation
+
+```
+cl> trebin rebin.tbl rebspl.tbl lambda 450. 550. 10. function=spline
+rebin.tbl --> rebspl.tbl
+cl> type rebspl.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+450.00  INDEF
+460.00 13.514
+470.00 22.065
+480.00 26.780
+490.00 28.293
+500.00 27.306
+510.00 24.524
+520.00 20.653
+530.00 16.395
+540.00 12.456
+550.00  9.540
+cl> trebin rebin.tbl rebsplu.tbl lambda 860. 870. 10. function=spline
+rebin.tbl --> rebsplu.tbl
+cl> type rebsplu.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+860.00 33.545
+870.00  INDEF
+```
+
+### TUIEP3: Poly3 interpolation
+
+
+```
+cl> trebin rebin.tbl rebpol.tbl lambda 450. 550. 10. function=poly3
+rebin.tbl --> rebpol.tbl
+cl> type rebpol.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+450.00  INDEF
+460.00 13.681
+470.00 22.107
+480.00 27.688
+490.00 30.876
+500.00 32.122
+510.00 31.879
+520.00 30.599
+530.00 28.733
+540.00 26.734
+550.00 25.052
+cl> trebin rebin.tbl rebpolu.tbl lambda 860. 870. 10. function=poly3
+rebin.tbl --> rebpolu.tbl
+cl> type rebpolu.tbl
+#c lambda d %6.2f nm
+#c Y d %6.3f pixels
+860.00 22.331
+870.00  INDEF
+```
