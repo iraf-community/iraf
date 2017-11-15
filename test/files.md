@@ -68,7 +68,6 @@ bin$libcurfit.a
 bin$libdeboor.a
 bin$libds.a
 bin$libex.a
-bin$libfftpack.a
 bin$libgks.a
 bin$libgsurfit.a
 bin$libimc.a
@@ -76,7 +75,6 @@ bin$libimd.a
 bin$libimfort.a
 bin$libiminterp.a
 bin$libinterp.a
-bin$liblapack.a
 bin$libllsq.a
 bin$libmemdbg.a
 bin$libncar.a
@@ -127,6 +125,7 @@ noaobin$x_quad.e
 noaobin$x_quadred.e
 noaobin$x_rv.e
 noaobin$x_scombine.e
+noaobin$x_vtel.e
 ```
 
 ```
