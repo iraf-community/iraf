@@ -275,17 +275,11 @@ rl_set_prompt (prompt)
   
 /* Read a line of input.  Prompt with PROMPT.  An empty PROMPT means
    none.  A return value of NULL means that EOF was encountered. */
-#define USE_STATIC
-
 char *
 readline (prompt)
-  const char *prompt;
+     const char *prompt;
 {
-  char  *value = (char *) NULL;
-#ifdef USE_STATIC
-  static char result[4096];
-#endif
-
+  char *value;
 
   /* If we are at EOF return a NULL string. */
   if (rl_pending_input == EOF)
@@ -310,17 +304,7 @@ readline (prompt)
   rl_clear_signals ();
 #endif
 
-#ifdef USE_STATIC
-  memset (result, 0, 4096);
-  if (value) {
-    strcpy (result, value);
-    free (value);
-  }
-
-  return (strdup (result));
-#else
   return (value);
-#endif
 }
 
 #if defined (READLINE_CALLBACKS)
