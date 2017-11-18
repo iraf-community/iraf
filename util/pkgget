@@ -34,52 +34,11 @@ fi
 source ${iraf}/unix/hlib/util.sh
 
 
-
 ##############################################################################
 # START OF MACHDEP DEFINITIONS.
 ##############################################################################
 
-# MACHDEP definitions which may be reset below.
-VERSION=`cat ../.version`
-
-
-#----------------------------------
-# Determine platform architecture.
-#----------------------------------
-
-UNAME=""
-if [ -e /usr/bin/uname ]; then
-    uname_cmd=/usr/bin/uname
-    UNAME=`/usr/bin/uname | tr '[A-Z]' '[a-z]'`
-elif [ -e /bin/uname ]; then
-    uname_cmd=/bin/uname
-    UNAME=`/bin/uname | tr '[A-Z]' '[a-z]'`
-else
-    WARNING  "No 'uname' command found to determine architecture."
-    exit 1
-fi
-
-case $UNAME in 
-    "linux" | "linux64")
-	dlcmd="/usr/bin/wget"
-	;;
-    "darwin" | "macosx" | "macintel" | "ipad")		    # Mac OSX/iOS
-        #dlcmd="/usr/bin/ftp -A"
-        dlcmd="/usr/bin/ftp"
-	;;
-
-    # Other architectures to be added here
-
-    *)      
-	ERRMSG  "Unable to determine platform architecture."
-	exit 1
-	;;
-esac
-
-# If we don't have a download command installed, use our own .....
-if [ ! -e $dlcmd ]; then
-    dlcmd=`dirname $0`/fget
-fi
+dlcmd="curl -O"
 
 ##############################################################################
 # END OF MACHDEP DEFINITIONS.
