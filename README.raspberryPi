@@ -1,0 +1,15 @@
+Tihs file is intended to record information that will be useful
+to those running on the Raspberry Pi.
+
+DISPLAY
+
+The version of ds9 needs to be a 7.6 b5 or greater. The version of ds9 that
+is referenced in apt-get is an older version. As an example, I placed the
+latest vesion in the directory /home/pi/Downloads/SAOImageDS9/bin.
+
+Then define IMTDEV, with the commands:
+
+IMTDEV=inet:5137
+export IMTDEV
+
+The run iraf (ecl) and the display command should be working.
