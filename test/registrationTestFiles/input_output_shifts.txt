@@ -1,0 +1,90 @@
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0001.fit
+	input		StarGateCluster_030_sec_1x1_0001.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	3.223368	4.606791
+	xshift		3.223368
+	yshift		4.606791
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0002.fit
+	input		StarGateCluster_030_sec_1x1_0002.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	2.999599	4.786817
+	xshift		2.999599
+	yshift		4.786817
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0003.fit
+	input		StarGateCluster_030_sec_1x1_0003.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	2.021624	3.226693
+	xshift		2.021624
+	yshift		3.226693
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0004.fit
+	input		StarGateCluster_030_sec_1x1_0004.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	0.9530783	1.940738
+	xshift		0.9530783
+	yshift		1.940738
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0005.fit
+	input		StarGateCluster_030_sec_1x1_0005.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	0.	0.
+	xshift		0.
+	yshift		0.
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0006.fit
+	input		StarGateCluster_030_sec_1x1_0006.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	0.4553623	3.21276
+	xshift		0.4553623
+	yshift		3.21276
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0007.fit
+	input		StarGateCluster_030_sec_1x1_0007.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	0.3875408	3.894256
+	xshift		0.3875408
+	yshift		3.894256
+
+# Fri 12:53:53 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0008.fit
+	input		StarGateCluster_030_sec_1x1_0008.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	0.4272628	4.834684
+	xshift		0.4272628
+	yshift		4.834684
+
+# Fri 12:53:54 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0009.fit
+	input		StarGateCluster_030_sec_1x1_0009.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	-1.15037	2.851609
+	xshift		-1.15037
+	yshift		2.851609
+
+# Fri 12:53:54 17-Nov-2017
+begin	StarGateCluster_030_sec_1x1_0010.fit
+	input		StarGateCluster_030_sec_1x1_0010.fit
+	reference	StarGateCluster_030_sec_1x1_0005.fit
+	nregions	1
+	[10:700,10:500]	[10:700,10:500]	-2.731535	1.014403
+	xshift		-2.731535
+	yshift		1.014403
