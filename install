@@ -1024,9 +1024,9 @@ for i in ${PATHFILES[@]}; do
     if [ -e "$iraf/unix/hlib/$i" ]; then
         RM $TEMP >> /dev/null 2>&1
 	cat $iraf/unix/hlib/$i | \
-	    sed -e "s+$o_iraf+$iraf+"   | \
-            sed -e "s+$o_cache+$cache+" | \
-            sed -e "s+$o_imdir+$imdir+" > $TEMP
+	    sed -e "s|$o_iraf|$iraf|"   | \
+            sed -e "s|$o_cache|$cache|" | \
+            sed -e "s|$o_imdir|$imdir|" > $TEMP
         cmp -s $iraf/unix/hlib/$i $TEMP
         if (( $?==1 )); then
             if [ "$exec"=="yes" ]; then
