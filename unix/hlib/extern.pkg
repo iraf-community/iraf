@@ -9,6 +9,11 @@ reset	extern		= iraf$extern/
 reset	helpdb		= "lib$helpdb.mip"
 reset   aproposdb       = "lib$apropos.db"
 
+if (access ("pkg$softools/softools.cl") == yes) {
+    reset	softools	= pkg$softools/
+    task	softools.pkg	= softools$softools.cl
+}
+;
 if (access ("iraf$noao/noao.cl") == yes) {
     reset	noao		= iraf$noao/
     task	noao.pkg	= noao$noao.cl

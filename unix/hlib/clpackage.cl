@@ -24,7 +24,6 @@ task	lists.pkg	= "lists$lists.cl"
 task	obsolete.pkg	= "obsolete$obsolete.cl"
 task	plot.pkg	= "plot$plot.cl"
 task	proto.pkg	= "proto$proto.cl"
-task	softools.pkg	= "softools$softools.cl"
 task	system.pkg	= "system$system.cl"
 task	utilities.pkg	= "utilities$utilities.cl"
 
