@@ -141,9 +141,6 @@ else {
 
 
 #============================================================================
-# Check for updates to the system
-chkupdate
-
 # Notify the user if we're using the global login.
 path (".") | scan (s1)
 if ( osfn("home$") != substr (s1, strldx("!",s1)+1, strlen(s1)) ) {
