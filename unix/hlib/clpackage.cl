@@ -46,7 +46,9 @@ if (access ("hlib$extpkg.cl") == yes)
 images
 proto
 utilities
-noao
+if (deftask ("noao"))
+   noao
+;
 
 # Load the SYSTEM package.  Avoid printing menu, but do not change the
 # default value of the menus switch.

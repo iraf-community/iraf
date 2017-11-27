@@ -123,9 +123,12 @@ if (deftask ("proto"))
 
 tv              # image display
 utilities       # miscellaneous utilities
-noao            # optical astronomy packages
-vo              # Virtual Observatory tools
-
+if (deftask ("noao"))
+    noao        # optical astronomy packages
+;
+if (deftask ("vo"))
+    vo          # Virtual Observatory tools
+;
 prcache directory
 cache   directory page type help
 

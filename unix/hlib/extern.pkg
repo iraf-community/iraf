@@ -4,12 +4,16 @@
 
 reset	extern		= iraf$extern/
 
-reset	noao		= iraf$noao/
-task	noao.pkg	= noao$noao.cl
-
-reset	vo		= iraf$vo/
-task	vo.pkg		= vo$vo.cl
-
+if (access ("iraf$noao/noao.cl") == yes) {
+    reset	noao		= iraf$noao/
+    task	noao.pkg	= noao$noao.cl
+}
+;
+if (access ("iraf$vo/vo.cl") == yes) {
+    reset	vo		= iraf$vo/
+    task	vo.pkg		= vo$vo.cl
+}
+;
 #reset	local		= iraf$local/
 #task	local.pkg	= local$local.cl
 
@@ -29,12 +33,13 @@ task	vo.pkg		= vo$vo.cl
 
 # Initialize the helpdb string.  We'll add to this when dyanamically 
 # loading packages when the next load the CLPACKAGE.
-reset	helpdb		= "lib$helpdb.mip\
-			  ,noao$lib/helpdb.mip\
-			  ,vo$lib/helpdb.mip\
-#			  ,example$lib/helpdb.mip\
-			  "
-
+reset	helpdb		= "lib$helpdb.mip"
+if (access("noao$lib/helpdb.mip") == yes)
+    reset	helpdb	= (envget("helpdb") // ",noao$lib/helpdb.mip")
+;
+if (access("vo$lib/helpdb.mip") == yes)
+    reset	helpdb	= (envget("helpdb") // ",vo$lib/helpdb.mip")
+;
 
 # Do not modify below this line!
 clpackage
