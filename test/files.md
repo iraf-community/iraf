@@ -102,35 +102,35 @@ host$bin/libos.a
 ## NOAO packages
 
 ```
-cl> dir noao$bin/*.e ncol=1
-noao$bin/x_apextract.e
-noao$bin/x_apphot.e
-noao$bin/x_artdata.e
-noao$bin/x_astcat.e
-noao$bin/x_astutil.e
-noao$bin/x_bias.e
-noao$bin/x_ccdred.e
-noao$bin/x_crutil.e
-noao$bin/x_daophot.e
-noao$bin/x_dtoi.e
-noao$bin/x_generic.e
-noao$bin/x_irred.e
-noao$bin/x_longslit.e
-noao$bin/x_mtlocal.e
-noao$bin/x_nobsolete.e
-noao$bin/x_nproto.e
-noao$bin/x_obsutil.e
-noao$bin/x_onedspec.e
-noao$bin/x_photcal.e
-noao$bin/x_ptools.e
-noao$bin/x_quad.e
-noao$bin/x_quadred.e
-noao$bin/x_rv.e
-noao$bin/x_scombine.e
+cl> dir noaobin$*.e ncol=1
+noaobin$x_apextract.e
+noaobin$x_apphot.e
+noaobin$x_artdata.e
+noaobin$x_astcat.e
+noaobin$x_astutil.e
+noaobin$x_bias.e
+noaobin$x_ccdred.e
+noaobin$x_crutil.e
+noaobin$x_daophot.e
+noaobin$x_dtoi.e
+noaobin$x_generic.e
+noaobin$x_irred.e
+noaobin$x_longslit.e
+noaobin$x_mtlocal.e
+noaobin$x_nobsolete.e
+noaobin$x_nproto.e
+noaobin$x_obsutil.e
+noaobin$x_onedspec.e
+noaobin$x_photcal.e
+noaobin$x_ptools.e
+noaobin$x_quad.e
+noaobin$x_quadred.e
+noaobin$x_rv.e
+noaobin$x_scombine.e
 ```
 
 ```
-cl> dir noao$bin/*.a ncol=1
-noao$bin/libasttools.a
-noao$bin/libsmw.a
+cl> dir noaobin$*.a ncol=1
+noaobin$libasttools.a
+noaobin$libsmw.a
 ```
