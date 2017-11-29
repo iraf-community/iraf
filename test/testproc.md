@@ -230,29 +230,57 @@ image.short.fits[512,512][short]: m51  B  600s
 ```
 ## Accessing a VOTable
 
-VOTables are internally converted to FITS binary tables.
+Just checking a simple one:
 
+File: `messier.xml`
 ```
-cl> tinfo iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-   2 rows written to table
-  10 columns defined
-  59 header parameters written to table
-  71 records allocated for header parameters
-  10 space allocated for column descriptors
+<?xml version="1.0"?>
+<VOTABLE version="1.1">
+  <RESOURCE>
+    <TABLE>
+      <DESCRIPTION>A few Messier objects</DESCRIPTION>
+      <PARAM datatype="char" arraysize="*" ucd="meta.bib.author"
+	     name="Author" value="Mark Taylor"/>
+      <FIELD name="Identifier" datatype="char" arraysize="*"
+	     ucd="meta.id;meta.main">
+	<DESCRIPTION>Messier Identifier for the object</DESCRIPTION>
+      </FIELD>
+      <FIELD name="RA" datatype="double" unit="deg" ucd="pos.eq.ra;meta.main"/>
+      <FIELD name="Dec" datatype="double" unit="deg" ucd="pos.eq.dec;meta.main"/>
+      <DATA>
+	<TABLEDATA>
+	  <TR><TD>M31</TD><TD> 10.502</TD><TD>41.266</TD></TR>
+	  <TR><TD>M57</TD><TD>283.253</TD><TD>33.033</TD></TR>
+	  <TR><TD>M82</TD><TD>148.753</TD><TD>69.683</TD></TR>
+	</TABLEDATA>
+      </DATA>
+    </TABLE>
+  </RESOURCE>
+</VOTABLE>
+```
+
+VOTables are internally converted to FITS binary tables. 
+
+
+Test options: `decimals=7`
+```
+cl> tinfo messier.xml
+# messier.xml
+   3 rows written to table
+   3 columns defined
+  20 header parameters written to table
+  35 records allocated for header parameters
+   3 space allocated for column descriptors
 table type:  fits
-cl> tlcol iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-# iraf$vendor/voclient/libvotable/examples/data/sia_m51.xml
-Survey           CH*3         %-3s ""
-Ra               D         %25.16g ""
-Dec              D         %25.16g ""
-Dim              I            %11d ""
-Size             I[2]         %11d ""
-Scale            D[2]      %25.16g ""
-Format           CH*10       %-10s ""
-PixFlags         CH*1         %-1s ""
-URL              CH*229     %-229s ""
-LogicalName      CH*1         %-1s ""
+cl> tlcol messier.xml
+# messier.xml
+Identifier       CH*3         %-3s ""
+RA               D         %25.16g deg
+Dec              D         %25.16g deg
+cl> tprint messier.xml showhdr-
+    1 M31                    10.502         41.26599999999999
+    2 M57                   283.253                    33.033
+    3 M82                   148.753         69.68300000000001
 ```
 
 # Plotting data
@@ -463,11 +491,11 @@ Hopefully all went well to this point. Let's clean things up a bit.
 
 ```
 cl> dir
-image.dbl.fits      image.sect.fits     inlist              uparmntstinfo.par
-image.real.fits     image.short.fits    uparmimlminmax.par
+image.dbl.fits      image.sect.fits     inlist              uparmimlminmax.par
+image.real.fits     image.short.fits    messier.xml         uparmntstinfo.par
 cl> imdelete image.*
 cl> dir
-inlist              uparmimlminmax.par  uparmntstinfo.par
+inlist              messier.xml         uparmimlminmax.par  uparmntstinfo.par
 ```
 
 Remember that if you want to delete any images you just use the task
