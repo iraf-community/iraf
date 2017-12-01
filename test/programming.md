@@ -189,6 +189,46 @@ cl> machtest
 Simple consistency check passed.
 ```
 
+## ILP64 memory model
+
+This is a test for [#107](https://github.com/iraf/iraf-v216/pull/107).
+
+On 64-bit machines, IRAF uses the ILP64 model that makes normal SPP
+`integer` 8 byte wide. `real` values however remain at 4 byte. This
+should be recognized by the Fortran compiler when doing
+`equivalence`.
+
+File: `test_equiv.x`
+```
+task test_equiv = t_equiv
+procedure t_equiv ()
+real	fval, gval
+int	ival
+%	equivalence (fval, ival)
+begin
+    ival = 0
+    gval = 1.2345e06
+    call printf("Should be zero: %d\n")
+    call pargi(ival)
+
+    gval = 0.
+    ival = 998765123423
+    call printf("Should be zero: %g\n")
+    call pargr(gval)
+end
+```
+
+In that example, setting `ival` should not affect the independently
+defined variable `gval` and vice versa:
+
+```
+cl> softools
+cl> xc test_equiv.x
+cl> task $test_equiv = test_equiv.e
+cl> test_equiv
+Should be zero: 0
+Should be zero: 0.
+```
 
 ## The `generic` preprocessor
 
