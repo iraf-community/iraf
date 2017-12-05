@@ -1,7 +1,8 @@
-
    NOAO/IRAF PC-IRAF Revision 2.16.1 EXPORT Mon Oct 14 21:40:13 MST 2013
       This is the EXPORT version of IRAF V2.16 supporting PC systems.
 
+  This product includes results achieved by the IRAF64 project in 2006-
+  2009 directed by Chisato Yamauchi (C-SODA/ISAS/JAXA).
 
   Welcome to IRAF.  To list the available commands, type ? or ??.  To get
   detailed information about a command, type `help <command>'.  To run  a
@@ -10,5 +11,4 @@
   what is new in the version of the system you are using.  
 
   Visit http://iraf.net if you have questions or to report problems.
-
 
