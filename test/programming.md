@@ -230,6 +230,52 @@ Should be zero: 0
 Should be zero: 0.
 ```
 
+## Loop optimization
+
+This is a test for [#60](https://github.com/iraf/iraf-v216/pull/60).
+
+With the original 2.16.1 release, there is a problem with loop
+optimization on "newer" platforms. A simple example task is here:
+
+File: `otest.x`
+```
+task otest = t_otest
+procedure t_otest ()
+int i
+pointer p, sp
+begin
+    call smark(sp)
+    call salloc(p, 4, TY_DOUBLE)
+    do i = 1, 4
+        memd[p+i-1] = i
+
+    do i = 1, 4 {
+        call printf("%d == %g\n")
+	    call pargi(i)
+        call pargd(memd[p+i-1])
+    }
+
+    call sfree(sp)
+end
+```
+
+All this code does is to allocate a temporary array with four
+integers, fill each position with its index, and then print out the
+integers. Compile it, declare the task in (e)cl and run it:
+
+```
+cl> softools
+cl> xc otest.x
+cl> task $otest = otest.e
+cl> otest
+1 == 1.
+2 == 2.
+3 == 3.
+4 == 4.
+```
+
+See issue #73 for the bug report.
+
 ## The `generic` preprocessor
 
 The `generic` preprocessor is used to translate generic source code (code
