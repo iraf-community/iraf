@@ -29,3 +29,54 @@ char u_ctype_[] = {
 	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L,
 	_L,	_L,	_L,	_P,	_P,	_P,	_P,	_C
 };
+
+int isalpha(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&(_U|_L));
+}
+
+int isupper(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_U);
+}
+
+int islower(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_L);
+}
+
+int isdigit(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_N);
+}
+
+int isxdigit(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&(_N|_X));
+}
+
+int isspace(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_S);
+}
+
+int ispunct(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_P);
+}
+
+int isalnum(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&(_U|_L|_N));
+}
+
+int isprint(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&(_P|_U|_L|_N));
+}
+
+int iscntrl(int c)
+{
+	return isascii(c) && ((u_ctype_+1)[(unsigned int)(c)]&_C);
+}
+
