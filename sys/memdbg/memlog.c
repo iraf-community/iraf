@@ -123,7 +123,7 @@ static void memput (char *message)
 	    "------", number++, "------");
 
 	/* Output message. */
-	fprintf (fp, message);
+	fprintf (fp, "%s", message);
 	fprintf (fp, "\n");
 
 	fflush (fp);
