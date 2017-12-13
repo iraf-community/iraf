@@ -421,12 +421,12 @@ putheader (
 
 	/* Encode the file header.
 	 */
-	strcpy  (hb.dbuf.name,  fh->name);
-	sprintf (hb.dbuf.mode,  "%6o ",   fh->mode);
-	sprintf (hb.dbuf.uid,   "%6o ",   fh->uid);
-	sprintf (hb.dbuf.gid,   "%6o ",   fh->gid);
-	sprintf (hb.dbuf.size,  "%11lo ", fh->size);
-	sprintf (hb.dbuf.mtime, "%11lo ", fh->mtime);
+	strncpy  (hb.dbuf.name, fh->name, NAMSIZ-1);
+	snprintf (hb.dbuf.mode,  8,  "%6o ",   fh->mode);
+	snprintf (hb.dbuf.uid,   8,  "%6o ",   fh->uid);
+	snprintf (hb.dbuf.gid,   8,  "%6o ",   fh->gid);
+	snprintf (hb.dbuf.size,  12, "%11lo ", fh->size);
+	snprintf (hb.dbuf.mtime, 12, "%11lo ", fh->mtime);
 
 	switch (fh->linkflag) {
 	case LF_SYMLINK:
@@ -439,7 +439,7 @@ putheader (
 	    hb.dbuf.linkflag = '0';
 	    break;
 	}
-	strcpy (hb.dbuf.linkname, fh->linkname);
+	strncpy (hb.dbuf.linkname, fh->linkname, NAMSIZ-1);
 
 	/* Encode the checksum value for the file header and then
 	 * write the field.  Calculate the checksum with the checksum
@@ -450,7 +450,7 @@ putheader (
 	for (n=0;  n < 8;  n++)
 	    hb.dbuf.chksum[n] = ' ';
 
-	sprintf (chksum, "%6o", cchksum (hb.dummy, TBLOCK));
+	snprintf (chksum, 8, "%6o", cchksum (hb.dummy, TBLOCK));
 	for (n=0, ip=chksum;  n < 8;  n++)
 	    hb.dbuf.chksum[n] = *ip++;
 
