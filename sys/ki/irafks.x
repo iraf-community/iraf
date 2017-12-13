@@ -397,7 +397,7 @@ begin
 
 		if (status != ERR) {
 		    # Return the integer part of the FI structure in args 2+.
-		    do i = 1, min(MAX_ARGS, LEN_FINFO)
+		    do i = 1, min(MAX_ARGS-1, LEN_FINFO)
 			p_arg[i+1] = fi[i]
 
 		    # Return the owner string in the string buffer.
