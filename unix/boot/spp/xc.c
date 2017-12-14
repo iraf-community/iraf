@@ -80,11 +80,11 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lexpat",			/*  4  */
 #ifdef __linux__
 		    "-lpthread",		/*  5  */
-		    "-lrt",			/*  6  */
 #else
 		    "",				/*  5  */
-		    "",				/*  6  */		    
 #endif
+		    "",				/*  6  */		    
+		    "",				/*  7  */
 		    "",				/*  8  */
 		    "",				/*  9  */
 		    0};				/* EOF */
