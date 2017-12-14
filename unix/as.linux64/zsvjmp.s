@@ -22,18 +22,6 @@
         .globl	zsvjmp_
 	.type   zsvjmp_, @function
 
-	# The following has nothing to do with ZSVJMP, and is included here
-	# only because this assembler module is loaded with every process.
-	# This code sets the value of the symbol MEM (the VOS or Fortran Mem
-	# common) to zero, setting the origin for IRAF pointers to zero
-	# rather than some arbitrary value, and ensuring that the MEM common
-	# is aligned for all datatypes as well as page aligned.  A further
-	# advantage is that references to NULL pointers are likely to cause a
-	# memory violation.
-
-	.globl  mem_
-	mem_   =       0
-
 zsvjmp_:
 	# %rsi ... &status  %rdi ... &jumpbuf
 	movq    %rsi, (%rdi)    # store &status in jmpbuf[0]
