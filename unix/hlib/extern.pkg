@@ -4,19 +4,26 @@
 
 reset	extern		= iraf$extern/
 
+# Initialize the helpdb string.  We'll add to this when dyanamically 
+# loading packages when the next load the CLPACKAGE.
+reset	helpdb		= "lib$helpdb.mip"
+
 if (access ("iraf$noao/noao.cl") == yes) {
     reset	noao		= iraf$noao/
     task	noao.pkg	= noao$noao.cl
+    reset	helpdb		= (envget("helpdb") // ",noao$lib/helpdb.mip")
 }
 ;
 if (access ("iraf$vo/vo.cl") == yes) {
     reset	vo		= iraf$vo/
     task	vo.pkg		= vo$vo.cl
+    reset	helpdb		= (envget("helpdb") // ",vo$lib/helpdb.mip")
 }
 ;
+
 #reset	local		= iraf$local/
 #task	local.pkg	= local$local.cl
-
+#reset	helpdb		= (envget("helpdb") // ",local$lib/helpdb.mip")
 
 # Manually defined external packages.  Packages installed in the iraf$extern
 # directory will be loaded dynamically, other packages may be defined here
@@ -26,20 +33,7 @@ if (access ("iraf$vo/vo.cl") == yes) {
 #
 #   reset example	= extern$example/	   <--- must have trailing '/'
 #   task  example.pkg	= example$example.cl
-#
-# Note the 'helpdb' string below must also be modified.
-
-
-
-# Initialize the helpdb string.  We'll add to this when dyanamically 
-# loading packages when the next load the CLPACKAGE.
-reset	helpdb		= "lib$helpdb.mip"
-if (access("noao$lib/helpdb.mip") == yes)
-    reset	helpdb	= (envget("helpdb") // ",noao$lib/helpdb.mip")
-;
-if (access("vo$lib/helpdb.mip") == yes)
-    reset	helpdb	= (envget("helpdb") // ",vo$lib/helpdb.mip")
-;
+#   reset helpdb	= (envget("helpdb") // ",example$lib/helpdb.mip")
 
 # Do not modify below this line!
 clpackage
