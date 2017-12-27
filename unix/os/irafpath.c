@@ -105,6 +105,8 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, "arm");
 #elif defined (__s390x__)
 	strcat (pathname, "s390x");
+#elif defined (__mips__)
+	strcat (pathname, "mips");
 #endif
 
 #endif /* ! __APPLE__ */

@@ -118,6 +118,8 @@ linuxarm::
 	(util/mkarch linuxarm)
 linuxarm64::
 	(util/mkarch linuxarm64)
+linuxmips::
+	(util/mkarch linuxmips)
 freebsd::
 	(util/mkarch freebsd)
 cygwin::
