@@ -264,6 +264,8 @@ again:		    if (fgets (lbuf, SZ_LINE, fp) == NULL)
 		ENVRESET (name, value);
 	}
 
-	fclose (fp);
+	if (fp != NULL) {
+	    fclose (fp);
+	}
 }
 #endif
