@@ -94,7 +94,6 @@ end
 
 Compile it, declare and run as an IRAF task
 
-
 ```
 cl> softools
 cl> xc hello.x
@@ -102,6 +101,10 @@ cl> task $hello = hello.e
 cl> hello
 Hello, world!
 ```
+
+## SPP debugging info
+
+This is a test for [#98](https://github.com/iraf/iraf-v216/pull/98).
 
 XC is able to keep the line number of the main file, for
 debugging. This is done with the `-x` flag:
@@ -123,6 +126,10 @@ cl> tail hello.f nlines=22 | head nlines=11
          return
       end
 ```
+
+## Machine dependent limits
+
+This is a test for [#106](https://github.com/iraf/iraf-v216/pull/106).
 
 Some limits are defined by the `R1MACH` and `D1MACH` functions. We
 just test some very basic properties of these numbers:
@@ -182,9 +189,13 @@ cl> machtest
 Simple consistency check passed.
 ```
 
+## ILP64 memory model
+
+This is a test for [#107](https://github.com/iraf/iraf-v216/pull/107).
+
 On 64-bit machines, IRAF uses the ILP64 model that makes normal SPP
 `integer` 8 byte wide. `real` values however remain at 4 byte. This
-shoulod be recognized by the Fortran compiler when doing
+should be recognized by the Fortran compiler when doing
 `equivalence`.
 
 File: `test_equiv.x`
@@ -207,7 +218,7 @@ begin
 end
 ```
 
-In that example, setting `ival` should not affect the independnetly
+In that example, setting `ival` should not affect the independently
 defined variable `gval` and vice versa:
 
 ```
@@ -218,6 +229,10 @@ cl> test_equiv
 Should be zero: 0
 Should be zero: 0.
 ```
+
+## Loop optimization
+
+This is a test for [#60](https://github.com/iraf/iraf-v216/pull/60).
 
 With the original 2.16.1 release, there is a problem with loop
 optimization on "newer" platforms. A simple example task is here:
@@ -260,6 +275,60 @@ cl> otest
 ```
 
 See issue #73 for the bug report.
+
+## Non-local goto
+
+IRAF uses its own version of a "long jump" (non-local goto), which needs a
+small piece of code to be written in assembler (`zsvjmp.s`). This is highly
+CPU and OS specific. Here is some test code:
+
+File: `jmptest.x`
+```
+include <config.h>
+task jmptest = t_jmptest
+procedure t_jmptest ()
+int jmp_buf[LEN_JUMPBUF]
+int status, step
+begin
+    status = 0
+    step = 0
+
+    call zsvjmp(jmp_buf, status)
+    call printf("status = %d, step = %d\n")
+    call pargi(status)
+    call pargi(step)
+    if (status == 0) {
+        if (step == 1) {
+	    call printf("Error: Called zsvjmp a second time\n")
+            return
+	 }
+         step = 1
+         call printf("Calling zdojmp\n")
+         call zdojmp(jmp_buf, status)
+         call printf("Error: return from ZDOJMP\n")
+         return
+      }
+      if (step == 0) {
+         call printf("Error: ZSVJMP was not called successfully\n")
+         return
+      }
+      call printf("All OK\n")
+end
+```
+
+`ZSVJMP` saves the processor registers in a buffer, while a following `ZDOJMP`
+restores them (and therefore goes back to the place where `ZSVJMP was called).
+
+```
+cl> softools
+cl> xc -w jmptest.x
+cl> task $jmptest = jmptest.e
+cl> jmptest
+status = 0, step = 0
+Calling zdojmp
+status = 1, step = 1
+All OK
+```
 
 ## The `generic` preprocessor
 
