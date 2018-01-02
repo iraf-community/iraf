@@ -99,6 +99,8 @@ char *fname;			/* simple filename, no dirs */
 	/* append nothing */
 #elif defined (__x86_64__)
 	strcat (pathname, "64");
+#elif defined (__aarch64__)
+	strcat (pathname, "arm64");
 #elif defined (__arm__)
 	strcat (pathname, "arm");
 #elif defined (__s390x__)
