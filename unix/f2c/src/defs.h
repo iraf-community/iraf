@@ -649,7 +649,7 @@ struct Dimblock
 		expptr dimexpr;	/* as above in basexpr, this is an
 				   expression for computing a variable
 				   dimension */
-		} dims[1];	/* Dimblocks are allocated with enough
+		} dims[];	/* Dimblocks are allocated with enough
 				   space for this to become dims[ndim] */
 	};
 

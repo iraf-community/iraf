@@ -453,7 +453,8 @@ pad_common(Extsym *c)
 	v->vstg = STGCOMMON;
 	v->vclass = CLVAR;
 	v->tag = TNAME;
-	v->vdim = t = ALLOC(Dimblock);
+	v->vdim = t = (struct Dimblock *) ckalloc((int)sizeof(struct Dimblock)
+						  + 2 * sizeof(expptr));
 	t->ndim = 1;
 	t->dims[0].dimsize = ICON(L / typesize[type]);
 	v->fvarname = v->cvarname = "eqv_pad";
