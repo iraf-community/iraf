@@ -299,7 +299,7 @@ begin
 	    psym = pr_gpari (sym, i, PTEQPAR)
 	    Memr[dparams+i-1] = pr_gsymr (psym, PFITDELTA)
 	}
-	call amovi (Memi[pr_gsymp (sym, PTEQSPLIST)], Memi[plist], nparams)
+	call amovi (Memi[P2I(pr_gsymp (sym, PTEQSPLIST))], Memi[plist], nparams)
 
 	# Initialize the fit evaluation. This is necessary in order to
 	# set the equations called by the INLFIT procedures.
@@ -311,7 +311,7 @@ begin
 
 	# Initialize INLFIT.
 	call in_initr (in, locpr (ft_func), locpr (ft_dfunc),
-	    Memr[pr_gsymp (sym, PTEQSPARVAL)], Memr[dparams],
+	    Memr[P2R(pr_gsymp (sym, PTEQSPARVAL))], Memr[dparams],
 	    nparams, Memi[plist], nfparams)
 
 	# Set INLFIT fitting parameters.

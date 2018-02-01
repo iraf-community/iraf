@@ -688,11 +688,11 @@ begin
 	# equation substructure, if there are any.
 	if (npar > 0) {
 	    call amovi (Memi[mct_getbuf (pr_getp (TPARTABLE))],
-			Memi[pr_gsymp (sym, PTEQSPAR)], npar)
+			Memi[P2I(pr_gsymp (sym, PTEQSPAR))], npar)
 	}
 
 	# Clear the fitting parameter list.
-	call aclri (Memi[pr_gsymp (sym, PTEQSPLIST)], npar)
+	call aclri (Memi[P2I(pr_gsymp (sym, PTEQSPLIST))], npar)
 
 	# Reset number of fitting parameters, and iterate
 	# for all the parameters in the equation.

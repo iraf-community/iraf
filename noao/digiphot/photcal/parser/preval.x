@@ -57,7 +57,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -75,28 +75,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -104,7 +104,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = pr_evi (caux, vdata, pdata)
@@ -124,11 +124,11 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evi (caux, vdata, Memr[paux])
+		stack[sp] = pr_evi (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -261,7 +261,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value
@@ -293,7 +293,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -311,28 +311,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -340,7 +340,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = pr_evl (caux, vdata, pdata)
@@ -360,11 +360,11 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evl (caux, vdata, Memr[paux])
+		stack[sp] = pr_evl (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -497,7 +497,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value
@@ -529,7 +529,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -547,28 +547,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -576,7 +576,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = pr_evr (caux, vdata, pdata)
@@ -596,11 +596,11 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evr (caux, vdata, Memr[paux])
+		stack[sp] = pr_evr (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -733,7 +733,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value
@@ -765,7 +765,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -783,28 +783,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -812,7 +812,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = pr_evd (caux, vdata, pdata)
@@ -832,11 +832,11 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evd (caux, vdata, Memr[paux])
+		stack[sp] = pr_evd (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -969,7 +969,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value
@@ -1001,7 +1001,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -1019,28 +1019,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -1048,7 +1048,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = pr_evx (caux, vdata, pdata)
@@ -1068,11 +1068,11 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evx (caux, vdata, Memr[paux])
+		stack[sp] = pr_evx (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -1205,7 +1205,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value
@@ -1236,7 +1236,7 @@ begin
 	ip = 0
 
 	# Get first instruction from the code buffer
-	ins = Memi[code + ip]
+	ins = Memi[P2I(code + ip)]
 
 	# Reset execution stack pointer
 	sp = 0
@@ -1254,28 +1254,28 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_CATVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_OBSVAR:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = vdata[Memi[code + ip]]
+		stack[sp] = vdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
 	    case PEV_PARAM:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = pdata[Memi[code + ip]]
+		stack[sp] = pdata[Memi[P2I(code + ip)]]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -1283,7 +1283,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_SETEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_SETEQ)
 		caux = pr_gsymp (sym, PSEQRPNEQ)
 
 		stack[sp] = dummy
@@ -1303,7 +1303,7 @@ begin
 		ip = ip + 1
 		sp = sp + 1
 
-		sym = pr_gsym (Memi[code + ip], PTY_TRNEQ)
+		sym = pr_gsym (Memi[P2I(code + ip)], PTY_TRNEQ)
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
@@ -1440,7 +1440,7 @@ begin
 
 	    # Get next instruction
 	    ip = ip + 1
-	    ins = Memi[code + ip]
+	    ins = Memi[P2I(code + ip)]
 	}
 
 	# Return expression value

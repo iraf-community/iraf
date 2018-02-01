@@ -90,13 +90,13 @@ include	"prcode.com"
 begin
 	# Put the end-of-code marker in
 	# the next instruction
-	Memi[code + cp - 1] = PEV_EOC
+	Memi[P2I(code + cp - 1)] = PEV_EOC
 
 	# Set code length
 	LEX_CLEN (ptr) = cp
 
 	# Copy the code buffer into the lexer symbol
-	call amovi (Memi[code], Memi[LEX_CODE (ptr)], cp)
+	call amovi (Memi[P2I(code)], Memi[LEX_CODE (ptr)], cp)
 
 	# Reset code counter to the first
 	# instruction
@@ -144,22 +144,22 @@ begin
 		type = pr_gsymi (sym, PSYMTYPE)
 		switch (type) {
 		case PTY_OBSVAR:
-		    Memi[code + cp - 1] = PEV_OBSVAR
+		    Memi[P2I(code + cp - 1)] = PEV_OBSVAR
 		    offset = 0
 		case PTY_CATVAR:
-		    Memi[code + cp - 1] = PEV_CATVAR
+		    Memi[P2I(code + cp - 1)] = PEV_CATVAR
 		    offset = pr_geti (NOBSVARS)
 		case PTY_FITPAR, PTY_CONST:
-		    Memi[code + cp - 1] = PEV_PARAM
+		    Memi[P2I(code + cp - 1)] = PEV_PARAM
 		    offset = 0
 		case PTY_SETEQ:
-		    Memi[code + cp - 1] = PEV_SETEQ
+		    Memi[P2I(code + cp - 1)] = PEV_SETEQ
 		    offset = 0
 		case PTY_EXTEQ:
-		    Memi[code + cp - 1] = PEV_EXTEQ
+		    Memi[P2I(code + cp - 1)] = PEV_EXTEQ
 		    offset = 0
 		case PTY_TRNEQ:
-		    Memi[code + cp - 1] = PEV_TRNEQ
+		    Memi[P2I(code + cp - 1)] = PEV_TRNEQ
 		    offset = 0
 		default:
 		    call sprintf (aux, SZ_LINE,
@@ -170,7 +170,7 @@ begin
 
 		# Store symbol number, plus the offset, in next instruction
 		cp = cp + 1
-		Memi[code + cp - 1] = pr_gsymi (sym, PSYMNUM) + offset
+		Memi[P2I(code + cp - 1)] = pr_gsymi (sym, PSYMNUM) + offset
 
 	    }
 
@@ -178,63 +178,63 @@ begin
 
 	    # Store number instruction code and the number
 	    # value in the next instruction
-	    Memi[code + cp - 1] = PEV_NUMBER
+	    Memi[P2I(code + cp - 1)] = PEV_NUMBER
 	    cp = cp + 1
-	    Memr[code + cp - 1] = value
+	    Memr[P2R(code + cp - 1)] = value
 
 	case UPLUS:
-	    Memi[code + cp - 1] = PEV_UPLUS
+	    Memi[P2I(code + cp - 1)] = PEV_UPLUS
 
 	case UMINUS:
-	    Memi[code + cp - 1] = PEV_UMINUS
+	    Memi[P2I(code + cp - 1)] = PEV_UMINUS
 
 	case PLUS:
-	    Memi[code + cp - 1] = PEV_PLUS
+	    Memi[P2I(code + cp - 1)] = PEV_PLUS
 
 	case MINUS:
-	    Memi[code + cp - 1] = PEV_MINUS
+	    Memi[P2I(code + cp - 1)] = PEV_MINUS
 
 	case STAR:
-	    Memi[code + cp - 1] = PEV_STAR
+	    Memi[P2I(code + cp - 1)] = PEV_STAR
 
 	case SLASH:
-	    Memi[code + cp - 1] = PEV_SLASH
+	    Memi[P2I(code + cp - 1)] = PEV_SLASH
 
 	case EXPON:
-	    Memi[code + cp - 1] = PEV_EXPON
+	    Memi[P2I(code + cp - 1)] = PEV_EXPON
 
 	case F_ABS:
-	    Memi[code + cp - 1] = PEV_ABS
+	    Memi[P2I(code + cp - 1)] = PEV_ABS
 
 	case F_ACOS:
-	    Memi[code + cp - 1] = PEV_ACOS
+	    Memi[P2I(code + cp - 1)] = PEV_ACOS
 
 	case F_ASIN:
-	    Memi[code + cp - 1] = PEV_ASIN
+	    Memi[P2I(code + cp - 1)] = PEV_ASIN
 
 	case F_ATAN:
-	    Memi[code + cp - 1] = PEV_ATAN
+	    Memi[P2I(code + cp - 1)] = PEV_ATAN
 
 	case F_COS:
-	    Memi[code + cp - 1] = PEV_COS
+	    Memi[P2I(code + cp - 1)] = PEV_COS
 
 	case F_EXP:
-	    Memi[code + cp - 1] = PEV_EXP
+	    Memi[P2I(code + cp - 1)] = PEV_EXP
 
 	case F_LOG:
-	    Memi[code + cp - 1] = PEV_LOG
+	    Memi[P2I(code + cp - 1)] = PEV_LOG
 
 	case F_LOG10:
-	    Memi[code + cp - 1] = PEV_LOG10
+	    Memi[P2I(code + cp - 1)] = PEV_LOG10
 
 	case F_SIN:
-	    Memi[code + cp - 1] = PEV_SIN
+	    Memi[P2I(code + cp - 1)] = PEV_SIN
 
 	case F_SQRT:
-	    Memi[code + cp - 1] = PEV_SQRT
+	    Memi[P2I(code + cp - 1)] = PEV_SQRT
 
 	case F_TAN:
-	    Memi[code + cp - 1] = PEV_TAN
+	    Memi[P2I(code + cp - 1)] = PEV_TAN
 
 	default:
 	    call error (0, "pr_cgen: Illegal instruction")
@@ -266,7 +266,7 @@ begin
 
 	# Allocate memory for code and copy code buffer into it
 	call malloc (aux, len, TY_STRUCT)
-	call amovi (Memi[code], Memi[aux], len)
+	call amovi (Memi[P2I(code)], Memi[P2I(aux)], len)
 
 	# Return new buffer pointer
 	return (aux)
