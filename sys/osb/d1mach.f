@@ -1,1 +1,0 @@
-/iraf/iraf/unix/hlib/d1mach.f

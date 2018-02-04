@@ -1,6 +1,0 @@
-GUIDEMO -- Demo IRAF GUI applications.  These applications demonstrate how to
-use the prototype widget server (xgterm) to build GUIs for IRAF applications.
-
-    imbrowse		Graphical image browser.  Can navigate a directory
-			tree and list, display, and otherwise examine the
-			images therein.

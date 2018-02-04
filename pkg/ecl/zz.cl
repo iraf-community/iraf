@@ -1,3 +1,0 @@
-cd /tmp/
-dir
-logout 

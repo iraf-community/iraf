@@ -1,6 +1,0 @@
-Blackbody calibrations:
-
-U    B    V    R    I   J   H   K   L   Lprime    M
-
-Magnitude conversions are available between V, J, H, K, L, Lprime, and M
-but for U, B, R, and I the star magnitudes must be in the same bandpass.

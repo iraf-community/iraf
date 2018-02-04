@@ -1,5 +1,0 @@
-# Parameters for HELLO task.
-
-gui,f,h,"guidemo$hello.gui",,,user interface file
-coords,*gcur,h,,,,graphics cursor input
-device,s,h,"stdgraph",,,graphics device for plots

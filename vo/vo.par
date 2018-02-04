@@ -1,7 +1,0 @@
-# VO Package parameter file
-
-graphics,s,h,"stdgraph",,,"Interactive graphics output device"
-cursor,*gcur,h,"",,,"Graphics cursor input"
-resdb,s,h,"vo$lib/registry.db",,,"Resource database"
-runid,s,h,"iraf2160",,,"RUNID logging string"
-version,s,h,"V1.0: March 1, 2012"

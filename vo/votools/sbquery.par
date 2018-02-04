@@ -1,7 +1,0 @@
-ra,r,q,,0.,360.,RA (J2000 decimal degrees)
-dec,r,q,,-90.,90.,Dec (J2000 decimal degrees)
-sr,r,q,,0.,,Search radius (arcsec)
-epoch,s,h,"now",,,Epoch of query (JD)
-fields,s,h,"name,ra,dec,vmag,dra,ddec",,,Object attributes to print
-fmt,b,h,yes,,,Format output?
-status,i,h,,,,Service status code

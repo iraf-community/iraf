@@ -1,4 +1,0 @@
-#IMTITLE -- Change the title of an image.
-
-image,f,a,,,,Image to be changed
-title,s,a,,,,New image title

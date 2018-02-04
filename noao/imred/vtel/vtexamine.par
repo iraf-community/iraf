@@ -1,3 +1,0 @@
-input,s,q,,,,Input file descriptor
-headers,b,h,yes,,,Print out header data 
-files,s,q,,,,List of files to be examined
