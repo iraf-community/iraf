@@ -1,7 +1,0 @@
-VOClient Client language/environment APIs
-------------------------------------------
-
-What is provided here is essentially the same VOClient functionality and
-API, bound into each target language or environment.  These include so
-far, the base C binding, plus Java, FORTRAN, IRAF SPP, Python, PHP, Perl,
-and Tcl.  An IDL binding is also planned.

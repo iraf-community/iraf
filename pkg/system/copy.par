@@ -1,3 +1,0 @@
-input,s,a,,,,input file or file template
-output,s,a,,,,output file or destination directory
-verbose,b,h,no,,,print names of files as they are copied

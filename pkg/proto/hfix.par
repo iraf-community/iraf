@@ -1,3 +1,0 @@
-images,f,a,"",,,"List of images to be fixed"
-command,s,h,"edit $fname",,,"User command to be applied"
-update,b,h,yes,,,"Update image header?"

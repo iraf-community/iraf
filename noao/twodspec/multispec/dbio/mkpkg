@@ -1,9 +1,0 @@
-# Multispec/dbio library.
-
-$checkout libpkg.a ../
-$update	  libpkg.a
-$checkin  libpkg.a ../
-
-libpkg.a:
-	dbio.x		dbio.h
-	;

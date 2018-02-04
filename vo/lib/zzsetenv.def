@@ -1,8 +1,0 @@
-# Global environment definitions for the package.
-
-reset	vobin			= "vo$bin(arch)/"
-reset	vosrc			= "vo$src/"
-reset	volib			= "vo$lib/"
-reset	pkglibs			= "vobin$"
-
-keep

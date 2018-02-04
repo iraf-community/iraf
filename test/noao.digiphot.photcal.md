@@ -30,7 +30,7 @@ FIT : y = v1 + v2 * x
 The catalog remains empty in this example (but has to be given as dummy).
 Running this gives a segmentation violation on 64-bit platforms:
 
-Test options: `decimals=4`
+Test options: `decimals=4 arch=linux,macosx`
 ```
 cl> noao
 cl> digiphot

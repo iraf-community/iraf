@@ -1,3 +1,0 @@
-SOFTOOLS -- Software tools package.  This directory contains only the portable
-software maintenance utilities.  Additional tools may be found in the HOST$BOOT
-directories and in the local USER package.

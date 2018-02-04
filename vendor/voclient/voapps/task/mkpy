@@ -1,5 +1,0 @@
-#!/bin/csh -f
-
-set PKG		= voPackage
-
-gcc -dynamiclib -I/usr/include/python2.6/ -lpython2.6 -o $PKG.so $PKG.c

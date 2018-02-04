@@ -1,3 +1,0 @@
-input,s,a,,,,Table name(s)
-chkfile,s,a,,,,Text file containing consistency checks
-mode, s, h, 'a',,,

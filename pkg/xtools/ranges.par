@@ -1,4 +1,0 @@
-# Parameters for ranges task
-
-range_string,s,a,,,,Range string
-test,*i,a,,,,Test value

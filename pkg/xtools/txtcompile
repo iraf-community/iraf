@@ -1,3 +1,0 @@
-#
-
-$iraf/bin$arch/x_txtcompile.e txtcompile input=$1 output=$2 procname=$3

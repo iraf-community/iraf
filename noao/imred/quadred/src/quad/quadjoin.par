@@ -1,4 +1,0 @@
-input,s,a,"",,,Input root name
-output,s,h,"",,,"Output image name
-"
-delete,b,h,yes,,,"Delete sub-images on completion"

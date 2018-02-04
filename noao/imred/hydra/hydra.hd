@@ -1,7 +1,0 @@
-# Help directory for the HYDRA package.
-
-$doc		 = "./doc/"
-
-dohydra		hlp=doc$dohydra.hlp
-
-revisions	sys=Revisions

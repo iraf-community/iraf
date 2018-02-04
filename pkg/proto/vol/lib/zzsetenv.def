@@ -1,7 +1,0 @@
-# Global environment definitions for the VOL package.
-
-set	vollib		= "vol$lib/"
-set	volsrc		= "vol$src/"
-set	volbin		= "vol$bin(arch)/"
-
-keep

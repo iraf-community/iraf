@@ -1,5 +1,0 @@
-# Make the bench package.
-
-$omake	x_bench.x
-$link	x_bench.o
-$exit
