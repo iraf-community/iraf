@@ -69,6 +69,7 @@ memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
 jmp_buf intenv;			/* X_INT during process jumps here	*/
+jmp_buf child_startup;		/* child processes jump here            */
 int	validerrenv;		/* stays 0 until errenv gets set	*/
 int	loggingout;		/* set while processing logout file	*/
 int	gologout;		/* set when logout() is typed		*/
@@ -120,9 +121,11 @@ PKCHAR	*cmd;			/* host command line			*/
 	 * these fail.
 	 */
 	startup ();
+	if (setjmp(child_startup)) {
+	    *prtype = PR_DETACHED;
+	}
 
 	if (*prtype == PR_DETACHED) {
-	    bkg_startup ((char *)bkgfile);
 	    cpustart = c_cputime (0L);
 	    clkstart = c_clktime (0L);
 	    execute (BACKGROUND);

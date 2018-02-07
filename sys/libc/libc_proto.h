@@ -120,6 +120,7 @@ extern int c_prchdir(int pid, char *newdir);
 extern int c_prenvset(int pid, char *envvar, char *value);
 /* cprdet.c */
 extern unsigned int c_propdpr(char *process, char *bkgfile, char *bkgmsg);
+extern unsigned int c_prfodpr(void);
 extern int c_prcldpr(unsigned job);
 extern int c_prdone(unsigned job);
 extern int c_prkill(unsigned job);

@@ -792,6 +792,7 @@ c_prenvset      c_prenvset
 c_printf        c_printf
 c_prkill        c_prkill
 c_propdpr       c_propdpr
+c_prfodpr       c_prfodpr
 c_propen        c_propen
 c_prredir       c_prredir
 c_prsignal      c_prsignal
@@ -3819,6 +3820,7 @@ znotty          ZNOTTY
 zopcpr          ZOPCPR
 zopdir          ZOPDIR
 zopdpr          ZOPDPR
+zfodpr          ZFODPR
 zopnbf          ZOPNBF
 zopnks          ZOPNKS
 zopnlp          ZOPNLP

@@ -154,6 +154,44 @@ ZOPDPR (
 }
 
 
+/* ZFODPR -- Fork a detached process.  In this implementation detached
+ * processes begin execution immediately, runing concurrently with the parent.
+ * "Jobcode" can be anything we want, provided it is unique.  Since detached
+ * processes run concurrently we return the pid of the child as the jobcode.
+ */
+int
+ZFODPR (
+  XINT	  *jobcode
+)
+{
+	int	pid;
+
+
+	/* Create child process.
+	 */
+	if ((pid = fork()) == ERR) {
+	    *jobcode = XERR;
+	    return (XERR);
+	}
+
+	if (pid == 0) {
+	    /* New, child process.
+	     */
+	    *jobcode = 0;
+
+	} else {
+	    /* Existing, parent process.
+	     * Save pid in parent's process table.  Entry cleared when
+	     * pr_wait is called to wait for process to terminate.
+	     */
+	    pr_enter (pid, 0, 0);
+	    *jobcode = pid;
+	}
+
+	return (XOK);
+}
+
+
 /* ZCLDPR -- Close a detached process.  If killflag is set interrupt the
  * process before waiting for it to die.  A detached process will shutdown
  * when interrupted, unlike a connected subprocess which merely processes
@@ -187,4 +225,19 @@ ZCLDPR (
 	    *exit_status = XERR;
 
 	return (*exit_status);
+}
+
+/* ZTSDPR -- Check if a detached process exists by sending a signal.
+ */
+XINT
+ZTSDPR(
+  XINT	*jobcode
+)
+{
+	int	pid = *jobcode;
+
+	if (kill (pid, 0) == ERR)
+	    return (XERR);
+	else 
+	    return (XOK);
 }

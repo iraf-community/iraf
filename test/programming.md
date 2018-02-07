@@ -34,6 +34,18 @@ sequence of tasks.  A Terminal Script is essentially a compound
 statement, but uses some of the simple programming tools provided by
 the CL.
 
+CL may execute a task in the background:
+
+```
+cl> sleep 1 ; print one &
+[1]
+cl> print two ; sleep 2 ; print three
+two
+one
+[0] done  0.0 0:00 0%
+two
+```
+
 Now we check some control structures. First create a list file with a
 `for` loop
 
@@ -64,7 +76,6 @@ File: `while.cl`
 list = "sqr.lis"
 while (fscan(list, i, j) != EOF) print(i, j)
 ```
-
 
 
 ```

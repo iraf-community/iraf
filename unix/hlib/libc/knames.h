@@ -124,6 +124,7 @@
 #define	ZNOTTY		znotty_
 #define	ZOPCPR		zopcpr_
 #define	ZOPDIR		zopdir_
+#define	ZFODPR		zfodpr_
 #define	ZOPDPR		zopdpr_
 #define	ZOPNBF		zopnbf_
 #define	ZOPNGD		zopngd_
@@ -151,6 +152,7 @@
 #define	ZSTTSF		zsttsf_
 #define	ZSTTTX		zstttx_
 #define	ZSTTTY		zsttty_
+#define ZTSDPR		ztsdpr_
 #define	ZSVJMP		zsvjmp_
 #define	ZTSLEE		ztslee_
 #define	ZWMSEC		zwmsec_

@@ -57,6 +57,20 @@ c_propdpr (
 }
 
 
+/* C_PRFODPR -- Open a detached process.
+*/
+unsigned int
+c_prfodpr (
+)
+{
+	unsigned job;
+	iferr (job = PRFODPR ())
+	    return (ERR);
+	else
+	    return (job);
+}
+
+
 /* C_PRCLDPR -- Close a detached process.  Wait (indefinitely) for process
 ** termination, then free all system resources allocated to the process.
 ** Should be called if a detached process terminated while the parent is

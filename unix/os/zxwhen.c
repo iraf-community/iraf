@@ -24,7 +24,7 @@
 /* Set the following nonzero to cause process termination with a core dump
  * when the first signal occurs.
  */
-int debug_sig = 0;
+int debug_sig = 1;
 
 
 /* If the OS allows, cancel any buffered output. If the OS doesn't, 

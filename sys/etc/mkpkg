@@ -87,6 +87,7 @@ libsys.a:
 	prkill.x	prd.com <config.h> <knet.h>
 	propcpr.x	prc.com <config.h> <fset.h> <knet.h> <prstat.h>\
 			<xwhen.h>
+	prfodpr.x	prd.com <config.h> <knet.h>
 	propdpr.x	prd.com <config.h> <knet.h>
 	propen.x	<knet.h>
 	proscmd.x	prc.com <config.h>

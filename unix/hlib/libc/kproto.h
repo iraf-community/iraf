@@ -216,6 +216,7 @@ extern int zcldir_(int *chan, int *status);
 extern int zgfdir_(int *chan, shortint *outstr, int *maxch, int *status);
 /* zopdpr.c */
 extern int zopdpr_(shortint *osfn, shortint *bkgfile, shortint *queue, int *jobcode);
+extern int zfodpr_(int *jobcode);
 extern int zcldpr_(int *jobcode, int *killflag, int *exit_status);
 /* zoscmd.c */
 extern int zoscmd_(shortint *oscmd, shortint *stdin_file, shortint *stdout_file, shortint *stderr_file, int *status);
