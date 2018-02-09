@@ -111,6 +111,8 @@ char *fname;			/* simple filename, no dirs */
 #else
 	strcat (pathname, "mips");
 #endif
+#elif defined (__ppc64__)
+	strcat (pathname, "ppc64");
 #endif
 
 #endif /* ! __APPLE__ */
