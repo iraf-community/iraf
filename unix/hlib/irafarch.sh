@@ -156,22 +156,22 @@ case "$MNAME" in
 	pipes=0
         ;;
 
-    "redhat"|"linux"|"linux64"|"linuxs390x"|"linuxarm"|"linuxarm64"|"linuxmips")
+    "redhat"|"linux"|"linux64"|"linuxs390x"|"linuxarm"|"linuxarm64"|"linuxmips"|"linuxmips64")
         if [ -n "$IRAFARCH" ]; then
             mach="$IRAFARCH"
             hmach="$IRAFARCH"
-	    if [ "$mach" == "linux64" -o "$mach" == "linuxs390x" ]; then
+	    if [ "$mach" = "linux64" -o "$mach" = "linuxs390x" -o "$mach" = "linuxarm64" -o "$mach" = "linuxmips64" ]; then
 		nbits=64
 	    fi
-	    if [ "$mach" == "linuxs390x" ]; then
+	    if [ "$mach" = "linuxs390x" ]; then
 		endian="big"
 	    fi
 	else 
-            if [ "$MNAME_M" == "x86_64" ]; then		# Linux x86_64
+            if [ "$MNAME_M" = "x86_64" ]; then		# Linux x86_64
                 mach="linux64"
                 hmach="linux64"
 	        nbits=64
-            elif [ "$MNAME_M" == "s390x" ]; then
+            elif [ "$MNAME_M" = "s390x" ]; then
                 mach="linuxs390x"
                 hmach="linuxs390x"
 	        nbits=64
@@ -186,6 +186,10 @@ case "$MNAME" in
             elif [ "$MNAME_M" = "mips" ]; then
                 mach="linuxmips"
                 hmach="linuxmips"
+            elif [ "$MNAME_M" = "mips64" ]; then
+                mach="linuxmips64"
+                hmach="linuxmips64"
+                nbits=64
             else					# Linux
                 mach="linux"
                 hmach="linux"

@@ -106,7 +106,11 @@ char *fname;			/* simple filename, no dirs */
 #elif defined (__s390x__)
 	strcat (pathname, "s390x");
 #elif defined (__mips__)
+#if (_MIPS_SIM == _ABI64)
+	strcat (pathname, "mips64");
+#else
 	strcat (pathname, "mips");
+#endif
 #endif
 
 #endif /* ! __APPLE__ */
