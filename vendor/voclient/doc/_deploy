@@ -1,5 +1,0 @@
-#!/bin/csh -f
-
-scp -p *.man tucana:voc/doc/
-scp -p *.man tucana:vao/voc.svn/doc/
-scp -p *.man tucana:vao/voc.svn/../rel/1.0/doc/
