@@ -6,7 +6,7 @@ if [ -z "$iraf" ]; then
 fi
 
 # Allow a previously defined $IRAFARCH to be used.
-if [ -n $IRAFARCH ]; then
+if [ -z "$IRAFARCH" ]; then
     export IRAFARCH=`$iraf/unix/hlib/irafarch.sh -actual`
 fi
 source $iraf/unix/hlib/irafuser.sh
