@@ -193,5 +193,7 @@ The following tests are available so far:
     - [`images.imgeom`](images.imgeom.md)
     - [`images.immatch`](images.immatch.md)
     - [`utilities.nttools`](utilities.nttools.md)
+    - [`noao.digiphot.photcal`](noao.digiphot.photcal.md)
+    - [`noao.astutil`](noao.astutil.md)
  * [Regression test](numerical-recipes.md) for the replacement of Numerical
    Recipes code
