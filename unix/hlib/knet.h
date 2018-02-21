@@ -47,6 +47,7 @@ define	zflstx	kflstx
 define	zflsty	kflsty
 define	zfmkcp	kfmkcp
 define	zfmkdr	kfmkdr
+define	zfodpr  kfodpr
 define	zfpath	kfpath
 define	zfprot	kfprot
 define	zfrnam	kfrnam

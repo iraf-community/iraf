@@ -57,3 +57,15 @@ begin
 
 	call sfree (sp)
 end
+
+# KFODPR -- Fork a detached process.
+
+procedure kfodpr (jobcode)
+
+int	jobcode			# receives job code of process
+int	ki_getchan()
+begin
+	call zfodpr (jobcode)
+	if (jobcode != ERR)
+	    jobcode = ki_getchan (NULL, jobcode)
+end
