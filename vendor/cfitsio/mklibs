@@ -1,6 +1,6 @@
 #!/bin/sh
 
-top=`pwd`
+top=$(pwd)
 
 export CC=gcc
 export CXX=g++
@@ -10,7 +10,7 @@ if [ "$PLMACH" = "macosx" ] ; then
    export CFLAGS="-DDarwin"
 fi
 
-echo "  (Using toplevel directory '"$top"' ....)"
+echo "  (Using toplevel directory $top ....)"
 
 # Global options.
 gopts="--prefix=$top --exec-prefix=$top --disable-shared"
