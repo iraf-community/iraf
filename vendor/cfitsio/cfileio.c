@@ -12,9 +12,12 @@
 #include <stddef.h>  /* apparently needed to define size_t */
 #include "fitsio2.h"
 #include "group.h"
+#ifdef CFITSIO_HAVE_CURL
+  #include <curl/curl.h>
+#endif
 
 #define MAX_PREFIX_LEN 20  /* max length of file type prefix (e.g. 'http://') */
-#define MAX_DRIVERS 24     /* max number of file I/O drivers */
+#define MAX_DRIVERS 27     /* max number of file I/O drivers */
 
 typedef struct    /* structure containing pointers to I/O driver functions */ 
 {   char prefix[MAX_PREFIX_LEN];
@@ -46,7 +49,12 @@ int no_of_drivers = 0;         /* number of currently defined I/O drivers */
 
 static int pixel_filter_helper(fitsfile **fptr, char *outfile,
 				char *expr,  int *status);
-
+static int find_quote(char **string);
+static int find_doublequote(char **string);
+static int find_paren(char **string);
+static int find_bracket(char **string);
+static int find_curlybracket(char **string);
+int comma2semicolon(char *string);
 
 #ifdef _REENTRANT
 
@@ -57,9 +65,11 @@ pthread_mutex_t Fitsio_InitLock = PTHREAD_MUTEX_INITIALIZER;
 /*--------------------------------------------------------------------------*/
 int fitsio_init_lock(void)
 {
-  static int need_to_init = 1;
+  int status = 0;
   
 #ifdef _REENTRANT
+
+  static int need_to_init = 1;
 
   pthread_mutexattr_t mutex_init;
 
@@ -69,16 +79,30 @@ int fitsio_init_lock(void)
 
     /* Init the main fitsio lock here since we need a a recursive lock */
 
-    assert(!pthread_mutexattr_init(&mutex_init));
-#ifdef linux
-    assert(!pthread_mutexattr_settype(&mutex_init,
-				     PTHREAD_MUTEX_RECURSIVE_NP));
-#else
-    assert(!pthread_mutexattr_settype(&mutex_init,
-				     PTHREAD_MUTEX_RECURSIVE));
-#endif
+    status = pthread_mutexattr_init(&mutex_init);
+    if (status) {
+        ffpmsg("pthread_mutexattr_init failed (fitsio_init_lock)");
+        return(status);
+    }
 
-    assert(!pthread_mutex_init(&Fitsio_Lock,&mutex_init));
+#ifdef __GLIBC__
+    status = pthread_mutexattr_settype(&mutex_init,
+				     PTHREAD_MUTEX_RECURSIVE_NP);
+#else
+    status = pthread_mutexattr_settype(&mutex_init,
+				     PTHREAD_MUTEX_RECURSIVE);
+#endif
+    if (status) {
+        ffpmsg("pthread_mutexattr_settype failed (fitsio_init_lock)");
+        return(status);
+    }
+
+    status = pthread_mutex_init(&Fitsio_Lock,&mutex_init);
+    if (status) {
+        ffpmsg("pthread_mutex_init failed (fitsio_init_lock)");
+        return(status);
+    }
+
     need_to_init = 0;
   }
 
@@ -86,7 +110,7 @@ int fitsio_init_lock(void)
 
 #endif
 
-    return(0);
+    return(status);
 }
 /*--------------------------------------------------------------------------*/
 int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */ 
@@ -303,26 +327,26 @@ int ffomem(fitsfile **fptr,      /* O - FITS file pointer                   */
         ffpmsg("ffomem could not move to the specified extension:");
         if (extnum > 0)
         {
-          sprintf(errmsg,
+          snprintf(errmsg, FLEN_ERRMSG,
           " extension number %d doesn't exist or couldn't be opened.",extnum);
           ffpmsg(errmsg);
         }
         else
         {
-          sprintf(errmsg,
+          snprintf(errmsg, FLEN_ERRMSG,
           " extension with EXTNAME = %s,", extname);
           ffpmsg(errmsg);
 
           if (extvers)
           {
-             sprintf(errmsg,
+             snprintf(errmsg, FLEN_ERRMSG,
              "           and with EXTVERS = %d,", extvers);
              ffpmsg(errmsg);
           }
 
           if (movetotype != ANY_HDU)
           {
-             sprintf(errmsg,
+             snprintf(errmsg, FLEN_ERRMSG,
              "           and with XTENSION = %s,", hdtype[movetotype]);
              ffpmsg(errmsg);
           }
@@ -374,6 +398,64 @@ int ffdopn(fitsfile **fptr,      /* O - FITS file pointer                   */
 
     ffopen(fptr, name, mode, status);
 
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffeopn(fitsfile **fptr,      /* O - FITS file pointer                   */ 
+           const char *name,     /* I - full name of file to open           */
+           int mode,             /* I - 0 = open readonly; 1 = read/write   */
+           char *extlist,        /* I - list of 'good' extensions to move to */
+           int *hdutype,         /* O - type of extension that is moved to  */
+           int *status)          /* IO - error status                       */
+/*
+  Open an existing FITS file with either readonly or read/write access. and
+  if the primary array contains a null image (i.e., NAXIS = 0) then attempt to
+  move to the first extension named in the extlist of extension names. If
+  none are found, then simply move to the 2nd extension.
+*/
+{
+    int hdunum, naxis, thdutype, gotext=0;
+    char *ext, *textlist;
+    char *saveptr;
+  
+    if (*status > 0)
+        return(*status);
+
+    if (ffopen(fptr, name, mode, status) > 0)
+        return(*status);
+
+    fits_get_hdu_num(*fptr, &hdunum); 
+    fits_get_img_dim(*fptr, &naxis, status);
+
+    if( (hdunum == 1) && (naxis == 0) ){ 
+      /* look through the extension list */
+      if( extlist ){
+        gotext = 0;
+	textlist = malloc(strlen(extlist) + 1);
+	if (!textlist) {
+	    *status = MEMORY_ALLOCATION;
+	    return(*status);
+	}
+
+        strcpy(textlist, extlist);
+        for(ext=(char *)ffstrtok(textlist, " ",&saveptr); ext != NULL; 
+	    ext=(char *)ffstrtok(NULL," ",&saveptr)){
+	    fits_movnam_hdu(*fptr, ANY_HDU, ext, 0, status);
+	    if( *status == 0 ){
+	      gotext = 1;
+	      break;
+	    } else {
+	      *status = 0;
+	    }
+        }
+        free(textlist);      
+      }
+      if( !gotext ){
+        /* if all else fails, move to extension #2 and hope for the best */
+        fits_movabs_hdu(*fptr, 2, &thdutype, status);
+      }
+    }
+    fits_get_hdu_type(*fptr, hdutype, status);
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -429,7 +511,7 @@ int ffiopn(fitsfile **fptr,      /* O - FITS file pointer                   */
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
-int ffopentest(double version,   /* I - CFITSIO version number, from the    */
+int ffopentest(int soname,       /* I - CFITSIO shared library version     */
                                  /*     application program (fitsio.h file) */
            fitsfile **fptr,      /* O - FITS file pointer                   */ 
            const char *name,     /* I - full name of file to open           */
@@ -437,18 +519,21 @@ int ffopentest(double version,   /* I - CFITSIO version number, from the    */
            int *status)          /* IO - error status                       */
 /*
   Open an existing FITS file with either readonly or read/write access.
-  First test that the version of fitsio.h used to build the CFITSIO library
-  is the same as the version used in building the application program that
+  First test that the SONAME of fitsio.h used to build the CFITSIO library
+  is the same as was used in compiling the application program that
   links to the library.
 */
-{
-    if (version != CFITSIO_VERSION)
+{ 
+    if (soname != CFITSIO_SONAME)
     {
-        printf("ERROR: Mismatch in the version of the fitsio.h include file used to build\n");
-	printf("the CFITSIO library, and the version included by the application program:\n");
-	printf("   Version used to build the CFITSIO library   = %f\n",CFITSIO_VERSION);
-	printf("   Version included by the application program = %f\n",version);
-	
+        printf("\nERROR: Mismatch in the CFITSIO_SONAME value in the fitsio.h include file\n");
+	printf("that was used to build the CFITSIO library, and the value in the include file\n");
+	printf("that was used when compiling the application program:\n");
+	printf("   Version used to build the CFITSIO library   = %d\n",CFITSIO_SONAME);
+	printf("   Version included by the application program = %d\n",soname);
+	printf("\nFix this by recompiling and then relinking this application program \n");
+	printf("with the CFITSIO library.\n");
+
         *status = FILE_NOT_OPENED;
 	return(*status);
     }
@@ -867,26 +952,26 @@ move2hdu:
         ffpmsg("ffopen could not move to the specified extension:");
         if (extnum > 0)
         {
-          sprintf(errmsg,
+          snprintf(errmsg, FLEN_ERRMSG,
           " extension number %d doesn't exist or couldn't be opened.",extnum);
           ffpmsg(errmsg);
         }
         else
         {
-          sprintf(errmsg,
+          snprintf(errmsg, FLEN_ERRMSG,
           " extension with EXTNAME = %s,", extname);
           ffpmsg(errmsg);
 
           if (extvers)
           {
-             sprintf(errmsg,
+             snprintf(errmsg, FLEN_ERRMSG,
              "           and with EXTVERS = %d,", extvers);
              ffpmsg(errmsg);
           }
 
           if (movetotype != ANY_HDU)
           {
-             sprintf(errmsg,
+             snprintf(errmsg, FLEN_ERRMSG,
              "           and with XTENSION = %s,", hdtype[movetotype]);
              ffpmsg(errmsg);
           }
@@ -965,7 +1050,7 @@ move2hdu:
                fits_read_key(*fptr, TSTRING, "EXTNAME", tblname, NULL,&tstatus);
 
                if ( (!strstr(tblname, "GTI") && !strstr(tblname, "gti")) &&
-                    strncasecmp(tblname, "OBSTABLE", 8) )
+                    fits_strncasecmp(tblname, "OBSTABLE", 8) )
                   break;  /* found an interesting table */
             }
           }  /* end while */
@@ -1050,16 +1135,8 @@ move2hdu:
 
        writecopy = 1;  /* we are now dealing with a copy of the original file */
 
-       /* add some HISTORY; fits_copy_image_cell also wrote HISTORY keywords */
        
-/*  disable this; leave it up to calling routine to write any HISTORY keywords
-       if (*extname)
-        sprintf(card,"HISTORY  in HDU '%.16s' of file '%.36s'",extname,infile);
-       else
-        sprintf(card,"HISTORY  in HDU %d of file '%.45s'", extnum, infile);
-
-       ffprec(*fptr, card, status);
-*/
+       /*  leave it up to calling routine to write any HISTORY keywords */
     }
 
     /* --------------------------------------------------------------------- */
@@ -1303,7 +1380,6 @@ move2hdu:
       ffparsecompspec(*fptr, compspec, status);
    }
  
-
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -1430,7 +1506,7 @@ int fits_already_open(fitsfile **fptr, /* I/O - FITS file pointer       */
     if (mode == 0)
         return(*status);
 
-    if(strcasecmp(urltype,"FILE://") == 0)
+    if(fits_strcasecmp(urltype,"FILE://") == 0)
       {
         fits_path2url(infile,tmpinfile,status);
 
@@ -1468,7 +1544,7 @@ int fits_already_open(fitsfile **fptr, /* I/O - FITS file pointer       */
             return(*status);
           }
 
-          if(strcasecmp(oldurltype,"FILE://") == 0)
+          if(fits_strcasecmp(oldurltype,"FILE://") == 0)
             {
               fits_path2url(oldinfile,tmpStr,status);
               
@@ -1578,6 +1654,195 @@ int fits_is_this_a_copy(char *urltype) /* I - type of file */
     return(iscopy);
 }
 /*--------------------------------------------------------------------------*/
+static int find_quote(char **string)
+
+/*  
+    look for the closing single quote character in the input string
+*/
+{
+    char *tstr;
+
+    tstr = *string;
+
+    while (*tstr) {
+        if (*tstr == '\'') { /* found the closing quote */
+           *string = tstr + 1;  /* set pointer to next char */
+           return(0); 
+        } else {  /* skip over any other character */
+           tstr++;
+        }
+    }
+    return(1);  /* opps, didn't find the closing character */
+}
+/*--------------------------------------------------------------------------*/
+static int find_doublequote(char **string)
+
+/*  
+    look for the closing double quote character in the input string
+*/
+{
+    char *tstr;
+
+    tstr = *string;
+
+    while (*tstr) {
+        if (*tstr == '"') { /* found the closing quote */
+           *string = tstr + 1;  /* set pointer to next char */
+           return(0); 
+        } else {  /* skip over any other character */
+           tstr++;
+        }
+    }
+    return(1);  /* opps, didn't find the closing character */
+}
+
+/*--------------------------------------------------------------------------*/
+static int find_paren(char **string)
+
+/*  
+    look for the closing parenthesis character in the input string
+*/
+{
+    char *tstr;
+
+    tstr = *string;
+
+    while (*tstr) {
+
+        if (*tstr == ')') { /* found the closing parens */
+           *string = tstr + 1;  /* set pointer to next char */
+           return(0); 
+        } else if (*tstr == '(') { /* found another level of parens */
+           tstr++;
+           if (find_paren(&tstr)) return(1); 
+        } else if (*tstr == '[') { 
+           tstr++;
+           if (find_bracket(&tstr)) return(1);
+        } else if (*tstr == '{') { 
+           tstr++;
+           if (find_curlybracket(&tstr)) return(1);
+        } else if (*tstr == '"') { 
+           tstr++;
+           if (find_doublequote(&tstr)) return(1);
+        } else if (*tstr == '\'') { 
+           tstr++;
+           if (find_quote(&tstr)) return(1);
+        } else { 
+           tstr++;
+        }
+    }
+    return(1);  /* opps, didn't find the closing character */
+}
+/*--------------------------------------------------------------------------*/
+static int find_bracket(char **string)
+
+/*  
+    look for the closing bracket character in the input string
+*/
+{
+    char *tstr;
+
+    tstr = *string;
+
+    while (*tstr) {
+        if (*tstr == ']') { /* found the closing bracket */
+           *string = tstr + 1;  /* set pointer to next char */
+           return(0); 
+        } else if (*tstr == '(') { /* found another level of parens */
+           tstr++;
+           if (find_paren(&tstr)) return(1); 
+        } else if (*tstr == '[') { 
+           tstr++;
+           if (find_bracket(&tstr)) return(1);
+        } else if (*tstr == '{') { 
+           tstr++;
+           if (find_curlybracket(&tstr)) return(1);
+        } else if (*tstr == '"') { 
+           tstr++;
+           if (find_doublequote(&tstr)) return(1);
+        } else if (*tstr == '\'') { 
+           tstr++;
+           if (find_quote(&tstr)) return(1);
+        } else { 
+           tstr++;
+        }
+    }
+    return(1);  /* opps, didn't find the closing character */
+}
+/*--------------------------------------------------------------------------*/
+static int find_curlybracket(char **string)
+
+/*  
+    look for the closing curly bracket character in the input string
+*/
+{
+    char *tstr;
+
+    tstr = *string;
+
+    while (*tstr) {
+        if (*tstr == '}') { /* found the closing curly bracket */
+           *string = tstr + 1;  /* set pointer to next char */
+           return(0); 
+        } else if (*tstr == '(') { /* found another level of parens */
+           tstr++;
+           if (find_paren(&tstr)) return(1); 
+        } else if (*tstr == '[') { 
+           tstr++;
+           if (find_bracket(&tstr)) return(1);
+        } else if (*tstr == '{') { 
+           tstr++;
+           if (find_curlybracket(&tstr)) return(1);
+        } else if (*tstr == '"') { 
+           tstr++;
+           if (find_doublequote(&tstr)) return(1);
+        } else if (*tstr == '\'') { 
+           tstr++;
+           if (find_quote(&tstr)) return(1);
+        } else { 
+           tstr++;
+        }
+    }
+    return(1);  /* opps, didn't find the closing character */
+}
+/*--------------------------------------------------------------------------*/
+int comma2semicolon(char *string)
+
+/*  
+    replace commas with semicolons, unless the comma is within a quoted or bracketed expression 
+*/
+{
+    char *tstr;
+
+    tstr = string;
+
+    while (*tstr) {
+
+        if (*tstr == ',') { /* found a comma */
+           *tstr = ';';
+           tstr++;
+        } else if (*tstr == '(') { /* found another level of parens */
+           tstr++;
+           if (find_paren(&tstr)) return(1); 
+        } else if (*tstr == '[') { 
+           tstr++;
+           if (find_bracket(&tstr)) return(1);
+        } else if (*tstr == '{') { 
+           tstr++;
+           if (find_curlybracket(&tstr)) return(1);
+        } else if (*tstr == '"') { 
+           tstr++;
+           if (find_doublequote(&tstr)) return(1);
+        } else if (*tstr == '\'') { 
+           tstr++;
+           if (find_quote(&tstr)) return(1);
+        } else { 
+           tstr++;
+        }
+    }
+    return(0);  /* reached end of string */
+}
+/*--------------------------------------------------------------------------*/
 int ffedit_columns(
            fitsfile **fptr,  /* IO - pointer to input table; on output it  */
                              /*      points to the new selected rows table */
@@ -1590,8 +1855,8 @@ int ffedit_columns(
 {
     fitsfile *newptr;
     int ii, hdunum, slen, colnum = -1, testnum, deletecol = 0, savecol = 0;
-    int numcols = 0, *colindex = 0, tstatus = 0, inparen;
-    char *cptr, *cptr2, *cptr3, clause[FLEN_FILENAME], keyname[FLEN_KEYWORD];
+    int numcols = 0, *colindex = 0, tstatus = 0;
+    char *cptr, *cptr2, *cptr3, *clause = NULL, keyname[FLEN_KEYWORD];
     char colname[FLEN_VALUE], oldname[FLEN_VALUE], colformat[FLEN_VALUE];
     char *file_expr = NULL, testname[FLEN_VALUE], card[FLEN_CARD];
 
@@ -1677,26 +1942,20 @@ int ffedit_columns(
     /* as of July 2012, the CFITSIO column filter syntax was modified */
     /* so that commas may be used to separate clauses, as well as semi-colons. */
     /* This was done because users cannot enter the semi-colon in the HEASARC's */
-    /* Hera on-line data processing system due for computer security reasons.  */
+    /* Hera on-line data processing system for computer security reasons.  */
     /* Therefore, we must convert those commas back to semi-colons here, but we */
     /* must not convert any columns that occur within parenthesies.  */
 
-    cptr2 = cptr;
-    inparen = 0;  /* flag to indicate we are within a parenthetical clause */
-
-    while (*cptr2) {
-       if (*cptr2 == '(') {
-           inparen++;    /* increment the nested-parenthesis counter */
-       } else if (*cptr2 == ')') {
-           inparen--;   /* decrement the nested-parenthesis counter */
-       } else if (*cptr2 == ',' && !inparen) {
-           *cptr2 = ';';   /* replace this comma with a semi-colon */
-       }
-       cptr2++;
+    if (comma2semicolon(cptr)) {
+         ffpmsg("parsing error in column filter expression");
+         ffpmsg(cptr);
+         if( file_expr ) free( file_expr );
+         *status = PARSE_SYNTAX_ERR;
+         return(*status);
     }
 
     /* parse expression and get first clause, if more than 1 */
-    while ((slen = fits_get_token(&cptr, ";", clause, NULL)) > 0 )
+    while ((slen = fits_get_token2(&cptr, ";", &clause, NULL, status)) > 0 )
     {
         if( *cptr==';' ) cptr++;
         clause[slen] = '\0';
@@ -1716,6 +1975,7 @@ int ffedit_columns(
                     ffpmsg(clause);
                     if( colindex ) free( colindex );
                     if( file_expr ) free( file_expr );
+		    if( clause ) free(clause);
                     return(*status);
                 }
                 deletecol = 1; /* set flag that at least one col was deleted */
@@ -1733,6 +1993,7 @@ int ffedit_columns(
                     ffpmsg(clause);
                     if( colindex ) free( colindex );
                     if( file_expr ) free( file_expr );
+		    if( clause ) free(clause);
                     return(*status);
                 }
             }
@@ -1752,13 +2013,13 @@ int ffedit_columns(
             cptr2 = clause;
             slen = fits_get_token(&cptr2, "( =", colname, NULL);
 
-
             if (slen == 0)
             {
                 ffpmsg("error: column or keyword name is blank:");
                 ffpmsg(clause);
                 if( colindex ) free( colindex );
                 if( file_expr ) free( file_expr );
+		if (clause) free(clause);
                 return(*status= URL_PARSE_ERROR);
             }
 
@@ -1777,6 +2038,8 @@ int ffedit_columns(
 		    ffpmsg(colname);
 		    ffpmsg("is invalid unless a column has been previously");
 		    ffpmsg("created or editted by a calculator command");
+                    if( file_expr ) free( file_expr );
+		    if (clause) free(clause);
 		    return(*status = URL_PARSE_ERROR);
 		  }
 		colname[strlen(colname)-1] = '\0';
@@ -1806,7 +2069,11 @@ int ffedit_columns(
  		    testname[strlen(testname)-1] = '\0';
 		    /* Make keyword name and put it in oldname */
 		    ffkeyn(testname, colnum, oldname, status);
-		    if (*status) return (*status);
+		    if (*status) {
+                      if( file_expr ) free( file_expr );
+		      if (clause) free(clause);
+		      return (*status);
+		    }
 
 		    tstatus = 0;
 		    if (!fits_read_card(*fptr, oldname, card, &tstatus)) {
@@ -1887,6 +2154,7 @@ int ffedit_columns(
                ffpmsg(cptr2);
                if( colindex ) free( colindex );
                if( file_expr ) free( file_expr );
+	       if (clause) free(clause);
                return(*status = URL_PARSE_ERROR);
               }
             }
@@ -1926,6 +2194,7 @@ int ffedit_columns(
                       ffpmsg(colname);
                       if( colindex ) free( colindex );
                       if( file_expr ) free( file_expr );
+	              if (clause) free(clause);
                       return(*status);
                     }
                     /* keep this column in the output file */
@@ -1946,6 +2215,7 @@ int ffedit_columns(
                         ffpmsg(clause);
                         if( colindex ) free( colindex );
                         if( file_expr ) free( file_expr );
+			if (clause) free(clause);
                         return(*status);
                     }
                 }
@@ -1978,7 +2248,10 @@ int ffedit_columns(
        	                        status) > 0) {
 				
                         ffpmsg("Unable to calculate expression");
-                        return(*status);
+                        if( colindex ) free( colindex );
+                        if( file_expr ) free( file_expr );
+			if (clause) free(clause);
+                         return(*status);
                 }
 
                 /* test if this is a column and not a keyword */
@@ -2003,6 +2276,8 @@ int ffedit_columns(
               }
             }
         }
+	if (clause) free(clause);  /* free old clause before getting new one */
+        clause = NULL;
     }
 
     if (savecol && !deletecol)
@@ -2018,6 +2293,7 @@ int ffedit_columns(
              ffpmsg(clause);
              if( colindex ) free( colindex );
              if( file_expr ) free( file_expr );
+	     if (clause) free(clause);
              return(*status);
            }
          }
@@ -2026,6 +2302,8 @@ int ffedit_columns(
 
     if( colindex ) free( colindex );
     if( file_expr ) free( file_expr );
+    if (clause) free(clause);
+
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -2247,7 +2525,7 @@ int fits_copy_cell2image(
 			    colnum, 0, 0, status);
 
     /* add some HISTORY  */
-    sprintf(card,"HISTORY  This image was copied from row %ld of column '%s',",
+    snprintf(card,FLEN_CARD,"HISTORY  This image was copied from row %ld of column '%s',",
             rownum, colname);
 /* disable this; leave it up to the caller to write history if needed.    
     ffprec(newptr, card, status);
@@ -2453,7 +2731,7 @@ int fits_copy_image2cell(
     if (*status) {
 
       *status = 0;
-      sprintf(tform, "%.0f%c", (double) repeat, tformchar);
+      snprintf(tform, 20, "%.0f%c", (double) repeat, tformchar);
       ffgncl(newptr, &ncols, status);
       colnum = ncols+1;
       fficol(newptr, colnum, colname, tform, status);
@@ -2516,7 +2794,7 @@ int fits_copy_image2cell(
     ffghadll(fptr, &headstart, &datastart, &dataend, status);
     imgstart = datastart;
 
-    sprintf(card, "HISTORY  Table column '%s' row %ld copied from image",
+    snprintf(card, FLEN_CARD, "HISTORY  Table column '%s' row %ld copied from image",
 	    colname, rownum);
 /*
   Don't automatically write History keywords; leave this up to the caller. 
@@ -2529,7 +2807,7 @@ int fits_copy_image2cell(
     strcpy(filename, "HISTORY   ");
     ffflnm(fptr, filename+strlen(filename), status);
     ffghdn(fptr, &hdunum);
-    sprintf(filename+strlen(filename),"[%d]", hdunum-1);
+    snprintf(filename+strlen(filename),FLEN_FILENAME+20-strlen(filename),"[%d]", hdunum-1);
 /*
     ffprec(newptr, filename, status);
 */
@@ -3217,9 +3495,10 @@ when writing FITS images.
 
     /* initialize with default values */
     int ii, compresstype = RICE_1, smooth = 0;
-    long tilesize[MAX_COMPRESS_DIM] = {0,1,1,1,1,1};
-    float qlevel = 0.0, scale = 0.;
-
+    int quantize_method = SUBTRACTIVE_DITHER_1;
+    long tilesize[MAX_COMPRESS_DIM] = {0,0,0,0,0,0};
+    float qlevel = -99., scale = 0.;
+    
     ptr1 = compspec;
     while (*ptr1 == ' ')    /* ignore leading blanks */
            ptr1++;
@@ -3327,6 +3606,16 @@ when writing FITS images.
                 /* this should be the floating point quantization parameter */
 
                   ptr1++;
+                  if (*ptr1 == 'z' || *ptr1 == 'Z') {
+                      /* use the subtractive_dither_2 option */
+                      quantize_method = SUBTRACTIVE_DITHER_2;
+                      ptr1++;
+		  } else if (*ptr1 == '0') {
+                      /* do not dither */
+                      quantize_method = NO_DITHER;
+                      ptr1++;
+		  }
+
                   while (*ptr1 == ' ')    /* ignore leading blanks */
                       ptr1++;
 
@@ -3353,9 +3642,11 @@ when writing FITS images.
         fits_set_hcomp_smooth(fptr, smooth, status);
     }
 
-    if (qlevel != 0.0)
+    if (qlevel != -99.) {
         fits_set_quantize_level(fptr, qlevel, status);
-    
+        fits_set_quantize_method(fptr, quantize_method, status);
+    }
+
     return(*status);
 }
 /*--------------------------------------------------------------------------*/
@@ -3369,6 +3660,8 @@ int ffdkinit(fitsfile **fptr,      /* O - FITS file pointer                   */
   extended filename syntax.
 */
 {
+    *fptr = 0;              /* initialize null file pointer, */
+                            /* regardless of the value of *status */
     if (*status > 0)
         return(*status);
 
@@ -3392,6 +3685,8 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
     char tmplfile[FLEN_FILENAME], compspec[80];
     int handle, create_disk_file = 0;
 
+    *fptr = 0;              /* initialize null file pointer, */
+                            /* regardless of the value of *status */
     if (*status > 0)
         return(*status);
 
@@ -3400,8 +3695,6 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
        create_disk_file = 1;
        *status = 0;
     }
-
-    *fptr = 0;              /* initialize null file pointer */
 
     if (need_to_initialize)  {          /* this is called only once */
         *status = fits_init_cfitsio();
@@ -3477,9 +3770,11 @@ int ffinit(fitsfile **fptr,      /* O - FITS file pointer                   */
         /* call appropriate driver to create the file */
     if (driverTable[driver].create)
     {
+
         FFLOCK;  /* lock this while searching for vacant handle */
         *status = (*driverTable[driver].create)(outfile, &handle);
         FFUNLOCK;
+
         if (*status)
         {
             ffpmsg("failed to create new file (already exists?):");
@@ -4475,6 +4770,95 @@ int fits_init_cfitsio(void)
         return(status);
     }
 
+#ifdef HAVE_NET_SERVICES
+
+    /* 25--------------------https  driver-----------------------*/
+    status = fits_register_driver("https://",
+            NULL,
+            mem_shutdown,
+            mem_setoptions,
+            mem_getoptions, 
+            mem_getversion,
+            https_checkfile,
+            https_open,
+            NULL,            /* create function not required */
+            mem_truncate,
+            mem_close_free,
+            NULL,            /* remove function not required */
+            mem_size,
+            NULL,            /* flush function not required */
+            mem_seek,
+            mem_read,
+            mem_write);
+
+    if (status)
+    {
+        ffpmsg("failed to register the https:// driver (init_cfitsio)");
+        FFUNLOCK;
+        return(status);
+    }
+
+    /* 26--------------------https file driver-----------------------*/
+
+    status = fits_register_driver("httpsfile://",
+            NULL,
+            file_shutdown,
+            file_setoptions,
+            file_getoptions, 
+            file_getversion,
+            NULL,            /* checkfile not needed */ 
+            https_file_open,
+            file_create,
+#ifdef HAVE_FTRUNCATE
+            file_truncate,
+#else
+            NULL,   /* no file truncate function */
+#endif
+            file_close,
+            file_remove,
+            file_size,
+            file_flush,
+            file_seek,
+            file_read,
+            file_write);
+
+    if (status)
+    {
+        ffpmsg("failed to register the httpsfile:// driver (init_cfitsio)");
+        FFUNLOCK;
+        return(status);
+    }
+
+    /* 27--------------------https memory driver-----------------------*/
+    /*  same as https:// driver, except memory file can be opened READWRITE */
+    status = fits_register_driver("httpsmem://",
+            NULL,
+            mem_shutdown,
+            mem_setoptions,
+            mem_getoptions, 
+            mem_getversion,
+            https_checkfile,
+            https_file_open,  /* this will simply call https_open */
+            NULL,            /* create function not required */
+            mem_truncate,
+            mem_close_free,
+            NULL,            /* remove function not required */
+            mem_size,
+            NULL,            /* flush function not required */
+            mem_seek,
+            mem_read,
+            mem_write);
+
+    if (status)
+    {
+        ffpmsg("failed to register the httpsmem:// driver (init_cfitsio)");
+        FFUNLOCK;
+        return(status);
+    }
+      /* === End of https net drivers section === */  
+#endif
+
+
     /* reset flag.  Any other threads will now not need to call this routine */
     need_to_initialize = 0;
 
@@ -4494,7 +4878,7 @@ int fits_register_driver(char *prefix,
 	int (*truncate)(int driverhandle, LONGLONG filesize),
 	int (*close)(int driverhandle),
 	int (*fremove)(char *filename),
-        int (*size)(int driverhandle, LONGLONG *size),
+        int (*size)(int driverhandle, LONGLONG *sizex),
 	int (*flush)(int driverhandle),
 	int (*seek)(int driverhandle, LONGLONG offset),
 	int (*read) (int driverhandle, void *buffer, long nbytes),
@@ -4662,7 +5046,7 @@ int ffifile2(char *url,       /* input filename */
             strcat(urltype, "stdin://");
         ptr1++;
     }
-    else if (!strncasecmp(ptr1, "stdin", 5))
+    else if (!fits_strncasecmp(ptr1, "stdin", 5))
     {
         if (urltype)
             strcat(urltype, "stdin://");
@@ -5173,21 +5557,21 @@ int ffifile2(char *url,       /* input filename */
            if (*tmptr == '@')  /* test for leading @ symbol */
                hasAt = 1;
 
-           if ( !strncasecmp(tmptr, "col ", 4) )
+           if ( !fits_strncasecmp(tmptr, "col ", 4) )
               colStart = 1;
 
-           if ( !strncasecmp(tmptr, "bin", 3) )
+           if ( !fits_strncasecmp(tmptr, "bin", 3) )
               binStart = 1;
 
-           if ( !strncasecmp(tmptr, "pix", 3) )
+           if ( !fits_strncasecmp(tmptr, "pix", 3) )
               pixStart = 1;
 
-           if ( !strncasecmp(tmptr, "compress ", 9) ||
-                !strncasecmp(tmptr, "compress]", 9) )
+           if ( !fits_strncasecmp(tmptr, "compress ", 9) ||
+                !fits_strncasecmp(tmptr, "compress]", 9) )
               compStart = 1;
 
-           if ( !strncasecmp(tmptr, "gtifilter(", 10) ||
-                !strncasecmp(tmptr, "regfilter(", 10) )
+           if ( !fits_strncasecmp(tmptr, "gtifilter(", 10) ||
+                !fits_strncasecmp(tmptr, "regfilter(", 10) )
            {
                rowFilter = 1;
            }
@@ -6339,7 +6723,7 @@ int ffimport_file( char *filename,   /* Text file to read                   */
    reallocating memory.
 */
 {
-   int allocLen, totalLen, llen, eoline;
+   int allocLen, totalLen, llen, eoline = 1;
    char *lines,line[256];
    FILE *aFile;
 
@@ -6355,7 +6739,7 @@ int ffimport_file( char *filename,   /* Text file to read                   */
    lines[0] = '\0';
 
    if( (aFile = fopen( filename, "r" ))==NULL ) {
-      sprintf(line,"Could not open ASCII file %s.",filename);
+      snprintf(line,256,"Could not open ASCII file %s.",filename);
       ffpmsg(line);
       free( lines );
       return(*status = FILE_NOT_OPENED);
@@ -6363,7 +6747,7 @@ int ffimport_file( char *filename,   /* Text file to read                   */
 
    while( fgets(line,256,aFile)!=NULL ) {
       llen = strlen(line);
-      if ((llen > 1) && (line[0] == '/' && line[1] == '/'))
+      if ( eoline && (llen > 1) && (line[0] == '/' && line[1] == '/'))
           continue;       /* skip comment lines begging with // */
 
       eoline = 0;
@@ -6433,14 +6817,77 @@ int fits_get_token(char **ptr,
             *isanumber = 1;
 
 	    if (strchr(token, 'D'))  {
-	        strcpy(tval, token);
+	        strncpy(tval, token, 72);
+		tval[72] = '\0';
 
 	        /*  The C language does not support a 'D'; replace with 'E' */
-	        if (loc = strchr(tval, 'D')) *loc = 'E';
+	        if ((loc = strchr(tval, 'D'))) *loc = 'E';
 
 	        dval =  strtod(tval, &loc);
 	    } else {
 	        dval =  strtod(token, &loc);
+ 	    }
+
+	    /* check for read error, or junk following the value */
+	    if (*loc != '\0' && *loc != ' ' ) *isanumber = 0;
+	    if (errno == ERANGE) *isanumber = 0;
+        }
+    }
+
+    return(slen);
+}
+/*--------------------------------------------------------------------------*/
+int fits_get_token2(char **ptr, 
+                   char *delimiter,
+                   char **token,
+                   int *isanumber,  /* O - is this token a number? */
+		   int *status)
+
+/*
+   parse off the next token, delimited by a character in 'delimiter',
+   from the input ptr string;  increment *ptr to the end of the token.
+   Returns the length of the token, not including the delimiter char;
+
+   This routine allocates the *token string;  the calling routine must free it 
+*/
+{
+    char *loc, tval[73];
+    int slen;
+    double dval;
+    
+    if (*status)
+        return(0);
+	
+    while (**ptr == ' ')  /* skip over leading blanks */
+        (*ptr)++;
+
+    slen = strcspn(*ptr, delimiter);  /* length of next token */
+    if (slen)
+    {
+	*token = (char *) calloc(slen + 1, 1); 
+	if (!(*token)) {
+          ffpmsg("Couldn't allocate memory to hold token string (fits_get_token2).");
+          *status = MEMORY_ALLOCATION ;
+	  return(0);
+        }
+ 
+        strncat(*token, *ptr, slen);       /* copy token */
+        (*ptr) += slen;                   /* skip over the token */
+
+        if (isanumber)  /* check if token is a number */
+        {
+            *isanumber = 1;
+
+	    if (strchr(*token, 'D'))  {
+	        strncpy(tval, *token, 72);
+		tval[72] = '\0';
+
+	        /*  The C language does not support a 'D'; replace with 'E' */
+	        if ((loc = strchr(tval, 'D'))) *loc = 'E';
+
+	        dval =  strtod(tval, &loc);
+	    } else {
+	        dval =  strtod(*token, &loc);
  	    }
 
 	    /* check for read error, or junk following the value */
@@ -6607,14 +7054,18 @@ int ffdelt(fitsfile *fptr,      /* I - FITS file pointer */
 */
 {
     char *basename;
-    int slen, tstatus = 0;
+    int slen, tstatus = NO_CLOSE_ERROR, zerostatus = 0;
 
     if (!fptr)
         return(*status = NULL_INPUT_PTR);
     else if ((fptr->Fptr)->validcode != VALIDSTRUC) /* check for magic value */
         return(*status = BAD_FILEPTR); 
 
-    ffchdu(fptr, status);    /* close the current HDU, ignore any errors */
+    if (*status > 0)
+       ffchdu(fptr, &tstatus);  /* turn off the error message from ffchdu */
+    else
+        ffchdu(fptr, status);  
+
     ffflsh(fptr, TRUE, status);     /* flush and disassociate IO buffers */
 
         /* call driver function to actually close the file */
@@ -6639,7 +7090,7 @@ int ffdelt(fitsfile *fptr,      /* I - FITS file pointer */
             return(*status = MEMORY_ALLOCATION);
     
         fits_parse_input_url((fptr->Fptr)->filename, NULL, basename, NULL, NULL, NULL, NULL,
-               NULL, &tstatus);
+               NULL, &zerostatus);
 
        if ((*driverTable[(fptr->Fptr)->driver].remove)(basename))
         {
@@ -6759,6 +7210,8 @@ int fftplt(fitsfile **fptr,      /* O - FITS file pointer                   */
   Uses C fopen and fgets functions.
 */
 {
+    *fptr = 0;              /* initialize null file pointer, */
+                            /* regardless of the value of *status */
     if (*status > 0)
         return(*status);
 
@@ -6963,3 +7416,40 @@ int pixel_filter_helper(
 
     return(*status);
 }
+
+/*-------------------------------------------------------------------*/
+int ffihtps()
+{
+   /* Wrapper function for global initialization of curl library.
+      This is NOT THREAD-SAFE */
+   int status=0;
+#ifdef CFITSIO_HAVE_CURL
+   if (curl_global_init(CURL_GLOBAL_ALL))
+      /* Do we want to define a new CFITSIO error code for this? */
+      status = -1;
+#endif
+   return status;
+}
+
+/*-------------------------------------------------------------------*/
+int ffchtps()
+{
+   /* Wrapper function for global cleanup of curl library.
+      This is NOT THREAD-SAFE */
+#ifdef CFITSIO_HAVE_CURL
+   curl_global_cleanup();
+#endif
+   return 0;
+}
+
+/*-------------------------------------------------------------------*/
+void ffvhtps(int flag)
+{
+   /* Turn libcurl's verbose output on (1) or off (0). 
+      This is NOT THREAD-SAFE */
+#ifdef HAVE_NET_SERVICES
+
+   https_set_verbose(flag);
+#endif
+}
+

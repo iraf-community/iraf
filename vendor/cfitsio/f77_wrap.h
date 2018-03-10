@@ -243,7 +243,6 @@ static void C2FcopyLogVect(long size, int *A, char *B)
 /*  the integer unit number and the fitsfile file pointer.         */
 /*-----------------------------------------------------------------*/
 
-#define MAXFITSFILES 200             /*  Array of file pointers indexed  */
 extern fitsfile *gFitsFiles[];       /*    by Fortran unit numbers       */
 
 #define  FITSUNIT_cfINT(N,A,B,X,Y,Z)   INT_cfINT(N,A,B,X,Y,Z)

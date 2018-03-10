@@ -15,6 +15,7 @@
 # define NINT(x)  ((x >= 0.) ? (int) (x + 0.5) : (int) (x - 0.5))
 
 #define NULL_VALUE -2147483647 /* value used to represent undefined pixels */
+#define ZERO_VALUE -2147483646 /* value used to represent zero-valued pixels */
 #define N_RESERVED_VALUES 10   /* number of reserved values, starting with */
                                /* and including NULL_VALUE.  These values */
                                /* may not be used to represent the quantized */
@@ -81,11 +82,11 @@ static double quick_select_double(double arr[], int n);
 
 /*---------------------------------------------------------------------------*/
 int fits_quantize_float (long row, float fdata[], long nxpix, long nypix, int nullcheck, 
-	float in_null_value, float qlevel, int idata[], double *bscale,
+	float in_null_value, float qlevel, int dither_method, int idata[], double *bscale,
 	double *bzero, int *iminval, int *imaxval) {
 
 /* arguments:
-long row            i: if positive, tile number = row number in the binary table
+long row            i: if positive, used to calculate random dithering seed value
                        (this is only used when dithering the quantized values)
 float fdata[]       i: array of image pixels to be compressed
 long nxpix          i: number of pixels in each row of fdata
@@ -93,6 +94,7 @@ long nypix          i: number of rows in fdata
 nullcheck           i: check for nullvalues in fdata?
 float in_null_value i: value used to represent undefined pixels in fdata
 float qlevel        i: quantization level
+int dither_method   i; which dithering method to use
 int idata[]         o: values of fdata after applying bzero and bscale
 double bscale       o: scale factor
 double bzero        o: zero offset
@@ -105,7 +107,7 @@ nearly the original floating point values:  fdata ~= idata * bscale + bzero.
 If the function value is zero, the data were not copied to idata.
 */
 
-	int status, anynulls = 0, iseed;
+	int status, iseed = 0;
 	long i, nx, ngood = 0;
 	double stdev, noise2, noise3, noise5;	/* MAD 2nd, 3rd, and 5th order noise values */
 	float minval = 0., maxval = 0.;  /* min & max of fdata */
@@ -177,7 +179,12 @@ If the function value is zero, the data were not copied to idata.
             /* compression algorithms either only work for positive integers, */
             /* or are more efficient.  */
 
-            if ((maxval - minval) / delta < 2147483647. - N_RESERVED_VALUES )
+            if (dither_method == SUBTRACTIVE_DITHER_2)
+	    {
+                /* shift the range to be close to the value used to represent zeros */
+                zeropt = minval - delta * (NULL_VALUE + N_RESERVED_VALUES);
+            }
+	    else if ((maxval - minval) / delta < 2147483647. - N_RESERVED_VALUES )
             {
                 zeropt = minval;
 		/* fudge the zero point so it is an integer multiple of delta */
@@ -195,11 +202,15 @@ If the function value is zero, the data were not copied to idata.
             if (row > 0) {  /* dither the values when quantizing */
               for (i = 0;  i < nx;  i++) {
 	    
-		idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		if (dither_method == SUBTRACTIVE_DITHER_2 && fdata[i] == 0.0) {
+		   idata[i] = ZERO_VALUE;
+		} else {
+		   idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		}
 
                 nextrand++;
 		if (nextrand == N_RANDOM) {
-                    iseed++;
+		    iseed++;
 		    if (iseed == N_RANDOM) iseed = 0;
 	            nextrand = (int) (fits_rand_value[iseed] * 500);
                 }
@@ -219,7 +230,11 @@ If the function value is zero, the data were not copied to idata.
             if (row > 0) {  /* dither the values */
 	      for (i = 0;  i < nx;  i++) {
                 if (fdata[i] != in_null_value) {
-		    idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		    if (dither_method == SUBTRACTIVE_DITHER_2 && fdata[i] == 0.0) {
+		       idata[i] = ZERO_VALUE;
+		    } else {
+		       idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		    }
                 } else {
                     idata[i] = NULL_VALUE;
                 }
@@ -227,17 +242,19 @@ If the function value is zero, the data were not copied to idata.
                 /* increment the random number index, regardless */
                 nextrand++;
 		if (nextrand == N_RANDOM) {
-                      iseed++;
-		      if (iseed == N_RANDOM) iseed = 0;
-	              nextrand = (int) (fits_rand_value[iseed] * 500);
+		    iseed++;
+		    if (iseed == N_RANDOM) iseed = 0;
+	            nextrand = (int) (fits_rand_value[iseed] * 500);
                 }
               }
             } else {  /* do not dither the values */
 	       for (i = 0;  i < nx;  i++) {
-                 if (fdata[i] != in_null_value)
+ 
+                 if (fdata[i] != in_null_value) {
 		    idata[i] =  NINT((fdata[i] - zeropt) / delta);
-                 else 
+                 } else { 
                     idata[i] = NULL_VALUE;
+                 }
                }
             }
 	}
@@ -254,17 +271,19 @@ If the function value is zero, the data were not copied to idata.
 }
 /*---------------------------------------------------------------------------*/
 int fits_quantize_double (long row, double fdata[], long nxpix, long nypix, int nullcheck, 
-	double in_null_value, float qlevel, int idata[], double *bscale,
+	double in_null_value, float qlevel, int dither_method, int idata[], double *bscale,
 	double *bzero, int *iminval, int *imaxval) {
 
 /* arguments:
 long row            i: tile number = row number in the binary table
+                       (this is only used when dithering the quantized values)
 double fdata[]      i: array of image pixels to be compressed
 long nxpix          i: number of pixels in each row of fdata
 long nypix          i: number of rows in fdata
 nullcheck           i: check for nullvalues in fdata?
 double in_null_value i: value used to represent undefined pixels in fdata
-int noise_bits      i: quantization level (number of bits)
+float qlevel        i: quantization level
+int dither_method   i; which dithering method to use
 int idata[]         o: values of fdata after applying bzero and bscale
 double bscale       o: scale factor
 double bzero        o: zero offset
@@ -277,9 +296,9 @@ nearly the original floating point values:  fdata ~= idata * bscale + bzero.
 If the function value is zero, the data were not copied to idata.
 */
 
-	int status, anynulls = 0, iseed;
+	int status, iseed = 0;
 	long i, nx, ngood = 0;
-	double stdev, noise2, noise3, noise5;	/* MAD 2nd, 3rd, and 5th order noise values */
+	double stdev, noise2 = 0., noise3 = 0., noise5 = 0.;	/* MAD 2nd, 3rd, and 5th order noise values */
 	double minval = 0., maxval = 0.;  /* min & max of fdata */
 	double delta;		/* bscale, 1 in idata = delta in fdata */
 	double zeropt;	        /* bzero */
@@ -348,7 +367,13 @@ If the function value is zero, the data were not copied to idata.
             /* return all positive values, if possible since some */
             /* compression algorithms either only work for positive integers, */
             /* or are more efficient.  */
-            if ((maxval - minval) / delta < 2147483647. - N_RESERVED_VALUES )
+
+            if (dither_method == SUBTRACTIVE_DITHER_2)
+	    {
+                /* shift the range to be close to the value used to represent zeros */
+                zeropt = minval - delta * (NULL_VALUE + N_RESERVED_VALUES);
+            }
+	    else if ((maxval - minval) / delta < 2147483647. - N_RESERVED_VALUES )
             {
                 zeropt = minval;
 		/* fudge the zero point so it is an integer multiple of delta */
@@ -366,11 +391,16 @@ If the function value is zero, the data were not copied to idata.
             if (row > 0) {  /* dither the values when quantizing */
        	      for (i = 0;  i < nx;  i++) {
 
-		idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		if (dither_method == SUBTRACTIVE_DITHER_2 && fdata[i] == 0.0) {
+		   idata[i] = ZERO_VALUE;
+		} else {
+		   idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		}
 
                 nextrand++;
 		if (nextrand == N_RANDOM) {
                     iseed++;
+		    if (iseed == N_RANDOM) iseed = 0;
 	            nextrand = (int) (fits_rand_value[iseed] * 500);
                 }
               }
@@ -389,7 +419,11 @@ If the function value is zero, the data were not copied to idata.
             if (row > 0) {  /* dither the values */
 	      for (i = 0;  i < nx;  i++) {
                 if (fdata[i] != in_null_value) {
-		    idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		    if (dither_method == SUBTRACTIVE_DITHER_2 && fdata[i] == 0.0) {
+		       idata[i] = ZERO_VALUE;
+		    } else {
+		       idata[i] =  NINT((((double) fdata[i] - zeropt) / delta) + fits_rand_value[nextrand] - 0.5);
+		    }
                 } else {
                     idata[i] = NULL_VALUE;
                 }
@@ -397,9 +431,10 @@ If the function value is zero, the data were not copied to idata.
                 /* increment the random number index, regardless */
                 nextrand++;
 		if (nextrand == N_RANDOM) {
-                        iseed++;
-	                nextrand = (int) (fits_rand_value[iseed] * 500);
-                } 
+		    iseed++;
+		    if (iseed == N_RANDOM) iseed = 0;
+	            nextrand = (int) (fits_rand_value[iseed] * 500);
+                }
               }
             } else {  /* do not dither the values */
 	       for (i = 0;  i < nx;  i++) {
@@ -448,7 +483,7 @@ int fits_img_stats_short(short *array, /*  2 dimensional array of image pixels *
 */
 {
 	long ngood;
-	short minval, maxval;
+	short minval = 0, maxval = 0;
 	double xmean = 0., xsigma = 0., xnoise = 0., xnoise2 = 0., xnoise3 = 0., xnoise5 = 0.;
 
 	/* need to calculate mean and/or sigma and/or limits? */
@@ -507,7 +542,7 @@ int fits_img_stats_int(int *array, /*  2 dimensional array of image pixels */
 */
 {
 	long ngood;
-	int minval, maxval;
+	int minval = 0, maxval = 0;
 	double xmean = 0., xsigma = 0., xnoise = 0., xnoise2 = 0., xnoise3 = 0., xnoise5 = 0.;
 
 	/* need to calculate mean and/or sigma and/or limits? */
@@ -869,7 +904,7 @@ row of the image.
 	double *diffs2, *diffs3, *diffs5; 
 	double xnoise2 = 0, xnoise3 = 0, xnoise5 = 0;
 	
-	if (nx < 5) {
+	if (nx < 9) {
 		/* treat entire array as an image with a single row */
 		nx = nx * ny;
 		ny = 1;
@@ -961,6 +996,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v1 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v1 < xminval) xminval = v1;
@@ -974,6 +1010,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v2 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 		
 		if (do_range) {
 			if (v2 < xminval) xminval = v2;
@@ -987,6 +1024,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v3 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v3 < xminval) xminval = v3;
@@ -1000,6 +1038,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v4 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v4 < xminval) xminval = v4;
@@ -1013,6 +1052,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v5 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v5 < xminval) xminval = v5;
@@ -1026,6 +1066,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v6 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v6 < xminval) xminval = v6;
@@ -1039,6 +1080,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v7 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v7 < xminval) xminval = v7;
@@ -1052,6 +1094,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v8 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v8 < xminval) xminval = v8;
@@ -1104,7 +1147,7 @@ row of the image.
 
 		/* compute the median diffs */
 		/* Note that there are 8 more pixel values than there are diffs values. */
-		ngoodpix += (nvals + 8);
+		ngoodpix += nvals;
 
 		if (nvals == 0) {
 		    continue;  /* cannot compute medians on this row */
@@ -1207,7 +1250,7 @@ row of the image.
 	double *diffs2, *diffs3, *diffs5; 
 	double xnoise2 = 0, xnoise3 = 0, xnoise5 = 0;
 	
-	if (nx < 5) {
+	if (nx < 9) {
 		/* treat entire array as an image with a single row */
 		nx = nx * ny;
 		ny = 1;
@@ -1299,6 +1342,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v1 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v1 < xminval) xminval = v1;
@@ -1312,6 +1356,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v2 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 		
 		if (do_range) {
 			if (v2 < xminval) xminval = v2;
@@ -1325,6 +1370,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v3 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v3 < xminval) xminval = v3;
@@ -1338,6 +1384,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v4 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v4 < xminval) xminval = v4;
@@ -1351,6 +1398,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v5 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v5 < xminval) xminval = v5;
@@ -1364,6 +1412,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v6 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v6 < xminval) xminval = v6;
@@ -1377,6 +1426,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v7 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v7 < xminval) xminval = v7;
@@ -1390,6 +1440,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v8 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v8 < xminval) xminval = v8;
@@ -1457,7 +1508,7 @@ row of the image.
 
 		/* compute the median diffs */
 		/* Note that there are 8 more pixel values than there are diffs values. */
-		ngoodpix += (nvals + 8);
+		ngoodpix += nvals;
 
 		if (nvals == 0) {
 		    continue;  /* cannot compute medians on this row */
@@ -1560,7 +1611,7 @@ row of the image.
 	double *diffs2, *diffs3, *diffs5; 
 	double xnoise2 = 0, xnoise3 = 0, xnoise5 = 0;
 	
-	if (nx < 5) {
+	if (nx < 9) {
 		/* treat entire array as an image with a single row */
 		nx = nx * ny;
 		ny = 1;
@@ -1652,6 +1703,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v1 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v1 < xminval) xminval = v1;
@@ -1665,6 +1717,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v2 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 		
 		if (do_range) {
 			if (v2 < xminval) xminval = v2;
@@ -1678,6 +1731,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v3 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v3 < xminval) xminval = v3;
@@ -1691,6 +1745,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v4 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v4 < xminval) xminval = v4;
@@ -1704,6 +1759,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v5 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v5 < xminval) xminval = v5;
@@ -1717,6 +1773,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v6 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v6 < xminval) xminval = v6;
@@ -1730,6 +1787,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v7 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v7 < xminval) xminval = v7;
@@ -1743,6 +1801,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v8 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v8 < xminval) xminval = v8;
@@ -1795,7 +1854,7 @@ row of the image.
 
 		/* compute the median diffs */
 		/* Note that there are 8 more pixel values than there are diffs values. */
-		ngoodpix += (nvals + 8);
+		ngoodpix += nvals;
 
 		if (nvals == 0) {
 		    continue;  /* cannot compute medians on this row */
@@ -1898,7 +1957,7 @@ row of the image.
 	double *diffs2, *diffs3, *diffs5; 
 	double xnoise2 = 0, xnoise3 = 0, xnoise5 = 0;
 	
-	if (nx < 5) {
+	if (nx < 9) {
 		/* treat entire array as an image with a single row */
 		nx = nx * ny;
 		ny = 1;
@@ -1990,6 +2049,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v1 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v1 < xminval) xminval = v1;
@@ -2003,6 +2063,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v2 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 		
 		if (do_range) {
 			if (v2 < xminval) xminval = v2;
@@ -2016,6 +2077,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v3 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v3 < xminval) xminval = v3;
@@ -2029,6 +2091,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v4 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v4 < xminval) xminval = v4;
@@ -2042,6 +2105,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v5 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v5 < xminval) xminval = v5;
@@ -2055,6 +2119,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v6 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v6 < xminval) xminval = v6;
@@ -2068,6 +2133,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v7 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v7 < xminval) xminval = v7;
@@ -2081,6 +2147,7 @@ row of the image.
 
 		if (ii == nx) continue;  /* hit end of row */
 		v8 = rowpix[ii];  /* store the good pixel value */
+		ngoodpix++;
 
 		if (do_range) {
 			if (v8 < xminval) xminval = v8;
@@ -2133,7 +2200,7 @@ row of the image.
 
 		/* compute the median diffs */
 		/* Note that there are 8 more pixel values than there are diffs values. */
-		ngoodpix += (nvals + 8);
+		ngoodpix += nvals;
 
 		if (nvals == 0) {
 		    continue;  /* cannot compute medians on this row */

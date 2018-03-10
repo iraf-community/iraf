@@ -395,8 +395,12 @@ int ffpcld( fitsfile *fptr,  /* I - FITS file pointer                       */
        MACHINE == NATIVE && tcode == TDOUBLE)
     {
         writeraw = 1;
-        maxelem = nelem;  /* we can write the entire array at one time */
-    }
+        if (nelem < (LONGLONG)INT32_MAX) {
+            maxelem = nelem;
+        } else {
+            maxelem = INT32_MAX/8;
+        }
+     }
     else
         writeraw = 0;
 
@@ -493,7 +497,7 @@ int ffpcld( fitsfile *fptr,  /* I - FITS file pointer                       */
                 /* can't write to string column, so fall thru to default: */
 
             default:  /*  error trap  */
-                sprintf(message, 
+                snprintf(message, FLEN_ERRMSG,
                       "Cannot write numbers to column %d which has format %s",
                        colnum,tform);
                 ffpmsg(message);
@@ -509,7 +513,7 @@ int ffpcld( fitsfile *fptr,  /* I - FITS file pointer                       */
         /*-------------------------*/
         if (*status > 0)  /* test for error during previous write operation */
         {
-          sprintf(message,
+          snprintf(message,FLEN_ERRMSG,
           "Error writing elements %.0f thru %.0f of input data array (ffpcld).",
               (double) (next+1), (double) (next+ntodo));
          ffpmsg(message);
@@ -597,7 +601,7 @@ int ffpcnd( fitsfile *fptr,  /* I - FITS file pointer                       */
 */
 {
     tcolumn *colptr;
-    long  ngood = 0, nbad = 0, ii;
+    LONGLONG  ngood = 0, nbad = 0, ii;
     LONGLONG repeat, first, fstelm, fstrow;
     int tcode, overflow = 0;
 

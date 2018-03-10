@@ -84,7 +84,7 @@ unsigned int simplerng_getuint_pr(unsigned int *u, unsigned int *v)
 }
 
 /* Get uniform deviate [0,1] */
-double simplerng_getuniform()
+double simplerng_getuniform(void)
 {
 #ifdef USE_SYSTEM_RAND
   return rand()*(1.0 / ((double)RAND_MAX + 1));

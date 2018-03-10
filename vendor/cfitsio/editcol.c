@@ -80,7 +80,7 @@ int ffrsimll(fitsfile *fptr,    /* I - FITS file pointer           */
         longbitpix != LONG_IMG && longbitpix != LONGLONG_IMG &&
         longbitpix != FLOAT_IMG && longbitpix != DOUBLE_IMG)
     {
-        sprintf(message,
+        snprintf(message, FLEN_ERRMSG,
         "Illegal value for BITPIX keyword: %d", bitpix);
         ffpmsg(message);
         return(*status = BAD_BITPIX);
@@ -88,7 +88,7 @@ int ffrsimll(fitsfile *fptr,    /* I - FITS file pointer           */
 
     if (naxis < 0 || naxis > 999)
     {
-        sprintf(message,
+        snprintf(message, FLEN_ERRMSG,
         "Illegal value for NAXIS keyword: %d", naxis);
         ffpmsg(message);
         return(*status = BAD_NAXIS);
@@ -103,7 +103,7 @@ int ffrsimll(fitsfile *fptr,    /* I - FITS file pointer           */
     {
         if (naxes[ii] < 0)
         {
-            sprintf(message,
+            snprintf(message, FLEN_ERRMSG,
             "Illegal value for NAXIS%d keyword: %.0f", ii + 1,  (double) (naxes[ii]));
             ffpmsg(message);
             return(*status = BAD_NAXES);
@@ -1109,9 +1109,12 @@ int fficls(fitsfile *fptr,  /* I - FITS file pointer                        */
         {
             ffbnfm(tfm, &datacode, &repeat, &width, status);
 
-            if (datacode < 0)         /* variable length array column */
-                delbyte += 8;
-            else if (datacode == 1)          /* bit column; round up  */
+            if (datacode < 0)  {       /* variable length array column */
+	        if (strchr(tfm, 'Q'))
+		  delbyte += 16;
+		else
+                  delbyte += 8;
+            } else if (datacode == 1)          /* bit column; round up  */
                 delbyte += (repeat + 7) / 8; /* to multiple of 8 bits */
             else if (datacode == 16)  /* ASCII string column */
                 delbyte += repeat;
@@ -1396,6 +1399,11 @@ int ffmvec(fitsfile *fptr,  /* I - FITS file pointer                        */
       tstatus = 0;
       ffmkyj(fptr, "THEAP", (fptr->Fptr)->heapstart, "&", &tstatus);
 
+      /* Must reset colptr before using it again.  (fptr->Fptr)->tableptr
+         may have been reallocated down in ffbinit via the call to ffiblk above.*/
+      colptr = (fptr->Fptr)->tableptr;
+      colptr += (colnum - 1);
+
       firstcol = colptr->tbcol + (repeat * width);  /* insert position */
 
       /* insert delbyte bytes in every row, at byte position firstcol */
@@ -1461,9 +1469,9 @@ int ffmvec(fitsfile *fptr,  /* I - FITS file pointer                        */
       strcpy(tcode,"M");
 
     /* write as a double value because the LONGLONG conversion */
-    /* character in sprintf is platform dependent ( %lld, %ld, %I64d ) */
+    /* character in snprintf is platform dependent ( %lld, %ld, %I64d ) */
 
-    sprintf(tfm,"%.0f%s",(double) newveclen, tcode); 
+    snprintf(tfm,FLEN_VALUE,"%.0f%s",(double) newveclen, tcode); 
 
     ffkeyn("TFORM", colnum, keyname, status);  /* Keyword name */
     ffmkys(fptr, keyname, tfm, "&", status);   /* modify TFORM keyword */
@@ -1484,8 +1492,9 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
   copy a column from infptr and insert it in the outfptr table.
 */
 {
-    int tstatus, colnum, typecode, anynull;
-    long tfields, repeat, width, nrows, outrows;
+    int tstatus, colnum, typecode, otypecode, anynull;
+    int inHduType, outHduType;
+    long tfields, repeat, orepeat, width, owidth, nrows, outrows;
     long inloop, outloop, maxloop, ndone, ntodo, npixels;
     long firstrow, firstelem, ii;
     char keyname[FLEN_KEYWORD], ttype[FLEN_VALUE], tform[FLEN_VALUE];
@@ -1504,25 +1513,27 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     }
     else if ((infptr->Fptr)->datastart == DATA_UNDEFINED)
         ffrdef(infptr, status);                /* rescan header */
-
+    inHduType = (infptr->Fptr)->hdutype;
+    
     if (outfptr->HDUposition != (outfptr->Fptr)->curhdu)
     {
         ffmahd(outfptr, (outfptr->HDUposition) + 1, NULL, status);
     }
     else if ((outfptr->Fptr)->datastart == DATA_UNDEFINED)
         ffrdef(outfptr, status);               /* rescan header */
-
+    outHduType = (outfptr->Fptr)->hdutype;
+    
     if (*status > 0)
         return(*status);
 
-    if ((infptr->Fptr)->hdutype == IMAGE_HDU || (outfptr->Fptr)->hdutype == IMAGE_HDU)
+    if (inHduType == IMAGE_HDU || outHduType == IMAGE_HDU)
     {
        ffpmsg
        ("Can not copy columns to or from IMAGE HDUs (ffcpcl)");
        return(*status = NOT_TABLE);
     }
 
-    if ( (infptr->Fptr)->hdutype == BINARY_TBL &&  (outfptr->Fptr)->hdutype == ASCII_TBL)
+    if ( inHduType == BINARY_TBL &&  outHduType == ASCII_TBL)
     {
        ffpmsg
        ("Copying from Binary table to ASCII table is not supported (ffcpcl)");
@@ -1552,7 +1563,7 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
           return(*status = NO_TFORM);
         }
 
-        if ((infptr->Fptr)->hdutype == ASCII_TBL && (outfptr->Fptr)->hdutype == BINARY_TBL)
+        if (inHduType == ASCII_TBL && outHduType == BINARY_TBL)
         {
             /* convert from ASCII table to BINARY table format string */
             if (typecode == TSTRING)
@@ -1588,6 +1599,12 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
            return(*status);
         }
 
+        if ((infptr->Fptr == outfptr->Fptr)
+           && (infptr->HDUposition == outfptr->HDUposition)
+           && (colnum <= incol))  {
+	       incol++;  /* the input column has been shifted over */
+        }
+
         /* copy the comment strings from the input file for TTYPE and TFORM */
         tstatus = 0;
         ffkeyn("TTYPE", colnum, keyname, &tstatus);
@@ -1613,7 +1630,7 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
         ffcpky(infptr, outfptr, incol, colnum, "TCDLT", status);
         ffcpky(infptr, outfptr, incol, colnum, "TCROT", status);
 
-        if ((infptr->Fptr)->hdutype == ASCII_TBL && (outfptr->Fptr)->hdutype == BINARY_TBL)
+        if (inHduType == ASCII_TBL && outHduType == BINARY_TBL)
         {
             /* binary tables only have TNULLn keyword for integer columns */
             if (typecode == TLONG || typecode == TSHORT)
@@ -1642,6 +1659,13 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     else
     {
         colnum = outcol;
+        /* get the datatype and vector repeat length of the output column */
+        ffgtcl(outfptr, outcol, &otypecode, &orepeat, &owidth, status);
+
+        if (orepeat != repeat) {
+            ffpmsg("Input and output vector columns must have same length (ffcpcl)");
+            return(*status = BAD_TFORM);
+        }
     }
 
     ffgkyj(infptr,  "NAXIS2", &nrows,   0, status);  /* no. of input rows */
@@ -1649,8 +1673,8 @@ int ffcpcl(fitsfile *infptr,    /* I - FITS file pointer to input file  */
     nrows = minvalue(nrows, outrows);
 
     if (typecode == TBIT)
-        repeat = (repeat - 1) / 8 + 1;  /* convert from bits to bytes */
-    else if (typecode == TSTRING && (infptr->Fptr)->hdutype == BINARY_TBL)
+        repeat = (repeat + 7) / 8;  /* convert from bits to bytes */
+    else if (typecode == TSTRING && inHduType == BINARY_TBL)
         repeat = repeat / width;  /* convert from chars to unit strings */
 
     /* get optimum number of rows to copy at one time */

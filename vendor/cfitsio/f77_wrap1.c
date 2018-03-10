@@ -43,7 +43,7 @@
 #include "f77_wrap.h"
 
 unsigned long gMinStrLen=80L;
-fitsfile *gFitsFiles[MAXFITSFILES]={0};
+fitsfile *gFitsFiles[NMAXFILES]={0};
 
 /*----------------  Fortran Unit Number Allocation -------------*/
 
@@ -53,9 +53,9 @@ void Cffgiou( int *unit, int *status )
    int i;
 
    if( *status>0 ) return;
-   for( i=50;i<MAXFITSFILES;i++ ) /* Using a unit=0 sounds bad, so start at 1 */
+   for( i=50;i<NMAXFILES;i++ ) /* Using a unit=0 sounds bad, so start at 1 */
       if( gFitsFiles[i]==NULL ) break;
-   if( i==MAXFITSFILES ) {
+   if( i==NMAXFILES ) {
       *unit = 0;
       *status = TOO_MANY_FILES;
       ffpmsg("Cffgiou has no more available unit numbers.");
@@ -72,8 +72,8 @@ void Cfffiou( int unit, int *status )
 {
    if( *status>0 ) return;
    if( unit == -1 ) {
-      int i; for( i=50; i<MAXFITSFILES; ) gFitsFiles[i++]=NULL;
-   } else if( unit<1 || unit>=MAXFITSFILES ) {
+      int i; for( i=50; i<NMAXFILES; ) gFitsFiles[i++]=NULL;
+   } else if( unit<1 || unit>=NMAXFILES ) {
       *status = BAD_FILEPTR;
       ffpmsg("Cfffiou was sent an unacceptable unit number.");
    } else gFitsFiles[unit]=NULL;
@@ -100,7 +100,7 @@ int CFITS2Unit( fitsfile *fptr )
    /*  call CFITSIO... OUCH!!!                          */
 
    last_fptr = fptr;
-   for( last_unit=1; last_unit<MAXFITSFILES; last_unit++ ) {
+   for( last_unit=1; last_unit<NMAXFILES; last_unit++ ) {
       if( fptr == gFitsFiles[last_unit] )
 	 return( last_unit );
    }
@@ -117,7 +117,7 @@ int CFITS2Unit( fitsfile *fptr )
 
 fitsfile* CUnit2FITS(int unit)
 {
-    if( unit<1 || unit>=MAXFITSFILES )
+    if( unit<1 || unit>=NMAXFILES )
         return(0);
 	
     return(gFitsFiles[unit]);
@@ -334,6 +334,7 @@ FCALLSCSUB4(ffgknm,FTGKNM,ftgknm,STRING,PSTRING, PINT, PINT)
 FCALLSCSUB4(ffnkey,FTNKEY,ftnkey,INT,STRING,PSTRING,PINT)
 FCALLSCSUB3(ffdtyp,FTDTYP,ftdtyp,STRING,PSTRING,PINT)
 FCALLSCFUN1(INT,ffgkcl,FTGKCL,ftgkcl,STRING)
+FCALLSCSUB5(ffmkky,FTMKKY,ftmkky,STRING,STRING,STRING,PSTRING,PINT)
 FCALLSCSUB4(ffpsvc,FTPSVC,ftpsvc,STRING,PSTRING,PSTRING,PINT)
 FCALLSCSUB4(ffgthd,FTGTHD,ftgthd,STRING,PSTRING,PINT,PINT)
 FCALLSCSUB5(ffasfm,FTASFM,ftasfm,STRING,PINT,PLONG,PINT,PINT)

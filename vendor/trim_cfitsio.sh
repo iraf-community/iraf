@@ -34,26 +34,23 @@ patch -s -p1 <<EOF
 EOF
 
 # This just gets CORE_SOURCES from Makefile.in
-lib_files=`make -f cfitsio/Makefile.in cfitsioLibSrcs`
+lib_files=`make -f cfitsio/Makefile.in cfitsioLibSrcs | sed 's/zlib\/.*//'`
 flib_files='f77_wrap1.c f77_wrap2.c f77_wrap3.c f77_wrap4.c'
 # The include files cannot be directly inferred from Makefile.in
-inc_files='fitsio.h fitsio2.h longnam.h drvrsmem.h eval_defs.h eval_tab.h region.h group.h simplerng.h grparser.h zlib.h zconf.h zutil.h crc32.h inftrees.h inflate.h inffast.h deflate.h trees.h inffixed.h f77_wrap.h cfortran.h'
+inc_files='fitsio.h fitsio2.h longnam.h drvrsmem.h eval_defs.h eval_tab.h region.h group.h simplerng.h grparser.h f77_wrap.h cfortran.h'
+extra_files='config.sub config.guess Makefile.in'
 
 if [ ! -d cfitsio/lib ]; then
     mkdir cfitsio/lib
 fi
 
-for fil in $lib_files $flib_files $inc_files configure.ac Makefile.in; do
+for fil in $lib_files $flib_files $inc_files $extra_files; do
     if [ -f cfitsio/$fil ]; then
         mv cfitsio/$fil cfitsio/lib/
     fi
 done
-rm -f cfitsio/cfitsio.xcodeproj
-rm -f cfitsio/docs/*.tex
-rm -f cfitsio/docs/*.ps
-rm -f cfitsio/docs/*.pdf
-rm -f cfitsio/docs/*.doc
-rm -f cfitsio/docs/*.toc
+rm -rf cfitsio/cfitsio.xcodeproj
+rm -rf cfitsio/docs
 rm -f cfitsio/[^L]*.*
 mv cfitsio/lib/* cfitsio/
 rmdir cfitsio/lib/

@@ -15,13 +15,14 @@
 #define fits_open_memfile   ffomem
 
 /* 
-   use the following special macro to test that the fitsio.h include
-   file that was used to build the CFITSIO library is the same version
+   use the following special macro to test that the fitsio.h include file
+   that was used to build the CFITSIO library is compatible with the version
    as included when compiling the application program
 */
-#define fits_open_file(A, B, C, D)  ffopentest( CFITSIO_VERSION, A, B, C, D)
+#define fits_open_file(A, B, C, D)  ffopentest( CFITSIO_SONAME, A, B, C, D)
 
 #define fits_open_data      ffdopn
+#define fits_open_extlist   ffeopn
 #define fits_open_table     fftopn
 #define fits_open_image     ffiopn
 #define fits_open_diskfile  ffdkopn
@@ -53,6 +54,7 @@
 #define fits_null_check     ffnchk
 #define fits_make_keyn      ffkeyn
 #define fits_make_nkey      ffnkey
+#define fits_make_key       ffmkky
 #define fits_get_keyclass   ffgkcl
 #define fits_get_keytype    ffdtyp
 #define fits_get_inttype    ffinttyp
@@ -134,7 +136,9 @@
 #define fits_read_key_cmp      ffgkyc
 #define fits_read_key_dblcmp   ffgkym
 #define fits_read_key_triple   ffgkyt
+#define fits_get_key_strlen    ffgksl
 #define fits_read_key_longstr  ffgkls
+#define fits_read_string_key   ffgsky
 #define fits_free_memory       fffree
 #define fits_read_tdim         ffgtdm
 #define fits_read_tdimll       ffgtdmll
@@ -588,5 +592,9 @@
 #define fits_copy_member        ffgmcp 
 #define fits_transfer_member    ffgmtf 
 #define fits_remove_member      ffgmrm
+
+#define fits_init_https         ffihtps
+#define fits_cleanup_https      ffchtps
+#define fits_verbose_https      ffvhtps
 
 #endif

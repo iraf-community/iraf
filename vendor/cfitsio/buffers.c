@@ -67,8 +67,14 @@ int ffpbyt(fitsfile *fptr,   /* I - FITS file pointer                    */
     if (fptr->HDUposition != (fptr->Fptr)->curhdu)
         ffmahd(fptr, (fptr->HDUposition) + 1, NULL, status);
 
-    cptr = (char *)buffer;
+    if (nbytes > LONG_MAX) {
+        ffpmsg("Number of bytes to write is greater than LONG_MAX (ffpbyt).");
+        *status = WRITE_ERROR;
+	return(*status);
+    }
+    
     ntodo =  (long) nbytes;
+    cptr = (char *)buffer;
 
     if ((fptr->Fptr)->curbuf < 0)  /* no current data buffer for this file */
     {                              /* so reload the last one that was used */
@@ -1126,7 +1132,7 @@ int ffptbb(fitsfile *fptr,        /* I - FITS file pointer                 */
 */
 {
     LONGLONG bytepos, endrow, nrows;
-    char message[81];
+    char message[FLEN_ERRMSG];
 
     if (*status > 0 || nchars <= 0)
         return(*status);
@@ -1157,7 +1163,7 @@ int ffptbb(fitsfile *fptr,        /* I - FITS file pointer                 */
             /* ffirow also updates the heap address and numrows */
             if (ffirow(fptr, (fptr->Fptr)->numrows, nrows, status) > 0)
             {
-                 sprintf(message,
+                 snprintf(message, FLEN_ERRMSG,
                  "ffptbb failed to add space for %.0f new rows in table.",
                          (double) nrows);
                  ffpmsg(message);

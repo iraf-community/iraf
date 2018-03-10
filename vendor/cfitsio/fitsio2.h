@@ -18,18 +18,20 @@
 
 #ifdef _REENTRANT
 #include <pthread.h>
-#include <assert.h>
+/*  #include <assert.h>  not needed any more */
 extern pthread_mutex_t Fitsio_Lock;
 extern int Fitsio_Pthread_Status;
 
-#define FFLOCK1(lockname)   (assert(!(Fitsio_Pthread_Status = pthread_mutex_lock(&lockname))))
-#define FFUNLOCK1(lockname) (assert(!(Fitsio_Pthread_Status = pthread_mutex_unlock(&lockname))))
+#define FFLOCK1(lockname)   (Fitsio_Pthread_Status = pthread_mutex_lock(&lockname))
+#define FFUNLOCK1(lockname) (Fitsio_Pthread_Status = pthread_mutex_unlock(&lockname))
 #define FFLOCK   FFLOCK1(Fitsio_Lock)
 #define FFUNLOCK FFUNLOCK1(Fitsio_Lock)
+#define ffstrtok(str, tok, save) strtok_r(str, tok, save)
 
 #else
 #define FFLOCK
 #define FFUNLOCK
+#define ffstrtok(str, tok, save) strtok(str, tok)
 #endif
 
 /*
@@ -48,8 +50,10 @@ extern int Fitsio_Pthread_Status;
 
 #define DBUFFSIZE 28800 /* size of data buffer in bytes */
 
-#define NMAXFILES  300   /* maximum number of FITS files that can be opened */
+#define NMAXFILES  1000   /* maximum number of FITS files that can be opened */
         /* CFITSIO will allocate (NMAXFILES * 80) bytes of memory */
+	/* plus each file that is opened will use NIOBUF * 2880 bytes of memeory */
+	/* where NIOBUF is defined in fitio.h and has a default value of 40 */
 
 #define MINDIRECT 8640   /* minimum size for direct reads and writes */
                          /* MINDIRECT must have a value >= 8640 */
@@ -94,7 +98,7 @@ extern int Fitsio_Pthread_Status;
 #define BYTESWAPPED FALSE
 #define LONGSIZE 32
 
-#elif defined(__ia64__)  || defined(__x86_64__)
+#elif defined(__ia64__)  || defined(__x86_64__) || defined(__AARCH64EL__)
                   /*  Intel itanium 64-bit PC, or AMD opteron 64-bit PC */
 #define BYTESWAPPED TRUE
 #define LONGSIZE 64   
@@ -105,11 +109,16 @@ extern int Fitsio_Pthread_Status;
 #define MACHINE NATIVE
 #define LONGSIZE 64
 
-#elif defined(__powerpc64__) || defined(__64BIT__) /* IBM 64-bit AIX powerpc*/
+#elif defined(__powerpc64__) || defined(__64BIT__) || defined(__AARCH64EB__)  /* IBM 64-bit AIX powerpc*/
                               /* could also test for __ppc64__ or __PPC64 */
-#define BYTESWAPPED FALSE
-#define MACHINE NATIVE
-#define LONGSIZE 64   
+
+#  if defined(__LITTLE_ENDIAN__)
+#   define BYTESWAPPED TRUE
+#  else
+#   define BYTESWAPPED FALSE
+#   define MACHINE NATIVE
+#  endif
+#  define LONGSIZE 64
 
 #elif defined(_MIPS_SZLONG)
 
@@ -313,7 +322,6 @@ extern int Fitsio_Pthread_Status;
 #define COMPRESS_NULL_VALUE -2147483647
 #define N_RANDOM 10000  /* DO NOT CHANGE THIS;  used when quantizing real numbers */
 
-int ffmkky(const char *keyname, char *keyval, const char *comm, char *card, int *status);
 int ffgnky(fitsfile *fptr, char *card, int *status);
 void ffcfmt(char *tform, char *cform);
 void ffcdsp(char *tform, char *cform);
@@ -322,26 +330,28 @@ void ffswap4(INT32BIT *values, long nvalues);
 void ffswap8(double *values, long nvalues);
 int ffi2c(LONGLONG ival, char *cval, int *status);
 int ffl2c(int lval, char *cval, int *status);
-int ffs2c(char *instr, char *outstr, int *status);
+int ffs2c(const char *instr, char *outstr, int *status);
 int ffr2f(float fval, int decim, char *cval, int *status);
 int ffr2e(float fval, int decim, char *cval, int *status);
 int ffd2f(double dval, int decim, char *cval, int *status);
 int ffd2e(double dval, int decim, char *cval, int *status);
-int ffc2ii(char *cval, long *ival, int *status);
-int ffc2jj(char *cval, LONGLONG *ival, int *status);
-int ffc2ll(char *cval, int *lval, int *status);
-int ffc2rr(char *cval, float *fval, int *status);
-int ffc2dd(char *cval, double *dval, int *status);
-int ffc2x(char *cval, char *dtype, long *ival, int *lval, char *sval,
+int ffc2ii(const char *cval, long *ival, int *status);
+int ffc2jj(const char *cval, LONGLONG *ival, int *status);
+int ffc2ll(const char *cval, int *lval, int *status);
+int ffc2rr(const char *cval, float *fval, int *status);
+int ffc2dd(const char *cval, double *dval, int *status);
+int ffc2x(const char *cval, char *dtype, long *ival, int *lval, char *sval,
           double *dval, int *status);
-int ffc2s(char *instr, char *outstr, int *status);
-int ffc2i(char *cval, long *ival, int *status);
-int ffc2j(char *cval, LONGLONG *ival, int *status);
-int ffc2r(char *cval, float *fval, int *status);
-int ffc2d(char *cval, double *dval, int *status);
-int ffc2l(char *cval, int *lval, int *status);
+int ffc2xx(const char *cval, char *dtype, LONGLONG *ival, int *lval, char *sval,
+          double *dval, int *status);
+int ffc2s(const char *instr, char *outstr, int *status);
+int ffc2i(const char *cval, long *ival, int *status);
+int ffc2j(const char *cval, LONGLONG *ival, int *status);
+int ffc2r(const char *cval, float *fval, int *status);
+int ffc2d(const char *cval, double *dval, int *status);
+int ffc2l(const char *cval, int *lval, int *status);
 void ffxmsg(int action, char *err_message);
-int ffgcnt(fitsfile *fptr, char *value, int *status);
+int ffgcnt(fitsfile *fptr, char *value, char *comm, int *status);
 int ffgtkn(fitsfile *fptr, int numkey, char *keyname, long *value, int *status);
 int ffgtknjj(fitsfile *fptr, int numkey, char *keyname, LONGLONG *value, int *status);
 int fftkyn(fitsfile *fptr, int numkey, char *keyname, char *value, int *status);
@@ -351,7 +361,7 @@ int ffgphd(fitsfile *fptr, int maxdim, int *simple, int *bitpix, int *naxis,
 int ffgttb(fitsfile *fptr, LONGLONG *rowlen, LONGLONG *nrows, LONGLONG *pcount,
           long *tfield, int *status);
  
-int ffmkey(fitsfile *fptr, char *card, int *status);
+int ffmkey(fitsfile *fptr, const char *card, int *status);
  
 /*  ffmbyt has been moved to fitsio.h */
 int ffgbyt(fitsfile *fptr, LONGLONG nbytes, void *buffer, int *status);
@@ -383,7 +393,6 @@ int ffwritehisto(long totaln, long offset, long firstn, long nvalues,
              int narrays, iteratorCol *imagepars, void *userPointer);
 int ffcalchist(long totalrows, long offset, long firstrow, long nrows,
              int ncols, iteratorCol *colpars, void *userPointer);
-int ffrhdu(fitsfile *fptr, int *hdutype, int *status);
 int ffpinit(fitsfile *fptr, int *status);
 int ffainit(fitsfile *fptr, int *status);
 int ffbinit(fitsfile *fptr, int *status);
@@ -1001,18 +1010,20 @@ int imcomp_copy_overlap (char *tile, int pixlen, int ndim,
          long *tfpixel, long *tlpixel, char *bnullarray, char *image,
          long *fpixel, long *lpixel, long *inc, int nullcheck, char *nullarray,
          int *status);
+int imcomp_test_overlap (int ndim, long *tfpixel, long *tlpixel, 
+         long *fpixel, long *lpixel, long *inc, int *status);
 int imcomp_merge_overlap (char *tile, int pixlen, int ndim,
          long *tfpixel, long *tlpixel, char *bnullarray, char *image,
          long *fpixel, long *lpixel, int nullcheck, int *status);
 int imcomp_decompress_img(fitsfile *infptr, fitsfile *outfptr, int datatype,
          int  *status);
 int fits_quantize_float (long row, float fdata[], long nx, long ny, int nullcheck,
-         float in_null_value,
-           float quantize_level, int idata[], double *bscale, double *bzero,
+         float in_null_value, float quantize_level, 
+           int dither_method, int idata[], double *bscale, double *bzero,
            int *iminval, int *imaxval);
 int fits_quantize_double (long row, double fdata[], long nx, long ny, int nullcheck,
-         double in_null_value,
-           float quantize_level, int idata[], double *bscale, double *bzero,
+         double in_null_value, float quantize_level,
+           int dither_method, int idata[], double *bscale, double *bzero,
            int *iminval, int *imaxval);
 int fits_rcomp(int a[], int nx, unsigned char *c, int clen,int nblock);
 int fits_rcomp_short(short a[], int nx, unsigned char *c, int clen,int nblock);
@@ -1026,7 +1037,8 @@ int fits_rdecomp_byte (unsigned char *c, int clen, unsigned char array[], int nx
 int pl_p2li (int *pxsrc, int xs, short *lldst, int npix);
 int pl_l2pi (short *ll_src, int xs, int *px_dst, int npix);
 int fits_init_randoms(void);
-
+int fits_unset_compression_param( fitsfile *fptr, int *status);
+int fits_unset_compression_request( fitsfile *fptr, int *status);
 int fitsio_init_lock(void);
 
 /* general driver routines */
@@ -1045,7 +1057,7 @@ int fits_register_driver( char *prefix,
 	int (*fitstruncate)(int driverhandle, LONGLONG filesize),
 	int (*fitsclose)(int driverhandle),
 	int (*fremove)(char *filename),
-        int (*size)(int driverhandle, LONGLONG *size),
+        int (*size)(int driverhandle, LONGLONG *sizex),
 	int (*flush)(int driverhandle),
 	int (*seek)(int driverhandle, LONGLONG offset),
 	int (*fitsread) (int driverhandle, void *buffer, long nbytes),
@@ -1142,6 +1154,12 @@ int http_open(char *filename, int rwmode, int *driverhandle);
 int http_file_open(char *filename, int rwmode, int *driverhandle);
 int http_compress_open(char *filename, int rwmode, int *driverhandle);
 
+/* https driver I/O routines */
+int https_checkfile(char* urltype, char *infile, char *outfile);
+int https_open(char *filename, int rwmode, int *driverhandle);
+int https_file_open(char *filename, int rwmode, int *driverhandle);
+void https_set_verbose(int flag);
+
 /* ftp driver I/O routines */
 
 int ftp_checkfile(char *urltype, char *infile, char *outfile);
@@ -1195,11 +1213,10 @@ int compress2file_from_mem(
 #include "drvrsmem.h"
 #endif
 
-#if defined(vms) || defined(__vms) || defined(WIN32) || defined(__WIN32__) || (defined(macintosh) && !defined(TARGET_API_MAC_CARBON))
 /* A hack for nonunix machines, which lack strcasecmp and strncasecmp */
-int strcasecmp (const char *s1, const char *s2       );
-int strncasecmp(const char *s1, const char *s2, size_t n);
-#endif
+/* these functions are in fitscore.c */
+int fits_strcasecmp (const char *s1, const char *s2       );
+int fits_strncasecmp(const char *s1, const char *s2, size_t n);
 
 /* end of the entire "ifndef _FITSIO2_H" block */
 #endif

@@ -179,11 +179,14 @@ FCALLSCSUB3(ffmrky,FTMRKY,ftmrky,FITSUNIT,INT,PINT)
 #define ftgnxk_STRV_A2 NUM_ELEM_ARG(3)
 #define ftgnxk_STRV_A4 NUM_ELEM_ARG(5)
 FCALLSCSUB7(ffgnxk,FTGNXK,ftgnxk,FITSUNIT,STRINGV,INT,STRINGV,INT,PSTRING,PINT)
+FCALLSCSUB4(ffgksl,FTGKSL,ftgksl,FITSUNIT,STRING,PINT,PINT)
 FCALLSCSUB4(ffgrec,FTGREC,ftgrec,FITSUNIT,INT,PSTRING,PINT)
 FCALLSCSUB4(ffgcrd,FTGCRD,ftgcrd,FITSUNIT,STRING,PSTRING,PINT)
 FCALLSCSUB4(ffgunt,FTGUNT,ftgunt,FITSUNIT,STRING,PSTRING,PINT)
 FCALLSCSUB6(ffgkyn,FTGKYN,ftgkyn,FITSUNIT,INT,PSTRING,PSTRING,PSTRING,PINT)
 FCALLSCSUB5(ffgkey,FTGKEY,ftgkey,FITSUNIT,STRING,PSTRING,PSTRING,PINT)
+
+FCALLSCSUB8(ffgsky,FTGSKY,ftgsky,FITSUNIT,STRING,INT,INT,PSTRING,PINT,PSTRING,PINT)
 
 /*   FTGKYS supported the long string convention but FFGKYS does not,
      so redirect to FFGKLS.  To handle the pointer to a pointer,
@@ -252,6 +255,10 @@ FCALLSCSUB6(ffgkyt,FTGKYT,ftgkyt,FITSUNIT,STRING,PLONG,PDOUBLE,PSTRING,PINT)
 
 #define ftgtdm_LONGV_A5 A3
 FCALLSCSUB6(ffgtdm,FTGTDM,ftgtdm,FITSUNIT,INT,INT,PINT,LONGV,PINT)
+
+#define ftdtdm_LONGV_A6 A4
+FCALLSCSUB7(ffdtdm,FTDTDM,ftdtdm,FITSUNIT,STRING,INT,INT,PINT,LONGV,PINT)
+
 
 /*------------------ read array of keywords -----------------*/
 
@@ -465,13 +472,13 @@ CFARGT14(NCF,DCF,ABSOFT_cf2(VOID),FITSUNIT,INT,PLONGLONG,PINT,PSTRINGV,PSTRINGV,
    QCF(PINT,10)
 
    fitsfile *fptr;
-   LONGLONG tfields;
+   long tfields;
    int maxdim,*status;
 
    fptr = TCF(ftghbnll,FITSUNIT,1,0);
    status =  TCF(ftghbnll,PINT,10,0);
    maxdim =  TCF(ftghbnll,INT,2,0);
-   ffgkyjj( fptr, "TFIELDS", &tfields, 0, status );
+   ffgkyj( fptr, "TFIELDS", &tfields, 0, status );
    maxdim = (maxdim<0) ? tfields : _cfMIN(tfields,maxdim);
 
    ffghbnll( fptr, maxdim
