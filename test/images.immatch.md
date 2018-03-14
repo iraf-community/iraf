@@ -55,20 +55,6 @@ begin	rtran
 	surface2	0
 ```
 
-## geotran - Transform 1-D or 2-D images using various mapping transforms
-
-Register two images by transforming the coordinate system of the input
-image to the coordinate system of the reference image. The size of the
-reference image is 512 by 512.  The output image scale will be 1.0 and
-its size will be determined by the xmin, xmax, ymin, ymax parameters
-set in the task GEOMAP.  The file "rtran.db" containing the record
-"m51.coo" was produced by GEOMAP.
-
-Test options: `xfail`
-```
-cl> geotran wpix r.tran rtran.db m51.coo
-```
-
 ## geoxytran - Transform coordinate lists using the geomap transforms
 
 Compute the transformation from the reference system to the output
