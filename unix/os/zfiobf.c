@@ -94,7 +94,7 @@ ZOPNBF (
 	     */
 	    if ((fd = creat ((char *)osfn, _u_fmode(FILE_MODEBITS))) != ERR) {
 		close (fd);
-		fd = open ((char *)osfn, 2);
+		fd = open ((char *)osfn, O_RDWR);
 	    }
 	    break;
 
@@ -107,7 +107,7 @@ ZOPNBF (
 	     */
 	    if (access ((char *)osfn, 0) == ERR)
 		close (creat ((char *)osfn, _u_fmode(FILE_MODEBITS)));
-	    fd = open ((char *)osfn, 2);
+	    fd = open ((char *)osfn, O_RDWR);
 	    break;
 
 	default:

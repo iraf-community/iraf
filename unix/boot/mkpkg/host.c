@@ -525,7 +525,7 @@ u_fcopy (
 	/* Open the old file and create the new one with the same mode bits
 	 * as the original.
 	 */
-	if ((in  = open(old,0)) == ERR || fstat(in,&fi) == ERR) {
+	if ((in  = open(old,O_RDONLY)) == ERR || fstat(in,&fi) == ERR) {
 	    printf ("$copy: cannot open input file `%s'\n", old);
 	    fflush (stdout);
 	    return (ERR);

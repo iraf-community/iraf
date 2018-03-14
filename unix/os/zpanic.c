@@ -48,7 +48,7 @@ ZPANIC (
 	 * in case the user has logged off.
 	 */
 	if (save_prtype == PR_DETACHED) {
-	    fd = open ("/dev/console", 1);
+	    fd = open ("/dev/console", O_WRONLY);
 	    if (fd > 0) {
 		write (fd, &msg[1], strlen(&msg[1]));
 		close (fd);

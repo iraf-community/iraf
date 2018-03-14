@@ -96,7 +96,7 @@ ZFACSS (
 		 * the text to disinguish the case of a binary file containing
 		 * only ascii data, e.g., a cardimage file.
 		 */
-		fd = open ((char *)fname, 0);
+		fd = open ((char *)fname, O_RDONLY);
 		if (fd >= 0 && (nchars = read (fd, buf, SZ_TESTBLOCK)) > 0) {
 		    ip = buf;
 		    for (n=nchars, newline_seen=0;  --n >= 0;  ) {

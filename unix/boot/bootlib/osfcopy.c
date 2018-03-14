@@ -64,7 +64,7 @@ os_fcopy (
 		fprintf (stderr, "copy binary file `%s' -> `%s'\n",
 		    oldfile, newfile);
 
-	    if ((in = open (vfn2osfn(oldfile,0), 0)) == ERR)
+	    if ((in = open (vfn2osfn(oldfile,0), O_RDONLY)) == ERR)
 		return (ERR);
 	    if ((out = creat (vfn2osfn(newfile,1), 0644)) == ERR) {
 		close (in);

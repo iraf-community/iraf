@@ -449,9 +449,9 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
 
 	    /* Reset standard streams to console to record error messages. */
-	    fd = open ("/dev/null", 0);     close(0);  dup(fd);  close(fd);
-	    fd = open ("/dev/console", 1);  close(1);  dup(fd);  close(fd);
-	    fd = open ("/dev/console", 2);  close(2);  dup(fd);  close(fd);
+	    fd = open ("/dev/null",    O_RDONLY); close(0); dup(fd); close(fd);
+	    fd = open ("/dev/console", O_WRONLY); close(1); dup(fd); close(fd);
+	    fd = open ("/dev/console", O_WRONLY); close(2); dup(fd); close(fd);
 
 	    /* Loop forever or until the idle timeout expires, waiting for a
 	     * client connection.
@@ -1918,7 +1918,7 @@ static char *ks_getpass (char *user, char *host)
 	int	tty, n;
 	struct  termios tc, tc_save;
 
-	if ((tty = open ("/dev/tty", 2)) == ERR)
+	if ((tty = open ("/dev/tty", O_RDWR)) == ERR)
 	    return (NULL);
 
 	sprintf (prompt, "Password (%s@%s): ", user, host);

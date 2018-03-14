@@ -83,7 +83,7 @@ ZOSCMD (
 	     * to same files (i.e., terminal) as parent.
 	     */
 	    if (*sin != EOS) {					/* stdin */
-		fd = open (sin, 0);
+		fd = open (sin, O_RDONLY);
 		if (fd == ERR) {
 		    fprintf (stderr, "cannot open `%s'\n", sin);
 		    _exit (1);
