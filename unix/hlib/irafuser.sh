@@ -25,9 +25,9 @@ export XC_CFLAGS="-I${iraf}include ${CFLAGS} -g -Wall -O2"
 export HSI_CF="${XC_CFLAGS}"
 export HSI_XF="-x -Inolibc -/Wall -/O2"
 export HSI_FF="-g -DBLD_KERNEL -O2"
-export HSI_LF=""
-export HSI_F77LIBS=""
-export HSI_LFLAGS=""
+export HSI_LF="-no-pie"
+export HSI_F77LIBS="-no-pie"
+export HSI_LFLAGS="-no-pie"
 export HSI_OSLIBS=""
 
 if [ "$MACH" = "macosx" -o "$MACH" = "linux" ] ; then
