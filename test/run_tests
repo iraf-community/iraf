@@ -255,6 +255,10 @@ for CL in $IRAF_SHELLS ; do
 	    test_dir="${base_dir}/testroot"
 	    mkdir -p "${test_dir}"
 	    printf "%b: %b " "${CL}" "$(basename ${t})"
+	    data="$(echo $t | sed s/.md/.data/)"
+	    if [ -d "${data}/" ] ; then
+  	        cp -r "${data}/"* "${test_dir}"
+	    fi
 	    cd "$test_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
 	    rm -rf "${test_dir}"
 	done

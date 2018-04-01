@@ -1,0 +1,36 @@
+# Declare the catalog variables
+
+catalog
+
+V                2
+error(V)         3
+BV               4
+error(BV)        5
+
+# Declare the observations file variables
+
+observations
+
+X60           4              # airmass in filter 1
+x60           5              # x coordinate in filter 1
+y60           6              # y coordinate in filter 1
+m60           7              # instrumental magnitude in filter 1
+error(m60)    8              # magnitude error in filter 1
+
+X50           11             # airmass in filter 2
+x50           12             # x coordinate in filter 2
+y50           13             # y coordinate in filter 2
+m50           14             # instrumental magnitude in filter 2
+error(m50)    15             # magnitude error in filter 2
+
+
+transformation
+
+constant v3 = 0.18, b3 = 0.3
+
+fit  v1 = 25.0, v2 = -0.03
+fit  b1 = 2.10, b2 = -.06
+
+
+VFIT : m60 = V + v1 + v2 * BV + v3 * X60
+BFIT : m50 = V + BV + b1 + b2 * BV + b3 * X50
