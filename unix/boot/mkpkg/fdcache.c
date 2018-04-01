@@ -35,9 +35,9 @@ struct	_fdate *fd_head;		/* doubly linked list		*/
 struct	_fdate *fd_tail;
 int	fd_hits, fd_misses;
 
-struct	_fdate *fd_unlink();
-struct	_fdate *fd_tohead();
-struct	_fdate *fd_totail();
+struct	_fdate *fd_unlink(register struct _fdate *fd);
+struct	_fdate *fd_tohead(register struct _fdate *fd);
+struct	_fdate *fd_totail(register struct _fdate *fd);
 
 long  m_fdate (char *fname);
 void  m_fdinit (int debug);

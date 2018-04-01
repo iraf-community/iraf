@@ -55,7 +55,7 @@ int	ignore = YES;			/* ignore warns			*/
 int	execute = YES;			/* think but don't act?		*/
 int	exit_status;			/* exit status of last syscall	*/
 int	forceupdate = NO;		/* forcibly update libmod dates	*/
-extern	char *os_getenv();
+extern	char *os_getenv(char *);
 
 
 void warns (char *fmt, char *arg);
@@ -68,7 +68,8 @@ extern  int  do_mkpkg (struct context *cx, int islib);
 
 
 
-void zzpause () { printf ("ready ...."); (void) getc(stdin); }
+void 
+zzpause (void) { printf ("ready ...."); (void) getc(stdin); }
 
 
 /* MAIN -- Entry point of mkpkg.e

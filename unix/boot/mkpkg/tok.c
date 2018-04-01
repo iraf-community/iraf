@@ -308,7 +308,7 @@ do_if (struct context *cx, char	*keyword)
 	register char	*op;
 	char	tokbuf[SZ_COMMAND+1];
 	char	buf[SZ_PREDBUF], *argv[MAX_ARGS];
-	long    fdate, altdate, os_fdate();
+	long    fdate, altdate, os_fdate(char *);
 	int	argc, negate, bval, i;
 	char	*key;
  

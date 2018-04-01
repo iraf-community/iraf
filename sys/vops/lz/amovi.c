@@ -8,9 +8,11 @@
 /* AMOVI -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-AMOVI (a, b, n)
-XINT	*a, *b;
-XINT	*n;
+AMOVI (
+  XINT	*a,
+  XINT	*b,
+  XINT	*n
+)
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

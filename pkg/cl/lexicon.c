@@ -37,7 +37,8 @@ int	lhs;			/* "left hand side" switch for []	*/
  * _lexmodes to zero.  A single parser accepts input from both lexical
  * analyzers.
  */
-yylex()
+int 
+yylex (void)
 {
 	register int	token;
 
@@ -141,7 +142,8 @@ yylex()
  * lexical analyser.  Any sequence of nonwhite characters that does not form
  * one of the recognized tokens is returned as a string.
  */
-lexicon()
+int 
+lexicon (void)
 {
 	char	*bkgerr = "ERROR: cannot submit background job inside {}\n";
 	register int	ch, cch;
@@ -642,7 +644,8 @@ eatwhite_:
 /* LEXINIT -- Initialize the internal state variables of the lexical analyzer,
  * e.g. when processing is interrupted by an interrupt.
  */
-lexinit()
+int 
+lexinit (void)
 {
 	if (lexmodes() && !lex_cpumodeset (currentask->t_in)) {
 	    lexcol = 0;

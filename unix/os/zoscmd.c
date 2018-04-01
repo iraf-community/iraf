@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/time.h>
@@ -14,7 +15,7 @@
 #include <iraf.h>
 
 static	int lastsig;
-extern	int pr_onint();
+extern	int pr_onint(int usig, int *hwcode, int *scp);
 
 /* #define	vfork	fork */
 
@@ -40,10 +41,9 @@ ZOSCMD (
 	char	*sin, *sout, *serr, *cmd;
 	struct	rlimit rlim;
 	int	maxfd, fd, pid;
-	char	*getenv();
 	struct sigaction oldact;
 
-	extern  int _u_fmode();
+	extern  int _u_fmode(int mode);
 
 
 	cmd  = (char *)oscmd;

@@ -81,8 +81,8 @@ static	int tty_getraw = 0;	/* raw getc in progress */
 static	struct sigaction sigint, sigterm;
 static	struct sigaction sigtstp, sigcont;
 static	struct sigaction oldact;
-static	void  tty_rawon(), tty_reset(), uio_bwrite();
-static	void  tty_onsig(), tty_stop(), tty_continue();
+static	void  tty_rawon(struct ttyport *port, int flags), tty_reset(struct ttyport *port), uio_bwrite(FILE *fp, short int *buf, int nbytes);
+static	void  tty_onsig(int sig, int *code, int *scp), tty_stop(int sig, int *code, int *scp), tty_continue(int sig, int *code, int *scp);
 
 /* The ttyports array describes up to MAXOTTYS open terminal i/o ports.
  * Very few processes will ever have more than one or two ports open at
@@ -114,7 +114,6 @@ ZOPNTX (
 	register FILE *fp;
 	struct stat filestat;
 	int newmode, maskval;
-	FILE *fopen();
 	char *fmode;
 
 	/* Map FIO access mode into UNIX/stdio access mode.

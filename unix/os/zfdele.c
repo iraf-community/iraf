@@ -15,7 +15,7 @@ ZFDELE (
   XINT	  *status
 )
 {
-	extern  int vm_delete();
+	extern  int vm_delete(char *fname, int force);
 
 	vm_delete ((char *)fname, 0);
 	if (unlink ((char *)fname) == ERR)

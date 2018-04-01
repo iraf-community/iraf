@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -30,7 +31,6 @@ static	char osfn_bkgfile[SZ_PATHNAME];
 static	XINT ipc_in = 0, ipc_out = 0;
 static	XINT ipc_isatty = NO;
 static	XINT prtype;
-char	*getenv();
 
 
 /* MAIN -- UNIX Main routine for IRAF processes.  The process is a C process
@@ -62,8 +62,17 @@ main (int argc, char *argv[])
 	char	*ip;
 
 	int	arg = 1;
-	extern  int  ZGETTX(), ZGETTY(), ZARDPR(), SYSRUK(), ONENTRY();
-	extern  int  ZZSTRT(), ZLOCPR(), ZZSETK(), IRAF_MAIN();
+	extern  int  ZGETTX(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
+	extern	int  ZGETTY(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
+	extern	int  ZARDPR(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset);
+	extern	int  SYSRUK(XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint);
+	extern	int  ONENTRY(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
+	extern  int  ZZSTRT(void);
+	extern	int  ZLOCPR(PFI proc, XINT *o_epa );
+	extern	int  ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int out);
+	extern	int  IRAF_MAIN(XCHAR *acmd, XINT *ainchn, XINT *aoutcn, XINT *aerrcn, XINT *adrivr, XINT *adevte, XINT *prtype, XCHAR *bkgfie, XINT *jobcoe,
+			       int(sysruk)(XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint),
+			       int(onenty)(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd));
 
 
 	/* The following flag must be set before calling ZZSTRT. */

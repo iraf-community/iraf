@@ -4,7 +4,7 @@
 /* YYWRAP -- Called by lex when end of file is seen.
  */
 int
-yywrap()
+yywrap(void)
 {
     return (1);
 }

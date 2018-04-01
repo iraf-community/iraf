@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define NOKNET
 #define	import_spp
@@ -156,7 +157,6 @@ static char *getblock (int in);
 
 
 
-char	*getblock();
 
 
 /* MAIN -- "rtar [xtvlef] [names]".  The default operation is to extract all
@@ -543,7 +543,7 @@ printheader (
 )
 {
 	register struct	_modebits *mp;
-	char	*tp, *ctime();
+	char	*tp;
 
 	if (!verbose) {
 	    fprintf (out, "%s\n", fh->name);
@@ -637,7 +637,6 @@ newfile (
 {
 	int	fd;
 	char	*cp;
-	char	*rindex();
 
 	if (len_pathprefix && strncmp(fname,pathprefix,len_pathprefix) == 0)
 	    fname += len_pathprefix;
@@ -649,7 +648,7 @@ newfile (
 	    return (ERR);
 
 	if (type == DIRECTORY_FILE) {
-	    cp = rindex (fname, '/');
+	    cp = strrchr (fname, '/');
 	    if (cp && *(cp+1) == EOS)
 		*cp = EOS;
 	    fd = os_createdir (fname, mode);
@@ -682,11 +681,10 @@ checkdir (
 )
 {
 	register char	*cp;
-	char	*rindex();
 
 	/* Quick check to see if the directory exists.
 	 */
-	if ((cp = rindex (path, '/')) == NULL)
+	if ((cp = strrchr (path, '/')) == NULL)
 	    return (OK);
 
 	*cp = EOS;

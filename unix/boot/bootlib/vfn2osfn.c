@@ -15,7 +15,7 @@
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
-extern	char	*os_getenv();
+extern	char	*os_getenv(char *envvar);
 
 
 #ifdef NOVOS
@@ -85,7 +85,7 @@ vfn2osfn (
 	PKCHAR	upkvfn[SZ_PATHNAME+1];
 	int	err;
 
-        extern  void  _envinit();
+        extern  void  _envinit(void);
 
 
 
@@ -134,7 +134,10 @@ vfn2osfn (
  * is done when VOS filename mapping is in use to avoid linking in a lot of
  * objects that will never be used, since the HSI does not use networking.
  */
-int  KI_GETHOSTS() { return (0); }
-void KI_SEND(){}
-void KI_RECEIVE(){}
+int 
+KI_GETHOSTS (void) { return (0); }
+void 
+KI_SEND (void){}
+void 
+KI_RECEIVE (void){}
 #endif

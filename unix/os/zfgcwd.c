@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 
 #define import_spp
 #define	import_kernel
@@ -24,7 +25,6 @@ ZFGCWD (
 	register char	*ip, *op;
 	register int	n;
 	char	dirname[1025];
-	char	*getcwd();
 
 	/* If cwd is already known, just return the name.  Reconstructing
 	 * the pathname of the cwd is expensive on some systems.

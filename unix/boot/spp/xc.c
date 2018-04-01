@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "xpp.h"
 #include "../bootProto.h"
 
@@ -1198,7 +1199,6 @@ static int
 run (char *task, char *argv[])
 {
 	int	waitpid;
-	pid_t	fork();
 	char	path[SZ_PATHNAME];
 
 	if ((waitpid = fork()) == 0) {

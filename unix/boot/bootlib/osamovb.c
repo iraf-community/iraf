@@ -19,7 +19,7 @@ os_amovb (
 	XINT	a_off, b_off;
 	XINT	n_wp;
 
-	extern void BYTMOV();
+	extern void BYTMOV(XCHAR *a, XINT *aoff, XCHAR *b, XINT *boff, XINT *nbytes);
 
 
 	a_wp = (XCHAR *)a;

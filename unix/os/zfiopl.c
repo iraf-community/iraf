@@ -60,9 +60,14 @@ char	plstr[SZ_PLSTR+1];		/* save zopnpl argument		*/
 int	pltr_inuse = NO;		/* set if plotter is open	*/
 
 
-extern  int ZOPNBF (), ZCLSBF (), ZOSCMD (), ZFDELE (), ZARDBF ();
-extern  int ZAWRBF (), ZAWTBF (), ZSTTBF ();
-
+extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
+extern	int ZCLSBF (XINT *fd, XINT *status);
+extern	int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
+extern	int ZFDELE (PKCHAR *fname, XINT *status);
+extern	int ZARDBF (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
+extern  int ZAWRBF (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
+extern	int ZAWTBF (XINT *fd, XINT *status);
+extern	int ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue);
 
 
 /* ZOPNPL -- Open a plotter device for binary file i/o.  If we can talk

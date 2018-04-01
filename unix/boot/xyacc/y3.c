@@ -62,7 +62,7 @@ extern FILE *foutput;		/* y.output file                */
 
 /* print the output for the states */
 void
-output ()
+output (void)
 {
     int i, k, c;
     register WSET *u, *v;
@@ -144,9 +144,7 @@ output ()
 
 static int pkdebug = 0;
 int
-apack (p, n)
-     int *p;
-     int n;
+apack (int *p, int n)
 {
     /* pack state i from temp1 into amem */
     int off;
@@ -222,7 +220,7 @@ apack (p, n)
 }
 
 void
-go2out ()
+go2out (void)
 {
     /* output the gotos for the nontermninals */
     int i, j, k, best, count, cbest, times;
@@ -520,9 +518,7 @@ wdef (char *s, int n)
 # define NDP_PERLINE    8
 
 void
-warray (s, v, n)
-     char *s;
-     int *v, n;
+warray (char *s, int *v, int n)
 {
     register int i, j;
 
@@ -542,7 +538,7 @@ warray (s, v, n)
 }
 
 void
-hideprod ()
+hideprod (void)
 {
     /*
      * in order to free up the mem and amem arrays for the optimizer,
@@ -576,15 +572,14 @@ hideprod ()
 
 
 static int
-cmpmbchars (p, q)
-     MBCLIT *p, *q;
+cmpmbchars (MBCLIT *p, MBCLIT *q)
 {
     /* Compare two MBLITs. */
     return ((p->character) - (q->character));
 }
 
 static void
-wrmbchars ()
+wrmbchars (void)
 {
     int i;
 

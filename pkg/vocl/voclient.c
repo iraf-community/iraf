@@ -122,10 +122,8 @@ typedef int   RegResult;                /* Query Result object          */
 
 /* VOCOP --  Process a VO Client request.
  */
-vocop (opcode, op_index, nargs)
-int     opcode;
-int     op_index;
-int     nargs;
+int 
+vocop (int opcode, int op_index, int nargs)
 {
     struct	operand o;
     int 	op = optbl[op_index];	
@@ -443,9 +441,8 @@ int     nargs;
 
 /* Initialize the VO Client.
  */
-int
-cl_initVOClient (nargs)
-int nargs;
+int 
+cl_initVOClient (int nargs)
 {
     char *opts = NULL, *runid = NULL;
     struct	operand o;
@@ -477,8 +474,8 @@ int nargs;
 
 /* Close the VO Client connection.
  */
-int
-cl_closeVOClient ()
+int 
+cl_closeVOClient (void)
 {
     int shutdown = 0;
     struct	operand o;
@@ -503,8 +500,8 @@ cl_closeVOClient ()
 
 /* Restart the VO Client.
  */
-int
-cl_restartVOClient ()
+int 
+cl_restartVOClient (void)
 {
     char *opts = NULL;
     struct	operand o;
@@ -525,8 +522,8 @@ cl_restartVOClient ()
 
 /* Validate an object in the VO Client.
  */
-int
-cl_validObj ()
+int 
+cl_validObj (void)
 {
     struct	operand o;
 
@@ -547,8 +544,8 @@ cl_validObj ()
 
 /* Verify the VOClient is ready.
  */
-int
-cl_vocReady ()
+int 
+cl_vocReady (void)
 {
     struct	operand o;
 
@@ -568,7 +565,7 @@ cl_vocReady ()
 /* Call a Cone service.
  */
 int 
-cl_dalConeSvc ()
+cl_dalConeSvc (void)
 {
     char      *url;
     double    sr, ra, dec;
@@ -613,8 +610,7 @@ cl_dalConeSvc ()
 /* Call a Siap service.
  */
 int 
-cl_dalSiapSvc (nargs)
-int nargs;
+cl_dalSiapSvc (int nargs)
 {
     char     *fmt, *url;
     double    rasz, decsz, ra, dec;
@@ -677,7 +673,7 @@ int nargs;
 /* Get a count of the number of return records.
  */
 int 
-cl_dalRecordCount ()
+cl_dalRecordCount (void)
 {
     QResponse qres;
     int       count = -1;
@@ -703,7 +699,7 @@ cl_dalRecordCount ()
 /* Get the record handle.
  */
 int 
-cl_dalGetRecord ()
+cl_dalGetRecord (void)
 {
     QRecord   rec;
     QResponse qres;
@@ -735,7 +731,7 @@ cl_dalGetRecord ()
 /* Download a dataset referred to by a URL.
  */
 int 
-cl_dalGetData ()
+cl_dalGetData (void)
 {
     QRecord   rec;
     QResponse qres;
@@ -780,7 +776,7 @@ cl_dalGetData ()
 /* Get a string-valued attribute from a DAL response table. 
  */
 int 
-cl_dalGetStr ()
+cl_dalGetStr (void)
 {
     QRecord     rec;
     QResponse   qres;
@@ -821,7 +817,7 @@ cl_dalGetStr ()
 /* Get an integer-valued attribute from a DAL response table. 
  */
 int 
-cl_dalGetInt ()
+cl_dalGetInt (void)
 {
     QRecord     rec;
     QResponse   qres;
@@ -856,7 +852,7 @@ cl_dalGetInt ()
 /* Get an integer-valued attribute from a DAL response table. 
 */
 int 
-cl_dalGetDbl ()
+cl_dalGetDbl (void)
 {
     QRecord     rec;
     QResponse   qres;
@@ -893,7 +889,7 @@ cl_dalGetDbl ()
 /* Return a count of the number of attributes (i.e. columns) in a record (row).
  */
 int 
-cl_dalAttrCount ()
+cl_dalAttrCount (void)
 {
     QRecord   rec;
     int       count = -1;
@@ -921,7 +917,7 @@ cl_dalAttrCount ()
 /* Get the name of the attribute (i.e. column) given the index.
  */
 int 
-cl_dalAttrName ()
+cl_dalAttrName (void)
 {
     QRecord   rec;
     int       index, count = -1;
@@ -952,7 +948,7 @@ cl_dalAttrName ()
 /* Get the requested attribute as an integer.
  */
 int 
-cl_dalStrAttr ()
+cl_dalStrAttr (void)
 {
     QRAttribute attr;
     QRecord   rec;
@@ -984,7 +980,7 @@ cl_dalStrAttr ()
 /* Get the requested attribute as an integer.
  */
 int 
-cl_dalFloatAttr ()
+cl_dalFloatAttr (void)
 {
     QRAttribute attr;
     QRecord   rec;
@@ -1016,7 +1012,7 @@ cl_dalFloatAttr ()
 /* Get the requested attribute as an integer.
  */
 int 
-cl_dalIntAttr ()
+cl_dalIntAttr (void)
 {
     QRAttribute attr;
     QRecord   rec;
@@ -1048,8 +1044,7 @@ cl_dalIntAttr ()
 /* Download a dataset referred to by a URL.
  */
 int 
-cl_dalDataset (nargs)
-int nargs;
+cl_dalDataset (int nargs)
 {
     QRecord   rec = (QRecord) NULL;
     char      *fname, *acref, *res, *val, fbuf[SZ_FNAME];
@@ -1121,8 +1116,7 @@ int nargs;
  * read (always the number requested, empty fields filled w/ INDEF) or EOF.
  */
 int 
-cl_dalAttrScan (nargs)
-int nargs;
+cl_dalAttrScan (int nargs)
 {
     QRecord     rec;
     QRAttribute attr;
@@ -1184,8 +1178,7 @@ printf ("%d:  attr='%s'  =>  '%s'\n", i, attr_list[i], val);
  *       resource = regSearch (sql, keywords, orValues)
  */
 int 
-cl_regSearch (nargs)
-int nargs;
+cl_regSearch (int nargs)
 {
     RegResult res;
     char      *sql = NULL, *keyw = NULL;
@@ -1241,7 +1234,7 @@ int nargs;
  *  Search term may be either a keyword list or sql predicate.
  */
 int 
-cl_regSvcSearch ()
+cl_regSvcSearch (void)
 {
     RegResult res;
     int       count = -1;
@@ -1283,7 +1276,7 @@ cl_regSvcSearch ()
 /* Return a count of the number of attributes (i.e. columns) in a record (row).
  */
 int 
-cl_regResultCount ()
+cl_regResultCount (void)
 {
     RegResult res;
     int       count = -1;
@@ -1307,8 +1300,8 @@ cl_regResultCount ()
 	    
 /*  Set a bandpass constraint on a query.
  */
-int
-cl_regSetBandpass ()
+int 
+cl_regSetBandpass (void)
 {
     char     *bpass = NULL;
     RegQuery  query = 0;
@@ -1333,8 +1326,8 @@ cl_regSetBandpass ()
 	    
 /*  Set a ServiceType constraint on a query.
  */
-int
-cl_regSetService ()
+int 
+cl_regSetService (void)
 {
     char     *svctype = NULL;
     RegQuery  query = 0;
@@ -1359,8 +1352,8 @@ cl_regSetService ()
 	    
 /*  Set a ContentLevel constraint on a query.
  */
-int
-cl_regSetContent ()			/* FIXME - Not Yet Implemented */
+int 
+cl_regSetContent (void)			/* FIXME - Not Yet Implemented */
 {
     struct operand o;
     int    stat = OK;
@@ -1376,8 +1369,7 @@ cl_regSetContent ()			/* FIXME - Not Yet Implemented */
 /*  Get the attribute value from the named resource query handle.
  */
 int 
-cl_regValue (nargs)
-int	nargs;
+cl_regValue (int nargs)
 {
     RegResult res;
     int      index = 0, stat = OK;
@@ -1447,8 +1439,7 @@ int	nargs;
  */
 
 int 
-cl_regResolver (nargs)
-int	nargs;
+cl_regResolver (int nargs)
 {
     int       i, j, nreturns=0, nattrs=0, comma = ',', stat = OK;
     int	      exact=-1, recnum=0, istart, iend;
@@ -1648,7 +1639,7 @@ int	nargs;
 /*  Get a count of the number of return records.
  */
 int 
-cl_regNResolved ()
+cl_regNResolved (void)
 {
     struct    operand o;
 
@@ -1668,8 +1659,8 @@ cl_regNResolved ()
  * ========================================================*/
 
 
-int
-voGetIntArg ()
+int 
+voGetIntArg (void)
 {
     struct	operand o;
     int ival;
@@ -1693,8 +1684,8 @@ voGetIntArg ()
 }
 
 
-double
-voGetDblArg ()
+double 
+voGetDblArg (void)
 {
     struct	operand o;
     double dval;
@@ -1721,7 +1712,7 @@ voGetDblArg ()
 /* Note: caller must free the pointer!
  */
 char *
-voGetStrArg ()
+voGetStrArg (void)
 {
     struct  operand o;
     char   *str = NULL;

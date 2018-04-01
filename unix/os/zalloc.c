@@ -55,7 +55,7 @@ ZDVALL (
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 
-	extern int ZOSCMD ();
+	extern int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
 
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
@@ -93,7 +93,7 @@ ZDVOWN (
 {
 	register int	uid;
 	char	*dev, devname[SZ_FNAME+1];
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw;
 	struct	stat fi;
 
 
@@ -150,7 +150,7 @@ int
 loggedin (int uid)
 {
 	struct	utmpx ubuf;
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw;
 	FILE	*ufp;
 
 	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {
@@ -188,7 +188,7 @@ u_allocstat (
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 	XINT	x_status;
 
-	extern int ZOSCMD();
+	extern int ZOSCMD(PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
 
 
 	/* Syntax: $host/hlib/alloc.e -s aliases

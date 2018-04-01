@@ -39,9 +39,9 @@ struct	_sysfile *fn_head;		/* doubly linked list		*/
 struct	_sysfile *fn_tail;
 int	fn_hits, fn_misses;
 
-struct	_sysfile *fn_unlink();
-struct	_sysfile *fn_tohead();
-struct	_sysfile *fn_totail();
+struct	_sysfile *fn_unlink(register struct _sysfile *fn);
+struct	_sysfile *fn_tohead(register struct _sysfile *fn);
+struct	_sysfile *fn_totail(register struct _sysfile *fn);
 
 
 extern  int  os_sysfile (char *sysfile, char *fname, int maxch);

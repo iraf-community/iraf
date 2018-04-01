@@ -94,7 +94,6 @@ int main (int argc, char *argv[])
 	char	genfname[SZ_FNAME+1];
 	char	template[SZ_FNAME+1];
 	char	input_file[SZ_FNAME+1];
-	char	*index(), *rindex();
 	int	n, nfiles;
 	FILE	*fp;
 
@@ -145,7 +144,7 @@ int main (int argc, char *argv[])
 	     * normally a 'g', e.g., ".gx" or ".gc", but we want to generate
 	     * a ".x" or ".c" file, so lop off any leading g in the extension.
 	     */
-	    if ((extension = rindex (input_file, '.')) != NULL) {
+	    if ((extension = strrchr (input_file, '.')) != NULL) {
 		*extension++ = EOS;
 		if (*extension == 'g')
 		    extension++;
@@ -169,8 +168,8 @@ int main (int argc, char *argv[])
 		} else {
 		    strcpy (template, genfname);
 
-		    for (ip=index(genfname,'$');  ip != NULL;
-			ip = index(ip,'$')) {
+		    for (ip=strchr(genfname,'$');  ip != NULL;
+			ip = strchr(ip,'$')) {
 
 			if (*(ip+1) == '$')
 			    ip += 2;
@@ -654,7 +653,7 @@ do_endif (void)		/* $endif statement */
 int
 evaluate_expr (void)
 {
-	char	ch=0, *p, *index(); 
+	char	ch=0, *p;
 	int	lpar, size1, size2, op;
 
 
@@ -686,9 +685,9 @@ evaluate_expr (void)
 	    expr += 8;
 	    switch (relop()) {
 	    case EQ:
-		return (index(expr,type_char) != NULL);
+		return (strchr(expr,type_char) != NULL);
 	    case NE:
-		return (index(expr,type_char) == NULL);
+		return (strchr(expr,type_char) == NULL);
 	    default:
 		goto err;
 	    }

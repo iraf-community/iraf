@@ -9,11 +9,8 @@ int	spoolfd = 0;
  * it, delete the file, edit the Makefile, and change the reference to
  * zzrdks in irafks.x to zardks.
  */
-zzrdks_ (chan, buf, maxb, off)
-int	*chan;
-short	*buf;
-int	*maxb;
-int	*off;
+int 
+zzrdks_ (int *chan, short *buf, int *maxb, int *off)
 {
 	int	status;
 

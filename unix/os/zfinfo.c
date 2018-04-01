@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <pwd.h>
 
 #define	import_kernel
@@ -24,9 +25,7 @@ ZFINFO (
 {
 	struct	stat osfile;
 	struct	_finfo *fs;
-	struct	passwd *getpwuid();
-	time_t	gmt_to_lst();
-	int	stat();
+	time_t	gmt_to_lst(time_t gmt);
 
 	/* Get UNIX file info.
 	 */

@@ -63,9 +63,6 @@ static	int  proctype;			/* procedure type if function	*/
 static	struct symbol sym[MAX_SYMBOLS];	/* symbol table			*/
 static	int nsym = 0;			/* number of symbols		*/
 
-struct	symbol *d_enter();
-struct	symbol *d_lookup();
-
 extern  void error (int errcode, char *errmsg);
 extern  void xpp_warn (char *warnmsg);
 extern  int  yy_input (void);
@@ -93,10 +90,11 @@ void  d_declfunc (struct symbol *sp, FILE *fp);
  * several lines.  The symbol table is cleared whenever a new procedure
  * declaration is started.
  */
-void
-d_newproc (name, dtype)
-char	*name;			/* procedure name		*/
-int	dtype;			/* procedure type (0 if subr)	*/
+void 
+d_newproc (
+    char *name,			/* procedure name		*/
+    int dtype			/* procedure type (0 if subr)	*/
+)
 {
 	register int	token;
 	char	tokstr[SZ_TOKEN+1];
@@ -407,10 +405,11 @@ register FILE	*fp;		/* output file			*/
  * new symbol.
  */
 struct symbol *
-d_enter (name, dtype, flags)
-char	*name;			/* symbol name			*/
-int	dtype;			/* data type code		*/
-int	flags;			/* flag bits			*/
+d_enter (
+    char *name,			/* symbol name			*/
+    int dtype,			/* data type code		*/
+    int flags			/* flag bits			*/
+)
 {
 	register struct	symbol *sp;
 
@@ -436,8 +435,9 @@ int	flags;			/* flag bits			*/
  * symbol table entry.
  */
 struct symbol *
-d_lookup (name)
-char	*name;			/* symbol name			*/
+d_lookup (
+    char *name			/* symbol name			*/
+)
 {
 	register struct	symbol *sp;
 	register struct	symbol *top = &sym[nsym-1];
@@ -453,8 +453,8 @@ char	*name;			/* symbol name			*/
 
 /* D_CHKSBUF -- Check for overflow on the string buffer.
  */
-void
-d_chksbuf()
+void 
+d_chksbuf (void)
 {
 	if (nextch > SPMAX)
 	    error (XPP_COMPERR, "decl string buffer overflow");
@@ -465,10 +465,11 @@ d_chksbuf()
  * value of the first character of the token as the function value.  EOF
  * is an error in this application, not a token.
  */
-int
-d_gettok (tokstr, maxch)
-char	*tokstr;		/* receives token string	*/
-int	maxch;			/* max chars to token string	*/
+int 
+d_gettok (
+    char *tokstr,		/* receives token string	*/
+    int maxch			/* max chars to token string	*/
+)
 {
 	register char 	*op = tokstr;
 	register int	ch, n;

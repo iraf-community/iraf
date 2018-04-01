@@ -14,8 +14,8 @@
 #define	irafpath os_irafpath
 #endif
 
-char	*irafpath();
-char	*os_getenv();
+char	*irafpath(char *sysfile);
+char	*os_getenv(char *envvar);
 extern  int  os_access (char *fname, int mode, int type);
 
 
@@ -85,8 +85,9 @@ static	char *libs[] = { "iraf$lib/", "host$hlib/", "" };
  * if only the standard directories LIB and HLIB need to be searched.
  */
 char *
-os_irafpath (sysfile)
-char	*sysfile;		/* filename from include statement	*/
+os_irafpath (
+    char *sysfile		/* filename from include statement	*/
+)
 {
 	register char	*ip, *op;
 	register int	n;

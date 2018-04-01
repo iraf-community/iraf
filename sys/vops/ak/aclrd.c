@@ -8,9 +8,10 @@
 /* ACLRD -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-ACLRD (a, n)
-XDOUBLE	*a;
-XINT	*n;
+ACLRD (
+  XDOUBLE	*a,
+  XINT	*n
+)
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 }

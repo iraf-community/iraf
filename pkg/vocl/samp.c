@@ -88,8 +88,8 @@ extern	char   *voGetStrArg ();
 /**
  *  CL_SAMPINIT -- Initialize the SAMP interface.
  */
-int
-cl_sampInit ()
+int 
+cl_sampInit (void)
 {
     cl_pid = getpid ();				/* initialize		*/
     memset (samp_cmd, 0, SZ_CMDBLK);	
@@ -165,8 +165,8 @@ return 0;
  *  CL_SAMPSTOP - Stop SAMP communications, but we'll reinitialize the
  *  the interface.
  */
-int
-cl_sampStop ()
+int 
+cl_sampStop (void)
 {
     samp_registered = 0;
     if (samp >= 0) {

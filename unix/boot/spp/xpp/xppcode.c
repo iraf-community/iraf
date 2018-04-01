@@ -35,7 +35,7 @@
  */
 
 
-extern	char *vfn2osfn();
+extern	char *vfn2osfn(char *, int);
 
 /* Escape sequence characters and their binary equivalents.
  */
@@ -327,8 +327,8 @@ findkw (void)
 void
 mapident (void)
 {
-	int     i, findkw();
-	char	*str_fetch();
+	int     i, findkw(void);
+	char	*str_fetch(register char *strname);
 	register char *ip, *op;
 
 	/* If not keyword and not defined string, output as is.  The first
@@ -1336,7 +1336,7 @@ do_string (
 	register char ch, *ip;
 	register struct string *s;
 	int	readstr = 1;
-	char    *str_uniqid();
+	char    *str_uniqid(void);
 
 	/* If we run out of space for string storage, print error message,
 	 * dump string decls out early, clear buffer and continue processing.
@@ -1401,7 +1401,7 @@ sterr:		    error (XPP_SYNTAX, "String declaration syntax");
 	    if (!(delim == '"' || delim == '\'')) {
 		register char *ip, *op;
 		int	ch;
-		char	*str_fetch();
+		char	*str_fetch(register char *strname);
 
 		/* Fetch name of defined macro into yytext.
 		 */
@@ -1535,7 +1535,6 @@ void
 traverse (char delim)
 {
 	register char *op, *cp, ch;
-	char	*index();
 
 
 	for (op=yytext;  (*op = yy_input()) != EOF;  op++) {
@@ -1560,7 +1559,7 @@ traverse (char delim)
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
 		    continue;
-		} else if ((cp = index (esc_ch, *op)) != NULL) {
+		} else if ((cp = strchr (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
 		} else if (isdigit (*op)) {	/* '\0DD' octal constant */
 		    *op -= '0';
@@ -1659,7 +1658,7 @@ int
 charcon (char *string)
 {
 	register char *ip, ch;
-	char	*cc, *index();
+	char	*cc;
 	char    *nump;
 
 	ip = string + 1;		/* skip leading apostrophe	*/
@@ -1668,7 +1667,7 @@ charcon (char *string)
 	/* Handle '\c' and '\0dd' notations.
 	 */
 	if (ch == '\\') {
-	    if ((cc = index (esc_ch, *ip)) != NULL) {
+	    if ((cc = strchr (esc_ch, *ip)) != NULL) {
 		return (esc_val[cc-esc_ch]);
 	    } else if (isdigit (*ip)) {
 		nump = ip;
@@ -1691,7 +1690,7 @@ void
 int_constant (char *string, int base)
 {
 	char    decimal_constant[SZ_NUMBUF], *p;
-	long    accum(), value;
+	long    accum(int base, char **strp), value;
 	int     i;
 
 	p = string;

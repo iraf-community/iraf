@@ -36,7 +36,9 @@ extern	int errno;
 
 void 	ready_ (void);
 
-extern int ZAWSET(), ZOPNTY(), ZZSETK();
+extern int ZAWSET(XINT *best_size, XINT *new_size, XINT *old_size, XINT *max_size);
+extern int ZOPNTY(PKCHAR *osfn, XINT *mode, XINT *chan);
+extern int ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int out);
 
 
 
@@ -46,7 +48,7 @@ int
 ZZSTRT (void)
 {
 	XINT	wsetsize=0L, junk;
-	extern  int  spp_debug();
+	extern  int  spp_debug(void);
 
 
 	spp_debug ();

@@ -65,7 +65,7 @@ extern FILE *foutput;		/* y.output file                */
 
 
 void
-callopt ()
+callopt (void)
 {
     int i, *p, j, k, *q;
 
@@ -377,7 +377,7 @@ stin (int i)
 }
 
 static int
-nxti ()
+nxti (void)
 {
     /* finds the next i */
     int i, max, maxi;
@@ -404,7 +404,7 @@ nxti ()
 }
 
 static void
-osummary ()
+osummary (void)
 {
     /* write summary */
     int i, *p;
@@ -433,7 +433,7 @@ osummary ()
 /* AOUTPUT -- This version is for SPP.
  */
 static void
-aoutput ()
+aoutput (void)
 {
     /* write out the optimized parser */
 
@@ -450,9 +450,7 @@ aoutput ()
 # define NDP_PERLINE    8
 
 static void
-arout (s, v, n)
-     char *s;
-     int *v, n;
+arout (char *s, int *v, int n)
 {
     register int i, j;
 
@@ -472,7 +470,7 @@ arout (s, v, n)
 }
 
 static int
-gtnm ()
+gtnm (void)
 {
     int s, val, c;
 
@@ -498,8 +496,7 @@ gtnm ()
 }
 
 void
-exp_act (ptr)
-     int **ptr;
+exp_act (int **ptr)
 {
     static int *actbase;
     int i;

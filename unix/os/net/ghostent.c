@@ -32,7 +32,7 @@ static char	*tcp_locate();
  *	ddd.ddd		alias1 alias2 ... aliasN
  */
 struct hostent *
-tcp_ghostent()
+tcp_ghostent (void)
 {
 	register char *cp, **q;
 	u_long	tcp_inetaddr();
@@ -95,7 +95,8 @@ eprintf("..%s", line);
 
 /* TCP_OPHNT -- Open the host name table, a text file.
  */
-tcp_ophnt()
+int 
+tcp_ophnt (void)
 {
 	char	*tcp_hostdb();
 
@@ -107,7 +108,8 @@ eprintf ("ophnt %s\n", tcp_hostdb);
 
 /* TCP_CLHNT -- Close the host name table file.
  */
-tcp_clhnt()
+int 
+tcp_clhnt (void)
 {
 	if (hostf) {
 	    ku_fclose (hostf);
@@ -120,9 +122,7 @@ tcp_clhnt()
  * character class.
  */
 static char *
-tcp_locate (cp, match)
-register char *cp;
-char	*match;
+tcp_locate (register char *cp, char *match)
 {
 	register char *mp, c;
 

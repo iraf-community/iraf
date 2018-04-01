@@ -94,6 +94,6 @@ typedef	int   (*PFI)();
 #endif
 
 
-extern	char *irafpath();
+extern	char *irafpath(char *fname);
 
 #define	D_kernel

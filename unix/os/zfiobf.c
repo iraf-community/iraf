@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 # ifndef O_NDELAY
@@ -186,7 +187,6 @@ ZARDBF (
 	register int fd;
 	off_t fileoffset;
 	int aligned;
-	off_t lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];
@@ -236,7 +236,6 @@ ZAWRBF (
 	register int fd;
 	register struct	fiodes *kfp;
 	off_t fileoffset;
-	off_t lseek();
 	int aligned;
 
 	fd = *chan;
@@ -410,14 +409,12 @@ static int dio_threshold  = DEF_DIOTHRESH;
 static int vm_port 	  = DEF_VMPORT;
 static char vm_client[SZ_CNAME+1];
 
-extern char *getenv();
-extern char *realpath();
-static void vm_initialize();
-static void vm_shutdown();
-static void vm_identify();
-static int vm_write();
-static int vm_connect();
-static int getstr();
+static void vm_initialize(void);
+static void vm_shutdown(void);
+static void vm_identify(void);
+static int vm_write(int fd, char *buf, int nbytes);
+static int vm_connect(void);
+static int getstr(char **ipp, char *obuf, int maxch, int delim);
 
 
 
@@ -759,7 +756,7 @@ vm_connect (void)
 	XINT fd;
 	int status = 0;
 
-	extern int ZOPNND();
+	extern int ZOPNND(PKCHAR *pk_osfn, XINT *mode, XINT *chan);
 
 
 	/* Already connected? */
@@ -796,7 +793,7 @@ vm_shutdown (void)
 {
 	XINT status;
 	XINT fd = vm_server;
-	extern  int  ZCLSND();
+	extern  int  ZCLSND(XINT *fd, XINT *status);
 
 	if (vm_server) {
 	    if (vm_debug)

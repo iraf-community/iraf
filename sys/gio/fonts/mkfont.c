@@ -35,9 +35,8 @@ struct hershey_tab {
 int	encode();
 
 
-main (argc, argv)
-int	argc;
-char 	*argv[];
+int 
+main (int argc, char *argv[])
 {
 	register int i=0;
 	int	minx, maxx, charnum=0, idx=0, hnum, hindex, hlength;
@@ -118,8 +117,8 @@ x = (ch == '1' ? x-3: x);
 }
 
 
-print_index (idxtab, N)
-int	*idxtab, N;
+int 
+print_index (int *idxtab, int N)
 {
 	register int i, j, start=1, end=5;
 
@@ -134,8 +133,8 @@ int	*idxtab, N;
 }
 
 
-print_widths (wtab, N)
-int	*wtab, N;
+int 
+print_widths (int *wtab, int N)
 {
 	register int i, j, start=1, end=5;
 
@@ -150,8 +149,8 @@ int	*wtab, N;
 }
 
 
-print_strokes (strtab, N)
-int	*strtab, N;
+int 
+print_strokes (int *strtab, int N)
 {
 	register int i, j, start=1, end=5;
 
@@ -166,9 +165,8 @@ int	*strtab, N;
 }
 
 
-print_prologue(nidx, nchar)
-int	nidx;
-int	nchar;
+int 
+print_prologue (int nidx, int nchar)
 {
 
 printf ("# CHRTAB -- Table of strokes for the printable ASCII characters.  Each\n");

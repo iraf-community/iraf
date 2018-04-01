@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -27,9 +28,7 @@ ZFALOC (
 	char	data = 0;
 	char	*s;
 	int	fd;
-	off_t	lseek();
-	extern	char *getenv();
-	extern  int  _u_fmode();
+	extern  int  _u_fmode(int mode);
 
 
 	if ((fd = creat ((char *)fname, _u_fmode(FILE_MODEBITS))) == ERR) {

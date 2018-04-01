@@ -7,8 +7,7 @@
 /* GMT_TO_LST -- Convert gmt to local standard time, epoch 1980.
  */
 time_t
-gmt_to_lst (gmt)
-time_t	gmt;
+gmt_to_lst (time_t gmt)
 {
 	struct	tm epoch;
 	time_t	epoch_sec;

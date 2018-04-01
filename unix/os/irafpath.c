@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 #define import_spp
@@ -12,8 +13,6 @@
 #define	SZ_ULIBSTR	512
 #define	ULIB		"IRAFULIB"
 
-extern	char *getenv();
-
 
 /* IRAFPATH -- Determine the pathname of the given IRAF library file.  If the
  * file is found the full pathname is returned, else the given filename is
@@ -22,8 +21,8 @@ extern	char *getenv();
  * the system files, e.g., for testing purposes.
  */
 char *
-irafpath (fname)
-char *fname;			/* simple filename, no dirs */
+irafpath (char *fname)
+            			/* simple filename, no dirs */
 {
 	static	char pathname[SZ_PATHNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];
@@ -34,7 +33,7 @@ char *fname;			/* simple filename, no dirs */
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
 
-	extern  int  ZGTENV();
+	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
 
 
 	/* Search any user libraries first. */

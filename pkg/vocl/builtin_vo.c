@@ -126,8 +126,8 @@ cl_vocstop (void)
 
 /* CL_VOCRESET --  Restart the VO Client interface.
  */
-void
-cl_vocreset ()
+void 
+cl_vocreset (void)
 {
     int status;
 

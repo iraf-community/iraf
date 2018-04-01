@@ -17,7 +17,7 @@ os_access (
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	status, xmode=mode, xtype=type;
 
-	extern  int ZFACSS();
+	extern  int ZFACSS(PKCHAR *fname, XINT *mode, XINT *type, XINT *status);
 
 
 	strcpy ((char *)osfn, vfn2osfn(fname,0));

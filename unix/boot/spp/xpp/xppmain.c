@@ -29,9 +29,9 @@ extern	FILE *yyin;
 extern	FILE *yyout;
 extern	char fname[][SZ_PATHNAME];
 extern	int linenum[];
-extern	char *vfn2osfn();
-extern	char *os_getenv();
-char	*dottor();
+extern	char *vfn2osfn(char *, int);
+extern	char *os_getenv(char *);
+char	*dottor(char *fname);
 
 extern  void ZZSTRT (void);
 extern  void ZZSTOP (void);
@@ -201,8 +201,7 @@ isxfile (char *fname)
 /* DOTTOR -- Change the extension of the named file to ".r".
  */
 char *
-dottor (fname)
-char	*fname;
+dottor (char *fname)
 {
 	static	char rfname[SZ_PATHNAME+1];
 	char	*ip, *op, *lastdot;

@@ -155,9 +155,9 @@ struct cplx {
 
 /* Oft referenced functions.
  */
-XCHAR	*c_sppstr();
-XCHAR	*c_strupk();
-char	*c_strpak();
+XCHAR	*c_sppstr(char *str);
+XCHAR	*c_strupk(char *str, short *outstr, int maxch);
+char	*c_strpak(short *sppstr, char *cstr, int maxch);
 
 #define	D_spp
 #endif

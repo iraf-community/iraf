@@ -8,9 +8,10 @@
 /* ACLRS -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-ACLRS (a, n)
-XSHORT	*a;
-XINT	*n;
+ACLRS (
+  XSHORT	*a,
+  XINT	*n
+)
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 }
