@@ -1,5 +1,0 @@
-# STRIP -- Rmfiles command script, used to strip the VO directories
-# of all files not required for ordinary runtime use of the system.
-
-src		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
-

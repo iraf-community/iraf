@@ -1,7 +1,0 @@
-# VO Unit-Test package parameter file
-
-descr,s,h,"",,,"Test description"
-has_err,b,h,no,,,"Test throws an error"
-data_path,s,h,"data$",,,"Test data directory"
-data_url,s,h,"http://iraf.noao.edu/votest/",,,"Test data base URL"
-version,s,h,"V1.0: December 12, 2011"

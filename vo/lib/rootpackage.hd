@@ -1,8 +1,0 @@
-# Root task entry for the package help tree.  Defines `<package>'
-# as both a task and a package in the help database.
-
-vo		men  = vo$vo.men,
-		hlp  = vo$vo.men,
-		sys  = vo$vopkg.hlp,
-		pkg  = vo$vo.hd,
-		src  = vo$vo.cl

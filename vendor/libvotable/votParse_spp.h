@@ -56,6 +56,7 @@ define vx_getTABLEDATA   	vgetta
 define vx_getTR   		vgettr
 define vx_getTD   		vgettd
 define vx_getBINARY   		vgetby
+define vx_getBINARY2   		vgetb2
 define vx_getFITS   		vgetfs
 define vx_getGROUP   		vgetgp
 define vx_getFIELDREF   	vgetff
@@ -70,6 +71,30 @@ define vx_getMAX   		vgetmx
 define vx_getOPTION   		vgeton
 define vx_getLINK   		vgetlk
 define vx_getCOOSYS   		vgetcs
+
+define vx_newRESOURCE           vnetre
+define vx_newTABLE              vnette
+define vx_newFIELD              vnetfd
+define vx_newDATA               vnetda
+define vx_newTABLEDATA          vnetta
+define vx_newTR                 vnettr
+define vx_newTD                 vnettd
+define vx_newBINARY             vnetby
+define vx_newBINARY2            vnetb2
+define vx_newFITS               vnetfs
+define vx_newGROUP              vnetgp
+define vx_newFIELDREF           vnetff
+define vx_newPARAMREF           vnetpf
+define vx_newDESCRIPTION        vnetdn
+define vx_newPARAM              vnetpm
+define vx_newINFO               vnetio
+define vx_newSTREAM             vnetsm
+define vx_newVALUES             vnetvs
+define vx_newMIN                vnetmn
+define vx_newMAX                vnetmx
+define vx_newOPTION             vneton
+define vx_newLINK               vnetlk
+define vx_newCOOSYS             vnetcs
 
 define vx_getDATAType   	vgetde
 define vx_getDATATypeStr        vgetdr

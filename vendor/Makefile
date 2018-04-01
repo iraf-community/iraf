@@ -44,18 +44,18 @@ libs:
 
 install:
 	(cd cfitsio   ; make install)
-	(cd voclient  ; make install)
+	(cd libvotable  ; make install)
 
 clean:
 	(cd cfitsio   ; make clean)
-	(cd voclient  ; make clean)
+	(cd libvotable  ; make clean)
 
 
 cfitsio:
 	(cd cfitsio   ; ./configure --libdir=../../bin CFLAGS="$CARCH" ; make ; make install)
 
-voclient:
-	(cd voclient  ; make World)
+libvotable:
+	(cd libvotable  ; make World)
 
 
 ###############################################################################

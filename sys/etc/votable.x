@@ -129,10 +129,11 @@ char	in[ARB]					#i VOTable file name
 char	out[ARB]				#i FITS bintable file name
 char	fmt[ARB]				#i format name
 
-pointer	sp, nodename, buf
+pointer	sp, nodename, buf, vot_handle
 char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME], format[SZ_LINE]
 int	vfd, status, ip, opt, delim, infile, outfile
 
+int	vx_openVOTABLE()
 int	vfnopen(), vfnmapu(), access(), ki_gnode(), strdic(), strncmp()
 int	open(), getline()
 bool	streq()
@@ -172,14 +173,30 @@ begin
 	    call sfree (sp)
             return (ERR)
         }
-	if (opt == VOTBL || opt == XML || opt == RAW)
-	    call strcpy ("vot", format, SZ_FNAME)
-	if (opt == ASCII)
-	    call strcpy ("asv", format, SZ_FNAME)
+        vot_handle = vx_openVOTABLE (osfn[ip])
+        if (vot_handle <= 0) {
+            call eprintf ("Cannot open file: '%s'\n")
+                call pargstr (osfn[ip])
+            return (ERR)
+        }
 
-
-        # Convert the file from VOTable to FITS bintable.
-        call vx_vocopy (5, "-f", format, "-o", cnvname, osfn[ip])
+        if (opt == ASCII || opt == ASV)
+            call vx_writeASV (vot_handle, cnvname)
+        if (opt == BSV)
+            call vx_writeBSV (vot_handle, cnvname)
+        if (opt == CSV)
+            call vx_writeCSV (vot_handle, cnvname)
+        if (opt == TSV)
+            call vx_writeTSV (vot_handle, cnvname)
+        if (opt == HTML)
+            call vx_writeHTML (vot_handle, osfn[ip], cnvname)#
+        if (opt == SHTML)
+            call vx_writeSHTML (vot_handle, osfn[ip], cnvname)#
+        if (opt == FITS)
+            call vx_writeFITS (vot_handle, cnvname)
+        if (opt == VOTBL || opt == XML || opt == RAW)
+            call vx_writeXML (vot_handle, cnvname)
+        call vx_closeVOTABLE (vot_handle)
 
 	if (access (cnvname,0,0) == NO) {
 	    call eprintf ("Cannot convert %s to '%s'\n")
@@ -218,10 +235,11 @@ int procedure vot_to_fits (in, out)
 char	in[ARB]					#i VOTable file name
 char	out[ARB]				#i FITS bintable file name
 
-pointer	sp, nodename
+pointer	sp, nodename, vot_handle
 char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME]
 int	vfd, status, ip, delim
 
+int	vx_openVOTABLE()
 int	vfnopen(), vfnmapu(), access(), ki_gnode()
 bool	streq()
 
@@ -247,7 +265,14 @@ begin
         call strcat (".fits", cnvname, SZ_PATHNAME)
 
         # Convert the file from VOTable to FITS bintable.
-        call vx_vocopy (5, "-f", "fits", "-o", cnvname, osfn[ip])
+        vot_handle = vx_openVOTABLE (osfn[ip])
+        if (vot_handle <= 0) {
+            call eprintf ("Cannot open file: '%s'\n")
+                call pargstr (osfn[ip])
+            return (ERR)
+        }
+        call vx_writeFITS (vot_handle, cnvname)
+        call vx_closeVOTABLE (vot_handle)
 
 	if (access (cnvname,0,0) == NO)
 	    return (ERR)
@@ -273,9 +298,11 @@ int procedure vot_from_fits (in, out)
 char	in[ARB]					#i FITS bintable file name
 char	out[ARB]				#i VOTable file name
 
+pointer	vot_handle
 char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME]
 int	vfd, status
 
+int	vx_openVOTABLE()
 int	vfnopen(), vfnmapu()
 bool	streq()
 
@@ -290,7 +317,14 @@ begin
         call strcat (".xml", cnvname, SZ_PATHNAME)
 
         # Convert the file from VOTable to FITS bintable.
-        call vx_vocopy (5, "-f", "votable", "-o", cnvname, osfn)
+        vot_handle = vx_openVOTABLE (osfn)
+        if (vot_handle <= 0) {
+            call eprintf ("Cannot open file: '%s'\n")
+                call pargstr (osfn)
+            return (ERR)
+        }
+        call vx_writeXML (vot_handle, cnvname)
+        call vx_closeVOTABLE (vot_handle)
 
         # Delete the downloaded XML file, copy the bintable into its
         # place and delete the converted output filename.

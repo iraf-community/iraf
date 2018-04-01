@@ -1,6 +1,0 @@
-# Top level VOClient static makefile.
-# This is mainly a placeholder: ant and configure do the real work.
-
-maintainer-clean:
-	/bin/rm -rf classes
-
