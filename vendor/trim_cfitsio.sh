@@ -38,7 +38,7 @@ lib_files=`make -f cfitsio/Makefile.in cfitsioLibSrcs | sed 's/zlib\/.*//'`
 flib_files='f77_wrap1.c f77_wrap2.c f77_wrap3.c f77_wrap4.c'
 # The include files cannot be directly inferred from Makefile.in
 inc_files='fitsio.h fitsio2.h longnam.h drvrsmem.h eval_defs.h eval_tab.h region.h group.h simplerng.h grparser.h f77_wrap.h cfortran.h'
-extra_files='config.sub config.guess Makefile.in'
+extra_files='config.sub config.guess Makefile.in cfitsio.pc.in'
 
 if [ ! -d cfitsio/lib ]; then
     mkdir cfitsio/lib
