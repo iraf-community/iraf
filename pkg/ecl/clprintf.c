@@ -14,8 +14,7 @@
 #include "errs.h"
 #include "proto.h"
 
-
-extern void u_doprnt ();
+extern void u_doprnt();
 
 
 /*
@@ -41,6 +40,7 @@ eprintf (char *fmt, ...)
 
 /* OPRINTF -- Printf that always writes to the current pseudo-file t_stdout.
  */
+void
 oprintf (char *fmt, ...)
 {
 	va_list	args;
@@ -58,6 +58,7 @@ oprintf (char *fmt, ...)
  * running task.  Be a bit more careful here in case a pipe is broken or
  * something is going haywire.
  */
+void
 tprintf (char *fmt, ...)
 {
 	va_list	args;
@@ -82,9 +83,11 @@ tprintf (char *fmt, ...)
 /* TWRITE -- Write a binary block of data to the current task.
  *
  * This function is currently not used by anyone.
-twrite (buf, nbytes)
-char	*buf;
-int	nbytes;
+void
+twrite (
+  char	*buf,
+  int	nbytes
+)
 {
 	FILE *out;
 
@@ -107,8 +110,11 @@ int	nbytes;
  * Give name of file if list, don't do anything if undefinded. 
  * Do not include a trailing \n.
  */
-int 
-prparamval (struct param *pp, FILE *fp)
+void
+prparamval (
+  struct param *pp,
+  FILE	*fp
+)
 {
 	char	buf[SZ_LINE];
 
@@ -119,13 +125,13 @@ prparamval (struct param *pp, FILE *fp)
 
 /* STRSORT -- Sort a list of pointers to strings.
  */
-int 
+void
 strsort (
-    char *list[],		/* array of string pointers */
-    int nstr			/* number of strings */
+  char	*list[],		/* array of string pointers */
+  int	nstr			/* number of strings */
 )
 {
-	extern	qstrcmp();
+	extern	int qstrcmp();
 
 	qsort ((char *)list, nstr, sizeof(char *), qstrcmp);
 }
@@ -133,8 +139,11 @@ strsort (
 
 /* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
  */
-int 
-qstrcmp (char *a, char *b)
+int
+qstrcmp (
+  char	*a, 
+  char  *b
+)
 {
 	return (strcmp (*(char **)a, *(char **)b));
 }
@@ -146,15 +155,15 @@ qstrcmp (char *a, char *b)
  * with at least two spaces between strings.  Excessively long strings
  * are truncated (adapted from "fmtio/strtbl.x").
  */
-int 
+void
 strtable (
-    FILE *fp,			/* output file */
-    char *list[],		/* array of string pointers */
-    int nstr,			/* number of strings */
-    int first_col,
-    int last_col,	/* where to place table on a line */
-    int maxch,			/* maximum chars to print from a string */
-    int ncol			/* desired # of columns (0 to autoscale) */
+  FILE	*fp,			/* output file */
+  char	*list[],		/* array of string pointers */
+  int	nstr,			/* number of strings */
+  int	first_col,		/* where to place table on a line */ 
+  int   last_col,
+  int	maxch,			/* maximum chars to print from a string */
+  int	ncol 			/* desired # of columns (0 to autoscale) */
 )
 {
 	int	row, i, j, nspaces, len, maxlen, colwidth;

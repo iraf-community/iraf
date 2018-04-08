@@ -52,9 +52,9 @@ typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
-extern	yeof;			/* set when yacc sees eof 		*/
-extern	dobkg;			/* set when code is to be done in bkg	*/
-extern	bkgno;			/* job number if bkg job		*/
+extern	int yeof;		/* set when yacc sees eof 		*/
+extern	int dobkg;		/* set when code is to be done in bkg	*/
+extern	int bkgno;		/* job number if bkg job		*/
 
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
@@ -79,14 +79,17 @@ int	ninterrupts;		/* number of onint() calls per task	*/
 int	currentline;		/* current line being executed		*/
 int	errorline;		/* error line being recovered		*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
-int	logout_status = 0;	/* optional status arg to logout() 	*/
+int	logout_status = 0;	/* optional status arg to logout()	*/
 
-static  void execute();
-static  void login(), logout();
-static  void startup(), shutdown();
+
+static void execute();
+static void login(), logout();
+static void startup(), shutdown();
 static  char *file_concat (char  *in1, char  *in2);
 
-	
+extern void c_xwhen(), onint();
+extern int yyparse();
+
 static  char *tmpfile = NULL;
 extern	char epar_cmdbuf[];
 
@@ -96,10 +99,12 @@ extern	char epar_cmdbuf[];
  * the file system, etc. is initialized.  When we exit we signal that the
  * interpreter be skipped, proceeding directly to process shutdown.
  */
-c_main (prtype, bkgfile, cmd)
-int	*prtype;		/* process type (connected, detached)	*/
-PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
-PKCHAR	*cmd;			/* host command line			*/
+int
+c_main (
+  int	 *prtype,		/* process type (connected, detached)	*/
+  PKCHAR *bkgfile,		/* bkgfile filename if detached		*/
+  PKCHAR *cmd 			/* host command line			*/
+)
 {
 	XINT	bp;
 
@@ -151,7 +156,7 @@ exit_:
 /* CLEXIT -- Called on fatal error from error() when get an error so bad that we
  * should commit suicide.
  */
-int 
+void
 clexit (void)
 {
 	longjmp (jmp_clexit, 1);
@@ -160,7 +165,7 @@ clexit (void)
 
 /* CLSHUTDOWN -- Public entry for shutdown.
  */
-int 
+void
 clshutdown (void)
 {
 	shutdown();
@@ -188,10 +193,10 @@ clshutdown (void)
  *   The only alternative would be to use indices rather than pointers in
  *   the dictionary, which is not what C likes to do.
  */
-static void 
+static void
 startup (void)
 {
-	int	onint(), onipc();
+	void	onipc();
 
 	/* Set up pointers to dictionary buffer.
 	 */
@@ -224,7 +229,7 @@ startup (void)
  * Don't bother with restor'ing if BATCH since we don't want to write out
  *   anything then anyway.
  */
-static void 
+static void
 shutdown (void)
 {
 	float	cpu, clk;
@@ -240,7 +245,6 @@ shutdown (void)
 		fprintf (stderr, "\n[%d] done  %.1f %.0m %d%%\n", bkgno,
 		    cpu, clk/60., (int)((clk > 0 ? cpu / clk : 0.) * 100.));
 	    }
-
 	} else {
 	    firstask->t_topd = dereference (firstask->t_ltp) + LTASKSIZ;
 	    restor (firstask);
@@ -262,7 +266,7 @@ shutdown (void)
  * mode, we skip the preliminaries and jump right in and interpret the
  * compiled code.
  */
-static void 
+static void
 execute (int mode)
 {
 	int	parsestat;
@@ -370,7 +374,7 @@ bkg:
  * Add the builtin function ltasks.  Run the startup file as the stdin of cl.
  * If any of this fails, we die.
  */
-static void 
+static void
 login (char *cmd)
 { 
 	register struct task *tp;
@@ -625,7 +629,7 @@ file_concat (char  *in1, char  *in2)
  * of the CL is hooked to the system logout file and when the eof of the
  * logout file is seen the CL really does exit.
  */
-static void 
+static void
 logout (void)
 { 
 	register struct task *tp;
@@ -653,7 +657,7 @@ logout (void)
  */
 char *
 memneed (
-    int incr		/* amount of space desired in ints, not bytes	*/
+  int	incr 		/* amount of space desired in ints, not bytes	*/
 )
 {
 	memel *old;
@@ -684,10 +688,10 @@ memneed (
  *   before shutting down.
  */
 /* ARGSUSED */
-int 
+void
 onint (
-    int *vex,			/* virtual exception code	*/
-    int (**next_handler)(void)	/* next handler to be called	*/
+  int	*vex,			/* virtual exception code	*/
+  int	(**next_handler)(void) 	/* next handler to be called	*/
 )
 {
 	if (firstask->t_flags & T_BATCH) {
@@ -745,7 +749,7 @@ onint (
 /* INTR_DISABLE -- Disable interrupts, e.g., to protect a critical section
  * of code.
  */
-int 
+void
 intr_disable (void)
 {
 	PFI	junk;
@@ -760,7 +764,7 @@ intr_disable (void)
 /* INTR_ENABLE -- Reenable interrupts, reposting the interrupt vector saved
  * in a prior call to INTR_DISABLE.
  */
-int 
+void
 intr_enable (void)
 {
 	PFI	junk;
@@ -774,11 +778,10 @@ intr_enable (void)
 /* INTR_RESET -- Post the interrupt handler and clear the interrupt vector
  * save stack.
  */
-int 
+void
 intr_reset (void)
 {
 	PFI	junk;
-	int	onint();
 
 	c_xwhen (X_INT, onint, &junk);
 	intr_sp = 0;
@@ -793,7 +796,7 @@ intr_reset (void)
  * the system and call cl_error() which eventually does a longjmp back to
  * the errenv in execute().
  */
-int 
+void
 onerr (void)
 {
 	char	errmsg[SZ_LINE];
@@ -813,8 +816,12 @@ onerr (void)
 
 /* CL_AMOVI -- Copy an integer sized block of memory.
  */
-int 
-cl_amovi (register int *ip, register int *op, register int len)
+void
+cl_amovi (
+  register int	*ip,
+  register int	*op,
+  register int	len 
+)
 {
 	while (--len)
 	    *op++ = *ip++;

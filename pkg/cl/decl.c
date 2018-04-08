@@ -161,8 +161,9 @@ do_arrayinit (
   int    nindex
 )
 {
-	int	block1, block2, dim, asiz, asiz2, asiz2x, bastype, i;
-	int	slen;
+	char	*block1=NULL, *block2=NULL;
+	int	dim, asiz, asiz2, asiz2x, bastype, i;
+	int	slen=0;
 	short	*off, *len;
 	struct	arr_desc  *parr;
 	struct	operand	  *o;
@@ -187,7 +188,7 @@ do_arrayinit (
 	    asiz = nval;
 	    if (bastype == OT_REAL)
 		asiz = dtoi (asiz);
-	    block1 = (int) memneed (asiz);
+	    block1 = memneed (asiz);
 	    ar.a_i = (int *) block1;
 	    i = nval;
 
@@ -255,7 +256,7 @@ do_arrayinit (
 		asiz2x = asiz2;
 
 	    if (asiz2x > asiz) {	/* Need to allocate more space. */
-		block2 = (int) memneed (asiz2x-asiz);
+		block2 = memneed (asiz2x-asiz);
 
 		if (nval == 0) {
 		    block1 = block2;

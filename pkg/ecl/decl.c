@@ -35,8 +35,13 @@ char	*dup_def     = "Duplicate definition of `%s' ignored.\n";
 /* GETLIMITS -- Get the limits for the n'th index of a parameter.
  * Returns ERR if the parameter is not defined, or has fewer than n indexes.
  */
-int 
-getlimits (char *pname, int n, int *i1, int *i2)
+int
+getlimits (
+  char	*pname,
+  int	 n, 
+  int   *i1, 
+  int   *i2
+)
 {
 	struct param *pp;
 	char	*pk, *t, *p, *f;
@@ -68,7 +73,7 @@ getlimits (char *pname, int n, int *i1, int *i2)
 
 /* GET_DIM -- Get the dimensionality of an parameter.  If not an array return 0.
  */
-int 
+int
 get_dim (char *pname)
 {
 	struct param *pp, *lookup_param();
@@ -95,7 +100,7 @@ get_dim (char *pname)
 
 /* MAKETYPE -- Set the type of a parameter.
  */
-int 
+int
 maketype (int type, int list)
 {
 	register int	p = -1;
@@ -149,8 +154,12 @@ maketype (int type, int list)
  * we may find that some values are not initialized and so we
  * may need to allocate more memory.
  */
-void 
-do_arrayinit (struct param *pp, int nval, int nindex)
+void
+do_arrayinit (
+  struct param *pp,
+  int	 nval, 
+  int    nindex
+)
 {
 	char	*block1=NULL, *block2=NULL;
 	int	dim, asiz, asiz2, asiz2x, bastype, i;
@@ -184,8 +193,7 @@ do_arrayinit (struct param *pp, int nval, int nindex)
 	    i = nval;
 
 	    while (i--) {
-		memel p = pop();
-		o = (struct operand *) p;
+		o = (struct operand *) pop();
 
 		switch (bastype) {
 
@@ -312,8 +320,11 @@ do_arrayinit (struct param *pp, int nval, int nindex)
 
 /* DO_SCALARINIT -- Initialize a scalar.  Mostly copied from ADDPARAM.
  */
-void 
-do_scalarinit (struct param *pp, int inited)
+void
+do_scalarinit (
+  struct param	*pp,
+  int	inited
+)
 {
 	struct	operand	*o, undefoper;
 	extern	char	*e_invaldef;
@@ -323,9 +334,7 @@ do_scalarinit (struct param *pp, int inited)
 	pp->p_valo.o_type = bastype = pp->p_type & OT_BASIC;
 
 	if (inited) {
-	    memel p = pop();
-	    o = (struct operand *) p;
-
+	    o = (struct operand *)pop();
 	    if (o->o_type == OT_STRING)
 		s = o->o_val.v_s;
 	    else
@@ -433,8 +442,11 @@ do_scalarinit (struct param *pp, int inited)
 
 /* SCANFTYPE -- Get file type for file parameter.
  */
-int 
-scanftype (struct param *pp, struct operand *o)
+int
+scanftype (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	int	type;
 	char	*s;
@@ -462,8 +474,11 @@ scanftype (struct param *pp, struct operand *o)
 
 /* C_SCANMODE -- Get the mode for a parameter.
  */
-int 
-c_scanmode (struct param *pp, struct operand *o)
+int
+c_scanmode (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	if (o->o_type != OT_STRING)
 	    return (ERR);
@@ -475,8 +490,11 @@ c_scanmode (struct param *pp, struct operand *o)
 
 /* SCANLEN -- Get the length for structs and strings.
  */
-int 
-scanlen (struct param *pp, struct operand *o)
+int
+scanlen (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	if (o->o_type != OT_INT  ||
 	    !(pp->p_type & (OT_STRING|PT_LIST|PT_STRUCT)))
@@ -489,8 +507,11 @@ scanlen (struct param *pp, struct operand *o)
 
 /* SCANMIN -- Get the minimum for a parameter.
  */
-int 
-scanmin (struct param *pp, struct operand *o)
+int
+scanmin (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	int 	bastype, otype;
 
@@ -525,8 +546,11 @@ scanmin (struct param *pp, struct operand *o)
 /* SCANENUM -- Get the legal values for an enumerated string an store in the
  * min field of the parameter.
  */
-int 
-scanenum (register struct param *pp, register struct operand *o)
+int
+scanenum (
+  register struct param	*pp,
+  register struct operand *o
+)
 {
 	register int bastype;
 
@@ -541,8 +565,11 @@ scanenum (register struct param *pp, register struct operand *o)
 
 /* SCANMAX -- Get the maximum for a param.
  */
-int 
-scanmax (struct param *pp, struct operand *o)
+int
+scanmax (
+  struct param	*pp,
+  struct operand *o
+)
 {	
 	int	otype;
 
@@ -579,7 +606,7 @@ scanmax (struct param *pp, struct operand *o)
  * set it to AUTO mode.  Also rearrange the parameters so they
  * agree with order of definition in the procedure statement.
  */
-void 
+void
 proc_params (int npar)
 {
 	struct	operand	*o;
@@ -591,9 +618,7 @@ proc_params (int npar)
 	fp = lp = NULL;
 
 	while (npar--) {
-	    memel p = pop();
-	    o = (struct operand *) p;
-
+	    o = (struct operand *) pop();
 	    if (o->o_type != OT_STRING)
 		cl_error (E_UERR,"Invalid parameter in procedure statement.\n");
 
@@ -673,7 +698,12 @@ setmodes_:
 /* INITPARAM -- Get a new parameter and initialize appropriate fields.
  */
 struct param *
-initparam (struct operand *op, int isparam, int type, int list)
+initparam (
+  struct operand *op,
+  int	isparam, 
+  int   type,
+  int   list
+)
 {
 	struct	param *pp;
 	extern	char *e_lookparm;
@@ -719,7 +749,7 @@ initparam (struct operand *op, int isparam, int type, int list)
 
 /* PROCSCRIPT -- Is this a procedure script? 
  */
-int 
+int
 procscript (FILE *fp)
 {
 	char	*p, buf[PF_MAXLIN+1];
@@ -766,8 +796,11 @@ procscript (FILE *fp)
 
 /* SKIP_TO -- Within a file, skip to the statement beginning with the key.
  */
-int 
-skip_to (FILE *fp, char *key)
+int
+skip_to (
+  FILE	*fp,
+  char	*key
+)
 {
 	char	*p, buf[PF_MAXLIN+1];
 	int 	count, len;
@@ -800,8 +833,12 @@ skip_to (FILE *fp, char *key)
 /* DO_OPTION -- Set parameter attributes which have been explicitly
  * defined by the user.
  */
-void 
-do_option (struct param *pp, struct operand *oo, struct operand *o)
+void
+do_option (
+  struct param	*pp,
+  struct operand *oo,
+  struct operand *o
+)
 {
 	char	*opt;
 

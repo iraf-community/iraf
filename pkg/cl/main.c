@@ -85,7 +85,6 @@ static void execute();
 static void login(), logout();
 static void startup(), shutdown();
 
-extern void ZDOJMP();
 extern void c_xwhen(), onint();
 extern int yyparse();
 
@@ -192,7 +191,7 @@ clshutdown (void)
 static void
 startup (void)
 {
-	void	onint(), onipc(), c_xwhen();
+	void	onipc();
 
 	/* Set up pointers to dictionary buffer.
 	 */
@@ -582,7 +581,7 @@ memneed (
 void
 onint (
   int	*vex,			/* virtual exception code	*/
-  int	(**next_handler)() 	/* next handler to be called	*/
+  int	(**next_handler)(void) 	/* next handler to be called	*/
 )
 {
 	if (firstask->t_flags & T_BATCH) {
