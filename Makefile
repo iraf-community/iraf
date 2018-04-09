@@ -6,10 +6,9 @@
 # Compiler Flags.
 
 RELEASE		= v2.16
-CFLAGS 		=
-CDEBUGFLAGS 	= -O2 -Wall
+CFLAGS 		= -g -Wall -O2
 BOOTSTRAPCFLAGS = 
-        
+
 CC 		= gcc 
 AS 		= gcc -c -x assembler
 AR 		= ar clq

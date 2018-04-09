@@ -17,7 +17,6 @@ INCDIR    	:= ../lib/
 
 
 # includes, flags and libraries
-CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR) -I./
 ifeq  ($(PLATFORM), "Darwin")
     ifeq  ($(IRAFARCH), "macintel")
@@ -33,7 +32,6 @@ else
     endif
 endif
 
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 LIBS		= -lm -lc -lpthread
 
 
