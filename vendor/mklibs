@@ -9,14 +9,6 @@ build_cfitsio=1
 build_readline=1 # not needed in v2.16.1 and beyond
 build_libvotable=1
 
-if [ "$IRAFARCH" = "linux" ] ; then
-    CARCH="-m32"
-elif [ "$IRAFARCH" = "macintel" ] ; then
-    CARCH="-m64"
-elif [ "$IRAFARCH" = "macosx" ] ; then
-    CARCH="-m32"
-fi
-
 echo "Building support libraries ...."
 echo "  (Using toplevel directory '"$top"' ....)"
 
@@ -36,7 +28,7 @@ if [ $build_cfitsio = 1 ] ; then
     echo -n "    Building CFITSIO libs ...."
     opts="$gopts --bindir=$top/bin --libdir=$top/bin"
     (cd cfitsio ;  \
-     ./configure $opts CFLAGS="$CARCH"; \
+     ./configure $opts; \
      make clean 	     ; \
      make 	     ; \
      make install     ; \
@@ -69,8 +61,8 @@ if [ $build_libvotable = 1 ] ; then
     echo -n "    Building VOTABLE lib ...."
 
     (cd libvotable ; \
-     make all CARCH=$CARCH	        ; \
-     make clean 		        ) | tee -a _spool 2>&1
+     make all				; \
+     make clean				) | tee -a _spool 2>&1
     echo "done"
 
 fi

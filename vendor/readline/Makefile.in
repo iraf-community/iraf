@@ -87,33 +87,11 @@ GCC_LINT_CFLAGS = $(XCCFLAGS) $(GCC_LINT_FLAGS) @CFLAGS@ @LOCAL_CFLAGS@
 PLATFORM        := $(shell uname -s)
 PLMACH          := $(shell uname -m)
 
-ifeq ($(PLATFORM),Darwin)
-    ifeq ($(PLMACH),x86_64)
-        CARCH   = -m64
-    else
-        CARCH   = -m32
-    endif
-    ifdef IRAFARCH
-        ifeq ($(IRAFARCH),macintel)
-            CARCH = -m64
-        else
-            CARCH = -m32
-        endif
-    endif
-else
-    ifdef IRAFARCH
-        ifeq ($(IRAFARCH),linux)
-            CARCH = -m32
-        endif
-    endif
-endif
-
-
 # For libraries which include headers from other libraries.
 INCLUDES = -I. -I$(srcdir)
 
 XCCFLAGS = $(DEFS) $(LOCAL_DEFS) $(CPPFLAGS) $(INCLUDES)
-CCFLAGS = $(XCCFLAGS) $(LOCAL_CFLAGS) $(CFLAGS) $(CARCH)
+CCFLAGS = $(XCCFLAGS) $(LOCAL_CFLAGS) $(CFLAGS)
 
 
 

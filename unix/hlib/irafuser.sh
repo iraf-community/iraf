@@ -30,13 +30,6 @@ export HSI_F77LIBS=""
 export HSI_LFLAGS=""
 export HSI_OSLIBS=""
 
-if [ "$MACH" = "macosx" -o "$MACH" = "linux" ] ; then
-    HSI_CF=${HSI_CF}" -m32"
-    HSI_XF=${HSI_XF}" -/m32"
-    HSI_FF=${HSI_FF}" -m32"
-    HSI_LF=${HSI_LF}" -m32"
-fi
-
 if [ "$MACH" = "macosx" ] ; then
     export MACOSX_DEPLOYMENT_TARGET=10.5
 fi

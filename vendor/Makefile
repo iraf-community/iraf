@@ -18,20 +18,6 @@ INCDIR    	:= ../lib/
 
 # includes, flags and libraries
 CINCS  	  	= -I$(INCDIR) -I./
-ifeq  ($(PLATFORM), "Darwin")
-    ifeq  ($(IRAFARCH), "macintel")
-        CARCH	= -m64
-    else
-        CARCH	= -m32
-    endif
-else
-    ifdef IRAFARCH
-        ifeq ($(IRAFARCH),linux)
-            CARCH = -m32
-        endif
-    endif
-endif
-
 LIBS		= -lm -lc -lpthread
 
 
@@ -50,7 +36,7 @@ clean:
 
 
 cfitsio:
-	(cd cfitsio   ; ./configure --libdir=../../bin CFLAGS="$CARCH" ; make ; make install)
+	(cd cfitsio   ; ./configure --libdir=../../bin ; make ; make install)
 
 libvotable:
 	(cd libvotable  ; make World)
