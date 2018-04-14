@@ -7,5 +7,5 @@ Name: cfitsio
 Description: FITS File Subroutine Library
 Version: @CFITSIO_MAJOR@.@CFITSIO_MINOR@
 Libs: -L${libdir} -lcfitsio @LIBS@
-Libs.private: -lm -lz -lbz2 -lcurl
+Libs.private: -lm
 Cflags: -I${includedir}
