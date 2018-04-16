@@ -244,6 +244,9 @@ ZTSDPR(
 )
 {
 	int	pid = *jobcode;
+	int	pr_update(int);
+
+	pr_update(pid);
 
 	if (kill (pid, 0) == ERR)
 	    return (XERR);
