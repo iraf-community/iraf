@@ -261,7 +261,6 @@ bkg_jobstatus (
 	register int	j, n, ch;
 	register char	*ip;
 	long	seconds;
-	char	*outstr = NULL;
 
 	bkg_update (1);
 	for (bk=jobtable, j=1;  j <= NBKG;  j++, bk++)
@@ -284,16 +283,15 @@ bkg_jobstatus (
 		 */
 		if (busy(j)) {
 		    if (bk->b_flags & J_SERVICE)
-			outstr = "Stopped";
+		        fprintf (fp, "%-10s", "Stopped");
 		    else
-			outstr = "Running";
+		        fprintf (fp, "%-10s", "Running");
 		} else if (bk->b_flags & J_KILLED) {
-		    outstr = "Killed";
+		    fprintf (fp, "%-10s", "Killed");
 		} else if (bk->b_exitcode == OK) {
-		    outstr = "Done";
+		    fprintf (fp, "%-10s", "Done");
 		} else
-		    sprintf (outstr, "Exit %d", bk->b_exitcode);
-		fprintf (fp, "%-10s", outstr);
+		    fprintf (fp, "Exit %-5d", bk->b_exitcode);
 
 		/* Finally, print user command followed by newline.
 		 */
