@@ -70,6 +70,7 @@ memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
 jmp_buf intenv;			/* X_INT during process jumps here	*/
+jmp_buf child_startup;		/* child processes jump here            */
 int	validerrenv;		/* stays 0 until errenv gets set	*/
 int	loggingout;		/* set while processing logout file	*/
 int	gologout;		/* set when logout() is typed		*/
@@ -96,8 +97,6 @@ extern int yyparse();
  */
 int
 c_main (
-  int	 *prtype,		/* process type (connected, detached)	*/
-  PKCHAR *bkgfile,		/* bkgfile filename if detached		*/
   PKCHAR *cmd 			/* host command line			*/
 )
 {
@@ -120,9 +119,7 @@ c_main (
 	 * these fail.
 	 */
 	startup ();
-
-	if (*prtype == PR_DETACHED) {
-	    bkg_startup ((char *)bkgfile);
+	if (setjmp(child_startup)) {
 	    cpustart = c_cputime (0L);
 	    clkstart = c_clktime (0L);
 	    execute (BACKGROUND);
@@ -179,14 +176,6 @@ clshutdown (void)
  *   a buffer.  A simple binary copy of the dictionary to different region
  *   of memory in the bkg CL will leave the pointers pointing into limbo.
  *
- * TODO: Write a pair of procedures for each major data structure to dump
- *   and restore the data structure in a binary array.  Passing the CL context
- *   to the bkg CL would then be a matter of calling the dump procedure for
- *   each major data structure to dump the structure into the bkgfile, then
- *   doing a matching restore in the bkg CL to restore the data structure
- *   to a different region of memory.  The ENV package does this already.
- *   The only alternative would be to use indices rather than pointers in
- *   the dictionary, which is not what C likes to do.
  */
 static void
 startup (void)
