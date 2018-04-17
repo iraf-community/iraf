@@ -13,11 +13,15 @@ int procedure prdone (job)
 
 int	job			# job number (slot number in job table)
 int	access()
+int	ztsdpr()
 include	"prd.com"
 
 begin
 	if (pr_jobcode[job] == NULL)
 	    call syserr (SYS_PRBKGNF)
+
+	if (ztsdpr (pr_jobcode[job]) != ERR)
+	    return (NO)
 
 	if (access (Memc[pr_bkgfile[job]], 0, 0) == YES)
 	    return (NO)

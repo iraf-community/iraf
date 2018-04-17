@@ -83,6 +83,7 @@
 #define	ZFMKCP		zfmkcp_
 #define	ZFMKDR		zfmkdr_
 #define	ZFNBRK		zfnbrk_
+#define	ZFODPR		zfodpr_
 #define	ZFPATH		zfpath_
 #define	ZFPROT		zfprot_
 #define ZFPOLL		zfpoll_
@@ -151,6 +152,7 @@
 #define	ZSTTSF		zsttsf_
 #define	ZSTTTX		zstttx_
 #define	ZSTTTY		zsttty_
+#define ZTSDPR		ztsdpr_
 #define	ZSVJMP		zsvjmp_
 #define	ZTSLEE		ztslee_
 #define	ZWMSEC		zwmsec_

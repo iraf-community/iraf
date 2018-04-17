@@ -18,15 +18,15 @@
 ** of which is passed by the system to the child during process startup.
 ** While the format and contents of the bkgfile are in general application
 ** dependent, the system default action is to open the bkgfile as a text file
-** and read commands from it.  The CL process does not make use of this
-** default, but rather uses its own special format binary file to communicate
-** the full runtime context of the parent to the child, partially emulating
-** the UNIX fork.  The system automatically deletes the bkgfile when the
-** child process terminates.
+** and read commands from it.  The system automatically deletes the bkgfile
+** when the child process terminates.
 **
 ** N.B.: The environment and cwd are not automatically passed to the child,
 ** as they are for a connected subprocess.  The application must see to it
 ** that this information is passed in the bkgfile if needed by the child.
+**
+** The CL process does not make use of this default, but rather uses
+** C_PRFODPR (fork()) to create a new process.
 */
 
 /* C_PROPDPR -- Open a detached process.  The named process is either spawned
@@ -52,6 +52,20 @@ c_propdpr (
 	c_strupk (bkgmsg,  spp_bkgmsg,  SZ_LINE);
 	iferr (job = PROPDPR (c_sppstr(process), spp_bkgfile, spp_bkgmsg))
 	    return (NULL);
+	else
+	    return (job);
+}
+
+
+/* C_PRFODPR -- Fork a detached process.
+*/
+unsigned int
+c_prfodpr (
+)
+{
+	unsigned job;
+	iferr (job = PRFODPR ())
+	    return (ERR);
 	else
 	    return (job);
 }
