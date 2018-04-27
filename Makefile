@@ -6,15 +6,8 @@
 # Compiler Flags.
 
 RELEASE		= v2.16
-CFLAGS 		=
-CDEBUGFLAGS 	= -O2 -Wall
-BOOTSTRAPCFLAGS = 
-        
-CC 		= gcc 
-AS 		= gcc -c -x assembler
-AR 		= ar clq
-CP 		= cp -p
-
+export CFLAGS	= -g -Wall -O2 $(CARCH)
+export LDFLAGS	= $(CARCH)
 export  iraf     = $(shell pwd)/
 
 all:: update

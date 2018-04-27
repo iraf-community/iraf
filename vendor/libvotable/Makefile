@@ -20,11 +20,10 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 
 
 # includes, flags and libraries
-CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR)  -I. -I../../include
 
-CFLAGS 		= -g -Wall $(CARCH) $(CINCS) -L./ -DHAVE_CFITSIO
-CLIBS		= -lm -lc -lpthread 				-lcfitsio
+CFLAGS 		:= $(CFLAGS) $(CINCS) -L./ -DHAVE_CFITSIO
+CLIBS		= -lm -lc -lpthread -lcfitsio
 
 
 

@@ -178,7 +178,8 @@ ieee0(Void)
 	}
 #endif /* MSpc */
 
-#ifdef __mips	/* must link with -lfpe */
+/* What follows is for SGI IRIX only */
+#if defined(__mips) && defined(__sgi)   /* must link with -lfpe */
 #define IEEE0_done
 /* code from Eric Grosse */
 #include <stdlib.h>
@@ -231,7 +232,36 @@ ieee0(Void)
 	}
 #endif /* mips */
 
-#ifdef __linux__
+/*
+ * The following is the preferred method but depends upon a GLIBC extension only
+ * to be found in GLIBC 2.2 or later.  It is a GNU extension, not included in the
+ * C99 extensions which allow the FP status register to be examined in a platform
+ * independent way.  It should be used if at all possible  -- AFRB
+ */
+
+
+#if (defined(__GLIBC__)&& ( __GLIBC__>=2) && (__GLIBC_MINOR__>=2) )
+#define _GNU_SOURCE 1
+#define IEEE0_done
+#include <fenv.h>
+ static void
+  ieee0(Void)
+        
+{
+    /* Clear all exception flags */
+    if (fedisableexcept(FE_ALL_EXCEPT)==-1)
+         unsupported_error();
+    if (feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW)==-1)
+         unsupported_error();
+}
+
+#endif /* Glibc control */
+
+/* Many linux cases will be treated through GLIBC.  Note that modern
+ * linux runs on many non-i86 plaforms and as a result the following code
+ * must be processor dependent rather than simply OS specific */
+ 
+#if (defined(__linux__)&&(!defined(IEEE0_done)))
 #define IEEE0_done
 #include "fpu_control.h"
 

@@ -3,7 +3,7 @@
 echo		"--------------------- OS ----------------------"
 
 
-zsvjmp=../as/zsvjmp.s
+zsvjmp=../as/zsvjmp.[sS]
 $CC -c $HSI_CF -Wall $zsvjmp gmttolst.c irafpath.c prwait.c z*.c alloc.c getproc.c
 $CC $HSI_LF -Wall alloc.o getproc.o $HSI_OSLIBS -o alloc.e
 chmod	4755 alloc.e

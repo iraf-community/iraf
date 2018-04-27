@@ -8,7 +8,7 @@ matrix:
       env: IRAFARCH=linux64 OS_VERS=precise
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux OS_VERS=trusty
+      env: IRAFARCH=linux OS_VERS=trusty CARCH="-m32"
       addons:
         apt:
           packages:
@@ -18,7 +18,7 @@ matrix:
             - libexpat1-dev:i386
     - os: linux
       dist: precise
-      env: IRAFARCH=linux OS_VERS=precise
+      env: IRAFARCH=linux OS_VERS=precise CARCH="-m32"
       addons:
         apt:
           packages:
@@ -34,10 +34,10 @@ matrix:
       env: IRAFARCH=macintel OS_VERS=yosemite
     - os: osx
       osx_image: xcode9.1
-      env: IRAFARCH=macosx OS_VERS=sierra
+      env: IRAFARCH=macosx OS_VERS=sierra CARCH="-m32"
     - os: osx
       osx_image: xcode7.3
-      env: IRAFARCH=macosx OS_VERS=elcapitan
+      env: IRAFARCH=macosx OS_VERS=elcapitan CARCH="-m32"
 
 install:
   - if [ $TRAVIS_OS_NAME = osx ]; then brew install ccache; PATH=/usr/local/opt/ccache/libexec:$PATH ; fi

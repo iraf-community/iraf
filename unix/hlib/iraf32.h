@@ -61,16 +61,6 @@ define	SZ_PATHNAME	511		# OS dependent file names
 define	SZ_LINE		1023		# max chars in a line
 define	SZ_COMMAND	2047		# max size command block
 
-define  SZ_MII_SHORT    1		# size of MII data in SPP chars
-define  SZ_MII_LONG     2
-define  SZ_MII_REAL     2
-define  SZ_MII_DOUBLE   4
-define  SZ_MII_INT      SZ_MII_LONG
-
-define	SZ_INT32	2		# FIXED -- Do not change!
-define	SZ_LONG32	2
-define	SZ_STRUCT32	2
-
 define	TY_BOOL		1		# codes for type arguments, sizeof
 define	TY_CHAR		2
 define	TY_SHORT	3
@@ -83,6 +73,16 @@ define	TY_POINTER	9
 define	TY_STRUCT	10		# last (regular) type code
 define	TY_USHORT	11		# for image i/o
 define	TY_UBYTE	12		# (special) for image i/o
+
+define  SZ_MII_SHORT    1		# size of MII data in SPP chars
+define  SZ_MII_LONG     2
+define  SZ_MII_REAL     2
+define  SZ_MII_DOUBLE   4
+define  SZ_MII_INT      SZ_MII_LONG
+
+define	SZ_INT32	2		# FIXED -- Do not change!
+define	SZ_LONG32	2
+define	SZ_STRUCT32	2
 
 # Indefinite values.
 define	INDEFS		(-32767)

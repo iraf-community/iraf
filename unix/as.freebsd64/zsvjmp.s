@@ -18,11 +18,9 @@
 # of one longword containing the address of the STATUS variable, followed
 # by the "jmp_buf" used by setjmp/longjmp.
 #
-# This file contains the SUN/UNIX 386i (80386) version of ZSVJMP.
  
         .globl	zsvjmp_
-        .globl	sfpucw_
-        .globl	gfpucw_
+	.type   zsvjmp_, @function
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -33,41 +31,13 @@
 	# advantage is that references to NULL pointers are likely to cause a
 	# memory violation.
 
-	.globl	mem_
-	mem_	=	0
+	.globl  _mem_
+	_mem_   =       0
 
-	.text
 zsvjmp_:
-	movl	4(%esp), %ecx		# &jmpbuf to ECX
-	movl	8(%esp), %eax		# &status to EAX
-	movl	%eax, (%ecx)		# store &status in jmpbuf[0]
-	movl 	$0, (%eax)		# zero the value of status
-	addl	$4, %ecx		# change stack to point to &jmpbuf[1]
-	movl	%ecx, 4(%esp)		# 	...
-	movl	$0, 8(%esp)		# change arg2 to zero
-	jmp	__sigsetjmp		# let sigsetjmp do the rest
-
-gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)
-	pushl	%ebp
-	movl	%esp,%ebp
-	subl    $0x4,%esp
-	movl    0x8(%ebp), %eax
-	fnstcw  0xfffffffe(%ebp)
-	movw    0xfffffffe(%ebp), %dx
-	movl	%edx,(%eax)
-	movl	%ebp, %esp
-	popl	%ebp
-	ret
-
-sfpucw_:				# Set fpucw:  sfpucw_ (&new_fpucw)
-	pushl   %ebp
-	movl    %esp,%ebp
-	subl    $0x4,%esp
-	movl    0x8(%ebp), %eax
-	movl	(%eax), %eax
-	andl    $0xf3f, %eax
-	fclex
-	movw    %ax, 0xfffffffe(%ebp)
-	fldcw   0xfffffffe(%ebp)
-	leave  
-	ret    
+	# %rsi ... &status  %rdi ... &jumpbuf
+	movq    %rsi, (%rdi)    # store &status in jmpbuf[0]
+	movl    $0, (%rsi)      # zero the value of status
+	addq    $8, %rdi        # change point to &jmpbuf[1]
+	movl    $0, %esi        # change arg2 to zero
+	jmp     sigsetjmp       # let sigsetjmp do the rest
