@@ -1,0 +1,5 @@
+# mkapropos parameter file
+pkglist,s,a,"iraf,noao",,,Packages to be included
+helpdir,s,a,"lib/root.hd",,,Root help directory to be compiled
+aproposdb,s,a,"lib$apropos.db",,,Output apropos database name
+verbose,b,h,no,,,verbose output ?

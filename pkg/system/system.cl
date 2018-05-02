@@ -50,6 +50,8 @@ task	$devices	= "system$devices.cl"
 task	references	= "system$references.cl"
 task	phelp		= "system$phelp.cl"
 
+task	apropos		= "system$apropos.cl"
+
 hidetask mtclean
 
 keep

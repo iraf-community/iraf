@@ -7,11 +7,13 @@ reset	extern		= iraf$extern/
 # Initialize the helpdb string.  We'll add to this when dyanamically 
 # loading packages when the next load the CLPACKAGE.
 reset	helpdb		= "lib$helpdb.mip"
+reset   aproposdb       = "lib$apropos.db"
 
 if (access ("iraf$noao/noao.cl") == yes) {
     reset	noao		= iraf$noao/
     task	noao.pkg	= noao$noao.cl
     reset	helpdb		= (envget("helpdb") // ",noao$lib/helpdb.mip")
+    reset	aproposdb       = (envget("aproposdb") + ",noao$lib/apropos.db" )
 }
 ;
 if (access ("iraf$vo/vo.cl") == yes) {
