@@ -461,6 +461,19 @@ cl> imstat @inlist
      image.short.fits    262144     108.3     131.3       -1.    19936.
 ```
 
+You can also use the `//` operator:
+
+```
+cl> imarith @inlist * 2 @inlist//.2
+cl> imstat @inlist//.2
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+     image.dbl.2.fits    262144     216.6     262.6       -2.    39872.
+    image.real.2.fits    262144     216.6     262.6       -2.    39872.
+    image.sect.2.fits     10201     727.8      692.      216.    15468.
+   image.short.2.fits    262144     216.1      250.   -26476.    29280.
+cl> imdelete image.*.2.fits
+```
+
 ## Using the CL as a calculator
 
 The CL has a built-in calculator capability. Some variables that may
