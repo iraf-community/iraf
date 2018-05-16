@@ -30,7 +30,7 @@
 
 #if defined(__aarch64__)
 	.arch armv8-a
-#elif defined(__ppc64__)
+#elif defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__)
 	.abiversion 2
 #endif
 	.align 2
@@ -72,7 +72,7 @@ zsvjmp_:
 	jr $t9				// Tail call sigsetjmp
 	.end	zsvjmp_
 
-#elif defined(__ppc64__)
+#elif defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__)
 
 // Use VRSAVE (unused in Linux) and stack reserved area (SP+12) to
 // save the return address (LR) which is lost after bl __sigsetjmp.
