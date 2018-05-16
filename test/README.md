@@ -108,7 +108,7 @@ cl> while (1==1) i=1
 To run a test only on a subset of architectures, the `arch` option may
 be used:
 
-Test options: `arch=linux64`
+Test options: `arch=macintel`
 ```
 cl> !uname -m
 x86_64
