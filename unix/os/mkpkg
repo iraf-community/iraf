@@ -14,17 +14,11 @@ alloc:
 libos.a:
 	$set XFLAGS = "-cd $(HSI_XF)"
 
-	$ifdef (DEBUG)
-	    $iffile (as$zsvjmp_p.s)
-		as$zsvjmp_p.s
-	    $else
-		as$zsvjmp.s
-	    $endif
+	$iffile (as$zsvjmp.S)
+	    as$zsvjmp.S
 	$else
 	    as$zsvjmp.s
 	$endif
-
-	#"as$enbint.s"
 
 	# Do not put zmain.o in the library if it is linked explicitly as a .o
 	# on the host machine.  Having it in the library prevents use of the
