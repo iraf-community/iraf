@@ -1,0 +1,13 @@
+# mkapropos mkpkg file (Wed Aug 31 16:58:39 CST 2016)
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_mkapropos.x	"help.h" "helpdir.h" <error.h> <syserr.h>
+        helpdir.x       "help.h" "helpdir.h" <ctype.h> <error.h>
+	strext.x	<ctype.h>
+	word.x
+	;
