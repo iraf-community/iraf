@@ -225,6 +225,7 @@
 #define zflsty_	kflsty_
 #define zfmkcp_	kfmkcp_
 #define zfmkdr_	kfmkdr_
+#define zfodpr_	kfodpr_
 #define zfprot_	kfprot_
 #define zfrnam_	kfrnam_
 #define zfrmdr_	kfrmdr_
@@ -257,6 +258,7 @@
 #define zsttsf_	ksttsf_
 #define zstttx_	kstttx_
 #define zsttty_	ksttty_
+#define ztsdpr_	ktsdpr_
 #define zzclmt_	kzclmt_
 #define zzopmt_	kzopmt_
 #define zzrdmt_	kzrdmt_

@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<mach.h>
+include	<config.h>
 include	"ki.h"
 
 # KOPDPR -- Open a detached process.
@@ -37,7 +38,7 @@ begin
 	    }
 
 	} else {
-	    # Spawning of detached processes on remote notes is not really
+	    # Spawning of detached processes on remote nodes is not really
 	    # supported as of yet.  Add support for passing the bkgmsg; use
 	    # node name in bkgmsg to submit bkg job to remote node.
 
@@ -56,4 +57,40 @@ begin
 	    jobcode = ki_getchan (server, jobcode)
 
 	call sfree (sp)
+end
+
+
+# KFODPR -- Fork a detached process.
+
+procedure kfodpr (jobcode)
+
+int	jobcode			# receives job code of process
+
+int	ki_getchan()
+
+begin
+	call zfodpr (jobcode)
+
+	if (jobcode == NULL)	# Child process
+	    return
+
+	if (jobcode != ERR)
+	    jobcode = ki_getchan (NULL, jobcode)
+end
+
+
+# KTSDPR -- Check if a detached process exists by sending a signal.
+
+int procedure ktsdpr (jobcode)
+
+int	jobcode
+
+int	ztsdpr()
+include	"kichan.com"
+
+begin
+	if (k_node[jobcode] == NULL)
+	    return ztsdpr (k_oschan[jobcode])
+	else
+	    return ERR
 end
