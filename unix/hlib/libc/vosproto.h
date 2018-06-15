@@ -1763,7 +1763,7 @@ extern integer kflstx_(integer *chan, integer *status);
 extern integer kflsty_(integer *chan, integer *status);
 extern integer kfmkcp_(shortint *oldosn, shortint *newosn, integer *status);
 extern integer kfmkdr_(shortint *osfn, integer *status);
-extern integer kfodpr_(integer *jobcoe);
+extern integer kfodpr_(void);
 extern integer kfpath_(shortint *vfn, shortint *osfn, integer *maxch, integer *nchars);
 extern integer kfprot_(shortint *osfn, integer *protfg, integer *status);
 extern integer kfrnam_(shortint *oldosn, shortint *newosn, integer *status);

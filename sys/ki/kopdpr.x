@@ -62,20 +62,21 @@ end
 
 # KFODPR -- Fork a detached process.
 
-procedure kfodpr (jobcode)
+int procedure kfodpr ()
 
 int	jobcode			# receives job code of process
-
-int	ki_getchan()
+int	ki_getchan(), zfodpr()
 
 begin
-	call zfodpr (jobcode)
+	jobcode = zfodpr ()
 
 	if (jobcode == NULL)	# Child process
-	    return
+	    return NULL
 
-	if (jobcode != ERR)
-	    jobcode = ki_getchan (NULL, jobcode)
+	if (jobcode == ERR)
+	    return ERR
+
+	return ki_getchan (NULL, jobcode)
 end
 
 

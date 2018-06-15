@@ -161,18 +161,17 @@ ZOPDPR (
  */
 int
 ZFODPR (
-  XINT	  *jobcode
+  void
 )
 {
+ 	int	  pid;
 
 	/* Create child process.
 	 */
-	if ((*jobcode = fork()) == ERR) {
-	    *jobcode = XERR;
+	if ((pid = fork()) == ERR)
 	    return (XERR);
-	}
 
-	if (*jobcode == 0) {
+	if (pid == 0) {
 	    /* New, child process.
 	     * Arrange for the local file descriptors of the parent to
 	     * be closed in the child.  IRAF subprocesses do not
@@ -195,10 +194,10 @@ ZFODPR (
 	     * Save pid in parent's process table.  Entry cleared when
 	     * pr_wait is called to wait for process to terminate.
 	     */
-	    pr_enter (*jobcode, 0, 0);
+	    pr_enter (pid, 0, 0);
 	}
 
-	return (XOK);
+	return (pid);
 }
 
 

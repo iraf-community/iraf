@@ -12,6 +12,7 @@ int procedure prfodpr ()
 
 int	jobcode, pr
 errchk	fmapfn, syserrs, malloc
+int	zfodpr()
 include	"prd.com"
 
 begin
@@ -32,7 +33,7 @@ begin
 	    call syserrs (SYS_PRBKGOVFL, "fork")
 
 	# Spawn or enqueue detached process.
-	call zfodpr (jobcode)
+	jobcode = zfodpr ()
 	if (jobcode == ERR)
 	    call syserrs (SYS_PRBKGOPEN, "fork")
 
