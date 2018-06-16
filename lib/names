@@ -1340,6 +1340,7 @@ kflstx
 kflsty
 kfmkcp
 kfmkdr
+kfodpr
 kfpath
 kfprot
 kfrnam
@@ -1394,6 +1395,7 @@ ksttpr
 ksttsf
 kstttx
 ksttty
+ktsdpr
 ktzcls
 ktzfls
 ktzget
@@ -1869,6 +1871,7 @@ znotty
 zopcpr
 zopdir
 zopdpr
+zfodpr
 zopm70
 zopnbf
 zopngd

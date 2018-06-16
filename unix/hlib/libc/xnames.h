@@ -159,6 +159,7 @@
 #define	PRKILL		prkill_
 #define	PROPCPR		propcr_
 #define	PROPDPR		propdr_
+#define	PRFODPR		prfodr_
 #define	PROPEN		propen_
 #define	PROTECT		protet_
 #define	PRREDIR		prredr_

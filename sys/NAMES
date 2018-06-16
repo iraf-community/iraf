@@ -792,6 +792,7 @@ c_prenvset      c_prenvset
 c_printf        c_printf
 c_prkill        c_prkill
 c_propdpr       c_propdpr
+c_prfodpr       c_prfodpr
 c_propen        c_propen
 c_prredir       c_prredir
 c_prsignal      c_prsignal
@@ -2201,6 +2202,7 @@ kflstx          kflstx
 kflsty          kflsty
 kfmkcp          kfmkcp
 kfmkdr          kfmkdr
+kfodpr          kfodpr
 kfpath          kfpath
 kfprot          kfprot
 kfrnam          kfrnam
@@ -2288,6 +2290,7 @@ ksttty          ksttty
 kszfif          ks_zfiobf
 kszfit          ks_zfiomt
 kszfix          ks_zfiotx
+ktsdpr          ktsdpr
 ktzcls          kt_zcls
 ktzfls          kt_zfls
 ktzget          kt_zget
@@ -3819,6 +3822,7 @@ znotty          ZNOTTY
 zopcpr          ZOPCPR
 zopdir          ZOPDIR
 zopdpr          ZOPDPR
+zfodpr          ZFODPR
 zopnbf          ZOPNBF
 zopnks          ZOPNKS
 zopnlp          ZOPNLP

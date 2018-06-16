@@ -19,12 +19,11 @@ char	process[ARB]		# vfn of executable process file
 char	bkgfile[ARB]		# vfn of background file
 char	bkgmsg[ARB]		# control string for kernel
 
-bool	first_time
 int	jobcode, pr
 pointer	sp, process_osfn, bkgfile_osfn, pk_bkgmsg
-data	first_time /true/
 errchk	fmapfn, syserrs, malloc
 include	"prd.com"
+data	first_time /true/
 
 begin
 	call smark (sp)

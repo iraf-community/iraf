@@ -265,7 +265,7 @@ extern int lexinit(void);
 extern struct operand readlist(struct param *pp);
 extern void closelist(register struct param *pp);
 /* main.c */
-extern int cmain_(int *prtype, short *bkgfile, short *cmd);
+extern int cmain_(short *cmd);
 extern void clexit(void);
 extern void clshutdown(void);
 extern char *memneed(int incr);
