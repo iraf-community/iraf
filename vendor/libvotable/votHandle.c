@@ -92,7 +92,7 @@ vot_lookupHandle (Element *elem)
 handle_t
 vot_setHandle (Element *elem)
 {
-    unsigned int i = 0;
+    int i = 0;
     Element **old_handles;
     
     if (elem == NULL)
