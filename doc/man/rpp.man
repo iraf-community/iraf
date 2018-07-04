@@ -1,0 +1,20 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH RPP "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.SH NAME
+rpp \- second pass of the IRAF SPP preprocessor
+.SH SYNOPSIS
+.B rpp
+.RI [ target ]
+.SH DESCRIPTION
+    While RPP is derived from ratfor, it is not a ratfor preprocessor.
+It accepts as input the output of the first pass, XPP, and produces Fortran as
+output.  XPP and RPP together with the UNIX driver program XC make up the
+preprocessor for the IRAF SPP language.
+
+.SH SEE ALSO
+.BR xc (1),
+.BR xpp (1).
+.SH AUTHOR
+This manual page was written by Zed Pobre <zed@debian.org>, for the
+Debian GNU/Linux system (but may be used by others).  It was derived
+from the README in the RPP subdirectory of the IRAF sources.

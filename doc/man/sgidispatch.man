@@ -1,0 +1,21 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH SGIDISPATCH "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.SH NAME
+sgidispatch \- execute named sgi translator [IRAF]
+.SH SYNOPSIS
+.B sgidispatch
+.I translator
+.RI [ args ]
+
+.SH DESCRIPTION
+.B sgidispatch
+determines the pathname to the executable for the named SGI
+translator, and then executes the translator.  It passes all command
+line arguments to the child, which also inherits stdin, stdout, and
+stderr.
+
+.SH AUTHOR
+This manual page was written by Zed Pobre <zed@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).
+Information was taken from the sgidispatch.c file in the IRAF
+distribution.
