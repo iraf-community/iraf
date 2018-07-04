@@ -71,14 +71,18 @@
 
 #if (_MSC_VER < 1300)   /* versions earlier than V7.0 do not have 'long long' */
     typedef __int64 LONGLONG;
+    typedef unsigned __int64 ULONGLONG;
 #else                   /* newer versions do support 'long long' */
     typedef long long LONGLONG; 
+    typedef unsigned long long ULONGLONG; 
 #endif
 
 #elif defined( __BORLANDC__)  /* (WDP) for the free Borland compiler, in particular */
     typedef __int64 LONGLONG;
+    typedef unsigned __int64 ULONGLONG;
 #else
     typedef long long LONGLONG; 
+    typedef unsigned long long ULONGLONG; 
 #endif
 
 #define LONGLONG_TYPE
