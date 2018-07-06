@@ -1,0 +1,158 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH XC "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.SH NAME
+xc \- portable IRAF compile/link utility
+.SH SYNOPSIS
+.B xc
+.RI [ flags ] " files" ...
+
+.SH DESCRIPTION
+\fBXC\fP is a machine independent utility for compiling and linking
+IRAF tasks or files.  The XC utility may also be used to compile
+and/or link non-IRAF files and tasks.  The VMS version of XC supports
+all of the important flags except \-D which VMS C doesn't support in
+any way.  It can be used to generate fortran from xpp or ratfor code,
+to compile any number of files, and then link them if desired.  XC
+accepts and maps IRAF virtual filenames, but since it is a standalone
+bootstrap utility the environment is not passed, hence logical
+directories cannot be used.
+
+The following extensions are supported by the VMS version of 
+xc: .x, .r, .f, .ftn, .for, .c, .mar, .s, .o, .obj, .a, .olb, .e, .exe.
+It is suggested that everyone stick with the iraf virtual file name
+extensions.  These are : .x, .r, .f, .c, .s, .o, .a, .e. The mapping
+of these to their VMS counterparts is:
+
+.nf
+     .x -> .x    SPP code
+     .r -> .r    Ratfor code
+     .f -> .for  Fortran code
+     .c -> .c    C code
+     .s -> .mar  Macro assembler code
+     .o -> .obj  Object module
+     .a -> .olb  Library file
+     .e -> .exe  Executable Image
+.fi
+
+XC is available both in the CL, via the foreign task interface, and as
+a standalone DCL callable task.  Usage is equivalent in either case.
+Upper case flags must be quoted to be recognized (the upper case flags
+will be done away with at some point).
+
+.SH FLAGS
+.TP
+.B -a
+To support VMS link options file.  Next file is taken to be the VMS
+name of a link options file.  This is primarily for using long lists
+of files or libraries and not for actual VMS Linker options, since XC
+adds continuation characters where it believes it is appropriate.
+.TP
+.B -C
+Tells fortran to do array bound and other checking.  By default no
+checking is done.  From DCL fortran usually does array and overflow
+checking which is not used here.
+.TP
+.B -c
+Tells \fBxc\fR not to link, i.e., not to create an executable.
+.TP
+.B -d
+Causes debug messages to be printed during execution.
+.TP
+.B -F\fR,\fB -f
+Do not delete the Fortran translation of an SPP source file.
+.TP
+.B -g
+Generates debugging information and (for VMS), links in the debugger.
+.TP
+.B -h
+Causes the executable to be linked as a host program, i.e., without
+the IRAF main and without searching the IRAF libraries, unless
+explicitly referenced on the command line.  Used to compile and link
+host (e.g., Fortran) programs which may or may not reference the IRAF
+libraries.
+.TP
+.B -i2
+Tells fortran to use I*2 by default.
+.TP
+.B -i4
+Tells fortran to use I*4 by default.
+.TP
+.B -l\fIlib\fR
+This tells the linker which libraries besides the standard ones to
+include.  These must be either on the current directory, or in an IRAF
+system library (lib$ or hlib$).  The library specification must be
+immediately after the option as in "\-lxtools".  No other option may
+follow the 'l' option in the same argument as in \-lxtoolsO.
+.TP
+.B -L
+Creates a list file. VMS specific.
+.TP
+.B -M\fR,\fB -m
+Tells the linker to create a link map.
+.TP
+.B -n
+Not really supported under VMS since "normal" users cannot install
+images.  In Unix this is just a link option to make a shareable image.
+.TP
+.B -N
+Same as \-z for VMS.
+.TP
+.B -Nh \fR[\fIfilename\fR]
+This tells xpp that the foreign definitions in the file specified
+should be used in preference to standard include files.
+.TP
+.B -o
+This flag redirects the output of the compile if used in conjunction
+with \-c option or specifies where the executable or object is to be
+placed.  If not given the first file name is used to obtain the name
+for the executable or object.
+.TP
+.B -O
+Optimize object code produced; this is now the default, but this
+switch is still provided for backwards compatibility.
+.TP
+.B -p \fIpkgname
+Load the package environment for the named external package, e.g., 
+"xc \-c \-p noao file.x".  If the same package is always specified the
+environment variable or logical name PKGENV may be defined at the host
+level to accomplish the same thing.  The package name \fImust\fR be
+specified when doing software development in an external or layered
+package.
+.TP
+.B -P
+Check portability.  This should be used all of the time in IRAF, but
+the VMS C compiler forces the use of non-standard constructs in some
+cases.  Also <stdio.h> and <ctype.h> get complaints for the above
+reason.  This may be used and probably should when working with
+Fortran due to Dec non-standard extension.
+.TP
+.B -q
+Disable optimization.  Opposite of \-O.  Object code will be optimized
+by default.
+.TP
+.B -s
+Strips all symbols and debugging information.
+.TP
+.B -S
+Same as \-s for VMS.
+.TP
+.B -v
+Verbose mode.  Causes messages to be printed during execution telling
+what the \fBxc\fR program is doing.
+.TP
+.B -w
+Suppress warnings.                              
+.TP
+.B -X\fR,\fB -x
+Compile and link for debugging.  In VMS/IRAF, links in the VMS
+debugger and symbols.
+.TP
+.B -z
+Create a non-shareable image (default).
+
+.SH SEE ALSO
+.BR mkpkg (1),
+.BR generic (1).
+
+.SH AUTHOR
+This manual page was taken from the xc.hlp file in the IRAF sources.

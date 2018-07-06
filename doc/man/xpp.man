@@ -1,0 +1,20 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH XPP "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.SH NAME
+xpp \- first pass of the IRAF SPP preprocessor
+.SH SYNOPSIS
+.B xpp
+.RI [ target ]
+
+.SH DESCRIPTION
+XPP takes as input an SPP source file and produces as output a text
+file which is further processed by RPP (the second pass) to produce
+Fortran.
+
+.SH SEE ALSO
+.BR rpp (1),
+.BR xc (1).
+.SH AUTHOR
+This manual page was written by Zed Pobre <zed@debian.org>, for the
+Debian GNU/Linux system (but may be used by others).  It was derived
+from the README in the XPP subdirectory of the IRAF sources.

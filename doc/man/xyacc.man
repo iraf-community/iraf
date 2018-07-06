@@ -1,0 +1,68 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH XYACC "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.\" Please adjust this date whenever revising the manpage.
+.SH NAME
+xyacc \- SPP modified yacc compiler compiler [IRAF]
+.SH SYNOPSIS
+.B xyacc
+.RI [ options ] " file"
+
+.SH DESCRIPTION
+This is a version of yacc that has been modified to produce SPP
+language parsers.  For the most part, it should follow the operation
+of standard yacc, with the differences noted below.  See the man page
+for yacc for options.
+
+.SH DIFFERENCES
+.TP
+.B (1) 
+The Yacc input syntax is unmodified, except that the comment
+convention is now as in SPP, rather than C (i.e., use #, rather than
+/*..*/).  All defines, actions, etc. are of course given in the SPP
+language.
+.TP
+.B (2) 
+The Yacc output file is "ytab.x", rather than "y.tab.c".  The token
+defs file "y.tab.h" now contains SPP defines, rather than C #defines.
+The states file "y.output" is completely unmodified.
+.TP
+.B (3) 
+The global declarations section %{ .. %} had to be changed somewhat
+because SPP does not have global variables.  The section is now
+divided into two subsections.  The first is for global defines,
+includes, etc. which go into the header area of the ytab.x file.  Then
+follows a %L, telling Yacc that the local declarations for the parser
+procedure follow.  This second section should contain variable and
+function declarations required for the user supplied actions (code
+fragments to be executed when a rule of the grammar is recognized) in
+the yyparse procedure.
+.TP
+.B (4) 
+The global declarations section MUST contain the following two
+defines:
+
+.nf
+YYMAXDEPTH   Depth of the parser stacks; determines
+             the maximum complexity of a language
+             construct which can be parsed.  A
+             typical value is 150.
+
+YYOPLEN      The length, in struct units, of a token
+             operand value structure.  You define the
+             operand structure to be whatever you wish;
+             all the parser needs to know is how big an
+             element is.  The lexical analyzer and the
+             actions, both of which are supplied by the
+             user, use the operand structure for
+             communications.  Operand structures are
+             always referred to by a Mem pointer.
+.fi
+
+.SH SEE ALSO
+.BR yacc (1),
+.BR xpp (1),
+.BR rpp (1).
+.SH AUTHOR
+This manual page was written by Zed Pobre <zed@debian.org>, for the
+Debian GNU/Linux system (but may be used by others).  It includes text
+from the README file for xyacc in the IRAF sources.
