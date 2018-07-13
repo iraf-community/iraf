@@ -36,7 +36,7 @@ matrix:
             - libreadline-dev:i386
     - os: osx
       osx_image: xcode10
-      env: IRAFARCH=macintel OS_VERS=highsierra
+      env: IRAFARCH=macintel OS_VERS=highsierra TARFILE=iraf.macintel.tar.gz
     - os: osx
       osx_image: xcode6.4
       env: IRAFARCH=macintel OS_VERS=yosemite
@@ -70,3 +70,19 @@ before_script:
 
 script:
   - ./test/run_tests
+
+before_deploy:
+ - git checkout unix/hlib/
+ - tar --exclude ${TARFILE} -czf ${TARFILE} *
+ - ls -l
+
+deploy:
+  provider: releases
+  api_key:
+    secure: dGZRYkRPIz1jcJa8CGBc54eyqUx+7x2yHoezF4IWnl83dU1NC95/zretldXuQ5SP4ksRGp+TMnsH1x8hvaC3qd9G2ZXYnsKTAfWvRThXZW1LA8B1kEZfLikz0rBs7bw7qQirpdy64S0VAooeav4sTF7CHdqXCjqgQNlD/FGDwYKLOxhUq30YBDeCYOMn/CvvumQmwhynd74eTueCykEGFcVJe8k08+AS3V8N4AhN6gger9W2bZVxhPPaxUx1qyHurDAj+fq89QtOHwh+sq7VK7hDMmB2mfQvfekesUb0WUWx5VoNhHb+NzCfOWgaw0VKSQYuFte6Wy4xTTpyPr0H4AO8kGWFIn9fF/F41mQB+EtFZk0Cf84+rHgzUKn2wxr0nQUGUEmbeUT+gdyC5myegc5E6FThnPmbsTX8sebDj5VJP1ptJgeStJA0mD2C+mU86dU/nzLVjm8YApj7vxzs3k02DUmfayCcnUbZ8byBtxL5or0Wu70YJdJ7K0YDb09ABKJm/7oGNZHt6aTef2yxb/2iick8EsQxehT4qaqAypVcPHyalL9CsjEjAKYygCkhh/seVyeT37WB54k8G4fDuGYKLhO5If/E6igaZECcQaff5RQkw1a10ZHuWfC4hHOOGrA2i/g+JhHAasofeoHNq4W6dp8ymfV2/HmIb6feC/k=
+  file: ${TARFILE}
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
+    condition: ${TARFILE}
