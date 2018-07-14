@@ -11,7 +11,7 @@
 # Determine CL binary to run based on how we were called.
 
 nm=${0##*/}
-cl_binary="vocl.e"
+cl_binary="ecl.e"
 
 case "$nm" in
     "cl" | "cl.sh")
