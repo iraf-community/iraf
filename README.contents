@@ -1,5 +1,5 @@
 
-	This directory contains the IRAF v2.16.1 release from NOAO.  The
+	This directory contains the IRAF community snapshot release.  The
 contents of this directory include:
 
     LICENSE		Software license information
@@ -8,11 +8,6 @@ contents of this directory include:
     README.install	Installation Notes
     RELEASE.txt		IRAF v2.16.1 Release Notes
     bin			Symbolic link to current system architecture
-    bin.generic		Generic architecture (should always be empty)
-    bin.linux		32-bit Linux binaries
-    bin.linux64		64-bit Linux binaries
-    bin.macosx		32-bit Mac OSX (Intel) binaries
-    bin.macintel	64-bit Mac OSX (Intel) binaries
     dev			IRAF Device definition files
     doc			IRAF System Documentation, release notes, etc
     extern		External Packages
@@ -34,7 +29,8 @@ contents of this directory include:
   o  For Installation instructions see the 'README.install' file in 
      this directory.
 
-  o  For a summary of what is included in this release see the 'RELEASE.txt'
+  o  For a summary of what is included in this release see the 'RELEASE.md'
      file in this directory.
 
-  o  For problems or questions, please see http://iraf.net
+  o  For problems or questions, please see http://iraf.net and
+     https://github.com/iraf-community/iraf/issues
