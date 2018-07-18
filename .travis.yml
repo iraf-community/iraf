@@ -2,7 +2,7 @@ matrix:
   include:
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux64 OS_VERS=trusty
+      env: IRAFARCH=linux64 OS_VERS=trusty CARCH="-fpie"
       addons:
         apt:
           packages:
@@ -18,7 +18,7 @@ matrix:
             - libreadline-dev
     - os: linux
       dist: trusty
-      env: IRAFARCH=linux OS_VERS=trusty CARCH="-m32"
+      env: IRAFARCH=linux OS_VERS=trusty CARCH="-m32 -fpie"
       addons:
         apt:
           packages:
