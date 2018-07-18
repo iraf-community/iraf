@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 #
 # CL.SH -- Startup the version of the CL executable compiled for the
 # architecture or floating point hardware appropriate for the current
@@ -10,16 +10,15 @@
 
 # Determine CL binary to run based on how we were called.
 
-
 nm=${0##*/}
 cl_binary="ecl.e"
 
 case "$nm" in
     "cl" | "cl.sh")
-        cl_binary="vocl.e"
+        cl_binary="cl.e"
         ;;
     "ecl" | "ecl.sh")
-        cl_binary="vocl.e"
+        cl_binary="ecl.e"
         ;;
     "vocl" | "vocl.sh")
         cl_binary="vocl.e"
@@ -48,7 +47,7 @@ esac
 d_iraf="/iraf/iraf/"
 if [ -n $iraf ]; then
     if [ ! -e $iraf ]; then
-        echo "Warning: iraf=$iraf does not exist \(check .cshrc or .login\)"
+        echo "Warning: iraf=$iraf does not exist (check .cshrc or .login)"
         echo "Session will default to iraf=$d_iraf"
         unset iraf ; sleep 3
     fi
@@ -58,7 +57,7 @@ if [ -z $iraf ]; then
 fi
 
 # Check for a version query.
-if (( $# > 1 )); then
+if [ $# > 1 ]; then
     case "$1" in
 	"-v" | "-V" | "-version" | "--version")
             head -1 $iraf/unix/hlib/motd
@@ -121,7 +120,7 @@ else
         export IRAFARCH="$MACH"
     fi
 
-    if [ ! -e $iraf/bin.${MACH}/${cl_binary}  ]; then
+    if [ ! -e $iraf/bin.${MACH}/${cl_binary} ]; then
         echo "ERROR:  No $iraf/bin.${IRAFARCH}/${cl_binary} binary found."
 	exit 1
     fi
