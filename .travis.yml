@@ -6,6 +6,8 @@ matrix:
       addons:
         apt:
           packages:
+            - libcurl4-openssl-dev
+            - libexpat-dev
             - libreadline-dev
     - os: linux
       dist: precise
@@ -22,7 +24,7 @@ matrix:
           packages:
             - gcc-multilib
             - libcurl4-openssl-dev:i386
-            - libexpat1-dev:i386
+            - libexpat-dev:i386
             - libreadline-dev:i386
     - os: linux
       dist: precise
@@ -32,7 +34,7 @@ matrix:
           packages:
             - gcc-multilib
             - libcurl4-openssl-dev:i386
-            - libexpat1-dev:i386
+            - libexpat-dev:i386
             - libreadline-dev:i386
     - os: osx
       osx_image: xcode10
