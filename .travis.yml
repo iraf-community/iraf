@@ -38,7 +38,7 @@ matrix:
             - libreadline-dev:i386
     - os: osx
       osx_image: xcode10
-      env: IRAFARCH=macintel OS_VERS=highsierra TARFILE=iraf.macintel.tar.gz
+      env: IRAFARCH=macintel OS_VERS=highsierra MACOSX_DEPLOYMENT_TARGET=10.5 TARFILE=iraf.macintel.tar.gz
     - os: osx
       osx_image: xcode6.4
       env: IRAFARCH=macintel OS_VERS=yosemite

@@ -30,10 +30,6 @@ export HSI_F77LIBS=""
 export HSI_LFLAGS=""
 export HSI_OSLIBS=""
 
-if [ "$MACH" = "macosx" ] ; then
-    export MACOSX_DEPLOYMENT_TARGET=10.5
-fi
-
 # The following determines whether or not the VOS is used for filename mapping.
 if [ -f "${iraf}lib/libsys.a" ]; then
 	export	HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
