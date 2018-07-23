@@ -10,10 +10,10 @@
 #
 
 if [ -z "$iraf" ] ; then
-    export iraf=$(cd $(dirname $0)/..; pwd)/
+    export iraf=$(cd "$(dirname "$0")/.." && pwd)/
 fi
 if [ -z "$IRAFARCH" ] ; then
-    export IRAFARCH=$(${iraf}unix/hlib/irafarch.sh)
+    export IRAFARCH=$("${iraf}unix/hlib/irafarch.sh")
 fi
 
 export arch=.${IRAFARCH}
@@ -61,14 +61,14 @@ fi
 
 # Test scripts
 for f in $@ ; do
-    if [ $(echo $f | cut -c1) != "/" ] ; then
+    if [ "$(echo "$f" | cut -c1)" != "/" ] ; then
 	f=$(pwd)/$f
     fi
     TEST_FILES="$TEST_FILES $f"
 done
 
 if [ -z "$TEST_FILES" ] ; then
-    TEST_FILES=${iraf}test/*.md
+    TEST_FILES="${iraf}test/"*.md
 fi
 
 base_dir=$(mktemp -d -t iraftest.XXXXXXXXX)
@@ -100,40 +100,40 @@ run_test () {
 	printf "s"
 	return
     fi
-    if [ "$archs" -a -z "$(echo $archs | tr , \\n | grep ^$IRAFARCH\$)" ] ; then
+    if [ "$archs" ] && [ -z "$(echo "$archs" | tr , \\n | grep ^"$IRAFARCH"\$)" ] ; then
         echo "skipped" >> "$summary_file"
 	printf "a"
 	return
     fi
     local cmd_file="${base_dir}/cmd"
-    printf "%b\nlogout\n" "$command" > "$cmd_file"
+    printf "%b\\nlogout\\n" "$command" > "$cmd_file"
     res_file="${base_dir}/expected"
-    printf "%b\n" "$result" > "$res_file" 2>&1
+    printf "%b\\n" "$result" > "$res_file" 2>&1
     clres_file="${base_dir}/output"
     "${CL}" -f "$cmd_file" > "$clres_file" 2>&1
     diff_file="${base_dir}/diff"
     diff_floatingpoint "$res_file" "$clres_file" "$decimals" > "$diff_file"
-    if [ -s $diff_file ] ; then
+    if [ -s "$diff_file" ] ; then
 	if [ "$xfail" ] ; then
 	    printf "x"
 	    echo "xfailed" >> "$summary_file"
 	    return
 	else
-	    cat >> $failure_file <<EOF
+	    cat >> "$failure_file" <<EOF
 
-=================== Failure in $src with $(basename $CL) ===================
+=================== Failure in $src with $(basename "$CL") ===================
 
 Expected
 ========
-$(cat $res_file)
+$(cat "$res_file")
 
 Output
 ======
-$(cat $clres_file)
+$(cat "$clres_file")
 
 Diff
 ====
-$(cat $diff_file | tail -n +3)
+$(tail -n +3 "$diff_file")
 EOF
 	    echo "failed" >> "$summary_file"
 	    printf "F"
@@ -144,7 +144,7 @@ EOF
 	printf "."
 	return
     fi
-    rm -f $cmd_file $res_file $clres_file $diff_file
+    rm -f "$cmd_file" "$res_file" "$clres_file" "$diff_file"
 }
 
 # Diff two files, with an optionally given floating point precision
@@ -163,8 +163,8 @@ diff_floatingpoint () {
     if [ -z "$decimals" ] ; then
 	diff -uw "$file1" "$file2"
     else
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file1" > "$file1".fp
-	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'${decimals}'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file2" > "$file2".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'"${decimals}"'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file1" > "$file1".fp
+	perl -pe 's/(-?\d+\.\d*)(E-?\d+)?/sprintf("%.'"${decimals}"'f%s", $1, $2)/ge;s/\-(0+\.0*)/$1/ge' < "$file2" > "$file2".fp
 	diff -uw "$file1".fp "$file2".fp
 	rm -f "$file1".fp "$file2".fp
     fi
@@ -187,17 +187,17 @@ run_tests () {
     options=''  # Test options
     lineno=0    # line counter
     cat "$FILE" | while read -r line ; do
-	lineno=$(expr $lineno + 1)
+	lineno=$(( lineno + 1 ))
 	if [ "$in_code"  = 1 ] ; then
 	    if echo "$line" | grep -q '^```$' ; then
 		# we are at the end of a code section,
 		# so let's execute the test if there was one
 		if [ "$command" ] ; then
-		    if [ "$verbose" = 1 -a -n "$headline" ] ; then
-			printf "\n    %s: " "$headline"
+		    if [ "$verbose" = 1 ] && [ -n "$headline" ] ; then
+			printf "\\n    %s: " "$headline"
 			headline=""
 		    fi
-		    run_test "$CL" "$command" "$result" "$(basename ${FILE}):${l_start}" "$options"
+		    run_test "$CL" "$command" "$result" "$(basename "${FILE}"):${l_start}" "$options"
 		fi
 		command=''
 		result=''
@@ -206,47 +206,47 @@ run_tests () {
 		in_code=0
 	    elif [ "$filename" ] ; then
 		# We are in a code line that is to be stored in a file
-		printf "%s\n" "$line" >> "$filename"
-	    elif echo "$line" | egrep -q '^[a-z>]+> ' ; then
+		printf "%s\\n" "$line" >> "$filename"
+	    elif echo "$line" | grep -q -E '^[a-z>]+> ' ; then
 		# We are in a code line that contains a command.
 		# First add a command to print the full line so that
 		# it appears in the output. Then add the command itself
 		# And add the command to to the expected results.
 		cmd=$(echo "$line" | sed 's/^[a-z>]*> //')
 		if [ "$command" ] ; then
-		    command="${command}\nprint '${line}'"
-		    result="${result}\n${line}"
+		    command="${command}\\nprint '${line}'"
+		    result="${result}\\n${line}"
 		else
 		    command="print '${line}'"
 		    result="${line}"
 		fi
-		command="${command}\n${cmd}"
+		command="${command}\\n${cmd}"
 	    else
 		# We are in a code line that contains the response from IRAF.
 		# Just add it to the expected results.
-		result="${result}\n${line}"
+		result="${result}\\n${line}"
 	    fi
 	elif echo "$line" | grep -q '^```$' ; then
 	    # A new code section started. Store the next line number for
 	    # reference
-	    l_start=$(expr $lineno + 1)
+	    l_start=$(( lineno + 1 ))
 	    in_code=1
-	elif echo "$line" | egrep -q '^File: `.+`$' ; then
+	elif echo "$line" | grep -q -E '^File: `.+`$' ; then
 	    # There is some file content printed out in the next block.
 	    # Just prepare to save it.
-	    filename="$(echo $line | cut '-d`' -f2)"
-	elif echo "$line" | egrep -q '^Test options: `.+`$' ; then
+	    filename="$(echo "$line" | cut '-d`' -f2)"
+	elif echo "$line" | grep -q -E '^Test options: `.+`$' ; then
 	    # Special test options
-	    options="$(echo $line | cut '-d`' -f2)"
-	elif echo "$line" | egrep -q '^#' ; then
+	    options="$(echo "$line" | cut '-d`' -f2)"
+	elif echo "$line" | grep -q -E '^#' ; then
 	    # Head line
-	    headline="$(echo $line | sed s/^#*\ //)"
+	    headline="$(echo "$line" | sed s/^#*\ //)"
 	else
 	    filename=""
 	    options=""
 	fi
     done
-    printf "\n"
+    printf "\\n"
 }
 
 for CL in $IRAF_SHELLS ; do
@@ -254,8 +254,8 @@ for CL in $IRAF_SHELLS ; do
 	for t in $TEST_FILES ; do
 	    test_dir="${base_dir}/testroot"
 	    mkdir -p "${test_dir}"
-	    printf "%b: %b " "${CL}" "$(basename ${t})"
-	    cd "$test_dir" ; run_tests "${IRAFBIN}${CL}" "${t}"
+	    printf "%b: %b " "${CL}" "$(basename "${t}")"
+	    cd "$test_dir" && run_tests "${IRAFBIN}${CL}" "${t}"
 	    rm -rf "${test_dir}"
 	done
     else
@@ -265,7 +265,7 @@ for CL in $IRAF_SHELLS ; do
 done
 
 if [ -s "$summary_file" ] ; then
-    printf "Test summary:$(sort $summary_file | uniq -c | sed ':a;N;$!ba;s/\n */, /g')\n"
+    printf "Test summary: %s\\n" "$(sort "$summary_file" | uniq -c | sed ':a;N;$!ba;s/\\n */, /g')"
 fi
 
 if [ -s "$failure_file" ] ; then
