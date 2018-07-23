@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  CONFIGURE -- Bootstrap the dynamic external package system by downloading
 #  the repository manifest and creating a workable Makefile to be used for
@@ -8,14 +8,14 @@
 
 
 clean=1
-irafdir=`pwd`/../util
+irafdir=$(pwd)/../util
 
 
 # Process cmdline flags.
 while [ -n "$1" ]; do
    case "$1" in
    "-noclean")                      # clean all package sources
-      set clean = 0
+      clean=0
       ;;
    *)
       break
@@ -27,12 +27,12 @@ done
 
 
 
-/bin/echo "Initializing repository data ...."
-$irafdir/pkginit				# init repository information
+echo "Initializing repository data ...."
+"$irafdir/pkginit"				# init repository information
 
 
 # Create the template Makefile.
-/bin/echo "Creating system makefile ...."
+echo "Creating system makefile ...."
 cat << MAKE_TEMP_END		> Makefile
 #
 #  Makefile for IRAF external package installation/maintenance.
@@ -83,7 +83,6 @@ self_update::
 config_update::
 	@../util/pkgupdate -config
 
-
 MAKE_TEMP_END
 
 echo "Setup Complete."
@@ -91,52 +90,54 @@ echo "Setup Complete."
 
 
 # For each package we have, append a makefile entry.
-files=`cat .repo_pkgs`
-for p in ${files[@]}; do
+files=$(cat .repo_pkgs)
+for p in ${files}; do
 
    # Create template makefile entries for each package
-   /bin/echo "${p}::"						>> Makefile
-   /bin/echo "	@../util/pkginst $p"				>> Makefile
-   /bin/echo "clean_${p}::"					>> Makefile
-   /bin/echo "	@../util/pkgclean $p"				>> Makefile
-   /bin/echo "update_${p}::"					>> Makefile
-   /bin/echo "	@../util/pkgupdate $p"				>> Makefile
-   /bin/echo ""							>> Makefile
+   cat >> Makefile <<EOF
+
+${p}::
+	@../util/pkginst $p
+clean_${p}::
+	@../util/pkgclean $p
+update_${p}::
+	@../util/pkgupdate $p
+EOF
 
    # Create the directory
    if [ -e "$p" ]; then
-	if (( $clean==1 )); then
-	    /bin/rm -rf $p
+	if [ "$clean" = 1 ]; then
+	    /bin/rm -rf "$p"
 	fi
    else
-       mkdir $p
+       mkdir "$p"
    fi
 done
 
-if (( $clean==0 )); then
+if [ "$clean" = 0 ]; then
     exit 0
 fi
 
 
-/bin/echo ""
-/bin/echo ""
-/bin/echo "    To install packages, use 'ls' to list the currently available"
-/bin/echo "    packages from the IRAF repository.  For each package you wish"
-/bin/echo "    to install, use the command:"
-/bin/echo ""
-/bin/echo "      make <pkg>"
-/bin/echo ""
-/bin/echo "    The package will be loaded dynamically the next time you start"
-/bin/echo "    the CL session."
-/bin/echo ""
-/bin/echo "    Use the commmands:"
-/bin/echo ""
-/bin/echo "      make update	# to update pkgs to the latest repository version"
-/bin/echo "      make check	# to list available updates"
-/bin/echo "      make clean	# to delete installed all packages"
-/bin/echo "      make init    	# restore to pre-configure state"
-/bin/echo "      make <pkg>	# to force a re-install of named <pkg>"
-/bin/echo ""
-/bin/echo ""
+cat <<EOF
+
+    To install packages, use 'ls' to list the currently available
+    packages from the IRAF repository.  For each package you wish
+    to install, use the command:
+
+      make <pkg>
+
+    The package will be loaded dynamically the next time you start
+    the CL session.
+
+    Use the commmands:
+
+      make update	# to update pkgs to the latest repository version
+      make check	# to list available updates
+      make clean	# to delete installed all packages
+      make init    	# restore to pre-configure state
+      make <pkg>	# to force a re-install of named <pkg>
+
+EOF
 
 exit 0

@@ -11,12 +11,12 @@
 
 # MACHDEP definitions which may be reset below.
 LS() {
-    /bin/ls 					# [MACHDEP]
+    ls 					# [MACHDEP]
 } ; export LS
 
 
 export IRAF_VERSION="V2.16"
-export V=`/bin/echo $IRAF_VERSION | cut -c2-5`
+export V=$(printf "%s" $IRAF_VERSION | cut -c2-5)
 
 export hilite=1
 
@@ -26,19 +26,19 @@ export hilite=1
 ##############################################################################
 
 ECHO() {
-    if [ "$1" == "-n" ]; then
-        /bin/echo -n "$2"
+    if [ "$1" = "-n" ]; then
+        printf "%s" "$2"
     else
-        /bin/echo "$1"
+        printf "%s\\n" "$1"
     fi
 } ; export ECHO
 
 RM() {
-    rm -rf $1
+    rm -rf "$1"
 } ; export RM
 
 LN() {
-    ln -s $2 $1
+    ln -s "$2" "$1"
 } ; export LN
 
 BOLD_ON() {
@@ -73,7 +73,7 @@ NEWLINE() {
 
 
 PUT() {
-    cp -p $1 $2
+    cp -p "$1" "$2"
 } ; export PUT
 
 PROMPT() {
@@ -109,7 +109,7 @@ WARNING() {
     BOLD_ON;
     ECHO -n "WARNING: ";
     BOLD_OFF;
-    ECHO $1
+    ECHO "$1"
 } ; export WARNING
 
 

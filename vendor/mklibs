@@ -1,16 +1,16 @@
 #!/bin/sh
 
-top=`cd ..; pwd`
+top=$(cd .. && pwd)
 
 export CC=gcc
 export CXX=g++
 
 build_cfitsio=1
-build_readline=1 # not needed in v2.16.1 and beyond
+build_readline=1
 build_libvotable=1
 
 echo "Building support libraries ...."
-echo "  (Using toplevel directory '"$top"' ....)"
+echo "  (Using toplevel directory $top ....)"
 
 # Global options.
 gopts="--prefix=$top --exec-prefix=$top"
@@ -25,14 +25,10 @@ gopts="--prefix=$top --exec-prefix=$top"
 ####################################################################
 if [ $build_cfitsio = 1 ] ; then
 
-    echo -n "    Building CFITSIO libs ...."
+    printf "    Building CFITSIO libs ...."
     opts="$gopts --bindir=$top/bin --libdir=$top/bin"
-    (cd cfitsio ;  \
-     ./configure $opts; \
-     make clean 	     ; \
-     make 	     ; \
-     make install     ; \
-     make distclean        ) | tee -a _spool 2>&1
+    (cd cfitsio	&& ./configure $opts && \
+     make clean all install distclean ) 2>&1 | tee -a _spool
     echo "done"
 
 fi
@@ -44,9 +40,9 @@ fi
 ####################################################################
 if [ $build_readline = 1 ] ; then
 
-    echo -n "    Building Readline libs ...."
+    printf "    Building Readline libs ...."
     opts="$gopts  --disable-shared --bindir=../../bin --libdir=../../bin"
-    (cd readline ; mkpkg ) | tee -a _spool 2>&1
+    (cd readline && mkpkg ) 2>&1 | tee -a _spool
     echo "done"
 
 fi
@@ -58,11 +54,8 @@ fi
 ####################################################################
 if [ $build_libvotable = 1 ] ; then
 
-    echo -n "    Building VOTABLE lib ...."
-
-    (cd libvotable ; \
-     make all				; \
-     make clean				) | tee -a _spool 2>&1
+    printf "    Building VOTABLE lib ...."
+    (cd libvotable && make all clean ) 2>&1 | tee -a _spool
     echo "done"
 
 fi

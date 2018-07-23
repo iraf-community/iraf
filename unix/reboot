@@ -11,16 +11,16 @@
 # .login file (which is automatic if the reboot is performed using the iraf
 # account).
 
-source hlib/irafuser.sh
+. hlib/irafuser.sh
 
-/bin/echo "iraf     = $iraf"
-/bin/echo "mach     = $MACH"
-/bin/echo "HSI_CF   = $HSI_CF"
-/bin/echo "HSI_LIBS = $HSI_LIBS"
+echo "iraf     = $iraf"
+echo "mach     = $MACH"
+echo "HSI_CF   = $HSI_CF"
+echo "HSI_LIBS = $HSI_LIBS"
 
-if [ "`echo $HSI_CF | grep NOVOS`" != "" ]; then
+if [ "$(echo "$HSI_CF" | grep NOVOS)" != "" ]; then
     echo "HSI is being built NOVOS, should be rebuilt once VOS is compiled"
 fi
 
-/bin/echo "---------------------- REBOOT -----------------------"
+echo "---------------------- REBOOT -----------------------"
 sh -x mkpkg.sh
