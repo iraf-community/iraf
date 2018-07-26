@@ -1,28 +1,29 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  MKARCH - Return platform architecture.  Assumes source-only tree and
 #  that it's safe to just manually change links.
 
+set -e
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source unix/hlib/setup.sh
+    . unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
 
-aarch=`unix/hlib/irafarch.sh -actual`
+aarch=$(unix/hlib/irafarch.sh -actual)
 
 if [ -e "$iraf/unix/bin.$aarch/mkpkg.e" ]; then
     # Assume we've got a system with binaries and can use MKPKG.
     use_mkpkg=1
 else
-    if [ -n "$IRAFARCH" -a -e "$iraf/unix/bin.$IRAFARCH/mkpkg.e" ]; then
+    if [ -n "$IRAFARCH" ] && [ -e "$iraf/unix/bin.$IRAFARCH/mkpkg.e" ]; then
         use_mkpkg=1
     else
         # Change the links manually, but strip all binaries first.
@@ -32,53 +33,49 @@ fi
 
 
 # Parse the arguments.
-loop_="yes"
-while [ "$loop_" == "yes" ]; do
-    /bin/echo "Making architecture: "$arch
+if [ "$*" ]; then
+    archs="$*"
+else
+    archs=$aarch
+fi
 
-  if [ "$#" -gt 0 ]; then
-    arch=$1
+echo "Archs='$archs'"
+
+for arch in $archs; do
+    echo "Making architecture: $arch"
+
     nbits=$(IRAFARCH=$arch $iraf/unix/hlib/irafarch.sh -nbits)
     endian=$(IRAFARCH=$arch $iraf/unix/hlib/irafarch.sh -endian)
 
-    if (( "$use_mkpkg"==1 )); then
-        mkpkg $arch
-        cd noao; mkpkg -p noao $arch; cd ../
+    if [ "$use_mkpkg" = 1 ]; then
+        mkpkg "$arch"
+        (cd noao && mkpkg -p noao "$arch")
     else
-	$iraf/util/mkclean
-        /bin/rm -rf bin noao/bin unix/bin unix/as
+	"$iraf/util/mkclean"
 
-        mkdir -p bin.$arch noao/bin.$arch unix/bin.$arch
-        ln -s bin.$arch bin
-        cd noao; ln -s bin.$arch bin; cd ../
-        cd unix; ln -s bin.$arch bin; cd ../
-        cd unix; ln -s as.$arch as; cd ../
+        mkdir -p "bin.$arch" "noao/bin.$arch" "unix/bin.$arch"
+        ln -sf "bin.$arch" bin
+        (cd noao && ln -sf "bin.$arch" bin)
+        (cd unix && ln -sf "bin.$arch" bin)
+        (cd unix && ln -sf "as.$arch" as)
     fi
 
     if [ "$nbits" = "64" ]; then
-        cd unix/hlib; \
-	     rm -f iraf.h mach.h; \
-	     ln -s iraf64.h iraf.h; \
-	     ln -s mach64.h mach.h; cd $iraf
+        (cd unix/hlib && \
+	     ln -sf iraf64.h iraf.h && \
+	     ln -sf mach64.h mach.h )
     else
-        cd unix/hlib; \
-	     rm -f iraf.h mach.h; \
-	     ln -s iraf32.h iraf.h; \
-	     ln -s mach32.h mach.h; cd $iraf
+        (cd unix/hlib && \
+	     ln -sf iraf32.h iraf.h && \
+	     ln -sf mach32.h mach.h)
     fi
     if [ "$endian" = "big" ]; then
-        ( cd unix/hlib; ln -sf swapbe.h swap.h )
+        ( cd unix/hlib && ln -sf swapbe.h swap.h )
     else
-        ( cd unix/hlib; ln -sf swaple.h swap.h )
+        ( cd unix/hlib && ln -sf swaple.h swap.h )
     fi
-    loop_="no"
-
-  else
-    arch=$aarch
-    loop_="yes"
-  fi
 done
 
 if [ -e "$HOME/.iraf/arch" ]; then
-    echo $arch > $HOME/.iraf/arch
+    echo "$arch" > "$HOME/.iraf/arch"
 fi

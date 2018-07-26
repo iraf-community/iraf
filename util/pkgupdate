@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  PKGUPDATE - Update the named packages
 
@@ -7,7 +7,7 @@ pkg=""
 all=no
 list_only=no
 
-if (( $#<1 )); then
+if [ $# -lt 1 ]; then
     exit 0
 else
     # Process cmdline flags.
@@ -30,92 +30,87 @@ else
 fi
 
 
-bindir="`dirname $0`"                # get iraf root directory 
+bindir=$(dirname "$0")                # get iraf root directory 
 irafdir=${bindir%/*}
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source ../unix/hlib/setup.sh
+    . ../unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
 
-REPO=`${irafdir}/util/pkgrepo`
-if [ -n "$IRAFARCH" ]; then
-    arch=$IRAFARCH
-else
-    arch=`${irafdir}/unix/hlib/irafarch.sh -actual`
-fi
+REPO=$("${irafdir}/util/pkgrepo")
 
-/bin/echo "Updating repository data ...."
+echo "Updating repository data ...."
 ../util/pkginit                                # init repository information
 
 # Check for a self-update.
-if [ "$pkg" == "-self" ]; then
-    /bin/echo "Updating utility scripts ...."
-    /bin/rm -f /tmp/util.tgz
-    ../util/pkgget ${REPO}/util-universal.tar.gz /tmp/util.tgz
-    (cd ../util; tar zxf /tmp/util.tgz; /bin/rm -f /tmp/util.tgz)
-    /bin/echo "Done"
+if [ "$pkg" = "-self" ]; then
+    echo "Updating utility scripts ...."
+    rm -f /tmp/util.tgz
+    ../util/pkgget "${REPO}/util-universal.tar.gz" /tmp/util.tgz
+    (cd ../util && tar zxf /tmp/util.tgz && rm -f /tmp/util.tgz)
+    echo "Done"
     exit 0
 fi
  
 # Check for a extern update.
-if [ "$pkg" == "-config" ]; then
-    /bin/echo "Updating config script ...."
-    ../util/pkgget ${REPO}/config-universal configure
+if [ "$pkg" = "-config" ]; then
+    echo "Updating config script ...."
+    "../util/pkgget ${REPO}/config-universal" configure
     chmod 777 configure
-    /bin/echo "Done"
+    echo "Done"
     exit 0
 fi
  
 
 
 # Process the requested package and any dependencies.
-pkgs=`cat .repo_pkgs`
-for ip in ${pkgs[@]}; do 
+pkgs=$(cat .repo_pkgs)
+for ip in $pkgs; do 
 
-  if [ -e $ip/.installed ]; then
+  if [ -e "$ip/.installed" ]; then
 
-     pd=`grep $ip $ip/.installed | awk '{printf("%s\n", $1)}'`
-     rd=`grep $ip .repo_manifest | head -1 | awk '{printf("%s\n", $3)}'`
+     pd=$(grep "$ip" "$ip/.installed" | awk '{printf("%s\n", $1)}')
+     rd=$(grep "$ip" .repo_manifest | head -1 | awk '{printf("%s\n", $3)}')
 
-     alist=`(cd $ip; ls -1 .inst*.* | sed -e "s/\.installed\.//g")`
+     alist=$(cd "$ip" && ls -1 .inst*.* | sed -e "s/\.installed\.//g")
 
-     if (( $rd>$pd )); then
+     if [ "$rd" -gt "$pd" ]; then
 
        # Update each installed architecture automatically.
-       for a in ${alist[@]}; do
+       for a in $alist; do
 
-	 if [ "$list_only" == "yes" ]; then
-            printf "Package %-12s for %-8s is out of date ....\n" $ip $a
+	 if [ "$list_only" = "yes" ]; then
+            printf "Package %-12s for %-8s is out of date ....\n" "$ip" "$a"
 	 else
-	    if [ "$all" == "yes" -o "$ip" == "$pkg" ]; then
-              /bin/echo "Updating package '$ip' for '$a' ...."
-              ../util/pkginst $ip
+	    if [ "$all" = "yes" ] || [ "$ip" = "$pkg" ]; then
+              echo "Updating package '$ip' for '$a' ...."
+              ../util/pkginst "$ip"
 	    fi
 	 fi
        done
 
      else
-	if [ "$list_only" == "yes" ]; then
-           printf "Package %-12s is current ....\n" $ip
-	elif (( $rd<=$pd )); then
-           printf "Package %-12s is current ....\n" $ip
+	if [ "$list_only" = "yes" ]; then
+           printf "Package %-12s is current ....\n" "$ip"
+	elif [ "$rd" -le "$pd" ]; then
+           printf "Package %-12s is current ....\n" "$ip"
 	fi
      fi
 
   else
-     printf "Package %-12s is not installed ....\n" $ip
+     printf "Package %-12s is not installed ....\n" "$ip"
   fi
 
-  ${irafdir}/util/pkgenv -init
+  "${irafdir}/util/pkgenv" -init
 done
 
-/bin/echo "Done"
+echo "Done"
 exit 0

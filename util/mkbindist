@@ -1,32 +1,29 @@
-#!/bin/bash
-
-
-export 	PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/5bin:/usr/ucb:/etc:/usr/etc:$PATH:/usr/local/bin:/opt/local/bin:/local/bin:/home/local/bin
+#!/bin/sh
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source unix/hlib/setup.sh
+    . unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
 
 # Utility aliases.
-source $iraf/unix/hlib/util.sh
+. "$iraf/unix/hlib/util.sh"
 
 if [ ! -n "$iraf" ]; then
-    /bin/echo ""
-    /bin/echo "Error:  You must have the iraf env variable defined !"
-    /bin/echo ""
+    echo
+    echo "Error:  You must have the iraf env variable defined !"
+    echo
     exit 1
 fi
 
 exec=yes
-arch=`$iraf/unix/hlib/irafarch.sh -actual`
+arch=$("$iraf/unix/hlib/irafarch.sh" -actual)
 
 
 #=============================================================================
@@ -55,21 +52,21 @@ done
 # Determine platform architecture.
 #----------------------------------
 
-mach=`$iraf/unix/hlib/irafarch.sh -actual`
-hmach=`$iraf/unix/hlib/irafarch.sh -actual`
+mach=$("$iraf/unix/hlib/irafarch.sh" -actual)
+hmach=$("$iraf/unix/hlib/irafarch.sh" -actual)
 
-/bin/echo "mach = " $mach
-/bin/echo "hmach = " $hmach
+echo "mach = $mach"
+echo "hmach = $hmach"
 
 make generic
 
-/bin/echo -n "Making $arch binary distribution ...."
+echo "Making $arch binary distribution ...."
   make generic
-  if [ $exec == "yes" ]; then
-    tar czf ../${arch}-bin.tar.gz bin.$arch */bin.$arch extern/*/bin.$arch
+  if [ "$exec" = "yes" ]; then
+    tar czf "../${arch}-bin.tar.gz" "bin.$arch" "*/bin.$arch" "extern/*/bin.$arch"
   else
-    /bin/echo "tar czf ../${arch}-bin.tar.gz bin.$arch */bin.$arch extern/*/bin.$arch"
+    echo "tar czf ../${arch}-bin.tar.gz bin.$arch */bin.$arch extern/*/bin.$arch"
   fi
-/bin/echo "		Done"
+echo "		Done"
 
 exit 0

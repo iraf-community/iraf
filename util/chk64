@@ -1,17 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
-find . -type f -name \*.x -exec egrep -H SZ_REAL {} \; >& _real
-find . -type f -name \*.h -exec egrep -H SZ_REAL {} \; >& _realh
+find . -type f -name \*.x -exec grep -E -H SZ_REAL {} \; > _real 2>&1
+find . -type f -name \*.h -exec grep -E -H SZ_REAL {} \; > _realh 2>&1
 
-find . -type f -name \*.h -exec egrep -H SZ_INT {} \; >& _inth
-find . -type f -name \*.x -exec egrep -H SZ_INT {} \; >& _int
+find . -type f -name \*.h -exec grep -E -H SZ_INT {} \; > _inth 2>&1
+find . -type f -name \*.x -exec grep -E -H SZ_INT {} \; > _int 2>&1
 
-find . -type f -name \*.x -exec egrep -H SZ_STRUCT {} \; >& _sz
-find . -type f -name \*.h -exec egrep -H SZ_STRUCT {} \; >& _szh
+find . -type f -name \*.x -exec grep -E -H SZ_STRUCT {} \; > _sz 2>&1
+find . -type f -name \*.h -exec grep -E -H SZ_STRUCT {} \; > _szh 2>&1
 
-find . -type f -name \*.x -exec egrep -H mii_ {} \; >& _mii
-find . -type f -name \*.gx -exec egrep -H SZ_PIXEL {} \; >& _szpix
+find . -type f -name \*.x -exec grep -E -H mii_ {} \; > _mii 2>&1
+find . -type f -name \*.gx -exec grep -E -H SZ_PIXEL {} \; > _szpix 2>&1
 
-find . -type f -name \*.x -exec egrep -H sizeof {} \;   | \
-	egrep -v -e ":int"  >& _sizeof
-find . -type f -name \*.x -exec egrep -H szdtype {} \; >& _szdtype
+find . -type f -name \*.x -exec grep -E -H sizeof {} \;   | \
+	grep -v -E -e ":int" > _sizeof 2>&1
+find . -type f -name \*.x -exec grep -E -H szdtype {} \; > _szdtype 2>&1

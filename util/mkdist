@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
-bins=("cygwin" "freebsd" "linux" "linux64" "macintel" "macosx" "sunos")
-for i in ${bins[@]}; do
-    touch bin.$i/IRAF.NET
-    touch noao/bin.$i/IRAF.NET
+bins="cygwin freebsd linux linux64 macintel macosx sunos"
+for i in $bins; do
+    touch "bin.$i/IRAF.NET"
+    touch "noao/bin.$i/IRAF.NET"
 done
 
 touch bin.cygwin/IB.CYGW.x86
