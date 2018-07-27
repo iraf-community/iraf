@@ -1012,57 +1012,6 @@ fi
 
 
 
-
-NEWLINE
-BOLD_ON
-ECHO "                       Checking File Permissions"
-ECHO "                       -------------------------"
-BOLD_OFF
-
-# Set default file permissions for the executable files in the BINDIRS,
-# in case the file mode has somehow been changed, e.g., in a file restore
-# or copy.
-
-ECHO -n "Checking iraf file permissions ...                             "
-
-err_seen=0
-for i in ${MODEFILES}; do
-    file=$i
-    if [ ! -e "$file" ]; then
-        for j in ${BINDIRS}; do
-            if [ -e "$j/$i" ]; then
-                file=$j/$i
-                break
-            fi
-        done
-    fi
-
-    if [ -e "$file" ]; then
-        if [ "$($LS -l $file | grep '^.rw[xs]r.[xs]r.[xt]')" = "" ]; then
-            if [ "$err_seen" = 0 ]; then
-                DO_WARN
-                err_seen=1
-                err_count=$(( err_count+1 ))
-            fi
-            MSG  "Setting $file:t to mode 0755."
-            if [ "$exec" = "yes" ]; then
-                chmod 755 "$file"
-            fi
-        fi
-    else
-        if [ "$err_seen" = 0 ]; then
-            DO_FAIL
-            err_seen=1
-            err_count=$(( err_count+1 ))
-        fi
-        MSG  "File $i not found."
-    fi
-done
-if [ "$err_seen" = 0 ]; then
-    DO_OK
-fi
-
-
     # Create the root imdir as a public scratch directory, if not already
     # created.
     err_seen=0
