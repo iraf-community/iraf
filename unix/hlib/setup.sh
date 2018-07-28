@@ -9,7 +9,10 @@ fi
 if [ -z "$IRAFARCH" ]; then
     export IRAFARCH=$("$iraf/unix/hlib/irafarch.sh" -actual)
 fi
-. $iraf/unix/hlib/irafuser.sh
+
+# Development environment
+# not loaded by default
+#. $iraf/unix/hlib/irafuser.sh
 
 export PATH=$HOME/.iraf/bin:${PATH}
 
