@@ -1,4 +1,8 @@
+#!/bin/sh
 # XYACC -- Yacc parser generator for SPP.
+
+# Exit on error
+set -e
 
 $CC -c $HSI_CF	y[1-4].c
 $CC $HSI_LF	y[1-4].o $HSI_LIBS -o xyacc.e

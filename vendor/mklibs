@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 top=$(cd .. && pwd)
 
 export CC=gcc
@@ -27,7 +29,7 @@ if [ $build_cfitsio = 1 ] ; then
     printf "    Building CFITSIO libs ...."
     opts="$gopts --bindir=$top/bin --libdir=$top/bin"
     (cd cfitsio	&& ./configure $opts && \
-     make clean all install distclean ) 2>&1 | tee -a _spool
+     make clean all install distclean )
     echo "done"
 
 fi
@@ -40,7 +42,7 @@ fi
 if [ $build_libvotable = 1 ] ; then
 
     printf "    Building VOTABLE lib ...."
-    (cd libvotable && make all clean ) 2>&1 | tee -a _spool
+    (cd libvotable && make all clean )
     echo "done"
 
 fi

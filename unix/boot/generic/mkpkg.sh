@@ -3,6 +3,9 @@
 # the enternal dependency.  The filename lex.yy.c is changed to lexyy.c
 # for portability reasons.
 
+# Exit on error
+set -e
+
 #if [ ! -f lexyy.c -o tok.l -nt lexyy.c ] ; then
     lex -o lexyy.c tok.l
 #fi

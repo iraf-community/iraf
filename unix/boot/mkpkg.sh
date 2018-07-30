@@ -1,5 +1,9 @@
+#!/bin/sh
 # Bootstrap the bootstrap utilities.  The logical directory hlib$ should be
 # defined for the cshell when this is run.
+
+# Exit on error
+set -e
 
 echo "----------------------- BOOTLIB ------------------------"
 (cd bootlib; sh -x mkpkg.sh)

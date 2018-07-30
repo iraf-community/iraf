@@ -1,4 +1,8 @@
+#!/bin/sh
 # Make the Subset Preprocessor language (SPP) compiler.
+
+# Exit on error
+set -e
 
 echo "----------------------- XC  ----------------------------"
 $CC -c $HSI_CF	xc.c

@@ -1,4 +1,8 @@
+#!/bin/sh
 # Make the SGI translators and install them in hlib.
+
+# Exit on error
+set -e
 
 $CC -c $HSI_CF	sgiUtil.c
 

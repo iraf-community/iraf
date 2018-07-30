@@ -62,6 +62,8 @@ EOF
 cat <<EOF >cfitsio/mklibs
 #!/bin/sh
 
+set -e
+
 top=\$(pwd)
 
 export CC=gcc
@@ -77,9 +79,9 @@ echo "  (Using toplevel directory \$top ....)"
 # Global options.
 gopts="--prefix=\$top --exec-prefix=\$top --disable-shared"
 
-./configure \$gopts  			       | tee _spool 2>&1
-make clean 				       | tee -a _spool 2>&1
-make 					       | tee -a _spool 2>&1
+./configure \$gopts
+make clean
+make
 
 cp   libcfitsio.a ../voclient/lib
 mv   libcfitsio.a ../../lib

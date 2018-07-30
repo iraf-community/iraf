@@ -1,4 +1,8 @@
+#!/bin/sh
 # Make the second pass (RPP) of the SPP language compiler.
+
+# Exit on error
+set -e
 
 echo "----------------------- RPPFOR -------------------------"
 (cd rppfor;	sh -x mkpkg.sh)

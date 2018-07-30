@@ -1,4 +1,8 @@
+#!/bin/sh
 # Utility library subroutines for RPP.
+
+# Exit on error
+set -e
 
 $F77 -c $HSI_FF	addset.f addstr.f amatch.f catsub.f clower.f concat.f
 $F77 -c $HSI_FF	ctoc.f ctoi.f ctomn.f cupper.f delete.f docant.f dodash.f
