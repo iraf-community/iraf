@@ -1,25 +1,27 @@
-#!/bin/bash
+#!/bin/sh
 #
+
+set -e
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source unix/hlib/setup.sh
+    . unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
 
-cd $iraf/				# build core system
+cd "$iraf/"				# build core system
 mkpkg -x
 
-cd $iraf/noao				# build NOAO package
-export noao=$`pwd`/
+cd "$iraf/noao"				# build NOAO package
+export noao=$(pwd)/
 mkpkg -x -p noao
 
-cd $iraf/vo				# build VO package
-export vo=`pwd`/
+cd "$iraf/vo"				# build VO package
+export vo=$(pwd)/
 mkpkg -x -p vo

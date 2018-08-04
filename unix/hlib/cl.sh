@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # CL.SH -- Startup the version of the CL executable compiled for the
 # architecture or floating point hardware appropriate for the current
@@ -24,14 +24,14 @@ case "$nm" in
         cl_binary="vocl.e"
         ;;
     *)
-	if (( $# > 1 )); then
-	    if [ $1 == "-old" -o $1 == "-o" ]; then
+	if [ $# -gt 1 ]; then
+	    if [ "$1" = "-old" ] || [ "$1" = "-o" ]; then
         	cl_binary="cl.e"
-	    elif [ $1 == "-ecl" -o $1 == "-e" ]; then
+	    elif [ "$1" = "-ecl" ] || [ "$1" = "-e" ]; then
         	cl_binary="ecl.e"
-	    elif [ $1 == "-vo" ]; then
+	    elif [ "$1" = "-vo" ]; then
         	cl_binary="vocl.e"
-	    elif [ ${1##*.} == "c" ]; then
+	    elif [ "${1##*.}" = "c" ]; then
 		# Workaround for autoconf scripts attempting to use this 
 		# command as a valid compiler option.  On some systems (mostly
 		# Debian) a valid CC command can't be found and eventually 
@@ -45,19 +45,19 @@ esac
 
 # Determine IRAF root directory (value set in install script).
 d_iraf="/iraf/iraf/"
-if [ -n $iraf ]; then
-    if [ ! -e $iraf ]; then
+if [ -n "$iraf" ]; then
+    if [ ! -e "$iraf" ]; then
         echo "Warning: iraf=$iraf does not exist (check .cshrc or .login)"
         echo "Session will default to iraf=$d_iraf"
         unset iraf ; sleep 3
     fi
 fi
-if [ -z $iraf ]; then
+if [ -z "$iraf" ]; then
     export iraf="$d_iraf"
 fi
 
 # Check for a version query.
-if [ $# > 1 ]; then
+if [ $# -gt 1 ]; then
     case "$1" in
 	"-v" | "-V" | "-version" | "--version")
             head -1 $iraf/unix/hlib/motd
@@ -71,13 +71,13 @@ fi
 
 # Determine platform architecture.
 if [ -e $iraf/unix/hlib/irafarch.sh ]; then
-    ACTUAL_ARCH=`$iraf/unix/hlib/irafarch.sh -actual`
+    ACTUAL_ARCH=$($iraf/unix/hlib/irafarch.sh -actual)
 else
     ACTUAL_ARCH=$IRAFARCH
 fi
 
 if [ -n "$IRAFARCH" ]; then
-    if [ -e $iraf/bin.${IRAFARCH}/${cl_binary} ]; then
+    if [ -e "$iraf/bin.${IRAFARCH}/${cl_binary}" ]; then
 	MACH=$IRAFARCH
     else
         echo "ERROR:  No $iraf/bin.${IRAFARCH}/${cl_binary} binary found."
@@ -89,38 +89,38 @@ if [ -n "$IRAFARCH" ]; then
     export arch=".$MACH"
 
 else
-    os_mach=`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
+    os_mach=$(uname -s | tr '[:upper:]' '[:lower:]' | cut -c1-6)
  
     if [ -e $iraf/unix/hlib/irafarch.csh ]; then
-        MACH=`$iraf/unix/hlib/irafarch.csh`
+        MACH=$($iraf/unix/hlib/irafarch.csh)
     else
         MACH=$os_mach
     fi
 
-    if [ "$os_mach" == "linux" ]; then		# handle linux systems
-        if [ `uname -m` == "x86_64" ]; then
+    if [ "$os_mach" = "linux" ]; then		# handle linux systems
+        if [ "$(uname -m)" = "x86_64" ]; then
             export mach="linux64"
         else
             export mach="linux"
         fi
-    elif [ "$os_mach" == "darwin" ]; then	# handle Mac systems
-        if [ "`uname -m`" == "x86_64" ]; then
+    elif [ "$os_mach" = "darwin" ]; then	# handle Mac systems
+        if [ "$(uname -m)" = "x86_64" ]; then
             export mach="macintel"
         else
             export mach="macosx"
         fi
-    elif [ "$os_mach" == "cygwin" ]; then
+    elif [ "$os_mach" = "cygwin" ]; then
         export mach="cygwin"
     else
-        mach=`uname -s | tr '[A-Z]' '[a-z]'`
+        mach=$(uname -s | tr '[:upper:]' '[:lower:]')
     fi
 
     export arch=".$MACH"
-    if [ -z $IRAFARCH ]; then
+    if [ -z "$IRAFARCH" ]; then
         export IRAFARCH="$MACH"
     fi
 
-    if [ ! -e $iraf/bin.${MACH}/${cl_binary} ]; then
+    if [ ! -e "$iraf/bin.${MACH}/${cl_binary}" ]; then
         echo "ERROR:  No $iraf/bin.${IRAFARCH}/${cl_binary} binary found."
 	exit 1
     fi
@@ -129,16 +129,16 @@ fi
 
 # Just run the CL if IRAFARCH already defined.
 if [ -n "$IRAFARCH" ]; then
-    if [ -z $IRAFARCH ]; then
+    if [ -z "$IRAFARCH" ]; then
 	export arch=""
     else
 	export arch=".$IRAFARCH"
     fi
 
-    export IRAFBIN=${iraf}bin$arch/
+    export IRAFBIN="${iraf}bin$arch/"
     file=${IRAFBIN}$cl_binary
-    if [ -e $file ]; then
-	exec $file
+    if [ -e "$file" ]; then
+	exec "$file"
     else
 	echo "$file not found"
     fi
@@ -151,4 +151,4 @@ export arch=.$IRAFARCH
 export IRAFBIN=${iraf}bin$arch/
 
 # Run the desired CL.
-exec  ${IRAFBIN}$cl_binary
+exec  "${IRAFBIN}$cl_binary"

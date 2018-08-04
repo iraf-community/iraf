@@ -121,67 +121,67 @@ srcarc:
 arch:
 showfloat:				# show current float option
 	$verbose off
-	!$(hlib)/mkfloat.csh
+	!$(hlib)/mkfloat.sh
 	;
 generic:				# make architecture indep. (no bins)
 	$verbose off
-	!$(hlib)/mkfloat.csh generic
+	!$(hlib)/mkfloat.sh generic
 	!(cd ./unix; setenv MACH generic; sh setarch.sh)
 	;
 
 cygwin:					# install WinXP/Cygwin binaries
         $verbose off
-        !$(hlib)/mkfloat.csh cygwin
+        !$(hlib)/mkfloat.sh cygwin
         !(cd ./unix; setenv MACH cygwin; sh setarch.sh)
         ;
 freebsd:				# install freebsd binaries
         $verbose off
-        !$(hlib)/mkfloat.csh freebsd
+        !$(hlib)/mkfloat.sh freebsd
         !(cd ./unix; setenv MACH freebsd; sh setarch.sh)
         ;
         ;
 linux:					# install linux (32-bit) binaries
         $verbose off
-        !$(hlib)/mkfloat.csh linux
+        !$(hlib)/mkfloat.sh linux
         !(cd ./unix; setenv MACH linux; sh setarch.sh)
         ;
 linux64:				# install linux (64-bit) binaries
         $verbose off
-        !$(hlib)/mkfloat.csh linux64
+        !$(hlib)/mkfloat.sh linux64
         !(cd ./unix; setenv MACH linux64; sh setarch.sh)
         ;
 macintel:				# install MacOS X (x86_64) binaries
         $verbose off
-        !$(hlib)/mkfloat.csh macintel
+        !$(hlib)/mkfloat.sh macintel
         !(cd ./unix; setenv MACH macintel; sh setarch.sh)
         ;
 macosx:					# install MacOS X (Unix 32-bit) binaries
         $verbose off
-        !$(hlib)/mkfloat.csh macosx
+        !$(hlib)/mkfloat.sh macosx
         !(cd ./unix; setenv MACH macosx; sh setarch.sh)
         ;
 ipad:					# install Mac iPad binaries
         $verbose off
-        !$(hlib)/mkfloat.csh ipad
+        !$(hlib)/mkfloat.sh ipad
         !(cd ./unix; setenv MACH ipad; sh setarch.sh)
         ;
 redhat:					# install redhat binaries
         $verbose off
-        !$(hlib)/mkfloat.csh redhat
+        !$(hlib)/mkfloat.sh redhat
         !(cd ./unix; setenv MACH redhat; sh setarch.sh)
         ;
 sparc:					# install sparc binaries
 	$verbose off
-	!$(hlib)/mkfloat.csh sparc
+	!$(hlib)/mkfloat.sh sparc
 	!(cd ./unix; setenv MACH sparc; sh setarch.sh)
 	;
 sunos:					# install sunos binaries
         $verbose off
-        !$(hlib)/mkfloat.csh sunos
+        !$(hlib)/mkfloat.sh sunos
         !(cd ./unix; setenv MACH sunos; sh setarch.sh)
         ;
 ssun:					# install ssun binaries
 	$verbose off
-	!$(hlib)/mkfloat.csh ssun
+	!$(hlib)/mkfloat.sh ssun
 	!(cd ./unix; setenv MACH ssol; sh setarch.sh)
 	;

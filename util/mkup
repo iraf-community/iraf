@@ -1,41 +1,43 @@
-#!/bin/bash
+#!/bin/sh
 #
+
+set -e
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source unix/hlib/setup.sh
+    . unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
-source $iraf/unix/hlib/irafuser.sh
+. $iraf/unix/hlib/irafuser.sh
 
 # Reconfigure the system for the proper architecture if needed.
 if [ -n "$IRAFARCH" ]; then		# use environment value
-    make $IRAFARCH
+    make "$IRAFARCH"
 else					# use actual value
-    arch=`$iraf/unix/hlib/irafarch.sh -actual`
-    cfgarch=`mkpkg arch | sed -e "s/system is configured for //g"`
-    if [ $cfgarch != $arch ]; then
+    arch=$("$iraf/unix/hlib/irafarch.sh" -actual)
+    cfgarch=$(mkpkg arch | sed -e "s/system is configured for //g")
+    if [ "$cfgarch" != "$arch" ]; then
 	#make $arch
-	/bin/echo "Warning: current arch="$cfgarch" but system arch="$arch
+	echo "Warning: current arch=$cfgarch but system arch=$arch"
 	export IRAFARCH=$arch
     fi
 fi
 
-cd $iraf/				# build core system
+cd "$iraf/"				# build core system
 mkpkg
 mkpkg update
 
-cd $iraf/noao				# build NOAO package
-export noao=`pwd`/
+cd "$iraf/noao"				# build NOAO package
+export noao=$(pwd)/
 mkpkg -p noao
 
-cd $iraf/vo				# build VO package
-export vo=`pwd`/
+cd "$iraf/vo"				# build VO package
+export vo=$(pwd)/
 cd votools				# build VOTOOLS package
 mkpkg -p vo update

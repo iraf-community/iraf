@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Allow a previously defined $iraf to be used.
 if [ -z "$iraf" ]; then
@@ -7,9 +7,12 @@ fi
 
 # Allow a previously defined $IRAFARCH to be used.
 if [ -z "$IRAFARCH" ]; then
-    export IRAFARCH=`$iraf/unix/hlib/irafarch.sh -actual`
+    export IRAFARCH=$("$iraf/unix/hlib/irafarch.sh" -actual)
 fi
-source $iraf/unix/hlib/irafuser.sh
+
+# Development environment
+# not loaded by default
+#. $iraf/unix/hlib/irafuser.sh
 
 export PATH=$HOME/.iraf/bin:${PATH}
 

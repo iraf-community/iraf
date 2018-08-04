@@ -7,10 +7,8 @@ directories.
 Contents include:
 
     README		This file
-    chk64		Check subdirectories for 64-bit issues
     mkarch		Reconfigure the system for given architecture
     mkclean		Clean the current architecture of binaries
-    mkdist		Create a distribution file (NYI)
     mkproto		Create system prototype files
     mksrc		Clean the system of all binaries
     mksysgen		Build from a clean system source

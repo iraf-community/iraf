@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  MKIRAF -- Setup the IRAF environment for a user.  Should be called from the
 #  directory from which the user will thereafter type "cl" to start a session.
@@ -25,7 +25,7 @@ def=0
 defterm="xgterm"
 
 				# Paths edited by the install script.
-iraf="/iraf/iraf/" 		
+iraf="/iraf/iraf/"
 imdir="/iraf/imdir/"
 cachedir="/iraf/cache/"
 
@@ -34,7 +34,7 @@ cachedir="/iraf/cache/"
 
 # The following kludge is for Solaris, which doesn't have whoami.
 if [ "$USER" = "" ]; then
-    USER=`whoami`
+    USER=$(whoami)
 fi
 
 
@@ -43,7 +43,7 @@ for i in "$@"
 do
   case $i in
     -t=*|--term=*)			# Set the default terminal type
-        myterm=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+        myterm=$(echo "$i" | sed 's/[-a-zA-Z0-9]*=//')
     	;;
     -d|--default)			# Create default login dir
         def=1
@@ -60,7 +60,7 @@ do
         quiet=1
     	;;
     *)
-        /bin/echo "Error: unknown option '$i'"
+        echo "Error: unknown option '$i'"
 	exit 1
     	;;
   esac
@@ -69,23 +69,23 @@ done
 
 
 # Protect against running mkiraf in an iraf system directory.
-irafdir=`cd $iraf ; pwd`
-if [ ! "`pwd | grep $irafdir`" = "" ]; then
-    if [ "`pwd | grep iraf/local`" = "" ]; then
-	/bin/echo "Error: current directory is not an iraf user login directory"
+irafdir=$(cd "$iraf" ; pwd)
+if [ ! "$(pwd | grep "$irafdir")" = "" ]; then
+    if [ "$(pwd | grep iraf/local)" = "" ]; then
+	echo "Error: current directory is not an iraf user login directory"
 	exit 1
     fi
 fi
 
-if (( $def == 1 )); then
-    imdir=`echo $HOME`"/.iraf/imdir/"
-    cachedir=`echo $HOME`"/.iraf/cache/"
+if [ "$def" = 1 ]; then
+    imdir="$HOME/.iraf/imdir/"
+    cachedir="$HOME/.iraf/cache/"
     #myterm="xgterm"
-    cd $HOME
+    cd "$HOME"
     if [ ! -e .iraf ]; then
-	mkdir $HOME/.iraf
+	mkdir "$HOME/.iraf"
     fi
-    cd $HOME/.iraf
+    cd "$HOME/.iraf"
     if [ ! -e bin ]; then
         mkdir bin
     fi
@@ -95,41 +95,41 @@ if (( $def == 1 )); then
     if [ ! -e cache ]; then
         mkdir cache
     fi
-    cp $iraf/unix/hlib/setup.*sh .
+    cp "$iraf/unix/hlib/setup.*sh" .
 fi
 
 
 # Make an empty "uparm" (user parameter) directory.
 if [ ! -e uparm ]; then
-    if (( quiet<1 )); then
-      if (( $def == 0 )); then
-        /bin/echo '-- creating a new uparm directory'
+    if [ "$quiet" -lt 1 ]; then
+      if [ "$def" = 0 ]; then
+        echo '-- creating a new uparm directory'
       fi
     fi
     mkdir uparm
 elif [ ! -d uparm ]; then
-    /bin/echo "Error: a file uparm exists"
+    echo "Error: a file uparm exists"
     exit 1
 else
-    if (( uparm_init<0 )) ; then
-      if (( quiet<1 )) ; then
-        /bin/echo -n 'Initialize uparm? (y|n): '
+    if [ "$uparm_init" -lt 0 ] ; then
+      if [ "$quiet"  -lt 1 ] ; then
+        printf 'Initialize uparm? (y|n): '
         read yesno
       else
 	yesno="yes"
       fi
-      if [ "$yesno" = "y" -o "$yesno" = "yes" ]; then
-	if (( quiet<1 )); then
-	    /bin/echo '-- initializing uparm'
+      if [ "$yesno" = "y" ] || [ "$yesno" = "yes" ]; then
+	if [ "$quiet" -lt 1 ]; then
+	    echo '-- initializing uparm'
 	fi
-	/bin/rm -rf uparm
+	rm -rf uparm
 	mkdir uparm
       fi
-    elif (( uparm_init==1 )); then
-	if (( quiet<1 )); then
-	    /bin/echo '-- initializing uparm'
+    elif [ "$uparm_init" = 1 ]; then
+	if [ "$quiet" -lt 1 ]; then
+	    echo '-- initializing uparm'
 	fi
-	/bin/rm -rf uparm
+	rm -rf uparm
 	mkdir uparm
     fi
 fi
@@ -137,29 +137,29 @@ fi
 # Edit the login.cl file, setting the user's home directory, default image
 # directory, and terminal.
 
-if [ "$myterm" == "none" ]; then
-    /bin/echo "Terminal types: xgterm,xtermjh,xterm,etc."
-    /bin/echo -n 'Enter terminal type ('$defterm'): '
+if [ "$myterm" = "none" ]; then
+    echo "Terminal types: xgterm,xtermjh,xterm,etc."
+    printf 'Enter terminal type (%s): ' $defterm
     read myterm
-    if [ "$myterm" == "" ]; then
+    if [ "$myterm" = "" ]; then
 	myterm=$defterm
     fi
 fi
 
 # Initialize the 'imdir' and 'cachedir' paths.
 IDIR="${imdir}$USER"
-if [ -d $imdir ]; then
-    mkdir -p $IDIR &> /dev/null
+if [ -d "$imdir" ]; then
+    mkdir -p "$IDIR"
 fi
-if [ ! -d $IDIR -o ! -w $IDIR ]; then
+if [ ! -d "$IDIR" ] || [ ! -w "$IDIR" ]; then
     IDIR="HDR$"
 fi
 
 CDIR="${cachedir}$USER"
-if [ -d $cachedir ]; then
-    mkdir -p $CDIR &> /dev/null
+if [ -d "$cachedir" ]; then
+    mkdir -p "$CDIR"
 fi
-if [ ! -d $CDIR -o ! -w $CDIR ]; then
+if [ ! -d "$CDIR" ] || [ ! -w "$CDIR" ]; then
     CDIR="/tmp"
 fi
 
@@ -171,19 +171,19 @@ fi
 
 # Create the path editing script.
 _sed() {
-    /bin/echo $1	| sed -e "s;.*;s+U_TERM+&+;"
+    echo "$1"		| sed -e "s;.*;s+U_TERM+&+;"
     pwd			| sed -e "s;.*;s+U_HOME+&/+;"
     pwd			| sed -e "s;.*;s+U_UPARM+&/uparm/+;"
-    /bin/echo $IDIR	| sed -e "s;.*;s+U_IMDIR+&/+;"
-    /bin/echo $CDIR	| sed -e "s;.*;s+U_CACHEDIR+&/+;"
-    /bin/echo $USER	| sed -e "s;.*;s+U_USER+&+;"
+    echo "$IDIR"	| sed -e "s;.*;s+U_IMDIR+&/+;"
+    echo "$CDIR"	| sed -e "s;.*;s+U_CACHEDIR+&/+;"
+    echo "$USER"	| sed -e "s;.*;s+U_USER+&+;"
 }
 
-sed "`_sed $myterm`" < ${iraf}/unix/hlib/login.cl > login.cl
+sed "$(_sed $myterm)" < "${iraf}/unix/hlib/login.cl" > login.cl
 
-if (( $def == 0 )); then
- if (( quiet<1 )) ; then
-  /bin/echo 'A new LOGIN.CL file has been created in the current directory.'
-  /bin/echo 'You may wish to review and edit this file to change the defaults.'
+if [ $def = 0 ]; then
+ if [ $quiet -lt 1 ] ; then
+  echo 'A new LOGIN.CL file has been created in the current directory.'
+  echo 'You may wish to review and edit this file to change the defaults.'
  fi
 fi

@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/sh 
 #
 #  IRAFARCH -- Determine or set the current platform architecture parameters.
 #
@@ -26,10 +26,10 @@ debug=0
 # Get the Utility aliases.
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
-  bindir="`dirname $0`"                # get iraf root directory 
+  bindir=$(dirname "$0")                # get iraf root directory 
   iraf=${bindir%/*}/../
 fi
-source ${iraf}/unix/hlib/util.sh
+. "${iraf}/unix/hlib/util.sh"
 
 
 #----------------------------------
@@ -45,7 +45,7 @@ else
     exit 1
 fi
 
-export MNAME=`$uname_cmd | tr '[A-Z]' '[a-z]'`
+export MNAME=$($uname_cmd | tr '[:upper:]' '[:lower:]')
 
 # Allow an IRAFARCH definition in the environment to override.
 
@@ -54,9 +54,9 @@ if [ $# -gt 0 ]; then
         unset IRAFARCH
 	shift
     elif [ "$1" = "-current" ]; then
-        export IRAFARCH=`/bin/ls -lad $iraf/bin | \
+        export IRAFARCH=$(ls -lad "$iraf/bin" | \
 			awk '{ printf ("%s\n", $11) }' | \
-			sed -e 's/bin.//g'`
+			sed -e 's/bin.//g')
 	shift
     elif [ "$1" = "-set" ]; then
 	export IRAFARCH=$2
@@ -77,7 +77,7 @@ fi
 # Determine parameters for each architecture.
 if [ -n "$IRAFARCH" ]; then
     mach="$IRAFARCH"
-    if [ "$mach" = "macintel" -o "$mach" = "freebsd64" -o "$mach" = "linux64" ]; then
+    if [ "$mach" = "macintel" ] || [ "$mach" = "freebsd64" ] || [ "$mach" = "linux64" ]; then
 	nbits=64
     else
 	nbits=32
@@ -118,7 +118,7 @@ else
 	;;
     esac
 fi
-if [ "$(echo -n I | od -to2 | awk 'FNR==1{ print substr($2,6,1)}')" = "0" ] ; then
+if [ "$(printf 'I' | od -to2 | awk 'FNR==1{ print substr($2,6,1)}')" = "0" ] ; then
     endian="big"
 else
     endian="little"
@@ -129,27 +129,27 @@ fi
 ##############################################################################
 
 # Handle any command-line options.
-if (( $# == 0 )); then
+if [ $# = 0 ]; then
     ECHO $mach
 else
     case "$1" in
     "-mach"|"-hsi")
-	ECHO $mach
+	ECHO "$mach"
 	;;
     "-nbits")
-	ECHO $nbits
+	ECHO "$nbits"
 	;;
     "-endian")
-	ECHO $endian
+	ECHO "$endian"
 	;;
     "-set")
-	if [ -n $2 ]; then
+	if [ -n "$2" ]; then
 	    export IRAFARCH=$2
 	fi
 	export MNAME=$IRAFARCH
 	;;
     *)
-	ECHO 'Invalid option '$1
+	ECHO 'Invalid option '"$1"
 	;;
     esac
 fi

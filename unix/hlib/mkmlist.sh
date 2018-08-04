@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 # MKMLIST -- Make a library member list on the standard output, e.g., for
 # inclusion in a MKPKG file.
 
 _ml1() {
-    ls	*.[xfcs]
-    grep	'^include' *.x
+    ls	-- *.[xfcs]
+    grep	'^include' -- *.x
 }
 
 _ml2() {
@@ -13,7 +13,7 @@ _ml2() {
 	sed -e	's/\.x/.x	/' | tr -s '\n ' '\t' 
 }
 
-echo -n "	"
+printf "	"
 _ml2 | sed -e 's/\(	\)\([^<]\)/#	\2/g' | tr '#' '\n' |\
     sed -e 's/>	</> </g'
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # FC.SH -- Link an IMFORT or host fortran program from IRAF.  A front end
 # to XC, the purpose of this script is to determine the IRAF architecture
@@ -6,9 +6,8 @@
 
 
 # Determine the desired architecture.
-IRAFARCH=`$iraf/unix/hlib/irafarch.csh`
-MACH=$IRAFARCH
-
+IRAFARCH=$("$iraf/unix/hlib/irafarch.csh")
+export MACH=$IRAFARCH
 
 # Set any float option switch.
 case $IRAFARCH in
@@ -27,4 +26,4 @@ case $IRAFARCH in
 esac
 
 # Call XC with the appropriate float option.
-xc $float $@
+xc $float "$@"

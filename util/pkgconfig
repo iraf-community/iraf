@@ -7,23 +7,23 @@
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
-    source $HOME/.iraf/setup.sh
+    . "$HOME/.iraf/setup.sh"
   else
-    source unix/hlib/setup.sh
+    . unix/hlib/setup.sh
   fi
 else
-    source $iraf/unix/hlib/setup.sh
+    . "$iraf/unix/hlib/setup.sh"
 fi
 
 
-/bin/echo "Initializing repository data ...."
-$iraf/util/pkginit				# init repository information
-if (( $? == 1 )); then
+echo "Initializing repository data ...."
+"$iraf/util/pkginit"				# init repository information
+if [ $? = 1 ]; then
    exit
 fi
 
 # Create the template Makefile.
-/bin/echo "Creating system makefile ...."
+echo "Creating system makefile ...."
 cat << MAKE_TEMP_END		> Makefile
 #
 #  Makefile for IRAF external package installation/maintenance.
@@ -32,7 +32,7 @@ cat << MAKE_TEMP_END		> Makefile
 
 # Compiler Flags.
 
-RELEASE		= `cat ../.version`
+RELEASE		= $(cat ../.version)
         
 all:: update
 
@@ -78,24 +78,24 @@ echo "Setup Complete."
 
 
 # For each package we have, append a makefile entry.
-pkg=`cat .repo_pkgs`
-for p in ${pkg[@]} ; do
+pkg=$(cat .repo_pkgs)
+for p in $pkg ; do
 
    # Create template makefile entries for each package
-   /bin/echo "${p}::"					>> Makefile
-   /bin/echo "	@../util/pkginst $p"			>> Makefile
-   /bin/echo "clean_${p}::"				>> Makefile
-   /bin/echo "	@../util/pkgclean $p"			>> Makefile
-   /bin/echo "update_${p}::"				>> Makefile
-   /bin/echo "	@../util/pkgupdate $p"			>> Makefile
-   /bin/echo ""						>> Makefile
+   echo "${p}::"					>> Makefile
+   echo "	@../util/pkginst $p"			>> Makefile
+   echo "clean_${p}::"				>> Makefile
+   echo "	@../util/pkgclean $p"			>> Makefile
+   echo "update_${p}::"				>> Makefile
+   echo "	@../util/pkgupdate $p"			>> Makefile
+   echo ""						>> Makefile
 
    # Create the directory
    if [ -e "$p" ]; then
-      /bin/rm -rf $p
+      rm -rf "$p"
    fi
-   mkdir $p
+   mkdir "$p"
 done
 
-/bin/echo ""
+echo
 exit 0

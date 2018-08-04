@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 #
-# IRAF definitions for the UNIX/bash user.  The additional variables iraf$ and
+# IRAF definitions for the UNIX/sh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
 
-export MACH=`$iraf/unix/hlib/irafarch.sh`
-export IRAFARCH=`$iraf/unix/hlib/irafarch.sh`
+export MACH=$("$iraf/unix/hlib/irafarch.sh")
+export IRAFARCH=$("$iraf/unix/hlib/irafarch.sh")
             
 
 
@@ -35,7 +35,7 @@ if [ "$MACH" = "macosx" ] ; then
 fi
 
 # The following determines whether or not the VOS is used for filename mapping.
-if [ -f ${iraf}lib/libsys.a ]; then
+if [ -f "${iraf}lib/libsys.a" ]; then
 	export	HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
 else
 	export	HSI_CF="$HSI_CF -DNOVOS"
@@ -44,15 +44,15 @@ fi
 
 export HSI_LIBS="$HSI_LIBS $HSI_OSLIBS"
 
-alias	mkiraf=${hlib}mkiraf.sh
-alias	mkmlist=${hlib}mkmlist.sh
+alias	mkiraf="${hlib}mkiraf.sh"
+alias	mkmlist="${hlib}mkmlist.sh"
 
-alias	edsym=${hbin}edsym.e
-alias	generic=${hbin}generic.e
-alias	mkpkg=${hbin}mkpkg.e
-alias	rmbin=${hbin}rmbin.e
-alias	rmfiles=${hbin}rmfiles.e
-alias	rtar=${hbin}rtar.e
-alias	wtar=${hbin}wtar.e
-alias	xc=${hbin}xc.e
-alias	xyacc=${hbin}xyacc.e
+alias	edsym="${hbin}edsym.e"
+alias	generic="${hbin}generic.e"
+alias	mkpkg="${hbin}mkpkg.e"
+alias	rmbin="${hbin}rmbin.e"
+alias	rmfiles="${hbin}rmfiles.e"
+alias	rtar="${hbin}rtar.e"
+alias	wtar="${hbin}wtar.e"
+alias	xc="${hbin}xc.e"
+alias	xyacc="${hbin}xyacc.e"
