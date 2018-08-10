@@ -80,7 +80,6 @@ bin$libllsq.a
 bin$libmemdbg.a
 bin$libncar.a
 bin$libnlfit.a
-bin$libreadline.a
 bin$libsgi.a
 bin$libslalib.a
 bin$libstg.a
