@@ -4,9 +4,6 @@ $call	relink				# make ecl.e in current directory
 $exit
 
 update:					# make ecl.e and install in bin$
-        $ifeq (MACH, sparc) then
-            $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
-        $endif
 	$call	relink
 	$call	install
 	;
@@ -37,24 +34,6 @@ relink:
 	    $endif
 	$endif
 
-	$ifeq (siteid, stsci)
-	$ifeq (hostid, vms)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex grammar.l
-		!@lex.com
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y
-	    $endif
-	$endif
-	$endif
-
-	$ifeq (MACH, sparc) then
-	    $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
-	$endif
-
 	$update libpkg.a
 
 	#$set	xflags = "$(xflags) -x -/DYYDEBUG"
@@ -67,14 +46,10 @@ relink:
 		param.h task.h
 link:
 	$set	LIBS = "-lc -lcur -lds -lstg"
-	$ifneq (MACH, sparc) then
-	  $ifeq (MACH, linux) then
-	    $set	LIBS2 = "-/L/usr/lib32 -lreadline -lncurses"
-	  $else
-	    $set	LIBS2 = "-lreadline -lncurses"
-	  $endif
+	$ifeq (MACH, macosx, macintel) then
+	  $set	LIBS2 = "-ledit"
 	$else
-	$set	LIBS2 = ""
+	  $set	LIBS2 = "-lreadline"
 	$endif
 	$link	ecl.o globals.o opcodes.o libpkg.a $(LIBS) $(LIBS2)
 	;
