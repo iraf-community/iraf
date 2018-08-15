@@ -82,6 +82,7 @@ libos.a:
 	zpanic.c	<libc/kernel.h> <libc/spp.h>
 	zraloc.c	<libc/kernel.h> <libc/spp.h>
 	zshlib.c
+	zttyio.c	<libc/kernel.h>	<libc/spp.h>
 	zwmsec.c	<libc/kernel.h> <libc/spp.h>
 	zxwhen.c	<libc/kernel.h> <libc/spp.h>
 	zzepro.c	<libc/spp.h>
