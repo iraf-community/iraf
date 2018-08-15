@@ -155,6 +155,7 @@
 #define ZTSDPR		ztsdpr_
 #define	ZSVJMP		zsvjmp_
 #define	ZTSLEE		ztslee_
+#define	ZTTYSZ		zttysz_
 #define	ZWMSEC		zwmsec_
 #define	ZXGMES		zxgmes_
 #define	ZXWHEN		zxwhen_
