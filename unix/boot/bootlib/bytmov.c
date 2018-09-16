@@ -1,6 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
 #define	import_spp
 #define import_knames
 #include <iraf.h>
@@ -11,6 +12,7 @@
  * to determine if they overlap.
  * [Specially optimized version for Sun/IRAF].
  */
+void
 BYTMOV (
   XCHAR	*a,			/* input byte array			*/
   XINT	*aoff,			/* first byte in A to be moved		*/
