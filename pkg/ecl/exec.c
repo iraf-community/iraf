@@ -750,7 +750,7 @@ findexe (
 
 	if (c_access (bin_path, 0, 0) == YES) {
 	    return (bin_path);
-	} else {
+	} else if (arch != NULL) {
 	    /*  The binary wasn't found in the expected bin directory, but
 	     *  on certain platforms look for alternate binaries that may
 	     *  work.  This supports backward compatability with older
