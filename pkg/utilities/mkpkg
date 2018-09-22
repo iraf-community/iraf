@@ -4,8 +4,6 @@ $call	relink
 $exit
 
 update:
-	@nttools
-
 	$call	relink
 	$call	install
 	;
@@ -21,6 +19,7 @@ relink:
 	;
 
 install:
+	@nttools
 	$move	xx_utilities.e bin$x_utilities.e
 	;
 
