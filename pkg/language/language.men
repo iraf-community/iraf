@@ -3,6 +3,7 @@ Language package.
 Note: To get help on a keyword enclose it in quotes.  Keywords are starred.
 
 	  intro - A brief introduction to IRAF
+    expressions - Standard expression syntax in IRAF tasks
 
 Language components:
 
