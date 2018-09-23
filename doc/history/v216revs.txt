@@ -1,0 +1,605 @@
+
+
+                 *************************************
+                 **** IRAF Version 2.16.1 Release ****
+                 *************************************
+
+**  Release history
+**
+**   3/22/12   Initial IRAF v2.16 Release
+**  10/17/13   Intitial Release: V2.16.1 for PCIX (Src/OSX/Linux, 32 and 64-bit)
+**
+
+================================================================================
+
+
+Contents:
+---------
+
+   1)  What is the IRAF V2.16.1 Patch Release
+   2)  Who Should Install
+         -  Distribution files and patch releases
+   3)  How to Install This Release
+         -  I am installing for the First Time
+         -  I am replacing an existing IRAF installation
+         -  I am installing multiple IRAF versions
+         -  I want to build the IRAF system from source
+         -  I want to install IRAF to support multiple platforms
+     3.1) Upgrading External Packages
+     3.2) Mixed 64-bit IRAF and 32-bit External Packages
+     3.3) System Requirements and Dependencies
+   4)  Dynamic Loading of External Packages
+   5)  Mixed 64-bit IRAF and 32-bit External Packages
+   6)  Known Problems
+   7)  V2.16 Release Modification History
+
+================================================================================
+
+------------------------------------------
+1)  What is the IRAF V2.16.1 Patch Release
+------------------------------------------
+
+    IRAF V2.16.1 is a patch release of the IRAF v2.16 system for all
+supported Linux and OSX platforms.  This is primarily a bug-fix release,
+however there are several significant updates related to the installation
+procedures included as part of this release.
+
+    This release is a cumulative patch of all applications and system
+interfaces since the initial v2.16 release.
+
+In summary, this release contains
+
+    o	IRAF V2.16.1 updates for the following architectures:
+
+	    linux	All 32-bit linux systems
+	    linux64	All 64-bit linux systems
+	    macintel	64-bit Mac OSX (10.6, Intel only) systems
+	    macosx	32-bit Mac OSX (10.4+) Intel systems (default)
+	    macosx	32-bit Mac OSX (10.4+) PPC systems (optional)
+
+	Cygwin, FreeBSD and Solaris x86 updates to v2.16 are possible
+	given sufficient user interest, however we do not plan to port to
+	these systems unless there is a compelling demand from the
+	community.
+
+
+    o	32-bit OSX binary changes
+
+	    Beginning with this release, the 32-bit OSX 'macosx' architecture
+	will no longer be a Universal i386/ppc binary.  Instead, due to the
+	limited demand for PPC systems (and waning support from Apple) we've
+	decided to separate these binaries into individual distributions for
+	each platform.
+
+
+    o	Non-root installation option
+
+	    Beginning with this release, root user permissions are no longer
+	*required* for a working IRAF system; by default, the iraf$install
+	script will do a "personal installation" of all files to the dir-
+	ectory $HOME/.iraf and modify the user's login/shell-setup files to
+	define a working runtime and build environment.  The process of
+	downloading, unpacking and installing IRAF can all be done from a
+	normal user account, and the installed system will supercede any
+	existing IRAF version on the machine.
+	    In summary, a full installation can be accomplished by:
+
+		1) Download the distribution file
+		2) Create an iraf directory and unpack the system
+		3) Go to that directory
+		4) Run the install script as "./install"
+
+	In most cases you can simply accept the prompt defaults, however you
+	should review the values before accepting.
+
+	    The install script can optionally also be run with a "--system"
+	flag (as 'root' or with 'sudo') to do an installation to system
+	directories as before.   This form of installation is required if you
+	plan to use IRAF networking on the machine.  It can also be run in
+	this mode *in addition* to a personal install if you plan to use the
+	global login mechanism (see below).
+
+	***
+	***  Important notes:
+	***
+
+	    1) 	The default personal install will modify the following files
+		in your $HOME directory (if they exist):
+
+			.login	   .cshrc
+			.bashrc    .profile	.bash_profile
+
+		A backup of these files will be created with a ".bak"
+		extension, and this file will be modified only once.
+
+	    2)  Spaces in path names (e.g. "/Users/Jane Smith/") are NOT
+		supported at this time.  If your $HOME directory contains
+		a space, a system install is recommended.
+
+
+    o	Global login.cl/uparm
+
+	    With a personal installation, the $HOME/.iraf directory will
+	contain not only a bin directory of IRAF commands and runtime files
+	(e.g. the "iraf.h" link), but the install script will also create a
+	default login.cl file and uparm directory.  The CL has been
+	modified such that if there is no login.cl file in the current
+	directory, these global login files will be used, i.e. it is now
+	possible to login to IRAF from *any* directory on the machine
+	without an error.  Users can likewise choose to create the
+	$HOME/.iraf/loginuser.cl file to be used for global definitions.
+
+	    This global login method can be overridden by local files when
+	needed.  If you run MKIRAF in a given directory, then starting IRAF
+	in that directory will use the local login.cl/uparm files.
+	Similarly, a loginuser.cl file in the current directory will
+	override a loginuser.cl in the $HOME/.iraf directory.  Lastly, it
+	is possible to create a 'uparm' directory that will be used to
+	store the parameters when logging in from that directory.  The
+	flexibility of these methods means that users can exclusively use
+	the global login, always use directory-specific login files, or
+	some combination.
+
+
+    o	New task to check for system updates
+
+	    A new CHKUPDATE task hase been added to the SYSTEM package and
+	is called automatically in the login.cl file.  The purpose of the task
+	is to check the NOAO distribution servers for an available IRAF update.
+	This task will check only every <N> days, where <N> is set by the 
+	'interval' parameter to the task.  You can set the 'interval' param-
+	eter to -1 to disable the checks entirely (or comment out the task
+	from the login.cl file), to zero to check with each login, or to
+	some positive number which will be the number of days before checking
+	again for an update.
+	    If the specified interval has passed a message will be printed 
+	on the login banner indicating whether the installed system is
+	current or if an update is available.
+
+
+    o	C-shell no longer required
+
+	    In IRAF v2.16.1 we have re-written all of the shell scripts used
+	in the runtime system to use the Bourne shell instead of the C-shell
+	from previous releases.  These older scripts are still available and
+	can be installed for use by running the install script as
+
+		% ./install --csh
+
+	On newer Linux and OSX systems where Bash shell is the default for
+	user accounts, the private installation will modify the Bash shell
+	setup files to define a proper IRAF environment.  If an account is
+	configured to use the C-shell the appropriate setup files for that
+	shell will also be modified.  
+
+	    C-shell scripts are still used in a few places in the third-party
+	iraf$vendor code however these are only needed when building completely
+	from source.  These scripts will be replaced in a future update.
+
+
+    o	X11IRAF binaries distributed with IRAF
+
+	    Since XGterm/XImtool have long been needed for a working IRAF
+	system anyway, we've decided to now include these binaries with the
+	core distribution.  The install script will create the appropriate
+	links to these files and once installed, both commands will be
+	available.
+
+
+    o  	Update SLALIB version to GPL licensed version
+
+     	   Replaced the SLALIB with the GPL'd version from Starlink per a 
+	request by Pat Wallace.  This updates the library to v2.5-2 and 
+	includes updates to the leap-second table to 2012.  The IRAF 
+	copyright was not edited into the files, instead each file contains
+	the GPL copyright (full text of which is in SLA_CONDITIONS.
+
+
+    o	32-bit OSX Platform Support
+
+	The v2.16 release featured Universal (i.e. Intel and PPC) binaries
+	for the 'macosx' architecture.  Since the initial release however
+	it has become clear that PPC support is needed by only a handful
+	of users and the burden of providing a Universal OSX binary is 
+	not worth the cost of supporting such a release.  As a result, 
+	we've changed the definition of the 'macosx' architecture to refer
+	only to the 32-bit Intel systems with the v2.16.1 release.  Support
+	for PPC systems will still be provided
+
+
+    o	Updated compiler support
+
+	Mkpkg files and compiler flags set in the XC compiler have been
+	modified to support recent GCC 4.4 compilers without error.
+	Additionally, the HSI code has been modified to compile cleanly
+	(i.e. no warning produced when compiling with '-Wall').
+
+
+    o   Increased number of allowed background jobs
+
+	The max number of background jobs allowed by the CL has been
+	increased from 4 to 32.
+
+    o  	Updated versions of TOPCAT and ALADIN.
+
+    o  	Numerous bug fixes and minor enhancements
+
+
+    When reporting a bug or problem,  please be sure to indicate the
+platform used and supply whatever information (parameters or data) is
+necessary to reproduce the problem.  If you are reporting a problem with a
+Virtual Observatory data service, please also indicate which service and
+what task was used to access it.
+
+
+
+----------------------
+2)  Who Should Install
+----------------------
+
+    IRAF v2.16.1 is RECOMMENDED FOR ALL USERS.  Although the VO features are
+optional, v2.16.1 contains a number of important bug fixes (especially for
+those on 64-bit platforms).
+
+
+Distribution Files and Patch Releases
+-------------------------------------
+
+    The main IRAF distribution files are build for the latest release of
+the system (at this writing, v2.16) meaning that new users will always be
+instaling the most current release.  Patch files will be built as a
+cumulative patch to the initial release, meaning that e.g. the 'patch1'
+release file applies the v2.16.1 patch to the original IRAF v2.16 release.
+Patch files include source code changes as well as needed binaries for the
+patch.
+
+    Because bugs in or changes to the new core system capabilities will
+require a complete set of binaries, installation of patches has now been
+automated using a mechanism similar to what's done for external packages.
+At this writing, there are no patches available, however the installation
+of future patches will be a matter of simply:
+
+	% cd $iraf		# go to the iraf root dir
+	% make latest		# download and install latest patch
+
+Additional targets in the toplevel Makefile include:
+
+     make latest                Update entire system (core + extpkgs)
+     make latest_src            Update only source code
+     make latest_core           Update only the core iraf system
+
+     make check_latest          Check is system is latest released version
+
+
+
+-------------------------------
+3)  How to Install This Release
+-------------------------------
+
+    To install this release, you should download the binary distribution
+file appropriate for your machine (either linux or osx) and then identify
+yourself as one of the following users and follow the steps described:
+
+    - I am installing for the First Time:
+
+	1)  Create an 'iraf' directory (preferrably /iraf/iraf) and unpack
+	    the distribution file for your platform there.
+	2)  Define $iraf in your environment (with a trailing '/')
+	3)  Run the $iraf/install script to install the system for personal
+	    use (or with root permission and the '--system' flag for a
+	    system installation).
+
+
+    - I am replacing an existing IRAF installation:
+
+	1)  Save any local configuration file (graphcap, extern.pkg, etc)
+	    of the existing IRAF installation to a separate directory
+	2)  Delete the existing IRAF tree
+	3)  Unpack the distribution in the existing iraf root directory
+	4)  Replace/merge local configuration files
+	5)  Optionally run the $iraf/install script to install the system
+	    so that a global login may be used.
+
+
+    - I am installing multiple IRAF versions:
+
+	1)  Create a new 'iraf' root directory and unpack the distribution 
+	    file for the host platform
+	2a) If you wish to use the new IRAF v2.16.1 version as the default,
+	    execute the iraf$install script to create a personal login.
+
+	2b) If you want to select which system to use, set $iraf and $IRAFARCH
+	    in your environment as appropriate for the desired version before
+	    running the 'cl' command or compiling software.
+
+
+    - I want to build the IRAF system from source:
+
+	1)  Download the iraf-src.tar.gz (or as.pcix.gen.gz) source-only 
+	    distribution file
+	2)  Create a new iraf root directory and unpack the distribution
+	3)  Execute the iraf$install script to create needed links.
+	4)  Configure the directory tree for the proper architecture and
+	    compile, e.g. on a 64-bit linux system:
+
+		% make linux64			<-- reset system arch
+		% make sysgen			<-- compile from source
+
+
+    - I want to install IRAF to support multiple platforms:
+
+	1)  The 'iraf-all', 'iraf-linux', and 'iraf-macosx' distributions
+	    represent various combinations of platforms one might typically
+	    use.  These should be installed per the instructions above.  
+	2)  To develop or recompile the system, switch between systems
+	    by reconfiguring the architecture, e.g.
+
+		% make linux64		# set linux64 arch
+		% make update		# compile recent changes
+		% make linux		# set linux arch
+		% make update		# compile recent changes
+
+
+    We recommend if possible that a dedicated machine be used for testing
+to avoid possible confusion with a multi-version system.  Note that while
+environment variables can typically be used to control which version of
+IRAF is started, these same environment variables when defined in startup
+files such as .login or .cshrc can cause confusion when building software.
+
+
+3.1) Upgrading External Packages
+--------------------------------
+
+    External packages available under v2.16 will continue to be available
+using the same installation procedures.  New binaries for these packages
+are required so that the new core capabilities will be available to external
+tasks as well.
+
+    However, only those packages that were previously updated to support
+v2.15 can be linked against the v2.16 libraries.  This means that packages
+such as STSDAS/TABLES and other third-party packages that remain 32-bit
+only are unchanged.  These packages can continue to be installed using
+the external package 'make' mechanism, but will not have VO capabilities.
+
+
+3.2) Mixed 64-bit IRAF and 32-bit External Packages
+---------------------------------------------------
+
+    On 64-bit systems it is possible to still use 32-bit external package
+binaries (e.g. for packages that haven't been updated yet), however care
+must be taken to match the architecture names.
+
+    For example, on Linux systems the arch name is 'linux64' and this
+will be used to find binaries in external packages as well.  For packages
+such as STSDAS where no 'bin.linux64' binaries are available, you can
+simply use the 32-bit binaries by making a 'bin.linux64' symlink that
+points to the 'bin.linux' directory.
+
+
+3.3) System Requirements and Dependencies
+-----------------------------------------
+
+    Support for VO data queries is provided by the VOClient interface which
+relies on a background Java process to execute the queries and web-service
+calls.  Although this process is started transparently by the applications
+which need it, Java 1.5 or greater must be available on the machine.
+
+    Additionally, the distributed ECL and VOCL binaries are built
+dynamically and assume the CURSES libraries are installed.  This library is
+available by default on OSX systems but is often an optional installation
+for many Linux distributions.  Details about exactly which package
+file is required depend on the distribution being used, however it is
+typically named NCURSES (or perhaps TERMCAP on some older distributions).
+Statically-linked binaries for ECL and VOCL can be provided upon request.
+
+
+
+----------------------------------------
+4)  Dynamic Loading of External Packages
+----------------------------------------
+
+    Dynamic package loading is a feature introduced in v2.15 that allows for
+package directories created in the iraf$extern directory to be automatically
+defined when the CL is started.  The means that external package installation
+no longer *requires* that the hlib$extern.pkg file be edited to define the
+package, although that remains an option for packages which somehow cannot
+conform to this new scheme.
+
+
+Getting Started
+---------------
+
+    The IRAF v2.16 system is shipped with no defined external packages,
+instead we assume packages will be installed using this new feature.  To
+begin, simply execute the 'configure' script in this directory to create
+the files needed.  For example,
+
+	% ./configure
+
+This will create a local 'manifest' file of packages available form
+the IRAF reposistory and iraf.noao.edu and skeleton directories of
+available packages will be created automatically along with a Makefile
+used to do the actual installation.  THIS STEP IS REQUIRED BEFORE PACKAGE
+INSTALLATION!
+
+    To get a listing of packages that can be installed, or to check
+which installed packages might need to be updated or are newly available,
+use the command:
+
+	% make check
+
+Each listed package may then be installed using a simple 'make' command.
+For packages not on the list, a manual install is still required.
+
+    The external package tree may be initialize to the distribution state
+using the command:
+
+	% make init
+
+Updates to the distribution mechanism itself is done using the command:
+
+	% make self_update
+
+This last command is used to update the system to new features or bug fixes
+that might be available as the mechanism evolves.
+
+
+Installing and Updating Packages
+--------------------------------
+
+    External packages may now be installed with a command such as:
+	
+	% make ctio mscred stsdas
+
+Note that dependency packages for each requested package will automatically
+be added to the installation so you do not need to necessarily list every
+package (e.g. you'll get FITSUTIL automatically by installing MSCRED).  The
+next time you login to the CL the requested package will be defined.
+
+    To update packages to the latest version, use the command
+
+	% make update
+
+The information about available packages will be updated, then a comparison
+of the timestamps of your installed packages with those on the repository
+will be made.  If newer package versions are available they will be updated
+(along with their depencies) automatically.
+
+    If a binary repository distribution of a package is not available
+at the moment, a 'source only' distribution will be installed and you will
+not a "[SOURCE ONLY]' status from the make command.  The user is then
+responsible for compiling th epackages locally even though the package will
+still be defined for use (but unusable).  Our goal is to provide a binary
+distribution for all available packages we can reasonably support.
+
+
+How it Works
+------------
+
+    This scheme relies on IRAF v2.16 changes to the CL login process to
+scan this directory for packages, as well as a server-side respository of
+distribution files suited for this method (see below).  The 'configure'
+script customizes the package information for your platform and creates a
+'Makefile' based on that information.  Subsequent commands update these
+files, however we don't yet provide an automated system for multi-platform
+support.
+
+    The bulk of the work is done using utility scripts found in the
+iraf$util directory and called from the Makefile.  The management of the
+repository files is the responsibility of the distribution maintainers (by
+default, this is NOAO).  Please contact us if you wish to have your package
+added to the system.
+
+
+Repositories
+------------
+
+    The default package repository is defined in the $iraf/util/pkgrepo
+script and may be changed to point to a local respository (e.g. a mirror
+site).  It may also be changed by pointing the 'IRAF_REPO' environment
+variable to a new URI source, e.g.
+
+	setenv IRAF_REPO  "ftp://localhost/myrepository"
+
+Of course, a network connection is assumed to exist.  Local repositories
+may be preferred for faster local access via mirrors, please contact us for
+information on creating one.
+
+
+
+Server-Side Repository Description
+==================================
+
+[The following comes from the README file on the repository]
+
+	This is the IRAF v2.16 distribution repository directory.  Files
+    here are bundled so as to allow them to operate with the dynamic
+    package mechanism or IRAF install procedurs for v2.16. Aside from
+    the repository files themselves, this directory contains
+
+	README		  This file 
+	REPO.DESC	  A description of each package 
+	MK		  Utility script to update repo checksum/manifest
+
+	CHECKSUM	  Checksums files on repo tarballs created by MK
+	REPO.MANIFEST	  Manifest file
+
+    The MK script is used to generate the CHECKSUMS file and REPO.MANIFEST
+    file automatically, it should be run whenever a package is installed
+    or updated.  The REPO.DESC file is a handcrafted description of the
+    available package, this is important to describing the dependencies
+    of each package.  The MK script is also capable of determining
+    which of the available packages may be used on which platform.
+    For example, a "redhat" package will suffice for both a linux64
+    and linux IRAF system if there is no specific version available.
+    The manifest file created will then list the redhat version as the
+    file to be installed for the linux/linux64 platforms.
+
+	If a binary distribution for a particular package is not provided,
+    the MK script will default to use the source distribution tarball
+    (if available).  On the receiving end the user will then have the
+    option of compiling the package locally.  The reserved <arch> name
+    "universal" is used for script-only packages, or distributions
+    containing binaries for all supported platforms.
+
+	When packages are installed in the IRAF dynamic package tree,
+    both the REPO.MANIFEST and REPO.DESC files are downloaded.	Scripts
+    use these files to build up package lists that are available for a
+    particular platform, as well as which packages are required to be
+    installed to support the requested package. We assume the REPO.DESC
+    file lists full dependencies, e.g. if A requires B, and B requires
+    C the the dependency list for A is both B and C.
+
+
+    The convention for file names is as follows:
+
+		<pkg>-<arch>.tar.gz
+
+    where <pkg> is the package name and <arch> is the iraf architecture.
+
+	For external packages, tarfiles are build at the toplevel, i.e.
+    when unpacked, a subdirectory of the package is created in th current
+    directory.	For IRAF distributions we violate this rule and assume
+    the tarball is built from the $iraf root directory.
+
+    When installing a new package, the REPO.DESC file should be edited
+    and the MK script should be run.
+
+    When installing an update to an existing repo package, or a new
+    architecture version of a package, the MK script should be re-run.
+
+
+
+-------------------------------------------------
+5) Mixed 64-bit IRAF and 32-bit External Packages
+-------------------------------------------------
+
+    V2.16 is very forgiving in the way that is allows multiple architectures
+to be used.  For example, where the core system might be 'linux64', external
+packages containing only the 'linux' or older 'redhat' bin directories will
+be used automatically when a native binary cannot be found.  The same is true
+for mixing the 'macintel' and 'macosx' architectures.
+
+    In some cases, external packages can/will not be ported to 64-bit
+systems or otherwise updated with a new release, v2.16 is designed to allow
+these older packages automatically to continue to be used whenever possible
+based on the last available release.  In many cases this means a package
+can be relinked against the latest IRAF version, but only in 32-bit mode.
+
+
+
+------------------
+6)  Known Problems
+------------------
+
+    There are no known problems with the initial release of v2.16.
+
+
+
+-------------------------------------
+7)  V2.16 Release Modification History
+-------------------------------------
+
+Mar 22, 2012	Initial IRAF v2.16 Release
+Oct 21, 2013    IRAF v2.16.1 Patch Release
+
