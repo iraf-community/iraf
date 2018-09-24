@@ -1,3 +1,7 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy
+# Inc. (comment block)
+# Copyright(c) 2008 Chisato Yamauchi (C-SODA/ISAS/JAXA) (amd64 code)
+
 	.file	"zsvjmp.s"
 
 # ZSVJMP, ZDOJMP -- Set up a jump (non-local goto) by saving the processor
