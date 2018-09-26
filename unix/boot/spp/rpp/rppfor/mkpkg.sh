@@ -1,4 +1,8 @@
+#!/bin/sh
 # Fortran source for RPP preprocessor.
+
+# Exit on error
+set -e
 
 $F77 -c $HSI_FF	addchr.f allblk.f alldig.f baderr.f balpar.f beginc.f
 $F77 -c $HSI_FF	brknxt.f cascod.f caslab.f declco.f deftok.f doarth.f

@@ -1,4 +1,8 @@
+#!/bin/sh
 # Bootstrap the LIBOS.A library.
+
+# Exit on error
+set -e
 
 echo		"--------------------- OS ----------------------"
 

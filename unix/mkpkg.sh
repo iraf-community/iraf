@@ -1,8 +1,12 @@
+#!/bin/sh
 # Bootstrap the UNIX bootstrap utilities and host system interface.
 # Note - the environment variables HSI_CF and HSI_FF (compile/link flags)
 # are required for the bootstrap; these are defined in hlib$irafuser.csh.
 #
 # USAGE:  `sh -x mkpkg.sh >& spool'  to bootstrap the IRAF HSI.
+
+# Exit on error
+set -e
 
 # Set the HSI architecture.
 sh -x setarch.sh

@@ -1,6 +1,9 @@
 #!/bin/sh
 #
 
+# Exit on error
+set -e
+
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
@@ -31,33 +34,19 @@ if [ -e "$HOME/.iraf/arch" ]; then
 fi
 
 c_start=$(date)
-rm -f spool */spool
 
 
 "$iraf/util/mkclean"				# clean old binaries
 
-cd "$iraf/unix"					# NOVOS bootstrap
-. hlib/irafuser.sh
-sh -x mkpkg.sh 2>&1 | tee -a spool
+. "$iraf/unix/hlib/irafuser.sh"			# NOVOS bootstrap
+(cd "$iraf/unix" && sh -x mkpkg.sh)
+(cd "$iraf/sys"	&& mkpkg)			# build NOVOS
 
-cd "$iraf/sys"					# build NOVOS
-mkpkg 2>&1 | tee -a spool
-
-cd "$iraf/unix/boot"				# VOS bootstrap
-. ../hlib/irafuser.sh
-sh -x mkpkg.sh 2>&1 | tee -a spool
-mv -v "$hlib"/*.e "$hbin"
-
-cd "$iraf/vendor"                               # build vendor libs
-make all 2>&1 | tee -a ../spool.final
-cd ../
-
-cd "$iraf/"					# build core system
-mkpkg 2>&1 | tee -a spool
-
-cd "$iraf/noao"					# build NOAO package
-export noao=$(pwd)/
-mkpkg -p noao 2>&1 | tee -a ../spool.final
+. "$iraf/unix/hlib/irafuser.sh"			# VOS bootstrap
+(cd "$iraf/unix/boot" && sh -x mkpkg.sh && mv -v "$hlib"/*.e "$hbin")
+(cd "$iraf/vendor" && make all)			# build vendor libs
+(cd "$iraf/" && mkpkg)				# build core system
+(cd "$iraf/noao" && noao=$(pwd)/ mkpkg -p noao)	# build NOAO package
 
 rm -rf bin*/pkgconfig			# misc clean up
 

@@ -1,4 +1,8 @@
+#!/bin/sh
 # Make the first pass (XPP) of the SPP language compiler.
+
+# Exit on error
+set -e
 
 if [ ! -f lexyy.c -o xpp.l -nt lexyy.c ] ; then
     lex	-o lexyy.c -t xpp.l
