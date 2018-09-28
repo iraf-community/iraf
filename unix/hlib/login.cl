@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.16.1 Oct 2013"
+    logver = "IRAF V2.16.1+ 2018"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -136,7 +136,10 @@ cache   directory page type help
 if (access (".hushiraf"))
     menus = no
 else {
-    clear; type hlib$motd
+    clear
+    printf ("\n  %s\n\n", envget("version"))
+    type hlib$motd
+    printf ("\n")
 }
 
 
