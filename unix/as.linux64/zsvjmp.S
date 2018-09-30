@@ -1,5 +1,6 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy
- * Inc. (amd64),
+ * Inc. (comment block)
+ * Copyright(c) 2008 Chisato Yamauchi (C-SODA/ISAS/JAXA) (amd64),
  * Copyright(c) 2018 Peter Green (arm64)
  * Copyright(c) 2018 James Cowgill <jcowgill AT debian TOD org> (mips64)
  * Copyright(c) 2018 Gustavo Romero, Rogerio Cardoso, Breno Leitao,
