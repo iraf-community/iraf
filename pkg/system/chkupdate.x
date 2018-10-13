@@ -19,7 +19,6 @@ char	version[SZ_FNAME], baseurl[SZ_FNAME], chkfile[SZ_LINE]
 char	netpath[SZ_LINE], arch[SZ_FNAME], tmpfile[SZ_FNAME]
 char	host[SZ_LINE], ref_file[SZ_LINE], release[SZ_LINE]
 char	buf[SZ_LINE]
-pointer	reply
 bool	verbose
 long	last, reldate, ndays, info[LEN_FINFO]
 int	ip, op, fd, nread, interval, tm[LEN_TMSTRUCT]
@@ -111,9 +110,7 @@ begin
 
 
 	# Access the URL and get the reply.
-	call calloc (reply, SZ_LINE, TY_CHAR)
-
-	if (url_get (netpath, tmpfile, reply) > 0) {
+	if (url_get (netpath, tmpfile, NULL) > 0) {
 	    call aclrc (buf, SZ_LINE)
 	    fd = open (tmpfile, READ_ONLY, TEXT_FILE)
 	    if (getline (fd, buf) != EOF) {
@@ -172,7 +169,6 @@ begin
 	call close (fd)
 
 	# Clean up.
-done_ 	call mfree (reply, TY_CHAR)
-	if (access (tmpfile, 0, 0) == YES) 
+done_ 	if (access (tmpfile, 0, 0) == YES) 
 	    call delete (tmpfile)
 end
