@@ -38,7 +38,7 @@ define 	DBG_HDRS	FALSE
 
 # URL_GET -- Do an HTTP GET on the given URL, save the results to the named
 # file.  If a 'reply' pointer is given, return the request reply string (must
-# be allocated at least SZ_PATHNAME).
+# be allocated at least 8192 chars).
 
 int procedure url_get (url, fname, reply)
 
@@ -47,7 +47,7 @@ char	fname[ARB]				#i local filename
 pointer	reply					#u pointer to reply string
 
 char	protocol[SZ_FNAME], host[SZ_FNAME], path[SZ_BUF], emsg[SZ_PATHNAME]
-char	inurl[SZ_PATHNAME], outname[SZ_PATHNAME]
+char	inurl[SZ_LINE], outname[SZ_LINE]
 int	port, stat
 pointer buf
 
@@ -58,7 +58,7 @@ define	redirect_	99
 
 begin
 	# Breakup the URL into usable pieces.
-	call strcpy (url, inurl, SZ_PATHNAME)
+	call strcpy (url, inurl, SZ_LINE)
 redirect_
 	call url_break (inurl, protocol, host, port, path)
 
@@ -74,7 +74,7 @@ redirect_
 	call strcpy (fname, outname, SZ_PATHNAME)
 
 	if (reply == NULL) {
-	    call calloc (buf, SZ_LINE, TY_CHAR)
+	    call calloc (buf, SZ_BUF, TY_CHAR)
 	    stat = url_access (host, port, path, outname, buf)
 	    if (url_redirect (stat, buf, inurl)) {     # check for a redirection
 		call mfree (buf, TY_CHAR)
@@ -122,7 +122,7 @@ begin
 		call strcpy (url, inurl, SZ_LINE)
         	for (ip=reply+loc; IS_WHITE(Memc[ip]); ip=ip+1)
                     ;
-		for (op=1; Memc[ip] != '\n'; op=op+1) {
+		for (op=1; op <= SZ_LINE && ip <= reply + SZ_BUF && Memc[ip] != '\n' && Memc[ip] != EOS; op=op+1) {
 		    url[op] = Memc[ip]
 		    ip = ip + 1
 		}
@@ -203,7 +203,7 @@ pointer	reply					#i reply buffer
 
 pointer	rep
 int	in, out, nchars, totchars, retcode, clen, ip
-char	buf[SZ_BUF], netpath[SZ_PATHNAME], request[SZ_BUF], hd[SZ_PATHNAME]
+char	buf[SZ_BUF], netpath[SZ_PATHNAME], request[SZ_BUF], hd[SZ_LINE]
 bool	done
 
 int	open(), access(), ndopen(), getline(), read(), strlen(), ctoi()
@@ -250,13 +250,13 @@ begin
         # a \r\n. and then validate it will return the request correctly.
 	done = false
 	clen = -1
-	call calloc (rep, SZ_PATHNAME, TY_CHAR)
+	call calloc (rep, SZ_BUF, TY_CHAR)
         repeat {
-	    call aclrc (hd, SZ_PATHNAME)
+	    call aclrc (hd, SZ_LINE)
             nchars = getline (in, hd)
             if (nchars <= 0)
                 break
-	    call strcat (hd, Memc[rep], SZ_PATHNAME)
+	    call strcat (hd, Memc[rep], SZ_LINE)
 	    if (strncmp (hd, "Content-Length:", 15) == 0) {
 		ip = 16
 		nchars = ctoi (hd, ip, clen)
@@ -273,7 +273,7 @@ begin
 	retcode = url_retcode (Memc[rep])
 
 	if (reply != NULL)
-	    call strcpy (Memc[rep], Memc[reply], SZ_PATHNAME)
+	    call strcpy (Memc[rep], Memc[reply], SZ_BUF)
 	call mfree (rep, TY_CHAR)
 	if (retcode != HTTP_OK)
 	    return (- retcode)

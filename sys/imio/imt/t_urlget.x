@@ -14,7 +14,6 @@ task urlget	= t_urlget
 
 procedure t_urlget ()
 
-pointer	reply
 char	url[SZ_PATHNAME], fname[SZ_PATHNAME], extn[SZ_PATHNAME]
 char	cache[SZ_PATHNAME], lfname[SZ_PATHNAME]
 int	nread
@@ -61,9 +60,7 @@ begin
 
 	} else {
 	    # Not in cache, or not using the cache, so force the download.
-	    call calloc (reply, SZ_LINE, TY_CHAR)
-	    nread = url_get (url, fname, reply)
-	    call mfree (reply, TY_CHAR)
+	    nread = url_get (url, fname, NULL)
 	}
 end
 

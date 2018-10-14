@@ -35,6 +35,7 @@ define	INC_ENVBUF	500		# increment if overflow occurs
 define	MAX_SZKEY	32		# max chars in a key
 define	MAX_SZVALUE	80		# max chars in value string
 define	MAX_LENLISTELEM	(3+(MAX_SZKEY+1+MAX_SZVALUE+1+SZ_SHORT-1)/SZ_SHORT)
+define 	SZ_BUF		8192			# http response buffer
 
 # List element structure, stored in ENVBUF, which is allocated as an array of
 # type SHORT integer.  Each list element is aligned on a short integer boundary
@@ -390,7 +391,7 @@ begin
 	call clgstr ("fname", fname, SZ_FNAME)
 	hdr = clgetb ("hdr")
 
-	call calloc (reply, SZ_LINE, TY_CHAR)
+	call calloc (reply, SZ_BUF, TY_CHAR)
 
 	nread = url_get (url, fname, reply)
 
