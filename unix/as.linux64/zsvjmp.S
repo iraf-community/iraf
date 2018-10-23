@@ -5,6 +5,7 @@
  * Copyright(c) 2018 James Cowgill <jcowgill AT debian TOD org> (mips64)
  * Copyright(c) 2018 Gustavo Romero, Rogerio Cardoso, Breno Leitao,
  * IBM Corporation (ppc64)
+ * Copyright(c) 2018 Manuel A. Fernandez Montecelo (riscv64)
  * Copyright(c) 2014 John Long <codeblue@inbox.lv> (s390x)
  */
 
@@ -109,6 +110,14 @@ zsvjmp_:
 	mtvrsave %r11
 
 	blr
+
+#elif defined (__riscv)
+
+        sd      zero,0(a1)
+        sd      a1,0(a0)
+        li      a1,0
+        addi    a0,a0,8
+        tail    __sigsetjmp@plt
 
 #elif defined (__s390x__)
 
