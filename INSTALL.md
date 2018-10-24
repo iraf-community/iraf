@@ -59,17 +59,18 @@ and build:
 
 For `<arch>`, use the proper IRAF architecture name:
 
-`<arch>`   | Description
------------|----------------
-`linux64`  | Linux 64 bit
-`linux`    | Linux 32 bit
-`macintel` | Mac OS X 64 bit
-`macosx`   | Mac OS X 32 bit (Intel)
-`freebsd64`| FreeBSD 64 bit
-`freebsd`  | FreeBSD 32 bit
-`hurd`     | GNU HURD 32 bit
+`<arch>`   | Operating system | CPU
+-----------|------------------|--------------------
+`linux64`  | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64
+`linux`    | Linux 32 bit     | i386, x32, arm, mips
+`macintel` | Mac OS X 64 bit  | x86_64
+`macosx`   | Mac OS X 32 bit  | i386
+`freebsd64`| FreeBSD 64 bit   | x86_64
+`freebsd`  | FreeBSD 32 bit   | i386, arm
+`hurd`     | GNU HURD 32 bit  | i386
 
-Note that the PowerPC architecture of MacOS X is not supported anymore.
+Note that Cygwin and big endian architectures like macosx/ppc are not
+supported anymore.
 
 
 ## Test the Build
