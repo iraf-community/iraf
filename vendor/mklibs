@@ -29,7 +29,7 @@ if [ $build_cfitsio = 1 ] ; then
     printf "    Building CFITSIO libs ...."
     opts="$gopts --bindir=$top/bin --libdir=$top/bin"
     (cd cfitsio	&& ./configure $opts && \
-     make clean all install distclean )
+     make clean all install && make distclean )
     echo "done"
 
 fi
