@@ -91,8 +91,8 @@ if [ -n "$IRAFARCH" ]; then
 else
     os_mach=$(uname -s | tr '[:upper:]' '[:lower:]' | cut -c1-6)
  
-    if [ -e $iraf/unix/hlib/irafarch.csh ]; then
-        MACH=$($iraf/unix/hlib/irafarch.csh)
+    if [ -e $iraf/unix/hlib/irafarch.sh ]; then
+        MACH=$($iraf/unix/hlib/irafarch.sh)
     else
         MACH=$os_mach
     fi
