@@ -95,7 +95,7 @@ if [ "$def" = 1 ]; then
     if [ ! -e cache ]; then
         mkdir cache
     fi
-    cp "$iraf/unix/hlib/setup.*sh" .
+    cp $iraf/unix/hlib/setup.*sh .
 fi
 
 
