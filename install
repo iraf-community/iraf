@@ -951,7 +951,8 @@ fi
 for file in ${pfiles}; do
     if [ -e "$file" ]; then
 	if [ "$exec" = "yes" ]; then
-            sed -e "s+$o_iraf+$iraf+" -i "$file"
+            sed -i.bak -e "s+$o_iraf+$iraf+" "$file"
+	    RM "${file}.bak"
 	fi
     fi
 done
@@ -965,10 +966,12 @@ ECHO -n "Editing iraf/imdir/cache paths into system files ...           "
 err_seen=0
 for i in ${PATHFILES}; do
     if [ -e "$iraf/unix/hlib/$i" ]; then
-	sed -e "s|$o_iraf|$iraf|"   \
+	sed -i.bak \
+	    -e "s|$o_iraf|$iraf|"   \
 	    -e "s|$o_cache|$cache|" \
 	    -e "s|$o_imdir|$imdir|" \
-	    -i "$iraf/unix/hlib/$i"
+	    "$iraf/unix/hlib/$i"
+	    RM "${iraf}/unix/hlib/${i}.bak"
     else
         if [ "$err_seen" = 0 ]; then
             DO_FAIL
