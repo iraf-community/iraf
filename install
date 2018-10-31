@@ -355,36 +355,8 @@ NEWLINE
 iraf_prompt="yes"
 
 if [ "$iraf" = "" ]; then
-    if [ -e "IRAF.NET" ] && [ -e "IS.PORT.GEN" ]; then
-        # Use the current directory.
-        d_iraf=$(pwd)
-
-    else
-        # Make a guess at what the new root directory is.
-        d_iraf=""
-        if [ -d "/iraf/iraf" ]; then
-            d_iraf="/iraf/iraf"
-        elif [ -d "/iraf" ]; then
-            d_iraf="/iraf"
-        elif [ -d "/usr/local/iraf" ]; then
-            d_iraf="/usr/local/iraf"
-        elif [ -d "/usr/iraf" ]; then
-            d_iraf="/usr/iraf"
-        else
-            # Search for an iraf directory.
-            IDIRS="/u* /local /home /opt /iraf* /"
-            for i in ${IDIRS} ; do
-                if [ -d "$i/iraf" ]; then
-                    d_iraf="$i/iraf"
-                    break
-                fi
-            done
-        fi
-
-        if [ "$d_iraf" = "" ]; then
-            d_iraf="/iraf/iraf"
-        fi
-    fi
+    # Use the current directory.
+    d_iraf=$(pwd)
 else
     if [ "$p_iraf" ]; then
 	d_iraf="$p_iraf"
@@ -1136,7 +1108,7 @@ if [ "$do_system" = 1 ]; then
         fi
     else
         if [ "$exec" = "yes" ]; then
-            RM -f "$file1"
+            RM "$file1"
             ln -s "$file2" "$file1"
         fi
     fi
@@ -1166,7 +1138,7 @@ else			# else of 'do_system'
         fi
     else
         if [ "$exec" = "yes" ]; then
-            RM -f "$file1"
+            RM "$file1"
             ln -s "$file2" "$file1"
         fi
     fi
@@ -1348,7 +1320,7 @@ if [ -e "$file1" ]; then
 else
     if [ "$exec" = "yes" ]; then
 	if [ -e "$file1" ]; then
-	    RM -f "$file1"
+	    RM "$file1"
 	fi
         ln -s "$file2" "$file1"
     fi
@@ -1507,11 +1479,12 @@ if [ "$err_count" = 0 ]; then
    ECHO ""
  fi
 
- ECHO "Additional user information can be found at the IRAF.NET web site:"
+ ECHO "Additional user information can be found at the iraf community web site:"
  NEWLINE
- BOLD_ON ; ECHO "                   http://iraf.net" ; BOLD_OFF
+ BOLD_ON ; ECHO "    https://iraf-community.github.io" ; BOLD_OFF
  NEWLINE
- ECHO "Please contact http://iraf.net with any questions or problems."
+ ECHO "Please create an issue on https://github.com/iraf-community/iraf/issues"
+ ECHO "in case of problems."
  NEWLINE
  NEWLINE
 
