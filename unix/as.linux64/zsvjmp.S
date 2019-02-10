@@ -1,5 +1,5 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy
- * Inc. (comment block)
+ * Inc. (comment block, alpha)
  * Copyright(c) 2008 Chisato Yamauchi (C-SODA/ISAS/JAXA) (amd64),
  * Copyright(c) 2018 Peter Green (arm64)
  * Copyright(c) 2018 James Cowgill <jcowgill AT debian TOD org> (mips64)
@@ -118,6 +118,20 @@ zsvjmp_:
         li      a1,0
         addi    a0,a0,8
         tail    __sigsetjmp@plt
+
+#elif defined(__alpha__)
+
+	// $16=jmpbuf, $17=status
+	mov	$29, $8			// save caller's global pointer
+	ldgp	$29, 4($27)		// needed for setjmp reference
+
+	stq	$17, 0($16)		// jmpbuf[0] = status
+	stl	$31, 0($17)		// *status = 0
+	addq	$16, 8, $16		// setjmp ignores jmpbuf[0]
+
+	lda	$27, setjmp		// get address of setjmp
+	mov	$8, $29			// restore caller's global pointer
+	jmp	($27)			// branch to setjmp
 
 #elif defined (__s390x__)
 
