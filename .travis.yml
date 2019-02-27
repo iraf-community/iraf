@@ -1,15 +1,15 @@
 matrix:
   include:
     - os: linux
-      dist: trusty
-      env: IRAFARCH=linux64 OS_VERS=trusty
+      dist: xenial
+      env: IRAFARCH=linux64 OS_VERS=xenial
       addons:
         apt:
           packages:
             - libreadline-dev
     - os: linux
-      dist: trusty
-      env: IRAFARCH=linux OS_VERS=trusty CARCH="-m32"
+      dist: xenial
+      env: IRAFARCH=linux OS_VERS=xenial CARCH="-m32"
       addons:
         apt:
           packages:
