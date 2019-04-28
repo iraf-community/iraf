@@ -427,8 +427,6 @@ if [ "$imdir" = "" ]; then
       d_imdir=/iraf/imdirs
   elif [ -d "/home/iraf" ]; then
       d_imdir=/home/iraf/imdirs
-  elif [ -d "$iraf_p" ]; then
-      d_imdir=$iraf_p/imdirs
   elif [ -d "/usr/local/iraf" ]; then
       d_imdir=/usr/local/iraf/imdirs
   else
@@ -495,8 +493,6 @@ if [ "$cache" = "" ]; then
       d_cache="/iraf/cache"
   elif [ -d "/home/iraf" ]; then
       d_cache="/home/iraf/cache"
-  elif [ -d "$iraf_p" ]; then
-      d_cache="$iraf_p/cache"
   elif [ -d "/usr/local/iraf" ]; then
       d_cache="/usr/local/iraf/cache"
   else
@@ -1054,27 +1050,7 @@ ECHO "                         -------------------"
 BOLD_OFF
 
 
-# Create a /iraf symlink on the system to establish a /iraf/iraf root
-# path regardless of the actual root dir.  We only do this if there is
-# no /iraf on the system already.
-
 if [ "$do_system" = 1 ]; then
-    ECHO -n "Checking for /iraf symlink ...                                 "
-    if [ ! -e "/iraf" ]; then
-        if [ "$exec" = "yes" ]; then
-            ln -s "$iraf_p" /iraf
-        fi
-        if [ "$exec" = "no" ] || [ -e "/iraf/iraf" ]; then
-            DO_OK
-        else
-            DO_FAIL
-            err_count=$(( err_count+1 ))
-        fi
-    else
-        DO_OK
-    fi
-
-
     # Link $hlib/libc/iraf.h to <iraf.h>.  This is needed not only to compile
     # C source files in iraf, but also to define $iraf, $host, etc. for iraf
     # tasks.
