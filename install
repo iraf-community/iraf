@@ -1313,23 +1313,6 @@ else
     err_count=$(( err_count+1 ))
 fi
 
-
-# Install links for the X11IRAF binaries.
-ECHO -n "Creating X11IRAF links ...                                     "
-if [ "$do_system" = 0 ]; then
-    xfiles="xgterm ximtool ism_wcspix.e"
-
-    for f in ${xfiles}; do
-        if [ -e "$iraf/vendor/x11iraf/bin.$IRAFARCH/$f" ]; then
-            if [ "$exec" = "yes" ]; then
-        	if [ -e "$HOME/.iraf/bin/$f" ]; then
-		    RM "$HOME/.iraf/bin/$f"
-        	fi
-                ln -s "$iraf/vendor/x11iraf/bin.$IRAFARCH/$f" "$HOME/.iraf/bin/$f"
-            fi
-        fi
-    done
-fi
 DO_OK
 
 
