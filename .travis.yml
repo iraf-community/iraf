@@ -41,7 +41,7 @@ before_script:
   - build_tmp=$(mktemp -d -t irafbuild.XXXXXXXXX)
   - mkdir -p ${build_tmp}/bin
   - PATH=${build_tmp}/bin:$PATH
-  - ./install --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir --root $(pwd) < /dev/null || true
+  - ./install --term xterm --bindir $build_tmp/bin --cache $build_tmp/cache --imdir $build_tmp/imdir < /dev/null || true
   - make ${IRAFARCH}
   - make sysgen
 

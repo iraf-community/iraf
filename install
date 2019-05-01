@@ -21,7 +21,6 @@
 #     -c, --cache <dir>           # set cache directory
 #     -i, --imdir <dir>           # set image directory
 #     -m, --mach <arch>           # set architecture
-#     -r, --root <dir>            # set iraf root directory
 # 
 #     -C, --oldcache <dir>        # set old cache directory
 #     -I, --oldimdir <dir>        # set old image directory
@@ -85,7 +84,6 @@ imdir=""				# image directory
 cache=""				# cache directory
 myterm=""			        # terminal type
 
-p_iraf=""				# <param> iraf root directory
 p_imdir=""				# <param> image directory
 p_cache=""				# <param> cache directory
 p_lbin=""				# commands directory
@@ -116,7 +114,6 @@ install_help() {
     ECHO "    -c, --cache <dir>         # set cache directory"
     ECHO "    -i, --imdir <dir>         # set image directory"
     ECHO "    -m, --mach <arch>         # set architecture"
-    ECHO "    -r, --root <dir>          # set iraf root directory"
     ECHO ""
     ECHO "    -C, --oldcache <dir>      # set old cache directory"
     ECHO "    -I, --oldimdir <dir>      # set old image directory"
@@ -169,19 +166,6 @@ while [ -n "$1" ] ; do
     "-m"|"-mach"|"--mach")                   	# set architecture
 	mach=$2 ; 	shift
         ;;
-    "-r"|"-root"|"--root")                   	# set iraf root directory
-	p_iraf=$2 ; 	shift
-	if [ ! -n "$p_iraf" ]; then
-    	    export iraf=$p_iraf
-	fi
-	if [ -e "$iraf/unix/hlib/util.sh" ]; then
-	    . "$iraf/unix/hlib/util.sh"
-	fi
-	if [ -e "${iraf}/unix/hlib/irafarch.sh" ]; then
-	    mach=$("${iraf}/unix/hlib/irafarch.sh")
-	fi
-        ;;
-
     "-C"|"-oldcache"|"--oldcache")              # set old cache directory
 	o_cache=$2 ; shift
         ;;
@@ -352,55 +336,8 @@ NEWLINE
 # files have yet been modified.
 #=============================================================================
 
-iraf_prompt="yes"
-
-if [ "$iraf" = "" ]; then
-    # Use the current directory.
-    d_iraf=$(pwd)
-else
-    if [ "$p_iraf" ]; then
-	d_iraf="$p_iraf"
-        iraf_prompt="no"
-    else
-        d_iraf="$iraf"
-    fi
-fi
-
-
-while [ $iraf_prompt = "yes" ]; do
-    d_iraf=$(ECHO "$d_iraf" | sed -e 's+/\(["]*\)$+\1+')
-
-    iraf_prompt="no"
-    NEWLINE
-    BOLD_ON ; ECHO -n "New iraf root directory " ; BOLD_OFF
-    ECHO -n "($d_iraf): "
-    read iraf
-
-    if [ "$iraf" = "" ]; then
-        export iraf="$d_iraf"
-	break
-    elif [ "$iraf" = "quit" ] || [ "$iraf" = "q" ]; then
-        exit 0
-    elif [ "$iraf" = "help" ] || [ "$iraf" = "h" ] || [ "$iraf" = "?" ]; then
-        NEWLINE
-            MSG "The iraf root directory is the place where the IRAF tar"
-            MSG "file was unpacked; it contains subdirectories such as 'dev',"
-            MSG "'local', 'noao', 'pkg', and the file IS.PORT.GEN."
-
-        di=$d_iraf
-        if [ -d "$di/dev" ] && [ -d "$di/pkg" ] && [ -d "$di/noao" ]; then
-            MSG  ""
-            MSG  "The default path '$d_iraf' appears to be correct ..."
-        else 
-            MSG  ""
-            MSG  "The default path '$d_iraf' appears to be incorrect ..."
-        fi
-        NEWLINE
-
-        iraf=$d_iraf
-        iraf_prompt="yes"
-    fi
-done
+# Use the current directory.
+iraf=$(pwd)
 
 
 #=============================================================================
@@ -427,8 +364,6 @@ if [ "$imdir" = "" ]; then
       d_imdir=/iraf/imdirs
   elif [ -d "/home/iraf" ]; then
       d_imdir=/home/iraf/imdirs
-  elif [ -d "$iraf_p" ]; then
-      d_imdir=$iraf_p/imdirs
   elif [ -d "/usr/local/iraf" ]; then
       d_imdir=/usr/local/iraf/imdirs
   else
@@ -495,8 +430,6 @@ if [ "$cache" = "" ]; then
       d_cache="/iraf/cache"
   elif [ -d "/home/iraf" ]; then
       d_cache="/home/iraf/cache"
-  elif [ -d "$iraf_p" ]; then
-      d_cache="$iraf_p/cache"
   elif [ -d "/usr/local/iraf" ]; then
       d_cache="/usr/local/iraf/cache"
   else
@@ -1054,27 +987,7 @@ ECHO "                         -------------------"
 BOLD_OFF
 
 
-# Create a /iraf symlink on the system to establish a /iraf/iraf root
-# path regardless of the actual root dir.  We only do this if there is
-# no /iraf on the system already.
-
 if [ "$do_system" = 1 ]; then
-    ECHO -n "Checking for /iraf symlink ...                                 "
-    if [ ! -e "/iraf" ]; then
-        if [ "$exec" = "yes" ]; then
-            ln -s "$iraf_p" /iraf
-        fi
-        if [ "$exec" = "no" ] || [ -e "/iraf/iraf" ]; then
-            DO_OK
-        else
-            DO_FAIL
-            err_count=$(( err_count+1 ))
-        fi
-    else
-        DO_OK
-    fi
-
-
     # Link $hlib/libc/iraf.h to <iraf.h>.  This is needed not only to compile
     # C source files in iraf, but also to define $iraf, $host, etc. for iraf
     # tasks.
@@ -1337,23 +1250,6 @@ else
     err_count=$(( err_count+1 ))
 fi
 
-
-# Install links for the X11IRAF binaries.
-ECHO -n "Creating X11IRAF links ...                                     "
-if [ "$do_system" = 0 ]; then
-    xfiles="xgterm ximtool ism_wcspix.e"
-
-    for f in ${xfiles}; do
-        if [ -e "$iraf/vendor/x11iraf/bin.$IRAFARCH/$f" ]; then
-            if [ "$exec" = "yes" ]; then
-        	if [ -e "$HOME/.iraf/bin/$f" ]; then
-		    RM "$HOME/.iraf/bin/$f"
-        	fi
-                ln -s "$iraf/vendor/x11iraf/bin.$IRAFARCH/$f" "$HOME/.iraf/bin/$f"
-            fi
-        fi
-    done
-fi
 DO_OK
 
 
