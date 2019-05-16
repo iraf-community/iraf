@@ -20,6 +20,15 @@ setenv	CC	gcc
 setenv	F77	$hlib/f77.sh
 setenv	F2C	$hbin/f2c.e
 setenv	RANLIB	ranlib
+if ( ! ${?CPPFLAGS} ) then
+    set CPPFLAGS
+endif
+if (! ${?CFLAGS} ) then
+    set CFLAGS
+endif
+if (! ${?LDFLAGS} ) then
+    set LDFLAGS
+endif
 
 setenv XC_CFLAGS "${CPPFLAGS} ${CFLAGS} -I${iraf}include"
 setenv HSI_CF "${XC_CFLAGS}"
