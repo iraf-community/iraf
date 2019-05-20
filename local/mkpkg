@@ -32,30 +32,30 @@ summary:
 
 showfloat:				# show current float option
 	$verbose off
-	!$(hlib)/mkfloat.sh
+	!$(hlib)/mkfloat
 	;
 f68881:					# install f68881 binaries
 	$verbose off
 	$set DIRS = "lib src"
-	!$(hlib)/mkfloat.sh f68881 -d $(DIRS)
+	!$(hlib)/mkfloat f68881 -d $(DIRS)
 	;
 ffpa:					# install ffpa binaries
 	$verbose off
 	$set DIRS = "lib src"
-	!$(hlib)/mkfloat.sh ffpa -d $(DIRS)
+	!$(hlib)/mkfloat ffpa -d $(DIRS)
 	;
 fswitch:				# install fswitch binaries
 	$verbose off
 	$set DIRS = "lib src"
-	!$(hlib)/mkfloat.sh fswitch -d $(DIRS)
+	!$(hlib)/mkfloat fswitch -d $(DIRS)
 	;
 fsoft:					# install fsoft binaries
 	$verbose off
 	$set DIRS = "lib src"
-	!$(hlib)/mkfloat.sh fsoft -d $(DIRS)
+	!$(hlib)/mkfloat fsoft -d $(DIRS)
 	;
 sparc:					# install sparc binaries
 	$verbose off
 	$set DIRS = "lib src"
-	!$(hlib)/mkfloat.sh sparc -d $(DIRS)
+	!$(hlib)/mkfloat sparc -d $(DIRS)
 	;
