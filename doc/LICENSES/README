@@ -7,3 +7,4 @@ to third-party sources in the IRAF system:
     UCAR				For NCAR graphics
     ERFA				For ast_julday_to_date in noao$astutil/asttools/asttimes.x
     LLSQ				For math$llsq
+    LAPACK				For math$lapack
