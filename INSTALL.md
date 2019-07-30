@@ -50,9 +50,19 @@ links:
 
     $ ./install 		# execute the install script
 
-Usually, you can everywhere use the default settings when asked from
-the install script.  Configure the system for the proper architecture
-and build:
+The script will prompt you for the path to the default image 
+directory, the cache directory and the binary files directory.
+Usually, you can everywhere use the default settings when asked from 
+the install script. You will need to include the binary files 
+directory in your PATH before proceeding to the `<make>` step.
+In BASH this can be done with the command:
+
+    $ export PATH=/path/to/iraf/bin/:$PATH
+
+where `</path/to/iraf/bin/>` is the binary files path specified to 
+the install script.
+
+Now you can configure the system for the proper architecture and build:
 
     $ make <arch>
     $ make sysgen 2>&1 | tee build.log
