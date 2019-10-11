@@ -10,7 +10,7 @@ nfields 0
 
 
 begin usnob1@noao
-address inet:80:archive.tuc.noao.edu:text
+address inet:80:r2.sdm.noao.edu:text
 query GET /cgi-bin/scat?catalog=ub1&ra=%-s&dec=%-s&sys=J2000&mrad=%-s&nstar=-1 HTTP/1.0\n\n
 nquery 4
     ra 00:00:00.00 hours %0.2h
@@ -38,7 +38,7 @@ nfields 11
 
 
 begin twomass@noao
-address inet:80:archive.tuc.noao.edu:text
+address inet:80:r2.sdm.noao.edu:text
 query GET /cgi-bin/scat?catalog=tmc&ra=%-s&dec=%-s&sys=J2000&mrad=%-s&nstar=-1 HTTP/1.0\n\n
 nquery 4
     ra 00:00:00.00 hours %0.2h
