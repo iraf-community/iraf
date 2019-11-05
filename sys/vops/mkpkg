@@ -146,5 +146,5 @@ libvops.a:
 	@lz
 	@achtgen			# acht conversion matrix
 	fftr.f
-	fftx.f
+	fftx.x
 	;

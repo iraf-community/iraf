@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit -lfftpack"
+	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit"
 	$update libpkg.a
 	$omake x_rv.x
 	$link -o xx_rv.e x_rv.o libpkg.a $(LIBS)
