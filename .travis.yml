@@ -1,15 +1,28 @@
 matrix:
   include:
     - os: linux
-      dist: xenial
-      env: IRAFARCH=linux64 OS_VERS=xenial
+      dist: bionic
+      arch: amd64
+      env: IRAFARCH=linux64 OS_VERS=bionic
       addons:
         apt:
           packages:
+            - libcurl4-openssl-dev
+            - libexpat1-dev
             - libreadline-dev
     - os: linux
-      dist: xenial
-      env: IRAFARCH=linux OS_VERS=xenial CARCH="-m32"
+      dist: bionic
+      arch: arm64
+      env: IRAFARCH=linux64 OS_VERS=bionic
+      addons:
+        apt:
+          packages:
+            - libcurl4-openssl-dev
+            - libexpat1-dev
+            - libreadline-dev
+    - os: linux
+      dist: bionic
+      env: IRAFARCH=linux OS_VERS=bionic CARCH="-m32"
       addons:
         apt:
           packages:
