@@ -18,8 +18,8 @@ matrix:
             - libexpat1-dev:i386
             - libreadline-dev:i386
     - os: osx
-      osx_image: xcode10.2
-      env: IRAFARCH=macintel OS_VERS=mojave
+      osx_image: xcode11.2
+      env: IRAFARCH=macintel OS_VERS=catalina
     - os: osx
       osx_image: xcode9.4
       env: IRAFARCH=macosx OS_VERS=highsierra CARCH="-m32"
