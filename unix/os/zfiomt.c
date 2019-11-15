@@ -1712,8 +1712,8 @@ static void zmtdbgopen (struct mtdesc *mp)
 	    if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
 		return;
 
-	    bzero ((char *)&sockaddr, sizeof(sockaddr));
-	    bcopy ((char *)hp->h_addr,(char *)&sockaddr.sin_addr, hp->h_length);
+	    memset ((char *)&sockaddr, 0, sizeof(sockaddr));
+	    memcpy ((char *)&sockaddr.sin_addr,(char *)hp->h_addr, hp->h_length);
 	    sockaddr.sin_family = AF_INET;
 	    sockaddr.sin_port = htons((short)port);
 	    if (connect (s,(struct sockaddr *)&sockaddr,sizeof(sockaddr)) < 0) {

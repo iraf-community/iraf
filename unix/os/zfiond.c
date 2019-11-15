@@ -223,7 +223,7 @@ ZOPNND (
 		    if ((int)host_addr == -1)
 			goto err;
 		} else if ((hp = gethostbyname(host_str))) {
-		    bcopy (hp->h_addr, (char *)&host_addr, sizeof(host_addr));
+  		    memcpy (&host_addr, hp->h_addr, sizeof(host_addr));
 		} else
 		    goto err;
 
@@ -340,11 +340,10 @@ ZOPNND (
 		    goto err;
 
 		/* Compose network address. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset (&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
-		bcopy ((char *)&host_addr, (char *)&sockaddr.sin_addr,
-		    sizeof(host_addr));
+		memcpy (&sockaddr.sin_addr, &host_addr, sizeof(host_addr));
 
 		/* Connect to server. */
 		if (fd >= MAXOFILES || (connect (fd,
@@ -365,7 +364,7 @@ ZOPNND (
 		    goto err;
 
 		/* Compose network address. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,
 		    np->path1, sizeof(sockaddr.sun_path));
@@ -420,7 +419,7 @@ ZOPNND (
 		    goto err;
 
 		/* Bind server port to socket. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
 		sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -469,7 +468,7 @@ ZOPNND (
 		    goto err;
 
 		/* Bind server port to socket. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,np->path1,sizeof(sockaddr.sun_path));
 		addrlen = sizeof(sockaddr) - sizeof(sockaddr.sun_path)

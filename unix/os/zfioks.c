@@ -1126,7 +1126,7 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	    return (ERR);
 
 	/* Set socket address. */
-	bzero ((char *)&sockaddr, sizeof(sockaddr));
+	memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons((short)port);
 
@@ -1136,7 +1136,7 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	} else if (*host) {
 	    if ((hp = gethostbyname (host)) == NULL)
 		goto failed;
-	    bcopy((char *)hp->h_addr,(char *)&sockaddr.sin_addr, hp->h_length);
+	    memcpy((char *)&sockaddr.sin_addr,(char *)hp->h_addr, hp->h_length);
 	} else
 	    sockaddr.sin_addr.s_addr = INADDR_ANY;
 

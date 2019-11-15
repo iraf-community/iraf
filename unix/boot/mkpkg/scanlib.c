@@ -193,11 +193,11 @@ h_scanlibrary (char *library)
 		        char p[SZ_PATHNAME];
 
 		        len = atoi(&arf.ar_name[3]);
-	                bzero (p, SZ_PATHNAME);
+	                memset (p, 0, SZ_PATHNAME);
 		        if (fread(p, len, 1, fp) != 1) {
 		            fprintf (stderr, "%s: premature EOF", libfname);
 		        }
-	                bzero (modname, SZ_KEY+1);
+	                memset (modname, 0, SZ_KEY+1);
 		        sprintf (modname, "%s", p);
 	        } else 
 		    len = 0;
