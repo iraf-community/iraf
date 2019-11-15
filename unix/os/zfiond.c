@@ -172,7 +172,7 @@ ZOPNND (
 	register int fd;
 	    register struct portal *np, *s_np = (struct portal *) NULL;
 	    unsigned short host_port = 0;
-	    unsigned long host_addr = 0;
+	    in_addr_t host_addr = 0;
 	    char osfn[SZ_NAME*2];
 	    char flag[SZ_NAME];
 	    char *ip;
@@ -220,7 +220,7 @@ ZOPNND (
 		    strcpy (host_str, "localhost");
 		if (isdigit (host_str[0])) {
 		    host_addr = inet_addr (host_str);
-		    if ((int)host_addr == -1)
+		    if (host_addr == INADDR_NONE)
 			goto err;
 		} else if ((hp = gethostbyname(host_str))) {
   		    memcpy (&host_addr, hp->h_addr, sizeof(host_addr));
