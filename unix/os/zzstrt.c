@@ -90,7 +90,7 @@ ZZSTRT (void)
 
 	/* Pass the values of the kernel parameters into the kernel. */
 	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty,
-	    &ipc_in, &ipc_out);
+	    ipc_in, ipc_out);
 
 	return (XOK);
 }
