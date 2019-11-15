@@ -320,7 +320,7 @@ ZOPNKS (
             client_host = ip + 1;
 
 	    dbgmsgf ("S:callback client %s on port %d\n", client_host, port);
-	    if ((s = ks_socket (client_host, NULL, port, "connect")) < 0)
+	    if ((s = ks_socket (client_host, 0, port, "connect")) < 0)
 		*chan = ERR;
 	    else
 		*chan = s;
@@ -686,7 +686,7 @@ again:
 	     * to start up a new irafks daemon on the port just created.  If
 	     * the connection fails, fork an rsh and start up the in.irafksd.
 	     */
-	    if (!port || (t = ks_socket (host, NULL, port, "connect")) < 0) {
+	    if (!port || (t = ks_socket (host, 0, port, "connect")) < 0) {
 		dbgmsg ("C:no server, fork rsh to start in.irafksd\n");
 
 		if (pipe(pin) < 0 || pipe(pout) < 0) {
@@ -734,7 +734,7 @@ retry:
 		     * the daemon.
 		     */
 		    if (status ||
-			(t = ks_socket (host, NULL, port, "connect")) < 0) {
+			(t = ks_socket (host, 0, port, "connect")) < 0) {
 
 			/* The KS_RETRY environment variable may be set to 
 			 * the number of times we wish to try to reconnect.
