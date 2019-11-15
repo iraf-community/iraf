@@ -213,8 +213,8 @@ vot_openVOTABLE (char *arg)
     FILE    *fd = (FILE *) NULL;
     Element *my_element;
     char     buf[BUFSIZE], *ip, urlFname[BUFSIZE];
-    size_t   len, nleft = 0, fsize = -1, nread = 0;
-    int      done, ret_handle, nerrs;
+    size_t   len = 0, nleft = 0, fsize = -1, nread = 0;
+    int      done, ret_handle;
     XML_Parser parser;
 
     struct   stat st;
@@ -260,7 +260,7 @@ vot_openVOTABLE (char *arg)
 	    strcpy (urlFname, "/tmp/votquery");
 	close (tfd);
 
-	nerrs = vot_simpleGetURL (arg, urlFname);
+	vot_simpleGetURL (arg, urlFname);
         if ( !(fd = fopen (urlFname, "r")) ) {
             fprintf (stderr, "Unable to open url '%s'\n", arg);
             return (0);			/* cannot open file error	*/
@@ -3392,7 +3392,7 @@ static void
 vot_htmlTableData (FILE *fd, handle_t res, char *ifname)
 {
     handle_t  tab, data, tdata, field, tr, td;
-    register  int i, nrows, ncols;
+    register  int i;
     char     *name, *id, *ucd, *s;
 
 
@@ -3411,8 +3411,6 @@ vot_htmlTableData (FILE *fd, handle_t res, char *ifname)
 	return;
     if ((tdata = vot_getTABLEDATA (data)) <= 0)
 	return;
-    nrows = vot_getNRows (tdata);
-    ncols = vot_getNCols (tdata);
 
 
     fprintf (fd, "<table border='%d'>\n", tborder);

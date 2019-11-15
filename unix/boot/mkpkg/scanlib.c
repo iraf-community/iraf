@@ -78,7 +78,6 @@ h_scanlibrary (char *library)
 	mlb_op = 1;
 	nmodules = 0;
 
-	len = 0;
 	for (i=0;  i < MAX_LIBFILES;  i++)
 	    mlb_index[i] = 0;
 

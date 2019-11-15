@@ -19,7 +19,7 @@ os_fcopy (
 )
 {
 	XCHAR	buf[SZ_FBUF];
-	XINT	status,	junk, maxch = SZ_FBUF, mode = 0, in, out, n, nw;
+	XINT	status,	junk, maxch = SZ_FBUF, mode = 0, in, out, n;
 
 	extern  int ZOPNTX(PKCHAR *osfn, XINT *mode, XINT *chan);
 	extern  int ZGETTX(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
@@ -75,7 +75,7 @@ os_fcopy (
 	    }
 
 	    while ((n = read (in, (char *)buf, SZ_FBUF)) > 0)
-		nw = write (out, (char *)buf, n);
+		write (out, (char *)buf, n);
 
 	    close (in);
 	    close (out);
