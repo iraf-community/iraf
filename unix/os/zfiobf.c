@@ -777,7 +777,7 @@ vm_connect (void)
 	} else {
 	    vm_server = fd;
 	    if (vm_debug)
-		fprintf (stderr, "fd=%d\n", fd);
+		fprintf (stderr, "fd=%d\n", (int)fd);
 	    vm_identify();
 	}
 

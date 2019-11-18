@@ -91,11 +91,10 @@ h_updatelibrary (
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
 	char	libfname[SZ_PATHNAME+1];
-	char   *lname = NULL;
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
-	lname = resolvefname(libfname);
+	resolvefname(libfname);
 
 	/*
 	 * Compile the files.

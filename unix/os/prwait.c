@@ -45,7 +45,7 @@ pr_enter (int pid, int inchan, int outchan)
 	extern  int kernel_panic (char *msg);
 
 
-	if ((pr = pr_findpid (NULL)) == NULL)
+	if ((pr = pr_findpid (0)) == NULL)
 	    kernel_panic ("iraf process table overflow");
 	else {
 	    pr->pr_pid = pid;

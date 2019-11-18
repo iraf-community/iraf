@@ -172,7 +172,7 @@ ZOPNND (
 	register int fd;
 	    register struct portal *np, *s_np = (struct portal *) NULL;
 	    unsigned short host_port = 0;
-	    unsigned long host_addr = 0;
+	    in_addr_t host_addr = 0;
 	    char osfn[SZ_NAME*2];
 	    char flag[SZ_NAME];
 	    char *ip;
@@ -220,10 +220,10 @@ ZOPNND (
 		    strcpy (host_str, "localhost");
 		if (isdigit (host_str[0])) {
 		    host_addr = inet_addr (host_str);
-		    if ((int)host_addr == -1)
+		    if (host_addr == INADDR_NONE)
 			goto err;
 		} else if ((hp = gethostbyname(host_str))) {
-		    bcopy (hp->h_addr, (char *)&host_addr, sizeof(host_addr));
+  		    memcpy (&host_addr, hp->h_addr, sizeof(host_addr));
 		} else
 		    goto err;
 
@@ -340,11 +340,10 @@ ZOPNND (
 		    goto err;
 
 		/* Compose network address. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset (&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
-		bcopy ((char *)&host_addr, (char *)&sockaddr.sin_addr,
-		    sizeof(host_addr));
+		memcpy (&sockaddr.sin_addr, &host_addr, sizeof(host_addr));
 
 		/* Connect to server. */
 		if (fd >= MAXOFILES || (connect (fd,
@@ -365,7 +364,7 @@ ZOPNND (
 		    goto err;
 
 		/* Compose network address. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,
 		    np->path1, sizeof(sockaddr.sun_path));
@@ -420,7 +419,7 @@ ZOPNND (
 		    goto err;
 
 		/* Bind server port to socket. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
 		sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -469,7 +468,7 @@ ZOPNND (
 		    goto err;
 
 		/* Bind server port to socket. */
-		bzero ((char *)&sockaddr, sizeof(sockaddr));
+		memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,np->path1,sizeof(sockaddr.sun_path));
 		addrlen = sizeof(sockaddr) - sizeof(sockaddr.sun_path)

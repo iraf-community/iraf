@@ -320,7 +320,7 @@ ZOPNKS (
             client_host = ip + 1;
 
 	    dbgmsgf ("S:callback client %s on port %d\n", client_host, port);
-	    if ((s = ks_socket (client_host, NULL, port, "connect")) < 0)
+	    if ((s = ks_socket (client_host, 0, port, "connect")) < 0)
 		*chan = ERR;
 	    else
 		*chan = s;
@@ -686,7 +686,7 @@ again:
 	     * to start up a new irafks daemon on the port just created.  If
 	     * the connection fails, fork an rsh and start up the in.irafksd.
 	     */
-	    if (!port || (t = ks_socket (host, NULL, port, "connect")) < 0) {
+	    if (!port || (t = ks_socket (host, 0, port, "connect")) < 0) {
 		dbgmsg ("C:no server, fork rsh to start in.irafksd\n");
 
 		if (pipe(pin) < 0 || pipe(pout) < 0) {
@@ -734,7 +734,7 @@ retry:
 		     * the daemon.
 		     */
 		    if (status ||
-			(t = ks_socket (host, NULL, port, "connect")) < 0) {
+			(t = ks_socket (host, 0, port, "connect")) < 0) {
 
 			/* The KS_RETRY environment variable may be set to 
 			 * the number of times we wish to try to reconnect.
@@ -1126,7 +1126,7 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	    return (ERR);
 
 	/* Set socket address. */
-	bzero ((char *)&sockaddr, sizeof(sockaddr));
+	memset ((char *)&sockaddr, 0, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons((short)port);
 
@@ -1136,7 +1136,7 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	} else if (*host) {
 	    if ((hp = gethostbyname (host)) == NULL)
 		goto failed;
-	    bcopy((char *)hp->h_addr,(char *)&sockaddr.sin_addr, hp->h_length);
+	    memcpy((char *)&sockaddr.sin_addr,(char *)hp->h_addr, hp->h_length);
 	} else
 	    sockaddr.sin_addr.s_addr = INADDR_ANY;
 

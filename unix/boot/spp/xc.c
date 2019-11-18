@@ -192,10 +192,6 @@ static void  rmfiles (void);
 static void  fatalstr (char *s1, char *s2);
 static void  fatal (char *s);
 
-static char *findexe (char *prog, char *dir);
-
-
-
 
 /**
  *  MAIN -- Execution begins here.  Interpret command line arguments and
@@ -1403,69 +1399,4 @@ fatal (char *s)
 	fprintf (stderr, "Fatal compiler error: %s\n", s);
 	fflush (stderr);
 	done (1);
-}
-
-
-/* FINDEXE -- Search for the named file and return the path if found, else
- * NULL.  If "dir" is non-NULL the directory in which the file resides is
- * returned in the string buffer pointed to.  The user's PATH is searched,
- * followed by SYSBINDIR, then LOCALBINDIR.
- */
-static char *
-findexe (
-    char  *prog,		/* file to search for */
-    char  *dir			/* pointer to output string buf, or NULL */
-)
-{
-	register char *ip, *op;
-	static	char path[SZ_PATHNAME];
-	char	dirpath[SZ_PATHNAME];
-	char	*dp = dir ? dir : dirpath;
-	char	*pathp;
-
-	/* Look for the program in the directories in the user's path.
-	 */
-	ip = pathp = os_getenv ("PATH");
-	while (*ip) {
-	    for (op=dp;  *ip && (*op = *ip++) != ':';  op++)
-		;
-	    *op++ = '/';
-	    *op++ = EOS;
-	    strcpy (path, dp);
-	    strcat (path, prog);
-	    if (access (path, 0) != -1)
-		return (path);
-	}
-
-	/* Look in SYSBINDIR. */
-	strcpy (dp, SYSBINDIR);
-	strcpy (path, dp);
-	strcat (path, prog);
-
-	if (access (path, 0) != -1) {
-	    static  char envpath[8192];
-	    char    *oldpath;
-
-	    /* Add SYSBINDIR to the user's path.  This is required to
-	     * use the V1.3 compiler.  Note that this code should only be
-	     * executed once, since the next time findexe is called the
-	     * SYSBINDIR directory will be in the default path, above.
-	     */
-	    if ((oldpath = pathp)) {
-		sprintf (envpath, "PATH=%s:%s", SYSBINDIR, oldpath);
-		putenv (envpath);
-	    }
-
-	    return (path);
-	}
-
-	/* Look in LOCALBINDIR. */
-	strcpy (dp, LOCALBINDIR);
-	strcpy (path, dp);
-	strcat (path, prog);
-	if (access (path, 0) != -1)
-	    return (path);
-
-	/* Not found. */
-	return (NULL);
 }
