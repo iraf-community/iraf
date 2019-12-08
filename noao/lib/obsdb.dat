@@ -600,3 +600,19 @@ observatory = "helmos"
        latitude = 37.9844
        altitude = 2340
        timezone = -2
+
+# Submitted by Gu Lim 8/19/19
+observatory = "sao"
+	name = "Seoul National University Astronomical Observatory : 1-m telescope"
+	longitude = 233.046667
+	latitude = 37.45704167
+	altitude = 190.
+	timezone = 9
+
+# Submitted by Anael Wunsche 11/26/19
+observatory = "obp"
+	Name = "Observatory of Baronnies Provencales"
+	longitude = -05:30.18
+	latitude = +44:24.8
+	altitude = 820.
+	timezone = -1
