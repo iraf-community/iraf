@@ -1,13 +1,19 @@
 .help revisions May93 noao.lib
 .nf
 
-noao/lib/obsb.dat
-    Added entry for Helmos Observatory, Penteli, Greece.  (2/17/14(
+noaolib$obsb.dat
+    Added entry for Baronnies Provencales Observatory, (11/26/19)
 
-noao/lib/obsb.dat
+noaolib$obsb.dat
+    Added entry for Seoul National Observatory, 1-m Telescope.  (8/19/19)
+
+noaolib$obsb.dat
+    Added entry for Helmos Observatory, Penteli, Greece.  (2/17/14)
+
+noaolib$obsb.dat
     Added entry for Bologna Astronomical Obs., Loiano, Italy.   (1/14/14)
 
-noao/lib/obsb.dat
+noaolib$obsb.dat
     Added entry for Obs. Haute-Provence.   (12/12/13)
 
 noaolib$obsdb.dat
