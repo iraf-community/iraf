@@ -16,7 +16,7 @@ uid_executing (int uid)
 {
 	register struct dirent *direntp;
 	register DIR *dirp;
-	char fname[256];
+	char fname[320];
 	struct stat st;
 
 	dirp = opendir ("/proc");
