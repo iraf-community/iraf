@@ -473,11 +473,13 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	 */
 	{   
 	    /* 0x332: round to nearest, 64 bit precision, mask P-U-D. */
+/*
 #ifdef MACUNIX
 	    int fpucw = _FPU_IEEE;
 #else
 	    int fpucw = 0x332;
 #endif
+*/
 #ifdef LINUX64
             /*
             XINT fpucw = 0x332;
