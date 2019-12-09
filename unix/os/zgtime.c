@@ -32,18 +32,8 @@ ZGTIME (
 	long	time();
 #endif
 	time_t	gmt_to_lst();
-	long	cpu, clkfreq;
+	long	cpu;
 
-
-#ifdef LINUX
-	clkfreq = CLOCKS_PER_SEC;
-#else
-#ifdef MACOSX
-	clkfreq = CLOCKS_PER_SEC;
-#else
-	clkfreq = CLKFREQ;			/* from <kernel.h> */
-#endif
-#endif
 
 	times (&t);
 	*clock_time = gmt_to_lst ((time_t)time(0));
@@ -55,10 +45,8 @@ ZGTIME (
 	cpu = (t.tms_utime + t.tms_cutime);
 
 	if (cpu > MAX_LONG/1000)
-	    /* *cpu_time = cpu / clkfreq * 1000;*/
 	    *cpu_time = cpu / 10;
 	else
-	    /* *cpu_time = cpu * 1000 / clkfreq;*/
 	    *cpu_time = cpu * 10;
 
 	return (XOK);
