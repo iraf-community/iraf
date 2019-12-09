@@ -57,6 +57,7 @@
 #define import_prtype
 #include <iraf.h>
 
+
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
  * during process startup and shutdown, when the IRAF kernel routines are being
@@ -612,7 +613,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 
 	/* Pass the values of the kernel parameters into the kernel. */
 	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty,
-	    &ipc_in, &ipc_out);
+	    ipc_in, ipc_out);
 
 	return (XOK);
 }
