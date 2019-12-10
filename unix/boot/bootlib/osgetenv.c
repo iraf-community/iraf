@@ -6,7 +6,9 @@
 #include "bootlib.h"
 
 
-char *_os_getenv();
+char *_os_getenv(char *envvar, char *outstr, int maxch);
+
+extern int ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
 
 
 /* OS_GETENV -- Return the value of the named environment variable.  Null is
@@ -82,6 +84,7 @@ _os_getenv (
 	PKCHAR	symbol[SZ_FNAME+1];
 	PKCHAR	value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
+
 
 	strcpy ((char *)symbol, envvar);
 	ZGTENV (symbol, value, &x_maxch, &status);
