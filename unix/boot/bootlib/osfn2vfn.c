@@ -44,7 +44,7 @@ char	*osfn;			/* input OS filename	*/
 	XINT	x_maxch = SZ_PATHNAME;
 	XINT	x_mode, vp, nchars;
 
-	extern  void _envinit();
+	extern  void _envinit(void);
 
 
 	_envinit();

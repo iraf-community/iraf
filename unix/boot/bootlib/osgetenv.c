@@ -21,7 +21,7 @@ os_getenv (char *envvar)
 	static	char	hostdir[SZ_PATHNAME+1] = "";
 	static	char	valstr[SZ_COMMAND+1];
 	static	char	errmsg[] = "environment variable `%s' not found\n";
-	extern	char	*os_subdir();
+	extern	char	*os_subdir(char *dir, char *subdir);
 	char	*vp;
 
 
@@ -113,7 +113,7 @@ _os_getenv (
 	XCHAR	x_symbol[SZ_FNAME+1];
 	XCHAR	x_value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
-	extern  XINT ENVFIND();
+	extern  XINT ENVFIND(XCHAR *key, XCHAR *value, XINT *maxch);
 
 
 	os_strupk (envvar, x_symbol, SZ_FNAME);
