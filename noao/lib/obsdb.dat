@@ -611,8 +611,16 @@ observatory = "sao"
 
 # Submitted by Anael Wunsche 11/26/19
 observatory = "obp"
-	Name = "Observatory of Baronnies Provencales"
+	name = "Observatory of Baronnies Provencales"
 	longitude = -05:30.18
 	latitude = +44:24.8
 	altitude = 820.
 	timezone = -1
+
+# Submitted by Parveen 12/16/19
+observatory = "MIRO"
+        name = "Mount Abu Infrared Observatory"
+        longitude = 287.22078
+        lattitude = 24.65482
+        altitude = 1680
+        timezone = -5.5
