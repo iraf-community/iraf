@@ -89,6 +89,7 @@ base:
 
 
 xrpc: $(SRCS:%.c=%.o)
+	mkdir -p lib/build
 	cp $(OBJS) lib/build/
 	/usr/bin/ar rv libxrpc.a $?
 	(cp libxrpc.a ../libsamp.a)
