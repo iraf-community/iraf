@@ -15,9 +15,10 @@
  * or null if the char is not found.
  */
 char *
-rindex (str, ch)
-char	*str;
-register int ch;
+rindex (
+    char *str,
+    int   ch
+)
 {
 	register char	*ip;
 	register int	cch;
@@ -30,4 +31,15 @@ register int ch;
 	return (last);
 }
 
+#else
+#include <strings.h>
+
+char *
+strrindex (
+    char *str,
+    int   ch
+)
+{
+    return (rindex (str, ch));
+}
 #endif
