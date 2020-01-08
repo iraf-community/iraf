@@ -14,7 +14,7 @@
 #endif
 
 #define	SECONDS_1970_TO_1980	315532800L
-static	long os_timezone();
+static	long os_timezone (void);
 
 
 /* OS_UTIME -- Convert IRAF time (local standard, epoch 1980) to UNIX time
@@ -28,7 +28,7 @@ static	long os_timezone();
 long
 os_utime (long iraf_time)
 {
-	struct	tm *localtime();
+	struct	tm *localtime(const time_t *);
 	time_t	time_var, lst;
 #ifdef AUX
 	long	lstl;
@@ -58,7 +58,7 @@ os_utime (long iraf_time)
 long
 os_itime (long unix_time)
 {
-	struct	tm *localtime();
+	struct	tm *localtime(const time_t *);
 	time_t	time_var, gmt;
 #ifdef AUX
 	long	gmtl;
@@ -86,7 +86,7 @@ os_itime (long unix_time)
  * from Greenwich, ignoring daylight savings time if in effect.
  */
 static long
-os_timezone()
+os_timezone (void)
 {
 #ifdef CYGWIN
 	extern	long _timezone;
