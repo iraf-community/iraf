@@ -31,5 +31,5 @@ os_amovb (
 	a_off = a - (char *)a_wp + 1;
 	b_off = b - (char *)b_wp + 1;
 	
-	BYTMOV (a_wp, &a_off, b_wp, &b_off, &nbytes);
+	BYTMOV (a_wp, &a_off, b_wp, &b_off, (XINT *)&nbytes);
 }
