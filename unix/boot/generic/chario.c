@@ -24,9 +24,10 @@ struct context {
 };
 
 FILE *
-k_fopen (fname, mode)
-char	*fname;
-char	*mode;
+k_fopen (
+  char	*fname,
+  char	*mode
+)
 {
 	register struct context *cx;
 	register FILE	*fp;
@@ -44,8 +45,9 @@ char	*mode;
 
 
 int
-k_fclose (cx_i)
-FILE	*cx_i;
+k_fclose (
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	int	status;
@@ -59,8 +61,9 @@ FILE	*cx_i;
 #ifdef vms
 
 int
-k_getc (cx_i)
-FILE	*cx_i;
+k_getc (
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	register int	ch;
@@ -75,10 +78,11 @@ FILE	*cx_i;
 }
 
 char *
-k_fgets (obuf, maxch, cx_i)
-char	*obuf;
-int	maxch;
-FILE	*cx_i;
+k_fgets (
+  char	*obuf,
+  int	maxch,
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	register int	ch, n;
@@ -97,10 +101,11 @@ FILE	*cx_i;
 }
 
 seek
-k_fseek (cx_i, offset, type)
-FILE	*cx_i;
-long	offset;
-int	type;
+k_fseek (
+  FILE	*cx_i,
+  long	offset,
+  int	type
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	register FILE	*fp = cx->fp;
@@ -134,8 +139,9 @@ int	type;
 }
 
 long
-k_ftell (cx_i)
-FILE	*cx_i;
+k_ftell (
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 
@@ -150,36 +156,40 @@ FILE	*cx_i;
 #else
 
 int
-k_getc (cx_i)
-FILE	*cx_i;
+k_getc (
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	return (getc (cx->fp));
 }
 
 char *
-k_fgets (op, maxch, cx_i)
-char	*op;
-int	maxch;
-FILE	*cx_i;
+k_fgets (
+  char	*op,
+  int	maxch,
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	return (fgets (op, maxch, cx->fp));
 }
 
 int
-k_fseek (cx_i, offset, type)
-FILE	*cx_i;
-long	offset;
-int	type;
+k_fseek (
+  FILE	*cx_i,
+  long	offset,
+  int	type
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	return (fseek (cx->fp, offset, type));
 }
 
 int
-k_ftell (cx_i)
-FILE	*cx_i;
+k_ftell (
+  FILE	*cx_i
+)
 {
 	register struct context *cx = (struct context *)cx_i;
 	return (ftell (cx->fp));
