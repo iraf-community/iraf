@@ -104,7 +104,7 @@ int main (int argc, char *argv[])
 	genfname[0] = EOS;
 	nfiles = 0;
 
-	for (p = &argv[1];  *p != NULL;  p++) {
+	for (n = argc, p = &argv[1];  *p != NULL;  p++, n--) {
 	    s = *p;
 	    if (s[0] == '-') {
 		switch (s[1]) {
