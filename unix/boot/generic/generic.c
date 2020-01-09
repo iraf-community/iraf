@@ -83,6 +83,7 @@ void  output (char ch);
 void  outstr (char *s);
 
 
+extern char	*index(const char *, int), *rindex(const char *, int);
 
 
 /**
@@ -97,7 +98,6 @@ int main (int argc, char *argv[])
 	char	genfname[SZ_FNAME+1];
 	char	template[SZ_FNAME+1];
 	char	input_file[SZ_FNAME+1];
-	char	*index(), *rindex();
 	int	n, nfiles;
 	FILE	*fp;
 
@@ -657,7 +657,7 @@ do_endif (void)		/* $endif statement */
 int
 evaluate_expr (void)
 {
-	char	ch=0, *p, *index(); 
+	char	ch=0, *p;
 	int	lpar, size1, size2, op;
 
 
