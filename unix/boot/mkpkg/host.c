@@ -44,14 +44,14 @@
 #define	XC		"xc"
 #define	INTERRUPT	SYS_XINT
 
-extern	char *makeobj();
-extern	char *vfn2osfn();
-extern	char *getenv();
+extern  char *makeobj (char *fname);
+extern  char *vfn2osfn (char *vfn, int new);
+extern  char *getenv (const char *envvar);
 
 extern  void fatals (char *fmt, char *arg);
 
-char	*resolvefname();
-char	*mkpath();
+char	*resolvefname (char *fname);
+char	*mkpath (char *module, char *directory, char *outstr);
 
 int   h_updatelibrary (char *library, char *flist[], int totfiles, 
                 char *xflags, char *irafdir);
@@ -851,7 +851,6 @@ resolvefname (char *fname)
 {
 	static char pathname[SZ_LIBPATH];
 	char relpath[SZ_LIBPATH];
-	extern char *strrchr();
 
 	strcpy (pathname, fname);
 	while (os_symlink (pathname, relpath, SZ_LIBPATH)) {
