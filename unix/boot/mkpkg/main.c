@@ -55,7 +55,6 @@ int	ignore = YES;			/* ignore warns			*/
 int	execute = YES;			/* think but don't act?		*/
 int	exit_status;			/* exit status of last syscall	*/
 int	forceupdate = NO;		/* forcibly update libmod dates	*/
-extern	char *os_getenv();
 
 
 void warns (char *fmt, char *arg);
@@ -102,7 +101,7 @@ main (int argc, char *argv[])
 
 	/* Process the command line.
 	 */
-	for (argp = &argv[1];  *argp;  ) {
+	for (i=argc, argp = &argv[1];  *argp; i-- ) {
 	    if (**argp == '-') {
 		/* A Mkpkg switch, or a flag to be passed on to XC.
 		 */
