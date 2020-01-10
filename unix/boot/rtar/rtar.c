@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define NOKNET
 #define	import_spp
@@ -147,16 +148,12 @@ static int   cchksum (register char *p, register int nbyte);
 static void  printheader (FILE *out, register struct fheader *fh, int verbose);
 static int   filetype (int in, struct fheader *fh);
 static int   newfile (char *fname, int mode, int uid, int gid, int type);
-static int   checkdir (register char *path, int mode, int uid, int gid);
+static int   checkdir (register char *path, int uid, int gid);
 static void  copyfile (int in, int out, struct fheader *fh, int ftype);
 static void  strip_blanks (int in, int out, long nbytes);
 static void  skipfile (int in, struct fheader *fh);
 static char *getblock (int in);
 
-
-
-
-char	*getblock();
 
 
 /* MAIN -- "rtar [xtvlef] [names]".  The default operation is to extract all
@@ -543,7 +540,7 @@ printheader (
 )
 {
 	register struct	_modebits *mp;
-	char	*tp, *ctime();
+	char	*tp;
 
 	if (!verbose) {
 	    fprintf (out, "%s\n", fh->name);
@@ -637,7 +634,7 @@ newfile (
 {
 	int	fd;
 	char	*cp;
-	char	*rindex();
+
 
 	if (len_pathprefix && strncmp(fname,pathprefix,len_pathprefix) == 0)
 	    fname += len_pathprefix;
@@ -645,11 +642,11 @@ newfile (
 	if (debug)
 	    fprintf (stderr, "newfile `%s':\n", fname);
 
-	if (checkdir (fname, mode, uid, gid) == ERR)
+	if (checkdir (fname, uid, gid) == ERR)
 	    return (ERR);
 
 	if (type == DIRECTORY_FILE) {
-	    cp = rindex (fname, '/');
+	    cp = rindex (fname, (int)'/');
 	    if (cp && *(cp+1) == EOS)
 		*cp = EOS;
 	    fd = os_createdir (fname, mode);
@@ -677,16 +674,15 @@ newfile (
 static int
 checkdir (
     register char *path,
-    int	mode,
     int	uid, int gid
 )
 {
 	register char	*cp;
-	char	*rindex();
+
 
 	/* Quick check to see if the directory exists.
 	 */
-	if ((cp = rindex (path, '/')) == NULL)
+	if ((cp = rindex (path, (int)'/')) == NULL)
 	    return (OK);
 
 	*cp = EOS;
