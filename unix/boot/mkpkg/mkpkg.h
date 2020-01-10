@@ -104,7 +104,6 @@ struct	sfile {
 
 
 /* External functions.
- */
 struct	sfile	*sf_dirsearch(), *sf_filesearch();
 struct	context *push_context();
 struct	context *pop_context();
@@ -115,14 +114,29 @@ char	*getargs();
 char	*makeobj();
 char	*getsym();
 char	*putstr();
-/*
-char	*malloc();
-char	*calloc();
-*/
 long	os_fdate();
 long	m_fdate();
 char	*index();
 char	*k_fgets();
+
+struct  sfile   *sf_dirsearch (char *dirname);
+struct  sfile   *sf_filesearch (struct sfile *sflist, char *stname);
+struct  context *push_context (register struct context *cx, char *module,
+                    char *newdir, char *fname);
+struct  context *pop_context (register struct context *cx);
+char    *vfn2osfn (char *vfn, int new);
+char    *os_getenv (char *envvar);
+char    *mklower (char *s);
+char    *getargs (register struct context *cx);
+char    *makeobj (char *fname);
+char    *getsym( char *name);
+char    *putstr (char *s);
+long    os_fdate (char *fname);
+long    m_fdate (char *fname);
+char    *k_fgets (char *op, int maxch, register struct context *cx);
+ */
+
+
 
 
 /*****************************************************************************/
@@ -196,8 +210,7 @@ struct context *push_context (register struct context *cx, char *module,
 struct context *pop_context (register struct context *cx);
 void  get_dependency_list (struct context *cx, char *module, 
                 char *dflist[], int maxfiles);
-int   up_to_date (struct context *cx, char *module, char *lname, 
-                char *dflist[], int *useobj);
+int   up_to_date (char *module, char *lname, char *dflist[], int *useobj);
 int   open_mkpkgfile (register struct context *cx);
 void  close_mkpkgfile (register struct context *cx);
 struct context *find_mkpkgfile ( struct context *head_cx, 
