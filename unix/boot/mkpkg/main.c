@@ -68,9 +68,6 @@ extern  int  do_mkpkg (struct context *cx, int islib);
 
 
 
-void zzpause () { printf ("ready ...."); (void) getc(stdin); }
-
-
 /* MAIN -- Entry point of mkpkg.e
  */
 int
@@ -150,9 +147,6 @@ main (int argc, char *argv[])
 			break;
 		    case 'v':
 			verbose = YES;
-			break;
-		    case 'w':
-			zzpause();
 			break;
 		    case 'r':
 			if (*argp == NULL)
