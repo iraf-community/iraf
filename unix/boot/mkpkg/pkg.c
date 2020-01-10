@@ -208,7 +208,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		parse_fname (srcname, dname, fname);
 		get_dependency_list (cx, modname, dflist, MAX_DEPFILES);
 
-		if (!up_to_date (cx, srcname, fname, dflist, &useobj)) {
+		if (!up_to_date (srcname, fname, dflist, &useobj)) {
 
 		    /* If file is remote add its name to the remote file list
 		     * and "checkout" the file, making it accessible in the
@@ -697,7 +697,6 @@ done:
  */
 int
 up_to_date (
-  struct context *cx,		/* current library context	*/
   char	*module,		/* module to compare dates for	*/
   char	*lname,			/* local name of module		*/
   char	*dflist[],		/* list of dependent files	*/

@@ -193,8 +193,7 @@ struct context *push_context (register struct context *cx, char *module,
 struct context *pop_context (register struct context *cx);
 void  get_dependency_list (struct context *cx, char *module, 
                 char *dflist[], int maxfiles);
-int   up_to_date (struct context *cx, char *module, char *lname, 
-                char *dflist[], int *useobj);
+int   up_to_date (char *module, char *lname, char *dflist[], int *useobj);
 int   open_mkpkgfile (register struct context *cx);
 void  close_mkpkgfile (register struct context *cx);
 struct context *find_mkpkgfile ( struct context *head_cx, 
