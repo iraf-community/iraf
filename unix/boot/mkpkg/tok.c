@@ -247,16 +247,16 @@ do_ppdir (
 	if (     strncmp (token, "$if",		3) == 0)
 	    do_if (cx, token);
 	else if (strncmp (token, "$else",	5) == 0)
-	    do_else (cx);
+	    do_else ();
 	else if (strncmp (token, "$endif",	6) == 0)
-	    do_endif (cx);
+	    do_endif ();
 	else if (strncmp (token, "$end",	4) == 0)
 	    do_end (cx);
 
 	else if (strncmp (token, "$call",	5) == 0)
 	    do_call (cx, getargs(cx), islib=NO);
 	else if (strncmp (token, "$echo",	5) == 0)
-	    do_echo (cx, getargs(cx));
+	    do_echo (getargs(cx));
 	else if (strncmp (token, "$goto",	5) == 0)
 	    do_goto (cx, getargs(cx));
 	else if (strncmp (token, "$include",	8) == 0)
@@ -287,7 +287,7 @@ do_ppdir (
 	else if (strncmp (token, "$omake",	6) == 0)
 	    do_omake (cx, getargs(cx));
 	else if (strncmp (token, "$purge",	6) == 0)
-	    do_purge (cx, getargs(cx));
+	    do_purge (getargs(cx));
 	else if (strncmp (token, "$xc",		3) == 0)
 	    do_xc (cx);
 
@@ -518,7 +518,7 @@ do_if (struct context *cx, char	*keyword)
  * outer $IF.
  */
 void
-do_else (struct	context *cx)
+do_else (void)
 {
 	if (debug > 1) {
 	    printf ("do_else:\n");
@@ -538,7 +538,7 @@ do_else (struct	context *cx)
  * Pop the if stack.
  */
 void
-do_endif (struct context *cx)
+do_endif (void)
 {
 	if (debug > 1) {
 	    printf ("do_endif:\n");
@@ -639,7 +639,7 @@ do_call (
 /* DO_ECHO -- Print a message on the standard output.
  */
 void
-do_echo (struct context *cx, char *msg)
+do_echo (char *msg)
 {
 	if (ifstate[iflev] == PASS) {
 	    printf ("%s\n", msg);
@@ -1220,7 +1220,6 @@ do_delete (struct context *cx)
  */
 void
 do_purge (
-  struct context *cx,		/* not used			*/
   char	*dname			/* logical directory name	*/
 )
 {
