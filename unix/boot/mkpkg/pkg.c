@@ -662,6 +662,7 @@ get_dependency_list (
 		break;
 	    case TOK_END:
 		warns ("unexpected EOF in dependency list for `%s'", module);
+		break;
 	    default:
 		warns ("bad token `%s' in dependency list", fname);
 	    }
