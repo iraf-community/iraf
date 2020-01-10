@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define	NOKNET
 #define	import_spp
@@ -503,7 +504,7 @@ printheader (
 )
 {
 	register struct	_modebits *mp;
-	char	*tp, *ctime();
+	char	*tp;
 
 	if (!verbose) {
 	    fprintf (fp, "%s\n", fh->name);
