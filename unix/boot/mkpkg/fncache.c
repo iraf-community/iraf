@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-//#include "../bootProto.h"
-
 
 /*
  * FNCACHE -- Maintain a cache of system logical filenames (e.g., <config.h>)
@@ -39,10 +37,9 @@ struct	_sysfile *fn_head;		/* doubly linked list		*/
 struct	_sysfile *fn_tail;
 int	fn_hits, fn_misses;
 
-struct	_sysfile *fn_unlink();
-struct	_sysfile *fn_tohead();
-struct	_sysfile *fn_totail();
-
+struct  _sysfile *fn_unlink (register struct _sysfile *fn);
+struct  _sysfile *fn_tohead (register struct _sysfile *fn);
+struct  _sysfile *fn_totail (register struct _sysfile *fn);
 
 extern  int  os_sysfile (char *sysfile, char *fname, int maxch);
 
@@ -109,7 +106,7 @@ m_fninit (int debug)
 	int	total;
 
 	if (debug) {
-	    char    lname[SZ_FNAME+1];
+	    char    lname[SZ_FNAME+3];
 
 	    total = fn_hits + fn_misses;
 	    printf ("file name cache: %d hits, %d misses, %d%% of %d\n",
@@ -117,6 +114,7 @@ m_fninit (int debug)
 
 	    for (fn=fn_head;  fn != NULL;  fn=fn->dnlnk)
 		if (fn->lname[0]) {
+                    memset (&lname[0], 0, SZ_FNAME+1);
 		    sprintf (lname, "<%s>", fn->lname);
 		    printf ("%3d (%05d) %-20s => %s\n",
 			fn->nrefs, fn->chksum, lname, fn->fname);
