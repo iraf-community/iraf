@@ -15,5 +15,6 @@
 #define	VM_CANCELREFCNT		0200
 #define	VM_DONTMAP		0400
 
-void	*vm_initcache();
-void	*vm_cacheregion();
+void	*vm_initcache (register VMcache *vm, char *initstr);
+void	*vm_cacheregion (register VMcache *vm, char *fname, int fd,
+            unsigned long offset, unsigned long nbytes, int acmode, int flags);
