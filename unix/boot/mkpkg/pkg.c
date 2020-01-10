@@ -656,7 +656,7 @@ get_dependency_list (
 	    case TOK_NEWLINE:
 		goto done;
 	    case TOK_FNAME:
-		if (nfiles >= MAX_DEPFILES)
+		if (nfiles >= maxfiles)
 		    warns ("too many dependency files for module `%s'", module);
 		dflist[nfiles++] = putstr (fname);
 		break;
