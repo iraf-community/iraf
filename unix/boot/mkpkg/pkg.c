@@ -38,7 +38,7 @@ do_mkpkg (
 	}
 
 	if (open_mkpkgfile (cx) == ERR) {
-	    char    fname[SZ_PATHNAME+1];
+	    char    fname[2*SZ_PATHNAME+1];
 	    struct  context *save_cx;
 
 	    save_cx = topcx;
@@ -705,7 +705,7 @@ up_to_date (
 )
 {
 	long	armod_date, newest_date, date;
-	long	h_ardate();
+	long	h_ardate (char *fname);
 	char	*fname;
 	int	old, i;
 
@@ -765,7 +765,8 @@ int
 open_mkpkgfile (register struct context *cx)
 {
 	register char	*fname = cx->mkpkgfile;
-	struct	context *find_mkpkgfile();
+	struct	context *find_mkpkgfile(struct context *head_cx,
+                            char *mkpkgfile, int level);
 	struct	context *ax;
 	
 	if (strcmp (fname, "stdin") == 0 || strcmp (fname, "STDIN") == 0) {
@@ -792,7 +793,8 @@ open_mkpkgfile (register struct context *cx)
 void
 close_mkpkgfile (register struct context *cx)
 {
-	struct context *find_mkpkgfile();
+	struct	context *find_mkpkgfile(struct context *head_cx,
+                            char *mkpkgfile, int level);
 
 	if (cx->fp != stdin)
 	    if (find_mkpkgfile (cx->prev, cx->mkpkgfile, cx->level) == NULL)
