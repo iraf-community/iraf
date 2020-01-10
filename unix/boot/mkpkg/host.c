@@ -101,11 +101,9 @@ h_updatelibrary (
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
 	char	libfname[SZ_PATHNAME+1];
-	char   *lname = NULL;
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
-	lname = resolvefname(libfname);
 
 	/*
 	 * Compile the files.
@@ -189,6 +187,9 @@ h_updatelibrary (
 #if defined(MACOSX) && !defined(MACH64)
 	/* For FAT libraries we need to use libtool to update.
 	 */
+	/* Get the library file name. */
+	char   *lname = resolvefname(libfname);
+
 	if (access (lname, F_OK) == 0)
 	    sprintf (cmd, "%s %s %s %s", LIBTOOL, "-a -T -o", lname, lname);
 	else
