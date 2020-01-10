@@ -38,7 +38,7 @@ do_mkpkg (
 	}
 
 	if (open_mkpkgfile (cx) == ERR) {
-	    char    fname[SZ_PATHNAME+1];
+	    char    fname[2*SZ_PATHNAME+1];
 	    struct  context *save_cx;
 
 	    save_cx = topcx;
