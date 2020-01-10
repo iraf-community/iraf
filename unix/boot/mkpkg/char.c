@@ -13,6 +13,7 @@
 
 #include "mkpkg.h"
 #include "extern.h"
+#include "../bootProto.h"
 
 /*
  * CHAR.C -- Character functions, character i/o.
