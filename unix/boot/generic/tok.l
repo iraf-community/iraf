@@ -14,6 +14,25 @@ extern	char	*type_string;
 extern	char	xtype_string[];
 extern	char	type_char;
 
+extern void  copy_line (void);
+extern void  copy_string (void);
+extern void  copy_comment (void);
+extern void  make_float (char type_ch);
+extern void  pass_through (void);
+extern void  do_for (void);
+extern void  do_endfor (void);
+extern void  do_if (void);
+extern void  do_else (void);
+extern void  do_endif (void);
+
+extern void  output_indef (char ch);
+extern void  output_upper (char *s);
+extern void  output (char ch);
+extern void  outstr (char *s);
+extern int   getc (FILE *cx_i);	  /* NOTE: lex.sed changes this to k_getc() */
+
+
+
 %}
 
 W	[ \t]
@@ -76,7 +95,8 @@ $INDEF				outstr ("INDEF");
 
 /* LEX_INPUT -- Make input() callable as a function from the .c code.
  */
-lex_input()
+int
+lex_input (void)
 {
 	return (input());
 }
@@ -84,8 +104,8 @@ lex_input()
 
 /* LEX_UNPUT -- Make unput() callable as a function from the .c code.
  */
-lex_unput (ch)
-int	ch;
+void
+lex_unput (int ch)
 {
 	unput (ch);
 }
