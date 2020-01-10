@@ -444,7 +444,7 @@ getheader (
 	    if (*hb->dbuf.chksum == '\0' && cchksum ((char *)hb, TBLOCK) == 0)
 		return (EOF);
 	    else
-		sscanf (hb->dbuf.chksum, "%o", &tape_checksum);
+		sscanf (hb->dbuf.chksum, "%o", (unsigned int *)&tape_checksum);
 
 	    for (ip=hb->dbuf.chksum, n=8;  --n >= 0;  )
 		*ip++ = ' ';
@@ -474,11 +474,11 @@ getheader (
 	    ;
 	fh->isdir = (*(op-2) == '/');
 
-	sscanf (hb->dbuf.mode,     "%o",  &fh->mode);
-	sscanf (hb->dbuf.uid,      "%o",  &fh->uid);
-	sscanf (hb->dbuf.gid,      "%o",  &fh->gid);
-	sscanf (hb->dbuf.size,     "%lo", &fh->size);
-	sscanf (hb->dbuf.mtime,    "%lo", &fh->mtime);
+	sscanf (hb->dbuf.mode,     "%o",  (unsigned int *)&fh->mode);
+	sscanf (hb->dbuf.uid,      "%o",  (unsigned int *)&fh->uid);
+	sscanf (hb->dbuf.gid,      "%o",  (unsigned int *)&fh->gid);
+	sscanf (hb->dbuf.size,     "%lo", (unsigned long *)&fh->size);
+	sscanf (hb->dbuf.mtime,    "%lo", (unsigned long *)&fh->mtime);
 
 	n = hb->dbuf.linkflag;
 	if (n >= '0' && n <= '9')
