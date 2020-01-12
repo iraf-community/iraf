@@ -90,7 +90,7 @@ typedef	void  (*SIGFUNC)();
 #endif
 
 typedef	void  (*PFV)();
-#ifdef MACH64
+#ifdef MACH64 || __LP64__
 typedef	long  (*PFI)();
 #else
 typedef	int   (*PFI)();
@@ -102,6 +102,6 @@ typedef	int   (*PFI)();
 #define bcopy(a,b,n)	memmove(b,a,n)
 #endif
 
-extern	char *irafpath();
+extern	char *irafpath (char *fname);
 
 #define	D_kernel
