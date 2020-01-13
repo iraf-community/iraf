@@ -11,6 +11,8 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include "xpp.h"
 #include "../bootProto.h"
 
@@ -450,6 +452,7 @@ main (int argc, char *argv[])
 	/* Process command line options, make file lists.
 	 * Convert ".x" files to ".f".
 	 */
+        (void)(argc);           // NOTUSED
 	for (i=1;  (arg = argv[i]) != NULL;  i++) {
 	    if (arg[0] == '-') {
 		switch (arg[1]) {
@@ -543,7 +546,7 @@ main (int argc, char *argv[])
 
 		case 'r':
 		    /* Not used anymore */
-		    if ((arg = argv[++i]) == EOS)
+		    if ((arg = argv[++i]) == NULL || *arg == EOS)
 			i--;
 		    break;
 
@@ -593,7 +596,7 @@ main (int argc, char *argv[])
 
 		default:
 		    if (strcmp (&arg[1], "Nh") == 0) {
-			if ((arg = argv[++i]) == EOS)
+		        if ((arg = argv[++i]) == NULL || *arg == EOS)
 			    i--;
 			else {
 			    foreigndefs++;
@@ -1657,7 +1660,6 @@ static int
 run (char *task, char *argv[])
 {
 	int	waitpid;
-	pid_t	fork();
 	char	path[SZ_PATHNAME];
 
 	if ((waitpid = fork()) == 0) {
