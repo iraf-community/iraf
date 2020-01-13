@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <strings.h>
 #include "xpp.h"
 #include "../../bootProto.h"
 #include "xppProto.h"
@@ -50,7 +51,7 @@ extern	int context;			/* lexical context flags	*/
 extern  int ntasks;
 static	int dtype;			/* set if typed procedure	*/
 
-extern  char *vfn2osfn();
+extern  char *vfn2osfn (char *vfn, int new);
 extern  void skipnl (void);
 
 
@@ -219,8 +220,7 @@ NI	[^a-zA-Z0-9_]
  * code for d_newproc().
  */
 void
-typespec (typecode)
-int	typecode;
+typespec (int typecode)
 {
 	if (context & DECL)
 	    d_declaration (typecode);
@@ -241,7 +241,7 @@ int	typecode;
  * replaced by the taskname dictionary as processing continues.
  */
 void
-process_task_statement()
+process_task_statement(void)
 {
         char    ch;
 
@@ -294,9 +294,9 @@ process_task_statement()
  * System include files are referenced as "<file>", other files as "file".
  */
 void
-do_include()
+do_include(void)
 {
-	char    *p, delim, *rindex();
+	char    *p, delim;
 	char    hfile[SZ_FNAME+1], *op;
 	int	root_len;
 
@@ -425,7 +425,7 @@ do_include()
  * main file.
  */
 int
-yywrap()
+yywrap(void)
 {
 	/* The last line of a file is not necessarily newline terminated.
 	 * Output a newline just in case.
@@ -460,7 +460,7 @@ yywrap()
 /* YY_INPUT -- Get a character from the input stream.
  */
 int
-yy_input ()
+yy_input (void)
 {
 	return (input());
 }
@@ -469,8 +469,7 @@ yy_input ()
 /* YY_UNPUT -- Put a character back into the input stream.
  */
 void
-yy_unput (ch)
-char	ch;
+yy_unput (char ch)
 {
 	unput(ch);
 }

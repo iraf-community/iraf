@@ -30,9 +30,9 @@ extern	FILE *yyout;
 extern	char fname[][SZ_PATHNAME];
 extern	int linenum[];
 
-extern	char *vfn2osfn(char *vfn, int new);
-extern	char *os_getenv(char *envvar);
-char	*dottor(char *fname);
+extern	char *vfn2osfn (char *vfn, int new);
+extern	char *os_getenv (char *envvar);
+char	*dottor (char *fname);
 
 extern  void ZZSTRT (void);
 extern  void ZZSTOP (void);

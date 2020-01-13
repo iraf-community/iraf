@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "xpp.h"
@@ -35,7 +36,7 @@
  */
 
 
-extern	char *vfn2osfn();
+extern	char *vfn2osfn (char *vfn, int new);
 
 /* Escape sequence characters and their binary equivalents.
  */
@@ -61,13 +62,16 @@ extern	int	yylineno;
 #define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
 */
 
-extern int   input();
-extern void  yyunput();
+extern int   input (void);
+extern void  yyunput (char ch);
 extern void  d_codegen (register FILE *fp);
 extern void  d_runtime (char *text);
 
 extern char *yytext_ptr;
+/*
 #define unput(c) yyunput( c, (yytext_ptr)  )
+*/
+#define unput(c) yyunput(c)
 
 
 
@@ -337,8 +341,7 @@ findkw (void)
 void
 mapident (void)
 {
-	int     i, findkw();
-	char	*str_fetch();
+	int     i;
 	register char *ip, *op;
 
 	/* If not keyword and not defined string, output as is.  The first
@@ -1347,7 +1350,6 @@ do_string (
 	register char ch, *ip;
 	register struct string *s;
 	int	readstr = 1;
-	char    *str_uniqid();
 
 	/* If we run out of space for string storage, print error message,
 	 * dump string decls out early, clear buffer and continue processing.
@@ -1412,7 +1414,6 @@ sterr:		    error (XPP_SYNTAX, "String declaration syntax");
 	    if (!(delim == '"' || delim == '\'')) {
 		register char *ip, *op;
 		int	ch;
-		char	*str_fetch();
 
 		/* Fetch name of defined macro into yytext.
 		 */
@@ -1551,7 +1552,6 @@ void
 traverse (char delim)
 {
 	register char *op, *cp, ch;
-	char	*index();
 
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
@@ -1675,8 +1675,8 @@ int
 charcon (char *string)
 {
 	register char *ip, ch;
-	char	*cc, *index();
-	char    *nump;
+	char	*cc, *nump;
+
 
 	ip = string + 1;		/* skip leading apostrophe	*/
 	ch = *ip++;
@@ -1707,7 +1707,7 @@ void
 int_constant (char *string, int base)
 {
 	char    decimal_constant[SZ_NUMBUF], *p;
-	long    accum(), value;
+	long    value;
 	int     i;
 
 	p = string;
