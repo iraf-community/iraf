@@ -29,9 +29,10 @@ extern	FILE *yyin;
 extern	FILE *yyout;
 extern	char fname[][SZ_PATHNAME];
 extern	int linenum[];
-extern	char *vfn2osfn();
-extern	char *os_getenv();
-char	*dottor();
+
+extern	char *vfn2osfn(char *vfn, int new);
+extern	char *os_getenv(char *envvar);
+char	*dottor(char *fname);
 
 extern  void ZZSTRT (void);
 extern  void ZZSTOP (void);
@@ -40,7 +41,7 @@ extern  int yylex (void);
 static  int  isxfile (char *fname);
 
 
-int main (int argc, char *argv[])
+int main (int argc, char **argv)
 {
 	int	i, rfflag, nfiles;
 	FILE	*fp_defs, *source;
@@ -55,6 +56,7 @@ int main (int argc, char *argv[])
 
 	/* Process flags and count the number of files.
 	 */
+        (void)(argc);           // NOTUSED
 	for (i=1;  argv[i] != NULL;  i++) {
 	    if (argv[i][0] == '-') {
 		switch (argv[i][1]) {
@@ -205,8 +207,7 @@ isxfile (char *fname)
 /* DOTTOR -- Change the extension of the named file to ".r".
  */
 char *
-dottor (fname)
-char	*fname;
+dottor (char *fname)
 {
 	static	char rfname[SZ_PATHNAME+1];
 	char	*ip, *op, *lastdot;
