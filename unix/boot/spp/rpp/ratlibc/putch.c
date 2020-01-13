@@ -3,9 +3,10 @@
 
 #include "ratdef.h"
 
-int PUTCH(c, fd)
-register RCHAR *c;
-register FINT  *fd;
+int PUTCH(
+    register RCHAR *c,
+    register FINT  *fd
+)
 {
 	register FILE *file;
 

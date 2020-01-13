@@ -6,9 +6,10 @@
 extern void r4tocstr (register RCHAR *rstr, register char *cstr);
 
 FINT
-OPEN(rname, mode)
-RCHAR *rname;
-register FINT *mode;
+OPEN(
+    RCHAR *rname,
+    register FINT *mode
+)
 {
 	register FILE  *fp;
 	char	       cname[FILENAMESIZE];

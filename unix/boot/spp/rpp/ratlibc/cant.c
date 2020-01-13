@@ -6,11 +6,12 @@
 extern  int  ENDST (void);
 
 
-void CANT(rname)
-register RCHAR *rname;
+void CANT(
+    register RCHAR *rname
+)
 {
 	while (*rname != REOS)
-		putc(*rname++, stderr);
+	    putc(*rname++, stderr);
 	fprintf(stderr, ": cant open\n");
 	ENDST();
 }

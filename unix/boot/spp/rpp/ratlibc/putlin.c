@@ -3,9 +3,10 @@
 
 #include "ratdef.h"
 
-void PUTLIN(line, fd)
-RCHAR *line;
-FINT	*fd;
+void PUTLIN(
+    RCHAR *line,
+    FINT  *fd
+)
 {
 	register FILE *fp;
 	register int c;
