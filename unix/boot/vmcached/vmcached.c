@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "vmcache.h"
 
@@ -44,19 +46,39 @@ int nclients;
 int maxclients;
 int debug;
 int running;
-extern char *getenv();
 void *vm;
+
+int execute(Client *cx, int argc, char *argv[]);
+int argname(char *arg, char *name1, char *name2);
+int getcmd(char **ipp, char *itop, int *argc, char *argv[]);
+void putstati(FILE *fp, int argc, char **argv, int status);
+void putstats(FILE *fp, int argc, char **argv, char *status);
+
+extern int vm_access (register VMcache *vm, char *fname, char *mode, int flags);
+extern int vm_status (register VMcache *vm, char *outbuf, int maxch, int flags);
+extern int vm_cachefile (register VMcache *vm, char *fname, int flags);
+extern int vm_uncachefile (register VMcache *vm, char *fname, int flags);
+extern int vm_uncachefd (register VMcache *vm, int fd, int flags);
+extern int vm_reservespace (register VMcache *vm, unsigned long nbytes);
+extern int vm_refreshfile (register VMcache *vm, char *fname, int flags);
+extern int vm_refreshregion (register VMcache *vm, int fd,
+                        unsigned long offset, unsigned long nbytes);
+
+extern void  vm_closecache (register VMcache *vm);
+extern void * vm_initcache (register VMcache *vm, char *initstr);
+
+
+
 
 
 /* MAIN -- VMCACHED main program.
  */
-main (argc, argv)
-int argc;
-char **argv;
+int
+main (int argc, char **argv)
 {
 	char *argp, *op, *cachesize;
 	int socket, lockpages, defpri, refbase, tock;
-	int c_argc, fd, status, acmode, server, i;
+	int c_argc, fd, status, acmode, server, i, n;
 	char *c_argv[MAX_ARGS];
 	char initstr[SZ_FNAME];
 	char osfn[SZ_FNAME];
@@ -70,11 +92,12 @@ char **argv;
 	lockpages = 0;
 
 	/* The socket to be used can be set in the environment. */
-	if (argp = getenv (ENV_VMSOCK))
+	if ((argp = getenv (ENV_VMSOCK)))
 	    socket = atoi (argp);
 
 	/* Parse argument list. */
-	for (i=1;  i < argc, argp = argv[i];  i++) {
+	for (i=1;  i < argc;  i++) {
+	    argp = argv[i];
 	    if (argname (argp, "-k", "-port")) {
 		argp = (argv[++i]);
 		socket = atoi (argp);
@@ -152,8 +175,6 @@ char **argv;
 	    /* Check for a new client connection. */
 	    if (FD_ISSET (server, &readfds)) {
 		char buf[SZ_CMDBUF];
-		FILE *fdopen();
-		int fd, n;
 
 		if (debug)
 		    fprintf (stderr, "vmcached: open new client connection: ");
@@ -285,10 +306,12 @@ disconnect:		    fclose (cx->out);
  * The command is echoed so that the status value can be matched to the
  * command it is for, e.g., if multiple commands were issued.
  */
-execute (cx, argc, argv)
-Client *cx;
-int argc;
-char *argv[];
+int
+execute (
+    Client *cx,
+    int argc,
+    char *argv[]
+)
 {
 	char *cmd = argv[0];
 	int execstat = 0;
@@ -429,7 +452,7 @@ char *argv[];
 	    char statbuf[SZ_STATBUF];
 
 	    status = vm_status (vm, statbuf, SZ_STATBUF, 0);
-	    putstats (cx->out, argc, argv, status);
+	    putstats (cx->out, argc, argv, statbuf);
 	    fputs (statbuf, cx->out);
 
 	} else if (strcmp (cmd, "subscribe") == 0) {
@@ -451,11 +474,13 @@ char *argv[];
 
 /* PUTSTATI -- Return an integer valued command status to the client.
  */
-putstati (fp, argc, argv, status)
-FILE *fp;
-int argc;
-char **argv;
-int status;
+void
+putstati (
+    FILE *fp,
+    int argc,
+    char **argv,
+    int status
+)
 {
 	register int i;
 
@@ -472,11 +497,13 @@ int status;
 
 /* PUTSTATS -- Return a string valued command status to the client.
  */
-putstats (fp, argc, argv, status)
-FILE *fp;
-int argc;
-char **argv;
-char *status;
+void
+putstats (
+    FILE *fp,
+    int argc,
+    char **argv,
+    char *status
+)
 {
 	register int i;
 
@@ -490,9 +517,12 @@ char *status;
 
 /* ARGNAME -- Test whether a string is one of the named arguments.
  */
-argname (arg, name1, name2)
-char *arg;
-char *name1, *name2;
+int
+argname (
+    char *arg,
+    char *name1, 
+    char *name2
+)
 {
 	int status = 0;
 
@@ -510,11 +540,13 @@ char *name1, *name2;
  * to the text following the command.  The command name is returned as
  * argv[0];
  */
-getcmd (ipp, itop, argc, argv)
-char **ipp;
-char *itop;
-int *argc;
-char *argv[];
+int
+getcmd (
+    char **ipp,
+    char *itop,
+    int *argc,
+    char *argv[]
+)
 {
 	register char *ip = *ipp;
 	register char *argp;

@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <string.h>
+#include <time.h>
 #include "vmcache.h"
 
 #ifdef sun
@@ -105,44 +108,7 @@
 #define	isfile(sp,st)	(sp->device == st.st_dev && sp->inode == st.st_ino)
 
 
-/* Segment descriptor. */
-struct segment {
-	struct segment *next;
-	struct segment *prev;
-	struct segment *nexthash;
-	int priority;
-	int userpri;
-	int refcnt;
-	int nrefs;
-	time_t atime;
-	time_t ptime;
-	void *addr;
-	int fd;
-	int acmode;
-	unsigned long inode;
-	unsigned long device;
-	unsigned long offset;
-	unsigned long nbytes;
-	char *fname;
-}; typedef struct segment Segment;
-
-/* Main VMcache descriptor. */
-struct vmcache {
-	Segment *segment_head, *last_mapped, *segment_tail;
-	int cache_initialized;
-	int cache_enabled;
-	int cachelen;
-	unsigned long cacheused;
-	unsigned long cachesize;
-	unsigned long physmem;
-	int lockpages;
-	int pagesize;
-	int defuserpri;
-	int refbase;
-	int tock;
-}; typedef struct vmcache VMcache;
-
-static debug = 0;
+static int debug = 0;
 static VMcache vmcache;
 static Segment *hashtbl[SZ_HASHTBL];
 
@@ -151,11 +117,23 @@ static int primes[] = {
 	149,151,157,163,167,173,179,181,191,
 };
 
-static vm_readahead();
-static vm_uncache();
-static Segment *vm_locate();
-static int vm_cachepriority();
-static int hashint();
+int     vm_uncachefile (register VMcache *vm, char *fname, int flags);
+int     vm_uncachefd (register VMcache *vm, int fd, int flags);
+int     vm_reservespace (register VMcache *vm, unsigned long nbytes);
+int     vm_refreshfile (register VMcache *vm, char *fname, int flags);
+int     vm_refreshregion (register VMcache *vm, int fd,
+                        unsigned long offset, unsigned long nbytes);
+
+void    vm_closecache (register VMcache *vm);
+
+static void vm_readahead(register VMcache *vm, void *addr, 
+                        unsigned long nbytes);
+static int vm_uncache(register VMcache *vm, register Segment *sp, int flags);
+static Segment *vm_locate(VMcache *vm, register dev_t device,
+                          register ino_t inode);
+static int vm_cachepriority(register VMcache *vm, register Segment *sp);
+static int hashint(int nthreads, register int w1, register int w2);
+
 
 
 /* VM_INITCACHE -- Initialize the VM cache.  A pointer to the cache 
@@ -188,9 +166,10 @@ static int hashint();
  * will still be called, the cache controller will be disabled.
  */
 void *
-vm_initcache (vm, initstr)
-register VMcache *vm;
-char *initstr;
+vm_initcache (
+    register VMcache *vm,
+    char *initstr
+)
 {
 	register char *ip, *op;
 	char keyword[SZ_NAME], valstr[SZ_NAME];
@@ -200,7 +179,8 @@ char *initstr;
 	unsigned long physpages;
 
 	if (debug)
-	    fprintf (stderr, "vm_initcache (0x%x, \"%s\")\n", vm, initstr);
+	    fprintf (stderr, "vm_initcache (0x%lx, \"%s\")\n", 
+                                (unsigned long)vm, initstr);
 
 	strcpy (cachesize, DEF_CACHESIZE);
 	defuserpri = DEF_PRIORITY;
@@ -267,7 +247,7 @@ char *initstr;
 #ifdef _SC_PHYS_PAGES
 	physpages = sysconf (_SC_PHYS_PAGES);
 	if (debug) {
-	    fprintf (stderr, "total physical memory %d (%dm)\n",
+	    fprintf (stderr, "total physical memory %ld (%ldMB)\n",
 		physpages * getpagesize(),
 		physpages * getpagesize() / (1024 * 1024));
 	}
@@ -309,21 +289,21 @@ char *initstr;
  * to close any open files (this is the only case where the VM cache code
  * closes files opened by the caller).
  */
-vm_closecache (vm)
-register VMcache *vm;
+void
+vm_closecache (register VMcache *vm)
 {
 	register Segment *sp;
 	struct stat st;
 
 	if (debug)
-	    fprintf (stderr, "vm_closecache (0x%x)\n", vm);
+	    fprintf (stderr, "vm_closecache (0x%lx)\n", (unsigned long)vm);
 	if (!vm->cache_initialized)
 	    return;
 
 	/* Free successive segments at the head of the cache list until the
 	 * list is empty.
 	 */
-	while (sp = vm->segment_head) {
+	while ((sp = vm->segment_head)) {
 	    vm_uncache (vm, sp, VM_DESTROYREGION | VM_CANCELREFCNT);
 
 	    /* Since we are closing the cache attempt to forcibly close the
@@ -372,24 +352,28 @@ register VMcache *vm;
  * space for large new files which may subsequently be shared by other
  * applications.
  */
-vm_access (vm, fname, mode, flags)
-register VMcache *vm;
-char *fname, *mode;
-int flags;
+int
+vm_access (
+    register VMcache *vm,
+    char *fname, 
+    char *mode,
+    int flags
+)
 {
 	register Segment *sp, *xp;
 	Segment *first=NULL, *last=NULL;
 	unsigned long offset, x0, x1, vm_offset, vm_nbytes;
-	int spaceused, map, n, status=0, fd;
+	int map, n, status=0, fd;
+	unsigned long spaceused;
 	struct stat st;
 
 	if (debug)
-	    fprintf (stderr, "vm_access (0x%x, \"%s\", 0%o)\n",
-		vm, fname, flags);
+	    fprintf (stderr, "vm_access (0x%lx, \"%s\", 0%o)\n",
+		(unsigned long) vm, fname, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
-	if ((fd = open (fname, O_RDONLY)) < 0)
+	if ((fd = open (fname, (strcmp(mode, "r")==0 ? O_RDONLY : O_RDWR))) < 0)
 	    return (-1);
 	if (fstat (fd, &st) < 0) {
 abort:	    close (fd);
@@ -597,16 +581,19 @@ again:
  * be accessed.  A value of zero indicates that the file is not cached.
  * A value of 1 or more indicates the number of file segments in the cache.
  */
-vm_statfile (vm, fname)
-register VMcache *vm;
-char *fname;
+int
+vm_statfile (
+    register VMcache *vm,
+    char *fname
+)
 {
 	register Segment *sp;
 	struct stat st;
 	int status=0;
 
 	if (debug)
-	    fprintf (stderr, "vm_statfile (0x%x, \"%s\")\n", vm, fname);
+	    fprintf (stderr, "vm_statfile (0x%lx, \"%s\")\n", 
+                            (unsigned long)vm, fname);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -626,10 +613,12 @@ char *fname;
  * zero it will never be cached in memory.  A priority of 1 is neutral;
  * higher values increase the cache priority of the file.
  */
-vm_setpriority (vm, fname, priority)
-register VMcache *vm;
-char *fname;
-int priority;
+int
+vm_setpriority (
+    register VMcache *vm,
+    char *fname,
+    int priority
+)
 {
 	register Segment *sp;
 	struct stat st;
@@ -639,8 +628,8 @@ int priority;
 	    priority = 0;
 
 	if (debug)
-	    fprintf (stderr, "vm_setpriority (0x%x, \"%s\", %d)\n",
-		vm, fname, priority);
+	    fprintf (stderr, "vm_setpriority (0x%lx, \"%s\", %d)\n",
+		(unsigned long)vm, fname, priority);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -657,17 +646,19 @@ int priority;
 
 /* VM_CACHEFILE -- Cache an entire named file in the VM cache.
  */
-vm_cachefile (vm, fname, flags)
-register VMcache *vm;
-char *fname;
-int flags;
+int
+vm_cachefile (
+    register VMcache *vm,
+    char *fname,
+    int flags
+)
 {
 	struct stat st;
 	int fd;
 
 	if (debug)
-	    fprintf (stderr, "vm_cachefile (0x%x, \"%s\", 0%o)\n",
-		vm, fname, flags);
+	    fprintf (stderr, "vm_cachefile (0x%lx, \"%s\", 0%o)\n",
+		(unsigned long)vm, fname, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -691,16 +682,19 @@ int flags;
 
 /* VM_CACHEFD -- Cache an already open file in the VM cache.
  */
-vm_cachefd (vm, fd, acmode, flags)
-register VMcache *vm;
-int acmode;
-int flags;
+int
+vm_cachefd (
+    register VMcache *vm,
+    int fd,
+    int acmode,
+    int flags
+)
 {
 	struct stat st;
 
 	if (debug)
-	    fprintf (stderr, "vm_cachefd (0x%x, %d, 0%o, 0%o)\n",
-		vm, fd, acmode, flags);
+	    fprintf (stderr, "vm_cachefd (0x%lx, %d, 0%o, 0%o)\n",
+		(unsigned long)vm, fd, acmode, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -722,18 +716,20 @@ int flags;
  * recently used basis.  If it is desired to immediately free the space used
  * by cached file immediately the VM_DESTROYREGION flag may be set in FLAGS.
  */
-vm_uncachefile (vm, fname, flags)
-register VMcache *vm;
-char *fname;
-int flags;
+int
+vm_uncachefile (
+    register VMcache *vm,
+    char *fname,
+    int flags
+)
 {
 	register Segment *sp;
 	struct stat st;
 	int status = 0;
 
 	if (debug)
-	    fprintf (stderr, "vm_uncachefile (0x%x, \"%s\", 0%o)\n",
-		vm, fname, flags);
+	    fprintf (stderr, "vm_uncachefile (0x%lx, \"%s\", 0%o)\n",
+		(unsigned long)vm, fname, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -757,18 +753,20 @@ int flags;
  * used by cached file immediately the VM_DESTROYREGION flag may be set in
  * FLAGS.
  */
-vm_uncachefd (vm, fd, flags)
-register VMcache *vm;
-int fd;
-int flags;
+int
+vm_uncachefd (
+    register VMcache *vm,
+    int fd,
+    int flags
+)
 {
 	register Segment *sp;
 	struct stat st;
 	int status = 0;
 
 	if (debug)
-	    fprintf (stderr, "vm_uncachefd (0x%x, %d, 0%o)\n",
-		vm, fd, flags);
+	    fprintf (stderr, "vm_uncachefd (0x%lx, %d, 0%o)\n",
+		(unsigned long)vm, fd, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -791,17 +789,19 @@ int flags;
  * If the file is cached it is refreshed, i.e., moved to the head of
  * the cache, reloading any pages not already present in memory.
  */
-vm_refreshfile (vm, fname, flags)
-register VMcache *vm;
-char *fname;
-int flags;
+int
+vm_refreshfile (
+    register VMcache *vm,
+    char *fname,
+    int flags
+)
 {
 	struct stat st;
 	int fd;
 
 	if (debug)
-	    fprintf (stderr, "vm_refreshfile (0x%x, \"%s\", 0%o)\n",
-		vm, fname, flags);
+	    fprintf (stderr, "vm_refreshfile (0x%lx, \"%s\", 0%o)\n",
+		(unsigned long)vm, fname, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -822,16 +822,18 @@ int flags;
 
 /* VM_REFRESHFD -- Refresh an already open file in the VM cache.
  */
-vm_refreshfd (vm, fd, flags)
-register VMcache *vm;
-int fd;
-int flags;
+int
+vm_refreshfd (
+    register VMcache *vm,
+    int fd,
+    int flags
+)
 {
 	struct stat st;
 
 	if (debug)
-	    fprintf (stderr, "vm_refreshfd (0x%x, %d, 0%o)\n",
-		vm, fd, flags);
+	    fprintf (stderr, "vm_refreshfd (0x%lx, %d, 0%o)\n",
+		(unsigned long)vm, fd, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -882,13 +884,15 @@ int flags;
  * have already been opened with write permission.
  */
 void *
-vm_cacheregion (vm, fname, fd, offset, nbytes, acmode, flags)
-register VMcache *vm;
-char *fname;
-int fd;
-unsigned long offset;
-unsigned long nbytes;
-int acmode, flags;
+vm_cacheregion (
+    register VMcache *vm,
+    char *fname,
+    int fd,
+    unsigned long offset,
+    unsigned long nbytes,
+    int acmode, 
+    int flags
+)
 {
 	register Segment *sp, *xp;
 	unsigned long x0, x1, vm_offset, vm_nbytes;
@@ -898,8 +902,8 @@ int acmode, flags;
 
 	if (debug)
 	    fprintf (stderr,
-		"vm_cacheregion (0x%x, \"%s\", %d, %d, %d, 0%o, 0%o)\n",
-		vm, fname, fd, offset, nbytes, acmode, flags);
+		"vm_cacheregion (0x%lx, \"%s\", %d, %ld, %ld, 0%o, 0%o)\n",
+		(unsigned long)vm, fname, fd, offset, nbytes, acmode, flags);
 	if (fstat (fd, &st) < 0)
 	    return (NULL);
 
@@ -920,7 +924,7 @@ int acmode, flags;
 	    if (!isfile(sp,st))
 		continue;
 
-	    if (x0 >= sp->offset && x0 < (sp->offset + sp->nbytes))
+	    if (x0 >= sp->offset && x0 < (sp->offset + sp->nbytes)) {
 		if (x1 >= sp->offset && x1 < (sp->offset + sp->nbytes)) {
 		    /* New segment lies entirely within an existing one. */
 		    vm_offset = sp->offset;
@@ -930,6 +934,7 @@ int acmode, flags;
 		    /* New segment extends an existing one. */
 		    return (NULL);
 		}
+	    }
 	}
 
 	mode = PROT_READ;
@@ -994,7 +999,7 @@ int acmode, flags;
 
 	/* Add the segment to the global file hash table.
 	 */
-	if (xp = vm_locate(vm,st.st_dev,st.st_ino)) {
+	if ((xp = vm_locate(vm,st.st_dev,st.st_ino))) {
 	    /* The file is already in the hash table.  Add the new segment
 	     * to the tail of the file segment list.
 	     */
@@ -1007,7 +1012,7 @@ int acmode, flags;
 	    int hashval;
 
 	    hashval = hashint (SZ_HASHTBL, (int)st.st_dev, (int)st.st_ino);
-	    if (xp = hashtbl[hashval]) {
+	    if ((xp = hashtbl[hashval])) {
 		while (xp->nexthash)
 		    xp = xp->nexthash;
 		xp->nexthash = sp;
@@ -1062,21 +1067,24 @@ refresh:
  * be reused, it can be freed immediately by setting the VM_DESTROYREGION
  * flag in FLAGS.
  */
-vm_uncacheregion (vm, fd, offset, nbytes, flags)
-register VMcache *vm;
-int fd;
-unsigned long offset;
-unsigned long nbytes;
-int flags;
+int
+vm_uncacheregion (
+    register VMcache *vm,
+    int fd,
+    unsigned long offset,
+    unsigned long nbytes,
+    int flags
+)
 {
 	register Segment *sp;
-	unsigned long x0, x1, vm_offset, vm_nbytes;
+	unsigned long  x0, x1;
+        unsigned long  vm_offset;
+        //unsigned long  vm_nbytes;
 	struct stat st;
-	int mode;
 
 	if (debug)
-	    fprintf (stderr, "vm_uncacheregion (0x%x, %d, %d, %d, 0%o)\n",
-		vm, fd, offset, nbytes, flags);
+	    fprintf (stderr, "vm_uncacheregion (0x%lx, %d, %ld, %ld, 0%o)\n",
+		(unsigned long)vm, fd, offset, nbytes, flags);
 
 	/* Map offset,nbytes to a range of memory pages.
 	 */
@@ -1087,7 +1095,7 @@ int flags;
 	x1 = (x1 - (x1 % vm->pagesize)) + vm->pagesize - 1;
 
 	vm_offset = x0;
-	vm_nbytes = x1 - x0 + 1;
+	//vm_nbytes = x1 - x0 + 1;
 
 	if (fstat (fd, &st) < 0)
 	    return (-1);
@@ -1107,21 +1115,21 @@ int flags;
  * moved to the head of the cache and preloading of any non-memory resident
  * pages is initiated.
  */
-vm_refreshregion (vm, fd, offset, nbytes)
-register VMcache *vm;
-int fd;
-unsigned long offset;
-unsigned long nbytes;
+int
+vm_refreshregion (
+    register VMcache *vm,
+    int fd,
+    unsigned long offset,
+    unsigned long nbytes
+)
 {
 	register Segment *sp;
 	unsigned long x0, x1, vm_offset, vm_nbytes;
 	struct stat st;
-	int mode;
-	void *addr;
 
 	if (debug)
-	    fprintf (stderr, "vm_refreshregion (0x%x, %d, %d, %d)\n",
-		vm, fd, offset, nbytes);
+	    fprintf (stderr, "vm_refreshregion (0x%lx, %d, %ld, %ld)\n",
+		(unsigned long)vm, fd, offset, nbytes);
 
 	if (!vm->cache_enabled)
 	    return (0);
@@ -1172,7 +1180,7 @@ unsigned long nbytes;
 	sp->priority = vm_cachepriority (vm, sp);
 
 	/* Preload any missing pages from the referenced segment. */
-	madvise (addr, vm_nbytes, MADV_WILLNEED);
+	madvise (sp->addr, vm_nbytes, MADV_WILLNEED);
 
 	return (0);
 }
@@ -1180,18 +1188,20 @@ unsigned long nbytes;
 
 /* VM_UNCACHE -- Internal routine to free a cache segment.
  */
-static
-vm_uncache (vm, sp, flags)
-register VMcache *vm;
-register Segment *sp;
-int flags;
+static int
+vm_uncache (
+    register VMcache *vm,
+    register Segment *sp,
+    int flags
+)
 {
 	register Segment *xp;
 	Segment *first, *last;
-	int hashval, status=0, mode;
+	int hashval, status=0;
 
 	if (debug)
-	    fprintf (stderr, "vm_uncache (0x%x, 0x%x, 0%o)\n", vm, sp, flags);
+	    fprintf (stderr, "vm_uncache (0x%lx, 0x%lx, 0%o)\n", 
+                (unsigned long)vm, (unsigned long)sp, flags);
 
 	/* Decrement the reference count.  Setting VM_CANCELREFCNT (as in
 	 * closecache) causes any references to be ignored.
@@ -1255,16 +1265,19 @@ int flags;
  * have a reference count of zero are freed.  We do not actually remove
  * segments from the cache here, we just free any mapped pages.
  */
-vm_reservespace (vm, nbytes)
-register VMcache *vm;
-unsigned long nbytes;
+int
+vm_reservespace (
+    register VMcache *vm,
+    unsigned long nbytes
+)
 {
 	register Segment *sp;
 	unsigned long freespace = vm->cachesize - vm->cacheused;
 	int locked_segment_seen = 0;
 
 	if (debug)
-	    fprintf (stderr, "vm_reservespace (0x%x, %d)\n", vm, nbytes);
+	    fprintf (stderr, "vm_reservespace (0x%lx, %ld)\n", 
+                    (unsigned long)vm, nbytes);
 
 	if (!vm->cache_enabled)
 	    return (0);
@@ -1281,8 +1294,8 @@ unsigned long nbytes;
 		continue;
 
 	    if (debug)
-		fprintf (stderr, "vm_reservespace: free %d bytes at 0x%x\n",
-		    sp->nbytes, sp->addr);
+		fprintf (stderr, "vm_reservespace: free %ld bytes at 0x%lx\n",
+		    sp->nbytes, (unsigned long)sp->addr);
 
 	    madvise (sp->addr, sp->nbytes, MADV_DONTNEED);
 	    munmap (sp->addr, sp->nbytes);
@@ -1300,15 +1313,18 @@ unsigned long nbytes;
 /* VM_STATUS -- Return a description of the status and contents of the VM
  * cache.  The output is written to the supplied text buffer.
  */
-vm_status (vm, outbuf, maxch, flags)
-register VMcache *vm;
-char *outbuf;
-int maxch, flags;
+int
+vm_status (
+    register VMcache *vm,
+    char *outbuf,
+    int maxch,
+    int flags
+)
 {
 	register Segment *sp;
 	register char *op = outbuf;
 	char buf[SZ_LINE];
-	int seg, nseg;
+	int seg, nseg, sz;
 
 	sprintf (buf, "initialized %d\n", vm->cache_initialized);
 	strcpy (op, buf);  op += strlen (buf);
@@ -1319,16 +1335,19 @@ int maxch, flags;
 	sprintf (buf, "lockpages %d\n", vm->lockpages);
 	strcpy (op, buf);  op += strlen (buf);
 
-	sprintf (buf, "physmem %d\n", vm->physmem);
+	sprintf (buf, "physmem %ld\n", (unsigned long)vm->physmem);
 	strcpy (op, buf);  op += strlen (buf);
 
-	sprintf (buf, "cachesize %d\n", vm->cachesize);
+	sprintf (buf, "cachesize %ld\n", (unsigned long)vm->cachesize);
 	strcpy (op, buf);  op += strlen (buf);
 
-	sprintf (buf, "cacheused %d\n", vm->cacheused);
+	sprintf (buf, "cacheused %ld\n", (unsigned long)vm->cacheused);
 	strcpy (op, buf);  op += strlen (buf);
 
-	sprintf (buf, "pagesize %d\n", vm->pagesize);
+	sprintf (buf, "pagesize %ld\n", (unsigned long)vm->pagesize);
+	strcpy (op, buf);  op += strlen (buf);
+
+	sprintf (buf, "flags %d\n", (unsigned int)flags);
 	strcpy (op, buf);  op += strlen (buf);
 
 	for (nseg=0, sp = vm->segment_head;  sp;  sp = sp->next)
@@ -1337,12 +1356,13 @@ int maxch, flags;
 	strcpy (op, buf);  op += strlen (buf);
 
 	for (seg=0, sp = vm->segment_head;  sp;  sp = sp->next, seg++) {
-	    sprintf (buf, "segment %d inode %d device %d ",
+	    sprintf (buf, "segment %d inode %ld device %ld ",
 		seg, sp->inode, sp->device);
-	    sprintf (buf+strlen(buf), "offset %d nbytes %d refcnt %d %s\n",
+	    sprintf (buf+strlen(buf), "offset %ld nbytes %ld refcnt %d %s\n",
 		sp->offset, sp->nbytes, sp->refcnt,
 		sp->fname ? sp->fname : "[done]");
-	    if (op-outbuf+strlen(buf) >= maxch)
+	    sz = (op-outbuf+strlen(buf));
+	    if (sz >= maxch)
 		break;
 	    strcpy (op, buf);  op += strlen (buf);
 	}
@@ -1356,14 +1376,16 @@ int maxch, flags;
  * has no segments in the cache.
  */
 static Segment *
-vm_locate (vm, device, inode)
-VMcache *vm;
-register dev_t device;
-register ino_t inode;
+vm_locate (
+    VMcache *vm,                // NOTUSED
+    register dev_t device,
+    register ino_t inode
+)
 {
 	register Segment *sp;
 	int hashval;
 
+        (void)(vm);             // NOTUSED
 	hashval = hashint (SZ_HASHTBL, device, inode);
 	for (sp = hashtbl[hashval];  sp;  sp = sp->nexthash)
 	    if (sp->device == device && sp->inode == inode)
@@ -1377,15 +1399,21 @@ register ino_t inode;
  * range 0-nthreads is returned.
  */
 static int
-hashint (nthreads, w1, w2)
-int nthreads;
-register int w1, w2;
+hashint (
+    int nthreads,
+    register int w1, 
+    register int w2
+)
 {
-	unsigned int h1, h2;
-	register int i=0;
+	unsigned int h1, h2, a, b;
+	int i=0;
 
-	h1 = (((w1 >> 16) * primes[i++]) ^ (w1 * primes[i++]));
-	h2 = (((w2 >> 16) * primes[i++]) ^ (w2 * primes[i++]));
+	a = ((w1 >> 16) * primes[i++]);
+	b = (w1 * primes[i++]);
+	h1 = a ^ b;
+	a = ((w2 >> 16) * primes[i++]);
+	b = (w2 * primes[i++]);
+	h2 = a ^ b;
 
 	return ((h1 ^ h2) % nthreads);
 }
@@ -1400,9 +1428,10 @@ register int w1, w2;
  * tune the algorithm for the expected file activity.
  */
 static int
-vm_cachepriority (vm, sp)
-register VMcache *vm;
-register Segment *sp;
+vm_cachepriority (
+    register VMcache *vm,
+    register Segment *sp
+)
 {
 	register int priority = 0;
 	time_t curtime = time(NULL);
@@ -1440,21 +1469,24 @@ register Segment *sp;
  * will be performed asynchronously and vm_sync will return immediately,
  * otherwise vm_sync waits for the synchronization operation to complete.
  */
-vm_sync (vm, fd, offset, nbytes, flags)
-register VMcache *vm;
-int fd;
-unsigned long offset;
-unsigned long nbytes;
-int flags;
+int
+vm_sync (
+    register VMcache *vm,
+    int fd,
+    unsigned long offset,
+    unsigned long nbytes,
+    int flags
+)
 {
 	register Segment *sp;
-	unsigned long x0, x1, vm_offset, vm_nbytes;
+	unsigned long x0, x1, vm_offset;
+        //unsigned long vm_nbytes;
 	int syncflag, status = 0;
 	struct stat st;
 
 	if (debug)
-	    fprintf (stderr, "vm_sync (0x%x, %d, %d, %d, 0%o)\n",
-		vm, fd, offset, nbytes, flags);
+	    fprintf (stderr, "vm_sync (0x%lx, %d, %ld, %ld, 0%o)\n",
+		(unsigned long)vm, fd, offset, nbytes, flags);
 	if (!vm->cache_enabled)
 	    return (0);
 
@@ -1467,7 +1499,7 @@ int flags;
 	x1 = (x1 - (x1 % vm->pagesize)) + vm->pagesize - 1;
 
 	vm_offset = x0;
-	vm_nbytes = x1 - x0 + 1;
+	//vm_nbytes = x1 - x0 + 1;
 
 #ifdef sun
 #ifdef _SYS_SYSTEMINFO_H
@@ -1515,19 +1547,20 @@ int flags;
  * asynchronously and vm_sync will return immediately, therwise vm_sync waits
  * for the synchronization operation to complete.
  */
-vm_msync (vm, addr, nbytes, flags)
-register VMcache *vm;
-void *addr;
-unsigned long nbytes;
-int flags;
+int
+vm_msync (
+    register VMcache *vm,
+    void *addr,
+    unsigned long nbytes,
+    int flags
+)
 {
-	register Segment *sp;
 	unsigned long addr1, addr2;
 	int syncflag;
 
 	if (debug)
-	    fprintf (stderr, "vm_msync (0x%x, 0x%x, %d, 0%o)\n",
-		vm, addr, nbytes, flags);
+	    fprintf (stderr, "vm_msync (0x%lx, 0x%lx, %ld, 0%o)\n",
+		(unsigned long)vm, (unsigned long)addr, nbytes, flags);
 
 	/* Align the given address region to the page boundaries.
 	 */
@@ -1543,14 +1576,15 @@ int flags;
 /* VM_READAHEAD -- Internal routine used to request that a segment of file
  * data be preloaded.
  */
-static
-vm_readahead (vm, addr, nbytes)
-register VMcache *vm;
-void *addr;
-unsigned long nbytes;
+static void
+vm_readahead (
+    register VMcache *vm,
+    void *addr,
+    unsigned long nbytes
+)
 {
-	register int n, nb;
-	int chunk = READAHEAD * vm->pagesize;
+	register unsigned int n, nb;
+	unsigned int chunk = READAHEAD * vm->pagesize;
 	unsigned long buf = (unsigned long) addr;
 
 	/* Break large reads into chunks of READAHEAD memory pages.  This
