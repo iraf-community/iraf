@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <unistd.h>
+
 #define import_libc
 #define import_stdio
 #define import_spp
@@ -8,13 +10,22 @@
 #define import_xwhen
 #include <iraf.h>
 
-thello_()
+
+typedef int (*PFI)(int *, int*);  /* pointer to function returning int    */
+
+int onint (int *code, int *old_handler);
+
+extern void c_xwhen (int exception, PFI new_handler, PFI *old_handler);
+extern integer clgstr_(shortint *param, shortint *outstr, integer *maxch);
+
+
+void thello_(void)
 {
 	fputs ("hello, world\n", stdout);
 }
 
 
-tprint_()
+void tprint_(void)
 {
 	char	buf[128];
 
@@ -23,7 +34,7 @@ tprint_()
 }
 
 
-tcopy_()
+void tcopy_(void)
 {
 	FILE	*in, *out;
 	int	ch;
@@ -41,16 +52,16 @@ tcopy_()
 }
 
 
-tscan_()
+void tscan_(void)
 {
 	char	buf[SZ_LINE];
 	char	str[SZ_LINE];
 	char	cval;
 	int	ival, nscan, n1, n2;
-	int	onint(), oldint;
+	int	oldint;
 	double	dval;
 
-	c_xwhen (X_INT, onint, &oldint);
+	c_xwhen (X_INT, (PFI)onint, (PFI *)&oldint);
 
 	printf (">> \n");
 	fflush (stdout);
@@ -68,23 +79,25 @@ tscan_()
 }
 
 
-onint (code, old_handler)
-int	*code;			/* NOTUSED */
-int	*old_handler;
+int onint (
+  int	*code,			/* NOTUSED */
+  int	*old_handler
+)
 {
 	write (2, "\7", 1);
 	*old_handler = 0;
+        return (*code);
 }
 
 
-tgettk_()
+void tgettk_(void)
 {
 	XCHAR	fname[SZ_FNAME+1];
 	char	token[SZ_LINE+1], delim;
 	int	maxch = SZ_FNAME;
 	FILE	*fp;
 
-	clgstr_ (c_sppstr("fname"), fname, &maxch);
+	clgstr_ (c_sppstr("fname"), fname, (integer *)&maxch);
 	c_strpak (fname, token, maxch);
 
 	fp = fopen (token, "r");
