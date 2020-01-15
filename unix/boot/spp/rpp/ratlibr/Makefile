@@ -1,9 +1,10 @@
 # Ratfor source for the ratfor library.  A TOOLS compatible ratfor compiler
 # is required to compile this.  The original UNIX ratfor compiler may not do
 # the job.
+RATFOR = ratfor
 
 .r.f:
-	/usr/local/bin/ratfor $*.r > $*.f
+	${RATFOR} $*.r > $*.f
 
 SRCS=	addset.r addstr.r amatch.r catsub.r clower.r concat.r ctoc.r\
 	ctoi.r ctomn.r cupper.r delete.r docant.r dodash.r dsdbiu.r\
@@ -28,6 +29,8 @@ FORT=	addset.f addstr.f amatch.f catsub.f clower.f concat.f ctoc.f\
 	stlu.f strcmp.f strim.f termin.f trmout.f type.f upper.f wkday.f
 
 fort:	$(SRCS) defs
-	make fsrc; mv *.f ../ratlibf; touch fort
+	make fsrc
+	mv *.f ../ratlibf
+	touch fort
 
 fsrc:	$(FORT)
