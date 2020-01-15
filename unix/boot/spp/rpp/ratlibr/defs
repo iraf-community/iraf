@@ -8,12 +8,6 @@
 # automatically open this file, set STDENFS to "".
 #
 #---------------------------------------------------------------
-#    If you want the preprocessor to output upper case only,
-#    set the following definition:
-#
-#	       define (UPPERC,)
-#
-#---------------------------------------------------------------
 #  Some of the buffer sizes and other symbols might have to be
 #  changed.  Especially check the following:
 #
@@ -26,8 +20,6 @@
 
 
 define (STDEFNS, string defns "")  # standard defns file
-#define (UPPERC,)	   # define if Fortran compiler wants upper case
-#define (IMPNONE,)	   # output IMPLICIT NONE in procedures
 define (NULL,0)
 define (INDENT,3)	   # number of spaces of indentation
 define (MAX_INDENT,30)	   # maximum column for indentation
