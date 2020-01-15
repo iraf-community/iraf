@@ -5,7 +5,7 @@ include	defs
    pointer function dsget (w)
    integer w
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    pointer p, q, l
 

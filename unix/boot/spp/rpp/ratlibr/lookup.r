@@ -7,7 +7,7 @@ include	defs
    integer info (ARB)
    pointer st
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer i, nodsiz, kluge
    integer stlu

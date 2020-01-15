@@ -6,7 +6,7 @@ include	defs
    pointer b
    character form
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer l, s, lmax
 

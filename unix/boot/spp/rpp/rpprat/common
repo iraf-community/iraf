@@ -75,5 +75,5 @@ common /erchek/ ername, body, esp, errstk(MAXERRSTK)
    integer esp	       # error stack pointer
    integer errstk      # error stack (for statement labels)
 
- DS_DECL(mem, MEMSIZE)
+ DS_COMMON
 #-t-  common			 2163  local   12/01/80  15:50:08

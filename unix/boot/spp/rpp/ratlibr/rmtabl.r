@@ -5,7 +5,7 @@ include	defs
    subroutine rmtabl (st)
    pointer st
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer i
 

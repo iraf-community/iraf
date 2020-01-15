@@ -19,6 +19,7 @@
 #-----------------------------------------------------------------
 
 
+include defs
 define (STDEFNS, string defns "")  # standard defns file
 define (NULL,0)
 define (INDENT,3)	   # number of spaces of indentation

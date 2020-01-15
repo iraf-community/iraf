@@ -6,7 +6,7 @@ include	defs
    character symbol (ARB)
    pointer st
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer stlu
 
