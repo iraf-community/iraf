@@ -98,7 +98,7 @@ define (SBUFSIZE,2048)	   # buffer for string statements
 define (MAXDEF,2048)	   # max chars in a defn
 define (MAXFORSTK,200)	   # max space for for reinit clauses
 define (MAXERRSTK,30)	   # max nesting of iferr statements
-define (MAXFNAMES, arith(NFILES,*,FILENAMESIZE))
+define (MAXFNAMES, 150)    # arith(NFILES,*,FILENAMESIZE))
 define (MAXSTACK,100)	   # max stack depth for parser
 define (MAXSWITCH,1000)    # max stack for switch statement
 define (MAXSWNEST,10)	   # max nesting of switches in a procedure
