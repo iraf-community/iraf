@@ -1,0 +1,14 @@
+define (LAMBDA,0)
+
+define (MAXPAT,128)
+define (CLOSIZE,4)
+define (PREVCL,2)
+define (NCCL,110)
+define (CCL,91)
+define (CCLEND,93)
+
+define (DITTO,-3)          # substitution placeholder
+
+define (COUNT,1)
+define (START,3)
+

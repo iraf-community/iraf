@@ -1,0 +1,60 @@
+# definitions specific for rpprat
+
+# Lexical items (codes are negative to avoid conflict with character values)
+
+define (ALPHA,-9)
+define (LEXBEGIN,-83)
+define (LEXBREAK,-79)
+define (LEXCASE,-91)
+define (LEXDEFAULT,-90)
+define (LEXDIGITS,-89)
+define (LEXDO,-96)
+define (LEXELSE,-87)
+define (LEXEND,-82)
+define (LEXERRCHK,-84)
+define (LEXERROR,-73)
+define (LEXFOR,-94)
+define (LEXIF,-99)
+define (LEXIFELSE,-72)
+define (LEXIFERR,-98)
+define (LEXIFNOERR,-97)
+define (LEXLITERAL,-85)
+define (LEXNEXT,-78)
+define (LEXOTHER,-80)
+define (LEXPOINTER,-88)
+define (LEXRBRACE,-74)
+define (LEXREPEAT,-93)
+define (LEXRETURN,-77)
+define (LEXGOTO,-76)
+define (LEXSTOP,-71)
+define (LEXSTRING,-75)
+define (LEXSWITCH,-92)
+define (LEXTHEN,-86)
+define (LEXUNTIL,-70)
+define (LEXWHILE,-95)
+define (LSTRIPC,-69)
+define (RSTRIPC,-68)
+define (LEXDECL,-67)
+
+define (XPP_DIRECTIVE, -166)
+
+# Built-in macro functions:
+
+define (DEFTYPE,-4)
+define (MACTYPE,-10)
+define (IFTYPE,-11)
+define (INCTYPE,-12)
+define (SUBTYPE,-13)
+define (ARITHTYPE,-14)
+define (IFDEFTYPE,-15)
+define (IFNOTDEFTYPE,-16)
+define (PRAGMATYPE,-17)
+
+
+# Where to find the common blocks:
+
+define (COMMON_BLOCKS,"common")
+
+# Data types, Dynamic Memory common:
+
+define (XPOINTER,"integer ")

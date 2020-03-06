@@ -1,0 +1,35 @@
+# Defines for memory management routines:
+
+define (DS_COMMON,integer mem(MEMSIZE) 
+                 common/cdsmem/mem)
+define (DS_MEMEND,1)     # pointer to end of memory
+define (DS_AVAIL,2)      # start of available space list
+define (DS_CLOSE,8)      # threshhold for close-fitting blocks
+define (DS_LINK,1)       # link field of storage block
+define (DS_SIZE,0)       # size field of storage block
+define (DS_OHEAD,2)      # total words of overhead per block
+
+# Defines for symbol table routines:
+define (ST_LINK,0)       # offset of link field in symbol table node
+define (ST_DATA,1)       # offset of data field in symbol table node
+define (ST_HTABSIZE,43)  # should be a prime number
+
+# Size-limiting definitions:
+
+define (MEMSIZE, 60000)	   # space allotted to symbol tables and macro text
+define (BUFSIZE,4096)	   # pushback buffer for ngetch and putbak
+define (PBPOINT,3192)	   # point in buffer where pushback begins
+define (SBUFSIZE,2048)	   # buffer for string statements
+define (MAXDEF,2048)	   # max chars in a defn
+define (MAXFORSTK,200)	   # max space for for reinit clauses
+define (MAXERRSTK,30)	   # max nesting of iferr statements
+define (MAXFNAMES, 150)    # arith(NFILES,*,FILENAMESIZE))
+define (MAXSTACK,100)	   # max stack depth for parser
+define (MAXSWITCH,1000)    # max stack for switch statement
+define (MAXSWNEST,10)	   # max nesting of switches in a procedure
+define (MAXTOK,100)	   # max chars in a token
+define (NFILES,5)	   # max number of include file nesting
+define (MAXNBRSTR,20)	   #max nbr string declarations per module
+define (CALLSIZE,50)
+define (ARGSIZE,100)
+define (EVALSIZE,500)
