@@ -10,7 +10,7 @@
    if (str (1) == EOS)
       return
    for (i = 1; str (i) != EOS; i = i + 1)
-      if (!IS_DIGIT(str (i)))
+      if (!(DIG0 <= str (i) & str (i) <= DIG9))
 	 return
    alldig = YES
    return

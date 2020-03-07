@@ -36,7 +36,7 @@ include  defs
       }
 
    i = 1
-   if (IS_LETTER(c)) {				# alpha
+   if ((BIGA <= c & c <= BIGZ) | (LETA <= c & c <= LETZ)) {				# alpha
       gtok = ALPHA
       if (c == LETX) {				# "x$cccc" directive?
 	 c = ngetch (lexstr(2))
@@ -50,15 +50,17 @@ include  defs
 
       for (;  i < toksiz - 2;  i=i+1) {
 	 c = ngetch (lexstr(i+1))
-	 if (!IS_LETTER(c) & !IS_DIGIT(c) & c != UNDERLINE)
+	 if (!((BIGA <= c & c <= BIGZ)
+	     | (LETA <= c & c <= LETZ)
+	     | (DIG0 <= c & c <= DIG9)) & c != UNDERLINE)
 	    break
 	 }
       call putbak (c)
 
-	} else if (IS_DIGIT(c)) {   # digits
+	} else if (DIG0 <= c & c <= DIG9) {   # digits
 	    for (i=1;  i < toksiz - 2;  i=i+1) {
 		c = ngetch (lexstr (i + 1))
-		if (!IS_DIGIT(c))
+		if (!(DIG0 <= c & c <= DIG9))
 		    break
 	    }
 	    call putbak (c)
@@ -71,7 +73,7 @@ include  defs
 #      b = c - DIG0 # in case alternate base number
 #      for (i = 1; i < toksiz - 2; i = i + 1) {
 #	 c = ngetch (lexstr (i + 1))
-#	 if (!IS_DIGIT(c))
+#	 if (!(DIG0 <= c & c <= DIG9))
 #	    break
 #	 b = 10 * b + (c - DIG0)
 #	 }

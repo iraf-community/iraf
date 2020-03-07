@@ -53,7 +53,9 @@ include	defs
       tmp (tp) = buf (p)
       tp = tp + 1
       p = p + 1
-      } until (! (IS_LETTER(buf (p)) | IS_DIGIT(buf (p)))
+      } until (! ((BIGA <= buf(p) & buf(p) <= BIGZ)
+                | (LETA <= buf(p) & buf(p) <= LETZ)
+                | (DIG0 <= buf(p) & buf(p) <= DIG9))
 		  | tp >= MAXLINE)
    tmp (tp) = EOS
 

@@ -26,8 +26,8 @@ include	defs
    if (str (i) == PLUS | str (i) == MINUS)
       i = i + 1
 
-   if (str (i + 2) == LETR & str (i) == DIG1 & IS_DIGIT(str (i + 1))
-	 | str (i + 1) == LETR & IS_DIGIT(str (i))) {
+   if (str (i + 2) == LETR & str (i) == DIG1 & DIG0 <= str(i+1) & str(i+1) <= DIG9
+	 | str (i + 1) == LETR & DIG0 <= str(i) & str(i) <= DIG9) {
       base = str (i) - DIG0
       j = i
       if (str (i + 1) != LETR) {
@@ -41,7 +41,7 @@ include	defs
       }
 
    for (; str (i) != EOS; i = i + 1) {
-      if (IS_DIGIT(str (i)))
+      if (DIG0 <= str(i) & str(i) <= DIG9)
 	 d = str (i) - DIG0
       else
 	 d = index (digits, clower (str (i))) - 1
