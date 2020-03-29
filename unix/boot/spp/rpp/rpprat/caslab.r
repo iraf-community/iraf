@@ -41,7 +41,7 @@ integer gnbtok, ctoi
 	while (t == NEWLINE)
 	    t = gnbtok (tok, MAXTOK)
 
-	return
+	return 0
 
  99	call synerr ("Invalid case label.")
 	n = 0

@@ -34,14 +34,9 @@ FORT=	addchr.f allblk.f alldig.f baderr.f balpar.f beginc.f brknxt.f\
 	strdcl.f swcode.f swend.f swvar.f synerr.f thenco.f ulstal.f\
 	uniqid.f unstak.f untils.f whilec.f whiles.f
 
-# NOTE -- After regenerating the fortran CASLAB.F, comment out the unreachable
-# goto on line 32, generated due to a bug in the ratfor.
-
 fort:	$(SRCS) common defs
 	make fsrc
 	mv *.f ../rppfor
 	touch fort
-	(cd ../rppfor; sed -e 's/      goto 23012/c     goto 23012/'\
-	< caslab.f > temp; mv temp caslab.f)
 
 fsrc:	$(FORT)
