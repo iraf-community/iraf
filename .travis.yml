@@ -31,7 +31,7 @@ matrix:
             - libexpat1-dev:i386
             - libreadline-dev:i386
     - os: osx
-      osx_image: xcode11.2
+      osx_image: xcode11.4
       env: IRAFARCH=macintel OS_VERS=catalina
     - os: osx
       osx_image: xcode9.4
