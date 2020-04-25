@@ -17,7 +17,9 @@ include COMMON_BLOCKS
 
 	j = 1
 	for (i=1;  id(i) != EOS;  i=i+1)		# copy, delete '_'
-	    if (IS_LETTER(id(i)) | IS_DIGIT(id(i))) {
+	    if ((BIGA <= id(i) & id(i) <= BIGZ)
+              | (LETA <= id(i) & id(i) <= LETZ)
+              | (DIG0 <= id(i) & id(i) <= DIG9)) {
 		newid(j) = id(i)
 	        j = j + 1
 	    }

@@ -6,7 +6,7 @@ include	defs
    pointer b
    character form
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer l, s, lmax
 
@@ -29,7 +29,7 @@ include	defs
 	 call putlin (blanks, ERROUT)
       if (form == DIGIT)
 	 call putint (Mem (b), 10, ERROUT)
-      elif (form == LETTER)
+      else if (form == LETTER)
 	 call putch (Mem (b), ERROUT)
       l = l + 1
       if (l >= lmax) {

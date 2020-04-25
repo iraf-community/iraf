@@ -5,7 +5,7 @@ include	defs
    pointer function mktabl (nodsiz)
    integer nodsiz
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    pointer st
    pointer dsget

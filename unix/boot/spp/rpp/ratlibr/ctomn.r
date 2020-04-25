@@ -48,7 +48,7 @@ include	defs
    i = mod (max(c,0), 128)
    if (0 <= i & i <= 32)     # non-printing character or space
       call scopy (mntext, 4 * i + 1, rep, 1)
-   elif (i == 127)	      # rubout (DEL)
+   else if (i == 127)	      # rubout (DEL)
       call scopy (mntext, 133, rep, 1)
    else {		      # printing character
       rep (1) = c

@@ -6,7 +6,7 @@ include	defs
    character symbol (ARB)
    pointer node, pred, st
 
-   DS_DECL(Mem, MEMSIZE)
+   DS_COMMON
 
    integer hash, i, j, nodsiz
 

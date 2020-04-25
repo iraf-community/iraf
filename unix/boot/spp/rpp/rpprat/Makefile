@@ -1,9 +1,10 @@
 # Ratfor source for the SPP preprocessor.  A TOOLS compatible ratfor compiler
 # is required to compile this.  The original UNIX ratfor compiler may not do
 # the job.
+RATFOR = ratfor
 
 .r.f:
-	/usr/local/bin/ratfor $*.r > $*.f
+	${RATFOR} $*.r > $*.f
 
 SRCS=	addchr.r allblk.r alldig.r baderr.r balpar.r beginc.r brknxt.r\
 	cascod.r caslab.r declco.r deftok.r doarth.r docode.r doif.r\
@@ -33,12 +34,9 @@ FORT=	addchr.f allblk.f alldig.f baderr.f balpar.f beginc.f brknxt.f\
 	strdcl.f swcode.f swend.f swvar.f synerr.f thenco.f ulstal.f\
 	uniqid.f unstak.f untils.f whilec.f whiles.f
 
-# NOTE -- After regenerating the fortran CASLAB.F, comment out the unreachable
-# goto on line 32, generated due to a bug in the ratfor.
-
 fort:	$(SRCS) common defs
-	make fsrc; mv *.f ../rppfor; touch fort
-	(cd ../rppfor; sed -e 's/      goto 23012/c     goto 23012/'\
-	< caslab.f > temp; mv temp caslab.f)
+	make fsrc
+	mv *.f ../rppfor
+	touch fort
 
 fsrc:	$(FORT)

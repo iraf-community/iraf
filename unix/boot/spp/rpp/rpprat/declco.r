@@ -14,8 +14,6 @@ string	xptyp XPOINTER
 string	xpntr "x$pntr"
 string	xfunc "x$func"
 string	xsubr "x$subr"
-ifdef	(IMPNONE,
-string	impnone "implicit none")
 
 	if (ludef (id, newid, xpptbl) == YES) {
 	    if (equal (id, xpntr) == YES) {
@@ -35,11 +33,6 @@ string	impnone "implicit none")
 		    call eatup
 		    call outdon
 
-		    ifdef (IMPNONE,
-		    call outtab
-		    call outstr (impnone)
-		    call outdon)
-
 		    call poicod (NO)
 
 		} else {
@@ -54,11 +47,6 @@ string	impnone "implicit none")
 		call outstr (newid)
 		call eatup
 		call outdon
-
-		ifdef (IMPNONE,
-		call outtab
-		call outstr (impnone)
-		call outdon)
 
 	    } else  {
 		# Some other declaration.

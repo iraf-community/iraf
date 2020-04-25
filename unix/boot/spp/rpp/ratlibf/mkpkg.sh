@@ -16,7 +16,7 @@ $F77 -c $HSI_FF	scopy.f sctabl.f sdrop.f skipbl.f slstr.f stake.f stclos.f
 $F77 -c $HSI_FF	stcopy.f stlu.f strcmp.f strim.f termin.f trmout.f type.f
 $F77 -c $HSI_FF	upper.f wkday.f
 
-ar rv		libf.a *.o
+ar r		libf.a *.o
 $RANLIB		libf.a
 mv -f		libf.a ..
 rm		*.o

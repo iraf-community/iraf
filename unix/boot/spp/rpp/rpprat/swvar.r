@@ -7,10 +7,8 @@
    subroutine swvar (lab)
    integer lab, i, labnum, ndigits
 
-   ifnotdef (UPPERC, call outch (LETS))
-   ifdef    (UPPERC, call outch (BIGS))
-   ifnotdef (UPPERC, call outch (LETW))
-   ifdef    (UPPERC, call outch (BIGW))
+   call outch (LETS)
+   call outch (LETW)
 
    labnum = lab
    for (ndigits=0;  labnum > 0;  labnum=labnum/10)

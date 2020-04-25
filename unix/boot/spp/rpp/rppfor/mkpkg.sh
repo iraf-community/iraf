@@ -20,7 +20,7 @@ $F77 -c $HSI_FF	repcod.f retcod.f sdupl.f skpblk.f squash.f strdcl.f
 $F77 -c $HSI_FF	swcode.f swend.f swvar.f synerr.f thenco.f ulstal.f
 $F77 -c $HSI_FF	uniqid.f unstak.f untils.f whilec.f whiles.f
 
-ar rv		librpp.a *.o
+ar r		librpp.a *.o
 $RANLIB		librpp.a
 mv -f		librpp.a ..
 rm		*.o

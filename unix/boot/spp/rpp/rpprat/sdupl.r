@@ -5,7 +5,7 @@
    pointer function sdupl (str)
    character str (ARB)
 
-   DS_DECL(mem, MEMSIZE)
+   DS_COMMON
 
    integer i
    integer length

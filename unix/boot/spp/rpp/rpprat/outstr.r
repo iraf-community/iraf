@@ -6,7 +6,6 @@
    character str (ARB)
 
    character c
-   ifdef (UPPERC, character cupper)
 
    integer i, j
 
@@ -14,9 +13,6 @@
       c = str (i)
       if (c != SQUOTE & c != DQUOTE) {
 			 # produce upper case fortran, if desired
-	 ifdef (UPPERC,
-	    c = cupper (c)
-	    )
 	 call outch (c)
 	 }
       else {

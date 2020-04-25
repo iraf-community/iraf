@@ -9,7 +9,8 @@
 
    xfer = NO
    call outtab
-   if (IS_LETTER(lexstr (1)))
+   if ((BIGA <= lexstr(1) & lexstr(1) <= BIGZ)
+     | (LETA <= lexstr(1) & lexstr(1) <= LETZ))
       call squash (lexstr)
    call outstr (lexstr)
    call eatup

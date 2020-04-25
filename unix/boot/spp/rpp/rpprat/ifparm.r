@@ -19,13 +19,12 @@
       ifparm = NO
       for (i = 1; index (strng (i), ARGFLAG) > 0; ) {
 	 i = i + index (strng (i), ARGFLAG) # i points at char after ARGFLAG
-	 if (type (strng (i)) == DIGIT)
-	 andif (type (strng (i + 1)) != DIGIT) {
+	 if ((type (strng (i)) == DIGIT)
+	   & (type (strng (i + 1)) != DIGIT)) {
 	    ifparm = YES
 	    break
-	    }
 	 }
       }
-
+   }
    return
    end
