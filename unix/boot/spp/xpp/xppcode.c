@@ -106,7 +106,7 @@ int	ntasks = 0;			/* number of tasks in interpreter     */
 int	str_idnum = 0;			/* for generating unique string names */
 int	nbrace = 0;			/* must be zero when "end" is reached */
 int	nswitch = 0;			/* number switch stmts in procedure   */
-int	errflag;
+extern int	errflag;
 int	errhand = NO;			/* set if proc employs error handler  */
 int	errchk = NO;			/* set if proc employs error checking */
 
