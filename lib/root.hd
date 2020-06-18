@@ -20,7 +20,7 @@
 _clpackage	pkg = lib$clpackage.hd,		hlp = clpackage$clpackage.men
 _sys		pkg = sys$_sys.hd,		hlp = sys$sys.men
 _math		pkg = math$_math.hd,		hlp = math$math.men
-_doc		pkg = doc$_doc.hd,		hlp = doc$doc.men
+_doc		pkg = doc$doc.hd,		hlp = doc$doc.men
 
 
 # SETTING UP HELP DIRECTORIES
