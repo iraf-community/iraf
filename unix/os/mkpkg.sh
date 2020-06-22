@@ -7,8 +7,7 @@ set -e
 echo		"--------------------- OS ----------------------"
 
 
-zsvjmp=../as/zsvjmp.[sS]
-$CC -c $HSI_CF -Wall $zsvjmp gmttolst.c irafpath.c prwait.c z*.c alloc.c getproc.c
+$CC -c $HSI_CF -Wall zsvjmp.S gmttolst.c irafpath.c prwait.c z*.c alloc.c getproc.c
 $CC $HSI_LF -Wall alloc.o getproc.o $HSI_OSLIBS -o alloc.e
 chmod	4755 alloc.e
 mv -f	alloc.e ../hlib
