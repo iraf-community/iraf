@@ -4,7 +4,7 @@ third-party sources in the IRAF system:
  * GPL: math$slalib, pkg/images/imcoords/src/healpix.x,
         pkg/xtools/rmturlach.x
 
- * OpenSolaris_License-CDDL.pdf: boot$xyacc
+ * CDDL: boot$xyacc
 
  * UCAR: NCAR graphics
 
