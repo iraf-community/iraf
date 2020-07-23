@@ -1,10 +1,17 @@
+This directory contains text of the license files that apply to
+third-party sources in the IRAF system:
 
-	This directory contains text of the license files that apply
-to third-party sources in the IRAF system:
+ * GPL: math/slalib, pkg/images/imcoords/src/healpix.x,
+        pkg/xtools/rmturlach.x
 
-    GPL					For the math$slalib and ecl$readline
-    OpenSolaris_License-CDDL.pdf	For the XYACC parser (boot$xyacc)
-    UCAR				For NCAR graphics
-    ERFA				For ast_julday_to_date in noao$astutil/asttools/asttimes.x
-    LLSQ				For math$llsq
-    LAPACK				For math$lapack
+ * CDDL: unix/boot/xyacc
+
+ * UCAR: sys/gio/ncarutil
+
+ * ERFA: ast_julday_to_date in noao$astutil/asttools/asttimes.x
+
+ * LLSQ: math/llsq
+
+ * LAPACK: math/lapack
+
+ * ATT: unix/f2c
