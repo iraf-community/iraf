@@ -47,7 +47,7 @@ zsvjmp_:
 	addl	$4, %ecx		// change stack to point to &jmpbuf[1]
 	movl	%ecx, 4(%esp)		// 	...
 	movl	$0, 8(%esp)		// change arg2 to zero
-	jmp	__sigsetjmp		// let sigsetjmp do the rest
+	jmp	__sigsetjmp@PLT		// let sigsetjmp do the rest
 
 #elif defined(__x86_64__)		// linux x32 ABI
 
