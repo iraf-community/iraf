@@ -6,6 +6,7 @@
 #include <sys/times.h>
 #include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
 
 #define	import_kernel
 #define	import_knames
@@ -27,7 +28,7 @@ ZGTIME (
 	long	cpu, clkfreq;
 
 
-	clkfreq = CLOCKS_PER_SEC;
+	clkfreq = sysconf(_SC_CLK_TCK);
 
 	times (&t);
 	*clock_time = gmt_to_lst (time(0));
@@ -39,11 +40,9 @@ ZGTIME (
 	cpu = (t.tms_utime + t.tms_cutime);
 
 	if (cpu > MAX_LONG/1000)
-	    /* *cpu_time = cpu / clkfreq * 1000;*/
-	    *cpu_time = cpu / 10;
+	  *cpu_time = cpu / clkfreq * 1000;
 	else
-	    /* *cpu_time = cpu * 1000 / clkfreq;*/
-	    *cpu_time = cpu * 10;
+	  *cpu_time = cpu * 1000 / clkfreq;
 
 	return (XOK);
 }
