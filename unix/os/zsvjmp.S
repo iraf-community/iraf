@@ -180,7 +180,7 @@ zsvjmp_:
 	movl	%ecx, 4(%esp)		// 	...
 	movl	$0, 8(%esp)		// change arg2 to zero
 #if defined(__APPLE__)
-	jmp	_setjmp			// let setjmp do the rest
+	jmp	_sigsetjmp		// let setjmp do the rest
 #else
 	jmp	__sigsetjmp@PLT		// let sigsetjmp do the rest
 #endif
