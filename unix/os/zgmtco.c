@@ -1,9 +1,6 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
-
 #include <stdio.h>
-#include <time.h>
-
 #define	import_kernel
 #define	import_knames
 #define import_spp
@@ -18,9 +15,7 @@ ZGMTCO (
   XINT	*gmtcor				/* seconds */
 )
 {
-	time_t now = time(NULL);
-	struct tm ptm;
-	localtime_r(&now, &ptm);
-	*gmtcor = -ptm.tm_gmtoff;
-	return (XOK);
+    time_t gmt = 315532800; /* The value doesn't matter here; we take 1980-01-01 */
+    *gmtcor = gmt - gmt_to_lst(gmt);
+    return (XOK);
 }
