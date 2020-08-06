@@ -154,7 +154,7 @@ zsvjmp_:
 	stl	$31, 0($17)		// *status = 0
 	addq	$16, 8, $16		// setjmp ignores jmpbuf[0]
 
-	lda	$27, setjmp		// get address of setjmp
+	lda	$27, __sigsetjmp	// get address of setjmp
 	mov	$8, $29			// restore caller's global pointer
 	jmp	($27)			// branch to setjmp
 
