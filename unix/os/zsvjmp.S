@@ -1,12 +1,14 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy
- * Inc. (comment block, alpha)
+ * Inc. (comment block, alpha, i386)
  * Copyright(c) 2008 Chisato Yamauchi (C-SODA/ISAS/JAXA) (amd64),
+ * Copyright(c) 2014 David Kuehling <dvdkhlng AT posteo TOD de> (mips)
+ * Copyright(c) 2014 John Long <codeblue@inbox.lv> (s390x)
+ * Copyright(c) 2018 Ole Streicher (arm, x32)
  * Copyright(c) 2018 Peter Green (arm64)
  * Copyright(c) 2018 James Cowgill <jcowgill AT debian TOD org> (mips64)
  * Copyright(c) 2018 Gustavo Romero, Rogerio Cardoso, Breno Leitao,
- * IBM Corporation (ppc64)
+ *                   IBM Corporation (ppc64)
  * Copyright(c) 2018 Manuel A. Fernandez Montecelo (riscv64)
- * Copyright(c) 2014 John Long <codeblue@inbox.lv> (s390x)
  */
 
 /* ZSVJMP, ZDOJMP -- Set up a jump (non-local goto) by saving the processor
@@ -27,30 +29,53 @@
  * of one longword containing the address of the STATUS variable, followed
  * by the "jmp_buf" used by setjmp/longjmp.
  */
- 
 	.file	"zsvjmp.S"
 
 #if defined(__aarch64__)
 	.arch armv8-a
 #elif defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__)
 	.abiversion 2
+#elif defined (__arm__)
+	.arch	armv6
+#elif defined(__mips__) && (_MIPS_SIM == _ABIO32)
+	.set mips1
+	.abicalls
 #endif
 	.align 2
-        .globl	zsvjmp_
-	.type   zsvjmp_, STT_FUNC
 
+#if defined(__APPLE__)
+        .globl	_zsvjmp_
+	.text
+_zsvjmp_:
+
+#else
+        .globl	zsvjmp_
+	.text
+	.type   zsvjmp_, STT_FUNC
 zsvjmp_:
 
-#if defined(__x86_64__)
+#endif
+
+/* ***************************************************************
+ * 64-bit architectures (LP64)
+ * *************************************************************** */
+
+#if defined(__x86_64__) && defined(__LP64__)
 
 	// %rsi ... &status  %rdi ... &jumpbuf
 	movq	%rsi, (%rdi)		// store &status in jmpbuf[0]
 	movl	$0, (%rsi)		// zero the value of status
 	addq	$8, %rdi		// change point to &jmpbuf[1]
 	movl	$0, %esi		// change arg2 to zero
+#if defined(__APPLE__)
+	jmp     _sigsetjmp		// let sigsetjmp do the rest
+#elif defined(__freebsd__)
+	jmp     sigsetjmp		// let sigsetjmp do the rest
+#else
 	jmp	__sigsetjmp@PLT		// let sigsetjmp do the rest
+#endif
 
-#elif defined(__aarch64__)
+#elif defined(__aarch64__) && defined(__LP64__)
 
 	str	xzr, [x1]		// *status = 0;
 	str	x1, [x0], 8		// ((long **)buf)[0] = status
@@ -58,7 +83,7 @@ zsvjmp_:
 	mov	w1, 0			// 0 --> 2nd arg for sigsetjmp
 	b      __sigsetjmp		// call sigsetjmp
 
-#elif defined(__mips__)
+#elif defined(__mips__) && (_MIPS_SIM == _ABI64)
 
 	.ent	zsvjmp_, 0
 	.frame	$sp, 0, $ra
@@ -129,7 +154,7 @@ zsvjmp_:
 	stl	$31, 0($17)		// *status = 0
 	addq	$16, 8, $16		// setjmp ignores jmpbuf[0]
 
-	lda	$27, setjmp		// get address of setjmp
+	lda	$27, __sigsetjmp	// get address of setjmp
 	mov	$8, $29			// restore caller's global pointer
 	jmp	($27)			// branch to setjmp
 
@@ -141,8 +166,58 @@ zsvjmp_:
 	aghi    %r2,8                // r2 <- r2 + 8
 	jg      __sigsetjmp@PLT      // load vcon resolved by linker
 
+/* ***************************************************************
+ * 31-bit architectures (ILP32)
+ * *************************************************************** */
+
+#elif defined (__i386__)
+
+	movl	4(%esp), %ecx		// &jmpbuf to ECX
+	movl	8(%esp), %eax		// &status to EAX
+	movl	%eax, (%ecx)		// store &status in jmpbuf[0]
+	movl 	$0, (%eax)		// zero the value of status
+	addl	$4, %ecx		// change stack to point to &jmpbuf[1]
+	movl	%ecx, 4(%esp)		// 	...
+	movl	$0, 8(%esp)		// change arg2 to zero
+#if defined(__APPLE__)
+	jmp	_sigsetjmp		// let setjmp do the rest
+#else
+	jmp	__sigsetjmp@PLT		// let sigsetjmp do the rest
+#endif
+
+#elif defined(__x86_64__) && defined(__ILP32__) // linux x32 ABI
+
+	// %esi ... &status  edi ... &jumpbuf
+	movl	%esi, (%edi)		// store &status in jmpbuf[0]
+	movl	$0, (%esi)		// zero the value of status
+	addl	$4, %edi		// change point to &jmpbuf[1]
+	movl	$0, %esi		// change arg2 to zero
+	jmp	__sigsetjmp@PLT		// let sigsetjmp do the rest
+
+#elif defined (__arm__)
+
+	mov	r2, #0			//
+	str	r2, [r1, #0]		// *status = 0
+	str	r1, [r0, #0]		// buf[0] = status
+	add	r0, r0, #4		// &buf[1] --> 1st arg for sigsetjmp
+	mov	r1, #0			// 0	   --> 2nd arg for sigsetjmp
+	b	__sigsetjmp		// call sigsetjmp
+
+#elif defined(__mips__) && (_MIPS_SIM == _ABIO32)
+
+	.set noreorder
+	.cpload $t9
+	.set reorder
+	sw  $a1, 0($a0)			// buf[0]=status
+	sw  $zero, 0($a1)		// *status=0
+	addiu  $a0, $a0, 4		// &buf[1] --> 1st arg for sigsetjmp
+	move    $a1, $zero		// 2nd arg is zero
+
+	// this call sequence is required when used inside shared library
+	la $t9, __sigsetjmp
+	j $t9
+	//  note: no delay slot, filled by GAS
+
 #else
 #error "Unsupported CPU type"
 #endif
-
-	.size	zsvjmp_,.-zsvjmp_

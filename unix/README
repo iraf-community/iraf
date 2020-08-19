@@ -33,7 +33,6 @@ UNIX (a.k.a. host$) -- IRAF/UNIX System Interface (13Dec85 Dct)
 machine or host operating system dependent.  The major directories are as
 follows:
 
-	as		all assembler files (most of these are optional)
 	boot		bootstrap utilities (mkpkg, xc, etc.)
 	hlib		host library (config files, header files, etc.)
 	os		the UNIX/IRAF kernel (LIBOS.A)
@@ -43,24 +42,22 @@ A graph of the IRAF/UNIX system interface directories is shown below.
 -------------------------------------------------------------------------------
 Thu Jan 16 16:37:52 MST 1986
 
-                |-as------------
-                |
-                |               |-bootlib-------
-                |               |-generic-------
-                |               |-mkpkg---------
-                |               |-rmbin---------
-                |               |-rtar----------
-                |               |               
-                |               |                               |-ratlibc-------
+                                |-bootlib-------
+                                |-generic-------
+                                |-mkpkg---------
+                                |-rmbin---------
+                                |-rtar----------
+                                |               
+                                |                               |-ratlibc-------
                 |-boot----------|                               |-ratlibf-------
                 |               |-spp-----------|-rpp-----------|-ratlibr-------
-|-unix----------|               |               |               |-rppfor--------
+                |               |               |               |-rppfor--------
                 |               |               |               |-rpprat--------
                 |               |               |-xpp-----------
                 |               |-vfn-----------
                 |               |-wtar----------
                 |               |
-                |               |-xyacc---------|-debug---------
+|-unix----------|               |-xyacc---------|-debug---------
                 |
                 |-gdev----------|-iism70--------
                 |
@@ -85,15 +82,11 @@ tables and other runtime files.
 	mach.h, libc/iraf.h, libc/libc.h, and libc/knames.h.  All files should
 	be reviewed.
     
-    [2] If the AS assembler files will not work on your machine, rename the
-	directory as VAXAS or some such, create a new, empty AS directory,
-	and code the file ZSVJMP.S therein.  This is the only assembler file
-	required for the operation of IRAF; the autogeneration code will use
-	alternate (but less efficient) portable routines if any of the other
-	AS files are not found.  To code ZSVJMP on a UNIX system, it may help
-	to write a small C program which calls longjmp and setjmp and use ADB
-	to disassemble it.  Write a modified version which is callable from
-	Fortran and has the indicated calling sequence.
+    [2] If the zsvjmp assembler file will not work on your machine, add a new
+	section in this file.  To code ZSVJMP on a UNIX system, it may help
+	to write a small C program which calls longjmp and setjmp and use 
+	"gcc -S" to create a template.  Write a modified version which is
+	callable from Fortran and has the indicated calling sequence.
 
     [3] The directory OS contains the IRAF kernel for 4.2BSD UNIX.  This will
    	have to be modified somewhat if a different version of UNIX is in use.
@@ -114,7 +107,7 @@ tables and other runtime files.
     [5]	Use source or login to pick up the environment defs and aliases.  You
 	are now ready to compile the bootstrap utilities:
 
-		% sh -x mkpkg.csh >& spool &
+		% sh -x mkpkg.sh >& spool &
 
 	This command should compile the libraries LIBOS.A and LIBBOOT.A and
 	install them in hlib, then compile and install all the bootstrap

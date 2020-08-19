@@ -57,7 +57,6 @@ for arch in $archs; do
         ln -sf "bin.$arch" bin
         (cd noao && ln -sf "bin.$arch" bin)
         (cd unix && ln -sf "bin.$arch" bin)
-        (cd unix && ln -sf "as.$arch" as)
     fi
 
     if [ "$nbits" = "64" ]; then
