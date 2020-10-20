@@ -1,14 +1,12 @@
 matrix:
   include:
     - os: linux
-      dist: bionic
+      dist: focal
       arch: amd64
-      env: IRAFARCH=linux64 OS_VERS=bionic RATFOR=ratfor
+      env: IRAFARCH=linux64 OS_VERS=focal RATFOR=ratfor
       addons:
         apt:
           update: true
-          sources:
-            - sourceline: 'ppa:olebole/astro-bionic'
           packages:
             - libcurl4-openssl-dev
             - libexpat1-dev
