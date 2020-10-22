@@ -1,14 +1,12 @@
 matrix:
   include:
     - os: linux
-      dist: bionic
+      dist: focal
       arch: amd64
-      env: IRAFARCH=linux64 OS_VERS=bionic RATFOR=ratfor
+      env: IRAFARCH=linux64 OS_VERS=focal RATFOR=ratfor
       addons:
         apt:
           update: true
-          sources:
-            - sourceline: 'ppa:olebole/astro-bionic'
           packages:
             - libcurl4-openssl-dev
             - libexpat1-dev
@@ -25,7 +23,7 @@ matrix:
             - libexpat1-dev:i386
             - libreadline-dev:i386
     - os: osx
-      osx_image: xcode11.4
+      osx_image: xcode12.2
       env: IRAFARCH=macintel OS_VERS=catalina
     - os: osx
       osx_image: xcode9.4

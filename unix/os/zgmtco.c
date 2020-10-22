@@ -15,6 +15,7 @@ ZGMTCO (
   XINT	*gmtcor				/* seconds */
 )
 {
+    time_t gmt_to_lst(time_t);
     time_t gmt = 315532800; /* The value doesn't matter here; we take 1980-01-01 */
     *gmtcor = gmt - gmt_to_lst(gmt);
     return (XOK);
