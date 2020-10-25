@@ -68,36 +68,14 @@ irafpath (char *fname)
 	    return (fname);
 
 	/* Look first in HBIN.
+	 * Use IRAFARCH if defined.
 	 */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin");
-
-#if defined( __APPLE__) /* These have special rules */
-
-#if defined (__x86_64__)
-	strcat (pathname, ".macintel");
-#elif defined (__i386__)
-	strcat (pathname, ".macosx");
-#endif
-
-#else /* ! __APPLE__ */
-
-#if defined (__linux__)
-	strcat (pathname, ".linux");
-#elif defined( __freebsd__)
-	strcat (pathname, ".freebsd");
-#elif defined( __hurd__)
-	strcat (pathname, ".hurd");
-#else
-	strcat (pathname, ".unknown");
-#endif
-
-#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
-	strcat (pathname, "64");
-#endif
-
-#endif /* ! __APPLE__ */
-
+	if ( (irafarch = getenv("IRAFARCH")) ) {
+	    strcat (pathname, ".");
+	    strcat (pathname, irafarch);
+	}
 	strcat (pathname, "/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)
@@ -111,15 +89,13 @@ irafpath (char *fname)
 	    return (pathname);
 
 	/* Try BIN - use IRAFARCH if defined. */
+	strcpy (pathname, (char *)irafdir);
+	strcat (pathname, "bin");
 	if ( (irafarch = getenv("IRAFARCH")) ) {
-	    strcpy (pathname, (char *)irafdir);
-	    strcat (pathname, "bin.");
+	    strcat (pathname, ".");
 	    strcat (pathname, irafarch);
-	    strcat (pathname, "/");
-	} else {
-	    strcpy (pathname, (char *)irafdir);
-	    strcat (pathname, "bin/");
 	}
+	strcat (pathname, "/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)
 	    return (pathname);
