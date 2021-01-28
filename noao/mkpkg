@@ -115,115 +115,6 @@ generic:				# make architecture indep. (no bins)
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat generic -d $(DIRS)
 	;
-sparc:					# install sparc binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat sparc -d $(DIRS)
-	;
-ssun:					# install ssun binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat ssun -d $(DIRS)
-	;
-sf2c:					# install sf2c binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat sf2c -d $(DIRS)
-	;
-i386:					# install i386 binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat i386 -d $(DIRS)
-	;
-f68881:					# install f68881 binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat f68881 -d $(DIRS)
-	;
-ffpa:					# install ffpa binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat ffpa -d $(DIRS)
-	;
-fswitch:				# install fswitch binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat fswitch -d $(DIRS)
-	;
-fsoft:					# install fsoft binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat fsoft -d $(DIRS)
-	;
-pg:					# install -pg -f68881 binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat pg -d $(DIRS)
-	;
-f2c:					# install Macintosh A/UX f2c binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat f2c -d $(DIRS)
-	;
-alpha:					# install DEC Alpha/OSF binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat alpha -d $(DIRS)
-	;
-ddec:					# install DECstation DEC-Fortran bins
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat ddec -d $(DIRS)
-	;
-dmip:					# install DECstation MIPS-Fortran bins
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat dmip -d $(DIRS)
-	;
-irix:					# install SGI IRIX binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat irix -d $(DIRS)
-	;
-rs6000:					# install IBM AIX binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat rs6000 -d $(DIRS)
-	;
-mips:					# install MIPS workstation binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat mips -d $(DIRS)
-	;
-hp300:                                  # install HPUX series 300 binaries
-        $verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-        !$(hlib)/mkfloat hp300 -d $(DIRS)
-        ;
-hp700:                                  # install HPUX series 700 binaries
-hp800:					# install HPUX series 800/700 binaries
-        $verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-        !$(hlib)/mkfloat hp700 -d $(DIRS)
-        ;
 freebsd:				# install FREEBSD binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
@@ -242,17 +133,11 @@ macintel:				# install MACOSX (x86) binaries
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat macintel -d $(DIRS)
 	;
-ipad:					# install Mac iPad  binaries
+macos64:				# install MACOSX (arm64) binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat ipad -d $(DIRS)
-	;
-cygwin:					# install WinXP/Cygwin binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat cygwin -d $(DIRS)
+	!$(hlib)/mkfloat macos64 -d $(DIRS)
 	;
 linux:					# install Linux binaries
 	$verbose off
@@ -261,42 +146,6 @@ linux:					# install Linux binaries
 	!$(hlib)/mkfloat linux -d $(DIRS)
 	;
 linux64:				# install Linux x86_64 binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat linux64 -d $(DIRS)
-	;
-redhat:					# install Redhat Linux binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat redhat -d $(DIRS)
-	;
-suse:					# install SUSE Linux binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-		     nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat suse -d $(DIRS)
-	;
-linuz:					# install LINUZ binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat linuz -d $(DIRS)
-	;
-sunos:					# install SUNOS (Solaris x86) binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat sunos -d $(DIRS)
-	;
-linuxppc:				# install Linux (PPC) binaries
-	$verbose off
-	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
-	             nproto nobsolete rv surfphot twodspec obsutil"
-	!$(hlib)/mkfloat linuxppc -d $(DIRS)
-	;
-linux64:				# install Linux (64-bit) binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"

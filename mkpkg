@@ -129,11 +129,6 @@ generic:				# make architecture indep. (no bins)
 	!(cd ./unix; export MACH=generic; sh setarch.sh)
 	;
 
-cygwin:					# install WinXP/Cygwin binaries
-        $verbose off
-        !$(hlib)/mkfloat cygwin
-        !(cd ./unix; export MACH=cygwin; sh setarch.sh)
-        ;
 freebsd:				# install freebsd binaries
         $verbose off
         !$(hlib)/mkfloat freebsd
@@ -160,28 +155,8 @@ macosx:					# install MacOS X (Unix 32-bit) binaries
         !$(hlib)/mkfloat macosx
         !(cd ./unix; export MACH=macosx; sh setarch.sh)
         ;
-ipad:					# install Mac iPad binaries
+macos64:				# install MacOS X (x86_64) binaries
         $verbose off
-        !$(hlib)/mkfloat ipad
-        !(cd ./unix; export MACH=ipad; sh setarch.sh)
+        !$(hlib)/mkfloat macos64
+        !(cd ./unix; export MACH=macos64; sh setarch.sh)
         ;
-redhat:					# install redhat binaries
-        $verbose off
-        !$(hlib)/mkfloat redhat
-        !(cd ./unix; export MACH=redhat; sh setarch.sh)
-        ;
-sparc:					# install sparc binaries
-	$verbose off
-	!$(hlib)/mkfloat sparc
-	!(cd ./unix; export MACH=sparc; sh setarch.sh)
-	;
-sunos:					# install sunos binaries
-        $verbose off
-        !$(hlib)/mkfloat sunos
-        !(cd ./unix; export MACH=sunos; sh setarch.sh)
-        ;
-ssun:					# install ssun binaries
-	$verbose off
-	!$(hlib)/mkfloat ssun
-	!(cd ./unix; export MACH=ssol; sh setarch.sh)
-	;

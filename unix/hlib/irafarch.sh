@@ -77,7 +77,7 @@ fi
 # Determine parameters for each architecture.
 if [ -n "$IRAFARCH" ]; then
     mach="$IRAFARCH"
-    if [ "$mach" = "macintel" ] || [ "$mach" = "freebsd64" ] || [ "$mach" = "linux64" ]; then
+    if [ "$mach" = "macintel" ] || [ "$mach" = "macos64" ] || [ "$mach" = "freebsd64" ] || [ "$mach" = "linux64" ]; then
 	nbits=64
     else
 	nbits=32
@@ -87,7 +87,11 @@ else
     case "$MNAME" in
      "darwin")		# Mac OS X
 	 if [ "$nbits" = 64 ] ; then
-             mach="macintel"
+	     if [ "$(uname -m)" = "x86_64" ] ; then
+	         mach="macintel"
+             else
+                 mach="macos64"
+	     fi
 	 else
              mach="macosx"
          fi

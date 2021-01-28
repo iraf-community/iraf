@@ -46,7 +46,7 @@ relink:
 		param.h task.h
 link:
 	$set	LIBS = "-lc -lcur -lds -lstg"
-	$ifeq (MACH, macosx, macintel) then
+	$ifeq (MACH, macosx, macintel, macos64) then
 	  $set	LIBS2 = "-ledit"
 	$else
 	  $set	LIBS2 = "-lreadline"
