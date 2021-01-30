@@ -1,0 +1,57 @@
+
+name: IRAF CI test
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    env:
+      IRAFARCH: ${{ matrix.irafarch }}
+      CARCH: ${{ matrix.carch }}
+
+    strategy:
+      matrix:
+        include:
+          - name: Ubuntu 20.04 Focal x86_64
+            os: ubuntu-20.04
+            irafarch: linux64
+
+          - name: Ubuntu 16.04 Xenial i386
+            os: ubuntu-16.04
+            irafarch: linux
+            carch: '-m32'
+
+          - name: macOS 10.15 Catalina x86_64
+            os: macos-10.15
+            irafarch: macintel
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup dependencies on Ubuntu 64 bit
+        if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev
+
+      - name: Setup dependencies on Ubuntu 32 bit
+        if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux'
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -y
+          sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386
+
+      - name: Setup and build IRAF
+        run: |
+          PATH=${HOME}/.iraf/bin:$PATH
+          ./install --term xterm < /dev/null
+          make ${IRAFARCH}
+          make sysgen
+
+      - name: Run tests
+        run: |
+          PATH=${HOME}/.iraf/bin:$PATH
+          ./test/run_tests
