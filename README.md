@@ -1,6 +1,6 @@
 # IRAF Snapshot Release
 
-[![IRAF's Travis CI Status](https://travis-ci.com/iraf-community/iraf.svg)](https://travis-ci.com/iraf-community/iraf)
+[![IRAF CI test](https://github.com/iraf-community/iraf/workflows/IRAF%20CI%20test/badge.svg)](https://github.com/olebole/iraf/actions?query=workflow%3A%22IRAF+CI+test%22)
 [![GitHub release](https://img.shields.io/github/release/iraf-community/iraf.svg)](https://github.com/iraf-community/iraf/releases/latest)
 
 IRAF is the Image Reduction and Analysis Facility, a general purpose
