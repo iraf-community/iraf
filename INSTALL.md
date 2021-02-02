@@ -39,8 +39,8 @@ The source distribution file is built as a tarball with the package
 name and version as base directory. Thus, distribution files can be
 unpacked with the command
 
-    $ tar zxf /<path>/iraf-2.16.1-2018.06.15.tar.gz
-    $ cd iraf-2.16.1-2018.06.15/
+    $ tar zxf /<path>/iraf-2.16.1-2018.11.01.tar.gz
+    $ cd iraf-2.16.1-2018.11.01/
 
 
 ## Build from Sources
@@ -69,12 +69,13 @@ Now you can configure the system for the proper architecture and build:
 
 For `<arch>`, use the proper IRAF architecture name:
 
-`<arch>`   | Operating system | CPU
------------|------------------|--------------------
+`<arch>`   | Operating system | Supported CPU types
+-----------|------------------|---------------------------------------
 `linux64`  | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64, alpha
 `linux`    | Linux 32 bit     | i386, x32, arm, mips
-`macintel` | Mac OS X 64 bit  | x86_64
-`macosx`   | Mac OS X 32 bit  | i386
+`macos64`  | macOS 64 bit     | arm64
+`macintel` | macOS 64 bit     | x86_64
+`macosx`   | macOS 32 bit     | i386
 `freebsd64`| FreeBSD 64 bit   | x86_64
 `freebsd`  | FreeBSD 32 bit   | i386, arm
 `hurd`     | GNU HURD 32 bit  | i386
