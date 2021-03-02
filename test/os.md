@@ -90,7 +90,7 @@ procedure t_gmtcotest ()
 int corr
 begin
     call zgmtco(corr)
-	if ((corr < 315532800 - 86400) || (corr < 315532800 - 86400)) {
+	if ((corr < - 86400) || (corr > 86400)) {
 	    call printf("Unreasonable correction %d\n")
 		    call pargi(corr)
 	} else {
