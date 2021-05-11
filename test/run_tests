@@ -265,7 +265,7 @@ for CL in $IRAF_SHELLS ; do
 done
 
 if [ -s "$summary_file" ] ; then
-    printf "Test summary: %s\\n" "$(sort "$summary_file" | uniq -c | sed ':a;N;$!ba;s/\\n */, /g')"
+    printf "Test summary: %s\\n" "$(sort "$summary_file" | uniq -c | sed ':a;N;$!ba;s/\\n */, /g' 2> /dev/null)"
 fi
 
 if [ -s "$failure_file" ] ; then
