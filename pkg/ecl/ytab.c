@@ -207,6 +207,7 @@
 #include "task.h"
 #include "construct.h"
 #include "errs.h"
+#include "proto.h"
 
 
 /* CL parser, written as a yacc grammar:
