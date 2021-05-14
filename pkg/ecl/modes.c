@@ -562,7 +562,7 @@ nextstr (char **pbuf, FILE *fp)
 
 	    while (*p != quote) {
 
-		if (p == '\0'  ||  cnt >= SZ_LINE)
+		if (*p == '\0'  ||  cnt >= SZ_LINE)
 		    return ( (char *) ERR);
 
 		else {

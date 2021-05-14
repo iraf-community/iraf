@@ -954,10 +954,9 @@ cllparam (void)
  * Dump the parameters for the named tasks to the standard output in the
  * form of a series of `task.param=value' assignments.
  */
-void 
+void
 cldparam (void)
 {
-	register struct ltask *ltp;
 	register struct pfile *pfp;
 	struct	operand o;
 	int	n, nleft;
@@ -974,7 +973,6 @@ cldparam (void)
 
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
 		pfp = pfilesrch (o.o_val.v_s);
-		ltp = pfp->pf_ltp;
 		dumpparams (pfp);
 	    } else
 		cl_error (E_UERR, "dparam: argument must be a taskname");
