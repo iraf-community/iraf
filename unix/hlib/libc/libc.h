@@ -309,7 +309,7 @@ extern void	fputs (char *str, struct _iobuf *fp);
 extern void	free (char *buf);
 extern void	perror (char *prefix);
 extern void	printf (char *format, ...);
-extern void	qsort (char *base, int n, int size, int  (*compar) (void));
+extern void	qsort (char *base, int n, int size, int  (*compar) ());
 extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
