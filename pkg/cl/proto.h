@@ -139,7 +139,7 @@ extern void edtinit(void);
 extern void edtexit(void);
 extern char *host_editor(char *editor);
 extern void get_editor(char *editor);
-extern int what_cmd(char first_char);
+extern int what_cmd(int first_char);
 extern int cmd_match(char *cstring, int nchars);
 extern void show_editorhelp(void);
 /* eparam.c */

@@ -13,6 +13,7 @@
 #include "errs.h"
 #include "task.h"
 #include "operand.h"
+#include "param.h"
 #include "proto.h"
 
 
@@ -94,7 +95,6 @@ static void pr_totail (struct process *pr);
 static void pr_unlink (struct process *pr);
 
 
-
 /* PR_CONNECT -- Run a task resident in an external process.  Look in the cache
  * for the named process; if not found or already active, spawn the process
  * and add it to the cache.  Send the startup message to the child to start
@@ -108,18 +108,18 @@ static void pr_unlink (struct process *pr);
  * and should support i/o redirection to named files for (greatly) increased
  * efficiency of pipes.
  */
-int 
+int
 pr_connect (
     char *process,			/* filename of process		*/
     char *command,			/* IRAF Main command		*/
     FILE **in,
-    FILE **out,			/* IPC channels (output)	*/
+    FILE **out,				/* IPC channels (output)	*/
     FILE *t_in,
     FILE *t_out,
-    FILE *t_err,		/* task stdin,out,err (input)	*/
+    FILE *t_err,			/* task stdin,out,err (input)	*/
     FILE *t_gr,
     FILE *t_im,
-    FILE *t_pl,		/* task graphics streams	*/
+    FILE *t_pl,				/* task graphics streams	*/
     int timeit				/* if !0, time command		*/
 )
 {
@@ -162,7 +162,7 @@ pr_connect (
  * Our only function for normal task termination is to clear the active flag.
  * Until the active flag is cleared the process cannot be reused nor terminated.
  */
-void 
+void
 pr_disconnect (
     int pid			/* process id returned by connect	*/
 )
@@ -184,7 +184,7 @@ pr_disconnect (
  * and add it to the cache.  Return the process id and file pointers to the
  * IPC channels to the caller.
  */
-int 
+int
 pr_pconnect (
     char *process,			/* filename of process		*/
     FILE **in,
@@ -268,7 +268,7 @@ pr_pconnect (
 /* PR_PDISCONNECT -- Remove a process from the process cache.  Processes are
  * disconnected when pushed out of the cache or when the cache is flushed.
  */
-void 
+void
 pr_pdisconnect (struct process *pr)
 {
 	/* Ignore attempts to dump active processes.  This might happen
@@ -297,7 +297,7 @@ pr_pdisconnect (struct process *pr)
  * the cache size on an active cache causes the cache to be flushed and all
  * locked processes to be reconnected.
  */
-void 
+void
 pr_setcache (int new_szprcache)
 {
 	struct	process *pr;
@@ -350,10 +350,11 @@ pr_findproc (char *process)
 {
 	struct	process *pr;
 
-	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
+	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
 	    if (pr->pr_pid != NULL && pr_idle(pr))
 		if (strcmp (process, pr->pr_name) == 0)
 		    return (pr);
+	}
 
 	return (NULL);
 }
@@ -363,7 +364,7 @@ pr_findproc (char *process)
  * If the process is already connected merely returns its pid, else connect
  * the process and return its pid.
  */
-int 
+int
 pr_cachetask (
     char *ltname		/* logical task name	*/
 )
@@ -389,19 +390,20 @@ pr_cachetask (
  * as deadlock may occur.  Locked processes are also not disconnected by
  * pr_dumpcache, which may not be what is desired.
  */
-void 
+void
 pr_lock (
     register int pid			/* process id			*/
 )
 {
 	struct process *pr;
 
-	if (pid != NULL)
+	if (pid != NULL) {
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
 		if (pr->pr_pid == pid) {
 		    pr->pr_flags |= P_LOCKED;
 		    break;
 		}
+	}
 }
 
 
@@ -410,7 +412,7 @@ pr_lock (
  *
  * This function is currently unused.
  */
-int 
+int
 pr_unlock (
     register int pid			/* process id			*/
 )
@@ -429,7 +431,7 @@ pr_unlock (
 /* PR_LISTCACHE -- Info command, used to display the contents of the process
  * cache.  Format:  pid [RH][L] process_name
  */
-void 
+void
 pr_listcache (
     FILE *fp			/* output file		*/
 )
@@ -471,7 +473,7 @@ pr_listcache (
  * value.  Locks may be forced if desired, i.e., when dumping the cache prior
  * to process termination.
  */
-void 
+void
 pr_dumpcache (int pid, int break_locks)
 {
 	register struct	process *pr;
@@ -500,7 +502,7 @@ pr_dumpcache (int pid, int break_locks)
  * connected since the given PNO was assigned.  Locked processes are not
  * affected.
  */
-void 
+void
 pr_prunecache (int pno)
 {
 	register struct	process *pr;
@@ -523,7 +525,7 @@ pr_prunecache (int pno)
  * called, the counter might wrap around, but that does not seem likely and is
  * harmless in any case.
  */
-int 
+int
 pr_getpno (void)
 {
 	return (pr_pno++);
@@ -533,7 +535,7 @@ pr_getpno (void)
 /* PR_PNAMETOPID -- Lookup the named process in the cache and return the pid
  * if found, NULL otherwise.
  */
-int 
+int
 pr_pnametopid (char *pname)
 {
 	register struct process *pr;
@@ -543,14 +545,14 @@ pr_pnametopid (char *pname)
 	    if (strcmp (pr->pr_name, pname) == 0)
 		return (pr->pr_pid);
 
-	return (NULL);
+	return (0);
 }
 
 
 /* PR_CHDIR -- Change the current working directory of a child process, or
  * of all connected but idle processes if pid=0.
  */
-void 
+void
 pr_chdir (register int pid, char *newdir)
 {
 	register struct process *pr;
@@ -568,7 +570,7 @@ pr_chdir (register int pid, char *newdir)
 /* PR_ENVSET -- Set the value of an environment variable in a child process,
  * or in all connected but idle processes if pid=0.
  */
-void 
+void
 pr_envset (register int pid, char *envvar, char *valuestr)
 {
 	register struct process *pr;
@@ -587,7 +589,7 @@ pr_envset (register int pid, char *envvar, char *valuestr)
  * if any have died.  If a process has died we must disconnect the process
  * to free file descriptors and the process cache slot.
  */
-void 
+void
 pr_checkup (void)
 {
 	register struct	process *pr;
@@ -614,7 +616,7 @@ pr_checkup (void)
  * disabling any further output to the process.
  */
 /* ARGSUSED */
-void 
+void
 onipc (
     int *vex,			/* virtual exception code	*/
     PFI *next_handler		/* next handler to be called	*/
@@ -637,7 +639,7 @@ onipc (
 /* PR_INITCACHE -- Initialize the process cache, i.e., set up the queue for the
  * first time.  The minimum cache size is 2.
  */
-void 
+void
 pr_initcache (void)
 {
 	register struct process *pr;
@@ -661,7 +663,7 @@ pr_initcache (void)
 
 /* PR_TOHEAD -- Relink a process at the head of the cache list.
  */
-static void 
+static void
 pr_tohead (struct process *pr)
 {
 	if (pr_head != pr) {
@@ -676,7 +678,7 @@ pr_tohead (struct process *pr)
 
 /* PR_TOTAIL -- Relink a process at the tail of the cache list.
  */
-static void 
+static void
 pr_totail (struct process *pr)
 {
 	if (pr_tail != pr) {
@@ -691,7 +693,7 @@ pr_totail (struct process *pr)
 
 /* PR_UNLINK -- Unlink a process from the list.
  */
-static void 
+static void
 pr_unlink (struct process *pr)
 {
 	if (pr->pr_up) {

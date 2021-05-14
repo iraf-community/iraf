@@ -14,6 +14,7 @@
 #define import_xnames
 #include <iraf.h>
 
+#include <ctype.h>
 #include "config.h"
 #include "grammar.h"
 #include "opcodes.h"
@@ -493,7 +494,6 @@ login (char *cmd)
 		    *ap++ = *arg++;
 	    }
 	}
-
 
 	/* Copy any user supplied host command line arguments into the
 	 * CL parameter $args to use in the startup script (for instance).

@@ -23,27 +23,20 @@ relink:
 	    $endif
 	    $ifolder (ytab.c,  grammar.y)
 		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+		$ifeq (MACH, linux)
+		    !yacc -vd grammar.y; 
+		    !egrep -v "\<stdlib.h\>" y.tab.c > ytab.c; 
+		    !egrep -v "\<stdio.h\>" ytab.c > ntab.c; mv ntab.c ytab.c
+		    !mv y.tab.h ytab.h
+		$else
+		    !yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+		$endif
 	    $endif
-	$endif
-
-	$ifeq (siteid, stsci)
-	$ifeq (hostid, vms)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex grammar.l
-		!@lex.com
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y
-	    $endif
-	$endif
 	$endif
 
 	$update libpkg.a
 
-	#$set	xflags = "$(xflags) -x"
+	$set	xflags = "$(xflags) -x"
 	$omake  cl.x
 	$omake	globals.c <libc/libc.h> <libc/stdio.h> <libc/spp.h>\
 		construct.h eparam.h operand.h param.h task.h
@@ -60,7 +53,7 @@ install:
 	;
 
 libpkg.a:
-	#$set	xflags = "$(xflags) -qx"
+	$set	xflags = "$(xflags) -qx"
 
 	binop.c		<libc/spp.h> <libc/libc.h> <libc/xnames.h>\
 			<libc/math.h> <libc/ctype.h> config.h\

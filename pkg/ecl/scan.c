@@ -51,8 +51,7 @@ static	int nscan_val=0;	/* value returned by NSCAN intrinsic	*/
  * query if readlist yields undefined.
  * error() may be called on various conditions.
  */
-
-void 
+void
 cl_scan (int nargs, char *source)
 {
 	char	buf[SZ_LINE];
@@ -195,7 +194,7 @@ cl_scan (int nargs, char *source)
 /* CL_SCANF -- Formatted scan.  Like SCAN except that a C-scanf like format
  * statement is used to decode the input text.
  */
-void 
+void
 cl_scanf (char *format, int nargs, char *input)
 {
 	int	nscan_val, eoftst, n;
@@ -318,7 +317,7 @@ cl_scanf (char *format, int nargs, char *input)
 /* GET_NSCANVAL -- Return the number of items successfully scanned in the
  * last call to SCAN.
  */
-int 
+int
 get_nscanval (void)
 {
 	return (nscan_val);
@@ -328,7 +327,7 @@ get_nscanval (void)
 /* LENTST -- Test that the scan line just read did not overflow the line
  * buffer.
  */
-void 
+void
 lentst (char *buf)
 {
 	char	*index();

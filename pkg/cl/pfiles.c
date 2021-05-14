@@ -40,7 +40,7 @@ extern  int c_finfo();
  */
 struct pfile *
 newpfile (
-  struct ltask *ltp 			/* ltask descriptor */
+    struct ltask *ltp		/* ltask descriptor */
 )
 {
 	register struct pfile *pfp, *head_pfp;
@@ -69,7 +69,7 @@ newpfile (
  */
 void
 pfileunlink (
-  register struct pfile *pfp 	/* pfile to be unlinked	*/
+    register struct pfile *pfp	/* pfile to be unlinked	*/
 )
 {
 	register struct pfile *npf;
@@ -95,7 +95,7 @@ pfileunlink (
  */
 struct pfile *
 pfilefind (
-  register struct ltask *ltp 		/* ltask descriptor */
+    register struct ltask *ltp		/* ltask descriptor */
 )
 {
 	register struct pfile *pfp;
@@ -114,7 +114,7 @@ pfilefind (
  */
 struct pfile *
 pfilesrch (
-  char	*pfilepath 		/* filename or ltask pathname	*/
+    char *pfilepath		/* filename or ltask pathname	*/
 )
 {
 	struct	pfile *pfp;
@@ -154,7 +154,7 @@ pfilesrch (
  */
 struct pfile *
 pfileload (
-  register struct ltask *ltp 		/* ltask descriptor */
+    register struct ltask *ltp		/* ltask descriptor */
 )
 {
 	static	long sys_ftime = 0;
@@ -317,15 +317,15 @@ epset_:
  */
 int
 pfilemerge (
-  struct pfile *npf,			/* loaded parameter set	*/
-  char	*opfile 			/* old parameter file	*/
+    struct pfile *npf,			/* loaded parameter set	*/
+    char *opfile			/* old parameter file	*/
 )
 {
 	register struct param *o_pp, *n_pp, *l_pp;
 	int	bastype;
+	XINT	save_topd;
 	struct	pfile *opf;
 	struct	ltask *ltp;
-	XINT	save_topd;
 
 	if (cldebug)
 	    eprintf ("pfilemerge, task %s, pfile %s\n",
@@ -423,7 +423,7 @@ pfilemerge (
  */
 void
 pfileupdate (
-  struct pfile *pfp 		/* parameter file descriptor */
+    struct pfile *pfp		/* parameter file descriptor */
 )
 {
 	if ((pfp->pf_flags & (PF_FAKE|PF_UPDATE)) != PF_UPDATE)
@@ -451,9 +451,9 @@ pfileupdate (
  */
 struct pfile *
 pfileread (
-  struct ltask *ltp,		/* associated ltask		*/
-  char	*pfilename,		/* parameter file filename	*/
-  int	checkmode 		/* check for "mode" parameter	*/
+    struct ltask *ltp,		/* associated ltask		*/
+    char *pfilename,		/* parameter file filename	*/
+    int checkmode		/* check for "mode" parameter	*/
 )
 {
 	register char	*ip;
@@ -467,7 +467,7 @@ pfileread (
 	if (cldebug)
 	    eprintf ("pfileread, task %s, pfile %s\n",
 		ltp ? ltp->lt_lname : "", pfilename);
-	    
+
 	if ((fp = fopen (pfilename, "r")) == NULL)
 	    return (NULL);
 
@@ -511,7 +511,7 @@ pfileread (
 		goto error_;
 
 	} else if (procscript (fp)) {
-	    extern int yyparse();
+	    extern int yyparse ();
 
 	    /* Parse the declarations section of a procedure script.
 	     * The procscript() call leaves us positioned to the procedure
@@ -596,8 +596,8 @@ error_:
  */
 int
 pfilewrite (
-  struct pfile *pfp,		/* pfile descriptor	*/
-  char	*pfilename 		/* file to be written	*/
+    struct pfile *pfp,		/* pfile descriptor	*/
+    char *pfilename		/* file to be written	*/
 )
 {
 	register char	*ip, *op, *dot;
@@ -665,9 +665,7 @@ pfilewrite (
  * "unlearn" to restore the package default parameters for an ltask or package.
  */
 int
-pfileinit (
-  struct ltask *ltp
-)
+pfileinit (struct ltask *ltp)
 {
 	struct	task *tp;
 	struct	pfile *pfp;
@@ -754,11 +752,11 @@ is_pfilename (char *opstr)
  */
 void
 mkpfilename (
-  char	*buf,			/* receives output filename	*/
-  char	*dir,			/* dir name or prefix		*/
-  char	*pkname,		/* package name			*/
-  char	*ltname,		/* ltask name			*/
-  char	*extn 			/* filename extension		*/
+    char *buf,			/* receives output filename	*/
+    char *dir,			/* dir name or prefix		*/
+    char *pkname,		/* package name			*/
+    char *ltname,		/* ltask name			*/
+    char *extn			/* filename extension		*/
 )
 {
 	char	temp[SZ_FNAME+1];
@@ -783,11 +781,7 @@ mkpfilename (
  * characters generated.
  */
 static void
-mapname (
-  char	*in,
-  char	*out,
-  int	maxlen
-)
+mapname (char *in, char *out, int maxlen)
 {
 	register int ip, op;
 
@@ -811,8 +805,8 @@ mapname (
  */
 long
 filetime (
-  char	*fname,			/* file name		*/
-  char	*timecode 		/* "c" or "m"		*/
+    char *fname,			/* file name		*/
+    char *timecode		/* "c" or "m"		*/
 )
 {
 	struct	_finfo fi;
@@ -841,9 +835,7 @@ filetime (
  *   these events happened for this particular run of the task.
  */
 struct pfile *
-pfilecopy (
-  register struct pfile *pfp
-)
+pfilecopy (register struct pfile *pfp)
 {
 	register struct param *pp, *newpp;
 	struct	pfile *newpfp;
@@ -957,7 +949,6 @@ pfilecopy (
 	    newpp->p_listfp = pp->p_listfp;
 	    newpp->p_listval = pp->p_listval;
 	    newpp->p_lenval = pp->p_lenval;
-
 	}
 
 	newpfp->pf_oldpfp = pfp;
@@ -989,9 +980,7 @@ pfilecopy (
  *   dead pfile if it is below the new topd set by keep.
  */
 void
-pfcopyback (
-  struct pfile *pff
-)
+pfcopyback (struct pfile *pff)
 {
 	register struct param *pt, *pf;
 	struct	pfile *pft;
@@ -1136,11 +1125,7 @@ pfcopyback (
  *   execnewtask(), to add such parameters as $nargs and mode.
  */
 struct param *
-addparam (
-  struct pfile *pfp,
-  char	*buf,
-  FILE	*fp
-)
+addparam (struct pfile *pfp, char *buf, FILE *fp)
 {
 	static char *minfields =
 		"must specify at least name,type,mode for `%s'\n";
@@ -1156,7 +1141,7 @@ addparam (
 	int	bastype;	/* OT_BASIC part of type as soon as know*/
 	int	arrflag;	/* Is param an array?			*/
 	struct arr_desc *parrd;	/* Pointer to array descriptor.		*/
-	int	size_arr;	/* Size of array.			*/
+	int	size_arr=0;	/* Size of array.			*/
 	extern double atof();
 	char	**tbuf;
 
@@ -1510,7 +1495,7 @@ addparam (
 	/* ARRAY INITIALIZATION */
 
 	if (arrflag) {
-	    int     i, len;
+	    int     i, len=0;
 
 	    /* First initialize all fields, since we do not
 	     * require initialization of the entire array.
@@ -1604,10 +1589,7 @@ addparam (
 /* CK_ATOI -- Check a string for non-numerics before conversion.
  */
 int
-ck_atoi (
-  char	*str,
-  int	*val
-)
+ck_atoi (char *str, int *val)
 {
 	char	*s;
 
@@ -1643,10 +1625,7 @@ ck_atoi (
  *   empty return a pointer to the string "undefval".
  */
 char *
-nextfield (
-  char	**pp,
-  FILE	*fp
-)
+nextfield (char **pp, FILE *fp)
 {
 	static char readbuf[SZ_LINE];
 	register char c, *p;	/* fast references to field	 	*/
@@ -1739,7 +1718,7 @@ nextfield (
 	     * lines here.
 	     */
 	    while (*p == ' ' || *p == '\t')
-		*p++;
+		p++;
 
 	    c = *p;
 
@@ -1811,9 +1790,7 @@ nextfield (
  * you have ASCII.
  */
 char *
-makelower (
-  register char *cp
-)
+makelower (register char *cp)
 {
 	char *start = cp;
 	register char c;
@@ -1925,9 +1902,7 @@ scanmode (char *s)
  * N.B. hope ERR doesn't map into a reasonable set of flags.
  */
 int
-scantype (
-  register char *s
-)
+scantype (register char *s)
 {
 	static char *badtype =  "bad type spec `%c'";
 	static char *cnfltype = "conflicting type spec `%c'";

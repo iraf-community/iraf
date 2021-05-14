@@ -137,7 +137,7 @@ paramfind (struct pfile *pfp, char *pname, int pos, int exact)
  *
  *	order of interpolator (3|5|7) (5):
  */
-void 
+void
 paramset (register struct param *pp, int field)
 {
 	struct	operand o;
@@ -357,7 +357,7 @@ paramset (register struct param *pp, int field)
  * in file if list-structured.  If getting FN_NULL, query if in query mode
  * or if pp is out of range.  Call error if return value would be undefined.
  */
-void 
+void
 validparamget (register struct param *pp, int field)
 {
 	struct operand o;
@@ -378,7 +378,7 @@ validparamget (register struct param *pp, int field)
  * if list-structured.  If getting FN_NULL, query if in query mode or if pp
  * is out of range.  Value returned may be undefined.
  */
-void 
+void
 paramget (register struct param *pp, int field)
 {
 	char	mode[5];	/* used to turn bits into string	*/
@@ -642,7 +642,7 @@ paramget (register struct param *pp, int field)
  * are on in param pp.  S should be at least 5 characters long, in the
  * (impossible) worse case.
  */
-void 
+void
 makemode (struct param *pp, char *s)
 {
 	register int m = pp->p_mode;
@@ -763,7 +763,7 @@ paramsrch (char *pkname, char *ltname, char *pname)
  * with appropriate searching as necessary.  False is returned if either the
  * task has no param file or the param does not exist.
  */
-int 
+int
 defpar (char *param_spec)
 {
 	char	sbuf[SZ_LINE];
@@ -784,7 +784,7 @@ defpar (char *param_spec)
 
 /* DEFVAR -- Determine if the named environment variable exists.
  */
-int 
+int
 defvar (char *envvar)
 {
 	char	sbuf[SZ_LINE];
@@ -874,7 +874,7 @@ lookup_param (char *pkname, char *ltname, char *pname)
 	    ambig = 0;
 	    for (i=0;  i < npfiles;  i++) {
 		pfp = pfiles[i];
-		if (pfp != NULL && (pp = paramfind(pfp, pname,0,NO)) != NULL) {
+		if (pfp != NULL && (pp=paramfind (pfp, pname, 0, NO)) != NULL) {
 		    if ((XINT)pp == -1) {
 			ambig++;
 		    } else if (!strcmp (pp->p_name, pname)) {
@@ -943,7 +943,7 @@ lookup_param (char *pkname, char *ltname, char *pname)
  * Put quotes around strings; convert escape chars into escape sequences.
  * Don't call error() so caller can have a chance to close the file.
  */
-int 
+int
 printparam (struct param *pp, register FILE *fp)
 {
 	register int type, bastype;
@@ -1125,8 +1125,8 @@ printparam (struct param *pp, register FILE *fp)
 	    /* For a first approximation use a fixed number of
 	     * values per line.
 	     */
-	    int    count=0, lcount=0, n_per=0, *p_i= (int *) NULL;
-	    double *p_r= (double *) NULL;
+	    int    count=0, lcount=0, n_per=0, *p_i= NULL;
+	    double *p_r= NULL;
 	    char   **p_s = NULL;
 
 	    if (bastype == OT_BOOL) {
@@ -1197,7 +1197,7 @@ printparam (struct param *pp, register FILE *fp)
  * control characters (newline, tab, and string delimiters) into escape
  * sequences, so that they can later be read back in unmodified.
  */
-void 
+void
 qputs (register char *str, register FILE *fp)
 {
 	register char	ch;
@@ -1242,7 +1242,7 @@ qputs (register char *str, register FILE *fp)
  * the null string a null string per se does not qualify as an undefined
  * value.
  */
-int 
+int
 pvaldefined (struct param *pp, char *s)
 {
 	int val;
@@ -1315,7 +1315,7 @@ newfakeparam (
 /* GETOFFSET -- Getoffset returns the offset from the beginning of the array
  * for using the index values stored on the stack.
  */
-int 
+int
 getoffset (struct param *pp)
 {
 	int	dim, offset, index;
@@ -1365,7 +1365,7 @@ getoffset (struct param *pp)
  * the offsets using an index list, or to push the offset onto the stack
  * directly.
  */
-void 
+void
 offsetmode (int mode)
 {
 	if (mode)
@@ -1377,7 +1377,7 @@ offsetmode (int mode)
 
 /* SIZE_ARRAY -- Get the number of elements in an array.
  */
-int 
+int
 size_array (struct param *pp)
 {
 	int dim, d, size;

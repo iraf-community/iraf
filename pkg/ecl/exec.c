@@ -48,7 +48,6 @@ char	*onerr_handler  = NULL;
 char	*findexe();
 
 
-
 /* RUN -- Run the code beginning at pc until we run an EXEC instruction of
  *   something other than a builtin command or END instruction.
  *   The EXEC instruction means that a new task is being started and we should
@@ -135,7 +134,7 @@ run (void)
  *   ability to have multiple package defn's in a script ltask.
  *   Any parameter references will refer to the cl's also.
  */
-void 
+void
 callnewtask (char *name)
 {
 	/* x1 and x2 are just place holders to call breakout().
@@ -149,7 +148,7 @@ callnewtask (char *name)
 
 	currentline = coderef(pc)->c_scriptln;
 
-	/* Save current dictionary and stack pointers.  They get restored when
+	/* Save current dictionary and stack pointers. They get restored when
 	 * the new task dies normally and the current task is to continue.
 	 * Save pc when get to the EXEC instruction so it continues from there.
 	 */
@@ -288,7 +287,7 @@ callnewtask (char *name)
  * main()'s loop.  Do not set newtask to NULL so that run() can tell what it
  * exec'd.
  */
-void 
+void
 execnewtask (void)
 {
 	/* VMS C V2.1 cannot handle this (see below).
@@ -562,7 +561,7 @@ execnewtask (void)
  * i.e., with predefined values that are not expected to change during task
  * execution (no queries) may be passed on the command line.
  */
-void 
+void
 mk_startupmsg (
     struct task *tp,			/* task being executed		*/
     char *cmd,				/* receives formatted command	*/
@@ -829,7 +828,7 @@ findexe (
  * used to change packages, change the current package and push a cl() on the
  * control stack but continue reading from the current command stream.
  */
-void 
+void
 set_clio (register struct task *newtask)
 {
 	register struct task *tp;
@@ -881,13 +880,13 @@ ppfind (
 )
 {
 	struct	param *pp, *m_pp;
-	struct	pfile *m_pfp = (struct pfile *) NULL;
+	struct	pfile *m_pfp = NULL;
 	int	nchars;
 
 	if (tn != NULL && *tn != EOS) {
 	    /* Locate the named pset and search it. */
-	    for (nchars=strlen(tn), m_pp=NULL;  pfp;  pfp = pfp->pf_npset)
-		if ( (pp = pfp->pf_psetp) )
+	    for (nchars=strlen(tn), m_pp=NULL;  pfp;  pfp = pfp->pf_npset) {
+		if ((pp = pfp->pf_psetp)) {
 		    if (strncmp (pp->p_name, tn, nchars) == 0) {
 			if (strlen (pp->p_name) == nchars)
 			    return (paramfind (pfp, pn, pos, abbrev));
@@ -898,6 +897,8 @@ ppfind (
 			    m_pfp = pfp;
 			}
 		    }
+		}
+	    }
 
 	    /* Unique abbreviation for pset was given. */
 	    if (m_pp)
@@ -920,14 +921,14 @@ ppfind (
  * been used by callnewtask() to load a pset.  We must replace the old pset
  * by the new one.
  */
-void 
+void
 psetreload (
     struct pfile *main_pfp,		/* main task pfile	*/
     struct param *psetp			/* pset param		*/
 )
 {
 	struct	pfile *o_pfp, *n_pfp, *prev_pfp;
-	struct	pfile *next_pfp = (struct pfile *) NULL;
+	struct	pfile *next_pfp = NULL;
 
 	if (cldebug)
 	    eprintf ("psetreload, pset %s\n", psetp->p_name);
@@ -973,7 +974,7 @@ psetreload (
  * Don't call error() because in trying to restor to an interactive task
  *   it might call us again and cause an inf. loop.
  */
-void 
+void
 iofinish (register struct task *tp)
 {
 	register FILE *fp;
@@ -1062,7 +1063,7 @@ iofinish (register struct task *tp)
  *   of each pfile below topd and lob off any params above topd.
  *   The way posargset, et al, and call/execnewtask are now, we are safe.
  */
-void 
+void
 restor (struct task *tp)
 {
 	memel *topdp;
@@ -1205,7 +1206,7 @@ restor (struct task *tp)
  * If currentask is the first cl or we are batch, then we are truely done.
  *   Return true to the caller (EXECUTE), causing a return to the main.
  */
-void 
+void
 oneof (void)
 {
 	register struct pfile *pfp;
@@ -1216,11 +1217,10 @@ oneof (void)
 	extern  ErrCom	errcom;
 	extern  int 	err_clear;
 
-	    
 	if (cldebug)
 	    eprintf ("received `%s' from `%s'\n", yeof ? "eof" : "bye",
 		currentask == firstask ? "root" : currentask->t_ltp->lt_lname);
-	    
+
 	if (!(firstask->t_flags & T_BATCH))
 	    if (currentask == firstask && !gologout && !loggingout &&
 		isatty (fileno (stdin)) && nerrs++ < 8)
@@ -1281,7 +1281,7 @@ oneof (void)
 /* PRINTCALL -- Print the calling sequence for a task.  Called by killtask()
  * to print stack trace.
  */
-void 
+void
 printcall (FILE *fp, struct task *tp)
 {
 	register struct param *pp;
@@ -1301,7 +1301,6 @@ printcall (FILE *fp, struct task *tp)
 	    tp->t_ltp->lt_flags);
 
 	fprintf (fp, "     called as: `%s (", tp->t_ltp->lt_lname);
-
 	for (pp = tp->t_pfp->pf_pp;  pp != NULL;  pp = pp->p_np) {
 	    if (pp->p_flags & P_CLSET) {
 		if (notfirst)
@@ -1379,7 +1378,7 @@ print_call_line (FILE *out, int line, char *fname, int flags)
  *   it resides.  The process is left running in the cache in case it is needed
  *   again.
  */
-void 
+void
 killtask (register struct task *tp)
 {
 	char	buf[128];

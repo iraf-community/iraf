@@ -17,7 +17,6 @@
 #include "construct.h"
 #include "proto.h"
 
-
 /*
  * OPCODES -- This is the instruction set that forms the internal language of
  *   the CL.  The runtime interpreter (in runtime.c) executes these functions
@@ -52,9 +51,7 @@ o_undefined (void)
  * fake parameter the same as the type of the operand.
  */
 void
-o_absargset (
-  memel *argp
-)
+o_absargset (memel *argp)
 {
 	char	*argname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -66,7 +63,7 @@ o_absargset (
 	    /* use full argname and always assign to value field.
 	     */
 	    struct operand o;
-	    int	string_len;
+	    int	string_len=0;
 	    o = popop();
 	    if ((o.o_type & OT_BASIC) == OT_STRING)
 		string_len = strlen (o.o_val.v_s);
@@ -103,9 +100,7 @@ o_add (void)
 /* <increment to be added to named parameter> .
  */
 void
-o_addassign (
-  memel *argp
-)
+o_addassign (memel *argp)
 {
 	/* order of operands will be incorrect.
 	 * strictly speaking, only strings are not commutative but we need
@@ -252,9 +247,7 @@ o_append (void)
 /* <new value for named parameter> .
  */
 void
-o_assign (
-  memel *argp
-)
+o_assign (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -270,9 +263,7 @@ o_assign (
  * branch if false (or INDEF).
  */
 void
-o_biff (
-  memel *argp
-)
+o_biff (memel *argp)
 {
 	extern XINT pc;
 	struct operand o;
@@ -288,9 +279,7 @@ o_biff (
  * see runtime.c
  */
 void
-o_call (
-  memel *argp
-)
+o_call (memel *argp)
 {
 	callnewtask ((char *) argp);
 }
@@ -328,9 +317,7 @@ o_doend (void)
 /* <value to be divided into named parameter> .
  */
 void
-o_divassign (
-  memel *argp
-)
+o_divassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -353,9 +340,7 @@ o_divassign (
 /* <value to be concatenated onto named parameter> .
  */
 void
-o_catassign (
-  memel *argp
-)
+o_catassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -417,9 +402,7 @@ o_ge (void)
  * *argp is the SIGNED increment to be added to pc.
  */
 void
-o_dogoto (
-  memel *argp
-)
+o_dogoto (memel *argp)
 {
 	extern XINT pc;
 	pc += (int)*argp;
@@ -446,9 +429,7 @@ o_gt (void)
  *   indirection.
  */
 void
-o_indirabsset (
-  memel *argp
-)
+o_indirabsset (memel *argp)
 {
 	char	*argname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -507,9 +488,7 @@ o_indirabsset (
  *   this avoids quotes around simple strings and filenames.
  */
 void
-o_indirposset (
-  memel *argp
-)
+o_indirposset (memel *argp)
 {
 	int pos = (int) *argp;
 	struct pfile *pfp;
@@ -552,9 +531,7 @@ o_indirposset (
 /* Increment the loop counters for an implicit loop.
  */
 void
-o_indxincr (
-  memel	*argp
-)
+o_indxincr (memel *argp)
 {
 	int	i;
 	i = 0;
@@ -582,9 +559,7 @@ o_indxincr (
  * given the name of a parameter, print it on t_out, the task pipe channel.
  */
 void
-o_inspect (
-  memel *argp
-)
+o_inspect (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -625,9 +600,7 @@ o_inspect (
  * done by intrfunc() in gram.c.
  */
 void
-o_intrinsic (
-  memel *argp
-)
+o_intrinsic (memel *argp)
 {
 	char *funcname = (char *) argp;
 	struct operand o;
@@ -666,9 +639,7 @@ o_mul (void)
 /* <value to be multiplied into named parameter> .
  */
 void
-o_mulassign (
-  memel *argp
-)
+o_mulassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -713,9 +684,7 @@ o_or (void)
  * and t_stderr of the current task.
  */
 void
-o_osesc (
-  memel *argp
-)
+o_osesc (memel *argp)
 {
 	char *command = (char *)argp;
 
@@ -726,15 +695,13 @@ o_osesc (
 /* <new value for argument at command position *argp> .
  */
 void
-o_posargset (
-  memel *argp
-)
+o_posargset (memel *argp)
 {
 	int	pos = (int) *argp;
 	struct	pfile *pfp;
 	struct	param *pp;
 	struct	operand o;
-	int	string_len;
+	int	string_len=0;
 
 	pfp = newtask->t_pfp;
 
@@ -767,9 +734,9 @@ o_posargset (
 void
 o_dopow (void)
 {
-
 	binop (OP_POW);
 }
+
 
 /* <exprn-1> ... <expr1> <dest> <n> .
  * Do the print task.  First op on stack is number of operands to follow.
@@ -807,9 +774,7 @@ o_immed (void)
  * response and producing a quiet undefined op there is correct.
  */
 void
-o_pushconst (
-  memel *argp
-)
+o_pushconst (memel *argp)
 {
 	/* argument is pointer to an operand */
 	struct operand *op;
@@ -824,9 +789,7 @@ o_pushconst (
  * when the parameter is accessed.
  */
 void
-o_pushindex (
-  int	*mode
-)
+o_pushindex (int *mode)
 {
 	struct operand op;
 
@@ -876,9 +839,7 @@ o_pushindex (
 /* . <value of parameter>
  */
 void
-o_pushparam (
-  memel *argp
-)
+o_pushparam (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -954,9 +915,7 @@ o_redirin (void)
  * <filename> .
  */
 void
-o_gsredir (
-  memel *argp
-)
+o_gsredir (memel *argp)
 {
 	register char	*ip;
 	register FILE	*fp;
@@ -1002,9 +961,7 @@ o_gsredir (
 }
 
 void
-o_doaddpipe (
-  memel *argp
-)
+o_doaddpipe (memel *argp)
 {
 	XINT	getpipe_pc = *argp;
 	char	*x1, *pk, *t, *x2;	
@@ -1039,7 +996,7 @@ o_doaddpipe (
 
 void
 o_dogetpipe (
-  memel *argp			/* name of ltask (not used) */
+    memel *argp			/* name of ltask (not used) */
 )
 {
 	struct	operand o;
@@ -1060,9 +1017,7 @@ o_dogetpipe (
 
 
 void
-o_rmpipes (
-  memel *argp
-)
+o_rmpipes (memel *argp)
 {
 	delpipes ((int)*argp);
 }
@@ -1136,8 +1091,7 @@ o_dofscan (void)
 void
 o_dofscanf (void)
 {
-	struct operand o;
-	struct operand o_sv[64];
+	struct operand o, o_sv[64];
 	char	format[SZ_LINE];
 	char	pname[SZ_FNAME];
 	int	nargs, i;
@@ -1191,9 +1145,7 @@ o_sub (void)
 /* <value to be subtracted from named parameter> .
  */
 void
-o_subassign (
-  memel *argp
-)
+o_subassign (memel *argp)
 {
 	/* operands are backwards on stack, so negate and add. can get by
 	 * with this as long as subtraction is never defined for strings.
@@ -1217,12 +1169,10 @@ o_subassign (
  * jump table and goes there.
  */
 void
-o_doswitch (
-  int	*jmpdelta
-)
+o_doswitch (int *jmpdelta)
 {
 	int pdft, icase, jmptable;
-	int value;
+	int value=0;
 	struct operand o;
 	memel delta;
 	/* Remember to subtract 3 because PC has already been incremented. */
@@ -1282,9 +1232,7 @@ o_doswitch (
 }
 
 void
-o_swoff (
-  memel *argp
-)
+o_swoff (memel *argp)
 {
 	register char *pname = (char *)argp;
 	register struct param *pp;
@@ -1313,9 +1261,7 @@ o_swoff (
 }
 
 void
-o_swon (
-  memel *argp
-)
+o_swon (memel *argp)
 {
 	register char *pname = (char *)argp;
 	register struct param *pp;
@@ -1443,5 +1389,5 @@ void (*opcodetbl[])() = {
 /* 57 */	o_swon,
 /* 58 */	o_fixlanguage,
 /* 59 */	o_gsredir,
-/* 60 */	o_catassign
+/* 60 */	o_catassign,
 };

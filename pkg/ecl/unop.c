@@ -16,7 +16,6 @@
 #include "param.h"
 #include "proto.h"
 
-
 extern	int	cldebug;
 
 /*
@@ -42,7 +41,7 @@ unop (int opcode)
 	register int out_type;		/* bool, int, real, string	*/
 	register int in_type;		/* bool, int, real, string	*/
 	struct	operand o, result;
-	double	rval=0., rresult;	/* input value, result		*/
+	double	rval=0.0, rresult;	/* input value, result		*/
 	long	ival=0, iresult;
 	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];

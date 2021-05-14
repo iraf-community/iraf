@@ -41,10 +41,7 @@
 #define	RIGHTSIDE	1
 
 char *
-strint (
-    register char  *s,
-    int	  side
-)
+strint (register char *s, int side)
 {
 	if (side == LEFTSIDE) {
 	    while (isdigit (*s))
@@ -139,7 +136,7 @@ binop (int opcode)
 	    break;			/* any datatype is ok here	*/
 	case OP_RADIX:
 	    if (typ2 != OT_INT)
-		cl_error (E_UERR, "Radix: second arg must be integer radix");
+		cl_error (E_UERR, "radix: second arg must be integer radix");
 	    typecode = OT_STRING;
 	    break;
 	case OP_STRIDX:
@@ -147,8 +144,7 @@ binop (int opcode)
 	case OP_STRSTR:
 	case OP_STRLSTR:
 	    if (typ1 != OT_STRING || typ2 != OT_STRING)
-		cl_error (E_UERR,
-		    "stridx: both arguments must be of type string");
+		cl_error (E_UERR, "stridx: both arguments must be of type string");
 	    typecode = OT_INT;
 	    break;
 	case OP_SUB:
@@ -163,7 +159,7 @@ binop (int opcode)
 		if (typ1 == OT_STRING)
 		    cl_error (E_UERR, e_badstrop, o1.o_val.v_s);
 		else
-		    cl_error (E_UERR, e_badstrop, o1.o_val.v_s);
+		    cl_error (E_UERR, e_badstrop, o2.o_val.v_s);
 	    }
 	    break;
 
@@ -252,7 +248,6 @@ binop (int opcode)
 		    break;
 		}
 
-
 	    case OP_RADIX:
 		if (typ1 == OT_STRING) {
 		    if (sscanf (o1.o_val.v_s, "%ld", &lval) != 1)
@@ -324,7 +319,7 @@ binop (int opcode)
 		 * or ZERO if none found.
 		 */
 		{
-		    char    *ip, *cp, *fp, first_char, ch;
+		    char    *ip, *cp, *fp, *tp, first_char, ch;
 
 		    first_char = o1.o_val.v_s[0];
 		    
@@ -343,8 +338,9 @@ binop (int opcode)
 			if (ch == first_char) {
 			    fp = ip;
 			    cp = o1.o_val.v_s;  
-			    while (*cp != EOS && *cp == *ip) {
-				cp++; ip++;
+			    tp = ip;
+			    while (*cp != EOS && *cp == *tp) {
+				cp++; tp++;
 			    }
 			    if (*cp == EOS) {
 				iresult = (fp - o2.o_val.v_s + 1);
@@ -555,7 +551,6 @@ binexp (int opcode)
 	o1 = popop();
 	typ1 = o1.o_type & OT_BASIC;
 	typ2 = o2.o_type & OT_BASIC;
-	dostr = 0;
 
 	if ((typ1 != OT_BOOL || typ2 != OT_BOOL) &&
 	    (opcode == OP_OR || opcode == OP_AND))

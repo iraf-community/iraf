@@ -88,13 +88,11 @@ int	sz_prcache = 2;			/* nprocess slots in cache	*/
 struct	process pr_cache[MAXSUBPROC];
 struct	process *pr_head = NULL, *pr_tail = NULL;
 extern	char *findexe();
-extern int c_finfo();
 
-
-static void pr_pdisconnect (register struct process *pr);
-static void pr_tohead (register struct process *pr);
-static void pr_totail (register struct process *pr);
-static void pr_unlink (register struct process *pr);
+static void pr_pdisconnect (struct process *pr);
+static void pr_tohead (struct process *pr);
+static void pr_totail (struct process *pr);
+static void pr_unlink (struct process *pr);
 
 
 /* PR_CONNECT -- Run a task resident in an external process.  Look in the cache
@@ -112,17 +110,17 @@ static void pr_unlink (register struct process *pr);
  */
 int
 pr_connect (
-  char	*process,			/* filename of process		*/
-  char	*command,			/* IRAF Main command		*/
-  FILE	**in, 				/* IPC channels (output)	*/
-  FILE  **out,
-  FILE	*t_in, 				/* task stdin,out,err (input)	*/
-  FILE  *t_out, 
-  FILE  *t_err,
-  FILE	*t_gr,				/* task graphics streams	*/ 
-  FILE  *t_im, 
-  FILE  *t_pl,
-  int	timeit 				/* if !0, time command		*/
+    char *process,			/* filename of process		*/
+    char *command,			/* IRAF Main command		*/
+    FILE **in,
+    FILE **out,				/* IPC channels (output)	*/
+    FILE *t_in,
+    FILE *t_out,
+    FILE *t_err,			/* task stdin,out,err (input)	*/
+    FILE *t_gr,
+    FILE *t_im,
+    FILE *t_pl,				/* task graphics streams	*/
+    int timeit				/* if !0, time command		*/
 )
 {
 	register int	pid;
@@ -166,10 +164,10 @@ pr_connect (
  */
 void
 pr_disconnect (
-  int	pid 			/* process id returned by connect	*/
+    int pid			/* process id returned by connect	*/
 )
 {
-	register struct process *pr;
+	struct process *pr;
 
 	pr_checkup();
 	for (pr=pr_head;  pr != NULL;  pr = pr->pr_dn) {
@@ -188,15 +186,16 @@ pr_disconnect (
  */
 int
 pr_pconnect (
-  char	*process,			/* filename of process		*/
-  FILE	**in, 
-  FILE  **out 				/* IPC channels (output)	*/
+    char *process,			/* filename of process		*/
+    FILE **in,
+    FILE **out			/* IPC channels (output)	*/
 )
 {
-	register struct process *pr;
+	struct process *pr;
 	struct	process *pr_findproc();
 	struct	_finfo fi;
 	int	fd_in, fd_out;
+	extern  int c_finfo (char *name, struct _finfo *fi);
 
 	if (pr_head == NULL)
 	    pr_initcache();
@@ -270,9 +269,7 @@ pr_pconnect (
  * disconnected when pushed out of the cache or when the cache is flushed.
  */
 static void
-pr_pdisconnect (
-  register struct process *pr
-)
+pr_pdisconnect (struct process *pr)
 {
 	/* Ignore attempts to dump active processes.  This might happen
 	 * when an active process executes a command which calls dumpcache.
@@ -303,7 +300,7 @@ pr_pdisconnect (
 void
 pr_setcache (int new_szprcache)
 {
-	register struct	process *pr;
+	struct	process *pr;
 	char	pname[MAXSUBPROC][SZ_PATHNAME+1];
 	int	nprocs=0, pid, i;
 	FILE	*fdummy;
@@ -351,7 +348,7 @@ pr_setcache (int new_szprcache)
 struct process *
 pr_findproc (char *process)
 {
-	register struct	process *pr;
+	struct	process *pr;
 
 	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
 	    if (pr->pr_pid != NULL && pr_idle(pr))
@@ -369,7 +366,7 @@ pr_findproc (char *process)
  */
 int
 pr_cachetask (
-  char	*ltname 		/* logical task name	*/
+    char *ltname		/* logical task name	*/
 )
 {
 	register int  pid;
@@ -395,10 +392,10 @@ pr_cachetask (
  */
 void
 pr_lock (
-  register int	pid 			/* process id			*/
+    register int pid			/* process id			*/
 )
 {
-	register struct process *pr;
+	struct process *pr;
 
 	if (pid != NULL) {
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
@@ -417,10 +414,10 @@ pr_lock (
  */
 int
 pr_unlock (
-  register int	pid 			/* process id			*/
+    register int pid			/* process id			*/
 )
 {
-	register struct process *pr;
+	struct process *pr;
 
 	if (pid != NULL)
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
@@ -436,7 +433,7 @@ pr_unlock (
  */
 void
 pr_listcache (
-  FILE	*fp 			/* output file		*/
+    FILE *fp			/* output file		*/
 )
 {
 	register struct process *pr;
@@ -477,14 +474,10 @@ pr_listcache (
  * to process termination.
  */
 void
-pr_dumpcache (
-  int	pid,
-  int	break_locks 
-)
+pr_dumpcache (int pid, int break_locks)
 {
 	register struct	process *pr;
 	register int	n;
-
 
 	pr_checkup();
 
@@ -552,7 +545,7 @@ pr_pnametopid (char *pname)
 	    if (strcmp (pr->pr_name, pname) == 0)
 		return (pr->pr_pid);
 
-	return ((int) NULL);
+	return (0);
 }
 
 
@@ -560,19 +553,17 @@ pr_pnametopid (char *pname)
  * of all connected but idle processes if pid=0.
  */
 void
-pr_chdir (
-  register int	pid,
-  char	*newdir
-)
+pr_chdir (register int pid, char *newdir)
 {
 	register struct process *pr;
 
 	pr_checkup();
-	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
+	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
 	    if (pr->pr_pid == NULL || !pr_idle(pr))
 		continue;
 	    else if (pid == NULL || pr->pr_pid == pid)
 		c_prchdir (pr->pr_pid, newdir);
+	}
 }
 
 
@@ -580,20 +571,17 @@ pr_chdir (
  * or in all connected but idle processes if pid=0.
  */
 void
-pr_envset (
-  register int	pid,
-  char	*envvar,
-  char	*valuestr 
-)
+pr_envset (register int pid, char *envvar, char *valuestr)
 {
 	register struct process *pr;
 
 	pr_checkup();
-	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
+	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
 	    if (pr->pr_pid == NULL || !pr_idle(pr))
 		continue;
 	    else if (pid == NULL || pr->pr_pid == pid)
 		c_prenvset (pr->pr_pid, envvar, valuestr);
+	}
 }
 
 
@@ -611,12 +599,14 @@ pr_checkup (void)
 	 * pr_disconnect will leave process pr at the tail of the list,
 	 * causing premature termination.
 	 */
-	for (pr=pr_cache, n=sz_prcache;  --n >= 0;  pr++)
-	    if (pr->pr_pid != NULL)
+	for (pr=pr_cache, n=sz_prcache;  --n >= 0;  pr++) {
+	    if (pr->pr_pid != NULL) {
 		if (c_prstati (pr->pr_pid, PR_STATUS) == P_DEAD) {
 		    pr->pr_flags = 0;
 		    pr_pdisconnect (pr);
 		}
+	    }
+	}
 }
 
 
@@ -628,16 +618,18 @@ pr_checkup (void)
 /* ARGSUSED */
 void
 onipc (
-  int	*vex,			/* virtual exception code	*/
-  PFI	*next_handler 		/* next handler to be called	*/
+    int *vex,			/* virtual exception code	*/
+    PFI *next_handler		/* next handler to be called	*/
 )
 {
 	register struct	process *pr;
 
-	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
-	    if (pr->pr_pid != NULL)
+	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
+	    if (pr->pr_pid != NULL) {
 		if (c_prstati (pr->pr_pid, PR_STATUS) == P_DEAD)
 		    break;
+	    }
+	}
 
 	cl_error (E_UERR, "Abnormal termination of child process '%s'",
 	    pr ? pr->pr_name : "??");
@@ -671,10 +663,8 @@ pr_initcache (void)
 
 /* PR_TOHEAD -- Relink a process at the head of the cache list.
  */
-void
-pr_tohead (
-  register struct process *pr
-)
+static void
+pr_tohead (struct process *pr)
 {
 	if (pr_head != pr) {
 	    pr_unlink (pr);
@@ -689,9 +679,7 @@ pr_tohead (
 /* PR_TOTAIL -- Relink a process at the tail of the cache list.
  */
 static void
-pr_totail (
-  register struct process *pr
-)
+pr_totail (struct process *pr)
 {
 	if (pr_tail != pr) {
 	    pr_unlink (pr);
@@ -706,9 +694,7 @@ pr_totail (
 /* PR_UNLINK -- Unlink a process from the list.
  */
 static void
-pr_unlink (
-  register struct process *pr
-)
+pr_unlink (struct process *pr)
 {
 	if (pr->pr_up) {
 	    (pr->pr_up)->pr_dn = pr->pr_dn;
