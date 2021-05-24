@@ -21,9 +21,7 @@
 *
 *  Called:  slNUTC
 *
-*  Patrick Wallace   Starlink   23 August 1996
-*
-*  Copyright (C) 1996 Rutherford Appleton Laboratory
+*  Patrick Wallace   Starlink   23 August 1996, amended 22 May 2021
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -41,7 +39,6 @@
 *    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 *    Boston, MA  02110-1301  USA
 *
-*  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
       IMPLICIT NONE
@@ -66,7 +63,7 @@
      :         +(7.455D0+0.008D0*T)*T)*T)
 
 *  Nutation
-      CALL slNUTC(DATE,DPSI,DEPS,EPS0)
+      CALL slNUTC80(DATE,DPSI,DEPS,EPS0)
 
 *  Equation of the equinoxes
       slEQEX=DPSI*COS(EPS0)+AS2R*(0.00264D0*SIN(OM)+
