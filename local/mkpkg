@@ -14,19 +14,6 @@ strip:
 	!rmfiles -f lib/strip.local
 	;
 
-# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
-# output, omitting most of the mundane chatter.  Used to scan large spool
-# files for errors.
-
-summary:
-	$ifeq (HOSTID, unix)
-	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
-	    | grep -v '^check file'
-	$else
-	    $echo "mkpkg summary only available on a UNIX system"
-	$endif
-	;
-
 # SUN/IRAF multiple architecture support.
 # ----------------------------------------
 
