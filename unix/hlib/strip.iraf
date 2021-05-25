@@ -31,4 +31,5 @@
 -file bin.linux64/OBJS.arc.Z
 -file bin.macosx/OBJS.arc.Z
 -file bin.macintel/OBJS.arc.Z
+-file bin.macos64/OBJS.arc.Z
 

@@ -105,12 +105,14 @@ else
         fi
     elif [ "$os_mach" = "darwin" ]; then	# handle Mac systems
         if [ "$(uname -m)" = "x86_64" ]; then
-            export mach="macintel"
+	     if [ "$(uname -m)" = "x86_64" ] ; then
+	         export mach="macintel"
+             else
+                 export mach="macos64"
+	     fi
         else
             export mach="macosx"
         fi
-    elif [ "$os_mach" = "cygwin" ]; then
-        export mach="cygwin"
     else
         mach=$(uname -s | tr '[:upper:]' '[:lower:]')
     fi

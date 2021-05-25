@@ -81,7 +81,11 @@ zsvjmp_:
 	str	x1, [x0], 8		// ((long **)buf)[0] = status
 	// also post-increment x0 by 8: 1st arg for sigsetjmp
 	mov	w1, 0			// 0 --> 2nd arg for sigsetjmp
+#if defined(__APPLE__)
+	b      _sigsetjmp		// call sigsetjmp
+#else
 	b      __sigsetjmp		// call sigsetjmp
+#endif
 
 #elif defined(__mips__) && (_MIPS_SIM == _ABI64)
 

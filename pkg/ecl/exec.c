@@ -791,6 +791,13 @@ findexe (
 		if (c_access (bin_path, 0, 0) == YES)
 	    	    return (bin_path);
 
+	    } else if (strcmp (arch, ".macos64") == 0) {
+		/*  On 64-bit Mac systems, check for older 'macintel' binaries.
+		 */
+		sprintf (bin_path, "%s.macintel/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+		    return (bin_path);
+
 	    } else if (strcmp (arch, ".macintel") == 0) {
 		/*  On 64-bit Mac systems, check for older 32-bin binaries.
 		 */

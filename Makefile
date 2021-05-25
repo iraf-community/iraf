@@ -101,23 +101,13 @@ macosx::
 	(util/mkarch macosx)
 macintel::
 	(util/mkarch macintel)
-redhat::
-	(util/mkarch redhat)
+macos64::
+	(util/mkarch macos64)
 linux::
 	(util/mkarch linux)
 linux64::
 	(util/mkarch linux64)
 freebsd::
-	(util/mkarch freebsd)
-cygwin::
-	(util/mkarch cygwin)
-sunos::
-	(util/mkarch sunos)
-sparc::
-	(util/mkarch sparc)
-ssun::
-	(util/mkarch ssun)
-
 
 
 # ----------------------------------------------------------------------
