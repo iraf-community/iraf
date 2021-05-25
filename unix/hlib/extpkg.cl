@@ -23,7 +23,7 @@ dpkg = mktemp ("tmp$dpkg")
 if (access (dpkg) == yes)
   printf ("!/bin/rm -f %s\n", osfn(dpkg))                              	| cl ()
 ;
-printf ("!/bin/ls -1ad [a-y]*\n") | cl (,> dpkg)
+printf ("!/bin/ls -1ad [a-y]* 2> /dev/null\n") | cl (,> dpkg)
 
 list = dpkg
 while (fscan (list, s1) != EOF) {
