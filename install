@@ -1131,12 +1131,6 @@ if [ "$err_seen" = 0 ]; then
     DO_OK
 fi
 
-
-# Mark the system update time.
-ECHO -n 'Marking system update time hlib$utime ...                      '
-if [ "$exec" = "yes" ]; then
-    touch "$hlib/utime"
-fi
 DO_OK
 
 
