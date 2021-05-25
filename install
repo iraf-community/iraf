@@ -31,41 +31,15 @@
 
 # Initialize script variables.
 
-if [ ! -n "$iraf" ]; then
-    export iraf=$PWD
-fi
-if [ -e "$iraf/unix/hlib/util.sh" ]; then
-    . "$iraf/unix/hlib/util.sh"
-fi
-if [ -e "${iraf}/unix/hlib/irafarch.sh" ]; then
-  mach=$("${iraf}/unix/hlib/irafarch.sh")	# current platform architecture
-  hmach=$("${iraf}/unix/hlib/irafarch.sh" -hsi)	# current HSI architecture
-  if [ -z "$IRAFARCH" ]; then
-      IRAFARCH=$mach
-  fi
-
-elif [ -e "./unix/hlib/irafarch.sh" ]; then
-  mach=$(./unix/hlib/irafarch.sh)	# current platform architecture
-  hmach=$(./unix/hlib/irafarch.sh -hsi)	# current HSI architecture
-  if [ -z "$IRAFARCH" ]; then
-      IRAFARCH=$mach
-  fi
-
-else
-  mach=""
-  hmach=""
-  echo "Error: Cannot determine platform architecture, quitting."
-  echo '     : Try setting a $iraf or $IRAFARCH variable.'
-  exit 1
+export iraf=$PWD
+. "$iraf/unix/hlib/util.sh"
+mach=$("${iraf}/unix/hlib/irafarch.sh")	# current platform architecture
+hmach=$("${iraf}/unix/hlib/irafarch.sh" -hsi)	# current HSI architecture
+if [ -z "$IRAFARCH" ]; then
+    IRAFARCH=$mach
 fi
 
-
-if [ -e "${iraf}/.version" ]; then
-  VERSION=$(cat "${iraf}/.version")
-else
-  VERSION="v2.16"
-fi
-
+VERSION="v2.16"                         # current IRAF version
 
 defterm="xgterm"			# default terminal type
 do_system=0				# system or personal install?
