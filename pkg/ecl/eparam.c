@@ -100,7 +100,7 @@ char	*e_tonextword(), *e_toprevword(), *index();
 
 char	epar_cmdbuf[SZ_LINE];
 
-
+int eparam (struct ep_context *cx, int *update, int *nextcmd, char *nextpset);
 
 /* EPSET -- Edit a parameter set.  Once in the parameter set editor, editor
  * colon commands may be used to edit any other parameter set, to save psets

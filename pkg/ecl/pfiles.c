@@ -31,6 +31,8 @@ char	*uparmdir = UPARM;
 long	filetime();
 static	void mapname();
 
+extern  int c_finfo();
+
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
  * Set pfp->pf_ltp to ltp.  Null out all unused fields.  Call error() and don't
@@ -65,7 +67,7 @@ newpfile (
 
 /* PFILEUNLINK -- Unlink a pfile from the pfile list.
  */
-void 
+void
 pfileunlink (
     register struct pfile *pfp	/* pfile to be unlinked	*/
 )
@@ -313,7 +315,7 @@ epset_:
 /* PFILEMERGE -- Merge the parameter values from the named (old user) pfile
  * into a loaded parameter set.
  */
-int 
+int
 pfilemerge (
     struct pfile *npf,			/* loaded parameter set	*/
     char *opfile			/* old parameter file	*/
@@ -419,7 +421,7 @@ pfilemerge (
  * originally read.  Nothing is done unless the parameter set has been
  * modified and needs updating, or if we have a fake (in-core) parameter set.
  */
-void 
+void
 pfileupdate (
     struct pfile *pfp		/* parameter file descriptor */
 )
@@ -592,7 +594,7 @@ error_:
  * Any existing file is silently clobbered.  The filename extension is
  * always ".par".
  */
-int 
+int
 pfilewrite (
     struct pfile *pfp,		/* pfile descriptor	*/
     char *pfilename		/* file to be written	*/
@@ -662,7 +664,7 @@ pfilewrite (
  * pfile list.  Fix up flag bits in ltask descriptor.  We are called from
  * "unlearn" to restore the package default parameters for an ltask or package.
  */
-int 
+int
 pfileinit (struct ltask *ltp)
 {
 	struct	task *tp;
@@ -722,7 +724,7 @@ pfileinit (struct ltask *ltp)
 /* IS_PFILENAME -- Test whether a string is a pfile filename, i.e., whether
  * or not the string has a ".par" extension.
  */
-int 
+int
 is_pfilename (char *opstr)
 {
 	register char	*ip;
@@ -748,7 +750,7 @@ is_pfilename (char *opstr)
  * squeezed to LEN_PFILENAME characters.  If not writing to UPARM, we just
  * use the full filename.
  */
-void 
+void
 mkpfilename (
     char *buf,			/* receives output filename	*/
     char *dir,			/* dir name or prefix		*/
@@ -801,14 +803,13 @@ mapname (char *in, char *out, int maxlen)
 /* FILETIME -- Get the time of creation or of last modify of a file.  If the
  * file does not exist or cannot be accessed zero is returned.
  */
-long 
+long
 filetime (
     char *fname,			/* file name		*/
     char *timecode		/* "c" or "m"		*/
 )
 {
 	struct	_finfo fi;
-	extern int c_finfo();
 
 	if (c_finfo (fname, &fi) == ERR)
 	    return (0L);
@@ -978,7 +979,7 @@ pfilecopy (register struct pfile *pfp)
  *   termination of a task which called KEEP.  Restor() will not lop off the
  *   dead pfile if it is below the new topd set by keep.
  */
-void 
+void
 pfcopyback (struct pfile *pff)
 {
 	register struct param *pt, *pf;
@@ -1178,7 +1179,6 @@ addparam (struct pfile *pfp, char *buf, FILE *fp)
 	}
 	bastype = pp->p_type & OT_BASIC;
 	arrflag = pp->p_type & PT_ARRAY;
-
 
 	/* P_MODE */
 
@@ -1588,7 +1588,7 @@ addparam (struct pfile *pfp, char *buf, FILE *fp)
 
 /* CK_ATOI -- Check a string for non-numerics before conversion.
  */
-int 
+int
 ck_atoi (char *str, int *val)
 {
 	char	*s;
@@ -1716,8 +1716,6 @@ nextfield (char **pp, FILE *fp)
 
 	    /* Skip any white space.  We assume that we needn't skip
 	     * lines here.
-	    while (*p == ' ' || *p == '\t')
-		*p++;
 	     */
 	    while (*p == ' ' || *p == '\t')
 		p++;
@@ -1813,7 +1811,7 @@ makelower (register char *cp)
  *   caller can include more info if necessary.
  * N.B. we assume ERR doesn't map into a reasonable set of flags.
  */
-int 
+int
 scanmode (char *s)
 {
 	register int mode = 0;
@@ -1903,7 +1901,7 @@ scanmode (char *s)
  *   caller can include more info if necessary.
  * N.B. hope ERR doesn't map into a reasonable set of flags.
  */
-int 
+int
 scantype (register char *s)
 {
 	static char *badtype =  "bad type spec `%c'";

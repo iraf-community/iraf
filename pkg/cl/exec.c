@@ -53,7 +53,7 @@ char	*findexe();
  *   a longjmp(errenv,1), causing setjmp to return (in main) and an
  *   immediate retreat to the most recent terminaltask with unwind().
  */
-void
+void 
 run (void)
 {
 	register struct codeentry *cp;
@@ -97,9 +97,7 @@ run (void)
  *   Any parameter references will refer to the cl's also.
  */
 void
-callnewtask (
-  char	*name
-)
+callnewtask (char *name)
 {
 	/* x1 and x2 are just place holders to call breakout().
 	 */
@@ -110,9 +108,9 @@ callnewtask (
 	if (cldebug)
 	    eprintf ("callnewtask: name=%s, currentask=%x\n", name, currentask);
 
-	/* Save current dictionary and stack pointers. they get restored when
+	/* Save current dictionary and stack pointers. They get restored when
 	 * the new task dies normally and the current task is to continue.
-	 * save pc when get to the EXEC instruction so it continues from there.
+	 * Save pc when get to the EXEC instruction so it continues from there.
 	 */
 	currentask->t_topos = topos;	/* save these two just in case 	*/
 	currentask->t_basos = basos;	/* something is left on the stk	*/
@@ -262,7 +260,7 @@ execnewtask (void)
 	if (newtask == NULL)
 	    /* if this ever happens, i don't want to know about it. */
 	    return;
-	
+
 	currentask->t_pc = pc;		/* instruction after EXEC	*/
 
 	if (cldebug)
@@ -519,9 +517,9 @@ execnewtask (void)
  */
 void
 mk_startupmsg (
-  struct task *tp,			/* task being executed		*/
-  char	*cmd,				/* receives formatted command	*/
-  int	maxch				/* max chars out		*/
+    struct task *tp,			/* task being executed		*/
+    char *cmd,				/* receives formatted command	*/
+    int maxch				/* max chars out		*/
 )
 {
 	register char	*ip, *op, *cp;
@@ -718,11 +716,11 @@ findexe (
 	    strcpy (bin_root, root_path);
 	    if ((ip = strstr (bin_root, arch)))
 		*ip = '\0';
-            else {
-                int len = strlen (bin_root);
-                if (bin_root[len-1] == '/')
-                    bin_root[len-1] = '\0';
-            }
+	    else {
+		int len = strlen (bin_root);
+		if (bin_root[len-1] == '/')
+		    bin_root[len-1] = '\0';
+	    }
 
 	    if (strcmp (arch, ".linux64") == 0) {
 		/*  On 64-bit Linux systems we can use either of the
@@ -785,9 +783,7 @@ findexe (
  * control stack but continue reading from the current command stream.
  */
 void
-set_clio (
-  register struct task *newtask
-)
+set_clio (register struct task *newtask)
 {
 	register struct task *tp;
 
@@ -830,15 +826,15 @@ set_clio (
  */
 struct param *
 ppfind (
-  struct pfile *pfp,		/* first pfile in chain		*/
-  char	*tn,			/* psetname (taskname) or null	*/
-  char	*pn,			/* parameter name		*/
-  int	pos,			/* for paramfind		*/
-  int	abbrev			/* for paramfind		*/
+    struct pfile *pfp,		/* first pfile in chain		*/
+    char *tn,			/* psetname (taskname) or null	*/
+    char *pn,			/* parameter name		*/
+    int pos,			/* for paramfind		*/
+    int abbrev			/* for paramfind		*/
 )
 {
 	struct	param *pp, *m_pp;
-	struct	pfile *m_pfp;
+	struct	pfile *m_pfp = NULL;
 	int	nchars;
 
 	if (tn != NULL && *tn != EOS) {
@@ -881,11 +877,12 @@ ppfind (
  */
 void
 psetreload (
-  struct pfile *main_pfp,		/* main task pfile	*/
-  struct param *psetp 			/* pset param		*/
+    struct pfile *main_pfp,		/* main task pfile	*/
+    struct param *psetp			/* pset param		*/
 )
 {
-	struct	pfile *o_pfp, *n_pfp, *prev_pfp, *next_pfp;
+	struct	pfile *o_pfp, *n_pfp, *prev_pfp;
+	struct	pfile *next_pfp = NULL;
 
 	if (cldebug)
 	    eprintf ("psetreload, pset %s\n", psetp->p_name);
@@ -932,9 +929,7 @@ psetreload (
  *   it might call us again and cause an inf. loop.
  */
 void
-iofinish (
-  register struct task *tp
-)
+iofinish (register struct task *tp)
 {
 	register FILE *fp;
 	int	flags;
@@ -1023,9 +1018,7 @@ iofinish (
  *   The way posargset, et al, and call/execnewtask are now, we are safe.
  */
 void
-restor (
-  struct task *tp
-)
+restor (struct task *tp)
 {
 	memel *topdp;
 	register struct ltask *ltp;
@@ -1197,7 +1190,7 @@ oneof (void)
 	if (currentask->t_ltp->lt_flags & LT_PFILE) {
 	    pfcopyback (pfp = currentask->t_pfp);
 	    if (currentask->t_ltp->lt_flags & LT_DEFPCK)
-		if ((pkp = pacfind(currentask->t_ltp->lt_lname)))
+		if ( (pkp = pacfind(currentask->t_ltp->lt_lname)) )
 		    if (pkp->pk_pfp == pfp)
 			pkp->pk_pfp = pfp->pf_oldpfp;
 	    for (pfp = pfp->pf_npset;  pfp != NULL;  pfp = pfp->pf_npset)
@@ -1220,16 +1213,13 @@ oneof (void)
  * to print stack trace.
  */
 void
-printcall (
-  FILE	*fp,
-  struct task *tp
-)
+printcall (FILE *fp, struct task *tp)
 {
 	register struct param *pp;
-	int	notfirst = 0;
+	int	 notfirst = 0;
 
 	fprintf (fp, "    %s (", tp->t_ltp->lt_lname);
-	for (pp = tp->t_pfp->pf_pp;  pp != NULL;  pp = pp->p_np)
+	for (pp = tp->t_pfp->pf_pp;  pp != NULL;  pp = pp->p_np) {
 	    if (pp->p_flags & P_CLSET) {
 		if (notfirst)
 		    fprintf (fp, ", ");
@@ -1246,6 +1236,7 @@ printcall (
 		else
 		    fprintf (fp, "UNDEF");
 	    }
+	}
 	fprintf (fp, ")\n");
 }
 
@@ -1260,9 +1251,7 @@ printcall (
  *   again.
  */
 void
-killtask (
-  register struct task *tp
-)
+killtask (register struct task *tp)
 {
 	char	buf[128];
 

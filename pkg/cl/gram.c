@@ -42,16 +42,16 @@ extern	int get_nscanval();
 int	pipetable[MAXPIPES];	/* for maintaining pipe temp files	*/
 int	nextpipe = 0;
 
-char	*truestr = "yes";	/* true constant as it appears in ASCII	*/
-char	*falsestr = "no";	/* false                "		*/
-char	*nullstr = "";
-char	*undefval = "";		/* used in nextfield(), pvaldefined()	*/
-char	*indefstr = "INDEF";	/* input or output for indef operands	*/
-char	*indeflc = "indef";	/*   lower case version.		*/
-char	*eofstr = "EOF";	/* list file EOF or input		*/
-char	*eoflc = "eof";		/*   lower case version			*/
+char	*truestr    = "yes";	/* true constant as it appears in ASCII	*/
+char	*falsestr   = "no";	/* false                "		*/
+char	*nullstr    = "";
+char	*undefval   = "";	/* used in nextfield(), pvaldefined()	*/
+char	*indefstr   = "INDEF";	/* input or output for indef operands	*/
+char	*indeflc    = "indef";	/*   lower case version.		*/
+char	*eofstr     = "EOF";	/* list file EOF or input		*/
+char	*eoflc      = "eof";	/*   lower case version			*/
 char	*epsilonstr="epsilon";	/* a small value; see config.h		*/
-char	*errorstr = "error";	/* the error statement			*/
+char	*errorstr   = "error";	/* the error statement			*/
 char	*err_cmdblk;		/* Pointer where error detected		*/
 extern  char  cmdblk[SZ_CMDBLK+1]; /* current command block (in history.c) */
 
@@ -120,43 +120,42 @@ crackident (char *s)
 
 	    /* Control flow keywords.
 	     */
-	  { "while", Y_WHILE, 0},	{ "if", Y_IF, 0},
-	  { "else", Y_ELSE, 0},		{ "switch", Y_SWITCH, 0},
-	  { "case", Y_CASE, 0},		{ "default", Y_DEFAULT, 0},
-	  { "break", Y_BREAK, 0},	{ "next", Y_NEXT, 0}, 
-	  { "return", Y_RETURN, 0},	{ "goto", Y_GOTO, 0},
-	  { "for", Y_FOR, 0},		{ "procedure", Y_PROCEDURE, 0},
-	  { "begin", Y_BEGIN, 0},	{ "end", Y_END, 0},
+	    { "while",  Y_WHILE,  0 },	{ "if",        Y_IF,        0 },
+	    { "else",   Y_ELSE,   0 },	{ "switch",    Y_SWITCH,    0 },
+	    { "case",   Y_CASE,   0 },	{ "default",   Y_DEFAULT,   0 },
+	    { "break",  Y_BREAK,  0 },	{ "next",      Y_NEXT,      0 }, 
+	    { "return", Y_RETURN, 0 },	{ "goto",      Y_GOTO,      0 },
+	    { "for",    Y_FOR,    0 },	{ "procedure", Y_PROCEDURE, 0 },
+	    { "begin",  Y_BEGIN,  0 },	{ "end",       Y_END,       0 },
 
 	    /* Parameter and variable types.
 	     */
-	  { "int", Y_INT, 0},		{ "char", Y_STRING, 0},
-	  { "real", Y_REAL, 0},		{ "string", Y_STRING, 0},
-	  { "file", Y_FILE, 0},		{ "gcur", Y_GCUR, 0},
-	  { "imcur", Y_IMCUR, 0},	{ "ukey", Y_UKEY, 0},
-	  { "pset", Y_PSET, 0},		{ "bool", Y_BOOL, 0},
-	  { "struct", Y_STRUCT, 0},
+	    { "int",    Y_INT,    0 },	{ "char",      Y_STRING,    0 },
+	    { "real",   Y_REAL,   0 },	{ "string",    Y_STRING,    0 },
+	    { "file",   Y_FILE,   0 },	{ "gcur",      Y_GCUR,      0 },
+	    { "imcur",  Y_IMCUR,  0 },	{ "ukey",      Y_UKEY,      0 },
+	    { "pset",   Y_PSET,   0 },	{ "bool",      Y_BOOL,      0 },
+	    { "struct", Y_STRUCT, 0 },
 
 	    /* debugging commands.
 	     */
-	  { "d_d", D_D, 0},
-	  { "d_peek", D_PEEK, 0},
+	    { "d_d",    D_D,      0 },
+	    { "d_peek", D_PEEK,   0 },
 
-	    /* sentinel; leave it here... */
-	  { "", 0, 0} 
+	    { "", 0, 0 } 		/* sentinel; leave it here... */
 	};
 
 	static struct keywords kf[] = {
 	    /* Keywords of intrinsic functions that get built into
 	     * the grammar.  Most intrinsics handled by intrinsic().
 	     */
-	  { "scan", Y_SCAN, 0},
-	  { "scanf", Y_SCANF, 0},
-	  { "fscan", Y_FSCAN, 0},
-	  { "fscanf", Y_FSCANF, 0},
+	    { "scan",   Y_SCAN,   0 },
+	    { "scanf",  Y_SCANF,  0 },
+	    { "fscan",  Y_FSCAN,  0 },
+	    { "fscanf", Y_FSCANF, 0 },
 
 	    /* sentinel; leave it here... */
-	  { "", 0, 0} 
+	    { "", 0, 0 } 
 	};
 
 	register struct keywords *kp;
@@ -240,9 +239,7 @@ crackident (char *s)
  *   ((struct operand *)&dictionary[$1])->o_... in yacc specs.
  */
 XINT
-addconst (s, t)
-char	*s;
-int	t;
+addconst (char *s, int t)
 {
 	register struct operand *op;
 	XINT	lasttopd;
@@ -270,9 +267,7 @@ int	t;
  * parentheses.
  */
 void
-listparams (
-  struct pfile *pfp
-)
+listparams (struct pfile *pfp)
 {
 	register struct param *pp;
 
@@ -291,10 +286,7 @@ listparams (
  * if a hidden parameter.
  */
 void
-pretty_param (
-  struct param *pp,
-  FILE	*fp 
-)
+pretty_param (struct param *pp, FILE *fp)
 {
 	register char	ch, *p;
 	char	buf[SZ_LINE];
@@ -409,9 +401,7 @@ pretty_param (
  * t_stdout in the form `task.param=value'.
  */
 void
-dumpparams (
-  struct pfile *pfp
-)
+dumpparams (struct pfile *pfp)
 {
 	register struct param *pp;
 	register FILE	*fp = currentask->t_stdout;
@@ -432,11 +422,7 @@ dumpparams (
  * in the format `task.param = value'.
  */
 void
-show_param (
-  struct ltask *ltp,
-  struct param *pp,
-  FILE	*fp
-)
+show_param (struct ltask *ltp, struct param *pp, FILE *fp)
 {
 	char	buf[SZ_LINE+1];
 	int	isstr;
@@ -467,10 +453,7 @@ show_param (
  * of a sorted table.  Used to give menus in response to ? and ?? directives.
  */
 void
-listhelp (
-  struct package *pkp,
-  int	show_invis
-)
+listhelp (struct package *pkp, int show_invis)
 {
 	static	int first_col=7, maxch=20, ncol=0;
 	register struct ltask *ltp;
@@ -522,9 +505,7 @@ listhelp (
  * TODO: this should be optimized once a nice form is settled on.
  */
 void
-listallhelp (
-  int	show_invis
-)
+listallhelp (int show_invis)
 {
 	register struct package *pkp;
 
@@ -560,13 +541,7 @@ listallhelp (
  *   e.g. = task.array[*]
  */
 void
-breakout (
-  char	*full, 
-  char **pk, 
-  char **t, 
-  char **p, 
-  char **f 
-)
+breakout (char *full, char **pk, char **t, char **p, char **f)
 {
 	register char *cp;
 	register int npts, n;
@@ -576,7 +551,7 @@ breakout (
 	strncpy (buffer, full, SZ_LINE);
 	buffer[SZ_LINE] = '\0';
 
-	for (npts=0, cp=buffer;  *cp;  cp++)
+	for (npts=0, cp=buffer;  *cp;  cp++) {
 	    if (*cp == '.') {
 		if (*(cp+1) == EOS) {
 		    *cp = EOS;		/* chop dot if last character	*/
@@ -588,6 +563,7 @@ breakout (
 		    pts[npts++] = cp;
 		}
 	    }
+	}
 
 	for (n=0;  n < npts;  n++)
 	    *(pts[n]++) = '\0';		/* null over and skip dots	*/
@@ -633,9 +609,7 @@ breakout (
  *   (and abbrevs are enabled).
  */
 int
-fieldcvt (
-  register char *f
-)
+fieldcvt (register char *f)
 {
 	/* Field name and corresponding code tables.
 	 */
@@ -677,10 +651,7 @@ fieldcvt (
  * at which s matched.
  */
 int
-keyword (
-  register char *tbl[], 
-  register char *s
-)
+keyword (register char *tbl[], register char *s)
 {
 	register int i;
 	register char *kentry;
@@ -713,35 +684,30 @@ keyword (
  * run it if found. it gets nargs arguments from the operand stack.
  */
 void
-intrfunc (
-  char	*fname,
-  int	nargs
-)
+intrfunc (char *fname, int nargs)
 {
 	static char *ifnames[] = {
-	    "abs",       "access",    "atan2",     "cos",
-	    "defpac",    "defpar",    "deftask",   "envget",
-	    "exp",       "frac",      "int",       "log",
-	    "log10",     "nscan",     "max",       "min",
-	    "mod",       "nint",      "osfn",      "radix",
-	    "real",      "sin",       "sqrt",      "str",
-	    "substr",    "tan",       "mktemp",    "stridx",
-	    "strlen",	 "imaccess",  "defvar",	   "strldx",
-	    "strstr",    "strlwr",    "strupr",    "isindef",
-	    "strlstr",
+	    "abs",       "access",    "atan2",     "cos", 	"defpac",
+	    "defpar",    "deftask",   "envget",    "exp",       "frac",
+	    "int",       "log",       "log10",     "nscan",     "max",
+	    "min",       "mod",       "nint",      "osfn",      "radix",
+	    "real",      "sin",       "sqrt",      "str",       "substr",
+	    "tan",       "mktemp",    "stridx",    "strlen",	"imaccess",
+	    "defvar",	 "strldx",    "strstr",    "strlwr",    "strupr",    
+	    "isindef",   "strlstr",
 	    NULL
 	};
 	static int optbl[] = {
-	    UNOP|OP_ABS,     UNOP|OP_ACCESS,  BINOP|OP_ATAN2,   UNOP|OP_COS,
-	    UNOP|OP_DEFPAC,  UNOP|OP_DEFPAR,   UNOP|OP_DEFTASK, UNOP|OP_ENVGET,
-	    UNOP|OP_EXP,     UNOP|OP_FRAC,     UNOP|OP_INT,     UNOP|OP_LOG,
-	    UNOP|OP_LOG10, MULTOP|OP_NSCAN,  MULTOP|OP_MAX,   MULTOP|OP_MIN,
-	   BINOP|OP_MOD,     UNOP|OP_NINT,     UNOP|OP_OSFN,   BINOP|OP_RADIX,
-	    UNOP|OP_REAL,    UNOP|OP_SIN,      UNOP|OP_SQRT,    UNOP|OP_STR,
-	  MULTOP|OP_SUBSTR,  UNOP|OP_TAN,      UNOP|OP_MKTEMP, BINOP|OP_STRIDX,
-	    UNOP|OP_STRLEN,  UNOP|OP_IMACCESS, UNOP|OP_DEFVAR, BINOP|OP_STRLDX,
-	   BINOP|OP_STRSTR,  UNOP|OP_STRLWR,   UNOP|OP_STRUPR,  UNOP|OP_ISINDEF,
-	   BINOP|OP_STRLSTR,
+	 UNOP|OP_ABS,      UNOP|OP_ACCESS,   BINOP|OP_ATAN2,    UNOP|OP_COS,
+	 UNOP|OP_DEFPAC,   UNOP|OP_DEFPAR,    UNOP|OP_DEFTASK,  UNOP|OP_ENVGET,
+	 UNOP|OP_EXP,      UNOP|OP_FRAC,      UNOP|OP_INT,      UNOP|OP_LOG,
+	 UNOP|OP_LOG10,  MULTOP|OP_NSCAN,   MULTOP|OP_MAX,    MULTOP|OP_MIN,
+	BINOP|OP_MOD,      UNOP|OP_NINT,      UNOP|OP_OSFN,    BINOP|OP_RADIX,
+	 UNOP|OP_REAL,     UNOP|OP_SIN,       UNOP|OP_SQRT,     UNOP|OP_STR,
+       MULTOP|OP_SUBSTR,   UNOP|OP_TAN,       UNOP|OP_MKTEMP,  BINOP|OP_STRIDX,
+	 UNOP|OP_STRLEN,   UNOP|OP_IMACCESS,  UNOP|OP_DEFVAR,  BINOP|OP_STRLDX,
+	BINOP|OP_STRSTR,   UNOP|OP_STRLWR,    UNOP|OP_STRUPR,   UNOP|OP_ISINDEF,
+	BINOP|OP_STRLSTR,
 	};
 	int	index, op;
 	int	i, n, subi[2];
@@ -870,11 +836,7 @@ sexa (char *s)
 /* Convert a sexagesimal real back to an index range.
  */
 void
-sexa_to_index (
-  double r,
-  int	*i1, 
-  int   *i2
-)
+sexa_to_index (double r, int *i1, int *i2)
 {
 	int	sgn;
 
@@ -907,23 +869,22 @@ addpipe (void)
 	/* Get unique pipefile name described by a simple integer.
 	 */
 	do {
-	/*
-	 * There seems to be a problem with this code in the VMS compiler.
-	 * It has been changed to a form which will work for UNIX and VMS.
-	 *
-	 *	    pipecode = (pipecode++ % MAX_PIPECODE);
-	 *
-	 */
+	   /*
+	    * There seems to be a problem with this code in the VMS compiler.
+	    * It has been changed to a form which will work for UNIX and VMS.
+	    *
+	    *	    pipecode = (pipecode++ % MAX_PIPECODE);
+	    */
 	    pipecode %= MAX_PIPECODE;
 
-	 /* There can be applications where multiple CL are spawned in
-	  * relatively short order so that the PIDs are close.  Incrementing
-	  * the least significant digits can result in duplications.  So
-	  * instead we use the lower digits as the "unique" part and
-	  * increment the higer digits.
-	  *  
-	  *  pipecode++;
-	  */
+	   /* There can be applications where multiple CL are spawned in
+	    * relatively short order so that the PIDs are close.  Incrementing
+	    * the least significant digits can result in duplications.  So
+	    * instead we use the lower digits as the "unique" part and
+	    * increment the higer digits.
+	    *
+	    *  pipecode++;
+	    */
 	    pipecode += 1000;
 
 	} while (c_access (pipefile(pipecode),0,0) == YES);
@@ -954,9 +915,7 @@ getpipe (void)
  * deleted and the pipestack is cleared (i.e., during error recovery).
  */
 void
-delpipes (
-  register int npipes
-)
+delpipes (register int npipes)
 {
 	register int pipe;
 	char	*pipefile();
@@ -978,9 +937,7 @@ delpipes (
  * buffer and return pointer to pipefile name to caller.
  */
 char *
-pipefile (
-  int	pipecode
-)
+pipefile (int pipecode)
 {
 	static	char fname[SZ_PIPEFILENAME+1];
 	char	*dir;
@@ -1159,10 +1116,7 @@ in_switch (void)
  * executed.
  */
 void
-caseset (
-  memel	*parg,
-  int	ncaseval 
-)
+caseset (memel *parg, int ncaseval)
 {
 	struct	operand	*o;
 	static	char *badcase = "Invalid case constant.";
@@ -1197,9 +1151,7 @@ caseset (
  * top of a linked list.
  */
 struct label *
-setlabel (
-  struct operand *name
-)
+setlabel (struct operand *name)
 {
 	struct	label	*p;
 
@@ -1220,9 +1172,7 @@ setlabel (
  * name, or NULL if the label has not been defined.
  */
 struct label *
-getlabel (
-  struct operand *name
-)
+getlabel (struct operand *name)
 {
 	struct	label	*l;
 
@@ -1244,9 +1194,7 @@ getlabel (
  * the GOTO is taken out of the indirect list.
  */
 void
-setigoto (
-  int	loc
-)
+setigoto (int loc)
 {
 	if (igoto1 < 0)
 	    coderef(loc)->c_args = -1;
@@ -1261,9 +1209,7 @@ setigoto (
  * the target may be put in the argument.
  */
 void
-unsetigoto (
-  int loc
-)
+unsetigoto (int loc)
 {
 	int 	last, curr;
 
@@ -1286,10 +1232,7 @@ unsetigoto (
  * implicit array loops e.g. a[*,5].
  */
 int
-make_imloop (
-  int  i1, 
-  int  i2
-)
+make_imloop (int i1, int i2)
 {
 	int 	mode;
 
@@ -1344,6 +1287,7 @@ y_typedef (char *key)
 	else
 	    cl_error (E_UERR, "illegal type specifier `%s'", key);
 	/*NOTREACHED*/
+	return (0);
 }
 
 

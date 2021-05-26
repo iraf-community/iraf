@@ -66,9 +66,7 @@ int	cllogmode = LOG_COMMANDS;	/* Logging control flag */
  *   values are undefined.
  */
 int
-effmode (
-  struct param *pp
-)
+effmode (struct param *pp)
 {
 	static	char	*localerr =
 		"Attempt to access undefined local variable `%s'.\n";
@@ -82,12 +80,13 @@ effmode (
 	 * this is an ERR, if defined just return mode 0 to defeat
 	 * querying.
 	 */
-	if (pp != NULL)
+	if (pp != NULL) {
 	    if (pp->p_mode & M_LOCAL) {
 		if (opundef (&(pp->p_valo)))
 		    cl_error (E_UERR, localerr, pp->p_name);
 		return (0);
 	    }
+	}
 
 	/* Determine whether or not the current task was called interactively.
 	 * Menu mode is only permitted for tasks called interactively.
@@ -110,9 +109,9 @@ effmode (
 	     * parameter, task, package, cl.  The mode is taken from the first
 	     * of these which is not automatic.
 	     */
-	    if ((mode = (pp->p_mode & modebits)))
+	    if ( (mode = (pp->p_mode & modebits)) )
 		;
-	    else if ((mode = (ltmode & modebits)))
+	    else if ( (mode = (ltmode & modebits)) )
 		;
 	    else {
 		/* Check the mode of the package to which the ltask belongs,
@@ -120,7 +119,7 @@ effmode (
 		 */
 		struct pfile *pfp;
 
-		if ((pfp = currentask->t_ltp->lt_pkp->pk_pfp)) {
+		if ( (pfp = currentask->t_ltp->lt_pkp->pk_pfp) ) {
 	 	    struct param   *ppx;
 	 	    ppx = paramfind (pfp, "mode", 0, YES);
 	 	    if ((ppx != NULL)  &&  (ppx != (struct param *)ERR))
@@ -129,7 +128,7 @@ effmode (
 
 		if (pkmode > 0 && (mode = (pkmode & modebits)))
 		    ;
-		else if ((mode = (clmode & modebits)))
+		else if ( (mode = (clmode & modebits)) )
 		    ;
 		else
 		    mode = M_AUTO;
@@ -191,9 +190,7 @@ effmode (
 /* TASKMODE -- Determine the effective mode for a task.
  */
 int
-taskmode (
-  register struct task *tp
-)
+taskmode (register struct task *tp)
 {
 	register int	modebits, mode;
 	struct	pfile *pfp;
@@ -217,14 +214,14 @@ taskmode (
 
 	/* If the mode of the task is anything but AUTO we are done.
 	 */
-	if ((mode = (ltmode & modebits)))
+	if ( (mode = (ltmode & modebits)) )
 	    if (interactive || !(mode & M_MENU))
 		return (mode|learn);
 
 	/* If the package to which the task belongs has a pfile and the mode
 	 * of the package is anything but AUTO, we are done.
 	 */
-	if ((pfp = tp->t_ltp->lt_pkp->pk_pfp)) {
+	if ( (pfp = tp->t_ltp->lt_pkp->pk_pfp) ) {
 	    struct param   *ppx;
 
 	    pkmode = ERR;
@@ -261,16 +258,14 @@ taskmode (
  *   get no response, we timeout.
  */
 void
-query (
-  struct param *pp
-)
+query (struct param *pp)
 {
 	static	char *oormsg =
 		"ERROR: Parameter value is out of range; try again";
 	register char *ip;
 	char	buf[SZ_PROMPTBUF+1];
 	struct	operand o;
-	int	bastype, batch, arrflag, offset, n_ele, max_ele, fd;
+	int	bastype, batch, arrflag, offset=0, n_ele, max_ele, fd;
 	char	*index(), *nlp, *nextstr();
 	char	*bkg_query(), *query_status;
 	char	*abuf;
@@ -345,13 +340,13 @@ query (
 			    sprintf (keystr, "\\%03o", key);
 			sprintf (buf, "%.3f %.3f %d %s %s\n",
 			    x, y, wcs, keystr, str);
-			query_status = (char *) ((XINT)strlen(buf));
+		        query_status = (char *) ((XINT) strlen(buf));
 		    }
 
 		} else if (c_rcursor (cursor, buf, SZ_PROMPTBUF) == EOF) {
 		    query_status = NULL;
 		} else
-		    query_status = (char *) ((XINT)strlen(buf));
+		    query_status = (char *) ((XINT) strlen(buf));
 
 	    } else if (pp->p_type & PT_UKEY) {
 		/* Read a user keystroke command from the terminal.
@@ -360,7 +355,7 @@ query (
 		if (c_rdukey (buf, SZ_PROMPTBUF) == EOF)
 		    query_status = NULL;
 		else
-		    query_status = (char *) ((XINT)strlen(buf));
+		    query_status = (char *) ((XINT) strlen(buf));
 
 	    } else {
 text_query:	fd = spf_open (buf, SZ_PROMPTBUF);
@@ -532,17 +527,13 @@ testval:
 		n_ele++;
 	    }
 	}
-
 }
 
 
 /* NEXTSTR -- Get the next string in a prompt.
  */
 char *
-nextstr (
-  char	**pbuf,
-  FILE	*fp
-)
+nextstr (char **pbuf, FILE *fp)
 {
 	char	*p, *nxtchr();
 	static	char	tbuf[SZ_LINE];
@@ -571,7 +562,7 @@ nextstr (
 
 	    while (*p != quote) {
 
-		if (p == '\0'  ||  cnt >= SZ_LINE)
+		if (*p == '\0'  ||  cnt >= SZ_LINE)
 		    return ( (char *) ERR);
 
 		else {
@@ -622,10 +613,7 @@ nextstr (
 /* NXTCHR -- Get a pointer to the next char, reading the next line if necessary.
  */
 char *
-nxtchr (
-  char	*p,
-  FILE	*fp
-)
+nxtchr (char *p, FILE *fp)
 {
 	/* P may point to within readbuf on return, so it had better be
 	 * static.
@@ -656,13 +644,10 @@ start:
 /* PQUERY -- Print the query message.
  */
 void
-pquery (
-  register struct param *pp,
-  FILE	*fp
-)
+pquery (register struct param *pp, FILE *fp)
 {
 	struct	operand o;
-	int	offset, arrflag;
+	int	offset=0, arrflag=0;
 
 	arrflag = pp->p_type & PT_ARRAY;
 
@@ -757,9 +742,9 @@ pquery (
  */
 char *
 bkg_query (
-  char	*obuf,			/* same calling sequence as 'fgets' */
-  int	maxch,
-  register struct param *pp
+    char *obuf,			/* same calling sequence as 'fgets' */
+    int maxch,
+    register struct param *pp
 )
 {
 	char	bqfile[SZ_PATHNAME], qrfile[SZ_PATHNAME];
@@ -822,7 +807,7 @@ bkg_query (
  */
 void
 service_bkgquery (
-  int	bkgno			/* ordinal of job requiring service	*/
+    int bkgno			/* ordinal of job requiring service	*/
 )
 {
 	register int ch;
@@ -876,12 +861,7 @@ service_bkgquery (
  * job and then change uparm$ in the foreground cl.
  */
 void
-get_bkgqfiles (
-  int	bkgno, 
-  int   pid,
-  char	*bkg_query_file, 
-  char  *query_response_file
-)
+get_bkgqfiles (int bkgno, int pid, char *bkg_query_file, char *query_response_file)
 {
 	int	filecode;
 	char	*envget();
@@ -909,10 +889,7 @@ get_bkgqfiles (
  * This routine uses binexp() and thus the operand stack.
  */
 int
-inrange (
-  register struct param *pp,
-  register struct operand *op
-)
+inrange (register struct param *pp, register struct operand *op)
 {
 	register int fulltype, bastype;
 	struct	operand omin, test;
@@ -1024,9 +1001,7 @@ inrange (
  * is disabled.
  */
 int
-range_check (
-  struct param *pp
-)
+range_check (struct param *pp)
 {
 	int	fulltype, bastype;
 	struct	operand test, omin, omax;
@@ -1068,9 +1043,7 @@ range_check (
  * been read in.
  */
 void
-setclmodes (
-  struct task *tp
-)
+setclmodes (struct task *tp)
 {
 	register struct param *pp;
 	register char *name;
@@ -1133,10 +1106,7 @@ setclmodes (
  * delimited.
  */
 void
-parse_clmodes (
-  struct param	*pp,
-  struct operand *newval
-)
+parse_clmodes (struct param *pp, struct operand *newval)
 {
 	register char  *name, *ip;
 

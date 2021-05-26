@@ -53,7 +53,7 @@ char	*e_badstrop 	= "illegal operation on string '%0.20s'";
 char	*e_badsw 	= "bad switch case, %d, in `%s'";
 char	*e_geonearg 	= "`%s' requires at least one argument";
 char	*e_indexunf 	= "no indices on stack for array reference";
-char 	*e_nominmax 	= "structs, strings, cursors and bools have no ranges";
+char 	*e_nominmax 	= "structs, strings, cursors and booleans have no ranges";
 char	*e_nopfile 	= "task `%s' has no param file";
 char	*e_badpfile 	= "cannot read parameter file `%s'";
 char	*e_nostrcnv 	= "may not convert string to other types";
@@ -108,6 +108,7 @@ ErrCom	errcom;
 extern	int in_iferr, do_error;
 extern  char *onerr_handler;
 
+extern  int u_doprnt();
 
 
 /* CL_ERROR -- print error info according to errtype on our t_stderr, pop back
@@ -118,7 +119,6 @@ extern  char *onerr_handler;
  * If we are a background task, print the task ordinal to tell the user
  * which task aborted.
  */
-
 void
 cl_error (int errtype, char *diagstr, ...)
 {
@@ -151,7 +151,6 @@ cl_error (int errtype, char *diagstr, ...)
 	 * we may safely longjmp back to main's loop on an error.  ERRENV is
 	 * not set for bkg jobs since error restart is not permitted.
 	 */
-	    
 	if (!validerrenv && !(firstask->t_flags & T_BATCH)) {
 	    nfatal++;
             u_doprnt (diagstr, &args, currentask->t_stderr);

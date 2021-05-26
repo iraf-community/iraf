@@ -8,6 +8,8 @@
 #define	import_lexnum
 #include <iraf.h>
 
+#include "proto.h"
+
 extern	int	cldebug;
 
 /*

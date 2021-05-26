@@ -118,7 +118,7 @@ extern	ErrCom	errcom;
 /* Usually the following routine is provided by the yacc library but we need
  * our own here to signal the parser that an eof has been read.
  */
-int 
+int
 yywrap (void)
 {
 	yeof = 1;
@@ -130,7 +130,7 @@ yywrap (void)
  * error occurred in the input stream.
  */
 /* ARGSUSED */
-void 
+void
 yyerror (char *s)
 {
 	extern	char	*ip_cmdblk;
@@ -145,7 +145,7 @@ yyerror (char *s)
  * All we need to do is advance the pc up to what it would be if the
  * command were typed in again.  See grammar.y '.' rule.
  */
-void 
+void
 rerun (void)
 {
 	register struct codeentry *cp;
@@ -173,7 +173,7 @@ rerun (void)
 			  return (Y_CONSTANT); \
 			}
 
-int 
+int
 crackident (char *s)
 {
 	struct keywords {
@@ -338,7 +338,7 @@ crackident (char *s)
  * Return dictionary index of new operand entry so that it may be used as
  *   ((struct operand *)&dictionary[$1])->o_... in yacc specs.
  */
-XINT 
+XINT
 addconst (char *s, int t)
 {
 	register struct operand *op;
@@ -366,7 +366,7 @@ addconst (char *s, int t)
  * t_stdout.  Give all non-hidden ones first, then all hidden ones in
  * parentheses.
  */
-void 
+void
 listparams (struct pfile *pfp)
 {
 	register struct param *pp;
@@ -385,7 +385,7 @@ listparams (struct pfile *pfp)
  * a parameter on the output file.  Put parens around the name=value string
  * if a hidden parameter.
  */
-void 
+void
 pretty_param (struct param *pp, FILE *fp)
 {
 	register char	ch, *p;
@@ -500,7 +500,7 @@ pretty_param (struct param *pp, FILE *fp)
 /* DUMPPARAMS -- Go through the given pfile and list out its parameters on
  * t_stdout in the form `task.param=value'.
  */
-void 
+void
 dumpparams (struct pfile *pfp)
 {
 	register struct param *pp;
@@ -521,7 +521,7 @@ dumpparams (struct pfile *pfp)
 /* SHOW_PARAM -- Print the name and value of a parameter on the output file
  * in the format `task.param = value'.
  */
-void 
+void
 show_param (struct ltask *ltp, struct param *pp, FILE *fp)
 {
 	char	buf[SZ_LINE+1];
@@ -552,7 +552,7 @@ show_param (struct ltask *ltp, struct param *pp, FILE *fp)
 /* LISTHELP -- List all the (visible) ltasks in the given package in the form
  * of a sorted table.  Used to give menus in response to ? and ?? directives.
  */
-void 
+void
 listhelp (struct package *pkp, int show_invis)
 {
 	static	int first_col=7, maxch=20, ncol=0;
@@ -604,7 +604,7 @@ listhelp (struct package *pkp, int show_invis)
  * path works.  Label the current package in some way.  Serves ?? directive.
  * TODO: this should be optimized once a nice form is settled on.
  */
-void 
+void
 listallhelp (int show_invis)
 {
 	register struct package *pkp;
@@ -640,7 +640,7 @@ listallhelp (int show_invis)
  * This bug is particularly manifest when accessing arrays in specified tasks,
  *   e.g. = task.array[*]
  */
-void 
+void
 breakout (char *full, char **pk, char **t, char **p, char **f)
 {
 	register char *cp;
@@ -708,7 +708,7 @@ breakout (char *full, char **pk, char **t, char **p, char **f)
  * Call error() if f starts with p_ but is not found or if ambiguous
  *   (and abbrevs are enabled).
  */
-int 
+int
 fieldcvt (register char *f)
 {
 	/* Field name and corresponding code tables.
@@ -750,7 +750,7 @@ fieldcvt (register char *f)
  * than one entry in tbl would match s, else the ordinal (index) into tbl
  * at which s matched.
  */
-int 
+int
 keyword (register char *tbl[], register char *s)
 {
 	register int i;
@@ -783,7 +783,7 @@ keyword (register char *tbl[], register char *s)
 /* Given a, possibly abbreviated, function name to run, look it up and
  * run it if found. it gets nargs arguments from the operand stack.
  */
-void 
+void
 intrfunc (char *fname, int nargs)
 {
 	int	op_index, op;
@@ -794,11 +794,11 @@ intrfunc (char *fname, int nargs)
 	struct	operand o;
 
 	static char *ifnames[] = {
-	    "abs",       "access",    "atan2",     "cos", 	"defpac",    
+	    "abs",       "access",    "atan2",     "cos", 	"defpac",
 	    "defpar",    "deftask",   "envget",    "exp",       "frac",
-	    "int",       "log",       "log10",     "nscan",     "max",       
+	    "int",       "log",       "log10",     "nscan",     "max",
 	    "min",       "mod",       "nint",      "osfn",      "radix",
-	    "real",      "sin",       "sqrt",      "str",       "substr",    
+	    "real",      "sin",       "sqrt",      "str",       "substr",
 	    "tan",       "mktemp",    "stridx",    "strlen",	"imaccess",
 	    "defvar",	 "strldx",    "strstr",    "strlwr",    "strupr",    
 	    "isindef",   "strlstr",   "not",       "or",	"xor",
@@ -1030,7 +1030,7 @@ sexa (char *s)
 
 /* Convert a sexagesimal real back to an index range.
  */
-void 
+void
 sexa_to_index (double r, int *i1, int *i2)
 {
 	int	sgn;
@@ -1109,7 +1109,7 @@ getpipe (void)
  * yet), and pop N pipes off the pipe stack.  If N is zero, all pipefiles are
  * deleted and the pipestack is cleared (i.e., during error recovery).
  */
-void 
+void
 delpipes (register int npipes)
 {
 	register int pipe;
@@ -1158,7 +1158,7 @@ pipefile (int pipecode)
  * address for NEXT statements.  It should be called just before the
  * destination is compiled.
  */
-void 
+void
 loopincr (void)
 {
 	if (nestlevel >= MAX_LOOP)
@@ -1174,7 +1174,7 @@ loopincr (void)
  * has been set it resolves the GOTO statement which has been made
  * the target of BREAK's.
  */
-void 
+void
 loopdecr (void)
 {
 	int	p_goto;
@@ -1192,7 +1192,7 @@ loopdecr (void)
  * GOTO operands which terminate each block.
  * The jumptable is created at the location of the current pc.
  */
-void 
+void
 setswitch (void)
 {
 	int	code, jmp, njump, assgn, oper, delta;
@@ -1274,7 +1274,7 @@ setswitch (void)
 /* IN_SWITCH -- determines whether a CASE or DEFAULT block is
  * legal at the current location.
  */
-int 
+int
 in_switch (void)
 {
 	int 	oper, code, oper2, code2, status;
@@ -1310,7 +1310,7 @@ in_switch (void)
 /* CASESET -- Fill in the values for which the current case block is to be
  * executed.
  */
-void 
+void
 caseset (memel *parg, int ncaseval)
 {
 	struct	operand	*o;
@@ -1388,7 +1388,7 @@ getlabel (struct operand *name)
  * is used as the list pointer.  When the destination is defined,
  * the GOTO is taken out of the indirect list.
  */
-void 
+void
 setigoto (int loc)
 {
 	if (igoto1 < 0)
@@ -1403,7 +1403,7 @@ setigoto (int loc)
 /* UNSETIGOTO -- takes a GOTO out of the indirect list so that
  * the target may be put in the argument.
  */
-void 
+void
 unsetigoto (int loc)
 {
 	int 	last, curr;
@@ -1426,7 +1426,7 @@ unsetigoto (int loc)
 /* MAKE_IMLOOP -- compiles the meta-code for the indexing of arrays in
  * implicit array loops e.g. a[*,5].
  */
-int 
+int
 make_imloop (int i1, int i2)
 {
 	int 	mode;
@@ -1456,7 +1456,7 @@ make_imloop (int i1, int i2)
 
 /* Y_TYPEDEF -- Convert a type specifier keyword into a datatype code.
  */
-int 
+int
 y_typedef (char *key)
 {
 	if (strcmp (key, "string") == 0 || strcmp (key, "char") == 0)
@@ -1489,7 +1489,7 @@ y_typedef (char *key)
 /* P_POSITION -- Called when we get a syntax error in the parser.  Print
  * the current cmdblk and point to the offending token.
  */
-void 
+void
 p_position (void)
 {
 	register int i;

@@ -17,7 +17,6 @@
 #include "task.h"
 #include "proto.h"
 
-			    
 
 /*
  * BINOP.C -- Perform binary operations or expressions on two operands.
@@ -74,7 +73,7 @@ strint (register char *s, int side)
  * Call error() and do not return if internal error or undefined string
  *   operation.
  */
-void 
+void
 binop (int opcode)
 {
 	register int typ1, typ2;
@@ -86,7 +85,6 @@ binop (int opcode)
 	long	lval;
 	extern  int errorline, err_abort, err_trace, do_error;
 	extern  ErrCom errcom;
-
 
 	o2 = popop();		/* operands will be on stack backwards	*/
 	o1 = popop();
@@ -110,7 +108,7 @@ binop (int opcode)
 	    case OP_DIV:
 	    case OP_POW:
 		cl_error (E_UERR,
-		    "Illegal boolean operand in arithmetic expression");
+		"Illegal boolean operand in arithmetic expression");
 		break;
 
 	    case OP_MAX:
@@ -339,7 +337,7 @@ binop (int opcode)
 		 */
 		{
 		    char    *ip, *cp, ch;
-		    short    len;
+		    int	    len;
 
 		    iresult = 0;
 		    len = strlen (o2.o_val.v_s);
@@ -454,12 +452,11 @@ binop (int opcode)
                  * found.
                  */
                 {
-                    char    *ip, *cp, *fp, ch, delim, first_char;
-                    short    len, index;
+                    char    *ip, *cp, ch, delim, first_char;
+                    short    index;
 
                     iresult = 0;
                     index = 0;
-                    len = strlen (o2.o_val.v_s);
 
                     delim = o2.o_val.v_s[0];
                     first_char = o1.o_val.v_s[0];
@@ -467,12 +464,11 @@ binop (int opcode)
                     /* Search s2 for first_char, if found check for complete
                      * match of s1, else move on.
                      */
-                    ch = o2.o_val.v_s;
+                    ch = *o2.o_val.v_s;
                     for (ip=o2.o_val.v_s; !iresult && (ch=*ip) != EOS; ip++) {
                         if (ch == delim) {
                             index++;
                         } else if (*ip == first_char) {
-                            fp = ip;
                             cp = o1.o_val.v_s;
                             while (*cp != EOS && *cp == *ip && *ip != delim ) {
                                 cp++; ip++;
@@ -546,7 +542,6 @@ binop (int opcode)
 			    cl_error (E_UERR, e_fdivzero, opcode, "binop()");
 		    } else
 			dresult = VALU(&o1) / VALU(&o2); 
-
 		} else {
 		    if (o2.o_val.v_i == 0) {
 			if (err_abort == NO || do_error == NO) {
@@ -706,18 +701,17 @@ pushresult:
  * INDEF operands propagate through. we should never see an UNDEF operand.
  * all error() and do not return on internal error or bad string operations.
  */
-void 
+void
 binexp (int opcode)
 {
 	register int typ1, typ2;
 	struct	operand o1, o2, result;
-	int	strres = NULL, dostr;
+	int	strres=0, dostr=0;
 
 	o2 = popop();		/* operands will be on stack backwards	*/
 	o1 = popop();
 	typ1 = o1.o_type & OT_BASIC;
 	typ2 = o2.o_type & OT_BASIC;
-	dostr = 0;
 
 	if ((typ1 != OT_BOOL || typ2 != OT_BOOL) &&
 	    (opcode == OP_OR || opcode == OP_AND))

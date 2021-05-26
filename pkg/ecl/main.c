@@ -14,6 +14,7 @@
 #define import_xnames
 #include <iraf.h>
 
+#include <ctype.h>
 #include "config.h"
 #include "grammar.h"
 #include "opcodes.h"
@@ -261,7 +262,6 @@ execute (int mode)
 	int	parsestat;
 	XINT	old_parhead;
 	char	*curcmd();
-	extern  char *onerr_handler;
 
 	alldone = 0;
 	gologout = 0;
@@ -493,7 +493,6 @@ login (char *cmd)
 		    *ap++ = *arg++;
 	    }
 	}
-
 
 	/* Copy any user supplied host command line arguments into the
 	 * CL parameter $args to use in the startup script (for instance).
@@ -789,7 +788,6 @@ void
 onerr (void)
 {
 	char	errmsg[SZ_LINE];
-	extern	int do_error;
 
 	c_erract (EA_RESTART);
 	c_errget (errmsg, SZ_LINE);

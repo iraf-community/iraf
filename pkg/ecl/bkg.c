@@ -4,7 +4,7 @@
 #define import_spp
 #define import_libc
 #define import_stdio
-#define	import_setjmp
+#define import_setjmp
 #define import_knames
 #define import_xwhen
 #define import_ctype
@@ -64,7 +64,8 @@ extern	int nextpipe;		/* pipe stack pointer (next index)	*/
 extern	int dobkg;		/* flag bkg execution 			*/
 
 extern	memel cl_dictbuf[];	/* static dictionary area		*/
-extern	long c_clktime();
+extern	long c_clktime(long reftime);
+extern	unsigned int c_prfodpr(void);
 extern	char *findexe();
 
 #define	SZ_CMD		40		/* command in jobs table	*/
@@ -98,7 +99,7 @@ struct _bkgjob {
 #define	busy(job)	(jobtable[(job)-1].b_flags & J_RUNNING)
 
 
-static	void bkg_close();
+static void bkg_close (int job, int pmsg);
 
 
 /* BKG_INIT -- Setup to execute a background job.  Called by the lexical
@@ -106,7 +107,7 @@ static	void bkg_close();
  * following the & to end of line) and set the dobkg flag to flag background
  * execution of the command block currently being parsed.
  */
-void 
+void
 bkg_init (
     char *bcs		/* background control string	*/
 )
@@ -119,7 +120,7 @@ bkg_init (
 /* BKG_SPAWN -- Spawn a new background job.  Called by main() when we have
  * seen an '&'.
  */
-void 
+void
 bkg_spawn (
     char *cmd		/* command entered by user to spawn job	*/
 )
@@ -127,7 +128,6 @@ bkg_spawn (
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
 	int	curpid = c_getpid();
-	char	clprocess[SZ_PATHNAME];
 	void	pr_initcache();
 
 	/* Find first unused slot in a circular search.
@@ -186,7 +186,7 @@ bkg_spawn (
 /* BKG_WAIT -- Wait for a background job to terminate.  If job=0, wait for
  * all bkg jobs to terminate.
  */
-void 
+void
 bkg_wait (register int job)
 {
 	register int	j;
@@ -214,7 +214,7 @@ bkg_wait (register int job)
 /* BKG_KILL -- Kill a background job.  If job=0, kill all background jobs.
  * If the job cannot be killed assume it is because it died unexpectedly.
  */
-void 
+void
 bkg_kill (int job)
 {
 	register struct _bkgjob *bk;
@@ -251,7 +251,7 @@ bkg_kill (int job)
  * A job will remain in the job table until another job is submitted which uses
  * the same slot.
  */
-void 
+void
 bkg_jobstatus (
     FILE *fp,			/* output file		*/
     int job			/* job(s)		*/
@@ -311,7 +311,7 @@ bkg_jobstatus (
  * job is still running.  It does not matter if the job is waiting for
  * service.
  */
-int 
+int
 bkg_jobactive (int job)
 {
 	bkg_update (1);
@@ -326,7 +326,7 @@ bkg_jobactive (int job)
  * the notify option is off the done or wait message will not have been printed
  * by the bkg job, so we output the message ourselves.
  */
-void 
+void
 bkg_update (
     int pmsg			/* print event messages		*/
 )
@@ -366,10 +366,11 @@ bkg_close (
 	bk->b_flags &= ~(J_RUNNING|J_SERVICE);
 
 	if (bk->b_verbose && (pmsg > 1 || (pmsg == 1 && !notify()))) {
-	    if (bk->b_exitcode != OK)
+	    if (bk->b_exitcode != OK) {
 		eprintf ("[%d] exit %d\n", job, bk->b_exitcode);
-	    else
+	    } else {
 		eprintf ("[%d] done\n", job);
+	    }
 	}
 
 	/* Make a logfile entry, saying the background job ended.
@@ -385,7 +386,7 @@ bkg_close (
 /* BKG_WFSERVICE -- Determine if a bkg job is waiting for service (for the
  * user to answer a query).
  */
-int 
+int
 bkg_wfservice (int job)
 {
 	char	bkg_query_file[SZ_PATHNAME];
@@ -400,7 +401,7 @@ bkg_wfservice (int job)
  * are no dreg query service files lying about from a prior job which did not
  * complete normally.
  */
-void 
+void
 bkg_delfiles (int job)
 {
 	char	bkg_query_file[SZ_PATHNAME];
@@ -418,7 +419,7 @@ bkg_delfiles (int job)
  * file, kill all tasks back to the one that started us as background and
  * write a message on stderr.
  */
-void 
+void
 bkg_abort (void)
 {
 	register int	job;

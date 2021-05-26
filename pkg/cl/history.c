@@ -70,9 +70,7 @@ extern	char *ifseen;		/* Processing an IF statement?		*/
  * the logfile.
  */
 int
-yy_getc (
-  FILE	*fp
-)
+yy_getc (FILE *fp)
 {
 	register char ch;
 
@@ -95,9 +93,7 @@ yy_getc (
  * interrupted.
  */
 void
-yy_startblock (
-  int	logflag
-)
+yy_startblock (int logflag)
 {
 	register char *ip;
 
@@ -166,9 +162,7 @@ curcmd (void)
  *   or by a call to yy_startblock.
  */
 int
-get_command (
-  FILE	*fp
-)
+get_command (FILE *fp)
 {
 	register char *ip, *op;
 	char	raw_cmd[SZ_LINE+1];	/* buffer for raw command line	*/
@@ -357,10 +351,7 @@ input_:
  * is appended to the new command block.
  */
 int
-process_history_directive (
-  char	*directive,
-  char	*new_command_block
-)
+process_history_directive (char *directive, char *new_command_block)
 {
 	register char *ip, *op, *p;
 	char	last_command_block[SZ_CMDBLK+1];
@@ -442,10 +433,7 @@ process_history_directive (
  * matches anything.
  */
 int
-search_history (
-  char	*directive,
-  char	*new_command_block
-)
+search_history (char *directive, char *new_command_block)
 {
 	register char *ip, *op, *p;
 	char	pattern[SZ_FNAME];
@@ -520,9 +508,9 @@ search_history (
  */
 int
 stredit (
-  char	*edit_directive,		/* e.g., "^str1^str2^"		*/
-  char	*in_text,			/* text to be edited		*/
-  char	*out_text 			/* buffer for output text	*/
+    char *edit_directive,		/* e.g., "^str1^str2^"		*/
+    char *in_text,			/* text to be edited		*/
+    char *out_text			/* buffer for output text	*/
 )
 {
 	register char *ip, *op, *pp;
@@ -623,14 +611,11 @@ stredit (
  * The function returns true if any macros were expanded.
  */
 int
-expand_history_macros (
-  char	*in_text,
-  char	*out_text
-)
+expand_history_macros (char *in_text, char *out_text)
 {
 	register char *ip, *op, *ap;
 	char	cmdblk[SZ_CMDBLK+1], *argp[100];
-	int	nargs, nrep, argno, have_arg_strings=0;
+	int	nargs=0, nrep=0, argno=0, have_arg_strings=0;
 	char	*index();
 
 	/* Copy the command text.  Fetch argument strings from history only
@@ -713,8 +698,8 @@ expand_history_macros (
  */
 int
 get_arglist (
-  char	*cmdblk,		/* buffer to store argument list in	*/
-  char	*argp[] 		/* receives argument pointers		*/
+    char *cmdblk,		/* buffer to store argument list in	*/
+    char *argp[]		/* receives argument pointers		*/
 )
 {
 	register char	*cp;
@@ -781,11 +766,7 @@ put_history (char *command)
  * returning OK if found, ERR otherwise.
  */
 int
-get_history (
-  int	record,
-  char	*command,
-  int	maxch 
-)
+get_history (int record, char *command, int maxch)
 {
 	char	*recptr;
 	char	*find_history();
@@ -805,11 +786,7 @@ get_history (
  * well behaved linear rather than circular buffer).
  */
 void
-fetch_history (
-  char	*recptr,
-  char	*command,
-  int	maxch 
-)
+fetch_history (char *recptr, char *command, int maxch)
 {
 	register char	*ip, *op, *itop;
 	register int	n;
@@ -819,8 +796,8 @@ fetch_history (
 	op   = command;
 	n    = ((maxch < SZ_HISTBUF) ? maxch : SZ_HISTBUF) - 1;
 
-	while (--n >= 0 && (*op = *ip++) != EOS) {
-	    *op++;
+	while (--n >= 0 && ((*op = *ip++) != EOS) ) {
+	    op++;
 	    if (ip >= itop)
 		ip = histbuf;
 	}
@@ -902,10 +879,7 @@ find_history (int record)
  * Show at most min (max_commands, MAX_SHOWHIST) command blocks.
  */
 void
-show_history (
-  FILE	*fp,
-  int	max_commands
-)
+show_history (FILE *fp, int max_commands)
 {
 	char	*recptr[MAX_SHOWHIST];
 	char	cmdblk[SZ_CMDBLK+1];
@@ -941,9 +915,7 @@ show_history (
  * if menus() are enabled and a new package has been invoked.
  */
 void
-pprompt (
-  register char *string
-)
+pprompt (register char *string)
 {
 	static	struct package *lastpack = NULL;
 
@@ -1059,10 +1031,10 @@ reset_logfile (void)
  */
 void
 print_command (
-  register FILE	*fp,
-  char	*command,
-  char	*marg1,  		/* margin strings of first and subseq. cmds */
-  char  *marg2
+    register FILE *fp,
+    char *command,
+    char *marg1,
+    char *marg2		/* margin strings of first and subseq. cmds */
 )
 {
 	register char *ip;
@@ -1103,8 +1075,8 @@ what_record (void)
  */
 void
 putlog (
-  struct task  *tp,		/* pointer to task or NULL */
-  char	*usermsg 
+    struct task *tp,		/* pointer to task or NULL */
+    char *usermsg
 )
 {
 	register char	*ip, *op, *otop;

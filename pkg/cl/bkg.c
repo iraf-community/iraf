@@ -64,7 +64,8 @@ extern	int nextpipe;		/* pipe stack pointer (next index)	*/
 extern	int dobkg;		/* flag bkg execution 			*/
 
 extern	memel cl_dictbuf[];	/* static dictionary area		*/
-extern	long c_clktime();
+extern	long c_clktime(long reftime);
+extern	unsigned int c_prfodpr(void);
 extern	char *findexe();
 
 #define	SZ_CMD		40		/* command in jobs table	*/
@@ -107,7 +108,7 @@ static void bkg_close (int job, int pmsg);
  */
 void
 bkg_init (
-  char	*bcs		/* background control string	*/
+    char *bcs		/* background control string	*/
 )
 {
 	strncpy (bkgmsg, bcs, SZ_BKGMSG);
@@ -120,13 +121,12 @@ bkg_init (
  */
 void
 bkg_spawn (
-  char	*cmd		/* command entered by user to spawn job	*/
+    char *cmd		/* command entered by user to spawn job	*/
 )
 {
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
 	int	curpid = c_getpid();
-	char	clprocess[SZ_PATHNAME];
 	void	pr_initcache();
 
 	/* Find first unused slot in a circular search.
@@ -185,9 +185,7 @@ bkg_spawn (
  * all bkg jobs to terminate.
  */
 void
-bkg_wait (
-  register int	job
-)
+bkg_wait (register int job)
 {
 	register int	j;
 	int	active_jobs;
@@ -215,9 +213,7 @@ bkg_wait (
  * If the job cannot be killed assume it is because it died unexpectedly.
  */
 void
-bkg_kill (
-  int	job
-)
+bkg_kill (int job)
 {
 	register struct _bkgjob *bk;
 	register int	j;
@@ -255,8 +251,8 @@ bkg_kill (
  */
 void
 bkg_jobstatus (
-  FILE	*fp,			/* output file		*/
-  int	job			/* job(s)		*/
+    FILE *fp,			/* output file		*/
+    int job			/* job(s)		*/
 )
 {
 	register struct _bkgjob *bk;
@@ -314,9 +310,7 @@ bkg_jobstatus (
  * service.
  */
 int
-bkg_jobactive (
-  int	job
-)
+bkg_jobactive (int job)
 {
 	bkg_update (1);
 	return (busy (job));
@@ -332,7 +326,7 @@ bkg_jobactive (
  */
 void
 bkg_update (
-  int	pmsg			/* print event messages		*/
+    int pmsg			/* print event messages		*/
 )
 {
 	register struct	_bkgjob *bk;
@@ -359,8 +353,8 @@ bkg_update (
  */
 static void
 bkg_close (
-  int	job,			/* job ordinal			*/
-  int	pmsg			/* print termination message	*/
+    int job,			/* job ordinal			*/
+    int pmsg			/* print termination message	*/
 )
 {
 	register struct	_bkgjob *bk = &jobtable[job-1];
@@ -391,9 +385,7 @@ bkg_close (
  * user to answer a query).
  */
 int
-bkg_wfservice (
-  int	job
-)
+bkg_wfservice (int job)
 {
 	char	bkg_query_file[SZ_PATHNAME];
 	char	query_response_file[SZ_PATHNAME];
@@ -408,9 +400,7 @@ bkg_wfservice (
  * complete normally.
  */
 void
-bkg_delfiles (
-  int	job
-)
+bkg_delfiles (int job)
 {
 	char	bkg_query_file[SZ_PATHNAME];
 	char	query_response_file[SZ_PATHNAME];

@@ -197,11 +197,11 @@ unop (int opcode)
 	case OP_DEFPAR:
 	    iresult = defpar (sval);
 	    break;
-	case OP_DEFVAR:
-	    iresult = defvar (sval);
-	    break;
 	case OP_DEFTASK:
 	    iresult = deftask (sval);
+	    break;
+	case OP_DEFVAR:
+	    iresult = defvar (sval);
 	    break;
 	case OP_EXP:
 	    rresult = exp (rval);

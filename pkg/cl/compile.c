@@ -15,14 +15,15 @@
 #include "task.h"
 #include "proto.h"
 
+
 /*
  * COMPILE -- compile instructions at compile time, compile constants,
  * params and misc at runtime on stacks or dictionary.
  */
 
 memel *dictionary;		/* base of dictionary			*/
-XINT	 pc;			/* program-counter			*/
-XINT	 topd, maxd;		/* current top and highest d. indices	*/
+XINT   pc;			/* program-counter			*/
+XINT   topd, maxd;		/* current top and highest d. indices	*/
 
 extern	int	cldebug;
 
@@ -75,7 +76,7 @@ compile (int opcode, ...)
 	case SUBASSIGN:
 	case SWOFF:
  	case SWON: {
-		char *sp = va_arg (argp, char *);;
+                char *sp = va_arg (argp, char *);
 		status = comstr (sp, &cep->c_args);
 		if (status != ERR)
 		    cep->c_length += status;
@@ -200,20 +201,16 @@ compile (int opcode, ...)
 
 
 /* COMSTR -- compile string s into an arbitrary core address loc, which must be
- *   on an int boundry. 
- * allow for trailing '\0'.
- * return number of whole ints taken up by string else ERR if no room.
+ * on an int boundry.  Allow for trailing '\0'.  Return number of whole ints 
+ * taken up by string else ERR if no room.  
  * (comdstr() should be used to copy a string into the dictionary)
  */
 int
-comstr (
-  register char *s,
-  memel *loc
-)
+comstr (register char *s, memel *loc)
 {
 	register char *to, *from;
 
-	from = (to = (char *)loc);
+	from = to = (char *)loc;
 	while ( (*to++ = *s++) )
 	    ;
 	return (btoi((memel)to - (memel)from));

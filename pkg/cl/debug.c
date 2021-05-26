@@ -38,10 +38,7 @@ static	void dd_f();
  * instructions.  Done directly.
  */
 void
-d_stack (
-  register XINT locpc,
-  int ss
-)
+d_stack (register XINT locpc, int ss)
 {
 	register struct codeentry *cep;
 	int n, opcode, errs = 0;
@@ -67,11 +64,7 @@ d_stack (
  * the instruction in memel is returned as the function value.
  */
 int
-d_instr (
-  FILE *fp,
-  char *prefix,
-  register XINT locpc
-)
+d_instr (FILE *fp, char *prefix, register XINT locpc)
 {
 	register struct codeentry *cep;
 	int opcode, extra=0;
@@ -82,22 +75,22 @@ d_instr (
 	fprintf (fp, "%s%6d+%d: ", prefix, locpc, cep->c_length);
 
 	switch (opcode) {
-	case ABSARGSET:   fprintf (fp, "absargset"); goto string;
-	case ADDASSIGN:   fprintf (fp, "addassign"); goto string;
-	case ASSIGN:	  fprintf (fp, "assign"); goto string;
-	case CALL:	  fprintf (fp, "call\t"); goto string;
-	case CATASSIGN:	  fprintf (fp, "catassign"); goto string;
-	case DIVASSIGN:	  fprintf (fp, "divassign"); goto string;
-	case GSREDIR:	  fprintf (fp, "gsredir"); goto string;
-	case INDIRABSSET: fprintf (fp, "indirabsset"); goto string;
-	case INSPECT:	  fprintf (fp, "inspect\t"); goto string;
-	case INTRINSIC:	  fprintf (fp, "intrinsic"); goto string;
-	case MULASSIGN:	  fprintf (fp, "mulassign"); goto string;
-	case OSESC:	  fprintf (fp, "os_escape"); goto string;
-	case PUSHPARAM:	  fprintf (fp, "pushparam"); goto string;
-	case SUBASSIGN:	  fprintf (fp, "subassign"); goto string;
-	case SWOFF:	  fprintf (fp, "swoff\t"); goto string;
-	case SWON:	  fprintf (fp, "swon"); goto string;
+	case ABSARGSET:   fprintf (fp, "absargset");	goto string;
+	case ADDASSIGN:   fprintf (fp, "addassign");	goto string;
+	case ASSIGN:	  fprintf (fp, "assign");	goto string;
+	case CALL:	  fprintf (fp, "call\t");	goto string;
+	case CATASSIGN:	  fprintf (fp, "catassign");	goto string;
+	case DIVASSIGN:	  fprintf (fp, "divassign");	goto string;
+	case GSREDIR:	  fprintf (fp, "gsredir");	goto string;
+	case INDIRABSSET: fprintf (fp, "indirabsset");	goto string;
+	case INSPECT:	  fprintf (fp, "inspect\t");	goto string;
+	case INTRINSIC:	  fprintf (fp, "intrinsic");	goto string;
+	case MULASSIGN:	  fprintf (fp, "mulassign");	goto string;
+	case OSESC:	  fprintf (fp, "os_escape");	goto string;
+	case PUSHPARAM:	  fprintf (fp, "pushparam");	goto string;
+	case SUBASSIGN:	  fprintf (fp, "subassign");	goto string;
+	case SWOFF:	  fprintf (fp, "swoff\t");	goto string;
+	case SWON:	  fprintf (fp, "swon");		goto string;
 string:
 	    fprintf (fp, "\t%s\n", (char *)&cep->c_args);
 	    break;
@@ -117,43 +110,43 @@ op:
 	    }
 	    break;
 
-	case ADD:	  fprintf (fp, "add\n"); break;
-	case ADDPIPE:	  fprintf (fp, "addpipe\n"); break;
-	case ALLAPPEND:	  fprintf (fp, "allappend\n"); break;
-	case ALLREDIR:	  fprintf (fp, "allredir\n"); break;
-	case AND:	  fprintf (fp, "and\n"); break;
-	case APPENDOUT:	  fprintf (fp, "append\n"); break;
-	case CHSIGN:	  fprintf (fp, "chsign\n"); break;
-	case CONCAT:	  fprintf (fp, "concat\n"); break;
-	case DEFAULT:     fprintf (fp, "default\n"); break;
-	case DIV:	  fprintf (fp, "div\n"); break;
-	case END:	  fprintf (fp, "end\n"); break;
-	case EQ:	  fprintf (fp, "eq\n"); break;
-	case EXEC:	  fprintf (fp, "exec\n"); break;
-	case FSCAN:	  fprintf (fp, "fscan\n"); break;
-	case FSCANF:	  fprintf (fp, "fscanf\n"); break;
-	case GE:	  fprintf (fp, "ge\n"); break;
-	case GETPIPE:	  fprintf (fp, "getpipe\n"); break;
-	case GT:	  fprintf (fp, "gt\n"); break;
-	case IMMED:	  fprintf (fp, "immed\n"); break;
-	case LE:	  fprintf (fp, "le\n"); break;
-	case LT:	  fprintf (fp, "lt\n"); break;
-	case MUL:	  fprintf (fp, "mul\n"); break;
-	case NE:	  fprintf (fp, "ne\n"); break;
-	case NOT:	  fprintf (fp, "not\n"); break;
-	case OR:	  fprintf (fp, "or\n"); break;
-	case POW:	  fprintf (fp, "pow\n"); break;
-	case PRINT:	  fprintf (fp, "print\n"); break;
-	case REDIR:	  fprintf (fp, "redir\n"); break;
-	case REDIRIN:	  fprintf (fp, "redirin\n"); break;
-	case RETURN:	  fprintf (fp, "return\n"); break;
-	case SCAN:	  fprintf (fp, "scan\n"); break;
-	case SCANF:	  fprintf (fp, "scanf\n"); break;
-	case SUB:	  fprintf (fp, "sub\n"); break;
-	case SWITCH:      fprintf (fp, "switch\n"); break;
+	case ADD:	  fprintf (fp, "add\n"); 	break;
+	case ADDPIPE:	  fprintf (fp, "addpipe\n"); 	break;
+	case ALLAPPEND:	  fprintf (fp, "allappend\n"); 	break;
+	case ALLREDIR:	  fprintf (fp, "allredir\n"); 	break;
+	case AND:	  fprintf (fp, "and\n"); 	break;
+	case APPENDOUT:	  fprintf (fp, "append\n"); 	break;
+	case CHSIGN:	  fprintf (fp, "chsign\n"); 	break;
+	case CONCAT:	  fprintf (fp, "concat\n"); 	break;
+	case DEFAULT:     fprintf (fp, "default\n"); 	break;
+	case DIV:	  fprintf (fp, "div\n"); 	break;
+	case END:	  fprintf (fp, "end\n"); 	break;
+	case EQ:	  fprintf (fp, "eq\n"); 	break;
+	case EXEC:	  fprintf (fp, "exec\n"); 	break;
+	case FSCAN:	  fprintf (fp, "fscan\n"); 	break;
+	case FSCANF:	  fprintf (fp, "fscanf\n"); 	break;
+	case GE:	  fprintf (fp, "ge\n"); 	break;
+	case GETPIPE:	  fprintf (fp, "getpipe\n"); 	break;
+	case GT:	  fprintf (fp, "gt\n"); 	break;
+	case IMMED:	  fprintf (fp, "immed\n"); 	break;
+	case LE:	  fprintf (fp, "le\n"); 	break;
+	case LT:	  fprintf (fp, "lt\n"); 	break;
+	case MUL:	  fprintf (fp, "mul\n"); 	break;
+	case NE:	  fprintf (fp, "ne\n"); 	break;
+	case NOT:	  fprintf (fp, "not\n"); 	break;
+	case OR:	  fprintf (fp, "or\n"); 	break;
+	case POW:	  fprintf (fp, "pow\n"); 	break;
+	case PRINT:	  fprintf (fp, "print\n"); 	break;
+	case REDIR:	  fprintf (fp, "redir\n"); 	break;
+	case REDIRIN:	  fprintf (fp, "redirin\n"); 	break;
+	case RETURN:	  fprintf (fp, "return\n"); 	break;
+	case SCAN:	  fprintf (fp, "scan\n"); 	break;
+	case SCANF:	  fprintf (fp, "scanf\n"); 	break;
+	case SUB:	  fprintf (fp, "sub\n"); 	break;
+	case SWITCH:      fprintf (fp, "switch\n"); 	break;
 
-	case BIFF:	  fprintf (fp, "biff\t"); goto offset;
-	case GOTO:	  fprintf (fp, "goto\t"); goto offset;
+	case BIFF:	  fprintf (fp, "biff\t"); 	goto offset;
+	case GOTO:	  fprintf (fp, "goto\t"); 	goto offset;
 offset:
 	    /* Print offset with sign, - or +, in all cases. */
 	    if ((int)cep->c_args <= 0)
@@ -162,16 +155,16 @@ offset:
 		 fprintf (fp, "\t+%d\n", cep->c_args);
 	    break;
 
-	case CASE:        fprintf (fp, "case\n"); goto oneint;
-	case INDIRPOSSET: fprintf (fp, "indirposset"); goto oneint;
-	case POSARGSET:	  fprintf (fp, "posargset"); goto oneint;
-	case RMPIPES:	  fprintf (fp, "rmpipes\t"); goto oneint;
+	case CASE:        fprintf (fp, "case\n"); 	goto oneint;
+	case INDIRPOSSET: fprintf (fp, "indirposset"); 	goto oneint;
+	case POSARGSET:	  fprintf (fp, "posargset"); 	goto oneint;
+	case RMPIPES:	  fprintf (fp, "rmpipes\t"); 	goto oneint;
 oneint:
 	    fprintf (fp, "\t%d\n", cep->c_args);
 	    break;
 
 	/* Used for arrays. */
-	case PUSHINDEX:   fprintf (fp, "pushindex"); goto oneint;
+	case PUSHINDEX:   fprintf (fp, "pushindex"); 	goto oneint;
 	case INDXINCR:    fprintf (fp, "indxincr");
 	    /* Output two jump offsets. */
 	     fprintf (fp, "\t%d, %d\t", cep->c_args, *(&cep->c_args+1));
@@ -199,7 +192,7 @@ oneint:
 /* print neat things about the dictionary and stack.
  * done directly.
  */
-void
+void 
 d_d (void)
 {
 	char *stackaddr = (char *)stack;  /*  just so we may subtract	*/
@@ -237,7 +230,7 @@ d_d (void)
  * has been unlinked from parhead before the builtin is run to avoid showing
  * it. see execnewtask().
  */
-void
+void 
 d_p (void)
 {
 	register struct pfile *pfp;
@@ -265,11 +258,11 @@ d_p (void)
  * done as a builtin. no attempt is made to hide the task running for this 
  * builtin.
  */
-void
+void 
 d_t (void)
 {
-	register struct task *tp;
-	int flags;
+	struct task *tp;
+	int    flags;
 
 	eprintf ("stacked tasks (most recent first)\n\n");
 	for (tp=currentask; (XINT)tp<(XINT)&stack[STACKSIZ]; tp=next_task(tp)) {
@@ -296,7 +289,7 @@ d_t (void)
 /* print all loaded packages and their ltasks from pachead.
  * builtin.
  */
-void
+void 
 d_l (void)
 {
 	register struct package *pkp;
@@ -328,7 +321,7 @@ d_l (void)
 /* D_F -- Determine the number of logical (e.g. dev$null, stropen) and physical
  * (host system) file slots available.
  */
-void
+void 
 d_f (void)
 {
 	dd_f ("logical:  ", "dev$null");
@@ -336,10 +329,7 @@ d_f (void)
 }
 
 static void
-dd_f (
-  char	*msg,
-  char	*fname
-)
+dd_f (char *msg, char *fname)
 {
 	FILE	*fp[128];
 	int	fn;
@@ -400,12 +390,7 @@ e_dumpop (void)
 /* Format a multiline exec-task message string for debug output.
  */
 void
-d_fmtmsg (
-  FILE *fp,
-  char *prefix,
-  char *message,
-  int width
-)
+d_fmtmsg (FILE *fp, char *prefix, char *message, int width)
 {
 	register char *ip, *op, *cp;
 	char lbuf[SZ_COMMAND], obuf[SZ_COMMAND];

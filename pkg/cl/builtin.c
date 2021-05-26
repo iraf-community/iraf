@@ -50,11 +50,10 @@
  * the function nargs().
  */
 
-extern	int cldebug;
-extern	int cltrace;
-extern	int lastjobno;		/* last background job spawned		*/
-extern	int gologout;		/* flag to execute() to cause logout	*/
-extern	int logout_status;	/* optional arg to logout()		*/
+extern	int cldebug, cltrace;		/* debug/trace flags		     */
+extern	int lastjobno;			/* last background job spawned	     */
+extern	int gologout;			/* flag to execute() to cause logout */
+extern  int logout_status;      	/* optional arg to logout()          */
 extern	char *findexe();
 
 /* Device Allocation stuff (really should be in a separate package).
@@ -230,15 +229,13 @@ clcache (void)
 /* CL_LOCATE -- Locate the named task in the package list.
  */
 void
-cl_locate (
-  char	*task_spec,
-  int	first_only
-)
+cl_locate (char *task_spec, int first_only)
 {
 	char	buf[SZ_LINE];
 	char	*pkname, *ltname, *junk;
 	struct	package *pkp;
-	int	stat, found = 0;
+	struct  ltask   *stat;
+	int	found = 0;
 
 	strcpy (buf, task_spec);
 	breakout (buf, &junk, &pkname, &ltname, &junk);
@@ -246,7 +243,7 @@ cl_locate (
 	if (pkname[0] != '\0') {	/* explicit package named	*/
 	    if ((pkp = pacfind (pkname)) == NULL)
 		cl_error (E_UERR, e_pcknonexist, pkname);
-	    if ((stat = (int) ltaskfind (pkp, ltname, 1)) == NULL)
+	    if ((stat = ltaskfind (pkp, ltname, 1)) == (struct ltask *) NULL)
 		oprintf ("%s'\n", pkname);
 
 	} else {			/* search all packages		*/
@@ -254,8 +251,8 @@ cl_locate (
 	    stat = NULL;
 
 	    while (pkp != NULL) {
-		stat = (int) ltaskfind (pkp, ltname, 1);
-		if (stat == ERR)
+		stat = ltaskfind (pkp, ltname, 1);
+		if (stat == (struct ltask *) ERR)
 	    	    cl_error (E_UERR, e_tambig, ltname);
 		else if (stat != NULL) {
 	            oprintf ("%s", pkp->pk_name);
@@ -509,7 +506,6 @@ clerror (void)
 {
 	register struct	param *arg1, *arg2;
 	register struct pfile *pfp;
-	int	errcode;		/* NOT USED */
 	char	*errmsg;
 	
 	pfp = newtask->t_pfp;
@@ -518,10 +514,6 @@ clerror (void)
 	arg1 = pfp->pf_pp;
 	arg2 = arg1->p_np;
 
-	if (arg1 && (arg1->p_valo.o_type & OT_BASIC) == OT_INT)
-	    errcode = arg1->p_val.v_i;
-	else
-	    errcode = 1;
 	if (arg2 && (arg2->p_valo.o_type & OT_BASIC) == OT_STRING)
 	    errmsg = arg2->p_val.v_s;
 	else
@@ -535,7 +527,7 @@ clerror (void)
 	 * tell the CL error handler that we've already logged the error, by
 	 * setting the 'errlog' flag.
 	 */
-	if (keeplog() && log_errors())
+	if (keeplog() && log_errors()) {
 	    if (currentask->t_flags & T_SCRIPT || currentask->t_pid != -1) {
 	    	char  buf[SZ_LINE];
 		extern	int  errlog;			/* see errs.c */
@@ -545,6 +537,7 @@ clerror (void)
 	    	putlog (currentask, buf);
 		errlog = 1;
 	    }
+	}
 
 	/* ERROR terminates a task like BYE.  Pop the task which issued
 	 * the error statement, provided it was not the first task.
@@ -591,7 +584,7 @@ clhelp (void)
 			listhelp (curpack, show_invis);
 		} else if ((pkp = pacfind (o.o_val.v_s)) == NULL) {
 		    eprintf ("Warning: package '%s' not found\n", o.o_val.v_s);
-		} else if ((XINT)pkp == ERR) {
+		} else if ((XINT) pkp == ERR) {
 		    cl_error (E_UERR, e_pckambig, o.o_val.v_s);
 		} else {
 		    if (n > 1)
@@ -720,7 +713,7 @@ clservice (void)
 void
 clkeep (void)
 {
-	register struct	task *tp, *root_task;
+	register struct	task *tp, *root_task = (struct task *) NULL;
 
 	if (nargs (newtask->t_pfp) > 0)
 	    cl_error (E_UERR, "`keep' command has no arguments");
@@ -855,7 +848,6 @@ cllparam (void)
 void
 cldparam (void)
 {
-	register struct ltask *ltp;
 	register struct pfile *pfp;
 	struct	operand o;
 	int	n, nleft;
@@ -872,7 +864,6 @@ cldparam (void)
 
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
 		pfp = pfilesrch (o.o_val.v_s);
-		ltp = pfp->pf_ltp;
 		dumpparams (pfp);
 	    } else
 		cl_error (E_UERR, "dparam: argument must be a taskname");
@@ -1034,9 +1025,7 @@ clfprint (void)
 
 
 void
-do_clprint (
-  char	*dest
-)
+do_clprint (char *dest)
 {
 	/* x1 and x2 are just place holders for the call to breakout.
 	 */
@@ -1366,7 +1355,7 @@ clstty (void)
 	register char	*ip, *op;
 	char	sttycmd[2048], args[1024], *argp[100];
 	int	argc, i;
-	XINT    std_in = STDIN, std_out = STDOUT;
+	XINT	std_in = STDIN, std_out = STDOUT;
 
 
 	pfp = newtask->t_pfp;
@@ -1405,9 +1394,7 @@ clstty (void)
  * first char in the task name is an underscore.
  */
 void
-cltask (
-  int	redef
-)
+cltask (int redef)
 {
 	register struct pfile *pfp;
 	struct	operand o;
@@ -2109,9 +2096,7 @@ cldevstatus (void)
  * b_f.  Setting LT_INVIS will keep it from being seen in the menu.
  */
 void
-setbuiltins (
-  register struct package *pkp
-)
+setbuiltins (register struct package *pkp)
 {
 	/* Debugging functions are in debug.c.
 	 */
@@ -2123,46 +2108,46 @@ setbuiltins (
 		void	(*b_f)();
 		int	b_flags;
 	} btbl[] = {
-	  { "d_f", d_f, LT_INVIS},	/* shows available file des	*/
-	  { "d_l", d_l, LT_INVIS},	/* shows defined ltasks	i	*/
-	  { "d_m", d_d, LT_INVIS},	/* shows memory usage		*/
-	  { "d_off", d_off, LT_INVIS},	/* disables debuggin msgs	*/
-	  { "d_on", d_on, LT_INVIS},	/* enables debuging msgs	*/
-	  { "d_trace",dotrace,LT_INVIS},/* instruction tracing		*/
-	  { "d_p", d_p, LT_INVIS},	/* shows loaded param files	*/
-	  { "d_t", d_t, LT_INVIS},	/* shows running tasks		*/
-	  { "prcache", clprcache, 0},	/* show process cache		*/
-	  { "?", clhelp, LT_INVIS},	/* tasks in current package	*/
-	  { "??", clallhelp, LT_INVIS},	/* all tasks in all packs	*/
-	  { "wait", clwait, 0},		/* wait for all bkg jobs	*/
-	  { "jobs", cljobs, 0},		/* show status of bkg jobs	*/
-	  { "unlearn", clunlearn, 0},	/* unlearn params 		*/
-	  { "update", clupdate, 0},	/* write out a changed pfile	*/
-	  { "hidetask",clhidetask, 0},  /* make these tasks invisible   */
-	  { "task", clntask, 0},	/* define new ltask/ptask	*/
-	  { "set", clset, 0},		/* make environ table entry	*/
-	  { "reset", clreset, 0},	/* reset value of envvar	*/
-	  { "show", clshow, 0},		/* show value of environ var	*/
-	  { "stty", clstty, 0},		/* set terminal driver options	*/
-	  { "redefine", clrtask, 0},	/* redfine ltasl/ptask		*/
-	  { "package", clpack, 0},	/* define new package		*/
+	  { "d_f", d_f, LT_INVIS},	/* shows available file descr	     */
+	  { "d_l", d_l, LT_INVIS},	/* shows defined ltasks		     */
+	  { "d_m", d_d, LT_INVIS},	/* shows memory usage		     */
+	  { "d_off", d_off, LT_INVIS},	/* disables debugging msgs	     */
+	  { "d_on", d_on, LT_INVIS},	/* enables debugging msgs	     */
+	  { "d_trace",dotrace,LT_INVIS},/* instruction tracing toggle	     */
+	  { "d_p", d_p, LT_INVIS},	/* shows loaded param files	     */
+	  { "d_t", d_t, LT_INVIS},	/* shows running tasks		     */
+	  { "prcache", clprcache, 0},	/* show process cache		     */
+	  { "?", clhelp, LT_INVIS},	/* tasks in current package	     */
+	  { "??", clallhelp, LT_INVIS},	/* all tasks in all packs	     */
+	  { "wait", clwait, 0},		/* wait for all bkg jobs	     */
+	  { "jobs", cljobs, 0},		/* show status of bkg jobs	     */
+	  { "unlearn", clunlearn, 0},	/* unlearn params 		     */
+	  { "update", clupdate, 0},	/* write out a changed pfile	     */
+	  { "hidetask",clhidetask, 0},  /* make these tasks invisible        */
+	  { "task", clntask, 0},	/* define new ltask/ptask	     */
+	  { "set", clset, 0},		/* make environ table entry	     */
+	  { "reset", clreset, 0},	/* reset value of envvar	     */
+	  { "show", clshow, 0},		/* show value of environ var	     */
+	  { "stty", clstty, 0},		/* set terminal driver options	     */
+	  { "redefine", clrtask, 0},	/* redfine ltasl/ptask		     */
+	  { "package", clpack, 0},	/* define new package		     */
 	  { "_curpack", clcurpack,
-		LT_INVIS},		/* name the current package	*/
-	  { "print", clprint, 0},	/* formatted output to stdout	*/
-	  { "printf", clprintf, 0},	/* formatted output to stdout	*/
-	  { "fprint", clfprint, 0},	/* formatted output		*/
-	  { "putlog", clputlog, 0}, 	/* put a message to the logfile */
-	  { "dparam", cldparam, 0},	/* dump params for tasks	*/
-	  { "lparam", cllparam, 0},	/* list params for tasks	*/
-	  { "eparam", cleparam, 0},	/* edit params for tasks	*/
-	  { "ehistory", clehistory, 0},	/* edit command history		*/
-	  { "history", clhistory, 0},	/* print command history	*/
-	  { "service", clservice, 0},	/* respond to bkg query		*/
-	  { "kill", clkill, 0},		/* kill a background job	*/
-	  { "keep", clkeep, 0},		/* keep new defn's after bye	*/
-	  { "error", clerror, 0},	/* error msg from child		*/
+		LT_INVIS},		/* name the current package	     */
+	  { "print", clprint, 0},	/* formatted output to stdout	     */
+	  { "printf", clprintf, 0},	/* formatted output to stdout	     */
+	  { "fprint", clfprint, 0},	/* formatted output		     */
+	  { "putlog", clputlog, 0}, 	/* put a message to the logfile      */
+	  { "dparam", cldparam, 0},	/* dump params for tasks	     */
+	  { "lparam", cllparam, 0},	/* list params for tasks	     */
+	  { "eparam", cleparam, 0},	/* edit params for tasks	     */
+	  { "ehistory", clehistory, 0},	/* edit command history		     */
+	  { "history", clhistory, 0},	/* print command history	     */
+	  { "service", clservice, 0},	/* respond to bkg query		     */
+	  { "kill", clkill, 0},		/* kill a background job	     */
+	  { "keep", clkeep, 0},		/* keep new defn's after bye	     */
+	  { "error", clerror, 0},	/* error msg from child		     */
 	  { ROOTPACKAGE, lapkg,
-	    	LT_INVIS|LT_DEFPCK},	/* fake task for language.	*/
+	    	LT_INVIS|LT_DEFPCK},	/* fake task for language.	     */
 	  { CLPACKAGE, clpkg,
 		LT_INVIS|LT_DEFPCK},	/* fake task for clpackage.	*/
 	  { "chdir", clchdir, 0},	/* change directory		*/
@@ -2197,7 +2182,7 @@ setbuiltins (
 	  { "sleep", clsleep, 0},	/* suspend process execution	*/
 	  { "_allocate", clallocate, LT_INVIS},
 	  { "_deallocate", cldeallocate, LT_INVIS},
-	  { "_devstatus", cldevstatus, LT_INVIS}
+	  { "_devstatus", cldevstatus, LT_INVIS},
 	};
 
 	register struct builtin *bp;
@@ -2217,7 +2202,7 @@ void
 newbuiltin (
   struct package *pkp,		/* package which owns task	*/
   char	*lname,			/* ltask name			*/
-  void	(*fp)(),		/* pointer to builtin fcn	*/
+  void	(*fp)(void),		/* pointer to builtin fcn	*/
   int	flags,			/* task flags			*/
   char	*ftprefix,		/* OSCMD prefix if foreign	*/
   int	redef			/* permit redefinitions		*/
@@ -2247,9 +2232,9 @@ newbuiltin (
  */
 int
 mkarglist (
-  register struct pfile *pfp,	/* pfile pointer		*/
-  char	*args,			/* string buffer for arg chars	*/
-  char	*argp[]			/* array of arg pointers	*/
+    register struct pfile *pfp,	/* pfile pointer		*/
+    char *args,			/* string buffer for arg chars	*/
+    char *argp[]		/* array of arg pointers	*/
 )
 {
 	register char	*ip, *op;
@@ -2302,9 +2287,7 @@ mkarglist (
  * a builtin will be accessed right-to-left.
  */
 void
-pushfparams (
-  register struct param *pp
-)
+pushfparams (register struct param *pp)
 {
 	struct operand onam;
 
@@ -2323,9 +2306,7 @@ pushfparams (
  * parameters for a builtin will be accessed left-to-right.
  */
 void
-pushbparams (
-  struct param *pp
-)
+pushbparams (struct param *pp)
 {
 	struct operand onam;
 	struct param *npp;
@@ -2346,9 +2327,7 @@ pushbparams (
 /* PUSHBPVALS -- Like pushbparams, but only the parameter value is pushed.
  */
 void
-pushbpvals (
-  struct param *pp
-)
+pushbpvals (struct param *pp)
 {
 	struct param *npp;
 
@@ -2366,9 +2345,7 @@ pushbpvals (
  * the number of command line arguments to a builtin.
  */
 int
-nargs (
-  struct pfile *pfp
-)
+nargs (struct pfile *pfp)
 {
 	struct	param	*pp;
 	int	n;
@@ -2384,9 +2361,7 @@ nargs (
  * referenced task terminates.
  */
 void
-keep (
-  register struct task *tp
-)
+keep (register struct task *tp)
 {
 	if (cldebug) {
 	    eprintf ("currentask: %d, prevtask: %d\n",currentask,prevtask);

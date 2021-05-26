@@ -50,7 +50,7 @@ XINT pachead;			/* dict index of first package		*/
 struct ltask *
 cmdsrch (char *pkname, char *ltname)
 {
-	register struct ltask *ltp = (struct ltask *) NULL;
+	register struct ltask *ltp = NULL;
 	register struct package *pkp, *pkcand;
 	static	struct ltask pacltask;	/* used to signal a package change */
 	struct	ltask *temptaskset();
@@ -262,7 +262,7 @@ pacfind (char *name)
 /* DEFPAC -- Return true/false if the named package is/isnot loaded.
  * Call error if an ambiguous abbreviation is given.
  */
-int 
+int
 defpac (char *pkname)
 {
 	switch ((XINT) pacfind (pkname)) {
@@ -323,7 +323,7 @@ ltaskfind (
  * If a specific package is named, look only there; otherwise search
  * the usual path.  Call error if an ambiguous abbreviation is given.
  */
-int 
+int
 deftask (char *task_spec)
 {
 	char	buf[SZ_LINE];
@@ -374,7 +374,7 @@ deftask (char *task_spec)
 
 int unwind_level = 0;
 
-void 
+void
 taskunwind (void)
 {
 	struct task *lastask = currentask;

@@ -10,7 +10,6 @@
 
 #include "proto.h"
 
-
 extern	int	cldebug;
 
 /*

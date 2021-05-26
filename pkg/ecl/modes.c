@@ -65,7 +65,7 @@ int	cllogmode = LOG_COMMANDS;	/* Logging control flag */
  * Local variables cannot be prompted for so it is an error if their
  *   values are undefined.
  */
-int 
+int
 effmode (struct param *pp)
 {
 	static	char	*localerr =
@@ -75,7 +75,6 @@ effmode (struct param *pp)
 	struct	operand o;
 	int	clmode, ltmode, pkmode, offset;
 	int	interactive;
-
 
 	/* Check if param is a local variable.  If it is undefined
 	 * this is an ERR, if defined just return mode 0 to defeat
@@ -190,7 +189,7 @@ effmode (struct param *pp)
 
 /* TASKMODE -- Determine the effective mode for a task.
  */
-int 
+int
 taskmode (register struct task *tp)
 {
 	register int	modebits, mode;
@@ -258,7 +257,7 @@ taskmode (register struct task *tp)
  *   another file which we read and then delete.  If we wait a long time and
  *   get no response, we timeout.
  */
-void 
+void
 query (struct param *pp)
 {
 	static	char *oormsg =
@@ -563,7 +562,7 @@ nextstr (char **pbuf, FILE *fp)
 
 	    while (*p != quote) {
 
-		if (p == '\0'  ||  cnt >= SZ_LINE)
+		if (*p == '\0'  ||  cnt >= SZ_LINE)
 		    return ( (char *) ERR);
 
 		else {
@@ -624,7 +623,7 @@ nxtchr (char *p, FILE *fp)
 	if (*p)
 	    p++;
 start:
-	if (*p == '\\')
+	if (*p == '\\') {
 	    if (*(p+1) == '\n') {
 		if (fgets (readbuf, SZ_LINE, fp) == NULL)
 		    /* We assume that the newline is always followed by a
@@ -636,6 +635,7 @@ start:
 		    goto start;
 		}
 	    }
+	}
 
 	return (p);
 }
@@ -643,7 +643,7 @@ start:
 
 /* PQUERY -- Print the query message.
  */
-void 
+void
 pquery (register struct param *pp, FILE *fp)
 {
 	struct	operand o;
@@ -805,7 +805,7 @@ bkg_query (
  * are done.  When the bkg job wakes up it will read the response file and
  * (assuming there are no errors) continue on.
  */
-void 
+void
 service_bkgquery (
     int bkgno			/* ordinal of job requiring service	*/
 )
@@ -860,7 +860,7 @@ service_bkgquery (
  * expect to find the files.  We assume that the user does not start a bkg
  * job and then change uparm$ in the foreground cl.
  */
-void 
+void
 get_bkgqfiles (int bkgno, int pid, char *bkg_query_file, char *query_response_file)
 {
 	int	filecode;
@@ -888,7 +888,7 @@ get_bkgqfiles (int bkgno, int pid, char *bkg_query_file, char *query_response_fi
  *   Always return NO if op is UNDEFined.
  * This routine uses binexp() and thus the operand stack.
  */
-int 
+int
 inrange (register struct param *pp, register struct operand *op)
 {
 	register int fulltype, bastype;
@@ -1000,7 +1000,7 @@ inrange (register struct param *pp, register struct operand *op)
  * If both the min and max fields are set, but max is less than min, checking
  * is disabled.
  */
-int 
+int
 range_check (struct param *pp)
 {
 	int	fulltype, bastype;
@@ -1042,7 +1042,7 @@ range_check (struct param *pp)
  * parameter is not found.  Called once by login() after the cl's pfile has
  * been read in.
  */
-void 
+void
 setclmodes (struct task *tp)
 {
 	register struct param *pp;
@@ -1105,7 +1105,7 @@ setclmodes (struct task *tp)
  * appropriately.  Tokens in the parameter strings are white-space 
  * delimited.
  */
-void 
+void
 parse_clmodes (struct param *pp, struct operand *newval)
 {
 	register char  *name, *ip;
@@ -1226,7 +1226,7 @@ parse_clmodes (struct param *pp, struct operand *newval)
  * currentask is a builtin and the previous task is interactive (or batch),
  * regardless of value of clabbrev parameter.
  */
-int 
+int
 abbrev (void)
 {
 	/* Enable abbreviations everywhere for now.
@@ -1252,7 +1252,7 @@ abbrev (void)
 
 /* POFFSET--push an offset in an array for a later reference.
  */
-void 
+void
 poffset (int off)
 {
 	n_indexes++;
