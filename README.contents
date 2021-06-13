@@ -1,12 +1,12 @@
 
-	This directory contains the IRAF community snapshot release.  The
-contents of this directory include:
+	This directory contains the IRAF community release.  The
+	contents of this directory include:
 
     LICENSE		Software license information
     Makefile		Top-level makefile
     README		This file
     README.install	Installation Notes
-    RELEASE.txt		IRAF v2.16.1 Release Notes
+    RELEASE.txt		IRAF Release Notes
     bin			Symbolic link to current system architecture
     dev			IRAF Device definition files
     doc			IRAF System Documentation, release notes, etc
