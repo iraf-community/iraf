@@ -519,4 +519,4 @@ If discrepancies occur during any of these steps, please look at the
 examples closely. It might be advisable to backtrack a few steps and
 verify things again. If the discrepancies are repeatable there could
 indeed be a problem. Please document the discrepancy and feel free to
-contact us if some advice or help is needed (iraf@noao.edu).
+contact us if some advice or help is needed.
