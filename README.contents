@@ -4,7 +4,7 @@
 
     LICENSE		Software license information
     Makefile		Top-level makefile
-    README		This file
+    README.contents	This file
     README.install	Installation Notes
     RELEASE.txt		IRAF Release Notes
     bin			Symbolic link to current system architecture
@@ -32,5 +32,6 @@
   o  For a summary of what is included in this release see the 'RELEASE.md'
      file in this directory.
 
-  o  For problems or questions, please see http://iraf.net and
+  o  For problems or questions, please see
+     https://github.com/iraf-community/iraf/discussions and
      https://github.com/iraf-community/iraf/issues
