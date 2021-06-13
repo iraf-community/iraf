@@ -3,7 +3,7 @@
 ## CL scripts
 
 This is based on [An Introductory User’s Guide to IRAF
-Scripts](http://iraf.noao.edu/iraf/ftp/iraf/docs/script.pdf) by Ed Anderson.
+Scripts](https://iraf-community.github.io/doc/script.pdf) by Ed Anderson.
 
 You will recall that several tasks may be called in sequence on a
 single command line, using a semicolon `;` to separate each command.
@@ -78,7 +78,7 @@ cl> cl < while.cl
 # SPP tasks
 
 This example is taken from a the [slides of a talk by Rob
-Seaman](http://iraf.noao.edu/ftp/docs/spp_intro.pdf).
+Seaman](https://iraf-community.github.io/doc/spp_intro.pdf).
 
 Take a simple program from the test directory:
 
