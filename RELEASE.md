@@ -1,9 +1,9 @@
-# IRAF 2.16.1 Snapshot
+# IRAF 2.17
 
-The latest official IRAF release is 2.16.1 from March 2012. Our releases are
-snapshots based on the latest available source code. The snapshots are tagged
-with their release date in the version number. Changes to the original 2.16.1
-sources include:
+The latest NOAO IRAF release is 2.16.1 from October 2013. Intermediate
+releases were snapshots based on that latest available source code. These
+snapshots were tagged with their release date in the version number.
+Changes to the 2.16.1 sources include:
 
 * __All known non-free code removed__
 
@@ -57,11 +57,11 @@ sources include:
 * __IRAF ported to other architectures__
 
     IRAF is now ported to a number of little endian architectures
-    (ARM, PowerPC, MIPS, x32) and operating systems (GNU Hurd and
+    (ARM, PowerPC, MIPS, x32, RISC-V64) and operating systems (GNU Hurd and
     FreeBSD).
 
 * __Simple CI test framework added__
 
     The tests are defined and documented in
     [MarkDown](https://github.com/iraf-community/iraf/blob/main/test/README.md)
-    files. Tests are run on Travis CI on Linux and MacOS X platforms.
+    files. Tests are run using Github Actions on Linux and MacOS X platforms.

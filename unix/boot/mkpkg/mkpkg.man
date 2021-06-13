@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH MKPKG "1" "Novemver 2017" "IRAF 2.16.1" "IRAF commands"
+.TH MKPKG "1" "June 2021" "IRAF 2.17" "IRAF commands"
 .SH NAME
 mkpkg \- make or update an IRAF package or library
 .SH SYNOPSIS
