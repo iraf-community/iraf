@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 
 **System details:**
  - OS: [e.g. macOS 10.15, or Ubuntu 20.04]
- - Version [e.g. 2.16.1+2018.11.01]
+ - Version [e.g. 2.16.1+2021.06.14]
  - Versions of all additionally involved software, i.e. xgterm, PyRAF, sptable,
 
 **Additional context**
