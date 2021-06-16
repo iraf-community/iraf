@@ -4,11 +4,11 @@
 # Exit on error
 set -e
 
-if [ "$(RATFOR)" ] ; then
+if [ "${RATFOR}" ] ; then
     echo "------------------- Ratfor preprocessing ---------------"
     rm -f rppfor/*.f ratlibf/*.f rpprat/fort ratlibr/fort
-    make -C rpprat RATFOR=$(RATFOR)
-    make -C ratlibr RATFOR=$(RATFOR)
+    make -C rpprat RATFOR=${RATFOR}
+    make -C ratlibr RATFOR=${RATFOR}
 fi
 
 echo "----------------------- RPPFOR -------------------------"
