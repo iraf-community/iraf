@@ -105,7 +105,7 @@ else
          fi
          ;;
 
-     "freebsd")
+     "*freebsd")
 	 if [ "$nbits" = 64 ] ; then
              mach="freebsd64"
          else
