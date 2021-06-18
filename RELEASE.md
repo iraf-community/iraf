@@ -19,7 +19,7 @@ Changes to the 2.16.1 sources include:
   Many bugs of the 2.16.1 release are fixed. Some of he major ones are:
   
    - Linux systems crashed with "Out of memory" (13 year old bug;
-     [2.12 release notes](https://github.com/iraf/iraf-v216/blob/9590f4/doc/notes.v212#L1065-L1075))
+     [2.12 release notes](https://github.com/iraf-community/iraf/blob/9590f4/doc/notes.v212#L1065-L1075))
    
    - `noao.digiphot.photcal.fitparams` failed with a segmentation
      fault on 64-bit systems
@@ -27,7 +27,7 @@ Changes to the 2.16.1 sources include:
    
    - The system wide IRAF installation changed the permissions of
      `/tmp/`, creating a major security hole in the system
-     (https://github.com/iraf/iraf-v216/issues/23)
+     (https://iraf-community.github.io/iraf-v216/issues/23)
    
    - On Linux systems, self-compiled tasks gave wrong results
      ([iraf.net](http://iraf.net/forum/viewtopic.php?showtopic=1467841))
@@ -49,7 +49,7 @@ Changes to the 2.16.1 sources include:
     package also uses outdated VO standards. A discussion with Mike
     Fitzpatrick resulted in his plan to [move the VO functionality
     into an external
-    package](https://github.com/iraf/iraf-v216/issues/90#issuecomment-310968834).
+    package](https://iraf-community.github.io/iraf-v216/issues/90).
     Therefore, no attempt was put into getting these problems fixed,
     and the VO stuff was cut out.  The VOTable functionality, however,
     remains available
