@@ -51,7 +51,7 @@ ZOSCMD (
 	sout = (char *)stdout_file;
 	serr = (char *)stderr_file;
 
-	/* The Bourne shell SH is used if the first character of the cmd
+	/* The POSIX shell SH is used if the first character of the cmd
 	 * is '!' or if the user does not have SHELL defined in their
 	 * environment.
 	 */

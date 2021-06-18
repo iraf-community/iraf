@@ -15,15 +15,15 @@ extdir = osfn ("iraf$extern")
 # Go to the dynamic package directory, but save the current directory so
 # we can return when we're done.  At this stage of the login we need to 
 # use host commands since the system package isn't available.
-printf ("!/bin/pwd\n") | cl () | scan (curdir)
+printf ("!!/bin/pwd\n") | cl () | scan (curdir)
 chdir (extdir)
 
 #  Create a file list to process.
 dpkg = mktemp ("tmp$dpkg")
 if (access (dpkg) == yes)
-  printf ("!/bin/rm -f %s\n", osfn(dpkg))                              	| cl ()
+  printf ("!!/bin/rm -f %s\n", osfn(dpkg))                             	| cl ()
 ;
-printf ("!/bin/ls -1ad [a-y]* 2> /dev/null\n") | cl (,> dpkg)
+printf ("!!/bin/ls -1ad [a-y]* 2> /dev/null\n") | cl (,> dpkg)
 
 list = dpkg
 while (fscan (list, s1) != EOF) {
@@ -52,7 +52,7 @@ while (fscan (list, s1) != EOF) {
 }
 
 # Clean up and go back to the login directory.
-printf  ("!/bin/rm -f %s\n", osfn(dpkg))                               	| cl ()
+printf  ("!!/bin/rm -f %s\n", osfn(dpkg))                               | cl ()
 if (curdir != "") {
     chdir (curdir)
 } else {
