@@ -31,6 +31,11 @@ long	clktime(), ctol()
 define	done_		99
 
 begin
+	# Chkupdate is disabled
+	call eprintf ("chkupdate is not supported in the community edition.\n")
+	call eprintf ("Check https://iraf-community.github.io manually\n")
+	return 
+
 	# Initialize strings.
 	call aclrc (baseurl, SZ_FNAME)
 	call aclrc (release, SZ_LINE)
