@@ -116,7 +116,7 @@ begin
 			clean=clean, extras=no)
 		else
 		    apscript (flat2d, output=resp, ansrecenter="NO",
-			ansrecenter="NO", ansresize="NO", ansedit="NO",
+			ansresize="NO", ansedit="NO",
 			anstrace="NO", background="none",
 			clean=clean, extras=no)
 	    } else
@@ -207,7 +207,7 @@ begin
 		print ("Set aperture throughput using ", skyflat2d) | tee (log1)
 		if (!access (apref // mstype)) {
 		    apscript (apref, output=resp, ansrecenter="NO",
-			ansrecenter="NO", ansresize="NO", ansedit="NO",
+			ansresize="NO", ansedit="NO",
 			anstrace="NO", background="none",
 			clean=no, extras=no)
 		    sarith (resp, "replace", "0", resp, w1=INDEF,
