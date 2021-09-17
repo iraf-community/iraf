@@ -36,9 +36,9 @@ char	section[ARB]				#I section to print
 
 pointer sp, ip, sptr
 pointer ibuf, unesc, name, level
-int	lastline, font, indented, ls_level
+int	lastline, font, ls_level
 int	i, arg, nsec, cmd
-bool	format, quit_at_le, quit_at_ih, formatted
+bool	quit_at_le, quit_at_ih, formatted, in_para, in_pre
 
 int	lh_findsection(), lh_findblock(), nextcmd()
 int	stridxs(), getline(), strlen(), strmatch(), lgetarg()
@@ -64,10 +64,10 @@ begin
 	# Initialize.
 	lastline  = TEXT
 	font 	  = F_ROMAN
-	indented  = YES
+	in_para  = false
 	nsec 	  = 0
 	ls_level  = 0
-        format    = true
+        in_pre    = false
 	quit_at_le = false
 	quit_at_ih = false
         formatted  = false
@@ -98,16 +98,6 @@ begin
 
 	# Begin the output.
 	call lh_prolog (out, module, parstr, center)
-	call fprintf (out, "<TITLE>%s</TITLE>\n<UL>\n")
-	    if (ls_block[1] != EOS)
-		call pargstr (ls_block)
-	    else if (section[1] != EOS)
-		call pargstr (section)
-	    else if (module[1] != EOS)
-		call pargstr (module)
-	    else
-		call pargstr (" ")
-
 
 	# Process the file.
 	while (getline (in, Memc[ibuf]) != EOF) {
@@ -120,12 +110,17 @@ begin
 
 	    # Escape problem chars for HTML and handle font changes. Changes
 	    # are done in-place.
-	    call lh_escape (Memc[ibuf], font, format, NO, SZ_LINE)
+	    call lh_escape (Memc[ibuf], font, !in_pre, NO, SZ_LINE)
 
 	    switch (Memc[ibuf]) {
 	    case '\n':
-		call fprintf (out, "<P>\n")
-
+		if (in_para == true) {
+		    call fprintf (out, "</p>\n")
+		    in_para = false
+		}
+		if (in_pre == true) {
+		    call fprintf (out, "\n")
+		}
 	    case '.':
 		# Swallow any help strings if present.
 		if (strmatch (Memc[ibuf], "^.help") > 0)
@@ -141,12 +136,20 @@ begin
                     ip = ip + 1
 
 		switch (cmd) {
-		case FI:		# enter fill mode
-		    call fprintf (out, "</PRE>\n")
-		    format = true
+		case FI:		# leave nofill mode; enter normal mode
+		    if (in_pre == true) {
+			call fprintf (out, "</pre>\n")
+			in_pre = false
+		    }
 		case NF:		# leave fill mode (nofill)
-		    call fprintf (out, "<PRE>\n")
-		    format = false
+		    if (in_para == true) {
+			call fprintf(out, "</p>\n")
+			in_para = false
+		    }
+		    if (in_pre == false) {
+			call fprintf (out, "<pre>\n")
+			in_pre = true
+		    }
 		case JU:		# enter line justification mode
 		    # no-op
 		    next
@@ -158,17 +161,17 @@ begin
 		    next
 
 		case SH:		# section heading
-		    if (ls_level > 0) {	# for missing .le statements
-		        call fprintf (out, "</DD>\n</DL>\n")
-		        ls_level = 0
+		    if (in_para == true) {
+			call fprintf(out, "</p>\n")
+			in_para = false
 		    }
 		    lastline = DIRECTIVE
        	    	    Memc[level] = EOS
 		    next
 		case IH:		# indented section heading
-		    if (ls_level > 0) {	# for missing .le statements
-		        call fprintf (out, "</DD>\n</DL>\n")
-		        ls_level = 0
+		    if (in_para == true) {
+		        call fprintf(out, "</p>\n")
+			in_para = false
 		    }
 		    lastline = DIRECTIVE
        	    	    Memc[level] = EOS
@@ -182,10 +185,6 @@ begin
 		    	    break
 		    next
 		case NH:		# numbered section heading
-		    if (ls_level > 0) {	# for missing .le statements
-		        call fprintf (out, "</DD>\n</DL>\n")
-		        ls_level = 0
-		    }
 		    call lh_set_level (lgetarg(Memc[ibuf],ip,1), Memc[level])
 		    lastline = DIRECTIVE
 		    next
@@ -194,18 +193,22 @@ begin
 		    if (getline (in, Memc[ibuf]) == EOF)
 			break
 		    else {
+		        if (in_para == true) {
+		            call fprintf(out, "</p>\n")
+			    in_para = false
+		        }
 	    	        call lh_escape (Memc[ibuf], font, true, NO, SZ_LINE)
-		        call fprintf (out, "<CENTER>%s</CENTER><BR>\n")
+		        call fprintf (out, "<p style=\"text-align:center\">%s</p>\n")
 		            call pargstr (Memc[ibuf])
 		    }
 
 		case BR:		# break line
-		    call fprintf (out, "<BR>\n")
+		    call fprintf (out, "<br>\n")
 		case SP:		# break, space N spaces on output
 		    arg = lgetarg (Memc[ibuf], ip, 1)
-		    call fprintf (out, "<BR>\n")
+		    call fprintf (out, "<br>\n")
 		    for (i=1; i < arg; i = i + 1)
-		        call fprintf (out, "<BR>\n")
+		        call fprintf (out, "<br>\n")
 		case IN:		# indent +/- N spaces
 		    # no-op
 		    next
@@ -223,17 +226,25 @@ begin
 		    Memc[name+i] = EOS
 	    	    Memc[ibuf+ip+strlen(Memc[ibuf+ip])-1] = EOS
 
-		    call fprintf (out, "<DL>\n<DT><B>")
-		    call fprintf (out,"<A NAME=\"l_%s\">%s</A>")
-		        call pargstr (Memc[name])
-		        call pargstr (Memc[ibuf+ip-1])
-		    call fprintf (out, "</B></DT>\n")
+		    if (in_para == true) {
+		        call fprintf(out, "</p>\n")
+			in_para = false
+		    }
+		    if (Memc[name] == EOS || ls_level > 0) {
+		        call fprintf (out, "<dl>\n<dt><b>%s")
+		            call pargstr (Memc[ibuf+ip-1])
+		    } else {
+		        call fprintf (out, "<dl id=\"l_%s\">\n<dt><b>%s")
+		            call pargstr (Memc[name])
+		            call pargstr (Memc[ibuf+ip-1])
+		    }
+		    call fprintf (out, "</b></dt>\n")
 
 		    # Write out a comment line for the GUI to use.
 	    	    call lh_escape(Memc[unesc+ip-1], font, true, YES, SZ_LINE)
 	    	    Memc[unesc+strlen(Memc[unesc])-1] = EOS
 		    call fprintf (out, 
-			"<! Sec=%s Level=%d Label=\'%s\' Line=\'%s\'>\n<DD>")
+			"<!-- Sec=%s Level=%d Label=\'%s\' Line=\'%s\' -->\n<dd>")
 			    if (nsec > 0)
 		                call pargstr (SECTION(sptr, nsec-1))
 			    else
@@ -247,7 +258,7 @@ begin
 		    ls_level = ls_level + 1
 
 		case LE:		# end labelled section
-		    call fprintf (out, "</DD>\n</DL>\n")
+		    call fprintf (out, "</dd>\n</dl>\n")
 		    ls_level = ls_level - 1
 		    if (quit_at_le)
 			break
@@ -262,7 +273,7 @@ begin
 		    }
 		    Memc[name+i] = EOS
 
-		    call fprintf (out, "<A HREF=\"%s\">%s</A>\n")
+		    call fprintf (out, "<a href=\"%s\">%s</A>\n")
 		        call pargstr (Memc[name])
 		        call pargstr (Memc[ibuf+ip+1])
 
@@ -270,7 +281,7 @@ begin
                     # HTML name target of the form ".hn <name>", strip the
 		    # newline added in the escape routine.
 	    	    Memc[ibuf+ip+strlen(Memc[ibuf+ip])-1] = EOS
-		    call fprintf (out, "<A NAME=\"%s\"></A>\n")
+		    call fprintf (out, "<span id=\"%s\"></span>\n")
 			call pargstr (Memc[ibuf+ip])
 
 		case BP:		# break page
@@ -280,11 +291,19 @@ begin
 		    # no-op
 		    next
 		case KS:		# start floating keep
-		    call fprintf (out, "<PRE>\n")
-		    format = false
+		    if (in_para == true) {
+		        call fprintf(out, "</p>\n")
+			in_para = false
+		    }
+		    if (in_pre == false) {
+		        call fprintf (out, "<pre>\n")
+		        in_pre = true
+		    }
 		case KE:		# end floating keep
-		    call fprintf (out, "</PRE>\n")
-		    format = true
+		    if (in_pre == true) {
+		        call fprintf (out, "</pre>\n")
+		        in_pre = false
+		    }
 		case ENDHELP:		# end of help block
 		    break
 		}
@@ -303,33 +322,32 @@ begin
 		    call sprintf (SECTION(sptr,nsec), SZ_LINE, "\'%s\'")
 			call pargstr (Memc[ibuf])
 
-		    if (indented == YES)
-		        call fprintf (out, "</UL>\n")
+		    if (in_para == true) {
+		        call fprintf (out, "</p>\n")
+			in_para = false
+		    }
 		    if (nsec > 0) {
-		        call fprintf (out, "<! EndSection:   %s>\n")
+		        call fprintf (out, "<!-- EndSection:   %s -->\n")
 		            call pargstr (SECTION(sptr,nsec-1))
 		    }
 
 		    # Make the section name a URL target.
 		    call lh_mkname (Memc[ibuf], Memc[name])
 		    if (Memc[level] == EOS) {
-		        call fprintf (out, "<H2><A NAME=\"s_%s\">%s</A></H2>\n")
+		        call fprintf (out, "<h2 id=\"s_%s\">%s</h2>\n")
 			    call pargstr (Memc[name])
 			    call pargstr (Memc[ibuf])
 		    } else {
 		        call fprintf (out,
-			    "<H2><A NAME=\"s_%s\">%s %s</A></H2>\n")
+			    "<span id=\"s_%s\">%s %s</span>\n")
 			    	call pargstr (Memc[name])
 			    	call pargstr (Memc[level])
 			    	call pargstr (Memc[ibuf])
        	    	    	Memc[level] = EOS
 		    }
 
-		    call fprintf (out, "<! BeginSection: \'%s\'>\n")
+		    call fprintf (out, "<!-- BeginSection: \'%s\' -->\n")
 		        call pargstr (Memc[ibuf])
-		    if (indented == YES)
-		        call fprintf (out, "<UL>\n")
-
 		    lastline = NAME
 		    nsec = nsec + 1
 		    if (section[1] != EOS)
@@ -337,7 +355,11 @@ begin
 
 		} else {
 		    # Ordinary text line.
-text_	    	    call fprintf (out, "%s")
+text_		    if (in_para == false && in_pre == false && ls_level == 0) {
+			call fprintf (out, "<p>\n")
+			in_para = true
+		    }
+		    call fprintf (out, "%s")
 	   	        call pargstr (Memc[ibuf])
 		    lastline = TEXT
 		}
@@ -348,20 +370,24 @@ text_	    	    call fprintf (out, "%s")
 	    call aclrc (Memc[name], SZ_LINE)
 	}
 
+	if (in_para == true) {
+	    call fprintf(out, "</p>\n")
+	    in_para = false
+	}
 	# Close the last section.
 	if (nsec > 0) {
-	    call fprintf (out, "</UL>\n<! EndSection:    %s>\n\n")
+	    call fprintf (out, "\n<!-- EndSection:    %s -->\n\n")
                 call pargstr (SECTION(sptr,nsec-1))
 	}
 
 	# Write out an HTML comment giving the document section names.
-	call fprintf (out, "<! Contents: ")
+	call fprintf (out, "<!-- Contents: ")
 	for (i=0; i < nsec; i=i+1) {
 	    call fprintf (out, "%s ")
 		call pargstr (SECTION(sptr,i))
 	}
-	call fprintf (out, " >\n\n")
-	call fprintf (out, "</BODY>\n</HTML>\n")
+	call fprintf (out, " -->\n\n")
+	call fprintf (out, "</body>\n</html>\n")
 
 	call flush (out)
 err_	call sfree (sp)
@@ -379,48 +405,53 @@ char	date[ARB]				#I .help keyword 2
 char	title[ARB]				#I .help keyword 3
 
 begin
-        call fprintf (fd, "<HTML>\n<BODY>\n")
+        call fprintf (fd, "<!DOCTYPE html>\n<HTML>\n<HEAD>\n")
+	if (title[1] != EOS) {
+            call fprintf (fd, "<title>%s</title>\n")
+                call pargstr (title)
+	}
+        call fprintf (fd, "</head>\n<body>\n")
 
 	# If we only have the module name don't bother with header.
 	if (date[1] == EOS && title[1] == EOS)
 	    return
 
 	# Begin the HTML output prolog.
-        call fprintf (fd, "<TABLE WIDTH=\"100%%\" BORDER=0><TR>\n")
+        call fprintf (fd, "<table style=\"width:100%%; border:0;\"><tr>\n")
 
 	# Left side page header.
-        call fprintf (fd, "<TD ALIGN=LEFT><FONT SIZE=4>\n")
+        call fprintf (fd, "<td style=\"text-align: left; font-size: 4px;\">\n")
 	if (date[1] == EOS) {
-            call fprintf (fd, "<B>%s</B>")
+            call fprintf (fd, "<b>%s</b>")
                 call pargstr (mod)
 	} else {
-            call fprintf (fd, "<B>%s (%s)</B>")
+            call fprintf (fd, "<b>%s (%s)</b>")
                 call pargstr (mod)
                 call pargstr (date)
 	}
-        call fprintf (fd, "</FONT></TD>\n")
+        call fprintf (fd, "</td>\n")
 
 	# Center page header.
 	if (title[1] != EOS) {
-            call fprintf (fd, "<TD ALIGN=CENTER><FONT SIZE=4>\n")
-            call fprintf (fd, "<B>%s</B>\n")
+	        call fprintf (fd, "<td style=\"text-align: center; font-size: 4px;\">\n")
+            call fprintf (fd, "<b>%s</b>\n")
                 call pargstr (title)
-            call fprintf (fd, "</FONT></TD>\n")
+            call fprintf (fd, "</td>\n")
 	}
 
 	# Right side page header.
-        call fprintf (fd, "<TD ALIGN=RIGHT><FONT SIZE=4>\n")
+        call fprintf (fd, "<td style=\"text-align: right; font-size: 4px;\">\n")
 	if (date[1] == EOS) {
-            call fprintf (fd, "<B>%s</B>")
+            call fprintf (fd, "<b>%s</b>")
                 call pargstr (mod)
 	} else {
-            call fprintf (fd, "<B>%s (%s)</B>")
+            call fprintf (fd, "<b>%s (%s)</b>")
                 call pargstr (mod)
                 call pargstr (date)
 	}
-        call fprintf (fd, "</FONT></TD>\n")
+        call fprintf (fd, "</td>\n")
 
-        call fprintf (fd, "</TR></TABLE><P>\n")
+        call fprintf (fd, "</tr></table><p>\n")
 end
 
 
@@ -466,29 +497,50 @@ begin
 	    # Quoted single chars and strings get a special font.
 	    case '\'':
 		if (str[i+2] == '\'') {
-		    ip = ip + gstrcpy ("<TT>",  Memc[ip], SZ_LINE)
-		    ip = ip + gstrcpy (str[i],  Memc[ip], 3)
-		    ip = ip + gstrcpy ("</TT>", Memc[ip], SZ_LINE)
+		    ip = ip + gstrcpy ("<span style=\"font-family: monospace;\">",
+		                       Memc[ip], SZ_LINE)
+		    switch (str[i+1]) {
+		    # Handle special chars.
+		    case '<':
+			ip = ip + gstrcpy ("'&lt;'", Memc[ip], SZ_LINE)
+	            case '>':
+		        ip = ip + gstrcpy ("'&gt;'", Memc[ip], SZ_LINE)
+	            case '&':
+		        ip = ip + gstrcpy ("'&amp;'", Memc[ip], SZ_LINE)
+		    default:
+	                ip = ip + gstrcpy (str[i],  Memc[ip], 3)
+		    }
+		    ip = ip + gstrcpy ("</span>", Memc[ip], SZ_LINE)
 		    i = i + 2
 		} else
 		    goto copy_
 	    case '`':
 		if (str[i+2] == '`' || str[i+2] == '\'') {
-		    ip = ip + gstrcpy ("<TT>",  Memc[ip], SZ_LINE)
-		    ip = ip + gstrcpy (str[i],  Memc[ip], 3)
-		    ip = ip + gstrcpy ("</TT>", Memc[ip], SZ_LINE)
+		    ip = ip + gstrcpy ("<span style=\"font-family: monospace;\">",  Memc[ip], SZ_LINE)
+		    switch (str[i+1]) {
+		    # Handle special chars.
+		    case '<':
+			ip = ip + gstrcpy ("`&lt;`", Memc[ip], SZ_LINE)
+	            case '>':
+		        ip = ip + gstrcpy ("`&gt;`", Memc[ip], SZ_LINE)
+	            case '&':
+		        ip = ip + gstrcpy ("`&amp;`", Memc[ip], SZ_LINE)
+		    default:
+	                ip = ip + gstrcpy (str[i],  Memc[ip], 3)
+		    }
+		    ip = ip + gstrcpy ("</span>", Memc[ip], SZ_LINE)
 		    i = i + 2
 		} else
 		    goto copy_
 	    case '"':
-                if (format && str[i+1] != '/' && str[i+2] != '/') {
-		    if (font == F_TELETYPE) {
-		        # Do a closing quote.
-		        ip = ip + gstrcpy ("</TT>\"", Memc[ip], SZ_LINE)
+                if (format) {
+	            if (font == F_TELETYPE) {
+	                # Do a closing quote.
+	                ip = ip + gstrcpy ("\"</span>", Memc[ip], SZ_LINE)
 		        font = F_ROMAN
 		    } else if (font == F_ROMAN) {
 		        # Do an opening quote.
-		        ip = ip + gstrcpy ("\"<TT>", Memc[ip], SZ_LINE)
+		        ip = ip + gstrcpy ("<span style=\"font-family: monospace;\">\"", Memc[ip], SZ_LINE)
 		        font = F_TELETYPE
 		    } else
 		        goto copy_
@@ -502,30 +554,30 @@ begin
 			if (font == F_BOLD)
 			    next
 			if (font == F_ITALIC)
-			    ip = ip + gstrcpy ("</I>", Memc[ip], SZ_LINE)
-			ip = ip + gstrcpy ("<B>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</i>", Memc[ip], SZ_LINE)
+			ip = ip + gstrcpy ("<b>", Memc[ip], SZ_LINE)
 			font = F_BOLD
 
 		    } else if (str[i+2] == 'I') {
 			if (font == F_ITALIC)
 			    next
 			if (font == F_BOLD)
-			    ip = ip + gstrcpy ("</B>", Memc[ip], SZ_LINE)
-			ip = ip + gstrcpy ("<I>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</b>", Memc[ip], SZ_LINE)
+			ip = ip + gstrcpy ("<i>", Memc[ip], SZ_LINE)
 			font = F_ITALIC
 
 		    } else if (str[i+2] == 'R') {
 			if (font == F_BOLD)
-			    ip = ip + gstrcpy ("</B>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</b>", Memc[ip], SZ_LINE)
 			else if (font == F_ITALIC)
-			    ip = ip + gstrcpy ("</I>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</i>", Memc[ip], SZ_LINE)
 			font = F_ROMAN
 
 		    } else if (str[i+2] == 'P') {
 			if (font == F_BOLD) {
-			    ip = ip + gstrcpy ("</B>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</b>", Memc[ip], SZ_LINE)
 			} else if (font == F_ITALIC) {
-			    ip = ip + gstrcpy ("</I>", Memc[ip], SZ_LINE)
+			    ip = ip + gstrcpy ("</i>", Memc[ip], SZ_LINE)
 			}
 			font = F_ROMAN
 		    }
@@ -534,9 +586,10 @@ begin
 		    Memc[ip] = str[i]
 		    ip = ip + 1
 		    i = i + 1
-		    ip = ip + gstrcpy ("<BR>", Memc[ip], SZ_LINE)
-		} else
+		    ip = ip + gstrcpy ("<br>", Memc[ip], SZ_LINE)
+		} else {
 		    goto copy_
+                }
 
 	    default:
 copy_		Memc[ip] = str[i]
