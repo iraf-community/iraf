@@ -474,6 +474,7 @@ The "first" option does not allow rebinning to a non-linear dispersion.
 Instead, it rebins to the nearest linear dispersion matching the first
 spectrum.
 .le
+.le
 .ih
 SEE ALSO
 imcombine, scombine, scopy, sarith, lscombine

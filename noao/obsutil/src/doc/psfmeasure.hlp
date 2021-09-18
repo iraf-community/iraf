@@ -625,9 +625,9 @@ NOAO/IRAF IRAFV2.10.3 valdes@puppis Tue 18:22:36 06-Jul-93
 
 The estimated average FWHM is 4.5722.  The variation in size is real
 in this artificial image having a radial variation in PSF.
+.fi
 .ih
 SEE ALSO
-.nf
 imexamine, implot, pprofile, pradprof, radlist, radplt, radprof,
 specfocus, starfocus, splot
 .endhelp

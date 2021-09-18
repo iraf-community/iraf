@@ -97,6 +97,7 @@ the points which were deleted using this task.
 .ls (gtpar = "") [pset]
 The name of the pset containing the parameters which describe the plot
 attributes.
+.le
 .ih
 EXAMPLES
 1. Edit a table containing the output photometry from DAOPHOT. 

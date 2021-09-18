@@ -86,7 +86,7 @@ processed to subtract the overscan.
 	    27.     273.555     273.778          0.
 	    48.     482.161     481.949          0.
 .fi
-.le
+
 .ih
 SEE ALSO
 imstatistics

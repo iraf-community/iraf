@@ -130,6 +130,7 @@ cl> epar aimpars
 ... type :w aimhdr1.par
 ... type :q to quit
 cl> agetim ... aimpars=aimhdr1.par ...
+.fi
 
 .ih
 TIME REQUIREMENTS

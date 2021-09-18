@@ -247,24 +247,24 @@ xi and eta refer to the usual standard coordinates used in astrometry.
 Xi and eta shifts only are fit.
 .le
 .ls xyscale
-Xi and eta shifts and x and y magnification factors in " / pixel are fit.
+Xi and eta shifts and x and y magnification factors in arcsec / pixel are fit.
 Axis flips are allowed for.
 .le
 .ls rotate
 Xi and eta shifts and a rotation angle are fit. Axis flips are allowed for.
 .le
 .ls rscale
-Xi and eta shifts, a magnification factor in " / pixel assumed to be the same
+Xi and eta shifts, a magnification factor in arcsec / pixel assumed to be the same
 in x and y, and a rotation angle are fit. Axis flips are allowed for.
 .le
 .ls rxyscale
-Xi and eta shifts, x and y magnifications factors in " / pixel, and a rotation
+Xi and eta shifts, x and y magnifications factors in arcsec / pixel, and a rotation
 angle are fit.  Axis flips are allowed for.
 .le
 .ls general
 A polynomial of arbitrary order in x and y is fit. A linear term and a
 distortion term are computed separately. The linear term includes a xi and eta
-shift, an x and y scale factor in " / pixel, a rotation and a skew.  Axis
+shift, an x and y scale factor in arcsec / pixel, a rotation and a skew.  Axis
 flips are also allowed for in the linear portion of the fit. The distortion
 term consists of a polynomial fit to the residuals of the linear term. By
 default the distortion term is set to zero.
@@ -293,7 +293,7 @@ Power series polynomials in x and y.
 The order of the polynomials in x and y for the xi and eta fits respectively.
 The default order and cross term settings define the linear term in x
 and y, where the 6 coefficients can be interpreted in terms of an xi and eta
-shift, an x and y scaling in " / pixel, and rotations of the x and y axes.
+shift, an x and y scaling in arcsec / pixel, and rotations of the x and y axes.
 The "shift", "xyscale", "rotation", "rscale", and "rxyscale", fitting geometries
 assume that the polynomial order parameters are 2 regardless of the values
 set by the user. If any of the order parameters are higher than 2 and
@@ -405,7 +405,7 @@ place in the post-IAU 1976 system.
 
 The plate solution computed by CCMAP has the following form, where x and y
 are the pixel coordinates of points in the input image and xi and eta are the
-corresponding standard coordinates in units of " / pixel.
+corresponding standard coordinates in units of arcsec / pixel.
 
 .nf
      xi = f (x, y)
@@ -672,7 +672,7 @@ The coefficients can be interpreted as follows. X0, y0, xi0, eta0
 are the origins in the reference and input frames respectively. By definition
 xi0 and eta0 are 0.0 and 0.0 respectively. Rotation and skew are the rotation
 of the x and y axes and their deviation from perpendicularity respectively.
-Xmag and ymag are the scaling factors in x and y in " / pixel and are assumed
+Xmag and ymag are the scaling factors in x and y in arcsec / pixel and are assumed
 to be positive by definition.
 
 .nf
@@ -787,7 +787,7 @@ cl> ccmap coords coords.db image=pix xcol=3 ycol=4 lngcol=1 latcol=2
     ... type y to see the eta fit residuals versus x
     ... type s to see the eta fit residuals versus y
     ... type g to return to the default plot
-    ... type l to see the computed x and y scales in " / pixel
+    ... type l to see the computed x and y scales in arcsec / pixel
     ... type q to quit and save fit
 .fi
 

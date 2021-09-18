@@ -104,6 +104,7 @@ Round axes to nice values?
 .le
 .ls (fill = yes) [boolean]
 Fill the viewport rather than enforcing unity aspect ratio?
+.le
 .ih
 EXAMPLES
 .ih

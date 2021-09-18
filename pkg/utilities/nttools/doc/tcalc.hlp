@@ -47,11 +47,11 @@ return a value of 1 if true or 0 if false. Logical operators are
 supported in both their Fortran and SPP form.
 
 .nf
-.or. ||		logical or	.and. 	&&	logical and
-.eq. ==		equality	.ne. 	!=	inequality
-.lt. <		less than	.gt. 	>	greater than
-.le. <=		less or equal	.ge. 	>=	greater or equal
-.not. !		not
+ .or. ||		logical or	.and. 	&&	logical and
+ .eq. ==		equality	.ne. 	!=	inequality
+ .lt. <		less than	.gt. 	>	greater than
+ .le. <=		less or equal	.ge. 	>=	greater or equal
+ .not. !		not
 .fi
 
 The following functions are supported. These functions all take a

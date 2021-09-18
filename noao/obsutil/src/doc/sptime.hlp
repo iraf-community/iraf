@@ -851,7 +851,7 @@ The types of tables and the units of the columns are listed below.
 .fi
 
 The disperser and crossdisperser files have an additional feature to allow
-for efficiency curves at different orders.  The parameter "effN" (or "xeffN
+for efficiency curves at different orders.  The parameter "effN" (or "xeffN"
 for crossdispersers), where N is the order, may be specified whose value is
 a separate table (or constant).  If there is no "eff1/xeff1" (efficiency in
 first order) then any efficiency table in the disperser table is used.  In
@@ -1022,7 +1022,7 @@ parameter giving the angle between the incident and diffracted rays at the
 detector center.
 
 The last magnification factor is given by the spectrograph parameters
-"apmagdisp" and apxmagdisp".  These define magnifications of the aperture
+"apmagdisp" and "apxmagdisp".  These define magnifications of the aperture
 along and across the dispersion apart from the other two magnifications.
 These parameters are often missing which means no additional
 magnifications.

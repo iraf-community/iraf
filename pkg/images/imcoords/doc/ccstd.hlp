@@ -202,7 +202,7 @@ the simple geometrical interpretation shown below.
 
 xref, yref, xi0, and eta0 are the origins of the reference and output
 coordinate systems respectively. xi0 and eta0 are both 0.0 by default.
-xmag and ymag are the x and y scales in " / pixel, and xrotation and yrotation
+xmag and ymag are the x and y scales in arcsec / pixel, and xrotation and yrotation
 are the x and y axes rotation angles measured counter-clockwise from original
 x and y axes.
 

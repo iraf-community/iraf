@@ -144,62 +144,55 @@ delimited unless they contain whitespace.
 .sp
 The \fBlroff\fR-format help text fragment
 .sp
-.ls
 .nf
-.help stcopy	2	"string utilities"
-.ih
-NAME
-stcopy -- copy a string.
-.ih
-PURPOSE
-Stcopy is used to copy an EOS delimited character
-string.  The EOS delimiter MUST be present.
-.ih
-USAGE
-stcopy (from, to, maxchar)
-.ih
-PARAMETERS
-.ls from
-The input string.
-.le
-.ls to
-The output string, of length no less than "maxchar"
-characters (excluding the EOS).
-.le
-.ls maxchar
-The maximum number of characters to be copied.
-Note that "maxchar" does not include the EOS.
-Thus, the destination string must contain storage
-for at least (maxchar + 1) characters.
-.le
-.ih
-DESCRIPTION
+ .help stcopy	2	"string utilities"
+ .ih
+ NAME
+ stcopy -- copy a string.
+ .ih
+ PURPOSE
+ Stcopy is used to copy an EOS delimited character
+ string.  The EOS delimiter MUST be present.
+ .ih
+ USAGE
+ stcopy (from, to, maxchar)
+ .ih
+ PARAMETERS
+ .ls from
+ The input string.
+ .le
+ .ls to
+ The output string, of length no less than "maxchar"
+ characters (excluding the EOS).
+ .le
+ .ls maxchar
+ The maximum number of characters to be copied.
+ Note that "maxchar" does not include the EOS.
+ Thus, the destination string must contain storage
+ for at least (maxchar + 1) characters.
+ .le
+ .ih
+ DESCRIPTION
+ ...
 .fi
-.sp 2
-.le
 would be converted by \fBlroff\fR (as called from Help) into something like
 the following.  Remember that the margins are runtime arguments to \fBlroff\fR.
 Help does not print a header line, or break pages.
 .sp 2
-.in 8
-NAME
-.in 5
+\fBNAME\fR
+.sp
 stcopy -- copy a string.
-.in -5
 .sp 2
-PURPOSE
-.in 5
+\fBPURPOSE\fR
+.sp
 Stcopy  is  used  to  copy  an  EOS delimited character
 string.  The EOS delimiter MUST be present.
-.in -5
 .sp 2
-USAGE
-.in 5
+\fBUSAGE\fR
+.sp
 stcopy (from, to, maxchar)
-.in -5
 .sp 2
-PARAMETERS
-.in 5
+\fBPARAMETERS\fR
 .ls from
 The input string.
 .le
@@ -213,9 +206,10 @@ Note that "maxchar" does not include the EOS.
 Thus, the destination string must contain storage
 for at least (maxchar + 1) characters.
 .le
-.in -5
-.sp 2
-DESCRIPTION
+.sp
+\fBDESCRIPTION\fR
+.sp
+ ...
 .sp
 .ih
 SEE ALSO

@@ -111,7 +111,7 @@ The coordinate system of the input coordinates read from \fIphotfile\fR and
 system is used to transform from the input coordinate system to the "logical"
 pixel coordinate system used internally, and from the internal "logical" pixel
 coordinate system to the output coordinate system. The input coordinate system
-options are "logical", tv", "physical", and "world". The output coordinate
+options are "logical", "tv", "physical", and "world". The output coordinate
 system options are "logical", "tv", and "physical". The image cursor coordinate
 system is assumed to be the "tv" system.
 .ls logical
@@ -384,7 +384,7 @@ The parameters of the analytic component of the psf model are stored
 in the psf image header parameters "FUNCTION", "PSFHEIGH", "NPARS",
 and "PARN". The magnitude, size, and centroid of the PSF are stored
 in the image header parameters "PSFMAG", "PSFRAD", 
-"XPSF", "and "YPSF". If \fImatchbyid\fR is "no" or there is no input psf star list "PSFMAG" is
+"XPSF", and "YPSF". If \fImatchbyid\fR is "no" or there is no input psf star list "PSFMAG" is
 set to the magnitude of the first PSF star in the input photometry file. If \fImatchbyid\fR
 is "yes", and there is an input psf star list "PSFMAG" is set to the magnitude of the first psf star
 in the psf star list. "XPSF" and "YPSF" are the center of the image.

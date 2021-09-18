@@ -52,7 +52,7 @@ order, set 'ascend = no'.
 Are sorts on character columns to be case sensitive?  If 'casesens = yes',
 upper case letters will precede lower case letters.  If 'casesens = no',
 case is ignored by the sort operation.
-.ls
+.le
 .ih
 EXAMPLES
 1. Sort a table of star positions by right ascension and declination:

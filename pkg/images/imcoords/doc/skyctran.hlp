@@ -167,7 +167,7 @@ y/dec/latitude coordinates. Lngcolumn and latcolumn are always 1 and
 .le
 .ls plngcolumn = INDEF, platcolumn = INDEF
 The columns in the input file containing the ra and dec proper motions
-in " / year. If plngcolumn and platcolumn are INDEF the proper motions
+in arcsec / year. If plngcolumn and platcolumn are INDEF the proper motions
 are assumed to be undefined. Proper motions
 are used only if the input coordinate system is equatorial fk4, noefk4,
 fk5, or icrs.  Plngcolumn and platcolumn are always 3 and 4 if the input is from
@@ -175,7 +175,7 @@ the unredirected standard input.
 .le
 .ls pxcolumn = INDEF, rvcolumn = INDEF
 The columns in the input file containing the parallax and radial velocity in
-in " and km / sec respectively. If pxcolumn and rvcolumn are INDEF, the 
+in arcsec and km / sec respectively. If pxcolumn and rvcolumn are INDEF, the 
 parallax and radial velocities are assumed to be 0.0 and 0.0.
 Parallaxes and radial velocities are only used if proper motions are
 defined. Pxcolumn and rvcolumn are always 5 and 6 if the input is from the
@@ -467,8 +467,8 @@ q	Exit task
 x/ra/long y/dec/lat [pmra pmdec [parallax radial velocity]]
 
 ... x/ra/long y/dec/lat must be in pixels or the input units
-... pmra and pmdec must be in " / year
-... parallax must be in "
+... pmra and pmdec must be in arcsec / year
+... parallax must be in arcsec
 ... radial velocity must be in km / sec
 
 	COLON COMMANDS

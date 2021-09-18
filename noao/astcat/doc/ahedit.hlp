@@ -72,7 +72,7 @@ Update the default values of the algorithm parameter sets, e.g. aregpars,
 .ls verbose = yes
 Print status messages on the terminal as the task proceeds ?
 .le
-.ls imdb = ")_.imdb)
+.ls imdb = "astcat$lib/imdb.dat"
 The image surveys configuration file. Imdb defaults to the value of the
 package parameter imdb. The default image surveys configuration file is
 "astcat$lib/imdb.dat".
@@ -148,7 +148,7 @@ cl> ahedit @imlist "" hupdate+ wcsedit+ wcs=dss hdredit-
 4. Add an approximate FITS WCS to an image for which the coordinates
 of the image center in hours and degrees are stored in the keywords
 RA and DEC, the epoch of the image center coordinates is stored in EQUINOX,
-the image scale is 0.261" per pixel and east is left and north is down.
+the image scale is 0.261 arcsec per pixel and east is left and north is down.
 
 .nf
 cl> ahedit image "" wcsedit+ wcs="none" wraref="RA" wdecref="DEC" \

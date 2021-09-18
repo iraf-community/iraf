@@ -133,7 +133,7 @@ The units of the field center coordinates. The options are "hours", "degrees",
 and "radians" for the ra / longitude coordinate and "degrees" and "radians"
 for the dec / latitude coordinates. If fclngunits and fclatunits are undefined
 they default to the preferred units for the given system, e.g. "hours" and
-degrees" for equatorial systems and "degrees" and "degrees" for ecliptic,
+"degrees" for equatorial systems and "degrees" and "degrees" for ecliptic,
 galactic, and supergalactic systems.
 .le
 .ls colaliases = ""
@@ -157,7 +157,7 @@ The units of the catalog coordinates. The options are "hours", "degrees",
 and "radians" for the ra / longitude coordinate and "degrees" and "radians"
 for the dec / latitude coordinates. If catlngunits and catlatunits are undefined
 they default to the preferred units for the catalog system, e.g. "hours" and
-degrees" for equatorial systems and "degrees" and "degrees" for ecliptic,
+"degrees" for equatorial systems and "degrees" and "degrees" for ecliptic,
 galactic, and supergalactic systems.
 .le
 .ls outsystem = ""
@@ -171,7 +171,7 @@ section.
 The units of the output coordinates. The options are "hours", "degrees",
 and "radians" for the ra / longitude coordinate and "degrees" and "radians"
 for the dec / latitude coordinates. If olngunits and olatunits are undefined
-they default to the preferred units for outsystem, e.g. "hours" and degrees" for
+they default to the preferred units for outsystem, e.g. "hours" and "degrees" for
 equatorial systems and "degrees" and "degrees" for ecliptic, galactic, and
 supergalactic systems.
 .le

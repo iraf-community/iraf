@@ -104,6 +104,7 @@ image cursor input is requested. A cursor file in the appropriate format may be
 substituted by specifying the name of the file. Also the image cursor may be
 changed to query the graphics device or the terminal by setting the environment
 variable "stdimcur" to "stdgraph" or "text" respectively.
+.le
 .ls gcommands = ""
 The graphics cursor. If null the standard graphics cursor is used whenever
 graphics cursor input is requested. A cursor file in the appropriate format may

@@ -814,7 +814,6 @@ set to those names.  However, rather than use \fBstarfocus\fR
 one would use the more convenient \fBkpnofocus\fR.
 .ih
 SEE ALSO
-.nf
 imexamine, implot, kpnofocus, pprofile, pradprof, psfmeasure, radlist,
 radplt, radprof, ranges, specfocus, splot
 .endhelp

@@ -81,7 +81,7 @@ of the output coordinates written to \fIoutput\fR respectively. The image
 header coordinate system is used to transform from the input coordinate
 system to the "logical" pixel coordinate system used internally,
 and from the internal "logical" pixel coordinate system to the output
-coordinate system. The input coordinate system options are "logical", tv",
+coordinate system. The input coordinate system options are "logical", "tv",
 "physical", and "world". The output coordinate system options are "logical",
 "tv", and "physical". The image cursor coordinate system is assumed to
 be the "tv" system.
@@ -128,7 +128,6 @@ The wcsin and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin and wcsout are "logical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
 package parameter (the default), "yes", or "no". By default cacheing is 
@@ -136,25 +135,25 @@ disabled.
 .le
 .ls verify = ")_.verify"
 Verify the critical parameters in non-interactive mode ? Verify may be set to
-the apphot package parameter value (the default), "yes", or "no.
+the apphot package parameter value (the default), "yes", or "no".
 .le
 .ls update = ")_.update"
 Update the critical parameters in non-interactive mode if verify is yes ?
 Update may be set to the apphot package parameter value (the default), "yes",
-or "no.
+or "no".
 .le
 .ls verbose = ")_.verbose"
 Print messages in non-interactive mode? Verbose may be set to the apphot
-package parameter value (the default), "yes", or "no.
+package parameter value (the default), "yes", or "no".
 .le
 .ls graphics = ")_.graphics"
 The default graphics device. Graphics may be set to the apphot package
 parameter value (the default), "yes",
-or "no.
+or "no".
 .le
 .ls display = ")_.display"
 The default display device. By default graphics overlay is disabled. Display
-may be set to the apphot package parameter value (the default), "yes", or "no. 
+may be set to the apphot package parameter value (the default), "yes", or "no". 
 Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables graphics
 overlay with the IMD graphics kernel.  Setting display to "stdgraph" enables
 POLYPHOT to work interactively from a contour plot.
