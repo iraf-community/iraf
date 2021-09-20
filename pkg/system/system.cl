@@ -36,7 +36,6 @@ task	cmdstr,
 	help		= "system$x_system.e"
 
 task	mkscript	= "system$mkscript.cl"; hidetask cmdstr
-task	$news		= "system$news.cl"
 task	$bench		= "system$bench.cl"
 
 task	allocate	= "hlib$allocate.cl"

@@ -20,7 +20,6 @@
        mkscript - Make a command script
       movefiles - Move files to a directory
       netstatus - Print the status of the local network
-	   news - Page through the system news file
            page - Page through a file
       pathnames - Expand a file template into a list of OS pathnames
 	  phelp - Paged HELP: collects and pages the output of HELP

@@ -25,7 +25,6 @@ match		hlp=doc$match.hlp,	 src=match.x
 mkdir		hlp=doc$mkdir.hlp,	 src=mkdir.x
 mkscript	hlp=doc$mkscript.hlp,	 src=mkscript.cl
 movefiles	hlp=doc$movefiles.hlp,	 src=movefiles.x
-news		hlp=doc$news.hlp,	 src=news.cl
 netstatus	hlp=doc$netstatus.hlp,	 src=netstatus.x
 page		hlp=doc$page.hlp,	 src=page.x
 pathnames	hlp=doc$pathnames.hlp,	 src=pathnames.x
