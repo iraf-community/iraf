@@ -39,7 +39,7 @@ task	$bench		= "system$bench.cl"
 task	$chkupdate	= "system$chkupdate.cl"
 
 task	allocate	= "hlib$allocate.cl"
-task	gripes		= "hlib$gripes.cl"
+task	$gripes		= "hlib$gripes.cl"
 task	deallocate	= "hlib$deallocate.cl"
 task	devstatus	= "hlib$devstatus.cl"
 task	$diskspace	= "hlib$diskspace.cl"
