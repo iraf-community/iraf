@@ -4,7 +4,6 @@
 	 memchk - Process a memdbg mem.log file for errors
       mkapropos - Make the apropos database (from STSDAS).
        mkhelpdb - Make (compile) a help database
-      mkmanpage - Make a manual page
 	  mkpkg - Make or update an object library or package
 	 mktags - Tag all procedure declarations in a set of files
       mkttydata - Build cache for termcap/graphcap device entries

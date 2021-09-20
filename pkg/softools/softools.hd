@@ -9,7 +9,6 @@ hdbexamine	hlp = help$hdbexamine.hlp
 lroff		hlp = lroff$lroff.hlp
 mkapropos	hlp = mkapropos.hlp, src=mkapropos$t_mkapropos.x
 mkhelpdb	hlp = help$mkhelpdb.hlp
-mkmanpage	hlp = mkmanpage.hlp
 mkpkg		hlp = host$boot/mkpkg/mkpkg.hlp
 mktags		hlp = mktags.hlp
 mkttydata	hlp = mkttydata.hlp
