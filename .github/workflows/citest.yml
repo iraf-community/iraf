@@ -18,8 +18,8 @@ jobs:
             os: ubuntu-20.04
             irafarch: linux64
 
-          - name: Ubuntu 16.04 Xenial i386
-            os: ubuntu-16.04
+          - name: Ubuntu 18.04 Bionic i386
+            os: ubuntu-18.04
             irafarch: linux
             carch: '-m32'
 
