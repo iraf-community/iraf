@@ -1,1 +1,12 @@
-DOC --	Miscellaneous documents pertaining to the IRAF system as a whole.
+This directory contains general documents pertaining to the IRAF
+system as a whole.
+
+	clman.rst	CL Programmer’s Manual (1983)
+	cluser.tex	A User's Introduction to the IRAF Command Language (1984)
+	spp.rst		SPP Reference Manual (1983)
+	std.rst		IRAF Standards and Conventions (1983)
+	std_gl.rst	Standard Nomenclature (1983)
+	unixsmg.rst	Site Manager's Guide (2011)
+	paspconf.sty,
+	iraf92f3.eps,
+	iraf92.tex	IRAF in the Nineties (paper) (1992)
