@@ -92,8 +92,7 @@ and so \fBridsfile\fR may not be able to convert some DUMPF format disk files.
 Task \fBridsfile\fR allows for converting only one IDSFILE per execution.
 If you wish to read more than one IDSFILE
 from a DUMPF tape, \fBridsfile\fR must be executed more than once.
-.ih
-BUGS
+.sp
 The Cyber format readers, including \fIridsfile\fR, have not been implemented
 on SUN/IRAF and AOS/IRAF.
 .ih

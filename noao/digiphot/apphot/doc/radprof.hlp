@@ -136,7 +136,6 @@ The wcsin and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin and wcsout are "logical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
 package parameter (the default), "yes", or "no". By default cacheing is 
@@ -158,11 +157,11 @@ to the apphot package parameter value (the default), "yes", or "no".
 .le
 .ls graphics = ")_.graphics"
 The default graphics device.  Graphics may be set to the apphot package
-parameter value (the default), "yes", or "no.
+parameter value (the default), "yes", or "no".
 .le
 .ls display = ")_.display"
 The default display device. Display may be set to the apphot package
-parameter value (the default), "yes", or "no. By default graphics overlay
+parameter value (the default), "yes", or "no". By default graphics overlay
 is disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy"
 enables graphics overlay with the IMD graphics kernel.  Setting display to
 "stdgraph" enables RADPROF to work interactively from a contour plot.

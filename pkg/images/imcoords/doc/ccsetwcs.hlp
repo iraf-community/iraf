@@ -267,7 +267,7 @@ interpretation shown below.
 
 xref, yref, xi0, and eta0 are the origins of the pixel and standard
 coordinate systems respectively. xmag and ymag are the x and y scale factors
-in " / pixel and xrotation and yrotation are the rotation angles measured
+in arcsec / pixel and xrotation and yrotation are the rotation angles measured
 counter-clockwise of the x and y axes.
 
 If the CCMAP database is undefined then CCSETWCS computes a linear plate

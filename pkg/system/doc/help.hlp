@@ -373,7 +373,7 @@ display, or a native HTML document.
 
 HTML files may contain URLs of the form
 .nf
-	\fB<a href=\fI[package.]task\fB>\fIurl_text\fB</a>
+	\fB<a href=\fI[package.]task\fB>\fIurl_text\fB</a>\fR
 .fi
 
 where \fIurl_text\fR is the text to appear in the window and the URL itself

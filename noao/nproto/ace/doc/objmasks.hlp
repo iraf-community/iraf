@@ -692,19 +692,3 @@ constant background of 400 and a sigma of 10.
       Write object mask: gfmask3[pl,append,type=mask]
 .fi
 
-.ih
-REVISIONS
-.le
-.ih
-SEE ALSO
-.endhelp
-266c266
-< fit to produce a function for <S>.
----
-> fit to produce a constant function for <S>.
-273c273,274
-< weights are used to fit a 2D plane for both <I> and <S>.
----
-> weights are used to fit a 2D plane for both <I> and <S>.  The <S> surface
-> is a constant in order to avoid potential negative sigma values.
-

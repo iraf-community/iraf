@@ -39,7 +39,7 @@ i.e. they cannot be expressions or contain embedded blanks.
 .ls fntypes = ""
 The list of new field types separated by commas. By default new fields are
 assigned type real. Permitted field types are "s" for string, "i" for
-integer, "r" for real, or "d" for double".
+integer, "r" for real, or "d" for double.
 .le
 .ls fnunits = ""
 The list of new field units separated by commas. By default new fields are
@@ -169,7 +169,7 @@ The names and format of any newly computed pixel coordinate fields may
 be specified by setting one or more of the \fIfixp\fR, \fIfiyp\fR,
 \fIfixc\fR, \fIfiyc\fR, \fIfoxformat\fR, or \fIfoyformat\fR parameters.
 By default the filtering code expects the pixel coordinates to be located
-in fields called "xp", "yp", 'xc", and "yc". If these fields do not have
+in fields called "xp", "yp", "xc", and "yc". If these fields do not have
 standard names then generic field names of the form "f#" can be substituted.
 .ih
 EXPRESSIONS

@@ -303,7 +303,7 @@ as in the following example, which prints the pathname of the
 interactively from the standard input by adding a question mark after the
 left parenthesis, i.e., "$(?terminal)" (this does not work with the -f stdin
 flag).  The contents of a file may be included using the notation
-"$(@\fIfile\fR)".   Note that case is ignored in macro names; by convention,
+"$(@file)".   Note that case is ignored in macro names; by convention,
 logical directories are normally given in lower case, and locally defined
 symbols in upper case.
 

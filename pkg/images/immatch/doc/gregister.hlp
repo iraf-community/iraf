@@ -40,7 +40,7 @@ and may not extend beyond the bounds of those parameters.
 .le
 .ls xscale = 1.0, yscale = 1.0
 The output x and y scales in units of reference x and y
-units per pixel, e.g "/ pixel or Angstroms / pixel if the reference
+units per pixel, e.g arcsec / pixel or Angstroms / pixel if the reference
 coordinates
 are arc-seconds or Angstroms. If the reference coordinates are in pixels
 then xscale and yscale should be 1.0 to preserve the scale of the reference

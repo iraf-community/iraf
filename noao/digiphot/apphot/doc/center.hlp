@@ -68,7 +68,7 @@ of the output coordinates written to \fIoutput\fR respectively. The image
 header coordinate system is used to transform from the input coordinate
 system to the "logical" pixel coordinate system used internally,
 and from the internal "logical" pixel coordinate system to the output
-coordinate system. The input coordinate system options are "logical", tv",
+coordinate system. The input coordinate system options are "logical", "tv",
 "physical", and "world". The output coordinate system options are "logical",
 "tv", and "physical". The image cursor coordinate system is assumed to
 be the "tv" system.
@@ -122,25 +122,25 @@ disabled.
 .le
 .ls verify = ")_.verify"
 Verify the critical parameters in non-interactive mode ? Verify may be set to
-the apphot package parameter value (the default), "yes", or "no.
+the apphot package parameter value (the default), "yes", or "no".
 .le
 .ls update = ")_.update"
 Update the critical parameters in non-interactive mode if \fIverify\fR is
 set to yes? Update may be set to the apphot package parameter value (the
-default), "yes", or "no.
+default), "yes", or "no".
 .le
 .ls verbose = ")_.verbose"
 Print messages on the terminal in non-interactive mode ? Verbose may be set
-to the apphot package parameter value (the default), "yes", or "no.
+to the apphot package parameter value (the default), "yes", or "no".
 .le
 .ls graphics = ")_.graphics"
 The default graphics device.
 Graphics may be set to the apphot package parameter value (the default), "yes",
-or "no.
+or "no".
 .le
 .ls display = ")_.display"
 The default display device.  Display may be set to the apphot package
-parameter value (the default), "yes", or "no. By default graphics overlay
+parameter value (the default), "yes", or "no". By default graphics overlay
 is disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy"
 enables graphics overlay with the IMD graphics kernel.  Setting display to
 "stdgraph" enables CENTER to work interactively from a contour plot.

@@ -47,7 +47,7 @@ and so on.  To determine the \fIpackage pathname\fR of each named task,
 get \fIhelp\fR on the named \fIkeyword\fR and the pathname will be seen at
 the top of the help screen, followed by additional information about the
 referenced object.  If there are multiple objects with the same name,
-a "help <keyword> \fIall+\fR" may be required to locate a particular one.
+a "help <keyword> all+" may be required to locate a particular one.
 .ih
 EXAMPLES
 1. Find all help on CCDs.
