@@ -163,26 +163,26 @@ everything to one case.  Omit the "-x" flag on a UNIX system.
 
 1. Compile and link the source file "mytask.x" to produce the executable
 "mytask.e".
-
+.nf
 	cl> xc mytask.x
-
+.fi
 2. Translate the file "file.x" into Fortran.
-
+.nf
 	cl> xc -f file.x
-
+.fi
 3. Compile but do not link "mytask.x" and the support file "util.x".
-
+.nf
 	cl> xc -c file.x util.x
-
+.fi
 4. Now link these for debugging.
-
+.nf
 	cl> xc -x file.o util.o
-
+.fi
 5. Link the same files without the VMS debug stuff, but link in the library
 -ldeboor (the DeBoor spline routines) as well.
-
+.nf
 	cl> xc file.o util.o -ldeboor
-
+.fi
 XC is often combined with \fImkpkg\fR to automatically maintain large packages
 or libraries.
 .ih

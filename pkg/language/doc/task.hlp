@@ -112,9 +112,9 @@ the new program.  Declare it using the task statement and then run it.
 2. Define a script task with associated parameter file (if the script is
 a \fIprocedure\fR, the parameter file is omitted since procedure scripts
 always have defined parameters).
-
+.nf
 	cl> task myscript = myscript.cl
-
+.fi
 3. Define the four new tasks implot, graph, showcap, and gkiextract.
 All have parameter files except showcap.  The gkiextract task has a
 binary output stream.  All tasks are executable and are stored in the
@@ -133,9 +133,9 @@ be found in a package script task.
 foreign tasks.  None of the tasks has a parameter file.  The "$foreign"
 declares the tasks as foreign, and indicates that the IRAF task name
 is the same as the host system task name.
-
+.nf
 	cl> task $ls $od $rlogin = $foreign
-
+.fi
 5. Define a couple of foreign tasks for VMS, where the command to be sent
 to VMS is not the same as the IRAF task name.
 

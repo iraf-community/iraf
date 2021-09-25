@@ -294,9 +294,9 @@ Image Transpose [IMTRAN]
 
     To run this benchmark, transpose the image PIX.S, placing the output in a
 new image.
-
+.nf
 	cl> $imtran pix.s pix2.s
-
+.fi
 This benchmark tests the ability of a process to grab a large amount of
 physical memory (large working set), and the speed with which the host system
 can service random rather than sequential file access requests.
@@ -350,9 +350,9 @@ This will connect and disconnect the x_images.e subprocess 10 times.
 Difference the starting and final times printed as the task output to get
 the results of the benchmark.  The cpu time measurement may be meaningless
 (very small) on some systems.
-
+.nf
 	cl> subproc 10
-
+.fi
 This benchmark measures the time required to connect and disconnect an
 IRAF subprocess.  This includes not only the host time required to spawn
 and later shutdown a process, but also the time required by the IRAF VOS
@@ -367,9 +367,9 @@ IPC Overhead [IPCO]
 
     The \fBgetpar\fR task is a compiled task in x_bench.e.  The task will
 fetch the value of a CL parameter 100 times.
-
+.nf
 	cl> $getpar 100
-
+.fi
 Since each parameter access consists of a request sent to the CL by the
 subprocess, followed by a response from the CL process, with a negligible
 amount of data being transferred in each call, this tests the IPC overhead.
@@ -379,9 +379,9 @@ IPC Bandwidth [IPCB]
 
     To run this benchmark enter the following command.  The \fBwipc\fR task
 is a compiled task in x_bench.e.
-
+.nf
 	cl> $wipc 1E6 > dev$null
-
+.fi
 This writes approximately 1 Mb of binary data via IPC to the CL, which discards
 the data (writes it to the null file via FIO).  Since no actual disk file i/o is
 involved, this tests the efficiency of the IRAF pseudofile i/o system and of the
@@ -392,9 +392,9 @@ Foreign Task Execution [FORTSK]
 
     To run this benchmark enter the following command.  The \fBfortask\fR
 task is a CL script task in the \fBbench\fR package.
-
+.nf
 	cl> fortask 10
-
+.fi
 This benchmark executes the standard IRAF foreign task \fBrmbin\fR (one of the
 bootstrap utilities) 10 times.  The task is called with no arguments and does
 nothing other than execute, print out its "usage" message, and shut down.
@@ -489,9 +489,9 @@ repeatedly to plot the same line of an image.  The graphics output is
 discarded (directed to the null file) rather than plotted since otherwise
 the results of the benchmark would be dominated by the plotting speed of the
 graphics terminal.
-
+.nf
 	cl> plots pix.s 10
-
+.fi
 This is a complex benchmark.  The benchmark measures the overhead of task
 (not process) execution and the overhead of the IMIO and GIO subsystems,
 as well as the speed with which IPC can be used to pass parameters to a task
@@ -515,9 +515,9 @@ enter the following command, and then repeat the PLOTS benchmark discussed
 in the last section.  Be sure to use a different login or login directory
 for each "user", to avoid concurrency problems, e.g., when reading the
 input image or updating parameter files.
-
+.nf
 	cl> plots pix.s 9999
-
+.fi
 Theoretically, the timings should be approximately .5 (2USER) and .25 (4USER)
 as fast as when the PLOTS benchmark was run on a single user system, assuming
 that cpu time is the limiting resource and that a single job is cpu bound.

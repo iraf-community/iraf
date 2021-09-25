@@ -162,7 +162,9 @@ The aperture finding algorithm may be selected from nearly every task
 in the package.
 .ih
 EXAMPLES
+.nf
 	cl> apfind image nfind=10
+.fi
 .ih
 .ih
 REVISIONS

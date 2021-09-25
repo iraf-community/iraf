@@ -147,8 +147,9 @@ are updated in the parameter file.
 .ih
 EXAMPLES
 1. To create a response image non-interactively:
-
+.nf
 	cl> response quartz quartz response order=20 interactive=no
+.fi
 
 2. To determine independent responses for a multislit image determine the
 image sections defining each slit.  Then the responses are computed as

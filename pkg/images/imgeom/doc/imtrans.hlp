@@ -35,31 +35,32 @@ in the input image section specification.
 .ih
 EXAMPLES
 1. To transpose an image:
-
+.nf
 	cl> imtranspose image1 image2
-
+.fi
 2. To transpose an image in place:
-
+.nf
 	cl> imtranspose image1 image1
-
+.fi
 3. To rotate an image 90 degrees counter-clockwise and clockwise:
-
+.nf
 	cl> imtranspose image1[*,-*] image2
 
 	cl> imtranspose image1[-*,*] image2
-
+.fi
 3. To transpose a set of 3 images listed 1 per line in the file imlist to
 the new images trans001, trans002, and trans003:
-
+.nf
 	cl> imtranspose @imlist trans001,trans002,trans003
-
+.fi
 4. To transpose a set of images in place:
-
+.nf
 	cl> imtranspose frame* frame*
-
+.fi
 5. To rotate an image 90 degrees counter-clockwise in place:
-
+.nf
 	cl> imtranspose image[*,-*] image
+.fi
 .ih
 BUGS
 

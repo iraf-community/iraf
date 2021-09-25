@@ -91,8 +91,9 @@ the parameter editor, with explicit assignments, or on the command line:
 .fi
 
 In practice the output would be directed to a file:
-
+.nf
     >>> asttimes (day=i, header=no, >>"table")
+.fi
 
 3. To use an input file:
 

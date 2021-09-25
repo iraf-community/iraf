@@ -136,12 +136,13 @@ found to be the best way to fit highly blended spectra.
 EXAMPLES
 The default action is to fit Gaussian profiles to the spectra and trace
 the fit from the starting line.  An example of this is:
-
+.nf
 	cl> fitgauss5 image 1
-
+.fi
 To fit heavily blended spectra with the four parameter model (i0, x0, s0, s1):
-
+.nf
 	cl> fitgauss5 image 1 algorithm=2
+.fi
 .ih
 SEE ALSO
 findspectra

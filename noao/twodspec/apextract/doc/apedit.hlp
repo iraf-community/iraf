@@ -331,8 +331,9 @@ for which it is impossible illustrate all likely uses.  The following
 give some simple examples.
 
 1.  To define and edit apertures for image "n1.001":
-
+.nf
 	cl> apedit n1.001
+.fi
 
 2.  To define apertures for one image and then apply them to several other
 images:

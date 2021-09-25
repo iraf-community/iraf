@@ -125,9 +125,8 @@ EXAMPLES
 1.  The x,y pairs in file test.data are interactively fit with a fourth 
 order legendre polynomial.  The printed output is shown.
 
-	cl> curfit test.data 
-
 .nf
+	cl> curfit test.data 
 	NOAO/IRAF V2.0 Hammond@lyra Fri 11:45:41 13-Dec-85
 	file = test.data
 	function = legendre
@@ -150,18 +149,18 @@ order legendre polynomial.  The printed output is shown.
 
 .fi
 2.  Fit a cubic spline to the last 12 columns of image "m74".
-
+.nf
    cl> curfit m74[501:512,1:512] axis=2 func=spline3 order=5
-
+.fi
 3. Use \fIcurfit\fR as a filter to overplot a smoothed curve to an existing
 plot of the data points.  The command line for \fBgraph\fR is shown as
 well as the \fBcurfit\fR command.  Note the interactive flag for 
 \fBcurfit\fR is turned off.
-
+.nf
    cl> graph points.list point+ mark=box wx1=.13 xlab="X VALUES"\
    >>> ylab="Y VALUES" title="Legendre fit to points.list"
-
    cl> type points.list | curfit list+ inter- | graph append+
+.fi
 .ih
 SEE ALSO
 icfit,  polyfit

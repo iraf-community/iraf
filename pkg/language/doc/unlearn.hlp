@@ -23,13 +23,13 @@ If a package name is specified all the tasks in the package are unlearned.
 .ih
 EXAMPLES
 1. Unlearn the parameters for the delete and plot.graph tasks.
-
+.nf
 	cl> unlearn delete plot.graph
-
+.fi
 2. Unlearn the parameters for all tasks in the \fIdataio\fR package.
-
+.nf
 	cl> unlearn dataio
-
+.fi
 3. To unlearn the parameters for all tasks in the system, log out of the
 CL and run \fImkiraf\fR, or enter the following:
 

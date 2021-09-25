@@ -93,13 +93,13 @@ commands following the \fIclbye\fR will not be executed.
 .ih
 EXAMPLES
 1. Execute CL commands from a file.
-
+.nf
 	cl> cl < cmdfile
-
+.fi
 2. Execute CL commands from a pipe.
-
+.nf
 	cl> print ("!type ", fname) | cl
-
+.fi
 3. Execute \fIcl\fR, taking command input from the terminal.  Since command
 input is already from the terminal, the only effect is to mark the state
 of CL memory, to allow \fItask\fR, \fIset\fR, and other definitions to be

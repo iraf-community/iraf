@@ -30,13 +30,13 @@ thing happens when a program like \fIimplot\fR or \fIsplot\fR reads the cursor.
 .fi
 
 More complex accesses are occasionally useful, e.g.:
-
+.nf
 	cl> print (gcur, > "curpos")
-
+.fi
 writes the cursor value into a file, and
-
+.nf
 	cl> = fscan (gcur, x, y)
-
+.fi
 leaves the X and Y coordinates of the cursor in parameters X and Y.
 
 A cursor read returns a string value, as can be seen in the above example.
@@ -82,9 +82,9 @@ Invoking Cursor Mode
     Many IRAF tasks produce a plot of some sort and then bring up a graphics
 cursor (e.g. a crosshair) and automatically leave the terminal in cursor mode.
 Alternatively, the user can invoke cursor mode from the CL by typing:
-
+.nf
 	cl> = gcur
-
+.fi
 If the CL environment variable \fBcminit\fR is defined when
 cursor mode is first entered, the string value will be interpreted as
 a cursor mode command and used for initialization.  For example, to
@@ -514,9 +514,9 @@ values in a text file, e.g., with the \fIrgcursor\fR or \fIrimcursor\fR tasks
 in the \fIlists\fR package.  We then run the task assigning the name of the
 cursor list file to the parameter "coords".  For example, to run the
 \fIapphot\fR task in batch, with the cursor list in the file "starlist":
-
+.nf
 	cl> apphot arg1 arg2 ... argN coords=starlist &
-
+.fi
 The program will then read successive cursor values from the starlist file,
 not knowing that the cursor values are coming from a text file rather than
 from actual cursor reads.
@@ -527,9 +527,9 @@ have graphics, or when debugging software.  To work this way one must
 first set the value of the environment variable \fIstdgcur\fR (for the
 graphics cursor) or \fIstdimcur\fR (for the image cursor).  Set the value
 to "text" to direct cursor reads to the terminal, e.g.:
-
+.nf
 	cl> set stdgcur = text
-
+.fi
 The cursor value will then be a line of text read from the user terminal.
 In this mode the user enters at least two of the fields defining a cursor
 value.  Missing fields are assigned the value zero (the user presumably

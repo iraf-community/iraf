@@ -46,9 +46,9 @@ EXAMPLES
 all files with the extension ".com".  Note that filename sorting occurs only
 within a comma delimited field of the filename template, hence the "*.[xh]"
 files are printed in sort order, followed by the ".com" files.
-
+.nf
 	cl> lprint *.[xh],*.com
-
+.fi
 2. Print the output of the \fIimstat\fR task on the versatec printer,
 paginating the output with the given label on each page.  Note that the
 command may be broken after the "pipe" character without need for

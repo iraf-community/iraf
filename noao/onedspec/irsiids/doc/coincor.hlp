@@ -80,8 +80,9 @@ correction, and 2 for the photomuliplier mode correction.
 .ih
 EXAMPLES
 The following example corrects a series of IIDS spectra:
-
+.nf
 	cl> coincor nite1 1-250 output=nite1cc start_rec=1
+.fi
 
 The following example corrects a series of spectra from the
 Lick ITS:

@@ -156,16 +156,17 @@ and the number of pixels replaced by the cleaning process.
 .ih
 EXAMPLES
 To extract all the integrated spectra from all the image lines:
-
+.nf
 	cl> msextract image image.ms
-
+.fi
 To extract model strip spectra:
-
+.nf
 	cl> msextract image image.ms ex_model=yes int=no
-
+.fi
 To extract integrated spectra without any modeling:
-
+.nf
 	cl> msextract image image.ms clean=no
+.fi
 .ih
 SEE ALSO
 newimage

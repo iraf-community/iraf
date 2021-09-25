@@ -19,8 +19,9 @@ is loaded to show you the CCD frames being processed.
 .ih
 EXAMPLES
 1. To run a demonstration of the \fBccdred\fR package:
-
+.nf
 	cl> demo
+.fi
 .ih
 SEE ALSO
 stty

@@ -28,26 +28,26 @@ directory without typing its name.
 .ih
 EXAMPLES
 1. Return to our home directory.
-
+.nf
 	cl> cd
-
+.fi
 2. Go to the package logical directory "pkg$".
-
+.nf
 	cl> chdir pkg
-
+.fi
 3. Go down one level to the directory "dataio", a subdirectory of "pkg".
-
+.nf
 	cl> cd dataio
-
+.fi
 4. From "dataio", go back up to "pkg" and down into "images".
-
+.nf
 	cl> cd ../images
-
+.fi
 5. Go to the "tv" directory, a subdirectory of "images", regardless of the
 current directory
-
+.nf
 	cl> cd pkg$images/tv
-
+.fi
 6. On a VMS system, define a new logical directory on a different disk device
 and go there.  Note that the character $ is not permitted in host file or
 directory names.

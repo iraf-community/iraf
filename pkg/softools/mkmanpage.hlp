@@ -32,9 +32,9 @@ command line.  The editor is called up to edit the file and the task exits.
 .ih
 EXAMPLES
 1. Make a new manual page for task "page".
-
+.nf
 	cl> mkmanpage page
-
+.fi
 The task creates a file "page.hlp" in the current directory, and calls
 up the editor to edit the new file.
 .ih

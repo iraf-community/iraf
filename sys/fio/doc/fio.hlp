@@ -607,7 +607,6 @@ Write behind will occur, but reading will not be asynchrounous.
 
 
 
-.fi
 In certain circumstances, such as when IMIO overwrites a line of an
 image, where each line is known to be aligned on a block boundary,
 the "fill buffer" operation can be omitted (since it is guaranteed

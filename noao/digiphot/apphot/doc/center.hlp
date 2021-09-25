@@ -554,6 +554,7 @@ the background.
 	ap> pdump ypix.ctr.6 xc,yc yes | tvmark 1 STDIN col=204
 
 	... mark the stars on the display
+.fi
 
 
 7. Run CENTER interactively without using the image display.

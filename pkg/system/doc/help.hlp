@@ -163,14 +163,16 @@ might appear as follows:
 .fi
 
 To get help on a module one supplies the module name as an argument,
-
+.nf
 	pl> help graph
+.fi
 
 and the manual page for the \fBplot.graph\fR program will be printed on the
 terminal.  To get a hardcopy of the manual page on the printer, the output
 may be redirected to the line printer, as follows:
-
+.nf
 	pl> help graph | lprint
+.fi
 .ih
 DESCRIPTION
 The function of the \fBhelp\fR program is to perform a depth first search

@@ -26,13 +26,13 @@ the offset is measured from the beginning of the file rather than the end.
 EXAMPLES
 
 1. Prints the last 12 lines of each help file in the current directory.
-
+.nf
 	cl> tail *.hlp
-
+.fi
 2. Print the last line of each help file.
-
+.nf
 	cl> tail *.hlp nl=1
-
+.fi
 3. Prints the third through fifth lines of "file".  The same thing
 might be done (at least conceptually) by "head file,nlines=5"
 piped into "tail ,nlines=3".  However, \fItail\fR does not work on STDIN.

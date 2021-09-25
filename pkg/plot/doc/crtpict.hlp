@@ -135,23 +135,23 @@ EXAMPLES
 1.  To subsample every 4th pixel of a large image, fill the output area and use
 previously determined values of z1 and z2 for the greyscale transformation
 the command would be:
-
+.nf
     cl> crtpict sunpic[*:4,*:4] ztrans=min z1=0 z2=800
-
+.fi
 2.  To process every image with the root name ccdpic, using default values of
 all parameters, the command would be:
-
+.nf
     cl> crtpict ccdpic*
-
+.fi
 3.  To process images created with \fBsnap\fR, ztrans and z2 must be changed
 from their default values:
-
+.nf
     cl> crtpict iis.snap ztrans=min z2=1023
-
+.fi
 4.  Image `mypic' is processed using the look up table in file `mylut',
-
+.nf
     cl> crtpict mypic ztrans=user lutfile=mylut
-
+.fi
 Where file `mylut' contains this information:
 .nf
 		10	40

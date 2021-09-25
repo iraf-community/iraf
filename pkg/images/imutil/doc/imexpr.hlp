@@ -144,17 +144,17 @@ would evaluate the expression shown, storing the result in the output image
 
 Operands may also be specified directly in the expression, with the
 exception of image operands.  For example,
-
+.nf
 	cl> imexpr "a - a / a.itime"
-
+.fi
 is equivalent to the earlier example.
 
 If the input operand is not a simple identifier (a simple name like "itime"
 containing only alphanumeric characters, underscore, ".", or "$") then it
 is necessary to quote the operand name and precede it with an "@", e.g.,
-
+.nf
 	cl> imexpr 'a - a / @"a.i-time"'
-
+.fi
 Finally, there is a special builtin type of operand used to represent the
 image pixel coordinates in an image expression.  These operands have the
 special reserved names "I", "J", "K", etc., up to the dimensions of the
@@ -379,48 +379,48 @@ There are many ways to create masks, but in some cases \fIimexpr\fR itself
 can be used for this purpose.  For example, to create a boolean mask with
 \fIimexpr\fR merely evaluate a boolean expression and specify a ".pl" file
 as the output image.  For example,
-
+.nf
     cl> imexpr "a > 800" mask.pl
-
+.fi
 will create a boolean mask "mask.pl" which identifies all the pixels in an
 image with a value greater than 800.
 
 An example of the use of masks is the problem of combining portions of two
 images to form a new image.
-
+.nf
     cl> imexpr "c ? a : b"  c=mask.pl
-
+.fi
 This example will select pixels from either image A or B to form the output
 image, using the mask assigned to operand C to control the selection.
 .ih
 EXAMPLES
 1. Copy an image, changing the datatype to real (there are better ways to
 do this of course).
-
+.nf
     cl> imexpr a pix2 a=pix outtype=real
-
+.fi
 2. Create a new, empty image with all the pixels set to 0.
-
+.nf
     cl> imexpr "repl(0,512)" pix dim=512,512
-
+.fi
 3. Create a 1D image containing the sinc function.
-
+.nf
     cl> imexpr "I == 10 ? 1.0 : sin(I-10.0)/(I-10)" sinc dim=20
-
+.fi
 4. Create a new image containing a simple test pattern consisting of a 5
 element vector repeated 100 times across each image line.
-
+.nf
     cl> imexpr "repl((9 // 3 // 3 // 11 // 11), 100)" patt dim=500,500
-
+.fi
 5. Subtract the median value from each line of an image.
-
+.nf
     cl> imexpr "a - median(a)" medimage
-
+.fi
 6. Compute the HIV (low value) projection of an image.  The result is a
 transposed 1D image.
-
+.nf
     cl> imexpr "hiv(a)" hvector
-
+.fi
 7. Swap the left and right halves of an image.
 
 .nf

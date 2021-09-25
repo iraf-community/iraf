@@ -839,9 +839,9 @@ parameter.
 
 For example, if task \fBplotit\fR  has cursor and device parameters named
 "cursor" and "device", the command
-
+.nf
 	cl> plotit cursor=listfile device=qms
-
+.fi
 would run the task taking cursor input from the text file "listfile", with
 stdgraph graphics output directed to the plotter device "qms".
 

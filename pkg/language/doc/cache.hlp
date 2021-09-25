@@ -23,8 +23,9 @@ currently "cached" tasks is printed.
 .ih
 EXAMPLES
 1. Cache the parameters for the tasks \fIdirectory\fR and \fIpage\fR.
-
+.nf
 	cl> cache dir page
+.fi
 
 2. Cache the parameters for the tasks called in a loop within the body of
 a procedure script.  Note the use of command mode in the script.

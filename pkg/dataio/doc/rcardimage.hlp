@@ -82,28 +82,27 @@ EXAMPLES
 1. Convert a set of ASCII cardimage files on magnetic tape to IRAF text files,
 replacing blanks with tabs and blanks, and trimming whitespace from
 the ends of lines.
-
+.nf
 	cl> rcardimage mtb1600 1-999 textfiles
-
+.fi
 2. Convert a set of ASCII cardimage files on disk to IRAF test files.
-
+.nf
 	cl> rcard card* 1 textfiles
-
+.fi
 3. Convert a set of EBCDIC cardimage files on magnetic tape to IRAF text files,
 trimming whitespace from the ends of lines but leaving embedded blanks
 unchanged.
-
+.nf
 	cl> rcardimage mtb1600 1-999 textfile en- ebc+
-
+.fi
 4. Convert  an odd-blocked (81 bytes per card) rcardimage file on tape to an
 IRAF text file by using reblock to write the file to disk and pad the cards
 with blanks, followed by rcardimage to convert the file to an IRAF textfile.
-
+.nf
 	cl> reblock mta[1] cardimage inrecord=81 outrecord=82 \
 	    padchar=" "
-
 	cl> rcardimage cardimage 1 textfile card_length=82
-
+.fi
 .ih
 BUGS
 Due to portability considerations The card length in bytes must fill an

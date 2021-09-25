@@ -127,17 +127,18 @@ appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
 1. Plot columns 64 through 128 of image crab.5009 with default parameters:
-
+.nf
     cl> pcols crab.5009 64 128
-
+.fi
 2. Overplot columns 64 through  128 of crab.red using boxes to mark the 
 added points:
-
+.nf
     cl> pcols crab.red 64 128 append+ pointmode+
-
+.fi
 3. Annotate the axes of the plot:
-
+.nf
     cl> pcols crab.5009 64 84 xlabel="Row Number" ylabel=Intensity
+.fi
 .ih
 TIME REQUIREMENTS
 \fBpcols\fR takes about 3.25 cp seconds to plot the average of 20 columns

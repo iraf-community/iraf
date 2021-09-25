@@ -2829,16 +2829,20 @@ on the uvby photometric system.
 The user also has a STARFILE data tape containing not only coordinates
 of all objects but also magnitudes of standard stars.
 The following commands may be used to interactively reduce the data:
-
+.nf
 fi> allocate,'mta'
+.fi
 
 This command allocates tape drive 'mta'.
 Program ALLOCATE is in the DATAIO package.
+.nf
 fi> sf_init,'uvby.stars'
+.fi
 
 This command initializes the default caches of a SF named 'uvby.stars'.
-
+.nf
 fi> ??? | sf_read,'uvby.stars',0
+.fi
 
 The ??? represents a currently undefined program in the DATAIO package
 that physically reads a magnetic tape on a specified tape drive
@@ -2848,8 +2852,9 @@ It is used to read the STARFILE tape.
 The output of ??? is piped into program SF_READ
 which decodes the STARFILE information and stores it
 cache 0 of a SF named 'uvby.stars'.
-
+.nf
 fi> ??? | ph_read,>uvby.raw
+.fi
 
 Again, ??? represents a currently undefined program in the DATAIO package.
 It is used to read the PHOTOM tape.
@@ -2860,27 +2865,31 @@ NOTE: For informational use only,
 the first two card-images (i.e header)
 of the tape (actually the file)
 are presented to the user via the standard error file.
-
+.nf
 fi> average,40.0,<uvby.raw,>uvby.rate
+.fi
 
 This command averages raw data into individual measurements.
 A dead time of 40 nanoseconds is used in the calculations.
 The output is written to an ARDF named 'uvby.rate'.
-
+.nf
 fi> uvby,'uvby.parms',4,3,2,1
+.fi
 
 This command initializes a CF named 'uvby.parms' for uvby photometry.
 Filters u, v, b, and y are in positions 4, 3, 2, and 1, respectively.
-
+.nf
 fi> rate_to_inst,'uvby.parms',no,<uvby.rate,>uvby.inst
+.fi
 
 This command converts count rates into all-sky instrumental magnitudes,
 using the reduction defined in a CF named 'uvby.parms'.
 The output is written to a IMF named 'uvby.inst'.
 The argument "no" is associated with parameter calc_diff
 and is used to indicate that no differential magnitudes are desired.
-
+.nf
 fi> calc_1_ext,'uvby.parms','dummy','weight',no
+.fi
 
 This command is used to calculate first-order extinction coefficients
 using the weighted-average method.
@@ -2893,20 +2902,23 @@ Indeed, there are no second-order extinction coefficients for uvby photometry.
 Note that a fictitious file named 'dummy' is specified as a SF.
 This argument can be used IN THIS CASE because the weighted-average method
 of calculation does not require a SF.
-
+.nf
 fi> cf_list,'uvby.parms'
+.fi
 
 This command displays the current coefficients and other parameters
 stored in the CF named 'uvby.parms'.
 For this example, assume that the user is satisfied with the calculated values.
-
+.nf
 fi> inst_to_nat,'uvby.parms',<uvby.inst,>uvby.nat
+.fi
 
 This command converts instrumental into natural system magnitudes,
 using the coefficients in a CF named 'uvby.parms'.
 The output is written to a NMF named 'uvby.nat'.
-
+.nf
 fi> calc_trans,'uvby.parms','uvby.stars',yes,yes,no
+.fi
 
 This command calculates transformation coefficients.
 The calculated values are written to a CF named 'uvby.parms'.
@@ -2916,14 +2928,16 @@ Arguments "yes", "yes", and "no" refer to parameters
 calc_slope, calc_zero, and set_break_point.
 These arguments indicate that a single solution for all transformation
 coefficients is requested.
-
+.nf
 fi> cf_list,'uvby.parms'
+.fi
 
 This command displays the current coefficients and other parameters
 stored in a CF named 'uvby.parms'.
 For this example, assume that the user is satisfied with the calculated values.
-
+.nf
 fi> nat_to_std,'uvby.parms',<uvby.nat,>uvby.std
+.fi
 
 This command converts natural into standard system magnitudes,
 using the coefficients in a CF named 'uvby.parms'.
@@ -2939,8 +2953,9 @@ The arguments "yes" and "yes" refer to parameters list_obs
 and list_avg, respectively.
 They indicate that a listing of each observation as well as listing
 of the mean value is desired.
-
+.nf
 fi> deallocate,'mta'
+.fi
 
 This command deallocates tape drive 'mta'.
 
@@ -2960,8 +2975,9 @@ a SF named 'UBV.stars' and a CF named 'UBV.parms' are available.
 The latter contains mean coefficients that are adequate
 for differential photometry.
 The following commands may be used to reduce the data:
-
+.nf
 fi> allocate,'mta'
+.fi
 
 This command allocates tape drive 'mta'.
 
@@ -3025,8 +3041,9 @@ Program NAT_TO_STD converts natural into standard system magnitudes.
 The output is written to a file named 'UBV.831001'.
 .le
 .le
-
+.nf
 fi> deallocate,'mta'
+.fi
 
 This command deallocates tape drive 'mta'.
 

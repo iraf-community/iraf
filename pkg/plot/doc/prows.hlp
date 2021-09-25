@@ -128,17 +128,18 @@ appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
 1. Plot rows 128 through 150 of image crab.5009 with default parameters:
-
+.nf
     cl> prows crab.5009 128 150
-
+.fi
 2. Overplot rows 128 through 150 of crab.red using circles to mark the 
 added points:
-
+.nf
     cl> prows crab.red 128 150 append+ pointmode+ marker=circle
-
+.fi
 3. Annotate the axes of the plot:
-
+.nf
     cl> prows crab.5009 64 128 xlabel="Column Number" ylabel=Intensity
+.fi
 .ih
 TIME REQUIREMENTS
 To plot the average of 20 rows from a 512 square image, \fIprows\fR takes

@@ -84,8 +84,9 @@ process is used.
 EXAMPLES
 1. The example below makes an iillumination correction image from the
 flat field image, "flat017".
-
+.nf
     cl> mkillumcor flat017 Illum
+.fi
 .ih
 SEE ALSO
 ccdproc, flatfields, mkillumflat, mkskycor, mkskyflat

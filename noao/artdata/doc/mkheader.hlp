@@ -67,8 +67,9 @@ EXAMPLES
 .fi
 
 2. Copy an image header.
-
+.nf
     ar> mkheader new dev$pix append-
+.fi
 
 3. Edit the image header with a text editor and replace the old header
 with the edited header.

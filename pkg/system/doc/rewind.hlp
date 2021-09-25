@@ -28,8 +28,9 @@ on the tape and to ensure that the tape is left in a defined position.
 EXAMPLES
 
 1. Rewind logical tape drive a.
-
+.nf
 	cl> rewind mta
+.fi
 .ih
 SEE ALSO
 allocate, deallocate, devstatus

@@ -45,7 +45,6 @@ gctod(2), ctotok(2).
 
 
 .help states 2 "States of the LEXNUM Finite State Automaton"
-.fi
 
 
 .ks

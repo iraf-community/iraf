@@ -25,8 +25,9 @@ is automatically disposed of to the device.
 .ih
 EXAMPLES
 1. Flush any graphics output and initialize the graphics system.
-
+.nf
 	cl> gflush
+.fi
 .ih
 SEE ALSO
 cursor, stdplot

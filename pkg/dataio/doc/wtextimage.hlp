@@ -88,8 +88,9 @@ END
                                                                                 
 2. Write a series of text files from the IRAF images having root name
 "reduced".  One text file is written for each image. 
-
+.nf
     cl> wtext reduced.* txt 
+.fi
 .ih
 TIME REQUIREMENTS
 It takes almost 10 cpu minutes to convert a 512 square image of real pixels.

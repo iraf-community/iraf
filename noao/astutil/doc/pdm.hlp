@@ -347,15 +347,15 @@ EXAMPLES
 1. To find the main period in the data contained in the file 'vstar645',
 whose period is within the bounds (200., 800.) interactively
 the command might be:
-
+.nf
 	cl> pdm vstar645 minp=200. maxp=800.
-
+.fi
 2. To do the same thing in batch mode, allowing the program to guess the 
 period window, with no lightcurve analysis, and saving the metacode
 in vstar645.m, the command might be:
-
+.nf
 	cl> pdm vstar645 inter=no meta="vstar645.m"
-
+.fi
 .ih
 BUGS
 Pdm has some problems with data sets containing a small number (<20)

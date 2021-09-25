@@ -112,8 +112,9 @@ features, such as thresholding, offseting, masking, and projecting, use
 EXAMPLES
 1. The image data contains four dark count images.  To automatically select
 them and combine them as a background job using the default combining algorithm:
-
+.nf
     cl> darkcombine ccd*.imh&
+.fi
 .ih
 SEE ALSO
 ccdproc, combine

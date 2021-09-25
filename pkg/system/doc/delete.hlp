@@ -42,15 +42,15 @@ EXAMPLES
 
 1. Delete all files with extension ".x", verifying each file deletion before
 it is performed.
-
+.nf
 	cl> delete *.x ver+
-
+.fi
 2. List all files in the current directory, deleting only those files for
 which the user responds to the verify prompt with "yes" or "y".  Note that
 "delete *" is a very dangerous operation.
-
+.nf
 	cl> delete * ver+ def=no
-
+.fi
 .ih
 SEE ALSO
 protect, unprotect, imdelete

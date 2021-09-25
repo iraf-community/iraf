@@ -174,7 +174,6 @@ CALENDARS
  epj2d --  d = slej2d (epj)
        Julian epoch to Modified Julian Date
 .fi
-.fi
 .ih
 TIMESCALES
 .nf
@@ -229,7 +228,6 @@ preces --  call subroutine slprce (system, ep0, ep1, ra, dc)
 
 precss --  call subroutine slprcs (system, ep0, ep1, ra, dc)
        Precession in either the old or new system, integer ep0 and ep1
-.fi
 .fi
 .ih
 PROPER MOTION
@@ -502,6 +500,7 @@ pertue -- call subroutine slprue (date, u, jstat)
 .fi
 .ih
 RADIAL VELOCITIES
+.nf
 rverot --  s = slrver (phi, ra, da, st)
        Velocity component due to rotation of the earth
 

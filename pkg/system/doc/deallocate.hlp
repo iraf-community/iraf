@@ -25,9 +25,9 @@ deallocate devices upon logout.
 EXAMPLES
 
 1. Deallocate logical magtape drive B.
-
+.nf
 	cl> dealloc mtb
-
+.fi
 .ih
 SEE ALSO
 allocate, devstatus, file dev$devices, dev$tapecap

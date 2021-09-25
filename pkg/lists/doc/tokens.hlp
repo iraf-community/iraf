@@ -47,8 +47,9 @@ delimit tokens.
 .ih
 EXAMPLES
 Break up the source file for this task into tokens:
-
+.nf
 	cl> tokens tokens.x
+.fi
 .ih
 SEE ALSO
 words

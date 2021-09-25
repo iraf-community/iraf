@@ -264,8 +264,9 @@ nameless      3:18:47   42:24   INDEF
 .fi
 2. Create a table called "outfile.tab" using the columns specified
 in "columns.cd" and the data in "data.dat".
-
+.nf
 tt> tcreate outfile columns.cd data.dat nskip=3
+.fi
 
 "columns.cd" may contain just the following:
 .sp

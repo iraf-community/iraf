@@ -105,9 +105,9 @@ and set grow to 4 pixels.
 .nf
 	cl> flat1d quartz flat order=25 sample="2:799" grow=4 \
 	>>> interactive=no
-
-			or
-
+.fi
+or
+.nf
 	cl> flat1d quartz[2:799,*] flat order=25 grow=4 inter-
 .fi
 
@@ -140,8 +140,9 @@ example the files might contain
 .fi
 
 A flat field for the slits is then obtained with the command
-
+.nf
 	cl> flat1d @quartzs flats axis=2
+.fi
 .ih
 REVISIONS
 .ls FLAT1D V2.10.3

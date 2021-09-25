@@ -68,19 +68,20 @@ for purposes of speed!
 EXAMPLES
 1. To create an 2 dimensional real image of size 100 x 200 with all zero
 values:
-
+.nf
 	cl> mkimage name make 0 2 "100 200"
-
+.fi
 Note that the dimension string is quoted because of the blank separated
 values.
 
 2. To add noise with a sigma of 5:
-
+.nf
 	cl> mkimage name add 0 sigma=5
-
+.fi
 2. To replace a region of the image with the value 10:
-
+.nf
 	cl> mkimage name[10:20,30:40] replace 10
+.fi
 .ih
 SEE ALSO
 artobs, subsection

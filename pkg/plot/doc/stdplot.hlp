@@ -43,13 +43,14 @@ units.
 .ih
 EXAMPLES
 1. Extract the fourth frame from metacode file "oned.mc" and plot it.
-
+.nf
     cl> gkiextract oned.mc 4 | stdplot
-
+.fi
 2. Plot metacode frame "contour.demo" in debug mode, so the plotting
 instructions can be read as they are processed.
-
+.nf
     cl> stdplot contour.demo debug+
+.fi
 .ih
 SEE ALSO
 gkiextract stdgraph

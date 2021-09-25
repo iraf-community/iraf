@@ -23,16 +23,17 @@ name in it, a short header precedes each listing.
 EXAMPLES
 
 1. Print the first 12 lines of each help file in the current directory.
-
+.nf
 	cl> head *.hlp
-
+.fi
 2. Print the first line of each help file.
-
+.nf
 	cl> head *.hlp nl=1
-
+.fi
 3. Print the most recently defined \fIset\fR environment definitions.
-
+.nf
 	cl> set | head
+.fi
 .ih
 SEE ALSO
 tail, page

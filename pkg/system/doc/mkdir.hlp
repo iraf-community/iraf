@@ -19,16 +19,17 @@ or a host directory name.
 EXAMPLES
 
 1. Make a subdirectory named "sub1".
-
+.nf
 	cl> mkdir sub1
-
+.fi
 2. Make a subdirectory "sub2" below "sub1".  The subdirectory "sub1" must
 already exist.
-
+.nf
 	cl> mkdir sub1/sub2
-
+.fi
 3. Make a directory "blue" at the same level in the directory hierarchy as
 the current directory (".." is a synonym for the previous directory).
-
+.nf
 	cl> mkdir ../blue
+.fi
 .endhelp

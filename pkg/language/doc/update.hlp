@@ -22,8 +22,9 @@ parameters for a task to be updated on disk.
 .ih
 EXAMPLE
 1. Update the parameters for the \fIpage\fR task.
-
+.nf
 	cl> update page
+.fi
 .ih
 BUGS
 The parameter set is only updated on disk if a parameter has been modified

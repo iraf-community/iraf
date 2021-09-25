@@ -88,16 +88,17 @@ To add several comments to the database by query:
 
 where <eof> is the end of file character terminating the list.
 To set the value of s0 to 1 for all the spectra in sample line 1:
-
+.nf
 	cl> msset image "s0" 1
-
+.fi
 To set the spectra positions from a list:
-
+.nf
 	cl> msset image "x0" read_list+ list=positionlist
-
+.fi
 To add a single comment such as in a script:
-
+.nf
 	cl> msset image "comments" "Comment here."
+.fi
 .ih
 SEE ALSO
 findspectra mslist

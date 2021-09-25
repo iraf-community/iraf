@@ -28,19 +28,19 @@ EXAMPLES
 
 1. Copy all files in the current directory with extension ".x" to the
 directory "home$src".  As each copy is made, the user is informed.
-
+.nf
 	cl> copy *.x home$src ver+
-
+.fi
 2. Make a copy "fred.BAK" of the file "fred".
-
+.nf
 	cl> copy fred fred.BAK
-
+.fi
 3. Copy the "graphcap" file from the remote node "lyra" to the current node,
 without changing the name of the file.  Note that "." is a synonym for the
 current directory.
-
+.nf
 	cl> copy lyra!dev$graphcap .
-
+.fi
 .ih
 SEE ALSO
 concatenate, movefiles

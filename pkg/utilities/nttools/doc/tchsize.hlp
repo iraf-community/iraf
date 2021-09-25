@@ -102,15 +102,18 @@ EXAMPLES
 2. Set the allocated space for user (header) parameters to 27 records
 without changing any other size parameter.  The result is to be put
 in a new file called 'table2.tab', leaving the input table unchanged.
-
+.nf
 	tt> tchsize table table2 27 -1 -1 -1
+.fi
 
 3. Truncate unused space in three different tables, with the truncated tables
 named 'a.tab', 'b.tab', and 'c.tab':
 
 .nf
 	tt> tchsize table1,table2,tab67 a,b,c 0 0 0 0
-		or
+.fi
+or
+.nf
 	tt> tchsize tab*.tab a,b,c 0 0 0 0
 .fi
 In the latter case the extension is given explicitly in case there

@@ -208,7 +208,6 @@ The estimated best focus is between the 4th and 5th focus setting
 at a value of 4722.4 and the best focus FWHM is 3.02 pixels.
 .ih
 SEE ALSO
-.nf
 imexamine, implot, pprofile, pradprof, psfmeasure, radlist,
 radplt, radprof, ranges, specfocus, splot, starfocus
 .endhelp

@@ -94,15 +94,13 @@ EXAMPLES
 [1] Convert all records on the IDS tape to IRAF images, with the root image name
 being "aug83".  The data is mountain reduced, and all records will be
 converted.  The IDS tape is mounted on mtb.
-	
+	.nf
 	cl> ridsmtn mtb aug83
-
+.fi
 [2] List the headers from the same mountain tape read in example 1 but don't
 make output images.  A \fIlong_header\fR will be listed; sample output is shown.
-
-	cl> ridsmtn mtb make_image=no long_header=yes
-
 .nf
+cl> ridsmtn mtb make_image=no long_header=yes
 
 RECORD = 79, label = "NGC 7662 7.4E 10S AUG 23/24 84 CLOUDS",
 oflag = OBJECT, beam_number = 0,  W0 = 4588.503,  WPC = 2.598, ITM = 120,

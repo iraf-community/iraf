@@ -76,22 +76,23 @@ images and histograms with few bins.
 .ih
 EXAMPLES
 1. Output the histogram of an image to a file.
-
+.nf
     cl> imhist M51.imh li+ nbins=100 > fits1.hst
-
+.fi
 2. Plot the histogram of another image between the values 0 and 2000.
-
+.nf
     cl> imhist M31.imh nbins=100 z1=0. z2=2000.
-
+.fi
 3. Ditto, but set the histogram resolution explicitly to avoid
 smoothing the histogram.
-
+.nf
     cl> imhist M31.imh nbins=100 z1=0 z2=2000 nbins=2001
-
+.fi
 4. Plot the cumulative histogram.  This is most useful for images with
 fairly flat "normal" histograms.
-
+.nf
     cl> imhist R50.imh hist=cum
+.fi
 .ih
 BUGS
 If the resolution of the histogram (number of bins) is a non-integral multiple

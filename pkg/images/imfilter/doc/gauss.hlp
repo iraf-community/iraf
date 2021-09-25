@@ -134,20 +134,20 @@ EXAMPLES
 1. Convolve an image with a circular Gaussian function of sigma 2.0, and
 size 4.0 sigma using nearest neighbor boundary extension and the bilinear
 kernel.
-
+.nf
     cl> gauss m83 m83.gau 2.0
-
+.fi
 2. Do the same convolution using the full 2D kernel.
-
+.nf
     cl> gauss m83 m83.gau.2D 2.0 bilinear-
-
+.fi
 3. Convolve an image with an elliptical Gaussian function whose sigma in the
 major and minor axis direction is 2.0 and 1.5 respectively, and whose position
 angle is 45 degrees, using wrap around boundary extension. In this case the
 full 2D kernel is used by default.
-
+.nf
     cl> gauss m84 m84.gau 2.0 ratio=.75 theta=45. bound=wrap
-
+.fi
 .ih
 TIME REQUIREMENTS
 GAUSS requires approximately 30 and 8 cpu seconds to

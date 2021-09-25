@@ -19,7 +19,6 @@ string if given, or else the longest GTEXT string found (hopefully the
 plot title), or else the string "(no title)".  The output format is as
 follows:
 .nf
-
 	file1: 
 	    [1] (1234 words)	title_string
 	    [2] (78364 words)	title_string
@@ -29,13 +28,13 @@ follows:
 		.
 		.
 		.
-
 .fi
 .ih
 EXAMPLES
 1. List the plots in the GKI metacode file "file":
-
+.nf
     cl> gkidir file
+.fi
 .ih
 SEE ALSO
 gkiextract

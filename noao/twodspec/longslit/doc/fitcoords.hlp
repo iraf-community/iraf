@@ -256,30 +256,30 @@ EXAMPLES
 A number of strong arc lines are identified along one column of an arc
 calibration image "arc001".  The arc lines are then reidentified at every
 20th column.  A two dimensional dispersion solution is determined as follows:
-
+.nf
 	cl> fitcoords arc001 fit.
-
+.fi
 The fitting is done interactively and deleted points are recorded.
 The fit is recorded under the name fit.arc001.  A set of similar arc
 calibrations are fit non-interactively, with the same points deleted,
 as follows:
-
+.nf
 	cl> fitcoords arc* interactive=no
-
+.fi
 Several stellar spectra are identified at different positions along the slit
 and traced to other lines.  A fit to the geometric distortion is determined
 with the command:
-
+.nf
 	cl> fitcoords star001,star003,star005 fitname=distortion combine=yes
-
+.fi
 In this case the coordinates from all the tracings are combined in a single
 fit called distortion.
 
 The plots in the plot file are spooled to the standard plotting device as
 follows:
-
+.nf
 	cl> gkimosaic plotfile
-
+.fi
 \fBGkimosaic\fR is in the \fBplot\fR package.
 .ih
 SEE ALSO

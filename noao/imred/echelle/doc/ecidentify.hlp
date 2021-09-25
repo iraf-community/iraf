@@ -685,8 +685,9 @@ o values to the range -1 to 1 and then iteratively evaluating them.
 EXAMPLES
 Because this task is interactive it is difficult to provide an actual
 example.  The following describes a typical usage on arc spectra.
-
+.nf
 	cl> ecidentify arc1.ec,arc2.ec
+.fi
 
 .ls (1)
 The database is searched for an entry for arc1.ec.  None is found and

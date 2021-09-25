@@ -454,6 +454,7 @@ comma.  For example
                                1 2 1
     1 2 1, 2 3 2, 1 2 1  ==>   2 3 2
                                1 2 1
+.fi
 .le
 
 When a logfile is defined the weights are included in the log output.

@@ -90,8 +90,9 @@ first and last steps are interactive, at least initially.  After the first
 image other images may be traced noninteractively.
 
 Select an image with narrow, strong profiles and run trace:
-
+.nf
 	ec> trace imagename
+.fi
 
 When you are asked if you want to edit the apertures respond with "yes".
 The central cut across the dispersion is graphed.  Position the cursor
@@ -165,8 +166,9 @@ defining the apertures or later using the apedit mode in \fBapedit\fR,
 for further information.
 
 Once the extraction parameters have been set simply type
-
+.nf
 	ec> sumextract images
+.fi
 
 where images is the list of images to be extracted.  If each image has
 not been traced then a traced reference image should be given.

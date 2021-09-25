@@ -57,8 +57,9 @@ and may be printed with the verbose option.
 EXAMPLES
 1. To divide a object image by a flat field and then rescale the division
 back to the mean of the object image:
-
+.nf
     cl> imdivide object image final rescale=numerator
+.fi
 .ih
 SEE ALSO
 imarith

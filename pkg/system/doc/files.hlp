@@ -43,29 +43,30 @@ EXAMPLES
 
 1. Generate a single column list of files in the current directory,
 sorted in ASCII collating sequence.
-
+.nf
 	cl> files
-
+.fi
 2. Generate an unsorted single column list of files in logical directory
 "lib$".  Each entry in the output list is of the form "lib$...".
-
+.nf
 	cl> files lib$ sort-
-
+.fi
 3. Generate a file list to be used to make a set of new files.  The new file
 names will be the old file names with "_1" concatenated to the root, e.g.,
 "root.x" would map to "root_1.x" and so on.
-
+.nf
 	cl> files root.*//_1
-
+.fi
 4. Generate a file list similar to that in [3], adding a directory prefix
 to each filename.
-
+.nf
 	cl> files dir$//root.*
-
+.fi
 5. Use string substitution to change the filename extension of a set of files
 to ".y".
-
+.nf
 	cl> files root.%*%y%
+.fi
 .ih
 SEE ALSO
 directory, pathnames, images.sections

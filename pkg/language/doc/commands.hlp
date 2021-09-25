@@ -165,33 +165,33 @@ command block with an "&".
 .ih
 EXAMPLES
 1. Simple positional arguments only (command mode).
-
+.nf
 	cl> copy file1 file2
-
+.fi
 2. Simple positional arguments only (compute mode).
-
+.nf
 	cl> copy ("file1", "file2")
-
+.fi
 3. One positional argument, i.e., the string "file1,file", and one keyword=value
 type argument.  Note that string need not be quoted even though it contains
 the comma, provided there are no spaces in the string.
-
+.nf
 	cl> lprint file1,file2 device=versatec
-
+.fi
 4. Syntax for i/o redirection in compute mode, as in a script.
 
 	type ("*.x", > "spool")
 
 5. The same command in command mode.
-
+.nf
 	cl> type *.x > spool
-
+.fi
 6. Use of an arithmetic expression in command mode; the scalar value of the
 expression given as the third positional argument is added to the value
 of every pixel in image "pix1", writing a new image "pix2" as output.
-
+.nf
 	cl> imarith pix1 + (log(4.2)+10) pix2
-
+.fi
 Many additional examples may be found in the EXAMPLES section of the
 manual pages throughout the system.
 .ih

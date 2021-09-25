@@ -127,28 +127,28 @@ though they were exactly 5 degrees.
 .ih
 EXAMPLES
 1. Plot a metacode file exactly as is:
-
+.nf
     cl> calcomp metacodefile
-
+.fi
 2. Get the fastest plot you can -- no bold lines or text, no dashed or dotted
 lines:
-
+.nf
     cl> calcomp metacodefile lwover+ ltover+ txquality=low
-
+.fi
 3. Get a plot half the size of the original; suppose the original plot had
 metacode scales = 0.0003 inches / GKI unit:
-
+.nf
     cl> calcomp metacodefile xscale=0.00015 yscale=0.00015
-
+.fi
 4. Get the highest quality plot you can without having to change pens:
-
+.nf
     cl> calcomp metacodefile txqual=high 
-
+.fi
 5. Get a high-quality plot where you have to change the pen each time the
 metacode switches from bold to single-width lines or text:
-
+.nf
     cl> calcomp metacodefile txqual=high lwtype=penchange
-
+.fi
 .ih
 TIME REQUIREMENTS
 Pen plotters vary considerably in their plotting rates.  At NOAO, plotting a

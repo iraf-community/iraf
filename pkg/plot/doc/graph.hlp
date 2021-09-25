@@ -205,29 +205,29 @@ appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
 1. Plot the output of a list processing filter:
-
+.nf
     cl> ... list_filter | graph
-
+.fi
 2. Plot a graph entered interactively from the terminal:
-
+.nf
     cl> graph STDIN
-
+.fi
 3. Overplot two lists:
-
+.nf
     cl> graph list1,list2
-
+.fi
 4. Graph line 128 of image "pix":
-
+.nf
     cl> graph pix[*,128]
-
+.fi
 5. Graph the average of columns 50 through 100:
-
+.nf
     cl> graph pix[50:100,*] axis=2
-
+.fi
 6. Graph a list in point plot mode:
-
+.nf
     cl> graph list po+
-
+.fi
 7. Annotate a graph:
 
 .nf
@@ -236,8 +236,9 @@ EXAMPLES
 .fi
 
 8. Direct the graph to the standard plotter device:
-
+.nf
     cl> graph list device=stdplot
+.fi
 .ih
 BUGS
 Indefinites are not recognized when computing image projections.

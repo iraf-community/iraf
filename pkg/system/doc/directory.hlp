@@ -85,9 +85,9 @@ immediately.
 EXAMPLES
 
 1. List all the files in the current directory in tabular format.
-
+.nf
 	cl> dir
-
+.fi
 2. Print detailed information on all files in the current directory.
 
 .nf

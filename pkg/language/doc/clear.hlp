@@ -14,8 +14,9 @@ currently in use.  If the terminal should get stuck in reverse video mode,
 .ih
 EXAMPLES
 1. Clear the screen and print the current directory.
-
+.nf
 	cl> cle;dir
+.fi
 .ih
 SEE ALSO
 beep, stty

@@ -98,14 +98,14 @@ outside the boundaries of the image is determined by the parameter
 EXAMPLES
 
 1. Shift the lines of an image by 0.25 pixels to the right.
-
+.nf
 	cl> shiftlines imagein imageout 0.25
-
+.fi
 2. Shift the lines of an image by -.3 pixels using cubic spline interpolation
 and replace the input image by the output image.
-
+.nf
 	cl> shiftlines image image -.3 interp=spline3
-
+.fi
 .ih
 TIMINGS
 It requires approximately 28 and 59 seconds to shift a 512 square image

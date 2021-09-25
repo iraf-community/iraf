@@ -1026,3 +1026,4 @@ begin
 	if (extn != null_string)
 	    map filename extension
 end
+.fi

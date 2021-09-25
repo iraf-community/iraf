@@ -139,19 +139,19 @@ the CL, it may be called either from within the CL (as in the examples),
 or at the host system level.  The command syntax is identical on both cases.
 
 1. List the contents of the disk archive file "foo.tar".
-
+.nf
 	cl> rtar -tvf foo.tar
-
+.fi
 2. Unpack the tape archive on unix device /dev/nrmt8 in the current
 directory.
-
+.nf
 	cl> rtar -xf /dev/nrmt8
-
+.fi
 3. Unpack the tape archive on the VMS device MSA0: in the current
 directory.
-
+.nf
 	cl> rtar -xf msa0
-
+.fi
 When working within the CL, commands such as \fIrewind\fR may be used
 with \fIrtar\fR, but switching between IRAF and host device names may be
 confusing.

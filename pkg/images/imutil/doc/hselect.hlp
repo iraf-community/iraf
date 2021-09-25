@@ -54,9 +54,9 @@ EXAMPLES
 1. Compute the mean exposure time for all the images in a database.  Note that
 the argument "yes" is a trivial case of a general boolean expression and
 hence need not be quoted.
-
+.nf
 	cl> hselect n1.* exp yes | average
-
+.fi
 2. Print the name, length of axes 1 and 2, and title of all two dimensional
 images in a database.
 
@@ -74,14 +74,14 @@ images in a database.
 criterion is all images for which the value of the parameter "q-flag"
 has the value 1.  Note carefully the use of quotes.  If the @ operator
 is unfamiliar read the manual page for \fIhedit\fR.
-
+.nf
 	cl> hselect n1.* $I '@"q-flag" == 1' > imlist
-
+.fi
 If the parameter "q-flag" were instead named "qflag", the following
 simpler expression would suffice.
-
+.nf
 	cl> hselect n1.* $I 'qflag == 1' > imlist
-
+.fi
 4.  Scan a set of keyword and allow for missing keywords.
 
 .nf

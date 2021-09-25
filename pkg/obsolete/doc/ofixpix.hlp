@@ -65,8 +65,9 @@ the lines
 .fi
 
 The set of images "image*" are fixed by:
-
+.nf
 	cl> ofixpix image* badpixfile
+.fi
 .ih
 REVISIONS
 .ls OFIXPIX V2.11

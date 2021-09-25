@@ -16,8 +16,9 @@ The specified frame is displayed on the image display monitor ("stdimage").
 .ih
 EXAMPLES
 To display frame 3:
-
+.nf
 	cl> frame 3
+.fi
 .ih
 SEE ALSO
 cv

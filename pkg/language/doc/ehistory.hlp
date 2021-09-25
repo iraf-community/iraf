@@ -48,13 +48,14 @@ executed.
 .ih
 EXAMPLES
 1. Set no standout and verify modes. 
-
+.nf
 	cl> ehinit = "nostandout verify".
-
+.fi
 2. Recall the last "xc" command from the history list and edit it.
 If \fIverify\fR were not enabled the command would simply be repeated.
-
+.nf
 	cl> ^xc
+.fi
 .ih
 BUGS
 The command editor really only works well for single line commands;

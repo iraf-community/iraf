@@ -24,12 +24,13 @@ file, leaving a "zombie" pixel file somewhere on disk.
 EXAMPLES
 
 1. Protect the file "paper.ms" from deletion, accidental or otherwise.
-
+.nf
 	cl> protect paper.ms
-
+.fi
 2. Protect all the ".ms" files from deletion.
-
+.nf
 	cl> protect *.ms
+.fi
 .ih
 SEE ALSO
 unprotect, delete

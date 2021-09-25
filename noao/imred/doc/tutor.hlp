@@ -37,16 +37,17 @@ not be the same as the standard help database.
 .ih
 EXAMPLES
 To get started:
-
+.nf
 	cl> tutor
-
+.fi
 To get help on reading and writing data tapes:
-
+.nf
 	cl> tutor dataio
-
+.fi
 To read all the topics:
-
+.nf
 	cl> tutor all
+.fi
 .ih
 BUGS
 Piping the output of \fBtutor\fR to lprint does not work properly because

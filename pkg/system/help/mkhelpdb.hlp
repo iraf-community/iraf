@@ -68,8 +68,9 @@ EXAMPLES
 .fi
 
 2. Update the NOAO package help database.
-
+.nf
 	so> mkhelpdb helpdir=noao$lib/root.hd helpdb=noao$lib/helpdb.mip
+.fi
 .ih
 SEE ALSO
 hdbexamine, help

@@ -61,8 +61,9 @@ of oversize lines with ">>".
 2. Convert a set of IRAF text files to a set of blocked EBCDIC cardimage files
 on tape, replacing tabs with blanks and prefixing the leftover portions
 of oversize lines with ">>".
-
+.nf
 	cl> wcardimage files* mtb1600[1] eb+
+.fi
 .ih
 BUGS
 The card_length in bytes must be an integral number of chars.

@@ -153,13 +153,13 @@ discontinuous (constant and wrap) may introduce interpolation errors.
 .ih
 EXAMPLES
 1. To expand an image by a factor of 2.5:
-
+.nf
 	cl> magnify imagein imageout 2.5 2.5
-
+.fi
 2. To subsample the lines of an image in steps of 3.5:
-
+.nf
 	cl> magnify imagein imageout dx=3.5 dy=1
-
+.fi
 3. To magnify the central part of an image by 2 into a 11 by 31 image:
 
 .nf

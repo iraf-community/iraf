@@ -102,18 +102,18 @@ to avoid surprises.
 .ih
 EXAMPLES
 1. Print the name of the current terminal.
-
+.nf
 	cl> print ("terminal = ", envget ("terminal"))
-
+.fi
 2. Output a blank line on the standard output, e.g., in a script.
-
+.nf
 	print ("")
-
+.fi
 3. Format a command and send it to the host system.  In this example,
 "fname" is a string valued parameter.
-
+.nf
 	cl> print ("!ls -l ", fname) | cl
-
+.fi
 4. Write to a file.
 
 .nf
@@ -138,9 +138,9 @@ formatted string, whereas the scan() example requires a struct parameter.
 	cl> fprint (s1, "pi = ", x)
 	cl> = s1
 	pi = 3.14159
-
-	     or 
-
+.fi
+or 
+.nf
 	cl> printf ("pi = %g\n", x) | scan (line)
 .fi
 

@@ -26,7 +26,9 @@ drive the red, green, and blue guns of the color display monitor.
 Optionally, window the rgb lookup tables.
 .ih
 EXAMPLES
+.nf
 	cl> rgb 1 2 3
+.fi
 .ih
 SEE ALSO
 cv

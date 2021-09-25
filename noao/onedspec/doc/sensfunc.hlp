@@ -366,8 +366,9 @@ sensitivity.
 .ih
 EXAMPLES
 1.  The following command generates sensitivity spectra
-
+.nf
 	cl> sensfunc std sens
+.fi
 
 This command uses the data from the \fBstandard\fR output
 file "std" to create sensitivity functions with rootname "sens".

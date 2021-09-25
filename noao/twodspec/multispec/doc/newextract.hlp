@@ -49,8 +49,9 @@ spectra.
 EXAMPLES
 To initialize a MULTISPEC database for extracting the spectra in
 the image \fIimage1\fR:
-
+.nf
 	cl> newextraction image1 ""
+.fi
 
 To create a new MULTISPEC database for extracting the spectra in
 the image \fIimage2\fR  using \fIimage1\fR as a template image:

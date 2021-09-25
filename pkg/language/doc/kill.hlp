@@ -20,8 +20,9 @@ be seen using the \fIjobs\fR command.
 .ih
 EXAMPLE
 1. Kill job number 4.
-
+.nf
 	cl> kill 4
+.fi
 .ih
 SEE ALSO
 jobs, service
