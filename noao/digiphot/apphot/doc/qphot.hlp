@@ -246,7 +246,6 @@ l	Do photometry for remaining stars in coordinate list, output results
 r	Rewind the coordinate list
 q	Exit task
 
-
 	Colon Commands
 
 :show	List the parameters
@@ -273,10 +272,8 @@ q	Exit task
 
 :radplot	[y/n]		Plot radial profile of object
 
-
 The following commands are available from inside the interactive setup menu
 using the i key.
-
 
                     Interactive Qphot Setup Menu
 
@@ -361,7 +358,6 @@ In interactive and batchmode a radial profile plot is written to
 \fIplotfile\fR  if it is defined each time the result of an object
 measurement is written to \fIoutput\fR .
 
-
 .ih
 ERRORS
 If the object centering was error free then the field cier will be zero.
@@ -377,7 +373,6 @@ Non-zero values of cier flag the following error conditions.
 106      # The x or y center fit did not converge
 107      # The x or y center shift is greater than 1 pixel
 108      # There is bad data in the centering box
-
 .fi
 
 If all goes well during the sky fitting process then the error code sier
@@ -397,7 +392,6 @@ will be 0. Non-zero values of sier flag the following error conditions.
 210       # The sky file is at EOF
 211       # Cannot read the sky value correctly
 212       # The best fit parameter are non-physical
-
 .fi
 
 If no error occurs during the measurement of the magnitudes then pier is
@@ -434,13 +428,11 @@ the display and the image cursor.
 	... full output will appear in ypix.mag.1
 .fi
 
-
 2. Perform aperture photometry interactively for a few stars in dev$ypix
 using the contour plot and the graphics cursor. This option is only useful
 for those (now very few) users who have access to a graphics terminal but
 not to an image display server. Setup the task parameters using the
 interactive setup menu defined by the i key command as in example 1.
-
 
 .nf
         ap> show stdimcur
@@ -477,8 +469,6 @@ interactive setup menu defined by the i key command as in example 1.
         ... reset stdimcur to its previous value
 .fi
 
-
-
 3. Setup and run QPHOT interactively on a list of objects temporarily
 overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
  parameters determined in examples 1 or 2.
@@ -493,7 +483,6 @@ overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
         ap> qphot dev$ypix 7.0 12.0 5.0 "3.0,5.0" coords=ypix.coo.1
 
         ... type ? for optional help
-
 
         ... move the graphics cursor to the stars and tap space bar
 
@@ -512,7 +501,6 @@ overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
 
         ... the output will appear in ypix.mag.3 ...
 .fi
-
 
 4. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.
@@ -533,7 +521,6 @@ coordinates in the coordinate system of the parent image.
         ap> pdump ypix.mag.4 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
-
 5. Run QPHOT in batch mode using the coordinate file and the previously
 saved parameters.
 
@@ -542,7 +529,6 @@ saved parameters.
 
         ... output will appear in ypix.mag.5 ...
 .fi
-
 
 6. Repeat example 5 but assume that the input coordinate are ra and dec
 in degrees and degrees and submit the task to the background.
@@ -565,7 +551,6 @@ in degrees and degrees and submit the task to the background.
 
         ... mark the stars on the display
 .fi
-
 
 7. Run QPHOT interactively without using the image display.
 
@@ -626,7 +611,6 @@ and quits the task.
 
         ... full output will appear in ypix.mag.8
 .fi
-
 
 .ih
 BUGS

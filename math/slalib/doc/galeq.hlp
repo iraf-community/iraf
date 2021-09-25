@@ -1,7 +1,6 @@
 .help galeq Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slGAEQ (DL, DB, DR, DD)
 
      - - - - - -
@@ -34,7 +33,6 @@
 
   Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

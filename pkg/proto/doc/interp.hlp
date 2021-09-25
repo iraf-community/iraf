@@ -61,7 +61,6 @@ EXAMPLES
     cl> interp testdata STDIN
 .fi
 
-
 2. The following command generates points to plot (by piping to graph) in the
    range from x=10 to x=20 at intervals of 0.1 (10.0, 10.1 ... 19.9, 20.0).
 

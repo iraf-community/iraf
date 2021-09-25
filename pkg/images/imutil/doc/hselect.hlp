@@ -62,7 +62,6 @@ hence need not be quoted.
 2. Print the name, length of axes 1 and 2, and title of all two dimensional
 images in a database.
 
-
 .nf
 	cl> hselect n1.* $I,naxis[12],title 'naxis == 2'
 	n1.0001	512	512	quartz
@@ -70,7 +69,6 @@ images in a database.
 	n1.0005 384	800	"ngc 3127 at 45 degrees"
 	cl>
 .fi
-
 
 3. Produce an image name list for use to drive another task.  The selection
 criterion is all images for which the value of the parameter "q-flag"

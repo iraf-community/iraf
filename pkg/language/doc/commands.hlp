@@ -63,7 +63,6 @@ right hand side of a "= expr" (inspect statement), or within procedures.
 The sequence #{ <statements> #} may be used to force interpretation of a
 series of statements in compute mode.
 
-
 1. \fBArguments\fR
 
     The task name may be followed by any number of positional arguments
@@ -126,7 +125,6 @@ called the "switch" syntax is available:
 .ke
 
 A given parameter may only be assigned to once in a command line.
-
 
 2. \fBI/O Redirection\fR
 

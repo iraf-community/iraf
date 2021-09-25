@@ -25,7 +25,6 @@ reducing data from the KPNO instruments of the same name.  The \fBimred\fR
 packages shall call upon the basic operators in \fBonedspec\fR, \fBimages\fR,
 and other packages to reduce the data for a specific instrument.
 
-
 .ks
 .nf
 	iids(etc)
@@ -40,13 +39,11 @@ and other packages to reduce the data for a specific instrument.
 					lists
 					system
 					language
-
 .fi
 
 .ce
 Relationship of \fBOnedspec\fR to other IRAF Packages
 .ke
-
 
 The relationship of the \fBonedspec\fR packages to other related packages in
 the IRAF system is shown above.  A program (CL script) in a package at one
@@ -163,7 +160,6 @@ single row from a table, but we often use the term is a less strict sense.
 .le
 .le
 
-
 An \fBimage\fR appears in the database as a record.  The record is really
 just the image header; the pixels are stored external to the database in a
 separate file, storing only the name of the pixel storage file in the record
@@ -207,7 +203,6 @@ control parameters should be implemented as positional arguments following
 the primary operands, and data independent or optional (rarely used) parameters
 should be implemented as hidden parameters.
 
-
 .ks
 .nf
 	imop (input, output, data_dependent_control_params)
@@ -224,7 +219,6 @@ for example,
 	coincor (spectra, newgroup, dead_time)
 .fi
 .ke
-
 
 If a series of spectra are to be processed it seems reasonable to add the
 processed spectra to a new or existing data group (possibly the same as an

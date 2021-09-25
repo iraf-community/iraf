@@ -790,9 +790,7 @@ this type of data.  The parameter values can be changed from the
 defaults by using the parameter editor,
 
 .nf
-
 	cl> epar params
-
 .fi
 
 or simple typing \fIparams\fR.  The parameter editor can also be

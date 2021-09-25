@@ -804,7 +804,6 @@ object information independent of other records.  Figure 1 shows an example
 of a file for a configuration called LMC123.
 
 .nf
-
     Figure 1: Example Aperture Identification File
 
     cl> type LMC124
@@ -816,7 +815,6 @@ of a file for a configuration called LMC123.
        .
     47 1 s92
     48 0 sky
-
 .fi
 
 Note the identification of the sky fibers with beam number 0 and the
@@ -1001,9 +999,7 @@ Argus.  The parameter values can be changed from the
 defaults by using the parameter editor,
 
 .nf
-
 	cl> epar params
-
 .fi
 
 or simple typing \fIparams\fR.  The parameter editor can also be

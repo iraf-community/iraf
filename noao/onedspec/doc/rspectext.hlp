@@ -16,7 +16,6 @@ Output list of IRAF spectra image names.  The list must match the
 input list.
 .le
 
-
 The following parameters are only used if there is no FITS header
 with the data.
 .ls title = ""

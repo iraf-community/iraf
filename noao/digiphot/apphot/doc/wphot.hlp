@@ -245,13 +245,11 @@ r	Rewind the coordinate list
 e	Print error messages
 q	Exit task
 
-
 	Colon Commands
 
 :show	[data/center/sky/fit]	Show parameters
 :m [n]	Move to next [nth] star in the coordinate list
 :n [n]	Do photometry for next [nth] star in coordinate list, output results
-
 
 	Colon Parameter Editing Commands
 
@@ -332,10 +330,7 @@ q	Exit task
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot radial profile of object
 
-
-
 The following commands are available from inside the interactive setup menu.
-
 
                     Interactive Phot/Wphot Setup Menu
 
@@ -595,7 +590,6 @@ the i key command as in example 1.
         ... reset stdimcur to its previous value
 .fi
 
-
 3. Setup and run PHOT interactively on a list of objects temporarily
 overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
 parameters determined in examples 1 or 2.
@@ -611,7 +605,6 @@ parameters determined in examples 1 or 2.
            apertures="3.0,5.0" coords=ypix.coo.1
 
         ... type ? for optional help
-
 
         ... move the graphics cursor to the stars and tap space bar
 
@@ -630,7 +623,6 @@ parameters determined in examples 1 or 2.
 
         ... the output will appear in ypix.omag.3 ...
 .fi
-
 
 4. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.
@@ -651,7 +643,6 @@ coordinates in the coordinate system of the parent image.
         ap> pdump ypix.omag.4 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
-
 5. Run PHOT in batch mode using the coordinate file and the previously
 saved parameters. Verify the critical parameters.
 
@@ -660,7 +651,6 @@ saved parameters. Verify the critical parameters.
 
         ... output will appear in ypix.omag.5 ...
 .fi
-
 
 6. Repeat example 5 but assume that the input coordinate are ra and dec
 in degrees and degrees, turn off verification, and submit the task to to
@@ -683,7 +673,6 @@ the background.
 
         ... mark the stars on the display
 .fi
-
 
 7. Run PHOT interactively without using the image display.
 
@@ -730,7 +719,6 @@ the background.
         ... reset the value of stdimcur
 .fi
 
-
 8. Use a image cursor command file to drive the PHOT task. The cursor command
 file shown below sets the cbox, annulus, dannulus, and apertures parameters
 computes the centers, sky values, and magnitudes for 3 stars, updates the
@@ -753,9 +741,6 @@ parameter files, and quits the task.
         ... full output will appear in ypix.omag.8
 .fi
 
-
-
-
 .ih
 BUGS
 This task is experimental and requires more work.
@@ -771,7 +756,6 @@ blue or yellow overlays and set the centerpars mkcenter switch to
 "yes", the fitskypars mksky switch to"yes", or the photpars mkapert
 witch to "yes". It may be necessary to run gflush and to redisplay the image
 to get the overlays position correctly.
-
 
 .ih
 SEE ALSO

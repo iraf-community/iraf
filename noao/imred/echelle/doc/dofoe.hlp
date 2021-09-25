@@ -293,7 +293,6 @@ for good extraction one may box car smooth the background to improve the
 statistics.
 .le
 
-
 .ce
 -- APERTURE EXTRACTION PARAMETERS --
 .ls weights = "none" (apsum)
@@ -751,9 +750,7 @@ FOE data.  The parameter values can be changed from the
 defaults by using the parameter editor,
 
 .nf
-
 	cl> epar params
-
 .fi
 
 or simple typing \fIparams\fR.  The parameter editor can also be

@@ -595,7 +595,6 @@ v	Mark points with Y < Y (cursor) for deletion or undeletion
 b	Mark points inside a box for deletion or undeletion
 f	Actually delete the marked points and replot
 
-
 	      PEXAMINE Interactive Colon Commands
 
 :xcolumn	  [name]	     Show/set the X-Y plot X axis quantity
@@ -607,7 +606,6 @@ f	Actually delete the marked points and replot
 :eparam		  [x/h/r/s/c]	     Edit/unlearn the specified plot pset
     or
 :unlearn
-
 
 	     PEXAMINE Interactive X-Y Plotting Commands
 
@@ -628,7 +626,6 @@ f	Actually delete the marked points and replot
 :minry      [value]	  Number of minor divisions along y axis
 :round      [yes/no]      Round axes to nice values?
 :fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
-
 
 	PEXAMINE Interactive Histogram Plotting Commands
 
@@ -672,7 +669,6 @@ f	Actually delete the marked points and replot
 :round      [yes/no]      Round axes to nice values?
 :fill       [yes/no]      Fill viewport vs enforce unity aspect ratio?
 
-
 	PEXAMINE Interactive Surface Plotting Commands
 
 :ncolumns   [value]	  Number of columns to be plotted
@@ -682,7 +678,6 @@ f	Actually delete the marked points and replot
 :angv	    [value]	  Vertical viewing angle
 :floor	    [value]	  Minimum value to be plotted
 :ceiling    [value]	  Maximum value to be plotted
-
 
 	PEXAMINE Interactive Contour Plotting Commands
 
@@ -810,7 +805,6 @@ original image and the image display.
 
 	... finally after examining the image and making all the changes
 	    the user decides to quit and save the changes with the 'e' key
-
 .fi
 
 .ih

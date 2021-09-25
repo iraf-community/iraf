@@ -186,7 +186,6 @@ global headers with NDIM=0 as well as headers with image data.
 Note that proper script programming would make all the hidden parameters
 explicit.
 
-
 6.  Example of the extension name pattern matching.
 
 .nf

@@ -310,10 +310,8 @@ values of pier flag the following error conditions.
 .ih
 EXAMPLES
 
-
 1. Compute the PSF model for the test image dev$ypix. Good stars for making the
 PSF model can be found at (442,410), (348,189), and (379,67).
-
 
 .nf
    da> datapars.epadu = 14.0
@@ -389,7 +387,6 @@ PSF model can be found at (442,410), (348,189), and (379,67).
 	    objects which are not stars don't
 .fi
 
-
 2. Run peak on a section of the input image using the photometry file and PSF
 model derived in example 1 for the parent image and writing the results
 in the coordinate system of the parent image.
@@ -418,14 +415,12 @@ in the coordinate system of the parent image.
 
 	... the output images is ypix.sub.2
 
-
     da> substar dev$ypix[150:450,150:450] ypix.pk.2 "" default default  \
 	wcsin=tv wcspsf=tv wcsout=tv
 
 	... subtract stars from the peak input image
 
 	... the output images is ypix.sub.3
-
 .fi
 
 .ih

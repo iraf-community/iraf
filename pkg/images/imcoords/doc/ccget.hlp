@@ -274,7 +274,6 @@ decimal numbers. The operators are arithmetic, logical, and string.
 
 The following operators are supported:
 
-    
 .nf
             +  -  *  /              arithmetic operators
             **                      exponentiation
@@ -288,7 +287,6 @@ The following operators are supported:
 
 The following intrinsic functions are supported:
 
-    
 .nf
             abs     atan2   deg     log     min     real    sqrt
             acos    bool    double  log10   mod     short   str
@@ -296,7 +294,6 @@ The following intrinsic functions are supported:
             atan    cosh    int     max     rad     sinh    tanh
 .fi
 
-    
 .ih
 COLUMN FORMATS
 
@@ -324,14 +321,12 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
 
-
 Conventions for w (field width) specification:
 
     W =  n      right justify in field of N characters, blank fill
         -n      left justify in field of N characters, blank fill
         0n      zero fill at left (only if right justified)
 absent, 0       use as much space as needed (D field sets precision)
-
 
 Escape sequences (e.g. "\n" for newline):
 

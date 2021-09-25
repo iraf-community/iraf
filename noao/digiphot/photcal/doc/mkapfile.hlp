@@ -305,7 +305,6 @@ exponential analytic components of the model respectively. The subscript i
 denotes quantities that are a function of each image. 
 
 .nf
-
     I[r,X[i];RO[i],swings,pwings,pgauss,regscale,xwings] =
 	(pwings + X[i] * xwings) * P[r;swings] + (1 - pwings - X[i] *
 	xwings) * (pgauss * G[r;RO[i]] + (1 - pgauss) *
@@ -319,7 +318,6 @@ denotes quantities that are a function of each image.
 
     E[r;RO[i]] = hnorm  * exp (-r / (rgescale * RO[i]))
          hnorm = 1 /  (2 * PI * (rgescale * RO[i]) ** 2) 
-
 .fi
 
 This equation is actually applied to the magnitude differences between
@@ -327,33 +325,26 @@ apertures where the observed magnitude differences are computed as follows
 for image i, star j, and aperture k.
 
 .nf
-
     mdiff[i,j,k] = m[i,j,k] - m[i,j,k-1]           k=2,..,naperts
-
 .fi
-
 
 The observed differences are fit by least-squares techniques to 
 to the theoretical model differences represented by the following equation.
 
 .nf
-
 diff[i,j,k] = -2.5 * log10 (integral (2 * PI * r * I) from 0 to r[k] /
           integral (2 * PI * r * I) from 0 to r[k-1])
-
 .fi
 
 The integrals of the three model components P, G, and E are the following.
 
 .nf
-
     integral (2 * PI * r * P) = 1 - (1 + r ** 2) ** -swings
 
     integral (2 * PI * r * G) = 1 - exp (-r ** 2 / (2 * RO[i] ** 2))
 
     integral (2 * PI * r * H) = 1 + (1 + r / (rgescale * RO[i]) *
                           exp (-r / (rgescale * RO[i]))
-
 .fi
 
 In a given run of MKAPFILE the seeing radius
@@ -387,7 +378,6 @@ is lowest are written to \fImagfile\fR, along with the image id, x and y
 coordinates, filter ids, exposure times, airmasses, and errors in the
 magnitude. This file can be read into the OBSFILE program so as to
 create a photometry catalog suitable for input into PHOTCAL.
-
 
 .ih
 REFERENCES

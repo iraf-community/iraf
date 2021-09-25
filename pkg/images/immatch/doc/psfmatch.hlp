@@ -362,7 +362,6 @@ PSFMATCH.
 .nf
 	Interactive Keystroke Commands
 
-
 ?	Print help 
 :	Colon commands
 k	Draw a contour plot of the psf matching kernel
@@ -374,16 +373,12 @@ f	Recompute the psf matching kernel
 w	Update the task parameters
 q	Exit
 
-
 	Colon Commands
-
 
 :mark	[file]		Mark objects on the display
 :show			Show current values of the parameters
 
-
 	Show/Set Parameters
-
 
 :input	    [string]	    Show/set the current input image name
 :reference  [string]	    Show/set the current reference image/psf name

@@ -1,7 +1,6 @@
 .help euler Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slEULR (ORDER, PHI, THETA, PSI, RMAT)
 
      - - - - - -
@@ -48,7 +47,6 @@
 
   Copyright (C) 1997 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

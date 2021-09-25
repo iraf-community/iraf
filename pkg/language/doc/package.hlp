@@ -52,7 +52,6 @@ EXAMPLES
 	clbye()
 .fi
 
-
 2. List the currently defined packages in the order in which they will
 be searched for tasks.
 

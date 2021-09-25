@@ -3,7 +3,6 @@
 .ce
 Variance Weighted and Cleaned Extractions
 
-
 There are two types of aperture extraction (estimating the background
 subtracted flux across a fixed width aperture at each image line or
 column) in the APEXTRACT package.  One is a simple sum of pixel values

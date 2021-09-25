@@ -43,10 +43,7 @@ SEE ALSO
 gctod(2), ctotok(2).
 .endhelp ___________________________________________________________________
 
-
-
 .help states 2 "States of the LEXNUM Finite State Automaton"
-
 
 .ks
 .nf
@@ -64,7 +61,6 @@ start:								(1)
 .fi
 .ke
 
-
 .ks
 .nf
 unop_or_number:		(+|-)					(2)
@@ -80,7 +76,6 @@ unop_or_number:		(+|-)					(2)
 	other		revert
 .fi
 .ke
-
 
 .ks
 .nf
@@ -98,7 +93,6 @@ odhr:			(+|-)?[0-7]				(3)
 .fi
 .ke
 
-
 .ks
 .nf
 dhr:			(+|-)?[0-9]+				(4)
@@ -114,7 +108,6 @@ dhr:			(+|-)?[0-9]+				(4)
 	other		reduce	decimal_number
 .fi
 .ke
-
 
 .ks
 .nf
@@ -132,7 +125,6 @@ maybe_real_fraction:	(+|-)?"."				(5)
 .fi
 .ke
 
-
 .ks
 .nf
 h:			(+|-)?[0-9]*[a-f]			(6)
@@ -148,7 +140,6 @@ h:			(+|-)?[0-9]*[a-f]			(6)
 	other		revert
 .fi
 .ke
-
 
 .ks
 .nf
@@ -166,7 +157,6 @@ maybe_hex_or_rexp:	(+|-)?[0-9]+[ed]			(7)
 .fi
 .ke
 
-
 .ks
 .nf
 maybe_real_number:	(+|-)?[0-9]*":"				(8)
@@ -182,7 +172,6 @@ maybe_real_number:	(+|-)?[0-9]*":"				(8)
 	other		revert
 .fi
 .ke
-
 
 .ks
 .nf
@@ -200,7 +189,6 @@ octal_or_hex_number:	(+|-)?[0-7]"b"				(9)
 .fi
 .ke
 
-
 .ks
 .nf
 real_fraction:		(+|-)?"."[0-9]				(10)
@@ -216,7 +204,6 @@ real_fraction:		(+|-)?"."[0-9]				(10)
 	other		reduce	real_number
 .fi
 .ke
-
 
 .ks
 .nf
@@ -234,7 +221,6 @@ rfr_or_rexp:		(+|-)?"."[0-9]+[ed]			(11)
 .fi
 .ke
 
-
 .ks
 .nf
 maybe_rexp:		(+|-)?[0-9]+[ed](+|-)			(12)
@@ -250,7 +236,6 @@ maybe_rexp:		(+|-)?[0-9]+[ed](+|-)			(12)
 	other		revert
 .fi
 .ke
-
 
 .ks
 .nf
@@ -268,7 +253,6 @@ hex_or_rexp:		(+|-)?[0-9]+[ed][0-9]			(13)
 .fi
 .ke
 
-
 .ks
 .nf
 r:			(+|-)?[0-9]*":"[0-9]			(14)
@@ -284,7 +268,6 @@ r:			(+|-)?[0-9]*":"[0-9]			(14)
 	other		reduce	real_number
 .fi
 .ke
-
 
 .ks
 .nf

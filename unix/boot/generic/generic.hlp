@@ -75,7 +75,6 @@ input file.  This mode is most commonly used for object libraries.
 .le
 .le
 
-
 The generic preprocessor operates by token replacement (currently using a
 UNIX \fILex\fR lexical analyzer).  The input stream is broken up into a
 stream of tokens.  Each token is examined to see if it is in the following
@@ -142,7 +141,6 @@ sizeof()	the size of the specified type,
 
 != ==		the relational operators
  >  <  >= <=
-
 
 Examples:
 

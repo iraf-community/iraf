@@ -40,7 +40,6 @@ The cursor mode keystrokes are all upper case letters, reserving lower case
 for applications programs.  The terminal shift lock key may be used to
 minimize typing.  The recognized cursor mode keystrokes are shown below.
 
-
 .ks
 .nf
 (*X* means not yet implemented)
@@ -71,18 +70,15 @@ minimize typing.  The recognized cursor mode keystrokes are shown below.
 	:!	send a command to the host system
 	0	reset and redraw
        1-9	roam
-
 .fi
 
 .ce
 Figure 2. Cursor Mode Keystrokes
 .ke
 
-
 The numeric keypad of the terminal (if it has one) is used for directional
 roaming.  The directional significance of the numeric keys for roaming
 is obvious if the terminal has a keypad, and is illustrated below.
-
 
 .ks
 .nf
@@ -93,7 +89,6 @@ is obvious if the terminal has a keypad, and is illustrated below.
 	1   2   3	225 -90 -45
 .fi
 .ke
-
 
 If the character : is typed while in cursor mode the alpha cursor will appear
 at the bottom of the screen, allowing a command line to be entered.  If the
@@ -172,7 +167,6 @@ Equivalent to the numeric key 0, i.e., restore the unitary workstation
 transformation and redraw the screen.
 .le
 .le
-
 
 For example, to set the X and Y resolutions to 250 and 100, respectively,
 one could enter the following command (the computer will type the ':' at

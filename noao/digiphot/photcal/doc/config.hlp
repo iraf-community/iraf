@@ -240,7 +240,6 @@ the catalog variables for program objects.
 .ls Example
 
 .nf
-
 # Sample transformation section for the UBV system
 
 transform
@@ -395,7 +394,6 @@ are also optional.
 .nf
 weight (label) = expression
     min = expression max = expression
-
 .fi
 .le
 
@@ -659,7 +657,6 @@ ut3             17      # ut time of filter 3 observation
 X3              18      # airmass of filter 3 observation
 m3              19      # filter 3 instrumental magnitude
 error(m3)       20      # error in filter 3 instrumental magnitude
-
 
 transformation
 

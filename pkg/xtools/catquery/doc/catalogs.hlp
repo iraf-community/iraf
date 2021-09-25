@@ -226,7 +226,6 @@ and units names are conventions that are adopted to simplify writing the
 configuration file and astrometric applications. They are not part of
 the catalog access API itself.
 
-
 .ih
 SEE ALSO
 surveys

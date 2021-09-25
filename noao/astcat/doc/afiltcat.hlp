@@ -140,7 +140,6 @@ cl> page reg001.cat.1
 cl> afiltcat reg001.cat.1 reg001.cat.1 fsort=mag1
 .fi
 
-
 5. Filter a list of input astrometry files by extracting columns 1-4
 but reversing the order of fields 3 and 4.  Overwrite the input files.
 

@@ -324,7 +324,6 @@ interpretation for all the fitting geometries as shown below.
             b * f - c * e = +/- const
 .fi
 
-
 The coefficients can be interpreted as follows. Xref0, yref0, xin0, yin0
 are the origins in the reference and input frames respectively. Orientation
 and skew are the orientation of the x and y axes and their deviation from
@@ -382,7 +381,6 @@ y and are assumed to be positive.
             a = xin0 - b * xref0 - c * yref0 = xshift
             d = yin0 - e * xref0 - f * yref0 = yshift
 .fi
-
 
 \fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the region of
 validity of the fit as well as the limits of the grid
@@ -462,7 +460,6 @@ commands. Typing the parameter name alone will list the current value.
 :reject [value]                 Rejection threshold
 .fi
 
-
 .ih
 FORMATS
 
@@ -490,8 +487,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill

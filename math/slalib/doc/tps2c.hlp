@@ -1,7 +1,6 @@
 .help tps2c Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slTPSC (XI, ETA, RA, DEC, RAZ1, DECZ1,
      :                                        RAZ2, DECZ2, N)
 
@@ -54,7 +53,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

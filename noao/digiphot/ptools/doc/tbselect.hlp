@@ -96,7 +96,6 @@ removing all INDEF valued magnitudes.
 
 .nf
     pt> tbselect  n2264b.nst.1 n2264out  "MAG != INDEF"
-
 .fi
 
 .ih

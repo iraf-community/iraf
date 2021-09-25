@@ -208,7 +208,6 @@ themselves not the coordinate axes.
 	   d = yo - e * xref0 - f * yref0 = xshift
 .fi
 
-
 .ih
 Forward vs. Backward Transformations
 
@@ -262,7 +261,6 @@ u       unsigned decimal integer
 w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
-   
    
 Conventions for w (field width) specification:
    
@@ -368,7 +366,6 @@ the list of unknowns.
 
     cl> geoxytran unknowns unknowns.tran rtran.db rtran
 
-
 2.  Evaluate the backward transformation to take coordinates from the
 output system to the reference system.  In this example we use the
 output of the first example to illustrate getting back the coordinates
@@ -381,14 +378,12 @@ used in the original geomap input.
 	512.     512. 346.8555 684.0376
     0.999918 512.0001 -153.0380 346.8555
 
-
 3. Evaluate the transform computed in example 1 for the same list of
 unknowns but modify the transformation slightly by setting xmag
 and ymag to 1.18 and 1.18 exactly.
 
     cl> geoxytran unknowns unknowns.tran rtran.db rtran xmag=1.18 \
 	ymag=1.18
-
 
 4. Evaluate the same transformation for the same unknowns as before
 using the linear transformation parameters not the transform computed

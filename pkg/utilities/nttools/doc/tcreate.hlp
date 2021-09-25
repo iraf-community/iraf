@@ -67,7 +67,6 @@ The following data types are recognized by this parameter
 (the default data type is single-precision real):
 
 .nf
-
      r - Single-precision real.
      d - Double-precision real.
      i - Integer.
@@ -247,7 +246,6 @@ and "Give table data".
 The table will have 4 columns and 2 rows.
 
 .nf
-
 tt> tcreate test STDIN STDIN
 
 Give column definitions (name, datatype, print format, units)
@@ -262,7 +260,6 @@ Give table data ... then newline & EOF to finish.
 nameless      3:18:47   42:24   INDEF
 "SA0 123456"  19:00:06.3  -0:00:01  3.5
 ^Z
-
 .fi
 
 2. Create a table called "outfile.tab" using the columns specified
@@ -339,7 +336,6 @@ may have the following data:
           465.180  7.79  0.16   9.999    9.999    9.999    9.999
          3   156.25     5.17   14.610   14.537   14.483   14.438
           462.206  7.26  0.37   0.013    0.014    0.015    0.016
-
 
 and could have the following column-definition file:
 

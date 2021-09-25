@@ -21,7 +21,6 @@ At startup \fBshowcap\fR prints the following instructions to STDOUT, then
 prompts with an asterisk.
 
 .nf
-
 	cmd :  `set' device
 	    |  `*' (to dump full graphcap entry)
 	    |  cc [arg1 [arg2 [arg3]]]
@@ -31,7 +30,6 @@ prompts with an asterisk.
 	    |   an encoder program (non alpha first char)
 	    ;
 	*
-	
 .fi
 
 The user must first use `set' to tell \fBshowcap\fR which graphics device to

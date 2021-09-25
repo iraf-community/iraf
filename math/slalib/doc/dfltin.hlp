@@ -1,7 +1,6 @@
 .help dfltin Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slDFLI (STRING, NSTRT, DRESLT, JFLAG)
 
      - - - - - - -
@@ -114,7 +113,6 @@
 
   Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

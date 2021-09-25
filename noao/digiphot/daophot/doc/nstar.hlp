@@ -439,7 +439,6 @@ making the PSF model can be found at (442,410), (348,189), and (379,67).
             objects which are not stars don't
 .fi
 
-
 2. Run nstar on a section of the input image using the group file and PSF
 model derived in example 1 for the parent image and writing the results
 in the coordinate system of the parent image.
@@ -468,17 +467,13 @@ in the coordinate system of the parent image.
 
         ... the output images is ypix.sub.2
 
-
     da> substar dev$ypix[150:450,150:450] ypix.nst.2 "" default default  \
         wcsin=tv wcspsf=tv wcsout=tv
 
         ... subtract stars from the nstar input image
 
         ... the output images is ypix.sub.3
-
 .fi
-
-
 
 3. Run nstar exactly as in example 1 but submit the task to the background.
 Turn off verify and verbose.
@@ -489,7 +484,6 @@ Turn off verify and verbose.
 
         ... the results will appear in ypix.nst.3 and ypix.nrj.3
 .fi
-
 
 .ih
 TIME REQUIREMENTS

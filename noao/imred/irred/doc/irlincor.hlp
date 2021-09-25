@@ -37,9 +37,7 @@ performed as type real. The correction is performed assuming
 that the non-linearity can be represented by the following simple relationship:
 
 .nf
-
 ADU' = ADU * [ coeff1 + coeff2 * (ADU / 32767) + coeff3 * (ADU / 32767)**2 ]
-
 .fi
 
 The coefficients which occur in this expression are specified by the
@@ -56,14 +54,12 @@ EXAMPLES
 
 .nf
 	cl> irlincor input output
-
 .fi
 
 2. Correct a list of images in place using specified values for the coefficients
 
 .nf
 	cl> irlincor @list @list coeff1=1.0 coeff2=0.1 coeff3=0.01
-
 .fi
 
 .ih

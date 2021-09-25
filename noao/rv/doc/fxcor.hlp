@@ -140,9 +140,7 @@ in fitting the correlation peak are weighted by a power of the
 distance from the center as given by the equation
 
 .nf
-
          weight = 1 - (distance / (width/2)) ** \fIweights\fR
-
 .fi
 
 Note that a weight parameter of zero is equivalent to uniform weights.
@@ -199,7 +197,6 @@ and ".gki" files (see the description for the \fIoutput\fR parameter).
 Possible values  for \fIverbose\fR and the files created are as follows:
 
 .nf
-
     Value:      Files Created:
 
     short       (an 80-char .txt file and a .gki file)
@@ -208,7 +205,6 @@ Possible values  for \fIverbose\fR and the files created are as follows:
     nogki       (a 125-char .txt file and a .log file)
     txtonly     (a 125-char .txt file)
     stxtonly    (an 80-char .txt file)
-
 .fi
 
 The \fIfields\fR task 
@@ -826,12 +822,10 @@ respectively) will be computed.
 In short form, here are the equations:
 
 .nf
-
     ref_rvobs = catalogue_vel_of_template - H(temp)  # obs. vel. of temp.
     VREL = C * (10 ** (wpc * shift) - 1.)	     # relative vel.
     VOBS = ((1+ref_rvobs/C)*(10**(wpc*shift)-1)) * C # observed vel.
     VHELIO = VOBS + H(object)			     # heliocentric vel.
-
 .fi
 
 where H() is the heliocentric correction for that observation.  The

@@ -141,7 +141,6 @@ image is described below.
 
     x(output) = xt + xout
     y(output) = yt + yout
-
 .fi
 
 The output image gray levels are determined by interpolating in the input

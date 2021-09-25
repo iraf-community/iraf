@@ -166,7 +166,6 @@ Care should be taken in this case to avoid having too many
 (\fBtoo many is typically more than one\fR) background job running
 at once.
 
-
 To make one-button snap files and solitaires:
 
 The \fBimttodmd\fR script has various options for leaving the
@@ -178,7 +177,6 @@ suspicious by nature) set the variable:
     setenv R_DISPOSE    '/ursa/iraf/extern/nlocal/lib/imttodmd -image %s'
 .fi
 
-
 To only make the images, with no solitaire output:
 
 .nf
@@ -187,7 +185,6 @@ To only make the images, with no solitaire output:
 
 This will allow you to run a single CRTPICT job after collecting all
 the snap files.
-
 
 To make solitaires from an imtool window, the old way:
 

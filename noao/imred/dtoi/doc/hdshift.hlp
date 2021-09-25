@@ -20,7 +20,6 @@ first coefficient (Bevington, eqn 9-3):
 .nf
                 _      _      _               _
            a0 = y - a1*X - a2*X**2 - ... - an*X**n
-
 .fi
 
 Here, the averages over y and X refer to individual \fBdatabase\fR averages; 
@@ -38,7 +37,6 @@ determine the common solution.
 EXAMPLES
 
 .nf
-
 Shift the curves in four databases to a common zero point.  
 
 	cl> hdshift db1,db2,db3,db4

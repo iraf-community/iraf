@@ -68,7 +68,6 @@ Compute the continuum as flux per unit frequency (F-nu) if yes or flux per
 unit wavelength (F-lambda) if no.
 .le
 
-
 LINE PARAMETERS
 .ls lines = ""
 List of spectral line files.  Spectral line files contain lines of rest

@@ -38,7 +38,6 @@ greyscale values of the output device.  Intensity z1 maps to black, z2 to white.
 The 4 choices for \fIztrans\fR are:
 
 .nf
-
 	"auto"		- z1 and z2 centered on median of image
 	"min_max"	- set z1 and z2 to specified intensities
 	"none" 		- truncate intensities to fit output range

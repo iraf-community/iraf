@@ -28,7 +28,6 @@ output images contain a single 1D spectrum.  Other tasks, such as
 \fBscopy\fR, may be used to pack the spectra into a single file.
 .le
 
-
 There are a number of additional optional output files that may be produced.
 The lists are handled in the same was as for the primary output; i.e.
 depending on the grouping a single name, root name, or a matching list
@@ -79,7 +78,6 @@ produced.  The special filename "STDOUT" prints log information to the
 terminal.
 .le
 
-
 .ce
 Grouping Parameters
 .ls apertures = ""
@@ -105,7 +103,6 @@ number extension.
 .le
 .le
 
-
 .ce
 Dispersion Matching Parameters
 .ls first = no
@@ -126,7 +123,6 @@ parameter is set to produce constant pixel increments in the log of the
 wavelength.  The dispersion is interpreted in that case as the difference
 in the log of the endpoints divided by the number of pixel.
 .le
-
 
 .ce
 Combining Parameters
@@ -168,7 +164,6 @@ Output region limits specified as a pair of whitespace separated pixel
 values.
 .le
 
-
 .ce
 Masking Parameters
 .ls smaskformat = "bpmspectrum" (bpmspectrum|bpmpixel)
@@ -203,7 +198,6 @@ and 4.
 .ls blank = 0.
 Output value to be used when there are no pixels.
 .le
-
 
 .ce
 Scaling/Weighting Parameters
@@ -267,7 +261,6 @@ options.  Also if an exposure keyword is specified that keyword will be
 added to the output image using a weighted average of the input exposure
 values.
 .le
-
 
 .ce
 Algorithm Parameters

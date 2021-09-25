@@ -42,7 +42,6 @@ may be a list for array.  A repetition count may be specified in the form
 
 	rep_count (value)
 
-
 which is equivalent to value repeated the rep_count times.
 The values in the initialization list are separated by commas.
 .le

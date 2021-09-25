@@ -84,14 +84,12 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
     
-    
 Conventions for w (field width) specification:
     
     W =  n      right justify in field of N characters, blank fill
         -n      left justify in field of N characters, blank fill
         0n      zero fill at left (only if right justified)
 absent, 0       use as much space as needed (D field sets precision)
-    
     
 Escape sequences (e.g. "\n" for newline):
     

@@ -116,7 +116,6 @@ x  Delete nearest point, star, or focus (selected by query)
 z  Zoom to a single measurement
 <space> Step through different focus or stars in current plot type
 
-
 :beta <val>     Beta parameter for Moffat fits
 :level <val>	Level at which the size parameter is evaluated
 :overplot <y|n> Overplot the profiles from the narrowest profile?

@@ -377,7 +377,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
    
-   
 Conventions for w (field width) specification:
    
     W =  n      right justify in field of N characters, blank fill
@@ -496,7 +495,6 @@ Refsystem: b1950  Coordinates: equatorial FK4
     Equinox: B1950.000 Epoch: B1950.00000000 MJD: 33281.92346
 Located 5 objects in image wpix
 
-
 cl> type wpix.match 
 
 # Input File: wpix.coords  Output File: wpix.match
@@ -583,7 +581,6 @@ cl> type wpix.match
 cl> display wpix 1
 
 cl> fields wpix.match 3,4 | tvmark 1 STDIN col=204
-
 .fi
 
 .ih

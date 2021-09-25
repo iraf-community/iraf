@@ -289,7 +289,6 @@ EXAMPLES
 directory and writes them to 'history.lis'.
 
 .nf
-
 tt> tupar *.tab same=yes verbose=no readonly=yes >history.lis
         (The task writes a ":" prompt and waits for input.)
 :g history
@@ -303,7 +302,6 @@ would not be appropriate when operating on a list of tables unless
 the 'same' parameter is set to "no".
 
 .nf
-
 tt> tupar junk
         (The task writes the table name and a ":" prompt and waits for input.)
 junk.lis

@@ -619,7 +619,6 @@ consists of a list of frames to be panned together, terminated, as
 is almost everything in this code, by IDS_EOD.
 
 .nf
-
 # Pan subroutine
 
 procedure pansub (frames)
@@ -693,7 +692,6 @@ frames retain their relative offsets.]
     The cursor and button routines are given here.
 
 .nf
-
 # CV_RDBUT -- read button on trackball (or whatever)
 # if none pressed, will get zero back
 

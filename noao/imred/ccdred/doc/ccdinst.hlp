@@ -130,7 +130,6 @@ translate   Translate image string selected by the imagetyp
 	    parameter to one of the CCDRED types given as an
 	    argument or queried:
 	    object, zero, dark, flat, comp, illum, fringe, other
-
 .fi
 
 The following are CCDRED parameters which may be translated.  You are
@@ -139,7 +138,6 @@ An optional default value (returned if the image does not contain the
 keyword) may be typed as the second argument of the command.
 
 .nf
-
 	BASIC PARAMETERS
 imagetyp	Image type parameter (see also translate)
 subset		Subset or filter parameter

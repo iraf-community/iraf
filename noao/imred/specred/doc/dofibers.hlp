@@ -812,7 +812,6 @@ that the data will contain the object information independent of other
 records.  Figure 1 shows an example identification file called M33Sch2.
 
 .nf
-
     Figure 1: Example Aperture Identification File
 
     cl> type m33sch2
@@ -829,7 +828,6 @@ records.  Figure 1 shows an example identification file called M33Sch2.
     46 2 arc
     47 0 sky
     48 1 phil2
-
 .fi
 
 Note the identification of the sky fibers with beam number 0, the object
@@ -1014,9 +1012,7 @@ multifiber data.  The parameter values can be changed from the
 defaults by using the parameter editor,
 
 .nf
-
 	cl> epar params
-
 .fi
 
 or simple typing \fIparams\fR.  The parameter editor can also be

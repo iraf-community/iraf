@@ -45,7 +45,6 @@ elements long where ncoeff is defined as follows.
 	SF_SPLINE1:		nxcoeff = xorder + 1
 				nycoeff = yorder + 1
 				ncoeff = (xorder + 1) * (yorder + 1)
-
 .fi
 
 .ih

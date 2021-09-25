@@ -69,7 +69,6 @@ mapping function is selected with the \fBmapping_function\fR string.
 The types of mapping are:
 
 .nf
-
    linear
    exponential - emphasizes high intensity values.
    logarithmic - emphasizes low intensity values.

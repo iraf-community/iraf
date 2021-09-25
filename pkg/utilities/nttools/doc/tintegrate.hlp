@@ -74,7 +74,6 @@ tt> tstat intab flux
   401     0.07562488719   0.171107  -0.0381  -0.72729  0.22527
 tt> =0.07562488719 * 401
 30.32557976319
-
 .fi
 
 3.  Integrate the flux over row number.

@@ -1,7 +1,6 @@
 .help m2av Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slM2AV (RMAT, AXVEC)
 
      - - - - -
@@ -34,7 +33,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

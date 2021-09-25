@@ -57,7 +57,6 @@ Type "help ccsystems" to see the list of the supported sky coordinate systems.
 Type "help mwcs$MWCS.hlp fi+" to find out more about the IRAF image world
 coordinate system library MWCS.
 
-
 SEE ALSO
 skdecwstr, skdecim
 .endhelp

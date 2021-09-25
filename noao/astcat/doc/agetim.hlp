@@ -181,7 +181,6 @@ cl> display reg001.2.fits 1 fi+
 cl> imheader reg001.2.fits
 .fi
 
-
 3. Repeat example 2 but extract data for two surveys.
 
 .nf

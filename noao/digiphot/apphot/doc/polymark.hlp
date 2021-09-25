@@ -253,7 +253,6 @@ polygon and polygon center lists.
 
 	... output will appear in ypix.coo.1 and ypix.ver.1
 
-
 	ap> display dev$ypix 2 fi+ 
 
 	... display the image
@@ -269,7 +268,6 @@ polygon and polygon center lists.
 
 	... type q to quit and q to confirm the quit
 
-
 	ap> display dev$ypix 2 fi+ 
 
 	... redisplay the image
@@ -283,14 +281,12 @@ polygon and polygon center lists.
 	... type q to quit and q to confirm the quit
 .fi
 
-
 2. Repeat the previous example using an image section.
 
 .nf
 	ap> display dev$ypix[150:450,150:450] 1 fi+ 
 
 	... display the image
-
 
 	ap> polymark dev$ypix[150:450,150:450]] display=imdg wcsout=tv
 
@@ -322,11 +318,9 @@ polygon and polygon center lists.
 
 	... output will appear in ypix.coo.2 and ypix.ver.2
 
-
 	ap> display dev$ypix[150:450,150:450] 2 fi+ 
 
 	... display the image
-
 
 	ap> polymark dev$ypix[150:450,150:450] coords=ypix.coo.2 \
             polygons=ypix.ver.2 display=imdg wcsin=tv
@@ -336,9 +330,7 @@ polygon and polygon center lists.
 	... type m to mark the next polygon / polygon center on the display
 
 	... type l to mark the remaining polygons
-
 .fi
-
 
 3. Repeat example 1 using a contour plot instead of the image display.
 

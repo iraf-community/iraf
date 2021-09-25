@@ -60,7 +60,6 @@ Three new functions are available in addition to the usual arithmetic
 functions:
 
 .nf
-
 row     takes no argument, returns current row number 
 delta   takes two dates (in CDBS format) and returns the
         number of days between them

@@ -134,7 +134,6 @@ while (i != j) {
     files *.gif | count STDIN | scan (i)
 }
 
-
 if (i > 0) {
     printf ("<br><p><em>Note: DN and S/N are per-pixel</em><br>\n")
 	

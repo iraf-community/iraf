@@ -1,7 +1,6 @@
 .help epj2d Jun99 "Slalib Package"
 
 .nf
-
       DOUBLE PRECISION FUNCTION slEJ2D (EPJ)
 
      - - - - - -
@@ -22,7 +21,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

@@ -146,7 +146,6 @@ order legendre polynomial.  The printed output is shown.
  	2	   3.150E1	  1.820E-6
  	3	   8.167E0	  1.896E-6
  	4	 -1.621E-6	  2.117E-6
-
 .fi
 
 2.  Fit a cubic spline to the last 12 columns of image "m74".

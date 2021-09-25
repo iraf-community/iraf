@@ -1,7 +1,6 @@
 .help pertel Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slPRTL (JFORM, DATE0, DATE1,
      :                 EPOCH0, ORBI0, ANODE0, PERIH0, AORQ0, E0, AM0,
      :                 EPOCH1, ORBI1, ANODE1, PERIH1, AORQ1, E1, AM1,
@@ -117,7 +116,6 @@
 
   Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

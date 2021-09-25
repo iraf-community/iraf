@@ -313,7 +313,6 @@ m3	 	10	# filter 3 instrumental magnitude
 error(m3) 	11	# error in filter 3 instrumental magnitude
 Xm3	        12	# airmass of filter 3 observation		
 
-
 transformation
 
 fit   u1 = 27.0, u2=0.68, u3=0.05
@@ -325,7 +324,6 @@ BFIT: m2 = b1 + V + BV + b2 * Xm2 + b3 * BV
 fit   v1 = 25.0, v2=0.17, v3=-0.02
 VFIT: m1 = v1 + V + v2 * Xm1 + v3 * BV
 .fi
-
 
 .ih
 THE NON-LINEAR INTERACTIVE FITTING PACKAGE
@@ -364,13 +362,11 @@ algorithm to fit the data. Detailed descriptions of the algorithm can
 be found in the following two references.
 
 .nf
-
 1. Bevington, P.R., 1969, Data Reduction and Error Analysis for the
    Physical Sciences, Chapter 11, page 235.
 
 2. Press, W.H. et al., 1986, Numerical Recipes: The Art of Scientific
    Computing, Chapter 14, page 523.
-
 .fi
 
 CURSOR COMMANDS
@@ -402,7 +398,6 @@ delimited by a comma. The data types are the following (they can be
 abbreviated to up to three characters).
 
 .nf
-
     function    Dependent variable or function
     fit         Fitted value
     residuals   Residuals (function - fit)
@@ -411,7 +406,6 @@ abbreviated to up to three characters).
     identifier  Independent variable named "identifier" (if defined)
     var n       Independent variable number "n"
     user n      User defined plot equation "n"  (if defined)
-
 .fi
 
 The application program can define independent variable names and user plot 
@@ -433,13 +427,11 @@ which may be redefined by the application program or interactively by using
 the 'g' key, are the following.
 
 .nf
-
         h       function, fit
         i       function, residuals
         j       function, ratio
         k       var 1, function
         l       user 1, user 2 (default)
-
 .fi
 
 The initial graph key, if not redefined by the application program is 'h'.
@@ -629,7 +621,6 @@ eye instead of using the automatic rejection algorithm.
 
 	... proceed to the next fit by typing "next" in response to the
 	    prompt
-
 .fi
 
 .ih

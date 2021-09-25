@@ -43,7 +43,6 @@ list.
     SPLINE1	# linear spline with uniformly spaced break points
 .fi
 
-
 The CURFIT package performs a weighted fit.
 The weighting options are WTS_USR, WTS_UNIFORM and WTS_SPACING.
 The user must supply a weight array. In WTS_UNIFORM mode the curfit
@@ -93,7 +92,6 @@ Example 1: Fit curve to data, unifrom weighting
 
     call cvfree (cv)
 
-
 Example 2: Fit curve using accumulate mode, weight based on spacing
 
     include <math/curfit.h>
@@ -117,7 +115,6 @@ Example 2: Fit curve using accumulate mode, weight based on spacing
 
     call cvfree (cv)
 
-
 Example 3: Fit and subtract smooth curve from image lines
 
     include <math/curfit.h>
@@ -140,7 +137,6 @@ Example 3: Fit and subtract smooth curve from image lines
     }
 
     call cvfree (cv)
-
 
 Example 4: Fit curve, save fit for later use by CVEVAL. LEN_FIT must be a least
 	   order + 7 elements long.

@@ -16,7 +16,6 @@ roughly modeled after C and Ratfor as well as fairly sophisticated
 capabilities for performing mathematical calculations and string manipulation.
 The CL environment may easily be extended by the user.
 
-
 2. \fITask Initiation and Termination\fR
 
     IRAF organizes tasks into groups called \fIpackages\fR.  When a package
@@ -71,7 +70,6 @@ image, or when the user explicitly clears the cache using the flprcache
 command.  The size of the process cache is small, usually only
 three executables can be maintained in the cache.
 
-
 3. \fIParameter Retrieval and Update\fR
 
     Most CL tasks have a parameter list associated with them.  When the task
@@ -85,7 +83,6 @@ a new private copy of the parameters is stored into the directory
 pointed to by the IRAF logical name `uparm'.  A number of
 builtins are used to control the handling of parameters including
 lparam, eparam, update and unlearn.
-
 
 4. \fIError Handling\fR
 

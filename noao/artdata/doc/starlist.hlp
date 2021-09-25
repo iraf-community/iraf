@@ -262,7 +262,6 @@ q	Exit program
 
 The following parameters can be shown or set from within the STARLIST task.
 
-
 .nf
 		Starlist Colon Commands
 

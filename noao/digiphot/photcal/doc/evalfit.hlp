@@ -131,7 +131,6 @@ the observed quantities are mv, mb, Xv, and Xb.
 		 mb = b0 + V + BV + b1 * Xb + b2 * BV
 .fi
 
-
 Formal errors for each fit may
 be computed by,  1) setting \fIerrors\fR to "obserrors" and using the
 error columns defined in the observations section of \fIconfig\fR
@@ -191,14 +190,12 @@ w	output the number of spaces given by field W
 x	hexadecimal integer
 z	complex format (r,r) (D = precision)
 
-
 Conventions for w (field width) specification:
 
     W =  n	right justify in field of N characters, blank fill
 	-n	left justify in field of N characters, blank fill
 	0n	zero fill at left (only if right justified)
 absent, 0	use as much space as needed (D field sets precision)
-
 
 Escape sequences (e.g. "\n" for newline):
 
@@ -228,9 +225,7 @@ Examples
 %-12.5g     same as above but left justified
 
 \n          insert a newline
-
 .fi
-
 
 Note that deferred value fields are \fBnot implemented\fR in EVALFIT.
 
@@ -258,7 +253,6 @@ xu, yu, fit value and fit error respectively.
 .nf
 	ph> evalfit m92.obs m92.cfg m92.fit m92.cal print="xu,yu"\
 	    format="%-10.10s  %-7.2f  %-7.2f  %-7.3f  %-6.3f\n"
-
 .fi
 
 .ih

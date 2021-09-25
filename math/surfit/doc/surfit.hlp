@@ -4,7 +4,6 @@
 NAME
 surfit -- set of routines for fitting gridded surface data
 
-
 .ih
 SYNOPSIS
 
@@ -83,7 +82,6 @@ and output the fitted image
 include <imhdr.h>
 include <math/surfit.h>
 
- 	
 	old = immap (old_image, READ_ONLY, 0)
 	new = immap (new_image, NEW_COPY, 0)
 	
@@ -152,7 +150,6 @@ include <math/surfit.h>
 
 	call imunmap (old)
 	call imunmap (new)
-
 .fi
 
 .endhelp

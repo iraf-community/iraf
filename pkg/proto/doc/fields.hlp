@@ -44,7 +44,6 @@ EXAMPLES
 1. Reverse the order of the 5 columns in list file "list".
 
 .nf
-
 	cl> fields list 5-1 > newlist
 .fi
 
@@ -52,7 +51,6 @@ EXAMPLES
 \fIgraph\fR.
 
 .nf
-
 	cl> fields newlist 1,3 | graph
 .fi
 

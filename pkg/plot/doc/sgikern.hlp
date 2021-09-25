@@ -42,7 +42,6 @@ in the machine independent MII format (twos complement, most significant byte
 first).  The SGI kernel reduces all IRAF plotting instructions to only four
 SGK metacode instructions, i.e.:
 
-
 .ks
 .nf
 	opcode  arguments                description
@@ -53,7 +52,6 @@ SGK metacode instructions, i.e.:
 	   4      W    0                set line width (>= 1)
 .fi
 .ke
-
 
 All coordinates are specified in GKI NDC units in the range 0-32767.  Note that
 all metacode instructions are the same length.  All text generation, line type

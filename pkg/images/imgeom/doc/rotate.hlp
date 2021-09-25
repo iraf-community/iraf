@@ -111,7 +111,6 @@ transformation is described below.
 .nf
     xt = (x - xin) * cos (rotation) - (y - yin) * sin (rotation) + xout
     yt = (x - xin) * sin (rotation) + (y - yin) * cos (rotation) + yout
-
 .fi
 
 The output image gray levels are determined by interpolating in the input

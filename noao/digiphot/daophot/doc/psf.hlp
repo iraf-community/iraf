@@ -341,7 +341,6 @@ q	Quit task
 :psfrad	    [value]	Show/set the psf radius (scale units)
 :fitrad	    [value]	Show/set the fitting radius (scale units)
 
-
 The following cursor commands are available once a star has been selected 
 and the graphics cursor has been activated.
 
@@ -359,7 +358,6 @@ w	Decrease horizontal angle by 15 degrees (mesh plot only)
 e	Increase horizontal angle by 15 degrees (mesh plot only)
 c	Plot the default contour plot for this star
 r	Plot the radial profile for this star
-
 
 	Colon Graphics Commands
 
@@ -635,7 +633,6 @@ for each star. Good stars for making the PSF model can be found at (442,410),
             ypix.psg.1
 .fi
 
-
 2. Run PSF non-interactively using the photometry file and psf star file
 created in the previous example.
 
@@ -658,7 +655,6 @@ created in the previous example.
 
 	... convert the sampled PSF look-up table to a PSF image
 .fi
-
 
 3. Setup and run PSF interactively without using the image display cursor.
 Use the photometry file created in example 1. Before running PSF in this
@@ -715,7 +711,6 @@ manner the user should have a list of the candidate PSF star ids.
 	... reset the image cursor
 .fi
 
-
 4. Run PSF in non-interactive mode using an image cursor  command file of
 instructions called icmds.
 
@@ -738,9 +733,7 @@ instructions called icmds.
 	    in the input photometry file
 
 	... the output will appear in ypix.psf.4, ypix.pst.4, ypix.psg.4
-
 .fi
-
 
 .ih
 TIME REQUIREMENTS

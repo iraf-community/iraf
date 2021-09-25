@@ -259,9 +259,7 @@ file on the 800 bpi input tape into file "myfile", converting to lower case:
 .fi
 .ke
 
-
 The source for the program "rcardimage" follows:
-
 
 .ks
 .nf
@@ -281,8 +279,6 @@ begin
 end
 .fi
 .ke
-
-
 
 .ks
 .nf
@@ -323,7 +319,6 @@ end
 .fi
 .ke
 .endhelp
-
 
 .helpsys mtio Nov83 "MTIO Interface Detailed Design"
 .sh
@@ -468,7 +463,6 @@ of the device lock file in the dev$ directory.  The lock file is used to
 indicate that the drive has been allocated, and to keep track of the tape
 position when the drive is closed.
 
-
 .ks
 .nf
 	mtopen
@@ -481,11 +475,9 @@ position when the drive is closed.
 			zsttmt
 		fset			[to set buffer size]
 
-	    
 	    	Structure of the MTOPEN Procedure
 .fi
 .ke
-
 
 The ZCLSMT procedure is called by CLOSE to close a file opened with MTOPEN.
 CLOSE may be called by the user, by the IRAF main if the task completes w/o
@@ -493,7 +485,6 @@ closing the file, or during error recovery.  An error occurring during MTOPEN
 may result in a call to CLOSE.  We do not have to worry about reentrancy here
 because none of the MTIO z-routines called by ZOPNMT call error (they will
 return an ERR status to FOPNBF and therefore terminate before ZCLSMT is called).
-
 
 .ks
 .nf
@@ -511,16 +502,13 @@ return an ERR status to FOPNBF and therefore terminate before ZCLSMT is called).
 				fatal
 			zzclmt
 
-
 	    	Structure of the ZCLSMT procedure
 .fi
 .ke
 
-
 The i/o procedures keep track of the number of records read or written and
 ensure that we do not read past EOF or EOT.  We need to keep track of the
 number of records written so that we can detect a null file write.
-
 
 .ks
 .nf
@@ -528,21 +516,17 @@ number of records written so that we can detect a null file write.
 		zardmt				zawrmt
 			zzrdmt				zzwrmt
 
-
 	await
 		zawtmt
 			zzwtmt
 	
-
 		Structure of the I/O Procedures
 .fi
 .ke
 
-
 The final routine is the ZSTTMT status procedure.  This routine is self
 contained, except that access to the MTIO common is required to get the
 access mode (which determines the default buffer size).
-
 
 .sh
 Semicode
@@ -555,7 +539,6 @@ drive has not been reopened, parse the filespec and save the pieces in the
 descriptor (for later use by ZOPNMT), read in the current tape position from
 the lock file, and then call fopnbf which in turn calls ZOPNMT to open the
 drive and position to the desired file.
-
 
 .tp 8
 
@@ -589,14 +572,12 @@ begin
 end
 .fi
 
-
 ZOPNMT is passed a mostly initialized magtape file descriptor in the mtio
 common by MTOPEN.  The "filespec" string is not actually used by ZOPNMT.
 We physically open the file and set up the remaining fields in the tape file
 descriptor.  NOTE: if an interrupt occurs during the call to ZZOPMT,
 ZCLSMT will be called to perform error recovery.  If this happens the
 position of the tape is undefined.
-
 
 .ks
 .nf
@@ -628,7 +609,6 @@ end
 .fi
 .ke
 
-
 Opening a file for writing and then immediately closing it poses problems.
 There is no way to write a zero-length file on an unlabeled tape.  We cannot
 just write a tape mark because that might mean writing a spurious double
@@ -651,7 +631,6 @@ of call and modify the lock file, marking the position of the tape
 as UNDEFINED.  The next open call will then automatically rewind the
 tape, ensuring accurate positioning.  In a normal close we write out
 a lockfile identifying the file and record to which the tape is positioned.
-
 
 .ks
 .nf
@@ -676,14 +655,12 @@ end
 .fi
 .ke
 
-
 Ignore all read requests once EOF or EOT has been reached.  The only operation
 possible at that point is to close the device; there is no rewind or backskip
 function for a streaming device.  We do not "know" what would happen if we
 called ZZRDMT after reaching EOF; this is OS dependent, and we do not want
 to require any particular behavior (some systems would return the first
 record of the next file, others would keep returning EOF).
-
 
 .ks
 .nf
@@ -696,10 +673,8 @@ end
 .fi
 .ke
 
-
 We cannot hit EOF or EOT on a write, so merely post the request and return.
 Ignore the "offset" parameter since magtape is a streaming device.
-
 
 .ks
 .nf
@@ -711,13 +686,11 @@ end
 .fi
 .ke
 
-
 FIO insures that ZAWTMT is called once and only once after every asynchronous
 i/o read or write request.  Once we hit EOF or EOT on a read, we return
 EOF (nchars = 0) on every subsequent request until the file is closed.
 After each real data transfer we update the record,file counters as
 directed by the OS.
-
 
 .ks
 .nf
@@ -768,7 +741,6 @@ device in use.  The maximum number of magtape files which can be open at one
 time is the maximum number of tape drives.  Only one file can be open on each
 drive at a time.
 
-
 .ks
 .nf
 	struct mtiodes {
@@ -787,14 +759,12 @@ drive at a time.
 .fi
 .ke
 
-
 When a device is allocated, a lock file is created in the system logical device
 directory "dev$".  For example, the lock file for magtape unit A is the
 file "dev$mta.lok".  This is a human readable text file; it is typed out on
 the terminal when the user types "devstatus mta".  The lock file is updated
 when the drive is closed and deleted when the drive is deallocated.  The drive
 is automatically deallocated when the user logs out of the CL.
-
 
 .ks
 .nf
@@ -806,7 +776,6 @@ Sample Lock File:
     72 records read, EOF seen
 .fi
 .ke
-
 
 The preliminary comments are written when the lock file is created, i.e.,
 when the device is allocated.  Any number of comment lines are permitted.

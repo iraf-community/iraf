@@ -80,7 +80,6 @@ IMSHIFT will shift an image in x and y such that:
 .nf
     xout = xin + xshift
     yout = yin + yshift
-
 .fi
 
 The output image gray levels are determined by interpolating in the input

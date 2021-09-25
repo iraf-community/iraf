@@ -17,7 +17,6 @@ and a pure translation or scale change is being performed, the corresponding
 output coordinate will be indefinite.  If either input coordinate is indefinite
 and a rotation is being performed, both output coordinates will be indefinite.
 
-
 Parameters:
 
 	list
@@ -38,7 +37,6 @@ Parameters:
 
 	x2 = 0.0, y2 = 0.0
 	    New origin; applied after scaling and rotating the input coords.
-
 
 Examples:
 

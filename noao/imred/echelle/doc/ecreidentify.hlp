@@ -103,7 +103,6 @@ ECREIDENTIFY: NOAO/IRAF V2.7 seaman@puppis Mon 09:03:51 27-Jun-88
                Image    Found  Pix Shift  User Shift  Z Shift      RMS
              f043.ec  561/561       0.11       -1.07  -1.9E-6   0.0117
 
-
 ec> ecreidentify f043.ec f033.ec refit=no
 
 ECREIDENTIFY: NOAO/IRAF V2.7 seaman@puppis Mon 09:15:21 27-Jun-88

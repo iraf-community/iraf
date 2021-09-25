@@ -160,7 +160,6 @@ databases it may be necessary to escape the leading square bracket.
     pt> pdump image.mag.3 "ID,XCEN,YCEN,MAG\[1],MAG\[2],MAG\[3]" yes
 .fi
 
-
 4. Select the ID, XCENTER, YCENTER, MSKY and MAG fields from the output
 of the DAOPHOT NSTAR task. Print the headers and parameters as well.
 

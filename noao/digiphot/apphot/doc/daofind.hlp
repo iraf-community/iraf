@@ -190,12 +190,10 @@ to automatically enable confirmation of the critical parameters
 \fIdatapars.fwhmpsf\fR and \fIdatapars.sigma\fR when running in
 non-interactive mode.
 
-
 .ih
 CURSOR COMMANDS
 
 .nf
-
 	     Interactive Keystroke Commands
 
 ?	Print help
@@ -207,7 +205,6 @@ i	Interactively set parameters using star near cursor
 f	Find stars in the image
 spbar	Find stars in the image, output results
 q	Exit task
-
 
 		Colon Commands
 
@@ -263,10 +260,8 @@ q	Exit task
 
 :mkdetections	[y/n]		Mark detections on the image display
 
-
 The following commands are available inside the interactive setup menu.
 
- 
                     Interactive Daofind Setup Menu
 
 	v	Mark and verify critical daofind parameters (f,s)
@@ -385,7 +380,6 @@ setup key i.
 	... type q to quit and q again to confirm the quit
 
 	... full output will appear in the text file ypix.coo.1
-
 .fi
 
 2. Run daofind interactively on a single image using a contour plot in place
@@ -441,9 +435,7 @@ interactive setup key i.
 	ap> set stdimcur = <default>
 
         ... reset the image cursor to its default value
-
 .fi
-
 
 3. Run DAOFIND interactively without using the image display cursor.
 
@@ -493,7 +485,6 @@ interactive setup key i.
         ... reset the image cursor to its default value
 .fi
 
-
 4. Run daofind on a list of 3 images contained in the file imlist in batch mode.
 The program will ask the user to verify that the fwhmpsf and the threshold are
 correct before beginning execution.
@@ -508,7 +499,6 @@ correct before beginning execution.
 
         ... the output will appear in ypix.coo.4, wpix.coo.1, pix.coo.1
 .fi
-
 
 5. Display and find stars in an image section. Write the output coordinates
 in the coordinate system of the parent image. Mark the detected stars on
@@ -526,7 +516,6 @@ the displayed image.
         ap> tvmark 1 ypix.coo.5 col=204
 .fi
 
-
 6. Repeat example 4 but submit the job to the background  and turn off the
 verify switch.
 
@@ -535,7 +524,6 @@ verify switch.
 
 	... the output will appear in ypix.coo.6, wpix.coo.2, pix.coo.2
 .fi
-
 
 7. Use an image cursor command file to drive the daofind task. The cursor
 command file shown below sets the fwhmpsf, sigma, and threshold parameters,
@@ -554,7 +542,6 @@ located stars in the image, updates the parameter files, and quits the task.
 
         ... full output will appear in ypix.coo.7
 .fi
-
 
 .ih
 TIME REQUIREMENTS

@@ -24,7 +24,6 @@ exhausted or a list element "exit" or "quit" is encountered.
 	}
 .fi
 
-
 2. Sum the pixels in a two dimensional array, terminating the sum for each
 line if a negative pixel is encountered, and terminating the entire process
 when the total sum passes a predefined limit.

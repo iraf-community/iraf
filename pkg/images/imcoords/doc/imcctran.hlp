@@ -405,7 +405,6 @@ After the transformation the header looks like the following.
 Note the rms of the x and y fits is on the order 10.0e-10 to 10.0e-11 which
 is the expected numerical precision of the transformation.
 
-
 [2]. Convert the input image used in example 1 to the BFK4 1950.0 system. 
 
 .nf
@@ -420,7 +419,6 @@ Outsystem: B1950  Coordinates: equatorial FK4
 Crval1,2: 201:56:43.5, 47:27:16.0 -> 201:25:02.3, 47:42:47.1 dd:mm:ss.s
     Scaling: Xmag: 0.999999 Ymag: 0.999999 Xrot: 359.848 Yrot: 359.848 degrees
     Rms: X fit: 1.302837E-7 pixels  Y fit: 8.545616E-8 pixels
-
 .fi
 
 Note that precision of the transformation is still good but is significantly
@@ -454,7 +452,6 @@ The transformed image header in this case looks like the following.
     WAT2_001= 'wtype=tan axtype=dec'
     ...
 .fi
-
 
 [3].  Transform the celestial coordinate system of the input image used in
 examples 1 and 2 to the galactic coordinate system.

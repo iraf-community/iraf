@@ -689,7 +689,6 @@ where \fItopic\fR is one of the following.
     flatcombine - Combine and process flat field images
     zerocombine - Combine and process zero level images
  
- 
             STANDARD CCDRED TASKS
  
     badpiximage - Create a bad pixel mask image from a bad pixel file

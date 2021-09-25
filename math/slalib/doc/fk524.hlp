@@ -1,7 +1,6 @@
 .help fk524 Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slFK54 (R2000,D2000,DR2000,DD2000,P2000,V2000,
      :                      R1950,D1950,DR1950,DD1950,P1950,V1950)
 
@@ -77,7 +76,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

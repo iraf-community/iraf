@@ -592,7 +592,6 @@ difficult.
 .le
 .le
 
-
 Because so many factors contribute to the results of a benchmark, it can be
 difficult to draw firm conclusions from any benchmark, no matter how simple.
 The hardware and software in modern computer systems is so complicated that
@@ -655,7 +654,6 @@ MIPS rating is a significant factor in all but the most i/o bound benchmarks.
 	RBIN	                                         *
 .fi
 .ke
-
 
 By \fIresponsiveness\fR we refer to the interactive response of the system
 as perceived by the user.  A system with a good interactive response will do
@@ -765,7 +763,6 @@ PLOTS	        n/a	0:29	10 plots	2.9 sec/PROW
 4USER	        n/a	1:19	10 plots	7.9 sec/PROW
 .fi
 
-
 Notes:
 .ls [1]
 All cpu timings from MKHDB on do not include the "system" time.
@@ -816,7 +813,6 @@ PLOTS		n/a	0:09	10 plots	0.9 sec/PROW
 2USER		n/a	0:16	10 plots	1.6 sec/PROW
 4USER		n/a	0:35	10 plots	3.5 sec/PROW
 .fi
-
 
 Notes:
 .ls [1]
@@ -869,7 +865,6 @@ PLOTS		n/a	0:06	10 plots	0.6 sec/PROW
 4USER		n/a	0:26	10 plots	2.6 sec/PROW
 .fi
 
-
 Notes:
 .ls [1]
 All timings from MKHDB on do not include the "system" time.
@@ -916,7 +911,6 @@ PLOTS		 -	0:07	10 plots		  0.7 sec/PROW
 2USER		 -	0:13
 4USER		 -	0:35
 .fi
-
 
 Notes:
 .ls [1]
@@ -968,7 +962,6 @@ PLOTS           n/a     0:10      10 plots	1.0 sec/PROW
 4USER           n/a    
 .fi
 
-
 Notes:
 .ls [1]
 An initial attempt to bring IRAF up on the ISI using the ISI C and Fortran
@@ -1017,7 +1010,6 @@ PLOTS	       n/a	0:20	10 plots	2.0 sec/PROW
 2USER	       n/a	0:30	10 plots	3.0 sec/PROW
 4USER	       n/a	0:51	10 plots	5.1 sec/PROW
 .fi
-
 
 Notes:
 .ls [1]
@@ -1075,7 +1067,6 @@ PLOTS		n/a	0:09	10 plots	0.9 sec/PROW
 2USER		n/a	0:10    10 plots	1.0 sec/PROW
 4USER		n/a	0:18	10 plots	1.8 sec/PROW
 .fi
-
 
 Notes:
 .ls [1]
@@ -1144,7 +1135,6 @@ PLOTS           n/a    0:19      10 plots	1.9 sec/PROW
 2USER           n/a    0:31      10 plots	3.1 sec/PROW
 4USER           n/a    1:04      10 plots	6.4 sec/PROW
 .fi
-
 
 Notes:
 .ls [1]
@@ -1296,7 +1286,6 @@ PLOTS                  0:17      10 plots        1.7 sec/plot
 4USER          n/a
 .fi
 
-
 Notes:
 .ls [1]
 IRAF installed on a 300 Mb Maxstor with Emulax controller; data files on a
@@ -1343,7 +1332,6 @@ PLOTS           n/a     0:25	10 plots	2.5  sec/PROW
 2USER           n/a	0:53	10 plots	5.3  sec/PROW
 4USER           n/a	1:59    10 plots        11.9 sec/PROW
 .fi
-
 
 Notes:
 .ls [1]
@@ -1422,7 +1410,6 @@ PLOTS		 n/a	0:09	10 plots		  0.9 sec/PROW
 4USER		 n/a	0:20
 .fi
 
-
 Notes:
 .ls [1]
 The CLSS given is for a single user on the system.  With one user already
@@ -1492,7 +1479,6 @@ PLOTS		 n/a	0:16	10 plots		  1.6 sec/PROW
 4USER		 
 .fi
 
-
 Notes:
 .ls [1]
 These benchmarks were run with the disks very nearly full and badly
@@ -1553,7 +1539,6 @@ PLOTS		  -	0:25	10 plots		  2.5 clk/PROW
 2USER		  -	0:43
 4USER		  -	1:24
 .fi
-
 
 Notes:
 .ls [1]
@@ -1624,7 +1609,6 @@ PLOTS		 -	0:24	10 plots
 2USER		 -	0:43
 4USER		 -	2:13	response was somewhat erratic
 .fi
-
 
 Notes:
 
@@ -1701,7 +1685,6 @@ PLOTS		 -	0:06	10 plots		  0.6 sec/PROW
 2USER		 -	0:08
 4USER		 -	0:14
 .fi
-
 
 Notes:
 

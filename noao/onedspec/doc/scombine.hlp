@@ -403,7 +403,6 @@ where the zero values are those before adjustment to zero mean over
 all images.  The reasoning is that if the zero level is high the sky
 brightness is high and so the S/N is lower and the weight should be lower.
 
-
 THRESHOLD REJECTION
 
 There is an initial threshold rejection step which may be applied.  The
@@ -415,7 +414,6 @@ bright cosmic rays.  Some of the rejection algorithms, such as "avsigclip",
 can perform poorly if very strong cosmic rays are present.  For masking one
 can use a task like \fBimedit\fR or \fBimreplace\fR to set parts of the
 spectra to be excluded to some very low or high magic value.
-
 
 REJECTION ALGORITHMS
 
@@ -697,7 +695,6 @@ algorithm, \fIpclip\fR to select the percentile pixel, \fInkeep\fR to limit
 the number of pixels rejected, and \fIlsigma\fR and \fIhsigma\fR to select
 the clipping thresholds.
 
-
 .in -4
 GROW REJECTION
 
@@ -711,7 +708,6 @@ rejected.  Unlike it's application in the rejection algorithms at
 this stage there is no checking on the magnitude of the residuals
 and the pixels retained which would otherwise be rejected are randomly
 selected.
-
 
 COMBINING
 

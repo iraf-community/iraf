@@ -43,7 +43,6 @@ Match densities in db1 to log exposure values for wedge#117
 with a IIIAJ emulsion and a GG385 filter.
 
 .nf
-
 	cl> dematch db1 wedge=117 filt=gg385 emulsion=IIIAJ
 .fi
 

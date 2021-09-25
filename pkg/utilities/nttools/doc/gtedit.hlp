@@ -64,7 +64,6 @@ z	display current status (delete or undelete)
 :x(-) xcolumn	set the table column for the X axis and possibly replot
 :y(-) ycolumn	set the table column for the Y axis and possibly replot
 - do not automatically replot after reading in new column
-
 .fi
 
 .ih

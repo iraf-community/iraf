@@ -552,7 +552,6 @@ data and fit graphically until a satisfactory fit has been achieved. The
 keystroke commands are listed below.
 
 .nf
-
 ?       Print options
 f       Fit data and graph fit with the current graph type (g,x,r,y,s)
 g       Graph the data and the current fit
@@ -730,7 +729,6 @@ to be positive by definition.
 .ih
 REFERENCES
 
-
 Additional information on the IRAF world coordinate systems can be found in
 the help pages for the WCSEDIT and WCRESET tasks.
 Detailed documentation for the IRAF world coordinate system interface MWCS
@@ -755,8 +753,6 @@ and "help <routine>" to get a description of each routine's calling sequence,
 required input and output, etc. An overview of the library can be found in the
 paper "SLALIB - A Library of Subprograms", Starlink User Note 67.7
 by P.T. Wallace, available from the Starlink archives.
-
-
 
 .ih
 EXAMPLES
@@ -912,7 +908,6 @@ inter-
 442.0  409.6  13:29:38.70  47:13:36.2  13:29:38.70  47:13:35.9  0.040  0.282
 224.3  131.2  13:29:55.42  47:10:05.2  13:29:55.40  47:10:05.1  0.289  0.059
 134.4  356.3  13:30:01.82  47:12:58.8  13:30:01.84  47:12:58.7 -0.267  0.091
-
 .fi
 
 Note that the position of the tangent point is slightly different again but
@@ -1009,7 +1004,6 @@ cl> skyctran coords STDOUT "pix log" "pix world" lngcol=3 latcol=4 trans+
 13:29:38.700  47:13:36.23 13:29:38.696 47:13:35.95
 13:29:55.424  47:10:05.15 13:29:55.396 47:10:05.09
 13:30:01.816  47:12:58.79 13:30:01.842 47:12:58.70
-
 .fi
 
 Note that two versions of the rms values are printed, one for the fit

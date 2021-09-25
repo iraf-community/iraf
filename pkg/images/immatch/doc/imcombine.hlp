@@ -14,7 +14,6 @@ be of different sizes.  Otherwise each input image is handled separately
 and they may have different dimensionalities.
 .le
 
-
 When the \fIproject\fR parameter is "no" all the input images are combined
 into a single output file.  In this case the following parameters specify
 only a single file name.  Otherwise each input image is combined by
@@ -729,7 +728,6 @@ is roughly 240 images for lines where the strips overlap.  The
 non-overlapping blocks can be mosaiced together with this task as a final
 step if desired.
 
-
 SCALES AND WEIGHTS
 
 In order to combine images with rejection of pixels based on deviations
@@ -960,7 +958,6 @@ When the number of input images exceeds the maximum number of open files
 allowed by IRAF and the input images need to be "stacked" then the masks
 are also stacked.  The stacking requires all the images to have the same size.
 
-
 THRESHOLD REJECTION
 
 In addition to rejecting masked pixels, pixels in the unscaled input
@@ -971,7 +968,6 @@ to exclude very bad pixel values or as an alternative way of masking
 images.  In the latter case one can use a task like \fBimedit\fR
 or \fBimreplace\fR to set parts of the images to be excluded to some
 very low or high magic value.
-
 
 REJECTION ALGORITHMS
 

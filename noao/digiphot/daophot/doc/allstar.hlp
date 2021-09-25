@@ -400,7 +400,6 @@ making the PSF model can be found at (442,410), (348,189), and (379,67).
 
         ... type a to accept the star, d to reject it
 
-
         ... move to the next candidate stars and repeat the previous
             steps
 
@@ -436,7 +435,6 @@ making the PSF model can be found at (442,410), (348,189), and (379,67).
             objects which are not stars don't
 .fi
 
-
 2. Repeat example 1 but refit the sky using an annulus with an inner sky
 radius of 3.0 and an outer radius of 15.0.
 
@@ -459,8 +457,6 @@ radius of 3.0 and an outer radius of 15.0.
         ... note that the psf stars subtract reasonably well but other
             objects which are not stars don't
 .fi
-
-
 
 3. Run allstar on a section of the input image using the group file and PSF
 model derived in example 1 for the parent image and writing the results
@@ -487,9 +483,7 @@ in the coordinate system of the parent image.
     da> display ypix.sub.3 2
 
        ... display the subtracted image section
-
 .fi
-
 
 4. Run allstar exactly as in example 1 but submit the task to the background.
 Turn off verify and verbose.
@@ -500,7 +494,6 @@ Turn off verify and verbose.
 
         ... the results will appear in ypix.als.4 and ypix.arj.4
 .fi
-
 
 4. Run ALLSTAR exactly as in example 3 but turn caching off.
 

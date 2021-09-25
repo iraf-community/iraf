@@ -87,7 +87,6 @@ input image and the O[*,*] are the elements of the output image.
     O[0,0] = 1*I[-1,0]  - 4*I[0,0]  + 1*I[1,0]  +
              0*I[-1,-1] + 1*I[0,-1] + 0*I[1,-1]
 
-
 		       diagonals
 
           I[-1,1]/sqrt(2)  + I[0,1]*0         +  I[1,1]/sqrt(2) +
@@ -105,7 +104,6 @@ O[0,0] =  I[-1,0]*0        - I[0,0]*4/sqrt(2) +  I[1,0]*0       +
           I[-1,1]/sqrt(2)/2  + I[0,1]/2           + I[1,1]/sqrt(2)/2 +
 O[0,0] =  I[-1,0]/2          - I[0,0]*(2-sqrt(2)) + I[1,0]/2         +
 	  I[-1,-1]/sqrt(2)/2 + I[0,-1]/2          + I[1,-1]/sqrt(2) 
-
 .fi
 
 .ih

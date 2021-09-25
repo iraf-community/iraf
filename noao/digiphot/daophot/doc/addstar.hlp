@@ -306,7 +306,6 @@ artificial stars. Good stars for making the PSF model can be found at
 	... mark the stars on the artificial image
 .fi
 
-
 2. Repeat example 1 using the output starlist as input.
 
 .nf
@@ -314,7 +313,6 @@ artificial stars. Good stars for making the PSF model can be found at
 
     ... the answers will appear in ypix.add.2 and ypix.art.2
 .fi
-
 
 3. Repeat example 1 using a simple text file as input.
 
@@ -327,7 +325,6 @@ artificial stars. Good stars for making the PSF model can be found at
 
     ... the answers will appear in ypix.add.3 and ypix.art.3
 .fi
-
 
 4. Run addstar on a section of the input image using the PSF model derived in
 example 1 for the parent image, the artificial star list from examples 2 and
@@ -351,9 +348,7 @@ not the parent image.
     da> pdump ypix.art.4 xc,yc yes | tvmark 1 STDIN col=204
 
         ... mark the stars
-
 .fi
-
 
 .ih
 TIME REQUIREMENTS

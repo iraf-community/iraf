@@ -163,7 +163,6 @@ must match the full field name.  Currently, field name matches are case
 insensitive since image headers are often converted to and from FITS headers,
 which are case insensitive.
 
-
 2. Advanced Usage
 
     The header editor is capable of performing global edits on entire image
@@ -215,7 +214,6 @@ fields and any user or application defined fields.  The standard header fields
 currently defined are shown below.  There is no guarantee that the names and/or
 usage of these fields will not change in the future.
 
-
 .ks
 .nf
 	i_ctime		int		create time
@@ -232,12 +230,10 @@ usage of these fields will not change in the future.
 .fi
 .ke
 
-
 The standard header field names have an "i_" prefix to reduce the possibility
 of a name collision with a user field name, and to distinguish the two classes
 of parameters in templates.  The prefix may be omitted provided the simple
 name is unique.
-
 
 2.4 Field name template
 
@@ -248,7 +244,6 @@ of an image, rather than upon a directory.  Abbreviations are not permitted
 in field names and case is not significant.  Case is ignored in this context
 due to the present internal storage format for the user parameters (FITS),
 which also limits the length of a user field name to 8 characters.
-
 
 2.5 Value expression
 
@@ -292,13 +287,11 @@ For completeness minimal documentation is given here, but the documentation
 for \fIevexpr\fR itself should be consulted if additional detail is required
 or if problems occur.
 
-
 2.5.1 operators
 
     The following operators are recognized in value expressions.  With the
 exception of the operators "?", "?=", and "@", the operator set is equivalent
 to that available in the CL and SPP languages.
-
 
 .nf
 	+  -  *  /		arithmetic operators
@@ -311,7 +304,6 @@ to that available in the CL and SPP languages.
 	? :			conditional expression
 	@			reference a variable
 .fi
-
 
 The operators "==", "&&", and "||" may be abbreviated as "=", "&", and "|"
 if desired.  The ?= operator performs pattern matching upon strings.
@@ -363,19 +355,16 @@ Mixed mode expressions are permitted with automatic type coercion.  Most type
 coercions from boolean or string to other datatypes are illegal.  The boolean
 constants "yes" and "no" are predefined and may be used within expressions.
 
-
 2.5.2 intrinsic functions
 
     A number of standard intrinsic functions are recognized within expressions.
 The set of functions currently supported is shown below.
-
 
 .nf
 	abs	acos	asin	atan	atan2	bool	cos
 	exp	int	log	log10	max	min	mod
 	nint	real	sin	sqrt	str	tan	
 .fi
-
 
 The trigonometric functions operate in units of degrees rather than radians.
 The \fImin\fR and \fImax\fR functions may have any number of arguments up
@@ -394,13 +383,11 @@ The first form is the conventional form found in all programming languages.
 The second permits the generation of function names by string valued
 expressions and might be useful on rare occasions.
 
-
 2.5.3 special operands
 
     As noted earlier, expression operands may be constants, variables (header
 fields), function calls, or references to any of the special variables.
 The following special variables are recognized within expressions:
-
 
 .nf
 	.		A string constant, used to flag printing
@@ -409,7 +396,6 @@ The following special variables are recognized within expressions:
 	$I		The name of the "current image"
 	$T		The current clock time (an integer value)
 .fi
-
 
 These builtin variables are especially useful for constructing context
 dependent expressions.  For example, the value of a field may be incremented
@@ -453,17 +439,14 @@ replaced by a blank keyword in the header.
 .nf
    cl> nhedit file.fits history \
        "History text from column 9 to 80, no quotes" before=wcsdim add+
-
 .fi
 
 6. Run a command file through the first 50 extensions
 
 .nf
-
     cl>  for(i=1;i<51;i=i+1) {
           nhedit("mymef["//i//"]",comfile="home$hh.in")
        }
-
 .fi
 
 7. Add a text file to the header. This will be put as HISTORY lines with 
@@ -471,19 +454,14 @@ text appropriately split when long lines are encountered. Start putting the
 text after the keyword KEYWN.
 
 .nf
-
    cl> nhedit add_textf "mytext_file.tx" after=KEYWN add+
-
-
 .fi
 
 8. Run nhedit through all the extensions in a MEF file. Assuming it is 6, then:
 
 .nf
-
    cl> for(i=1;i<7;i=i+1)
           nhedit("mymef.fits["//i//"]",comfi="home$myheader.txt")
-
 .fi
 
 9. Run several fits files with the same set of header commands from the file
@@ -526,7 +504,6 @@ history "this is a hist to append"  add+ show-
 history "this is a hist 22 after trim pkey"  after="TRIM" add+ show-
 comment "this is a comment" after="FR-SCALE" add+ show-
 # END OF HDRC.TXT FILE
-
 .fi
 
 .ih

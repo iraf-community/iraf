@@ -983,9 +983,7 @@ Hydra or Nessie data.  The parameter values can be changed from the
 defaults by using the parameter editor,
 
 .nf
-
 	cl> epar params
-
 .fi
 
 or simple typing \fIparams\fR.  The parameter editor can also be
@@ -1362,12 +1360,10 @@ exposure though it is unlikely.  Figure 1 gives an example of this
 setup file.
 
 .nf
-
     Figure 1: Example Arc Aperture Replacement File
 
     cl> type arcreplace
     nesjun042c nesjun049c 1,7,9,13,17,19,28,34
-
 .fi
 
 The primary arc exposure is "nesjun042c", the secondary arc is
@@ -1393,7 +1389,6 @@ records.  Figure 2 shows an example for the \fIblue\fR fibers from a board
 called M33Sch2.
 
 .nf
-
     Figure 2: Example Aperture Identification File
 
     cl> type m33sch2
@@ -1411,7 +1406,6 @@ called M33Sch2.
     46 2 arc
     47 0 sky
     48 1 phil2
-
 .fi
 
 Note the identification of the sky fibers with beam number 0, the object

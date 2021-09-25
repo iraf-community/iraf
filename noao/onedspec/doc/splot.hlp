@@ -602,7 +602,6 @@ Enable/disable the flipped coordinates option
 Enable/disable the permanent overplot option
 .le
 
-
 .ls :/help
 Get help on GTOOLS options.
 .le

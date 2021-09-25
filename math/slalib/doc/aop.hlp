@@ -1,7 +1,6 @@
 .help aop Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slAOP (RAP, DAP, DATE, DUT, ELONGM, PHIM, HM,
      :                    XP, YP, TDK, PMB, RH, WL, TLR,
      :                    AOB, ZOB, HOB, DOB, ROB)
@@ -162,7 +161,6 @@
 
   Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

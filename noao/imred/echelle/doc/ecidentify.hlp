@@ -123,7 +123,6 @@ y  Find peaks             z  Zoom graph              .  Nearest feature
 :minsep [value]           :read [image]              :write [image]
 :zwidth [value]
 
-
        ECHELLE DISPERSION FUNCTION FITTING COMMAND SUMMARY
 
 ?  Help             c  Print coordinates             d  Delete point
@@ -133,7 +132,6 @@ x  Set ordinate     y  Set abscissa                  I  Interrupt
 
 :show               :function [value]   :highreject [value]   :lowreject [value]
 :niterate [value]   :xorder [value]     :yorder [value]
-
 .fi
 
             ECIDENTIFY CURSOR KEYS AND COLON COMMANDS
@@ -309,7 +307,6 @@ Write a record to the database.  The record name defaults to the image name.
 .ls :zwidth value
 Set or show the zoom width in user units.
 .le
-
 
               DISPERSION FUNCTION FITTING COMMANDS
 .ls ?

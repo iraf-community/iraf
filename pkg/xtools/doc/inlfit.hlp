@@ -74,7 +74,6 @@ delimited by a comma. The data types are the following (they can be
 abbreviated to up to three characters).
 
 .nf
-
     function    Dependent variable or function
     fit         Fitted value
     residuals   Residuals (function - fit)
@@ -83,7 +82,6 @@ abbreviated to up to three characters).
     identifier  Independent variable named "identifier" (if defined)
     var n       Independent variable number "n"
     user n      User defined plot equation "n"  (if defined)
-
 .fi
 
 The application program can define independent variable names and user plot 
@@ -105,13 +103,11 @@ which may be redefined by the application program or interactively by using
 the 'g' key, are the following.
 
 .nf
-
         h       function, fit
         i       function, residuals
         j       function, ratio
         k       var 1, function
         l       user 1, user 2 (default)
-
 .fi
 
 The initial graph key, if not redefined by the application program is 'h'.
@@ -249,13 +245,11 @@ algorithm to fit the data. Detailed descriptions of the algorithm can
 be found in the following two references.
 
 .nf
-
 1. Bevington, P.R., 1969, Data Reduction and Error Analysis for the
    Physical Sciences, Chapter 11, page 235.
 
 2. Press, W.H. et al., 1986, Numerical Recipes: The Art of Scientific
    Computing, Chapter 14, page 523.
-
 .fi
 
 .ih

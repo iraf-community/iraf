@@ -3,7 +3,6 @@
 .ce
 APEXTRACT System Notes
 
-
 \fBIntroduction\fR
 
 The \fBapextract\fR package is a complex package with a simple
@@ -75,7 +74,6 @@ functions.
 
 This document describes some of the implementation details and features
 which are hidden from the normal user.
-
 
 \fBParameters\fR
 
@@ -235,7 +233,6 @@ e_profil=                       Profile reference image
 
 Note how the parameters are redirected to a variety of tasks.
 
-
 \fBInvisible Parameters\fR
 
 The following algorithm parameters are not visible to the normal user
@@ -277,7 +274,6 @@ Marsh algorithm polynomial spacing.
 .ls polyorder = 10
 Marsh algorithm polynomial order.
 .le
-
 
 \fBQuery Mechanism and Invisible Query Parameters\fR
 
@@ -381,7 +377,6 @@ Query parameter for the smooth function of \fBapscatter\fR.
 .ls anstrace
 Query parameter for the trace function.
 .le
-
 
 \fBTask Entry Points\fR
 

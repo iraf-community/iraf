@@ -254,7 +254,6 @@ CURSOR COMMANDS
 The indicated spectrum is the one with a point closest to the cursor position.
 
 .nf
-
 ? - Print help summary
 a - Append a new spectrum following the indicated spectrum
 i - Insert a new spectrum before the indicated spectrum

@@ -1,7 +1,6 @@
 .help dcs2c Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slDS2C (A, B, V)
 
      - - - - - -
@@ -27,7 +26,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

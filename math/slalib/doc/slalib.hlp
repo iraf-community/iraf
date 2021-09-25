@@ -113,7 +113,6 @@ dranrm --  d = slda2p (angle)
 deuler --  call subroutine sldeul (order, phi, theta, psi, rmat)
        Form form rotation matrix from three Euler angles
 
-
   av2m --  call subroutine slav2m (axvec, rmat)
  dav2m --  call subroutine sldavm (axvec, rmat)
        Form rotation matrix from axial vector

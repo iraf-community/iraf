@@ -24,7 +24,6 @@ SYNOPSIS
 	     rv, olng, olat)
 	  sk_saveim (coo, mw, im)
 	  sk_close (coo)
-
 .fi
 
 .ih
@@ -39,7 +38,6 @@ name, e.g. "J2000", "galactic", etc. or by an image system name, e.g.
 The skywcs routine are layered on the Starlink Positional Astronomy library
 SLALIB which is installed in the IRAF MATH package.  Type "help slalib
 option=sys" for more information about SLALIB.
-
 
 .ih
 NOTES
@@ -70,7 +68,6 @@ must be input in degrees and will be output in degrees and adjust their
 code accordingly.
 
 The skywcs routine sk_saveim can be used to update an image header.
-
 
 .ih
 EXAMPLES
@@ -106,7 +103,6 @@ Example 1: Convert from B1950 coordinates to J2000 coordinates.
     call sk_close (outcoo)
 
     ...
-
 
 Example 2: Repeat example 1 but convert to galactic coordinates.
 
@@ -219,7 +215,6 @@ Example 3: Convert a grid of pixel coordinates in the input image to the
     call mw_close (mwout)
     call sk_close (refcoo)
     call sk_close (outcoo)
-
 
 Example 4: Convert a 2D image with an J2000 tangent plane projection
 	   wcs to the equivalent galactic wcs. The transformation

@@ -1,21 +1,17 @@
 .help
 \fBSpecifications for IRAF Calcomp kernel -- (CCP package)\fR
 
-
 The Calcomp kernel (package prefix "ccp") will implement selected GKI 
 instructions, using only calls to the Calcomp routines \fBplots\fR, 
 \fBplot\fR, \fBnewpen\fR and \fBsymbol\fR.
-
 
 There are two sub-components of the CCP package:  1) the kernel driver
 task allowing a user to send a specified graphics metafile to the plotter, and
 2) the low-level kernel routines which implement specific GKI instructions,
 and which make the only calls to the Calcomp library.
 
-
 .nh
 \fBCL interface -- task CALCOMP\fR
-
 
 The driver task, \fBcalcomp\fR, allows a user to direct an existing GKI metacode
 file to a particular Calcomp plotter under control of a set of CL parameters.
@@ -43,15 +39,12 @@ lcover,b,h,no,,,"override line color implementation by penchange"
 dashlen,r,h,INDEF,0.0,,"dashed line dash length, pltr units; 0.5 reasonable"
 gaplen,r,h,INDEF,0.0,,"dashed line gap length, pltr units; 0.1 reasonable"
 plwsep,r,hl,INDEF,0.,,"polyline width separation for ntracing; 0.005 reasonable"
-
 .fi
-
 
 .nh
 \fBSuggested GRAPHCAP entry for calcomp plotter\fR
 
 .nf
-
     p5|calcomp|calcomp pen plotter:\
 	    :kf=xcalcomp.e:tn=calcomp:co#132:li#66:xr#32767:yr#5375:\
 	    :ch#.0294:cw#.0125:xs#1.664564:ys#0.27305:\
@@ -71,13 +64,10 @@ plwsep,r,hl,INDEF,0.,,"polyline width separation for ntracing; 0.005 reasonable"
     #PW	0.0050		# n-tracing (bold line simul.) width sep. in pltr units
     #if yscale not set by kernel, g_yndcto_p = GKI_MAXNDC/(MP*yr); 32767/10.75"
     #if xscale not set by kernel, g_xndcto_p = g_yndcto_p; square aspect ratio
-
 .fi
-
 
 .nh
 \fBInterface between CALCOMP task and lower-level kernel routines\fR
-
 
 Two kernel routines will normally be called from outside the GKI
 instruction-stream decoding facility (as from the driver task):
@@ -97,25 +87,20 @@ instruction-stream decoding facility (as from the driver task):
 		      to the device initialized by the Calcomp library.  
 		      See ccp_openws.
 
-
      ccp_close ()
 
 	  discussion: causes a Calcomp "newframe" -- resets origin to 
 		      right of last previously-plotted point.
-
-
 .fi
 
 .nh
 \fBLow-level kernel routines\fR
-
 
 All remaining kernel routines will normally be called either by ccp_open or
 by gki_execute, or by each other.  Following are descriptions of the 
 implementation of GKI instructions:
 
 .nf
-
      GKI_EOF
 
           Not implemented; it should be trapped outside the kernel, as in
@@ -374,7 +359,6 @@ implementation of GKI instructions:
 
 		    The macros ESC_*NDCTO_P, currently defined in ccp.h, should
 		    probably be defined in a gki-public place like gki.h.
-
 
      GKI_SETWCS
 

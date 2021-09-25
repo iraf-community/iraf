@@ -70,7 +70,6 @@ Similarly, pagination control directives can be added to the list of
 \fBlroff\fR directives, to be intercepted by the user supplied INPUT procedure.
 See the Manpage command for an example.
 
-
 DIRECTIVES
 
 Most of the \fBlroff\fR directives function the same as in the UNIX text

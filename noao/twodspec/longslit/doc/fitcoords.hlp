@@ -159,7 +159,6 @@ output STDOUT).  The last interactive plot or a default non-interactive
 plot is written the specified plot file which may be examined and spooled
 at a later time.
 
-
 FITCOORDS DATABASE
 
 The FITCOORDS fits are stored in text files in the subdirectory given by

@@ -199,7 +199,6 @@ of the grammar and syntax of the configuration file type \fI"help config"\fR.
 The following examples show typical configuration files for two different types
 of photometric calibrations.
 
-
 \fIExample 1\fR. A sample configuration file for reducing UBV photoelectric
 photometry. Note that the instrumental magnitudes are all on the right-hand
 side of the transformation equation and that the standard magnitudes and colors
@@ -247,7 +246,6 @@ const	u4 = 0.0
 UBFIT:  UB = u1 - u2 * X + u3 * (u - b) + u4 * X * (u - b)
 .fi
 
-
 \fIExample 2\fR. A sample configuration file for reducing UBV CCD photometry.
 Note that the instrumental magnitudes are all on the left-hand side of the
 transformation equations and the standard star magnitudes and colors
@@ -289,7 +287,6 @@ ut3		17	# ut time of filter 3 observation
 X3	        18	# airmass of filter 3 observation		
 m3	 	19	# filter 3 instrumental magnitude
 error(m3) 	20	# error in filter 3 instrumental magnitude
-
 
 transformation
 
@@ -387,7 +384,6 @@ format is known by the user.
     ph> chkconfig ubv.cfg
 
 	... check the newly edited file for errors
-
 .fi
 
 2. Create a configuration file to reduce some JHK photometry. In this
@@ -438,7 +434,6 @@ star observations file "stdobs" was created with the task MKNOBSFILE.
 		equations as desired
 
 	    ... check the result for errors
-
 .fi
 
 .ih

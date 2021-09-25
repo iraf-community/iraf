@@ -183,7 +183,6 @@ x1 y1  [x2 y2 [x3 y3]]   # tie points for input coordinate file 2
 ...
 x1 y1  [x2 y2 [x3 y3]]   # tie points for input coordinate file N
 
-
 # Second sample refpoints file (N reference files and N input files)
 
 x1 y1  [x2 y2 [x3 y3]]   # tie points for reference coordinate file 1
@@ -193,7 +192,6 @@ x1 y1  [x2 y2 [x3 y3]]   # tie points for input coordinate file 2
 ...
 x1 y1  [x2 y2 [x3 y3]]   # tie points for reference coordinate file N
 x1 y1  [x2 y2 [x3 y3]]   # tie points for input coordinate file N
-
 .fi
 
 The coordinates of the tie points can be typed in by hand if \fIrefpoints\fR
@@ -328,8 +326,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill

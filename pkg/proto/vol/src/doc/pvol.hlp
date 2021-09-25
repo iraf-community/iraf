@@ -105,7 +105,6 @@ Report memory usage, progress around the rotation, and more detail on
 errors if yes.
 .le
 
-
 .ih
 DESCRIPTION
 
@@ -182,7 +181,6 @@ discuss how the transformed value contributes to the final projected image.
 		(omax-omin)
 	else			# let minimum amount of light through
 	    attenuation = amin
-
 .fi
 
 The intensity class of projections includes \fBptype\fR = 2, 3, 4, 5, and 6.
@@ -279,7 +277,6 @@ current, arbitrarily-oriented column of voxels projects.  To summarize:
 	6 LASTONLY:
 	    if (\fBimin\fR < newval && newval <= \fBimax\fR)
 		proj_pix = newval
-
 .fi
 
 .ih
@@ -361,7 +358,6 @@ EXAMPLES
     by subsequent opacities), with no distance weighting.
 
     cl> pvol input output ptype=3 opacelem=2
-
 .fi
 
 .ih

@@ -54,7 +54,6 @@ the \fItermcap\fR or \fIgraphcap\fR environment variable, hence do not
 enter "graphcap" rather than "dev$graphcap", just because you happen to
 be in the dev directory.
 
-
 .ks
 .nf
 			\fItermcap_file\fR	\fIoutput_file\fR
@@ -63,7 +62,6 @@ be in the dev directory.
 	graphcap	dev$graphcap	dev$cacheg.dat
 .fi
 .ke
-
 
 After updating these files, perform a sysgen-relink to update the
 system libraries and relink all executables (this takes a while, and

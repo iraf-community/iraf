@@ -121,7 +121,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0
     call asifree (asi)
     ...
 
-
     include <math/iminterp.h>
 
     real tmpx[2]
@@ -139,7 +138,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0
 
     call asifree (asi)
     ...
-
 
 Example 2: Shift a 2D array by a constant amount using a 3rd order polynomial
 interpolant and the drizzle interpolant respectively. Note that
@@ -165,7 +163,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0.
 
     call msifree (msi)
     ...
-
 
     include <math/iminterp.h>
     ...
@@ -196,7 +193,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0.
 
     call msifree (msi)
     ...
-
 
 Example 3: Calculate the integral under a 1D data array
 

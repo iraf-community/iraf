@@ -150,7 +150,6 @@ VMS counterparts is:
 .fi
 .ke
 
-
 XC is available both in the CL, via the foreign task interface, and as
 a standalone DCL callable task.  Usage is equivalent in either case.  Upper
 case flags must be quoted to be recognized (the upper case flags will be

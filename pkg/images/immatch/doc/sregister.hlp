@@ -365,7 +365,6 @@ xxorder = 3, xyorder = 3, yxorder = 3, yyorder = 3
          a33' * xref ** 2 * yref ** 2
 .fi
 
-
 The computation can be done in either real or
 double precision by setting the \fIcalctype\fR parameter.
 Automatic pixel rejection may be enabled by setting the \fIreject\fR
@@ -464,7 +463,6 @@ y and are assumed to be positive.
             a = xin0 - b * xref0 - c * yref0 = xshift
             d = yin0 - e * xref0 - f * yref0 = yshift
 .fi
-
 
 \fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the region of
 validity of the transformation as well as the limits of the grid
@@ -588,7 +586,6 @@ commands. Typing the parameter name alone will list the current value.
 :reject [value]                 Rejection threshold
 .fi
 
-
 .ih
 FORMATS
 
@@ -616,8 +613,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill
@@ -738,7 +733,6 @@ residuals.
 		image
 .fi
 
-
 3. Mosaic a set of 9 images covering a ~ 1 degree field into a single image
 centered at  12:32:53.1 +43:13:03. Set the output image scale to 0.5
 arc-seconds / pixel which is close the detector scale of 0.51 arc-seconds
@@ -766,7 +760,6 @@ The 9 images all have accurate world coordinate information in their headers.
         # Combine the images using imcombine
 
         cl> imcombine @outlist mosaic lthreshold=<uservalue> ...
-
 .fi
 
 .ih

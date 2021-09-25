@@ -54,7 +54,6 @@ on tape, replacing tabs with blanks and prefixing the leftover portions
 of oversize lines with ">>".
 
 .nf
-
 	cl> wcardimage files* mtb1600[1]
 .fi
 

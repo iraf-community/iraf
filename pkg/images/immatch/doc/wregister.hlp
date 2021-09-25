@@ -359,7 +359,6 @@ xxorder = 3, xyorder = 3, yxorder = 3, yyorder = 3
          a33' * xref ** 2 * yref ** 2
 .fi
 
-
 If the \fBfitgeometry\fR parameter is anything other than "general", the  order
 parameters assume the value 2 and the cross terms switches assume the value
 "none", regardless of the values set by the user. The computation can be done in
@@ -402,7 +401,6 @@ interpretation for all the fitting geometries as shown below.
             yin = d + e * xref + f * yref
             b * f - c * e = +/- const
 .fi
-
 
 The coefficients can be interpreted as follows. Xref0, yref0, xin0, yin0
 are the origins in the reference and input frames respectively. Orientation
@@ -461,7 +459,6 @@ y and are assumed to be positive.
             a = xin0 - b * xref0 - c * yref0 = xshift
             d = yin0 - e * xref0 - f * yref0 = yshift
 .fi
-
 
 \fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the region of
 validity of the transformation as well as the limits of the grid
@@ -582,7 +579,6 @@ commands. Typing the parameter name alone will list the current value.
 :reject [value]                 Rejection threshold
 .fi
 
-
 .ih
 FORMATS
 
@@ -610,8 +606,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill
@@ -748,7 +742,6 @@ The 9 images all have accurate world coordinate information in their headers.
 	# Combine the images using imcombine
 
 	cl> imcombine @outlist mosaic lthreshold=<uservalue> ...
-
 .fi
 
 .ih

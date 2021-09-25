@@ -52,7 +52,6 @@ columns in the table "example.tab":
 2.  Print (using the 'tprint' task) specific columns:
 
 .nf
-
 	tt> tlcol example.tab nlist=1 >colnames.lis
 	tt> edit colnames.lis
         (Rearrange the column names and perhaps delete some of them.)

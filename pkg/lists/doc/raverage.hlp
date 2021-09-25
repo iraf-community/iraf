@@ -85,7 +85,6 @@ EXAMPLES
 numbers in file "numbers".
 
 .nf
-	
 	cl> raverage numbers 100
 .fi
 

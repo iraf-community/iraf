@@ -1,7 +1,6 @@
 .help ampqk Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slAMPQ (RA, DA, AMPRMS, RM, DM)
 
      - - - - - -
@@ -61,7 +60,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

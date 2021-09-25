@@ -322,7 +322,6 @@ redshift/magnitude relation is assumed to be such that the redshift is
 proportional to the luminosity distance (the square root of the
 apparent luminosity).  Thus,
 
-
 .nf
                 Z = z * 10. ** (0.2 * (M - minmag))
                 Zfactor = ((1+Z)**2 / Z) / ((1+z)**2 / z)

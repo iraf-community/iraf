@@ -35,7 +35,6 @@ appended to the value to change the input base value:
 	ecl> bases 256b					# octal input
 	  dec  hex  oct   7654 3210
 	  174  AEx  256b  1010 1110
-
 .fi
 
 .ih

@@ -80,7 +80,6 @@ string giving the type and size of each pixel, the syntax for the outtype
 entry is
 
 .nf
-
 		<type>[<nbytes>]
 where
     type = b            # byte
@@ -90,7 +89,6 @@ where
            n            # native floating point
 
     nbytes = 1, 2, 4, or 8
-
 .fi
 
 If no value for \fInbytes\fR is given the smallest size for the given type
@@ -231,7 +229,6 @@ in general interpreted arithmetic expressions as follows:
 \fBOperands\fR
 
 .nf
-
 	iN		      	    # image list item
 	iN.param		    # image parameter
 	@"param"	    	    # parameter of 3-D image
@@ -248,10 +245,8 @@ current image if the input list contains 3-D images.  They may
 be used in an outbands expression such as
 
 .nf
-
     (i1*(i1.otime/i2.otime)),i2,(i3*(i3.otime/i2.otime))	(1)
     (b1/@"otime")),(b2/@"otime"),(b3/@"otime")			(2)
-
 .fi
 
 to normalize the output bands by the exposure time value in the second image
@@ -273,7 +268,6 @@ The expression syntax implemented by \fIexport\fR provides the following
 set of operators:
 
 .nf
-
         ( expr )              	    - grouping
         + - * /               	    - arithmetic
         **                    	    - exponentiation
@@ -309,7 +303,6 @@ The concatenation operator applies to all types of data, not just
 strings.  Concatenating two vectors results in a vector the 
 combined length of the two input vectors.  An example use of this would
 be to concatenate images side-by-side on output.
-
 
 \fBSpecial Functions\fR
 
@@ -374,12 +367,10 @@ is similar to the "repl()" intrinsic function which replicates a data element
 a given number of times.
 .le
 
-
 .ce
 \fBScaling Functions:\fR
 
 .nf
-
    zscale (arg [,z1, z2 [, nbins]]) - scale to a fixed number of bins
                zscalem (arg1, arg2) - automatic scaling with filtering
            gr[ea]y (arg1,arg2,arg3) - RGB to grayscale conversion
@@ -410,7 +401,6 @@ test image to 200 colors such that there are "black" stars on a "white"
 background one could use
 
 .nf
-
 	zscale (b1, @"i_maxpixval", @"i_minpixval", 200)
 .fi
 .le
@@ -424,7 +414,6 @@ pixels specified in a mask or to a certain range to exclude extreme or bad
 values that would otherwise perturb the result.  Typical usages might be
 
 .nf
-
 	zscalem (i1, i2==0)
 	zscalem (i1, i1>0&&i1<10000)
 .fi
@@ -439,7 +428,6 @@ Convert three image operands or expressions to a single grayscale image
 using the standard NTSC equation:
 
 .nf
-
 	Gray = 0.3 * arg1 + 0.59 * arg2 + 0.11 * arg3
 .fi
 .le
@@ -447,9 +435,7 @@ using the standard NTSC equation:
 Linearly transform the intensity scale of the image using the equation
 
 .nf
-
 	new[i] = (arg[i] - zero) / scale
-
 .fi
 
 Pixels are scaled in their input datatype prior to converting to the output
@@ -460,14 +446,11 @@ Apply a gamma correction to the pixels.  Pixel values are scaled according to
 the equation
 
 .nf
-
 	new = scale * [ (old/scale) ** (1.0/gamma) ]
-
 .fi
 
 If no scale argument is given a value of 255 will be assumed.
 .le
-
 
     \fIAdditional functions\fR are supported for specific formats:
 
@@ -485,9 +468,7 @@ named above.  For example, one can specify the dpi resolution of EPS output
 and band storage of images using something like
 
 .nf
-
 	psdpi(band(args), dpi)
-
 .fi
 
 .ls cmap (arg1,arg2,arg3 [, ncolors])
@@ -623,7 +604,6 @@ can be written.  Complete examples for the most common cases are shown in
 the \fIExamples\fR section below.  The columns in the table are defined as
 
 .nf
-
     #expr		- number of required \fIoutbands\fR expressions
     Type		- RGB or 8-bit colormap (index) file
     bitpix		- number of bits-per-pixel
@@ -631,7 +611,6 @@ the \fIExamples\fR section below.  The columns in the table are defined as
     Alpha?		- does the file have an alpha channel?
     Interleaving	- type of pixel interleaving
     Notes		- see explanation below each table
-
 .fi
 
 A general description and specific restrictions or requirements are given for 
@@ -652,11 +631,9 @@ then each band of the image will be written as a color component.
 .ls EPS     - Encapsulated PostScript
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       no    no      none          
-
 .fi
 
 	The output 8-bit Encapsulated PostScript image
@@ -674,7 +651,6 @@ postscript or with a colormap applied to the data (using either the
 .ls GIF     - Compuserve's GIF format
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       yes   no      none          1
@@ -684,7 +660,6 @@ postscript or with a colormap applied to the data (using either the
 	1) Colormap generation enabled using \fIsetcmap()\fR or else
            default grayscale colormap will be used
 	2) use of \fIcmap()\fR required to generate colormap
-
 .fi
 
 	The output file is a GIF '87 image.  A linear colormap of 256 entries 
@@ -705,7 +680,6 @@ task before writing out the final format.
 .ls MIFF    - ImageMagick MIFF format image
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       no    no      none
@@ -715,7 +689,6 @@ task before writing out the final format.
     Notes:
 	1) Colormap generation enabled using \fIsetcmap()\fR
 	2) Colormap generation enabled using \fIcmap()\fR
-
 .fi
 
 	The output file is a Machine Independent File Format image, with or
@@ -726,7 +699,6 @@ used in the image.  The maximum pixel value per color is assumed to be 255.
 .ls PGM     - PBMPlus PGM format image
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       no    no      none
@@ -734,7 +706,6 @@ used in the image.  The maximum pixel value per color is assumed to be 255.
 
     Notes:
 	1) Grayscale may be produce with \fIgray()\fR function
-
 .fi
 
 	The output file is an 8-bit raw (i.e. binary pixels) PGM image.  
@@ -743,11 +714,9 @@ The maximum pixel value is assumed to be 255.
 .ls PPM     - PBMPlus PPM format image
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     3      rgb    24      no    no      pixel         
-
 .fi
 
 	The output file is an 24-bit raw (i.e. binary pixels) PPM image. 
@@ -756,7 +725,6 @@ The maximum pixel value per color is assumed to be 255.
 .ls RAS     - Sun rasterfile format
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       no    no      none
@@ -767,7 +735,6 @@ The maximum pixel value per color is assumed to be 255.
     Notes:
 	1) Colormap generation enabled using \fIsetcmap()\fR
 	2) Colormap generation enabled using \fIcmap()\fR
-
 .fi
 
 	The output file will be a Sun rasterfile.  The header values
@@ -779,12 +746,10 @@ pixel value is assumed to be 255.
 .ls RGB     - SGI RGB format image
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       no    no      none          
     3      rgb    24      no    no      scanline      
-
 .fi
 
 	The output file will be an SGI RGB (IRIS) format image.  Although
@@ -794,7 +759,6 @@ The maximum pixel value is assumed to be 255.
 .ls XWD     - X11 Window dump file
 
 .nf
-
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
   -----    -----  ------  ----  ------  ------------  -----
     1      index  8       yes   no      none          1,2,3
@@ -804,7 +768,6 @@ The maximum pixel value is assumed to be 255.
 	1) Linear grayscale colormap automatically generated
 	2) Colormap generation enabled using \fIsetcmap()\fR
 	3) Colormap generation enabled using \fIcmap()\fR
-
 .fi
 
 	The output file will be an X11 window dump file.
@@ -876,9 +839,7 @@ brightness/contrast values could be read from the control panel and the
 rasterfile generated using
 
 .nf
-
         setcmap (b1, "aips0", 0.36, 1.2)
-
 .fi
 
 where the "aips0" is one of the builtin colormaps and the brightness and
@@ -893,7 +854,6 @@ will save the image with the same intensity scaling and color as would be see
 by displaying it to ximtool using the default DISPLAY task settings,
 normalized XImtool brightness/contrast values and the "idl15.lut" LUT in the
 current directory.
-
 
 .ih
 EXAMPLES

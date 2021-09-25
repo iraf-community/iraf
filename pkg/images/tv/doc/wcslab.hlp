@@ -99,7 +99,6 @@ coordinate transformation. These elements usually have the values
 The extent in pixel space over which the transformation is valid.
 .le
 
-
 .ih
 WLPARS PARAMETERS
 
@@ -352,25 +351,21 @@ matrix to produce the world coordinates.  The CD matrix is represented in
 the parameters as follows:
 
 .nf
-
                 |---------------|
                 | cd1_1  cd1_2  |
                 |               |
                 | cd2_1  cd2_2  |
                 |---------------|
-
 .fi
 
 To construct a typical CD matrix, the following definitions of the
 individual matrix elements may be used:
 
 .nf
-
         cd1_1 =  xscale * cos (ROT)
         cd1_2 = -yscale * sin (ROT)
         cd2_1 =  xscale * sin (ROT)
         cd2_2 =  yscale * cos (ROT)
-
 .fi
 
 where xscale and yscale are the scale factors from the logical to world
@@ -383,12 +378,10 @@ transformation needs to be multiplied by -1.  This results in the
 following formulas: 
 
 .nf
-
         cd1_1 = -xscale * cos (ROT)
         cd1_2 =  yscale * sin (ROT)
         cd2_1 =  xscale * sin (ROT)
         cd2_2 =  yscale * cos (ROT)
-
 .fi
 
 Finally, the origins of the logical and world systems must be defined.
@@ -630,7 +623,6 @@ approximately correct for the IRAF test image dev$pix.
 	CDELT1  =        -2.1277777E-4
 	CDELT2  =         2.1277777E-4
 
-
 	cl> display dev$pix 1
 
 	cl> wcslab dev$pix 1
@@ -639,7 +631,6 @@ approximately correct for the IRAF test image dev$pix.
 7. Display a  512 square image with a defined tangent plane sky projection
 approximately centered on the north celestial pole in an 800 square frame
 buffer. The FITS keywords shown below define the WCS.
-
 
 .nf
 	# IRAF image header keywords which define the WCS
@@ -664,7 +655,6 @@ is located at (9h 22m 30.5s, -15o 05m 42s), the pixels are .10
 arcseconds in size, and are rotated 30.0 degrees counter-clockwise.
 
 .nf
-
 	cl> lpar wcspars
 
 	    ctype1 = 'ra---tan'
@@ -685,7 +675,6 @@ arcseconds in size, and are rotated 30.0 degrees counter-clockwise.
 	cl> display image 1
 
 	cl> wcslab image usewcs+
-
 .fi
 
 .ih

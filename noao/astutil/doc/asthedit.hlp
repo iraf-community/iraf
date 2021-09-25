@@ -247,7 +247,6 @@ The following operators are recognized in expressions.  With the exception
 of the operators "?", "?=", and "@", the operator set is equivalent to that
 available in the CL and SPP languages.
 
-
 .nf
         +  -  *  /              arithmetic operators
         **                      exponentiation
@@ -259,7 +258,6 @@ available in the CL and SPP languages.
         ? :                     conditional expression
         @                       reference a variable
 .fi
-
 
 The operators "==", "&&", and "||" may be abbreviated as "=", "&", and "|"
 if desired.  The ?= operator performs pattern matching upon strings.
@@ -279,14 +277,12 @@ intrinsic functions:
 A number of standard intrinsic functions are recognized within expressions.
 The set of functions currently supported is shown below.
 
-
 .nf
 	abs     atan2   deg     log     min     real    sqrt
 	acos    bool    double  log10   mod     short   str
 	asin    cos     exp     long    nint    sin     tan
 	atan    cosh    int     max     rad     sinh    tanh
 .fi
-
 
 The trigonometric functions operate in units of radians.
 The \fImin\fR and \fImax\fR functions may have any number of arguments up
@@ -513,14 +509,12 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
     
-    
 Conventions for w (field width) specification:
     
     W =  n      right justify in field of N characters, blank fill
         -n      left justify in field of N characters, blank fill
         0n      zero fill at left (only if right justified)
 absent, 0       use as much space as needed (D field sets precision)
-    
     
 Escape sequences (e.g. "\n" for newline):
     

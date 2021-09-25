@@ -5,8 +5,6 @@ Comments on Multispec Package Specifications
 .ce
 November 8, 1983
 
-
-
     The basic package structure and the decomposition of the package into
 tasks looks good.  The requirements for both general operators and canned
 procedures are addressed well.  I got the impression that you have a pretty

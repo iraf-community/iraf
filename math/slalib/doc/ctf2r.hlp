@@ -1,7 +1,6 @@
 .help ctf2r Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slCTFR (IHOUR, IMIN, SEC, RAD, J)
 
      - - - - - -
@@ -36,7 +35,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

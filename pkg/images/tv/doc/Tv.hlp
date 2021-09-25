@@ -6,7 +6,6 @@ Technical Specifications
 .ce
 February 17, 1984
 
-
 .nh
 Virtual Display Characteristics
 
@@ -57,7 +56,6 @@ A single lookup table is used to assign a color to each graphics plane.
 .le
 .le
 
-
 The following functions are supported but are not required.
 .ls
 .ls [8]
@@ -68,7 +66,6 @@ Split screen: simultaneous display of any two frames, horizontal or vertical
 split through the center of the display.
 .le
 .le
-
 
 Blinking of two or more image frames is provided in software.  Character and
 vector generation in the graphics overlays is only provided in software in the
@@ -147,7 +144,6 @@ All display control processes behave identically at the CL level.  The STDIMAGE
 environment variable is used to select the particular display control process
 to be run.
 
-
 .ks
 .nf
 		user interface
@@ -159,7 +155,6 @@ to be run.
 .ce
 Structure of the Display Control Software
 .ke
-
 
 The display control process consists of a device independent part and a
 device dependent part.  The device dependent part provides the virtual
@@ -195,7 +190,6 @@ The specifications for the package are given below (excluding the \fBdisplay\fR
 program, which is documented elsewhere).  All control functions operate
 independently of each other, i.e., without side effects, unless otherwise noted.
 
-
 .ks
 .nf
       blink         dsave         initdisplay   rgb           
@@ -207,7 +201,6 @@ independently of each other, i.e., without side effects, unless otherwise noted.
 .ce
 The \fBDcontrol\fR Package
 .ke
-
 
 The basic \fBdcontrol\fR package is shown above, and further documentation
 is given below.  Additional routines will be added in the future.

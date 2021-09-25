@@ -18,7 +18,6 @@ pointer	refim			#I Reference image pointer
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-
 # Close the mask.
 procedure xt_pmunmap (im)
 

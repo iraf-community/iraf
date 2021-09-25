@@ -214,7 +214,6 @@ is doubled by converting it to a real image with the chpixtype task then the
 effect of caching in interactive is can be quite noticeable if measurements
 of objects in the top and bottom halves of the image are alternated.
 
-
 .ih
 CURSORS
 
@@ -222,7 +221,6 @@ CURSORS
     has been activated.
 
 .nf
-
 	Keystroke Commands 
 
 ?	Print help
@@ -256,7 +254,6 @@ w       Decrease horizontal angle by 15 degrees (mesh plot only)
 e       Increase horizontal angle by 15 degrees (mesh plot only)
 c       Plot the default contour plot for this star
 r       Plot the radial profile for this star
-
 
         Colon Graphics Commands
 
@@ -331,10 +328,8 @@ Save surface plots of the selected stars in the file "psf.plots".
 	... make a surface plot of the first candidate psf star
 .fi
 
-
 2. Repeat the previous results for an image section while preserving the
 coordinate system of the original image.
-
 
 .nf
     da> daofind dev$ypix[150:450,150:450] default wcsout=tv fwhmpsf=2.5 \
@@ -377,7 +372,6 @@ coordinate system of the original image.
 	... make a surface plot of the 4th candidate psf star
 .fi
 
-
 3. Repeat example 1 but run pstselect in interactive mode and do not save the
 plots.
 
@@ -405,7 +399,6 @@ plots.
 	    add psf stars to the list with the a keystroke command
 
 	... type q to quit
-
 .fi
 
 .ih

@@ -111,7 +111,6 @@ using excessive memory, but does not allow 2D or higher operations to be
 performed within the expression (e.g., transpose).  The entire expression is
 evaluated once for each line of the output image.
 
-
 \fBOperands\fR
 
 Input operands are represented symbolically in the input expression using
@@ -174,7 +173,6 @@ input operands "i", "j", "k" and so on.
 An example of the use of the pixel coordinate operands is the generation of
 multidimensional analytic functions.
 
-
 \fBOperators\fR
 
 The expression syntax implemented by \fIimexpr\fR provides the following
@@ -224,7 +222,6 @@ two input vectors.
 The substring equals operator "?=", used for string comparisons,  is like 
 "==" but checks for the presence of a substring, rather than exact equality
 of the two strings.
-
 
 \fBFunctions\fR
 
@@ -330,7 +327,6 @@ The \fIrepl\fR (replicate) function replicates a data element, returning a
 vector of length (n * len(a)) as output.  For example, this can be used to
 create a dummy data array or image by replicating a constant value.
 
-
 \fBThe Expression Database\fR
 
 The \fIimexpr\fR expression database provides a macro facility which can be
@@ -365,7 +361,6 @@ necessary.  If so, continuation lines must be indented.  The first line
 with no whitespace at the beginning of the line terminates the macro.
 Macro functions may be nested.  Macro functions are indistinguishable from
 intrinsic functions in expressions.
-
 
 \fBIMEXPR and Pixel Masks\fR
 

@@ -1,7 +1,6 @@
 .help dat Jun99 "Slalib Package"
 
 .nf
-
       DOUBLE PRECISION FUNCTION slDAT (UTC)
 
      - - - -
@@ -34,7 +33,6 @@
      to call the routine with an earlier epoch.  However, if this
      is attempted, the TAI-UTC expression for the year 1960 is used.
 
-
      :-----------------------------------------:
      :                                         :
      :                IMPORTANT                :
@@ -51,7 +49,6 @@
 
   Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

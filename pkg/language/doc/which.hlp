@@ -34,7 +34,6 @@ EXAMPLES
 1.  Find out which package contains the HEAD task.
 
 .nf
-
 	cl> which head
 	system
 .fi
@@ -42,7 +41,6 @@ EXAMPLES
 2.  Find all currently loaded package which contain the SPLOT task.
 
 .nf
-
 	cl> whereis splot
 	echelle onedspec
 .fi

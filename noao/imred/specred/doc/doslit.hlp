@@ -631,9 +631,7 @@ with standard star fluxes and band passes.  The available extinction
 files and flux calibration directories may be listed using the command:
 
 .nf
-
 	cl> help onedstds
-
 .fi
 
 The extinction correction requires computation of an air mass using the
@@ -790,9 +788,7 @@ those which are relevant for slit data.  The parameter values
 can be changed from the defaults by using the parameter editor,
 
 .nf
-
 cl> epar sparams
-
 .fi
 
 or simple typing \fIsparams\fR.

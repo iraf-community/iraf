@@ -181,7 +181,6 @@ tt> tmatch catalog1.tab catalog2.tab match.tab \
 first catalog and get the rest of its information from the second
 catalog. This could be done with the following command:
 
-
 .nf
 tt> tmatch catalog1.tab catalog2.tab match.tab \
 >>> ra,dec ra,dec 0:00:10 incol1=name sphere+
@@ -201,7 +200,6 @@ The following objects matched the same object:
 1:163 6601  GEM
 1:164 6601  GEM
 2:163 6601  GEM
-
 
 The following objects have the largest norms:
 Norm = 0.00253

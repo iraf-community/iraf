@@ -120,7 +120,6 @@ do not support color at all.  The usual interpretation of the color
 index is:
 
 .nf
-
     1 -- Black
     2 -- White
     3 -- Red

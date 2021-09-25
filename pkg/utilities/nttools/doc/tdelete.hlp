@@ -49,7 +49,6 @@ EXAMPLES
 .nf
 	cl> tdelete table1,table2,tab67
 	cl> tdelete *.tab,a,b,c
-
 .fi
 
 In the latter case, the extension is given explicitly because there may be

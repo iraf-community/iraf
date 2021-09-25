@@ -90,7 +90,6 @@ wavenumbers are set to zero.  Components between these regions are weighted
 according to the equation for a Welch window.  Namely,
 
 .nf 
-
 						     2      
 	w(j)  = 1. - [ (j - 1/2(N-1)) / (1/2(N+1)) ] 
 		        
@@ -104,7 +103,6 @@ wavenumbers are set to zero. Components between these regions are weighted
 according to the equation for a Hanning window.  Namely,
 
 .nf
-
 	w(j)  =  1/2 [ 1. - cos( (TWOPI*j) / (N-1) ) ]
 
 		where j =  (wavenumber - cuton_wavenumber) 

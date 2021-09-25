@@ -16,7 +16,6 @@ describe the default terminal and printer devices.  The user may subsequently
 change the values of these variables with the SET statement or with the STTY
 program.
 
-
 .ks
 .nf
 	printer		default printer (i.e., "versatec")
@@ -27,7 +26,6 @@ program.
 	ttynlines	number of lines per screen
 .fi
 .ke
-
 
 The variables defining the names of the default terminal and printer
 devices will normally correspond to the names of device entries in the
@@ -60,7 +58,6 @@ done to close the descriptor, returning all buffer space used.  If "ttyname"
 is "terminal" or "printer", the descriptor for the default terminal or printer
 is accessed.
 
-
 .ks
 .nf
 Open/Close descriptor:
@@ -69,7 +66,6 @@ Open/Close descriptor:
 		ttycdes (tty)
 .fi
 .ke
-
 
 .ks
 .nf
@@ -83,7 +79,6 @@ Low level database access, tty control:
 		ttysubi (ctrlstr, outstr, maxch, arg1, arg2)
 .fi
 .ke
-
 
 .ks
 .nf
@@ -101,7 +96,6 @@ NI		ttyvert (fd, tty, from, to)	# move cursor on column
 	     ttyputline (fd, tty, textline, map_cc)	# put text line
 .fi
 .ke
-
 
 The TTYGET procedures are used to get capabilities from the database entry.
 If the named capability is not found, TTYGETI returns zero, TTYGETB returns
@@ -156,7 +150,6 @@ open descriptor:
 .fi
 .ke
 
-
 .ks
 .nf
 close descriptor:
@@ -166,7 +159,6 @@ close descriptor:
 	    mfree			[free tty descriptor]
 .fi
 .ke
-
 
 .ks
 .nf
@@ -178,7 +170,6 @@ get integer capability:
 .fi
 .ke
 
-
 .ks
 .nf
 get string capability:
@@ -189,7 +180,6 @@ get string capability:
 .fi
 .ke
 
-
 .ks
 .nf
 perform argument substitution on control string:
@@ -198,7 +188,6 @@ perform argument substitution on control string:
 	    gltoc
 .fi
 .ke
-
 
 .ks
 .nf
@@ -218,7 +207,6 @@ device.  Since a fixed length array is used to index capabilities, there is
 an upper limit on the number of capabilities, but there is no limit on the
 length of a termcap entry.
 
-
 .ks
 .nf
 	struct tty_descriptor {
@@ -236,13 +224,11 @@ length of a termcap entry.
 .fi
 .ke
 
-
 TTYODES "opens" the tty descriptor, i.e., allocates a descriptor,
 scans the termcap file and reads the terminal entry into the descriptor,
 expanding any tc references, and then sets the baud and padchar fields.
 There is no limit on the size of a termcap entry, unlike the UNIX
 implementation which uses a fixed size, 1024 character caplist buffer.
-
 
 .tp 10
 
@@ -299,7 +285,6 @@ begin
 end
 .fi
 
-
 Scan the termcap file until the desired entry is found.  Copy the entry
 into the caplist field of the tty descriptor.  If the caplist buffer
 overflows, reallocate a larger buffer.
@@ -334,7 +319,6 @@ begin
 end
 .fi
 
-
 Prepare the caplist index.  Each two-character capability name maps into
 an unique integer code.  We prepare an list of capcodes and an associated
 list of indices into the caplist, then sort the capcode list.  At runtime
@@ -364,7 +348,6 @@ begin
 	    sort list
 end
 .fi
-
 
 Process a capability string containing arguments.  Examples of such capability
 strings are cursor motion to [x,y], and set scrolling region to [l1,l2].
@@ -442,14 +425,12 @@ begin
 end
 .fi
 
-
 The technique used for cursor addressing depends on the characteristics
 of the terminal.  If the terminal has no cursor motion capability, we
 try to position the cursor using primitive motion commands.  Otherwise
 we use TTYSUBI to generate the cursor motion sequence.  If TTYSUBI returns
 a residual, we use primitive motion commands (up line and backspace) to go
 the rest of the way in.
-
 
 .nf
 procedure ttygoto (fd, tty, col, line)

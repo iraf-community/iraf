@@ -350,7 +350,6 @@ in the observatory task.
 		longitude = 111:36.0
 		name = 'Kitt Peak National Observatory'
 		Images: demoobj1 (OBSERVAT keyword)
-
 .fi
 
 6.  Set explicit observatory parameters:

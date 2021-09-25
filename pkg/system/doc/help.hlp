@@ -467,7 +467,6 @@ to specify a name (an HTML \fINAME\fR directive).  The syntax for these are
 as follows:
 
 .nf
-
 	\fB.hn\fI <name>\fR
 	\fB.hr\fI <link> <text> \fR
 .fi
@@ -489,7 +488,6 @@ GUI EXAMPLES
 1) Start \fIhelp\fR as a GUI browser:
 
 .nf
-
 	cl> help dev=gui
 .fi
 
@@ -497,14 +495,12 @@ GUI EXAMPLES
 selected from the search panel which will appear when the task starts:
 
 .nf
-
 	cl> help gauss dev=gui search+
 .fi
 
 3) Load an LROFF help page in the browser at startup
 
 .nf
-
 	cl> help mytask.hlp dev=gui file+
 .fi
 
@@ -525,21 +521,18 @@ or
 2. Print the help text on the line printer:
 
 .nf
-
 	cl> help delete | lprint
 .fi
 
 3. Print help for the current package:
 
 .nf
-
 	cl> help
 .fi
 
 4. Print the usage section of all modules in the package \fBimages\fR:
 
 .nf
-
 	cl> help images.* section=usage
 .fi
 
@@ -547,7 +540,6 @@ or
 and \fBclio\fR (and any others whose names begin with the string "cl"):
 
 .nf
-
 	cl> help cl* op=dir
 .fi
 
@@ -555,7 +547,6 @@ and \fBclio\fR (and any others whose names begin with the string "cl"):
 overview of the contents of a help database):
 
 .nf
-
 	cl> help * op=dir
 .fi
 
@@ -563,14 +554,12 @@ overview of the contents of a help database):
 package \fBfmtio\fR:
 
 .nf
-
 	cl> help fmtio.str* op=source
 .fi
 
 8. Find all tasks that delete something:
 
 .nf
-
 	cl> help * | match delete
 .fi
 
@@ -578,7 +567,6 @@ package \fBfmtio\fR:
 default printer device:
 
 .nf
-
 	cl> help help,lprint | lpr
 .fi
 
@@ -586,14 +574,12 @@ default printer device:
 suitable for printing on any device.
 
 .nf
-
 	cl> help hedit dev=text > hedit.txt
 .fi
 
 11. Print the manual page for task \fIhedit\fR as a Postscript file. 
 
 .nf
-
 	cl> help hedit dev=ps | lprint
 .fi
 

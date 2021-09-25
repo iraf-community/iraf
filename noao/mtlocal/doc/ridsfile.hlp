@@ -69,7 +69,6 @@ output images.  A \fBlong_header\fR will be listed; sample output is shown.
 	cl> ridsfile mtb 4 make_image=no long_header=yes
 .fi
 
-
 .nf
 RECORD = 2317, label = "CALLISTO  2297/2298  CLEAR/2.5ND",
 oflag = OBJECT, beam_number = 0,   alpha_ID = NEW,   companion = 2318,

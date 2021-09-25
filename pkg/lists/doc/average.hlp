@@ -25,7 +25,6 @@ Additional points can be added to or deleted from the sample by rerunning
 \fIaverage\fR with \fBoption\fR equal to one of the following:
 
 .nf
-
 	add -- add points to the sample, recalculate mean and sigma
 	sub -- subtract points from the sample
 .fi
@@ -36,14 +35,12 @@ EXAMPLES
 Run \fIaverage\fR on the list of numbers in file "numbers".
 
 .nf
-	
 	cl> type numbers | average
 .fi
 
 Add in to the sample the list of numbers in file "numbers.2".
 
 .nf
-
 	cl> average add < numbers.2
 .fi
 

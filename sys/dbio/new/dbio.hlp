@@ -141,7 +141,6 @@ and the applications programmer.  There is a lot more to the DB Kernel than
 is evident from the figure, and indeed the DB Kernel will be the subject of
 another figure when we discuss the system architecture in section 4.2.
 
-
 .ks
 .nf
                  DBMS          IMAGES(etc)            (CL)
@@ -159,13 +158,11 @@ another figure when we discuss the system architecture in section 4.2.
                          |
                          |
                     (DB Kernel)                (VOS or Host System)
-
 .fi
 
 .ce
 Figure 1.  Major Components of the Database Subsystem
 .ke
-
 
 With the exception of certain optional subsystems to be outlined later,
 the entire DBSS is machine independent and portable.  The IRAF system may
@@ -375,7 +372,6 @@ X is in the range A to B and Y is greater than 30.
 .le
 .le
 
-
 In the past queries such as these have all too often been answered by writing
 a program to answer each query, or worse, by wading though a listing of the
 program output and manually computing the result or manually plotting points
@@ -411,7 +407,6 @@ A general purpose interactive query capability is required for the user to
 effectively make use of the data in a catalog.
 .le
 .le
-
 
 In DBSS terminology a user catalog will often be referred to as a \fBtable\fR
 to avoid confusion with the use of the DBSS term \fBcatalog\fR which refers
@@ -523,7 +518,6 @@ access is possible.
 .le
 .le
 
-
 In summary, images are characterized by a header with a highly variable set
 of fields, some of which may vary in size during the lifetime of the image.
 New fields may be added to the image header at any time.  Array valued fields
@@ -564,7 +558,6 @@ common.  For example, assume that a polynomial has been fitted to a data
 vector and we wish to record the fit in the database.  A typical set of
 attributes describing a polynomial fit are shown below.
 
-
 .ks
 .nf
 	image_name	char*30		# name of source image
@@ -576,7 +569,6 @@ attributes describing a polynomial fit are shown below.
 	curve.coeff	real*4[*]	# coefficients
 .fi
 .ke
-
 
 The data structure shown records the positions (X) and world coordinates (Y)
 of the data features to which the curve was fitted, plus the coefficients of
@@ -622,7 +614,6 @@ single user to process a specific dataset with a specific applications package.
 .le
 .le
 
-
 Application specific information may sometimes be stored directly in the header
 of the image being analyzed, but more often will be stored in one or more
 separate tables, recording the name of the image analyzed in the new record
@@ -663,7 +654,6 @@ Archived data could be invaluable for future projects studying the variability
 of an object or objects over a period of years.
 .le
 .le
-
 
 Ideally data should be archived as it is taken at the telescope, possibly
 performing some simple pipeline reductions before archiving takes place.
@@ -805,7 +795,6 @@ use the formal relational terms relation, tuple, attribute, and so on.
 The correspondence between the formal relational terms and their informal
 equivalents is given in the table below.
 
-
 .ks
 .nf
 	\fBformal relational term\fR		    \fBinformal equivalents\fR
@@ -817,7 +806,6 @@ equivalents is given in the table below.
 		domain				pool of legal values
 .fi
 .ke
-
 
 A \fBrelation\fR is a set of like tuples.  A \fBtuple\fR is a set of
 \fBattributes\fR, each of which is defined upon a specific domain.
@@ -888,7 +876,6 @@ formats, and the host database system (HDB), if any.  Specialized HDBI
 drivers are required to access foreign image formats or to interface to
 an HDB.
 
-
 .ks
 .nf
 		 DBMS          IMAGES(etc)            (CL)
@@ -932,14 +919,11 @@ an HDB.
                                     +---+---+
                                     |       |
                                    DBK     DBK
-
-
 .fi
 
 .ce
 Figure 2. \fBDatabase Subsystem Architecture\fR
 .ke
-
 
 .nh 2
 The DBMS Package
@@ -1066,7 +1050,6 @@ refuse to delete a database until all tables therein have been dropped.
 .le
 .le
 
-
 Several terms were introduced in the discussion above which have not yet been
 defined.  A \fBbase table\fR is a physical table (instance of a defined
 relation), unlike a \fBview\fR which is a virtual table defined via selection
@@ -1104,7 +1087,6 @@ Print a set of records on the standard output, using the forms generator to
 generate a nice self documenting format.
 .le
 .le
-
 
 The \fBforms editor\fR (etable) may be used to display or edit existing records
 as well as to enter new ones.  It is desirable for the forms editor to be able
@@ -1174,7 +1156,6 @@ used to enter a table into a DBSS database.
 .le
 .le
 
-
 The most common use for list format output will probably be to print tables.
 When a table is too wide to fit on a line the user will learn to use
 \fBprojection\fR to print only the fields of interest.  The default format
@@ -1207,7 +1188,6 @@ Print the contents of the relation \fIspe\fR in list form on the standard
 output.  The operand \fIspe\fR may be any general select/project expression.
 .le
 .le
-
 
 The \fBptable\fR operator (introduced in section 4.3.2.1) is used to generate
 list output.  The inverse operation is provided by \fBrtable\fR.
@@ -1256,7 +1236,6 @@ The named fields of the indicated record are set to the values given in the
 free format value string.
 .le
 .le
-
 
 More sophisticated table and record access facilities are conceivable but
 cannot profitably be implemented until an enhanced CL becomes available.
@@ -1310,7 +1289,6 @@ package).
 .le
 .le
 
-
 Unlike most commercial database systems, the DBSS is not built around the
 query language.  The heart of the IRAF DBSS is the DBIO interface, which is
 little more than a glorified record access interface.  The query language
@@ -1357,7 +1335,6 @@ Tabular and graphical output.  The result of any query may be printed or
 plotted in a variety of ways, without need to repeat the query.
 .le
 .le
-
 
 The most important function performed by the query language is of course the
 interactive evaluation of queries, i.e., questions about the data in the
@@ -1484,7 +1461,6 @@ Print the values of the attributes OBJ, X, Y, and Z of all objects of type
 .le
 .le
 
-
 It should not be difficult for the imaginative reader to make up similar
 queries for a particular astronomical catalog or data archive.
 For example (I can't resist), "find all objects for which B-V exceeds X",
@@ -1502,7 +1478,6 @@ from which records are to be selected, "pqr" is the desired value of the
 field "type" of table "table", and "x", "y", and "z" are numeric fields of
 the table.
 
-
 .ks
 .nf
 SQL:
@@ -1516,7 +1491,6 @@ SQL:
 .fi
 .ke
 
-
 .ks
 .nf
 QUEL:
@@ -1529,7 +1503,6 @@ QUEL:
 	AND	t.z >  30
 .fi
 .ke
-
 
 .ks
 .nf
@@ -1546,7 +1519,6 @@ ASTRID (mnemonic form):
 .fi
 .ke
 
-
 .ks
 .nf
 ASTRID (mathematical form):
@@ -1555,7 +1527,6 @@ ASTRID (mathematical form):
 		obj, x, y, z
 .fi
 .ke
-
 
 .ks
 .nf
@@ -1567,7 +1538,6 @@ ASTRID (alternate query showing use of intermediates):
 .fi
 .ke
 
-
 .ks
 .nf
 ML (Li/Prolog):
@@ -1575,7 +1545,6 @@ ML (Li/Prolog):
 	table : type=pqr, x >= 10, x <= 20, z < 10 [obj,x,y,z]
 .fi
 .ke
-
 
 Note that in ASTRID and ML selection and projection are implemented as
 operators or qualifiers modifying the relation on the left.  To print all
@@ -1601,7 +1570,6 @@ SPJX and SPJY are aliases for SPJ.  This example is rather contrived and
 the data is not interesting, but it should serve to illustrate the use of
 SQL for complex queries.
 
-
 .ks
 .nf
 Query: Get part numbers for parts supplied to all projects in London.
@@ -1619,7 +1587,6 @@ Query: Get part numbers for parts supplied to all projects in London.
 			AND	spjy.j# = j.j# ));
 .fi
 .ke
-
 
 The nesting shown in this example is characteristic of the calculus languages
 when used to evaluate complex queries.  Each SELECT implicitly returns an
@@ -1757,7 +1724,6 @@ region mask may be associated with any number of different images.
 .le
 .le
 
-
 In summary, the \fBimage header\fR contains the standard header fields,
 the pixels, the bad pixel list, and any user defined fields the user wishes
 to store directly in the header.  All other information describing an image
@@ -1836,11 +1802,9 @@ for annotating plots and other forms of output.
 .le
 .le
 
-
 The possible values of the \fIpixtype\fR field are shown below.  The format
 of the value string is "type.host", where \fItype\fR is the logical datatype
 and \fIhost\fR is the host machine encoding used to represent that datatype.
-
 
 .ks
 .nf
@@ -1857,7 +1821,6 @@ and \fIhost\fR is the host machine encoding used to represent that datatype.
 .fi
 .ke
 
-
 Note that the first character of each keyword is sufficient to uniquely
 identify the datatype.  The ".m" suffix identifies the "machine" to which
 the datatype refers.  When new images are written \fIm\fR will usually be
@@ -1865,7 +1828,6 @@ the name of the host machine.  When images written on a different machine
 are read on the local host there is no guarantee that the i/o system will
 recognize the formats for the named machine, but at least the format will
 be uniquely defined.  Some possible values for \fIm\fR are shown below.
-
 
 .ks
 .nf
@@ -1877,7 +1839,6 @@ be uniquely defined.  Some possible values for \fIm\fR are shown below.
 	mvs		DG MV-series data formats
 .fi
 .ke
-
 
 The DBK format is used when the pixels are stored directly in the image header,
 since only the DBK binary formats are supported in DBK binary datafiles.
@@ -1920,7 +1881,6 @@ the image and listing its arguments.
 .le
 .le
 
-
 .ks
 .nf
 Example:
@@ -1933,7 +1893,6 @@ Example:
 	Sep 23 20:30    nite1[15]       --       nite1[10] - nite1[11]
 .fi
 .ke
-
 
 The principal reason for collecting all history text together in a single
 relation rather than storing it scattered about in string attributes in the
@@ -2023,7 +1982,6 @@ applications.
 .le
 .le
 
-
 For example, the WCS for a three dimensional image might consist of a bivariate
 Nth order chebyshev polynomial mapping X and Y to RA and DEC via gnomic
 projection, plus a univariate piecewise linear function mapping each discrete
@@ -2101,13 +2059,11 @@ field width with two decimal places in the seconds field.
 .le
 .le
 
-
 As noted earlier, the full transformation for an axis involves a linear
 transformation followed by a nonlinear transformation.  The linear term
 is defined in terms of the WCS attributes \fIp1, p2\fR, etc. as shown below.
 The variables X and Y are the input values of the axes \fIaxin1\fR and
 \fIaxin2\fR, which need not correspond to the X and Y axes of the image.
-
 
 .ks
 .nf
@@ -2121,7 +2077,6 @@ The variables X and Y are the input values of the axes \fIaxin1\fR and
 	v  = y" + w2
 .fi
 .ke
-
 
 The output variables U and V are then used as input to the nonlinear mapping,
 producing the world coordinate value W for the specified image axis \fIaxis\fR
@@ -2178,7 +2133,6 @@ intensity range.
 .le
 .le
 
-
 The histogram limits Z1 and Z2 will normally correspond to the minimum and
 maximum pixel values in the image section to which the histogram applies.
 
@@ -2206,7 +2160,6 @@ line.  The bad pixel list is a series of either column numbers or ranges of
 column numbers.  Single columns are represented in the list as positive
 integers; ranges are indicated by a negative second value.
 
-
 .ks
 .nf
 	15   2 512 512
@@ -2214,7 +2167,6 @@ integers; ranges are indicated by a negative second value.
 	 4  72  23 -29   35
 .fi
 .ke
-
 
 An example of a bad pixel list describing a total of 15 bad pixels is shown
 above.  The first line is the pixel list header which records the total list
@@ -2301,7 +2253,6 @@ The mask itself, a variable length integer array.
 .le
 .le
 
-
 Examples of the use of region masks include specifying the regions to be
 used in a surface fit to a two dimensional image, or specifying the regions
 to be used to correlate two or more images for image registration.
@@ -2344,7 +2295,6 @@ FITS style as a character string not to exceed 20 characters in length.
 An optional comment string, not to exceed 49 characters in length.
 .le
 .le
-
 
 Group format is provided primarily for the STScI/SDAS applications, which
 require data to be in group format.  The format is however useful for any
@@ -2459,7 +2409,6 @@ to locate and access the pixel segment if it is stored externally.
 An image database may contain a number of other tables; these are summarized
 below.
 
-
 .ks
 .nf
 	<images>	Image storage (a set of tables named by the user)
@@ -2470,7 +2419,6 @@ below.
 	wcs		World coordinate systems
 .fi
 .ke
-
 
 Any number of additional application specific tables may be present in an
 actual database.  The names of the application and user defined tables must
@@ -2564,7 +2512,6 @@ we be able to archive data in a machine independent format and read it on a
 variety of machines seems to be an unusual one.
 .le
 .le
-
 
 In summary, we need a simple interface which provides flexibility in the way
 in which data can be stored, and which supports complex, dynamic data structures
@@ -2690,7 +2637,6 @@ Contains an entry for every primary or secondary index in the database.
 .le
 .le
 
-
 The system tables are visible to the user, i.e., they appear in the database
 catalog.  Like the user tables, the system tables are themselves described by
 entries in the database catalog, attribute list table, and domain descriptor
@@ -2743,7 +2689,6 @@ indexes, to avoid an unnecessary search of the \fBsysidx\fR table when
 accessing an unindexed table.
 .le
 .le
-
 
 Only a subset of these fields will be of interest to the user in ordinary
 catalog listings.  The \fBpcatalog\fR task will by default print only the
@@ -2813,7 +2758,6 @@ in a record.  In the case of variable length arrays fields \fBoffset\fR and
 \fBwidth\fR refer to the array descriptor.
 .le
 .le
-
 
 In summary, the attribute list defines the physical structure of a record
 as stored in mass storage.  DBIO is responsible for encoding and decoding
@@ -2904,7 +2848,6 @@ The field width in characters for printed output.
 .le
 .le
 
-
 Note that the \fIunits\fR and \fIformat\fR fields and the four "*val" fields
 are stored as variable length character arrays, hence there is no fixed limit
 on the sizes of these strings.  Use of a variable length field also minimizes
@@ -2914,7 +2857,6 @@ in indexes and selection predicates, however.
 
 A number of global domains are predefined by DBIO.  These are summarized
 in the table below.
-
 
 .ks
 .nf
@@ -2931,11 +2873,9 @@ in the table below.
 .fi
 .ke
 
-
 The predefined global domains, as well as all user defined domains, are defined
 in terms of the four DBK variable precision atomic datatypes.  These are the
 following:
-
 
 .ks
 .nf
@@ -2947,7 +2887,6 @@ following:
 	real	  r	2-8	floating point
 .fi
 .ke
-
 
 DBIO stores records with the field values encoded in the machine independent
 variable precision DBK data format.  The precision of an atomic datatype is
@@ -3047,7 +2986,6 @@ occurring in the calling program.
 .le
 .le
 
-
 Testing for null values in predicates is possible only if the default value
 is something recognizable like INDEF, and is handled by the conventional
 equality operator.  Indefinites are propagated in expressions by the usual
@@ -3078,7 +3016,6 @@ a touch of the CL thrown in.  If a relation is defined only in terms of the
 predefined domains or atomic datatypes and has no primary key, etc., then the
 declaration would look very much like an SPP+ (or C) structure declaration.
 
-
 .ks
 .nf
 	relation masks {
@@ -3095,7 +3032,6 @@ declaration would look very much like an SPP+ (or C) structure declaration.
 	}
 .fi
 .ke
-
 
 The declaration shown identifies the primary key for the relation and gives
 a comment describing the relation, then declares the attributes of the
@@ -3123,7 +3059,6 @@ base tables or views (set union).
 The general form of a select/project expression is shown below.  The syntax
 is patterned after the algebraic languages and even happens to be upward
 compatible with the existing IMIO image template syntax.
-
 
 .ks
 .nf
@@ -3156,7 +3091,6 @@ where
 			    output relation.
 .fi
 .ke
-
 
 All components of an SPE are optional except \fItables\fR; the simplest
 SPE is the name of a single table.  Some simple examples follow.

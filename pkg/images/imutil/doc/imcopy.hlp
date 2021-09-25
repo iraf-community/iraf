@@ -37,7 +37,6 @@ clobber checking is in effect.
 The verbose options prints for each copy lines of the form:
 
 .nf
-
 input image -> output image
 .fi
 

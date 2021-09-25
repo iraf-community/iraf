@@ -9,7 +9,6 @@ heap storage directly if desired, for large or semipermanent buffers.
 Stack storage is intended for use with small buffers, where the overhead
 of allocating and deallocating space must be kept to a minimum.
 
-
 .ks
 .nf
 heap routines:
@@ -19,7 +18,6 @@ heap routines:
 	realloc (ptr, number_of_elements, data_type)
 	mfree   (ptr, data_type)
 
-
 stack routines:
 
 	salloc  (ptr, number_of_elements, data_type)
@@ -27,7 +25,6 @@ stack routines:
 	sfree   (ptr)
 .fi
 .ke
-
 
 MALLOC allocates space on the heap.  CALLOC does the same, and fills the buffer
 with zeroes.  REALLOC is used to change the size of a previously allocated
@@ -37,7 +34,6 @@ allocated by a prior call to MALLOC, CALLOC, or REALLOC.
 Space is allocated on the stack with SALLOC.  SMARK should be called before
 SALLOC, to mark the position of the stack pointer.  SFREE returns all space
 allocated on the stack since the matching call to SMARK.
-
 
 .KS
 Example:
@@ -54,7 +50,6 @@ Example:
 		call sfree (sp)
 .fi
 .KE
-
 
 These routines will generate an error abort if memory cannot be allocated
 for some reason.
@@ -102,7 +97,6 @@ arrays in procedures.  The preprocessor compiles code which makes calls
 to the stack management routines whenever an array is declared with the
 storage calls AUTO, or whenever the ALLOC statement is used in a procedure.
 
-
 .KS
 .nf
 	auto	char lbuf[SZ_LINE]
@@ -117,11 +111,9 @@ storage calls AUTO, or whenever the ALLOC statement is used in a procedure.
 .fi
 .KE
 
-
 The AUTO storage class and the ALLOC statement are provided in the full
 preprocessor, but not in the subset preprocessor.  The following subset
 preprocessor code is functionally equivalent to the code show above:
-
 
 .KS
 .nf
@@ -150,33 +142,19 @@ Stack overflow is handled by calling MALLOC to allocate another stack segment.
 A pointer to the previous stack segment is kept in each new stack segment,
 to permit reclamation of stack space.
 
-
-
-
 .KS
 .nf
 		salloc             smark              sfree
 
-
-
 	    stack_overflow 
 
-
-	
 		malloc            realloc             mfree
 
-
-
 		zmget              zmrget             zmfree
-
-
 
 		Structure of the Memory Management Routines
 .fi
 .KE
-
-
-
 
 .tp 5
 
@@ -210,9 +188,6 @@ begin
 	return
 end
 
-
-
-
 .tp 5
 procedure sfree (old_sp)			# pop the stack
 
@@ -232,18 +207,12 @@ begin
 	sp = old_sp
 end
 
-
-
-
 .tp 5
 procedure smark (old_sp)			# save stack pointer
 
 begin
 	old_sp = sp
 end
-
-
-
 
 .tp 5
 procedure stack_overflow (nchars_needed)	# increase stk size
@@ -264,13 +233,10 @@ begin
 	stack_top = new_segment.stack_top
 	sp = stack_base
 end
-
-
 .fi
 
 The segment header contains fields describing the location and size of
 the segment, plus a link pointer to the previous segment in the list.
-
 
 .KS
 .nf

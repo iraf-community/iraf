@@ -119,15 +119,12 @@ EXAMPLES
 1.  Dump the table "junk.tab" to STDOUT:
 
 .nf
-
      tt> tdump junk.tab cdfile=STDOUT pfile=STDOUT datafile=STDOUT
-
 .fi
 
 2.  Dump "junk.tab", but with the order of the columns rearranged:
 
 .nf
-
      tt> tlcol junk.tab nlist=1 > colnames.lis
      tt> edit colnames.lis
         (Rearrange the column names and perhaps delete some of them.)

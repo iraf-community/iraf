@@ -118,7 +118,6 @@ the phasecurve plot will be deleted or undeleted from the working data set.
 
 The ICFIT keystrokes are described elsewhere. (see help for icfit)
 
-
 Phase Dispersion Minimization User Interface (keystrokes)
 
 When the program starts up it reads the data file(s) and displays
@@ -287,7 +286,6 @@ file is specified, the output will go there.
 .le
 
 .nf
-
 :minp :maxp [period]		set min/max search period
 :minf :maxf [frequency]		set min/max search frequency
 .fi

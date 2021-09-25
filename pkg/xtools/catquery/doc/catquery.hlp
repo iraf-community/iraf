@@ -200,7 +200,6 @@ Example 1: Query a catalog and dump the results to a catalog file.
     # Close the database.
     call cq_unmap (cq)
 
-
 Example 2: Repeat the previous example but only output records for
 	   which magnitude values  <= 16.0.
 
@@ -229,7 +228,6 @@ Example 2: Repeat the previous example but only output records for
      call cq_rclose (res)
 
      ...
-
 
 Example 3: Make an image survey query and dump the results to a fits file.
 
@@ -294,8 +292,6 @@ Example 3: Make an image survey query and dump the results to a fits file.
 
     # Unmap the database
     call cq_unmap (cq)
-
-
 
 Example 4:  Repeat the previous example but convert the dss wcs to a fits wcs.
             At_mkdss is a routine which converts a dss wcs to a fits wcs

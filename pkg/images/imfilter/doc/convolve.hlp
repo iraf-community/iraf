@@ -137,7 +137,6 @@ of xkernel and ykernel respectively.
 		  .0625  .1250  .0625      y1*x1  y1*x2  y1*x3
 	 kernel = .1250  .2500  .1250   =  y2*x1  y2*x2  y2*x3
 	          .0625  .1250  .0625      y3*x1  y3*x2  y3*x3
-
 .fi
 
 3. Convolve an image with the full 2D kernel and with the the equivalent 

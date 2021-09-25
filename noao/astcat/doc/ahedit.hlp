@@ -153,7 +153,6 @@ the image scale is 0.261 arcsec per pixel and east is left and north is down.
 .nf
 cl> ahedit image "" wcsedit+ wcs="none" wraref="RA" wdecref="DEC" \
 wxmag=0.26 wymag=0.26 wxrot=270 wyrot=90 wsystem="EQUINOX" hdredit-
-
 .fi
 
 5. Add the standard keyword name and values pairs for a list

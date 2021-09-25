@@ -331,7 +331,6 @@ the cursor recognizes the digit characters as commands.
 The directional significance of the numeric keys in roam mode is obvious
 if the terminal has a keypad, and is illustrated below.
 
-
 .nf
 	7   8   9	135 090 045
 
@@ -339,7 +338,6 @@ if the terminal has a keypad, and is illustrated below.
 
 	1   2   3      -135 -90 -45
 .fi
-
 
 Even if the terminal has a keypad, it may not be possible to use it for
 roam on some terminals.  If the keypad does not work, the normal numeric
@@ -411,7 +409,6 @@ cursor, its size, font, and orientation.  Use ":.txset" to change the
 text drawing parameters as follows:
 
 .nf
-
     keyword	values					default
 
     up		degrees counterclockwise, zero = +x	90
@@ -422,7 +419,6 @@ text drawing parameters as follows:
     font	roman, greek, italic, bold		roman
     quality	normal, low, medium, high		normal
     color	integers greater than one		1
-
 .fi
 
 The "up" keyword controls the orientation of the character and the whole
@@ -457,12 +453,10 @@ For example, to annotate a spectral line with "H-alpha", written sideways
 up the screen from the current position in italics:
 
 .nf
-
 	:.txqual high
 	:.txset up=180;font=italic
 	T
 	text: H-alpha
-
 .fi
 
 On the last line, cursor mode provided the "text: " prompt.  The
@@ -492,7 +486,6 @@ graphics output to a plotter from the CL using the Language Package task
 	<RETURN>
 	cl>
 	cl> gflush
-
 .fi
 
 Alternatively, you can use ":.write mcodefile" as discussed above, appending
@@ -509,7 +502,6 @@ metacode file to a plotter with one of the graphics kernels:
 		or
 
 	cl> calcomp file1.mc		(etc.)
-
 .fi
 
 .nh 2
@@ -603,7 +595,6 @@ state of the graphics system.  This is an example of such a status report:
 	keys	= ABCDEFGHIJKLMNOPQRSTUVWXYZ<>0123456789?:
 		->ABCDEFGHIJKLMNOPQRSTUVWXYZ<>0123456789?:
 
-
     Graphics Kernel Status:
 
 	STDGRAPH: kernel=cl, device=vt640
@@ -632,7 +623,6 @@ on that stream.  This is the device the stream is currently writing plots to.
 
 The significance of the remaining kernel status fields is described below.
 
-
 .nf
 	memory		- total memory used, chars
 	fb		- size of primary frame buffer, chars
@@ -655,7 +645,6 @@ The significance of the remaining kernel status fields is described below.
 	vj		- vertical justification
 	color		- index of current color attribute
 .fi
-
 
 This status report reflects only the information known to the CL.  The graphics
 subkernels, which are subprocesses of the CL, may themselves have subprocesses,

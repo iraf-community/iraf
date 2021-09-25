@@ -1,7 +1,6 @@
 .help ctf2d Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slCTFD (IHOUR, IMIN, SEC, DAYS, J)
 
      - - - - - -
@@ -33,7 +32,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

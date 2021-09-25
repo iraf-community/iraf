@@ -8,13 +8,11 @@ summarized later in this document.  A general discussion of files in
 the IRAF system follows.  The reader is assumed to have some familiarity
 with the IRAF command language (CL).
 
-
 .sh
 Virtual File Names
 
     File names may be specified in a machine independent fashion, or with
 OS dependent pathnames.  A Virtual File Name (VFN) has the following form:
-
 
 .nf
 	ldir$root.extn
@@ -27,7 +25,6 @@ where
 	root		root or base file name
 	extn		extension denoting the type of file
 .fi
-
 
 The LDIR and EXTN fields are optional.  The ROOT and EXTN fields may contain
 up to 20 characters selected from the set [a-zA-Z0-9_.+-#].  The EXTN field
@@ -45,7 +42,6 @@ at startup time.  Additional logical directories are defined by applications
 packages upon entry, and become undefined when dictionary space is reclaimed
 on exit from the package.  The user may override environment definitions at
 will, by issuing SET commands to redefine environment variables.
-
 
 .sh
 File List Templates
@@ -97,7 +93,6 @@ standard input (until the first EOF), the contents of the standard input
 itself (until the second EOF), and the contents of the file "file2",
 placing the output in the file "ofile".
 
-
 .sh
 File Protection and Clobber
 
@@ -123,7 +118,6 @@ A final form of file protection is provided to prevent a file from being
 clobbered which is already open by a task.  Thus, "COPY file,file" will
 abort when FIO discovers that "file" is already opened for reading.  This
 holds even if file clobber is enabled.
-
 
 .sh
 File Synchronization

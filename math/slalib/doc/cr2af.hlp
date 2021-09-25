@@ -1,7 +1,6 @@
 .help cr2af Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slCRAF (NDP, ANGLE, SIGN, IDMSF)
 
      - - - - - -
@@ -42,7 +41,6 @@
 
   Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

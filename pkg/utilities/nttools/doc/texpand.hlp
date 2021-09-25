@@ -31,20 +31,16 @@ For example, suppose the following rules are contained in the rules
 file:
 
 .nf
-
 SEX = M && NAME = ANY => NAME = Tom || NAME = Dick || NAME = Harry;
 SEX = F && NAME = ANY => NAME = Mary || NAME = Jane;
 SEX = X => SEX = M || SEX = F;
-
 .fi
 
 And suppose the input table contains the following information:
 
 .nf
-
 NAME		SEX		TITLE
 ANY		X		Astronomer
-
 .fi
 
 The first two rules impose two conditions, the first on the value of
@@ -56,11 +52,9 @@ rule of the rule file is applied to the input table and the following
 intermediate result is produced:
 
 .nf
-
 NAME		SEX		TITLE
 ANY		M		Astronomer
 ANY		F		Astronomer
-
 .fi
 
 The rules file is searched again, and now the first rule matches the
@@ -68,14 +62,12 @@ first row and the second rule matches the second row. So the following
 result is produced when these two rules are applied:
 
 .nf
-
 NAME		SEX		TITLE
 Tom		M		Astronomer
 Dick		M		Astronomer
 Harry		M		Astronomer
 Mary		F		Astronomer
 Jane		F		Astronomer
-
 .fi
 
 The rules file is searched again, and because no matches are found,
@@ -100,11 +92,9 @@ name/value pairs are separated by "&&" symbols. An example of a rule
 with all these syntax elements is:
 
 .nf
-
 TARGET = ANY && OBSERVER = ANY =>		   # Two conditions
 	TARGET=M31 && OBSERVER = HUBBLE ||	   # First result
 	TARGET='OMEGA CENT' && OBSERVER = STRUVE ; # Second result
-
 .fi
 
 Notice that in the above example that an identifier containing a blank

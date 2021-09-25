@@ -1,7 +1,6 @@
 .help e2h Jun99 "Slalib Package"
 
 .nf
-
       SUBROUTINE slE2H (HA, DEC, PHI, AZ, EL)
 
      - - - -
@@ -55,7 +54,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
 
 .endhelp

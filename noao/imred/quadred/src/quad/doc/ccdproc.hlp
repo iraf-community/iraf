@@ -143,7 +143,6 @@ Number of scan readout lines used in short scan mode.  This parameter is used
 when the scan type is "shortscan".
 .le
 
-
 .ce
 OVERSCAN FITTING PARAMETERS
 .ls interactive = no
