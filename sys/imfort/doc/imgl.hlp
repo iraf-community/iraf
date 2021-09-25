@@ -1,11 +1,14 @@
 .help imgl Sep86 imfort
 .ih
 NAME
+
 .nf
 imgl -- get (read) an image line
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 subroutine imgl1r (im, rbuf, ier)
 subroutine imgl1s (im, sbuf, ier)
@@ -21,6 +24,7 @@ integer		lineno		#I line (row) number (1:axlen(2))
 integer		bandno		#I band number (1:axlen(3))
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimgl\fR procedures are used to get a line (row) from an image.
@@ -42,6 +46,7 @@ IE_RDPIX:	error reading image pixel file
 IE_YOOB:	image y coordinates out of range
 IE_ZOOB:	image z coordinates out of range
 .fi
+
 .ih
 SEE ALSO
 impl, imgs, imps

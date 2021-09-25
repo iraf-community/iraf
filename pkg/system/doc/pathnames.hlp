@@ -34,9 +34,11 @@ a VMS host system).
 2. Translate the file "vfiles", containing a list of virtual filenames, into
 the equivalent list of host system filenames, e.g., for use as input to a
 foreign task.
+
 .nf
 	cl> path @vfiles > hfiles
 .fi
+
 .ih
 SEE ALSO
 directory, files

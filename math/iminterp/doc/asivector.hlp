@@ -12,6 +12,7 @@ asivector (asi, x, y, npix)
     real	y[npix]		#O array of interpolated values
     int		npix		#I number of x values
 .fi
+
 .ih
 ARGUMENTS
 .ls asi  

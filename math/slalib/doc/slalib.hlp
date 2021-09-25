@@ -24,6 +24,7 @@ will give detailed help on the subroutine slrfli.
 
 .ih
 STRING DECODING
+
 .nf
  intin --  call subroutine slinti (string, nstrt, ireslt, jflag)
        Convert free-format string into integer
@@ -36,8 +37,10 @@ dfltin --  call subroutine sldfli (string, nstrt, dreslt, jflag)
  dafin --  call subroutine sldafn (string, iptr, a, j)
        Convert free-format string from deg, armin, arcsec to radians
 .fi
+
 .ih
 SEXAGESIMAL CONVERSIONS
+
 .nf
  ctf2d --  call subroutine slctfd (ihour, imin, sec, days, j)
  dtf2d --  call subroutine sldtfd (ihour, imin, sec, days, j)
@@ -63,8 +66,10 @@ SEXAGESIMAL CONVERSIONS
  dr2af --  call subroutine sldraf (ndp, angle, sign, idmsf)
        Radians to degrees, arcminutes, arcseconds
 .fi
+
 .ih
 ANGLES, VECTORS AND ROTATION MATRICES
+
 .nf
  range --  r = slra1p (angle)
 drange --  d = slda1p (angle)
@@ -139,8 +144,10 @@ deuler --  call subroutine sldeul (order, phi, theta, psi, rmat)
        Conversion of position/velocity from Cartesian to spherical
 	   coordinates
 .fi
+
 .ih
 CALENDARS
+
 .nf
   cldj --  call subroutine slcadj (iy, im, id, djm, j)
        Gregorian calendar to Modified Julian Date
@@ -174,8 +181,10 @@ CALENDARS
  epj2d --  d = slej2d (epj)
        Julian epoch to Modified Julian Date
 .fi
+
 .ih
 TIMESCALES
+
 .nf
   gmst --  d = slgmst (ut1)
        Conversion from Universal Time to siderial time
@@ -201,8 +210,10 @@ TIMESCALES
    rcc --  d = slrcc (tdb, ut1, wl, u, v)
        Relativistic clock correction: TDB - TT
 .fi
+
 .ih
 PRECESSION AND NUTATION
+
 .nf
    nut --  call subroutine slnut (date, rmatn)
        Nutation matrix
@@ -229,14 +240,18 @@ preces --  call subroutine slprce (system, ep0, ep1, ra, dc)
 precss --  call subroutine slprcs (system, ep0, ep1, ra, dc)
        Precession in either the old or new system, integer ep0 and ep1
 .fi
+
 .ih
 PROPER MOTION
+
 .nf
     pm --  call subroutine slpm (r0, d0, pr, pd, px, rv, ep0, ep1, r1, d1)
        Adjust for proper motion
 .fi
+
 .ih
 FK4/5/ICRS CONVERSIONS
+
 .nf
  fk425 --  call subroutine slfk45 (r1950, d1950, dr1950, dd1950,
            p1950, v1950, r2000, d2000, dr2000, dd2000, p2000, v2000)
@@ -278,8 +293,10 @@ FK4/5/ICRS CONVERSIONS
   epco --  d = slepco (k0, k, e)
        Convert an epoch into the appropriate form 'B' or 'J'
 .fi
+
 .ih
 ELLIPTIC ABERRATIONS
+
 .nf
  etrms --  call subroutine sletrm (ep, ev)
        E-terms
@@ -290,8 +307,10 @@ ELLIPTIC ABERRATIONS
  addet --  call subroutine sladet (rm, dm, eq, rc, dc)
        Add the E-terms
 .fi
+
 .ih
 GEOCENTRIC COORDINATES
+
 .nf
    obs --  call subroutine slobs (n, c, name, w, p, h)
        Interrogate list of observatory parameters
@@ -302,8 +321,10 @@ GEOCENTRIC COORDINATES
  pvobs --  call subroutine slpvob (p, h, stl, pv)
        Position and velocity of observatory
 .fi
+
 .ih
 APPARENT AND OBSERVED PLACE
+
 .nf
    map --  call subroutine slmap (rm, dm, pr, pd, px, rv, eq, date, ra, da)
        Mean place to geocentric apparent place
@@ -348,8 +369,10 @@ aoppat --  call subroutine slaopt (date, aoprms)
  polmo -- call subroutine slplmo (elongim, phim, xp, yp, elong, phi, daz)
        Correct site longitude and latitude for polar motion
 .fi
+
 .ih
 AZIMUTH AND ELEVATION
+
 .nf
  altaz --  call subroutine slalaz (ha, dec, phi,
        Positions, velocities, etc. for an altazimuth mount
@@ -374,8 +397,10 @@ AZIMUTH AND ELEVATION
     zd --  d = slzd (ha, dec, phi)
        Hour angle and declination to zenith distance
 .fi
+
 .ih
 REFRACTION AND AIR MASS
+
 .nf
  refro --  call subroutine slrfro (zobs, hm, tdk, pmb, rh, wl, phi, tlr,
 	   eps, ref)
@@ -400,8 +425,10 @@ atmdsp --  call subroutine slatmd (tdk, pmb, rh, wl1, a1, b1, wl2, a2, b2)
 airmas --  d = slarms (zd)
        Air mass
 .fi
+
 .ih
 ECLIPTIC COORDINATES
+
 .nf
  ecmat --  call subroutine slecma (date, rmat)
        Equatorial to ecliptic rotation matrix
@@ -412,8 +439,10 @@ ECLIPTIC COORDINATES
  ecleq --  call subroutine sleceq (dl, db, date, dr, dd)
        Ecliptic to J2000.0 FK5 coordinates
 .fi
+
 .ih
 GALACTIC COORDINATES
+
 .nf
   eg50 --  call subroutine sleg50 (dr, dd, dl, db)
        B1950.0 FK4 to galactic coordinates
@@ -427,8 +456,10 @@ GALACTIC COORDINATES
  galeq --  call subroutine slgaeq (dl, db, dr, dd)
        Galactic to J2000.0 FK5 coordinates
 .fi
+
 .ih
 SUPERGALACTIC COORDINATES
+
 .nf
 galsup --  call subroutine slgasu (dl, db, dsl, dsb)
        Galactic to supergalactic coordinates
@@ -436,8 +467,10 @@ galsup --  call subroutine slgasu (dl, db, dsl, dsb)
 supgal --  call subroutine slsuga (dsl, dsb, dl, db)
        Supergalactic to galactic coordinates
 .fi
+
 .ih
 EPHEMERIDES
+
 .nf
  dmoon --  call subroutine sldmon (date, pv)
        Approximate geocentric position and velocity of moon
@@ -498,8 +531,10 @@ pertue -- call subroutine slprue (date, u, jstat)
        Update universal elements of a comet or asteroid by applying planetary
        perturbations.
 .fi
+
 .ih
 RADIAL VELOCITIES
+
 .nf
 rverot --  s = slrver (phi, ra, da, st)
        Velocity component due to rotation of the earth
@@ -520,8 +555,10 @@ rvgalc --  r = slrvga (r2000, d2000)
        Velocity component due to rotation and translation of the Galaxy,
            relative to the mean motion of the local group
 .fi
+
 .ih
 ASTROMETRY
+
 .nf
   s2tp --  call subroutine sls2tp (ra, dec, raz, decz, xi, eta, j)
  ds2tp --  call subroutine sldstp (ra, dec, raz, decz, xi, eta, j)
@@ -571,8 +608,10 @@ dtpv2c --  call subroutine sldpvc (xi, eta, v, v01, v02, n)
  dcmpf --  call subroutine sldcmf (coeffs, xz, yz, xs, ys, perp, orient)
        Decompose a linear fit into geometric parameters
 .fi
+
 .ih
 NUMERICAL METHODS
+
 .nf
   smat --  call subroutine slsmat (n, a, y, d, jf, iw)
   dmat --  call subroutine sldmat (n, a, y, d, jf, iw)
@@ -587,4 +626,5 @@ svdsol --  call subroutine slsvds (m, n, mp, np, b, u, w, v, work, x)
 svdcov --  call subroutine slsvdc (n, np, nc, w, v, work, cvm)
        Covariance matrix from SVD
 .fi
+
 .endhelp

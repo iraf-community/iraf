@@ -12,6 +12,7 @@ gsscoeff (sf, xorder, yorder, coeff)
     int		yorder	# y order of desired coefficient
     real	coeff	# coefficient value
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

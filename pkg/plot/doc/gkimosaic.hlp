@@ -65,6 +65,7 @@ Standard cursor mode keystroke commands are available as well as the
 :fill and :rotate take effect on the next page of output.  Command :skip
 allows you to browse through a metacode file, skipping either forward or
 backward by N input plots.
+
 .nf
 
 	q				quit
@@ -81,25 +82,32 @@ backward by N input plots.
 	:skip +/-N			skip forward/backward N plots
 
 .fi
+
 .ih
 EXAMPLES
 1. Plot every frame in the metacode file "oned.plots".  There will be 4 plots
 to the page originally, but this can be overridden interactively.
+
 .nf
     cl> gkimosaic oned.plots
 .fi
+
 2. Extract every third plot from the metacode file "oned.plots" with task
 \fIgkiextract\fR and plot them four to a page.
+
 .nf
     cl> gkiextract oned.plots 1-99x3 | gkimosaic
 .fi
+
 3. Plot all frames in every metacode file beginning with "mcode." and
 condense them so 16 fit on a page.  The metacode is being spooled;
 it will be plotted, perhaps, when the computer isn't so busy.  Interactive
 mode is automatically disabled when not plotting to a graphics terminal.
+
 .nf
     cl> gkimosaic mcode.* nx=4 ny=4 output=plt.spool
 .fi
+
 .ih
 BUGS
 Setting \fBdevice\fR to "stdvdm" does not work.  To produce an output file

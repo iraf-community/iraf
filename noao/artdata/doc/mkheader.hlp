@@ -67,6 +67,7 @@ EXAMPLES
 .fi
 
 2. Copy an image header.
+
 .nf
     ar> mkheader new dev$pix append-
 .fi
@@ -79,6 +80,7 @@ with the edited header.
     ar> edit temp
     ar> mkheader myimage temp append-
 .fi
+
 .ih
 SEE ALSO
 hedit, mkobjects, mknoise, mk1dspec, mk2dspec

@@ -177,6 +177,7 @@ The summing parameters are ignored.
 .nf
 	cl> deredden obj1 drobj1 1.2 type=A
 .fi
+
 .ih
 REVISIONS
 .ls DEREDDEN V2.10.3

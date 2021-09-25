@@ -47,6 +47,7 @@ related standard IRAF interfaces is shown in Figure 1.1.
 
 
 .fi
+
 .ce
 Fig 1.1 Major Interfaces
 .ke
@@ -73,6 +74,7 @@ The relationship of IMIO to DBIO is shown in Figure 1.2.
 
 
 .fi
+
 .ce
 Fig 1.2 Relationship of Database and Image I/O
 .ke

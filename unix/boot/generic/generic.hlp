@@ -199,14 +199,18 @@ EXAMPLES
 existing files therein.  The \fIgeneric\fR task is a bootstrap utility
 written in C and is implemented as a CL foreign task, hence the UNIX
 command syntax.
+
 .nf
 	cl> generic -k -p ak/ -t silrdx aadd.gx
 .fi
+
 2. Perform an inline transformation ($FOR directive) of the source file
 "imsum.gx", producing the single file "imsum.x" as output.
+
 .nf
 	cl> generic -k -o imsum.x imsum.gx
 .fi 
+
 3. The following is a simple example of a typical generic source file.
 For additional examples, see the ".gx" sources in the VOPS, IMIO, IMAGES
 and other directories.
@@ -240,6 +244,7 @@ begin
 	}
 end
 .fi
+
 .ih
 SEE ALSO
 xc, xyacc

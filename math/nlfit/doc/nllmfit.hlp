@@ -100,6 +100,7 @@ define	SINGULAR		1	# Singular matrix
 define	NO_DEG_FREEDOM		2	# Too few points
 define	NOT_DONE		3	# Solution did not converge
 .fi
+
 .ih
 REFERENCES
 1. Bevington,P.R., 1969, Data Reduction and Error Analysis for the Physical
@@ -109,6 +110,7 @@ Sciences, Chapter 11, page 235.
 Computing, Chapter 14, page 523
 .ih
 EXAMPLES
+
 .nf
 Example 1: Fit a curve to the data using uniform weighting. Fit all the
 parameters.
@@ -169,4 +171,5 @@ parameters.
 	    }
     end
 .fi
+
 .endhelp

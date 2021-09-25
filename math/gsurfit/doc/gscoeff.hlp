@@ -11,6 +11,7 @@ pointer	sf		# surface descriptor
 real	coeff[ncoeff]	# coefficient array
 int	ncoeff		# number of coefficients
 .fi
+
 .ih
 ARGUMENTS
 .ls sf   
@@ -27,6 +28,7 @@ to gsstati.
 .nf
 	ncoeff = gsstati (sf, GSNCOEFF)
 .fi
+
 .ih
 DESCRIPTION
 GSCOEFF fetches the coefficient array and the number of coefficients from

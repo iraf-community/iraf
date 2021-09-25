@@ -105,6 +105,7 @@ instruction-stream decoding facility (as from the driver task):
 
 
 .fi
+
 .nh
 \fBLow-level kernel routines\fR
 
@@ -112,6 +113,7 @@ instruction-stream decoding facility (as from the driver task):
 All remaining kernel routines will normally be called either by ccp_open or
 by gki_execute, or by each other.  Following are descriptions of the 
 implementation of GKI instructions:
+
 .nf
 
      GKI_EOF

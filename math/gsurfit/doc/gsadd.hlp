@@ -11,6 +11,7 @@ pointer	sf1		# first surface descriptor
 pointer	sf2		# second surface descriptor
 pointer	sf3		# resultant surface descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls sf1    

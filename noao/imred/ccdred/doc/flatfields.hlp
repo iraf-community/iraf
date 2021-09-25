@@ -170,8 +170,10 @@ is used.  Note also that the sky observations must be explicitly
 processed through the flat field stage before computing the iillumination.
 .ih
 SEE ALSO
+
 .nf
 ccdproc, guide, mkillumcor, mkillumflat, mkskycor, mkskyflat
 apextract.apnormalize, longslit.response, longslit.iillumination
 .fi
+
 .endhelp

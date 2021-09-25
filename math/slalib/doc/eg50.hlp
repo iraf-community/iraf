@@ -1,4 +1,5 @@
 .help eg50 Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slEG50 (DR, DD, DL, DB)
@@ -35,4 +36,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

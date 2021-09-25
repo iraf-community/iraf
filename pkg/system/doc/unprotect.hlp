@@ -19,9 +19,11 @@ A "protected" file cannot be deleted or clobbered.
 EXAMPLES
 
 1. Remove file protection from the listed files.
+
 .nf
 	cl> unprotect alpha,beta,gamma.x,*.db
 .fi
+
 .ih
 SEE ALSO
 protect, delete

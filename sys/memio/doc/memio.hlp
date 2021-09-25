@@ -41,6 +41,7 @@ allocated on the stack since the matching call to SMARK.
 
 .KS
 Example:
+
 .nf
 	pointer	buf, sp
 
@@ -178,6 +179,7 @@ to permit reclamation of stack space.
 
 
 .tp 5
+
 .nf
 procedure salloc (bufptr, nelements, data_type)
 
@@ -265,6 +267,7 @@ end
 
 
 .fi
+
 The segment header contains fields describing the location and size of
 the segment, plus a link pointer to the previous segment in the list.
 

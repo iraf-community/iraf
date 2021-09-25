@@ -788,11 +788,13 @@ is to collect all the algorithm parameters in one place separate from the
 processing parameters and include only those which are relevant for
 this type of data.  The parameter values can be changed from the
 defaults by using the parameter editor,
+
 .nf
 
 	cl> epar params
 
 .fi
+
 or simple typing \fIparams\fR.  The parameter editor can also be
 entered when editing the \fBdo3fiber\fR parameters by typing \fI:e
 params\fR or simply \fI:e\fR if positioned at the \fIparams\fR
@@ -1124,6 +1126,7 @@ demoobj.ms.imh:
 Splot spectrum? (no|yes|NO|YES) (yes):
 <Exit with 'q'>
 .fi
+
 .ih
 REVISIONS
 .ls DO3FIBER V2.11

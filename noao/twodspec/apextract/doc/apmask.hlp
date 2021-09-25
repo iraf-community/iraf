@@ -109,6 +109,7 @@ EXAMPLES
 	cl> apmask image image.pl nfind=10
 	cl> imarith image * image.pl image1
 .fi
+
 .ih
 REVISIONS
 .ls APMASK V2.11

@@ -32,9 +32,11 @@ Coordinates are printed in NDC units (0-1) by default.  When \fBgkiunits\fR
 .ih
 EXAMPLES
 1. Decode the metacode in file "home$vdm.sgi".
+
 .nf
     cl> sgidecode home$vdm.sgi
 .fi
+
 .ih
 SEE ALSO
 gkidecode sgikern

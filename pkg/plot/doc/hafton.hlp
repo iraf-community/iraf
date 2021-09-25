@@ -67,6 +67,7 @@ intensities in the image are represented by areas of varying darkness on
 the plot.  Six different mapping functions are available; the desired 
 mapping function is selected with the \fBmapping_function\fR string.
 The types of mapping are:
+
 .nf
 
    linear
@@ -77,6 +78,7 @@ The types of mapping are:
    crtpict     - linear mapping centered on median intensity.  The slope of
 		 the function is modified by \fBcontrast\fR.
 .fi
+
 To speed up the plotting, the resolution of the input image can be 
 decreased to \fBxres\fR by \fByres\fR.  
 When \fBpreserve\fR = yes, \fBhafton\fR automatically reduces the 
@@ -102,15 +104,19 @@ viewports (e.g., the vt640), a square image will appear extended when
 EXAMPLES
 1. Image "crab.6563" is plotted in negative contrast, with linear mapping
 between the minimum and maximum image pixel.
+
 .nf
     cl> hafton crab.6563 contrast=-1
 .fi
+
 2. The image is plotted in negative contrast using the same mapping
 function as used by the \fIcrtpict\fR task.  The resulting plot is
 in negative contrast.
+
 .nf
     cl> hafton crab.6563 mapping_fun=crt contrast =-0.25
 .fi
+
 .ih
 TIME REQUIREMENTS
 To produce a \fIhafton\fR plot on the terminal takes just under 9 cpu

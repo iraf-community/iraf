@@ -12,6 +12,7 @@ gssolve (sf, ier)
 pointer	sf		# surface descriptor
 int	ier		# error code
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

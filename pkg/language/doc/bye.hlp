@@ -20,6 +20,7 @@ exit a package; in this case, \fIbye\fR terminates the package script task.
 	pl> bye
 	cl>
 .fi
+
 .ih
 SEE ALSO
 clbye, return

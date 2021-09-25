@@ -104,6 +104,7 @@ input sky images are converted to sky flats are:
     cl> mkskyflat sky004 Skyflat
     cl> mkskyflat sky* ""
 .fi
+
 .ih
 SEE ALSO
 ccdproc, flatfields, mkfringecor, mkillumcor, mkillumflat, mkskycor

@@ -4,6 +4,7 @@ NAME
 center1d -- One dimensional centering
 .ih
 SYNOPSIS
+
 .nf
 center = center1d (initial, data, npts, width, type, radius, threshold)
 
@@ -15,6 +16,7 @@ int	type			# Feature type
 real	radius			# Centering radius
 real	threshold		# Detection threshold
 .fi
+
 .ih
 ARGUMENTS
 .ls initial

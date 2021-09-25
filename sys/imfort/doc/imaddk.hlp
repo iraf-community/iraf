@@ -4,6 +4,7 @@ NAME
 imaddk -- add a new keyword to an image header
 .ih
 SYNOPSIS
+
 .nf
 subroutine imaddk (im, keyw, dtype, comm, ier)
 
@@ -13,6 +14,7 @@ integer		dtype		#I keyword datatype code
 character*(*)	comm		#I comment string describing keyword
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimaddk\fR procedure is used to add a new keyword to the header of
@@ -39,6 +41,7 @@ keyword does not redefine an existing keyword.
 SYS_IDBREDEF:	attempt to redefine an image header keyword
 SYS_IDBOVFL:	out of space in image header
 .fi
+
 .ih
 NOTES
 The precision of a keyword name is currently limited to eight characters

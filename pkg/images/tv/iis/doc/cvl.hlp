@@ -260,20 +260,26 @@ display frame 1 without spatial interpolation and with the automatic intensity
 mapping.  Only the central 512x512 area of image2 is loaded in display frame 2
 
 To load the display without any intensity transformation:
+
 .nf
 	cl> cvl image1 1 ztrans=none
 .fi
+
 The next example interpolates image2 to fill the full 512 horizontal range
 of the frame and maps the full image range into the display range.  Note
 that the spatial interpolation first block averages by a factor of 2 and then
 magnifies by 0.512.
+
 .nf
 	cl> cvl image2 3 fill+ zscale-
 .fi
+
 The next example makes image1 square and sets the intensity range explicitly.
+
 .nf
 	cl> cvl image1 4 zscale- zrange- z1=800 z2=1200 xmag=2
 .fi
+
 The next example loads the two images in the same frame side-by-side.
 
 .nf
@@ -281,6 +287,7 @@ The next example loads the two images in the same frame side-by-side.
 	cl> cvl image1 fill+ xcen=0.25
 	cl> cvl image2 erase- fill+ xcen=0.75
 .fi
+
 .ih
 SEE ALSO
 display, magnify

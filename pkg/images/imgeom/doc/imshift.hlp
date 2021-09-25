@@ -92,15 +92,20 @@ EXAMPLES
 
 1. Shift an image by (+3.2, -4.5) using a biquintic interior polynomial
    interpolant and boundary extension.
+
 .nf
    cl> imshift vys70 vys70shift 3.2 -4.5 inter=poly5 bound=neare
 .fi
+
 2. Shift an image by (-6., 1.2) using bilinear interpolation and
    boundary extension.
+
 .nf
    cl> imshift ugc1040 ugc1040shift -6.0 1.2 bound=neare
 .fi
+
 3. Shift a set of images using shifts listed in the textfile "shifts".
+
 .nf
    cl> page shifts
 
@@ -110,6 +115,7 @@ EXAMPLES
 
    cl> imshift im1,im2,im3 im1.s,im2.s,im3.s shifts_file=shifts
 .fi
+
 .ih
 TIMINGS
 The time required to shift a 512 by 512 real image by fractional pixel

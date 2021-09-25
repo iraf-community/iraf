@@ -12,6 +12,7 @@ pointer	cq		# the configuration file descriptor
 char	pname		# the query parameter name
 char	value		# the query parameter value
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

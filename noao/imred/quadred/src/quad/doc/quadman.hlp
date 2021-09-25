@@ -32,6 +32,7 @@
 
 						 September 30, 1993
 .fi
+
 .bp
 .ls \fI1. Introduction\fR
 
@@ -176,6 +177,7 @@ instrumental to standard magnitudes. There is also a manual which was
 written by the IRAF group in Tucson which is a good guide; "A User's
 Guide to Stellar CCD Photometry with IRAF".
 .bp
+
 .nf
 
                    ==========================
@@ -637,6 +639,7 @@ type.
 .nf
       cc> page ccdlog
 .fi
+
 .bp
 
 .nf
@@ -825,12 +828,14 @@ the image.
       cc> ccdlist flat1R
 
 .fi
+
 You should get the following,
 
 .nf
         flat1R[496,501][real][flat][R][OTZ]:dflat R
 
 .fi
+
 'ccdlist' should tell you the image name (flat1R), the image size [496,501]
 left after trimming, the pixel type [real] of the image (the processed
 images should normally have pixels in real format, as opposed to
@@ -1073,7 +1078,9 @@ Now you can process your images.
         (grow = 0.)             Rejection growing radius
         (mode = "ql")           
 .fi
+
 .bp
+
 .nf
                       \fImkskyflat\fR
 

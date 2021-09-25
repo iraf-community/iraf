@@ -115,6 +115,7 @@ cl> adumpim dss2@cadc m51.fits 13:29:53.27 +47:11:48.4 10.0
 cl> imheader m51.fits
 
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

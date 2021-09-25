@@ -40,6 +40,7 @@ respectively.
 EXAMPLES
 
 1. Check to see that all the DAOPHOT tasks are functioning correctly.
+
 .nf
 	da> daophot
 

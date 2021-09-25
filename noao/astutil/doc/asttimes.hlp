@@ -91,6 +91,7 @@ the parameter editor, with explicit assignments, or on the command line:
 .fi
 
 In practice the output would be directed to a file:
+
 .nf
     >>> asttimes (day=i, header=no, >>"table")
 .fi
@@ -109,6 +110,7 @@ In practice the output would be directed to a file:
     1987  10 29 THU  0:00:00.0  7:00:00.0 1987.82421 2447097.7917  2:01:55.5
     1987  10 29 THU  1:00:00.0  8:00:00.0 1987.82432 2447097.8333  3:02:05.4
 .fi
+
 .ih
 REVISIONS
 .ls ASTTIMES V2.10.3

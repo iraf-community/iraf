@@ -133,6 +133,7 @@ Convert watts to ergs per second. Print the diagnostic messages:
 .nf
 tt> tunits source.tab power "ergs/sec" old=watts verb+
 .fi
+
 .ih
 REFERENCES
 This task was written by Bernie Simon

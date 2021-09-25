@@ -59,17 +59,23 @@ on the second tape of a multi-volume-set is indicated by \fBfile_list\fR = 2.
 .ih
 EXAMPLES
 [1] Convert all rasters in the 3rd permanent file on tape:
+
 .nf
 	cl> rdumpf mta 3 ipps
 .fi
+
 [2] Convert all rasters in all permanent files:
+
 .nf
 	cl> rdumpf mta 1-999 ipps
 .fi
+
 [3] List the first 10 IPPS rasters of the first permanent file:
+
 .nf
 	cl> rdumpf mta 1 raster_list=1-10 make_image=no
 .fi
+
 .ih
 BUGS
 The Cyber format readers, including \fIrdumpf\fR, have not been implemented

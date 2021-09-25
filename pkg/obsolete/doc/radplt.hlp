@@ -40,9 +40,11 @@ EXAMPLES
 The following example plots the profile of a star near (123, 234):
 .sp 1
 .nj
+
 .nf
 cl> radplt m92red 123 234
 .fi
+
 .ju
 .ih
 BUGS

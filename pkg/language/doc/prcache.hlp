@@ -29,9 +29,11 @@ The \fIprcache\fR command gives the user some control over this process.
 Using it without any arguments shows the tasks which are currently
 stored in the process cache.  For each slot one gets a line like the
 following.
+
 .nf
     [07] lyra!17763(4563X)           H  bin$x_images.e
 .fi
+
 Here, 07 is the process slot number as required by \fIflprcache\fR to
 disconnect the process.  The name "lyra" is the name of the node in the
 local network on which the process is executing; this is not normally
@@ -82,9 +84,11 @@ EXAMPLES
 necessary after aborting a task to initialize (by re-executing) the
 associated process, which may not have recovered completely from the
 abort.
+
 .nf
 	cl> flpr
 .fi
+
 .ih
 BUGS
 The user is responsible for making sure that he does not lock all

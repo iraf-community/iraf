@@ -4,12 +4,14 @@ NAME
 zfchdr -- change the current working directory
 .ih
 SYNOPSIS
+
 .nf
 zfchdr (new_directory, status)
 
 packed	char new_directory[]		# osfn of new directory
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The current working directory is changed to the directory specified

@@ -30,11 +30,13 @@ After the pseudocolor enhancement is enabled on the display monitor the
 user may, optionally, adjust the frame lookup table.
 .ih
 EXAMPLES
+
 .nf
 	cl> pseudocolor random
 	cl> pseudocolor 8color
 	cl> pseudocolor linear
 .fi
+
 .ih
 SEE ALSO
 cv

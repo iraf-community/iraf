@@ -11,9 +11,11 @@ Beep sends the bell character (^G) to the terminal.
 .ih
 EXAMPLES
 1. Wait for a background job to complete, ringing the terminal bell when done.
+
 .nf
 	cl> wait;beep
 .fi
+
 .ih
 SEE ALSO
 clear

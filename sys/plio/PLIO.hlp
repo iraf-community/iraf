@@ -317,6 +317,7 @@ the area indicated by the mask.
 .fi
 
 .tp 6
+
 .nf
     # SUM -- Sum the image pixels lying within the given mask.
 

@@ -4,9 +4,11 @@ NAME
 crcombine -- combine multiple exposures to eliminate cosmic rays
 .ih
 USAGE	
+
 .nf
 crcombine input output
 .fi
+
 .ih
 PARAMETERS
 See parameters for \fBimcombine\fR.
@@ -29,6 +31,7 @@ the image header:
 .nf
     cl> crcombine obj012,obj013 abc gain=gain rdnoise=rdnoise 
 .fi
+
 .ih
 SEE ALSO
 imcombine

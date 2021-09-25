@@ -4,6 +4,7 @@ NAME
 bfread -- read from a binary file at the specified offset
 .ih
 SYNOPSIS
+
 .nf
 integer function bfread (fd, buf, nchars, offset)
 
@@ -12,6 +13,7 @@ typeless	buf(*)		#O buffer to receive file data
 integer		nchars		#I number of SPP chars to read
 integer		offset		#I 1-indexed char offset into file
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfread\fR procedure reads \fInchars\fR char units of storage from

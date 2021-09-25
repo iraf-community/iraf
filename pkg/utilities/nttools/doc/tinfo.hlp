@@ -114,6 +114,7 @@ just put the values into parameters.
 .nf
 	tt> tinfo m87pol ttout=no
 .fi
+
 .ih
 BUGS
 .ih

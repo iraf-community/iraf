@@ -49,6 +49,7 @@ a coordinate transformation (CD) matrix.  Through matrix
 multiplication, the logical coordinates are multiplied by the CD
 matrix to produce the world coordinates.  The matrix is represented in
 the parameters as follows:
+
 .nf
 
         |---------------|
@@ -58,7 +59,9 @@ the parameters as follows:
         |---------------|
 
 .fi
+
 To construct the CD matrix, the following definitions may be used:
+
 .nf
 
         cd1_1 =  Sx * cos(PA)
@@ -67,6 +70,7 @@ To construct the CD matrix, the following definitions may be used:
         cd2_2 =  Sy * cos(PA)
 
 .fi
+
 where Sx and Sy are the scale factors from the logical to world
 systems and PA is the angle of rotation between the two systems
 (positive rotation is counterclockwise).
@@ -75,6 +79,7 @@ There is a special case for the transformation to RA and DEC.  Since RA
 increases "to the left", opposite of standard convention,  -1 needs
 to be multiplied through the CD matrix for the first axis.  This
 results in the formulas below:
+
 .nf
 
         cd1_1 = -Sx * cos(PA)
@@ -159,6 +164,7 @@ is for an image that does not contain any WCS information.
 The image is 512x512 pixels, where the pixels are approximately 1/10th
 an arcsecond in size, whose center pixel is located at 9h 22m 30.5s
 and -15o 5m 42s and is rotated 30 degrees towards the west:
+
 .nf
 
 	ctype1 = 'ra---tan'
@@ -177,6 +183,7 @@ and -15o 5m 42s and is rotated 30 degrees towards the west:
         log_y2 = 512.
 
 .fi
+
 .ih
 BUGS
 .ih

@@ -176,6 +176,7 @@ characters, or fraction thereof.
 .le
 .ih
 EXAMPLES
+
 .nf
 1. Suppose you have the following two tables.
 
@@ -220,6 +221,7 @@ app.tab:
 	27	INDEF	beta	3.14
 	28	INDEF	delta	2.72
 .fi
+
 .ih
 BUGS
 .ih

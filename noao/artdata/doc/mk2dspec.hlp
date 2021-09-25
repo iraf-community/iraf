@@ -201,6 +201,7 @@ of the spec2 spectrum is wider simulating a galaxy spectrum.
 	artspec1d 1 gauss 5 0 125 0
 	[EOF]
 .fi
+
 .ih
 SEE ALSO
 mk1dspec, mknoise, mkheader

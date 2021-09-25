@@ -4,6 +4,7 @@ NAME
 zardbf -- asynchronous read from a binary file
 .ih
 SYNOPSIS
+
 .nf
 zardbf (chan, buf, maxbytes, loffset)
 
@@ -12,6 +13,7 @@ char	buf[maxbytes]		# output buffer
 int	maxbytes		# maximum number of bytes to read
 long	loffset			# file offset of first byte
 .fi
+
 .ih
 DESCRIPTION
 Initiate a read of at most \fImaxbytes\fR bytes from channel \fIchan\fR into

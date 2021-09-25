@@ -172,9 +172,11 @@ The following example will accumulate 8 spectra and fit the first
 aperture data interactively but not the second, and apply coincidence
 corrections to the sums. The upper and lower rejection criteria
 have been altered to bias the seventh order fit to a higher level.
+
 .nf
 	cl> flatfit nite1 1-4,201-204 coin+ low=1.4 up=3 order=7
 .fi
+
 .ih
 BUGS
 For some reason, the error plot is supposed to have a zero level line

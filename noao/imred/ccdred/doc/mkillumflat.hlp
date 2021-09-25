@@ -95,6 +95,7 @@ input flat fields are corrected in place are:
     cl> mkllumflat flat004 FlatV
     cl> mkillumflat flat* ""
 .fi
+
 .ih
 SEE ALSO
 ccdproc, flatfields, mkfringecor, mkillumcor, mkskycor, mkskyflat

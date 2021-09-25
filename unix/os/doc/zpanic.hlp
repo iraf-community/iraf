@@ -4,12 +4,14 @@ NAME
 zpanic -- terminate process execution unconditionally
 .ih
 SYNOPSIS
+
 .nf
 zpanic (errcode, errmsg)
 
 int	errcode			# exit status
 packed	char errmsg[]		# error message
 .fi
+
 .ih
 DESCRIPTION
 The error message \fIerrmsg\fR is written to the process standard error

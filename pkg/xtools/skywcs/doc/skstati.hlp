@@ -12,6 +12,7 @@ ival = sk_stati (coo, parameter)
 pointer	coo		# the input sky coordinate descriptor
 int	parameter	# the integer parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    
@@ -19,6 +20,7 @@ The sky coordinate descriptor.
 .le
 .ls parameter
 Parameter to be returned. The integer parameter definitions in skywcs.h are:
+
 .nf
 	S_CTYPE		# the celestial coordinate system type
 	S_RADECSYS	# the equatorial system type

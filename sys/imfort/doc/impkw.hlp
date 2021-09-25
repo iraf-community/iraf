@@ -4,6 +4,7 @@ NAME
 impkw -- set the value of an image header keyword
 .ih
 SYNOPSIS
+
 .nf
 subroutine impkwb (im, keyw, bval, ier)
 subroutine impkwc (im, keyw, cval, ier)
@@ -21,6 +22,7 @@ integer		ival		#I integer keyword value
 real		rval		#I real keyword value
 doubleprecision	dval		#I double precision keyword value
 .fi
+
 .ih
 DESCRIPTION
 The \fIimpkw\fR procedures are used to set the values of existing image
@@ -40,6 +42,7 @@ the datatype coercion implied is permissible.
 SYS_IDBKEYNF:	image header keyword not found
 SYS_IDBTYPE:	illegal header parameter data type conversion
 .fi
+
 .ih
 NOTES
 It is not an error to update the value of a keyword in an image opened

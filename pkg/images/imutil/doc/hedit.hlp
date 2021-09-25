@@ -65,9 +65,11 @@ inspection of the fields of an image header.  Both the "standard" and
 "user" fields may be edited in the same fashion, although not all standard
 fields are writable.  For example, to change the value of the standard field
 "title" of the image "m74" to "sky flat" we would enter the following command.
+
 .nf
 	cl> hedit m74 title "sky flat"
 .fi
+
 If \fIverify\fR mode is selected the editor will print the old value of the
 field and query with the new value, allowing some other value to be entered
 instead, e.g.:
@@ -91,25 +93,33 @@ If the response is "q" the editor will exit entirely.
 
 To conveniently print the value of the field "title" without modifying the
 image header, we repeat the command with the special value ".".
+
 .nf
 	cl> hedit m74 title .
 .fi
+
 To print (or edit) the values of all header fields a field template may be
 given.
+
 .nf
 	cl> hedit m74 * .
 .fi
+
 To print (or edit) the values of only a few fields the field template may
 be given as a list.
+
 .nf
 	cl> hedit m74 w0,wpc .
 .fi
+
 To print the value of one or more fields in a set of images, an image template
 may be given.  Both image templates and field templates may be given if
 desired.
+
 .nf
 	cl> hedit n1.* exp .
 .fi
+
 Abbreviations are not permitted for field names, i.e., the given template
 must match the full field name.  Currently, field name matches are case
 insensitive since image headers are often converted to and from FITS headers,
@@ -195,23 +205,29 @@ blanks, quotes, parenthesis, etc., and hence must usually be quoted to avoid
 interpretation by the CL rather than by the header editor.
 
 For example, the command
+
 .nf
 	cl> hedit m74 title "title // ';ss'"
 .fi
+
 would change the title to the literal string constant "title // ';ss'",
 whereas the command
+
 .nf
 	cl> hedit m74 title "(title // ';ss')"
 .fi
+
 would concatenate the string ";ss" to the old title string.  We require
 parenthesis for expression evaluation to avoid the need to doubly quote
 simple string constant values, which would be even more confusing for the
 user than using parenthesis.  For example, if expressions did not have to
 be parenthesized, the first example in the basic usage section would have
 to be entered as shown below.
+
 .nf
 	cl> hedit m74 title '"sky flat"'	# invalid command
 .fi
+
 Expression evaluation for \fIhedit\fR, \fIhselect\fR, and similar tasks
 is carried out internally by the FMTIO library routine \fBevexpr\fR.
 For completeness minimal documentation is given here, but the documentation
@@ -345,19 +361,25 @@ by 100 by assigning it the value "$ + 100".
 EXAMPLES
 1. Globally edit the database "n1", setting the value of the string parameter
 "obs" to "sky" if "s-flag" is 1, to "obj" otherwise.
+
 .nf
     cl> hedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")'
 .fi
+
 2. Globally edit the same database, replacing the value of the parameter
 "variance" by the square root of the original value.
+
 .nf
     cl> hedit n1.* var '(sqrt(var))'
 .fi
+
 3. Replace the values of the fields A and B by the absolute value of the
 original value:
+
 .nf
     cl> hedit n1.* a,b '(abs($))'
 .fi
+
 .ih
 BUGS
 The internal storage format is currently FITS card image, hence field names

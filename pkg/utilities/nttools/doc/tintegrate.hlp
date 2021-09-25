@@ -85,6 +85,7 @@ tt> tcalc intab row rownum datatype="real" colfmt="%8.1f"
 tt> tintegrate intab flux row
       integral= 30.34466478228569 using 401 points
 .fi
+
 .ih
 BUGS
 .ih

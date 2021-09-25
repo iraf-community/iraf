@@ -170,24 +170,32 @@ in the package with the \fIresize\fR parameter.
 .ih
 EXAMPLES
 1.  To resize all apertures to the range -4 to 4:
+
 .nf
 	cl> apresize image llimit=-4 ulimit=4 ylevel=INDEF
 .fi
+
 2.  To resize all aperture to a point which is 5% of the peak relative
 to a local background:
+
 .nf
 	cl> apresize image ylevel=.05 peak+ bkg+
 .fi
+
 3.  To resize all apertures to the point where the data exceeds 100
 data units:
+
 .nf
 	cl> apresize image ylevel=100 peak- bkg-
 .fi
+
 4.  To resize all apertures to default values of the task except
 averaging all the results at the end:
+
 .nf
 	cl> apresize image avg+
 .fi
+
 .ih
 REVISIONS
 .ls APRESIZE V2.11

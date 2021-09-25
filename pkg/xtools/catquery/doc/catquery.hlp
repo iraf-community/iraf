@@ -67,6 +67,7 @@ SYNOPSIS
 
         cq_unmap (cq)
 .fi
+
 .ih
 DESCRIPTION
 The catquery package provides a set of routines for local and remote
@@ -120,6 +121,7 @@ survey query. Cq_imclose frees the survey results descriptor.
 
 .ih
 EXAMPLES
+
 .nf
 Example 1: Query a catalog and dump the results to a catalog file.
 
@@ -319,4 +321,5 @@ Example 4:  Repeat the previous example but convert the dss wcs to a fits wcs.
 
     ...
 .fi
+
 .endhelp

@@ -10,6 +10,7 @@ cvrestore (cv, fit)
 pointer	cv		# pointer to curve descriptor
 real	fit[]		# array containing curve parameters
 .fi
+
 .ih
 ARGUMENTS
 .ls cv    

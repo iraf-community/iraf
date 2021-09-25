@@ -265,6 +265,7 @@ print the first five and last five rows.
 .nf
 	tt> tprint big rows="1-5,99996-"
 .fi
+
 .ih
 BUGS
 .ih

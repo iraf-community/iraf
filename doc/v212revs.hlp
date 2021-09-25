@@ -239,6 +239,7 @@ CORE IRAF REVISIONS SUMMARY
 
 .nh 2
 New Tasks
+
 .nf
      imcoords.ccget - extract objects from a test file catalog
      imcoords.ccstd - transform to and from standard astrometric coordinates
@@ -250,6 +251,7 @@ proto.mimstatistics - do image statistics through a mask
 
 .nh 2
 Existing Tasks with New Parameters or New Parameter Defaults
+
 .nf
  immatch.imcentroid - new parameter maxshift
     immatch.imalign - new parameter maxshift
@@ -262,6 +264,7 @@ imutil.imstatistics - new parameters nclip, lsigma, usigma, cache
 
 .nh 2
 Existing Tasks with New Capabilities
+
 .nf
  immatch.imcentroid - optionally rejects objects whose centers wander too much
     immatch.imalign - optionally rejects objects whose centers wander too much
@@ -279,6 +282,7 @@ NOAO PACKAGE REVISIONS SUMMARY
 
 .nh 2
 New NOAO Packages
+
 .nf
       astcat - Astronomical catalog and surveys access package
       crutil - Cosmic ray detection and removal package
@@ -287,6 +291,7 @@ New NOAO Packages
 
 .nh 2
 New NOAO Package Tasks
+
 .nf
       apphot.pcalc - Do arithmetic operations on a list of apphot databases
    apphot.pconvert - Convert a text database to a tables database
@@ -336,6 +341,7 @@ obsutil.psfmeasure - Measure PSF sizes from stellar images
 
 .nh 2
 Existing Packages and Tasks with New Parameters or New Parameter Defaults
+
 .nf
             apphot - new package parameters wcsin, wcsout, and cache
      apphot.center - new parameters wcsin, wcsout, cache
@@ -367,6 +373,7 @@ astutil.setairmass - new parameters ra, dec, equinox, st, ut, scale
 
 .nh 2
 Existing Tasks with New Capabilities
+
 .nf
      apphot.center - coordinate system support, optional image cacheing
     apphot.daofind - coordinate system support, optional image cacheing
@@ -676,6 +683,7 @@ Parameter File Changes
 
 In the tables below each parameter change is identified with one of the
 following codes followed by task name and the description of the change.
+
 .nf
    * n = new parameter
    * c = changed/modified parameter
@@ -801,6 +809,7 @@ Details of Major System Changes
 
 .nh 2
 FITS kernel changes
+
 .nf
         The FITS kernel was modified to add support for storing images in
     extensions as compressed pixel masks.  The mask is stored as a binary

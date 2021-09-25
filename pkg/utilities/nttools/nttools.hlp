@@ -75,6 +75,7 @@ or they can have header keywords and/or explicit column definitions.
 
 Header keywords and column definitions
 in text tables have the following syntax:
+
 .nf
 #k keyword = value comment
 #c column_name data_type print_format units
@@ -236,6 +237,7 @@ Type "help selectors" for further information about sections.
 
 .ih
 SEE ALSO
+
 .nf
 selectors
 files in tables$doc/

@@ -4,6 +4,7 @@ NAME
 zzwrmt -- asynchronous write to a magtape file
 .ih
 SYNOPSIS
+
 .nf
 zzwrmt (chan, buf, nbytes)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel of magtape file
 char	buf[nbytes]		# buffer containing the data
 int	nbytes			# number of bytes to be written
 .fi
+
 .ih
 DESCRIPTION
 Initiate a write of exactly \fInbytes\fR bytes from the buffer \fIbuf\fR to

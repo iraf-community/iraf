@@ -4,6 +4,7 @@ NAME
 zputtx -- put next line to a text file
 .ih
 SYNOPSIS
+
 .nf
 zputtx (chan, text, nchars, status)
 
@@ -12,6 +13,7 @@ char	text[nchars]		# text data to be output
 int	nchars			# number of characters in buffer
 int	status
 .fi
+
 .ih
 DESCRIPTION
 Exactly \fInchars\fR chars are written from the SPP char array \fItext\fR

@@ -4,6 +4,7 @@ NAME
 zfpath -- convert an OSFN into an absolute pathname
 .ih
 SYNOPSIS
+
 .nf
 zfpath (osfn, pathname, maxch, status)
 
@@ -11,6 +12,7 @@ char	osfn[ARB]		# OS filename
 char	pathname[maxch]		# absolute pathname equiv. of OSFN
 int	maxch, status
 .fi
+
 .ih
 DESCRIPTION
 Return the absolute pathname equivalent of an OS filename.  An absolute pathname

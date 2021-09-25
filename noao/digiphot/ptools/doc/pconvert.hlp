@@ -133,6 +133,7 @@ MAG[1], MAG[2], MAG[3] and MAG[4]
 
 3. Convert all the records in the NSTAR text database n4147.nst.1 to
    an STSDAS table.
+
 .nf
    pt> pconvert n4147.nst.1 n4147.tnst.1 "*"
 .fi

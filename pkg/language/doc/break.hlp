@@ -41,6 +41,7 @@ when the total sum passes a predefined limit.
 		break			# exit the I loop
 	}
 .fi
+
 .ih
 BUGS
 .ih

@@ -72,6 +72,7 @@ graph key to be redefined. Another prompt is issued for the data to be
 plotted at which point the user must enter the x and y axis data to plot,
 delimited by a comma. The data types are the following (they can be
 abbreviated to up to three characters).
+
 .nf
 
     function    Dependent variable or function
@@ -84,6 +85,7 @@ abbreviated to up to three characters).
     user n      User defined plot equation "n"  (if defined)
 
 .fi
+
 The application program can define independent variable names and user plot 
 functions, aside from the standard options provided. If variable names are 
 supplied, the user can reference them by their names. Otherwise they can be 
@@ -101,6 +103,7 @@ the data which is graphed along each axis as defined above. The default graph
 keys,
 which may be redefined by the application program or interactively by using 
 the 'g' key, are the following.
+
 .nf
 
         h       function, fit
@@ -110,6 +113,7 @@ the 'g' key, are the following.
         l       user 1, user 2 (default)
 
 .fi
+
 The initial graph key, if not redefined by the application program is 'h'.
 .le
 .ls o
@@ -243,6 +247,7 @@ ALGORITHMS
 INLFIT uses the standard Levenberg-Marquardt non-linear least squares
 algorithm to fit the data. Detailed descriptions of the algorithm can
 be found in the following two references.
+
 .nf
 
 1. Bevington, P.R., 1969, Data Reduction and Error Analysis for the

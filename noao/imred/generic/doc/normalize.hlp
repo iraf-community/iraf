@@ -37,9 +37,11 @@ The normalized images are of datatype "real" and replace the original images.
 EXAMPLES
 To normalize a set of two dimensional images excluding deviant pixels below
 1000 and above 5000 and subsampling every fifth pixel in each dimension:
+
 .nf
 	cl> normalize frame* sample=[*:5,*:5] low=1000 up=5000
 .fi
+
 .ih
 SEE ALSO
 imstatistics, normflat

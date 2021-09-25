@@ -13,6 +13,7 @@ real	y[npts]		# y array, ymin <= y <= ymax
 real	zfit[npts]	# data values
 int	npts		# number of data points
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

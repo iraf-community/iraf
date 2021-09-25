@@ -1,11 +1,14 @@
 .help imgs Sep86 imfort
 .ih
 NAME
+
 .nf
 imgs -- get (read) an image section
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 subroutine imgs1r (im, rbuf, i1,i2, ier)
 subroutine imgs1s (im, sbuf, i1,i2, ier)
@@ -22,6 +25,7 @@ integer		j1, j2		#I range of lines to be extracted
 integer		k1, k2		#I range of bands to be extracted
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimgs\fR procedures are used to get a section (subraster) from an image.
@@ -48,6 +52,7 @@ IE_XOOB:	image x coordinates out of range or out of order
 IE_YOOB:	image y coordinates out of range
 IE_ZOOB:	image z coordinates out of range
 .fi
+
 .ih
 SEE ALSO
 imps, imgl, impl

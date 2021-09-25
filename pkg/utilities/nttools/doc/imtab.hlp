@@ -150,6 +150,7 @@ but print the values on the standard output.
 	tt> imtab x0y70206t.d0h[257:257,129:384] STDOUT x0y70206 \
 	>>> pname="p" wcs="world" formats="%12.1H %12.1h"
 .fi
+
 .ih
 BUGS
 .ih

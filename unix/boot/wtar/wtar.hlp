@@ -65,23 +65,30 @@ EXAMPLES
 .fi
 
 2. Archive the "uparm" directory to the VMS logical device MSA0:.
+
 .nf
 	cl> wtar -f msa0 uparm
 .fi
+
 3. Make a disk archive of the LIB and PKG directory trees in your home
 directory.
+
 .nf
 	cl> wtar -f home$archive.tar lib pkg 
 .fi
+
 4. Examine the resultant file to make sure everything worked correctly.
+
 .nf
 	cl> rtar -tvf home$archive.tar
 .fi
 
 5. Make a disk archive, using a host filename for the output file.
+
 .nf
 	cl> wtar -f /tmp2/arc lib pkg sys
 .fi
+
 IRAF magtape commands such as \fIrewind\fR may be used with \fIwtar\fR,
 but switching between IRAF and host device names can be confusing.
 .ih

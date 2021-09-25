@@ -14,9 +14,11 @@ input is sorted.
 .ls column = 0
 If 0, sort entire text lines, else sort based on data/text starting
 in the specified column.  Columns are delimited by whitespace.  Thus,
+
 .nf
 	12   abc   34   56
 .fi
+
 has four columns, "abc" being in the second.
 .le
 .ls ignore_whitespace = no
@@ -41,19 +43,25 @@ EXAMPLES
 
 1. Sort the output of the set command into alphabetic (ASCII collating)
 order.
+
 .nf
 	cl> set | sort
 .fi
+
 2. Sort the contents of "file", in reverse ASCII order, ignoring the
 contents of columns 1 through 4.
+
 .nf
 	cl> sort file rev+ col=5
 .fi
+
 3. Print a long form directory listing with the files sorted by size,
 largest files first.
+
 .nf
 	cl> dir | sort num+ rev+ col=3
 .fi
+
 .ih
 BUGS
 Only one file can be sorted per call, and only one column or all columns can

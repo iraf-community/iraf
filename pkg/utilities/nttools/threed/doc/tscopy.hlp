@@ -55,6 +55,7 @@ EXAMPLES
       cl> tscopy table1,table2,tab67 a,b,c
       cl> tscopy tab*.tab a,b,c
 .fi
+
 In the latter case the extension is given explicitly in case there
 are other files beginning with "tab" that are not tables; there must
 be exactly three tables beginning with "tab" because the output list

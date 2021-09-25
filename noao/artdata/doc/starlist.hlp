@@ -334,6 +334,7 @@ creating a data file.
 	    ... type = to make a copy of any of the plots
 	    ... type q to quit
 .fi
+
 .ih
 REVISIONS
 .ls STARLIST V2.11+

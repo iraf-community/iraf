@@ -30,14 +30,18 @@ utilities, are automatically invoked.  The user may configure their
 "login.cl" file to automatically invoke other packages.
 
 Within the CL a task is invoked by entering its name, e.g.
+
 .nf
      cl> reduce args
 .fi
+
 If two tasks in different packages have the same name, then the
 package name may be included:
+
 .nf
      cl> spectra.reduce args
 .fi
+
 The task name may be followed by a parameter list and tasks
 may be linked together by pipes (see parameters).  The task initiates
 execution of either a script file, an ASCII file containing further

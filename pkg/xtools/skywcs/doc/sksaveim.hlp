@@ -11,6 +11,7 @@ pointer	coo		# the input sky coordinate descriptor
 pointer	mw		# the input mwcs descriptor
 pointer	im		# the input image descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls coo

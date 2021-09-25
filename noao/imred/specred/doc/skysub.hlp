@@ -92,6 +92,7 @@ EXAMPLES
 .nf
     ms> skysub obj010.ms out=skysub010.ms skyaps="1,10,15,20"
 .fi
+
 .ih
 SEE ALSO
 specplot, scombine

@@ -31,6 +31,7 @@ EXAMPLES
     qu> qhist quad0072
     [graph appears]
 .fi
+
 .ih
 SEE ALSO
 quadformat, quadsections, imhistogram

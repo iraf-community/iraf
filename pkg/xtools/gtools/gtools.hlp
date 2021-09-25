@@ -49,8 +49,10 @@ x  Zoom x axis about cursor
 y  Zoom y axis about cursor
 z  Zoom x and y axes about cursor
 .fi
+
 .ih
 COLON COMMANDS
+
 .nf
 :/help			Print help menu
 :/redraw		Redraw the graph
@@ -88,4 +90,5 @@ COLON COMMANDS
 
 Format changes do not take effect until the graph is redrawn.
 .fi
+
 .endhelp

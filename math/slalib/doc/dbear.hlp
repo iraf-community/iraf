@@ -1,4 +1,5 @@
 .help dbear Jun99 "Slalib Package"
+
 .nf
 
       DOUBLE PRECISION FUNCTION slDBER (A1, B1, A2, B2)
@@ -27,4 +28,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

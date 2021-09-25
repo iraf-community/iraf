@@ -27,9 +27,11 @@ received.
 .ih
 EXAMPLE
 1. Respond to a parameter request from job 3.
+
 .nf
 	cl> service 3
 .fi
+
 .ih
 BUGS
 If one never responds to a request for service from a background job, the job

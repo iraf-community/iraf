@@ -161,6 +161,7 @@ another figure when we discuss the system architecture in section 4.2.
                     (DB Kernel)                (VOS or Host System)
 
 .fi
+
 .ce
 Figure 1.  Major Components of the Database Subsystem
 .ke
@@ -934,6 +935,7 @@ an HDB.
 
 
 .fi
+
 .ce
 Figure 2. \fBDatabase Subsystem Architecture\fR
 .ke
@@ -3164,25 +3166,34 @@ Examples
 
     Print all fields of table \fInite1\fR.  The table \fInite1\fR is an image
 table containing several images with primary keys 1, 2, 3, and so on.
+
 .nf
 	cl> ptable nite1
 .fi
+
 Print selected fields of table \fInite1\fR.
+
 .nf
 	cl> ptable nite1%image,title
 .fi
+
 Plot line 200 of image 2 in table \fInite1\fR.
+
 .nf
 	cl> graph nite1[2][*,200]
 .fi
+
 Print image statistics on the indicated images in table \fInite1\fR.
 The example shows a predicate specifying images 1, 3, and 5 through 12,
 not an image section.
+
 .nf
 	cl> imstat nite1[1,3,5:12]
 .fi
+
 Print the names and number of bad pixels in tables \fInite1\fR and \fIm87\fR
 for all images that have any bad pixels.
+
 .nf
 	cl> ptable "nite1,m87 [nbadpix > 0] % image, nbadpix"
 .fi
@@ -3195,8 +3206,10 @@ the ability of SPEs to nest is used to implement views.  Nesting may also
 be used to perform selection or projection upon the individual input tables.
 For example, the SPE used in the following command specifies the union of
 selected records from tables \fInite1\fR and \fInite2\fR.
+
 .nf
 	cl> imstat nite1[1,8,21:23],nite2[9]
 .fi
+
 .nh 3
 Operators

@@ -14,6 +14,7 @@ int	parameter	# the parameter to be returned
 char	text		# the returned text parameter value
 int	maxch		# the maximum size of the returned text parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     
@@ -21,6 +22,7 @@ The configuration catalog / survey file descriptor.
 .le
 .ls parameter
 The parameter to be returned.  The text parameters defined in cq.h are:
+
 .nf
 define	CQRECLIST	# the catalog configuration file record list
 .fi

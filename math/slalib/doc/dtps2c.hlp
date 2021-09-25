@@ -1,4 +1,5 @@
 .help dtps2c Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slDPSC (XI, ETA, RA, DEC, RAZ1, DECZ1,
@@ -55,4 +56,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

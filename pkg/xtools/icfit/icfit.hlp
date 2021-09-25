@@ -39,6 +39,7 @@ A '?' to either prompt prints help information.  A graph
 is given by a pair of comma separated data types.  The first data type defines
 the horizontal axis and the second defines the vertical axis.  Any of the
 data types may be graphed along either axis.  The data types are
+
 .nf
     x  Independent variable		y  Dependent variable
     f  Fitted value			r  Residual (y - f)

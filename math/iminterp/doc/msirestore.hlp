@@ -10,6 +10,7 @@ msirestore (msi, interpolant)
     pointer	msi		#U interpolant descriptor
     real	interpolant[]	#I array containing interpolant
 .fi
+
 .ih
 ARGUMENTS
 .ls msi   
@@ -23,6 +24,7 @@ can be determined by a call to msigeti.
 .nf
 	    len_interpolant = msigeti (msi, II_MSINSAVE)
 .fi
+
 .ih
 DESCRIPTION
 MSIRESTORE allocates space for the interpolant descriptor and restores the

@@ -23,6 +23,7 @@ currently "cached" tasks is printed.
 .ih
 EXAMPLES
 1. Cache the parameters for the tasks \fIdirectory\fR and \fIpage\fR.
+
 .nf
 	cl> cache dir page
 .fi
@@ -39,6 +40,7 @@ a procedure script.  Note the use of command mode in the script.
 		}
 	end
 .fi
+
 .ih
 BUGS
 The parameter cache should not be confused with the process cache associated

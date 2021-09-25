@@ -27,6 +27,7 @@ rval = gsstatr (sf, param)
         gscopy (sf1, sf2)
         gsfree (sf)
 .fi
+
 .ih
 DESCRIPTION
 The gsurfit package provides a set of routines for fitting data to functions
@@ -65,6 +66,7 @@ GSINIT must be called before each fit. GSFREE frees the space used by
 the GSURFIT package.
 .ih
 EXAMPLES
+
 .nf
 Example 1: Fit surface to data, uniform weighting
 
@@ -166,4 +168,5 @@ call gsfree (sf)
 
 ...
 .fi
+
 .endhelp

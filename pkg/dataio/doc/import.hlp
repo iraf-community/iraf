@@ -38,6 +38,7 @@ expressions.  The syntax for the pixtype entry is
 .ls  <type><nbytes>[:tag],<type><nbytes>[:tag],[....]
 
 where
+
 .nf
     type = b            # byte (no conversions)
            u            # unsigned integer
@@ -248,6 +249,7 @@ defaults could also be used.
 contain any of the standard expression evaluator functions (see 
 the \fIimexpr\fR help page for more details).  Special functions in 
 expressions also include:
+
 .nf
 
      flipx (arg)      	- flip image in X
@@ -259,17 +261,20 @@ expressions also include:
      gamma (arg, gamma) - apply a gamma correction to the image
 
 .fi
+
 The two flip functions can change the image orientation by reversing the order
 of pixels within a line (a flipx() call), or it can flip an image from top-
 to-bottom (a flipy() call).  The flipping will apply to all bands of the out-
 put image even if it was only used in one expression.  To reverse the channel 
 order simply change the order of the tags in the outbands parameter.  RGB
 images may be converted to a single grayscale image using the NTSC formula:
+
 .nf
 
 	gray = (0.289 * r) + (0.587 * G) + (0.114 * B)
 
 .fi
+
 Note that a similar grayscale conversion can be done by explicitly defining
 a similar equation in \fIoutbands\fR and supplying different coefficients.
 
@@ -278,6 +283,7 @@ to get a single color component from a colormap image rather than the
 grayscale equivalent of the colormap.  For example, to separate an 8-bit
 GIF color image into it's RGB components one could specify an outbands
 parameter such as
+
 .nf
 
 cl> import foo.gif bar format=gif outbands="red(b1),green(b1),blue(b1)"
@@ -375,6 +381,7 @@ Special Functions:
 
         In addition to the intrinsic functions already provided there are a
 number of input and utility functions for the database.  These are:
+
 .nf
 
                      \fIINPUT FUNCTIONS\fR
@@ -524,6 +531,7 @@ be used to set byte swapping for the whole file, or for only certain data
 types.  The value is a string parameter that may be "yes" to byteswap the
 whole file, "no" to not swap anything, or a comma delimited string of types
 described below to enable swapping for only those values.
+
 .nf
 
         bswap = { no | yes | i2 i4 }
@@ -544,6 +552,7 @@ swapping).
 
 .ih 
 EXAMPLES
+
 .nf
 
 Get a list of known input formats:

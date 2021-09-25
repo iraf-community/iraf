@@ -256,6 +256,7 @@ written to the output image.  A brief log output is printed for
 each spectrum.
 .ih
 CURSOR KEYS AND COLON COMMANDS
+
 .nf
 ? - print help
 a - automatic RMS minimization within sample regions
@@ -278,6 +279,7 @@ y - graph and select from corrected scaled candidates
 :sample [value] - print or reset the sample regions
 :smooth [value] - print or reset the smoothing box size
 .fi
+
 .ih
 EXAMPLES
 1.  To interactively search for a best correction with the default
@@ -300,6 +302,7 @@ log the processing:
 .nf
     cl> skytweak spec* "" skyspec inter- > log
 .fi
+
 .ih
 REVISIONS
 .ls SKYTWEAK V2.11

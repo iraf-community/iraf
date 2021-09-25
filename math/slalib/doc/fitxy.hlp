@@ -1,4 +1,5 @@
 .help fitxy Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slFTXY (ITYPE,NP,XYE,XYM,COEFFS,J)
@@ -73,4 +74,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

@@ -214,6 +214,7 @@ t_wfits()
 
 			wrt_last_record (fits_fd)
 .fi
+
 .sh
 WFITS Structure Summary
 

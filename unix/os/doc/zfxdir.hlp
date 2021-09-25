@@ -4,6 +4,7 @@ NAME
 zfxdir -- extract OS directory prefix from OSFN
 .ih
 SYNOPSIS
+
 .nf
 zfxdir (osfn, osdir, maxch, status)
 
@@ -11,6 +12,7 @@ char	osfn[ARB]		# OS filename
 char	osdir[maxch]		# OS directory prefix
 int	maxch, status
 .fi
+
 .ih
 DESCRIPTION
 The OS directory prefix, if any, is extracted from the OS filename

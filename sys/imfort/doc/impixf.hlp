@@ -4,6 +4,7 @@ NAME
 impixf -- get the physical attributes of the pixel file
 .ih
 SYNOPSIS
+
 .nf
 subroutine impixf (im, pixfd, pixfil, pixoff, szline, ier)
 
@@ -14,6 +15,7 @@ integer		pixoff		#O 1-indexed "char" offset of pixels
 integer		szline		#O "chars" per physical image line
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimpixf\fR procedure is used to obtain information describing the

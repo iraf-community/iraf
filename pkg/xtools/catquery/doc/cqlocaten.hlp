@@ -13,6 +13,7 @@ int catno		# the number of the catalog / survey to be located
 char	catname		# the name of the located catalog
 int	maxch		# the maximum size of the name of the located catalog
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

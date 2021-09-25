@@ -749,11 +749,13 @@ is to collect all the algorithm parameters in one place separate from the
 processing parameters and include only those which are relevant for
 FOE data.  The parameter values can be changed from the
 defaults by using the parameter editor,
+
 .nf
 
 	cl> epar params
 
 .fi
+
 or simple typing \fIparams\fR.  The parameter editor can also be
 entered when editing the \fBdofoe\fR parameters by typing \fI:e
 params\fR or simply \fI:e\fR if positioned at the \fIparams\fR
@@ -1137,6 +1139,7 @@ d...ec.imh: ap = 1, w1 = 4959.1, w2 = 4978.5, dw = 0.076, nw = 256
 d...ec.imh: ap = 2, w1 = 5003.4, w2 = 5022.1, dw = 0.073, nw = 256
 d...ec.imh: ap = 3, w1 = 5049.0, w2 = 5067.0, dw = 0.070, nw = 256
 .fi
+
 .ih
 REVISIONS
 .ls DOFOE V2.10.3

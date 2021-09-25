@@ -113,6 +113,7 @@ EXAMPLES
 
 1. Convolve an image with the Laplacian filter xyall using nearest neighbor
 boundary extension.
+
 .nf
     cl> laplace m83 m83.lap xyall
 .fi

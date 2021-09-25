@@ -56,21 +56,26 @@ are the same.
 EXAMPLES
 1. Read a file written by \fIwtextimage\fR from the magtape file "mta[1]" into
 the IRAF image "picture".
+
 .nf
     cl>  rcard mta[1] | rtext out=picture
 .fi
+
 2. Read a series of text files with no headers preceding the pixels.  The 
 text files were previously read from tape with task \fBrcardimage\fR. 
 The two dimensional images are 512 by 320 pixels, and will be named 
 crab001, crab002, crab003, etc.
+
 .nf
     cl> rtext text.* crab header- dim=512,320
 .fi
 
 3. Read a file with a non-standard header.  The header is 5 cardimages long.
+
 .nf
     cl> rcard mta[5] | rtext out=spect.1 head- nskip=5 dim=1024
 .fi
+
 .ih
 TIME REQUIREMENTS
 Task \fIrtextimage\fR requires about 145 cpu seconds to write a 512 square

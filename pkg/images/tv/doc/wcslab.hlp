@@ -687,6 +687,7 @@ arcseconds in size, and are rotated 30.0 degrees counter-clockwise.
 	cl> wcslab image usewcs+
 
 .fi
+
 .ih
 AUTHORS
 The WCSLAB task was written by members of the STScI SDAS programming group

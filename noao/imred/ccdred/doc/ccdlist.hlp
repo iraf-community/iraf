@@ -123,6 +123,7 @@ The processing indicated is overscan subtraction, trimming, and flat fielding.
 .fi
 
 6. To make a list file containing all the flat field images:
+
 .nf
     cl> ccdlist *.imh ccdtype=flat name+ > flats
 .fi

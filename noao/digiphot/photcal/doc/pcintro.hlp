@@ -365,11 +365,13 @@ The configuration file is a text file, created by the user, that specifies
 both the format of the input data and the form of the transformation equations.
 A detailed description of the grammar and syntax of the configuration file
 can be obtained by typing the following command.
+
 .nf
 
 ph> help config
 
 .fi
+
 The configuration file can be prepared in one of the following ways.
 
 .ls [1]
@@ -458,11 +460,13 @@ VI. FITTING THE PARAMETERS OF THE TRANSFORMATION EQUATIONS
 The heart of the PHOTCAL package is the parameter fitting task FITPARAMS.
 A detailed description of this task and its parameters can be obtained by
 typing the following command. 
+
 .nf
 
 ph> help fitparams
 
 .fi
+
 FITPARAMS takes the observation files, catalog files, and configuration file, 
 and computes the value of the fit parameters for each of the 
 transformation equations specified in the configuration file. Equations will 
@@ -486,6 +490,7 @@ with the cursor, change which parameters are to be fit and which are to be
 held constant, and so on. A detailed description of
 all the interactive options and colon commands can be obtained by typing
 the following command. 
+
 .nf 
 
 ph> help inlfit
@@ -724,4 +729,5 @@ STD2-4  11.710  0.034  0.479  0.061  0.660   0.113
 STD6-3  10.589  0.006  0.619  0.016  -0.069  0.022
 STD7-5  11.852  0.059  0.406  0.069  0.981   0.129
 .fi
+
 .endhelp

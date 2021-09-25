@@ -245,6 +245,7 @@ implementation which uses a fixed size, 1024 character caplist buffer.
 
 
 .tp 10
+
 .nf
 procedure ttyodes (ttyname)
 

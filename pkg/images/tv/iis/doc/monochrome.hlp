@@ -11,9 +11,11 @@ Set the display monitor to display monochrome grey levels by setting
 the lookup tables for each color gun to the same values.
 .ih
 EXAMPLES
+
 .nf
 	cl> monochrome
 .fi
+
 .ih
 SEE ALSO
 cv

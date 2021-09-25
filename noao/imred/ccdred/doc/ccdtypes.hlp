@@ -19,6 +19,7 @@ The following CCD image types may be specified as the value of the parameter
 	none	- images without an image type parameter
 	unknown - image types not defined in the translation file
 .fi
+
 .ih
 DESCRIPTION
 The \fBccdred\fR package recognizes certain standard CCD image types

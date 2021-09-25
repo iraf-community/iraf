@@ -116,9 +116,11 @@ is listed.  This appears as follows:
 .fi
 
 A summary of the tasks and additional help topics is obtained by typing:
+
 .nf
     cl> help
 .fi
+
 This list and how to get additional help on specific topics is described
 in the \fBReferences\fR section at the end of this guide.
 
@@ -353,9 +355,11 @@ filter to produce the calibration images "FlatV", "FlatB", and
 
      Processing the CCD data is easy and largely automated.
 First, set the task parameters with the following command:
+
 .nf
     cl> eparam ccdproc
 .fi
+
 You may have already set the parameters when you ran
 \fBsetinstrument\fR, though the calibration image parameters
 \fIzero\fR, \fIdark\fR, and \fIflat\fR may still need to be set or
@@ -410,9 +414,11 @@ and the task run as a background job.  This is done with the commands
 The already processed images in the input list are recognized as having been
 processed and are not affected.  To check the status of the processing we
 can look at the end of the log file with:
+
 .nf
     cl> tail logfile
 .fi
+
 After processing we can repeat the \fBccdlist\fR command to find:
 
 .nf
@@ -470,9 +476,11 @@ detector or trimmed then you may use the flat field without special
 processing.
 
    First you must process the flat field images explicitly with
+
 .nf
     cl> ccdproc *.imh ccdtype=flat
 .fi
+
 where "*.imh" may be replaced with any list containing the flat fields.
 If zero level and dark count corrections are required these calibration
 images must be available at this time.
@@ -560,6 +568,7 @@ input images are converted to sky flats are
     cl> mkskyflat sky004 Skyflat
     cl> mkskyflat sky*.imh ""
 .fi
+
 .sh
 4.4 Iillumination Corrected Flat Fields
 
@@ -616,15 +625,18 @@ As examples,
     cl> mkfringecor sky004 Fringe
     cl> mkfringecor sky*.imh ""
 .fi
+
 .sh
 5. Demonstration
 
      A simple demonstration task is available.  To run this demonstration
 load the \fBccdtest\fR package; this is a subpackage of the main
 \fBccdred\fR package.  Then simply type
+
 .nf
 	cl> demo
 .fi
+
 The demonstration will then create some artificial CCD data and reduce
 them giving descriptive comments as it goes along.  This demonstration uses
 the "playback" facility of the command language and is actually substituting
@@ -649,9 +661,11 @@ If you need to combine calibration images to form a master calibration
 image use one of the combine tasks.  Spectroscopic flat fields may
 need to be processed first in order to remove the lamp spectrum.
 Finally, just type
+
 .nf
     cl> ccdproc *.imh&
 .fi
+
 .sh
 7. References
 
@@ -672,9 +686,11 @@ published by Springer-Verlag.
 in printed form in the IRAF documentation sets, a special set
 containing documentation for just the \fBccdred\fR package, and on-line
 through the help task by typing
+
 .nf
     cl> help \fItopic\fR
 .fi
+
 where \fItopic\fR is one of the following.
 
 .nf
@@ -708,9 +724,11 @@ setinstrument - Set instrument parameters
 
 Printed copies of the on-line help documentation may be made with the
 command
+
 .nf
     cl> help topic | lprint
 .fi
+
      In addition to the package documentation for \fBccdred\fR,
 \fBlongslit\fR, and \fBapextract\fR there may be specific guides for
 certain instruments.  These specific guides, called "cookbooks", give

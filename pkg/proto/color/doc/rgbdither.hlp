@@ -82,6 +82,7 @@ block averaging factor 6 will yield a final composite image of size
 	cl> rgbdither trifidr trifidv trifidb trifidrgb \
 	>>> rz1=1 rz2=500 gz1=1 gz2=500 bz1=1 bz2=500 blk=6
 .fi
+
 .ih
 TIME REQUIREMENTS
 Example 1 takes 2:20 minutes (33 seconds CPU) on a SparcStation 2.

@@ -116,6 +116,7 @@ residuals for an input table named "hr465.tab" would be put in "hr465h.tab".
 .nf
   tt> tlinear hr*.tab STDOUT wavelength flux
 .fi
+
 .ih
 BUGS
 .ih

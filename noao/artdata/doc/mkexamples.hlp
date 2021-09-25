@@ -153,6 +153,7 @@ EXAMPLES
 
     delete (dat, verify=no)
 .fi
+
 .ih
 REVISIONS
 .ls MKEXAMPLES V2.10.3

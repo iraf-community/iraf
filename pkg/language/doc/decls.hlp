@@ -4,6 +4,7 @@ NAME
 declarations -- parameter and variable declarations
 .ih
 SYNTAX
+
 .nf
 vartype [*]varname[index_list] [= init_value] [{options}] [, ...]
 
@@ -11,6 +12,7 @@ vartype [*]varname[index_list] [= init_value] [{options}] [, ...]
 
 vartype [*]varname[index_list] [{init_value [, options]}] [, ...]
 .fi
+
 .ih
 ELEMENTS
 .ls vartype
@@ -132,12 +134,15 @@ int	karray[3]=1	# (note second and third elements are undefined)
 struct	*list="inputfile.list" {mode="q"}
 int	*ilist="infile.inp" {mode="h", min=0, max=100}
 .fi
+
 .ih
 BUGS
+
 .nf
 Options are only permitted for parameters, not local variables.
 The filetype options are recognized but are not implemented internally.
 .fi
+
 .ih
 SEE ALSO
 parameters, procedure

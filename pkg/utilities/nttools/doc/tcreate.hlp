@@ -65,6 +65,7 @@ by beginning the line with the comment symbol (#).
 
 The following data types are recognized by this parameter
 (the default data type is single-precision real):
+
 .nf
 
      r - Single-precision real.
@@ -244,6 +245,7 @@ The prompts are printed by the 'tcreate' task;
 these are the lines beginning with "Give column definitions"
 and "Give table data".
 The table will have 4 columns and 2 rows.
+
 .nf
 
 tt> tcreate test STDIN STDIN
@@ -262,8 +264,10 @@ nameless      3:18:47   42:24   INDEF
 ^Z
 
 .fi
+
 2. Create a table called "outfile.tab" using the columns specified
 in "columns.cd" and the data in "data.dat".
+
 .nf
 tt> tcreate outfile columns.cd data.dat nskip=3
 .fi
@@ -366,6 +370,7 @@ PH/ADU  r 20.0
 RNOISE  r 6.50
 BAD     r 300.0
 .fi
+
 .ih
 BUGS
 .ih

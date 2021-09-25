@@ -26,17 +26,23 @@ one file.
 .ih
 EXAMPLES
 1. Rename the image "pix" to "wfpc.1".
+
 .nf
 	cl> imrename pix wfpc.1
 .fi
+
 2. Rename all the "nite1*" images as "nite1_c".
+
 .nf
 	cl> imrename nite1.*.imh nite1%%_c%.*.imh
 .fi
+
 3. Move the images in logical directory "dd" to the current directory.
+
 .nf
 	cl> imrename dd$*.imh .
 .fi
+
 4. Move the pixel files associated with the images in the current directory
 to a subdirectory "pix" of the current directory.
 
@@ -44,6 +50,7 @@ to a subdirectory "pix" of the current directory.
 	cl> reset imdir = HDR$pix/
 	cl> imrename *.imh .
 .fi
+
 .ih
 SEE ALSO
 imcopy, imdelete, imheader

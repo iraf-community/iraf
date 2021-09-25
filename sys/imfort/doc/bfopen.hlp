@@ -4,6 +4,7 @@ NAME
 bfopen -- open a file for binary file i/o
 .ih
 SYNOPSIS
+
 .nf
 integer function bfopen (fname, acmode, advice)
 
@@ -11,6 +12,7 @@ character*(*)	fname		#I host name of file to be opened
 integer		acmode		#I file access mode (1=RO,3=RW,5=NF)
 integer		advice		#I type of access (1=random,2=seq.)
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfopen\fR procedure either opens an existing file for binary

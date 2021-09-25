@@ -12,6 +12,7 @@ pointer	coo		# the input sky coordinate descriptor
 char	csystem		# the output system name
 int	maxch		# the maximum size of the output system name
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    

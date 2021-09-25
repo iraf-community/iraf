@@ -12,6 +12,7 @@ pointer	mw		# the output mwcs descriptor
 pointer	coo		# the output sky coordinate descriptor
 pointer	imcoo		# the input image sky coordinate descriptor 
 .fi
+
 .ih
 ARGUMENTS
 .ls  im

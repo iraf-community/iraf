@@ -30,6 +30,7 @@ square root.
 	else
 	    y = sqrt (x)
 .fi
+
 .ih
 BUGS
 There is currently no way to post an error handler to receive control

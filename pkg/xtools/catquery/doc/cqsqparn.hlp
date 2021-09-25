@@ -12,6 +12,7 @@ pointer	cq		# the configuration file descriptor
 int	parno		# the sequence number of the query parameter
 char	value		# the query parameter value
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

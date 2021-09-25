@@ -20,6 +20,7 @@ extension which \fBlparam\fR uses to distinguish between task-psets and named
 (file) psets.
 
 Each parameter is listed on a single line with the following format:
+
 .nf
 	param = value		prompt string
 .fi
@@ -52,9 +53,11 @@ cl> lparam delete
 are most commonly produced using the \fB":w filename"\fR colon command in
 \fBeparam\fR, e.g., to prepare several different versions of the parameter
 set for a task.
+
 .nf
 	cl> lparam delete.par
 .fi
+
 .ih
 BUGS
 You cannot list the parameters of a task that does not have a parameter

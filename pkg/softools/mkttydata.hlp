@@ -98,9 +98,11 @@ Guide: Reference Manual", section 5.  IRAF uses a standard UNIX termcap.
 .ih
 EXAMPLES
 1. Update the graphcap cache.
+
 .nf
     cl> mktty vt640,vt240,4012,cit414a dev$graphcap dev$cacheg.dat
 .fi
+
 .ih
 BUGS
 There is a fixed limit on the amount of data that can be cached.

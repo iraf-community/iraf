@@ -92,6 +92,7 @@ Insert images into a 3-D table at column named FLUX:
 .nf
 cl> tiimage flux*.hhh "otable.tab[c:FLUX]"
 .fi
+
 .ih
 BUGS
 The output and template table names must be supplied in full, including 

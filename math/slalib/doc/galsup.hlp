@@ -1,4 +1,5 @@
 .help galsup Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slGASU (DL, DB, DSL, DSB)
@@ -40,4 +41,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

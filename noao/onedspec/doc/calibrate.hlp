@@ -155,19 +155,24 @@ extension) is applied.
 EXAMPLES
 1.  To flux calibrates a series of spectra replacing the input spectra by
 the calibrated spectra:
+
 .nf
 	cl> calibrate nite1 ""
 .fi
+
 2.  To only extinction correct echelle spectra:
+
 .nf
 	cl> calibrate ccd*.ec.imh new//ccd*.ec.imh flux-
 .fi
+
 3. To flux calibrate a long slit spectrum:
 
 .nf
 	cl> dispaxis = 2
 	cl> calibrate obj.imh fcobj.imh
 .fi
+
 .ih
 REVISIONS
 .ls CALIBRATE V2.10.3

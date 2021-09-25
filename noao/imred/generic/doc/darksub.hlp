@@ -54,6 +54,7 @@ To subtract the dark count image 'dark' from obs1, obs2, and obs3:
 	Tue 18:51:05 08-Apr-86
 	  obs2 = obs2 - 5.009999733075 * dark
 .fi
+
 .ih
 SEE ALSO
 imarith

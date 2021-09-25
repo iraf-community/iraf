@@ -23,13 +23,17 @@ all at once.
 .ih
 EXAMPLES
 1. Page the help page for the \fImkpkg\fR task.
+
 .nf
     cl> phelp mkpkg
 .fi
+
 2. View the help pages for all the tasks in the IMAGES package.
+
 .nf
     cl> phelp images.*
 .fi
+
 When viewing multiple help pages as in this last example, note that the
 'N' and 'P' keystrokes in the pager may be used to move to the next or
 previous help page.  "." will return to the first help page (the start

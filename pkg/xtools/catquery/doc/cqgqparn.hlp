@@ -20,6 +20,7 @@ int	max_qpunits	# the maximum size of the returned parameter units
 char	qpformat	# the returned query parameter format
 int	max_qpformat	# the maximum size of the returned parameter format
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

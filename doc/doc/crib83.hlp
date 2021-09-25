@@ -358,8 +358,10 @@ characters converted:
     token =  ctotok (str, ip, outstr, maxch)	# extract token
 
 .fi
+
 The following procedures return the number of characters written into the output
 string (the DTOC "format" is one of the chars [efghm], i.e., 'f'):
+
 .nf
 
     nchar =    itoc (ival, outstr, maxch)	# integer to char
@@ -403,10 +405,12 @@ NI  stat =   clglcur (param, x, y, ch)		# get cursor param
 
 
 .fi
+
 Expand file name template (string param in CL).  CLPOPNI expands and
 sorts a list of input files (contingent on whether or not the standard
 input is redirected); CLPOPNS expands and sorts any template; CLPONPU
 expands a template without sorting.
+
 .nf
 
    list = clpopn[isu] (param)			# "open" template
@@ -561,6 +565,7 @@ i.e.,	bufptr = imgl2r (im, linenum)		# get line, type real
 
 
 .fi
+
 Here, [gp] implies get or put, [pls] specifies whether a pixel, line, or
 section is to be accessed, [123] specifies the dimensionality of the
 subscript (but not of the image itself), and [silrdx] specifies the datatype
@@ -1158,6 +1163,7 @@ Examples:
 
 
 .tp 5
+
 .nf
      Instruction	    Operation		          Data Types
 

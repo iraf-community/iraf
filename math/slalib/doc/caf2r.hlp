@@ -1,4 +1,5 @@
 .help caf2r Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slCAFR (IDEG, IAMIN, ASEC, RAD, J)
@@ -35,4 +36,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

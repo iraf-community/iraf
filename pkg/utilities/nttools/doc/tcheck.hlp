@@ -58,6 +58,7 @@ string concatenation	//
 
 Three new functions are available in addition to the usual arithmetic
 functions:
+
 .nf
 
 row     takes no argument, returns current row number 

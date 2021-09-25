@@ -4,12 +4,14 @@ NAME
 zclcpr -- close or disconnect a connected subprocess
 .ih
 SYNOPSIS
+
 .nf
 zclcpr (pid, exit_status)
 
 int	pid			# process id (a magic integer)
 int	exit_status		# termination code from process
 .fi
+
 .ih
 DESCRIPTION
 Disconnect a subprocess previously connected with \fBzopcpr\fR,

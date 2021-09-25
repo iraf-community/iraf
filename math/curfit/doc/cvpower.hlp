@@ -4,6 +4,7 @@ NAME
 cvpower -- convert coefficients to power series coefficients.
 .ih
 SYNOPSIS
+
 .nf
 include <math/curfit.h>
 include "curfitdef.h"
@@ -14,6 +15,7 @@ pointer	cv			# Curve descriptor
 real	ps_coeff[ncoeff]	# Power series coefficients
 int	ncoeff			# Number of coefficients in fit
 .fi
+
 .ih
 ARGUMENTS
 .ls cv      

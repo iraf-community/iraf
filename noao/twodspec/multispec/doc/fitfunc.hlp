@@ -57,6 +57,7 @@ with \fBmslist\fR.
 EXAMPLES
 The extraction of the spectra requires that a fitting function be
 determined for the spectra positions.  This is done by:
+
 .nf
 	cl> fitfunction image
 .fi
@@ -68,6 +69,7 @@ and leave out a bad point at sample line 7:
 	cl> fitfunction image parmeter=s0 function=smooth \
 	>>> lines="1-6,8-"
 .fi
+
 .ih
 SEE ALSO
 mslist

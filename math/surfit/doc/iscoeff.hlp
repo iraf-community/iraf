@@ -11,6 +11,7 @@ pointer	sf		# surface descriptor
 real	coeff[ncoeff]	# coefficient array
 int	ncoeff		# number of coefficients
 .fi
+
 .ih
 ARGUMENTS
 .ls sf   

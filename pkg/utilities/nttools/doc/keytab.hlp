@@ -52,6 +52,7 @@ wavelength in the table 'spectrum.tab'.
 .nf
 tt> keytab image.hhh[2] CRVAL1 spectrum.tab WAVELENGTH 1
 .fi
+
 .ih
 REFERENCES
 This task was written by Bernie Simon.

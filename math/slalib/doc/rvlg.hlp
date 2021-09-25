@@ -1,4 +1,5 @@
 .help rvlg Jun99 "Slalib Package"
+
 .nf
 
       REAL FUNCTION slRVLG (R2000, D2000)
@@ -33,4 +34,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

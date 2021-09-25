@@ -78,6 +78,7 @@ of the header layout.
 Output pixel type if \fIformat\fR is set to "raw" or "list".  This is a 
 string giving the type and size of each pixel, the syntax for the outtype 
 entry is
+
 .nf
 
 		<type>[<nbytes>]
@@ -91,6 +92,7 @@ where
     nbytes = 1, 2, 4, or 8
 
 .fi
+
 If no value for \fInbytes\fR is given the smallest size for the given type
 (i.e. 1 byte for 'b', 2 bytes for ints, 4 bytes for floating point) will
 be used.  If no value is entered at all the type of the input image is used, 
@@ -227,6 +229,7 @@ Individual \fIoutbands\fR expressions are composed of operators and operands
 in general interpreted arithmetic expressions as follows:
 
 \fBOperands\fR
+
 .nf
 
 	iN		      	    # image list item
@@ -243,12 +246,14 @@ to be accessed.  For example 'i2.otime' refers to the 'otime' image
 header parameter in the second image of a list and '@"otime"' refers to the 
 current image if the input list contains 3-D images.  They may
 be used in an outbands expression such as
+
 .nf
 
     (i1*(i1.otime/i2.otime)),i2,(i3*(i3.otime/i2.otime))	(1)
     (b1/@"otime")),(b2/@"otime"),(b3/@"otime")			(2)
 
 .fi
+
 to normalize the output bands by the exposure time value in the second image
 in the first example, or to normalize by the 'otime' keyword of a 3-D image
 in the second example.
@@ -257,6 +262,7 @@ in the second example.
 alpha channel (an extra 8-bits of constant intensity) will be created 
 consisting of that value.  For example, writing a 32-bit RGB image with an 
 alpha channel of 255 could be written using
+
 .nf
     cl> export rgbim file outtype="b1" outbands="b1,b2,b3,255"
 .fi
@@ -371,6 +377,7 @@ a given number of times.
 
 .ce
 \fBScaling Functions:\fR
+
 .nf
 
    zscale (arg [,z1, z2 [, nbins]]) - scale to a fixed number of bins
@@ -401,6 +408,7 @@ i.e. larger pixel values will map to the lower bin numbers, smaller pixel
 values will map to larger bin numbers.  For example, to map the dev$pix
 test image to 200 colors such that there are "black" stars on a "white"
 background one could use
+
 .nf
 
 	zscale (b1, @"i_maxpixval", @"i_minpixval", 200)
@@ -414,11 +422,13 @@ expression selecting whether a value in the first argument is to be used in
 the calculation.  This allows limiting the automatic scale calculation to
 pixels specified in a mask or to a certain range to exclude extreme or bad
 values that would otherwise perturb the result.  Typical usages might be
+
 .nf
 
 	zscalem (i1, i2==0)
 	zscalem (i1, i1>0&&i1<10000)
 .fi
+
 where i1 are the image pixels and i2 would be pixels from the second
 input argument which defines a mask.  Note that you can't just say i2
 for a mask but must use it in an expression resulting in a true or false
@@ -427,6 +437,7 @@ value.  Also note that the result is always in the range 0 to 255.
 .ls grey (arg1,arg2,arg3) or gray (arg1,arg2,arg3)
 Convert three image operands or expressions to a single grayscale image
 using the standard NTSC equation:
+
 .nf
 
 	Gray = 0.3 * arg1 + 0.59 * arg2 + 0.11 * arg3
@@ -434,22 +445,26 @@ using the standard NTSC equation:
 .le
 .ls bscale (arg, zero, scale)
 Linearly transform the intensity scale of the image using the equation
+
 .nf
 
 	new[i] = (arg[i] - zero) / scale
 
 .fi
+
 Pixels are scaled in their input datatype prior to converting to the output
 datatype.
 .le
 .ls gamma (arg, gamma [, scale])
 Apply a gamma correction to the pixels.  Pixel values are scaled according to
 the equation
+
 .nf
 
 	new = scale * [ (old/scale) ** (1.0/gamma) ]
 
 .fi
+
 If no scale argument is given a value of 255 will be assumed.
 .le
 
@@ -468,6 +483,7 @@ If no scale argument is given a value of 255 will be assumed.
 	These functions may take as arguments some of the output functions
 named above.  For example, one can specify the dpi resolution of EPS output
 and band storage of images using something like
+
 .nf
 
 	psdpi(band(args), dpi)
@@ -490,6 +506,7 @@ for formats that support colormaps, the \fIargs\fR expressions are used to
 compute the color index values.  The \fIcmap\fR argument may either be the
 filename of a normalized colormap table (such as is used by \fIXImtool\fR)
 or one of the builtin values:
+
 .nf
 	aips0		- and RGB false color mapping
 	blue		- various shades of blue
@@ -604,6 +621,7 @@ cases this can be handled with the \fIzscale()\fR or \fIzscalem\fR functions.
 of \fIoutbands\fR expressions required and the type of output file that
 can be written.  Complete examples for the most common cases are shown in
 the \fIExamples\fR section below.  The columns in the table are defined as
+
 .nf
 
     #expr		- number of required \fIoutbands\fR expressions
@@ -615,6 +633,7 @@ the \fIExamples\fR section below.  The columns in the table are defined as
     Notes		- see explanation below each table
 
 .fi
+
 A general description and specific restrictions or requirements are given for 
 each format.  An error is generated of the input parameters do not meet the 
 requirements of the requested format.  Unless otherwise noted the values of 
@@ -631,6 +650,7 @@ then each band of the image will be written as a color component.
 	The currently supported builtin formats include:
 
 .ls EPS     - Encapsulated PostScript
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -638,6 +658,7 @@ then each band of the image will be written as a color component.
     1      index  8       no    no      none          
 
 .fi
+
 	The output 8-bit Encapsulated PostScript image
 centered on the page at a default scale of 1.0 at 300dpi (i.e. the image will
 appear on a 300dpi printer about the same size as displayed on a 72dpi 
@@ -651,6 +672,7 @@ postscript or with a colormap applied to the data (using either the
 \fIcmap()\fR or \fIsetcmap()\fR functions).
 .le
 .ls GIF     - Compuserve's GIF format
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -664,6 +686,7 @@ postscript or with a colormap applied to the data (using either the
 	2) use of \fIcmap()\fR required to generate colormap
 
 .fi
+
 	The output file is a GIF '87 image.  A linear colormap of 256 entries 
 will automatically be generated if only one image or expression is given for
 conversion and no colormap is specified.  
@@ -680,6 +703,7 @@ several images into a new image that can be annotated with the \fITVMARK\fR
 task before writing out the final format.
 .le
 .ls MIFF    - ImageMagick MIFF format image
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -693,12 +717,14 @@ task before writing out the final format.
 	2) Colormap generation enabled using \fIcmap()\fR
 
 .fi
+
 	The output file is a Machine Independent File Format image, with or
 without a colormap or as a 24-bit RGB image.  Although MIFF permits 64K
 colors in a colormap the task only supports 256 colors, no compression is
 used in the image.  The maximum pixel value per color is assumed to be 255.
 .le
 .ls PGM     - PBMPlus PGM format image
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -710,10 +736,12 @@ used in the image.  The maximum pixel value per color is assumed to be 255.
 	1) Grayscale may be produce with \fIgray()\fR function
 
 .fi
+
 	The output file is an 8-bit raw (i.e. binary pixels) PGM image.  
 The maximum pixel value is assumed to be 255.
 .le
 .ls PPM     - PBMPlus PPM format image
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -721,10 +749,12 @@ The maximum pixel value is assumed to be 255.
     3      rgb    24      no    no      pixel         
 
 .fi
+
 	The output file is an 24-bit raw (i.e. binary pixels) PPM image. 
 The maximum pixel value per color is assumed to be 255.
 .le
 .ls RAS     - Sun rasterfile format
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -739,6 +769,7 @@ The maximum pixel value per color is assumed to be 255.
 	2) Colormap generation enabled using \fIcmap()\fR
 
 .fi
+
 	The output file will be a Sun rasterfile.  The header values
 (long integers) may be byte swapped by setting the \fIbswap\fR parameter 
 to "yes" or "i4".  For 32-bit true-color rasterfiles the
@@ -746,6 +777,7 @@ alpha channel should be specified as the first expression.  The maximum
 pixel value is assumed to be 255.
 .le
 .ls RGB     - SGI RGB format image
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -754,11 +786,13 @@ pixel value is assumed to be 255.
     3      rgb    24      no    no      scanline      
 
 .fi
+
 	The output file will be an SGI RGB (IRIS) format image.  Although
 this format supports colormaps they are not supported by this task.
 The maximum pixel value is assumed to be 255.
 .le
 .ls XWD     - X11 Window dump file
+
 .nf
 
   #expr    Type   bitpix  CLT?  Alpha?  Interleaving  Notes
@@ -772,6 +806,7 @@ The maximum pixel value is assumed to be 255.
 	3) Colormap generation enabled using \fIcmap()\fR
 
 .fi
+
 	The output file will be an X11 window dump file.
 A linear colormap of 256 entries will automatically be generated if only 
 one image or expression is given for conversion, the \fIsetcmap()\fR function
@@ -839,17 +874,21 @@ IRAF image to a color rasterfile with the same colormap and intensity
 scaling as was displayed in XImtool.  After adjusting the display the 
 brightness/contrast values could be read from the control panel and the 
 rasterfile generated using
+
 .nf
 
         setcmap (b1, "aips0", 0.36, 1.2)
 
 .fi
+
 where the "aips0" is one of the builtin colormaps and the brightness and
 contrast arguments are those from the ximtool display.  Similarly, the
 expression
+
 .nf
         setcmap (zscale(i1),"idl15.lut")
 .fi
+
 will save the image with the same intensity scaling and color as would be see
 by displaying it to ximtool using the default DISPLAY task settings,
 normalized XImtool brightness/contrast values and the "idl15.lut" LUT in the
@@ -867,32 +906,43 @@ format when converting to a builtin format.
 
 List the pixels being one the standard output, apply a linear scale
 function first:
+
 .nf
     cl> export dev$pix "" list outbands="bscale(b1,1.0,3.2)"
 .fi
+
 Convert the dev$pix test image to an 8-bit binary file with a gamma 
 correction, write the standard header:
+
 .nf
     cl> export dev$pix bfil raw header+ outty="u1" outbands="gamma(b1,1.8)"
 .fi
+
 Write the three bands of an IRAF image to a pixel interleaved binary 
 file of short integers, prepend a user-defined header:
+
 .nf
     cl> export rgbim bfil raw header="hdr.txt" outty="i2" outban="b1,b2,b3"
 .fi
+
 Convert three images representing RGB to a 4-color line-interleaved
 file, the IRAF images don't require scaling, create alpha channel:
+
 .nf
     cl> export rim,gim,bim bfil raw outty="u1" outban="line(i1,i2,i3,0)"
 .fi
+
 Write the three bands of an IRAF image to a line-interleaved binary 
 file of short integers:
+
 .nf
     cl> export rgbim binfil raw outtype="i2" outbands="line(b1,b2,b3)"
     cl> export rgbim binfil raw outtype="i2" outbands="" interleave=3
 .fi
+
 Write the three bands of an IRAF image to a grayscale binary file using 
 a custom conversion formula.  Pixel values are truncated to 8-bits:
+
 .nf
     cl> export rgbim grey raw outty="u1" outban="(.2*b1)+(.5*b2)+(.3*b3)"
 .fi
@@ -901,64 +951,77 @@ a custom conversion formula.  Pixel values are truncated to 8-bits:
 
 Convert dev$pix to an 8-bit Sun rasterfile with no colormap, scale the 
 image to 8-bits using the default \fIzscale()\fR intensity mapping:
+
 .nf
     cl> export dev$pix dpix ras outbands="zscale(i1)"
 .fi
 
 Apply various functions to the data before doing the same conversion:
+
 .nf
     cl> export dev$pix dpix ras outbands="zscale(log(i1))"
     cl> export dev$pix dpix ras outbands="zscale(sqrt(i1))"
 .fi
+
 Convert dev$pix to an 8-bit Sun rasterfile with no colormap, image pixel
 values are truncated to 8-bits:
+
 .nf
     cl> export dev$pix dpix ras
 .fi
 
 Convert three images representing RGB to a 24-bit Sun rasterfile, assume
 the IRAF images don't require intensity scaling:
+
 .nf
     cl> export rim,gim,bim rgb ras outbands="i1,i2,i3"
 .fi
 
 Create a Silicon Graphics RGB format image from a 3-D image:
+
 .nf
   cl> export rgbim bdata rgb outbands="b1,b2,b3"
 .fi
 
 Convert dev$pix to an 8-bit GIF grayscale image, scale the image to map 
 only pixel values between 0 and 320:
+
 .nf
   cl> export dev$pix dpix gif outbands="zscale(i1,0.0,320.0)"
 .fi
 
 Combine three images representing RGB into an 8-bit X11 window dump
 grayscale image:
+
 .nf
   cl> export rim,gim,bim gray xwd outbands="gray(i1,i2,i3)"
 .fi
 
 Convert dev$pix to an Encapsulated PostScript file at half the normal scale 
 and apply a linear transformation to scale the pixel values:
+
 .nf
     cl> export dev$pix dpix eps \
     >>>    outbands="psscale(bscale(i1,0.,0.32), 0.5)"
 .fi
+
 Convert three images representing RGB to an 8-bit GIF color image with
 a computed colormap:
+
 .nf
   cl> export rim,gim,bim rgb gif outbands="cmap(i1,i2,i3)"
 .fi
 
 Convert dev$pix to a color rasterfile using the builtin "heat" colormap
 and default intensity mapping:
+
 .nf
   cl> export dev$pix dpix ras outban='setcmap(zscale(i1),"heat")'
 .fi
 
 Convert dev$pix to a color rasterfile using the XImtool "idl15.lut" 
 LUT file in the current directory and default intensity mapping:
+
 .nf
   cl> copy /usr/local/lib/imtoolcmap/idl15.lut .
   cl> export dev$pix dpix ras outbands="setcmap(zscale(i1),'idl15.lut')"
@@ -969,22 +1032,27 @@ LUT file in the current directory and default intensity mapping:
 Given a set of DISPLAY task z1/z2 values of 10 and 320 respectively, and
 brightness/contrast values from XImtool of 0.6 and 1.2 respectively, 
 convert an image to an EPS file with the same appearance:
+
 .nf
   im> type expr
   setcmap ( zscale (i1, 10.0, 320.0), "greyscale", 0.6, 1.2 )
   im> export dev$pix dpix eps outbands="@expr"
 .fi
+
 Concatenate two images side-by-side to a PGM file, normalize each image 
 by it's exposure time and apply a default intensity mapping:
+
 .nf
   cl> export im1,im2 two pgm \
   >>>     outbands='(zscale(i1/i1.otime)) // (zscale(i2/i2.otime))'
 .fi
+
 Convert dev$pix to a color GIF using the XImtool "idl15" LUT with a spec-
 ified brightness/contrast scale.  Map only pixel values between 5 and 300 
 to 201 output intensity values.  This should produce and image identical 
 to what one would get by displaying dev$pix to imtool, setting the same 
 brightness/contrast scale, and selecting the idl15 LUT:
+
 .nf
   cl> copy /usr/local/lib/imtoolcmap/idl15.lut .
   cl> type expr.dat
@@ -995,8 +1063,10 @@ brightness/contrast scale, and selecting the idl15 LUT:
 	    1.35)
   cl> export dev$pix dpix gif outbands="@expr.dat"
 .fi
+
 Combine three images representing RGB to an 8-bit Sun rasterfile with a
 computed colormap.  Scale the intensity value of each image differently.
+
 .nf
   cl> type expr.dat
         cmap (
@@ -1005,7 +1075,9 @@ computed colormap.  Scale the intensity value of each image differently.
 	    zscale (i3, -1.0, 320.0) )
   cl> export im1,im2,im3 rgb ras outbands="@expr.dat"
 .fi
+
 Do the same example but apply a gamma correction to the images:
+
 .nf
   cl> type expr.dat
         cmap (
@@ -1013,15 +1085,19 @@ Do the same example but apply a gamma correction to the images:
             gamma (zscale(i2,0,1200), 2.2),
 	    gamma (zscale(i3,-1,320), 2.2) )
 .fi
+
 Write four images to a grayscale GIF file such that they are tiled in a 
 2x2 grid:
+
 .nf
   cl> export im1,im2,im3,im4 quad gif \
   >>>        outbands="band( (i1//i2), (i3//i4) )"
 .fi
+
 Do the same example but create a border of 2 gray pixels around each
 of the images and apply the AIPS0 LUT with brightness/contrast values
 to create a color image:
+
 .nf
   cl> copy /usr/local/lib/imtoolcmap/aips0.lut .
   cl> type expr.dat
@@ -1041,6 +1117,7 @@ to create a color image:
 Automatically scale an image ignoring data in a bad pixel mask (bpm), map the
 result to the greyscale part of the "overlay" color map, and apply a
 overlay pattern given by another mask (pattern).
+
 .nf
   cl> export dev$pix,bpm,pattern foo gif \
   >>> outbands = "setcmap(i3==0?(zscalem(i1,i2==0)*200/255.):i3+203,'overlay')"

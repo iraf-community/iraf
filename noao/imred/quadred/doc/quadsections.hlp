@@ -75,6 +75,7 @@ EXAMPLES
     qu> quadsec quad0072 template="$I.$A,"
     quad0072.11,quad0072.12,quad0072.21,quad0072.22,
 .fi
+
 .ih
 SEE ALSO
 quadformat

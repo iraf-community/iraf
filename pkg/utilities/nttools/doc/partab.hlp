@@ -51,6 +51,7 @@ in 'spectrum.tab' to undefined:
 .nf
 tt> partab INDEF spectrum.tab WAVELENGTH 100
 .fi
+
 .ih
 BUGS
 .ih

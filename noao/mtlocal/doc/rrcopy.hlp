@@ -48,14 +48,18 @@ to read a 256 x 256 30-bit IPPS raster; 42 cpu seconds for a 320 x 512
 EXAMPLES
 
 [1] List all IPPS headers from an RCOPY tape:
+
 .nf
 	cl> rrcopy mtb 1-999 make_image=no
 .fi
+
 [2] Read the first 5 rasters from tape into IRAF images ipps001 
 through ipps005 with default data types:
+
 .nf
 	cl> rrcopy mtb 1-5 ipps
 .fi
+
 .ih
 BUGS
 The Cyber format readers, including \fIrrcopy\fR, have not been implemented

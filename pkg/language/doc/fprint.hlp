@@ -1,18 +1,22 @@
 .help "fprint,print,printf" Jul95 language
 .ih
 NAME
+
 .nf
 print  -- print to the standard output
 fprint -- print to a parameter
 printf -- formatted print to the standard output
 .fi
+
 .ih
 USAGE
+
 .nf
 print  expr [expr ...]
 fprint param expr [expr ...]
 printf format [arg ...]
 .fi
+
 .ih
 PARAMETERS
 .ls expr
@@ -86,6 +90,7 @@ Conventions for W (field width) specification:
 .fi
 
 Escape sequences (e.g. "\n" for newline):
+
 .nf
         \f      formfeed
         \n      newline (crlf)
@@ -102,18 +107,24 @@ to avoid surprises.
 .ih
 EXAMPLES
 1. Print the name of the current terminal.
+
 .nf
 	cl> print ("terminal = ", envget ("terminal"))
 .fi
+
 2. Output a blank line on the standard output, e.g., in a script.
+
 .nf
 	print ("")
 .fi
+
 3. Format a command and send it to the host system.  In this example,
 "fname" is a string valued parameter.
+
 .nf
 	cl> print ("!ls -l ", fname) | cl
 .fi
+
 4. Write to a file.
 
 .nf
@@ -139,7 +150,9 @@ formatted string, whereas the scan() example requires a struct parameter.
 	cl> = s1
 	pi = 3.14159
 .fi
+
 or 
+
 .nf
 	cl> printf ("pi = %g\n", x) | scan (line)
 .fi

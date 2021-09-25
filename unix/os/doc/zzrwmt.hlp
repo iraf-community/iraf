@@ -4,12 +4,14 @@ NAME
 zzrwmt -- rewind magtape
 .ih
 SYNOPSIS
+
 .nf
 zzrwmt (chan, status)
 
 int	chan			# OS channel of magtape
 int	status
 .fi
+
 .ih
 DESCRIPTION
 A rewind of the magnetic tape opened on channel \fIchan\fR is initiated.

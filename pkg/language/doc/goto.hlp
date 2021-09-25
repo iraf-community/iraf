@@ -4,6 +4,7 @@ NAME
 goto -- branch to a label
 .ih
 USAGE
+
 .nf
 goto label
   .
@@ -12,6 +13,7 @@ goto label
 label: statement
 
 .fi
+
 .ih
 PARAMETERS
 .ls label
@@ -48,6 +50,7 @@ err:
 	print ("Invalid pixel value at ",i,j,k)
 end
 .fi
+
 .ih
 BUGS
 No checking is done to see if a jump is made into a loop.

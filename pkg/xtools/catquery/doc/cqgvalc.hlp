@@ -13,6 +13,7 @@ char	fname		# the field name
 char	str		# the returned string value
 int	maxch		# the maximum size of the returned string value
 .fi
+
 .ih
 ARGUMENTS
 .ls res     

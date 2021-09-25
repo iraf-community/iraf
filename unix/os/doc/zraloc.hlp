@@ -4,6 +4,7 @@ NAME
 zraloc -- reallocate memory
 .ih
 SYNOPSIS
+
 .nf
 zraloc (buffer, nbytes, status)
 
@@ -11,6 +12,7 @@ int	buffer			# address of buffer
 int	nbytes			# size of buffer
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The size of the previously allocated buffer pointed to by \fIbuffer\fR is

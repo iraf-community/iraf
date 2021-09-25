@@ -4,11 +4,13 @@ NAME
 zgtpid -- get unique process-id number
 .ih
 SYNOPSIS
+
 .nf
 zgtpid (pid)
 
 int	pid			# process id number
 .fi
+
 .ih
 DESCRIPTION
 The magic integer value by which the current process is known to the host

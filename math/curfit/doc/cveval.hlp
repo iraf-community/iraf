@@ -10,6 +10,7 @@ y = cveval (cv, x)
 pointer	cv	# curve descriptor
 real	x	# x value
 .fi
+
 .ih
 ARGUMENTS
 .ls cv    

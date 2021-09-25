@@ -4,6 +4,7 @@ NAME
 zsttbf -- get file status for a binary file
 .ih
 SYNOPSIS
+
 .nf
 zsttbf (chan, param, lvalue)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel assigned to file
 int	param			# parameter to be returned
 long	lvalue			# return value of parameter
 .fi
+
 .ih
 DESCRIPTION
 The \fBzsttbf\fR primitive is used to obtain file, device, and machine

@@ -81,9 +81,11 @@ and subtracting see \fBapbackground\fR.
 .ih
 EXAMPLES
 To review and modify the default aperture parameters:
+
 .nf
 	cl> apdefault
 .fi
+
 .ih
 REVISIONS
 .ls APDEFAULT V2.11

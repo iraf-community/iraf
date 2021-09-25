@@ -118,13 +118,17 @@ and any pixels replaced by the cleaning process.
 .ih
 EXAMPLES
 To create a cleaned version of the image using model \fIsmooth\fR for cleaning:
+
 .nf
 	cl> newimage image newimage
 .fi
+
 To create an model image using model \fIgauss5\fR:
+
 .nf
 	cl> newimage image newimage ex_model=yes model="gauss5"
 .fi
+
 .ih
 SEE ALSO
 msextract

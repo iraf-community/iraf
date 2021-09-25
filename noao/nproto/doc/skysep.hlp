@@ -58,6 +58,7 @@ EXAMPLES
     skysep (r1, d1, r2, d2, raunit="deg", verbose-)
     printf ("The separation is %.5f\n", skysep.sep)
 .fi
+
 .ih
 SEE ALSO
 astcalc, asthedit

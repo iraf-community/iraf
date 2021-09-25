@@ -58,6 +58,7 @@ of these files will be found throughout the IRAF directories.
 	.hlp		manual page
 	.men		package menu (module listing)
 .fi
+
 .ih
 EXAMPLES
 1. Update the standard IRAF help database.
@@ -68,9 +69,11 @@ EXAMPLES
 .fi
 
 2. Update the NOAO package help database.
+
 .nf
 	so> mkhelpdb helpdir=noao$lib/root.hd helpdb=noao$lib/helpdb.mip
 .fi
+
 .ih
 SEE ALSO
 hdbexamine, help

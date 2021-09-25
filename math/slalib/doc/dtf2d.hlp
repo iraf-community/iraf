@@ -1,4 +1,5 @@
 .help dtf2d Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slDTFD (IHOUR, IMIN, SEC, DAYS, J)
@@ -33,4 +34,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

@@ -362,12 +362,14 @@ USER COMMENT []
 B) AOSVS Bugs.
 
 .fi
+
     The current DG release of C has a bug which hangs up IRAF if the file
 :ETC:PASSWD does not exist or is not setup properly.  This file comes
 with MV/UX.  If you are running MV/UX, and you keep the file up to date,
 you should have no problem.  Otherwise, you should create the file and
 enter the following as a minimum.  Ideally, you should add one line for
 each user in the system.
+
 .nf
 
 bin::2:2::/usr/bin:

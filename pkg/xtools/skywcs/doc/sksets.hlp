@@ -13,6 +13,7 @@ pointer	coo		# the input sky coordinate descriptor
 int	parameter	# the string parameter to be set
 char	str		# the value of the string parameter to be set
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    
@@ -20,6 +21,7 @@ The sky coordinate descriptor.
 .le
 .ls parameter
 The parameter to be set. The string parameter definitions in skywcs.h are:
+
 .nf
 	S_COOSYSTEM	# the celestial coordinate system name
 .fi

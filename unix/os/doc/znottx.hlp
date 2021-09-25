@@ -4,12 +4,14 @@ NAME
 znottx -- note position in text file for a later seek
 .ih
 SYNOPSIS
+
 .nf
 znottx (chan, loffset)
 
 int	chan			# OS channel of text file
 long	loffset			# magic seek offset
 .fi
+
 .ih
 DESCRIPTION
 The absolute seek offset of the "current line" is returned in the long integer

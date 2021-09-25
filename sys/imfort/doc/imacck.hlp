@@ -4,6 +4,7 @@ NAME
 imacck -- determine if the named header keyword exists
 .ih
 SYNOPSIS
+
 .nf
 subroutine imacck (im, keyw, ier)
 
@@ -11,6 +12,7 @@ integer		im		#I image descriptor of open image
 character*(*)	keyw		#I name of keyword to be accessed
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimacck\fR procedure is used to test if the named header keyword

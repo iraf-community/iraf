@@ -13,6 +13,7 @@ pointer	coo		# the input sky coordinate descriptor
 int	parameter	# the double parameter to be set
 double	dval		# the value of the parameter to be set
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    
@@ -20,6 +21,7 @@ The sky coordinate descriptor.
 .le
 .ls parameter
 The parameter to be set. The double parameter definitions in skywcs.h are:
+
 .nf
 	S_VXOFF		# the logical ra / longitude offset in pixels
 	S_VYOFF		# the logical dec / latitude offset in pixels

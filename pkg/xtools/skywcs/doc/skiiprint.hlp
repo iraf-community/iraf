@@ -13,6 +13,7 @@ char	imagesys	# the input image system
 pointer	mw		# the input mwcs descriptor 
 pointer	coo		# the sky coordinate descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls label

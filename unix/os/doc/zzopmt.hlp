@@ -4,6 +4,7 @@ NAME
 zzopmt -- open a magtape file
 .ih
 SYNOPSIS
+
 .nf
 zzopmt (drive, density, mode, oldrec, oldfile, newfile, chan)
 
@@ -15,6 +16,7 @@ int	oldfile		# current file number on tape
 int	newfile		# requested/actual new file number
 int	chan		# OS channel assigned to file
 .fi
+
 .ih
 DESCRIPTION
 The magnetic tape on logical drive number \fIdrive\fR is opened positioned to

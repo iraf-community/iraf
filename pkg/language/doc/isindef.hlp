@@ -49,6 +49,7 @@ EXAMPLES
 	function returns 'yes' even though the first expression is a
 	valid boolean.
 .fi
+
 .ih
 BUGS
 .endhelp

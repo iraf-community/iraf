@@ -68,14 +68,18 @@ the parameters see the help text for \fBicfit\fR and \fBfit1d\fR.
 EXAMPLES
 A spectrum of an object runs down the center of a 500 x 500 image.  To
 subtract a constant background using columns 10 to 100 and 410 to 500:
+
 .nf
 	cl> background image image sample="10:100,410:500"
 .fi
+
 To subtract a quadratic background from the columns of an image in which
 the spectrum lies between lines 50 and 70:
+
 .nf
 	cl> background image image axis=2 sample="1:40,80:120" o=3
 .fi
+
 .ih
 SEE ALSO
 fit1d, icfit

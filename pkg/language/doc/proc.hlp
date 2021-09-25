@@ -4,6 +4,7 @@ NAME
 procedure -- declare a new CL procedure
 .ih
 SYNTAX
+
 .nf
 \fBprocedure\fR proc_name [( [req_par, ...] )]
 
@@ -15,6 +16,7 @@ SYNTAX
 	<executable statements>
 \fBend\fR
 .fi
+
 .ih
 ELEMENTS
 .ls proc_name
@@ -79,6 +81,7 @@ begin
 	}
 end
 .fi
+
 .ih
 BUGS
 CL procedures can only be placed in script files, they cannot currently

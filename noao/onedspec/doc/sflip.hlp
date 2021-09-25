@@ -101,6 +101,7 @@ long slit, or spectral data cubes.
     cl> sflip spec1 spec1f coord+ 	# Flip both coordinates and data
     cl> sflip spec* f//spec*		# Flip a list of images
 .fi
+
 .ih
 REVISIONS
 .ls SFLIP V2.10.4

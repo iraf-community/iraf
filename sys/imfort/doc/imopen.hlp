@@ -4,6 +4,7 @@ NAME
 imopen -- open an existing image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imopen (image, acmode, im, ier)
 
@@ -12,6 +13,7 @@ integer		acmode		#I access mode
 integer		im		#O receives image descriptor
 integer		ier		#O status code
 .fi
+
 .ih
 DESCRIPTION
 The \fIimopen\fR procedure is used to open an existing image for either
@@ -29,6 +31,7 @@ IE_OPEN:	cannot open image
 IE_NOTIMH:	attempt to access a non-image file as an image
 IE_OPNPIX:	cannot open pixel file
 .fi
+
 .ih
 SEE ALSO
 imclos, imcrea, imopnc, imdele, imrnam

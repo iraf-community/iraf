@@ -4,12 +4,14 @@ NAME
 bfclos -- close a file opened for binary file i/o
 .ih
 SYNOPSIS
+
 .nf
 subroutine bfclos (fd, status)
 
 integer		fd		#I BFIO file descriptor of open file
 integer		status		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfclos\fR procedure closes a file previously opened with \fIbfopen\fR,

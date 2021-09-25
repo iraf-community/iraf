@@ -282,9 +282,11 @@ for \fBTRANSFORM\fR and \fBIMCOMBINE\fR ignoring parameters which are
 not part of this task.
 .ih
 EXAMPLES
+
 .nf
     cl> lscombine obj* lscomb
 .fi
+
 .ih
 NOTES
 .ls LSCOMBINE: V2.12.3

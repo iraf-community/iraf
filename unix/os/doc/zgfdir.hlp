@@ -4,6 +4,7 @@ NAME
 zgfdir -- get next filename from a directory
 .ih
 SYNOPSIS
+
 .nf
 zgfdir (chan, osfn, maxch, status)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel of directory file
 packed	char osfn[maxch]	# output filename
 int	maxch, status
 .fi
+
 .ih
 DESCRIPTION
 The next machine dependent filename is returned from the directory file

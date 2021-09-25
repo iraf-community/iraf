@@ -1,20 +1,24 @@
 .help "defpac,defpar,deftask,defvar" Feb86 language
 .ih
 NAME
+
 .nf
 defpac  -- test if the named package is defined
 deftask -- test if the named task is defined
 defpar  -- test if the named parameter is defined
 defvar  -- test if the named environment variable is defined
 .fi
+
 .ih
 USAGE
+
 .nf
 defpac  (pacname)
 deftask (taskname)
 defpar  (param)
 defvar  (variable)
 .fi
+
 .ih 
 PARAMETERS
 .ls pacname
@@ -77,6 +81,7 @@ exists (the example is for a script).
 	>>> }
 	>>> ;
 .fi
+
 .ih
 SEE ALSO
 package, task, redefine, lparam

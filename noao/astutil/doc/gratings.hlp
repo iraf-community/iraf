@@ -246,6 +246,7 @@ the wavelength parameters in 80th order and what order is 6563 in.
 	  Blaze wavelength = 6598.105 Angstroms
 	  Blaze dispersion = 3.436772 Angstroms/mm
 .fi
+
 .ih
 SEE ALSO
 artdata.mkechelle

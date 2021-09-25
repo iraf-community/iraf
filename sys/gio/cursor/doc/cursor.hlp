@@ -73,6 +73,7 @@ minimize typing.  The recognized cursor mode keystrokes are shown below.
        1-9	roam
 
 .fi
+
 .ce
 Figure 2. Cursor Mode Keystrokes
 .ke
@@ -181,13 +182,17 @@ the bottom of the screen when the ':' key is pressed):
 
 Cursor mode may be initialized at login time by supplying a CL environment
 variable named "cminit".  For example,
+
 .nf
 	cl> set cminit = off
 .fi
+
 would disable cursor mode, and
+
 .nf
 	cl> set cminit = "mark;case-;xres=100;yres=50"
 .fi
+
 would enable marking, turn off case sensitivity, and set the plotting
 resolution to 100x50.  Initialization is performed only once, when cursor
 mode is first entered.

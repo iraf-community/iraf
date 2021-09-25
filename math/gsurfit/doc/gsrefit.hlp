@@ -16,6 +16,7 @@ real	z[ARB]		# array of data values
 real	w[ARB]		# array of weights
 int	ier		# error code
 .fi
+
 .ih
 ARGUMENTS
 .ls sf          

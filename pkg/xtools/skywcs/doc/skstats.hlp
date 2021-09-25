@@ -14,6 +14,7 @@ int	parameter	# the string parameter to be returned
 char	str		# the returned string parameter value
 int	maxch		# the maximum size of the returned string parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    
@@ -21,6 +22,7 @@ The sky coordinate descriptor.
 .le
 .ls parameter
 The parameter to be returned. The string parameter definitions in skywcs.h are:
+
 .nf
 	S_COOSYSTEM	# the celestial coordinate system name
 .fi

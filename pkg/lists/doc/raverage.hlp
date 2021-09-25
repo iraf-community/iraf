@@ -83,6 +83,7 @@ This is where the sorting and envelope options are useful.
 EXAMPLES
 1.  Compute the running average with a window of 100 values on the list of
 numbers in file "numbers".
+
 .nf
 	
 	cl> raverage numbers 100
@@ -104,6 +105,7 @@ overplotted.
 	cl> fields tmp 1,5 | graph append+
 	cl> fields tmp 1,6 | graph append+
 .fi
+
 .ih
 SEE ALSO
 average, boxcar

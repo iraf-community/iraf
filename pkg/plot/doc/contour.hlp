@@ -119,18 +119,24 @@ EXAMPLES
 1. Draw a contour plot of a 512 square image on the graphics terminal.
 With the default values for \fBxres\fR and \fByres\fR, the image
 would automatically be block averaged by a factor of 8 in x and y.
+
 .nf
     cl> contour crab.5009
 .fi
+
 2. The plot could be output to the plotter as a background job:
+
 .nf
     cl> contour crab.5009 device=stdplot &
 .fi
+
 3. Place a ceiling at an intensity value of 500 to cut out a noise spike.
 The plot has been moved to the lower left corner of the display.
+
 .nf
     cl> cont crab.5009 ceil=500 vx1=.1 vx2=.6 vy1=.1 vy2=.6
 .fi
+
 4. Overlay a contour plot of an image on the same image displayed on the
 display device. Note that the CONTOUR parameters \fBfill\fR and \fBperimeter\fR
 must be on and off respectively, the \fBfill\fR parameter should be specified
@@ -141,6 +147,7 @@ same way.
     cl> display m51 1 fill+
     cl> cont m51 fill+ per- device=imd
 .fi
+
 .ih
 TIME REQUIREMENTS
 The time required for \fIcontour\fR depends on the number of contours

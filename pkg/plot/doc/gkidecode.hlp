@@ -35,17 +35,23 @@ units.
 .ih
 EXAMPLES
 1. Decode the metacode instructions in file crtpict.mc in verbose mode.
+
 .nf
     cl> gkidecode crtpict.mc verbose+
 .fi
+
 2. Print a shorter listing of the same file on the versatec.
+
 .nf
     cl> gkidecode crtpict.mc | lprint dev=ver
 .fi
+
 3. Decode the third frame in metacode file "oned.mc".
+
 .nf
     cl> gkiextract oned.mc 3 | gkidecode
 .fi
+
 .ih
 SEE ALSO
 stdgraph stdplot 

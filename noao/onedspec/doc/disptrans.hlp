@@ -156,6 +156,7 @@ a wavelength of 1 micron the unit string would be:
 .nf
 	km/s 1 micron
 .fi
+
 .ih
 AIR/VACUUM CONVERSION
 The air to vacuum and vacuum to air conversions are obtained by multiplying
@@ -182,6 +183,7 @@ a nonlinear dispersion function.
     vac.ec: Dispersion transformed to angstroms in vacuum with
       t = 15. C, p = 760. mmHg, f = 4. mmHg.
 .fi
+
 .ih
 REVISIONS
 .ls DISPTRANS V2.10.4

@@ -4,9 +4,11 @@ NAME
 nhedit - edit or view an image header interactively or using a command file
 .ih
 USAGE
+
 .nf
 nhedit images fields value comment
 .fi
+
 .ih
 PARAMETERS
 .ls images
@@ -100,9 +102,11 @@ inspection of the fields of an image header.  Both the "standard" and
 fields are writable.  For example, to change the value of the standard field
 "title" of the image "m74" to "sky flat" and enter a comment  field we
 would enter the following command.
+
 .nf
 	cl> nhedit m74 title "sky flat" "comment field"
 .fi
+
 If \fIverify\fR mode is selected the editor will print the old value of the
 field and query with the new value, allowing some other value to be entered
 instead, e.g.:
@@ -127,25 +131,33 @@ If the response is "q" the editor will exit entirely.
 To conveniently print the value of the field "title" without modifying 
 the image header, we repeat the command with the special value "." and "." 
 for the comment portion.
+
 .nf
 	cl> nhedit m74 title . .
 .fi
+
 To print (or edit) the values of all header fields a field template may be
 given.
+
 .nf
 	cl> nhedit m74 * . . 
 .fi
+
 To print (or edit) the values of only a few fields the field template may
 be given as a list.
+
 .nf
 	cl> nhedit m74 w0,wpc . .
 .fi
+
 To print the value of one or more fields in a set of images, an image template
 may be given.  Both image templates and field templates may be given if
 desired.
+
 .nf
 	cl> nhedit n1.* exp . .
 .fi
+
 Abbreviations are not permitted for field names, i.e., the given template
 must match the full field name.  Currently, field name matches are case
 insensitive since image headers are often converted to and from FITS headers,
@@ -251,23 +263,29 @@ blanks, quotes, parenthesis, etc., and hence must usually be quoted to avoid
 interpretation by the CL rather than by the header editor.
 
 For example, the command
+
 .nf
 	cl> nhedit m74 title "title // ';ss'" "."
 .fi
+
 would change the title to the literal string constant "title // ';ss'",
 whereas the command
+
 .nf
 	cl> nhedit m74 title "(title // ';ss')" "."
 .fi
+
 would concatenate the string ";ss" to the old title string.  We require
 parenthesis for expression evaluation to avoid the need to doubly quote
 simple string constant values, which would be even more confusing for the
 user than using parenthesis.  For example, if expressions did not have to
 be parenthesized, the first example in the basic usage section would have
 to be entered as shown below.
+
 .nf
 	cl> nhedit m74 title '"sky flat"'	# invalid command
 .fi
+
 Expression evaluation for \fInhedit\fR, \fIhselect\fR, and similar tasks
 is carried out internally by the FMTIO library routine \fBevexpr\fR.
 For completeness minimal documentation is given here, but the documentation
@@ -402,23 +420,31 @@ EXAMPLES
 
 1. Globally edit the database "n1", setting the value of the string parameter
 "obs" to "sky" if "s-flag" is 1, to "obj" otherwise.
+
 .nf
     cl> nhedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")' "Observation value"
 .fi
+
 2. Globally edit the same database, replacing the value of the parameter
 "variance" by the square root of the original value.
+
 .nf
     cl> nhedit n1.* var '(sqrt(var))' "Variance value"
 .fi
+
 3. Replace the values of the fields A and B by the absolute value of the
 original value:
+
 .nf
     cl> nhedit n1.* a,b '(abs($))' 'Absolute value'
 .fi
+
 4. Add a blank field with a comment after a given field (K5DX).
+
 .nf
     cl> nhedit file.fits add_blank "INSTRUMENT DESCRIPTION " after=k5dx add+
 .fi
+
     Notice the use of the special field value 'add_blank' which will be 
 replaced by a blank keyword in the header.
 
@@ -429,7 +455,9 @@ replaced by a blank keyword in the header.
        "History text from column 9 to 80, no quotes" before=wcsdim add+
 
 .fi
+
 6. Run a command file through the first 50 extensions
+
 .nf
 
     cl>  for(i=1;i<51;i=i+1) {
@@ -437,27 +465,34 @@ replaced by a blank keyword in the header.
        }
 
 .fi
+
 7. Add a text file to the header. This will be put as HISTORY lines with 
 text appropriately split when long lines are encountered. Start putting the
 text after the keyword KEYWN.
+
 .nf
 
    cl> nhedit add_textf "mytext_file.tx" after=KEYWN add+
 
 
 .fi
+
 8. Run nhedit through all the extensions in a MEF file. Assuming it is 6, then:
+
 .nf
 
    cl> for(i=1;i<7;i=i+1)
           nhedit("mymef.fits["//i//"]",comfi="home$myheader.txt")
 
 .fi
+
 9. Run several fits files with the same set of header commands from the file
 "hdrc.txt".
+
 .nf
    cl> nhedit file*.fits commfile=hdrc.txt
 .fi
+
 As an example the 'hdrc.txt' content can be: (Notice the 'default_pars' command)
 
 .nf
@@ -493,6 +528,7 @@ comment "this is a comment" after="FR-SCALE" add+ show-
 # END OF HDRC.TXT FILE
 
 .fi
+
 .ih
 SEE ALSO
 hselect, hedit, mkheader, imgets, imheader

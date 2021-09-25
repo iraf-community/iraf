@@ -15,6 +15,7 @@ int	npts		# number of points
 real	chisqr		# the standard deviation of the fit
 real	errors[]	# standard deviations of the coefficients
 .fi
+
 .ih
 ARGUMENTS
 .ls cv     

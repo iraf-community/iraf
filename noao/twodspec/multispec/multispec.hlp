@@ -1,4 +1,5 @@
 .help multispec OCT85 noao.twodspec.multispec
+
 .nf
       findpeaks - Find the peaks
     fitfunction - Fit a function to the spectra parameter values
@@ -11,4 +12,5 @@
   newextraction - Create a new MULTISPEC extraction database
        newimage - Create a new multi-spectra image
 .fi
+
 .endhelp

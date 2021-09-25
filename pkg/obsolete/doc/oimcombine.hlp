@@ -997,6 +997,7 @@ sky brightness and make a weighted average:
 	cl> oimcombine obj* avsig combine=average reject=avsig \
 	>>> scale=exp zero=mode weight=exp  expname=exptime
 .fi
+
 .ih
 REVISIONS
 .ls OIMCOMBINE V2.11.4

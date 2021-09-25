@@ -38,6 +38,7 @@ EXAMPLES
 	while (fscan (list, line) != EOF)
 	    print (line)
 .fi
+
 .ih
 SEE ALSO
 for, case, break, next

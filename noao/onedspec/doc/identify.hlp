@@ -687,6 +687,7 @@ a and b, as defined earlier, as follows
 	z_2 = 1 + 3 * b * (1 + a * b)
 	z_3 = b**3
 .fi
+
 .ih
 EXAMPLES
 1.  Because this task is interactive and has many possible applications

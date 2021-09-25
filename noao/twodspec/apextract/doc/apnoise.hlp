@@ -158,6 +158,7 @@ I  Interupt immediately
 Also see the CURSOR MODE commands (:.help) and the windowing commands
 (:/help).
 .fi
+
 .ih
 DESCRIPTION
 \fBApnoise\fR computes the noise sigma as a function of data value
@@ -216,6 +217,7 @@ apertures have already been defined and traced.
 	    The read noise and gain may be varied if desired.
 	    Exit with 'q'
 .fi
+
 .ih
 REVISIONS
 .ls APNOISE V2.11

@@ -15,6 +15,7 @@ int	max_hname	# the maximum size of the header parameter name
 char	hvalue		# the returned header parameter value
 int	max_hvalue	# the maximum size of the header parameter value
 .fi
+
 .ih
 ARGUMENTS
 .ls  res    

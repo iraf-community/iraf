@@ -936,6 +936,7 @@ e.g., \fRreferences vector\fR will list all tasks that have the string
 .NH 2
 Glossary of New Tasks in the IRAF System Packages
     \fR
+
 .nf
 \fITask\fR         \fIPackage\fR                     \fIDescription\fR
 

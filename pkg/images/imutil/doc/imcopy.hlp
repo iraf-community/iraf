@@ -35,33 +35,45 @@ and the file already exists then a clobber error will occur if
 clobber checking is in effect.
 
 The verbose options prints for each copy lines of the form:
+
 .nf
 
 input image -> output image
 .fi
+
 .ih
 EXAMPLES
 1. For a simple copy of an image:
+
 .nf
 	cl> imcopy image imagecopy
 .fi
+
 2. To copy a portion of an image:
+
 .nf
 	cl> imcopy image[10:20,*] subimage
 .fi
+
 3. To copy several images:
+
 .nf
 	cl> imcopy image1,image2,frame10 a,b,c
 .fi
+
 4. To trim an image:
+
 .nf
 	cl> imcopy image[10:20,*] image
 .fi
+
 In the above example the specified section of the input image replaces the
 original input image.  To trim several images using an image template:
+
 .nf
 	cl> imcopy frame*[1:512,1:512] frame*
 .fi
+
 In this example all images beginning with "frame" are trimmed to 512 x 512.
 
 5. To copy a set of images to a new directory:
@@ -69,11 +81,15 @@ In this example all images beginning with "frame" are trimmed to 512 x 512.
 .nf
 	cl> imcopy image* directory
 .fi
+
 or
+
 .nf
 	cl> imcopy image* directory$
 .fi
+
 or
+
 .nf
 	cl> imcopy image* osdirectory
 .fi

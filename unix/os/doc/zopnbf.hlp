@@ -4,6 +4,7 @@ NAME
 zopnbf -- open a binary file
 .ih
 SYNOPSIS
+
 .nf
 zopnbf (osfn, mode, chan)
 
@@ -11,6 +12,7 @@ packed	char osfn[]		# OS filename
 int	mode			# access mode
 int	chan			# OS channel assigned to file
 .fi
+
 .ih
 DESCRIPTION
 File \fIosfn\fR is opened with access mode \fImode\fR and connected to

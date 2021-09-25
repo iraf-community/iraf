@@ -23,6 +23,7 @@ Calibration directory containing standard star data.  This parameter
 is used by several tasks in the package through redirection.  A list of
 standard calibration directories may be obtained by listing the file
 "onedstds$README"; for example:
+
 .nf
 	cl> page onedstds$README
 .fi
@@ -288,6 +289,7 @@ Some additional examples of units strings are:
 	m/s 3 inv mic
 	z 5015 ang
 .fi
+
 .ih
 SEE ALSO
 apextract, longslit, rv, imred, specwcs

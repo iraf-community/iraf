@@ -4,6 +4,7 @@ NAME
 zsektx -- seek on a text file
 .ih
 SYNOPSIS
+
 .nf
 zsektx (chan, loffset, status)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel of text file
 long	loffset			# magic seek offset
 int	status
 .fi
+
 .ih
 DESCRIPTION
 Text files are normally accessed sequentially, but random access is possible

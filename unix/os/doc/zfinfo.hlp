@@ -4,6 +4,7 @@ NAME
 zfinfo -- get directory information for the named file
 .ih
 SYNOPSIS
+
 .nf
 include <finfo.h>
 
@@ -13,6 +14,7 @@ packed	char osfn[]			# host filename
 long	out_struct[LEN_FINFO]		# output structure
 int	status
 .fi
+
 .ih
 DESCRIPTION
 A binary structure is returned describing the named file.

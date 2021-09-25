@@ -182,6 +182,7 @@ by the size of the pushback buffer.
 
 
 .tp 5
+
 .nf
 procedure ungetc (fd, ch)		# push back a character
 
@@ -238,6 +239,7 @@ wide constant SZ_LINE.  The constant SZ_LINE includes space for the newline
 character, but not for the EOS marker (character array dimensions never
 include space for the EOS, because the preprocessor automatically allows an
 extra character for the EOS when dimensioning the array for Fortran).
+
 .nf
 
 
@@ -303,6 +305,7 @@ end
 
 
 .fi
+
 The READ procedure reads a maximum of MAXCHARS characters from the file
 FD into the user supplied buffer BUFFER.  In the case of block structured
 devices, READ will continue to read blocks from the file until the output
@@ -313,6 +316,7 @@ contents of the file buffer.
 
 
 .tp 5
+
 .nf
 int procedure read (fd, buffer, maxchars)
 
@@ -477,6 +481,7 @@ No actual i/o takes place if the data is already buffered.
 
 
 .tp 5
+
 .nf
 int procedure ffault (fd, char_offset)
 
@@ -619,6 +624,7 @@ of two reduction in the number of i/o transfers.
 
 
 .tp 5
+
 .nf
 procedure ffilbf (fd, bufdes)
 
@@ -642,6 +648,7 @@ end
 
 
 .fi
+
 The FFLSBF routine is called by FFAULT to actually flush a buffer to
 the file.  Note that if the buffer is at the end of the file, and the
 buffer is only partially full, a partially full block will be written.
@@ -651,6 +658,7 @@ the z-routine must compensate.
 
 
 .tp 6
+
 .nf
 procedure fflsbf (fd, bufdes)
 
@@ -711,6 +719,7 @@ end
 
 
 .fi
+
 SEEK is used to move the file pointer (offset in a file at which the
 next data transfer will occur).  With text files, one can only seek
 to the start of a line, the position of which must have been determined
@@ -739,6 +748,7 @@ and BOF and EOF are zero or negative, the special offsets are unambiguous.
 A logical seek on a binary file is effected merely by setting the in-buffer
 pointer IOP according to the relation shown above.  A macro LSEEK (fd, offset)
 is defined to perform a logical seek with inline code.
+
 .nf
 
 
@@ -805,6 +815,7 @@ end
 
 
 .fi
+
 The asynchronous i/o primitives ZAREAD and ZAWRIT must enforce device block
 boundaries.  Thus, if maxchars is not an integral multiple of the block size,
 the file pointer will nonetheless be advanced to the next block boundary.
@@ -829,6 +840,7 @@ to be called with N arguments, the values of which make up the remaining
 arguments to ZCALL.  The additional machine dependence of this routine
 is thought to be more than justified by the clean, flexible interface
 which it provides between FIO and the various supported devices.
+
 .nf
 
 
@@ -848,6 +860,7 @@ end
 
 
 .fi
+
 Note that FIO, when it seeks to the end of a file for a buffered binary
 write, actually seeks to the nearest block boundary preceeding the physical
 EOF which is an integral multiple of the file buffer size.  When the file
@@ -857,6 +870,7 @@ for the implementor of the ZAWRITE routine on some systems.
 
 
 .tp 5
+
 .nf
 procedure awrite (fd, buffer, maxchars)
 
@@ -1050,6 +1064,7 @@ if the default file parameters are not applicable to the device in question.
 
 
 .tp 5
+
 .nf
 int procedure open (file, mode, type)
 
@@ -1088,6 +1103,7 @@ end
 
 
 .fi
+
 To conserve resources (file descriptors, buffer space) a file should be
 closed when no longer needed.  Any file buffers that may have been
 created and written into will be flushed before being deallocated.
@@ -1097,6 +1113,7 @@ STDOUT, STDERR, or CLOUT cause the respective output byte stream to be
 flushed, but are otherwise ignored.  An error action results if one
 attempts to close a file which is not open, or if one attempts to close
 a file which was not opened with OPEN.
+
 .nf
 
 
@@ -1470,6 +1487,7 @@ buffer, and initializes the descriptor for the buffer.
 
 
 .tp 5
+
 .nf
 procedure fmkbfs (fd)
 
@@ -1499,9 +1517,11 @@ end
 
 
 .fi
+
 Unlink a buffer from whatever lists it is on, relink it at head of the
 local list, and also at head of global list if a mapped file.  Called
 by FFAULT.
+
 .nf
 
 
@@ -1698,6 +1718,7 @@ clearer, it is time to go back and fill in some of the details in FFAULT.
 
 
 .tp 5
+
 .nf
 int procedure ffault (fd, char_offset)
 

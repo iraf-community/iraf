@@ -4,6 +4,7 @@ NAME
 zxwhen -- post an exception handler
 .ih
 SYNOPSIS
+
 .nf
 include <when.h>
 
@@ -13,6 +14,7 @@ int	exception		# virtual exception code
 int	new_handler		# EPA of new handler
 int	old_handler		# EPA of old handler
 .fi
+
 .ih
 DESCRIPTION
 The exception handler procedure \fInew_handler\fR is posted for the specified

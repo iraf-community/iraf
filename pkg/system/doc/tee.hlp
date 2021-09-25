@@ -27,9 +27,11 @@ EXAMPLES
 and are also passed on to the "match" command.  The result is
 a "temp" file of perhaps 100 lines, with the output to the screen
 only around 5 lines.
+
 .nf
 	cl> set | tee temp | match tty
 .fi
+
 .ih
 BUGS
 Since the processes in an IRAF pipe execute serially rather than concurrently,

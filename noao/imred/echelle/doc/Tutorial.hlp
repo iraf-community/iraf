@@ -78,6 +78,7 @@ tape drive.
 	ec> rfits mta 1-99 ech datatype=r >rfits.log &
 	ec> wfits mta spectra*
 .fi
+
 .ih
 TRACING
 The positions of the orders across the image dispersion axis as a function
@@ -90,6 +91,7 @@ first and last steps are interactive, at least initially.  After the first
 image other images may be traced noninteractively.
 
 Select an image with narrow, strong profiles and run trace:
+
 .nf
 	ec> trace imagename
 .fi
@@ -166,6 +168,7 @@ defining the apertures or later using the apedit mode in \fBapedit\fR,
 for further information.
 
 Once the extraction parameters have been set simply type
+
 .nf
 	ec> sumextract images
 .fi

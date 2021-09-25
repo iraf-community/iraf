@@ -80,6 +80,7 @@ correction, and 2 for the photomuliplier mode correction.
 .ih
 EXAMPLES
 The following example corrects a series of IIDS spectra:
+
 .nf
 	cl> coincor nite1 1-250 output=nite1cc start_rec=1
 .fi
@@ -91,12 +92,15 @@ Lick ITS:
 	cl> coincor its 1-250 output=itscc start=1 ccmode=photo \
 	>>> deadtime=2.4E-4 power=1
 .fi
+
 .ih
 TIME REQUIREMENTS
 \fBCoincor\fR requires approximately 1 second per spectrum of length 1024.
 .ih
 SEE ALSO
+
 .nf
 The \fBimred.iids\fR package is designed for reducing NOAO IIDS spectra.
 .fi
+
 .endhelp

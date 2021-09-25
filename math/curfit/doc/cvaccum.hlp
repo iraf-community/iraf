@@ -15,6 +15,7 @@ real	y		# y value
 real	weight		# weight
 int	wtflag		# type of weighting
 .fi
+
 .ih
 ARGUMENTS
 .ls cv    

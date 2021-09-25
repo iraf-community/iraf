@@ -11,6 +11,7 @@ asifit (asi, datain, npix)
     real	datain[npix]	#I input data
     int		npix		#I the number of data points
 .fi
+
 .ih
 ARGUMENTS
 .ls asi   

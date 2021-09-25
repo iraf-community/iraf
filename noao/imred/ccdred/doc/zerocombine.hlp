@@ -113,9 +113,11 @@ EXAMPLES
 1. The image data contains four zero level images.
 To automatically select them and combine them as a background job
 using the default combining algorithm:
+
 .nf
     cl> zerocombine ccd*.imh&
 .fi
+
 .ih
 SEE ALSO
 ccdproc, combine

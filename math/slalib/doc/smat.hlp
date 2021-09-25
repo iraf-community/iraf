@@ -1,4 +1,5 @@
 .help smat Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slSMAT (N, A, Y, D, JF, IW)
@@ -57,4 +58,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

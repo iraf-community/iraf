@@ -156,6 +156,7 @@ Use :parameters to see current parameter values.
 :usigma         :weights        :width          :write
 :ylevel		:t_nlost
 .fi
+
 .ih
 DESCRIPTION
 For each image in the input image list, apertures are defined and edited
@@ -331,6 +332,7 @@ for which it is impossible illustrate all likely uses.  The following
 give some simple examples.
 
 1.  To define and edit apertures for image "n1.001":
+
 .nf
 	cl> apedit n1.001
 .fi
@@ -368,8 +370,10 @@ The aperture ID table information may now be contained in the
 image header under the keywords SLFIBnnn.
 .le
 SEE ALSO
+
 .nf
 apdefault, apfind, aprecenter, apresize, aptrace, apsum, apall
 center1d, cursor, gtools, icfit
 .fi
+
 .endhelp

@@ -225,17 +225,21 @@ function is all that is required.
 EXAMPLES
 1.  To subtract the scattered light from a set of images to form a
 new set of images:
+
 .nf
 	cl> apscatter raw* %raw%new%*
 .fi
+
 This example uses a substitution in the names from raw to new.
 By default this would be done interactively
 
 2.  To subtract the scattered light in place and save the scattered light
 images:
+
 .nf
 	cl> apscatter im* "" scatter="s//im*" ref=im1 interact-
 .fi
+
 The prefix s is added to the original names for the scattered light.
 This operation is done noninteractively using a reference spectrum
 to define the apertures.

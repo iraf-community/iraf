@@ -12,6 +12,7 @@ asider (asi, x, der, nder)
     real	der[]	#O der[1] = interpolant, der[2] = 1st derivative
     int		nder	#I number of derivatives 
 .fi
+
 .ih
 ARGUMENTS
 .ls asi   

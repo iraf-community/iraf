@@ -10,6 +10,7 @@ cq = cq_map (file, mode)
 char		file		# the catalog / survey configuration file
 int		mode		# the file access mode 
 .fi
+
 .ih
 ARGUMENTS
 .ls file

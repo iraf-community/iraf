@@ -25,4 +25,5 @@ Remove the tabs from file "cubspl.f", using the default tab stops.
 	cl> delete cubspl.f
 	cl> rename temp cubspl.f
 .fi
+
 .endhelp

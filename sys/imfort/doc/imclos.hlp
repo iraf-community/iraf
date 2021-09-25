@@ -4,12 +4,14 @@ NAME
 imclos -- close an image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imclos (im, ier)
 
 integer		im		#I image descriptor of open image
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 An image opened with \fIimopen\fR or \fIimopnc\fR should be closed with
@@ -28,6 +30,7 @@ IE_CLSPIX:	error closing image pixel file
 IE_UPDHDR:	error updating image header file
 IE_UPDRO:	image header modified but image was opened read only
 .fi
+
 .ih
 NOTES
 If an image is erroneously opened read-only by a program which updates the

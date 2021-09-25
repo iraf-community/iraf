@@ -25,10 +25,12 @@ positive to negative the image may be displayed as positive or negative.
 The interactive loop is exited by pressing any button on the cursor control.
 .ih
 EXAMPLES
+
 .nf
 	cl> window
 	Window the display and push any button to exit:
 .fi
+
 .ih
 BUGS
 It may be necessary to execute FRAME before windowing.

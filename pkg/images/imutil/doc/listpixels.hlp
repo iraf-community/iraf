@@ -134,6 +134,7 @@ Examples
 
 \n          insert a newline
 .fi
+
 .ih
 EXAMPLES
 1. List the pixels of an image on the standard output.

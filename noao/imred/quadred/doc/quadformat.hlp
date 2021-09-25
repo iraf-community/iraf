@@ -389,4 +389,5 @@ CCDMEAN =             9727.605
 CCDMEANT=            683126983
 CCDPROC = 'Aug 24 13:29 CCD processing done'
 .fi
+
 .endhelp

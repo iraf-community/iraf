@@ -4,6 +4,7 @@ NAME
 zfiobf -- binary file driver
 .ih
 SYNOPSIS
+
 .nf
 zopnbf (osfn, mode, chan)		# open or create binary file
 zclsbf (chan, status)			# close binary file
@@ -17,6 +18,7 @@ char	buf[]
 int	mode, chan, maxbytes, nbytes, param, status
 long	loffset, lvalue
 .fi
+
 .ih
 DESCRIPTION
 A binary file is an extendable array of machine bytes.  There are two types

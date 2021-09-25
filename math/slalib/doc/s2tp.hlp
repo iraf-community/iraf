@@ -1,4 +1,5 @@
 .help s2tp Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slS2TP (RA, DEC, RAZ, DECZ, XI, ETA, J)
@@ -28,4 +29,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

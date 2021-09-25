@@ -13,6 +13,7 @@ msivector (msi, x, y, zfit, npts)
     real	zfit[npts]	#O interpolated values
     int		npts		#I number of points
 .fi
+
 .ih
 ARGUMENTS
 .ls msi    

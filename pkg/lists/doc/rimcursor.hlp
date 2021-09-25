@@ -260,6 +260,7 @@ image.
 .nf
     cl> rimcur obs001 wcs=world cursor=coordlist >worldlist
 .fi
+
 .ih
 NOTES
 Future plans call for implementation of cursor mode commands for image

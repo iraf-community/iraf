@@ -4,6 +4,7 @@ NAME
 zzwtmt -- wait for i/o on a magtape file
 .ih
 SYNOPSIS
+
 .nf
 zzwtmt (chan, nrecords, nfiles, status)
 
@@ -12,6 +13,7 @@ int	nrecords		# nrecords skipped
 int	nfiles			# nfiles skipped
 int	status
 .fi
+
 .ih
 DESCRIPTION
 If a transfer is in progress on the channel \fIchan\fR process execution

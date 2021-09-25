@@ -90,6 +90,7 @@ since \fIrmfiles\fR is a foreign task.
 	cl> cd iraf
 	cl> rmfiles -vf hlib$stripper
 .fi
+
 .ih
 SEE ALSO
 rmbin, rtar, wtar

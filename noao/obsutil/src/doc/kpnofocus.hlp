@@ -130,6 +130,7 @@ z  Zoom to a single measurement
 The profile radius may not exceed the initial value set by the task
 parameter.
 .fi
+
 .ih
 DESCRIPTION
 This task is a script based on the task \fBstarfocus\fR.  The details

@@ -13,6 +13,7 @@ real	y[npts]		# y array, 1 <= y[i] <= nlines
 real	zfit[npts]	# data values
 int	npts		# number of data points
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

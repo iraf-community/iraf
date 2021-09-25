@@ -543,6 +543,7 @@ EXAMPLES
 .nf
     cl> autoidentify spec002 5400 2.5 crpix=1
 .fi
+
 .ih
 REVISIONS
 .ls AIDPARS V2.12.2

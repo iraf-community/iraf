@@ -200,6 +200,7 @@ Examples
 To clear all frames, one would issue the following sequence
 .ls
 .tp 4
+
 .nf
 GKI_ESCAPE  11  IFA[1] = IDS_EOD  IBPL[1] = IDS_EOD
 GKI_CLEARWS
@@ -211,6 +212,7 @@ GKI_CLEARWS
 To write an image to frame 2 ( IIS internal frame number 1 )
 .ls
 .tp 2
+
 .nf
 GKI_ESCAPE  11  IFA[1] = 2  IFA[2] = IDS_EOD  IBPL[1] = IDS_EOD
 GKI_PCELL   data
@@ -220,6 +222,7 @@ GKI_PCELL   data
 To activate frame 1 in red and green
 .ls
 .tp 2
+
 .nf
 GKI_ESCAPE  13  IFA[1] = 1  IFA[2] = IDS_EOD  ICOLOR[1] = IDS_RED
 		ICOLOR[2] = IDS_GREEN  ICOLOR[3] = IDS_EOD
@@ -338,6 +341,7 @@ define	IDS_BUT_RD	4098		# "cursor number" for read buttons cmd
 define	IDS_BUT_WT	4099		# wait for button press, then read
 define	IDS_CRAW2	4100		# a second "raw" cursor
 .fi
+
 .nh
 Explanation
 
@@ -613,6 +617,7 @@ Example
 to a changing cursor position.  It is assumed that the "frame" array
 consists of a list of frames to be panned together, terminated, as
 is almost everything in this code, by IDS_EOD.
+
 .nf
 
 # Pan subroutine
@@ -680,11 +685,13 @@ begin
 	} until (button > 0)
 end
 .fi
+
     [The call to cvpan may in fact need to be a series of calls, with
 the array "frames" specifying one frame at a time, and (x,y) being the
 new cursor position for that particular frame, so that differently panned
 frames retain their relative offsets.]
     The cursor and button routines are given here.
+
 .nf
 
 # CV_RDBUT -- read button on trackball (or whatever)
@@ -790,4 +797,5 @@ begin
 	call gescape (cv_gp, IDS_CONTROL, Mems[cv_stack], count+8)
 end
 .fi
+
 .endhelp

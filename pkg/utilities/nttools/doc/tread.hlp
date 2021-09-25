@@ -133,6 +133,7 @@ list of
 column names so there is no question about spelling.  This list may be
 edited to rearrange (or delete) the names, and then pass the list to this task 
 by preceding the its file name with an "@", for example,  
+
 .nf
 tt> tedit junk columns=@colnames.lis
 .fi
@@ -147,6 +148,7 @@ EXAMPLES
 .nf
 tt> tread m12b columns="SHARP,ROUND"
 .fi
+
 .ih 
 BUGS
 .ih

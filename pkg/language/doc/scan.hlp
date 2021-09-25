@@ -1,6 +1,7 @@
 .help "scan,scanf,fscan,fscanf,nscan" Jul95 language
 .ih
 NAME
+
 .nf
 scan   -- read parameters from standard input
 fscan  -- read parameters from file, or another parameter
@@ -8,8 +9,10 @@ scanf  -- formatted read from standard input
 fscanf -- formatted read from file, or another parameter
 nscan  -- get number of parameters scanned
 .fi
+
 .ih
 USAGE
+
 .nf
 scan  (p1, p2, p3 ... pn)
 fscan (param, p1, p2, p3, ... pn)
@@ -18,6 +21,7 @@ fscanf (param, format, p1, p2, p3, ... pn)
 
 n = nscan()
 .fi
+
 .ih
 PARAMETERS
 .ls pN

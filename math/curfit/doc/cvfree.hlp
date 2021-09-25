@@ -9,6 +9,7 @@ cvfree (cv)
 .nf
 pointer	cv	# curve descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls cv     

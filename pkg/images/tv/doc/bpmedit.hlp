@@ -141,6 +141,7 @@ process.
     maxvalue [value]	 Maximum value for modification (INDEF=maximum)
     write [name]	 Write changes to name
 .fi
+
 .ih
 EXAMPLES
 1.  Interactively edit a mask.

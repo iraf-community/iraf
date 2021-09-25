@@ -109,6 +109,7 @@ in two columns, "last" and "first".
 .nf
 tt> tjoin phone.tab address.tab output.tab LAST,FIRST LAST,FIRST
 .fi
+
 .ih
 BUGS
 .ih

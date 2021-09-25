@@ -17,6 +17,7 @@ real	weight[npts]	# array of weights
 int	npts		# the number of data points
 int	wtflag		# type of weighting
 .fi
+
 .ih
 ARGUMENTS
 .ls sf      

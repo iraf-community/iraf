@@ -685,6 +685,7 @@ o values to the range -1 to 1 and then iteratively evaluating them.
 EXAMPLES
 Because this task is interactive it is difficult to provide an actual
 example.  The following describes a typical usage on arc spectra.
+
 .nf
 	cl> ecidentify arc1.ec,arc2.ec
 .fi

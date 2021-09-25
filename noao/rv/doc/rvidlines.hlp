@@ -206,6 +206,7 @@ Labels:
       user - User labels
       both - Combination of coords and user
 .fi
+
 .ih
 DESCRIPTION
 \fBRvidlines\fR measures radial velocities from spectra by determining the
@@ -421,6 +422,7 @@ in the same log file they can be easily extracted with the match command:
     im2 40 : Vhelio = 14.65 km/s, Mean err =  11.2 km/s, Lines = 7
     ...
 .fi
+
 .ih
 DATABASE RECORDS
 The database specified by the parameter \fIdatabase\fR is a directory of

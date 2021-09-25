@@ -1,4 +1,5 @@
 .help zd Jun99 "Slalib Package"
+
 .nf
 
       DOUBLE PRECISION FUNCTION slZD (HA, DEC, PHI)
@@ -45,4 +46,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

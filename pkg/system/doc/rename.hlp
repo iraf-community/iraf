@@ -42,26 +42,36 @@ otherwise an error is generated to prevent overwriting files.
 EXAMPLES
 
 1. Rename file "fred" to "jay".
+
 .nf
     cl> rename fred jay
 .fi
+
 2. Change the root name of a set of files from "out" to "pkout".
+
 .nf
     cl> rename out.x,out.o,out.par pkout field=root
 .fi
+
 3. Change the extension of all ".f77" files from ".f77" to ".f".
+
 .nf
     cl> rename *.f77 f field=extn
 .fi
+
 4. Move all files with a ".dat" extension to a new directory.
+
 .nf
     cl> rename *.dat data$
     cl> rename *.dat /data/user
 .fi
+
 5. Add a ".fits" extension to all files in a directory.
+
 .nf
     cl> rename im00* fits field=extn
 .fi
+
 .ih
 BUGS
 .ih

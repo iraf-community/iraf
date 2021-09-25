@@ -65,6 +65,7 @@ The catalog  section begins with the keyword \fIcatalog\fR, followed by
 any number of name and error(name), column associations.
 
 .ls Syntax
+
 .nf
 catalog
 
@@ -91,6 +92,7 @@ This name is used to match objects in the catalog file with objects in the
 observations file.
 
 .ls Example
+
 .nf
 # Sample catalog section for the UBV system.
 
@@ -116,6 +118,7 @@ The observations section begins with the keyword \fIobservation\fR, followed by
 any number of name and error (name) column associations.
 
 .ls Syntax
+
 .nf
 observation
 
@@ -142,6 +145,7 @@ This name is used to match objects in the observations file with
 objects in the catalog file.
 
 .ls Example
+
 .nf
 # Sample observation section for the UBV system.
 
@@ -170,6 +174,7 @@ followed by the list of parameter declarations,
 followed by the transformation equation.
 	
 .ls Syntax
+
 .nf
 transformation
 
@@ -233,6 +238,7 @@ it MAY be possible to invert the system of equations and so evaluate
 the catalog variables for program objects.
 
 .ls Example
+
 .nf
 
 # Sample transformation section for the UBV system

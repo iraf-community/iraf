@@ -333,13 +333,17 @@ editor.
 
 4.  Assign the nearest reference spectrum in zenith distance using
 wildcard lists.  By default the aperture numbers must match.
+
 .nf
     cl> refspec *.imh "" sort=zd select=nearest time-
 .fi
+
 5.  Assign a specific reference spectrum to all apertures.
+
 .nf
     cl> refspec *.imh "" refer=refnite1 ignoreaps+
 .fi
+
 6.  Confirm assignments.
 
 .nf
@@ -395,6 +399,7 @@ for apertures 2 thru 5.
 .nf
      cl> refspec spec 2-5 recfor+ refer=arc.*.imh refaps=1 ignoreaps+
 .fi
+
 .ih
 REVISIONS
 .ls REFSPECTRA V2.10.3

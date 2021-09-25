@@ -456,6 +456,7 @@ EXAMPLES
 	cl> scopy comb1d.* comb.ms format="multispec"
 	cl> imdel comb1d.*
 .fi
+
 .ih
 REVISIONS
 .ls ODCOMBINE V2.12.3

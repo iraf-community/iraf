@@ -68,6 +68,7 @@ in the file 'columns.dat'.  Eliminate duplicate rows:
 .nf
 tt> tproject datalog.tab sublog.tab @columns.dat uniq+
 .fi
+
 .ih
 BUGS
 .ih

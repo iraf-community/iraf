@@ -4,6 +4,7 @@ NAME
 bfwrit -- write to a binary file at the specified offset
 .ih
 SYNOPSIS
+
 .nf
 integer function bfwrit (fd, buf, nchars, offset)
 
@@ -13,6 +14,7 @@ integer		nchars		#I number of SPP chars to be written
 integer		offset		#I 1-indexed char offset into file
 
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfwrit\fR procedure writes \fInchars\fR char units of storage from

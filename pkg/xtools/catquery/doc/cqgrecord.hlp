@@ -13,6 +13,7 @@ char	buf		# the output buffer
 int	maxch		# the maximum size of the output buffer
 int	recno		# the record to be fetched
 .fi
+
 .ih
 ARGUMENTS
 .ls res    

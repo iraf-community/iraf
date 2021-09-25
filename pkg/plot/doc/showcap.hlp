@@ -19,6 +19,7 @@ new graphcap device entries.
 
 At startup \fBshowcap\fR prints the following instructions to STDOUT, then
 prompts with an asterisk.
+
 .nf
 
 	cmd :  `set' device
@@ -32,6 +33,7 @@ prompts with an asterisk.
 	*
 	
 .fi
+
 The user must first use `set' to tell \fBshowcap\fR which graphics device to
 read from graphcap.  After a `set' or `*', the full graphcap entry for the
 named device will be printed.  To view an individual capability, type the
@@ -89,6 +91,7 @@ from coordinate x=150, y=350 after a read-cursor request.
 			      $$8#1=#-39;);
 		    X(R1)=150 Y(R2)=350, key = a
 .fi
+
 .ih
 BUGS
 Diagnostics are mostly limited to a numeric status return when debugging

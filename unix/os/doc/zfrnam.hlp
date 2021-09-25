@@ -4,6 +4,7 @@ NAME
 zfrnam -- rename a file
 .ih
 SYNOPSIS
+
 .nf
 zfrnam (old_osfn, new_osfn, status)
 
@@ -11,6 +12,7 @@ packed	char old_osfn[]		# OS name of existing file
 packed	char new_osfn[]		# new OS name of file
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The name of file \fIold_osfn\fR is changed to \fInew_osfn\fR.

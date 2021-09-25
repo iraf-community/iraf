@@ -21,6 +21,7 @@ int	max_funits	# the maximum size of the returned field units
 char	format		# the field format
 int	max_format	# the maximum size of the returned field format
 .fi
+
 .ih
 ARGUMENTS
 .ls res    
@@ -73,6 +74,7 @@ Related routines of interest are:
 .nf
 call cq_fname (res, fieldno, name, max_name)
 .fi
+
 .ih
 SEE ALSO
 cqfinfo

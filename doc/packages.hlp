@@ -773,18 +773,24 @@ Calls to intrinsic functions.
 .le
 
 For example, the command
+
 .nf
     cl> imcalc "subras = image[40:50,33:43]"
 .fi
+
 would extract a subraster from the image "image" into the new image
 "subras".  The command
+
 .nf
     cl> imcalc "image = image[*,-*]"
 .fi
+
 would flip the columns of the two-dimensional input image.  The command
+
 .nf
     cl> imcalc "avg = (a + max(b,0) + c) / 3"
 .fi
+
 where "a", "b", and "c" are the names of images,
 would produce the new image "avg" which is the average of the images
 "a", "c", and the image "b" with all negative pixels set to zero.
@@ -1983,4 +1989,5 @@ system is provided by the IRAF package structure outlined above.
 	XV.A.2	DECOMP			onedspec, maybe
         XIV.B	(analysis)		onedspec
 .fi
+
 .endhelp

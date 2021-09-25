@@ -91,6 +91,7 @@ system files is also straightforward.
 	cl> setinst.dir=""
 	cl> setinst fits
 .fi
+
 .ih
 SEE ALSO
 instruments, ccdred, ccdproc

@@ -159,31 +159,42 @@ appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
 1. Plot from the lower left to upper right of 512 square image crab.5009.
+
 .nf
     cl> pvector crab.5009 1. 1. 512. 512.
 .fi
+
 2. Plot the same vector but with the sampling width = 3.
+
 .nf
     cl> pvector crab.5009 1. 1. 512. 512. width=3
 .fi
+
 3. Plot a vector in same image with center position 256, 256, and a position
 angle of 45 degrees which extends from one edge of the frame to the other.
+
 .nf
     cl> pvector crab.5009 0. 0. 0. 0. 256. 256. theta=45.
 .fi    
+
 or
+
 .nf
     cl> pvector crab.5009 xc=256. xc=256. theta=45.
 .fi
 
 4. Plot the above vector with a length of 100 pixels.
+
 .nf
     cl> pvector crab.5009 0. 0. 0. 0. 256. 256. theta=45. length=100.
 .fi
+
 or
+
 .nf
     cl> pvector crab.5009 xc=256. xc=256. theta=45. length=100.
 .fi
+
 .ih
 TIME REQUIREMENTS
 It takes approximately 6.7 cpu seconds to compute and plot the twenty

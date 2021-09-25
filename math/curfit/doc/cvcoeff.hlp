@@ -11,6 +11,7 @@ pointer	cv		# curve descriptor
 real	coeff[]		# the coefficient array
 int	ncoeff		# the number of coefficients
 .fi
+
 .ih
 ARGUMENTS
 .ls pointer

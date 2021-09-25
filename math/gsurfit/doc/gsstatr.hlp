@@ -12,6 +12,7 @@ rval = gsstatr (sf, parameter)
 pointer	sf		# surface descriptor
 real	parameter	# real parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

@@ -26,17 +26,23 @@ than 10.  \fIRadix\fR can only be called as a function.
 .ih
 EXAMPLES
 1. Print the hex number 7cde in binary.
+
 .nf
 	cl> = radix (7cdex, 2)
 .fi
+
 2. Print the hex number 7cde in decimal.
+
 .nf
 	cl> = 7cdex
 .fi
+
 3. Print the number in variable I in decimal, octal, and hex.
+
 .nf
 	cl> print (i, radix(i,8), " ", radix(i,16))
 .fi
+
 .ih
 BUGS
 Very large bases produce strange results.

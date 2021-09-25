@@ -12,6 +12,7 @@ ival = gsstati (sf, parameter)
 pointer	sf		# surface descriptor
 int	parameter	# integer parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

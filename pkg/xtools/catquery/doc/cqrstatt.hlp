@@ -14,6 +14,7 @@ int	parameter	# the parameter to be returned
 char	text		# the returned text parameter value
 int	maxch		# the maximum size of the returned text parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls res    

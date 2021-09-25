@@ -12,6 +12,7 @@ y = msigrl (msi, x, y, npts)
     real	y[npts]		#I y values, 1 <= y <= npts, y[1] = y[npts]
     int		npts		#I number of points
 .fi
+
 .ih
 ARGUMENTS
 .ls msi    

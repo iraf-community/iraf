@@ -21,22 +21,30 @@ value given as the new default number of commands to be printed.
 .ih
 EXAMPLES
 1. Print the last few commands.
+
 .nf
 	cl> history
 .fi
+
 2. Print the entire history list.
+
 .nf
 	cl> history -999
 .fi
+
 3. Change the default number of history lines to be printed to 5 (and print
 the last five commands).
+
 .nf
 	cl> history 5
 .fi
+
 4. Save the history in the file "commands".
+
 .nf
 	cl> history -999 > commands
 .fi
+
 .ih
 SEE ALSO
 ehistory

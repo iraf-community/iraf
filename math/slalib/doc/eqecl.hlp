@@ -1,4 +1,5 @@
 .help eqecl Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slEQEC (DR, DD, DATE, DL, DB)
@@ -28,4 +29,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

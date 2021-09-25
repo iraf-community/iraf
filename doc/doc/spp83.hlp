@@ -145,6 +145,7 @@ limited to exactly two.  The decimal point is optional.
 	01:00:00	= 1.0
 	01:00:00.00	= 1.0
 .fi
+
 .ih
 3.1.5 Character Constants
 
@@ -171,6 +172,7 @@ The following escape sequences are defined:
 	\r		carriage return
 	\t		tab
 .fi
+
 .ih
 3.1.6 String Constants
 
@@ -192,6 +194,7 @@ The following identifiers are reserved (though some are not actually used
 at present):
 
 .ls -8
+
 .nf
 auto		do		include		short
 begin		double		int		sizeof
@@ -957,6 +960,7 @@ that the limiting values are indefinite.  INDEF is another predefined constant.
 
 
 .tp 6
+
 .nf
 	procedure limits (data, npix, minval, maxval)
 
@@ -1343,6 +1347,7 @@ gaussian elimination with partial pivoting is shown below.  The help
 text is shown with text formatter commands inserted.  The restriction
 of this procedure to matrices of a fixed size is unfortunate, but
 we have kept it that way to conform to Bevington's original code.
+
 .nf
 
 
@@ -1495,6 +1500,7 @@ a match.  For example:
 In this case, STRMATCH would search for the string "naxis =", returning
 the index of the first character matched or zero.  The meta-characters are
 defined in the INCLUDE file "pattern.h", as follows:
+
 .nf
 
 

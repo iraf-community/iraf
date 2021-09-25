@@ -31,19 +31,25 @@ The \fIeparam\fR task may be used to edit either ordinary task parameter
 sets, or named parameter files.
 The presence or absence of a \fB.par\fR filename extension is used to
 determine whether an operand is a taskname or a filename.  For example,
+
 .nf
 	cl> eparam skypars.par
 .fi
+
 will edit the parameter \fIfile\fR \fBskypars.par\fR in the current directory,
 whereas
+
 .nf
 	cl> eparam skypars
 .fi
+
 will edit the parameter set for the pset-task \fIskypars\fR.
 Lastly, since \fIspypars\fR is a pset-task, we could just type
+
 .nf
 	cl> skypars
 .fi
+
 to edit or review the contents of the pset.
 
 The parameter file \fBskypars.par\fR in the above example would probably be
@@ -126,13 +132,17 @@ it was positioned to when colon command entry mode was entered.
 EXAMPLES
 1. Set standout mode and disable the editing of hidden parameters (leaving
 only the positional parameters).
+
 .nf
 	cl> epinit = "standout noshowall"
 .fi
+
 2. Edit the parameters for the \fIdelete\fR task.
+
 .nf
 	cl> ep delete
 .fi
+
 .ih
 SEE ALSO
 lparam, ehistory

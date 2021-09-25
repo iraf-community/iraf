@@ -16,6 +16,7 @@ real	z		# z value
 real	weight		# weight
 int	wtflag		# type of weighting
 .fi
+
 .ih
 ARGUMENTS
 .ls sf      

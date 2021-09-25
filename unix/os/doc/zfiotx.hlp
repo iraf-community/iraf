@@ -4,6 +4,7 @@ NAME
 zfiotx -- text file driver
 .ih
 SYNOPSIS
+
 .nf
 zopntx (osfn, mode, chan)		# open or create text file
 zclstx (chan, status)			# close text file
@@ -19,6 +20,7 @@ char	text[]
 int	mode, chan, maxch, nchars, status, param
 long	loffset, lvalue
 .fi
+
 .ih
 DESCRIPTION
 All text file i/o is via these primitives.  The detailed specifications

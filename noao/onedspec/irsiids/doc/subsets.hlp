@@ -39,12 +39,16 @@ spectrum.
 EXAMPLES
 The following example forms 50 new spectra from nite1.2001-nite1.2002,
 nite1.2003-nite1.2004, ...
+
 .nf
 	cl> subsets nite1 2001-2100
 .fi
+
 The following example creates new spectra from the pairs nite2.2001-nite2.2002,
 nite2.2003-nite2.2004 in spite of the order of the record numbers entered.
+
 .nf
 	cl> subsets nite2 2001,2003,2002,2004
 .fi
+
 .endhelp

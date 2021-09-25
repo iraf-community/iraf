@@ -4,6 +4,7 @@ NAME
 zcall -- call an external procedure by reference
 .ih
 SYNOPSIS
+
 .nf
 zcall1 (procedure, arg1)
 zcall2 (procedure, arg1, arg2)
@@ -14,6 +15,7 @@ zcall5 (procedure, arg1, arg2, arg3, arg4, arg5)
 int	procedure		# reference to external procedure
 arb	arg1, ..., arg\fIn\fR		# arguments for external procedure
 .fi
+
 .ih
 DESCRIPTION
 The subroutine referenced by the magic integer passed as the first argument

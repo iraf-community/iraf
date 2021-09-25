@@ -4,9 +4,11 @@ NAME
 credit -- interactively edit cosmic rays using an image display
 .ih
 USAGE	
+
 .nf
 credit input output
 .fi
+
 .ih
 PARAMETERS
 See parameters for \fBimedit\fR.
@@ -33,6 +35,7 @@ the 'b' key algorithm.
 .nf
     cl> credit obj012 crobj012 cursor=crlist.dat display-
 .fi
+
 .ih
 SEE ALSO
 imedit, epix

@@ -12,6 +12,7 @@ value = asigeti (asi, param)
     pointer	asi		#I interpolant descriptor
     int		param		#I parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls asi      

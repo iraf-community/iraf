@@ -159,6 +159,7 @@ redshift is computed:
 	-0.76190476190476
 	cl> dopcor artspec "" -0.762 flux+
 .fi
+
 .ih
 REVISIONS
 .ls DOPCOR V2.10.3

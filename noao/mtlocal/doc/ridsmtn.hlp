@@ -65,10 +65,12 @@ string is entered, the default data type \fIreal\fR is used.
 .ls offset = 0
 The integer value of this parameter is added to each IDS record number when
 generating output filenames.  Filenames are of the form 
+
 .nf
 	\fIiraf_file\fR.record_number+\fIoffset\fR
 
 .fi
+
 The offset parameter can be used to create a sequence of output IRAF 
 filenames with continuous, sequential suffixes over more than one night's data.
 .le
@@ -94,11 +96,14 @@ EXAMPLES
 [1] Convert all records on the IDS tape to IRAF images, with the root image name
 being "aug83".  The data is mountain reduced, and all records will be
 converted.  The IDS tape is mounted on mtb.
+
 	.nf
 	cl> ridsmtn mtb aug83
 .fi
+
 [2] List the headers from the same mountain tape read in example 1 but don't
 make output images.  A \fIlong_header\fR will be listed; sample output is shown.
+
 .nf
 cl> ridsmtn mtb make_image=no long_header=yes
 
@@ -125,6 +130,7 @@ contains raw data, not reduced.
 .nf
 	cl> ridsmtn mtb red- make_im- rec=5086,5087 print_pix-
 .fi
+
 .ih
 SEE ALSO
 ridsout, ridsfile

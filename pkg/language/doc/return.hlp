@@ -18,10 +18,12 @@ may be present in a script.  A \fIreturn\fR statement without a value
 is equivalent to a \fIbye\fR.
 .ih
 EXAMPLES
+
 .nf
 return
 return (j+3)
 .fi
+
 .ih
 BUGS
 The return value cannot currently be utilized by the invoking procedure.

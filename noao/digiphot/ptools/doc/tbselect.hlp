@@ -80,6 +80,7 @@ minimum			min(x,y)	maximum			max(x,y)
 convert to integer	int(x)		convert to real		real(x)
 nearest integer		nint(x)		modulo			mod(x)
 .fi
+
 .ih
 EXAMPLES
 
@@ -97,6 +98,7 @@ removing all INDEF valued magnitudes.
     pt> tbselect  n2264b.nst.1 n2264out  "MAG != INDEF"
 
 .fi
+
 .ih
 BUGS
 Column names must be set off from operators by blanks in the expression so

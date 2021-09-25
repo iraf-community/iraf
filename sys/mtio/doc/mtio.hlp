@@ -558,6 +558,7 @@ drive and position to the desired file.
 
 
 .tp 8
+
 .nf
 int procedure mtopen (filespec, access_mode, bufsize)
 

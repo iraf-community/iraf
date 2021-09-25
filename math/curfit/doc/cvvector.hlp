@@ -12,6 +12,7 @@ real	x[]		# x array
 real	yfit[]		# array of fitted y values
 int	npts		# number of x values
 .fi
+
 .ih
 ARGUMENTS
 .ls cv   

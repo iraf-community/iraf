@@ -4,6 +4,7 @@ NAME
 zfprot -- set, remove, or query file delete protection
 .ih
 SYNOPSIS
+
 .nf
 zfprot (osfn, protflag, status)
 
@@ -11,6 +12,7 @@ packed	char osfn[ARB]		# OS filename
 int	protflag		# operation to be performed
 int	status
 .fi
+
 .ih
 DESCRIPTION
 A protected file cannot be deleted, accidentally or otherwise.

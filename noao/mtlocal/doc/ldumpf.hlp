@@ -26,13 +26,17 @@ to convert IPPS rasters stored on DUMPF tapes to IRAF images, use task
 .ih
 EXAMPLES
 List all permanent files on a DUMPF tape:
+
 .nf
 	cl> ldumpf mta 1-999
 .fi
+
 List information for the 4th permanent file on the tape:
+
 .nf
 	cl> ldumpf mta 4
 .fi
+
 .ih
 BUGS
 The Cyber format readers, including task \fIldumpf\fR, have not been 

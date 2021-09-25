@@ -35,11 +35,13 @@ images must match the number input. The pixel type of the output image(s) will
 match that of the input image(s), however, internally all calculations are 
 performed as type real. The correction is performed assuming 
 that the non-linearity can be represented by the following simple relationship:
+
 .nf
 
 ADU' = ADU * [ coeff1 + coeff2 * (ADU / 32767) + coeff3 * (ADU / 32767)**2 ]
 
 .fi
+
 The coefficients which occur in this expression are specified by the
 parameters \fIcoeff1\fR, \fIcoeff2\fR and \fIcoeff3\fR. Their values are 
 derived from periodic instrumental calibrations and are believed to be
@@ -63,6 +65,7 @@ EXAMPLES
 	cl> irlincor @list @list coeff1=1.0 coeff2=0.1 coeff3=0.01
 
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

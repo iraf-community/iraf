@@ -4,6 +4,7 @@ NAME
 imakw -- add or set the value of an image header keyword
 .ih
 SYNOPSIS
+
 .nf
 subroutine imakwb (im, keyw, bval, comm, ier)
 subroutine imakwc (im, keyw, cval, comm, ier)
@@ -22,6 +23,7 @@ integer		ival		#I integer keyword value
 real		rval		#I real keyword value
 doubleprecision	dval		#I double precision keyword value
 .fi
+
 .ih
 DESCRIPTION
 The \fIimakw\fR procedures are used to set the values of image header keywords.
@@ -44,6 +46,7 @@ SYS_IDBOVFL:	out of space in image header
 SYS_IDBREDEF:	attempt to redefine an image header keyword
 SYS_IDBTYPE:	illegal header parameter data type conversion
 .fi
+
 .ih
 SEE ALSO
 imaddk, imacck, impkw, imgkw

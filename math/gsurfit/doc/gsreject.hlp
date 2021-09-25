@@ -13,6 +13,7 @@ real	y		# y value, ymin <= y <= ymax
 real	z		# data value
 real	weight		# weight
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

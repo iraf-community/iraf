@@ -629,6 +629,7 @@ calibration directory is used for determining flux calibrations from
 standard star observations.  The calibration directories contain data files
 with standard star fluxes and band passes.  The available extinction
 files and flux calibration directories may be listed using the command:
+
 .nf
 
 	cl> help onedstds
@@ -787,11 +788,13 @@ parameter set organization is to collect all the algorithm parameters
 in one place separate from the processing parameters and include only
 those which are relevant for slit data.  The parameter values
 can be changed from the defaults by using the parameter editor,
+
 .nf
 
 cl> epar sparams
 
 .fi
+
 or simple typing \fIsparams\fR.
 The parameter editor can also be entered when editing the \fBdoslit\fR
 parameters by typing \fI:e\fR when positioned at the \fIsparams\fR
@@ -1176,6 +1179,7 @@ Flux calibrate demoobj1
 cl> doslit demoobj1 arcs=demoarc1,demoarc2 stand=demostd1 \
 >>> extcor=yes, fluxcal=yes resize=yes redo+
 .fi
+
 .ih
 REVISIONS
 .ls DOSLIT V2.11

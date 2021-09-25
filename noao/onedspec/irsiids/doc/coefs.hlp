@@ -44,6 +44,7 @@ EXAMPLES
 The following example reads the coefficients from the headers
 for nite1 arc spectra taken near the beginning and end of the
 night and creates a database file called nite1.db:
+
 .nf
 	cl> coefs nite1 3-4,201-202 nite1.db
 .fi

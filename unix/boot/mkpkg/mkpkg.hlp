@@ -581,14 +581,19 @@ and the run successfully completes.
 .ih
 EXAMPLES
 Update the current package.
+
 .nf
 	cl> mkpkg
 .fi
+
 Update the package library but do not relink.
+
 .nf
 	cl> mkpkg libpkg.a
 .fi
+
 Make a listing of the package.
+
 .nf
 	cl> mkpkg listing
 .fi

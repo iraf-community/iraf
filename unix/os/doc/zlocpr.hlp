@@ -4,12 +4,14 @@ NAME
 zlocpr -- get the entry point address of a procedure
 .ih
 SYNOPSIS
+
 .nf
 zlocpr (procedure, address)
 
 extern	procedure()		# external procedure
 int	address			# address of the procedure
 .fi
+
 .ih
 DESCRIPTION
 The entry point address (EPA) of \fIprocedure\fR is returned in the integer

@@ -39,4 +39,5 @@ To flatten a set of two dimensional images excluding pixels below
 .nf
 	cl> flatten frame* flat minflat=0.2
 .fi
+
 .endhelp

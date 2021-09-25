@@ -163,8 +163,10 @@ minimum			min(x,y)	maximum			max(x,y)
 convert to integer	int(x)		convert to real		real(x)
 nearest integer		nint(x)		modulo			mod(x)
 .fi
+
 .ih
 EXAMPLES
+
 .nf
 1. Dump the "ID", "MAG" and "MAGERR" columns of the DAOPHOT package NSTAR
 output to the standard output.
@@ -185,6 +187,7 @@ result to graph.
 
     pt> tbdump n4147.nst.1 "" yes rows="1-100"
 .fi
+
 .ih
 BUGS
 .ih

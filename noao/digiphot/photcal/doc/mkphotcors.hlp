@@ -264,6 +264,7 @@ existing image set file m17.imsets. In this case the filter set is "J H K".
 .nf
 	ph> mkphotcors m17.imsets "J,H,K" "" m17.shifts m17.apcors
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

@@ -19,7 +19,9 @@ OS dependent pathnames.  A Virtual File Name (VFN) has the following form:
 .nf
 	ldir$root.extn
 .fi
+
 where
+
 .nf
 	ldir		logical directory or device name
 	root		root or base file name
@@ -85,9 +87,11 @@ and the applications program will read from the standard input when
 it opens the corresponding file in the template.
 
 For example,
+
 .nf
 	cl> concat "file1, @STDIN, STDIN, file2", > ofile
 .fi
+
 concatenates the file "file1", the contents of the files named in the
 standard input (until the first EOF), the contents of the standard input
 itself (until the second EOF), and the contents of the file "file2",
@@ -105,9 +109,11 @@ file of the same name is created as an output file.  If "clobber" is
 defined as "no" in the environment, an IRAF task will abort if a new file
 would clobber an existing file.  If file clobber is enabled, FIO will try
 to overwrite the old file, and will abort if it cannot do so.
+
 .nf
 	cl> set clobber = "yes"
 .fi
+
 More explicit file protection is provided by the CL commands PROTECT and
 UNPROTECT.  A protected file cannot be deleted, accidentally or otherwise,
 until the protection has been removed with the UNPROTECT command or system
@@ -127,9 +133,11 @@ to a file which is already open for exclusive access by another process.
 When this situation occurs, the second task may abort with a message stating
 that it cannot access the file, or the task may wait for the file to become
 available.  File waiting is especially important for batch processes.
+
 .nf
 	cl> set file_wait = "yes"
 .fi
+
 The file wait option is controlled by the "file_wait" variable in the
 environment.  If file waiting is enabled, and a process finds that it
 has to wait to access a file, a warning message will be printed on the

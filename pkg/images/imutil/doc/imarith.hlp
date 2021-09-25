@@ -136,9 +136,11 @@ EXAMPLES
 
 2. To subtract a constant from an image and replace input image by the
 subtracted image:
+
 .nf
 	cl> imarith m31 - 223.2 m31
 .fi
+
 Note that the final pixel datatype and the calculation datatype will be at
 least of type real because the constant operand is real.
 
@@ -181,9 +183,11 @@ The same operation can be done in place with image template expansion by:
 
 6. To subtract a two dimensional bias from stacked observations (multiple
 two dimensional observations stacked to form a three dimensional image):
+
 .nf
 	cl> imarith obs* - bias obs*//b
 .fi
+
 Note that the output observations obs101b, ..., will be three dimensional.
 
 7. To divide a 50 x 50 image by the average column:
@@ -196,9 +200,11 @@ Note that the output observations obs101b, ..., will be three dimensional.
 
 8. To subtract a one dimensional image from the lines of a two dimensional
 image:
+
 .nf
 	cl> imarith im2d - im1d diff
 .fi
+
 9. To subtract a one dimensional image from the columns of a two dimensional
 image:
 

@@ -39,10 +39,13 @@ plotted.  The vector at the point (i,j) has:
     magnitude = sqrt (uimage(i,j)**2 + vimage(i,j)**2)
     direction = atan2 (vimage(i,j), uimage(i,j))
 .fi
+
 .ih
 EXAMPLES
 1. Make a vector plot from the two images "crab.blue" and "crab.red".
+
 .nf
     cl> velvect crab.blue crab.red
 .fi
+
 .endhelp

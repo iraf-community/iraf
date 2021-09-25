@@ -1,9 +1,11 @@
 .help logging Mar86 language
 .ih
 NAME
+
 .nf
 logging -- Using the CL logging features
 .fi
+
 .ih 
 DESCRIPTION
 The CL has some simple logging features to allow the recording of events of
@@ -68,9 +70,11 @@ time.  The start message also includes the filename of the task (.cl or .e).
 .ih
 EXAMPLES
 1. Turn all the logging features on except for background logging:
+
 .nf
 	cl> logmode = "commands nobackground errors trace"
 .fi
+
 .ih
 BUGS
 Background logging to the same logfile can cause problems.  The environment

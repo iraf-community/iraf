@@ -54,9 +54,11 @@ This task is a script calling \fBcoincor\fR with \fIccmode\fR = "iids".
 .ih
 EXAMPLES
 The following example corrects a series of IIDS spectra:
+
 .nf
 	cl> powercor nite1 1-250 output=nite1cc start_rec=1
 .fi
+
 .ih
 SEE ALSO
 coincor

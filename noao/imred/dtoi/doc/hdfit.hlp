@@ -63,6 +63,7 @@ default choice is to fit log exposure as a function of the log opacitance;
 this is traditionally known as the Baker-Seidel function.
 .ih
 EXAMPLES
+
 .nf
 Using the defaults as starting parameters, interactively fit a curve to
 the data points in db1.
@@ -73,6 +74,7 @@ A sixth order power series function is fit in batch mode to the db1 data.
 
 	cl> hdfit db1 order=6 interactive-
 .fi
+
 .ih
 SEE ALSO
 spotlist, dematch, hdtoi

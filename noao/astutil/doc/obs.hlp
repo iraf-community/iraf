@@ -384,6 +384,7 @@ in the observatory task.
 	cl> = sin (3.14159/180 * observ.lat)
 	0.52962280742153
 .fi
+
 .ih
 SEE ALSO
 Tasks in astutil, imred, onedspec, and twodspec.

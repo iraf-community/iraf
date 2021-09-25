@@ -950,6 +950,7 @@ z1          h           Lower intensity value limit of histogram
 z2          h           Upper intensity value limit of histogram
 zero        e           Zero level for contour plot
 .fi
+
 .ih
 EXAMPLES
 The following  example illustrates many of the features in a descriptive
@@ -992,6 +993,7 @@ way using the standard image dev$pix.
   <Image cursor> s          # Make surface plot
   <Image cursor> q          # Quit
 .fi
+
 .ih
 BUGS
 If an operation is interrupted, e.g., an image display or surface plot,

@@ -103,6 +103,7 @@ The data of type real are in exponent format; i.e FORTRAN 'E' format (1.234e3).
 EXAMPLES
 To convert an two dimensional image containing three spectra to the
 output file "idsout":
+
 .nf
 	cl> widsout image idsout type_output=single label=file
 .fi

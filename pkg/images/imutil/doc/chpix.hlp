@@ -46,6 +46,7 @@ complex number only.
 EXAMPLES
 
 1. Convert a list of images to type real, overwriting the existing images.
+
 .nf
         im> chpixtype nite1*.imh nite1*.imh real
 .fi
@@ -53,9 +54,11 @@ EXAMPLES
 2. Convert only those images in imlist1 which are of type short to type real.
    Imlist1 and imlist2 are text files containing the list of input and
    output images respectively. The image names are listed 1 per line.
+
 .nf
         im> chpixtype @imlist1 @imlist2 real old=short
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

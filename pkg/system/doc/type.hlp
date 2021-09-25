@@ -30,14 +30,18 @@ EXAMPLES
 
 1. Type all files in the current directory with the extension ".x" on the
 standard output.  Do not pause between files or pages (unlike \fIpage\fR).
+
 .nf
 	cl> type *.x
 .fi
+
 2. Capture the manual page for task \fIhedit\fR in a text file, in a form
 suitable for printing on any device.
+
 .nf
 	cl> help hedit | type dev=text > hedit.doc
 .fi
+
 .ih
 SEE ALSO
 page, head, tail, concatenate, lprint

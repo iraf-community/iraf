@@ -49,6 +49,7 @@ EXAMPLES
 
     cl> binpairs data data .01 1 20 >> result
 .fi
+
 .ih
 SEE ALSO
 .endhelp

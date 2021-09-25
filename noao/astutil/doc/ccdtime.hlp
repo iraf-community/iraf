@@ -239,6 +239,7 @@ given by:
 	noise total = (nstar+npix*(nsky+ndark+rdnoise**2)) ** 1/2
 	SNR = nstar / noise total
 .fi
+
 .ih
 EXAMPLES
 1.  To get a list of the telescopes, filters, and detectors in a database:
@@ -331,6 +332,7 @@ mode.  In the following example we want to change the magnitude.
     cl> ccdtime 22
     ...
 .fi
+
 .ih
 REVISIONS
 .ls CCDTIME V2.11.4

@@ -66,9 +66,11 @@ one per line, and append this data to "junk".
 5. Concatenation is also possible using \fItype\fR, e.g., the following
 command will append the contents of "file" to the file "outfile", which will
 be created if it does not already exist.
+
 .nf
 	cl> type file >> outfile
 .fi
+
 The redirect-append operator ">>" may be used to append the output of any
 task to a file.
 

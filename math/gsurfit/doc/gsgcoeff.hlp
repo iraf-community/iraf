@@ -11,6 +11,7 @@ rval = gsgcoeff (sf, xorder, yorder)
     int		xorder	# x order of desired coefficient
     int		yorder	# y order of desired coefficient
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

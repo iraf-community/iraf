@@ -810,6 +810,7 @@ task are 0 for sky, 1 for object, and 2 for arc.  The object
 identifications are optional but it is good practice to include them so
 that the data will contain the object information independent of other
 records.  Figure 1 shows an example identification file called M33Sch2.
+
 .nf
 
     Figure 1: Example Aperture Identification File
@@ -830,6 +831,7 @@ records.  Figure 1 shows an example identification file called M33Sch2.
     48 1 phil2
 
 .fi
+
 Note the identification of the sky fibers with beam number 0, the object
 fibers with 1, and the arc fibers with 2.
 The broken and unassigned fiber entries, given beam
@@ -1010,11 +1012,13 @@ is to collect all the algorithm parameters in one place separate from the
 processing parameters and include only those which are relevant for
 multifiber data.  The parameter values can be changed from the
 defaults by using the parameter editor,
+
 .nf
 
 	cl> epar params
 
 .fi
+
 or simple typing \fIparams\fR.  The parameter editor can also be
 entered when editing the \fBdofibers\fR parameters by typing \fI:e
 params\fR or simply \fI:e\fR if positioned at the \fIparams\fR
@@ -1504,6 +1508,7 @@ Image line/aperture to plot (1:) (1):
 <Look at spectra and change apertures with # key>
 <Exit with 'q'>
 .fi
+
 .ih
 REVISIONS
 .ls DOFIBERS V2.11

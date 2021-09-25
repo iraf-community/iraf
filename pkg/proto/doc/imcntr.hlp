@@ -47,9 +47,11 @@ EXAMPLES
 in 3 images.
 .sp 1
 .nj
+
 .nf
 cl> imcntr m92red,m92blu,m92grn 123 234
 .fi
+
 .ju
 .ih
 BUGS

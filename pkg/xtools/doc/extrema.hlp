@@ -4,6 +4,7 @@ NAME
 extrema -- find the extrema in an array of x and y points
 .ih
 SYNOPSIS
+
 .nf
 nextrema = extrema (x, y, curvature, npts, dx)
 
@@ -12,6 +13,7 @@ real	curvature[npts]		# 2nd deriv. of cubic spline at extrema
 int	npts			# Number of input data points
 real	dx			# Precision of extrema positions
 .fi
+
 .ih
 DESCRIPTION
 The input data points are fitted with a cubic interpolation spline.  The

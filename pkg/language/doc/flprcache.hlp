@@ -33,20 +33,26 @@ not flushed unless explicitly named.
 EXAMPLES
 1. Run \fIprcache\fR to get the process slot number, then flush the process
 by slot number.
+
 .nf
 	cl> flpr 5
 .fi
+
 2. Flush all idle processes which are not locked in the cache.
+
 .nf
 	cl> flpr
 .fi
+
 3. Flush the "x_system.e" process by naming the "directory" task, which
 is contained in that process.  Lock a fresh copy of the process in the cache.
 This initializes the process, and may be necessary if a system task is
 interrupted at the wrong time.
+
 .nf
 	cl> flpr dir; prc dir
 .fi
+
 .ih
 BUGS
 In some circumstances the CL may believe that a process in the

@@ -4,6 +4,7 @@ NAME
 zfioty -- terminal driver
 .ih
 SYNOPSIS
+
 .nf
 zopnty (osfn, mode, chan)		# open terminal
 zclsty (chan, status)			# close terminal
@@ -19,6 +20,7 @@ char	text[]
 int	mode, chan, maxch, nchars, status, param
 long	loffset, lvalue
 .fi
+
 .ih
 DESCRIPTION
 Except where noted herein, the terminal driver is functionally equivalent to

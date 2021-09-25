@@ -57,4 +57,5 @@ Examples:
 
 		lintran list, xcol=2, ycol=3, angle=45
 .fi
+
 .endhelp

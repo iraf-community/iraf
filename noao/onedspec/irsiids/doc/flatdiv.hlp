@@ -70,18 +70,24 @@ matched.
 EXAMPLES
 The following example divides a series of spectra to produce 20 new
 spectra having names nite1.1221 ... nite1.1240.
+
 .nf
 	cl> flatdiv nite1 1201-1220 nite1 1221
 .fi
+
 The same spectra as above are simultaneously corrected for
 coincidence losses.
+
 .nf
 	cl> flatdiv nite1 1201-1220 nite1 1221 coincor=yes
 .fi
+
 The flattened spectra replace the unflattened spectra.
+
 .nf
 	cl> flatdiv nite1 1201-1220 nite1 1201
 .fi
+
 Note that the input record numbers must be contiguous and the starting
 output record number must be the same as the first input record number.
 .ih

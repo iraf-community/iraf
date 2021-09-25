@@ -14,6 +14,7 @@ int	parameter	# the parameter to be returned
 char	str		# the returned string parameter value
 int	maxch		# the maximum size of the returned string parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     
@@ -22,6 +23,7 @@ The catalog / survey configuration file descriptor.
 .ls parameter
 The parameter to be returned.  The string parameters defined
 in cq.h are:
+
 .nf
 	CQCATDB		# the name of the configuration file
 	CQCATNAME	# the name of the current catalog

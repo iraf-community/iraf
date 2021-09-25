@@ -133,9 +133,11 @@ The aperture recentering algorithm may be selected from nearly every task
 in the package.
 .ih
 EXAMPLES
+
 .nf
 	cl> aprecenter newimage reference=flat
 .fi
+
 .ih
 REVISIONS
 .ls APRECENTER V2.11

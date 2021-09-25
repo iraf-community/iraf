@@ -26,6 +26,7 @@ SYNOPSIS
 	  sk_close (coo)
 
 .fi
+
 .ih
 DESCRIPTION
 
@@ -73,6 +74,7 @@ The skywcs routine sk_saveim can be used to update an image header.
 
 .ih
 EXAMPLES
+
 .nf
 Example 1: Convert from B1950 coordinates to J2000 coordinates.
 
@@ -303,4 +305,5 @@ Example 4: Convert a 2D image with an J2000 tangent plane projection
     call sk_close (cooout)
     call imunmap (im)
 .fi
+
 .endhelp

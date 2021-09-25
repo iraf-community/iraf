@@ -10,6 +10,7 @@ call gssave (sf, fit)
 pointer	sf		# surface descriptor
 real	fit[ARB]	# fit array
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     
@@ -23,6 +24,7 @@ by a call to gsstati.
 .nf
 	    len_fit = gsstati (sf, GSNSAVE)
 .fi
+
 .ih
 DESCRIPTION
 GSSAVE saves the surface parameters in the real array fit. The first eight

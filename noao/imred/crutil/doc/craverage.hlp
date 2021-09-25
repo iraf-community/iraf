@@ -11,9 +11,11 @@ It avoids identification of the cores of objects as cosmic rays by
 excluding pixels within the detected objects as cosmic ray candidates.
 .ih
 USAGE   
+
 .nf
 craverage input output
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -226,6 +228,7 @@ model coefficients of
     >>> crval=1 objval=2
     cl> display crobj001 2 overlay=mask001 ocol="1=green,2=red"
 .fi
+
 .ih
 SEE ALSO
 cosmicrays, crnebula, median, crfix, crgrow, crmedian

@@ -65,6 +65,7 @@ EXAMPLES
                          vver  2112 1636  VMS generic interface to th
 			         (etc.)
 .fi
+
 .ih
 BUGS
 The method used to extract device entries involves multiple scans of the

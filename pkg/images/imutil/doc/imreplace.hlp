@@ -51,13 +51,17 @@ so that, for example, the range 5.1-9.9 affets pixels 6-9.
 EXAMPLES
 1. In a flat field calibration which has been scaled to unit mean replace
 all response values less than or equal to 0.8 by 1.
+
 .nf
     cl> imreplace calib 1 upper=.8
 .fi
+
 2. Set all pixels to zero within a section of an image.
+
 .nf
     cl> imreplace image[1:10,5:100] 0
 .fi
+
 .ih
 REVISIONS
 .ls IMREPLACE V2.11.1

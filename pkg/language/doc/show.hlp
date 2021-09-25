@@ -19,13 +19,17 @@ not the entire history of the definitions of environment variables.
 .ih
 EXAMPLES
 1. Show the current default printer device.
+
 .nf
 	cl> show printer
 .fi
+
 2. Show all "std" (standard i/o stream) related variables.
+
 .nf
 	cl> show | match std
 .fi
+
 .ih
 SEE ALSO
 set

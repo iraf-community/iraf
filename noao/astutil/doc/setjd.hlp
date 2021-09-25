@@ -201,6 +201,7 @@ the Julian date may change during the observations.
 .nf
     cl> setjd obs1 date=date time=time exp="" hjd="" ljd=""
 .fi
+
 .ih
 REVISIONS
 .ls SETJD V2.11.2

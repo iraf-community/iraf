@@ -2,6 +2,7 @@
 # local host or network.
 
 .help devices Jan99 "NOAO/Tucson Devices"
+
 .nf
     \fBDevice      Aliases 	Description+Location\fR
 
@@ -65,4 +66,5 @@
     draco!mti			   HP 1/2" tapedrive, Rm 101 [VMS cluster only]
     draco!mtj			   Exabyte 8200, Rm 101 [VMS cluster only]
 .fi
+
 .endhelp

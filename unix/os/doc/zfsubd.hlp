@@ -4,6 +4,7 @@ NAME
 zfsubd -- get host name of a subdirectory
 .ih
 SYNOPSIS
+
 .nf
 zfsubd (osdir, subdir, new_osdir, maxch, nchars)
 
@@ -13,6 +14,7 @@ char	new_osdir[maxch]	# pathname of osdir/subdir
 int	maxch			# maximum length of new_osdir
 int	nchars			# length of new_osdir
 .fi
+
 .ih
 DESCRIPTION
 Given \fIosdir\fR, the machine dependent name of a host directory,

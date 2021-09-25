@@ -9,6 +9,7 @@ msifree (msi)
 .nf
     pointer	msi		#U interpolant descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls msi      

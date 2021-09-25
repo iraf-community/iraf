@@ -4,12 +4,14 @@ NAME
 zmfree -- free memory
 .ih
 SYNOPSIS
+
 .nf
 zmfree (buffer, status)
 
 int	buffer			# buffer address
 int	status
 .fi
+
 .ih
 DESCRIPTION
 Free a buffer previously allocated with \fBzmaloc\fR or \fBzraloc\fR,

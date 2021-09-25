@@ -130,6 +130,7 @@ minimum			min(x,y)	maximum			max(x,y)
 convert to integer	int(x)		convert to real		real(x)
 nearest integer		nint(x)		modulo			mod(x)
 .fi
+
 .ih
 EXAMPLES
 

@@ -19,9 +19,11 @@ The files to be read from a tape are specified by the file_list string.  The
 string can consist of any sequence of file numbers separated by
 at least one of comma, or dash.
 A dash specifies a range of files.  For example the string
+
 .nf
 	"1,2,3-5,8-6"
 .fi
+
 will convert the files 1 through 8.
 .le
 .ls iraf_file
@@ -75,15 +77,18 @@ optionally be converted to an IRAF image of specified data type.
 EXAMPLES
 
 1. Convert a 2D-Frutti image tape to a set of IRAF images.
+
 .nf
 	da> r2df mtb1600 1-999 r2dfile
 .fi
 
 2. List the contents of a 2D-Frutti tape on the standard output without
 creating an image file.
+
 .nf
 	da> r2df mtb1600 1-999 r2dfile ma-
 .fi
+
 .ih
 SEE ALSO
 t2d, mtexamine, rewind

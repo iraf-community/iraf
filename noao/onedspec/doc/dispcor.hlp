@@ -424,6 +424,7 @@ on> dispcor spec* ""  linearize=no verbose- logfile=logfile
 
 5. Apply a single dispersion solution to a set of record number format
 images.
+
 .nf
 ir> dispcor nite101 dcnite101 "1-10" ignore+ confirm-
 .fi

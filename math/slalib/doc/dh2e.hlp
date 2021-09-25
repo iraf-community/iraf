@@ -1,4 +1,5 @@
 .help dh2e Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slDH2E (AZ, EL, PHI, HA, DEC)
@@ -55,4 +56,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

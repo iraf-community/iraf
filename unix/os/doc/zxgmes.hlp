@@ -4,12 +4,14 @@ NAME
 zxgmes -- get info on most recent exception
 .ih
 SYNOPSIS
+
 .nf
 zxgmes (os_exception, errmsg, maxch)
 
 int	os_exception		# machine dependent exception code
 packed	char errmsg[maxch]	# machine dependent error message
 .fi
+
 .ih
 DESCRIPTION
 A description of the most recent hardware or software exception is returned.

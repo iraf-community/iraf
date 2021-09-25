@@ -4,6 +4,7 @@ NAME
 zfiomt -- magtape driver primitives
 .ih
 SYNOPSIS
+
 .nf
 zzopmt (drive, density, mode, oldrec, oldfile, newfile, chan)
 zzclmt (chan, mode, nrecords, nfiles, status)
@@ -16,6 +17,7 @@ int	drive, density, mode, oldrec, oldfile, newfile, chan
 int	nfiles, maxbytes, nbytes, nrecords, nfiles, status
 char	buf[]
 .fi
+
 .ih
 DESCRIPTION
 Magnetic tape is interfaced to FIO as a streaming binary file.

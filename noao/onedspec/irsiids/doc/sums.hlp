@@ -39,7 +39,9 @@ EXAMPLES
 The following example forms 4 new spectra from nite1.2001-nite1.2002,
 nite1.2003-nite1.2004, ... assuming this string is derived from
 IIDS spectra.
+
 .nf
 	cl> sums nite1 2001-2100
 .fi
+
 .endhelp

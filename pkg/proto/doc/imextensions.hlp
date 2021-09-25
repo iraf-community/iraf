@@ -4,9 +4,11 @@ NAME
 imextensions -- make a list of image extensions
 .ih
 USAGE   
+
 .nf
 imextensions input
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -229,7 +231,9 @@ This task is new in this release.
 .le
 .ih
 SEE ALSO
+
 .nf
 files, sections, ranges, match
 .fi
+
 .endhelp

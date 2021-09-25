@@ -231,6 +231,7 @@ nature of the process of image registration.  This all leads to a few
     o	Pad dissimilar sized images with blanks to
 	the largest size and disable trimming
 .fi
+
 .ih
 CENTERING ALGORITHM
 The algorithm is a "marginal" centroid in which the fit for each axis
@@ -299,6 +300,7 @@ supply a reference image):
 .nf
     pr> imshift @imlist shiftfile=x1.shifts
 .fi
+
 .ih
 BUGS
 The images being shifted must be in the current directory.

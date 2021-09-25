@@ -28,10 +28,12 @@ column in the input table.
 EXAMPLES
 Make 3 files named datacol.1, datacol.2 and datacol.3 from the 3 column
 table dtable:
+
 .nf
 
     cl> columns dtable 3 outroot=datacol.
 .fi
+
 .ih
 SEE ALSO
 fields

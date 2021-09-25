@@ -36,9 +36,11 @@ appropriately to the instrument. For IIDS and IRS data, this
 is 2.
 .ih
 EXAMPLES
+
 .nf
 	cl> extinct  nite1 1001-1032 nite1ex
 .fi
+
 .ih
 BUGS
 The input string of spectra must be ordered so that only

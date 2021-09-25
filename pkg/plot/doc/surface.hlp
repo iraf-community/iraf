@@ -67,20 +67,26 @@ the image is smaller than \fBxres\fR by \fByres\fR.
 EXAMPLES
 1. Surface plot of a 512 square image.  With the default values of \fBxres\fR
 and \fByres\fR, the image would be block averaged by a factor of 8 in x and y.
+
 .nf
     cl> surface crab.5009
 .fi
+
 2. Look at the bottom of the surface, but subsample rather that block average
 to decrease resolution and speed things up.  Also, the output device will
 be the plotter, and the job will run in the background:
+
 .nf
     cl> surface crab.5009 angv=-30 subsample+ device=stdplot &
 .fi
+
 3. Surface plot of band 4 of an image cube.  Since the image is specified using
 image section notation, no block averaging or subsampling will be done.
+
 .nf
     cl> surface cube[*,*,4]
 .fi
+
 .ih
 TIME REQUIREMENTS
 The time required by \fIsurface\fR depends on image size and resolution.

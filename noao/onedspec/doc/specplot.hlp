@@ -252,6 +252,7 @@ value is negative.
 CURSOR COMMANDS
 
 The indicated spectrum is the one with a point closest to the cursor position.
+
 .nf
 
 ? - Print help summary
@@ -278,6 +279,7 @@ x - Cancel all scales and offsets
 y - Automatically layout the spectra with offsets to common mean
 z - Automatically layout the spectra scaled to common mean
 .fi
+
 .ih
 COLON COMMANDS
 
@@ -323,20 +325,25 @@ spectra.
 .fi 
 
 Examples:
+
 .nf
     w0		  Print value of wavelength zero point
     w0 4010	  Set wavelength zero point of spectrum nearest the cursor
     w0[3] 4010	  Set wavelength zero point of spectrum with index 3
     w0[*] 4010	  Set wavelength zero point of all spectra
 .fi
+
 .ih
 EXAMPLES
 1. To make a nice plot of a set of spectra with the default layout:
+
 .nf
 	cl> specplot spec*
 .fi
+
 2.  To set the colors or line types for multiple spectra in a batch
 mode application create a cursor file like:
+
 .nf
 	cl> type cursor.dat
 	:color[1] 2
@@ -345,6 +352,7 @@ mode application create a cursor file like:
 	r
 	cl> specplot im1,im2,im3 cursor=cursor.dat
 .fi
+
 Note that the 'r' key is necessary redraw the graph with the changed
 attributes.
 .ih

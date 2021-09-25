@@ -122,21 +122,27 @@ EXAMPLES
 
 1. Page through all of the files in the directory "lib" which have
 the extension ".h".
+
 .nf
 	cl> page lib$*.h
 .fi
+
 2. Use \fIhelp\fR to format the text in the file "doc$spp.hlp", displaying
 the formatted document beginning on page 5 (the entire document has to be
 formatted first so it takes a minute or so to get any output).
+
 .nf
 	cl> help doc$spp.hlp fi+ | page first=5
 .fi
+
 3. Run \fIrfits\fR to print a long format listing of the headers of a series
 of FITS images from a magnetic tape, directing the output through \fIpage\fR
 so that it does not flash by when you aren't looking.
+
 .nf
 	cl> rfits mta make- long+ | page
 .fi
+
 .ih
 BUGS
 Since \fIpage\fR does not currently buffer any input text, backwards motions

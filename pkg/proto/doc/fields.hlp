@@ -42,6 +42,7 @@ message, or call an error and exit.
 .ih
 EXAMPLES
 1. Reverse the order of the 5 columns in list file "list".
+
 .nf
 
 	cl> fields list 5-1 > newlist
@@ -49,10 +50,12 @@ EXAMPLES
 
 2. Extract columns 1 and 3 from file "newlist" and pipe them to task
 \fIgraph\fR.
+
 .nf
 
 	cl> fields newlist 1,3 | graph
 .fi
+
 .ih
 REVISIONS
 .ls FIELDS V2.11

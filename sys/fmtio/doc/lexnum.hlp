@@ -33,6 +33,7 @@ as as follows:
 	LEX_REAL	floating, exponential [eEdD], sexagesimal
 	LEX_NONNUM	not a number
 .fi
+
 .ih
 IMPLEMENTATION
 Numtype is implemented as a finite state automaton.  Additional documentation

@@ -4,6 +4,7 @@ NAME
 zfacss -- determine the accessibility and type of a file
 .ih
 SYNOPSIS
+
 .nf
 zfacss (osfn, mode, type, status)
 
@@ -12,6 +13,7 @@ int	mode			# access mode to be checked
 int	type			# file type to be tested
 int	status			# is file accessible as specified
 .fi
+
 .ih
 DESCRIPTION
 Determine if a file is accessible with the indicated access modes and whether

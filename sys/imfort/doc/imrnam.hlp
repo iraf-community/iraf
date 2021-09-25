@@ -4,6 +4,7 @@ NAME
 imrnam -- rename an image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imrnam (oldnam, newnam, ier)
 
@@ -11,6 +12,7 @@ character*(*)	oldnam		#I host name of existing image
 character*(*)	newnam		#I new host name for image
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimrnam\fR procedure renames an image, i.e., changes the filenames
@@ -24,6 +26,7 @@ A zero status is returned if the image exists and was successfully renamed.
 IE_IMRNAMNEXIM:	attempt to rename a nonexistent image
 IE_IMRENAME:	cannot rename image
 .fi
+
 .ih
 NOTES
 Since the filename of the pixel file associated with an image may be

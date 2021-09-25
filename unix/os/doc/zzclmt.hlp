@@ -4,6 +4,7 @@ NAME
 zzclmt -- close a magtape file
 .ih
 SYNOPSIS
+
 .nf
 zzclmt (chan, mode, nrecords, nfiles, status)
 
@@ -13,6 +14,7 @@ int	nrecords		# number of records skipped
 int	nfiles			# number of filemarks skipped
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The magtape file associated with the channel \fIchan\fR is closed, i.e., the

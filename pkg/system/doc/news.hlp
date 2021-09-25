@@ -16,9 +16,11 @@ system revisions summary.  The revisions summary is given in the file
 
 For reasons of brevity, only the revisions summary is printed.  For detailed
 information on the revisions made to a particular science package, type
+
 .nf
     cl> help <pkg>.revisions op=sys
 .fi
+
 where "pkg" is the name of the CL package for which revisions information
 is desired.  For detailed information on the revisions to the system
 software and programming interfaces, examine the system notes file,
@@ -35,24 +37,32 @@ at present.
 .ih
 EXAMPLES
 1. Page the revisions summary for the current IRAF release.
+
 .nf
     cl> news
 .fi
+
 2. Print the revisions summary.
+
 .nf
     cl> lprint doc$newsfile
 .fi
+
 3. Page the system notes file.  Anyone who develops software for IRAF
 should review this file with each new release, to see what has changed.
 Documentation for new system facilities is often given in the system
 notesfile.
+
 .nf
     cl> page iraf$local/notes.*
 .fi
+
 4. Review the revisions summary for the IMAGES package.
+
 .nf
     cl> phelp images.revisions op=sys
 .fi
+
 .ih
 SEE ALSO
 help, phelp, page

@@ -15,6 +15,7 @@ int		npts		# number of data points
 int		wtflag		# type of weighting
 int		ier		# error code
 .fi
+
 .ih
 ARGUMENTS
 .ls nl    
@@ -76,6 +77,7 @@ define	SINGULAR		1	# Singular matrix
 define	NO_DEG_FREEDOM		2	# Too few points
 define	NOT_DONE		3	# Solution did not converge
 .fi
+
 .ih
 SEE ALSO
 .endhelp

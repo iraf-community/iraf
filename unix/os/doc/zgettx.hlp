@@ -4,6 +4,7 @@ NAME
 zgettx -- get next line from a text file
 .ih
 SYNOPSIS
+
 .nf
 zgettx (chan, text, maxch, status)
 
@@ -12,6 +13,7 @@ char	text[maxch]		# output record buffer
 int	maxch			# capacity of buffer
 int	status
 .fi
+
 .ih
 DESCRIPTION
 At most \fImaxch\fR chars are read from the next line of the text file

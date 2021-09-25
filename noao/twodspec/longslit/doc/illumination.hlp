@@ -101,6 +101,7 @@ abbreviated.  To list the value of a parameter type the command alone.
 :bins value		Iillumination bins
 :show			Show the values of all the parameters
 .fi
+
 .ih
 DESCRIPTION
 An illumination calibration, in the form of an image, is created for each
@@ -214,6 +215,7 @@ vertically (varying with the image lines):
 .nf
 	cl> hedit *.imh dispaxis 2 add+
 .fi
+
 .ih
 SEE ALSO
 icfit, response

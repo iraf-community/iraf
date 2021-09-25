@@ -56,22 +56,30 @@ EXAMPLES
 
 1. From all the lines displayed by "set", print only those that have
 the string "tty" somewhere in them.
+
 .nf
 	cl> set | match tty
 .fi
+
 2. Find all tasks that delete something.
+
 .nf
 	cl> help * | match delete
 .fi
+
 3. Delete all the "red" objects from the list file "catalog".
+
 .nf
 	cl> match red catalog stop+ > newcatalog
 .fi
+
 4. Type out the file "spool", omitting all lines that end in a colon,
 and paginating the output.
+
 .nf
 	cl> match ":$" spool stop+ | page
 .fi
+
 .ih
 SEE ALSO
 lcase, ucase, translit, sort, unique

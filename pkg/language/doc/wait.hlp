@@ -21,13 +21,17 @@ not running the wait returns immediately.
 .ih
 EXAMPLES
 1. Wait for any background jobs to finish, beeping the terminal when done.
+
 .nf
 	cl> wait;beep
 .fi
+
 2. Wait for job 3 to terminate.
+
 .nf
 	cl> wait 3
 .fi
+
 .ih
 BUGS
 Deadlock is possible.

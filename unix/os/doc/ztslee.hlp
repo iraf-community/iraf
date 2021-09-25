@@ -4,11 +4,13 @@ NAME
 ztslee -- suspend process execution (sleep)
 .ih
 SYNOPSIS
+
 .nf
 ztslee (nseconds)
 
 int	nseconds		# number of seconds to sleep
 .fi
+
 .ih
 DESCRIPTION
 Process execution is suspended for \fInseconds\fR seconds.

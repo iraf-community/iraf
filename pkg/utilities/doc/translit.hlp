@@ -36,15 +36,21 @@ are squeezed to a single character.
 EXAMPLES
 To change all the alphabetic characters in a file from lower to upper
 case, writing the result on the standard output:
+
 .nf
     cl> translit filename a-z A-Z
 .fi
+
 To delete the letters a, b, and c from a file:
+
 .nf
     cl> translit filename abc de=yes
 .fi
+
 To replace all but the letters abc in a file with A:
+
 .nf
     cl> translit filename ^abc A
 .fi
+
 .endhelp

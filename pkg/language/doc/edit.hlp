@@ -29,19 +29,25 @@ by adding new \fIedcap\fR files.
 .ih
 EXAMPLES
 1. Edit the login.cl file.
+
 .nf
 	cl> edit home$login.cl
 .fi
+
 2. Edit the file "temp" in the current directory.
+
 .nf
 	cl> edit temp
 .fi
+
 3. On a UNIX system, edit all the ".x" files in the current directory.
 Filename templates cannot be used with the editor unless the editor itself,
 or the host system, expands the filename template.
+
 .nf
 	cl> edit *.x
 .fi
+
 .ih
 BUGS
 The EOF control character is set in the edcap file for the editor language in

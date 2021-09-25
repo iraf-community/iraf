@@ -37,6 +37,7 @@ tt> tselect phone.tmp share.tmp "phone_1 == phone_2 && name_1 < name_2"
 tt> tproject share.tmp share.tab phone_2 inc-
 tt> delete *.tmp
 .fi
+
 .ih
 BUGS
 .ih

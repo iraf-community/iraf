@@ -70,12 +70,15 @@ Run task selftest for 12 bit data with plots appearing on the terminal.
 	cl> selftest
 
 .fi
+
 Run selftest in verbose mode, spooling the output to file 'ditable'.  This
 file is then run through the 'fields' task to extract the density and intensity
 columns which are piped to plot.  The results in a plot of the look up table.
+
 .nf
 
 	cl> selftest ver+ > ditable
 	cl> fields ditable 2,3 | graph xlab=Density ylab=Intensity
 .fi
+
 .endhelp

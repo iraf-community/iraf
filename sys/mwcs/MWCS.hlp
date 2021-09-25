@@ -51,6 +51,7 @@ plus a shift to an offset [x1,y1] may be expressed as
 .fi
 .ke
 whence
+
 .nf
 	 u = x1 - ax0 - by0
 and                                                                [2.2]

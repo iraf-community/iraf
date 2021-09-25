@@ -142,27 +142,37 @@ PHISTOGRAM appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
 1. Output the histogram of an image to a file.
+
 .nf
     cl> phist M51.imh li+ nbins=100 > fits1.hst
 .fi
+
 2. Plot the histogram of an image using only values from 0 to 2000.
+
 .nf
     cl> phist M31.imh nbins=100 z1=0. z2=2000.
 .fi
+
 3. Ditto, but set the histogram resolution explicitly to avoid
 smoothing the histogram.
+
 .nf
     cl> phist M31.imh z1=0 z2=2000 nbins=2001
 .fi
+
 4. Plot the cumulative histogram.  This is most useful for images with
 fairly flat "normal" histograms.
+
 .nf
     cl> phist R50.imh hist=cum
 .fi
+
 5. Plot the histogram of a stream of values in the textfile "list".
+
 .nf
     cl> phist list
 .fi
+
 .ih
 BUGS
 If the resolution of the histogram (number of bins) is a non-integral multiple

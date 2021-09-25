@@ -112,6 +112,7 @@ EXAMPLES
 1. To create some test CCD images first set the task parameters such as
 number of columns and lines, data, bias, and trim sections, and data
 values.  The images are then created as follows:
+
 .nf
 	cl> artobs.filter = "V"		# Set the filter
 	cl> artobs zero 0. zero		# Zero level image
@@ -119,6 +120,7 @@ values.  The images are then created as follows:
 	cl> artobs flat 1. flat skyrate=1000.	# Flat field image
 	cl> artobs obj 10. object		# Object image
 .fi
+
 Note that the CCD image type is not used explicitly so that for a
 dark count image you must set the sky count rate to zero.
 .ih

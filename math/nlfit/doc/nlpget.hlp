@@ -12,6 +12,7 @@ pointer		nl		# curve descriptor
 real/double	params[nparams]	# the parameters array
 int		nparams		# the number of parameters
 .fi
+
 .ih
 ARGUMENTS
 .ls nl

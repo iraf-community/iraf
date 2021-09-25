@@ -19,9 +19,11 @@ standard output.
 EXAMPLES
 Remove repeated names from a list.  Note the input file has been sorted 
 alphabetically so repeated names are adjacent.  
+
 .nf
 	cl> sort names | unique > names.final
 .fi
+
 .ih
 SEE ALSO
 sort

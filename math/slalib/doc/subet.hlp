@@ -1,4 +1,5 @@
 .help subet Jun99 "Slalib Package"
+
 .nf
 
       SUBROUTINE slSUET (RC, DC, EQ, RM, DM)
@@ -38,4 +39,5 @@
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi
+
 .endhelp

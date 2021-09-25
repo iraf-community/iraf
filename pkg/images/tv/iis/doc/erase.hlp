@@ -18,9 +18,11 @@ being displayed on the monitor.  The graphics frame is not erased.
 .ih
 EXAMPLES
 To erase frame 3:
+
 .nf
 	cl> erase 3
 .fi
+
 .ih
 SEE ALSO
 cv

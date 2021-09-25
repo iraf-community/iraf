@@ -456,6 +456,7 @@ and the number rejected as a function of n is:
 	 nl  0  0  0  0  0  1  1  1  1  1  2
 	 nh  0  0  0  0  0  0  0  0  0  0  1
 .fi
+
 .in -4
 CCDCLIP
 .in 4
@@ -739,6 +740,7 @@ EXAMPLES
 	cl> scombine *.ms combine.ms nout=ncombine.ms \\
 	>>> group=apertures scale=exptime weights=exptime
 .fi
+
 .ih
 REVISIONS
 .ls SCOMBINE V2.10.3

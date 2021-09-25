@@ -167,6 +167,7 @@ EXAMPLES
 .nf
 	cl> mkpat dev$pix out=gridpix pat=grid op=mul v1=1 v2=0
 .fi
+
 .ih
 REVISIONS
 .ls MKPATTERN V2.11

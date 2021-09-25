@@ -21,6 +21,7 @@ int	pktype		# the parameter data type
 char	pkunits		# the parameter units (INDEF if undefined)
 int	max_wpunits	# the maximum size of the parameter units
 .fi
+
 .ih
 ARGUMENTS
 .ls imres    

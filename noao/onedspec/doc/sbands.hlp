@@ -194,6 +194,7 @@ aperture selection and magnitude output.
      ls[58:62,*](60)   band2    3.19
      ls[58:62,*](60)   band3    3.15
 .fi
+
 .ih
 REVISIONS
 .ls SBANDS V2.10.4
