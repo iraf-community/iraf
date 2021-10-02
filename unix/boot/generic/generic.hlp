@@ -25,7 +25,7 @@ for each type specified, with \fIgeneric\fR automatically generating the
 output filename by appending the type character to the root filename of
 the input file.  The \fItype\fR string is some subset of [ubscilrdx],
 where the type characters are as follows.
-.ls
+
 .nf
 u	- C unsigned short
 b	- C byte (char)
@@ -37,7 +37,6 @@ r	- SPP real
 d	- SPP double
 x	- SPP complex
 .fi
-.le
 
 This option cannot be used in combination with the -o option, and should
 not be used when generic code is expanded inline, rather than written into
