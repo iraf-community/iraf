@@ -47,26 +47,28 @@ as the x and y coordinates to be transformed (default: fields 1, 2).
 All other fields are be preserved across the transformation.  
 For clarification, the equations used in the transformation are shown below:
 
-.ks
+1. Subtract off the current origin:
+
 .nf
-	1. Subtract off the current origin:
-    
     	xt = x - x1
     	yt = y - y1
+.fi
 
-	2. Scale and rotate the coordinates:
-    
+2. Scale and rotate the coordinates:
+
+.nf
 	xs = xt * xscale
 	ys = yt * yscale
     	xt = xs * cos(angle) - ys * sin(angle)
     	yt = xs * sin(angle) + ys * cos(angle)
+.fi
 
-	3. Shift to the new origin:
+3. Shift to the new origin:
 
+.nf
 	xt = xt + x2
 	yt = yt + y2
 .fi
-.ke
 
 Comment lines and blank lines are passed on to the output unmodified
 (a comment line is any line beginning with the character '#').
