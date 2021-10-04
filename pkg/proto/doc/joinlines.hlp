@@ -119,6 +119,7 @@ results.  This illustrates the use of pipes.
 .nf
 	cl> myprog | fields STDIN 2 | joinlines last STDIN > new
 .fi
+
 .ih
 BUGS
 .ih

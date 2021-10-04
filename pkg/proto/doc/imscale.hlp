@@ -40,4 +40,5 @@ To scale an image to a unit mean excluding deviant points below
 .nf
     cl> imscale calib flat 1 lower=1000 upper=5000
 .fi
+
 .endhelp

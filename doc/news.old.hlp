@@ -1,4 +1,5 @@
 .help news Jul86 "Ancient News"
+
 .nf
 30 July 86	IMIO Modifications
 -------------------------------------------------------------------------------
@@ -196,4 +197,5 @@ infrequently (which is why it is so hard to find the bug), and will usually
 go away after exiting and reentering cursor mode and trying again.  It might
 also help to do a ":.gflush" while in cursor mode.
 .fi
+
 .endhelp

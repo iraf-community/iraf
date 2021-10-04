@@ -57,11 +57,13 @@ EXAMPLES
 .fi
 
 2. Force a URL to be downloaded again:
+
 .nf
     cl> urlget http://iraf.noao.edu/foo.fits use_cache=no
 .fi
 
 3. Download a URL with special characters:
+
 .nf
     cl> urlget http://iraf.noao.edu/scripts/tget?f=foo.fits
 or

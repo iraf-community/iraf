@@ -75,6 +75,7 @@ read in from a FITS format tape.  The database "db1" will be created.
 .nf
 	cl> spotlist spots* fogspot db1 scale=1.893e-4
 .fi
+
 .ih
 SEE ALSO
 dematch, hdfit, hdtoi

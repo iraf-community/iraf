@@ -73,6 +73,7 @@ named 'binary') are first:
 .nf
 tt> tsort starcat.tab binary asc-
 .fi
+
 .ih
 BUGS
 .ih

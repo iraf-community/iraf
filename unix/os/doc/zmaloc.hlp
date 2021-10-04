@@ -4,6 +4,7 @@ NAME
 zmaloc -- allocate memory
 .ih
 SYNOPSIS
+
 .nf
 zmaloc (buffer, nbytes, status)
 
@@ -11,6 +12,7 @@ int	buffer			# address of buffer
 int	nbytes			# size of buffer
 int	status
 .fi
+
 .ih
 DESCRIPTION
 An uninitialized region of memory at least \fInbytes\fR in size is dynamically

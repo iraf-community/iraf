@@ -1,6 +1,6 @@
 .help ecor Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slECOR (RM, DM, IY, ID, FD, RV, TL)
 
      - - - - -
@@ -49,6 +49,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

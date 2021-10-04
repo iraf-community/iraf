@@ -66,7 +66,6 @@ facilities as stepwise cursor motion, plot expansion, movies, disposal to a
 batch plotter or metafile, and plot annotation facilities.  Cursor mode is
 documented elsewhere.
 
-
 .ks
 .nf
 	?		print help and other info
@@ -87,7 +86,6 @@ documented elsewhere.
 	<space>		print coordinates and pixel value
 .fi
 .ke
-
 
 The single character keystroke commands use the position to the cursor to
 determine what region of the image to plot.  If the plot is examined carefully
@@ -157,7 +155,6 @@ are multiple lines of results which are scrolled using the '/' key.
 In addition to the single keystroke commands, the following : escape
 commands are provided:
 
-
 .ks
 .nf
 	:a N		set number of lines or columns to average
@@ -175,7 +172,6 @@ commands are provided:
 	:y y1 y2	fix range in Y (call with no args to unfix)
 .fi
 .ke
-
 
 The 'c' and 'l' commands are identical to the keystroke commands except
 that the column or line position is explicitly entered rather than taken

@@ -21,7 +21,10 @@ Print messages of actions performed?
 EXAMPLES
 1. Convert a binary file on disk to a text file on disk.
 
+.nf
 	cl> bintxt binary_file text_file
+.fi
+
 .ih
 SEE ALSO
 txtbin

@@ -36,7 +36,10 @@ EXAMPLES
 1. Format a file containing names into a two column table.  The table is 
 sorted alphabetically first.
 
+.nf
 	cl> sort names | table ncols=2
+.fi
+
 .ih
 SEE ALSO
 words, tokens

@@ -426,7 +426,6 @@ time.
 There is an exception to using the truncated PSF.  If the size of the
 galaxy because very small, 0.01 pixel, then a stellar image is substituted.
 
-
 OBJECT FILES
 
 The object files contain lines defining stars and galaxies.  Stars

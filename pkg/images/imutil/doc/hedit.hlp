@@ -66,7 +66,9 @@ inspection of the fields of an image header.  Both the "standard" and
 fields are writable.  For example, to change the value of the standard field
 "title" of the image "m74" to "sky flat" we would enter the following command.
 
+.nf
 	cl> hedit m74 title "sky flat"
+.fi
 
 If \fIverify\fR mode is selected the editor will print the old value of the
 field and query with the new value, allowing some other value to be entered
@@ -92,29 +94,36 @@ If the response is "q" the editor will exit entirely.
 To conveniently print the value of the field "title" without modifying the
 image header, we repeat the command with the special value ".".
 
+.nf
 	cl> hedit m74 title .
+.fi
 
 To print (or edit) the values of all header fields a field template may be
 given.
 
+.nf
 	cl> hedit m74 * .
+.fi
 
 To print (or edit) the values of only a few fields the field template may
 be given as a list.
 
+.nf
 	cl> hedit m74 w0,wpc .
+.fi
 
 To print the value of one or more fields in a set of images, an image template
 may be given.  Both image templates and field templates may be given if
 desired.
 
+.nf
 	cl> hedit n1.* exp .
+.fi
 
 Abbreviations are not permitted for field names, i.e., the given template
 must match the full field name.  Currently, field name matches are case
 insensitive since image headers are often converted to and from FITS headers,
 which are case insensitive.
-
 
 2. Advanced Usage
 
@@ -139,14 +148,12 @@ The major editing functions of the \fIhedit\fR task are the following:
 In addition, \fIhedit\fR may be used merely to inspect the values of the header
 fields, without modification of the image database.
 
-
 2.1 Standard header fields
 
     The header editor may be used to access both the standard image header
 fields and any user or application defined fields.  The standard header fields
 currently defined are shown below.  There is no guarantee that the names and/or
 usage of these fields will not change in the future.
-
 
 .ks
 .nf
@@ -164,12 +171,10 @@ usage of these fields will not change in the future.
 .fi
 .ke
 
-
 The standard header field names have an "i_" prefix to reduce the possibility
 of a name collision with a user field name, and to distinguish the two classes
 of parameters in templates.  The prefix may be omitted provided the simple
 name is unique.
-
 
 2.2 Field name template
 
@@ -180,7 +185,6 @@ of an image, rather than upon a directory.  Abbreviations are not permitted
 in field names and case is not significant.  Case is ignored in this context
 due to the present internal storage format for the user parameters (FITS),
 which also limits the length of a user field name to 8 characters.
-
 
 2.3 Value expression
 
@@ -196,12 +200,16 @@ interpretation by the CL rather than by the header editor.
 
 For example, the command
 
+.nf
 	cl> hedit m74 title "title // ';ss'"
+.fi
 
 would change the title to the literal string constant "title // ';ss'",
 whereas the command
 
+.nf
 	cl> hedit m74 title "(title // ';ss')"
+.fi
 
 would concatenate the string ";ss" to the old title string.  We require
 parenthesis for expression evaluation to avoid the need to doubly quote
@@ -210,7 +218,9 @@ user than using parenthesis.  For example, if expressions did not have to
 be parenthesized, the first example in the basic usage section would have
 to be entered as shown below.
 
+.nf
 	cl> hedit m74 title '"sky flat"'	# invalid command
+.fi
 
 Expression evaluation for \fIhedit\fR, \fIhselect\fR, and similar tasks
 is carried out internally by the FMTIO library routine \fBevexpr\fR.
@@ -218,13 +228,11 @@ For completeness minimal documentation is given here, but the documentation
 for \fIevexpr\fR itself should be consulted if additional detail is required
 or if problems occur.
 
-
 2.3.1 operators
 
     The following operators are recognized in value expressions.  With the
 exception of the operators "?", "?=", and "@", the operator set is equivalent
 to that available in the CL and SPP languages.
-
 
 .nf
 	+  -  *  /		arithmetic operators
@@ -237,7 +245,6 @@ to that available in the CL and SPP languages.
 	? :			conditional expression
 	@			reference a variable
 .fi
-
 
 The operators "==", "&&", and "||" may be abbreviated as "=", "&", and "|"
 if desired.  The ?= operator performs pattern matching upon strings.
@@ -289,19 +296,16 @@ Mixed mode expressions are permitted with automatic type coercion.  Most type
 coercions from boolean or string to other datatypes are illegal.  The boolean
 constants "yes" and "no" are predefined and may be used within expressions.
 
-
 2.3.2 intrinsic functions
 
     A number of standard intrinsic functions are recognized within expressions.
 The set of functions currently supported is shown below.
-
 
 .nf
 	abs	acos	asin	atan	atan2	bool	cos
 	exp	int	log	log10	max	min	mod
 	nint	real	sin	sqrt	str	tan	
 .fi
-
 
 The trigonometric functions operate in units of degrees rather than radians.
 The \fImin\fR and \fImax\fR functions may have any number of arguments up
@@ -320,13 +324,11 @@ The first form is the conventional form found in all programming languages.
 The second permits the generation of function names by string valued
 expressions and might be useful on rare occasions.
 
-
 2.3.3 special operands
 
     As noted earlier, expression operands may be constants, variables (header
 fields), function calls, or references to any of the special variables.
 The following special variables are recognized within expressions:
-
 
 .nf
 	.		A string constant, used to flag printing
@@ -335,7 +337,6 @@ The following special variables are recognized within expressions:
 	$I		The name of the "current image"
 	$T		The current clock time (an integer value)
 .fi
-
 
 These builtin variables are especially useful for constructing context
 dependent expressions.  For example, the value of a field may be incremented
@@ -346,17 +347,23 @@ EXAMPLES
 1. Globally edit the database "n1", setting the value of the string parameter
 "obs" to "sky" if "s-flag" is 1, to "obj" otherwise.
 
+.nf
     cl> hedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")'
+.fi
 
 2. Globally edit the same database, replacing the value of the parameter
 "variance" by the square root of the original value.
 
+.nf
     cl> hedit n1.* var '(sqrt(var))'
+.fi
 
 3. Replace the values of the fields A and B by the absolute value of the
 original value:
 
+.nf
     cl> hedit n1.* a,b '(abs($))'
+.fi
 
 .ih
 BUGS

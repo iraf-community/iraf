@@ -220,7 +220,6 @@ e	Print error messages
 r	Rewind the coordinate list
 q	Exit task
 
-
         Colon commands
 
 :show	[data/sky]	List the parameters
@@ -285,9 +284,7 @@ q	Exit task
 :mksky		[y/n]		Mark sky annuli on the display
 :radplot	[y/n]		Plot radial profile of sky pixels
 
-
 The following commands are available from within the interactive setup menu.
-
 
                       Interactive Fitsky Setup Menu
 
@@ -476,7 +473,6 @@ in examples 1 or 2.
 
         ... type ? for optional help
 
-
         ... move the graphics cursor to the stars and tap space bar
 
                                 or
@@ -494,7 +490,6 @@ in examples 1 or 2.
 
         ... the output will appear in ypix.sky.3 ...
 .fi
-
 
 4. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.

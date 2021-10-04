@@ -4,12 +4,14 @@ NAME
 zfgcwd -- get current working directory
 .ih
 SYNOPSIS
+
 .nf
 zfgcwd (pathname, maxch, status)
 
 packed	char pathname[maxch]		# receives pathname of cwd
 int	maxch, status
 .fi
+
 .ih
 DESCRIPTION
 The pathname of the current working directory is returned as a packed string,

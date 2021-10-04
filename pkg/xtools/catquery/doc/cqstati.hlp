@@ -12,6 +12,7 @@ ival = cq_stati (cq, parameter)
 pointer	cq		# the configuration file descriptor
 int	parameter	# the parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     
@@ -20,6 +21,7 @@ The configuration file descriptor.
 .ls parameter
 The parameter to be returned.  The currently supported parameters defined
 in cq.h are:
+
 .nf
 	CQNRECS		# the number of catalog / survey file records
 	CQSZRECLIST	# the length of the record name list in chars
@@ -42,6 +44,7 @@ required to fetch the text parameter CQRECLIST.
 
 .ih
 EXAMPLES
+
 .nf
 	include <cq.h>
 
@@ -55,6 +58,7 @@ EXAMPLES
 
 	...
 .fi
+
 .ih
 SEE ALSO
 cq_stats, cq_statt

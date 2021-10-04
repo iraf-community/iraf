@@ -4,6 +4,7 @@ NAME
 imtypk -- get the type information for a header keyword
 .ih
 SYNOPSIS
+
 .nf
 subroutine imtypk (im, keyw, dtype, comm, ier)
 
@@ -13,6 +14,7 @@ integer		dtype		#O keyword datatype code
 character*(*)	comm		#O comment string describing keyword
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimtypk\fR procedure is used to fetch the information defining

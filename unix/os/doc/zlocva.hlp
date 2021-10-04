@@ -4,12 +4,14 @@ NAME
 zlocva -- get the memory address of a variable
 .ih
 SYNOPSIS
+
 .nf
 zlocva (object, address)
 
 arb	object			# reference to variable
 int	address			# value of the reference
 .fi
+
 .ih
 DESCRIPTION
 The memory address of \fIobject\fR in char storage units is returned as

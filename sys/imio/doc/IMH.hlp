@@ -54,7 +54,6 @@ following constructs:
 	[section]	append image section
 .fi
 
-
 These elements may appear in any order, although not all orderings make
 sense.  The \fIpattern\fR string may contain any of the standard pattern
 matching characters, but the pattern matching meta-characters {} (ignore
@@ -65,7 +64,6 @@ or selection set.  The \fIselect\fR expression is limited to a range list
 at present.  The range list syntax uses the : range syntax, i.e.,
 "from[:to[:by]]".  Some examples are given below.  None of templates shown
 in these examples need be quoted if entered in the CL command mode.
-
 
 .nf
 	pix			one image
@@ -79,7 +77,6 @@ in these examples need be quoted if entered in the CL command mode.
 	pix{1,4,9:21}		pix.0001, pix.0004, and 9 through 21
 	pix{1,4,9:21}[1:10,5]	same, but append section to each one
 .fi
-
 
 Note that \fIselect\fR expressions are expanded without checking to see if the
 named images actually exist.  Image names are formed by concatenating the
@@ -96,7 +93,6 @@ have however been made internally, and the new package has been installed
 in IMIO.  The old package has been removed from the XTOOLS library.  To use
 the new version of the package, all one need do is relink.
 
-
 .ks
 .nf
 	list = imtopen (template)
@@ -106,7 +102,6 @@ the new version of the package, all one need do is relink.
 	      imtclose (list)
 .fi
 .ke
-
 
 An image template is expanded into a list of image names or image sections
 with \fBimtopen\fR.  The list is not globally sorted, however sublists
@@ -133,7 +128,6 @@ procedures are required for each supported storage format.
 The IMH package is intended as an internal IMIO package and should not normally
 be called by packages other than IMIO.
 
-
 .ks
 .nf
 	im = imh_open (image, acmode, o_im)	# open/create header
@@ -147,7 +141,6 @@ be called by packages other than IMIO.
 	     imh_copy (oldname, newname)	# copy an image
 .fi
 .ke
-
 
 The \fIimh_open\fR procedure will open an existing image, create a new
 image, or make a new copy of an existing image (preserving the header

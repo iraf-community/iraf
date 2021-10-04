@@ -16,6 +16,7 @@ arider (x, datain, npix, der, nder, interp_type)
     int		nder		#I number of derivatives, 1 + max order
     int		interp_type	#I interpolant type
 .fi
+
 .ih
 ARGUMENTS
 .ls x     

@@ -4,12 +4,14 @@ NAME
 clrawc -- return the raw command line as a string
 .ih
 SYNOPSIS
+
 .nf
 subroutine clrawc (outstr, ier)
 
 character*(*)	outstr		#O receives the command line string
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIclrawc\fR procedure returns the raw command line as a string,

@@ -224,7 +224,6 @@ OBSFILE, a format description file called "fnite1.dat" will also be
 created. Any pre-existing format description file of that name, which does
 not have an associated observations file, will be deleted.
 
-
 THE IMSETS FILE
 
 The \fIimsets\fR file lists the 
@@ -498,7 +497,6 @@ were not measured in all filters position matching is necessary.
 
 	ph> obsfile m92umags,m92bmags,m92vmags "1 2 3 6 8 7 0 4 5" "U,B,V"\
 	    fields standards.obs tolerance=8.0
-
 .fi
 
 .ih

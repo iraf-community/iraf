@@ -31,6 +31,7 @@ file is a simple string of pixels, with the exception that the first
 The header elements are stored as follows:
 
 .nj
+
 .nf
 	word 1    : nrows
 	word 2    : ncols
@@ -38,6 +39,7 @@ The header elements are stored as follows:
 	word 4-13 : reserved space
 	word 14-45: image title (ASCII 64 bytes)
 .fi
+
 .ju
 
 Pixels from the input images are converted to short integers after scaling
@@ -52,9 +54,11 @@ EXAMPLES
 Convert the IRAF image irafimage to the binary file irafimage.b.
 
 .nj
+
 .nf
 cl> binfil irafimage scale=0.01
 .fi
+
 .ju
 
 .ih

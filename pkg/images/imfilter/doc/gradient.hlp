@@ -142,7 +142,6 @@ the input image and the O[*,*] are elements of the output image.
 	    - I[-1,1]/2/sqrt(2) - I[0,1]   + I[1,1]*0
    O[0,0] = - I[-1,0]           + I[0,0]*0 + I[1,0]
             + I[-1,-1]*0        + I[0,-1]  + I[1,-1]/2/sqrt(2) 
-
 .fi
 
 .ih

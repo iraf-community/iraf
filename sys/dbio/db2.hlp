@@ -32,7 +32,6 @@ are expected to make use of DBIO; many will depend upon it heavily.
 The relationship of the DBIO and DBMS packages to each other and to the
 related standard IRAF interfaces is shown in Figure 1.1.
 
-
 .ks
 .nf
 		DBMS
@@ -43,14 +42,11 @@ related standard IRAF interfaces is shown in Figure 1.1.
 						(datafiles)
 
 	     (cl)    |      (vos)     |     (host)
-
-
-
 .fi
+
 .ce
 Fig 1.1 Major Interfaces
 .ke
-
 
 While images will be maintained under DBIO, access to the pixels will
 continue to be provided by the IMIO interface.  IMIO is a higher level interface
@@ -59,7 +55,6 @@ in a separate pixel storage file or in the database file itself (as a one
 dimensional array), depending on the size of the image.
 A system defined thresold value will determine which type of storage is used.
 The relationship of IMIO to DBIO is shown in Figure 1.2.
-
 
 .ks
 .nf
@@ -70,9 +65,8 @@ The relationship of IMIO to DBIO is shown in Figure 1.2.
 					MEMIO
 
 			(cl)   |    (vos)
-
-
 .fi
+
 .ce
 Fig 1.2 Relationship of Database and Image I/O
 .ke
@@ -148,7 +142,6 @@ multiple records from the same data group.
 .le
 .le
 
-
 To summarize, the primary requirements are data independence, efficient access
 to both large and small databases, and flexibility in the contents of the
 database.
@@ -181,7 +174,6 @@ On the other hand, the database requirements of IRAF are similar enough to
 those addressed by commercial databases that we would be foolish not to try
 to make use of some of the same technology.
 
-
 .ks
 .nf
 	\fBformal relational term\fR		    \fBinformal equivalents\fR
@@ -193,7 +185,6 @@ to make use of some of the same technology.
 		primary key			record id
 .fi
 .ke
-
 
 A DBIO \fBdatabase\fR shall consist of one or more \fBrelations\fR (tables).
 Each relation shall contain zero or more \fBrecords\fR (rows of the table).
@@ -300,7 +291,6 @@ deletion or by updates involving variant records.
 .le
 .le
 
-
 Additional nonalgebraic operators are required for examining the structure
 and contents of relations, returning the number of records or attributes in
 a relation, and determining whether a given relation exists.
@@ -350,7 +340,6 @@ Delete the current record.
 .le
 .le
 
-
 Additional operators are required to close or open a relation for record
 level access and to count the number of records in a relation.
 
@@ -377,7 +366,6 @@ updating modified records or inserting the record in the output relation.
 Steps [2] and [3] are repeated until the entire relation has been processed.
 .le
 .le
-
 
 Examples of such operators are conversion to and from DBIO and LIST file
 formats, column extraction, mimimum or maximum of an attribute (domain
@@ -442,7 +430,6 @@ analysis program or an astronomical catalog.
 .le
 .le
 
-
 Updates and insertions are generally random access operations; retrieval
 based on the values of several attributes requires efficient sequential
 access.  Efficient random access for relations [2] and [3] requires use
@@ -491,7 +478,6 @@ Structure of a Binary Relation
     Putting all this together we come up with the following structure for
 a binary relation:
 
-
 .ks
 .nf
 	BOF
@@ -519,7 +505,6 @@ a binary relation:
 	EOF
 .fi
 .ke
-
 
 Vector valued fields with a fixed upper size will be stored directly in the
 record, prefixed by the length of the actual vector (which may vary from
@@ -572,7 +557,6 @@ assignment, and to flag attribute comparisons which are likely to be erroneous
 "bool", "char", "short", etc. are predefined.  The following information
 must be stored for each user defined domain:
 
-
 .ks
 .nf
 	name			may be same as attribute name
@@ -585,12 +569,10 @@ must be stored for each user defined domain:
 .fi
 .ke
 
-
 The following information is required to describe each attribute.
 The attribute list is maintained separately from the hash table of attribute
 names and can be used to regenerate the hash table of attribute names if
 necessary.
-
 
 .ks
 .nf
@@ -599,7 +581,6 @@ necessary.
 	offset			offset in record
 .fi
 .ke
-
 
 All strings will be stored in a fixed size string buffer in the header
 area; it is the index of the string which is stored in the domain and

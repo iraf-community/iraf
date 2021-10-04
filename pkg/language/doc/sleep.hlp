@@ -18,7 +18,10 @@ amount of time.
 EXAMPLES
 1. Sleep for 10 seconds, and then ring the bell.
 
+.nf
 	cl> sleep 10; beep
+.fi
+
 .ih
 SEE ALSO
 wait

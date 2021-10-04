@@ -65,6 +65,7 @@ To accumulate a grand total over a list of images:
 .nf
     nl> bitcount a001*.imh grandtotal+
 .fi
+
 .ih
 BUGS
 A warning will be issued when accumulating a grand total over a list

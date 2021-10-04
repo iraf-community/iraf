@@ -4,9 +4,11 @@ NAME
 fit1d -- fit a function to image lines
 .ih
 USAGE	
+
 .nf
 fit1d input output type
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -136,12 +138,16 @@ each image in the input list.
 EXAMPLES
 1.  To create a smoothed version of an image by fitting the image lines:
 
+.nf
     cl> fit1d image fitimage fit
+.fi
 
 If the interactive flag is set and the image is two dimensional then a prompt
 for an image line is printed:
 
+.nf
     image: Fit line = 100 200
+.fi
 
 The selected lines are averaged, graphed, and the interactive options for
 setting and fitting the line are used.  Exiting with 'q' or return prompts for
@@ -165,7 +171,9 @@ subtractions.
 
 3.  To determine a small scale response image:
 
+.nf
     cl> fit1d image1 flat ratio
+.fi
 
 The task \fBimred.generic.flat1d\fR is available for making flat field images
 by this method with the addition of an extra parameter to limit the data values

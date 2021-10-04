@@ -9,6 +9,7 @@ iszero (sf)
 .nf
 pointer	sf		# surface grid descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

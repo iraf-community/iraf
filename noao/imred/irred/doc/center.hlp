@@ -221,14 +221,12 @@ e	Print error messages
 r	Rewind the coordinate list
 q	Exit task
 
-
 	Colon Commands
 
 :show	[data/center]	List the parameters
 :m      [n]	        Move to next [nth] star in coordinate list
 :n      [n]	        Center next [nth] star in coordinate list,
 			output results
-
 
 	Colon Parameter Editing Commands
 
@@ -283,7 +281,6 @@ q	Exit task
 
 :mkcenter	[y/n]		Mark computed centers on the display
 :radplot	[y/n]		Plot radial profile of object
-
 
 The following keystroke commands are available from the interactive setup
 menu.
@@ -406,7 +403,6 @@ setup menu defined by the i keystroke command and a radial profile plot.
 	... type q to quit followed by q to confirm the quit
 
 	... the output will appear in ypix.ctr.1
-
 .fi
 
 2. Compute the centers for a few stars in dev$ypix using the contour plot
@@ -469,7 +465,6 @@ the i key command as in example 1.
 	... reset stdimcur to its previous value
 .fi
 
-
 3. Setup and run CENTER interactively on a list of objects temporarily
 overriding the fwhmpsf, sigma, and cbox parameters determined in examples
 1 or 2.
@@ -484,7 +479,6 @@ overriding the fwhmpsf, sigma, and cbox parameters determined in examples
 	ap> center dev$ypix cbox=7.0 coords=ypix.coo.1 
 
 	... type ? for optional help
-
 
 	... move the graphics cursor to the stars and tap space bar
 
@@ -501,7 +495,6 @@ overriding the fwhmpsf, sigma, and cbox parameters determined in examples
 
 	... the output will appear in ypix.ctr.3 ...
 .fi
-
 
 4. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.
@@ -522,7 +515,6 @@ coordinates in the coordinate system of the parent image.
 	ap> pdump ypix.ctr.4 xc,yc yes | tvmark 1 STDIN col=204 
 .fi
 
-
 5. Run CENTER in batch mode using the coordinate file and the previously
 saved parameters. Verify the critical parameters.
 
@@ -531,7 +523,6 @@ saved parameters. Verify the critical parameters.
 
 	... output will appear in ypix.ctr.5 ...
 .fi
-
 
 6. Repeat example 5 but assume that the input coordinate are ra and dec
 in degrees and degrees, turn off verification, and submit the task to to
@@ -553,7 +544,7 @@ the background.
 	ap> pdump ypix.ctr.6 xc,yc yes | tvmark 1 STDIN col=204
 
 	... mark the stars on the display
-
+.fi
 
 7. Run CENTER interactively without using the image display.
 

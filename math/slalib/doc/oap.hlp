@@ -1,6 +1,6 @@
 .help oap Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slOAP (TYPE, OB1, OB2, DATE, DUT, ELONGM, PHIM,
      :                    HM, XP, YP, TDK, PMB, RH, WL, TLR,
      :                    RAP, DAP)
@@ -158,6 +158,6 @@
 
   Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

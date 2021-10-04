@@ -18,13 +18,7 @@
           3.8   Creating the Bad Pixel File
           3.9   Writing the Data to Tape
 
-
-
-
-
-
 					A thinly disguised version of CCDMAN
-
 
 						     Lisa Wells
 
@@ -32,6 +26,7 @@
 
 						 September 30, 1993
 .fi
+
 .bp
 .ls \fI1. Introduction\fR
 
@@ -176,8 +171,8 @@ instrumental to standard magnitudes. There is also a manual which was
 written by the IRAF group in Tucson which is a good guide; "A User's
 Guide to Stellar CCD Photometry with IRAF".
 .bp
-.nf
 
+.nf
                    ==========================
                    =      Set Instrument    =
                    =  and Translation File  =
@@ -350,13 +345,11 @@ to edit its parameters. We will edit
      (version = "2: October 1987") 
         (mode = "ql")           
       ($nargs = 0)              
-
 .fi
 
 An example of the \fIinstrument translation file\fR follows.
 
 .nf
-
           exptime exptime
           darktime darktime
           imagetyp imagetyp
@@ -382,7 +375,6 @@ An example of the \fIinstrument translation file\fR follows.
           "DOME FLAT"		flat
           MASK			other
 .fi
-
 
 The instrument file consists of first, the IRAF parameter and its associated
 image header keyword from the objects. These header values may vary depending
@@ -637,6 +629,7 @@ type.
 .nf
       cc> page ccdlog
 .fi
+
 .bp
 
 .nf
@@ -823,14 +816,14 @@ the image.
 
 .nf
       cc> ccdlist flat1R
-
 .fi
+
 You should get the following,
 
 .nf
         flat1R[496,501][real][flat][R][OTZ]:dflat R
-
 .fi
+
 'ccdlist' should tell you the image name (flat1R), the image size [496,501]
 left after trimming, the pixel type [real] of the image (the processed
 images should normally have pixels in real format, as opposed to
@@ -1033,7 +1026,6 @@ with the smoothing parameters. Repeat these steps until you are satisfied.
 Now you can process your images.
 
 .nf
-
 			\fIccdproc for sky flats\fR
 
        images = "sky1*imh"      List of CCD images to correct
@@ -1073,7 +1065,9 @@ Now you can process your images.
         (grow = 0.)             Rejection growing radius
         (mode = "ql")           
 .fi
+
 .bp
+
 .nf
                       \fImkskyflat\fR
 
@@ -1134,7 +1128,6 @@ check whether the frames have been duly processed, i.e.,
 You should get a listing of your images in the format that follows,
 
 .nf
-
       obj1010.imh[496,501][real][object][R][OTZF]:rubin 152 R
       obj1011.imh[496,501][real][object][I][OTZF]:rubin 152 I
       obj1012.imh[496,501][real][object][B][OTZF]:rubin 149 B
@@ -1188,7 +1181,6 @@ where the [OTZF] code reveals the degree of processing of the images.
  (high_reject = 3.)             High sigma rejection factor
         (grow = 0.)             Rejection growing radius
         (mode = "ql")           
-
 .fi
 
 .le
@@ -1300,7 +1292,6 @@ to be used. If you plan to do photometry in IRAF see section VI of this manual.
  (high_reject = 3.)             High sigma rejection factor
         (grow = 0.)             Rejection growing radius
         (mode = "ql")           
-
 .fi
 .le
 .bp

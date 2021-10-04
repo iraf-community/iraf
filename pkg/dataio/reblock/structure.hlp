@@ -1,6 +1,7 @@
 .help gcopy "Program Structure"
 .sh
 Program Structure
+
 .nf
 t_bincopy()
 # Returns when file list is finished or EOT reached.
@@ -17,6 +18,7 @@ t_bincopy()
 	block_pad (szb_outblock, szb_outrecord, padchar, buffer, op, rem_out,
 		    outparam)
 .fi
+
 .sh
 BINCOPY Structure Summary
 .ls t_bincopy

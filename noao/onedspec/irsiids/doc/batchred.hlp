@@ -125,12 +125,17 @@ EXAMPLES
 
 The following invokes the batch reductions using all task options;
 
+.nf
 	cl> batchred
+.fi
 
 The following inhibits the STANDARD and SENSFUNC tasks which must have
 been run previously. This is equivalent to the IPPS "autoreduce":
 
+.nf
 	cl> batchred standard- sensfunc-
+.fi
+
 .ih
 BUGS
 If you make an error while entering the requested information, there

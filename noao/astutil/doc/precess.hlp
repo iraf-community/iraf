@@ -60,4 +60,5 @@ the file "coords", rather than from the terminal:
 	  12:34:42.89  -20:29:46.29  1990.0
 	  12:35:14.40  -20:33:04.40  2000.0
 .fi
+
 .endhelp

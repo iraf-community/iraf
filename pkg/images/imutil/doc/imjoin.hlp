@@ -52,7 +52,6 @@ EXAMPLES
 2.  Join three datacubes along the z direction.
 
     cl> imjoin c1,c2,c3 c123 3
-
 .fi
 
 .ih

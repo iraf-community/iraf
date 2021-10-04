@@ -237,7 +237,6 @@ The time of observations values are not used in any DAOPHOT
 computations, however their presence in the DAOPHOT output files can
 greatly simplify future reduction steps.
 
-
 .ih
 EXAMPLES
 
@@ -278,6 +277,7 @@ example.
 
 	... type ":w datnite1.par"  from within epar
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

@@ -332,7 +332,6 @@ o   Compute sigmas of remaining pixels about the combined values
 o   Write the output image line, rejected pixel masks, and sigmas
 .fi
 
-
 OFFSETS
 
 The images to be combined need not be of the same size or overlap.  They
@@ -434,7 +433,6 @@ input pixel.  Continuing with the above example, the file
 will have the first pixel of the first image in the 11th pixel of the
 output image.  Note that there is no way to "pad" the other side of
 the output image.
-
 
 SCALES AND WEIGHTS
 
@@ -579,7 +577,6 @@ in the weights the user must specify the weights in a file taking
 explicit account of changes in the weights due to different sky
 statistics.
 
-
 PIXEL MASKS
 
 A pixel mask is a type of IRAF file having the extension ".pl" which
@@ -651,7 +648,6 @@ are stacked and combined with the \fIproject\fR option.  \fBNote\fR that
 this means that the bad pixel mask from the first input image will be
 applied to all the images.
 
-
 THRESHOLD REJECTION
 
 In addition to rejecting masked pixels, pixels in the unscaled input
@@ -662,7 +658,6 @@ to exclude very bad pixel values or as an alternative way of masking
 images.  In the latter case one can use a task like \fBimedit\fR
 or \fBimreplace\fR to set parts of the images to be excluded to some
 very low or high magic value.
-
 
 REJECTION ALGORITHMS
 
@@ -954,7 +949,6 @@ threshold rejection, scaling, and applying a rejection algorithms the
 remaining pixels are combined and output.  The pixels may be combined
 by computing the median or by computing a weighted average.
 
-
 SIGMA OUTPUT
 
 In addition to the combined image and optional sigma image may be
@@ -997,6 +991,7 @@ sky brightness and make a weighted average:
 	cl> oimcombine obj* avsig combine=average reject=avsig \
 	>>> scale=exp zero=mode weight=exp  expname=exptime
 .fi
+
 .ih
 REVISIONS
 .ls OIMCOMBINE V2.11.4

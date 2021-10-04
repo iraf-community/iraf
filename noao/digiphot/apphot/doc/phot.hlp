@@ -253,7 +253,6 @@ e	Print error messages
 r	Rewind coordinate list
 q	Exit task
 
-
 Photometry parameters are listed or set with the following commands.
 
 	Colon commands
@@ -339,7 +338,6 @@ Photometry parameters are listed or set with the following commands.
 :mksky		[y/n]		Mark the sky annuli on the display
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot radial profile of object
-
 
                     Interactive Phot Setup Menu
 
@@ -589,7 +587,6 @@ the i key command as in example 1.
         ... reset stdimcur to its previous value
 .fi
 
-
 3. Setup and run PHOT interactively on a list of objects temporarily
 overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
 parameters determined in examples 1 or 2.
@@ -605,7 +602,6 @@ parameters determined in examples 1 or 2.
            apertures="3.0,5.0" coords=ypix.coo.1
 
         ... type ? for optional help
-
 
         ... move the graphics cursor to the stars and tap space bar
 
@@ -624,7 +620,6 @@ parameters determined in examples 1 or 2.
 
         ... the output will appear in ypix.mag.3 ...
 .fi
-
 
 4. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.
@@ -675,7 +670,6 @@ the background.
 
         ... mark the stars on the display
 .fi
-
 
 7. Run PHOT interactively without using the image display.
 
@@ -743,7 +737,6 @@ parameter files, and quits the task.
 
         ... full output will appear in ypix.mag.8
 .fi
-
 
 .ih
 BUGS

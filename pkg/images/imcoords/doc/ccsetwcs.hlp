@@ -239,7 +239,6 @@ are the image pixel coordinates and xi and eta are the corresponding standard
 coordinates in arcseconds per pixel. The standard coordinates are computed
 by applying the appropriate sky projection to the celestial coordinates.
 
-
 .nf
 	 xi = f (x, y)
 	eta = g (x, y)
@@ -361,8 +360,6 @@ required input and output, etc. An overview of the library can be found in the
 paper "SLALIB - A Library of Subprograms", Starlink User Note 67.7
 by P.T. Wallace, available from the Starlink archives.
 
-
-
 .ih
 EXAMPLES
 
@@ -377,7 +374,6 @@ cl> type coords
 13:29:38.700  47:13:36.23  442.01  409.65
 13:29:55.424  47:10:05.15  224.35  131.20
 13:30:01.816  47:12:58.79  134.37  356.33
-
 
 cl> ccmap coords coords.db image=pix xcol=3 ycol=4 lngcol=1 latcol=2 \
 inter-
@@ -439,8 +435,6 @@ begin   coords
                         -0.01393966623835092    0.7665650170136847
         surface2        0
 
-
-
 cl> imheader pix l+
 ...
 DATE-OBS= '05/04/87'            /  DATE DD/MM/YY
@@ -448,7 +442,6 @@ RA      = '13:29:24.00'         /  RIGHT ASCENSION
 DEC     = '47:15:34.00'         /  DECLINATION
 EPOCH   =              1987.26  /  EPOCH OF RA AND DEC
 ...
-
 
 cl> ccsetwcs pix coords.db pix 
 Image: pix  Database: coords.db  Record: pix
@@ -511,7 +504,6 @@ Columns 1 and 2 contain the original ra and dec values and columns 3 and 4
 contain the transformed values. The second imheader listing shows what the
 image wcs looks like.
 
-
 2. Repeat the previous example but enter the plate solution parameters by
 hand.
 
@@ -527,7 +519,6 @@ Coordinate mapping parameters
     X and Y scale: 0.764  0.767  (arcsec/pixel  arcsec/pixel)
     X and Y coordinate rotation: 180.890  1.042  (degrees  degrees)
 Updating image header wcs
-
 
 cl> skyctran coords STDOUT "pix log" "pix world" lngcol=3 latcol=4 trans+
 

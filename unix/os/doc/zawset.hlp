@@ -4,6 +4,7 @@ NAME
 zawset -- adjust working set size
 .ih
 SYNOPSIS
+
 .nf
 zawset (requested_size, newsize, oldsize, textsize)
 
@@ -12,6 +13,7 @@ int	newsize			# working set allocated, bytes
 int	oldsize			# old working set size, bytes
 int	textsize		# size of text segment
 .fi
+
 .ih
 DESCRIPTION
 Adjust the amount of physical memory allocated to a process, i.e., the

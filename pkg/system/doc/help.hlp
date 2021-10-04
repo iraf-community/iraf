@@ -164,13 +164,18 @@ might appear as follows:
 
 To get help on a module one supplies the module name as an argument,
 
+.nf
 	pl> help graph
+.fi
 
 and the manual page for the \fBplot.graph\fR program will be printed on the
 terminal.  To get a hardcopy of the manual page on the printer, the output
 may be redirected to the line printer, as follows:
 
+.nf
 	pl> help graph | lprint
+.fi
+
 .ih
 DESCRIPTION
 The function of the \fBhelp\fR program is to perform a depth first search
@@ -372,6 +377,7 @@ text, a help document in LROFF format which will be converted to HTML for
 display, or a native HTML document.
 
 HTML files may contain URLs of the form
+
 .nf
 	\fB<a href=\fI[package.]task\fB>\fIurl_text\fB</a>\fR
 .fi
@@ -381,6 +387,7 @@ consists of an optional package and task name delimited by a period.  For
 example, to create a link to the 
 .hr onedspec.splot \fBsplot\fR
 task in a document one would use the URL
+
 .nf
 	\fB<a href=onedspec.splot>splot</a>\fR
 .fi
@@ -458,8 +465,8 @@ new directives have been added to the LROFF text formatter.  These are
 \fB.hr\fR to specify a link (an HTML \fIHREF\fR directive) and \fB.hn\fR
 to specify a name (an HTML \fINAME\fR directive).  The syntax for these are
 as follows:
-.nf
 
+.nf
 	\fB.hn\fI <name>\fR
 	\fB.hr\fI <link> <text> \fR
 .fi
@@ -479,21 +486,21 @@ plain text or PostScript.
 .ih
 GUI EXAMPLES
 1) Start \fIhelp\fR as a GUI browser:
-.nf
 
+.nf
 	cl> help dev=gui
 .fi
 
 2) Begin by searching for the phrase 'gauss', tasks and packages may be
 selected from the search panel which will appear when the task starts:
-.nf
 
+.nf
 	cl> help gauss dev=gui search+
 .fi
 
 3) Load an LROFF help page in the browser at startup
-.nf
 
+.nf
 	cl> help mytask.hlp dev=gui file+
 .fi
 
@@ -512,67 +519,67 @@ or
 .fi
 
 2. Print the help text on the line printer:
-.nf
 
+.nf
 	cl> help delete | lprint
 .fi
 
 3. Print help for the current package:
-.nf
 
+.nf
 	cl> help
 .fi
 
 4. Print the usage section of all modules in the package \fBimages\fR:
-.nf
 
+.nf
 	cl> help images.* section=usage
 .fi
 
 5. Print a directory of all help blocks in the packages \fBclpackage\fR
 and \fBclio\fR (and any others whose names begin with the string "cl"):
-.nf
 
+.nf
 	cl> help cl* op=dir
 .fi
 
 6. Print a directory of each package in the database (useful for getting an
 overview of the contents of a help database):
-.nf
 
+.nf
 	cl> help * op=dir
 .fi
 
 7. Print the source for all of the string utilities in the system library
 package \fBfmtio\fR:
-.nf
 
+.nf
 	cl> help fmtio.str* op=source
 .fi
 
 8. Find all tasks that delete something:
-.nf
 
+.nf
 	cl> help * | match delete
 .fi
 
 9. Print the manual pages for the \fIhelp\fR and \fIlprint\fR tasks on the
 default printer device:
-.nf
 
+.nf
 	cl> help help,lprint | lpr
 .fi
 
 10. Capture the manual page for task \fIhedit\fR in a text file, in a form
 suitable for printing on any device.
-.nf
 
+.nf
 	cl> help hedit dev=text > hedit.txt
 .fi
 
 11. Print the manual page for task \fIhedit\fR as a Postscript file. 
-.nf
 
+.nf
 	cl> help hedit dev=ps | lprint
 .fi
 

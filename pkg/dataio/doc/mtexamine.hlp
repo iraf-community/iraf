@@ -73,6 +73,7 @@ characters on the standard output.
 .nf
 	cl> mtexamine mtb1600[3] du+ re=5 ou=c
 .fi
+
 .ih
 BUGS
 The IRAF magtape i/o routines do not permit data beyond a double EOF

@@ -1,6 +1,6 @@
 .help xy2xy Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slXYXY (X1,Y1,COEFFS,X2,Y2)
 
      - - - - - -
@@ -40,6 +40,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

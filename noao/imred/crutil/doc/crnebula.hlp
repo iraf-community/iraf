@@ -4,9 +4,11 @@ NAME
 crnebula -- create a cosmic ray mask from nebular images
 .ih
 USAGE	
+
 .nf
 crnebula input output
 .fi
+
 .ih
 PARAMETERS
 .ls input

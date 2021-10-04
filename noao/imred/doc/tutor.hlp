@@ -38,15 +38,22 @@ not be the same as the standard help database.
 EXAMPLES
 To get started:
 
+.nf
 	cl> tutor
+.fi
 
 To get help on reading and writing data tapes:
 
+.nf
 	cl> tutor dataio
+.fi
 
 To read all the topics:
 
+.nf
 	cl> tutor all
+.fi
+
 .ih
 BUGS
 Piping the output of \fBtutor\fR to lprint does not work properly because
@@ -57,8 +64,10 @@ Tutorials are currently available only for the \fBechelle\fR package.
 This tutorial is in the process of being developed.
 .ih
 SEE ALSO
+
 .nf
 help
 Individual help pages for all the tasks mentioned in the tutorial.
 .fi
+
 .endhelp

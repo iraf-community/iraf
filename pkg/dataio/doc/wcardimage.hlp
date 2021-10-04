@@ -54,7 +54,6 @@ on tape, replacing tabs with blanks and prefixing the leftover portions
 of oversize lines with ">>".
 
 .nf
-
 	cl> wcardimage files* mtb1600[1]
 .fi
 
@@ -62,7 +61,10 @@ of oversize lines with ">>".
 on tape, replacing tabs with blanks and prefixing the leftover portions
 of oversize lines with ">>".
 
+.nf
 	cl> wcardimage files* mtb1600[1] eb+
+.fi
+
 .ih
 BUGS
 The card_length in bytes must be an integral number of chars.

@@ -442,7 +442,6 @@ files are correct.
 	ph> mknobsfile *.mag.* "1,2,3" jun11.stdim jun11.stobs tol=0.0
 
 	    ... create the observations file
-
 .fi
 
 2. Prepare an observations file from a set of standard star observations

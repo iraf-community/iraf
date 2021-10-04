@@ -40,7 +40,9 @@ EXAMPLES
 To create a flat field from a calibration image "quartz" using pixels
 above 1000 and selecting the normalization to be 3500:
 
+.nf
 	cl> normflat quartz flat norm=3500 minflat=1000
+.fi
 
 To determine a normalization from the pixels above 1000 and sampling
 every fifth pixel in each dimension:
@@ -48,6 +50,7 @@ every fifth pixel in each dimension:
 .nf
 	cl> normflat quartz flat minflat=1000 sample=[*:5,*:5]
 .fi
+
 .ih
 SEE ALSO
 normalize

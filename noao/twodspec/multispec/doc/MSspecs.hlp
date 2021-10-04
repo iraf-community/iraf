@@ -50,7 +50,6 @@ the operations will be repetitively applied.
      The following CL scripts are required to reduce multi-spectra images
 from digital detectors.
 
-
 .nf
 	debias		multispec_flat		flat_divide
 .fi
@@ -412,6 +411,7 @@ are selected by a string.  The possible values are
     ips3 - fit the intensity scale, position, and three parameter shape
     ips4 - fit the intensity scale, position, and four parameter shape
 .fi
+
 These models will be combined in a script to search for the best fit.
 
 The initial shape parameters will generally be set by scripts for a
@@ -558,10 +558,10 @@ use in the ONEDSPEC reduction package.
 extract the spectra from a specified list of image files.  These steps have
 been found to generally perform the desired extraction task fully.
 
-
 .nf
 	multiap_extract		echelle_extract
 .fi
+
 .ks
 .ls multiap_extract
 The specified multi-aperture plate images are extracted.

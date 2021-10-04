@@ -4,6 +4,7 @@ NAME
 strings -- string manipulation functions available in the CL
 .ih
 USAGE
+
 .nf
 str     (x)
 substr  (str, first, last)
@@ -15,6 +16,7 @@ strupr  (str)
 strstr  (str1, str2)
 strlstr (str1, str2)
 .fi
+
 .ih
 DESCRIPTION
 The following functions are available for the manipulation of strings
@@ -72,6 +74,7 @@ EXAMPLES
 	i = strstr  ("imh","imhead.imh")     # i = 1
 	i = strlstr ("imh","imhead.imh")     # i = 8
 .fi
+
 .ih
 SEE ALSO
 scan, radix

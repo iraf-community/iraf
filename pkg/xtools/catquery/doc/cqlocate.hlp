@@ -11,6 +11,7 @@ catno = cq_locate (cq, catname)
 pointer	cq		# the configuration file descriptor
 char	catname		# the name of the catalog / survey record to be located
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

@@ -10,6 +10,7 @@ asisave (asi, interpolant)
     pointer	asi		#I interpolant descriptor
     real	interpolant[]	#O array containing the interpolant
 .fi
+
 .ih
 ARGUMENTS
 .ls asi   
@@ -23,6 +24,7 @@ determined by a call to asigeti.
 .nf
 		len_interpolant = asigeti (asi, II_ASINSAVE)
 .fi
+
 .ih
 DESCRIPTION
 The interpolant type, number of coefficients and the position of

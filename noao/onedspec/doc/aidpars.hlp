@@ -217,7 +217,6 @@ line strengths need not be very similar (due to different lamps or
 detectors) but will still help separate the inherently weak and strong
 lines.
 
-
 The Input
 
 The primary inputs to the algorithm are the observed one dimensional target
@@ -303,7 +302,6 @@ is included where <image> is the image filename of the reference spectrum.
 Some of the standard line lists in linelists$ may include a reference
 spectrum.  The reference spectrum is used to select the strongest lines for
 the pattern matching algorithm.
-
 
 The Algorithm
 
@@ -543,6 +541,7 @@ EXAMPLES
 .nf
     cl> autoidentify spec002 5400 2.5 crpix=1
 .fi
+
 .ih
 REVISIONS
 .ls AIDPARS V2.12.2

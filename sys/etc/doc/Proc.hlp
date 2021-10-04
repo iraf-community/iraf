@@ -12,8 +12,6 @@ Connected Subprocesses
 	    pid = propcpr (process, in, out)
 	   stat = prclcpr (pid)
 
-
-
 Detached Processes
 
 	    job = propdpr (process, bkgfile)

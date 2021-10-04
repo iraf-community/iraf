@@ -165,7 +165,6 @@ INVERTFIT does not test for this condition and may converge to either solution.
 	      mb = b0 + V + BV + b1 * BV + b2 * BV ** 2
 .fi
  
-
 Formal errors for the fit may
 be computed by,  1) setting \fIerrors\fR to "obserrors" and using the
 error columns defined in the observations section of \fIconfig\fR
@@ -225,14 +224,12 @@ w	output the number of spaces given by field W
 x	hexadecimal integer
 z	complex format (r,r) (D = precision)
 
-
 Conventions for w (field width) specification:
 
     W =  n	right justify in field of N characters, blank fill
 	-n	left justify in field of N characters, blank fill
 	0n	zero fill at left (only if right justified)
 absent, 0	use as much space as needed (D field sets precision)
-
 
 Escape sequences (e.g. "\n" for newline):
 
@@ -262,7 +259,6 @@ Examples
 %-12.5g     same as above but left justified
 
 \n          insert a newline
-
 .fi
 
 .ih

@@ -40,6 +40,7 @@ The relationships between the parameters is as follows:
     clow = lowval + dx / 2
     chigh = highval - dx / 2
 .fi
+
 .ih
 PARAMETERS
 .ls intable [file name template]
@@ -141,6 +142,7 @@ but set the spacing between bins to be 0.1.
 	tt> thistogram bs STDOUT V nbins=INDEF dx=0.1 | \\
 	>>>   sgraph (crvstyle="pseudohist")
 .fi
+
 .ih
 BUGS
 .ih

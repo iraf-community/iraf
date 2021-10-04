@@ -70,7 +70,6 @@ Similarly, pagination control directives can be added to the list of
 \fBlroff\fR directives, to be intercepted by the user supplied INPUT procedure.
 See the Manpage command for an example.
 
-
 DIRECTIVES
 
 Most of the \fBlroff\fR directives function the same as in the UNIX text
@@ -175,6 +174,7 @@ The \fBlroff\fR-format help text fragment
  DESCRIPTION
  ...
 .fi
+
 would be converted by \fBlroff\fR (as called from Help) into something like
 the following.  Remember that the margins are runtime arguments to \fBlroff\fR.
 Help does not print a header line, or break pages.
@@ -249,4 +249,5 @@ additional directives provided by MANPAGE:
   .ks			  yes	Begin saving output.
   .ke			  yes	Output saved text all on one page.
 .fi
+
 .endhelp

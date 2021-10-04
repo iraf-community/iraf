@@ -100,7 +100,6 @@ convert to integer	int(x)		convert to real		real(x)
 nearest integer		nint(x)		modulo			mod(x)
 .fi
 
-
 If the append parameter is "yes" then the converted input text database is
 appended to the specified output table. When appending to a table each of the
 output fields must already exist in the output table.
@@ -121,20 +120,20 @@ If there were 4 magnitude fields in n4147.mag.1
 then there would be 4 columns in the output table with names of 
 MAG[1], MAG[2], MAG[3] and MAG[4]
 
-
 2. Convert the same file as in example 1. but append the output to
    n4147.tmag.1 and only select records with YCENTER <= 200.0.
 
 .nf
    pt> pconvert n4147.mag.1 n4147.tmag.1 "ID,XCENTER,YCENTER,MAG,MSKY" \
        expr="YCENTER < 200.0" append+
-
 .fi
 
 3. Convert all the records in the NSTAR text database n4147.nst.1 to
    an STSDAS table.
 
+.nf
    pt> pconvert n4147.nst.1 n4147.tnst.1 "*"
+.fi
 
 .ih
 TIME REQUIREMENTS

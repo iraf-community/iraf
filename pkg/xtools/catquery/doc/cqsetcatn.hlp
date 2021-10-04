@@ -11,6 +11,7 @@ catno = cq_setcatn (cq, catno)
 pointer	cq		# the configuration file descriptor
 int	catno		# the sequence number of the catalog / survey to be set
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

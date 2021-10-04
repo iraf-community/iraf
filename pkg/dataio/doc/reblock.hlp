@@ -171,6 +171,7 @@ bytes and padding the last block.
 .nf
 	cl> reblock input output inrec=81 outrec=82 padchar=" "
 .fi
+
 .ih
 SEE ALSO
 t2d

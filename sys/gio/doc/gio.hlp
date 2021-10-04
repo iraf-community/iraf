@@ -43,7 +43,6 @@ noninteractively or from a nongraphics workstation.
 .le
 .le
 
-
 IRAF needs its own graphics interface partly because no existing graphics
 interface meets all of the above requirements, and partly because we do not
 want our applications to be dependent upon any particular external graphics
@@ -93,7 +92,6 @@ an NSPP kernel and others with a GKS kernel.  On a different host CORE might
 be the only thing available and GIO would have to be interfaced to CORE on
 such a host.
 
-
 .ks
 .nf
 	        __________
@@ -117,17 +115,14 @@ such a host.
 		|  task  |-----------------------> (gki metacode)
 		+--------+
 
-
 	          simple                   plotters
 	  |---  interactive ---|------     metafile    ------|
 		 graphics               special devices
-
-
 .fi
+
 .ce
 Figure 1. Graphics Task Structure
 .ke
-
 
 The IRAF command language (CL) is the user interface to IRAF programs and
 as such moderates all interaction with the user, including interaction via
@@ -211,7 +206,6 @@ which can draw an entire plot with autoscaling and axis labeling in one call,
 to the polyline, polymarker, move, draw, and text drawing primitives at
 the low end.
 
-
 .ks
 .nf
 	       gplotv (v, npts, x1, x2, title)
@@ -259,7 +253,6 @@ the low end.
 	 stat = ggcur (gp, x, y, key)
 .fi
 .ke
-
 
 All coordinates are given in world coordinates (user coordinates)
 except the viewport coordinates and the marker sizes, which are given in
@@ -375,7 +368,6 @@ labeling is used because it is simple and because it is appropriate for
 both vector graphics and image display output devices (and cursor mode
 must serve both).
 
-
 .ks
 .nf
 	A 			draw and label the axes of current viewport
@@ -407,10 +399,10 @@ must serve both).
 	0			reset and redraw
        1-9			roam
 .fi
+
 .ce
 Figure 2. Cursor Mode Keystrokes
 .ke
-
 
 By default the cursor mode keystrokes are all upper case letters, reserving
 lower case for applications programs.  The terminal shift lock key may be
@@ -428,7 +420,6 @@ any other command will terminate the cursor read, returning the character ':'
 as the key value, and the command string as the string value of the cursor
 read.  The commands recognized by the graphics system are summarized in
 figure 3.
-
 
 .ks
 .nf
@@ -455,11 +446,9 @@ figure 3.
 	:.zero			reset viewport and redraw frame
 .fi
 
-
 .ce
 Figure 3. Cursor Mode Commands
 .ke
-
 
 Minimum match abbreviations are permitted for cursor mode command names.
 Multiple commands may be given on one line, delimited by semicolons.
@@ -479,7 +468,6 @@ applications program.  In roam mode a numeric key must be escaped to exit
 cursor mode.  The directional significance of the numeric keys in roam
 mode is obvious if the terminal has a keypad, and is illustrated below.
 
-
 .ks
 .nf
 	7   8   9	135 090 045
@@ -489,7 +477,6 @@ mode is obvious if the terminal has a keypad, and is illustrated below.
 	1   2   3	225 -90 -45
 .fi
 .ke
-
 
 There is a fixed upper limit on the size of the cursor mode frame buffer.
 If the frame data overflows the frame buffer while plotting the plot will
@@ -512,7 +499,6 @@ procedures.  The following procedure will plot a data vector (pixel array)
 and then repeatedly read the cursor, drawing a mark at successive positions
 of the cursor.  The procedure exits if the user types either the character
 'q' or EOF, e.g., <ctrl/z> or carriage return.
-
 
 .ks
 .nf
@@ -558,7 +544,6 @@ more often graphics output devices will be specified by one of the logical
 device names shown below.  Examples of the installation dependent device name
 associated with each logical name are also shown.
 
-
 .ks
 .nf
 	stdgraph	= "gterm"
@@ -567,7 +552,6 @@ associated with each logical name are also shown.
 	stdvdm		= "uparm$vdm"
 .fi
 .ke
-
 
 Interaction (via the CL) is supported only for \fBstdgraph\fR and
 \fBstdimage\fR.  The standard batch plotter device is \fBstdplot\fR,
@@ -606,7 +590,6 @@ calls to the TTY interface, used to access both graphcap and termcap files.
 The sequence of actions taken by GIO to access the graphcap entry for a
 device is summarized below.
 
-
 .ks
 .nf
 	if (standard graphics output device)
@@ -631,14 +614,12 @@ is similar to that used for output devices.  A CL environment variable is
 associated with each cursor type.  The names and default values of the
 environment variables are shown below.
 
-
 .ks
 .nf
 	stdgcur		= "stdgraph"
 	stdimcur	= "stdimage"
 .fi
 .ke
-
 
 The default input source for a cursor is the graphics output device associated
 with the graphics output stream.  If the cursor device is "stdgraph" or
@@ -648,7 +629,6 @@ the cursor value is a line of text read from the user terminal.
 In this mode the user enters at least two of the fields defining
 a cursor value.  Missing fields are assigned the value zero (the user
 presumably will know that the program does not use the extra fields).
-
 
 .ks
 .nf
@@ -660,7 +640,6 @@ presumably will know that the program does not use the extra fields).
 .fi
 .ke
 
-
 An example of a cursor read request entered interactively by the user,
 taking input from the terminal and sending output to the terminal,
 is shown above (the CL typed the "gcur: " query and the user entered the
@@ -671,7 +650,6 @@ where the world coordinate system was defined by the last plot output to
 the device.  For an imaging device the world coordinates will typically
 be the pixel coordinates of the image section being displayed.
 
-
 .ks
 .nf
 	cl> = gcur
@@ -680,14 +658,12 @@ be the pixel coordinates of the image section being displayed.
 .fi
 .ke
 
-
 Redirecting cursor input to the terminal is useful when working from a
 nongraphics workstation and when debugging programs.  ASCII cursor queries
 are the only type supported when running an IRAF program outside the CL.
 Cursor input may also be taken from a list file by assigning a filename
 to a cursor parameter, i.e., by assigning a list file to a list structured
 parameter and overriding query mode:
-
 
 .ks
 .nf
@@ -697,7 +673,6 @@ parameter and overriding query mode:
 	cl>
 .fi
 .ke
-
 
 This last mechanism is a standard technique used with CL list structured
 parameters and will not be discussed further here.
@@ -840,7 +815,9 @@ parameter.
 For example, if task \fBplotit\fR  has cursor and device parameters named
 "cursor" and "device", the command
 
+.nf
 	cl> plotit cursor=listfile device=qms
+.fi
 
 would run the task taking cursor input from the text file "listfile", with
 stdgraph graphics output directed to the plotter device "qms".
@@ -1202,6 +1179,7 @@ gstati (gp, param)
 gstatr (gp, param)
 gstats (gp, param, outstr, maxch)
 .fi
+
 .ls
 .nf
 pointer	gp		# graphics descriptor
@@ -1224,6 +1202,7 @@ ggeti (gp, cap)
 ggetr (gp, cap)
 ggets (gp, cap, outstr, maxch)
 .fi
+
 .ls
 .nf
 pointer	gp		# graphics descriptor
@@ -1601,7 +1580,6 @@ may be set by a prior call to \fBgset\fR or overridden for the duration
 of the current call by the \fIformat\fR string.  A null format string
 is permtted.
 
-
 .ks
 .nf
           keyword               values                 default
@@ -1616,7 +1594,6 @@ is permtted.
 	color		integers greater than one	1
 .fi
 .ke
-
 
 The attributes controlling how text is generated are shown above.
 The character up vector (attribute \fIup\fR) defines the horizontal and
@@ -1802,8 +1779,8 @@ in the include file <gset.h>.  In input to \fBgscan\fR, parameters are
 referred to by name in lower case, without the "g_" prefix.  The parameters
 and their default values are shown below.
 
-
 .tp 5
+
 .nf
         \fBparameter     default            description\fR
 
@@ -1832,6 +1809,7 @@ and their default values are shown below.
 .fi
 
 .tp 9
+
 .nf
 	    (axis labeling parameters)
 
@@ -1865,6 +1843,7 @@ and their default values are shown below.
 .fi
 
 .tp 4
+
 .nf
 	    (read only variables)
 
@@ -1872,7 +1851,6 @@ and their default values are shown below.
 	fd		-	file descriptor of output stream
 	devname		-	device name as passed to gopen
 .fi
-
 
 The Y axis parameters have names equivalent to those shown with the
 X prefix replaced by a Y.  If the prefix is omitted entirely then the
@@ -1902,7 +1880,6 @@ major ticks will be placed at powers of ten with eight minor ticks
 (e.g., 2,3,4,5,6,7,8,9) between each pair of major ticks.
 Tick lengths are given in NDC coordinates.  The default tick lengths
 are parameterized in terms of the character height for the device.
-
 
 .nh 2
 Graphcap Parameters
@@ -1945,8 +1922,8 @@ for example, in section 5 of the UNIX manuals.  A sample termcap entry for
 the devices "vt100-nam" and "vt100-am" is included below as an example of
 a typical termcap entry.
 
-
 .tp 5
+
 .nf
 d1|vt100|vt100-nam|vt100 w/no am:\
 	:am@:xn@:tc=vt100-am:
@@ -1962,7 +1939,6 @@ d0|vt100|vt100-am|vt100|dec vt100:\
 	:sc=\E7:rc=\E8:cs=\E[%i%d;%dr:ks=\E[?1h\E=:ke=\E[?1l\E>:
 .fi
 
-
 Note that each device may be known by several names.  The device capabilities
 are delimited by colons, e.g., ":xx=...:yy=...:".  The special capability "tc"
 allows an entry to include another entry recursively.  Escape is represented
@@ -1971,7 +1947,6 @@ is required after transmission of a string, the number of milliseconds
 appears as the first few chars in an entry, e.g., "cl=50..." causes a
 delay of 50 milliseconds following a screen clear.  Numeric capabilities are
 prefaced by a sharp, e.g., ":co#80:" (screen has 80 columns).
-
 
 .nh 3
 Generic GRAPHCAP Parameters
@@ -2100,7 +2075,6 @@ at each point using the cell array primitive.
 .le
 .le
 
-
 The graphcap parameters are accessed by name via \fBgget\fR calls.
 For example,
 
@@ -2163,7 +2137,6 @@ The fill area and font tables are array valued parameters mapping the GKI
 fill area and font indices into device codes (if the device should happen
 to support such niceties).
 
-
 .ks
 .nf
 	OW		open (reactivate) workstation
@@ -2179,12 +2152,10 @@ to support such niceties).
 .fi
 .ke
 
-
 The set attribute parameters are format strings used to encode set attribute
 commands, each of which has a single integer argument.  The format string is
 similar to a \fBprintf\fR format string with the addition of a notation for
 binary encoding (described below).
-
 
 .ks
 .nf
@@ -2199,7 +2170,6 @@ binary encoding (described below).
 	FC(i)		set fill area color
 .fi
 .ke
-
 
 Polyline generation, i.e., vector drawing, is more difficult to parameterize.
 We assume that polylines, polymarkers, fill areas, etc. are all similar enough
@@ -2221,7 +2191,6 @@ such instruction to have different head and tail strings.
 .fi
 .ke
 
-
 A polyline command consists of a number of subcommands, as outlined in the
 drawing below.  The polyline is a move followed by one or more draws.
 The polyline flag PL is set to indicate that multiple coordinate pairs
@@ -2229,7 +2198,6 @@ can be output between the DS and DE commands.  If PL is false (or omitted)
 each coordinate pair in the GKI polyline will be output surrounded by DS
 and DE commands.  The encoding of each coordinate pair is defined by the
 parameter XY.
-
 
 .ks
 .nf
@@ -2244,7 +2212,6 @@ parameter XY.
 	draw end
 .fi
 .ke
-
 
 The polymarker and fillarea parameters are optional.  The kernel will
 emulate markers and fill area if not supported by the hardware.
@@ -2264,14 +2231,12 @@ If characters are not addressed at the lower left corner an offset
 may be applied to the given coordinates using the binary encoding
 facilities.
 
-
 .ks
 .nf
 	TS(i,j)		text start
 	TE		text end
 .fi
 .ke
-
 
 Cursor output is controlled by the parameter WC.
 Cursor input is initiated by output of the sequence defined by the format RC.
@@ -2280,7 +2245,6 @@ The UC capability, if defined, will cause the cursor position to be updated
 (with WC) to the position at the last cursor read.  This is desirable if the
 device cannot maintain the cursor position, i.e., if unrelated graphics
 output commands affect the cursor position as an unwanted side effect.
-
 
 .ks
 .nf
@@ -2293,7 +2257,6 @@ output commands affect the cursor position as an unwanted side effect.
 	SC		scan cursor (-> x,y,key)
 .fi
 .ke
-
 
 Following transmission of the RC sequence the kernel will read the
 response as defined by the parameters CN and CD.  At least one of CN or CD
@@ -2327,7 +2290,6 @@ Initially characters are simply copied to the output.  Three special
 characters are recognized in \fBcopy mode\fR (excluding the characters
 already counted as special by termcap):
 
-
 .ks
 .nf
 	'	escape next character (literal)
@@ -2335,7 +2297,6 @@ already counted as special by termcap):
 	(	begin an executable expression
 .fi
 .ke
-
 
 The encoder is a table driven interpreter which is programmed by the format
 given in the graphcap file.  Programming the encoder is rather
@@ -2376,7 +2337,6 @@ In \fBexecute mode\fR the following characters have special meanings
 	!!	generate a N millisecond delay, where N is on the stack
 .fi
 .ke
-
 
 Any other character encountered in execute mode is interpreted as an integer
 number and pushed on the stack.  Hence, the character "@" is equivalent to
@@ -2419,7 +2379,6 @@ compatible graphics terminal and for an AED512, two quite different
 graphics terminals.  The Tektronix format for encoding an (X,Y) coordinate
 pair is as follows:
 
-
 .ks
 .nf
 	0 1 YA Y9 Y8 Y7 Y6
@@ -2428,7 +2387,6 @@ pair is as follows:
 	1 0 X5 X4 X3 X2 X1
 .fi
 .ke
-
 
 Since the Tektronix device is so common the special format %t is provided
 for encoding register 1 and 2 (X and Y) in this format, and writing out
@@ -2450,7 +2408,6 @@ Now consider the AED512 in binary mode (this is courtesy of NCAR; I do not
 have access to such a terminal).  The output encoding of a coordinate pair
 is as follows:
 
-
 .ks
 .nf
 	XA X9 X8 YB YA Y9 Y8
@@ -2458,7 +2415,6 @@ is as follows:
 	Y7 Y6 Y5 Y4 Y3 Y2 Y1
 .fi
 .ke
-
 
 The format required to generate this is shown below.  Note the use of
 register 9 to store the constant 200B.  The "^N" signifies <ctrl/n>,
@@ -2495,7 +2451,6 @@ For the VT640 there are nine possible linetypes, i.e., line clear,
 five builtin linetypes, and 3 user defined linetypes.  The strings to be
 output for the cases 0 through 5 are the following:
 
-
 .ks
 .nf
 	linetype		     string
@@ -2507,7 +2462,6 @@ output for the cases 0 through 5 are the following:
 	  (etc)			     (etc)
 .fi
 .ke
-
 
 We could encode linetypes 0, 1 through 5, and everything else with the
 following format (linetype code in register 1):
@@ -2530,7 +2484,6 @@ subroutine for each encoding required for each device.  Benchmarks run
 to compare the three alternatives yielded the following times in
 cpu seconds required to plot a 1000 point array with Tektronix encoding:
 
-
 .ks
 .nf
 	bitfields	approximately 30 seconds
@@ -2538,7 +2491,6 @@ cpu seconds required to plot a 1000 point array with Tektronix encoding:
 	hand coded	0.78 seconds (mostly i/o)
 .fi
 .ke
-
 
 The time required for character output is included in the figures shown.
 The bitfields benchmark is an extrapolation from an actual timing of the
@@ -2572,7 +2524,6 @@ by a Tektronix compatible terminal.  The return value is 6 characters,
 consisting of the character typed followed by the encoded X and Y in
 the next four characters, and lastly a CR terminator:
 
-
 .ks
 .nf
 	C7 C6 C5 C4 C3 C2 C1
@@ -2584,7 +2535,6 @@ the next four characters, and lastly a CR terminator:
 .fi
 .ke
 
-
 The required decoding format is shown below.
 
 	",!3, & *, &+!1, & *, &+!2"
@@ -2595,8 +2545,8 @@ Summary of STDGRAPH Graphcap Parameters
     An alphabetical summary of the graphcap parameters used by the STDGRAPH
 kernel is given below.
 
-
 .tp 3
+
 .nf
 	CD		cursor value delimiter
 	CL		screen clear
@@ -2638,10 +2588,8 @@ kernel is given below.
 	Y2		last device Y coordinate
 .fi
 
-
 As a final example, the actual graphcap entry for the vt640 terminal
 (DEC VT100 with retrographics) is reproduced below.
-
 
 .ks
 .nf
@@ -2723,7 +2671,6 @@ commands into sequences of polyline instructions.
 .le
 .le
 
-
 The main functions of the kernel are the control and attribute set functions,
 set cursor, polyline, polymarker (GM_POINT only), text generation, fill area,
 cell array, and cursor read.  A kernel need not implement all such functions,
@@ -2740,7 +2687,6 @@ and an arbitrary number of parameter and data words.
 The BOI word aids in the detection of and recovery from botched instructions,
 e.g., if an interrupt occurs while writing an instruction.
 
-
 .ks
 .nf
 	 \fBfield\fR                          \fBdescription\fR
@@ -2755,7 +2701,6 @@ e.g., if an interrupt occurs while writing an instruction.
 .ce
 Figure 3. GKI Instruction Format
 .ke
-
 
 The instruction format chosen for GKI is basically a direct mapping of the
 required low level functions into binary opcodes.
@@ -2823,7 +2768,6 @@ new file mode.
 The MFTITLE instruction is optional and is provided only for documenting
 the contents of a metafile.
 
-
 .ks
 .nf
 			GKI_EOF = BOI  0 L
@@ -2876,7 +2820,6 @@ APPEND mode to be possible.  Normal termination of the kernel process
 will or an open workstation in a mode other than append will cause the last
 frame to be terminated.
 
-
 .ls
 .tp 4
 GKI_EOF = BOI 0 L
@@ -2885,7 +2828,6 @@ GKI_EOF = BOI 0 L
 L(i)		3
 .fi
 .le
-
 
 .tp 6
 GKI_OPENWS = BOI 1 L M N D
@@ -2898,7 +2840,6 @@ D(Nc)		device name as in \fBgraphcap\fR file
 .fi
 .le
 
-
 .tp 5
 GKI_CLOSEWS = BOI 2 L N D
 .ls
@@ -2909,7 +2850,6 @@ D(Nc)		device name as in \fBgraphcap\fR file
 .fi
 .le
 
-
 .tp 5
 GKI_REACTIVATEWS = BOI 3 L
 .ls
@@ -2918,7 +2858,6 @@ L(i)		3
 .fi
 .le
 
-
 .tp 5
 GKI_DEACTIVATEWS = BOI 4 L
 .ls
@@ -2926,7 +2865,6 @@ GKI_DEACTIVATEWS = BOI 4 L
 L(i)		3
 .fi
 .le
-
 
 .tp 5
 .rj (optional)
@@ -2939,7 +2877,6 @@ T(Nc)		title string identifying metafile
 .fi
 .le
 
-
 .tp 3
 GKI_CLEARWS = BOI 6 L
 .ls
@@ -2948,7 +2885,6 @@ L(i)		set to the constant 3 (no data fields)
 .fi
 .le
 
-
 .tp 3
 GKI_CANCEL = BOI 7 L
 .ls
@@ -2956,7 +2892,6 @@ GKI_CANCEL = BOI 7 L
 L(i)		set to the constant 3 (no data fields)
 .fi
 .le
-
 
 .tp 3
 GKI_FLUSH = BOI 8 L
@@ -2997,7 +2932,6 @@ P(Np)		list of points (x,y pairs)
 .fi
 .le
 
-
 .tp 5
 GKI_POLYMARKER = BOI 10 L N P
 .ls
@@ -3007,7 +2941,6 @@ N(i)		number of points in the polymarker
 P(Np)		list of points (x,y pairs)
 .fi
 .le
-
 
 .tp 6
 GKI_TEXT = BOI 11 L P N T
@@ -3020,7 +2953,6 @@ T(Nc)		string of N ASCII characters
 .fi
 .le
 
-
 .tp 5
 GKI_FILLAREA = BOI 12 L N P
 .ls
@@ -3030,7 +2962,6 @@ N(i)		number of points defining the polygon to be filled
 P(Np)		list of points (x,y pairs)
 .fi
 .le
-
 
 .tp 8
 GKI_PUTCELLARRAY = BOI 13 L LL UR NC NL P
@@ -3044,7 +2975,6 @@ NL(i)		number of lines in array
 P(NCNLi)	array of color indices (pixels) stored by row
 .fi
 .le
-
 
 .tp 5
 GKI_SETCURSOR = BOI 14 L CN POS
@@ -3077,7 +3007,6 @@ CI(i)		polyline color index
 .fi
 .le
 
-
 .tp 6
 GKI_PMSET = BOI 16 L MT MW CI
 .ls
@@ -3088,7 +3017,6 @@ MW(i)		marksize, NDC coords (not used at present)
 CI(i)		marker color index
 .fi
 .le
-
 
 .tp 9
 GKI_TXSET = BOI 17 L UP SZ SP P HJ VJ F Q CI
@@ -3109,7 +3037,6 @@ CI(i)		text color index
 .fi
 .le
 
-
 .tp 5
 GKI_FASET = BOI 18 L FS CI
 .ls
@@ -3120,7 +3047,6 @@ CI(i)		fill area color index
 .fi
 .le
 .le
-
 
 The attributes for the output primitives are assumed to be set to their
 default values when OPENWS is issued.
@@ -3164,7 +3090,6 @@ where
 .fi
 .le
 
-
 .tp 8
 GKI_GETCELLARRAY = BOI 20 L LL UR NC NL
 .ls
@@ -3189,7 +3114,6 @@ where
 	P(NPi)		array of pixels
 .fi
 .le
-
 
 (instruction codes 19-24 are reserved for future use)
 .le
@@ -3246,7 +3170,6 @@ WCS		binary copy of the 17 WCS structures, transmitted
 		    in a single call to WRITE
 .fi
 .le
-
 
 .tp 5
 GKI_GETWCS = BOI 27 L N
@@ -3307,7 +3230,6 @@ The GKI instruction encoding procedures are shown below.
 .fi
 .ke
 
-
 .nh 3
 Decoding GKI Instructions
 
@@ -3317,7 +3239,6 @@ is a short integer array containing the encoded GKI instruction, and \fIdd\fR
 is the device driver table, i.e., array of \fBzlocpr\fR entry point addresses
 of the standard kernel procedures.
 
-
 .ks
 .nf
 	 stat = gki_fetch_next_instruction (fd, instruction_ptr)
@@ -3325,7 +3246,6 @@ of the standard kernel procedures.
 		gkp_install (dd, out_fd, verbose_output)
 .fi
 .ke
-
 
 The \fBfetch\fR procedure extracts the next instruction from the input metacode
 stream, returning a short integer pointer to the instruction as an output
@@ -3363,8 +3283,8 @@ in NDC units.  The redundant points appearing in the output metacode
 are expected to be filtered out by the kernel, which should not plot
 points separated by less than the device resolution in NDC units.
 
-
 .tp 4
+
 .nf
 open_workstation 'vt640', mode=new_file
 set_wcs nwords=352
@@ -3466,7 +3386,6 @@ polyline np=5, xmin=0.19,xmax=0.69,xavg=0.44, ymin=0.33,ymax=0.96,yavg=0.59
 flush
 close_workstation 'vt640'
 .fi
-
 
 .nh 2
 Graphics Kernel Parameters

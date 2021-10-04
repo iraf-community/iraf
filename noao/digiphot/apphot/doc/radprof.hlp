@@ -247,13 +247,11 @@ r	Rewind the coordinate list
 e	Print error messages
 q	Exit task
 
-
 	Colon Commands
 
 :show	[data/center/sky/fit]	List the parameters
 :m [n]	Move to next [nth] object in coordinate list
 :n [n]	Fit next [nth] object in coordinate list, output results
-
 
 	Colon Parameter Editing Commands
 
@@ -341,10 +339,7 @@ q	Exit task
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot the radial profile
 
-
-
 The following commands are available from inside the interactive setup menu.
-
 
                     Interactive Radprof Setup Menu
 
@@ -461,7 +456,6 @@ fitted total intensity profile respectively. Rier and rerror are the spline
 fitting error code and accompanying error message. Pradius, intensity
 and tintensity are the computed radii, intensity and total intensity
 values at each radial step.
-
 
 .ih
 ERRORS
@@ -638,7 +632,6 @@ radius, and step  parameters determined in examples 1 or 2.
 
         ... type ? for optional help
 
-
         ... move the graphics cursor to the stars and tap space bar
 
                                 or
@@ -676,7 +669,6 @@ coordinates in the coordinate system of the parent image.
 
         ap> pdump ypix.prf.1 xc,yc yes | tvmark 1 STDIN col=204
 .fi
-
 
 5. Run RADPROF in batch mode using the coordinate file and the previously
 saved parameters. Save the text and plot output. 
@@ -719,7 +711,6 @@ the background.
 
         ... mark the stars on the display
 .fi
-
 
 7. Run RADPROF interactively without using the image display.
 
@@ -789,7 +780,6 @@ for 3 stars, updates the parameter files, and quits the task.
         ... by default no output file is written, plots will appear in
 	    ypix.rplots3
 .fi
-
 
 .ih
 BUGS

@@ -14,6 +14,7 @@ int	lines[nlines]	# surface grid line numbers, 1 <= lines[i] <= nlines
 int	nlines		# number of lines
 int	ier		# error code
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

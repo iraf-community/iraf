@@ -24,7 +24,10 @@ frame.
 EXAMPLES
 To magnify the displayed frame by a factor of 2:
 
+.nf
 	cl> zoom 2
+.fi
+
 .ih
 SEE ALSO
 cv

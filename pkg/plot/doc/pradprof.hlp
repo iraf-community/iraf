@@ -114,15 +114,21 @@ the radial profile is listed on the standard output instead of plotted.
 EXAMPLES
 1. Plot the radial profile of a star near (123, 234).
 
+.nf
     cl> pradprof m92red 123 234 
+.fi
 
 2. Plot the profile around (123, 234) with centering turned off.
 
+.nf
     cl> pradprof m92red 123 234 center=no
+.fi
 
 3. List the radial profile and redirect it to a file.
 
+.nf
     cl> pradprof m92red 123 234 list=yes > profile 
+.fi
 
 .ih
 BUGS

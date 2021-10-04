@@ -107,6 +107,7 @@ EXAMPLES
 	<server is a host program you may need to copy the map
 	<first.
 .fi
+
 .ih
 SEE ALSO
 rgbto8, rgbdither, color.package

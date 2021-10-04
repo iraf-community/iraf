@@ -15,6 +15,7 @@ int		order		# order of the fit
 real		xmin		# minimum x value
 real		xmax		# maximum x value
 .fi
+
 .ih
 ARGUMENTS
 .ls cv      

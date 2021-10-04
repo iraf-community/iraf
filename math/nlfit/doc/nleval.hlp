@@ -11,6 +11,7 @@ pointer		nl		# curve descriptor
 real/double	x[nvars]	# array of variables
 int		nvars		# the number of variables
 .fi
+
 .ih
 ARGUMENTS
 .ls nl    

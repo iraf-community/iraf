@@ -12,6 +12,7 @@ pointer	cq		# the configuration file descriptor
 char	catfile		# the catalog file name
 char	hdrtext		# the catalog file header text
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

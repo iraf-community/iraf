@@ -13,6 +13,7 @@ y = msisqgrl (msi, x1, x2, y1, y2)
     real	y1		#I lower y limit, 1 <= y1 <= nypix
     real	y2		#I upper y limit, 1 <= y2 <= nypix
 .fi
+
 .ih
 ARGUMENTS
 .ls msi    

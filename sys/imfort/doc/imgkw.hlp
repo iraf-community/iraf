@@ -4,6 +4,7 @@ NAME
 imgkw -- get the value of an image header keyword
 .ih
 SYNOPSIS
+
 .nf
 subroutine imgkwb (im, keyw, bval, ier)
 subroutine imgkwc (im, keyw, cval, ier)
@@ -21,6 +22,7 @@ integer		ival		#O integer keyword value
 real		rval		#O real keyword value
 doubleprecision	dval		#O double precision keyword value
 .fi
+
 .ih
 DESCRIPTION
 The \fIimgkw\fR procedures are used to get the values of image header keywords.
@@ -35,6 +37,7 @@ coercion implied is permissible.
 SYS_IDBKEYNF:	image header keyword not found
 SYS_IDBTYPE:	illegal header parameter data type conversion
 .fi
+
 .ih
 SEE ALSO
 impkw, imaddk, imacck

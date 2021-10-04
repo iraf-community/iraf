@@ -80,7 +80,10 @@ EXAMPLES
 The following example writes an IDSOUT format tape starting at the
 beginning of the tape.
 
+.nf
 	cl> widstape mta nite1 1001-1200 new_tape+
+.fi
+
 .ih
 TIME REQUIREMENTS: UNIX/VAX 11/750
 Each spectrum of 1024 points requires about 2 second.

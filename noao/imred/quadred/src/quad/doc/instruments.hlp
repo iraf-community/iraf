@@ -206,6 +206,7 @@ delete unimportant and query parameters.  For example,
 		...
 	cl> ed file.cl
 .fi
+
 .sh
 3. Instrument Bad Pixel File
 The bad pixel file describes the bad pixels, columns, and lines in the

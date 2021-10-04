@@ -4,6 +4,7 @@ NAME
 zintpr -- interrupt a process
 .ih
 SYNOPSIS
+
 .nf
 zintpr (pid, exception, status)
 
@@ -11,6 +12,7 @@ int	pid		# process id of process to be interrupted
 int	exception	# exception to be raised
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The indicated virtual exception is raised in the process associated with

@@ -104,7 +104,9 @@ EXAMPLES
 To convert an two dimensional image containing three spectra to the
 output file "idsout":
 
+.nf
 	cl> widsout image idsout type_output=single label=file
+.fi
 
 where file contains three strings to be used for the record labels.
 .ih

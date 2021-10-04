@@ -126,15 +126,22 @@ appears extended in the x direction unless \fBfill\fR = no.
 EXAMPLES
 1. Plot row 128 of image crab.5009 with default parameters:
 
+.nf
     cl> prow crab.5009 128
+.fi
 
 2. Overplot row 128 of crab.red using crosses to mark the added points:
 
+.nf
     cl> prow crab.red 128 append+ pointmode+ marker=cross
+.fi
 
 3. Annotate the axes of a row plot:
 
+.nf
     cl> prow crab.5009 64 xlabel="Column Number" ylabel=Intensity
+.fi
+
 .ih
 TIME REQUIREMENTS
 \fIprow\fR takes about 1 cp second to plot a row of a 512 square image.

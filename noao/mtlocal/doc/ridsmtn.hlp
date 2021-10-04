@@ -65,10 +65,11 @@ string is entered, the default data type \fIreal\fR is used.
 .ls offset = 0
 The integer value of this parameter is added to each IDS record number when
 generating output filenames.  Filenames are of the form 
+
 .nf
 	\fIiraf_file\fR.record_number+\fIoffset\fR
-
 .fi
+
 The offset parameter can be used to create a sequence of output IRAF 
 filenames with continuous, sequential suffixes over more than one night's data.
 .le
@@ -94,22 +95,22 @@ EXAMPLES
 [1] Convert all records on the IDS tape to IRAF images, with the root image name
 being "aug83".  The data is mountain reduced, and all records will be
 converted.  The IDS tape is mounted on mtb.
-	
+
+	.nf
 	cl> ridsmtn mtb aug83
+.fi
 
 [2] List the headers from the same mountain tape read in example 1 but don't
 make output images.  A \fIlong_header\fR will be listed; sample output is shown.
 
-	cl> ridsmtn mtb make_image=no long_header=yes
-
 .nf
+cl> ridsmtn mtb make_image=no long_header=yes
 
 RECORD = 79, label = "NGC 7662 7.4E 10S AUG 23/24 84 CLOUDS",
 oflag = OBJECT, beam_number = 0,  W0 = 4588.503,  WPC = 2.598, ITM = 120,
 NP1 = 0, NP2 = 1024,  UT = 7:37:04.0,  ST = 22:21:46.0,  HA = -1:03:25.7,
 RA = 23:25:12.6,   DEC = 42:26:37.0,   DRA = 7.4,   DDEC = -10.,
 df =-1, sm =-1, qf =-1, dc = 0, qd = 0, ex =-1, bs = -1, ca = -1, co = 0
-
 
 RECORD = 238, label = "HENEAR AUG 23/24 84 END 8.4" ENT",
 oflag = SKY,  beam_number = 1,  W0 = 4585.501,  WPC = 2.602, ITM = 400,
@@ -127,6 +128,7 @@ contains raw data, not reduced.
 .nf
 	cl> ridsmtn mtb red- make_im- rec=5086,5087 print_pix-
 .fi
+
 .ih
 SEE ALSO
 ridsout, ridsfile

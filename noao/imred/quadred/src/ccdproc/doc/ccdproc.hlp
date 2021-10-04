@@ -172,7 +172,6 @@ cannot be determined from the object image header (using the keyword
 nscanrows or it's translation).
 .le
 
-
 .ce
 OVERSCAN FITTING PARAMETERS
 
@@ -767,7 +766,9 @@ The user's \fBguide\fR presents a tutorial in the use of this task.
 1. In general all that needs to be done is to set the task parameters
 and enter
 
+.nf
 	cl> ccdproc *.imh &
+.fi
 
 This will run in the background and process all images which have not
 been processed previously.

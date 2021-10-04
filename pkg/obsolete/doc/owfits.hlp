@@ -181,6 +181,7 @@ per block). Note that owfits will normally by default write a 28000 (
 .nf
 	cl> owfits images* mtb[1] block=1
 .fi
+
 .ih
 BUGS
 OWFITS does not attempt to recover from write errors. When an error is

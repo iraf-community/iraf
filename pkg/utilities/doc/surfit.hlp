@@ -142,7 +142,6 @@ xorder = 3, yorder = 3
          a33 * x ** 2 * y ** 2
 .fi
 
-
 The fit results are written to the standard output; the terminal unless
 redirected.  It consists of the input parameters, the coefficients and
 errors, and the input data plus the fitted values and residuals.  The
@@ -220,7 +219,6 @@ random numbers.
       zmin =    1.217
       zmax =    99.14
 
-
     Surface coefficients:
        x  y    coeff    error
        0  0  75.7125  17.2504
@@ -251,6 +249,7 @@ random numbers.
      0.68 50.69  36.67273
     47.56 50.69  42.6855
 .fi
+
 .ih
 SEE ALSO
 apphot.fitsky, apphot.txdump, imsurfit

@@ -213,7 +213,6 @@ EXAMPLES
 cl> rskysub @inlist @outlist maxiter=10 lnsigrej=5.0 unsigrej=5.0
 .fi
 
-
 2. Sky subtract the same list of 25 images with masking where the masks
 are assumed to be stored in the BPM keyword.
 

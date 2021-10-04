@@ -51,6 +51,7 @@ those targets which have not previously been observed:
 .nf
 tt> tdiffer targets.tab images.tab new.tab targetid targetid
 .fi
+
 .ih
 BUGS
 .ih

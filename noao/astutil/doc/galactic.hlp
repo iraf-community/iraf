@@ -61,7 +61,9 @@ the file "coords", rather than from the terminal:
 3. If image headers contain the coordinates, in this case RA, DEC, and EPOCH,
 then one can get the galactic coordinates for the image by:
 
+.nf
 	cl> hselect *.imh ra,dec,epoch yes | galactic STDIN
+.fi
 
 (Consult the help for the task \fBhselect\fR for information about selecting
 fields from image headers.)

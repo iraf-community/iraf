@@ -30,4 +30,5 @@ EXAMPLE
 	/dev/ra1h     397102  306688   50702    86%    /tmp2
 	/dev/ra2h     397102  275010   82380    77%    /tmp3
 .fi
+
 .endhelp

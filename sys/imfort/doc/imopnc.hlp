@@ -4,6 +4,7 @@ NAME
 imopnc -- open a new copy of an existing image
 .ih
 SYNOPSIS
+
 .nf
 imopnc (nimage, oim, nim, ier)
 
@@ -12,6 +13,7 @@ integer		oim		#I image descriptor of existing image
 integer		nim		#O image descriptor of the new image
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimopnc\fR procedure is used to open a new copy of an existing image,
@@ -38,6 +40,7 @@ IE_OPEN:	cannot open image
 IE_OPNPIX:	cannot open pixel file
 IE_UPDHDR:	error updating image header file
 .fi
+
 .ih
 NOTES
 If it is desired that the new image be of a different size or datatype than

@@ -327,27 +327,25 @@ begin
 			in_para = false
 		    }
 		    if (nsec > 0) {
-		        call fprintf (out, "<!-- EndSection:   %s -->\n")
-		            call pargstr (SECTION(sptr,nsec-1))
+		        call fprintf (out, "</section>\n")
 		    }
 
 		    # Make the section name a URL target.
 		    call lh_mkname (Memc[ibuf], Memc[name])
+		    call fprintf (out, "<section id=\"s_%s\">\n")
+		        call pargstr (Memc[name])
+
 		    if (Memc[level] == EOS) {
-		        call fprintf (out, "<h2 id=\"s_%s\">%s</h2>\n")
-			    call pargstr (Memc[name])
+		        call fprintf (out, "<h2>%s</h2>\n")
 			    call pargstr (Memc[ibuf])
 		    } else {
 		        call fprintf (out,
-			    "<span id=\"s_%s\">%s %s</span>\n")
-			    	call pargstr (Memc[name])
+			    "<span>%s %s</span>\n")
 			    	call pargstr (Memc[level])
 			    	call pargstr (Memc[ibuf])
        	    	    	Memc[level] = EOS
 		    }
 
-		    call fprintf (out, "<!-- BeginSection: \'%s\' -->\n")
-		        call pargstr (Memc[ibuf])
 		    lastline = NAME
 		    nsec = nsec + 1
 		    if (section[1] != EOS)
@@ -376,8 +374,7 @@ text_		    if (in_para == false && in_pre == false && ls_level == 0) {
 	}
 	# Close the last section.
 	if (nsec > 0) {
-	    call fprintf (out, "\n<!-- EndSection:    %s -->\n\n")
-                call pargstr (SECTION(sptr,nsec-1))
+	    call fprintf (out, "\n</section>\n\n")
 	}
 
 	# Write out an HTML comment giving the document section names.
@@ -420,7 +417,7 @@ begin
         call fprintf (fd, "<table style=\"width:100%%; border:0;\"><tr>\n")
 
 	# Left side page header.
-        call fprintf (fd, "<td style=\"text-align: left; font-size: 4px;\">\n")
+        call fprintf (fd, "<td style=\"text-align: left;\">\n")
 	if (date[1] == EOS) {
             call fprintf (fd, "<b>%s</b>")
                 call pargstr (mod)
@@ -433,14 +430,14 @@ begin
 
 	# Center page header.
 	if (title[1] != EOS) {
-	        call fprintf (fd, "<td style=\"text-align: center; font-size: 4px;\">\n")
+	        call fprintf (fd, "<td style=\"text-align: center;\">\n")
             call fprintf (fd, "<b>%s</b>\n")
                 call pargstr (title)
             call fprintf (fd, "</td>\n")
 	}
 
 	# Right side page header.
-        call fprintf (fd, "<td style=\"text-align: right; font-size: 4px;\">\n")
+        call fprintf (fd, "<td style=\"text-align: right;\">\n")
 	if (date[1] == EOS) {
             call fprintf (fd, "<b>%s</b>")
                 call pargstr (mod)

@@ -4,9 +4,11 @@ NAME
 linebias -- Fit and subtract an average line bias
 .ih
 USAGE	
+
 .nf
 linebias input output
 .fi
+
 .ih
 PARAMETERS
 .ls input

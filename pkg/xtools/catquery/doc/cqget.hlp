@@ -24,6 +24,7 @@ char	str		# the keyword string value to be read
 char	text		# the keyword text value to be read
 int	maxch		# the maximum size of the word, string, text value
 .fi
+
 .ih
 SYNOPSIS
 .ls cq

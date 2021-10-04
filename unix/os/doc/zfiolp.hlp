@@ -4,6 +4,7 @@ NAME
 zfiolp -- line printer driver
 .ih
 SYNOPSIS
+
 .nf
 zopnlp (osfn, mode, chan)		# open line printer
 zclslp (chan, status)			# close line printer
@@ -17,6 +18,7 @@ char	buf[]
 int	mode, chan, maxbytes, nbytes, param, status
 long	loffset, lvalue
 .fi
+
 .ih
 DESCRIPTION
 The line printer devices are interfaced as binary files.  Except where noted

@@ -31,13 +31,16 @@ The possible states for a background job are:
 			(see the \fIservice\fR command)
 	Running -- the job is currently executing
 .fi
+
 .ih
 EXAMPLES
+
 .nf
 cl> jobs
     [1]  21:13  Done      mkhelp >& dev$null & 
     [2]   0:05 +Running   count *.hlp > _junk & 
 .fi
+
 .ih
 BUGS
 Exit codes are rarely displayed when jobs terminate abnormally.

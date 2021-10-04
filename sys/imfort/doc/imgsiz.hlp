@@ -4,6 +4,7 @@ NAME
 imgsiz -- determine the size and datatype of an open image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imgsiz (im, axlen, naxis, dtype, ier)
 
@@ -13,6 +14,7 @@ integer		naxis		#O number of axes (dimensionality)
 integer		dtype		#O pixel datatype
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimgsiz\fR procedure is called to determine the dimensionality, size,

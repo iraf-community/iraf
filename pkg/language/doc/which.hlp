@@ -1,16 +1,20 @@
 .help "which,whereis" Mar04 language
 .ih
 NAME
+
 .nf
 which -- locate a task in the package list
 whereis -- locate all occurrences of a task in the package list
 .fi
+
 .ih
 USAGE
+
 .nf
 which [task] [...]
 whereis [task] [...]
 .fi
+
 .ih
 PARAMETERS
 .ls task
@@ -28,18 +32,19 @@ note that \fIonly\fR the currently loaded packages are searched.
 .ih
 EXAMPLES
 1.  Find out which package contains the HEAD task.
-.nf
 
+.nf
 	cl> which head
 	system
 .fi
 
 2.  Find all currently loaded package which contain the SPLOT task.
-.nf
 
+.nf
 	cl> whereis splot
 	echelle onedspec
 .fi
+
 .ih
 SEE ALSO
 .endhelp

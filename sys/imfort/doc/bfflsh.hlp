@@ -4,11 +4,13 @@ NAME
 bfflsh -- flush any buffered output data to disk
 .ih
 SYNOPSIS
+
 .nf
 integer function bfflsh (fd)
 
 integer		fd		#I BFIO file descriptor of open file
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfflsh\fR procedure flushes any buffered output data to a binary

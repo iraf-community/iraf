@@ -73,10 +73,12 @@ is pix3034x. Assuming the pixels are short integers, the image is
 10 rows by 800 columns:
 
 .nj
+
 .nf
 lo> irafil pix3034x 10 1024 skip=1024
 lo> imcopy pix3034x.i[1:800,*] phoenix
 .fi
+
 .ju
 
 The first line creates the IRAF image pix3034x.i which is readable
@@ -88,9 +90,11 @@ the picture to the new IRAF image we call phoenix.
 2. To read the "snap" format pictures from the Compaq station:
 
 .nj
+
 .nf
 lo> irafil m82.snp 512 512 tb_flip+ bits=8
 .fi
+
 .ju
 
 This will create the IRAF image m82.snp.i which can then be run

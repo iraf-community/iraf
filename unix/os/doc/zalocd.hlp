@@ -4,6 +4,7 @@ NAME
 zalocd -- set, remove, or query device allocation
 .ih
 SYNOPSIS
+
 .nf
 zalocd (device, action, status)
 
@@ -11,6 +12,7 @@ packed	char device[ARB]	# device 1
 int	action			# operation to be performed
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The named logical device is either allocated or deallocated, or the device

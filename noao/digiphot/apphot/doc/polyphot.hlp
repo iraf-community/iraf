@@ -246,7 +246,6 @@ A sample polygons file and accompanying coordinates file is listed below.
         ;
 .fi
 
-
 .ih
 CURSOR COMMANDS
 
@@ -279,13 +278,11 @@ r	Rewind the polygon list
 e	Print error messages
 q	Exit task
 
-
 	Colon Commands
 
 :show	[data/center/sky/phot]	List the parameters
 :m [n]	Move to next [nth] object in coordinate list
 :n [n]	Do photometry for next [nth] object in coordinate list, output results
-
 
 	Colon Parameter Editing Commands
 
@@ -364,10 +361,7 @@ q	Exit task
 :mksky		[y/n]		Mark the sky annuli on the display
 :mkpolygon	[y/n]		Mark the polygon on the display
 
-
-
 The following commands are available from inside the interactive setup menu.
-
 
                     Interactive Photometry Setup Menu
 
@@ -585,7 +579,6 @@ the sky background to 0.0.
 	... the output will appear in ypix.ply.1
 .fi
 
-
 2.  Repeat the previous example but use a contour plot and the graphics
 cursor in place of the image display and image cursor. This option is
 really only useful for users (very few these days) with access to a graphics
@@ -650,8 +643,6 @@ terminal but not an image display server.
 	ap> reset stdimcur = <default>
 
 	... reset stdimcur to its default value
-
-
 .fi
 
 3. Setup and run POLYPHOT interactively on a list of objects created with
@@ -698,7 +689,6 @@ POLYMARK.
 
 	... the output will appear in ypix.ply.3
 .fi
-
 
 4. Repeat example 3 but work on a section of the input image while
 preserving the coordinate system of the original image.
@@ -750,7 +740,6 @@ preserving the coordinate system of the original image.
         ... mark the centers of the polygons on the display
 .fi
 
-
 5. Run POLYPHOT in batch mode using a polygon and coordinate file and the
 default parameters. Verify the critical parameters.
 
@@ -759,7 +748,6 @@ default parameters. Verify the critical parameters.
 
 	... output will appear in ypix.ply.5
 .fi
-
 
 .ih
 TIMINGS

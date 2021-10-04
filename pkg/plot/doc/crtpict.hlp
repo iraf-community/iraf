@@ -36,8 +36,8 @@ block replicated to fill the device viewport.
 This parameter specifies how the image intensities are mapped into the 
 greyscale values of the output device.  Intensity z1 maps to black, z2 to white.
 The 4 choices for \fIztrans\fR are:
-.nf
 
+.nf
 	"auto"		- z1 and z2 centered on median of image
 	"min_max"	- set z1 and z2 to specified intensities
 	"none" 		- truncate intensities to fit output range
@@ -136,23 +136,32 @@ EXAMPLES
 previously determined values of z1 and z2 for the greyscale transformation
 the command would be:
 
+.nf
     cl> crtpict sunpic[*:4,*:4] ztrans=min z1=0 z2=800
+.fi
 
 2.  To process every image with the root name ccdpic, using default values of
 all parameters, the command would be:
 
+.nf
     cl> crtpict ccdpic*
+.fi
 
 3.  To process images created with \fBsnap\fR, ztrans and z2 must be changed
 from their default values:
 
+.nf
     cl> crtpict iis.snap ztrans=min z2=1023
+.fi
 
 4.  Image `mypic' is processed using the look up table in file `mylut',
 
+.nf
     cl> crtpict mypic ztrans=user lutfile=mylut
+.fi
 
 Where file `mylut' contains this information:
+
 .nf
 		10	40
 		1500	100
@@ -160,6 +169,7 @@ Where file `mylut' contains this information:
 		3500	200
 		7500	255
 .fi
+
 .ih
 TIMING
 For a 512 x 512 real image, \fBcrtpict\fR takes about 40 cpu seconds with

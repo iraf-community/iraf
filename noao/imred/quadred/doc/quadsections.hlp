@@ -63,7 +63,6 @@ EXAMPLES
     quad0072[1163:2186,1025:2048]
 .fi
 
-
 4.  To make a custom output.
 
 .nf
@@ -75,6 +74,7 @@ EXAMPLES
     qu> quadsec quad0072 template="$I.$A,"
     quad0072.11,quad0072.12,quad0072.21,quad0072.22,
 .fi
+
 .ih
 SEE ALSO
 quadformat

@@ -83,26 +83,31 @@ filename/URL.
 EXAMPLES
 
 1. Remove all "url" files from the cache.
+
 .nf
     cl> fcache init pattern="url"
 .fi
 
 2. List the contents of the file cache.
+
 .nf
     cl> fcache list
 .fi
 
 3. Destroy a cache directory (i.e. remove it entirely).
+
 .nf
     cl> fcache destroy cache="/tmp/cache"
 .fi
 
 4. Purge all cache files older than 7 days:
+
 .nf
     cl> fcache purge age=7
 .fi
 
 5. Determine if a URL is already in the cache:
+
 .nf
     cl> fcache add src="/tmp/dpix.fits"
     cl> fcache list
@@ -115,11 +120,13 @@ EXAMPLES
 .fi
 
 6. Delete a cached URL:
+
 .nf
     cl> fcache delete src="http://iraf.noao.edu/vao/dpix.fits"
 .fi
 
 7. Add a local file to the cache, then look it up:
+
 .nf
     cl> fcache add src="/tmp/test.fits"
     cl> fcache lookup src="/tmp/test.fits"
@@ -129,7 +136,6 @@ EXAMPLES
     cl> =fcache.src
     /tmp/test.fits
 .fi
-
 
 .ih
 BUGS

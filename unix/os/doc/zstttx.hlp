@@ -4,6 +4,7 @@ NAME
 zstttx -- get file status for a text file
 .ih
 SYNOPSIS
+
 .nf
 zstttx (chan, param, lvalue)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel assigned to file
 int	param			# magic code for parameter
 long	lvalue			# return value of parameter
 .fi
+
 .ih
 DESCRIPTION
 The \fBzstttx\fR primitive is used to obtain file, device, and machine

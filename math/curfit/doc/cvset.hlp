@@ -15,6 +15,7 @@ real	xmin, xmax	# minimum and maximum x values
 real	coeff[ncoeff]	# coefficient array
 int	ncoeff		# number of coefficients
 .fi
+
 .ih
 ARGUMENTS
 .ls cv    

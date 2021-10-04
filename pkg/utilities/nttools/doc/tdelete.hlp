@@ -49,8 +49,8 @@ EXAMPLES
 .nf
 	cl> tdelete table1,table2,tab67
 	cl> tdelete *.tab,a,b,c
-
 .fi
+
 In the latter case, the extension is given explicitly because there may be
 other files beginning with "tab" that are not tables.
 
@@ -62,6 +62,7 @@ other files beginning with "tab" that are not tables.
 	cl> delete table `fits2.tab' ? (yes): yes
 	cl> delete table `fits3.tab' ? (yes): yes
 .fi
+
 .ih
 BUGS
 Text tables cannot be deleted by 'tdelete' unless 'verify' is set to yes.

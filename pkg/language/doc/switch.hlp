@@ -4,6 +4,7 @@ NAME
 switch -- switch case statement
 .ih
 SYNTAX
+
 .nf
 switch (expr) {
 case val1 [, val1,...]:
@@ -15,6 +16,7 @@ default:
     statements
 }
 .fi
+
 .ih
 ELEMENTS
 .ls expr
@@ -73,6 +75,7 @@ EXAMPLES
 	    error (1, "invalid number")
 	}
 .fi
+
 .ih
 BUGS
 Only integer values are allowed (no strings).

@@ -118,8 +118,8 @@ the `color' parameter.  Note that the actual, drawn color will depend
 on the device and graphics kernel (driver) used to plot.  Many kernels
 do not support color at all.  The usual interpretation of the color
 index is:
-.nf
 
+.nf
     1 -- Black
     2 -- White
     3 -- Red

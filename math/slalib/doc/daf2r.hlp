@@ -1,6 +1,6 @@
 .help daf2r Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slDAFR (IDEG, IAMIN, ASEC, RAD, J)
 
      - - - - - -
@@ -31,6 +31,6 @@
 
   Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

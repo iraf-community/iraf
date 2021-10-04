@@ -230,6 +230,7 @@ record of the cosmic rays.
 	325.6 99.6 250
 	cl> mknoise dev$pix out=newpix cos=cosfile
 .fi
+
 .ih
 REVISIONS
 .ls MKNOISE V2.11+

@@ -203,7 +203,6 @@ The standard set of operators are supported.  Expressions are evaluated
 using the standard operator precedences and associativities.  The following
 operators are recognized:
 
-
 .nf
 binary operators:
 
@@ -211,7 +210,6 @@ binary operators:
 	<   <=   >   >=  ==  !=	  @		comparison
 	&&  ||					boolean and, or
 	//					string concatenation
-
 
 unary operators:
 
@@ -232,7 +230,6 @@ string is given, the entire record is searched.
 
 The expression syntax recognized by the list calculator is defined in
 the figure below.
-
 
 .nf
 	expr	:	primary

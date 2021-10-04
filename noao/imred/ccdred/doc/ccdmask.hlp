@@ -4,9 +4,11 @@ NAME
 ccdmask -- create a pixel mask from a CCD image
 .ih
 USAGE	
+
 .nf
 ccdmask image mask
 .fi
+
 .ih
 PARAMETERS
 .ls image
@@ -127,6 +129,7 @@ to generate a CCD mask.
     cl> imarith flat1 / flat2 ratio
     cl> ccdmask ratio mask
 .fi
+
 .ih
 REVISIONS
 .ls CCDMASK V2.11

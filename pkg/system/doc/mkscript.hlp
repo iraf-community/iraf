@@ -140,11 +140,15 @@ Add another command? (yes): no
 
 To run the command script as a foreground job:
 
+.nf
 cl> cl < script.cl
+.fi
 
 To run the command script as a background job:
 
+.nf
 cl> cl < script.cl >& logfile &
+.fi
 
 Note that the output including possible error output is redirected to a logfile.
 .ih

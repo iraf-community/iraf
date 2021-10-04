@@ -162,7 +162,6 @@ Enter a name for error column 7 (name, <CR>=error(UB), <->=skip):
     Enter width of column 7 (width, <CR>=10): 
 Enter a name for column 8 (name, <CR>=COL8, <EOF>=quit entry): ^Z
 
-
 Catalog UBVcat in file UBVcat has 7 columns
 	Column 1:  ID             
 	Column 2:  V         
@@ -172,7 +171,6 @@ Catalog UBVcat in file UBVcat has 7 columns
 	Column 6:  UB        
 	Column 7:  error(UB) 
 
-
 ... note that the <EOF> character terminates column definition
 
 ... enter values for each defined column as prompted
@@ -181,7 +179,6 @@ Catalog UBVcat in file UBVcat has 7 columns
 
 ... review the entries with the editor
 .fi
-
 
 2. Add new entries to the file created in example 1.
 
@@ -194,7 +191,6 @@ ph> mkcatalog UBVcat
 
 ... review the catalog with the editor
 .fi
-
 
 3. Edit an existing catalog created with a foreign program.
 

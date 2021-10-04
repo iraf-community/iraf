@@ -169,19 +169,25 @@ The following example will accumulate a series of 16 spectra obtained
 in the normal beam-switched mode and create two new extinction corrected
 spectra having names nite1bs.1 and nite1bs.2:
 
+.nf
 	cl> bswitch nite1 1011-1026 nite1bs 1
+.fi
 
 The following example performs the same functions but accumulates the data
 to produce 8 new spectra representing the individual object-sky pairs:
 
+.nf
 	cl> bswitch nite1 1011-1026 nite1bs 1 subset=4
+.fi
 
 The following example produces an extinction corrected spectrum for every
 input spectrum. Note that ids_mode is set to off to generate separate object and
 sky sums, and subset is set to 2 so that every pair of spectra (one object and
 one sky) are written out as two new spectra:
 
+.nf
 	cl> bswitch nite1 1011-1026 nite1bs 1 subset=2 ids_mode-
+.fi
 
 The next example produces a pair of spectra for each of 3 independent
 objects observed, provided that each was observed for the same number
@@ -200,6 +206,7 @@ of 5007A.
 	cl> bswitch nite1 1011-1026 nite1bs 1 weighting- \
 	>>> wave1=4990, wave2=5020
 .fi
+
 .ih
 TIME REQUIREMENTS
 The principle time expenditure goes toward extinction correcting the

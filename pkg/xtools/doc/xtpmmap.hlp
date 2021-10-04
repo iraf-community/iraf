@@ -1,11 +1,14 @@
 .help xt_pmmap Mar07 xtools
 .ih
 NAME
+
 .nf
 xt_pmmap -- map a mask and match it to a reference image
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 # Open a mask.
 pointer procedure xt_pmmap (pmname, refim, mname, sz_mname)
@@ -15,12 +18,12 @@ pointer	refim			#I Reference image pointer
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-
 # Close the mask.
 procedure xt_pmunmap (im)
 
 pointer im                      #I IMIO pointer for mask
 .fi
+
 .ih
 DESCRIPTION
 This interface maps (opens) and unmaps (closes) a mask for use in an

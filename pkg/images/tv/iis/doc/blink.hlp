@@ -30,11 +30,16 @@ Two or more frames are alternately displayed on the image display monitor
 EXAMPLES
 To blink two frames:
 
+.nf
 	cl> blink 1 2
+.fi
 
 To blink three frames at a rate of 2 seconds per frame:
 
+.nf
 	cl> blink 3 1 2 rate=2
+.fi
+
 .ih
 BUGS
 The blink rate is measured in

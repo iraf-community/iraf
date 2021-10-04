@@ -29,7 +29,10 @@ EXAMPLES
 
 1. Rewind logical tape drive a.
 
+.nf
 	cl> rewind mta
+.fi
+
 .ih
 SEE ALSO
 allocate, deallocate, devstatus

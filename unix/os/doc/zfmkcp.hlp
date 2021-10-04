@@ -4,6 +4,7 @@ NAME
 zfmkcp -- make a zero length copy of a file
 .ih
 SYNOPSIS
+
 .nf
 zfmkcp (osfn, new_osfn, status)
 
@@ -11,6 +12,7 @@ packed	char osfn[]			# name of original file
 packed	char new_osfn[]			# name of new file
 int	status
 .fi
+
 .ih
 DESCRIPTION
 A zero length file is created which inherits all the machine dependent

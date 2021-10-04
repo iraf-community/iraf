@@ -46,6 +46,7 @@ notes.v210 and notes.v211 files in the iraf$doc and iraf$local directories.
 
     7. \fBParameter file changes\fR
 .fi
+
 .nh
 Things to be aware of or watch out for
 .nh 2
@@ -79,10 +80,12 @@ The "set node = foo" syntax, used to enable remote image display under
 IRAF networking, has changed.  The new syntax requires that an exclamation
 be appended to the node name as in the example below (this dates back to
 V2.10.4 so many users will already be familiar with the feature).
+
 .nf
 
         cl> set node = "orion!"
 .fi
+
 .nh 2
 Image format change 
 
@@ -150,6 +153,7 @@ IMAGES package changes
 
 The IMAGES package has been reorganized by function into the 7 subpackages
 listed below.
+
 .nf
 
       imcoords - Image coordinates package
@@ -161,6 +165,7 @@ listed below.
             tv - Image display utilities package
 
 .fi
+
 The new IMAGES package contains a total of 82 tasks, including 26 new tasks
 from the IMMATCH and VOL external addon packages, 6 existing PROTO package
 tasks, and 1 existing NOAO.PROTO package task. The undocumented IMAGES
@@ -223,6 +228,7 @@ Changes to the IRAF native image format (OIF)
      viewer) can be used at the Unix level to look at the text contained in
      the new V2 OIF image headers.
 .fi
+
 .nh 2
 IMFORT changes
 
@@ -239,6 +245,7 @@ IMFORT changes
      The builtin default header buffer is 64000 chars, which is about 800
      card images.
 .fi
+
 .nh 2
 Environment variables
 
@@ -351,6 +358,7 @@ Several new environment variable have been added to the system.
      compatibility, e.g., when using V2.11 IRAF with old software which
      cannot easily be updated.
 .fi
+
 .nh 2
 New intrinsic functions
 
@@ -360,6 +368,7 @@ Two new intrinsic functions were added to the CL, \fIimaccess\fR and
 whether an environment variable exists, e.g. (defvar("imextn")).
 .nh 2
 System default modifications
+
 .nf
 
    o The default size of the user area (\fImin_lenuserarea\fR) was increased
@@ -382,6 +391,7 @@ System default modifications
 
         - Expanded file names (pathnames) can be up to 511 characters long.
 .fi
+
 .nh 2
 Libraries added
 
@@ -389,6 +399,7 @@ The Starlink positional astronomy library SLALIB was added to the math
 package.
 .nh 2
 Graphics changes
+
 .nf
 
    o SGI Translator change: Modified the header ID string produced by
@@ -409,6 +420,7 @@ Graphics changes
      the mappings for the greek fonts and other special characters can be
      found at http://iraf.noao.edu/greek.ps.
 .fi
+
 .nh 2
 FITS-related core-level task changes
 .nh 3
@@ -511,6 +523,7 @@ General changes
      Users with IPAC data that use the CAR projection function should now be
      able to read the image coordinates directly with LISTPIXELS, etc.
 .fi
+
 .nh
 New tasks, or old tasks moved to new packages
 
@@ -622,6 +635,7 @@ New tasks, or old tasks moved to new packages
 
  ASTRADIUS      ASTUTIL          Finds images within a circle on the sky.
 .fi
+
 .nh
 Task and package deletions
 
@@ -640,6 +654,7 @@ Modifications to old tasks
 Grouped by package, a list of modifications to old tasks in IRAF are
 summarized below.  We have included modifications since the V2.10.3 
 release.
+
 .nf
 
 \fBIMFILTER:\fR
@@ -1019,6 +1034,7 @@ release.
         with regard the mergerad parameter. The behavior of the parameter is
         unchanged. (V2.10.4p2)
 .fi
+
 .nh
 Parameter file changes
 
@@ -1196,4 +1212,5 @@ the change.
  n  daopars.mergerad: critical object merging radius in scale units
     (V2.10.4p2)
 .fi
+
 .endhelp

@@ -152,7 +152,6 @@ struct helpdir {
 	struct	module hd_module[MAX_MODULES] # module names, files
 }
 
-
 struct module {
 	int	m_name			# index of module name
 	int	m_hlp			# index of help file name
@@ -203,7 +202,6 @@ begin
 	    call process_template (template, ctrl)
 end
 .fi
-
 
 PROCESS_TEMPLATE -- Called with a template defining the packages and
 modules for which help is desired, and the control parameters defining
@@ -257,7 +255,6 @@ begin
 end
 .fi
 
-
 EXPAND_TEMPLATE -- Expand a template into a list of module names,
 given a help directory defining the pattern matching domain.
 The permissible complexity of a help template is somewhat less than
@@ -278,7 +275,6 @@ The simple alphanumeric string is a special type of pattern.  The string
 expansion is a simple matter of scanning through the module list of
 a help directory and extracting all names which match the pattern.
 
-
 .nf
 pointer procedure expand_template (hp, template)
 
@@ -297,7 +293,6 @@ begin
 end
 .fi
 
-
 READ_TEMPLATE -- Get next module name from help directory matching the
 encoded pattern.  Return EOF when directory is exhausted.
 
@@ -312,7 +307,6 @@ begin
 	return (EOF)
 end
 .fi
-
 
 PRINT_HELP -- Print help documentation for the named module or parameter.
 We are called with the name of a single module; all fiddling with packages
@@ -335,7 +329,6 @@ Recall that the principal options are
 	alldoc		print all documentation		 hlp,sys
 	summary		print help block titles		 hlp,sys
 .fi
-
 
 .nf
 procedure print_help (hp, modname, ctrl)
@@ -369,7 +362,6 @@ begin
 end
 .fi
 
-
 PR_HELPBLOCK -- Format and print a help block.  Open the help file and search
 for the named module.  Interpret block header and print help title.
 Process the remainder of the help block with lroff.
@@ -393,7 +385,6 @@ begin
 	close help file
 end
 .fi
-
 
 INPUT -- Lroff line input procedure.  Called by Lroff to get lines of
 input text.  Function varies slightly depending on the Help option.
@@ -464,7 +455,6 @@ begin
 	return, passing line to Lroff
 end
 .fi
-
 
 OUTPUT -- Output a line of text to the "out" file.  If the standard output
 is redirected, put lines out as is with \fBputline\fR.  Otherwise put lines out

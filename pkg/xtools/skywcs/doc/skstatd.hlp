@@ -12,6 +12,7 @@ dval = sk_statd (coo, parameter)
 pointer	coo		# the input sky coordinate descriptor
 int	parameter	# the double parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    
@@ -19,6 +20,7 @@ The sky coordinate descriptor.
 .le
 .ls parameter
 The oarameter to be returned. The double parameter definitions in skywcs.h are:
+
 .nf
 	S_VXOFF		# the logical ra / longitude offset in pixels
 	S_VYOFF		# the logical dec / latitude offset in pixels

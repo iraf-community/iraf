@@ -3,7 +3,6 @@
 .ce
 Background Determination
 
-
 Data from slit spectra allow the determination and subtraction
 of the background sky using information from regions near the object
 of interest.  Background subtraction may also apply to cases of

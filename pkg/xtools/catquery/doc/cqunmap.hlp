@@ -9,6 +9,7 @@ call cq_unmap (cq)
 .nf
 pointer		cq		# the configuration file descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls cq

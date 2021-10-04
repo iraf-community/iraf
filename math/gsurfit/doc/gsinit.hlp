@@ -22,6 +22,7 @@ real	xmax		# maximum x value
 real	ymin		# minimum y value
 real	ymax		# maximum y value
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

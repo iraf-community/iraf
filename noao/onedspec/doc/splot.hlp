@@ -602,7 +602,6 @@ Enable/disable the flipped coordinates option
 Enable/disable the permanent overplot option
 .le
 
-
 .ls :/help
 Get help on GTOOLS options.
 .le
@@ -964,6 +963,7 @@ Some additional examples of units strings are:
 	log hertz
 	m/s 3 inv mic
 .fi
+
 .ih
 EXAMPLES
 This task has a very large number of commands and capabilities which
@@ -974,22 +974,30 @@ the task.  To get some help use the '?' or '/' keys.
 1.  To plot a single spectrum and record any measurements in the file
 'ngc7662':
 
+.nf
 	cl> splot spectrum save_file=ngc7662
+.fi
 
 2.  To force all plots to display zero as the minimum y value:
 
+.nf
 	cl> splot spectrum options="auto, zero"
+.fi
 
 Note that the options auto and zero can be abbreviated to one character.
 
 3.  To successively display graphs for a set of spectra with the wavelength
 limits set to 3000 to 6000 angstroms:
 
+.nf
 	cl> splot spec* xmin=3000 xmax=6000
+.fi
 
 4.  To make batch plots create a file containing the simple cursor command
 
+.nf
 	0 0 0 q
+.fi
 
 or an empty file and then execute one of the following:
 

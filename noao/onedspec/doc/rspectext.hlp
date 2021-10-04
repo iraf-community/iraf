@@ -16,7 +16,6 @@ Output list of IRAF spectra image names.  The list must match the
 input list.
 .le
 
-
 The following parameters are only used if there is no FITS header
 with the data.
 .ls title = ""
@@ -124,6 +123,7 @@ values as a lookup table.
     ...
     cl> rspectext text002 spec002 title="HH12" dtype=nonlinear
 .fi
+
 .ih
 REVISIONS
 .ls RSPECTEXT V2.11

@@ -26,7 +26,10 @@ otherwise the four bytes within each successive longword are swapped.
 EXAMPLES
 1. Byte swap file A, writing the result to file B.
 
+.nf
 	cl> bswap a b
+.fi
+
 .ih
 BUGS
 The input and output files cannot be the same.

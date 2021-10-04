@@ -142,7 +142,6 @@ are the pixel coordinates and xi and eta are the corresponding standard
 coordinates in arcseconds per pixel. The standard coordinates are computed
 by applying the appropriate sky projection to the celestial coordinates.
 
-
 .nf
 	 xi = f (x, y)
 	eta = g (x, y)
@@ -199,7 +198,6 @@ solutions are evaluated in the forward sense using straight-forward
 evaluation of the polynomial terms, in the reverse sense by applying
 Newton's method to the plate solution.
 
-
 .ih
 FORMATS
 
@@ -226,7 +224,6 @@ u       unsigned decimal integer
 w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
-   
    
 Conventions for w (field width) specification:
    
@@ -291,7 +288,6 @@ cl> type coords
 13:29:55.424  47:10:05.15  224.35  131.20
 13:30:01.816  47:12:58.79  134.37  356.33
 
-
 cl> ccmap coords coords.db xcol=3 ycol=4 lngcol=1 latcol=2 inter-
 Coords File: coords  Image: 
     Database: coords.db  Record: coords
@@ -307,7 +303,6 @@ Coordinate mapping parameters
     Reference point: 318.735  273.900  (pixels  pixels)
     X and Y scale: 0.764  0.767  (arcsec/pixel  arcsec/pixel)
     X and Y axis rotation: 179.110  358.958  (degrees  degrees)
-
 
 cl> type coords.db
 # Mon 15:10:37 13-May-96
@@ -350,8 +345,6 @@ begin   coords
                         -0.01393966623835092    0.7665650170136847
         surface2        0
 
-
-
 cl> cctran coords STDOUT coords.db coords xcol=3 ycol=4 lngformat=%0.3h \
 latformat=%0.2h
 13:29:47.297  47:13:37.52 13:29:47.284 47:13:37.89
@@ -372,7 +365,6 @@ Note that for the forward transformation the original ras and decs are in
 columns 1 and 2 and the computed ras and decs are in columns 3 and 4, but
 for the reverse transformation the original x and y values are in columns
 3 and 4 and the computed values are in columns 1 and 2.
-
 
 2. Use the previous plate solution to transform x and y values to
 ra and dec values and vice versa but enter the plate solution by hand.
@@ -395,7 +387,6 @@ xrot=180.890 yrot=1.042 forward-
 441.983   409.968  442.01  409.65
 223.954   131.334  224.35  131.20
 134.680   356.426  134.37  356.33
-
 .fi
 
 Note that there are minor differences between examples 1 and 2 due to

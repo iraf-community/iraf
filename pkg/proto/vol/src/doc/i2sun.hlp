@@ -58,7 +58,6 @@ to a computer with opposite byte-swapping from that of the home computer
 (e.g. between VAX and Sun).
 .le
 
-
 .ih
 DESCRIPTION
 
@@ -107,7 +106,6 @@ If the output rasterfiles are being sent to a computer with opposite
 byte-swapping characteristics, set \fIswap\fR = yes (e.g., when running
 I2SUN on a VAX, with output to a Sun).
 
-
 .ih
 EXAMPLES
 
@@ -132,7 +130,6 @@ EXAMPLES
 4.  Run I2SUN on a VAX, with output to a Sun.
 
     cl> i2sun @imlist sunnode!home$ras/frame.%d 1 256 swap+
-
 .fi
 
 .ih

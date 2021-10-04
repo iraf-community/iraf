@@ -7,12 +7,10 @@ interface, concerns the way in which the image header is implemented and
 accessed.  In the prototype version, we will simply read the entire header
 into core and access it as an ordinary (dynamically allocated) structure.
 
-
 .nf
 	ptr =	immap (fname, mode, hdrsize/hdrptr)
 	      imunmap (hdrptr)
 .fi
-
 
 The final resolution of how image headers are implemented depends on how
 we decide to implement virtual structures in the spp language.  The immap
@@ -31,10 +29,8 @@ A generic, polymorphic GETPIX or PUTPIX statement is translated into a
 reference to a low level Fortran function.  The transformation is governed
 by the following subprogram name generating function:
 
-
 .rj (108 total)
 GETPIX, PUTPIX -->  im[gp][pls][123][silrdx]
-
 
 .ks
 .nf
@@ -54,14 +50,12 @@ For example (get, type real):
 .fi
 .ke
 
-
 The IM?P?? procedures access a list of pixels, the coordinates of which
 are given by the X, Y, Z, etc. arrays given as arguments.  Note that random
 access of individual pixels is provided as a special case (npix=1).
 
 The IM?L?? routines access the lines of an image, and the IM?S?? routines
 operate on general, but connected, subsections of images.
-
 
 .sh
 Restrictions Imposed by the Initial Prototype:
@@ -104,7 +98,6 @@ cases will not be optimized.  The most general entry points are IMGGSR
 and IMPGSR (get/put general section).  Initially, all of the other entry
 points can be defined in terms of these.
 
-
 .ks
 .nf
 Structure of the input procedures (type REAL): 
@@ -137,14 +130,11 @@ Structure of the input procedures (type REAL):
 .fi
 .ke
 
-
-
 The output procedures are structured somewhat differently, because the
 transfer of a section occurs sometime after a "put section" returns,
 rather than immediately as in the input procedures.  Since the output
 is buffered for a delayed write, we must have an IMFLUSH entry point, and
 IMUNMAP must flush the output buffer before unmapping an image.
-
 
 .ks
 .nf
@@ -182,7 +172,6 @@ Structure of the output procedures (type REAL):
 .fi
 .ke
 
-
 .sh
 Semicode for the Basic I/O Routines
 
@@ -198,10 +187,8 @@ here, but these features can be easily added in the future.  This version
 of IMIO assumes that pixels are stored on disk in line storage mode, with
 no interlacing of bands.
 
-
 IMGGS? gets a general section, and converts it to the datatype indicated
 by the type suffix.
-
 
 .ks
 .nf
@@ -219,13 +206,10 @@ end
 .fi
 .ke
 
-
-
 IMGGSC gets a general section from an imagefile into a buffer.  Upon
 exit, the buffer contains the requested section, with the pixels still
 in the same datatype they were in the imagefile.  The buffer is made
 large enough to accommodate the pixels in either datatype.
-
 
 .ks
 .nf
@@ -273,14 +257,9 @@ end
 .fi
 .ke
 
-
-
-
-
 Prepare the section descriptor vectors V and VINC.  V is a vector specifying
 the coordinates at which the next i/o transfer will take place.  VINC is
 a vector specifying the loop step size.
-
 
 .ks
 .nf
@@ -311,16 +290,11 @@ end
 .fi
 .ke
 
-
-
-
-
 The put-section procedure must write the contents of the output buffer
 to the image, using the section parameters saved during the previous call.
 The new section parameters are then saved, and the buffer pointer is
 returned to the calling program.  The calling program subsequently fills
 the buffer, and the sequence repeats.
-
 
 .ks
 .nf
@@ -347,13 +321,10 @@ end
 .fi
 .ke
 
-
-
 Flush the output buffer, if a put procedure has been called, and the
 buffer has not yet been flushed.  The output buffer is flushed automatically
 whenever a put procedure is called, when an image is unmapped, or when
 the applications program calls IMFLUSH.
-
 
 .ks
 .nf
@@ -377,7 +348,6 @@ begin
 end
 .fi
 .ke
-
 
 .ks
 .nf
@@ -415,12 +385,8 @@ end
 .fi
 .ke
 
-
-
-
 Read a contiguous array of NPIX pixels, starting at the point defined by
 the vector V, into the callers buffer.
-
 
 .ks
 .nf
@@ -445,11 +411,8 @@ end
 .fi
 .ke
 
-
-
 Write a contiguous array of NPIX pixels, starting at the point defined by
 the vector V, into the pixel storage file.
-
 
 .ks
 .nf
@@ -489,13 +452,9 @@ end
 .fi
 .ke
 
-
-
-
 IMNOTE computes the physical offset of a particular pixel in the
 pixel storage file.  If the disk datatype is UBYTE, this is the offset
 of the char containing the subscripted byte.
-
 
 .ks
 .nf
@@ -512,13 +471,10 @@ end
 .fi
 .ke
 
-
-
 Convert a vector of any datatype to type PIXEL ($t).  The input and
 output vectors may be the same, without loss of data.  The input and
 output datatypes may be the same, in which case no conversion is
 performed.
-
 
 .ks
 .nf
@@ -547,13 +503,10 @@ end
 .fi
 .ke
 
-
-
 Convert a vector of type PIXEL ($t) to any datatype.  The input and
 output vectors may be the same, without loss of data.  The input and
 output datatypes may be the same, in which case no conversion is
 performed.
-
 
 .ks
 .nf
@@ -581,7 +534,6 @@ begin
 end
 .fi
 .ke
-
 
 .sh
 Data Structure Management
@@ -631,7 +583,6 @@ round robin fashion, one per GETPIX call.  Several buffers may contain
 data from the same part of the image.  Once the desired number of buffers
 have been filled, a buffer "goes away" with each subsequent GETPIX call.
 
-
 IMGIBF gets an input buffer.  When called to get a line or section,
 the vectors VS and VE specify the subsection to be extracted.
 This information is saved in the buffer descriptor, along with the
@@ -642,9 +593,6 @@ replaced by a set of NPIX such vectors, to fully specify the section.
 It is impractical to save this much information in the buffer descriptor,
 so when creating a buffer to contain a list of pixels, VS and VE are faked
 to indicate a one dimensional section of the appropriate size.
-
-
-
 
 .ks
 .nf
@@ -699,9 +647,6 @@ end
 .fi
 .ke
 
-
-
-
 .ks
 .nf
 pointer procedure imgobf (imdes, vs, ve, dtype)
@@ -753,14 +698,10 @@ end
 .fi
 .ke
 
-
-
 Given two vectors describing the starting and ending coordinates
 of an image section, compute and return the amount of storage needed
 to contain the section.  Sufficient storage must be allocated to
 hold the largest datatype pixels which will occupy the buffer.
-
-
 
 .ks
 .nf
@@ -780,7 +721,6 @@ begin
 end
 .fi
 .ke
-
 
 .sh
 Mapping and unmapping Image Structures
@@ -815,8 +755,6 @@ the user area of the header as the third argument to IMMAP.
 IMMAP returns a pointer to the first field of the standard header
 as the function value.  The image descriptor is invisible to the
 calling program.
-
-
 
 .ks
 .nf
@@ -867,9 +805,6 @@ end
 .fi
 .ke
 
-
-
-
 .ks
 .nf
 procedure imunmap (imhdr)
@@ -910,7 +845,6 @@ end
 .fi
 .ke
 
-
 IMFLUSH indirectly references a typed flush procedure, the entry point
 address of which was saved in the image descriptor at the time of the
 last IMPGS? call.  The problem here is that IMFLUSH must work properly
@@ -918,8 +852,6 @@ regardless of the data type of the pixels in the output buffer.  To
 ensure this, and to avoid having to link in the full matrix of 48 type
 conversion routines, we call LOC in the put-section procedure to reference
 the appropriate typed flush routine.
-
-
 
 .ks
 .nf
@@ -932,12 +864,9 @@ end
 .fi
 .ke
 
-
-
 The following procedure is called by the IMGOBF and IMGIBF routines
 to open the pixel storage file, during the first PUTPIX operation on
 a file.
-
 
 .ks
 .nf
@@ -989,7 +918,6 @@ end
 .fi
 .ke
 
-
 .sh
 Data Structures
 
@@ -1008,7 +936,6 @@ making it possible to detect headerless images.
 The pixel storage file contains a small header, followed by the pixels
 (aligned on a block boundary), optionally followed by a fixed size
 histogram, and a variable size bad pixel list.
-
 
 .ks
 .nf
@@ -1030,7 +957,6 @@ histogram, and a variable size bad pixel list.
 				     ---------
 .fi
 .ke
-
 
 The image header file, which is small, will reside in the users own
 directory.  The pixel storage file is generated and manipulated 
@@ -1061,7 +987,6 @@ characteristics of the image (required to access the pixels), plus
 a few derived or historic attributes, which are commonly associated
 with images as used in scientific applications.
 
-
 .ks
 .nf
 struct imhdr {
@@ -1089,8 +1014,6 @@ struct imhdr {
 .fi
 .ke
 
-
-
 The histogram structure, if valid, tells where in the pixel storage file
 the histogram is stored, and in addition summarizes the principal
 attributes of the histogram.  All of these quantities are directly
@@ -1098,7 +1021,6 @@ calculable, except for the last three.  The modal value is determined
 by centering on the (major) peak of the histogram.  LCUT and HCUT define
 an area, centered on the modal value, which contains a certain fraction
 of the total integral.
-
 
 .ks
 .nf
@@ -1119,13 +1041,10 @@ struct histogram {
 .fi
 .ke
 
-
-
 The coordinate transformation descriptor is used to map pixel coordinates
 to some user defined virtual coordinate system, (useful when displaying the
 contents of an image).  For lack of a significantly better scheme, we have
 simply adopted the descriptor defined by the FITS standard.
-
 
 .ks
 .nf
@@ -1142,14 +1061,11 @@ struct coord_tran {
 .fi
 .ke
 
-
-
 The image and buffer descriptors are used internally by IMIO while
 doing i/o on a mapped image.  The image descriptor structure is
 allocated immediately before the image header, is transparent to the
 applications program, and is used to maintain runtime data, which
 does not belong in the image header.
-
 
 .ks
 .nf
@@ -1168,8 +1084,6 @@ struct image_descriptor {
 }
 .fi
 .ke
-
-
 
 .ks
 .nf

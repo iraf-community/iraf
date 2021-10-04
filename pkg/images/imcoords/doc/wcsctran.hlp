@@ -214,7 +214,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
   
-
 Conventions for w (field width) specification:
   
     W =  n      right justify in field of N characters, blank fill
@@ -263,7 +262,6 @@ Examples
 
 \n          insert a newline
 .fi
-
 
 .ih
 REFERENCES

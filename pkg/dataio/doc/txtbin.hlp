@@ -21,7 +21,10 @@ Print messages about files processed?
 EXAMPLES
 1. Convert a text file on disk to a binary file on disk.
 
+.nf
 	cl> txtbin text_file binary_file
+.fi
+
 .ih
 SEE ALSO
 bintxt

@@ -4,6 +4,7 @@ NAME
 clarg -- fetch and decode the value of a command line argument
 .ih
 SYNOPSIS
+
 .nf
 subroutine clargc (argno, cval, ier)
 subroutine clargi (argno, ival, ier)
@@ -18,6 +19,7 @@ integer		ival		#O integer value of argument
 real		rval		#O real value of argument
 doubleprecision	dval		#O double value of argument
 .fi
+
 .ih
 DESCRIPTION
 The four \fIclarg\fR procedures are used to fetch and decode the value of
@@ -36,6 +38,7 @@ IE_GCMDLN:	cannot read command line string
 IE_NEXARG:	nonexistent command line argument referenced
 IE_NONNUMARG:	command line argument cannot be decoded as a number
 .fi
+
 .ih
 SEE ALSO
 clnarg, clrawc

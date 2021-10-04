@@ -72,7 +72,10 @@ and \fIimage2\fR, updating the image header with the new values when done.
 images matching the template in the background, without printing the computed
 values on the terminal.
 
+.nf
 	cl> minmax nite1.* force+ verbose- &
+.fi
+
 .ih
 BUGS
 The minimum and maximum pixel values are stored in the image header as values

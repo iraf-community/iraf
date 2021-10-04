@@ -21,7 +21,10 @@ on the display monitor are matched in one frame to a reference frame.
 EXAMPLES
 To match the lookup tables in frame 3 to those in frame 1:
 
+.nf
 	cl> lumatch 3 1
+.fi
+
 .ih
 SEE ALSO
 cv

@@ -52,7 +52,6 @@ EXAMPLES
 	clbye()
 .fi
 
-
 2. List the currently defined packages in the order in which they will
 be searched for tasks.
 
@@ -63,6 +62,7 @@ be searched for tasks.
 	user
 	system
 .fi
+
 .ih
 BUGS
 All active packages must have unique names.  To eliminate the possibility

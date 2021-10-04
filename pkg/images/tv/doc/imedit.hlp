@@ -374,7 +374,6 @@ image display interface.
 	1-9	Shift display
 .fi
  
- 
 .ce
 IMEDIT COLON COMMANDS
  
@@ -405,15 +404,18 @@ write [name]		Write changes to name (default current output)
 xorder [value]		X order for background fitting
 yorder [value]		Y order for background fitting
 .fi
+
 .ih
 KEYWORDS
 None
 .ih
 EXAMPLES
 1.  Interactively edit an image.
- 
+
+.nf 
 	cl> imedit raw002 ed002
- 
+.fi
+
 2.  Edit pixels non-interactively from an x-y list.  Replace the original images
     by the edited images.
  
@@ -443,6 +445,7 @@ EXAMPLES
 	<etc>
 	cl> imedit raw* %raw%ed%* cursor=fixpix fixpix+ display-
 .fi
+
 .ih
 REVISIONS
 .ls IMEDIT V2.13

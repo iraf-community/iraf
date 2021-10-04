@@ -37,5 +37,8 @@ Generate a sequence of 100 random numbers and graph them on the graphics
 terminal in point plot mode.  Autoscaling is turned off so that the plot
 will be scaled to the rand 0-1 (the \fBgraph\fR defaults) in both axes.
 
+.nf
 	cl> urand 100 2 | graph po+ xa- ya-
+.fi
+
 .endhelp

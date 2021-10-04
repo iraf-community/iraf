@@ -141,7 +141,9 @@ is listed.  This appears as follows:
 
 A summary of the tasks and additional help topics is obtained by typing:
 
+.nf
     cl> help
+.fi
 
 This list and how to get additional help on specific topics is described
 in the \fBReferences\fR section at the end of this guide.
@@ -365,7 +367,9 @@ filter to produce the calibration images "FlatV", "FlatB", and
      Processing the CCD data is easy and largely automated.
 First, set the task parameters with the following command:
 
+.nf
     cl> eparam quadproc
+.fi
 
 You may have already set the parameters when you ran
 \fBsetinstrument\fR, though the calibration image parameters
@@ -422,7 +426,9 @@ The already processed images in the input list are recognized as having been
 processed and are not affected.  To check the status of the processing we
 can look at the end of the log file with:
 
+.nf
     cl> tail logfile
+.fi
 
 After processing we can repeat the \fBccdlist\fR command to find:
 
@@ -482,7 +488,9 @@ processing.
 
    First you must process the flat field images explicitly with
 
+.nf
     cl> quadproc *.imh ccdtype=flat
+.fi
 
 where "*.imh" may be replaced with any list containing the flat fields.
 If zero level and dark count corrections are required these calibration
@@ -571,6 +579,7 @@ input images are converted to sky flats are
     cl> mkskyflat sky004 Skyflat
     cl> mkskyflat sky*.imh ""
 .fi
+
 .sh
 4.4 Iillumination Corrected Flat Fields
 
@@ -627,6 +636,7 @@ As examples,
     cl> mkfringecor sky004 Fringe
     cl> mkfringecor sky*.imh ""
 .fi
+
 .sh
 6. Summary
 
@@ -639,7 +649,10 @@ calibration image use one of the combine tasks.  Spectroscopic flat fields may
 need to be processed first in order to remove the lamp spectrum.
 Finally, just type
 
+.nf
     cl> quadproc *.imh&
+.fi
+
 .sh
 7. References
 
@@ -659,7 +672,9 @@ Lloyd B. Robinson and published by Springer-Verlag.
      The task descriptions and supplementary documentation are available
 on-line through the help task by typing
 
+.nf
     cl> help \fItopic\fR
+.fi
 
 where \fItopic\fR is one of the following.
 
@@ -673,7 +688,6 @@ where \fItopic\fR is one of the following.
     darkcombine - Combine and process dark count images
     flatcombine - Combine and process flat field images
     zerocombine - Combine and process zero level images
- 
  
             STANDARD CCDRED TASKS
  
@@ -706,7 +720,9 @@ where \fItopic\fR is one of the following.
 Printed copies of the on-line help documentation may be made with the
 command
 
+.nf
     cl> help topic | lprint
+.fi
 
      In addition to the package documentation for \fBquad\fR,
 \fBlongslit\fR, and \fBapextract\fR there may be specific guides for

@@ -1,6 +1,6 @@
 .help prec Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slPREC (EP0, EP1, RMATP)
 
      - - - - -
@@ -48,6 +48,6 @@
 
   Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

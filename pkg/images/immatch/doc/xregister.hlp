@@ -479,7 +479,6 @@ CURSOR COMMANDS
 The following graphics cursor commands are currently available in
 XREGISTER.
 
-
 .nf
 		Interactive Keystroke Commands
 
@@ -494,7 +493,6 @@ f	Recompute the cross-correlation function
 o	Enter the image overlay plot submenu 
 w	Update the task parameters
 q	Exit
-
 
 		Colon Commands
 
@@ -529,12 +527,10 @@ q	Exit
 :ycbox		[value]	    Show/set the centering box width in y
 .fi
 
-
 The following submenu of image cursor commands is also available.
 
 .nf
 		Image Overlay Plot Submenu
-
 
 ?	Print help
 c  	Overlay the marked column of the reference image
@@ -550,7 +546,6 @@ v 	Overlay the marked column of the reference image
 h 	Overlay the marked line of the reference image
 	with the x and y shifted line of the input image
 q	Quit 
-
 
 		Image Overlay Sub-menu Colon Commands
 
@@ -586,7 +581,6 @@ correlation = discrete
 	      ----------------------------------------------------
 			 sumsqI * sumsqR
 
-
 correlation = fourier
 
         <I> = SUMj SUMi { I[i,j] } / (Nx * Ny)
@@ -597,7 +591,6 @@ correlation = fourier
        FFTR = FFT { (R - <R>) / sumsqR } 
 
           X = FFTINV { FFTR * conj { FFTI } }
-
 
 correlation = difference
 

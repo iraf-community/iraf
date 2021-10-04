@@ -59,11 +59,9 @@ New elements may be added by writing to "record_name[*]".
 .le
 .le
 
-
 The values of these attributes are available via ordinary DBIO read
 requests (but writing is not allowed).  Each record in the dictionary
 automatically has the following (user accessible) fields associated with it:
-
 
 .ks
 .nf
@@ -75,12 +73,10 @@ automatically has the following (user accessible) fields associated with it:
 .fi
 .ke
 
-
 Thus, to determine the number of elements in a record, one would make the
 following function call:
 
 	nelements = dbgeti (db, "record_name.r_len")
-
 
 .sh
 2.1 Records and Fields
@@ -113,7 +109,6 @@ is merely the name of the record or field to be accessed, i.e., "im.ndim",
 to set or inspect DBIO parameters affecting the operation of DBIO itself,
 and do not perform i/o on a datafile.
 
-
 .ks
 .nf
 		    db = dbopen (file_name, access_mode)
@@ -133,7 +128,6 @@ and do not perform i/o on a datafile.
 .fi
 .ke
 
-
 A new, empty database is created by opening with access mode NEW_FILE.
 The get and put calls are functionally equivalent to those used by
 the CL interface, down to the "." syntax used to reference fields.
@@ -144,7 +138,6 @@ place if reasonable.  This also eliminates the need to convert to and
 from chars in the fourth argument, and avoids the need for a 7**2 type
 conversion matrix.
 
-
 .sh
 4. Other DBIO Procedures
 
@@ -152,7 +145,6 @@ conversion matrix.
 deleting dictionary entries, making links to create aliases, searching
 a dictionary of unknown content, and so on.  The calls are summarized
 below:
-
 
 .ks
 .nf
@@ -165,7 +157,6 @@ below:
 .fi
 .ke
 		
-
 The semantics of these routines are explained in more detail below:
 
 .ls 4
@@ -200,7 +191,6 @@ the record is physically deleted and storage may be reclaimed.
 .le
 .le
 
-
 .sh
 5. Database Access from the CL
 
@@ -231,7 +221,6 @@ structured code).
 This requires that we be able to store arbitrary information in
 image headers, and that this information be available in CL scripts.
 DBIO will provide such a capability.
-
 
     In addition to access from CL scripts, we will need interactive access
 to datafiles at the CL level.  The DBIO interface makes it easy to
@@ -289,28 +278,19 @@ usually not very large and will normally reside in the user's directory
 system.  The pixel storage file is created and managed by IMIO transparently
 to the user and to DBIO.
 
-
 .ks
 .nf
                       applications program
 
-
-
                                    IMIO
-
-
 
 			 DBIO
 
-
-
 				    FIO
-
 
             Structure of a program which accesses images
 .fi
 .ke
-
 
 It shall be possible for an single datafile to contain any number of
 image header structures.  The standard image header shall be implemented

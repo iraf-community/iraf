@@ -304,11 +304,15 @@ EXAMPLES
 Because of the large number of parameters the parameter values are often
 set using the task \fBeparam\fR.  Then simply execute the command
 
+.nf
 	cl> rvcorrect
+.fi
 
 2. To set some of the parameters on the command line
 
+.nf
 	cl> rvcorrect ra=12:22:1.116 dec=15:55:16.244 ut=5:30
+.fi
 
 3. To use a text file generate a file containing the year, month, day, ut,
 ra, and dec with one observation per line.
@@ -336,7 +340,9 @@ cl> type rv.dat
 
 4. To use observation parameters from a set of images the command is
 
+.nf
 	cl> rvcorrect images=hz44.001,aboo.001 > rv.dat
+.fi
 
 5. A CL loop can be used to compute a table in which one parameter varies.
 

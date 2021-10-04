@@ -84,6 +84,7 @@ sky image.
     cl> mkskycor sky017 Fringe
     cl> mkskycor sky017 frg017
 .fi
+
 .ih
 SEE ALSO
 ccdproc

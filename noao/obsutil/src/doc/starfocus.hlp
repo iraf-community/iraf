@@ -197,7 +197,6 @@ x  Delete nearest point, star, or focus (selected by query)
 z  Zoom to a single measurement
 <space> Step through different focus or stars in current plot type
 
-
 :beta <val>     Beta parameter for Moffat fit
 :level <val>	Level at which the size parameter is evaluated
 :overplot <y|n> Overplot the profiles from the narrowest profile?
@@ -211,6 +210,7 @@ z  Zoom to a single measurement
 The profile radius may not exceed the initial value set by the task
 parameter.
 .fi
+
 .ih
 DESCRIPTION
 This task measures the point-spread function (PSF) width of stars or other

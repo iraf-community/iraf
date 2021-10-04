@@ -4,12 +4,14 @@ NAME
 imdele -- delete an image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imdele (image, ier)
 
 character*(*)	image		#I host name of image to be deleted
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimdele\fR procedure deletes an image, i.e., the both the header file
@@ -23,6 +25,7 @@ It is not an error if there is no pixel file.
 IE_IMDELNEXIM:	attempt to delete a nonexistent image
 IE_IMDELETE:	cannot delete image
 .fi
+
 .ih
 SEE ALSO
 imrnam, imcrea

@@ -11,6 +11,7 @@ pointer	sf		# surface descriptor
 real	x		# x value, 1 <= x <= ncols
 real	y		# y value, 1 <= y <= nlines
 .fi
+
 .ih
 ARGUMENTS
 .ls sf      

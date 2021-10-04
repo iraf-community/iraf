@@ -242,14 +242,11 @@ e	Print error messages
 r	Rewind the coordinate list
 q	Exit task 
 
-
-
                  Colon Commands
 
 :show	[data/fit]	List the parameters
 :m [n]	Move to next [nth] star in coordinate list
 :n [n]	Fit next [nth] star in coordinate list, output results
-
 
 		Colon Parameter Editing Commands
 
@@ -299,9 +296,7 @@ q	Exit task
 
 :mkbox		[y/n]		Mark the fitting box on the display
 
-
 The following command are available from within the interactive setup menu.
-
 
                     Interactive Fitpsf Setup Menu
 
@@ -349,7 +344,6 @@ moments functions respectively.
     image  xcenter  ycenter  xsigma  ysigma rot  amplitude  sky  err
 
     image  xcenter  ycenter  rgyrat  ellip  pa amplitude  sky  err
-
 .fi
 
 In both interactive and batch mode the full output is written to the
@@ -498,7 +492,6 @@ Use uniform weighting.
 	... full output will appear in the text file ypix.psf.2 
 .fi
 
-
 3. Setup and run FITPSF interactively on a list of objects temporarily
 overriding the fwhmpsf and sigma parameters determined in examples 1 or 2.
 Use uniform weighting.
@@ -513,7 +506,6 @@ Use uniform weighting.
         ap> fitpsf dev$ypix 11.0 fwhmpsf=2.6 noise=constant coords=ypix.coo.1
 
         ... type ? for optional help
-
 
         ... move the graphics cursor to the stars and tap space bar
 
@@ -532,7 +524,6 @@ Use uniform weighting.
 
         ... the output will appear in ypix.psf.3 ...
 .fi
-
 
 4. Display and fit some stars in an image section and write the output
 coordinates in the coordinate system of the parent image. Use uniform 
@@ -553,7 +544,6 @@ weighting.
 
         ap> pdump ypix.psf.4 xc,yc yes | tvmark 1 STDIN col=204
 .fi
-
 
 5. Run FITPSF in batch mode using the coordinate file and the previously
 saved parameters. Use uniform weighting. Verify the critical parameters.
@@ -652,7 +642,6 @@ the task.
 
         ... full output will appear in ypix.psf.8
 .fi
-
 
 .ih
 BUGS

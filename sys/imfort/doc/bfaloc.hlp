@@ -4,6 +4,7 @@ NAME
 bfaloc -- create and preallocate storage for a binary file
 .ih
 SYNOPSIS
+
 .nf
 subroutine bfaloc (fname, nchars, status)
 
@@ -11,6 +12,7 @@ character*(*)	fname		#I host name of new file
 integer		nchars		#I size of file in "chars"
 integer		status		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfaloc\fR procedure creates a new file \fIfname\fR and preallocates

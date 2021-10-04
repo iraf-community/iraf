@@ -804,7 +804,6 @@ object information independent of other records.  Figure 1 shows an example
 of a file for a configuration called LMC123.
 
 .nf
-
     Figure 1: Example Aperture Identification File
 
     cl> type LMC124
@@ -816,8 +815,8 @@ of a file for a configuration called LMC123.
        .
     47 1 s92
     48 0 sky
-
 .fi
+
 Note the identification of the sky fibers with beam number 0 and the
 object fibers with 1.  Any broken fibers should be included and
 identified by a different beam number, say beam number -1, to give the
@@ -998,11 +997,11 @@ is to collect all the algorithm parameters in one place separate from the
 processing parameters and include only those which are relevant for
 Argus.  The parameter values can be changed from the
 defaults by using the parameter editor,
+
 .nf
-
 	cl> epar params
-
 .fi
+
 or simple typing \fIparams\fR.  The parameter editor can also be
 entered when editing the \fBdoargus\fR parameters by typing \fI:e
 params\fR or simply \fI:e\fR if positioned at the \fIparams\fR
@@ -1437,6 +1436,7 @@ Image line/aperture to plot (1:) (1):
 <Look at spectra and change apertures with # key>
 <Exit with 'q'>
 .fi
+
 .ih
 REVISIONS
 .ls DOARGUS V2.11

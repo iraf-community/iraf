@@ -216,7 +216,6 @@ is doubled by converting it to a real image with the chpixtype task then the
 effect of caching in interactive is can be quite noticeable if measurements
 of objects in the top and bottom halves of the image are alternated.
 
-
 PHOT computes accurate centers for each object using the centering
 parameters defined in \fIcenterpars\fR, computes an accurate sky value
 for each object using the sky fitting parameters defined in \fIfitskypars\fR,
@@ -254,7 +253,6 @@ parameter to a reasonable value, and that they have accounted for the
 exposure time by setting either the DATAPARS \fIexposure\fR or \fIitime\fR
 parameters.
 
-
 .ih
 CURSOR COMMANDS
 
@@ -282,7 +280,6 @@ l	Do photometry for remaining stars in coordinate list, output results
 e	Print error messages
 r	Rewind coordinate list
 q	Exit task
-
 
 Photometry parameters are listed or set with the following commands.
 
@@ -370,7 +367,6 @@ Photometry parameters are listed or set with the following commands.
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot radial profile of object
 
-
 The following commands are available from inside the interactive setup menu.
  
                     Interactive Phot Setup Menu
@@ -436,7 +432,6 @@ and accompanying error message respectively.  Xinit, yinit, xcenter, ycenter,
 xshift, yshift, and xerr, yerr are self explanatory and output in pixel units.
 The sense of the xshift and yshift definitions is the following.
 
-
 .nf
 	xshift = xcenter - xinit
 	yshift = ycenter - yinit
@@ -474,7 +469,6 @@ in the graphics window if \fIradplots\fR is "yes".
 In interactive and batchmode a radial profile plot is written to
 \fIplotfile\fR  if it is defined each time the result of an object
 measurement is written to \fIoutput\fR .
-
 
 .ih
 ERRORS
@@ -543,7 +537,6 @@ created by DAOFIND and the default setup.
 	... the results will appear in ypix.mag.1
 .fi
 
-
 2. Compute the magnitudes for a few  stars in dev$ypix using the display
 and the image cursor. Setup the task parameters using the interactive
 setup menu defined by the i key command and a radial profile plot.
@@ -582,7 +575,6 @@ setup menu defined by the i key command and a radial profile plot.
 
         ... the output will appear in ypix.mag.2
 .fi
-
 
 3. Compute the magnitudes for a few stars in dev$ypix using a contour plot
 and the graphics cursor. This option is only useful for those (now very few)
@@ -644,13 +636,11 @@ the i key command as in example 1.
         ... reset stdimcur to its previous value
 .fi
 
-
 4. Setup and run PHOT interactively on a list of objects temporarily
 overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
 parameters determined in examples 1 or 2.
 
 .nf
-
 	da> display dev$ypix 1
 
 	    ... display the image
@@ -660,7 +650,6 @@ parameters determined in examples 1 or 2.
             interactive+
 
         ... type ? for optional help
-
 
         ... move the graphics cursor to the stars and tap space bar
 
@@ -679,7 +668,6 @@ parameters determined in examples 1 or 2.
 
         ... the output will appear in ypix.mag.4 ...
 .fi
-
 
 5. Display and measure some stars in an image section and write the output
 coordinates in the coordinate system of the parent image.
@@ -701,7 +689,6 @@ coordinates in the coordinate system of the parent image.
         da> pdump ypix.mag.5 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
-
 6. Run PHOT in batch mode using the coordinate file and the previously
 saved parameters. Verify the critical parameters.
 
@@ -710,7 +697,6 @@ saved parameters. Verify the critical parameters.
 
         ... output will appear in ypix.mag.6...
 .fi
-
 
 7. Repeat example 6 but assume that the input coordinate are ra and dec
 in degrees and degrees, turn off verification, and submit the task to to
@@ -733,7 +719,6 @@ the background.
 
         ... mark the stars on the display
 .fi
-
 
 8. Run PHOT interactively without using the image display cursor.
 
@@ -778,7 +763,6 @@ the background.
         da> set stdimcur = <default>
 
         ... reset the value of stdimcur
-
 .fi
 
 8. Use a image cursor command file to drive the PHOT task. The cursor command
@@ -803,10 +787,6 @@ parameter files, and quits the task.
 
         ... full output will appear in ypix.mag.9
 .fi
-
-
-
-
 
 .ih
 TIME REQUIREMENTS

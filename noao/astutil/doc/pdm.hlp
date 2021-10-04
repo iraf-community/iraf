@@ -118,7 +118,6 @@ the phasecurve plot will be deleted or undeleted from the working data set.
 
 The ICFIT keystrokes are described elsewhere. (see help for icfit)
 
-
 Phase Dispersion Minimization User Interface (keystrokes)
 
 When the program starts up it reads the data file(s) and displays
@@ -285,11 +284,12 @@ command plus curfit information if the any curves have been fit.  Also,
 the residual data will be shown if residuals have been calculated. If
 file is specified, the output will go there.
 .le
-.nf
 
+.nf
 :minp :maxp [period]		set min/max search period
 :minf :maxf [frequency]		set min/max search frequency
 .fi
+
 .ls
 These commands are self explanatory.  Whichever value is set,
 period or frequency, the corresponding frequency or period is
@@ -348,13 +348,17 @@ EXAMPLES
 whose period is within the bounds (200., 800.) interactively
 the command might be:
 
+.nf
 	cl> pdm vstar645 minp=200. maxp=800.
+.fi
 
 2. To do the same thing in batch mode, allowing the program to guess the 
 period window, with no lightcurve analysis, and saving the metacode
 in vstar645.m, the command might be:
 
+.nf
 	cl> pdm vstar645 inter=no meta="vstar645.m"
+.fi
 
 .ih
 BUGS

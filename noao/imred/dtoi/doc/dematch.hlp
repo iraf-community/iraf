@@ -41,10 +41,11 @@ measured.
 EXAMPLES
 Match densities in db1 to log exposure values for wedge#117
 with a IIIAJ emulsion and a GG385 filter.
-.nf
 
+.nf
 	cl> dematch db1 wedge=117 filt=gg385 emulsion=IIIAJ
 .fi
+
 .ih
 SEE ALSO
 spotlist, hdfit, hdtoi

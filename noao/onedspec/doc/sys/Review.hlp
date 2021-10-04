@@ -25,7 +25,6 @@ reducing data from the KPNO instruments of the same name.  The \fBimred\fR
 packages shall call upon the basic operators in \fBonedspec\fR, \fBimages\fR,
 and other packages to reduce the data for a specific instrument.
 
-
 .ks
 .nf
 	iids(etc)
@@ -40,12 +39,11 @@ and other packages to reduce the data for a specific instrument.
 					lists
 					system
 					language
-
 .fi
+
 .ce
 Relationship of \fBOnedspec\fR to other IRAF Packages
 .ke
-
 
 The relationship of the \fBonedspec\fR packages to other related packages in
 the IRAF system is shown above.  A program (CL script) in a package at one
@@ -162,7 +160,6 @@ single row from a table, but we often use the term is a less strict sense.
 .le
 .le
 
-
 An \fBimage\fR appears in the database as a record.  The record is really
 just the image header; the pixels are stored external to the database in a
 separate file, storing only the name of the pixel storage file in the record
@@ -206,7 +203,6 @@ control parameters should be implemented as positional arguments following
 the primary operands, and data independent or optional (rarely used) parameters
 should be implemented as hidden parameters.
 
-
 .ks
 .nf
 	imop (input, output, data_dependent_control_params)
@@ -223,7 +219,6 @@ for example,
 	coincor (spectra, newgroup, dead_time)
 .fi
 .ke
-
 
 If a series of spectra are to be processed it seems reasonable to add the
 processed spectra to a new or existing data group (possibly the same as an
@@ -248,13 +243,17 @@ The simplest case occurs when there is one spectrum per data group (file).
 For example, assuming that the file "a" contains a single spectrum, the
 command
 
+.nf
 	cl> coincor a, b, .2
+.fi
 
 would perform coincidence correction for spectrum A, placing the result in
 B, using a dead time parameter of .2.  For a more complex example, consider
 the following command:
 
+.nf
 	cl> coincor "a.type=obj&coincor=no,b", a, .2
+.fi
 
 This would perform coincidence correction for all spectra in group B plus all
 object spectra in group A which have not already been coincidence corrected,
@@ -262,13 +261,17 @@ adding the corrected spectra to group A (notation approximate only).  If the
 user does not trust the database explicit record numbers may be used and
 referenced via range list expressions, e.g.,
 
+.nf
 	cl> coincor "a.recnum=(1,5,7:11),b", a, .2
+.fi
 
 would select records 1, 5, and 7 through 11 from data group A.  Alternatively
 the database utilities could be used to list the spectra matching the selection
 criteria prior to the operation if desired.  For example,
 
+.nf
 	cl> db.select "a.type=obj"
+.fi
 
 would write a table on the standard output (the terminal) wherein each spectrum
 in data group A is shown as a row of field values.  If one wanted to generate
@@ -276,7 +279,9 @@ an explicit list of records to be processed with help from the database
 utilities, a set of records could be selected from a data group and selected
 fields from each record written into a text file:
 
+.nf
 	cl> db.select "a.type=obj", "recnum, history" > reclistfile
+.fi
 
 The output file "reclistfile" produced by this command would contain the
 fields "recnum" (record number) and "history" (description of processing
@@ -284,7 +289,9 @@ performed to generate the record).  The editor could be used to delete
 unwanted records, producing a list of record numbers suitable for use as
 an image template:
 
+.nf
 	cl> coincor "a.recnum=@reclistfile", a, .2
+.fi
 
 .nh
 Reduction Operators

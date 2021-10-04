@@ -101,7 +101,10 @@ as an object.  For example to flatten a flat field:
 
 10. To delete processing flags:
 
+.nf
     cl> ccdhedit obj042 flatcor ""
+.fi
+
 .ih
 SEE ALSO
 hedit, instruments, ccdtypes, subsets

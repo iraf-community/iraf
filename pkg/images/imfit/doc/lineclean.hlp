@@ -4,9 +4,11 @@ NAME
 lineclean -- replace deviant pixels in image lines
 .ih
 USAGE	
+
 .nf
 lineclean input output
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -102,18 +104,24 @@ in the help information \fBicfit\fR.
 EXAMPLES
 1. To clean pixels deviating by more than 2.5 sigma:
 
+.nf
 	cl> lineclean image cleanimage
+.fi
 
 If the interactive flag is set then a prompt for an image line is
 printed:
 
+.nf
 	image: Fit line = 100
+.fi
 
 For a one or two dimensional image the line number is entered (1 for a one
 dimensional image).  For a three dimensional image two numbers are entered.
 For example:
 
+.nf
 	image: Fit line = 10 2
+.fi
 
 for line 10 of the second image plane.
 

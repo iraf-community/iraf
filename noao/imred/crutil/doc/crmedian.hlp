@@ -4,9 +4,11 @@ NAME
 crmedian -- detect, fix, and flag cosmic rays using median filtering
 .ih
 USAGE   
+
 .nf
 crmedian input output
 .fi
+
 .ih
 PARAMETERS
 .ls input

@@ -4,9 +4,11 @@ NAME
 colbias -- Fit and subtract an average column bias
 .ih
 USAGE	
+
 .nf
 colbias input output
 .fi
+
 .ih
 PARAMETERS
 .ls input

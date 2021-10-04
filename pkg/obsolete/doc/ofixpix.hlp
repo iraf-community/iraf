@@ -4,9 +4,11 @@ NAME
 ofixpix -- fix bad pixels using a text file (from proto V2.10.4)
 .ih
 USAGE	
+
 .nf
 ofixpix images badpixels
 .fi
+
 .ih
 PARAMETERS
 .ls image
@@ -66,7 +68,10 @@ the lines
 
 The set of images "image*" are fixed by:
 
+.nf
 	cl> ofixpix image* badpixfile
+.fi
+
 .ih
 REVISIONS
 .ls OFIXPIX V2.11

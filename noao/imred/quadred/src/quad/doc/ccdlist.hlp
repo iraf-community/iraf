@@ -124,7 +124,9 @@ The processing indicated is overscan subtraction, trimming, and flat fielding.
 
 6. To make a list file containing all the flat field images:
 
+.nf
     cl> ccdlist *.imh ccdtype=flat name+ > flats
+.fi
 
 This file can be used as an @ file for processing.
 .ih

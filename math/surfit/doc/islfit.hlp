@@ -18,6 +18,7 @@ int	npts		# number of data points, npts <= ncols
 int	wtflag		# type of weighting
 int	ier		# error code
 .fi
+
 .ih
 ARGUMENTS
 .ls sf    

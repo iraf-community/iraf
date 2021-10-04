@@ -71,18 +71,27 @@ automatically determining the number and positions of the peaks.
 The most automatic method just uses the contrast to limit the acceptable
 peaks:
 
+.nf
 	cl> findpeaks image.db 1 .1
+.fi
 
 However, if the number of spectra in the image is known:
 
+.nf
 	cl> findpeaks image.db 1 0 min=10 max=10
+.fi
 
 or if a threshold is known:
 
+.nf
 	cl> findpeaks image.db 1 0 threshold = 1000
+.fi
 
 For a noisy image the separation parameter can be set to eliminate spurious
 noise peaks near the peaks to be found:
 
+.nf
 	cl> findpeaks image.db 1 .1 sep=20
+.fi
+
 .endhelp

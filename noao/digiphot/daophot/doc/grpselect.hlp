@@ -51,7 +51,6 @@ ypix.grp.1 and write them into a new file named ypixsmall.grp.
 
 .nf
     da> grpselect ypix.grp.1 ypixsmall.grp 1 70
-
 .fi
 
 2. Select groups larger than 70 from the same input group file and rerun
@@ -60,7 +59,6 @@ group with a new value of the critoverlap parameter on the results.
 .nf
     da> grpselect ypix.grp.1 ypixlarge.grp 71 400
     da> group dev$ypix ypixlarge.grp ypix.psf.1 default crit=5.0
-
 .fi
 
 .ih

@@ -19,7 +19,10 @@ The title in \fIimage\fR is changed to \fItitle\fR.
 .ih
 EXAMPLES
 
+.nf
     cl> imtitle m1 "M1 U Band"
+.fi
+
 .ih
 USE INSTEAD
 images.hedit

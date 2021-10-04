@@ -43,11 +43,16 @@ EXAMPLES
 
 1. Stack a set of four two dimensional images:
 
+.nf
 	cl> imstack image* image.3d
+.fi
 
 2. To stack a section of images:
 
+.nf
 	cl> imstack image*[1:10,1:10] newimage
+.fi
+
 .ih
 BUGS
 .ih

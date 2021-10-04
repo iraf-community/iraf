@@ -365,7 +365,6 @@ at the beginning of the line terminates the macro. Macro functions may be
 nested.  Macro functions are indistinguishable from intrinsic functions in
 expressions.
 
-
 .ih
 EXAMPLES
 
@@ -440,7 +439,6 @@ create a boolean mask for one of the images from the deep source mask:
 cl> set pmmatch="world"
 cl> mskexpr "m" mask1.pl exp1 refmask=stackmask
 .fi
-
 
 .ih
 TIME REQUIREMENTS

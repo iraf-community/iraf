@@ -12,6 +12,7 @@ include <math/nlfit.h>
 pointer	nl		# curve descriptor
 int	parameter	# parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls nl     
@@ -43,6 +44,7 @@ chi-squared, the lambda factor, the fitting tolerance and the fitted
 scatter term.
 .ih
 EXAMPLES
+
 .nf
 include <math/nlfit.h>
 
@@ -51,6 +53,7 @@ int	nlstati()
 call malloc (buf, nlstati (nl, NLNPARAMS), TY_REAL)
 call nlpgetr (nl, Memr[buf], nparams)
 .fi
+
 .ih
 SEE ALSO
 nlpget

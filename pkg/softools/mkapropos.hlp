@@ -60,6 +60,7 @@ EXAMPLES
 .nf
   cl> mkap pkglist=home helpdir=myroot.hd aproposdb=my.db
 .fi
+
 .ih
 SEE ALSO
 apropos, mkhelpdb

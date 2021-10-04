@@ -350,7 +350,6 @@ f	Recompute the intensity matching function
 w	Update the task parameters
 q	Exit
 
-
 		Colon Commands
 
 :markcoords	    Mark objects on the display
@@ -686,7 +685,6 @@ five non-overlapping image regions in the sections file.
 
 	    ... type q to quit the interactive loop, n to go to the
 		next image or q to quit the task
-		
 .fi
 
 .ih

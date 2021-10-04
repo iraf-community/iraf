@@ -1,6 +1,6 @@
 .help pda2h Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slPDAH (P, D, A, H1, J1, H2, J2)
 
      - - - - - -
@@ -28,6 +28,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

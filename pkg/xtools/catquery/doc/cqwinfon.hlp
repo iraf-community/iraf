@@ -21,6 +21,7 @@ int	wktype		# the wcs parameter data type
 char	wkunits		# the wcs parameter units (INDEF if undefined)
 int	max_wkunits	# the maximum size of the wcs parameter units
 .fi
+
 .ih
 ARGUMENTS
 .ls imres    

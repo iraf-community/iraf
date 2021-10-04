@@ -54,16 +54,16 @@ EXAMPLES
 [1] Convert all records in the IDSOUT file to IRAF images, with the root image 
 name being "aug83".  The IDSOUT file is the first file on the tape, which is 
 mounted on mtb.
-	
-	cl> rcardimage mtb[1] | ridsout aug83
+
+.nf
+cl> rcardimage mtb[1] | ridsout aug83
+.fi
 
 [2] List the headers from the same IDSOUT file read in example 1, but don't make
 output images.  A \fBlong_header\fR will be listed; sample output is shown.
 
-	cl> rcardimage mtb[1] | ridsout make_image=no
-
 .nf
-
+cl> rcardimage mtb[1] | ridsout make_image=no
 RECORD = 2317, label = "CALLISTO  2297/2298  CLEAR/2.5ND",
 oflag = OBJECT, beam_number = 0,   alpha_ID = NEW,   companion = 2318,
 airmass = 1.524,        W0 = 3430.735,    WPC = 1.032,     ITM =  960,
@@ -79,6 +79,7 @@ first file on the tape, which is mounted on mtb.
 .nf
 	cl> rcard mtb[1] | ridsout make- long- print+ rec = 5086,5087
 .fi
+
 .ih
 BUGS
 The current version of IRAF magtape I/O does not read beyond the first

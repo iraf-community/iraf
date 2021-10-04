@@ -4,6 +4,7 @@ NAME
 zcldpr -- close a detached process
 .ih
 SYNOPSIS
+
 .nf
 zcldpr (jobcode, killflag, exit_status)
 
@@ -11,6 +12,7 @@ int	jobcode			# code by which job is known to system
 int	killflag		# if YES, kill bkg job
 int	exit_status		# exit status of bkg job
 .fi
+
 .ih
 DESCRIPTION
 If \fIkillflag\fR is NO, process execution will be suspended until

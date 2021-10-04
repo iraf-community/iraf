@@ -40,11 +40,16 @@ EXAMPLES
 1. To make a bad pixel mask image from the bad pixel file "cryocambp.dat"
 using the image "ccd005" as the template:
 
+.nf
 	cl> badpiximage cryocambp.dat ccd005 cryocambp
+.fi
 
 2. To make the bad pixel mask image with good values of 0 and bad values of 1:
 
+.nf
 	cl> badpixim cryomapbp.dat ccd005 cryocambp good=0 bad=1
+.fi
+
 .ih
 SEE ALSO
 ccdproc, instruments

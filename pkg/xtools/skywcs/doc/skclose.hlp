@@ -9,6 +9,7 @@ call sk_close (coo)
 .nf
 pointer	coo		# the sky coordinate descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls  coo    

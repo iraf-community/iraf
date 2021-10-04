@@ -75,6 +75,7 @@ EXAMPLES
 	cl> mkspec bb5000 "5000 deg black body" 512 1 3 start=3000 \
 	>>> end=8000 temp=5000
 .fi
+
 .ih
 REVISIONS
 .ls MKSPEC V2.10

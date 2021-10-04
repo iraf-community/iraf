@@ -23,6 +23,7 @@ are to be deleted will be marked with an "x" (this information
 is retained if columns change).
 
 To mark a point for deletion you can:
+
 .nf
 1) Specify the points individually
 2) Define a box in which all points will be deleted
@@ -63,8 +64,8 @@ z	display current status (delete or undelete)
 :x(-) xcolumn	set the table column for the X axis and possibly replot
 :y(-) ycolumn	set the table column for the Y axis and possibly replot
 - do not automatically replot after reading in new column
-
 .fi
+
 .ih
 PARAMETERS
 .ls input [file name]
@@ -107,6 +108,7 @@ to decide which points to delete.
 .nf
      st> gtedit m31.mag MAG MERR
 .fi
+
 .ih
 BUGS
 .ih

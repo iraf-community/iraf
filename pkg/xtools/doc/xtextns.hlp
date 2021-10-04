@@ -1,11 +1,14 @@
 .help xt_extns Mar07 xtools
 .ih
 NAME
+
 .nf
 xt_extns -- Expand an MEF into a list of image extensions
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 int procedure xt_extns (files, index, extname, extver, lindex, lname, lver,
 	dataless, ikparams, err, imext)
@@ -22,6 +25,7 @@ char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 int	imext			#O Image extensions?
 .fi
+
 .ih
 DESCRIPTION
 A list, \fIfiles\fR,  of regular images and multi-extension FITS (MEF)

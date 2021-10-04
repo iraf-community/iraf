@@ -1,6 +1,6 @@
 .help svd Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slSVD (M, N, MP, NP, A, W, V, WORK, JSTAT)
 
      - - - -
@@ -68,6 +68,6 @@
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

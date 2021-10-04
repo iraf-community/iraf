@@ -65,8 +65,8 @@ by beginning the line with the comment symbol (#).
 
 The following data types are recognized by this parameter
 (the default data type is single-precision real):
-.nf
 
+.nf
      r - Single-precision real.
      d - Double-precision real.
      i - Integer.
@@ -244,8 +244,8 @@ The prompts are printed by the 'tcreate' task;
 these are the lines beginning with "Give column definitions"
 and "Give table data".
 The table will have 4 columns and 2 rows.
-.nf
 
+.nf
 tt> tcreate test STDIN STDIN
 
 Give column definitions (name, datatype, print format, units)
@@ -260,12 +260,14 @@ Give table data ... then newline & EOF to finish.
 nameless      3:18:47   42:24   INDEF
 "SA0 123456"  19:00:06.3  -0:00:01  3.5
 ^Z
-
 .fi
+
 2. Create a table called "outfile.tab" using the columns specified
 in "columns.cd" and the data in "data.dat".
 
+.nf
 tt> tcreate outfile columns.cd data.dat nskip=3
+.fi
 
 "columns.cd" may contain just the following:
 .sp
@@ -335,7 +337,6 @@ may have the following data:
          3   156.25     5.17   14.610   14.537   14.483   14.438
           462.206  7.26  0.37   0.013    0.014    0.015    0.016
 
-
 and could have the following column-definition file:
 
 STARno	i
@@ -365,6 +366,7 @@ PH/ADU  r 20.0
 RNOISE  r 6.50
 BAD     r 300.0
 .fi
+
 .ih
 BUGS
 .ih

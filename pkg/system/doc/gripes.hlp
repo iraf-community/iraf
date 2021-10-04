@@ -56,6 +56,7 @@ the text.
 	.
 	cl>
 .fi
+
 .ih
 BUGS
 There is currently no provision for communicating gripes from a remote site

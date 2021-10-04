@@ -10,6 +10,7 @@ islzero (sf, lineno)
 pointer	sf		# surface grid descriptor
 int	lineno		# surface grid line number
 .fi
+
 .ih
 ARGUMENTS
 .ls sf     

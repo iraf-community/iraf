@@ -24,7 +24,9 @@ extensions are read from an entire tape. Legal file lists are composed
 of a series of file numbers and / or file ranges separated by commas
 or whitespace.  For example the string
 
+.nf
 	"1-3,4-8"
+.fi
 
 will convert ALL the FITS extensions in files 1 through 8 on tape,
 but only FITS extensions 1 through 8 from a disk file or a single tape file.
@@ -33,7 +35,9 @@ each input file.  For the case of tape input the FITS extensions to be
 read from each file must be specified separately. For example the following
 string
 
+.nf
 	"1-10[2-4],15-21[1-10]"
+.fi
 
 tells rfits to convert extensions 2 through 4 in tape files 1 through 10
 and extensions 1 through 10 in tape files 15 through 21. Rfits will only
@@ -123,9 +127,11 @@ to zero.
 
 .nf
 	cl> rfits mtb1600 "" images
+.fi
 
-	      or alternatively
+or alternatively
 
+.nf
 	cl> rfits mtb1600 * images
 .fi
 
@@ -138,16 +144,19 @@ the user has told rfits to read only the primary fits data unit.
 
 .nf
 	cl> rfits fits* "" images
+.fi
 
-	      or alternatively
+or alternatively
 
+.nf
 	cl> rfits fits* 0 images
 
-
 	cl> rfits @fitslist "" @imlist
+.fi
 
-	      or alternatively
+or alternatively
 
+.nf
 	cl> rfits @fitslist 0 @imlist
 .fi
 

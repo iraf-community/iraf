@@ -81,7 +81,6 @@ The database is currently a directory containing simple text files
 in a human readable format.  The elements of an aperture definition
 are as follows.
 
-
 .ce
 Elements of an Aperture Definition
 .ls aperture
@@ -138,7 +137,6 @@ in a text file, with name given by the prefix "ap" followed by the entry
 name, in the database directory.  An example with the special entry  name
 "last", stored in the file "database$aplast", is given below. The "begin"
 line marks the beginning of an aperture definition.
-
 
 .ce
 Sample Aperture Database Entry
@@ -237,7 +235,6 @@ functions.
 
 The package menu and help summary is shown below.
 
-
 .ce
 The APEXTRACT Package Tasks
 
@@ -298,7 +295,6 @@ output formats for reasons of compactness, ease of handling, and efficiency.
 These formats are compatible with the \fBonedspec\fR, \fBechelle\fR, and
 \fBmsred\fR packages.  The format is a standard IRAF image with
 specialized image header keywords.  Below is an example of the keywords.
-
 
 .ce
 MULTISPEC/ECHELLE Format Image Header Keywords

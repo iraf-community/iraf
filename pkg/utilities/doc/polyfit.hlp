@@ -73,9 +73,12 @@ The routine REGRES from the library of routines written by Bevington is used
 for the fit; see \fBData Reduction and Error Analysis\fR, by Bevington.
 .ih
 EXAMPLES
+
+.nf
 	cl> polyfit STDIN 2
-.br
 	cl> polyfit datafile 4 verbose+
+.fi
+
 .ih
 BUGS
 The maximum number of data elements is currently limited to 1000

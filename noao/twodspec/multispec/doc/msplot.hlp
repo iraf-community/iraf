@@ -37,7 +37,10 @@ manipulated, and printed with the standard cursor mode commands.
 EXAMPLES
 To plot the model fit for image sample for image line 400:
 
+.nf
 	cl> msplot sample 400
+.fi
+
 .ih
 SEE ALSO
 modellist

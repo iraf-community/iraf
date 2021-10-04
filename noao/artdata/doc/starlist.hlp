@@ -262,7 +262,6 @@ q	Exit program
 
 The following parameters can be shown or set from within the STARLIST task.
 
-
 .nf
 		Starlist Colon Commands
 
@@ -334,6 +333,7 @@ creating a data file.
 	    ... type = to make a copy of any of the plots
 	    ... type q to quit
 .fi
+
 .ih
 REVISIONS
 .ls STARLIST V2.11+

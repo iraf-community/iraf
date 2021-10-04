@@ -4,12 +4,14 @@ NAME
 zawtbf -- wait for an asynchronous i/o transfer to complete
 .ih
 SYNOPSIS
+
 .nf
 zawtbf (chan, status)
 
 int	chan			# OS channel assigned to file
 int	status			# number of bytes read or written
 .fi
+
 .ih
 DESCRIPTION
 If a transfer is in progress on the channel \fIchan\fR, process execution

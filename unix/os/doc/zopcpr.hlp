@@ -4,6 +4,7 @@ NAME
 zopcpr -- open a connected subprocess
 .ih
 SYNOPSIS
+
 .nf
 zopcpr (process_file, inchan, outchan, pid)
 
@@ -12,6 +13,7 @@ int	inchan				# input from child
 int	outchan				# output to child
 int	pid				# pid of child
 .fi
+
 .ih
 DESCRIPTION
 The executable file \fIprocess_file\fR is spawned as a child process and

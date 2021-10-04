@@ -4,6 +4,7 @@ NAME
 zfaloc -- preallocate space for a binary file
 .ih
 SYNOPSIS
+
 .nf
 zfaloc (osfn, nbytes, status)
 
@@ -11,6 +12,7 @@ packed	char osfn[]		# host filename
 long	nbytes			# file size in bytes
 int	status
 .fi
+
 .ih
 DESCRIPTION
 Create and allocate storage for a file of the indicated size.  The actual amount

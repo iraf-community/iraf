@@ -184,6 +184,7 @@ pixels in the output images as in the input images:
 	cl> transform obj001,obj002 out001,out002 dispmap,distort \
 	>>> y1=3800 y2=6400 ylog=yes
 .fi
+
 .ih
 TIMINGS
 The following timings were obtained for transforming a 511x512 real

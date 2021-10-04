@@ -95,7 +95,9 @@ may be changed by typing new values explicitly on the command line.
 The most common use of \fIstty\fR is to inform IRAF of the type of terminal
 being used, e.g.,
 
+.nf
 	cl> stty vt100
+.fi
 
 would set the terminal type to "vt100".  An error message will be printed
 unless an entry for the named terminal is present in the \fBtermcap\fR file;
@@ -107,7 +109,11 @@ To find out about the current terminal settings, type
 .ks
 .nf
 	cl> stty
+.fi
+
 or
+
+.nf
 	cl> stty all
 .fi
 .ke
@@ -276,7 +282,9 @@ the command to be executed, to give the user watching the playback a chance
 to read the command.  Aside from this programmed delay, execution is fully
 automated.  For example,
 
+.nf
 	cl> stty play=filename delay=2000
+.fi
 
 would playback the file "filename", with a delay of 2 seconds following echo
 of each line of recorded input text.
@@ -532,32 +540,46 @@ EXAMPLES
 
 2. Tell the system that the terminal is a vt100.
 
+.nf
 	cl> stty vt100
+.fi
 
 3. Set the baud rate of the current terminal to 9600 baud.
 
+.nf
 	cl> stty baud=9600
+.fi
 
 4. Set the width of the screen to 80 columns, e.g., to get short menus on a
 workstation where the physical number of columns may be much greater than 80.
 
+.nf
 	cl> stty ncols=80
+.fi
 
 5. Set the terminal type to 4012 and set ucasein and ucaseout modes.
 
+.nf
 	cl> stty 4012 ucasein ucaseout
+.fi
 
 6. Clear the ucasein and ucaseout modes.
 
+.nf
 	cl> stty clear ucasein ucaseout
+.fi
 
 7. Record a terminal session in the default logfile (home$ttyio.log).
 
+.nf
 	cl> stty logio
+.fi
 
 8. Record input from the terminal in the file "demo".
-	
+
+.nf	
 	cl> stty login=demo
+.fi
 
 9. Terminate logging and playback the terminal session recorded in this file.
 
@@ -565,6 +587,7 @@ workstation where the physical number of columns may be much greater than 80.
 	cl> stty reset
 	cl> stty playback=demo
 .fi
+
 .ih
 BUGS
 1. Note that, when working with a terminal which supports runtime querying

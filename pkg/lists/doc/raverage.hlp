@@ -51,14 +51,32 @@ zero or greater than zero.
 
 .nf
     average1 average1 stddev number [lower upper]
-
-    average1 - the running average of the first column
-    average2 - the running average of the second column
-      stddev - standard deviation of the second column
-      number - number of values in the statistic
-       lower - optional lower envelope value
-       upper - optional upper envelope value
 .fi
+
+.ls
+average1
+the running average of the first column
+.le
+.ls
+average2
+the running average of the second column
+.le
+.ls
+stddev
+standard deviation of the second column
+.le
+.ls
+number
+number of values in the statistic
+.le
+.ls
+lower
+optional lower envelope value
+.le
+.ls
+upper
+optional upper envelope value
+.le
 
 The "number" of values may be less than the window if the window size is
 larger than the list.
@@ -83,8 +101,8 @@ This is where the sorting and envelope options are useful.
 EXAMPLES
 1.  Compute the running average with a window of 100 values on the list of
 numbers in file "numbers".
+
 .nf
-	
 	cl> raverage numbers 100
 .fi
 
@@ -104,6 +122,7 @@ overplotted.
 	cl> fields tmp 1,5 | graph append+
 	cl> fields tmp 1,6 | graph append+
 .fi
+
 .ih
 SEE ALSO
 average, boxcar

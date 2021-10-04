@@ -332,6 +332,7 @@ file and mask image:
     cl> cosmicrays ccd001 ccd001 badpix=ccd001.bp
     cl> badpiximage ccd001.bp ccd001 ccd001bp
 .fi
+
 .ih
 SEE ALSO
 badpixelimage gtools imedit rimcursor

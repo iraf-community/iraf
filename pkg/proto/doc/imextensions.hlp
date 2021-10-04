@@ -4,9 +4,11 @@ NAME
 imextensions -- make a list of image extensions
 .ih
 USAGE   
+
 .nf
 imextensions input
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -184,7 +186,6 @@ global headers with NDIM=0 as well as headers with image data.
 Note that proper script programming would make all the hidden parameters
 explicit.
 
-
 6.  Example of the extension name pattern matching.
 
 .nf
@@ -229,7 +230,9 @@ This task is new in this release.
 .le
 .ih
 SEE ALSO
+
 .nf
 files, sections, ranges, match
 .fi
+
 .endhelp

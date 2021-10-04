@@ -4,11 +4,13 @@ NAME
 bfbsiz -- get the buffer size in chars of a binary file
 .ih
 SYNOPSIS
+
 .nf
 integer function bfbsiz (fd)
 
 integer		fd		#I BFIO file descriptor of open file
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfbsiz\fR function is used to query the size in SPP char units of

@@ -79,17 +79,24 @@ times.  No correction is made for rejected pixels.
 EXAMPLES
 1. To sum three images:
 
+.nf
 	im> imsum frame1,frame2,frame3 sum hparams="itime,exposure"
+.fi
 
 2. To make a median image of a set of images:
 
+.nf
 	im> imsum obs* median option=median
+.fi
 
 where '*' is a template wildcard.
 
 3. To reject the lowest and highest 2 pixels and average the rest:
 
+.nf
 	im> imsum obs* avg option=average low=2 high=2
+.fi
+
 .ih
 REVISIONS
 .ls IMSUM V2.11
@@ -110,6 +117,7 @@ image is also short and the calculation type is short.
 	6. Sum of middle 3 of 5		45.5
 	7. Median of 7			77.8
 .fi
+
 .ih
 NOTES
 Any number of images may be used.  However, there is a maximum number of

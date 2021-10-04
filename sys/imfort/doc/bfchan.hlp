@@ -4,11 +4,13 @@ NAME
 bfchan -- return the kernel i/o channel of an open BFIO file
 .ih
 SYNOPSIS
+
 .nf
 integer function bfchan (fd)
 
 integer		fd		#I BFIO file descriptor of open file
 .fi
+
 .ih
 DESCRIPTION
 The \fIbfchan\fR procedure is used to get the i/o channel assigned to the

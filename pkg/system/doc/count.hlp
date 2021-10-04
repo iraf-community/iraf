@@ -24,20 +24,29 @@ EXAMPLES
 1. Count the number of lines, words and characters in all files in the
 current directory with the extensions ".x" and ".h".
 
+.nf
 	cl> count *.[xh]
+.fi
 
 2. Count the number of .x files in the current directory.
 
+.nf
 	cl> dir *.x op=1 | count
+.fi
 
 3. Count the number of \fIset\fR environment definitions.
 
+.nf
 	cl> set | count
+.fi
 
 4. Count the number of references to the READ function in all .x files in
 the current directory.
 
+.nf
 	cl> match "read#(" *.x | count
+.fi
+
 .ih
 SEE ALSO
 directory

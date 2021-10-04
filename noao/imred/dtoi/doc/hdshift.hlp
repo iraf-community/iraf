@@ -16,11 +16,12 @@ For each file in \fBdatabase\fR, procedure \fBhdshift\fR calculates and
 subtracts a zero point shift to bring several related HD curves into
 alignment.  The individual shifts are calculated by elimination of the 
 first coefficient (Bevington, eqn 9-3):
+
 .nf
                 _      _      _               _
            a0 = y - a1*X - a2*X**2 - ... - an*X**n
-
 .fi
+
 Here, the averages over y and X refer to individual \fBdatabase\fR averages; 
 the coefficients a1, ... an were previously calculated using data from all 
 \fBdatabase\fRs, in task \fIhdfit\fR, and stored in the database.  The
@@ -34,12 +35,13 @@ to run task \fIhdfit\fR on the modified \fBdatabase\fR list and
 determine the common solution.
 .ih
 EXAMPLES
-.nf
 
+.nf
 Shift the curves in four databases to a common zero point.  
 
 	cl> hdshift db1,db2,db3,db4
 .fi
+
 .ih
 SEE ALSO
 hdfit, hdtoi

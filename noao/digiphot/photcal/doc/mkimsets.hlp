@@ -265,7 +265,6 @@ the time of observation field was undefined in the input data sets.
 	   ... quit the editor
 .fi
 
-
 2. Create the image set file from the list of IRAF images associated with
 the APPHOT databases in example 1.  The images contain the image
 header keyword "f1pos" which specifies the filter id and which may assume
@@ -342,9 +341,7 @@ internal blanks in the title would otherwise confuse the sorting routine.
 	   ... quit the editor
 
 	   ... note that MKIMSETS did not save the output image list
-
 .fi
-
 
 .ih
 TIME REQUIREMENTS

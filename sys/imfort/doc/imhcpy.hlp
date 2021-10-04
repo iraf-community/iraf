@@ -4,6 +4,7 @@ NAME
 imhcpy -- copy an image header
 .ih
 SYNOPSIS
+
 .nf
 subroutine imhcpy (oim, nim, ier)
 
@@ -11,6 +12,7 @@ integer		oim		#I image descriptor of input image
 integer		nim		#I image descriptor of output image
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimhcpy\fR procedure is used to copy the non-pixel fields in the header

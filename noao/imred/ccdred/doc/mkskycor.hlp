@@ -97,6 +97,7 @@ and in the second the iillumination image replaces the sky image.
     cl> mkskycor sky017 Illum
     cl> mkskycor sky017 sky017
 .fi
+
 .ih
 SEE ALSO
 ccdproc, flatfields, mkillumcor, mkillumflat, mkskyflat

@@ -166,7 +166,6 @@ cannot be determined from the object image header (using the keyword
 nscanrows or it's translation).
 .le
 
-
 .ce
 OVERSCAN FITTING PARAMETERS
 
@@ -745,12 +744,15 @@ The user's \fBguide\fR presents a tutorial in the use of this task.
 1. In general all that needs to be done is to set the task parameters
 and enter
 
+.nf
 	cl> ccdproc *.imh &
+.fi
 
 This will run in the background and process all images which have not
 been processed previously.
 .ih
 TIME REQUIREMENTS
+
 .nf
 o SUN-3, 15 MHz 68020 with 68881 floating point hardware (no FPA)
 o 8 Mb RAM, 2 Fuji Eagle disks.
@@ -778,6 +780,7 @@ Caching:     151.5u 29.0s 4:14 70% 27+227K 2346+1637io 148pf+0w
 No caching:  272.7u 63.8u 8:47 63% 28+ 50K 9598+3713io  12pf+0w
 Caching:     271.2u 50.9s 7:00 76% 28+173K 4487+3613io  51pf+0w
 .fi
+
 .ih
 REVISIONS
 .ls CCDPROC V2.11.2
@@ -818,8 +821,10 @@ modify time to determine if the value is valid or needs to be recomputed.
 .le
 .ih
 SEE ALSO
+
 .nf
 instruments, ccdtypes, flatfields, icfit, ccdred, guide, mkillumcor,
 mkskycor, mkfringecor
 .fi
+
 .endhelp

@@ -1,6 +1,6 @@
 .help refcoq Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slRFCQ (TDK, PMB, RH, WL, REFA, REFB)
 
      - - - - - - -
@@ -162,6 +162,6 @@
 
   Copyright (C) 1997 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

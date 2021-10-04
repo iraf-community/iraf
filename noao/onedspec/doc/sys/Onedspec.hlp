@@ -58,7 +58,6 @@ options.
      Specific reduction scripts will be provided to efficiently
 process raw data from the Kitt Peak instruments IIDS and IRS.
 
-
 .sh
 SCOPE OF SPECIFICATIONS
 
@@ -130,6 +129,7 @@ crsens_func -- Create system sensitivity function
 ext_cor     -- Extinction correct specified spectra
 sens_cor    -- Correct the specified spectra for system sensitivity
 .fi
+
 .ju
 .ke
 
@@ -241,7 +241,6 @@ For spectroscopic applications, the parameter data_type would be
 specified as r for real, and the filename would probably be assigned
 as the "group" name as well. (see section on data groups.)
 
-
 .sh
 IIDS/IRS
 .ih
@@ -300,7 +299,6 @@ will be printed. (default = yes)
 .ls 4 make_image
 See definition of this parameter under FITS.
 .le
-
 
 .sh
 REDUCER
@@ -399,7 +397,6 @@ starting with the twelfth block are to be extracted to
 form the spectrum. (default = '1 32767', or all)
 .le
 
-
 .sh
 PDS
 
@@ -460,7 +457,6 @@ The data type may be specified as s (short), l (long), or r
 (real).
 .le
 
-
 .sh
 TEXT (Read Card-Image)
 
@@ -469,7 +465,6 @@ Unlike FITS, there is no standard for internally documenting the
 contents of the text file. Header information is essentially
 lost. This makes card-image data transfer a relatively unattractive
 format.
-
 
 .ih
 NAME
@@ -541,7 +536,6 @@ If this switch is set to yes, any pixel having exactly the value
 specified by the parameter blank_value will be flagged as a blank
 pixel. If set to no, all pixel values are assumed to be valid.
 .le
-
 
 .bp
 .sh
@@ -652,7 +646,6 @@ parameter will be set to the maximum representable value.
 (default = yes)
 .le
 
-
 .sh
 TEXT (Write Card-Image)
 
@@ -732,7 +725,6 @@ The value to be assigned to blank pixels for the purpose of
 representing them on the card image. (default = -32767)
 .le
 .bp
-
 
 .sh
 MATHEMATICAL OPERATORS

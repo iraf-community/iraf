@@ -1,6 +1,6 @@
 .help mapqk Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slMAPQ (RM, DM, PR, PD, PX, RV, AMPRMS, RA, DA)
 
      - - - - - -
@@ -71,6 +71,6 @@
 
   Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

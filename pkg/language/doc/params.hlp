@@ -14,7 +14,6 @@ and by tailoring these as they wish, they may customize the IRAF environment.
 Here we describe characteristics of IRAF parameters.
 The syntax of parameter declarations is described elsewhere.
 
-
 2. \fIParameter Types\fR
 
     The CL supports a variety of parameter datatypes, from the conventional
@@ -64,7 +63,6 @@ from a list (text file).  For a more detailed discussion of cursor control
 in the CL, type \fIhelp cursors\fR.
 .le
 
-
 3. \fIList-Directed Parameters\fR
 
     Frequently one may have a list of values, e.g. numbers or file names,
@@ -86,7 +84,6 @@ null string to a list parameter closes the associated list file.
 	    cur_val = list
 	    analyze (cur_val)
 	}
-
 .fi
 
 A common usage of struct list-directed parameters is to read files in
@@ -100,7 +97,6 @@ out a file.
 	while (fscan (slist, line) != EOF)
 	    print (line)
 .fi
-
 
 4. \fIModes\fR
 
@@ -126,7 +122,6 @@ parameter with the name "mode" associated with the task, package or CL.
 Query and automatic parameters are learned by default, while hidden parameters
 are not.
 
-
 5. \fIRanges\fR
 
     The CL supports ranges for integer and real variables, and enumeration
@@ -137,7 +132,6 @@ performed during querying, or inside \fIeparam\fR, not when a value
 is assigned directly.  For an enumerated string the input string
 is matched against any of the enumerated possibilities
 using a minimum-matching technique.  A value with no match is rejected.
-
 
 6. \fIParameter Attributes\fR
 
@@ -196,7 +190,6 @@ The maximum value for a parameter.
 For list-directed parameters the file name associated with the parameter.
 .le
 
-
 Attributes may appear on either side of an equals sign, e.g.
 
 .nf
@@ -210,7 +203,6 @@ Attributes may appear on either side of an equals sign, e.g.
 It is illegal to assign to the p_name, p_type and p_xtype fields.
 Most of the direct use of the parameter attributes is expected to be
 in systems level programming.
-
 
 7. \fIArrays\fR
 
@@ -240,7 +232,6 @@ agree on the limits of the loop.  For example,
 	z = x[1:10,*]
 .fi
 
-
 8. \fIScope\fR
 
     A parameter is known via an implicit reference if the task in which
@@ -260,7 +251,6 @@ the system package is activated during login to the CL, the parameters
 of "page" may be referenced by "page.param".  In general a package
 qualifier is used only to remove ambiguity between tasks with the
 same name in two different packages.
-
 
 9. \fIStorage\fR
 

@@ -4,12 +4,14 @@ NAME
 zclsbf -- close a binary file
 .ih
 SYNOPSIS
+
 .nf
 zclsbf (chan, status)
 
 int	chan			# OS channel of binary file
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The binary file associated with the channel \fIchan\fR is closed, i.e.,

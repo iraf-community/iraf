@@ -4,6 +4,7 @@ NAME
 zsvjmp, zdojmp -- non-local goto
 .ih
 SYNOPSIS
+
 .nf
 include	<config.h>
 
@@ -13,6 +14,7 @@ zdojmp (jumpbuf, status)		# restore context and jump
 int	jumpbuf[LEN_JUMPBUF]		# context saved by \fBzsvjmp\fR
 int	status				# code returned by \fBzsvjmp\fR
 .fi
+
 .ih
 DESCRIPTION
 These primitives are used principally to restart interpreters (e.g. the IRAF

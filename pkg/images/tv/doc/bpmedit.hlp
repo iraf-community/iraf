@@ -123,7 +123,6 @@ process.
 	<	Replace pixels < or = to "cursor value" to "value"
 	>	Replace pixels > than or = to "cursor value" to "value"
 
-
 		BPMEDIT COLON COMMANDS
 
     The colon either print the current value of a parameter when
@@ -141,6 +140,7 @@ process.
     maxvalue [value]	 Maximum value for modification (INDEF=maximum)
     write [name]	 Write changes to name
 .fi
+
 .ih
 EXAMPLES
 1.  Interactively edit a mask.

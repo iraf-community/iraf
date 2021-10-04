@@ -17,6 +17,7 @@ real	w[npts]		# array of weights
 int	npts		# number of surface values, npts <= ncols
 int	wtflag		# type of weighting desired
 .fi
+
 .ih
 ARGUMENTS
 .ls sf      

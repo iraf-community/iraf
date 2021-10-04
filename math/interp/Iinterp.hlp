@@ -7,7 +7,6 @@ Introduction
 Due to the very large amount of data involved, efficiency is quite important,
 and the general purpose routines available from many sources cannot be used.
 
-
 The task of interpolating image data is simplified by the following
 considerations:
 .ls 4
@@ -22,7 +21,6 @@ data array.  The coordinate of the first pixel in the array may be assumed
 to be 1.0, and the spacing between pixels is also 1.0.
 .le
 .le
-
 
 The task of interpolating image data is complicated by the following
 considerations:
@@ -106,7 +104,6 @@ For example, the following subset preprocessor code fragment uses
 the array interpolation routines to shift a data array by a constant
 amount:
 
-
 .ks
 .nf
 	real	shift, coeff[NPIX+SZ_ASIHDR]
@@ -126,7 +123,6 @@ amount:
 		    outrow[i] = asival (i + shift, coeff)
 .fi
 .ke
-
 
 The array COEFF is actually a simple structure.  An initial call to ASISET
 is required to save the interpolator parameters in the COEFF structure.
@@ -152,7 +148,6 @@ if there are any indefinite pixels in that range).
 		    The COEFF structure
 .fi
 .ke
-
 
 In the case of the nearest neighbor and linear interpolation algorithms,
 the coefficient array will contain the same data as the input data array.
@@ -258,7 +253,6 @@ best for approximating analytic functions, but they are unreliable with
 noisy data.  The natural cubic cardinal spline is fitted by solving the
 following tridiagonal system of equations (Prenter, 1975).
 
-
 .ks
 .nf
 	/				  :		\
@@ -272,7 +266,6 @@ following tridiagonal system of equations (Prenter, 1975).
 	\				  :		/
 .fi
 .ke
-
 
 This matrix can most efficiently be solved by hardwiring the appropriate
 recursion relations into a procedure.  The problem of what to do when some

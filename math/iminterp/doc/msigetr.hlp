@@ -12,6 +12,7 @@ rvalue = msigetr (msi, param)
     pointer	msi		#I interpolant descriptor
     int		param		#I parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls msi      

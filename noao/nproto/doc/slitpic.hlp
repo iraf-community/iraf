@@ -53,6 +53,7 @@ in file "mask67.dat";  the output image is named "mask":
 .nf
 	cl> slitpic 67 mask tape1=mask67.dat
 .fi
+
 .ih
 TIME REQUIREMENTS
 Task \fBslitpic\fR takes 8 cp seconds to create a 780 x 780 mask;  a

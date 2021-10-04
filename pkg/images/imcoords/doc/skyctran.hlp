@@ -461,7 +461,6 @@ The following commands must be followed by a carriage return.
 data	Measure object
 q	Exit task
 
-
 	VALID DATA STRING
 
 x/ra/long y/dec/lat [pmra pmdec [parallax radial velocity]]
@@ -518,7 +517,6 @@ formats. The available commands are listed below.
 spbar	Measure object
 q	Exit task
 
-
 	COLON COMMANDS
 
 :show				Show the input and output coordinate systems
@@ -551,7 +549,6 @@ degrees		%12.2h
 radians		%13.7g
 .fi
 
-
 .ih
 FORMATS
 
@@ -579,7 +576,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill
@@ -628,7 +624,6 @@ Examples
 
 \n          insert a newline
 .fi
-
 
 .ih
 REFERENCES
@@ -821,7 +816,6 @@ registration tasks geomap and geotran. Note that this example  and examples
 image header coordinates are not fully supported. They will work
 however on two images which have equatorial coordinates systems
 which are precessed with respect to each other.
-
 
 .nf
 	cl> display image1

@@ -52,16 +52,23 @@ a "help <keyword> all+" may be required to locate a particular one.
 EXAMPLES
 1. Find all help on CCDs.
 
+.nf
 	cl> ref ccd
+.fi
 
 2. Create or update your private quick-reference file.
 
+.nf
 	cl> ref upd+
+.fi
 
 3. Examine the quick-reference file to get a summary of all the tasks
 or other help modules in the help database.
 
+.nf
 	cl> page (ref.quickref)
+.fi
+
 .ih
 TIME REQUIREMENTS
 If a quick-reference file is used searching takes seconds, otherwise it

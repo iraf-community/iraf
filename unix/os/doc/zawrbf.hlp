@@ -4,6 +4,7 @@ NAME
 zawrbf -- asynchronous write to a binary file
 .ih
 SYNOPSIS
+
 .nf
 zawrbf (chan, buf, nbytes, loffset)
 
@@ -12,6 +13,7 @@ char	buf[nbytes]		# buffer to be copied to file
 int	nbytes			# number of bytes to be written
 long	loffset			# file offset of first byte
 .fi
+
 .ih
 DESCRIPTION
 Initiate a write of exactly \fInbytes\fR bytes from the buffer \fIbuf\fR

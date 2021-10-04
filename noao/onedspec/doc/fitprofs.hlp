@@ -336,7 +336,6 @@ It requires the \fBartdata\fR and \fBproto\fR packages be loaded.
       7814.418  1488.579  -2926.49    1.966  -164.891   16.67      0.
       5310.929  1168.846  -10132.2    8.669  -487.502   19.53      0.
       5022.948  1132.066   -7532.8    6.654  -325.594   21.73      0.
-
 .fi
 
 2.  Suppose there is no obvious continuum level near the fitting

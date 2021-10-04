@@ -21,6 +21,7 @@ following:
 	 cosmic - Problems with cosmic ray removal
 	    all - Print all of this tutorial
 .fi
+
 .ih
 OVERVIEW
 The \fBapextract\fR tasks extract spectra from two dimensional images.

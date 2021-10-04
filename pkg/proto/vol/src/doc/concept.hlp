@@ -67,7 +67,6 @@ with a mouse, but this would amount to computing the projections in real
 time and is not likely at present.
 
 .nf
-
 Let:	i     = projected intensity before considering the current
 	        voxel
 	i'    = intensity of light after passing through the current
@@ -84,7 +83,6 @@ Let:	i     = projected intensity before considering the current
 
 Then:	i' = i * (1 - f(Vo)) + g(Vi)
 		[initial i = Imax, then iterate over all voxels in path]
-
 .fi
 
 We want to choose the opacity and intensity transformation functions in such
@@ -115,7 +113,6 @@ after being subtracted from 1.0 it is the intensity attenuation factor
 for the current voxel.
 
 .nf
-
 		Opacity Transformation Function f(Vo):
 
 	        { Vo < o1       : 	    0.0		    }
@@ -127,7 +124,6 @@ for the current voxel.
 	        {			    I0	    }
 	        {					    }
 	        { o2 <= Vo      : 	    1.0		    }
-
 
 backg. int.  I0-|
 		|
@@ -159,7 +155,6 @@ i * (1 - f(Vo))-|..............`	voxel intensity contri-
 		{
 		{
 		{
-
 
 	        |
 		|

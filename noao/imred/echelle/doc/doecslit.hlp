@@ -661,11 +661,11 @@ calibration directory is used for determining flux calibrations from
 standard star observations.  The calibration directories contain data files
 with standard star fluxes and band passes.  The available extinction
 files and flux calibration directories may be listed using the command:
+
 .nf
-
 	cl> page onedstds$README
-
 .fi
+
 The extinction correction requires computation of an air mass using the
 task \fBsetairmass\fR.  The air mass computation needs information
 about the observation and, in particular, the latitude of the observatory.
@@ -828,11 +828,11 @@ parameter set organization is to collect all the algorithm parameters
 in one place separate from the processing parameters and include only
 those which are relevant for echelle slit data.  The parameter values
 can be changed from the defaults by using the parameter editor,
+
 .nf
-
 cl> epar sparams
-
 .fi
+
 or simple typing \fIsparams\fR.
 The parameter editor can also be entered when editing the \fBdoecslit\fR
 parameters by typing \fI:e\fR when positioned at the \fIsparams\fR
@@ -1210,6 +1210,7 @@ Splot spectrum? (no|yes|NO|YES) (yes):
 Image line/aperture to plot (0:) (1):
 <Exit with 'q'>
 .fi
+
 .ih
 REVISIONS
 .ls DOECSLIT V2.10.3

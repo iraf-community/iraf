@@ -519,6 +519,7 @@ line 100 from a set of 3D images with dispaxis=3:
 	longslit3[250]  -->  c250.3[250]
 	...
 .fi
+
 .ih
 REVISIONS
 .ls SCOPY V2.11

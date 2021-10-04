@@ -12,6 +12,7 @@ ival = cvstati (cv, parameter)
 pointer	cv		# curve descriptor
 int	parameter	# parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls cv     
@@ -19,6 +20,7 @@ The pointer to the curve descriptor structure.
 .le
 .ls parameter
 Parameter to be return.  Definitions in curfit.h are:
+
 .nf
 	define	CVTYPE		1	# curve type
 	define	CVORDER		2	# order
@@ -33,6 +35,7 @@ the curve type, the order, the number of coefficients, and the length
 of the buffer required by CVSAVE (which is of TY_REAL).
 .ih
 EXAMPLES
+
 .nf
 	include <curfit.h>
 
@@ -41,6 +44,7 @@ EXAMPLES
 	call malloc (buf, cvstati (cv, CVNSAVE), TY_REAL)
 	call cvsave (cv, Memr[buf])
 .fi
+
 .ih
 SEE ALSO
 cvstatr

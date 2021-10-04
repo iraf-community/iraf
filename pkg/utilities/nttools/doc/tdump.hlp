@@ -117,14 +117,14 @@ which will be used if the value to be printed includes a blank or tab.
 .ih
 EXAMPLES
 1.  Dump the table "junk.tab" to STDOUT:
-.nf
 
+.nf
      tt> tdump junk.tab cdfile=STDOUT pfile=STDOUT datafile=STDOUT
-
 .fi
-2.  Dump "junk.tab", but with the order of the columns rearranged:
-.nf
 
+2.  Dump "junk.tab", but with the order of the columns rearranged:
+
+.nf
      tt> tlcol junk.tab nlist=1 > colnames.lis
      tt> edit colnames.lis
         (Rearrange the column names and perhaps delete some of them.)
@@ -136,6 +136,7 @@ EXAMPLES
 .nf
 	tt> tdump big.fits rows="1-100"
 .fi
+
 .ih
 BUGS
 .ih

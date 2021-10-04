@@ -1,6 +1,6 @@
 .help rdplan Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slRDPL (DATE, NP, ELONG, PHI, RA, DEC, DIAM)
 
      - - - - - - -
@@ -68,6 +68,6 @@
 
   Copyright (C) 1997 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

@@ -117,9 +117,6 @@ r > \fIrclip\fR / \fIscale\fR are tested in the same manner as those in
 the cleaning region. However the sigma employed is the sigma of the
 sky background. DAOPHOT users should leave clean set to "no".
 
-
-
-
 New centers are computed using the centering algorithm specified by
 \fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and pixels
 that are some threshold above (below) an estimate of the local minimum
@@ -162,7 +159,6 @@ than "centroid" is no thresholding.
 If the computed shift in either coordinate > \fImaxshift\fR / \fIscale\fR,
 the new center is returned but an error flag is set.
 
-
 1. List the centering parameters.
 
 .nf
@@ -198,6 +194,7 @@ above example.
 
 	... type ":w ctrnite1.par"  from within epar
 .fi
+
 .ih
 BUGS
 

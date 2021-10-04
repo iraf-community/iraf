@@ -148,15 +148,19 @@ EXAMPLES
 1. Mosaic a list of 64 infrared images onto an 8 by 8 grid after sky 
    subtraction and flat fielding. Use an externally derived sky and
    flat field image
- 
+
+.nf 
     ir> mosproc @imlist mosaic 8 8 skysub+ sky=skyimage flatten+ \
     >>>  flat=flatfield
+.fi
 
 2. Mosaic a list of 64 infrared images onto an 8 by 8 grid after sky 
    subtraction and flat fielding. Derive the sky and flat field frames
    from the data excluding image number 5
- 
+
+.nf 
     ir> mosproc @imlist mosaic 8 8 skysub+ exclude="5" flatten+ 
+.fi
 
 .ih
 TIME REQUIREMENTS

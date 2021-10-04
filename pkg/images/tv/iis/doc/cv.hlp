@@ -45,6 +45,7 @@ x   or   q			exit/quit
 --- F: f followed by a frame number or 'a' for all
 --- Q: q followed by quadrant number or t,b,l,r for top, bottom,...
 .fi
+
 .ih
 DESCRIPTION
 The \fIcv\fR program is used to control the image display from within

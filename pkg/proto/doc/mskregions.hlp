@@ -127,7 +127,6 @@ set of operators:
         !                       logical not
 .fi
 
-
 \fBFunctions Used in Region Expressions\fR
 
 Mskexpr supports a group of boolean region functions which can be used to set
@@ -208,7 +207,6 @@ If so, continuation lines must be indented.  The first line with no whitespace
 at the beginning of the line terminates the macro. Macro functions may be
 nested.  Macro functions are indistinguishable from intrinsic functions in
 expressions.
-
 
 .ih
 EXAMPLES

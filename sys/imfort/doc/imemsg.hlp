@@ -4,12 +4,14 @@ NAME
 imemsg -- convert an IMFORT error code into an error message
 .ih
 SYNOPSIS
+
 .nf
 subroutine imemsg (ier, errmsg)
 
 integer		ier		#I an IMFORT error code
 character*(*)	errmsg		#O the corresponding error message
 .fi
+
 .ih
 DESCRIPTION
 The \fIimemsg\fR procedure converts a positive integer error code,
@@ -24,8 +26,10 @@ The error message string, or "imfort error (unrecognized error code)" if
 called with an unknown error code.
 .ih
 SEE ALSO
+
 .nf
 The individual manual pages for the symbolic names of the error codes
 imfort$imfort.h and lib$syserr.h for the integer error codes.
 .fi
+
 .endhelp

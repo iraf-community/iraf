@@ -27,11 +27,16 @@ EXAMPLES
 1. Move all files whose names start with `im' and end with `ab' to
 the directory `dir'.  Since "verbose" defaults to "no", do the work silently.
 
+.nf
 	cl> movefiles im*ab dir
+.fi
 
 2. Move all files in the current directory into the directory one level up.
 
+.nf
 	cl> move * ..
+.fi
+
 .ih
 SEE ALSO
 copy, rename

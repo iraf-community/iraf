@@ -1,13 +1,16 @@
 .help cogetr.hlp Feb86 xtools
 .ih
 NAME
+
 .nf
 comap   -- Initialize buffered image column access
 cogetr  -- Get buffered image columns from 2D image
 counmap -- Free memory used in image column access
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 pointer	im		# IMIO pointer
 pointer	co		# COGETR pointer
@@ -26,6 +29,7 @@ pointer	cogetr()	# Get columns
 	buf = cogetr (co, col, line1, line2)
 	call counmap (co)
 .fi
+
 .ih
 DESCRIPTION
 A pointer to a real image column vector between the limits \fIline1\fR

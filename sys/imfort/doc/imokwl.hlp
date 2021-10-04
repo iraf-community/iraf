@@ -1,13 +1,16 @@
 .help imokwl,imgnkw,imckwl Sep86 imfort
 .ih
 NAME
+
 .nf
 imokwl -- open an image header keyword list
 imgnkw -- get the next keyword from the list
 imckwl -- close the keyword list
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 subroutine imokwl (im, patstr, sortit, kwl, ier)
 
@@ -28,6 +31,7 @@ subroutine imckwl (kwl, ier)
 integer		kwl		#I keyword list descriptor
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The keyword list package is used to define some subset of the keywords in an
@@ -55,6 +59,7 @@ keyword list is reached.
 SYS_IMFNOVFL:	out of space for header keyword name list
 IE_EOF:		end of file or list detected
 .fi
+
 .ih
 NOTES
 An example illustrating the use of the keyword list package may be found

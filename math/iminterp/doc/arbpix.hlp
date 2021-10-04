@@ -15,6 +15,7 @@ arbpix (datain, dataout, npix, interp_type, boundary_type)
     int		interp_type	#I type of interpolant
     int		boundary_type	#I type of boundary condition
 .fi
+
 .ih
 ARGUMENTS
 .ls datain

@@ -48,6 +48,7 @@ is given it defaults to dwarf.
 
 .ls extinction
 Extinction file.  The current standard extinction files:
+
 .nf
 	onedstds$kpnoextinct.dat - KPNO standard extinction
 	onedstds$ctioextinct.dat - CTIO standard extinction
@@ -113,6 +114,7 @@ EXAMPLES
 	# As above but for IIDS file
 	cl> lcalib stars calib_file=onedstds$iidscal/
 .fi
+
 .ih
 REVISIONS
 .ls LCALIB V2.10

@@ -4,6 +4,7 @@ NAME
 imcrea -- create a new image
 .ih
 SYNOPSIS
+
 .nf
 subroutine imcrea (image, axlen, naxis, dtype, ier)
 
@@ -13,6 +14,7 @@ integer		naxis		#I number of axes
 integer		dtype		#I pixel datatype
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimcrea\fR procedure is used to create a new image from scratch,
@@ -49,6 +51,7 @@ IE_WRHDR:	error writing to image header file
 IE_ALCPIX:	cannot create or allocate space for pixel file
 IE_ACCPIX:	error writing into pixel file during image create
 .fi
+
 .ih
 SEE ALSO
 imopen, imopnc, imdele, imrnam

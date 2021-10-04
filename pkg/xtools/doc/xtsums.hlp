@@ -1,14 +1,17 @@
 .help xtsums Feb86 xtools
 .ih
 NAME
+
 .nf
 xt_lsum  -- Sum image lines
 xt_csum  -- Sum image columns
 xt_lsumb -- Sum image lines with buffering
 xt_csumb -- Sum image columns with buffering
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 pointer	im		# IMIO pointer
 pointer	co		# COGETR pointer
@@ -21,6 +24,7 @@ pointer	data		# Data pointer returned
 	call xt_lsumb (im, col1, col2, line1, line2, data)
 	call xt_csumb (co, col1, col2, line1, line2, data)
 .fi
+
 .ih
 DESCRIPTION
 The specified lines or columns in a 2D images are summed and a pointer to
@@ -77,6 +81,7 @@ in steps of "nstep".  The following code fragment illustrates the usage.
 	}
 	call imunmap (im)
 .fi
+
 .ih
 SEE ALSO
 cogetr

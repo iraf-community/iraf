@@ -4,6 +4,7 @@ NAME
 zzrdmt -- asynchronous read from a magtape file
 .ih
 SYNOPSIS
+
 .nf
 zzrdmt (chan, buf, maxbytes)
 
@@ -11,6 +12,7 @@ int	chan			# OS channel of magtape file
 char	buf[maxbytes]		# output buffer to receive data
 int	maxbytes		# capacity of buffer
 .fi
+
 .ih
 DESCRIPTION
 Initiate a read of at most \fImaxbytes\fR bytes from channel \fIchan\fR into

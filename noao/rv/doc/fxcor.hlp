@@ -138,11 +138,11 @@ from the height.
 Power of distance defining the fitting weights.  The points used
 in fitting the correlation peak are weighted by a power of the
 distance from the center as given by the equation
+
 .nf
-
          weight = 1 - (distance / (width/2)) ** \fIweights\fR
-
 .fi
+
 Note that a weight parameter of zero is equivalent to uniform weights.
 The center1d fitting algorithm uses it's own weighting function.
 .le
@@ -195,8 +195,8 @@ parameter is an enumerated string whose values determine the number and type
 of output files created.  Up to three files are created: the ".txt", ".log",
 and ".gki" files (see the description for the \fIoutput\fR parameter).
 Possible values  for \fIverbose\fR and the files created are as follows:
-.nf
 
+.nf
     Value:      Files Created:
 
     short       (an 80-char .txt file and a .gki file)
@@ -205,8 +205,8 @@ Possible values  for \fIverbose\fR and the files created are as follows:
     nogki       (a 125-char .txt file and a .log file)
     txtonly     (a 125-char .txt file)
     stxtonly    (an 80-char .txt file)
-
 .fi
+
 The \fIfields\fR task 
 may be used to strip out selected columns from the .txt files.  The 125-char
 .txt output
@@ -820,14 +820,14 @@ help page), an observed and heliocentric velocity (VOBS and VHELIO
 respectively) will be computed.
 
 In short form, here are the equations:
-.nf
 
+.nf
     ref_rvobs = catalogue_vel_of_template - H(temp)  # obs. vel. of temp.
     VREL = C * (10 ** (wpc * shift) - 1.)	     # relative vel.
     VOBS = ((1+ref_rvobs/C)*(10**(wpc*shift)-1)) * C # observed vel.
     VHELIO = VOBS + H(object)			     # heliocentric vel.
-
 .fi
+
 where H() is the heliocentric correction for that observation.  The
 equation used for the relative velocity is derived from the standard
 (1+z), and the VOBS equation reflects that the observed velocty is the
@@ -858,6 +858,7 @@ CURSOR KEYS AND COLON COMMANDS SUMMARY
 
 .ce
 CORRELATION MODE COMMANDS
+
 .nf
 ?  Print list of cursor key and colon commands
 -  Subtract blended component from correlation peak
@@ -938,6 +939,7 @@ z  Expand on different correlation peak using full correlation plot
 
 .ce
 FOURIER MODE COMMANDS
+
 .nf
 ?  Print list of cursor key and colon commands
 b  Display power spectra before filtering
@@ -969,6 +971,7 @@ See \fBicfit\fR.
 
 .ce
 SPECTRUM MODE COMMANDS
+
 .nf
 ?  Print list of cursor key and colon commands
 b  Select sample regions for both spectra
@@ -991,6 +994,7 @@ x  Return to correlation mode
 
 .ih
 EXAMPLES
+
 .nf
     1. Cross correlate a list of 1-dimensional object spectra against
     three 1-dimensional template spectra, saving results automatically

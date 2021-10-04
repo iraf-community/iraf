@@ -1,6 +1,6 @@
 .help precss Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slPRCS (SYSTEM, EP0, EP1, RA, DC)
 
      - - - - - - -
@@ -39,6 +39,6 @@
          be returned for both RA and DC.
 
   P.T.Wallace   Starlink   20 April 1990
-
 .fi
+
 .endhelp

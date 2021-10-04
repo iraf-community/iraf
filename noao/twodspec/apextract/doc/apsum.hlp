@@ -360,7 +360,9 @@ determination see \fBapvariance\fR and \fBapprofiles\fR.
 EXAMPLES
 1.  To simply extract the spectra from a multislit observation:
 
+.nf
 	cl> apsum multislit1
+.fi
 
 The positions of the slits are defined using either automatic finding
 or with the aperture editor.  The positions of the slits are traced if

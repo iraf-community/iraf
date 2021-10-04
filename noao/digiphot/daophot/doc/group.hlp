@@ -160,7 +160,6 @@ is doubled by converting it to a real image with the chpixtype task then the
 effect of caching in interactive is can be quite noticeable if measurements
 of objects in the top and bottom halves of the image are alternated.
 
-
 The algorithm works in the following manner. If two stars are within a
 distance R pixels of one another, where R = \fIpsfrad\fR / \fIscale\fR +
 \fIfitrad\fR / \fIscale\fR + 1, the PSF of the brighter one is evaluated at
@@ -194,7 +193,6 @@ to get the best possible photometry for stars in different crowding regimes.
 If any stars in \fIphotfile\fR have INDEF magnitudes, GROUP will attempt
 to estimate a magnitude for them based on the weighted sum of the pixels
 of a radial weighting function and the value of the PSF at that point.
-
 
 .ih
 EXAMPLES
@@ -258,15 +256,12 @@ and (379,67).
         ... the output will appear in ypix.psf.1.imh, ypix.pst.1 and
             ypix.psg.1
 
-
     da> group dev$ypix default default default crit=1.0 verbose+
 
         ... verify the critical parameters
 
         ... answers will appear in ypix.grp.1
-
 .fi
-
 
 2. Run group on a section of the input image using the photometry file and PSF
 model derived in example 1 for the parent image and writing the results
@@ -290,9 +285,7 @@ example 2 are identical to those in example 1.
     da> pdump ypix.grp.2 xc,yc yes | tvmark 1 STDIN col=204
 
         ... mark the stars
-
 .fi
-
 
 .ih
 TIME REQUIREMENTS

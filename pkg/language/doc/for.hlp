@@ -46,6 +46,7 @@ array element I.
 	     j *= 2
 	}
 .fi
+
 .ih
 BUGS
 A simple assignment of the form i++ will not work.

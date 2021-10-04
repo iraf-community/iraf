@@ -16,7 +16,6 @@ statement.  Note that the condition to be tested in an IFERR statement may
 be a procedure call or assignment statement, while the IF statement tests
 a boolean expression.
 
-
 .nf
 	errchk	proc1, proc2, ...		# errchk declaration
 
@@ -28,7 +27,6 @@ a boolean expression.
 	} then
 	    <error_action_statement>
 
-
 Library procedures (ERROR and FATAL cause a RETURN):
 
 	  error (errcode, error_message)
@@ -36,14 +34,12 @@ Library procedures (ERROR and FATAL cause a RETURN):
 	 erract (severity)
   val = errcode ()
 
-
 ERRACT severity codes (<error.h>):
 
 	EA_WARN			# issue a warning message
 	EA_ERROR		# assert recoverable error
 	EA_FATAL		# assert fatal error
 .fi
-
 
 An arithmetic exception (X_ARITH) will be trapped by an IFERR statement,
 provided the posted handler(s) return without causing error restart.

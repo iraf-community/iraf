@@ -14,6 +14,7 @@ y = arieval (x, datain, npix, interp_type)
     int		npix		#I number of data values
     int		interp_type	#I interpolant type
 .fi
+
 .ih
 ARGUMENTS
 .ls x      

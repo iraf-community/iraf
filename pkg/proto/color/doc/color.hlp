@@ -21,7 +21,6 @@ as IIS/IVAS devices or 24-bit workstations.
 For further information on the tasks described here see the approriate
 help pages.
 
-
 SUN 24-BIT RGB RASTERFILES
 
 The task \fBrgbsun\fR takes three input IRAF images and produces a 24-bit
@@ -47,7 +46,6 @@ screen.  Different sites may also have color printers which accept
 the rasterfile directly or some other form of capture from the screen.
 At NOAO there is a Shinko color printer which may be used directly with
 the rasterfile to make moderate quality color prints and slides.
-
 
 24-BIT to 8-BIT COLOR MAP COMPRESSION
 
@@ -82,7 +80,6 @@ used, and with SAOimage you must restart) and the contrast mapping must not
 be changed.  There are no adjustments that can be made in IMTOOL or XIMTOOL
 but with SAOimage you can adjust the colors using the "gamma" selections
 and the mouse.
-
 
 8-BIT PIXEL DITHERING
 

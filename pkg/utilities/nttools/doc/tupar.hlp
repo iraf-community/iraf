@@ -64,6 +64,7 @@ and its current value.
 If the keyword has an associated comment,
 the comment will be displayed following the value.
 The following are examples of valid syntax for listing header parameters:
+
 .nf
 t
 l
@@ -88,6 +89,7 @@ the get command displays the comment following the value;
 a text string value will be enclosed in quotes
 to distinguish the value from the comment.
 Examples of valid syntax follow:
+
 .nf
 g history
 gd coeff0
@@ -110,6 +112,7 @@ in order to distinguish it from the comment.  (Keyword names
 HISTORY and COMMENT are already comments,
 and further comments cannot be added to them.)
 Examples of valid put command syntax follow:
+
 .nf
 p comment Created for testing.
 gd coeff0
@@ -153,6 +156,7 @@ then the current keyword value is not changed,
 either in the first table or in subsequent tables.
 
 Sample replace commands follow:
+
 .nf
 r coeff0
 r 17
@@ -177,6 +181,7 @@ As with replacing a range of parameters,
 a contiguous block of parameters will be deleted.
 
 Examples of valid delete commands follow:
+
 .nf
 d testflag
 d 17
@@ -194,10 +199,12 @@ If the name of a COMMENT or HISTORY keyword is changed,
 only the first occurrence of that keyword will be changed.
 
 Examples of valid change keyword commands follow:
+
 .nf
 k history comment
 k dummy test
 .fi
+
 .ih
 PARAMETERS
 .ls table [file name template]
@@ -280,8 +287,8 @@ It is the parameter which is actually gotten in response to a prompt.
 EXAMPLES
 1. This example reads all history records from all tables in the default
 directory and writes them to 'history.lis'.
-.nf
 
+.nf
 tt> tupar *.tab same=yes verbose=no readonly=yes >history.lis
         (The task writes a ":" prompt and waits for input.)
 :g history
@@ -293,8 +300,8 @@ tt>
 parameters in one table.  This kind of interactive use of the task
 would not be appropriate when operating on a list of tables unless
 the 'same' parameter is set to "no".
-.nf
 
+.nf
 tt> tupar junk
         (The task writes the table name and a ":" prompt and waits for input.)
 junk.lis
@@ -351,6 +358,7 @@ no action taken
 :q
 tt>
 .fi
+
 .ih
 BUGS
 .ih

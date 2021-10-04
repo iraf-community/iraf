@@ -32,7 +32,6 @@ working directory, then in one of the directories given by the
 sptimelib$.
 .le
 
-
 .ls time = INDEF (INDEF) [spectrograph]
 Total exposure time in seconds.  This time may be divided into shorter
 individual exposure times as defined by the \fImaxexp\fR parameter.  If
@@ -43,7 +42,6 @@ signal-to-noise per pixel specified by the \fIsn\fR parameter is computed.
 Desired signal-to-noise per pixel at the central wavelength if the
 exposure \fItime\fR parameter is not specified.
 .le
-
 
 The following parameters define the source and sky/atmosphere background
 spectra.
@@ -94,7 +92,6 @@ wavelength in Angstroms and extinction in magnitudes per airmass.
 Extinction title.
 .le
 
-
 The following parameters are used with the source spectrum is specified
 by the special functions.
 .ls refwave = INDEF (INDEF) [spectrum|spectrograph]
@@ -118,7 +115,6 @@ Blackbody temperature for a blackbody source spectrum in degrees Kelvin.
 .ls index = 0. (0.) [spectrograph]
 Power law index for the power law source spectrum.
 .le
-
 
 The following parameters are observational parameters describing either
 the observing conditions or spectrograph setup.
@@ -178,7 +174,6 @@ Detector binning along the dispersion direction.
 Detector binning along the spatial direction.
 .le
 
-
 The following parameters a miscellaneous parameters for the task.
 .ls search = "spectimedb$"
 List of directories to search for the various table files.  The current
@@ -237,7 +232,6 @@ and flambda is the source flux in ergs/s/cm^2/A.  This table is used
 to compute an efficiency correction given a measurement of the
 sensitivity function from standard stars for the instrument.
 .le
-
 
 The following parameters control the output of the task.  The task
 always prints a result page at the central wavelength but additional
@@ -352,8 +346,6 @@ Spectrograph parameter set.  If "" then the default pset \fBspecpars\fR
 is used otherwise the named pset is used.
 .le
 
-
-
 SPECPARS PARAMETERS
 .ls spectrograph = ""
 Spectrograph efficiency table.  This text file may contain parameters and an
@@ -385,7 +377,6 @@ dispersers.  If the value is INDEF it is derived from the grating
 parameters.
 .le
 
-
 .ls telescope = "" [spectrograph]
 Telescope efficiency table as a function of wavelength.  
 .le
@@ -410,7 +401,6 @@ is added to the calculation.
 Title for the emissivity table used.
 .le
 
-
 .ls corrector = "" [spectrograph]
 Efficiency table for one or more correctors.
 .le
@@ -423,7 +413,6 @@ Efficiency table for atmospheric dispersion compensator.
 .ls adctitle = "" [adc|spectrograph]
 Title for ADC table used.
 .le
-
 
 .ls disperser = "" [spectrograph]
 Disperser table.  If this file contains an efficiency table it applies
@@ -477,7 +466,6 @@ is computed for the disperser.  This theoretical efficiency is scaled
 to peak efficiency given by this parameter.
 .le
 
-
 .ls xdisperser = "" [spectrograph]
 Crossdisperser table.  If this file contains an efficiency table it applies
 only to first order.  An alternate first order table and tables for
@@ -528,7 +516,6 @@ is computed for the crossdisperser.  This theoretical efficiency is scaled
 to peak efficiency given by this parameter.
 .le
 
-
 .ls aperture = "" (default based on context) [spectrograph]
 Aperture table.  The text file gives aperture thruput as a function of the
 aperture size in units of seeing FWHM.  For rectangular apertures there are
@@ -549,7 +536,6 @@ parameter is not specified then if the aperture table has two columns the
 type is "circular" otherwise it is "rectangular".
 .le
 
-
 .ls fiber = "" [spectrograph]
 Fiber transmission table.  The transmission is a function of wavelength
 in Angstroms.  If no fiber transmission is specified then no fiber
@@ -558,7 +544,6 @@ component is included.
 .ls fibtitle = "" [fiber|spectrograph]
 Title for fiber transmission used.
 .le
-
 
 .ls filter = "" [spectrograph]
 Filter transmission table.  The transmission is a function of wavelength
@@ -579,7 +564,6 @@ Title for filter transmission used.
 .ls block = "" ("no") [filter|spectrograph]
 If "yes" then no check will be made for other orders.
 .le
-
 
 .ls collimator = "" (1.) [spectrograph]
 Collimator transmission table.  The transmission is a function of
@@ -617,7 +601,6 @@ Vignetting table.  The independent variable is distance from the center
 of the detector in mm.  The value is the fraction the light transmitted.
 If no vignetting table is specified then no vignetting effect is applied.
 .le
-
 
 .ls detector = "" (1.) [spectrograph]
 Detector DQE table.  The DQE is a function of wavelength in Angstroms.
@@ -661,7 +644,6 @@ Detector binning along the spatial direction.
 .le
 .ih
 DISCUSSION
-
 
 OVERVIEW
 
@@ -778,7 +760,6 @@ particular setup.  In many cases it may be easier to use the calculated
 efficiencies rather than measure them.  Depending on the level of accuracy
 desired this may be adequate or deviations from the analytic blaze function
 can be accounted for in another component.
-
 
 TABLES
 
@@ -912,7 +893,6 @@ a wavelength of 1 micron the unit string would be:
 	km/s 1 micron
 .fi
 
-
 CALCULATIONS
 
 This section describes the calculations, and assumptions behind the
@@ -921,7 +901,6 @@ efficiencies of gratings and grisms, the dispersion resolution, the spatial
 resolution and how it applies to the number of object and sky pixels in the
 apertures, the object and sky detected photons/counts, the signal-to-noise
 ratio , and the exposure time for a given S/N.
-
 
 Gratings
 
@@ -973,7 +952,6 @@ include a wavelength dependence.  Thus the peak efficiency is near the
 reflectance value but somewhat lower and is order dependent due to the other
 effects.
 
-
 Grisms
 
 Grisms are assumed to have a prism angle equal to the blaze angle of
@@ -998,7 +976,6 @@ reflection grating except that shadowing is not included (a consequence of
 the blaze face being parallel to the prism face and theta being near
 zero).  Instead of a reflectance value normalizing the blaze function a
 transmission value is used.
-
 
 Scales and Sizes
 
@@ -1045,7 +1022,6 @@ in the aperture description file).  Using the detector pixel size and the
 scale factors allows conversion of aperture sizes specified in this way
 back to the actual aperture size.
 
-
 Resolution
 
 A camera resolution parameter may be set in the camera description.  If
@@ -1070,7 +1046,6 @@ and the third from the finite resolution of a pixel (the factor of 1) and
 the spread of wavelengths across the aperture or seeing disk.  The
 dispersion resolution is printed for information and the S/N per dispersion
 resolution element is given in addition to the per pixel value.
-
 
 Object and Sky Pixels Across the Dispersion
 
@@ -1113,7 +1088,6 @@ zero a warning is printed.
 For "multiap" sky subtraction the number of sky pixels is the
 number of sky apertures times the number of pixels per aperture.
 
-
 Source Counts
 
 The source spectrum flux at each wavelength, either given in a spectrum
@@ -1139,7 +1113,6 @@ spatial integration is implicit in the aperture function.
     - the camera transmission
     - the detector DQE
 .fi
-
 
 Background Counts
 
@@ -1167,7 +1140,6 @@ the number of spatial pixels occupied by the source.
 If no background subtraction is specified then the background counts are added
 to the source counts to define the final source counts and the background
 counts are set to zero.
-
 
 Signal-to-Noise Ratio
 
@@ -1198,7 +1170,6 @@ number of pixels per resolution element to get the S/N per resolution
 element.  If multiple exposures are used to make up the total exposure time
 then the single exposure S/N is multiplied by the square root of the number
 of exposures.
-
 
 Exposure Time From Signal-to-Noise Ratio
 

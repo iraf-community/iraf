@@ -171,7 +171,6 @@ as input to MKCONFIG. The comments opposite
 the column definitions were not produced by MKCATALOG but typed in later.
 
 .nf
-
 # Declare the catalog variables
 
 catalog
@@ -182,7 +181,6 @@ BV         4		# the B-V color
 error(BV)  5		# the error in the B-V color
 UB         6		# the U-B color
 error(UB)  7		# the error in the U-B color
-
 .fi
 
 .ih
@@ -264,7 +262,6 @@ original observations file have been replaced with the undefined value
 INDEF.
 
 .nf
-
 before editing
 
 # FIELD     FILTER OTIME    AIRMASS  XCENTER  YCENTER      MAG      MERR
@@ -365,11 +362,11 @@ The configuration file is a text file, created by the user, that specifies
 both the format of the input data and the form of the transformation equations.
 A detailed description of the grammar and syntax of the configuration file
 can be obtained by typing the following command.
+
 .nf
-
 ph> help config
-
 .fi
+
 The configuration file can be prepared in one of the following ways.
 
 .ls [1]
@@ -402,7 +399,6 @@ file until no errors are found.
 A sample configuration file is shown below.
 
 .nf
-
 # Declare the catalog file variables
 
 catalog
@@ -439,7 +435,6 @@ y3            20             # y coordinate in filter 3
 m3            21             # instrumental magnitude in filter 3
 error(m3)     22             # magnitude error in filter 3
 
-
 transformation
 
 fit  u1 = 0.0, u2 = -.07, u3 = 0.70
@@ -458,11 +453,11 @@ VI. FITTING THE PARAMETERS OF THE TRANSFORMATION EQUATIONS
 The heart of the PHOTCAL package is the parameter fitting task FITPARAMS.
 A detailed description of this task and its parameters can be obtained by
 typing the following command. 
+
 .nf
-
 ph> help fitparams
-
 .fi
+
 FITPARAMS takes the observation files, catalog files, and configuration file, 
 and computes the value of the fit parameters for each of the 
 transformation equations specified in the configuration file. Equations will 
@@ -486,10 +481,9 @@ with the cursor, change which parameters are to be fit and which are to be
 held constant, and so on. A detailed description of
 all the interactive options and colon commands can be obtained by typing
 the following command. 
+
 .nf 
-
 ph> help inlfit
-
 .fi
 
 The database file produced by FITPARAMS for the catalog and
@@ -650,7 +644,6 @@ inverted producing a row of INDEF values.
 #	9	error(UB)
 #	10	resid(UB)
 
-
 105-405  8.308  0.002 0.001  1.563  0.006  -0.042 1.878  0.011  0.027
 105-411  10.597 0.008 0.023  0.913  0.024  0.037  0.639  0.027  -0.019
 105-257  9.140  0.004 0.000  0.451  0.006  0.039  0.040  0.007  -0.020
@@ -717,11 +710,11 @@ objects and are therefore not output.
 #	6	UB
 #	7	error(UB)
 
-
 STD1-3  12.165  0.019  0.403  0.063  0.508   0.069
 STD2-2  12.136  0.045  0.796  0.096  -0.242  0.115
 STD2-4  11.710  0.034  0.479  0.061  0.660   0.113
 STD6-3  10.589  0.006  0.619  0.016  -0.069  0.022
 STD7-5  11.852  0.059  0.406  0.069  0.981   0.129
 .fi
+
 .endhelp

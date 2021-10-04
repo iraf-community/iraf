@@ -28,4 +28,5 @@ Compute the airmass at an elevation of 30 degrees above the horizon
 	airmass 1.996 at an elevation of 30. degrees (0.5236 radians)
 	above horizon
 .fi
+
 .endhelp

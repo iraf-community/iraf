@@ -188,6 +188,7 @@ nature of the process of image registration.  This all leads to a few
 
     o	Pad dissimilar sized images with blanks to the largest size
 .fi
+
 .ih
 CENTERING ALGORITHM
 The algorithm is a "marginal" centroid in which the fit for each axis
@@ -235,6 +236,7 @@ or a coarse centering pass are still needed:
 .nf
     pr> imcentroid @imlist x1.coords
 .fi
+
 .ih
 BUGS
 The coarse centering portion of the algorithm can be fooled if the

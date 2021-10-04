@@ -32,7 +32,6 @@ If the input image does not exist a data-less image header is created.
 The WCS is treated as an independent object and
 there is no check made on the dimensionality and sizes of the images.
 
-
 .ih
 REFERENCES
 

@@ -246,7 +246,9 @@ EXAMPLES
 1.  To compute the residuals of a model fit where the image already has
 aperture defined:
 
+.nf
 	cl> apfit ls1 inter- rec- res- trace- read=3 gain=1 back=fit
+.fi
 
 .ih
 REVISIONS

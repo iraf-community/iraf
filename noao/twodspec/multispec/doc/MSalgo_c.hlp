@@ -142,7 +142,6 @@ end
 .fi
 .ke
 
-
 I would have the background fitting routine write as output a background
 frame, the name of which would be saved in the datafile, rather than saving
 the coeff of the bkg fit in the datafile.  The background frame may then
@@ -160,7 +159,6 @@ to the datafile.  Second order corrections could be made to the background
 by repeating the solution using the background fitted by the extraction
 procedure.
 
-
 .ks
 .nf
 procedure extract_swath
@@ -172,7 +170,6 @@ begin
 end
 .fi
 .ke
-
 
 The algorithm used to simultaneously model all spectra in a swath from
 across the dispersion is probably the most difficult and time consuming
@@ -244,7 +241,6 @@ end
 .fi
 .ke
 
-
 The following is close to what is currently done to fit the analytic
 model, as far as I can remember (I have modified it slightly to stimulate
 discussion).  The solution is broken up into two parts to reduce the number
@@ -259,7 +255,6 @@ to one iteration.  If it takes (very rough estimates) .5 sec to set up the
 banded matrix and .3 sec to solve it, 3 iterations to convergence, we have
 5 sec per swath.  If we have an 800 lines broken into swaths of 32 lines,
 the total is 125 sec per image (to within a factor of 5). 
-
 
 .ks
 .nf
@@ -337,7 +332,6 @@ constrain the integral.  More accurate photometric results should therefore
 be possible.
 .le
 .le
-
 
 Method (2) has the advantage that the integral is invariant with respect
 to scale errors in the fitted models, provided the same error is made in

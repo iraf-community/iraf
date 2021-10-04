@@ -160,6 +160,7 @@ w	Change weights of point, star, or wavelength nearest the cursor
 :stats [file]      Statistics about stars and sensitivity fit
 :vstats [file]     Verbose statistics about sensitivity fit
 .fi
+
 .ih
 DESCRIPTION
 Standard star calibration measurements are used to determine the system
@@ -367,7 +368,9 @@ sensitivity.
 EXAMPLES
 1.  The following command generates sensitivity spectra
 
+.nf
 	cl> sensfunc std sens
+.fi
 
 This command uses the data from the \fBstandard\fR output
 file "std" to create sensitivity functions with rootname "sens".
@@ -400,6 +403,7 @@ commands an optional output file may be given to record the information.
 :stats		     Print statistics to terminal
 :vstats stdstats     Print verbose statistics to file
 .fi
+
 .ih
 REVISIONS
 .ls SENSFUNC V2.10.3+

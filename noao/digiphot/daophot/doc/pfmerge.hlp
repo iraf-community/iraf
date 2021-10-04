@@ -55,6 +55,7 @@ subtracted from the original image.
 .nf
 	cl> pfmerge m92.als.1,m92.mag.5 m92.als.2
 .fi
+
 .ih
 TIME REQUIREMENTS
 .ih

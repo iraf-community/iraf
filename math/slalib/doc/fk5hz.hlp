@@ -1,6 +1,6 @@
 .help fk5hz Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slF5HZ (R5,D5,EPOCH,RH,DH)
 
      - - - - - -
@@ -49,6 +49,6 @@
 
   Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

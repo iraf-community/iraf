@@ -4,6 +4,7 @@ NAME
 zfiopr -- IPC driver
 .ih
 SYNOPSIS
+
 .nf
 zopnpr (osfn, mode, chan)		# ** NOT USED **
 zclspr (chan, status)			# ** NOT USED **
@@ -17,6 +18,7 @@ char	buf[]
 int	mode, chan, maxbytes, nbytes, param, status
 long	loffset, lvalue
 .fi
+
 .ih
 DESCRIPTION
 The IPC driver is used to read and write the inter-process communications

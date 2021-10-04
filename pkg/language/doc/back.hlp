@@ -17,11 +17,16 @@ between two directories.
 EXAMPLES
 1. Go to the logical directory "dataio".
 
+.nf
 	cl> cd dataio
+.fi
 
 2. Return to the previous directory, and then go back to the dataio directory.
 
+.nf
 	cl> back;back
+.fi
+
 .ih
 SEE ALSO
 chdir, pathnames

@@ -84,6 +84,7 @@ tt> tabpar g.tab counts 4 format=no
 tt> =tabpar.value
 49
 .fi
+
 .ih
 BUGS
 .ih

@@ -49,6 +49,7 @@ will modify the input mask.
 .nf
     cl> crgrow crmask crmask 1.5
 .fi
+
 .ih
 SEE ALSO
 imreplace

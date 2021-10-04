@@ -1,6 +1,6 @@
 .help obs Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slOBS (N, C, NAME, W, P, H)
 
      - - - -
@@ -78,6 +78,6 @@
 
   Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

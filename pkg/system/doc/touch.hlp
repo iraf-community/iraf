@@ -52,19 +52,27 @@ EXAMPLES
 
 1.  Update the times of all SPP source files in the current directory:
 
+.nf
 	cl> touch *.x
+.fi
 
 2.  Create an empty file on a remode node:
 
+.nf
 	cl> touch ursa!/data/trigger_file
+.fi
 
 3.  Reset the file modification time to 2:33:45 pm on June 5, 2003:
 
+.nf
 	cl> touch nite1.fits time="2003-06-05T14:23:45"
+.fi
 
 4.  Reset the file modification time to match dev$hosts:
 
+.nf
 	cl> touch nite1.fits ref_file=dev$hosts
+.fi
 
 .ih
 SEE ALSO

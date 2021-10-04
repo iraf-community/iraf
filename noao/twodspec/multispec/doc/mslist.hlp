@@ -64,14 +64,21 @@ the desired sample or image lines and the desired spectra.
 EXAMPLES
 To list the spectra positions for spectrum 3 at all the sample lines:
 
+.nf
 	cl> mslist image x0 "*" 3
+.fi
 
 To list the model profile scale parameter for sample line 1:
 
+.nf
 	cl> mslist image i0 1 "*"
+.fi
 
 To list the gauss5 model parameters for spectra 2 and 3 and sample lines 5
 and 7:
 
+.nf
 	cl> mslist image gauss5 "5,7" "2-3" titles+
+.fi
+
 .endhelp

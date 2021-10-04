@@ -4,12 +4,14 @@ NAME
 imflsh -- flush any buffered image data to disk
 .ih
 SYNOPSIS
+
 .nf
 subroutine imflsh (im, ier)
 
 integer		im		#I image descriptor of open image
 integer		ier		#O status return
 .fi
+
 .ih
 DESCRIPTION
 The \fIimflsh\fR procedure flushes any buffered image data to disk.  Both the
@@ -33,6 +35,7 @@ IE_FLUSH:	error flushing buffered data to pixel file
 IE_UPDHDR:	error updating image header file
 IE_UPDRO:	image header modified but image was opened read only
 .fi
+
 .ih
 SEE ALSO
 imclos

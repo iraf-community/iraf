@@ -322,7 +322,6 @@ redshift/magnitude relation is assumed to be such that the redshift is
 proportional to the luminosity distance (the square root of the
 apparent luminosity).  Thus,
 
-
 .nf
                 Z = z * 10. ** (0.2 * (M - minmag))
                 Zfactor = ((1+Z)**2 / Z) / ((1+z)**2 / z)
@@ -429,6 +428,7 @@ The following parameters can be shown or set from within the GALLIST task.
 :ebinsize   [value]	Resolution of roundness histogram in pixels
 :pbinsize   [value]     Resolution of position angle histogram in degrees
 .fi
+
 .ih
 EXAMPLES
 1. Create a galaxy cluster with a power law distribution of field galaxies
@@ -459,6 +459,7 @@ creating a data file.
 	    ... type = to make a copy of any of the plots
 	    ... type q to quit
 .fi
+
 .ih
 REVISIONS
 .ls GALLIST V2.11+

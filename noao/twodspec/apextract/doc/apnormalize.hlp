@@ -309,6 +309,7 @@ images approximately unchanged from a quartz echelle or slitlet image:
 	Yes flatten
 	Yes fit interactively
 .fi
+
 .ih
 REVISIONS
 .ls APNORMALIZE V2.11

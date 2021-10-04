@@ -1,16 +1,20 @@
 .help set,reset Apr87 language
 .ih
 NAME
+
 .nf
   set -- set the value of an IRAF environment variable
 reset -- reset (overwrite) the value of an IRAF environment variable
 .fi
+
 .ih
 USAGE
+
 .nf
 set [varname = valuestring]
 reset [varname = valuestring]
 .fi
+
 .ih
 PARAMETERS
 .ls varname
@@ -76,6 +80,7 @@ value is discarded when the \fIbye\fR is entered.
 		...
 	cl> bye
 .fi
+
 .ih
 SEE ALSO
 show, envget

@@ -83,6 +83,7 @@ color printer interfaced as a Unix printer (the Shinko at NOAO).
 	cl> !xv -swap24 trifid.ras
 	cl> !lpr -Pclp trifd.ras
 .fi
+
 .ih
 TIME REQUIREMENTS
 Example 1 takes 2:20 minutes (33 seconds CPU) on a SparcStation 2.

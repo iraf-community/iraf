@@ -4,11 +4,13 @@ NAME
 clnarg -- get the number of arguments on the command line
 .ih
 SYNOPSIS
+
 .nf
 subroutine clnarg (nargs)
 
 integer		nargs		#O the number of arguments
 .fi
+
 .ih
 DESCRIPTION
 The \fIclnarg\fR subroutine returns the number of whitespace delimited

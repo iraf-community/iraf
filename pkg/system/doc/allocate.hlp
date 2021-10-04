@@ -35,7 +35,6 @@ informational purposes only.
 .fi
 .ke
 
-
 2. Allocate a tape drive after checking its status.
 
 .ks

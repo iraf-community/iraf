@@ -40,7 +40,6 @@ when in VI.
 .le
 .le
 
-
 By default the operation of \fImktags\fR is to silently update the tags
 database.  If a printed listing is desired the \fIlisting\fR switch must
 be enabled.

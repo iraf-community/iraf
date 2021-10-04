@@ -4,12 +4,14 @@ NAME
 zcldir -- close a directory file
 .ih
 SYNOPSIS
+
 .nf
 zcldir (chan, status)
 
 int	chan			# OS channel of directory file
 int	status
 .fi
+
 .ih
 DESCRIPTION
 Close a directory file previously opened for reading with \fBzopdir\fR.

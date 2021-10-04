@@ -35,7 +35,10 @@ a VMS host system).
 the equivalent list of host system filenames, e.g., for use as input to a
 foreign task.
 
+.nf
 	cl> path @vfiles > hfiles
+.fi
+
 .ih
 SEE ALSO
 directory, files

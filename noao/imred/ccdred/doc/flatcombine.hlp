@@ -124,7 +124,9 @@ EXAMPLES
 To automatically select them and combine them as a background job
 using the default combining algorithm:
 
+.nf
     cl> flatcombine ccd*.imh&
+.fi
 
 The final images are "FlatV", "FlatB", and "FlatR".
 .ih

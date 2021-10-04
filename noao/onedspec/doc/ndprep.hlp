@@ -78,11 +78,15 @@ the columns).
 EXAMPLES
 To get a list of standard ND filter curves:
 
+.nf
 	cl> ndprep ?
+.fi
 
 To graph the ND filter curve:
 
+.nf
 	cl> graph onedstds$ctio/nd1m.100mag.dat
+.fi
 
 Naturally, if a calibration image is made then the image plotting tasks
 such as \fBgraph\fR, \fBimplot\fR, and \fBsplot\fR may also be used.
@@ -102,6 +106,7 @@ To make a two dimensional ND calibration spectrum in logarithmic wavelength:
 	Input ND filter curve:  onedstds$ctio/nd4m.u000mag.dat
 	Output calibration image: NDimage
 .fi
+
 .ih
 REVISIONS
 .ls NDPREP V2.10

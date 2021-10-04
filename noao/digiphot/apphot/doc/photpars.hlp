@@ -77,7 +77,6 @@ EXAMPLES
 	... edit the photpars parameters and type :wq
 
 	... finish editing the phot parameters and type :wq
-
 .fi
 
 4. Save the current PHOTPARS parameter set in a text file photnite1.par.

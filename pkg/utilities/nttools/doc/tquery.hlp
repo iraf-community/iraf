@@ -102,6 +102,7 @@ to ".tbl".
 .nf
 tt> tquery *.tab *.%tab%tbl% "" "" "" uniq+
 .fi
+
 .ih
 BUGS
 Column names must be set off from operators by blanks in the expression so

@@ -88,8 +88,8 @@ begins to fall at the \fIcutoff\fR wavenumber until it completely blocks
 Fourier components below the \fIcuton\fR and above the \fIcutoff\fR 
 wavenumbers are set to zero.  Components between these regions are weighted
 according to the equation for a Welch window.  Namely,
-.nf 
 
+.nf 
 						     2      
 	w(j)  = 1. - [ (j - 1/2(N-1)) / (1/2(N+1)) ] 
 		        
@@ -101,8 +101,8 @@ according to the equation for a Welch window.  Namely,
 Fourier components below the \fIcuton\fR and above the \fIcutoff\fR 
 wavenumbers are set to zero. Components between these regions are weighted
 according to the equation for a Hanning window.  Namely,
-.nf
 
+.nf
 	w(j)  =  1/2 [ 1. - cos( (TWOPI*j) / (N-1) ) ]
 
 		where j =  (wavenumber - cuton_wavenumber) 
@@ -161,6 +161,7 @@ EXAMPLES
 .nf
 	rv> filtpars
 .fi
+
 .ih
 SEE ALSO
 fxcor

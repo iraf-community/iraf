@@ -65,8 +65,11 @@ the task \fBartobs\fR.  Then set the subsection parameters
 for the size of the subsection observation, the data section, trim section,
 bias section, and the CCD section of the subsection observation.
 
+.nf
 	cl> artobs obj 5 object filter=V
 	cl> subsection obj1 object
+.fi
+
 .ih
 SEE ALSO
 mkimage, artobs, demo

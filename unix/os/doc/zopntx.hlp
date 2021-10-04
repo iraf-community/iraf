@@ -4,6 +4,7 @@ NAME
 zopntx -- open a text file
 .ih
 SYNOPSIS
+
 .nf
 zopntx (osfn, mode, chan)
 
@@ -11,6 +12,7 @@ packed	char osfn[]		# OS filename
 int	mode			# access mode
 int	chan			# OS channel assigned to file
 .fi
+
 .ih
 DESCRIPTION
 The text file \fIosfn\fR is opened with access mode \fImode\fR and

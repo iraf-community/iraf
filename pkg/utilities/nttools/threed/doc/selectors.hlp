@@ -14,6 +14,7 @@ The basic structure of a column selector is a list of column patterns
 separated by commas. The column pattern is either a column name, a file 
 name containing a list of column names, or a pattern using the usual IRAF 
 pattern matching syntax. For example, the string
+
 .nf
 	[c:a[1-9], b, time*, @column.lis]
 .fi
@@ -75,6 +76,7 @@ filter.  A filter, can also be placed in an include file, for example
 and include files can contain other files, up to seven levels deep.
 .ih
 EXAMPLES
+
 .nf
 1. "[c:WAVELENGTH,FLUX]"        selects columns named "WAVELENGTH" and 
                                 "FLUX"
@@ -86,6 +88,7 @@ EXAMPLES
 3. "[c:FLUX][r:row=(25:30)]"    selects column FLUX and all rows from 25 
                                 to 30.
 .fi
+
 .ih
 SEE ALSO
 .endhelp

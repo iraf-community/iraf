@@ -22,6 +22,7 @@ max(a,b,...)	type of max. arg	maximum of a list of values
 real(x)		real			convert to real
 int(x)		integer			integer part
 .fi
+
 .ih
 DESCRIPTION
 A number of mathematical functions are available under the CL.  In general
@@ -40,12 +41,14 @@ Note that the intrinsic functions \fIint\fR and \fIreal\fR may be called
 to decode string valued arguments.
 .ih
 EXAMPLES
+
 .nf
 y = sin (x)
   = 180 / 3.1415927 * atan2 (x, y)
 i = int (max (4.3, x, y, 2))
   = 1. - (sin(.5)**2 + cos(.5)**2)
 .fi
+
 .ih
 BUGS
 An invalid argument list to a math function (e.g. log(-1)) will terminate

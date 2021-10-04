@@ -185,6 +185,7 @@ wavelength coverage, etc.
 .nf
     ms> msresp1d "" obj005 "" resp005
 .fi
+
 .ih
 SEE ALSO
 icfit, fit1d, apflatten, apnormalize, dofibers

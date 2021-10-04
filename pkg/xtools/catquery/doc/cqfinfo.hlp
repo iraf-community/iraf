@@ -21,6 +21,7 @@ int	max_funits	# the maximum size of the field units
 char	format		# the returned field format
 int	max_format	# the maximum size of the field format
 .fi
+
 .ih
 ARGUMENTS
 .ls res    
@@ -79,6 +80,7 @@ foffset = cq_foffset (res, fname)
      call cq_funits (res, fname, units, max_units)
      call cq_ffmts (res, fname, format, max_format)
 .fi
+
 .ih
 SEE ALSO
 cqfinfon

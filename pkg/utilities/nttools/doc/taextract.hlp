@@ -95,6 +95,7 @@ putting the values in column "polar" of table "scalar.tab".
 .nf
 at> taextract array.tab scalar.tab 5 polar
 .fi
+
 .ih
 BUGS
 .ih

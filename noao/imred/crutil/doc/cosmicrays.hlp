@@ -300,6 +300,7 @@ A difference image or mask image may also be created.
 .nf
     cl> cosmicrays ccd001 ccd001 crmask=crccd001
 .fi
+
 .ih
 SEE ALSO
 crmedian, crnebula, crgrow, crfix, credit, gtools, imedit, rimcursor

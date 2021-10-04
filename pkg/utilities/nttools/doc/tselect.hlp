@@ -129,6 +129,7 @@ tt> tselect datalog.tab sublog.tab "name ?= '^[0-9]'"
 .nf
 tt> tselect schedule.tab week.tab "abs(delta(date,'19891231:12'))<.5"
 .fi
+
 .ih
 BUGS
 Column names must be set off from operators by blanks in the

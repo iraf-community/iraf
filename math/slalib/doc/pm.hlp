@@ -1,6 +1,6 @@
 .help pm Jun99 "Slalib Package"
-.nf
 
+.nf
       SUBROUTINE slPM (R0, D0, PR, PD, PX, RV, EP0, EP1, R1, D1)
 
      - - -
@@ -40,6 +40,6 @@
 
   Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
-
 .fi
+
 .endhelp

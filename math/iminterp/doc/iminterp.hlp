@@ -99,6 +99,7 @@ msi routines the corresponding examples are MSIINIT, MSISINIT, MSIRESTORE
 and MSIFREE.
 .ih
 EXAMPLES
+
 .nf
 Example 1: Shift a 1D data array by a constant amount using a 5th order
 polynomial interpolant and the drizzle routine respectively. Note that
@@ -120,7 +121,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0
     call asifree (asi)
     ...
 
-
     include <math/iminterp.h>
 
     real tmpx[2]
@@ -138,7 +138,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0
 
     call asifree (asi)
     ...
-
 
 Example 2: Shift a 2D array by a constant amount using a 3rd order polynomial
 interpolant and the drizzle interpolant respectively. Note that
@@ -164,7 +163,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0.
 
     call msifree (msi)
     ...
-
 
     include <math/iminterp.h>
     ...
@@ -195,7 +193,6 @@ is no scale change. Out-of-bounds pixels are set to 0.0.
 
     call msifree (msi)
     ...
-
 
 Example 3: Calculate the integral under a 1D data array
 
@@ -231,4 +228,5 @@ Example 4: Store a 1D interpolant for later use by ASIEVAL
     call asifree (asi)
     ...
 .fi
+
 .endhelp

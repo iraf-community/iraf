@@ -50,8 +50,8 @@ columns in the table "example.tab":
 .fi
 
 2.  Print (using the 'tprint' task) specific columns:
-.nf
 
+.nf
 	tt> tlcol example.tab nlist=1 >colnames.lis
 	tt> edit colnames.lis
         (Rearrange the column names and perhaps delete some of them.)
@@ -64,6 +64,7 @@ columns in the table "example.tab":
         (Delete or modify some column descriptions and/or add new ones.)
 	tt> tcreate ex2.tab cdfile=colnames.lis ...
 .fi
+
 .ih
 BUGS
 .ih

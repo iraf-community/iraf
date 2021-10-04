@@ -12,6 +12,7 @@ rval = cvstatr (cv, parameter)
 pointer	cv		# curve descriptor
 int	parameter	# parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls cv     
@@ -19,6 +20,7 @@ The pointer to the curve descriptor structure.
 .le
 .ls parameter
 Parameter to be return.  Definitions in curfit.h are:
+
 .nf
 	define	CVXMIN		5	# minimum ordinate
 	define	CVORDER		6	# maximum ordinate
@@ -30,6 +32,7 @@ The values of real parameters are returned.  The parameters include
 the minimum and maximum ordinate values of the curve.
 .ih
 EXAMPLES
+
 .nf
 	include <curfit.h>
 
@@ -38,6 +41,7 @@ EXAMPLES
 	xmin = cvstatr (cv, CVXMIN)
 	xmax = cvstatr (cv, CVXMAX)
 .fi
+
 .ih
 SEE ALSO
 cvstati

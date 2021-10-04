@@ -129,7 +129,6 @@ show		Print out the current WCS
 update		Quit WCSEDIT and update the image WCS
 quit		Quit WCSEDIT without updating the image WCS
 
-
 	      PARAMETER DISPLAY AND EDITING COMMANDS
 
 crval  [value axes1]		Show/set the FITS crval parameter(s)
@@ -241,14 +240,12 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
     
-    
 Conventions for w (field width) specification:
     
     W =  n      right justify in field of N characters, blank fill
         -n      left justify in field of N characters, blank fill
         0n      zero fill at left (only if right justified)
 absent, 0       use as much space as needed (D field sets precision)
-    
     
 Escape sequences (e.g. "\n" for newline):
     
@@ -329,7 +326,6 @@ doing the actual update.
 	cl> wcsedit image wtype sin 1-2 update-
 	cl> wcsedit image wtype sin 1-2
 .fi
-
 
 3. Change the diagonal elements of the FITS cd matrix to 2.0. The off
 diagonal elements are 0.0. This is equivalent to resetting the image scale.

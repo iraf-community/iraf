@@ -18,7 +18,6 @@ three character instruction mnemonic is used, the B operand must be vector.
 If the letter "k" is added to the mnemonic, the B operand must be a constant.
 These dual mode operators are flagged (with "(k)") in the table below.
 
-
 .nf
      Instruction	    Operation		          Data Types
 
@@ -53,7 +52,6 @@ These dual mode operators are flagged (with "(k)") in the table below.
 	bor_	(k)	c = or(a,b)			     sil
 	xor_	(k)	c = xor(a,b)			     sil
 
-
 .tp 4
 other vector primitives:
 
@@ -63,7 +61,6 @@ other vector primitives:
 	rav_	ngpix =	 rav_ (a, npix; mean, sigma; ksig)   silrdx
 ?	med_	ngpix =	 med_ (a, ia, npix; median) 	     silrd
 .fi
-
 
 For example, "aaddr(a,b,c,npix)" would add the two REAL vectors A and B,
 of length NPIX, placing the sum in the vector C.  To add a constant K to

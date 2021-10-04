@@ -11,6 +11,7 @@ imres = cq_fimquery (cq, imname)
 pointer	cq		# the configuration file descriptor
 char	imname		# the input image file name 
 .fi
+
 .ih
 ARGUMENTS
 .ls cq     

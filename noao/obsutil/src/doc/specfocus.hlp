@@ -350,7 +350,6 @@ the dispersion.
 
       -- Image jdv009.imh at Focus 200. --
 
-
 	    Width at 50% of Peak:
 
 			 Columns
@@ -369,6 +368,7 @@ the dispersion.
 	     268-533  |    0.64       0.00       0.13   
 	     534-799  |    0.92       0.00       0.16   
 .fi
+
 .ih
 SEE ALSO
 imexamine, implot, ranges, splot

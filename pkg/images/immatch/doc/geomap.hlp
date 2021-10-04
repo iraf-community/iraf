@@ -170,7 +170,6 @@ input image coordinate system to the reference coordinate system then he or she
 must reverse the roles of the reference and input coordinates as defined above,
 and compute the inverse transformation.
 
-
 The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order \fIxxorder\fR and \fIxyorder\fR in x
 and \fIyxorder\fR and \fIyyorder\fR in y.
@@ -360,13 +359,11 @@ y and are assumed to be positive.
 	    d = yin0 - e * xref0 - f * yref0 = yshift
 .fi
 
-
 .ih
 EXAMPLES
 1. Compute the linear transformation between coordinate systems.
    A record called "m51.coo" will be written in the database
    file "database".
-
 
 .nf
 	cl> geomap m51.coo database 1. 512. 1. 512.

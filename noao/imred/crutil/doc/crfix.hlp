@@ -4,9 +4,11 @@ NAME
 crfix -- fix cosmic rays in images using cosmic ray masks
 .ih
 USAGE	
+
 .nf
 crfix input output masks
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -42,6 +44,7 @@ EXAMPLES
 .nf
     cl> crfix obj012 crobj012 crmask012
 .fi
+
 .ih
 SEE ALSO
 fixpix, crmedian, crnebula, cosmicrays, credit, epix

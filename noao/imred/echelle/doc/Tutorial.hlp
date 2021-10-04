@@ -78,6 +78,7 @@ tape drive.
 	ec> rfits mta 1-99 ech datatype=r >rfits.log &
 	ec> wfits mta spectra*
 .fi
+
 .ih
 TRACING
 The positions of the orders across the image dispersion axis as a function
@@ -91,7 +92,9 @@ image other images may be traced noninteractively.
 
 Select an image with narrow, strong profiles and run trace:
 
+.nf
 	ec> trace imagename
+.fi
 
 When you are asked if you want to edit the apertures respond with "yes".
 The central cut across the dispersion is graphed.  Position the cursor
@@ -166,7 +169,9 @@ for further information.
 
 Once the extraction parameters have been set simply type
 
+.nf
 	ec> sumextract images
+.fi
 
 where images is the list of images to be extracted.  If each image has
 not been traced then a traced reference image should be given.

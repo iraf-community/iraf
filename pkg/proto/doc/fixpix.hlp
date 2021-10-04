@@ -4,9 +4,11 @@ NAME
 fixpix -- fix pixels identified by a bad pixel mask, image, or file
 .ih
 USAGE	
+
 .nf
 fixpix images masks
 .fi
+
 .ih
 PARAMETERS
 .ls images
@@ -177,6 +179,7 @@ obviously not what is intended.  To make this work set linterp to
 .nf
     cl> fixpix myimage mask.dat linterp=3
 .fi
+
 .ih
 REVISIONS
 .ls FIXPIX V2.11

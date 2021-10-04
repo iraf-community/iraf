@@ -21,7 +21,10 @@ be permitted to logout with the device still allocated.
 EXAMPLE
 1. Logout of the CL.
 
+.nf
 	cl> logo
+.fi
+
 .ih
 SEE ALSO
 deallocate, bye

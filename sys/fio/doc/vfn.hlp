@@ -54,7 +54,6 @@ Mapping Functions
 	map filename extension
 .fi
 
-
 .nh
 VFN Virtual Filename Mapping Package
 
@@ -69,7 +68,6 @@ is locked.  The mapping file is locked only if the vfn is degenerate and the
 access mode is VFN_WRITE.  The recognized vfn access modes are VFN_READ,
 VFN_WRITE, and VFN_UNMAP (for reading directories).
 
-
 .ks
 .nf
 	vp =	 vfnopen (vfn, mode)
@@ -82,7 +80,6 @@ VFN_WRITE, and VFN_UNMAP (for reading directories).
 	stat =    fmapfn (vfn, osfn)	[=:vfnopen/RO,vfnmap,vfnclose]
 .fi
 .ke
-
 
 A distinction is made between mapping the filename and opening and closing
 the vfn to permit efficient and secure error recovery.  The mapping file is
@@ -119,7 +116,6 @@ is not affected.
 	rename					RW=DEL+ADD
 .fi
 .ke	
-
 
 .nf
 # FALLOC -- Create a new file and allocate uninitialized storage.  Open/NF and
@@ -163,7 +159,6 @@ begin
 	    vfnclose (vp, UPDATE)			# UNLOCK
 end
 
-
 # DELETE -- Delete a file and all subfiles.  A subfile is a file which is
 # logically part of the parent file but which is physically a separate file
 # at the kernel level.  An example is the pixel storage file associated with
@@ -191,7 +186,6 @@ begin
 	    close (fd)
 	}
 end
-
 
 # FDELPF -- Delete a single physical file.  Check if the file is protected
 # and do not try to delete the file if it is protected.  If file cannot be
@@ -225,7 +219,6 @@ begin
 
 	vfnclose (vp, UPDATE)				# UNLOCK
 end
-
 
 # RENAME -- Rename a file.  A file may be renamed within a single directory
 # or may be moved to another directory by the rename operation.  Note that
@@ -303,7 +296,6 @@ failing to remove the lock.
 .le
 .le
 
-
 On a system which provides file locking, i.e., which forbids a process
 access to a file which is open with write permission by another process,
 the host OS guarantees mutual exclusion and protection from lockout.
@@ -336,7 +328,6 @@ Thus if the lock file can be successfully deleted, the lock has been tested
 and found to be absent and the directory has been locked, all in one
 indivisible kernel operation.
 
-
 .ks
 .nf
 	# Gain exclusive access to a file.  The file must have an
@@ -346,12 +337,10 @@ indivisible kernel operation.
 	while (delete (lockfile) == ERR)
 	    ;
 
-
 	# Give up exclusive access to a file.
 	create (lockfile)
 .fi
 .ke
-
 
 The above is a bit simplistic because the file itself may not exist,
 in which case there will be no lockfile, and the process may not have
@@ -414,8 +403,8 @@ the lock.  This may be done by creating a new lockfile as if the transaction
 had been completed.  There is a hidden bug, however -- if two or
 more processes timeout simultaneously, the following scenario might occur:
 
-
 .kf
+
 .nf
 	A times out
 	B times out
@@ -428,7 +417,6 @@ more processes timeout simultaneously, the following scenario might occur:
 	[...mutual exclusion is violated...]
 .fi
 .ke
-
 
 No matter how unlikely this scenario might be, it prevents us from using the
 simple technique to break the lock.  Breaking the lock appears to be another
@@ -445,7 +433,6 @@ that the lock can only be broken if it has been in place for a specified
 interval of time which is much larger than the timeout interval.  This suffices
 to recover from a process crash and prevents two processes from breaking
 the lock at almost the same time.
-
 
 .ks
 .nf
@@ -474,7 +461,6 @@ the lock at almost the same time.
 	create (lockfile)
 .fi
 .ke
-
 
 Lockout is still possible if the process or the computer dies in the interval
 between deletion and creation of timelock1, but the chances of that happening
@@ -512,7 +498,6 @@ broken our timelock file will have been deleted and the transaction must be
 rolled back.  If a lot of time remains on the lock we go ahead and perform
 the update, otherwise a new timelock2 is written, providing a time equal to
 the minimum lifetime of a lock in which to update the file.
-
 
 .ks
 .nf
@@ -556,7 +541,6 @@ locking primitives are presented below.  These are low level routines
 with fairly restrictive semantics, and are not intended to be used in other
 than system code.
 
-
 .ks
 .nf
 	time =	    osfn_lock (osfn)
@@ -564,7 +548,6 @@ than system code.
 	nsec =	  osfn_unlock (osfn, time)
 .fi
 .ke
-
 
 A file is locked with the \fBosfn_lock\fR primitive, which returns when
 it has successfully placed a lock on the file \fIosfn\fR.  The lock is
@@ -584,7 +567,6 @@ A lock is removed with \fBosfn_unlock\fR.  The number of seconds remaining
 on the lock at the time it was removed is returned as the function value.
 ERR is returned if the file was no longer locked or had been locked by
 another user when \fBosfn_unlock\fR was called.
-
 
 .nf
 # OSFN_LOCK -- Lock the named OSFN, i.e., gain exclusive write access
@@ -654,7 +636,6 @@ setlock_
 	return (creation time of timelock2)
 end
 
-
 # OSFN_TIMELEFT -- Determine if a file is still locked, and if so, how
 # much time remains on the lock.  TIME is the time value returned when
 # the file was locked.  All time values are in units of seconds.
@@ -680,7 +661,6 @@ begin
 	    return (timeleft)
 	}
 end
-
 
 # OSFN_UNLOCK -- Release the lock on a file and return the number of
 # seconds that were left on the lock.  ERR is returned if the file is
@@ -722,7 +702,6 @@ the first file reference).  Thus, for a simple filename mapping where the
 OSFN is short, no MALLOC or other kernel calls will be required, i.e., the only
 expense will be the string operations required to map the filename.
 
-
 .ks
 .nf
 # VFN Descriptor
@@ -740,7 +719,6 @@ struct vfd {
 }
 .fi
 .ke
-
 
 .ks
 .nf
@@ -787,7 +765,6 @@ begin
 
 	return (pointer to VFD)
 end
-
 
 # VFNCLOSE -- Close a VFN and optionally update the VFN database.  An update
 # is performed only if the mapping file is open with write permission,
@@ -839,7 +816,6 @@ begin
 	if (nvfn_open > 1)
 	    mfree (vp, TY_STRUCT)
 end
-
 
 # VFNMAP -- Map and pack the VFN into an OSFN, but do not modify the
 # database.  The mapping file is accessed only if the filename is
@@ -926,7 +902,6 @@ begin
 	return (status)
 end
 
-
 # VFNADD -- Map a VFN to an OSFN and add an entry for the VFN to the
 # database if the OSFN is degenerate.
 
@@ -953,7 +928,6 @@ begin
 	return (OK)
 end
 
-
 # VFNDEL -- Map a VFN to an OSFN and delete the entry for the VFN from
 # the database if the OSFN is degenerate.  Do not delete the degeneracy
 # flag file if no longer degenerate, because even though the OSFN is
@@ -976,7 +950,6 @@ begin
 
 	return (OK)
 end
-
 
 # FBRKFN -- Transform a VFN into an OSDIR, an escape sequence encoded and
 # extension mapped root OS filename ROOT, and an extension EXTN.  The root
@@ -1026,3 +999,4 @@ begin
 	if (extn != null_string)
 	    map filename extension
 end
+.fi

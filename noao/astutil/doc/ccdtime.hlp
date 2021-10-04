@@ -239,6 +239,7 @@ given by:
 	noise total = (nstar+npix*(nsky+ndark+rdnoise**2)) ** 1/2
 	SNR = nstar / noise total
 .fi
+
 .ih
 EXAMPLES
 1.  To get a list of the telescopes, filters, and detectors in a database:
@@ -277,7 +278,6 @@ whitespace removed to fit on this page.
       Sum: 1 Arcsec/pixel: 0.72  Pixels/star: 6.0
       Seeing: 1.5  Airmass: 1.20  Phase: 0.0
 
-
      Filter  Time   Mag   SNR   Star Sky/pix Noise contributions
 					      Star    Sky    CCD
 
@@ -298,7 +298,6 @@ whitespace removed to fit on this page.
 	  V   1.0  20.0   1.6   19.0    2.3   4.36   4.50  10.50
 	  R   1.0  20.0   1.6   21.1    5.5   4.59   7.06  10.50
 	  I   1.0  20.0   0.7   10.0   12.7   3.16  10.71  10.50
-
 .fi
 
 Note that the default of 1 second in the last section
@@ -331,6 +330,7 @@ mode.  In the following example we want to change the magnitude.
     cl> ccdtime 22
     ...
 .fi
+
 .ih
 REVISIONS
 .ls CCDTIME V2.11.4

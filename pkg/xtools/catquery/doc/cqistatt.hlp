@@ -14,6 +14,7 @@ int	parameter	# the parameter to be returned
 char	text		# the returned text parameter value
 int	maxch		# the maximum size of the returned text parameter
 .fi
+
 .ih
 ARGUMENTS
 .ls imres    
@@ -22,6 +23,7 @@ The results descriptor.
 .ls parameter
 The image survey parameter to be returned. The currently supported text
 image survey results text parameters defined in cq.h are:
+
 .nf
 CQIQPNAMES	# the list of survey results query parameter names
 CQIQPVALUES	# the list of survey results query parameter values

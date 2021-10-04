@@ -198,7 +198,6 @@ ra1 dec1  [ra2 dec2 [ra3 dec3]] # tie points for reference coordinate file
 ..    ..  [ ..  ..  [ ..   ..]
  x1   y1  [ x2  y2  [ x3   y3]] # tie points for input coordinate file N
 
-
 # Second sample refpoints file (N reference files and N input files)
 
 ra1 dec1  [ra2 dec2 [ra3 dec3]] # tie points for reference coordinate file 1
@@ -208,7 +207,6 @@ ra1 dec1  [ra2 dec2 [ra3 dec3]] # tie points for reference coordinate file 2
  ..   ..  [ ..   .. [ ..   ..]]
 ra1 dec1  [ra2 dec2 [ra3 dec3]] # tie points for reference coordinate file N
  x1   y1  [ x2   y2 [ x3   y3]] # tie points for input coordinate file N
-
 .fi
 
 If the refpoints file is undefined the parameters \fIxin\fR, \fIxin\fR,
@@ -217,7 +215,6 @@ to compute a linear transformation from the pixel coordinates to the
 standard coordinates xi and eta as shown below. Orientation and skew
 are the orientation of the x and y axes and their deviation from
 perpendicularity respectively.
-
 
 .nf
 	 xi = a + b * x + c * y
@@ -355,8 +352,6 @@ w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
  
-
-
 Conventions for w (field width) specification:
  
     W =  n      right justify in field of N characters, blank fill
@@ -553,8 +548,6 @@ Coordinate mapping parameters
  236.1  864.8  13:30:14.95 47:10:27.6  13:30:14.94 47:10:27.5  0.127  0.073
 .fi
 
-
-
 2. Repeat example 1 but replace the daofind pixel list with one generated
 using the center task and a finder chart created with the skymap task.
 
@@ -642,7 +635,6 @@ Coordinate mapping parameters
    X      Y        Ra         Dec        Ra(fit)    Dec(fit)    Dra    Ddec
 .fi
 
-
 3. Repeat example 1 but use the "tolerance" matching algorithm and apriori
 knowledge of the celestial and pixel coordinates of the nucleus of M51,
 the x and y image scales, and the orientation of the detector on the telescope
@@ -682,7 +674,6 @@ cl> type m51b.mat.3
  13:29:29.730   47:12:04.10       1307.802      1085.564     16    60
  13:29:38.700   47:13:36.20       1093.813      1300.189     13    63
 
-
 ... Compute the plate solution.
 cl> ccmap m51b.mat.3 ccmap.db results=STDOUT xcolumn=3 ycolumn=4 lngcolumn=1 \
 latcolumn=2 refpoint=user lngref=13:29:52.8 latref=47:11:41 interactive=no
@@ -714,8 +705,6 @@ Coordinate mapping parameters
 1307.8 1085.6  13:29:29.73 47:12:04.1  13:29:29.72 47:12:04.0  0.082  0.060
 1093.8 1300.2  13:29:38.70 47:13:36.2  13:29:38.73 47:13:36.4 -0.332 -0.184
 .fi
-
-
 
 4. Repeat example 3 but input the appropriate linear transformation via a list
 of tie points, rather than setting the transformation parameters directly.
@@ -755,7 +744,6 @@ cl> type m51b.mat.4
 #    Column 5: Reference line number
 #    Column 6: Input line number
 
-
  13:30:07.960   47:05:18.30        401.034       147.262     17    42
  13:29:48.600   47:07:42.50        860.002       480.061      8    44
  13:29:37.400   47:09:09.20       1127.791       680.033     12    46
@@ -763,7 +751,6 @@ cl> type m51b.mat.4
  13:30:14.950   47:10:27.60        236.088       864.817     21    52
  13:29:29.730   47:12:04.10       1307.802      1085.564     16    60
  13:29:38.700   47:13:36.20       1093.813      1300.189     13    63
-
 
 ... Compute the plate solution which is identical to the solution computed
 ... in example 2.

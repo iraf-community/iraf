@@ -4,12 +4,14 @@ NAME
 zgtime -- get clock and cpu times
 .ih
 SYNOPSIS
+
 .nf
 zgtime (clock_time, cpu_time)
 
 long	clock_time		# LST, long integer seconds
 long	cpu_time		# cpu time consumed, milliseconds
 .fi
+
 .ih
 DESCRIPTION
 The \fBzgtime\fR primitive returns the local standard time (clock time)

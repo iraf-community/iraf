@@ -19,7 +19,9 @@ filename as input and returns the equivalent host system filename as output.
 EXAMPLES
 1. Print the host equivalent of the vfn "hlib$login.cl".
 
+.nf
 	cl> = osfn ("hlib$login.cl")
+.fi
 
 2. Compute a host filename for use as an argument to a foreign task
 (see help \fItask\fR for more information on foreign tasks).
@@ -28,6 +30,7 @@ EXAMPLES
 	cl> task $vdir = "$directory"	# VMS directory lister
 	cl> vdir /size osfn("bin$")
 .fi
+
 .ih
 SEE ALSO
 pathnames, task

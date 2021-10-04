@@ -4,12 +4,14 @@ NAME
 zopdir -- open a directory file
 .ih
 SYNOPSIS
+
 .nf
 zopdir (osfn, chan)
 
 packed	char osfn[]		# directory file name
 int	chan			# channel assigned to file
 .fi
+
 .ih
 DESCRIPTION
 The named directory file is opened for sequential access in READ_ONLY mode.

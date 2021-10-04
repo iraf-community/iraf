@@ -10,6 +10,7 @@ call cvsave (cv, fit)
 pointer	cv		# curve descriptor
 real	fit[]		# array containing the fit parameters
 .fi
+
 .ih
 ARGUMENTS
 .ls cv     

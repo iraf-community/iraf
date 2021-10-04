@@ -4,9 +4,11 @@ NAME
 blkrep -- block replicate n-dimensional images
 .ih
 USAGE	
+
 .nf
 blkrep input output b1 [b2 b3 b4 b5 b6 b7]
 .fi
+
 .ih
 PARAMETERS
 .ls input
@@ -49,27 +51,36 @@ VAX 11/750 with FPA running UNIX 4.3BSD and IRAF V2.4:
     100x100     real         5x5    2.1s     6s
   100x100x1     real       5x5x5    9.7s    33s
 .fi
+
 .ih
 EXAMPLES
 .ls 4 1.
 To block replicate a 1D image in blocks of 3:
 
-cl> blkrep imagein imageout 3
+.nf
+	cl> blkrep imagein imageout 3
+.fi
 .le
 .ls 4 2.
 To block replicate a 2D image in blocks of 2 by 3:
 
-cl> blkrep imagein imageout 2 3
+.nf
+	cl> blkrep imagein imageout 2 3
+.fi
 .le
 .ls 4 3.
 To block replicate two 2D images in blocks of 5 by 5:
 
+.nf
 cl> blkrep image1,image2 out1,out2 5 5
+.fi
 .le
 .ls 4 4.
 To block replicate a 3D image in place by factors of 2:
 
+.nf
 cl> blkrep image1 image1 2 2 2
+.fi
 .le
 .ls 4 5.
 To smooth an image by block averaging and expanding by a factor of 2:

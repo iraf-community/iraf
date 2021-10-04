@@ -111,6 +111,7 @@ written to the instrument file or saved in a private copy.  The
 list of commands is shown below and may be printed using ? or help.
 
 .in 4
+
 .nf
 			CCDINSTRUMENT COMMANDS
 
@@ -129,20 +130,21 @@ translate   Translate image string selected by the imagetyp
 	    parameter to one of the CCDRED types given as an
 	    argument or queried:
 	    object, zero, dark, flat, comp, illum, fringe, other
-
 .fi
+
 The following are CCDRED parameters which may be translated.  You are
 queried for the image keyword to use or it may be typed after the command.
 An optional default value (returned if the image does not contain the
 keyword) may be typed as the second argument of the command.
-.nf
 
+.nf
 	BASIC PARAMETERS
 imagetyp	Image type parameter (see also translate)
 subset		Subset or filter parameter
 exptime		Exposure time
 darktime	Dark time (may be same as the exposure time)
 .fi
+
 .in -4
 
 The commands may be followed by values such as file names for some of
@@ -161,6 +163,7 @@ and changed.  The parameters displayed is controlled by the \fIparameters\fR
 keyword.  The additional parameters not shown above are:
 
 .in 4
+
 .nf
 	USEFUL DEFAULT GEOMETRY PARAMETERS
 biassec		Bias section (often has a default value)
@@ -197,6 +200,7 @@ dec		Declination
 ra		Right Ascension
 title		Image title
 .fi
+
 .in -4
 .ih
 EXAMPLES
@@ -383,6 +387,7 @@ arguments must be on the command line.
 	ccdinstrument> q
 	Update instrument file myccd (yes)? 
 .fi
+
 .ih
 SEE ALSO
 instruments, setinstrument

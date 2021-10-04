@@ -10,6 +10,7 @@ msisave (msi, interpolant)
     pointer	msi		#I interpolant descriptor
     real	interpolant[]	#O array containing the interpolant
 .fi
+
 .ih
 ARGUMENTS
 .ls msi   
@@ -23,6 +24,7 @@ required can be determined by a call to msigeti.
 .nf
 	    len_interpolant = msigeti (msi, II_MSINSAVE)
 .fi
+
 .ih
 DESCRIPTION
 The interpolant type, number of coefficients in x and y, the position of

@@ -16,6 +16,7 @@ double	px		# the input parallax in arcsec
 double	rv		# the input radial velocity in km / sec (+ve receding)
 double olng, olat	# the output sky coordinates in radians
 .fi
+
 .ih
 ARGUMENTS
 .ls  incoo    

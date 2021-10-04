@@ -12,6 +12,7 @@ msiinit (msi, interp_type)
     pointer	msi		#U interpolant descriptor
     int		interp_type	#I interpolant type
 .fi
+
 .ih
 ARGUMENTS
 .ls msi     

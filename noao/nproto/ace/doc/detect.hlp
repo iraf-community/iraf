@@ -175,7 +175,6 @@ Sigma of mean flux cutoff
 Sigma of maximum pixel
 .le
 
-
 # Growing"
 .ls ngrow = 2
 Number of grow rings
@@ -296,7 +295,6 @@ fit will not be written to the header but the task continues.
 
 UPDATED TO SKY DURING DETECTION
 
-
 DETECTION
 
 The detection of objects in an image is conceptually quite simple.  Each
@@ -355,9 +353,7 @@ sky is given by the \fIhsigma\fR.  This number is multiplied by the sky
 sigma to get the deviation from sky.  As noted earlier the sky sigma is
 for the convolved pixels and the 
 
-
 CONVOLUTION DETECTION FILTER
-
 
 The convolution detection filter is specified with the \fIconvolve\fR
 parameter.  There is only one convolution that can be specified and it applies
@@ -454,10 +450,10 @@ comma.  For example
                                1 2 1
     1 2 1, 2 3 2, 1 2 1  ==>   2 3 2
                                1 2 1
+.fi
 .le
 
 When a logfile is defined the weights are included in the log output.
-
 
 OBJECT MASKS
 

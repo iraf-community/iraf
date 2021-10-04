@@ -1,10 +1,12 @@
 .help cl,clbye Jun86 language
 .ih
 NAME
+
 .nf
 cl    -- call the CL as a task
 clbye -- like cl(), but closes current script file too
 .fi
+
 .ih
 PARAMETERS
 .ls gcur = ""
@@ -94,11 +96,15 @@ commands following the \fIclbye\fR will not be executed.
 EXAMPLES
 1. Execute CL commands from a file.
 
+.nf
 	cl> cl < cmdfile
+.fi
 
 2. Execute CL commands from a pipe.
 
+.nf
 	cl> print ("!type ", fname) | cl
+.fi
 
 3. Execute \fIcl\fR, taking command input from the terminal.  Since command
 input is already from the terminal, the only effect is to mark the state

@@ -4,6 +4,7 @@ NAME
 zopdpr -- open a detached process
 .ih
 SYNOPSIS
+
 .nf
 zopdpr (process_name, bkgfile, jobcode)
 
@@ -11,6 +12,7 @@ packed	char process_name[]		# executable file name
 packed	char bkgfile[]			# job file
 int	jobcode				# job number of bkg job
 .fi
+
 .ih
 DESCRIPTION
 A background job is queued for execution at some unspecifiable future time.

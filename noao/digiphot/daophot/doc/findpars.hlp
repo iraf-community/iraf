@@ -83,7 +83,6 @@ by computing the ratio of the amplitude of the best fitting Gaussian at
 the object position to \fIfindpars.threshold\fR * \fIdatapars.sigma\fR,
 and the object is added to the output coordinate file.
 
-
 .ih
 EXAMPLES
 

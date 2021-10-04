@@ -24,7 +24,9 @@ The list of assignments is terminated by the string "# EOF" so that programs
 reading the list from a stream can easily distinguish the end of the variable
 length list of parameters.
 
+.nf
 	task.param = value
+.fi
 
 Here "task.param" is the name of the parameter, and "value" is the current
 value of the parameter.  The assignment is skipped if the value is undefined.
@@ -58,7 +60,9 @@ are most commonly produced using the \fB":w filename"\fR colon command in
 \fBeparam\fR, e.g., to prepare several different versions of the parameter
 set for a task.
 
+.nf
 	cl> dparam delete.par
+.fi
 
 .ih
 BUGS

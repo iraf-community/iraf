@@ -3,7 +3,6 @@
 .ce
 \fBThe IRAF/NOAO Spectral World Coordinate Systems\fR
 
-
 .sh
 1. Types of Spectral Data
 
@@ -307,6 +306,7 @@ Figure 2: Equispec Spectrum
     LTM3_3  =                   1.
     CD3_3   =                   1.
 .fi
+
 .sh
 5. Multispec Spectral World Coordinate System
 
@@ -409,6 +409,7 @@ than or equal to s.
     s = (p - pmin) / (pmax - pmin) * npieces
     j = int(s)
 .fi
+
 .sh
 5.1 Linear and Log Linear Dispersion Function
 
@@ -449,6 +450,7 @@ Figure 3: Echelle Spectrum with Linear Dispersion Function
     LTM2_2  =                   1.
     CD2_2   =                   1.
 .fi
+
 .sh
 5.2 Chebyshev Polynomial Dispersion Function
 
@@ -471,6 +473,7 @@ where x_1 = 1, x_2 = n, and x_i = 2 * n * x_{i-1} - x_{i-2}.
 .nf
     W = sum from i=1 to order {c_i * x_i}
 .fi
+
 .sh
 5.3 Legendre Polynomial Dispersion Function
 
@@ -519,6 +522,7 @@ Figure 4: Echelle Spectrum with Legendre Polynomial Function
     LTM2_2  =                   1.
     CD2_2   =                   1.
 .fi
+
 .sh
 5.4 Linear Spline Dispersion Function
 
@@ -534,6 +538,7 @@ knots, a=(j+1)-s, b=s-j, and x_0=a, and x_1=b.
 .nf
     W = sum from i=0 to 1 {c_(i+j) * x_i}
 .fi
+
 .sh
 5.5 Cubic Spline Dispersion Function
 
@@ -559,6 +564,7 @@ and x_0=a**3, x_1=(1+3*a*(1+a*b)), x_2=(1+3*b*(1+a*b)), and x_3=b**3.
 .nf
     W = sum from i=0 to 3 {c_(i+j) * x_i}
 .fi
+
 .sh
 5.6 Pixel Array Dispersion Function
 
@@ -574,6 +580,7 @@ and x_0=a, and x_1=b.
 .nf
     W = sum from i=0 to 1 {c_(i+j) * x_i}
 .fi
+
 .sh
 5.7 Sampled Array Dispersion Function
 

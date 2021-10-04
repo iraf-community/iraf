@@ -4,12 +4,14 @@ NAME
 zfdele -- delete a file
 .ih
 SYNOPSIS
+
 .nf
 zfdele (osfn, status)
 
 packed	char osfn[]		# host filename
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The named file is deleted.

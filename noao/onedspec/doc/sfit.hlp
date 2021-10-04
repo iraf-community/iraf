@@ -200,11 +200,14 @@ response is:
 			   for all spectra!
 		cancel  - return to the main prompt
 .fi
+
 .ih
 EXAMPLES
 1.  To normalize all orders of the echelle spectrum for hd221170
 
+.nf
 	cl> sfit hd221170.ec nhd221170.ec type=ratio
+.fi
 
 Each order of the spectrum is graphed and the interactive options for
 setting and fitting the continuum are available.  The important
@@ -224,19 +227,26 @@ and image to image.
 
 2.  To do several images at the same time
 
+.nf
 	cl> sfit spec*.imh c//spec*.imh
+.fi
 
 Note how the image template concatenation operator is used to construct
 the output list of spectra.  Alternatively:
 
+.nf
 	cl> sfit @inlist @outlist
+.fi
 
 where the two list files could have been created with the sections
 command or by editing.
 
 3.  To measure the power law slope of the continuum (fluxed data)
 
+.nf
 	cl> sfit uv.* type=ratio logscale+ listonly+ fun=leg order=2
+.fi
+
 .ih
 REVISIONS
 .ls SFIT V2.10.4

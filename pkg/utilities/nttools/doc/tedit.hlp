@@ -282,6 +282,7 @@ be added or deleted, and columns may be added.
 .nf
 tt> tedit m12b columns="SHARP,ROUND"
 .fi
+
 .ih 
 BUGS
 .ih

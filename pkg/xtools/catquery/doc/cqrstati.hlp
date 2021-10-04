@@ -12,6 +12,7 @@ ival = cq_rstati (res, parameter)
 pointer	res		# the results descriptor
 int	parameter	# the parameter to be returned
 .fi
+
 .ih
 ARGUMENTS
 .ls res    
@@ -20,6 +21,7 @@ The results descriptor.
 .ls parameter
 The catalog results parameter to be returned. The currently supported
 catalog results parameters defined in cq.h are:
+
 .nf
 CQRNQPARS	# the number of query params used to produce results
 CQRTYPE		# the data type of the results, CQSTEXT or CQBTEXT

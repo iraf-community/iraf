@@ -52,11 +52,12 @@ probably want to start with a contour plot labeled in image pixel coordinates.
 .nf
 	cl> contour m74			# make the plot
 	cl> rgcursor > starlist		# make the object list
+.fi
 
-	At this point, the cursor loop is entered and the terminal
-	is placed into cursor mode.  Any of the following commands
-	might be appropriate:
+At this point, the cursor loop is entered and the terminal is placed
+into cursor mode.  Any of the following commands might be appropriate:
 
+.nf
 	\fBcommand\fR		\fBaction\fR
 
 	:.markcur+	enables marking of the cursor position
@@ -88,6 +89,7 @@ contain the following cursor values.
 	822.918 311.748 1 \40
 	76.8272 822.139 1 \40
 .fi
+
 .ih
 SEE ALSO
 rimcursor, cursor

@@ -122,6 +122,7 @@ sky level for each image section:
     lo> findthresh.section="[271:370,361:460]"
     lo> findthresh data*.imh center=mode
 .fi
+
 .ih
 SEE ALSO
 findgain, imstatistics, imhistogram

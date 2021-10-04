@@ -359,6 +359,7 @@ the middle fiber of an extracted multispec image.
     cl> autoid.coordlist="linelists$henear.dat"
     cl> autoid a0003 5300 3.2 interactive- verbose- dbwrite=YES
 .fi
+
 .ih
 REVISIONS
 .ls AUTOIDENTIFY V2.11

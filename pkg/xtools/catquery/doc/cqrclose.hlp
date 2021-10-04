@@ -10,6 +10,7 @@ call cq_rclose (res)
 .nf
 pointer	res		# the results descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls res    

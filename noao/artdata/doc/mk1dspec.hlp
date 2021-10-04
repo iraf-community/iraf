@@ -68,7 +68,6 @@ Compute the continuum as flux per unit frequency (F-nu) if yes or flux per
 unit wavelength (F-lambda) if no.
 .le
 
-
 LINE PARAMETERS
 .ls lines = ""
 List of spectral line files.  Spectral line files contain lines of rest
@@ -334,6 +333,7 @@ in redshift.
 	cl> mk1dspec spec.ms ap=4 nl=30 rv=3000
 	cl> mk1dspec spec.ms ap=5 nl=30 rv=4000
 .fi
+
 .ih
 REVISIONS
 .ls MK1DSPEC V2.11+

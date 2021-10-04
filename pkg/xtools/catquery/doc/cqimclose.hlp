@@ -10,6 +10,7 @@ call cq_imclose (imres)
 .nf
 pointer	imres		# the results descriptor
 .fi
+
 .ih
 ARGUMENTS
 .ls imres    

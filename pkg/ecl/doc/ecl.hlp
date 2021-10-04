@@ -1,3 +1,4 @@
+
 .nf
 		ECL:  Enhanced CL Release Notes and User's Guide
 		================================================
@@ -8,13 +9,11 @@
 
 			   Revised: 5/28/05
 								
-
 ********************************************************************************
 Release History:
      02/10/05		** Alpha Release for testing
      05/06/05		** 2nd Alpha Release for testing
      06/07/05		** 1st Beta Release for testing
-
 
 ********************************************************************************
 
@@ -53,7 +52,6 @@ Table of Contents
 
     Post-Release Notes
 
-
 ********************************************************************************
 
 ============
@@ -83,8 +81,6 @@ problems to
 New releases will be announced on the IRAF website (http://iraf.noao.edu)
 following the addition of any new features or when critical bugs have been
 fixed.
-
-
 
 ====================
 Installation and Use
@@ -120,7 +116,6 @@ installation" option is not implemented at this time but could be considered
 later for users who don't have write permission on their IRAF tree.  Please
 contact iraf@noao.edu for instructions on how to manually setup such a
 system for personal use.
-
 
 To Install the ECL
 ------------------
@@ -174,10 +169,8 @@ Step 3) Start the ECL from your normal IRAF login directory as either
 
 	       cl> cl.ehinit = cl.ehinit // " nolongprompt"
 
-
 Except as described below, use of the ECL should be identical to the
 traditional CL for most users.
-
 
 Determining CL Version
 ----------------------
@@ -193,9 +186,6 @@ package loading scripts or within tasks, is something like
 	} else {
 	    print ("You are using the old CL")
 	}
-
-
-
 
 ==============
 Error Handling
@@ -282,7 +272,6 @@ to clean up intermediate files or reset counter variables.  New language
 features mean new types of bugs can be introduced into a script, even if
 the irony is that these new features are meant to trap bugs!
 
-
 Example Descriptions
 --------------------
 
@@ -298,8 +287,6 @@ in the examples to follow:
      segvio -- Compiled task producing a segmentation violation
      spperr -- Compiled task invoking the SPP error() function
     
-
-
 Reporting of Errors
 ===================
     
@@ -365,7 +352,6 @@ allows the traceback to be suppressed entirely, to print information only
 at the level where the error occurred, or to print a full calling stack
 trace (default).
 
-
 Trapping Errors
 ===================
 
@@ -381,23 +367,19 @@ to "post" an error handler that is called at the end of a block of code and
 which checks for error conditions that may have occurred in that block.
 The syntax for these statements is of the form:
 
-
     iferr { <statement> } 		ifnoerr { <statement> }
         <error action statement> 	    <success action statement>
-
 
     iferr { 				ifnoerr {
         <block of statements> 	    	    <block of statements>
     } then 				} then
         <error action statement> 	    <success action statement>
 
-
     iferr { 				ifnoerr {
         <block of statements> 		    <block of statements>
     } then { 				} then {
         <block of error stmts> 		    <block of success action stmts>
     } 					}
-
 
 The IFERR is grammatically equivalent to the IF statement and means "if an
 error occurs during the processing of the enclosed code, execute the error
@@ -406,7 +388,6 @@ of the test is reversed and the action statements are executed only if the
 enclosed code completes without error.  Additionally, these statements take
 an ELSE clause allowing both forms of the test to be combined.  For example,
 
-
     iferr { 				ifnoerr {
         <block of statements> 		    <block of statements>
     } then { 				} then {
@@ -414,7 +395,6 @@ an ELSE clause allowing both forms of the test to be combined.  For example,
     } else { 				} else {
         <success stmts>	    	    	    <error stmts>
     } 					}
-
 
 In all cases 
 
@@ -427,7 +407,6 @@ In all cases
     o  It is a syntax error for a condition block to itself directly contain
        an IFERR or IFNOERR statement and action statements, i.e.  IFERR
        statements may not be nested
-
 
     To make effective use of these statements a few points need to be
 kept in mind:
@@ -481,14 +460,12 @@ well as strategies for how to handle those errors which can be detected.
 We'll also see how to determine which task in a condition block failed
 and why.
 
-
 The 'erract' Environment Variable
 ----------------------------------
 
 	The ECL has a new 'erract' environment variable used to control the
 different aspects of the error handling.  This is a whitespace-delimited
 string comprised of the following options:
-
 
     abort	Script task should abort at an error and begin error
 		recovery back to the command-line
@@ -520,7 +497,6 @@ string comprised of the following options:
     nofull	Print only the error report for the task causing the error
 		and none of its parents.
 
-
 The default value is set as:
 
     set erract = "abort trace flpr clear full"
@@ -538,8 +514,6 @@ a single parameter without affecting other options, e.g.
     cl> set erract = "noabort"		# reset one of them
     cl> show erract			# print options again
     noabort trace flpr clear full
-
-
 
 Error Handling: Then and Now
 ----------------------------
@@ -618,7 +592,6 @@ As an example, consider
 
 When compiled this is the equivalent of writing
 
-
 	_errpsh () 
 	task1 (arg1, arg2) 
 	task2 (arg1)
@@ -659,7 +632,6 @@ task which fails and that triggers the second to fail because we depend
 on the first succeeding, how should we post the error number/message for
 the script?  We simply disallow nested IFERR statements for the moment
 to avoid dealing with these complex interactions
-
 
 New CL parameters
 ===================
@@ -714,8 +686,6 @@ However,
 Note the warning message indicating the use of the parameter followed by the
 result.
 
-
-
 What Errors Are NOT Trapped
 ===========================
 
@@ -742,8 +712,6 @@ features includes:
 	For instance, a script prints "I can't run this on Tuesdays" and
 	returns to the command-line but does not otherwise post an error
 	condition for the calling context.
-
-    
 
 ============================================
 Command-line History and BackSpace Revisions
@@ -772,8 +740,6 @@ from the user's session by adding the string "noreadline" to the CL
 'ehinit' parameter, e.g.
 
 	ecl> cl.ehinit = cl.ehinit // " noreadline"
-
-
 
 Input Command Summary
 ---------------------
@@ -845,8 +811,6 @@ readline() interface for command input:
 	to proper function and so the forward search mechanism isn't
 	generally recommended.
 
-
-
 =====================
 New Builtin Functions
 =====================
@@ -872,8 +836,6 @@ Examples:
 	    # or equivalently
 	    printf ("Error in '%s': %s\n", $errtask, $errmsg)
 	}
-
-
 
 String Functions
 ----------------
@@ -927,7 +889,6 @@ New functions include:
 	    cl> = strldx (".", "junk.fits")
 	    5
 		
-
     strlstr (str1, str2)						(*)
        	Search for last occurance of 'str1' in 'str2', returns index
        	of the start of 'str1' or zero if not found.
@@ -948,7 +909,6 @@ New functions include:
 	'trimchars' argument is not specified the whitespace chars
 	(tab and space) are assumed.  
 
-			 
        	Example:
 	    cl> printf ("'%s'\n", trim ("   test   "))
 	    'test'
@@ -960,7 +920,6 @@ New functions include:
 	        if (trim (foo) == "")
 	            error (0, "no legal value specified for 'foo'")
 
-
         The new string functions are particularly useful for dealing with
 pathnames where one needs to find and extension, separate a file from a
 path prefix, trim trailing slashes. and so on.
@@ -968,7 +927,6 @@ path prefix, trim trailing slashes. and so on.
 	Additionally, the existing substr() function has been modified to
 allow a 'last' index greater than a 'first' index, in which case the return
 string is reversed.
-
 
 Trig Functions
 --------------
@@ -990,7 +948,6 @@ versions to simplify degree/radian conversion.
       dacos (arg)	    Inverse cosine function, result in degrees
       datan2 (y, x)	    Inverse tangent function, result in degrees
 
-
 Utility Functions
 -----------------
 
@@ -1000,7 +957,6 @@ Utility Functions
       hypot (x, y)	    Euclidean distance (i.e. sqrt (x*x + y*y))
       sign (arg)	    Sign of argument (-1 or 1)
 
-
   Examples:
 	cl> = fp_equal (1.2345, 1.234)
 	0
@@ -1008,7 +964,6 @@ Utility Functions
 	5
 	cl> = sign (-23)	# may also take real arguments
 	-1
-
 
 Bitwise Operations
 ------------------
@@ -1041,8 +996,6 @@ goal of providing a richer scripting language.
       -13
       cl> = radix (not(12), 2)
       11111111111111111111111111110011
-
-
 
 =================
 Defined Constants
@@ -1090,10 +1043,7 @@ below:
 	area = (PI * radius ** 2) 	# Compute area of circle.
 	rad = degrees / RADIAN		# Convert degrees to radians
 
-
-
 ===============================================================================
 # Post-Release Notes
 ===============================================================================
-
 .fi

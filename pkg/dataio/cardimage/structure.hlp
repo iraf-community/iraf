@@ -33,6 +33,7 @@ t_wcardimage()
 
 			    conversion routines
 .fi
+
 .sh
 RCARDIMAGE Structure Summary
 
@@ -102,6 +103,7 @@ t_mtexamine ()
 
 		    sign_convert (a, nelems, max_plusint, twice_max_plusint)
 .fi
+
 .sh
 MTEXAMINE Structure Summary
 .ls t_mtexamine

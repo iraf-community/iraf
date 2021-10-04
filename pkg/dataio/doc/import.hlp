@@ -38,6 +38,7 @@ expressions.  The syntax for the pixtype entry is
 .ls  <type><nbytes>[:tag],<type><nbytes>[:tag],[....]
 
 where
+
 .nf
     type = b            # byte (no conversions)
            u            # unsigned integer
@@ -51,7 +52,6 @@ where
     tag is something like 'r','g','b' (color triplets), 'r',
 	'i' (complex data), etc.  If no tags are given one will 
 	automatically be assigned of the form 'b1', 'b2', etc.
-
 .fi
 .le
 .le
@@ -248,8 +248,8 @@ defaults could also be used.
 contain any of the standard expression evaluator functions (see 
 the \fIimexpr\fR help page for more details).  Special functions in 
 expressions also include:
-.nf
 
+.nf
      flipx (arg)      	- flip image in X
      flipy (arg)      	- flip image in Y
    gr[ea]y (r,g,b)    	- RGB to grayscale using the NTSC Y formula
@@ -257,19 +257,19 @@ expressions also include:
      green (arg)	- get the green component of a colormap image
       blue (arg)	- get the blue component of a colormap image
      gamma (arg, gamma) - apply a gamma correction to the image
-
 .fi
+
 The two flip functions can change the image orientation by reversing the order
 of pixels within a line (a flipx() call), or it can flip an image from top-
 to-bottom (a flipy() call).  The flipping will apply to all bands of the out-
 put image even if it was only used in one expression.  To reverse the channel 
 order simply change the order of the tags in the outbands parameter.  RGB
 images may be converted to a single grayscale image using the NTSC formula:
+
 .nf
-
 	gray = (0.289 * r) + (0.587 * G) + (0.114 * B)
-
 .fi
+
 Note that a similar grayscale conversion can be done by explicitly defining
 a similar equation in \fIoutbands\fR and supplying different coefficients.
 
@@ -278,10 +278,9 @@ to get a single color component from a colormap image rather than the
 grayscale equivalent of the colormap.  For example, to separate an 8-bit
 GIF color image into it's RGB components one could specify an outbands
 parameter such as
+
 .nf
-
 cl> import foo.gif bar format=gif outbands="red(b1),green(b1),blue(b1)"
-
 .fi
 
         Functions may also be nested in complex expressions such as:
@@ -369,14 +368,13 @@ file name may possibly be used to determine the format from a file name
 extension.
 .le
 
-
 .ih
 Special Functions:
 
         In addition to the intrinsic functions already provided there are a
 number of input and utility functions for the database.  These are:
-.nf
 
+.nf
                      \fIINPUT FUNCTIONS\fR
 
    ctocc ([offset])      - convert byte to printable char constant
@@ -524,8 +522,8 @@ be used to set byte swapping for the whole file, or for only certain data
 types.  The value is a string parameter that may be "yes" to byteswap the
 whole file, "no" to not swap anything, or a comma delimited string of types
 described below to enable swapping for only those values.
-.nf
 
+.nf
         bswap = { no | yes | i2 i4 }
 
                 no              # no swapping (default)
@@ -544,8 +542,8 @@ swapping).
 
 .ih 
 EXAMPLES
-.nf
 
+.nf
 Get a list of known input formats:
 
     cl> import "" "" output=info
@@ -612,7 +610,6 @@ Read a FITS image with one header record in which the data bytes
     cl> imdel nite1.imh
     cl> import nite1.fits nite1 format="none" dims="640,480" \
     >>> bswap+ hskip=2880 pixtype="i2" outtype="s" imheader="imheader.dat"
-
 .fi
 
 .ih

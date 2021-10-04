@@ -175,7 +175,6 @@ coordinates in arcseconds per pixel. The observed standard coordinates are
 computed by applying the appropriate sky projection to the celestial
 coordinates.
 
-
 .nf
 	 xi = f (x, y)
 	eta = g (x, y)
@@ -232,7 +231,6 @@ solutions are evaluated in the forward sense using straight-forward
 evaluation of the polynomial terms, in the reverse sense by applying
 Newton's method to the plate solution.
 
-
 .ih
 FORMATS
 
@@ -259,7 +257,6 @@ u       unsigned decimal integer
 w       output the number of spaces given by field W
 x       hexadecimal integer
 z       complex format (r,r) (D = precision)
-   
    
 Conventions for w (field width) specification:
    
@@ -346,7 +343,6 @@ latref = 47:11:53.4 xcol=3 ycol=4 lngcol=1 latcol=2 polar+
 131.504   304.608   129.359   255.609
 154.309    25.093   157.740   140.737
 
-
 3. Compute the plate solution and use it to evaluate the Cartesian and
 polar standard coordinates for the input coordinate list used in example 1.
 
@@ -365,7 +361,6 @@ Coordinate mapping parameters
     Reference point: 318.735  273.900  (pixels  pixels)
     X and Y scale: 0.764  0.767  (arcsec/pixel  arcsec/pixel)
     X and Y axis rotation: 179.110  358.958  (degrees  degrees)
-
 
 cl> type coords.db
 # Mon 10:29:13 24-Nov-97
@@ -407,7 +402,6 @@ begin   coords
                         -0.7640812161068504     -0.011868034832272
                         -0.01393966623835092    0.7665650170136847
         surface2        0
-
 
 cl> ccstd coords STDOUT coords.db coords xcol=3 ycol=4 lngcol=1 latcol=2
   -8.471   104.146    -8.599   104.517

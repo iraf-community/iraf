@@ -50,7 +50,6 @@ is specified in units of the half-width at half-maximum of the point
 spread function the aperture per pixel  a single value of apertures
 will work well on images with differing psfs.
 
-
 .ih
 EXAMPLES
 

@@ -74,7 +74,6 @@ q	Quit task
 :lparam/eparam/unlearn	pset	List/edit/unlearn the named pset
 :parameter	        [value]	List or set an individual pset parameter
 
-
 		      Psets
 
 datapars	The data dependent parameters
@@ -84,10 +83,8 @@ fitskypars	The phot task sky fitting algorithm parameters
 photpars	The phot task photometry algorithm parameters
 daopars		The psf fitting algorithm parameters
 
-
 The following commands are available from within the interactive setup
 menu.
-
 
 	    Interactive Daoedit Setup Menu
 
@@ -111,7 +108,6 @@ g	Mark/verify the sky region growing radius on the radial profile plot
 r	Mark/verify the photometry aperture(s) on the radial profile plot
 w	Mark/verify the psf function radius on the radial profile plot
 b	Mark/verify the psf fitting radius on the radial profile plot
-
 .fi
 
 .ih

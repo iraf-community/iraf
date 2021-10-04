@@ -228,6 +228,7 @@ the independent variable in "in" is the first column, "c1".
 .nf
   tt> trebin in STDOUT c1 xtable="x1d.fits[r:row=37][c:wavelength]"
 .fi
+
 .ih
 BUGS
 A column which contains an integer bit mask

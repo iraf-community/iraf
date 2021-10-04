@@ -4,12 +4,14 @@ NAME
 zclstx -- close a text file
 .ih
 SYNOPSIS
+
 .nf
 zclstx (chan, status)
 
 int	chan			# OS channel of text file
 int	status
 .fi
+
 .ih
 DESCRIPTION
 The text file associated with the channel \fIchan\fR is closed, i.e.,

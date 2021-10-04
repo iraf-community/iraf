@@ -12,6 +12,7 @@ real	x		# x value
 real	y		# y value
 real	weight		# weight value
 .fi
+
 .ih
 ARGUMENTS
 .ls cv    

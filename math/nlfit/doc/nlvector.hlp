@@ -13,6 +13,7 @@ real/double	zfit[npts]	# array of fitted function values
 int		npts		# number of data points
 int		nvars		# number of variables
 .fi
+
 .ih
 ARGUMENTS
 .ls nl   

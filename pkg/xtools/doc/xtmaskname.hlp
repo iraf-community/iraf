@@ -1,11 +1,14 @@
 .help xt_maskname Mar07 xtools
 .ih
 NAME
+
 .nf
 xt_maskname -- create mask name 
 .fi
+
 .ih
 SYNOPSIS
+
 .nf
 procedure xt_maskname (fname, extname, mode, mname, maxchar)
 
@@ -15,6 +18,7 @@ int	mode				#I Mode
 char	mname[maxchar]			#O Output mask name
 int	maxchar				#I Maximum characters in mask name
 .fi
+
 .ih
 DESCRIPTION
 This routine encapsulates creating a mask name from a user specified
@@ -82,4 +86,5 @@ EXAMPLES
             abc[def] "ghi"      -->     abc/def.pl
             abc[def] ""         -->     abc_def.pl
 .fi
+
 .endhelp

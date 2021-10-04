@@ -12,6 +12,7 @@ pointer	mw		# the output mwcs descriptor
 pointer	coo		# the output sky coordinate descriptor
 pointer	imcoo		# the input image sky coordinate descriptor 
 .fi
+
 .ih
 ARGUMENTS
 .ls  ccsystem.   
@@ -55,7 +56,6 @@ Type "help ccsystems" to see the list of the supported sky coordinate systems.
 
 Type "help mwcs$MWCS.hlp fi+" to find out more about the IRAF image world
 coordinate system library MWCS.
-
 
 SEE ALSO
 skdecwstr, skdecim

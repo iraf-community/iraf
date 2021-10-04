@@ -57,6 +57,7 @@ header keyword 'DATE' in 'image.hhh'. The keyword 'DATE' must already exist:
 .nf
 tt> tabkey schedule.tab DATE 10 image.hhh date
 .fi
+
 .ih
 BUGS
 .ih

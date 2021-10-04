@@ -29,7 +29,10 @@ EXAMPLES
 
 2. Tell if a image exists.
 
+.nf
 	cl> = imaccess ("dev$pix")
+.fi
+
 .ih
 BUGS
 An optional second argument should be added to test whether the named file

@@ -16,5 +16,8 @@ The task \fBbatchred\fR is run to setup a set of beam switching operations.
 It creates the script \fBprocess.cl\fR which the user runs as a background
 process as follows:
 
+.nf
 	cl> process&
+.fi
+
 .endhelp

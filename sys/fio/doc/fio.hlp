@@ -12,88 +12,53 @@ but does not depend on the characteristics of the device on which the
 file is resident.  The output procedures are similar to the input
 procedures, except that FLSBUF is called to flush the buffer when it fills.
 
-
-
-
 .ks
 .nf
 	              getc     getline     read
 
-
-
 		               filbuf
-
 
               text files                     binary files
 
 	             zgettx    fmkbfs     ffault
 
-
-
 	          Structure of the Input Procedures
 .fi
 .ke
-
-
-
-
 
 .ks
 .nf
 		      putc     putline     write
 
-
-
-
 		               flsbuf
-
 
 	        text files                 binary files
 
-
 	             zputtx    fmkbfs     ffault
-
-
 
 	          Structure of the Output Procedures
 .fi
 .ke
 
-
 The "file fault" procedure (FFAULT) is called by both FILBUF and FLSBUF
 for binary files, when the referenced data lies outside the range of
 the current buffer.
-
-
 
 .ks
 .nf
  	                        ffault
 
-
-
-	                      
 	             ffilbf     frelnk      fflsbf
-
-
-
 
                           fwatio      fbseek
 
-
-
 	       aread      await      aseek/anote     awrite
 
-
-
 	       zaread     zawait     zseek/znote     zawrite
-
-
 
 	        FIO Structure for Accessing Binary Files
 .fi
 .ke
-
 
 In the above structure chart, the "z" routines at the lowest level
 are system and device dependent, and are actually part of the system
@@ -110,7 +75,6 @@ device dependent routines, and makes it possible to add new devices
 without editing the source for FIO.  In fact, it is possible to interface
 new devices to FIO dynamically, at run time.
 
-
 .tp 10
 .sh
 SEMICODE FOR THE BASIC FILE I/O PROCEDURES
@@ -120,8 +84,6 @@ character at a time.  Since these procedures may be called once for each
 character in a file, they must be as efficient (ergo, simple) as feasible.
 These machine code for these routines should be hand optimized if much
 text processing (i.e. compilations) is anticipated.
-
-
 
 .nf
 .tp 5
@@ -141,8 +103,6 @@ begin
 
 	return (ch)
 end
-
-
 
 .tp 5
 procedure putc (fd, ch)				# put character
@@ -164,7 +124,6 @@ begin
 end
 .fi
 
-
 Characters and strings (and even binary data) may be "pushed back" into
 the input stream.  UNGETC pushes a single character.  Subsequent calls
 to GETC, GETLINE, READ, etc. will read out the characters in the order
@@ -180,8 +139,8 @@ after the file is opened, and before any data is pushed back.  Recursion
 is limited by the size of the input pointer stack, and pushback capacity
 by the size of the pushback buffer.
 
-
 .tp 5
+
 .nf
 procedure ungetc (fd, ch)		# push back a character
 
@@ -203,8 +162,6 @@ begin
 	itop = itop + 1
 end
 
-
-
 .tp 5
 procedure ungets (fd, str)		# recursively push back a string
 
@@ -223,8 +180,6 @@ begin
 end
 .fi
 
-
-
 Calls to GETLINE may be intermixed with calls to GETC, READ, and so on.
 If, however, only GETLINE is used to access a file, and the associated
 file is a text file, a file buffer will never need to be created (the
@@ -238,9 +193,8 @@ wide constant SZ_LINE.  The constant SZ_LINE includes space for the newline
 character, but not for the EOS marker (character array dimensions never
 include space for the EOS, because the preprocessor automatically allows an
 extra character for the EOS when dimensioning the array for Fortran).
+
 .nf
-
-
 .tp 5
 int procedure getline (fd, linebuf)		# get a line from file
 
@@ -276,9 +230,6 @@ begin
 	    return (op - 1)			# number of chars
 end
 
-
-
-
 .tp 5
 procedure putline (fd, linebuf)			# put a line to file
 
@@ -299,10 +250,8 @@ begin
 	    }
 	}
 end
-
-
-
 .fi
+
 The READ procedure reads a maximum of MAXCHARS characters from the file
 FD into the user supplied buffer BUFFER.  In the case of block structured
 devices, READ will continue to read blocks from the file until the output
@@ -310,9 +259,8 @@ buffer has filled.  In the case of record structured devices (i.e., terminals,
 text files, pipes) READ will read at most one record, after exhausting the
 contents of the file buffer.
 
-
-
 .tp 5
+
 .nf
 int procedure read (fd, buffer, maxchars)
 
@@ -349,9 +297,6 @@ begin
 	    return (nchars)
 end
 
-
-
-
 .tp 5
 procedure write (fd, buffer, maxchars)
 
@@ -374,9 +319,6 @@ begin
 	    }
 	}
 end
-
-
-
 
 .tp 5
 int procedure filbuf (fd)
@@ -405,9 +347,6 @@ begin
 	return (nchars)
 end
 
-
-
-
 .tp 5
 int procedure flsbuf (fd)
 
@@ -429,7 +368,6 @@ begin
 	return (status)
 end
 .fi
-
 
 .sh
 Buffer Management for Binary Files
@@ -474,9 +412,8 @@ FFAULT calculates the file offset of the new buffer implied by the offset
 argument (note that offset may be BOF or EOF as well as a real offset).
 No actual i/o takes place if the data is already buffered.
 
-
-
 .tp 5
+
 .nf
 int procedure ffault (fd, char_offset)
 
@@ -505,7 +442,6 @@ begin
 	return (status: OK, ERR, or EOF)
 end
 .fi
-
 
 .sh
 Verification of the File Fault Procedure
@@ -604,10 +540,6 @@ Write behind will occur, but reading will not be asynchrounous.
 .ke
 .le
 
-
-
-
-.fi
 In certain circumstances, such as when IMIO overwrites a line of an
 image, where each line is known to be aligned on a block boundary,
 the "fill buffer" operation can be omitted (since it is guaranteed
@@ -616,10 +548,8 @@ buffer is flushed).  The fill buffer operation is disabled via an FSET
 option.  Both access modes 3 and 4 are affected, yielding a factor
 of two reduction in the number of i/o transfers.
 
-
-
-
 .tp 5
+
 .nf
 procedure ffilbf (fd, bufdes)
 
@@ -639,19 +569,16 @@ begin
 	    set pointer to active buffer in file descriptor
 	}
 end
-
-
-
 .fi
+
 The FFLSBF routine is called by FFAULT to actually flush a buffer to
 the file.  Note that if the buffer is at the end of the file, and the
 buffer is only partially full, a partially full block will be written.
 If partial file blocks are not permitted by the underlying system,
 the z-routine must compensate.
 
-
-
 .tp 6
+
 .nf
 procedure fflsbf (fd, bufdes)
 
@@ -671,9 +598,6 @@ begin
 	set i/o mode word in buffer descriptor
 	set pointer to active buffer in file descriptor
 end
-
-
-
 
 .tp 5
 procedure fwatio (fd)
@@ -697,9 +621,6 @@ begin
 	}
 end
 
-
-
-
 .tp 5
 procedure fbseek (fd, bufdes)
 
@@ -707,11 +628,8 @@ begin
 	if (current_offset != buffer_offset)
 	    aseek (fd, buffer_offset)
 end
-
-
-
-
 .fi
+
 SEEK is used to move the file pointer (offset in a file at which the
 next data transfer will occur).  With text files, one can only seek
 to the start of a line, the position of which must have been determined
@@ -740,10 +658,8 @@ and BOF and EOF are zero or negative, the special offsets are unambiguous.
 A logical seek on a binary file is effected merely by setting the in-buffer
 pointer IOP according to the relation shown above.  A macro LSEEK (fd, offset)
 is defined to perform a logical seek with inline code.
+
 .nf
-
-
-
 .tp 5
 procedure seek (fd, offset)
 
@@ -764,9 +680,6 @@ begin
 	    lseek (fd, offset)
 end
 
-
-
-
 .tp 5
 long procedure note (fd)	# note file position for later seek
 
@@ -781,9 +694,6 @@ begin
 	} else
 	    return (logical offset)
 end
-
-
-
 
 .tp 5
 procedure flush (fd)
@@ -801,11 +711,8 @@ begin
 		if (buffer has been written into)
 		    call fflsbf to flush buffer
 end
-
-
-
-
 .fi
+
 The asynchronous i/o primitives ZAREAD and ZAWRIT must enforce device block
 boundaries.  Thus, if maxchars is not an integral multiple of the block size,
 the file pointer will nonetheless be advanced to the next block boundary.
@@ -830,10 +737,8 @@ to be called with N arguments, the values of which make up the remaining
 arguments to ZCALL.  The additional machine dependence of this routine
 is thought to be more than justified by the clean, flexible interface
 which it provides between FIO and the various supported devices.
+
 .nf
-
-
-
 .tp 5
 procedure aread (fd, buffer, maxchars)
 
@@ -845,19 +750,16 @@ begin
 
 	zcall3 (zaread[fd], channel[fd], buffer, maxchars)
 end
-
-
-
 .fi
+
 Note that FIO, when it seeks to the end of a file for a buffered binary
 write, actually seeks to the nearest block boundary preceeding the physical
 EOF which is an integral multiple of the file buffer size.  When the file
 buffer fills, it is flushed out, OVERWRITING THE EOF.  This may pose problems
 for the implementor of the ZAWRITE routine on some systems.
 
-
-
 .tp 5
+
 .nf
 procedure awrite (fd, buffer, maxchars)
 
@@ -869,9 +771,6 @@ begin
 
 	zcall3 (zawrite[fd], channel[fd], buffer, maxchars)
 end
-
-
-
 
 .tp 5
 int procedure await (fd)
@@ -899,9 +798,6 @@ begin
 	clear io_in_progress word in file descriptor
 	return (status)
 end
-
-
-
 
 .tp 5
 procedure aseek (fd, offset)
@@ -933,8 +829,6 @@ begin
 	    take error action
 end
 
-
-
 .tp 5
 long procedure anote (fd)
 
@@ -943,8 +837,6 @@ begin
 	return (current_offset)
 end
 .fi
-
-
 
 .sh
 Z-ROUTINES REQUIRED TO INTERFACE TO A BINARY DEVICE
@@ -973,9 +865,7 @@ are reserved.
 The exact specifications of these routines will be detailed in the system
 interface documentation.
 
-
 The following binary devices are fully supported by the program interface:
-
 
 .ks
 .nf
@@ -989,7 +879,6 @@ The following binary devices are fully supported by the program interface:
 	graphics devices			GOPEN
 .fi
 .ke
-
 
 A new device may be interfaced to FIO at run time with the procedure FIODEV.
 Repetitive calls to FIODEV for the same device are harmless and are
@@ -1010,7 +899,6 @@ The device must have been installed with the FIODEV call by the time FSET
 is called to associate the device with a particular file, or an error action
 will result.
 
-
 .sh
 SEMICODE FOR THE FIO INITIALIZATION AND CONTROL PROCEDURES
 
@@ -1024,33 +912,20 @@ FGETFD to allocate and initialize (with defaults) a file descriptor.
 Assorted calls to FSET and possibly FIODEV may optionally follow,
 if the default file parameters are not applicable to the device in question.
 
-
-
-
 .ks
 .nf
 		     open                       close
 
-
-
-
                           fgetfd     frtnfd     flush
 
-
-
-
        zmapfn  zopen      malloc     mfree                  zclose
-
-
 
 	       Structure of the Initialization Procedures
 .fi
 .ke
 
-
-
-
 .tp 5
+
 .nf
 int procedure open (file, mode, type)
 
@@ -1085,10 +960,8 @@ begin
 	} else
 	    return (fd)
 end
-
-
-
 .fi
+
 To conserve resources (file descriptors, buffer space) a file should be
 closed when no longer needed.  Any file buffers that may have been
 created and written into will be flushed before being deallocated.
@@ -1098,10 +971,8 @@ STDOUT, STDERR, or CLOUT cause the respective output byte stream to be
 flushed, but are otherwise ignored.  An error action results if one
 attempts to close a file which is not open, or if one attempts to close
 a file which was not opened with OPEN.
+
 .nf
-
-
-
 .tp 5
 procedure close (fd)			# close an opened file
 
@@ -1120,10 +991,6 @@ begin
 	zclose (channel[fd])
 	frtnfd (fd)
 end
-
-
-
-
 
 .tp 5
 int procedure fgetfd (file, mode, type)		# get file descriptor
@@ -1148,9 +1015,6 @@ begin
 	initialize fields of file descriptor to default values
 	return (fd)
 end
-
-
-
 
 .tp 5
 procedure frtnfd (fd)		# return file descriptor and buffers
@@ -1186,7 +1050,6 @@ begin
 end
 .fi
 
-
 .sh
 SETTING AND INSPECTING THE FIO CONTROL PARAMETERS
 
@@ -1196,14 +1059,12 @@ Occasionally, however, it is desirable to change the default file control
 parameters, to optimize i/o to the file.  The IMIO and VSIO interfaces,
 for example, control the size, number, and ownership of the FIO file buffers.
 
-
 .ks
 .nf
 		fset (fd, parameter, value)
 	value = fget (fd, parameter)
 .fi
 .ke
-
 
 The FSET procedure is used to set the FIO parameters for a particular file,
 while FGET is used to inspect the values of these parameters.  The special
@@ -1263,7 +1124,6 @@ in chars.
 .le
 .le
 
-
 The parameters controlling the size and number of the various buffers
 (ADVICE, NBUFFERS, BUF_SIZE, BUF_TYPE, PBB_SIZE, GNBUFFERS, GBUF_SIZE) must
 be set before i/o causes the affected buffers to be created using the default
@@ -1276,7 +1136,6 @@ Example 1:  File access is expected to be highly random.
 
      The most system independent approach is to call FSET to set the
 ADVICE parameter to RANDOM.
-
 
 .nf
 	include <fio.h>
@@ -1296,7 +1155,6 @@ Example 2:  High speed sequential access is desired
 to SEQUENTIAL.  To demonstrate use of some of the other parameters, we have
 taken a different approach here.
 
-
 .nf
 	fd = open (file, READ_ONLY, BINARY_FILE)
 	if (fd == ERR)
@@ -1306,7 +1164,6 @@ taken a different approach here.
 	call fset (fd, BUF_SIZE, SZ_BLOCK * 16)
 	call fset (fd, ASYNC_IO, YES)
 .fi
-
 
 In practice it will rarely be necessary for the user to call FSET, because
 the facilities provided by VSIO and IMIO (which do call FSET in the manner
@@ -1323,7 +1180,6 @@ would be disabled.  This would be the minimum memory configuration.
 At the other extreme, we might allocate two large buffers to each file,
 with asynchronous i/o enabled.
 
-
 .sh
 DETAILS OF THE FIO DATA STRUCTURES
 
@@ -1334,8 +1190,6 @@ the global buffer pool, the descriptor for the global pool, and the
 device table.  Each file descriptor controls a local list of buffers,
 and possibly a buffer for pushed back data.   A buffer descriptor
 structure is associated with each file buffer.
-
-
 
 .ks
 .nf
@@ -1359,7 +1213,6 @@ common fiocom {
 }
 .fi
 .ke
-
 
 .ks
 .nf
@@ -1389,7 +1242,6 @@ struct fiodes {
 .fi
 .ke
 
-
 .nf
 # flags (saved in fdes[fd].fflags)
 
@@ -1403,8 +1255,6 @@ struct fiodes {
 	F_SEQUENTIAL			# optimize for seq. access
 	F_WRITE				# write perm on file
 .fi
-
-
 
 .ks
 .nf
@@ -1426,7 +1276,6 @@ struct bufdes {
 .fi
 .ke
 
-
 .sh
 SEMICODE FOR THE FIO DATABASE ACCESS PROCEDURES
 
@@ -1435,30 +1284,19 @@ and to link and unlink buffers from the buffer lists.  Now that the
 data structures have been more clearly defined, we shall go into a
 little more detail in the semicode.
 
-
 .ks
 .nf
 	                        fmkbfs
 
-
-
                                 fmklst
-
-
 
 		   flnkhd       fmkbuf       flnktl
 
-
-
 		                malloc
-
-
 
 	      Structure of the Buffer Allocation Procedures
 .fi
 .ke
-
-
 
 The main buffer creation procedure, FMKBFS, is called by either
 FILBUF or FLSBUF when i/o is first done on a file.  FMKLST allocates
@@ -1467,10 +1305,8 @@ links a buffer at the head of a list, while FLNKTL links a buffer at
 the tail of a list.  FMKBUF calls MALLOC to allocate memory for a file
 buffer, and initializes the descriptor for the buffer.
 
-
-
-
 .tp 5
+
 .nf
 procedure fmkbfs (fd)
 
@@ -1496,16 +1332,13 @@ begin
 		take error action
 	}
 end
-
-
-
 .fi
+
 Unlink a buffer from whatever lists it is on, relink it at head of the
 local list, and also at head of global list if a mapped file.  Called
 by FFAULT.
+
 .nf
-
-
 .tp 5
 procedure frelnk (fd, bp) 
 
@@ -1523,9 +1356,6 @@ begin
 	    call flnkhd (fd, bp, GLOBAL)
 	}
 end
-
-
-
 
 .tp 5
 int procedure fmklst (fd, nbufs, bufsize, list)		# make list
@@ -1545,9 +1375,6 @@ begin
 	return (nb)
 end
 
-
-
-
 .tp 5
 int procedure fmkbuf (fd, bufsize)		# make a buffer
 
@@ -1563,9 +1390,6 @@ begin
 	    return (bufdes_pointer)
 	}
 end
-
-
-
 
 .tp 5
 procedure flnkhd (fd, bp, list)		# link buf at head of list
@@ -1598,9 +1422,6 @@ begin
 	}
 end
 
-
-
-
 .tp 5
 procedure flnktl (fd, bp, list)		# link buf at tail of list
 
@@ -1632,9 +1453,6 @@ begin
 	}
 end
 
-
-
-
 .tp 5
 procedure flnkto (fd, bp, to)		# link buf bp after to
 
@@ -1650,9 +1468,6 @@ begin
 	else
 	    bp.ldnlnk.luplnk = bp
 end
-
-
-
 
 .tp 5
 procedure funlnk (bp, list)			# unlink from list
@@ -1688,7 +1503,6 @@ begin
 end
 .fi
 
-
 .sh
 SEMICODE FOR FFAULT, AGAIN
 
@@ -1696,9 +1510,8 @@ SEMICODE FOR FFAULT, AGAIN
 data structures, initialization procedures, and linked list operators are
 clearer, it is time to go back and fill in some of the details in FFAULT.
 
-
-
 .tp 5
+
 .nf
 int procedure ffault (fd, char_offset)
 
@@ -1789,13 +1602,9 @@ begin
 	    return (itop[fd] - iop[fd])		# return nchars
 end
 
-
-
-
 # Search for a file buffer.  If found, return buffer pointer in BP,
 # otherwise allocate a buffer from the tail of either the global or
 # local list.
-
 
 .tp 5
 int procedure ffndbf (fd, buffer_offset, bp)
@@ -1828,7 +1637,6 @@ begin
 end
 .fi
 
-
 .sh
 SUMMARY OF THE FIO/OS INTERFACE (MACHINE DEPENDENT PRIMITIVES)
 
@@ -1845,7 +1653,6 @@ logical name facilities, multiple directories per task, multitasking and
 intertask communication facilities, and dynamic memory allocation/deallocation
 facilities.
 
-
 .nf
 Text Files
 
@@ -1859,12 +1666,10 @@ Text Files
 	zsektx	(chan, znotln_offset; status)
 	znottx	(chan; file_offset)
 
-
 Binary File Initialization (one set per device)
 
 	zopnbf	(osfn, access_mode; chan)
 	zfaloc	(osfn, nchars; chan)
-
 
 Binary File I/O primitives (one set per device)
 
@@ -1877,12 +1682,10 @@ Binary File I/O primitives (one set per device)
 	standard devices: regular files, inter-task pipes (CL,GIO),
 			  memory, magnetic tapes.
 
-
 Virtual File Name Mapping
 
 	zmapfn	(vfn, osfn, maxch)
 	zabsfn	(vfn, osfn, maxch)
-
 
 File Manipulation, Status, File Protection, Temporary Files
 
@@ -1891,7 +1694,6 @@ File Manipulation, Status, File Protection, Temporary Files
 	zrenam	(from_osfn, to_osfn; status)
 	zfprot	(osfn)
 	zmktmp	(root, temp_file_osfn)
-
 
 Other Dependencies (also used outside of FIO)
 
@@ -1903,7 +1705,6 @@ Other Dependencies (also used outside of FIO)
 	int =	or	(int, int)
 	int =	loc	(reference)
 .fi
-
 
 The STATUS returned by the Z-routines may be ERR or a meaningful number,
 such as the channel number or number of characters read or written.
