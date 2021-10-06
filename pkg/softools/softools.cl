@@ -18,7 +18,6 @@ task	mktags,
 	mkapropos	= "softools$x_softools.e"
 
 task	mkttydata	= "softools$x_mkttydata.e"
-task	mkmanpage	= "softools$mkmanpage.cl"
 
 task	lroff,
 	mkhelpdb,

@@ -30,6 +30,7 @@ envget		hlp = envget.hlp
 envget		hlp = envget.hlp
 eparam		hlp = eparam.hlp
 error		hlp = error.hlp
+expressions	hlp = expressions.hlp
 flprcache	hlp = flprcache.hlp
 for		hlp = for.hlp
 fprint		hlp = fprint.hlp

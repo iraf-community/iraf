@@ -1,0 +1,668 @@
+% PASPCONF.STY -- PASP conference proceedings substyle definition for LaTeX.
+%
+% Technically, this file should be called ASPCP.STY since it is now
+% nominally RevTeX compliant, but we will leave that for the next go.
+
+\def\revtex@ver{1.6}		% Version number of this file.
+\def\revtex@date{12 Aug 93}	% Revision date.
+\def\revtex@org{PASP}		% Sponsoring organization.
+\def\revtex@jnl{}		% Applicable journal, if specific.
+\def\revtex@genre{conference proceedings}	% Document "type".
+
+\typeout{\revtex@org\space
+    \ifx\revtex@jnl\@empty\else\revtex@jnl\space\fi
+    \revtex@genre\space substyle, v\revtex@ver\space <\revtex@date>.}
+
+\def\revtex@pageid{\xdef\@thefnmark{\null}
+    \@footnotetext{This \revtex@genre\space was prepared with the
+    \revtex@org\space \revtex@jnl\space Rev\TeX\ macros v\revtex@ver.}}
+
+
+%  ****************************************
+%  *            PAGE LAYOUT               *
+%  ****************************************
+
+\ifnum\@ptsize<1
+    \typeout{Warning: Undersize manuscript font (1\@ptsize\space pts).
+	Use 11pt documentstyle option.}
+\fi
+
+% Set up titlepage and myheadings page styles so that author names and
+% short title info can be used in running heads in final copy.  The
+% object of the exercise to enable us to produce all the final pages
+% with proper heads and folios by adding two commands to the preamble
+% of each paper:
+%
+%    \markboth{AUTHORS}{ABBREV TITLE}
+%    \setcounter{page}{N}
+
+% PASP conference series title page style.
+
+\def\ps@paspcstitle{\let\@mkboth\@gobbletwo
+    \def\@oddhead{\null{\footnotesize\it\@slug}\hfil}
+    \def\@oddfoot{\rm\hfil\thepage\hfil}
+    \let\@evenhead\@oddhead\let\@evenfoot\@oddfoot
+}
+
+\def\ps@myheadings{\let\@mkboth\@gobbletwo
+\def\@oddhead{\hbox{}\hfil\sl\rightmark\hskip 1in\rm\thepage}%
+\def\@oddfoot{}%
+\def\@evenhead{\rm\thepage\hskip 1in\sl\leftmark\hfil\hbox{}}%
+\def\@evenfoot{}\def\sectionmark##1{}\def\subsectionmark##1{}}
+
+\def\@leftmark#1#2{\sec@upcase{#1}}
+\def\@rightmark#1#2{\sec@upcase{#2}}
+
+%\def\posterpaper{\@input{poster.sty}}
+
+% Page size, spacing parameters, etc.
+
+\textwidth=5.25in
+\textheight=8.3in
+\headheight=18pt
+\headsep=18pt
+\topmargin=0in
+\footskip=.25in
+\oddsidemargin=1.37in
+\evensidemargin=1.37in
+\parindent=2em
+\parskip=.1ex
+
+% The following gives "reasonable" ragged right results.
+
+%\@rightskip=0pt plus 1.8em\rightskip\@rightskip
+
+% Define parameters to use when we want to adjust the baselineskip.
+% These are passed as the scale factor argument to \baselinestretch.
+
+\def\@singleleading{0.9}
+\def\@doubleleading{1.6}
+
+% Single-space by default.  Observe that you double-space in LaTeX by
+% resetting \baselinestretch, which is essentially a scale factor for
+% \baselineskip (= leading, for you typographophiles).  We take the
+% \@singleleading factor, defined above.
+
+\def\baselinestretch{\@singleleading}
+
+% The \tightenlines command merely resets the \baselinestretch to a
+% smaller factor, resulting in single-column text that is more closely
+% spaced.  (This will always work.)  Tightening the vertical spacing
+% in the text results in output that is more attractive for distribution
+% to colleagues who are primarily interested in reading the paper, as
+% opposed to copy editing it.
+
+\def\tightenlines{\def\baselinestretch{\@singleleading}}
+\def\loosenlines{\def\baselinestretch{\@doubleleading}}
+
+% Set widow line and club line penalties to very large values.
+% This will effectively disallow such lines under all circumstances
+% except the most desparate.
+
+\clubpenalty\@M
+\widowpenalty\@M
+
+% Another approach to this problem would be to set \looseness=1.  This
+% instructs TeX to try to make paragraphs one line longer than optimum.
+% If the optimum length resulted in a widow, then having this parameter
+% set thus would cause *two* lines to spill over the page.  I have chosen
+% not to use this parameter in the interest of keeping the paragraphs
+% as tight as possible in light of the page limits.
+
+%  ****************************************
+%  *              SLUG LINE               *
+%  ****************************************
+
+% These things need to be merged more intelligently from the AASTeX markup.
+% I'll have to do this at a time when I'm more lucid; I'm having a little
+% trouble this evening figuring out how to assign some of these categories
+% when we're dealing with a *book* in a series.  For now, set what's obvious.
+
+\def\@journalname{ASP Conference Series}
+\def\cpr@holder{Astronomical Society of the Pacific}
+
+% These next two are internal, normally set by other macros.
+
+\def\@jourvol{10000}
+\def\cpr@year{1994}
+
+% I think we have to make these two up for books...
+
+\def\vol@title{Astronomical Data Analysis Software and Systems III}
+\def\vol@author{R.\ J.\ Hanisch, D.\ R.\ Crabtree, and J.\ Barnes, eds.}
+
+% These are more or less irrelevant for PASP conference proceedings.
+
+\let\journalid=\@gobbletwo
+\let\articleid=\@gobbletwo
+\let\received=\@gobble
+\let\accepted=\@gobble
+
+% There is a bit of citation and copyright data on the title page of each
+% article in the volume.  The next macro defines the formatting of this
+% block of information.  It is placed in the head of the title page in
+% the definition of the "titlepage" pagestyle, below.
+
+\def\@slug{{\tabcolsep\z@\begin{tabular}[t]{l}\vol@title\\
+    \@journalname, Vol.\ \@jourvol, \cpr@year\\
+    \vol@author
+    \end{tabular}}
+}
+
+% Title and author identification is by way of standard LaTeX commands
+% \title and \author, although the macros themselves are rather different.
+% The information is typeset by these macros in this style, rather than
+% being buffered as per regular LaTeX.  The authors' principal affiliation
+% is specified with a separate macro \affil.  Each \author command should
+% be followed by its own \affil (or address).
+%
+% Authors often have affiliations above and beyond their main employer,
+% and these are specified with the \altaffilmark and \altaffiltext commands.
+% These commands behave like the \footnotemark and \footnotetext commands
+% of LaTeX.  \altaffilmark is appended to author's names in the \author
+% lists, and generates the superscript identification numbers.
+% The text for the individual alternate affiliations is generated by the
+% \altaffiltext command.  It is up to the author to make sure that the
+% \altaffilmark numbers attached to authors' names correspond to the correct
+% alternate affiliation.
+%
+%     \title{LUCID TEXT}
+%     \author{NAME(S)}
+%     \affil{ADDRESS}
+%     \altaffilmark{TAG NUMBER(S)}
+%     \altaffiltext{NUMERICAL TAG}{TEXT}
+%
+% The typesetting performed by these commands is appropriate for the top of
+% the first text page of the manuscript.  They could as well be used on a
+% title cover page, but vertical placement would have to be controlled by
+% the author.   This is not to be encouraged, since we want to discourage
+% the introduction of any extra horizontal or vertical space.
+%
+% The APS apparently does not use a separate cover sheet for the Physical
+% Review.  Rather, the title, author, affiliation, and abstract appear on
+% the first page, with the editorial staff adding the \received and
+% \accepted commands as appropriate; the dates would appear on the first
+% page beneath the abstract after they have been filled in.  This is a
+% nice approach.
+
+\def\paspconf@frontindent{.45in}
+
+\def\title#1{\vspace*{1.0\baselineskip}
+    \@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+    \hfill%\leftskip\paspconf@frontindent
+    \parbox{\@tempdima}
+	{\pretolerance=10000\raggedright\large\bf\sec@upcase{#1}}\par
+    \vspace*{1\baselineskip}\thispagestyle{title}}
+\def\author#1{\vspace*{1\baselineskip}
+    \@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+    \hfill%\leftskip\paspconf@frontindent
+    \parbox{\@tempdima}
+        {\pretolerance=10000\raggedright{#1}}\par}
+\def\affil#1{\vspace*{.5\baselineskip}
+    \@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+    \hfill%\leftskip\paspconf@frontindent
+    \parbox{\@tempdima}
+        {\pretolerance=10000\raggedright{\it #1}}\par}
+\def\altaffilmark#1{$^{#1}$}
+\def\altaffiltext#1#2{\footnotetext[#1]{#2}}
+
+\def\abstract{\vspace*{1.3\baselineskip}\bgroup\leftskip\paspconf@frontindent
+    \noindent{\bf\sec@upcase{Abstract.}}\hskip 1em}
+\def\endabstract{\par\egroup\vspace*{1.4\baselineskip}}
+
+%  ****************************************
+%  *          FOOTNOTE HACKS              *
+%  ****************************************
+
+% The following code redefines a few things so that spacing in footnotes is
+% different than LaTeX defaults.  The adjustment to \skip\footins increases
+% the amount of vspace inserted before the \footnoterule.  We redefine
+% \@makefntext to remove hspace and indentation.
+
+\skip\footins 4ex plus 1ex minus .5ex
+\footnotesep 3ex
+
+\long\def\@makefntext#1{\noindent\hbox to\z@{\hss$^{\@thefnmark}$}#1}
+
+%  ****************************************
+%  *         TABLES AND FIGURES           *
+%  ****************************************
+
+% Additions and adjustments for tables and figures.
+%
+% Footnotes for tables are to be identified with lower case alphabetics,
+% rather than numeric.  We provide \tablenotemark and \tablenotetext
+% commands analogous to \footnotemark and \footnotetext, but with the
+% identifier *required*, like \altaffilmark and \altaffiltext.  The
+% \tablenotetext must be specified before the \end{table}, since
+% \end{table} displays it.
+%
+%     \tablenotemark{TAG LETTER(S)}
+%     \tablenotetext{ALPHA TAG}{TEXT}
+%
+% Note that TAG LETTER == ALPHA TAG for corresponding text.  It is the
+% responsibility of the author to get the correspondence correct.
+%
+% The table footnotes are coupled to the table in which they occur, rather
+% than being associated with a particular page, and they are printed with
+% the table (relatively close to the caption) instead of appearing at the
+% extreme bottom of the page.  This is done to ensure that the notes wind
+% up on the same page as the table, since tables are floats and can migrate
+% from one page to another.  There is the additional benefit that the notes
+% are unambiguously attached to the proper table, which is what is required
+% in the event that the editorial requirement of one table only per page
+% is ever changed to permit several tables per page.
+%
+% Footnotes are NOT supported for figures.
+
+\def\tablenotemark#1{\rlap{$^{#1}$}}
+
+% The \tablenotemark command buffers the table note text and the "proper"
+% tablenote formatting information in a token buffer.  The tablenotes are
+% dispensed into the vertical page list by \spewtablenotes, which is
+% executed by \end{table}.  Note that certain "global" tablenote formatting
+% details are handled by \spewtablenotes, which also clears the tblnote list.
+% Praise and honor are due to Kresten Krab Thorup (krab@iesd.auc.dk) for
+% posting ftn.sty to the Usenet, from which I drew the technique.
+
+\def\tablenotetext#1#2{
+    \@temptokena={\vspace{.5ex}{\noindent\llap{$^{#1}$}#2}\par}
+    \@temptokenb=\expandafter{\tblnote@list}
+    \xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+
+\def\spewtablenotes{
+  \ifx\tblnote@list\@empty
+  \else
+    \let\@temptokena=\tblnote@list
+    \gdef\tblnote@list{\@empty}
+    \vspace{4.5ex}
+    \footnoterule
+    \vspace{.5ex}
+    {\footnotesize\@temptokena}
+  \fi}
+
+\newtoks\@temptokenb
+\def\tblnote@list{}
+
+\def\endtable{\spewtablenotes\end@float}
+\@namedef{endtable*}{\spewtablenotes\end@dblfloat}
+
+% We add a \tableline command for use in tabular environments.  This command
+% produces the horizontal rule(s) between the column headings and the body
+% of the table.  Authors are discouraged from using any \hlines themselves,
+% and are typically forbidden from using vertical rules by editors.
+
+\let\tableline=\hline
+
+% Figure and table identifiers.
+
+\def\thefigure{\@arabic\c@figure}
+\def\fnum@figure{Figure \thefigure.}
+
+\def\thetable{\@arabic\c@table}
+\def\fnum@table{Table \thetable.}
+
+\long\def\@makecaption#1#2{
+    \vskip 10pt 
+    \setbox\@tempboxa\hbox{#1\hskip 1.5em #2}
+    \let\@tempdima=\hsize \advance\@tempdima by -2em
+    \ifdim \wd\@tempboxa >\@tempdima % IF longer than one line:
+	{\leftskip 2em
+	#1\hskip 1.5em #2\par}     %   THEN set as ordinary paragraph.
+    \else                          %   ELSE set one-liner.
+	\hbox to\hsize{\hskip 2em\box\@tempboxa\hfil}  
+    \fi}
+
+% Figure and table float positions.
+
+\def\fps@figure{tbp}
+\def\fps@table{htbp}
+
+%  ****************************************
+%  *             SECTIONS                 *
+%  ****************************************
+
+% Permit \keywords declaration, but eat the contents.
+
+\let\keywords=\@gobble
+\let\subjectheadings=\@gobble
+
+% Don't number subsubsections.
+
+\setcounter{secnumdepth}{2}
+
+\def\upper{\def\sec@upcase##1{\uppercase{##1}}}
+\def\sec@upcase#1{\relax#1}
+
+\def\section{\@startsection {section}{1}{\z@}{-4.2ex plus -1ex minus
+    -.2ex}{2.2ex plus .2ex}{\normalsize\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{-2.2ex plus -1ex minus
+    -.2ex}{1.1ex plus .2ex}{\normalsize\bf}}
+
+% Third-level head options.  The first one causes the third-level section
+% text to start a new paragraph (after a vskip); the second option makes
+% the text run-in after the heading.  The last argument in both commands
+% specifies the typography of the heading itself, which is italic.  If you
+% want to see what they look like in bold, change the \it to \bf.
+
+%\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus
+    %-1ex minus -.2ex}{0.3ex plus .2ex}{\normalsize\it}}
+
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus
+    -1ex minus -.2ex}{-1.2em}{\normalsize\it}}
+
+\def\thesection{\@arabic\c@section.}
+\def\thesubsection{\thesection\@arabic\c@subsection.}
+\def\thesubsubsection{\thesubsection\@arabic\c@subsubsection.}
+
+% When you want underlining and uppercasing in section heads, you have to
+% get deep enough into the macros so that you have access to the actual
+% string, because you're making changes to the text the author has provided.
+% LaTeX's preferred mechanism (using \@startsection) assumes you will not
+% want to do stuff like that, hence to enforce those things we must revise
+% the \@sect definition.
+
+\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
+     \def\@svsec{}\else 
+     \refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname\hskip 1em }\fi
+     \@tempskipa #5\relax
+      \ifdim \@tempskipa>\z@ 
+        \begingroup #6\relax
+          \@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M \sec@upcase{#8}\par}%
+        \endgroup
+       \csname #1mark\endcsname{#7}\addcontentsline
+         {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                      \protect\numberline{\csname the#1\endcsname}\fi
+                    #7}\else
+        \def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+                      {#7}\addcontentsline
+                           {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                             \protect\numberline{\csname the#1\endcsname}\fi
+                       #7}}\fi
+     \@xsect{#5}}
+
+\def\@ssect#1#2#3#4#5{\@tempskipa #3\relax
+   \ifdim \@tempskipa>\z@
+     \begingroup #4\@hangfrom{\hskip #1}{\interlinepenalty \@M \sec@upcase{#5}\par}\endgroup
+   \else \def\@svsechd{#4\hskip #1\relax #5}\fi
+    \@xsect{#3}}
+
+\def\acknowledgments{\@startsection{paragraph}{4}{1em}
+    {1ex plus .5ex minus .5ex}{-1em}{\bf}{\sec@upcase{Acknowledgments.}}}
+%\def\acknowledgments{\vspace*{1\baselineskip}
+    %\noindent{\bf\sec@upcase{Acknowledgments.}}\hskip 1em}
+%\def\acknowledgments{\section{Acknowledgments}}
+\let\acknowledgements=\acknowledgments			% second spelling
+
+% Until this file gets re-arranged a bit, I will put the question and
+% answer environments here.  It is the practice sometimes to include
+% synopses of pithy exchanges between members of the audience and the
+% presentor of an oral paper.  For this purpose, we have these environments.
+%
+%    \begin{question}{INQUIRER}
+%    \end{question}
+%
+%    \begin{answer}{ANSWERER}
+%    \end{answer}
+
+\def\qanda@heading{Discussion}
+
+\newif\if@firstquestion \@firstquestiontrue
+
+\newenvironment{question}[1]{\if@firstquestion
+    \section*{\qanda@heading}\global\@firstquestionfalse\fi
+    \par\vskip 1ex
+    \noindent{\it#1\/}:}{\par}
+
+\newenvironment{answer}[1]{\par\vskip 1ex
+    \noindent{\it#1\/}:}{\par}
+
+%  ****************************************
+%  *            EQUATIONS                 *
+%  ****************************************
+
+% Sometimes people want to number equations by section, rather than
+% sequentially through the whole paper.
+
+\def\mathwithsecnums{
+    \@newctr{equation}[section]
+    \def\theequation{\hbox{\normalsize\arabic{section}-\arabic{equation}}}}
+
+%  ****************************************
+%  *          BIBLIOGRAPHY                *
+%  ****************************************
+
+% Bibliography/references environment.  For the time being, we will not
+% force an implementation based on BibTeX, although we will prepare for
+% that eventuality by using the constructs and general ideas of the LaTeX
+% thebibliography environment.  Adjustments have been made so that the
+% \cite-\bibitem mechanism can be used to cite references symbolically
+% while maintaining proper citation syntax within the paper; the author
+% must create the citation label for each reference in proper ApJ format
+% in the \bibitem command.
+%
+%    \begin{thebibliography}
+%    \bibitem[LABEL]{TEXTTAG} \reference <bibliographic data>
+%    \end{thebibliography}
+%
+% where LABEL must adhere to ApJ standards, e.g. "Abt 1986".
+%
+% It is not necessary to use the thebibliography environment.  We define
+% also a references environment that simply sets off the list of references
+% and adjusts spacing parameters.  It is not possible to use \bibitems
+% within the references environment.  (The \reference command cannot be
+% shortened to \ref; \ref is used in vanilla LaTeX for cross-referencing.)
+%
+%    \begin{references}
+%    \reference <bibliographic data>
+%    \end{references}
+%
+% Observe that the bibliographic data supplied by the author must also
+% conform to the standards of the journal.  We have elected not to burden
+% authors with tedious LaTeX commands which would require many curly braces
+% to delimit the bibliographic fields because many of the journals we have
+% targeted in this project have agreed to reduce typographic overhead (bolding,
+% italicizing, etc.) in reference lists.  (See Helmut's editorial in ApJ 357.)
+% It is the responsibility of the author to get these fields in the proper
+% order with the correct punctuation; the information will be typeset as is,
+% i.e., in roman with no size or style changes.
+%
+% We do provide macros for many of the oft-referenced journals so that authors
+% may use the LaTeX names rather than having to look up a particular journal's
+% specific abbreviation.  In principle, all the journals should be using the
+% same abbreviations, too, but we anticipate some changes in the specific
+% abbreviations before a set is finally settled on.  As long as these macros
+% are kept up to date, authors need not be concerned about such editorial
+% changes.
+
+\def\references{\section*{References}
+    \bgroup\parindent=0pt\parskip=.5ex
+    \def\refpar{\par\hangindent=3em\hangafter=1}}
+\def\endreferences{\refpar\egroup} % \paspconf@pageid}
+
+\def\thebibliography{\section*{References}
+    \list{\null}{\leftmargin 3em\labelwidth 0pt\labelsep 0pt\itemindent -3em
+    \usecounter{enumi}}
+    \def\refpar{\relax}
+    \def\newblock{\hskip .11em plus .33em minus .07em}
+    \sloppy\clubpenalty4000\widowpenalty4000
+    \sfcode`\.=1000\relax}
+\def\endthebibliography{\endlist} % \paspconf@pageid}
+
+\def\@biblabel#1{\relax}
+%\def\@cite#1#2{({#1\if@tempswa , #2\fi})}
+\def\@cite#1#2{#1\if@tempswa , #2\fi}
+
+\def\reference{\relax\refpar}  % Generic: might be better...
+
+% We modify \@citex so that individual citation texts are NOT hboxed.
+% This allows TeX to break lines at spaces between words in citations.
+% We have also removed the obnoxious {\bf ?} that was inserted in the
+% text when undefined citations are encountered; here, only the warning
+% message is printed on the terminal.
+
+\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do
+    {\@citea\def\@citea{,\penalty\@m\ }\@ifundefined
+       {b@\@citeb}{\@warning
+       {Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}
+
+% Abbreviations for journals.  It is advisable to use the TeX control
+% sequence and allow the keeper of the macros to make sure they expand
+% to the proper text.  If macro package writers agree to all use the
+% same TeX command name, authors only have to remember one thing, and
+% the style file will take care of editorial preferences.  This is also
+% the case when a single journal decides to revamp their abbreviating
+% scheme, as has been happening with the ApJ (1990 et seq.).
+
+\let\jnl@style=\rm
+\def\ref@jnl#1{{\jnl@style#1\/}}
+
+\def\aj{\ref@jnl{AJ}}			% Astronomical Journal
+\def\araa{\ref@jnl{ARA\&A}}		% Annual Review of Astron and Astrophys
+\def\apj{\ref@jnl{ApJ}}			% Astrophysical Journal
+\def\apjl{\ref@jnl{ApJ}}		% Astrophysical Journal, Letters
+\def\apjs{\ref@jnl{ApJS}}		% Astrophysical Journal, Supplement
+\def\ao{\ref@jnl{Appl.Optics}}		% Applied Optics
+\def\apss{\ref@jnl{Ap\&SS}}		% Astrophysics and Space Science
+\def\aap{\ref@jnl{A\&A}}		% Astronomy and Astrophysics
+\def\aapr{\ref@jnl{A\&A~Rev.}}		% Astronomy and Astrophysics Reviews
+\def\aaps{\ref@jnl{A\&AS}}		% Astronomy and Astrophysics, Supplement
+\def\azh{\ref@jnl{AZh}}			% Astronomicheskii Zhurnal
+\def\baas{\ref@jnl{BAAS}}		% Bulletin of the AAS
+\def\jrasc{\ref@jnl{JRASC}}		% Journal of the RAS of Canada
+\def\memras{\ref@jnl{MmRAS}}		% Memoirs of the RAS
+\def\mnras{\ref@jnl{MNRAS}}		% Monthly Notices of the RAS
+\def\pra{\ref@jnl{Phys.Rev.A}}		% Physical Review A: General Physics
+\def\prb{\ref@jnl{Phys.Rev.B}}		% Physical Review B: Solid State
+\def\prc{\ref@jnl{Phys.Rev.C}}		% Physical Review C
+\def\prd{\ref@jnl{Phys.Rev.D}}		% Physical Review D
+\def\prl{\ref@jnl{Phys.Rev.Lett}}	% Physical Review Letters
+\def\pasp{\ref@jnl{PASP}}		% Publications of the ASP
+\def\pasj{\ref@jnl{PASJ}}		% Publications of the ASJ
+\def\qjras{\ref@jnl{QJRAS}}		% Quarterly Journal of the RAS
+\def\skytel{\ref@jnl{S\&T}}		% Sky and Telescope
+\def\solphys{\ref@jnl{Solar~Phys.}}	% Solar Physics
+\def\sovast{\ref@jnl{Soviet~Ast.}}	% Soviet Astronomy
+\def\ssr{\ref@jnl{Space~Sci.Rev.}}	% Space Science Reviews
+\def\zap{\ref@jnl{ZAp}}			% Zeitschrift fuer Astrophysik
+
+\let\astap=\aap
+\let\apjlett=\apjl
+\let\apjsupp=\apjs
+
+%  ****************************************
+%  *            MISCELLANEOUS             *
+%  ****************************************
+
+% Handy little things everybody works out for themselves anyway.  Many
+% of these come from Springer's A&A package, and some were contributed
+% by Francois Schweizer at DTM.  You can go berserk making these up,
+% especially when you start getting into the composite ones.  We have
+% tried to select a tractable number that were useful, and somewhat
+% difficult to get right because fussy kerning or some such is required.
+% Most can be used in or out of math mode with impunity; \la and \ga
+% are relations and can only be used in math mode.
+
+\def\deg{\hbox{$^\circ$}}
+\def\sun{\hbox{$\odot$}}
+\def\earth{\hbox{$\oplus$}}
+\def\la{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$<$}}}}
+\def\ga{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$>$}}}}
+\def\sq{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+\def\arcmin{\hbox{$^\prime$}}
+\def\arcsec{\hbox{$^{\prime\prime}$}}
+\def\fd{\hbox{$.\!\!^{\rm d}$}}
+\def\fh{\hbox{$.\!\!^{\rm h}$}}
+\def\fm{\hbox{$.\!\!^{\rm m}$}}
+\def\fs{\hbox{$.\!\!^{\rm s}$}}
+\def\fdg{\hbox{$.\!\!^\circ$}}
+\def\farcm{\hbox{$.\mkern-4mu^\prime$}}
+\def\farcs{\hbox{$.\!\!^{\prime\prime}$}}
+\def\fp{\hbox{$.\!\!^{\scriptscriptstyle\rm p}$}}
+\def\micron{\hbox{$\mu$m}}
+
+\def\onehalf{\hbox{$\,^1\!/_2$}}	% Common fractions with solidus
+\def\onethird{\hbox{$\,^1\!/_3$}}
+\def\twothirds{\hbox{$\,^2\!/_3$}}
+\def\onequarter{\hbox{$\,^1\!/_4$}}
+\def\threequarters{\hbox{$\,^3\!/_4$}}
+
+\def\ubvr{\hbox{$U\!BV\!R$}}		% UBVR system
+\def\ub{\hbox{$U\!-\!B$}}		% U-B
+\def\bv{\hbox{$B\!-\!V$}}		% B-V
+\def\vr{\hbox{$V\!-\!R$}}		% V-R
+\def\ur{\hbox{$U\!-\!R$}}		% U-R
+
+% This is a generalization of the \LaTeX definition that comes in LaTeX.
+% The change here ensures that LaTeX will be typeset in the current style,
+% rather than always in roman.
+
+\newcount\lecurrentfam
+\def\LaTeX{\lecurrentfam=\the\fam \leavevmode L\raise.42ex
+        \hbox{$\fam\lecurrentfam\scriptstyle\kern-.3em A$}\kern-.15em\TeX}
+
+%  ****************************************
+%  *           EPS INCLUSIONS             *
+%  ****************************************
+
+% Simplified EPS inclusion macros so we can see how this goes...
+% These are layered on Rokicki's dvips material, and are dependent
+% on the author's use of that DVI driver.
+%
+%    \plotone{EPSFILE}
+%    \plottwo{EPSFILE}{EPSFILE}
+%    \plotfiddle{EPSFILE}{VSIZE}{ROT}{HSF}{VSF}{HTRANS}{VTRANS}
+%
+% \plotone inserts the plot in a space that is \textwidth wide; the
+% plot is scaled so the horizontal dimension fits in the text width,
+% and the vertical dimension is scaled to maintain the aspect ratio.
+% \plottwo inserts two plots next to each other in one \textwidth,
+% sort of like "two-up" mode.
+%
+%    EPSFILE    name of file with EPS
+%
+% The following arguments are for the \plotfiddle macro which formats
+% the \special itself, prepares vspace, etc.  This completely bypasses
+% Rokicki's macros that attempt to rationalize the EPS BoundingBox with
+% the LaTeX page dimensions.
+%
+%    VSIZE      vertical white space to allow for plot
+%    ROT        rotation angle
+%    HSF        horiz scale factor
+%    VSF        vert scale factor
+%    HTRANS     horiz translation
+%    VTRANS     vert translation
+
+%\epsfverbosetrue
+
+\def\plotone#1{\centering \leavevmode
+    \epsfxsize=\textwidth \epsfbox{#1}}
+
+\def\plottwo#1#2{\centering \leavevmode
+    \epsfxsize=.45\textwidth \epsfbox{#1} \hfil
+    \epsfxsize=.45\textwidth \epsfbox{#2}}
+
+\def\plotfiddle#1#2#3#4#5#6#7{\centering \leavevmode
+    \vbox to#2{\rule{0pt}{#2}}
+    \special{psfile=#1 voffset=#7 hoffset=#6 vscale=#5 hscale=#4 angle=#3}}
+
+
+%  ****************************************
+%  *            INITIALIZATION            *
+%  ****************************************
+
+% Permit typesetter to toggle between "author" and "final" styles.
+
+\newif\if@finalstyle \@finalstylefalse
+
+\if@finalstyle
+  \ps@myheadings		% Use running heads defined by auths/eds.
+  \let\ps@title=\ps@paspcstitle	% Include colophon on title page.
+\else
+  \ps@plain			% Use "plain" pagestyle by default.
+  \let\ps@title=\ps@plain	% Title page should always use drop folio.
+\fi
+
+\ds@twoside

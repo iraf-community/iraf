@@ -599,8 +599,6 @@ SEE ALSO
 ,
 .hr system.hdbexamine hdbexamine
 ,
-.hr system.mkmanpage mkmanpage
-,
 .hr system.lroff lroff
 , the online task help documents.
 .endhelp

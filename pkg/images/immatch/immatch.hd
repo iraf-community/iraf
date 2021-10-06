@@ -28,5 +28,5 @@ wcsxymatch	hlp=doc$wcsxymatch.hlp,	src=wcsmatch$t_wcsxymatch.x
 wregister       hlp=doc$wregister.hlp,  src=immatch$wregister.cl
 xregister       hlp=doc$xregister.hlp,  src=xregister$t_xregister.x
 xyxymatch       hlp=doc$xyxymatch.hlp,  src=listmatch$t_xyxymatch.x
+pmmatch         hlp=doc$pmmatch.hlp
 revisions	sys=Revisions
-

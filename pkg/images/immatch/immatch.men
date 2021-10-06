@@ -16,3 +16,4 @@
       wregister - Register 1-D or 2-D images using the image wcs 
       xregister - Register 1-D or 2-D images using x-correlation techniques
       xyxymatch - Match pixel coordinate lists 
+        pmmatch - Pixel mask matching
