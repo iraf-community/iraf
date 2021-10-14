@@ -16,7 +16,6 @@ szprcache	= 4
 
 # IRAF standard system package script task declarations.
 
-task	dbms.pkg	= "dbms$dbms.cl"
 task	dataio.pkg	= "dataio$dataio.cl"
 task	images.pkg	= "images$images.cl"
 task	language.pkg	= "language$language.cl"

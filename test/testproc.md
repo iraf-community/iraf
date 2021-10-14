@@ -59,8 +59,8 @@ di> ?
       apphot   daophot  photcal  ptools
 di> bye
 cl> ?
-      dataio      images      lists       obsolete    proto       system
-      dbms        language    noao        plot        softools    utilities
+      dataio      language    noao        plot        softools    utilities
+      images      lists       obsolete    proto       system
 ```
 
 ## Image files
