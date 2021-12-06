@@ -23,17 +23,17 @@ Changes to the 2.16.1 sources include:
    
    - `noao.digiphot.photcal.fitparams` failed with a segmentation
      fault on 64-bit systems
-     ([iraf.net](http://iraf.net/forum/viewtopic.php?showtopic=1467834))
+     ([iraf.net](https://iraf.net/forum/viewtopic.php?showtopic=1467834))
    
    - The system wide IRAF installation changed the permissions of
      `/tmp/`, creating a major security hole in the system
      (https://iraf-community.github.io/iraf-v216/issues/23)
    
    - On Linux systems, self-compiled tasks gave wrong results
-     ([iraf.net](http://iraf.net/forum/viewtopic.php?showtopic=1467841))
+     ([iraf.net](https://iraf.net/forum/viewtopic.php?showtopic=1467841))
    
    - On modern systems, background execution did not work
-     ([iraf.net](http://iraf.net/forum/viewtopic.php?showtopic=1467431))
+     ([iraf.net](https://iraf.net/forum/viewtopic.php?showtopic=1467431))
 
 * __Fixes to build and run IRAF on non-historic platforms__
 

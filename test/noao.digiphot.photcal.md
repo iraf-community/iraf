@@ -4,7 +4,7 @@ This package has serious 64-bit problems in the original 2.16.1 distribution.
 
 ## fitparams - Compute the parameters of the transformation equations
 
-This issue is created on base of [a forum post in 2013](http://iraf.net/forum/viewtopic.php?showtopic=1467834). Lets take the following minimal observation list:
+This issue is created on base of [a forum post in 2013](https://iraf.net/forum/viewtopic.php?showtopic=1467834). Lets take the following minimal observation list:
 
 File: `sobs.dat`
 ```
