@@ -3,7 +3,7 @@
 ## CL scripts
 
 This is based on [An Introductory User’s Guide to IRAF
-Scripts](http://iraf.noao.edu/iraf/ftp/iraf/docs/script.pdf) by Ed Anderson.
+Scripts](https://iraf-community.github.io/doc/script.pdf) by Ed Anderson.
 
 You will recall that several tasks may be called in sequence on a
 single command line, using a semicolon `;` to separate each command.
@@ -78,7 +78,7 @@ cl> cl < while.cl
 # SPP tasks
 
 This example is taken from a the [slides of a talk by Rob
-Seaman](http://iraf.noao.edu/ftp/docs/spp_intro.pdf).
+Seaman](https://iraf-community.github.io/doc/spp_intro.pdf).
 
 Take a simple program from the test directory:
 
@@ -104,7 +104,7 @@ Hello, world!
 
 ## SPP debugging info
 
-This is a test for [#98](https://github.com/iraf/iraf-v216/pull/98).
+This is a test for [#98](https://iraf-community.github.io/iraf-v216/issues/98).
 
 XC is able to keep the line number of the main file, for
 debugging. This is done with the `-x` flag:
@@ -129,7 +129,7 @@ cl> tail hello.f nlines=22 | head nlines=11
 
 ## Machine dependent limits
 
-This is a test for [#106](https://github.com/iraf/iraf-v216/pull/106).
+This is a test for [#106](https://iraf-community.github.io/iraf-v216/issues/106).
 
 Some limits are defined by the `R1MACH` and `D1MACH` functions. We
 just test some very basic properties of these numbers:
@@ -191,7 +191,7 @@ Simple consistency check passed.
 
 ## ILP64 memory model
 
-This is a test for [#107](https://github.com/iraf/iraf-v216/pull/107).
+This is a test for [#107](https://iraf-community.github.io/iraf-v216/issues/107).
 
 On 64-bit machines, IRAF uses the ILP64 model that makes normal SPP
 `integer` 8 byte wide. `real` values however remain at 4 byte. This
@@ -232,7 +232,7 @@ Should be zero: 0.
 
 ## Loop optimization
 
-This is a test for [#60](https://github.com/iraf/iraf-v216/pull/60).
+This is a test for [#60](https://iraf-community.github.io/iraf-v216/issues/60).
 
 With the original 2.16.1 release, there is a problem with loop
 optimization on "newer" platforms. A simple example task is here:

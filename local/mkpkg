@@ -13,36 +13,3 @@ update:
 strip:
 	!rmfiles -f lib/strip.local
 	;
-
-# SUN/IRAF multiple architecture support.
-# ----------------------------------------
-
-showfloat:				# show current float option
-	$verbose off
-	!$(hlib)/mkfloat
-	;
-f68881:					# install f68881 binaries
-	$verbose off
-	$set DIRS = "lib src"
-	!$(hlib)/mkfloat f68881 -d $(DIRS)
-	;
-ffpa:					# install ffpa binaries
-	$verbose off
-	$set DIRS = "lib src"
-	!$(hlib)/mkfloat ffpa -d $(DIRS)
-	;
-fswitch:				# install fswitch binaries
-	$verbose off
-	$set DIRS = "lib src"
-	!$(hlib)/mkfloat fswitch -d $(DIRS)
-	;
-fsoft:					# install fsoft binaries
-	$verbose off
-	$set DIRS = "lib src"
-	!$(hlib)/mkfloat fsoft -d $(DIRS)
-	;
-sparc:					# install sparc binaries
-	$verbose off
-	$set DIRS = "lib src"
-	!$(hlib)/mkfloat sparc -d $(DIRS)
-	;

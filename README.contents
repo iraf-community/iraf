@@ -1,12 +1,12 @@
 
-	This directory contains the IRAF community snapshot release.  The
-contents of this directory include:
+	This directory contains the IRAF community release.  The
+	contents of this directory include:
 
     LICENSE		Software license information
     Makefile		Top-level makefile
-    README		This file
-    README.install	Installation Notes
-    RELEASE.txt		IRAF v2.16.1 Release Notes
+    README.contents	This file
+    INSTALL.md		Installation Notes
+    RELEASE.md		IRAF Release Notes
     bin			Symbolic link to current system architecture
     dev			IRAF Device definition files
     doc			IRAF System Documentation, release notes, etc
@@ -26,11 +26,12 @@ contents of this directory include:
     vo			VO External Package
 
 
-  o  For Installation instructions see the 'README.install' file in 
+  o  For Installation instructions see the 'INSTALL.md' file in
      this directory.
 
   o  For a summary of what is included in this release see the 'RELEASE.md'
      file in this directory.
 
-  o  For problems or questions, please see http://iraf.net and
+  o  For problems or questions, please see
+     https://github.com/iraf-community/iraf/discussions and
      https://github.com/iraf-community/iraf/issues

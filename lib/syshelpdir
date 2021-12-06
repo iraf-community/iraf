@@ -7,7 +7,6 @@
 
 $artdata	= "pkg$artdata/"
 $astrometry	= "pkg$astrometry/"
-$dbms		= "pkg$dbms/"
 $dataio		= "pkg$dataio/"
 $digiphot	= "pkg$digiphot/"
 $dtoi		= "pkg$dtoi/"

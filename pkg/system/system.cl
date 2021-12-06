@@ -6,7 +6,6 @@ lists
 package	system
 
 task	cmdstr,
-	chkupdate,
 	concatenate,
 	copy,
 	count,
@@ -37,9 +36,10 @@ task	cmdstr,
 
 task	mkscript	= "system$mkscript.cl"; hidetask cmdstr
 task	$bench		= "system$bench.cl"
+task	$chkupdate	= "system$chkupdate.cl"
 
 task	allocate	= "hlib$allocate.cl"
-task	gripes		= "hlib$gripes.cl"
+task	$gripes		= "hlib$gripes.cl"
 task	deallocate	= "hlib$deallocate.cl"
 task	devstatus	= "hlib$devstatus.cl"
 task	$diskspace	= "hlib$diskspace.cl"

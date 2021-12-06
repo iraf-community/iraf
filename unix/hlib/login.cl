@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.16.1+ 2018"
+    logver = "IRAF V2.17 2021"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"

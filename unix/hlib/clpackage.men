@@ -1,5 +1,4 @@
          dataio - Data format conversion package (RFITS, etc.)
-           dbms - Database management package (not yet implemented)
          images - General image processing package
        language - The command language itself
           lists - List processing package

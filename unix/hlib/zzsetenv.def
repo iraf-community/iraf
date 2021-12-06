@@ -40,7 +40,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF community V2.16.1+ snapshot"
+set	version		= "Community IRAF V2.17"
 
 # System directories.
 
@@ -86,7 +86,6 @@ set	vops		= "sys$vops/"
 set	cl		= "pkg$cl/"
 set	clpackage	= "hlib$"
 set	dataio		= "pkg$dataio/"
-set	dbms		= "pkg$dbms/"
 set	images		= "pkg$images/"
 set	language	= "pkg$language/"
 set	lists		= "pkg$lists/"

@@ -1,11 +1,11 @@
 This is compiled from
 
- * [Preliminary Test Procedure for IRAF](http://iraf.noao.edu/iraf/ftp/iraf/docs/testproc.ps.Z),
+ * [Preliminary Test Procedure for IRAF](https://iraf-community.github.io/doc/testproc.pdf),
    IRAF Version V2.11, Jeannette Barnes, Central Computer Services,
    National Optical Astronomy Observatories, P.O. Box 26732, Tucson, AZ
    85726, Revised September 23, 1997,
 
- * [A Beginner's Guide to Using IRAF](http://iraf.noao.edu/iraf/ftp/pub/beguide.ps.Z),
+ * [A Beginner's Guide to Using IRAF](https://iraf-community.github.io/doc/beguide.pdf),
    IRAF Version 2.10, Jeannette Barnes, Central Computer Services, August 1993.
 
 ***
@@ -59,8 +59,8 @@ di> ?
       apphot   daophot  photcal  ptools
 di> bye
 cl> ?
-      dataio      images      lists       obsolete    proto       system
-      dbms        language    noao        plot        softools    utilities
+      dataio      language    noao        plot        softools    utilities
+      images      lists       obsolete    proto       system
 ```
 
 ## Image files
@@ -519,4 +519,4 @@ If discrepancies occur during any of these steps, please look at the
 examples closely. It might be advisable to backtrack a few steps and
 verify things again. If the discrepancies are repeatable there could
 indeed be a problem. Please document the discrepancy and feel free to
-contact us if some advice or help is needed (iraf@noao.edu).
+contact us if some advice or help is needed.

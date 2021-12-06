@@ -3,7 +3,6 @@ files for all IRAF system packages.
 
 	cl		The command language
 	dataio		Data format conversions (FITS, card image, etc.)
-	dbms		Database management utilities
 	images		General image processing and display
 	language	CL language stuff (task, kill, set, etc.)
 	lists		List processing utilities
