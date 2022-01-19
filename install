@@ -853,7 +853,7 @@ BOLD_OFF
 # Edit the $iraf pathname in the .login file for user 'iraf'.
 if [ "$do_system" = 0 ]; then
   ECHO -n "Editing the user login/rc files ...                            "
-  pfiles="$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login $HOME/.cshrc $HOME/.login"
+  pfiles="$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login $HOME/.cshrc $HOME/.login $HOME/.zshrc"
 fi
 for file in ${pfiles}; do
     if [ -e "$file" ]; then
@@ -1270,7 +1270,7 @@ EOF
   fi
 
   if [ "$exec" = "yes" ]; then
-      bfiles="$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login"
+      bfiles="$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login $HOME/.zshrc"
       for file in ${bfiles}; do
 	  if ! grep -qs iraf/setup.sh "$file"; then
 	      if [ -e "$file" ] ; then
