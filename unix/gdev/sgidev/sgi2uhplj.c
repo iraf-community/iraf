@@ -155,7 +155,7 @@ translate (FILE *in, FILE *out)
 	int	n1, swap_bytes;
 	int	n, nlines, length, len_buf;
 	register unsigned char *bp1, *buffer1;
-	char buf_rast [SZ_RAST];
+	char buf_rast [SZ_RAST+1];
 
 
 	swap_bytes = isSwapped ();
@@ -215,7 +215,7 @@ translate (FILE *in, FILE *out)
 static char *
 xyencode (int x, int y)
 {
-    static char obuf [SZ_VECT];
+    static char obuf [SZ_VECT+1];
 
     memset (obuf, 0, SZ_VECT);
     sprintf (obuf, DEV_VECT, x, y);
