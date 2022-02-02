@@ -15,7 +15,7 @@ LS() {
 } ; export LS
 
 
-export IRAF_VERSION="V2.16"
+export IRAF_VERSION="V2.17"
 export V=$(printf "%s" $IRAF_VERSION | cut -c2-5)
 
 export hilite=1
