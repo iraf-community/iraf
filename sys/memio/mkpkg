@@ -6,17 +6,24 @@ $checkin  libsys.a lib$
 $exit
 
 libsys.a:
+	#$set XFLAGS	= "$(XFLAGS) -g"
+
 	begmem.x	<mach.h>
 	calloc.x	
 	coerce.x	<szdtype.inc>
 	kmalloc.x	<config.h>
 	krealloc.x	<config.h> <mach.h>
+	malloc1.x	<mach.h> memio.com
 	malloc.x	<config.h>
-	malloc1.x	<mach.h>
-	mfree.x	
+	merror.x	<error.h> memio.com
+	mfini.x		<config.h> memio.com
+	mfree.x		<error.h> memio.com
+	mgc.x		<mach.h> memio.com
 	mgdptr.x	
 	mgtfwa.x	<config.h> <mach.h>
-	msvfwa.x	
+	mgtlwl.x	<config.h> <mach.h>
+	minit.x		<config.h> memio.com
+	msvfwa.x	<mach.h> memio.com
 	realloc.x	
 	salloc.x	<config.h> <szdtype.inc>
 	sizeof.x	<szdtype.inc>

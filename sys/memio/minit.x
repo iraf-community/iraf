@@ -16,7 +16,7 @@ char	task[ARB]			# task name
 
 int	mgtenv()
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	# Initialize I/O buffers for stdout/stderr.  We do this here to
@@ -107,7 +107,7 @@ end
 
 procedure mio_init ()
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	mgc       = NULL

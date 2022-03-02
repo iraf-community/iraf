@@ -21,7 +21,7 @@ int	bmax                            # current maximum number of pointers
 pointer	mgc				# garbage collection buffer
 
 #  Debug common
-common	/nmemio/ mclear, mwatch, mcollect, mreport, lsentinal, usentinal,
-		 mem_used, max_alloc, nleaked, leaked, nalloc, nfree, 
-		 mdebug, in_task, bmax, mgc
+common	/memio/ mclear, mwatch, mcollect, mreport, lsentinal, usentinal,
+		mem_used, max_alloc, nleaked, leaked, nalloc, nfree, 
+		mdebug, in_task, bmax, mgc
 

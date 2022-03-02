@@ -17,11 +17,11 @@ int	coerce()
 
 begin
 	bufptr = coerce (ptr, dtype, TY_INT)
-	fwa = Memi[bufptr-1]
-	call zlocva (Memi[bufptr-1], locbuf)
+	fwa = Memi[bufptr-5]
+	call zlocva (Memi[bufptr-5], locbuf)
 
-	if (abs (locbuf - fwa) > SZ_VMEMALIGN)
-	    call sys_panic (SYS_MCORRUPTED, "Memory has been corrupted")
+	if (abs (locbuf - fwa) > (6 * SZ_VMEMALIGN))
+	    call sys_panic (SYS_MCORRUPTED, "Memory fwa has been corrupted")
 
 	return (fwa)
 end

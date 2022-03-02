@@ -30,7 +30,7 @@ int	a_nelems		# new size of buffer
 int	a_dtype			# buffer datatype
 
 pointer	dataptr
-int	nelems, dtype, nchars, old_fwa, new_fwa
+int	nelems, dtype, nchars, nuser, old_fwa, new_fwa
 int	char_shift, old_char_offset, new_char_offset
 int	status, locbuf, loc_Mem
 
@@ -50,15 +50,18 @@ begin
 
 	} else {
 	    if (dtype == TY_CHAR)
-		nchars = nelems + 1 + SZ_INT + SZ_MEMALIGN
+		nuser = nelems + 1
 	    else
-		nchars = nelems * sizeof(dtype) + SZ_INT + SZ_MEMALIGN
+		nuser = nelems * sizeof(dtype) + 1
+
+	    nchars = nuser + (8 * SZ_INT) + SZ_MEMALIGN
 	    old_fwa = mgtfwa (ptr, dtype)
 	    new_fwa = old_fwa
 
 	    # Change the buffer size; any error is fatal.
-	    call zraloc (new_fwa, nchars * SZB_CHAR, status)
+	    call zraloc (new_fwa, nchars * SZB_CHAR,  status)
 	    if (status == ERR) {
+		call merror ("Realloc failed\n")
 		ptr = NULL
 		return (ERR)
 	    }
@@ -85,7 +88,11 @@ begin
 	    new_char_offset = (locbuf - new_fwa)
 
 	    # Shift the old data to satisfy the new alignment criteria,
-	    # if necessary.
+	    # if necessary.  
+	    # 
+	    # FIXME -- If the new alloation is smaller than the old pointer,
+	    # 	       we should only copy as much data as will fit in the
+	    #	       new space as per normal unix handling.
 
 	    char_shift = (new_char_offset - old_char_offset)
 	    if (char_shift != 0) {
@@ -96,7 +103,7 @@ begin
 	    # Save the fwa of the OS buffer in the buffer header, and return
 	    # new pointer to user.
 
-	    ptr = msvfwa (new_fwa, dtype, SZ_MEMALIGN, loc_Mem)
+	    ptr = msvfwa (new_fwa, dtype, nelems, SZ_MEMALIGN, loc_Mem)
 	}
 
 	return (OK)

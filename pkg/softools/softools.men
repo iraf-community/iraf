@@ -1,7 +1,6 @@
 	generic - Preprocess a generic source file
      hdbexamine - Examine a help database
 	  lroff - Lroff (line-roff) text formatter
-	 memchk - Process a memdbg mem.log file for errors
       mkapropos - Make the apropos database (from STSDAS).
        mkhelpdb - Make (compile) a help database
 	  mkpkg - Make or update an object library or package

@@ -19,7 +19,6 @@ install:
 	;
 
 libpkg.a:
-	memchk.x        <ctype.h>
 	mktags.x        <ctotok.h> <ctype.h> <error.h>
 	tgutil.x        <ctotok.h> <ctype.h> <error.h>
 	@mkapropos
