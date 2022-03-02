@@ -1,11 +1,9 @@
 #!/bin/sh
 #
-# CL.SH -- Startup the version of the CL executable compiled for the
+# ECL.SH -- Startup the version of the CL executable compiled for the
 # architecture or floating point hardware appropriate for the current
-# machine.  This script can be used to invoke a number of CL flavors 
-# depending on how it is called.  The installation will create a 'cl'
-# and 'ecl' command link to this script with the intent that a different
-# binary would be started for each command.  
+# machine. The installation will create an 'ecl' command link to this
+# script.
 
 # Determine IRAF root directory (value set in install script).
 d_iraf=/iraf/iraf/
@@ -41,18 +39,6 @@ nm=${0##*/}
 
 cl_binary="${bin}ecl.e"
 
-case "$nm" in
-    "cl" | "cl.sh")
-        cl_binary="${bin}cl.e"
-        ;;
-    "ecl" | "ecl.sh")
-        cl_binary="${bin}ecl.e"
-        ;;
-    "vocl" | "vocl.sh")
-        cl_binary="${bin}vocl.e"
-        ;;
-esac
-
 iraf_version=$(grep version\\s  ${iraf}unix/hlib/zzsetenv.def | \
 		   cut -d\" -f2 | cut -d\  -f-3)
 
@@ -66,8 +52,6 @@ while getopts "h?Vcexf:" opt; do
 	echo ''
 	echo 'Arguments:'
 	echo '    -V        print version and exit'
-	echo '    -e        force ecl'
-	echo '    -c        force classic cl'
 	echo '    -x        start in new xgterm (xterm if xgterm is not installed)'
 	echo '    -f file   start with file'
 	echo ''
@@ -77,12 +61,6 @@ while getopts "h?Vcexf:" opt; do
         echo "${iraf_version}"
 	exit 0
         ;;
-    e)
-	cl_binary=${irafbin}ecl.e
-	;;
-    c)
-	cl_binary=${irafbin}cl.e
-	;;
     x)
 	start_x="yes"
 	;;

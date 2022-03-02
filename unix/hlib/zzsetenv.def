@@ -85,7 +85,7 @@ set	vops		= "sys$vops/"
 
 # System package directories.
 
-set	cl		= "pkg$cl/"
+set	cl		= "pkg$ecl/"
 set	clpackage	= "hlib$"
 set	dataio		= "pkg$dataio/"
 set	images		= "pkg$images/"

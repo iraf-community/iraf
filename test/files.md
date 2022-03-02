@@ -4,7 +4,6 @@
 
 ```
 cl> dir bin$*.e ncol=1
-bin$cl.e
 bin$ecl.e
 bin$irafks.e
 bin$x_color.e

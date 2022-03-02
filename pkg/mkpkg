@@ -6,7 +6,6 @@ $ifeq (hostid, unix)  !(date)  $endif
 $exit
 
 update:
-	$call cl
 	$call ecl
 	$call system
 	$call softools
@@ -24,10 +23,6 @@ update:
 	$purge bin$
 	;
 
-cl:
-	$echo "--------------------- CL --------------------------"
-	$call update@cl
-	;
 ecl:
 	$echo "--------------------- ECL -------------------------"
 	$call update@ecl

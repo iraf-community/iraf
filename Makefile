@@ -152,7 +152,6 @@ bindir = $(HOME)/.iraf/bin
 # Create symbolic links for user callable scripts and executables
 binary_links:
 	mkdir -p $(DESTDIR)$(bindir)
-	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/cl
 	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/ecl
 	ln -sf $(hlib)mkiraf.sh $(DESTDIR)$(bindir)/mkiraf
 	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
@@ -186,7 +185,6 @@ install: noao/bin/x_quad.e
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
 	cp -f $(hlib)mkiraf.man $(DESTDIR)$(prefix)/share/man/man1/mkiraf.1
 	cp -f $(hlib)ecl.man $(DESTDIR)$(prefix)/share/man/man1/ecl.1
-	ln -sf ecl.1 $(DESTDIR)$(prefix)/share/man/man1/cl.1
 	cp -f $(host)boot/mkpkg/mkpkg.man $(DESTDIR)$(prefix)/share/man/man1/mkpkg.1
 	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
 	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
