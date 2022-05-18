@@ -39,7 +39,7 @@ if [ -z "$IRAFARCH" ]; then
     IRAFARCH=$mach
 fi
 
-VERSION="v2.16"                         # current IRAF version
+VERSION="v2.17"                         # current IRAF version
 
 defterm="xgterm"			# default terminal type
 do_system=0				# system or personal install?
