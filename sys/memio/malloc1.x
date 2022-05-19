@@ -33,11 +33,31 @@ may not be needed to satisfy the alignment criteria):
 	7		byte 4	"   "    "
 	8		first cell available to user (maximum alignment)
 
+
+New Scheme allowing for 64-bit architectures(10/15/2009):
+
+      offset			allocation
+	
+	 0		start of the physical buffer (from zmaloc)
+	 0-7		alignment space
+	 8-15		bytes 1-8 of saved fwa (address of cell 0)
+	16-23		Bytes 1-8 of upper sentinal location
+	24-31		Bytes 1-8 of pointer type
+	32-39		Bytes 1-8 of nbytes of storage
+	40-47		Bytes 1-8 of lower sentinal value
+	48		first cell available to user (maximum alignment)
+	N+1		Bytes 1-8 of upper sentinal value
+
+   Total storage required is
+
+      [ ((nelems + 1) * sizeof(dtype)) + sz-align + (5 * SZ_INT) ] * SZB_CHAR
+	
+
 MALLOC, given the CHAR address of the buffer allocated by the z-routine,
 adds space for the saved fwa (an integer), and determines the address of the
 next cell which is sufficiently aligned, relative to the Mem common.  This
-cell marks the start of the user buffer area.  The buffer fwa is saved in the
-integer location immediately preceding the "first cell".
+cell marks the start of the user buffer area.  The buffer fwa is saved in an
+integer location preceding the "first cell".
 
 MFREE, called with a pointer to the buffer to be returned, fetches the location
 of the physical buffer from the save area.  If this does not agree with the
@@ -53,6 +73,7 @@ TODO:	- Add debugging routine to summarize allocated buffer space and
 .endhelp ---------------------------------------------------------------------
 
 
+
 # MALLOC1 -- Low level procedure which does the actual buffer allocation.
 
 int procedure malloc1 (output_pointer, nelems, dtype, sz_align, fwa_align)
@@ -63,22 +84,47 @@ int	dtype			# datatype of the storage elements
 int	sz_align		# number of chars of alignment required
 int	fwa_align		# address to which buffer is to be aligned
 
-int	fwa, nchars, status
+int	fwa, nchars, nuser, status
+pointer	cp
+
 int	sizeof()
-pointer	msvfwa()
+pointer	msvfwa(), coerce()
+
+include "memio.com"
 
 begin
 	if (dtype == TY_CHAR)
-	    nchars = nelems + 1 + SZ_INT + sz_align	# add space for EOS
+	    nuser = nelems + 1  			# add space for EOS
 	else
-	    nchars = nelems * sizeof (dtype) + SZ_INT + sz_align
+	    nuser = nelems * sizeof (dtype) + 1
+	nchars = nuser + (8 * SZ_INT) + sz_align
 
-	call zmaloc (fwa, nchars * SZB_CHAR, status)
+	call zmaloc (fwa, (nchars * SZB_CHAR), status)
 
 	if (status == ERR)
 	    return (ERR)
+
 	else {
-	    output_pointer = msvfwa (fwa, dtype, sz_align, fwa_align)
+	    output_pointer = msvfwa (fwa, dtype, nelems, sz_align, fwa_align)
+
+	    if (mclear > 0) {
+		# Clear the user area only.
+	        cp = coerce (output_pointer, dtype, TY_CHAR)
+                call aclrc (Memc[cp], (nuser * SZB_CHAR))
+	    }
+
+	    # Update usage stats.
+	    if (mreport > 0) {
+	        nalloc = nalloc + 1
+	        mem_used = mem_used + (nchars * SZB_CHAR)
+	        if ((nchars * SZB_CHAR) > max_alloc)
+		    max_alloc = (nchars * SZB_CHAR)
+	    }
+
+	    # Save the ptr in the GC buffer.
+	    if (mcollect > 0)
+		call mgc_save (output_pointer, dtype)
+
 	    return (OK)
 	}
 end

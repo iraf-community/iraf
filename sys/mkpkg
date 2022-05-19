@@ -47,9 +47,6 @@ sysgen:
 	# DS is required for cursor readback by the CL.
 	$call ds
 
-	# MEMIO debug library.
-	$call memdbg
-
 	$purge lib$
 	;
 
@@ -157,12 +154,6 @@ ds:
 	$update   libds.a
 	$checkin  libds.a  lib$
 	;
-memdbg:
-	$echo "-------------- LIBMEMDBG  ------------" 
-	$checkout libmemdbg.a  lib$
-	$update   libmemdbg.a
-	$checkin  libmemdbg.a  lib$
-	;
 
 libsys.a:				# Core system
 	@fio	
@@ -171,8 +162,7 @@ libsys.a:				# Core system
 	@clio
 	@etc
 	@gty
-	#@memio
-	@nmemio
+	@memio
 	@mtio
 	@symtab
 	@tty
@@ -254,8 +244,4 @@ libccp.a:				# The CALCOMP graphics kernel
 
 libds.a:				# The DS display interface library
 	@pkg$images/tv/display/mkpkg
-	;
-
-libmemdbg.a:				# The MEMIO debug library
-	@memdbg
 	;

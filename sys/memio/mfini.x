@@ -15,7 +15,7 @@ char 	task[ARB]			# task name
 
 int	sv_report
 
-include	"nmemio.com"
+include	"memio.com"
 
 begin
 	# Do garbage collection.

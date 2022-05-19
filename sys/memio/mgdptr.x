@@ -8,8 +8,7 @@
 pointer procedure mgdptr (fwa, dtype, sz_align, fwa_align)
 
 int	fwa, dtype, sz_align, fwa_align
-#long	bufadr
-int	bufadr
+long	bufadr
 pointer	bufptr
 int	modulus, loc_Mem
 int	sizeof()
@@ -21,9 +20,11 @@ begin
 
 	if (loc_Mem == NULL)
 	    call zlocva (Memc, loc_Mem)
-	bufadr = fwa + SZ_INT
+	bufadr = fwa + (5 * SZ_INT)
 
 	modulus = mod (bufadr - fwa_align, sz_align)
+	if (modulus < 0)
+	    modulus = modulus + sz_align
 	if (modulus != 0)
 	    bufadr = bufadr + (sz_align - modulus)
 

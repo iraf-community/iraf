@@ -33,7 +33,7 @@ define	GC_TYPE			Memi[$1+($2 * 2 + 1)]
 
 procedure mgc_init ()
 
-include "nmemio.com"
+include "memio.com"
 
 begin
        	if (mcollect > 0)
@@ -47,7 +47,7 @@ end
 
 procedure mgc_close ()
 
-include "nmemio.com"
+include "memio.com"
 
 begin
         if (mcollect > 0 && mgc != NULL) {
@@ -66,7 +66,7 @@ int	dtype					#i pointer type
 
 int	i
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (mcollect <= 0 || mgc == NULL)
@@ -104,7 +104,7 @@ pointer	ptr					#i pointer to save
 
 int	i
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (mgc == NULL || in_task == 0)
@@ -137,7 +137,7 @@ pointer	ptr					#i pointer to save
 
 int	i
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (mcollect <= 0 || mgc == NULL)
@@ -160,7 +160,7 @@ pointer	ptr					#i pointer to save
 
 int	i
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (mcollect <= 0 || mgc == NULL)
@@ -185,7 +185,7 @@ pointer	bp
 int	sizeof ()
 pointer	coerce ()
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (mcollect <= 0 || mgc == NULL)

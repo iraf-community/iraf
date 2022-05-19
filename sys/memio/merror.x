@@ -10,7 +10,7 @@ procedure merror (msg)
 
 char	msg[ARB]
 
-include "nmemio.com"
+include "memio.com"
 
 begin
 	if (in_task > 0)
