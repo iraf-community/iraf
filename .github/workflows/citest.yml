@@ -23,8 +23,8 @@ jobs:
             irafarch: linux
             carch: '-m32'
 
-          - name: macOS 10.15 Catalina x86_64
-            os: macos-10.15
+          - name: macOS 12.3.1 Monterey x86_64
+            os: macos-12
             irafarch: macintel
 
     steps:
