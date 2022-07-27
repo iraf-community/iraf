@@ -17,8 +17,6 @@
 static	int lastsig;
 extern	int pr_onint(int usig, int *hwcode, int *scp);
 
-/* #define	vfork	fork */
-
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
 
@@ -63,15 +61,8 @@ ZOSCMD (
 
 	sigaction (SIGINT, NULL, &oldact);
 
-	/* Vfork is faster if we can use it.
-	 */
-	if (*sin == EOS && *sout == EOS && *serr == EOS) {
-	    while ((pid = vfork()) == ERR)
-		sleep (2);
-	} else {
-	    while ((pid =  fork()) == ERR)
-		sleep (2);
-	}
+	while ((pid =  fork()) == ERR)
+	  sleep (2);
 
 	if (pid == 0) {
 	    /* Child.

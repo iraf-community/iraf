@@ -16,7 +16,6 @@
 #include <iraf.h>
 
 extern	int errno;		/* error code returned by the kernel	*/
-/* #define	vfork	fork */
 
 extern void pr_enter (int pid, int inchan, int outchan);
 
@@ -98,13 +97,11 @@ err:	    close (pin[0]);  close (pin[1]);
 	pr_ionbytes[pout[0]] = 0;
 	pr_ionbytes[pout[1]] = 0;
 
-	/* Create child process.  Vfork is used to avoid necessity to copy
-	 * the full address space of the parent, since we are going to overlay
-	 * a new process immediately with Execl anyhow.  The child inherits
-	 * the open stdio files.  The fork can fail if swap space is full or
-	 * if we have too many processes.
+	/* Create child process.  The child inherits the open stdio
+	 * files.  The fork can fail if swap space is full or if we
+	 * have too many processes.
 	 */
-	while ((*pid = vfork()) == ERR) {
+	while ((*pid = fork()) == ERR) {
 	    if (--maxforks == 0) {
 		close (pin[0]);  close (pin[1]);
 		close (pout[0]); close (pout[1]);
