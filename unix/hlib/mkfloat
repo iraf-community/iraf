@@ -63,7 +63,7 @@ DIRS=""
 if [ "$1" = "-d" ]; then
     DIRS=""
     shift
-    while : ; do
+    while "$1" ; do
 	DIRS="$DIRS $1"
 	shift
     done
