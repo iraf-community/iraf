@@ -39,7 +39,6 @@ libex.a:
 	@dbc		# Update image database interface (enhanced).
 	@iki		# Update image kernel interface.
 	@imt		# Update the image template package.
-	#imt.x	
 
 	imaccess.x	
 	imaflp.x	
