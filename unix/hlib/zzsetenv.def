@@ -9,6 +9,8 @@ set	pkglibs		= "hlib$libc/"
 
 #set	nomwcs		= yes
 
+set	use_new_imt	= yes
+
 # Default cache directory.
 set	cache		= "tmp$cache/"
 set	cache_age	= 30
