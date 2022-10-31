@@ -87,7 +87,7 @@ begin
 	# concerned, but we'll branch here to the enhanced list processing
 	# if it is available.
 
-        if (envgetb ("use_vo") && envgetb ("use_new_imt")) 
+        if (envgetb ("use_new_imt"))
 	    return (imxopen (template))
 
 

@@ -474,6 +474,19 @@ cl> imstat @inlist//.2
 cl> imdelete image.*.2.fits
 ```
 
+A common extension can be specified as well in the list with the new
+image opening code (`set use_vo = yes`; see
+[#235](https://github.com/iraf-community/iraf/issues/235)):
+
+```
+cl> imstat @inlist[0]
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+    image.dbl.fits[0]    262144     108.3     131.3       -1.    19936.
+   image.real.fits[0]    262144     108.3     131.3       -1.    19936.
+   image.sect.fits[0]     10201     363.9      346.      108.     7734.
+  image.short.fits[0]    262144     108.3     131.3       -1.    19936.
+```
+
 ## Using the CL as a calculator
 
 The CL has a built-in calculator capability. Some variables that may
