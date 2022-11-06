@@ -394,3 +394,48 @@ begin
         }
 end
 ```
+
+The `generic` has a specific handling for `INDEF`: `INDEF` and
+`IS_INDEF` are replaced with the ones specific for the processed data
+type, while `INDEFR` etc. are kept as they are. Also, `$if` can limit
+the preprocessing.
+
+For example,
+
+File: `geofxy.gx`
+```
+$for (rd)
+procedure geo_fxy$t(fit, sf1)
+pointer fit, sf1
+begin
+$if (datatype == r)
+        if (IS_INDEFD(GM_XO(fit)))
+            call gsset (sf1, GSXREF, INDEF)
+$else
+        call gsset (sf1, GSXREF, INDEF)
+$endif
+end
+$endfor
+```
+
+which produces:
+
+```
+cl> softools
+cl> generic geofxy.gx -o geofxy.x
+cl> type geofxy.x
+
+procedure geo_fxyr(fit, sf1)
+pointer fit, sf1
+begin
+        if (IS_INDEFD(GM_XO(fit)))
+            call gsset (sf1, GSXREF, INDEFR)
+end
+
+procedure geo_fxyd(fit, sf1)
+pointer fit, sf1
+begin
+        call gsset (sf1, GSXREF, INDEFD)
+end
+
+```
