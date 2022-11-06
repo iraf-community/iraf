@@ -39,7 +39,7 @@ W	[ \t]
 PIXEL				outstr (type_string);
 XPIXEL				outstr (xtype_string);
 INDEF				output_indef (type_char);
-INDEF(S|I|L|R|D|X)		ECHO;
+INDEF(S|I|L|R|D|X)		outstr(yytext);
 SZ_PIXEL			output_upper ("SZ_");
 TY_PIXEL			output_upper ("TY_");
 $PIXEL				outstr ("PIXEL");
@@ -79,10 +79,10 @@ $INDEF				outstr ("INDEF");
 "/*"				copy_comment();
 \"				copy_string();
 
-^\#if				ECHO;
-^\#else				ECHO;
-^\#endif			ECHO;
-^\#include			ECHO;
+^\#if				outstr(yytext);;
+^\#else				outstr(yytext);;
+^\#endif			outstr(yytext);;
+^\#include			outstr(yytext);;
 
 \#				copy_line();
 ^\%				copy_line();
