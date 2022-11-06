@@ -28,6 +28,7 @@ generic:
 	$ifolder (icdosetupr.x, icdosetup.gx)	$(GEN) icdosetup.gx $endif
 	$ifolder (icvshowr.x, icvshow.gx)	$(GEN) icvshow.gx $endif
 	$ifolder (icfvshowr.x, icfvshow.gx)	$(GEN) icfvshow.gx $endif
+	$ifolder (iclistr.x, iclist.gx)		$(GEN) iclist.gx $endif
 	;
 
 libxtools.a:

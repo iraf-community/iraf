@@ -30,6 +30,7 @@ tfiles:
 	$ifolder (gserrorsr.x, gserrors.gx)	$(GEN)	gserrors.gx	$endif
 	$ifolder (gsevalr.x, gseval.gx)		$(GEN)	gseval.gx	$endif
 	$ifolder (gsfitr.x, gsfit.gx)		$(GEN)	gsfit.gx	$endif
+	$ifolder (gsfit1r.x, gsfit.gx)		$(GEN)	gsfit1.gx	$endif
 	$ifolder (gsfreer.x, gsfree.gx)		$(GEN)	gsfree.gx	$endif
 	$ifolder (gsgcoeffr.x, gsgcoeff.gx)	$(GEN)	gsgcoeff.gx	$endif
 	$ifolder (gsinitr.x, gsinit.gx)		$(GEN)	gsinit.gx	$endif
