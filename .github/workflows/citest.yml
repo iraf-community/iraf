@@ -35,14 +35,14 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux64'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev
+          sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
 
       - name: Setup dependencies on Ubuntu 32 bit
         if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux'
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -y
-          sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386
+          sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
 
       - name: Setup and build IRAF
         run: |
