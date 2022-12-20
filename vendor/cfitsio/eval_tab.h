@@ -1,23 +1,22 @@
+/* A Bison parser, made by GNU Bison 3.8.  */
 
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* Bison interface for Yacc-like parsers in C
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
-   
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -28,94 +27,85 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
-/* Tokens.  */
-#ifndef FFTOKENTYPE
-# define FFTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum fftokentype {
-     BOOLEAN = 258,
-     LONG = 259,
-     DOUBLE = 260,
-     STRING = 261,
-     BITSTR = 262,
-     FUNCTION = 263,
-     BFUNCTION = 264,
-     IFUNCTION = 265,
-     GTIFILTER = 266,
-     REGFILTER = 267,
-     COLUMN = 268,
-     BCOLUMN = 269,
-     SCOLUMN = 270,
-     BITCOL = 271,
-     ROWREF = 272,
-     NULLREF = 273,
-     SNULLREF = 274,
-     OR = 275,
-     AND = 276,
-     NE = 277,
-     EQ = 278,
-     GTE = 279,
-     LTE = 280,
-     LT = 281,
-     GT = 282,
-     POWER = 283,
-     NOT = 284,
-     FLTCAST = 285,
-     INTCAST = 286,
-     UMINUS = 287,
-     DIFF = 288,
-     ACCUM = 289
-   };
+#ifndef YY_FITS_PARSER_YY_EVAL_TAB_H_INCLUDED
+# define YY_FITS_PARSER_YY_EVAL_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef FITS_PARSER_YYDEBUG
+# if defined YYDEBUG
+#if YYDEBUG
+#   define FITS_PARSER_YYDEBUG 1
+#  else
+#   define FITS_PARSER_YYDEBUG 0
+#  endif
+# else /* ! defined YYDEBUG */
+#  define FITS_PARSER_YYDEBUG 0
+# endif /* ! defined YYDEBUG */
+#endif  /* ! defined FITS_PARSER_YYDEBUG */
+#if FITS_PARSER_YYDEBUG
+extern int fits_parser_yydebug;
 #endif
-/* Tokens.  */
-#define BOOLEAN 258
-#define LONG 259
-#define DOUBLE 260
-#define STRING 261
-#define BITSTR 262
-#define FUNCTION 263
-#define BFUNCTION 264
-#define IFUNCTION 265
-#define GTIFILTER 266
-#define REGFILTER 267
-#define COLUMN 268
-#define BCOLUMN 269
-#define SCOLUMN 270
-#define BITCOL 271
-#define ROWREF 272
-#define NULLREF 273
-#define SNULLREF 274
-#define OR 275
-#define AND 276
-#define NE 277
-#define EQ 278
-#define GTE 279
-#define LTE 280
-#define LT 281
-#define GT 282
-#define POWER 283
-#define NOT 284
-#define FLTCAST 285
-#define INTCAST 286
-#define UMINUS 287
-#define DIFF 288
-#define ACCUM 289
 
+/* Token kinds.  */
+#ifndef FITS_PARSER_YYTOKENTYPE
+# define FITS_PARSER_YYTOKENTYPE
+  enum fits_parser_yytokentype
+  {
+    FITS_PARSER_YYEMPTY = -2,
+    FITS_PARSER_YYEOF = 0,         /* "end of file"  */
+    FITS_PARSER_YYerror = 256,     /* error  */
+    FITS_PARSER_YYUNDEF = 257,     /* "invalid token"  */
+    BOOLEAN = 258,                 /* BOOLEAN  */
+    LONG = 259,                    /* LONG  */
+    DOUBLE = 260,                  /* DOUBLE  */
+    STRING = 261,                  /* STRING  */
+    BITSTR = 262,                  /* BITSTR  */
+    FUNCTION = 263,                /* FUNCTION  */
+    BFUNCTION = 264,               /* BFUNCTION  */
+    IFUNCTION = 265,               /* IFUNCTION  */
+    GTIFILTER = 266,               /* GTIFILTER  */
+    GTIOVERLAP = 267,              /* GTIOVERLAP  */
+    GTIFIND = 268,                 /* GTIFIND  */
+    REGFILTER = 269,               /* REGFILTER  */
+    COLUMN = 270,                  /* COLUMN  */
+    BCOLUMN = 271,                 /* BCOLUMN  */
+    SCOLUMN = 272,                 /* SCOLUMN  */
+    BITCOL = 273,                  /* BITCOL  */
+    ROWREF = 274,                  /* ROWREF  */
+    NULLREF = 275,                 /* NULLREF  */
+    SNULLREF = 276,                /* SNULLREF  */
+    OR = 277,                      /* OR  */
+    AND = 278,                     /* AND  */
+    EQ = 279,                      /* EQ  */
+    NE = 280,                      /* NE  */
+    GT = 281,                      /* GT  */
+    LT = 282,                      /* LT  */
+    LTE = 283,                     /* LTE  */
+    GTE = 284,                     /* GTE  */
+    XOR = 285,                     /* XOR  */
+    POWER = 286,                   /* POWER  */
+    NOT = 287,                     /* NOT  */
+    INTCAST = 288,                 /* INTCAST  */
+    FLTCAST = 289,                 /* FLTCAST  */
+    UMINUS = 290,                  /* UMINUS  */
+    ACCUM = 291,                   /* ACCUM  */
+    DIFF = 292                     /* DIFF  */
+  };
+  typedef enum fits_parser_yytokentype fits_parser_yytoken_kind_t;
+#endif
 
-
-
-#if ! defined FFSTYPE && ! defined FFSTYPE_IS_DECLARED
-typedef union FFSTYPE
+/* Value type.  */
+#if ! defined FITS_PARSER_YYSTYPE && ! defined FITS_PARSER_YYSTYPE_IS_DECLARED
+union FITS_PARSER_YYSTYPE
 {
-
-/* Line 1676 of yacc.c  */
-#line 192 "eval.y"
+#line 212 "eval.y"
 
     int    Node;        /* Index of Node */
     double dbl;         /* real value    */
@@ -123,16 +113,18 @@ typedef union FFSTYPE
     char   log;         /* logical value */
     char   str[MAX_STRLEN];    /* string value  */
 
+#line 117 "eval_tab.h"
 
-
-/* Line 1676 of yacc.c  */
-#line 130 "y.tab.h"
-} FFSTYPE;
-# define FFSTYPE_IS_TRIVIAL 1
-# define ffstype FFSTYPE /* obsolescent; will be withdrawn */
-# define FFSTYPE_IS_DECLARED 1
+};
+typedef union FITS_PARSER_YYSTYPE FITS_PARSER_YYSTYPE;
+# define FITS_PARSER_YYSTYPE_IS_TRIVIAL 1
+# define FITS_PARSER_YYSTYPE_IS_DECLARED 1
 #endif
 
-extern FFSTYPE fflval;
 
 
+
+int fits_parser_yyparse (yyscan_t scanner, ParseData *lParse);
+
+
+#endif /* !YY_FITS_PARSER_YY_EVAL_TAB_H_INCLUDED  */

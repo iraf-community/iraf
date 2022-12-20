@@ -1,23 +1,22 @@
+/* A Bison parser, made by GNU Bison 3.8.  */
 
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* Bison implementation for Yacc-like parsers in C
 
-/* Skeleton implementation for Bison's Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
-   
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -28,52 +27,54 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
 /* C LALR(1) parser skeleton written by Richard Stallman, by
    simplifying the original so-called "semantic" parser.  */
 
-/* All symbols defined below should begin with ff or FF, to avoid
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+/* All symbols defined below should begin with yy or YY, to avoid
    infringing on user name space.  This should be done even for local
    variables, as they might otherwise be expanded by user macros.
    There are some unavoidable exceptions within include files to
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
-/* Identify Bison output.  */
-#define FFBISON 1
+/* Identify Bison output, and Bison version.  */
+#define YYBISON 30800
 
-/* Bison version.  */
-#define FFBISON_VERSION "2.4.1"
+/* Bison version string.  */
+#define YYBISON_VERSION "3.8"
 
 /* Skeleton name.  */
-#define FFSKELETON_NAME "yacc.c"
+#define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define FFPURE 0
+#define YYPURE 2
 
 /* Push parsers.  */
-#define FFPUSH 0
+#define YYPUSH 0
 
 /* Pull parsers.  */
-#define FFPULL 1
+#define YYPULL 1
 
-/* Using locations.  */
-#define FFLSP_NEEDED 0
+/* Substitute the type names.  */
+#define YYSTYPE         FITS_PARSER_YYSTYPE
+/* Substitute the variable and function names.  */
+#define yyparse         fits_parser_yyparse
+#define yylex           fits_parser_yylex
+#define yyerror         fits_parser_yyerror
+#define yydebug         fits_parser_yydebug
+#define yynerrs         fits_parser_yynerrs
 
+/* First part of user prologue.  */
+#line 16 "eval.y"
 
-
-/* Copy the first part of user declarations.  */
-
-/* Line 189 of yacc.c  */
-#line 1 "eval.y"
-
-/************************************************************************/
-/*                                                                      */
-/*                       CFITSIO Lexical Parser                         */
-/*                                                                      */
 /* This file is one of 3 files containing code which parses an          */
 /* arithmetic expression and evaluates it in the context of an input    */
 /* FITS file table extension.  The CFITSIO lexical parser is divided    */
@@ -134,6 +135,9 @@
 /*                              determine the output dimensions         */
 /*  Craig B Markwardt Aug 2009  Add substring STRMID() and string search*/
 /*                              STRSTR() functions; more overflow checks*/
+/*  Craig B Markwardt Dec 2019  Add bit/hex/oct literal strings and     */
+/*                              bitwise operatiosn between integers     */
+/*  Craig B Markwardt Mar 2021  Add SETNULL() function                  */
 /*                                                                      */
 /************************************************************************/
 
@@ -153,7 +157,7 @@
 
    /*  Shrink the initial stack depth to keep local data <32K (mac limit)  */
    /*  yacc will allocate more space if needed, though.                    */
-#define  FFINITDEPTH   100
+#define  YYINITDEPTH   100
 
 /***************************************************************/
 /*  Replace Bison's BACKUP macro with one that fixes a bug --  */
@@ -161,32 +165,32 @@
 /*  popping multiple terms at one time.                        */
 /***************************************************************/
 
-#define FFNEWBACKUP(token, value)                               \
+#define YYNEWBACKUP(token, value)                               \
    do								\
-     if (ffchar == FFEMPTY )   					\
-       { ffchar = (token);                                      \
-         memcpy( &fflval, &(value), sizeof(value) );            \
-         ffchar1 = FFTRANSLATE (ffchar);			\
-         while (fflen--) FFPOPSTACK;				\
-         ffstate = *ffssp;					\
-         goto ffbackup;						\
+     if (yychar == YYEMPTY )   					\
+       { yychar = (token);                                      \
+         memcpy( &yylval, &(value), sizeof(value) );            \
+         yychar1 = YYTRANSLATE (yychar);			\
+         while (yylen--) YYPOPSTACK;				\
+         yystate = *yyssp;					\
+         goto yybackup;						\
        }							\
      else							\
-       { fferror ("syntax error: cannot back up"); FFERROR; }	\
+       { yyerror ("syntax error: cannot back up"); YYERROR; }	\
    while (0)
 
 /***************************************************************/
 /*  Useful macros for accessing/testing Nodes                  */
 /***************************************************************/
 
-#define TEST(a)        if( (a)<0 ) FFERROR
-#define SIZE(a)        gParse.Nodes[ a ].value.nelem
-#define TYPE(a)        gParse.Nodes[ a ].type
-#define OPER(a)        gParse.Nodes[ a ].operation
+#define TEST(a)        if( (a)<0 ) YYERROR
+#define SIZE(a)        lParse->Nodes[ a ].value.nelem
+#define TYPE(a)        lParse->Nodes[ a ].type
+#define OPER(a)        lParse->Nodes[ a ].operation
 #define PROMOTE(a,b)   if( TYPE(a) > TYPE(b) )                  \
-                          b = New_Unary( TYPE(a), 0, b );       \
+                          b = New_Unary( lParse, TYPE(a), 0, b );       \
                        else if( TYPE(a) < TYPE(b) )             \
-	                  a = New_Unary( TYPE(b), 0, a );
+	                  a = New_Unary( lParse, TYPE(b), 0, a );
 
 /*****  Internal functions  *****/
 
@@ -194,47 +198,53 @@
 extern "C" {
 #endif
 
-static int  Alloc_Node    ( void );
-static void Free_Last_Node( void );
-static void Evaluate_Node ( int thisNode );
+static int  Alloc_Node    ( ParseData * );
+static void Free_Last_Node( ParseData * );
+static void Evaluate_Node ( ParseData *, int thisNode );
 
-static int  New_Const ( int returnType, void *value, long len );
-static int  New_Column( int ColNum );
-static int  New_Offset( int ColNum, int offset );
-static int  New_Unary ( int returnType, int Op, int Node1 );
-static int  New_BinOp ( int returnType, int Node1, int Op, int Node2 );
-static int  New_Func  ( int returnType, funcOp Op, int nNodes,
+static int  New_Const ( ParseData *, int returnType, void *value, long len );
+static int  New_Column( ParseData *, int ColNum );
+static int  New_Offset( ParseData *, int ColNum, int offset );
+static int  New_Unary ( ParseData *, int returnType, int Op, int Node1 );
+static int  New_BinOp ( ParseData *, int returnType, int Node1, int Op, int Node2 );
+static int  New_Func  ( ParseData *, int returnType, funcOp Op, int nNodes,
 			int Node1, int Node2, int Node3, int Node4, 
 			int Node5, int Node6, int Node7 );
-static int  New_FuncSize( int returnType, funcOp Op, int nNodes,
+static int  New_FuncSize( ParseData *, int returnType, funcOp Op, int nNodes,
 			int Node1, int Node2, int Node3, int Node4, 
 			  int Node5, int Node6, int Node7, int Size);
-static int  New_Deref ( int Var,  int nDim,
+static int  New_Deref ( ParseData *, int Var,  int nDim,
 			int Dim1, int Dim2, int Dim3, int Dim4, int Dim5 );
-static int  New_GTI   ( char *fname, int Node1, char *start, char *stop );
-static int  New_REG   ( char *fname, int NodeX, int NodeY, char *colNames );
-static int  New_Vector( int subNode );
-static int  Close_Vec ( int vecNode );
-static int  Locate_Col( Node *this );
-static int  Test_Dims ( int Node1, int Node2 );
-static void Copy_Dims ( int Node1, int Node2 );
+static int  New_GTI   ( ParseData *, funcOp Op, char *fname, int Node1, int Node2, char *start, char *stop );
+static int  New_REG   ( ParseData *, char *fname, int NodeX, int NodeY, char *colNames );
+static int  New_Vector( ParseData *, int subNode );
+static int  Close_Vec ( ParseData *, int vecNode );
+static int  New_Array(  ParseData *, int valueNode, int dimNode );
+static int  Locate_Col( ParseData *, Node *this );
+static int  Test_Dims ( ParseData *, int Node1, int Node2 );
+static void Copy_Dims ( ParseData *, int Node1, int Node2 );
 
-static void Allocate_Ptrs( Node *this );
-static void Do_Unary     ( Node *this );
-static void Do_Offset    ( Node *this );
-static void Do_BinOp_bit ( Node *this );
-static void Do_BinOp_str ( Node *this );
-static void Do_BinOp_log ( Node *this );
-static void Do_BinOp_lng ( Node *this );
-static void Do_BinOp_dbl ( Node *this );
-static void Do_Func      ( Node *this );
-static void Do_Deref     ( Node *this );
-static void Do_GTI       ( Node *this );
-static void Do_REG       ( Node *this );
-static void Do_Vector    ( Node *this );
+static void Allocate_Ptrs( ParseData *, Node *this );
+static void Do_Unary     ( ParseData *, Node *this );
+static void Do_Offset    ( ParseData *, Node *this );
+static void Do_BinOp_bit ( ParseData *, Node *this );
+static void Do_BinOp_str ( ParseData *, Node *this );
+static void Do_BinOp_log ( ParseData *, Node *this );
+static void Do_BinOp_lng ( ParseData *, Node *this );
+static void Do_BinOp_dbl ( ParseData *, Node *this );
+static void Do_Func      ( ParseData *, Node *this );
+static void Do_Deref     ( ParseData *, Node *this );
+static void Do_GTI       ( ParseData *, Node *this );
+static void Do_GTI_Over  ( ParseData *, Node *this );
+static void Do_REG       ( ParseData *, Node *this );
+static void Do_Vector    ( ParseData *, Node *this );
+static void Do_Array     ( ParseData *, Node *this );
 
 static long Search_GTI   ( double evtTime, long nGTI, double *start,
-			   double *stop, int ordered );
+			   double *stop, int ordered, long *nextGTI );
+static double GTI_Over(double evtStart, double evtStop,
+		       long nGTI, double *start, double *stop,
+		       long *gtiout);
 
 static char  saobox (double xcen, double ycen, double xwid, double ywid,
 		     double rot,  double xcol, double ycol);
@@ -249,393 +259,476 @@ static char  bitlgte(char *bits1, int oper, char *bits2);
 static void  bitand(char *result, char *bitstrm1, char *bitstrm2);
 static void  bitor (char *result, char *bitstrm1, char *bitstrm2);
 static void  bitnot(char *result, char *bits);
-static int cstrmid(char *dest_str, int dest_len,
+static int cstrmid(ParseData *lParse, char *dest_str, int dest_len,
 		   char *src_str,  int src_len, int pos);
 
-static void  fferror(char *msg);
+static void yyerror(yyscan_t scanner, ParseData *lParse, char *s);
 
 #ifdef __cplusplus
     }
 #endif
 
 
+#line 273 "eval_y.c"
 
-/* Line 189 of yacc.c  */
-#line 265 "y.tab.c"
+# ifndef YY_CAST
+#  ifdef __cplusplus
+#   define YY_CAST(Type, Val) static_cast<Type> (Val)
+#   define YY_REINTERPRET_CAST(Type, Val) reinterpret_cast<Type> (Val)
+#  else
+#   define YY_CAST(Type, Val) ((Type) (Val))
+#   define YY_REINTERPRET_CAST(Type, Val) ((Type) (Val))
+#  endif
+# endif
+# ifndef YY_NULLPTR
+#  if defined __cplusplus
+#   if 201103L <= __cplusplus
+#    define YY_NULLPTR nullptr
+#   else
+#    define YY_NULLPTR 0
+#   endif
+#  else
+#   define YY_NULLPTR ((void*)0)
+#  endif
+# endif
 
-/* Enabling traces.  */
-#ifndef FFDEBUG
-# define FFDEBUG 0
-#endif
-
-/* Enabling verbose error messages.  */
-#ifdef FFERROR_VERBOSE
-# undef FFERROR_VERBOSE
-# define FFERROR_VERBOSE 1
-#else
-# define FFERROR_VERBOSE 0
-#endif
-
-/* Enabling the token table.  */
-#ifndef FFTOKEN_TABLE
-# define FFTOKEN_TABLE 0
-#endif
-
-
-/* Tokens.  */
-#ifndef FFTOKENTYPE
-# define FFTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum fftokentype {
-     BOOLEAN = 258,
-     LONG = 259,
-     DOUBLE = 260,
-     STRING = 261,
-     BITSTR = 262,
-     FUNCTION = 263,
-     BFUNCTION = 264,
-     IFUNCTION = 265,
-     GTIFILTER = 266,
-     REGFILTER = 267,
-     COLUMN = 268,
-     BCOLUMN = 269,
-     SCOLUMN = 270,
-     BITCOL = 271,
-     ROWREF = 272,
-     NULLREF = 273,
-     SNULLREF = 274,
-     OR = 275,
-     AND = 276,
-     NE = 277,
-     EQ = 278,
-     GTE = 279,
-     LTE = 280,
-     LT = 281,
-     GT = 282,
-     POWER = 283,
-     NOT = 284,
-     FLTCAST = 285,
-     INTCAST = 286,
-     UMINUS = 287,
-     DIFF = 288,
-     ACCUM = 289
-   };
-#endif
-/* Tokens.  */
-#define BOOLEAN 258
-#define LONG 259
-#define DOUBLE 260
-#define STRING 261
-#define BITSTR 262
-#define FUNCTION 263
-#define BFUNCTION 264
-#define IFUNCTION 265
-#define GTIFILTER 266
-#define REGFILTER 267
-#define COLUMN 268
-#define BCOLUMN 269
-#define SCOLUMN 270
-#define BITCOL 271
-#define ROWREF 272
-#define NULLREF 273
-#define SNULLREF 274
-#define OR 275
-#define AND 276
-#define NE 277
-#define EQ 278
-#define GTE 279
-#define LTE 280
-#define LT 281
-#define GT 282
-#define POWER 283
-#define NOT 284
-#define FLTCAST 285
-#define INTCAST 286
-#define UMINUS 287
-#define DIFF 288
-#define ACCUM 289
-
-
-
-
-#if ! defined FFSTYPE && ! defined FFSTYPE_IS_DECLARED
-typedef union FFSTYPE
+#include "eval_tab.h"
+/* Symbol kind.  */
+enum yysymbol_kind_t
 {
+  YYSYMBOL_YYEMPTY = -2,
+  YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
+  YYSYMBOL_YYerror = 1,                    /* error  */
+  YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
+  YYSYMBOL_BOOLEAN = 3,                    /* BOOLEAN  */
+  YYSYMBOL_LONG = 4,                       /* LONG  */
+  YYSYMBOL_DOUBLE = 5,                     /* DOUBLE  */
+  YYSYMBOL_STRING = 6,                     /* STRING  */
+  YYSYMBOL_BITSTR = 7,                     /* BITSTR  */
+  YYSYMBOL_FUNCTION = 8,                   /* FUNCTION  */
+  YYSYMBOL_BFUNCTION = 9,                  /* BFUNCTION  */
+  YYSYMBOL_IFUNCTION = 10,                 /* IFUNCTION  */
+  YYSYMBOL_GTIFILTER = 11,                 /* GTIFILTER  */
+  YYSYMBOL_GTIOVERLAP = 12,                /* GTIOVERLAP  */
+  YYSYMBOL_GTIFIND = 13,                   /* GTIFIND  */
+  YYSYMBOL_REGFILTER = 14,                 /* REGFILTER  */
+  YYSYMBOL_COLUMN = 15,                    /* COLUMN  */
+  YYSYMBOL_BCOLUMN = 16,                   /* BCOLUMN  */
+  YYSYMBOL_SCOLUMN = 17,                   /* SCOLUMN  */
+  YYSYMBOL_BITCOL = 18,                    /* BITCOL  */
+  YYSYMBOL_ROWREF = 19,                    /* ROWREF  */
+  YYSYMBOL_NULLREF = 20,                   /* NULLREF  */
+  YYSYMBOL_SNULLREF = 21,                  /* SNULLREF  */
+  YYSYMBOL_22_ = 22,                       /* ','  */
+  YYSYMBOL_23_ = 23,                       /* '='  */
+  YYSYMBOL_24_ = 24,                       /* ':'  */
+  YYSYMBOL_25_ = 25,                       /* '{'  */
+  YYSYMBOL_26_ = 26,                       /* '}'  */
+  YYSYMBOL_27_ = 27,                       /* '?'  */
+  YYSYMBOL_OR = 28,                        /* OR  */
+  YYSYMBOL_AND = 29,                       /* AND  */
+  YYSYMBOL_EQ = 30,                        /* EQ  */
+  YYSYMBOL_NE = 31,                        /* NE  */
+  YYSYMBOL_32_ = 32,                       /* '~'  */
+  YYSYMBOL_GT = 33,                        /* GT  */
+  YYSYMBOL_LT = 34,                        /* LT  */
+  YYSYMBOL_LTE = 35,                       /* LTE  */
+  YYSYMBOL_GTE = 36,                       /* GTE  */
+  YYSYMBOL_37_ = 37,                       /* '+'  */
+  YYSYMBOL_38_ = 38,                       /* '-'  */
+  YYSYMBOL_39_ = 39,                       /* '%'  */
+  YYSYMBOL_40_ = 40,                       /* '*'  */
+  YYSYMBOL_41_ = 41,                       /* '/'  */
+  YYSYMBOL_42_ = 42,                       /* '|'  */
+  YYSYMBOL_43_ = 43,                       /* '&'  */
+  YYSYMBOL_XOR = 44,                       /* XOR  */
+  YYSYMBOL_POWER = 45,                     /* POWER  */
+  YYSYMBOL_NOT = 46,                       /* NOT  */
+  YYSYMBOL_INTCAST = 47,                   /* INTCAST  */
+  YYSYMBOL_FLTCAST = 48,                   /* FLTCAST  */
+  YYSYMBOL_UMINUS = 49,                    /* UMINUS  */
+  YYSYMBOL_50_ = 50,                       /* '['  */
+  YYSYMBOL_ACCUM = 51,                     /* ACCUM  */
+  YYSYMBOL_DIFF = 52,                      /* DIFF  */
+  YYSYMBOL_53_n_ = 53,                     /* '\n'  */
+  YYSYMBOL_54_ = 54,                       /* ']'  */
+  YYSYMBOL_55_ = 55,                       /* '('  */
+  YYSYMBOL_56_ = 56,                       /* ')'  */
+  YYSYMBOL_YYACCEPT = 57,                  /* $accept  */
+  YYSYMBOL_lines = 58,                     /* lines  */
+  YYSYMBOL_line = 59,                      /* line  */
+  YYSYMBOL_bvector = 60,                   /* bvector  */
+  YYSYMBOL_vector = 61,                    /* vector  */
+  YYSYMBOL_expr = 62,                      /* expr  */
+  YYSYMBOL_bexpr = 63,                     /* bexpr  */
+  YYSYMBOL_bits = 64,                      /* bits  */
+  YYSYMBOL_sexpr = 65                      /* sexpr  */
+};
+typedef enum yysymbol_kind_t yysymbol_kind_t;
 
-/* Line 214 of yacc.c  */
-#line 192 "eval.y"
-
-    int    Node;        /* Index of Node */
-    double dbl;         /* real value    */
-    long   lng;         /* integer value */
-    char   log;         /* logical value */
-    char   str[MAX_STRLEN];    /* string value  */
 
 
-
-/* Line 214 of yacc.c  */
-#line 379 "y.tab.c"
-} FFSTYPE;
-# define FFSTYPE_IS_TRIVIAL 1
-# define ffstype FFSTYPE /* obsolescent; will be withdrawn */
-# define FFSTYPE_IS_DECLARED 1
-#endif
-
-
-/* Copy the second part of user declarations.  */
-
-
-/* Line 264 of yacc.c  */
-#line 391 "y.tab.c"
 
 #ifdef short
 # undef short
 #endif
 
-#ifdef FFTYPE_UINT8
-typedef FFTYPE_UINT8 fftype_uint8;
-#else
-typedef unsigned char fftype_uint8;
-#endif
+/* On compilers that do not define __PTRDIFF_MAX__ etc., make sure
+   <limits.h> and (if available) <stdint.h> are included
+   so that the code can choose integer types of a good width.  */
 
-#ifdef FFTYPE_INT8
-typedef FFTYPE_INT8 fftype_int8;
-#elif (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-typedef signed char fftype_int8;
-#else
-typedef short int fftype_int8;
-#endif
-
-#ifdef FFTYPE_UINT16
-typedef FFTYPE_UINT16 fftype_uint16;
-#else
-typedef unsigned short int fftype_uint16;
-#endif
-
-#ifdef FFTYPE_INT16
-typedef FFTYPE_INT16 fftype_int16;
-#else
-typedef short int fftype_int16;
-#endif
-
-#ifndef FFSIZE_T
-# ifdef __SIZE_TYPE__
-#  define FFSIZE_T __SIZE_TYPE__
-# elif defined size_t
-#  define FFSIZE_T size_t
-# elif ! defined FFSIZE_T && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-#  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
-#  define FFSIZE_T size_t
-# else
-#  define FFSIZE_T unsigned int
+#ifndef __PTRDIFF_MAX__
+# include <limits.h> /* INFRINGES ON USER NAME SPACE */
+# if defined __STDC_VERSION__ && 199901 <= __STDC_VERSION__
+#  include <stdint.h> /* INFRINGES ON USER NAME SPACE */
+#  define YY_STDINT_H
 # endif
 #endif
 
-#define FFSIZE_MAXIMUM ((FFSIZE_T) -1)
+/* Narrow types that promote to a signed type and that can represent a
+   signed or unsigned integer of at least N bits.  In tables they can
+   save space and decrease cache pressure.  Promoting to a signed type
+   helps avoid bugs in integer arithmetic.  */
 
-#ifndef FF_
-# if FFENABLE_NLS
+#ifdef __INT_LEAST8_MAX__
+typedef __INT_LEAST8_TYPE__ yytype_int8;
+#elif defined YY_STDINT_H
+typedef int_least8_t yytype_int8;
+#else
+typedef signed char yytype_int8;
+#endif
+
+#ifdef __INT_LEAST16_MAX__
+typedef __INT_LEAST16_TYPE__ yytype_int16;
+#elif defined YY_STDINT_H
+typedef int_least16_t yytype_int16;
+#else
+typedef short yytype_int16;
+#endif
+
+/* Work around bug in HP-UX 11.23, which defines these macros
+   incorrectly for preprocessor constants.  This workaround can likely
+   be removed in 2023, as HPE has promised support for HP-UX 11.23
+   (aka HP-UX 11i v2) only through the end of 2022; see Table 2 of
+   <https://h20195.www2.hpe.com/V2/getpdf.aspx/4AA4-7673ENW.pdf>.  */
+#ifdef __hpux
+# undef UINT_LEAST8_MAX
+# undef UINT_LEAST16_MAX
+# define UINT_LEAST8_MAX 255
+# define UINT_LEAST16_MAX 65535
+#endif
+
+#if defined __UINT_LEAST8_MAX__ && __UINT_LEAST8_MAX__ <= __INT_MAX__
+typedef __UINT_LEAST8_TYPE__ yytype_uint8;
+#elif (!defined __UINT_LEAST8_MAX__ && defined YY_STDINT_H \
+       && UINT_LEAST8_MAX <= INT_MAX)
+typedef uint_least8_t yytype_uint8;
+#elif !defined __UINT_LEAST8_MAX__ && UCHAR_MAX <= INT_MAX
+typedef unsigned char yytype_uint8;
+#else
+typedef short yytype_uint8;
+#endif
+
+#if defined __UINT_LEAST16_MAX__ && __UINT_LEAST16_MAX__ <= __INT_MAX__
+typedef __UINT_LEAST16_TYPE__ yytype_uint16;
+#elif (!defined __UINT_LEAST16_MAX__ && defined YY_STDINT_H \
+       && UINT_LEAST16_MAX <= INT_MAX)
+typedef uint_least16_t yytype_uint16;
+#elif !defined __UINT_LEAST16_MAX__ && USHRT_MAX <= INT_MAX
+typedef unsigned short yytype_uint16;
+#else
+typedef int yytype_uint16;
+#endif
+
+#ifndef YYPTRDIFF_T
+# if defined __PTRDIFF_TYPE__ && defined __PTRDIFF_MAX__
+#  define YYPTRDIFF_T __PTRDIFF_TYPE__
+#  define YYPTRDIFF_MAXIMUM __PTRDIFF_MAX__
+# elif defined PTRDIFF_MAX
+#  ifndef ptrdiff_t
+#   include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#  endif
+#  define YYPTRDIFF_T ptrdiff_t
+#  define YYPTRDIFF_MAXIMUM PTRDIFF_MAX
+# else
+#  define YYPTRDIFF_T long
+#  define YYPTRDIFF_MAXIMUM LONG_MAX
+# endif
+#endif
+
+#ifndef YYSIZE_T
+# ifdef __SIZE_TYPE__
+#  define YYSIZE_T __SIZE_TYPE__
+# elif defined size_t
+#  define YYSIZE_T size_t
+# elif defined __STDC_VERSION__ && 199901 <= __STDC_VERSION__
+#  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#  define YYSIZE_T size_t
+# else
+#  define YYSIZE_T unsigned
+# endif
+#endif
+
+#define YYSIZE_MAXIMUM                                  \
+  YY_CAST (YYPTRDIFF_T,                                 \
+           (YYPTRDIFF_MAXIMUM < YY_CAST (YYSIZE_T, -1)  \
+            ? YYPTRDIFF_MAXIMUM                         \
+            : YY_CAST (YYSIZE_T, -1)))
+
+#define YYSIZEOF(X) YY_CAST (YYPTRDIFF_T, sizeof (X))
+
+
+/* Stored state numbers (used for stacks). */
+typedef yytype_int16 yy_state_t;
+
+/* State numbers in computations.  */
+typedef int yy_state_fast_t;
+
+#ifndef YY_
+# if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define FF_(msgid) dgettext ("bison-runtime", msgid)
+#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
 #  endif
 # endif
-# ifndef FF_
-#  define FF_(msgid) msgid
+# ifndef YY_
+#  define YY_(Msgid) Msgid
+# endif
+#endif
+
+
+#ifndef YY_ATTRIBUTE_PURE
+# if defined __GNUC__ && 2 < __GNUC__ + (96 <= __GNUC_MINOR__)
+#  define YY_ATTRIBUTE_PURE __attribute__ ((__pure__))
+# else
+#  define YY_ATTRIBUTE_PURE
+# endif
+#endif
+
+#ifndef YY_ATTRIBUTE_UNUSED
+# if defined __GNUC__ && 2 < __GNUC__ + (7 <= __GNUC_MINOR__)
+#  define YY_ATTRIBUTE_UNUSED __attribute__ ((__unused__))
+# else
+#  define YY_ATTRIBUTE_UNUSED
 # endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define FFUSE(e) ((void) (e))
+# define YY_USE(E) ((void) (E))
 #else
-# define FFUSE(e) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
-/* Identity function, used to suppress warnings about constant conditions.  */
-#ifndef lint
-# define FFID(n) (n)
+/* Suppress an incorrect diagnostic about yylval being uninitialized.  */
+#if defined __GNUC__ && ! defined __ICC && 406 <= __GNUC__ * 100 + __GNUC_MINOR__
+# if __GNUC__ * 100 + __GNUC_MINOR__ < 407
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")
+# else
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")              \
+    _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# endif
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END      \
+    _Pragma ("GCC diagnostic pop")
 #else
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static int
-FFID (int ffi)
-#else
-static int
-FFID (ffi)
-    int ffi;
+# define YY_INITIAL_VALUE(Value) Value
 #endif
-{
-  return ffi;
-}
+#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END
+#endif
+#ifndef YY_INITIAL_VALUE
+# define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
-#if ! defined ffoverflow || FFERROR_VERBOSE
+#if defined __cplusplus && defined __GNUC__ && ! defined __ICC && 6 <= __GNUC__
+# define YY_IGNORE_USELESS_CAST_BEGIN                          \
+    _Pragma ("GCC diagnostic push")                            \
+    _Pragma ("GCC diagnostic ignored \"-Wuseless-cast\"")
+# define YY_IGNORE_USELESS_CAST_END            \
+    _Pragma ("GCC diagnostic pop")
+#endif
+#ifndef YY_IGNORE_USELESS_CAST_BEGIN
+# define YY_IGNORE_USELESS_CAST_BEGIN
+# define YY_IGNORE_USELESS_CAST_END
+#endif
+
+
+#define YY_ASSERT(E) ((void) (0 && (E)))
+
+#if !defined yyoverflow
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
-# ifdef FFSTACK_USE_ALLOCA
-#  if FFSTACK_USE_ALLOCA
+# ifdef YYSTACK_USE_ALLOCA
+#  if YYSTACK_USE_ALLOCA
 #   ifdef __GNUC__
-#    define FFSTACK_ALLOC __builtin_alloca
+#    define YYSTACK_ALLOC __builtin_alloca
 #   elif defined __BUILTIN_VA_ARG_INCR
 #    include <alloca.h> /* INFRINGES ON USER NAME SPACE */
 #   elif defined _AIX
-#    define FFSTACK_ALLOC __alloca
+#    define YYSTACK_ALLOC __alloca
 #   elif defined _MSC_VER
 #    include <malloc.h> /* INFRINGES ON USER NAME SPACE */
 #    define alloca _alloca
 #   else
-#    define FFSTACK_ALLOC alloca
-#    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#    define YYSTACK_ALLOC alloca
+#    if ! defined _ALLOCA_H && ! defined EXIT_SUCCESS
 #     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#     ifndef _STDLIB_H
-#      define _STDLIB_H 1
+      /* Use EXIT_SUCCESS as a witness for stdlib.h.  */
+#     ifndef EXIT_SUCCESS
+#      define EXIT_SUCCESS 0
 #     endif
 #    endif
 #   endif
 #  endif
 # endif
 
-# ifdef FFSTACK_ALLOC
-   /* Pacify GCC's `empty if-body' warning.  */
-#  define FFSTACK_FREE(Ptr) do { /* empty */; } while (FFID (0))
-#  ifndef FFSTACK_ALLOC_MAXIMUM
+# ifdef YYSTACK_ALLOC
+   /* Pacify GCC's 'empty if-body' warning.  */
+#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (0)
+#  ifndef YYSTACK_ALLOC_MAXIMUM
     /* The OS might guarantee only one guard page at the bottom of the stack,
        and a page size can be as small as 4096 bytes.  So we cannot safely
        invoke alloca (N) if N exceeds 4096.  Use a slightly smaller number
        to allow for a few compiler-allocated temporary stack slots.  */
-#   define FFSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
+#   define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
 #  endif
 # else
-#  define FFSTACK_ALLOC FFMALLOC
-#  define FFSTACK_FREE FFFREE
-#  ifndef FFSTACK_ALLOC_MAXIMUM
-#   define FFSTACK_ALLOC_MAXIMUM FFSIZE_MAXIMUM
+#  define YYSTACK_ALLOC YYMALLOC
+#  define YYSTACK_FREE YYFREE
+#  ifndef YYSTACK_ALLOC_MAXIMUM
+#   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #  endif
-#  if (defined __cplusplus && ! defined _STDLIB_H \
-       && ! ((defined FFMALLOC || defined malloc) \
-	     && (defined FFFREE || defined free)))
+#  if (defined __cplusplus && ! defined EXIT_SUCCESS \
+       && ! ((defined YYMALLOC || defined malloc) \
+             && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#   ifndef _STDLIB_H
-#    define _STDLIB_H 1
+#   ifndef EXIT_SUCCESS
+#    define EXIT_SUCCESS 0
 #   endif
 #  endif
-#  ifndef FFMALLOC
-#   define FFMALLOC malloc
-#   if ! defined malloc && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-void *malloc (FFSIZE_T); /* INFRINGES ON USER NAME SPACE */
+#  ifndef YYMALLOC
+#   define YYMALLOC malloc
+#   if ! defined malloc && ! defined EXIT_SUCCESS
+void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
-#  ifndef FFFREE
-#   define FFFREE free
-#   if ! defined free && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#  ifndef YYFREE
+#   define YYFREE free
+#   if ! defined free && ! defined EXIT_SUCCESS
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 # endif
-#endif /* ! defined ffoverflow || FFERROR_VERBOSE */
+#endif /* !defined yyoverflow */
 
-
-#if (! defined ffoverflow \
+#if (! defined yyoverflow \
      && (! defined __cplusplus \
-	 || (defined FFSTYPE_IS_TRIVIAL && FFSTYPE_IS_TRIVIAL)))
+         || (defined FITS_PARSER_YYSTYPE_IS_TRIVIAL && FITS_PARSER_YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
-union ffalloc
+union yyalloc
 {
-  fftype_int16 ffss_alloc;
-  FFSTYPE ffvs_alloc;
+  yy_state_t yyss_alloc;
+  YYSTYPE yyvs_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
-# define FFSTACK_GAP_MAXIMUM (sizeof (union ffalloc) - 1)
+# define YYSTACK_GAP_MAXIMUM (YYSIZEOF (union yyalloc) - 1)
 
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
-# define FFSTACK_BYTES(N) \
-     ((N) * (sizeof (fftype_int16) + sizeof (FFSTYPE)) \
-      + FFSTACK_GAP_MAXIMUM)
+# define YYSTACK_BYTES(N) \
+     ((N) * (YYSIZEOF (yy_state_t) + YYSIZEOF (YYSTYPE)) \
+      + YYSTACK_GAP_MAXIMUM)
 
-/* Copy COUNT objects from FROM to TO.  The source and destination do
-   not overlap.  */
-# ifndef FFCOPY
-#  if defined __GNUC__ && 1 < __GNUC__
-#   define FFCOPY(To, From, Count) \
-      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
-#  else
-#   define FFCOPY(To, From, Count)		\
-      do					\
-	{					\
-	  FFSIZE_T ffi;				\
-	  for (ffi = 0; ffi < (Count); ffi++)	\
-	    (To)[ffi] = (From)[ffi];		\
-	}					\
-      while (FFID (0))
-#  endif
-# endif
+# define YYCOPY_NEEDED 1
 
 /* Relocate STACK from its old location to the new one.  The
-   local variables FFSIZE and FFSTACKSIZE give the old and new number of
-   elements in the stack, and FFPTR gives the new location of the
-   stack.  Advance FFPTR to a properly aligned location for the next
+   local variables YYSIZE and YYSTACKSIZE give the old and new number of
+   elements in the stack, and YYPTR gives the new location of the
+   stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define FFSTACK_RELOCATE(Stack_alloc, Stack)				\
-    do									\
-      {									\
-	FFSIZE_T ffnewbytes;						\
-	FFCOPY (&ffptr->Stack_alloc, Stack, ffsize);			\
-	Stack = &ffptr->Stack_alloc;					\
-	ffnewbytes = ffstacksize * sizeof (*Stack) + FFSTACK_GAP_MAXIMUM; \
-	ffptr += ffnewbytes / sizeof (*ffptr);				\
-      }									\
-    while (FFID (0))
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)                           \
+    do                                                                  \
+      {                                                                 \
+        YYPTRDIFF_T yynewbytes;                                         \
+        YYCOPY (&yyptr->Stack_alloc, Stack, yysize);                    \
+        Stack = &yyptr->Stack_alloc;                                    \
+        yynewbytes = yystacksize * YYSIZEOF (*Stack) + YYSTACK_GAP_MAXIMUM; \
+        yyptr += yynewbytes / YYSIZEOF (*yyptr);                        \
+      }                                                                 \
+    while (0)
 
 #endif
 
-/* FFFINAL -- State number of the termination state.  */
-#define FFFINAL  2
-/* FFLAST -- Last index in FFTABLE.  */
-#define FFLAST   1603
+#if defined YYCOPY_NEEDED && YYCOPY_NEEDED
+/* Copy COUNT objects from SRC to DST.  The source and destination do
+   not overlap.  */
+# ifndef YYCOPY
+#  if defined __GNUC__ && 1 < __GNUC__
+#   define YYCOPY(Dst, Src, Count) \
+      __builtin_memcpy (Dst, Src, YY_CAST (YYSIZE_T, (Count)) * sizeof (*(Src)))
+#  else
+#   define YYCOPY(Dst, Src, Count)              \
+      do                                        \
+        {                                       \
+          YYPTRDIFF_T yyi;                      \
+          for (yyi = 0; yyi < (Count); yyi++)   \
+            (Dst)[yyi] = (Src)[yyi];            \
+        }                                       \
+      while (0)
+#  endif
+# endif
+#endif /* !YYCOPY_NEEDED */
 
-/* FFNTOKENS -- Number of terminals.  */
-#define FFNTOKENS  54
-/* FFNNTS -- Number of nonterminals.  */
-#define FFNNTS  9
-/* FFNRULES -- Number of rules.  */
-#define FFNRULES  125
-/* FFNRULES -- Number of states.  */
-#define FFNSTATES  290
+/* YYFINAL -- State number of the termination state.  */
+#define YYFINAL  2
+/* YYLAST -- Last index in YYTABLE.  */
+#define YYLAST   1776
 
-/* FFTRANSLATE(FFLEX) -- Bison symbol number corresponding to FFLEX.  */
-#define FFUNDEFTOK  2
-#define FFMAXUTOK   289
+/* YYNTOKENS -- Number of terminals.  */
+#define YYNTOKENS  57
+/* YYNNTS -- Number of nonterminals.  */
+#define YYNNTS  9
+/* YYNRULES -- Number of rules.  */
+#define YYNRULES  135
+/* YYNSTATES -- Number of states.  */
+#define YYNSTATES  322
 
-#define FFTRANSLATE(FFX)						\
-  ((unsigned int) (FFX) <= FFMAXUTOK ? fftranslate[FFX] : FFUNDEFTOK)
+/* YYMAXUTOK -- Last valid token kind.  */
+#define YYMAXUTOK   292
 
-/* FFTRANSLATE[FFLEX] -- Bison symbol number corresponding to FFLEX.  */
-static const fftype_uint8 fftranslate[] =
+
+/* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
+   as returned by yylex, with out-of-bounds checking.  */
+#define YYTRANSLATE(YYX)                                \
+  (0 <= (YYX) && (YYX) <= YYMAXUTOK                     \
+   ? YY_CAST (yysymbol_kind_t, yytranslate[YYX])        \
+   : YYSYMBOL_YYUNDEF)
+
+/* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
+   as returned by yylex.  */
+static const yytype_int8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      50,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+      53,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,    37,    41,     2,
-      52,    53,    38,    35,    20,    36,     2,    39,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    22,     2,
-       2,    21,     2,    25,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    47,     2,    51,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,    39,    43,     2,
+      55,    56,    40,    37,    22,    38,     2,    41,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    24,     2,
+       2,    23,     2,    27,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    23,    40,    24,    28,     2,     2,     2,
+       2,    50,     2,    54,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    25,    42,    26,    32,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -650,3195 +743,2882 @@ static const fftype_uint8 fftranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    26,    27,    29,    30,    31,
-      32,    33,    34,    42,    43,    44,    45,    46,    48,    49
+      15,    16,    17,    18,    19,    20,    21,    28,    29,    30,
+      31,    33,    34,    35,    36,    44,    45,    46,    47,    48,
+      49,    51,    52
 };
 
-#if FFDEBUG
-/* FFPRHS[FFN] -- Index of the first RHS symbol of rule number FFN in
-   FFRHS.  */
-static const fftype_uint16 ffprhs[] =
+#if FITS_PARSER_YYDEBUG
+/* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
+static const yytype_int16 yyrline[] =
 {
-       0,     0,     3,     4,     7,     9,    12,    15,    18,    21,
-      24,    27,    31,    34,    38,    42,    46,    49,    52,    54,
-      56,    61,    65,    69,    73,    78,    85,    94,   105,   118,
-     121,   125,   127,   129,   131,   136,   138,   140,   144,   148,
-     152,   156,   160,   164,   167,   170,   174,   178,   182,   188,
-     194,   200,   203,   207,   211,   215,   219,   225,   231,   241,
-     246,   253,   262,   273,   286,   289,   292,   295,   298,   300,
-     302,   307,   311,   315,   319,   323,   327,   331,   335,   339,
-     343,   347,   351,   355,   359,   363,   367,   371,   375,   379,
-     383,   387,   391,   395,   399,   405,   411,   415,   419,   423,
-     429,   437,   449,   465,   468,   472,   478,   488,   492,   500,
-     510,   515,   522,   531,   542,   555,   558,   562,   564,   566,
-     571,   573,   577,   581,   587,   593
-};
-
-/* FFRHS -- A `-1'-separated list of the rules' RHS.  */
-static const fftype_int8 ffrhs[] =
-{
-      55,     0,    -1,    -1,    55,    56,    -1,    50,    -1,    59,
-      50,    -1,    60,    50,    -1,    62,    50,    -1,    61,    50,
-      -1,     1,    50,    -1,    23,    60,    -1,    57,    20,    60,
-      -1,    23,    59,    -1,    58,    20,    59,    -1,    58,    20,
-      60,    -1,    57,    20,    59,    -1,    58,    24,    -1,    57,
-      24,    -1,     7,    -1,    16,    -1,    16,    23,    59,    24,
-      -1,    61,    41,    61,    -1,    61,    40,    61,    -1,    61,
-      35,    61,    -1,    61,    47,    59,    51,    -1,    61,    47,
-      59,    20,    59,    51,    -1,    61,    47,    59,    20,    59,
-      20,    59,    51,    -1,    61,    47,    59,    20,    59,    20,
-      59,    20,    59,    51,    -1,    61,    47,    59,    20,    59,
-      20,    59,    20,    59,    20,    59,    51,    -1,    43,    61,
-      -1,    52,    61,    53,    -1,     4,    -1,     5,    -1,    13,
-      -1,    13,    23,    59,    24,    -1,    17,    -1,    18,    -1,
-      59,    37,    59,    -1,    59,    35,    59,    -1,    59,    36,
-      59,    -1,    59,    38,    59,    -1,    59,    39,    59,    -1,
-      59,    42,    59,    -1,    35,    59,    -1,    36,    59,    -1,
-      52,    59,    53,    -1,    59,    38,    60,    -1,    60,    38,
-      59,    -1,    60,    25,    59,    22,    59,    -1,    60,    25,
-      60,    22,    59,    -1,    60,    25,    59,    22,    60,    -1,
-       8,    53,    -1,     8,    60,    53,    -1,     8,    62,    53,
-      -1,     8,    61,    53,    -1,     8,    59,    53,    -1,    10,
-      62,    20,    62,    53,    -1,     8,    59,    20,    59,    53,
-      -1,     8,    59,    20,    59,    20,    59,    20,    59,    53,
-      -1,    59,    47,    59,    51,    -1,    59,    47,    59,    20,
-      59,    51,    -1,    59,    47,    59,    20,    59,    20,    59,
-      51,    -1,    59,    47,    59,    20,    59,    20,    59,    20,
-      59,    51,    -1,    59,    47,    59,    20,    59,    20,    59,
-      20,    59,    20,    59,    51,    -1,    45,    59,    -1,    45,
-      60,    -1,    44,    59,    -1,    44,    60,    -1,     3,    -1,
-      14,    -1,    14,    23,    59,    24,    -1,    61,    30,    61,
-      -1,    61,    29,    61,    -1,    61,    33,    61,    -1,    61,
-      32,    61,    -1,    61,    34,    61,    -1,    61,    31,    61,
-      -1,    59,    34,    59,    -1,    59,    33,    59,    -1,    59,
-      31,    59,    -1,    59,    32,    59,    -1,    59,    28,    59,
-      -1,    59,    30,    59,    -1,    59,    29,    59,    -1,    62,
-      30,    62,    -1,    62,    29,    62,    -1,    62,    34,    62,
-      -1,    62,    31,    62,    -1,    62,    33,    62,    -1,    62,
-      32,    62,    -1,    60,    27,    60,    -1,    60,    26,    60,
-      -1,    60,    30,    60,    -1,    60,    29,    60,    -1,    59,
-      21,    59,    22,    59,    -1,    60,    25,    60,    22,    60,
-      -1,     9,    59,    53,    -1,     9,    60,    53,    -1,     9,
-      62,    53,    -1,     8,    60,    20,    60,    53,    -1,     9,
-      59,    20,    59,    20,    59,    53,    -1,     9,    59,    20,
-      59,    20,    59,    20,    59,    20,    59,    53,    -1,     9,
-      59,    20,    59,    20,    59,    20,    59,    20,    59,    20,
-      59,    20,    59,    53,    -1,    11,    53,    -1,    11,     6,
-      53,    -1,    11,     6,    20,    59,    53,    -1,    11,     6,
-      20,    59,    20,     6,    20,     6,    53,    -1,    12,     6,
-      53,    -1,    12,     6,    20,    59,    20,    59,    53,    -1,
-      12,     6,    20,    59,    20,    59,    20,     6,    53,    -1,
-      60,    47,    59,    51,    -1,    60,    47,    59,    20,    59,
-      51,    -1,    60,    47,    59,    20,    59,    20,    59,    51,
-      -1,    60,    47,    59,    20,    59,    20,    59,    20,    59,
-      51,    -1,    60,    47,    59,    20,    59,    20,    59,    20,
-      59,    20,    59,    51,    -1,    43,    60,    -1,    52,    60,
-      53,    -1,     6,    -1,    15,    -1,    15,    23,    59,    24,
-      -1,    19,    -1,    52,    62,    53,    -1,    62,    35,    62,
-      -1,    60,    25,    62,    22,    62,    -1,     8,    62,    20,
-      62,    53,    -1,     8,    62,    20,    59,    20,    59,    53,
-      -1
-};
-
-/* FFRLINE[FFN] -- source line where rule number FFN was defined.  */
-static const fftype_uint16 ffrline[] =
-{
-       0,   244,   244,   245,   248,   249,   255,   261,   267,   273,
-     276,   278,   291,   293,   306,   317,   331,   335,   339,   343,
-     345,   354,   357,   360,   369,   371,   373,   375,   377,   379,
-     382,   386,   388,   390,   392,   401,   403,   405,   408,   411,
-     414,   417,   420,   423,   425,   427,   429,   433,   437,   456,
-     475,   494,   505,   519,   531,   562,   657,   665,   727,   751,
-     753,   755,   757,   759,   761,   763,   765,   767,   771,   773,
-     775,   784,   787,   790,   793,   796,   799,   802,   805,   808,
-     811,   814,   817,   820,   823,   826,   829,   832,   835,   838,
-     841,   843,   845,   847,   850,   857,   874,   887,   900,   911,
-     927,   951,   979,  1016,  1020,  1024,  1027,  1031,  1035,  1038,
-    1042,  1044,  1046,  1048,  1050,  1052,  1054,  1058,  1061,  1063,
-    1072,  1074,  1076,  1085,  1104,  1123
+       0,   266,   266,   267,   270,   271,   277,   283,   289,   295,
+     298,   300,   313,   315,   328,   339,   353,   357,   361,   365,
+     367,   376,   379,   382,   391,   393,   395,   397,   399,   401,
+     404,   408,   410,   412,   414,   423,   425,   427,   430,   433,
+     436,   439,   442,   451,   460,   469,   472,   474,   476,   478,
+     482,   486,   505,   524,   543,   554,   568,   617,   629,   660,
+     774,   782,   885,   909,   911,   913,   915,   917,   919,   921,
+     923,   925,   929,   931,   933,   942,   945,   948,   951,   954,
+     957,   960,   963,   966,   969,   972,   975,   978,   981,   984,
+     987,   990,   993,   996,   999,  1001,  1003,  1005,  1008,  1015,
+    1032,  1045,  1058,  1069,  1085,  1109,  1137,  1174,  1178,  1182,
+    1185,  1190,  1193,  1198,  1202,  1206,  1209,  1214,  1218,  1221,
+    1225,  1227,  1229,  1231,  1233,  1235,  1237,  1241,  1244,  1246,
+    1255,  1257,  1259,  1268,  1287,  1306
 };
 #endif
 
-#if FFDEBUG || FFERROR_VERBOSE || FFTOKEN_TABLE
-/* FFTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-   First, the terminals, then, starting at FFNTOKENS, nonterminals.  */
-static const char *const fftname[] =
+/** Accessing symbol of state STATE.  */
+#define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
+
+#if FITS_PARSER_YYDEBUG || 0
+/* The user-facing name of the symbol whose (internal) number is
+   YYSYMBOL.  No bounds checking.  */
+static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
+
+/* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
+   First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
+static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "BOOLEAN", "LONG", "DOUBLE", "STRING",
-  "BITSTR", "FUNCTION", "BFUNCTION", "IFUNCTION", "GTIFILTER", "REGFILTER",
-  "COLUMN", "BCOLUMN", "SCOLUMN", "BITCOL", "ROWREF", "NULLREF",
-  "SNULLREF", "','", "'='", "':'", "'{'", "'}'", "'?'", "OR", "AND", "'~'",
-  "NE", "EQ", "GTE", "LTE", "LT", "GT", "'+'", "'-'", "'%'", "'*'", "'/'",
-  "'|'", "'&'", "POWER", "NOT", "FLTCAST", "INTCAST", "UMINUS", "'['",
-  "DIFF", "ACCUM", "'\\n'", "']'", "'('", "')'", "$accept", "lines",
-  "line", "bvector", "vector", "expr", "bexpr", "bits", "sexpr", 0
+  "\"end of file\"", "error", "\"invalid token\"", "BOOLEAN", "LONG",
+  "DOUBLE", "STRING", "BITSTR", "FUNCTION", "BFUNCTION", "IFUNCTION",
+  "GTIFILTER", "GTIOVERLAP", "GTIFIND", "REGFILTER", "COLUMN", "BCOLUMN",
+  "SCOLUMN", "BITCOL", "ROWREF", "NULLREF", "SNULLREF", "','", "'='",
+  "':'", "'{'", "'}'", "'?'", "OR", "AND", "EQ", "NE", "'~'", "GT", "LT",
+  "LTE", "GTE", "'+'", "'-'", "'%'", "'*'", "'/'", "'|'", "'&'", "XOR",
+  "POWER", "NOT", "INTCAST", "FLTCAST", "UMINUS", "'['", "ACCUM", "DIFF",
+  "'\\n'", "']'", "'('", "')'", "$accept", "lines", "line", "bvector",
+  "vector", "expr", "bexpr", "bits", "sexpr", YY_NULLPTR
 };
+
+static const char *
+yysymbol_name (yysymbol_kind_t yysymbol)
+{
+  return yytname[yysymbol];
+}
 #endif
 
-# ifdef FFPRINT
-/* FFTOKNUM[FFLEX-NUM] -- Internal token number corresponding to
-   token FFLEX-NUM.  */
-static const fftype_uint16 fftoknum[] =
-{
-       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-      44,    61,    58,   123,   125,    63,   275,   276,   126,   277,
-     278,   279,   280,   281,   282,    43,    45,    37,    42,    47,
-     124,    38,   283,   284,   285,   286,   287,    91,   288,   289,
-      10,    93,    40,    41
-};
-# endif
+#define YYPACT_NINF (-41)
 
-/* FFR1[FFN] -- Symbol number of symbol that rule FFN derives.  */
-static const fftype_uint8 ffr1[] =
+#define yypact_value_is_default(Yyn) \
+  ((Yyn) == YYPACT_NINF)
+
+#define YYTABLE_NINF (-1)
+
+#define yytable_value_is_error(Yyn) \
+  0
+
+/* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
+   STATE-NUM.  */
+static const yytype_int16 yypact[] =
 {
-       0,    54,    55,    55,    56,    56,    56,    56,    56,    56,
-      57,    57,    58,    58,    58,    58,    59,    60,    61,    61,
-      61,    61,    61,    61,    61,    61,    61,    61,    61,    61,
-      61,    59,    59,    59,    59,    59,    59,    59,    59,    59,
-      59,    59,    59,    59,    59,    59,    59,    59,    59,    59,
-      59,    59,    59,    59,    59,    59,    59,    59,    59,    59,
-      59,    59,    59,    59,    59,    59,    59,    59,    60,    60,
-      60,    60,    60,    60,    60,    60,    60,    60,    60,    60,
-      60,    60,    60,    60,    60,    60,    60,    60,    60,    60,
-      60,    60,    60,    60,    60,    60,    60,    60,    60,    60,
-      60,    60,    60,    60,    60,    60,    60,    60,    60,    60,
-      60,    60,    60,    60,    60,    60,    60,    62,    62,    62,
-      62,    62,    62,    62,    62,    62
+     -41,   316,   -41,   -40,   -41,   -41,   -41,   -41,   -41,   369,
+     423,   423,    -5,    15,    -4,    27,    36,    38,    40,    41,
+     -41,   -41,   -41,   423,   423,   423,   423,   423,   423,   -41,
+     423,   -41,    -7,    10,  1226,    81,  1646,    83,   -41,   -41,
+     450,   116,   309,    12,   479,   185,   152,   222,  1593,  1673,
+    1675,   -19,   -41,    13,   -18,   -41,     6,   423,   423,   423,
+     423,  1593,  1673,  1684,    17,    17,    19,    24,    17,    19,
+      17,    19,   710,  1253,  1611,   365,   423,   -41,   423,   -41,
+     423,   423,   423,   423,   423,   423,   423,   423,   423,   423,
+     423,   423,   423,   423,   423,   423,   423,   423,   -41,   423,
+     423,   423,   423,   423,   423,   423,   -41,    -2,    -2,    -2,
+      -2,    -2,    -2,    -2,    -2,    -2,   423,   -41,   423,   423,
+     423,   423,   423,   423,   423,   -41,   423,   -41,   423,   -41,
+     -41,   423,   -41,   423,   -41,   -41,   -41,   423,   423,   -41,
+     423,   423,   -41,   423,   -41,  1455,  1478,  1501,  1524,   -41,
+     -41,   -41,   -41,  1593,  1673,  1593,  1673,  1547,  1712,  1712,
+    1712,  1726,  1726,  1726,  1726,   368,   368,   368,    28,    19,
+      28,     5,     5,     5,     5,   851,  1570,   425,   260,   128,
+     -20,    14,    14,    28,   876,    -2,    -2,   -25,   -25,   -25,
+     -25,   -25,   -25,   -36,    24,    24,   901,   140,   140,    39,
+      39,    39,    39,   -41,   508,   738,  1258,  1288,  1629,  1312,
+    1638,   537,  1336,   566,  1360,   -41,   -41,   -41,   -41,   423,
+     423,   -41,   423,   423,   423,   423,   -41,    24,   189,   423,
+     -41,   423,   -41,   -41,   -41,   423,   -41,   423,   -41,    93,
+     -41,   423,    94,   -41,   423,  1694,   926,  1694,  1673,  1694,
+    1673,  1684,   951,   976,  1384,   766,   595,    79,   624,    80,
+     653,   423,   -41,   423,   -41,   423,   -41,   423,   -41,   423,
+     -41,   100,   101,   -41,   117,   118,   -41,  1001,  1026,  1051,
+     794,  1408,    72,   111,    85,    99,   423,   -41,   423,   -41,
+     423,   -41,   -41,   423,   -41,   129,   -41,   -41,  1076,  1101,
+    1126,   682,   104,   423,   -41,   423,   -41,   423,   -41,   423,
+     -41,   -41,  1151,  1176,  1201,  1432,   -41,   -41,   -41,   423,
+     822,   -41
 };
 
-/* FFR2[FFN] -- Number of symbols composing right hand side of rule FFN.  */
-static const fftype_uint8 ffr2[] =
+/* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
+   Performed when YYTABLE does not specify something else to do.  Zero
+   means the default is an error.  */
+static const yytype_uint8 yydefact[] =
+{
+       2,     0,     1,     0,    72,    31,    32,   127,    18,     0,
+       0,     0,     0,     0,     0,     0,    33,    73,   128,    19,
+      35,    36,   130,     0,     0,     0,     0,     0,     0,     4,
+       0,     3,     0,     0,     0,     0,     0,     0,     9,    54,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   107,     0,     0,   113,     0,     0,     0,     0,
+       0,    12,    10,     0,    46,    47,   125,    29,    68,    69,
+      70,    71,     0,     0,     0,     0,     0,    17,     0,    16,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     5,     0,
+       0,     0,     0,     0,     0,     0,     6,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     8,     0,     0,
+       0,     0,     0,     0,     0,     7,     0,    59,     0,    55,
+      58,     0,    57,     0,   100,   101,   102,     0,     0,   108,
+       0,     0,   114,     0,   117,     0,     0,     0,     0,    48,
+     126,    30,   131,    15,    11,    13,    14,     0,    86,    87,
+      85,    81,    82,    84,    83,    38,    39,    37,    40,    49,
+      41,    43,    42,    44,    45,     0,     0,     0,     0,    95,
+      94,    96,    97,    50,     0,     0,     0,    75,    76,    79,
+      77,    78,    80,    23,    22,    21,     0,    88,    89,    90,
+      92,    93,    91,   132,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    34,    74,   129,    20,     0,
+       0,    63,     0,     0,     0,     0,   120,    29,     0,     0,
+      24,     0,    61,    56,   103,     0,   134,     0,    60,     0,
+     109,     0,     0,   115,     0,    98,     0,    51,    53,    52,
+      99,   133,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    64,     0,   121,     0,    25,     0,   135,     0,
+     104,     0,     0,   111,     0,     0,   118,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    65,     0,   122,
+       0,    26,    62,     0,   110,     0,   116,   119,     0,     0,
+       0,     0,     0,     0,    66,     0,   123,     0,    27,     0,
+     105,   112,     0,     0,     0,     0,    67,   124,    28,     0,
+       0,   106
+};
+
+/* YYPGOTO[NTERM-NUM].  */
+static const yytype_int16 yypgoto[] =
+{
+     -41,   -41,   -41,   -41,   -41,    -1,   170,    96,    30
+};
+
+/* YYDEFGOTO[NTERM-NUM].  */
+static const yytype_int8 yydefgoto[] =
+{
+       0,     1,    31,    32,    33,    48,    49,    46,    63
+};
+
+/* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
+   positive, shift that token.  If negative, reduce the rule whose
+   number is the opposite.  If YYTABLE_NINF, syntax error.  */
+static const yytype_int16 yytable[] =
+{
+      34,    51,    54,   138,   141,     8,   114,   115,    40,    44,
+     102,   103,   113,    38,   116,    76,    19,   114,   115,    77,
+     104,    53,    61,    64,    65,   116,    68,    70,   143,    72,
+     105,    37,    78,    56,   131,   140,    79,   139,   142,    43,
+      47,    50,   118,   119,   185,   120,   121,   122,   123,   124,
+      96,    52,    55,   186,   104,    97,   145,   146,   147,   148,
+      75,    57,   144,    58,   105,    59,    60,    97,   132,   105,
+      93,    94,    95,    96,   116,   153,   124,   155,    97,   157,
+     158,   159,   160,   161,   162,   163,   164,   165,   166,   167,
+     168,   170,   171,   172,   173,   174,   175,    36,   176,   257,
+     259,   271,   274,   183,   184,    42,   282,   283,    99,   100,
+     101,   102,   103,   118,   119,   196,   120,   121,   122,   123,
+     124,   104,    67,   284,   285,   204,    74,   205,   294,   178,
+     207,   105,   209,   295,   106,   302,   125,   211,   128,   212,
+     213,   296,   214,    99,   100,   101,   102,   103,   197,   198,
+     199,   200,   201,   202,   203,   297,   104,   101,   102,   103,
+     311,   208,     0,     0,     0,     0,   105,   210,   104,     0,
+       0,    35,   129,   120,   121,   122,   123,   124,   105,    41,
+      45,     0,   107,   108,     0,   109,   110,   111,   112,   113,
+       0,     0,     0,    62,   114,   115,    66,    69,    71,     0,
+      73,     0,   116,   187,   188,   189,   190,   191,   192,   193,
+     194,   195,    99,   100,   101,   102,   103,     0,   245,   246,
+       0,   247,   249,     0,   252,   104,   113,     0,   253,     0,
+     254,   114,   115,     0,   255,   105,   256,     0,     0,   116,
+     258,   135,     0,   260,     0,   151,   154,     0,   156,     0,
+       0,     0,   118,   119,   251,   120,   121,   122,   123,   124,
+     277,   169,   278,     0,   279,     0,   280,     0,   281,   177,
+     179,   180,   181,   182,     0,     0,     0,     0,   136,     0,
+       0,   227,   228,     0,   224,   298,     0,   299,     0,   300,
+     118,   119,   301,   120,   121,   122,   123,   124,   206,     0,
+       0,     0,   312,     0,   313,     0,   314,     0,   315,     0,
+       0,     0,     0,     0,     0,     0,     2,     3,   320,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,     0,   107,
+     108,    23,   109,   110,   111,   112,   113,     0,     0,     0,
+       0,   114,   115,    24,    25,     0,     0,     0,     0,   116,
+       0,     0,    26,    27,    28,   130,     0,     0,     0,    29,
+       0,    30,     4,     5,     6,     7,     8,     9,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      22,     0,   248,   250,    23,   118,   119,     0,   120,   121,
+     122,   123,   124,     0,     0,     0,    24,    25,    91,    92,
+      93,    94,    95,    96,     0,    26,    27,    28,    97,     0,
+       0,   152,     0,     0,    30,    39,     4,     5,     6,     7,
+       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,    22,     0,     0,     0,    23,   223,
+       0,     0,    99,   100,   101,   102,   103,     0,     0,     0,
+      24,    25,     0,     0,     0,   104,     0,     0,     0,    26,
+      27,    28,   126,    80,     0,   105,     0,     0,    30,     0,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,     0,     0,     0,     0,
+      97,   133,    80,     0,     0,     0,   127,     0,     0,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
+      92,    93,    94,    95,    96,     0,     0,     0,     0,    97,
+     231,    80,     0,     0,     0,   134,     0,     0,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,     0,     0,     0,     0,    97,   239,
+      80,     0,     0,     0,   232,     0,     0,    81,    82,    83,
+      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
+      94,    95,    96,     0,     0,     0,     0,    97,   242,    80,
+       0,     0,     0,   240,     0,     0,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,     0,     0,    97,   269,    80,     0,
+       0,     0,   243,     0,     0,    81,    82,    83,    84,    85,
+      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
+      96,     0,     0,     0,     0,    97,   272,    80,     0,     0,
+       0,   270,     0,     0,    81,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+       0,     0,     0,     0,    97,   275,    80,     0,     0,     0,
+     273,     0,     0,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,    90,    91,    92,    93,    94,    95,    96,     0,
+       0,     0,     0,    97,   309,    80,     0,     0,     0,   276,
+       0,     0,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,     0,     0,
+       0,     0,    97,    80,     0,     0,     0,     0,   310,     0,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,     0,     0,     0,     0,
+      97,    80,     0,     0,     0,     0,   149,     0,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,     0,     0,     0,     0,    97,    80,
+       0,     0,     0,     0,   233,     0,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,     0,     0,    97,    80,     0,     0,
+       0,     0,   268,     0,    81,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+       0,     0,     0,     0,    97,    80,     0,     0,     0,     0,
+     292,     0,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,     0,     0,
+       0,     0,    97,   220,    80,     0,     0,     0,   321,     0,
+       0,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   225,    80,
+       0,    97,     0,     0,     0,   221,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,   229,    80,     0,    97,     0,     0,     0,
+     226,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   261,    80,
+       0,    97,     0,     0,     0,   230,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,   263,    80,     0,    97,     0,     0,     0,
+     262,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   265,    80,
+       0,    97,     0,     0,     0,   264,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,   286,    80,     0,    97,     0,     0,     0,
+     266,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   288,    80,
+       0,    97,     0,     0,     0,   287,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,   290,    80,     0,    97,     0,     0,     0,
+     289,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   303,    80,
+       0,    97,     0,     0,     0,   291,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,   305,    80,     0,    97,     0,     0,     0,
+     304,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,   307,    80,
+       0,    97,     0,     0,     0,   306,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,    80,     0,    97,     0,     0,     0,
+     308,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,     0,    80,
+       0,    97,     0,     0,     0,   316,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,    80,     0,    97,     0,     0,     0,
+     317,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,     0,     0,    80,
+       0,    97,     0,     0,     0,   318,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,     0,     0,    97,     0,     0,    98,
+      99,   100,   101,   102,   103,    99,   100,   101,   102,   103,
+       0,     0,     0,   104,     0,     0,     0,     0,   104,     0,
+       0,     0,     0,   105,     0,     0,     0,     0,   105,   150,
+     235,    80,     0,     0,   234,     0,     0,     0,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,   237,    80,     0,     0,    97,     0,
+       0,     0,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,   241,    80,
+       0,     0,    97,     0,     0,     0,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,   244,    80,     0,     0,    97,     0,     0,     0,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,   267,    80,     0,     0,
+      97,     0,     0,     0,    81,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+     293,    80,     0,     0,    97,     0,     0,     0,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,   319,    80,     0,     0,    97,     0,
+       0,     0,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,    80,     0,
+       0,   215,    97,     0,     0,    81,    82,    83,    84,    85,
+      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
+      96,    80,     0,     0,   216,    97,     0,     0,    81,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,    80,     0,     0,   217,    97,     0,
+       0,    81,    82,    83,    84,    85,    86,    87,    88,    89,
+      90,    91,    92,    93,    94,    95,    96,    80,     0,     0,
+     218,    97,     0,     0,    81,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+      80,   219,     0,     0,    97,     0,     0,    81,    82,    83,
+      84,    85,    86,    87,    88,    89,    90,    91,    92,    93,
+      94,    95,    96,    80,   222,     0,     0,    97,     0,     0,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,    80,     0,     0,     0,
+      97,     0,     0,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,    90,    91,    92,    93,    94,    95,    96,     0,
+       0,   107,   108,    97,   109,   110,   111,   112,   113,     0,
+       0,     0,     0,   114,   115,     0,     0,     0,     0,   118,
+     119,   116,   120,   121,   122,   123,   124,   151,   118,   119,
+       0,   120,   121,   122,   123,   124,   107,   108,     0,   109,
+     110,   111,   112,   113,     0,   236,     0,     0,   114,   115,
+       0,     0,     0,     0,   238,     0,   116,   137,     0,   117,
+      99,   100,   101,   102,   103,   118,   119,     0,   120,   121,
+     122,   123,   124,   104,   118,   119,     0,   120,   121,   122,
+     123,   124,     0,   105,    81,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+       0,     0,     0,     0,    97,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    94,    95,    96,     0,     0,
+       0,     0,    97,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,     0,     0,     0,     0,    97
+};
+
+static const yytype_int16 yycheck[] =
+{
+       1,     6,     6,    22,    22,     7,    42,    43,     9,    10,
+      30,    31,    37,    53,    50,    22,    18,    42,    43,    26,
+      40,     6,    23,    24,    25,    50,    27,    28,    22,    30,
+      50,     1,    22,     6,    22,    22,    26,    56,    56,     9,
+      10,    11,    30,    31,    46,    33,    34,    35,    36,    37,
+      45,    56,    56,    55,    40,    50,    57,    58,    59,    60,
+      30,    25,    56,    25,    50,    25,    25,    50,    56,    50,
+      42,    43,    44,    45,    50,    76,    37,    78,    50,    80,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    96,    97,     1,    99,     6,
+       6,    22,    22,   104,   105,     9,     6,     6,    27,    28,
+      29,    30,    31,    30,    31,   116,    33,    34,    35,    36,
+      37,    40,    26,     6,     6,   126,    30,   128,    56,    99,
+     131,    50,   133,    22,    53,     6,    53,   138,    22,   140,
+     141,    56,   143,    27,    28,    29,    30,    31,   118,   119,
+     120,   121,   122,   123,   124,    56,    40,    29,    30,    31,
+      56,   131,    -1,    -1,    -1,    -1,    50,   137,    40,    -1,
+      -1,     1,    56,    33,    34,    35,    36,    37,    50,     9,
+      10,    -1,    30,    31,    -1,    33,    34,    35,    36,    37,
+      -1,    -1,    -1,    23,    42,    43,    26,    27,    28,    -1,
+      30,    -1,    50,   107,   108,   109,   110,   111,   112,   113,
+     114,   115,    27,    28,    29,    30,    31,    -1,   219,   220,
+      -1,   222,   223,    -1,   225,    40,    37,    -1,   229,    -1,
+     231,    42,    43,    -1,   235,    50,   237,    -1,    -1,    50,
+     241,    56,    -1,   244,    -1,    56,    76,    -1,    78,    -1,
+      -1,    -1,    30,    31,   224,    33,    34,    35,    36,    37,
+     261,    91,   263,    -1,   265,    -1,   267,    -1,   269,    99,
+     100,   101,   102,   103,    -1,    -1,    -1,    -1,    56,    -1,
+      -1,   185,   186,    -1,    24,   286,    -1,   288,    -1,   290,
+      30,    31,   293,    33,    34,    35,    36,    37,   128,    -1,
+      -1,    -1,   303,    -1,   305,    -1,   307,    -1,   309,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,     0,     1,   319,     3,
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    -1,    30,
+      31,    25,    33,    34,    35,    36,    37,    -1,    -1,    -1,
+      -1,    42,    43,    37,    38,    -1,    -1,    -1,    -1,    50,
+      -1,    -1,    46,    47,    48,    56,    -1,    -1,    -1,    53,
+      -1,    55,     3,     4,     5,     6,     7,     8,     9,    10,
+      11,    12,    13,    14,    15,    16,    17,    18,    19,    20,
+      21,    -1,   222,   223,    25,    30,    31,    -1,    33,    34,
+      35,    36,    37,    -1,    -1,    -1,    37,    38,    40,    41,
+      42,    43,    44,    45,    -1,    46,    47,    48,    50,    -1,
+      -1,    56,    -1,    -1,    55,    56,     3,     4,     5,     6,
+       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    25,    24,
+      -1,    -1,    27,    28,    29,    30,    31,    -1,    -1,    -1,
+      37,    38,    -1,    -1,    -1,    40,    -1,    -1,    -1,    46,
+      47,    48,    22,    23,    -1,    50,    -1,    -1,    55,    -1,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    -1,    -1,    -1,    -1,
+      50,    22,    23,    -1,    -1,    -1,    56,    -1,    -1,    30,
+      31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
+      41,    42,    43,    44,    45,    -1,    -1,    -1,    -1,    50,
+      22,    23,    -1,    -1,    -1,    56,    -1,    -1,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    -1,    -1,    -1,    -1,    50,    22,
+      23,    -1,    -1,    -1,    56,    -1,    -1,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    -1,    -1,    -1,    -1,    50,    22,    23,
+      -1,    -1,    -1,    56,    -1,    -1,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    -1,    -1,    50,    22,    23,    -1,
+      -1,    -1,    56,    -1,    -1,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    -1,    -1,    -1,    -1,    50,    22,    23,    -1,    -1,
+      -1,    56,    -1,    -1,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      -1,    -1,    -1,    -1,    50,    22,    23,    -1,    -1,    -1,
+      56,    -1,    -1,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,    39,    40,    41,    42,    43,    44,    45,    -1,
+      -1,    -1,    -1,    50,    22,    23,    -1,    -1,    -1,    56,
+      -1,    -1,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    -1,    -1,
+      -1,    -1,    50,    23,    -1,    -1,    -1,    -1,    56,    -1,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    -1,    -1,    -1,    -1,
+      50,    23,    -1,    -1,    -1,    -1,    56,    -1,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    -1,    -1,    -1,    -1,    50,    23,
+      -1,    -1,    -1,    -1,    56,    -1,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    -1,    -1,    50,    23,    -1,    -1,
+      -1,    -1,    56,    -1,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      -1,    -1,    -1,    -1,    50,    23,    -1,    -1,    -1,    -1,
+      56,    -1,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    -1,    -1,
+      -1,    -1,    50,    22,    23,    -1,    -1,    -1,    56,    -1,
+      -1,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    22,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    22,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    22,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    22,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    22,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    22,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    -1,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    23,    -1,    50,    -1,    -1,    -1,
+      54,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    -1,    -1,    23,
+      -1,    50,    -1,    -1,    -1,    54,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    -1,    -1,    50,    -1,    -1,    53,
+      27,    28,    29,    30,    31,    27,    28,    29,    30,    31,
+      -1,    -1,    -1,    40,    -1,    -1,    -1,    -1,    40,    -1,
+      -1,    -1,    -1,    50,    -1,    -1,    -1,    -1,    50,    56,
+      22,    23,    -1,    -1,    56,    -1,    -1,    -1,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    22,    23,    -1,    -1,    50,    -1,
+      -1,    -1,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    22,    23,
+      -1,    -1,    50,    -1,    -1,    -1,    30,    31,    32,    33,
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    22,    23,    -1,    -1,    50,    -1,    -1,    -1,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    22,    23,    -1,    -1,
+      50,    -1,    -1,    -1,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      22,    23,    -1,    -1,    50,    -1,    -1,    -1,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    22,    23,    -1,    -1,    50,    -1,
+      -1,    -1,    30,    31,    32,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    23,    -1,
+      -1,    26,    50,    -1,    -1,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    23,    -1,    -1,    26,    50,    -1,    -1,    30,    31,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      42,    43,    44,    45,    23,    -1,    -1,    26,    50,    -1,
+      -1,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    23,    -1,    -1,
+      26,    50,    -1,    -1,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      23,    24,    -1,    -1,    50,    -1,    -1,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
+      43,    44,    45,    23,    24,    -1,    -1,    50,    -1,    -1,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    45,    23,    -1,    -1,    -1,
+      50,    -1,    -1,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,    39,    40,    41,    42,    43,    44,    45,    -1,
+      -1,    30,    31,    50,    33,    34,    35,    36,    37,    -1,
+      -1,    -1,    -1,    42,    43,    -1,    -1,    -1,    -1,    30,
+      31,    50,    33,    34,    35,    36,    37,    56,    30,    31,
+      -1,    33,    34,    35,    36,    37,    30,    31,    -1,    33,
+      34,    35,    36,    37,    -1,    56,    -1,    -1,    42,    43,
+      -1,    -1,    -1,    -1,    56,    -1,    50,    22,    -1,    53,
+      27,    28,    29,    30,    31,    30,    31,    -1,    33,    34,
+      35,    36,    37,    40,    30,    31,    -1,    33,    34,    35,
+      36,    37,    -1,    50,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+      -1,    -1,    -1,    -1,    50,    33,    34,    35,    36,    37,
+      38,    39,    40,    41,    42,    43,    44,    45,    -1,    -1,
+      -1,    -1,    50,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,    -1,    -1,    -1,    -1,    50
+};
+
+/* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
+   state STATE-NUM.  */
+static const yytype_int8 yystos[] =
+{
+       0,    58,     0,     1,     3,     4,     5,     6,     7,     8,
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,    25,    37,    38,    46,    47,    48,    53,
+      55,    59,    60,    61,    62,    63,    64,    65,    53,    56,
+      62,    63,    64,    65,    62,    63,    64,    65,    62,    63,
+      65,     6,    56,     6,     6,    56,     6,    25,    25,    25,
+      25,    62,    63,    65,    62,    62,    63,    64,    62,    63,
+      62,    63,    62,    63,    64,    65,    22,    26,    22,    26,
+      23,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    42,    43,    44,    45,    50,    53,    27,
+      28,    29,    30,    31,    40,    50,    53,    30,    31,    33,
+      34,    35,    36,    37,    42,    43,    50,    53,    30,    31,
+      33,    34,    35,    36,    37,    53,    22,    56,    22,    56,
+      56,    22,    56,    22,    56,    56,    56,    22,    22,    56,
+      22,    22,    56,    22,    56,    62,    62,    62,    62,    56,
+      56,    56,    56,    62,    63,    62,    63,    62,    62,    62,
+      62,    62,    62,    62,    62,    62,    62,    62,    62,    63,
+      62,    62,    62,    62,    62,    62,    62,    63,    65,    63,
+      63,    63,    63,    62,    62,    46,    55,    64,    64,    64,
+      64,    64,    64,    64,    64,    64,    62,    65,    65,    65,
+      65,    65,    65,    65,    62,    62,    63,    62,    65,    62,
+      65,    62,    62,    62,    62,    26,    26,    26,    26,    24,
+      22,    54,    24,    24,    24,    22,    54,    64,    64,    22,
+      54,    22,    56,    56,    56,    22,    56,    22,    56,    22,
+      56,    22,    22,    56,    22,    62,    62,    62,    63,    62,
+      63,    65,    62,    62,    62,    62,    62,     6,    62,     6,
+      62,    22,    54,    22,    54,    22,    54,    22,    56,    22,
+      56,    22,    22,    56,    22,    22,    56,    62,    62,    62,
+      62,    62,     6,     6,     6,     6,    22,    54,    22,    54,
+      22,    54,    56,    22,    56,    22,    56,    56,    62,    62,
+      62,    62,     6,    22,    54,    22,    54,    22,    54,    22,
+      56,    56,    62,    62,    62,    62,    54,    54,    54,    22,
+      62,    56
+};
+
+/* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
+static const yytype_int8 yyr1[] =
+{
+       0,    57,    58,    58,    59,    59,    59,    59,    59,    59,
+      60,    60,    61,    61,    61,    61,    62,    63,    64,    64,
+      64,    64,    64,    64,    64,    64,    64,    64,    64,    64,
+      64,    62,    62,    62,    62,    62,    62,    62,    62,    62,
+      62,    62,    62,    62,    62,    62,    62,    62,    62,    62,
+      62,    62,    62,    62,    62,    62,    62,    62,    62,    62,
+      62,    62,    62,    62,    62,    62,    62,    62,    62,    62,
+      62,    62,    63,    63,    63,    63,    63,    63,    63,    63,
+      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
+      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
+      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
+      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
+      63,    63,    63,    63,    63,    63,    63,    65,    65,    65,
+      65,    65,    65,    65,    65,    65
+};
+
+/* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
+static const yytype_int8 yyr2[] =
 {
        0,     2,     0,     2,     1,     2,     2,     2,     2,     2,
        2,     3,     2,     3,     3,     3,     2,     2,     1,     1,
        4,     3,     3,     3,     4,     6,     8,    10,    12,     2,
        3,     1,     1,     1,     4,     1,     1,     3,     3,     3,
-       3,     3,     3,     2,     2,     3,     3,     3,     5,     5,
-       5,     2,     3,     3,     3,     3,     5,     5,     9,     4,
-       6,     8,    10,    12,     2,     2,     2,     2,     1,     1,
-       4,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     2,     2,     3,     3,
+       3,     5,     5,     5,     2,     3,     5,     3,     3,     3,
+       5,     5,     9,     4,     6,     8,    10,    12,     2,     2,
+       2,     2,     1,     1,     4,     3,     3,     3,     3,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     5,     5,     3,     3,     3,     5,
-       7,    11,    15,     2,     3,     5,     9,     3,     7,     9,
+       3,     3,     3,     3,     3,     3,     3,     3,     5,     5,
+       3,     3,     3,     5,     7,    11,    15,     2,     3,     5,
+       9,     7,    11,     2,     3,     5,     9,     3,     7,     9,
        4,     6,     8,    10,    12,     2,     3,     1,     1,     4,
        1,     3,     3,     5,     5,     7
 };
 
-/* FFDEFACT[STATE-NAME] -- Default rule to reduce with in state
-   STATE-NUM when FFTABLE doesn't specify something else to do.  Zero
-   means the default is an error.  */
-static const fftype_uint8 ffdefact[] =
-{
-       2,     0,     1,     0,    68,    31,    32,   117,    18,     0,
-       0,     0,     0,     0,    33,    69,   118,    19,    35,    36,
-     120,     0,     0,     0,     0,     0,     0,     4,     0,     3,
-       0,     0,     0,     0,     0,     0,     9,    51,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-     103,     0,     0,     0,     0,     0,    12,    10,     0,    43,
-      44,   115,    29,    66,    67,    64,    65,     0,     0,     0,
-       0,     0,    17,     0,    16,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       5,     0,     0,     0,     0,     0,     0,     0,     6,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     8,
-       0,     0,     0,     0,     0,     0,     0,     7,     0,    55,
-       0,    52,    54,     0,    53,     0,    96,    97,    98,     0,
-       0,   104,     0,   107,     0,     0,     0,     0,    45,   116,
-      30,   121,    15,    11,    13,    14,     0,    81,    83,    82,
-      79,    80,    78,    77,    38,    39,    37,    40,    46,    41,
-      42,     0,     0,     0,     0,    91,    90,    93,    92,    47,
-       0,     0,     0,    72,    71,    76,    74,    73,    75,    23,
-      22,    21,     0,    85,    84,    87,    89,    88,    86,   122,
-       0,     0,     0,     0,     0,     0,     0,     0,    34,    70,
-     119,    20,     0,     0,    59,     0,     0,     0,     0,   110,
-      29,     0,     0,    24,     0,    57,    99,     0,   124,     0,
-      56,     0,   105,     0,    94,     0,    48,    50,    49,    95,
-     123,     0,     0,     0,     0,     0,     0,     0,     0,    60,
-       0,   111,     0,    25,     0,   125,     0,   100,     0,     0,
-     108,     0,     0,     0,     0,     0,     0,     0,     0,    61,
-       0,   112,     0,    26,    58,     0,   106,   109,     0,     0,
-       0,     0,     0,    62,     0,   113,     0,    27,     0,   101,
-       0,     0,     0,     0,    63,   114,    28,     0,     0,   102
-};
 
-/* FFDEFGOTO[NTERM-NUM].  */
-static const fftype_int8 ffdefgoto[] =
-{
-      -1,     1,    29,    30,    31,    46,    47,    44,    58
-};
+enum { YYENOMEM = -2 };
 
-/* FFPACT[STATE-NUM] -- Index in FFTABLE of the portion describing
-   STATE-NUM.  */
-#define FFPACT_NINF -46
-static const fftype_int16 ffpact[] =
-{
-     -46,   297,   -46,   -45,   -46,   -46,   -46,   -46,   -46,   347,
-     398,   398,    -5,     0,    -4,     5,    19,    23,   -46,   -46,
-     -46,   398,   398,   398,   398,   398,   398,   -46,   398,   -46,
-       6,    17,  1088,   296,  1468,  1490,   -46,   -46,   424,     9,
-    1374,   135,   452,   168,  1518,   344,  1355,  1449,  1555,   -10,
-     -46,    -9,   398,   398,   398,   398,  1355,  1449,   250,    -2,
-      -2,    10,    11,    -2,    10,    -2,    10,   619,   240,  1399,
-    1424,   398,   -46,   398,   -46,   398,   398,   398,   398,   398,
-     398,   398,   398,   398,   398,   398,   398,   398,   398,   398,
-     -46,   398,   398,   398,   398,   398,   398,   398,   -46,    -3,
-      -3,    -3,    -3,    -3,    -3,    -3,    -3,    -3,   398,   -46,
-     398,   398,   398,   398,   398,   398,   398,   -46,   398,   -46,
-     398,   -46,   -46,   398,   -46,   398,   -46,   -46,   -46,   398,
-     398,   -46,   398,   -46,  1231,  1251,  1271,  1291,   -46,   -46,
-     -46,   -46,  1355,  1449,  1355,  1449,  1313,  1535,  1535,  1535,
-    1556,  1556,  1556,  1556,    55,    55,    55,   -40,    10,   -40,
-     -40,   728,  1335,   400,   201,    74,   111,   -35,   -35,   -40,
-     752,    -3,    -3,    24,    24,    24,    24,    24,    24,    79,
-      11,    11,   776,   -17,   -17,    28,    28,    28,    28,   -46,
-     480,   342,  1111,  1431,  1131,  1438,   508,  1151,   -46,   -46,
-     -46,   -46,   398,   398,   -46,   398,   398,   398,   398,   -46,
-      11,    20,   398,   -46,   398,   -46,   -46,   398,   -46,   398,
-     -46,    60,   -46,   398,  1499,   800,  1499,  1449,  1499,  1449,
-     250,   824,   848,  1171,   646,   536,    48,   564,   398,   -46,
-     398,   -46,   398,   -46,   398,   -46,   398,   -46,    63,    83,
-     -46,   872,   896,   920,   673,  1191,    39,    45,   398,   -46,
-     398,   -46,   398,   -46,   -46,   398,   -46,   -46,   944,   968,
-     992,   592,   398,   -46,   398,   -46,   398,   -46,   398,   -46,
-    1016,  1040,  1064,  1211,   -46,   -46,   -46,   398,   700,   -46
-};
+#define yyerrok         (yyerrstatus = 0)
+#define yyclearin       (yychar = FITS_PARSER_YYEMPTY)
 
-/* FFPGOTO[NTERM-NUM].  */
-static const fftype_int16 ffpgoto[] =
-{
-     -46,   -46,   -46,   -46,   -46,    -1,    90,   147,    22
-};
-
-/* FFTABLE[FFPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
-   positive, shift that token.  If negative, reduce the rule which
-   number is the opposite.  If zero, do what FFDEFACT says.
-   If FFTABLE_NINF, syntax error.  */
-#define FFTABLE_NINF -1
-static const fftype_uint16 fftable[] =
-{
-      32,    49,    88,    96,     8,    36,    51,    89,    38,    42,
-     130,   132,    97,    17,   112,   113,   114,   115,   116,    52,
-      56,    59,    60,    35,    63,    65,    71,    67,    53,   120,
-      72,    41,    45,    48,    91,    92,    93,    73,    94,    95,
-     171,    74,    54,   131,   133,    89,    55,    96,    50,   172,
-      70,   134,   135,   136,   137,   105,    97,    97,   108,   105,
-     106,   107,   121,   116,   106,   107,   236,   108,   248,   256,
-     142,   108,   144,   140,   146,   147,   148,   149,   150,   151,
-     152,   153,   154,   155,   156,   157,   159,   160,   161,   257,
-     162,    33,   266,    86,    87,   169,   170,    88,   267,    39,
-      43,    93,    89,    94,    95,     0,     0,   182,     0,     0,
-       0,    57,    96,   164,    61,    64,    66,   190,    68,   106,
-     107,    97,   192,     0,   194,     0,   108,     0,     0,   196,
-       0,   197,   183,   184,   185,   186,   187,   188,   189,     0,
-      94,    95,     0,     0,     0,   193,     0,     0,    34,    96,
-       0,   195,     0,     0,     0,   123,    40,     0,    97,     0,
-       0,   143,     0,   145,   110,   111,   112,   113,   114,   115,
-     116,    62,     0,     0,     0,    69,   158,     0,     0,     0,
-       0,   163,   165,   166,   167,   168,     0,     0,   124,     0,
-       0,     0,     0,    91,    92,    93,     0,    94,    95,     0,
-       0,   224,   225,     0,   226,   228,    96,   231,     0,     0,
-     191,   232,     0,   233,     0,    97,   234,     0,   235,     0,
-       0,   127,   237,   207,     0,     0,     0,     0,     0,   230,
-     110,   111,   112,   113,   114,   115,   116,   251,     0,   252,
-       0,   253,     0,   254,     0,   255,   173,   174,   175,   176,
-     177,   178,   179,   180,   181,     0,     0,   268,     0,   269,
-       0,   270,     0,     0,   271,    91,    92,    93,     0,    94,
-      95,   280,     0,   281,     0,   282,     0,   283,    96,   110,
-     111,   112,   113,   114,   115,   116,   288,    97,     0,     0,
-       0,     0,     0,   139,     0,   227,   229,     2,     3,     0,
-       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,     0,   210,   211,
-      21,    91,    92,    93,     0,    94,    95,     0,     0,     0,
-       0,     0,    22,    23,    96,     0,     0,     0,     0,     0,
-      24,    25,    26,    97,     0,     0,    98,    27,     0,    28,
-       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    91,    92,    93,
-      21,    94,    95,   110,   111,   112,   113,   114,   115,   116,
-      96,     0,    22,    23,     0,     0,     0,     0,     0,    97,
-      24,    25,    26,     0,     0,   216,     0,   128,     0,    28,
-      37,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    20,     0,     0,
-       0,    21,   206,     0,     0,    91,    92,    93,     0,    94,
-      95,     0,     0,    22,    23,     0,     0,     0,    96,     0,
-       0,    24,    25,    26,   118,    75,     0,    97,     0,     0,
-      28,     0,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,     0,     0,    88,     0,     0,     0,
-       0,    89,   125,    75,     0,     0,     0,   119,     0,     0,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,     0,     0,    88,     0,     0,     0,     0,    89,
-     214,    75,     0,     0,     0,   126,     0,     0,    76,    77,
-      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
-       0,     0,    88,     0,     0,     0,     0,    89,   221,    75,
-       0,     0,     0,   215,     0,     0,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,     0,     0,
-      88,     0,     0,     0,     0,    89,   246,    75,     0,     0,
-       0,   222,     0,     0,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-       0,     0,     0,    89,   249,    75,     0,     0,     0,   247,
-       0,     0,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,     0,     0,    88,     0,     0,     0,
-       0,    89,   278,    75,     0,     0,     0,   250,     0,     0,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,     0,     0,    88,     0,     0,     0,     0,    89,
-      75,     0,     0,     0,     0,   279,     0,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,     0,
-       0,    88,     0,     0,     0,     0,    89,    75,     0,     0,
-       0,     0,   138,     0,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-       0,     0,     0,    89,    75,     0,     0,     0,     0,   245,
-       0,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,     0,     0,    88,     0,     0,     0,     0,
-      89,    75,     0,     0,     0,     0,   264,     0,    76,    77,
-      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
-       0,     0,    88,     0,     0,     0,     0,    89,   203,    75,
-       0,     0,     0,   289,     0,     0,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,     0,     0,
-      88,     0,   208,    75,     0,    89,     0,     0,     0,   204,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,     0,     0,    88,     0,   212,    75,     0,    89,
-       0,     0,     0,   209,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-     238,    75,     0,    89,     0,     0,     0,   213,    76,    77,
-      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
-       0,     0,    88,     0,   240,    75,     0,    89,     0,     0,
-       0,   239,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,     0,     0,    88,     0,   242,    75,
-       0,    89,     0,     0,     0,   241,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,     0,     0,
-      88,     0,   258,    75,     0,    89,     0,     0,     0,   243,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,     0,     0,    88,     0,   260,    75,     0,    89,
-       0,     0,     0,   259,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-     262,    75,     0,    89,     0,     0,     0,   261,    76,    77,
-      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
-       0,     0,    88,     0,   272,    75,     0,    89,     0,     0,
-       0,   263,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,     0,     0,    88,     0,   274,    75,
-       0,    89,     0,     0,     0,   273,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,     0,     0,
-      88,     0,   276,    75,     0,    89,     0,     0,     0,   275,
-      76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
-      86,    87,     0,     0,    88,     0,     0,    75,     0,    89,
-       0,     0,     0,   277,    76,    77,    78,    79,    80,    81,
-      82,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-       0,    75,     0,    89,     0,     0,     0,   284,    76,    77,
-      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
-       0,     0,    88,     0,     0,    75,     0,    89,     0,     0,
-       0,   285,    76,    77,    78,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,     0,     0,    88,     0,     0,    75,
-       0,    89,     0,     0,     0,   286,    76,    77,    78,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,     0,     0,
-      88,   217,    75,     0,     0,    89,     0,     0,    90,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,   219,    75,    88,     0,     0,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,   223,    75,    88,     0,     0,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,   244,    75,    88,     0,     0,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,   265,    75,    88,     0,     0,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,   287,    75,    88,     0,     0,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,     0,    75,    88,     0,   198,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,     0,    75,    88,     0,   199,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,     0,    75,    88,     0,   200,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,     0,    75,    88,     0,   201,     0,     0,    89,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,     0,     0,    88,    75,   202,     0,     0,    89,     0,
-       0,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,     0,     0,    88,    75,   205,     0,     0,
-      89,     0,     0,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,    86,    87,     0,    75,    88,     0,     0,
-       0,     0,    89,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,    86,    87,     0,     0,    88,     0,     0,
-       0,     0,    89,    99,   100,   101,   102,   103,   104,   105,
-       0,     0,     0,     0,   106,   107,     0,     0,     0,     0,
-       0,   108,     0,     0,     0,     0,     0,   122,    99,   100,
-     101,   102,   103,   104,   105,     0,     0,     0,     0,   106,
-     107,     0,     0,     0,     0,     0,   108,     0,     0,     0,
-       0,     0,   140,   110,   111,   112,   113,   114,   115,   116,
-     110,   111,   112,   113,   114,   115,   116,   110,   111,   112,
-     113,   114,   115,   116,    91,    92,    93,   141,    94,    95,
-       0,     0,     0,     0,   218,     0,     0,    96,     0,     0,
-       0,   220,     0,     0,     0,     0,    97,    99,   100,   101,
-     102,   103,   104,   105,     0,     0,     0,     0,   106,   107,
-       0,     0,     0,     0,     0,   108,     0,     0,   109,   110,
-     111,   112,   113,   114,   115,   116,     0,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,     0,
-     117,    88,     0,     0,     0,     0,    89,    99,   100,   101,
-     102,   103,   104,   105,     0,     0,     0,     0,   106,   107,
-       0,     0,     0,     0,     0,   108,    79,    80,    81,    82,
-      83,    84,    85,    86,    87,   129,     0,    88,     0,     0,
-       0,     0,    89,     0,   110,   111,   112,   113,   114,   115,
-     116,    83,    84,    85,    86,    87,     0,     0,    88,     0,
-       0,     0,     0,    89
-};
-
-static const fftype_int16 ffcheck[] =
-{
-       1,     6,    42,    38,     7,    50,     6,    47,     9,    10,
-      20,    20,    47,    16,    31,    32,    33,    34,    35,    23,
-      21,    22,    23,     1,    25,    26,    20,    28,    23,    20,
-      24,     9,    10,    11,    25,    26,    27,    20,    29,    30,
-      43,    24,    23,    53,    53,    47,    23,    38,    53,    52,
-      28,    52,    53,    54,    55,    35,    47,    47,    47,    35,
-      40,    41,    53,    35,    40,    41,     6,    47,    20,     6,
-      71,    47,    73,    53,    75,    76,    77,    78,    79,    80,
-      81,    82,    83,    84,    85,    86,    87,    88,    89,     6,
-      91,     1,    53,    38,    39,    96,    97,    42,    53,     9,
-      10,    27,    47,    29,    30,    -1,    -1,   108,    -1,    -1,
-      -1,    21,    38,    91,    24,    25,    26,   118,    28,    40,
-      41,    47,   123,    -1,   125,    -1,    47,    -1,    -1,   130,
-      -1,   132,   110,   111,   112,   113,   114,   115,   116,    -1,
-      29,    30,    -1,    -1,    -1,   123,    -1,    -1,     1,    38,
-      -1,   129,    -1,    -1,    -1,    20,     9,    -1,    47,    -1,
-      -1,    71,    -1,    73,    29,    30,    31,    32,    33,    34,
-      35,    24,    -1,    -1,    -1,    28,    86,    -1,    -1,    -1,
-      -1,    91,    92,    93,    94,    95,    -1,    -1,    53,    -1,
-      -1,    -1,    -1,    25,    26,    27,    -1,    29,    30,    -1,
-      -1,   202,   203,    -1,   205,   206,    38,   208,    -1,    -1,
-     120,   212,    -1,   214,    -1,    47,   217,    -1,   219,    -1,
-      -1,    53,   223,    22,    -1,    -1,    -1,    -1,    -1,   207,
-      29,    30,    31,    32,    33,    34,    35,   238,    -1,   240,
-      -1,   242,    -1,   244,    -1,   246,    99,   100,   101,   102,
-     103,   104,   105,   106,   107,    -1,    -1,   258,    -1,   260,
-      -1,   262,    -1,    -1,   265,    25,    26,    27,    -1,    29,
-      30,   272,    -1,   274,    -1,   276,    -1,   278,    38,    29,
-      30,    31,    32,    33,    34,    35,   287,    47,    -1,    -1,
-      -1,    -1,    -1,    53,    -1,   205,   206,     0,     1,    -1,
-       3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    -1,   171,   172,
-      23,    25,    26,    27,    -1,    29,    30,    -1,    -1,    -1,
-      -1,    -1,    35,    36,    38,    -1,    -1,    -1,    -1,    -1,
-      43,    44,    45,    47,    -1,    -1,    50,    50,    -1,    52,
-       3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    25,    26,    27,
-      23,    29,    30,    29,    30,    31,    32,    33,    34,    35,
-      38,    -1,    35,    36,    -1,    -1,    -1,    -1,    -1,    47,
-      43,    44,    45,    -1,    -1,    53,    -1,    53,    -1,    52,
-      53,     3,     4,     5,     6,     7,     8,     9,    10,    11,
-      12,    13,    14,    15,    16,    17,    18,    19,    -1,    -1,
-      -1,    23,    22,    -1,    -1,    25,    26,    27,    -1,    29,
-      30,    -1,    -1,    35,    36,    -1,    -1,    -1,    38,    -1,
-      -1,    43,    44,    45,    20,    21,    -1,    47,    -1,    -1,
-      52,    -1,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    -1,    42,    -1,    -1,    -1,
-      -1,    47,    20,    21,    -1,    -1,    -1,    53,    -1,    -1,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    -1,    42,    -1,    -1,    -1,    -1,    47,
-      20,    21,    -1,    -1,    -1,    53,    -1,    -1,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      -1,    -1,    42,    -1,    -1,    -1,    -1,    47,    20,    21,
-      -1,    -1,    -1,    53,    -1,    -1,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    -1,    -1,
-      42,    -1,    -1,    -1,    -1,    47,    20,    21,    -1,    -1,
-      -1,    53,    -1,    -1,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      -1,    -1,    -1,    47,    20,    21,    -1,    -1,    -1,    53,
-      -1,    -1,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    -1,    42,    -1,    -1,    -1,
-      -1,    47,    20,    21,    -1,    -1,    -1,    53,    -1,    -1,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    -1,    42,    -1,    -1,    -1,    -1,    47,
-      21,    -1,    -1,    -1,    -1,    53,    -1,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    -1,
-      -1,    42,    -1,    -1,    -1,    -1,    47,    21,    -1,    -1,
-      -1,    -1,    53,    -1,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      -1,    -1,    -1,    47,    21,    -1,    -1,    -1,    -1,    53,
-      -1,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-      37,    38,    39,    -1,    -1,    42,    -1,    -1,    -1,    -1,
-      47,    21,    -1,    -1,    -1,    -1,    53,    -1,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      -1,    -1,    42,    -1,    -1,    -1,    -1,    47,    20,    21,
-      -1,    -1,    -1,    53,    -1,    -1,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    -1,    -1,
-      42,    -1,    20,    21,    -1,    47,    -1,    -1,    -1,    51,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    -1,    42,    -1,    20,    21,    -1,    47,
-      -1,    -1,    -1,    51,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      20,    21,    -1,    47,    -1,    -1,    -1,    51,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      -1,    -1,    42,    -1,    20,    21,    -1,    47,    -1,    -1,
-      -1,    51,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    -1,    42,    -1,    20,    21,
-      -1,    47,    -1,    -1,    -1,    51,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    -1,    -1,
-      42,    -1,    20,    21,    -1,    47,    -1,    -1,    -1,    51,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    -1,    42,    -1,    20,    21,    -1,    47,
-      -1,    -1,    -1,    51,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      20,    21,    -1,    47,    -1,    -1,    -1,    51,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      -1,    -1,    42,    -1,    20,    21,    -1,    47,    -1,    -1,
-      -1,    51,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    -1,    42,    -1,    20,    21,
-      -1,    47,    -1,    -1,    -1,    51,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    -1,    -1,
-      42,    -1,    20,    21,    -1,    47,    -1,    -1,    -1,    51,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    -1,    42,    -1,    -1,    21,    -1,    47,
-      -1,    -1,    -1,    51,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      -1,    21,    -1,    47,    -1,    -1,    -1,    51,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      -1,    -1,    42,    -1,    -1,    21,    -1,    47,    -1,    -1,
-      -1,    51,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    -1,    42,    -1,    -1,    21,
-      -1,    47,    -1,    -1,    -1,    51,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    -1,    -1,
-      42,    20,    21,    -1,    -1,    47,    -1,    -1,    50,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    20,    21,    42,    -1,    -1,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    20,    21,    42,    -1,    -1,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    20,    21,    42,    -1,    -1,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    20,    21,    42,    -1,    -1,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    20,    21,    42,    -1,    -1,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    -1,    21,    42,    -1,    24,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    -1,    21,    42,    -1,    24,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    -1,    21,    42,    -1,    24,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    -1,    21,    42,    -1,    24,    -1,    -1,    47,    28,
-      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
-      39,    -1,    -1,    42,    21,    22,    -1,    -1,    47,    -1,
-      -1,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-      37,    38,    39,    -1,    -1,    42,    21,    22,    -1,    -1,
-      47,    -1,    -1,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    -1,    21,    42,    -1,    -1,
-      -1,    -1,    47,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    -1,    -1,    42,    -1,    -1,
-      -1,    -1,    47,    29,    30,    31,    32,    33,    34,    35,
-      -1,    -1,    -1,    -1,    40,    41,    -1,    -1,    -1,    -1,
-      -1,    47,    -1,    -1,    -1,    -1,    -1,    53,    29,    30,
-      31,    32,    33,    34,    35,    -1,    -1,    -1,    -1,    40,
-      41,    -1,    -1,    -1,    -1,    -1,    47,    -1,    -1,    -1,
-      -1,    -1,    53,    29,    30,    31,    32,    33,    34,    35,
-      29,    30,    31,    32,    33,    34,    35,    29,    30,    31,
-      32,    33,    34,    35,    25,    26,    27,    53,    29,    30,
-      -1,    -1,    -1,    -1,    53,    -1,    -1,    38,    -1,    -1,
-      -1,    53,    -1,    -1,    -1,    -1,    47,    29,    30,    31,
-      32,    33,    34,    35,    -1,    -1,    -1,    -1,    40,    41,
-      -1,    -1,    -1,    -1,    -1,    47,    -1,    -1,    50,    29,
-      30,    31,    32,    33,    34,    35,    -1,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    -1,
-      50,    42,    -1,    -1,    -1,    -1,    47,    29,    30,    31,
-      32,    33,    34,    35,    -1,    -1,    -1,    -1,    40,    41,
-      -1,    -1,    -1,    -1,    -1,    47,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    20,    -1,    42,    -1,    -1,
-      -1,    -1,    47,    -1,    29,    30,    31,    32,    33,    34,
-      35,    35,    36,    37,    38,    39,    -1,    -1,    42,    -1,
-      -1,    -1,    -1,    47
-};
-
-/* FFSTOS[STATE-NUM] -- The (internal number of the) accessing
-   symbol of state STATE-NUM.  */
-static const fftype_uint8 ffstos[] =
-{
-       0,    55,     0,     1,     3,     4,     5,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    23,    35,    36,    43,    44,    45,    50,    52,    56,
-      57,    58,    59,    60,    61,    62,    50,    53,    59,    60,
-      61,    62,    59,    60,    61,    62,    59,    60,    62,     6,
-      53,     6,    23,    23,    23,    23,    59,    60,    62,    59,
-      59,    60,    61,    59,    60,    59,    60,    59,    60,    61,
-      62,    20,    24,    20,    24,    21,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    42,    47,
-      50,    25,    26,    27,    29,    30,    38,    47,    50,    29,
-      30,    31,    32,    33,    34,    35,    40,    41,    47,    50,
-      29,    30,    31,    32,    33,    34,    35,    50,    20,    53,
-      20,    53,    53,    20,    53,    20,    53,    53,    53,    20,
-      20,    53,    20,    53,    59,    59,    59,    59,    53,    53,
-      53,    53,    59,    60,    59,    60,    59,    59,    59,    59,
-      59,    59,    59,    59,    59,    59,    59,    59,    60,    59,
-      59,    59,    59,    60,    62,    60,    60,    60,    60,    59,
-      59,    43,    52,    61,    61,    61,    61,    61,    61,    61,
-      61,    61,    59,    62,    62,    62,    62,    62,    62,    62,
-      59,    60,    59,    62,    59,    62,    59,    59,    24,    24,
-      24,    24,    22,    20,    51,    22,    22,    22,    20,    51,
-      61,    61,    20,    51,    20,    53,    53,    20,    53,    20,
-      53,    20,    53,    20,    59,    59,    59,    60,    59,    60,
-      62,    59,    59,    59,    59,    59,     6,    59,    20,    51,
-      20,    51,    20,    51,    20,    53,    20,    53,    20,    20,
-      53,    59,    59,    59,    59,    59,     6,     6,    20,    51,
-      20,    51,    20,    51,    53,    20,    53,    53,    59,    59,
-      59,    59,    20,    51,    20,    51,    20,    51,    20,    53,
-      59,    59,    59,    59,    51,    51,    51,    20,    59,    53
-};
-
-#define fferrok		(fferrstatus = 0)
-#define ffclearin	(ffchar = FFEMPTY)
-#define FFEMPTY		(-2)
-#define FFEOF		0
-
-#define FFACCEPT	goto ffacceptlab
-#define FFABORT		goto ffabortlab
-#define FFERROR		goto fferrorlab
+#define YYACCEPT        goto yyacceptlab
+#define YYABORT         goto yyabortlab
+#define YYERROR         goto yyerrorlab
+#define YYNOMEM         goto yyexhaustedlab
 
 
-/* Like FFERROR except do call fferror.  This remains here temporarily
-   to ease the transition to the new meaning of FFERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+#define YYRECOVERING()  (!!yyerrstatus)
 
-#define FFFAIL		goto fferrlab
+#define YYBACKUP(Token, Value)                                    \
+  do                                                              \
+    if (yychar == FITS_PARSER_YYEMPTY)                                        \
+      {                                                           \
+        yychar = (Token);                                         \
+        yylval = (Value);                                         \
+        YYPOPSTACK (yylen);                                       \
+        yystate = *yyssp;                                         \
+        goto yybackup;                                            \
+      }                                                           \
+    else                                                          \
+      {                                                           \
+        yyerror (scanner, lParse, YY_("syntax error: cannot back up")); \
+        YYERROR;                                                  \
+      }                                                           \
+  while (0)
 
-#define FFRECOVERING()  (!!fferrstatus)
+/* Backward compatibility with an undocumented macro.
+   Use FITS_PARSER_YYerror or FITS_PARSER_YYUNDEF. */
+#define YYERRCODE FITS_PARSER_YYUNDEF
 
-#define FFBACKUP(Token, Value)					\
-do								\
-  if (ffchar == FFEMPTY && fflen == 1)				\
-    {								\
-      ffchar = (Token);						\
-      fflval = (Value);						\
-      fftoken = FFTRANSLATE (ffchar);				\
-      FFPOPSTACK (1);						\
-      goto ffbackup;						\
-    }								\
-  else								\
-    {								\
-      fferror (FF_("syntax error: cannot back up")); \
-      FFERROR;							\
-    }								\
-while (FFID (0))
-
-
-#define FFTERROR	1
-#define FFERRCODE	256
-
-
-/* FFLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-   If N is 0, then set CURRENT to the empty location which ends
-   the previous symbol: RHS[0] (always defined).  */
-
-#define FFRHSLOC(Rhs, K) ((Rhs)[K])
-#ifndef FFLLOC_DEFAULT
-# define FFLLOC_DEFAULT(Current, Rhs, N)				\
-    do									\
-      if (FFID (N))                                                    \
-	{								\
-	  (Current).first_line   = FFRHSLOC (Rhs, 1).first_line;	\
-	  (Current).first_column = FFRHSLOC (Rhs, 1).first_column;	\
-	  (Current).last_line    = FFRHSLOC (Rhs, N).last_line;		\
-	  (Current).last_column  = FFRHSLOC (Rhs, N).last_column;	\
-	}								\
-      else								\
-	{								\
-	  (Current).first_line   = (Current).last_line   =		\
-	    FFRHSLOC (Rhs, 0).last_line;				\
-	  (Current).first_column = (Current).last_column =		\
-	    FFRHSLOC (Rhs, 0).last_column;				\
-	}								\
-    while (FFID (0))
-#endif
-
-
-/* FF_LOCATION_PRINT -- Print the location on the stream.
-   This macro was not mandated originally: define only if we know
-   we won't break user code: when these are the locations we know.  */
-
-#ifndef FF_LOCATION_PRINT
-# if FFLTYPE_IS_TRIVIAL
-#  define FF_LOCATION_PRINT(File, Loc)			\
-     fprintf (File, "%d.%d-%d.%d",			\
-	      (Loc).first_line, (Loc).first_column,	\
-	      (Loc).last_line,  (Loc).last_column)
-# else
-#  define FF_LOCATION_PRINT(File, Loc) ((void) 0)
-# endif
-#endif
-
-
-/* FFLEX -- calling `fflex' with the right arguments.  */
-
-#ifdef FFLEX_PARAM
-# define FFLEX fflex (FFLEX_PARAM)
-#else
-# define FFLEX fflex ()
-#endif
 
 /* Enable debugging if requested.  */
-#if FFDEBUG
+#if FITS_PARSER_YYDEBUG
 
-# ifndef FFFPRINTF
+# ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#  define FFFPRINTF fprintf
+#  define YYFPRINTF fprintf
 # endif
 
-# define FFDPRINTF(Args)			\
-do {						\
-  if (ffdebug)					\
-    FFFPRINTF Args;				\
-} while (FFID (0))
-
-# define FF_SYMBOL_PRINT(Title, Type, Value, Location)			  \
-do {									  \
-  if (ffdebug)								  \
-    {									  \
-      FFFPRINTF (stderr, "%s ", Title);					  \
-      ff_symbol_print (stderr,						  \
-		  Type, Value); \
-      FFFPRINTF (stderr, "\n");						  \
-    }									  \
-} while (FFID (0))
+# define YYDPRINTF(Args)                        \
+do {                                            \
+  if (yydebug)                                  \
+    YYFPRINTF Args;                             \
+} while (0)
 
 
-/*--------------------------------.
-| Print this symbol on FFOUTPUT.  |
-`--------------------------------*/
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)                    \
+do {                                                                      \
+  if (yydebug)                                                            \
+    {                                                                     \
+      YYFPRINTF (stderr, "%s ", Title);                                   \
+      yy_symbol_print (stderr,                                            \
+                  Kind, Value, scanner, lParse); \
+      YYFPRINTF (stderr, "\n");                                           \
+    }                                                                     \
+} while (0)
+
+
+/*-----------------------------------.
+| Print this symbol's value on YYO.  |
+`-----------------------------------*/
+
 static void
-ff_symbol_value_print (FILE *ffoutput, int fftype, FFSTYPE const * const ffvaluep)
-#else
-static void
-ff_symbol_value_print (ffoutput, fftype, ffvaluep)
-    FILE *ffoutput;
-    int fftype;
-    FFSTYPE const * const ffvaluep;
-#endif
+yy_symbol_value_print (FILE *yyo,
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t scanner, ParseData *lParse)
 {
-  if (!ffvaluep)
+  FILE *yyoutput = yyo;
+  YY_USE (yyoutput);
+  YY_USE (scanner);
+  YY_USE (lParse);
+  if (!yyvaluep)
     return;
-# ifdef FFPRINT
-  if (fftype < FFNTOKENS)
-    FFPRINT (ffoutput, fftoknum[fftype], *ffvaluep);
-# else
-  FFUSE (ffoutput);
-# endif
-  switch (fftype)
-    {
-      default:
-	break;
-    }
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  YY_USE (yykind);
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
 
-/*--------------------------------.
-| Print this symbol on FFOUTPUT.  |
-`--------------------------------*/
+/*---------------------------.
+| Print this symbol on YYO.  |
+`---------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
-ff_symbol_print (FILE *ffoutput, int fftype, FFSTYPE const * const ffvaluep)
-#else
-static void
-ff_symbol_print (ffoutput, fftype, ffvaluep)
-    FILE *ffoutput;
-    int fftype;
-    FFSTYPE const * const ffvaluep;
-#endif
+yy_symbol_print (FILE *yyo,
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, yyscan_t scanner, ParseData *lParse)
 {
-  if (fftype < FFNTOKENS)
-    FFFPRINTF (ffoutput, "token %s (", fftname[fftype]);
-  else
-    FFFPRINTF (ffoutput, "nterm %s (", fftname[fftype]);
+  YYFPRINTF (yyo, "%s %s (",
+             yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
 
-  ff_symbol_value_print (ffoutput, fftype, ffvaluep);
-  FFFPRINTF (ffoutput, ")");
+  yy_symbol_value_print (yyo, yykind, yyvaluep, scanner, lParse);
+  YYFPRINTF (yyo, ")");
 }
 
 /*------------------------------------------------------------------.
-| ff_stack_print -- Print the state stack from its BOTTOM up to its |
+| yy_stack_print -- Print the state stack from its BOTTOM up to its |
 | TOP (included).                                                   |
 `------------------------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
-ff_stack_print (fftype_int16 *ffbottom, fftype_int16 *fftop)
-#else
-static void
-ff_stack_print (ffbottom, fftop)
-    fftype_int16 *ffbottom;
-    fftype_int16 *fftop;
-#endif
+yy_stack_print (yy_state_t *yybottom, yy_state_t *yytop)
 {
-  FFFPRINTF (stderr, "Stack now");
-  for (; ffbottom <= fftop; ffbottom++)
+  YYFPRINTF (stderr, "Stack now");
+  for (; yybottom <= yytop; yybottom++)
     {
-      int ffbot = *ffbottom;
-      FFFPRINTF (stderr, " %d", ffbot);
+      int yybot = *yybottom;
+      YYFPRINTF (stderr, " %d", yybot);
     }
-  FFFPRINTF (stderr, "\n");
+  YYFPRINTF (stderr, "\n");
 }
 
-# define FF_STACK_PRINT(Bottom, Top)				\
-do {								\
-  if (ffdebug)							\
-    ff_stack_print ((Bottom), (Top));				\
-} while (FFID (0))
+# define YY_STACK_PRINT(Bottom, Top)                            \
+do {                                                            \
+  if (yydebug)                                                  \
+    yy_stack_print ((Bottom), (Top));                           \
+} while (0)
 
 
 /*------------------------------------------------.
-| Report that the FFRULE is going to be reduced.  |
+| Report that the YYRULE is going to be reduced.  |
 `------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
-ff_reduce_print (FFSTYPE *ffvsp, int ffrule)
-#else
-static void
-ff_reduce_print (ffvsp, ffrule)
-    FFSTYPE *ffvsp;
-    int ffrule;
-#endif
+yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
+                 int yyrule, yyscan_t scanner, ParseData *lParse)
 {
-  int ffnrhs = ffr2[ffrule];
-  int ffi;
-  unsigned long int fflno = ffrline[ffrule];
-  FFFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
-	     ffrule - 1, fflno);
+  int yylno = yyrline[yyrule];
+  int yynrhs = yyr2[yyrule];
+  int yyi;
+  YYFPRINTF (stderr, "Reducing stack by rule %d (line %d):\n",
+             yyrule - 1, yylno);
   /* The symbols being reduced.  */
-  for (ffi = 0; ffi < ffnrhs; ffi++)
+  for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      FFFPRINTF (stderr, "   $%d = ", ffi + 1);
-      ff_symbol_print (stderr, ffrhs[ffprhs[ffrule] + ffi],
-		       &(ffvsp[(ffi + 1) - (ffnrhs)])
-		       		       );
-      FFFPRINTF (stderr, "\n");
+      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
+      yy_symbol_print (stderr,
+                       YY_ACCESSING_SYMBOL (+yyssp[yyi + 1 - yynrhs]),
+                       &yyvsp[(yyi + 1) - (yynrhs)], scanner, lParse);
+      YYFPRINTF (stderr, "\n");
     }
 }
 
-# define FF_REDUCE_PRINT(Rule)		\
-do {					\
-  if (ffdebug)				\
-    ff_reduce_print (ffvsp, Rule); \
-} while (FFID (0))
+# define YY_REDUCE_PRINT(Rule)          \
+do {                                    \
+  if (yydebug)                          \
+    yy_reduce_print (yyssp, yyvsp, Rule, scanner, lParse); \
+} while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
-int ffdebug;
-#else /* !FFDEBUG */
-# define FFDPRINTF(Args)
-# define FF_SYMBOL_PRINT(Title, Type, Value, Location)
-# define FF_STACK_PRINT(Bottom, Top)
-# define FF_REDUCE_PRINT(Rule)
-#endif /* !FFDEBUG */
+int yydebug;
+#else /* !FITS_PARSER_YYDEBUG */
+# define YYDPRINTF(Args) ((void) 0)
+# define YY_SYMBOL_PRINT(Title, Kind, Value, Location)
+# define YY_STACK_PRINT(Bottom, Top)
+# define YY_REDUCE_PRINT(Rule)
+#endif /* !FITS_PARSER_YYDEBUG */
 
 
-/* FFINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef	FFINITDEPTH
-# define FFINITDEPTH 200
+/* YYINITDEPTH -- initial size of the parser's stacks.  */
+#ifndef YYINITDEPTH
+# define YYINITDEPTH 200
 #endif
 
-/* FFMAXDEPTH -- maximum size the stacks can grow to (effective only
+/* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
    if the built-in stack extension method is used).
 
    Do not make this value too large; the results are undefined if
-   FFSTACK_ALLOC_MAXIMUM < FFSTACK_BYTES (FFMAXDEPTH)
+   YYSTACK_ALLOC_MAXIMUM < YYSTACK_BYTES (YYMAXDEPTH)
    evaluated with infinite-precision integer arithmetic.  */
 
-#ifndef FFMAXDEPTH
-# define FFMAXDEPTH 10000
+#ifndef YYMAXDEPTH
+# define YYMAXDEPTH 10000
 #endif
 
-
 
-#if FFERROR_VERBOSE
 
-# ifndef ffstrlen
-#  if defined __GLIBC__ && defined _STRING_H
-#   define ffstrlen strlen
-#  else
-/* Return the length of FFSTR.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static FFSIZE_T
-ffstrlen (const char *ffstr)
-#else
-static FFSIZE_T
-ffstrlen (ffstr)
-    const char *ffstr;
-#endif
-{
-  FFSIZE_T fflen;
-  for (fflen = 0; ffstr[fflen]; fflen++)
-    continue;
-  return fflen;
-}
-#  endif
-# endif
 
-# ifndef ffstpcpy
-#  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
-#   define ffstpcpy stpcpy
-#  else
-/* Copy FFSRC to FFDEST, returning the address of the terminating '\0' in
-   FFDEST.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static char *
-ffstpcpy (char *ffdest, const char *ffsrc)
-#else
-static char *
-ffstpcpy (ffdest, ffsrc)
-    char *ffdest;
-    const char *ffsrc;
-#endif
-{
-  char *ffd = ffdest;
-  const char *ffs = ffsrc;
 
-  while ((*ffd++ = *ffs++) != '\0')
-    continue;
-
-  return ffd - 1;
-}
-#  endif
-# endif
-
-# ifndef fftnamerr
-/* Copy to FFRES the contents of FFSTR after stripping away unnecessary
-   quotes and backslashes, so that it's suitable for fferror.  The
-   heuristic is that double-quoting is unnecessary unless the string
-   contains an apostrophe, a comma, or backslash (other than
-   backslash-backslash).  FFSTR is taken from fftname.  If FFRES is
-   null, do not copy; instead, return the length of what the result
-   would have been.  */
-static FFSIZE_T
-fftnamerr (char *ffres, const char *ffstr)
-{
-  if (*ffstr == '"')
-    {
-      FFSIZE_T ffn = 0;
-      char const *ffp = ffstr;
-
-      for (;;)
-	switch (*++ffp)
-	  {
-	  case '\'':
-	  case ',':
-	    goto do_not_strip_quotes;
-
-	  case '\\':
-	    if (*++ffp != '\\')
-	      goto do_not_strip_quotes;
-	    /* Fall through.  */
-	  default:
-	    if (ffres)
-	      ffres[ffn] = *ffp;
-	    ffn++;
-	    break;
-
-	  case '"':
-	    if (ffres)
-	      ffres[ffn] = '\0';
-	    return ffn;
-	  }
-    do_not_strip_quotes: ;
-    }
-
-  if (! ffres)
-    return ffstrlen (ffstr);
-
-  return ffstpcpy (ffres, ffstr) - ffres;
-}
-# endif
-
-/* Copy into FFRESULT an error message about the unexpected token
-   FFCHAR while in state FFSTATE.  Return the number of bytes copied,
-   including the terminating null byte.  If FFRESULT is null, do not
-   copy anything; just return the number of bytes that would be
-   copied.  As a special case, return 0 if an ordinary "syntax error"
-   message will do.  Return FFSIZE_MAXIMUM if overflow occurs during
-   size calculation.  */
-static FFSIZE_T
-ffsyntax_error (char *ffresult, int ffstate, int ffchar)
-{
-  int ffn = ffpact[ffstate];
-
-  if (! (FFPACT_NINF < ffn && ffn <= FFLAST))
-    return 0;
-  else
-    {
-      int fftype = FFTRANSLATE (ffchar);
-      FFSIZE_T ffsize0 = fftnamerr (0, fftname[fftype]);
-      FFSIZE_T ffsize = ffsize0;
-      FFSIZE_T ffsize1;
-      int ffsize_overflow = 0;
-      enum { FFERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-      char const *ffarg[FFERROR_VERBOSE_ARGS_MAXIMUM];
-      int ffx;
-
-# if 0
-      /* This is so xgettext sees the translatable formats that are
-	 constructed on the fly.  */
-      FF_("syntax error, unexpected %s");
-      FF_("syntax error, unexpected %s, expecting %s");
-      FF_("syntax error, unexpected %s, expecting %s or %s");
-      FF_("syntax error, unexpected %s, expecting %s or %s or %s");
-      FF_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
-# endif
-      char *fffmt;
-      char const *fff;
-      static char const ffunexpected[] = "syntax error, unexpected %s";
-      static char const ffexpecting[] = ", expecting %s";
-      static char const ffor[] = " or %s";
-      char ffformat[sizeof ffunexpected
-		    + sizeof ffexpecting - 1
-		    + ((FFERROR_VERBOSE_ARGS_MAXIMUM - 2)
-		       * (sizeof ffor - 1))];
-      char const *ffprefix = ffexpecting;
-
-      /* Start FFX at -FFN if negative to avoid negative indexes in
-	 FFCHECK.  */
-      int ffxbegin = ffn < 0 ? -ffn : 0;
-
-      /* Stay within bounds of both ffcheck and fftname.  */
-      int ffchecklim = FFLAST - ffn + 1;
-      int ffxend = ffchecklim < FFNTOKENS ? ffchecklim : FFNTOKENS;
-      int ffcount = 1;
-
-      ffarg[0] = fftname[fftype];
-      fffmt = ffstpcpy (ffformat, ffunexpected);
-
-      for (ffx = ffxbegin; ffx < ffxend; ++ffx)
-	if (ffcheck[ffx + ffn] == ffx && ffx != FFTERROR)
-	  {
-	    if (ffcount == FFERROR_VERBOSE_ARGS_MAXIMUM)
-	      {
-		ffcount = 1;
-		ffsize = ffsize0;
-		ffformat[sizeof ffunexpected - 1] = '\0';
-		break;
-	      }
-	    ffarg[ffcount++] = fftname[ffx];
-	    ffsize1 = ffsize + fftnamerr (0, fftname[ffx]);
-	    ffsize_overflow |= (ffsize1 < ffsize);
-	    ffsize = ffsize1;
-	    fffmt = ffstpcpy (fffmt, ffprefix);
-	    ffprefix = ffor;
-	  }
-
-      fff = FF_(ffformat);
-      ffsize1 = ffsize + ffstrlen (fff);
-      ffsize_overflow |= (ffsize1 < ffsize);
-      ffsize = ffsize1;
-
-      if (ffsize_overflow)
-	return FFSIZE_MAXIMUM;
-
-      if (ffresult)
-	{
-	  /* Avoid sprintf, as that infringes on the user's name space.
-	     Don't have undefined behavior even if the translation
-	     produced a string with the wrong number of "%s"s.  */
-	  char *ffp = ffresult;
-	  int ffi = 0;
-	  while ((*ffp = *fff) != '\0')
-	    {
-	      if (*ffp == '%' && fff[1] == 's' && ffi < ffcount)
-		{
-		  ffp += fftnamerr (ffp, ffarg[ffi++]);
-		  fff += 2;
-		}
-	      else
-		{
-		  ffp++;
-		  fff++;
-		}
-	    }
-	}
-      return ffsize;
-    }
-}
-#endif /* FFERROR_VERBOSE */
-
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
-ffdestruct (const char *ffmsg, int fftype, FFSTYPE *ffvaluep)
-#else
-static void
-ffdestruct (ffmsg, fftype, ffvaluep)
-    const char *ffmsg;
-    int fftype;
-    FFSTYPE *ffvaluep;
-#endif
+yydestruct (const char *yymsg,
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, yyscan_t scanner, ParseData *lParse)
 {
-  FFUSE (ffvaluep);
+  YY_USE (yyvaluep);
+  YY_USE (scanner);
+  YY_USE (lParse);
+  if (!yymsg)
+    yymsg = "Deleting";
+  YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
 
-  if (!ffmsg)
-    ffmsg = "Deleting";
-  FF_SYMBOL_PRINT (ffmsg, fftype, ffvaluep, fflocationp);
-
-  switch (fftype)
-    {
-
-      default:
-	break;
-    }
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  YY_USE (yykind);
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
-/* Prevent warnings from -Wmissing-prototypes.  */
-#ifdef FFPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int ffparse (void *FFPARSE_PARAM);
-#else
-int ffparse ();
-#endif
-#else /* ! FFPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int ffparse (void);
-#else
-int ffparse ();
-#endif
-#endif /* ! FFPARSE_PARAM */
 
 
-/* The lookahead symbol.  */
-int ffchar;
+
+
+
+/*----------.
+| yyparse.  |
+`----------*/
+
+int
+yyparse (yyscan_t scanner, ParseData *lParse)
+{
+/* Lookahead token kind.  */
+int yychar;
+
 
 /* The semantic value of the lookahead symbol.  */
-FFSTYPE fflval;
+/* Default value used for initialization, for pacifying older GCCs
+   or non-GCC compilers.  */
+YY_INITIAL_VALUE (static YYSTYPE yyval_default;)
+YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
 
-/* Number of syntax errors so far.  */
-int ffnerrs;
+    /* Number of syntax errors so far.  */
+    int yynerrs = 0;
 
-
-
-/*-------------------------.
-| ffparse or ffpush_parse.  |
-`-------------------------*/
-
-#ifdef FFPARSE_PARAM
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-int
-ffparse (void *FFPARSE_PARAM)
-#else
-int
-ffparse (FFPARSE_PARAM)
-    void *FFPARSE_PARAM;
-#endif
-#else /* ! FFPARSE_PARAM */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-int
-ffparse (void)
-#else
-int
-ffparse ()
-
-#endif
-#endif
-{
-
-
-    int ffstate;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
-    int fferrstatus;
+    int yyerrstatus = 0;
 
-    /* The stacks and their tools:
-       `ffss': related to states.
-       `ffvs': related to semantic values.
-
-       Refer to the stacks thru separate pointers, to allow ffoverflow
+    /* Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
-    /* The state stack.  */
-    fftype_int16 ffssa[FFINITDEPTH];
-    fftype_int16 *ffss;
-    fftype_int16 *ffssp;
+    /* Their size.  */
+    YYPTRDIFF_T yystacksize = YYINITDEPTH;
 
-    /* The semantic value stack.  */
-    FFSTYPE ffvsa[FFINITDEPTH];
-    FFSTYPE *ffvs;
-    FFSTYPE *ffvsp;
+    /* The state stack: array, bottom, top.  */
+    yy_state_t yyssa[YYINITDEPTH];
+    yy_state_t *yyss = yyssa;
+    yy_state_t *yyssp = yyss;
 
-    FFSIZE_T ffstacksize;
+    /* The semantic value stack: array, bottom, top.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs = yyvsa;
+    YYSTYPE *yyvsp = yyvs;
 
-  int ffn;
-  int ffresult;
-  /* Lookahead token as an internal (translated) token number.  */
-  int fftoken;
+  int yyn;
+  /* The return value of yyparse.  */
+  int yyresult;
+  /* Lookahead symbol kind.  */
+  yysymbol_kind_t yytoken = YYSYMBOL_YYEMPTY;
   /* The variables used to return semantic value and location from the
      action routines.  */
-  FFSTYPE ffval;
+  YYSTYPE yyval;
 
-#if FFERROR_VERBOSE
-  /* Buffer for error messages, and its allocated size.  */
-  char ffmsgbuf[128];
-  char *ffmsg = ffmsgbuf;
-  FFSIZE_T ffmsg_alloc = sizeof ffmsgbuf;
-#endif
 
-#define FFPOPSTACK(N)   (ffvsp -= (N), ffssp -= (N))
+
+#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
-  int fflen = 0;
+  int yylen = 0;
 
-  fftoken = 0;
-  ffss = ffssa;
-  ffvs = ffvsa;
-  ffstacksize = FFINITDEPTH;
+  YYDPRINTF ((stderr, "Starting parse\n"));
 
-  FFDPRINTF ((stderr, "Starting parse\n"));
+  yychar = FITS_PARSER_YYEMPTY; /* Cause a token to be read.  */
 
-  ffstate = 0;
-  fferrstatus = 0;
-  ffnerrs = 0;
-  ffchar = FFEMPTY; /* Cause a token to be read.  */
+  goto yysetstate;
 
-  /* Initialize stack pointers.
-     Waste one element of value and location stack
-     so that they stay on the same level as the state stack.
-     The wasted elements are never initialized.  */
-  ffssp = ffss;
-  ffvsp = ffvs;
-
-  goto ffsetstate;
 
 /*------------------------------------------------------------.
-| ffnewstate -- Push a new state, which is found in ffstate.  |
+| yynewstate -- push a new state, which is found in yystate.  |
 `------------------------------------------------------------*/
- ffnewstate:
+yynewstate:
   /* In all cases, when you get here, the value and location stacks
      have just been pushed.  So pushing a state here evens the stacks.  */
-  ffssp++;
+  yyssp++;
 
- ffsetstate:
-  *ffssp = ffstate;
 
-  if (ffss + ffstacksize - 1 <= ffssp)
+/*--------------------------------------------------------------------.
+| yysetstate -- set current state (the top of the stack) to yystate.  |
+`--------------------------------------------------------------------*/
+yysetstate:
+  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YY_ASSERT (0 <= yystate && yystate < YYNSTATES);
+  YY_IGNORE_USELESS_CAST_BEGIN
+  *yyssp = YY_CAST (yy_state_t, yystate);
+  YY_IGNORE_USELESS_CAST_END
+  YY_STACK_PRINT (yyss, yyssp);
+
+  if (yyss + yystacksize - 1 <= yyssp)
+#if !defined yyoverflow && !defined YYSTACK_RELOCATE
+    YYNOMEM;
+#else
     {
       /* Get the current used size of the three stacks, in elements.  */
-      FFSIZE_T ffsize = ffssp - ffss + 1;
+      YYPTRDIFF_T yysize = yyssp - yyss + 1;
 
-#ifdef ffoverflow
+# if defined yyoverflow
       {
-	/* Give user a chance to reallocate the stack.  Use copies of
-	   these so that the &'s don't force the real ones into
-	   memory.  */
-	FFSTYPE *ffvs1 = ffvs;
-	fftype_int16 *ffss1 = ffss;
+        /* Give user a chance to reallocate the stack.  Use copies of
+           these so that the &'s don't force the real ones into
+           memory.  */
+        yy_state_t *yyss1 = yyss;
+        YYSTYPE *yyvs1 = yyvs;
 
-	/* Each stack pointer address is followed by the size of the
-	   data in use in that stack, in bytes.  This used to be a
-	   conditional around just the two extra args, but that might
-	   be undefined if ffoverflow is a macro.  */
-	ffoverflow (FF_("memory exhausted"),
-		    &ffss1, ffsize * sizeof (*ffssp),
-		    &ffvs1, ffsize * sizeof (*ffvsp),
-		    &ffstacksize);
-
-	ffss = ffss1;
-	ffvs = ffvs1;
+        /* Each stack pointer address is followed by the size of the
+           data in use in that stack, in bytes.  This used to be a
+           conditional around just the two extra args, but that might
+           be undefined if yyoverflow is a macro.  */
+        yyoverflow (YY_("memory exhausted"),
+                    &yyss1, yysize * YYSIZEOF (*yyssp),
+                    &yyvs1, yysize * YYSIZEOF (*yyvsp),
+                    &yystacksize);
+        yyss = yyss1;
+        yyvs = yyvs1;
       }
-#else /* no ffoverflow */
-# ifndef FFSTACK_RELOCATE
-      goto ffexhaustedlab;
-# else
+# else /* defined YYSTACK_RELOCATE */
       /* Extend the stack our own way.  */
-      if (FFMAXDEPTH <= ffstacksize)
-	goto ffexhaustedlab;
-      ffstacksize *= 2;
-      if (FFMAXDEPTH < ffstacksize)
-	ffstacksize = FFMAXDEPTH;
+      if (YYMAXDEPTH <= yystacksize)
+        YYNOMEM;
+      yystacksize *= 2;
+      if (YYMAXDEPTH < yystacksize)
+        yystacksize = YYMAXDEPTH;
 
       {
-	fftype_int16 *ffss1 = ffss;
-	union ffalloc *ffptr =
-	  (union ffalloc *) FFSTACK_ALLOC (FFSTACK_BYTES (ffstacksize));
-	if (! ffptr)
-	  goto ffexhaustedlab;
-	FFSTACK_RELOCATE (ffss_alloc, ffss);
-	FFSTACK_RELOCATE (ffvs_alloc, ffvs);
-#  undef FFSTACK_RELOCATE
-	if (ffss1 != ffssa)
-	  FFSTACK_FREE (ffss1);
+        yy_state_t *yyss1 = yyss;
+        union yyalloc *yyptr =
+          YY_CAST (union yyalloc *,
+                   YYSTACK_ALLOC (YY_CAST (YYSIZE_T, YYSTACK_BYTES (yystacksize))));
+        if (! yyptr)
+          YYNOMEM;
+        YYSTACK_RELOCATE (yyss_alloc, yyss);
+        YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+#  undef YYSTACK_RELOCATE
+        if (yyss1 != yyssa)
+          YYSTACK_FREE (yyss1);
       }
 # endif
-#endif /* no ffoverflow */
 
-      ffssp = ffss + ffsize - 1;
-      ffvsp = ffvs + ffsize - 1;
+      yyssp = yyss + yysize - 1;
+      yyvsp = yyvs + yysize - 1;
 
-      FFDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) ffstacksize));
+      YY_IGNORE_USELESS_CAST_BEGIN
+      YYDPRINTF ((stderr, "Stack size increased to %ld\n",
+                  YY_CAST (long, yystacksize)));
+      YY_IGNORE_USELESS_CAST_END
 
-      if (ffss + ffstacksize - 1 <= ffssp)
-	FFABORT;
+      if (yyss + yystacksize - 1 <= yyssp)
+        YYABORT;
     }
+#endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
 
-  FFDPRINTF ((stderr, "Entering state %d\n", ffstate));
 
-  if (ffstate == FFFINAL)
-    FFACCEPT;
+  if (yystate == YYFINAL)
+    YYACCEPT;
 
-  goto ffbackup;
+  goto yybackup;
+
 
 /*-----------.
-| ffbackup.  |
+| yybackup.  |
 `-----------*/
-ffbackup:
-
+yybackup:
   /* Do appropriate processing given the current state.  Read a
      lookahead token if we need one and don't already have one.  */
 
   /* First try to decide what to do without reference to lookahead token.  */
-  ffn = ffpact[ffstate];
-  if (ffn == FFPACT_NINF)
-    goto ffdefault;
+  yyn = yypact[yystate];
+  if (yypact_value_is_default (yyn))
+    goto yydefault;
 
   /* Not known => get a lookahead token if don't already have one.  */
 
-  /* FFCHAR is either FFEMPTY or FFEOF or a valid lookahead symbol.  */
-  if (ffchar == FFEMPTY)
+  /* YYCHAR is either empty, or end-of-input, or a valid lookahead.  */
+  if (yychar == FITS_PARSER_YYEMPTY)
     {
-      FFDPRINTF ((stderr, "Reading a token: "));
-      ffchar = FFLEX;
+      YYDPRINTF ((stderr, "Reading a token\n"));
+      yychar = yylex (&yylval, scanner);
     }
 
-  if (ffchar <= FFEOF)
+  if (yychar <= FITS_PARSER_YYEOF)
     {
-      ffchar = fftoken = FFEOF;
-      FFDPRINTF ((stderr, "Now at end of input.\n"));
+      yychar = FITS_PARSER_YYEOF;
+      yytoken = YYSYMBOL_YYEOF;
+      YYDPRINTF ((stderr, "Now at end of input.\n"));
+    }
+  else if (yychar == FITS_PARSER_YYerror)
+    {
+      /* The scanner already issued an error message, process directly
+         to error recovery.  But do not keep the error token as
+         lookahead, it is too special and may lead us to an endless
+         loop in error recovery. */
+      yychar = FITS_PARSER_YYUNDEF;
+      yytoken = YYSYMBOL_YYerror;
+      goto yyerrlab1;
     }
   else
     {
-      fftoken = FFTRANSLATE (ffchar);
-      FF_SYMBOL_PRINT ("Next token is", fftoken, &fflval, &fflloc);
+      yytoken = YYTRANSLATE (yychar);
+      YY_SYMBOL_PRINT ("Next token is", yytoken, &yylval, &yylloc);
     }
 
-  /* If the proper action on seeing token FFTOKEN is to reduce or to
+  /* If the proper action on seeing token YYTOKEN is to reduce or to
      detect an error, take that action.  */
-  ffn += fftoken;
-  if (ffn < 0 || FFLAST < ffn || ffcheck[ffn] != fftoken)
-    goto ffdefault;
-  ffn = fftable[ffn];
-  if (ffn <= 0)
+  yyn += yytoken;
+  if (yyn < 0 || YYLAST < yyn || yycheck[yyn] != yytoken)
+    goto yydefault;
+  yyn = yytable[yyn];
+  if (yyn <= 0)
     {
-      if (ffn == 0 || ffn == FFTABLE_NINF)
-	goto fferrlab;
-      ffn = -ffn;
-      goto ffreduce;
+      if (yytable_value_is_error (yyn))
+        goto yyerrlab;
+      yyn = -yyn;
+      goto yyreduce;
     }
 
   /* Count tokens shifted since error; after three, turn off error
      status.  */
-  if (fferrstatus)
-    fferrstatus--;
+  if (yyerrstatus)
+    yyerrstatus--;
 
   /* Shift the lookahead token.  */
-  FF_SYMBOL_PRINT ("Shifting", fftoken, &fflval, &fflloc);
+  YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
+  yystate = yyn;
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   /* Discard the shifted token.  */
-  ffchar = FFEMPTY;
-
-  ffstate = ffn;
-  *++ffvsp = fflval;
-
-  goto ffnewstate;
+  yychar = FITS_PARSER_YYEMPTY;
+  goto yynewstate;
 
 
 /*-----------------------------------------------------------.
-| ffdefault -- do the default action for the current state.  |
+| yydefault -- do the default action for the current state.  |
 `-----------------------------------------------------------*/
-ffdefault:
-  ffn = ffdefact[ffstate];
-  if (ffn == 0)
-    goto fferrlab;
-  goto ffreduce;
+yydefault:
+  yyn = yydefact[yystate];
+  if (yyn == 0)
+    goto yyerrlab;
+  goto yyreduce;
 
 
 /*-----------------------------.
-| ffreduce -- Do a reduction.  |
+| yyreduce -- do a reduction.  |
 `-----------------------------*/
-ffreduce:
-  /* ffn is the number of a rule to reduce with.  */
-  fflen = ffr2[ffn];
+yyreduce:
+  /* yyn is the number of a rule to reduce with.  */
+  yylen = yyr2[yyn];
 
-  /* If FFLEN is nonzero, implement the default value of the action:
-     `$$ = $1'.
+  /* If YYLEN is nonzero, implement the default value of the action:
+     '$$ = $1'.
 
-     Otherwise, the following line sets FFVAL to garbage.
+     Otherwise, the following line sets YYVAL to garbage.
      This behavior is undocumented and Bison
-     users should not rely upon it.  Assigning to FFVAL
+     users should not rely upon it.  Assigning to YYVAL
      unconditionally makes the parser a bit smaller, and it avoids a
-     GCC warning that FFVAL may be used uninitialized.  */
-  ffval = ffvsp[1-fflen];
+     GCC warning that YYVAL may be used uninitialized.  */
+  yyval = yyvsp[1-yylen];
 
 
-  FF_REDUCE_PRINT (ffn);
-  switch (ffn)
+  YY_REDUCE_PRINT (yyn);
+  switch (yyn)
     {
-        case 4:
-
-/* Line 1455 of yacc.c  */
-#line 248 "eval.y"
-    {}
+  case 4: /* line: '\n'  */
+#line 270 "eval.y"
+                     {}
+#line 1821 "eval_y.c"
     break;
 
-  case 5:
-
-/* Line 1455 of yacc.c  */
-#line 250 "eval.y"
-    { if( (ffvsp[(1) - (2)].Node)<0 ) {
-		     fferror("Couldn't build node structure: out of memory?");
-		     FFERROR;  }
-                  gParse.resultNode = (ffvsp[(1) - (2)].Node);
+  case 5: /* line: expr '\n'  */
+#line 272 "eval.y"
+                { if( (yyvsp[-1].Node)<0 ) {
+		     yyerror(scanner, lParse, "Couldn't build node structure: out of memory?");
+		     YYERROR;  }
+                  lParse->resultNode = (yyvsp[-1].Node);
 		}
+#line 1831 "eval_y.c"
     break;
 
-  case 6:
-
-/* Line 1455 of yacc.c  */
-#line 256 "eval.y"
-    { if( (ffvsp[(1) - (2)].Node)<0 ) {
-		     fferror("Couldn't build node structure: out of memory?");
-		     FFERROR;  }
-                  gParse.resultNode = (ffvsp[(1) - (2)].Node);
+  case 6: /* line: bexpr '\n'  */
+#line 278 "eval.y"
+                { if( (yyvsp[-1].Node)<0 ) {
+		     yyerror(scanner, lParse, "Couldn't build node structure: out of memory?");
+		     YYERROR;  }
+                  lParse->resultNode = (yyvsp[-1].Node);
 		}
+#line 1841 "eval_y.c"
     break;
 
-  case 7:
-
-/* Line 1455 of yacc.c  */
-#line 262 "eval.y"
-    { if( (ffvsp[(1) - (2)].Node)<0 ) {
-		     fferror("Couldn't build node structure: out of memory?");
-		     FFERROR;  } 
-                  gParse.resultNode = (ffvsp[(1) - (2)].Node);
+  case 7: /* line: sexpr '\n'  */
+#line 284 "eval.y"
+                { if( (yyvsp[-1].Node)<0 ) {
+		     yyerror(scanner, lParse, "Couldn't build node structure: out of memory?");
+		     YYERROR;  } 
+                  lParse->resultNode = (yyvsp[-1].Node);
 		}
+#line 1851 "eval_y.c"
     break;
 
-  case 8:
-
-/* Line 1455 of yacc.c  */
-#line 268 "eval.y"
-    { if( (ffvsp[(1) - (2)].Node)<0 ) {
-		     fferror("Couldn't build node structure: out of memory?");
-		     FFERROR;  }
-                  gParse.resultNode = (ffvsp[(1) - (2)].Node);
+  case 8: /* line: bits '\n'  */
+#line 290 "eval.y"
+                { if( (yyvsp[-1].Node)<0 ) {
+		     yyerror(scanner, lParse, "Couldn't build node structure: out of memory?");
+		     YYERROR;  }
+                  lParse->resultNode = (yyvsp[-1].Node);
 		}
+#line 1861 "eval_y.c"
     break;
 
-  case 9:
-
-/* Line 1455 of yacc.c  */
-#line 273 "eval.y"
-    {  fferrok;  }
+  case 9: /* line: error '\n'  */
+#line 295 "eval.y"
+                     {  yyerrok;  }
+#line 1867 "eval_y.c"
     break;
 
-  case 10:
-
-/* Line 1455 of yacc.c  */
-#line 277 "eval.y"
-    { (ffval.Node) = New_Vector( (ffvsp[(2) - (2)].Node) ); TEST((ffval.Node)); }
+  case 10: /* bvector: '{' bexpr  */
+#line 299 "eval.y"
+                { (yyval.Node) = New_Vector(lParse,  (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 1873 "eval_y.c"
     break;
 
-  case 11:
-
-/* Line 1455 of yacc.c  */
-#line 279 "eval.y"
-    {
-                  if( gParse.Nodes[(ffvsp[(1) - (3)].Node)].nSubNodes >= MAXSUBS ) {
-		     (ffvsp[(1) - (3)].Node) = Close_Vec( (ffvsp[(1) - (3)].Node) ); TEST((ffvsp[(1) - (3)].Node));
-		     (ffval.Node) = New_Vector( (ffvsp[(1) - (3)].Node) ); TEST((ffval.Node));
+  case 11: /* bvector: bvector ',' bexpr  */
+#line 301 "eval.y"
+                {
+                  if( lParse->Nodes[(yyvsp[-2].Node)].nSubNodes >= MAXSUBS ) {
+		     (yyvsp[-2].Node) = Close_Vec(lParse,  (yyvsp[-2].Node) ); TEST((yyvsp[-2].Node));
+		     (yyval.Node) = New_Vector(lParse,  (yyvsp[-2].Node) ); TEST((yyval.Node));
                   } else {
-                     (ffval.Node) = (ffvsp[(1) - (3)].Node);
+                     (yyval.Node) = (yyvsp[-2].Node);
                   }
-		  gParse.Nodes[(ffval.Node)].SubNodes[ gParse.Nodes[(ffval.Node)].nSubNodes++ ]
-		     = (ffvsp[(3) - (3)].Node);
+		  lParse->Nodes[(yyval.Node)].SubNodes[ lParse->Nodes[(yyval.Node)].nSubNodes++ ]
+		     = (yyvsp[0].Node);
                 }
+#line 1888 "eval_y.c"
     break;
 
-  case 12:
-
-/* Line 1455 of yacc.c  */
-#line 292 "eval.y"
-    { (ffval.Node) = New_Vector( (ffvsp[(2) - (2)].Node) ); TEST((ffval.Node)); }
+  case 12: /* vector: '{' expr  */
+#line 314 "eval.y"
+                { (yyval.Node) = New_Vector(lParse,  (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 1894 "eval_y.c"
     break;
 
-  case 13:
-
-/* Line 1455 of yacc.c  */
-#line 294 "eval.y"
-    {
-                  if( TYPE((ffvsp[(1) - (3)].Node)) < TYPE((ffvsp[(3) - (3)].Node)) )
-                     TYPE((ffvsp[(1) - (3)].Node)) = TYPE((ffvsp[(3) - (3)].Node));
-                  if( gParse.Nodes[(ffvsp[(1) - (3)].Node)].nSubNodes >= MAXSUBS ) {
-		     (ffvsp[(1) - (3)].Node) = Close_Vec( (ffvsp[(1) - (3)].Node) ); TEST((ffvsp[(1) - (3)].Node));
-		     (ffval.Node) = New_Vector( (ffvsp[(1) - (3)].Node) ); TEST((ffval.Node));
+  case 13: /* vector: vector ',' expr  */
+#line 316 "eval.y"
+                {
+                  if( TYPE((yyvsp[-2].Node)) < TYPE((yyvsp[0].Node)) )
+                     TYPE((yyvsp[-2].Node)) = TYPE((yyvsp[0].Node));
+                  if( lParse->Nodes[(yyvsp[-2].Node)].nSubNodes >= MAXSUBS ) {
+		     (yyvsp[-2].Node) = Close_Vec(lParse,  (yyvsp[-2].Node) ); TEST((yyvsp[-2].Node));
+		     (yyval.Node) = New_Vector(lParse,  (yyvsp[-2].Node) ); TEST((yyval.Node));
                   } else {
-                     (ffval.Node) = (ffvsp[(1) - (3)].Node);
+                     (yyval.Node) = (yyvsp[-2].Node);
                   }
-		  gParse.Nodes[(ffval.Node)].SubNodes[ gParse.Nodes[(ffval.Node)].nSubNodes++ ]
-		     = (ffvsp[(3) - (3)].Node);
+		  lParse->Nodes[(yyval.Node)].SubNodes[ lParse->Nodes[(yyval.Node)].nSubNodes++ ]
+		     = (yyvsp[0].Node);
                 }
+#line 1911 "eval_y.c"
     break;
 
-  case 14:
-
-/* Line 1455 of yacc.c  */
-#line 307 "eval.y"
-    {
-                  if( gParse.Nodes[(ffvsp[(1) - (3)].Node)].nSubNodes >= MAXSUBS ) {
-		     (ffvsp[(1) - (3)].Node) = Close_Vec( (ffvsp[(1) - (3)].Node) ); TEST((ffvsp[(1) - (3)].Node));
-		     (ffval.Node) = New_Vector( (ffvsp[(1) - (3)].Node) ); TEST((ffval.Node));
+  case 14: /* vector: vector ',' bexpr  */
+#line 329 "eval.y"
+                {
+                  if( lParse->Nodes[(yyvsp[-2].Node)].nSubNodes >= MAXSUBS ) {
+		     (yyvsp[-2].Node) = Close_Vec(lParse,  (yyvsp[-2].Node) ); TEST((yyvsp[-2].Node));
+		     (yyval.Node) = New_Vector(lParse,  (yyvsp[-2].Node) ); TEST((yyval.Node));
                   } else {
-                     (ffval.Node) = (ffvsp[(1) - (3)].Node);
+                     (yyval.Node) = (yyvsp[-2].Node);
                   }
-		  gParse.Nodes[(ffval.Node)].SubNodes[ gParse.Nodes[(ffval.Node)].nSubNodes++ ]
-		     = (ffvsp[(3) - (3)].Node);
+		  lParse->Nodes[(yyval.Node)].SubNodes[ lParse->Nodes[(yyval.Node)].nSubNodes++ ]
+		     = (yyvsp[0].Node);
                 }
+#line 1926 "eval_y.c"
     break;
 
-  case 15:
-
-/* Line 1455 of yacc.c  */
-#line 318 "eval.y"
-    {
-                  TYPE((ffvsp[(1) - (3)].Node)) = TYPE((ffvsp[(3) - (3)].Node));
-                  if( gParse.Nodes[(ffvsp[(1) - (3)].Node)].nSubNodes >= MAXSUBS ) {
-		     (ffvsp[(1) - (3)].Node) = Close_Vec( (ffvsp[(1) - (3)].Node) ); TEST((ffvsp[(1) - (3)].Node));
-		     (ffval.Node) = New_Vector( (ffvsp[(1) - (3)].Node) ); TEST((ffval.Node));
-                  } else {
-                     (ffval.Node) = (ffvsp[(1) - (3)].Node);
-                  }
-		  gParse.Nodes[(ffval.Node)].SubNodes[ gParse.Nodes[(ffval.Node)].nSubNodes++ ]
-		     = (ffvsp[(3) - (3)].Node);
-                }
-    break;
-
-  case 16:
-
-/* Line 1455 of yacc.c  */
-#line 332 "eval.y"
-    { (ffval.Node) = Close_Vec( (ffvsp[(1) - (2)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 17:
-
-/* Line 1455 of yacc.c  */
-#line 336 "eval.y"
-    { (ffval.Node) = Close_Vec( (ffvsp[(1) - (2)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 18:
-
-/* Line 1455 of yacc.c  */
+  case 15: /* vector: bvector ',' expr  */
 #line 340 "eval.y"
-    {
-                  (ffval.Node) = New_Const( BITSTR, (ffvsp[(1) - (1)].str), strlen((ffvsp[(1) - (1)].str))+1 ); TEST((ffval.Node));
-		  SIZE((ffval.Node)) = strlen((ffvsp[(1) - (1)].str)); }
-    break;
-
-  case 19:
-
-/* Line 1455 of yacc.c  */
-#line 344 "eval.y"
-    { (ffval.Node) = New_Column( (ffvsp[(1) - (1)].lng) ); TEST((ffval.Node)); }
-    break;
-
-  case 20:
-
-/* Line 1455 of yacc.c  */
-#line 346 "eval.y"
-    {
-                  if( TYPE((ffvsp[(3) - (4)].Node)) != LONG
-		      || OPER((ffvsp[(3) - (4)].Node)) != CONST_OP ) {
-		     fferror("Offset argument must be a constant integer");
-		     FFERROR;
-		  }
-                  (ffval.Node) = New_Offset( (ffvsp[(1) - (4)].lng), (ffvsp[(3) - (4)].Node) ); TEST((ffval.Node));
-                }
-    break;
-
-  case 21:
-
-/* Line 1455 of yacc.c  */
-#line 355 "eval.y"
-    { (ffval.Node) = New_BinOp( BITSTR, (ffvsp[(1) - (3)].Node), '&', (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = ( SIZE((ffvsp[(1) - (3)].Node))>SIZE((ffvsp[(3) - (3)].Node)) ? SIZE((ffvsp[(1) - (3)].Node)) : SIZE((ffvsp[(3) - (3)].Node)) );  }
-    break;
-
-  case 22:
-
-/* Line 1455 of yacc.c  */
-#line 358 "eval.y"
-    { (ffval.Node) = New_BinOp( BITSTR, (ffvsp[(1) - (3)].Node), '|', (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = ( SIZE((ffvsp[(1) - (3)].Node))>SIZE((ffvsp[(3) - (3)].Node)) ? SIZE((ffvsp[(1) - (3)].Node)) : SIZE((ffvsp[(3) - (3)].Node)) );  }
-    break;
-
-  case 23:
-
-/* Line 1455 of yacc.c  */
-#line 361 "eval.y"
-    { 
-		  if (SIZE((ffvsp[(1) - (3)].Node))+SIZE((ffvsp[(3) - (3)].Node)) >= MAX_STRLEN) {
-		    fferror("Combined bit string size exceeds " MAX_STRLEN_S " bits");
-		    FFERROR;
-		  }
-		  (ffval.Node) = New_BinOp( BITSTR, (ffvsp[(1) - (3)].Node), '+', (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = SIZE((ffvsp[(1) - (3)].Node)) + SIZE((ffvsp[(3) - (3)].Node)); 
-		}
-    break;
-
-  case 24:
-
-/* Line 1455 of yacc.c  */
-#line 370 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (4)].Node), 1, (ffvsp[(3) - (4)].Node),  0,  0,  0,   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 25:
-
-/* Line 1455 of yacc.c  */
-#line 372 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (6)].Node), 2, (ffvsp[(3) - (6)].Node), (ffvsp[(5) - (6)].Node),  0,  0,   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 26:
-
-/* Line 1455 of yacc.c  */
-#line 374 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (8)].Node), 3, (ffvsp[(3) - (8)].Node), (ffvsp[(5) - (8)].Node), (ffvsp[(7) - (8)].Node),  0,   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 27:
-
-/* Line 1455 of yacc.c  */
-#line 376 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (10)].Node), 4, (ffvsp[(3) - (10)].Node), (ffvsp[(5) - (10)].Node), (ffvsp[(7) - (10)].Node), (ffvsp[(9) - (10)].Node),   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 28:
-
-/* Line 1455 of yacc.c  */
-#line 378 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (12)].Node), 5, (ffvsp[(3) - (12)].Node), (ffvsp[(5) - (12)].Node), (ffvsp[(7) - (12)].Node), (ffvsp[(9) - (12)].Node), (ffvsp[(11) - (12)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 29:
-
-/* Line 1455 of yacc.c  */
-#line 380 "eval.y"
-    { (ffval.Node) = New_Unary( BITSTR, NOT, (ffvsp[(2) - (2)].Node) ); TEST((ffval.Node));     }
-    break;
-
-  case 30:
-
-/* Line 1455 of yacc.c  */
-#line 383 "eval.y"
-    { (ffval.Node) = (ffvsp[(2) - (3)].Node); }
-    break;
-
-  case 31:
-
-/* Line 1455 of yacc.c  */
-#line 387 "eval.y"
-    { (ffval.Node) = New_Const( LONG,   &((ffvsp[(1) - (1)].lng)), sizeof(long)   ); TEST((ffval.Node)); }
-    break;
-
-  case 32:
-
-/* Line 1455 of yacc.c  */
-#line 389 "eval.y"
-    { (ffval.Node) = New_Const( DOUBLE, &((ffvsp[(1) - (1)].dbl)), sizeof(double) ); TEST((ffval.Node)); }
-    break;
-
-  case 33:
-
-/* Line 1455 of yacc.c  */
-#line 391 "eval.y"
-    { (ffval.Node) = New_Column( (ffvsp[(1) - (1)].lng) ); TEST((ffval.Node)); }
-    break;
-
-  case 34:
-
-/* Line 1455 of yacc.c  */
-#line 393 "eval.y"
-    {
-                  if( TYPE((ffvsp[(3) - (4)].Node)) != LONG
-		      || OPER((ffvsp[(3) - (4)].Node)) != CONST_OP ) {
-		     fferror("Offset argument must be a constant integer");
-		     FFERROR;
-		  }
-                  (ffval.Node) = New_Offset( (ffvsp[(1) - (4)].lng), (ffvsp[(3) - (4)].Node) ); TEST((ffval.Node));
-                }
-    break;
-
-  case 35:
-
-/* Line 1455 of yacc.c  */
-#line 402 "eval.y"
-    { (ffval.Node) = New_Func( LONG, row_fct,  0, 0, 0, 0, 0, 0, 0, 0 ); }
-    break;
-
-  case 36:
-
-/* Line 1455 of yacc.c  */
-#line 404 "eval.y"
-    { (ffval.Node) = New_Func( LONG, null_fct, 0, 0, 0, 0, 0, 0, 0, 0 ); }
-    break;
-
-  case 37:
-
-/* Line 1455 of yacc.c  */
-#line 406 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '%', (ffvsp[(3) - (3)].Node) );
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 38:
-
-/* Line 1455 of yacc.c  */
-#line 409 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '+', (ffvsp[(3) - (3)].Node) );
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 39:
-
-/* Line 1455 of yacc.c  */
-#line 412 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '-', (ffvsp[(3) - (3)].Node) ); 
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 40:
-
-/* Line 1455 of yacc.c  */
-#line 415 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '*', (ffvsp[(3) - (3)].Node) ); 
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 41:
-
-/* Line 1455 of yacc.c  */
-#line 418 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '/', (ffvsp[(3) - (3)].Node) ); 
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 42:
-
-/* Line 1455 of yacc.c  */
-#line 421 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), POWER, (ffvsp[(3) - (3)].Node) );
-		  TEST((ffval.Node));                                                }
-    break;
-
-  case 43:
-
-/* Line 1455 of yacc.c  */
-#line 424 "eval.y"
-    { (ffval.Node) = (ffvsp[(2) - (2)].Node); }
-    break;
-
-  case 44:
-
-/* Line 1455 of yacc.c  */
-#line 426 "eval.y"
-    { (ffval.Node) = New_Unary( TYPE((ffvsp[(2) - (2)].Node)), UMINUS, (ffvsp[(2) - (2)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 45:
-
-/* Line 1455 of yacc.c  */
-#line 428 "eval.y"
-    { (ffval.Node) = (ffvsp[(2) - (3)].Node); }
-    break;
-
-  case 46:
-
-/* Line 1455 of yacc.c  */
-#line 430 "eval.y"
-    { (ffvsp[(3) - (3)].Node) = New_Unary( TYPE((ffvsp[(1) - (3)].Node)), 0, (ffvsp[(3) - (3)].Node) );
-                  (ffval.Node) = New_BinOp( TYPE((ffvsp[(1) - (3)].Node)), (ffvsp[(1) - (3)].Node), '*', (ffvsp[(3) - (3)].Node) ); 
-		  TEST((ffval.Node));                                }
-    break;
-
-  case 47:
-
-/* Line 1455 of yacc.c  */
-#line 434 "eval.y"
-    { (ffvsp[(1) - (3)].Node) = New_Unary( TYPE((ffvsp[(3) - (3)].Node)), 0, (ffvsp[(1) - (3)].Node) );
-                  (ffval.Node) = New_BinOp( TYPE((ffvsp[(3) - (3)].Node)), (ffvsp[(1) - (3)].Node), '*', (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                }
-    break;
-
-  case 48:
-
-/* Line 1455 of yacc.c  */
-#line 438 "eval.y"
-    {
-                  PROMOTE((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node)) ) {
-                     fferror("Incompatible dimensions in '?:' arguments");
-		     FFERROR;
-                  }
-                  (ffval.Node) = New_Func( 0, ifthenelse_fct, 3, (ffvsp[(3) - (5)].Node), (ffvsp[(5) - (5)].Node), (ffvsp[(1) - (5)].Node),
-                                 0, 0, 0, 0 );
-                  TEST((ffval.Node));
-                  if( SIZE((ffvsp[(3) - (5)].Node))<SIZE((ffvsp[(5) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(5) - (5)].Node));
-                  TYPE((ffvsp[(1) - (5)].Node)) = TYPE((ffvsp[(3) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(1) - (5)].Node),(ffval.Node)) ) {
-                     fferror("Incompatible dimensions in '?:' condition");
-		     FFERROR;
-                  }
-                  TYPE((ffvsp[(1) - (5)].Node)) = BOOLEAN;
-                  if( SIZE((ffval.Node))<SIZE((ffvsp[(1) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(1) - (5)].Node));
-                }
-    break;
-
-  case 49:
-
-/* Line 1455 of yacc.c  */
-#line 457 "eval.y"
-    {
-                  PROMOTE((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node)) ) {
-                     fferror("Incompatible dimensions in '?:' arguments");
-		     FFERROR;
-                  }
-                  (ffval.Node) = New_Func( 0, ifthenelse_fct, 3, (ffvsp[(3) - (5)].Node), (ffvsp[(5) - (5)].Node), (ffvsp[(1) - (5)].Node),
-                                 0, 0, 0, 0 );
-                  TEST((ffval.Node));
-                  if( SIZE((ffvsp[(3) - (5)].Node))<SIZE((ffvsp[(5) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(5) - (5)].Node));
-                  TYPE((ffvsp[(1) - (5)].Node)) = TYPE((ffvsp[(3) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(1) - (5)].Node),(ffval.Node)) ) {
-                     fferror("Incompatible dimensions in '?:' condition");
-		     FFERROR;
-                  }
-                  TYPE((ffvsp[(1) - (5)].Node)) = BOOLEAN;
-                  if( SIZE((ffval.Node))<SIZE((ffvsp[(1) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(1) - (5)].Node));
-                }
-    break;
-
-  case 50:
-
-/* Line 1455 of yacc.c  */
-#line 476 "eval.y"
-    {
-                  PROMOTE((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node)) ) {
-                     fferror("Incompatible dimensions in '?:' arguments");
-		     FFERROR;
-                  }
-                  (ffval.Node) = New_Func( 0, ifthenelse_fct, 3, (ffvsp[(3) - (5)].Node), (ffvsp[(5) - (5)].Node), (ffvsp[(1) - (5)].Node),
-                                 0, 0, 0, 0 );
-                  TEST((ffval.Node));
-                  if( SIZE((ffvsp[(3) - (5)].Node))<SIZE((ffvsp[(5) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(5) - (5)].Node));
-                  TYPE((ffvsp[(1) - (5)].Node)) = TYPE((ffvsp[(3) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(1) - (5)].Node),(ffval.Node)) ) {
-                     fferror("Incompatible dimensions in '?:' condition");
-		     FFERROR;
-                  }
-                  TYPE((ffvsp[(1) - (5)].Node)) = BOOLEAN;
-                  if( SIZE((ffval.Node))<SIZE((ffvsp[(1) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(1) - (5)].Node));
-                }
-    break;
-
-  case 51:
-
-/* Line 1455 of yacc.c  */
-#line 495 "eval.y"
-    { if (FSTRCMP((ffvsp[(1) - (2)].str),"RANDOM(") == 0) {  /* Scalar RANDOM() */
-                     (ffval.Node) = New_Func( DOUBLE, rnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
-		  } else if (FSTRCMP((ffvsp[(1) - (2)].str),"RANDOMN(") == 0) {/*Scalar RANDOMN()*/
-		     (ffval.Node) = New_Func( DOUBLE, gasrnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
+                {
+                  TYPE((yyvsp[-2].Node)) = TYPE((yyvsp[0].Node));
+                  if( lParse->Nodes[(yyvsp[-2].Node)].nSubNodes >= MAXSUBS ) {
+		     (yyvsp[-2].Node) = Close_Vec(lParse,  (yyvsp[-2].Node) ); TEST((yyvsp[-2].Node));
+		     (yyval.Node) = New_Vector(lParse,  (yyvsp[-2].Node) ); TEST((yyval.Node));
                   } else {
-                     fferror("Function() not supported");
-		     FFERROR;
-		  }
-                  TEST((ffval.Node)); 
+                     (yyval.Node) = (yyvsp[-2].Node);
+                  }
+		  lParse->Nodes[(yyval.Node)].SubNodes[ lParse->Nodes[(yyval.Node)].nSubNodes++ ]
+		     = (yyvsp[0].Node);
                 }
+#line 1942 "eval_y.c"
     break;
 
-  case 52:
+  case 16: /* expr: vector '}'  */
+#line 354 "eval.y"
+                { (yyval.Node) = Close_Vec(lParse,  (yyvsp[-1].Node) ); TEST((yyval.Node)); }
+#line 1948 "eval_y.c"
+    break;
 
-/* Line 1455 of yacc.c  */
+  case 17: /* bexpr: bvector '}'  */
+#line 358 "eval.y"
+                { (yyval.Node) = Close_Vec(lParse,  (yyvsp[-1].Node) ); TEST((yyval.Node)); }
+#line 1954 "eval_y.c"
+    break;
+
+  case 18: /* bits: BITSTR  */
+#line 362 "eval.y"
+                {
+                  (yyval.Node) = New_Const(lParse,  BITSTR, (yyvsp[0].str), strlen((yyvsp[0].str))+1 ); TEST((yyval.Node));
+		  SIZE((yyval.Node)) = strlen((yyvsp[0].str)); }
+#line 1962 "eval_y.c"
+    break;
+
+  case 19: /* bits: BITCOL  */
+#line 366 "eval.y"
+                { (yyval.Node) = New_Column(lParse,  (yyvsp[0].lng) ); TEST((yyval.Node)); }
+#line 1968 "eval_y.c"
+    break;
+
+  case 20: /* bits: BITCOL '{' expr '}'  */
+#line 368 "eval.y"
+                {
+                  if( TYPE((yyvsp[-1].Node)) != LONG
+		      || OPER((yyvsp[-1].Node)) != CONST_OP ) {
+		     yyerror(scanner, lParse, "Offset argument must be a constant integer");
+		     YYERROR;
+		  }
+                  (yyval.Node) = New_Offset(lParse,  (yyvsp[-3].lng), (yyvsp[-1].Node) ); TEST((yyval.Node));
+                }
+#line 1981 "eval_y.c"
+    break;
+
+  case 21: /* bits: bits '&' bits  */
+#line 377 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BITSTR, (yyvsp[-2].Node), '&', (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = ( SIZE((yyvsp[-2].Node))>SIZE((yyvsp[0].Node)) ? SIZE((yyvsp[-2].Node)) : SIZE((yyvsp[0].Node)) );  }
+#line 1988 "eval_y.c"
+    break;
+
+  case 22: /* bits: bits '|' bits  */
+#line 380 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BITSTR, (yyvsp[-2].Node), '|', (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = ( SIZE((yyvsp[-2].Node))>SIZE((yyvsp[0].Node)) ? SIZE((yyvsp[-2].Node)) : SIZE((yyvsp[0].Node)) );  }
+#line 1995 "eval_y.c"
+    break;
+
+  case 23: /* bits: bits '+' bits  */
+#line 383 "eval.y"
+                { 
+		  if (SIZE((yyvsp[-2].Node))+SIZE((yyvsp[0].Node)) >= MAX_STRLEN) {
+		    yyerror(scanner, lParse, "Combined bit string size exceeds " MAX_STRLEN_S " bits");
+		    YYERROR;
+		  }
+		  (yyval.Node) = New_BinOp(lParse,  BITSTR, (yyvsp[-2].Node), '+', (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = SIZE((yyvsp[-2].Node)) + SIZE((yyvsp[0].Node)); 
+		}
+#line 2008 "eval_y.c"
+    break;
+
+  case 24: /* bits: bits '[' expr ']'  */
+#line 392 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-3].Node), 1, (yyvsp[-1].Node),  0,  0,  0,   0 ); TEST((yyval.Node)); }
+#line 2014 "eval_y.c"
+    break;
+
+  case 25: /* bits: bits '[' expr ',' expr ']'  */
+#line 394 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-5].Node), 2, (yyvsp[-3].Node), (yyvsp[-1].Node),  0,  0,   0 ); TEST((yyval.Node)); }
+#line 2020 "eval_y.c"
+    break;
+
+  case 26: /* bits: bits '[' expr ',' expr ',' expr ']'  */
+#line 396 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-7].Node), 3, (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),  0,   0 ); TEST((yyval.Node)); }
+#line 2026 "eval_y.c"
+    break;
+
+  case 27: /* bits: bits '[' expr ',' expr ',' expr ',' expr ']'  */
+#line 398 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-9].Node), 4, (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),   0 ); TEST((yyval.Node)); }
+#line 2032 "eval_y.c"
+    break;
+
+  case 28: /* bits: bits '[' expr ',' expr ',' expr ',' expr ',' expr ']'  */
+#line 400 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-11].Node), 5, (yyvsp[-9].Node), (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node) ); TEST((yyval.Node)); }
+#line 2038 "eval_y.c"
+    break;
+
+  case 29: /* bits: NOT bits  */
+#line 402 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  BITSTR, NOT, (yyvsp[0].Node) ); TEST((yyval.Node));     }
+#line 2044 "eval_y.c"
+    break;
+
+  case 30: /* bits: '(' bits ')'  */
+#line 405 "eval.y"
+                { (yyval.Node) = (yyvsp[-1].Node); }
+#line 2050 "eval_y.c"
+    break;
+
+  case 31: /* expr: LONG  */
+#line 409 "eval.y"
+                { (yyval.Node) = New_Const(lParse,  LONG,   &((yyvsp[0].lng)), sizeof(long)   ); TEST((yyval.Node)); }
+#line 2056 "eval_y.c"
+    break;
+
+  case 32: /* expr: DOUBLE  */
+#line 411 "eval.y"
+                { (yyval.Node) = New_Const(lParse,  DOUBLE, &((yyvsp[0].dbl)), sizeof(double) ); TEST((yyval.Node)); }
+#line 2062 "eval_y.c"
+    break;
+
+  case 33: /* expr: COLUMN  */
+#line 413 "eval.y"
+                { (yyval.Node) = New_Column(lParse,  (yyvsp[0].lng) ); TEST((yyval.Node)); }
+#line 2068 "eval_y.c"
+    break;
+
+  case 34: /* expr: COLUMN '{' expr '}'  */
+#line 415 "eval.y"
+                {
+                  if( TYPE((yyvsp[-1].Node)) != LONG
+		      || OPER((yyvsp[-1].Node)) != CONST_OP ) {
+		     yyerror(scanner, lParse, "Offset argument must be a constant integer");
+		     YYERROR;
+		  }
+                  (yyval.Node) = New_Offset(lParse,  (yyvsp[-3].lng), (yyvsp[-1].Node) ); TEST((yyval.Node));
+                }
+#line 2081 "eval_y.c"
+    break;
+
+  case 35: /* expr: ROWREF  */
+#line 424 "eval.y"
+                { (yyval.Node) = New_Func(lParse,  LONG, row_fct,  0, 0, 0, 0, 0, 0, 0, 0 ); }
+#line 2087 "eval_y.c"
+    break;
+
+  case 36: /* expr: NULLREF  */
+#line 426 "eval.y"
+                { (yyval.Node) = New_Func(lParse,  LONG, null_fct, 0, 0, 0, 0, 0, 0, 0, 0 ); }
+#line 2093 "eval_y.c"
+    break;
+
+  case 37: /* expr: expr '%' expr  */
+#line 428 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '%', (yyvsp[0].Node) );
+		  TEST((yyval.Node));                                                }
+#line 2100 "eval_y.c"
+    break;
+
+  case 38: /* expr: expr '+' expr  */
+#line 431 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '+', (yyvsp[0].Node) );
+		  TEST((yyval.Node));                                                }
+#line 2107 "eval_y.c"
+    break;
+
+  case 39: /* expr: expr '-' expr  */
+#line 434 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '-', (yyvsp[0].Node) ); 
+		  TEST((yyval.Node));                                                }
+#line 2114 "eval_y.c"
+    break;
+
+  case 40: /* expr: expr '*' expr  */
+#line 437 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '*', (yyvsp[0].Node) ); 
+		  TEST((yyval.Node));                                                }
+#line 2121 "eval_y.c"
+    break;
+
+  case 41: /* expr: expr '/' expr  */
+#line 440 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '/', (yyvsp[0].Node) ); 
+		  TEST((yyval.Node));                                                }
+#line 2128 "eval_y.c"
+    break;
+
+  case 42: /* expr: expr '&' expr  */
+#line 443 "eval.y"
+                { 
+                   if (TYPE((yyvsp[-2].Node)) != LONG ||
+		       TYPE((yyvsp[0].Node)) != LONG) {
+                     yyerror(scanner, lParse, "Bitwise operations with incompatible types; only (bit OP bit) and (int OP int) are allowed");
+                      YYERROR;
+                   }
+                   (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '&', (yyvsp[0].Node) );
+                }
+#line 2141 "eval_y.c"
+    break;
+
+  case 43: /* expr: expr '|' expr  */
+#line 452 "eval.y"
+                { 
+                   if (TYPE((yyvsp[-2].Node)) != LONG ||
+		       TYPE((yyvsp[0].Node)) != LONG) {
+                     yyerror(scanner, lParse, "Bitwise operations with incompatible types; only (bit OP bit) and (int OP int) are allowed");
+                      YYERROR;
+                   }
+                   (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '|', (yyvsp[0].Node) );
+                }
+#line 2154 "eval_y.c"
+    break;
+
+  case 44: /* expr: expr XOR expr  */
+#line 461 "eval.y"
+                { 
+                   if (TYPE((yyvsp[-2].Node)) != LONG ||
+		       TYPE((yyvsp[0].Node)) != LONG) {
+                     yyerror(scanner, lParse, "Bitwise operations with incompatible types; only (bit OP bit) and (int OP int) are allowed");
+                      YYERROR;
+                   }
+                   (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '^', (yyvsp[0].Node) );
+                }
+#line 2167 "eval_y.c"
+    break;
+
+  case 45: /* expr: expr POWER expr  */
+#line 470 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), POWER, (yyvsp[0].Node) );
+		  TEST((yyval.Node));                                                }
+#line 2174 "eval_y.c"
+    break;
+
+  case 46: /* expr: '+' expr  */
+#line 473 "eval.y"
+                { (yyval.Node) = (yyvsp[0].Node); }
+#line 2180 "eval_y.c"
+    break;
+
+  case 47: /* expr: '-' expr  */
+#line 475 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  TYPE((yyvsp[0].Node)), UMINUS, (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 2186 "eval_y.c"
+    break;
+
+  case 48: /* expr: '(' expr ')'  */
+#line 477 "eval.y"
+                { (yyval.Node) = (yyvsp[-1].Node); }
+#line 2192 "eval_y.c"
+    break;
+
+  case 49: /* expr: expr '*' bexpr  */
+#line 479 "eval.y"
+                { (yyvsp[0].Node) = New_Unary(lParse,  TYPE((yyvsp[-2].Node)), 0, (yyvsp[0].Node) );
+                  (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[-2].Node)), (yyvsp[-2].Node), '*', (yyvsp[0].Node) ); 
+		  TEST((yyval.Node));                                }
+#line 2200 "eval_y.c"
+    break;
+
+  case 50: /* expr: bexpr '*' expr  */
+#line 483 "eval.y"
+                { (yyvsp[-2].Node) = New_Unary(lParse,  TYPE((yyvsp[0].Node)), 0, (yyvsp[-2].Node) );
+                  (yyval.Node) = New_BinOp(lParse,  TYPE((yyvsp[0].Node)), (yyvsp[-2].Node), '*', (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                }
+#line 2208 "eval_y.c"
+    break;
+
+  case 51: /* expr: bexpr '?' expr ':' expr  */
+#line 487 "eval.y"
+                {
+                  PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-2].Node),(yyvsp[0].Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' arguments");
+		     YYERROR;
+                  }
+                  (yyval.Node) = New_Func(lParse,  0, ifthenelse_fct, 3, (yyvsp[-2].Node), (yyvsp[0].Node), (yyvsp[-4].Node),
+                                 0, 0, 0, 0 );
+                  TEST((yyval.Node));
+                  if( SIZE((yyvsp[-2].Node))<SIZE((yyvsp[0].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[0].Node));
+                  TYPE((yyvsp[-4].Node)) = TYPE((yyvsp[-2].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-4].Node),(yyval.Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' condition");
+		     YYERROR;
+                  }
+                  TYPE((yyvsp[-4].Node)) = BOOLEAN;
+                  if( SIZE((yyval.Node))<SIZE((yyvsp[-4].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-4].Node));
+                }
+#line 2231 "eval_y.c"
+    break;
+
+  case 52: /* expr: bexpr '?' bexpr ':' expr  */
 #line 506 "eval.y"
-    { if (FSTRCMP((ffvsp[(1) - (3)].str),"SUM(") == 0) {
-		     (ffval.Node) = New_Func( LONG, sum_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-                  } else if (FSTRCMP((ffvsp[(1) - (3)].str),"NELEM(") == 0) {
-                     (ffval.Node) = New_Const( LONG, &( SIZE((ffvsp[(2) - (3)].Node)) ), sizeof(long) );
-                  } else if (FSTRCMP((ffvsp[(1) - (3)].str),"ACCUM(") == 0) {
+                {
+                  PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-2].Node),(yyvsp[0].Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' arguments");
+		     YYERROR;
+                  }
+                  (yyval.Node) = New_Func(lParse,  0, ifthenelse_fct, 3, (yyvsp[-2].Node), (yyvsp[0].Node), (yyvsp[-4].Node),
+                                 0, 0, 0, 0 );
+                  TEST((yyval.Node));
+                  if( SIZE((yyvsp[-2].Node))<SIZE((yyvsp[0].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[0].Node));
+                  TYPE((yyvsp[-4].Node)) = TYPE((yyvsp[-2].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-4].Node),(yyval.Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' condition");
+		     YYERROR;
+                  }
+                  TYPE((yyvsp[-4].Node)) = BOOLEAN;
+                  if( SIZE((yyval.Node))<SIZE((yyvsp[-4].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-4].Node));
+                }
+#line 2254 "eval_y.c"
+    break;
+
+  case 53: /* expr: bexpr '?' expr ':' bexpr  */
+#line 525 "eval.y"
+                {
+                  PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-2].Node),(yyvsp[0].Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' arguments");
+		     YYERROR;
+                  }
+                  (yyval.Node) = New_Func(lParse,  0, ifthenelse_fct, 3, (yyvsp[-2].Node), (yyvsp[0].Node), (yyvsp[-4].Node),
+                                 0, 0, 0, 0 );
+                  TEST((yyval.Node));
+                  if( SIZE((yyvsp[-2].Node))<SIZE((yyvsp[0].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[0].Node));
+                  TYPE((yyvsp[-4].Node)) = TYPE((yyvsp[-2].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-4].Node),(yyval.Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' condition");
+		     YYERROR;
+                  }
+                  TYPE((yyvsp[-4].Node)) = BOOLEAN;
+                  if( SIZE((yyval.Node))<SIZE((yyvsp[-4].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-4].Node));
+                }
+#line 2277 "eval_y.c"
+    break;
+
+  case 54: /* expr: FUNCTION ')'  */
+#line 544 "eval.y"
+                { if (FSTRCMP((yyvsp[-1].str),"RANDOM(") == 0) {  /* Scalar RANDOM() */
+                     (yyval.Node) = New_Func(lParse,  DOUBLE, rnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
+		  } else if (FSTRCMP((yyvsp[-1].str),"RANDOMN(") == 0) {/*Scalar RANDOMN()*/
+		     (yyval.Node) = New_Func(lParse,  DOUBLE, gasrnd_fct, 0, 0, 0, 0, 0, 0, 0, 0 );
+                  } else {
+                     yyerror(scanner, lParse, "Function() not supported");
+		     YYERROR;
+		  }
+                  TEST((yyval.Node)); 
+                }
+#line 2292 "eval_y.c"
+    break;
+
+  case 55: /* expr: FUNCTION bexpr ')'  */
+#line 555 "eval.y"
+                { if (FSTRCMP((yyvsp[-2].str),"SUM(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  LONG, sum_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+                  } else if (FSTRCMP((yyvsp[-2].str),"NELEM(") == 0) {
+                     (yyval.Node) = New_Const(lParse,  LONG, &( SIZE((yyvsp[-1].Node)) ), sizeof(long) );
+                  } else if (FSTRCMP((yyvsp[-2].str),"ACCUM(") == 0) {
 		    long zero = 0;
-		    (ffval.Node) = New_BinOp( LONG , (ffvsp[(2) - (3)].Node), ACCUM, New_Const( LONG, &zero, sizeof(zero) ));
+		    (yyval.Node) = New_BinOp(lParse,  LONG , (yyvsp[-1].Node), ACCUM, New_Const(lParse,  LONG, &zero, sizeof(zero) ));
 		  } else {
-                     fferror("Function(bool) not supported");
-		     FFERROR;
+                     yyerror(scanner, lParse, "Function(bool) not supported");
+		     YYERROR;
 		  }
-                  TEST((ffval.Node)); 
+                  TEST((yyval.Node)); 
 		}
+#line 2310 "eval_y.c"
     break;
 
-  case 53:
+  case 56: /* expr: FUNCTION bexpr ',' expr ')'  */
+#line 569 "eval.y"
+                { if (FSTRCMP((yyvsp[-4].str),"AXISELEM(") == 0) {  /* AXISELEM(V,n) */
+		     if (OPER((yyvsp[-1].Node)) != CONST_OP
+			 || SIZE((yyvsp[-1].Node)) != 1) {
+		       yyerror(scanner, lParse, "AXISELEM second argument must be a scalar constant");
+		       YYERROR;
+		     }
+		     if (OPER((yyvsp[-3].Node)) == CONST_OP) {
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {
+		       if ( TYPE((yyvsp[-1].Node)) != LONG ) (yyvsp[-1].Node) = New_Unary(lParse, LONG, 0, (yyvsp[-1].Node));
+		       (yyval.Node) = New_Func(lParse, 0, axiselem_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 0, 0, 0, 0 );
+		       TEST((yyval.Node));
+		       TYPE((yyval.Node)) = LONG;
+		     }
+		   } else if (FSTRCMP((yyvsp[-4].str),"NAXES(") == 0) {  /* NAXES(V,n) */
+		     if (OPER((yyvsp[-1].Node)) != CONST_OP
+			 || SIZE((yyvsp[-1].Node)) != 1) {
+		       yyerror(scanner, lParse, "NAXES second argument must be a scalar constant");
+		       YYERROR;
+		     }
+		     if (OPER((yyvsp[-3].Node)) == CONST_OP) { /* if V is constant, return 1 in every case */
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {                    /* determine now the dimension of the expression */
+		       long iaxis;
+		       int naxis;
+		       if ( TYPE((yyvsp[-1].Node)) != LONG ) (yyvsp[-1].Node) = New_Unary(lParse, LONG, 0, (yyvsp[-1].Node));
+		       /* Since it is already constant, we can extract long value directly */
+		       iaxis = (lParse->Nodes[(yyvsp[-1].Node)].value.data.lng);
+		       naxis = lParse->Nodes[(yyvsp[-3].Node)].value.naxis;
 
-/* Line 1455 of yacc.c  */
-#line 520 "eval.y"
-    { if (FSTRCMP((ffvsp[(1) - (3)].str),"NELEM(") == 0) {
-                     (ffval.Node) = New_Const( LONG, &( SIZE((ffvsp[(2) - (3)].Node)) ), sizeof(long) );
-		  } else if (FSTRCMP((ffvsp[(1) - (3)].str),"NVALID(") == 0) {
-		     (ffval.Node) = New_Func( LONG, nonnull_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
+		       if (iaxis == 0)          iaxis = naxis;   /* NAXIS(V,0) = NAXIS */
+		       else if (iaxis <= naxis) iaxis = lParse->Nodes[(yyvsp[-3].Node)].value.naxes[iaxis-1]; /* NAXIS(V,n) = NAXISn */
+		       else                     iaxis = 1;       /* Out of bounds use 1 */
+
+		       (yyval.Node) = New_Const(lParse,  LONG, &iaxis, sizeof(iaxis) );
+		       TEST((yyval.Node));
+		     }
+		   } else if (FSTRCMP((yyvsp[-4].str),"ARRAY(") == 0) {  /* NAXES(bexpr,n) */
+		     (yyval.Node) = New_Array(lParse, (yyvsp[-3].Node), (yyvsp[-1].Node));
+		     TEST((yyval.Node));
 		  } else {
-                     fferror("Function(str) not supported");
-		     FFERROR;
+                     yyerror(scanner, lParse, "Function(bool,expr) not supported");
+		     YYERROR;
 		  }
-                  TEST((ffval.Node)); 
+                  TEST((yyval.Node)); 
 		}
+#line 2363 "eval_y.c"
     break;
 
-  case 54:
-
-/* Line 1455 of yacc.c  */
-#line 532 "eval.y"
-    { if (FSTRCMP((ffvsp[(1) - (3)].str),"NELEM(") == 0) {
-                     (ffval.Node) = New_Const( LONG, &( SIZE((ffvsp[(2) - (3)].Node)) ), sizeof(long) );
-		} else if (FSTRCMP((ffvsp[(1) - (3)].str),"NVALID(") == 0) { /* Bit arrays do not have NULL */
-                     (ffval.Node) = New_Const( LONG, &( SIZE((ffvsp[(2) - (3)].Node)) ), sizeof(long) );
-		} else if (FSTRCMP((ffvsp[(1) - (3)].str),"SUM(") == 0) {
-		     (ffval.Node) = New_Func( LONG, sum_fct, 1, (ffvsp[(2) - (3)].Node),
+  case 57: /* expr: FUNCTION sexpr ')'  */
+#line 618 "eval.y"
+                { if (FSTRCMP((yyvsp[-2].str),"NELEM(") == 0) {
+                     (yyval.Node) = New_Const(lParse,  LONG, &( SIZE((yyvsp[-1].Node)) ), sizeof(long) );
+		  } else if (FSTRCMP((yyvsp[-2].str),"NVALID(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  LONG, nonnull_fct, 1, (yyvsp[-1].Node),
 				    0, 0, 0, 0, 0, 0 );
-		} else if (FSTRCMP((ffvsp[(1) - (3)].str),"MIN(") == 0) {
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)),  /* Force 1D result */
-				    min1_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
+		  } else {
+                     yyerror(scanner, lParse, "Function(str) not supported");
+		     YYERROR;
+		  }
+                  TEST((yyval.Node)); 
+		}
+#line 2379 "eval_y.c"
+    break;
+
+  case 58: /* expr: FUNCTION bits ')'  */
+#line 630 "eval.y"
+                { if (FSTRCMP((yyvsp[-2].str),"NELEM(") == 0) {
+                     (yyval.Node) = New_Const(lParse,  LONG, &( SIZE((yyvsp[-1].Node)) ), sizeof(long) );
+		} else if (FSTRCMP((yyvsp[-2].str),"NVALID(") == 0) { /* Bit arrays do not have NULL */
+                     (yyval.Node) = New_Const(lParse,  LONG, &( SIZE((yyvsp[-1].Node)) ), sizeof(long) );
+		} else if (FSTRCMP((yyvsp[-2].str),"SUM(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  LONG, sum_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		} else if (FSTRCMP((yyvsp[-2].str),"MIN(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)),  /* Force 1D result */
+				    min1_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
 		     /* Note: $2 is a vector so the result can never
 		        be a constant.  Therefore it will never be set
 		        inside New_Func(), and it is safe to set SIZE() */
-		     SIZE((ffval.Node)) = 1;
-		} else if (FSTRCMP((ffvsp[(1) - (3)].str),"ACCUM(") == 0) {
+		     SIZE((yyval.Node)) = 1;
+		} else if (FSTRCMP((yyvsp[-2].str),"ACCUM(") == 0) {
 		    long zero = 0;
-		    (ffval.Node) = New_BinOp( LONG , (ffvsp[(2) - (3)].Node), ACCUM, New_Const( LONG, &zero, sizeof(zero) ));
-		} else if (FSTRCMP((ffvsp[(1) - (3)].str),"MAX(") == 0) {
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)),  /* Force 1D result */
-				    max1_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
+		    (yyval.Node) = New_BinOp(lParse,  LONG , (yyvsp[-1].Node), ACCUM, New_Const(lParse,  LONG, &zero, sizeof(zero) ));
+		} else if (FSTRCMP((yyvsp[-2].str),"MAX(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)),  /* Force 1D result */
+				    max1_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
 		     /* Note: $2 is a vector so the result can never
 		        be a constant.  Therefore it will never be set
 		        inside New_Func(), and it is safe to set SIZE() */
-		     SIZE((ffval.Node)) = 1;
+		     SIZE((yyval.Node)) = 1;
 		} else {
-                     fferror("Function(bits) not supported");
-		     FFERROR;
+                     yyerror(scanner, lParse, "Function(bits) not supported");
+		     YYERROR;
 		  }
-                  TEST((ffval.Node)); 
+                  TEST((yyval.Node)); 
 		}
+#line 2414 "eval_y.c"
     break;
 
-  case 55:
+  case 59: /* expr: FUNCTION expr ')'  */
+#line 661 "eval.y"
+                { if (FSTRCMP((yyvsp[-2].str),"SUM(") == 0)
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)), sum_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"AVERAGE(") == 0)
+		     (yyval.Node) = New_Func(lParse,  DOUBLE, average_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"STDDEV(") == 0)
+		     (yyval.Node) = New_Func(lParse,  DOUBLE, stddev_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"MEDIAN(") == 0)
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)), median_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"NELEM(") == 0)
+                     (yyval.Node) = New_Const(lParse,  LONG, &( SIZE((yyvsp[-1].Node)) ), sizeof(long) );
+		  else if (FSTRCMP((yyvsp[-2].str),"NVALID(") == 0)
+		     (yyval.Node) = New_Func(lParse,  LONG, nonnull_fct, 1, (yyvsp[-1].Node),
+				    0, 0, 0, 0, 0, 0 );
+		  else if   ((FSTRCMP((yyvsp[-2].str),"ACCUM(") == 0) && (TYPE((yyvsp[-1].Node)) == LONG)) {
+		    long zero = 0;
+		    (yyval.Node) = New_BinOp(lParse,  LONG ,   (yyvsp[-1].Node), ACCUM, New_Const(lParse,  LONG,   &zero, sizeof(zero) ));
+		  } else if ((FSTRCMP((yyvsp[-2].str),"ACCUM(") == 0) && (TYPE((yyvsp[-1].Node)) == DOUBLE)) {
+		    double zero = 0;
+		    (yyval.Node) = New_BinOp(lParse,  DOUBLE , (yyvsp[-1].Node), ACCUM, New_Const(lParse,  DOUBLE, &zero, sizeof(zero) ));
+		  } else if ((FSTRCMP((yyvsp[-2].str),"SEQDIFF(") == 0) && (TYPE((yyvsp[-1].Node)) == LONG)) {
+		    long zero = 0;
+		    (yyval.Node) = New_BinOp(lParse,  LONG ,   (yyvsp[-1].Node), DIFF, New_Const(lParse,  LONG,   &zero, sizeof(zero) ));
+		  } else if ((FSTRCMP((yyvsp[-2].str),"SEQDIFF(") == 0) && (TYPE((yyvsp[-1].Node)) == DOUBLE)) {
+		    double zero = 0;
+		    (yyval.Node) = New_BinOp(lParse,  DOUBLE , (yyvsp[-1].Node), DIFF, New_Const(lParse,  DOUBLE, &zero, sizeof(zero) ));
+		  } else if (FSTRCMP((yyvsp[-2].str),"ABS(") == 0)
+		     (yyval.Node) = New_Func(lParse,  0, abs_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+ 		  else if (FSTRCMP((yyvsp[-2].str),"MIN(") == 0)
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)),  /* Force 1D result */
+				    min1_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"MAX(") == 0)
+		     (yyval.Node) = New_Func(lParse,  TYPE((yyvsp[-1].Node)),  /* Force 1D result */
+				    max1_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		  else if (FSTRCMP((yyvsp[-2].str),"RANDOM(") == 0) { /* Vector RANDOM() */
+                     (yyval.Node) = New_Func(lParse,  0, rnd_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     TEST((yyval.Node));
+		     TYPE((yyval.Node)) = DOUBLE;
+		  } else if (FSTRCMP((yyvsp[-2].str),"RANDOMN(") == 0) {
+		     (yyval.Node) = New_Func(lParse,  0, gasrnd_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     TEST((yyval.Node));
+		     TYPE((yyval.Node)) = DOUBLE;
+		  } else if (FSTRCMP((yyvsp[-2].str),"ELEMENTNUM(") == 0) {
+		     if (OPER((yyvsp[-1].Node)) == CONST_OP) {
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {
+		       (yyval.Node) = New_Func(lParse,  0, elemnum_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		       TEST((yyval.Node));
+		       TYPE((yyval.Node)) = LONG;
+		     }
+		  } else if (FSTRCMP((yyvsp[-2].str),"NAXIS(") == 0) {  /* NAXIS(V) */
+		     if (OPER((yyvsp[-1].Node)) == CONST_OP) { /* if V is constant, return 1 in every case */
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {                    /* determine now the dimension of the expression */
+		       long naxis = lParse->Nodes[(yyvsp[-1].Node)].value.naxis;
 
-/* Line 1455 of yacc.c  */
-#line 563 "eval.y"
-    { if (FSTRCMP((ffvsp[(1) - (3)].str),"SUM(") == 0)
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)), sum_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"AVERAGE(") == 0)
-		     (ffval.Node) = New_Func( DOUBLE, average_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"STDDEV(") == 0)
-		     (ffval.Node) = New_Func( DOUBLE, stddev_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"MEDIAN(") == 0)
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)), median_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"NELEM(") == 0)
-                     (ffval.Node) = New_Const( LONG, &( SIZE((ffvsp[(2) - (3)].Node)) ), sizeof(long) );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"NVALID(") == 0)
-		     (ffval.Node) = New_Func( LONG, nonnull_fct, 1, (ffvsp[(2) - (3)].Node),
-				    0, 0, 0, 0, 0, 0 );
-		  else if   ((FSTRCMP((ffvsp[(1) - (3)].str),"ACCUM(") == 0) && (TYPE((ffvsp[(2) - (3)].Node)) == LONG)) {
-		    long zero = 0;
-		    (ffval.Node) = New_BinOp( LONG ,   (ffvsp[(2) - (3)].Node), ACCUM, New_Const( LONG,   &zero, sizeof(zero) ));
-		  } else if ((FSTRCMP((ffvsp[(1) - (3)].str),"ACCUM(") == 0) && (TYPE((ffvsp[(2) - (3)].Node)) == DOUBLE)) {
-		    double zero = 0;
-		    (ffval.Node) = New_BinOp( DOUBLE , (ffvsp[(2) - (3)].Node), ACCUM, New_Const( DOUBLE, &zero, sizeof(zero) ));
-		  } else if ((FSTRCMP((ffvsp[(1) - (3)].str),"SEQDIFF(") == 0) && (TYPE((ffvsp[(2) - (3)].Node)) == LONG)) {
-		    long zero = 0;
-		    (ffval.Node) = New_BinOp( LONG ,   (ffvsp[(2) - (3)].Node), DIFF, New_Const( LONG,   &zero, sizeof(zero) ));
-		  } else if ((FSTRCMP((ffvsp[(1) - (3)].str),"SEQDIFF(") == 0) && (TYPE((ffvsp[(2) - (3)].Node)) == DOUBLE)) {
-		    double zero = 0;
-		    (ffval.Node) = New_BinOp( DOUBLE , (ffvsp[(2) - (3)].Node), DIFF, New_Const( DOUBLE, &zero, sizeof(zero) ));
-		  } else if (FSTRCMP((ffvsp[(1) - (3)].str),"ABS(") == 0)
-		     (ffval.Node) = New_Func( 0, abs_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
- 		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"MIN(") == 0)
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)),  /* Force 1D result */
-				    min1_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"MAX(") == 0)
-		     (ffval.Node) = New_Func( TYPE((ffvsp[(2) - (3)].Node)),  /* Force 1D result */
-				    max1_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		  else if (FSTRCMP((ffvsp[(1) - (3)].str),"RANDOM(") == 0) { /* Vector RANDOM() */
-                     (ffval.Node) = New_Func( 0, rnd_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     TEST((ffval.Node));
-		     TYPE((ffval.Node)) = DOUBLE;
-		  } else if (FSTRCMP((ffvsp[(1) - (3)].str),"RANDOMN(") == 0) {
-		     (ffval.Node) = New_Func( 0, gasrnd_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     TEST((ffval.Node));
-		     TYPE((ffval.Node)) = DOUBLE;
+		       (yyval.Node) = New_Const(lParse,  LONG, &naxis, sizeof(naxis) );
+		       TEST((yyval.Node));
+		     }
                   } 
   		  else {  /*  These all take DOUBLE arguments  */
-		     if( TYPE((ffvsp[(2) - (3)].Node)) != DOUBLE ) (ffvsp[(2) - (3)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (3)].Node) );
-                     if (FSTRCMP((ffvsp[(1) - (3)].str),"SIN(") == 0)
-			(ffval.Node) = New_Func( 0, sin_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"COS(") == 0)
-			(ffval.Node) = New_Func( 0, cos_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"TAN(") == 0)
-			(ffval.Node) = New_Func( 0, tan_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"ARCSIN(") == 0
-			      || FSTRCMP((ffvsp[(1) - (3)].str),"ASIN(") == 0)
-			(ffval.Node) = New_Func( 0, asin_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"ARCCOS(") == 0
-			      || FSTRCMP((ffvsp[(1) - (3)].str),"ACOS(") == 0)
-			(ffval.Node) = New_Func( 0, acos_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"ARCTAN(") == 0
-			      || FSTRCMP((ffvsp[(1) - (3)].str),"ATAN(") == 0)
-			(ffval.Node) = New_Func( 0, atan_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"SINH(") == 0)
-			(ffval.Node) = New_Func( 0, sinh_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"COSH(") == 0)
-			(ffval.Node) = New_Func( 0, cosh_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"TANH(") == 0)
-			(ffval.Node) = New_Func( 0, tanh_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"EXP(") == 0)
-			(ffval.Node) = New_Func( 0, exp_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"LOG(") == 0)
-			(ffval.Node) = New_Func( 0, log_fct,  1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"LOG10(") == 0)
-			(ffval.Node) = New_Func( 0, log10_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"SQRT(") == 0)
-			(ffval.Node) = New_Func( 0, sqrt_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"ROUND(") == 0)
-			(ffval.Node) = New_Func( 0, round_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"FLOOR(") == 0)
-			(ffval.Node) = New_Func( 0, floor_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"CEIL(") == 0)
-			(ffval.Node) = New_Func( 0, ceil_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0, 0, 0, 0, 0 );
-		     else if (FSTRCMP((ffvsp[(1) - (3)].str),"RANDOMP(") == 0) {
-		       (ffval.Node) = New_Func( 0, poirnd_fct, 1, (ffvsp[(2) - (3)].Node), 
+		     if( TYPE((yyvsp[-1].Node)) != DOUBLE ) (yyvsp[-1].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node) );
+                     if (FSTRCMP((yyvsp[-2].str),"SIN(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, sin_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"COS(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, cos_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"TAN(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, tan_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"ARCSIN(") == 0
+			      || FSTRCMP((yyvsp[-2].str),"ASIN(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, asin_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"ARCCOS(") == 0
+			      || FSTRCMP((yyvsp[-2].str),"ACOS(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, acos_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"ARCTAN(") == 0
+			      || FSTRCMP((yyvsp[-2].str),"ATAN(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, atan_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"SINH(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, sinh_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"COSH(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, cosh_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"TANH(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, tanh_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"EXP(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, exp_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"LOG(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, log_fct,  1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"LOG10(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, log10_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"SQRT(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, sqrt_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"ROUND(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, round_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"FLOOR(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, floor_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"CEIL(") == 0)
+			(yyval.Node) = New_Func(lParse,  0, ceil_fct, 1, (yyvsp[-1].Node), 0, 0, 0, 0, 0, 0 );
+		     else if (FSTRCMP((yyvsp[-2].str),"RANDOMP(") == 0) {
+		       (yyval.Node) = New_Func(lParse,  0, poirnd_fct, 1, (yyvsp[-1].Node), 
 				      0, 0, 0, 0, 0, 0 );
-		       TYPE((ffval.Node)) = LONG;
+		       TYPE((yyval.Node)) = LONG;
 		     } else {
-			fferror("Function(expr) not supported");
-			FFERROR;
+			yyerror(scanner, lParse, "Function(expr) not supported");
+			YYERROR;
 		     }
 		  }
-                  TEST((ffval.Node)); 
+                  TEST((yyval.Node)); 
                 }
+#line 2532 "eval_y.c"
     break;
 
-  case 56:
-
-/* Line 1455 of yacc.c  */
-#line 658 "eval.y"
-    { 
-		  if (FSTRCMP((ffvsp[(1) - (5)].str),"STRSTR(") == 0) {
-		    (ffval.Node) = New_Func( LONG, strpos_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0, 
+  case 60: /* expr: IFUNCTION sexpr ',' sexpr ')'  */
+#line 775 "eval.y"
+                { 
+		  if (FSTRCMP((yyvsp[-4].str),"STRSTR(") == 0) {
+		    (yyval.Node) = New_Func(lParse,  LONG, strpos_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 
 				   0, 0, 0, 0 );
-		    TEST((ffval.Node));
+		    TEST((yyval.Node));
 		  }
                 }
+#line 2544 "eval_y.c"
     break;
 
-  case 57:
-
-/* Line 1455 of yacc.c  */
-#line 666 "eval.y"
-    { 
-		   if (FSTRCMP((ffvsp[(1) - (5)].str),"DEFNULL(") == 0) {
-		      if( SIZE((ffvsp[(2) - (5)].Node))>=SIZE((ffvsp[(4) - (5)].Node)) && Test_Dims( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) ) ) {
-			 PROMOTE((ffvsp[(2) - (5)].Node),(ffvsp[(4) - (5)].Node));
-			 (ffval.Node) = New_Func( 0, defnull_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0,
+  case 61: /* expr: FUNCTION expr ',' expr ')'  */
+#line 783 "eval.y"
+                { 
+		   if (FSTRCMP((yyvsp[-4].str),"DEFNULL(") == 0) {
+		      if( SIZE((yyvsp[-3].Node))>=SIZE((yyvsp[-1].Node)) && Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+			 PROMOTE((yyvsp[-3].Node),(yyvsp[-1].Node));
+			 (yyval.Node) = New_Func(lParse,  0, defnull_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0,
 					0, 0, 0, 0 );
-			 TEST((ffval.Node)); 
+			 TEST((yyval.Node)); 
 		      } else {
-			 fferror("Dimensions of DEFNULL arguments "
+			 yyerror(scanner, lParse, "Dimensions of DEFNULL arguments "
 				 "are not compatible");
-			 FFERROR;
+			 YYERROR;
 		      }
-		   } else if (FSTRCMP((ffvsp[(1) - (5)].str),"ARCTAN2(") == 0) {
-		     if( TYPE((ffvsp[(2) - (5)].Node)) != DOUBLE ) (ffvsp[(2) - (5)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (5)].Node) );
-		     if( TYPE((ffvsp[(4) - (5)].Node)) != DOUBLE ) (ffvsp[(4) - (5)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(4) - (5)].Node) );
-		     if( Test_Dims( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) ) ) {
-			(ffval.Node) = New_Func( 0, atan2_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0, 0, 0, 0, 0 );
-			TEST((ffval.Node)); 
-			if( SIZE((ffvsp[(2) - (5)].Node))<SIZE((ffvsp[(4) - (5)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(4) - (5)].Node));
+		   } else if (FSTRCMP((yyvsp[-4].str),"ARCTAN2(") == 0) {
+		     if( TYPE((yyvsp[-3].Node)) != DOUBLE ) (yyvsp[-3].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-3].Node) );
+		     if( TYPE((yyvsp[-1].Node)) != DOUBLE ) (yyvsp[-1].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node) );
+		     if( Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+			(yyval.Node) = New_Func(lParse,  0, atan2_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 0, 0, 0, 0 );
+			TEST((yyval.Node)); 
+			if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		     } else {
-			fferror("Dimensions of arctan2 arguments "
+			yyerror(scanner, lParse, "Dimensions of arctan2 arguments "
 				"are not compatible");
-			FFERROR;
+			YYERROR;
 		     }
-		   } else if (FSTRCMP((ffvsp[(1) - (5)].str),"MIN(") == 0) {
-		      PROMOTE( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) );
-		      if( Test_Dims( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) ) ) {
-			(ffval.Node) = New_Func( 0, min2_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0, 0, 0, 0, 0 );
-			TEST((ffval.Node));
-			if( SIZE((ffvsp[(2) - (5)].Node))<SIZE((ffvsp[(4) - (5)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(4) - (5)].Node));
+		   } else if (FSTRCMP((yyvsp[-4].str),"MIN(") == 0) {
+		      PROMOTE( (yyvsp[-3].Node), (yyvsp[-1].Node) );
+		      if( Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+			(yyval.Node) = New_Func(lParse,  0, min2_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 0, 0, 0, 0 );
+			TEST((yyval.Node));
+			if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		      } else {
-			fferror("Dimensions of min(a,b) arguments "
+			yyerror(scanner, lParse, "Dimensions of min(a,b) arguments "
 				"are not compatible");
-			FFERROR;
+			YYERROR;
 		      }
-		   } else if (FSTRCMP((ffvsp[(1) - (5)].str),"MAX(") == 0) {
-		      PROMOTE( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) );
-		      if( Test_Dims( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) ) ) {
-			(ffval.Node) = New_Func( 0, max2_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0, 0, 0, 0, 0 );
-			TEST((ffval.Node));
-			if( SIZE((ffvsp[(2) - (5)].Node))<SIZE((ffvsp[(4) - (5)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(4) - (5)].Node));
+		   } else if (FSTRCMP((yyvsp[-4].str),"MAX(") == 0) {
+		      PROMOTE( (yyvsp[-3].Node), (yyvsp[-1].Node) );
+		      if( Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+			(yyval.Node) = New_Func(lParse,  0, max2_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 0, 0, 0, 0 );
+			TEST((yyval.Node));
+			if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		      } else {
-			fferror("Dimensions of max(a,b) arguments "
+			yyerror(scanner, lParse, "Dimensions of max(a,b) arguments "
 				"are not compatible");
-			FFERROR;
+			YYERROR;
 		      }
-#if 0
-		   } else if (FSTRCMP((ffvsp[(1) - (5)].str),"STRSTR(") == 0) {
-		     if( TYPE((ffvsp[(2) - (5)].Node)) != STRING || TYPE((ffvsp[(4) - (5)].Node)) != STRING) {
-		       fferror("Arguments to strstr(s,r) must be strings");
-		       FFERROR;
+		   } else if (FSTRCMP((yyvsp[-4].str),"SETNULL(") == 0) {
+		     if (OPER((yyvsp[-3].Node)) != CONST_OP
+			 || SIZE((yyvsp[-3].Node)) != 1) {
+		       yyerror(scanner, lParse, "SETNULL first argument must be a scalar constant");
+		       YYERROR;
 		     }
-		     (ffval.Node) = New_Func( LONG, strpos_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0, 
-				    0, 0, 0, 0 );
-		     TEST((ffval.Node));
-#endif
+		     /* Make sure first arg is same type as second arg */
+		     if ( TYPE((yyvsp[-3].Node)) != TYPE((yyvsp[-1].Node)) ) (yyvsp[-3].Node) = New_Unary(lParse,  TYPE((yyvsp[-1].Node)), 0, (yyvsp[-3].Node) );
+		     (yyval.Node) = New_Func(lParse,  0, setnull_fct, 2, (yyvsp[-1].Node), (yyvsp[-3].Node), 0, 0, 0, 0, 0 );
+		   } else if (FSTRCMP((yyvsp[-4].str),"AXISELEM(") == 0) {  /* AXISELEM(V,n) */
+		     if (OPER((yyvsp[-1].Node)) != CONST_OP
+			 || SIZE((yyvsp[-1].Node)) != 1) {
+		       yyerror(scanner, lParse, "AXISELEM second argument must be a scalar constant");
+		       YYERROR;
+		     }
+		     if (OPER((yyvsp[-3].Node)) == CONST_OP) {
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {
+		       if ( TYPE((yyvsp[-1].Node)) != LONG ) (yyvsp[-1].Node) = New_Unary(lParse, LONG, 0, (yyvsp[-1].Node));
+		       (yyval.Node) = New_Func(lParse, 0, axiselem_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0, 0, 0, 0, 0 );
+		       TEST((yyval.Node));
+		       TYPE((yyval.Node)) = LONG;
+		     }
+		   } else if (FSTRCMP((yyvsp[-4].str),"NAXES(") == 0) {  /* NAXES(V,n) */
+		     if (OPER((yyvsp[-1].Node)) != CONST_OP
+			 || SIZE((yyvsp[-1].Node)) != 1) {
+		       yyerror(scanner, lParse, "NAXES second argument must be a scalar constant");
+		       YYERROR;
+		     }
+		     if (OPER((yyvsp[-3].Node)) == CONST_OP) { /* if V is constant, return 1 in every case */
+		       long one = 1;
+		       (yyval.Node) = New_Const(lParse,  LONG, &one, sizeof(one) );
+		     } else {                    /* determine now the dimension of the expression */
+		       long iaxis;
+		       int naxis;
+		       if ( TYPE((yyvsp[-1].Node)) != LONG ) (yyvsp[-1].Node) = New_Unary(lParse, LONG, 0, (yyvsp[-1].Node));
+		       /* Since it is already constant, we can extract long value directly */
+		       iaxis = (lParse->Nodes[(yyvsp[-1].Node)].value.data.lng);
+		       naxis = lParse->Nodes[(yyvsp[-3].Node)].value.naxis;
+
+		       if (iaxis == 0)          iaxis = naxis;   /* NAXIS(V,0) = NAXIS */
+		       else if (iaxis <= naxis) iaxis = lParse->Nodes[(yyvsp[-3].Node)].value.naxes[iaxis-1]; /* NAXIS(V,n) = NAXISn */
+		       else                     iaxis = 1;       /* Out of bounds use 1 */
+
+		       (yyval.Node) = New_Const(lParse,  LONG, &iaxis, sizeof(iaxis) );
+		       TEST((yyval.Node));
+		     }
+		   } else if (FSTRCMP((yyvsp[-4].str),"ARRAY(") == 0) {  /* NAXES(expr,n) */
+		     (yyval.Node) = New_Array(lParse, (yyvsp[-3].Node), (yyvsp[-1].Node));
+		     TEST((yyval.Node));
 		   } else {
-		      fferror("Function(expr,expr) not supported");
-		      FFERROR;
+		      yyerror(scanner, lParse, "Function(expr,expr) not supported");
+		      YYERROR;
 		   }
                 }
+#line 2651 "eval_y.c"
     break;
 
-  case 58:
-
-/* Line 1455 of yacc.c  */
-#line 728 "eval.y"
-    { 
-		  if (FSTRCMP((ffvsp[(1) - (9)].str),"ANGSEP(") == 0) {
-		    if( TYPE((ffvsp[(2) - (9)].Node)) != DOUBLE ) (ffvsp[(2) - (9)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (9)].Node) );
-		    if( TYPE((ffvsp[(4) - (9)].Node)) != DOUBLE ) (ffvsp[(4) - (9)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(4) - (9)].Node) );
-		    if( TYPE((ffvsp[(6) - (9)].Node)) != DOUBLE ) (ffvsp[(6) - (9)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(6) - (9)].Node) );
-		    if( TYPE((ffvsp[(8) - (9)].Node)) != DOUBLE ) (ffvsp[(8) - (9)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(8) - (9)].Node) );
-		    if( Test_Dims( (ffvsp[(2) - (9)].Node), (ffvsp[(4) - (9)].Node) ) && Test_Dims( (ffvsp[(4) - (9)].Node), (ffvsp[(6) - (9)].Node) ) && 
-			Test_Dims( (ffvsp[(6) - (9)].Node), (ffvsp[(8) - (9)].Node) ) ) {
-		      (ffval.Node) = New_Func( 0, angsep_fct, 4, (ffvsp[(2) - (9)].Node), (ffvsp[(4) - (9)].Node), (ffvsp[(6) - (9)].Node), (ffvsp[(8) - (9)].Node),0,0,0 );
-		      TEST((ffval.Node)); 
-		      if( SIZE((ffvsp[(2) - (9)].Node))<SIZE((ffvsp[(4) - (9)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(4) - (9)].Node));
-		      if( SIZE((ffvsp[(4) - (9)].Node))<SIZE((ffvsp[(6) - (9)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(6) - (9)].Node));
-		      if( SIZE((ffvsp[(6) - (9)].Node))<SIZE((ffvsp[(8) - (9)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(8) - (9)].Node));
+  case 62: /* expr: FUNCTION expr ',' expr ',' expr ',' expr ')'  */
+#line 886 "eval.y"
+                { 
+		  if (FSTRCMP((yyvsp[-8].str),"ANGSEP(") == 0) {
+		    if( TYPE((yyvsp[-7].Node)) != DOUBLE ) (yyvsp[-7].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-7].Node) );
+		    if( TYPE((yyvsp[-5].Node)) != DOUBLE ) (yyvsp[-5].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-5].Node) );
+		    if( TYPE((yyvsp[-3].Node)) != DOUBLE ) (yyvsp[-3].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-3].Node) );
+		    if( TYPE((yyvsp[-1].Node)) != DOUBLE ) (yyvsp[-1].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node) );
+		    if( Test_Dims( lParse,  (yyvsp[-7].Node), (yyvsp[-5].Node) ) && Test_Dims( lParse,  (yyvsp[-5].Node), (yyvsp[-3].Node) ) && 
+			Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+		      (yyval.Node) = New_Func(lParse,  0, angsep_fct, 4, (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),0,0,0 );
+		      TEST((yyval.Node)); 
+		      if( SIZE((yyvsp[-7].Node))<SIZE((yyvsp[-5].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-5].Node));
+		      if( SIZE((yyvsp[-5].Node))<SIZE((yyvsp[-3].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-3].Node));
+		      if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		    } else {
-		      fferror("Dimensions of ANGSEP arguments "
+		      yyerror(scanner, lParse, "Dimensions of ANGSEP arguments "
 			      "are not compatible");
-		      FFERROR;
+		      YYERROR;
 		    }
 		   } else {
-		      fferror("Function(expr,expr,expr,expr) not supported");
-		      FFERROR;
+		      yyerror(scanner, lParse, "Function(expr,expr,expr,expr) not supported");
+		      YYERROR;
 		   }
                 }
+#line 2679 "eval_y.c"
     break;
 
-  case 59:
-
-/* Line 1455 of yacc.c  */
-#line 752 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (4)].Node), 1, (ffvsp[(3) - (4)].Node),  0,  0,  0,   0 ); TEST((ffval.Node)); }
+  case 63: /* expr: expr '[' expr ']'  */
+#line 910 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-3].Node), 1, (yyvsp[-1].Node),  0,  0,  0,   0 ); TEST((yyval.Node)); }
+#line 2685 "eval_y.c"
     break;
 
-  case 60:
-
-/* Line 1455 of yacc.c  */
-#line 754 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (6)].Node), 2, (ffvsp[(3) - (6)].Node), (ffvsp[(5) - (6)].Node),  0,  0,   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 61:
-
-/* Line 1455 of yacc.c  */
-#line 756 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (8)].Node), 3, (ffvsp[(3) - (8)].Node), (ffvsp[(5) - (8)].Node), (ffvsp[(7) - (8)].Node),  0,   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 62:
-
-/* Line 1455 of yacc.c  */
-#line 758 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (10)].Node), 4, (ffvsp[(3) - (10)].Node), (ffvsp[(5) - (10)].Node), (ffvsp[(7) - (10)].Node), (ffvsp[(9) - (10)].Node),   0 ); TEST((ffval.Node)); }
-    break;
-
-  case 63:
-
-/* Line 1455 of yacc.c  */
-#line 760 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (12)].Node), 5, (ffvsp[(3) - (12)].Node), (ffvsp[(5) - (12)].Node), (ffvsp[(7) - (12)].Node), (ffvsp[(9) - (12)].Node), (ffvsp[(11) - (12)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 64:
-
-/* Line 1455 of yacc.c  */
-#line 762 "eval.y"
-    { (ffval.Node) = New_Unary( LONG,   INTCAST, (ffvsp[(2) - (2)].Node) );  TEST((ffval.Node));  }
-    break;
-
-  case 65:
-
-/* Line 1455 of yacc.c  */
-#line 764 "eval.y"
-    { (ffval.Node) = New_Unary( LONG,   INTCAST, (ffvsp[(2) - (2)].Node) );  TEST((ffval.Node));  }
-    break;
-
-  case 66:
-
-/* Line 1455 of yacc.c  */
-#line 766 "eval.y"
-    { (ffval.Node) = New_Unary( DOUBLE, FLTCAST, (ffvsp[(2) - (2)].Node) );  TEST((ffval.Node));  }
-    break;
-
-  case 67:
-
-/* Line 1455 of yacc.c  */
-#line 768 "eval.y"
-    { (ffval.Node) = New_Unary( DOUBLE, FLTCAST, (ffvsp[(2) - (2)].Node) );  TEST((ffval.Node));  }
-    break;
-
-  case 68:
-
-/* Line 1455 of yacc.c  */
-#line 772 "eval.y"
-    { (ffval.Node) = New_Const( BOOLEAN, &((ffvsp[(1) - (1)].log)), sizeof(char) ); TEST((ffval.Node)); }
-    break;
-
-  case 69:
-
-/* Line 1455 of yacc.c  */
-#line 774 "eval.y"
-    { (ffval.Node) = New_Column( (ffvsp[(1) - (1)].lng) ); TEST((ffval.Node)); }
-    break;
-
-  case 70:
-
-/* Line 1455 of yacc.c  */
-#line 776 "eval.y"
-    {
-                  if( TYPE((ffvsp[(3) - (4)].Node)) != LONG
-		      || OPER((ffvsp[(3) - (4)].Node)) != CONST_OP ) {
-		     fferror("Offset argument must be a constant integer");
-		     FFERROR;
-		  }
-                  (ffval.Node) = New_Offset( (ffvsp[(1) - (4)].lng), (ffvsp[(3) - (4)].Node) ); TEST((ffval.Node));
-                }
-    break;
-
-  case 71:
-
-/* Line 1455 of yacc.c  */
-#line 785 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), EQ,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 72:
-
-/* Line 1455 of yacc.c  */
-#line 788 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), NE,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); 
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 73:
-
-/* Line 1455 of yacc.c  */
-#line 791 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LT,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); 
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 74:
-
-/* Line 1455 of yacc.c  */
-#line 794 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LTE, (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); 
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 75:
-
-/* Line 1455 of yacc.c  */
-#line 797 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GT,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); 
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 76:
-
-/* Line 1455 of yacc.c  */
-#line 800 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GTE, (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); 
-		  SIZE((ffval.Node)) = 1;                                     }
-    break;
-
-  case 77:
-
-/* Line 1455 of yacc.c  */
-#line 803 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GT,  (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 78:
-
-/* Line 1455 of yacc.c  */
-#line 806 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LT,  (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 79:
-
-/* Line 1455 of yacc.c  */
-#line 809 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GTE, (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 80:
-
-/* Line 1455 of yacc.c  */
-#line 812 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LTE, (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 81:
-
-/* Line 1455 of yacc.c  */
-#line 815 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), '~', (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 82:
-
-/* Line 1455 of yacc.c  */
-#line 818 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), EQ,  (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 83:
-
-/* Line 1455 of yacc.c  */
-#line 821 "eval.y"
-    { PROMOTE((ffvsp[(1) - (3)].Node),(ffvsp[(3) - (3)].Node)); (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), NE,  (ffvsp[(3) - (3)].Node) );
-                  TEST((ffval.Node));                                               }
-    break;
-
-  case 84:
-
-/* Line 1455 of yacc.c  */
-#line 824 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), EQ,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 85:
-
-/* Line 1455 of yacc.c  */
-#line 827 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), NE,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 86:
-
-/* Line 1455 of yacc.c  */
-#line 830 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GT,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 87:
-
-/* Line 1455 of yacc.c  */
-#line 833 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), GTE, (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 88:
-
-/* Line 1455 of yacc.c  */
-#line 836 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LT,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 89:
-
-/* Line 1455 of yacc.c  */
-#line 839 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), LTE, (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = 1; }
-    break;
-
-  case 90:
-
-/* Line 1455 of yacc.c  */
-#line 842 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), AND, (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 91:
-
-/* Line 1455 of yacc.c  */
-#line 844 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), OR,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 92:
-
-/* Line 1455 of yacc.c  */
-#line 846 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), EQ,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 93:
-
-/* Line 1455 of yacc.c  */
-#line 848 "eval.y"
-    { (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (3)].Node), NE,  (ffvsp[(3) - (3)].Node) ); TEST((ffval.Node)); }
-    break;
-
-  case 94:
-
-/* Line 1455 of yacc.c  */
-#line 851 "eval.y"
-    { PROMOTE((ffvsp[(1) - (5)].Node),(ffvsp[(3) - (5)].Node)); PROMOTE((ffvsp[(1) - (5)].Node),(ffvsp[(5) - (5)].Node)); PROMOTE((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node));
-		  (ffvsp[(3) - (5)].Node) = New_BinOp( BOOLEAN, (ffvsp[(3) - (5)].Node), LTE, (ffvsp[(1) - (5)].Node) );
-                  (ffvsp[(5) - (5)].Node) = New_BinOp( BOOLEAN, (ffvsp[(1) - (5)].Node), LTE, (ffvsp[(5) - (5)].Node) );
-                  (ffval.Node) = New_BinOp( BOOLEAN, (ffvsp[(3) - (5)].Node), AND, (ffvsp[(5) - (5)].Node) );
-                  TEST((ffval.Node));                                         }
-    break;
-
-  case 95:
-
-/* Line 1455 of yacc.c  */
-#line 858 "eval.y"
-    {
-                  if( ! Test_Dims((ffvsp[(3) - (5)].Node),(ffvsp[(5) - (5)].Node)) ) {
-                     fferror("Incompatible dimensions in '?:' arguments");
-		     FFERROR;
-                  }
-                  (ffval.Node) = New_Func( 0, ifthenelse_fct, 3, (ffvsp[(3) - (5)].Node), (ffvsp[(5) - (5)].Node), (ffvsp[(1) - (5)].Node),
-                                 0, 0, 0, 0 );
-                  TEST((ffval.Node));
-                  if( SIZE((ffvsp[(3) - (5)].Node))<SIZE((ffvsp[(5) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(5) - (5)].Node));
-                  if( ! Test_Dims((ffvsp[(1) - (5)].Node),(ffval.Node)) ) {
-                     fferror("Incompatible dimensions in '?:' condition");
-		     FFERROR;
-                  }
-                  if( SIZE((ffval.Node))<SIZE((ffvsp[(1) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(1) - (5)].Node));
-                }
-    break;
-
-  case 96:
-
-/* Line 1455 of yacc.c  */
-#line 875 "eval.y"
-    {
-		   if (FSTRCMP((ffvsp[(1) - (3)].str),"ISNULL(") == 0) {
-		      (ffval.Node) = New_Func( 0, isnull_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0,
-				     0, 0, 0, 0 );
-		      TEST((ffval.Node)); 
-                      /* Use expression's size, but return BOOLEAN */
-		      TYPE((ffval.Node)) = BOOLEAN;
-		   } else {
-		      fferror("Boolean Function(expr) not supported");
-		      FFERROR;
-		   }
-		}
-    break;
-
-  case 97:
-
-/* Line 1455 of yacc.c  */
-#line 888 "eval.y"
-    {
-		   if (FSTRCMP((ffvsp[(1) - (3)].str),"ISNULL(") == 0) {
-		      (ffval.Node) = New_Func( 0, isnull_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0,
-				     0, 0, 0, 0 );
-		      TEST((ffval.Node)); 
-                      /* Use expression's size, but return BOOLEAN */
-		      TYPE((ffval.Node)) = BOOLEAN;
-		   } else {
-		      fferror("Boolean Function(expr) not supported");
-		      FFERROR;
-		   }
-		}
-    break;
-
-  case 98:
-
-/* Line 1455 of yacc.c  */
-#line 901 "eval.y"
-    {
-		   if (FSTRCMP((ffvsp[(1) - (3)].str),"ISNULL(") == 0) {
-		      (ffval.Node) = New_Func( BOOLEAN, isnull_fct, 1, (ffvsp[(2) - (3)].Node), 0, 0,
-				     0, 0, 0, 0 );
-		      TEST((ffval.Node)); 
-		   } else {
-		      fferror("Boolean Function(expr) not supported");
-		      FFERROR;
-		   }
-		}
-    break;
-
-  case 99:
-
-/* Line 1455 of yacc.c  */
+  case 64: /* expr: expr '[' expr ',' expr ']'  */
 #line 912 "eval.y"
-    {
-		   if (FSTRCMP((ffvsp[(1) - (5)].str),"DEFNULL(") == 0) {
-		      if( SIZE((ffvsp[(2) - (5)].Node))>=SIZE((ffvsp[(4) - (5)].Node)) && Test_Dims( (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node) ) ) {
-			 (ffval.Node) = New_Func( 0, defnull_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0,
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-5].Node), 2, (yyvsp[-3].Node), (yyvsp[-1].Node),  0,  0,   0 ); TEST((yyval.Node)); }
+#line 2691 "eval_y.c"
+    break;
+
+  case 65: /* expr: expr '[' expr ',' expr ',' expr ']'  */
+#line 914 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-7].Node), 3, (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),  0,   0 ); TEST((yyval.Node)); }
+#line 2697 "eval_y.c"
+    break;
+
+  case 66: /* expr: expr '[' expr ',' expr ',' expr ',' expr ']'  */
+#line 916 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-9].Node), 4, (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),   0 ); TEST((yyval.Node)); }
+#line 2703 "eval_y.c"
+    break;
+
+  case 67: /* expr: expr '[' expr ',' expr ',' expr ',' expr ',' expr ']'  */
+#line 918 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-11].Node), 5, (yyvsp[-9].Node), (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node) ); TEST((yyval.Node)); }
+#line 2709 "eval_y.c"
+    break;
+
+  case 68: /* expr: INTCAST expr  */
+#line 920 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  LONG,   INTCAST, (yyvsp[0].Node) );  TEST((yyval.Node));  }
+#line 2715 "eval_y.c"
+    break;
+
+  case 69: /* expr: INTCAST bexpr  */
+#line 922 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  LONG,   INTCAST, (yyvsp[0].Node) );  TEST((yyval.Node));  }
+#line 2721 "eval_y.c"
+    break;
+
+  case 70: /* expr: FLTCAST expr  */
+#line 924 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  DOUBLE, FLTCAST, (yyvsp[0].Node) );  TEST((yyval.Node));  }
+#line 2727 "eval_y.c"
+    break;
+
+  case 71: /* expr: FLTCAST bexpr  */
+#line 926 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  DOUBLE, FLTCAST, (yyvsp[0].Node) );  TEST((yyval.Node));  }
+#line 2733 "eval_y.c"
+    break;
+
+  case 72: /* bexpr: BOOLEAN  */
+#line 930 "eval.y"
+                { (yyval.Node) = New_Const(lParse,  BOOLEAN, &((yyvsp[0].log)), sizeof(char) ); TEST((yyval.Node)); }
+#line 2739 "eval_y.c"
+    break;
+
+  case 73: /* bexpr: BCOLUMN  */
+#line 932 "eval.y"
+                { (yyval.Node) = New_Column(lParse,  (yyvsp[0].lng) ); TEST((yyval.Node)); }
+#line 2745 "eval_y.c"
+    break;
+
+  case 74: /* bexpr: BCOLUMN '{' expr '}'  */
+#line 934 "eval.y"
+                {
+                  if( TYPE((yyvsp[-1].Node)) != LONG
+		      || OPER((yyvsp[-1].Node)) != CONST_OP ) {
+		     yyerror(scanner, lParse, "Offset argument must be a constant integer");
+		     YYERROR;
+		  }
+                  (yyval.Node) = New_Offset(lParse,  (yyvsp[-3].lng), (yyvsp[-1].Node) ); TEST((yyval.Node));
+                }
+#line 2758 "eval_y.c"
+    break;
+
+  case 75: /* bexpr: bits EQ bits  */
+#line 943 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), EQ,  (yyvsp[0].Node) ); TEST((yyval.Node));
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2765 "eval_y.c"
+    break;
+
+  case 76: /* bexpr: bits NE bits  */
+#line 946 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), NE,  (yyvsp[0].Node) ); TEST((yyval.Node)); 
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2772 "eval_y.c"
+    break;
+
+  case 77: /* bexpr: bits LT bits  */
+#line 949 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LT,  (yyvsp[0].Node) ); TEST((yyval.Node)); 
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2779 "eval_y.c"
+    break;
+
+  case 78: /* bexpr: bits LTE bits  */
+#line 952 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LTE, (yyvsp[0].Node) ); TEST((yyval.Node)); 
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2786 "eval_y.c"
+    break;
+
+  case 79: /* bexpr: bits GT bits  */
+#line 955 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GT,  (yyvsp[0].Node) ); TEST((yyval.Node)); 
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2793 "eval_y.c"
+    break;
+
+  case 80: /* bexpr: bits GTE bits  */
+#line 958 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GTE, (yyvsp[0].Node) ); TEST((yyval.Node)); 
+		  SIZE((yyval.Node)) = 1;                                     }
+#line 2800 "eval_y.c"
+    break;
+
+  case 81: /* bexpr: expr GT expr  */
+#line 961 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GT,  (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2807 "eval_y.c"
+    break;
+
+  case 82: /* bexpr: expr LT expr  */
+#line 964 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LT,  (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2814 "eval_y.c"
+    break;
+
+  case 83: /* bexpr: expr GTE expr  */
+#line 967 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GTE, (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2821 "eval_y.c"
+    break;
+
+  case 84: /* bexpr: expr LTE expr  */
+#line 970 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LTE, (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2828 "eval_y.c"
+    break;
+
+  case 85: /* bexpr: expr '~' expr  */
+#line 973 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), '~', (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2835 "eval_y.c"
+    break;
+
+  case 86: /* bexpr: expr EQ expr  */
+#line 976 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), EQ,  (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2842 "eval_y.c"
+    break;
+
+  case 87: /* bexpr: expr NE expr  */
+#line 979 "eval.y"
+                { PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node)); (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), NE,  (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                               }
+#line 2849 "eval_y.c"
+    break;
+
+  case 88: /* bexpr: sexpr EQ sexpr  */
+#line 982 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), EQ,  (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2856 "eval_y.c"
+    break;
+
+  case 89: /* bexpr: sexpr NE sexpr  */
+#line 985 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), NE,  (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2863 "eval_y.c"
+    break;
+
+  case 90: /* bexpr: sexpr GT sexpr  */
+#line 988 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GT,  (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2870 "eval_y.c"
+    break;
+
+  case 91: /* bexpr: sexpr GTE sexpr  */
+#line 991 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), GTE, (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2877 "eval_y.c"
+    break;
+
+  case 92: /* bexpr: sexpr LT sexpr  */
+#line 994 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LT,  (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2884 "eval_y.c"
+    break;
+
+  case 93: /* bexpr: sexpr LTE sexpr  */
+#line 997 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LTE, (yyvsp[0].Node) ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = 1; }
+#line 2891 "eval_y.c"
+    break;
+
+  case 94: /* bexpr: bexpr AND bexpr  */
+#line 1000 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), AND, (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 2897 "eval_y.c"
+    break;
+
+  case 95: /* bexpr: bexpr OR bexpr  */
+#line 1002 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), OR,  (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 2903 "eval_y.c"
+    break;
+
+  case 96: /* bexpr: bexpr EQ bexpr  */
+#line 1004 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), EQ,  (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 2909 "eval_y.c"
+    break;
+
+  case 97: /* bexpr: bexpr NE bexpr  */
+#line 1006 "eval.y"
+                { (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), NE,  (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 2915 "eval_y.c"
+    break;
+
+  case 98: /* bexpr: expr '=' expr ':' expr  */
+#line 1009 "eval.y"
+                { PROMOTE((yyvsp[-4].Node),(yyvsp[-2].Node)); PROMOTE((yyvsp[-4].Node),(yyvsp[0].Node)); PROMOTE((yyvsp[-2].Node),(yyvsp[0].Node));
+		  (yyvsp[-2].Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), LTE, (yyvsp[-4].Node) );
+                  (yyvsp[0].Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-4].Node), LTE, (yyvsp[0].Node) );
+                  (yyval.Node) = New_BinOp(lParse,  BOOLEAN, (yyvsp[-2].Node), AND, (yyvsp[0].Node) );
+                  TEST((yyval.Node));                                         }
+#line 2925 "eval_y.c"
+    break;
+
+  case 99: /* bexpr: bexpr '?' bexpr ':' bexpr  */
+#line 1016 "eval.y"
+                {
+                  if( ! Test_Dims( lParse, (yyvsp[-2].Node),(yyvsp[0].Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' arguments");
+		     YYERROR;
+                  }
+                  (yyval.Node) = New_Func(lParse,  0, ifthenelse_fct, 3, (yyvsp[-2].Node), (yyvsp[0].Node), (yyvsp[-4].Node),
+                                 0, 0, 0, 0 );
+                  TEST((yyval.Node));
+                  if( SIZE((yyvsp[-2].Node))<SIZE((yyvsp[0].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[0].Node));
+                  if( ! Test_Dims( lParse, (yyvsp[-4].Node),(yyval.Node)) ) {
+                     yyerror(scanner, lParse, "Incompatible dimensions in '?:' condition");
+		     YYERROR;
+                  }
+                  if( SIZE((yyval.Node))<SIZE((yyvsp[-4].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-4].Node));
+                }
+#line 2945 "eval_y.c"
+    break;
+
+  case 100: /* bexpr: BFUNCTION expr ')'  */
+#line 1033 "eval.y"
+                {
+		   if (FSTRCMP((yyvsp[-2].str),"ISNULL(") == 0) {
+		      (yyval.Node) = New_Func(lParse,  0, isnull_fct, 1, (yyvsp[-1].Node), 0, 0,
+				     0, 0, 0, 0 );
+		      TEST((yyval.Node)); 
+                      /* Use expression's size, but return BOOLEAN */
+		      TYPE((yyval.Node)) = BOOLEAN;
+		   } else {
+		      yyerror(scanner, lParse, "Boolean Function(expr) not supported");
+		      YYERROR;
+		   }
+		}
+#line 2962 "eval_y.c"
+    break;
+
+  case 101: /* bexpr: BFUNCTION bexpr ')'  */
+#line 1046 "eval.y"
+                {
+		   if (FSTRCMP((yyvsp[-2].str),"ISNULL(") == 0) {
+		      (yyval.Node) = New_Func(lParse,  0, isnull_fct, 1, (yyvsp[-1].Node), 0, 0,
+				     0, 0, 0, 0 );
+		      TEST((yyval.Node)); 
+                      /* Use expression's size, but return BOOLEAN */
+		      TYPE((yyval.Node)) = BOOLEAN;
+		   } else {
+		      yyerror(scanner, lParse, "Boolean Function(expr) not supported");
+		      YYERROR;
+		   }
+		}
+#line 2979 "eval_y.c"
+    break;
+
+  case 102: /* bexpr: BFUNCTION sexpr ')'  */
+#line 1059 "eval.y"
+                {
+		   if (FSTRCMP((yyvsp[-2].str),"ISNULL(") == 0) {
+		      (yyval.Node) = New_Func(lParse,  BOOLEAN, isnull_fct, 1, (yyvsp[-1].Node), 0, 0,
+				     0, 0, 0, 0 );
+		      TEST((yyval.Node)); 
+		   } else {
+		      yyerror(scanner, lParse, "Boolean Function(expr) not supported");
+		      YYERROR;
+		   }
+		}
+#line 2994 "eval_y.c"
+    break;
+
+  case 103: /* bexpr: FUNCTION bexpr ',' bexpr ')'  */
+#line 1070 "eval.y"
+                {
+		   if (FSTRCMP((yyvsp[-4].str),"DEFNULL(") == 0) {
+		      if( SIZE((yyvsp[-3].Node))>=SIZE((yyvsp[-1].Node)) && Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) {
+			 (yyval.Node) = New_Func(lParse,  0, defnull_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0,
 					0, 0, 0, 0 );
-			 TEST((ffval.Node)); 
+			 TEST((yyval.Node)); 
 		      } else {
-			 fferror("Dimensions of DEFNULL arguments are not compatible");
-			 FFERROR;
+			 yyerror(scanner, lParse, "Dimensions of DEFNULL arguments are not compatible");
+			 YYERROR;
 		      }
 		   } else {
-		      fferror("Boolean Function(expr,expr) not supported");
-		      FFERROR;
+		      yyerror(scanner, lParse, "Boolean Function(expr,expr) not supported");
+		      YYERROR;
 		   }
 		}
+#line 3014 "eval_y.c"
     break;
 
-  case 100:
-
-/* Line 1455 of yacc.c  */
-#line 928 "eval.y"
-    {
-		   if( TYPE((ffvsp[(2) - (7)].Node)) != DOUBLE ) (ffvsp[(2) - (7)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (7)].Node) );
-		   if( TYPE((ffvsp[(4) - (7)].Node)) != DOUBLE ) (ffvsp[(4) - (7)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(4) - (7)].Node) );
-		   if( TYPE((ffvsp[(6) - (7)].Node)) != DOUBLE ) (ffvsp[(6) - (7)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(6) - (7)].Node) );
-		   if( ! (Test_Dims( (ffvsp[(2) - (7)].Node), (ffvsp[(4) - (7)].Node) ) && Test_Dims( (ffvsp[(4) - (7)].Node), (ffvsp[(6) - (7)].Node) ) ) ) {
-		       fferror("Dimensions of NEAR arguments "
+  case 104: /* bexpr: BFUNCTION expr ',' expr ',' expr ')'  */
+#line 1086 "eval.y"
+                {
+		   if( TYPE((yyvsp[-5].Node)) != DOUBLE ) (yyvsp[-5].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-5].Node) );
+		   if( TYPE((yyvsp[-3].Node)) != DOUBLE ) (yyvsp[-3].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-3].Node) );
+		   if( TYPE((yyvsp[-1].Node)) != DOUBLE ) (yyvsp[-1].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node) );
+		   if( ! (Test_Dims( lParse,  (yyvsp[-5].Node), (yyvsp[-3].Node) ) && Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) ) {
+		       yyerror(scanner, lParse, "Dimensions of NEAR arguments "
 			       "are not compatible");
-		       FFERROR;
+		       YYERROR;
 		   } else {
-		     if (FSTRCMP((ffvsp[(1) - (7)].str),"NEAR(") == 0) {
-		       (ffval.Node) = New_Func( BOOLEAN, near_fct, 3, (ffvsp[(2) - (7)].Node), (ffvsp[(4) - (7)].Node), (ffvsp[(6) - (7)].Node),
+		     if (FSTRCMP((yyvsp[-6].str),"NEAR(") == 0) {
+		       (yyval.Node) = New_Func(lParse,  BOOLEAN, near_fct, 3, (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),
 				      0, 0, 0, 0 );
 		     } else {
-		       fferror("Boolean Function not supported");
-		       FFERROR;
+		       yyerror(scanner, lParse, "Boolean Function not supported");
+		       YYERROR;
 		     }
-		     TEST((ffval.Node)); 
+		     TEST((yyval.Node)); 
 
-		     if( SIZE((ffval.Node))<SIZE((ffvsp[(2) - (7)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(2) - (7)].Node));
-		     if( SIZE((ffvsp[(2) - (7)].Node))<SIZE((ffvsp[(4) - (7)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(4) - (7)].Node));
-		     if( SIZE((ffvsp[(4) - (7)].Node))<SIZE((ffvsp[(6) - (7)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(6) - (7)].Node));
+		     if( SIZE((yyval.Node))<SIZE((yyvsp[-5].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-5].Node));
+		     if( SIZE((yyvsp[-5].Node))<SIZE((yyvsp[-3].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-3].Node));
+		     if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		   }
 		}
+#line 3042 "eval_y.c"
     break;
 
-  case 101:
-
-/* Line 1455 of yacc.c  */
-#line 952 "eval.y"
-    {
-		   if( TYPE((ffvsp[(2) - (11)].Node)) != DOUBLE ) (ffvsp[(2) - (11)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (11)].Node) );
-		   if( TYPE((ffvsp[(4) - (11)].Node)) != DOUBLE ) (ffvsp[(4) - (11)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(4) - (11)].Node) );
-		   if( TYPE((ffvsp[(6) - (11)].Node)) != DOUBLE ) (ffvsp[(6) - (11)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(6) - (11)].Node) );
-		   if( TYPE((ffvsp[(8) - (11)].Node)) != DOUBLE ) (ffvsp[(8) - (11)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(8) - (11)].Node) );
-		   if( TYPE((ffvsp[(10) - (11)].Node))!= DOUBLE ) (ffvsp[(10) - (11)].Node)= New_Unary( DOUBLE, 0, (ffvsp[(10) - (11)].Node));
-		   if( ! (Test_Dims( (ffvsp[(2) - (11)].Node), (ffvsp[(4) - (11)].Node) ) && Test_Dims( (ffvsp[(4) - (11)].Node), (ffvsp[(6) - (11)].Node) ) && 
-			  Test_Dims( (ffvsp[(6) - (11)].Node), (ffvsp[(8) - (11)].Node) ) && Test_Dims( (ffvsp[(8) - (11)].Node), (ffvsp[(10) - (11)].Node) )) ) {
-		     fferror("Dimensions of CIRCLE arguments "
+  case 105: /* bexpr: BFUNCTION expr ',' expr ',' expr ',' expr ',' expr ')'  */
+#line 1110 "eval.y"
+                {
+		   if( TYPE((yyvsp[-9].Node)) != DOUBLE ) (yyvsp[-9].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-9].Node) );
+		   if( TYPE((yyvsp[-7].Node)) != DOUBLE ) (yyvsp[-7].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-7].Node) );
+		   if( TYPE((yyvsp[-5].Node)) != DOUBLE ) (yyvsp[-5].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-5].Node) );
+		   if( TYPE((yyvsp[-3].Node)) != DOUBLE ) (yyvsp[-3].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-3].Node) );
+		   if( TYPE((yyvsp[-1].Node))!= DOUBLE ) (yyvsp[-1].Node)= New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node));
+		   if( ! (Test_Dims( lParse,  (yyvsp[-9].Node), (yyvsp[-7].Node) ) && Test_Dims( lParse,  (yyvsp[-7].Node), (yyvsp[-5].Node) ) && 
+			  Test_Dims( lParse,  (yyvsp[-5].Node), (yyvsp[-3].Node) ) && Test_Dims( lParse,  (yyvsp[-3].Node), (yyvsp[-1].Node) )) ) {
+		     yyerror(scanner, lParse, "Dimensions of CIRCLE arguments "
 			     "are not compatible");
-		     FFERROR;
+		     YYERROR;
 		   } else {
-		     if (FSTRCMP((ffvsp[(1) - (11)].str),"CIRCLE(") == 0) {
-		       (ffval.Node) = New_Func( BOOLEAN, circle_fct, 5, (ffvsp[(2) - (11)].Node), (ffvsp[(4) - (11)].Node), (ffvsp[(6) - (11)].Node), (ffvsp[(8) - (11)].Node),
-				      (ffvsp[(10) - (11)].Node), 0, 0 );
+		     if (FSTRCMP((yyvsp[-10].str),"CIRCLE(") == 0) {
+		       (yyval.Node) = New_Func(lParse,  BOOLEAN, circle_fct, 5, (yyvsp[-9].Node), (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node),
+				      (yyvsp[-1].Node), 0, 0 );
 		     } else {
-		       fferror("Boolean Function not supported");
-		       FFERROR;
+		       yyerror(scanner, lParse, "Boolean Function not supported");
+		       YYERROR;
 		     }
-		     TEST((ffval.Node)); 
-		     if( SIZE((ffval.Node))<SIZE((ffvsp[(2) - (11)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(2) - (11)].Node));
-		     if( SIZE((ffvsp[(2) - (11)].Node))<SIZE((ffvsp[(4) - (11)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(4) - (11)].Node));
-		     if( SIZE((ffvsp[(4) - (11)].Node))<SIZE((ffvsp[(6) - (11)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(6) - (11)].Node));
-		     if( SIZE((ffvsp[(6) - (11)].Node))<SIZE((ffvsp[(8) - (11)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(8) - (11)].Node));
-		     if( SIZE((ffvsp[(8) - (11)].Node))<SIZE((ffvsp[(10) - (11)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(10) - (11)].Node));
+		     TEST((yyval.Node)); 
+		     if( SIZE((yyval.Node))<SIZE((yyvsp[-9].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-9].Node));
+		     if( SIZE((yyvsp[-9].Node))<SIZE((yyvsp[-7].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-7].Node));
+		     if( SIZE((yyvsp[-7].Node))<SIZE((yyvsp[-5].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-5].Node));
+		     if( SIZE((yyvsp[-5].Node))<SIZE((yyvsp[-3].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-3].Node));
+		     if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		   }
 		}
+#line 3074 "eval_y.c"
     break;
 
-  case 102:
-
-/* Line 1455 of yacc.c  */
-#line 980 "eval.y"
-    {
-		   if( TYPE((ffvsp[(2) - (15)].Node)) != DOUBLE ) (ffvsp[(2) - (15)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(2) - (15)].Node) );
-		   if( TYPE((ffvsp[(4) - (15)].Node)) != DOUBLE ) (ffvsp[(4) - (15)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(4) - (15)].Node) );
-		   if( TYPE((ffvsp[(6) - (15)].Node)) != DOUBLE ) (ffvsp[(6) - (15)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(6) - (15)].Node) );
-		   if( TYPE((ffvsp[(8) - (15)].Node)) != DOUBLE ) (ffvsp[(8) - (15)].Node) = New_Unary( DOUBLE, 0, (ffvsp[(8) - (15)].Node) );
-		   if( TYPE((ffvsp[(10) - (15)].Node))!= DOUBLE ) (ffvsp[(10) - (15)].Node)= New_Unary( DOUBLE, 0, (ffvsp[(10) - (15)].Node));
-		   if( TYPE((ffvsp[(12) - (15)].Node))!= DOUBLE ) (ffvsp[(12) - (15)].Node)= New_Unary( DOUBLE, 0, (ffvsp[(12) - (15)].Node));
-		   if( TYPE((ffvsp[(14) - (15)].Node))!= DOUBLE ) (ffvsp[(14) - (15)].Node)= New_Unary( DOUBLE, 0, (ffvsp[(14) - (15)].Node));
-		   if( ! (Test_Dims( (ffvsp[(2) - (15)].Node), (ffvsp[(4) - (15)].Node) ) && Test_Dims( (ffvsp[(4) - (15)].Node), (ffvsp[(6) - (15)].Node) ) && 
-			  Test_Dims( (ffvsp[(6) - (15)].Node), (ffvsp[(8) - (15)].Node) ) && Test_Dims( (ffvsp[(8) - (15)].Node), (ffvsp[(10) - (15)].Node) ) &&
-			  Test_Dims((ffvsp[(10) - (15)].Node),(ffvsp[(12) - (15)].Node) ) && Test_Dims((ffvsp[(12) - (15)].Node), (ffvsp[(14) - (15)].Node) ) ) ) {
-		     fferror("Dimensions of BOX or ELLIPSE arguments "
+  case 106: /* bexpr: BFUNCTION expr ',' expr ',' expr ',' expr ',' expr ',' expr ',' expr ')'  */
+#line 1138 "eval.y"
+                {
+		   if( TYPE((yyvsp[-13].Node)) != DOUBLE ) (yyvsp[-13].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-13].Node) );
+		   if( TYPE((yyvsp[-11].Node)) != DOUBLE ) (yyvsp[-11].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-11].Node) );
+		   if( TYPE((yyvsp[-9].Node)) != DOUBLE ) (yyvsp[-9].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-9].Node) );
+		   if( TYPE((yyvsp[-7].Node)) != DOUBLE ) (yyvsp[-7].Node) = New_Unary(lParse,  DOUBLE, 0, (yyvsp[-7].Node) );
+		   if( TYPE((yyvsp[-5].Node))!= DOUBLE ) (yyvsp[-5].Node)= New_Unary(lParse,  DOUBLE, 0, (yyvsp[-5].Node));
+		   if( TYPE((yyvsp[-3].Node))!= DOUBLE ) (yyvsp[-3].Node)= New_Unary(lParse,  DOUBLE, 0, (yyvsp[-3].Node));
+		   if( TYPE((yyvsp[-1].Node))!= DOUBLE ) (yyvsp[-1].Node)= New_Unary(lParse,  DOUBLE, 0, (yyvsp[-1].Node));
+		   if( ! (Test_Dims( lParse,  (yyvsp[-13].Node), (yyvsp[-11].Node) ) && Test_Dims( lParse,  (yyvsp[-11].Node), (yyvsp[-9].Node) ) && 
+			  Test_Dims( lParse,  (yyvsp[-9].Node), (yyvsp[-7].Node) ) && Test_Dims( lParse,  (yyvsp[-7].Node), (yyvsp[-5].Node) ) &&
+			  Test_Dims( lParse, (yyvsp[-5].Node),(yyvsp[-3].Node) ) && Test_Dims( lParse, (yyvsp[-3].Node), (yyvsp[-1].Node) ) ) ) {
+		     yyerror(scanner, lParse, "Dimensions of BOX or ELLIPSE arguments "
 			     "are not compatible");
-		     FFERROR;
+		     YYERROR;
 		   } else {
-		     if (FSTRCMP((ffvsp[(1) - (15)].str),"BOX(") == 0) {
-		       (ffval.Node) = New_Func( BOOLEAN, box_fct, 7, (ffvsp[(2) - (15)].Node), (ffvsp[(4) - (15)].Node), (ffvsp[(6) - (15)].Node), (ffvsp[(8) - (15)].Node),
-				      (ffvsp[(10) - (15)].Node), (ffvsp[(12) - (15)].Node), (ffvsp[(14) - (15)].Node) );
-		     } else if (FSTRCMP((ffvsp[(1) - (15)].str),"ELLIPSE(") == 0) {
-		       (ffval.Node) = New_Func( BOOLEAN, elps_fct, 7, (ffvsp[(2) - (15)].Node), (ffvsp[(4) - (15)].Node), (ffvsp[(6) - (15)].Node), (ffvsp[(8) - (15)].Node),
-				      (ffvsp[(10) - (15)].Node), (ffvsp[(12) - (15)].Node), (ffvsp[(14) - (15)].Node) );
+		     if (FSTRCMP((yyvsp[-14].str),"BOX(") == 0) {
+		       (yyval.Node) = New_Func(lParse,  BOOLEAN, box_fct, 7, (yyvsp[-13].Node), (yyvsp[-11].Node), (yyvsp[-9].Node), (yyvsp[-7].Node),
+				      (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node) );
+		     } else if (FSTRCMP((yyvsp[-14].str),"ELLIPSE(") == 0) {
+		       (yyval.Node) = New_Func(lParse,  BOOLEAN, elps_fct, 7, (yyvsp[-13].Node), (yyvsp[-11].Node), (yyvsp[-9].Node), (yyvsp[-7].Node),
+				      (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node) );
 		     } else {
-		       fferror("SAO Image Function not supported");
-		       FFERROR;
+		       yyerror(scanner, lParse, "SAO Image Function not supported");
+		       YYERROR;
 		     }
-		     TEST((ffval.Node)); 
-		     if( SIZE((ffval.Node))<SIZE((ffvsp[(2) - (15)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(2) - (15)].Node));
-		     if( SIZE((ffvsp[(2) - (15)].Node))<SIZE((ffvsp[(4) - (15)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(4) - (15)].Node));
-		     if( SIZE((ffvsp[(4) - (15)].Node))<SIZE((ffvsp[(6) - (15)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(6) - (15)].Node));
-		     if( SIZE((ffvsp[(6) - (15)].Node))<SIZE((ffvsp[(8) - (15)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(8) - (15)].Node));
-		     if( SIZE((ffvsp[(8) - (15)].Node))<SIZE((ffvsp[(10) - (15)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(10) - (15)].Node));
-		     if( SIZE((ffvsp[(10) - (15)].Node))<SIZE((ffvsp[(12) - (15)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(12) - (15)].Node));
-		     if( SIZE((ffvsp[(12) - (15)].Node))<SIZE((ffvsp[(14) - (15)].Node)) ) Copy_Dims((ffval.Node), (ffvsp[(14) - (15)].Node));
+		     TEST((yyval.Node)); 
+		     if( SIZE((yyval.Node))<SIZE((yyvsp[-13].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-13].Node));
+		     if( SIZE((yyvsp[-13].Node))<SIZE((yyvsp[-11].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-11].Node));
+		     if( SIZE((yyvsp[-11].Node))<SIZE((yyvsp[-9].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-9].Node));
+		     if( SIZE((yyvsp[-9].Node))<SIZE((yyvsp[-7].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[-7].Node));
+		     if( SIZE((yyvsp[-7].Node))<SIZE((yyvsp[-5].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-5].Node));
+		     if( SIZE((yyvsp[-5].Node))<SIZE((yyvsp[-3].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-3].Node));
+		     if( SIZE((yyvsp[-3].Node))<SIZE((yyvsp[-1].Node)) ) Copy_Dims( lParse,(yyval.Node), (yyvsp[-1].Node));
 		   }
 		}
+#line 3114 "eval_y.c"
     break;
 
-  case 103:
-
-/* Line 1455 of yacc.c  */
-#line 1017 "eval.y"
-    { /* Use defaults for all elements */
-                   (ffval.Node) = New_GTI( "", -99, "*START*", "*STOP*" );
-                   TEST((ffval.Node));                                        }
+  case 107: /* bexpr: GTIFILTER ')'  */
+#line 1175 "eval.y"
+                { /* Use defaults for all elements */
+		   (yyval.Node) = New_GTI(lParse, gtifilt_fct,  "", -99, -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3122 "eval_y.c"
     break;
 
-  case 104:
-
-/* Line 1455 of yacc.c  */
-#line 1021 "eval.y"
-    { /* Use defaults for all except filename */
-                   (ffval.Node) = New_GTI( (ffvsp[(2) - (3)].str), -99, "*START*", "*STOP*" );
-                   TEST((ffval.Node));                                        }
+  case 108: /* bexpr: GTIFILTER STRING ')'  */
+#line 1179 "eval.y"
+                { /* Use defaults for all except filename */
+		  (yyval.Node) = New_GTI(lParse, gtifilt_fct,  (yyvsp[-1].str), -99, -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3130 "eval_y.c"
     break;
 
-  case 105:
-
-/* Line 1455 of yacc.c  */
-#line 1025 "eval.y"
-    {  (ffval.Node) = New_GTI( (ffvsp[(2) - (5)].str), (ffvsp[(4) - (5)].Node), "*START*", "*STOP*" );
-                   TEST((ffval.Node));                                        }
+  case 109: /* bexpr: GTIFILTER STRING ',' expr ')'  */
+#line 1183 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtifilt_fct,  (yyvsp[-3].str), (yyvsp[-1].Node), -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3137 "eval_y.c"
     break;
 
-  case 106:
-
-/* Line 1455 of yacc.c  */
-#line 1028 "eval.y"
-    {  (ffval.Node) = New_GTI( (ffvsp[(2) - (9)].str), (ffvsp[(4) - (9)].Node), (ffvsp[(6) - (9)].str), (ffvsp[(8) - (9)].str) );
-                   TEST((ffval.Node));                                        }
+  case 110: /* bexpr: GTIFILTER STRING ',' expr ',' STRING ',' STRING ')'  */
+#line 1186 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtifilt_fct,  (yyvsp[-7].str), (yyvsp[-5].Node), -99, (yyvsp[-3].str), (yyvsp[-1].str) );
+                   TEST((yyval.Node));                                        }
+#line 3144 "eval_y.c"
     break;
 
-  case 107:
-
-/* Line 1455 of yacc.c  */
-#line 1032 "eval.y"
-    { /* Use defaults for all except filename */
-                   (ffval.Node) = New_REG( (ffvsp[(2) - (3)].str), -99, -99, "" );
-                   TEST((ffval.Node));                                        }
+  case 111: /* bexpr: GTIOVERLAP STRING ',' expr ',' expr ')'  */
+#line 1191 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtiover_fct,  (yyvsp[-5].str), (yyvsp[-3].Node), (yyvsp[-1].Node), "*START*", "*STOP*");
+                   TEST((yyval.Node));                                        }
+#line 3151 "eval_y.c"
     break;
 
-  case 108:
-
-/* Line 1455 of yacc.c  */
-#line 1036 "eval.y"
-    {  (ffval.Node) = New_REG( (ffvsp[(2) - (7)].str), (ffvsp[(4) - (7)].Node), (ffvsp[(6) - (7)].Node), "" );
-                   TEST((ffval.Node));                                        }
+  case 112: /* bexpr: GTIOVERLAP STRING ',' expr ',' expr ',' STRING ',' STRING ')'  */
+#line 1194 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtiover_fct,  (yyvsp[-9].str), (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].str), (yyvsp[-1].str) );
+                   TEST((yyval.Node));                                        }
+#line 3158 "eval_y.c"
     break;
 
-  case 109:
-
-/* Line 1455 of yacc.c  */
-#line 1039 "eval.y"
-    {  (ffval.Node) = New_REG( (ffvsp[(2) - (9)].str), (ffvsp[(4) - (9)].Node), (ffvsp[(6) - (9)].Node), (ffvsp[(8) - (9)].str) );
-                   TEST((ffval.Node));                                        }
+  case 113: /* bexpr: GTIFIND ')'  */
+#line 1199 "eval.y"
+                { /* Use defaults for all elements */
+		   (yyval.Node) = New_GTI(lParse, gtifind_fct,  "", -99, -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3166 "eval_y.c"
     break;
 
-  case 110:
-
-/* Line 1455 of yacc.c  */
-#line 1043 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (4)].Node), 1, (ffvsp[(3) - (4)].Node),  0,  0,  0,   0 ); TEST((ffval.Node)); }
+  case 114: /* bexpr: GTIFIND STRING ')'  */
+#line 1203 "eval.y"
+                { /* Use defaults for all except filename */
+		  (yyval.Node) = New_GTI(lParse, gtifind_fct,  (yyvsp[-1].str), -99, -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3174 "eval_y.c"
     break;
 
-  case 111:
-
-/* Line 1455 of yacc.c  */
-#line 1045 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (6)].Node), 2, (ffvsp[(3) - (6)].Node), (ffvsp[(5) - (6)].Node),  0,  0,   0 ); TEST((ffval.Node)); }
+  case 115: /* bexpr: GTIFIND STRING ',' expr ')'  */
+#line 1207 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtifind_fct,  (yyvsp[-3].str), (yyvsp[-1].Node), -99, "*START*", "*STOP*" );
+                   TEST((yyval.Node));                                        }
+#line 3181 "eval_y.c"
     break;
 
-  case 112:
-
-/* Line 1455 of yacc.c  */
-#line 1047 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (8)].Node), 3, (ffvsp[(3) - (8)].Node), (ffvsp[(5) - (8)].Node), (ffvsp[(7) - (8)].Node),  0,   0 ); TEST((ffval.Node)); }
+  case 116: /* bexpr: GTIFIND STRING ',' expr ',' STRING ',' STRING ')'  */
+#line 1210 "eval.y"
+                {  (yyval.Node) = New_GTI(lParse, gtifind_fct,  (yyvsp[-7].str), (yyvsp[-5].Node), -99, (yyvsp[-3].str), (yyvsp[-1].str) );
+                   TEST((yyval.Node));                                        }
+#line 3188 "eval_y.c"
     break;
 
-  case 113:
-
-/* Line 1455 of yacc.c  */
-#line 1049 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (10)].Node), 4, (ffvsp[(3) - (10)].Node), (ffvsp[(5) - (10)].Node), (ffvsp[(7) - (10)].Node), (ffvsp[(9) - (10)].Node),   0 ); TEST((ffval.Node)); }
+  case 117: /* bexpr: REGFILTER STRING ')'  */
+#line 1215 "eval.y"
+                { /* Use defaults for all except filename */
+                   (yyval.Node) = New_REG(lParse,  (yyvsp[-1].str), -99, -99, "" );
+                   TEST((yyval.Node));                                        }
+#line 3196 "eval_y.c"
     break;
 
-  case 114:
-
-/* Line 1455 of yacc.c  */
-#line 1051 "eval.y"
-    { (ffval.Node) = New_Deref( (ffvsp[(1) - (12)].Node), 5, (ffvsp[(3) - (12)].Node), (ffvsp[(5) - (12)].Node), (ffvsp[(7) - (12)].Node), (ffvsp[(9) - (12)].Node), (ffvsp[(11) - (12)].Node) ); TEST((ffval.Node)); }
+  case 118: /* bexpr: REGFILTER STRING ',' expr ',' expr ')'  */
+#line 1219 "eval.y"
+                {  (yyval.Node) = New_REG(lParse,  (yyvsp[-5].str), (yyvsp[-3].Node), (yyvsp[-1].Node), "" );
+                   TEST((yyval.Node));                                        }
+#line 3203 "eval_y.c"
     break;
 
-  case 115:
-
-/* Line 1455 of yacc.c  */
-#line 1053 "eval.y"
-    { (ffval.Node) = New_Unary( BOOLEAN, NOT, (ffvsp[(2) - (2)].Node) ); TEST((ffval.Node)); }
+  case 119: /* bexpr: REGFILTER STRING ',' expr ',' expr ',' STRING ')'  */
+#line 1222 "eval.y"
+                {  (yyval.Node) = New_REG(lParse,  (yyvsp[-7].str), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].str) );
+                   TEST((yyval.Node));                                        }
+#line 3210 "eval_y.c"
     break;
 
-  case 116:
-
-/* Line 1455 of yacc.c  */
-#line 1055 "eval.y"
-    { (ffval.Node) = (ffvsp[(2) - (3)].Node); }
+  case 120: /* bexpr: bexpr '[' expr ']'  */
+#line 1226 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-3].Node), 1, (yyvsp[-1].Node),  0,  0,  0,   0 ); TEST((yyval.Node)); }
+#line 3216 "eval_y.c"
     break;
 
-  case 117:
-
-/* Line 1455 of yacc.c  */
-#line 1059 "eval.y"
-    { (ffval.Node) = New_Const( STRING, (ffvsp[(1) - (1)].str), strlen((ffvsp[(1) - (1)].str))+1 ); TEST((ffval.Node));
-                  SIZE((ffval.Node)) = strlen((ffvsp[(1) - (1)].str)); }
+  case 121: /* bexpr: bexpr '[' expr ',' expr ']'  */
+#line 1228 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-5].Node), 2, (yyvsp[-3].Node), (yyvsp[-1].Node),  0,  0,   0 ); TEST((yyval.Node)); }
+#line 3222 "eval_y.c"
     break;
 
-  case 118:
-
-/* Line 1455 of yacc.c  */
-#line 1062 "eval.y"
-    { (ffval.Node) = New_Column( (ffvsp[(1) - (1)].lng) ); TEST((ffval.Node)); }
+  case 122: /* bexpr: bexpr '[' expr ',' expr ',' expr ']'  */
+#line 1230 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-7].Node), 3, (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),  0,   0 ); TEST((yyval.Node)); }
+#line 3228 "eval_y.c"
     break;
 
-  case 119:
+  case 123: /* bexpr: bexpr '[' expr ',' expr ',' expr ',' expr ']'  */
+#line 1232 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-9].Node), 4, (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node),   0 ); TEST((yyval.Node)); }
+#line 3234 "eval_y.c"
+    break;
 
-/* Line 1455 of yacc.c  */
-#line 1064 "eval.y"
-    {
-                  if( TYPE((ffvsp[(3) - (4)].Node)) != LONG
-		      || OPER((ffvsp[(3) - (4)].Node)) != CONST_OP ) {
-		     fferror("Offset argument must be a constant integer");
-		     FFERROR;
+  case 124: /* bexpr: bexpr '[' expr ',' expr ',' expr ',' expr ',' expr ']'  */
+#line 1234 "eval.y"
+                { (yyval.Node) = New_Deref(lParse,  (yyvsp[-11].Node), 5, (yyvsp[-9].Node), (yyvsp[-7].Node), (yyvsp[-5].Node), (yyvsp[-3].Node), (yyvsp[-1].Node) ); TEST((yyval.Node)); }
+#line 3240 "eval_y.c"
+    break;
+
+  case 125: /* bexpr: NOT bexpr  */
+#line 1236 "eval.y"
+                { (yyval.Node) = New_Unary(lParse,  BOOLEAN, NOT, (yyvsp[0].Node) ); TEST((yyval.Node)); }
+#line 3246 "eval_y.c"
+    break;
+
+  case 126: /* bexpr: '(' bexpr ')'  */
+#line 1238 "eval.y"
+                { (yyval.Node) = (yyvsp[-1].Node); }
+#line 3252 "eval_y.c"
+    break;
+
+  case 127: /* sexpr: STRING  */
+#line 1242 "eval.y"
+                { (yyval.Node) = New_Const(lParse,  STRING, (yyvsp[0].str), strlen((yyvsp[0].str))+1 ); TEST((yyval.Node));
+                  SIZE((yyval.Node)) = strlen((yyvsp[0].str)); }
+#line 3259 "eval_y.c"
+    break;
+
+  case 128: /* sexpr: SCOLUMN  */
+#line 1245 "eval.y"
+                { (yyval.Node) = New_Column(lParse,  (yyvsp[0].lng) ); TEST((yyval.Node)); }
+#line 3265 "eval_y.c"
+    break;
+
+  case 129: /* sexpr: SCOLUMN '{' expr '}'  */
+#line 1247 "eval.y"
+                {
+                  if( TYPE((yyvsp[-1].Node)) != LONG
+		      || OPER((yyvsp[-1].Node)) != CONST_OP ) {
+		     yyerror(scanner, lParse, "Offset argument must be a constant integer");
+		     YYERROR;
 		  }
-                  (ffval.Node) = New_Offset( (ffvsp[(1) - (4)].lng), (ffvsp[(3) - (4)].Node) ); TEST((ffval.Node));
+                  (yyval.Node) = New_Offset(lParse,  (yyvsp[-3].lng), (yyvsp[-1].Node) ); TEST((yyval.Node));
                 }
+#line 3278 "eval_y.c"
     break;
 
-  case 120:
-
-/* Line 1455 of yacc.c  */
-#line 1073 "eval.y"
-    { (ffval.Node) = New_Func( STRING, null_fct, 0, 0, 0, 0, 0, 0, 0, 0 ); }
+  case 130: /* sexpr: SNULLREF  */
+#line 1256 "eval.y"
+                { (yyval.Node) = New_Func(lParse,  STRING, null_fct, 0, 0, 0, 0, 0, 0, 0, 0 ); }
+#line 3284 "eval_y.c"
     break;
 
-  case 121:
-
-/* Line 1455 of yacc.c  */
-#line 1075 "eval.y"
-    { (ffval.Node) = (ffvsp[(2) - (3)].Node); }
+  case 131: /* sexpr: '(' sexpr ')'  */
+#line 1258 "eval.y"
+                { (yyval.Node) = (yyvsp[-1].Node); }
+#line 3290 "eval_y.c"
     break;
 
-  case 122:
-
-/* Line 1455 of yacc.c  */
-#line 1077 "eval.y"
-    { 
-		  if (SIZE((ffvsp[(1) - (3)].Node))+SIZE((ffvsp[(3) - (3)].Node)) >= MAX_STRLEN) {
-		    fferror("Combined string size exceeds " MAX_STRLEN_S " characters");
-		    FFERROR;
+  case 132: /* sexpr: sexpr '+' sexpr  */
+#line 1260 "eval.y"
+                { 
+		  if (SIZE((yyvsp[-2].Node))+SIZE((yyvsp[0].Node)) >= MAX_STRLEN) {
+		    yyerror(scanner, lParse, "Combined string size exceeds " MAX_STRLEN_S " characters");
+		    YYERROR;
 		  }
-		  (ffval.Node) = New_BinOp( STRING, (ffvsp[(1) - (3)].Node), '+', (ffvsp[(3) - (3)].Node) );  TEST((ffval.Node));
-		  SIZE((ffval.Node)) = SIZE((ffvsp[(1) - (3)].Node)) + SIZE((ffvsp[(3) - (3)].Node));
+		  (yyval.Node) = New_BinOp(lParse,  STRING, (yyvsp[-2].Node), '+', (yyvsp[0].Node) );  TEST((yyval.Node));
+		  SIZE((yyval.Node)) = SIZE((yyvsp[-2].Node)) + SIZE((yyvsp[0].Node));
 		}
+#line 3303 "eval_y.c"
     break;
 
-  case 123:
-
-/* Line 1455 of yacc.c  */
-#line 1086 "eval.y"
-    {
+  case 133: /* sexpr: bexpr '?' sexpr ':' sexpr  */
+#line 1269 "eval.y"
+                {
 		  int outSize;
-                  if( SIZE((ffvsp[(1) - (5)].Node))!=1 ) {
-                     fferror("Cannot have a vector string column");
-		     FFERROR;
+                  if( SIZE((yyvsp[-4].Node))!=1 ) {
+                     yyerror(scanner, lParse, "Cannot have a vector string column");
+		     YYERROR;
                   }
 		  /* Since the output can be calculated now, as a constant
 		     scalar, we must precalculate the output size, in
 		     order to avoid an overflow. */
-		  outSize = SIZE((ffvsp[(3) - (5)].Node));
-		  if (SIZE((ffvsp[(5) - (5)].Node)) > outSize) outSize = SIZE((ffvsp[(5) - (5)].Node));
-                  (ffval.Node) = New_FuncSize( 0, ifthenelse_fct, 3, (ffvsp[(3) - (5)].Node), (ffvsp[(5) - (5)].Node), (ffvsp[(1) - (5)].Node),
+		  outSize = SIZE((yyvsp[-2].Node));
+		  if (SIZE((yyvsp[0].Node)) > outSize) outSize = SIZE((yyvsp[0].Node));
+                  (yyval.Node) = New_FuncSize(lParse,  0, ifthenelse_fct, 3, (yyvsp[-2].Node), (yyvsp[0].Node), (yyvsp[-4].Node),
 				     0, 0, 0, 0, outSize);
 		  
-                  TEST((ffval.Node));
-                  if( SIZE((ffvsp[(3) - (5)].Node))<SIZE((ffvsp[(5) - (5)].Node)) )  Copy_Dims((ffval.Node), (ffvsp[(5) - (5)].Node));
+                  TEST((yyval.Node));
+                  if( SIZE((yyvsp[-2].Node))<SIZE((yyvsp[0].Node)) )  Copy_Dims( lParse,(yyval.Node), (yyvsp[0].Node));
                 }
+#line 3325 "eval_y.c"
     break;
 
-  case 124:
-
-/* Line 1455 of yacc.c  */
-#line 1105 "eval.y"
-    { 
-		  if (FSTRCMP((ffvsp[(1) - (5)].str),"DEFNULL(") == 0) {
+  case 134: /* sexpr: FUNCTION sexpr ',' sexpr ')'  */
+#line 1288 "eval.y"
+                { 
+		  if (FSTRCMP((yyvsp[-4].str),"DEFNULL(") == 0) {
 		     int outSize;
 		     /* Since the output can be calculated now, as a constant
 			scalar, we must precalculate the output size, in
 			order to avoid an overflow. */
-		     outSize = SIZE((ffvsp[(2) - (5)].Node));
-		     if (SIZE((ffvsp[(4) - (5)].Node)) > outSize) outSize = SIZE((ffvsp[(4) - (5)].Node));
+		     outSize = SIZE((yyvsp[-3].Node));
+		     if (SIZE((yyvsp[-1].Node)) > outSize) outSize = SIZE((yyvsp[-1].Node));
 		     
-		     (ffval.Node) = New_FuncSize( 0, defnull_fct, 2, (ffvsp[(2) - (5)].Node), (ffvsp[(4) - (5)].Node), 0,
+		     (yyval.Node) = New_FuncSize(lParse,  0, defnull_fct, 2, (yyvsp[-3].Node), (yyvsp[-1].Node), 0,
 					0, 0, 0, 0, outSize );
-		     TEST((ffval.Node)); 
-		     if( SIZE((ffvsp[(4) - (5)].Node))>SIZE((ffvsp[(2) - (5)].Node)) ) SIZE((ffval.Node)) = SIZE((ffvsp[(4) - (5)].Node));
+		     TEST((yyval.Node)); 
+		     if( SIZE((yyvsp[-1].Node))>SIZE((yyvsp[-3].Node)) ) SIZE((yyval.Node)) = SIZE((yyvsp[-1].Node));
 		  } else {
-		     fferror("Function(string,string) not supported");
-		     FFERROR;
+		     yyerror(scanner, lParse, "Function(string,string) not supported");
+		     YYERROR;
 		  }
 		}
+#line 3348 "eval_y.c"
     break;
 
-  case 125:
-
-/* Line 1455 of yacc.c  */
-#line 1124 "eval.y"
-    { 
-		  if (FSTRCMP((ffvsp[(1) - (7)].str),"STRMID(") == 0) {
+  case 135: /* sexpr: FUNCTION sexpr ',' expr ',' expr ')'  */
+#line 1307 "eval.y"
+                { 
+		  if (FSTRCMP((yyvsp[-6].str),"STRMID(") == 0) {
 		    int len;
-		    if( TYPE((ffvsp[(4) - (7)].Node)) != LONG || SIZE((ffvsp[(4) - (7)].Node)) != 1 ||
-			TYPE((ffvsp[(6) - (7)].Node)) != LONG || SIZE((ffvsp[(6) - (7)].Node)) != 1) {
-		      fferror("When using STRMID(S,P,N), P and N must be integers (and not vector columns)");
-		      FFERROR;
+		    if( TYPE((yyvsp[-3].Node)) != LONG || SIZE((yyvsp[-3].Node)) != 1 ||
+			TYPE((yyvsp[-1].Node)) != LONG || SIZE((yyvsp[-1].Node)) != 1) {
+		      yyerror(scanner, lParse, "When using STRMID(S,P,N), P and N must be integers (and not vector columns)");
+		      YYERROR;
 		    }
-		    if (OPER((ffvsp[(6) - (7)].Node)) == CONST_OP) {
+		    if (OPER((yyvsp[-1].Node)) == CONST_OP) {
 		      /* Constant value: use that directly */
-		      len = (gParse.Nodes[(ffvsp[(6) - (7)].Node)].value.data.lng);
+		      len = (lParse->Nodes[(yyvsp[-1].Node)].value.data.lng);
 		    } else {
 		      /* Variable value: use the maximum possible (from $2) */
-		      len = SIZE((ffvsp[(2) - (7)].Node));
+		      len = SIZE((yyvsp[-5].Node));
 		    }
 		    if (len <= 0 || len >= MAX_STRLEN) {
-		      fferror("STRMID(S,P,N), N must be 1-" MAX_STRLEN_S);
-		      FFERROR;
+		      yyerror(scanner, lParse, "STRMID(S,P,N), N must be 1-" MAX_STRLEN_S);
+		      YYERROR;
 		    }
-		    (ffval.Node) = New_FuncSize( 0, strmid_fct, 3, (ffvsp[(2) - (7)].Node), (ffvsp[(4) - (7)].Node),(ffvsp[(6) - (7)].Node),0,0,0,0,len);
-		    TEST((ffval.Node));
+		    (yyval.Node) = New_FuncSize(lParse,  0, strmid_fct, 3, (yyvsp[-5].Node), (yyvsp[-3].Node),(yyvsp[-1].Node),0,0,0,0,len);
+		    TEST((yyval.Node));
 		  } else {
-		     fferror("Function(string,expr,expr) not supported");
-		     FFERROR;
+		     yyerror(scanner, lParse, "Function(string,expr,expr) not supported");
+		     YYERROR;
 		  }
 		}
+#line 3379 "eval_y.c"
     break;
 
 
+#line 3383 "eval_y.c"
 
-/* Line 1455 of yacc.c  */
-#line 3584 "y.tab.c"
       default: break;
     }
-  FF_SYMBOL_PRINT ("-> $$ =", ffr1[ffn], &ffval, &ffloc);
+  /* User semantic actions sometimes alter yychar, and that requires
+     that yytoken be updated with the new translation.  We take the
+     approach of translating immediately before every use of yytoken.
+     One alternative is translating here after every semantic action,
+     but that translation would be missed if the semantic action invokes
+     YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
+     if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
+     incorrect destructor might then be invoked immediately.  In the
+     case of YYERROR or YYBACKUP, subsequent parser actions might lead
+     to an incorrect destructor call or verbose syntax error message
+     before the lookahead is translated.  */
+  YY_SYMBOL_PRINT ("-> $$ =", YY_CAST (yysymbol_kind_t, yyr1[yyn]), &yyval, &yyloc);
 
-  FFPOPSTACK (fflen);
-  fflen = 0;
-  FF_STACK_PRINT (ffss, ffssp);
+  YYPOPSTACK (yylen);
+  yylen = 0;
 
-  *++ffvsp = ffval;
+  *++yyvsp = yyval;
 
-  /* Now `shift' the result of the reduction.  Determine what state
+  /* Now 'shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
      number reduced by.  */
+  {
+    const int yylhs = yyr1[yyn] - YYNTOKENS;
+    const int yyi = yypgoto[yylhs] + *yyssp;
+    yystate = (0 <= yyi && yyi <= YYLAST && yycheck[yyi] == *yyssp
+               ? yytable[yyi]
+               : yydefgoto[yylhs]);
+  }
 
-  ffn = ffr1[ffn];
-
-  ffstate = ffpgoto[ffn - FFNTOKENS] + *ffssp;
-  if (0 <= ffstate && ffstate <= FFLAST && ffcheck[ffstate] == *ffssp)
-    ffstate = fftable[ffstate];
-  else
-    ffstate = ffdefgoto[ffn - FFNTOKENS];
-
-  goto ffnewstate;
+  goto yynewstate;
 
 
-/*------------------------------------.
-| fferrlab -- here on detecting error |
-`------------------------------------*/
-fferrlab:
+/*--------------------------------------.
+| yyerrlab -- here on detecting error.  |
+`--------------------------------------*/
+yyerrlab:
+  /* Make sure we have latest lookahead translation.  See comments at
+     user semantic actions for why this is necessary.  */
+  yytoken = yychar == FITS_PARSER_YYEMPTY ? YYSYMBOL_YYEMPTY : YYTRANSLATE (yychar);
   /* If not already recovering from an error, report this error.  */
-  if (!fferrstatus)
+  if (!yyerrstatus)
     {
-      ++ffnerrs;
-#if ! FFERROR_VERBOSE
-      fferror (FF_("syntax error"));
-#else
-      {
-	FFSIZE_T ffsize = ffsyntax_error (0, ffstate, ffchar);
-	if (ffmsg_alloc < ffsize && ffmsg_alloc < FFSTACK_ALLOC_MAXIMUM)
-	  {
-	    FFSIZE_T ffalloc = 2 * ffsize;
-	    if (! (ffsize <= ffalloc && ffalloc <= FFSTACK_ALLOC_MAXIMUM))
-	      ffalloc = FFSTACK_ALLOC_MAXIMUM;
-	    if (ffmsg != ffmsgbuf)
-	      FFSTACK_FREE (ffmsg);
-	    ffmsg = (char *) FFSTACK_ALLOC (ffalloc);
-	    if (ffmsg)
-	      ffmsg_alloc = ffalloc;
-	    else
-	      {
-		ffmsg = ffmsgbuf;
-		ffmsg_alloc = sizeof ffmsgbuf;
-	      }
-	  }
-
-	if (0 < ffsize && ffsize <= ffmsg_alloc)
-	  {
-	    (void) ffsyntax_error (ffmsg, ffstate, ffchar);
-	    fferror (ffmsg);
-	  }
-	else
-	  {
-	    fferror (FF_("syntax error"));
-	    if (ffsize != 0)
-	      goto ffexhaustedlab;
-	  }
-      }
-#endif
+      ++yynerrs;
+      yyerror (scanner, lParse, YY_("syntax error"));
     }
 
-
-
-  if (fferrstatus == 3)
+  if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
+         error, discard it.  */
 
-      if (ffchar <= FFEOF)
-	{
-	  /* Return failure if at end of input.  */
-	  if (ffchar == FFEOF)
-	    FFABORT;
-	}
+      if (yychar <= FITS_PARSER_YYEOF)
+        {
+          /* Return failure if at end of input.  */
+          if (yychar == FITS_PARSER_YYEOF)
+            YYABORT;
+        }
       else
-	{
-	  ffdestruct ("Error: discarding",
-		      fftoken, &fflval);
-	  ffchar = FFEMPTY;
-	}
+        {
+          yydestruct ("Error: discarding",
+                      yytoken, &yylval, scanner, lParse);
+          yychar = FITS_PARSER_YYEMPTY;
+        }
     }
 
   /* Else will try to reuse lookahead token after shifting the error
      token.  */
-  goto fferrlab1;
+  goto yyerrlab1;
 
 
 /*---------------------------------------------------.
-| fferrorlab -- error raised explicitly by FFERROR.  |
+| yyerrorlab -- error raised explicitly by YYERROR.  |
 `---------------------------------------------------*/
-fferrorlab:
+yyerrorlab:
+  /* Pacify compilers when the user code never invokes YYERROR and the
+     label yyerrorlab therefore never appears in user code.  */
+  if (0)
+    YYERROR;
+  ++yynerrs;
 
-  /* Pacify compilers like GCC when the user code never invokes
-     FFERROR and the label fferrorlab therefore never appears in user
-     code.  */
-  if (/*CONSTCOND*/ 0)
-     goto fferrorlab;
-
-  /* Do not reclaim the symbols of the rule which action triggered
-     this FFERROR.  */
-  FFPOPSTACK (fflen);
-  fflen = 0;
-  FF_STACK_PRINT (ffss, ffssp);
-  ffstate = *ffssp;
-  goto fferrlab1;
+  /* Do not reclaim the symbols of the rule whose action triggered
+     this YYERROR.  */
+  YYPOPSTACK (yylen);
+  yylen = 0;
+  YY_STACK_PRINT (yyss, yyssp);
+  yystate = *yyssp;
+  goto yyerrlab1;
 
 
 /*-------------------------------------------------------------.
-| fferrlab1 -- common code for both syntax error and FFERROR.  |
+| yyerrlab1 -- common code for both syntax error and YYERROR.  |
 `-------------------------------------------------------------*/
-fferrlab1:
-  fferrstatus = 3;	/* Each real token shifted decrements this.  */
+yyerrlab1:
+  yyerrstatus = 3;      /* Each real token shifted decrements this.  */
 
+  /* Pop stack until we find a state that shifts the error token.  */
   for (;;)
     {
-      ffn = ffpact[ffstate];
-      if (ffn != FFPACT_NINF)
-	{
-	  ffn += FFTERROR;
-	  if (0 <= ffn && ffn <= FFLAST && ffcheck[ffn] == FFTERROR)
-	    {
-	      ffn = fftable[ffn];
-	      if (0 < ffn)
-		break;
-	    }
-	}
+      yyn = yypact[yystate];
+      if (!yypact_value_is_default (yyn))
+        {
+          yyn += YYSYMBOL_YYerror;
+          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYSYMBOL_YYerror)
+            {
+              yyn = yytable[yyn];
+              if (0 < yyn)
+                break;
+            }
+        }
 
       /* Pop the current state because it cannot handle the error token.  */
-      if (ffssp == ffss)
-	FFABORT;
+      if (yyssp == yyss)
+        YYABORT;
 
 
-      ffdestruct ("Error: popping",
-		  ffstos[ffstate], ffvsp);
-      FFPOPSTACK (1);
-      ffstate = *ffssp;
-      FF_STACK_PRINT (ffss, ffssp);
+      yydestruct ("Error: popping",
+                  YY_ACCESSING_SYMBOL (yystate), yyvsp, scanner, lParse);
+      YYPOPSTACK (1);
+      yystate = *yyssp;
+      YY_STACK_PRINT (yyss, yyssp);
     }
 
-  *++ffvsp = fflval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
   /* Shift the error token.  */
-  FF_SYMBOL_PRINT ("Shifting", ffstos[ffn], ffvsp, fflsp);
+  YY_SYMBOL_PRINT ("Shifting", YY_ACCESSING_SYMBOL (yyn), yyvsp, yylsp);
 
-  ffstate = ffn;
-  goto ffnewstate;
+  yystate = yyn;
+  goto yynewstate;
 
 
 /*-------------------------------------.
-| ffacceptlab -- FFACCEPT comes here.  |
+| yyacceptlab -- YYACCEPT comes here.  |
 `-------------------------------------*/
-ffacceptlab:
-  ffresult = 0;
-  goto ffreturn;
+yyacceptlab:
+  yyresult = 0;
+  goto yyreturnlab;
+
 
 /*-----------------------------------.
-| ffabortlab -- FFABORT comes here.  |
+| yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
-ffabortlab:
-  ffresult = 1;
-  goto ffreturn;
+yyabortlab:
+  yyresult = 1;
+  goto yyreturnlab;
 
-#if !defined(ffoverflow) || FFERROR_VERBOSE
-/*-------------------------------------------------.
-| ffexhaustedlab -- memory exhaustion comes here.  |
-`-------------------------------------------------*/
-ffexhaustedlab:
-  fferror (FF_("memory exhausted"));
-  ffresult = 2;
-  /* Fall through.  */
-#endif
 
-ffreturn:
-  if (ffchar != FFEMPTY)
-     ffdestruct ("Cleanup: discarding lookahead",
-		 fftoken, &fflval);
-  /* Do not reclaim the symbols of the rule which action triggered
-     this FFABORT or FFACCEPT.  */
-  FFPOPSTACK (fflen);
-  FF_STACK_PRINT (ffss, ffssp);
-  while (ffssp != ffss)
+/*-----------------------------------------------------------.
+| yyexhaustedlab -- YYNOMEM (memory exhaustion) comes here.  |
+`-----------------------------------------------------------*/
+yyexhaustedlab:
+  yyerror (scanner, lParse, YY_("memory exhausted"));
+  yyresult = 2;
+  goto yyreturnlab;
+
+
+/*----------------------------------------------------------.
+| yyreturnlab -- parsing is finished, clean up and return.  |
+`----------------------------------------------------------*/
+yyreturnlab:
+  if (yychar != FITS_PARSER_YYEMPTY)
     {
-      ffdestruct ("Cleanup: popping",
-		  ffstos[*ffssp], ffvsp);
-      FFPOPSTACK (1);
+      /* Make sure we have latest lookahead translation.  See comments at
+         user semantic actions for why this is necessary.  */
+      yytoken = YYTRANSLATE (yychar);
+      yydestruct ("Cleanup: discarding lookahead",
+                  yytoken, &yylval, scanner, lParse);
     }
-#ifndef ffoverflow
-  if (ffss != ffssa)
-    FFSTACK_FREE (ffss);
+  /* Do not reclaim the symbols of the rule whose action triggered
+     this YYABORT or YYACCEPT.  */
+  YYPOPSTACK (yylen);
+  YY_STACK_PRINT (yyss, yyssp);
+  while (yyssp != yyss)
+    {
+      yydestruct ("Cleanup: popping",
+                  YY_ACCESSING_SYMBOL (+*yyssp), yyvsp, scanner, lParse);
+      YYPOPSTACK (1);
+    }
+#ifndef yyoverflow
+  if (yyss != yyssa)
+    YYSTACK_FREE (yyss);
 #endif
-#if FFERROR_VERBOSE
-  if (ffmsg != ffmsgbuf)
-    FFSTACK_FREE (ffmsg);
-#endif
-  /* Make sure FFID is used.  */
-  return FFID (ffresult);
+
+  return yyresult;
 }
 
-
-
-/* Line 1675 of yacc.c  */
-#line 1153 "eval.y"
+#line 1336 "eval.y"
 
 
 /*************************************************************************/
 /*  Start of "New" routines which build the expression Nodal structure   */
 /*************************************************************************/
 
-static int Alloc_Node( void )
+static int Alloc_Node( ParseData *lParse )
 {
                       /* Use this for allocation to guarantee *Nodes */
    Node *newNodePtr;  /* survives on failure, making it still valid  */
                       /* while working our way out of this error     */
 
-   if( gParse.nNodes == gParse.nNodesAlloc ) {
-      if( gParse.Nodes ) {
-	 gParse.nNodesAlloc += gParse.nNodesAlloc;
-	 newNodePtr = (Node *)realloc( gParse.Nodes,
-				       sizeof(Node)*gParse.nNodesAlloc );
+   if( lParse->nNodes == lParse->nNodesAlloc ) {
+      if( lParse->Nodes ) {
+	 lParse->nNodesAlloc += lParse->nNodesAlloc;
+	 newNodePtr = (Node *)realloc( lParse->Nodes,
+				       sizeof(Node)*lParse->nNodesAlloc );
       } else {
-	 gParse.nNodesAlloc = 100;
-	 newNodePtr = (Node *)malloc ( sizeof(Node)*gParse.nNodesAlloc );
+	 lParse->nNodesAlloc = 100;
+	 newNodePtr = (Node *)malloc ( sizeof(Node)*lParse->nNodesAlloc );
       }	 
 
       if( newNodePtr ) {
-	 gParse.Nodes = newNodePtr;
+	 lParse->Nodes = newNodePtr;
       } else {
-	 gParse.status = MEMORY_ALLOCATION;
+	 lParse->status = MEMORY_ALLOCATION;
 	 return( -1 );
       }
    }
 
-   return ( gParse.nNodes++ );
+   return ( lParse->nNodes++ );
 }
 
-static void Free_Last_Node( void )
+static void Free_Last_Node( ParseData *lParse )
 {
-   if( gParse.nNodes ) gParse.nNodes--;
+   if( lParse->nNodes ) lParse->nNodes--;
 }
 
-static int New_Const( int returnType, void *value, long len )
+static int New_Const( ParseData *lParse, int returnType, void *value, long len )
 {
    Node *this;
    int n;
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this             = gParse.Nodes + n;
+      this             = lParse->Nodes + n;
       this->operation  = CONST_OP;             /* Flag a constant */
       this->DoOp       = NULL;
       this->nSubNodes  = 0;
@@ -3852,58 +3632,58 @@ static int New_Const( int returnType, void *value, long len )
    return(n);
 }
 
-static int New_Column( int ColNum )
+static int New_Column( ParseData *lParse, int ColNum )
 {
    Node *this;
    int  n, i;
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this              = gParse.Nodes + n;
+      this              = lParse->Nodes + n;
       this->operation   = -ColNum;
       this->DoOp        = NULL;
       this->nSubNodes   = 0;
-      this->type        = gParse.varData[ColNum].type;
-      this->value.nelem = gParse.varData[ColNum].nelem;
-      this->value.naxis = gParse.varData[ColNum].naxis;
-      for( i=0; i<gParse.varData[ColNum].naxis; i++ )
-	 this->value.naxes[i] = gParse.varData[ColNum].naxes[i];
+      this->type        = lParse->varData[ColNum].type;
+      this->value.nelem = lParse->varData[ColNum].nelem;
+      this->value.naxis = lParse->varData[ColNum].naxis;
+      for( i=0; i<lParse->varData[ColNum].naxis; i++ )
+	 this->value.naxes[i] = lParse->varData[ColNum].naxes[i];
    }
    return(n);
 }
 
-static int New_Offset( int ColNum, int offsetNode )
+static int New_Offset( ParseData *lParse, int ColNum, int offsetNode )
 {
    Node *this;
    int  n, i, colNode;
 
-   colNode = New_Column( ColNum );
+   colNode = New_Column( lParse, ColNum );
    if( colNode<0 ) return(-1);
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this              = gParse.Nodes + n;
+      this              = lParse->Nodes + n;
       this->operation   = '{';
       this->DoOp        = Do_Offset;
       this->nSubNodes   = 2;
       this->SubNodes[0] = colNode;
       this->SubNodes[1] = offsetNode;
-      this->type        = gParse.varData[ColNum].type;
-      this->value.nelem = gParse.varData[ColNum].nelem;
-      this->value.naxis = gParse.varData[ColNum].naxis;
-      for( i=0; i<gParse.varData[ColNum].naxis; i++ )
-	 this->value.naxes[i] = gParse.varData[ColNum].naxes[i];
+      this->type        = lParse->varData[ColNum].type;
+      this->value.nelem = lParse->varData[ColNum].nelem;
+      this->value.naxis = lParse->varData[ColNum].naxis;
+      for( i=0; i<lParse->varData[ColNum].naxis; i++ )
+	 this->value.naxes[i] = lParse->varData[ColNum].naxes[i];
    }
    return(n);
 }
 
-static int New_Unary( int returnType, int Op, int Node1 )
+static int New_Unary( ParseData *lParse, int returnType, int Op, int Node1 )
 {
    Node *this, *that;
    int  i,n;
 
    if( Node1<0 ) return(-1);
-   that = gParse.Nodes + Node1;
+   that = lParse->Nodes + Node1;
 
    if( !Op ) Op = returnType;
 
@@ -3911,50 +3691,50 @@ static int New_Unary( int returnType, int Op, int Node1 )
    if( (Op==LONG   || Op==INTCAST) && that->type==LONG    ) return( Node1 );
    if( (Op==BOOLEAN              ) && that->type==BOOLEAN ) return( Node1 );
    
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this              = gParse.Nodes + n;
+      this              = lParse->Nodes + n;
       this->operation   = Op;
       this->DoOp        = Do_Unary;
       this->nSubNodes   = 1;
       this->SubNodes[0] = Node1;
       this->type        = returnType;
 
-      that              = gParse.Nodes + Node1; /* Reset in case .Nodes mv'd */
+      that              = lParse->Nodes + Node1; /* Reset in case .Nodes mv'd */
       this->value.nelem = that->value.nelem;
       this->value.naxis = that->value.naxis;
       for( i=0; i<that->value.naxis; i++ )
 	 this->value.naxes[i] = that->value.naxes[i];
 
-      if( that->operation==CONST_OP ) this->DoOp( this );
+      if( that->operation==CONST_OP ) this->DoOp( lParse, this );
    }
    return( n );
 }
 
-static int New_BinOp( int returnType, int Node1, int Op, int Node2 )
+static int New_BinOp( ParseData *lParse, int returnType, int Node1, int Op, int Node2 )
 {
    Node *this,*that1,*that2;
    int  n,i,constant;
 
    if( Node1<0 || Node2<0 ) return(-1);
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this             = gParse.Nodes + n;
+      this             = lParse->Nodes + n;
       this->operation  = Op;
       this->nSubNodes  = 2;
       this->SubNodes[0]= Node1;
       this->SubNodes[1]= Node2;
       this->type       = returnType;
 
-      that1            = gParse.Nodes + Node1;
-      that2            = gParse.Nodes + Node2;
+      that1            = lParse->Nodes + Node1;
+      that2            = lParse->Nodes + Node2;
       constant         = (that1->operation==CONST_OP
                           && that2->operation==CONST_OP);
       if( that1->type!=STRING && that1->type!=BITSTR )
-	 if( !Test_Dims( Node1, Node2 ) ) {
-	    Free_Last_Node();
-	    fferror("Array sizes/dims do not match for binary operator");
+	if( !Test_Dims( lParse, Node1, Node2 ) ) {
+	    Free_Last_Node(lParse);
+	    yyerror(0, lParse, "Array sizes/dims do not match for binary operator");
 	    return(-1);
 	 }
       if( that1->value.nelem == 1 ) that1 = that2;
@@ -3979,22 +3759,25 @@ static int New_BinOp( int returnType, int Node1, int Op, int Node2 )
       case LONG:    this->DoOp = Do_BinOp_lng;  break;
       case DOUBLE:  this->DoOp = Do_BinOp_dbl;  break;
       }
-      if( constant ) this->DoOp( this );
+      if( constant ) this->DoOp( lParse, this );
    }
    return( n );
 }
 
-static int New_Func( int returnType, funcOp Op, int nNodes,
+static int New_Func( ParseData *lParse,
+		     int returnType, funcOp Op, int nNodes,
 		     int Node1, int Node2, int Node3, int Node4, 
 		     int Node5, int Node6, int Node7 )
 {
-  return New_FuncSize(returnType, Op, nNodes,
+  return New_FuncSize(lParse,
+		      returnType, Op, nNodes,
 		      Node1, Node2, Node3, Node4, 
 		      Node5, Node6, Node7, 0);
 }
 
-static int New_FuncSize( int returnType, funcOp Op, int nNodes,
-		     int Node1, int Node2, int Node3, int Node4, 
+static int New_FuncSize( ParseData *lParse,
+			 int returnType, funcOp Op, int nNodes,
+			 int Node1, int Node2, int Node3, int Node4, 
 			 int Node5, int Node6, int Node7, int Size )
 /* If returnType==0 , use Node1's type and vector sizes as returnType, */
 /* else return a single value of type returnType                       */
@@ -4005,9 +3788,9 @@ static int New_FuncSize( int returnType, funcOp Op, int nNodes,
    if( Node1<0 || Node2<0 || Node3<0 || Node4<0 || 
        Node5<0 || Node6<0 || Node7<0 ) return(-1);
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this              = gParse.Nodes + n;
+      this              = lParse->Nodes + n;
       this->operation   = (int)Op;
       this->DoOp        = Do_Func;
       this->nSubNodes   = nNodes;
@@ -4030,7 +3813,7 @@ static int New_FuncSize( int returnType, funcOp Op, int nNodes,
 	 this->value.naxis    = 1;
 	 this->value.naxes[0] = 1;
       } else {
-	 that              = gParse.Nodes + Node1;
+	 that              = lParse->Nodes + Node1;
 	 this->type        = that->type;
 	 this->value.nelem = that->value.nelem;
 	 this->value.naxis = that->value.naxis;
@@ -4040,12 +3823,12 @@ static int New_FuncSize( int returnType, funcOp Op, int nNodes,
       /* Force explicit size before evaluating */
       if (Size > 0) this->value.nelem = Size;
 
-      if( constant ) this->DoOp( this );
+      if( constant ) this->DoOp( lParse, this );
    }
    return( n );
 }
 
-static int New_Deref( int Var,  int nDim,
+static int New_Deref( ParseData *lParse, int Var,  int nDim,
 		      int Dim1, int Dim2, int Dim3, int Dim4, int Dim5 )
 {
    int n, idx, constant;
@@ -4054,34 +3837,34 @@ static int New_Deref( int Var,  int nDim,
 
    if( Var<0 || Dim1<0 || Dim2<0 || Dim3<0 || Dim4<0 || Dim5<0 ) return(-1);
 
-   theVar = gParse.Nodes + Var;
+   theVar = lParse->Nodes + Var;
    if( theVar->operation==CONST_OP || theVar->value.nelem==1 ) {
-      fferror("Cannot index a scalar value");
+      yyerror(0, lParse, "Cannot index a scalar value");
       return(-1);
    }
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n>=0 ) {
-      this              = gParse.Nodes + n;
+      this              = lParse->Nodes + n;
       this->nSubNodes   = nDim+1;
-      theVar            = gParse.Nodes + (this->SubNodes[0]=Var);
-      theDim[0]         = gParse.Nodes + (this->SubNodes[1]=Dim1);
-      theDim[1]         = gParse.Nodes + (this->SubNodes[2]=Dim2);
-      theDim[2]         = gParse.Nodes + (this->SubNodes[3]=Dim3);
-      theDim[3]         = gParse.Nodes + (this->SubNodes[4]=Dim4);
-      theDim[4]         = gParse.Nodes + (this->SubNodes[5]=Dim5);
+      theVar            = lParse->Nodes + (this->SubNodes[0]=Var);
+      theDim[0]         = lParse->Nodes + (this->SubNodes[1]=Dim1);
+      theDim[1]         = lParse->Nodes + (this->SubNodes[2]=Dim2);
+      theDim[2]         = lParse->Nodes + (this->SubNodes[3]=Dim3);
+      theDim[3]         = lParse->Nodes + (this->SubNodes[4]=Dim4);
+      theDim[4]         = lParse->Nodes + (this->SubNodes[5]=Dim5);
       constant          = theVar->operation==CONST_OP;
       for( idx=0; idx<nDim; idx++ )
 	 constant = (constant && theDim[idx]->operation==CONST_OP);
 
       for( idx=0; idx<nDim; idx++ )
 	 if( theDim[idx]->value.nelem>1 ) {
-	    Free_Last_Node();
-	    fferror("Cannot use an array as an index value");
+	    Free_Last_Node(lParse);
+	    yyerror(0, lParse, "Cannot use an array as an index value");
 	    return(-1);
 	 } else if( theDim[idx]->type!=LONG ) {
-	    Free_Last_Node();
-	    fferror("Index value must be an integer type");
+	    Free_Last_Node(lParse);
+	    yyerror(0, lParse, "Index value must be an integer type");
 	    return(-1);
 	 }
 
@@ -4101,45 +3884,58 @@ static int New_Deref( int Var,  int nDim,
 	 }
 	 this->value.nelem = elem;
       } else {
-	 Free_Last_Node();
-	 fferror("Must specify just one or all indices for vector");
+	 Free_Last_Node(lParse);
+	 yyerror(0, lParse, "Must specify just one or all indices for vector");
 	 return(-1);
       }
-      if( constant ) this->DoOp( this );
+      if( constant ) this->DoOp( lParse, this );
    }
    return(n);
 }
 
-extern int ffGetVariable( char *varName, FFSTYPE *varVal );
+extern int fits_parser_yyGetVariable( ParseData *lParse, char *varName, YYSTYPE *varVal );
 
-static int New_GTI( char *fname, int Node1, char *start, char *stop )
+static int New_GTI( ParseData *lParse, funcOp Op, char *fname, int Node1, int Node2, char *start, char *stop )
 {
    fitsfile *fptr;
-   Node *this, *that0, *that1;
+   Node *this, *that0, *that1, *that2;
    int  type,i,n, startCol, stopCol, Node0;
    int  hdutype, hdunum, evthdu, samefile, extvers, movetotype, tstat;
    char extname[100];
    long nrows;
    double timeZeroI[2], timeZeroF[2], dt, timeSpan;
    char xcol[20], xexpr[20];
-   FFSTYPE colVal;
+   YYSTYPE colVal;
 
-   if( Node1==-99 ) {
-      type = ffGetVariable( "TIME", &colVal );
+   if( (Op == gtifilt_fct || Op == gtifind_fct) && Node1==-99 ) {
+      type = fits_parser_yyGetVariable( lParse,  "TIME", &colVal );
       if( type==COLUMN ) {
-	 Node1 = New_Column( (int)colVal.lng );
+	 Node1 = New_Column( lParse, (int)colVal.lng );
       } else {
-	 fferror("Could not build TIME column for GTIFILTER");
+	 yyerror(0, lParse, "Could not build TIME column for GTIFILTER/GTIFIND");
 	 return(-1);
       }
    }
-   Node1 = New_Unary( DOUBLE, 0, Node1 );
-   Node0 = Alloc_Node(); /* This will hold the START/STOP times */
+
+   if (Op == gtiover_fct) {
+     if (Node1 == -99 || Node2 == -99) {
+       yyerror(0, lParse, "startExpr and stopExpr values must be defined for GTIOVERLAP");
+       return(-1);
+     }
+     /* Also case TIME_STOP to double precision */
+     Node2 = New_Unary( lParse, DOUBLE, 0, Node2 );
+     if (Node2 < 0) return(-1);
+
+   }
+
+   /* Type cast TIME to double precision */
+   Node1 = New_Unary( lParse, DOUBLE, 0, Node1 );
+   Node0 = Alloc_Node(lParse); /* This will hold the START/STOP times */
    if( Node1<0 || Node0<0 ) return(-1);
 
    /*  Record current HDU number in case we need to move within this file  */
 
-   fptr = gParse.def_fptr;
+   fptr = lParse->def_fptr;
    ffghdn( fptr, &evthdu );
 
    /*  Look for TIMEZERO keywords in current extension  */
@@ -4171,18 +3967,18 @@ static int New_GTI( char *fname, int Node1, char *start, char *stop )
 	 fname[i] = '\0';
 	 fname++;
 	 ffexts( fname, &hdunum, extname, &extvers, &movetotype,
-		 xcol, xexpr, &gParse.status );
+		 xcol, xexpr, &lParse->status );
          if( *extname ) {
-	    ffmnhd( fptr, movetotype, extname, extvers, &gParse.status );
+	    ffmnhd( fptr, movetotype, extname, extvers, &lParse->status );
 	    ffghdn( fptr, &hdunum );
 	 } else if( hdunum ) {
-	    ffmahd( fptr, ++hdunum, &hdutype, &gParse.status );
-	 } else if( !gParse.status ) {
-	    fferror("Cannot use primary array for GTI filter");
+	    ffmahd( fptr, ++hdunum, &hdutype, &lParse->status );
+	 } else if( !lParse->status ) {
+	    yyerror(0, lParse, "Cannot use primary array for GTI filter");
 	    return( -1 );
 	 }
       } else {
-	 fferror("File extension specifier lacks closing ']'");
+	 yyerror(0, lParse, "File extension specifier lacks closing ']'");
 	 return( -1 );
       }
       break;
@@ -4190,44 +3986,44 @@ static int New_GTI( char *fname, int Node1, char *start, char *stop )
       samefile = 1;
       hdunum = atoi( fname ) + 1;
       if( hdunum>1 )
-	 ffmahd( fptr, hdunum, &hdutype, &gParse.status );
+	 ffmahd( fptr, hdunum, &hdutype, &lParse->status );
       else {
-	 fferror("Cannot use primary array for GTI filter");
+	 yyerror(0, lParse, "Cannot use primary array for GTI filter / GTIFIND");
 	 return( -1 );
       }
       break;
    default:
       samefile = 0;
-      if( ! ffopen( &fptr, fname, READONLY, &gParse.status ) )
+      if( ! ffopen( &fptr, fname, READONLY, &lParse->status ) )
 	 ffghdn( fptr, &hdunum );
       break;
    }
-   if( gParse.status ) return(-1);
+   if( lParse->status ) return(-1);
 
    /*  If at primary, search for GTI extension  */
 
    if( hdunum==1 ) {
       while( 1 ) {
 	 hdunum++;
-	 if( ffmahd( fptr, hdunum, &hdutype, &gParse.status ) ) break;
+	 if( ffmahd( fptr, hdunum, &hdutype, &lParse->status ) ) break;
 	 if( hdutype==IMAGE_HDU ) continue;
 	 tstat = 0;
 	 if( ffgkys( fptr, "EXTNAME", extname, NULL, &tstat ) ) continue;
 	 ffupch( extname );
 	 if( strstr( extname, "GTI" ) ) break;
       }
-      if( gParse.status ) {
-	 if( gParse.status==END_OF_FILE )
-	    fferror("GTI extension not found in this file");
+      if( lParse->status ) {
+	 if( lParse->status==END_OF_FILE )
+	    yyerror(0, lParse, "GTI extension not found in this file");
 	 return(-1);
       }
    }
 
    /*  Locate START/STOP Columns  */
 
-   ffgcno( fptr, CASEINSEN, start, &startCol, &gParse.status );
-   ffgcno( fptr, CASEINSEN, stop,  &stopCol,  &gParse.status );
-   if( gParse.status ) return(-1);
+   ffgcno( fptr, CASEINSEN, start, &startCol, &lParse->status );
+   ffgcno( fptr, CASEINSEN, stop,  &stopCol,  &lParse->status );
+   if( lParse->status ) return(-1);
 
    /*  Look for TIMEZERO keywords in GTI extension  */
 
@@ -4243,46 +4039,64 @@ static int New_GTI( char *fname, int Node1, char *start, char *stop )
       timeZeroF[1] = 0.0;
    }
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n >= 0 ) {
-      this                 = gParse.Nodes + n;
-      this->nSubNodes      = 2;
+      this                 = lParse->Nodes + n;
       this->SubNodes[1]    = Node1;
-      this->operation      = (int)gtifilt_fct;
-      this->DoOp           = Do_GTI;
-      this->type           = BOOLEAN;
-      that1                = gParse.Nodes + Node1;
+      this->operation      = (int) Op;
+      if (Op == gtifilt_fct) {
+	this->nSubNodes      = 2;
+	this->DoOp           = Do_GTI;
+	this->type           = BOOLEAN;
+      } else if (Op == gtifind_fct) {
+	this->nSubNodes      = 2;
+	this->DoOp           = Do_GTI;
+	this->type           = LONG;
+      } else {
+	this->nSubNodes      = 3;
+	this->DoOp           = Do_GTI_Over;
+	this->type           = DOUBLE;
+      }
+      that1                = lParse->Nodes + Node1;
       this->value.nelem    = that1->value.nelem;
       this->value.naxis    = that1->value.naxis;
       for( i=0; i < that1->value.naxis; i++ )
 	 this->value.naxes[i] = that1->value.naxes[i];
+      if (Op == gtiover_fct) {
+	this->SubNodes[2]  = Node2;
+	that2 = lParse->Nodes + Node2;
+	if (that1->value.nelem != that2->value.nelem) {
+	  yyerror(0, lParse, "Dimensions of TIME and TIME_STOP must match for GTIOVERLAP");
+	  return(-1);
+	}
+      }
 
       /* Init START/STOP node to be treated as a "constant" */
 
       this->SubNodes[0]    = Node0;
-      that0                = gParse.Nodes + Node0;
+      that0                = lParse->Nodes + Node0;
       that0->operation     = CONST_OP;
       that0->DoOp          = NULL;
       that0->value.data.ptr= NULL;
 
       /*  Read in START/STOP times  */
 
-      if( ffgkyj( fptr, "NAXIS2", &nrows, NULL, &gParse.status ) )
+      if( ffgkyj( fptr, "NAXIS2", &nrows, NULL, &lParse->status ) )
 	 return(-1);
       that0->value.nelem = nrows;
       if( nrows ) {
 
 	 that0->value.data.dblptr = (double*)malloc( 2*nrows*sizeof(double) );
 	 if( !that0->value.data.dblptr ) {
-	    gParse.status = MEMORY_ALLOCATION;
+	    lParse->status = MEMORY_ALLOCATION;
 	    return(-1);
 	 }
 	 
 	 ffgcvd( fptr, startCol, 1L, 1L, nrows, 0.0,
-		 that0->value.data.dblptr, &i, &gParse.status );
+		 that0->value.data.dblptr, &i, &lParse->status );
 	 ffgcvd( fptr, stopCol, 1L, 1L, nrows, 0.0,
-		 that0->value.data.dblptr+nrows, &i, &gParse.status );
-	 if( gParse.status ) {
+		 that0->value.data.dblptr+nrows, &i, &lParse->status );
+	 if( lParse->status ) {
 	    free( that0->value.data.dblptr );
 	    return(-1);
 	 }
@@ -4299,31 +4113,41 @@ static int New_GTI( char *fname, int Node1, char *start, char *stop )
 	       that0->type = 0;
 	       break;
 	    }
+
+	 /* GTIOVERLAP() requires ordered GTI */
+	 if (that0->type != 1 && Op == gtiover_fct) {
+	   yyerror(0, lParse, "Input GTI must be time-ordered for GTIOVERLAP");
+	   return(-1);
+	 }
 	 
 	 /*  Handle TIMEZERO offset, if any  */
 	 
 	 dt = (timeZeroI[1] - timeZeroI[0]) + (timeZeroF[1] - timeZeroF[0]);
 	 timeSpan = that0->value.data.dblptr[nrows+nrows-1]
 	    - that0->value.data.dblptr[0];
+	 if (timeSpan == 0) timeSpan = 1.0;
 	 
 	 if( fabs( dt / timeSpan ) > 1e-12 ) {
 	    for( i=0; i<(nrows+nrows); i++ )
 	       that0->value.data.dblptr[i] += dt;
 	 }
       }
-      if( OPER(Node1)==CONST_OP )
-	 this->DoOp( this );
+      /* If Node1 is constant (gtifilt_fct) or
+	 Node1 and Node2 are constant (gtiover_fct), then evaluate now */
+      if( OPER(Node1)==CONST_OP && (Op == gtifilt_fct || OPER(Node2)==CONST_OP)) {
+	this->DoOp( lParse, this );
+      }
    }
 
    if( samefile )
-      ffmahd( fptr, evthdu, &hdutype, &gParse.status );
+      ffmahd( fptr, evthdu, &hdutype, &lParse->status );
    else
-      ffclos( fptr, &gParse.status );
+      ffclos( fptr, &lParse->status );
 
    return( n );
 }
 
-static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
+static int New_REG( ParseData *lParse, char *fname, int NodeX, int NodeY, char *colNames )
 {
    Node *this, *that0;
    int  type, n, Node0;
@@ -4331,39 +4155,39 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
    WCSdata wcs;
    SAORegion *Rgn;
    char *cX, *cY;
-   FFSTYPE colVal;
+   YYSTYPE colVal;
 
    if( NodeX==-99 ) {
-      type = ffGetVariable( "X", &colVal );
+      type = fits_parser_yyGetVariable( lParse,  "X", &colVal );
       if( type==COLUMN ) {
-	 NodeX = New_Column( (int)colVal.lng );
+	 NodeX = New_Column( lParse, (int)colVal.lng );
       } else {
-	 fferror("Could not build X column for REGFILTER");
+	 yyerror(0, lParse, "Could not build X column for REGFILTER");
 	 return(-1);
       }
    }
    if( NodeY==-99 ) {
-      type = ffGetVariable( "Y", &colVal );
+      type = fits_parser_yyGetVariable( lParse, "Y", &colVal );
       if( type==COLUMN ) {
-	 NodeY = New_Column( (int)colVal.lng );
+ 	 NodeY = New_Column( lParse, (int)colVal.lng );
       } else {
-	 fferror("Could not build Y column for REGFILTER");
+	 yyerror(0, lParse, "Could not build Y column for REGFILTER");
 	 return(-1);
       }
    }
-   NodeX = New_Unary( DOUBLE, 0, NodeX );
-   NodeY = New_Unary( DOUBLE, 0, NodeY );
-   Node0 = Alloc_Node(); /* This will hold the Region Data */
+   NodeX = New_Unary( lParse, DOUBLE, 0, NodeX );
+   NodeY = New_Unary( lParse, DOUBLE, 0, NodeY );
+   Node0 = Alloc_Node(lParse); /* This will hold the Region Data */
    if( NodeX<0 || NodeY<0 || Node0<0 ) return(-1);
 
-   if( ! (Test_Dims( NodeX, NodeY ) ) ) {
-     fferror("Dimensions of REGFILTER arguments are not compatible");
+   if( ! (Test_Dims( lParse, NodeX, NodeY ) ) ) {
+     yyerror(0, lParse, "Dimensions of REGFILTER arguments are not compatible");
      return (-1);
    }
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n >= 0 ) {
-      this                 = gParse.Nodes + n;
+      this                 = lParse->Nodes + n;
       this->nSubNodes      = 3;
       this->SubNodes[0]    = Node0;
       this->SubNodes[1]    = NodeX;
@@ -4375,12 +4199,12 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
       this->value.naxis    = 1;
       this->value.naxes[0] = 1;
       
-      Copy_Dims(n, NodeX);
-      if( SIZE(NodeX)<SIZE(NodeY) )  Copy_Dims(n, NodeY);
+      Copy_Dims(lParse, n, NodeX);
+      if( SIZE(NodeX)<SIZE(NodeY) )  Copy_Dims(lParse, n, NodeY);
 
       /* Init Region node to be treated as a "constant" */
 
-      that0                = gParse.Nodes + Node0;
+      that0                = lParse->Nodes + Node0;
       that0->operation     = CONST_OP;
       that0->DoOp          = NULL;
 
@@ -4396,27 +4220,27 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
 	    *(cY++) = '\0';
 	 while( *cY==' ' ) cY++;
 	 if( !*cY ) {
-	    fferror("Could not extract valid pair of column names from REGFILTER");
-	    Free_Last_Node();
+	    yyerror(0, lParse, "Could not extract valid pair of column names from REGFILTER");
+	    Free_Last_Node(lParse);
 	    return( -1 );
 	 }
-	 fits_get_colnum( gParse.def_fptr, CASEINSEN, cX, &Xcol,
-			  &gParse.status );
-	 fits_get_colnum( gParse.def_fptr, CASEINSEN, cY, &Ycol,
-			  &gParse.status );
-	 if( gParse.status ) {
-	    fferror("Could not locate columns indicated for WCS info");
-	    Free_Last_Node();
+	 fits_get_colnum( lParse->def_fptr, CASEINSEN, cX, &Xcol,
+			  &lParse->status );
+	 fits_get_colnum( lParse->def_fptr, CASEINSEN, cY, &Ycol,
+			  &lParse->status );
+	 if( lParse->status ) {
+	    yyerror(0, lParse, "Could not locate columns indicated for WCS info");
+	    Free_Last_Node(lParse);
 	    return( -1 );
 	 }
 
       } else {
 	 /*  Try to find columns used in X/Y expressions  */
-	 Xcol = Locate_Col( gParse.Nodes + NodeX );
-	 Ycol = Locate_Col( gParse.Nodes + NodeY );
+	 Xcol = Locate_Col( lParse, lParse->Nodes + NodeX );
+	 Ycol = Locate_Col( lParse, lParse->Nodes + NodeY );
 	 if( Xcol<0 || Ycol<0 ) {
-	    fferror("Found multiple X/Y column references in REGFILTER");
-	    Free_Last_Node();
+	    yyerror(0, lParse, "Found multiple X/Y column references in REGFILTER");
+	    Free_Last_Node(lParse);
 	    return( -1 );
 	 }
       }
@@ -4425,7 +4249,7 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
       wcs.exists = 0;
       if( Xcol>0 && Ycol>0 ) {
 	 tstat = 0;
-	 ffgtcs( gParse.def_fptr, Xcol, Ycol,
+	 ffgtcs( lParse->def_fptr, Xcol, Ycol,
 		 &wcs.xrefval, &wcs.yrefval,
 		 &wcs.xrefpix, &wcs.yrefpix,
 		 &wcs.xinc,    &wcs.yinc,
@@ -4434,8 +4258,8 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
 	 if( tstat==NO_WCS_KEY ) {
 	    wcs.exists = 0;
 	 } else if( tstat ) {
-	    gParse.status = tstat;
-	    Free_Last_Node();
+	    lParse->status = tstat;
+	    Free_Last_Node(lParse);
 	    return( -1 );
 	 } else {
 	    wcs.exists = 1;
@@ -4444,30 +4268,30 @@ static int New_REG( char *fname, int NodeX, int NodeY, char *colNames )
 
       /*  Read in Region file  */
 
-      fits_read_rgnfile( fname, &wcs, &Rgn, &gParse.status );
-      if( gParse.status ) {
-	 Free_Last_Node();
+      fits_read_rgnfile( fname, &wcs, &Rgn, &lParse->status );
+      if( lParse->status ) {
+	 Free_Last_Node(lParse);
 	 return( -1 );
       }
 
       that0->value.data.ptr = Rgn;
 
       if( OPER(NodeX)==CONST_OP && OPER(NodeY)==CONST_OP )
-	 this->DoOp( this );
+	 this->DoOp( lParse, this );
    }
 
    return( n );
 }
 
-static int New_Vector( int subNode )
+static int New_Vector( ParseData *lParse, int subNode )
 {
    Node *this, *that;
    int n;
 
-   n = Alloc_Node();
+   n = Alloc_Node(lParse);
    if( n >= 0 ) {
-      this              = gParse.Nodes + n;
-      that              = gParse.Nodes + subNode;
+      this              = lParse->Nodes + n;
+      that              = lParse->Nodes + subNode;
       this->type        = that->type;
       this->nSubNodes   = 1;
       this->SubNodes[0] = subNode;
@@ -4478,15 +4302,15 @@ static int New_Vector( int subNode )
    return( n );
 }
 
-static int Close_Vec( int vecNode )
+static int Close_Vec( ParseData *lParse, int vecNode )
 {
    Node *this;
    int n, nelem=0;
 
-   this = gParse.Nodes + vecNode;
+   this = lParse->Nodes + vecNode;
    for( n=0; n < this->nSubNodes; n++ ) {
       if( TYPE( this->SubNodes[n] ) != this->type ) {
-	 this->SubNodes[n] = New_Unary( this->type, 0, this->SubNodes[n] );
+	 this->SubNodes[n] = New_Unary( lParse, this->type, 0, this->SubNodes[n] );
 	 if( this->SubNodes[n]<0 ) return(-1);
       }
       nelem += SIZE(this->SubNodes[n]);
@@ -4498,7 +4322,82 @@ static int Close_Vec( int vecNode )
    return( vecNode );
 }
 
-static int Locate_Col( Node *this )
+static int New_Array( ParseData *lParse, int valueNode, int dimNode )
+{
+  Node *dims;
+  long naxis, nelem;
+  long naxes[MAXDIMS];
+  Node *this;
+  int  n,i;
+
+   if( valueNode<0 || dimNode<0 ) return(-1);
+
+   /* Check that dimensions are {a,b,c,d}
+        - vector
+	- every element is constant integer
+	- 5 or fewer dimensions 
+   */
+
+   if (SIZE(valueNode) > 1) {
+     yyerror(0, lParse, "ARRAY(V,n) value V must have vector dimension of 1");
+     return (-1);
+   }
+
+   dims = &(lParse->Nodes[dimNode]);
+   for (i=0; i<MAXDIMS; i++) naxes[i] = 1;
+
+   if (OPER(dimNode) == CONST_OP) { /* ARRAY(V,n) is a constant integer */
+     if ( TYPE(dimNode) != LONG ) dimNode = New_Unary(lParse, LONG, 0, dimNode);
+     if (dimNode < 0) return (-1);
+     naxis = 1;
+     naxes[0] = lParse->Nodes[dimNode].value.data.lng;
+
+   } else if (OPER(dimNode) == '{') { /* ARRAY(V,{a,b,c,d,e}) up to 5 dimensions */
+     if (dims->nSubNodes > MAXDIMS) {
+       yyerror(0, lParse, "ARRAY(V,{...}) number of dimensions must not exceed 5");
+       return (-1);
+     }
+     naxis = dims->nSubNodes;
+     for (i=0; i<dims->nSubNodes; i++) {
+       if ( TYPE(dims->SubNodes[i]) != LONG ) {
+	 dims->SubNodes[i] = New_Unary(lParse, LONG, 0, dims->SubNodes[i]);
+	 if (dims->SubNodes[i] < 0) return (-1);
+       }
+       naxes[i] = lParse->Nodes[ dims->SubNodes[i] ].value.data.lng;
+     }
+   } else {
+     yyerror(0, lParse, "ARRAY(V,dims) dims must be either integer or const vector");
+     return (-1);
+   }
+
+   nelem = 1;
+   for (i=0; i<naxis; i++) {
+     if (naxes[i] <= 0) {
+       yyerror(0, lParse, "ARRAY(V,dims) must have positive dimensions");
+       return (-1);
+     }
+     nelem *= naxes[i];
+   }
+
+   n = Alloc_Node(lParse);
+   if( n>=0 ) {
+      this             = lParse->Nodes + n;
+      this->operation  = array_fct;
+      this->nSubNodes  = 1;
+      this->SubNodes[0]= valueNode;
+      this->type       = TYPE(valueNode);
+
+      this->value.nelem = nelem;
+      this->value.naxis = naxis;
+      for( i=0; i<naxis; i++ )
+	this->value.naxes[i] = naxes[i];
+
+      this->DoOp = Do_Array;
+   }
+   return( n );
+}
+
+static int Locate_Col( ParseData *lParse, Node *this )
 /*  Locate the TABLE column number of any columns in "this" calculation.  */
 /*  Return ZERO if none found, or negative if more than 1 found.          */
 {
@@ -4507,12 +4406,12 @@ static int Locate_Col( Node *this )
    
    if( this->nSubNodes==0
        && this->operation<=0 && this->operation!=CONST_OP )
-      return gParse.colData[ - this->operation].colnum;
+      return lParse->colData[ - this->operation].colnum;
 
    for( i=0; i<this->nSubNodes; i++ ) {
-      that = gParse.Nodes + this->SubNodes[i];
+      that = lParse->Nodes + this->SubNodes[i];
       if( that->operation>0 ) {
-	 newCol = Locate_Col( that );
+	 newCol = Locate_Col( lParse, that );
 	 if( newCol<=0 ) {
 	    nfound += -newCol;
 	 } else {
@@ -4525,7 +4424,7 @@ static int Locate_Col( Node *this )
 	 }
       } else if( that->operation!=CONST_OP ) {
 	 /*  Found a Column  */
-	 newCol = gParse.colData[- that->operation].colnum;
+	 newCol = lParse->colData[- that->operation].colnum;
 	 if( !nfound ) {
 	    col = newCol;
 	    nfound++;
@@ -4540,15 +4439,15 @@ static int Locate_Col( Node *this )
       return( col );
 }
 
-static int Test_Dims( int Node1, int Node2 )
+static int Test_Dims( ParseData *lParse, int Node1, int Node2 )
 {
    Node *that1, *that2;
    int valid, i;
 
    if( Node1<0 || Node2<0 ) return(0);
 
-   that1 = gParse.Nodes + Node1;
-   that2 = gParse.Nodes + Node2;
+   that1 = lParse->Nodes + Node1;
+   that2 = lParse->Nodes + Node2;
 
    if( that1->value.nelem==1 || that2->value.nelem==1 )
       valid = 1;
@@ -4565,15 +4464,15 @@ static int Test_Dims( int Node1, int Node2 )
    return( valid );
 }   
 
-static void Copy_Dims( int Node1, int Node2 )
+static void Copy_Dims( ParseData *lParse, int Node1, int Node2 )
 {
    Node *that1, *that2;
    int i;
 
    if( Node1<0 || Node2<0 ) return;
 
-   that1 = gParse.Nodes + Node1;
-   that2 = gParse.Nodes + Node2;
+   that1 = lParse->Nodes + Node1;
+   that2 = lParse->Nodes + Node2;
 
    that1->value.nelem = that2->value.nelem;
    that1->value.naxis = that2->value.naxis;
@@ -4585,7 +4484,7 @@ static void Copy_Dims( int Node1, int Node2 )
 /*    Routines for actually evaluating the expression start here    */
 /********************************************************************/
 
-void Evaluate_Parser( long firstRow, long nRows )
+void Evaluate_Parser( ParseData *lParse, long firstRow, long nRows )
     /***********************************************************************/
     /*  Reset the parser for processing another batch of data...           */
     /*    firstRow:  Row number of the first element to evaluate           */
@@ -4605,50 +4504,50 @@ void Evaluate_Parser( long firstRow, long nRows )
      rand_initialized = 1;
    }
 
-   gParse.firstRow = firstRow;
-   gParse.nRows    = nRows;
+   lParse->firstRow = firstRow;
+   lParse->nRows    = nRows;
 
    /*  Reset Column Nodes' pointers to point to right data and UNDEF arrays  */
 
-   rowOffset = firstRow - gParse.firstDataRow;
-   for( i=0; i<gParse.nNodes; i++ ) {
+   rowOffset = firstRow - lParse->firstDataRow;
+   for( i=0; i<lParse->nNodes; i++ ) {
      if(    OPER(i) >  0 || OPER(i) == CONST_OP ) continue;
 
       column = -OPER(i);
-      offset = gParse.varData[column].nelem * rowOffset;
+      offset = lParse->varData[column].nelem * rowOffset;
 
-      gParse.Nodes[i].value.undef = gParse.varData[column].undef + offset;
+      lParse->Nodes[i].value.undef = lParse->varData[column].undef + offset;
 
-      switch( gParse.Nodes[i].type ) {
+      switch( lParse->Nodes[i].type ) {
       case BITSTR:
-	 gParse.Nodes[i].value.data.strptr =
-	    (char**)gParse.varData[column].data + rowOffset;
-	 gParse.Nodes[i].value.undef       = NULL;
+	 lParse->Nodes[i].value.data.strptr =
+	    (char**)lParse->varData[column].data + rowOffset;
+	 lParse->Nodes[i].value.undef       = NULL;
 	 break;
       case STRING:
-	 gParse.Nodes[i].value.data.strptr = 
-	    (char**)gParse.varData[column].data + rowOffset;
-	 gParse.Nodes[i].value.undef = gParse.varData[column].undef + rowOffset;
+	 lParse->Nodes[i].value.data.strptr = 
+	    (char**)lParse->varData[column].data + rowOffset;
+	 lParse->Nodes[i].value.undef = lParse->varData[column].undef + rowOffset;
 	 break;
       case BOOLEAN:
-	 gParse.Nodes[i].value.data.logptr = 
-	    (char*)gParse.varData[column].data + offset;
+	 lParse->Nodes[i].value.data.logptr = 
+	    (char*)lParse->varData[column].data + offset;
 	 break;
       case LONG:
-	 gParse.Nodes[i].value.data.lngptr = 
-	    (long*)gParse.varData[column].data + offset;
+	 lParse->Nodes[i].value.data.lngptr = 
+	    (long*)lParse->varData[column].data + offset;
 	 break;
       case DOUBLE:
-	 gParse.Nodes[i].value.data.dblptr = 
-	    (double*)gParse.varData[column].data + offset;
+	 lParse->Nodes[i].value.data.dblptr = 
+	    (double*)lParse->varData[column].data + offset;
 	 break;
       }
    }
 
-   Evaluate_Node( gParse.resultNode );
+   Evaluate_Node( lParse, lParse->resultNode );
 }
 
-static void Evaluate_Node( int thisNode )
+static void Evaluate_Node( ParseData *lParse, int thisNode )
     /**********************************************************************/
     /*  Recursively evaluate thisNode's subNodes, then call one of the    */
     /*  Do_<Action> functions pointed to by thisNode's DoOp element.      */
@@ -4657,34 +4556,34 @@ static void Evaluate_Node( int thisNode )
    Node *this;
    int i;
    
-   if( gParse.status ) return;
+   if( lParse->status ) return;
 
-   this = gParse.Nodes + thisNode;
+   this = lParse->Nodes + thisNode;
    if( this->operation>0 ) {  /* <=0 indicate constants and columns */
       i = this->nSubNodes;
       while( i-- ) {
-	 Evaluate_Node( this->SubNodes[i] );
-	 if( gParse.status ) return;
+	 Evaluate_Node( lParse, this->SubNodes[i] );
+	 if( lParse->status ) return;
       }
-      this->DoOp( this );
+      this->DoOp( lParse, this );
    }
 }
 
-static void Allocate_Ptrs( Node *this )
+static void Allocate_Ptrs( ParseData *lParse, Node *this )
 {
    long elem, row, size;
 
    if( this->type==BITSTR || this->type==STRING ) {
 
-      this->value.data.strptr = (char**)malloc( gParse.nRows
+      this->value.data.strptr = (char**)malloc( lParse->nRows
 						* sizeof(char*) );
       if( this->value.data.strptr ) {
-	 this->value.data.strptr[0] = (char*)malloc( gParse.nRows
+	 this->value.data.strptr[0] = (char*)malloc( lParse->nRows
 						     * (this->value.nelem+2)
 						     * sizeof(char) );
 	 if( this->value.data.strptr[0] ) {
 	    row = 0;
-	    while( (++row)<gParse.nRows ) {
+	    while( (++row)<lParse->nRows ) {
 	       this->value.data.strptr[row] =
 		  this->value.data.strptr[row-1] + this->value.nelem+1;
 	    }
@@ -4695,16 +4594,16 @@ static void Allocate_Ptrs( Node *this )
 	       this->value.undef = NULL;  /* BITSTRs don't use undef array */
 	    }
 	 } else {
-	    gParse.status = MEMORY_ALLOCATION;
+	    lParse->status = MEMORY_ALLOCATION;
 	    free( this->value.data.strptr );
 	 }
       } else {
-	 gParse.status = MEMORY_ALLOCATION;
+	 lParse->status = MEMORY_ALLOCATION;
       }
 
    } else {
 
-      elem = this->value.nelem * gParse.nRows;
+      elem = this->value.nelem * lParse->nRows;
       switch( this->type ) {
       case DOUBLE:  size = sizeof( double ); break;
       case LONG:    size = sizeof( long   ); break;
@@ -4715,19 +4614,19 @@ static void Allocate_Ptrs( Node *this )
       this->value.data.ptr = calloc(size+1, elem);
 
       if( this->value.data.ptr==NULL ) {
-	 gParse.status = MEMORY_ALLOCATION;
+	 lParse->status = MEMORY_ALLOCATION;
       } else {
 	 this->value.undef = (char *)this->value.data.ptr + elem*size;
       }
    }
 }
 
-static void Do_Unary( Node *this )
+static void Do_Unary( ParseData *lParse, Node *this )
 {
    Node *that;
    long elem;
 
-   that = gParse.Nodes + this->SubNodes[0];
+   that = lParse->Nodes + this->SubNodes[0];
 
    if( that->operation==CONST_OP ) {  /* Operating on a constant! */
       switch( this->operation ) {
@@ -4768,19 +4667,19 @@ static void Do_Unary( Node *this )
 
    } else {
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 
 	 if( this->type!=BITSTR ) {
-	    elem = gParse.nRows;
+	    elem = lParse->nRows;
 	    if( this->type!=STRING )
 	       elem *= this->value.nelem;
 	    while( elem-- )
 	       this->value.undef[elem] = that->value.undef[elem];
 	 }
 
-	 elem = gParse.nRows * this->value.nelem;
+	 elem = lParse->nRows * this->value.nelem;
 
 	 switch( this->operation ) {
 
@@ -4837,7 +4736,7 @@ static void Do_Unary( Node *this )
 		  this->value.data.logptr[elem] =
 		     ( ! that->value.data.logptr[elem] );
 	    } else if( that->type==BITSTR ) {
-	       elem = gParse.nRows;
+	       elem = lParse->nRows;
 	       while( elem-- )
 		  bitnot( this->value.data.strptr[elem],
 			  that->value.data.strptr[elem] );
@@ -4852,19 +4751,19 @@ static void Do_Unary( Node *this )
    }
 }
 
-static void Do_Offset( Node *this )
+static void Do_Offset( ParseData *lParse, Node *this )
 {
    Node *col;
    long fRow, nRowOverlap, nRowReload, rowOffset;
    long nelem, elem, offset, nRealElem;
    int status;
 
-   col       = gParse.Nodes + this->SubNodes[0];
-   rowOffset = gParse.Nodes[  this->SubNodes[1] ].value.data.lng;
+   col       = lParse->Nodes + this->SubNodes[0];
+   rowOffset = lParse->Nodes[  this->SubNodes[1] ].value.data.lng;
 
-   Allocate_Ptrs( this );
+   Allocate_Ptrs( lParse, this );
 
-   fRow   = gParse.firstRow + rowOffset;
+   fRow   = lParse->firstRow + rowOffset;
    if( this->type==STRING || this->type==BITSTR )
       nRealElem = 1;
    else
@@ -4872,13 +4771,13 @@ static void Do_Offset( Node *this )
 
    nelem = nRealElem;
 
-   if( fRow < gParse.firstDataRow ) {
+   if( fRow < lParse->firstDataRow ) {
 
       /* Must fill in data at start of array */
 
-      nRowReload = gParse.firstDataRow - fRow;
-      if( nRowReload > gParse.nRows ) nRowReload = gParse.nRows;
-      nRowOverlap = gParse.nRows - nRowReload;
+      nRowReload = lParse->firstDataRow - fRow;
+      if( nRowReload > lParse->nRows ) nRowReload = lParse->nRows;
+      nRowOverlap = lParse->nRows - nRowReload;
 
       offset = 0;
 
@@ -4899,24 +4798,24 @@ static void Do_Offset( Node *this )
 	 nRowReload--;
       }
 
-   } else if( fRow + gParse.nRows > gParse.firstDataRow + gParse.nDataRows ) {
+   } else if( fRow + lParse->nRows > lParse->firstDataRow + lParse->nDataRows ) {
 
       /* Must fill in data at end of array */
 
-      nRowReload = (fRow+gParse.nRows) - (gParse.firstDataRow+gParse.nDataRows);
-      if( nRowReload>gParse.nRows ) {
-	 nRowReload = gParse.nRows;
+      nRowReload = (fRow+lParse->nRows) - (lParse->firstDataRow+lParse->nDataRows);
+      if( nRowReload>lParse->nRows ) {
+	 nRowReload = lParse->nRows;
       } else {
-	 fRow = gParse.firstDataRow + gParse.nDataRows;
+	 fRow = lParse->firstDataRow + lParse->nDataRows;
       }
-      nRowOverlap = gParse.nRows - nRowReload;
+      nRowOverlap = lParse->nRows - nRowReload;
 
       offset = nRowOverlap * nelem;
 
       /*  NULLify any values falling out of bounds  */
 
-      elem = gParse.nRows * nelem;
-      while( fRow+nRowReload>gParse.totalRows && nRowReload>0 ) {
+      elem = lParse->nRows * nelem;
+      while( fRow+nRowReload>lParse->totalRows && nRowReload>0 ) {
 	 if( this->type == BITSTR ) {
 	    nelem = this->value.nelem;
 	    elem--;
@@ -4933,7 +4832,7 @@ static void Do_Offset( Node *this )
    } else {
 
       nRowReload  = 0;
-      nRowOverlap = gParse.nRows;
+      nRowOverlap = lParse->nRows;
       offset      = 0;
 
    }
@@ -4942,22 +4841,22 @@ static void Do_Offset( Node *this )
       switch( this->type ) {
       case BITSTR:
       case STRING:
-	 status = (*gParse.loadData)( -col->operation, fRow, nRowReload,
+	 status = (*lParse->loadData)( lParse, -col->operation, fRow, nRowReload,
 				      this->value.data.strptr+offset,
 				      this->value.undef+offset );
 	 break;
       case BOOLEAN:
-	 status = (*gParse.loadData)( -col->operation, fRow, nRowReload,
+	 status = (*lParse->loadData)( lParse, -col->operation, fRow, nRowReload,
 				      this->value.data.logptr+offset,
 				      this->value.undef+offset );
 	 break;
       case LONG:
-	 status = (*gParse.loadData)( -col->operation, fRow, nRowReload,
+	 status = (*lParse->loadData)( lParse, -col->operation, fRow, nRowReload,
 				      this->value.data.lngptr+offset,
 				      this->value.undef+offset );
 	 break;
       case DOUBLE:
-	 status = (*gParse.loadData)( -col->operation, fRow, nRowReload,
+	 status = (*lParse->loadData)( lParse, -col->operation, fRow, nRowReload,
 				      this->value.data.dblptr+offset,
 				      this->value.undef+offset );
 	 break;
@@ -4971,11 +4870,11 @@ static void Do_Offset( Node *this )
    if( rowOffset>0 )
       elem = nRowOverlap * nelem;
    else
-      elem = gParse.nRows * nelem;
+      elem = lParse->nRows * nelem;
 
    offset = nelem * rowOffset;
-   while( nRowOverlap-- && !gParse.status ) {
-      while( nelem-- && !gParse.status ) {
+   while( nRowOverlap-- && !lParse->status ) {
+      while( nelem-- && !lParse->status ) {
 	 elem--;
 	 if( this->type != BITSTR )
 	    this->value.undef[elem] = col->value.undef[elem+offset];
@@ -5003,15 +4902,15 @@ static void Do_Offset( Node *this )
    }
 }
 
-static void Do_BinOp_bit( Node *this )
+static void Do_BinOp_bit( ParseData *lParse, Node *this )
 {
    Node *that1, *that2;
    char *sptr1=NULL, *sptr2=NULL;
    int  const1, const2;
    long rows;
 
-   that1 = gParse.Nodes + this->SubNodes[0];
-   that2 = gParse.Nodes + this->SubNodes[1];
+   that1 = lParse->Nodes + this->SubNodes[0];
+   that2 = lParse->Nodes + this->SubNodes[1];
 
    const1 = ( that1->operation==CONST_OP );
    const2 = ( that2->operation==CONST_OP );
@@ -5055,10 +4954,10 @@ static void Do_BinOp_bit( Node *this )
 
    } else {
 
-      Allocate_Ptrs( this );
-
-      if( !gParse.status ) {
-	 rows  = gParse.nRows;
+      Allocate_Ptrs( lParse, this );
+     
+      if( !lParse->status ) {
+	 rows  = lParse->nRows;
 	 switch( this->operation ) {
 
 	    /*  BITSTR comparisons  */
@@ -5148,15 +5047,15 @@ static void Do_BinOp_bit( Node *this )
    }
 }
 
-static void Do_BinOp_str( Node *this )
+static void Do_BinOp_str( ParseData *lParse, Node *this )
 {
    Node *that1, *that2;
    char *sptr1, *sptr2, null1=0, null2=0;
    int const1, const2, val;
    long rows;
 
-   that1 = gParse.Nodes + this->SubNodes[0];
-   that2 = gParse.Nodes + this->SubNodes[1];
+   that1 = lParse->Nodes + this->SubNodes[0];
+   that2 = lParse->Nodes + this->SubNodes[1];
 
    const1 = ( that1->operation==CONST_OP );
    const2 = ( that2->operation==CONST_OP );
@@ -5197,11 +5096,11 @@ static void Do_BinOp_str( Node *this )
 
    } else {  /*  Not a constant  */
 
-      Allocate_Ptrs( this );
+     Allocate_Ptrs( lParse, this );
 
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 
-	 rows = gParse.nRows;
+	 rows = lParse->nRows;
 	 switch( this->operation ) {
 
 	    /*  Compare Strings  */
@@ -5283,15 +5182,15 @@ static void Do_BinOp_str( Node *this )
    }
 }
 
-static void Do_BinOp_log( Node *this )
+static void Do_BinOp_log( ParseData *lParse, Node *this )
 {
    Node *that1, *that2;
    int vector1, vector2;
    char val1=0, val2=0, null1=0, null2=0;
    long rows, nelem, elem;
 
-   that1 = gParse.Nodes + this->SubNodes[0];
-   that2 = gParse.Nodes + this->SubNodes[1];
+   that1 = lParse->Nodes + this->SubNodes[0];
+   that2 = lParse->Nodes + this->SubNodes[1];
 
    vector1 = ( that1->operation!=CONST_OP );
    if( vector1 )
@@ -5328,13 +5227,13 @@ static void Do_BinOp_log( Node *this )
       this->operation=CONST_OP;
    } else if (this->operation == ACCUM) {
       long i, previous, curr;
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
       
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
       
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 	previous = that2->value.data.lng;
 	
 	/* Cumulative sum of this chunk */
@@ -5352,13 +5251,13 @@ static void Do_BinOp_log( Node *this )
       }
       
    } else {
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 	
 	 if (this->operation == ACCUM) {
 	   long i, previous, curr;
@@ -5452,7 +5351,7 @@ static void Do_BinOp_log( Node *this )
    }
 }
 
-static void Do_BinOp_lng( Node *this )
+static void Do_BinOp_lng( ParseData *lParse, Node *this )
 {
    Node *that1, *that2;
    int  vector1, vector2;
@@ -5460,8 +5359,8 @@ static void Do_BinOp_lng( Node *this )
    char null1=0, null2=0;
    long rows, nelem, elem;
 
-   that1 = gParse.Nodes + this->SubNodes[0];
-   that2 = gParse.Nodes + this->SubNodes[1];
+   that1 = lParse->Nodes + this->SubNodes[0];
+   that2 = lParse->Nodes + this->SubNodes[1];
 
    vector1 = ( that1->operation!=CONST_OP );
    if( vector1 )
@@ -5492,13 +5391,17 @@ static void Do_BinOp_lng( Node *this )
       case '-':   this->value.data.lng = (val1  - val2);   break;
       case '*':   this->value.data.lng = (val1  * val2);   break;
 
+      case '&':   this->value.data.lng = (val1  & val2);   break;
+      case '|':   this->value.data.lng = (val1  | val2);   break;
+      case '^':   this->value.data.lng = (val1  ^ val2);   break;
+
       case '%':
 	 if( val2 ) this->value.data.lng = (val1 % val2);
-	 else       fferror("Divide by Zero");
+	 else       yyerror(0, lParse, "Divide by Zero");
 	 break;
       case '/': 
 	 if( val2 ) this->value.data.lng = (val1 / val2); 
-	 else       fferror("Divide by Zero");
+	 else       yyerror(0, lParse, "Divide by Zero");
 	 break;
       case POWER:
 	 this->value.data.lng = (long)pow((double)val1,(double)val2);
@@ -5515,13 +5418,13 @@ static void Do_BinOp_lng( Node *this )
    } else if ((this->operation == ACCUM) || (this->operation == DIFF)) {
       long i, previous, curr;
       long undef;
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
       
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
       
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 	previous = that2->value.data.lng;
 	undef    = (long) that2->value.undef;
 	
@@ -5561,14 +5464,14 @@ static void Do_BinOp_lng( Node *this )
       
    } else {
 
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
-      while( rows-- && !gParse.status ) {
-	 while( nelem-- && !gParse.status ) {
+      while( rows-- && !lParse->status ) {
+	 while( nelem-- && !lParse->status ) {
 	    elem--;
 
 	    if( vector1>1 ) {
@@ -5601,6 +5504,10 @@ static void Do_BinOp_lng( Node *this )
 	    case '-':  this->value.data.lngptr[elem] = (val1  - val2);   break;
 	    case '*':  this->value.data.lngptr[elem] = (val1  * val2);   break;
 
+	    case '&':  this->value.data.lngptr[elem] = (val1  & val2);   break;
+	    case '|':  this->value.data.lngptr[elem] = (val1  | val2);   break;
+	    case '^':  this->value.data.lngptr[elem] = (val1  ^ val2);   break;
+
 	    case '%':   
 	       if( val2 ) this->value.data.lngptr[elem] = (val1 % val2);
 	       else {
@@ -5632,7 +5539,7 @@ static void Do_BinOp_lng( Node *this )
    }
 }
 
-static void Do_BinOp_dbl( Node *this )
+static void Do_BinOp_dbl( ParseData *lParse, Node *this )
 {
    Node   *that1, *that2;
    int    vector1, vector2;
@@ -5640,8 +5547,8 @@ static void Do_BinOp_dbl( Node *this )
    char   null1=0, null2=0;
    long   rows, nelem, elem;
 
-   that1 = gParse.Nodes + this->SubNodes[0];
-   that2 = gParse.Nodes + this->SubNodes[1];
+   that1 = lParse->Nodes + this->SubNodes[0];
+   that2 = lParse->Nodes + this->SubNodes[1];
 
    vector1 = ( that1->operation!=CONST_OP );
    if( vector1 )
@@ -5674,11 +5581,11 @@ static void Do_BinOp_dbl( Node *this )
 
       case '%':
 	 if( val2 ) this->value.data.dbl = val1 - val2*((int)(val1/val2));
-	 else       fferror("Divide by Zero");
+	 else       yyerror(0, lParse, "Divide by Zero");
 	 break;
       case '/': 
 	 if( val2 ) this->value.data.dbl = (val1 / val2); 
-	 else       fferror("Divide by Zero");
+	 else       yyerror(0, lParse, "Divide by Zero");
 	 break;
       case POWER:
 	 this->value.data.dbl = (double)pow(val1,val2);
@@ -5696,13 +5603,13 @@ static void Do_BinOp_dbl( Node *this )
       long i;
       long undef;
       double previous, curr;
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
       
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
       
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 	previous = that2->value.data.dbl;
 	undef    = (long) that2->value.undef;
 	
@@ -5742,14 +5649,14 @@ static void Do_BinOp_dbl( Node *this )
       
    } else {
 
-      rows  = gParse.nRows;
+      rows  = lParse->nRows;
       nelem = this->value.nelem;
       elem  = this->value.nelem * rows;
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
-      while( rows-- && !gParse.status ) {
-	 while( nelem-- && !gParse.status ) {
+      while( rows-- && !lParse->status ) {
+	 while( nelem-- && !lParse->status ) {
 	    elem--;
 
 	    if( vector1>1 ) {
@@ -6003,7 +5910,7 @@ double angsep_calc(double ra1, double dec1, double ra2, double dec2)
   return 2.0*atan2(sqrt(a), sqrt(1.0 - a)) / deg;
 }
 
-static void Do_Func( Node *this )
+static void Do_Func( ParseData *lParse, Node *this )
 {
    Node *theParams[MAXSUBS];
    int  vector[MAXSUBS], allConst;
@@ -6017,7 +5924,7 @@ static void Do_Func( Node *this )
    i = this->nSubNodes;
    allConst = 1;
    while( i-- ) {
-      theParams[i] = gParse.Nodes + this->SubNodes[i];
+      theParams[i] = lParse->Nodes + this->SubNodes[i];
       vector[i]   = ( theParams[i]->operation!=CONST_OP );
       if( vector[i] ) {
 	 allConst = 0;
@@ -6110,6 +6017,12 @@ static void Do_Func( Node *this )
             else if( this->type==STRING )
 	       strcpy(this->value.data.str,pVals[0].data.str);
 	    break;
+        case setnull_fct: /* Only defined for numeric expressions */
+            if( this->type==LONG )
+ 	      this->value.data.lng = pVals[0].data.lng;
+            else if( this->type==DOUBLE )
+	       this->value.data.dbl = pVals[0].data.dbl;
+	    break;
 
 	    /* Math functions with 1 double argument */
 
@@ -6125,14 +6038,14 @@ static void Do_Func( Node *this )
 	 case asin_fct:
 	    dval = pVals[0].data.dbl;
 	    if( dval<-1.0 || dval>1.0 )
-	       fferror("Out of range argument to arcsin");
+	       yyerror(0, lParse, "Out of range argument to arcsin");
 	    else
 	       this->value.data.dbl = asin( dval );
 	    break;
 	 case acos_fct:
 	    dval = pVals[0].data.dbl;
 	    if( dval<-1.0 || dval>1.0 )
-	       fferror("Out of range argument to arccos");
+	       yyerror(0, lParse, "Out of range argument to arccos");
 	    else
 	       this->value.data.dbl = acos( dval );
 	    break;
@@ -6154,21 +6067,21 @@ static void Do_Func( Node *this )
 	 case log_fct:
 	    dval = pVals[0].data.dbl;
 	    if( dval<=0.0 )
-	       fferror("Out of range argument to log");
+	       yyerror(0, lParse, "Out of range argument to log");
 	    else
 	       this->value.data.dbl = log( dval );
 	    break;
 	 case log10_fct:
 	    dval = pVals[0].data.dbl;
 	    if( dval<=0.0 )
-	       fferror("Out of range argument to log10");
+	       yyerror(0, lParse, "Out of range argument to log10");
 	    else
 	       this->value.data.dbl = log10( dval );
 	    break;
 	 case sqrt_fct:
 	    dval = pVals[0].data.dbl;
 	    if( dval<0.0 )
-	       fferror("Out of range argument to sqrt");
+	       yyerror(0, lParse, "Out of range argument to sqrt");
 	    else
 	       this->value.data.dbl = sqrt( dval );
 	    break;
@@ -6283,7 +6196,8 @@ static void Do_Func( Node *this )
 
 	    /* String functions */
          case strmid_fct:
-	   cstrmid(this->value.data.str, this->value.nelem, 
+	   cstrmid(lParse, 
+		   this->value.data.str, this->value.nelem, 
 		   pVals[0].data.str,    pVals[0].nelem,
 		   pVals[1].data.lng);
 	   break;
@@ -6303,19 +6217,19 @@ static void Do_Func( Node *this )
 
    } else {
 
-      Allocate_Ptrs( this );
+     Allocate_Ptrs( lParse, this );
 
-      row  = gParse.nRows;
+      row  = lParse->nRows;
       elem = row * this->value.nelem;
 
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 	 switch( this->operation ) {
 
 	    /* Special functions with no arguments */
 
 	 case row_fct:
 	    while( row-- ) {
-	       this->value.data.lngptr[row] = gParse.firstRow + row;
+	       this->value.data.lngptr[row] = lParse->firstRow + row;
 	       this->value.undef[row] = 0;
 	    }
 	    break;
@@ -6332,6 +6246,49 @@ static void Do_Func( Node *this )
                }
             }
 	    break;
+	 case axiselem_fct:
+	   {
+	     long ielem;
+	     long iaxis[MAXDIMS] = {1, 1, 1, 1, 1};
+	     long ipos = pVals[1].data.lng - 1; /* This should be a constant long value */
+	     int naxis = this->value.naxis;
+	     int j;
+	     if (ipos < 0 || ipos >= MAXDIMS) {
+	         yyerror(0, lParse, "AXISELEM(V,n) n value exceeded maximum dimension");
+		 free( this->value.data.ptr );
+		 break;
+	     }
+
+	     for (ielem = 0; ielem<elem; ielem++) {
+	       this->value.data.lngptr[ielem] = iaxis[ipos];
+	       this->value.undef[ielem] = 0;
+	       iaxis[0]++;
+	       for (j = 0; j < naxis; j++) {
+		 if (iaxis[j] > this->value.naxes[j]) { 
+		   iaxis[j] = 1; 
+		   if (j < (naxis-1)) iaxis[j+1]++;
+		 } else {
+		   break;
+		 }
+	       }
+
+	     }
+	   }
+	   break;
+	 case elemnum_fct:
+	   {
+	     long ielem;
+	     long elemnum = 1;
+	     int j;
+
+	     for (ielem = 0; ielem<elem; ielem++) {
+	       this->value.data.lngptr[ielem] = elemnum;
+	       this->value.undef[ielem] = 0;
+	       elemnum ++;
+	       if (elemnum > this->value.nelem) elemnum = 1;
+	     }
+	   }
+	   break;
 	 case rnd_fct:
 	   while( elem-- ) {
 	     this->value.data.dblptr[elem] = simplerng_getuniform();
@@ -6590,7 +6547,7 @@ static void Do_Func( Node *this )
 	       /* Allocate temporary storage for this row, since the
                   quickselect function will scramble the contents */
 	       if (mptr == 0) {
-		 fferror("Could not allocate temporary memory in median function");
+		 yyerror(0, lParse, "Could not allocate temporary memory in median function");
 		 free( this->value.data.ptr );
 		 break;
 	       }
@@ -6629,7 +6586,7 @@ static void Do_Func( Node *this )
 	       /* Allocate temporary storage for this row, since the
                   quickselect function will scramble the contents */
 	       if (mptr == 0) {
-		 fferror("Could not allocate temporary memory in median function");
+		 yyerror(0, lParse, "Could not allocate temporary memory in median function");
 		 free( this->value.data.ptr );
 		 break;
 	       }
@@ -6791,6 +6748,34 @@ static void Do_Func( Node *this )
 		     strcpy(this->value.data.strptr[row],pVals[0].data.str);
 		  }
 	       }
+	    }
+	    break;
+         case setnull_fct:
+	    switch( this->type ) {
+	    case LONG:
+	      while( elem-- ) {
+		if ( theParams[1]->value.data.lng == 
+		     theParams[0]->value.data.lngptr[elem] ) {
+		  this->value.data.lngptr[elem] = 0;
+		  this->value.undef[elem] = 1;
+		} else {
+		  this->value.data.lngptr[elem] = theParams[0]->value.data.lngptr[elem];
+		  this->value.undef[elem] = theParams[0]->value.undef[elem];
+		}
+	      }
+	      break;
+	    case DOUBLE:
+	      while( elem-- ) {
+		if ( theParams[1]->value.data.dbl == 
+		     theParams[0]->value.data.dblptr[elem] ) {
+		  this->value.data.dblptr[elem] = 0;
+		  this->value.undef[elem] = 1;
+		} else {
+		  this->value.data.dblptr[elem] = theParams[0]->value.data.dblptr[elem];
+		  this->value.undef[elem] = theParams[0]->value.undef[elem];
+		}
+	      }
+	      break;
 	    }
 	    break;
 
@@ -7519,7 +7504,8 @@ static void Do_Func( Node *this )
 		  this->value.data.strptr[row][0] = '\0';
 		  if (pos == 0) undef = 1;
 		  if (! undef ) {
-		    if (cstrmid(this->value.data.strptr[row], len,
+		    if (cstrmid(lParse,
+				this->value.data.strptr[row], len,
 				str, src_len, pos) < 0) break;
 		  }
 		  this->value.undef[row] = undef;
@@ -7566,7 +7552,7 @@ static void Do_Func( Node *this )
 
 		    
 	 } /* End switch(this->operation) */
-      } /* End if (!gParse.status) */
+      } /* End if (!lParse->status) */
    } /* End non-constant operations */
 
    i = this->nSubNodes;
@@ -7578,7 +7564,7 @@ static void Do_Func( Node *this )
    }
 }
 
-static void Do_Deref( Node *this )
+static void Do_Deref( ParseData *lParse, Node *this )
 {
    Node *theVar, *theDims[MAXDIMS];
    int  isConst[MAXDIMS], allConst;
@@ -7586,12 +7572,12 @@ static void Do_Deref( Node *this )
    int  i, nDims;
    long row, elem, dsize;
 
-   theVar = gParse.Nodes + this->SubNodes[0];
+   theVar = lParse->Nodes + this->SubNodes[0];
 
    i = nDims = this->nSubNodes-1;
    allConst = 1;
    while( i-- ) {
-      theDims[i] = gParse.Nodes + this->SubNodes[i+1];
+      theDims[i] = lParse->Nodes + this->SubNodes[i+1];
       isConst[i] = ( theDims[i]->operation==CONST_OP );
       if( isConst[i] )
 	 dimVals[i] = theDims[i]->value.data.lng;
@@ -7608,9 +7594,9 @@ static void Do_Deref( Node *this )
    } else
       dsize = 0;
 
-   Allocate_Ptrs( this );
+   Allocate_Ptrs( lParse, this );
 
-   if( !gParse.status ) {
+   if( !lParse->status ) {
 
       if( allConst && theVar->value.naxis==nDims ) {
 
@@ -7623,7 +7609,7 @@ static void Do_Deref( Node *this )
 	    elem = theVar->value.naxes[i]*elem + dimVals[i]-1;
 	 }
 	 if( i<0 ) {
-	    for( row=0; row<gParse.nRows; row++ ) {
+	    for( row=0; row<lParse->nRows; row++ ) {
 	       if( this->type==STRING )
 		 this->value.undef[row] = theVar->value.undef[row];
 	       else if( this->type==BITSTR ) 
@@ -7652,7 +7638,7 @@ static void Do_Deref( Node *this )
 	       elem += theVar->value.nelem;
 	    }
 	 } else {
-	    fferror("Index out of range");
+	    yyerror(0, lParse, "Index out of range");
 	    free( this->value.data.ptr );
 	 }
 	 
@@ -7662,11 +7648,11 @@ static void Do_Deref( Node *this )
 	 
 	 if( dimVals[0] < 1 ||
 	     dimVals[0] > theVar->value.naxes[ theVar->value.naxis-1 ] ) {
-	    fferror("Index out of range");
+	    yyerror(0, lParse, "Index out of range");
 	    free( this->value.data.ptr );
 	 } else if ( this->type == BITSTR || this->type == STRING ) {
 	    elem = this->value.nelem * (dimVals[0]-1);
-	    for( row=0; row<gParse.nRows; row++ ) {
+	    for( row=0; row<lParse->nRows; row++ ) {
 	      if (this->value.undef) 
 		this->value.undef[row] = theVar->value.undef[row];
 	      memcpy( (char*)this->value.data.strptr[0]
@@ -7679,7 +7665,7 @@ static void Do_Deref( Node *this )
 	    }	       
 	 } else {
 	    elem = this->value.nelem * (dimVals[0]-1);
-	    for( row=0; row<gParse.nRows; row++ ) {
+	    for( row=0; row<lParse->nRows; row++ ) {
 	       memcpy( this->value.undef + row*this->value.nelem,
 		       theVar->value.undef + elem,
 		       this->value.nelem * sizeof(char) );
@@ -7695,19 +7681,19 @@ static void Do_Deref( Node *this )
 
 	 /* Dereference completely using an expression for the indices */
 
-	 for( row=0; row<gParse.nRows; row++ ) {
+	 for( row=0; row<lParse->nRows; row++ ) {
 
 	    for( i=0; i<nDims; i++ ) {
 	       if( !isConst[i] ) {
 		  if( theDims[i]->value.undef[row] ) {
-		     fferror("Null encountered as vector index");
+		     yyerror(0, lParse, "Null encountered as vector index");
 		     free( this->value.data.ptr );
 		     break;
 		  } else
 		     dimVals[i] = theDims[i]->value.data.lngptr[row];
 	       }
 	    }
-	    if( gParse.status ) break;
+	    if( lParse->status ) break;
 
 	    elem = 0;
 	    i    = nDims;
@@ -7744,7 +7730,7 @@ static void Do_Deref( Node *this )
 		  this->value.data.strptr[row][1] = 0;  /* Null terminate */
 	       }
 	    } else {
-	       fferror("Index out of range");
+	       yyerror(0, lParse, "Index out of range");
 	       free( this->value.data.ptr );
 	    }
 	 }
@@ -7753,12 +7739,12 @@ static void Do_Deref( Node *this )
 
 	 /* Reduce dimensions by 1, using a nonconstant expression */
 
-	 for( row=0; row<gParse.nRows; row++ ) {
+	 for( row=0; row<lParse->nRows; row++ ) {
 
 	    /* Index cannot be a constant */
 
 	    if( theDims[0]->value.undef[row] ) {
-	       fferror("Null encountered as vector index");
+	       yyerror(0, lParse, "Null encountered as vector index");
 	       free( this->value.data.ptr );
 	       break;
 	    } else
@@ -7766,7 +7752,7 @@ static void Do_Deref( Node *this )
 
 	    if( dimVals[0] < 1 ||
 		dimVals[0] > theVar->value.naxes[ theVar->value.naxis-1 ] ) {
-	       fferror("Index out of range");
+	       yyerror(0, lParse, "Index out of range");
 	       free( this->value.data.ptr );
 	    } else if ( this->type == BITSTR || this->type == STRING ) {
 	      elem = this->value.nelem * (dimVals[0]-1);
@@ -7806,15 +7792,16 @@ static void Do_Deref( Node *this )
       }
 }
 
-static void Do_GTI( Node *this )
+static void Do_GTI( ParseData *lParse, Node *this )
 {
    Node *theExpr, *theTimes;
    double *start, *stop, *times;
    long elem, nGTI, gti;
    int ordered;
+   int dorow = (this->operation == gtifind_fct);
 
-   theTimes = gParse.Nodes + this->SubNodes[0];
-   theExpr  = gParse.Nodes + this->SubNodes[1];
+   theTimes = lParse->Nodes + this->SubNodes[0];
+   theExpr  = lParse->Nodes + this->SubNodes[1];
 
    nGTI    = theTimes->value.nelem;
    start   = theTimes->value.data.dblptr;
@@ -7822,19 +7809,22 @@ static void Do_GTI( Node *this )
    ordered = theTimes->type;
 
    if( theExpr->operation==CONST_OP ) {
-
-      this->value.data.log = 
-	 (Search_GTI( theExpr->value.data.dbl, nGTI, start, stop, ordered )>=0);
+      gti = Search_GTI( theExpr->value.data.dbl, nGTI, start, stop, ordered, 0 );
+      if (dorow) {
+	this->value.data.lng = (gti >= 0) ? (gti+1) : -1;
+      } else {
+	this->value.data.log = (gti>=0);
+      }
       this->operation      = CONST_OP;
 
    } else {
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
       times = theExpr->value.data.dblptr;
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 
-	 elem = gParse.nRows * this->value.nelem;
+	 elem = lParse->nRows * this->value.nelem;
 	 if( nGTI ) {
 	    gti = -1;
 	    while( elem-- ) {
@@ -7843,15 +7833,29 @@ static void Do_GTI( Node *this )
 
             /*  Before searching entire GTI, check the GTI found last time  */
 	       if( gti<0 || times[elem]<start[gti] || times[elem]>stop[gti] ) {
-		  gti = Search_GTI( times[elem], nGTI, start, stop, ordered );
+		 gti = Search_GTI( times[elem], nGTI, start, stop, ordered, 0 );
 	       }
-	       this->value.data.logptr[elem] = ( gti>=0 );
+	       if (dorow) {
+		 this->value.data.lngptr[elem] = ( gti >= 0 ) ? (gti + 1) : (-1);
+		 this->value.undef[elem]  = ( gti >= 0 ) ? 0 : 1;
+	       } else {
+		 this->value.data.logptr[elem] = ( gti>=0 );
+	       }
 	    }
-	 } else
-	    while( elem-- ) {
+	 } else { /* nGTI == 0 */
+
+	   if (dorow) { /* no good times so all values are undef */
+	     while( elem-- ) {
+	       this->value.undef[elem]       = 1;
+	     }
+	   } else {    /* no good times so all logicals are 0 */
+	     while( elem-- ) {
 	       this->value.data.logptr[elem] = 0;
 	       this->value.undef[elem]       = 0;
-	    }
+	     }
+	   }
+	   
+	 }
       }
    }
 
@@ -7859,10 +7863,158 @@ static void Do_GTI( Node *this )
       free( theExpr->value.data.ptr );
 }
 
-static long Search_GTI( double evtTime, long nGTI, double *start,
-			double *stop, int ordered )
+static void Do_GTI_Over( ParseData *lParse, Node *this )
 {
-   long gti, step;
+   Node *theTimes, *theStart, *theStop;
+   double *gtiStart, *gtiStop;
+   double *evtStart, *evtStop;
+   long elem, nGTI, gti, nextGTI;
+   int ordered;
+
+   theTimes = lParse->Nodes + this->SubNodes[0]; /* GTI times */
+   theStop  = lParse->Nodes + this->SubNodes[2]; /* User start time */
+   theStart = lParse->Nodes + this->SubNodes[1]; /* User stop time */
+
+   nGTI     = theTimes->value.nelem;
+   gtiStart = theTimes->value.data.dblptr;        /* GTI start */
+   gtiStop  = theTimes->value.data.dblptr + nGTI; /* GTI stop */
+
+   if( theStart->operation==CONST_OP && theStop->operation==CONST_OP) {
+
+      this->value.data.dbl = 
+	(GTI_Over( theStart->value.data.dbl, theStop->value.data.dbl,
+		   nGTI, gtiStart, gtiStop, &gti));
+      this->operation      = CONST_OP;
+
+   } else {
+      char undefStart = 0, undefStop = 0; /* Input values are undef? */
+      double uStart, uStop;       /* User start/stop values */
+      if (theStart->operation==CONST_OP) uStart = theStart->value.data.dbl;
+      if (theStop ->operation==CONST_OP) uStop  = theStop ->value.data.dbl;
+
+      Allocate_Ptrs( lParse, this );
+
+      evtStart = theStart->value.data.dblptr;
+      evtStop  = theStop ->value.data.dblptr;
+      if( !lParse->status ) {
+
+	 elem = lParse->nRows * this->value.nelem;
+	 if( nGTI ) {
+	    double toverlap = 0.0;
+	    gti = -1;
+	    while( elem-- ) {
+	      if (theStart->operation!=CONST_OP) {
+		undefStart = theStart->value.undef[elem];
+		uStart     = evtStart[elem];
+	      }
+	      if (theStop->operation!=CONST_OP) {
+		undefStop  = theStop ->value.undef[elem];
+		uStop      = evtStop[elem];
+	      }
+	      /* This works because at least one of the values is not const */
+	      if( (this->value.undef[elem] = (undefStart||undefStop)) )
+		  continue;
+
+            /*  Before searching entire GTI, check the GTI found last time  */
+	       if( gti<0 || 
+		   uStart<gtiStart[gti] || uStart>gtiStop[gti] ||
+		   uStop <gtiStart[gti] || uStop >gtiStop[gti]) {
+		 /* Nope, need to recalculate */
+		 toverlap = GTI_Over(uStart, uStop, 
+				     nGTI, gtiStart, gtiStop, 
+				     &gti);
+	       } else {
+		 /* We are in same GTI, the overlap is just stop-start of user range */
+		 toverlap = (uStop-uStart);
+	       }
+
+	       /* This works because at least one of the values is not const */
+	       this->value.data.dblptr[elem] = toverlap;
+	    }
+	 } else
+	    /* nGTI == 0; there is no overlap so set all values to 0.0 */
+	    while( elem-- ) {
+	       this->value.data.dblptr[elem] = 0.0;
+	       this->value.undef[elem]       = 0;
+	    }
+      }
+   }
+
+   if( theStart->operation>0 ) {
+     free( theStart->value.data.ptr );
+   }
+   if( theStop->operation>0 ) {
+     free( theStop->value.data.ptr );
+   }
+}
+
+static double GTI_Over(double evtStart, double evtStop,
+		       long nGTI, double *start, double *stop,
+		       long *gtiout)
+{
+  long gti1, gti2, nextGTI1, nextGTI2;
+  long gti, nMax;
+  double overlap = 0.0;
+
+  *gtiout = -1L;
+  /* Zero or negative bin size */
+  if (evtStop <= evtStart) return 0.0;
+
+  /* Locate adjacent GTIs for evtStart and evtStop */
+  gti1 = Search_GTI(evtStart, nGTI, start, stop, 1, &nextGTI1);
+  gti2 = Search_GTI(evtStop,  nGTI, start, stop, 1, &nextGTI2);
+
+  /* evtStart is in gti1, we return that for future processing */
+  if (gti1 >= 0) *gtiout = gti1;
+
+  /* Both evtStart/evtStop are beyond the last GTI */
+  if (nextGTI1 < 0 && nextGTI2 < 0) return 0.0;
+
+  /* Both evtStart/evtStop are in the same gap between GTIs */
+  if (gti1 < 0 && gti2 < 0 && nextGTI1 == nextGTI2) return 0.0;
+
+  /* Both evtStart/evtStop are in the same GTI */
+  if (gti1 >= 0 && gti1 == gti2) return (evtStop-evtStart);
+
+  /* Count through the remaining GTIs; there will be at least one */
+  /* The largest GTI to consider is either nextGTI2-1, if it exists,
+     or nGTI-1 */
+  if (nextGTI2 < 0) nMax = nGTI-1;
+  else if (gti2 >= 0) nMax = nextGTI2;
+  else nMax = nextGTI2-1;
+  for (gti = nextGTI1; gti <= nMax; gti++) {
+    double starti = start[gti], stopi = stop[gti];
+    /* Trim the GTI by actual evtStart/Stop times */
+    if (evtStart > starti) starti = evtStart;
+    if (evtStop  < stopi ) stopi  = evtStop;
+    overlap += (stopi - starti);
+  }
+    
+  return overlap;
+}
+
+/*
+ * Search_GTI - search GTI for requested evtTime
+ * 
+ * double evtTime - requested event time
+ * long nGTI - number of entries in start[] and stop[]
+ * double start[], stop[] - start and stop of each GTI
+ * int ordered - set to 1 if time-ordered
+ * long *nextGTI0 - upon return, *nextGTI0 is either
+ *                   the GTI evtTime is inside
+ *                   the next GTI if evtTime is not inside
+ *                   -1L if there is no next GTI
+ *                   not set if nextGTI0 is a null pointer
+ *
+ * NOTE: for *nextGTI to be well-defined, the GTI must
+ *   be ordered.  This is true when called by Do_GTI.
+ *
+ * RETURNS: gti index that evtTime is located inside, or -1L
+ */
+static long Search_GTI( double evtTime, long nGTI, double *start,
+			double *stop, int ordered, long *nextGTI0 )
+{
+   long gti, nextGTI = -1L, step;
                              
    if( ordered && nGTI>15 ) { /*  If time-ordered and lots of GTIs,   */
                               /*  use "FAST" Binary search algorithm  */
@@ -7875,6 +8027,7 @@ static long Search_GTI( double evtTime, long nGTI, double *start,
 	       if( evtTime>=start[gti+1] )
 		  gti += step;
 	       else {
+		  nextGTI = gti+1;
 		  gti = -1L;
 		  break;
 	       }
@@ -7882,26 +8035,39 @@ static long Search_GTI( double evtTime, long nGTI, double *start,
 	       if( evtTime<=stop[gti-1] )
 		  gti -= step;
 	       else {
+		  nextGTI = gti;
 		  gti = -1L;
 		  break;
 	       }
 	    } else {
+	       nextGTI = gti;
 	       break;
 	    }
 	 }
-      } else
+      } else {
+	 if (start[0] > evtTime) nextGTI = 0;
 	 gti = -1L;
+      }
       
-   } else { /*  Use "SLOW" linear search  */
+   } else { /*  Use "SLOW" linear search.  Not required to be 
+	        ordered, so we have to search the whole table
+		no matter what.
+	    */
       gti = nGTI;
-      while( gti-- )
-	 if( evtTime>=start[gti] && evtTime<=stop[gti] )
+      while( gti-- ) {
+	if( stop[gti] >= evtTime ) nextGTI = gti;
+	if( evtTime>=start[gti] && evtTime<=stop[gti] )
 	    break;
+      }
    }
+
+   if (nextGTI >= nGTI) nextGTI = -1;
+   if (nextGTI0) *nextGTI0 = nextGTI;
+
    return( gti );
 }
 
-static void Do_REG( Node *this )
+static void Do_REG( ParseData *lParse, Node *this )
 {
    Node *theRegion, *theX, *theY;
    double Xval=0.0, Yval=0.0;
@@ -7909,9 +8075,9 @@ static void Do_REG( Node *this )
    int    Xvector, Yvector;
    long   nelem, elem, rows;
 
-   theRegion = gParse.Nodes + this->SubNodes[0];
-   theX      = gParse.Nodes + this->SubNodes[1];
-   theY      = gParse.Nodes + this->SubNodes[2];
+   theRegion = lParse->Nodes + this->SubNodes[0];
+   theX      = lParse->Nodes + this->SubNodes[1];
+   theY      = lParse->Nodes + this->SubNodes[2];
 
    Xvector = ( theX->operation!=CONST_OP );
    if( Xvector )
@@ -7936,11 +8102,11 @@ static void Do_REG( Node *this )
 
    } else {
 
-      Allocate_Ptrs( this );
+      Allocate_Ptrs( lParse, this );
 
-      if( !gParse.status ) {
+      if( !lParse->status ) {
 
-	 rows  = gParse.nRows;
+	 rows  = lParse->nRows;
 	 nelem = this->value.nelem;
 	 elem  = rows*nelem;
 
@@ -7984,23 +8150,23 @@ static void Do_REG( Node *this )
       free( theY->value.data.ptr );
 }
 
-static void Do_Vector( Node *this )
+static void Do_Vector( ParseData *lParse, Node *this )
 {
    Node *that;
    long row, elem, idx, jdx, offset=0;
    int node;
 
-   Allocate_Ptrs( this );
+   Allocate_Ptrs( lParse, this );
 
-   if( !gParse.status ) {
+   if( !lParse->status ) {
 
       for( node=0; node<this->nSubNodes; node++ ) {
 
-	 that = gParse.Nodes + this->SubNodes[node];
+	 that = lParse->Nodes + this->SubNodes[node];
 
 	 if( that->operation == CONST_OP ) {
 
-	    idx = gParse.nRows*this->value.nelem + offset;
+	    idx = lParse->nRows*this->value.nelem + offset;
 	    while( (idx-=this->value.nelem)>=0 ) {
 	       
 	       this->value.undef[idx] = 0;
@@ -8020,7 +8186,7 @@ static void Do_Vector( Node *this )
 	    
 	 } else {
 	       
-	    row  = gParse.nRows;
+	    row  = lParse->nRows;
 	    idx  = row * that->value.nelem;
 	    while( row-- ) {
 	       elem = that->value.nelem;
@@ -8053,7 +8219,73 @@ static void Do_Vector( Node *this )
 
    for( node=0; node < this->nSubNodes; node++ )
      if( OPER(this->SubNodes[node])>0 )
-       free( gParse.Nodes[this->SubNodes[node]].value.data.ptr );
+       free( lParse->Nodes[this->SubNodes[node]].value.data.ptr );
+}
+
+static void Do_Array( ParseData *lParse, Node *this )
+{
+   Node *that;
+   long row, elem, idx, jdx, offset=0;
+   int node;
+
+   Allocate_Ptrs( lParse, this );
+
+   if( !lParse->status ) {
+
+     /* This is the item to be replicated */
+     that = lParse->Nodes + this->SubNodes[0];
+
+     if( that->operation == CONST_OP ) {
+
+       idx = lParse->nRows*this->value.nelem + offset;
+       while( (idx--)>=0 ) {
+	       
+	 this->value.undef[idx] = 0;
+
+	 switch( this->type ) {
+	 case BOOLEAN:
+	   this->value.data.logptr[idx] = that->value.data.log;
+	   break;
+	 case LONG:
+	   this->value.data.lngptr[idx] = that->value.data.lng;
+	   break;
+	 case DOUBLE:
+	   this->value.data.dblptr[idx] = that->value.data.dbl;
+	   break;
+	 }
+       }
+       
+     } else {
+       
+       row  = lParse->nRows;
+       idx  = row * this->value.nelem - 1;
+       while( row-- ) {
+	 elem = this->value.nelem;
+	 while( elem-- ) {
+	   this->value.undef[idx] = that->value.undef[row];
+
+	   switch( this->type ) {
+	   case BOOLEAN:
+	     this->value.data.logptr[idx] = that->value.data.logptr[row];
+	     break;
+	   case LONG:
+	     this->value.data.lngptr[idx] = that->value.data.lngptr[row];
+	     break;
+	   case DOUBLE:
+	     this->value.data.dblptr[idx] = that->value.data.dblptr[row];
+	     break;
+	   }
+	   idx--;
+	 }
+       }
+
+     } /* not constant */
+
+     if( OPER(this->SubNodes[0])>0 )
+       free( lParse->Nodes[this->SubNodes[0]].value.data.ptr );
+
+   }
+
 }
 
 /*****************************************************************************/
@@ -8330,7 +8562,7 @@ static char ellipse(double xcen, double ycen, double xrad, double yrad,
 /*
  * Extract substring
  */
-int cstrmid(char *dest_str, int dest_len,
+ int cstrmid(ParseData *lParse, char *dest_str, int dest_len,
 	    char *src_str,  int src_len,
 	    int pos)
 {
@@ -8340,7 +8572,7 @@ int cstrmid(char *dest_str, int dest_len,
 
   /* Fill destination with blanks */
   if (pos < 0) { 
-    fferror("STRMID(S,P,N) P must be 0 or greater");
+    yyerror(0, lParse, "STRMID(S,P,N) P must be 0 or greater");
     return -1;
   }
   if (pos > src_len || pos == 0) {
@@ -8363,14 +8595,13 @@ int cstrmid(char *dest_str, int dest_len,
 }
 
 
-static void fferror(char *s)
+static void yyerror(yyscan_t scanner, ParseData *lParse, char *s)
 {
     char msg[80];
 
-    if( !gParse.status ) gParse.status = PARSE_SYNTAX_ERR;
+    if( !lParse->status ) lParse->status = PARSE_SYNTAX_ERR;
 
     strncpy(msg, s, 80);
     msg[79] = '\0';
     ffpmsg(msg);
 }
-

@@ -34,10 +34,13 @@ SERVICES PROVIDED HEREUNDER."
 #ifndef _FITSIO_H
 #define _FITSIO_H
 
-#define CFITSIO_VERSION 3.45
-#define CFITSIO_MINOR 45
-#define CFITSIO_MAJOR 3
-#define CFITSIO_SONAME 7
+#define CFITSIO_VERSION 4.2.0
+/* Minor and micro numbers must not exceed 99 under current method
+   of version representataion in ffvers(). */
+#define CFITSIO_MICRO 0
+#define CFITSIO_MINOR 2
+#define CFITSIO_MAJOR 4
+#define CFITSIO_SONAME 10
 
 /* the SONAME is incremented in a new release if the binary shared */
 /* library (on linux and Mac systems) is not backward compatible */
@@ -361,6 +364,7 @@ typedef struct      /* structure used to store basic FITS file information */
     char *filename;   /* file name */
     int validcode;    /* magic value used to verify that structure is valid */
     int only_one;     /* flag meaning only copy the specified extension */
+    int noextsyntax;  /* flag for file opened with request to ignore extended syntax*/
     LONGLONG filesize; /* current size of the physical disk file in bytes */
     LONGLONG logfilesize; /* logical size of file, including unflushed buffers */
     int lasthdu;      /* is this the last HDU in the file? 0 = no, else yes */
@@ -479,6 +483,7 @@ typedef struct  /* structure for the iterator function column information */
 #define InputCol         0  /* flag for input only iterator column       */
 #define InputOutputCol   1  /* flag for input and output iterator column */
 #define OutputCol        2  /* flag for output only iterator column      */
+#define TemporaryCol     3  /* flag for temporary iterator column INTERNAL */
 
 /*=============================================================================
 *
@@ -574,6 +579,7 @@ int CFITS_API fits_read_wcstab(fitsfile *fptr, int nwtb, wtbarr *wtb, int *statu
 #define BAD_FILEPTR       114  /* invalid fitsfile pointer */
 #define NULL_INPUT_PTR    115  /* NULL input pointer to routine */
 #define SEEK_ERROR        116  /* error seeking position in file */
+#define BAD_NETTIMEOUT    117  /* bad value for file download timeout setting */
 
 #define BAD_URL_PREFIX    121  /* invalid URL prefix on file name */
 #define TOO_MANY_DRIVERS  122  /* tried to register too many IO drivers */
@@ -1435,6 +1441,8 @@ int CFITS_API ffggpd(fitsfile *fptr, long group, long firstelem, long nelem,
 int CFITS_API ffgcv( fitsfile *fptr, int datatype, int colnum, LONGLONG firstrow,
            LONGLONG firstelem, LONGLONG nelem, void *nulval, void *array, int *anynul,
            int  *status);
+int CFITS_API ffgcvn (fitsfile *fptr, int ncols, int *datatype, int *colnum, LONGLONG firstrow,
+	    LONGLONG nrows, void **nulval, void **array, int *anynul, int *status);
 int CFITS_API ffgcf( fitsfile *fptr, int datatype, int colnum, LONGLONG firstrow,
            LONGLONG firstelem, LONGLONG nelem, void *array, char *nullarray,
            int *anynul, int *status);
@@ -1744,6 +1752,8 @@ int CFITS_API ffiter(int ncols,  iteratorCol *data, long offset, long nPerLoop,
 /*--------------------- write column elements -------------*/
 int CFITS_API ffpcl(fitsfile *fptr, int datatype, int colnum, LONGLONG firstrow,
           LONGLONG firstelem, LONGLONG nelem, void *array, int *status);
+int CFITS_API ffpcln(fitsfile *fptr, int ncols, int *datatype, int *colnum, LONGLONG firstrow,
+	   LONGLONG nrows, void **array, void **nulval, int *status);
 int CFITS_API ffpcls(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
            LONGLONG nelem, char **array, int *status);
 int CFITS_API ffpcll(fitsfile *fptr, int colnum, LONGLONG firstrow, LONGLONG firstelem,
@@ -1835,6 +1845,10 @@ int CFITS_API ffcpcl(fitsfile *infptr, fitsfile *outfptr, int incol, int outcol,
 int CFITS_API ffccls(fitsfile *infptr, fitsfile *outfptr, int incol, int outcol, 
 	   int ncols, int create_col, int *status);
 int CFITS_API ffcprw(fitsfile *infptr, fitsfile *outfptr, LONGLONG firstrow, 
+           LONGLONG nrows, int *status);
+int CFITS_API ffcpsr(fitsfile *infptr, fitsfile *outfptr, LONGLONG firstrow, 
+	   LONGLONG nrows, char *row_status, int *status);
+int CFITS_API ffcpht(fitsfile *infptr, fitsfile *outfptr, LONGLONG firstrow, 
            LONGLONG nrows, int *status);
 
 /*--------------------- WCS Utilities ------------------*/
@@ -2055,6 +2069,10 @@ int CFITS_API fits_uncompress_table(fitsfile *infptr, fitsfile *outfptr, int *st
 int CFITS_API fits_init_https(void);
 int CFITS_API fits_cleanup_https(void);
 void CFITS_API fits_verbose_https(int flag);
+
+void CFITS_API ffshdwn(int flag);
+int CFITS_API ffgtmo(void);
+int CFITS_API ffstmo(int sec, int *status);
 
 /*  The following exclusion if __CINT__ is defined is needed for ROOT */
 #ifndef __CINT__
