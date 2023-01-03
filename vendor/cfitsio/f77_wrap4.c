@@ -468,8 +468,8 @@ void Cffcrep( char *comm, char *comm1, int *repeat )
    len=strlen(comm);
        /* cfortran strips trailing spaces so only check last character  */
    if( len && comm[ len-1 ]=='&' ) {
-      strncpy(comm1,comm,len-1);  /*  Don't copy '&'  */
-      comm1[len-1]='\0';
+      strcpy(comm1,comm);  
+      comm1[len-1]='\0'; /*  Erase '&'  */
       *repeat=TRUE;
    }
    return;

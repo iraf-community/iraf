@@ -9,17 +9,17 @@ https://github.com/iraf-community/iraf/releases/latest/
 
 ## System Requirements and Dependencies
 
-The distributed binaries require the readline or libedit, curl, and
-expat libraries to be installed.
+The distributed binaries require the readline or libedit, curl, expat,
+and zlib libraries to be installed.
 
 On Debian and its derivatives (Ubuntu, Mint, Devuan, Raspbian etc.):
 
-    $ sudo apt install gcc make flex
+    $ sudo apt install gcc make flex zlib1g-dev
     $ sudo apt install libcurl4-openssl-dev libexpat-dev libreadline-dev
 
 On Fedora and its derivatives (Redhat, Scientific Linux etc.)
 
-    $ sudo dnf install gcc make perl flex
+    $ sudo dnf install gcc make perl flex zlib-devel
     $ sudo dnf install libcurl-devel expat-devel readline-devel
 
 On MacOS X, you need to have the XCode tools installed. If you

@@ -53,6 +53,7 @@ void Cffgiou( int *unit, int *status )
    int i;
 
    if( *status>0 ) return;
+   FFLOCK;
    for( i=50;i<NMAXFILES;i++ ) /* Using a unit=0 sounds bad, so start at 1 */
       if( gFitsFiles[i]==NULL ) break;
    if( i==NMAXFILES ) {
@@ -64,6 +65,7 @@ void Cffgiou( int *unit, int *status )
       gFitsFiles[i] = (fitsfile *)1; /*  Flag it as taken until ftopen/init  */
                                      /*  can be called and set a real value  */
    }
+   FFUNLOCK;
 }
 FCALLSCSUB2(Cffgiou,FTGIOU,ftgiou,PINT,PINT)
 
@@ -71,12 +73,14 @@ void Cfffiou( int unit, int *status );
 void Cfffiou( int unit, int *status )
 {
    if( *status>0 ) return;
+   FFLOCK;
    if( unit == -1 ) {
       int i; for( i=50; i<NMAXFILES; ) gFitsFiles[i++]=NULL;
    } else if( unit<1 || unit>=NMAXFILES ) {
       *status = BAD_FILEPTR;
       ffpmsg("Cfffiou was sent an unacceptable unit number.");
    } else gFitsFiles[unit]=NULL;
+   FFUNLOCK;
 }
 FCALLSCSUB2(Cfffiou,FTFIOU,ftfiou,INT,PINT)
 
@@ -343,4 +347,16 @@ FCALLSCSUB5(ffbnfm,FTBNFM,ftbnfm,STRING,PINT,PLONG,PLONG,PINT)
 #define ftgabc_STRV_A2 NUM_ELEM_ARG(1)
 #define ftgabc_LONGV_A5 A1
 FCALLSCSUB6(ffgabc,FTGABC,ftgabc,INT,STRINGV,INT,PLONG,LONGV,PINT)
+
+/* File download diagnostic functions */
+FCALLSCSUB1(ffvhtps,FTVHTPS,ftvhtps,INT)
+FCALLSCSUB1(ffshdwn,FTSHDWN,ftshdwn,INT)
+void Cffgtmo(int *secs);
+void Cffgtmo(int *secs)
+{
+   *secs = ffgtmo();
+}
+FCALLSCSUB1(Cffgtmo,FTGTMO,ftgtmo,PINT)
+FCALLSCSUB2(ffstmo,FTSTMO,ftstmo,INT,PINT)
+
 

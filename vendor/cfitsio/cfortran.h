@@ -52,7 +52,29 @@
 		get rid of compiler warnings.  Thanks to ROOT developers
 		Jacek Holeczek and Rene Brun for these suggestions. (KMCCARTY)
       Dec 2008  Added typedef for LONGLONG to support Borland compiler (WDP)
+      Jan 2020  Added __attribute__((unused)) for GCC to prevent warnings (C. Markwardt)
+      Jan 2022  Changed H_CF_SPECIAL definition from 'unsigned' to 'size_t'.
+                This determines the type of the hidden length argument which
+                gets added to functions passing strings from Fortran to C.
+                This change was first required when testing Homebrew
+                compilers native to Mac/ARM Silicon. (C. Gordon)
+      Apr 2022  Made equivalent 'unsigned'/'size_t' change to STRING_cfKK(B)
+                definition.  This is required for passing strings from
+                C to Fortran.  To avoid duplication, defined an 'if' block
+                for setting new CF_STRLENTYPE variable.  H_CF_SPECIAL and
+                STRING_cfKK(B) are now set to this.
+      May 2022  Set ALL Mac/ARM platforms to 'size_t' for CF_STRLENTYPE
+                since Clang/Clang++ will not pass GNUC>7 test, yet its
+                (3rd-party) Fortran still needs this.
  *******/
+
+#ifndef __CFORTRAN__PCTYPE__UNUSED__
+#ifdef __GNUC__
+#define __CFORTRAN__PCTYPE__UNUSED__ __attribute__ ((unused))
+#else
+#define __CFORTRAN__PCTYPE__UNUSED__
+#endif
+#endif
 
 /* 
   Avoid symbols already used by compilers and system *.h:
@@ -424,6 +446,19 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 #define AcfCOMMA ,
 #define AcfCOLON ;
 
+
+/* Use CF_STRLENTYPE = size_t for all Fortran newer than GNU version 7.x.
+   Apple clang identifies itself as GNUC=4, but we want it to use size_t too.
+   Note that 2 assumptions are in play here:
+   1) Aside from clang, the C version (GNUC) also represents the version
+      of Fortran being used!
+   2) No one is pairing clang with gfortran older than v8.x anymore. */
+#if (defined(__GNUC__) && !defined(__clang__)) && __GNUC__ < 8
+#define  CF_STRLENTYPE       unsigned
+#else
+#define  CF_STRLENTYPE       size_t
+#endif
+
 /*-------------------------------------------------------------------------*/
 
 /*               UTILITIES USED WITHIN CFORTRAN.H                          */
@@ -704,11 +739,11 @@ return (int)num;
 /* This allows Pvariables for ARGS. ARGF machinery is above ARGFP.
  * B is not needed because the variable may be changed by the Fortran routine,
  * but because B is the only way to access an arbitrary macro argument.       */
-#define     PINT_cfVP(A,B) int  B = (int)A;              /* For ZSTRINGV_ARGS */
+#define     PINT_cfVP(A,B) int  B __CFORTRAN__PCTYPE__UNUSED__ = (int)A;              /* For ZSTRINGV_ARGS */
 #else
 #define     PINT_cfVP(A,B)
 #endif
-#define PLOGICAL_cfVP(A,B) int *B;      /* Returning LOGICAL in FUNn and SUBn */
+#define PLOGICAL_cfVP(A,B) int *B __CFORTRAN__PCTYPE__UNUSED__ ;      /* Returning LOGICAL in FUNn and SUBn */
 #define    PLONG_cfVP(A,B) PINT_cfVP(A,B)
 #define   PSHORT_cfVP(A,B) PINT_cfVP(A,B)
 
@@ -868,7 +903,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #endif
 #define  LOGICAL_cfKK(B) DEFAULT_cfKK(B)
 #define PLOGICAL_cfKK(B) DEFAULT_cfKK(B)
-#define   STRING_cfKK(B) , unsigned B
+#define   STRING_cfKK(B) , CF_STRLENTYPE B
 #define  PSTRING_cfKK(B) STRING_cfKK(B)
 #define  STRINGV_cfKK(B) STRING_cfKK(B)
 #define PSTRINGV_cfKK(B) STRING_cfKK(B)
@@ -1692,7 +1727,7 @@ do{VVCF(T1,A1,B1)  VVCF(T2,A2,B2)  VVCF(T3,A3,B3)  VVCF(T4,A4,B4)  VVCF(T5,A5,B5
 #define   HCF(TN,I)         _(TN,_cfSTR)(3,H,cfCOMMA, H,_(C,I),0,0)
 #define  HHCF(TN,I)         _(TN,_cfSTR)(3,H,cfCOMMA,HH,_(C,I),0,0)
 #define HHHCF(TN,I)         _(TN,_cfSTR)(3,H,cfCOLON, H,_(C,I),0,0)
-#define  H_CF_SPECIAL       unsigned
+#define  H_CF_SPECIAL       CF_STRLENTYPE
 #define HH_CF_SPECIAL
 #define  DEFAULT_cfH(M,I,A)
 #define  LOGICAL_cfH(S,U,B)
@@ -2520,6 +2555,5 @@ string. */
                    CFARGT27S(RCF,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE,TF,TG,TH,TI,TJ,TK,TL,TM,TN,TO,TP,TQ,TR)  _(T0,_cfI)}
 
 #endif
-
 
 #endif	 /* __CFORTRAN_LOADED */

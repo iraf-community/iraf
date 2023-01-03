@@ -21,8 +21,9 @@
 PACKAGE		= cfitsio
 
 # CFITSIO version numbers:
-CFITSIO_MAJOR	= @CFITSIO_MAJOR@
+CFITSIO_MAJOR   = @CFITSIO_MAJOR@
 CFITSIO_MINOR	= @CFITSIO_MINOR@
+CFITSIO_MICRO   = @CFITSIO_MICRO@
 CFITSIO_SONAME	= @CFITSIO_SONAME@
 
 prefix		= @prefix@
@@ -30,7 +31,7 @@ exec_prefix	= @exec_prefix@
 CFITSIO_BIN	= ${DESTDIR}@bindir@
 CFITSIO_LIB	= ${DESTDIR}@libdir@
 CFITSIO_INCLUDE	= ${DESTDIR}@includedir@
-INSTALL_DIRS	= @INSTALL_ROOT@ ${CFITSIO_INCLUDE} ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig
+INSTALL_DIRS	= ${DESTDIR}@INSTALL_ROOT@ ${CFITSIO_INCLUDE} ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig
 
 
 SHELL =		/bin/sh
@@ -45,6 +46,7 @@ LDFLAGS =	@LDFLAGS@
 LDFLAGS_BIN =	@LDFLAGS_BIN@
 DEFS =		@DEFS@
 LIBS =		@LIBS@
+LIBS_CURL =	@LIBS_CURL@
 FLEX =		flex
 BISON =		bison
 
@@ -67,9 +69,7 @@ CORE_SOURCES = 	buffers.c cfileio.c checksum.c drvrfile.c drvrmem.c \
 		pliocomp.c fits_hcompress.c fits_hdecompress.c \
 		simplerng.c @GSIFTP_SRC@
 
-ZLIB_SOURCES =	zlib/adler32.c zlib/crc32.c zlib/deflate.c zlib/infback.c \
-		zlib/inffast.c zlib/inflate.c zlib/inftrees.c zlib/trees.c \
-		zlib/uncompr.c zlib/zcompress.c zlib/zuncompress.c zlib/zutil.c
+ZLIB_SOURCES =	zcompress.c zuncompress.c
 
 SOURCES = ${CORE_SOURCES} ${ZLIB_SOURCES} @F77_WRAPPERS@
 
@@ -93,7 +93,7 @@ all:
 all-nofitsio:
 		${MAKE} stand_alone "FITSIO_SRC="
 
-stand_alone:	lib${PACKAGE}.a
+stand_alone:	lib${PACKAGE}.a shared
 
 lib${PACKAGE}.a:	${OBJECTS}
 		${ARCHIVE} $@ ${OBJECTS}; \
@@ -102,7 +102,7 @@ lib${PACKAGE}.a:	${OBJECTS}
 shared: lib${PACKAGE}${SHLIB_SUFFIX}
 
 lib${PACKAGE}${SHLIB_SUFFIX}: ${OBJECTS}
-		${SHLIB_LD} ${LDFLAGS} -o ${CFITSIO_SHLIB} ${OBJECTS} -lm ${LIBS}
+		${SHLIB_LD} ${LDFLAGS} -o ${CFITSIO_SHLIB} ${OBJECTS} -lm ${LIBS_CURL} ${LIBS}
 		@if [ "x${CFITSIO_SHLIB_SONAME}" != x ]; then \
 			ln -sf ${CFITSIO_SHLIB} ${CFITSIO_SHLIB_SONAME}; \
 			ln -sf ${CFITSIO_SHLIB_SONAME} $@; \
@@ -112,6 +112,8 @@ install:	lib${PACKAGE}.a ${INSTALL_DIRS}
 		@for lib in lib${PACKAGE}.a lib${PACKAGE}${SHLIB_SUFFIX} \
 				${CFITSIO_SHLIB} ${CFITSIO_SHLIB_SONAME}; do \
 		    if [ -f $$lib ]; then \
+			echo "/bin/rm -f ${CFITSIO_LIB}/$$lib"; \
+			/bin/rm -f ${CFITSIO_LIB}/$$lib; \
 			echo "/bin/cp -a $$lib ${CFITSIO_LIB}"; \
 			/bin/cp -a $$lib ${CFITSIO_LIB}; \
 		    fi; \
@@ -133,6 +135,7 @@ UTILS		= cookbook fitscopy imcopy smem speed testprog
 
 FPACK_UTILS	= fpack funpack
 
+# Optional build target:
 utils:		${FPACK_UTILS} ${UTILS}
 
 swapproc.o:	swapproc.c
@@ -162,19 +165,17 @@ imcopy:		imcopy.o lib${PACKAGE}.a ${OBJECTS}
 cookbook:	cookbook.o lib${PACKAGE}.a ${OBJECTS}
 		${CC} ${LDFLAGS_BIN} ${DEFS} -o $@ ${@}.o -L. -l${PACKAGE} -lm ${LIBS}
 
+testf77:	testf77.o lib${PACKAGE}.a ${OBJECTS}
+		${FC} ${LDFLAGS_BIN} -o $@ ${@}.o -L. -l${PACKAGE} -lm ${LIBS}
+
+# Tested with bison 3.8 and flex 2.6.4
 eval:		# Rebuild eval_* files from flex/bison source
-		${FLEX} -t eval.l > eval_l.c1
-		# Note workaround for yyfree=fffree conflict
-		/bin/sed -e 's/yy/ff/g' -e 's/YY/FF/g' eval_l.c1 -e 's/fffree/yyfffree/g' > eval_l.c
-		/bin/rm -f eval_l.c1
-		${BISON} -d -v -y eval.y
-		/bin/sed -e 's/yy/ff/g' -e 's/YY/FF/g' y.tab.c > eval_y.c
-		/bin/sed -e 's/yy/ff/g' -e 's/YY/FF/g' y.tab.h > eval_tab.h
-		/bin/rm -f y.tab.c y.tab.h
+		${FLEX} -o eval_l.c eval.l 
+		${BISON} -o eval_y.c --header=eval_tab.h eval.y
 
 clean:
 	-	/bin/rm -rf *.o zlib/*.o *.dSYM lib${PACKAGE}* y.output so_locations \
-		${UTILS} ${FPACK_UTILS} testprog.fit
+		${UTILS} ${FPACK_UTILS} testprog.fit testf77
 
 distclean:	clean
 	-	/bin/rm -f Makefile cfitsio.pc config.log config.status configure.lineno

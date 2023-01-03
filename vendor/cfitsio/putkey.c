@@ -457,7 +457,11 @@ int ffpkls( fitsfile *fptr,     /* I - FITS file pointer        */
     {
         tstring[0] = '\0';
         strncat(tstring, &value[next], nchar); /* copy string to temp buff */
-        ffs2c(tstring, valstring, status);  /* expand quotes, and put quotes around the string */
+        /* expand quotes, and put quotes around the string */
+        if (contin)
+           ffs2c_nopad(tstring,valstring,status);
+        else
+           ffs2c(tstring, valstring, status);  
 
         if (remain > nchar)   /* if string is continued, put & as last char */
         {
@@ -1401,12 +1405,13 @@ int ffs2tm(char *datestr,     /* I - date string: "YYYY-MM-DD"    */
             return(*status = BAD_DATE);
         }
 
-        else if (datestr[10] == 'T' && datestr[13] == ':' && datestr[16] == ':')
+        else if (datestr[10] == 'T')
         {
-          if (isdigit((int) datestr[11]) && isdigit((int) datestr[12])
-           && isdigit((int) datestr[14]) && isdigit((int) datestr[15])
-           && isdigit((int) datestr[17]) && isdigit((int) datestr[18]) )
-            {
+          if (datestr[13] == ':' && datestr[16] == ':') {
+            if (isdigit((int) datestr[11]) && isdigit((int) datestr[12])
+             && isdigit((int) datestr[14]) && isdigit((int) datestr[15])
+             && isdigit((int) datestr[17]) && isdigit((int) datestr[18]) )
+             {
                 if (slen > 19 && datestr[19] != '.')
                 {
                   ffpmsg("input date string has illegal format:");
@@ -1423,14 +1428,21 @@ int ffs2tm(char *datestr,     /* I - date string: "YYYY-MM-DD"    */
 
                 if (second)
                     *second = atof(&datestr[17]);
-            }
-            else
-            {
+             }
+             else
+             {
                   ffpmsg("input date string has illegal format:");
                   ffpmsg(datestr);
                   return(*status = BAD_DATE);
-            }
+             }
 
+          }
+          else
+          {
+               ffpmsg("input date string has illegal format:");
+               ffpmsg(datestr);
+               return(*status = BAD_DATE);
+          }
         }
     }
     else   /* no date fields */
@@ -1564,7 +1576,7 @@ int ffpkns( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1623,7 +1635,7 @@ int ffpknl( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1683,7 +1695,7 @@ int ffpknj( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1741,7 +1753,7 @@ int ffpknjj( fitsfile *fptr,    /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1800,7 +1812,7 @@ int ffpknf( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1859,7 +1871,7 @@ int ffpkne( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1918,7 +1930,7 @@ int ffpkng( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -1977,7 +1989,7 @@ int ffpknd( fitsfile *fptr,     /* I - FITS file pointer                    */
       while (len > 0  && comm[0][len - 1] == ' ')
         len--;                               /* ignore trailing blanks */
 
-      if (comm[0][len - 1] == '&')
+      if (len > 0 && comm[0][len - 1] == '&')
       {
         len = minvalue(len, FLEN_COMMENT);
         tcomment[0] = '\0';
@@ -3006,6 +3018,8 @@ int ffs2c(const char *instr, /* I - null terminated input string  */
   convert an input string to a quoted string. Leading spaces 
   are significant.  FITS string keyword values must be at least 
   8 chars long so pad out string with spaces if necessary.
+  (*** This 8 char requirement is now obsolete.  See ffs2c_nopad
+  for an alternative ***)
       Example:   km/s ==> 'km/s    '
   Single quote characters in the input string will be replace by
   two single quote characters. e.g., o'brian ==> 'o''brian'
@@ -3040,6 +3054,57 @@ int ffs2c(const char *instr, /* I - null terminated input string  */
 
     for (; jj < 9; jj++)       /* pad string so it is at least 8 chars long */
         outstr[jj] = ' ';
+
+    if (jj == 70)   /* only occurs if the last char of string was a quote */
+        outstr[69] = '\0';
+    else
+    {
+        outstr[jj] = '\'';         /* append closing quote character */
+        outstr[jj+1] = '\0';          /* terminate the string */
+    }
+
+    return(*status);
+}
+/*--------------------------------------------------------------------------*/
+int ffs2c_nopad(const char *instr, /* I - null terminated input string  */
+          char *outstr,      /* O - null terminated quoted output string */
+          int *status)       /* IO - error status */
+/*
+   This performs identically to ffs2c except that it won't pad output
+   strings to make them a minimum of 8 chars long.  The requirement
+   that FITS keyword string values be 8 characters is now obsolete
+   (except for "XTENSION" keyword), but for backwards compatibility we'll
+   keep ffs2c the way it is.  A better solution would be to add another
+   argument to ffs2c for 'pad' or 'nopad', but it is called from many other
+   places in Heasoft outside of CFITSIO.  
+*/
+{
+    size_t len, ii, jj;
+
+    if (*status > 0)           /* inherit input status value if > 0 */
+        return(*status);
+
+    if (!instr)            /* a null input pointer?? */
+    {
+       strcpy(outstr, "''");   /* a null FITS string */
+       return(*status);
+    }
+
+    outstr[0] = '\'';      /* start output string with a quote */
+
+    len = strlen(instr);
+    if (len > 68)
+        len = 68;    /* limit input string to 68 chars */
+
+    for (ii=0, jj=1; ii < len && jj < 69; ii++, jj++)
+    {
+        outstr[jj] = instr[ii];  /* copy each char from input to output */
+        if (instr[ii] == '\'')
+        {
+            jj++;
+            outstr[jj]='\'';   /* duplicate any apostrophies in the input */
+        }
+    }
 
     if (jj == 70)   /* only occurs if the last char of string was a quote */
         outstr[69] = '\0';
