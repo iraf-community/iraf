@@ -87,7 +87,7 @@ lib: objs
 ###############################################################################
 
 votUtil_spp.o: votUtil_spp.x votParse_spp.h
-	(xc -c votUtil_spp.x)
+	($(hbin)xc.e -c votUtil_spp.x)
 
 
 ###############################################################################
@@ -186,7 +186,7 @@ $(STATICLIB): $(SRCS:%.c=Static/%.o)
 Static/%.o: %.c $(INCS)
 	/usr/bin/gcc $(CINCS) $(CFLAGS) -c $< -o $@
 Static/%.o: %.x $(SPP_INCS)
-	(xc -c $< -o $@)
+	($(hbin)xc.e -c $< -o $@)
 Static:
 	/bin/mkdir $@
 	chmod 777 $@
