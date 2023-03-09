@@ -46,12 +46,9 @@ jobs:
 
       - name: Setup and build IRAF
         run: |
-          PATH=${HOME}/.iraf/bin:$PATH
-          ./install --term xterm < /dev/null
           make ${IRAFARCH}
           make sysgen
 
       - name: Run tests
         run: |
-          PATH=${HOME}/.iraf/bin:$PATH
           ./test/run_tests
