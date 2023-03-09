@@ -1621,7 +1621,7 @@ ks_sysname (char *filename, char *pathname)
 	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
 
 
-	ZGTENV ("iraf", irafdir, &x_maxch, &x_nchars);
+	ZGTENV ((const int*)"iraf", irafdir, &x_maxch, &x_nchars);
 	if (x_nchars <= 0)
 	    return (NULL);
 
