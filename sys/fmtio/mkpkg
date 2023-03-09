@@ -6,23 +6,15 @@ $checkin  libsys.a lib$
 $exit
 
 tfiles:
-	$ifnewer (evvexpr.gy, evvexpr.y)
+	$ifnewer (evvexpr.gy, evvexpr.x)
 	    $generic -k evvexpr.gy -o evvexpr.y
+	    $xyacc evexpr.y
+	    $move ytab.x evexpr.x
 	$endif
 
-	    $ifeq (HOSTID, unix)
-		$echo "fmtio/evvexpr.x is out of date; rebuilding with XYACC:"
-		!(xyacc evvexpr.y; mv -f ytab.x evvexpr.x)
-	    $else
-		$echo "fmtio/evvexpr.x is out of date; rebuild with XYACC"
-	    $endif
+	$xyacc evvexpr.y
+	$move ytab.x evvexpr.x
 
-	    $ifeq (HOSTID, unix)
-		$echo "fmtio/evexpr.x is out of date; rebuilding with XYACC:"
-		!(xyacc evexpr.y; mv -f ytab.x evexpr.x)
-	    $else
-		$echo "fmtio/evexpr.x is out of date; rebuild with XYACC"
-	    $endif
 	;
 
 libsys.a:

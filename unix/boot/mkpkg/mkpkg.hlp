@@ -472,6 +472,12 @@ Delete the named file or files.
 Run the generic preprocessor on the named files.  The generic preprocessor
 is an IRAF bootstrap utility and may not be available on non-UNIX hosts.
 .le
+.ls \fB$xyacc\fR [options] file
+.sp
+Run the xyacc parser generator on the named files.  The yacc parser
+generator is an IRAF bootstrap utility and may not be available on
+non-UNIX hosts.
+.le
 .ls \fB$link\fR [switches] file1 file2 ... fileN [-o file.e]
 .sp
 Call XC with the given argument list to link the indicated files and libraries.

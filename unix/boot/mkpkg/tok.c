@@ -276,6 +276,8 @@ do_ppdir (
 	    do_delete (cx);
 	else if (strncmp (token, "$generic",	8) == 0)
 	    do_generic (cx);
+	else if (strncmp (token, "$xyacc",	6) == 0)
+	    do_xyacc (cx);
 	else if (strncmp (token, "$link",	5) == 0)
 	    do_link (cx);
 	else if (strncmp (token, "$move",	5) == 0)
@@ -968,6 +970,42 @@ do_generic (struct context *cx)
 	}
 
 	getcmd (cx, generic_path, cmd, SZ_CMD);
+
+	if (ifstate[iflev] == STOP)
+	    return 0;
+
+	if (verbose) {
+	    printf ("%s\n", cmd);
+	    fflush (stdout);
+	}
+
+	if (execute)
+	    exit_status = os_cmd (cmd);
+	if (exit_status == INTERRUPT)
+	    fatals ("<ctrl/c> interrupt %s", cx->library);
+
+	return (exit_status);
+}
+
+
+/* DO_XYACC -- Call the xyacc parser generator
+ */
+int
+do_xyacc (struct context *cx)
+{
+	char	cmd[SZ_CMD+1];
+	static  char xyacc_path[SZ_PATHNAME+1];
+
+        if (!xyacc_path[0])
+            if (os_sysfile (XYACC, xyacc_path, SZ_PATHNAME) <= 0)
+                strcpy (xyacc_path, XYACC);
+
+	if (debug > 1) {
+	    printf ("do_xyacc:\n");
+	    fflush (stdout);
+	}
+
+	getcmd (cx, xyacc_path, cmd, SZ_CMD);
 
 	if (ifstate[iflev] == STOP)
 	    return 0;
