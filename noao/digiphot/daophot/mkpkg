@@ -10,11 +10,11 @@ update:
 
 relink:
 	$omake x_daophot.x
-	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	$call trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	;
 
 linkonly:
-	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	$call trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	;
 
 install:
