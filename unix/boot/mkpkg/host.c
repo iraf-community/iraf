@@ -31,7 +31,7 @@
 #define	LIBTOOL		"libtool"
 #define	LIBFLAGS	"r"
 #define	REBUILD		"ranlib"
-#define	XC		"xc"
+#define	XC		"xc.e"
 #define	INTERRUPT	SYS_XINT
 
 extern	char *makeobj(char *fname);
@@ -91,6 +91,11 @@ h_updatelibrary (
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
 	char	libfname[SZ_PATHNAME+1];
+	static  char xc_path[SZ_PATHNAME+1];
+
+        if (!xc_path[0])
+            if (os_sysfile (XC, xc_path, SZ_PATHNAME) <= 0)
+                strcpy (xc_path, XC);
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
@@ -101,9 +106,9 @@ h_updatelibrary (
 	 * -------------------
 	 */
 	if (irafdir[0])
-	    sprintf (cmd, "%s -r %s %s", XC, irafdir, xflags);
+	    sprintf (cmd, "%s -r %s %s", xc_path, irafdir, xflags);
 	else
-	    sprintf (cmd, "%s %s", XC, xflags);
+	    sprintf (cmd, "%s %s", xc_path, xflags);
 
 	if (debug)
 	    strcat (cmd, " -d");

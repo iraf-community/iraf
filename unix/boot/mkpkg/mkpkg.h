@@ -25,8 +25,8 @@
 #define	XFLAGS		"xflags"
 #define	XVFLAGS		"xvflags"
 #define	DEBUGSYM	"debug"
-#define	XC		"xc"
-#define	GENERIC		"generic"
+#define	XC		"xc.e"
+#define	GENERIC		"generic.e"
 #define	GFLAGS		"gflags"
 #define	BACK		".."
 

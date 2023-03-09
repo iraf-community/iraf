@@ -27,5 +27,5 @@ echo "----------------------- GDEV ---------------------------"
 (cd gdev; sh -x mkpkg.sh)
 
 # Install the newly created executables.
-echo "install HSI executables in $host/bin.$MACH"
-mv -f hlib/*.e bin.$MACH
+echo "install HSI executables in $hbin"
+mv -f hlib/*.e $hbin
