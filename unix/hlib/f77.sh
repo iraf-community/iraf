@@ -8,8 +8,8 @@
 #		-u		complain about undeclared variables
 #		-w		omit all warning messages
 #		-w66		omit Fortran 66 compatibility warning messages
-#		-f*		pass thru gcc optimizer options
-#		-W*		pass thru gcc warning options
+#		-f*		pass thru cc optimizer options
+#		-W*		pass thru cc warning options
 #		files		FORTRAN source files ending in .f .
 #				C source files ending in .c .
 #				Assembly language files ending in .s .
@@ -41,7 +41,7 @@
 # https://bugs.mageia.org/show_bug.cgi?id=11507
 
 s=/tmp/stderr_$$
-CC=${CC_f2c:-'gcc'}
+CC=${CC_f2c:-${CC:-cc}}
 CFLAGS="-I${iraf}include -I${iraf}unix/f2c/libf2c ${XC_CFLAGS} -Wno-maybe-uninitialized -Wno-strict-aliasing -Wno-unknown-warning-option -fcommon"
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}

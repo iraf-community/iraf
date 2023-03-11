@@ -1,10 +1,11 @@
 HLIB	= ../../hlib/
 IRAFLIB	= ../../../lib/
 VGRIND	= csh /usr/ucb/vgrind -W
+CC ?= cc
 
 head:	xyacc 
 xyacc:	y1.o y2.o y3.o y4.o
-	cc -o xyacc.e y?.o 
+	$(CC) -o xyacc.e y?.o
 
 y1.o y2.o y3.o y4.o: dextern files
 

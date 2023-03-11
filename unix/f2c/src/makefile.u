@@ -1,7 +1,7 @@
 #	Makefile for f2c, a Fortran 77 to C converter
 
 .SUFFIXES: .c .o
-CC = cc
+CC ?= cc
 CFLAGS = -O -w $(HSI_CF)
 LDFLAGS = $(HSI_LF)
 SHELL = /bin/sh

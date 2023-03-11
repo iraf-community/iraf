@@ -16,7 +16,7 @@ setenv	hbin	${iraf}unix/bin.$MACH/
 setenv	tmp	/tmp/
 
 # Default to GCC for compilation.
-setenv	CC	gcc
+setenv	CC	cc
 setenv	F77	${hlib}f77.sh
 setenv	F2C	${hbin}f2c.e
 setenv	RANLIB	ranlib

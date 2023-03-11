@@ -16,7 +16,7 @@ export	hbin=${iraf}unix/bin.$MACH/
 export	tmp=/tmp/
 
 # Default to GCC for compilation.
-export	CC=gcc
+export	CC=${CC:-cc}
 export	F77=$hlib/f77.sh
 export	F2C=$hbin/f2c.e
 export	RANLIB=ranlib
