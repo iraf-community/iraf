@@ -1,6 +1,6 @@
 # Make the IRAF system packages.
 
-$ifeq (hostid, unix)  !(clear;date)  $endif
+$ifeq (hostid, unix)  !(date)  $endif
 $call update
 $ifeq (hostid, unix)  !(date)  $endif
 $exit

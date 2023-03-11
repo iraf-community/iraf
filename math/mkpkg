@@ -1,6 +1,6 @@
 # Update the IRAF MATH libraries.
 
-$ifeq (hostid, unix)  !(clear;date)  $endif
+$ifeq (hostid, unix)  !(date)  $endif
 $call mathgen
 $echo "-------------- (done) -------------------"
 $ifeq (hostid, unix) !(date) $endif
