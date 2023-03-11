@@ -13,7 +13,7 @@ if [ -z "$iraf" ] ; then
     export iraf=$(cd "$(dirname "$0")/.." && pwd)/
 fi
 if [ -z "$IRAFARCH" ] ; then
-    export IRAFARCH=$("${iraf}unix/hlib/irafarch.sh")
+    export IRAFARCH=$(${iraf}unix/hlib/irafarch.sh -current)
 fi
 
 export arch=.${IRAFARCH}

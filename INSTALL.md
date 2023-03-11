@@ -36,35 +36,34 @@ The source distribution file is built as a tarball with the package
 name and version as base directory. Thus, distribution files can be
 unpacked with the command
 
-    $ tar zxf /<path>/iraf-2.17.tar.gz
-    $ cd iraf-2.17/
+    $ tar zxf /<path>/iraf-2.17.1.tar.gz
+    $ cd iraf-2.17.1/
 
 
 ## Build from Sources
 
-Now you can configure the system for the proper architecture and build:
+Now you can compile IRAF on your system with the command
 
-    $ make <arch>
-    $ make sysgen 2>&1 | tee build.log
+    $ make 2>&1 | tee build.log
 
-For `<arch>`, use the proper IRAF architecture name:
+The following IRAF architectures are supported:
 
-`<arch>`   | Operating system | Supported CPU types
------------|------------------|---------------------------------------
-`linux64`  | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64, alpha
-`linux`    | Linux 32 bit     | i386, x32, arm, mips
-`macos64`  | macOS 64 bit     | arm64
-`macintel` | macOS 64 bit     | x86_64
-`macosx`   | macOS 32 bit     | i386
-`freebsd64`| FreeBSD 64 bit   | x86_64
-`freebsd`  | FreeBSD 32 bit   | i386, arm
-`hurd`     | GNU HURD 32 bit  | i386
+Architecture | Operating system | Supported CPU types
+-------------|------------------|---------------------------------------------
+`linux64`    | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64, alpha
+`linux`      | Linux 32 bit     | i386, x32, arm, mips
+`macos64`    | macOS 64 bit     | arm64
+`macintel`   | macOS 64 bit     | x86_64
+`macosx`     | macOS 32 bit     | i386
+`freebsd64`  | FreeBSD 64 bit   | x86_64
+`freebsd`    | FreeBSD 32 bit   | i386, arm
+`hurd`       | GNU HURD 32 bit  | i386
 
 Note that Cygwin and big endian architectures like macosx/ppc are not
 supported anymore.
 
-In the source directory, execute the install script to create needed
-links:
+When the build finishes, execute the install script to create the
+links needed to run IRAF:
 
     $ ./install 		# execute the install script
 
