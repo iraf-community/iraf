@@ -14,8 +14,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Ubuntu 20.04 Focal x86_64
-            os: ubuntu-20.04
+          - name: Ubuntu latest x86_64
+            os: ubuntu-latest
             irafarch: linux64
 
           - name: Ubuntu 18.04 Bionic i386
@@ -23,8 +23,8 @@ jobs:
             irafarch: linux
             carch: '-m32'
 
-          - name: macOS 12.3.1 Monterey x86_64
-            os: macos-12
+          - name: macOS x86_64
+            os: macos-latest
             irafarch: macintel
 
     steps:
