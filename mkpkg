@@ -12,7 +12,7 @@ sysgen:
 	;
 
 mkall:
-	$ifeq (hostid, unix)  !(clear;date)  $endif
+	$ifeq (hostid, unix)  !(date)  $endif
 	$echo "==================== MAKE IRAF! ========================="
 	$echo "+"
 	$call syslibs

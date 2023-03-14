@@ -25,8 +25,9 @@
 #define	XFLAGS		"xflags"
 #define	XVFLAGS		"xvflags"
 #define	DEBUGSYM	"debug"
-#define	XC		"xc"
-#define	GENERIC		"generic"
+#define	XC		"xc.e"
+#define	GENERIC		"generic.e"
+#define XYACC		"xyacc.e"
 #define	GFLAGS		"gflags"
 #define	BACK		".."
 
@@ -217,6 +218,7 @@ void  do_omake (struct context *cx, char *fname);
 int   do_xc (struct context *cx);
 int   do_link (struct context *cx);
 int   do_generic (struct context *cx);
+int   do_xyacc (struct context *cx);
 void  do_set (struct context *cx);
 int   do_incheck (struct context *cx);
 int   do_outcheck (struct context *cx);

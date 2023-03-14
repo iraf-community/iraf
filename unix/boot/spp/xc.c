@@ -41,14 +41,12 @@
 #define	SZ_PKGENV	256
 #define DEF_PKGENV	"iraf"
 
-#if (defined (__APPLE__) || defined (__freebsd__))
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
 #define	LINKER		"cc"			/* Linking utility */
+#if (defined (__APPLE__) || defined (__freebsd__))
 #define	F_STATIC	"-static"
 #define	F_SHARED	"-shared"
 #else
-#define	CCOMP		"gcc"			/* C compiler (also .s etc.) */
-#define	LINKER		"gcc"			/* Linking utility */
 #define	F_STATIC	"-Wl,-Bstatic"
 #define	F_SHARED	"-Wl,-Bdynamic"
 #endif
@@ -235,18 +233,25 @@ main (int argc, char *argv[])
 	enbint ((SIGFUNC)interrupt);
 	pid = getpid();
 
-	/* Load any XC related environment definitions.
+	/* Load general environment definitions.
+	 */
+	if ((s = os_getenv ("CC"))) {
+	    strcpy (ccomp, s);
+	    strcpy (linker, s);
+	}
+	if ((s = os_getenv ("F77")))
+	    strcpy (f77comp, s);
+
+	/* Load any XC specific environment definitions.
 	 */
 	if ((s = os_getenv ("XC-CC")) || (s = os_getenv ("XC_CC")))
 	    strcpy (ccomp, s);
-	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77"))) {
+	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77")))
 	    strcpy (f77comp, s);
-	    usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
-	    useg95 = (strncmp (f77comp, "g95", 3) == 0 ? 1 : 0);
-	}
+	usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
+	useg95 = (strncmp (f77comp, "g95", 3) == 0 ? 1 : 0);
 	if ((s = os_getenv ("XC-LINKER")) || (s = os_getenv ("XC_LINKER")))
 	    strcpy (linker, s);
-
 
 
         /* Always load the default IRAF package environment. */

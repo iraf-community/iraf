@@ -36,49 +36,41 @@ The source distribution file is built as a tarball with the package
 name and version as base directory. Thus, distribution files can be
 unpacked with the command
 
-    $ tar zxf /<path>/iraf-2.17.tar.gz
-    $ cd iraf-2.17/
+    $ tar zxf /<path>/iraf-2.17.1.tar.gz
+    $ cd iraf-2.17.1/
 
 
 ## Build from Sources
 
-In the source directory, execute the install script to create needed
-links:
+Now you can compile IRAF on your system with the command
+
+    $ make 2>&1 | tee build.log
+
+The following IRAF architectures are supported:
+
+Architecture | Operating system | Supported CPU types
+-------------|------------------|---------------------------------------------
+`linux64`    | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64, alpha
+`linux`      | Linux 32 bit     | i386, x32, arm, mips
+`macos64`    | macOS 64 bit     | arm64
+`macintel`   | macOS 64 bit     | x86_64
+`macosx`     | macOS 32 bit     | i386
+`freebsd64`  | FreeBSD 64 bit   | x86_64
+`freebsd`    | FreeBSD 32 bit   | i386, arm
+`hurd`       | GNU HURD 32 bit  | i386
+
+Note that Cygwin and big endian architectures like macosx/ppc are not
+supported anymore.
+
+When the build finishes, execute the install script to create the
+links needed to run IRAF:
 
     $ ./install 		# execute the install script
 
 The script will prompt you for the path to the default image 
 directory, the cache directory and the binary files directory.
 Usually, you can everywhere use the default settings when asked from 
-the install script. You will need to include the binary files 
-directory in your PATH before proceeding to the `<make>` step.
-In BASH this can be done with the command:
-
-    $ export PATH=/path/to/iraf/bin/:$PATH
-
-where `</path/to/iraf/bin/>` is the binary files path specified to 
 the install script.
-
-Now you can configure the system for the proper architecture and build:
-
-    $ make <arch>
-    $ make sysgen 2>&1 | tee build.log
-
-For `<arch>`, use the proper IRAF architecture name:
-
-`<arch>`   | Operating system | Supported CPU types
------------|------------------|---------------------------------------
-`linux64`  | Linux 64 bit     | x86_64, arm64, mips64, ppc64, riscv64, alpha
-`linux`    | Linux 32 bit     | i386, x32, arm, mips
-`macos64`  | macOS 64 bit     | arm64
-`macintel` | macOS 64 bit     | x86_64
-`macosx`   | macOS 32 bit     | i386
-`freebsd64`| FreeBSD 64 bit   | x86_64
-`freebsd`  | FreeBSD 32 bit   | i386, arm
-`hurd`     | GNU HURD 32 bit  | i386
-
-Note that Cygwin and big endian architectures like macosx/ppc are not
-supported anymore.
 
 
 ## Test the Build

@@ -8,50 +8,47 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     env:
-      IRAFARCH: ${{ matrix.irafarch }}
       CARCH: ${{ matrix.carch }}
 
     strategy:
       matrix:
         include:
-          - name: Ubuntu 20.04 Focal x86_64
-            os: ubuntu-20.04
-            irafarch: linux64
+          - name: Ubuntu latest x86_64
+            os: ubuntu-latest
 
           - name: Ubuntu 18.04 Bionic i386
             os: ubuntu-18.04
             irafarch: linux
             carch: '-m32'
 
-          - name: macOS 12.3.1 Monterey x86_64
-            os: macos-12
-            irafarch: macintel
+          - name: macOS x86_64
+            os: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup dependencies on Ubuntu 64 bit
-        if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux64'
+      - name: Setup dependencies on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
+          if [ ${CARCH} == '-m32' ] ; then
+            sudo dpkg --add-architecture i386
+            sudo apt-get update -y
+            sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
+          else
+            sudo apt-get update -y
+            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
+          fi
 
-      - name: Setup dependencies on Ubuntu 32 bit
-        if: startsWith(matrix.os, 'ubuntu') && matrix.irafarch == 'linux'
+      - name: Setup non-standard IRAF build (32 bit)
+        if: matrix.irafarch == 'linux'
         run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -y
-          sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
+          make linux
 
-      - name: Setup and build IRAF
+      - name: Build IRAF
         run: |
-          PATH=${HOME}/.iraf/bin:$PATH
-          ./install --term xterm < /dev/null
-          make ${IRAFARCH}
-          make sysgen
+          make
 
       - name: Run tests
         run: |
-          PATH=${HOME}/.iraf/bin:$PATH
           ./test/run_tests

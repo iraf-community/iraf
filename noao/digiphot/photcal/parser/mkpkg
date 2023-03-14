@@ -11,14 +11,9 @@ libpkg.a:
 	$endif
 
 	$ifnewer (parser.y, parser.x)
-	    $ifeq (HOSTID, unix)
-	        $echo "parser.x is out of date; rebuilding with XYACC:"
-	        !xyacc -d parser.y
-		$move ytab.x parser.x
-		$move ytab.h ../lib/prtoken.h
-	    $else
-	        $echo "parser.x is out of date; rebuild with XYACC"
-	    $endif
+	    $xyacc -d parser.y
+	    $move ytab.x parser.x
+	    $move y.tab.h ../lib/prtoken.h
 	$endif
 
 	parser.x	"../lib/lexer.h" "../lib/parser.h" "../lib/prdefs.h"\

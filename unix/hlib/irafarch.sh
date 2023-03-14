@@ -54,7 +54,7 @@ if [ $# -gt 0 ]; then
         unset IRAFARCH
 	shift
     elif [ "$1" = "-current" ]; then
-        export IRAFARCH=$(ls -lad "$iraf/bin" | \
+        export IRAFARCH=$(ls -lad "${iraf}bin" 2> /dev/null | \
 			awk '{ printf ("%s\n", $11) }' | \
 			sed -e 's/bin.//g')
 	shift

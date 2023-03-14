@@ -276,6 +276,8 @@ do_ppdir (
 	    do_delete (cx);
 	else if (strncmp (token, "$generic",	8) == 0)
 	    do_generic (cx);
+	else if (strncmp (token, "$xyacc",	6) == 0)
+	    do_xyacc (cx);
 	else if (strncmp (token, "$link",	5) == 0)
 	    do_link (cx);
 	else if (strncmp (token, "$move",	5) == 0)
@@ -739,6 +741,11 @@ do_omake (
 	char	*s_xflags, *dfile;
 	long	sourcedate, objdate, date;
 	int	recompile, i;
+	static  char xc_path[SZ_PATHNAME+1];
+
+        if (!xc_path[0])
+            if (os_sysfile (XC, xc_path, SZ_PATHNAME) <= 0)
+                strcpy (xc_path, XC);
 
 
 	if (ifstate[iflev] == STOP)
@@ -783,9 +790,9 @@ do_omake (
 	    strcat (xflags, s_xflags);
 
 	    if (irafdir[0])
-		sprintf (cmd, "%s %s -r %s %s", XC, xflags, irafdir, fname);
+		sprintf (cmd, "%s %s -r %s %s", xc_path, xflags, irafdir, fname);
 	    else
-		sprintf (cmd, "%s %s %s", XC, xflags, fname);
+		sprintf (cmd, "%s %s %s", xc_path, xflags, fname);
 
 	    if (verbose) {
 		printf ("%s\n", cmd);
@@ -811,6 +818,11 @@ int
 do_xc (struct context *cx)
 {
 	char	cmd[SZ_CMD+1];
+	static  char xc_path[SZ_PATHNAME+1];
+
+        if (!xc_path[0])
+            if (os_sysfile (XC, xc_path, SZ_PATHNAME) <= 0)
+                strcpy (xc_path, XC);
 
 
 	if (debug > 1) {
@@ -819,9 +831,9 @@ do_xc (struct context *cx)
 	}
 
 	if (irafdir[0])
-	    sprintf (cmd, "%s -r %s", XC, irafdir);
+	    sprintf (cmd, "%s -r %s", xc_path, irafdir);
 	else
-	    sprintf (cmd, "%s", XC);
+	    sprintf (cmd, "%s", xc_path);
 
 	if (debug)
 	    strcat (cmd, " -d");
@@ -861,6 +873,11 @@ do_link (struct context *cx)
 	char *cmd = cmdbuf;
 	int lflags_set = 0;
 	char *lflags;
+	static  char xc_path[SZ_PATHNAME+1];
+
+        if (!xc_path[0])
+            if (os_sysfile (XC, xc_path, SZ_PATHNAME) <= 0)
+                strcpy (xc_path, XC);
 
 
 	if (debug > 1) {
@@ -892,9 +909,9 @@ do_link (struct context *cx)
 	    lflags = getsym (LFLAGS);
 
 	if (irafdir[0])
-	    sprintf (cmd, "%s %s -r %s", XC, lflags, irafdir);
+	    sprintf (cmd, "%s %s -r %s", xc_path, lflags, irafdir);
 	else
-	    sprintf (cmd, "%s %s", XC, lflags);
+	    sprintf (cmd, "%s %s", xc_path, lflags);
 
 	if (debug)
 	    strcat (cmd, " -d");
@@ -941,13 +958,54 @@ int
 do_generic (struct context *cx)
 {
 	char	cmd[SZ_CMD+1];
+	static  char generic_path[SZ_PATHNAME+1];
+
+        if (!generic_path[0])
+            if (os_sysfile (GENERIC, generic_path, SZ_PATHNAME) <= 0)
+                strcpy (generic_path, GENERIC);
 
 	if (debug > 1) {
 	    printf ("do_generic:\n");
 	    fflush (stdout);
 	}
 
-	getcmd (cx, GENERIC, cmd, SZ_CMD);
+	getcmd (cx, generic_path, cmd, SZ_CMD);
+
+	if (ifstate[iflev] == STOP)
+	    return 0;
+
+	if (verbose) {
+	    printf ("%s\n", cmd);
+	    fflush (stdout);
+	}
+
+	if (execute)
+	    exit_status = os_cmd (cmd);
+	if (exit_status == INTERRUPT)
+	    fatals ("<ctrl/c> interrupt %s", cx->library);
+
+	return (exit_status);
+}
+
+
+/* DO_XYACC -- Call the xyacc parser generator
+ */
+int
+do_xyacc (struct context *cx)
+{
+	char	cmd[SZ_CMD+1];
+	static  char xyacc_path[SZ_PATHNAME+1];
+
+        if (!xyacc_path[0])
+            if (os_sysfile (XYACC, xyacc_path, SZ_PATHNAME) <= 0)
+                strcpy (xyacc_path, XYACC);
+
+	if (debug > 1) {
+	    printf ("do_xyacc:\n");
+	    fflush (stdout);
+	}
+
+	getcmd (cx, xyacc_path, cmd, SZ_CMD);
 
 	if (ifstate[iflev] == STOP)
 	    return 0;

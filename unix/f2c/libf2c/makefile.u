@@ -13,7 +13,7 @@
 # to the CFLAGS = line below.
 
 .SUFFIXES: .c .o
-CC = cc
+CC ?= cc
 SHELL = /bin/sh
 CFLAGS = -O -w $(HSI_CF)
 LDFLAGS = $(HSI_LF)

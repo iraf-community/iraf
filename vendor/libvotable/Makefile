@@ -20,11 +20,13 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 
 
 # includes, flags and libraries
+XC		?= $(hbin)xc.e
+CC		?= cc
+
 CINCS  	  	= -I$(INCDIR)  -I. -I../../include
 
 CFLAGS 		:= $(CFLAGS) $(CINCS) -L./ -DHAVE_CFITSIO
 CLIBS		= -lm -lc -lpthread -lcfitsio
-
 
 
 # list of source and include files
@@ -87,7 +89,7 @@ lib: objs
 ###############################################################################
 
 votUtil_spp.o: votUtil_spp.x votParse_spp.h
-	(xc -c votUtil_spp.x)
+	($(hbin)xc.e -c votUtil_spp.x)
 
 
 ###############################################################################
@@ -150,7 +152,7 @@ python_lib:  votParse.i
 	$(RM) votParse_wrap.*
 
 perl_lib:  votParse.i
-	gcc -c $(SRCS) votParsePerl.c `perl -MExtUtils::Embed -e ccopts`
+	$(CC) -c $(SRCS) votParsePerl.c `perl -MExtUtils::Embed -e ccopts`
 	ld -G $(OBJS) -o lib$(NAME).so
 	$(RM) votParse_wrap.*
 
@@ -158,8 +160,8 @@ perl_lib:  votParse.i
 JWRAP_FLAGS 	= -I/usr/java/j2sdk/include/ -I/usr/java/j2sdk/include/linux
 
 java_lib:  votParse.i
-	gcc -fpic -c $(WRAP_SRCS) votParseJava.c $(JWRAP_FLAGS)
-	gcc -shared $(WRAP_OBJS) votParseJava.o -o lib$(NAME).so
+	$(CC) -fpic -c $(WRAP_SRCS) votParseJava.c $(JWRAP_FLAGS)
+	$(CC) -shared $(WRAP_OBJS) votParseJava.o -o lib$(NAME).so
 	$(RM) votParse_wrap.*
 
 
@@ -169,8 +171,8 @@ PHP_INCS = -I. -I/usr/include/php -I/usr/local/include/php \
 	   -I/usr/local/include/php/Zend
 
 php_lib:   votParse.i
-	gcc -fpic -c $(PHP_INCS) $(WRAP_SRCS) votParsePhp.c
-	gcc -shared $(WRAP_OBJS) votParsePhp.o -o lib$(NAME).so
+	$(CC) -fpic -c $(PHP_INCS) $(WRAP_SRCS) votParsePhp.c
+	$(CC) -shared $(WRAP_OBJS) votParsePhp.o -o lib$(NAME).so
 	$(RM) votParse_wrap.*
 
 
@@ -184,9 +186,9 @@ php_lib:   votParse.i
 $(STATICLIB): $(SRCS:%.c=Static/%.o)
 	/usr/bin/ar rv $@ $?
 Static/%.o: %.c $(INCS)
-	/usr/bin/gcc $(CINCS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CINCS) $(CFLAGS) -c $< -o $@
 Static/%.o: %.x $(SPP_INCS)
-	(xc -c $< -o $@)
+	$(XC) -c $< -o $@
 Static:
 	/bin/mkdir $@
 	chmod 777 $@
@@ -194,7 +196,7 @@ Static:
 $(SHAREDLIB): $(SRCS:%.c=Shared/%.o)
 	/usr/bin/ld -shared -o $@ $? -lc -ldl
 Shared/%.o: %.c $(INCS)
-	/usr/bin/gcc $(CINCS) $(CFLAGS) -fpic -shared -c $< -o $@
+	$(CC) $(CINCS) $(CFLAGS) -fpic -shared -c $< -o $@
 Shared:
 	/bin/mkdir $@
 	chmod 777 $@

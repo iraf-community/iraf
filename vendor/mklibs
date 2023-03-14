@@ -4,8 +4,8 @@ set -e
 
 top=$(cd .. && pwd)
 
-export CC=gcc
-export CXX=g++
+export	CC=${CC:-cc}
+export  XC=${XC:-$(hbin)xc.e}
 
 build_cfitsio=1
 build_libvotable=1

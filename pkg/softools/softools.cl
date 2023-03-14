@@ -4,14 +4,14 @@
 
 package softools
 
-task	$generic,
-	$mkpkg,
-	$rmbin,
-	$rmfiles,
-	$rtar,
-	$wtar,
-	$xc,
-	$xyacc		= "$foreign"
+task	$generic	= "$"//osfn("host$bin/generic.e")
+task	$mkpkg		= "$"//osfn("host$bin/mkpkg.e")
+task	$rmbin		= "$"//osfn("host$bin/rmbin.e")
+task	$rmfiles	= "$"//osfn("host$bin/rmfiles.e")
+task	$rtar		= "$"//osfn("host$bin/rtar.e")
+task	$wtar		= "$"//osfn("host$bin/wtar.e")
+task	$xc		= "$"//osfn("host$bin/xc.e")
+task	$xyacc		= "$"//osfn("host$bin/xyacc.e")
 
 task	mktags,
 	mkapropos	= "softools$x_softools.e"

@@ -66,9 +66,7 @@ set -e
 
 top=\$(pwd)
 
-export CC=gcc
-export CXX=g++
-
+export	CC=\${CC:-cc}
 
 if [ "\$PLMACH" = "macosx" ] ; then
    export CFLAGS="-DDarwin"

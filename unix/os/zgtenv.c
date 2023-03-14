@@ -11,7 +11,7 @@
 #include <iraf.h>
 
 static char *_ev_scaniraf (char *envvar);
-static int   _ev_loadcache (char *fname);
+static char *_ev_guess_irafdir (char *fname);
 
 
 /* ZGTENV -- Get the value of a host system environment variable.  Look first
@@ -27,14 +27,14 @@ ZGTENV (
   XINT    *status
 )
 {
-	register char	*ip, *op;
-	register int	n;
+	char	*ip, *op;
+	int	n;
 
+	if ((ip = getenv ((char *)envvar)) == NULL) {
+	    ip = _ev_scaniraf ((char *)envvar);
+	}
 
 	op = (char *)outstr;
-	if ((ip = getenv ((char *)envvar)) == NULL)
-	    ip = _ev_scaniraf ((char *)envvar);
-
 	if (ip == NULL) {
 	    *op = EOS;
 	    *status = XERR;
@@ -54,21 +54,8 @@ ZGTENV (
  */
 
 #define	TABLE		"/usr/include/iraf.h"	/* table file		*/
-#define	NENV		3			/* n variables		*/
 #define	SZ_NAME		10
 #define	SZ_VALUE	80
-
-struct	env {
-	char	*ev_name;
-	char	*ev_value;
-};
-
-int	ev_cacheloaded = 0;
-struct	env ev_table[NENV] = {
-	{ "host",		""},
-	{ "iraf",		""},
-	{ "tmp",		""}
-};
 
 
 /* SCANIRAF -- If the referenced environment variable is a well known standard
@@ -98,14 +85,8 @@ struct	env ev_table[NENV] = {
  *			    This is normally /tmp/ for a UNIX system.  TMP
  *			    also serves as the default IMDIR.
  *	
- * The entries for these variables in the <iraf.h> must adhere to a standard
- * format, e.g. (substituting @ for *):
- *
- *	/@ ### Start of run time definitions @/
- *	#define	iraf		"/iraf/"
- *	#define	host		"/iraf/unix/"
- *	#define	tmp		"/tmp/"
- *	/@ ### End of run time definitions @/
+ * The iraf and host names are derived from the origin of the symbolic link
+ * to /usr/include/iraf.h, if not given as environment variable.
  *
  * Although the definitions are entered as standard C #defines, they should not
  * be directly referenced in C programs.
@@ -113,24 +94,38 @@ struct	env ev_table[NENV] = {
 static char *
 _ev_scaniraf (char *envvar)
 {
-	int	i;
+	char	*ip = NULL;
 
-
-	for (i=0;  i < NENV;  i++)
-	    if (strcmp (ev_table[i].ev_name, envvar) == 0)
-		break;
-
-	if (i >= NENV)
-	    return (NULL);
-
-	if (!ev_cacheloaded) {
-	    if (_ev_loadcache (TABLE) == ERR)
+	if (strcmp(envvar, "tmp") == 0) {
+	    if ((ip = getenv("TMPDIR")) == NULL) {
+		ip = P_tmpdir;
+	    }
+	    ip = strdup(ip);
+	    if (ip[strlen(ip)-1] != '/') {
+		ip = realloc(ip, strlen(ip) + 2);
+		strcat(ip, "/");
+	    }
+	} else if (strcmp(envvar, "host") == 0) {
+	    if ((ip = getenv("iraf")) != NULL) {
+	        ip = strdup(ip);
+	    } else if ((ip = _ev_scaniraf("iraf")) == NULL) {
+	        return (NULL);
+	    }
+	    ip = realloc(ip, strlen(ip) + 7);
+	    strcat(ip, "/unix/");
+	} else if (strcmp(envvar, "iraf") == 0) {
+ 	    if ((ip = _ev_guess_irafdir(TABLE)) == NULL) {
 		return (NULL);
-	    else
-		ev_cacheloaded++;
+	    }
+	    ip = realloc(ip, strlen(ip) + 2);
+	    strcat(ip, "/");
 	}
 
-	return (ev_table[i].ev_value);
+	if (ip != NULL) {
+	    setenv(envvar, ip, 1);
+	}
+
+	return (ip);
 }
 
 
@@ -140,61 +135,36 @@ _ev_scaniraf (char *envvar)
  * in accessing the table probably indicate an error in installing
  * IRAF hence should be reported immediately.
  */
-static int
-_ev_loadcache (char *fname)
+static char*
+_ev_guess_irafdir (char *fname)
 {
-        static  char   *home, hpath[SZ_PATHNAME+1], *rpath, *lpath;
+  static  char	 *home, hpath[SZ_PATHNAME+1], *rpath, *path0, *path1, *path2;
 
 	rpath = malloc(SZ_PATHNAME+1);
 	if ((home = getenv ("HOME"))) {
 	    sprintf (hpath, "%s/.iraf/iraf.h", home);
 	    if ((realpath(hpath, rpath)) == NULL) {
-                if ((realpath(fname, rpath)) == NULL) {
+		if ((realpath(fname, rpath)) == NULL) {
 		    fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
 		    free(rpath);
-		    return (ERR);
+		    return (NULL);
 		}
 	    }
 	} else {
-	    /*  We should always have a $HOME, but try this to be safe.
+	    /*	We should always have a $HOME, but try this to be safe.
 	     */
 	  if ((realpath(fname, rpath)) == NULL) {
-	        fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
+		fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
 		free(rpath);
-		return (ERR);
+		return (NULL);
 	    }
 	}
 
-	/* host */
-	lpath = strdup(dirname(rpath));
+	path0 = strdup(dirname(rpath));
 	free(rpath);
-	rpath = strdup(dirname(lpath));
-	free(lpath);
-	ev_table[0].ev_value = strdup(dirname(rpath)); 
-	free(rpath);
-	ev_table[0].ev_value = realloc(ev_table[0].ev_value,
-				       strlen(ev_table[0].ev_value) + 2);
-	strcat(ev_table[0].ev_value, "/");
-
-	/* iraf */
-	rpath = strdup(ev_table[0].ev_value);
-	ev_table[1].ev_value = strdup(dirname(rpath));
-	free(rpath);
-	ev_table[1].ev_value = realloc(ev_table[1].ev_value,
-				       strlen(ev_table[1].ev_value) + 2);
-	strcat(ev_table[1].ev_value, "/");
-
-	/* tmp */
-	ev_table[2].ev_value = getenv("TMPDIR");
-	if (ev_table[2].ev_value == NULL) {
-	  ev_table[2].ev_value = P_tmpdir;
-	}
-	ev_table[2].ev_value = strdup(ev_table[2].ev_value);
-	if (ev_table[2].ev_value[strlen(ev_table[2].ev_value)-1] != '/') {
-	  ev_table[2].ev_value = realloc(ev_table[2].ev_value,
-					 strlen(ev_table[2].ev_value) + 2);
-	  strcat(ev_table[2].ev_value, "/");
-	}
-	
-	return (OK);
+	path1 = strdup(dirname(path0));
+	free(path0);
+	path2 = strdup(dirname(path1));
+	free(path1);
+	return (path2);
 }
