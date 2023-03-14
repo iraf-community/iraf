@@ -321,16 +321,19 @@ changes.
 Changes affecting image display in VMS/IRAF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new version of Nigel Sharp’s UISDISPLAY program, for image display on
-VMS systems running UIS, has been installed in
-“*iraf\ :math:`vms/uis*". An executable for an early version of the SAOIMAGE display program for the X window system, written by Mike VanHilst (SAO), and ported to VMS by Jay Travisano (STScI) has been placed in the directory "*iraf`\ vms/x11*”.
-An executable for a VMS version of XTERM (the X window terminal
-emulator, ported to VMS by Stephan Jansen), is also in this directory.
-We wanted our VMS users to have access to these programs, although more
-development work and testing is needed before we can offer good support
-for X window based image display and graphics on VMS. A more
-comprehensive package providing enhanced capabilities should be
-available as an add-on later this year.
+A new version of Nigel Sharp’s UISDISPLAY program, for image display
+on VMS systems running UIS, has been installed in
+``*iraf$vms/uis*``. An executable for an early version of the SAOIMAGE
+display program for the X window system, written by Mike VanHilst
+(SAO), and ported to VMS by Jay Travisano (STScI) has been placed in
+the directory ``*iraf$vms/x11*``.  An executable for a VMS version of
+XTERM (the X window terminal emulator, ported to VMS by Stephan
+Jansen), is also in this directory.  We wanted our VMS users to have
+access to these programs, although more development work and testing
+is needed before we can offer good support for X window based image
+display and graphics on VMS. A more comprehensive package providing
+enhanced capabilities should be available as an add-on later this
+year.
 
 IRAF Package Revisions
 ----------------------

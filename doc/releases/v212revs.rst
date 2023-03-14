@@ -80,7 +80,7 @@ can be used to verify the system once the install is complete, or to
 generate a report of the system configuration if needed by site support.
 An UNINSTALL script to remove iraf command links and files created by
 the INSTALL script is also available to remove IRAF from a machine. All
-scripts are now installed in the hlib$ directory.
+scripts are now installed in the ``hlib$`` directory.
 
 New HELP GUI and Output Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,7 +138,7 @@ New Developer Libraries
 Several new libraries are available for SPP developers:
 
 -  PSIO is a new Postscript text generation library installed in
-   sys$psio.
+   ``sys$psio``.
 
 -  CATQUERY is a remote astrometric/photometric catalog access lib
    installed in the XTOOLS utility library.
@@ -171,7 +171,7 @@ IRAF System Revisions Summary
 
 -  Added support for the bitwise boolean operators: ‘&’ (and), ‘\|’
    (or), ‘^’ (xor), and ‘~’ (not/complement), to vectory expression
-   evaluator fmtio$evvexpr.gy. The IMEXPR task was modified to allow
+   evaluator ``fmtio$evvexpr.gy``. The IMEXPR task was modified to allow
    these new bitwise operations.
 
 -  Added new vector operators to VOPS library: alan, alank (logical AND)
@@ -1045,7 +1045,7 @@ The FIO buffer allocated will not be larger than the size of the image.
 The FIO buffer will also not exceed the maximum size set by the file
 driver being accessed. For example, for PLIO images the file buffer will
 not exceed about 2KB, even for a very large mask. This is because the
-“pixel file” for a PLIO image is dev$null, the driver for which
+“pixel file” for a PLIO image is ``dev$null``, the driver for which
 specifies a maximum i/o buffer size of 2K (the real file to load or save
 the mask will use a different descriptor).
 
@@ -1085,15 +1085,15 @@ applications and systems development.
 The following notes summarize the changes made for this feature and
 describe it’s function in more detail. A more complete description of
 the interface, environment variables which control it, etc can be found
-in the main systems revisions file iraf$local/notes.v211.
+in the main systems revisions file ``iraf$local/notes.v211``.
 
-The source for the developmental version of the VMcache library and the
-VMcache daemon (vmcached) have been installed in the unix$boot tree and
-the HSI binary file driver was modified to add VMcache client support.
-This adds two new capabilities to the driver: 1) built-in support for
-direct i/o (on systems that support it), and 2) a client interface to
-the VMcache daemon to permit the daemon to optimally manage binary file
-i/o if a VMcache daemon is present.
+The source for the developmental version of the VMcache library and
+the VMcache daemon (vmcached) have been installed in the ``unix$boot``
+tree and the HSI binary file driver was modified to add VMcache client
+support.  This adds two new capabilities to the driver: 1) built-in
+support for direct i/o (on systems that support it), and 2) a client
+interface to the VMcache daemon to permit the daemon to optimally
+manage binary file i/o if a VMcache daemon is present.
 
 The vmcached code is complete but only enough debug/testing was done to
 support development of the VMcache client interface for IRAF (the
@@ -1138,11 +1138,11 @@ New Developer Libraries
 Several new libraries are now available for developers:
 
 -  **PSIO** New Postscript text generation library installed in the
-   sys$psio.
+   ``sys$psio``.
 
    The PSIO interface is used to format a block of text as Postscript
    output on a page of a given size (Letter, Legal, A4 or B5). See the
-   psio$README file for details.
+   ``psio$README`` file for details.
 
 -  **CATQUERY** Remote astrometric/photometric catalog access lib
    installed in the XTOOLS utility library.
@@ -1158,11 +1158,11 @@ Several new libraries are now available for developers:
 -  **SKYWCS** Sky coordinate transformation library installed in the
    XTOOLS utility library.
 
-   The skywcs package contains a simple set of routines for managing sky
-   coordinate information and for transforming from one sky coordinate
-   system to another. The sky coordinate system is defined either by a
-   system name, e.g. “J2000”, “galactic”, etc., or by an image system
-   name, e.g. “dev\ :math:`ypix" or "dev`\ ypix world”.
+   The skywcs package contains a simple set of routines for managing
+   sky coordinate information and for transforming from one sky
+   coordinate system to another. The sky coordinate system is defined
+   either by a system name, e.g. “J2000”, “galactic”, etc., or by an
+   image system name, e.g. ``“dev$ypix"`` or ``"dev$ypix world”``.
 
 System Changes Which May Affect You
 -----------------------------------
