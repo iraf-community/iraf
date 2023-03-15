@@ -328,7 +328,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		    /* Compile the modules and update the library.
 		     */
 		    exit_status = h_updatelibrary (cx->libpath,
-			cx->flist, cx->nfiles, getsym(XFLAGS), irafdir);
+			cx->flist, cx->nfiles, getsym(XFLAGS));
 		    if (exit_status == INTERRUPT)
 			fatals ("<ctrl/c> interrupt %s", cx->library);
 		    cx->totfiles += cx->nfiles;

@@ -44,7 +44,6 @@ char	*ctop = &sbuf[SZ_SBUF];		/* top of sbuf			*/
 int	npkg = 0;			/* number of packages		*/
 char	*pkgenv[MAX_PKGENV];		/* package environments		*/
 char	v_pkgenv[SZ_PKGENV+1];		/* buffer for pkgenv names	*/
-char	irafdir[SZ_PATHNAME+1];		/* iraf root directory		*/
 int	nsymbols = 0;			/* number of defined symbols	*/
 int	ifstate[SZ_IFSTACK];		/* $IF stack			*/
 int	iflev;				/* $IF stack pointer		*/
@@ -67,11 +66,6 @@ extern  int  ZZSTOP (void);
 extern  int  do_mkpkg (struct context *cx, int islib);
 
 
-
-void 
-zzpause (void) { printf ("ready ...."); (void) getc(stdin); }
-
-
 /* MAIN -- Entry point of mkpkg.e
  */
 int
@@ -87,7 +81,6 @@ main (int argc, char *argv[])
 
 	/* Initialize the MKPKG context.
 	 */
-	irafdir[0] = EOS;
 	topcx = cx = (struct context *) calloc (1, sizeof (struct context));
 	if (cx == NULL)
 	    fatals ("out of memory (%s)", "mkpkg.e");
@@ -151,15 +144,6 @@ main (int argc, char *argv[])
 			break;
 		    case 'v':
 			verbose = YES;
-			break;
-		    case 'w':
-			zzpause();
-			break;
-		    case 'r':
-			if (*argp == NULL)
-			    warns ("missing argument to switch `-r'", NULL);
-			else
-			    strcpy (irafdir, *argp++);
 			break;
 		    default:
 addflag:		for (op=flags;  *op;  op++)

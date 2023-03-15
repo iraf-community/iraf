@@ -5,7 +5,6 @@ extern	struct	symbol symtab[];	/* symbol table (macros)	*/
 extern	struct	context *topcx;		/* currently active context	*/
 extern	char	*cp;			/* pointer into sbuf		*/
 extern	char	*ctop;			/* top of sbuf			*/
-extern	char	irafdir[];		/* iraf root directory		*/
 extern	int	nsymbols;		/* number of defined symbols	*/
 extern	int	ifstate[];		/* $IF stack			*/
 extern	int	iflev;			/* $IF stack pointer		*/

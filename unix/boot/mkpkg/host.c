@@ -44,7 +44,7 @@ char	*resolvefname(char *fname);
 char	*mkpath(char *module, char *directory, char *outstr);
 
 int   h_updatelibrary (char *library, char *flist[], int totfiles, 
-                char *xflags, char *irafdir);
+                char *xflags);
 int   h_rebuildlibrary (char *library);
 int   h_incheck (char *file, char *dir);
 int   h_outcheck (char *file, char *dir, int clobber);
@@ -82,8 +82,7 @@ h_updatelibrary (
     char   *library,		/* pathname of library		*/
     char   *flist[],		/* pointers to filename strings	*/
     int	    totfiles,		/* number of files in list	*/
-    char   *xflags,		/* XC compiler flags		*/
-    char   *irafdir 		/* iraf root directory		*/
+    char   *xflags		/* XC compiler flags		*/
 )
 {
 	char	cmd[SZ_CMD+1], *args;
@@ -105,10 +104,7 @@ h_updatelibrary (
 	 * Compile the files.
 	 * -------------------
 	 */
-	if (irafdir[0])
-	    sprintf (cmd, "%s -r %s %s", xc_path, irafdir, xflags);
-	else
-	    sprintf (cmd, "%s %s", xc_path, xflags);
+	sprintf (cmd, "%s %s", xc_path, xflags);
 
 	if (debug)
 	    strcat (cmd, " -d");
