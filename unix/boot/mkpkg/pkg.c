@@ -364,7 +364,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 	 * been reached (but only if the module being processed is a library
 	 * list).
 	 */
-	if (cx->totfiles == 0 && !forceupdate) {
+	if (cx->totfiles == 0) {
 	    printf ("Library %s is up to date\n", cx->library);
 	    fflush (stdout);
 	} else if (exit_status == OK || ignore) {

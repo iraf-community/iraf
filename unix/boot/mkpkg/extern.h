@@ -14,4 +14,3 @@ extern	int	verbose;		/* print informative messages	*/
 extern	int	ignore;			/* ignore warns			*/
 extern	int	execute;		/* think but don't act?		*/
 extern	int	exit_status;		/* exit status of last syscall	*/
-extern	int	forceupdate;		/* foribly update libmod dates	*/

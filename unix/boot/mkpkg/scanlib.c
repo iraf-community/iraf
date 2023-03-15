@@ -30,7 +30,6 @@
  */
 
 #define	SZ_KEY		128		/* arbitrary			*/
-extern	int forceupdate;		/* NOT IMPLEMENTED for UNIX	*/
 
 char	mlb_sbuf[SZ_SBUF];		/* string buffer		*/
 int	mlb_op = 0;			/* index into string buffer	*/

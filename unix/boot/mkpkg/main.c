@@ -53,7 +53,6 @@ int	verbose = NO;			/* print informative messages	*/
 int	ignore = YES;			/* ignore warns			*/
 int	execute = YES;			/* think but don't act?		*/
 int	exit_status;			/* exit status of last syscall	*/
-int	forceupdate = NO;		/* forcibly update libmod dates	*/
 extern	char *os_getenv(char *);
 
 
@@ -138,9 +137,6 @@ main (int argc, char *argv[])
 			    if (npkg++ >= MAX_PKGENV)
 				fatals ("too many -p package arguments", NULL);
 			}
-			break;
-		    case 'u':
-			forceupdate = YES;
 			break;
 		    case 'v':
 			verbose = YES;
