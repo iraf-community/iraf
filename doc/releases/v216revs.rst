@@ -25,7 +25,7 @@ suffice to bring a system up to date following a bug-fix release:
 
 ::
 
-   make latest     # Update entire system (core + extpkgs)
+   make latest         # Update entire system (core + extpkgs)
    make latest_src     # Update only source code
    make latest_core    # Update only the core iraf system
 
@@ -127,17 +127,17 @@ consider the following templates:
 
 ::
 
-   @file*              expand all files beginning w/ 'file'
-   @file//".fits"          append ".fits" to contents of 'file'
-   @mef.fits           expand image extensions of an MEF file
-   @mef.fits[SCI]          select SCI extensions from MEF file
-   @mef.fits[SCI,2][noinherit] select v2 SCI extns, add kernel param
-   @mef.fits[1-16x2]       select range of extensions from MEF file
-   @mef.fits[+1-8]         create a list of extensions for an MEF
-   *.fits[1:100,1:100]     append section to all FITS images
-   @@file[1:100,1:100]     append section to expanded MEFs in file
-   *.fits[filter?='V']     select images where FILTER contains 'V'
-   @*.fits[gain==3.0]      select extns where GAIN keyword is 3.0
+   @file*                          expand all files beginning w/ 'file'
+   @file//".fits"                  append ".fits" to contents of 'file'
+   @mef.fits                       expand image extensions of an MEF file
+   @mef.fits[SCI]                  select SCI extensions from MEF file
+   @mef.fits[SCI,2][noinherit]     select v2 SCI extns, add kernel param
+   @mef.fits[1-16x2]               select range of extensions from MEF file
+   @mef.fits[+1-8]                 create a list of extensions for an MEF
+   *.fits[1:100,1:100]             append section to all FITS images
+   @@file[1:100,1:100]             append section to expanded MEFs in file
+   *.fits[filter?='V']             select images where FILTER contains 'V'
+   @*.fits[gain==3.0]              select extns where GAIN keyword is 3.0
    *.fits[filter?='V';gain==2.5]   select using multiple OR's expressions
 
 These templates could be used e.g. to run IMSTAT on all the extensions
@@ -147,10 +147,10 @@ of a FITS file with a single command, as in
 
      Enhanced @-files        Old @-files
      ----------------        -----------
-                     cl> imext mef.fits output=file > list.dat
-     cl> imstat @mef.fits        cl> if (imext.nimages > 0)
-                     >>>     imstat @list.dat 
-                     cl> del list.dat
+                             cl> imext mef.fits output=file > list.dat
+     cl> imstat @mef.fits    cl> if (imext.nimages > 0)
+                             >>>     imstat @list.dat 
+                             cl> del list.dat
 
 where before it would have been necessary to expand the extensions
 explicitly using a second task into a standard @file. Notice how the
@@ -168,13 +168,14 @@ System File Cache
 ~~~~~~~~~~~~~~~~~
 
 The system file cache is used to provide local storage for URL files,
-i.e. when a URL is encountered it is downloaded and put into the cache.
-If that same URL is used again (e.g. from within a script), the cached
-file is passed to the task instead of accessing the URL a second time.
-The cache directory used is determined by the ‘cache’ environment
-variable set in the user’s login.cl file, or by the
-hlib\ :math:`zzsetenv.def file. Upon login, files in the cache older than 'cache_age' days will automatically be removed. This value may be changed in the login.cl file or the hlib`\ zzsetenv.def
-as needed.
+i.e. when a URL is encountered it is downloaded and put into the
+cache.  If that same URL is used again (e.g. from within a script),
+the cached file is passed to the task instead of accessing the URL a
+second time.  The cache directory used is determined by the ‘cache’
+environment variable set in the user’s login.cl file, or by the
+``hlib$zzsetenv.def`` file. Upon login, files in the cache older than
+'cache_age' days will automatically be removed. This value may be
+changed in the login.cl file or the ``hlib$zzsetenv.def`` as needed.
 
 URL Support by all tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,9 +284,9 @@ IRAF commands. Allowed ‘make’ command targets include:
    showarch        show currently configure arch
    <arch>          reconfigure for named architecture
 
-   latest      Update entire system to latest patch release
-   latest_src  Update only source code
-   latest_core Update only the core iraf system
+   latest          Update entire system to latest patch release
+   latest_src      Update only source code
+   latest_core     Update only the core iraf system
 
    check_latest    Check is system is latest released version
 
@@ -297,14 +298,14 @@ configurations:
 
 ::
 
-   iraf-src.tar.gz     Source code only
-   iraf-all.tar.gz     Source + all supported platform binaries
-   iraf-linux.tar.gz       Source + linux/linux64 platform binaries
-   iraf-macosx.tar.gz      Source + macosx/macintel platform binaries
+   iraf-src.tar.gz           Source code only
+   iraf-all.tar.gz           Source + all supported platform binaries
+   iraf-linux.tar.gz         Source + linux/linux64 platform binaries
+   iraf-macosx.tar.gz        Source + macosx/macintel platform binaries
 
-   iraf.lnux.x86.tar.gz        Source + 32-bit Linux binaries
+   iraf.lnux.x86.tar.gz      Source + 32-bit Linux binaries
    iraf.lnux.x86_64.tar.gz   Source + 64-bit Linux binaries
-   iraf.macx.uni.tar.gz        Source + 32-bit OSX binaries
+   iraf.macx.uni.tar.gz      Source + 32-bit OSX binaries
    iraf.macx.x86_64.tar.gz   Source + 64-bit OSX binaries
 
 With these distributions files, installation is a simple matter of
@@ -324,8 +325,8 @@ example,
 ::
 
    % cd $iraf/extern       # go to extern directory
-   % ./configure       # configure system (only once)
-   % make mscred       # install the MSCRED package
+   % ./configure           # configure system (only once)
+   % make mscred           # install the MSCRED package
 
 Packages defined in this way will be available the next time you login
 to the system. See the $iraf/extern/README file for details.

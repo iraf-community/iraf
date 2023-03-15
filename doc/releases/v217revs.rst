@@ -2,7 +2,7 @@ IRAF 2.17 Release notes
 =======================
 
 :Authors: IRAF Community
-:Date: January 07, 2012
+:Date: January 07, 2022
 
 The current IRAF version 2.17 is available from github at
 
