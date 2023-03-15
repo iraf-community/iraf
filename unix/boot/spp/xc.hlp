@@ -7,17 +7,6 @@ USAGE
 xc [flags] files
 .ih
 FLAGS
-.ls 10 -a
-To support VMS link options file.  Next file is taken to be the VMS name
-of a link options file.  This is primarily for using long lists of files
-or libraries and not for actual VMS Linker options, since XC adds continuation
-characters where it believes it is appropriate.
-.le
-.ls 10 -C
-Tells fortran to do array bound and other checking.
-By default no checking is done.  From DCL fortran usually
-does array and overflow checking which is not used here.
-.le
 .ls 10 -c
 Tells \fIxc\fR not to link, i.e., not to create an executable.
 .le
@@ -28,7 +17,7 @@ Causes debug messages to be printed during execution.
 Do not delete the Fortran translation of an SPP source file.
 .le
 .ls 10 -g
-Generates debugging information and (for VMS), links in the debugger.
+Generates debugging information.
 .le
 .ls 10 -h
 Causes the executable to be linked as a host program, i.e., without the
@@ -36,33 +25,43 @@ IRAF main and without searching the IRAF libraries, unless explicitly
 referenced on the command line.  Used to compile and link host (e.g., Fortran)
 programs which may or may not reference the IRAF libraries.
 .le
-.ls 10 -i2
-Tells fortran to use I*2 by default.
+.ls 10 -H
+Link a host program as with "-h", but include the VOS libraries.
 .le
-.ls 10 -i4
-Tells fortran to use I*4 by default.
+.ls 10 -A
+Force architecture specific include files.
 .le
-.ls 10 -l\fIlib\fR
-This tells the linker which libraries besides the standard
-ones to include.  These must be either on the current
+.ls 10 -C
+Link a host program which has a C main.  We may need to tweak the
+command line as a special case here since we normally assume Fortran
+sources.
+.le
+.ls 10 -/\fIflag\fR, -//\fIfoo\fR
+Pass \fIflag\fR to host compiler without further
+interpretation. "-/\fIflag\fR" becomes "-\fIfoo\fR", "-//\fIfoo\fR"
+becomes "\fIfoo\fR".
+.le
+.ls 10 -D\fIdefine\fR
+Pass a -D\fIdefine\fR flag on to the host compiler.
+.le
+.ls 10 -I\fIdir\fR
+Pass a -I\fIdir\fR flag on to the host compiler.  A special case is
+"-Inolibc" which disables automatic inclusion of the IRAF LIBC
+includes (hlib$libc).
+.le
+.ls 10 -l\fIlib\fR, -L\fIdir\fR
+This tells the linker which library files or library directories
+besides the standard ones to include.  These must be either on the current
 directory, or in an IRAF system library (lib$ or hlib$).
 The library specification must be immediately after the option as in
 "-lxtools".  No other option may follow the 'l' option in the same
-argument as in -lxtoolsO.	
-.le
-.ls 10 -L
-Creates a list file. VMS specific.
-.le
-.ls 10 -M, -m
-Tells the linker to create a link map.
-.le
-.ls 10 -n
-Not really supported under VMS since "normal" users
-cannot install images.  In Unix this is just a link
-option to make a shareable image.
+argument as in -lxtoolsO.
 .le
 .ls 10 -N
-Same as -z for VMS.
+Generates the output temp file in /tmp during the link, then moves it
+to the output directory in one operation when done.  For cases such as
+linking in an NFS-mounted directory, where all the NFS i/o may slow
+the link down excessively.
 .le
 .ls 10 -Nh [filename]
 This tells xpp that the foreign definitions in the
@@ -88,23 +87,12 @@ host level to accomplish the same thing.  The package name \fImust\fR
 be specified when doing software development in an external or layered
 package.
 .le
-.ls 10 -P
-Check portability.  This should be used all of the time in IRAF,
-but the VMS C compiler forces the use of non-standard
-constructs in some cases.  Also <stdio.h> and <ctype.h> get
-complaints for the above reason.  This may be used and probably
-should when working with Fortran due to Dec non-standard
-extension.
-.le
 .ls 10 -q
 Disable optimization.  Opposite of -O.  Object code will be optimized
 by default.
 .le
 .ls 10 -s
 Strips all symbols and debugging information.
-.le
-.ls 10 -S
-Same as -s for VMS.
 .le
 .ls 10 -v
 Verbose mode.  Causes messages to be printed during execution telling
@@ -113,52 +101,46 @@ what the \fIxc\fR program is doing.
 .ls 10 -w
 Suppress warnings.				
 .le
-.ls 10 -X, -x
-Compile and link for debugging.  In VMS/IRAF, links in the VMS debugger
-and symbols.
+.ls 10 -x
+Compile and link for debugging.
 .le
 .ls 10 -z
 Create a non-shareable image (default).
 .le
+.ls 10 -V
+Print XC version identification.
+.le
 .ih
 DESCRIPTION
 XC is a machine independent utility for compiling and linking IRAF
-tasks or files.  The XC utility may also be used to compile and/or link
-non-IRAF files and tasks.  The VMS version of XC supports all of the
-important flags except -D which VMS C doesn't support in any way.
-It can be used to generate fortran from xpp or ratfor code, to compile any
-number of files, and then link them if desired.  XC accepts and maps IRAF
-virtual filenames, but since it is a standalone bootstrap utility the
-environment is not passed, hence logical directories cannot be used.
+tasks or files.  The XC utility may also be used to compile and/or
+link non-IRAF files and tasks. It can be used to generate fortran from
+xpp or ratfor code, to compile any number of files, and then link them
+if desired.  XC accepts and maps IRAF virtual filenames, but since it
+is a standalone bootstrap utility the environment is not passed, hence
+logical directories cannot be used.
 
-The following extensions are supported by the VMS version of xc:
-.x, .r, .f, .ftn, .for, .c, .mar, .s, .o, .obj, .a, .olb, .e, .exe.
 It is suggested that everyone stick with the iraf virtual file name extensions.
-These are : .x, .r, .f, .c, .s, .o, .a, .e. The mapping of these to their
-VMS counterparts is:
+These are : .x, .r, .f, .c, .s, .o, .a, .e.
+The meaning of these is:
 
 .ks
 .nf
-     .x -> .x    SPP code
-     .r -> .r    Ratfor code
-     .f -> .for  Fortran code
-     .c -> .c    C code
-     .s -> .mar  Macro assembler code
-     .o -> .obj  Object module
-     .a -> .olb  Library file
-     .e -> .exe  Executable Image
+     .x  SPP code
+     .r  Ratfor code
+     .f  Fortran code
+     .c  C code
+     .s  Macro assembler code
+     .o  Object module
+     .a  Library file
+     .e  Executable Image
 .fi
 .ke
 
-XC is available both in the CL, via the foreign task interface, and as
-a standalone DCL callable task.  Usage is equivalent in either case.  Upper
-case flags must be quoted to be recognized (the upper case flags will be
-done away with at some point).
+XC is available both in the CL and as a standalone task.
+Usage is equivalent in either case.
 .ih
 EXAMPLES
-Any upper case flags in the following examples must be doubly quoted in
-the CL, singly quoted in VMS, to make it to XC without VMS mapping
-everything to one case.  Omit the "-x" flag on a UNIX system.
 
 1. Compile and link the source file "mytask.x" to produce the executable
 "mytask.e".
@@ -194,12 +176,6 @@ everything to one case.  Omit the "-x" flag on a UNIX system.
 
 XC is often combined with \fImkpkg\fR to automatically maintain large packages
 or libraries.
-.ih
-BUGS
-The -S flag should generate assembler
-output but does not presently do so in the VMS version.  All case sensitive
-switches should be done away with in both the UNIX and VMS versions of the
-utility.
 .ih
 SEE ALSO
 mkpkg, generic
