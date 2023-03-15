@@ -25,7 +25,7 @@
  * system.
  */
 
-#define VERSION		"IRAFNET XC V2.4 Jan 21 2010"
+#define VERSION		"IRAF community XC V2.5 Mar 15 2023"
 
 #define	ERR		(-1)
 #define	EOS		'\0'
@@ -128,7 +128,6 @@ int	nolibc 		= NO;
 int	usef2c 		= YES;
 int	useg95 		= NO;
 int	userincs	= NO;
-int	useg2c 		= NO;
 int	host_c_main 	= NO;
 
 char	ccomp[SZ_FNAME] 	= CCOMP;
@@ -200,9 +199,9 @@ static void  fatal (char *s);
  *	f77		UNIX fortran compiler
  *	cc		compile other sources, link if desired
  *
- *  The Fortran source is left behind if the -F flag is given.  The IRAF root
- *  directory must either be given on the command line as "-r pathname" or in
- *  the environment as the variable "irafdir".
+ *  The Fortran source is left behind if the -F flag is given.  The
+ *  IRAF root directory must be given in the environment as the
+ *  variable "iraf".
  */
 int
 main (int argc, char *argv[])
@@ -394,12 +393,6 @@ main (int argc, char *argv[])
 		    i++;
 		    break;
 
-		case 'r':
-		    /* Not used anymore */
-		    if ((arg = argv[++i]) == NULL)
-			i--;
-		    break;
-
 		case 'h':
 		    /* Host program: do not link in IRAF main or search
 		     * standard IRAF libraries unless explicitly referenced
@@ -414,12 +407,6 @@ main (int argc, char *argv[])
 		    hostprog++;
 		    noedsym++;
 		    nolibc++;
-		    break;
-
-		case 'G':
-		    /* Force a program to link w/ libg2c.a instead of libf2c.a
-		     */
-		    useg2c++;
 		    break;
 
 		case 'A':
@@ -617,16 +604,6 @@ passflag:		    mkobject = YES;
 		    ip++;
 	    }
 	}
-
-	/* Now check for any alternative compiler definitions or commandline
-	 * flags which will affect out link line.  Some systems like LinuxPPC
-	 * will require use of -lg2c even though we can continue to use the
-	 * hlib$f77.sh the fortran compiler script on that system.
-	 */
-	if (useg2c || strncmp (f77comp, "g77", 3) == 0) {
-	    fortlib[0] = fortlib[1] = "-lg2c";
-	}
-
 
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,

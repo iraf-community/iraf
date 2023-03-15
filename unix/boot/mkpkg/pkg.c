@@ -328,7 +328,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		    /* Compile the modules and update the library.
 		     */
 		    exit_status = h_updatelibrary (cx->libpath,
-			cx->flist, cx->nfiles, getsym(XFLAGS), irafdir);
+			cx->flist, cx->nfiles, getsym(XFLAGS));
 		    if (exit_status == INTERRUPT)
 			fatals ("<ctrl/c> interrupt %s", cx->library);
 		    cx->totfiles += cx->nfiles;
@@ -364,7 +364,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 	 * been reached (but only if the module being processed is a library
 	 * list).
 	 */
-	if (cx->totfiles == 0 && !forceupdate) {
+	if (cx->totfiles == 0) {
 	    printf ("Library %s is up to date\n", cx->library);
 	    fflush (stdout);
 	} else if (exit_status == OK || ignore) {

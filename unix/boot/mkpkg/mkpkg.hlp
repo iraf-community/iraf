@@ -14,7 +14,7 @@ character in the switch, e.g., "-d" is level one, "-dd" is level two, and
 so on.  The debug messages get progressively more detailed as the debug level
 increases.  Debug mode automatically enables the verbose mode messages.
 .le
-.ls 10 \fB-f file\fR
+.ls 10 \fB-f \fIfile\fR
 Set the name of the file to be interpreted (default: "mkpkg").
 The special value "stdin" (lower case) allows commands to be entered
 interactively from the standard input, e.g., for debugging \fImkpkg\fR.
@@ -36,23 +36,12 @@ host level to accomplish the same thing.  The package name \fImust\fR
 be specified when doing software development in an external or layered
 package.
 .le
-.ls 10 \fB-u\fR    [AOSVS/IRAF only]
-Forcibly update the dates of improperly dated library modules.  This option
-is used when a binary archive is restored on a machine which cannot restore
-the file modify dates.  In this case, all source file dates would appear to
-have been modified since the libraries were updated, causing all sources to
-be recompiled.  By running \fImkpkg\fR with the \fI-u\fR flag, one can update
-the library module dates without recompiling the associated files.  This is
-done by setting the date of each library module to be no older than the
-file \fIhlib$iraf.h\fR, which should be "touched" after the system has fully
-been restored to disk to mark the installation time.  Note that files which
-have been modified \fIsince\fR the system was restored to disk will still
-cause the affected library modules to be updated, even when the \fI-u\fR flag
-is specfied.
-.le
 .ls 10 \fB-v\fR
 Verbose mode.  A message is printed whenever a file is touched.
 Recommended when running large mkpkg jobs in batch mode.
+.le
+.ls 10 \fB-x\fR, \fB-g\fR
+Define the symbol "DEBUG" to build for debugging.
 .le
 .ls 10 \fBmodule\fR
 The names of the module or modules (named entries in the "mkpkg" file) to be
@@ -133,7 +122,6 @@ directory or a logical directory.
 
 .ks
 .nf
-	as$		where .s files go		host$as/
 	bin$		installed executables		iraf$bin/
 	dev$		device tables			iraf$dev/
 	hlib$		machdep header files		host$hlib/
@@ -470,13 +458,12 @@ Delete the named file or files.
 .ls \fB$generic\fR [-k] [-p prefix] [-t types] [-o root] files
 .sp
 Run the generic preprocessor on the named files.  The generic preprocessor
-is an IRAF bootstrap utility and may not be available on non-UNIX hosts.
+is an IRAF bootstrap utility.
 .le
 .ls \fB$xyacc\fR [options] file
 .sp
 Run the xyacc parser generator on the named files.  The yacc parser
-generator is an IRAF bootstrap utility and may not be available on
-non-UNIX hosts.
+generator is an IRAF bootstrap utility.
 .le
 .ls \fB$link\fR [switches] file1 file2 ... fileN [-o file.e]
 .sp

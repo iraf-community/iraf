@@ -44,21 +44,6 @@ host level to accomplish the same thing.  The package name \fImust\fR
 be specified when doing software development in an external or layered
 package.
 .TP
-.B \-u  [AOSVS/IRAF only]
-Forcibly update the dates of improperly dated library modules.  This
-option is used when a binary archive is restored on a machine which
-cannot restore the file modify dates.  In this case, all source file
-dates would appear to have been modified since the libraries were
-updated, causing all sources to be recompiled.  By running \fBmkpkg\fP
-with the \fB-u\fP flag, one can update the library module dates
-without recompiling the associated files.  This is done by setting the
-date of each library module to be no older than the file
-\fBhlib$iraf.h\fP, which should be "touched" after the system has
-fully been restored to disk to mark the installation time.  Note that
-files which have been modified \fIsince\fR the system was restored to
-disk will still cause the affected library modules to be updated, even
-when the \fB-u\fP flag is specified.
-.TP
 .B \-v
 Verbose mode.  A message is printed whenever a file is touched.
 Recommended when running large mkpkg jobs in batch mode.
@@ -137,7 +122,6 @@ logical directories; these are summarized in the list below.  The IRAF
 the current directory or a logical directory.
 
 .nf
-        as$         where .s files go             host$as/
         bin$        installed executables         iraf$bin/
         dev$        device tables                 iraf$dev/
         hlib$       machdep header files          host$hlib/
@@ -453,13 +437,12 @@ Delete the named file or files.
 .B $generic \fP[\fI-k\fP] [\fI-p prefix\fP] [\fI-t types\fP] [\fI-o root\fP] \fIfiles\fP
 .sp
 Run the generic preprocessor on the named files.  The generic preprocessor
-is an IRAF bootstrap utility and may not be available on non-UNIX hosts.
+is an IRAF bootstrap utility.
 .TP
 .B $xyacc \fP[\fIoptions\fP] \fIfile\fP
 .sp
 Run the xyacc parser generator on the named files.  The yacc parser
-generator is an IRAF bootstrap utility and may not be available on
-non-UNIX hosts.
+generator is an IRAF bootstrap utility.
 .TP
 .B $link \fP[\fIswitches\fP] \fIfile1 file2 ... fileN \fP[\fI-o file.e\fP]
 .sp

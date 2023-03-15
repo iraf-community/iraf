@@ -789,10 +789,7 @@ do_omake (
 		strcat (xflags, "-x ");
 	    strcat (xflags, s_xflags);
 
-	    if (irafdir[0])
-		sprintf (cmd, "%s %s -r %s %s", xc_path, xflags, irafdir, fname);
-	    else
-		sprintf (cmd, "%s %s %s", xc_path, xflags, fname);
+	    sprintf (cmd, "%s %s %s", xc_path, xflags, fname);
 
 	    if (verbose) {
 		printf ("%s\n", cmd);
@@ -830,10 +827,7 @@ do_xc (struct context *cx)
 	    fflush (stdout);
 	}
 
-	if (irafdir[0])
-	    sprintf (cmd, "%s -r %s", xc_path, irafdir);
-	else
-	    sprintf (cmd, "%s", xc_path);
+	sprintf (cmd, "%s", xc_path);
 
 	if (debug)
 	    strcat (cmd, " -d");
@@ -908,10 +902,7 @@ do_link (struct context *cx)
 	} else
 	    lflags = getsym (LFLAGS);
 
-	if (irafdir[0])
-	    sprintf (cmd, "%s %s -r %s", xc_path, lflags, irafdir);
-	else
-	    sprintf (cmd, "%s %s", xc_path, lflags);
+	sprintf (cmd, "%s %s", xc_path, lflags);
 
 	if (debug)
 	    strcat (cmd, " -d");

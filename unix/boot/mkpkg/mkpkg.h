@@ -158,7 +158,7 @@ int   fn_strncpy (char *out, char *in, int maxch);
 
 /*  host.c  */ 
 int   h_updatelibrary (char *library, char *flist[], int totfiles, 
-		char *xflags, char *irafdir);
+		char *xflags);
 int   h_rebuildlibrary (char *library);
 int   h_incheck (char *file, char *dir);
 int   h_outcheck (char *file, char *dir, int clobber);

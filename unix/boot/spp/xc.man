@@ -9,48 +9,31 @@ xc \- portable IRAF compile/link utility
 .SH DESCRIPTION
 \fBXC\fP is a machine independent utility for compiling and linking
 IRAF tasks or files.  The XC utility may also be used to compile
-and/or link non-IRAF files and tasks.  The VMS version of XC supports
-all of the important flags except \-D which VMS C doesn't support in
-any way.  It can be used to generate fortran from xpp or ratfor code,
-to compile any number of files, and then link them if desired.  XC
-accepts and maps IRAF virtual filenames, but since it is a standalone
-bootstrap utility the environment is not passed, hence logical
-directories cannot be used.
+and/or link non-IRAF files and tasks. It can be used to generate
+fortran from xpp or ratfor code, to compile any number of files, and
+then link them if desired.  XC accepts and maps IRAF virtual
+filenames, but since it is a standalone bootstrap utility the
+environment is not passed, hence logical directories cannot be used.
 
-The following extensions are supported by the VMS version of 
-xc: .x, .r, .f, .ftn, .for, .c, .mar, .s, .o, .obj, .a, .olb, .e, .exe.
 It is suggested that everyone stick with the iraf virtual file name
-extensions.  These are : .x, .r, .f, .c, .s, .o, .a, .e. The mapping
-of these to their VMS counterparts is:
+extensions.  These are : .x, .r, .f, .c, .s, .o, .a, .e. The meaning
+of these is:
 
 .nf
-     .x -> .x    SPP code
-     .r -> .r    Ratfor code
-     .f -> .for  Fortran code
-     .c -> .c    C code
-     .s -> .mar  Macro assembler code
-     .o -> .obj  Object module
-     .a -> .olb  Library file
-     .e -> .exe  Executable Image
+     .x   SPP code
+     .r   Ratfor code
+     .f   Fortran code
+     .c   C code
+     .s   Macro assembler code
+     .o   Object module
+     .a   Library file
+     .e   Executable Image
 .fi
 
-XC is available both in the CL, via the foreign task interface, and as
-a standalone DCL callable task.  Usage is equivalent in either case.
-Upper case flags must be quoted to be recognized (the upper case flags
-will be done away with at some point).
+XC is available both in the CL and as
+a standalone task.  Usage is equivalent in either case.
 
 .SH FLAGS
-.TP
-.B -a
-To support VMS link options file.  Next file is taken to be the VMS
-name of a link options file.  This is primarily for using long lists
-of files or libraries and not for actual VMS Linker options, since XC
-adds continuation characters where it believes it is appropriate.
-.TP
-.B -C
-Tells fortran to do array bound and other checking.  By default no
-checking is done.  From DCL fortran usually does array and overflow
-checking which is not used here.
 .TP
 .B -c
 Tells \fBxc\fR not to link, i.e., not to create an executable.
@@ -62,7 +45,7 @@ Causes debug messages to be printed during execution.
 Do not delete the Fortran translation of an SPP source file.
 .TP
 .B -g
-Generates debugging information and (for VMS), links in the debugger.
+Generates debugging information .
 .TP
 .B -h
 Causes the executable to be linked as a host program, i.e., without
@@ -71,31 +54,43 @@ explicitly referenced on the command line.  Used to compile and link
 host (e.g., Fortran) programs which may or may not reference the IRAF
 libraries.
 .TP
-.B -i2
-Tells fortran to use I*2 by default.
+.B -H
+Link a host program as with "-h", but include the VOS libraries.
 .TP
-.B -i4
-Tells fortran to use I*4 by default.
+.B -A
+Force architecture specific include files.
 .TP
-.B -l\fIlib\fR
-This tells the linker which libraries besides the standard ones to
-include.  These must be either on the current directory, or in an IRAF
-system library (lib$ or hlib$).  The library specification must be
-immediately after the option as in "\-lxtools".  No other option may
-follow the 'l' option in the same argument as in \-lxtoolsO.
+.B -C
+Link a host program which has a C main.  We may need to tweak the
+command line as a special case here since we normally assume Fortran
+sources.
 .TP
-.B -L
-Creates a list file. VMS specific.
+.B -/\fIflag\fR, \fB-//\fIfoo
+Pass \fIflag\fR to host compiler without further
+interpretation. "-/\fIflag\fR" becomes "-\fIfoo\fR", "-//\fIfoo\fR"
+becomes "\fIfoo\fR".
 .TP
-.B -M\fR,\fB -m
-Tells the linker to create a link map.
+.B -D\fIdefine
+Pass a -D\fIdefine\fR flag on to the host compiler.
 .TP
-.B -n
-Not really supported under VMS since "normal" users cannot install
-images.  In Unix this is just a link option to make a shareable image.
+.B -I\fIdir
+Pass a -I\fIdir\fR flag on to the host compiler.  A special case is
+"-Inolibc" which disables automatic inclusion of the IRAF LIBC
+includes (hlib$libc).
+.TP
+.B -l\fIlib\fR, \fB-L\fIdir\fR
+This tells the linker which library files or library directories
+besides the standard ones to include.  These must be either on the current
+directory, or in an IRAF system library (lib$ or hlib$).
+The library specification must be immediately after the option as in
+"-lxtools".  No other option may follow the 'l' option in the same
+argument as in -lxtoolsO.	
 .TP
 .B -N
-Same as \-z for VMS.
+Generates the output temp file in /tmp during the link, then moves it
+to the output directory in one operation when done.  For cases such as
+linking in an NFS-mounted directory, where all the NFS i/o may slow
+the link down excessively.
 .TP
 .B -Nh \fR[\fIfilename\fR]
 This tells xpp that the foreign definitions in the file specified
@@ -119,13 +114,6 @@ level to accomplish the same thing.  The package name \fImust\fR be
 specified when doing software development in an external or layered
 package.
 .TP
-.B -P
-Check portability.  This should be used all of the time in IRAF, but
-the VMS C compiler forces the use of non-standard constructs in some
-cases.  Also <stdio.h> and <ctype.h> get complaints for the above
-reason.  This may be used and probably should when working with
-Fortran due to Dec non-standard extension.
-.TP
 .B -q
 Disable optimization.  Opposite of \-O.  Object code will be optimized
 by default.
@@ -143,12 +131,11 @@ what the \fBxc\fR program is doing.
 .B -w
 Suppress warnings.                              
 .TP
-.B -X\fR,\fB -x
-Compile and link for debugging.  In VMS/IRAF, links in the VMS
-debugger and symbols.
-.TP
 .B -z
 Create a non-shareable image (default).
+.TP
+.B V
+Print XC version identification.
 
 .SH SEE ALSO
 .BR mkpkg (1),
