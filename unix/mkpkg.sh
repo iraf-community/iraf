@@ -19,7 +19,7 @@ echo "+"; echo "+"
 (cd f2c; sh -x mkpkg.sh)
 echo "----------------------- BOOT ---------------------------"
 echo "+"; echo "+"
-(cd boot; sh -x mkpkg.sh)
+make -C boot hlib clean
 #echo "----------------------- SHLIB --------------------------"
 #echo "+"; echo "+"
 #(cd shlib; sh -x mkpkg.sh)
