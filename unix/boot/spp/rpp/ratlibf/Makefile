@@ -1,6 +1,3 @@
-FFLAGS := $(HSI_FF)
-FC := $(F77)
-
 OBJS = addset.o addstr.o amatch.o catsub.o clower.o concat.o ctoc.o	\
     ctoi.o ctomn.o cupper.o delete.o docant.o dodash.o dsdbiu.o		\
     dsdump.o dsfree.o dsget.o dsinit.o enter.o equal.o error.o		\

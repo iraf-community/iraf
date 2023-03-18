@@ -1,7 +1,7 @@
 OBJS := rmfiles.o
 
-hlib: rmfiles.e
-	cp $? $(hlib)
+hbin: rmfiles.e
+	cp $? $(hbin)
 
 rmfiles.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

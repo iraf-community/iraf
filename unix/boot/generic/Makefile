@@ -1,7 +1,7 @@
 OBJS := generic.o lexyy.o yywrap.o
 
-hlib: generic.e
-	cp $? $(hlib)
+hbin: generic.e
+	cp $? $(hbin)
 
 lexyy.c: tok.l
 	flex -o $@ $^

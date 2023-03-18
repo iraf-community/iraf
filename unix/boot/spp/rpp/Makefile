@@ -1,7 +1,7 @@
 OBJS := rpp.o rppfor/librpp.a ratlibf/libf.a ratlibc/libc.a
 
-hlib: rpp.e
-	cp $? $(hlib)
+hbin: rpp.e
+	cp $? $(hbin)
 
 rpp.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(FLIBS) -o $@

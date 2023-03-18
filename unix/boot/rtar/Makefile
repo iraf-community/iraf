@@ -1,7 +1,7 @@
 OBJS := rtar.o
 
-hlib: rtar.e
-	cp $? $(hlib)
+hbin: rtar.e
+	cp $? $(hbin)
 
 rtar.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

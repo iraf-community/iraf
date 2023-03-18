@@ -1,8 +1,8 @@
 OBJS := main.o char.o fdcache.o fncache.o host.o pkg.o scanlib.o	\
         sflist.o tok.o
 
-hlib: mkpkg.e
-	cp $? $(hlib)
+hbin: mkpkg.e
+	cp $? $(hbin)
 
 mkpkg.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

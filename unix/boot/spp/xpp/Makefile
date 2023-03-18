@@ -1,7 +1,7 @@
 OBJS := xppmain.o lexyy.o xppcode.o decl.o
 
-hlib: xpp.e
-	cp $? $(hlib)
+hbin: xpp.e
+	cp $? $(hbin)
 
 xpp.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

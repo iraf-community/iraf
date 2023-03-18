@@ -1,7 +1,7 @@
 OBJS := xc.o
 
-hlib: xc.e
-	cp $? $(hlib)
+hbin: xc.e
+	cp $? $(hbin)
 	$(MAKE) -C xpp $@
 	$(MAKE) -C rpp $@
 

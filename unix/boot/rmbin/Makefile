@@ -1,7 +1,7 @@
 OBJS := rmbin.o
 
-hlib: rmbin.e
-	cp $? $(hlib)
+hbin: rmbin.e
+	cp $? $(hbin)
 
 rmbin.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

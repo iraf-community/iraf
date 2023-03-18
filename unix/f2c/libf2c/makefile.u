@@ -120,6 +120,7 @@ sysdep1.h: sysdep1.h0
 # uncomment the following two lines:
 #main.o: main.c
 #	$(CC) -c -Donexit=on_exit -DSkip_f2c_Undefs main.c
+main.o: main.c signal1.h
 
 install: libf2c.a
 	cp libf2c.a $(LIBDIR)
@@ -128,13 +129,13 @@ install: libf2c.a
 clean:
 	rm -f libf2c.a *.o arith.h signal1.h sysdep1.h
 
-backspac.o:	fio.h
+backspac.o:	fio.h sysdep1.h
 close.o:	fio.h
 dfe.o:		fio.h
 dfe.o:		fmt.h
 due.o:		fio.h
 endfile.o:	fio.h rawio.h
-err.o:		fio.h rawio.h
+err.o:		fio.h rawio.h sysdep1.h
 fmt.o:		fio.h
 fmt.o:		fmt.h
 iio.o:		fio.h
@@ -165,7 +166,7 @@ signbit.o:	arith.h
 sue.o:		fio.h
 uio.o:		fio.h
 uninit.o:	arith.h
-util.o:		fio.h
+util.o:		fio.h sysdep1.h
 wref.o:		fio.h
 wref.o:		fmt.h
 wref.o:		fp.h

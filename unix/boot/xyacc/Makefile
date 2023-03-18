@@ -1,7 +1,7 @@
 OBJS := y1.o y2.o y3.o y4.o
 
-hlib: xyacc.e
-	cp $? $(hlib)
+hbin: xyacc.e
+	cp $? $(hbin)
 
 xyacc.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@

@@ -39,12 +39,12 @@ c_start=$(date)
 "$iraf/util/mkclean"				# clean old binaries
 
 . "$iraf/unix/hlib/irafuser.sh"			# NOVOS bootstrap
-(cd "$iraf/unix" && sh -x mkpkg.sh)
+make -C "$iraf/unix" hbin clean
 (cd "$iraf/sys"	&& mkpkg)			# build NOVOS
 
 . "$iraf/unix/hlib/irafuser.sh"			# VOS bootstrap
-(cd "$iraf/unix/boot" && sh -x mkpkg.sh && mv -v "$hlib"/*.e "$hbin")
-(cd "$iraf/vendor" && make all)			# build vendor libs
+make -C "$iraf/unix/boot" hbin clean
+make -C "$iraf/vendor" all			# build vendor libs
 (cd "$iraf/" && mkpkg)				# build core system
 (cd "$iraf/noao" && noao=$(pwd)/ mkpkg -p noao)	# build NOAO package
 

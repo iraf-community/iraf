@@ -1,7 +1,7 @@
 OBJS := wtar.o
 
-hlib: wtar.e
-	cp $? $(hlib)
+hbin: wtar.e
+	cp $? $(hbin)
 
 wtar.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
