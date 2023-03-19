@@ -1,10 +1,3 @@
-export CFLAGS := $(HSI_CF)
-export FFLAGS := $(HSI_FF)
-export LDFLAGS := $(HSI_LF)
-export LIBS := $(HSI_LIBS)
-export FLIBS := $(HSI_F77LIBS)
-export FC := $(F77)
-
 hbin:
 	$(MAKE) -C bootlib $@
 	$(MAKE) -C generic $@

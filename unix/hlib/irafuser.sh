@@ -10,15 +10,16 @@ export IRAFARCH=$("$iraf/unix/hlib/irafarch.sh")
 
 
 export	hostid=unix
-export	host=${iraf}unix/
-export	hlib=${iraf}unix/hlib/
-export	hbin=${iraf}unix/bin.$MACH/
+export	host=${iraf}${hostid}/
+export	hlib=${host}hlib/
+export	hbin=${host}bin.${MACH}/
 export	tmp=/tmp/
 
 # Default to GCC for compilation.
 export	CC=${CC:-cc}
-export	F77=$hlib/f77.sh
-export	F2C=$hbin/f2c.e
+export	F77=${hlib}f77.sh
+export	FC=${F77}
+export	F2C=${hbin}f2c.e
 export	RANLIB=ranlib
 
 export XC_CFLAGS="${CPPFLAGS} ${CFLAGS} -I${iraf}include"
@@ -33,16 +34,6 @@ export HSI_OSLIBS=""
 if [ "$MACH" = "macosx" ] ; then
     export MACOSX_DEPLOYMENT_TARGET=10.5
 fi
-
-# The following determines whether or not the VOS is used for filename mapping.
-if [ -f "${iraf}lib/libsys.a" ]; then
-	export	HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
-else
-	export	HSI_CF="$HSI_CF -DNOVOS"
-	export	HSI_LIBS="${hlib}libboot.a ${hlib}libos.a -lm"
-fi
-
-export HSI_LIBS="$HSI_LIBS $HSI_OSLIBS"
 
 alias	mkiraf="${hlib}mkiraf.sh"
 alias	mkmlist="${hlib}mkmlist.sh"
