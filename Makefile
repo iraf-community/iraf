@@ -31,12 +31,12 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
-.PHONY: all sysgen clean test macosx macintel macos64 linux linux64 freebsd freebsd64 hurd generic
+.PHONY: all sysgen clean test arch
 
 all:: sysgen
 
 # Do a full sysgen.
-sysgen: bin
+sysgen: arch
 	# Bootstrap first stage: build xc, mkpkg etc. without the
 	# Virtual Operating System (VOS)
 	$(MAKE) -C $(host) NOVOS=yes bindir=$(hbin) install clean
@@ -70,7 +70,24 @@ clean:
 	      include/drvrsmem.h include/fitsio.h include/fitsio2.h \
 	      include/longnam.h include/votParse.h include/votParse_spp.h
 
-bin: $(IRAFARCH)
+arch:
+	mkdir -p bin.$(IRAFARCH) noao/bin.$(IRAFARCH) unix/bin.$(IRAFARCH)
+	rm -f bin unix/bin noao/bin
+	ln -s bin.$(IRAFARCH) bin
+	(cd noao && ln -s bin.$(IRAFARCH) bin)
+	(cd unix && ln -s bin.$(IRAFARCH) bin)
 
-macosx macintel macos64 linux linux64 freebsd freebsd64 hurd generic::
-	util/mkarch $@
+	if [ "$(shell $(hlib)irafarch.sh -nbits)" = 64 ] ; then \
+	    ( cd unix/hlib && \
+	      ln -sf iraf64.h iraf.h && \
+	      ln -sf mach64.h mach.h ) ; \
+	else \
+	    ( cd unix/hlib && \
+	      ln -sf iraf32.h iraf.h && \
+	      ln -sf mach32.h mach.h ) ; \
+	fi
+	if [ "$(shell $(hlib)irafarch.sh -endian)" = big ] ; then \
+	    ( cd unix/hlib && ln -sf swapbe.h swap.h ) ; \
+	else \
+	    ( cd unix/hlib && ln -sf swaple.h swap.h ) ; \
+	fi

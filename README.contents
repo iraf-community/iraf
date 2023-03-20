@@ -2,7 +2,7 @@
 	This directory contains the IRAF community release.  The
 	contents of this directory include:
 
-    LICENSE		Software license information
+    licenses		Software license information
     Makefile		Top-level makefile
     README.contents	This file
     INSTALL.md		Installation Notes
@@ -21,9 +21,7 @@
     pkg			IRAF core system package sources
     sys			IRAF Virtual Operating System (VOS) sources
     unix		Host System Interface files (Unix)
-    util		Build utility scripts
     vendor		Third-party vendor libraries (e.g. CFITSIO)
-    vo			VO External Package
 
 
   o  For Installation instructions see the 'INSTALL.md' file in
