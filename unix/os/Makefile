@@ -19,5 +19,5 @@ install: libos.a alloc.e
 	cp -p $? $(bindir)
 
 clean:
-	rm -f $(OBJS) alloc.e libos.a
+	rm -f $(OBJS) alloc.[eo] libos.a
 

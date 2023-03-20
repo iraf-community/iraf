@@ -51,7 +51,7 @@ for arch in $archs; do
         mkpkg "$arch"
         (cd noao && mkpkg -p noao "$arch")
     else
-	"$iraf/util/mkclean"
+	make clean
 
         mkdir -p "bin.$arch" "noao/bin.$arch" "unix/bin.$arch"
         ln -sf "bin.$arch" bin

@@ -31,6 +31,8 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
+.PHONY: all sysgen clean test macosx macintel macos64 linux linux64 freebsd freebsd64 hurd generic
+
 all:: sysgen
 
 # Do a full sysgen.
@@ -56,19 +58,17 @@ sysgen: bin
 	# Build the NOAO package
 	(cd $(iraf)noao && noao=$(iraf)noao/ $(MKPKG) -p noao)
 
+test:
+	env -u XC_CFLAGS ./test/run_tests
 
-# Clean the IRAF tree of all binaries.
-src pristine::
-	util/mksrc
-
-# Clean the IRAF tree of binaries for the currently configured arch.
-clean::
-	util/mkclean
-
-# Make only the NOAO package.
-noao::
-	cd noao ; $(MKPKG) -p noao
-
+clean:
+	$(MAKE) -C unix clean
+	$(MAKE) -C vendor clean
+	find ./local ./math ./pkg ./sys ./noao/[adfimnorst]* \
+	     -type f -name \*.\[aeo\] -exec rm -f {} \;
+	rm -f bin.$(IRAFARCH)/* noao/bin.$(IRAFARCH)/* $(hbin)* \
+	      include/drvrsmem.h include/fitsio.h include/fitsio2.h \
+	      include/longnam.h include/votParse.h include/votParse_spp.h
 
 bin: $(IRAFARCH)
 
