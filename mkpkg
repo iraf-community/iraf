@@ -21,7 +21,6 @@ mkall:
 relink:
 	$call sysexe
 	$call packages
-	$ifeq (hostid, unix)  !(touch unix/hlib/utime)  $endif
 	$echo "====================== (done) ==========================="
 	$ifeq (hostid, unix)  !(date)  $endif
 	;
