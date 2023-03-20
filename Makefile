@@ -31,31 +31,40 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
-.PHONY: all sysgen clean test arch
+.PHONY: all sysgen clean test arch noao host novos core vendor
 
 all:: sysgen
 
-# Do a full sysgen.
-sysgen: arch
-	# Bootstrap first stage: build xc, mkpkg etc. without the
-	# Virtual Operating System (VOS)
-	$(MAKE) -C $(host) NOVOS=yes bindir=$(hbin) install clean
+# Do a full sysgen, which consists on the host binaries, the core
+# system, and the NOAO package.
+sysgen: host core noao
 
-	# Build the libraries containing the Virtual Operating System
+# Bootstrap first stage: build xc, mkpkg etc. without the Virtual
+# Operating System (VOS)
+novos: arch
+	$(MAKE) -C $(host) NOVOS=yes bindir=$(hbin) install
+	$(MAKE) -C $(host) clean
+
+# Build the libraries containing the Virtual Operating System, and
+# re-build the build tools (xc, mkpkg, ...) with VOS
+host: novos
 	(cd $(iraf)sys && $(MKPKG))
+	$(MAKE) -C $(host) bindir=$(hbin) boot/install
+	$(MAKE) -C $(host) clean
 
-	# Re-build the build tools (xc, mkpkg, ...) with VOS
-	$(MAKE) -C $(host) bindir=$(hbin) boot/install clean
-
-	# Build vendor libs (cfitsio and libvotable)
+# Build vendor libs (cfitsio and libvotable)
+vendor: host
 	$(MAKE) -C $(iraf)vendor \
-	    includedir=$(iraf)include bindir=$(iraf)bin.$(IRAFARCH) \
-	    install clean
+	    includedir=$(iraf)include/ bindir=$(iraf)bin.$(IRAFARCH) \
+	    install
+	$(MAKE) -C $(iraf)vendor clean
 
-	# Build the full core system
+# Build the core system.
+core: host vendor
 	$(MKPKG)
 
-	# Build the NOAO package
+# Build the NOAO package.
+noao: host vendor core
 	(cd $(iraf)noao && noao=$(iraf)noao/ $(MKPKG) -p noao)
 
 test:
