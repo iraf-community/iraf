@@ -9,14 +9,14 @@ OBJS := zalloc.o zfdele.o zfiond.o zfmkcp.o zfrnam.o zglobl.o	\
     zintpr.o zopdpr.o zwmsec.o zzstrt.o zfchdr.o zfiomt.o	\
     zflink.o zfrmdr.o zghost.o zlocpr.o zoscmd.o zxwhen.o
 
-hbin: libos.a alloc.e
-	cp -p $? $(hbin)
+libos.a: $(OBJS)
+	ar r $@ $?
 
 alloc.e: alloc.o getproc.o
 	$(CC) $(LDFLAGS) -o $@ alloc.o getproc.o
 
-libos.a: $(OBJS)
-	ar r $@ $?
+install: libos.a alloc.e
+	cp -p $? $(bindir)
 
 clean:
 	rm -f $(OBJS) alloc.e libos.a

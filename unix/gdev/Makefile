@@ -1,4 +1,4 @@
-hbin:
+install:
 	$(MAKE) -C sgidev $@
 
 clean:

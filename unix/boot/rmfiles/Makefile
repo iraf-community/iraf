@@ -1,12 +1,12 @@
 OBJS := rmfiles.o
 
-hbin: rmfiles.e
-	cp $? $(hbin)
-
 rmfiles.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
+
+install: rmfiles.e
+	cp $? $(bindir)
 
 clean:
 	rm -f $(OBJS) rmfiles.e
 
-.PHONY: hlib clean
+.PHONY: install clean

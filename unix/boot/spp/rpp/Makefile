@@ -1,10 +1,10 @@
 OBJS := rpp.o rppfor/librpp.a ratlibf/libf.a ratlibc/libc.a
 
-hbin: rpp.e
-	cp $? $(hbin)
-
 rpp.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(FLIBS) -o $@
+
+install: rpp.e
+	cp $? $(bindir)
 
 rppfor/librpp.a: rppfor
 	$(MAKE) -C rppfor librpp.a
@@ -37,4 +37,4 @@ ratlibf:
 	  $(MAKE) -C ratlibr RATFOR=${RATFOR} ; \
 	fi
 
-.PHONY: hlib clean rppfor ratlibf
+.PHONY: install clean rppfor ratlibf

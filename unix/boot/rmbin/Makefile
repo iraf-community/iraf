@@ -1,12 +1,12 @@
 OBJS := rmbin.o
 
-hbin: rmbin.e
-	cp $? $(hbin)
-
 rmbin.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
+
+install: rmbin.e
+	cp $? $(bindir)
 
 clean:
 	rm -f $(OBJS) rmbin.e
 
-.PHONY: hlib clean
+.PHONY: install clean

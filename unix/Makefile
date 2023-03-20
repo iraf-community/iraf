@@ -19,19 +19,15 @@ export FLIBS := $(HSI_F77LIBS)
 export LDFLAGS := $(HSI_LF)
 export LIBS = $(HSI_LIBS)
 
-boot/hbin:
-	$(MAKE) -C boot hbin
+export bindir ?= $(hbin)
 
-hbin:
+%:
 	$(MAKE) -C os $@
 	$(MAKE) -C f2c $@
 	$(MAKE) -C boot $@
 	$(MAKE) -C gdev $@
 
-clean:
-	$(MAKE) -C os $@
-	$(MAKE) -C f2c $@
-	$(MAKE) -C gdev $@
-	$(MAKE) -C boot $@
+boot/install:
+	$(MAKE) -C boot install
 
-.PHONY: hbin boot/hbin clean
+.PHONY: boot/install

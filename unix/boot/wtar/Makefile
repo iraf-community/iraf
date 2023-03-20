@@ -1,12 +1,12 @@
 OBJS := wtar.o
 
-hbin: wtar.e
-	cp $? $(hbin)
-
 wtar.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
+
+install: wtar.e
+	cp $? $(bindir)
 
 clean:
 	rm -f $(OBJS) wtar.e
 
-.PHONY: hlib clean
+.PHONY: install clean

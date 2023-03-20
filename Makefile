@@ -36,13 +36,13 @@ all:: sysgen
 sysgen: bin
 	# Bootstrap first stage: build xc, mkpkg etc. without the
 	# Virtual Operating System (VOS)
-	$(MAKE) -C $(host) NOVOS=yes hbin clean
+	$(MAKE) -C $(host) NOVOS=yes bindir=$(hbin) install clean
 
 	# Build the libraries containing the Virtual Operating System
 	(cd $(iraf)sys && $(MKPKG))
 
 	# Re-build the build tools (xc, mkpkg, ...) with VOS
-	$(MAKE) -C $(host) boot/hbin clean
+	$(MAKE) -C $(host) bindir=$(hbin) boot/install clean
 
 	# Build vendor libs (cfitsio and libvotable)
 	$(MAKE) -C $(iraf)vendor all

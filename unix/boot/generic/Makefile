@@ -1,15 +1,15 @@
 OBJS := generic.o lexyy.o yywrap.o
 
-hbin: generic.e
-	cp $? $(hbin)
+generic.e: $(OBJS)
+	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
+
+install: generic.e
+	cp $? $(bindir)
 
 lexyy.c: tok.l
 	flex -o $@ $^
 
-generic.e: $(OBJS)
-	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
-
 clean:
 	rm -f $(OBJS) lexyy.c generic.e
 
-.PHONY: hlib clean
+.PHONY: install clean
