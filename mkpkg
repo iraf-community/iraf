@@ -54,13 +54,6 @@ mathlibs:
 packages:
 	$echo "====================== PACKAGES ========================="
 	$echo "+" $echo "+"
-
-	# On the UNIX distribution, the BIN directory is excluded from the
-	# tar tape in a "you relink" distribution.  Lets make sure we have
-	# the directory before proceeding to relink all the packages.
-
-	$ifeq (hostid, unix)  !(mkdir $(iraf)bin >& /dev/null)  $endif
-
 	$call update@pkg
 	$echo "+" $echo "+"
 	;
