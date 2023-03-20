@@ -1,64 +1,25 @@
-#///////////////////////////////////////////////////////////////////////////////
-#//
-#//  Makefile for the Vendor Libraries
-#//
-#///////////////////////////////////////////////////////////////////////////////
+export bindir ?= $(bin)
+export includedir ?= $(iraf)include/
 
-# primary dependencies
+all: cfitsio libvotable
 
-NAME       	 = vendor
-VERSION    	 = 1.0
-PLATFORM  	:= $(shell uname -s)
-PLMACH  	:= $(shell uname -m)
-HERE      	:= $(shell /bin/pwd)
-BINDIR    	:= ../bin/
-LIBDIR    	:= ../lib/
-INCDIR    	:= ../lib/
-
-
-# includes, flags and libraries
-CC		?= cc
-CINCS  	  	= -I$(INCDIR) -I./
-LIBS		= -lm -lc -lpthread
-
-
-all:
-	./mklibs
-
-libs:
-
-install:
-	(cd cfitsio   ; make install)
-	(cd libvotable  ; make install)
+install: all
+	$(MAKE) -C cfitsio install
+	rm -rf $(bindir)pkgconfig/
+	rmdir $(bindir)pkgconfig || true
+	$(MAKE) -C libvotable install
 
 clean:
-	(cd cfitsio   ; make clean)
-	(cd libvotable  ; make clean)
-
+	$(MAKE) -C cfitsio distclean || true
+	$(MAKE) -C libvotable clean
 
 cfitsio:
-	(cd cfitsio   ; ./configure --libdir=../../bin ; make ; make install)
+	cd cfitsio && \
+	./configure --includedir=$(includedir) \
+	            --bindir=$(bindir) --libdir=$(bindir)
+	$(MAKE) -C cfitsio libcfitsio.a
 
 libvotable:
-	(cd libvotable  ; make World)
+	$(MAKE) -C libvotable libVOTable.a
 
-
-###############################################################################
-# Leave this stuff alone.
-###############################################################################
-
-$(STATICLIB): $(SRCS:%.c=Static/%.o)
-	/usr/bin/ar rv $@ $?
-Static/%.o: %.c $(INCS)
-	$(CC) $(CINCS) $(CFLAGS) -c $< -o $@
-Static:
-	/bin/mkdir $@
-	chmod 777 $@
-
-$(SHAREDLIB): $(SRCS:%.c=Shared/%.o)
-	/usr/bin/ld -shared -o $@ $? -lc -ldl
-Shared/%.o: %.c $(INCS)
-	$(CC) $(CINCS) $(CFLAGS) -fpic -shared -c $< -o $@
-Shared:
-	/bin/mkdir $@
-	chmod 777 $@
+.PHONY: cfitsio libvotable clean all install

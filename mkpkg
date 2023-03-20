@@ -6,7 +6,6 @@ $call	mkall					# make everything
 $exit
 
 sysgen:
-	$call vendor
 	$call mkall
 	$call update
 	;
@@ -30,13 +29,6 @@ relink:
 update:
 	$call sysexe
 	$call packages
-	;
-
-vendor:
-	$echo "======================= VENDOR =========================="
-	$echo "+"
-	$call sysgen@vendor
-	$echo "+" $echo "+"
 	;
 
 syslibs:

@@ -36,8 +36,10 @@ EOF
 # This just gets CORE_SOURCES from Makefile.in
 lib_files=$(make -f cfitsio/Makefile.in cfitsioLibSrcs | sed 's/zlib\/.*//')
 flib_files='f77_wrap1.c f77_wrap2.c f77_wrap3.c f77_wrap4.c'
+
 # The include files cannot be directly inferred from Makefile.in
 inc_files='fitsio.h fitsio2.h longnam.h drvrsmem.h eval_defs.h eval_tab.h region.h group.h simplerng.h grparser.h f77_wrap.h cfortran.h'
+
 extra_files='config.sub config.guess Makefile.in cfitsio.pc.in'
 
 if [ ! -d cfitsio/lib ]; then
@@ -49,44 +51,15 @@ for fil in $lib_files $flib_files $inc_files $extra_files; do
         mv "cfitsio/$fil" cfitsio/lib/
     fi
 done
+
 rm -rf cfitsio/cfitsio.xcodeproj
 rm -rf cfitsio/docs
 rm -f cfitsio/[!L]*.*
 mv cfitsio/lib/* cfitsio/
 rmdir cfitsio/lib/
+
 cat <<EOF >cfitsio/README.IRAF
 Note: IRAF only requires the CFITSIO library, and hence in this bundled version,
 we removed all other files except the required license (License.txt) and changelog
 (docs/changes.txt, which has the version number).
 EOF
-cat <<EOF >cfitsio/mklibs
-#!/bin/sh
-
-set -e
-
-top=\$(pwd)
-
-export	CC=\${CC:-cc}
-
-if [ "\$PLMACH" = "macosx" ] ; then
-   export CFLAGS="-DDarwin"
-fi
-
-echo "  (Using toplevel directory \$top ....)"
-
-# Global options.
-gopts="--prefix=\$top --exec-prefix=\$top --disable-shared"
-
-./configure \$gopts
-make clean
-make
-
-cp   libcfitsio.a ../voclient/lib
-mv   libcfitsio.a ../../lib
-cp   fitsio*.h longnam.h ../../include
-
-make clean
-echo "done"
-EOF
-
-chmod +x cfitsio/mklibs

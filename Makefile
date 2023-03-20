@@ -4,10 +4,10 @@
 # ---------------------------------------------------------------------------
 
 # IRAF specific variables
-export iraf	= $(shell pwd)/
+export iraf = $(shell pwd)/
 export IRAFARCH	?= $(shell unix/hlib/irafarch.sh -current)
 
-# Default IRAD directory structure
+# Default IRAF directory structure
 export hostid = unix
 export host = $(iraf)$(hostid)/
 export hlib = $(host)hlib/
@@ -21,13 +21,14 @@ export F77 = $(hlib)f77.sh
 export FC = $(F77)
 export F2C = $(hbin)f2c.e
 export MKPKG = $(hbin)mkpkg.e
+export XC = $(hbin)xc.e
 export RANLIB = ranlib
 
 # General compiler flags. Compiler flags specific to the build of the
 # host tools and software are in unix/Makefile.
 export CFLAGS ?= -g -Wall -O2
 CFLAGS += $(CARCH)
-export LDFLAGS = $(CARCH)
+export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
 all:: sysgen
@@ -45,7 +46,9 @@ sysgen: bin
 	$(MAKE) -C $(host) bindir=$(hbin) boot/install clean
 
 	# Build vendor libs (cfitsio and libvotable)
-	$(MAKE) -C $(iraf)vendor all
+	$(MAKE) -C $(iraf)vendor \
+	    includedir=$(iraf)include bindir=$(iraf)bin.$(IRAFARCH) \
+	    install clean
 
 	# Build the full core system
 	$(MKPKG)
