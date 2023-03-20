@@ -20,8 +20,7 @@ The special value "stdin" (lower case) allows commands to be entered
 interactively from the standard input, e.g., for debugging \fImkpkg\fR.
 .le
 .ls 10 \fB-i\fR
-Ignore errors.  Execution continues even if an error occurs.  In most cases
-it does anyhow, so this switch has little effect at present.
+Ignore errors.  Execution continues even if an error occurs.
 .le
 .ls 10 \fB-n\fR
 No execute.  Go through the motions, but do not touch any files.

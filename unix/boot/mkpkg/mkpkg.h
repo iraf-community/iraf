@@ -125,6 +125,7 @@ char	*k_fgets(char *op, int maxch, register struct context *cx);
 
 /*  main.c  */
 void warns (char *fmt, char *arg);
+void errors (char *fmt, char *arg);
 void fatals (char *fmt, char *arg);
 
 

@@ -148,6 +148,8 @@ h_updatelibrary (
 		if ((status = os_cmd (cmd)) != OK) {
 		    if (status == INTERRUPT)
 			fatals ("<ctrl/c> interrupt %s", library);
+		    if (status != OK)
+		        errors ("Command '%s' returned error", cmd);
 		    if (!ignore)
 			baderr++;
 		    exit_status += status;
@@ -213,8 +215,11 @@ h_updatelibrary (
 
 		    for (i=0;  i < nfiles;  i++)
 			os_delete (makeobj (flist[ndone+i]));
-		} else if (exit_status == INTERRUPT)
+		} else if (exit_status == INTERRUPT) {
 		    fatals ("<ctrl/c> interrupt %s", library);
+		} else {
+	            errors ("Command '%s' returned error", cmd);
+		}
 	    }
 
 	    /* Truncate command and repeat with the next few files.

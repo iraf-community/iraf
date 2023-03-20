@@ -221,6 +221,8 @@ do_osescape (register struct context *cx)
 	    exit_status = os_cmd (cmd);
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
+	if (exit_status != OK)
+	    errors ("Command '%s' returned error", cmd);
 }
 
 
@@ -296,7 +298,7 @@ do_ppdir (
 	    verbose = (strcmp (getargs(cx), "off") != 0);
 
 	else
-	    warns ("illegal preprocessor directive `%s'", token);
+	    errors ("illegal preprocessor directive `%s'", token);
 }
 
 
@@ -333,9 +335,9 @@ do_if (struct context *cx, char	*keyword)
 	 */
 	while ((ch = m_getc(cx)) != '(')
 	    if (ch == '\n')
-		warns ("illegal `%s' predicate", keyword);
+		errors ("illegal `%s' predicate", keyword);
 	    else if (ch == EOF)
-		warns ("unexpected EOF in `%s'", keyword);
+		errors ("unexpected EOF in `%s'", keyword);
 
 	argv[0] = buf;
 	op      = buf;
@@ -349,9 +351,9 @@ do_if (struct context *cx, char	*keyword)
 		else
 		    *op++ = ch;
 	    } else if (ch == '\n') {
-		warns ("missing right paren in `%s'", keyword);
+		errors ("missing right paren in `%s'", keyword);
 	    } else if (ch == EOF) {
-		warns ("unexpected EOF in `%s'", keyword);
+		errors ("unexpected EOF in `%s'", keyword);
 	    } else if (ch == ' ') {
 		continue;
 	    } else if (ch == SYSFILE_BEGIN && op == argv[argc]) {
@@ -364,9 +366,9 @@ do_if (struct context *cx, char	*keyword)
 	    } else if (ch == ':' || ch == ',') {
 		*op++ = EOS;
 		if (op - buf >= SZ_PREDBUF)
-		    warns ("predicate too large in `%s'", keyword);
+		    errors ("predicate too large in `%s'", keyword);
 		if (++argc >= MAX_ARGS)
-		    warns ("too many arguments in `%s' predicate", keyword);
+		    errors ("too many arguments in `%s' predicate", keyword);
 		argv[argc] = op;
 	    } else
 		*op++ = ch;
@@ -376,7 +378,7 @@ do_if (struct context *cx, char	*keyword)
 	argc++;
 
 	if (++iflev > SZ_IFSTACK)
-	    warns ("$IFs nested too deeply (%s)", keyword);
+	    errors ("$IFs nested too deeply (%s)", keyword);
 
 	/* If the $IF is encountered while scanning the tokens in a false-IF
 	 * clause, do not "execute" the $IF.  We still have to push the IF
@@ -411,7 +413,7 @@ do_if (struct context *cx, char	*keyword)
 		if ((valstr = getsym (argv[0])) == NULL &&
 		    (valstr = os_getenv (argv[0])) == NULL) {
 
-		    warns ("symbol `%s' not found", argv[0]);
+		    errors ("symbol `%s' not found", argv[0]);
 		    bval = 0;
 
 		} else {
@@ -492,7 +494,7 @@ do_if (struct context *cx, char	*keyword)
 	    bval = (exit_status != OK);
 
 	} else
-	    warns ("unrecognized $if statement `%s'", keyword);
+	    errors ("unrecognized $if statement `%s'", keyword);
 
 	if (negate)
 	    bval = !bval;
@@ -524,7 +526,7 @@ do_else (struct	context *cx)
 	}
 
 	if (iflev < 1)
-	    warns ("%s with no matching $if", "$else");
+	    errors ("%s with no matching $if", "$else");
 	else if (iflev > 1 && ifstate[iflev-1] == STOP)
 	    return;
 	else
@@ -544,7 +546,7 @@ do_endif (struct context *cx)
 	}
 
 	if (--iflev < 0)
-	    warns ("unmatched %s", "$endif");
+	    errors ("unmatched %s", "$endif");
 }
 
 
@@ -627,7 +629,7 @@ do_call (
 	/* Restore the old context and discard the argument temporaries.
 	 */
 	if (exit_status != OK)
-	    warns ("module `%s' not found or returned error", modspec);
+	    errors ("module `%s' not found or returned error", modspec);
 
 	cp = old_cp;
 	nsymbols = old_nsymbols;
@@ -687,7 +689,7 @@ do_goto (struct context *cx, char *symbol)
 	    }
 	}
 
-	warns ("could not find mkpkg module or label `%s'", symbol);
+	errors ("could not find mkpkg module or label `%s'", symbol);
 	if (cx->fp != stdin)
 	    k_fseek (cx, fpos, 0);
 
@@ -757,7 +759,7 @@ do_omake (
 	}
 
 	if ((sourcedate = os_fdate (fname)) <= 0) {
-	    warns ("file `%s' not found", fname);
+	    errors ("file `%s' not found", fname);
 	    exit_status = ERR;
 	    return;
 
@@ -800,6 +802,8 @@ do_omake (
 		exit_status = h_xc (cmd);
 	    if (exit_status == INTERRUPT)
 		fatals ("<ctrl/c> interrupt %s", cx->library);
+	    if (exit_status != OK)
+	        errors ("Command '%s' returned error", cmd);
 
 	} else if (verbose) {
 	    printf ("Object %s is up to date\n", makeobj(fname));
@@ -848,6 +852,8 @@ do_xc (struct context *cx)
 	    exit_status = h_xc (cmd);
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
+	if (exit_status != OK)
+	    errors ("Command '%s' returned error", cmd);
 
 	return (exit_status);
 }
@@ -937,6 +943,8 @@ do_link (struct context *cx)
 	    exit_status = h_xc (cmd);
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
+	if (exit_status != OK)
+	    errors ("Command '%s' returned error", cmd);
 
 	skip_sf = 0;
 	return (exit_status);
@@ -974,6 +982,8 @@ do_generic (struct context *cx)
 	    exit_status = os_cmd (cmd);
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
+	if (exit_status != OK)
+	    errors ("Command '%s' returned error", cmd);
 
 	return (exit_status);
 }
@@ -1010,6 +1020,8 @@ do_xyacc (struct context *cx)
 	    exit_status = os_cmd (cmd);
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
+	if (exit_status != OK)
+	    errors ("Command '%s' returned error", cmd);
 
 	return (exit_status);
 }
@@ -1062,7 +1074,7 @@ do_incheck (struct context *cx)
 
 	exit_status = h_incheck (fname, dname);
 	if (exit_status != OK)
-	    warns ("error during checkin of %s", fname);
+	    errors ("error during checkin of %s", fname);
 
 	return (exit_status);
 }
@@ -1087,7 +1099,7 @@ do_outcheck (struct context *cx)
 
 	exit_status = h_outcheck (fname, dname, clobber=YES);
 	if (exit_status != OK)
-	    warns ("error during checkout of %s", fname);
+	    errors ("error during checkout of %s", fname);
 
 	return (exit_status);
 }
@@ -1119,7 +1131,7 @@ do_copyfile (struct context *cx)
 	
 	exit_status = h_copyfile (old, new);
 	if (exit_status != OK)
-	    warns ("error making copy of %s", old);
+	    errors ("error making copy of %s", old);
 
 	return (exit_status);
 }
@@ -1162,7 +1174,7 @@ do_movefile (struct context *cx)
 	
 	exit_status = h_movefile (old, new);
 	if (exit_status != OK)
-	    warns ("error moving file %s", old);
+	    errors ("error moving file %s", old);
 
 	return (exit_status);
 }
@@ -1197,7 +1209,7 @@ do_delete (struct context *cx)
 
 		exit_status = os_delete (fname);
 		if (exit_status != OK)
-		    warns ("cannot delete file %s", fname);
+		    errors ("cannot delete file %s", fname);
 	    }
 	}
 }
@@ -1222,7 +1234,7 @@ do_purge (
 
 	exit_status = h_purge (dname);
 	if (exit_status != OK)
-	    warns ("error during purge of %s", dname);
+	    errors ("error during purge of %s", dname);
 }
 
 
@@ -1343,7 +1355,7 @@ getstr (
 	    } else if (ch == '\n' || ch == EOF) {
 		*op = EOS;
 		if (delim != ' ')
-		    warns ("missing closing quote in string `%s'", outstr);
+		    errors ("missing closing quote in string `%s'", outstr);
 		m_ungetc ('\n', cx);
 		break;
 	    } else
@@ -1379,7 +1391,7 @@ getkwvpair (
 	    if (ch == ' ') {
 		continue;
 	    } else if (ch == '\n') {
-		warns ("missing `=' in $set statement `%s'", symbol);
+		errors ("missing `=' in $set statement `%s'", symbol);
 		m_ungetc ('\n', cx);
 		return (ERR);
 	    } else
