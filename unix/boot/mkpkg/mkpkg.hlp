@@ -340,7 +340,8 @@ Test if the value of the named symbol matches one of the listed value strings.
 .ls \fB$iferr\fR
 .sp
 Test for an error return from the last directive executed which touched
-a file.
+a file. This has only effect if mkpkg is invoked with the \fB-i\fR option
+so that it doesn't exit on the first error.
 .le
 .ls \fB$iffile\fR (file [, file,...])
 .sp
