@@ -469,7 +469,7 @@ yy_input (void)
 /* YY_UNPUT -- Put a character back into the input stream.
  */
 void
-yy_unput (char	ch)
+yy_unput (int	ch)
 {
 	unput(ch);
 }

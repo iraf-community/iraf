@@ -7,6 +7,7 @@ xpp.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
 
 lexyy.c: xpp.l
+	flex -o $@ -l $^
 
 clean:
 	rm -f $(OBJS) xpp.e
