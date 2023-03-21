@@ -5,13 +5,24 @@
 
 # IRAF specific variables
 export iraf = $(shell pwd)/
+
+# If IRAFARCH is not set, automatically determine it.
+# If it set, but empty, build IRAF without arch specific
+# directory names.
 export IRAFARCH	?= $(shell unix/hlib/irafarch.sh -current)
+ifeq ($(IRAFARCH),)
+unexport IRAFARCH
+else
+export arch = .$(IRAFARCH)
+endif
 
 # Default IRAF directory structure
 export hostid = unix
 export host = $(iraf)$(hostid)/
 export hlib = $(host)hlib/
-export hbin = $(host)bin.$(IRAFARCH)/
+export hbin = $(host)bin$(arch)/
+export bin = $(iraf)bin$(arch)/
+export noao = $(iraf)noao/
 export tmp = /tmp/
 
 # Compiler and other build tools. While the C compiler can be chosen,
@@ -31,7 +42,7 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
-.PHONY: all sysgen clean test arch noao host novos core vendor
+.PHONY: all sysgen clean test arch noao host novos core vendor bindirs
 
 all:: sysgen
 
@@ -41,22 +52,21 @@ sysgen: host core noao
 
 # Bootstrap first stage: build xc, mkpkg etc. without the Virtual
 # Operating System (VOS)
-novos: arch
+novos: arch bindirs
 	$(MAKE) -C $(host) NOVOS=yes bindir=$(hbin) install
 	$(MAKE) -C $(host) clean
 
 # Build the libraries containing the Virtual Operating System, and
 # re-build the build tools (xc, mkpkg, ...) with VOS
 host: novos
-	(cd $(iraf)sys && $(MKPKG))
+	$(MKPKG) syslibs
 	$(MAKE) -C $(host) bindir=$(hbin) boot/install
 	$(MAKE) -C $(host) clean
 
 # Build vendor libs (cfitsio and libvotable)
 vendor: host
 	$(MAKE) -C $(iraf)vendor \
-	    includedir=$(iraf)include/ bindir=$(iraf)bin.$(IRAFARCH) \
-	    install
+	    includedir=$(iraf)include/ bindir=$(bin) install
 	$(MAKE) -C $(iraf)vendor clean
 
 # Build the core system.
@@ -65,38 +75,49 @@ core: host vendor
 
 # Build the NOAO package.
 noao: host vendor core
-	(cd $(iraf)noao && noao=$(iraf)noao/ $(MKPKG) -p noao)
+	cd $(noao) && $(MKPKG) -p noao
 
+# Run the test suite.
+# The XC_CFLAGS are reset here since they produce warnings that
+# confuse the test scripts.
 test:
 	env -u XC_CFLAGS ./test/run_tests
 
+# Remove all binaries built. This keeps .x files that were generated
+# by generic, xyacc and similar.
 clean:
 	$(MAKE) -C unix clean
 	$(MAKE) -C vendor clean
 	find ./local ./math ./pkg ./sys ./noao/[adfimnorst]* \
 	     -type f -name \*.\[aeo\] -exec rm -f {} \;
-	rm -f bin.$(IRAFARCH)/* noao/bin.$(IRAFARCH)/* $(hbin)* \
+	rm -f $(bin)/* noao/bin$(arch)/* $(hbin)* \
 	      include/drvrsmem.h include/fitsio.h include/fitsio2.h \
 	      include/longnam.h include/votParse.h include/votParse_spp.h
 
+# Prepare the source tree for the architecture specifics
 arch:
-	mkdir -p bin.$(IRAFARCH) noao/bin.$(IRAFARCH) unix/bin.$(IRAFARCH)
-	rm -f bin unix/bin noao/bin
-	ln -s bin.$(IRAFARCH) bin
-	(cd noao && ln -s bin.$(IRAFARCH) bin)
-	(cd unix && ln -s bin.$(IRAFARCH) bin)
-
 	if [ "$(shell $(hlib)irafarch.sh -nbits)" = 64 ] ; then \
-	    ( cd unix/hlib && \
-	      ln -sf iraf64.h iraf.h && \
-	      ln -sf mach64.h mach.h ) ; \
+	    ln -sf iraf64.h $(hlib)iraf.h && \
+	    ln -sf mach64.h $(hlib)mach.h ; \
 	else \
-	    ( cd unix/hlib && \
-	      ln -sf iraf32.h iraf.h && \
-	      ln -sf mach32.h mach.h ) ; \
+	    ln -sf iraf32.h $(hlib)iraf.h && \
+	    ln -sf mach32.h $(hlib)mach.h ; \
 	fi
 	if [ "$(shell $(hlib)irafarch.sh -endian)" = big ] ; then \
-	    ( cd unix/hlib && ln -sf swapbe.h swap.h ) ; \
+	    ln -sf swapbe.h $(hlib)swap.h ; \
 	else \
-	    ( cd unix/hlib && ln -sf swaple.h swap.h ) ; \
+	    ln -sf swaple.h $(hlib)swap.h ; \
+	fi
+
+# Create bindirs for current architecture
+bindirs:
+	if [ bin$(arch) != bin ] ; then \
+	    mkdir -p bin$(arch) noao/bin$(arch) unix/bin$(arch) && \
+	    rm -rf bin unix/bin noao/bin && \
+	    ln -s bin$(arch) bin && \
+	    ln -s bin$(arch) noao/bin && \
+	    ln -s bin$(arch) unix/bin ; \
+	else \
+	    if [ -L bin ] ; then rm -f bin unix/bin noao/bin ; fi && \
+	    mkdir -p bin noao/bin unix/bin ; \
 	fi
