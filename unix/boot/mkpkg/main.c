@@ -306,8 +306,8 @@ warns (char *fmt, char *arg)
 	char	errmsg[SZ_LINE+1];
 
 	sprintf (errmsg, fmt, arg);
-	printf ("Warning, %s line %d: %s\n", topcx->mkpkgfile, topcx->lineno,
-	    errmsg);
+	printf ("%s%s:%d: warning: %s\n", topcx->curdir, topcx->mkpkgfile,
+		topcx->lineno, errmsg);
 	fflush (stdout);
 }
 
@@ -321,8 +321,8 @@ errors (char *fmt, char *arg)
 	char	errmsg[SZ_LINE+1];
 
 	sprintf (errmsg, fmt, arg);
-	printf ("Error, %s line %d: %s\n", topcx->mkpkgfile, topcx->lineno,
-	    errmsg);
+	printf ("%s%s:%d: error: %s\n", topcx->curdir, topcx->mkpkgfile,
+		topcx->lineno, errmsg);
 	fflush (stdout);
 	if (ignore == NO)
 	  exit (OSOK+1);
@@ -338,8 +338,8 @@ fatals (char *fmt, char	*arg)
 	char	errmsg[SZ_LINE+1];
 
 	sprintf (errmsg, fmt, arg);
-	printf ("Fatal error, %s line %d: %s\n", topcx->mkpkgfile,
-	    topcx->lineno, errmsg);
+	printf ("%s%s:%d: fatal: %s\n", topcx->curdir,
+		topcx->mkpkgfile, topcx->lineno, errmsg);
 	fflush (stdout);
 	exit (OSOK+1);
 }
