@@ -71,7 +71,7 @@ m_getc (register struct context *cx)
 	     */
 	    if (name[0] == '?') {
 		/* Interactive query. */
-		if ((cx->fp == stdin)) {
+		if (cx->fp == stdin) {
 		    warns ("`$(%s)': cannot query in -f stdin mode", name);
 		    val = &name[1];
 		} else {
