@@ -546,11 +546,6 @@ push_context (
 	    strcat (ncx->curdir, newdir);
 	    strcat (ncx->curdir, "/");
 
-	    if (debug) {
-		printf ("change directory to `%s'\n", newdir);
-		fflush (stdout);
-	    }
-
 	    if (os_chdir (newdir) == ERR) {
 		errors ("cannot access subdirectory `%s'", newdir);
 		free (ncx);
@@ -559,6 +554,9 @@ push_context (
 		os_fpathname ("", ncx->dirpath, SZ_PATHNAME);
 		ncx->level++;
 	    }
+
+	    printf ("mkpkg[%d]: Entering directory `%s'\n",
+		    ncx->level, ncx->dirpath);
 
 	    /* Initialize the file date cache, since the filenames therein
 	     * often reference the current directory.
@@ -596,6 +594,10 @@ pop_context (
 	    level = cx->level;
 	    pcx   = cx->prev;
 
+	    if (level > pcx->level)
+	        printf ("mkpkg[%d]: Leaving directory `%s'\n",
+			cx->level, cx->dirpath);
+
 	    root_modlist = (strcmp (cx->library, pcx->library) != 0);
 	    if (!root_modlist)
 		pcx->totfiles += cx->totfiles;
@@ -611,11 +613,6 @@ pop_context (
 	    iflev    = cx->old_iflev;
 
 	    if (level > pcx->level) {
-		if (debug) {
-		    printf ("chdir ..\n");
-		    fflush (stdout);
-		}
-
 		if (os_chdir (pcx->dirpath) == ERR)
 		    fatals ("cannot return from subdirectory", cx->curdir);
 

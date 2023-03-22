@@ -598,7 +598,7 @@ do_call (
 	int	old_nsymbols;
 
 	strcpy (modspec, program);
-	if (debug && ifstate[iflev] == PASS) {
+	if (ifstate[iflev] == PASS) {
 	    printf ("$call %s\n", modspec);
 	    fflush (stdout);
 	}
