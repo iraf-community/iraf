@@ -17,7 +17,11 @@ if [ -z "$IRAFARCH" ] ; then
 fi
 
 export arch=.${IRAFARCH}
-export IRAFBIN=${iraf}bin${arch}/
+export bin=${iraf}bin${arch}/
+if [ ! -d $bin -a -d ${iraf}bin ] ; then
+    bin=${iraf}bin/
+    unset arch IRAFARCH
+fi
 export PATH=$HOME/.iraf/bin:${PATH}
 
 TEST_FILES=""
@@ -250,17 +254,18 @@ run_tests () {
 }
 
 for CL in $IRAF_SHELLS ; do
-    if [ -x "${IRAFBIN}${CL}" ] ; then
+    cl="${bin}${CL}"
+    if [ -x "${cl}" ] ; then
 	for t in $TEST_FILES ; do
 	    test_dir="${base_dir}/testroot"
 	    mkdir -p "${test_dir}"
 	    printf "%b: %b " "${CL}" "$(basename "${t}")"
-	    cd "$test_dir" && run_tests "${IRAFBIN}${CL}" "${t}"
+	    cd "$test_dir" && run_tests "${cl}" "${t}"
 	    rm -rf "${test_dir}"
 	done
     else
-	echo "IRAF shell $CL not found"
-	stat "${IRAFBIN}${CL}" >> "$failure_file" 2>&1
+	echo "IRAF shell ${cl} not found"
+	stat "${cl}" >> "$failure_file" 2>&1
     fi
 done
 

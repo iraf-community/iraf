@@ -1,12 +1,12 @@
-OBJS := y1.o y2.o y3.o y4.o
+OBJS := rtar.o
 
-xyacc.e: $(OBJS)
+rtar.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
 
-install: xyacc.e
+install: rtar.e
 	cp $? $(bindir)
 
 clean:
-	rm -f $(OBJS) xyacc.e
+	rm -f $(OBJS) rtar.e
 
 .PHONY: install clean

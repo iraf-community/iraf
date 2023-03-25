@@ -43,12 +43,13 @@ jobs:
       - name: Setup non-standard IRAF build (32 bit)
         if: matrix.irafarch == 'linux'
         run: |
-          make linux
+          IRAFARCH=linux make
 
       - name: Build IRAF
+        if: matrix.irafarch != 'linux'
         run: |
           make
 
       - name: Run tests
         run: |
-          ./test/run_tests
+         make test

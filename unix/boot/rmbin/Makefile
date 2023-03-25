@@ -1,12 +1,12 @@
-OBJS := y1.o y2.o y3.o y4.o
+OBJS := rmbin.o
 
-xyacc.e: $(OBJS)
+rmbin.e: $(OBJS)
 	$(CC) $(LDFLAGS) $? $(LIBS) -o $@
 
-install: xyacc.e
+install: rmbin.e
 	cp $? $(bindir)
 
 clean:
-	rm -f $(OBJS) xyacc.e
+	rm -f $(OBJS) rmbin.e
 
 .PHONY: install clean

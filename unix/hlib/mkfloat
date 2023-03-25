@@ -23,16 +23,7 @@ TARXFLGS=-xpf
 
 # See if we're able to compress the files.
 do_compress=1
-if [ ! -x "$(which compress)" ] || [ "$os_mach" = "cygwin" ]; then
-    if [ ! -x "$(which gzip)" ]; then
-        echo "no compress command found, files will not be compressed"
-	do_compress=0
-    else
-	COMPRESS="gzip -S .Z"
-    fi
-else
-    COMPRESS="compress"
-fi
+COMPRESS="gzip -S .Z"
 
 # Check for an error in the package structure, i.e. the 'bin' is a directory
 # and not a symlink we can change.  It's valid for an external package to

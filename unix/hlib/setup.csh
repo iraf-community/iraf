@@ -10,10 +10,6 @@ if ( ! ( $?IRAFARCH )) then
     setenv IRAFARCH	`$iraf/unix/hlib/irafarch.sh -actual`
 endif
 
-# Development environment
-# not loaded by default
-#source $iraf/unix/hlib/irafuser.csh
-
 set path = ($HOME/.iraf/bin $path)
 set cdpath  = ($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot)
 
