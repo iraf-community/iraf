@@ -46,7 +46,7 @@ do_mkpkg (
 		topcx = cx->prev;
 
 	    sprintf (fname, "%s%s", cx->curdir, cx->mkpkgfile);
-	    warns ("cannot open `%s'", fname);
+	    errors ("cannot open `%s'", fname);
 
 	    topcx = save_cx;
 	    return (ERR);
@@ -147,7 +147,7 @@ scan_modlist (
 	     * library is possible.
 	     */
 	    if ((exit_status = h_scanlibrary (cx->library)) != OK) {
-		warns ("error reading library file `%s'", cx->library);
+		errors ("error reading library file `%s'", cx->library);
 		return (ERR);
 	    }
 	}
@@ -372,6 +372,8 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 	     */
 	    if ((exit_status = h_rebuildlibrary (cx->library)) == INTERRUPT)
 		fatals ("<ctrl/c> interrupt %s", cx->library);
+	    if (exit_status != OK)
+	        errors ("Error rebuilding library %s", cx->library);
 	    printf ("Updated %d files in %s\n", cx->totfiles, cx->library);
 	    fflush (stdout);
 	}
@@ -544,19 +546,17 @@ push_context (
 	    strcat (ncx->curdir, newdir);
 	    strcat (ncx->curdir, "/");
 
-	    if (debug) {
-		printf ("change directory to `%s'\n", newdir);
-		fflush (stdout);
-	    }
-
 	    if (os_chdir (newdir) == ERR) {
-		warns ("cannot access subdirectory `%s'", newdir);
+		errors ("cannot access subdirectory `%s'", newdir);
 		free (ncx);
 		return (NULL);
 	    } else {
 		os_fpathname ("", ncx->dirpath, SZ_PATHNAME);
 		ncx->level++;
 	    }
+
+	    printf ("mkpkg[%d]: Entering directory `%s'\n",
+		    ncx->level, ncx->dirpath);
 
 	    /* Initialize the file date cache, since the filenames therein
 	     * often reference the current directory.
@@ -594,6 +594,10 @@ pop_context (
 	    level = cx->level;
 	    pcx   = cx->prev;
 
+	    if (level > pcx->level)
+	        printf ("mkpkg[%d]: Leaving directory `%s'\n",
+			cx->level, cx->dirpath);
+
 	    root_modlist = (strcmp (cx->library, pcx->library) != 0);
 	    if (!root_modlist)
 		pcx->totfiles += cx->totfiles;
@@ -609,11 +613,6 @@ pop_context (
 	    iflev    = cx->old_iflev;
 
 	    if (level > pcx->level) {
-		if (debug) {
-		    printf ("chdir ..\n");
-		    fflush (stdout);
-		}
-
 		if (os_chdir (pcx->dirpath) == ERR)
 		    fatals ("cannot return from subdirectory", cx->curdir);
 
@@ -657,13 +656,13 @@ get_dependency_list (
 		goto done;
 	    case TOK_FNAME:
 		if (nfiles >= MAX_DEPFILES)
-		    warns ("too many dependency files for module `%s'", module);
+		    errors ("too many dependency files for module `%s'", module);
 		dflist[nfiles++] = putstr (fname);
 		break;
 	    case TOK_END:
-		warns ("unexpected EOF in dependency list for `%s'", module);
+		errors ("unexpected EOF in dependency list for `%s'", module);
 	    default:
-		warns ("bad token `%s' in dependency list", fname);
+		errors ("bad token `%s' in dependency list", fname);
 	    }
 	}
 

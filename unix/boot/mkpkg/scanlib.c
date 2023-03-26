@@ -64,7 +64,10 @@ h_scanlibrary (char *library)
 	char	lbuf[SZ_LINE];
 	struct	ar_hdr arf;
 	long	length, fdate;
-	int	len=0, len_arfmag, nmodules;
+	int	len_arfmag, nmodules;
+#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+	int	len=0;
+#endif
 	FILE	*fp;
 	struct stat library_stat;
 

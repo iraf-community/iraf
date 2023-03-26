@@ -50,7 +50,7 @@ int	iflev;				/* $IF stack pointer		*/
 int	debug = 0;			/* print debug messages		*/
 int	dbgout = 0;			/* compile for debugging	*/
 int	verbose = NO;			/* print informative messages	*/
-int	ignore = YES;			/* ignore warns			*/
+int	ignore = NO;			/* ignore warns			*/
 int	execute = YES;			/* think but don't act?		*/
 int	exit_status;			/* exit status of last syscall	*/
 extern	char *os_getenv(char *);
@@ -297,7 +297,7 @@ addflag:		for (op=flags;  *op;  op++)
 }
 
 
-/* WARNS -- Print error message with one string argument but do not terminate
+/* WARNS -- Print warning message with one string argument but do not terminate
  * program execution.
  */
 void
@@ -306,9 +306,26 @@ warns (char *fmt, char *arg)
 	char	errmsg[SZ_LINE+1];
 
 	sprintf (errmsg, fmt, arg);
-	printf ("Warning, %s line %d: %s\n", topcx->mkpkgfile, topcx->lineno,
-	    errmsg);
+	printf ("%s%s:%d: warning: %s\n", topcx->curdir, topcx->mkpkgfile,
+		topcx->lineno, errmsg);
 	fflush (stdout);
+}
+
+
+/* ERRORS -- Print error message with one string argument and terminate
+ * program execution if -i flag is not given.
+ */
+void
+errors (char *fmt, char *arg)
+{
+	char	errmsg[SZ_LINE+1];
+
+	sprintf (errmsg, fmt, arg);
+	printf ("%s%s:%d: error: %s\n", topcx->curdir, topcx->mkpkgfile,
+		topcx->lineno, errmsg);
+	fflush (stdout);
+	if (ignore == NO)
+	  exit (OSOK+1);
 }
 
 
@@ -321,8 +338,8 @@ fatals (char *fmt, char	*arg)
 	char	errmsg[SZ_LINE+1];
 
 	sprintf (errmsg, fmt, arg);
-	printf ("Fatal error, %s line %d: %s\n", topcx->mkpkgfile,
-	    topcx->lineno, errmsg);
+	printf ("%s%s:%d: fatal: %s\n", topcx->curdir,
+		topcx->mkpkgfile, topcx->lineno, errmsg);
 	fflush (stdout);
 	exit (OSOK+1);
 }

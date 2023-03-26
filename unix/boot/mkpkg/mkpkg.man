@@ -28,8 +28,7 @@ interactively from the standard input, e.g., for debugging
 \fBmkpkg\fP.
 .TP
 .B \-i
-Ignore errors.  Execution continues even if an error occurs.  In most
-cases it does anyhow, so this switch has little effect at present.
+Ignore errors. Execution continues even if an error occurs.
 .TP
 .B \-n
 No execute.  Go through the motions, but do not touch any files.  No
@@ -327,7 +326,9 @@ Test if the value of the named symbol matches one of the listed value strings.
 .B $iferr
 .sp
 Test for an error return from the last directive executed which touched
-a file.
+a file. This has only effect if mkpkg is invoked with the \fB-i\fR option
+so that it doesn't exit on the first error.
+
 .TP
 .B $iffile\fP (\fIfile\fP [, \fIfile\fP, \fI...\fP])
 .sp
