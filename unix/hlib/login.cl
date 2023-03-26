@@ -4,18 +4,20 @@
 if (defpar ("logver"))
     logver = "IRAF V2.17 2021"
 
-set	home		= "U_HOME"
-set	imdir		= "U_IMDIR"
-set	cache		= "U_CACHEDIR"
+set	home		= (envget("HOME") // "/.iraf/")
+set	imdir		= (envget("HOME") // "/.iraf/imdir")
+set	cache		= (envget("HOME") // "/.iraf/cache")
 set	uparm		= "home$uparm/"
-set	userid		= "U_USER"
+set	userid		= envget("USER")
 
-# Set the terminal type.  We assume the user has defined this correctly 
-# when issuing the MKIRAF and no longer key off the unix TERM to set a
-# default.
-if (access (".hushiraf") == no)
-    print "setting terminal type to 'U_TERM' ..."
-stty U_TERM
+# Set the terminal type.
+if (envget("TERM") == "xgterm")
+    stty xgterm
+else
+if (envget("TERM") == "xterm")
+    stty xtermjh
+else
+    stty vt220
 
 
 #============================================================================

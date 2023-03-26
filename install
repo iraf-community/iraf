@@ -16,14 +16,8 @@
 #     -s, --system                # do a system install (needs root)
 #     -C, --csh              	  # install C-shell scripts
 # 
-#     -t, --term <term>           # set default terminal type
-#     -b, --bindir <dir>          # set local bin directory
-#     -c, --cache <dir>           # set cache directory
-#     -i, --imdir <dir>           # set image directory
 #     -m, --mach <arch>           # set architecture
 # 
-#     -C, --oldcache <dir>        # set old cache directory
-#     -I, --oldimdir <dir>        # set old image directory
 #     -R, --oldroot <dir>         # set old iraf root directory
 # 
 # 
@@ -41,7 +35,6 @@ fi
 
 VERSION="v2.17"                         # current IRAF version
 
-defterm="xgterm"			# default terminal type
 do_system=0				# system or personal install?
 do_csh=0                                # Install csh scripts?
 err_seen=0				# have errors been seen?
@@ -54,16 +47,8 @@ LS="/bin/ls"				# directory listing command
 TEMP="/tmp/iraf_install.$$"		# temp output file
 
 
-imdir=""				# image directory
-cache=""				# cache directory
-myterm=""			        # terminal type
-
-p_imdir=""				# <param> image directory
-p_cache=""				# <param> cache directory
 p_lbin=""				# commands directory
 o_iraf=""				# old iraf root directory
-o_imdir=""				# old image directory
-o_cache=""				# old cache directory
 
 
 
@@ -83,14 +68,9 @@ install_help() {
     ECHO "    -s, --system              # do a system install (needs root)"
     ECHO "    -C, --csh                 # install C-shell scripts"
     ECHO ""
-    ECHO "    -t, --term <term>         # set default terminal type"
     ECHO "    -b, --bindir <dir>        # set local bin directory"
-    ECHO "    -c, --cache <dir>         # set cache directory"
-    ECHO "    -i, --imdir <dir>         # set image directory"
     ECHO "    -m, --mach <arch>         # set architecture"
     ECHO ""
-    ECHO "    -C, --oldcache <dir>      # set old cache directory"
-    ECHO "    -I, --oldimdir <dir>      # set old image directory"
     ECHO "    -R, --oldroot <dir>       # set old iraf root directory"
     ECHO ""
     ECHO ""
@@ -125,26 +105,11 @@ while [ -n "$1" ] ; do
     "-C"|"-csh"|"--csh")                 	# Install csh scripts?
         do_csh=1
         ;;
-    "-t"|"-term"|"--term")                 	# set default terminal type.
-	myterm=$2 ; 	shift
-        ;;
     "-b"|"-bindir"|"--bindir")                 	# set local bin directory
 	p_lbin=$2 ; 	shift
         ;;
-    "-c"|"-cache"|"--cache")               	# set cache directory
-	p_cache=$2 ; 	shift
-        ;;
-    "-i"|"-imdir"|"--imdir")                  	# set image directory
-	p_imdir=$2 ; 	shift
-        ;;
     "-m"|"-mach"|"--mach")                   	# set architecture
 	mach=$2 ; 	shift
-        ;;
-    "-C"|"-oldcache"|"--oldcache")              # set old cache directory
-	o_cache=$2 ; shift
-        ;;
-    "-I"|"-oldimdir"|"--oldimdir")              # set old image directory
-	o_imdir=$2 ; 	shift
         ;;
     "-R"|"-oldroot"|"--oldroot")                # set old iraf root directory
 	o_iraf=$2 ; 	shift
@@ -165,11 +130,11 @@ done
 
 
 #=============================================================================
-#  Get the values of o_iraf and o_imdir from the current mkiraf.*sh file, if
-#  not already otherwise defined.  Strip any trailing / in the pathname to be
-#  matched, so that the trailing /, if present, will be LEFT in the occurrence
-#  of the path in the file.
-#=============================================================================
+#  Get the values of o_iraf from the current mkiraf.*sh file, if not
+#  already otherwise defined.  Strip any trailing / in the pathname to
+#  be matched, so that the trailing /, if present, will be LEFT in the
+#  occurrence of the path in the file.
+#  =============================================================================
 
 mkiraf=${iraf}/unix/hlib/mkiraf.sh
 
@@ -177,17 +142,6 @@ if [ "$o_iraf" = "" ]; then
    o_iraf=$(grep "^iraf=" "$mkiraf" | sed -e "s+iraf=++" -e 's+"++g')
 fi
 o_iraf=$(echo "$o_iraf"  | sed -e 's+/\(["]*\)$+\1+')
-
-if [ "$o_imdir" = "" ]; then
-   o_imdir=$(grep "^imdir=" "$mkiraf" | sed -e "s+imdir=++" -e 's+"++g')
-fi
-o_imdir=$(echo "$o_imdir" | sed -e 's+/\(["]*\)$+\1+')
-
-if [ "$o_cache" = "" ]; then
-   o_cache=$(grep "^cachedir=" "$mkiraf" | sed -e "s+cachedir=++" -e 's+"++g')
-fi
-o_cache=$(echo "$o_cache" | sed -e 's+/\(["]*\)$+\1+')
-
 
 
 #=============================================================================
@@ -315,142 +269,6 @@ iraf=$(pwd)
 
 
 #=============================================================================
-# Set $imdir, the default user image storage root directory.  Each user imdir
-# will be a subdirectory of this directory by default, when MKIRAF is run.
-# Since bulk image data can consume hundreds of megabytes of disk space, IRAF
-# likes to keep such data on a public scratch device, which is probably not
-# backed up, which has a short file expiration interval, and possibly which
-# has been configured (newfs/mkfs) with a large block size for fast seq. i/o.
-#=============================================================================
-
-if [ "$imdir" = "" ]; then
-
-  imdir_prompt="yes"
-
-  if [ "$p_imdir" ]; then
-      imdir=$p_imdir
-      imdir_prompt="no"
-  elif [ "$do_system" = 0 ]; then
-      d_imdir="$HOME/.iraf/imdir"
-  elif [ -d "$o_imdir" ]; then
-      d_imdir=$o_imdir
-  elif [ -d "/iraf" ]; then
-      d_imdir=/iraf/imdirs
-  elif [ -d "/home/iraf" ]; then
-      d_imdir=/home/iraf/imdirs
-  elif [ -d "/usr/local/iraf" ]; then
-      d_imdir=/usr/local/iraf/imdirs
-  else
-      d_imdir="/tmp"
-  fi
-
-  while [ "$imdir_prompt" = "yes" ]; do
-
-    imdir_prompt="no"
-    BOLD_ON ; ECHO -n "Default root image storage directory " ; BOLD_OFF
-    ECHO -n "($d_imdir): "
-    read imdir
-
-    if [ "$imdir" = "" ]; then
-        imdir="$d_imdir"
-        imdir_prompt="no"
-    elif [ "$imdir" = "quit" ] || [ "$imdir" = "q" ]; then
-        exit 0
-    elif [ "$imdir" = "help" ] || [ "$imdir" = "h" ] || [ "$imdir" = "?" ]; then
-        NEWLINE
-            MSG "The root imdir directory is the default image storage dir"
-            MSG 'for OIF images (i.e. the ".imh" format) used by all users on'
-            MSG "this system.   Individual user dirs will be created as needed."
-            MSG "It should be some large data disk on the machine which has a"
-            MSG "regular backup, scratch or tmp disks should be avoided or data"
-            MSG "may be lost."
-            MSG ""
-            MSG 'The "HDR$" syntax should not be used at this stage, please'
-            MSG 'edit the hlib$mkiraf.sh script after installation if you wish'
-            MSG "to make this the default."
-        export imdir=$d_imdir
-        imdir_prompt="yes"
-    fi
-
-    # Cannot have iraf and imdir the same.
-    if [ "$imdir" = "$iraf" ]; then
-        NEWLINE
-            MSG  "The definition of imdir cannot be the same as the iraf"
-            MSG  "root, please choose a different directory.  Ideally this"
-            MSG  "should be some large data area on your system or a user"
-            MSG  "data area such as /home, /users, /u1, etc."
-        NEWLINE
-        NEWLINE
-        imdir_prompt="yes"
-    fi
-  done
-fi
-
-
-#=============================================================================
-# Set $cache, the default user file cache root directory.
-#=============================================================================
-
-if [ "$cache" = "" ]; then
-
-  cache_prompt="yes"
-
-  if [ "$p_cache" ]; then
-      cache=$p_cache
-      cache_prompt="no"
-  elif [ "$do_system" = 0 ]; then
-      d_cache="$HOME/.iraf/cache"
-  elif [ -d "/iraf" ]; then
-      d_cache="/iraf/cache"
-  elif [ -d "/home/iraf" ]; then
-      d_cache="/home/iraf/cache"
-  elif [ -d "/usr/local/iraf" ]; then
-      d_cache="/usr/local/iraf/cache"
-  else
-      d_cache="/tmp"
-  fi
-
-  while [ "$cache_prompt" = "yes" ]; do
-
-    cache_prompt="no"
-    BOLD_ON ; ECHO -n "Default root cache directory " ; BOLD_OFF
-    ECHO -n "($d_cache): "
-    read cache
-    if [ "$cache" = "" ]; then
-        cache="$d_cache"
-        cache_prompt="no"
-    elif [ "$cache" = "quit" ] || [ "$cache" = "q" ]; then
-        exit 0
-    elif [ "$cache" = "help" ] || [ "$cache" = "h" ] || [ "$cache" = "?" ]; then
-        NEWLINE
-            MSG "The root cache directory is the default storage directory for"
-            MSG "URL-referenced files. Individual user dirs will be created as"
-            MSG "needed. It should be some large data disk on the machine "
-            MSG "which has a regular backup, scratch or tmp disks should be"
-            MSG "avoided or data may be lost."
-            MSG ""
-        NEWLINE
-        export cache=$d_cache
-        cache_prompt="yes"
-    fi
-
-    # Cannot have iraf and cache the same.
-    if [ "$cache" = "$iraf" ]; then
-        NEWLINE
-            MSG  "The definition of cache cannot be the same as the iraf"
-            MSG  "root, please choose a different directory.  Ideally this"
-            MSG  "should be some large data area on your system or a user"
-            MSG  "data area such as /home, /users, /u1, etc."
-        NEWLINE
-        NEWLINE
-        cache_prompt="yes"
-    fi
-  done
-fi
-
-
-
-#=============================================================================
 # Get UNIX directory where HSI commands (links) are to be installed, if not
 # set on command line.  IRAF will only install a very few new commands in this
 # directory.  Ideally it should be a directory on the standard user $path,
@@ -531,35 +349,13 @@ bindir=$lbin
 
 
 
-#  Prompt for the terminal to use in a private installation.
-
-if [ "$do_system" = 0 ]; then
-    if [ -z "$myterm" ] ; then
-	BOLD_ON
-	ECHO    "Terminal types: xgterm, xtermjh, xterm, etc."
-	ECHO -n 'Enter default terminal type ('
-	BOLD_OFF
-	ECHO -n "$defterm"
-	BOLD_ON
-	ECHO -n '): '
-	BOLD_OFF
-
-	read myterm
-	if [ -z "$myterm" ]; then
-            myterm=$defterm
-	fi
-    fi
-fi
-
-
-
 #===============================================================================
 # Determine iraf root directory
 #===============================================================================
 
 
 #===============================================================================
-# Determine the old 'iraf', 'imdir' and 'cachedir' for editing.
+# Determine the old 'iraf' for editing.
 #===============================================================================
 
 
@@ -652,14 +448,6 @@ BOLD_ON; ECHO -n "Old iraf root = "; \
     BOLD_OFF; ECHO "$o_iraf" | awk '{printf("%-20s  ", $1)}'
 BOLD_ON; ECHO -n "New iraf root = "; \
     BOLD_OFF; ECHO "$iraf" | awk '{printf("%-20s\n", $1)}'
-BOLD_ON; ECHO -n "Old imdir     = "; \
-    BOLD_OFF; ECHO "$o_imdir" | awk '{printf("%-20s  ", $1)}'
-BOLD_ON; ECHO -n "New imdir     = "; \
-    BOLD_OFF; ECHO "$imdir" | awk '{printf("%-s\n", $1)}'
-BOLD_ON; ECHO -n "Old cache     = "; \
-    BOLD_OFF; ECHO "$o_cache" | awk '{printf("%-20s  ", $1)}'
-BOLD_ON; ECHO -n "New cache     = "; \
-    BOLD_OFF; ECHO "$cache" | awk '{printf("%-s\n", $1)}'
 NEWLINE
 
 BOLD_ON; ECHO -n "Local bin dir = "; \
@@ -707,8 +495,6 @@ done
 # Constraints:
 #
 #	- validate iraf root directory
-#	- imdir cannot be under iraf root directory
-#	- cache cannot be under iraf root directory
 #	- check for write permission on iraf directory
 #
 #	- if [ sysinstall ]; then
@@ -725,10 +511,6 @@ done
 #       1) Editing the $iraf path into system files
 #       2) Creating the <iraf.h> link
 #       3) Creating the system command links
-#       4) Creating the image directory (imdir)
-#       5) Creating the cache directory (cache)
-#       6) Tape setup (modes on alloc.e and /dev tape devices)
-#       7) Graphics/Display file installation/setup
 
 
 #=============================================================================
@@ -875,8 +657,6 @@ for i in ${PATHFILES}; do
     if [ -e "$iraf/unix/hlib/$i" ]; then
 	sed -i.bak \
 	    -e "s|$o_iraf|$iraf|"   \
-	    -e "s|$o_cache|$cache|" \
-	    -e "s|$o_imdir|$imdir|" \
 	    "$iraf/unix/hlib/$i"
 	    RM "${iraf}/unix/hlib/${i}.bak"
     else
@@ -891,67 +671,6 @@ done
 if [ "$err_seen" = 0 ]; then
     DO_OK
 fi
-
-
-
-    # Create the root imdir as a public scratch directory, if not already
-    # created.
-    err_seen=0
-    if [ -d "$imdir" ]; then
-        if [ -x $"imdir" ]; then
-            ECHO -n 'Checking imdir permissions ...'
-            ECHO -n '                                 '
-        else
-            ECHO -n 'Setting mode for $imdir to 0777'
-	    ECHO -n '                                '
-            if [ "$exec" = "yes" ]; then
-                chmod 777 "$imdir"
-            fi
-        fi
-    else
-	if [ "$do_system" = 1 ]; then
-          ECHO -n "Creating root imdir at $imdir ...                    "
-	else
-          ECHO -n 'Creating root imdir at $HOME/.iraf/imdir ...		'
-          ECHO -n '       '
-	fi
-        if [ "$exec" = "yes" ]; then
-            mkdir $imdir; chmod 777 $imdir
-        fi
-    fi
-    if [ "$err_seen" = 0 ]; then
-        DO_OK
-    fi
-
-
-    # Create the root cache as a public scratch directory, if not already
-    # created.
-    err_seen=0
-    if [ -d "$cache" ]; then
-        if [ -x "$cache" ]; then
-            ECHO -n 'Checking cache permissions ...'
-            ECHO -n '                                 '
-        else
-            ECHO -n 'Setting mode for $cache to 0777                  '
-            if [ "$exec" = "yes" ]; then
-                chmod 777 $cache
-            fi
-        fi
-    else
-	if [ "$do_system" = 1 ]; then
-          ECHO -n "Creating root cache at $cache ...                    "
-	else
-          ECHO -n 'Creating root cache at $HOME/.iraf/cach  ...		'
-          ECHO -n '       '
-	fi
-        if [ "$exec" = "yes" ]; then
-            mkdir $cache; chmod 777 $cache
-        fi
-    fi
-    if [ "$err_seen" = 0 ]; then
-        DO_OK
-    fi
-
 
 
 NEWLINE
@@ -1238,7 +957,7 @@ if [ "$do_system" = 0 ]; then
   fi
   cd "$HOME/.iraf"
   ECHO -n "Creating global login.cl and uparm directory ....              "
-  "$iraf/unix/hlib/mkiraf.sh" --default --init --term="$myterm" > /dev/null 2>&1
+  "$iraf/unix/hlib/mkiraf.sh" --default --init 2>&1
   if [ -e "$HOME/.iraf/login.cl" ]; then
       DO_OK
   else

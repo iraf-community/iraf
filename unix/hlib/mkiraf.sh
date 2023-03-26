@@ -17,17 +17,19 @@
 #  for input.
 
 
-				# Initialize the script variables.
-myterm="none" 			
+# Initialize the script variables.
+myterm="xgterm" 			
 uparm_init=-1
 quiet=0
 def=0
 defterm="xgterm"
 
-				# Paths edited by the install script.
-iraf="/iraf/iraf/"
-imdir="/iraf/imdir/"
-cachedir="/iraf/cache/"
+imdir="${HOME}/.iraf/imdir/"
+cachedir="${HOME}/.iraf/cache/"
+
+# Paths edited by the install script.
+iraf="/home/ole/Projects/2015/upstream/iraf/iraf/"
+
 
 
 # ------------- (end of site dependent definitions) ------------------------
@@ -80,7 +82,7 @@ fi
 if [ "$def" = 1 ]; then
     imdir="$HOME/.iraf/imdir/"
     cachedir="$HOME/.iraf/cache/"
-    #myterm="xgterm"
+    myterm="xgterm"
     cd "$HOME"
     if [ ! -e .iraf ]; then
 	mkdir "$HOME/.iraf"
