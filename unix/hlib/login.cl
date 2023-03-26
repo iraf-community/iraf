@@ -19,6 +19,10 @@ if (envget("TERM") == "xterm")
 else
     stty vt220
 
+i=24
+j=80
+print ("!!stty size 2>/dev/null") | cl() | scan(i,j)
+stty nlines=(i) ncols=(j)
 
 #============================================================================
 # Uncomment and edit to change the defaults.
