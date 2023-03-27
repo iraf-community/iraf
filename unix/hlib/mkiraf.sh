@@ -5,24 +5,21 @@
 #
 #  Usage:
 #
-#	% mkiraf [--term=<term>] [--init] [--noinit] [--quiet]
+#	% mkiraf [--init] [--noinit] [--quiet]
 #
 #  Where
-#	-t,--term=<term>	Set the default terminal type
 #	-i,--init		Initialize the uparm directory
 #	-n,--noinit		Do not nitialize the uparm directory
 #	-q,--quiet		Suppress output
 #
-#  Use of the -t, -i, or -n options will suppress the corresponding prompts
+#  Use of the -i or -n options will suppress the corresponding prompts
 #  for input.
 
 
 # Initialize the script variables.
-myterm="xgterm" 			
 uparm_init=-1
 quiet=0
 def=0
-defterm="xgterm"
 
 imdir="${HOME}/.iraf/imdir/"
 cachedir="${HOME}/.iraf/cache/"
@@ -44,9 +41,6 @@ fi
 for i in "$@"
 do
   case $i in
-    -t=*|--term=*)			# Set the default terminal type
-        myterm=$(echo "$i" | sed 's/[-a-zA-Z0-9]*=//')
-    	;;
     -d|--default)			# Create default login dir
         def=1
         quiet=1
@@ -82,7 +76,6 @@ fi
 if [ "$def" = 1 ]; then
     imdir="$HOME/.iraf/imdir/"
     cachedir="$HOME/.iraf/cache/"
-    myterm="xgterm"
     cd "$HOME"
     if [ ! -e .iraf ]; then
 	mkdir "$HOME/.iraf"
@@ -136,17 +129,8 @@ else
     fi
 fi
 
-# Edit the login.cl file, setting the user's home directory, default image
-# directory, and terminal.
-
-if [ "$myterm" = "none" ]; then
-    echo "Terminal types: xgterm,xtermjh,xterm,etc."
-    printf 'Enter terminal type (%s): ' $defterm
-    read myterm
-    if [ "$myterm" = "" ]; then
-	myterm=$defterm
-    fi
-fi
+# Edit the login.cl file, setting the user's home directory, and
+# default image directory
 
 # Initialize the 'imdir' and 'cachedir' paths.
 IDIR="${imdir}$USER"
@@ -173,7 +157,6 @@ fi
 
 # Create the path editing script.
 _sed() {
-    echo "$1"		| sed -e "s;.*;s+U_TERM+&+;"
     pwd			| sed -e "s;.*;s+U_HOME+&/+;"
     pwd			| sed -e "s;.*;s+U_UPARM+&/uparm/+;"
     echo "$IDIR"	| sed -e "s;.*;s+U_IMDIR+&/+;"
@@ -181,7 +164,7 @@ _sed() {
     echo "$USER"	| sed -e "s;.*;s+U_USER+&+;"
 }
 
-sed "$(_sed $myterm)" < "${iraf}/unix/hlib/login.cl" > login.cl
+sed "$(_sed)" < "${iraf}/unix/hlib/login.cl" > login.cl
 
 if [ $def = 0 ]; then
  if [ $quiet -lt 1 ] ; then
