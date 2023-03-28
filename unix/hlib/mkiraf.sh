@@ -5,12 +5,13 @@
 #
 #  Usage:
 #
-#	% mkiraf [--default] [--init] [--noinit] [--quiet]
+#	% mkiraf [--default] [--init] [--noinit] [--copy] [--quiet]
 #
 #  Where
 #	-d,--default		Create default login dir
 #	-i,--init		Initialize the uparm directory
 #	-n,--noinit		Do not nitialize the uparm directory
+#	-c,--copy		Copy login.cl file
 #	-q,--quiet		Suppress output
 #
 #  Use of the -i or -n options will suppress the corresponding prompt
@@ -21,6 +22,7 @@
 uparm_init="ask"
 quiet=""
 def=""
+copy=""
 imdir="${HOME}/.iraf/imdir/"
 cachedir="${HOME}/.iraf/cache/"
 
@@ -41,6 +43,9 @@ for i in "$@"; do
 	-n|--noinit)			# Don't initialize uparm directory
             uparm_init="no"
     	    ;;
+	-c|--copy)                      # Copy login.cl file
+	    copy="yes"
+	    ;;
 	-q|--quiet)			# Suppress output
             quiet="quiet"
     	    ;;
@@ -100,20 +105,12 @@ else
     fi
 fi
 
-# Back up the old login.cl file.
-if [ -e login.cl ]; then
-    mv -f login.cl login.cl.OLD
-fi
 
 # Create local login.cl
-if [ ! "$def" ]; then
-    # Patch the "set home = ..." line in login.cl. The uparm path is
-    # derived from that.
-    RE='^[[:space:]]*set[[:space:]]*home[[:space:]]*=.*'
-    LINE="set	home		= $(pwd)/"
-    sed -E "s+${RE}+${LINE}+" "${iraf}unix/hlib/login.cl" > login.cl
-else
-    # The default dir is already set in login.cl; no need to patch
+if [ "$copy" ]; then
+    if [ -e login.cl ]; then
+	mv -f login.cl login.cl.OLD
+    fi
     cp -f "${iraf}unix/hlib/login.cl" login.cl
 fi
 

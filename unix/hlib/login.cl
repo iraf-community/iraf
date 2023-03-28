@@ -5,8 +5,8 @@ if (defpar ("logver"))
     logver = "IRAF V2.17 2021"
 
 set	home		= (envget("HOME") // "/.iraf/")
-set	imdir		= (envget("HOME") // "/.iraf/imdir")
-set	cache		= (envget("HOME") // "/.iraf/cache")
+set	imdir		= "home$imdir/"
+set	cache		= "home$cache/"
 set	uparm		= "home$uparm/"
 set	userid		= envget("USER")
 
@@ -147,15 +147,6 @@ else {
     type hlib$motd
     printf ("\n")
 }
-
-
-#============================================================================
-# Notify the user if we're using the global login.
-path (".") | scan (s1)
-if ( osfn("home$") != substr (s1, strldx("!",s1)+1, strlen(s1)) ) {
-    printf ("  ***  Using global login file:  %slogin.cl\n", osfn("home$"))
-}
-;
 
 
 #============================================================================

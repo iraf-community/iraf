@@ -958,7 +958,7 @@ if [ "$do_system" = 0 ]; then
   cd "$HOME/.iraf"
   ECHO -n "Creating global login.cl and uparm directory ....              "
   "$iraf/unix/hlib/mkiraf.sh" --default --init 2>&1
-  if [ -e "$HOME/.iraf/login.cl" ]; then
+  if [ -d "$HOME/.iraf/uparm" ]; then
       DO_OK
   else
       DO_FAIL
