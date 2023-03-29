@@ -137,16 +137,16 @@ config:
 	       -i $(hlib)setup.csh
 	grep '"$(iraf)"' $(hlib)setup.csh
 
-bindir = $(HOME)/.iraf/bin/
+bindir = $(HOME)/.iraf/bin
 
 # Create symbolic links for user callable scripts and executables
 binary_links:
 	mkdir -p $(bindir)
 	for script in mkiraf cl ecl ; do \
-	    ln -sf $(hlib)$${script}.sh $(bindir)$${script} ; \
+	    ln -sf $(hlib)$${script}.sh $(bindir)/$${script} ; \
 	done
 	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
-	    ln -sf $(hbin)$${hprog}.e $(bindir)$${hprog} ; \
+	    ln -sf $(hbin)$${hprog}.e $(bindir)/$${hprog} ; \
 	done
 
 # Do a default in-place (user) installation
@@ -158,3 +158,18 @@ inplace: config binary_links
 	else \
 	  rm -f $(HOME)/.iraf/arch ; \
 	fi
+
+# Strip unneeded files from the installation.
+#
+# *Warning*: Calling this directly will remove all source files from
+#            your source directory.
+strip:
+	cd $(iraf) && $(hbin)rmfiles.e -f $(hlib)strip.iraf
+
+prefix ?= /usr/local
+
+install:
+	mkdir -p $(prefix)/lib/iraf $(prefix)/bin
+	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
+	         $(prefix)/lib/iraf
+	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
