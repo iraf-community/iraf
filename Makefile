@@ -172,3 +172,11 @@ install:
 	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
 	         $(prefix)/lib/iraf
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
+	cp -f $(hlib)mkiraf.man $(prefix)/share/man/man1/mkiraf.1
+	cp -f $(hlib)ecl.man $(prefix)/share/man/man1/ecl.1
+	ln -sf ecl.1 $(prefix)/share/man/man1/cl.1
+	cp -f $(host)boot/mkpkg/mkpkg.man $(prefix)/share/man/man1/mkpkg.1
+	cp -f $(host)boot/spp/xc.man $(prefix)/share/man/man1/xc.1
+	cp -f $(host)boot/xyacc/xyacc.man $(prefix)/share/man/man1/xyacc.1
+	cp -f $(host)boot/generic/generic.man $(prefix)/share/man/man1/generic.1
+	ln -sf $(prefix)/lib/iraf/include/iraf.h /usr/include/iraf.h
