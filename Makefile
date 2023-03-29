@@ -42,7 +42,7 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
 
-.PHONY: all sysgen clean test arch noao host novos core vendor bindirs
+.PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace
 
 all:: sysgen
 
@@ -120,4 +120,41 @@ bindirs:
 	else \
 	    if [ -L bin ] ; then rm -f bin unix/bin noao/bin ; fi && \
 	    mkdir -p bin noao/bin unix/bin ; \
+	fi
+
+# Patch the "iraf" environment variable into shell scripts
+# The "grep -q" calls are to make sure that the file was edited
+config:
+	sed -E s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
+	       -i $(hlib)ecl.sh $(hlib)cl.sh
+	grep '"$(iraf)"' $(hlib)ecl.sh
+	grep '"$(iraf)"' $(hlib)cl.sh
+	sed -E s+'^([[:space:]]*export)?([[:space:]]*iraf=).*+\1\2"$(iraf)"'+ \
+	       -i $(hlib)setup.sh $(hlib)mkiraf.sh
+	grep '"$(iraf)"' $(hlib)setup.sh
+	grep '"$(iraf)"' $(hlib)mkiraf.sh
+	sed -E s+'^([[:space:]]*setenv[[:space:]]*iraf[[:space:]]*).*+\1"$(iraf)"'+ \
+	       -i $(hlib)setup.csh
+	grep '"$(iraf)"' $(hlib)setup.csh
+
+bindir = $(HOME)/.iraf/bin/
+
+# Create symbolic links for user callable scripts and executables
+binary_links:
+	mkdir -p $(bindir)
+	for script in mkiraf cl ecl ; do \
+	    ln -sf $(hlib)$${script}.sh $(bindir)$${script} ; \
+	done
+	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
+	    ln -sf $(hbin)$${hprog}.e $(bindir)$${hprog} ; \
+	done
+
+# Do a default in-place (user) installation
+inplace: config binary_links
+	$(hlib)mkiraf.sh --default --init
+	ln -sf $(hlib)libc/iraf.h $(hlib)/setup.*sh $(HOME)/.iraf/
+	if [ "$(IRAFARCH)" ] ; then \
+	  echo "$(IRAFARCH)" > $(HOME)/.iraf/arch ; \
+	else \
+	  rm -f $(HOME)/.iraf/arch ; \
 	fi
