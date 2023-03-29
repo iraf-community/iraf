@@ -126,9 +126,8 @@ bindirs:
 # The "grep -q" calls are to make sure that the file was edited
 config:
 	sed -E s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
-	       -i $(hlib)ecl.sh $(hlib)cl.sh
+	       -i $(hlib)ecl.sh
 	grep '"$(iraf)"' $(hlib)ecl.sh
-	grep '"$(iraf)"' $(hlib)cl.sh
 	sed -E s+'^([[:space:]]*export)?([[:space:]]*iraf=).*+\1\2"$(iraf)"'+ \
 	       -i $(hlib)setup.sh $(hlib)mkiraf.sh
 	grep '"$(iraf)"' $(hlib)setup.sh
@@ -142,9 +141,9 @@ bindir = $(HOME)/.iraf/bin
 # Create symbolic links for user callable scripts and executables
 binary_links:
 	mkdir -p $(bindir)
-	for script in mkiraf cl ecl ; do \
-	    ln -sf $(hlib)$${script}.sh $(bindir)/$${script} ; \
-	done
+	ln -sf $(hlib)ecl.sh $(bindir)/cl
+	ln -sf $(hlib)ecl.sh $(bindir)/ecl
+	ln -sf $(hlib)mkiraf.sh $(bindir)/mkiraf
 	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
 	    ln -sf $(hbin)$${hprog}.e $(bindir)/$${hprog} ; \
 	done
