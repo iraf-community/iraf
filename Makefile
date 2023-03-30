@@ -125,27 +125,30 @@ bindirs:
 # Patch the "iraf" environment variable into shell scripts
 # The "grep -q" calls are to make sure that the file was edited
 config:
-	sed -E s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
-	       -i $(hlib)ecl.sh
-	grep '"$(iraf)"' $(hlib)ecl.sh
-	sed -E s+'^([[:space:]]*export)?([[:space:]]*iraf=).*+\1\2"$(iraf)"'+ \
-	       -i $(hlib)setup.sh $(hlib)mkiraf.sh
-	grep '"$(iraf)"' $(hlib)setup.sh
-	grep '"$(iraf)"' $(hlib)mkiraf.sh
-	sed -E s+'^([[:space:]]*setenv[[:space:]]*iraf[[:space:]]*).*+\1"$(iraf)"'+ \
-	       -i $(hlib)setup.csh
-	grep '"$(iraf)"' $(hlib)setup.csh
+	sed -E -i.orig \
+	    s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
+	    $(DESTDIR)$(hlib)ecl.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)ecl.sh
+	sed -E -i.orig \
+	    s+'^([[:space:]]*export)?([[:space:]]*iraf=).*+\1\2"$(iraf)"'+ \
+	    $(DESTDIR)$(hlib)setup.sh $(DESTDIR)$(hlib)mkiraf.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)mkiraf.sh
+	sed -E -i.orig \
+	    s+'^([[:space:]]*setenv[[:space:]]*iraf[[:space:]]*).*+\1"$(iraf)"'+ \
+	    $(DESTDIR)$(hlib)setup.csh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.csh
 
 bindir = $(HOME)/.iraf/bin
 
 # Create symbolic links for user callable scripts and executables
 binary_links:
-	mkdir -p $(bindir)
-	ln -sf $(hlib)ecl.sh $(bindir)/cl
-	ln -sf $(hlib)ecl.sh $(bindir)/ecl
-	ln -sf $(hlib)mkiraf.sh $(bindir)/mkiraf
+	mkdir -p $(DESTDIR)$(bindir)
+	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/cl
+	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/ecl
+	ln -sf $(hlib)mkiraf.sh $(DESTDIR)$(bindir)/mkiraf
 	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
-	    ln -sf $(hbin)$${hprog}.e $(bindir)/$${hprog} ; \
+	    ln -sf $(hbin)$${hprog}.e $(DESTDIR)$(bindir)/$${hprog} ; \
 	done
 
 # Do a default in-place (user) installation
@@ -163,20 +166,20 @@ inplace: config binary_links
 # *Warning*: Calling this directly will remove all source files from
 #            your source directory.
 strip:
-	cd $(iraf) && $(hbin)rmfiles.e -f $(hlib)strip.iraf
+	cd $(DESTDIR)$(iraf) && $(hostid)/bin/rmfiles.e -f $(hostid)/hlib/strip.iraf
 
 prefix ?= /usr/local
 
 install:
-	mkdir -p $(prefix)/lib/iraf $(prefix)/bin
+	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/usr/include
 	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
 	         $(prefix)/lib/iraf
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
-	cp -f $(hlib)mkiraf.man $(prefix)/share/man/man1/mkiraf.1
-	cp -f $(hlib)ecl.man $(prefix)/share/man/man1/ecl.1
-	ln -sf ecl.1 $(prefix)/share/man/man1/cl.1
-	cp -f $(host)boot/mkpkg/mkpkg.man $(prefix)/share/man/man1/mkpkg.1
-	cp -f $(host)boot/spp/xc.man $(prefix)/share/man/man1/xc.1
-	cp -f $(host)boot/xyacc/xyacc.man $(prefix)/share/man/man1/xyacc.1
-	cp -f $(host)boot/generic/generic.man $(prefix)/share/man/man1/generic.1
-	ln -sf $(prefix)/lib/iraf/include/iraf.h /usr/include/iraf.h
+	cp -f $(hlib)mkiraf.man $(DESTDIR)$(prefix)/share/man/man1/mkiraf.1
+	cp -f $(hlib)ecl.man $(DESTDIR)$(prefix)/share/man/man1/ecl.1
+	ln -sf ecl.1 $(DESTDIR)$(prefix)/share/man/man1/cl.1
+	cp -f $(host)boot/mkpkg/mkpkg.man $(DESTDIR)$(prefix)/share/man/man1/mkpkg.1
+	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
+	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
+	cp -f $(host)boot/generic/generic.man $(DESTDIR)$(prefix)/share/man/man1/generic.1
+	ln -sf $(prefix)/lib/iraf/unix/hlib/iraf.h $(DESTDIR)/usr/include/iraf.h
