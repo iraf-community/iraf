@@ -40,7 +40,7 @@ export RANLIB = ranlib
 export CFLAGS ?= -g -Wall -O2
 CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
-export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
+export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 
 .PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace
 
