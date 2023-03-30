@@ -127,15 +127,14 @@ bindirs:
 config:
 	sed -E -i.orig \
 	    s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
-	    $(DESTDIR)$(hlib)ecl.sh
+	    $(DESTDIR)$(hlib)ecl.sh \
+	    $(DESTDIR)$(hlib)setup.sh \
+            $(DESTDIR)$(hlib)mkiraf.sh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)ecl.sh
-	sed -E -i.orig \
-	    s+'^([[:space:]]*export)?([[:space:]]*iraf=).*+\1\2"$(iraf)"'+ \
-	    $(DESTDIR)$(hlib)setup.sh $(DESTDIR)$(hlib)mkiraf.sh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.sh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)mkiraf.sh
 	sed -E -i.orig \
-	    s+'^([[:space:]]*setenv[[:space:]]*iraf[[:space:]]*).*+\1"$(iraf)"'+ \
+	    s+'^([[:space:]]*set[[:space:]]*d_iraf[[:space:]]*=[[:space:]]*).*+\1"$(iraf)"'+ \
 	    $(DESTDIR)$(hlib)setup.csh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.csh
 
@@ -155,6 +154,7 @@ binary_links:
 inplace: config binary_links
 	$(hlib)mkiraf.sh --default --init
 	ln -sf $(hlib)libc/iraf.h $(hlib)/setup.*sh $(HOME)/.iraf/
+	echo $(iraf) > $(HOME)/.iraf/irafroot
 	if [ "$(IRAFARCH)" ] ; then \
 	  echo "$(IRAFARCH)" > $(HOME)/.iraf/arch ; \
 	else \
@@ -171,7 +171,7 @@ strip:
 prefix ?= /usr/local
 
 install:
-	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/usr/include
+	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/etc/iraf
 	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
 	         $(prefix)/lib/iraf
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
@@ -182,4 +182,4 @@ install:
 	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
 	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
 	cp -f $(host)boot/generic/generic.man $(DESTDIR)$(prefix)/share/man/man1/generic.1
-	ln -sf $(prefix)/lib/iraf/unix/hlib/iraf.h $(DESTDIR)/usr/include/iraf.h
+	echo $(prefix)/lib/iraf/ > $(DESTDIR)/etc/iraf/irafroot

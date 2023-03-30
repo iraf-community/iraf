@@ -15,7 +15,13 @@ if [ -n "$iraf" -a  ! -e "$iraf" ]; then
     unset iraf ; sleep 3
 fi
 if [ -z "$iraf" ]; then
-    export iraf="$d_iraf"
+    if [ -r ${HOME}/.iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    elif [ -r /etc/iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    else
+	export iraf="$d_iraf"
+    fi
 fi
 
 if [ "${IRAFARCH}" -a  ! -e "${iraf}bin.${IRAFARCH}" ] ; then

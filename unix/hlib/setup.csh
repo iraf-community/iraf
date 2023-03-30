@@ -1,8 +1,13 @@
-#!/bin/csh -f
-
 # Allow a previously defined $iraf to be used.
+set d_iraf = /iraf/iraf/
 if ( ! ( $?iraf )) then
-    setenv iraf	/iraf/iraf/
+    if ( -r ${HOME}/.iraf/irafroot ) then
+	setenv iraf `cat /etc/iraf/irafroot`
+    else if ( -r /etc/iraf/irafroot ) then
+	setenv iraf `cat /etc/iraf/irafroot`
+    else
+	setenv iraf $d_iraf
+    endif
 endif
 
 # Allow a previously defined $IRAFARCH to be used.
@@ -17,4 +22,3 @@ set cdpath  = ($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot)
 alias iraf	"xgterm -e cl &"
 
 rehash
-

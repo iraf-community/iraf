@@ -27,7 +27,16 @@ imdir="${HOME}/.iraf/imdir/"
 cachedir="${HOME}/.iraf/cache/"
 
 # Path edited by the install script.
-iraf="/iraf/iraf/"
+d_iraf="/iraf/iraf/"
+if [ -z "$iraf" ]; then
+    if [ -r ${HOME}/.iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    elif [ -r /etc/iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    else
+	export iraf="$d_iraf"
+    fi
+fi
 
 # Parse the command-line options.
 for i in "$@"; do
