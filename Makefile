@@ -165,12 +165,12 @@ inplace: config binary_links
 #
 # *Warning*: Calling this directly will remove all source files from
 #            your source directory.
-strip:
+strip: noao/bin/x_quad.e
 	cd $(DESTDIR)$(iraf) && $(hostid)/bin/rmfiles.e -f $(hostid)/hlib/strip.iraf
 
 prefix ?= /usr/local
 
-install:
+install: noao/bin/x_quad.e
 	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/etc/iraf
 	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
 	         $(prefix)/lib/iraf
