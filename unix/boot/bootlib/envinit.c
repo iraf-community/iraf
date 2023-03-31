@@ -215,11 +215,8 @@ loadenv (char *osfn)
 			    } else
 				ip++;
 
-			if ((fp = fopen (vfn2osfn(fname,0), "r")) == NULL) {
-			    printf ("envinit: cannot open `%s'\n", fname);
-			    fflush (stdout);
+			if ((fp = fopen (vfn2osfn(fname,0), "r")) == NULL)
 			    break;
-			}
 		    }
 		    continue;
 		}
