@@ -62,17 +62,6 @@ Architecture | Operating system | Supported CPU types
 Note that Cygwin and big endian architectures like macosx/ppc are not
 supported anymore.
 
-When the build finishes, execute the install script to create the
-links needed to run IRAF:
-
-    $ ./install 		# execute the install script
-
-The script will prompt you for the path to the default image 
-directory, the cache directory and the binary files directory.
-Usually, you can everywhere use the default settings when asked from 
-the install script.
-
-
 ## Test the Build
 
 IRAF comes with a small set of basic tests to ensure that the build
@@ -106,3 +95,44 @@ The output should look like
 Note that `xfailed` (`x`) are e**x**pected **fail**ures.
 
 For details of the tests, see the file [`test/README.md`](test/README.md).
+
+## Install the software at its final place
+
+There are two options to install the build: system wide (by default
+under `/usr/local/lib/iraf`), or in-place for the current user
+only. If you have root (sudo, admin) access, the system wide
+installation is the preferred option.
+
+### System wide installation
+
+The system wide installation copies everything that is needed to
+`/usr/local/lib/iraf`, making it available for all users of the
+computer. For this, do the following command:
+
+    $ sudo make install
+
+This also installs the links required to run iraf or its commands to
+`/usr/local/bin`. After the installation finishes, one can directly
+start using
+
+    $ mkiraf
+    $ ecl
+
+Note that the `mkiraf` command is now optional if a local parameter
+storage is not needed. Setting the `iraf` environment variable is not
+needed to run the system.
+
+### In-place installation
+
+The in-place installation just configures the built system in its
+current location.
+
+    $ make inplace
+
+This also installs the links required to run iraf or its commands to
+`~/.iraf/bin`. This directory should be added to your `PATH` variable
+so that the IRAF commands can be found by their name. Different to
+previous versions, the installation does not touch your login files;
+you should edit these files manually to add the path if
+needed. Setting the `iraf` environment variable is not needed to run
+the system.
