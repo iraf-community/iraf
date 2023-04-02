@@ -16,7 +16,8 @@ clean:
 cfitsio:
 	cd cfitsio && \
 	./configure --includedir=$(includedir) \
-	            --bindir=$(bindir) --libdir=$(bindir)
+	            --bindir=$(bindir) --libdir=$(bindir) \
+	            FC=none
 	$(MAKE) -C cfitsio libcfitsio.a
 
 libvotable:
