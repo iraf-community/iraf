@@ -39,11 +39,11 @@ ZFINFO (
 
 	/* Determine file type.
 	 */
-	if (osfile.st_mode & S_IFDIR)
+	if (S_ISDIR(osfile.st_mode))
 	    fs->fi_type = FI_DIRECTORY;
-	else if (osfile.st_mode & S_IEXEC)
+	else if (osfile.st_mode & S_IXUSR)
 	    fs->fi_type = FI_EXECUTABLE;
-	else if (osfile.st_mode & S_IFREG)
+	else if (S_ISREG(osfile.st_mode))
 	    fs->fi_type = FI_REGULAR;
 	else
 	    fs->fi_type = FI_SPECIAL;

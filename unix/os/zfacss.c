@@ -63,7 +63,7 @@ ZFACSS (
 
 	if (accessible && *type == DIRECTORY_FILE) {
 	    stat ((char *)fname, &fi);
-	    if (fi.st_mode & S_IFDIR)
+	    if (S_ISDIR(fi.st_mode))
 		*status = YES;
 	    else
 		*status = NO;
@@ -71,7 +71,7 @@ ZFACSS (
 
 	} else if (!accessible && *type == SYMLINK_FILE) {
 	    lstat ((char *)fname, &fi);
-	    if (fi.st_mode & S_IFLNK)
+	    if (S_ISLNK(fi.st_mode))
 		*status = YES;
 	    else
 		*status = NO;
@@ -89,7 +89,7 @@ ZFACSS (
 	    stat ((char *)fname, &fi);
 
 	    /* Do NOT read from a special device (may block) */
-	    if ((fi.st_mode & S_IFMT) & S_IFREG) {
+	    if (S_ISREG(fi.st_mode)) {
 		/* If we are testing for a text file the portion of the file
 		 * tested must consist of only printable ascii characters or
 		 * whitespace, with occasional newline line delimiters.
@@ -116,7 +116,7 @@ ZFACSS (
 			accessible = NO;
 		    close (fd);
 		}
-	    } else if (fi.st_mode & S_IFCHR && *type != TEXT_FILE)
+	    } else if (S_ISCHR(fi.st_mode) && *type != TEXT_FILE)
 		accessible = NO;
 	}
 		
