@@ -224,7 +224,7 @@ ZOPNND (
 		    if (host_addr == INADDR_NONE)
 			goto err;
 		} else if ((hp = gethostbyname(host_str))) {
-  		    memcpy (&host_addr, hp->h_addr, sizeof(host_addr));
+ 		    memcpy (&host_addr, hp->h_addr_list[0], sizeof(host_addr));
 		} else
 		    goto err;
 
