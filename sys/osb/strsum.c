@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #define	import_spp
 #define import_knames
 #include <iraf.h>

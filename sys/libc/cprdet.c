@@ -6,6 +6,7 @@
 #define	import_xnames
 #include <iraf.h>
 
+int PRFODPR (void);
 
 /*
 ** CPRDET -- Detached processes.  A detached process is a process which runs

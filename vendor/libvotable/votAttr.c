@@ -8,15 +8,14 @@
  *  @brief  	(Private) Methods to manage XML attributes.
  */
 
-#define _GNU_SOURCE
+#define _DEFAULT_SOURCE 1       /* strdup/strcasecomp comes from BSD */
+#define _GNU_SOURCE 1		/* strcasestr */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 
 #include "votParseP.h"
-
-extern char  *strcasestr();
 
 
 /** 

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
  int
 #ifdef KR_headers

@@ -6,6 +6,7 @@
 #define	import_knames
 #include <iraf.h>
 
+int ZWMSEC (XINT *msec);
 
 /* C_WMSEC -- Delay for so may milliseconds.
 */

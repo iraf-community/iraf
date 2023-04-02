@@ -70,7 +70,7 @@ A		[a-zA-Z]
 "?"		return (crackident (yytext));	/* current package help	     */
 "??"		return (crackident (yytext));	/* all tasks help	     */
 
-"&"		{	extern bracelevel;
+"&"		{	extern int bracelevel;
 			if (bracelevel) {
 	    eprintf ("ERROR: background not allowed within statement block\n");
 			    return ('#');

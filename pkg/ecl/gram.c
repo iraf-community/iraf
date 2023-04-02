@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -919,7 +921,6 @@ intrfunc (char *fname, int nargs)
 		    int	o1, o2;
 		    struct operand istr;
 		    char *index();
-		    extern void *memset();
 trim_:
 		    if (nargs >= 2) {
 		        /* Get the chars to trim, otherwise its whitespace.  */

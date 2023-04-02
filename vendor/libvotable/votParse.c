@@ -8,9 +8,10 @@
  *  @brief      Public interface procedures for the libVOTable parser.
  */
 
+#define _DEFAULT_SOURCE 1       /* strcasecomp/strdup comes from BSD */
+#define _GNU_SOURCE 1       /* strcasecomp/strdup comes from BSD */
 #include <stdio.h>
 #include <stdlib.h>
-#define _GNU_SOURCE
 #include <string.h>
 #include <expat.h>
 #include <unistd.h>
@@ -29,9 +30,6 @@
 
 
 #define	BUFSIZE			4096
-
-    
-extern char  *strcasestr();
 
 
 /* Private procedures

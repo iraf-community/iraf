@@ -1,10 +1,15 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
+#define	import_knames
 #include <iraf.h>
+
+int ZFREE (void  *buf);
 
 
 /*  FREADLINE -- Get a line from a user with editing.  This is a libc 
@@ -27,7 +32,7 @@ freadline (
             return ((char *) NULL);
 	} else {
 	    strcpy (line, cmd);		/* save to static buffer	*/
-	    zfree_ ((void *) cmd);	/* free readline() buffer	*/
+	    ZFREE ((void *) cmd);	/* free readline() buffer	*/
 	}
 
 	return ((char *) line);

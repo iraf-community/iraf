@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -66,7 +68,6 @@ extern	char *ifseen;		/* Processing an IF statement?		*/
 
 extern	int do_error;		/* Are we processing errors?		*/
 
-extern	void *memset();
 char   *freadline (char *prompt);
 int     add_history (char *buf);
 

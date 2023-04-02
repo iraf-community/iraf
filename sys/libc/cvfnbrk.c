@@ -6,6 +6,8 @@
 #define import_knames
 #include <iraf.h>
 
+int ZFNBRK (XCHAR *vfn, XINT *uroot_offset, XINT  *uextn_offset);
+
 
 /* C_VFNBRK -- Break a virtual filename (or host filename) into its component
 ** parts, i.e., logical directory (ldir), root, and extension.  No characters

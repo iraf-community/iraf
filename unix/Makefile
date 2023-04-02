@@ -1,4 +1,4 @@
-export HSI_CF = $(XC_CFLAGS) -I$(iraf)include
+export HSI_CF = $(XC_CFLAGS) -I$(iraf)include -D_GNU_SOURCE
 export HSI_XF = -x -Inolibc -/Wall -/O2
 export HSI_FF = -g -DBLD_KERNEL -O2
 export HSI_LF = $(LDFLAGS)
