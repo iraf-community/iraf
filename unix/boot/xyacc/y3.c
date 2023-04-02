@@ -571,31 +571,8 @@ hideprod (void)
 }
 
 
-static int
-cmpmbchars (MBCLIT *p, MBCLIT *q)
-{
-    /* Compare two MBLITs. */
-    return ((p->character) - (q->character));
-}
-
 static void
 wrmbchars (void)
 {
-    int i;
-
-    return wdef ("YYNMBCHARS", nmbchars);
-    qsort (mbchars, nmbchars, sizeof (*mbchars),
-	   (int (*)(const void *, const void *)) cmpmbchars);
-    (void) fprintf (ftable,
-		    "static struct{\n\tchar character;"
-		    "\n\tint tvalue;\n}yymbchars[YYNMBCHARS]={\n");
-    for (i = 0; i < nmbchars; ++i) {
-	(void) fprintf (ftable, "\t{%#x,%d}",
-			(int) mbchars[i].character, mbchars[i].tvalue);
-	if (i < nmbchars - 1) {
-	    /* Not the last. */
-	    (void) fprintf (ftable, ",\n");
-	}
-    }
-    (void) fprintf (ftable, "\n};\n");
+    wdef ("YYNMBCHARS", nmbchars);
 }

@@ -16,9 +16,6 @@ Also produce a header file \fBy.tab.h\fR.
 .ls 10 -l
 Don't generate '#line' directives
 .le
-.ls 10 -p \fIsym_prefix\fR
-Prepend sym_prefix to the external symbols
-.le
 .ls 10 -P \fIparser\fR
 Specify parser file (default \fBboot$xyacc/yaccpar.x\fR)
 .le

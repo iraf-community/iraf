@@ -18,9 +18,6 @@ Also produce a header file \fBy.tab.h\fR.
 .B -l
 Don't generate '#line' directives
 .TP
-.B -p \fIsym_prefix\fR
-Prepend sym_prefix to the external symbols
-.TP
 .B -P \fIparser\fR
 Specify parser file (default \fBboot$xyacc/yaccpar.x\fR)
 .TP
