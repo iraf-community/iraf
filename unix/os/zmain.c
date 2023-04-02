@@ -187,7 +187,7 @@ ipc_:
 	 * code only in the event of a panic.
 	 */
 	errstat = IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
-	    &driver, &devtype, &prtype, osfn_bkgfile, &jobcode, SYSRUK,ONENTRY);
+			     &driver, &devtype, &prtype, (XCHAR*)osfn_bkgfile, &jobcode, SYSRUK,ONENTRY);
 
 	/* Normal process shutdown.  Our only action is to delete the bkgfile
 	 * if run as a detached process (see also zpanic).

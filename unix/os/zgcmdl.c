@@ -6,7 +6,7 @@
 
 #include "osproto.h"
 
-extern	char *environ[];
+extern char **environ;
 #ifdef	__APPLE__
 extern  char ***_NSGetArgv();
 extern  int *_NSGetArgc();
