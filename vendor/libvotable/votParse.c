@@ -1841,7 +1841,7 @@ vot_copyElement (handle_t src_h, handle_t parent_h)
 {
     /* A recurseive function to copy a node and it's children. */
     Element   *src_ptr, *return_ptr;
-    handle_t   return_handle, parent;
+    handle_t   return_handle, parent = 0;
     handle_t   src_child_h, src_next_h;
     
 
