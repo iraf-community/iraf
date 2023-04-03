@@ -1,5 +1,5 @@
 #ifndef D_xnames
-#include "iraf/xnames.h"
+#include "iraf_xnames.h"
 #endif
 
 extern C_f ahivx_(complex * ret_val, complex *a, integer *npix);

@@ -3,10 +3,10 @@
  */
 
 #ifndef D_spp
-#include "iraf/spp.h"
+#include "iraf_spp.h"
 #endif
 #ifndef D_knames
-#include "iraf/knames.h"
+#include "iraf_knames.h"
 #endif
 
 /* zalloc.c */

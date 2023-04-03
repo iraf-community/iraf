@@ -122,7 +122,7 @@ define	P2P	($1)			# no-op
 # define not	noti
 
 # Name conversions (to avoid conflicts with host system).  Must agree with
-# defines in hlib$libc/xnames.h.
+# defines in hlib$libc/iraf_xnames.h.
 
 define	access	xfaccs
 define	calloc	xcallc

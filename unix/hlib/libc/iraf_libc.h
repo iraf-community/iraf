@@ -6,7 +6,7 @@
 #ifndef D_libc
 #ifndef D_spp
 #ifndef import_spp
-#include "spp.h"
+#include "iraf_spp.h"
 #endif
 #endif
 
@@ -327,7 +327,7 @@ extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handle
 /*
 */
 #include "../../f2c/libf2c/f2c.h"
-#include "vosproto.h"
+#include "iraf_vosproto.h"
 
 #define	D_libc
 #define	D_libc_proto
