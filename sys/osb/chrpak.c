@@ -11,6 +11,7 @@
  * hence we pack the chars in unsigned bytes, dealing explicitly with any
  * negative values.
  */
+void
 CHRPAK (a, a_off, b, b_off, nchars)
 XCHAR	*a;
 PKCHAR	*b;

@@ -16,6 +16,7 @@
  * and the operation is being performed in place, then this procedure should
  * do nothing.
  */
+void
 STRUPK (instr, outstr, maxch)
 PKCHAR	*instr;
 XCHAR	*outstr;

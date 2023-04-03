@@ -8,6 +8,7 @@
 /* AMOVS -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVS (
   XSHORT	*a,
   XSHORT	*b,

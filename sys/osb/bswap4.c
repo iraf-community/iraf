@@ -9,6 +9,7 @@
  * in each successive 4 byte group, i.e., 12345678 becomes 43218765.
  * The input and output arrays may be the same but may not partially overlap.
  */
+void
 BSWAP4 (a, aoff, b, boff, nbytes)
 XCHAR	*a;			/* input array			*/
 XINT	*aoff;			/* first byte in input array	*/

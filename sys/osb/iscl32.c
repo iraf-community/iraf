@@ -9,6 +9,7 @@
 
 /* ISCL32 - Scale a pixel array stored as SPP chars to the desired type.
  */
+void
 ISCL32 (a, b, npix, bscale, bzero)
 XCHAR	*a;			/* input array			*/
 XCHAR	*b;			/* output array			*/

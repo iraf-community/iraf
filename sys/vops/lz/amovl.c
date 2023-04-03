@@ -8,6 +8,7 @@
 /* AMOVL -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVL (
   XLONG	*a,
   XLONG	*b,

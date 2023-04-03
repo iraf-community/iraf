@@ -10,6 +10,7 @@
  * Note that while XCHAR is signed, the signedness of the C char is unspecified,
  * hence we pack the chars into unsigned bytes and restore the sign explicitly.
  */
+void
 CHRUPK (a, a_off, b, b_off, nchars)
 PKCHAR	*a;
 XCHAR	*b;

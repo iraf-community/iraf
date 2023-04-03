@@ -9,6 +9,7 @@
  * pairs of bytes.  The two arrays may be the same but may not be offset
  * and overlapping.
  */
+void
 BSWAP2 (a, aoff, b, boff, nbytes)
 XCHAR	*a;			/* input array			*/
 XINT	*aoff;			/* first byte in input array	*/

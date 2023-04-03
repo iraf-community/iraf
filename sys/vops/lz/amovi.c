@@ -8,6 +8,7 @@
 /* AMOVI -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVI (
   XINT	*a,
   XINT	*b,

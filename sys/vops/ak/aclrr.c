@@ -8,6 +8,7 @@
 /* ACLRR -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 ACLRR (
   XREAL	*a,
   XINT	*n
