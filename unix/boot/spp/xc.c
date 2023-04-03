@@ -970,7 +970,8 @@ addflags (char *flag, char *arglist[], int *p_nargs)
 		        *p_nargs = nargs;
 		        return (1);
 	        }
-	        arglist[nargs++] = fs;
+		if (strlen(fs))
+		    arglist[nargs++] = fs;
 	    }
 
 	    *p_nargs = nargs;
