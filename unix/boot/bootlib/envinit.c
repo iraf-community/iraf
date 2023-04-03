@@ -185,8 +185,8 @@ loadenv (char *osfn)
 		/* Skip comments and blank lines. */
 		for (ip=lbuf;  isspace(*ip);  ip++)
 		    ;
-		if (strncmp (lbuf, "set", 3) != 0) {
-		    if (strncmp (lbuf, "reset", 5) != 0)
+		if (strncmp (ip, "set", 3) != 0) {
+		    if (strncmp (ip, "reset", 5) != 0)
 			continue;
 		    else
 			ip += 5;
@@ -215,11 +215,8 @@ loadenv (char *osfn)
 			    } else
 				ip++;
 
-			if ((fp = fopen (vfn2osfn(fname,0), "r")) == NULL) {
-			    printf ("envinit: cannot open `%s'\n", fname);
-			    fflush (stdout);
+			if ((fp = fopen (vfn2osfn(fname,0), "r")) == NULL)
 			    break;
-			}
 		    }
 		    continue;
 		}
