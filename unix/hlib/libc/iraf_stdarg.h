@@ -11,14 +11,6 @@
  * varargs directly is unaffected.
  */
 #ifndef D_stdarg
-
-
-#ifdef __GNUC__
-#include "stdarg-gcc.h"
-#else
 #include <stdarg.h>
-#endif
-
-
 #define	D_stdarg
 #endif
