@@ -516,11 +516,11 @@ Hopefully all went well to this point. Let's clean things up a bit.
 
 ```
 cl> dir
-image.dbl.fits      image.sect.fits     inlist              uparmimlminmax.par
-image.real.fits     image.short.fits    messier.xml         uparmntstinfo.par
+image.dbl.fits      image.sect.fits     inlist
+image.real.fits     image.short.fits    messier.xml
 cl> imdelete image.*
 cl> dir
-inlist              messier.xml         uparmimlminmax.par  uparmntstinfo.par
+inlist       messier.xml
 ```
 
 Remember that if you want to delete any images you just use the task

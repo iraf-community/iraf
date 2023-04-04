@@ -258,7 +258,10 @@ for CL in $IRAF_SHELLS ; do
     if [ -x "${cl}" ] ; then
 	for t in $TEST_FILES ; do
 	    test_dir="${base_dir}/testroot"
-	    mkdir -p "${test_dir}"
+	    export uparm="${test_dir}/.uparm/"
+	    export cache="${test_dir}/.cache/"
+	    export imdir="${test_dir}/.imdir/"
+	    mkdir -p "${test_dir}" "${uparm}" "${cache}" "${imdir}"
 	    printf "%b: %b " "${CL}" "$(basename "${t}")"
 	    cd "$test_dir" && run_tests "${cl}" "${t}"
 	    rm -rf "${test_dir}"
