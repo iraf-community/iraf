@@ -55,6 +55,7 @@
 #define	USEF2C		1			/* use Fortran to C trans. */
 
 #define	LIBCINCLUDES	"hlib$libc/"		/* IRAF LIBC include dir */
+#define IRAFINCLUDES    "iraf$include/"		/* IRAF include dir */
 #define	LOCALBINDIR	"/usr/local/bin/"	/* standard local BIN */
 #define	SYSBINDIR	"/usr/bin/"		/* special system BIN */
 
@@ -714,6 +715,11 @@ passflag:		    mkobject = YES;
 	if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	        arglist[nargs++] = opt_flags[i];
+	}
+
+	if (! nolibc) {
+	    addflags ("-I", arglist, &nargs);
+	    addflags (vfn2osfn(IRAFINCLUDES, 0), arglist, &nargs);
 	}
 
 	/* Add the user-defined flags last so they can override the 

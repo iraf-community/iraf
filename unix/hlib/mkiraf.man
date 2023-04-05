@@ -1,0 +1,59 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH GENERIC "1" "April 2023" "IRAF 2.17.1" "IRAF commands"
+.SH NAME
+mkiraf \- Setup the IRAF environment for a user
+.SH SYNOPSIS
+mkiraf [\fB\-d\fR|\fB\-\-default\fR]
+[\fB\-i\fR|\fB\-\-init\fR]
+[\fB\-n\fR|\fB\-\-noinit\fR]
+[\fB\-c\fR|\fB\-\-copy\fR]
+[\fB\-q\fR|\fB\-\-quiet\fR]
+.SH DESCRIPTION
+Creates the parameter directory, image directory and cache directory
+for the use with IRAF CL, and optionally create a local copy of the
+IRAF CL startup file \fIlogin.cl\fR.
+
+Within IRAF CL, these directory have the names \fIuparm$\fR,
+\fIimdir$\fR, and \fIcache$\fR.
+
+Without the \fB-d\fR|\fB--default\fR flag, the parameter directory
+\fIuparm\fR is created in the local directory, triggering a parameter
+storage locally. If no local parameter directory exists, a general user
+specific parameter storage in \fI${HOME}/.iraf/uparm\fR is used. The
+image directory \fIimdir\fR and the cache directory \fIcache\fR are
+always created in \fI${HOME}/.iraf/\fR.
+.SH OPTIONS
+.TP
+.B \-d, \-\-default
+Create the \fIupar\fR file in the user specific directory
+\fI${HOME}/.iraf\fR instead of the local directory.
+.TP
+.B \-i, \-\-init
+Initialize an empty uparm directory, removing old parameter settings.
+If neither the \fB\-i\fR|\fB\-\-init\fR nor the
+\fB\-n\fR|\fB\-\-noinit\fR is given, the command asks whether the
+\fIupar\fR directory should be initialized.
+.TP
+.B \-n, \-\-noinit
+Do not nitialize the uparm directory if it exists, keeping old
+parameter settings.
+If neither the \fB\-i\fR|\fB\-\-init\fR nor the
+\fB\-n\fR|\fB\-\-noinit\fR is given, the command asks whether the
+\fIupar\fR directory should be initialized.
+.TP
+.B \-c, \-\-copy
+Create a copy of the \fIlogin.cl\fR file in the local directory, or
+(if the \fB-d\fR|\fB--default\fR flag was given), in the directory
+\fI${HOME}/.iraf\fR. These copies are only needed if local
+changes shall be applied.
+.TP
+.B \-q, \-\-quiet
+Suppress output messages
+.SH BUGS
+IRAF should use XDG conform user directories in \fI${HOME}/.cache\fR,
+\fI${HOME}/.local\fR and \fI${HOME}/.config\fR.
+.SH SEE ALSO
+.BR ecl (1),
+.SH AUTHOR
+Created by Ole Streicher for the IRAF community
+

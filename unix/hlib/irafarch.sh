@@ -29,7 +29,6 @@ if [ -z "$iraf" ]; then
   bindir=$(dirname "$0")                # get iraf root directory 
   iraf=${bindir%/*}/../
 fi
-. "${iraf}/unix/hlib/util.sh"
 
 
 #----------------------------------
@@ -41,7 +40,7 @@ if [ -e /usr/bin/uname ]; then
 elif [ -e /bin/uname ]; then
     uname_cmd=/bin/uname
 else
-    WARNING  "No 'uname' command found to determine architecture."
+    echo  "No 'uname' command found to determine architecture."
     exit 1
 fi
 
@@ -68,9 +67,9 @@ fi
 
 if [ $debug = 1 ]; then				# DEBUG PRINT
     if [ -n "$IRAFARCH" ]; then
-        ECHO " IRAFARCH=$IRAFARCH"
+        echo " IRAFARCH=$IRAFARCH"
     fi
-    ECHO "    MNAME=$MNAME"
+    echo "    MNAME=$MNAME"
 fi
 
 
@@ -117,7 +116,7 @@ else
          ;;
 
     *)
-	ECHO  "Unable to determine platform architecture for ($MNAME)."
+	echo  "Unable to determine platform architecture for ($MNAME)."
 	exit 1
 	;;
     esac
@@ -134,17 +133,17 @@ fi
 
 # Handle any command-line options.
 if [ $# = 0 ]; then
-    ECHO $mach
+    echo $mach
 else
     case "$1" in
     "-mach"|"-hsi")
-	ECHO "$mach"
+	echo "$mach"
 	;;
     "-nbits")
-	ECHO "$nbits"
+	echo "$nbits"
 	;;
     "-endian")
-	ECHO "$endian"
+	echo "$endian"
 	;;
     "-set")
 	if [ -n "$2" ]; then
@@ -153,7 +152,7 @@ else
 	export MNAME=$IRAFARCH
 	;;
     *)
-	ECHO 'Invalid option '"$1"
+	echo 'Invalid option '"$1"
 	;;
     esac
 fi

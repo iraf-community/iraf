@@ -11,7 +11,7 @@
 #include <iraf.h>
 
 static char *_ev_scaniraf (char *envvar);
-static char *_ev_guess_irafdir (char *fname);
+static char *_ev_irafroot (void);
 
 
 /* ZGTENV -- Get the value of a host system environment variable.  Look first
@@ -49,14 +49,6 @@ ZGTENV (
 }
 
 
-/*
- * Code to bootstrap the IRAF environment list for UNIX.
- */
-
-#define	TABLE		"/usr/include/iraf.h"	/* table file		*/
-#define	SZ_NAME		10
-#define	SZ_VALUE	80
-
 
 /* SCANIRAF -- If the referenced environment variable is a well known standard
  * variable, scan the file <iraf.h> for its system wide default value.  This
@@ -76,10 +68,9 @@ ZGTENV (
  *			    to find IRAF files.
  *
  *	host		The machine dependent subdirectory of iraf$.  The
- *			    actual name of this directory varies from system
- *			    to system (to avoid name collisions on tar tapes),
- *		 	    hence we cannot use "iraf$host/".
- *			    Examples: iraf$unix/, iraf$vms/, iraf$sun/, etc.
+ *			    actual name of this directory is nowadays
+ *			    usually "unix", but can be overwritten by an
+ *			    environment variable.
  *
  *	tmp		The place where IRAF is to put its temporary files.
  *			    This is normally /tmp/ for a UNIX system.  TMP
@@ -111,14 +102,16 @@ _ev_scaniraf (char *envvar)
 	    } else if ((ip = _ev_scaniraf("iraf")) == NULL) {
 	        return (NULL);
 	    }
-	    ip = realloc(ip, strlen(ip) + 7);
-	    strcat(ip, "/unix/");
+	    ip = realloc(ip, strlen(ip) + 6);
+	    strcat(ip, "unix/");
 	} else if (strcmp(envvar, "iraf") == 0) {
- 	    if ((ip = _ev_guess_irafdir(TABLE)) == NULL) {
+ 	    if ((ip = _ev_irafroot()) == NULL) {
 		return (NULL);
 	    }
-	    ip = realloc(ip, strlen(ip) + 2);
-	    strcat(ip, "/");
+	    if (ip[strlen(ip)-1] != '/') {
+		ip = realloc(ip, strlen(ip) + 2);
+		strcat(ip, "/");
+	    }
 	}
 
 	if (ip != NULL) {
@@ -129,42 +122,42 @@ _ev_scaniraf (char *envvar)
 }
 
 
-/* _EV_LOADCACHE -- Follow the link <iraf.h> to the path of the IRAF
- * installation.  Cache these in case we are called again (they do not
- * change so often that we cannot cache them in memory).  Any errors
- * in accessing the table probably indicate an error in installing
- * IRAF hence should be reported immediately.
+/*
+ * Code to bootstrap the IRAF environment list for UNIX.
+ */
+
+#define	IRAFROOT	"/etc/iraf/irafroot"
+
+
+/* _EV_IRAFROOT -- Read one line of the irafroot file and return it
+   (without the trailing newline).
  */
 static char*
-_ev_guess_irafdir (char *fname)
+_ev_irafroot (void)
 {
-  static  char	 *home, hpath[SZ_PATHNAME+1], *rpath, *path0, *path1, *path2;
+	char	*home, hpath[SZ_PATHNAME+1], *lbuf;
+	FILE	*fp = NULL;
 
-	rpath = malloc(SZ_PATHNAME+1);
 	if ((home = getenv ("HOME"))) {
-	    sprintf (hpath, "%s/.iraf/iraf.h", home);
-	    if ((realpath(hpath, rpath)) == NULL) {
-		if ((realpath(fname, rpath)) == NULL) {
-		    fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
-		    free(rpath);
-		    return (NULL);
-		}
-	    }
-	} else {
-	    /*	We should always have a $HOME, but try this to be safe.
-	     */
-	  if ((realpath(fname, rpath)) == NULL) {
-		fprintf (stderr, "os.zgtenv: cannot follow link `%s'\n", fname);
-		free(rpath);
-		return (NULL);
+	    sprintf (hpath, "%s/.iraf/irafroot", home);
+	    fp = fopen (hpath, "r");
+	}
+	if (fp == NULL) {
+	    if ((fp = fopen (IRAFROOT, "r")) == NULL) {
+	        fprintf (stderr, "os.zgtenv: cannot open `%s'\n", IRAFROOT);
+	        return (NULL);
 	    }
 	}
 
-	path0 = strdup(dirname(rpath));
-	free(rpath);
-	path1 = strdup(dirname(path0));
-	free(path0);
-	path2 = strdup(dirname(path1));
-	free(path1);
-	return (path2);
+	lbuf = malloc(SZ_LINE+1);
+	if (fgets (lbuf, SZ_LINE, fp) == NULL) {
+	    fclose(fp);
+	    return (NULL);
+	} else {
+	    fclose(fp);
+	    if (lbuf[strlen(lbuf)-1] == '\n') {
+	        lbuf[strlen(lbuf)-1] = 0;
+	    }
+	    return (lbuf);
+	}
 }

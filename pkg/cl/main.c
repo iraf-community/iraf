@@ -346,11 +346,19 @@ login (char *cmd)
 	register char *ip, *op;
 	struct	ltask *ltp;
 	struct	operand o;
-	char	*loginfile = LOGINFILE;
+	char	loginfile[SZ_PATHNAME];
 	char	alt_loginfile[SZ_PATHNAME];
 	char	clstartup[SZ_PATHNAME];
 	char	clprocess[SZ_PATHNAME];
 	char	*arglist;
+	char    *loginfiles[] = {
+	    LOGINFILE,
+	    "HOME$/.iraf/" LOGINFILE,
+	    "/etc/iraf/" LOGINFILE,
+	    "hlib$" LOGINFILE,
+	    NULL
+	};
+	int i;
 
 	strcpy (clstartup, HOSTLIB);
 	strcat (clstartup, CLSTARTUP);
@@ -466,28 +474,21 @@ login (char *cmd)
 		compile (EXEC);
 	    }
 
-        } else if (c_access (loginfile,0,0) == NO) {
-            char *home = envget ("HOME");
-            char global[SZ_LINE];
-
-            memset (global, 0, SZ_LINE);
-            sprintf (global, "%s/.iraf/login.cl", home);
-            if (c_access (global, 0, 0) == YES) {
-                o.o_val.v_s = global;
-                compile (CALL, "cl");
-                compile (PUSHCONST, &o);
-                compile (REDIRIN);
-                compile (EXEC);
-            } else {
-                printf ("Warning: no login.cl found in login directory\n");
-            }
-
-	} else {
-	    o.o_val.v_s = loginfile;
-	    compile (CALL, "cl");
-	    compile (PUSHCONST, &o);
-	    compile (REDIRIN);
-	    compile (EXEC);
+        } else {
+	    for (i = 0; loginfiles[i] != NULL; i++) {
+		c_fmapfn (loginfiles[i], loginfile, SZ_PATHNAME);
+		if (c_access (loginfile,0,0) == YES) {
+		    o.o_val.v_s = loginfile;
+		    compile (CALL, "cl");
+		    compile (PUSHCONST, &o);
+		    compile (REDIRIN);
+		    compile (EXEC);
+		    break;
+		}
+	    }
+	    if (loginfiles[i] == NULL) {
+		printf("Warning: no login.cl found.\n");
+	    }
 	}
 
 	compile (END);

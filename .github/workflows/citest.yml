@@ -40,16 +40,18 @@ jobs:
             sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
           fi
 
-      - name: Setup non-standard IRAF build (32 bit)
-        if: matrix.irafarch == 'linux'
-        run: |
-          IRAFARCH=linux make
-
       - name: Build IRAF
-        if: matrix.irafarch != 'linux'
         run: |
+          if [ "${{ matrix.irafarch }}" ] ; then export IRAFARCH=${{ matrix.irafarch }}; fi
           make
 
       - name: Run tests
         run: |
          make test
+
+      - name: Installation test
+        run: |
+          sudo make install
+          /usr/local/lib/iraf/test/run_tests /usr/local/lib/iraf/test/noao.astutil.md
+          cd pkg/images
+          xc -d -c x_images.x

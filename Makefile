@@ -40,9 +40,9 @@ export RANLIB = ranlib
 export CFLAGS ?= -g -Wall -O2
 CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
-export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS) -I$(iraf)include
+export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 
-.PHONY: all sysgen clean test arch noao host novos core vendor bindirs
+.PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace
 
 all:: sysgen
 
@@ -121,3 +121,65 @@ bindirs:
 	    if [ -L bin ] ; then rm -f bin unix/bin noao/bin ; fi && \
 	    mkdir -p bin noao/bin unix/bin ; \
 	fi
+
+# Patch the "iraf" environment variable into shell scripts
+# The "grep -q" calls are to make sure that the file was edited
+config:
+	sed -E -i.orig \
+	    s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
+	    $(DESTDIR)$(hlib)ecl.sh \
+	    $(DESTDIR)$(hlib)setup.sh \
+            $(DESTDIR)$(hlib)mkiraf.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)ecl.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)mkiraf.sh
+	sed -E -i.orig \
+	    s+'^([[:space:]]*set[[:space:]]*d_iraf[[:space:]]*=[[:space:]]*).*+\1"$(iraf)"'+ \
+	    $(DESTDIR)$(hlib)setup.csh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.csh
+
+bindir = $(HOME)/.iraf/bin
+
+# Create symbolic links for user callable scripts and executables
+binary_links:
+	mkdir -p $(DESTDIR)$(bindir)
+	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/cl
+	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/ecl
+	ln -sf $(hlib)mkiraf.sh $(DESTDIR)$(bindir)/mkiraf
+	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
+	    ln -sf $(hbin)$${hprog}.e $(DESTDIR)$(bindir)/$${hprog} ; \
+	done
+
+# Do a default in-place (user) installation
+inplace: config binary_links
+	$(hlib)mkiraf.sh --default --init
+	ln -sf $(hlib)libc/iraf.h $(hlib)/setup.*sh $(HOME)/.iraf/
+	echo $(iraf) > $(HOME)/.iraf/irafroot
+	if [ "$(IRAFARCH)" ] ; then \
+	  echo "$(IRAFARCH)" > $(HOME)/.iraf/arch ; \
+	else \
+	  rm -f $(HOME)/.iraf/arch ; \
+	fi
+
+# Strip unneeded files from the installation.
+#
+# *Warning*: Calling this directly will remove all source files from
+#            your source directory.
+strip: noao/bin/x_quad.e
+	cd $(DESTDIR)$(iraf) && $(hostid)/bin/rmfiles.e -f $(hostid)/hlib/strip.iraf
+
+prefix ?= /usr/local
+
+install: noao/bin/x_quad.e
+	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/etc/iraf
+	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
+	         $(prefix)/lib/iraf
+	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
+	cp -f $(hlib)mkiraf.man $(DESTDIR)$(prefix)/share/man/man1/mkiraf.1
+	cp -f $(hlib)ecl.man $(DESTDIR)$(prefix)/share/man/man1/ecl.1
+	ln -sf ecl.1 $(DESTDIR)$(prefix)/share/man/man1/cl.1
+	cp -f $(host)boot/mkpkg/mkpkg.man $(DESTDIR)$(prefix)/share/man/man1/mkpkg.1
+	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
+	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
+	cp -f $(host)boot/generic/generic.man $(DESTDIR)$(prefix)/share/man/man1/generic.1
+	echo $(prefix)/lib/iraf/ > $(DESTDIR)/etc/iraf/irafroot

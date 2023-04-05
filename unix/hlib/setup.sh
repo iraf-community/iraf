@@ -1,8 +1,13 @@
-#!/bin/sh
-
 # Allow a previously defined $iraf to be used.
+d_iraf="/iraf/iraf/"
 if [ -z "$iraf" ]; then
-    export iraf=/iraf/iraf/
+    if [ -r ${HOME}/.iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    elif [ -r /etc/iraf/irafroot ] ; then
+	export iraf=$(cat /etc/iraf/irafroot)
+    else
+	export iraf="$d_iraf"
+    fi
 fi
 
 # Allow a previously defined $IRAFARCH to be used.

@@ -1,0 +1,34 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH CL "1" "April 2023" "IRAF 2.17.1" "IRAF commands"
+.SH NAME
+ECL/CL \- IRAF Command Language Interpreter
+.SH SYNOPSIS
+ecl [\fB\,\-V\fR|\fB\-c\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR]
+
+cl [\fB\,\-V\fR|\fB\-c\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR]
+.SH DESCRIPTION
+\fBECL\fR or \fBCL\fR starts up the command language interpreter for
+IRAF, the Image Reduction and Analysis Facility.  It can be fed a
+series of commands that will be executed in sequence.
+
+The ECL (Enhanced CL) has a number of features over CL, including
+better error handling, command line editing, new functions and
+constants. Unless for compatibility reasons, ECL should be used over
+CL.
+.TP
+\fB\-V\fR
+Show version of program.
+.TP
+\fB\-e\fR
+Force enhanced CL (command line editing etc.)
+.TP
+\fB\-c\fR
+Force classic CL
+.TP
+\fB\-x\fR
+Start in a new xgterm (or xterm if xgterm is not available)
+.TP
+\fB\-f\fR \fI\,FILE\/\fR
+Start with executing FILE
+.SH AUTHOR
+Created by Ole Streicher for the IRAF community
