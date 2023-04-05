@@ -33,8 +33,6 @@ ZFSUBD (
 	XCHAR	*slash;
 	char	*cp;
 
-	extern  int ZFGCWD(PKCHAR *outstr, XINT *maxch, XINT *status);
-
 
 	/* If osdir is null, use the current directory.
 	 */

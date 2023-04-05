@@ -26,8 +26,6 @@ ZFRNAM (
 	static	XINT setprot    = SET_PROTECTION;
 	XINT	protected;
 
-	extern  int ZFPROT(PKCHAR *fname, XINT *action, XINT *status);
-
 
 	/* Most remove file protection before renaming the file, else
 	 * zfprot will not find the file and will refuse to delete the

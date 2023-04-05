@@ -68,17 +68,6 @@ struct	oprinter lpr;			/* printer descriptor		*/
 int	lpr_inuse = NO;			/* set if printer is open	*/
 char	lpstr[SZ_LPSTR+1];		/* save zopnlp argument		*/
 
-
-extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
-extern	int ZCLSBF (XINT *fd, XINT *status);
-extern	int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
-extern	int ZFDELE (PKCHAR *fname, XINT *status);
-extern	int ZARDBF (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
-extern  int ZAWRBF (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
-extern	int ZAWTBF (XINT *fd, XINT *status);
-extern	int ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue);
-
-
 /* ZOPNLP -- Open a printer device for binary file i/o.  If we can talk
  * directly to the printer, do so, otherwise open a spoolfile which is
  * to be sent to the printer when ZCLSLP is later called.

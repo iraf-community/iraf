@@ -26,8 +26,6 @@ ZFPATH (
 	register int	n = *maxch;
 	PKCHAR	cwd[SZ_PATHNAME+1];
 
-	extern  int ZFGCWD(PKCHAR  *outstr, XINT *maxch, XINT *status);
-
 
 	op = pathname;
 	for (ip=osfn;  *ip == ' ';  ip++)

@@ -11,16 +11,6 @@
 #include "osproto.h"
 
 
-extern  int ZOPNTX (PKCHAR *osfn, XINT *mode, XINT *chan);
-extern	int ZCLSTX (XINT *fd, XINT *status);
-extern	int ZFLSTX (XINT *fd, XINT *status);
-extern	int ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-extern  int ZNOTTX (XINT *fd, XLONG *offset);
-extern	int ZPUTTX (XINT *fd, XCHAR *buf, XINT *nchars, XINT *status);
-extern	int ZSEKTX (XINT *fd, XLONG *znottx_offset, XINT *status);
-extern	int ZSTTTX (XINT *fd, XINT *param, XLONG *value);
-
-
 /*
  * ZFIOTY -- Device driver for terminals.  In the 4.1BSD UNIX kernel the same
  * driver is used for both terminals and ordinary text files, hence all we

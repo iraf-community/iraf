@@ -33,8 +33,6 @@ ZFUTIM (
 	struct	utimbuf time;
 	XINT	offset = 0;
 
-	extern  int ZGMTCO (XINT  *gmtcor);
-
 
 	/* Get UNIX file info.
 	 */

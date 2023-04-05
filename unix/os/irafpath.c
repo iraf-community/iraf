@@ -35,9 +35,6 @@ irafpath (char *fname)
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
 
-	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
-
-
 	/* Search any user libraries first. */
 	strcpy ((char *)ldir, ULIB);
 	(void) ZGTENV (ldir, ulibs, &sz_ulibs, &x_status);

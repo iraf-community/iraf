@@ -758,9 +758,6 @@ vm_connect (void)
 	XINT fd;
 	int status = 0;
 
-	extern int ZOPNND(PKCHAR *pk_osfn, XINT *mode, XINT *chan);
-
-
 	/* Already connected? */
 	if (vm_server)
 	    return (0);
@@ -795,7 +792,6 @@ vm_shutdown (void)
 {
 	XINT status;
 	XINT fd = vm_server;
-	extern  int  ZCLSND(XINT *fd, XINT *status);
 
 	if (vm_server) {
 	    if (vm_debug)

@@ -90,8 +90,6 @@ kernel_panic (char *errmsg)
 	PKCHAR	pkmsg[SZ_LINE];
 	register char	*ip, *op;
 
-	extern  int ZPANIC(XINT *errcode, PKCHAR *errmsg);
-
 
 	/* It is necessary to copy the error message string to get a PKCHAR
 	 * type string since misalignment is possible when coercing from char

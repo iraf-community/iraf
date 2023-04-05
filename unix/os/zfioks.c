@@ -1620,8 +1620,6 @@ ks_sysname (char *filename, char *pathname)
 {
 	XCHAR	irafdir[SZ_PATHNAME+1];
 	XINT	x_maxch=SZ_PATHNAME, x_nchars;
-	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
-
 
 	ZGTENV ((const int*)"iraf", irafdir, &x_maxch, &x_nchars);
 	if (x_nchars <= 0)
