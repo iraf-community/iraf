@@ -7,6 +7,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZLOCVA -- Return the address of a variable or array element in XCHAR units.
  * Must be able to do signed arithmetic on the integer value returned.
  * We ASSUME that XCHAR through XDOUBLE are addressed in the same units.

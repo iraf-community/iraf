@@ -13,6 +13,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	PREFIX		".."		/* hidden link for protected files */
 
 static int chk_prot (char *fname, char *link_name);

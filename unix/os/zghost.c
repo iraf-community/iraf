@@ -7,6 +7,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZGHOST -- Get the network name of the host computer.
  */
 int

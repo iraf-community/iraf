@@ -13,6 +13,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOLP -- IRAF FIO interface to the line printer device.  The line printer
  * is opened as a streaming type (no seeks) write-only binary device.

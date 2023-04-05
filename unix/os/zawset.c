@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	PCT_RESERVE	10	 /* percent */
 #define	MIN_RESERVE	50	 /* megabytes */
 #define	MIN_WORKSET	32	 /* megabytes */

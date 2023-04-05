@@ -10,6 +10,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* Process table code.  The high level code assumes that it can open and close
  * processes in any order.  The UNIX "wait" primitive, called when a process is
  * closed, returns the process status and pid of the first process to exit.

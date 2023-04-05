@@ -13,6 +13,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZALLOC.C -- Device allocation interface.  Requires the dev$devices table,
  * which is read by the high level code before we are called.

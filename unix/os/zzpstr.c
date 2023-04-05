@@ -6,6 +6,8 @@
 #define	import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZZPSTR.C -- Support for debugging SPP programs.
  *

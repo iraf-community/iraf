@@ -4,6 +4,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 extern	char *environ[];
 #ifdef	__APPLE__
 extern  char ***_NSGetArgv();

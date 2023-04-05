@@ -8,6 +8,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 extern	char os_process_name[];
 extern	PKCHAR osfn_bkgfile[];
 extern	int save_prtype;

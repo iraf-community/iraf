@@ -10,6 +10,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 static char *_ev_scaniraf (char *envvar);
 static char *_ev_irafroot (void);
 

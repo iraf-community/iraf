@@ -18,6 +18,8 @@
 #define import_prtype
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
  * during process startup and shutdown, when the IRAF kernel routines are being

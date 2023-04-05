@@ -15,6 +15,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	QUANTUM		6
 
 extern void pr_enter (int pid, int inchan, int outchan);

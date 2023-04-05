@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 extern  int ZOPNTX (PKCHAR *osfn, XINT *mode, XINT *chan);
 extern	int ZCLSTX (XINT *fd, XINT *status);

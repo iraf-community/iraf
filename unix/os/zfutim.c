@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define SECONDS_1970_TO_1980    315532800L
 
 

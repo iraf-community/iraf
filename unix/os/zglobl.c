@@ -6,6 +6,8 @@
 #define	import_kernel
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	SZ_PROCNAME	256
 
 /* Allocate ZFD, the global data structure for the kernel file i/o system.

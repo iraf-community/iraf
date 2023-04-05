@@ -13,6 +13,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZGTIME -- Get the local standard (clock) time, in units of seconds
  * since 00:00:00 01-Jan-80.  Return the total cpu time consumed by the
  * process (and any subprocesses), in units of milliseconds.

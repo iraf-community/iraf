@@ -10,6 +10,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	SZ_ULIBSTR	512
 #define	ULIB		"IRAFULIB"
 

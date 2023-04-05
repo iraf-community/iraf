@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZINTPR -- Interrupt a connected subprocess, i.e., raise the exception X_INT
  * in the subprocess.  On the UNIX system subprocesses ignore the UNIX SIGINT
  * exception, hence we send SIGTERM instead and the exception handling code

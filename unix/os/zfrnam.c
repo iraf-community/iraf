@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFRNAM -- Rename a file.  Do nothing to original file if operation
  * fails.  File must retain all attributes; special action is required
  * to transfer file protection.

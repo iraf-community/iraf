@@ -15,6 +15,8 @@
 #define import_prtype
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 
 void zzval_ (XINT *val) 

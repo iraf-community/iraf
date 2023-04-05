@@ -13,6 +13,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFALOC -- Preallocate space for a large file of known size, without having
  * to physically write zero blocks.  In UNIX this is done by seeking to the
  * desired end of file and writing some data.  Standard UNIX does not provide

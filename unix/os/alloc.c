@@ -16,6 +16,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ALLOC -- Unix task to allocate and deallocate devices given their generic
  * name.  These names are associated with special files in the ALLOCFILE file.

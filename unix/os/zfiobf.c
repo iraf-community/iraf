@@ -21,6 +21,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOBF -- FIO interface to UNIX 4.1BSD binary files.
  * This is the interface to general, random access disk resident binary

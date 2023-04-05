@@ -8,6 +8,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFNBRK -- Determine the offsets of the components of a virtual file name:
  *
  * 	"ldir$subdir/root.extn"

@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZOPDIR.C -- Routines for returning the contents of a directory as a list
  * of filename strings.

@@ -7,6 +7,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZGTPID -- Get process id number (used for process control and to make
  * unique file names).
  */

@@ -15,6 +15,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 extern	int errno;		/* error code returned by the kernel	*/
 
 extern void pr_enter (int pid, int inchan, int outchan);

@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	SZ_TESTBLOCK	1024		/* for TEXT/BINARY heuristic	*/
 #define	MAX_LINELEN	256		/* when looking for newlines	*/
 #define	R		04		/* UNIX access() codes		*/

@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOSF -- Static file device driver.  In the 4.1BSD UNIX kernel the ordinary
  * binary file driver is used for static files (files that do not change in

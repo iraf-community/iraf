@@ -5,6 +5,8 @@
 #define import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 
 void ex_handler ( int, siginfo_t *, void * );

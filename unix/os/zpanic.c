@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 extern	char os_process_name[];		/* process name, set in zmain	*/
 extern	PKCHAR osfn_bkgfile[];		/* bkgfile fname if detached	*/
 extern	int save_prtype;		/* process type saved by zmain	*/

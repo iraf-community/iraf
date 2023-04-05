@@ -13,6 +13,8 @@
 #define import_finfo
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFINFO -- Get information describing the named file.  Access times
  * are returned in units of seconds since 00:00:00 01-Jan-80, local time.
  */

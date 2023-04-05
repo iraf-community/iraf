@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 
 /* ZMALOC -- Allocate space on the heap.  NULL is returned if the buffer

@@ -8,6 +8,8 @@
 #define import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZCALL[0-10] -- Call the procedure whose entry point address is pointed to
  * by the first argument, which is the integer valued entry point address of
  * the procedure as returned by ZLOCPR.  Up to ten arguments are passed by

@@ -11,6 +11,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 /* ZFLINK -- Create a file symlink.
  */

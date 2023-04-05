@@ -13,6 +13,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOPL -- IRAF FIO interface to plotter devices.  A plotter
  * is opened as a streaming type (no seeks) write-only binary device.

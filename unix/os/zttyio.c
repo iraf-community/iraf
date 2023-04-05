@@ -9,6 +9,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 int ZTTYSZ ( XINT *dev, XINT *width, XINT *height )
 {
     struct winsize buf;

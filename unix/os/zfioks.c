@@ -30,6 +30,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 /* ZFIOKS -- File i/o to a remote kernel server.  This driver is the network
  * interface for the kernel interface package (sys$ki).  The KS driver is

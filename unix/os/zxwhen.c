@@ -13,6 +13,8 @@
 #define import_xwhen
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
  * customized for PC-IRAF, i.e., LINUX and FreeBSD.
  *
