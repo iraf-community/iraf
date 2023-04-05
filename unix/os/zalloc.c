@@ -15,6 +15,8 @@
 
 #include "osproto.h"
 
+static int loggedin (int uid);
+
 /*
  * ZALLOC.C -- Device allocation interface.  Requires the dev$devices table,
  * which is read by the high level code before we are called.
@@ -145,7 +147,7 @@ ZDVOWN (
 
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
-int
+static int
 loggedin (int uid)
 {
 	struct	utmpx ubuf;

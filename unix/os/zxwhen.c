@@ -38,7 +38,7 @@ int debug_sig = 0;
 #define	fcancel(fp)
 #endif
 
-void ex_handler ( int, siginfo_t *, void * );
+static void ex_handler (int unix_signal, siginfo_t *info, void *ucp);
 
 static long setsig(int code, SIGFUNC handler);
 static int ignore_sigint = 0;
@@ -185,8 +185,6 @@ ZXWHEN (
 	int     vex, uex;
 	SIGFUNC	vvector;
 
-	extern  int  kernel_panic (char *errmsg);
-
 
 	/* Convert code for virtual exception into an index into the table
 	 * of exception handler EPA's.
@@ -275,7 +273,7 @@ setsig (int code, SIGFUNC handler)
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-void
+static void
 ex_handler (
   int  	    unix_signal,
   siginfo_t *info,

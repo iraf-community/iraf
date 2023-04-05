@@ -63,9 +63,6 @@ int findsfs (char *argv[]);
 int dealloc (char *argv[]);
 int alloc (char	*argv[], int statonly);
 
-extern  int	uid_executing (int uid);
-
-
 
 int main (int argc, char *argv[])
 {

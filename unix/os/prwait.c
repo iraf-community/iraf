@@ -44,8 +44,6 @@ pr_enter (int pid, int inchan, int outchan)
 	register struct proctable *pr;
 	struct	proctable *pr_findpid(int pid);
 
-	extern  int kernel_panic (char *msg);
-
 
 	if ((pr = pr_findpid (0)) == NULL)
 	    kernel_panic ("iraf process table overflow");

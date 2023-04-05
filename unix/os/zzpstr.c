@@ -52,13 +52,6 @@ void 	spp_printmemc (long memc_ptr);
 void 	spp_printstr (XCHAR *s);
 
 
-
-/* SPP_DEBUG -- Dummy function called to link the SPP debug functions into
- * a program.
- */
-int spp_debug (void) { return (0); }
-
-
 /* ZZPSTR -- Write SPP text data directly to the host stderr.  Up to two
  * strings may be ouptut.  Either may be the null pointer to disable.
  * A newline is added at the end if not present in the last string.

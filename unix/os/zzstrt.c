@@ -45,11 +45,6 @@ int
 ZZSTRT (void)
 {
 	XINT	wsetsize=0L, junk;
-	extern  int  spp_debug(void);
-
-
-	spp_debug ();
-
 	/* Initialize globals.
 	 */
 	sprintf (os_process_name, "%d", getpid());

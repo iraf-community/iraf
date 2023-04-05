@@ -7,11 +7,6 @@
 
 #include "osproto.h"
 
-
-
-void ex_handler ( int, siginfo_t *, void * );
-
-
 /*
  * ZZEPRO.C -- Code which is executed at the end of every procedure.
  */
