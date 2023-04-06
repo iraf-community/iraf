@@ -1619,7 +1619,7 @@ zmtbsr (int fd, int nrecords)
  */
 
 #ifdef TCPIP
-static	SIGFUNC sigpipe = NULL;
+static	void (*sigpipe)(int) = NULL;
 static	int nsockets = 0;
 static	int s_port[MAXDEV];
 static	FILE *s_fp[MAXDEV];
@@ -1654,7 +1654,7 @@ static void zmtdbgopen (struct mtdesc *mp)
 	 */
         if (mp->mtdev.statusout) {
 	    if (nsockets > 0 && !sigpipe)
-		sigpipe = (SIGFUNC) signal (SIGPIPE, SIG_IGN);
+		sigpipe = signal (SIGPIPE, SIG_IGN);
 	    return;
 	}
 
@@ -1777,7 +1777,7 @@ static void zmtdbgclose (struct mtdesc *mp)
 
 	    if (sigpipe && nsockets <= 0) {
 		signal (SIGPIPE, sigpipe);
-		sigpipe = (SIGFUNC) NULL;
+		sigpipe = NULL;
 		nsockets = 0;
 	    }
 	}

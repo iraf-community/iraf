@@ -39,10 +39,11 @@ int debug_sig = 0;
 #endif
 
 static void ex_handler (int unix_signal, siginfo_t *info, void *ucp);
+static long setsig(int code, void (*handler)(int));
 
-static long setsig(int code, SIGFUNC handler);
 static int ignore_sigint = 0;
 
+typedef        void  (*SIGFUNC)();
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
  *
@@ -183,7 +184,7 @@ ZXWHEN (
 {
 	static	int first_call = 1;
 	int     vex, uex;
-	SIGFUNC	vvector;
+	void	(*vvector)(int);
 
 
 	/* Convert code for virtual exception into an index into the table
@@ -203,13 +204,13 @@ ZXWHEN (
 	    
 	*old_epa = handler_epa[vex];
 	handler_epa[vex] = *epa;
-	vvector = (SIGFUNC) ex_handler;
+	vvector = ex_handler;
 
 	/* Check for attempt to post same handler twice.  Do not return EPA
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if (*epa == (XINT) X_IGNORE)
-	    vvector = (SIGFUNC) SIG_IGN;
+	    vvector = SIG_IGN;
 	else if (*epa == *old_epa)
 	    *old_epa = (XINT) X_IGNORE;
 
@@ -249,17 +250,13 @@ ZXWHEN (
 /* SETSIG -- Post an exception handler for the given exception.
  */
 static long
-setsig (int code, SIGFUNC handler)
+setsig (int code, void (*handler)(int))
 {
 	struct sigaction sig;
 	long status;
 
 	sigemptyset (&sig.sa_mask);
-#ifdef __APPLE__
-	sig.sa_handler = (SIGFUNC) handler;
-#else
-	sig.sa_sigaction = (SIGFUNC) handler;
-#endif
+	sig.sa_handler = handler;
 	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
 	status = (long) sigaction (code, &sig, NULL);
 

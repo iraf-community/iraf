@@ -41,7 +41,7 @@ ZWMSEC (XINT *msec)
 #define	mask(s)	(1<<((s)-1))
 
 static int ringring;
-static void napmsx();
+static void napmsx(int);
 
 
 /* ZWMSEC -- Suspend task execution (sleep) for the specified number
@@ -52,7 +52,7 @@ ZWMSEC (XINT *msec)
 {
 	struct itimerval itv, oitv;
 	register struct itimerval *itp = &itv;
-	SIGFUNC	sv_handler;
+	void	(*sv_handler)(int);
 	int omask;
 
 	if (*msec == 0)
@@ -83,7 +83,7 @@ ZWMSEC (XINT *msec)
 	}
 
 	ringring = 0;
-	sv_handler = signal (SIGALRM, (SIGFUNC)napmsx);
+	sv_handler = signal (SIGALRM, napmsx);
 	(void) setitimer (ITIMER_REAL, itp, (struct itimerval *)0);
 
 	while (!ringring)
@@ -97,7 +97,7 @@ ZWMSEC (XINT *msec)
 
 
 static void 
-napmsx (void)
+napmsx (int)
 {
 	ringring = 1;
 }

@@ -161,14 +161,14 @@ static	jmp_buf jmpbuf;
 static	int jmpset = 0;
 static	int recursion = 0;
 static	int parent = -1;
-static	SIGFUNC old_sigcld;
+static	void (*old_sigcld)(int);
 static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
 static	int ks_getresvport(int *alport), ks_rexecport(void);
 static	int ks_socket(char *host, u_long addr, int port, char *mode), ks_geti(int fd), ks_puti(int fd, int ival), ks_getlogin(char *hostname, char *loginname, char *password, struct ksparam *ks);
 static	void dbgsp(int pid), dbgmsg(char *msg), dbgmsgf(char *fmt, ...);
 static	char *ks_getpass(char *user, char *host);
-static	void ks_onsig(int sig, int *arg1, int *arg2), ks_reaper(int sig, int *arg1, int *arg2);
+static	void ks_onsig(int sig), ks_reaper(int sig);
 
 static int ks_getlogin (char *hostname, char *loginname, char *password,
   				struct ksparam *ks);
@@ -446,7 +446,7 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 
 	    dbgmsgf ("S:in.irafksd started, pid=%d ppid=%d\n",
 		getpid(), getppid());
-	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
+	    old_sigcld = signal (SIGCHLD, ks_reaper);
 
 	    /* Reset standard streams to console to record error messages. */
 	    fd = open ("/dev/null",    O_RDONLY); close(0); dup(fd); close(fd);
@@ -544,7 +544,7 @@ s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n",
 			getpid(), getppid());
 		    signal (SIGCHLD, old_sigcld);
 		    /*
-		    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
+		    old_sigcld = signal (SIGCHLD, ks_reaper);
 		    */
 		    close (fd); close (s);
 
@@ -917,7 +917,7 @@ ZARDKS (
 	char	*op;
 	int	fd, nbytes;
 #endif
-	SIGFUNC	sigint, sigterm;
+	void	(*sigint)(int), (*sigterm)(int);
 	int	status = ERR;
 
 	fd = *chan;
@@ -933,8 +933,8 @@ ZARDKS (
 	 * entire record.  Reads are interruptable but the interrupt is caught
 	 * and returned as a read error on the server channel.
 	 */
-	sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)ks_onsig);
-	sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)ks_onsig);
+	sigint  = signal (SIGINT,  ks_onsig);
+	sigterm = signal (SIGTERM, ks_onsig);
 
 	while (nbytes > 0) {
 	    jmpset++;
@@ -977,7 +977,7 @@ ZAWRKS (
   XLONG	*loffset 		/* not used				*/
 )
 {
-	SIGFUNC	sigint, sigterm, sigpipe;
+  void	(*sigint)(int), (*sigterm)(int), (*sigpipe)(int);
 #ifdef ANSI
 	volatile int fd, nbytes;
 	volatile int ofd;
@@ -1003,9 +1003,9 @@ ZAWRKS (
 	 * Trap SIGPIPE and return it as a write error on the channel instead.
 	 * Likewise, turn an interrupt into a write error on the channel.
 	 */
-	sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)ks_onsig);
-	sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)ks_onsig);
-	sigpipe = (SIGFUNC) signal (SIGPIPE, (SIGFUNC)ks_onsig);
+	sigint  = signal (SIGINT,  ks_onsig);
+	sigterm = signal (SIGTERM, ks_onsig);
+	sigpipe = signal (SIGPIPE, ks_onsig);
 	recursion = 0;
 
 	jmpset++;
@@ -1029,9 +1029,7 @@ ZAWRKS (
  */
 static void
 ks_onsig (
-  int	sig,			/* signal which was trapped	*/
-  int	*arg1,			/* not used */
-  int	*arg2 			/* not used */
+  int	sig			/* signal which was trapped	*/
 )
 {
 	/* If we get a SIGPIPE writing to a server the server has probably
@@ -1049,9 +1047,7 @@ ks_onsig (
  */
 static void
 ks_reaper (
-  int     sig,                  /* signal which was trapped     */
-  int     *arg1,                /* not used */
-  int     *arg2                 /* not used */
+  int     sig                  /* signal which was trapped     */
 )
 {
         int status=0, pid=0;

@@ -84,7 +84,7 @@ static	struct sigaction sigint, sigterm;
 static	struct sigaction sigtstp, sigcont;
 static	struct sigaction oldact;
 static	void  tty_rawon(struct ttyport *port, int flags), tty_reset(struct ttyport *port), uio_bwrite(FILE *fp, short int *buf, int nbytes);
-static	void  tty_onsig(int sig, int *code, int *scp), tty_stop(int sig, int *code, int *scp), tty_continue(int sig, int *code, int *scp);
+static	void  tty_onsig(int sig), tty_stop(int sig), tty_continue(int sig);
 
 /* The ttyports array describes up to MAXOTTYS open terminal i/o ports.
  * Very few processes will ever have more than one or two ports open at
@@ -386,12 +386,12 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 	     * because ctrl/s ctrl/q is disabled in raw mode, and that can
 	     * cause sporadic protocol failures.
 	     */
-            sigint.sa_handler = (SIGFUNC) tty_onsig;
+            sigint.sa_handler = tty_onsig;
             sigemptyset (&sigint.sa_mask);
             sigint.sa_flags = SA_NODEFER;
             sigaction (SIGINT, &sigint, &oldact);
 
-            sigterm.sa_handler = (SIGFUNC) tty_onsig;
+            sigterm.sa_handler = tty_onsig;
             sigemptyset (&sigterm.sa_mask);
             sigterm.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigterm, &oldact);
@@ -732,12 +732,12 @@ tty_rawon (
 	    /* Post signal handlers to clear/restore raw mode if process is
 	     * suspended.
 	     */
-            sigtstp.sa_handler = (SIGFUNC) tty_stop;
+            sigtstp.sa_handler = tty_stop;
             sigemptyset (&sigtstp.sa_mask);
             sigtstp.sa_flags = SA_NODEFER;
             sigaction (SIGINT, &sigtstp, &oldact);
 
-            sigcont.sa_handler = (SIGFUNC) tty_continue;
+            sigcont.sa_handler = tty_continue;
             sigemptyset (&sigcont.sa_mask);
             sigcont.sa_flags = SA_NODEFER;
             sigaction (SIGTERM, &sigcont, &oldact);
@@ -796,9 +796,7 @@ tty_reset (
  */
 static void
 tty_onsig (
-  int	sig,			/* signal which was trapped	*/
-  int	*code,			/* not used */
-  int	*scp 			/* not used */
+  int	sig			/* signal which was trapped	*/
 )
 {
 	longjmp (jmpbuf, CTRLC);
@@ -810,9 +808,7 @@ tty_onsig (
  */
 static void
 tty_stop (
-  int	sig,			/* signal which was trapped	*/
-  int	*code,			/* not used */
-  int	*scp 			/* not used */
+  int	sig			/* signal which was trapped	*/
 )
 {
 	register struct ttyport *port = lastdev;
@@ -845,9 +841,7 @@ tty_stop (
  */
 static void
 tty_continue (
-  int	sig,			/* signal which was trapped	*/
-  int	*code,			/* not used */
-  int	*scp 			/* not used */
+  int	sig			/* signal which was trapped	*/
 )
 {
 	register struct ttyport *port = lastdev;
