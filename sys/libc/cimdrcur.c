@@ -23,7 +23,7 @@ c_imdrcur (
   int	pause			/* true to pause for key to terminate read */
 )
 {
-	PKCHAR	x_strval[SZ_LINE+1];
+	XCHAR	x_strval[SZ_LINE+1];
 	XINT  x_maxch = maxch,  x_d_wcs = d_wcs,  x_pause = pause;
 	XINT  x_wcs, x_key;
 
