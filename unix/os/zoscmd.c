@@ -16,12 +16,8 @@
 
 #include "osproto.h"
 
-static	int lastsig;
-static	int pr_onint(int usig, int *hwcode, int *scp);
-
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
-
 
 
 /* ZOSCMD -- Send a (machine dependent) command to the host operating
@@ -142,7 +138,6 @@ ZOSCMD (
 	 * is running (except for the pr_onint interrupt handler, below).
 	 */
 	pr_enter (pid, 0, 0);
-	lastsig = 0;
 
 	*status = pr_wait (pid);
 
@@ -152,28 +147,8 @@ ZOSCMD (
 	 */
 	if (*status == SYS_XINT)
 	    *status = 1;
-	if (lastsig == SIGINT)
-	    *status = SYS_XINT;
 
 	sigaction (SIGINT, &oldact, NULL);
-
-	return (XOK);
-}
-
-
-/* PR_ONINT -- Special interrupt handler for ZOSCMD.  If the OS command is
- * interrupted, post a flag to indicate this to ZOSCMD when the pr_wait()
- * returns.
- */
-static int
-pr_onint (
-  int	usig,				/* SIGINT, SIGFPE, etc.		*/
-  int	*hwcode,			/* not used */
-  int	*scp 				/* not used */
-)
-{
-	lastsig = usig;
-	/* return to wait() */
 
 	return (XOK);
 }
