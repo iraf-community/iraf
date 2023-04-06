@@ -38,12 +38,15 @@ int debug_sig = 0;
 #define	fcancel(fp)
 #endif
 
-static void ex_handler (int unix_signal, siginfo_t *info, void *ucp);
-static long setsig(int code, void (*handler)(int));
+typedef void  (*SIGFUNC)(XINT *, XINT *);
+typedef	void  (*sigaction_t)(int, siginfo_t *, void *);
+typedef void  (*sighandler_t)(int);
+
+static void ex_handler (int, siginfo_t *, void *);
+static sighandler_t setsig(int, sigaction_t);
 
 static int ignore_sigint = 0;
 
-typedef        void  (*SIGFUNC)();
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
  *
@@ -184,7 +187,7 @@ ZXWHEN (
 {
 	static	int first_call = 1;
 	int     vex, uex;
-	void	(*vvector)(int);
+	sigaction_t vvector;
 
 
 	/* Convert code for virtual exception into an index into the table
@@ -210,7 +213,7 @@ ZXWHEN (
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if (*epa == (XINT) X_IGNORE)
-	    vvector = SIG_IGN;
+	  vvector = (sigaction_t)SIG_IGN;
 	else if (*epa == *old_epa)
 	    *old_epa = (XINT) X_IGNORE;
 
@@ -223,20 +226,20 @@ ZXWHEN (
 	    if (unix_exception[uex].x_vex == *sig_code) {
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (setsig (uex, vvector) == (long) SIG_IGN) {
-			    setsig (uex, SIG_IGN);
+			if (setsig (uex, vvector) == SIG_IGN) {
+			    setsig (uex, (sigaction_t)SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    setsig (uex, SIG_DFL);
+			    setsig (uex, (sigaction_t)SIG_DFL);
 			else
 			    setsig (uex, vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			setsig (uex, SIG_DFL);
+			setsig (uex, (sigaction_t)SIG_DFL);
 		    else
 			setsig (uex, vvector);
 		}
@@ -249,18 +252,24 @@ ZXWHEN (
 
 /* SETSIG -- Post an exception handler for the given exception.
  */
-static long
-setsig (int code, void (*handler)(int))
+static sighandler_t
+setsig(int code, sigaction_t action)
 {
-	struct sigaction sig;
-	long status;
+	struct sigaction sig, old_sig;
+	int status;
 
 	sigemptyset (&sig.sa_mask);
-	sig.sa_handler = handler;
-	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
-	status = (long) sigaction (code, &sig, NULL);
+	if ((action != (sigaction_t)SIG_DFL)
+	  && (action != (sigaction_t)SIG_IGN)) {
+	  sig.sa_sigaction = action;
+	  sig.sa_flags = SA_NODEFER|SA_SIGINFO;
+	} else {
+	  sig.sa_handler = (sighandler_t)action;
+	  sig.sa_flags = SA_NODEFER;
+	}
+	status = sigaction (code, &sig, &old_sig);
 
-	return (status);
+	return (status == 0)? old_sig.sa_handler: NULL;
 }
 
 
