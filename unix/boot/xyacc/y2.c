@@ -185,7 +185,6 @@ setup (int argc, char **argv)
     char actname[8];
     unsigned int options = 0;
     char *file_prefix = DEFAULT_PREFIX;
-    char *sym_prefix = "";
 #define	F_NAME_LENGTH	128
     char fname[F_NAME_LENGTH + 1];
 
@@ -217,7 +216,7 @@ setup (int argc, char **argv)
     mem = mem0;
     tracemem = mem0;
 
-    while ((c = getopt (argc, argv, "vVdltp:Q:Y:P:b:")) != EOF)
+    while ((c = getopt (argc, argv, "vVdltQ:Y:P:b:")) != EOF)
 	switch (c) {
 	case 'v':
 	    options |= v_FLAG;
@@ -251,12 +250,6 @@ setup (int argc, char **argv)
 	    break;
 	case 'P':
 	    parser = optarg;
-	    break;
-	case 'p':
-	    if (strcmp (optarg, "yy") != 0)
-		sym_prefix = optarg;
-	    else
-		sym_prefix = "";
 	    break;
 	case 'b':
 	    file_prefix = optarg;
@@ -1385,8 +1378,7 @@ static void
 cpyact (int offset)
 {
     /* copy C action to the next ; or closing } */
-    int brac, c, match, j, s, tok, argument;
-    char id_name[NAMESIZE + 1];
+    int brac, c, match, j, s, tok;
     int id_idx = 0;
 
     if (gen_lines) {
@@ -1394,7 +1386,6 @@ cpyact (int offset)
 	act_lines++;
     }
     brac = 0;
-    id_name[0] = 0;
   loop:
     c = getc (finput);
   swt:
@@ -1411,7 +1402,6 @@ cpyact (int offset)
     case '$':
 	s = 1;
 	tok = -1;
-	argument = 1;
 	while ((c = getc (finput)) == ' ' || c == '\t')
 	    /* NULL */ ;
 	if (c == '<') {		/* type description */
@@ -1564,11 +1554,9 @@ cpyact (int offset)
      * part of identifier, save it.
      */
     else if (isalnum (c) || c == '_') {
-	id_name[id_idx++] = c;
-	id_name[id_idx] = 0;
+        id_idx++;
     } else {
 	id_idx = 0;
-	id_name[id_idx] = 0;
     }
     goto loop;
 }

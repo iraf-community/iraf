@@ -9,8 +9,6 @@
 
 #include "osproto.h"
 
-extern	unsigned VSHLIB[], VSHEND;	/* shared library descriptor */
-
 /* ZLOCPR -- Return the entry point address of a procedure as a magic
  * integer value.  A subsequent call to one of the ZCALL primitives is used
  * to call the procedure.

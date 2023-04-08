@@ -205,10 +205,8 @@ opcast (int newtype)
 	case OT_BOOL:
 	    /* Coercion of booleans is not permitted */
 	    if (o.o_type != OT_BOOL)
-{ ready_();
 		cl_error (E_UERR,
 		    "Non-boolean operand used where boolean expected");
-}
 	    break;
 
 	case OT_INT:

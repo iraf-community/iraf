@@ -55,6 +55,7 @@ done
 rm -rf cfitsio/cfitsio.xcodeproj
 rm -rf cfitsio/docs
 rm -f cfitsio/[!L]*.*
+rm -f cfitsio/f77_* cfitsio/cfortran.h
 mv cfitsio/lib/* cfitsio/
 rmdir cfitsio/lib/
 

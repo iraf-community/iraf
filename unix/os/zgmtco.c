@@ -21,8 +21,6 @@ ZGMTCO (
   XINT	*gmtcor				/* seconds */
 )
 {
-	time_t ltime;
-
 	/* Given an input value of zero (biased by SECONDS_1970_TO_1980)
 	 * gmt_to_lst will return a negative value in seconds for a location
 	 * in the US (as an limiting test case).  We want to return the

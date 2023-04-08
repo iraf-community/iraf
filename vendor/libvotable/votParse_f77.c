@@ -275,7 +275,7 @@ void 	  VF_ATTACHNODE (handle_t *parent, handle_t *new);
 void 	  VF_FREENODE (handle_t *elem);
 void 	  VF_DELETENODE (handle_t *elem);
 handle_t  VF_COPYELEMENT (handle_t *src, handle_t *parent);
-;
+
 int 	  VF_GETNCOLS (handle_t *tdata);
 int 	  VF_GETNROWS (handle_t *tdata);
 void 	  VF_GETTABLECELL (handle_t *tdata, int *row, int *col, char *value, 
@@ -295,7 +295,7 @@ handle_t  VF_GETPARENT (handle_t *elem);
 handle_t  VF_CHILDOFTYPE (handle_t *elem, int *type);
 int 	  VF_VALUEOF (handle_t *elem);
 int 	  VF_TYPEOF (handle_t *elem);
-;
+
 int 	  VF_SETVALUE (handle_t *elem, char *value, int vlen);
 void 	  VF_GETVALUE (handle_t *elem, char *value, int *maxch, int vlen);
 int 	  VF_GETINTVALUE (handle_t *elem);

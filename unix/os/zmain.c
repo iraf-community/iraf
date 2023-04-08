@@ -26,10 +26,6 @@ extern	int  ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int 
 /*
  * ZMAIN.C -- C main for IRAF processes.
  */
-
-extern	unsigned USHLIB[];
-extern	int sh_debug;
-
 #define	LOGIPC	"LOGIPC"		/* define to enable IPC logging. */
 
 static	char os_process_name[SZ_FNAME];
@@ -75,7 +71,6 @@ main (int argc, char *argv[])
 
 	/* The following flag must be set before calling ZZSTRT. */
 	if (argc > 1 && strcmp (argv[arg], "-w") == 0) {
-	    sh_debug++;
 	    arg++;
 	}
 

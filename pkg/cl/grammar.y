@@ -297,7 +297,6 @@ script_body:	begin_stmt {
 			 */
 			if (cldebug)
 			    eprintf ("parse init (script_body)...\n");
-ready_();
 
 			errcnt     = 0;
 			err_cmdblk = 0;

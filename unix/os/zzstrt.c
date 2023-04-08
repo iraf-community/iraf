@@ -36,8 +36,6 @@ extern	int errno;
 
 #define	align(a)	((a)&(~pmask))
 
-void 	ready_ (void);
-
 
 /* ZZSTRT -- Initialize the IRAF kernel at process startup time.
  */
@@ -55,9 +53,6 @@ ZZSTRT (void)
 	zfd[0].fp = stdin;	zfd[0].flags = KF_NOSEEK;
 	zfd[1].fp = stdout;	zfd[1].flags = KF_NOSEEK;
 	zfd[2].fp = stderr;	zfd[2].flags = KF_NOSEEK;
-
-	/* Dummy routine called to indicate that mapping is complete. */
-	ready_();
 
         /*  Clears the exception-occurred bits in the FP status register.
          */
@@ -91,10 +86,3 @@ ZZSTRT (void)
 /* ZZSTOP -- Clean up prior to process shutdown.
  */
 int ZZSTOP (void) { return (XOK); }
-
-
-/* ready -- This is a dummy routine used when debugging to allow a breakpoint
- * to be set at a convenient point after the shared image has been mapped in.
- */
-void ready_ (void) {}
-
