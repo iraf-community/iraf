@@ -182,8 +182,8 @@ static int   run (char *task, char *argv[]);
 static int   sys (char *cmd);
 
 static void  done (int k);
-static void  enbint (SIGFUNC handler);
-static void  interrupt (void);
+static void  enbint (void (*handler)(int));
+static void  interrupt (int);
 static int   await (int waitpid);
 static void  rmfiles (void);
 
@@ -230,7 +230,7 @@ main (int argc, char *argv[])
 	sig_hup  = (long) signal (SIGHUP,  SIG_IGN) & 01;
 	sig_term = (long) signal (SIGTERM, SIG_IGN) & 01;
 
-	enbint ((SIGFUNC)interrupt);
+	enbint (interrupt);
 	pid = getpid();
 
 	/* Load general environment definitions.
@@ -1307,7 +1307,7 @@ done (int k)
  * of interrupt occurs.
  */
 static void
-enbint (SIGFUNC handler)
+enbint (void (*handler)(int))
 {
 	if (sig_int == 0)
 	    signal (SIGINT, handler);
@@ -1324,7 +1324,7 @@ enbint (SIGFUNC handler)
  * during compilation.
  */
 static void
-interrupt (void)
+interrupt (int signum)
 {
 	done (2);
 }
@@ -1341,7 +1341,7 @@ await (int waitpid)
 	while ((w = wait (&status)) != waitpid)
 	    if (w == -1)
 		fatal ("bad wait code");
-	enbint ((SIGFUNC)interrupt);
+	enbint (interrupt);
 	if (status & 0377) {
 	    if (status != SIGINT) {
 		fprintf (stderr, "Termination code %d", status);

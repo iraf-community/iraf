@@ -158,8 +158,7 @@ static	int recursion = 0;
 extern	int errno;
 static	int getstr(char **ipp, char *obuf, int maxch, int delim);
 
-static void nd_onsig (int sig, int *arg1, int *arg2);
-
+static void nd_onsig (int sig);
 
 
 /* ZOPNND -- Open a network device.
@@ -741,12 +740,12 @@ ZAWRND (
 	int nwritten, maxbytes, n;
 	char *text, *ip = (char *)buf;
 	char obuf[SZ_OBUF];
-	SIGFUNC sigpipe;
+	void (*sigpipe)(int);
 
 
 	/* Enable a signal mask to catch SIGPIPE when the server has died. 
 	 */
-	sigpipe = (SIGFUNC) signal (SIGPIPE, (SIGFUNC)nd_onsig);
+	sigpipe = signal (SIGPIPE, nd_onsig);
 	recursion = 0;
 
 	maxbytes = (np->domain == FIFO || (np->flags & F_TEXT)) ? SZ_OBUF : 0;
@@ -800,9 +799,7 @@ ZAWRND (
  *  */
 static void
 nd_onsig (
-  int     sig,                    /* signal which was trapped     */
-  int     *arg1,                  /* not used */
-  int     *arg2                   /* not used */
+  int     sig                    /* signal which was trapped     */
 )
 {
         /* If we get a SIGPIPE writing to a server the server has probably
