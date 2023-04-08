@@ -8,6 +8,7 @@
 #define import_knames
 #define import_xwhen
 #define import_ctype
+#define import_kproto
 #include <iraf.h>
 
 #include "config.h"

@@ -14,6 +14,7 @@
 #define	import_prtype
 #define	import_xwhen
 #define import_xnames
+#define import_kproto
 #include <iraf.h>
 
 #include <ctype.h>

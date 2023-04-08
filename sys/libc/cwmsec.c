@@ -4,9 +4,9 @@
 #define	import_spp
 #define	import_libc
 #define	import_knames
+#define	import_kproto
 #include <iraf.h>
 
-int ZWMSEC (XINT *msec);
 
 /* C_WMSEC -- Delay for so may milliseconds.
 */

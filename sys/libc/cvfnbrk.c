@@ -4,9 +4,8 @@
 #define	import_spp
 #define	import_libc
 #define import_knames
+#define	import_kproto
 #include <iraf.h>
-
-int ZFNBRK (XCHAR *vfn, XINT *uroot_offset, XINT  *uextn_offset);
 
 
 /* C_VFNBRK -- Break a virtual filename (or host filename) into its component

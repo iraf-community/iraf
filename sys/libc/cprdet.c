@@ -4,9 +4,8 @@
 #define import_spp
 #define	import_libc
 #define	import_xnames
+#define	import_kproto
 #include <iraf.h>
-
-int PRFODPR (void);
 
 /*
 ** CPRDET -- Detached processes.  A detached process is a process which runs

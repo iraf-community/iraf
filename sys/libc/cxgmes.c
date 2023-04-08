@@ -5,9 +5,9 @@
 #define	import_libc
 #define	import_xnames
 #define	import_knames
+#define	import_kproto
 #include <iraf.h>
 
-int ZXGMES (XINT *os_exception, PKCHAR  *errmsg, XINT *maxch);
 
 /* C_XGMES -- Fetch the machine dependent integer code and message string
 ** for the most recent exception.  The integer code XOK is returned if

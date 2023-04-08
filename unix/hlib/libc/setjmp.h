@@ -8,10 +8,10 @@
 #ifndef import_knames
 #include "knames.h"
 #endif
+#ifndef import_kproto
+#include "kproto.h"
 #endif
-
-void ZDOJMP (XINT *jmpbuf, XINT *status);
-void ZSVJMP (XINT *jmpbuf, XINT *status);
+#endif
 
 typedef	XINT	jmp_buf[LEN_JUMPBUF];
 static	XINT	u_jmpstat;

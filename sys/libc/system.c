@@ -4,6 +4,7 @@
 #define	import_spp
 #define	import_libc
 #define	import_knames
+#define	import_kproto
 #include <iraf.h>
 
 

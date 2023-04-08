@@ -7,9 +7,8 @@
 #define	import_libc
 #define	import_stdio
 #define	import_knames
+#define	import_kproto
 #include <iraf.h>
-
-int ZFREE (void  *buf);
 
 
 /*  FREADLINE -- Get a line from a user with editing.  This is a libc 
