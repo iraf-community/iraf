@@ -8,6 +8,8 @@
 #define import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFSUBD -- Fold a subdirectory into an OS directory.  If osdir is null the
  * current directory is assumed.  If subdir is null osdir is modified as
  * necessary to make it a legal directory prefix, e.g., if osdir = "/usr/iraf"
@@ -30,8 +32,6 @@ ZFSUBD (
 	XINT	x_maxch = SZ_PATHNAME;
 	XCHAR	*slash;
 	char	*cp;
-
-	extern  int ZFGCWD(PKCHAR *outstr, XINT *maxch, XINT *status);
 
 
 	/* If osdir is null, use the current directory.

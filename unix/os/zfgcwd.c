@@ -9,6 +9,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 extern	char oscwd[];
 
 

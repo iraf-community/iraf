@@ -10,6 +10,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFRMDR -- Remove an existing directory.
  */
 int

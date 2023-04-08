@@ -16,6 +16,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ALLOC -- Unix task to allocate and deallocate devices given their generic
  * name.  These names are associated with special files in the ALLOCFILE file.
@@ -60,9 +62,6 @@ int	mode;				/* 07 mode, ie, 04, 02, or 06	*/
 int findsfs (char *argv[]);
 int dealloc (char *argv[]);
 int alloc (char	*argv[], int statonly);
-
-extern  int	uid_executing (int uid);
-
 
 
 int main (int argc, char *argv[])

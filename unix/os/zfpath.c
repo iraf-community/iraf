@@ -8,6 +8,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFPATH -- Return the absolute pathname equivalent of an OSFN.  If the null
  * string is given the OSFN of the current working directory is returned.
  */
@@ -23,8 +25,6 @@ ZFPATH (
 	register XCHAR	*ip, *op;
 	register int	n = *maxch;
 	PKCHAR	cwd[SZ_PATHNAME+1];
-
-	extern  int ZFGCWD(PKCHAR  *outstr, XINT *maxch, XINT *status);
 
 
 	op = pathname;

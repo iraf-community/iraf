@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFMKCP -- Make a null length copy of a file.  The new file inherits all
  * attributes of the original file except the file owner (the copy belongs to
  * the owner of the process which called us), the file size (this will be 0
@@ -32,8 +34,6 @@ ZFMKCP (
 	struct	stat statbuf;
 	int	fd, mode;
 	XINT	prot;
-
-	extern  int ZFPROT(PKCHAR *fname, XINT *action, XINT *status);
 
 
 	/* Get directory information for the old file.  Most of the file

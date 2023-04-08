@@ -15,12 +15,9 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	QUANTUM		6
-
-extern void pr_enter (int pid, int inchan, int outchan);
-extern int  pr_wait (int pid);
-extern void pr_release (int pid);
-
 
 /* ZOPDPR -- Open a detached process.  In this implementation detached
  * processes begin execution immediately, runing concurrently with the parent.

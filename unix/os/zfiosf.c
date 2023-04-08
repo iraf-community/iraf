@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOSF -- Static file device driver.  In the 4.1BSD UNIX kernel the ordinary
  * binary file driver is used for static files (files that do not change in
@@ -34,14 +36,6 @@
  * permit asynchronous i/o, bypassing the UNIX files system entirely except
  * during file creation and deletion.
  */
-
-extern	int ZARDBF (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
-extern	int ZAWRBF (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
-extern	int ZAWTBF (XINT *fd, XINT *status);
-extern	int ZCLSBF (XINT *fd, XINT *status);
-extern	int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
-extern	int ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue);
-
 
 /* ZOPNSF -- Open a static file.  Only RO, WO, and RW modes are permitted
  * for static files, since allocation is via ZFALOC and appending is not

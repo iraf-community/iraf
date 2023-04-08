@@ -6,6 +6,8 @@
 #define	import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZZPSTR.C -- Support for debugging SPP programs.
  *
@@ -48,13 +50,6 @@
 
 void 	spp_printmemc (long memc_ptr);
 void 	spp_printstr (XCHAR *s);
-
-
-
-/* SPP_DEBUG -- Dummy function called to link the SPP debug functions into
- * a program.
- */
-int spp_debug (void) { return (0); }
 
 
 /* ZZPSTR -- Write SPP text data directly to the host stderr.  Up to two

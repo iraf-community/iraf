@@ -15,7 +15,13 @@
 #define import_prtype
 #define	import_knames
 #define	import_xnames
+#define import_kproto
 #include <iraf.h>
+
+extern	int  ONENTRY(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
+extern	int  SYSRUK(XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint);
+extern	int  ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int out);
+
 
 /*
  * ZMAIN.C -- C main for IRAF processes.
@@ -62,14 +68,6 @@ main (int argc, char *argv[])
 	char	*ip;
 
 	int	arg = 1;
-	extern  int  ZGETTX(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-	extern	int  ZGETTY(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-	extern	int  ZARDPR(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset);
-	extern	int  SYSRUK(XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint);
-	extern	int  ONENTRY(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
-	extern  int  ZZSTRT(void);
-	extern	int  ZLOCPR(PFI proc, XINT *o_epa );
-	extern	int  ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int out);
 	extern	int  IRAF_MAIN(XCHAR *acmd, XINT *ainchn, XINT *aoutcn, XINT *aerrcn, XINT *adrivr, XINT *adevte, XINT *prtype, XCHAR *bkgfie, XINT *jobcoe,
 			       int(sysruk)(XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint),
 			       int(onenty)(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd));

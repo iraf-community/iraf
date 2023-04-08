@@ -7,6 +7,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 /* ZMFREE -- Return heap space previously allocated by ZMALOC or ZRALOC.
  * The manual page for FREE says nothing about error checking, so we do

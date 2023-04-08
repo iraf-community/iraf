@@ -24,6 +24,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOTX -- File i/o to textfiles, for UNIX 4.1BSD.  This driver is used for
  * both terminals and ordinary disk text files.  I/O is via the C library

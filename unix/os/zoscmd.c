@@ -14,8 +14,10 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 static	int lastsig;
-extern	int pr_onint(int usig, int *hwcode, int *scp);
+static	int pr_onint(int usig, int *hwcode, int *scp);
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -163,7 +165,7 @@ ZOSCMD (
  * interrupted, post a flag to indicate this to ZOSCMD when the pr_wait()
  * returns.
  */
-int
+static int
 pr_onint (
   int	usig,				/* SIGINT, SIGFPE, etc.		*/
   int	*hwcode,			/* not used */

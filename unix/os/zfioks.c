@@ -30,6 +30,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 /* ZFIOKS -- File i/o to a remote kernel server.  This driver is the network
  * interface for the kernel interface package (sys$ki).  The KS driver is
@@ -1618,8 +1620,6 @@ ks_sysname (char *filename, char *pathname)
 {
 	XCHAR	irafdir[SZ_PATHNAME+1];
 	XINT	x_maxch=SZ_PATHNAME, x_nchars;
-	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
-
 
 	ZGTENV ((const int*)"iraf", irafdir, &x_maxch, &x_nchars);
 	if (x_nchars <= 0)

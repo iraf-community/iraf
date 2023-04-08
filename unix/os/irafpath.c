@@ -10,6 +10,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define	SZ_ULIBSTR	512
 #define	ULIB		"IRAFULIB"
 
@@ -32,9 +34,6 @@ irafpath (char *fname)
 	XINT	sz_ulibs=SZ_ULIBSTR;
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
-
-	extern  int  ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
-
 
 	/* Search any user libraries first. */
 	strcpy ((char *)ldir, ULIB);

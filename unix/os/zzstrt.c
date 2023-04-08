@@ -18,6 +18,8 @@
 #define import_prtype
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
  * during process startup and shutdown, when the IRAF kernel routines are being
@@ -36,11 +38,6 @@ extern	int errno;
 
 void 	ready_ (void);
 
-extern int ZAWSET(XINT *best_size, XINT *new_size, XINT *old_size, XINT *max_size);
-extern int ZOPNTY(PKCHAR *osfn, XINT *mode, XINT *chan);
-extern int ZZSETK(char *ospn, char *osbfn, int prtype, int isatty, int in, int out);
-
-
 
 /* ZZSTRT -- Initialize the IRAF kernel at process startup time.
  */
@@ -48,11 +45,6 @@ int
 ZZSTRT (void)
 {
 	XINT	wsetsize=0L, junk;
-	extern  int  spp_debug(void);
-
-
-	spp_debug ();
-
 	/* Initialize globals.
 	 */
 	sprintf (os_process_name, "%d", getpid());

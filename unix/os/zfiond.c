@@ -23,6 +23,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOND -- This driver provides a FIO-compatible interface to network or
  * IPC streaming devices such as Berkeley sockets, FIFOs, and the like.

@@ -8,6 +8,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFRNAM -- Rename a file.  Do nothing to original file if operation
  * fails.  File must retain all attributes; special action is required
  * to transfer file protection.
@@ -23,8 +25,6 @@ ZFRNAM (
 	static	XINT removeprot = REMOVE_PROTECTION;
 	static	XINT setprot    = SET_PROTECTION;
 	XINT	protected;
-
-	extern  int ZFPROT(PKCHAR *fname, XINT *action, XINT *status);
 
 
 	/* Most remove file protection before renaming the file, else

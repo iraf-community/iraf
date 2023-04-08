@@ -12,6 +12,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define SECONDS_1970_TO_1980    315532800L
 
 
@@ -30,8 +32,6 @@ ZFUTIM (
 	struct	stat osfile;
 	struct	utimbuf time;
 	XINT	offset = 0;
-
-	extern  int ZGMTCO (XINT  *gmtcor);
 
 
 	/* Get UNIX file info.

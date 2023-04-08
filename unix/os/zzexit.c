@@ -3,6 +3,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZZEXIT.C -- Fortran callable exit procedure.  Some systems (e.g. libf2c)
  * require this procedure.  We implement it as a separate library procedure

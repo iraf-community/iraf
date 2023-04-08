@@ -4,6 +4,8 @@
 #define import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZSHLIB.C -- This file contains dummy shared library descriptors to be linked
  * into executables which do not use the Sun/IRAF shared library.  See zzstrt.c

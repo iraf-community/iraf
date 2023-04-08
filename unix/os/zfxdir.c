@@ -8,6 +8,8 @@
 #define import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZFXDIR -- Extract OS directory prefix from OSFN.  The null string is
  * returned if there is no directory prefix.  The status value is the number
  * of characters in the output string.

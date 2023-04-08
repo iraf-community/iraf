@@ -11,6 +11,8 @@
 #define import_fpoll
 #include <iraf.h>
 
+#include "osproto.h"
+
 
 /* For compilation on systems with old and dev versions.
 */

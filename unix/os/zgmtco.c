@@ -9,6 +9,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 #define SECONDS_1970_TO_1980    315532800L
 
 /* ZGMTCO -- Return the correction, in seconds, from local standard time
@@ -19,7 +21,7 @@ ZGMTCO (
   XINT	*gmtcor				/* seconds */
 )
 {
-	time_t gmt_to_lst(), ltime;
+	time_t ltime;
 
 	/* Given an input value of zero (biased by SECONDS_1970_TO_1980)
 	 * gmt_to_lst will return a negative value in seconds for a location

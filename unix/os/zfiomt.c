@@ -33,6 +33,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /*
  * ZFIOMT.C -- Programmable magtape kernel interface for UNIX/IRAF systems.
  * This file contains only the lowest level i/o routines.  Most of the

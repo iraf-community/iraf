@@ -10,6 +10,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* Process table code.  The high level code assumes that it can open and close
  * processes in any order.  The UNIX "wait" primitive, called when a process is
  * closed, returns the process status and pid of the first process to exit.
@@ -41,8 +43,6 @@ pr_enter (int pid, int inchan, int outchan)
 {
 	register struct proctable *pr;
 	struct	proctable *pr_findpid(int pid);
-
-	extern  int kernel_panic (char *msg);
 
 
 	if ((pr = pr_findpid (0)) == NULL)

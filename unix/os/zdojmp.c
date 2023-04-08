@@ -9,6 +9,8 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
 /* ZDOJMP -- Restore the saved processor context (non-local goto).  See also
  * as$zsvjmp.s, where most of the work is done.
  */

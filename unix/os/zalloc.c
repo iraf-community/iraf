@@ -13,6 +13,10 @@
 #define	import_knames
 #include <iraf.h>
 
+#include "osproto.h"
+
+static int loggedin (int uid);
+
 /*
  * ZALLOC.C -- Device allocation interface.  Requires the dev$devices table,
  * which is read by the high level code before we are called.
@@ -54,9 +58,6 @@ ZDVALL (
 )
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
-
-	extern int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
-
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
 	 */
@@ -146,7 +147,7 @@ ZDVOWN (
 
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
-int
+static int
 loggedin (int uid)
 {
 	struct	utmpx ubuf;
@@ -187,9 +188,6 @@ u_allocstat (
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 	XINT	x_status;
-
-	extern int ZOSCMD(PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
-
 
 	/* Syntax: $host/hlib/alloc.e -s aliases
 	 */
