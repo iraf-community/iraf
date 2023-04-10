@@ -9,7 +9,7 @@
 #include "iraf/knames.h"
 #endif
 
-typedef	int   (*PFI)();
+typedef	int   (*PFI)(void);
 
 /* zalloc.c */
 int ZDVALL (PKCHAR *aliases, XINT *allflg, XINT *status);
