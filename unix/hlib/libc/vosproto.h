@@ -3530,6 +3530,7 @@ extern integer prgete_(integer *fd, shortint *lbuf);
 extern integer prgetr_(integer *pid, integer *stream);
 extern integer propcr_(shortint *proces, integer *in, integer *out);
 extern integer propdr_(shortint *proces, shortint *bkgfie, shortint *bkgmsg);
+extern integer prfodr_(void);
 extern integer propen_(shortint *proces, integer *in, integer *out);
 extern integer protet_(shortint *fname, integer *action);
 extern integer prpsio_(integer *pid, integer *fd, integer *rwflag);
