@@ -94,7 +94,8 @@ c_envgetb (
   char	*var			/* name of variable to be fetched	*/
 )
 {
-	return ((int) BTOI ((XINT) ENVGETB (c_sppstr(var))));
+	XBOOL res = ENVGETB (c_sppstr(var));
+	return ((int) BTOI (&res));
 }
 
 
