@@ -20,11 +20,11 @@ c_vfnbrk (
 )
 {
 	XCHAR	sppvfn[SZ_PATHNAME];
-	XINT    x_root = *root, x_extn = extn;
+	XINT    x_root, x_extn;
 
 	ZFNBRK (c_strupk(vfn,sppvfn,SZ_PATHNAME), &x_root, &x_extn);
 
 	/* Make offsets zero-indexed. */
-	*root -= 1;
-	*extn -= 1;
+	*root = x_root - 1;
+	*extn = x_extn - 1;
 }
