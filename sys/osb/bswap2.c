@@ -10,12 +10,13 @@
  * and overlapping.
  */
 void
-BSWAP2 (a, aoff, b, boff, nbytes)
-XCHAR	*a;			/* input array			*/
-XINT	*aoff;			/* first byte in input array	*/
-XCHAR	*b;			/* output array			*/
-XINT	*boff;			/* first byte in output array	*/
-XINT	*nbytes;		/* number of bytes to swap	*/
+BSWAP2 (
+    XCHAR	*a,		/* input array			*/
+    XINT	*aoff,		/* first byte in input array	*/
+    XCHAR	*b,		/* output array			*/
+    XINT	*boff,		/* first byte in output array	*/
+    XINT	*nbytes		/* number of bytes to swap	*/
+)
 {
 	register char *ip, *op, *otop;
 	register unsigned temp;

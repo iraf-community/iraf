@@ -9,9 +9,7 @@
  * [Specially optimized for Sun/IRAF].
  */
 void
-ACLRB (a, n)
-XCHAR	*a;
-XINT	*n;
+ACLRB (XCHAR *a, XINT *n)
 {
 	memset ((char *)a, 0, *n);
 }
