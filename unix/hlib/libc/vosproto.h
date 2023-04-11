@@ -1,3 +1,7 @@
+#ifndef D_xnames
+#include "iraf/xnames.h"
+#endif
+
 extern C_f ahivx_(complex * ret_val, complex *a, integer *npix);
 extern C_f alovx_(complex * ret_val, complex *a, integer *npix);
 extern C_f amedx_(complex * ret_val, complex *a, integer *npix);
@@ -3059,6 +3063,7 @@ extern integer ffilsz_(integer *fd);
 extern integer fgdev0_(integer *ffp, integer *what);
 extern integer fgetfd_(shortint *filene, integer *mode, integer *type__);
 /*extern integer filbuf_(integer *fd);*/
+extern XINT FILBUF(XINT *fd);
 extern integer finfo_(shortint *fname, integer *ostrut);
 extern integer fmaccs_(shortint *dfname, integer *mode);
 extern integer fmfinf_(integer *fc, integer *lfile);
@@ -3519,6 +3524,7 @@ extern integer prcloe_(integer *pid);
 extern integer prdone_(integer *job);
 extern integer prenve_(integer *pid, integer *marker);
 /*extern integer prfilf_(integer *fd);*/
+extern XINT PRFILBUF(XINT *fd);
 extern integer prfinc_(integer *pid);
 extern integer prgete_(integer *fd, shortint *lbuf);
 extern integer prgetr_(integer *pid, integer *stream);
