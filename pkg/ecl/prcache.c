@@ -64,8 +64,6 @@
 extern	int	cldebug;
 extern	int	cltrace;
 
-typedef	XINT (*PFI)();
-
 struct process {
 	int	pr_pid;			/* process id of subprocess	*/
 	long	pr_time;		/* time when process executed	*/
