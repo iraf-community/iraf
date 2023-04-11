@@ -617,7 +617,7 @@ pr_checkup (void)
 void
 onipc (
     int *vex,			/* virtual exception code	*/
-    PFI *next_handler		/* next handler to be called	*/
+    funcptr_t *next_handler	/* next handler to be called	*/
 )
 {
 	register struct	process *pr;

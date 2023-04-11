@@ -9,8 +9,6 @@
 #include "iraf/knames.h"
 #endif
 
-typedef	int   (*PFI)(void);
-
 /* zalloc.c */
 int ZDVALL (PKCHAR *aliases, XINT *allflg, XINT *status);
 int ZDVOWN (PKCHAR *device, PKCHAR *owner, XINT *maxch, XINT *status);
@@ -142,7 +140,7 @@ int ZGTPID (XINT *pid);
 /* zintpr.c */
 int ZINTPR (XINT *pid, XINT *exception, XINT *status);
 /* zlocpr.c */
-int ZLOCPR (PFI	proc, XINT *o_epa);
+int ZLOCPR (funcptr_t proc, XINT *o_epa);
 /* zlocva.c */
 int ZLOCVA (XCHAR *variable, XINT *location);
 /* zmaloc.c */

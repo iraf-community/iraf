@@ -15,7 +15,7 @@
  */
 int
 ZLOCPR (
-  PFI	proc,			/* procedure for which we desire address */
+  funcptr_t	proc,		/* procedure for which we desire address */
   XINT	*o_epa			/* entry point address */
 )
 {

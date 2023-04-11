@@ -7,7 +7,6 @@
 #define	import_libc
 #include <iraf.h>
 
-
 /* CXWHEN -- Post an exception handler.  The exception handler procedure
 ** is called when an exception occurs, unless the exception has been
 ** disabled.  If a user exception handler has not been posted and an
@@ -41,8 +40,6 @@
 */
 
 #define	SZ_ERRMSG	64
-typedef	int (*PFI)();		/* pointer to function returning int	*/
-
 
 /* C_XWHEN -- Post an exception handler for an exception, or disable the
 ** exception (not all exceptions can be disabled).
@@ -50,8 +47,8 @@ typedef	int (*PFI)();		/* pointer to function returning int	*/
 void
 c_xwhen (
   int	exception,		/* code for virtual exception		*/
-  PFI	new_handler,		/* new exception handler		*/
-  PFI	*old_handler		/* old exception handler (output)	*/
+  funcptr_t	new_handler,	/* new exception handler		*/
+  funcptr_t	*old_handler	/* old exception handler (output)	*/
 )
 {
 	XINT	excode = exception;
@@ -59,5 +56,5 @@ c_xwhen (
 	XINT	epa_old_handler;
 
 	XWHEN (&excode, &epa_new_handler, &epa_old_handler);
-	*old_handler = (PFI)epa_old_handler;
+	*old_handler = (funcptr_t)epa_old_handler;
 }

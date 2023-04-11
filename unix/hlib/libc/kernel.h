@@ -84,8 +84,6 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
-typedef	int   (*PFI)(void);
-
 extern	char *irafpath(char *fname);
 
 #define	D_kernel
