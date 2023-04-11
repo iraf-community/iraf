@@ -10,6 +10,8 @@
 
 #define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
 
+extern void u_doprnt(char *format, va_list *argp, FILE *fp);
+
 
 /* SPRINTF -- Formatted print to a string.  If char and XCHAR are the
 ** same size we open the output string as a file and write directly into
@@ -25,8 +27,6 @@ sprintf (char *str, char *format, ...)
 	XCHAR obuf[SZ_OBUF], *fiobuf;
 	XINT x_fd, x_maxch = SZ_OBUF, x_mode = NEW_FILE;
 	va_list	argp;
-
-	extern int  u_doprnt();
 
 
 	va_start (argp, format);

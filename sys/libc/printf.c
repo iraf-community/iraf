@@ -9,6 +9,10 @@
 #define	import_stdarg
 #include <iraf.h>
 
+extern void u_doprnt(char *format, va_list *argp, FILE *fp);
+extern void u_doarg(FILE *fp, XCHAR *formspec, va_list **argp, int prec[], int varprec, int dtype);
+
+
 
 /* PRINTF -- Emulation of the UNIX printf facilities with the IRAF FMTIO
 ** interface as the backend.  All features of the UNIX printf are supported
@@ -29,7 +33,6 @@ void
 printf (char *format, ...)
 {
         va_list argp;
-	void u_doprnt();
 
 	va_start (argp, format);
 	u_doprnt (format, &argp, stdout);
@@ -43,7 +46,6 @@ void
 fprintf (FILE *fp, char *format, ...)
 {
         va_list argp;
-	void u_doprnt();
 
 	va_start (argp, format);
 	u_doprnt (format, &argp, fp);
@@ -70,8 +72,6 @@ u_doprnt (
 	int	done, dotseen;		/* one when at end of a format	*/
 	int	varprec;		/* runtime precision is used	*/
 	int	prec[MAX_PREC];		/* values of prec args		*/
-
-	void  u_doarg ();
 
 
 	while ( (ch = *format++) ) {
@@ -200,13 +200,14 @@ rval:			if (!dotseen) {
 ** formatted output procedures.
 */
 void
-u_doarg (fp, formspec, argp, prec, varprec, dtype)
-FILE	*fp;			/* output file			*/
-XCHAR	*formspec;		/* format string		*/
-va_list	**argp;			/* pointer to data value	*/
-int	prec[];			/* varprec args, if any		*/
-int	varprec;		/* number of varprec args	*/
-int	dtype;			/* datatype of data value	*/
+u_doarg (
+  FILE		*fp,		/* output file			*/
+  XCHAR		*formspec,	/* format string		*/
+  va_list	**argp,		/* pointer to data value	*/
+  int		prec[],		/* varprec args, if any		*/
+  int		varprec,	/* number of varprec args	*/
+  int		dtype		/* datatype of data value	*/
+)
 {
 	register int	p;
 	XCHAR	sbuf[SZ_OBUF+1];

@@ -35,8 +35,6 @@ spf_open (
 )
 {
 	XINT    x_maxch = maxch, x_mode = NEW_FILE;
-	char	*malloc();
-
 
 	spf_userbuf = buf;
 	spf_maxch = maxch;
