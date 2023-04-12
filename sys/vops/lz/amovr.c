@@ -8,6 +8,7 @@
 /* AMOVR -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVR (
   XREAL	*a,
   XREAL	*b,

@@ -2,9 +2,6 @@
  * MATH.H -- Math functions for C.
  */
 
-double	XEXP(), XLOG(), XLOG10(), XPOW(), XSQRT();
-double	XSIN(), XCOS(), XASIN(), XACOS(), XTAN(), XATAN(), XATAN2();
-
 static	double um_x, um_y;
 
 #define nint(x)		XNINT((um_x=(x),&um_x))

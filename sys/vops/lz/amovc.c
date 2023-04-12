@@ -8,6 +8,7 @@
 /* AMOVC -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVC (
   XCHAR	*a,
   XCHAR	*b,

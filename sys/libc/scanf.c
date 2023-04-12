@@ -75,8 +75,6 @@ scanf (char *format, ...)
 	struct _input in;
 	int status;
 
-	extern int u_doscan();
-
 
 	va_start (argp, format);
 	in.i_type = SCAN_FILE;
@@ -97,8 +95,6 @@ fscanf (FILE *fp, char *format, ...)
 	va_list	argp;
 	int	status;
 	struct	_input in;
-
-	extern int u_doscan();
 
 
 	va_start (argp, format);
@@ -121,8 +117,6 @@ sscanf (char *str, char *format, ...)
 	va_list	argp;
 	struct _input in;
 	int status;
-
-	extern int u_doscan();
 
 
 	va_start (argp, format);
@@ -155,9 +149,6 @@ u_doscan (
 	struct	_format fmt;
 	int	nscan = 0, match;
 	int	eofflag = 0;
-	char	*u_crackformat(), *u_setucc();
-	int	u_scanstr(), u_scannum();
-
 
 	while ( (ch = *format++) ) {
 	    if (ch == '%' && *format != '%') {
@@ -431,7 +422,7 @@ out_:
 	 */
 	if (floating) {
 	    float	rval;
-	    double	dval, atof();
+	    double	dval;
 
 	    if (fmt->f_longword) {
 		*(va_arg ((**argp), double *)) = atof (numbuf);

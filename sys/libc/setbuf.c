@@ -7,6 +7,8 @@
 #define	import_fset
 #include <iraf.h>
 
+void setbuffer (FILE *fp, char *buf, int size);
+
 
 /* SETBUF -- Assign a buffer to be used by the i/o system to access a file.
 ** Should be called after opening the file but before doing any i/o.
@@ -17,8 +19,6 @@ setbuf (
   char	*buf
 )
 {
-	void setbuffer();
-
 	setbuffer (fp, buf, BUFSIZ);
 }
 
@@ -57,9 +57,6 @@ setlinebuf (
 )
 {
 	register XINT	fd = fileno(fp);
-
-	extern int  c_fstati();
-	extern void c_fseti();
 
 
 	if (c_fstati (fd, F_BUFSIZE) < SZ_LINE)

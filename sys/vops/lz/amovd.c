@@ -8,6 +8,7 @@
 /* AMOVD -- Copy a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 AMOVD (
   XDOUBLE	*a,
   XDOUBLE	*b,

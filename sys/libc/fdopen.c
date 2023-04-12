@@ -8,8 +8,6 @@
 #include <iraf.h>
 
 	
-extern int c_fstati();
-
 
 /* FDOPEN -- Reopen a file for i/o with the STDIO package, after the file
 ** as already been opened by FIO.  It is an error if the access modes are

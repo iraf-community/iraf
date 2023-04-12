@@ -7,6 +7,8 @@
 #define	import_stdarg
 #include <iraf.h>
 
+extern void u_doprnt(char *format, va_list *argp, FILE *fp);
+
 
 /* EPRINTF -- Formatted print to the standard error output.
 */
@@ -14,9 +16,6 @@ void
 eprintf (char *format, ...)
 {
 	va_list	argp;
-
-	extern void u_doprnt();
-
 
 	va_start (argp, format);
 	u_doprnt (format, &argp, stderr);

@@ -9,11 +9,14 @@
 
 /* ISCL32 - Scale a pixel array stored as SPP chars to the desired type.
  */
-ISCL32 (a, b, npix, bscale, bzero)
-XCHAR	*a;			/* input array			*/
-XCHAR	*b;			/* output array			*/
-XINT	*npix;			/* number of bytes to swap	*/
-XDOUBLE *bscale, *bzero;	/* scaling factors		*/
+void
+ISCL32 (
+    XCHAR	*a,		/* input array			*/
+    XCHAR	*b,		/* output array			*/
+    XINT	*npix,		/* number of bytes to swap	*/
+    XDOUBLE *bscale, 
+    XDOUBLE *bzero		/* scaling factors		*/
+)
 {
     int   i, pix;
     int   *ip = (int *) a;

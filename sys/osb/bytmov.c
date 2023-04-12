@@ -11,6 +11,7 @@
  * to determine if they overlap.
  * [Specially optimized version for Sun/IRAF].
  */
+void
 BYTMOV (
   XCHAR	*a,			/* input byte array			*/
   XINT	*aoff,			/* first byte in A to be moved		*/

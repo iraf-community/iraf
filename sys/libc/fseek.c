@@ -38,7 +38,6 @@ fseek (
 {
 	register XINT	fd = fileno(fp);
 	int	text_file, stat;
-	long	c_note();
 
 
 	text_file = (c_fstati (fd, F_TYPE) == TEXT_FILE);

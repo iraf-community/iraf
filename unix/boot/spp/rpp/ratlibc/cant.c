@@ -6,8 +6,7 @@
 extern  int  ENDST (void);
 
 
-void CANT(rname)
-register RCHAR *rname;
+void CANT(RCHAR *rname)
 {
 	while (*rname != REOS)
 		putc(*rname++, stderr);

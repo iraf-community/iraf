@@ -9,12 +9,14 @@
  * pairs of bytes.  The two arrays may be the same but may not be offset
  * and overlapping.
  */
-BSWAP2 (a, aoff, b, boff, nbytes)
-XCHAR	*a;			/* input array			*/
-XINT	*aoff;			/* first byte in input array	*/
-XCHAR	*b;			/* output array			*/
-XINT	*boff;			/* first byte in output array	*/
-XINT	*nbytes;		/* number of bytes to swap	*/
+void
+BSWAP2 (
+    XCHAR	*a,		/* input array			*/
+    XINT	*aoff,		/* first byte in input array	*/
+    XCHAR	*b,		/* output array			*/
+    XINT	*boff,		/* first byte in output array	*/
+    XINT	*nbytes		/* number of bytes to swap	*/
+)
 {
 	register char *ip, *op, *otop;
 	register unsigned temp;

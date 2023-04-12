@@ -287,8 +287,7 @@ d_declaration (int dtype)
  * by nonarguments.
  */
 void
-d_codegen (fp)
-register FILE	*fp;
+d_codegen (FILE	*fp)
 {
 	register struct symbol *sp;
 	register struct	symbol *top = &sym[nsym-1];
@@ -377,9 +376,10 @@ d_runtime (char *text)
  * is output on a separate line.
  */
 void
-d_makedecl (sp, fp)
-register struct symbol *sp;	/* symbol table entry		*/
-register FILE	*fp;		/* output file			*/
+d_makedecl (
+    struct symbol	*sp,	/* symbol table entry		*/
+    FILE		*fp	/* output file			*/
+)
 {
 	extern	char *type_decl[];
 
@@ -536,9 +536,7 @@ d_gettok (
  * declarations.
  */
 void
-d_declfunc (sp, fp)
-register struct symbol *sp;
-FILE  *fp;
+d_declfunc (struct symbol *sp, FILE  *fp)
 {
 	d_makedecl (sp, fp);
 }

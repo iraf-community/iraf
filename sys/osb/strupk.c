@@ -16,10 +16,8 @@
  * and the operation is being performed in place, then this procedure should
  * do nothing.
  */
-STRUPK (instr, outstr, maxch)
-PKCHAR	*instr;
-XCHAR	*outstr;
-XINT	*maxch;
+void
+STRUPK (PKCHAR *instr, XCHAR *outstr, XINT *maxch)
 {
 	register char	*ip = (char *)instr;
 	register XCHAR	*op = outstr;

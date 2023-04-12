@@ -8,6 +8,7 @@
 /* ACLRD -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
+void
 ACLRD (
   XDOUBLE	*a,
   XINT	*n

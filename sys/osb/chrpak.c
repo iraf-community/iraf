@@ -11,10 +11,8 @@
  * hence we pack the chars in unsigned bytes, dealing explicitly with any
  * negative values.
  */
-CHRPAK (a, a_off, b, b_off, nchars)
-XCHAR	*a;
-PKCHAR	*b;
-XINT	*a_off, *b_off, *nchars;
+void
+CHRPAK (XCHAR *a, XCHAR *a_off, PKCHAR *b, XINT *b_off, XINT *nchars)
 {
 	register XCHAR	*ip;
 	register unsigned char *op;
