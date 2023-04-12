@@ -10,7 +10,7 @@
 
 #define	BUFSIZ		SZ_DEFIOBUF
 #define	_NFILE		FIO_MAXFD
-#define	FILE		struct _iobuf
+typedef	struct _iobuf	FILE;
 
 # ifndef NULL
 #define	NULL		0

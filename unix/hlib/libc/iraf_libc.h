@@ -9,13 +9,13 @@
 
 #include "iraf_spp.h"
 
-#define	XCHAR		short
+typedef	short		XCHAR;
 #if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
-#define	XINT		long
-#define	XLONG		long
+typedef	long		XINT;
+typedef	long		XLONG;
 #elif (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
-#define	XINT		int
-#define	XLONG		int
+typedef	int		XINT;
+typedef	int		XLONG;
 #else
 #error "No data model: need either LP64 or ILP32"
 #endif

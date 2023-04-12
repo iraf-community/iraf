@@ -74,33 +74,33 @@
 /*  SPP datatypes. (potentially MACHDEP)
  *  Must match sizes in hlib$iraf.h
  */
-#ifndef XCHAR
-#define	XCHAR		short
-#endif
+typedef	short		XCHAR;
 
 #if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
-#define	XINT		long
-#define	XLONG		long
-#define	XSTRUCT		long
-#define	XPOINTER	long
-#define	XBOOL		long	
+typedef	long		XINT;
+typedef	long		XLONG;
+typedef	long		XSTRUCT;
+typedef	long		XPOINTER;
+typedef	long		XBOOL;
+typedef	unsigned long	XUINT;
 #elif (__SIZEOF_INT__ == 4 && __SIZEOF_POINTER__ == 4) /* ILP32 */
-#define	XINT		int
-#define	XLONG		int
-#define	XSTRUCT		int
-#define	XPOINTER	int
-#define	XBOOL		int
+typedef	int		XINT;
+typedef	int		XLONG;
+typedef	int		XSTRUCT;
+typedef	int		XPOINTER;
+typedef	int		XBOOL;
+typedef	unsigned int	XUINT;
 #else
 #error "No data model: need either LP64 or ILP32"
 #endif
 
-#define	PKCHAR		XCHAR
-#define XUBYTE		unsigned char
-#define	XSHORT		short
-#define	XUSHORT		unsigned short
-#define	XREAL		float
-#define	XDOUBLE		double
-#define XCOMPLEX	struct cplx
+typedef	XCHAR		PKCHAR;
+typedef unsigned char	XUBYTE;
+typedef	short		XSHORT;
+typedef	unsigned short	XUSHORT;
+typedef	float		XREAL;
+typedef	double		XDOUBLE;
+typedef struct cplx	XCOMPLEX;
 
 typedef	void (*funcptr_t)(void);
 
