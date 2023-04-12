@@ -19,6 +19,7 @@ c_ttygetb (
 )
 {
 	XINT  x_tty = tty;
+	XBOOL res = (XBOOL) TTYGETB (&x_tty, c_sppstr(cap));
 
-	return ((int) BTOI ((XBOOL) TTYGETB (&x_tty, c_sppstr(cap))));
+	return ((int) BTOI (&res));
 }

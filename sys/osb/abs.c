@@ -9,5 +9,5 @@
 XINT
 abs_ (XINT *a)
 {
-	return (abs(a));
+	return (abs(*a));
 }
