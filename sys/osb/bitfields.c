@@ -10,7 +10,7 @@
  * integers into an integer value.
  */
 
-unsigned XINT bitmask[] = {	0,		/* MACHDEP		*/
+XUINT bitmask[] = {	0,		/* MACHDEP		*/
   01,			    03,			     07,
   017,			    037,		     077,
   0177,			    0377,		     0777,
@@ -42,14 +42,14 @@ unsigned XINT bitmask[] = {	0,		/* MACHDEP		*/
  */
 void
 BITPAK (
-  unsigned XINT	*ival,		/* value to be placed in bitfield	*/
-  unsigned XINT	*wordp,		/* longword to be written into		*/
+  XUINT	*ival,			/* value to be placed in bitfield	*/
+  XUINT	*wordp,			/* longword to be written into		*/
   XINT	*offset,		/* one-indexed offset of first bit	*/
   XINT	*nbits 			/* number of bits to be set		*/
 )
 {
-	register unsigned XINT	shift;
-	register unsigned XINT	mask;
+	register XUINT	shift;
+	register XUINT	mask;
 
 	shift = *offset - 1;
 	mask = bitmask[*nbits] << shift;
@@ -61,7 +61,7 @@ BITPAK (
  */
 XINT
 BITUPK (
-  unsigned XINT	*wordp,		/* longword to be examined		*/
+  XUINT	*wordp,			/* longword to be examined		*/
   XINT	*offset,		/* one-indexed offset of first bit	*/
   XINT	*nbits 			/* number of bits to be set		*/
 )

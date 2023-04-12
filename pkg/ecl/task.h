@@ -55,8 +55,7 @@ struct task {
 	char	*ft_out;	/* stdout file for foreign task		*/
 	char	*ft_err;	/* stderr file for foreign task		*/
 	struct ltask *t_ltp;	/* link back to fostering ltask		*/
-	unsigned XINT
-		t_topd,		/* topd when this task was last pushed	*/
+	XUINT	t_topd,		/* topd when this task was last pushed	*/
 		t_pc,		/* pc			"		*/
 		t_topos,	/* topos		"		*/
 		t_basos,	/* basos		"		*/
