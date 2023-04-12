@@ -101,6 +101,9 @@
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
 
+typedef	void (*funcptr_t)(void);
+
+
 struct cplx {
 	float	r;
 	float	i;

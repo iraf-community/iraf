@@ -89,7 +89,7 @@ main (int argc, char *argv[])
 
         /* Default if no arguments (same as -h, or host process). */
 	prtype = PR_HOST;
-	ZLOCPR (ZGETTY, &driver);
+	ZLOCPR ((funcptr_t)ZGETTY, &driver);
 	devtype = TEXT_FILE;
 
 	if (arg < argc) {
@@ -118,7 +118,7 @@ main (int argc, char *argv[])
 
 ipc_:
 		prtype = PR_CONNECTED;
-		ZLOCPR (ZARDPR, &driver);
+		ZLOCPR ((funcptr_t)ZARDPR, &driver);
 		devtype = BINARY_FILE;
 
 	    } else if (strcmp (argv[arg], "-d") == 0) {
@@ -138,7 +138,7 @@ ipc_:
 		setpgid (0, jobcode);
 		freopen ("/dev/null", "r", stdin);
 		prtype = PR_DETACHED;
-		ZLOCPR (ZGETTX, &driver);
+		ZLOCPR ((funcptr_t)ZGETTX, &driver);
 		devtype = TEXT_FILE;
 
 		/* Copy the bkgfile to PKCHAR buffer to avoid the possibility

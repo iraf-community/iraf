@@ -49,7 +49,6 @@
 #define	BKG_QUANTUM	30	/* period(sec) bkgjob checkup		*/
 #define	MAX_INTERRUPTS	5	/* max interrupts of a task		*/
 #define	LEN_INTRSTK	10	/* max nesting of saved interrupts	*/
-typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
@@ -60,7 +59,7 @@ extern	int bkgno;		/* job number if bkg job		*/
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
 
-static	PFI old_onipc;		/* X_IPC handler chained to onint()	*/
+static	funcptr_t old_onipc;	/* X_IPC handler chained to onint()	*/
 static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
@@ -740,7 +739,7 @@ onint (
 void
 intr_disable (void)
 {
-	PFI	junk;
+	funcptr_t	junk;
 
 	if (intr_sp >= LEN_INTRSTK)
 	    cl_error (E_IERR, "interrupt save stack overflow");
@@ -755,7 +754,7 @@ intr_disable (void)
 void
 intr_enable (void)
 {
-	PFI	junk;
+	funcptr_t	junk;
 
 	if (--intr_sp < 0)
 	    cl_error (E_IERR, "interrupt save stack underflow");
@@ -769,7 +768,7 @@ intr_enable (void)
 void
 intr_reset (void)
 {
-	PFI	junk;
+	funcptr_t	junk;
 
 	c_xwhen (X_INT, onint, &junk);
 	intr_sp = 0;

@@ -113,7 +113,7 @@ extern int zgtenv_(short *envvar, short *outstr, int *maxch, int *status);
 extern int zgtime_(int *clock_time, int *cpu_time);
 extern int zgtpid_(int *pid);
 extern int zintpr_(int *pid, int *exception, int *status);
-extern int zlocpr_(PFI proc, int *o_epa);
+extern int zlocpr_(funcptr_t proc, int *o_epa);
 extern int zlocva_(short *variable, int *location);
 extern int zmaloc_(int *buf, int *nbytes, int *status);
 extern int zmfree_(int *buf, int *status);

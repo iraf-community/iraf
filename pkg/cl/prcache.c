@@ -64,8 +64,6 @@
 extern	int	cldebug;
 extern	int	cltrace;
 
-typedef	XINT (*PFI)();
-
 struct process {
 	int	pr_pid;			/* process id of subprocess	*/
 	long	pr_time;		/* time when process executed	*/
@@ -619,7 +617,7 @@ pr_checkup (void)
 void
 onipc (
     int *vex,			/* virtual exception code	*/
-    PFI *next_handler		/* next handler to be called	*/
+    funcptr_t *next_handler	/* next handler to be called	*/
 )
 {
 	register struct	process *pr;

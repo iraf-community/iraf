@@ -217,7 +217,7 @@ extern void c_xonerr(int errcode);
 /* cxttysize.c */
 extern void c_xttysize(int *ncols, int *nlines);
 /* cxwhen.c
-extern void c_xwhen(int exception, PFI new_handler, PFI *old_handler);
+extern void c_xwhen(int exception, funcptr_t new_handler, funcptr_t *old_handler);
  */
 /* eprintf.c */
 extern void u_eprintf(char *format, ...);

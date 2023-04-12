@@ -318,7 +318,7 @@ extern void	spf_close (XINT fd);
 /*  The following have conflicts because of the order in which the
 **  include files are done in iraf.h.  Commented out for now.
 extern int	c_finfo (char *fname, struct _finfo *fi);
-extern void	c_xwhen (int exception, PFI new_handler, PFI *old_handler);
+extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
 */
 
 #endif
