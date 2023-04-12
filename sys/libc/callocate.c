@@ -65,7 +65,7 @@ c_devowner (
   int	maxch 
 )
 {
-	PKCHAR	x_owner[SZ_FNAME+1];
+	XCHAR	x_owner[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME;
 	int	status;
 

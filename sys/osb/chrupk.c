@@ -11,7 +11,8 @@
  * hence we pack the chars into unsigned bytes and restore the sign explicitly.
  */
 CHRUPK (a, a_off, b, b_off, nchars)
-XCHAR	*a, *b;
+PKCHAR	*a;
+XCHAR	*b;
 XINT	*a_off, *b_off, *nchars;
 {
 	register unsigned char *ip;

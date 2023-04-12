@@ -12,7 +12,8 @@
  * negative values.
  */
 CHRPAK (a, a_off, b, b_off, nchars)
-XCHAR	*a, *b;
+XCHAR	*a;
+PKCHAR	*b;
 XINT	*a_off, *b_off, *nchars;
 {
 	register XCHAR	*ip;

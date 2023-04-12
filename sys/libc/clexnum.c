@@ -31,7 +31,7 @@ c_lexnum (
 {
 	register char *ip;
 	register XCHAR *op, ch, ndigits;
-	PKCHAR	 numbuf[SZ_FNAME];
+	XCHAR	 numbuf[SZ_FNAME];
 	XINT	 ip_start = 1, x_toklen = *toklen;
 	int      status;
 
