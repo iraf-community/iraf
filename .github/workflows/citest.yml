@@ -9,20 +9,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CARCH: ${{ matrix.carch }}
+      CFLAGS: ${{ matrix.cflags }}
 
     strategy:
       matrix:
         include:
           - name: Ubuntu latest x86_64
             os: ubuntu-latest
+            cflags: -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
 
           - name: Ubuntu 20.04 Focal i386
             os: ubuntu-20.04
             irafarch: linux
             carch: '-m32'
+            cflags: -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
 
           - name: macOS x86_64
             os: macos-latest
+            cflags: -O2 -g -Wall -Wno-logical-op-parentheses
 
     steps:
       - name: Checkout repository

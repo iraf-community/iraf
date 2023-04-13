@@ -37,7 +37,7 @@ export RANLIB = ranlib
 
 # General compiler flags. Compiler flags specific to the build of the
 # host tools and software are in unix/Makefile.
-export CFLAGS ?= -g -Wall -O2
+export CFLAGS ?= -g -O2
 CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
@@ -78,10 +78,8 @@ noao: host vendor core
 	cd $(noao) && $(MKPKG) -p noao
 
 # Run the test suite.
-# The XC_CFLAGS are reset here since they produce warnings that
-# confuse the test scripts.
 test:
-	env -u XC_CFLAGS ./test/run_tests
+	./test/run_tests
 
 # Remove all binaries built. This keeps .x files that were generated
 # by generic, xyacc and similar.
