@@ -1,3 +1,6 @@
+#ifndef D_iraf_ctype_h
+#define D_iraf_ctype_h
+
 #define	_U	01
 #define	_L	02
 #define	_N	04
@@ -28,4 +31,4 @@ int iscntrl(int c);
 #define	tointeg(c)	((c)-'0')
 #define	todigit(c)	((c)+'0')
 
-#define D_ctype
+#endif /* D_iraf_ctype_h */

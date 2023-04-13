@@ -1,13 +1,11 @@
 /*
  *  KPROTO.H -- IRAF Kernel prototype definitions.
  */
+#ifndef D_iraf_kproto_h
+#define D_iraf_kproto_h
 
-#ifndef D_spp
 #include "iraf_spp.h"
-#endif
-#ifndef D_knames
 #include "iraf_knames.h"
-#endif
 
 /* zalloc.c */
 int ZDVALL (PKCHAR *aliases, XINT *allflg, XINT *status);
@@ -179,3 +177,5 @@ int ZZLSTR (XCHAR *s1, XCHAR *s2);
 /* zzstrt.c */
 int ZZSTRT (void);
 int ZZSTOP (void);
+
+#endif /* D_iraf_kproto_h */

@@ -1,5 +1,8 @@
 /* File info structure definitions (c_finfo).
  */
+#ifndef D_iraf_finfo_h
+#define D_iraf_finfo_h
+
 #define	SZ_OWNERSTR		16
 #define	FI_REGULAR		1	/* file types			*/
 #define	FI_DIRECTORY		2
@@ -16,4 +19,4 @@ struct _finfo {
 	char	fi_owner[SZ_OWNERSTR*sizeof(XLONG)];
 };
 
-#define D_finfo
+#endif /* D_iraf_finfo_h */

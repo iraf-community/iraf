@@ -1,6 +1,8 @@
 /*
  * MATH.H -- Math functions for C.
  */
+#ifndef	D_iraf_ma.h_h
+#define	D_iraf_ma.h_h
 
 static	double um_x, um_y;
 
@@ -18,4 +20,4 @@ static	double um_x, um_y;
 #define	atan(x)		XATAN((um_x=(x),&um_x))
 #define	atan2(x,y)	XATAN2((um_x=(x),&um_x),(um_y=(y),&um_y))
 
-#define	D_math
+#endif /* D_iraf_ma.h_h */

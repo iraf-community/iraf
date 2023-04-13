@@ -1,7 +1,7 @@
 /* File poll structure definitions (c_fpoll).
  */
-#ifndef D_fpoll
-#define D_fpoll
+#ifndef D_iraf_fpoll_h
+#define D_iraf_fpoll_h
 
 #define IRAF_POLLIN      0x0001    	/* There is data to read 	*/
 #define IRAF_POLLPRI     0x0002    	/* There is urgent data to read */
@@ -56,4 +56,4 @@ struct _fpoll {
 
 #endif  /* ! NOLIBCNAMES */
 
-#endif
+#endif /* D_iraf_fpoll_h */

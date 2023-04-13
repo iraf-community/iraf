@@ -17,6 +17,8 @@
  *
  * The external names defined herein MUST agree with those in "hlib$iraf.h".
  */
+#ifndef	D_iraf_xnames_h
+#define	D_iraf_xnames_h
 
 #define	ACCESS		xfaccs_		/* to avoid name collisions */
 #define	CALLOC		xcallc_
@@ -242,4 +244,4 @@
 #define	XTOC		xtoc_
 #define	XWHEN		xwhen_
 
-#define	D_xnames
+#endif /* D_iraf_xnames_h */

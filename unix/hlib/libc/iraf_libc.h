@@ -3,12 +3,11 @@
  * use the IRAF runtime C library.
  */
 
-#ifndef D_libc
-#ifndef D_spp
-#ifndef import_spp
+#ifndef D_iraf_libc_h
+#define	D_iraf_libc_h
+#define	D_iraf_libc_h_proto
+
 #include "iraf_spp.h"
-#endif
-#endif
 
 #define	XCHAR		short
 #if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* LP64 */
@@ -321,14 +320,10 @@ extern int	c_finfo (char *fname, struct _finfo *fi);
 extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
 */
 
-
 #endif
 
 /*
 */
-#include "../../f2c/libf2c/f2c.h"
 #include "iraf_vosproto.h"
 
-#define	D_libc
-#define	D_libc_proto
-#endif
+#endif /* D_iraf_libc_h */
