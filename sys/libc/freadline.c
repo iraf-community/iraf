@@ -1,9 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
+#define	import_knames
+#define	import_kproto
 #include <iraf.h>
 
 
@@ -27,7 +31,7 @@ freadline (
             return ((char *) NULL);
 	} else {
 	    strcpy (line, cmd);		/* save to static buffer	*/
-	    zfree_ ((void *) cmd);	/* free readline() buffer	*/
+	    ZFREE ((void *) cmd);	/* free readline() buffer	*/
 	}
 
 	return ((char *) line);

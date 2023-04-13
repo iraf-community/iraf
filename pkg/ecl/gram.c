@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -721,7 +723,7 @@ fieldcvt (register char *f)
 	static char fctbl[] = {
 	    FN_NAME, FN_TYPE, FN_MODE, FN_VALUE, FN_MIN,
 	    FN_MAX, FN_PROMPT, FN_VALUE, FN_LENGTH, FN_VALUE,
-	    FN_XTYPE, NULL
+	    FN_XTYPE, '\0'
 	};
 
 	int kentry;
@@ -919,7 +921,6 @@ intrfunc (char *fname, int nargs)
 		    int	o1, o2;
 		    struct operand istr;
 		    char *index();
-		    extern void *memset();
 trim_:
 		    if (nargs >= 2) {
 		        /* Get the chars to trim, otherwise its whitespace.  */
@@ -1408,7 +1409,7 @@ unsetigoto (int loc)
 {
 	int 	last, curr;
 
-	last = NULL;
+	last = 0;
 	curr = igoto1;
 
 	while (curr != loc) {
@@ -1416,7 +1417,7 @@ unsetigoto (int loc)
 	    curr = coderef(curr)->c_args;
 	}
 
-	if (last == NULL)
+	if (last == 0)
 	    igoto1 = coderef(curr)->c_args;
 	else
 	    coderef(last)->c_args = coderef(curr)->c_args;

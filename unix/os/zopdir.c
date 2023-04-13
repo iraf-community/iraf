@@ -110,7 +110,7 @@ ZOPDIR (PKCHAR *fname, XINT *chan)
 	}
 
 	/* Sort the file list. */
-	d_qsort (soff, nentries, sizeof(int), d_compar);
+	d_qsort ((void *)soff, nentries, sizeof(int), d_compar);
 
 	/* Free unused space. */
 	if ((soff = (int *) realloc (soff, nentries * sizeof(int))) == NULL)

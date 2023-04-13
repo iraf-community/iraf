@@ -5,6 +5,7 @@
 #define	import_libc
 #define	import_xnames
 #define	import_knames
+#define	import_kproto
 #include <iraf.h>
 
 

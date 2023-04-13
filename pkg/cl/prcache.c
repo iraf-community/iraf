@@ -7,6 +7,7 @@
 #define	import_error
 #define	import_finfo
 #define	import_prstat
+#define import_kproto
 #include <iraf.h>
 
 #include "config.h"

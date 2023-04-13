@@ -9,6 +9,7 @@
 #define import_knames
 #define	import_xnames
 #define	import_stdarg
+#define import_kproto
 #include <iraf.h>
 
 #include "config.h"

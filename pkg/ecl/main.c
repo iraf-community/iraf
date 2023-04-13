@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_fset
@@ -12,6 +14,7 @@
 #define	import_prtype
 #define	import_xwhen
 #define import_xnames
+#define import_kproto
 #include <iraf.h>
 
 #include <ctype.h>

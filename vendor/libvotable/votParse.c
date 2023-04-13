@@ -8,9 +8,10 @@
  *  @brief      Public interface procedures for the libVOTable parser.
  */
 
+#define _DEFAULT_SOURCE 1       /* strcasecomp/strdup comes from BSD */
+#define _GNU_SOURCE 1       /* strcasecomp/strdup comes from BSD */
 #include <stdio.h>
 #include <stdlib.h>
-#define _GNU_SOURCE
 #include <string.h>
 #include <expat.h>
 #include <unistd.h>
@@ -29,9 +30,6 @@
 
 
 #define	BUFSIZE			4096
-
-    
-extern char  *strcasestr();
 
 
 /* Private procedures
@@ -1843,7 +1841,7 @@ vot_copyElement (handle_t src_h, handle_t parent_h)
 {
     /* A recurseive function to copy a node and it's children. */
     Element   *src_ptr, *return_ptr;
-    handle_t   return_handle, parent;
+    handle_t   return_handle, parent = 0;
     handle_t   src_child_h, src_next_h;
     
 

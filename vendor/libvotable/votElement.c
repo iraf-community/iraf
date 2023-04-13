@@ -8,6 +8,7 @@
  *  @brief      (Private) Methods to manage XML elements.
  */
 
+#define _DEFAULT_SOURCE 1       /* strcasecomp comes from BSD */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

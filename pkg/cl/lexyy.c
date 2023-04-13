@@ -28,6 +28,11 @@ struct yysvf {
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
 # define YYNEWLINE 10
+
+int yylook (void);
+int traverse (int);
+int yyback (int *p, int m);
+
 int 
 lex_yylex (void){
 int nstr; extern int yyprevious;
@@ -146,7 +151,7 @@ case 28:
 	return (crackident (yytext));
 break;
 case 29:
-	{	extern bracelevel;
+	{	extern int bracelevel;
 			if (bracelevel) {
 	    eprintf ("ERROR: background not allowed within statement block\n");
 			    return ('#');

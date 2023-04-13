@@ -30,6 +30,7 @@
 
 #include "dextern.h"
 #include <stdio.h>
+#include <string.h>
 
 char *os_getenv (char *envvar);
 

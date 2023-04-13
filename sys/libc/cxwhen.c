@@ -5,6 +5,7 @@
 #define	import_xnames
 #define	import_knames
 #define	import_libc
+#define import_kproto
 #include <iraf.h>
 
 /* CXWHEN -- Post an exception handler.  The exception handler procedure
