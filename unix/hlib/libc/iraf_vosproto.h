@@ -1,6 +1,8 @@
-#ifndef D_xnames
-#include "iraf/xnames.h"
-#endif
+#ifndef D_iraf_vosproto_h
+#define D_iraf_vosproto_h
+
+#include "iraf_xnames.h"
+#include "../../f2c/libf2c/f2c.h"
 
 extern C_f ahivx_(complex * ret_val, complex *a, integer *npix);
 extern C_f alovx_(complex * ret_val, complex *a, integer *npix);
@@ -4043,3 +4045,5 @@ extern integer xorl_(integer *a, integer *b);
 extern integer sysruk_(shortint *task, shortint *cmd, integer *rukarf, integer *rukint);
 extern int sbit_(void);
 extern int tbit_(void);
+
+#endif /* D_iraf_vosproto_h */

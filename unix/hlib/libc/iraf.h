@@ -6,180 +6,131 @@
  */
 
 #ifndef D_iraf
+#define D_iraf
+#endif
 
 /* Compile time definitions (for C #ifdefs).
  */
-
-#define D_iraf
-#endif
 
 /* Include any header files specified in "#define import_XXX" statements
  * before we were called.
  */
 #ifdef import_libc
-#ifndef D_libc
-#include "iraf/libc.h"
-#endif
+#include "iraf_libc.h"
 #undef import_libc
 #endif
 
 #ifdef import_spp
-#ifndef D_spp
-#include "iraf/spp.h"
-#endif
+#include "iraf_spp.h"
 #undef import_spp
 #endif
 
 #ifdef import_main
-#ifndef D_main
-#include "iraf/main.h"
-#endif
+#include "iraf_main.h"
 #undef import_main
 #endif
 
 #ifdef import_stdio
-#ifndef D_stdio
-#include "iraf/stdio.h"
-#endif
+#include "iraf_stdio.h"
 #undef import_stdio
 #endif
 
 #ifdef import_error
-#ifndef D_error
-#include "iraf/error.h"
-#endif
+#include "iraf_error.h"
 #undef import_error
 #endif
 
 #ifdef import_ctype
-#ifndef D_ctype
-#include "iraf/ctype.h"
-#endif
+#include "iraf_ctype.h"
 #undef import_ctype
 #endif
 
 #ifdef import_finfo
-#ifndef D_finfo
-#include "iraf/finfo.h"
-#endif
+#include "iraf_finfo.h"
 #undef import_finfo
 #endif
 
 #ifdef import_fset
-#ifndef D_fset
-#include "iraf/fset.h"
-#endif
+#include "iraf_fset.h"
 #undef import_fset
 #endif
 
 #ifdef import_fpoll
-#ifndef D_fpoll
-#include "iraf/fpoll.h"
-#endif
+#include "iraf_fpoll.h"
 #undef import_fpoll
 #endif
 
 #ifdef import_kernel
-#ifndef D_kernel
-#include "iraf/kernel.h"
-#endif
+#include "iraf_kernel.h"
 #undef import_kernel
 #endif
 
 #ifdef import_xnames
-#ifndef D_xnames
-#include "iraf/xnames.h"
-#endif
+#include "iraf_xnames.h"
 #undef import_xnames
 #endif
 
 #ifdef import_knames
-#ifndef D_knames
-#include "iraf/knames.h"
-#endif
+#include "iraf_knames.h"
 #undef import_knames
 #endif
 
 #ifdef import_kproto
-#ifndef D_kproto
-#include "iraf/kproto.h"
-#endif
+#include "iraf_kproto.h"
 #undef import_kproto
 #endif
 
 #ifdef import_setjmp
-#ifndef D_setjmp
-#include "iraf/setjmp.h"
-#endif
+#include "iraf_setjmp.h"
 #undef import_setjmp
 #endif
 
 #ifdef import_xwhen
-#ifndef D_xwhen
-#include "iraf/xwhen.h"
-#endif
+#include "iraf_xwhen.h"
 #undef import_xwhen
 #endif
 
 #ifdef import_protect
-#ifndef D_protect
-#include "iraf/protect.h"
-#endif
+#include "iraf_protect.h"
 #undef import_protect
 #endif
 
 #ifdef import_prtype
-#ifndef D_prtype
-#include "iraf/prtype.h"
-#endif
+#include "iraf_prtype.h"
 #undef import_prtype
 #endif
 
 #ifdef import_zfstat
-#ifndef D_zfstat
-#include "iraf/zfstat.h"
-#endif
+#include "iraf_zfstat.h"
 #undef import_zfstat
 #endif
 
 #ifdef import_alloc
-#ifndef D_alloc
-#include "iraf/alloc.h"
-#endif
+#include "iraf_alloc.h"
 #undef import_alloc
 #endif
 
 #ifdef import_math
-#ifndef D_math
-#include "iraf/math.h"
-#endif
+#include "iraf_math.h"
 #undef import_math
 #endif
 
 #ifdef import_prstat
-#ifndef D_prstat
-#include "iraf/prstat.h"
-#endif
+#include "iraf_prstat.h"
 #undef import_prstat
 #endif
 
 #ifdef import_lexnum
-#ifndef D_lexnum
-#include "iraf/lexnum.h"
-#endif
+#include "iraf_lexnum.h"
 #undef import_lexnum
 #endif
 
 #ifdef import_ttset
-#ifndef D_ttset
-#include "iraf/ttset.h"
-#endif
+#include "iraf_ttset.h"
 #undef import_ttset
 #endif
 
 #ifdef import_stdarg
-#ifndef D_stdarg
-#include "iraf/stdarg.h"
-#endif
+#include "iraf_stdarg.h"
 #undef import_stdarg
 #endif

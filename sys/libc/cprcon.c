@@ -94,7 +94,7 @@ c_prclose (
 }
 
 
-/* C_PRSTATI -- Get status on a connected subprocess.  See <libc/prstat.h>
+/* C_PRSTATI -- Get status on a connected subprocess.  See <libc/iraf_prstat.h>
 ** for a list of parameters.
 */
 int

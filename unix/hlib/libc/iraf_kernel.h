@@ -4,6 +4,8 @@
  * references "kernel.h".  The companion include file "language.h" defines
  * the (generally) machine independent kernel definitions.
  */
+#ifndef	D_iraf_kernel_h
+#define	D_iraf_kernel_h
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -86,4 +88,4 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 
 extern	char *irafpath(char *fname);
 
-#define	D_kernel
+#endif /* D_iraf_kernel_h */

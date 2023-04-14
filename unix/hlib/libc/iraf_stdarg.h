@@ -5,20 +5,11 @@
  * number of arguments.  This is done via indirection through this file so
  * that any problems can be dealt with by changing only this file.
  *
- * Usage: Include this file using import_stdarg.  If USE_STDARG is
- * defined use the stdarg interface, otherwise use the varargs
- * interface (ifdef the code accordingly).  Old code which uses
- * varargs directly is unaffected.
+ * Usage: Include this file using import_stdarg.
  */
-#ifndef D_stdarg
+#ifndef D_iraf_stdarg_h
+#define	D_iraf_stdarg_h
 
-
-#ifdef __GNUC__
-#include "stdarg-gcc.h"
-#else
 #include <stdarg.h>
-#endif
 
-
-#define	D_stdarg
-#endif
+#endif /* D_iraf_stdarg_h */

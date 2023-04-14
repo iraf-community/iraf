@@ -1,5 +1,8 @@
 /* PRSTAT parameters.
  */
+#ifndef	D_iraf_prstat_h
+#define	D_iraf_prstat_h
+
 #define	PR_STATUS	1	/* process status (OK, P_DEAD)		*/
 #define	PR_INCHAN	2	/* input channel			*/
 #define	PR_INFD		3	/* FD of input stream			*/
@@ -16,4 +19,4 @@
 #define	P_DONE		2	/* process terminated normally		*/
 #define	P_DEAD		3	/* process died and sent us X_IPC	*/
 
-#define	D_prstat
+#endif /* D_iraf_prstat_h */

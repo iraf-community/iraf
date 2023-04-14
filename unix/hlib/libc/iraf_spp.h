@@ -4,7 +4,8 @@
  * compiler and with <iraf.h> and <mach.h>.
  */
 
-#ifndef D_spp
+#ifndef D_iraf_spp_h
+#define D_iraf_spp_h
 
 /* Assorted machine constants. [MACHDEP]
  * Use osb$zzeps.f to compute the machine epsilon.
@@ -162,5 +163,4 @@ XCHAR	*c_sppstr(char *str);
 XCHAR	*c_strupk(char *str, short *outstr, int maxch);
 char	*c_strpak(short *sppstr, char *cstr, int maxch);
 
-#define	D_spp
-#endif
+#endif /* D_iraf_spp_h */

@@ -3,12 +3,10 @@
  * IRAF file i/o.  These definitions are portable, but highly dependent on
  * the guts of IRAF FIO.
  */
+#ifndef	D_iraf_stdio_h
+#define	D_iraf_stdio_h
 
-#ifndef D_libc
-#ifndef import_libc
-#include "libc.h"
-#endif
-#endif
+#include "iraf_libc.h"
 
 #define	BUFSIZ		SZ_DEFIOBUF
 #define	_NFILE		FIO_MAXFD
@@ -96,4 +94,4 @@ FILE	*fdopen(XINT fd, char *mode);
 char	*fgets(char *buf, int maxch, FILE *fp);
 char	*gets(char *buf);
 
-#define	D_stdio
+#endif /* D_iraf_stdio_h */

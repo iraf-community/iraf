@@ -8,6 +8,8 @@
  * some of the names will have to be changed.  To change the external name
  * change the define given here.
  */
+#ifndef	D_iraf_knames_h
+#define	D_iraf_knames_h
 
 #define	IRAF_MAIN	irafmn_
 #define	ZZSETK		zzsetk_
@@ -373,4 +375,4 @@
 #define import_kproto
 */
 
-#define	D_knames
+#endif /* D_iraf_knames_h */
