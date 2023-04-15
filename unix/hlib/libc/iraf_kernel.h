@@ -52,7 +52,7 @@
  * into an unsigned before rightshifting. Hopefully (!) this will
  * shift in a zero...
  */
-#define	ADDR_TO_LOC(addr) 	(((unsigned XINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
+#define	ADDR_TO_LOC(addr) 	(((XUINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
 #define	LOC_TO_ADDR(loc,type)   ((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
 
 
