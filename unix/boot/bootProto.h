@@ -6,8 +6,6 @@
 #include <iraf.h>
 
 
-void 	BYTMOV (XCHAR *a, XINT *aoff, XCHAR *b, XINT *boff, XINT *nbytes);
-
 void 	loadpkgenv (char *pkg);
 void 	_envinit (void);
 void 	loadenv (char *osfn);
@@ -18,7 +16,6 @@ char   *rindex (char *str, int ch);
 #endif
 
 int 	os_access (char *fname, int mode, int type);
-void 	os_amovb (char *a, char *b, int nbytes);
 int 	os_chdir (char *dir);
 void 	os_close (int fd);
 int 	os_cmd (char *cmd);
