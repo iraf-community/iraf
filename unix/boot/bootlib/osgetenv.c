@@ -5,8 +5,6 @@
 #define	import_xnames
 #include "bootlib.h"
 
-extern char *_os_getenv(char *envvar, char *outstr, int maxch);
-
 
 /* OS_GETENV -- Return the value of the named environment variable.  Null is
  * returned if the named variable is not found.
@@ -18,7 +16,6 @@ os_getenv (char *envvar)
 	static	char	hostdir[SZ_PATHNAME+1] = "";
 	static	char	valstr[SZ_COMMAND+1];
 	static	char	errmsg[] = "environment variable `%s' not found\n";
-	extern	char	*os_subdir(char *dir, char *subdir);
 	char	*vp;
 
 

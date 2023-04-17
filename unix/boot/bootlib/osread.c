@@ -2,7 +2,7 @@
  */
 
 #include <unistd.h>
-
+#include "bootlib.h"
 
 /* OS_READ -- Read from a disk file.  We can use the UNIX procedures for
  * reading both binary and text files.

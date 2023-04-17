@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include "bootlib.h"
 
-extern	int  os_access (char *fname, int mode, int type);
-
 
 /* OS_FCOPY -- Copy a file.  Used by RTAR to resolve links.
  */

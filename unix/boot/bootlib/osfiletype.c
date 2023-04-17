@@ -6,6 +6,8 @@
 #define import_spp
 #include <iraf.h>
 
+#include "bootlib.h"
+
 /*
  * OS_FILETYPE -- Determine whether the named file is a text file, a binary
  * file, or a directory.  The filename extensions used to speed up the test
@@ -58,9 +60,6 @@ char *srcextn[] = {		/* Known source file extensions */
 	".std",
 	NULL
 };
-
-extern 	int  os_access (char *fname, int mode, int type);
-
 
 
 /* OS_FILETYPE -- Determine the type of a file.  If the file has one of the

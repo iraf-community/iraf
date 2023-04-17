@@ -46,9 +46,6 @@ osfn2vfn (
 	XINT	x_maxch = SZ_PATHNAME;
 	XINT	x_mode, vp, nchars;
 
-	extern  void _envinit(void);
-
-
 	_envinit();
 	
 	os_strupk ("./", x_vfn, SZ_PATHNAME);

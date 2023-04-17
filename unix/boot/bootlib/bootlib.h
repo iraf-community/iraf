@@ -3,7 +3,12 @@
 #define	import_spp
 #define	NOKNET
 #define	import_knames
+#define import_kernel
 #include <iraf.h>
+
+#include "../bootProto.h"
+
+char *_os_getenv (char *envvar, char *outstr, int maxch);
 
 #define	SZ_FBUF		512		/* File i/o buffer size		*/
 
@@ -21,8 +26,3 @@ extern	int osfiletype;
 extern	XCHAR text[];
 extern	XCHAR *txop;
 # endif
-
-char	*vfn2osfn(char *vfn, int new);
-char	*osfn2vfn(char *osfn);
-char	*os_strpak(short int *sppstr, char *cstr, int maxch);
-XCHAR	*os_strupk(char *str, short int *outstr, int maxch);

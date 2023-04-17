@@ -14,10 +14,6 @@
 #define	irafpath os_irafpath
 #endif
 
-char	*irafpath(char *sysfile);
-char	*os_getenv(char *envvar);
-extern  int  os_access (char *fname, int mode, int type);
-
 
 /* OS_SYSFILE -- Return the pathname of a system library file.  The library
  * search order is
