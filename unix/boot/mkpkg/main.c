@@ -324,8 +324,12 @@ errors (char *fmt, char *arg)
 	printf ("%s%s:%d: error: %s\n", topcx->curdir, topcx->mkpkgfile,
 		topcx->lineno, errmsg);
 	fflush (stdout);
-	if (ignore == NO)
-	  exit (OSOK+1);
+	if (ignore == NO) {
+	    printf ("mkpkg[%d]: Leaving directory `%s'\n",
+		    topcx->level, topcx->dirpath);
+	    fflush (stdout);
+	    exit (OSOK+1);
+	}
 }
 
 
@@ -340,6 +344,8 @@ fatals (char *fmt, char	*arg)
 	sprintf (errmsg, fmt, arg);
 	printf ("%s%s:%d: fatal: %s\n", topcx->curdir,
 		topcx->mkpkgfile, topcx->lineno, errmsg);
+	printf ("mkpkg[%d]: Leaving directory `%s'\n",
+		topcx->level, topcx->dirpath);
 	fflush (stdout);
 	exit (OSOK+1);
 }
