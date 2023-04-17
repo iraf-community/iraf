@@ -14,7 +14,7 @@ int REALLOC (XPOINTER *ubufp, XINT *nelems, XINT *dtype);
 int CALLOC (XPOINTER *ubufp, XINT *buflen, XINT *dtype);
 XPOINTER COERCE (XPOINTER *ptr, XINT *type1, XINT *type2);
 int MFREE (XPOINTER *ptr, XINT *dtype);
-XINT IRAF_MAIN (XCHAR *a_cmd, XINT *a_inchan, XINT *a_outchan, XINT *a_errchan, XINT *a_driver, XINT *a_devtype, XINT *prtype, XCHAR *bkgfile, XINT *jobcode, funcptr_t *sys_runtask, funcptr_t *onentry);
+XINT IRAF_MAIN (XCHAR *a_cmd, XINT *a_inchan, XINT *a_outchan, XINT *a_errchan, XINT *a_driver, XINT *a_devtype, XINT *prtype, XCHAR *bkgfile, XINT *jobcode, int (*sys_runtask)(XCHAR *task, XCHAR *cmd, XINT *ruk_argoff, XINT *ruk_interact), XINT (*onentry)(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd));
 int MALLOC (XPOINTER *ubufp, XINT *nelems, XINT *dtype);
 int SALLOC (XPOINTER *output_pointer, XINT *nelem, XINT *datatype);
 int SMARK (XPOINTER *old_sp);
@@ -95,7 +95,7 @@ XINT CTOX (XCHAR *str, XINT *ip, XCOMPLEX *xval);
 /*
  * ETC -- Miscellaneous System Stuff
  */
-int ONEXIT (funcptr_t *user_proc);
+int ONEXIT (int (*user_proc)(XINT *exit_code));
 int PRKILL (XINT *job);
 int CNVDATE (XLONG *ltime, XCHAR *outstr, XINT *maxch);
 XINT PRCLDPR (XINT *job);
@@ -117,7 +117,7 @@ XINT XISATTY (XINT *fd);
 XINT PRFILBUF (XINT *fd);
 int PRENVSET (XINT *pid, XCHAR *envvar, XCHAR *valuestr);
 XBOOL ITOB (XINT *integer_value);
-int ONERROR (funcptr_t *user_proc);
+int ONERROR (int (*user_proc)(XINT *status));
 int XONERR (XINT *status);
 XINT GETPID (void);
 int CNVTIME (XLONG *ltime, XCHAR *outstr, XINT *maxch);
@@ -134,7 +134,7 @@ int ENVLIST (XINT *fd, XCHAR *prefix, XINT *print_redefined_variables);
 int ENVRESET (XCHAR *key, XCHAR *value);
 XINT PRSTATI (XINT *pid, XINT *param);
 int PRSIGNAL (XINT *pid, XINT *signal);
-XINT IRAF_MAIN (XCHAR *a_cmd, XINT *a_inchan, XINT *a_outchan, XINT *a_errchan, XINT *a_driver, XINT *a_devtype, XINT *prtype, XCHAR *bkgfile, XINT *jobcode, funcptr_t *sys_runtask, funcptr_t *onentry);
+XINT IRAF_MAIN (XCHAR *a_cmd, XINT *a_inchan, XINT *a_outchan, XINT *a_errchan, XINT *a_driver, XINT *a_devtype, XINT *prtype, XCHAR *bkgfile, XINT *jobcode, int (*sys_runtask)(XCHAR *task, XCHAR *cmd, XINT *ruk_argoff, XINT *ruk_interact), XINT (*onentry)(XINT *prtype, XCHAR *bkgfile, XCHAR *cmd));
 XINT BTOI (XBOOL *boolean_value);
 int STTYCO (XCHAR *args, XINT *ttin, XINT *ttout, XINT *outfd);
 XINT OSCMD (XCHAR *cmd, XCHAR *infile, XCHAR *outfile, XCHAR *errfile);
