@@ -773,7 +773,7 @@ defpar (char *param_spec)
 	breakout (sbuf, &pkname, &ltname, &pname, &junk);
 
 	switch ((XINT) lookup_param (pkname, ltname, pname)) {
-	case NULL:
+	case 0:
 	case ERR:
 	    return (NO);
 	default:

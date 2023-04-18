@@ -263,7 +263,7 @@ int
 defpac (char *pkname)
 {
 	switch ((XINT) pacfind (pkname)) {
-	case NULL:
+	case 0:
 	    return (NO);
 	case ERR:
 	    cl_error (E_UERR, e_pckambig, pkname);
@@ -334,18 +334,18 @@ deftask (char *task_spec)
 	if (pkname[0] != '\0') {	/* explicit package named	*/
 	    if ((pkp = pacfind (pkname)) == NULL)
 		cl_error (E_UERR, e_pcknonexist, pkname);
-	    if ((stat = (XINT) ltaskfind (pkp, ltname, 1)) == NULL)
+	    if ((stat = (XINT) ltaskfind (pkp, ltname, 1)) == 0)
 		return (NO);
 
 	} else {			/* search all packages		*/
 	    pkp = reference (package, pachead);
-	    stat = NULL;
+	    stat = 0;
 
 	    while (pkp != NULL) {
 		stat = (XINT) ltaskfind (pkp, ltname, 1);
 		if (stat == ERR)
 		    break;
-		else if (stat != NULL)
+		else if (stat != 0)
 		    return (YES);
 		pkp = pkp->pk_npk;
 	    }
@@ -353,7 +353,7 @@ deftask (char *task_spec)
 
 	if (stat == ERR)
 	    cl_error (E_UERR, e_tambig, ltname);
-	if (stat != NULL)
+	if (stat != 0)
 	    return (YES);
 	return (NO);
 }

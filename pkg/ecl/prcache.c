@@ -240,7 +240,7 @@ pr_pconnect (
 	    intr_disable();
 	    if ((pr->pr_pid = c_propen (process, &fd_in, &fd_out)) == NULL) {
 		intr_enable();
-		return (NULL);
+		return (0);
 	    }
 	    intr_enable();
 
@@ -273,7 +273,7 @@ pr_pdisconnect (struct process *pr)
 	/* Ignore attempts to dump active processes.  This might happen
 	 * when an active process executes a command which calls dumpcache.
 	 */
-	if (pr == NULL || pr->pr_pid == NULL || pr_busy(pr))
+	if (pr == NULL || pr->pr_pid == 0 || pr_busy(pr))
 	    return;
 
 	if (cltrace)
@@ -311,7 +311,7 @@ pr_setcache (int new_szprcache)
 	     * then dump the cache.
 	     */
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
-		if (pr->pr_pid != NULL && (pr->pr_flags & P_LOCKED))
+		if (pr->pr_pid != 0 && (pr->pr_flags & P_LOCKED))
 		    strcpy (pname[nprocs++], pr->pr_name);
 	    pr_dumpcache (0, 1);
 	}
@@ -350,7 +350,7 @@ pr_findproc (char *process)
 	struct	process *pr;
 
 	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
-	    if (pr->pr_pid != NULL && pr_idle(pr))
+	    if (pr->pr_pid != 0 && pr_idle(pr))
 		if (strcmp (process, pr->pr_name) == 0)
 		    return (pr);
 	}
@@ -375,7 +375,7 @@ pr_cachetask (
 	ltp = ltasksrch ("", ltname);
 	if (ltp->lt_flags & (LT_SCRIPT|LT_BUILTIN))
 	    return (ERR);
-	if ((pid = pr_pnametopid(findexe(ltp->lt_pkp,ltp->lt_pname))) == NULL) {
+	if ((pid = pr_pnametopid(findexe(ltp->lt_pkp,ltp->lt_pname))) == 0) {
 	    pid = pr_connect (findexe(ltp->lt_pkp,ltp->lt_pname), "\n", &fdummy,
 		&fdummy, stdin, stdout, stderr, 0,0,0, 0);
 	    pr_disconnect (pid);
@@ -396,7 +396,7 @@ pr_lock (
 {
 	struct process *pr;
 
-	if (pid != NULL) {
+	if (pid != 0) {
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
 		if (pr->pr_pid == pid) {
 		    pr->pr_flags |= P_LOCKED;
@@ -418,7 +418,7 @@ pr_unlock (
 {
 	struct process *pr;
 
-	if (pid != NULL)
+	if (pid != 0)
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
 		if (pr->pr_pid == pid)
 		    return (pr->pr_flags &= ~P_LOCKED);
@@ -532,7 +532,7 @@ pr_getpno (void)
 
 
 /* PR_PNAMETOPID -- Lookup the named process in the cache and return the pid
- * if found, NULL otherwise.
+ * if found, 0 otherwise.
  */
 int
 pr_pnametopid (char *pname)
@@ -558,9 +558,9 @@ pr_chdir (register int pid, char *newdir)
 
 	pr_checkup();
 	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
-	    if (pr->pr_pid == NULL || !pr_idle(pr))
+	    if (pr->pr_pid == 0 || !pr_idle(pr))
 		continue;
-	    else if (pid == NULL || pr->pr_pid == pid)
+	    else if (pid == 0 || pr->pr_pid == pid)
 		c_prchdir (pr->pr_pid, newdir);
 	}
 }
@@ -576,9 +576,9 @@ pr_envset (register int pid, char *envvar, char *valuestr)
 
 	pr_checkup();
 	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
-	    if (pr->pr_pid == NULL || !pr_idle(pr))
+	    if (pr->pr_pid == 0 || !pr_idle(pr))
 		continue;
-	    else if (pid == NULL || pr->pr_pid == pid)
+	    else if (pid == 0 || pr->pr_pid == pid)
 		c_prenvset (pr->pr_pid, envvar, valuestr);
 	}
 }
@@ -599,7 +599,7 @@ pr_checkup (void)
 	 * causing premature termination.
 	 */
 	for (pr=pr_cache, n=sz_prcache;  --n >= 0;  pr++) {
-	    if (pr->pr_pid != NULL) {
+	    if (pr->pr_pid != 0) {
 		if (c_prstati (pr->pr_pid, PR_STATUS) == P_DEAD) {
 		    pr->pr_flags = 0;
 		    pr_pdisconnect (pr);
@@ -624,7 +624,7 @@ onipc (
 	register struct	process *pr;
 
 	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
-	    if (pr->pr_pid != NULL) {
+	    if (pr->pr_pid != 0) {
 		if (c_prstati (pr->pr_pid, PR_STATUS) == P_DEAD)
 		    break;
 	    }
