@@ -3,8 +3,6 @@
 
 #include <stdio.h>
 #include <strings.h>
-#define import_spp
-#include <iraf.h>
 
 #include "bootlib.h"
 

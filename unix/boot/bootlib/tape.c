@@ -4,13 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <ctype.h>
 
-#define	NOKNET
-#define import_spp
-#define import_finfo
-#define import_knames
-#include <iraf.h>
+#include "bootlib.h"
 
 /*
  * TAPE.C -- Generalized binary file i/o to a tape drive or other devices.
@@ -61,18 +56,6 @@ static	XLONG offset = 0;
 
 static  int os_mtname (char *fname, char *osdev);
 
-extern  int ZZOPMT(PKCHAR *device, XINT *acmode, PKCHAR *devcap, XINT *devpos, XINT *newfile, XINT *chan);
-extern	int ZOPNBF(PKCHAR *osfn, XINT *mode, XINT *chan);
-extern	int ZCLSBF(XINT *fd, XINT *status);
-extern	int ZZCLMT(XINT *chan, XINT *devpos, XINT *o_status);
-extern  int ZARDBF(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
-extern	int ZAWTBF(XINT *fd, XINT *status);
-extern	int ZZRDMT(XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
-extern	int ZZWTMT(XINT *chan, XINT *devpos, XINT *o_status);
-extern	int ZAWRBF(XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
-extern	int ZZWRMT(XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
-
-
 
 /* TAPE_OPEN -- Open the named file, which need not actually be a tape device.
  */
@@ -84,7 +67,6 @@ tape_open (
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	chan;
-	extern  char *vfn2osfn(char *vfn, int new);
 
 
 	if (strcmp (fname, "stdin") == 0) {

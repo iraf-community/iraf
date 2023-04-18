@@ -2,6 +2,7 @@
  */
 
 #include <string.h>
+
 #include "bootlib.h"
 
 #define	SZ_CMD		2048
@@ -14,7 +15,6 @@ os_cmd (char *cmd)
 	PKCHAR	x_cmd[SZ_CMD+1];
 	PKCHAR	nullstr[1];
 	XINT	status;
-	extern  int ZOSCMD(PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR  *stdout_file, PKCHAR *stderr_file, XINT *status);
 
 
 	strncpy ((char *)x_cmd, cmd, SZ_CMD);

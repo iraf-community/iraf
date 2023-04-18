@@ -3,14 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#define	NOLIBCNAMES
-#define	import_spp
-#define	import_libc
-#define	import_xnames
-#define	import_knames
-#include <iraf.h>
 #include "bootlib.h"
-
 
 static	char	vfn[SZ_PATHNAME+1];
 

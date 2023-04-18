@@ -70,6 +70,11 @@
 #undef import_xnames
 #endif
 
+#ifdef import_vosproto
+#include "iraf_vosproto.h"
+#undef import_vosproto
+#endif
+
 #ifdef import_knames
 #include "iraf_knames.h"
 #undef import_knames

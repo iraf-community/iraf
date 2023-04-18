@@ -2,7 +2,6 @@
  */
 
 #include <string.h>
-#define	import_xnames
 #include "bootlib.h"
 
 
@@ -78,7 +77,7 @@ _os_getenv (
 	PKCHAR	symbol[SZ_FNAME+1];
 	PKCHAR	value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
-	extern int ZGTENV(PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
+
 
 	strcpy ((char *)symbol, envvar);
 	ZGTENV (symbol, value, &x_maxch, &status);
@@ -107,7 +106,6 @@ _os_getenv (
 	XCHAR	x_symbol[SZ_FNAME+1];
 	XCHAR	x_value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
-	extern  XINT ENVFIND(XCHAR *key, XCHAR *value, XINT *maxch);
 
 
 	os_strupk (envvar, x_symbol, SZ_FNAME);

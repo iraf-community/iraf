@@ -5,7 +5,6 @@
 #define import_knames
 #include <iraf.h>
 
-
 void 	loadpkgenv (char *pkg);
 void 	_envinit (void);
 void 	loadenv (char *osfn);

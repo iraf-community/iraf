@@ -11,8 +11,6 @@ os_delete (char *fname)
 {
 	XINT	status;
 
-	extern  int ZFDELE(PKCHAR *fname, XINT *status);
-
 
 	ZFDELE ((PKCHAR *)vfn2osfn (fname, 0), &status);
 	return (status);

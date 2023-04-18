@@ -4,10 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define	import_spp
-#define	import_xnames
-#include <iraf.h>
-
 #include "bootlib.h"
 
 #define	SETENV		"zzsetenv.def"
@@ -102,8 +98,6 @@ _envinit (void)
 	char	osfn[SZ_PATHNAME+1], *hlib;
 	char	irafarch[SZ_PATHNAME+1];
 
-	extern  void ENVINIT(void), ENVRESET(XCHAR *key, XCHAR *value);
-
 
 	if (initialized++)
 	    return;
@@ -150,8 +144,6 @@ loadenv (char *osfn)
 	XCHAR	name[SZ_FNAME+1], value[SZ_VALUE+1];
 	FILE	*fp, *sv_fp[MAXLEV];
 	int	lev=0;
-
-	extern  void ENVRESET(XCHAR *key, XCHAR *value);
 
 
 	if ((fp = fopen (osfn, "r")) == NULL) {

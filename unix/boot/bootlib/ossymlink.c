@@ -2,8 +2,6 @@
  */
 
 #include <unistd.h>
-#include <iraf.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 
