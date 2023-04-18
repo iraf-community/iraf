@@ -60,7 +60,6 @@ should be used wherever they would be used in a UNIX/C system.
       charp = getenv (envvar)                          NULL
         charp = gets (buf)                             NULL      NULL
          word = getw (fp)                              EOF       EOF
-       charp = index (str, ch)                         NULL
         double = log (x)
       double = log10 (x)
 	  int = nint (x)
@@ -79,7 +78,6 @@ should be used wherever they would be used in a UNIX/C system.
 	       qsort (array, len, isize, compar)
      charp = realloc (buf, newsize)                    NULL
               rewind (fp)                              EOF
-      charp = rindex (str, ch)
        nscan = scanf (format, argp)                    EOF       EOF
       nscan = fscanf (fp, format, argp)                EOF       EOF
       nscan = sscanf (str, format, argp)               EOF       EOF
@@ -88,13 +86,6 @@ should be used wherever they would be used in a UNIX/C system.
           setlinebuf (fp)
         double = sin (x)
        double = sqrt (x)
-      charp = strcat (s1, s2)
-      charp = strcmp (s1, s2)
-      charp = strcpy (s1, s2)
-        int = strlen (str)
-     charp = strncat (s1, s2, n)
-     charp = strncmp (s1, s2, n)
-     charp = strncpy (s1, s2, n)
        stat = system (cmd)
          ch = ungetc (ch, fp)                          EOF
 

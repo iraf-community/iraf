@@ -3483,13 +3483,6 @@ u_setlinebuf    setlinebuf
 u_setucc        u_setucc
 u_sprintf       sprintf
 u_sscanf        sscanf
-u_strcat        strcat
-u_strcmp        strcmp
-u_strcpy        strcpy
-u_strlen        strlen
-u_strnp         strncmp
-u_strnt         strncat
-u_strny         strncpy
 u_system        system
 u_ungetc        ungetc
 uid_executing   uid_executing

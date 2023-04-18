@@ -1,6 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
 #include <ctype.h>
 
 #define import_spp

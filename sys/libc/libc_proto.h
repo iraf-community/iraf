@@ -297,22 +297,6 @@ extern char *u_sprintf(char *str, char *format, ...);
 /* stgio.c */
 extern int c_stggetline(int fd, char *buf, int maxch);
 extern int c_stgputline(int fd, char *buf);
-/* strcat.c */
-extern char *u_strcat(char *s1, char *s2);
-/* strcmp.c */
-extern int u_strcmp(char *s1, char *s2);
-/* strdup.c */
-extern char *u_strdup(char *str);
-/* strcpy.c */
-extern char *u_strcpy(char *s1, char *s2);
-/* strlen.c */
-extern int u_strlen(char *s);
-/* strncat.c */
-extern char *u_strnt(char *s1, char *s2, int n);
-/* strncmp.c */
-extern int u_strnp(char *s1, char *s2, int n);
-/* strncpy.c */
-extern char *u_strny(char *s1, char *s2, int n);
 /* system.c */
 extern int u_system(char *cmd);
 /* ungetc.c */

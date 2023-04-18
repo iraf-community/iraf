@@ -72,7 +72,7 @@ extern	char		MEMCOM[];
 #define	fwrite		u_fwrite
 #define	gets		u_gets
 #define	getw		u_getw
-#define	index		u_index
+#define	index		strchr
 #define	isatty		u_isatty
 #define	malloc		u_malloc
 #define	mktemp		u_mktemp
@@ -83,23 +83,13 @@ extern	char		MEMCOM[];
 #define	qsort		u_qsort
 #define	realloc		u_realloc
 #define	rewind		u_rewind
-#define	rindex		u_rindex
+#define	rindex		strrchr
 #define	scanf		u_scanf
 #define	setbuf		u_setbuf
 #define	setbuffer	u_setfbf		/* collision	*/
 #define	setlinebuf	u_setlinebuf
 #define	sprintf		u_sprintf
 #define	sscanf		u_sscanf
-#define	strcat		u_strcat
-#define	strchr		u_index
-#define	strcmp		u_strcmp
-#define	strdup		u_strdup
-#define	strcpy		u_strcpy
-#define	strlen		u_strlen
-#define	strncat		u_strnt			/* collision	*/
-#define	strncmp		u_strnp			/* collision	*/
-#define	strncpy		u_strny			/* collision	*/
-#define	strrchr		u_rindex
 #define	system		u_system
 #define	ungetc		u_ungetc
 
@@ -138,19 +128,11 @@ extern char    *calloc (unsigned int nelems, unsigned int elsize);
 extern char    *envget (char *var);
 extern char    *fgets (char *buf, int maxch, struct _iobuf *fp);
 extern char    *gets (char *buf);
-extern char    *index (char *str, int ch);
 extern char    *malloc (unsigned nbytes);
 extern char    *mktemp (char *template);
 extern char    *freadline (char *prompt);
 extern char    *realloc (char *buf, unsigned newsize);
-extern char    *rindex (char *str, int ch);
 extern char    *sprintf (char *str, char *format, ...);
-extern char    *strcat (char *s1, char *s2);
-extern char    *strdup (char *str);
-extern char    *strcpy (char *s1, char *s2);
-extern char    *strncat (char *s1, char *s2, int n);
-extern char    *strncpy (char *s1, char *s2, int n);
-extern int	strncmp (char *s1, char *s2, int n);
 
 extern double   atof (char *str);
 extern float    c_ttygr (XINT tty, char *cap);
@@ -243,8 +225,6 @@ extern int	putw (int word, struct _iobuf *fp);
 extern int	scanf (char *format, ...);
 extern int	spf_open (char *buf, int maxch);
 extern int	sscanf (char *str, char *format, ...);
-extern int	strcmp (char *s1, char *s2);
-extern int	strlen (char *s);
 extern int	system (char *cmd);
 extern int	ungetc (int ch, struct _iobuf *fp);
 extern long	atol (char *str);

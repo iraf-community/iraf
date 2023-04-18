@@ -2,6 +2,7 @@
  */
 
 #include <ctype.h>
+#include <string.h>
 
 #define	import_spp
 #define	import_libc
