@@ -129,8 +129,3 @@
 #include "iraf_ttset.h"
 #undef import_ttset
 #endif
-
-#ifdef import_stdarg
-#include "iraf_stdarg.h"
-#undef import_stdarg
-#endif

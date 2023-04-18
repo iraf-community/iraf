@@ -23,15 +23,6 @@ files which reference the C library.  The include file "stdio.h"
 should be used wherever they would be used in a UNIX/C system.
 
 
-IMPORTANT NOTE:
-
-    Routines marked VARARGS are machine dependent in that they assume a
-certain ordering (left to right) for the argument list.  On some machines
-the ordering may be the opposite.
-
-TODO: Rewrite these procedures to use the UNIX <varargs.h> macros.
-
-
 1. LIBC Emulation of UNIX C-Library Procedures
 
                    syntax                              err       eof

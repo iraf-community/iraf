@@ -1,11 +1,12 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <stdarg.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
-#define	import_stdarg
 #include <iraf.h>
 
 extern void u_doprnt(char *format, va_list *argp, FILE *fp);

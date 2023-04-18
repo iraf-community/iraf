@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <stdarg.h>
+
 
 #ifdef __linux__
 #include <sys/mtio.h>
@@ -29,7 +31,6 @@
 #define	import_kernel
 #define	import_knames
 #define	import_zfstat
-#define	import_stdarg
 #define import_spp
 #include <iraf.h>
 

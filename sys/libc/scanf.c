@@ -2,11 +2,11 @@
 */
 
 #include <ctype.h>
+#include <stdarg.h>
 
 #define	import_spp
 #define	import_libc
 #define	import_stdio
-#define	import_stdarg
 #include <iraf.h>
 
 
