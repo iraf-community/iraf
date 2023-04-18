@@ -64,7 +64,7 @@ c_propen (
 	XINT  x_in = *in, x_out = *out;
 
 	iferr (pid = (unsigned int) PROPEN (c_sppstr(process), &x_in, &x_out))
-	    return (NULL);
+	    return (0);
 	else {
 	    *in = (int) x_in;
 	    *out = (int) x_out;

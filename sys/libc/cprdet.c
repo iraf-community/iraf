@@ -51,7 +51,7 @@ c_propdpr (
 	c_strupk (bkgfile, spp_bkgfile, SZ_PATHNAME);
 	c_strupk (bkgmsg,  spp_bkgmsg,  SZ_LINE);
 	iferr (job = PROPDPR (c_sppstr(process), spp_bkgfile, spp_bkgmsg))
-	    return (NULL);
+	    return (0);
 	else
 	    return (job);
 }
