@@ -3,11 +3,11 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #define import_spp
 #define import_libc
 #define import_xnames
-#define import_math
 #define import_stdio
 #include <iraf.h>
 

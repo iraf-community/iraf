@@ -3,12 +3,12 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #define	import_spp
 #define	import_libc
 #define	import_stdio
 #define	import_xnames
-#define	import_math
 #include <iraf.h>
 
 #include "config.h"
@@ -295,7 +295,7 @@ unop (int opcode)
 	    break;
 	case OP_NINT:
 	    if (in_type == OT_REAL)
-		iresult = nint (rval);
+		iresult = nearbyint (rval);
 	    else
 		iresult = ival;
 	    break;

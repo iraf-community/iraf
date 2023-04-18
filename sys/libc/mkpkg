@@ -325,8 +325,6 @@ libc.a:
 	malloc.c	<libc/iraf_libc.h> <libc/iraf_xnames.h>\
 			<libc/iraf_spp.h>
 
-	mathf.f
-
 	mktemp.c	<libc/iraf_libc.h> <libc/iraf_spp.h>
 
 	perror.c	<libc/iraf_libc.h> <libc/iraf_spp.h>\

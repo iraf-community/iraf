@@ -27,17 +27,11 @@ should be used wherever they would be used in a UNIX/C system.
 
                    syntax                              err       eof
 
-       double = asin (x)
-       double = acos (x)
-       double = atan (x)
-      double = atan2 (x, y)
        double = atof (str)                              0.
           int = atoi (str)                              0
          long = atol (str)                              0
       charp = calloc (nelems, elsize)                  NULL
             clearerr (fp)
-        double = cos (x)
-        double = exp (x)
               fclose (fp)                              EOF
        FILE = fdopen (fd, modestr)                     NULL
          bool = feof (fp)
@@ -60,13 +54,9 @@ should be used wherever they would be used in a UNIX/C system.
       charp = getenv (envvar)                          NULL
         charp = gets (buf)                             NULL      NULL
          word = getw (fp)                              EOF       EOF
-        double = log (x)
-      double = log10 (x)
-	  int = nint (x)
       charp = malloc (nbytes)                          NULL
       charp = mktemp (template)                        NULL
               perror (prefix)
-        double = pow (x, y)
               printf (format, argp)
              fprintf (fp, format, argp)
              sprintf (str, format, argp)
@@ -84,8 +74,6 @@ should be used wherever they would be used in a UNIX/C system.
               setbuf (fp, buf)
            setbuffer (fp, buf, size)
           setlinebuf (fp)
-        double = sin (x)
-       double = sqrt (x)
        stat = system (cmd)
          ch = ungetc (ch, fp)                          EOF
 

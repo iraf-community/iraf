@@ -61,8 +61,7 @@ libpkg.a:
 	$set	xflags = "$(xflags) -qx"
 
 	binop.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
-			<libc/iraf_xnames.h> <libc/iraf_math.h>\
-			config.h operand.h errs.h
+			<libc/iraf_xnames.h> config.h operand.h errs.h
 
 	bkg.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_knames.h>\
@@ -180,8 +179,7 @@ libpkg.a:
 
 	unop.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_xnames.h>\
-			<libc/iraf_math.h> config.h\
-			operand.h errs.h task.h param.h
+			config.h operand.h errs.h task.h param.h
 
 	ytab.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> config.h mem.h operand.h\

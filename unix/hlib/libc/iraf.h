@@ -110,11 +110,6 @@
 #undef import_alloc
 #endif
 
-#ifdef import_math
-#include "iraf_math.h"
-#undef import_math
-#endif
-
 #ifdef import_prstat
 #include "iraf_prstat.h"
 #undef import_prstat
