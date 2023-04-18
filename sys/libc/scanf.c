@@ -1,10 +1,11 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <ctype.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
-#define	import_ctype
 #define	import_stdarg
 #include <iraf.h>
 
@@ -21,6 +22,7 @@
 #define	SZ_UCC		128		/* maximum size user char class	*/
 #define	HUGE		999
 #define	ISHEX(c)	((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+#define	tointeg(c)	((c)-'0')
 
 struct _format {
 	int	f_type;			/* field type (doxscef[%)	*/

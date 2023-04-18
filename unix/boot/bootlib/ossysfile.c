@@ -2,6 +2,7 @@
  */
 
 #include <string.h>
+#include <ctype.h>
 #include "bootlib.h"
 
 /* Uncomment the following if the kernel for this machine does not need

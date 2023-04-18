@@ -10,14 +10,12 @@ $checkin  libc.a lib$
 $exit
 
 libc.a:
-	atof.c		<libc/iraf_ctype.h> <libc/iraf_libc.h>\
-			<libc/iraf_spp.h> <libc/iraf_xnames.h>
+	atof.c		<libc/iraf_libc.h> <libc/iraf_spp.h>\
+			<libc/iraf_xnames.h>
 
-	atoi.c		<libc/iraf_ctype.h> <libc/iraf_libc.h>\
-			<libc/iraf_spp.h>
+	atoi.c		<libc/iraf_libc.h> <libc/iraf_spp.h>
 
-	atol.c		<libc/iraf_ctype.h> <libc/iraf_libc.h>\
-			<libc/iraf_spp.h>
+	atol.c		<libc/iraf_libc.h> <libc/iraf_spp.h>
 
 	caccess.c	<libc/iraf_libc.h> <libc/iraf_xnames.h>\
 			<libc/iraf_spp.h>
@@ -126,9 +124,8 @@ libc.a:
 	ckimapc.c	<libc/iraf_libc.h> <libc/iraf_xnames.h>\
 			<libc/iraf_spp.h>
 
-	clexnum.c	<libc/iraf_ctype.h> <libc/iraf_lexnum.h>\
-			<libc/iraf_spp.h> <libc/iraf_xnames.h>\
-			<libc/iraf_libc.h>
+	clexnum.c	<libc/iraf_lexnum.h> <libc/iraf_spp.h>\
+			<libc/iraf_xnames.h> <libc/iraf_libc.h>
 
 	cmktemp.c	<libc/iraf_libc.h> <libc/iraf_xnames.h>\
 			<libc/iraf_spp.h>
@@ -241,8 +238,6 @@ libc.a:
 	cttystati.c	<libc/iraf_libc.h> <libc/iraf_spp.h>\
 			<libc/iraf_xnames.h>
 
-	ctype.c		<libc/iraf_ctype.h>
-
 	cungetc.c	<libc/iraf_libc.h> <libc/iraf_spp.h>\
 			<libc/iraf_xnames.h>
 
@@ -339,9 +334,8 @@ libc.a:
 	perror.c	<libc/iraf_libc.h> <libc/iraf_spp.h>\
 			<libc/iraf_stdio.h> <libc/iraf_xnames.h>
 
-	printf.c	<libc/iraf_ctype.h> <libc/iraf_libc.h>\
-			<libc/iraf_spp.h> <libc/iraf_stdio.h>\
-			<libc/iraf_xnames.h>
+	printf.c	<libc/iraf_libc.h> <libc/iraf_spp.h>\
+			<libc/iraf_stdio.h> <libc/iraf_xnames.h>
 
 	puts.c		<libc/iraf_libc.h> <libc/iraf_spp.h>\
 			<libc/iraf_stdio.h>
@@ -359,8 +353,8 @@ libc.a:
 
 	rindex.c	<libc/iraf_libc.h> <libc/iraf_spp.h>
 
-	scanf.c		<libc/iraf_ctype.h> <libc/iraf_libc.h>\
-			<libc/iraf_spp.h> <libc/iraf_stdio.h>
+	scanf.c		<libc/iraf_libc.h> <libc/iraf_spp.h>\
+			<libc/iraf_stdio.h>
 
 	setbuf.c	<libc/iraf_fset.h> <libc/iraf_libc.h>\
 			<libc/iraf_spp.h> <libc/iraf_stdio.h>

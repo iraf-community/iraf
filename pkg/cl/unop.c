@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
@@ -8,7 +10,6 @@
 #define	import_math
 #include <iraf.h>
 
-#include <ctype.h>
 #include "config.h"
 #include "operand.h"
 #include "errs.h"

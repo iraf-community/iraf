@@ -1,9 +1,10 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+
 #define import_spp
 #define	import_libc
-#define	import_ctype
 #define	import_xnames
 #define	import_lexnum
 #include <iraf.h>

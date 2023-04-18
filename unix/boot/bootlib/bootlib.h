@@ -1,7 +1,4 @@
 #include <stdio.h>
-#ifdef NOVOS
-#include <ctype.h>
-#endif
 
 #define	import_spp
 #define	NOKNET
@@ -10,7 +7,6 @@
 #ifndef NOVOS
 #define NOLIBCNAMES
 #define import_libc
-#define import_ctype
 #define import_vosproto
 #endif
 #include <iraf.h>

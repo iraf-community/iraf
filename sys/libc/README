@@ -18,8 +18,8 @@ This directory contains
 		memory management
 		exception handling
 
-The header files "irafio.h" and "names.h" should be included in all C files
-which reference the C library.  The include files "stdio.h" and "ctype.h"
+The header files "irafio.h" and "names.h" should be included in all C
+files which reference the C library.  The include file "stdio.h"
 should be used wherever they would be used in a UNIX/C system.
 
 

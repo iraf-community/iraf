@@ -1,6 +1,5 @@
 LIBC (C library) include files
 
-	ctype		character classes, conversions
 	error		c_erract actions
 	finfo		c_finfo data structure
 	fset		FIO set/stat parameter

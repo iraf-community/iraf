@@ -199,7 +199,6 @@ extern void c_ttyseti(XINT tty, int param, int value);
 extern void c_ttyso(int fd, XINT tty, int onoff);
 /* cttystati.c */
 extern XINT c_ttystati(XINT tty, int param);
-/* ctype.c */
 /* cungetc.c */
 extern int c_ungec(int fd, int ch);
 /* cungetl.c */

@@ -1,11 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <ctype.h>
+
 #define	import_spp
 #define	import_libc
-#define	import_ctype
 #include <iraf.h>
 
+#define	tointeg(c)	((c)-'0')
 
 /* ATOL -- Ascii to long integer.  Convert a simple integer in decimal radix to
 ** a binary long integer value.

@@ -5,13 +5,13 @@
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
-#define	import_ctype
 #define	import_stdarg
 #include <iraf.h>
 
 extern void u_doprnt(char *format, va_list *argp, FILE *fp);
 extern void u_doarg(FILE *fp, XCHAR *formspec, va_list **argp, int prec[], int varprec, int dtype);
 
+#define	todigit(c)	((c)+'0')
 
 
 /* PRINTF -- Emulation of the UNIX printf facilities with the IRAF FMTIO

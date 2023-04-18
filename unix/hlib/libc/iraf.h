@@ -40,11 +40,6 @@
 #undef import_error
 #endif
 
-#ifdef import_ctype
-#include "iraf_ctype.h"
-#undef import_ctype
-#endif
-
 #ifdef import_finfo
 #include "iraf_finfo.h"
 #undef import_finfo
