@@ -1,9 +1,10 @@
 #include <stdio.h>
-#include <ctype.h>
+
 #define	import_spp
 #define	NOKNET
 #define	import_knames
 #define import_kernel
+#define import_ctype
 #include <iraf.h>
 
 #include "../bootProto.h"

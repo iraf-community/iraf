@@ -3,13 +3,13 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #define	import_spp
 #define	import_xnames
 #include <iraf.h>
 
 #include "bootlib.h"
 
-#define	isspace(c)	((c)==' '||(c)=='\t'||(c)=='\n')
 #define	SETENV		"zzsetenv.def"
 #define	SZ_VALUE	SZ_COMMAND
 #define	MAXLEV		8
