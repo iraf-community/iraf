@@ -660,10 +660,10 @@ binop (int opcode)
 		/* Note: need to move fp_equald() to libc */
 		if (typecode) {
 		    double x1 = VALU(&o1), x2 = VALU(&o2);
-		    iresult = btoi (fpequd_ (&x1, &x2));
+		    iresult = btoi (FP_EQUALD (&x1, &x2));
 		} else {
 		    double x1 = o1.o_val.v_i, x2 = o2.o_val.v_i;
-		    iresult = btoi (fpequd_ (&x1, &x2));
+		    iresult = btoi (FP_EQUALD (&x1, &x2));
 		}
 		typecode = 0;	/* force integer result		*/
 		break;

@@ -99,6 +99,7 @@
 #define	FNTOPN		fntopn_
 #define	FOWNER		fowner_
 #define	FPATHNAME	fpathe_
+#define	FP_EQUALD	fpequd_
 #define	FPRINTF		fprinf_
 #define	FREDIR		fredir_
 #define	FREDIRO		fredio_
@@ -231,6 +232,9 @@
 #define	XDEVOWNER	xdevor_
 #define	XDEVSTATUS	xdevss_
 #define XER_RESET	xerret_
+#define	XERPSH		xerpsh_
+#define	XERPOP		xerpop_
+#define	XERPOPI		xerpoi_
 #define	XEXP		xexp_
 #define	XLOG		xlog_
 #define	XLOG10		xlog10_

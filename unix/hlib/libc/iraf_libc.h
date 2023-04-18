@@ -25,9 +25,6 @@ typedef	int		XLONG;
 
 #define	FIOCOM		fiocom_		/* [MACHDEP] */
 #define	MEMCOM		mem_
-#define	XERPSH		xerpsh_
-#define	XERPOP		xerpop_
-#define	XERPOPI		xerpoi_
 #define	c_main		cmain_
 
 /* Error handling.
