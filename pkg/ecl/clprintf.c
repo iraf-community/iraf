@@ -2,6 +2,7 @@
  */
 
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define import_spp
@@ -123,6 +124,18 @@ prparamval (
 }
 
 
+/* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
+ */
+static int
+qstrcmp (
+  const void	*a,
+  const void  *b
+)
+{
+	return (strcmp (*(char **)a, *(char **)b));
+}
+
+
 /* STRSORT -- Sort a list of pointers to strings.
  */
 void
@@ -131,21 +144,7 @@ strsort (
   int	nstr			/* number of strings */
 )
 {
-	extern	int qstrcmp();
-
 	qsort ((char *)list, nstr, sizeof(char *), qstrcmp);
-}
-
-
-/* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
- */
-int
-qstrcmp (
-  char	*a, 
-  char  *b
-)
-{
-	return (strcmp (*(char **)a, *(char **)b));
 }
 
 

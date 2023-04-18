@@ -65,7 +65,6 @@ should be used wherever they would be used in a UNIX/C system.
         ch = putchar (ch)                              EOF
                 puts (str)
          word = putw (word, fp)                        EOF
-	       qsort (array, len, isize, compar)
      charp = realloc (buf, newsize)                    NULL
               rewind (fp)                              EOF
        nscan = scanf (format, argp)                    EOF       EOF

@@ -339,8 +339,6 @@ libc.a:
 	putw.c		<libc/iraf_libc.h> <libc/iraf_spp.h>\
 			<libc/iraf_stdio.h>
 
-	qsort.c		<libc/iraf_libc.h>
-
 	realloc.c	<libc/iraf_libc.h> <libc/iraf_xnames.h>\
 			<libc/iraf_spp.h>
 

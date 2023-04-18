@@ -3468,7 +3468,6 @@ u_perror        perror
 u_printf        printf
 u_puts          puts
 u_putw          putw
-u_qsort         qsort
 u_realloc       realloc
 u_rewind        rewind
 u_rindex        rindex

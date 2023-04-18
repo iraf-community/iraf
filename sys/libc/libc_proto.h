@@ -269,8 +269,6 @@ extern void u_fprintf(struct _iobuf *fp, char *format, ...);
 extern int u_puts(char *str);
 /* putw.c */
 extern int u_putw(int word, struct _iobuf *fp);
-/* qsort.c */
-extern void u_qsort(char *base, int n, int size, int (*compar)(void));
 /* realloc.c */
 extern char *u_realloc(char *buf, unsigned newsize);
 /* rewind.c */

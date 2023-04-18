@@ -81,7 +81,6 @@ extern	char		MEMCOM[];
 #define	printf		u_printf
 #define	puts		u_puts
 #define	putw		u_putw
-#define	qsort		u_qsort
 #define	realloc		u_realloc
 #define	rewind		u_rewind
 #define	scanf		u_scanf
@@ -286,7 +285,6 @@ extern void	fputs (char *str, struct _iobuf *fp);
 extern void	free (char *buf);
 extern void	perror (char *prefix);
 extern void	printf (char *format, ...);
-extern void	qsort (char *base, int n, int size, int  (*compar) (char *, char *));
 extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
