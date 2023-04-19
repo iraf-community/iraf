@@ -79,9 +79,9 @@ again:	    fgets (line, SZ_LINE, pp->p_listfp);
 		result = makeop (eofstr, OT_STRING);
 
 	    } else {
-		char *index(), *nlp, *ip;
+		char *nlp, *ip;
 
-		nlp = index (line, '\n');
+		nlp = strchr (line, '\n');
 		if (nlp != NULL)
 		    *nlp = '\0';
 

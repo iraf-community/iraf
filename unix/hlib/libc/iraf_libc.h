@@ -72,7 +72,6 @@ extern	char		MEMCOM[];
 #define	fwrite		u_fwrite
 #define	gets		u_gets
 #define	getw		u_getw
-#define	index		strchr
 #define	isatty		u_isatty
 #define	malloc		u_malloc
 #define	mktemp		u_mktemp
@@ -83,7 +82,6 @@ extern	char		MEMCOM[];
 #define	qsort		u_qsort
 #define	realloc		u_realloc
 #define	rewind		u_rewind
-#define	rindex		strrchr
 #define	scanf		u_scanf
 #define	setbuf		u_setbuf
 #define	setbuffer	u_setfbf		/* collision	*/

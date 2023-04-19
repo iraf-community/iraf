@@ -105,7 +105,6 @@ extern	char	cmdblk[SZ_CMDBLK+1];	/* Command buffer in history.c */
 extern	char	*ip_cmdblk;		/* Pointer to current char in command.*/
 extern	char	*err_cmdblk;		/* ip_cmdblk when error detected. */
 
-char	*index();
 struct	param *initparam();
 struct	label *getlabel(), *setlabel();
 
@@ -2007,7 +2006,7 @@ index	:	expr1 {
 			int  i1, i2, mode;
 
 			if (!errcnt) {
-			    if (index(curr_param, '.') != NULL) {
+			    if (strchr(curr_param, '.') != NULL) {
 				errmsg = exlimits;
 				EYYERROR;
 			    }

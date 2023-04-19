@@ -92,7 +92,7 @@ int	eh_standout = YES;		/* ehist default for standout         */
 int	eh_bol      = NO;		/* start ehist at beginning of line   */
 int	eh_verify   = NO;		/* use ehist with history meta-chars  */
 
-char	*e_tonextword(), *e_toprevword(), *index();
+char	*e_tonextword(), *e_toprevword();
 
 int eparam (struct ep_context *cx, int *update, int *nextcmd, char *nextpset);
 
@@ -669,7 +669,7 @@ e_encode_vstring (
 			 * use the %g format directly.
 			 */
 			sprintf (colbuf, "%10g ", o.o_val.v_r);
-		        if (index (colbuf, '.') == NULL)
+		        if (strchr (colbuf, '.') == NULL)
 			    strcat (colbuf, ".");
 		    } else {
 			poffset (i-1);

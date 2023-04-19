@@ -100,7 +100,7 @@ gquery (struct param *pp, char *string)
 	}
 
 	/* Cancel the newline. */
-	if ((nlp = index (ip, '\n')) != NULL)
+	if ((nlp = strchr (ip, '\n')) != NULL)
 	    *nlp = '\0';
 
 	/* Finally, we have handled the pathological cases.

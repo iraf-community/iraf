@@ -1821,10 +1821,9 @@ scanmode (char *s)
 	static	char *badstr = "bad mode string `%s'";
 	char	strings[4][25];
 	int	i, n;
-	char *index();
 
 	str = s;
-	if (index (str, ',') != NULL || index (str, '+') != NULL) {
+	if (strchr (str, ',') != NULL || strchr (str, '+') != NULL) {
 	    if (*str == '"' || *str == '\'')
 		str++;
 

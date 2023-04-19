@@ -247,14 +247,13 @@ map_escapes (
 	register char	*ip = input;
 	register char	*op = output;
 	register int	n;
-	char	*index();
 
 	while (*ip != '\0') {
 	    if (*ip == '\\') { 
 		switch (*++ip) {
 		case 'b': case 'e': case 'f':
 		case 'n': case 'r': case 't':
-		    *op++ = ecodes[index(echars,*ip++)-echars];
+		    *op++ = ecodes[strchr(echars,*ip++)-echars];
 		    break;
 		default:
 		    if (isdigit (*ip)) {

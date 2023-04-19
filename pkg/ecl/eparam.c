@@ -98,7 +98,7 @@ int	eh_readline 	= YES;		/* use readline() for terminal input  */
 #endif
 int	eh_longprompt 	= YES;		/* print full package name as prompt  */
 
-char	*e_tonextword(), *e_toprevword(), *index();
+char	*e_tonextword(), *e_toprevword();
 
 char	epar_cmdbuf[SZ_LINE];
 
@@ -680,7 +680,7 @@ e_encode_vstring (
 			 * use the %g format directly.
 			 */
 			sprintf (colbuf, "%10g ", o.o_val.v_r);
-		        if (index (colbuf, '.') == NULL)
+		        if (strchr (colbuf, '.') == NULL)
 			    strcat (colbuf, ".");
 		    } else {
 			poffset (i-1);

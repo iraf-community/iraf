@@ -412,13 +412,12 @@ process_history_directive (char *directive, char *new_command_block)
 	char	last_command_block[SZ_CMDBLK+1];
 	int	execute=1, edit=0;
 	int	record;
-	char	*rindex();
 
 	ip = directive + 1;			/* skip the '^'		*/
 	op = new_command_block;
 
 	/* Chop the newline. */
-	if ((p = rindex (ip, '\n')) != NULL)
+	if ((p = strrchr (ip, '\n')) != NULL)
 	    *p = EOS;
 
 	/* Scan the directive string to determine whether or not we have
@@ -671,7 +670,6 @@ expand_history_macros (char *in_text, char *out_text)
 	register char *ip, *op, *ap;
 	char	cmdblk[SZ_CMDBLK+1], *argp[100];
 	int	nargs=0, nrep=0, argno=0, have_arg_strings=0;
-	char	*index();
 
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
@@ -690,7 +688,7 @@ expand_history_macros (char *in_text, char *out_text)
 		if (ip > in_text && *(ip-1) == '\\') {
 		    *(--op) = HISTCHAR;				/* \^	*/
 		    continue;
-		} else if (!isdigit(*(ip+1)) && index(ARGCHARS,*(ip+1)) == NULL)
+		} else if (!isdigit(*(ip+1)) && strchr(ARGCHARS,*(ip+1)) == NULL)
 		    continue;
 
 		/* Parse the argument list of the previous command if have not

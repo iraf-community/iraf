@@ -243,7 +243,6 @@ traverse (int delim)
 	register char *op, *cp, ch;
 	static	char *esc_ch  = "ntfr\\\"'";
 	static	char *esc_val = "\n\t\f\r\\\"\'";
-	char	*index();
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
 	    if (*op == delim) {
@@ -273,7 +272,7 @@ traverse (int delim)
 		    }
 		    unput (ch);
 		    continue;
-		} else if ((cp = index (esc_ch, *op)) != NULL) {
+		} else if ((cp = strchr (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
 		} else if (isdigit (*op)) {	/* '\0DD' octal constant   */
 		    *op -= '0';

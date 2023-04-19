@@ -332,10 +332,9 @@ get_nscanval (void)
 void
 lentst (char *buf)
 {
-	char	*index();
 	char	*bp;
 
-	bp = index (buf, '\n');
+	bp = strchr (buf, '\n');
 	if (bp != NULL)
 	    *bp = '\0';
 	else

@@ -417,7 +417,6 @@ addltask (struct package *pkp, char *ptname, char *ltname, int redef)
 {
 	register char *cp;
 	register struct ltask *ltp;
-	char	*rindex();
 	char	*ltbase;
 	int	flags;
 
@@ -437,7 +436,7 @@ addltask (struct package *pkp, char *ptname, char *ltname, int redef)
 
 	/* Check for trailing .bt etc. specs on logical task name.
 	 */
-	if ((cp = rindex (ltbase, '.')) != NULL) {
+	if ((cp = strrchr (ltbase, '.')) != NULL) {
 	    /* replace '.' with '\0' in hopes of finding valid specs.
 	     * if invalid, put back before giving error diagnostic.
 	     */
@@ -470,7 +469,7 @@ addltask (struct package *pkp, char *ptname, char *ltname, int redef)
 	/* Check for trailing .cl spec in physical task name to indicate
 	 * a script task, or a .par to indicate a pset task.
 	 */
-	if (ptname && (cp = rindex (ptname, '.')) != NULL) {
+	if (ptname && (cp = strrchr (ptname, '.')) != NULL) {
 	    cp++;
 	    if (!strcmp (cp, "cl"))
 		flags |= LT_SCRIPT;

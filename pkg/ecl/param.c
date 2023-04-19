@@ -949,7 +949,6 @@ printparam (struct param *pp, register FILE *fp)
 {
 	register int type, bastype;
 	register char *bp;
-	char	*index();
 	char	buf[20];
 	int	arrflag;
 	int	size_arr=0;

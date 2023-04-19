@@ -459,7 +459,6 @@ clchdir (void)
 	register struct pfile *pfp;
 	struct	operand o;
 	char	*dirname;
-	char	*index(), *envget();
 
 	pfp = newtask->t_pfp;
 	if (nargs (pfp) <= 0) {
