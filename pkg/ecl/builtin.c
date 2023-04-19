@@ -352,11 +352,11 @@ clflprcache (void)
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
 		ltp = ltasksrch ("", o.o_val.v_s);
 		if (ltp->lt_flags & (LT_SCRIPT|LT_BUILTIN|LT_FOREIGN|LT_PSET))
-		    pid = NULL;
+		    pid = 0;
 		else
 		    pid = pr_pnametopid (findexe(ltp->lt_pkp,
 			ltp->lt_u.ltu_pname));
-		if (pid == NULL) {
+		if (pid == 0) {
 		    eprintf ("Warning: task `%s' not in cache\n", o.o_val.v_s);
 		    continue;
 		}
@@ -385,7 +385,7 @@ flpr_task (char *task)
 
 	ltp = ltasksrch ("", task);
 	if (ltp->lt_flags & (LT_SCRIPT|LT_BUILTIN|LT_FOREIGN|LT_PSET))
-	    pid = NULL;
+	    pid = 0;
 	else
 	    pid = pr_pnametopid (findexe(ltp->lt_pkp, ltp->lt_u.ltu_pname));
 
@@ -2246,7 +2246,7 @@ clonerror (void)
 	extern  char *onerr_handler;
 
 
-	handler[0] = NULL;
+	handler[0] = '\0';
 	pushbparams (pfp->pf_pp);
 	if (nargs(pfp) > 0) {
 	    popop();			/* discard the $n name		*/

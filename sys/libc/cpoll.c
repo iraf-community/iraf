@@ -31,7 +31,7 @@ c_poll_open ( void )
 	XINT	fds;
 
 	iferr ((fds = (XINT) POLL_OPEN ()))
-	    return (NULL);
+	    return (0);
 	else 
 	    return (fds);
 }

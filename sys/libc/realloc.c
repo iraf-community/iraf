@@ -20,7 +20,7 @@ realloc (
 	XINT	x_nchars = (newsize + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	XINT	x_ptr, x_dtype = TY_CHAR;
 
-	x_ptr = buf ? Memcptr(buf) : NULL;
+	x_ptr = buf ? Memcptr(buf) : 0;
 	iferr (REALLOC (&x_ptr, &x_nchars, &x_dtype))
 	    return (NULL);
 	else
