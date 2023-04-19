@@ -8,9 +8,6 @@ $exit
 
 libboot.a:
 	$set XFLAGS = "-c $(HSI_XF)"
-	bytmov.c
-	osamovb.c
-
 	envinit.c
 
 	osaccess.c	bootlib.h

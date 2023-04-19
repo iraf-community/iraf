@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+#include "bootlib.h"
+
 #define	SECONDS_1970_TO_1980	315532800L
 static	long os_timezone(void);
 

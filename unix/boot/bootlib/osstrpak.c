@@ -1,9 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#define import_spp
-#include <iraf.h>
-
+#include "bootlib.h"
 
 /* OS_STRPAK -- Pack an SPP string (type XCHAR) into a C string in a user
  * supplied buffer.  Return a pointer to the output buffer.

@@ -2,10 +2,10 @@
  */
 
 #include <unistd.h>
-#include <iraf.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include "bootlib.h"
 
 /* OS_SYMLINK -- Determine if a file is a symbolic link.
  */

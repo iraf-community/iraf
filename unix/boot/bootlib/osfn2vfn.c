@@ -3,14 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#define	NOLIBCNAMES
-#define	import_spp
-#define	import_libc
-#define	import_xnames
-#define	import_knames
-#include <iraf.h>
 #include "bootlib.h"
-
 
 static	char	vfn[SZ_PATHNAME+1];
 
@@ -45,9 +38,6 @@ osfn2vfn (
 	XCHAR	x_vfn[SZ_PATHNAME+1];
 	XINT	x_maxch = SZ_PATHNAME;
 	XINT	x_mode, vp, nchars;
-
-	extern  void _envinit(void);
-
 
 	_envinit();
 	

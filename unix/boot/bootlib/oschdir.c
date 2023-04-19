@@ -4,10 +4,6 @@
 #include "bootlib.h"
 
 
-extern int  os_fpathname (char *vfn, char *osfn, int maxch);
-
-
-
 /* OS_CHDIR -- Change the current default directory.  Note that the kernel
  * procedure ZFCHDR should only be called with the full pathname of a 
  * directory.
@@ -18,11 +14,6 @@ os_chdir (char *dir)
 	XCHAR	dpath[SZ_PATHNAME+1];
 	XCHAR	osdir[SZ_PATHNAME+1];
 	XINT	sz_osdir, status, x_maxch=SZ_PATHNAME;
-
-	extern  int ZFXDIR(XCHAR *osfn, XCHAR  *osdir, XINT *maxch, XINT   *nchars);
-	extern	int ZFGCWD(PKCHAR  *outstr, XINT *maxch, XINT *status);
-	extern	int ZFSUBD(XCHAR *osdir, XINT *maxch, XCHAR *subdir, XINT *nchars);
-	extern	int ZFCHDR(PKCHAR  *newdir, XINT *status);
 
 
 	os_fpathname (dir, (char *)dpath, SZ_PATHNAME);

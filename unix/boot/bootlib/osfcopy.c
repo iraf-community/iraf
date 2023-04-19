@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include "bootlib.h"
 
-extern	int  os_access (char *fname, int mode, int type);
-
 
 /* OS_FCOPY -- Copy a file.  Used by RTAR to resolve links.
  */
@@ -20,11 +18,6 @@ os_fcopy (
 {
 	XCHAR	buf[SZ_FBUF];
 	XINT	status,	junk, maxch = SZ_FBUF, mode = 0, in, out, n;
-
-	extern  int ZOPNTX(PKCHAR *osfn, XINT *mode, XINT *chan);
-	extern  int ZGETTX(XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-	extern	int ZCLSTX(XINT *fd, XINT *status);
-	extern	int ZPUTTX(XINT *fd, XCHAR *buf, XINT *nchars, XINT *status);
 
 
 	if (os_access (oldfile,0,0) == NO)

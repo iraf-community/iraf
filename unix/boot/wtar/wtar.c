@@ -580,7 +580,7 @@ copyfile (
 		    /* Copy overflow back to beginning... */
 		    if (nbytes > TBLOCK) {
 			nleft = nbytes - TBLOCK;
-			os_amovb (&buf[TBLOCK], buf, nbytes - TBLOCK);
+			memmove (buf, &buf[TBLOCK], nbytes - TBLOCK);
 		    } else
 			nleft = 0;
 
@@ -626,7 +626,7 @@ putblock (int out, char *buf)
 	int	nbytes = 0;
 
 	if (buf) {
-	    os_amovb (buf, nextblock, TBLOCK);
+	    memmove (nextblock, buf, TBLOCK);
 	    nextblock += TBLOCK;
 	    if (++nblocks == NBLOCK)
 		nbytes = SZ_TAPEBUFFER;

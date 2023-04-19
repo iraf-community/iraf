@@ -3,20 +3,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#define	NOLIBCNAMES
-#define	import_spp
-#define	import_libc
-#define	import_xnames
-#define	import_knames
-#include <iraf.h>
 
 #define	FINIT
 #include "bootlib.h"
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
-extern	char	*os_getenv(char *envvar);
-
 
 #ifdef NOVOS
 
@@ -84,9 +76,6 @@ vfn2osfn (
 	XINT	vp, mode, maxch = SZ_PATHNAME;
 	PKCHAR	upkvfn[SZ_PATHNAME+1];
 	int	err;
-
-        extern  void  _envinit(void);
-
 
 
 	/* Copy the input filename into local storage before calling envinit,

@@ -2,10 +2,9 @@
  */
 
 #include <stdio.h>
-
 #include <string.h>
-#define	import_spp
-#include <iraf.h>
+
+#include "bootlib.h"
 
 /* OS_STRUPK -- Unpack a C string into an SPP string.  This procedure should
  * be called from C in preference to the SPP procedure STRUPK because the

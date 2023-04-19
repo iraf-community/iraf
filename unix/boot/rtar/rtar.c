@@ -792,7 +792,7 @@ strip_blanks (int in, int out, long nbytes)
 	op = padbuf;
 	while (nbytes > 0 && (ip = getblock (in)) != NULL) {
 	    n = nbytes < TBLOCK ? (int)nbytes : TBLOCK;
-	    os_amovb (ip, op, n + sizeof(XCHAR)-1);
+	    memmove (op, ip, n + sizeof(XCHAR)-1);
 	    nbytes -= n;
 	    op += n;
 	}

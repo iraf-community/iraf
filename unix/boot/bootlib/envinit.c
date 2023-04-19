@@ -3,29 +3,15 @@
 
 #include <stdio.h>
 #include <string.h>
-#define	import_spp
-#define	import_xnames
-#include <iraf.h>
 
-#define	isspace(c)	((c)==' '||(c)=='\t'||(c)=='\n')
+#include "bootlib.h"
+
 #define	SETENV		"zzsetenv.def"
 #define	SZ_VALUE	SZ_COMMAND
 #define	MAXLEV		8
 #define	PKGLIBS		"pkglibs"
 #define	IRAFARCH	"IRAFARCH"
 #define	ARCH		"arch"
-
-extern	char  *_os_getenv (char *envvar, char *outstr, int maxch);
-extern	char  *os_getenv (char *envvar);
-extern	char  *os_strpak (XCHAR *sppstr, char *cstr, int maxch);
-extern	char  *vfn2osfn (char *vfn, int new);
-extern  XCHAR *os_strupk (char *str, XCHAR *outstr, int maxch);
-extern	void   os_putenv (char *name, char *value);
-extern	int bdebug;
-
-void 	_envinit (void);
-void 	loadenv (char *osfn);
-
 
 
 /* LOADPKGENV -- Load the environment definitions for the named package.
@@ -112,8 +98,6 @@ _envinit (void)
 	char	osfn[SZ_PATHNAME+1], *hlib;
 	char	irafarch[SZ_PATHNAME+1];
 
-	extern  void ENVINIT(void), ENVRESET(XCHAR *key, XCHAR *value);
-
 
 	if (initialized++)
 	    return;
@@ -160,8 +144,6 @@ loadenv (char *osfn)
 	XCHAR	name[SZ_FNAME+1], value[SZ_VALUE+1];
 	FILE	*fp, *sv_fp[MAXLEV];
 	int	lev=0;
-
-	extern  void ENVRESET(XCHAR *key, XCHAR *value);
 
 
 	if ((fp = fopen (osfn, "r")) == NULL) {
