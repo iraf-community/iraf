@@ -66,9 +66,6 @@ extern	int nextpipe;		/* pipe stack pointer (next index)	*/
 extern	int dobkg;		/* flag bkg execution 			*/
 
 extern	memel cl_dictbuf[];	/* static dictionary area		*/
-extern	long c_clktime(long reftime);
-extern	unsigned int c_prfodpr(void);
-extern	char *findexe();
 
 #define	SZ_CMD		40		/* command in jobs table	*/
 #define	SZ_ENVDEF	1024		/* max size environment define	*/
@@ -129,7 +126,6 @@ bkg_spawn (
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
 	int	curpid = c_getpid();
-	void	pr_initcache();
 
 	/* Find first unused slot in a circular search.
 	 */

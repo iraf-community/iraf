@@ -816,7 +816,6 @@ sexa (char *s)
 	int	n, sign;
 	int	hr, minutes;
 	float	sec;
-	extern double atof();
 
 	o.o_type = OT_REAL;
 	sign = (*s == '-') ? (s++, -1) : 1;

@@ -56,7 +56,6 @@ extern	int cldebug, cltrace;		/* debug/trace flags		     */
 extern	int lastjobno;			/* last background job spawned	     */
 extern	int gologout;			/* flag to execute() to cause logout */
 extern  int logout_status;      	/* optional arg to logout()          */
-extern	char *findexe();
 
 /* Device Allocation stuff (really should be in a separate package).
  */

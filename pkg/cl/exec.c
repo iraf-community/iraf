@@ -38,8 +38,6 @@ extern	int yeof;		/* parser saw EOF			*/
 extern	int gologout;		/* user typed logout()			*/
 extern	int loggingout;		/* in the process of logging out	*/
 
-char	*findexe();
-
 
 /* RUN -- Run the code beginning at pc until we run an EXEC instruction of
  *   something other than a builtin command or END instruction.

@@ -58,7 +58,6 @@ extern	int gologout;			/* flag to execute() to cause logout */
 extern  int logout_status;      	/* optional arg to logout()          */
 extern  int errorline;			/* error recover line		     */
 extern  int currentline;		/* line currently being executed     */
-extern	char *findexe();
 
 extern	int do_error;			/* for error recovery/trapping 	     */
 

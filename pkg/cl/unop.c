@@ -46,7 +46,6 @@ unop (int opcode)
 	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];
 	char	ch, sbuf[SZ_LINE];
-	char	*envget();
 	int 	i;
 
 	o = popop();			/* pop operand from stack	*/

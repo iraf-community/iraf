@@ -1142,7 +1142,6 @@ addparam (struct pfile *pfp, char *buf, FILE *fp)
 	int	arrflag;	/* Is param an array?			*/
 	struct arr_desc *parrd;	/* Pointer to array descriptor.		*/
 	int	size_arr=0;	/* Size of array.			*/
-	extern double atof();
 	char	**tbuf;
 
 	pp = newparam (pfp);

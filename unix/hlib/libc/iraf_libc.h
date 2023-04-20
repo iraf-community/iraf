@@ -236,6 +236,7 @@ extern long	rewind (struct _iobuf *fp);
 extern short   *c_sppstr (char *str);
 extern short   *c_strupk (char *str, short *outstr, int maxch);
 extern unsigned int c_propdpr (char *process, char *bkgfile, char *bkgmsg);
+extern unsigned int c_prfodpr(void);
 extern unsigned int c_propen (char *process, int *in, int *out);
 extern void	c_devstatus (char *device, int out);
 extern void	c_envlist (XINT fd, char *prefix, int show_redefs);
