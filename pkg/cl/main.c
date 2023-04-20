@@ -67,7 +67,7 @@ static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
-static	XINT intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
+static	funcptr_t intr_save[LEN_INTRSTK];/* the interrupt save stack	*/
 memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
@@ -88,7 +88,7 @@ static void execute();
 static void login(), logout();
 static void startup(), shutdown();
 
-extern void c_xwhen(), onint();
+static void onint (int *vex, int (**next_handler)(void));
 extern int yyparse();
 
 
@@ -182,7 +182,7 @@ clshutdown (void)
 static void
 startup (void)
 {
-	void	onipc();
+	void	onipc(int *vex, funcptr_t *next_handler);
 
 	/* Set up pointers to dictionary buffer.
 	 */
@@ -196,7 +196,7 @@ startup (void)
 	/* Post exception handlers for interrupt and write to IPC with no
 	 * reader.  The remaining exceptions use the standard handler.
 	 */
-	c_xwhen (X_IPC, onipc, &old_onipc);
+	c_xwhen (X_IPC, (funcptr_t)onipc, &old_onipc);
 	intr_reset();
 
 	/* The following is a temporary solution to an initialization problem
@@ -570,7 +570,7 @@ memneed (
  *   before shutting down.
  */
 /* ARGSUSED */
-void
+static void
 onint (
   int	*vex,			/* virtual exception code	*/
   int	(**next_handler)(void) 	/* next handler to be called	*/
@@ -639,7 +639,7 @@ intr_disable (void)
 	if (intr_sp >= LEN_INTRSTK)
 	    cl_error (E_IERR, "interrupt save stack overflow");
 	c_xwhen (X_INT, X_IGNORE, &junk);
-	intr_save[intr_sp++] = (XINT) junk;
+	intr_save[intr_sp++] = junk;
 }
 
 
@@ -665,7 +665,7 @@ intr_reset (void)
 {
 	funcptr_t	junk;
 
-	c_xwhen (X_INT, onint, &junk);
+	c_xwhen (X_INT, (funcptr_t)onint, &junk);
 	intr_sp = 0;
 }
 

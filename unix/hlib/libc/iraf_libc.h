@@ -281,6 +281,7 @@ extern void	c_wmsec (int msec);
 extern void	c_xgmes (int *oscode, char *oserrmsg, int maxch);
 extern void	c_xonerr (int errcode);
 extern void	c_xttysize (int *ncols, int *nlines);
+extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
 extern void	eprintf (char *format, ...);
 extern void	fprintf (struct _iobuf *fp, char *format, ...);
 extern void	fputs (char *str, struct _iobuf *fp);
@@ -292,12 +293,6 @@ extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
 extern void	spf_close (XINT fd);
 extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
-
-/*  The following have conflicts because of the order in which the
-**  include files are done in iraf.h.  Commented out for now.
-extern int	c_finfo (char *fname, struct _finfo *fi);
-extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
-*/
 
 #endif
 
