@@ -42,13 +42,24 @@ CFLAGS += $(CARCH)
 export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 
-.PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace
+.PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace starttime
 
 all:: sysgen
 
 # Do a full sysgen, which consists on the host binaries, the core
 # system, and the NOAO package.
-sysgen: host core noao
+sysgen: starttime host core noao
+	@echo "============== IRAF build was successful! ==============="
+	@echo
+	@echo "Start: $(shell date -r .build_started)"
+	@echo "End:   $(shell date)"
+	@echo
+	@echo "You may now run \"make test\" for a quick test of the build"
+	@rm -f .build_started
+
+# Just create a file on sysgen start so that its creation time can be used
+starttime:
+	touch .build_started
 
 # Bootstrap first stage: build xc, mkpkg etc. without the Virtual
 # Operating System (VOS)
@@ -88,7 +99,7 @@ clean:
 	$(MAKE) -C vendor clean
 	find ./local ./math ./pkg ./sys ./noao/[adfimnorst]* \
 	     -type f -name \*.\[aeo\] -exec rm -f {} \;
-	rm -f $(bin)/* noao/bin$(arch)/* $(hbin)* \
+	rm -f $(bin)/* noao/bin$(arch)/* $(hbin)* .build_started \
 	      include/drvrsmem.h include/fitsio.h include/fitsio2.h \
 	      include/longnam.h include/votParse.h include/votParse_spp.h
 
