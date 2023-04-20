@@ -33,8 +33,6 @@ char	*uparmdir = UPARM;
 long	filetime();
 static	void mapname();
 
-extern  int c_finfo();
-
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
  * Set pfp->pf_ltp to ltp.  Null out all unused fields.  Call error() and don't

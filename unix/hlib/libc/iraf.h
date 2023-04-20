@@ -15,6 +15,11 @@
 /* Include any header files specified in "#define import_XXX" statements
  * before we were called.
  */
+#ifdef import_finfo
+#include "iraf_finfo.h"
+#undef import_finfo
+#endif
+
 #ifdef import_libc
 #include "iraf_libc.h"
 #undef import_libc
@@ -38,11 +43,6 @@
 #ifdef import_error
 #include "iraf_error.h"
 #undef import_error
-#endif
-
-#ifdef import_finfo
-#include "iraf_finfo.h"
-#undef import_finfo
 #endif
 
 #ifdef import_fset

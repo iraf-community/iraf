@@ -244,6 +244,7 @@ extern void	c_envputs (char *var, char *value);
 extern void	c_envreset (char *var, char *value);
 extern void	c_erract (int action);
 extern void	c_error (int errcode, char *errmsg);
+extern int	c_finfo (char *fname, struct _finfo *fi);
 extern void	c_flush (XINT fd);
 extern void	c_fseti (XINT fd, int param, int value);
 extern void	c_gflush (int stream);

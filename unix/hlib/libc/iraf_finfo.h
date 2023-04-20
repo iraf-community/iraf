@@ -3,6 +3,8 @@
 #ifndef D_iraf_finfo_h
 #define D_iraf_finfo_h
 
+#include "iraf_spp.h"
+
 #define	SZ_OWNERSTR		16
 #define	FI_REGULAR		1	/* file types			*/
 #define	FI_DIRECTORY		2
