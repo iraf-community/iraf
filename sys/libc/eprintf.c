@@ -8,8 +8,6 @@
 #define	import_stdio
 #include <iraf.h>
 
-extern void u_doprnt(char *format, va_list *argp, FILE *fp);
-
 
 /* EPRINTF -- Formatted print to the standard error output.
 */
@@ -19,7 +17,7 @@ eprintf (char *format, ...)
 	va_list	argp;
 
 	va_start (argp, format);
-	u_doprnt (format, &argp, stderr);
+	vfprintf (stderr, format, argp);
 	va_end (argp);
 	(void) fflush (stderr);
 }

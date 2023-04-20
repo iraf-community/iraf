@@ -11,8 +11,6 @@
 
 #define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
 
-extern void u_doprnt(char *format, va_list *argp, FILE *fp);
-
 
 /* SPRINTF -- Formatted print to a string.  If char and XCHAR are the
 ** same size we open the output string as a file and write directly into
@@ -43,7 +41,7 @@ sprintf (char *str, char *format, ...)
 	x_fd = STROPEN (fiobuf, &x_maxch, &x_mode);
 
 	/* Format the data into obuf.  */
-	u_doprnt (format, &argp, FDTOFP(x_fd));
+	vfprintf (FDTOFP(x_fd), format, argp);
 
 	/* FIO does not write the EOS until the string file is closed.
 	 * Move obuf to str if it is not already there.

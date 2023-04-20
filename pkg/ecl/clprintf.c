@@ -16,8 +16,6 @@
 #include "errs.h"
 #include "proto.h"
 
-extern void u_doprnt();
-
 
 /*
  * CLPRINTF -- These are just printf's with various implied write files for
@@ -34,7 +32,7 @@ eprintf (char *fmt, ...)
 
 	va_start (args, fmt);
 	eout = currentask->t_stderr;
-	u_doprnt (fmt, &args, eout);
+	vfprintf (eout, fmt, args);
 	va_end (args);
 	fflush (eout);
 }
@@ -50,7 +48,7 @@ oprintf (char *fmt, ...)
 
 	va_start (args, fmt);
 	sout = currentask->t_stdout;
-	u_doprnt (fmt, &args, sout);
+	vfprintf (sout, fmt, args);
 	va_end (args);
 	fflush (sout);
 }
@@ -72,7 +70,7 @@ tprintf (char *fmt, ...)
 	    currentask->t_ltp->lt_lname);
 	else {
 	    va_start (args, fmt);
-	    u_doprnt (fmt, &args, out);
+	    vfprintf (out, fmt, args);
 	    va_end (args);
 	    fflush (out);
 	    if (ferror (out))

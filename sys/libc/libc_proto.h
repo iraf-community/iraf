@@ -265,10 +265,6 @@ extern void u_perror(char *prefix);
 /* printf.c */
 extern void u_printf(char *format, ...);
 extern void u_fprintf(struct _iobuf *fp, char *format, ...);
-/*
-extern void u_doprnt(char *format, va_list *argp, struct _iobuf *fp);
-extern void u_doarg(struct _iobuf *fp, short *formspec, va_list **argp, int prec[], int varprec, int dtype);
-*/
 /* puts.c */
 extern int u_puts(char *str);
 /* putw.c */

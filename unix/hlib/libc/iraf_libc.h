@@ -7,6 +7,8 @@
 #define	D_iraf_libc_h
 #define	D_iraf_libc_h_proto
 
+#include <stdarg.h>
+
 #include "iraf_spp.h"
 
 typedef	short		XCHAR;
@@ -89,6 +91,7 @@ extern	char		MEMCOM[];
 #define	sprintf		u_sprintf
 #define	sscanf		u_sscanf
 #define	system		u_system
+#define	vfprintf	u_vfprintf
 #define	ungetc		u_ungetc
 
 /* C_SPP names not unique in the first seven characters.
@@ -288,6 +291,7 @@ extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
 extern void	spf_close (XINT fd);
+extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
 
 /*  The following have conflicts because of the order in which the
 **  include files are done in iraf.h.  Commented out for now.
@@ -297,8 +301,6 @@ extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handle
 
 #endif
 
-/*
-*/
 #include "iraf_vosproto.h"
 
 #endif /* D_iraf_libc_h */

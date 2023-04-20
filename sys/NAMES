@@ -3439,8 +3439,6 @@ u_atoi          atoi
 u_atol          atol
 u_calloc        calloc
 u_crackformat   u_crackformat
-u_doarg         u_doarg
-u_doprnt        u_doprnt
 u_doscan        u_doscan
 u_envget        envget
 u_eprintf       eprintf
@@ -3485,6 +3483,7 @@ u_sprintf       sprintf
 u_sscanf        sscanf
 u_system        system
 u_ungetc        ungetc
+u_vfprintf      vfprintf
 uid_executing   uid_executing
 uio_bwrite      uio_bwrite
 ungete          ungetline
