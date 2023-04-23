@@ -1,12 +1,10 @@
 LIBC (C library) include files
 
-	ctype		character classes, conversions
 	error		c_erract actions
 	finfo		c_finfo data structure
 	fset		FIO set/stat parameter
 	knames		external kernel names
 	libc		must be included by all files which use libc
-	math		UNIX math functions
 	spp		SPP language definitions
 	stdio		UNIX standard i/o
 	xnames		SPP external names

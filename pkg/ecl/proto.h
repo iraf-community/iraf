@@ -92,7 +92,6 @@ extern void oprintf(char *fmt, ...);
 extern void tprintf(char *fmt, ...);
 extern void prparamval(struct param *pp, struct _iobuf *fp);
 extern void strsort(char *list[], int nstr);
-extern int qstrcmp(char *a, char *b);
 extern void strtable(struct _iobuf *fp, char *list[], int nstr, int first_col, int last_col, int maxch, int ncol);
 /* clsystem.c */
 extern void clsystem(char *cmd, struct _iobuf *taskout, struct _iobuf *taskerr);
@@ -269,7 +268,6 @@ extern int cmain_(short *cmd);
 extern void clexit(void);
 extern void clshutdown(void);
 extern char *memneed(int incr);
-extern void onint(int *vex, int (**next_handler)(void));
 extern void intr_disable(void);
 extern void intr_enable(void);
 extern void intr_reset(void);

@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
@@ -194,7 +196,6 @@ pr_pconnect (
 	struct	process *pr_findproc();
 	struct	_finfo fi;
 	int	fd_in, fd_out;
-	extern  int c_finfo (char *name, struct _finfo *fi);
 
 	if (pr_head == NULL)
 	    pr_initcache();

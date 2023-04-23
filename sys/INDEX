@@ -3629,8 +3629,6 @@ ttysubi            53 ./tty/ttysubi.x    int procedure ttysubi (ctrlstr, outstr,
 ttywrite           18 ./tty/ttywrite.x   procedure ttywrite (fd, tty, ctrlstr, nchars, afflncnt)
 u_allocstat         3 ../unix/os/zalloc.c u_allocstat (aliases)
 u_crackformat       4 ./libc/scanf.c     u_crackformat (format, fmt)
-u_doarg             3 ./libc/printf.c    u_doarg (fp, formspec, argp, prec, varprec, dtype)/
-u_doprnt            2 ./libc/printf.c    u_doprnt (format, argp, fp)
 u_doscan            3 ./libc/scanf.c     u_doscan (in, format, argp)
 u_scannum           5 ./libc/scanf.c     u_scannum (in, argp, fmt, eofflag)
 u_scanstr           8 ./libc/scanf.c     u_scanstr (in, argp, fmt, eofflag)

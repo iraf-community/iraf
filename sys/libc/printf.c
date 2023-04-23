@@ -1,17 +1,17 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <stdarg.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
-#define	import_ctype
-#define	import_stdarg
 #include <iraf.h>
 
-extern void u_doprnt(char *format, va_list *argp, FILE *fp);
-extern void u_doarg(FILE *fp, XCHAR *formspec, va_list **argp, int prec[], int varprec, int dtype);
+static void u_doarg(FILE *fp, XCHAR *formspec, int prec[], int varprec);
 
+#define	todigit(c)	((c)+'0')
 
 
 /* PRINTF -- Emulation of the UNIX printf facilities with the IRAF FMTIO
@@ -35,7 +35,7 @@ printf (char *format, ...)
         va_list argp;
 
 	va_start (argp, format);
-	u_doprnt (format, &argp, stdout);
+	vfprintf (stdout, format, argp);
 	va_end (argp);
 }
 
@@ -48,22 +48,22 @@ fprintf (FILE *fp, char *format, ...)
         va_list argp;
 
 	va_start (argp, format);
-	u_doprnt (format, &argp, fp);
+	vfprintf (fp, format, argp);
 	va_end (argp);
 }
 
 
-/* U_DOPRNT -- Process the format to the output file, taking arguments from
+/* VFPRINTF -- Process the format to the output file, taking arguments from
 ** the list pointed to by argp as % format specs are encountered in the input.
 ** The main point of this routine is to handle the variable number of arguments.
 ** The actual encoding is all handled by the IRAF FPRINF and PARG calls.
 ** N.B. we assume chars are stacked as ints, and floats are stacked as doubles.
 */
 void
-u_doprnt (
+vfprintf (
+  FILE	*fp,				/* output file			*/
   char *format,				/* "%w.dC" etc. format spec	*/
-  va_list *argp,			/* pointer to first value arg	*/
-  FILE	*fp				/* output file			*/
+  va_list argp				/* pointer to first value arg	*/
 )
 {
 	register int ch;		/* next format char reference	*/
@@ -72,6 +72,10 @@ u_doprnt (
 	int	done, dotseen;		/* one when at end of a format	*/
 	int	varprec;		/* runtime precision is used	*/
 	int	prec[MAX_PREC];		/* values of prec args		*/
+	XINT	ival;
+	XCHAR	sbuf[SZ_OBUF+1];
+	XDOUBLE	dval;
+	char	*cptr;
 
 
 	while ( (ch = *format++) ) {
@@ -97,7 +101,7 @@ u_doprnt (
 			break;
 
 		    case '*':
-			prec[varprec++] = va_arg ((*argp), int);
+			prec[varprec++] = va_arg (argp, int);
 			break;
 
 		    case '.':
@@ -109,7 +113,7 @@ u_doprnt (
 			    int		radix;
 			    int		radchar;
 
-			    radix = va_arg ((*argp), int);
+			    radix = va_arg (argp, int);
 			    if (radix < 0)
 				radchar = 'A';
 			    else if (radix > 9)
@@ -130,7 +134,9 @@ u_doprnt (
 		    case 'x':
 		    case 'u':
 			*fsp = EOS;
-			u_doarg (fp, formspec, &argp, prec, varprec, TY_INT);
+			u_doarg (fp, formspec, prec, varprec);
+			ival = va_arg (argp, int);
+			PARGI (&ival);
 			done++;
 			break;
 
@@ -165,20 +171,24 @@ rval:			if (!dotseen) {
 			}
 
 			*fsp = XEOS;
-			u_doarg (fp, formspec, &argp, prec, varprec, TY_DOUBLE);
+			u_doarg (fp, formspec, prec, varprec);
+			dval = va_arg (argp, double);
+			PARGD (&dval);
 			done++;
 			break;
 
 		    case 's':
 			*fsp = EOS;
-			u_doarg (fp, formspec, &argp, prec, varprec, TY_CHAR);
+			u_doarg (fp, formspec, prec, varprec);
+			cptr = va_arg (argp, char *);
+			PARGSTR (c_strupk (cptr, sbuf, SZ_OBUF));
 			done++;
 			break;
 
 		    case 't':			/* nonstandard UNIX	*/
 		    case 'w':			/* nonstandard UNIX	*/
 			*fsp = EOS;
-			u_doarg (fp, formspec, &argp, prec, varprec, NOARG);
+			u_doarg (fp, formspec, prec, varprec);
 			done++;
 			break;
 
@@ -199,23 +209,17 @@ rval:			if (!dotseen) {
 ** specification given by formspec.  This is the interface to the IRAF
 ** formatted output procedures.
 */
-void
+static void
 u_doarg (
   FILE		*fp,		/* output file			*/
-  XCHAR		*formspec,	/* format string		*/
-  va_list	**argp,		/* pointer to data value	*/
+  XCHAR		*formspec,	/* format string                */
   int		prec[],		/* varprec args, if any		*/
-  int		varprec,	/* number of varprec args	*/
-  int		dtype		/* datatype of data value	*/
+  int		varprec		/* number of varprec args	*/
 )
 {
 	register int	p;
-	XCHAR	sbuf[SZ_OBUF+1];
 	XINT	fd = fileno (fp);
 	XINT	ival;
-	XDOUBLE	dval;
-	char	*cptr;
-
 
 	/* Pass format string and any variable precision arguments.
 	 */
@@ -225,22 +229,4 @@ u_doarg (
 	    PARGI (&ival);
 	}
 
-	/* Pass the data value to be encoded, bump argument pointer by the
-	 * size of the data object.  If there is no data value the case
-	 * is a no-op.
-	 */
-	switch (dtype) {
-	case TY_INT:
-	    ival = va_arg ((**argp), int);
-	    PARGI (&ival);
-	    break;
-	case TY_DOUBLE:
-	    dval = va_arg ((**argp), double);
-	    PARGD (&dval);
-	    break;
-	case TY_CHAR:
-	    cptr = va_arg ((**argp), char *);
-	    PARGSTR (c_strupk (cptr, sbuf, SZ_OBUF));
-	    break;
-	}
 }

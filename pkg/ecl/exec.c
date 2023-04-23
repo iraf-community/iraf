@@ -47,8 +47,6 @@ long int run_level 	= 0;
 int 	do_error  	= YES;
 char	*onerr_handler  = NULL;
 
-char	*findexe();
-
 
 /* RUN -- Run the code beginning at pc until we run an EXEC instruction of
  *   something other than a builtin command or END instruction.

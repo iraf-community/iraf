@@ -1,10 +1,12 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_ctype
 #include <iraf.h>
 
 #include "config.h"
@@ -266,7 +268,7 @@ query (struct param *pp)
 	char	buf[SZ_PROMPTBUF+1];
 	struct	operand o;
 	int	bastype, batch, arrflag, offset=0, n_ele, max_ele, fd;
-	char	*index(), *nlp, *nextstr();
+	char	*nlp, *nextstr();
 	char	*bkg_query(), *query_status;
 	char	*abuf;
 
@@ -424,7 +426,7 @@ text_query:	fd = spf_open (buf, SZ_PROMPTBUF);
 		    goto testval;
 	    }
 
-	    if ((nlp = index (ip, '\n')) != NULL)
+	    if ((nlp = strchr (ip, '\n')) != NULL)
 		*nlp = '\0';			/* cancel the newline	*/
 	    else
 		goto testval;
@@ -940,7 +942,7 @@ inrange (register struct param *pp, register struct operand *op)
 	 */
 	if (bastype == OT_STRING && !(pp->p_flags & P_UMIN)) {
 	    char	*s, *delim, *match;
-	    char	*val, *index();
+	    char	*val;
 	    int		n;
 
 	    paramget (pp, FN_MIN);
@@ -953,7 +955,7 @@ inrange (register struct param *pp, register struct operand *op)
 	    match = NULL;
 
 	    for (delim = s = omin.o_val.v_s;  delim && *s;  s=delim+1) {
-		delim = index (s, '|');
+		delim = strchr (s, '|');
 		if (delim)
 		    *delim = '\0';
 		if (strncmp (s, val, n) == 0) {
@@ -1212,9 +1214,8 @@ parse_clmodes (struct param *pp, struct operand *newval)
 	} else if (!strcmp (name, "mode")) {
 	    /* Menu mode is not permitted at the CL level.
 	     */
-	    char   *index();
 
-	    if (index (newval->o_val.v_s, 'm') != NULL)
+	    if (strchr (newval->o_val.v_s, 'm') != NULL)
 		cl_error (E_UERR,
 		    "menu mode is permitted only for packages and tasks");
 	}

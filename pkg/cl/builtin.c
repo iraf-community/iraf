@@ -1,11 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_fset
 #define import_error
-#define import_ctype
 #define import_stdio
 #define import_alloc
 #define import_ttset
@@ -54,7 +56,6 @@ extern	int cldebug, cltrace;		/* debug/trace flags		     */
 extern	int lastjobno;			/* last background job spawned	     */
 extern	int gologout;			/* flag to execute() to cause logout */
 extern  int logout_status;      	/* optional arg to logout()          */
-extern	char *findexe();
 
 /* Device Allocation stuff (really should be in a separate package).
  */
@@ -431,7 +432,6 @@ clchdir (void)
 	register struct pfile *pfp;
 	struct	operand o;
 	char	*dirname;
-	char	*index(), *envget();
 
 	pfp = newtask->t_pfp;
 	if (nargs (pfp) <= 0) {

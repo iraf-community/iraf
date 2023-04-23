@@ -224,10 +224,6 @@
 #define	VMALLOC		vmallc_
 #define	XACOS		xacos_
 #define	XALLOCATE	xalloe_
-#define	XASIN		xasin_
-#define	XATAN		xatan_
-#define	XATAN2		xatan2_
-#define	XCOS		xcos_
 #define	XDEALLOCATE	xdeale_
 #define	XDEVOWNER	xdevor_
 #define	XDEVSTATUS	xdevss_
@@ -235,16 +231,8 @@
 #define	XERPSH		xerpsh_
 #define	XERPOP		xerpop_
 #define	XERPOPI		xerpoi_
-#define	XEXP		xexp_
-#define	XLOG		xlog_
-#define	XLOG10		xlog10_
-#define	XNINT		xnint_
 #define	XMJBUF		xmjbuf_
 #define	XONERR		xonerr_
-#define	XPOW		xpow_
-#define	XSIN		xsin_
-#define	XSQRT		xsqrt_
-#define	XTAN		xtan_
 #define	XTOC		xtoc_
 #define	XWHEN		xwhen_
 

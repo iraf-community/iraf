@@ -18,35 +18,20 @@ This directory contains
 		memory management
 		exception handling
 
-The header files "irafio.h" and "names.h" should be included in all C files
-which reference the C library.  The include files "stdio.h" and "ctype.h"
+The header files "irafio.h" and "names.h" should be included in all C
+files which reference the C library.  The include file "stdio.h"
 should be used wherever they would be used in a UNIX/C system.
-
-
-IMPORTANT NOTE:
-
-    Routines marked VARARGS are machine dependent in that they assume a
-certain ordering (left to right) for the argument list.  On some machines
-the ordering may be the opposite.
-
-TODO: Rewrite these procedures to use the UNIX <varargs.h> macros.
 
 
 1. LIBC Emulation of UNIX C-Library Procedures
 
                    syntax                              err       eof
 
-       double = asin (x)
-       double = acos (x)
-       double = atan (x)
-      double = atan2 (x, y)
        double = atof (str)                              0.
           int = atoi (str)                              0
          long = atol (str)                              0
       charp = calloc (nelems, elsize)                  NULL
             clearerr (fp)
-        double = cos (x)
-        double = exp (x)
               fclose (fp)                              EOF
        FILE = fdopen (fd, modestr)                     NULL
          bool = feof (fp)
@@ -69,14 +54,9 @@ TODO: Rewrite these procedures to use the UNIX <varargs.h> macros.
       charp = getenv (envvar)                          NULL
         charp = gets (buf)                             NULL      NULL
          word = getw (fp)                              EOF       EOF
-       charp = index (str, ch)                         NULL
-        double = log (x)
-      double = log10 (x)
-	  int = nint (x)
       charp = malloc (nbytes)                          NULL
       charp = mktemp (template)                        NULL
               perror (prefix)
-        double = pow (x, y)
               printf (format, argp)
              fprintf (fp, format, argp)
              sprintf (str, format, argp)
@@ -85,25 +65,14 @@ TODO: Rewrite these procedures to use the UNIX <varargs.h> macros.
         ch = putchar (ch)                              EOF
                 puts (str)
          word = putw (word, fp)                        EOF
-	       qsort (array, len, isize, compar)
      charp = realloc (buf, newsize)                    NULL
               rewind (fp)                              EOF
-      charp = rindex (str, ch)
        nscan = scanf (format, argp)                    EOF       EOF
       nscan = fscanf (fp, format, argp)                EOF       EOF
       nscan = sscanf (str, format, argp)               EOF       EOF
               setbuf (fp, buf)
            setbuffer (fp, buf, size)
           setlinebuf (fp)
-        double = sin (x)
-       double = sqrt (x)
-      charp = strcat (s1, s2)
-      charp = strcmp (s1, s2)
-      charp = strcpy (s1, s2)
-        int = strlen (str)
-     charp = strncat (s1, s2, n)
-     charp = strncmp (s1, s2, n)
-     charp = strncpy (s1, s2, n)
        stat = system (cmd)
          ch = ungetc (ch, fp)                          EOF
 

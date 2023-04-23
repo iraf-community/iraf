@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -39,7 +41,6 @@ gquery (struct param *pp, char *string)
 	char	*query_status, *nlp, *errmsg;
 	int	arrflag=0, offset=0, bastype=0, batch=0;
 	struct	operand o;
-	char	*strcpy(), *index();
 
 	bastype = pp->p_type & OT_BASIC;
 	batch   = firstask->t_flags & T_BATCH;
@@ -99,7 +100,7 @@ gquery (struct param *pp, char *string)
 	}
 
 	/* Cancel the newline. */
-	if ((nlp = index (ip, '\n')) != NULL)
+	if ((nlp = strchr (ip, '\n')) != NULL)
 	    *nlp = '\0';
 
 	/* Finally, we have handled the pathological cases.

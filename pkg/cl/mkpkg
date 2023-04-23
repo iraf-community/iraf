@@ -56,19 +56,17 @@ libpkg.a:
 	$set	xflags = "$(xflags) -qx"
 
 	binop.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
-			<libc/iraf_xnames.h> <libc/iraf_math.h>\
-			<libc/iraf_ctype.h> config.h operand.h errs.h
+			<libc/iraf_xnames.h> config.h operand.h errs.h
 
 	bkg.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_knames.h>\
-			<libc/iraf_xwhen.h> <libc/iraf_ctype.h>\
-			clmodes.h config.h operand.h clmodes.h\
-			mem.h errs.h param.h task.h
+			<libc/iraf_xwhen.h> clmodes.h config.h\
+			operand.h clmodes.h mem.h errs.h param.h task.h
 
 	builtin.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_fset.h> <libc/iraf_error.h>\
-			<libc/iraf_ctype.h> <libc/iraf_stdio.h>\
-			<libc/iraf_alloc.h> <libc/iraf_ttset.h> clmodes.h\
+			<libc/iraf_stdio.h> <libc/iraf_alloc.h>\
+			<libc/iraf_ttset.h> clmodes.h\
 			config.h mem.h operand.h param.h task.h errs.h
 
 	clprintf.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
@@ -91,15 +89,14 @@ libpkg.a:
 			param.h task.h errs.h construct.h ytab.h
 
 	edcap.c		<libc/iraf_stdio.h> <libc/iraf_libc.h>\
-			<libc/iraf_ctype.h> <libc/iraf_fset.h>\
-			<libc/iraf_spp.h> config.h operand.h\
-			param.h task.h eparam.h
+			<libc/iraf_fset.h> <libc/iraf_spp.h>\
+			config.h operand.h param.h task.h eparam.h
 
 	eparam.c	<libc/iraf_stdio.h> <libc/iraf_libc.h>\
-			<libc/iraf_error.h> <libc/iraf_ctype.h>\
-			<libc/iraf_ttset.h> <libc/iraf_fset.h>\
-			<libc/iraf_spp.h> config.h mem.h operand.h\
-			errs.h param.h grammar.h task.h eparam.h
+			<libc/iraf_error.h> <libc/iraf_ttset.h>\
+			<libc/iraf_fset.h> <libc/iraf_spp.h>\
+			config.h mem.h operand.h errs.h param.h\
+			grammar.h task.h eparam.h
 
 	errs.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_fset.h> <libc/iraf_stdio.h>\
@@ -124,8 +121,8 @@ libpkg.a:
 
 	history.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_fset.h>\
-			<libc/iraf_ctype.h> config.h errs.h\
-			mem.h operand.h param.h task.h clmodes.h grammar.h
+			config.h errs.h mem.h operand.h param.h\
+			task.h clmodes.h grammar.h
 
 	lists.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> config.h mem.h operand.h\
@@ -141,8 +138,8 @@ libpkg.a:
 			errs.h mem.h
 
 	modes.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
-			<libc/iraf_stdio.h> <libc/iraf_ctype.h> clmodes.h\
-			config.h construct.h operand.h param.h grammar.h\
+			<libc/iraf_stdio.h> clmodes.h config.h\
+			construct.h operand.h param.h grammar.h\
 			mem.h task.h errs.h
 
 	operand.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
@@ -155,8 +152,8 @@ libpkg.a:
 
 	pfiles.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_finfo.h> <libc/iraf_stdio.h>\
-			<libc/iraf_ctype.h> config.h errs.h operand.h\
-			mem.h param.h task.h grammar.h
+			config.h errs.h operand.h mem.h param.h\
+			task.h grammar.h
 
 	prcache.c	<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_error.h>\
@@ -177,12 +174,10 @@ libpkg.a:
 
 	unop.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
 			<libc/iraf_stdio.h> <libc/iraf_xnames.h>\
-			<libc/iraf_math.h> config.h\
-			operand.h errs.h task.h param.h
+			config.h operand.h errs.h task.h param.h
 
 	ytab.c		<libc/iraf_spp.h> <libc/iraf_libc.h>\
-			<libc/iraf_stdio.h> <libc/iraf_ctype.h>\
-			config.h mem.h operand.h param.h grammar.h\
-			opcodes.h clmodes.h task.h\
+			<libc/iraf_stdio.h> config.h mem.h operand.h\
+			param.h grammar.h opcodes.h clmodes.h task.h\
 			construct.h errs.h lexyy.c lexicon.c
 	;

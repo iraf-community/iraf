@@ -199,7 +199,6 @@ extern void c_ttyseti(XINT tty, int param, int value);
 extern void c_ttyso(int fd, XINT tty, int onoff);
 /* cttystati.c */
 extern XINT c_ttystati(XINT tty, int param);
-/* ctype.c */
 /* cungetc.c */
 extern int c_ungec(int fd, int ch);
 /* cungetl.c */
@@ -266,16 +265,10 @@ extern void u_perror(char *prefix);
 /* printf.c */
 extern void u_printf(char *format, ...);
 extern void u_fprintf(struct _iobuf *fp, char *format, ...);
-/*
-extern void u_doprnt(char *format, va_list *argp, struct _iobuf *fp);
-extern void u_doarg(struct _iobuf *fp, short *formspec, va_list **argp, int prec[], int varprec, int dtype);
-*/
 /* puts.c */
 extern int u_puts(char *str);
 /* putw.c */
 extern int u_putw(int word, struct _iobuf *fp);
-/* qsort.c */
-extern void u_qsort(char *base, int n, int size, int (*compar)(void));
 /* realloc.c */
 extern char *u_realloc(char *buf, unsigned newsize);
 /* rewind.c */
@@ -298,22 +291,6 @@ extern char *u_sprintf(char *str, char *format, ...);
 /* stgio.c */
 extern int c_stggetline(int fd, char *buf, int maxch);
 extern int c_stgputline(int fd, char *buf);
-/* strcat.c */
-extern char *u_strcat(char *s1, char *s2);
-/* strcmp.c */
-extern int u_strcmp(char *s1, char *s2);
-/* strdup.c */
-extern char *u_strdup(char *str);
-/* strcpy.c */
-extern char *u_strcpy(char *s1, char *s2);
-/* strlen.c */
-extern int u_strlen(char *s);
-/* strncat.c */
-extern char *u_strnt(char *s1, char *s2, int n);
-/* strncmp.c */
-extern int u_strnp(char *s1, char *s2, int n);
-/* strncpy.c */
-extern char *u_strny(char *s1, char *s2, int n);
 /* system.c */
 extern int u_system(char *cmd);
 /* ungetc.c */

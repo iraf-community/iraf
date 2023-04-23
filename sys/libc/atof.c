@@ -4,7 +4,6 @@
 #define	import_spp
 #define	import_libc
 #define	import_xnames
-#define	import_ctype
 #include <iraf.h>
 
 

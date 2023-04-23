@@ -1,11 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+#include <math.h>
+
 #define import_spp
 #define import_libc
 #define import_xnames
-#define import_math
-#define import_ctype
 #define import_stdio
 #include <iraf.h>
 

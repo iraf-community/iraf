@@ -15,6 +15,11 @@
 /* Include any header files specified in "#define import_XXX" statements
  * before we were called.
  */
+#ifdef import_finfo
+#include "iraf_finfo.h"
+#undef import_finfo
+#endif
+
 #ifdef import_libc
 #include "iraf_libc.h"
 #undef import_libc
@@ -38,16 +43,6 @@
 #ifdef import_error
 #include "iraf_error.h"
 #undef import_error
-#endif
-
-#ifdef import_ctype
-#include "iraf_ctype.h"
-#undef import_ctype
-#endif
-
-#ifdef import_finfo
-#include "iraf_finfo.h"
-#undef import_finfo
 #endif
 
 #ifdef import_fset
@@ -115,11 +110,6 @@
 #undef import_alloc
 #endif
 
-#ifdef import_math
-#include "iraf_math.h"
-#undef import_math
-#endif
-
 #ifdef import_prstat
 #include "iraf_prstat.h"
 #undef import_prstat
@@ -133,9 +123,4 @@
 #ifdef import_ttset
 #include "iraf_ttset.h"
 #undef import_ttset
-#endif
-
-#ifdef import_stdarg
-#include "iraf_stdarg.h"
-#undef import_stdarg
 #endif

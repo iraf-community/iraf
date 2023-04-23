@@ -250,22 +250,6 @@ XINT GETLINE (XINT *fd, XCHAR *linebuf);
 int FCOPY (XCHAR *oldfile, XCHAR *newfile);
 int FCOPYO (XINT *in, XINT *out);
 /*
- * LIBC mathf.f -- C callable FORTRAN math functions.
- */
-XINT XNINT(XDOUBLE *x);
-XDOUBLE XEXP(XDOUBLE *x);
-XDOUBLE XLOG(XDOUBLE *x);
-XDOUBLE XLOG10(XDOUBLE *x);
-XDOUBLE XPOW(XDOUBLE *x, XDOUBLE *y);
-XDOUBLE XSQRT(XDOUBLE *x);
-XDOUBLE XSIN(XDOUBLE *x);
-XDOUBLE XCOS(XDOUBLE *x);
-XDOUBLE XTAN(XDOUBLE *x);
-XDOUBLE XASIN(XDOUBLE *x);
-XDOUBLE XACOS(XDOUBLE *x);
-XDOUBLE XATAN(XDOUBLE *x);
-XDOUBLE XATAN2(XDOUBLE *x, XDOUBLE *y);
-/*
  * lib/sysruk.x -- Run one of the tasks in a process.
  */
 int SYSRUK(XCHAR *task, XCHAR *cmd, XINT *ruk_argoff, XINT *ruk_interact);

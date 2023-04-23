@@ -1,10 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_stdarg
 #include <iraf.h>
 
 #include "config.h"
@@ -13,8 +16,6 @@
 #include "task.h"
 #include "errs.h"
 #include "proto.h"
-
-extern void u_doprnt();
 
 
 /*
@@ -32,7 +33,7 @@ eprintf (char *fmt, ...)
 
 	va_start (args, fmt);
 	eout = currentask->t_stderr;
-	u_doprnt (fmt, &args, eout);
+	vfprintf (eout, fmt, args);
 	va_end (args);
 	fflush (eout);
 }
@@ -48,7 +49,7 @@ oprintf (char *fmt, ...)
 
 	va_start (args, fmt);
 	sout = currentask->t_stdout;
-	u_doprnt (fmt, &args, sout);
+	vfprintf (sout, fmt, args);
 	va_end (args);
 	fflush (sout);
 }
@@ -70,7 +71,7 @@ tprintf (char *fmt, ...)
 	    currentask->t_ltp->lt_lname);
 	else {
 	    va_start (args, fmt);
-	    u_doprnt (fmt, &args, out);
+	    vfprintf (out, fmt, args);
 	    va_end (args);
 	    fflush (out);
 	    if (ferror (out))
@@ -123,6 +124,18 @@ prparamval (
 }
 
 
+/* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
+ */
+static int
+qstrcmp (
+  const void	*a,
+  const void  *b
+)
+{
+	return (strcmp (*(char **)a, *(char **)b));
+}
+
+
 /* STRSORT -- Sort a list of pointers to strings.
  */
 void
@@ -131,21 +144,7 @@ strsort (
   int	nstr			/* number of strings */
 )
 {
-	extern	int qstrcmp();
-
 	qsort ((char *)list, nstr, sizeof(char *), qstrcmp);
-}
-
-
-/* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
- */
-int
-qstrcmp (
-  char	*a, 
-  char  *b
-)
-{
-	return (strcmp (*(char **)a, *(char **)b));
 }
 
 

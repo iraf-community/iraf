@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -814,7 +816,6 @@ sexa (char *s)
 	int	n, sign;
 	int	hr, minutes;
 	float	sec;
-	extern double atof();
 
 	o.o_type = OT_REAL;
 	sign = (*s == '-') ? (s++, -1) : 1;

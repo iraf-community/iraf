@@ -1,11 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_finfo
 #define import_stdio
-#define import_ctype
 #include <iraf.h>
 
 #include "config.h"
@@ -30,8 +32,6 @@ extern	FILE *yyin;
 char	*uparmdir = UPARM;
 long	filetime();
 static	void mapname();
-
-extern  int c_finfo();
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
@@ -1142,7 +1142,6 @@ addparam (struct pfile *pfp, char *buf, FILE *fp)
 	int	arrflag;	/* Is param an array?			*/
 	struct arr_desc *parrd;	/* Pointer to array descriptor.		*/
 	int	size_arr=0;	/* Size of array.			*/
-	extern double atof();
 	char	**tbuf;
 
 	pp = newparam (pfp);
@@ -1819,10 +1818,9 @@ scanmode (char *s)
 	static	char *badstr = "bad mode string `%s'";
 	char	strings[4][25];
 	int	i, n;
-	char *index();
 
 	str = s;
-	if (index (str, ',') != NULL || index (str, '+') != NULL) {
+	if (strchr (str, ',') != NULL || strchr (str, '+') != NULL) {
 	    if (*str == '"' || *str == '\'')
 		str++;
 

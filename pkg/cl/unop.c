@@ -1,14 +1,16 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+#include <math.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
 #define	import_xnames
-#define	import_math
 #include <iraf.h>
 
-#include <ctype.h>
 #include "config.h"
 #include "operand.h"
 #include "errs.h"
@@ -44,7 +46,6 @@ unop (int opcode)
 	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];
 	char	ch, sbuf[SZ_LINE];
-	char	*envget();
 	int 	i;
 
 	o = popop();			/* pop operand from stack	*/
@@ -259,7 +260,7 @@ unop (int opcode)
 	    break;
 	case OP_NINT:
 	    if (in_type == OT_REAL)
-		iresult = nint (rval);
+		iresult = nearbyint (rval);
 	    else
 		iresult = ival;
 	    break;

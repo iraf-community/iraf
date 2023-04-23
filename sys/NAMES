@@ -3439,8 +3439,6 @@ u_atoi          atoi
 u_atol          atol
 u_calloc        calloc
 u_crackformat   u_crackformat
-u_doarg         u_doarg
-u_doprnt        u_doprnt
 u_doscan        u_doscan
 u_envget        envget
 u_eprintf       eprintf
@@ -3470,7 +3468,6 @@ u_perror        perror
 u_printf        printf
 u_puts          puts
 u_putw          putw
-u_qsort         qsort
 u_realloc       realloc
 u_rewind        rewind
 u_rindex        rindex
@@ -3483,15 +3480,9 @@ u_setlinebuf    setlinebuf
 u_setucc        u_setucc
 u_sprintf       sprintf
 u_sscanf        sscanf
-u_strcat        strcat
-u_strcmp        strcmp
-u_strcpy        strcpy
-u_strlen        strlen
-u_strnp         strncmp
-u_strnt         strncat
-u_strny         strncpy
 u_system        system
 u_ungetc        ungetc
+u_vfprintf      vfprintf
 uid_executing   uid_executing
 uio_bwrite      uio_bwrite
 ungete          ungetline

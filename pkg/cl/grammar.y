@@ -1,9 +1,11 @@
 %{
 
+#include <ctype.h>
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_ctype
 #include <iraf.h>
 
 #include "config.h"
@@ -97,7 +99,6 @@ extern	char	cmdblk[SZ_CMDBLK+1];	/* Command buffer in history.c */
 extern	char	*ip_cmdblk;		/* Pointer to current char in command.*/
 extern	char	*err_cmdblk;		/* ip_cmdblk when error detected. */
 
-char	*index();
 struct	param *initparam();
 struct	label *getlabel(), *setlabel();
 
@@ -1859,7 +1860,7 @@ ref	:	param {
 				 * specific field.  In these cases we don't 
 				 * want implicit looping.
 				 */
-				if (index (curr_param, '.') == NULL) {
+				if (strchr (curr_param, '.') == NULL) {
 				    if ((dim = get_dim (curr_param)) > 0) {
 					lastref = YES;
 			        	for (d = 0; d < dim; d++) {
@@ -1915,7 +1916,7 @@ index	:	expr1 {
 			int  i1, i2, mode;
 
 			if (!errcnt) {
-			    if (index(curr_param, '.') != NULL) {
+			    if (strchr(curr_param, '.') != NULL) {
 				eprintf (exlimits);
 				EYYERROR;
 			    }

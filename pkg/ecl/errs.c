@@ -1,6 +1,9 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdarg.h>
+#include <string.h>
+
 #define	import_spp
 #define import_libc
 #define	import_fset
@@ -8,7 +11,6 @@
 #define import_setjmp
 #define import_knames
 #define	import_xnames
-#define	import_stdarg
 #define import_kproto
 #include <iraf.h>
 
@@ -28,7 +30,7 @@
  * ERRS -- When a runtime operation detects an error, it calls error with an
  *   error type, a diagnostic string and some additional arguments. the type
  *   determines the severity and prefix for the diagnostic. the diagnositic
- *   and its args are written as an error message with doprnt.
+ *   and its args are written as an error message with vfprintf.
  * After the error message has been printed to our t_stderr, tasks are killed
  *   until an interactive cl is found. the longjmp forces the last
  *   setjmp (errenv) in main() to return and start the parser again.
@@ -109,8 +111,6 @@ ErrCom	errcom;
 extern	int in_iferr, do_error;
 extern  char *onerr_handler;
 
-extern  int u_doprnt();
-
 
 /* CL_ERROR -- print error info according to errtype on our t_stderr, pop back
  * to an interactive task and do a longjmp back to setjmp (errenv) in
@@ -154,7 +154,7 @@ cl_error (int errtype, char *diagstr, ...)
 	 */
 	if (!validerrenv && !(firstask->t_flags & T_BATCH)) {
 	    nfatal++;
-            u_doprnt (diagstr, &args, currentask->t_stderr);
+	    vfprintf (currentask->t_stderr, diagstr, args);
 	    if (errtype & E_P)
 	        perror ("\nOS errmsg");
 	    else
@@ -167,7 +167,7 @@ cl_error (int errtype, char *diagstr, ...)
 	 */
 	if (loggingout || gologout) {
 	    nfatal++;
-            u_doprnt (diagstr, &args, currentask->t_stderr);
+	    vfprintf (currentask->t_stderr, diagstr, args);
 	    if (errtype & E_P)
 	        perror ("\nOS errmsg");
 	    else
@@ -202,7 +202,7 @@ cl_error (int errtype, char *diagstr, ...)
 	    else
 	        eprintf ("ERROR: ");
 
-	    u_doprnt (diagstr, &args, currentask->t_stderr);
+	    vfprintf (currentask->t_stderr, diagstr, args);
 	    if (errtype & E_P)
 	        perror ("\nOS errmsg");
 	    else
@@ -221,7 +221,7 @@ cl_error (int errtype, char *diagstr, ...)
 		fp = fdopen (fd, "w");
 
 		fprintf (fp, "ERROR on line %d: ", errorline);
-		u_doprnt (diagstr, &args, fp);
+		vfprintf (fp, diagstr, args);
 
 		fclose (fp);
 		c_close (fd);

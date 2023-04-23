@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -39,7 +41,6 @@ void
 sprop (register char *outstr, register struct operand *op)
 {
 	register int type;
-	char	*index();
 
 	if (opundef (op))
 	    cl_error (E_IERR, "can not print an undefined operand");
@@ -59,7 +60,7 @@ sprop (register char *outstr, register struct operand *op)
 	case OT_REAL:
 	    /* unix's %g suppresses '.' if no fractional part */
 	    sprintf (outstr, "%g", op->o_val.v_r);
-	    if (index (outstr, '.') == NULL)
+	    if (strchr (outstr, '.') == NULL)
 		strcat (outstr, ".");
 	    break;
 	case OT_STRING:
@@ -297,7 +298,7 @@ makeop (char *str, int type)
 {
 	register char *s, *ip;
 	register char c;
-	char	*index(), *format;
+	char	*format;
 	char	hexnum[MAX_DIGITS];
 	char	firstchar;
 	struct	operand o;
@@ -348,11 +349,11 @@ makeop (char *str, int type)
 	    if (*s != '\''  &&  *s != '"')
 	 	makelower (s);
 
-	    if (index (s, 'x') != NULL) {
+	    if (strchr (s, 'x') != NULL) {
 		strcpy (hexnum, "0x");
 		strcat (hexnum, s);
 		format = "%x";
-	    } else if (index (s, 'b') != NULL) {
+	    } else if (strchr (s, 'b') != NULL) {
 		format = "%o";
 	    } else
 		format = "%d";
@@ -380,9 +381,9 @@ makeop (char *str, int type)
 	     */
 	    char *colon;
 
-	    if ( (colon=index (s, ':') ) != NULL) {
-		if (index (colon+1, ':') == NULL  &&
-		  index (colon+1, '.') == NULL)
+	    if ( (colon=strchr (s, ':') ) != NULL) {
+		if (strchr (colon+1, ':') == NULL  &&
+		  strchr (colon+1, '.') == NULL)
 		    maybeindex++;
 
 		o = sexa (s);

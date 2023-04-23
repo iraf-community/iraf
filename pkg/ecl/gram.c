@@ -920,7 +920,6 @@ intrfunc (char *fname, int nargs)
 		{
 		    int	o1, o2;
 		    struct operand istr;
-		    char *index();
 trim_:
 		    if (nargs >= 2) {
 		        /* Get the chars to trim, otherwise its whitespace.  */
@@ -934,9 +933,9 @@ trim_:
 
 		    memset (sbuf, 0, SZ_LINE);
 		    if (trim_side & TRIM_LEFT)
-			while (index (trim, (int)istr.o_val.v_s[o1])) o1++;
+			while (strchr (trim, (int)istr.o_val.v_s[o1])) o1++;
 		    if (trim_side & TRIM_RIGHT) {
-			while (index (trim, (int)istr.o_val.v_s[o2])) o2--;  
+			while (strchr (trim, (int)istr.o_val.v_s[o2])) o2--;  
 			istr.o_val.v_s[++o2] = '\0';
 		    }
 		    strncpy (sbuf, &istr.o_val.v_s[o1], o2-o1+1);
@@ -1010,7 +1009,6 @@ sexa (char *s)
 	int	n, sign;
 	int	hr, minutes;
 	float	sec;
-	extern double atof();
 
 	o.o_type = OT_REAL;
 	sign = (*s == '-') ? (s++, -1) : 1;

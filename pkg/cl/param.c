@@ -1,10 +1,11 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_ctype
 #include <iraf.h>
 
 #include "config.h"
@@ -937,7 +938,6 @@ printparam (struct param *pp, register FILE *fp)
 {
 	register int type, bastype;
 	register char *bp;
-	char	*index();
 	char	buf[20];
 	int	arrflag;
 	int	size_arr=0;

@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_libc
 #define import_stdio
@@ -77,9 +79,9 @@ again:	    fgets (line, SZ_LINE, pp->p_listfp);
 		result = makeop (eofstr, OT_STRING);
 
 	    } else {
-		char *index(), *nlp, *ip;
+		char *nlp, *ip;
 
-		nlp = index (line, '\n');
+		nlp = strchr (line, '\n');
 		if (nlp != NULL)
 		    *nlp = '\0';
 

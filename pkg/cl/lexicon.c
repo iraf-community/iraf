@@ -1,9 +1,10 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+
 #define import_spp
 #define	import_libc
-#define	import_ctype
 #define	import_xnames
 #define	import_lexnum
 #include <iraf.h>
@@ -149,7 +150,7 @@ lexicon (void)
 	register int	token;
 	int	stringtok, identifier, setlevel;
 	int	clswitch;
-	char	*op, *index();
+	char	*op;
 
 	/* Return pushed back token if any.
 	 */
@@ -389,7 +390,7 @@ etok_:		if (!newtoken) {
 		if (ch = input()) {
 		    if (ch == '\n')
 			continue;
-		    else if (index ("&;=+-\"'\\#><()|", ch) != NULL)
+		    else if (strchr ("&;=+-\"'\\#><()|", ch) != NULL)
 			goto deposit_;		/* put ch in string */
 		    else
 			goto escape_;		/* put \ch in string */

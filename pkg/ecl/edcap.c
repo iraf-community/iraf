@@ -1,9 +1,11 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+#include <string.h>
+
 #define	import_stdio
 #define	import_libc
-#define	import_ctype
 #define	import_fset
 #define	import_spp
 #include <iraf.h>
@@ -245,14 +247,13 @@ map_escapes (
 	register char	*ip = input;
 	register char	*op = output;
 	register int	n;
-	char	*index();
 
 	while (*ip != '\0') {
 	    if (*ip == '\\') { 
 		switch (*++ip) {
 		case 'b': case 'e': case 'f':
 		case 'n': case 'r': case 't':
-		    *op++ = ecodes[index(echars,*ip++)-echars];
+		    *op++ = ecodes[strchr(echars,*ip++)-echars];
 		    break;
 		default:
 		    if (isdigit (*ip)) {

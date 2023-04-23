@@ -7,6 +7,8 @@
 #define	D_iraf_libc_h
 #define	D_iraf_libc_h_proto
 
+#include <stdarg.h>
+
 #include "iraf_spp.h"
 
 typedef	short		XCHAR;
@@ -72,7 +74,6 @@ extern	char		MEMCOM[];
 #define	fwrite		u_fwrite
 #define	gets		u_gets
 #define	getw		u_getw
-#define	index		u_index
 #define	isatty		u_isatty
 #define	malloc		u_malloc
 #define	mktemp		u_mktemp
@@ -80,27 +81,16 @@ extern	char		MEMCOM[];
 #define	printf		u_printf
 #define	puts		u_puts
 #define	putw		u_putw
-#define	qsort		u_qsort
 #define	realloc		u_realloc
 #define	rewind		u_rewind
-#define	rindex		u_rindex
 #define	scanf		u_scanf
 #define	setbuf		u_setbuf
 #define	setbuffer	u_setfbf		/* collision	*/
 #define	setlinebuf	u_setlinebuf
 #define	sprintf		u_sprintf
 #define	sscanf		u_sscanf
-#define	strcat		u_strcat
-#define	strchr		u_index
-#define	strcmp		u_strcmp
-#define	strdup		u_strdup
-#define	strcpy		u_strcpy
-#define	strlen		u_strlen
-#define	strncat		u_strnt			/* collision	*/
-#define	strncmp		u_strnp			/* collision	*/
-#define	strncpy		u_strny			/* collision	*/
-#define	strrchr		u_rindex
 #define	system		u_system
+#define	vfprintf	u_vfprintf
 #define	ungetc		u_ungetc
 
 /* C_SPP names not unique in the first seven characters.
@@ -138,19 +128,11 @@ extern char    *calloc (unsigned int nelems, unsigned int elsize);
 extern char    *envget (char *var);
 extern char    *fgets (char *buf, int maxch, struct _iobuf *fp);
 extern char    *gets (char *buf);
-extern char    *index (char *str, int ch);
 extern char    *malloc (unsigned nbytes);
 extern char    *mktemp (char *template);
 extern char    *freadline (char *prompt);
 extern char    *realloc (char *buf, unsigned newsize);
-extern char    *rindex (char *str, int ch);
 extern char    *sprintf (char *str, char *format, ...);
-extern char    *strcat (char *s1, char *s2);
-extern char    *strdup (char *str);
-extern char    *strcpy (char *s1, char *s2);
-extern char    *strncat (char *s1, char *s2, int n);
-extern char    *strncpy (char *s1, char *s2, int n);
-extern int	strncmp (char *s1, char *s2, int n);
 
 extern double   atof (char *str);
 extern float    c_ttygr (XINT tty, char *cap);
@@ -243,8 +225,6 @@ extern int	putw (int word, struct _iobuf *fp);
 extern int	scanf (char *format, ...);
 extern int	spf_open (char *buf, int maxch);
 extern int	sscanf (char *str, char *format, ...);
-extern int	strcmp (char *s1, char *s2);
-extern int	strlen (char *s);
 extern int	system (char *cmd);
 extern int	ungetc (int ch, struct _iobuf *fp);
 extern long	atol (char *str);
@@ -256,6 +236,7 @@ extern long	rewind (struct _iobuf *fp);
 extern short   *c_sppstr (char *str);
 extern short   *c_strupk (char *str, short *outstr, int maxch);
 extern unsigned int c_propdpr (char *process, char *bkgfile, char *bkgmsg);
+extern unsigned int c_prfodpr(void);
 extern unsigned int c_propen (char *process, int *in, int *out);
 extern void	c_devstatus (char *device, int out);
 extern void	c_envlist (XINT fd, char *prefix, int show_redefs);
@@ -264,6 +245,7 @@ extern void	c_envputs (char *var, char *value);
 extern void	c_envreset (char *var, char *value);
 extern void	c_erract (int action);
 extern void	c_error (int errcode, char *errmsg);
+extern int	c_finfo (char *fname, struct _finfo *fi);
 extern void	c_flush (XINT fd);
 extern void	c_fseti (XINT fd, int param, int value);
 extern void	c_gflush (int stream);
@@ -299,28 +281,21 @@ extern void	c_wmsec (int msec);
 extern void	c_xgmes (int *oscode, char *oserrmsg, int maxch);
 extern void	c_xonerr (int errcode);
 extern void	c_xttysize (int *ncols, int *nlines);
+extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
 extern void	eprintf (char *format, ...);
 extern void	fprintf (struct _iobuf *fp, char *format, ...);
 extern void	fputs (char *str, struct _iobuf *fp);
 extern void	free (char *buf);
 extern void	perror (char *prefix);
 extern void	printf (char *format, ...);
-extern void	qsort (char *base, int n, int size, int  (*compar) (char *, char *));
 extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
 extern void	spf_close (XINT fd);
-
-/*  The following have conflicts because of the order in which the
-**  include files are done in iraf.h.  Commented out for now.
-extern int	c_finfo (char *fname, struct _finfo *fi);
-extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handler);
-*/
+extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
 
 #endif
 
-/*
-*/
 #include "iraf_vosproto.h"
 
 #endif /* D_iraf_libc_h */

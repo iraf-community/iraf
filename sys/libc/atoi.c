@@ -1,11 +1,14 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <ctype.h>
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
-#define	import_ctype
 #include <iraf.h>
 
+#define	tointeg(c)	((c)-'0')
 
 /* ATOI -- Ascii to integer.  Convert a simple integer in decimal radix to
 ** a binary integer value.
