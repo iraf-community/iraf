@@ -1,0 +1,34 @@
+From 81d2f49a650ab4865e87113e3aedc4ff01245c0a Mon Sep 17 00:00:00 2001
+From: Ole Streicher <olebole@debian.org>
+Date: Sat, 11 Mar 2023 12:54:21 +0100
+Subject: [PATCH] Don't force the use of gcc
+
+This makes the C compiler configurable during build process with the
+CC environment variable.
+---
+diff --git a/unix/f2c/libf2c/makefile.u b/unix/f2c/libf2c/makefile.u
+index bddbc6438..ccafa9df7 100644
+--- a/unix/f2c/libf2c/makefile.u
++++ b/unix/f2c/libf2c/makefile.u
+@@ -13,7 +13,7 @@
+ # to the CFLAGS = line below.
+ 
+ .SUFFIXES: .c .o
+-CC = cc
++CC ?= cc
+ SHELL = /bin/sh
+ CFLAGS = -O -w $(HSI_CF)
+ LDFLAGS = $(HSI_LF)
+diff --git a/unix/f2c/src/makefile.u b/unix/f2c/src/makefile.u
+index 0e2c73519..f4a4f1c56 100644
+--- a/unix/f2c/src/makefile.u
++++ b/unix/f2c/src/makefile.u
+@@ -1,7 +1,7 @@
+ #	Makefile for f2c, a Fortran 77 to C converter
+ 
+ .SUFFIXES: .c .o
+-CC = cc
++CC ?= cc
+ CFLAGS = -O -w $(HSI_CF)
+ LDFLAGS = $(HSI_LF)
+ SHELL = /bin/sh

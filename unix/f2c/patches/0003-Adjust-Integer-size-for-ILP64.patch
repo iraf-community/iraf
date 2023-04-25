@@ -1,0 +1,35 @@
+From 2dee32cd60bf4b3385f3dfa738dac516e0839314 Mon Sep 17 00:00:00 2001
+From: Ole Streicher <olebole@debian.org>
+Date: Sun, 15 Oct 2017 21:02:20 +0200
+Subject: Adjust Integer size for ILP64
+
+Otherwise, for EQUIVALENCE the wrong type may be used as the general
+type. This happens f.e.  in ieeer.x
+
+Pull request: https://iraf-community.github.io/iraf-v216/issues/107
+
+---
+ unix/f2c/src/init.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/unix/f2c/src/init.c b/unix/f2c/src/init.c
+index 752c99a89..da89843c1 100644
+--- a/unix/f2c/src/init.c
++++ b/unix/f2c/src/init.c
+@@ -79,7 +79,12 @@ int tyint	= TYLONG ;
+ int tylogical	= TYLONG;
+ int tylog	= TYLOGICAL;
+ int typesize[NTYPES] = {
+-	1, SZADDR, 1, SZSHORT, SZLONG,
++	1, SZADDR, 1, SZSHORT,
++#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
++	        2*SZLONG,
++#else /* ILP32 */
++	        SZLONG,
++#endif
+ #ifdef TYQUAD
+ 		2*SZLONG,
+ #endif
+-- 
+2.39.2
+

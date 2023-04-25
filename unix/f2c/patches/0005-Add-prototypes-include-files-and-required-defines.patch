@@ -1,0 +1,49 @@
+From 92476b2309b284376e572b390725b01142c2f5f7 Mon Sep 17 00:00:00 2001
+From: Ole Streicher <olebole@debian.org>
+Date: Sun, 2 Apr 2023 15:47:11 +0200
+Subject: Add include files for prototypes
+
+The source uses some functions from there.
+
+---
+ unix/f2c/src/sysdep.c          |  1 +
+ unix/f2c/src/sysdeptest.c      |  1 +
+
+diff --git a/unix/f2c/src/sysdep.c b/unix/f2c/src/sysdep.c
+index ab5b04ee9..a09c23465 100644
+--- a/unix/f2c/src/sysdep.c
++++ b/unix/f2c/src/sysdep.c
+@@ -20,6 +20,7 @@ data or profits, whether in an action of contract, negligence or
+ other tortious action, arising out of or in connection with the
+ use or performance of this software.
+ ****************************************************************/
++#include <unistd.h> /* mkdtemp(), unlink(), rmdir() */
+ #include "defs.h"
+ #include "usignal.h"
+ 
+@@ -116,9 +117,6 @@ rmtdir(Void)
+ 
+ #ifndef MSDOS
+ #include "sysdep.hd"
+-#ifndef NO_MKDTEMP
+-#include <unistd.h> /* for mkdtemp */
+-#endif
+ #endif
+ 
+  static void
+iff --git a/unix/f2c/src/sysdeptest.c b/unix/f2c/src/sysdeptest.c
+index 3c4705221..4c8f9735c 100644
+--- a/unix/f2c/src/sysdeptest.c
++++ b/unix/f2c/src/sysdeptest.c
+@@ -2,7 +2,11 @@
+ /* presence of mkdtemp and mkstemp by whether this links without error. */
+ 
+ #include <stdio.h>
++#ifndef NO_MKDTEMP
+ #include <unistd.h>
++#else
++#include <stdlib.h>
++#endif
+ 
+  int
+ #ifdef KR_headers

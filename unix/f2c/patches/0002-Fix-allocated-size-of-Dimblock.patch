@@ -1,0 +1,77 @@
+From 0509cec8c3dc7a636bd20d677ada2026fb1a3ebb Mon Sep 17 00:00:00 2001
+From: Ole Streicher <olebole@debian.org>
+Date: Mon, 22 Jan 2018 09:48:15 +0100
+Subject: Fix allocated size of Dimblock
+
+Generally, the size of a structure is not just the sum of the sizes of
+its members, since padding may require additional space. For
+`Dimblock`, this is the case, since the first member is an `int`, and
+the next one is a pointer: on 64-bit platforms, `int` is 4 bytes,
+while pointers are 8 bytes and therefore 4 bytes padding are inserted.
+
+This patch fixes the allocated size by using the real size of the
+structure.
+
+Also, the length of the `dims` member is set to unspecified, to avoid
+compilers to optimize out the access to the member.
+
+Pull Request: https://iraf-community.github.io/iraf-v216/issues/127
+
+---
+ unix/f2c/src/defs.h  | 2 +-
+ unix/f2c/src/names.c | 3 ++-
+ unix/f2c/src/proc.c  | 4 ++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/unix/f2c/src/defs.h b/unix/f2c/src/defs.h
+index 0f0a1c2d8..5295439ec 100644
+--- a/unix/f2c/src/defs.h
++++ b/unix/f2c/src/defs.h
+@@ -649,7 +649,7 @@ struct Dimblock
+ 		expptr dimexpr;	/* as above in basexpr, this is an
+ 				   expression for computing a variable
+ 				   dimension */
+-		} dims[1];	/* Dimblocks are allocated with enough
++		} dims[];	/* Dimblocks are allocated with enough
+ 				   space for this to become dims[ndim] */
+ 	};
+ 
+diff --git a/unix/f2c/src/names.c b/unix/f2c/src/names.c
+index 373f656cb..be695ffb2 100644
+--- a/unix/f2c/src/names.c
++++ b/unix/f2c/src/names.c
+@@ -453,7 +453,8 @@ pad_common(Extsym *c)
+ 	v->vstg = STGCOMMON;
+ 	v->vclass = CLVAR;
+ 	v->tag = TNAME;
+-	v->vdim = t = ALLOC(Dimblock);
++	v->vdim = t = (struct Dimblock *) ckalloc((int)sizeof(struct Dimblock)
++						  + 2 * sizeof(expptr));
+ 	t->ndim = 1;
+ 	t->dims[0].dimsize = ICON(L / typesize[type]);
+ 	v->fvarname = v->cvarname = "eqv_pad";
+diff --git a/unix/f2c/src/proc.c b/unix/f2c/src/proc.c
+index 98ca6e9de..07202049a 100644
+--- a/unix/f2c/src/proc.c
++++ b/unix/f2c/src/proc.c
+@@ -1146,7 +1146,7 @@ copy_data(chainp list)
+ 	    namep -> vleng = (expptr) cpexpr (namep -> vleng);
+ 	if (namep -> vdim) {
+ 	    nd = namep -> vdim -> ndim;
+-	    size = sizeof(int) + (3 + 2 * nd) * sizeof (expptr);
++	    size = sizeof(struct Dimblock) + 2 * nd * sizeof(expptr);
+ 	    dp = (struct Dimblock *) ckalloc (size);
+ 	    cpn(size, (char *)namep->vdim, (char *)dp);
+ 	    namep -> vdim = dp;
+@@ -1698,7 +1698,7 @@ setbound(Namep v, int nd, struct Dims *dims)
+ 	}
+ 
+ 	v->vdim = p = (struct Dimblock *)
+-	    ckalloc( sizeof(int) + (3+2*nd)*sizeof(expptr) );
++	    ckalloc( sizeof(struct Dimblock) + 2 * nd * sizeof(expptr) );
+ 	p->ndim = nd--;
+ 	p->nelt = ICON(1);
+ 	doin_setbound = 1;
+-- 
+2.39.2
+

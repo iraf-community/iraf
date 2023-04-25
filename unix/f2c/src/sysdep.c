@@ -20,7 +20,7 @@ data or profits, whether in an action of contract, negligence or
 other tortious action, arising out of or in connection with the
 use or performance of this software.
 ****************************************************************/
-#include <unistd.h>
+#include <unistd.h> /* mkdtemp(), unlink(), rmdir() */
 #include "defs.h"
 #include "usignal.h"
 
@@ -117,9 +117,6 @@ rmtdir(Void)
 
 #ifndef MSDOS
 #include "sysdep.hd"
-#ifndef NO_MKDTEMP
-#include <unistd.h> /* for mkdtemp */
-#endif
 #endif
 
  static void
