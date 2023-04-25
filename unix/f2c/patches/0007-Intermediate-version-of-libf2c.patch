@@ -1,0 +1,42 @@
+From a21870d6e9d8583ca094b8621d123e52ab41594f Mon Sep 17 00:00:00 2001
+From: netcdf <libf2c>
+Date: Mon, 25 Apr 2011 17:27:56 +0200
+Subject: [PATCH 7/9] Intermediate version of libf2c
+
+This is some intermediate update between libf2c2 versions 20090411 and
+20130926.
+---
+ unix/f2c/libf2c/README     | 2 +-
+ unix/f2c/libf2c/arithchk.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/unix/f2c/libf2c/README b/unix/f2c/libf2c/README
+index 940a354e3..c163b8772 100644
+--- a/unix/f2c/libf2c/README
++++ b/unix/f2c/libf2c/README
+@@ -38,7 +38,7 @@ This assumes you have the xsum program whose source, xsum.c,
+ is distributed as part of "all from f2c/src", and that it
+ is installed somewhere in your search path.  If you do not
+ have xsum, you can obtain xsum.c by sending the following E-mail
+-message to netlib@netlib.bell-labs.com
++message to netlib@netlib.org
+ 	send xsum.c from f2c/src
+ 
+ For convenience, the f2c.h0 in this directory is a copy of netlib's
+diff --git a/unix/f2c/libf2c/arithchk.c b/unix/f2c/libf2c/arithchk.c
+index 0522d965f..8e15722ac 100644
+--- a/unix/f2c/libf2c/arithchk.c
++++ b/unix/f2c/libf2c/arithchk.c
+@@ -216,6 +216,9 @@ main(void)
+ 		if (sizeof(char*) == 8)
+ 			fprintf(f, "#define X64_bit_pointers\n");
+ #ifndef NO_LONG_LONG
++		if (sizeof(long long) > sizeof(long)
++		 && sizeof(long long) == sizeof(void*))
++			fprintf(f, "#define LONG_LONG_POINTERS\n");
+ 		if (sizeof(long long) < 8)
+ #endif
+ 			fprintf(f, "#define NO_LONG_LONG\n");
+-- 
+2.39.2
+

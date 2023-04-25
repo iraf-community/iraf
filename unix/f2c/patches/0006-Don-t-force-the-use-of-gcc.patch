@@ -1,13 +1,17 @@
-From 81d2f49a650ab4865e87113e3aedc4ff01245c0a Mon Sep 17 00:00:00 2001
+From 206efbf7f6936c00f252d3fdf9af21edcd0f412d Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Sat, 11 Mar 2023 12:54:21 +0100
-Subject: [PATCH] Don't force the use of gcc
+Subject: [PATCH 6/9] Don't force the use of gcc
 
 This makes the C compiler configurable during build process with the
 CC environment variable.
 ---
+ unix/f2c/libf2c/makefile.u | 2 +-
+ unix/f2c/src/makefile.u    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/unix/f2c/libf2c/makefile.u b/unix/f2c/libf2c/makefile.u
-index bddbc6438..ccafa9df7 100644
+index 6d05dc6ed..33d2e9c10 100644
 --- a/unix/f2c/libf2c/makefile.u
 +++ b/unix/f2c/libf2c/makefile.u
 @@ -13,7 +13,7 @@
@@ -18,7 +22,7 @@ index bddbc6438..ccafa9df7 100644
 +CC ?= cc
  SHELL = /bin/sh
  CFLAGS = -O -w $(HSI_CF)
- LDFLAGS = $(HSI_LF)
+ 
 diff --git a/unix/f2c/src/makefile.u b/unix/f2c/src/makefile.u
 index 0e2c73519..f4a4f1c56 100644
 --- a/unix/f2c/src/makefile.u
@@ -32,3 +36,6 @@ index 0e2c73519..f4a4f1c56 100644
  CFLAGS = -O -w $(HSI_CF)
  LDFLAGS = $(HSI_LF)
  SHELL = /bin/sh
+-- 
+2.39.2
+

@@ -1,16 +1,16 @@
-From 92476b2309b284376e572b390725b01142c2f5f7 Mon Sep 17 00:00:00 2001
+From dcb322e8d49fb6d98884df3f490c9807ad92f044 Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Sun, 2 Apr 2023 15:47:11 +0200
-Subject: Add include files for prototypes
+Subject: [PATCH 5/9] Add include files for prototypes
 
 The source uses some functions from there.
-
 ---
- unix/f2c/src/sysdep.c          |  1 +
- unix/f2c/src/sysdeptest.c      |  1 +
+ unix/f2c/src/sysdep.c     | 4 +---
+ unix/f2c/src/sysdeptest.c | 4 ++++
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/unix/f2c/src/sysdep.c b/unix/f2c/src/sysdep.c
-index ab5b04ee9..a09c23465 100644
+index ab5b04ee9..d753dfc49 100644
 --- a/unix/f2c/src/sysdep.c
 +++ b/unix/f2c/src/sysdep.c
 @@ -20,6 +20,7 @@ data or profits, whether in an action of contract, negligence or
@@ -31,7 +31,7 @@ index ab5b04ee9..a09c23465 100644
  #endif
  
   static void
-iff --git a/unix/f2c/src/sysdeptest.c b/unix/f2c/src/sysdeptest.c
+diff --git a/unix/f2c/src/sysdeptest.c b/unix/f2c/src/sysdeptest.c
 index 3c4705221..4c8f9735c 100644
 --- a/unix/f2c/src/sysdeptest.c
 +++ b/unix/f2c/src/sysdeptest.c
@@ -47,3 +47,6 @@ index 3c4705221..4c8f9735c 100644
  
   int
  #ifdef KR_headers
+-- 
+2.39.2
+
