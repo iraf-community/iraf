@@ -1,7 +1,7 @@
-From 2f04342f06095779d87bb4f519dc8b4a062a29ef Mon Sep 17 00:00:00 2001
+From 9f38ac8c4cd390c59b87e81c9581ce4493b89b7e Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Sun, 15 Oct 2017 21:02:20 +0200
-Subject: [PATCH 3/9] Adjust Integer size for ILP64
+Subject: Adjust Integer size for ILP64
 
 Otherwise, for EQUIVALENCE the wrong type may be used as the general
 type. This happens f.e.  in ieeer.x

@@ -1,7 +1,7 @@
-From 57234dfb0fe0aca7874734e05fd876640123a2eb Mon Sep 17 00:00:00 2001
+From 7a58e948f0e2471e8094d4bccf37f5f1c52922ff Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Thu, 1 Jun 2017 12:17:42 +0200
-Subject: [PATCH 4/9] Be less verbose in xpp progress output
+Subject: Be less verbose in xpp progress output
 
 ---
  unix/f2c/src/main.c | 4 ----
@@ -9,7 +9,7 @@ Subject: [PATCH 4/9] Be less verbose in xpp progress output
  2 files changed, 12 deletions(-)
 
 diff --git a/unix/f2c/src/main.c b/unix/f2c/src/main.c
-index 14276f6d7..76599392a 100644
+index 977113dc3..a453f8765 100644
 --- a/unix/f2c/src/main.c
 +++ b/unix/f2c/src/main.c
 @@ -644,10 +644,6 @@ main(int argc, char **argv)
@@ -24,7 +24,7 @@ index 14276f6d7..76599392a 100644
  	procinit();
  	if(k = yyparse())
 diff --git a/unix/f2c/src/proc.c b/unix/f2c/src/proc.c
-index 609627264..07202049a 100644
+index 06798d0ba..92c05edcd 100644
 --- a/unix/f2c/src/proc.c
 +++ b/unix/f2c/src/proc.c
 @@ -460,13 +460,9 @@ startproc(Extsym *progname, int Class)

@@ -352,7 +352,7 @@ comlen(register FILE *pf)
 			return 1;
 		if (c == ' ')
 			break;
-		if (c < '0' && c > '9')
+		if (c < '0' || c > '9')
 			goto ret0;
 		L = 10*L + c - '0';
 		}

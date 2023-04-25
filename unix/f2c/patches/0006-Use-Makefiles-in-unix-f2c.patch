@@ -1,7 +1,7 @@
-From fe75767fc485d9a5a0bcfc63023e78e9688d0173 Mon Sep 17 00:00:00 2001
+From 471d68815bf3f8fa4cf5b4353e1fb6041d90db71 Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Sat, 18 Mar 2023 17:28:11 +0100
-Subject: [PATCH 9/9] Use Makefiles in unix/f2c
+Subject: Use Makefiles in unix/f2c
 
 ---
  unix/f2c/libf2c/makefile.u | 7 ++++---

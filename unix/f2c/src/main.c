@@ -528,10 +528,10 @@ show_help(char *progname)
 	"For usage details, see the man page, f2c.1.\n",
 	"For technical details, see the f2c report.\n",
 	"Both are available from netlib, e.g.,\n",
-	"\thttp://netlib.bell-labs.com/netlib/f2c/f2c.1.gz\n",
-	"\thttp://netlib.bell-labs.com/netlib/f2c/f2c.pdf\n",
-	"or\n\thttp://www.netlib.org/f2c/f2c.1\n",
-	"\thttp://www.netlib.org/f2c/f2c.pdf\n");
+	"\thttps://www.netlib.org/f2c/f2c.1\n",
+	"\thttps://www.netlib.org/f2c/f2c.pdf\nor\n",
+	"\thttps://ampl.com/netlib/f2c/f2c.1\n",
+	"\thttps://ampl.com/netlib/f2c/f2c.pdf\n");
 	}
 
  int retcode = 0;

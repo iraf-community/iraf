@@ -2,11 +2,8 @@
 /* presence of mkdtemp and mkstemp by whether this links without error. */
 
 #include <stdio.h>
-#ifndef NO_MKDTEMP
-#include <unistd.h>
-#else
 #include <stdlib.h>
-#endif
+#include <unistd.h>
 
  int
 #ifdef KR_headers
