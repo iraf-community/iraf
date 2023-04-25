@@ -1690,7 +1690,7 @@ setbound(Namep v, int nd, struct Dims *dims)
 	}
 
 	v->vdim = p = (struct Dimblock *)
-	    ckalloc( sizeof(int) + (3+2*nd)*sizeof(expptr) );
+	    ckalloc( sizeof(struct Dimblock) + 2*sizeof(expptr)*(nd-1) );
 	p->ndim = nd--;
 	p->nelt = ICON(1);
 	doin_setbound = 1;
