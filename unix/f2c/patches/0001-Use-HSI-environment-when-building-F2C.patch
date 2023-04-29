@@ -1,0 +1,50 @@
+From 9f8b61a85ab39b594021c3fa33ec265c79c88feb Mon Sep 17 00:00:00 2001
+From: Mike Fitzpatrick <iraf@noao.edu>
+Date: Mon, 21 Oct 2013 16:03:18 +0200
+Subject: Use HSI environment when building F2C
+
+Change appeared in version 2.16.1
+---
+ unix/f2c/libf2c/makefile.u | 2 +-
+ unix/f2c/src/makefile.u    | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/unix/f2c/libf2c/makefile.u b/unix/f2c/libf2c/makefile.u
+index efe7dc0da..6d05dc6ed 100644
+--- a/unix/f2c/libf2c/makefile.u
++++ b/unix/f2c/libf2c/makefile.u
+@@ -15,7 +15,7 @@
+ .SUFFIXES: .c .o
+ CC = cc
+ SHELL = /bin/sh
+-CFLAGS = -O
++CFLAGS = -O -w $(HSI_CF)
+ 
+ # compile, then strip unnecessary symbols
+ .c.o:
+diff --git a/unix/f2c/src/makefile.u b/unix/f2c/src/makefile.u
+index e9f9c5e44..0e2c73519 100644
+--- a/unix/f2c/src/makefile.u
++++ b/unix/f2c/src/makefile.u
+@@ -2,7 +2,8 @@
+ 
+ .SUFFIXES: .c .o
+ CC = cc
+-CFLAGS = -O
++CFLAGS = -O -w $(HSI_CF)
++LDFLAGS = $(HSI_LF)
+ SHELL = /bin/sh
+ YACC = yacc
+ YFLAGS =
+@@ -24,7 +25,7 @@ MALLOC =
+ 
+ OBJECTS = $(OBJECTSd) $(MALLOC)
+ 
+-all: xsum.out f2c
++all: f2c
+ 
+ f2c: $(OBJECTS)
+ 	$(CC) $(LDFLAGS) $(OBJECTS) -o f2c
+-- 
+2.39.2
+

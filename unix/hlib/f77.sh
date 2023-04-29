@@ -39,6 +39,7 @@
 #
 # This was the reported with Mageia bug #11507
 # https://bugs.mageia.org/show_bug.cgi?id=11507
+set -e
 
 s=/tmp/stderr_$$
 CC=${CC_f2c:-${CC:-cc}}

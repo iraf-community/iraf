@@ -154,7 +154,8 @@ realloc(Char *f, Unsigned size)
 		s1 = size + 7 & ~7;
 	if (!p->len) {
 		f1 = (Char *)(p->next + 1);
-		memcpy(f1, f, s1);
+		/* til 20160114 was memcpy(f1, f, s1); */
+		memmove(f1, f, s1);
 		f = f1;
 		}
 	q = malloc(size);

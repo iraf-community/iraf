@@ -10,4 +10,4 @@ src/f2c:
 	$(MAKE) -C src -f makefile.u f2c
 
 libf2c/libf2c.a:
-	$(MAKE) -C libf2c -f makefile.u libf2c.a
+	$(MAKE) -C libf2c -f makefile.u f2c.h libf2c.a
