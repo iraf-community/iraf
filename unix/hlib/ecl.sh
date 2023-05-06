@@ -57,7 +57,7 @@ if [ -z $iraf ]; then
 fi
 
 # Check for a version query.
-if [ $# > 1 ]; then
+if (( $# > 1 )); then
     case "$1" in
 	"-v" | "-V" | "-version" | "--version")
             head -1 $iraf/unix/hlib/motd
