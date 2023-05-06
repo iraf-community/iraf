@@ -57,7 +57,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.16"
+set VERSION		= "V2.18"
 set V 			= `echo $VERSION | cut -c2-5`
 set hmach 		= "INDEF"
 set shlib 		= "no"
@@ -1301,7 +1301,7 @@ _no_user_check:
 
 
 # Skip the ownership check on some platforms.
-if ($V != "2.15" && $V != "2.16") then
+if ($V != "2.15" && $V != "2.16" && $V != "2.18") then
  if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
 
   # Check file ownership.
@@ -1770,7 +1770,7 @@ endif
 
 set err_seen = 0
 
-if ($V != "2.15" && $V != "2.16") then
+if ($V != "2.15" && $V != "2.16" && $V != "2.18") then
 
  if ($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) then
  echo -n "Creating iraf user .login/.cshrc links ...			"
