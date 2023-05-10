@@ -27,7 +27,7 @@
 #define	X_OK		1		/* access mode `executable'   */
 #endif
 
-char	*irafpath();
+char	*irafpath (char *path);
 
 
 /* MAIN -- Main entry point for SGIDISPATCH.
