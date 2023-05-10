@@ -91,9 +91,10 @@ void  d_declfunc (struct symbol *sp, FILE *fp);
  * declaration is started.
  */
 void
-d_newproc (name, dtype)
-char	*name;			/* procedure name		*/
-int	dtype;			/* procedure type (0 if subr)	*/
+d_newproc (
+  char	*name,			/* procedure name		*/
+  int	dtype			/* procedure type (0 if subr)	*/
+)
 {
 	register int	token;
 	char	tokstr[SZ_TOKEN+1];
@@ -308,8 +309,7 @@ d_declaration (int dtype)
  * by nonarguments.
  */
 void
-d_codegen (fp)
-register FILE	*fp;
+d_codegen (register FILE *fp)
 {
 	register struct symbol *sp;
 	register struct	symbol *top = &sym[nsym-1];
@@ -398,9 +398,10 @@ d_runtime (char *text)
  * is output on a separate line.
  */
 void
-d_makedecl (sp, fp)
-register struct symbol *sp;	/* symbol table entry		*/
-register FILE	*fp;		/* output file			*/
+d_makedecl (
+    register struct symbol *sp,	    /* symbol table entry		*/
+    register FILE	*fp	    /* output file			*/
+)
 {
 	extern	char *type_decl[];
 
@@ -426,10 +427,11 @@ register FILE	*fp;		/* output file			*/
  * new symbol.
  */
 struct symbol *
-d_enter (name, dtype, flags)
-char	*name;			/* symbol name			*/
-int	dtype;			/* data type code		*/
-int	flags;			/* flag bits			*/
+d_enter (
+    char *name,			/* symbol name			*/
+    int	  dtype,		/* data type code		*/
+    int	  flags			/* flag bits			*/
+)
 {
 	register struct	symbol *sp;
 
@@ -455,8 +457,9 @@ int	flags;			/* flag bits			*/
  * symbol table entry.
  */
 struct symbol *
-d_lookup (name)
-char	*name;			/* symbol name			*/
+d_lookup (
+    char  *name			/* symbol name			*/
+)
 {
 	register struct	symbol *sp;
 	register struct	symbol *top = &sym[nsym-1];
@@ -473,7 +476,7 @@ char	*name;			/* symbol name			*/
 /* D_CHKSBUF -- Check for overflow on the string buffer.
  */
 void
-d_chksbuf()
+d_chksbuf(void)
 {
 	if (nextch > SPMAX)
 	    error (XPP_COMPERR, "decl string buffer overflow");
@@ -485,9 +488,10 @@ d_chksbuf()
  * is an error in this application, not a token.
  */
 int
-d_gettok (tokstr, maxch)
-char	*tokstr;		/* receives token string	*/
-int	maxch;			/* max chars to token string	*/
+d_gettok (
+    char *tokstr,		/* receives token string	*/
+    int	  maxch		        /* max chars to token string	*/
+)
 {
 	register char 	*op = tokstr;
 	register int	ch, n;
@@ -554,9 +558,10 @@ int	maxch;			/* max chars to token string	*/
  * declarations.
  */
 void
-d_declfunc (sp, fp)
-register struct symbol *sp;
-FILE  *fp;
+d_declfunc (
+    register struct symbol *sp,
+    FILE  *fp
+)
 {
 	d_makedecl (sp, fp);
 }
