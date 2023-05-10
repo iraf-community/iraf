@@ -68,6 +68,9 @@ extern void  vm_closecache (register VMcache *vm);
 extern void * vm_initcache (register VMcache *vm, char *initstr);
 
 
+extern int ZOPNND (short int *pk_osfn, long *mode, long *chan);
+extern int ZCLSND (long *fd, long *status);
+
 
 
 
@@ -150,7 +153,7 @@ main (int argc, char **argv)
 	if (debug)
 	    fprintf (stderr, "vmcached: open server socket `%s'\n", osfn);
 
-	ZOPNND (osfn, &acmode, &server);
+	ZOPNND ((short int *)osfn, (long *)&acmode, (long *)&server);
 	if (server == XERR) {
 	    fprintf (stderr, "vmcached: failed to open socket `%s'\n", osfn);
 	    vm_closecache (vm);
@@ -182,7 +185,7 @@ main (int argc, char **argv)
 		/* Accept the connection. */
 		sprintf (osfn, "sock:%d", server);
 		acmode = NEW_FILE;
-		ZOPNND (osfn, &acmode, &fd);
+		ZOPNND ((short int *)osfn, (long *)&acmode, (long *)&fd);
 		if (fd == XERR)
 		    exit (1);
 
@@ -191,7 +194,7 @@ main (int argc, char **argv)
 			break;
 		if (i >= MAX_CLIENTS) {
 		    fprintf (stderr, "vmcached: too many clients\n");
-		    ZCLSND (&fd, &status);
+		    ZCLSND ((long *)&fd, (long *)&status);
 		    continue;
 		}
 
@@ -251,7 +254,7 @@ main (int argc, char **argv)
 		    while (getcmd (&ip, itop, &c_argc, c_argv) > 0)
 			if (execute (cx, c_argc, c_argv) > 0) {
 disconnect:		    fclose (cx->out);
-			    ZCLSND (&cx->fd, &status);
+			    ZCLSND ((long *)&cx->fd, (long *)&status);
 			    cx->fd = 0;
 			    cx->out = NULL;
 			    nclients--;
@@ -279,7 +282,7 @@ disconnect:		    fclose (cx->out);
 	    }
 	}
 
-	ZCLSND (&server, &status);
+	ZCLSND ((long *)&server, (long *)&status);
 	vm_closecache (vm);
 	exit (0);
 }
