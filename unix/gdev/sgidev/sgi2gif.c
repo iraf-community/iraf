@@ -82,11 +82,21 @@ static int blue[]  = { DEF_BG, DEF_FG } ;
 static char *infile[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static char *s_root = "sgigif_";
 
-static int	GIFNextPixel();
-static void 	BumpPixel(), GIFEncode(), Putword(), compress();
-static void 	output(), cl_block(), cl_hash(), char_init();
-static void 	char_out(), flush_char(), unpack1to8();
 
+static void BumpPixel(void);
+static int  GIFNextPixel (void);
+static void Putword (int w, FILE *fp);
+
+static void GIFEncode (FILE *fp, int GWidth, int GHeight, int GInterlace,
+    int Background, int Bpp, int Red[], int Green[], int Blue[]);
+static void compress (int init_bits, FILE *outfile);
+static void output (code_int code);
+static void cl_block ();
+static void char_init(void);
+static void flush_char(void);
+static void char_out (int c);
+static void cl_hash(count_int hsize);
+static void unpack1to8 (byte *dest, byte *src, int len);
 
 
 /* MAIN -- Main entry point for the task.
@@ -256,13 +266,17 @@ static int	Interlace;
  */
 
 static void
-GIFEncode (fp, GWidth, GHeight, GInterlace, Background, Bpp, Red, Green, Blue)
-FILE	*fp;
-int	GWidth, GHeight;
-int	GInterlace;
-int	Background;
-int	Bpp;
-int	Red[], Green[], Blue[];
+GIFEncode (
+    FILE *fp,
+    int	  GWidth, 
+    int   GHeight,
+    int	  GInterlace,
+    int	  Background,
+    int	  Bpp,
+    int	  Red[], 
+    int   Green[], 
+    int   Blue[]
+)
 {
 	int	B;
 	int	RWidth, RHeight;
@@ -370,7 +384,7 @@ int	Red[], Green[], Blue[];
 /* Bump the 'curx' and 'cury' to point to the next pixel
  */
 static void
-BumpPixel()
+BumpPixel(void)
 {
 	/* Bump the current X position */
 	++curx;
@@ -386,7 +400,7 @@ BumpPixel()
 /* Return the next pixel from the image
  */
 static int	
-GIFNextPixel ()
+GIFNextPixel (void)
 {
 	int	r;
 
@@ -403,9 +417,7 @@ GIFNextPixel ()
 /* Write out a word to the GIF file
  */
 static void
-Putword (w, fp)
-int	w;
-FILE*fp;
+Putword (int w, FILE *fp)
 {
 	unsigned short	val = w;
 
@@ -492,10 +504,12 @@ static unsigned long	masks[] = {
 static int a_count; 	    /* Number of characters so far in this 'packet'  */
 static char accum[256];     /* Define the storage for the packet accumulator */
 
+
 static void
-compress (init_bits, outfile)
-int	init_bits;
-FILE	*outfile;
+compress (
+    int	  init_bits,
+    FILE *outfile
+)
 {
 	register long	fcode;
 	register code_int i /* = 0 */;
@@ -596,8 +610,7 @@ nomatch:
  */
 
 static void
-output (code)
-code_int  code;
+output (code_int code)
 {
 	cur_accum &= masks[ cur_bits ];
 
@@ -650,7 +663,7 @@ code_int  code;
  * Clear out the hash table
  */
 static void
-cl_block ()             /* table clear for block compress */
+cl_block (void)             /* table clear for block compress */
 {
 
 	cl_hash  ((count_int) hsize);
@@ -661,8 +674,7 @@ cl_block ()             /* table clear for block compress */
 }
 
 static void
-cl_hash(hsize)          /* reset code table */
-register count_int hsize;
+cl_hash(count_int hsize)          /* reset code table */
 {
 
 	register count_int *htab_p = htab + hsize;
@@ -698,7 +710,7 @@ register count_int hsize;
 /* Set up the 'byte output' routine
  */
 static void
-char_init()
+char_init (void)
 {
 	register int i;
 
@@ -711,17 +723,17 @@ char_init()
  * characters, flush the packet to disk.
  */
 static void
-char_out (c)
-int	c;
+char_out (int c)
 {
 	accum[ a_count++ ] = c;
 	if (a_count >= 254)
 	    flush_char();
 }
 
+
 /* Flush the packet to disk, and reset the accumulator */
 static void
-flush_char()
+flush_char(void)
 {
     	if (a_count > 0) {
     	    fputc (a_count, g_outfile);
