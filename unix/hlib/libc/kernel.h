@@ -90,7 +90,7 @@ typedef	void  (*SIGFUNC)();
 #endif
 
 typedef	void  (*PFV)();
-#ifdef MACH64 || __LP64__
+#if MACH64 || __LP64__
 typedef	long  (*PFI)();
 #else
 typedef	int   (*PFI)();
