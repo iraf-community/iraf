@@ -898,7 +898,7 @@ vm_cacheregion (
 	unsigned long x0, x1, vm_offset, vm_nbytes;
 	struct stat st;
 	int mode;
-	void *addr;
+	void *addr = (void *) NULL;
 
 	if (debug)
 	    fprintf (stderr,
