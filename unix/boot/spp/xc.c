@@ -1135,11 +1135,7 @@ passflag:		    mkobject = YES;
 
 	if (link_nfs) {
 	    sprintf (tempfile, "/tmp/T_%s.XXXXXX", outfile);
-#ifdef LINUX
 	    mkstemp (tempfile);
-#else
-	    mktemp (tempfile);
-#endif
 	} else
 	    sprintf (tempfile, "T_%s", outfile);
 	arglist[nargs++] = tempfile;
