@@ -75,7 +75,7 @@
 #define DECL_OBUF	register char *op; char *np; char obuf[SZ_OBUF+1];
 #define o_clear		(op=obuf)
 #define o_flush(o)	fwrite(obuf,op-obuf,1,o)
-#define putbyte(v)	(*op++ = (v))
+#define putbyte(v)	(*op++ = (char)(v))
 #define putword(v)	((*op++ = (v)/256), (*op++ = (v)%256))
 #define setcount(b,v)	((np = obuf+b), (*np++ = (v)/256), (*np = (v)%256))
 #define npoints		((op-obuf - SZ_HEAD)/4)
