@@ -211,8 +211,8 @@ h_updatelibrary (
 
 	for (npass=0; nleft > 0; npass++) {
 
-#if defined(MACOSX) && !defined(MACH64)
 	    if (npass > 0) {
+#if defined(MACOSX) && !defined(MACH64)
 	        /* For FAT libraries we need to use libtool to update.
 	         */
 	        if (access (lname, F_OK) == 0)
@@ -220,8 +220,10 @@ h_updatelibrary (
 			lname, lname);
 	        else
 	            sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
-	    }
+#else
+                ;
 #endif
+	    }
 
 	    /* Add as many filenames as will fit on the command line.  */
 	    nfiles = add_objects (cmd, SZ_CMD, &flist[ndone], nleft,
