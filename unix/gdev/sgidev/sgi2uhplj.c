@@ -50,8 +50,8 @@
 #define DEF_BOTTOM	30	/* origin in device pixels in y		      */
 #define DEF_HEIGHT	1590	/* height in y (150d/i, 11" paper)	      */
 
-#define SZ_VECT		14	/* total chars in cursor position command   */
-#define SZ_RAST		7	/* total chars in transfer graphics command   */
+#define SZ_VECT		15	/* total chars in cursor position command   */
+#define SZ_RAST		8	/* total chars in transfer graphics command   */
 
 /* graphcap entry for uhplj and sgi_hplaserjet. one problem with current
  * entry is that graph comes out slightly to the right of center on the page
