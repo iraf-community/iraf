@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#ifndef MACOSX
 #include <sys/mtio.h>
+#endif
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <ctype.h>
@@ -13,6 +15,66 @@
 #include <sundev/tmreg.h>
 #include <sundev/xtreg.h>
 #include <sundev/arreg.h>
+#endif
+
+
+#ifdef MACOSX
+
+/* Structure for MTIOCTOP - magnetic tape operation command.  */
+struct mtop
+  {
+    short int mt_op;            /* Operations defined below.  */
+    int mt_count;               /* How many of them.  */
+  };
+#define _IOT_mtop /* Hurd ioctl type field.  */ \
+  _IOT (_IOTS (short), 1, _IOTS (int), 1, 0, 0)
+
+/* Magnetic Tape operations [Not all operations supported by all drivers].  */
+#define MTRESET 0       /* +reset drive in case of problems.  */
+#define MTFSF   1       /* Forward space over FileMark,
+                         * position at first record of next file.  */
+#define MTBSF   2       /* Backward space FileMark (position before FM).  */
+#define MTFSR   3       /* Forward space record.  */
+#define MTBSR   4       /* Backward space record.  */
+#define MTWEOF  5       /* Write an end-of-file record (mark).  */
+#define MTREW   6       /* Rewind.  */
+#define MTOFFL  7       /* Rewind and put the drive offline (eject?).  */
+#define MTNOP   8       /* No op, set status only (read with MTIOCGET).  */
+#define MTRETEN 9       /* Retension tape.  */
+#define MTBSFM  10      /* +backward space FileMark, position at FM.  */
+#define MTFSFM  11      /* +forward space FileMark, position at FM.  */
+#define MTEOM   12      /* Goto end of recorded media (for appending files).
+                           MTEOM positions after the last FM, ready for
+                           appending another file.  */
+#define MTERASE 13      /* Erase tape -- be careful!  */
+
+#define MTRAS1  14      /* Run self test 1 (nondestructive).  */
+#define MTRAS2  15      /* Run self test 2 (destructive).  */
+#define MTRAS3  16      /* Reserved for self test 3.  */
+
+#define MTSETBLK 20     /* Set block length (SCSI).  */
+#define MTSETDENSITY 21 /* Set tape density (SCSI).  */
+#define MTSEEK  22      /* Seek to block (Tandberg, etc.).  */
+#define MTTELL  23      /* Tell block (Tandberg, etc.).  */
+#define MTSETDRVBUFFER 24 /* Set the drive buffering according to SCSI-2.
+                             Ordinary buffered operation with code 1.  */
+#define MTFSS   25      /* Space forward over setmarks.  */
+#define MTBSS   26      /* Space backward over setmarks.  */
+#define MTWSM   27      /* Write setmarks.  */
+
+#define MTLOCK  28      /* Lock the drive door.  */
+#define MTUNLOCK 29     /* Unlock the drive door.  */
+#define MTLOAD  30      /* Execute the SCSI load command.  */
+#define MTUNLOAD 31     /* Execute the SCSI unload command.  */
+#define MTCOMPRESSION 32/* Control compression with SCSI mode page 15.  */
+#define MTSETPART 33    /* Change the active tape partition.  */
+#define MTMKPART  34    /* Format the tape with one or two partitions.  */
+
+/* Magnetic tape I/O control commands.  */
+#define MTIOCTOP        _IOW('m', 1, struct mtop)       /* Do a mag tape op. */
+#define MTIOCGET        _IOR('m', 2, struct mtget)      /* Get tape status.  */
+#define MTIOCPOS        _IOR('m', 3, struct mtpos)      /* Get tape position.*/
+
 #endif
 
 
