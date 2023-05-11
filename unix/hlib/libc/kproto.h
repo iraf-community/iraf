@@ -2,9 +2,12 @@
  *  KPROTO.H -- IRAF Kernel prototype definitions.
  */
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
+
+
+typedef short int shortint;
 
 #ifndef MACH64
 
@@ -40,7 +43,7 @@ extern void phelp(void);
 /* zalloc.c */
 extern int zdvall_(shortint *aliases, int *allflg, int *status);
 extern int zdvown_(shortint *device, shortint *owner, int *maxch, int *status);
-extern int loggedin(int uid);
+extern int loggedin(uid_t uid);
 /* zawset.c */
 extern int zawset_(int *best_size, int *new_size, int *old_size, int *max_size);
 /* zcall.c */
@@ -275,7 +278,7 @@ extern void pr_release(int pid);
 /* zalloc.c */
 extern int zdvall_(shortint *aliases, long *allflg, long *status);
 extern int zdvown_(shortint *device, shortint *owner, long *maxch, long *status);
-extern int loggedin(int uid);
+extern int loggedin(uid_t uid);
 /* zawset.c */
 extern int zawset_(long *best_size, long *new_size, long *old_size, long *max_size);
 /* zcall.c */
