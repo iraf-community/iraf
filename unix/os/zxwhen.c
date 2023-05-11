@@ -73,20 +73,11 @@
  */
 int debug_sig = 0;
 
-#ifdef LINUX
-# define	fcancel(fp)
+#ifdef MACOSX
+#define _IONBF 2		/* No buffering.  */
+#define	fcancel(fp)     setvbuf(fp, NULL, _IONBF, 0);
 #else
-# ifdef BSD
-# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
-# ifdef MACOSX
-# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
-# ifdef SOLARIS
-# define	fcancel(fp)     ((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
-#endif
-#endif
-#endif
+#define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
 #endif
 
 
