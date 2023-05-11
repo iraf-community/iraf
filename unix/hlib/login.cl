@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.17 2021"
+    logver = "IRAF V2.17.1 2023"
 
 set	home		= (envget("HOME") // "/.iraf/")
 set	imdir		= "home$imdir/"
