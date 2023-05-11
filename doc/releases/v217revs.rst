@@ -1,10 +1,10 @@
-IRAF 2.17 Release notes
-=======================
+IRAF 2.17.1 Release notes
+=========================
 
 :Authors: IRAF Community
-:Date: January 07, 2022
+:Date: June 01, 2022
 
-The current IRAF version 2.17 is available from github at
+The current IRAF version 2.17.1 is available from github at
 
 https://github.com/iraf-community/iraf/releases/latest/
 
@@ -27,11 +27,23 @@ Changes to the NOAO 2.16.1 sources include:
    Source <https://opensource.org/docs/osd>`__, and as such included in
    Debian.
 
+-  **Installation procedure reworked**
+
+   The installation scripts are replaced with makefiles, and the build
+   and installation procedures now use the standard targets, standard
+   paths, and customization environment variables. The standard
+   installation place is ``/usr/local/lib/iraf``. On a build error the
+   build now stops now immediately, making it easier to find the
+   cause.
+   
 -  **IRAF ported to other architectures**
 
    IRAF is now ported to a number of little endian architectures (ARM,
    PowerPC, MIPS, x32, RISC-V64) and operating systems (GNU Hurd and
    FreeBSD). Specifically, the Mac M1 processor is supported now.
+
+   The code was adjusted to be compliant with newer (C99) C standards,
+   and to be compileable with actual compilers.
 
 -  **Major bug fixes**
 
@@ -74,6 +86,76 @@ Detailed list of changes
 ------------------------
 
 This list shows all pull requests that were merged since 2.16.1.
+
+Since 2.17
+~~~~~~~~~~
+
+- Update f2c to latest version and document local changes
+  (`#295 <https://github.com/iraf-community/iraf/pull/295>`__)
+- Ensure NULL is a pointer in SPP
+  (`#292 <https://github.com/iraf-community/iraf/pull/292>`__)
+- Replace vosproto.h with prototypes from xnames.h
+  (`#284 <https://github.com/iraf-community/iraf/pull/284>`__)
+- Use typedef instead of #define where applicable
+  (`#283 <https://github.com/iraf-community/iraf/pull/283>`__)
+- Protoize the remaining C code
+  (`#282 <https://github.com/iraf-community/iraf/pull/282>`__)
+- Restructure PFI to be used as "generic" function pointer
+  (`#281 <https://github.com/iraf-community/iraf/pull/281>`__)
+- Fix a few small bugs in sys$
+  (`#280 <https://github.com/iraf-community/iraf/pull/280>`__)
+- Change a few appearances of PKCHAR
+  (`#279 <https://github.com/iraf-community/iraf/pull/279>`__)
+- Replace SIGFUNC by sighandler_t
+  (`#278 <https://github.com/iraf-community/iraf/pull/278>`__)
+- Create useful prototypes for kernel functions (host$os)
+  (`#277 <https://github.com/iraf-community/iraf/pull/277>`__)
+- Fix several errors that appear when compiled with -std=c99
+  (`#276 <https://github.com/iraf-community/iraf/pull/276>`__)
+- Rename iraf subincludes
+  (`#275 <https://github.com/iraf-community/iraf/pull/275>`__)
+- Don't add empty arguments to xc argument lists
+  (`#271 <https://github.com/iraf-community/iraf/pull/271>`__)
+- Fix keyword search in envinit
+  (`#270 <https://github.com/iraf-community/iraf/pull/270>`__)
+- Re-work installation process
+  (`#268 <https://github.com/iraf-community/iraf/pull/268>`__,
+  `#300 <https://github.com/iraf-community/iraf/pull/300>`__)
+- Stop mkpkg execution if an error was discovered
+  (`#267 <https://github.com/iraf-community/iraf/pull/267>`__,
+  `#287 <https://github.com/iraf-community/iraf/pull/287>`__)
+- Convert make scripts (mkpkg.sh) into Makefiles
+  (`#266 <https://github.com/iraf-community/iraf/pull/266>`__,
+  `#293 <https://github.com/iraf-community/iraf/pull/293>`__,
+  `#301 <https://github.com/iraf-community/iraf/pull/301>`__)
+- Update documentation for host commands (xc, mkpkg etc.)
+  (`#265 <https://github.com/iraf-community/iraf/pull/265>`__)
+- Add old release notes as ReStructuredText
+  (`#263 <https://github.com/iraf-community/iraf/pull/263>`__,
+  `#264 <https://github.com/iraf-community/iraf/pull/264>`__)
+- Directly use xc.e, xyacc.e etc. from mkpkg and CL
+  (`#262 <https://github.com/iraf-community/iraf/pull/262>`__)
+- Update cfitsio to version 4.2.0
+  (`#249 <https://github.com/iraf-community/iraf/pull/249>`__)
+- Fix processing onf INDEF in the "generic" preprocessor
+  (`#238 <https://github.com/iraf-community/iraf/pull/238>`__)
+- Ensure the use of the extended image opening code
+  (`#236 <https://github.com/iraf-community/iraf/pull/236>`__)
+- Fix a bug in the parsing of directory arguments of mkfloat
+  (`#231 <https://github.com/iraf-community/iraf/pull/231>`__)
+- Fix off-by-one allocation error in sgi2uhplj.c
+  (`#207 <https://github.com/iraf-community/iraf/pull/207>`__)
+- Update to new C environment
+  (`#225 <https://github.com/iraf-community/iraf/pull/225>`__,
+  `#226 <https://github.com/iraf-community/iraf/pull/226>`__,
+  `#302 <https://github.com/iraf-community/iraf/pull/302>`__)
+- Code cleanup
+  (`#223 <https://github.com/iraf-community/iraf/pull/223>`__,
+  `#274 <https://github.com/iraf-community/iraf/pull/274>`__,
+  `#290 <https://github.com/iraf-community/iraf/pull/290>`__,
+  `#291 <https://github.com/iraf-community/iraf/pull/291>`__,
+  `#294 <https://github.com/iraf-community/iraf/pull/294>`__)
+
 
 Since 2.16.1+2021.06.14
 ~~~~~~~~~~~~~~~~~~~~~~~
