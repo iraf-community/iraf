@@ -38,8 +38,6 @@ export RANLIB = ranlib
 # General compiler flags. Compiler flags specific to the build of the
 # host tools and software are in unix/Makefile.
 export CFLAGS ?= -g -O2
-CFLAGS += $(CARCH)
-export LDFLAGS += $(CARCH)
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 
 .PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace starttime
