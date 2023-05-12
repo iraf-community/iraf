@@ -14,6 +14,7 @@
 #define import_prtype
 #define	import_knames
 #define	import_xnames
+#define	import_vosproto
 #include <iraf.h>
 
 /*
@@ -31,6 +32,7 @@ static	int ipc_in = 0, ipc_out = 0;
 static	int ipc_isatty = NO;
 static	int prtype;
 char	*getenv();
+
 
 
 /* MAIN -- UNIX Main routine for IRAF processes.  The process is a C process
@@ -62,8 +64,7 @@ main (int argc, char *argv[])
 	char	*ip;
 
 	int	arg = 1;
-	extern  int  ZGETTX(), ZGETTY(), ZARDPR(), SYSRUK(), ONENTRY();
-	extern  int  ZZSTRT(), ZLOCPR(), ZZSETK(), IRAF_MAIN();
+        extern int ZLOCPR (PFI proc, long *o_epa);
 
 
 	/* The following flag must be set before calling ZZSTRT. */
