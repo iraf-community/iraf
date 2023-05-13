@@ -4,4 +4,4 @@
 #
 #	USAGE:  'sh -x rmbin.sh'.
 
-/bin/rm -f `find . \! -type d -print | grep '\.[aoe]$'`
+/bin/rm -f `find . -type f -print | grep '\.[aoe]$'`
