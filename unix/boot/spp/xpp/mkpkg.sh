@@ -11,5 +11,15 @@ fi
 
 $CC -c $HSI_CF	xppmain.c xppcode.c decl.c
 $CC $HSI_LF	xppmain.o lexyy.o xppcode.o decl.o $HSI_LIBS -o xpp.e
+
+echo "================================================="
+echo "Testing sample source conversion for differences:"
+echo "================================================="
+./xpp.e -R zztest.x
+diff -bitw zztest.r zztest.r.ref
+echo "================================================="
+echo "Done"
+echo "================================================="
+
 mv -f		xpp.e ../../../hlib
-rm		*.o
+rm		*.o zztest.r
