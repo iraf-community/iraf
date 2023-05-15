@@ -146,13 +146,10 @@ static	char *tp;
 static	int tape;
 static	int sp;
 
-char	*nextcmd(), *prompt();
-char	*gettok(), *getenv();
-
 void  	mtop (int op, int count);
 char 	*nextcmd (FILE *in);
-char 	*gettok (void);
 char 	*prompt (void);
+char 	*gettok (void);
 void  	pstatus (void);
 void  	output (char *text);
 void  	phelp (void);
