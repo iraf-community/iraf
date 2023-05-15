@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <signal.h>
 #include <setjmp.h>
@@ -19,17 +20,10 @@
 #include <fcntl.h>
 #include <time.h>
 #include <pwd.h>
-
-#ifdef SYSV
+#ifndef MACOSX
 #include <termios.h>
-#else
-#include <sgtty.h>
 #endif
-
-#ifdef MACOSX
-#define	USE_RCMD 1
-#include <unistd.h>
-#endif
+#include <stdarg.h>
 
 #define	import_kernel
 #define	import_knames
@@ -182,12 +176,21 @@ static	int parent = -1;
 static	SIGFUNC old_sigcld;
 static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
-static	int ks_getresvport(), ks_rexecport();
-static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
-static	void dbgsp(), dbgmsg(), dbgmsgs();
-static  void dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
-static	char *ks_getpass();
-static	void ks_onsig(), ks_reaper();
+
+static int ks_socket (char *host, u_long addr, int port, char *mode);
+static void ks_onsig (int sig, int *arg1, int *arg2);
+static void ks_reaper (int sig, int *arg1, int *arg2);
+static char *ks_getpass (char *user, char *host);
+
+static int ks_getresvport (int *alport);
+static int ks_rexecport (void);
+static int ks_puti (int fd, int ival);
+static int ks_geti (int fd);
+static int ks_gets (int fd, char *outstr);
+
+static void dbgsp (int pid);
+static void dbgstr (char *str);
+static void dbgmsg (char *format, ...);
 
 static int ks_getlogin (char *hostname, char *loginname, char *password,
   				struct ksparam *ks);
@@ -310,9 +313,9 @@ ZOPNKS (
 
 
 	/* Begin debug message log. */
-	dbgmsg ("---------------------------------------------------------\n");
-	dbgmsg1 ("zopnks (`%s')\n", server);
-	dbgmsg4 ("kstype=%d, prot=%d, host=`%s', cmd=`%s')\n",
+	dbgstr ("---------------------------------------------------------\n");
+	dbgmsg ("zopnks (`%s')\n", server);
+	dbgmsg ("kstype=%d, prot=%d, host=`%s', cmd=`%s')\n",
 	    proctype, ks.protocol, host, ip);
 	parent = getpid();
 
@@ -340,7 +343,7 @@ ZOPNKS (
                 port = port * 10 + (*ip - '0');
             client_host = ip + 1;
 
-	    dbgmsg2 ("S:callback client %s on port %d\n", client_host, port);
+	    dbgmsg ("S:callback client %s on port %d\n", client_host, port);
 	    if ((s = ks_socket (client_host, NULL, port, "connect")) < 0)
 		*chan = ERR;
 	    else
@@ -407,7 +410,7 @@ ZOPNKS (
 		    nsec = 0;   /* no timeout */
 		} else
 		    ip = np;
-		dbgmsg3 ("S:detached in.irafksd, port=%d, auth=%d, timeout=%d\n",
+		dbgmsg ("S:detached in.irafksd, port=%d, auth=%d, timeout=%d\n",
 		    port, auth, nsec);
 
 	    } else {
@@ -418,7 +421,7 @@ ZOPNKS (
 		    { status = 2; goto d_err; }
 		if ((nsec = ks_geti(0)) < 0)
 		    { status = 3; goto d_err; }
-		dbgmsg2 ("S:client spawned in.irafksd, port=%d, timeout=%d\n",
+		dbgmsg ("S:client spawned in.irafksd, port=%d, timeout=%d\n",
 		    port, nsec);
 	    }
 
@@ -443,7 +446,7 @@ ZOPNKS (
 	    }
 
 	    /* Fork daemon process and return if parent, exiting rsh. */
-	    dbgmsg2 ("S:fork in.irafksd, port=%d, timeout=%d\n", port, nsec);
+	    dbgmsg ("S:fork in.irafksd, port=%d, timeout=%d\n", port, nsec);
 	    pid = fork();
 	    if (pid < 0) {
 		status = 4;
@@ -451,7 +454,7 @@ ZOPNKS (
 	    }
 
 	    if (pid) {
-d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
+d_err:		dbgmsg ("S:in.irafksd parent exit, status=%d\n", status);
 		if (!detached) {
 		    ks_puti (1, status);
 		    ks_puti (1, port);
@@ -467,7 +470,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 	     * server in response to each such request.
 	     */
 
-	    dbgmsg3 ("S:in.irafksd started, pid=%d ppid=%d\n",
+	    dbgmsg ("S:in.irafksd started, pid=%d ppid=%d\n",
 		getpid(), getppid());
 	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
 
@@ -496,7 +499,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		jmpset++;
 		if ((sig = setjmp(jmpbuf))) {
 	    	    if (sig == SIGCHLD) {
-	    		dbgmsg ("S:in.irafksd sigchld return\n");
+	    		dbgstr ("S:in.irafksd sigchld return\n");
 			while (waitpid ((pid_t)0, (int *)0, WNOHANG) > 0)
 			        ;
 		    } else
@@ -512,7 +515,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 			      "S:in.irafksd: accept on port %d failed\n", port);
 		    exit (2);
 		} else
-		    dbgmsg ("S:in.irafksd: connection established\n");
+		    dbgstr ("S:in.irafksd: connection established\n");
 
 		/* Find out where the connection is coming from. */
 		fromlen = sizeof (from);
@@ -547,7 +550,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		}
 
 		/* Connection authorized if this message is output. */
-		dbgmsg1 ("S:in.irafksd: client port = %d\n", s_port);
+		dbgmsg ("S:in.irafksd: client port = %d\n", s_port);
 
 		/* Fork the iraf kernel server. */
 		pid = fork();
@@ -558,7 +561,7 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		}
 
 		if (pid) {					/** parent **/
-s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
+s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
 			status);
 		    ks_puti (fd, status);
 		    close (fd);
@@ -571,7 +574,7 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 		    u_long  n_addr, addr;
 		    unsigned char *ap = (unsigned char *)&n_addr;
 
-		    dbgmsg2 ("S:irafks server started, pid=%d ppid=%d\n",
+		    dbgmsg ("S:irafks server started, pid=%d ppid=%d\n",
 			getpid(), getppid());
 		    signal (SIGCHLD, old_sigcld);
 		    /*
@@ -582,14 +585,14 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 		    n_addr = from.sin_addr.s_addr;
 		    addr = ntohl(n_addr);
 		    sprintf (obuf, "%d.%d.%d.%d", ap[0],ap[1],ap[2],ap[3]);
-		    dbgmsg2 ("S:client address=%s port=%d\n", obuf, s_port);
+		    dbgmsg ("S:client address=%s port=%d\n", obuf, s_port);
 
 		    if ((s = ks_socket (NULL, addr, s_port, "connect")) < 0) {
-			dbgmsg1 ("S:irafks connect to port %d failed\n", s_port);
+			dbgmsg ("S:irafks connect to port %d failed\n", s_port);
 			fprintf (stderr, "irafks: cannot connect to client\n");
 			exit (1);
 		    } else
-			dbgmsg1 ("S:irafks connected on port %d\n", s_port);
+			dbgmsg ("S:irafks connected on port %d\n", s_port);
 
 		    *chan = s;
 		    goto done;
@@ -615,7 +618,7 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 	     * rexec and communicate via the socket returned by rexec.
 	     */
 	    hostp = host;
-	    dbgmsg2 ("C:rexec for host=%s, user=%s\n", host, username);
+	    dbgmsg ("C:rexec for host=%s, user=%s\n", host, username);
 #ifdef USE_RCMD
 	    *chan = rcmd (&hostp, ks_rexecport(),
 		getlogin(), username, cmd, 0);
@@ -652,10 +655,10 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 		goto r_err;
 	    sprintf (callback_cmd, "%s callback %d@%s",
 		cmd, s_port, hp->h_name);
-	    dbgmsg2 ("rexec to host %s: %s\n", host, callback_cmd);
+	    dbgmsg ("rexec to host %s: %s\n", host, callback_cmd);
 
 	    hostp = host;
-	    dbgmsg3 ("rexec for host=%s, user=%s, using client port %d\n",
+	    dbgmsg ("rexec for host=%s, user=%s, using client port %d\n",
 		host, username, s_port);
 #ifdef USE_RCMD
 	    ss = rcmd (&hostp, ks_rexecport(),
@@ -666,14 +669,14 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 #endif
 
 	    /* Wait for the server to call us back. */
-	    dbgmsg1 ("waiting for connection on port %d\n", s_port);
+	    dbgmsg ("waiting for connection on port %d\n", s_port);
 	    if ((tfd = accept (s, (struct sockaddr *)0, (socklen_t *)0)) < 0) {
-r_err:		dbgmsg ("rexec-callback connect failed\n");
+r_err:		dbgstr ("rexec-callback connect failed\n");
 		close(s);  close(ss);
 		*chan = ERR;
 	    } else {
 		close(s);  fd = dup(tfd);  close(tfd);
-		dbgmsg1 ("connected to irafks server on fd=%d\n", fd);
+		dbgmsg ("connected to irafks server on fd=%d\n", fd);
 		*chan = fd;
 
 		/* Mark the rexec channel for deletion at close time when
@@ -708,7 +711,7 @@ r_err:		dbgmsg ("rexec-callback connect failed\n");
 		status |= 01;
 		goto c_err;
 	    }
-	    dbgmsg2 ("C:connect to in.irafksd host=%s client port=%d\n",
+	    dbgmsg ("C:connect to in.irafksd host=%s client port=%d\n",
 		host, s_port);
 
 	    /* Ready to receive callback from server. */
@@ -729,7 +732,7 @@ again:
 	     * the connection fails, fork an rsh and start up the in.irafksd.
 	     */
 	    if (!port || (t = ks_socket (host, NULL, port, "connect")) < 0) {
-		dbgmsg ("C:no server, fork rsh to start in.irafksd\n");
+		dbgstr ("C:no server, fork rsh to start in.irafksd\n");
 
 		if (pipe(pin) < 0 || pipe(pout) < 0) {
 		    status |= 04;
@@ -748,7 +751,7 @@ again:
 		    close (pin[1]);
 		    close (pout[0]);
 retry:
-		    dbgmsg2 ("C:send port=%d, timeout=%d to irafks.e\n",
+		    dbgmsg ("C:send port=%d, timeout=%d to irafks.e\n",
 			ks.port, ks.timeout);
 		    if (ks_puti (pout[1], port) <= 0)
 			status |= 0020;
@@ -760,7 +763,7 @@ retry:
 			status |= 0200;
 
 		    port = ks_geti (pin[0]);
-		    dbgmsg1 ("C:irafks.e returns port=%d\n", port);
+		    dbgmsg ("C:irafks.e returns port=%d\n", port);
 
 		    /* Wait for the rsh connection to shut down. */
 		    while (read (pin[0], obuf, SZ_LINE) > 0)
@@ -801,12 +804,12 @@ retry:
 			    goto c_err;
 			}
 
-			dbgmsg ("C:rsh failed - try rexec\n");
+			dbgstr ("C:rsh failed - try rexec\n");
 			if (!(password = ks_getpass (username, host)))
 			    { status |= 01000;  goto c_err; }
 
 			sprintf (command, "%s in.irafksd", cmd);
-			dbgmsg3 ("C:rexec %s@%s: %s\n", username, host, command);
+			dbgmsg ("C:rexec %s@%s: %s\n", username, host, command);
 
 			hostp = host;
 #ifdef USE_RCMD
@@ -839,7 +842,7 @@ retry:
 
 		    rshcmd = (s = getenv(KSRSH)) ? s : RSH;
 
-		    dbgmsg3 ("C:exec rsh %s -l %s `%s' in.irafksd\n",
+		    dbgmsg ("C:exec rsh %s -l %s `%s' in.irafksd\n",
 			host, username, cmd);
 		    execlp (rshcmd, rshcmd,
 			host, "-l", username, cmd, "in.irafksd", NULL);
@@ -852,7 +855,7 @@ retry:
 	     * authorization code.  The in.irafksd daemon returns a status
 	     * byte which will be zero if the operation is successful.
 	     */
-	    dbgmsg1 ("C:request irafks server for client port %d\n", s_port);
+	    dbgmsg ("C:request irafks server for client port %d\n", s_port);
 
 	    if (ks_puti (t, s_port) <= 0)
 		{ status |= 004000;  goto c_err; }
@@ -873,7 +876,7 @@ retry:
 		if (port && status == UNAUTH) {
 		    close(t);
 		    port = 0;
-		    dbgmsg ("C:authorization failed, retry with port=0\n");
+		    dbgstr ("C:authorization failed, retry with port=0\n");
 		    status = 0;
 		    goto again;
 		} else {
@@ -884,13 +887,13 @@ retry:
 
 	    /* Wait for the server to call us back. */
 	    if ((tfd = accept (s, (struct sockaddr *)0, (socklen_t *)0)) < 0) {
-c_err:		dbgmsg1 ("C:zfioks client status=%o\n", status);
+c_err:		dbgmsg ("C:zfioks client status=%o\n", status);
 		close(t);  close(s);
 		kill (pid, SIGTERM);
 		*chan = ERR;
 	    } else {
 		close(t);  close(s);  fd = dup(tfd);  close(tfd);
-		dbgmsg1 ("C:connected to irafks server on fd=%d\n", fd);
+		dbgmsg ("C:connected to irafks server on fd=%d\n", fd);
 		*chan = fd;
 	    }
 	}
@@ -906,7 +909,7 @@ done:
 	    }
 	}
 
-	dbgmsg1 ("zopnks returns status=%d\n", *chan);
+	dbgmsg ("zopnks returns status=%d\n", *chan);
 
 	return (*chan);
 }
@@ -933,7 +936,7 @@ ZCLSKS (
 	    }
 	}
 
-	dbgmsg2 ("server [%d] terminated, status = %d\n", *chan, *status);
+	dbgmsg ("server [%d] terminated, status = %d\n", *chan, *status);
 
 	return (*status);
 }
@@ -969,7 +972,7 @@ ZARDKS (
 	op = (char *)buf;
 	zfd[fd].nbytes = nbytes = *totbytes;
 	if (debug_ks > 1)
-	    dbgmsg2 ("initiate read of %d bytes from KS channel %d\n",
+	    dbgmsg ("initiate read of %d bytes from KS channel %d\n",
 		nbytes, fd);
 
 	/* Now read exactly nbytes of data from channel into user buffer.
@@ -1006,7 +1009,7 @@ ZARDKS (
 	signal (SIGINT,  sigint);
 	signal (SIGTERM, sigterm);
 	if (debug_ks > 1)
-	    dbgmsg2 ("read %d bytes from KS channel %d:\n", op-(char *)buf, fd);
+	    dbgmsg ("read %d bytes from KS channel %d:\n", op-(char *)buf, fd);
 
 	return (status);
 }
@@ -1039,7 +1042,7 @@ ZAWRKS (
 
 	zfd[fd].nbytes = nbytes = *totbytes;
 	if (debug_ks > 1)
-	    dbgmsg2 ("initiate write of %d bytes to KS channel %d\n",
+	    dbgmsg ("initiate write of %d bytes to KS channel %d\n",
 		nbytes, ofd);
 
 	/* Write exactly nbytes of data to the channel from user buffer to
@@ -1064,7 +1067,7 @@ ZAWRKS (
 	signal (SIGTERM, sigterm);
 	signal (SIGPIPE, sigpipe);
 	if (debug_ks > 1)
-	    dbgmsg2 ("wrote %d bytes to KS channel %d:\n", zfd[fd].nbytes, ofd);
+	    dbgmsg ("wrote %d bytes to KS channel %d:\n", zfd[fd].nbytes, ofd);
 
 	return (XOK);
 }
@@ -1102,7 +1105,7 @@ ks_reaper (
         int status=0, pid=0;
 
         while ((pid = waitpid ((pid_t)0, (int *) &status, WNOHANG)) > 0)
-	    dbgmsg2 ("ks_reaper -- pid=%d, status=%d\n", pid, status);
+	    dbgmsg ("ks_reaper -- pid=%d, status=%d\n", pid, status);
 
 	if (jmpset)
 	    longjmp (jmpbuf, sig);
@@ -1208,7 +1211,7 @@ char	*mode;
 	return (s);
 
 failed:
-	dbgmsg2 ("ks_socket: errno=%d (%s)\n", errno, strerror(errno));
+	dbgmsg ("ks_socket: errno=%d (%s)\n", errno, strerror(errno));
 	close (s);
 	return (ERR);
 }
@@ -1219,8 +1222,7 @@ failed:
  * output argument.
  */
 static int
-ks_getresvport (alport)
-int	*alport;
+ks_getresvport (int *alport)
 {
 	struct	sockaddr_in sin;
 	int	s;
@@ -1244,7 +1246,7 @@ int	*alport;
 		(void) close(s);
 		return (-1);
 	    }
-	    dbgmsg4 ("ks_getresvport: decr errno=%d (%s) alport=%d -> %d\n", 
+	    dbgmsg ("ks_getresvport: decr errno=%d (%s) alport=%d -> %d\n", 
 		errno, strerror(errno), *alport, *alport - 1);
 	    (*alport)--;
 	    if (*alport == IPPORT_RESERVED) {
@@ -1259,7 +1261,7 @@ int	*alport;
 /* KS_REXECPORT -- Return the port for the rexec system service.
  */
 static int
-ks_rexecport()
+ks_rexecport(void)
 {
 	register struct servent *sv;
 	static	int port = 0;
@@ -1278,9 +1280,7 @@ ks_rexecport()
  * ascii string.
  */
 static int
-ks_puti (fd, ival)
-int	fd;
-int	ival;
+ks_puti (int fd, int ival)
 {
 	char	obuf[SZ_FNAME];
 
@@ -1293,8 +1293,7 @@ int	ival;
  * string, base decimal, from the given stream.
  */
 static int
-ks_geti (fd)
-int	fd;
+ks_geti (int fd)
 {
 	register int value = 0;
 	struct  timeval timeout;
@@ -1325,13 +1324,13 @@ int	fd;
 	 */
 	do {
 	    if (select (SELWIDTH, &rfd, NULL, NULL, &timeout) <= 0) {
-		dbgmsg ("ks_geti: timeout on read\n");
+		dbgstr ("ks_geti: timeout on read\n");
 		jmpset = 0;
 		return (ERR);
 	    }
 
 	    if ((stat = read (fd, &ch, 1)) <= 0) {
-		dbgmsg3 ("ks_geti: read status=%d, errno=%d (%s)\n", 
+		dbgmsg ("ks_geti: read status=%d, errno=%d (%s)\n", 
 		    stat, errno, strerror(errno));
 		jmpset = 0;
 		return (ERR);
@@ -1341,7 +1340,7 @@ int	fd;
 		if (isdigit(ch))
 		    value = value * 10 + (ch - '0');
 		else {
-		    dbgmsg1 ("ks_geti: read char=%o\n", ch);
+		    dbgmsg ("ks_geti: read char=%o\n", ch);
 		    jmpset = 0;
 		    return (ERR);
 		}
@@ -1355,16 +1354,14 @@ int	fd;
 
 /* KS_GETS -- Read a null terminated ascii string.
 static int
-ks_gets (fd, outstr)
-int	fd;
-char	*outstr;
+ks_gets (int fd, char *outstr)
 {
 	register char *op = outstr;
 	int	stat;
 
 	do {
 	    if ((stat = read (fd, op, 1)) <= 0) {
-		dbgmsg3 ("ks_gets: read status=%d, errno=%d (%s)\n", 
+		dbgmsg ("ks_gets: read status=%d, errno=%d (%s)\n", 
 		    stat, errno, strerror(errno));
 		return (ERR);
 	    }
@@ -1377,8 +1374,8 @@ char	*outstr;
 
 /* KS_MSG -- Print debugging messages.
  */
-static void dbgsp (pid)
-int	pid;
+static void
+dbgsp (int pid)
 {
 	int i, nsp = ((parent > 0) ? (pid - parent) : 0);
 	for (i=0; i < nsp; i++)
@@ -1386,74 +1383,30 @@ int	pid;
 }
 
 static void
-dbgmsg (msg)
-char    *msg;
+dbgstr (char *msg)
 {
-	int pid;
 	if (debug_ks) {
+	    int pid;
 	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, "%s", msg);
 	}
 }
+
 static void
-dbgmsgs (fmt, arg)
-char    *fmt;
-char    *arg;
+dbgmsg (char *format, ...)
 {
-	int pid;
-	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, fmt, arg);
-	    fflush (debug_fp);
-	}
-}
-static void
-dbgmsg1 (fmt, arg)
-char    *fmt;
-int     arg;
-{
-	int pid;
-	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, fmt, arg);
-	    fflush (debug_fp);
-	}
-}
-static void
-dbgmsg2 (fmt, arg1, arg2)
-char    *fmt;
-int     arg1, arg2;
-{
-	int pid;
-	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, fmt, arg1, arg2);
-	    fflush (debug_fp);
-	}
-}
-static void
-dbgmsg3 (fmt, arg1, arg2, arg3)
-char    *fmt;
-int     arg1, arg2, arg3;
-{
-	int pid;
-	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, fmt, arg1, arg2, arg3);
-	    fflush (debug_fp);
-	}
-}
-static void
-dbgmsg4 (fmt, arg1, arg2, arg3, arg4)
-char    *fmt;
-int     arg1, arg2, arg3, arg4;
-{
-	int pid;
-	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
-	    fprintf (debug_fp, fmt, arg1, arg2, arg3, arg4);
-	    fflush (debug_fp);
-	}
+        if (debug_ks && debug_fp != (FILE *) NULL) {
+            int pid;
+            va_list vargs;
+
+            fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
+
+            va_start(vargs, format);
+            vfprintf (debug_fp, format, vargs);
+            va_end(vargs);
+
+            fflush (debug_fp);
+        }
 }
 
 
@@ -1689,9 +1642,9 @@ query:		if ((namep = ks_getpass (loginname, hostname)))
 	if (np->protocol)
 	    ks->protocol = np->protocol;
 
-	dbgmsg1 ("ks.port = %d\n", ks->port);
-	dbgmsg1 ("ks.hiport = %d\n", ks->hiport);
-	dbgmsg1 ("ks.timeout = %d\n", ks->timeout);
+	dbgmsg ("ks.port = %d\n", ks->port);
+	dbgmsg ("ks.hiport = %d\n", ks->hiport);
+	dbgmsg ("ks.timeout = %d\n", ks->timeout);
 
 	/* Update irafhosts if necessary. */
 	if (update || (hp->mode & 077))
@@ -1765,7 +1718,7 @@ ks_rhosts (char *filename)
 	int	value;
 	FILE	*fp;
 
-	dbgmsgs ("read %s\n", filename);
+	dbgmsg ("read %s\n", filename);
 
 	/* Open irafhosts file. */
 	if ((fp = fopen (filename, "r")) == NULL)
@@ -1932,7 +1885,7 @@ ks_whosts (
 	int	fd, q, i;
 	FILE	*fp;
 
-	dbgmsgs ("update %s\n", filename);
+	dbgmsg ("update %s\n", filename);
 
 	/* Open new irafhosts file. */
 	unlink (filename);
