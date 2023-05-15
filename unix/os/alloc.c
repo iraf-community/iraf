@@ -102,7 +102,7 @@ alloc (
 {
 	register int ruid, mode, i;
 	register struct file *fp;
-	struct	passwd *getpwuid();
+	struct	passwd *getpwuid(uid_t uid);
 	int	rgid;
 
 	if (findsfs (argv) == 0)
@@ -237,13 +237,13 @@ findsfs (char *argv[])
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
 int
-loggedin (int uid)
+loggedin (uid_t uid)
 {
 	register int i;
 	static	int uidcache[10];
 	static	int nuid = 0;
 	struct	utmpx ubuf;
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw, *getpwuid(uid_t uid);
 	FILE	*ufp;
 
 	for (i=0;  i < nuid;  i++)

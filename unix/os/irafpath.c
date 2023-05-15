@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 #define import_spp
@@ -11,8 +12,6 @@
 
 #define	SZ_ULIBSTR	512
 #define	ULIB		"IRAFULIB"
-
-extern	char *getenv();
 
 
 /* IRAFPATH -- Determine the pathname of the given IRAF library file.  If the

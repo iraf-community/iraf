@@ -232,7 +232,7 @@ ZXWHEN (
 	int     vex, uex;
 	SIGFUNC	vvector;
 
-	extern  int  kernel_panic ();
+	extern  int  kernel_panic (char *errmsg);
 
 
 	/* Convert code for virtual exception into an index into the table

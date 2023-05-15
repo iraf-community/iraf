@@ -17,6 +17,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #ifndef NORLIMIT
 #include <sys/time.h>
@@ -40,7 +41,6 @@
 unsigned int defworkset = SZ_DEFWORKSET;
 unsigned int maxworkset = SZ_MAXWORKSET;
 static unsigned int max_wss = 0;
-extern char *getenv();
 
 
 /* ZAWSET -- Adjust or query the "working set", i.e., the maximum amount of

@@ -9,8 +9,12 @@
 #include <iraf.h>
 
 
+/*
 extern  int  ZOPNTX (), ZCLSTX (), ZFLSTX (), ZGETTX ();
 extern  int  ZNOTTX (), ZPUTTX (), ZSEKTX (), ZSTTTX ();
+*/
+
+int ZGETTY (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
 
 
 /*

@@ -14,7 +14,7 @@
 #define import_prtype
 #define	import_knames
 #define	import_xnames
-#define	import_vosproto
+#define	import_kproto
 #include <iraf.h>
 
 /*
@@ -32,6 +32,18 @@ static	int ipc_in = 0, ipc_out = 0;
 static	int ipc_isatty = NO;
 static	int prtype;
 char	*getenv();
+
+extern XINT ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
+extern XINT ZGETTY (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
+extern XINT SYSRUK (XCHAR *task, XCHAR *cmd, XINT *ruk_argoff,
+                   XINT *ruk_interact);
+extern XINT ONENTRY (XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
+extern XINT ZARDPR (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset);
+
+/*
+extern XINT ONENTRY (XINT *prtype, XCHAR *bkgfie, XCHAR *cmd);
+extern XINT SYSRUK (XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint);
+*/
 
 
 

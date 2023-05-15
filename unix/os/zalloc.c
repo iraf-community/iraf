@@ -91,9 +91,9 @@ ZDVOWN (
   XINT	  *status		/* receives allocation status	*/
 )
 {
-	register int	uid;
+	register uid_t	uid;
 	char	*dev, devname[SZ_FNAME+1];
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw, *getpwuid(uid_t uid);
 	struct	stat fi;
 
 
@@ -147,10 +147,10 @@ ZDVOWN (
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
 int
-loggedin (int uid)
+loggedin (uid_t uid)
 {
 	struct	utmpx ubuf;
-	struct	passwd *pw, *getpwuid();
+	struct	passwd *pw, *getpwuid(uid_t uid);
 	FILE	*ufp;
 
 	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {

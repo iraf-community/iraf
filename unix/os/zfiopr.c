@@ -16,6 +16,7 @@
 #include <iraf.h>
 
 extern	int errno;		/* error code returned by the kernel	*/
+
 #ifdef SYSV
 #define	vfork	fork
 #else
@@ -25,7 +26,6 @@ extern	int errno;		/* error code returned by the kernel	*/
 #endif
 
 extern void pr_enter (int pid, int inchan, int outchan);
-
 
 
 /* ZFIOPR -- File i/o to a subprocess.  A "connected" subprocess is connected

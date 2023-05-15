@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -153,7 +154,6 @@ ZZSTRT (void)
 	    static   char envdef[SZ_FNAME];
 	    char     shimage[SZ_FNAME];
 	    char     *shlib, *arch;
-	    extern   char *getenv();
 	    caddr_t  addr;
 	    unsigned hsize;
 #ifdef SOLARIS

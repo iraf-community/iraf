@@ -6,6 +6,7 @@
 #include <sys/file.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 # ifndef O_NDELAY
 #include <fcntl.h>
@@ -414,8 +415,6 @@ static int dio_threshold  = DEF_DIOTHRESH;
 static int vm_port 	  = DEF_VMPORT;
 static char vm_client[SZ_CNAME+1];
 
-extern char *getenv();
-extern char *realpath();
 static void vm_initialize();
 static void vm_shutdown();
 static void vm_identify();
