@@ -13,6 +13,12 @@
 #define	import_knames
 #include <iraf.h>
 
+/* VOS Prototypes.
+ */
+extern int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR *stdout_file,
+                   PKCHAR *stderr_file, XINT *status);
+
+
 /*
  * ZALLOC.C -- Device allocation interface.  Requires the dev$devices table,
  * which is read by the high level code before we are called.
@@ -54,8 +60,6 @@ ZDVALL (
 )
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
-
-	extern int ZOSCMD ();
 
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
@@ -187,8 +191,6 @@ u_allocstat (
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 	XINT	x_status;
-
-	extern int ZOSCMD();
 
 
 	/* Syntax: $host/hlib/alloc.e -s aliases

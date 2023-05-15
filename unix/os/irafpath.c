@@ -15,7 +15,7 @@
 
 /* VOS Prototypes.
  */
-int ZGTENV (PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
+extern int ZGTENV (PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
 
 
 /* IRAFPATH -- Determine the pathname of the given IRAF library file.  If the
