@@ -1079,7 +1079,6 @@ vm_uncacheregion (
 	register Segment *sp;
 	unsigned long  x0, x1;
         unsigned long  vm_offset;
-        //unsigned long  vm_nbytes;
 	struct stat st;
 
 	if (debug)
@@ -1095,7 +1094,6 @@ vm_uncacheregion (
 	x1 = (x1 - (x1 % vm->pagesize)) + vm->pagesize - 1;
 
 	vm_offset = x0;
-	//vm_nbytes = x1 - x0 + 1;
 
 	if (fstat (fd, &st) < 0)
 	    return (-1);
@@ -1377,7 +1375,7 @@ vm_status (
  */
 static Segment *
 vm_locate (
-    VMcache *vm,                // NOTUSED
+    VMcache *vm,                /* NOTUSED */
     register dev_t device,
     register ino_t inode
 )
@@ -1385,7 +1383,7 @@ vm_locate (
 	register Segment *sp;
 	int hashval;
 
-        (void)(vm);             // NOTUSED
+        (void)(vm);             /* NOTUSED */
 	hashval = hashint (SZ_HASHTBL, device, inode);
 	for (sp = hashtbl[hashval];  sp;  sp = sp->nexthash)
 	    if (sp->device == device && sp->inode == inode)
@@ -1480,7 +1478,6 @@ vm_sync (
 {
 	register Segment *sp;
 	unsigned long x0, x1, vm_offset;
-        //unsigned long vm_nbytes;
 	int syncflag, status = 0;
 	struct stat st;
 
@@ -1499,7 +1496,6 @@ vm_sync (
 	x1 = (x1 - (x1 % vm->pagesize)) + vm->pagesize - 1;
 
 	vm_offset = x0;
-	//vm_nbytes = x1 - x0 + 1;
 
 #ifdef sun
 #ifdef _SYS_SYSTEMINFO_H
