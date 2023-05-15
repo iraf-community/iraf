@@ -8,8 +8,21 @@
 #define	import_libc
 #define	import_xnames
 #define	import_knames
+#define	import_vosproto
 #include <iraf.h>
 #include "bootlib.h"
+
+#include "../bootProto.h"
+
+/* VOS Prototypes.
+ */
+XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
+XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
+int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
+
+int XERPSH (void);              /* for iferr macro      */
+XBOOL XERPOP (void);
+XINT XERPOPI (void);
 
 
 static	char	vfn[SZ_PATHNAME+1];
@@ -25,7 +38,7 @@ osfn2vfn (
   char	*osfn 			/* input OS filename	*/
 )
 {
-	strcpy (vfn, osfn);		/* [MACHDEP */
+	strcpy (vfn, osfn);	/* [MACHDEP */
 	return (vfn);
 }
 
@@ -36,8 +49,10 @@ osfn2vfn (
  * the IRAF one.  No attempt is made to map OS directory names into IRAF
  * logical directory names; this is a local directory operation only.
  */
-char *osfn2vfn (osfn)
-char	*osfn;			/* input OS filename	*/
+char *
+osfn2vfn (
+    char *osfn			/* input OS filename	*/
+)
 {
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XCHAR	x_vfn[SZ_PATHNAME+1];
@@ -51,20 +66,20 @@ char	*osfn;			/* input OS filename	*/
 	
 	os_strupk ("./", x_vfn, SZ_PATHNAME);
 	x_mode = VFN_UNMAP;
-	iferr (vp = VFNOPEN (x_vfn, (integer *)&x_mode)) {
+	iferr (vp = VFNOPEN (x_vfn, (XINT *)&x_mode)) {
 	    vp = 0;
 	    goto err_;
 	}
 
 	strcpy ((char *)x_osfn, osfn);
-	iferr (nchars = VFNUNMAP ((integer *)&vp, x_osfn, x_vfn, 
-	    (integer *)&x_maxch))
+	iferr (nchars = VFNUNMAP ((XPOINTER *)&vp, x_osfn, x_vfn, 
+	    (XINT *)&x_maxch))
 	        goto err_;
 	if (nchars < 0)
 	    goto err_;
 
 	x_mode = VFN_NOUPDATE;
-	VFNCLOSE ((integer *)&vp, (integer *)&x_mode);
+	VFNCLOSE ((XPOINTER *)&vp, (XINT *)&x_mode);
 
 	os_strpak (x_vfn, vfn, SZ_PATHNAME);
 	return (vfn);
@@ -72,7 +87,7 @@ char	*osfn;			/* input OS filename	*/
 err_:
 	fprintf (stderr, "cannot unmap filename `%s'\n", osfn);
 	if (vp > 0)
-	    VFNCLOSE ((integer *)&vp, (integer *)&x_mode);
+	    VFNCLOSE ((XPOINTER *)&vp, (XINT *)&x_mode);
 
 	strcpy (vfn, osfn);
 	return (vfn);
