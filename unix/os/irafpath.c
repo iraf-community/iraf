@@ -13,6 +13,10 @@
 #define	SZ_ULIBSTR	512
 #define	ULIB		"IRAFULIB"
 
+/* VOS Prototypes.
+ */
+int ZGTENV (PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
+
 
 /* IRAFPATH -- Determine the pathname of the given IRAF library file.  If the
  * file is found the full pathname is returned, else the given filename is
@@ -21,8 +25,9 @@
  * the system files, e.g., for testing purposes.
  */
 char *
-irafpath (fname)
-char *fname;			/* simple filename, no dirs */
+irafpath (
+    char  *fname		/* simple filename, no dirs */
+)
 {
 	static	char pathname[SZ_PATHNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];
@@ -32,8 +37,6 @@ char *fname;			/* simple filename, no dirs */
 	XINT	sz_ulibs=SZ_ULIBSTR;
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
-
-	extern  int  ZGTENV();
 
 
 	/* Search any user libraries first. */
