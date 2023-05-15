@@ -12,6 +12,19 @@
 
 #define	FINIT
 #include "bootlib.h"
+#include "../bootProto.h"
+
+/* VOS Prototypes.
+ */
+XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
+XINT VFNMAP (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
+XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
+int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
+XINT VFNADD (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
+
+int XERPSH (void);              /* for iferr macro      */
+XBOOL XERPOP (void);
+XINT XERPOPI (void);
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
@@ -102,7 +115,7 @@ vfn2osfn (
 	_envinit();
 
 	err = 0;
-	iferr (vp = VFNOPEN (upkvfn, (integer *)&mode)) {
+	iferr (vp = VFNOPEN (upkvfn, (XINT *)&mode)) {
 	    fprintf (stderr, "Warning: cannot open vfn `%s' for %s\n",
 		vfn, mode == VFN_WRITE ? "writing" : "reading");
 	    err++;
@@ -110,17 +123,17 @@ vfn2osfn (
 
 	if (new) {
 	    if (!err)
-		iferr (VFNADD ((integer *)&vp, pk_osfn, (integer *)&maxch))
+		iferr (VFNADD ((XPOINTER *)&vp, pk_osfn, (XINT *)&maxch))
 		    fprintf (stderr, "Warning: cannot add filename `%s'\n",vfn);
 	} else {
 	    if (!err)
-		iferr (VFNMAP ((integer *)&vp, pk_osfn, (integer *)&maxch))
+		iferr (VFNMAP ((XPOINTER *)&vp, pk_osfn, (XINT *)&maxch))
 		    fprintf (stderr, "Warning: cannot map filename `%s'\n",vfn);
 	}
 
 	mode = (mode == VFN_WRITE) ? VFN_UPDATE : VFN_NOUPDATE;
 	if (!err) {
-	    iferr (VFNCLOSE ((integer *)&vp, (integer *)&mode))
+	    iferr (VFNCLOSE ((XPOINTER *)&vp, (XINT *)&mode))
 		fprintf (stderr, "Warning: error closing mapping file\n");
 	} else
 	    *osfn = EOS;
