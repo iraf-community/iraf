@@ -16,13 +16,13 @@
 
 /* VOS Prototypes.
  */
-XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
-XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
-int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
+extern XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
+extern XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
+extern int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
 
-int XERPSH (void);              /* for iferr macro      */
-XBOOL XERPOP (void);
-XINT XERPOPI (void);
+extern int XERPSH (void);              /* for iferr macro      */
+extern XBOOL XERPOP (void);
+extern XINT XERPOPI (void);
 
 
 static	char	vfn[SZ_PATHNAME+1];

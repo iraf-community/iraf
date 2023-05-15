@@ -16,15 +16,15 @@
 
 /* VOS Prototypes.
  */
-XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
-XINT VFNMAP (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
-XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
-int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
-XINT VFNADD (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
+extern XPOINTER VFNOPEN (XCHAR *vfn, XINT *mode);
+extern XINT VFNMAP (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
+extern XINT VFNUNMAP (XPOINTER *vfd, XCHAR *osfn, XCHAR *vfn, XINT *maxch);
+extern int VFNCLOSE (XPOINTER *vfd, XINT *update_enable);
+extern XINT VFNADD (XPOINTER *vfd, XCHAR *osfn, XINT *maxch);
 
-int XERPSH (void);              /* for iferr macro      */
-XBOOL XERPOP (void);
-XINT XERPOPI (void);
+extern int XERPSH (void);              /* for iferr macro      */
+extern XBOOL XERPOP (void);
+extern XINT XERPOPI (void);
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
