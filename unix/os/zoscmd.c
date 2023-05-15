@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/time.h>
@@ -50,7 +51,6 @@ ZOSCMD (
 	char	*sin, *sout, *serr, *cmd;
 	struct	rlimit rlim;
 	int	maxfd, fd, pid;
-	char	*getenv();
 #ifdef USE_SIGACTION
 	struct sigaction oldact;
 #else
