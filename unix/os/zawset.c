@@ -56,7 +56,7 @@ ZAWSET (
 {
 	int physmem=0, kb_page;
 	int debug = (getenv(ENV_DEBUG) != NULL);
-	char *s, *getenv();
+	char *s;
 
 #ifndef NORLIMIT
 	unsigned int working_set_size;
