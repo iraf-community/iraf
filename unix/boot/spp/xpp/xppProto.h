@@ -4,12 +4,14 @@ void  d_newproc (char *name, int dtype);
 int   d_declaration (int dtype);
 void  d_codegen (register FILE *fp);
 void  d_runtime (char *text);
-//void  d_makedecl (struct symbol *sp, FILE *fp);
+/*
+void  d_makedecl (struct symbol *sp, FILE *fp);
+void  d_declfunc (struct symbol *sp, FILE *fp);
+*/
 struct symbol *d_enter (char *name, int dtype, int flags);
 struct symbol *d_lookup (char *name);
 void  d_chksbuf (void);
 int   d_gettok (char *tokstr, int maxch);
-//void  d_declfunc (struct symbol *sp, FILE *fp);
 
 
 /* xppcode.c */
@@ -38,7 +40,9 @@ void  outstr (char *string);
 void  begin_code (void);
 void  end_code (void);
 void  init_strings (void);
-//void  write_string_data_statement (struct string *s);
+/*
+void  write_string_data_statement (struct string *s);
+*/
 void  do_string (char delim, int strtype);
 void  do_hollerith (void);
 void  sbuf_check (void);

@@ -55,8 +55,8 @@ int main (int argc, char **argv)
 	nfiles = 0;
 
 	/* Process flags and count the number of files.
-	 */
         (void)(argc);           // NOTUSED
+	 */
 	for (i=1;  argv[i] != NULL;  i++) {
 	    if (argv[i][0] == '-') {
 		switch (argv[i][1]) {
