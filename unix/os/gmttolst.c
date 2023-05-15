@@ -2,16 +2,7 @@
  */
 
 #include <sys/types.h>
-#ifdef SYSV
 #include <time.h>
-#else
-#include <sys/time.h>
-#include <sys/timeb.h>
-#endif
-
-#ifdef MACOSX
-#include <time.h>
-#endif
 
 #define	SECONDS_1970_TO_1980	315532800L
 static	long get_timezone();
@@ -19,18 +10,15 @@ static	long get_timezone();
 /* GMT_TO_LST -- Convert gmt to local standard time, epoch 1980.
  */
 time_t
-gmt_to_lst (gmt)
-time_t	gmt;
+gmt_to_lst (time_t gmt)
 {
-	struct	tm *localtime();
 	time_t	time_var;
-	long	gmtl;
+#ifndef MACOSX
+	long gmtl = (long)gmt;          /* correct for DST, if in effect */
+#endif
 	
 	/* Subtract seconds westward from GMT */
 	time_var = gmt - get_timezone();
-
-	/* Correct for daylight savings time, if in effect */
-	gmtl = (long)gmt;
 
 #ifndef MACOSX
 	/* Mac systems already include the DST offset in the GMT offset */
@@ -46,7 +34,7 @@ time_t	gmt;
  * from Greenwich, ignoring daylight savings time if in effect.
  */
 static long
-get_timezone()
+get_timezone(void)
 {
 #ifdef CYGWIN
 	extern	long _timezone;
