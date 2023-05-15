@@ -29,7 +29,6 @@
 #ifndef _DEXTERN_H
 #define	_DEXTERN_H
 
-//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include <stdio.h>
 #include <inttypes.h>

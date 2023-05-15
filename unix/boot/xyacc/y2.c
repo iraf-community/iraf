@@ -26,8 +26,6 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-//#pragma ident	"%Z%%M%	%I%	%E% SMI"
-
 #include "dextern.h"
 #include <stdio.h>
 
@@ -174,9 +172,10 @@ MBCLIT *mbchars = (MBCLIT *) 0;	/* array of mb literals */
 int nmbcharsz = 0;		/* allocated space for mbchars */
 
 void
-setup (argc, argv)
-     int argc;
-     char *argv[];
+setup (
+     int argc,
+     char *argv[]
+)
 {
     int ii, i, j, lev, t, ty;
     /* ty is the sequencial number of token name in tokset */
@@ -186,7 +185,6 @@ setup (argc, argv)
     char actname[8];
     unsigned int options = 0;
     char *file_prefix = DEFAULT_PREFIX;
-    char *sym_prefix = "";
 #define	F_NAME_LENGTH	128
     char fname[F_NAME_LENGTH + 1];
 
@@ -249,12 +247,6 @@ setup (argc, argv)
 	case 'P':
 	    parser = optarg;
 	    break;
-	case 'p':
-	    if (strcmp (optarg, "yy") != 0)
-		sym_prefix = optarg;
-	    else
-		sym_prefix = "";
-	    break;
 	case 'b':
 	    file_prefix = optarg;
 	    break;
@@ -267,7 +259,7 @@ setup (argc, argv)
  *	consistent with man page translation.
  */
 	    (void) fprintf (stderr,
-			    "Usage: yacc [-vVdltY] [-Q(y/n)] [-b file_prefix] [-p sym_prefix]"
+			    "Usage: yacc [-vVdltY] [-Q(y/n)] [-b file_prefix]"
 			    " [-P parser] file\n");
 	    exit (1);
 	}
@@ -793,7 +785,7 @@ setup (argc, argv)
 }
 
 static void
-finact ()
+finact (void)
 {
     /* finish action routine */
     (void) fclose (faction);
@@ -801,8 +793,7 @@ finact ()
 }
 
 static char *
-cstash (s)
-     register char *s;
+cstash (register char *s)
 {
     char *temp;
     static int used = 0;
@@ -1013,7 +1004,7 @@ defin (int t, char *s)
 }
 
 static void
-defout ()
+defout (void)
 {
     /* write out the defines (at the end of the declaration section) */
 
@@ -1052,7 +1043,7 @@ defout ()
 }
 
 static int
-gettok ()
+gettok (void)
 {
     int i, base;
     static int peekline;	/* number of '\n' seen in lookahead */
@@ -1263,7 +1254,7 @@ chfind (int t, char *s)
 }
 
 static void
-cpyunion ()
+cpyunion (void)
 {
     /*
      * copy the union declaration to the output,
@@ -1317,7 +1308,7 @@ cpyunion ()
 }
 
 static void
-cpycode ()
+cpycode (void)
 {
     /* copies code between \{ and \} */
     int c;
@@ -1366,7 +1357,7 @@ cpycode ()
 }
 
 static int
-skipcom ()
+skipcom (void)
 {
     register int ch;
 
@@ -1383,7 +1374,7 @@ static void
 cpyact (int offset)
 {
     /* copy C action to the next ; or closing } */
-    int brac, c, match, j, s, tok, argument;
+    int brac, c, match, j, s, tok;
     char id_name[NAMESIZE + 1];
     int id_idx = 0;
 
@@ -1409,7 +1400,6 @@ cpyact (int offset)
     case '$':
 	s = 1;
 	tok = -1;
-	argument = 1;
 	while ((c = getc (finput)) == ' ' || c == '\t')
 	    /* NULL */ ;
 	if (c == '<') {		/* type description */
@@ -1571,9 +1561,9 @@ cpyact (int offset)
     goto loop;
 }
 
+/* new rule, dump old (if exists), restart strings */
 static void
-lhsfill (s)			/* new rule, dump old (if exists), restart strings */
-     char *s;
+lhsfill (char *s)
 {
     static int lhs_len = LHS_TEXT_LEN;
     int s_lhs = strlen (s);
@@ -1594,8 +1584,9 @@ lhsfill (s)			/* new rule, dump old (if exists), restart strings */
 }
 
 static void
-rhsfill (s)
-     char *s;			/* either name or 0 */
+rhsfill (
+     char *s			/* either name or 0 */
+)
 {
     static char *loc;		/* next free location in rhstext */
     static int rhs_len = RHS_TEXT_LEN;
@@ -1645,7 +1636,7 @@ rhsfill (s)
 }
 
 static void
-lrprnt ()
+lrprnt (void)
 {				/* print out the left and right hand sides */
     char *rhs;
     char *m_rhs = NULL;
@@ -1721,7 +1712,7 @@ lrprnt ()
 #ifdef XYACC_DEBUG 
 
 static void
-beg_debug ()
+beg_debug (void)
 {				/* dump initial sequence for fdebug file */
     (void) fprintf (fdebug, "typedef struct\n");
     (void) fprintf (fdebug, "#ifdef __cplusplus\n\tyytoktype\n");
@@ -1737,7 +1728,7 @@ beg_debug ()
 
 
 static void
-end_toks ()
+end_toks (void)
 {				/* finish yytoks array, get ready for yyred's strings */
     (void) fprintf (fdebug, "\t\"-unknown-\",\t-1\t/* ends search */\n");
     (void) fprintf (fdebug, "};\n\n");
@@ -1748,7 +1739,7 @@ end_toks ()
 
 
 static void
-end_debug ()
+end_debug (void)
 {				/* finish yyred array, close file */
     lrprnt ();			/* dump last lhs, rhs */
     (void) fprintf (fdebug, "};\n#endif /* YYDEBUG */\n");
@@ -1764,7 +1755,7 @@ end_debug ()
  * seen that has a longer length, expand "tokname" by NAMESIZE.
  */
 static void
-exp_tokname ()
+exp_tokname (void)
 {
     toksize += NAMESIZE;
     tokname = (char *) realloc ((char *) tokname, sizeof (char) * toksize);
@@ -1776,7 +1767,7 @@ exp_tokname ()
  *
  */
 static void
-exp_prod ()
+exp_prod (void)
 {
     int i;
     nprodsz += NPROD;
@@ -1813,7 +1804,7 @@ exp_prod ()
  *	(ntoksz + NNONTERM) >= TEMPSIZE : temp1[]
  */
 static void
-exp_ntok ()
+exp_ntok (void)
 {
     ntoksz += NTERMS;
 
@@ -1834,7 +1825,7 @@ exp_ntok ()
 
 
 static void
-exp_nonterm ()
+exp_nonterm (void)
 {
     nnontersz += NNONTERM;
 
@@ -1853,8 +1844,7 @@ exp_nonterm ()
 }
 
 void
-exp_mem (flag)
-     int flag;
+exp_mem (int flag)
 {
     int i;
     static int *membase;
@@ -1884,8 +1874,7 @@ exp_mem (flag)
 }
 
 static int
-findchtok (chlit)
-     int chlit;
+findchtok (int chlit)
 /*
  * findchtok(chlit) returns the token number for a character literal
  * chlit that is "bigger" than 255 -- the max char value that the

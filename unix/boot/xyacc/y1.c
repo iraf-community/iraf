@@ -26,7 +26,6 @@
 /* Copyright (c) 1988 AT&T */
 /* All Rights Reserved */
 
-//#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
 #include "dextern.h"
 #include <sys/param.h>
@@ -150,7 +149,7 @@ main (int argc, char *argv[])
 
 
 static void
-mktbls ()
+mktbls (void)
 {
     int i;
 
@@ -247,11 +246,10 @@ mktbls ()
 
 /* put out other arrays, copy the parsers */
 static void
-others ()
+others (void)
 {
     extern int gen_lines;
     int c, i, j;
-    int tmpline;
 
     finput = fopen (parser, "r");
     if (finput == NULL)
@@ -295,11 +293,8 @@ others ()
 
     if (gen_lines)
 	(void) fprintf (fsppout, "# line\t1 \"%s\"\n", parser);
-    tmpline = 1;
     /* copy parser text */
     while ((c = getc (finput)) != EOF) {
-	if (c == '\n')
-	    tmpline++;
 	if (c == '$') {
 	    if ((c = getc (finput)) == 'A') {
 		/* Replace $A macro by the user declarations.
@@ -358,8 +353,7 @@ others ()
 
 /* copies string q into p, returning next free char ptr */
 static char *
-chcopy (p, q)
-     char *p, *q;
+chcopy (char *p, char *q)
 {
     while ((*p = *q++))
 	++p;
@@ -369,8 +363,7 @@ chcopy (p, q)
 #define	ISIZE 400
 /* creates output string for item pointed to by pp */
 char *
-writem (pp)
-     int *pp;
+writem (int *pp)
 {
     int i, *p;
     static int isize = ISIZE;
@@ -458,7 +451,7 @@ int zzrrconf = 0;
 
 /* output the summary on the tty */
 static void
-summary ()
+summary (void)
 {
     if (foutput != NULL) {
 	(void) fprintf (foutput,
@@ -581,8 +574,7 @@ warning (int flag, char *s, ...)
 
 /* set elements 0 through n-1 to c */
 void
-aryfil (v, n, c)
-     int *v, n, c;
+aryfil (int *v, int n, int c)
 {
     int i;
     for (i = 0; i < n; ++i)
@@ -592,8 +584,7 @@ aryfil (v, n, c)
 /* set a to the union of a and b */
 /* return 1 if b is not a subset of a, 0 otherwise */
 static int
-setunion (a, b)
-     int *a, *b;
+setunion (int *a, int *b)
 {
     int i, x, sub;
 
@@ -607,8 +598,7 @@ setunion (a, b)
 }
 
 static void
-prlook (p)
-     LOOKSETS *p;
+prlook (LOOKSETS *p)
 {
     int j, *pp;
     pp = p->lset;
@@ -631,7 +621,7 @@ prlook (p)
  * the array pyield has the lists: the total size is only NPROD+1
  */
 static void
-cpres ()
+cpres (void)
 {
     int **ptrpy;
     int **pyield;
@@ -701,7 +691,7 @@ cpres ()
 static int indebug = 0;
 /* compute an array with the first of nonterminals */
 static void
-cpfir ()
+cpfir (void)
 {
     int *p, **s, i, **t, ch, changes;
 
@@ -836,9 +826,7 @@ state (int c)
 static int pidebug = 0;
 
 void
-putitem (ptr, lptr)
-     int *ptr;
-     LOOKSETS *lptr;
+putitem (int *ptr, LOOKSETS *lptr)
 {
     register ITEM *j;
 
@@ -864,7 +852,7 @@ putitem (ptr, lptr)
  * also, look for nonterminals which don't derive any token strings
  */
 static void
-cempty ()
+cempty (void)
 {
 #define	EMPTY 1
 #define	WHOKNOWS 0
@@ -953,7 +941,7 @@ cempty ()
 /* generate the states */
 static int gsdebug = 0;
 static void
-stagen ()
+stagen (void)
 {
     int i, j;
     int c;
@@ -1147,8 +1135,7 @@ closure (int i)
 }
 
 static LOOKSETS *
-flset (p)
-     LOOKSETS *p;
+flset (LOOKSETS *p)
 {
     /* decide if the lookahead set pointed to by p is known */
     /* return pointer to a perminent location for the set */
@@ -1179,7 +1166,7 @@ flset (p)
 }
 
 static void
-exp_lkst ()
+exp_lkst (void)
 {
     int i, j;
     static LOOKSETS *lookbase;
@@ -1223,7 +1210,7 @@ exp_lkst ()
 }
 
 static void
-exp_wsets ()
+exp_wsets (void)
 {
     int i, j;
 
@@ -1258,7 +1245,7 @@ exp_wsets ()
 }
 
 static void
-exp_states ()
+exp_states (void)
 {
     nstatesz += NSTATES;
 
@@ -1283,7 +1270,7 @@ exp_states ()
 }
 
 static void
-exp_psmem ()
+exp_psmem (void)
 {
     int i;
 
