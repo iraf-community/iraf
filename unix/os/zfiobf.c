@@ -771,7 +771,7 @@ vm_connect (void)
 	char osfn[SZ_FNAME];
 	int fd, status = 0;
 
-	extern int ZOPNND();
+	extern int ZOPNND(PKCHAR *pk_osfn, XINT *mode, XINT *chan);
 
 
 	/* Already connected? */
@@ -807,7 +807,7 @@ static void
 vm_shutdown (void)
 {
 	int status;
-	extern  int  ZCLSND();
+	extern  int  ZCLSND(XINT *fd, XINT *status);
 
 	if (vm_server) {
 	    if (vm_debug)
