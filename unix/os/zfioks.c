@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <signal.h>
 #include <setjmp.h>
@@ -15,14 +14,14 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <sys/ioctl_compat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <time.h>
 #include <pwd.h>
-#ifndef MACOSX
 #include <termios.h>
-#endif
 #include <stdarg.h>
 
 #define	import_kernel
@@ -186,7 +185,9 @@ static int ks_getresvport (int *alport);
 static int ks_rexecport (void);
 static int ks_puti (int fd, int ival);
 static int ks_geti (int fd);
+/*
 static int ks_gets (int fd, char *outstr);
+*/
 
 static void dbgsp (int pid);
 static void dbgstr (char *str);
@@ -200,6 +201,9 @@ static struct irafhosts *ks_rhosts (char *filename);
 static int   ks_getword (char **ipp, char *obuf);
 static void  ks_whosts (struct irafhosts *hp, char *filename);
 static char *ks_getpass (char *user, char *host);
+
+static int rcmd_ (char **ahost, int inport, const char *locuser,
+                  const char *remuser, const char *cmd, int *fd2p);
 
 void  pr_mask (char *str);
 
@@ -344,7 +348,7 @@ ZOPNKS (
             client_host = ip + 1;
 
 	    dbgmsg ("S:callback client %s on port %d\n", client_host, port);
-	    if ((s = ks_socket (client_host, NULL, port, "connect")) < 0)
+	    if ((s = ks_socket (client_host, (u_long)NULL, port, "connect")) < 0)
 		*chan = ERR;
 	    else
 		*chan = s;
@@ -587,7 +591,7 @@ s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
 		    sprintf (obuf, "%d.%d.%d.%d", ap[0],ap[1],ap[2],ap[3]);
 		    dbgmsg ("S:client address=%s port=%d\n", obuf, s_port);
 
-		    if ((s = ks_socket (NULL, addr, s_port, "connect")) < 0) {
+		    if ((s = ks_socket ((char *)NULL, addr, s_port, "connect")) < 0) {
 			dbgmsg ("S:irafks connect to port %d failed\n", s_port);
 			fprintf (stderr, "irafks: cannot connect to client\n");
 			exit (1);
@@ -619,7 +623,7 @@ s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
 	     */
 	    hostp = host;
 	    dbgmsg ("C:rexec for host=%s, user=%s\n", host, username);
-	    *chan = rcmd (&hostp, ks_rexecport(),
+	    *chan = rcmd_ (&hostp, ks_rexecport(),
 		getlogin(), username, cmd, 0);
 
 	} else if (ks.protocol == C_REXEC_CALLBACK) {
@@ -656,7 +660,7 @@ s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
 	    hostp = host;
 	    dbgmsg ("rexec for host=%s, user=%s, using client port %d\n",
 		host, username, s_port);
-	    ss = rcmd (&hostp, ks_rexecport(),
+	    ss = rcmd_ (&hostp, ks_rexecport(),
 		getlogin(), username, callback_cmd, 0);
 
 	    /* Wait for the server to call us back. */
@@ -722,7 +726,7 @@ again:
 	     * to start up a new irafks daemon on the port just created.  If
 	     * the connection fails, fork an rsh and start up the in.irafksd.
 	     */
-	    if (!port || (t = ks_socket (host, NULL, port, "connect")) < 0) {
+	    if (!port || (t = ks_socket (host, (u_long)NULL, port, "connect")) < 0) {
 		dbgstr ("C:no server, fork rsh to start in.irafksd\n");
 
 		if (pipe(pin) < 0 || pipe(pout) < 0) {
@@ -770,7 +774,7 @@ retry:
 		     * the daemon.
 		     */
 		    if (status ||
-			(t = ks_socket (host, NULL, port, "connect")) < 0) {
+			(t = ks_socket (host, (u_long)NULL, port, "connect")) < 0) {
 
 			/* The KS_RETRY environment variable may be set to 
 			 * the number of times we wish to try to reconnect.
@@ -803,7 +807,7 @@ retry:
 			dbgmsg ("C:rexec %s@%s: %s\n", username, host, command);
 
 			hostp = host;
-			fd = rcmd (&hostp, ks_rexecport(),
+			fd = rcmd_ (&hostp, ks_rexecport(),
 			    getlogin(), username, command, 0);
 
 			if (fd < 0) {
@@ -1151,11 +1155,12 @@ ZSTTKS (
  * to the remote socket at the given address.
  */
 static int
-ks_socket (host, addr, port, mode)
-char	*host;
-u_long	addr;
-int	port;
-char	*mode;
+ks_socket (
+    char   *host,
+    u_long  addr,
+    int	    port,
+    char   *mode
+)
 {
 	struct	sockaddr_in sockaddr;
 	struct	hostent *hp;
@@ -1675,10 +1680,10 @@ ks_sysname (char *filename, char *pathname)
 {
 	XCHAR	irafdir[SZ_PATHNAME+1];
 	XINT	x_maxch=SZ_PATHNAME, x_nchars;
-	extern  int  ZGTENV();
+	extern  int ZGTENV (PKCHAR *envvar, PKCHAR *outstr,
+                            XINT *maxch, XINT *status);
 
-
-	ZGTENV ("iraf", irafdir, &x_maxch, &x_nchars);
+	ZGTENV ((PKCHAR *)"iraf", irafdir, &x_maxch, &x_nchars);
 	if (x_nchars <= 0)
 	    return (NULL);
 
@@ -2035,4 +2040,18 @@ void pr_mask (char *str)
 	    dbgmsg ("sigpending error");
 	if (sigismember (&pending, SIGCHLD))
 	    dbgmsg ("\tpr_mask: SIGCHLD pending\n"); 
+}
+
+
+/* RCMD_ -- Compat routine for deprecated system rcmd().
+ */
+static  int
+rcmd_(char **ahost, int inport, const char *locuser, const char *remuser,
+         const char *cmd, int *fd2p)
+{
+    int res = 0;
+#ifndef MACOSX
+    res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p)
+#endif
+    return res;
 }
