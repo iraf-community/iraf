@@ -19,15 +19,8 @@
 #endif
 
 static	int lastsig;
-extern	int pr_onint();
+int pr_onint (int usig, int	*hwcode, int *scp);
 
-#ifdef SYSV
-#define	vfork	fork
-#else
-#  ifdef sun
-#  include <vfork.h>
-#  endif
-#endif
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -57,7 +50,7 @@ ZOSCMD (
 	SIGFUNC	old_sigint;
 #endif
 
-	extern  int _u_fmode();
+	extern  int _u_fmode(int mode);
 
 
 	cmd  = (char *)oscmd;
@@ -83,13 +76,8 @@ ZOSCMD (
 
 	/* Vfork is faster if we can use it.
 	 */
-	if (*sin == EOS && *sout == EOS && *serr == EOS) {
-	    while ((pid = vfork()) == ERR)
-		sleep (2);
-	} else {
-	    while ((pid =  fork()) == ERR)
-		sleep (2);
-	}
+	while ((pid =  fork()) == ERR)
+	    sleep (2);
 
 	if (pid == 0) {
 	    /* Child.
