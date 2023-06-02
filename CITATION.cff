@@ -11,7 +11,6 @@ title: IRAF
 abstract: "Image Reduction and Analysis Facility "
 repository-code: "https://github.com/iraf-community/iraf"
 url: "https://iraf-community.github.io"
-repository: "https://ascl.net/9911.002"
 license-url: "https://github.com/iraf-community/iraf/blob/main/COPYRIGHT"
 
 # Version information
@@ -21,6 +20,9 @@ identifiers:
   - type: doi
     description: DOI for version 2.17
     value: "10.5281/zenodo.5816744"
+  - type: url
+    description: ASCL entry
+    value: https://ascl.net/9911.002
 
 # Associated papers
 preferred-citation:
@@ -47,8 +49,8 @@ preferred-citation:
       given-names: "D. L."
   identifiers:
     - description: ADS bibcode
-      type: other
-      value: 1986SPIE..627..733T
+      type: url
+      value: "https://ui.adsabs.harvard.edu/abs/1986SPIE..627..733T"
     - description: Paper download (login required)
       type: url
       value: "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/0627/1/The-Iraf-Data-Reduction-And-Analysis-System/10.1117/12.968154.short"
@@ -82,8 +84,8 @@ references:
         given-names: Jeanette
     identifiers:
       - description: ADS bibcode
-        type: other
-        value: 1993ASPC…52..173T
+        type: url
+        value: "https://ui.adsabs.harvard.edu/abs/1993ASPC…52..173T"
       - description: Download of scanned paper
         type: url
         value: "https://articles.adsabs.harvard.edu/pdf/1993ASPC...52..173T"
