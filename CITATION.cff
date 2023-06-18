@@ -1,0 +1,95 @@
+# This is a -*- yaml -*- file
+
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+
+# Project information
+authors:
+  - name: "National Optical Astronomy Observatories"
+  - name: "The IRAF community"
+title: IRAF
+abstract: "Image Reduction and Analysis Facility "
+repository-code: "https://github.com/iraf-community/iraf"
+url: "https://iraf-community.github.io"
+license-url: "https://github.com/iraf-community/iraf/blob/main/COPYRIGHT"
+
+# Version information
+version: "2.17"
+date-released: "2022-01-04"
+identifiers:
+  - type: doi
+    description: DOI for version 2.17
+    value: "10.5281/zenodo.5816744"
+  - type: url
+    description: ASCL entry
+    value: https://ascl.net/9911.002
+
+# Associated papers
+preferred-citation:
+  authors:
+    - family-names: Tody
+      given-names: Doug
+      affiliation: "National Optical Astronomy Observatories"
+  title: "The IRAF Data Reduction and Analysis System"
+  type: conference-paper
+  issue: 627
+  conference:
+    name: Instrumentation in astronomy
+    city: Tucson, AZ
+    country: US
+    date-start: "1986-03-04"
+    date-end: "1986-03-08"
+  collection-title: "Proc. SPIE Instrumentation in Astronomy VI"
+  collection-type: proceedings
+  year: 1986
+  pages: 733
+  doi: "10.1117/12.968154"
+  editors:
+    - family-names: Crawford
+      given-names: "D. L."
+  identifiers:
+    - description: ADS bibcode
+      type: url
+      value: "https://ui.adsabs.harvard.edu/abs/1986SPIE..627..733T"
+    - description: Paper download (login required)
+      type: url
+      value: "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/0627/1/The-Iraf-Data-Reduction-And-Analysis-System/10.1117/12.968154.short"
+    - description: Alternative download
+      type: url
+      value: https://iraf-community.github.io/doc/iraf.pdf
+references:
+  - authors:
+      - family-names: Tody
+        given-names: Doug
+        affiliation: "National Optical Astronomy Observatories"
+    title: "IRAF in the Nineties"
+    type: conference-paper
+    conference:
+      name: "Astronomical Data Analysis Software and Systems II"
+      city: Boston, MA
+      country: US
+      date-start: "1992-11-02"
+      date-end: "1992-11-04"
+    volume: 52
+    collection-title: "A.S.P. Conference Series"
+    collection-type: proceedings
+    pages: 173
+    year: 1993
+    editors:
+      - family-names: Hanisch
+        given-names: "R. J."
+      - family-names:  Brissenden
+        given-names: "R. J. V."
+      - family-names: Barnes
+        given-names: Jeanette
+    identifiers:
+      - description: ADS bibcode
+        type: url
+        value: "https://ui.adsabs.harvard.edu/abs/1993ASPC…52..173T"
+      - description: Download of scanned paper
+        type: url
+        value: "https://articles.adsabs.harvard.edu/pdf/1993ASPC...52..173T"
+      - description: Alternative download
+        type: url
+        value: https://iraf-community.github.io/doc/iraf92.pdf
+
