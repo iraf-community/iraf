@@ -9,6 +9,7 @@ local/.lesshst
 *.orig
 *.bak
 *.OLD
+*.xxx
 
 # Object files
 *.o
