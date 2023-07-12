@@ -30,7 +30,7 @@ cachedir="${HOME}/.iraf/cache/"
 d_iraf="/iraf/iraf/"
 if [ -z "$iraf" ]; then
     if [ -r ${HOME}/.iraf/irafroot ] ; then
-	export iraf=$(cat /etc/iraf/irafroot)
+	export iraf=$(cat ${HOME}/.iraf/irafroot)
     elif [ -r /etc/iraf/irafroot ] ; then
 	export iraf=$(cat /etc/iraf/irafroot)
     else
