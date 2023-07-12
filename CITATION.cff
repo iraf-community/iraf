@@ -15,7 +15,7 @@ license-url: "https://github.com/iraf-community/iraf/blob/main/COPYRIGHT"
 
 # Version information
 version: "2.17"
-date-released: "2022-01-04"
+date-released: 2022-01-04
 identifiers:
   - type: doi
     description: DOI for version 2.17
@@ -37,8 +37,8 @@ preferred-citation:
     name: Instrumentation in astronomy
     city: Tucson, AZ
     country: US
-    date-start: "1986-03-04"
-    date-end: "1986-03-08"
+    date-start: 1986-03-04
+    date-end: 1986-03-08
   collection-title: "Proc. SPIE Instrumentation in Astronomy VI"
   collection-type: proceedings
   year: 1986
@@ -68,8 +68,8 @@ references:
       name: "Astronomical Data Analysis Software and Systems II"
       city: Boston, MA
       country: US
-      date-start: "1992-11-02"
-      date-end: "1992-11-04"
+      date-start: 1992-11-02
+      date-end: 1992-11-04
     volume: 52
     collection-title: "A.S.P. Conference Series"
     collection-type: proceedings
