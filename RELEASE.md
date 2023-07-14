@@ -1,18 +1,42 @@
-# IRAF 2.17
+# IRAF 2.17.1
 
 The latest NOAO IRAF release is 2.16.1 from October 2013. Intermediate
 releases were snapshots based on that latest available source code. These
 snapshots were tagged with their release date in the version number.
 Changes to the 2.16.1 sources include:
 
+* __Community maintainance__
+
+   IRAF is no longer maintained by NOAO, but by the community of
+   volunteers. Contributions of bug fixes, documentation or improvements
+   are welcome.
+
 * __All known non-free code removed__
 
-    Although IRAF 2.16.1 was claimed to be "free software", it contained
-    source code that is not freely distributable; namely code copied from the
-    book ["Numerical Recipes in Fortran"](http://numerical.recipes/). This
-    code is replaced with free equivalents. The IRAF community edition is
-    [Open Source](https://opensource.org/docs/osd), and as such included in
-    Debian.
+   Although IRAF 2.16.1 was claimed to be "free software", it contained
+   source code that is not freely distributable; namely code copied from the
+   book ["Numerical Recipes in Fortran"](http://numerical.recipes/). This
+   code is replaced with free equivalents. The IRAF community edition is
+   [Open Source](https://opensource.org/docs/osd), and as such included in
+   Debian.
+
+* __Installation procedure reworked__
+
+   The installation scripts are replaced with makefiles, and the build
+   and installation procedures now use the standard targets, standard
+   paths, and customization environment variables. The standard
+   installation place is `/usr/local/lib/iraf`. On a build error the
+   build now stops now immediately, making it easier to find the
+   cause.
+   
+* __IRAF ported to other architectures__
+
+   IRAF is now ported to a number of little endian architectures (ARM,
+   PowerPC, MIPS, x32, RISC-V64) and operating systems (GNU Hurd and
+   FreeBSD). Specifically, the Mac M1 processor is supported now.
+
+   The code was adjusted to be compliant with newer (C99) C standards,
+   and to be compileable with actual compilers.
 
 * __Major bug fixes__
 
@@ -35,12 +59,15 @@ Changes to the 2.16.1 sources include:
    - On modern systems, background execution did not work
      ([iraf.net](https://iraf.net/forum/viewtopic.php?showtopic=1467431))
 
-* __Fixes to build and run IRAF on non-historic platforms__
+   -  The original code produced errornous executables when build on
+      Linux versions later than 2012. It also did not build from
+      scratch, but required an already compiled IRAF version.
 
-  The original code produced errornous executables when build on Linux
-  versions later than 2012, due to some funny hacks in the IRAF
-  code. It also did not build from scratch, but required an already
-  compiled IRAF version.
+* __Simple CI test framework added__
+
+    The tests are defined and documented in
+    [MarkDown](https://github.com/iraf-community/iraf/blob/main/test/README.md)
+    files. Tests are run using Github Actions on Linux and MacOS X platforms.
 
 * __VO package and vocl removed__
 
@@ -53,15 +80,3 @@ Changes to the 2.16.1 sources include:
     Therefore, no attempt was put into getting these problems fixed,
     and the VO stuff was cut out.  The VOTable functionality, however,
     remains available
-
-* __IRAF ported to other architectures__
-
-    IRAF is now ported to a number of little endian architectures
-    (ARM, PowerPC, MIPS, x32, RISC-V64) and operating systems (GNU Hurd and
-    FreeBSD).
-
-* __Simple CI test framework added__
-
-    The tests are defined and documented in
-    [MarkDown](https://github.com/iraf-community/iraf/blob/main/test/README.md)
-    files. Tests are run using Github Actions on Linux and MacOS X platforms.

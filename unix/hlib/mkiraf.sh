@@ -121,9 +121,8 @@ if [ "$copy" ]; then
 	mv -f login.cl login.cl.OLD
     fi
     cp -f "${iraf}unix/hlib/login.cl" login.cl
-fi
-
-if [ ! "$def" ]; then
-    echo 'A new LOGIN.CL file has been created in the current directory.'
-    echo 'You may wish to review and edit this file to change the defaults.'
+    if [ ! "$def" ]; then
+	echo 'A new LOGIN.CL file has been created in the current directory.'
+	echo 'You may wish to review and edit this file to change the defaults.'
+    fi
 fi
