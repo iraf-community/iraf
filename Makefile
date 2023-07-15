@@ -180,7 +180,7 @@ prefix ?= /usr/local
 install: noao/bin/x_quad.e
 	mkdir -p $(DESTDIR)$(prefix)/lib/iraf $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/share/man/man1 $(DESTDIR)/etc/iraf
 	cp -a -f bin* dev extern include lib local math mkpkg noao pkg sys test unix \
-	         $(prefix)/lib/iraf
+	         $(DESTDIR)$(prefix)/lib/iraf
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
 	cp -f $(hlib)mkiraf.man $(DESTDIR)$(prefix)/share/man/man1/mkiraf.1
 	cp -f $(hlib)ecl.man $(DESTDIR)$(prefix)/share/man/man1/ecl.1
