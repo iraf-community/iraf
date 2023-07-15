@@ -27,13 +27,13 @@ clean:
 
 rppfor:
 	if [ "$(RATFOR)" ] ; then \
-	  rm -f rppfor/*.f rppfor/fort ; \
+	  rm -f rppfor/*.f rpprat/fort ; \
 	  $(MAKE) -C rpprat RATFOR=${RATFOR} ; \
 	fi
 
 ratlibf:
 	if [ "$(RATFOR)" ] ; then \
-	  rm -f ratlibf/*.f ratlibf/fort ; \
+	  rm -f ratlibf/*.f ratlibr/fort ; \
 	  $(MAKE) -C ratlibr RATFOR=${RATFOR} ; \
 	fi
 
