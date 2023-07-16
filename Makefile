@@ -189,4 +189,5 @@ install: noao/bin/x_quad.e
 	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
 	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
 	cp -f $(host)boot/generic/generic.man $(DESTDIR)$(prefix)/share/man/man1/generic.1
+	cp -f $(host)gdev/sgidev/sgidispatch.man $(DESTDIR)$(prefix)/share/man/man1/sgidispatch.1
 	echo $(prefix)/lib/iraf/ > $(DESTDIR)/etc/iraf/irafroot
