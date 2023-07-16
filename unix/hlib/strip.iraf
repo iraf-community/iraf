@@ -5,6 +5,7 @@
   unix/boot		-allbut .hlp .hd
   unix/gdev		-all
   unix/os		-all
+  unix/f2c		-all
 
   dev			-only .dat
   doc			-allbut .hlp
@@ -12,6 +13,7 @@
   pkg			-allbut .hlp .hd .men .cl .par .key .dat .mip
   pkg/bench		-all
   sys			-all
+  vendor		-all
 
 -file pkg/obsolete/fits/structure.hlp
 -file pkg/images/tv/iis/ids/doc/Imdis.hlp
@@ -21,3 +23,7 @@
 -file pkg/system/doc/Sys.hlp
 -file pkg/system/doc/Sys_intro.hlp
 -file pkg/system/help/design.hlp
+-file mkpkg
+-file unix/Makefile
+-file unix/README
+-file unix/hlib/README

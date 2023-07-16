@@ -20,3 +20,11 @@ twodspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 
 onedspec/doc/sys -all
 filterphot	-only .hlp
+-file README
+-file mkpkg
+-file lib/Revisions
+-file lib/linelists/README
+-file lib/onedstds/README
+-file lib/scr/README
+-file lib/scr/icgfit.html
+-file lib/strip.noao
