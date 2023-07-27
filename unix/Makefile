@@ -20,6 +20,7 @@ export LDFLAGS := $(HSI_LF)
 export LIBS = $(HSI_LIBS)
 
 export bindir ?= $(hbin)
+export includedir ?= $(iraf)include
 
 %:
 	$(MAKE) -C os $@
