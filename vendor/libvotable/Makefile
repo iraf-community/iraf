@@ -12,6 +12,7 @@ libVOTable.a: $(OBJS)
 	ar r $@ $?
 
 install: libVOTable.a
+	mkdir -p $(bindir) $(includedir)
 	cp libVOTable.a $(bindir)
 	cp $(INCS) $(includedir)
 
