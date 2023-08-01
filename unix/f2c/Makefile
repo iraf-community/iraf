@@ -1,6 +1,8 @@
 install: src/f2c libf2c/libf2c.a
+	mkdir -p $(includedir) $(bindir)
 	cp libf2c/libf2c.a $(bindir)
 	cp src/f2c $(bindir)f2c.e
+	cp libf2c/f2c.h $(includedir)
 
 clean:
 	$(MAKE) -C src -f makefile.u $@
