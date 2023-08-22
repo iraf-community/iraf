@@ -1,5 +1,8 @@
-/* Copyright 2006-2009 Chisato Yamauchi (C-SODA/ISAS/JAXA)
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
+
+#include <string.h>
+#include <stdlib.h>
 
 #define import_spp
 #define import_knames
@@ -10,92 +13,16 @@
 int
 I64TO32 (void *a, void *b, XINT *nelems)
 {
-	char *ip = (char *)a,
-	     *op = (char *)b;
-	XINT i;
+	XINT *ip = (XINT *)a;
+	int *op = (int *) calloc (*nelems, sizeof (int));
+	int *tmp = (int *)NULL, i;
 
-
-	/*
-	 *  in      |--------|
-	 *  out   |----|
-	 */
-	if ( op <= ip ) {
-	    for ( i=0 ; i < *nelems ; i++ ) {
-		ip += 4;
-		*op = *ip;
-		op++; ip++;
-		*op = *ip;
-		op++; ip++;
-		*op = *ip;
-		op++; ip++;
-		*op = *ip;
-		op++; ip++;
-	    }
+	tmp = op;
+	for (i=0 ; i < *nelems ; i++, ip++) {
+	    *tmp++ = (int) (*ip >> 32);
 	}
-	else {
+	memmove (b, op, *nelems * sizeof(int));
 
-	    char *ipe = (char *)a + *nelems * 8 - 1;
-	    char *ope = (char *)b + *nelems * 4 - 1;
-	    
-	    /*
-	     *  in      |--------|
-	     *  out           |----|
-	     */
-	    if ( ipe <= ope ) {
-		for ( i=0 ; i < *nelems ; i++ ) {
-		    *ope = *ipe;
-		    ope--; ipe--;
-		    *ope = *ipe;
-		    ope--; ipe--;
-		    *ope = *ipe;
-		    ope--; ipe--;
-		    *ope = *ipe;
-		    ope--; ipe--;
-		    ipe -= 4;
-		}
-	    }
-	    /*
-	     *  in      |--------|
-	     *  out       |----|
-	     */
-	    else {
-		
-		for ( i=0 ; i < *nelems ; i++ ) {
-		    /* --------> */
-		    ip += 4;
-		    if ( op < ip ) {
-			*op = *ip;
-			op++; ip++;
-			*op = *ip;
-			op++; ip++;
-			*op = *ip;
-			op++; ip++;
-			*op = *ip;
-			op++; ip++;
-		    }
-		    else {
-			op += 4;
-			ip += 4;
-		    }
-		    /* <-------- */
-		    if ( ipe < ope ) {
-			*ope = *ipe;
-			ope--; ipe--;
-			*ope = *ipe;
-			ope--; ipe--;
-			*ope = *ipe;
-			ope--; ipe--;
-			*ope = *ipe;
-			ope--; ipe--;
-		    }
-		    else {
-			ope -= 4;
-			ipe -= 4;
-		    }
-		    ipe -= 4;
-		}
-	    }
-	}
-
+	free ((void *) op);
 	return 0;
 }

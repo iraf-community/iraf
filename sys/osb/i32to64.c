@@ -1,5 +1,7 @@
-/* Copyright 2006-2009 Chisato Yamauchi (C-SODA/ISAS/JAXA)
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
+
+#include <string.h>
 
 #define import_spp
 #define import_knames
@@ -13,32 +15,21 @@ I32TO64 (void *a, void *b, XINT *nelems)
 	XINT  i, j, k;
 	char  *ip = (char *) a, 
 	      *op = (char *) b;
+	int fill;
 
 
-	j = *nelems * 8;
-	k = *nelems * 4;
+	/* Move the input data to the output array so we can
+	 * do an in-place conversion.
+	 */
+	memmove ((void *)op, (void *)ip, *nelems * 8);
 
-	if ( ip < op ) {
-	    for ( i = k ; 0 < i ; i-- )
-		op[i-1] = ip[i-1];
-	}
-	else if ( op < ip ) {
-	    for ( i = 0 ; i < k ; i++ )
-		op[i] = ip[i];
-	}
-
-	for ( i=0 ; i < *nelems ; i++ ) {
-	    char pad;
-	    op[--j] = op[--k];
-	    op[--j] = op[--k];
-	    op[--j] = op[--k];
-	    op[--j] = op[--k];
-	    if ( (op[k] & 0x080) != 0 ) pad = 0x0ff;
-	    else pad = 0;
-	    op[--j] = pad;
-	    op[--j] = pad;
-	    op[--j] = pad;
-	    op[--j] = pad;
+	j = (*nelems) * 8 - 4;
+	k = (*nelems) * 4 - 4;
+	for (i=(*nelems - 1); i >= 0; i--) {
+	    memmove ((void *)&op[j], (void *)&ip[k], sizeof (int));
+	    fill = ((ip[k] & 0x080) != 0) ? 0x0ff : 0;
+	    memset ((void *)&op[j-4], (int)fill, 4);
+	    k -= 4, j -= 8;
 	}
 
 	return 0;
