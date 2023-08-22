@@ -1,3 +1,6 @@
+/* Copyright 2006-2009 Chisato Yamauchi (C-SODA/ISAS/JAXA)
+ */
+
 #define import_spp
 #define import_knames
 #include <iraf.h>
