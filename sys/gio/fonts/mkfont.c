@@ -1,6 +1,8 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+*/
+
 #include <stdio.h>
 
-#define	DEBUG		0
 #define	MASK		0x3F
 #define	SCALE		1.0
 
@@ -32,12 +34,19 @@ struct hershey_tab {
 #include "hershey.dat"
 };
 
-int	encode();
+
+static void print_index (int *idxtab, int N);
+static void print_widths (int *wtab, int N);
+static void print_strokes (int *strtab, int N);
+static void print_prologue (int	nidx, int nchar);
 
 
-main (argc, argv)
-int	argc;
-char 	*argv[];
+/* Program MAIN.
+ */
+int main (
+    int argc, 
+    char *argv[]
+)
 {
 	register int i=0;
 	int	minx, maxx, charnum=0, idx=0, hnum, hindex, hlength;
@@ -59,19 +68,12 @@ char 	*argv[];
 	    hlength = htab[hindex].length;
 	    dp = data = htab[hindex].code;
 
-	    if (DEBUG)
-		printf ("'%c' %4d: index=%4d len=%3d dlen=%3d %s\n",
-		    ch, hnum, hindex, hlength, strlen(data),
-		    (strlen(data) % 2) ? "ERROR" : "");
-
 	    /* Now decode the stroke data into X-Y pairs, first pair is for
 	     * proportional spacing.
 	     */
 	    minx = (*dp - 'R'); dp++;
 	    maxx = (*dp - 'R'); dp++;
 	    chrwid[charnum++] = min (32, maxx - minx + 5);
-
-	    if (DEBUG) printf("\twidth (%02d) (%d,%d)\n", maxx-minx,minx,maxx);
 
 	    /* Next pair is the initial move.  The Y coords are flipped
 	     * for what we need so fix that every place we get a Yval.
@@ -81,8 +83,6 @@ char 	*argv[];
 x = (ch == '1' ? x-3: x);
 	    y = YCOORD(); dp++;
 	    chrtab[idx++] = ENCODE(pen, x, y);
-
-	    if (DEBUG) printf ("\tmove (%3d,%3d) '%s'\n", x, y, dp);
 
 	    /* The remainder of the codes are move/draw strokes.
 	     */
@@ -100,10 +100,6 @@ x = (ch == '1' ? x-3: x);
 		y = YCOORD(); dp++;
 
 		chrtab[idx++] = ENCODE(pen, x, y);
-
-	        if (DEBUG) 
-		    printf("\t%s (%3d,%3d) => %6d\n",
-			pen?"draw":"move", x, y, ENCODE(pen,x,y));
 	    }
 	    chrtab[idx++] = ENCODE(0, 0, 0);
 	    ch++;
@@ -118,15 +114,21 @@ x = (ch == '1' ? x-3: x);
 }
 
 
-print_index (idxtab, N)
-int	*idxtab, N;
+static void
+print_index (
+    int	*idxtab, 
+    int N
+)
 {
 	register int i, j, start=1, end=5;
+        char ch;
 
 	for (i=0; i < N; ) {
 	    printf ("data    (chridx(i), i=%03d,%03d) /", start, min(N,end));
-	    for (j=0; j < 5 && i < N; j++)
-		printf ("%5d%c", idxtab[i++], (j<4 && i<N ? ',' : '/'));
+	    for (j=0; j < 5 && i < N; j++) {
+                ch = (j<4 && i<N ? ',' : '/');
+		printf ("%5d%c", idxtab[i++], ch);
+            }
 	    printf ("\n");
 	    start = end + 1;
 	    end += 5;
@@ -134,15 +136,21 @@ int	*idxtab, N;
 }
 
 
-print_widths (wtab, N)
-int	*wtab, N;
+static void
+print_widths (
+    int	*wtab,
+    int	N
+)
 {
 	register int i, j, start=1, end=5;
+        char ch;
 
 	for (i=0; i < N; ) {
 	    printf ("data    (chrwid(i), i=%03d,%03d) /", start, min(N,end));
-	    for (j=0; j < 5 && i < N; j++)
-		printf ("%5d%c", wtab[i++], (j<4 && i<N ? ',' : '/'));
+	    for (j=0; j < 5 && i < N; j++) {
+                ch = (j<4 && i<N ? ',' : '/');
+		printf ("%5d%c", wtab[i++], ch);
+            }
 	    printf ("\n");
 	    start = end + 1;
 	    end += 5;
@@ -150,15 +158,21 @@ int	*wtab, N;
 }
 
 
-print_strokes (strtab, N)
-int	*strtab, N;
+static void
+print_strokes (
+    int	*strtab,
+    int	N
+)
 {
 	register int i, j, start=1, end=5;
+        char ch;
 
 	for (i=0; i < N; ) {
 	    printf ("data    (chrtab(i), i=%04d,%04d) /", start, min(N,end));
-	    for (j=0; j < 5 && i < N; j++)
-		printf ("%6d%c", strtab[i++], (j<4 && i<N ? ',' : '/'));
+	    for (j=0; j < 5 && i < N; j++) {
+                ch = (j<4 && i<N ? ',' : '/');
+		printf ("%6d%c", strtab[i++], ch);
+            }
 	    printf ("\n");
 	    start = end + 1;
 	    end += 5;
@@ -166,11 +180,12 @@ int	*strtab, N;
 }
 
 
-print_prologue(nidx, nchar)
-int	nidx;
-int	nchar;
+static void
+print_prologue (
+    int	nidx,
+    int	nchar
+)
 {
-
 printf ("# CHRTAB -- Table of strokes for the printable ASCII characters.  Each\n");
 printf ("# character is encoded as a series of strokes.  Each stroke is ex-\n");
 printf ("# pressed by a single integer containing the following bitfields:\n");
