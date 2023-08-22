@@ -304,6 +304,7 @@
 #define	XORS		xors_
 #define I32TO64		i32to4_
 #define I64TO32		i64to2_
+#define IAND32		iand32_
 #define IPAK32		ipak32_
 #define IUPK32		iupk32_
 #define IPAK16		ipak16_
