@@ -10,9 +10,14 @@
  * Note that while XCHAR is signed, the signedness of the C char is unspecified,
  * hence we pack the chars into unsigned bytes and restore the sign explicitly.
  */
-CHRUPK (a, a_off, b, b_off, nchars)
-XCHAR	*a, *b;
-XINT	*a_off, *b_off, *nchars;
+void
+CHRUPK (
+    XCHAR   *a,
+    XCHAR  *b,
+    XINT   *a_off, 
+    XINT   *b_off, 
+    XINT   *nchars
+)
 {
 	register unsigned char *ip;
 	register XCHAR	*op;
