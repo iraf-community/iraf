@@ -25,7 +25,6 @@
 #	Phil Hodge, 31-July-2001, move @cfitsio.
 
 
-
 update:
         $checkout libtbtables.a lib$
         $update   libtbtables.a
@@ -236,15 +235,7 @@ libtbtables.a:
 	tbnparse.x	<ctype.h> <ctotok.h> <tbset.h>
 	@selector
 
-#	$ifdef (SPPFITSIO)
-	    $echo "NOTE:  SPP FITSIO will be used for FITS tables."
-	    tbfhp_f.x	<tbset.h> tbtables.h tblfits.h
-	    @fitsio
-#	$else
-#	    $echo "NOTE:  CFITSIO will be used for FITS tables."
-#	    $echo "NOTE:  CFITSIO does not support IRAF networking."
-#	    tbfhp.x	<tbset.h> tbtables.h tblfits.h
-#	    tbfxff.c	"cfitsio/fitsio.h" fitsio_spp.h underscore.h
-#	    @cfitsio
-#	$endif
+	$echo "NOTE:  SPP FITSIO will be used for FITS tables."
+	tbfhp_f.x	<tbset.h> tbtables.h tblfits.h
+	@fitsio
 	;
