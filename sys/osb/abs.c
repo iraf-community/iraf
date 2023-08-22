@@ -10,5 +10,9 @@
 XINT
 abs_ (XINT *a)
 {
+#ifdef MACH64
+	return (labs(*a));
+#else
 	return (abs(*a));
+#endif
 }
