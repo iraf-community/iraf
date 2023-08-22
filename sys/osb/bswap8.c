@@ -9,12 +9,14 @@
  * in each successive 8 byte group, i.e., 12345678 becomes 87654321.
  * The input and output arrays may be the same but may not partially overlap.
  */
-BSWAP8 (a, aoff, b, boff, nbytes)
-XCHAR	*a;			/* input array			*/
-XINT	*aoff;			/* first byte in input array	*/
-XCHAR	*b;			/* output array			*/
-XINT	*boff;			/* first byte in output array	*/
-XINT	*nbytes;		/* number of bytes to swap	*/
+void
+BSWAP8 (
+    XCHAR  *a,			/* input array			*/
+    XINT   *aoff,		/* first byte in input array	*/
+    XCHAR  *b,			/* output array			*/
+    XINT   *boff,		/* first byte in output array	*/
+    XINT   *nbytes 		/* number of bytes to swap	*/
+)
 {
 	register char	*ip, *op, *tp;
 	register int	n;
