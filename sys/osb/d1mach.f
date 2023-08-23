@@ -1,1 +1,1 @@
-/iraf/iraf/unix/hlib/d1mach.f
+../../unix/hlib/d1mach.f
