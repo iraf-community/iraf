@@ -1,12 +1,20 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
 
-#define	iand32		iand32_
+#include <string.h>
 
-long
-iand32 (long *a, long *b)
+#define import_spp
+#define import_knames
+#include <iraf.h>
+
+/* IAND32 - Bitwise AND of long integers.
+ */
+XINT
+IAND32 (XINT *a, XINT *b)
 {
-    long  val = 0;
+    XINT  val = 0;
     int   ia = (int) (*a >> 32), ib = (int) *b;
 
     val = (ia & ib);
-    return ((long) val);
+    return ((XINT) val);
 }

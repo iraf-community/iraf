@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #define import_spp
 #define import_knames
 #include <iraf.h>
@@ -8,7 +11,7 @@
  * such as random number generators.
  */
 int
-IMUL32 (long *a, long *b)
+IMUL32 (XINT *a, XINT *b)
 {
     int val = 0;
     int  ia = (int) *a;
