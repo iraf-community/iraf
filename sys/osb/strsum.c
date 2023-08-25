@@ -1,3 +1,8 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
+#include <stdlib.h>
+
 #define	import_spp
 #define import_knames
 #include <iraf.h>
@@ -8,7 +13,6 @@
 /**
  *  STRSUM -- Compute the 32-bit checksum of an SPP string.
  */
-
 int
 STRSUM (XCHAR *array, XINT *length, XINT *maxch)
 {
@@ -55,7 +59,6 @@ STRSUM (XCHAR *array, XINT *length, XINT *maxch)
 /**
  *  STRSUM -- Compute the 32-bit checksum of an SPP string.
  */
-
 int
 STRSUM (XCHAR *array, XINT *length, XINT *maxch)
 {
@@ -93,8 +96,9 @@ STRSUM (XCHAR *array, XINT *length, XINT *maxch)
         carry = newcarry;
         newcarry = 0;
     }
+    sum = lsum;
 
-    return (abs(sum = lsum));
+    return (sum);
 }
 
 #endif

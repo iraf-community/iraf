@@ -16,10 +16,12 @@
  * and the operation is being performed in place, then this procedure should
  * do nothing.
  */
-STRPAK (instr, outstr, maxch)
-XCHAR	*instr;
-PKCHAR	*outstr;
-XINT	*maxch;
+void
+STRPAK (
+    XCHAR   *instr,
+    PKCHAR  *outstr,
+    XINT    *maxch
+)
 {
 	register XCHAR	*ip = instr;
 	register char	*op = (char *)outstr;
