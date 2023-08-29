@@ -16,6 +16,7 @@ atof (char *str)
 {
 	XINT	ip = 1;
 	XDOUBLE dval;
+        extern int CTOD(XCHAR *str, XINT *ip, XDOUBLE *dval);
 
 	if (CTOD (c_sppstr(str), &ip, &dval) == 0)
 	    return ( (double) 0);
