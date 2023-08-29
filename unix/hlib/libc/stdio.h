@@ -91,9 +91,9 @@ c_flsbuf((unsigned)(ch),(fp)) : ((int)(Memc[(fp)->_iop++] = (unsigned)(ch))))
 #define	clearerr(fp)	((fp)->_fflags &= ~_FERR)
 
 
-FILE	*fopen();
-FILE	*fdopen();
-char	*fgets();
-char	*gets();
+FILE    *fopen(char *fname, char *modestr);
+FILE    *fdopen(XINT fd, char *mode);
+char    *fgets(char *buf, int maxch, FILE *fp);
+char    *gets(char *buf);
 
 #define	D_stdio
