@@ -22,6 +22,7 @@ c_flsbuf (
 	register int	buf_not_full;
 	XINT	fd = fileno(fp);
 	XINT	nreserve = 1;
+        int     FLSBUF (XINT *fd, XINT *nreserve);
 
 
 	/* If we were called due to flush on newline and there is space in

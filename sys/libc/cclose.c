@@ -15,6 +15,7 @@ c_close (
 )
 {
 	XINT  x_fd = fd;
+        int CLOSE (XINT *fd_arg);
 
 	iferr (CLOSE (&x_fd))
 	    return (ERR);

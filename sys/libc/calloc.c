@@ -18,6 +18,7 @@ calloc (
 {
 	XINT	nchars = (nelems*elsize + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	XINT	ptr, dtype = TY_CHAR;
+        extern int CALLOC (XPOINTER *ubufp, XINT *buflen, XINT *dtype);
 
 
 	iferr (CALLOC (&ptr, &nchars, &dtype))

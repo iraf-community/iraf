@@ -15,6 +15,7 @@ c_flush (
 )
 {
 	XINT  x_fd = fd;
+        int FLUSH (XINT *fd);
 
 	FLUSH (&x_fd);
 }

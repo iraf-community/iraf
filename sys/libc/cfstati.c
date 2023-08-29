@@ -16,6 +16,7 @@ c_fstati (
 )
 {
 	XINT  x_fd = fd,  x_param = param;
+        XINT  FSTATI (XINT *fd, XINT *what);
 
 	return (FSTATI (&x_fd, &x_param));
 }

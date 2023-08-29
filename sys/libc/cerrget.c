@@ -19,6 +19,7 @@ c_errget (
 	XCHAR	buf[SZ_LINE+1];
 	XINT	szbuf = SZ_LINE;
 	int	errcode;
+        XINT ERRGET (XCHAR *outstr, XINT *maxch);
 
 	errcode = (int) ERRGET (buf, &szbuf);
 	c_strpak (buf, outstr, maxch);

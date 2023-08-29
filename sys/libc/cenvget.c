@@ -32,6 +32,8 @@ envget (
   char	*var			/* environment variable name		*/
 )
 {
+        XINT ENVFIND (XCHAR *key, XCHAR *value, XINT *maxch);
+
 	if (ENVFIND (c_sppstr(var), valuestr, &len_valuestr) < 0)
 	    return (NULL);
 	else
@@ -54,6 +56,7 @@ c_envgets (
 )
 {
 	register int	nchars;
+        XINT ENVGETS (XCHAR *key, XCHAR *value, XINT *maxch);
 
 	if ((nchars = ENVGETS (c_sppstr(var), valuestr, &len_valuestr)) < 0)
 	    return (nchars);
@@ -75,6 +78,7 @@ c_envfind (
 )
 {
 	register int	nchars;
+        XINT ENVFIND (XCHAR *key, XCHAR *value, XINT *maxch);
 
 	if ((nchars = ENVFIND (c_sppstr(var), valuestr, &len_valuestr)) < 0)
 	    return (nchars);
@@ -94,7 +98,12 @@ c_envgetb (
   char	*var			/* name of variable to be fetched	*/
 )
 {
-	return ((int) BTOI ((XINT) ENVGETB (c_sppstr(var))));
+        XBOOL bval;
+        XBOOL ENVGETB (XCHAR *varname);
+        XINT BTOI (XBOOL *boolean_value);
+
+        bval = ENVGETB (c_sppstr(var));
+	return ((int) BTOI (&bval));
 }
 
 
@@ -107,6 +116,8 @@ c_envgeti (
   char	*var			/* name of variable to be fetched	*/
 )
 {
+        XINT ENVGETI (XCHAR *varname);
+
 	return ((int) ENVGETI (c_sppstr(var)));
 }
 
@@ -126,6 +137,8 @@ c_envputs (
   char	*value			/* value string				*/
 )
 {
+        XINT ENVPUTS (XCHAR *key, XCHAR *value);
+
 	ENVPUTS (c_sppstr(var), c_strupk (value, valuestr, SZ_VALUESTR));
 }
 
@@ -139,5 +152,7 @@ c_envreset (
   char	*value			/* value string				*/
 )
 {
+        void ENVRESET (XCHAR *key, XCHAR *value);
+
 	ENVRESET (c_sppstr(var), c_strupk (value, valuestr, SZ_VALUESTR));
 }

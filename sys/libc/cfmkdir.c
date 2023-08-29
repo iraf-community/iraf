@@ -14,6 +14,8 @@ c_fmkdir (
   char	*newdir		        /* name of the new directory	*/
 )
 {
+        int FMKDIR (XCHAR *newdir);
+
 	iferr (FMKDIR (c_sppstr(newdir)))
 	    return (ERR);
 	else

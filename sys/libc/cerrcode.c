@@ -11,5 +11,6 @@
 int
 c_errcode ( void )
 {
+        XINT ERRCODE (void);
 	return (ERRCODE());
 }

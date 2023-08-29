@@ -12,6 +12,8 @@
 int
 c_fchdir (char *newdir)
 {
+        int FCHDIR (XCHAR *newdir);
+
 	iferr (FCHDIR (c_sppstr (newdir)))
 	    return (ERR);
 	else

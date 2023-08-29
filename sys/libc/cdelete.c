@@ -13,6 +13,8 @@ c_delete (
   char	*fname			/* name of file to be opened	*/
 )
 {
+        void DELETE (XCHAR *fname);
+
 	iferr (DELETE (c_sppstr(fname)))
 	    return (ERR);
 	else

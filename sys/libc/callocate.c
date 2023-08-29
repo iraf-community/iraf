@@ -15,6 +15,7 @@ c_allocate (
 )
 {
 	int	status;
+        XINT XALLOCATE (XCHAR *device);
 
 	iferr (status = XALLOCATE (c_sppstr(device)))
 	    return (ERR);
@@ -33,6 +34,7 @@ c_deallocate (
 {
 	int	status;
 	XINT    x_rewind = rewind;
+        XINT XDEALLOCATE (XCHAR *device, XINT *rewind);
 
 	iferr (status = (int) XDEALLOCATE (c_sppstr(device), &x_rewind))
 	    return (ERR);
@@ -50,6 +52,7 @@ c_devstatus (
 )
 {
 	XINT  x_out = out;
+        int XDEVSTATUS (XCHAR *device, XINT *out);
 
 	XDEVSTATUS (c_sppstr(device), &x_out);
 }
@@ -68,6 +71,7 @@ c_devowner (
 	PKCHAR	x_owner[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME;
 	int	status;
+        XINT XDEVOWNER (XCHAR *device, XCHAR *owner, XINT *maxch);
 
 
 	iferr (status = (int) XDEVOWNER(c_sppstr(device), x_owner, &x_maxch)) {

@@ -18,6 +18,7 @@ c_fnldir (
 {
 	XCHAR	spp_ldir[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME, nchars;
+        XINT    FNLDIR (XCHAR *vfn, XCHAR *outstr, XINT *maxch);
 
 	nchars = FNLDIR (c_sppstr(vfn), spp_ldir, &x_maxch);
 	c_strpak (spp_ldir, ldir, maxch);

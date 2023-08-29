@@ -21,6 +21,7 @@ c_fredir (
 )
 {
 	XINT  x_fd = fd, x_type = type, x_mode = mode;
+        int FREDIR (XINT *fd, XCHAR *fname, XINT *mode, XINT *type);
 
 	iferr (FREDIR (&x_fd, c_sppstr(fname), &x_mode, &x_type))
 	    return (ERR);
@@ -38,6 +39,7 @@ c_frediro (
 )
 {
 	XINT  x_fd = fd, x_newfd = newfd;
+        int FREDIRO (XINT *fd, XINT *newfd);
 
 	iferr (FREDIRO (&x_fd, &x_newfd))
 	    return (ERR);

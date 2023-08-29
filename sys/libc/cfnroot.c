@@ -17,6 +17,7 @@ c_fnroot (
 {
 	XCHAR	spp_root[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME, nchars;
+        XINT    FNROOT (XCHAR *vfn, XCHAR *outstr, XINT *maxch);
 
 	nchars = FNROOT (c_sppstr(vfn), spp_root, &x_maxch);
 	c_strpak (spp_root, root, maxch);

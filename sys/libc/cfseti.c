@@ -17,6 +17,7 @@ c_fseti (
 )
 {
 	XINT  x_fd = fd,  x_param = param,  x_value = value;
+        int   FSETI (XINT *fd, XINT *param, XINT *value);
 
 	FSETI (&x_fd, &x_param, &x_value);
 }

@@ -16,6 +16,7 @@ void
 c_erract (int action)
 {
 	XINT  x_action = action;
+        int ERRACT (XINT *severity);
 
 	ERRACT (&x_action);
 }

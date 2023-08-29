@@ -15,6 +15,8 @@ c_error (
   char	*errmsg			/* error message		*/
 )
 {
+        int ERROR (XINT *error_code, XCHAR *message);
+
 	XINT  x_errcode = errcode;
 	ERROR (&x_errcode, c_sppstr(errmsg));
 }

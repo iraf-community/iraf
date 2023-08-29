@@ -16,6 +16,7 @@ c_clktime (
 )
 {
 	XLONG x_reftime = reftime;
+        XLONG CLKTIME (XLONG *old_time);
 
 	return (CLKTIME (&x_reftime));
 }
@@ -30,6 +31,7 @@ c_cputime (
 )
 {
 	XLONG x_reftime = reftime;
+        XLONG CPUTIME (XLONG *old_cputime);
 
 	return (CPUTIME (&x_reftime));
 }

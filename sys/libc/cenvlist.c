@@ -27,6 +27,7 @@ c_envlist (
 {
 	XINT  x_fd = fd,
 	      x_show_redefs = show_redefs;
+        void ENVLIST (XINT *fd, XCHAR *prefix, XINT *print_redefined_variables);
 
 	ENVLIST (&x_fd, c_sppstr(prefix), &x_show_redefs);
 }

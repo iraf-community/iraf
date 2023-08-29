@@ -18,6 +18,7 @@ c_fnextn (
 {
 	XCHAR	spp_extn[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME, nchars;
+        XINT    FNEXTN (XCHAR *vfn, XCHAR *outstr, XINT *maxch);
 
 	nchars = (int) FNEXTN (c_sppstr(vfn), spp_extn, &x_maxch);
 	c_strpak (spp_extn, extn, maxch);

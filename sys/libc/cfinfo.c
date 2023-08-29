@@ -17,6 +17,7 @@ c_finfo (
 )
 {
 	register int	status;
+        XINT FINFO (XCHAR *fname, XLONG *ostruct);
 
 	iferr (status = (int) FINFO (c_sppstr(fname), (XLONG *)fi)) {
 	    status = ERR;

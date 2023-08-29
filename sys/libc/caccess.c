@@ -17,6 +17,7 @@ c_access (
 )
 {
 	XINT x_mode = mode, x_type = type;
+        XINT ACCESS (XCHAR *fname, XINT *mode, XINT *type);
 
 	return (ACCESS (c_sppstr(fname), &x_mode, &x_type));
 }

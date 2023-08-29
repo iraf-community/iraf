@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define import_spp
 #define	import_libc
 #define	import_xnames
@@ -18,6 +20,7 @@ c_fmapfn (
 {
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XINT	sz_path = SZ_PATHNAME;
+        int     FMAPFN (XCHAR *vfn, XCHAR *osfn, XINT *maxch);
 
 
 	/* The OSFN is returned as a packed string in the XCHAR array x_osfn.
