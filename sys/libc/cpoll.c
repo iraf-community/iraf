@@ -29,6 +29,7 @@ XINT
 c_poll_open ( void )
 {
 	XINT	fds;
+        XPOINTER POLL_OPEN (void);
 
 	iferr ((fds = (XINT) POLL_OPEN ()))
 	    return (NULL);
@@ -47,6 +48,7 @@ c_poll (
 )
 {
 	XINT  x_fds = fds, x_nfds = nfds, x_timeout = timeout;
+        XINT  POLL (XPOINTER *fds, XINT *nfds, XINT *timeout);
 
 	return ((int) POLL (&x_fds, &x_nfds, &x_timeout));
 }
@@ -60,6 +62,7 @@ c_poll_close (
 )
 {
 	XINT  x_fds = fds;
+        int   POLL_CLOSE (XPOINTER *fds);
 
 	POLL_CLOSE (&x_fds);
 }
@@ -73,6 +76,7 @@ c_poll_zero (
 )
 {
 	XINT  x_fds = fds;
+        int   POLL_ZERO (XPOINTER *fds);
 
 	POLL_ZERO (&x_fds);
 }
@@ -89,6 +93,7 @@ c_poll_set (
 )
 {
 	XINT  x_fds = fds, x_fd = fd, x_type = type;
+        int   POLL_SET (XPOINTER *fds, XINT *fd, XINT *type);
 
 	POLL_SET (&x_fds, &x_fd, &x_type);
 }
@@ -106,6 +111,7 @@ c_poll_clear (
 )
 {
 	XINT  x_fds = fds, x_fd = fd, x_type = type;
+        int   POLL_CLEAR (XPOINTER *fds, XINT *fd, XINT *type);
 
 	POLL_CLEAR (&x_fds, &x_fd, &x_type);
 }
@@ -121,6 +127,7 @@ c_poll_test (
 )
 {
 	XINT  x_fds = fds, x_fd = fd, x_type = type;
+        XINT  POLL_TEST (XPOINTER *fds, XINT *fd, XINT *type);
 
 	return ((int) POLL_TEST (&x_fds, &x_fd, &x_type));
 }
@@ -134,6 +141,7 @@ c_poll_get_nfds (
 )
 {
 	XINT  x_fds = fds;
+        XINT  POLL_GET_NFDS (XPOINTER *fds);
 
 	return (POLL_GET_NFDS (&x_fds));
 }
@@ -145,6 +153,7 @@ void
 c_poll_print (XINT fds) 
 { 
 	XINT  x_fds = fds;
+        int   POLL_PRINT (XPOINTER *fds);
 
 	POLL_PRINT (&x_fds); 
 }

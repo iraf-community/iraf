@@ -17,6 +17,7 @@ c_ndopen (
 {
         int   fd;
 	XINT  x_mode = mode;
+        XINT NDOPEN (XCHAR *fname, XINT *mode);
 
         iferr (fd = NDOPEN (c_sppstr(fname), &x_mode))
             return (ERR);

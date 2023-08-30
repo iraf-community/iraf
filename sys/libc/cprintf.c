@@ -14,6 +14,8 @@ c_printf (
   char	*format			/* format string */
 )
 {
+        int PRINTF (XCHAR *format_string);
+
 	iferr (PRINTF (c_sppstr(format)))
 	    return (ERR);
 	else
@@ -30,6 +32,7 @@ c_fprintf (
 )
 {
 	XINT  x_fd = fd;
+        int   FPRINTF (XINT *fd, XCHAR *format_string);
 
 	iferr (FPRINTF (&x_fd, c_sppstr(format)))
 	    return (ERR);
@@ -37,6 +40,14 @@ c_fprintf (
 	    return (OK);
 }
 
+
+extern int PARGD (XDOUBLE *dval);
+extern int PARGC (XCHAR *cval);
+extern int PARGS (XSHORT *sval);
+extern int PARGI (XINT *ival);
+extern int PARGL (XLONG *lval);
+extern int PARGR (XREAL *rval);
+extern int PARGB (XBOOL *bval);
 
 void c_pargb (int    ival) { XINT    x_ival = ival; PARGI (&x_ival); }
 void c_pargc (int    ival) { XINT    x_ival = ival; PARGI (&x_ival); }
@@ -49,5 +60,7 @@ void c_pargd (double dval) { XDOUBLE x_dval = dval; PARGD (&x_dval); }
 
 void c_pargstr (char *strval)
 {
+    int PARGSTR (XCHAR *str);
+
     PARGSTR (c_sppstr(strval)); 
 }

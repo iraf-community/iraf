@@ -19,7 +19,7 @@ c_imaccess (
 {
 	int  status;
 	XINT  x_mode = mode;
-
+        XINT IMACCESS (XCHAR *image, XINT *acmode);
 
 	iferr (status = (int) IMACCESS (c_sppstr(imname), &x_mode))
 	    return (ERR);

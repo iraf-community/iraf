@@ -17,7 +17,7 @@ c_getuid (
 {
 	XCHAR	spp_uid[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME;
-
+        int GETUID (XCHAR *user_name, XINT *maxch);
 
 	GETUID (spp_uid, &x_maxch);
 	return (c_strpak (spp_uid, outstr, maxch));

@@ -15,6 +15,7 @@ c_gflush (
 )
 {
 	XINT  x_stream = stream;
+        int GTR_GFLUSH (XINT *stream);
 
 	GTR_GFLUSH (&x_stream);
 }

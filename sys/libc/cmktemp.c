@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define import_spp
 #define	import_libc
 #define	import_xnames
@@ -18,7 +20,7 @@ c_mktemp (
 {
 	XCHAR	temp[SZ_FNAME+1];
 	XINT	sz_temp = SZ_FNAME;
-
+        int     MKTEMP (XCHAR *seed, XCHAR *temp_file, XINT *maxchars);
 
 	iferr (MKTEMP (c_sppstr(root), temp, &sz_temp))
 	    return (0);

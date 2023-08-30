@@ -26,6 +26,9 @@ c_imdrcur (
 	PKCHAR	x_strval[SZ_LINE+1];
 	XINT  x_maxch = maxch,  x_d_wcs = d_wcs,  x_pause = pause;
 	XINT  x_wcs, x_key;
+        XINT  IMDRCUR (XCHAR *device, XREAL *x, XREAL *y, XINT *wcs, 
+                       XINT *key, XCHAR *strval, XINT *maxch,
+                       XINT *in_wcs, XINT *pause);
 
 
 	if (IMDRCUR (c_sppstr(device), x, y, &x_wcs, &x_key, x_strval, &x_maxch,

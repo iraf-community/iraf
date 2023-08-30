@@ -46,7 +46,7 @@ c_propdpr (
 	unsigned job;
 	XCHAR	spp_bkgfile[SZ_PATHNAME];
 	XCHAR	spp_bkgmsg[SZ_LINE];
-
+        XINT    PROPDPR (XCHAR *process, XCHAR *bkgfile, XCHAR *bkgmsg);
 
 	c_strupk (bkgfile, spp_bkgfile, SZ_PATHNAME);
 	c_strupk (bkgmsg,  spp_bkgmsg,  SZ_LINE);
@@ -70,6 +70,7 @@ c_prcldpr (
 )
 {
 	XINT  x_job = job;
+        XINT  PRCLDPR (XINT *job);
 
 	return (PRCLDPR (&x_job));
 }
@@ -84,6 +85,7 @@ c_prdone (
 )
 {
 	XINT  x_job = job;
+        XINT  PRDONE (XINT *job);
 
 	return (PRDONE (&x_job));
 }
@@ -101,6 +103,7 @@ c_prkill (
 )
 {
 	XINT  x_job = job;
+        int   PRKILL (XINT *job);
 
 	iferr (PRKILL (&x_job))
 	    return (ERR);

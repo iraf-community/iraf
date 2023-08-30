@@ -20,6 +20,7 @@ c_note (
 {
 	long  xchar_offset;
 	XINT  x_fd = fd;
+        XLONG NOTE (XINT *fd);
 
 	xchar_offset = (long) NOTE (&x_fd);
 	if (c_fstati (fd, F_TYPE) == BINARY_FILE)

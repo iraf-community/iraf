@@ -62,6 +62,7 @@ c_propen (
 {
 	register unsigned int pid;
 	XINT  x_in = *in, x_out = *out;
+        XINT  PROPEN (XCHAR *process, XINT *in, XINT *out);
 
 	iferr (pid = (unsigned int) PROPEN (c_sppstr(process), &x_in, &x_out))
 	    return (NULL);
@@ -89,6 +90,7 @@ c_prclose (
 )
 {
 	XINT  x_pid = pid;
+        XINT  PRCLOSE (XINT *pid);
 
 	return (PRCLOSE (&x_pid));
 }
@@ -104,6 +106,7 @@ c_prstati (
 )
 {
 	XINT  x_pid = pid, x_param = param;
+        XINT  PRSTATI (XINT *pid, XINT *param);
 
 	return (PRSTATI (&x_pid, &x_param));
 }
@@ -120,6 +123,7 @@ c_prsignal (
 )
 {
 	XINT  x_pid = pid,  x_signal = signal;
+        int   PRSIGNAL (XINT *pid, XINT *signal);
 
 	iferr (PRSIGNAL (&x_pid, &x_signal))
 	    return (ERR);
@@ -155,6 +159,7 @@ c_prredir (
 )
 {
 	XINT  x_pid = pid, x_stream = stream, x_new_fd = new_fd;
+        int   PRREDIR (XINT *pid, XINT *stream, XINT *new_fd);
 
 	iferr (PRREDIR (&x_pid, &x_stream, &x_new_fd))
 	    return (ERR);
@@ -174,6 +179,7 @@ c_prchdir (
 )
 {
 	XINT  x_pid = pid;
+        int   PRCHDIR (XINT *pid, XCHAR *newdir);
 
 	return (PRCHDIR (&x_pid, c_sppstr (newdir)));
 }
@@ -192,6 +198,7 @@ c_prenvset (
 {
 	XCHAR  spp_value[SZ_LINE];
 	XINT   x_pid = pid;
+        int    PRENVSET (XINT *pid, XCHAR *envvar, XCHAR *valuestr);
 
 	c_strupk (value, spp_value, SZ_LINE);
 	return (PRENVSET (&x_pid, c_sppstr (envvar), spp_value));

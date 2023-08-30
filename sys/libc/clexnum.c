@@ -34,6 +34,7 @@ c_lexnum (
 	PKCHAR	 numbuf[SZ_FNAME];
 	XINT	 ip_start = 1, x_toklen = *toklen;
 	int      status;
+        XINT     LEXNUM (XCHAR *str, XINT *ip_start, XINT *nchars);
 
 
 	/* Convert number to XCHAR for lexnum.  In the process check to see

@@ -24,6 +24,7 @@ c_oscmd (
 	XCHAR	spp_infile[SZ_FNAME+1];
 	XCHAR	spp_outfile[SZ_FNAME+1];
 	XCHAR	spp_errfile[SZ_FNAME+1];
+        XINT OSCMD (XCHAR *cmd, XCHAR *infile, XCHAR *outfile, XCHAR *errfile);
 
 	c_strupk (infile,  spp_infile,  SZ_FNAME);
 	c_strupk (outfile, spp_outfile, SZ_FNAME);

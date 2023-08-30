@@ -11,5 +11,7 @@
 int
 c_getpid ( void )
 {
+        XINT GETPID (void);
+
 	return ((int) GETPID());
 }

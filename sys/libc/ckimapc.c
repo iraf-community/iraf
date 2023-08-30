@@ -20,6 +20,7 @@ c_kimapchan (
 	XCHAR	x_nodename[SZ_FNAME+1];
 	XINT	ki_chan = chan, x_maxch = SZ_FNAME;
 	int	os_chan;
+        XINT    KI_MAPCHAN (XINT *chan, XCHAR *nodename, XINT *maxch);
 
 	os_chan = (int) KI_MAPCHAN (&ki_chan, x_nodename, &x_maxch);
 	c_strpak (x_nodename, nodename, SZ_FNAME);
