@@ -14,6 +14,7 @@ c_xonerr (
 )
 {
 	XINT  x_errcode = errcode;
+        int   XONERR (XINT *status);
 
 	XONERR (&x_errcode);
 }

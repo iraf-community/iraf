@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_xnames
@@ -22,6 +24,7 @@ c_xgmes (
 {
 	PKCHAR	x_oserrmsg[SZ_LINE+1];
 	XINT	x_oscode = *oscode, x_maxch = SZ_LINE;
+        int     ZXGMES (XINT *os_exception, PKCHAR *errmsg, XINT *maxch);
 
 	ZXGMES (&x_oscode, x_oserrmsg, &x_maxch);
 	(void) strncpy (oserrmsg, (char *)x_oserrmsg, maxch);

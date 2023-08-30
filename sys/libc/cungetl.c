@@ -22,7 +22,7 @@ c_ungetline (
 {
 	XINT    x_fd = fd;
 	XCHAR	spp_str[MAX_STRLEN];
-
+        int     UNGETLINE (XINT *fd, XCHAR *str);
 
 	iferr (UNGETLINE (&x_fd, c_strupk (str, spp_str, MAX_STRLEN)))
 	    return (ERR);

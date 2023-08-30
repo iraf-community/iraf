@@ -23,6 +23,7 @@ c_write (
 )
 {
 	XINT  x_fd = fd;
+        int   WRITE (XINT *fd, XCHAR *buffer, XINT *maxchars);
 
 	if (c_fstati (fd, F_TYPE) == TEXT_FILE) {
 	    register FILE	*fp = FDTOFP(fd);

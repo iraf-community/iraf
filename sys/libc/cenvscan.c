@@ -28,5 +28,7 @@ c_envscan (
   char	*input_source
 )
 {
+        XINT ENVSCAN (XCHAR *cmd);
+
 	return (ENVSCAN (c_sppstr(input_source)));
 }

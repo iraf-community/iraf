@@ -18,6 +18,7 @@ c_xttysize (
 )
 {
 	XINT  x_ncols, x_nlines;
+        int   XTTYSIZE (XINT *width, XINT *height);
 
 	XTTYSIZE (&x_ncols, &x_nlines);
 	*ncols = x_ncols;

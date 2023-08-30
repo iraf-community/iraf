@@ -57,6 +57,7 @@ c_xwhen (
 	XINT	excode = exception;
 	XINT	epa_new_handler = (XINT)new_handler;
 	XINT	epa_old_handler;
+        int     XWHEN (XINT *signal, XINT *handler, XINT *old_handler);
 
 	XWHEN (&excode, &epa_new_handler, &epa_old_handler);
 	*old_handler = (PFI)epa_old_handler;

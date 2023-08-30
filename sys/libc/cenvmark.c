@@ -16,6 +16,8 @@ c_envmark (
   XINT	*envp			/* storage for saved stack pointer	*/
 )
 {
+        int  ENVMARK (XINT *old_top);
+
 	ENVMARK (envp);
 }
 
@@ -31,6 +33,7 @@ c_envfree (
 )
 {
 	XINT  x_envp = envp;
+        XINT  ENVFREE (XINT *old_top, XINT *userfcn);
 
 	return (ENVFREE (&x_envp, (XINT *)&userfcn));
 }
@@ -49,6 +52,7 @@ c_prenvfree (
 )
 {
 	XINT  x_pid = pid,  x_envp = envp;
+        XINT  PRENVFREE (XINT *pid, XINT *marker);
 
 	return (PRENVFREE (&x_pid, &x_envp));
 }

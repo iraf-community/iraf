@@ -15,6 +15,7 @@ c_wmsec (
 )
 {
 	XINT  x_msec = msec;
+        int   ZWMSEC (XINT *msec);
 
 	ZWMSEC (&x_msec);
 }
