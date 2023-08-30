@@ -16,6 +16,7 @@ c_ttyclear (
 )
 {
 	XINT  x_fd = fd, x_tty = tty;
+        int   TTYCLEAR (XINT *fd, XPOINTER *tty);
 
 	TTYCLEAR (&x_fd, &x_tty);
 }

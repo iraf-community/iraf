@@ -18,7 +18,11 @@ c_ttygetb (
   char	*cap			/* two char capability name	*/
 )
 {
-	XINT  x_tty = tty;
+	XINT   x_tty = tty;
+        XBOOL  bval;
+        XBOOL  TTYGETB (XPOINTER *tty, XCHAR *cap);
+        XINT   BTOI (XBOOL *boolean_value);
 
-	return ((int) BTOI ((XBOOL) TTYGETB (&x_tty, c_sppstr(cap))));
+	bval = TTYGETB (&x_tty, c_sppstr(cap));
+	return ((int) BTOI (&bval));
 }

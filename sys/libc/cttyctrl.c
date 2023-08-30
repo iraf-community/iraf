@@ -22,6 +22,7 @@ c_ttyctrl (
 )
 {
 	XINT  x_fd = fd, x_tty = tty, x_afflncnt = afflncnt;
+        XINT  TTYCTRL (XINT *fd, XPOINTER *tty, XCHAR *cap, XINT *afflncnt);
 
 	return (TTYCTRL (&x_fd, &x_tty, c_sppstr(cap), &x_afflncnt));
 }

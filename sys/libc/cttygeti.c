@@ -18,6 +18,7 @@ c_ttygeti (
 )
 {
 	XINT  x_tty = tty;
+        XINT  TTYGETI (XPOINTER *tty, XCHAR *cap);
 
 	return ((XINT) TTYGETI (&x_tty, c_sppstr(cap)));
 }

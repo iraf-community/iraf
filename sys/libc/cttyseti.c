@@ -17,6 +17,7 @@ c_ttyseti (
 )
 {
 	XINT  x_tty = tty, x_param = param, x_value = value;
+        int   TTYSETI (XPOINTER *tty, XINT *parameter, XINT *value);
 
 	TTYSETI (&x_tty, &x_param, &x_value);
 }

@@ -25,7 +25,8 @@ c_ttygets (
 )
 {
 	XINT  x_tty = tty;
-	int	nchars;
+	int   nchars;
+        XINT  TTYGETS (XPOINTER *tty, XCHAR *cap, XCHAR *outstr, XINT *maxch);
 
 	nchars = TTYGETS (&x_tty, c_sppstr(cap), buf, &szbuf);
 	c_strpak (buf, outstr, maxch);

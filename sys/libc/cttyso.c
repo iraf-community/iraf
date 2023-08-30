@@ -18,6 +18,7 @@ c_ttyso (
 )
 {
 	XINT  x_fd = fd, x_tty = tty, x_onoff = onoff;
+        int   TTYSO (XINT *fd, XPOINTER *tty, XINT *onflag);
 
 	TTYSO (&x_fd, &x_tty, &x_onoff);
 }

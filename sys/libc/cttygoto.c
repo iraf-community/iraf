@@ -18,6 +18,7 @@ c_ttygoto (
 )
 {
 	XINT  x_fd = fd, x_tty = tty, x_col = col, x_line = line;
+        int   TTYGOTO (XINT *fd, XPOINTER *tty, XINT *col, XINT *line);
 
 	TTYGOTO (&x_fd, &x_tty, &x_col, &x_line);
 }

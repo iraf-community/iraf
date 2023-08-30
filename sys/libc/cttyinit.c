@@ -17,6 +17,7 @@ c_ttyinit (
 )
 {
 	XINT  x_fd = fd, x_tty = tty;
+        int   TTYINIT (XINT *fd, XPOINTER *tty);
 
 	TTYINIT (&x_fd, &x_tty);
 }

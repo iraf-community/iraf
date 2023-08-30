@@ -17,6 +17,7 @@ c_ttyclearln (
 )
 {
 	XINT  x_fd = fd, x_tty = tty;
+        int   TTYCLEARLN (XINT *fd, XPOINTER *tty);
 
 	TTYCLEARLN (&x_fd, &x_tty);
 }

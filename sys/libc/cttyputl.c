@@ -23,6 +23,7 @@ c_ttyputline (
 )
 {
 	XINT  x_fd = fd, x_tty = tty, x_map_cc = map_cc;
+        int   TTYPUTLINE (XINT *fd, XPOINTER *tty, XCHAR *text, XINT *map_cc);
 
 	TTYPUTLINE (&x_fd, &x_tty, c_sppstr(line), &x_map_cc);
 }

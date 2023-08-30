@@ -21,6 +21,7 @@ c_ttyputs (
 )
 {
 	XINT  x_fd = fd, x_tty = tty, x_afflncnt = afflncnt;
+        int   TTYPUTS (XINT *fd, XPOINTER *tty, XCHAR *ctrlstr, XINT *afflncnt);
 
 	iferr (TTYPUTS (&x_fd, &x_tty, c_sppstr(cap), &x_afflncnt))
 	    return (ERR);

@@ -16,6 +16,7 @@ c_ttystati (
 )
 {
 	XINT  x_tty = tty, x_param = param;
+        XINT  TTYSTATI (XPOINTER *tty, XINT *parameter);
 
 	return (TTYSTATI (&x_tty, &x_param));
 }

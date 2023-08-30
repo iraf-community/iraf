@@ -17,6 +17,7 @@ c_ttygetr (
 )
 {
 	XINT  x_tty = tty;
+        XREAL TTYGETR (XPOINTER *tty, XCHAR *cap);
 
 	return ((float) TTYGETR (&x_tty, c_sppstr(cap)));
 }

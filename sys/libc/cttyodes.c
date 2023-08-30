@@ -81,6 +81,7 @@ c_ttyodes (
 )
 {
 	XINT	tty;
+        XPOINTER TTYODES (XCHAR *ttyname);
 
 	iferr (tty = (XINT) TTYODES (c_sppstr (ttyname)))
 	    return ((XINT) ERR);

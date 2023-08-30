@@ -13,6 +13,7 @@ c_tsleep (
 )
 {
 	XINT  x_nsec = nseconds;
+        int   TSLEEP (XINT *seconds);
 
 	TSLEEP (&x_nsec);
 }

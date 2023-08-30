@@ -14,6 +14,7 @@ c_ttycdes (
 )
 {
 	XINT  x_tty = tty;
+        int   TTYCDES (XPOINTER *tty);
 
 	TTYCDES (&x_tty);
 }

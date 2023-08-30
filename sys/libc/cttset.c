@@ -19,6 +19,7 @@ c_sttyco (
 {
 	XCHAR	x_args[SZ_COMMAND];
 	XINT    x_ttin = ttin, x_ttout = ttout, x_outfd = outfd;
+        int     STTYCO (XCHAR *args, XINT *ttin, XINT *ttout, XINT *outfd);
 
 	c_strupk (args, x_args, SZ_COMMAND);
 	STTYCO (x_args, &x_ttin, &x_ttout, &x_outfd);
@@ -35,6 +36,7 @@ c_ttseti (
 )
 {
 	XINT  x_fd = fd, x_param = param, x_value = value;
+        int   TTSETI (XINT *fd, XINT *param, XINT *value);
 
 	TTSETI (&x_fd, &x_param, &x_value);
 }
@@ -49,6 +51,7 @@ c_ttstati (
 )
 {
 	XINT  x_fd = fd, x_param = param;
+        XINT  TTSTATI (XINT *fd, XINT *param);
 
 	return (TTSTATI (&x_fd, &x_param));
 }
@@ -63,6 +66,7 @@ c_ttsets (
 )
 {
 	XINT  x_fd = fd, x_param = param;
+        int   TTSETS (XINT *fd, XINT *param, XCHAR *svalue);
 
 	TTSETS (&x_fd, &x_param, c_sppstr (value));
 }
@@ -81,6 +85,7 @@ c_ttstats (
 	XCHAR	x_sval[SZ_LINE+1];
 	XINT	x_fd = fd, x_param = param, x_maxch = SZ_LINE;
 	int	nchars;
+        XINT    TTSTATS (XINT *fd, XINT *param, XCHAR *outstr, XINT *maxch);
 
 	nchars = TTSTATS (&x_fd, &x_param, x_sval, &x_maxch);
 	c_strpak (x_sval, outstr, maxch);
