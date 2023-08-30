@@ -1,9 +1,9 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <string.h>
+
 #define	import_spp
-#define	import_libc
-#define	import_stdio
 #include <iraf.h>
 
 
@@ -17,17 +17,22 @@ freadline (
   char	*prompt				/* user supplied output buffer	*/
 )
 {
-	char  *cmd = (char *) NULL;
+	char   *cmd = (char *) NULL;
 	static char line[SZ_LINE];
-	char  *readline (char *prompt);
+	char   *readline (char *prompt);
+        int     ZFREE (void *buf);
 
 
 	memset (line, 0, SZ_LINE);
         if ((cmd = readline (prompt)) == (char *) NULL) {
             return ((char *) NULL);
 	} else {
-	    strcpy (line, cmd);		/* save to static buffer	*/
-	    zfree_ ((void *) cmd);	/* free readline() buffer	*/
+            /* Save to static buffer using host strncpy().  The 'cmd'
+             * buffer returned by readline() is allocated with a host
+             * malloc() and must be freed by the kernel.
+             */
+	    strncpy (line, cmd, min(strlen(cmd),SZ_LINE));		
+	    ZFREE ((void *) cmd);
 	}
 
 	return ((char *) line);

@@ -15,6 +15,7 @@ fclose (
 )
 {
 	XINT	x_fd = fileno(fp);
+        int     CLOSE (XINT *fd_arg);
 	
 	iferr (CLOSE (&x_fd))
 	    return (EOF);

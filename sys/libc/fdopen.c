@@ -8,7 +8,7 @@
 #include <iraf.h>
 
 	
-extern int c_fstati();
+extern int c_fstati (XINT fd, int param);
 
 
 /* FDOPEN -- Reopen a file for i/o with the STDIO package, after the file

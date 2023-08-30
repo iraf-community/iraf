@@ -16,6 +16,7 @@ fflush (
 )
 {
 	XINT	x_fd = fileno(fp);
+        int     FLUSH (XINT *fd);
 
 	iferr (FLUSH (&x_fd))
 	    return (EOF);

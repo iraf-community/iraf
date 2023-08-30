@@ -16,6 +16,7 @@ free (
 )
 {
 	XINT	x_ptr, x_dtype = TY_CHAR;
+        int     MFREE (XPOINTER *ptr, XINT *dtype);
 
 	x_ptr = Memcptr (buf);
 	MFREE (&x_ptr, &x_dtype);

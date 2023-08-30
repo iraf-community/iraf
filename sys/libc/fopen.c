@@ -20,7 +20,7 @@ fopen (
 {
 	XINT	x_filetype, x_filemode;
 	int 	fd;
-
+        XINT    OPEN (XCHAR *fname, XINT *mode, XINT *type);
 
 	/* Get file type.
 	 */
