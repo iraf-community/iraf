@@ -1,7 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
-#define	import_libc
+//#define	import_libc
 #include <iraf.h>
 
 
@@ -10,7 +10,7 @@
 ** of S2 is N or more.
 */
 char *
-strncpy (
+u_strncpy (
   char	*s1,			/* output string		*/
   char	*s2,			/* string to be moved		*/
   int   n

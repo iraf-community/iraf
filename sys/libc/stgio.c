@@ -31,6 +31,7 @@ c_stggetline (
 	XCHAR	xbuf[maxch+1];
 	XINT    x_fd = fd;
 	int	status;
+        XINT    STG_GETLINE (XINT *fd, XCHAR *obuf);
 
 	iferr (status = STG_GETLINE (&x_fd, xbuf))
 	    return (EOF);
@@ -51,6 +52,7 @@ c_stgputline (
 {
 	XCHAR	xbuf[SZ_LINE+1];
 	XINT    x_fd = fd;
+        int     STG_PUTLINE (XINT *fd, XCHAR *text);
 
 	c_strupk (buf, xbuf, SZ_LINE);
 	iferr (STG_PUTLINE (&x_fd, xbuf))

@@ -2,7 +2,7 @@
 */
 
 #define	import_spp
-#define	import_libc
+//#define	import_libc
 #define	import_knames
 #include <iraf.h>
 
@@ -12,15 +12,17 @@
 ** which occurred.
 */
 int
-system (
+u_system (
   char	*cmd			/* command to be sent to host system	*/
 )
 {
 	PKCHAR	nullstr[1];
 	XINT	status;
+        int     ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR *stdout_file,
+                        PKCHAR *stderr_file, XINT *status);
 
 	nullstr[0] = EOS;
-	ZOSCMD (cmd, nullstr, nullstr, nullstr, &status);
+	ZOSCMD ((PKCHAR *)cmd, nullstr, nullstr, nullstr, &status);
 
 	return ((int) status);
 }

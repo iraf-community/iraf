@@ -1,14 +1,14 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#define	import_libc
+//#define	import_libc
 #include <iraf.h>
 
 
 /* STRLEN -- Length of a string.
 */
 int
-strlen (
+u_strlen (
   char	*s
 )
 {

@@ -35,8 +35,7 @@ spf_open (
 )
 {
 	XINT    x_maxch = maxch, x_mode = NEW_FILE;
-	char	*malloc();
-
+        XINT    STROPEN (XCHAR *str, XINT *maxch, XINT *mode);
 
 	spf_userbuf = buf;
 	spf_maxch = maxch;
@@ -57,7 +56,8 @@ spf_close (
   XINT	fd			/* file descriptor of stringbuf	*/
 )
 {
-	XINT  x_fd = fd;
+	XINT    x_fd = fd;
+        int     CLOSE (XINT *fd_arg);
 
 	CLOSE (&x_fd);
 	c_strpak (spf_buf, spf_userbuf, spf_maxch);

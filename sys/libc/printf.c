@@ -1,12 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <stdarg.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
 #define	import_ctype
-#define	import_stdarg
 #include <iraf.h>
 
 
@@ -23,13 +24,17 @@
 #define	NOARG		(-1)		/* % spec with no data value	*/
 
 
+void u_doarg (FILE *fp, XCHAR *formspec, va_list **argp, int prec[],
+              int varprec, int dtype);
+void u_doprnt (char *format, va_list *argp, FILE *fp);
+
+
 /* PRINTF -- Formatted print to the standard output.
 */
 void
 printf (char *format, ...)
 {
         va_list argp;
-	void u_doprnt();
 
 	va_start (argp, format);
 	u_doprnt (format, &argp, stdout);
@@ -43,7 +48,6 @@ void
 fprintf (FILE *fp, char *format, ...)
 {
         va_list argp;
-	void u_doprnt();
 
 	va_start (argp, format);
 	u_doprnt (format, &argp, fp);
@@ -70,8 +74,6 @@ u_doprnt (
 	int	done, dotseen;		/* one when at end of a format	*/
 	int	varprec;		/* runtime precision is used	*/
 	int	prec[MAX_PREC];		/* values of prec args		*/
-
-	void  u_doarg ();
 
 
 	while ( (ch = *format++) ) {
@@ -200,13 +202,14 @@ rval:			if (!dotseen) {
 ** formatted output procedures.
 */
 void
-u_doarg (fp, formspec, argp, prec, varprec, dtype)
-FILE	*fp;			/* output file			*/
-XCHAR	*formspec;		/* format string		*/
-va_list	**argp;			/* pointer to data value	*/
-int	prec[];			/* varprec args, if any		*/
-int	varprec;		/* number of varprec args	*/
-int	dtype;			/* datatype of data value	*/
+u_doarg (
+    FILE     *fp,		/* output file			*/
+    XCHAR    *formspec,		/* format string		*/
+    va_list  **argp,		/* pointer to data value	*/
+    int	     prec[],		/* varprec args, if any		*/
+    int	     varprec,		/* number of varprec args	*/
+    int	     dtype		/* datatype of data value	*/
+)
 {
 	register int	p;
 	XCHAR	sbuf[SZ_OBUF+1];
@@ -214,6 +217,16 @@ int	dtype;			/* datatype of data value	*/
 	XINT	ival;
 	XDOUBLE	dval;
 	char	*cptr;
+        int     FPRINTF (XINT *fd, XCHAR *format_string);
+        int     PARGX (XCOMPLEX *xval);
+        int     PARGSTR (XCHAR *str);
+        int     PARGD (XDOUBLE *dval);
+        int     PARGC (XCHAR *cval);
+        int     PARGS (XSHORT *sval);
+        int     PARGI (XINT *ival);
+        int     PARGL (XLONG *lval);
+        int     PARGR (XREAL *rval);
+        int     PARGB (XBOOL *bval);
 
 
 	/* Pass format string and any variable precision arguments.

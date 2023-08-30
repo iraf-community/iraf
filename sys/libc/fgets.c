@@ -18,11 +18,16 @@ fgets (
   FILE	*fp			/* input file			*/
 )
 {
-	register int	ch = 0, lastch = 0, n = maxch - 1;
+	register int	ch = 0, n = maxch - 1;
+#ifdef ADD_NEWLINE
+	register int	lastch = 0;
+#endif
 	register char	*op = buf;
 
 	while (--n >= 0 && (ch = getc (fp)) >= 0) {
+#ifdef ADD_NEWLINE
 	    lastch = ch;
+#endif
 	    if (ch == '\r')		/* handle DOS-style CR-NL	*/
 		continue;
 	    *op++ = ch;

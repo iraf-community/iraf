@@ -1,11 +1,13 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <stdarg.h>
+#include <stdlib.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_stdio
 #define	import_ctype
-#define	import_stdarg
 #include <iraf.h>
 
 
@@ -75,9 +77,6 @@ scanf (char *format, ...)
 	struct _input in;
 	int status;
 
-	extern int u_doscan();
-
-
 	va_start (argp, format);
 	in.i_type = SCAN_FILE;
 	in.i_nchars = 0;
@@ -97,9 +96,6 @@ fscanf (FILE *fp, char *format, ...)
 	va_list	argp;
 	int	status;
 	struct	_input in;
-
-	extern int u_doscan();
-
 
 	va_start (argp, format);
 	in.i_type = SCAN_FILE;
@@ -121,9 +117,6 @@ sscanf (char *str, char *format, ...)
 	va_list	argp;
 	struct _input in;
 	int status;
-
-	extern int u_doscan();
-
 
 	va_start (argp, format);
 	in.i_type = SCAN_STRING;
@@ -155,8 +148,8 @@ u_doscan (
 	struct	_format fmt;
 	int	nscan = 0, match;
 	int	eofflag = 0;
-	char	*u_crackformat(), *u_setucc();
-	int	u_scanstr(), u_scannum();
+	//char	*u_crackformat(), *u_setucc();
+	//int	u_scanstr(), u_scannum();
 
 
 	while ( (ch = *format++) ) {
@@ -431,7 +424,7 @@ out_:
 	 */
 	if (floating) {
 	    float	rval;
-	    double	dval, atof();
+	    double	dval;
 
 	    if (fmt->f_longword) {
 		*(va_arg ((**argp), double *)) = atof (numbuf);

@@ -16,6 +16,7 @@ malloc (
 {
 	XINT	x_nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	XINT	x_ptr, x_dtype = TY_CHAR;
+        int     MALLOC (XPOINTER *ubufp, XINT *nelems, XINT *dtype);
 
 	iferr (MALLOC (&x_ptr, &x_nchars, &x_dtype))
 	    return (NULL);

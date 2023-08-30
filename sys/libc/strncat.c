@@ -1,14 +1,14 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
-#define	import_libc
+//#define	import_libc
 #include <iraf.h>
 
 
 /* STRNCAT -- Concatenate at most N chars from S2 onto S1.
 */
 char *
-strncat (
+u_strncat (
   char	*s1,			/* output string		*/
   char	*s2,			/* string to be appended	*/
   int	n		/* max length of S1		*/

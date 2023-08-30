@@ -1,7 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
-#define	import_libc
+//#define	import_libc
 #include <iraf.h>
 
 
@@ -9,7 +9,7 @@
 ** and +N if S1 > S2.
 */
 int
-strcmp (
+u_strcmp (
   char	*s1,
   char	*s2
 )

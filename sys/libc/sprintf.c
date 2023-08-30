@@ -1,11 +1,12 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 */
 
+#include <stdarg.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
-#define	import_stdarg
 #include <iraf.h>
 
 #define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
@@ -22,11 +23,13 @@ sprintf (char *str, char *format, ...)
 {
 	register XCHAR	*ip;
 	register char	*op;
-	XCHAR obuf[SZ_OBUF], *fiobuf;
-	XINT x_fd, x_maxch = SZ_OBUF, x_mode = NEW_FILE;
+	XCHAR   obuf[SZ_OBUF], *fiobuf;
+	XINT    x_fd, x_maxch = SZ_OBUF, x_mode = NEW_FILE;
 	va_list	argp;
+        XINT    STROPEN (XCHAR *str, XINT *maxch, XINT *mode);
+        int     CLOSE (XINT *fd_arg);
 
-	extern int  u_doprnt();
+	extern int  u_doprnt(char *format, va_list *argp, FILE *fp);
 
 
 	va_start (argp, format);

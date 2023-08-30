@@ -8,6 +8,11 @@
 #include <iraf.h>
 
 
+extern void c_fseti (XINT fd, int param, int value);
+extern int c_fstati (XINT fd, int param);
+
+void setbuffer (FILE *fp, char *buf, int size);
+
 /* SETBUF -- Assign a buffer to be used by the i/o system to access a file.
 ** Should be called after opening the file but before doing any i/o.
 */
@@ -17,8 +22,6 @@ setbuf (
   char	*buf
 )
 {
-	void setbuffer();
-
 	setbuffer (fp, buf, BUFSIZ);
 }
 
@@ -36,7 +39,6 @@ setbuffer (
 )
 {
 	register XINT	fd = fileno(fp);
-
 
 	if (buf == NULL)
 	    c_fseti (fd, F_BUFSIZE, 1);
@@ -57,9 +59,6 @@ setlinebuf (
 )
 {
 	register XINT	fd = fileno(fp);
-
-	extern int  c_fstati();
-	extern void c_fseti();
 
 
 	if (c_fstati (fd, F_BUFSIZE) < SZ_LINE)

@@ -21,6 +21,7 @@ ungetc (
 {
 	XINT	x_fd = fileno(fp);
 	XCHAR	x_ch = ch;
+        int     UNGETC (XINT *fd, XCHAR *ch);
 
 	iferr (UNGETC (&x_fd, &x_ch))
 	    return (EOF);

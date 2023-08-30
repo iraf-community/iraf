@@ -13,7 +13,7 @@
  *  the caller is a static buffer containing the input string.
  */
 char *
-freadline (
+u_freadline (
   char	*prompt				/* user supplied output buffer	*/
 )
 {

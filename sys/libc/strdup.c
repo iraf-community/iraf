@@ -7,14 +7,14 @@
 /* STRDUP -- Save a copy of a string.
 */
 char *
-strdup (
+u_strdup (
   char	*str			/* string to copy		*/
 )
 {
     register char *ip, *op, *out;
-    int  len = strlen (str);
+    int  u_strlen (char *s);
 
-    out = calloc (1, strlen (str) + 1);
+    out = calloc (1, u_strlen(str) + 1);
     for (ip=str, op=out;  (*op++ = *ip++);  )
         ;
 

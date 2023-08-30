@@ -15,6 +15,7 @@ isatty (
 )
 {
 	XINT  x_fd = fd;
+        XINT XISATTY (XINT *fd);
 
 	return (XISATTY (&x_fd));
 }

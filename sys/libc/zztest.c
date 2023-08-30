@@ -16,7 +16,7 @@ typedef int (*PFI)(int *, int*);  /* pointer to function returning int    */
 int onint (int *code, int *old_handler);
 
 extern void c_xwhen (int exception, PFI new_handler, PFI *old_handler);
-extern integer clgstr_(shortint *param, shortint *outstr, integer *maxch);
+extern int clgstr_(short *param, short *outstr, int *maxch);
 
 
 void thello_(void)
@@ -97,7 +97,7 @@ void tgettk_(void)
 	int	maxch = SZ_FNAME;
 	FILE	*fp;
 
-	clgstr_ (c_sppstr("fname"), fname, (integer *)&maxch);
+	clgstr_ (c_sppstr("fname"), fname, (int *)&maxch);
 	c_strpak (fname, token, maxch);
 
 	fp = fopen (token, "r");

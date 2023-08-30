@@ -28,11 +28,11 @@
 #define	THRESH		4		/* threshold for insertion */
 #define	MTHRESH		6		/* threshold for median */
 
-static  int (*qcmp)();			/* the comparison routine */
+static  int (*qcmp)(char *a, char *b);	/* the comparison routine */
 static  int qsz;			/* size of each record */
 static  int thresh;			/* THRESHold in chars */
 static  int mthresh;			/* MTHRESHold in chars */
-static	void qst();
+static	void qst(char *base, char *maxval);
 
 
 /* QSORT -- First, set up some global parameters for qst to share.  Then,
