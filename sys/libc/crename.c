@@ -17,6 +17,7 @@ c_rename (
 {
 	XCHAR	spp_new_fname[SZ_FNAME];
 	int	maxch = SZ_FNAME;
+        int     RENAME (XCHAR *oldname, XCHAR *newname);
 
 	c_strupk (new_fname, spp_new_fname, maxch);
 	iferr (RENAME (c_sppstr(old_fname), spp_new_fname))

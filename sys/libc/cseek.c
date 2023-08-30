@@ -24,7 +24,7 @@ c_seek (
 	XLONG	x_char_offset = offset;
 	XINT    x_fd = fd;
 	int	bypass;
-
+        int     SEEK (XINT *fd, XLONG *offset);
 
 	bypass = (offset == BOFL || offset == EOFL
 		|| c_fstati (fd, F_TYPE) == TEXT_FILE);

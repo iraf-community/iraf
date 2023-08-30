@@ -44,7 +44,7 @@ c_salloc (
 {
 	XINT	buf;
 	XINT	x_nchars = nbytes, x_dtype = TY_CHAR;
-
+        int     SALLOC (XPOINTER *output_pointer, XINT *nelem, XINT *datatype);
 
 	x_nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	SALLOC (&buf, &x_nchars, &x_dtype);
@@ -60,6 +60,7 @@ c_smark (
 )
 {
 	XINT  x_sp = *sp;
+        int   SMARK (XPOINTER *old_sp);
 
 	SMARK (&x_sp);
 	*sp = x_sp;
@@ -75,6 +76,7 @@ c_sfree (
 )
 {
 	XINT  x_sp = sp;
+        int   SFREE (XPOINTER *old_sp);
 
 	SFREE (&x_sp);
 }

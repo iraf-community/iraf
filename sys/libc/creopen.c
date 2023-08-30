@@ -16,8 +16,8 @@ c_reopen (
 )
 {
 	XINT  x_fd = fd, x_mode = mode;
-	int new_fd;
-
+	int   new_fd;
+        XINT  REOPEN (XINT *fd, XINT *mode);
 
         iferr (new_fd = (int) REOPEN (&x_fd, &x_mode))
             return (ERR);

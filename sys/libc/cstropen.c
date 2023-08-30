@@ -18,6 +18,7 @@ c_stropen (
 {
 	XINT  x_maxch = maxch, x_mode = mode;
 	int   fd;
+        XINT  STROPEN (XCHAR *str, XINT *maxch, XINT *mode);
 
 	iferr (fd = (int) STROPEN (obuf, &x_maxch, &x_mode))
 	    return (ERR);

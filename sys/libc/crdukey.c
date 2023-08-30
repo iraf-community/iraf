@@ -18,7 +18,7 @@ c_rdukey (
 	XCHAR	buf[SZ_LINE+1];
 	XINT	x_maxch = SZ_LINE;
 	int	status;
-
+        XINT    RDUKEY (XCHAR *keystr, XINT *maxch);
 
 	obuf[0] = EOS;
 	if ((status = (int) RDUKEY (buf, &x_maxch)) > 0)

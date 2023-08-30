@@ -17,9 +17,9 @@ c_rcursor (
 )
 {
 	XCHAR	buf[SZ_LINE];
-	XINT x_fd = fd, x_maxch = maxch;
+	XINT    x_fd = fd, x_maxch = maxch;
 	int	key;
-
+        XINT    RCURSOR (XINT *stream, XCHAR *outstr, XINT *maxch);
 
 	key = (int) RCURSOR (&x_fd, buf, &x_maxch);
 	c_strpak (buf, outstr, maxch);

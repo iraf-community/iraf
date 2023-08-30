@@ -34,7 +34,7 @@ c_read (
 {
 	XINT  x_fd = fd;
 	int   nchars_read;
-
+        XINT  READ (XINT *fd, XCHAR *buffer, XINT *maxchars);
 
 	if (c_fstati (fd, F_TYPE) == TEXT_FILE) {
 	    register char	*op = buf;
