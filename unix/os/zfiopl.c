@@ -235,7 +235,7 @@ ZAWRPL (
 	 */
 	pltr.wbytes += *nbytes;
 	ZAWRBF (chan, buf, nbytes, &noffset);
-	ZAWTBF (chan, &pltr.status);
+	ZAWTBF (chan, (XINT *)&pltr.status);
 
 	/* Write out the integer record trailer.  Set the file offset to zero
 	 * since the file is sequential, and the offsets do not include the

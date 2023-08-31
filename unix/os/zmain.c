@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -28,22 +29,21 @@ extern	int sh_debug;
 
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
-static	int ipc_in = 0, ipc_out = 0;
-static	int ipc_isatty = NO;
-static	int prtype;
-char	*getenv();
+static	XINT ipc_in = 0, ipc_out = 0;
+static	XINT ipc_isatty = NO;
+static	XINT prtype;
 
-extern XINT ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-extern XINT ZGETTY (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status);
-extern XINT SYSRUK (XCHAR *task, XCHAR *cmd, XINT *ruk_argoff,
+
+extern XINT IRAF_MAIN (XCHAR *a_cmd, XINT *a_inchan, XINT *a_outchan,
+                       XINT *a_errchan, XINT *a_driver, XINT *a_devtype,
+                       XINT *prtype, XCHAR *bkgfile, XINT *jobcode,
+                       int (SYSRUK)(XCHAR *task, XCHAR *cmd,
+                       XINT *ruk_argoff, XINT *ruk_interact),
+                       int (ONENTRY)(XINT *prtype,XCHAR *bkgfile,XCHAR *cmd));
+
+extern int ONENTRY (XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
+extern int SYSRUK (XCHAR *task, XCHAR *cmd, XINT *ruk_argoff,
                    XINT *ruk_interact);
-extern XINT ONENTRY (XINT *prtype, XCHAR *bkgfile, XCHAR *cmd);
-extern XINT ZARDPR (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset);
-
-/*
-extern XINT ONENTRY (XINT *prtype, XCHAR *bkgfie, XCHAR *cmd);
-extern XINT SYSRUK (XCHAR *task, XCHAR *cmd, XINT *rukarf, XINT *rukint);
-*/
 
 
 
@@ -100,7 +100,7 @@ main (int argc, char *argv[])
 
         /* Default if no arguments (same as -h, or host process). */
 	prtype = PR_HOST;
-	ZLOCPR (ZGETTY, &driver);
+	ZLOCPR ((PFI) ZGETTY, &driver);
 	devtype = TEXT_FILE;
 
 	if (arg < argc) {
@@ -129,7 +129,7 @@ main (int argc, char *argv[])
 
 ipc_:
 		prtype = PR_CONNECTED;
-		ZLOCPR (ZARDPR, &driver);
+		ZLOCPR ((PFI) ZARDPR, &driver);
 		devtype = BINARY_FILE;
 
 	    } else if (strcmp (argv[arg], "-d") == 0) {
@@ -150,7 +150,7 @@ ipc_:
 
 		freopen ("/dev/null", "r", stdin);
 		prtype = PR_DETACHED;
-		ZLOCPR (ZGETTX, &driver);
+		ZLOCPR ((PFI) ZGETTX, &driver);
 		devtype = TEXT_FILE;
 
 		/* Copy the bkgfile to PKCHAR buffer to avoid the possibility
@@ -199,7 +199,8 @@ ipc_:
 	 * code only in the event of a panic.
 	 */
 	errstat = IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
-	    &driver, &devtype, &prtype, osfn_bkgfile, &jobcode, SYSRUK,ONENTRY);
+	    &driver, &devtype, (XINT *)&prtype, (XCHAR *)osfn_bkgfile,
+            &jobcode, SYSRUK, ONENTRY);
 
 	/* Normal process shutdown.  Our only action is to delete the bkgfile
 	 * if run as a detached process (see also zpanic).

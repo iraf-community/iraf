@@ -29,7 +29,6 @@ ZGTENV (
 {
 	register char	*ip, *op;
 	register int	n;
-	char	*getenv();
 
 
 	op = (char *)outstr;

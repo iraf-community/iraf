@@ -45,9 +45,10 @@ struct dir {
 	DIR	*dir;
 };
 
-static	int _getfile();
-static	int d_compar();
-static	void d_qsort();
+static  int _getfile (DIR *dir, char *outstr, int maxch);
+static  int d_compar (char *a, char *b);
+static  void d_qsort (char *base, int n, int size,
+                      int (*compar) (char *a, char *b));
 static	char *sbuf;
 static	int *soff;
 static	int nentries;
@@ -117,7 +118,7 @@ ZOPDIR (PKCHAR *fname, XINT *chan)
 	}
 
 	/* Sort the file list. */
-	d_qsort (soff, nentries, sizeof(int), d_compar);
+	d_qsort ((void *)soff, nentries, sizeof(int), d_compar);
 
 	/* Free unused space. */
 	if ((soff = (int *) realloc (soff, nentries * sizeof(int))) == NULL)
@@ -285,11 +286,11 @@ d_compar (char *a, char *b)
 #undef max
 #endif
 
-static  int (*qcmp)();			/* the comparison routine */
+static  int (*qcmp)(char *a, char *b);	/* the comparison routine */
 static  int qsz;			/* size of each record */
 static  int thresh;			/* THRESHold in chars */
 static  int mthresh;			/* MTHRESHold in chars */
-static	void d_qst();
+static	void d_qst (char *base, char *max);
 
 /* QSORT -- First, set up some global parameters for qst to share.  Then,
  * quicksort with qst(), and then a cleanup insertion sort ourselves.

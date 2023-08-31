@@ -55,6 +55,7 @@ int vm_largefile (long nbytes);
 int vm_directio (int fd, int flag);
 
 
+
 /* ZOPNBF -- Open a binary file.  The file must exist for modes RO, WO, RW.
  * A new file will always be created for mode NF, and a file will be created
  * if it does not exist for mode AP.  Append mode is write-only at EOF.
@@ -187,7 +188,6 @@ ZARDBF (
 	register int fd;
 	off_t fileoffset;
 	int aligned;
-	off_t lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];
@@ -237,7 +237,6 @@ ZAWRBF (
 	register int fd;
 	register struct	fiodes *kfp;
 	off_t fileoffset;
-	off_t lseek();
 	int aligned;
 
 	fd = *chan;
@@ -415,12 +414,12 @@ static int dio_threshold  = DEF_DIOTHRESH;
 static int vm_port 	  = DEF_VMPORT;
 static char vm_client[SZ_CNAME+1];
 
-static void vm_initialize();
-static void vm_shutdown();
-static void vm_identify();
-static int vm_write();
-static int vm_connect();
-static int getstr();
+static void vm_initialize (void);
+static void vm_shutdown (void);
+static void vm_identify (void);
+static int vm_write (int fd, char *buf, int nbytes);
+static int vm_connect (void);
+static int getstr(char **ipp, char *obuf, int maxch, int delim);
 
 
 
@@ -771,7 +770,7 @@ vm_connect (void)
 	char osfn[SZ_FNAME];
 	int fd, status = 0;
 
-	extern int ZOPNND(PKCHAR *pk_osfn, XINT *mode, XINT *chan);
+	extern int ZOPNND (PKCHAR *pk_osfn, XINT *mode, XINT *chan);
 
 
 	/* Already connected? */
@@ -784,7 +783,7 @@ vm_connect (void)
 		"vmclient (%s): open server connection `%s' -> ",
 		vm_client, osfn);
 
-	ZOPNND (osfn, &acmode, &fd);
+	ZOPNND ((PKCHAR *)osfn, &acmode, (XINT *)&fd);
 	if (fd == XERR) {
 	    if (vm_debug)
 		fprintf (stderr, "failed\n");
@@ -806,7 +805,7 @@ vm_connect (void)
 static void
 vm_shutdown (void)
 {
-	int status;
+	XINT status;
 	extern  int  ZCLSND(XINT *fd, XINT *status);
 
 	if (vm_server) {
@@ -814,7 +813,7 @@ vm_shutdown (void)
 		fprintf (stderr,
 		    "vmclient (%s): shutdown server connection\n", vm_client);
 	    vm_write (vm_server, "bye\n", 4);
-	    ZCLSND (&vm_server, &status);
+	    ZCLSND ((XINT *)&vm_server, &status);
 	}
 	vm_server = 0;
 }

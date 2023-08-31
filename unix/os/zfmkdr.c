@@ -21,7 +21,7 @@ ZFMKDR (
 	char	osdir[SZ_PATHNAME];
 	register char *ip, *op;
 
-	extern  int _u_fmode();
+	extern  int _u_fmode(int mode);
 
 
 	/* Change pathnames like "a/b/c/" to "a/b/c".  Probably not necessary,

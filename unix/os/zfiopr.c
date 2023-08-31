@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -16,14 +17,6 @@
 #include <iraf.h>
 
 extern	int errno;		/* error code returned by the kernel	*/
-
-#ifdef SYSV
-#define	vfork	fork
-#else
-#  ifdef sun
-#  include <vfork.h>
-#  endif
-#endif
 
 extern void pr_enter (int pid, int inchan, int outchan);
 
@@ -110,7 +103,7 @@ err:	    close (pin[0]);  close (pin[1]);
 	 * the open stdio files.  The fork can fail if swap space is full or
 	 * if we have too many processes.
 	 */
-	while ((*pid = vfork()) == ERR) {
+	while ((*pid = fork()) == ERR) {
 	    if (--maxforks == 0) {
 		close (pin[0]);  close (pin[1]);
 		close (pout[0]); close (pout[1]);
@@ -193,7 +186,8 @@ int
 ZCLCPR (XINT *pid, XINT *exit_status)
 {
 	int	inchan, outchan;
-	extern  int pr_getipc(), pr_wait();
+	extern  int pr_wait(int pid);
+        extern  int pr_getipc (int pid, int *inchan, int *outchan);
 
 
 	if (pr_getipc ((int)*pid, &inchan, &outchan) == ERR)

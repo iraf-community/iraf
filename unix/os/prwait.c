@@ -35,6 +35,8 @@ extern int errno;
 #define POSIX
 #endif
 
+struct	proctable *pr_findpid (int pid);
+
 
 /* PR_ENTER -- Make a new entry in the process table.  Something is very wrong
  * if the table overflows.
@@ -43,12 +45,11 @@ void
 pr_enter (int pid, int inchan, int outchan)
 {
 	register struct proctable *pr;
-	struct	proctable *pr_findpid();
 
 	extern  int kernel_panic (char *msg);
 
 
-	if ((pr = pr_findpid (NULL)) == NULL)
+	if ((pr = pr_findpid (0)) == NULL)
 	    kernel_panic ("iraf process table overflow");
 	else {
 	    pr->pr_pid = pid;
@@ -69,7 +70,6 @@ pr_wait (int pid)
 	register struct proctable *pr;
 	int	error_code;
 	pid_t	waitpid;
-	struct	proctable *pr_findpid();
 #ifdef POSIX
 	int	exit_status;
 #else
@@ -128,7 +128,6 @@ int
 pr_getipc (int pid, int *inchan, int *outchan)
 {
 	register struct proctable *pr;
-	struct	proctable *pr_findpid();
 
 
 	/* Lookup process in table.  Return ERR if there is no entry.

@@ -16,9 +16,6 @@
 #include <iraf.h>
 
 #define	QUANTUM		6
-#ifdef SYSV
-#define	vfork	fork
-#endif
 
 extern void pr_enter (int pid, int inchan, int outchan);
 extern int  pr_wait (int pid);
@@ -98,7 +95,7 @@ ZOPDPR (
 	 * the open stdio files.  The fork can fail if swap space is full or
 	 * if we have too many processes.
 	 */
-	while ((pid = vfork()) == ERR) {
+	while ((pid = fork()) == ERR) {
 	    if (--maxforks == 0) {
 		*jobcode = XERR;
 		return (XERR);
@@ -131,7 +128,7 @@ ZOPDPR (
 	    setpriority (PRIO_PROCESS, 0, priority);
 #endif
 
-	    /* Since we used vfork we share memory with the parent until the
+	    /* Since we used fork we share memory with the parent until the
 	     * call to execl(), hence we must not close any files or do
 	     * anything else which would corrupt the parent's data structures.
 	     * Instead, immediately exec the new process (will not return if

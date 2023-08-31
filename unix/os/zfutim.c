@@ -11,6 +11,7 @@
 #include <sys/timeb.h>
 #endif
 #include <utime.h>
+#include <unistd.h>
 
 #define	import_kernel
 #define	import_knames
@@ -34,8 +35,7 @@ ZFUTIM (
 {
 	struct	stat osfile;
 	struct	utimbuf time;
-	int	offset = 0;
-	int	stat(), utime();
+	XINT	offset = 0;
 
 	extern  int ZGMTCO (XINT *gmtcor);
 

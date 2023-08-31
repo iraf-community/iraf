@@ -73,6 +73,18 @@
  */
 int debug_sig = 0;
 
+/*
+typedef void  (*sighandler_t)(int);
+typedef void  (*sigaction_t)(int, siginfo_t *, void *);
+*/
+typedef void  (*SIGFUNC)(XINT *, XINT *);
+
+static void ex_handler (int, siginfo_t *, void *);
+/*
+static sighandler_t setsig(int, sigaction_t);
+*/
+
+
 #ifdef MACOSX
 #define _IONBF 2		/* No buffering.  */
 #define	fcancel(fp)     setvbuf(fp, NULL, _IONBF, 0);
@@ -87,7 +99,7 @@ void ex_handler ( int, int, struct sigcontext * );
 void ex_handler ( int, siginfo_t *, void * );
 #endif
 
-static long setsig();
+static long setsig (int code, SIGFUNC handler);
 static int ignore_sigint = 0;
 
 
@@ -298,9 +310,10 @@ ZXWHEN (
 /* SETSIG -- Post an exception handler for the given exception.
  */
 static long
-setsig (code, handler)
-int code;
-SIGFUNC	handler;
+setsig (
+    int         code,
+    SIGFUNC	handler
+)
 {
 	struct sigaction sig;
 	long status;
@@ -324,31 +337,12 @@ SIGFUNC	handler;
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-#if (defined(MACOSX) && defined(OLD_MACOSX))
-
-void
-ex_handler (unix_signal, info, scp)
-int unix_signal;
-#ifdef OLD_MACOSX
-void *info;
-#else
-siginfo_t *info;
-#endif
-#ifdef MACINTEL
-ucontext_t *scp;
-#else
-struct sigcontext *scp;
-#endif
-
-#else
-
 void
 ex_handler (
   int  	    unix_signal,
   siginfo_t *info,
   void      *ucp
 )
-#endif
 {
 	XINT  next_epa, epa, x_vex;
 	int   vex;
@@ -423,6 +417,8 @@ ex_handler (
 	 * is completed and processing is to continue normally.  If the handler
 	 * wishes to restart the process, i.e., initiate error recovery, then
 	 * the handler procedure will not return.
+	     ((int)(SIGFUNC)(int *,XINT *))epa(&x_vex,&next_epa))
+	     ((void)(SIGFUNC)(XINT *,XINT *))epa(&x_vex,&next_epa))
 	 */
 	for (next_epa=epa;  next_epa != (XINT) X_IGNORE;
 	    ((SIGFUNC)epa)(&x_vex,&next_epa))
