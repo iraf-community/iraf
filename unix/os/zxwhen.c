@@ -74,10 +74,10 @@
 int debug_sig = 0;
 
 /*
+*/
 typedef void  (*sighandler_t)(int);
 typedef void  (*sigaction_t)(int, siginfo_t *, void *);
-*/
-typedef void  (*SIGFUNC)(XINT *, XINT *);
+typedef void  (*XSIGFUNC)(XINT *, XINT *);
 
 static void ex_handler (int, siginfo_t *, void *);
 /*
@@ -417,11 +417,9 @@ ex_handler (
 	 * is completed and processing is to continue normally.  If the handler
 	 * wishes to restart the process, i.e., initiate error recovery, then
 	 * the handler procedure will not return.
-	     ((int)(SIGFUNC)(int *,XINT *))epa(&x_vex,&next_epa))
-	     ((void)(SIGFUNC)(XINT *,XINT *))epa(&x_vex,&next_epa))
 	 */
 	for (next_epa=epa;  next_epa != (XINT) X_IGNORE;
-	    ((SIGFUNC)epa)(&x_vex,&next_epa))
+	    ((XSIGFUNC)epa) (&x_vex,&next_epa))
 	        epa = next_epa;
 }
 
