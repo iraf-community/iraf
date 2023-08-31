@@ -67,7 +67,7 @@ int	lpr_inuse = NO;			/* set if printer is open	*/
 char	lpstr[SZ_LPSTR+1];		/* save zopnlp argument		*/
 
 
-extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan)
+extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
 extern  int ZCLSBF (XINT *fd, XINT *status);
 extern  int ZOSCMD (PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR *stdout_file,
                     PKCHAR *stderr_file, XINT *status);

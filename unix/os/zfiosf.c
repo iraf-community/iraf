@@ -35,7 +35,7 @@
  * during file creation and deletion.
  */
 
-extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan)
+extern  int ZOPNBF (PKCHAR *osfn, XINT *mode, XINT *chan);
 extern  int ZCLSBF (XINT *fd, XINT *status);
 extern  int ZARDBF (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset);
 extern  int ZAWRBF (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset);
