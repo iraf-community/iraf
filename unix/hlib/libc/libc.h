@@ -10,6 +10,8 @@
 #endif
 #endif
 
+#include <stdarg.h>
+
 #define	XCHAR		short
 #ifdef MACH64
 #define	XINT		long
@@ -103,6 +105,7 @@ extern	char		MEMCOM[];
 #define	strrchr		u_rindex
 #define	system		u_system
 #define	ungetc		u_ungetc
+#define	vfprintf	u_vfprintf
 
 /* C_SPP names not unique in the first seven characters.
  */
@@ -125,7 +128,8 @@ extern	char		MEMCOM[];
  * Prototype definitions for the IRAF runtime C library.
  */
 
-/*extern long      XERPSH(), XERPOPI();*/	/* standard for iferr use */
+extern int     XERPSH(void), XERPOPI(void);	/* standard for iferr use */
+extern int     XALLOCATE(char *device);
 
 extern struct _iobuf  *fdopen (XINT fd, char *mode);
 extern struct _iobuf  *fopen (char *fname, char *modestr);
@@ -246,7 +250,7 @@ extern int	spf_open (char *buf, int maxch);
 extern int	sscanf (char *str, char *format, ...);
 extern int	strcmp (char *s1, char *s2);
 extern int	strlen (char *s);
-extern int	system (char *cmd);
+extern int	system (const char *cmd);
 extern int	ungetc (int ch, struct _iobuf *fp);
 extern long	atol (char *str);
 extern long	c_clktime (long reftime);
@@ -311,6 +315,7 @@ extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
 extern void	spf_close (XINT fd);
+extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
 
 /*  The following have conflicts because of the order in which the
 **  include files are done in iraf.h.  Commented out for now.
@@ -321,9 +326,9 @@ extern void	c_xwhen (int exception, PFI new_handler, PFI *old_handler);
 #endif
 
 /*
-*/
 #include "../f2c.h"
-#include "vosproto.h"
+*/
+//#include "vosproto.h"
 
 #define	D_libc
 #define	D_libc_proto

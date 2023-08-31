@@ -2,7 +2,6 @@
  *  KPROTO.H -- IRAF Kernel prototype definitions.
  */
 
-//#include <stdio.h>
 #include <time.h>               /* for time_t                   */
 #include <signal.h>             /* for siginfo_t                */
 
@@ -10,7 +9,6 @@
 typedef short int shortint;
 
 #ifndef MACH64
-
 
 /* alloc.c */
 extern int main(int argc, char *argv[]);
@@ -495,5 +493,5 @@ extern int zzstop_(void);
 extern void ready_(void);
 extern void mdump_(long *buf, long *nbytes);
 
-
 #endif
+

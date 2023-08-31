@@ -86,11 +86,14 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #ifdef AUX
 #define SIGFUNC sigfunc_t
 #else
+/*
+typedef	void  (*SIGFUNC)(int *,XINT *);
+*/
 typedef	void  (*SIGFUNC)();
 #endif
 
 typedef	void  (*PFV)();
-#if MACH64 || __LP64__
+#ifdef __LP64__
 typedef	long  (*PFI)();
 #else
 typedef	int   (*PFI)();
