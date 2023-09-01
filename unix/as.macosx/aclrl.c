@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
+
 #define import_spp
 #define import_knames
 #include <iraf.h>
@@ -8,9 +10,8 @@
 /* ACLRL -- Clear a block of memory.
  * [Specially optimized for Sun/IRAF].
  */
-ACLRL (a, n)
-XLONG	*a;
-XINT	*n;
+void
+ACLRL (XLONG *a, XINT *n)
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 }
