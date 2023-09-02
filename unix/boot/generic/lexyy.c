@@ -591,7 +591,7 @@ extern void  output_indef (char ch);
 extern void  output_upper (char *s);
 extern void  output (char ch);
 extern void  outstr (char *s);
-extern int   k_getc (FILE *cx_i);	  /* NOTE: lex.sed changes this to k_getc() */
+extern int k_getc (FILE *fp);	  /* NOTE: lex.sed changes this to k_getc() */
 
 
 

@@ -45,10 +45,10 @@ char	type_char;
 int	pass_output = 1;
 int	clobber = NO;
 
-extern long  k_ftell (FILE *cx_i);
 extern FILE *k_fopen (char *fname, char *mode);
-extern int   k_fseek (FILE *cx_i, long offset, int type);
-extern int   k_fclose (FILE *cx_i);
+extern int   k_fclose (FILE *fp);
+extern long  k_ftell (FILE *fp);
+extern int   k_fseek (FILE *fp, long offset, int type);
 
 extern int   yylex (void);
 extern int   lex_input (void);
@@ -218,7 +218,7 @@ int main (int argc, char *argv[])
 		yylex();	/* do it */
 
 		fclose (fp);
-		k_fseek (yyin,0L,0);
+		k_fseek (yyin, 0L, SEEK_SET);
 	    }
 
 	    k_fclose (yyin);
