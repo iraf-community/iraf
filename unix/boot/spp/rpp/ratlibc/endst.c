@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "ratdef.h"
 
-void ENDST(void)
+void ENDST()
 {
 	exit(0);
 }

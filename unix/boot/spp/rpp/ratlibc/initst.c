@@ -10,7 +10,8 @@ FILE	*_fdtofile[10];
  * executable statement of every program using the tools
  * subroutines.
  */
-void INITST()
+void 
+INITST (void)
 {
 	_fdtofile[0] = stdin;
 	_fdtofile[1] = stdout;

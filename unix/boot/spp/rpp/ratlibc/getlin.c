@@ -4,10 +4,7 @@
 #include "ratdef.h"
 
 FINT
-GETLIN(
-    RCHAR *line,
-    FINT *fd
-)
+GETLIN(RCHAR *line, FINT *fd)
 {
 	register  int c=0;
 	register  int count=0;

@@ -1,6 +1,6 @@
       subroutine rmtabl (st)
       integer st
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer i
       integer walker, bucket, node

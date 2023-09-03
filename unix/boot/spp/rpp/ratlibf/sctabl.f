@@ -2,7 +2,7 @@
       integer table, posn
       integer sym (100)
       integer info (100)
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer bucket, walker
       integer dsget

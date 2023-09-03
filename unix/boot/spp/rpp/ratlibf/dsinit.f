@@ -1,6 +1,6 @@
       subroutine dsinit (w)
       integer w
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer t
       if (.not.(w .lt. 2 * 2 + 2))goto 23000
