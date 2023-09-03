@@ -14,6 +14,8 @@
 #include <iraf.h>
 
 
+int ZZEPRO ( void) { return (XOK); }
+#ifdef FIXME
 
 #if (defined(MACOSX) && defined(OLD_MACOSX))
 void ex_handler ( int, int, struct sigcontext * );
@@ -81,4 +83,6 @@ void mxumsk_ (void)
 
 #else
 int ZZEPRO ( void) { return (XOK); }
+#endif
+
 #endif
