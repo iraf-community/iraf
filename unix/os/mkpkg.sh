@@ -21,19 +21,14 @@ for i in gmttolst.c irafpath.c prwait.c z*.c ;\
     do $CC -c $HSI_CF -Wall $i ;\
 done
 
-#ar rv		libos.a *.o; ar dv libos.a zmain.o; rm *.o
-
 if [ "$IRAFARCH" = "macosx" ]; then
-##    $CC -c -O -DMACOSX -w -Wunused -arch ppc  ../as/zsvjmp_ppc.s  -o zsvjmp.o ;\
-##    libtool -a -T -o libos.a zsvjmp.o
-##    rm -f zsvjmp.o
-    $CC -c -O -DMACOSX -w -Wunused -m32 -arch i386 ../as/zsvjmp_i386.s -o zsvjmp.o ;\
+    $CC -g -c -O -DMACOSX -Wall -m64 -arch arm64 ../as/zsvjmp.s -o zsvjmp.o ;\
     ar r	libos.a *.o; 
     ranlib	libos.a
     rm -f 	zsvjmp.o zmain.o
 
 else
-    rm -f zmain.o
+    rm -f       zmain.o
     ar r	libos.a *.o; 
     ranlib	libos.a
 fi
