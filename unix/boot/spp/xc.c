@@ -32,7 +32,7 @@
  * system.
  */
 
-#define VERSION		"IRAFNET XC V2.4 Jan 21 2010"
+#define VERSION		"NOIRLab/IRAF XC V2.5 Sep2023"
 
 #define	ERR		(-1)
 #define	EOS		'\0'
@@ -73,8 +73,10 @@
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
-#define IRAFLIB5	"libVO.a"
-#define IRAFLIB6	"libcfitsio.a"
+#define IRAFLIB5	" "
+#define IRAFLIB6	" "
+//#define IRAFLIB5	"libVO.a"
+//#define IRAFLIB6	"libcfitsio.a"
 
 #ifdef LINUX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
@@ -806,20 +808,12 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-	        if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "ppc";
-		    */
-	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "i386";
-	    	    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-	        } else if (strcmp (irafarch, "macintel") == 0) {
-	            arglist[nargs++] = "-arch";
+	        arglist[nargs++] = "-arch";
+	        if (strcmp (irafarch, "macosx") == 0)
+	    	    arglist[nargs++] = "arm64";
+	        else if (strcmp (irafarch, "macintel") == 0)
 	    	    arglist[nargs++] = "x86_64";
-	    	    arglist[nargs++] = "-m64";
-		}
+	    	arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -888,21 +882,12 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-                if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
-                    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-                } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
+                arglist[nargs++] = "-arch";
+                if (strcmp (irafarch, "macosx") == 0)
+                    arglist[nargs++] = "arm64";
+                else if (strcmp (irafarch, "macintel") == 0)
                     arglist[nargs++] = "x86_64";
-                    arglist[nargs++] = "-m64";
-                }
-
+                arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -1001,21 +986,12 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = "-DMACOSX";
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-                if (strcmp (irafarch, "macosx") == 0) {
-		    /*
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-		    */
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "i386";
-                    arglist[nargs++] = "-m32";
-	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
-                } else if (strcmp (irafarch, "macintel") == 0) {
-                    arglist[nargs++] = "-arch";
+                arglist[nargs++] = "-arch";
+                if (strcmp (irafarch, "macosx") == 0)
+                    arglist[nargs++] = "arm64";
+                else if (strcmp (irafarch, "macintel") == 0)
                     arglist[nargs++] = "x86_64";
-                    arglist[nargs++] = "-m64";
-                }
-
+                arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -1086,20 +1062,12 @@ passflag:		    mkobject = YES;
 
 #ifdef MACOSX
 	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
-            if (strcmp (irafarch, "macosx") == 0) {
-		/*
                 arglist[nargs++] = "-arch";
-                arglist[nargs++] = "ppc";
-		*/
-                arglist[nargs++] = "-arch";
-                arglist[nargs++] = "i386";
-                arglist[nargs++] = "-m32";
-	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
-            } else if (strcmp (irafarch, "macintel") == 0) {
-                arglist[nargs++] = "-arch";
+            if (strcmp (irafarch, "macosx") == 0)
+                arglist[nargs++] = "arm64";
+            else if (strcmp (irafarch, "macintel") == 0)
                 arglist[nargs++] = "x86_64";
-                arglist[nargs++] = "-m64";
-            }
+            arglist[nargs++] = "-m64";
 	}
 #endif
 
@@ -1244,15 +1212,15 @@ passflag:		    mkobject = YES;
 	    if (usesharelib) {
 		arglist[nargs++] = mkfname (SHARELIB);
 		arglist[nargs++] = mkfname (IRAFLIB4);
-		arglist[nargs++] = mkfname (IRAFLIB5);
-		arglist[nargs++] = mkfname (IRAFLIB6);
+		//arglist[nargs++] = mkfname (IRAFLIB5);
+		//arglist[nargs++] = mkfname (IRAFLIB6);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
 		arglist[nargs++] = mkfname (IRAFLIB2);
 		arglist[nargs++] = mkfname (IRAFLIB3);
 		arglist[nargs++] = mkfname (IRAFLIB4);
-		arglist[nargs++] = mkfname (IRAFLIB5);
-		arglist[nargs++] = mkfname (IRAFLIB6);
+		//arglist[nargs++] = mkfname (IRAFLIB5);
+		//arglist[nargs++] = mkfname (IRAFLIB6);
 	    }
 	}
 
@@ -1460,9 +1428,7 @@ again:
 	if (strncmp (libref, "-l", 2) == 0) { 
 	    sprintf (libname, "lib%s.a", libref+2);
 	    libref = libname;
-	    goto again;
-	} else
-	    strcpy (libname, libref);
+	}
 
 	/* Position IP to EOS. */
 	for (ip=libref;  *ip;  ip++)
