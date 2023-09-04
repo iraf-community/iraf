@@ -143,7 +143,6 @@ begin
 				likparams, lsec, nimages)
 
 		case IMT_TABLE:
-		case IMT_VOTABLE:
 		    exp = imx_texpand (lfile, type, lexpr, lindex, "", nimages)
 
 		case IMT_FILE:

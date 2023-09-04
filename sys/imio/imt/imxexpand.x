@@ -11,7 +11,6 @@ include	<ctype.h>
 include	<diropen.h>
 
 include "imx.h"
-include <votParse_spp.h>
 
 
 define      SZ_BUF          8192	# name buffer string
@@ -319,7 +318,7 @@ char	ofname[SZ_PATHNAME]
 pointer	sp, exp, nodename
 int	ip, vfd, status, delim
 
-pointer imx_votable(), imx_table()
+pointer imx_table()
 int	vfnopen(), vfnmapu(), strncmp(), ki_gnode()
 
 begin
@@ -351,15 +350,9 @@ begin
         }
 
 
-	# Now process the file.  For a VOTable we parse the file and
-	# extract the acref columns as cached image names, for ascii
-	# tables we read the URLs directly but likewise returned the
-	# cache name.
-
-	if (type == IMT_TABLE)
-	    exp = imx_table (ofname[ip], index, nimages)
-	else if (type == IMT_VOTABLE)
-	    exp = imx_votable (ofname[ip], expr, index, fmt, nimages)
+	# Now process the file.  For ascii tables we read the URLs directly
+        # but likewise returned the cache name.
+	exp = imx_table (ofname[ip], index, nimages)
 
 	call sfree (sp)
 	return (exp)
@@ -486,195 +479,6 @@ begin
 end
 
 
-# IMX_FETCH -- Fetch the urls from the list.
-
-procedure imx_fetch (urls, istemp)
-
-char	urls[ARB]				#I file of URLS to download
-bool	istemp					#i is input file temporary?
-
-char	osfn[SZ_PATHNAME]
-char	url_osfn[SZ_PATHNAME]
-
-int	n, envgets()
-char	nthreads[SZ_FNAME]
-
-begin
-	# Get the host pathname of the cache directory.
-	call fmapfn ("cache$", osfn, SZ_PATHNAME)
-	call strupk (osfn, osfn, SZ_PATHNAME)
-
-	call fmapfn (urls, url_osfn, SZ_PATHNAME)
-	call strupk (url_osfn, url_osfn, SZ_PATHNAME)
-
-	n = envgets ("vo_nthreads", nthreads, SZ_FNAME)
-
-	# voget -B -C -D cache$ -b url -N <N> [-t] <infile>
-	if (istemp) {
-	    call vx_voget (10, "-B", "-C", "-D", osfn, "-b", "url", 
-	        "-N", nthreads, "-t", url_osfn)
-	} else {
-	    call vx_voget (10, "-B", "-C", "-D", osfn, "-b", "url", 
-	        "-N", nthreads, "-B", url_osfn)
-	}
-end
-
-
-# IMX_VOTABLE -- Read a VOTable, extracting the column of access references
-# as the image list.
-
-pointer procedure imx_votable (input, expr, index, fmt, nimages)
-
-char	input[ARB]			# List of ME file names
-char	expr[ARB]			# Filtering expression
-char	index[ARB]			# Range list of table rows
-char	fmt[ARB]			# Requested file format
-int	nimages				# Number of output images
-
-pointer	vot, exp, ranges
-int	nranges, tfd
-char	tfile[SZ_PATHNAME]
-
-int	open()
-int	imx_decode_ranges()
-pointer	imx_votselect(), votinit()
-bool	envgetb()
-
-begin
-	# Create a temp file for the parsed access references.
-	call mktemp ("tmp$vot", tfile, SZ_PATHNAME)
-	iferr (tfd = open (tfile, NEW_FILE, TEXT_FILE)) {
-	    nimages = 0
-	    return (NULL)
-	}
-
-	# Expand the index string into a range structure.
-	if (index[1] != EOS) {
-	    call calloc (ranges, 3 * SZ_RANGE, TY_INT)
-            if (imx_decode_ranges (index, Memi[ranges], SZ_RANGE,
-                 nranges, YES) == ERR) {
-		    call eprintf ("error parsing range '%s'\n")
-		        call pargstr (index)
-	    }
-	} else
-	    ranges = NULL
- 
-	# Initialize the VOT struct and parse the table.
-	vot = votinit (input)
-
-	# Select the column from the VOTable with the access reference.
-	exp = imx_votselect (vot, tfd, fmt, ranges, nimages)
-
-	call mfree (ranges, TY_INT)
-	call votclose (vot)			# close the files
-	call close (tfd)
-
-	# Close the temp file and pre-fetch the data if needed.
-	if (envgetb ("vo_prefetch"))
-	    call imx_fetch (tfile, true)
-
-	return (exp)
-end
-
-
-# IMX_VOTSELECT -- Select the access reference column.
-
-pointer procedure imx_votselect (vot, fd, fmt, ranges, nimages)
-
-pointer	vot					#i VOTable struct pointer
-int	fd					#i filename of selected rows
-char	fmt[ARB]				#i file format
-pointer	ranges					#i ranges struct pointer
-int	nimages					#o no. selected images
-
-pointer	exp
-int	col, len, clen, maxlen
-char 	acref_ucd[SZ_FNAME], imfmt[SZ_FNAME], ucd_col[SZ_FNAME]
-char	acref[SZ_LINE], ucd[SZ_FNAME], buf[SZ_LINE], cfname[SZ_PATHNAME]
-int	i, rownum, field, acref_col, acfmt_col
-
-int	strcmp(), strsearch(), strlen(), vx_getNext()
-bool	imx_in_range()
-
-begin
-	# Figure out which table column we want.  Note that we assume there
-	# is only one <RESOURCE> element.  The caller may pass in a specific
-	# column to be used, otherwise look for for the named UCD.
-
-	col = 0						# FIXME
-	call aclrc (ucd_col, SZ_FNAME) 			# FIXME
-	call strcpy ("fits", imfmt, SZ_FNAME) 		# FIXME
-
-	call aclrc (acref_ucd, SZ_FNAME)
-	if (col > 0) {
-	    acref_col = col
-	} else {
-	    if (ucd_col[1] != EOS)
-		call strcpy (ucd_col, acref_ucd, SZ_FNAME)
-	    else
-		call strcpy (DEF_ACREF_UCD, acref_ucd, SZ_FNAME)
-
-	    # Find the access reference column number.
-            i = 0
-            for (field=VOT_FIELD(vot); field > 0; field=vx_getNext (field)) {
-		call aclrc (ucd, SZ_FNAME)
-                call vx_getAttr (field, "ucd", ucd, SZ_FNAME)
-		if (strcmp (ucd, acref_ucd) == 0) {
-		    acref_col = i
-		} else if (strcmp (ucd, DEF_FORMAT_UCD) == 0)
-		    acfmt_col = i
-	        i = i + 1
-	    }
-	}
-
-	maxlen = SZ_BUF
-	call calloc (exp, maxlen, TY_CHAR)
-
-	# Download the files.
-	for (i=0; i < VOT_NROWS(vot); i=i+1) {
-	    call vx_getTableCell (VOT_TDATA(vot), i, acfmt_col, imfmt, SZ_FNAME)
-
-	    if (fmt[1] == EOS || (fmt[1] != EOS && strsearch(imfmt, fmt) > 0)) {
-	        call vx_getTableCell (VOT_TDATA(vot), i, acref_col, 
-		    acref, SZ_LINE)
-
-	        # Do the row selection based on the index string.
-		rownum = i + 1
-	        if (ranges != NULL && ! imx_in_range (Memi[ranges], rownum))
-		    next
-
-	        # Generate a unique cache filename based on the URL.
-	        call fcname ("cache$", acref, "url", cfname, SZ_PATHNAME)
-
-	        # Append the cache name to the output string. Reallocate the
-	        # string pointer if needed.
-	        clen = strlen (cfname)
-	        if ((len + clen) >= maxlen) {
-		    maxlen = maxlen + SZ_BUF
-		    call realloc (exp, maxlen, TY_CHAR)
-	        }
-	        len = len + clen
-
-	        if (nimages == 0) {
-		    call strcpy (cfname, Memc[exp], maxlen)
-	        } else {
-		    call strcat (",", Memc[exp], maxlen)
-	            call strcat (cfname, Memc[exp], maxlen)
-	        }
-	        call aclrc (buf, SZ_LINE)
-
-		# Write the URL to the download file.
-		call fprintf (fd, "%s\n")
-		    call pargstr (acref)
-
-		nimages = nimages + 1
-	    }
-	}
-
-	return (exp)
-end
-
-
 # IMX_TABLE -- Read an ASCII text table of URLs and create the list
 # of files to process.  We apply the list index to do row selection
 # and return a list of cached filenames.
@@ -750,9 +554,6 @@ begin
 
 	call mfree (ranges, TY_INT)
 	call close (fd)
-
-	if (envgetb ("vo_prefetch"))
-	    call imx_fetch (input, false)
 
 	return (exp)
 end

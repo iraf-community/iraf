@@ -96,17 +96,14 @@ begin
 	} else {
 	
 	    # If we get this far, we have a file of some kind.  See if it is a
- 	    # list of URLs, a VOTable, or a plain file.
+ 	    # list of URLs or a plain file.
 	    is_http_list = FALSE
 	    fd = open (name, READ_ONLY, TEXT_FILE)
 	    do i = 1, 10 {
 	        call aclrc (buf, SZ_LINE)
 	        nchars = read (fd, buf, SZ_LINE)
 	        call strupr (buf)
-	        if (strsearch (buf, "VOTABLE") > 0) {
-	    	    call close (fd)
-		    return (IMT_VOTABLE)
-	        } else if (strncmp (buf, "http://", 7) == 0)
+	        if (strncmp (buf, "http://", 7) == 0)
 	    	    is_http_list = TRUE
 	    }
 	    call close (fd)
