@@ -107,6 +107,8 @@ Un_link_all(int cdelete)
 rmtdir(Void)
 {
 	char *s;
+        extern int rmdir (const char *s);
+
 	if (*(s = tmpdir)) {
 		tmpdir = "";
 		rmdir(s);
