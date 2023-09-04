@@ -2,8 +2,12 @@
  * MATH.H -- Math functions for C.
  */
 
-double	XEXP(), XLOG(), XLOG10(), XPOW(), XSQRT();
-double	XSIN(), XCOS(), XASIN(), XACOS(), XTAN(), XATAN(), XATAN2();
+int     XNINT(double *x);
+double	XEXP(double *x), XLOG(double *x), XLOG10(double *x);
+double  XPOW(double *x, double *y), XSQRT(double *x);
+double	XSIN(double *x), XCOS(double *x), XASIN(double *x);
+double  XACOS(double *x), XTAN(double *x), XATAN(double *x);
+double  XATAN2(double *x, double *y);
 
 static	double um_x, um_y;
 
