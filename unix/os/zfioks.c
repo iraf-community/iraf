@@ -15,7 +15,6 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <sys/ioctl.h>
-#include <sys/ioctl_compat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
