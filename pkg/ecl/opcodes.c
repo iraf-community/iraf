@@ -43,8 +43,8 @@ char	*comdstr();
 extern	struct param *ppfind();		/* search task psets for param */
 extern	int currentline;
 
-void
-o_undefined (void)
+void 
+o_undefined (memel *argp)
 {
 	cl_error (E_IERR, e_uopcode, 0);
 }
@@ -94,8 +94,8 @@ o_absargset (memel *argp)
 
 /* <op1> <op2> . <op2 + op1>
  */
-void
-o_add (void)
+void 
+o_add (memel *argp)
 {
 	binop (OP_ADD);
 }
@@ -147,8 +147,8 @@ o_addassign (memel *argp)
 /* <name of file to be appended> .
  * includes stdout as well as stderr.
  */
-void
-o_allappend (void)
+void 
+o_allappend (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -181,8 +181,8 @@ o_allappend (void)
 /* <name of file to be used as stderr> .
  * redirect everything, including the stderr channel.
  */
-void
-o_allredir (void)
+void 
+o_allredir (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -213,16 +213,16 @@ o_allredir (void)
 
 /* <op1> <op2> . <op1 && op2>
  */
-void
-o_and (void)
+void 
+o_and (memel *argp)
 {
 	binexp (OP_AND);
 }
 
 /* <name of file to be appended> .
  */
-void
-o_append (void)
+void 
+o_append (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -289,8 +289,8 @@ o_call (memel *argp)
 
 /* <op> . <- op>
  */
-void
-o_chsign (void)
+void 
+o_chsign (memel *argp)
 {
 	unop (OP_MINUS);
 }
@@ -298,22 +298,22 @@ o_chsign (void)
 /* <op> // <op>
  * string concatenation
  */
-void
-o_concat (void)
+void 
+o_concat (memel *argp)
 {
 	binop (OP_CONCAT);
 }
 
 /* <op1> <op2> . <op1 / op2>
  */
-void
-o_div (void)
+void 
+o_div (memel *argp)
 {
 	binop (OP_DIV);
 }
 
-void
-o_doend (void)
+void 
+o_doend (memel *argp)
 {
 }
 
@@ -379,24 +379,24 @@ o_catassign (memel *argp)
 
 /* <op1> <op2> . <op1 == op2>
  */
-void
-o_eq (void)
+void 
+o_eq (memel *argp)
 {
 	binexp (OP_EQ);
 }
 
 /* run the newtask. see exec.c.
  */
-void
-o_exec (void)
+void 
+o_exec (memel *argp)
 {
 	execnewtask ();
 }
 
 /* <op1> <op2> . <op1 > op2>
  */
-void
-o_ge (void)
+void 
+o_ge (memel *argp)
 {
 	binexp (OP_GE);
 }
@@ -415,8 +415,8 @@ o_dogoto (memel *argp)
 
 /* <op1> <op2> . <op1 > op2>
  */
-void
-o_gt (void)
+void 
+o_gt (memel *argp)
 {
 	binexp (OP_GT);
 }
@@ -617,24 +617,24 @@ o_intrinsic (memel *argp)
 
 /* <op1> <op2> . <op1 <= op2>
  */
-void
-o_le (void)
+void 
+o_le (memel *argp)
 {
 	binexp (OP_LE);
 }
 
 /* <op1> <op2> . <op1 < op2>
  */
-void
-o_lt (void)
+void 
+o_lt (memel *argp)
 {
 	binexp (OP_LT);
 }
 
 /* <op1> <op2> . <op2 * op1>
  */
-void
-o_mul (void)
+void 
+o_mul (memel *argp)
 {
 	binop (OP_MUL);
 }
@@ -659,24 +659,24 @@ o_mulassign (memel *argp)
 
 /* <op1> <op2> . <op1 != op2>
  */
-void
-o_ne (void)
+void 
+o_ne (memel *argp)
 {
 	binexp (OP_NE);
 }
 
 /* <op> . <!op>
  */
-void
-o_not (void)
+void 
+o_not (memel *argp)
 {
 	unexp (OP_NOT);
 }
 
 /* <op1> <op2> . <op1 || op2>
  */
-void
-o_or (void)
+void 
+o_or (memel *argp)
 {
 	binexp (OP_OR);
 }
@@ -734,8 +734,8 @@ o_posargset (memel *argp)
 
 /* <op1> <op2> . <op1 ** op2>
  */
-void
-o_dopow (void)
+void 
+o_dopow (memel *argp)
 {
 	binop (OP_POW);
 }
@@ -746,8 +746,8 @@ o_dopow (void)
  * Next one is the name of the destination parameter, rest are values to
  * be printed.
  */
-void
-o_doprint (void)
+void 
+o_doprint (memel *argp)
 {
 	/* This is not used -- print is imp. as a builtin task.
 	struct operand o;
@@ -760,8 +760,8 @@ o_doprint (void)
 /* <value to be printed> .
  * used to print an operand on the stack. not to be confused with doprint.
  */
-void
-o_immed (void)
+void 
+o_immed (memel *argp)
 {
 	struct operand o;
 
@@ -791,10 +791,11 @@ o_pushconst (memel *argp)
 /* Push an index value onto the control stack for later use
  * when the parameter is accessed.
  */
-void
-o_pushindex (int *mode)
+void 
+o_pushindex (memel *argp)
 {
 	struct operand op;
+	int *mode = (int *) argp;
 
 	 if (cldebug)
 	    printf ("PUSHINDEX: mode=%d loopset=%d\n", *mode, imloopset);
@@ -856,8 +857,8 @@ o_pushparam (memel *argp)
 
 /* <name of file to be used as stdout> .
  */
-void
-o_redir (void)
+void 
+o_redir (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -889,8 +890,8 @@ o_redir (void)
 
 /* <name of file to be used as stdin> .
  */
-void
-o_redirin (void)
+void 
+o_redirin (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -1026,8 +1027,8 @@ o_rmpipes (memel *argp)
 }
 
 
-void
-o_doreturn (void)
+void 
+o_doreturn (memel *argp)
 {
 	eprintf ("return not implemented\n");
 }
@@ -1037,8 +1038,8 @@ o_doreturn (void)
  * follow, rest are names of destination params.  SCAN scans the standard
  * input.
  */
-void
-o_doscan (void)
+void 
+o_doscan (memel *argp)
 {
 	struct operand o;
 
@@ -1046,8 +1047,8 @@ o_doscan (void)
 	cl_scan (o.o_val.v_i - 1, "stdin");
 }
 
-void
-o_doscanf (void)
+void 
+o_doscanf (memel *argp)
 {
 	struct operand o;
 	struct operand o_sv[64];
@@ -1082,8 +1083,8 @@ o_doscanf (void)
  * follow.  Next one is the name of the source parameter, rest are names of
  * destination params.
  */
-void
-o_dofscan (void)
+void 
+o_dofscan (memel *argp)
 {
 	struct operand o;
 
@@ -1091,8 +1092,8 @@ o_dofscan (void)
 	cl_scan (o.o_val.v_i - 1, "");
 }
 
-void
-o_dofscanf (void)
+void 
+o_dofscanf (memel *argp)
 {
 	struct operand o, o_sv[64];
 	char	format[SZ_LINE];
@@ -1139,8 +1140,8 @@ o_dofscanf (void)
 
 /* <op1> <op2> . <op1 - op2>
  */
-void
-o_sub (void)
+void 
+o_sub (memel *argp)
 {
 	binop (OP_SUB);
 }
@@ -1171,11 +1172,12 @@ o_subassign (memel *argp)
 /* Doswitch finds the appropriate location to jump to in the
  * jump table and goes there.
  */
-void
-o_doswitch (int *jmpdelta)
+void 
+o_doswitch (memel *argp)
 {
 	int pdft, icase, jmptable;
 	int value=0;
+        int *jmpdelta = (int *)argp;
 	struct operand o;
 	memel delta;
 	/* Remember to subtract SZ_CE 'cuz PC has already been incremented. */
@@ -1302,8 +1304,8 @@ o_swon (memel *argp)
  * done in the conventional way since clpackage.language() is never
  * executed to load the language package, since it is the root package.
  */
-void
-o_fixlanguage (void)
+void 
+o_fixlanguage (memel *argp)
 {
 	register struct ltask *ltp;
 
@@ -1320,7 +1322,7 @@ o_fixlanguage (void)
  * then precede it with "do" but alphabetize it according to its intended name.
  */
 
-void (*opcodetbl[])() = {
+void (*opcodetbl[])(memel *arg) = {
 /*  0 */	o_undefined,
 
 /*  1 */	o_absargset,
