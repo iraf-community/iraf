@@ -13,7 +13,28 @@
 #include "opcodes.h"
 #include "param.h"
 #include "task.h"
-#include "proto.h"
+
+
+void  d_asmark (void);
+void  d_assemble (void);
+void  d_stack (register XINT locpc, int ss);
+void  d_d (void);
+void  d_p (void);
+void  d_t (void);
+void  d_l (void);
+void  d_f (void);
+void  d_on (void);
+void  d_off (void);
+void  d_trace (int value);
+void  e_dumpop (void);
+void  d_fmtmsg (struct _iobuf *fp, char *prefix, char *message,
+                int width);
+void  d_prof (void);
+int   d_instr (struct _iobuf *fp, char *prefix, register XINT locpc);
+
+extern  void  fprop (struct _iobuf *fp,  struct operand *op);
+extern  int   printparam (struct param *pp, register  struct _iobuf *fp);
+extern  void  oprop (struct operand *op);
 
 
 /*
@@ -30,7 +51,7 @@
 extern	char *nullstr;
 extern	int cldebug;
 extern	int cltrace;
-static	void dd_f();
+static void dd_f (char *msg, char *fname);
 
 
 /* D_STACK -- Go through the instruction stack, starting at locpc, printing

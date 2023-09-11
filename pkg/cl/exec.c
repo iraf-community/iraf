@@ -16,7 +16,62 @@
 #include "task.h"
 #include "errs.h"
 #include "grammar.h"
-#include "proto.h"
+
+
+void  run (void);
+void  callnewtask (char *name);
+void  execnewtask (void);
+void  mk_startupmsg (struct task *tp, char *cmd, int maxch);
+char *findexe (struct package *pkg, char *pkg_path);
+void  set_clio (register struct task *newtask);
+struct param *ppfind (struct pfile *pfp, char *tn, char *pn, int pos,
+                      int abbrev);
+void  psetreload (struct pfile *main_pfp, struct param *psetp);
+void  iofinish (register struct task *tp);
+void  restor (struct task *tp);
+void  oneof (void);
+void  printcall (struct _iobuf *fp, struct task *tp);
+void  print_call_line (struct _iobuf *out, int line, char *fname, int flags);
+void  killtask (register struct task *tp);
+
+extern  int   d_instr (struct _iobuf *fp, char *prefix, register XINT locpc);
+extern  struct task *pushtask (void);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  struct ltask *cmdsrch (char *pkname, char *ltname);
+extern  int   lexinit (void);
+extern  struct pfile *pfilefind (register  struct ltask *ltp);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct pfile *pfilecopy (register  struct pfile *pfp);
+extern  struct pfile *pfilesrch (char *pfilepath);
+extern  struct pfile *newpfile (struct ltask *ltp);
+extern  void  clkeep (void);
+extern  void  keep (register  struct task *tp);
+extern  struct param *paramfind (struct pfile *pfp, char *pname, int pos,
+                                 int exact);
+extern  struct param *addparam (struct pfile *pfp, char *buf,
+                                struct _iobuf *fp);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  int   taskmode (register  struct task *tp);
+extern  int   epset (char *pset);
+extern  int   pr_connect (char *process, char *command,  struct _iobuf **in,  struct _iobuf **out,  struct _iobuf *t_in,  struct _iobuf *t_out,  struct _iobuf *t_err,  struct _iobuf *t_gr,  struct _iobuf *t_im,  struct _iobuf *t_pl,  int   timeit);
+extern  int   procscript (struct _iobuf *fp);
+extern  int   skip_to (struct _iobuf *fp, char *key);
+extern  void  clputlog (void);
+extern  void  putlog (struct task *tp, char *usermsg);
+extern  int   effmode (struct param *pp);
+extern  void  sprop (register char *outstr, register  struct operand *op);
+extern  void  pfileunlink (register  struct pfile *pfp);
+extern  void  pr_disconnect (int pid);
+extern  void  closelist (register  struct param *pp);
+extern  void  pfileupdate (struct pfile *pfp);
+extern  void  pr_prunecache (int pno);
+extern  void  pfcopyback (struct pfile *pff);
+extern  void  fprop (struct _iobuf *fp,  struct operand *op);
+extern  struct package *pacfind (char *name);
+extern  struct task *poptask (void);
+
+extern  void *memset (void *p, int c, unsigned long n);
+extern  char *strstr(const char *haystack, const char *needle);
 
 
 /*
@@ -36,7 +91,7 @@ extern	int yeof;		/* parser saw EOF			*/
 extern	int gologout;		/* user typed logout()			*/
 extern	int loggingout;		/* in the process of logging out	*/
 
-char	*findexe();
+extern void (*opcodetbl[])(void *args);
 
 
 /* RUN -- Run the code beginning at pc until we run an EXEC instruction of
@@ -257,7 +312,6 @@ execnewtask (void)
 	static	struct pfile *pfp;
 
 	struct	param *pp;
-	FILE	*fopen();
 
 	if (newtask == NULL)
 	    /* if this ever happens, i don't want to know about it. */
@@ -686,7 +740,6 @@ findexe (
 	char	root[SZ_FNAME+1], root_path[SZ_PATHNAME+1];
 	char	bindir[SZ_FNAME+1], *ip = NULL, *arch = NULL;
 	char	bin_root[SZ_PATHNAME+1];
-	char   *envget();
 
 
 	memset (root, 0, SZ_FNAME);

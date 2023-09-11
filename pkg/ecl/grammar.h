@@ -58,4 +58,4 @@ extern int parse_state;			/* What are we parsing?	*/
 extern int proc_script;			/* In a procedure script? */
 extern struct pfile *parse_pfile;	/* Where parsed params are added. */
 
-char *today();				/* returns pointer to todays date */
+char *today(void);			/* returns pointer to todays date */

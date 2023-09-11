@@ -12,8 +12,11 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
 
+
+void closelist (register struct param *pp);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
 
 /*
  * LISTS -- Access lists for list-structured parameters.
@@ -79,7 +82,7 @@ again:	    fgets (line, SZ_LINE, pp->p_listfp);
 		result = makeop (eofstr, OT_STRING);
 
 	    } else {
-		char *index(), *nlp, *ip;
+		char  *nlp, *ip;
 
 		nlp = index (line, '\n');
 		if (nlp != NULL)

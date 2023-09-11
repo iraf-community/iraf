@@ -13,7 +13,31 @@
 #include "task.h"
 #include "errs.h"
 #include "clmodes.h"
-#include "proto.h"
+
+
+int    defpac (char *pkname);
+int    deftask (char *task_spec);
+void   taskunwind (void);
+struct ltask *cmdsrch (char *pkname, char *ltname);
+struct ltask *ltasksrch (char *pkname, char *ltname);
+struct ltask *_ltasksrch (char *pkname, char *ltname, struct package **o_pkp);
+struct ltask *ltaskfind (struct package *pkp, char *name,
+                         int enable_abbreviations);
+struct ltask *addltask (struct package *pkp, char *ptname, char *ltname,
+                        int redef);
+struct ltask *newltask (register struct package *pkp, char *lname,
+                        char *pname,  struct ltask *oldltp);
+struct package *newpac (char *name, char *bin);
+struct package *pacfind (char *name);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  killtask (register  struct task *tp);
+extern  void  restor (struct task *tp);
+extern  int   abbrev (void);
+extern  char *comdstr (char *s);
+extern  char *memneed (int incr);
+extern  struct task *poptask (void);
 
 
 /*
@@ -415,7 +439,6 @@ addltask (struct package *pkp, char *ptname, char *ltname, int redef)
 {
 	register char *cp;
 	register struct ltask *ltp;
-	char	*rindex();
 	char	*ltbase;
 	int	flags;
 

@@ -17,7 +17,20 @@
 #include "errs.h"
 #include "construct.h"
 #include "ytab.h"		/* pick up yacc token #defines		*/
-#include "proto.h"
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  int   pvaldefined (struct param *pp, char *s);
+extern  int   scanmode (char *s);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  opcast (int newtype);
+extern  char *memneed (int incr);
+extern  memel popmem (void);
+
+extern  struct param *newparam (struct pfile *pfp);
+extern  struct param *paramfind (struct pfile *pfp, char *pname,
+                                 int pos, int exact);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
+extern  struct param *lookup_param (char *pkname, char *ltname, char *pname);
 
 
 /*
@@ -71,7 +84,7 @@ getlimits (char *pname, int n, int *i1, int *i2)
 int 
 get_dim (char *pname)
 {
-	struct param *pp, *lookup_param();
+	struct param *pp;
 	char	*pk, *t, *p, *f;
 	int 	dim;
 

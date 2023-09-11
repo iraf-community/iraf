@@ -16,7 +16,52 @@
 #include "errs.h"
 #include "clmodes.h"
 #include "construct.h"
-#include "proto.h"
+
+
+struct param *paramfind (struct pfile *pfp, char *pname, int pos, int exact);
+void   paramset (register  struct param *pp, int field);
+void   validparamget (register  struct param *pp, int field);
+void   paramget (register  struct param *pp, int field);
+void   makemode (struct param *pp, char *s);
+struct param *newparam (struct pfile *pfp);
+struct param *paramsrch (char *pkname, char *ltname, char *pname);
+int    defpar (char *param_spec);
+int    defvar (char *envvar);
+struct param *lookup_param (char *pkname, char *ltname, char *pname);
+int    printparam (struct param *pp, register  struct _iobuf *fp);
+void   qputs (register char *str, register  struct _iobuf *fp);
+int    pvaldefined (struct param *pp, char *s);
+struct param *newfakeparam (struct pfile *pfp, char *name, int pos,
+                            int type, int string_len);
+int    getoffset (struct param *pp);
+void   offsetmode (int mode);
+int    size_array (struct param *pp);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  opcast (int newtype);
+extern  void  query (struct param *pp);
+extern  void  fprop (struct _iobuf *fp,  struct operand *op);
+extern  void  parse_clmodes (struct param *pp,  struct operand *newval);
+extern  void  closelist (register  struct param *pp);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  int   scanmode (char *s);
+extern  int   effmode (struct param *pp);
+extern  int   inrange (register  struct param *pp, register struct operand *op);
+extern  int   abbrev (void);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,
+                                  struct package **o_pkp);
+extern  char *comdstr (char *s);
+extern  char *memneed (int incr);
+extern  memel popmem (void);
+extern  struct pfile *pfilefind (register  struct ltask *ltp);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct ltask *ltaskfind (struct package *pkp, char *name,
+                                 int enable_abbreviations);
+extern  struct package *pacfind (char *name);
+extern  struct ltask *ltaskfind (struct package *pkp, char *name,
+                                 int enable_abbreviations);
+extern  struct operand readlist (struct param *pp);
 
 
 /*
@@ -716,7 +761,6 @@ paramsrch (char *pkname, char *ltname, char *pname)
 {
 	register struct param *pp;
 	struct	pfile *pfp;
-	struct	param *lookup_param();
 
 	/* First search for a regular parameter.  If this fails then we 
 	 * handle the case when currentask has no pfile.
@@ -948,7 +992,6 @@ printparam (struct param *pp, register FILE *fp)
 {
 	register int type, bastype;
 	register char *bp;
-	char	*index();
 	char	buf[20];
 	int	arrflag;
 	int	size_arr=0;

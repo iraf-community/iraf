@@ -70,7 +70,7 @@ A		[a-zA-Z]
 "?"		return (crackident (yytext));	/* current package help	     */
 "??"		return (crackident (yytext));	/* all tasks help	     */
 
-"&"		{	extern int bracelevel;
+"&"		{	extern bracelevel;
 			if (bracelevel) {
 	    eprintf ("ERROR: background not allowed within statement block\n");
 			    return ('#');
@@ -148,6 +148,7 @@ char	delim;
 	register char *op, *cp, ch;
 	static	char *esc_ch  = "ntfr\\\"'";
 	static	char *esc_val = "\n\t\f\r\\\"\'";
+	char	*index();
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
 	    if (*op == delim) {

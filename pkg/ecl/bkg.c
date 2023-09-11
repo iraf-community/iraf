@@ -17,7 +17,6 @@
 #include "errs.h"
 #include "param.h"
 #include "task.h"
-#include "proto.h"
 
 
 /*
@@ -63,8 +62,35 @@ extern	int nextpipe;		/* pipe stack pointer (next index)	*/
 extern	int dobkg;		/* flag bkg execution 			*/
 
 extern	memel cl_dictbuf[];	/* static dictionary area		*/
-extern	long c_clktime();
-extern	char *findexe();
+extern  long  c_clktime (long reftime);
+extern  char *findexe (struct package *pkg, char *pkg_path);
+extern  void  intr_enable (void), intr_disable (void);
+extern  void  putlog (struct task *tp, char *usermsg);
+extern  void  setclmodes (struct task *tp);
+extern  void  iofinish (register struct task *tp);
+extern  void  get_bkgqfiles (int bkgno, int pid, char *bkg_query_file,
+                             char  *query_response_file);
+extern  void  setclmodes (struct task *tp);
+extern  void  clexit (void);
+extern  void  delpipes (register int npipes);
+extern  void  killtask (register struct task *tp);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  struct task *poptask (void);
+
+void    bkg_init (char *bcs);
+void    bkg_spawn (char *cmd);
+void    bkg_wait (register int job);
+void    bkg_kill (int job);
+void    bkg_jobstatus (struct _iobuf *fp, int job);
+void    bkg_update (int pmsg);
+void    bkg_delfiles (int job);
+void    bkg_startup (char *bkgfile);
+void    bkg_abort (void);
+void    rbkgfile (char *bkgfile);
+int     bkg_jobactive (int job);
+char   *wbkgfile (int jobno, char *cmd, char *fname);
+int     bkg_wfservice (int job);
+
 
 #define	BKGHDRSIZ	(sizeof (struct bkgfilehdr))
 #define	SZ_CMD		40		/* command in jobs table	*/
@@ -127,7 +153,7 @@ struct _bkgjob {
 #define	J_KILLED	04		/* job was killed 		*/
 #define	busy(job)	(jobtable[(job)-1].b_flags & J_RUNNING)
 
-static	void bkg_close();
+static void bkg_close (int job, int pmsg);
 
 
 /* BKG_INIT -- Setup to execute a background job.  Called by the lexical
@@ -156,7 +182,6 @@ bkg_spawn (
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
 	char	clprocess[SZ_PATHNAME];
-	char	*wbkgfile();
 	char	*bkgfile;
 
 	/* Find first unused slot in a circular search.

@@ -16,7 +16,6 @@
 #include "task.h"
 #include "clmodes.h"
 #include "grammar.h"
-#include "proto.h"
 
 
 /*
@@ -62,6 +61,43 @@ int	history_number;		/* the current history record		*/
 
 extern	int _lexmodes;		/* enable lexical mode switching	*/
 extern	char *ifseen;		/* Processing an IF statement?		*/
+
+extern  void *memset(void *s, int c, unsigned long n);
+
+void   yy_startblock (int logflag);
+void   put_history (char *command);
+void   fetch_history (char *recptr, char *command,  int   maxch);
+void   show_history (struct _iobuf *fp,  int   max_commands);
+void   pprompt (register char *string);
+void   get_prompt (register char *string);
+void   put_logfile (char *command);
+void   close_logfile (char *fname);
+void   reset_logfile (void);
+void   print_command (register struct _iobuf *fp, char *command,
+                      char *marg1, char *marg2);
+void   putlog (struct task *tp, char *usermsg);
+int    add_history (char *buf);
+int    yy_getc (struct _iobuf *fp);
+int    get_command (struct _iobuf *fp);
+int    process_history_directive (char *directive, char *new_command_block);
+int    search_history (char *directive, char *new_command_block);
+int    stredit (char *edit_directive, char *in_text, char *out_text);
+int    expand_history_macros (char *in_text, char *out_text);
+int    get_arglist (char *cmdblk, char *argp[]);
+int    get_history (int record, char *command,  int   maxch);
+int    open_logfile (char *fname);
+int    what_record (void);
+int    lexinit (void);
+char  *curcmd (void);
+char  *find_history (int record);
+char  *today (void);
+char  *freadline (char *prompt);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  listhelp (struct package *pkp, int show_invis);
+extern  int   edit_history_directive (char *args, char *new_cmd);
+extern  int   process_history_directive (char *directive,
+                                         char *new_command_block);
 
 
 /* YY_GETC -- Called by the modified yylex() "input" macro in the lexical
@@ -299,7 +335,7 @@ input_:
 	    static  char ehist[] = "ehistory";
 	    int     n;
 
-	    for (n=0, ip=raw_cmd, op=ehist;  (*ip == *op);  ip++, op++)
+	    for (n=0, ip=raw_cmd, op=ehist;  *ip == *op;  ip++, op++)
 		n++;
 	    if (n > 0 && isspace (*ip)) {
 		while (isspace (*ip))
@@ -366,7 +402,6 @@ process_history_directive (
 	char	last_command_block[SZ_CMDBLK+1];
 	int	execute=1, edit=0;
 	int	record;
-	char	*rindex();
 
 	ip = directive + 1;			/* skip the '^'		*/
 	op = new_command_block;
@@ -631,7 +666,6 @@ expand_history_macros (
 	register char *ip, *op, *ap;
 	char	cmdblk[SZ_CMDBLK+1], *argp[100];
 	int	nargs, nrep, argno, have_arg_strings=0;
-	char	*index();
 
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
@@ -788,7 +822,6 @@ get_history (
 )
 {
 	char	*recptr;
-	char	*find_history();
 
 	if ((recptr = find_history (record)) == NULL) {
 	    *command = EOS;
@@ -820,7 +853,7 @@ fetch_history (
 	n    = ((maxch < SZ_HISTBUF) ? maxch : SZ_HISTBUF) - 1;
 
 	while (--n >= 0 && (*op = *ip++) != EOS) {
-	    *op++;
+	    op++;
 	    if (ip >= itop)
 		ip = histbuf;
 	}
@@ -910,7 +943,6 @@ show_history (
 	char	*recptr[MAX_SHOWHIST];
 	char	cmdblk[SZ_CMDBLK+1];
 	int	record;
-	char	*find_history();
 
 	/* Flush the "history" command so that it shows up in the history. */
 	yy_startblock (LOG);

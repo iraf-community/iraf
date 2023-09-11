@@ -219,8 +219,10 @@ struct package {
 #define	PACKAGESIZ	btoi (sizeof (struct package))
 #define	TCALLSIZ	btoi (sizeof (struct task_call))
 
+#ifdef __OLD_PROTO
 struct	package *newpac(), *pacfind();
 struct	ltask *addltask(), *newltask(), *ltaskfind(), *cmdsrch();
 struct	ltask *ltasksrch(), *_ltasksrch();
 struct	task *pushtask(), *poptask();
 int	deftask(), defpac();
+#endif

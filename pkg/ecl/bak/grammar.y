@@ -10,14 +10,12 @@
 #include "mem.h"
 #include "operand.h"
 #include "param.h"
-#include "eparam.h"
 #include "grammar.h"
 #include "opcodes.h"
 #include "clmodes.h"
 #include "task.h"
 #include "construct.h"
 #include "errs.h"
-#include "proto.h"
 
 
 /* CL parser, written as a yacc grammar:
@@ -104,6 +102,9 @@ extern	char	cmdblk[SZ_CMDBLK+1];	/* Command buffer in history.c */
 extern	char	*ip_cmdblk;		/* Pointer to current char in command.*/
 extern	char	*err_cmdblk;		/* ip_cmdblk when error detected. */
 
+char	*index();
+struct	param *initparam();
+struct	label *getlabel(), *setlabel();
 
 /* arbitrary large number for bracelevel in a procedure script 
  */

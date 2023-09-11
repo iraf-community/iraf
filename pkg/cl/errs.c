@@ -20,7 +20,6 @@
 #include "errs.h"
 #include "grammar.h"
 #include "construct.h"
-#include "proto.h"
 
 
 /*
@@ -87,7 +86,26 @@ char	*e_idivzero =	"integer divide by zero";
  */
 int	errlog = 0;
 
-extern  int u_doprnt();
+
+void  cl_error (int errtype, char *diagstr, ...);
+void  erract_init (void);
+
+extern  int   clexit (void);
+extern  int   clshutdown (void);
+extern  int   intr_reset (void);
+extern  void  u_doprnt (char *format, va_list *argp, FILE *fp);
+extern  void  delpipes (register  int   npipes);
+extern  void  offsetmode (int mode);
+extern  void  taskunwind (void);
+extern  void  clputlog (void);
+extern  void  putlog (struct task *tp, char *usermsg);
+extern  void  iofinish (register  struct task *tp);
+extern  void  pr_dumpcache (int pid, int break_locks);
+extern  void  yy_startblock (int logflag);
+extern  struct param *paramfind (struct pfile *pfp, char *pname, int pos,
+                                 int exact);
+
+extern  XINT  XER_RESET (void);
 
 
 /* CL_ERROR -- print error info according to errtype on our t_stderr, pop back

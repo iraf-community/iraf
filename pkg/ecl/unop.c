@@ -14,8 +14,17 @@
 #include "errs.h"
 #include "task.h"
 #include "param.h"
-#include "proto.h"
 
+
+void  unop (int opcode);
+void  unexp (int opcode);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  opcast (int newtype);
+extern  int   defpar (char *param_spec);
+extern  int   deftask (char *task_spec);
+extern  int   defpac (char *pkname);
+extern  int   defvar (char *envvar);
 
 extern	int	cldebug;
 
@@ -47,7 +56,6 @@ unop (int opcode)
 	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];
 	char	ch, sbuf[SZ_LINE];
-	char	*envget();
 	int 	i;
 
 	o = popop();			/* pop operand from stack	*/

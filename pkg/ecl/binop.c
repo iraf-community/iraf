@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <math.h>
+
 #define import_spp
 #define import_libc
 #define import_xnames
@@ -15,9 +17,16 @@
 #include "param.h"
 #include "mem.h"
 #include "task.h"
-#include "proto.h"
 
+extern struct param *paramfind(struct pfile *pfp, char *pname,
+                               int pos, int exact);
+extern void cl_error(int errtype, char *diagstr, ...);
+extern void erract_init(void);
+extern void opcast(int newtype);
 			    
+#define FP_EQUALD       fpequd_
+XBOOL fpequd_(XDOUBLE *x, XDOUBLE *y);
+                
 
 /*
  * BINOP.C -- Perform binary operations or expressions on two operands.
@@ -467,7 +476,7 @@ binop (int opcode)
                     /* Search s2 for first_char, if found check for complete
                      * match of s1, else move on.
                      */
-                    ch = o2.o_val.v_s;
+                    ch = *o2.o_val.v_s;
                     for (ip=o2.o_val.v_s; !iresult && (ch=*ip) != EOS; ip++) {
                         if (ch == delim) {
                             index++;
@@ -665,10 +674,10 @@ binop (int opcode)
 		/* Note: need to move fp_equald() to libc */
 		if (typecode) {
 		    double x1 = VALU(&o1), x2 = VALU(&o2);
-		    iresult = btoi (fpequd_ (&x1, &x2));
+		    iresult = btoi (FP_EQUALD (&x1, &x2));
 		} else {
 		    double x1 = o1.o_val.v_i, x2 = o2.o_val.v_i;
-		    iresult = btoi (fpequd_ (&x1, &x2));
+		    iresult = btoi (FP_EQUALD (&x1, &x2));
 		}
 		typecode = 0;	/* force integer result		*/
 		break;

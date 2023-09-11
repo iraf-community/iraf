@@ -19,7 +19,6 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
 
 
 /*
@@ -57,7 +56,147 @@ extern	int gologout;			/* flag to execute() to cause logout */
 extern  int logout_status;      	/* optional arg to logout()          */
 extern  int errorline;			/* error recover line		     */
 extern  int currentline;		/* line currently being executed     */
-extern	char *findexe();
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  opcast (int newtype);
+extern  void  oprintf (char *fmt, ...);
+extern  void  iofinish (register struct task *tp);
+extern  void  listhelp (struct package *pkp, int show_invis);
+extern  void  listallhelp (int show_invis);
+extern  void  bkg_kill (int job);
+extern  void  bkg_jobstatus (struct _iobuf *fp, int job);
+extern  void  listparams (struct pfile *pfp);
+extern  void  dumpparams (struct pfile *pfp);
+extern  void  tprintf (char *fmt, ...);
+extern  void  do_clprint (char *dest);
+extern  void  paramset (register struct param *pp, char field);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  service_bkgquery (int bkgno);
+extern  void  clsystem (char *cmd, struct _iobuf *taskout,
+                        struct _iobuf *taskerr);
+extern  void  cl_scan (int nargs, char *source);
+extern  void  cl_scanf (char *format,  int  nargs, char *input);
+extern  void  erract_init (void);
+extern  void  pfileupdate (struct pfile *pfp);
+extern  void  bkg_wait (register int job);
+extern  void  pfcopyback (struct pfile *pff);
+extern  void  paramget (register struct param *pp, int field);
+extern  void  d_trace (int value);
+extern  void  sprop (register char *outstr, register  struct operand *op);
+extern  void  putlog (struct task *tp, char *usermsg);
+extern  void  show_history (struct _iobuf *fp,  int   max_commands);
+extern  void  d_fmtmsg (struct _iobuf *fp, char *prefix, char *message,
+                        int width);
+extern  void   strtable (struct _iobuf *fp, char *list[], int nstr,
+                         int first_col, int last_col, int maxch, int ncol);
+extern  char *makelower (register char *cp);
+extern	char *findexe (struct package *pkg, char *pkg_path);
+extern  char *memneed (int incr);
+extern  char *comdstr (char *s);
+extern  char *host_editor (char *editor);
+extern  int   strsort (char *list[],  int   nstr);
+extern  int   epset (char *pset);
+extern  int   nargs (struct pfile *pfp);
+extern  int  pfileinit (struct ltask *ltp);
+extern  struct ltask *addltask (struct package *pkp, char *ptname,
+                                char *ltname, int redef);
+extern  struct ltask *ltaskfind (struct package *pkp, char *name,
+                                 int enable_abbreviations);
+extern  struct ltask *ltasksrch(char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,
+                                  struct package **o_pkp);
+extern  struct ltask *cmdsrch (char *pkname, char *ltname);
+extern  struct task *poptask (void);
+extern  struct package *pacfind (char *name);
+extern  struct package *newpac (char *name, char *bin);
+extern  struct pfile *pfilesrch (char *pfilepath);
+extern  struct pfile *pfilefind (register struct ltask *ltp);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
+extern  struct param *paramfind (struct pfile *pfp, char *pname,
+                                 int pos, int exact);
+
+extern  int   pr_cachetask (char *ltname);
+extern  int   pr_getpno (void);
+extern  int   pr_pnametopid (char *pname);
+extern  void  pr_lock (register int pid);
+extern  void  pr_listcache (struct _iobuf *fp);
+extern  void  pr_dumpcache (int pid, int break_locks);
+extern  void  pr_chdir (register int pid, char *newdir);
+extern  void  pr_envset (register int pid, char *envvar, char *valuestr);
+extern  void  pr_initcache (void);
+
+
+/* builtin.c */
+void  clbye (void);
+void  cllogout (void);
+void  clclbye (void);
+void  clcache (void);
+void  cl_locate (char *task_spec,  int  first_only);
+void  clwhich (void);
+void  clwhereis (void);
+void  clflprcache (void);
+void  flpr_task (char *task);
+void  clprcache (void);
+void  clgflush (void);
+void  clchdir (void);
+void  clback (void);
+void  clerror (void);
+void  clhelp (void);
+void  clallhelp (void);
+void  clhistory (void);
+void  dotrace (void);
+void  clehistory (void);
+void  clservice (void);
+void  clkeep (void);
+void  clkill (void);
+void  cleparam (void);
+void  cllparam (void);
+void  cldparam (void);
+void  clpack (void);
+void  clcurpack (void);
+void  clpkg (void);
+void  lapkg (void);
+void  clprint (void);
+void  clfprint (void);
+void  do_clprint (char *dest);
+void  clprintf (void);
+void  clscans (void);
+void  clscanf (void);
+void  clputlog (void);
+void  clset (void);
+void  clreset (void);
+void  clshow (void);
+void  clstty (void);
+void  cltask (int redef);
+void  clrtask (void);
+void  clntask (void);
+void  clforeign (void);
+void  clunlearn (void);
+void  clupdate (void);
+void  clhidetask (void);
+void  clwait (void);
+void  cljobs (void);
+void  clfunc (void);
+void  clbeep (void);
+void  cltime (void);
+void  clclear (void);
+void  clsleep (void);
+void  cledit (void);
+void  clallocate (void);
+void  cldeallocate (void);
+void  cldevstatus (void);
+void  clerrpsh (void);
+void  clerreset (void);
+void  clonerror (void);
+void  setbuiltins (register struct package *pkp);
+void  newbuiltin (struct package *pkp, char *lname, void  (*fp)(void),
+                  int flags, char *ftprefix, int redef);
+int  mkarglist (register struct pfile *pfp, char *args, char *argp[]);
+void  pushfparams (register struct param *pp);
+void  pushbparams (struct param *pp);
+void  pushbpvals (struct param *pp);
+int  nargs (struct pfile *pfp);
+void  keep (register struct task *tp);
 
 extern	int do_error;			/* for error recovery/trapping 	     */
 
@@ -461,7 +600,6 @@ clchdir (void)
 	register struct pfile *pfp;
 	struct	operand o;
 	char	*dirname;
-	char	*index(), *envget();
 
 	pfp = newtask->t_pfp;
 	if (nargs (pfp) <= 0) {
@@ -2018,7 +2156,6 @@ cledit (void)
 	char	oscmd[SZ_LINE], os_filelist[SZ_LINE];
 	char	osfn[SZ_PATHNAME];
 	struct	operand o;
-	char	*envget();
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -2300,8 +2437,7 @@ setbuiltins (register struct package *pkp)
 	/* Debugging functions are in debug.c.
 	 */
 	extern void d_f(), d_l(), d_d(), d_off(), d_on(), d_p(), d_t();
-	extern void d_asmark(), d_assemble(), d_prof(), d_trace();
-	extern void pr_listcache();
+	extern void d_asmark(), d_assemble(), d_prof();
 
 	static struct builtin {
 		char	*b_name;
@@ -2410,8 +2546,8 @@ setbuiltins (register struct package *pkp)
  */
 void 
 newbuiltin (
-    struct package *pkp,		/* package which owns task	*/
-    char *lname,			/* ltask name			*/
+    struct package *pkp,	/* package which owns task	*/
+    char *lname,		/* ltask name			*/
     void (*fp)(void),		/* pointer to builtin fcn	*/
     int flags,			/* task flags			*/
     char *ftprefix,		/* OSCMD prefix if foreign	*/

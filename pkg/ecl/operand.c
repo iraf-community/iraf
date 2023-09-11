@@ -15,7 +15,23 @@
 #include "task.h"		/* to get currentask for prop		*/
 #include "construct.h"
 #include "eparam.h"
-#include "proto.h"
+
+
+void  sprop (register char *outstr, register  struct operand *op);
+void  spparval (char *outstr,  struct param *pp);
+void  fprop (struct _iobuf *fp,  struct operand *op);
+void  oprop (struct operand *op);
+void  prop (struct operand *op);
+void  opindir (void);
+void  opcast (int newtype);
+struct operand makeop (char *str,  int   type);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  validparamget (register  struct param *pp,  int   field);
+extern  void  paramget (register  struct param *pp,  int   field);
+extern  char *makelower (register char *cp);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
 
 
 /*
@@ -39,7 +55,6 @@ void
 sprop (register char *outstr, register struct operand *op)
 {
 	register int type;
-	char	*index();
 
 	if (opundef (op))
 	    cl_error (E_IERR, "can not print an undefined operand");
@@ -297,9 +312,7 @@ makeop (char *str, int type)
 {
 	register char *s, *ip;
 	register char c;
-	char	*index(), *format;
-	char	hexnum[MAX_DIGITS];
-	char	firstchar;
+	char	*format, hexnum[MAX_DIGITS], firstchar;
 	struct	operand o;
 
 	maybeindex = 0;

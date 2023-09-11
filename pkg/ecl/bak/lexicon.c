@@ -6,9 +6,8 @@
 #define	import_ctype
 #define	import_xnames
 #define	import_lexnum
+#define	import_stdio
 #include <iraf.h>
-
-
 
 extern	int	cldebug;
 
@@ -36,7 +35,7 @@ int	lhs;			/* "left hand side" switch for []	*/
  * _lexmodes to zero.  A single parser accepts input from both lexical
  * analyzers.
  */
-int
+int 
 yylex (void)
 {
 	register int	token;
@@ -141,7 +140,7 @@ yylex (void)
  * lexical analyser.  Any sequence of nonwhite characters that does not form
  * one of the recognized tokens is returned as a string.
  */
-int
+int 
 lexicon (void)
 {
 	char	*bkgerr = "ERROR: cannot submit background job inside {}\n";
@@ -149,7 +148,7 @@ lexicon (void)
 	register int	token;
 	int	stringtok, identifier, setlevel;
 	int	clswitch;
-	char	*op;
+	char	*op, *index();
 
 	/* Return pushed back token if any.
 	 */
@@ -167,7 +166,7 @@ lexicon (void)
 	 * mode metacharacters (they will be automatically turned on when
 	 * compute mode is entered in an expression).
 	 */
-	while ((ch = input()))
+	while (ch = input())
 	    if (ch == ' ' || ch == '\t') {
 space:		if (lexcol > 0)
 		    lhs = 0;
@@ -198,7 +197,7 @@ space:		if (lexcol > 0)
 	 * integer constants, more complex tokens as operand structures in
 	 * yylval.
 	 */
-	while ((ch = input())) {
+	while (ch = input()) {
 	    lexcol++;
 
 	    switch (ch) {
@@ -211,7 +210,7 @@ space:		if (lexcol > 0)
 		    unput (ch);
 		    goto tokout_;
 		} else {
-		    while ((ch = input())) {
+		    while (ch = input()) {
 			if (ch == ' ' || ch == '\t')
 			    continue;
 			else {
@@ -299,7 +298,7 @@ etok_:		if (!newtoken) {
 		/* ?, ?? menu commands, recognized only at beginning of stmt */
 		if (lexcol > 1) {
 		    goto deposit_;
-		} else if ((ch = input())) {
+		} else if (ch = input()) {
 		    if (ch == '?')
 			return (crackident ("??"));
 		    else {
@@ -354,7 +353,7 @@ etok_:		if (!newtoken) {
 			}
 		    }
 
-		} else if ((cch = input())) {
+		} else if (cch = input()) {
 		    clswitch = (isspace (cch) || cch == ';');
 		    if (cch == '=') {
 			unput(cch);
@@ -386,7 +385,7 @@ etok_:		if (!newtoken) {
 		}
 
 	    case '\\':
-		if ((ch = input())) {
+		if (ch = input()) {
 		    if (ch == '\n')
 			continue;
 		    else if (index ("&;=+-\"'\\#><()|", ch) != NULL)
@@ -407,16 +406,14 @@ etok_:		if (!newtoken) {
 		 * command, but all other escapes are passed on unmodified.
 		 */
 		while ((ch = input()) && ch != '\n') {
-		    if (ch == '\\') {
-			if ((ch = input())) {
+		    if (ch == '\\')
+			if (ch = input()) {
 			    if (ch == '\n')
 				continue;
 			    else
 				yytext[yyleng++] = '\\';
-			} else {
+			} else
 			    break;
-			}
-                    }
 		    yytext[yyleng++] = ch;
 		}
 		if (ch)
@@ -512,7 +509,7 @@ gsredir_:
 		if (!newtoken) {
 		    unput (ch);
 		    goto tokout_;
-		} else if ((ch = input())) {
+		} else if (ch = input()) {
 		    if (ch == '&')
 			return (Y_ALLPIPE);
 		    else {
@@ -590,7 +587,11 @@ deposit_:
 		}
 
 		yytext[yyleng++] = ch;
-		if (ch == '\\')
+		if (ch == '[') {
+		    while ((ch = input()) != ']')
+		        yytext[yyleng++] = ch;
+		    yytext[yyleng++] = ch;
+		} else if (ch == '\\')
 		    yytext[yyleng++] = ch = input();
 		else if (!(isalnum(ch) || ch == '_' || ch == '$' || ch == '.'))
 		    identifier = 0;
@@ -645,7 +646,7 @@ eatwhite_:
 /* LEXINIT -- Initialize the internal state variables of the lexical analyzer,
  * e.g. when processing is interrupted by an interrupt.
  */
-void
+int 
 lexinit (void)
 {
 	if (lexmodes() && !lex_cpumodeset (currentask->t_in)) {

@@ -20,7 +20,7 @@ struct codeentry {
 #define	SZ_CE		4	/* size of codeentry			*/
 
 
-extern void (*opcodetbl[])();
+//extern void (*opcodetbl[])(void *args);
 
 /* manifest constant opcodes used in c_opcode.
  * value is index into opcodetbl[].
@@ -119,6 +119,66 @@ static char *opstrings[] = {
 };
 
 #define op2str(op) 	((char *)(opstrings[op-1] ? opstrings[op-1] : ""))
+
+void  o_absargset (memel *argp);
+void  o_add (memel *argp);
+void  o_addassign (memel *argp);
+void  o_allappend (memel *argp);
+void  o_allredir (memel *argp);
+void  o_and (memel *argp);
+void  o_append (memel *argp);
+void  o_assign (memel *argp);
+void  o_biff (memel *argp);
+void  o_call (memel *argp);
+void  o_chsign (memel *argp);
+void  o_concat (memel *argp);
+void  o_div (memel *argp);
+void  o_doend (memel *argp);
+void  o_divassign (memel *argp);
+void  o_catassign (memel *argp);
+void  o_eq (memel *argp);
+void  o_exec (memel *argp);
+void  o_ge (memel *argp);
+void  o_dogoto (memel *argp);
+void  o_gt (memel *argp);
+void  o_indirabsset (memel *argp);
+void  o_indirposset (memel *argp);
+void  o_indxincr (memel *argp);
+void  o_inspect (memel *argp);
+void  o_intrinsic (memel *argp);
+void  o_le (memel *argp);
+void  o_lt (memel *argp);
+void  o_mul (memel *argp);
+void  o_mulassign (memel *argp);
+void  o_ne (memel *argp);
+void  o_not (memel *argp);
+void  o_or (memel *argp);
+void  o_osesc (memel *argp);
+void  o_posargset (memel *argp);
+void  o_dopow (memel *argp);
+void  o_doprint (memel *argp);
+void  o_immed (memel *argp);
+void  o_pushconst (memel *argp);
+void  o_pushparam (memel *argp);
+void  o_redir (memel *argp);
+void  o_redirin (memel *argp);
+void  o_gsredir (memel *argp);
+void  o_doaddpipe (memel *argp);
+void  o_dogetpipe (memel *argp);
+void  o_rmpipes (memel *argp);
+void  o_doreturn (memel *argp);
+void  o_doscan (memel *argp);
+void  o_doscanf (memel *argp);
+void  o_dofscan (memel *argp);
+void  o_dofscanf (memel *argp);
+void  o_sub (memel *argp);
+void  o_subassign (memel *argp);
+void  o_swoff (memel *argp);
+void  o_swon (memel *argp);
+void  o_undefined (memel *argp);
+void  o_fixlanguage (memel *argp);
+void  o_doswitch (memel *argp);
+void  o_pushindex (memel *argp);
 
 #else
 

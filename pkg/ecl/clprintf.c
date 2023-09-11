@@ -12,10 +12,15 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
 
 
-extern void u_doprnt ();
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  u_doprnt (char *format, va_list *argp, FILE *fp);
+extern  void  spparval (char *outstr,  struct param *pp);
+
+int   qstrcmp (char *a, char *b);
+void  tprintf (char *fmt, ...);
+void  oprintf (char *fmt, ...);
 
 
 /*
@@ -41,6 +46,7 @@ eprintf (char *fmt, ...)
 
 /* OPRINTF -- Printf that always writes to the current pseudo-file t_stdout.
  */
+void
 oprintf (char *fmt, ...)
 {
 	va_list	args;
@@ -58,6 +64,7 @@ oprintf (char *fmt, ...)
  * running task.  Be a bit more careful here in case a pipe is broken or
  * something is going haywire.
  */
+void
 tprintf (char *fmt, ...)
 {
 	va_list	args;
@@ -107,7 +114,7 @@ int	nbytes;
  * Give name of file if list, don't do anything if undefinded. 
  * Do not include a trailing \n.
  */
-int 
+void 
 prparamval (struct param *pp, FILE *fp)
 {
 	char	buf[SZ_LINE];
@@ -119,13 +126,14 @@ prparamval (struct param *pp, FILE *fp)
 
 /* STRSORT -- Sort a list of pointers to strings.
  */
-int 
+void 
 strsort (
     char *list[],		/* array of string pointers */
     int nstr			/* number of strings */
 )
 {
-	extern	qstrcmp();
+        extern void qsort (char *base, int n, int size,
+                           int (*compar)(char *,char *));
 
 	qsort ((char *)list, nstr, sizeof(char *), qstrcmp);
 }
@@ -146,7 +154,7 @@ qstrcmp (char *a, char *b)
  * with at least two spaces between strings.  Excessively long strings
  * are truncated (adapted from "fmtio/strtbl.x").
  */
-int 
+void 
 strtable (
     FILE *fp,			/* output file */
     char *list[],		/* array of string pointers */

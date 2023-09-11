@@ -16,7 +16,48 @@
 #include "mem.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
+
+
+int    effmode (struct param *pp);
+int    taskmode (register struct task *tp);
+void   query (struct param *pp);
+char  *nextstr (char **pbuf, struct _iobuf *fp);
+char  *nxtchr (char *p, struct _iobuf *fp);
+void   pquery (register struct param *pp,  struct _iobuf *fp);
+char  *bkg_query (char *obuf, int maxch, register struct param *pp);
+void   service_bkgquery (int bkgno);
+void   get_bkgqfiles (int bkgno, int pid, char *bkg_query_file,
+                      char *query_response_file);
+int    inrange (register struct param *pp, register struct operand *op);
+int    range_check (struct param *pp);
+void   setclmodes (struct task *tp);
+void   parse_clmodes (struct param *pp, struct operand *newval);
+int    abbrev (void);
+void   poffset (int off);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  validparamget (register  struct param *pp, int field);
+extern  void  paramget (register  struct param *pp, int field);
+extern  void  closelist (register struct param *pp);
+extern  void  fprop (struct _iobuf *fp, struct operand *op);
+extern  void  paramset (register struct param *pp, int field);
+extern  void  binexp (int opcode);
+extern  void  reset_logfile (void);
+extern  void  pr_setcache (int new_szprcache);
+extern  void  pushmem (memel v);
+extern  void  ppushmem (register memel p);
+extern  void  offsetmode (int mode);
+extern  int   c_scanmode (struct param *pp, struct operand *o);
+extern  int   scanmode (char *s);
+extern  int   getoffset (struct param *pp);
+extern  int   getoffset (struct param *pp);
+extern  int   size_array (struct param *pp);
+extern  int   bkg_jobactive (int job);
+extern  char *comdstr (char *s);
+extern  struct param *paramfind (struct pfile *pfp, char *pname, int pos,
+                                 int exact);
+extern  struct param *paramfind (struct pfile *pfp, char *pname, int pos,
+                                 int exact);
 
 
 /*
@@ -271,8 +312,7 @@ query (
 	char	buf[SZ_PROMPTBUF+1];
 	struct	operand o;
 	int	bastype, batch, arrflag, offset, n_ele, max_ele, fd;
-	char	*index(), *nlp, *nextstr();
-	char	*bkg_query(), *query_status;
+	char	*nlp,  *query_status;
 	char	*abuf;
 
 	bastype = pp->p_type & OT_BASIC;
@@ -544,7 +584,7 @@ nextstr (
   FILE	*fp
 )
 {
-	char	*p, *nxtchr();
+	char	*p;
 	static	char	tbuf[SZ_LINE];
 	char	quote;
 	int	cnt;
@@ -571,7 +611,7 @@ nextstr (
 
 	    while (*p != quote) {
 
-		if (p == '\0'  ||  cnt >= SZ_LINE)
+		if (p == (char *)'\0'  ||  cnt >= SZ_LINE)
 		    return ( (char *) ERR);
 
 		else {
@@ -764,7 +804,7 @@ bkg_query (
 {
 	char	bqfile[SZ_PATHNAME], qrfile[SZ_PATHNAME];
 	int	waitime, delay;
-	char	*envget(), *fgets_status;
+	char	*fgets_status;
 	FILE	*fp, *in;
 
 	if (notify())
@@ -884,7 +924,6 @@ get_bkgqfiles (
 )
 {
 	int	filecode;
-	char	*envget();
 
 	if (envget (UPARM) == NULL)
 	    cl_error (E_UERR,
@@ -962,8 +1001,7 @@ inrange (
 	 * permitted.
 	 */
 	if (bastype == OT_STRING && !(pp->p_flags & P_UMIN)) {
-	    char	*s, *delim, *match;
-	    char	*val, *index();
+	    char	*s, *delim, *match, *val;
 	    int		n;
 
 	    paramget (pp, FN_MIN);
@@ -1230,8 +1268,6 @@ parse_clmodes (
 	} else if (!strcmp (name, "mode")) {
 	    /* Menu mode is not permitted at the CL level.
 	     */
-	    char   *index();
-
 	    if (index (newval->o_val.v_s, 'm') != NULL)
 		cl_error (E_UERR,
 		    "menu mode is permitted only for packages and tasks");

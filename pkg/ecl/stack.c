@@ -12,7 +12,6 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
 
 
 /*
@@ -39,6 +38,8 @@ memel stack[STACKSIZ];		/* control and operand stack combined	*/
 XINT topcs = STACKSIZ;		/* index of last cstack; grows downward	*/
 XINT topos = -1;		/* index of last ostack; grows upward	*/
 XINT basos = -1;		/* lowest legal index of operand stack	*/
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
 
 /* Push a memel value onto the control stack.  Return ERR if it would cause
  * overflow, else OK.  The control stack is used by the parser during

@@ -15,7 +15,10 @@
 #include "param.h"
 #include "mem.h"
 #include "task.h"
-#include "proto.h"
+
+extern void cl_error(int errtype, char *diagstr, ...);
+extern void erract_init(void);
+extern void opcast(int newtype);
 
 
 /*

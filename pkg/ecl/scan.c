@@ -12,7 +12,21 @@
 #include "grammar.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
+
+
+void  cl_scan (int nargs, char *source);
+void  cl_scanf (char *format,  int   nargs, char *input);
+int   get_nscanval (void);
+void  lentst (char *buf);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  paramset (register  struct param *pp,  int   field);
+extern  void  paramget (register  struct param *pp,  int   field);
+extern  void  lentst (char *buf);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
+extern  void  opcast (int newtype);
+extern  void  query (struct param *pp);
 
 
 /*
@@ -331,7 +345,6 @@ get_nscanval (void)
 void 
 lentst (char *buf)
 {
-	char	*index();
 	char	*bp;
 
 	bp = index (buf, '\n');

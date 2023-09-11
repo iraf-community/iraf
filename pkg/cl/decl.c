@@ -17,7 +17,21 @@
 #include "errs.h"
 #include "construct.h"
 #include "ytab.h"		/* pick up yacc token #defines		*/
-#include "proto.h"
+
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  int   pvaldefined (struct param *pp, char *s);
+extern  int   scanmode (char *s);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  opcast (int newtype);
+extern  char *memneed (int incr);
+extern  memel popmem (void);
+
+extern  struct param *newparam (struct pfile *pfp);
+extern  struct param *paramfind (struct pfile *pfp, char *pname,
+                                 int pos, int exact);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
+extern  struct param *lookup_param (char *pkname, char *ltname, char *pname);
 
 
 /*
@@ -76,7 +90,7 @@ getlimits (
 int
 get_dim (char *pname)
 {
-	struct param *pp, *lookup_param();
+	struct param *pp;
 	char	*pk, *t, *p, *f;
 	int 	dim;
 
@@ -161,7 +175,8 @@ do_arrayinit (
   int    nindex
 )
 {
-	int	block1, block2, dim, asiz, asiz2, asiz2x, bastype, i;
+	char	*block1=NULL, *block2=NULL;
+	int	dim, asiz, asiz2, asiz2x, bastype, i;
 	int	slen;
 	short	*off, *len;
 	struct	arr_desc  *parr;
@@ -187,7 +202,7 @@ do_arrayinit (
 	    asiz = nval;
 	    if (bastype == OT_REAL)
 		asiz = dtoi (asiz);
-	    block1 = (int) memneed (asiz);
+	    block1 = memneed (asiz);
 	    ar.a_i = (int *) block1;
 	    i = nval;
 
@@ -255,7 +270,7 @@ do_arrayinit (
 		asiz2x = asiz2;
 
 	    if (asiz2x > asiz) {	/* Need to allocate more space. */
-		block2 = (int) memneed (asiz2x-asiz);
+		block2 = memneed (asiz2x-asiz);
 
 		if (nval == 0) {
 		    block1 = block2;

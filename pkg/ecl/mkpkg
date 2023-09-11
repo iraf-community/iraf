@@ -4,9 +4,6 @@ $call	relink				# make ecl.e in current directory
 $exit
 
 update:					# make ecl.e and install in bin$
-        $ifeq (MACH, sparc) then
-            $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
-        $endif
 	$call	relink
 	$call	install
 	;
@@ -18,44 +15,27 @@ relink:
 	# ytab.h may be used without modification.
 
 	$ifeq (hostid, unix)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex -t grammar.l | sed -f lex.sed > lexyy.c
-	    $endif
+#	    $ifolder (lexyy.c, grammar.l)
+#		$echo "rebuilding lexyy.c"
+#		!lex -t grammar.l | sed -f lex.sed > lexyy.c
+#	    $endif
 	    $ifolder (ytab.c,  grammar.y)
 		$echo "rebuilding ytab.c"
-		$ifeq (MACH, linux, redhat, suse)
+		$ifeq (MACH, linux, redhat, macintel, macosx)
 		    !yacc -vd grammar.y; 
-		    !egrep -v "\<stdlib.h\>" y.tab.c > ytab.c; 
+		    !egrep -v "\<stdlib.h\>" y.tab.c | \
+                    sed -e "s/_FREE (/_FREE ((char *)/g" > ytab.c;
 		    !egrep -v "\<stdio.h\>" ytab.c > ntab.c; mv ntab.c ytab.c
 		    !mv y.tab.h ytab.h
 		$else
 		    !yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
 		$endif
+		!rm y.tab.c y.output
 	    $endif
-	$endif
-
-	$ifeq (siteid, stsci)
-	$ifeq (hostid, vms)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex grammar.l
-		!@lex.com
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y
-	    $endif
-	$endif
-	$endif
-
-	$ifeq (MACH, sparc) then
-	    $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
 	$endif
 
 	$update libpkg.a
 
-	#$set	xflags = "$(xflags) -x -/DYYDEBUG"
 	$set	xflags = "$(xflags) -x"
 	$omake  ecl.x
 	$omake	globals.c <libc/libc.h> <libc/stdio.h> <libc/spp.h>\

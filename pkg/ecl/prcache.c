@@ -5,7 +5,6 @@
 #define	import_libc
 #define	import_stdio
 #define	import_error
-#define	import_finfo
 #define	import_prstat
 #include <iraf.h>
 
@@ -13,7 +12,39 @@
 #include "errs.h"
 #include "task.h"
 #include "operand.h"
-#include "proto.h"
+
+int   pr_connect (char *process, char *command, struct _iobuf **in,
+                  struct _iobuf **out, struct _iobuf *t_in,
+                  struct _iobuf *t_out, struct _iobuf *t_err,
+                  struct _iobuf *t_gr, struct _iobuf *t_im,
+                  struct _iobuf *t_pl, int timeit);
+void  pr_disconnect (int pid);
+int   pr_pconnect (char *process, struct _iobuf **in,
+                   struct _iobuf **out);
+void  pr_setcache (int new_szprcache);
+int   pr_cachetask (char *ltname);
+void  pr_lock (register int pid);
+int   pr_unlock (register int pid);
+void  pr_listcache (struct _iobuf *fp);
+void  pr_dumpcache (int pid, int break_locks);
+void  pr_prunecache (int pno);
+int   pr_getpno (void);
+int   pr_pnametopid (char *pname);
+void  pr_chdir (register int pid, char *newdir);
+void  pr_envset (register int pid, char *envvar, char *valuestr);
+void  pr_checkup (void);
+void  pr_initcache (void);
+struct process *pr_findproc (char *process);
+
+extern  void  d_fmtmsg (struct _iobuf *fp, char *prefix, char *message,
+                        int width);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  intr_enable (void);
+extern  void  intr_disable (void);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,
+                                  struct package **o_pkp);
+extern  char *findexe (struct package *pkg, char *pkg_path);
 
 
 /*
@@ -63,8 +94,6 @@
 extern	int	cldebug;
 extern	int	cltrace;
 
-typedef	XINT (*PFI)();
-
 struct process {
 	int	pr_pid;			/* process id of subprocess	*/
 	long	pr_time;		/* time when process executed	*/
@@ -86,7 +115,6 @@ int	pr_pno = 1;			/* incremented for each connect	*/
 int	sz_prcache = 2;			/* nprocess slots in cache	*/
 struct	process pr_cache[MAXSUBPROC];
 struct	process *pr_head = NULL, *pr_tail = NULL;
-extern	char *findexe();
 
 static void pr_pdisconnect (struct process *pr);
 static void pr_tohead (struct process *pr);
@@ -192,10 +220,8 @@ pr_pconnect (
 )
 {
 	struct process *pr;
-	struct	process *pr_findproc();
 	struct	_finfo fi;
 	int	fd_in, fd_out;
-	extern  int c_finfo (char *name, struct _finfo *fi);
 
 	if (pr_head == NULL)
 	    pr_initcache();

@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <ctype.h>
+
 #define	import_spp
 #define	import_libc
 #define	import_fset
@@ -23,11 +25,64 @@
 #include "task.h"
 #include "errs.h"
 #include "mem.h"
-#include "proto.h"
 
 
 #define CLDIR	"cl$"
 #define HOSTLIB "hlib$"
+
+
+int    cmain_ (int *prtype, short *bkgfile, short *cmd);
+int    onint (int *vex, int (**next_handler) (void));
+void   onerr (void);
+void   cl_amovi (register int *ip, register int *op, register int len);
+void   clexit (void);
+void   clshutdown (void);
+void   intr_disable (void);
+void   intr_enable (void);
+void   intr_reset (void);
+char  *memneed (int incr);
+
+extern  void  oneof (void);
+extern  void  run (void);
+extern  void  rerun (void);
+extern  void  pr_prunecache (int pno);
+extern  void  yy_startblock (int logflag);
+extern  void  bkg_update (int pmsg);
+extern  void  close_logfile (char *fname);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  restor (struct task *tp);
+extern  void  iofinish (register  struct task *tp);
+extern  void  clgflush (void);
+extern  void  pr_dumpcache (int pid,  int   break_locks);
+extern  void  bkg_startup (char *bkgfile);
+extern  void  setclmodes (struct task *tp);
+extern  void  setbuiltins (register  struct package *pkp);
+extern  void  erract_init (void);
+extern  void  bkg_abort (void);
+
+extern  int   compile (int opcode, ...);
+extern  int   yyparse (void);
+extern  int   onipc (int *vex, int (**next_handler) (void));
+extern  void  bkg_spawn (char *cmd);
+extern  char *comdstr (char *s);
+
+extern  struct task *pushtask (void);
+extern  struct ltask *newltask (register struct package *pkp, char *lname,
+                                char *pname,  struct ltask *oldltp);
+extern  struct ltask *newltask (register struct package *pkp, char *lname,
+                                char *pname, struct ltask *oldltp);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct pfile *pfileload (register struct ltask *ltp);
+extern  struct package *newpac (char *name, char *bin);
+extern  struct param *addparam (struct pfile *pfp, char *buf,
+                                struct _iobuf *fp);
+
+extern  void  *memset (void *s, int c, unsigned long n);
+
+extern  int   PRPSINIT (void);
+extern  int   XMJBUF (XPOINTER *bp);
+
+
 
 /*
  * MAIN -- The main program of the CL.
@@ -52,9 +107,9 @@ typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
-extern	yeof;			/* set when yacc sees eof 		*/
-extern	dobkg;			/* set when code is to be done in bkg	*/
-extern	bkgno;			/* job number if bkg job		*/
+extern	int yeof;		/* set when yacc sees eof 		*/
+extern	int dobkg;		/* set when code is to be done in bkg	*/
+extern	int bkgno;		/* job number if bkg job		*/
 
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
@@ -81,9 +136,9 @@ int	errorline;		/* error line being recovered		*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 int	logout_status = 0;	/* optional status arg to logout() 	*/
 
-static  void execute();
-static  void login(), logout();
-static  void startup(), shutdown();
+static  void execute (int mode);
+static  void login (char *cmd), logout (void);
+static  void startup (void), shutdown (void);
 static  char *file_concat (char  *in1, char  *in2);
 
 	
@@ -96,10 +151,12 @@ extern	char epar_cmdbuf[];
  * the file system, etc. is initialized.  When we exit we signal that the
  * interpreter be skipped, proceeding directly to process shutdown.
  */
-c_main (prtype, bkgfile, cmd)
-int	*prtype;		/* process type (connected, detached)	*/
-PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
-PKCHAR	*cmd;			/* host command line			*/
+int
+c_main (
+    int	    *prtype,		/* process type (connected, detached)	*/
+    PKCHAR  *bkgfile,		/* bkgfile filename if detached		*/
+    PKCHAR  *cmd 		/* host command line			*/
+)
 {
 	XINT	bp;
 
@@ -151,7 +208,7 @@ exit_:
 /* CLEXIT -- Called on fatal error from error() when get an error so bad that we
  * should commit suicide.
  */
-int 
+void 
 clexit (void)
 {
 	longjmp (jmp_clexit, 1);
@@ -160,7 +217,7 @@ clexit (void)
 
 /* CLSHUTDOWN -- Public entry for shutdown.
  */
-int 
+void 
 clshutdown (void)
 {
 	shutdown();
@@ -191,8 +248,6 @@ clshutdown (void)
 static void 
 startup (void)
 {
-	int	onint(), onipc();
-
 	/* Set up pointers to dictionary buffer.
 	 */
 	dictionary = cl_dictbuf;
@@ -739,13 +794,15 @@ onint (
 	}
 
 	*next_handler = NULL;
+
+        return (0);
 }
 
 
 /* INTR_DISABLE -- Disable interrupts, e.g., to protect a critical section
  * of code.
  */
-int 
+void 
 intr_disable (void)
 {
 	PFI	junk;
@@ -760,27 +817,26 @@ intr_disable (void)
 /* INTR_ENABLE -- Reenable interrupts, reposting the interrupt vector saved
  * in a prior call to INTR_DISABLE.
  */
-int 
+void 
 intr_enable (void)
 {
 	PFI	junk;
 
 	if (--intr_sp < 0)
 	    cl_error (E_IERR, "interrupt save stack underflow");
-	c_xwhen (X_INT, intr_save[intr_sp], &junk);
+	c_xwhen (X_INT, (PFI)intr_save[intr_sp], &junk);
 }
 
 
 /* INTR_RESET -- Post the interrupt handler and clear the interrupt vector
  * save stack.
  */
-int 
+void 
 intr_reset (void)
 {
 	PFI	junk;
-	int	onint();
 
-	c_xwhen (X_INT, onint, &junk);
+	c_xwhen (X_INT, (PFI)onint, &junk);
 	intr_sp = 0;
 }
 
@@ -793,7 +849,7 @@ intr_reset (void)
  * the system and call cl_error() which eventually does a longjmp back to
  * the errenv in execute().
  */
-int 
+void 
 onerr (void)
 {
 	char	errmsg[SZ_LINE];
@@ -813,7 +869,7 @@ onerr (void)
 
 /* CL_AMOVI -- Copy an integer sized block of memory.
  */
-int 
+void 
 cl_amovi (register int *ip, register int *op, register int len)
 {
 	while (--len)

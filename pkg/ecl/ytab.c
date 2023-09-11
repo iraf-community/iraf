@@ -201,12 +201,14 @@
 #include "mem.h"
 #include "operand.h"
 #include "param.h"
+#include "eparam.h"
 #include "grammar.h"
 #include "opcodes.h"
 #include "clmodes.h"
 #include "task.h"
 #include "construct.h"
 #include "errs.h"
+#include "proto.h"
 
 
 /* CL parser, written as a yacc grammar:
@@ -293,9 +295,6 @@ extern	char	cmdblk[SZ_CMDBLK+1];	/* Command buffer in history.c */
 extern	char	*ip_cmdblk;		/* Pointer to current char in command.*/
 extern	char	*err_cmdblk;		/* ip_cmdblk when error detected. */
 
-char	*index();
-struct	param *initparam();
-struct	label *getlabel(), *setlabel();
 
 /* arbitrary large number for bracelevel in a procedure script 
  */
@@ -335,7 +334,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 339 "y.tab.c"
+#line 338 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -440,7 +439,6 @@ YYID (i)
 #    define YYSTACK_ALLOC alloca
 #    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
-#     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #     ifndef _STDLIB_H
 #      define _STDLIB_H 1
 #     endif
@@ -468,7 +466,6 @@ YYID (i)
 #  if (defined __cplusplus && ! defined _STDLIB_H \
        && ! ((defined YYMALLOC || defined malloc) \
 	     && (defined YYFREE || defined free)))
-#   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   ifndef _STDLIB_H
 #    define _STDLIB_H 1
 #   endif
@@ -725,34 +722,34 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   144,   144,   169,   181,   181,   201,   212,   224,   265,
-     266,   266,   276,   279,   288,   293,   303,   303,   329,   329,
-     352,   355,   361,   364,   367,   372,   379,   380,   383,   384,
-     387,   388,   389,   426,   426,   463,   464,   465,   466,   467,
-     468,   469,   470,   471,   472,   475,   476,   479,   497,   515,
-     519,   519,   527,   532,   532,   551,   555,   566,   570,   571,
-     575,   598,   615,   616,   619,   627,   648,   649,   655,   669,
-     670,   672,   682,   690,   693,   694,   697,   704,   712,   713,
-     726,   727,   731,   739,   743,   747,   753,   755,   759,   763,
-     767,   771,   775,   784,   788,   792,   796,   800,   804,   808,
-     812,   816,   820,   824,   829,   829,   842,   842,   859,   859,
-     873,   873,   894,   894,   911,   912,   920,   926,   933,   939,
-     945,   953,   956,   960,   969,   970,   971,   972,   973,   974,
-     975,   976,   977,   978,   979,   980,   981,   982,   983,   984,
-     985,   986,   987,   988,   989,   990,   996,   997,  1000,  1002,
-    1000,  1007,  1008,  1014,  1019,  1030,  1030,  1042,  1047,  1048,
-    1049,  1050,  1051,  1054,  1054,  1065,  1066,  1066,  1111,  1114,
-    1119,  1143,  1119,  1154,  1154,  1165,  1168,  1169,  1173,  1183,
-    1191,  1237,  1242,  1254,  1259,  1264,  1268,  1273,  1278,  1283,
-    1288,  1294,  1299,  1310,  1315,  1322,  1329,  1335,  1345,  1355,
-    1363,  1355,  1380,  1380,  1400,  1401,  1404,  1405,  1412,  1423,
-    1423,  1456,  1456,  1479,  1486,  1479,  1524,  1528,  1544,  1524,
-    1573,  1574,  1577,  1580,  1606,  1605,  1623,  1631,  1623,  1650,
-    1650,  1668,  1683,  1707,  1711,  1723,  1735,  1735,  1769,  1791,
-    1792,  1799,  1799,  1845,  1846,  1907,  1908,  1911,  1927,  1928,
-    1931,  1968,  1968,  1983,  1986,  1986,  1992,  1996,  2003,  2024,
-    2058,  2063,  2068,  2073,  2074,  2082,  2085,  2086,  2089,  2090,
-    2096,  2099,  2102
+       0,   143,   143,   168,   180,   180,   200,   211,   223,   264,
+     265,   265,   275,   278,   287,   292,   302,   302,   328,   328,
+     351,   354,   360,   363,   366,   371,   378,   379,   382,   383,
+     386,   387,   388,   425,   425,   462,   463,   464,   465,   466,
+     467,   468,   469,   470,   471,   474,   475,   478,   496,   514,
+     518,   518,   526,   531,   531,   550,   554,   565,   569,   570,
+     574,   597,   614,   615,   618,   626,   647,   648,   654,   668,
+     669,   671,   681,   689,   692,   693,   696,   703,   711,   712,
+     725,   726,   730,   738,   742,   746,   752,   754,   758,   762,
+     766,   770,   774,   783,   787,   791,   795,   799,   803,   807,
+     811,   815,   819,   823,   828,   828,   841,   841,   858,   858,
+     872,   872,   893,   893,   910,   911,   919,   925,   932,   938,
+     944,   952,   955,   959,   968,   969,   970,   971,   972,   973,
+     974,   975,   976,   977,   978,   979,   980,   981,   982,   983,
+     984,   985,   986,   987,   988,   989,   995,   996,   999,  1001,
+     999,  1006,  1007,  1013,  1018,  1029,  1029,  1041,  1046,  1047,
+    1048,  1049,  1050,  1053,  1053,  1064,  1065,  1065,  1110,  1113,
+    1118,  1142,  1118,  1153,  1153,  1164,  1167,  1168,  1172,  1182,
+    1190,  1236,  1241,  1253,  1258,  1263,  1267,  1272,  1277,  1282,
+    1287,  1293,  1298,  1309,  1314,  1321,  1328,  1334,  1344,  1354,
+    1362,  1354,  1379,  1379,  1399,  1400,  1403,  1404,  1411,  1422,
+    1422,  1455,  1455,  1478,  1485,  1478,  1523,  1527,  1543,  1523,
+    1572,  1573,  1576,  1579,  1605,  1604,  1622,  1630,  1622,  1649,
+    1649,  1667,  1682,  1706,  1710,  1722,  1734,  1734,  1768,  1790,
+    1791,  1798,  1798,  1844,  1845,  1906,  1907,  1910,  1926,  1927,
+    1930,  1967,  1967,  1982,  1985,  1985,  1991,  1995,  2002,  2023,
+    2057,  2062,  2067,  2072,  2073,  2081,  2084,  2085,  2088,  2089,
+    2095,  2098,  2101
 };
 #endif
 
@@ -1375,7 +1372,6 @@ while (YYID (0))
 #if YYDEBUG
 
 # ifndef YYFPRINTF
-#  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYFPRINTF fprintf
 # endif
 
@@ -1973,7 +1969,7 @@ yyparse ()
 
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
-	  YYSTACK_FREE (yyss1);
+	  YYSTACK_FREE ((char *)yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -2093,7 +2089,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 144 "grammar.y"
+#line 143 "grammar.y"
     {
 		    /* Done once on entry but after at least one call to
 		     * yylex().  Good for initing parser flags.
@@ -2121,7 +2117,7 @@ yyreduce:
     break;
 
   case 3:
-#line 169 "grammar.y"
+#line 168 "grammar.y"
     {
 		    /* Prepare to rerun whatever was compiled last.
 		     * Does not work for the debug commands builtin here.
@@ -2136,7 +2132,7 @@ yyreduce:
     break;
 
   case 4:
-#line 181 "grammar.y"
+#line 180 "grammar.y"
     {
 		    if (parse_state == PARSE_PARAMS) {
 			errmsg = "Illegal parser state.";
@@ -2146,7 +2142,7 @@ yyreduce:
     break;
 
   case 5:
-#line 187 "grammar.y"
+#line 186 "grammar.y"
     {
 		    if (sawnl && bracelevel == 0) {
 			if (!errcnt)
@@ -2163,7 +2159,7 @@ yyreduce:
     break;
 
   case 6:
-#line 201 "grammar.y"
+#line 200 "grammar.y"
     {
 		    /* Parse the parameters in a script file.  This will
 		     * normally be done on a call by pfileread().
@@ -2177,7 +2173,7 @@ yyreduce:
     break;
 
   case 7:
-#line 212 "grammar.y"
+#line 211 "grammar.y"
     {
 		    /* Parse the executable statements in a script.
 		     */
@@ -2192,7 +2188,7 @@ yyreduce:
     break;
 
   case 8:
-#line 224 "grammar.y"
+#line 223 "grammar.y"
     {
 		    /* This catches errors that the two other error lines
 		     * can't get, e.g. a missing `}' at the end of a script, 
@@ -2235,7 +2231,7 @@ yyreduce:
     break;
 
   case 10:
-#line 266 "grammar.y"
+#line 265 "grammar.y"
     {
 		    /* debug are those debugging functions that
 		     * should be run directly and not through a
@@ -2247,14 +2243,14 @@ yyreduce:
     break;
 
   case 12:
-#line 276 "grammar.y"
+#line 275 "grammar.y"
     {
 		    d_d(); /* show dictionary/stack pointers */
 		}
     break;
 
   case 13:
-#line 279 "grammar.y"
+#line 278 "grammar.y"
     { /* show a dictionary location	*/
 		    if (stkop((yyvsp[(2) - (2)]))->o_type & OT_INT) {
 			int	idx;
@@ -2267,14 +2263,14 @@ yyreduce:
     break;
 
   case 14:
-#line 288 "grammar.y"
+#line 287 "grammar.y"
     {
 		    d_stack (pc, 0, 0);		/* show compiled code	*/
 		}
     break;
 
   case 15:
-#line 295 "grammar.y"
+#line 294 "grammar.y"
     { 
 			/* Check for required params.
 			 */
@@ -2284,7 +2280,7 @@ yyreduce:
     break;
 
   case 16:
-#line 303 "grammar.y"
+#line 302 "grammar.y"
     {
 			/* Initialize parser for procedure body.
 			 */
@@ -2309,7 +2305,7 @@ yyreduce:
     break;
 
   case 18:
-#line 329 "grammar.y"
+#line 328 "grammar.y"
     {  
 			/* Initialize parser for procedure parameters.
 			 */
@@ -2332,21 +2328,21 @@ yyreduce:
     break;
 
   case 20:
-#line 352 "grammar.y"
+#line 351 "grammar.y"
     {
 		    n_procpar = 0;
 		}
     break;
 
   case 22:
-#line 361 "grammar.y"
+#line 360 "grammar.y"
     {
 		    n_procpar = 0;
 		}
     break;
 
   case 24:
-#line 367 "grammar.y"
+#line 366 "grammar.y"
     { 
 		    n_procpar = 1;
 		    if (!errcnt)
@@ -2355,7 +2351,7 @@ yyreduce:
     break;
 
   case 25:
-#line 372 "grammar.y"
+#line 371 "grammar.y"
     {
 		    n_procpar++;
 		    if (!errcnt)
@@ -2364,7 +2360,7 @@ yyreduce:
     break;
 
   case 32:
-#line 389 "grammar.y"
+#line 388 "grammar.y"
     {
 		    /* This catches errors in the parameter declarations
 		     * of a procedure script.
@@ -2403,7 +2399,7 @@ yyreduce:
     break;
 
   case 33:
-#line 426 "grammar.y"
+#line 425 "grammar.y"
     {
 	 	        /* For in-line definitions we don't want
 			 * to freeze stuff on the dictionary, so
@@ -2429,7 +2425,7 @@ yyreduce:
     break;
 
   case 34:
-#line 447 "grammar.y"
+#line 446 "grammar.y"
     {
 		      	/* Update dictionary to include these definitions.
 			 */
@@ -2447,57 +2443,57 @@ yyreduce:
     break;
 
   case 35:
-#line 463 "grammar.y"
+#line 462 "grammar.y"
     { vartype = V_BOOL; }
     break;
 
   case 36:
-#line 464 "grammar.y"
+#line 463 "grammar.y"
     { vartype = V_STRING; }
     break;
 
   case 37:
-#line 465 "grammar.y"
+#line 464 "grammar.y"
     { vartype = V_REAL; }
     break;
 
   case 38:
-#line 466 "grammar.y"
+#line 465 "grammar.y"
     { vartype = V_FILE; }
     break;
 
   case 39:
-#line 467 "grammar.y"
+#line 466 "grammar.y"
     { vartype = V_GCUR; }
     break;
 
   case 40:
-#line 468 "grammar.y"
+#line 467 "grammar.y"
     { vartype = V_IMCUR; }
     break;
 
   case 41:
-#line 469 "grammar.y"
+#line 468 "grammar.y"
     { vartype = V_UKEY; }
     break;
 
   case 42:
-#line 470 "grammar.y"
+#line 469 "grammar.y"
     { vartype = V_PSET; }
     break;
 
   case 43:
-#line 471 "grammar.y"
+#line 470 "grammar.y"
     { vartype = V_INT; }
     break;
 
   case 44:
-#line 472 "grammar.y"
+#line 471 "grammar.y"
     { vartype = V_STRUCT; }
     break;
 
   case 47:
-#line 479 "grammar.y"
+#line 478 "grammar.y"
     {
 			if (!errcnt) {
 			    if (pp != NULL) {
@@ -2514,7 +2510,7 @@ yyreduce:
     break;
 
   case 48:
-#line 497 "grammar.y"
+#line 496 "grammar.y"
     {
 			if (!errcnt) {
 			    if (pp != NULL) {
@@ -2534,7 +2530,7 @@ yyreduce:
     break;
 
   case 49:
-#line 515 "grammar.y"
+#line 514 "grammar.y"
     {
 			inited = NO;
 			n_aval = 0;
@@ -2542,21 +2538,21 @@ yyreduce:
     break;
 
   case 50:
-#line 519 "grammar.y"
+#line 518 "grammar.y"
     {
 			n_aval = 0;
 		}
     break;
 
   case 51:
-#line 522 "grammar.y"
+#line 521 "grammar.y"
     {
 			inited = YES;
 		}
     break;
 
   case 52:
-#line 527 "grammar.y"
+#line 526 "grammar.y"
     {
 		    index_cnt = 0;
 		    if (!errcnt)
@@ -2565,7 +2561,7 @@ yyreduce:
     break;
 
   case 53:
-#line 532 "grammar.y"
+#line 531 "grammar.y"
     {
 		    int  itemp;
 
@@ -2585,7 +2581,7 @@ yyreduce:
     break;
 
   case 55:
-#line 551 "grammar.y"
+#line 550 "grammar.y"
     {
 			varlist = NO;
 			index_cnt = 0;
@@ -2593,7 +2589,7 @@ yyreduce:
     break;
 
   case 56:
-#line 555 "grammar.y"
+#line 554 "grammar.y"
     {
 			if (!do_params) {
 			    errmsg = locallist;
@@ -2606,7 +2602,7 @@ yyreduce:
     break;
 
   case 60:
-#line 575 "grammar.y"
+#line 574 "grammar.y"
     {
 		    if (!errcnt) {
 			if (pp != NULL) {
@@ -2633,7 +2629,7 @@ yyreduce:
     break;
 
   case 61:
-#line 598 "grammar.y"
+#line 597 "grammar.y"
     {
 			if (!errcnt) {
 			    if (pp != NULL) {
@@ -2652,7 +2648,7 @@ yyreduce:
     break;
 
   case 64:
-#line 619 "grammar.y"
+#line 618 "grammar.y"
     {
 			if (!errcnt) {
 			    if (pp != NULL) {
@@ -2664,7 +2660,7 @@ yyreduce:
     break;
 
   case 65:
-#line 628 "grammar.y"
+#line 627 "grammar.y"
     {
 			int   cnt;
 			
@@ -2686,7 +2682,7 @@ yyreduce:
     break;
 
   case 68:
-#line 655 "grammar.y"
+#line 654 "grammar.y"
     {
 		      	if (stkop((yyvsp[(2) - (2)]))->o_type == OT_INT) {
 			    stkop((yyvsp[(2) - (2)]))->o_val.v_i *= (yyvsp[(1) - (2)]);
@@ -2702,17 +2698,17 @@ yyreduce:
     break;
 
   case 69:
-#line 669 "grammar.y"
+#line 668 "grammar.y"
     { (yyval) =  1; }
     break;
 
   case 70:
-#line 670 "grammar.y"
+#line 669 "grammar.y"
     { (yyval) = -1; }
     break;
 
   case 71:
-#line 672 "grammar.y"
+#line 671 "grammar.y"
     {
 			/* Check if we already had an initialization. 
 			 */
@@ -2726,7 +2722,7 @@ yyreduce:
     break;
 
   case 72:
-#line 682 "grammar.y"
+#line 681 "grammar.y"
     {
 		      	if (!errcnt) {
 			    if (inited && pp != NULL) {
@@ -2738,7 +2734,7 @@ yyreduce:
     break;
 
   case 76:
-#line 697 "grammar.y"
+#line 696 "grammar.y"
     {
 			if (!errcnt)
 			    if (pp != NULL)
@@ -2747,7 +2743,7 @@ yyreduce:
     break;
 
   case 79:
-#line 713 "grammar.y"
+#line 712 "grammar.y"
     {
 		    if (!errcnt)
 		        compile (PUSHPARAM, stkop((yyvsp[(1) - (1)]))->o_val.v_s);
@@ -2755,7 +2751,7 @@ yyreduce:
     break;
 
   case 81:
-#line 727 "grammar.y"
+#line 726 "grammar.y"
     {
 		    if  (!errcnt)
 		        compile (PUSHCONST, stkop((yyvsp[(1) - (1)])));
@@ -2763,7 +2759,7 @@ yyreduce:
     break;
 
   case 82:
-#line 731 "grammar.y"
+#line 730 "grammar.y"
     {
 		    /* "gcur" is both a keyword and a CL global parameter,
 		     * and must be built into the grammar here to permit
@@ -2775,7 +2771,7 @@ yyreduce:
     break;
 
   case 83:
-#line 739 "grammar.y"
+#line 738 "grammar.y"
     {
 		    if (!errcnt)
 			compile (PUSHPARAM, "imcur");
@@ -2783,7 +2779,7 @@ yyreduce:
     break;
 
   case 84:
-#line 743 "grammar.y"
+#line 742 "grammar.y"
     {
 		    if (!errcnt)
 			compile (PUSHPARAM, "ukey");
@@ -2791,7 +2787,7 @@ yyreduce:
     break;
 
   case 85:
-#line 747 "grammar.y"
+#line 746 "grammar.y"
     {
 		    if (!errcnt)
 			compile (PUSHPARAM, "pset");
@@ -2799,7 +2795,7 @@ yyreduce:
     break;
 
   case 87:
-#line 755 "grammar.y"
+#line 754 "grammar.y"
     {
 		    if (!errcnt)
 			compile (ADD);
@@ -2807,7 +2803,7 @@ yyreduce:
     break;
 
   case 88:
-#line 759 "grammar.y"
+#line 758 "grammar.y"
     {
 		    if (!errcnt)
 			compile (SUB);
@@ -2815,7 +2811,7 @@ yyreduce:
     break;
 
   case 89:
-#line 763 "grammar.y"
+#line 762 "grammar.y"
     {
 		    if (!errcnt)
 			compile (MUL);
@@ -2823,7 +2819,7 @@ yyreduce:
     break;
 
   case 90:
-#line 767 "grammar.y"
+#line 766 "grammar.y"
     {
 		    if (!errcnt)
 			compile (DIV);
@@ -2831,7 +2827,7 @@ yyreduce:
     break;
 
   case 91:
-#line 771 "grammar.y"
+#line 770 "grammar.y"
     {
 		    if (!errcnt)
 			compile (POW);
@@ -2839,7 +2835,7 @@ yyreduce:
     break;
 
   case 92:
-#line 775 "grammar.y"
+#line 774 "grammar.y"
     {
 		    struct	operand o;
 		    if (!errcnt) {
@@ -2852,7 +2848,7 @@ yyreduce:
     break;
 
   case 93:
-#line 784 "grammar.y"
+#line 783 "grammar.y"
     {
 		    if (!errcnt)
 			compile (CONCAT);
@@ -2860,7 +2856,7 @@ yyreduce:
     break;
 
   case 94:
-#line 788 "grammar.y"
+#line 787 "grammar.y"
     {
 		    if (!errcnt)
 			compile (LT);
@@ -2868,7 +2864,7 @@ yyreduce:
     break;
 
   case 95:
-#line 792 "grammar.y"
+#line 791 "grammar.y"
     {
 		    if (!errcnt)
 			compile (GT);
@@ -2876,7 +2872,7 @@ yyreduce:
     break;
 
   case 96:
-#line 796 "grammar.y"
+#line 795 "grammar.y"
     {
 		    if (!errcnt)
 			compile (LE);
@@ -2884,7 +2880,7 @@ yyreduce:
     break;
 
   case 97:
-#line 800 "grammar.y"
+#line 799 "grammar.y"
     {
 		    if (!errcnt)
 			compile (GE);
@@ -2892,7 +2888,7 @@ yyreduce:
     break;
 
   case 98:
-#line 804 "grammar.y"
+#line 803 "grammar.y"
     {
 		    if (!errcnt)
 			compile (EQ);
@@ -2900,7 +2896,7 @@ yyreduce:
     break;
 
   case 99:
-#line 808 "grammar.y"
+#line 807 "grammar.y"
     {
 		    if (!errcnt)
 			compile (NE);
@@ -2908,7 +2904,7 @@ yyreduce:
     break;
 
   case 100:
-#line 812 "grammar.y"
+#line 811 "grammar.y"
     {
 		    if (!errcnt)
 			compile (OR);
@@ -2916,7 +2912,7 @@ yyreduce:
     break;
 
   case 101:
-#line 816 "grammar.y"
+#line 815 "grammar.y"
     {
 		    if (!errcnt)
 			compile (AND);
@@ -2924,7 +2920,7 @@ yyreduce:
     break;
 
   case 102:
-#line 820 "grammar.y"
+#line 819 "grammar.y"
     {
 		    if (!errcnt)
 			compile (NOT);
@@ -2932,7 +2928,7 @@ yyreduce:
     break;
 
   case 103:
-#line 824 "grammar.y"
+#line 823 "grammar.y"
     {
 		    if (!errcnt)
 			compile (CHSIGN);
@@ -2940,7 +2936,7 @@ yyreduce:
     break;
 
   case 104:
-#line 829 "grammar.y"
+#line 828 "grammar.y"
     {
 		    /* Free format scan. */
 		    if (!errcnt)
@@ -2949,7 +2945,7 @@ yyreduce:
     break;
 
   case 105:
-#line 833 "grammar.y"
+#line 832 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -2962,7 +2958,7 @@ yyreduce:
     break;
 
   case 106:
-#line 842 "grammar.y"
+#line 841 "grammar.y"
     {
 		    /* Formatted scan. */
 		    if (!errcnt)
@@ -2971,7 +2967,7 @@ yyreduce:
     break;
 
   case 107:
-#line 846 "grammar.y"
+#line 845 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -2987,7 +2983,7 @@ yyreduce:
     break;
 
   case 108:
-#line 859 "grammar.y"
+#line 858 "grammar.y"
     {
 		    /* Free format scan from a parameter.  */
 		    if (!errcnt)
@@ -2996,7 +2992,7 @@ yyreduce:
     break;
 
   case 109:
-#line 863 "grammar.y"
+#line 862 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -3009,7 +3005,7 @@ yyreduce:
     break;
 
   case 110:
-#line 873 "grammar.y"
+#line 872 "grammar.y"
     {
 		    /* Formatted scan from a parameter.
 		     * fscanf (param, format, arg1, ...)
@@ -3022,7 +3018,7 @@ yyreduce:
     break;
 
   case 111:
-#line 881 "grammar.y"
+#line 880 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -3038,7 +3034,7 @@ yyreduce:
     break;
 
   case 112:
-#line 894 "grammar.y"
+#line 893 "grammar.y"
     {
 		    if (!errcnt)
 			push (0);	/* use control stack to count args */
@@ -3046,7 +3042,7 @@ yyreduce:
     break;
 
   case 113:
-#line 897 "grammar.y"
+#line 896 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -3059,7 +3055,7 @@ yyreduce:
     break;
 
   case 115:
-#line 912 "grammar.y"
+#line 911 "grammar.y"
     {
 			/* The YACC value of this must match normal intrinsics
 			 * so we must generate an operand with the proper
@@ -3071,7 +3067,7 @@ yyreduce:
     break;
 
   case 116:
-#line 920 "grammar.y"
+#line 919 "grammar.y"
     {
 			if (!errcnt)
 			    (yyval) = addconst ("real", OT_STRING);
@@ -3079,7 +3075,7 @@ yyreduce:
     break;
 
   case 117:
-#line 926 "grammar.y"
+#line 925 "grammar.y"
     {
 		    if (!errcnt) {
 		        push (pop() + 1);		/* inc num args	*/
@@ -3088,7 +3084,7 @@ yyreduce:
     break;
 
   case 119:
-#line 939 "grammar.y"
+#line 938 "grammar.y"
     {
                     if (!errcnt) {
                         compile (PUSHCONST, stkop ((yyvsp[(1) - (1)])));
@@ -3098,7 +3094,7 @@ yyreduce:
     break;
 
   case 120:
-#line 945 "grammar.y"
+#line 944 "grammar.y"
     {
                     if (!errcnt) {
                         compile (PUSHCONST, stkop ((yyvsp[(1) - (3)])));
@@ -3108,7 +3104,7 @@ yyreduce:
     break;
 
   case 122:
-#line 956 "grammar.y"
+#line 955 "grammar.y"
     {
 		    if (!errcnt)
 			push (pop() + 1);		/* inc num args	*/
@@ -3116,7 +3112,7 @@ yyreduce:
     break;
 
   case 123:
-#line 960 "grammar.y"
+#line 959 "grammar.y"
     {
 		    if (!errcnt)
 			push (pop() + 1);		/* inc num args	*/
@@ -3124,21 +3120,21 @@ yyreduce:
     break;
 
   case 148:
-#line 1000 "grammar.y"
+#line 999 "grammar.y"
     {
 		    bracelevel++;
 		}
     break;
 
   case 149:
-#line 1002 "grammar.y"
+#line 1001 "grammar.y"
     {
 		    --bracelevel;
 		}
     break;
 
   case 153:
-#line 1014 "grammar.y"
+#line 1013 "grammar.y"
     {
 			--parenlevel;
  			if (!errcnt)
@@ -3147,7 +3143,7 @@ yyreduce:
     break;
 
   case 154:
-#line 1019 "grammar.y"
+#line 1018 "grammar.y"
     {
 			/* Old code pushed a constant rather than a param
 			 * when not within braces.  This doesn't seem
@@ -3162,14 +3158,14 @@ yyreduce:
     break;
 
   case 155:
-#line 1030 "grammar.y"
+#line 1029 "grammar.y"
     {
 			parenlevel++;
 		}
     break;
 
   case 156:
-#line 1033 "grammar.y"
+#line 1032 "grammar.y"
     {
 		      	--parenlevel;
 			if (!errcnt)
@@ -3178,46 +3174,46 @@ yyreduce:
     break;
 
   case 157:
-#line 1042 "grammar.y"
+#line 1041 "grammar.y"
     {
 			parenlevel++;
 		}
     break;
 
   case 158:
-#line 1047 "grammar.y"
+#line 1046 "grammar.y"
     { (yyval) = ADDASSIGN; }
     break;
 
   case 159:
-#line 1048 "grammar.y"
+#line 1047 "grammar.y"
     { (yyval) = SUBASSIGN; }
     break;
 
   case 160:
-#line 1049 "grammar.y"
+#line 1048 "grammar.y"
     { (yyval) = MULASSIGN; }
     break;
 
   case 161:
-#line 1050 "grammar.y"
+#line 1049 "grammar.y"
     { (yyval) = DIVASSIGN; }
     break;
 
   case 162:
-#line 1051 "grammar.y"
+#line 1050 "grammar.y"
     { (yyval) = CATASSIGN; }
     break;
 
   case 163:
-#line 1054 "grammar.y"
+#line 1053 "grammar.y"
     {
 		    npipes = 0;
 		}
     break;
 
   case 164:
-#line 1056 "grammar.y"
+#line 1055 "grammar.y"
     {
 		    if (!errcnt) {
 			compile (EXEC);
@@ -3228,7 +3224,7 @@ yyreduce:
     break;
 
   case 166:
-#line 1066 "grammar.y"
+#line 1065 "grammar.y"
     {
 		    /* Pipefiles must be allocated at run time using a stack
 		     * to permit pipe commands within loops, and to permit
@@ -3267,7 +3263,7 @@ yyreduce:
     break;
 
   case 167:
-#line 1100 "grammar.y"
+#line 1099 "grammar.y"
     {
 		    /* Compile the GETPIPE instruction with the name of the
 		     * second task in the current pipe, and backpatch the
@@ -3280,21 +3276,21 @@ yyreduce:
     break;
 
   case 168:
-#line 1111 "grammar.y"
+#line 1110 "grammar.y"
     {
 		    (yyval) = 1;
 		}
     break;
 
   case 169:
-#line 1114 "grammar.y"
+#line 1113 "grammar.y"
     {
 		    (yyval) = 2;
 		}
     break;
 
   case 170:
-#line 1119 "grammar.y"
+#line 1118 "grammar.y"
     {
 		    char    *ltname;
 
@@ -3323,14 +3319,14 @@ yyreduce:
     break;
 
   case 171:
-#line 1143 "grammar.y"
+#line 1142 "grammar.y"
     {
 		    inarglist = 1;
 		}
     break;
 
   case 172:
-#line 1145 "grammar.y"
+#line 1144 "grammar.y"
     {
 		    extern char *onerr_handler;
 
@@ -3341,7 +3337,7 @@ yyreduce:
     break;
 
   case 173:
-#line 1154 "grammar.y"
+#line 1153 "grammar.y"
     {
 		    /* (,x) equates to nargs == 2.  Call posargset with
 		     * negative dummy argument to bump nargs.
@@ -3356,7 +3352,7 @@ yyreduce:
     break;
 
   case 178:
-#line 1173 "grammar.y"
+#line 1172 "grammar.y"
     {
 		    if (!errcnt) {
 			if (posit > 0) {		/* not first time */
@@ -3370,7 +3366,7 @@ yyreduce:
     break;
 
   case 179:
-#line 1183 "grammar.y"
+#line 1182 "grammar.y"
     {
 		    if (absmode) {
 			errmsg = posfirst;
@@ -3382,7 +3378,7 @@ yyreduce:
     break;
 
   case 180:
-#line 1191 "grammar.y"
+#line 1190 "grammar.y"
     {
 		    if (absmode) {
 			errmsg = posfirst;
@@ -3432,7 +3428,7 @@ yyreduce:
     break;
 
   case 181:
-#line 1237 "grammar.y"
+#line 1236 "grammar.y"
     {
 		    absmode++;
 		    if (!errcnt)
@@ -3441,7 +3437,7 @@ yyreduce:
     break;
 
   case 182:
-#line 1242 "grammar.y"
+#line 1241 "grammar.y"
     {
 		    absmode++;
 		    if (!errcnt) {
@@ -3457,7 +3453,7 @@ yyreduce:
     break;
 
   case 183:
-#line 1254 "grammar.y"
+#line 1253 "grammar.y"
     {
 		    absmode++;
 		    if (!errcnt)
@@ -3466,7 +3462,7 @@ yyreduce:
     break;
 
   case 184:
-#line 1259 "grammar.y"
+#line 1258 "grammar.y"
     {
 		    absmode++;
 		    if (!errcnt)
@@ -3475,7 +3471,7 @@ yyreduce:
     break;
 
   case 185:
-#line 1264 "grammar.y"
+#line 1263 "grammar.y"
     {
 		    if (!errcnt)
 			compile (REDIRIN);
@@ -3483,7 +3479,7 @@ yyreduce:
     break;
 
   case 186:
-#line 1268 "grammar.y"
+#line 1267 "grammar.y"
     {
 		    newstdout++;
 		    if (!errcnt)
@@ -3492,7 +3488,7 @@ yyreduce:
     break;
 
   case 187:
-#line 1273 "grammar.y"
+#line 1272 "grammar.y"
     {
 		    newstdout++;
 		    if (!errcnt)
@@ -3501,7 +3497,7 @@ yyreduce:
     break;
 
   case 188:
-#line 1278 "grammar.y"
+#line 1277 "grammar.y"
     {
 		    newstdout++;
 		    if (!errcnt)
@@ -3510,7 +3506,7 @@ yyreduce:
     break;
 
   case 189:
-#line 1283 "grammar.y"
+#line 1282 "grammar.y"
     {
 		    newstdout++;
 		    if (!errcnt)
@@ -3519,7 +3515,7 @@ yyreduce:
     break;
 
   case 190:
-#line 1288 "grammar.y"
+#line 1287 "grammar.y"
     {
 		    if (!errcnt)
 			compile (GSREDIR, stkop((yyvsp[(1) - (2)]))->o_val.v_s);
@@ -3527,7 +3523,7 @@ yyreduce:
     break;
 
   case 191:
-#line 1294 "grammar.y"
+#line 1293 "grammar.y"
     {
 		    absmode++;
 		    /* constant already pushed by expr0.
@@ -3536,7 +3532,7 @@ yyreduce:
     break;
 
   case 192:
-#line 1299 "grammar.y"
+#line 1298 "grammar.y"
     {
 		    absmode++;
 		    if (!errcnt) {
@@ -3549,7 +3545,7 @@ yyreduce:
     break;
 
   case 193:
-#line 1310 "grammar.y"
+#line 1309 "grammar.y"
     {
 			--parenlevel;
 			if (!errcnt)
@@ -3558,7 +3554,7 @@ yyreduce:
     break;
 
   case 194:
-#line 1315 "grammar.y"
+#line 1314 "grammar.y"
     {
 		      	--parenlevel;
 			if (!errcnt)
@@ -3567,7 +3563,7 @@ yyreduce:
     break;
 
   case 195:
-#line 1322 "grammar.y"
+#line 1321 "grammar.y"
     {
 			--parenlevel;
 			if (!errcnt)
@@ -3576,7 +3572,7 @@ yyreduce:
     break;
 
   case 196:
-#line 1329 "grammar.y"
+#line 1328 "grammar.y"
     {
 		    if (!errcnt)
 			compile (OSESC, stkop((yyvsp[(1) - (1)]))->o_val.v_s);
@@ -3584,7 +3580,7 @@ yyreduce:
     break;
 
   case 197:
-#line 1335 "grammar.y"
+#line 1334 "grammar.y"
     {
 		    --parenlevel;
 		    if (!errcnt)
@@ -3593,7 +3589,7 @@ yyreduce:
     break;
 
   case 198:
-#line 1345 "grammar.y"
+#line 1344 "grammar.y"
     {
 		    /* pop BIFF addr and set branch to just after statement */
 		    if (!errcnt) {
@@ -3605,7 +3601,7 @@ yyreduce:
     break;
 
   case 199:
-#line 1355 "grammar.y"
+#line 1354 "grammar.y"
     {
 		    if (++in_iferr > 1) { 
 			errmsg = nestediferr; 
@@ -3618,7 +3614,7 @@ yyreduce:
     break;
 
   case 200:
-#line 1363 "grammar.y"
+#line 1362 "grammar.y"
     {
 		    if (!errcnt) {
 			struct	operand o;
@@ -3635,14 +3631,14 @@ yyreduce:
     break;
 
   case 201:
-#line 1375 "grammar.y"
+#line 1374 "grammar.y"
     {
 		    in_iferr--;
 		}
     break;
 
   case 202:
-#line 1380 "grammar.y"
+#line 1379 "grammar.y"
     {
 		    if (!errcnt) {
 			/* Pop and save BIFF address, compile and push addr 
@@ -3657,7 +3653,7 @@ yyreduce:
     break;
 
   case 203:
-#line 1390 "grammar.y"
+#line 1389 "grammar.y"
     {
 		    if (!errcnt) {
 			/* Pop GOTO addr and set branch to just after statement
@@ -3669,17 +3665,17 @@ yyreduce:
     break;
 
   case 204:
-#line 1400 "grammar.y"
+#line 1399 "grammar.y"
     { iferr_tok = 0; }
     break;
 
   case 205:
-#line 1401 "grammar.y"
+#line 1400 "grammar.y"
     { iferr_tok = 1; }
     break;
 
   case 208:
-#line 1412 "grammar.y"
+#line 1411 "grammar.y"
     {
 		    /* pop BIFF addr and set branch to just after statement
 		     */
@@ -3692,7 +3688,7 @@ yyreduce:
     break;
 
   case 209:
-#line 1423 "grammar.y"
+#line 1422 "grammar.y"
     {
 			/* save BIFF addr so branch can be filled in 
 			 */
@@ -3702,7 +3698,7 @@ yyreduce:
     break;
 
   case 210:
-#line 1428 "grammar.y"
+#line 1427 "grammar.y"
     {
 			/* The shift/reduce conflict in the IF-IF/ELSE
 			 * construct can cause errors in compilation
@@ -3732,7 +3728,7 @@ yyreduce:
     break;
 
   case 211:
-#line 1456 "grammar.y"
+#line 1455 "grammar.y"
     {
 		    XINT  biffaddr;
 
@@ -3749,7 +3745,7 @@ yyreduce:
     break;
 
   case 212:
-#line 1468 "grammar.y"
+#line 1467 "grammar.y"
     {
 		    XINT  gotoaddr;
 		    if (!errcnt) {
@@ -3762,7 +3758,7 @@ yyreduce:
     break;
 
   case 213:
-#line 1479 "grammar.y"
+#line 1478 "grammar.y"
     {
 		    /* Save starting addr of while expression.
 		     */
@@ -3774,7 +3770,7 @@ yyreduce:
     break;
 
   case 214:
-#line 1486 "grammar.y"
+#line 1485 "grammar.y"
     {
 		    /* Save BIFF addr so branch can be filled in.
 		     */
@@ -3784,7 +3780,7 @@ yyreduce:
     break;
 
   case 215:
-#line 1491 "grammar.y"
+#line 1490 "grammar.y"
     {
 		    XINT  biffaddr;
 
@@ -3801,7 +3797,7 @@ yyreduce:
     break;
 
   case 216:
-#line 1524 "grammar.y"
+#line 1523 "grammar.y"
     {
 			if (!errcnt)
 			    push(pc);				/* Loop1: */
@@ -3809,7 +3805,7 @@ yyreduce:
     break;
 
   case 217:
-#line 1528 "grammar.y"
+#line 1527 "grammar.y"
     {
 			if (!errcnt) {
 			    if (for_expr)
@@ -3829,7 +3825,7 @@ yyreduce:
     break;
 
   case 218:
-#line 1544 "grammar.y"
+#line 1543 "grammar.y"
     {
 			XINT  stmtaddr;
 
@@ -3843,7 +3839,7 @@ yyreduce:
     break;
 
   case 219:
-#line 1554 "grammar.y"
+#line 1553 "grammar.y"
     {
 			XINT  stmtaddr;
 
@@ -3861,21 +3857,21 @@ yyreduce:
     break;
 
   case 222:
-#line 1577 "grammar.y"
+#line 1576 "grammar.y"
     {
 			for_expr = YES;
 		}
     break;
 
   case 223:
-#line 1580 "grammar.y"
+#line 1579 "grammar.y"
     {
 			for_expr = NO;
 		}
     break;
 
   case 224:
-#line 1606 "grammar.y"
+#line 1605 "grammar.y"
     {
 			if (!errcnt) {
 			    push (compile(SWITCH));
@@ -3889,7 +3885,7 @@ yyreduce:
     break;
 
   case 225:
-#line 1615 "grammar.y"
+#line 1614 "grammar.y"
     {
 			/* Set up jumptable and pop space on stack.
 			 */
@@ -3899,7 +3895,7 @@ yyreduce:
     break;
 
   case 226:
-#line 1623 "grammar.y"
+#line 1622 "grammar.y"
     {
 			if (!errcnt) {
 			    ncaseval = 0;
@@ -3912,7 +3908,7 @@ yyreduce:
     break;
 
   case 227:
-#line 1631 "grammar.y"
+#line 1630 "grammar.y"
     {
 			XINT  pcase;
 
@@ -3928,7 +3924,7 @@ yyreduce:
     break;
 
   case 228:
-#line 1642 "grammar.y"
+#line 1641 "grammar.y"
     {
 			/* Branch to end of switch block 
 			 */
@@ -3938,7 +3934,7 @@ yyreduce:
     break;
 
   case 229:
-#line 1650 "grammar.y"
+#line 1649 "grammar.y"
     {
 		      	/* Compile an operand to store the current PC.
 			 */
@@ -3953,7 +3949,7 @@ yyreduce:
     break;
 
   case 230:
-#line 1660 "grammar.y"
+#line 1659 "grammar.y"
     {
 		      	/* Branch past jump table. 
 			 */
@@ -3963,7 +3959,7 @@ yyreduce:
     break;
 
   case 231:
-#line 1668 "grammar.y"
+#line 1667 "grammar.y"
     {
 			/* All NEXT statements are backward references,
 			 * so we simply store the addresses in an array.
@@ -3980,7 +3976,7 @@ yyreduce:
     break;
 
   case 232:
-#line 1683 "grammar.y"
+#line 1682 "grammar.y"
     {
 			/* Each BREAK is a forward reference.  For the
 			 * first BREAK in each loop we compile a
@@ -4006,7 +4002,7 @@ yyreduce:
     break;
 
   case 233:
-#line 1707 "grammar.y"
+#line 1706 "grammar.y"
     {
 			if (!errcnt)
 			    compile (END);
@@ -4014,7 +4010,7 @@ yyreduce:
     break;
 
   case 234:
-#line 1711 "grammar.y"
+#line 1710 "grammar.y"
     {
 			/* Return values currently not implemented.
 			 */
@@ -4025,7 +4021,7 @@ yyreduce:
     break;
 
   case 235:
-#line 1723 "grammar.y"
+#line 1722 "grammar.y"
     {
 			bracelevel -= PBRACE;
 			if (bracelevel < 0) {
@@ -4039,7 +4035,7 @@ yyreduce:
     break;
 
   case 236:
-#line 1735 "grammar.y"
+#line 1734 "grammar.y"
     {
 			/* Put symbol in table in dictionary and
 			 * process indirect references if present.
@@ -4074,7 +4070,7 @@ yyreduce:
     break;
 
   case 238:
-#line 1769 "grammar.y"
+#line 1768 "grammar.y"
     {
 			/* Get the address corresponding to the label.
 			 */
@@ -4098,7 +4094,7 @@ yyreduce:
     break;
 
   case 241:
-#line 1799 "grammar.y"
+#line 1798 "grammar.y"
     { 
 			/* Save pc before compiling statement for loop back
 			 */
@@ -4110,7 +4106,7 @@ yyreduce:
     break;
 
   case 242:
-#line 1807 "grammar.y"
+#line 1806 "grammar.y"
     {
 		      	/* If there was an open reference compile the
 			 * loop increment and goback.
@@ -4152,7 +4148,7 @@ yyreduce:
     break;
 
   case 244:
-#line 1846 "grammar.y"
+#line 1845 "grammar.y"
     {
 		    /* This should get most errors in executable statements
 		     * or in the local variable declarations in a script.
@@ -4215,7 +4211,7 @@ yyreduce:
     break;
 
   case 247:
-#line 1911 "grammar.y"
+#line 1910 "grammar.y"
     {
 				if (!errcnt) {
 				    push(stkop((yyvsp[(1) - (1)]))) ; 
@@ -4225,7 +4221,7 @@ yyreduce:
     break;
 
   case 250:
-#line 1931 "grammar.y"
+#line 1930 "grammar.y"
     {
 			int  dim, d, i1, i2, mode;
 
@@ -4266,7 +4262,7 @@ yyreduce:
     break;
 
   case 251:
-#line 1968 "grammar.y"
+#line 1967 "grammar.y"
     {
 		    if (!errcnt) {
 			strncpy (curr_param, stkop((yyvsp[(1) - (1)]))->o_val.v_s, SZ_FNAME);
@@ -4276,7 +4272,7 @@ yyreduce:
     break;
 
   case 252:
-#line 1975 "grammar.y"
+#line 1974 "grammar.y"
     {
 		    if (i_oarr > 0  &&  n_oarr == 0)
 			n_oarr = i_oarr;
@@ -4286,21 +4282,21 @@ yyreduce:
     break;
 
   case 253:
-#line 1983 "grammar.y"
+#line 1982 "grammar.y"
     {
 			index_cnt = 1;
 		}
     break;
 
   case 254:
-#line 1986 "grammar.y"
+#line 1985 "grammar.y"
     {
 			index_cnt++;
 		}
     break;
 
   case 256:
-#line 1992 "grammar.y"
+#line 1991 "grammar.y"
     {
 			if (!errcnt)
 			    compile (PUSHINDEX, 0);
@@ -4308,7 +4304,7 @@ yyreduce:
     break;
 
   case 257:
-#line 1997 "grammar.y"
+#line 1996 "grammar.y"
     { 
 			if (!errcnt) {
 			    compile (PUSHPARAM, stkop((yyvsp[(1) - (1)]))->o_val.v_s);
@@ -4318,7 +4314,7 @@ yyreduce:
     break;
 
   case 258:
-#line 2003 "grammar.y"
+#line 2002 "grammar.y"
     {
 			int  i1, i2, mode;
 
@@ -4343,7 +4339,7 @@ yyreduce:
     break;
 
   case 259:
-#line 2024 "grammar.y"
+#line 2023 "grammar.y"
     {
 			/*  There is an ambiguity in the grammar between
 			 *  sexagesimal constants, and array range references.
@@ -4375,28 +4371,28 @@ yyreduce:
     break;
 
   case 260:
-#line 2058 "grammar.y"
+#line 2057 "grammar.y"
     {
 		    (yyval) = (yyvsp[(1) - (1)]);
 		}
     break;
 
   case 261:
-#line 2063 "grammar.y"
+#line 2062 "grammar.y"
     {
 		    (yyval) = (yyvsp[(1) - (1)]);
 		}
     break;
 
   case 262:
-#line 2068 "grammar.y"
+#line 2067 "grammar.y"
     {
 		    (yyval) = (yyvsp[(1) - (1)]);
 		}
     break;
 
   case 264:
-#line 2074 "grammar.y"
+#line 2073 "grammar.y"
     {
 		    /* If statements are delimited by ';'s, do not execute
 		     * until next newline EOST is received.
@@ -4406,23 +4402,23 @@ yyreduce:
     break;
 
   case 270:
-#line 2096 "grammar.y"
+#line 2095 "grammar.y"
     { parenlevel++; }
     break;
 
   case 271:
-#line 2099 "grammar.y"
+#line 2098 "grammar.y"
     { --parenlevel; }
     break;
 
   case 272:
-#line 2102 "grammar.y"
+#line 2101 "grammar.y"
     { sawnl = 1; }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 4426 "y.tab.c"
+#line 4425 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -4468,7 +4464,7 @@ yyerrlab:
 	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
 	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
 	    if (yymsg != yymsgbuf)
-	      YYSTACK_FREE (yymsg);
+	      YYSTACK_FREE ((char *)yymsg);
 	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
 	    if (yymsg)
 	      yymsg_alloc = yyalloc;
@@ -4625,18 +4621,18 @@ yyreturn:
     }
 #ifndef yyoverflow
   if (yyss != yyssa)
-    YYSTACK_FREE (yyss);
+    YYSTACK_FREE ((char *)yyss);
 #endif
 #if YYERROR_VERBOSE
   if (yymsg != yymsgbuf)
-    YYSTACK_FREE (yymsg);
+    YYSTACK_FREE ((char *)yymsg);
 #endif
   /* Make sure YYID is used.  */
   return YYID (yyresult);
 }
 
 
-#line 2105 "grammar.y"
+#line 2104 "grammar.y"
 
 
 #include "lexyy.c"

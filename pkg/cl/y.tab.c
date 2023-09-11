@@ -428,6 +428,7 @@ YYID (i)
 #    define YYSTACK_ALLOC alloca
 #    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
+#     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #     ifndef _STDLIB_H
 #      define _STDLIB_H 1
 #     endif
@@ -455,6 +456,7 @@ YYID (i)
 #  if (defined __cplusplus && ! defined _STDLIB_H \
        && ! ((defined YYMALLOC || defined malloc) \
 	     && (defined YYFREE || defined free)))
+#   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   ifndef _STDLIB_H
 #    define _STDLIB_H 1
 #   endif
@@ -1336,6 +1338,7 @@ while (YYID (0))
 #if YYDEBUG
 
 # ifndef YYFPRINTF
+#  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYFPRINTF fprintf
 # endif
 
@@ -1933,7 +1936,7 @@ yyparse ()
 
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
-	  YYSTACK_FREE ((char *)yyss1);
+	  YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -4331,7 +4334,7 @@ yyerrlab:
 	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
 	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
 	    if (yymsg != yymsgbuf)
-	      YYSTACK_FREE ((char *)yymsg);
+	      YYSTACK_FREE (yymsg);
 	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
 	    if (yymsg)
 	      yymsg_alloc = yyalloc;
@@ -4488,11 +4491,11 @@ yyreturn:
     }
 #ifndef yyoverflow
   if (yyss != yyssa)
-    YYSTACK_FREE ((char *)yyss);
+    YYSTACK_FREE (yyss);
 #endif
 #if YYERROR_VERBOSE
   if (yymsg != yymsgbuf)
-    YYSTACK_FREE ((char *)yymsg);
+    YYSTACK_FREE (yymsg);
 #endif
   /* Make sure YYID is used.  */
   return YYID (yyresult);

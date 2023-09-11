@@ -12,7 +12,22 @@
 #include "grammar.h"
 #include "task.h"
 #include "clmodes.h"
-#include "proto.h"
+
+
+char *gquery (struct param *pp, char *string);
+char *minmax (register  struct param *pp);
+char *enumin (register  struct param *pp);
+
+
+extern  void  paramset (register struct param *pp,  int   field);
+extern  void  paramget (register struct param *pp,  int   field);
+extern  void  fprop (struct _iobuf *fp, struct operand *op);
+extern  void  sprop (register char *outstr, register struct operand *op);
+extern  void  poffset (int off);
+extern  int   range_check (struct param *pp);
+extern  int   getoffset (struct param *pp);
+extern  int   inrange (register struct param *pp, register struct operand *op);
+extern  void  poffset (int off);
 
 
 /* Contains modified portions of modes.c for range checking etc. for use
@@ -39,7 +54,6 @@ gquery (struct param *pp, char *string)
 	char	*query_status, *nlp, *errmsg;
 	int	arrflag=0, offset=0, bastype=0, batch=0;
 	struct	operand o;
-	char	*strcpy(), *index();
 
 	bastype = pp->p_type & OT_BASIC;
 	batch   = firstask->t_flags & T_BATCH;

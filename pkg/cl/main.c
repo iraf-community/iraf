@@ -12,6 +12,7 @@
 #define	import_prtype
 #define	import_xwhen
 #define import_xnames
+#define import_finfo
 #include <iraf.h>
 
 #include <ctype.h>
@@ -24,7 +25,59 @@
 #include "task.h"
 #include "errs.h"
 #include "mem.h"
-#include "proto.h"
+
+
+int    cmain_ (int *prtype, short *bkgfile, short *cmd);
+void   cl_amovi (register int *ip, register int *op, register int len);
+void   onerr (void);
+void   onint (int *vex, int (**next_handler) (void));
+void   clexit (void);
+void   clshutdown (void);
+void   intr_disable (void);
+void   intr_enable (void);
+void   intr_reset (void);
+char  *memneed (int incr);
+
+extern  void  oneof (void);
+extern  void  run (void);
+extern  void  rerun (void);
+extern  void  pr_prunecache (int pno);
+extern  void  yy_startblock (int logflag);
+extern  void  bkg_update (int pmsg);
+extern  void  close_logfile (char *fname);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  restor (struct task *tp);
+extern  void  iofinish (register  struct task *tp);
+extern  void  clgflush (void);
+extern  void  pr_dumpcache (int pid,  int   break_locks);
+extern  void  bkg_startup (char *bkgfile);
+extern  void  setclmodes (struct task *tp);
+extern  void  setbuiltins (register  struct package *pkp);
+extern  void  erract_init (void);
+extern  void  bkg_abort (void);
+
+extern  int   compile (int opcode, ...);
+extern  int   yyparse (void);
+extern  int   onipc (int *vex, int (**next_handler) (void));
+extern  void  bkg_spawn (char *cmd);
+extern  char *comdstr (char *s);
+
+extern  struct task *pushtask (void);
+extern  struct ltask *newltask (register struct package *pkp, char *lname,
+                                char *pname,  struct ltask *oldltp);
+extern  struct ltask *newltask (register struct package *pkp, char *lname,
+                                char *pname, struct ltask *oldltp);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct pfile *pfileload (register struct ltask *ltp);
+extern  struct package *newpac (char *name, char *bin);
+extern  struct param *addparam (struct pfile *pfp, char *buf,
+                                struct _iobuf *fp);
+
+extern  void  *memset (void *s, int c, unsigned long n);
+
+extern  int   PRPSINIT (void);
+extern  int   XMJBUF (XPOINTER *bp);
+
 
 
 #define CLDIR	"cl$"
@@ -81,13 +134,11 @@ long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 int	logout_status = 0;	/* optional status arg to logout()	*/
 
 
-static void execute();
-static void login(), logout();
-static void startup(), shutdown();
+static  void execute (int mode);
+static  void login (char *cmd), logout (void);
+static  void startup (void), shutdown (void);
+static  char *file_concat (char  *in1, char  *in2);
 
-extern void ZDOJMP();
-extern void c_xwhen(), onint();
-extern int yyparse();
 
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.
@@ -192,8 +243,6 @@ clshutdown (void)
 static void
 startup (void)
 {
-	void	onint(), onipc(), c_xwhen();
-
 	/* Set up pointers to dictionary buffer.
 	 */
 	dictionary = cl_dictbuf;
@@ -662,7 +711,7 @@ intr_enable (void)
 
 	if (--intr_sp < 0)
 	    cl_error (E_IERR, "interrupt save stack underflow");
-	c_xwhen (X_INT, intr_save[intr_sp], &junk);
+	c_xwhen (X_INT, (PFI)intr_save[intr_sp], &junk);
 }
 
 
@@ -674,7 +723,7 @@ intr_reset (void)
 {
 	PFI	junk;
 
-	c_xwhen (X_INT, onint, &junk);
+	c_xwhen (X_INT, (PFI)onint, &junk);
 	intr_sp = 0;
 }
 

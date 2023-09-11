@@ -15,7 +15,6 @@
 #include "opcodes.h"
 #include "errs.h"
 #include "construct.h"
-#include "proto.h"
 
 /*
  * OPCODES -- This is the instruction set that forms the internal language of
@@ -37,13 +36,58 @@
 extern	int cldebug;
 extern	char *nullstr;
 int	binpipe;			/* last pipe binary or text ? */
-char	*comdstr();
-extern	struct param *ppfind();		/* search task psets for param */
 extern	int currentline;
 
 
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  paramset (register  struct param *pp, int field);
+extern  void  validparamget (register  struct param *pp, int field);
+extern  void  paramget (register  struct param *pp, int field);
+extern  void  psetreload (struct pfile *main_pfp, struct param *psetp);
+extern  void  binop (int opcode);
+extern  void  opcast (int newtype);
+extern  void  binexp (int opcode);
+extern  void  query (struct param *pp);
+extern  void  prop (struct operand *op);
+extern  void  unexp (int opcode);
+extern  void  clsystem (char *cmd, struct _iobuf *taskout,
+                        struct _iobuf *taskerr);
+extern  void  pushmem (memel v);
+extern  void  delpipes (register int npipes);
+extern  void  cl_scanf (char *format, int nargs, char *input);
+extern  void  clscanf (void);
+extern  void  cl_scanf (char *format, int nargs, char *input);
+extern  void  cl_scan (int nargs, char *source);
+extern  void  cl_scanf (char *format, int nargs, char *input);
+extern  void  unop (int opcode);
+extern  void  callnewtask (char *name);
+extern  void  execnewtask (void);
+extern  void  opindir (void);
+extern  void  intrfunc (char *fname, int nargs);
+extern  int   tprintf (char *fmt, ...);
+extern  int   scanftype (struct param *pp, struct operand *o);
+extern  int   inrange (register struct param *pp, register struct operand *op);
+extern  char *addpipe (void);
+extern  char *getpipe (void);
+extern  char *comdstr (char *s);
+extern  char *memneed (int incr);
+extern  struct param *newfakeparam (struct pfile *pfp, char *name,
+                                    int pos, int type, int string_len);
+extern  struct param *paramsrch (char *pkname, char *ltname, char *pname);
+extern  struct param *paramfind (struct pfile *pfp, char *pname,
+                                 int pos, int exact);
+extern  struct param *ppfind (struct pfile *pfp, char *tn, char *pn,
+                              int pos, int abbrev);
+extern  struct package *pacfind (char *name);
+extern  struct ltask *cmdsrch (char *pkname, char *ltname);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname, struct package **o_pkp);
+extern  struct operand readlist (struct param *pp);
+
+
 void 
-o_undefined (void)
+o_undefined (memel *argp)
 {
 	cl_error (E_IERR, e_uopcode, 0);
 }
@@ -94,7 +138,7 @@ o_absargset (memel *argp)
 /* <op1> <op2> . <op2 + op1>
  */
 void 
-o_add (void)
+o_add (memel *argp)
 {
 	binop (OP_ADD);
 }
@@ -147,7 +191,7 @@ o_addassign (memel *argp)
  * includes stdout as well as stderr.
  */
 void 
-o_allappend (void)
+o_allappend (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -181,7 +225,7 @@ o_allappend (void)
  * redirect everything, including the stderr channel.
  */
 void 
-o_allredir (void)
+o_allredir (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -213,7 +257,7 @@ o_allredir (void)
 /* <op1> <op2> . <op1 && op2>
  */
 void 
-o_and (void)
+o_and (memel *argp)
 {
 	binexp (OP_AND);
 }
@@ -221,7 +265,7 @@ o_and (void)
 /* <name of file to be appended> .
  */
 void 
-o_append (void)
+o_append (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -289,7 +333,7 @@ o_call (memel *argp)
 /* <op> . <- op>
  */
 void 
-o_chsign (void)
+o_chsign (memel *argp)
 {
 	unop (OP_MINUS);
 }
@@ -298,7 +342,7 @@ o_chsign (void)
  * string concatenation
  */
 void 
-o_concat (void)
+o_concat (memel *argp)
 {
 	binop (OP_CONCAT);
 }
@@ -306,13 +350,13 @@ o_concat (void)
 /* <op1> <op2> . <op1 / op2>
  */
 void 
-o_div (void)
+o_div (memel *argp)
 {
 	binop (OP_DIV);
 }
 
 void 
-o_doend (void)
+o_doend (memel *argp)
 {
 }
 
@@ -379,7 +423,7 @@ o_catassign (memel *argp)
 /* <op1> <op2> . <op1 == op2>
  */
 void 
-o_eq (void)
+o_eq (memel *argp)
 {
 	binexp (OP_EQ);
 }
@@ -387,7 +431,7 @@ o_eq (void)
 /* run the newtask. see exec.c.
  */
 void 
-o_exec (void)
+o_exec (memel *argp)
 {
 	execnewtask ();
 }
@@ -395,7 +439,7 @@ o_exec (void)
 /* <op1> <op2> . <op1 > op2>
  */
 void 
-o_ge (void)
+o_ge (memel *argp)
 {
 	binexp (OP_GE);
 }
@@ -415,7 +459,7 @@ o_dogoto (memel *argp)
 /* <op1> <op2> . <op1 > op2>
  */
 void 
-o_gt (void)
+o_gt (memel *argp)
 {
 	binexp (OP_GT);
 }
@@ -617,7 +661,7 @@ o_intrinsic (memel *argp)
 /* <op1> <op2> . <op1 <= op2>
  */
 void 
-o_le (void)
+o_le (memel *argp)
 {
 	binexp (OP_LE);
 }
@@ -625,7 +669,7 @@ o_le (void)
 /* <op1> <op2> . <op1 < op2>
  */
 void 
-o_lt (void)
+o_lt (memel *argp)
 {
 	binexp (OP_LT);
 }
@@ -633,7 +677,7 @@ o_lt (void)
 /* <op1> <op2> . <op2 * op1>
  */
 void 
-o_mul (void)
+o_mul (memel *argp)
 {
 	binop (OP_MUL);
 }
@@ -659,7 +703,7 @@ o_mulassign (memel *argp)
 /* <op1> <op2> . <op1 != op2>
  */
 void 
-o_ne (void)
+o_ne (memel *argp)
 {
 	binexp (OP_NE);
 }
@@ -667,7 +711,7 @@ o_ne (void)
 /* <op> . <!op>
  */
 void 
-o_not (void)
+o_not (memel *argp)
 {
 	unexp (OP_NOT);
 }
@@ -675,7 +719,7 @@ o_not (void)
 /* <op1> <op2> . <op1 || op2>
  */
 void 
-o_or (void)
+o_or (memel *argp)
 {
 	binexp (OP_OR);
 }
@@ -734,7 +778,7 @@ o_posargset (memel *argp)
 /* <op1> <op2> . <op1 ** op2>
  */
 void 
-o_dopow (void)
+o_dopow (memel *argp)
 {
 	binop (OP_POW);
 }
@@ -746,7 +790,7 @@ o_dopow (void)
  * be printed.
  */
 void 
-o_doprint (void)
+o_doprint (memel *argp)
 {
 	/* This is not used -- print is imp. as a builtin task.
 	struct operand o;
@@ -760,7 +804,7 @@ o_doprint (void)
  * used to print an operand on the stack. not to be confused with doprint.
  */
 void 
-o_immed (void)
+o_immed (memel *argp)
 {
 	struct operand o;
 
@@ -789,11 +833,13 @@ o_pushconst (memel *argp)
 
 /* Push an index value onto the control stack for later use
  * when the parameter is accessed.
+o_pushindex (int *mode)
  */
 void 
-o_pushindex (int *mode)
+o_pushindex (memel *argp)
 {
 	struct operand op;
+	int *mode = (int *) argp;
 
 	 if (cldebug)
 	    printf ("PUSHINDEX: mode=%d loopset=%d\n", *mode, imloopset);
@@ -856,7 +902,7 @@ o_pushparam (memel *argp)
 /* <name of file to be used as stdout> .
  */
 void 
-o_redir (void)
+o_redir (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -889,7 +935,7 @@ o_redir (void)
 /* <name of file to be used as stdin> .
  */
 void 
-o_redirin (void)
+o_redirin (memel *argp)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -1004,7 +1050,6 @@ o_dogetpipe (
 )
 {
 	struct	operand o;
-	char	*getpipe(), *comdstr();
 
 	/* GETPIPE is called immediately before REDIRIN and before EXEC so we
 	 * do not have to worry about storing the pipefile name in the dict.
@@ -1028,7 +1073,7 @@ o_rmpipes (memel *argp)
 
 
 void 
-o_doreturn (void)
+o_doreturn (memel *argp)
 {
 	eprintf ("return not implemented\n");
 }
@@ -1039,7 +1084,7 @@ o_doreturn (void)
  * input.
  */
 void 
-o_doscan (void)
+o_doscan (memel *argp)
 {
 	struct operand o;
 
@@ -1048,7 +1093,7 @@ o_doscan (void)
 }
 
 void 
-o_doscanf (void)
+o_doscanf (memel *argp)
 {
 	struct operand o;
 	struct operand o_sv[64];
@@ -1084,7 +1129,7 @@ o_doscanf (void)
  * destination params.
  */
 void 
-o_dofscan (void)
+o_dofscan (memel *argp)
 {
 	struct operand o;
 
@@ -1093,7 +1138,7 @@ o_dofscan (void)
 }
 
 void 
-o_dofscanf (void)
+o_dofscanf (memel *argp)
 {
 	struct operand o, o_sv[64];
 	char	format[SZ_LINE];
@@ -1141,7 +1186,7 @@ o_dofscanf (void)
 /* <op1> <op2> . <op1 - op2>
  */
 void 
-o_sub (void)
+o_sub (memel *argp)
 {
 	binop (OP_SUB);
 }
@@ -1171,13 +1216,14 @@ o_subassign (memel *argp)
 
 /* Doswitch finds the appropriate location to jump to in the
  * jump table and goes there.
+o_doswitch (int *jmpdelta)
  */
 void 
-o_doswitch (int *jmpdelta)
-
+o_doswitch (memel *argp)
 {
 	int pdft, icase, jmptable;
 	int value=0;
+        int *jmpdelta = (int *)argp;
 	struct operand o;
 	memel delta;
 	/* Remember to subtract SZ_CE 'cuz PC has already been incremented. */
@@ -1306,7 +1352,7 @@ o_swon (memel *argp)
  * executed to load the language package, since it is the root package.
  */
 void 
-o_fixlanguage (void)
+o_fixlanguage (memel *argp)
 {
 	register struct ltask *ltp;
 
@@ -1323,7 +1369,7 @@ o_fixlanguage (void)
  * then precede it with "do" but alphabetize it according to its intended name.
  */
 
-void (*opcodetbl[])() = {
+void (*opcodetbl[])(memel *arg) = {
 /*  0 */	o_undefined,
 
 /*  1 */	o_absargset,

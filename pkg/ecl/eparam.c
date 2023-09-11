@@ -94,9 +94,72 @@ int	eh_readline 	= YES;		/* use readline() for terminal input  */
 #endif
 int	eh_longprompt 	= YES;		/* print full package name as prompt  */
 
-char	*e_tonextword(), *e_toprevword(), *index();
-
 char	epar_cmdbuf[SZ_LINE];
+
+int   epset (char *pset);
+int   eparam (struct ep_context *cx, int *update, int *nextcmd, char *nextpset);
+
+char *e_tonextword (register char *ip);
+char *e_toprevword (char *ip, char *string);
+char *e_getfield (register char *ip, char *outstr,  int   maxch);
+int   e_makelist (struct pfile *pfileptr);
+int   e_testtop (int cur,  int   new);
+void  e_repaint (void);
+void  e_pheader (struct pfile *pfp,  int   cmdline,  int   maxcol);
+void  e_drawkey (void);
+void  e_encode_vstring (struct param *pp, char *outbuf);
+void  e_check_vals (char *string);
+int   e_undef (register char *s);
+void  e_rpterror (char *errstr);
+void  e_clrerror (void);
+void  e_moreflag (register  int   topkey);
+void  e_scrollit (void);
+int   edit_history_directive (char *args, char *new_cmd);
+int   editstring (char *string,  int   eparam);
+void  e_ttyinit (void);
+int   e_colon (void);
+int   e_psetok (char *pset);
+void  e_puterr (char *errmsg);
+void  e_ttyexit (void);
+int   e_moveup (int eparam);
+int   e_movedown (int eparam);
+void  e_ctrl (char *cap);
+void  e_goto (int col,  int   line);
+void  e_putline (char *stwing);
+void  e_clear (void);
+void  e_clrline (void);
+void  e_display (char *string,  int   sline,  int   scol);
+void  e_displayml (char *string,  int   sline,  int   scol,  int   ccol);
+
+extern  int   what_record (void);
+extern  int   process_history_directive (char *directive,
+                                         char *new_command_block);
+extern  void  sprop (register char *outstr, register  struct operand *op);
+extern  void  spparval (char *outstr,  struct param *pp);
+extern  void  edtinit (void);
+extern  void  edtexit (void);
+extern  void  put_history (char *command);
+extern  void  show_editorhelp (void);
+extern  void  pfileunlink (register  struct pfile *pfp);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  poffset (int off);
+extern  void  paramget (register  struct param *pp,  int   field);
+extern  void  pfileupdate (struct pfile *pfp);
+extern  void  pfcopyback (struct pfile *pff);
+extern  char *enumin (register  struct param *pp);
+extern  char *minmax (register  struct param *pp);
+extern  char *gquery (struct param *pp, char *string);
+extern  int   pfilemerge (struct pfile *npf, char *opfile);
+extern  int   pfilewrite (struct pfile *pfp, char *pfilename);
+extern  int   get_history (int record, char *command,  int   maxch);
+extern  int   is_pfilename (char *opstr);
+extern  int   what_cmd (int first_char);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct pfile *pfileread (struct ltask *ltp, char *pfilename,  int   checkmode);
+extern  struct pfile *pfilecopy (register  struct pfile *pfp);
+extern  struct pfile *pfilesrch (char *pfilepath);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,  struct package **o_pkp);
 
 
 
@@ -215,7 +278,7 @@ eparam (
 
 	/* When we are called to edit a file, the ltask ptr is NULL.
 	 */
-	if (ep_filemode = (pfilep->pf_ltp == NULL))
+	if ((ep_filemode = (pfilep->pf_ltp == NULL)))
 	    topline--;			/* room for one more param line */
 
 	numkeys = e_makelist (pfilep);	/* initialize parameter list	*/
@@ -412,7 +475,7 @@ e_testtop (
 
 /* E_REPAINT -- Repaint the current screen.
  */
-int 
+void 
 e_repaint (void)
 {
 	static	char *static_prompt = "--------- parameter array ---------";
@@ -487,7 +550,7 @@ e_repaint (void)
 
 /* E_PHEADER -- Print the EPARAM form header.
  */
-int 
+void 
 e_pheader (
     struct pfile *pfp,		/* pfile pointer		*/
     int cmdline,		/* terminal command line number	*/
@@ -556,7 +619,7 @@ e_pheader (
  * For maximum drawing speed output is optimized using line clears and screen 
  * gotos rather than blanks to erase and position text.
  */
-int 
+void 
 e_drawkey (void)
 {
 	char	valuebuf[MAXPROMPT];
@@ -617,10 +680,12 @@ e_drawkey (void)
 /* E_INDENT_PROMPT -- Must handle multiline prompts, i.e. prompt string may
  * have imbedded newlines.  Convert newline into newline plus the number of
  * spaces to indent.
-e_indent_prompt (p, bp, indent)
-char	*p;
-char	*bp;
-int	indent;
+void
+e_indent_prompt (
+    char  *p,
+    char  *bp,
+    int	   indent
+)
 {
 	register int	i;
 	register char	c;
@@ -637,7 +702,7 @@ int	indent;
  * get several of the values.  If it is an array, make sure the undefined values
  * get a '***', without calling spparval (which would bomb).
  */
-int 
+void 
 e_encode_vstring (struct param *pp, char *outbuf)
 {
 	char valuebuf[G_MAXSTRING];
@@ -703,10 +768,9 @@ e_encode_vstring (struct param *pp, char *outbuf)
  * the array and check it.  Also check whether there are enough elements in the
  * array.  In any case, if gquery returns an error, report that to the user.
  */
-int 
+void 
 e_check_vals (char *string)
 {
-	char *gquery();		/* declare gquery as returning a pointer  */
 	char *errstr;		/* pointer to the error string (or 0)     */
 	char message[SZ_LINE+1];/* error message string			  */
 	int  badnews;		/* a flag if an array element is in error */
@@ -723,7 +787,7 @@ e_check_vals (char *string)
 
 	if (isarray) {
 	    char    outstring[G_MAXSTRING];
-	    char    *in, *out, *e_getfield();
+	    char    *in, *out;
 	    int	    first, nelem, flen;
 	    
 	    /* Get the length of the first dimension, and the starting point.
@@ -808,7 +872,7 @@ static	char	message[SZ_LINE];	/* used by e_rpterror and e_clrerror */
 
 /* E_RPTERROR -- Report the error for the eparam user.
  */
-int 
+void 
 e_rpterror (char *errstr)
 {
 	char	*range;		/* pointer to the range error string	*/
@@ -842,7 +906,7 @@ e_rpterror (char *errstr)
 
 /* E_CLRERROR -- Clear the error line, i.e. the last error message.
  */
-int 
+void 
 e_clrerror (void)
 {
 	register int	i, len;
@@ -895,11 +959,11 @@ e_getfield (
 /* E_MOREFLAG -- Signal that there are more parameters above or below the
  * window.
  */
-int 
+void 
 e_moreflag (register int topkey)
 {
 	if ((numkeys == botkey) && (topkey == 1))
-	    return 0;
+	    return;
 
 	if (botkey < numkeys) {
 	    e_ctrl ("so");
@@ -927,7 +991,7 @@ e_moreflag (register int topkey)
 
 /* E_SCROLLIT -- Scroll the window if possible.
  */
-int 
+void 
 e_scrollit (void)
 {
 	register int i;
@@ -1540,7 +1604,7 @@ editstring (
 /* E_TTYINIT -- Initialize the terminal, i.e., set raw mode and standout mode
  * (if enabled).  Get dimensions of terminal screen.
  */
-int 
+void 
 e_ttyinit (void)
 {
 	/* Open the tty (termcap) descriptor for the terminal.
@@ -1644,7 +1708,7 @@ again_:
 	ch = *ip++;
 	if (ch == 'g' && *ip == 'o')
 	    ip++;
-	if (force = (*ip == '!'))
+	if ((force = (*ip == '!')))
 	    ip++;
 	for (;  isspace (*ip);  ip++)
 	    ;
@@ -1862,7 +1926,7 @@ error_:
 
 /* E_PUTERR -- Put an error message on the command line.
  */
-int 
+void 
 e_puterr (char *errmsg)
 {
 	c_ttygoto (tty_fd, tty, 1, cmdline);
@@ -1874,7 +1938,7 @@ e_puterr (char *errmsg)
 /* E_TTYEXIT -- Turn off raw mode and standout mode and close the termcap
  * descriptor, leaving everything as we found it.
  */
-int 
+void 
 e_ttyexit (void)
 {
 	c_fseti (fileno(stdin), F_RAW, NO);	/* unset raw mode */
@@ -2009,14 +2073,14 @@ e_toprevword (char *ip, char *string)
 
 /* E_CTRL -- Send a control sequence to the terminal.
  */
-int 
+void 
 e_ctrl (char *cap)
 {
 	/* Check for start standout or start underline mode.
 	 */
 	if (strcmp(cap,"so") == 0 || strcmp(cap,"us") == 0)
 	    if (standout == NO)
-		return 0;
+		return;
 
 	c_ttyctrl (tty_fd, tty, cap, 1);
 }
@@ -2024,7 +2088,7 @@ e_ctrl (char *cap)
 
 /* E_GOTO -- High level edcap version of ttygoto (cursor addressing).
  */
-int 
+void 
 e_goto (int col, int line)
 {
 	c_ttygoto (tty_fd, tty, col, line);
@@ -2034,7 +2098,7 @@ e_goto (int col, int line)
 /* E_PUTLINE -- Put a line of text to the terminal.  Do not map any embedded
  * control codes (bell will get lost).
  */
-int 
+void 
 e_putline (char *stwing)
 {
 	register char	*ip, *op;
@@ -2066,7 +2130,7 @@ e_putline (char *stwing)
 
 /* E_CLEAR -- Clear the screen (disables standout mode as a side effect).
  */
-int 
+void 
 e_clear (void)
 {
 	c_ttyctrl (tty_fd, tty, "se", 1);
@@ -2077,7 +2141,7 @@ e_clear (void)
 
 /* E_CLRLINE -- Clear the current line.
  */
-int 
+void 
 e_clrline (void)
 {
 	c_ttyclearln (tty_fd, tty);
@@ -2088,7 +2152,7 @@ e_clrline (void)
  * coordinates.  Each line is written starting at the same column on the
  * screen.
  */
-int 
+void 
 e_display (
     char *string,		/* string to be printed		*/
     int sline,
@@ -2104,7 +2168,7 @@ e_display (
  * line begins with \r (CR) it will be displayed starting at column 1, rather
  * than starting at column scol.
  */
-int 
+void 
 e_displayml (
     char *string,		/* string to be printed			*/
     int sline,

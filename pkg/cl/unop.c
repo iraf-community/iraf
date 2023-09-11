@@ -14,7 +14,17 @@
 #include "errs.h"
 #include "task.h"
 #include "param.h"
-#include "proto.h"
+
+
+void  unop (int opcode);
+void  unexp (int opcode);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  opcast (int newtype);
+extern  int   defpar (char *param_spec);
+extern  int   deftask (char *task_spec);
+extern  int   defpac (char *pkname);
+extern  int   defvar (char *envvar);
 
 extern	int	cldebug;
 
@@ -34,8 +44,7 @@ extern	int	cldebug;
  * internal error or an undefined string operation.
  */
 void
-unop (opcode)
-int	opcode;
+unop (int opcode)
 {
 	register int out_type;		/* bool, int, real, string	*/
 	register int in_type;		/* bool, int, real, string	*/
@@ -45,7 +54,6 @@ int	opcode;
 	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];
 	char	ch, sbuf[SZ_LINE];
-	char	*envget();
 	int 	i;
 
 	o = popop();			/* pop operand from stack	*/
@@ -337,8 +345,7 @@ pushresult:
  *   there is no automatic type coercion for booleans.
  */
 void
-unexp (opcode)
-int	opcode;
+unexp (int opcode)
 {
 	struct	operand o, result;
 	int	type;

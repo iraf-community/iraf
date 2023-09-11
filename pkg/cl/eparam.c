@@ -18,7 +18,6 @@
 #include "grammar.h"
 #include "task.h"
 #include "eparam.h"
-#include "proto.h"
 
 
 /*
@@ -90,7 +89,72 @@ int	eh_standout = YES;		/* ehist default for standout         */
 int	eh_bol      = NO;		/* start ehist at beginning of line   */
 int	eh_verify   = NO;		/* use ehist with history meta-chars  */
 
-char	*e_tonextword(), *e_toprevword(), *index();
+int   epset (char *pset);
+int   eparam (struct ep_context *cx, int *update, int *nextcmd, char *nextpset);
+
+char *e_tonextword (register char *ip);
+char *e_toprevword (char *ip, char *string);
+char *e_getfield (register char *ip, char *outstr,  int   maxch);
+int   e_makelist (struct pfile *pfileptr);
+int   e_testtop (int cur,  int   new);
+void  e_repaint (void);
+void  e_pheader (struct pfile *pfp,  int   cmdline,  int   maxcol);
+void  e_drawkey (void);
+void  e_encode_vstring (struct param *pp, char *outbuf);
+void  e_check_vals (char *string);
+int   e_undef (register char *s);
+void  e_rpterror (char *errstr);
+void  e_clrerror (void);
+int   e_moreflag (register  int   topkey);
+int   e_scrollit (void);
+int   edit_history_directive (char *args, char *new_cmd);
+int   editstring (char *string,  int   eparam);
+void  e_ttyinit (void);
+int   e_colon (void);
+int   e_psetok (char *pset);
+void  e_puterr (char *errmsg);
+void  e_ttyexit (void);
+int   e_moveup (int eparam);
+int   e_movedown (int eparam);
+void  e_ctrl (char *cap);
+void  e_goto (int col,  int   line);
+void  e_putline (char *stwing);
+void  e_clear (void);
+void  e_clrline (void);
+void  e_display (char *string,  int   sline,  int   scol);
+void  e_displayml (char *string,  int   sline,  int   scol,  int   ccol);
+
+extern  int   what_record (void);
+extern  int   process_history_directive (char *directive,
+                                         char *new_command_block);
+extern  void  sprop (register char *outstr, register  struct operand *op);
+extern  void  spparval (char *outstr,  struct param *pp);
+extern  void  edtinit (void);
+extern  void  edtexit (void);
+extern  void  put_history (char *command);
+extern  void  show_editorhelp (void);
+extern  void  pfileunlink (register  struct pfile *pfp);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  poffset (int off);
+extern  void  paramget (register  struct param *pp,  int   field);
+extern  void  pfileupdate (struct pfile *pfp);
+extern  void  pfcopyback (struct pfile *pff);
+extern  char *enumin (register  struct param *pp);
+extern  char *minmax (register  struct param *pp);
+extern  char *gquery (struct param *pp, char *string);
+extern  int   pfilemerge (struct pfile *npf, char *opfile);
+extern  int   pfilewrite (struct pfile *pfp, char *pfilename);
+extern  int   get_history (int record, char *command,  int   maxch);
+extern  int   is_pfilename (char *opstr);
+extern  int   what_cmd (int first_char);
+extern  struct pfile *pfileload (register  struct ltask *ltp);
+extern  struct pfile *pfileread (struct ltask *ltp, char *pfilename,  int   checkmode);
+extern  struct pfile *pfilecopy (register  struct pfile *pfp);
+extern  struct pfile *pfilesrch (char *pfilepath);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,  struct package **o_pkp);
+
+
 
 
 /* EPSET -- Edit a parameter set.  Once in the parameter set editor, editor
@@ -702,7 +766,6 @@ e_check_vals (
   char    *string
 )
 {
-	char *gquery();		/* declare gquery as returning a pointer  */
 	char *errstr;		/* pointer to the error string (or 0)     */
 	char message[SZ_LINE+1];/* error message string			  */
 	int  badnews;		/* a flag if an array element is in error */
@@ -718,8 +781,7 @@ e_check_vals (
 	}
 
 	if (isarray) {
-	    char    outstring[G_MAXSTRING];
-	    char    *in, *e_getfield();
+	    char    *in, outstring[G_MAXSTRING];
 	    int	    first, nelem, flen;
 	    
 	    /* Get the length of the first dimension, and the starting point.

@@ -27,11 +27,6 @@ struct yysvf {
 	int *yystops;};
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
-
-int yyback (int *p, int m);
-int yylook (void);
-int traverse (char delim);
-
 # define YYNEWLINE 10
 int 
 lex_yylex (void){
@@ -151,7 +146,7 @@ case 28:
 	return (crackident (yytext));
 break;
 case 29:
-	{	extern int bracelevel;
+	{	extern bracelevel;
 			if (bracelevel) {
 	    eprintf ("ERROR: background not allowed within statement block\n");
 			    return ('#');
@@ -238,11 +233,12 @@ fprintf(yyout,"bad switch yylook %d",nstr);
  * the double quote convention.
  */
 int 
-traverse (char delim)
+traverse (int delim)
 {
 	register char *op, *cp, ch;
 	static	char *esc_ch  = "ntfr\\\"'";
 	static	char *esc_val = "\n\t\f\r\\\"\'";
+	char	*index();
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
 	    if (*op == delim) {
@@ -289,7 +285,6 @@ traverse (char delim)
 
 	*op = '\0';
 	yyleng = (op - yytext);
-        return (0);
 }
 int yyvstop[] = {
 0,
@@ -777,7 +772,7 @@ yylook (void){
 				}
 # endif
 			yyr = yyt;
-			if ( (struct yywork *)yyt > (struct yywork *)yycrank){
+			if ( (int)yyt > (int)yycrank){
 				yyt = yyr + yych;
 				if (yyt <= yytop && yyt->verify+yysvec == yystate){
 					if(yyt->advance+yysvec == YYLERR)	/* error transitions */
@@ -787,7 +782,7 @@ yylook (void){
 					}
 				}
 # ifdef YYOPTIM
-			else if((struct yywork *)yyt < (struct yywork *)yycrank) {		/* r < yycrank */
+			else if((int)yyt < (int)yycrank) {		/* r < yycrank */
 				yyt = yyr = yycrank+(yycrank-yyt);
 # ifdef LEXDEBUG
 				if(debug)fprintf(yyout,"compressed state\n");
@@ -898,10 +893,8 @@ yyinput (void){
 int 
 yyoutput (int c) {
 	output(c);
-        return (0);
 	}
 int 
 yyunput (int c) {
 	unput(c);
-        return (0);
 	}

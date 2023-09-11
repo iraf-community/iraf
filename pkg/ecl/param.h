@@ -200,6 +200,7 @@ struct pfile {
 #define	V_FILE		9
 
 
+#ifdef __OLD_PROTO
 char	*nextfield();		/* cracks next pfile line field		*/
 char	*makelower();		/* upper to lower, in place and return	*/
 
@@ -218,3 +219,4 @@ struct	pfile *pfilecopy();	/* make an in-core copy of a pfile	*/
 
 int	defpar();		/* determine whether param exists	*/
 int	defvar();		/* determine whether envvar exists	*/
+#endif

@@ -4,17 +4,23 @@
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_stdarg
 #include <iraf.h>
+
+#include <stdarg.h>
 
 #include "config.h"
 #include "operand.h"
 #include "param.h"
 #include "task.h"
 #include "errs.h"
-#include "proto.h"
 
-extern void u_doprnt();
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  u_doprnt (char *format, va_list *argp, FILE *fp);
+extern  void  spparval (char *outstr,  struct param *pp);
+
+int   qstrcmp (char *a, char *b);
+void  tprintf (char *fmt, ...);
+void  oprintf (char *fmt, ...);
 
 
 /*
@@ -131,7 +137,8 @@ strsort (
   int	nstr			/* number of strings */
 )
 {
-	extern	int qstrcmp();
+        extern void qsort (char *base, int n, int size,
+                           int (*compar)(char *,char *));
 
 	qsort ((char *)list, nstr, sizeof(char *), qstrcmp);
 }
@@ -140,10 +147,7 @@ strsort (
 /* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
  */
 int
-qstrcmp (
-  char	*a, 
-  char  *b
-)
+qstrcmp (char *a, char *b)
 {
 	return (strcmp (*(char **)a, *(char **)b));
 }

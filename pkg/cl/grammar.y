@@ -10,6 +10,7 @@
 #include "mem.h"
 #include "operand.h"
 #include "param.h"
+#include "eparam.h"
 #include "grammar.h"
 #include "opcodes.h"
 #include "clmodes.h"
@@ -97,9 +98,7 @@ extern	char	cmdblk[SZ_CMDBLK+1];	/* Command buffer in history.c */
 extern	char	*ip_cmdblk;		/* Pointer to current char in command.*/
 extern	char	*err_cmdblk;		/* ip_cmdblk when error detected. */
 
-char	*index();
-struct	param *initparam();
-struct	label *getlabel(), *setlabel();
+extern  int   yylex (void);
 
 /* arbitrary large number for bracelevel in a procedure script 
  */
@@ -297,7 +296,6 @@ script_body:	begin_stmt {
 			 */
 			if (cldebug)
 			    eprintf ("parse init (script_body)...\n");
-ready_();
 
 			errcnt     = 0;
 			err_cmdblk = 0;

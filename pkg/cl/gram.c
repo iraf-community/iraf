@@ -17,8 +17,60 @@
 #include "errs.h"
 #include "construct.h"
 #include "ytab.h"		/* pick up yacc token #defines		*/
-#include "proto.h"
 
+int    yywrap (void);
+void   yyerror (char *s);
+void   rerun (void);
+int    crackident (char *s);
+XINT   addconst (char *s,  int   t);
+void   listparams (struct pfile *pfp);
+void   pretty_param (struct param *pp,  struct _iobuf *fp);
+void   dumpparams (struct pfile *pfp);
+void   show_param (struct ltask *ltp,  struct param *pp,  struct _iobuf *fp);
+void   listhelp (struct package *pkp,  int   show_invis);
+void   listallhelp (int show_invis);
+void   breakout (char *full, char **pk, char **t, char **p, char **f);
+int    fieldcvt (register char *f);
+int    keyword (register char *tbl[], register char *s);
+void   intrfunc (char *fname,  int   nargs);
+struct operand sexa (char *s);
+void   sexa_to_index (double r,  int   *i1,  int   *i2);
+char  *addpipe (void);
+char  *getpipe (void);
+void   delpipes (register  int   npipes);
+char  *pipefile (int pipecode);
+void   loopincr (void);
+void   loopdecr (void);
+void   setswitch (void);
+int    in_switch (void);
+void   caseset (memel *parg,  int   ncaseval);
+struct label *setlabel (struct operand *name);
+struct label *getlabel (struct operand *name);
+void   setigoto (int loc);
+void   unsetigoto (int loc);
+int    make_imloop (int i1,  int   i2);
+int    y_typedef (char *key);
+void   p_position (void);
+
+extern  void  unop (int opcode);
+extern  void  binop (int opcode);
+extern  void  opcast (int newtype);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  pushmem (memel v);
+extern  void  sprop (register char *outstr, register  struct operand *op);
+extern  int   oprintf (char *fmt, ...);
+extern  int   strsort (char *list[],  int   nstr);
+extern  int   strtable (struct _iobuf *fp, char *list[], int nstr,
+                        int first_col, int last_col, int maxch, int ncol);
+extern  int   abbrev (void);
+extern  memel popmem (void);
+extern  char *memneed (int incr);
+extern  char *comdstr (char *s);
+extern  char *comdstr (char *s);
+extern  char *makelower (register char *cp);
+extern  char *pipefile (int pipecode);
+
+extern  XINT addconst (char *s,  int   t);
 
 /*
  * GRAM -- These routines are used by the parser and lex files grammar.y and
@@ -240,9 +292,7 @@ crackident (char *s)
  *   ((struct operand *)&dictionary[$1])->o_... in yacc specs.
  */
 XINT
-addconst (s, t)
-char	*s;
-int	t;
+addconst (char *s, int t)
 {
 	register struct operand *op;
 	XINT	lasttopd;
@@ -848,7 +898,6 @@ sexa (char *s)
 	int	n, sign;
 	int	hr, minutes;
 	float	sec;
-	extern double atof();
 
 	o.o_type = OT_REAL;
 	sign = (*s == '-') ? (s++, -1) : 1;
@@ -899,7 +948,6 @@ char *
 addpipe (void)
 {
 	static	int pipecode = 0;
-	char	*pipefile();
 
 	if (pipecode == 0)
 	    pipecode = c_getpid();
@@ -941,7 +989,6 @@ addpipe (void)
 char *
 getpipe (void)
 {
-	char	*pipefile();
 
 	if (nextpipe == 0)
 	    cl_error (E_IERR, "Pipestack underflow");
@@ -959,7 +1006,6 @@ delpipes (
 )
 {
 	register int pipe;
-	char	*pipefile();
 
 	if (npipes == 0) {
 	    while (nextpipe > 0)
@@ -984,7 +1030,6 @@ pipefile (
 {
 	static	char fname[SZ_PIPEFILENAME+1];
 	char	*dir;
-	char	*envget();
 
 	/* Put pipefiles in 'pipes' or 'uparm' if defined, else use tmp.  Do
 	 * not put pipe files in current directory or pipe commands will fail
@@ -1344,6 +1389,7 @@ y_typedef (char *key)
 	else
 	    cl_error (E_UERR, "illegal type specifier `%s'", key);
 	/*NOTREACHED*/
+        return (0);
 }
 
 

@@ -21,22 +21,17 @@ relink:
 	    $endif
 	    $ifolder (ytab.c,  grammar.y)
 		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+                $ifeq (MACH, linux, redhat, macintel, macosx)
+                    !yacc -vd grammar.y;
+                    !egrep -v "\<stdlib.h\>" y.tab.c | \
+                    sed -e "s/_FREE (/_FREE ((char *)/g" > ytab.c;
+                    !egrep -v "\<stdio.h\>" ytab.c > ntab.c; mv ntab.c ytab.c
+                    !mv y.tab.h ytab.h
+                $else
+                    !yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+                $endif
+                !rm -f y.tab.c y.output
 	    $endif
-	$endif
-
-	$ifeq (siteid, stsci)
-	$ifeq (hostid, vms)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex grammar.l
-		!@lex.com
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y
-	    $endif
-	$endif
 	$endif
 
 	$update libpkg.a

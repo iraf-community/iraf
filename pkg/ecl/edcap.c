@@ -13,10 +13,20 @@
 #include "param.h"
 #include "task.h"
 #include "eparam.h"
-#include "proto.h"
 
 
 #define	COLWIDTH	40		/* column width for showhelp	*/
+
+void get_editor (char *editor);
+
+extern  int   cmd_match (char *cstring,  int   nchars);
+extern  int   e_clear (void);
+extern  int   e_goto (int col,  int   line);
+extern  int   e_ctrl (char *cap);
+extern  int   e_putline (char *stwing);
+extern  int   strsort (char *list[],  int   nstr);
+extern  int   strtable (struct _iobuf *fp, char *list[], int nstr,
+                        int first_col, int last_col, int maxch, int ncol);
 
 
 /*-------------------------------------------------------------------------
@@ -39,7 +49,7 @@
  */
 
 static	char ed_editorcmd[SZ_LINE+1];
-static	void map_escapes();
+static	void map_escapes (char *input, char *output);
 
 
 /* EDTINIT -- Initialize the editor.
@@ -245,7 +255,6 @@ map_escapes (
 	register char	*ip = input;
 	register char	*op = output;
 	register int	n;
-	char	*index();
 
 	while (*ip != '\0') {
 	    if (*ip == '\\') { 

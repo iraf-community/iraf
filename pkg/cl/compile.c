@@ -13,7 +13,12 @@
 #include "mem.h"
 #include "errs.h"
 #include "task.h"
-#include "proto.h"
+
+extern  int   comstr (register char *s, memel *loc);
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  int   d_instr (struct _iobuf *fp, char *prefix, register XINT locpc);
+extern char *memneed (int incr);
+
 
 /*
  * COMPILE -- compile instructions at compile time, compile constants,

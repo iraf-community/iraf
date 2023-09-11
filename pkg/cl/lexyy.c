@@ -27,8 +27,15 @@ struct yysvf {
 	int *yystops;};
 struct yysvf *yyestate;
 extern struct yysvf yysvec[], *yybgin;
+
+int yyback (int *p, int m);
+int yylook (void);
+int traverse (char delim);
+
+
 # define YYNEWLINE 10
-lex_yylex(){
+int
+lex_yylex (void){
 int nstr; extern int yyprevious;
 while((nstr = yylook()) >= 0)
 yyfussy: switch(nstr){
@@ -145,7 +152,7 @@ case 28:
 	return (crackident (yytext));
 break;
 case 29:
-	{	extern bracelevel;
+	{	extern int bracelevel;
 			if (bracelevel) {
 	    eprintf ("ERROR: background not allowed within statement block\n");
 			    return ('#');
@@ -231,13 +238,12 @@ fprintf(yyout,"bad switch yylook %d",nstr);
  * Quotes may be included in the string by escaping them, or by means of
  * the double quote convention.
  */
-traverse (delim)
-char	delim;
+int
+traverse (char delim)
 {
 	register char *op, *cp, ch;
 	static	char *esc_ch  = "ntfr\\\"'";
 	static	char *esc_val = "\n\t\f\r\\\"\'";
-	char	*index();
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
 	    if (*op == delim) {
@@ -284,6 +290,8 @@ char	delim;
 
 	*op = '\0';
 	yyleng = (op - yytext);
+
+        return (0);
 }
 int yyvstop[] = {
 0,
@@ -724,7 +732,9 @@ char *yysptr = yysbuf;
 int *yyfnd;
 extern struct yysvf *yyestate;
 int yyprevious = YYNEWLINE;
-yylook(){
+
+int
+yylook (void){
 	register struct yysvf *yystate, **lsp;
 	register struct yywork *yyt;
 	struct yysvf *yyz;
@@ -770,7 +780,7 @@ yylook(){
 				}
 # endif
 			yyr = yyt;
-			if ( (int)yyt > (int)yycrank){
+			if ( (struct yywork *)yyt > (struct yywork *)yycrank){
 				yyt = yyr + yych;
 				if (yyt <= yytop && yyt->verify+yysvec == yystate){
 					if(yyt->advance+yysvec == YYLERR)	/* error transitions */
@@ -780,7 +790,7 @@ yylook(){
 					}
 				}
 # ifdef YYOPTIM
-			else if((int)yyt < (int)yycrank) {		/* r < yycrank */
+			else if((struct yywork *)yyt < (struct yywork *)yycrank) {		/* r < yycrank */
 				yyt = yyr = yycrank+(yycrank-yyt);
 # ifdef LEXDEBUG
 				if(debug)fprintf(yyout,"compressed state\n");
@@ -872,8 +882,9 @@ yylook(){
 # endif
 		}
 	}
-yyback(p, m)
-	int *p;
+
+int
+yyback(int *p, int m)
 {
 if (p==0) return(0);
 while (*p)
@@ -884,14 +895,23 @@ while (*p)
 return(0);
 }
 	/* the following are only used in the lex library */
-yyinput(){
+
+int
+yyinput (void)
+{
 	return(input());
-	}
-yyoutput(c)
-  int c; {
+}
+
+int
+yyoutput (int c)
+{
 	output(c);
-	}
-yyunput(c)
-   int c; {
+        return (0);
+}
+
+int
+yyunput (int c)
+{
 	unput(c);
-	}
+        return (0);
+}

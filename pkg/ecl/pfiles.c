@@ -3,7 +3,6 @@
 
 #define import_spp
 #define import_libc
-#define import_finfo
 #define import_stdio
 #define import_ctype
 #include <iraf.h>
@@ -15,7 +14,48 @@
 #include "param.h"
 #include "task.h"
 #include "grammar.h"
-#include "proto.h"
+
+
+void   pfileunlink (register  struct pfile *pfp);
+void   pfcopyback (struct pfile *pff);
+void   pfileupdate (struct pfile *pfp);
+void   mkpfilename (char *buf, char *dir, char *pkname, char *ltname,
+                    char *extn);
+struct pfile *newpfile (struct ltask *ltp);
+struct pfile *pfilefind (register  struct ltask *ltp);
+struct pfile *pfilesrch (char *pfilepath);
+struct pfile *pfileload (register  struct ltask *ltp);
+struct pfile *pfileread (struct ltask *ltp, char *pfilename,  int   checkmode);
+struct pfile *pfilecopy (register  struct pfile *pfp);
+struct param *addparam (struct pfile *pfp, char *buf,  struct _iobuf *fp);
+int    pfilemerge (struct pfile *npf, char *opfile);
+int    pfilewrite (struct pfile *pfp, char *pfilename);
+int    pfileinit (struct ltask *ltp);
+int    is_pfilename (char *opstr);
+int    ck_atoi (char *str,  int   *val);
+int    scanmode (char *s);
+int    scantype (register char *s);
+long   filetime (char *fname, char *timecode);
+char  *nextfield (char **pp,  struct _iobuf *fp);
+char  *makelower (register char *cp);
+
+extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  catdstr (char *es, char *ns);
+extern  void  breakout (char *full, char **pk, char **t, char **p, char **f);
+extern  void  intr_disable (void);
+extern  void  intr_enable (void);
+extern  int   procscript (struct _iobuf *fp);
+extern  int   pvaldefined (struct param *pp, char *s);
+extern  int   effmode (struct param *pp);
+extern  int   printparam (struct param *pp, register  struct _iobuf *fp);
+extern  char *memneed (int incr);
+extern  char *comdstr (char *s);
+extern  struct param *newparam (struct pfile *pfp);
+extern  struct param *paramfind (struct pfile *pfp, char *pname,
+                                 int pos, int exact);
+extern  struct ltask *ltasksrch (char *pkname, char *ltname);
+extern  struct ltask *_ltasksrch (char *pkname, char *ltname,
+                                  struct package **o_pkp);
 
 
 /*
@@ -28,8 +68,7 @@ extern	char *nullstr;
 extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
-long	filetime();
-static	void mapname();
+static	void mapname (char *in, char *out, int maxlen);
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
@@ -808,7 +847,6 @@ filetime (
 )
 {
 	struct	_finfo fi;
-	extern int c_finfo();
 
 	if (c_finfo (fname, &fi) == ERR)
 	    return (0L);
@@ -910,7 +948,7 @@ pfilecopy (register struct pfile *pfp)
 		    for (d=0;  d < size_arr;  d++) {
 			*q = memneed (btoi(len));
 			strncpy (*q++, *p++, len-1);
-			*(q+len-1) = '\0' ;
+			*(q+len-1) = (char *)'\0' ;
 		    }
 		}
 
@@ -1141,7 +1179,6 @@ addparam (struct pfile *pfp, char *buf, FILE *fp)
 	int	arrflag;	/* Is param an array?			*/
 	struct arr_desc *parrd;	/* Pointer to array descriptor.		*/
 	int	size_arr=0;	/* Size of array.			*/
-	extern double atof();
 	char	**tbuf;
 
 	pp = newparam (pfp);
@@ -1716,8 +1753,6 @@ nextfield (char **pp, FILE *fp)
 
 	    /* Skip any white space.  We assume that we needn't skip
 	     * lines here.
-	    while (*p == ' ' || *p == '\t')
-		*p++;
 	     */
 	    while (*p == ' ' || *p == '\t')
 		p++;
@@ -1821,7 +1856,6 @@ scanmode (char *s)
 	static	char *badstr = "bad mode string `%s'";
 	char	strings[4][25];
 	int	i, n;
-	char *index();
 
 	str = s;
 	if (index (str, ',') != NULL || index (str, '+') != NULL) {

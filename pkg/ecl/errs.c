@@ -20,7 +20,6 @@
 #include "errs.h"
 #include "grammar.h"
 #include "construct.h"
-#include "proto.h"
 
 
 /*
@@ -107,6 +106,26 @@ ErrCom	errcom;
 
 extern	int in_iferr, do_error;
 extern  char *onerr_handler;
+
+void  cl_error (int errtype, char *diagstr, ...);
+void  erract_init (void);
+
+extern  int   clexit (void);
+extern  int   clshutdown (void);
+extern  int   intr_reset (void);
+extern  void  u_doprnt (char *format, va_list *argp, FILE *fp);
+extern  void  delpipes (register  int   npipes);
+extern  void  offsetmode (int mode);
+extern  void  taskunwind (void);
+extern  void  clputlog (void);
+extern  void  putlog (struct task *tp, char *usermsg);
+extern  void  iofinish (register  struct task *tp);
+extern  void  pr_dumpcache (int pid, int break_locks);
+extern  void  yy_startblock (int logflag);
+extern  struct param *paramfind (struct pfile *pfp, char *pname, int pos,
+                                 int exact);
+
+extern  XINT  XER_RESET (void);
 
 
 
@@ -348,8 +367,7 @@ cl_error (int errtype, char *diagstr, ...)
 void 
 erract_init (void)
 {
-	char *act, *envget();
-	char opt[SZ_LINE];
+	char *act, opt[SZ_LINE];
 
 	/* Parse the erract string to pick up new options.
 	 */
