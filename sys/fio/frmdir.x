@@ -13,7 +13,6 @@ char	dir[ARB]		# virtual or OS-dependent directory spec
 
 int	status
 pointer	sp, osfn, dirname
-int	access()
 errchk	syserrs
 
 begin
