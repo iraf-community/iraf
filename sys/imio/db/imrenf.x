@@ -13,9 +13,8 @@ pointer	im			# image descriptor
 char	oldkey[ARB]		# old keyword
 char	newkey[ARB]		# new keyword
 
-int	off
 pointer	rp, sp, keyname
-int	idb_kwlookup(), idb_findrecord(), stridxs()
+int	idb_kwlookup(), idb_findrecord()
 errchk	syserrs
 
 begin
