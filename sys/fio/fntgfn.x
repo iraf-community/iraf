@@ -591,7 +591,7 @@ int	npat			# receives number of PATP elements set
 pointer	sbuf			# used to store output strings
 int	maxch			# maxch chars out
 
-int	ch, peek
+char	ch, peek
 bool	is_url
 pointer	op
 
@@ -786,7 +786,7 @@ int	token				#O token type code
 
 int	nseen, i
 pointer	ip, ip_start, op, cp
-int	stridx(), strncmp()
+int	stridx()
 
 begin
 	ip = U_TEMPLATE_INDEX(pp)			# retrieve pointer
