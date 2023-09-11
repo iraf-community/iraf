@@ -2051,7 +2051,7 @@ rcmd_(char **ahost, int inport, const char *locuser, const char *remuser,
 {
     int res = 0;
 #ifndef MACOSX
-    res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p)
+    res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p);
 #endif
     return res;
 }
