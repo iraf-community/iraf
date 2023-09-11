@@ -886,7 +886,7 @@ end
 
 int procedure vvfn_checksum (a, nchars)
 
-char	a[nchars]		# array to be summed
+int	a[nchars]		# array to be summed
 int	nchars			# length of array
 int	i, sum
 
