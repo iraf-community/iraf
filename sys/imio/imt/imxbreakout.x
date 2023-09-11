@@ -23,7 +23,7 @@ int     nchars, ip, op
 bool	is_sif
 
 bool 	imx_issection(), imx_sifmatch()
-int	stridx()
+#int	stridx()
 
 define	next_str_	99
 
