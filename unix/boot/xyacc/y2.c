@@ -1375,7 +1375,6 @@ cpyact (int offset)
 {
     /* copy C action to the next ; or closing } */
     int brac, c, match, j, s, tok;
-    char id_name[NAMESIZE + 1];
     int id_idx = 0;
 
     if (gen_lines) {
@@ -1383,7 +1382,6 @@ cpyact (int offset)
 	act_lines++;
     }
     brac = 0;
-    id_name[0] = 0;
   loop:
     c = getc (finput);
   swt:
@@ -1552,11 +1550,9 @@ cpyact (int offset)
      * part of identifier, save it.
      */
     else if (isalnum (c) || c == '_') {
-	id_name[id_idx++] = c;
 	id_name[id_idx] = 0;
     } else {
 	id_idx = 0;
-	id_name[id_idx] = 0;
     }
     goto loop;
 }
