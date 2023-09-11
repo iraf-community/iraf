@@ -110,8 +110,6 @@ pointer fit, im
 int	ip, pixtype, nb
 int	status, totpix, npix
 int	datasizeb, pixoffb, nb_skipped, i
-double  dtemp
-real    rtemp, rscale, roffset
 
 include <szpixtype.inc>
 
