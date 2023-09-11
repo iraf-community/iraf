@@ -63,7 +63,7 @@ int	i, ualen, index, ip
 double	dec, dval
 pointer	ct, mw, wp, wv, im, idb, rp
 
-int	idb_nextcard(), itoc(), ctod()
+int	idb_nextcard(), ctod()
 pointer	idb_open()
 errchk	wf_decaxis()
 
