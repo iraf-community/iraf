@@ -15,8 +15,6 @@ int	sizeof()
 
 errchk	imopsf, malloc, realloc, calloc
 
-include	<szpixtype.inc>
-
 begin
 	# If first write, and if new image, create pixel storage file,
 	# otherwise open pixel storage file.  Allocate and initialize
