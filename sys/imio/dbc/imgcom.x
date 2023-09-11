@@ -12,10 +12,9 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I parameter to be set
 char	comment[ARB]		#O comment string
 
-bool	string_valued
-int	ch, i, n, j, ic, op
+int	i, op
 pointer	rp, ip, sp, buf
-int	idb_findrecord(), ctowrd(), stridx(), idb_getstring()
+int	idb_findrecord(), ctowrd()
 errchk	syserrs
 
 define  end_ 91
