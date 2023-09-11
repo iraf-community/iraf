@@ -12,12 +12,9 @@ int	fd			#I input file
 bool	spp[ARB]		#O receives data
 int	maxelem			# max number of data elements to be read
 
-pointer	sp, bp
 int	pksize, nchars, nelem
 int	nminelem(), read()
 errchk	read()
-
-long	note()
 
 begin
 	pksize = nminelem (maxelem, NMI_INT)
