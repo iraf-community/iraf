@@ -1550,7 +1550,7 @@ cpyact (int offset)
      * part of identifier, save it.
      */
     else if (isalnum (c) || c == '_') {
-	id_name[id_idx] = 0;
+	id_idx += 1;
     } else {
 	id_idx = 0;
     }
