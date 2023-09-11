@@ -24,7 +24,7 @@ int	status			#O output status - i/o channel if successful
 
 pointer im, fit
 int	ip, indx, channel, strldx(), ctoi()
-bool	lscale, lzero, bfloat, fxf_fpl_equald()
+bool	lscale, lzero, fxf_fpl_equald()#, bfloat
 char    fname[SZ_PATHNAME]
 
 begin
