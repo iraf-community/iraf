@@ -45,7 +45,7 @@ case "$nm" in
     "cl" | "cl.sh")
         cl_binary="${bin}cl.e"
         ;;
-    "ecl" | "ecl.sh")
+    "ecl" | "ecl.sh" | "irafcl" | "irafcl.sh")
         cl_binary="${bin}ecl.e"
         ;;
     "vocl" | "vocl.sh")
