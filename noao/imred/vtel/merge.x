@@ -116,12 +116,12 @@ begin
 	call imaddr (outputim, "AV_BZERO", bzeroave)
 	call imaddi (outputim, "WV_LNGTH", wavelength)
 	call imaddr (outw, "AV_BZERO", bzeroave)
-	call imaddr (outw, "WV_LNGTH", wavelength)
+	call imaddi (outw, "WV_LNGTH", wavelength)
 	call imaddb (outw, "WEIGHTS", TRUE)
 	call imaddr (outa, "AV_BZERO", bzeroave)
 	call imaddr (outr, "AV_BZERO", bzeroave)
-	call imaddr (outa, "WV_LNGTH", wavelength)
-	call imaddr (outr, "WV_LNGTH", wavelength)
+	call imaddi (outa, "WV_LNGTH", wavelength)
+	call imaddi (outr, "WV_LNGTH", wavelength)
 	call imaddb (outa, "ABS_VALU", TRUE)
 	call imaddb (outr, "POLARITY", TRUE)
 	
@@ -200,7 +200,7 @@ begin
 	call imaddr (outputim, "AV_BZERO", bzeroave)
 	call imaddi (outputim, "WV_LNGTH", wavelength)
 	call imaddr (outw, "AV_BZERO", bzeroave)
-	call imaddr (outw, "WV_LNGTH", wavelength)
+	call imaddi (outw, "WV_LNGTH", wavelength)
 	call imaddb (outw, "WEIGHTS", TRUE)
 	
 	# Weight the data image.
