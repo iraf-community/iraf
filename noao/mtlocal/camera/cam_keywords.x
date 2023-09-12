@@ -188,7 +188,7 @@ char	comment[ARB]		# Comment string
 begin
 	call fprintf (fd, "%-8.8s= %20d  /  %-45.45s\n")
 	    call pargstr (keyword)
-	    call pargs (value)
+	    call pargi (value)
 	    call pargstr (comment)
 end
 
