@@ -11,6 +11,7 @@ short	parameters[ARB]	# Pointer to program data structure
 char	text[ARB]	# ID string
 
 real	value
+short	sval
 errchk	cam_sicard, cam_rcard, cam_hmscard, cam_ymdcard, cam_obscard
 
 begin
@@ -113,7 +114,8 @@ begin
 	if (BT_FLAG(parameters) != 0) {
 	    call cam_sicard (STDOUT, "OVERSCAN", BT_FLAG(parameters),
 	        "OVERSCAN SUBTRACTED")
-	    call cam_sicard (STDOUT, "TRIM", short (1), "TRIMMED IMAGE")
+            sval = 1
+	    call cam_sicard (STDOUT, "TRIM", sval, "TRIMMED IMAGE")
 	}
 	if (BI_FLAG(parameters) != 0) {
 	    call cam_sicard (STDOUT, "ZEROCOR", BI_FLAG(parameters),

@@ -13,6 +13,7 @@ pointer	im		# Pointer to image
 
 int	fd
 real	value
+short   sval
 int	stropen()
 errchk	stropen, cam_sicard, cam_rcard, cam_hmscard, cam_ymdcard, cam_obscard
 
@@ -110,7 +111,8 @@ begin
 	if (BT_FLAG(parameters) != 0) {
 	    call cam_sicard (fd, "OVERSCAN", BT_FLAG(parameters),
 	        "OVERSCAN VALUE SUBTRACTED")
-	    call cam_sicard (fd, "TRIM", short (1), "TRIMMED IMAGE")
+            sval = 1
+	    call cam_sicard (fd, "TRIM", sval, "TRIMMED IMAGE")
 	}
 	if (BI_FLAG(parameters) != 0) {
 	    call cam_sicard (fd, "ZEROCOR", BI_FLAG(parameters),
