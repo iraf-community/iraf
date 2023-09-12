@@ -13,7 +13,7 @@ define	HD_K75		4	   # Ind var is Kaiser transform w/ alpha=0.75
 define	UDELETE		100	   # Point deleted by user flag
 define	PDELETE		101	   # Point deleted by program
 define	NDELETE		102	   # Point not deleted 
-define	ADDED_PT	0.0	   # Indication of added point in sdev array
+define	ADDED_PT	0.0D0	   # Indication of added point in sdev array
 
 # The ICFIT data structure - modified for use with the DTOI package.
 
