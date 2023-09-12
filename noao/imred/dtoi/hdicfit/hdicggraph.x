@@ -78,11 +78,10 @@ int	npts		# Number of points
 
 pointer	sp, xr, yr, sz, szmk, gt1, gt2
 char	tplot[SZ_TPLOT]
-int	i, xaxis, yaxis, symbols[3], markplot
+int	i, xaxis, yaxis, markplot
 real	size, rmin, rmax, big
 bool	fp_equald(), streq(), fp_equalr()
 int	strncmp()
-data	symbols/GM_PLUS, GM_BOX, GM_CIRCLE/
 include	"hdic.com"
 
 begin

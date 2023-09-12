@@ -13,7 +13,7 @@ include "rvfilter.h"
 # used as a working space.  Sign convention of this routine, if DATA1 lags 
 # DATA2, i.e. is shifted to the right of it, then ANS will show a peak at 
 # positive lags.
-# Referece:  Numerical Recipes in C, ch 12, Press, et al.
+# Reference:  Numerical Recipes in C, ch 12, Press, et al.
 
 procedure rv_correl (rv, data1, data2, npts, ans)
 
