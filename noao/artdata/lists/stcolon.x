@@ -21,8 +21,6 @@ real	rval
 bool	streq()
 int	strdic(), nscan(), open()
 
-string	lumfuncs LUMFUNCS
-
 begin
 	# Allocate temporary space.
 	call smark (sp)
@@ -403,8 +401,6 @@ long	lval
 real	rval
 bool	streq()
 int	strdic(), nscan(), open()
-
-string	lumfuncs LUMFUNCS
 
 begin
 	call smark (sp)
