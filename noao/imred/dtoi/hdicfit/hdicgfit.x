@@ -312,7 +312,7 @@ begin
 				oldx = Memd[x+i-1]
 				oldy = Memd[y+i-1]
 			        Memd[x+i-1] = x1
-				call hd_redraw (gp, oldx, oldy, x1, oldy)
+				call hd_redraw (gp, oldx, oldy, real(x1), oldy)
 			        IC_NEWX(ic) = YES
 			    }
 			}
@@ -334,7 +334,7 @@ begin
 				oldx = Memd[x+i-1]
 				oldy = Memd[y+i-1]
 			        Memd[y+i-1] = x1
-				call hd_redraw (gp, oldx, oldy, oldx, x1)
+				call hd_redraw (gp, oldx, oldy, oldx, real(x1))
 			        IC_NEWY(ic) = YES
 			    }
 			}
