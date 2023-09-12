@@ -18,6 +18,9 @@
 
 #ifdef SYSV
 #include <termios.h>
+#ifndef IUCLC
+#define IUCLC	0001000
+#endif
 #else
 #include <sgtty.h>
 #endif
