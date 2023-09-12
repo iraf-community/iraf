@@ -476,10 +476,8 @@ pointer procedure mkt_object (name)
 char	name[ARB]	# Profile name or file
 
 int	i, j, n, nxm, nym, fd
-real	radius, r, dr, s, b, flux, der[2]
+real	radius, r, dr, s, flux, der[2]
 pointer	sym, mkt, prof, asi, msi, buf, im
-
-real	c3, c4, c5, c6, c7
 
 real	asieval()
 double	uigamma()
