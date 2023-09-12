@@ -326,7 +326,7 @@ begin
 			        call sprintf (Memc[fcname], SZ_FNAME,
 				    "reg%03d.%03d")
 			            call pargi (stnsymbols(st, 0) - i + 1)
-				    call pargstr (j)
+				    call pargi (j)
 			    } else {
 			        call sprintf (Memc[fcname], SZ_FNAME,
 				    "reg%03d")
