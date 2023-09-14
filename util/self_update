@@ -43,7 +43,7 @@ fi
 
 # Edit the current IRAF path into the scripts.
 cd $iraf/unix/hlib
-pfiles=("cl.sh" "cl.csh" "ecl.sh" "ecl.csh" "vocl.sh" "vocl.csh" "setup.sh" "setup.csh" "mkiraf.sh" "mkiraf.csh")
+pfiles=("cl.sh" "cl.csh" "ecl.sh" "ecl.csh" "setup.sh" "setup.csh" "mkiraf.sh" "mkiraf.csh")
 d_iraf="/iraf/iraf/"
 TEMP="/tmp/iraf_update.$$"
 /bin/rm -f $TEMP

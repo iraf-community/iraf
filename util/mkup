@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+#  MKUP -- Update the IRAF binaries.
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
@@ -34,8 +35,3 @@ mkpkg update
 cd $iraf/noao				# build NOAO package
 export noao=`pwd`/
 mkpkg -p noao
-
-cd $iraf/vo				# build VO package
-export vo=`pwd`/
-cd votools				# build VOTOOLS package
-mkpkg -p vo update

@@ -8,7 +8,6 @@ src_only=no
 list_only=no
 core_only=no
 noao_only=no
-vo_only=no
 
 if (( $#<1 )); then
     opt="all"
@@ -48,10 +47,6 @@ else
       "-noao")                         # update only NOAO package
           noao_only=yes
 	  opt="noao"
-	  ;;
-      "-vo")                           # update only VO package
-          vo_only=yes
-	  opt="vo"
 	  ;;
       *)
           /bin/echo "Error: Unknown option '"$1"', quitting."

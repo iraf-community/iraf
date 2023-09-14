@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+#  MKUPX -- Update the IRAF binaries (debug compilation enabled).
 
 # Initialize the $iraf and environment.
 if [ -z "$iraf" ]; then
@@ -19,7 +20,3 @@ mkpkg -x
 cd $iraf/noao				# build NOAO package
 export noao=$`pwd`/
 mkpkg -x -p noao
-
-cd $iraf/vo				# build VO package
-export vo=`pwd`/
-mkpkg -x -p vo
