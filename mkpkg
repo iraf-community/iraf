@@ -66,12 +66,6 @@ packages:
 	$echo "+" $echo "+"
 	;
 
-shlib:
-	$echo "====================== SHLIB ============================"
-	$echo "+" $echo "+"
-	$call update@host$shlib/
-	$echo "+" $echo "+"
-	;
 
 # SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
 # output, omitting most of the mundane chatter.  Used to scan large spool
@@ -121,17 +115,6 @@ generic:				# make architecture indep. (no bins)
 	!(cd ./unix; setenv MACH generic; sh setarch.sh)
 	;
 
-cygwin:					# install WinXP/Cygwin binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh cygwin
-        !(cd ./unix; setenv MACH cygwin; sh setarch.sh)
-        ;
-freebsd:				# install freebsd binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh freebsd
-        !(cd ./unix; setenv MACH freebsd; sh setarch.sh)
-        ;
-        ;
 linux:					# install linux (32-bit) binaries
         $verbose off
         !$(hlib)/mkfloat.csh linux
@@ -152,28 +135,3 @@ macosx:					# install MacOS X (Unix 32-bit) binaries
         !$(hlib)/mkfloat.csh macosx
         !(cd ./unix; setenv MACH macosx; sh setarch.sh)
         ;
-ipad:					# install Mac iPad binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh ipad
-        !(cd ./unix; setenv MACH ipad; sh setarch.sh)
-        ;
-redhat:					# install redhat binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh redhat
-        !(cd ./unix; setenv MACH redhat; sh setarch.sh)
-        ;
-sparc:					# install sparc binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh sparc
-	!(cd ./unix; setenv MACH sparc; sh setarch.sh)
-	;
-sunos:					# install sunos binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh sunos
-        !(cd ./unix; setenv MACH sunos; sh setarch.sh)
-        ;
-ssun:					# install ssun binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh ssun
-	!(cd ./unix; setenv MACH ssol; sh setarch.sh)
-	;
