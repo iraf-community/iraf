@@ -113,7 +113,7 @@ _os_getenv (
 	XCHAR	x_symbol[SZ_FNAME+1];
 	XCHAR	x_value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
-	extern  XINT ENVFIND(XCHAR *key, XCHAR *value, XINT *maxch);
+	extern  int ENVFIND(XCHAR *key, XCHAR *value, XINT *maxch);
 
 
 	os_strupk (envvar, x_symbol, SZ_FNAME);
