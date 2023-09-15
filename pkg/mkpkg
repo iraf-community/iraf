@@ -8,7 +8,6 @@ $exit
 update:
 	$call cl
 	$call ecl
-	$call vocl
 	$call system
 	$call softools
 	$call xtools
@@ -32,10 +31,6 @@ cl:
 ecl:
 	$echo "--------------------- ECL -------------------------"
 	$call update@ecl
-	;
-vocl:
-	$echo "--------------------- VOCL ------------------------"
-	$call update@vocl
 	;
 system:
 	$echo "--------------------- SYSTEM ----------------------"
