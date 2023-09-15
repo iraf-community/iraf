@@ -3,6 +3,7 @@
 
 #include <string.h>
 
+#define	import_knames
 #define	import_spp
 #include <iraf.h>
 
@@ -20,7 +21,7 @@ u_freadline (
 	char   *cmd = (char *) NULL;
 	static char line[SZ_LINE];
 	char   *readline (char *prompt);
-        int     ZFREE (void *buf);
+        extern int ZFREE (XPOINTER *buf);
 
 
 	memset (line, 0, SZ_LINE);
