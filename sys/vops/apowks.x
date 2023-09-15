@@ -15,6 +15,7 @@ begin
 
 	switch (b) {
 	case 0:
+	        call amovk ((1.0,1.0), c, npix)
 	        call amovks (1, c, npix)
 	case 1:
 	    call amovs (a, c, npix)

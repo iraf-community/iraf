@@ -15,7 +15,7 @@ begin
 
 	switch (b) {
 	case 0:
-	    call amovkd (1.0D0, c, npix)
+	        call amovkd (1.0D0, c, npix)
 	case 1:
 	    call amovd (a, c, npix)
 	case 2:

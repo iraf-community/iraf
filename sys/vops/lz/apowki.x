@@ -15,7 +15,7 @@ begin
 
 	switch (b) {
 	case 0:
-	    call amovki (1, c, npix)
+	        call amovki (1, c, npix)
 	case 1:
 	    call amovi (a, c, npix)
 	case 2:

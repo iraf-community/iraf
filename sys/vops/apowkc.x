@@ -2,9 +2,9 @@
 
 # APOWK -- Compute a ** b, where b is a constant of type INT (generic).
 
-procedure apowks (a, b, c, npix)
+procedure apowkc (a, b, c, npix)
 
-short	a[ARB], c[ARB]
+char	a[ARB], c[ARB]
 int	b
 int	npix, i
 
@@ -15,9 +15,10 @@ begin
 
 	switch (b) {
 	case 0:
-	        call amovks (1, c, npix)
+	        call amovk ((1.0,1.0), c, npix)
+	        call amovkc (1, c, npix)
 	case 1:
-	    call amovs (a, c, npix)
+	    call amovc (a, c, npix)
 	case 2:
 	    do i = 1, npix
 		c[i] = a[i] ** 2
