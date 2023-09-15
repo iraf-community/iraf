@@ -11,7 +11,7 @@
 #include <iraf.h>
 
 
-typedef int (*PFI)(int *, int*);  /* pointer to function returning int    */
+//typedef int (*PFI)(int *, int*);  /* pointer to function returning int    */
 
 int onint (int *code, int *old_handler);
 
