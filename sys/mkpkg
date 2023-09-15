@@ -61,7 +61,7 @@ sysgen:
 	$call ds
 
 	# MEMIO debug library.
-	$call memdbg
+	#$call memdbg
 
 	$purge lib$
 	;
