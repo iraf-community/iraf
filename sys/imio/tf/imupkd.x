@@ -8,8 +8,6 @@ procedure imupkd (a, b, npix, dtype)
 double	b[npix]
 int	a[npix], npix, dtype
 
-pointer	bp
-
 begin
 	switch (dtype) {
 	case TY_USHORT:
