@@ -50,7 +50,6 @@ int	nchar
 int	morekeys	# extra space (none) in primary header
 int	fnroot(), fnextn(), tbparse(), tbttyp(), vot_to_fits()
 int	access(), strncmp()
-bool	is_votable()
 errchk	tbferr, tbparse, tbttyp, vfn_expand_ldir
 
 begin
@@ -92,12 +91,6 @@ begin
 
             if (access (Memc[cnv], 0, 0) == NO) {
                 call fcadd ("cache$", Memc[url], "", Memc[intbl], SZ_PATHNAME)
-                if (access (Memc[cnv],0,0) == YES && is_votable (Memc[cnv])) {
-                    if (vot_to_fits (Memc[intbl], Memc[intbl]) != OK) {
-                        call error (ER_TBCONVERT,
-                            "tbtopn: cannot convert table format")
-                    }
-                }
             } else
                 call strcpy (Memc[cnv], Memc[intbl], SZ_PATHNAME)
 	} else
