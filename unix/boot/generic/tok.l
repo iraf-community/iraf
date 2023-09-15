@@ -14,23 +14,21 @@ extern	char	*type_string;
 extern	char	xtype_string[];
 extern	char	type_char;
 
-extern void  copy_line (void);
-extern void  copy_string (void);
-extern void  copy_comment (void);
-extern void  make_float (char type_ch);
-extern void  pass_through (void);
-extern void  do_for (void);
-extern void  do_endfor (void);
-extern void  do_if (void);
-extern void  do_else (void);
-extern void  do_endif (void);
+void  copy_line (void);
+void  copy_string (void);
+void  copy_comment (void);
+void  make_float (char type_ch);
+void  pass_through (void);
+void  do_for (void);
+void  do_endfor (void);
+void  do_if (void);
+void  do_else (void);
+void  do_endif (void);
 
-extern void  output_indef (char ch);
-extern void  output_upper (char *s);
-extern void  output (char ch);
-extern void  outstr (char *s);
-extern int getc (FILE *fp);	  /* NOTE: lex.sed changes this to k_getc() */
-
+void  output_indef (char ch);
+void  output_upper (char *s);
+void  output (char ch);
+void  outstr (char *s);
 
 
 %}
@@ -42,7 +40,7 @@ W	[ \t]
 PIXEL				outstr (type_string);
 XPIXEL				outstr (xtype_string);
 INDEF				output_indef (type_char);
-INDEF(S|I|L|R|D|X)		ECHO;
+INDEF(S|I|L|R|D|X)		outstr (yytext);
 SZ_PIXEL			output_upper ("SZ_");
 TY_PIXEL			output_upper ("TY_");
 $PIXEL				outstr ("PIXEL");
@@ -82,30 +80,51 @@ $INDEF				outstr ("INDEF");
 "/*"				copy_comment();
 \"				copy_string();
 
-^\#if				ECHO;
-^\#else				ECHO;
-^\#endif			ECHO;
-^\#include			ECHO;
+^\#if				outstr (yytext);
+^\#else				outstr (yytext);
+^\#endif			outstr (yytext);
+^\#include			outstr (yytext);
 
 \#				copy_line();
 ^\%				copy_line();
 
+.|\n                            outstr (yytext);
+
 %%
 
+
+long     fpos;                  /* file buffer offset                   */
 
 /* LEX_INPUT -- Make input() callable as a function from the .c code.
  */
 int
 lex_input (void)
 {
+        fpos++;
 	return (input());
 }
-
 
 /* LEX_UNPUT -- Make unput() callable as a function from the .c code.
  */
 void
 lex_unput (int ch)
 {
+        fpos--;
 	unput (ch);
+}
+
+/* LEX_FSEEK -- Report current file position.
+ */
+long
+lex_ftell (void) {
+    return fpos;
+}
+
+/* LEX_FSEEK -- Move to specified file offset.
+ */
+void
+lex_fseek (long offset) {
+    YY_FLUSH_BUFFER;
+    fseek (yyin, offset, SEEK_SET);
+    fpos = offset;
 }
