@@ -16,8 +16,6 @@ int	pksize, nchars, nelem
 int	nmipksize(), nminelem(), read()
 errchk	read()
 
-long	note()
-
 begin
 	pksize = nmipksize (maxelem, NMI_SHORT)
 	nelem  = EOF
