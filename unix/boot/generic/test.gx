@@ -1,0 +1,19 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AABS -- Compute the absolute value of a vector (generic).
+
+procedure aabs$t (a, b, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+
+begin
+	do i = 1, npix
+	    b[i] = abs(a[i])
+
+        $if (datatype == x)
+            call amovk$t ((1.0,1.0), c, npix)
+        $else
+            call amovk$t (1$f, c, npix)
+        $endif
+end
