@@ -6,49 +6,29 @@ $set	MACH		= $(IRAFARCH)	# machine/fpu type
 $set	HOSTID		= unix		# host system name
 $set	SITEID		= noao		# site name
 
-$ifeq (MACH, freebsd) then
-$set	XFLAGS		= "-c -w -/m32"	# default XC compile flags
-$set	XVFLAGS		= "-c -w" -/m32	# VOPS XC compile flags
-$set	LFLAGS		= "-z -/static -/m32"	# default XC link flags
-$else $ifeq (MACH, linux) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$ifeq (MACH, linux) then
+$set	XFLAGS		= "-c"	# default XC compile flags
+$set	XVFLAGS		= "-c"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, linux64) then
-$set	XFLAGS		= "-c -w -/g -/m64"	# default XC compile flags
-$set	XVFLAGS		= "-c -w -/g -/m64"	# VOPS XC compile flags
+$set	XFLAGS		= "-c -/g -/m64"	# default XC compile flags
+$set	XVFLAGS		= "-c -/g -/m64"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz   -/g -/m64"	# default XC link flags
 $else $ifeq (MACH, redhat) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	XFLAGS		= "-c"	# default XC compile flags
+$set	XVFLAGS		= "-c"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, macosx) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	XFLAGS		= "-c"	# default XC compile flags
+$set	XVFLAGS		= "-c"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, macintel) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, ipad) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, linuxppc) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, sunos) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, cygwin) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	XFLAGS		= "-c"	# default XC compile flags
+$set	XVFLAGS		= "-c"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	XFLAGS		= "-c"	# default XC compile flags
+$set	XVFLAGS		= "-c"	# VOPS XC compile flags
 $set	LFLAGS		= "-z -/static"	# default XC link flags
 $end
 
