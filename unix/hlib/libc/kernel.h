@@ -83,13 +83,14 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
 
-#ifdef AUX
-#define SIGFUNC sigfunc_t
-#else
-/*
-typedef	void  (*SIGFUNC)(int *,XINT *);
+/* Signal Handler function.
+typedef	void  (*SIGFUNC)(XINT *,XINT *);
 */
-typedef	void  (*SIGFUNC)();
+#ifdef LINUX
+typedef	void  (*SIGFUNC)(int);
+#endif
+#ifdef MACOSX
+typedef	void  (*SIGFUNC)(int);
 #endif
 
 typedef	void  (*PFV)();
