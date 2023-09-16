@@ -66,7 +66,7 @@ extern	char		MEMCOM[];
 #define	fputc		u_fputc
 #define	fputs		u_fputs
 #define	fread		u_fread
-#define	freadline	u_readline
+#define	freadline	u_freadline
 #define	free		u_free
 #define	freopen		u_freopen
 #define	fscanf		u_fscanf
@@ -89,7 +89,7 @@ extern	char		MEMCOM[];
 #define	rindex		u_rindex
 #define	scanf		u_scanf
 #define	setbuf		u_setbuf
-#define	setbuffer	u_setfbf		/* collision	*/
+#define	setbuffer	u_setfbuffer		        /* collision	*/
 #define	setlinebuf	u_setlinebuf
 #define	sprintf		u_sprintf
 #define	sscanf		u_sscanf
@@ -99,9 +99,9 @@ extern	char		MEMCOM[];
 #define	strdup		u_strdup
 #define	strcpy		u_strcpy
 #define	strlen		u_strlen
-#define	strncat		u_strnt			/* collision	*/
-#define	strncmp		u_strnp			/* collision	*/
-#define	strncpy		u_strny			/* collision	*/
+#define	strncat		u_strncat			/* collision	*/
+#define	strncmp		u_strncmp			/* collision	*/
+#define	strncpy		u_strncpy			/* collision	*/
 #define	strrchr		u_rindex
 #define	system		u_system
 #define	ungetc		u_ungetc
@@ -310,7 +310,8 @@ extern void	fputs (char *str, struct _iobuf *fp);
 extern void	free (char *buf);
 extern void	perror (char *prefix);
 extern void	printf (char *format, ...);
-extern void	qsort (char *base, int n, int size, int  (*compar) (void));
+extern void	qsort (char *base, int n, int size,
+                       int (*compar) (char *, char *));
 extern void	setbuf (struct _iobuf *fp, char *buf);
 extern void	setfbf (struct _iobuf *fp, char *buf, int size);
 extern void	setlinebuf (struct _iobuf *fp);
@@ -319,17 +320,23 @@ extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
 
 /*  The following have conflicts because of the order in which the
 **  include files are done in iraf.h.  Commented out for now.
-extern int	c_finfo (char *fname, struct _finfo *fi);
-extern void	c_xwhen (int exception, PFI new_handler, PFI *old_handler);
 */
+#ifndef D_finfo
+#ifndef import_finfo
+#include "finfo.h"
+extern int	c_finfo (char *fname, struct _finfo *fi);
+#endif
+#endif
+
+typedef int (*PFI)();           /* pointer to function returning int    */
+extern void	c_xwhen (int exception, PFI new_handler, PFI *old_handler);
 
 #endif
 
 /*
 #include "../f2c.h"
+#include "vosproto.h"
 */
-//#include "vosproto.h"
 
 #define	D_libc
-#define	D_libc_proto
 #endif
