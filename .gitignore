@@ -10,6 +10,7 @@ local/.lesshst
 *.bak
 *.OLD
 *.xxx
+uparm
 spool
 spool.*
 _spool.*
