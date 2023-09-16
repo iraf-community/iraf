@@ -4,7 +4,11 @@
 #include "ratdef.h"
 
 FINT
-GETARG(FINT *n, RCHAR *s, FINT *maxsiz)
+GETARG (
+    FINT *n,
+    RCHAR *s,
+    FINT *maxsiz
+)
 {
 	extern int xargc;
 	extern char **xargv;

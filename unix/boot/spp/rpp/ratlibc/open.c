@@ -3,10 +3,13 @@
 
 #include "ratdef.h"
 
-extern void r4tocstr (RCHAR *rstr, char *cstr);
+extern void r4tocstr (register RCHAR *rstr, register char *cstr);
 
 FINT
-OPEN(RCHAR *rname, FINT *mode)
+OPEN (
+    RCHAR *rname,
+    FINT *mode
+)
 {
 	register FILE  *fp;
 	char	       cname[FILENAMESIZE];

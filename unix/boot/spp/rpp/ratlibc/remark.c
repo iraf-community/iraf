@@ -3,9 +3,9 @@
 
 #include "ratdef.h"
 
-void 
+void
 REMARK (
-    int *strarg		/* hollerith string is an integer array */
+   int	*strarg		/* hollerith string is an integer array */
 )
 {
 	register char  *strin = (char *)strarg;

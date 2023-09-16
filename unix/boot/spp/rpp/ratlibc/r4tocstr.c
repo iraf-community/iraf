@@ -7,7 +7,11 @@
  * by an EOS) to a C string (one character per 8-bit byte, terminated
  * by a byte of zero).
  */
-void r4tocstr(register RCHAR *rstr, register char *cstr)
+void
+r4tocstr (
+   RCHAR  *rstr,
+   char   *cstr
+)
 {
 	while (*rstr != REOS) {
 	    if (*rstr > 0177) {
