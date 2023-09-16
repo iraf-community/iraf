@@ -186,7 +186,7 @@
 
 #ifdef import_stdarg
 #ifndef D_stdarg
-#include "/opt/iraf/iraf/unix/hlib/libc/stdarg.h"
+#include <stdarg.h>
 #endif
 #undef import_stdarg
 #endif
