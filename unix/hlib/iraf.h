@@ -1,1 +1,1 @@
-iraf32.h
+iraf64.h
