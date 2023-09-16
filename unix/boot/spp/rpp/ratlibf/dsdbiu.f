@@ -1,7 +1,7 @@
       subroutine dsdbiu (b, form)
       integer b
       integer form
-      integer mem( 60000)
+      integer mem( 1)
       common/cdsmem/mem
       integer l, s, lmax
       integer blanks(6)

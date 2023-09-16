@@ -1,6 +1,6 @@
       subroutine dsfree (block)
       integer block
-      integer mem( 60000)
+      integer mem( 1)
       common/cdsmem/mem
       integer p0, p, q
       integer n, junk

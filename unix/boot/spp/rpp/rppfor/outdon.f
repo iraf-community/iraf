@@ -67,8 +67,7 @@
       data sline0(1)/35/,sline0(2)/108/,sline0(3)/105/,sline0(4)/110/,sl
      *ine0(5)/101/,sline0(6)/32/,sline0(7)/-2/
       if (.not.(dbgout .eq. 1))goto 23000
-      if (.not.((body .eq. 1 .or. dbglev .ne. level)
-     * .and. linect (level) .gt. 0))goto 23002
+      if (.not.(body .eq. 1 .or. dbglev .ne. level))goto 23002
       op = 1
       ip=1
 23004 if (.not.(sline0(ip) .ne. -2))goto 23006
