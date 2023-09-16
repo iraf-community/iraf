@@ -20,7 +20,6 @@ update:
 	$call twodspec
 	$call imred
 
-	$ifeq (HOSTID, vms) $purge [...] $endif
 	$purge noaobin$
 	;
 
