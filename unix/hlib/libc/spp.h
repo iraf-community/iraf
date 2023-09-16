@@ -95,6 +95,7 @@
 #define XUBYTE		unsigned char
 #define	XSHORT		short
 #define	XUSHORT		unsigned short
+#define	XUINT		unsigned int
 #define	XREAL		float
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
