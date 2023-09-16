@@ -22,7 +22,7 @@
 
 unset	noclobber
 onintr	cleanup_
-unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch sort which
+unalias cd cp echo sed set grep ls
 
 setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $path /usr/local/bin /opt/local/bin /local/bin /home/local/bin /usr/openwin/bin /usr/X11R6/bin /usr/X11/bin)"
 
@@ -35,7 +35,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 
 set VERSION		= "V2.18DEV"
 set hmach 		= "INDEF"
-set nbits 		= 32
+set nbits 		= 64
 set pipes 		= 1
 set shlibs 		= 0
 set tapecaps 		= 0
@@ -58,11 +58,7 @@ else
 endif
 
 setenv  UNAME	    `$uname_cmd    | tr '[A-Z]' '[a-z]'`
-if ($UNAME == "sunos") then
-    setenv  UNAME_M    `$uname_cmd -m | cut -c2- | tr '[A-Z]' '[a-z]'`
-else
-    setenv  UNAME_M    `$uname_cmd -m | tr '[A-Z]' '[a-z]' | tr ' ' '_'` 
-endif
+setenv  UNAME_M    `$uname_cmd -m | tr '[A-Z]' '[a-z]' | tr ' ' '_'` 
 setenv  OSVERSION   `$uname_cmd -r | cut -c1`
 
 
@@ -106,14 +102,11 @@ endif
 
 # Set some common defaults for most platforms
 set shlib		= 0			# no shared lib support
-set nbits		= 32			# 32-bit architecture
+set nbits		= 64			# 64-bit arch is default
 set tapecaps 		= 1			# platform supports tapecaps
 set tapes 		= 1			# platform support tape drives
 set pipes 		= 1			# supports display fifo pipes
 	
-set pciraf		= 1			# PC-IRAF system
-set suniraf		= 0			# SUN-IRAF system
-
 
 if ($debug == 1) then				# DEBUG PRINT
     if ($?IRAFARCH) then
@@ -126,34 +119,28 @@ endif
 
 # Determine parameters for each architecture.
 switch ($MNAME) 
-    case darwin: 					# Mac OS X
-    case ipad:
-    case macosx:
+    case macosx: 					# Mac OS X
+    case macos64: 					# Mac (alternate)
     case macintel:
+    case darwin:
         if ($?IRAFARCH) then
             set mach 		= "$IRAFARCH"
             set hmach 		= "$IRAFARCH"
-	    if ("$mach" == "macintel") then
-		set nbits	= 64
-	    endif
+	    set nbits	        = 64    # All Mac systems are now 64-bit only
 	else 
-            if ("$MNAME_M" == "x86_64") then		# 64-bit
+            if ("$MNAME_M" == "x86_64") then		# 64-bit Intel
                 set mach 	= "macintel"
                 set hmach 	= "macintel"
 		set nbits	= 64
-            else if ($MNAME_M == "x86" || $MNAME_M == "i386" || $MNAME_M == "ppc" || $MNAME_M == "power_macintosh") then
+            else if ($MNAME_M == "arm64") then          # Apple M1/M2
                 set mach 	= "macosx"
                 set hmach 	= "macosx"
-		set nbits	= 32
-            else
-                set mach 	= "ipad"		# iOS Device
-                set hmach 	= "ipad"
-		set nbits	= 32
+		set nbits	= 64
             endif
 	endif
-	set tapecaps 		= 0
-	set tapes 		= 0
-	set pipes 		= 0
+	set tapecaps 		= 0                     # No tape support
+	set tapes 		= 0                     # No tape support
+	set pipes 		= 1                     # Display pipes
         breaksw
 
     case redhat:
@@ -178,54 +165,9 @@ switch ($MNAME)
         endif
         breaksw
 
-    case ssun:
-    case sparc:
-    case sunos:
-	set tapecaps 		= 1
-        if ($UNAME_M != "86pc") then
-	    set suniraf		= 1
-	    set pciraf		= 0
-            if ($OSVERSION == 5) then			# Sparc Solaris
-                set mach  	= "ssun"
-                set hmach 	= "ssol"
-            else			   		# Sparc SunOS 4.x
-                set mach  	= "sparc"
-                set hmach 	= "sparc"
-            endif
-        else
-            set mach 		= "sunos"	    	# Intel Solaris x86
-            set hmach 		= "sunos"
-	    set tapecaps 	= 0
-	    set tapes 		= 0
-	    set pipes 		= 0
-        endif
-        breaksw
-
-    case freebsd: 					# FreeBSD
-        set mach 		= "freebsd"
-        set hmach 		= "freebsd"
-	set tapecaps 		= 0
-	set tapes 		= 0
-	set pipes 		= 0
-        breaksw
-
     default:      
-	# We don't want to be limited by the CYGWIN version numbering so
-	# look for a truncated match here before punting.
-	set os_mach = `echo $UNAME | cut -c1-6`
-	if ("$os_mach" == "cygwin") then
-            set mach 		= "cygwin"
-            set hmach 		= "cygwin"
-	    set shlib		= 0
-	    set tapecaps 	= 0
-	    set tapes 		= 0
-	    set pipes 		= 0
-            breaksw
-
-	else
-	    echo  "Unable to configure platform IRAFARCH='$MNAME'."
-	    exit 1
-	endif
+	echo  "Unable to configure platform IRAFARCH='$MNAME'."
+	exit 1
 endsw
 
 ##############################################################################

@@ -1,67 +1,18 @@
 #!/bin/csh -f
 #
-# IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
-# home$ should be defined in the user's .login file.
+# IRAF definitions for the UNIX/csh user.  The $iraf path should be defined
+# in the user's .login/.profile.
 
 
-set old_method		= 0
-
-if ($old_method == 1) then
-
-setenv OS_MACH	`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
-
-if (`uname -m` == "x86_64") then
-    if ($OS_MACH == "darwin") then
-        setenv MACH darwin
-        setenv IRAFARCH darwin
-    else
-        setenv MACH linux64
-        setenv IRAFARCH linux64
-    endif
-else if (-f /etc/redhat-release) then
-    setenv MACH redhat
+set a = `$iraf/unix/hlib/irafarch.csh`
+if ($status == 0) then
+    setenv MACH 	 $a
+    setenv IRAFARCH  $a
 else
-    setenv MACH		`uname -s | tr '[A-Z]' '[a-z]'`
+    echo "Error:  "$a
+    exit 1
 endif
-
-if ($MACH == "darwin") then
-    # Let the IRAFARCH override the machine to support cross compilation.
-    if ($?IRAFARCH) then
-        if ("$IRAFARCH" == "macosx") then
-	    setenv MACH macosx
-        else if ("$IRAFARCH" == "macintel") then
-	    setenv MACH macintel
-        endif
-    else
-        if ("`uname -m`" == "i386") then
-            setenv MACH macosx
-            setenv IRAFARCH macosx
-        else if ("`uname -m`" == "x86_64") then
-            setenv MACH macintel
-            setenv IRAFARCH macintel
-        else 
-            setenv MACH ipad
-            setenv IRAFARCH ipad
-        endif
-    endif
-else if ($OS_MACH == "cygwin") then
-    setenv MACH cygwin
-endif
-
-else		# old_method
             
-    set a = `$iraf/unix/hlib/irafarch.csh`
-    if ($status == 0) then
-        setenv MACH 	 $a
-        setenv IRAFARCH  $a
-    else
-	echo "Error:  "$a
-	exit 1
-    endif
-            
-endif		# old_method
-
-
 
 setenv	hostid	unix
 setenv	host	${iraf}unix/
@@ -76,31 +27,21 @@ setenv	F2C	$hbin/f2c.e
 setenv	RANLIB	ranlib
 
 switch ($MACH)
-case freebsd:
-    setenv HSI_CF "-O -DBSD -DPOSIX -w -Wunused -m32"
-    setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused -/m32"
-    setenv HSI_FF "-O -DBLD_KERNEL -m32"
-    setenv HSI_LF "-static -m32 -B/usr/lib32 -L/usr/lib32"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS "-lcompat"
-    set    mkzflags = "'lflags=-z' -/static"
-    breaksw
-
-case macosx:
-    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch i386 -m32 -mmacosx-version-min=10.4"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386"
-    setenv HSI_FF "-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
-    setenv HSI_LF "-arch i386 -m32 -mmacosx-version-min=10.4"
+  case macosx:
+  case macos64:
+    setenv HSI_CF "-O -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
+    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/Wall -/m64 -/arch -//arm64"
+    setenv HSI_FF "-O -arch arm64 -m64 -DBLD_KERNEL"
+    setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
     breaksw
 
-case macintel:
-    setenv HSI_CF "-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64 -g"
-    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused -/DMACH64 -/m64"
+  case macintel:
+    setenv HSI_CF "-O -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64"
+    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/m64"
     setenv HSI_FF "-O -m64 -DMACH64 -DBLD_KERNEL"
     setenv HSI_LF "-m64 -DMACH64"
     setenv HSI_F77LIBS ""
@@ -109,22 +50,10 @@ case macintel:
     set    mkzflags = "'lflags=-z'"
     breaksw
 
-case ipad:
-    setenv XC_CFLAGS	"-I/var/include"
-    setenv HSI_CF "-O -I/var/include -DMACOSX -DMACINTEL -DIPAD -w -Wunused"
-    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -/DIPAD -w -/Wunused"
-    setenv HSI_FF "-O -DBLD_KERNEL"
-    setenv HSI_LF ""
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-z'"
-    breaksw
-
-case linux64:
-    setenv HSI_CF "-g -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -w -m64"
-    setenv HSI_XF "-g -Inolibc -w -/m64 -/Wunused"
-    setenv HSI_FF "-g -m64 -DBLD_KERNEL"
+  case linux64:
+    setenv HSI_CF "-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -m64"
+    setenv HSI_XF "-Inolibc -/Wall -/m64 -/Wunused"
+    setenv HSI_FF "-m64 -DBLD_KERNEL"
     setenv HSI_LF "-m64 "
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
@@ -132,8 +61,8 @@ case linux64:
     set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
     breaksw
 
-case linux:
-case redhat:
+  case linux:
+  case redhat:
     setenv HSI_CF "-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -m32 -Wunused"
     setenv HSI_XF "-Inolibc -w -/Wunused -/m32"
     setenv HSI_FF "-O -DBLD_KERNEL -m32"
@@ -144,34 +73,7 @@ case redhat:
     set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
     breaksw
 
-case sunos:
-    setenv HSI_CF "-O -DSOLARIS -DX86 -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused"
-    setenv HSI_FF "-O"
-    #setenv HSI_LF "-t -Wl,-Bstatic"
-    #setenv HSI_LFLAGS "-t -Wl,-Bstatic"
-    #setenv HSI_OSLIBS \
-    #	"-lsocket -lnsl -lintl -Wl,-Bdynamic -ldl -Wl,-Bstatic -lelf"
-    setenv HSI_LF "-t"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS "-t"
-    setenv HSI_OSLIBS "-lsocket -lnsl -lintl -ldl -lelf"
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-case cygwin:
-    setenv HSI_CF "-O -DCYGWIN -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused -/DCYGWIN"
-    setenv HSI_FF "-O"
-    #setenv HSI_LF "-Wl,-Bstatic"
-    setenv HSI_LF ""
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS "${iraf}unix/bin.cygwin/libcompat.a"
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-default:
+  default:
     echo 'Warning in hlib$irafuser.csh: unknown platform '"$MACH"
     exit 1
     breaksw
@@ -199,6 +101,7 @@ endif
 
 setenv HSI_LIBS "$HSI_LIBS $HSI_OSLIBS"
 
+# Useful hosst command aliases
 alias	mkiraf	${hlib}mkiraf.csh
 alias	mkmlist	${hlib}mkmlist.csh
 alias	mkz	${hbin}mkpkg.e "$mkzflags"

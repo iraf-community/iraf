@@ -28,7 +28,7 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/5bin:/usr/ucb:/etc:/usr/etc:$PATH
 ##############################################################################
 
 hmach="INDEF"
-nbits=32
+nbits=64
 pipes=1
 shlibs=0
 tapecaps=0
@@ -59,11 +59,7 @@ else
 fi
 
 export  UNAME=`$uname_cmd | tr '[A-Z]' '[a-z]'`
-if [ $UNAME == "sunos" ]; then
-    export  UNAME_M=`$uname_cmd -m | cut -c2- | tr '[A-Z]' '[a-z]'`
-else
-    export  UNAME_M=`$uname_cmd -m | tr '[A-Z]' '[a-z]' | tr ' ' '_'` 
-fi
+export  UNAME_M=`$uname_cmd -m | tr '[A-Z]' '[a-z]' | tr ' ' '_'` 
 export  OSVERSION=`$uname_cmd -r | cut -c1`
 
 
@@ -106,13 +102,10 @@ fi
 
 # Set some common defaults for most platforms
 shlib=0				# no shared lib support
-nbits=32			# 32-bit architecture
+nbits=64			# 64-bit arch default
 tapecaps=1			# platform supports tapecaps
 tapes=1				# platform support tape drives
 pipes=1				# supports display fifo pipes
-
-pciraf=1			# PC-IRAF system
-suniraf=0			# SUN-IRAF system
 
 if (( $debug == 1 )); then				# DEBUG PRINT
     if [ -n "$IRAFARCH" ]; then
@@ -126,31 +119,25 @@ fi
 
 # Determine parameters for each architecture.
 case "$MNAME" in
-     "darwin"|"ipad"|"macosx"|"macintel")		# Mac OS X
+     "darwin"|"macosx"|"macintel"|"macos64")	        # Mac OS X
         if [ -n "$IRAFARCH" ]; then
             mach="$IRAFARCH"
             hmach="$IRAFARCH"
-	    if [ "$mach" == "macintel" ]; then
-		nbits=64
-	    fi
+	    nbits=64                    # All Mac systems are now 64-bit only
 	else 
-            if [ "$MNAME_M" == "x86_64" ]; then		# 64-bit
+            if [ "$MNAME_M" == "x86_64" ]; then		# 64-bit Intel
                 mach="macintel"
                 hmach="macintel"
 		nbits=64
-            elif [ "$MNAME_M" == "x86" -o "$MNAME_M" == "i386" ]; then
+            elif [ "$MNAME_M" == "arm64" ]; then        # Apple M1/M2
                 mach="macosx"
                 hmach="macosx"
-		nbits=32
-            else
-                mach="ipad"				# iOS Device
-                hmach="ipad"
-		nbits=32
+		nbits=64
             fi
 	fi
-	tapecaps=0
-	tapes=0
-	pipes=0
+	tapecaps=0                                      # No tape support
+	tapes=0                                         # No tape support
+	pipes=1                                         # Display pipes
         ;;
 
     "redhat"|"linux"|"linux64")
@@ -165,7 +152,7 @@ case "$MNAME" in
                 mach="linux64"
                 hmach="linux64"
 	        nbits=64
-            else					# Linux
+            else					# 32-bit Linux 
                 mach="linux"
                 hmach="linux"
 	        nbits=32
@@ -173,50 +160,9 @@ case "$MNAME" in
         fi
         ;;
 
-    "ssun"|"sparc"|"sunos")
-	tapecaps=1
-        if [ $UNAME_M != "86pc" ]; then
-	    suniraf=1
-	    pciraf=0
-            if [ $OSVERSION == 5 ]; then			# Sparc Solaris
-                mach= "ssun"
-                hmach= "ssol"
-            else			   		# Sparc SunOS 4.x
-                mach="sparc"
-                hmach="sparc"
-            fi
-        else
-            mach="sunos"	    	# Intel Solaris x86
-            hmach="sunos"
-	    tapecaps=0
-	    tapes=0
-	    pipes=0
-        fi
-        ;;
-
-    "freebsd") 					# FreeBSD
-        mach="freebsd"
-        hmach="freebsd"
-	tapecaps=0
-	tapes=0
-	pipes=0
-        ;;
-
     *)
-	# We don't want to be limited by the CYGWIN version numbering so
-	# look for a truncated match here before punting.
-	os_mach=`ECHO $UNAME | cut -c1-6`
-	if [ "$os_mach" == "cygwin" ]; then
-            mach="cygwin"
-            hmach="cygwin"
-	    shlib=0
-	    tapecaps=0
-	    tapes=0
-	    pipes=0
-	else
-	    ECHO  'Unable to determine platform architecture for ($MNAME).'
-	    exit 1
-	fi
+	ECHO  'Unable to determine platform architecture for ($MNAME).'
+	exit 1
 	;;
 esac
 
