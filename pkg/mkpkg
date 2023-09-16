@@ -20,7 +20,6 @@ update:
 	$call proto
 	$call utilities
 
-	$ifeq (HOSTID, vms) $purge [...] $endif
 	$purge bin$
 	;
 
