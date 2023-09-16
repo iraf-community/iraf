@@ -10,16 +10,14 @@
 #endif
 #endif
 
-typedef	int	jmp_buf[LEN_JUMPBUF];
-static	int	u_jmpstat;
+typedef	XINT	jmp_buf[LEN_JUMPBUF];
+static	XINT	u_jmpstat;
+
+extern  void  longjmp (jmp_buf env, int val);
+extern  void  ZSVJMP (XINT *jmpbuf, XINT *status);
+extern  void  ZDOJMP (XINT *jmpbuf, XINT *status);
 
 #define	setjmp(e)	(ZSVJMP((e),&u_jmpstat),u_jmpstat)
 #define	longjmp(e,v)	(u_jmpstat=(v),ZDOJMP((e),&u_jmpstat))
-
-/* The following is necessary to prevent to prevent the optimizer from
- * doing unwise things with setjmp on a Sun-4.
- */
-extern	int zsvjmp_();
-#pragma unknown_control_flow(zsvjmp_)
 
 #define	D_setjmp
