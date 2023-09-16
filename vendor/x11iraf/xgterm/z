@@ -1,5 +1,0 @@
-#!/iraf/iraf/bin.macintel/ecl.e -f
-
-plot
-prow dev$pix 23
-

@@ -1,5 +1,0 @@
-
-alias mx "c;make ; ./ximtool -gui ximtool-alt.gui zz.fits"
-alias x "c;./ximtool -gui ximtool-alt.gui zz.fits"
-alias z "c;(chdir gui; mkgui) ; ./ximtool -gui ximtool-alt.gui zz.fits"
-alias zz "c;(chdir gui; mkgui) ; make; ./ximtool -gui ximtool-alt.gui zz.fits"

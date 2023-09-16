@@ -1,9 +1,0 @@
-OBM -- Object Manager library.  This library implements a window system
-toolkit as an interpreted window-object language, allowing application GUIs
-to be defined and executed at runtime without compiling any code, and with
-minimal dependence upon the underlying window system toolkit library.
-The object manager is used in X11 client applications such as the IRAF widget
-server, which is basically just the object manager packaged as a server that
-remote client applications can connect to to download and execute a GUI.
-
-See obm.c for an overview of the library.
