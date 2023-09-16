@@ -134,6 +134,13 @@ rmfiles (
 	int	nextn, mode;
 	FILE	*fp = NULL;
 
+
+        /* Hardwire an exclusion for a .git directory so we don't
+         * unintentially delete the repo files.
+         */
+        if (strncmp (".git", dir, 4) == 0)
+            return;
+
 	if (debug) {
 	    fprintf (stderr, "rmfiles @(%s), exe=%d, ver=%d\n", prog, execute,
 		verbose);
