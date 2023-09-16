@@ -10,6 +10,9 @@ local/.lesshst
 *.bak
 *.OLD
 *.xxx
+spool
+spool.*
+_spool.*
 
 # Object files
 *.o
