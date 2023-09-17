@@ -193,3 +193,4 @@ begin
 	call amovki (value, Memi[MCT_DATA (table)],
 		     MCT_MAXROW (table) * MCT_MAXCOL (table))
 end
+

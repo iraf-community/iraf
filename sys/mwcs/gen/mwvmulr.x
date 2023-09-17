@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # MW_VMUL -- Vector multiply.
 
 procedure mw_vmulr (a, b, c, ndim)

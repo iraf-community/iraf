@@ -289,3 +289,4 @@ begin
 	# Enter value
 	call mct_putp (table, row, col, value)
 end
+

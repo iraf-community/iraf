@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	"../mwcs.h"
 
 # MW_V1TRAN -- Optimized 1D coordinate transformation for an array of points.

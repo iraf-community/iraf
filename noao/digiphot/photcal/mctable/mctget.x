@@ -305,3 +305,4 @@ begin
 	# Return value.
 	return (MEMP[mct_getrow (table, row) + col - 1])
 end
+
