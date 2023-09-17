@@ -28,6 +28,7 @@
 
 #include "dextern.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 #define	IDENTIFIER 257
@@ -58,7 +59,7 @@ char *infile;			/* input file name              */
 static int numbval;		/* value of an input number     */
 static int toksize = NAMESIZE;
 static char *tokname;		/* input token name             */
-char *parser = PARSER;		/* location of common parser    */
+char *parser = NULL;		/* location of common parser    */
 
 static void finact (void);
 static char *cstash (char *);
@@ -212,7 +213,7 @@ setup (
     mem = mem0;
     tracemem = mem0;
 
-    while ((c = getopt (argc, argv, "vVdltp:Q:Y:P:b:")) != EOF)
+    while ((c = getopt (argc, argv, "vVdltp:Q:Y:P:b:")) != EOF) {
 	switch (c) {
 	case 'v':
 	    options |= v_FLAG;
@@ -263,6 +264,18 @@ setup (
 			    " [-P parser] file\n");
 	    exit (1);
 	}
+    }
+
+
+    /*
+     * If no parser specified, get a default from the environment.
+     */
+    if (parser == (char *) NULL) {
+        parser = calloc (255, sizeof(char));
+        strcpy (parser, getenv ("iraf"));
+        strcat (parser, DEF_PARSER);
+    }
+
     /*
      * Open y.output if -v is specified
      */

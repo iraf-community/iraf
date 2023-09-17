@@ -350,8 +350,8 @@ extern char *parser;
 #define	ZAPFILE(x) (void)unlink(x)
 #endif
 
-#ifndef PARSER
-#define	PARSER "/iraf/iraf/lib/yaccpar.x"
+#ifndef DEF_PARSER
+#define	DEF_PARSER "lib/yaccpar.x"
 #endif
 
 
