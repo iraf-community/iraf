@@ -30,6 +30,8 @@ void  output_upper (char *s);
 void  output (char ch);
 void  outstr (char *s);
 
+static long bufpos;             /* file buffer offset                   */
+#define YY_USER_ACTION bufpos += yyleng;
 
 %}
 
@@ -93,14 +95,13 @@ $INDEF				outstr ("INDEF");
 %%
 
 
-long     fpos;                  /* file buffer offset                   */
 
 /* LEX_INPUT -- Make input() callable as a function from the .c code.
  */
 int
 lex_input (void)
 {
-        fpos++;
+        bufpos++;
 	return (input());
 }
 
@@ -109,7 +110,7 @@ lex_input (void)
 void
 lex_unput (int ch)
 {
-        fpos--;
+        bufpos--;
 	unput (ch);
 }
 
@@ -117,7 +118,7 @@ lex_unput (int ch)
  */
 long
 lex_ftell (void) {
-    return fpos;
+    return bufpos;
 }
 
 /* LEX_FSEEK -- Move to specified file offset.
@@ -126,5 +127,5 @@ void
 lex_fseek (long offset) {
     YY_FLUSH_BUFFER;
     fseek (yyin, offset, SEEK_SET);
-    fpos = offset;
+    bufpos = offset;
 }
