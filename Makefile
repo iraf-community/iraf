@@ -134,10 +134,10 @@ bindirs:
 config:
 	sed -E -i.orig \
 	    s+'^([[:space:]]*d_iraf=).*+\1"$(iraf)"'+ \
-	    $(DESTDIR)$(hlib)ecl.sh \
+	    $(DESTDIR)$(hlib)irafcl.sh \
 	    $(DESTDIR)$(hlib)setup.sh \
             $(DESTDIR)$(hlib)mkiraf.sh
-	grep '"$(iraf)"' $(DESTDIR)$(hlib)ecl.sh
+	grep '"$(iraf)"' $(DESTDIR)$(hlib)irafcl.sh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)setup.sh
 	grep '"$(iraf)"' $(DESTDIR)$(hlib)mkiraf.sh
 	sed -E -i.orig \
@@ -150,8 +150,9 @@ bindir = $(HOME)/.iraf/bin
 # Create symbolic links for user callable scripts and executables
 binary_links:
 	mkdir -p $(DESTDIR)$(bindir)
-	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/cl
-	ln -sf $(hlib)ecl.sh $(DESTDIR)$(bindir)/ecl
+	ln -sf $(hlib)irafcl.sh $(DESTDIR)$(bindir)/irafcl
+	ln -sf $(hlib)irafcl.sh $(DESTDIR)$(bindir)/cl
+	ln -sf $(hlib)irafcl.sh $(DESTDIR)$(bindir)/ecl
 	ln -sf $(hlib)mkiraf.sh $(DESTDIR)$(bindir)/mkiraf
 	for hprog in mkpkg rmbin rmfiles rtar sgidispatch wtar xc xyacc ; do \
 	    ln -sf $(hbin)$${hprog}.e $(DESTDIR)$(bindir)/$${hprog} ; \
@@ -184,8 +185,9 @@ install: noao/bin/x_quad.e
 	         $(DESTDIR)$(prefix)/lib/iraf
 	$(MAKE) config binary_links strip iraf=$(prefix)/lib/iraf/ bindir=$(prefix)/bin
 	cp -f $(hlib)mkiraf.man $(DESTDIR)$(prefix)/share/man/man1/mkiraf.1
-	cp -f $(hlib)ecl.man $(DESTDIR)$(prefix)/share/man/man1/ecl.1
-	ln -sf ecl.1 $(DESTDIR)$(prefix)/share/man/man1/cl.1
+	cp -f $(hlib)irafcl.man $(DESTDIR)$(prefix)/share/man/man1/irafcl.1
+	ln -sf irafcl.1 $(DESTDIR)$(prefix)/share/man/man1/ecl.1
+	ln -sf irafcl.1 $(DESTDIR)$(prefix)/share/man/man1/cl.1
 	cp -f $(host)boot/mkpkg/mkpkg.man $(DESTDIR)$(prefix)/share/man/man1/mkpkg.1
 	cp -f $(host)boot/spp/xc.man $(DESTDIR)$(prefix)/share/man/man1/xc.1
 	cp -f $(host)boot/xyacc/xyacc.man $(DESTDIR)$(prefix)/share/man/man1/xyacc.1
