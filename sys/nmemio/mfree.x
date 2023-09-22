@@ -6,7 +6,7 @@ include	<error.h>
 
 # MFREE -- Free a previously allocated buffer.  If the buffer has already been
 # returned (NULL pointer), ignore the request.  Once the buffer has been
-# returned, the old pointer value is of not useful (and invalid), so set it
+# returned, the old pointer value is not useful (and invalid), so set it
 # to NULL.
 
 procedure mfree (ptr, dtype)
