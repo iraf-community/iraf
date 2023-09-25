@@ -155,7 +155,6 @@ ZOPNTX (
 	register FILE *fp;
 	struct stat filestat;
 	int newmode, maskval;
-	FILE *fopen();
 	char *fmode;
 
 	/* Map FIO access mode into UNIX/stdio access mode.
