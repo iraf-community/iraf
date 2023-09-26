@@ -1,0 +1,71 @@
+C
+C     MACHINE CONSTANTS
+C
+C     MACH(1) = B**(EMIN-1)            THE SMALLEST POSITIVE MAGNITUDE.
+C     MACH(2) = B**EMAX*(1 - B**(-T))  THE LARGEST MAGNITUDE.
+C     MACH(3) = B**(-T)                THE SMALLEST RELATIVE SPACING.
+C     MACH(4) = B**(1-T)               THE LARGEST RELATIVE SPACING.
+C     MACH(5) = LOG10(B)
+
+      DOUBLE PRECISION FUNCTION D1MACH(I)
+      INTEGER I
+      DOUBLE PRECISION DMACH(5)
+      DATA DMACH(1) / 2.2250738585072014e-308 /
+      DATA DMACH(2) / 1.7976931348623157e+308 /
+      DATA DMACH(3) / 1.1102230246251565e-16 /
+      DATA DMACH(4) / 2.2204460492503131e-16 /
+      DATA DMACH(5) / 3.010299956639812e-1 /
+      IF (I .LT. 1 .OR. I .GT. 5) THEN
+	  D1MACH = 0.0
+	  RETURN
+      END IF
+      D1MACH = DMACH(I)
+      RETURN
+      END
+
+
+      REAL FUNCTION R1MACH(I)
+      INTEGER I
+      REAL RMACH(5)
+      DATA RMACH(1) / 1.1754943508222875e-38 /
+      DATA RMACH(2) / 3.4028234663852886e+38 /
+      DATA RMACH(3) / 5.960464477539063e-08 /
+      DATA RMACH(4) / 1.1920928955078125e-07 /
+      DATA RMACH(5) / 0.3010299956639812 /
+      IF (I .LT. 1 .OR. I .GT. 5) THEN
+	  R1MACH = 0.0
+      END IF
+      R1MACH = RMACH(I)
+      RETURN
+      END
+
+
+      INTEGER FUNCTION I1MACH(I)
+      INTEGER IMACH(16), OUTPUT, SMALL(2), I
+      SAVE IMACH
+      REAL RMACH
+      EQUIVALENCE (IMACH(4),OUTPUT), (RMACH,SMALL(1))
+      DATA IMACH( 1) /    5 /
+      DATA IMACH( 2) /    6 /
+      DATA IMACH( 3) /    7 /
+      DATA IMACH( 4) /    6 /
+      DATA IMACH( 5) /   32 /
+      DATA IMACH( 6) /    4 /
+      DATA IMACH( 7) /    2 /
+      DATA IMACH( 8) /   31 /
+      DATA IMACH( 9) / 2147483647 /
+      DATA IMACH(10) /    2 /
+      DATA IMACH(11) /   24 /
+      DATA IMACH(12) / -125 /
+      DATA IMACH(13) /  128 /
+      DATA IMACH(14) /   53 /
+      DATA IMACH(15) / -1021 /
+      DATA IMACH(16) /  1024 /
+      IF (I .LT. 1  .OR.  I .GT. 16) THEN
+         I1MACH = -1
+	 RETURN
+      END IF
+      I1MACH = IMACH(I)
+      IF (I .EQ. 6) I1MACH = 1
+      RETURN
+      END
