@@ -11,7 +11,7 @@
  * [Specially optimized for Sun/IRAF].
  */
 void
-ACLRD (XCHAR *a, XINT *n)
+ACLRD (XDOUBLE *a, XINT *n)
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 }
