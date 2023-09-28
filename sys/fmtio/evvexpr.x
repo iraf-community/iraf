@@ -4803,7 +4803,7 @@ yyabort_
 	switch (yym) {
 	    
 case 1:
-# line 266 "evvexpr.y"
+# line 267 "evvexpr.y"
 {
 			# Normal exit.  Move the final expression value operand
 			# into the operand structure pointed to by the global
@@ -4814,29 +4814,29 @@ case 1:
 			return (OK)
 		}
 case 2:
-# line 275 "evvexpr.y"
+# line 276 "evvexpr.y"
 {
 			call error (1, "syntax error")
 		}
 case 3:
-# line 280 "evvexpr.y"
+# line 281 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		}
 case 4:
-# line 283 "evvexpr.y"
+# line 284 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 			call xvv_freeop (yypvt-3*YYOPLEN)
 		}
 case 5:
-# line 289 "evvexpr.y"
+# line 290 "evvexpr.y"
 {
 			# Numeric constant.
 			YYMOVE (yypvt, yyval)
 		    }
 case 6:
-# line 293 "evvexpr.y"
+# line 294 "evvexpr.y"
 {
 			# The boolean constants "yes" and "no" are implemented
 			# as reserved operands.
@@ -4856,7 +4856,7 @@ case 6:
 			call xvv_freeop (yypvt)
 		    }
 case 7:
-# line 311 "evvexpr.y"
+# line 312 "evvexpr.y"
 {
 			# e.g., @"param"
 			if (ev_getop != NULL) {
@@ -4869,139 +4869,139 @@ case 7:
 			call xvv_freeop (yypvt)
 		    }
 case 8:
-# line 322 "evvexpr.y"
+# line 323 "evvexpr.y"
 {
 			# Unary arithmetic minus.
 			call xvv_unop (MINUS, yypvt, yyval)
 		    }
 case 9:
-# line 326 "evvexpr.y"
+# line 327 "evvexpr.y"
 {
 			# Logical not.
 			call xvv_unop (LNOT, yypvt, yyval)
 		    }
 case 10:
-# line 330 "evvexpr.y"
+# line 331 "evvexpr.y"
 {
 			# Boolean not.
 			call xvv_unop (BNOT, yypvt, yyval)
 		    }
 case 11:
-# line 334 "evvexpr.y"
+# line 335 "evvexpr.y"
 {
 			# Addition.
 			call xvv_binop (PLUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 12:
-# line 338 "evvexpr.y"
+# line 339 "evvexpr.y"
 {
 			# Subtraction.
 			call xvv_binop (MINUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 13:
-# line 342 "evvexpr.y"
+# line 343 "evvexpr.y"
 {
 			# Multiplication.
 			call xvv_binop (STAR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 14:
-# line 346 "evvexpr.y"
+# line 347 "evvexpr.y"
 {
 			# Division.
 			call xvv_binop (SLASH, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 15:
-# line 350 "evvexpr.y"
+# line 351 "evvexpr.y"
 {
 			# Exponentiation.
 			call xvv_binop (EXPON, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 16:
-# line 354 "evvexpr.y"
+# line 355 "evvexpr.y"
 {
 			# Concatenate two operands.
 			call xvv_binop (CONCAT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 17:
-# line 358 "evvexpr.y"
+# line 359 "evvexpr.y"
 {
 			# Logical and.
 			call xvv_boolop (LAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 18:
-# line 362 "evvexpr.y"
+# line 363 "evvexpr.y"
 {
 			# Logical or.
 			call xvv_boolop (LOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 19:
-# line 366 "evvexpr.y"
+# line 367 "evvexpr.y"
 {
 			# Boolean and.
 			call xvv_binop (BAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 20:
-# line 370 "evvexpr.y"
+# line 371 "evvexpr.y"
 {
 			# Boolean or.
 			call xvv_binop (BOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 21:
-# line 374 "evvexpr.y"
+# line 375 "evvexpr.y"
 {
 			# Boolean xor.
 			call xvv_binop (BXOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 22:
-# line 378 "evvexpr.y"
+# line 379 "evvexpr.y"
 {
 			# Boolean less than.
 			call xvv_boolop (LT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 23:
-# line 382 "evvexpr.y"
+# line 383 "evvexpr.y"
 {
 			# Boolean greater than.
 			call xvv_boolop (GT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 24:
-# line 386 "evvexpr.y"
+# line 387 "evvexpr.y"
 {
 			# Boolean less than or equal.
 			call xvv_boolop (LE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 25:
-# line 390 "evvexpr.y"
+# line 391 "evvexpr.y"
 {
 			# Boolean greater than or equal.
 			call xvv_boolop (GE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 26:
-# line 394 "evvexpr.y"
+# line 395 "evvexpr.y"
 {
 			# Boolean equal.
 			call xvv_boolop (EQ, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 27:
-# line 398 "evvexpr.y"
+# line 399 "evvexpr.y"
 {
 			# String pattern-equal.
 			call xvv_boolop (SE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 28:
-# line 402 "evvexpr.y"
+# line 403 "evvexpr.y"
 {
 			# Boolean not equal.
 			call xvv_boolop (NE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 29:
-# line 406 "evvexpr.y"
+# line 407 "evvexpr.y"
 {
 			# Conditional expression.
 			call xvv_quest (yypvt-6*YYOPLEN, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 30:
-# line 410 "evvexpr.y"
+# line 411 "evvexpr.y"
 {
 			# Call an intrinsic or external function.
 			ap = O_VALP(yypvt-YYOPLEN)
@@ -5011,36 +5011,36 @@ case 30:
 			call xvv_freeop (yypvt-YYOPLEN)
 		    }
 case 31:
-# line 418 "evvexpr.y"
+# line 419 "evvexpr.y"
 {
 			YYMOVE (yypvt-YYOPLEN, yyval)
 		    }
 case 32:
-# line 424 "evvexpr.y"
+# line 425 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		    }
 case 33:
-# line 427 "evvexpr.y"
+# line 428 "evvexpr.y"
 {
 			if (O_TYPE(yypvt) != TY_CHAR)
 			    call error (1, "illegal function name")
 			YYMOVE (yypvt, yyval)
 		    }
 case 34:
-# line 435 "evvexpr.y"
+# line 436 "evvexpr.y"
 {
 			# Empty.
 			call xvv_startarglist (NULL, yyval)
 		    }
 case 35:
-# line 439 "evvexpr.y"
+# line 440 "evvexpr.y"
 {
 			# First arg; start a nonnull list.
 			call xvv_startarglist (yypvt, yyval)
 		    }
 case 36:
-# line 443 "evvexpr.y"
+# line 444 "evvexpr.y"
 {
 			# Add an argument to an existing list.
 			call xvv_addarg (yypvt, yypvt-3*YYOPLEN, yyval)
