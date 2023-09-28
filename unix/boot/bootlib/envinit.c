@@ -21,7 +21,8 @@ extern	char  *os_strpak (XCHAR *sppstr, char *cstr, int maxch);
 extern	char  *vfn2osfn (char *vfn, int new);
 extern  XCHAR *os_strupk (char *str, XCHAR *outstr, int maxch);
 extern	void   os_putenv (char *name, char *value);
-extern	int bdebug;
+extern  int    os_access (char *fname, int mode, int type);
+extern	int    bdebug;
 
 void 	_envinit (void);
 void 	loadenv (char *osfn);
@@ -215,7 +216,14 @@ loadenv (char *osfn)
 			    } else
 				ip++;
 
-			if ((fp = fopen (vfn2osfn(fname,0), "r")) == NULL) {
+                        /* File in iraf$extern or home$ are optional so we
+                         * don't throw an error if they don't exist.
+                         */
+                        if (strncmp (fname, "iraf$extern", 11) == 0 ||
+                            strncmp (fname, "home$", 5) == 0) {
+                                if (os_access (vfn2osfn(fname,0), 0, 0) == NO)
+                                    continue;
+                        } else if ((fp=fopen(vfn2osfn(fname,0), "r")) == NULL) {
 			    printf ("envinit: cannot open `%s'\n", fname);
 			    fflush (stdout);
 			    break;
