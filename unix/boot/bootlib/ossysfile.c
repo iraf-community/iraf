@@ -69,7 +69,7 @@ os_sysfile (
 		ip = ip_save;
 
 		/* Exit if the file exists. */
-		if (os_access (fname, 0, 0))
+		if (os_access (fname, 0, 0) == YES)
 		    return (strlen (fname));
 	    }
 	}
