@@ -1,5 +1,4 @@
-#!/bin/bash
-PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
+#!/bin/sh
 # f77-style shell script to compile and load fortran, C, and assembly codes
 #	usage:	f77 [-g] [-O|-O[23456]] [-o absfile] [-c] files [-l library]
 #		-o objfile	Override default executable name a.out.
@@ -9,8 +8,8 @@ PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 #		-u		complain about undeclared variables
 #		-w		omit all warning messages
 #		-w66		omit Fortran 66 compatibility warning messages
-#		-f*		pass thru gcc optimizer options
-#		-W*		pass thru gcc warning options
+#		-f*		pass thru cc optimizer options
+#		-W*		pass thru cc warning options
 #		files		FORTRAN source files ending in .f .
 #				C source files ending in .c .
 #				Assembly language files ending in .s .
@@ -30,24 +29,34 @@ PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 # the Fortran file has a .F extension.  The modified (no f2ctmp_) behavior is
 # for .f files.
 
+# This f77.sh will modify the IRAF generated files so that the memd struct
+# contains two elements rather than one element.  This is essential to 
+# insure that doubles are aligned on 128 byte boundaries, which is necessary
+# for gcc 4.8 to correctly generate instructions with SSE2.
+#
+# Also note that config.h has to also have the memory alignment set so that
+# doubles are aligned against 128-bit boundaries.
+#
+# This was the reported with Mageia bug #11507
+# https://bugs.mageia.org/show_bug.cgi?id=11507
+set -e
+
 s=/tmp/stderr_$$
-t=/tmp/f77_$$
-CC=${CC_f2c:-'gcc'}
-CFLAGS=${CFLAGS:-"-I${iraf}unix/bin.${IRAFARCH} -w --std=c89"}
+CC=${CC_f2c:-${CC:-cc}}
+CFLAGS="-I${iraf}/unix/bin.${IRAFARCH} ${XC_CFLAGS} -w -fcommon"
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
-F2C=${F2C:-/usr/bin/f2c}
+F2C=${F2C:-${iraf}unix/bin/f2c.e}
 F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802'}
 keepc=0
 warn=1
 xsrc=0
 rc=0
-lib=/lib/num/lib.lo
-trap "rm -f $s ; exit \$rc" 0
+trap 'rm -f $s ; exit $rc' 0
 OUTF=a.out
 cOPT=1
 G=
-CPP=/bin/cat
+CPP=cat
 CPPFLAGS=
 # set -- `getopt cD:gI:N:Oo:Suw6 "$@"`
 case $? in 0);; *) exit 1;; esac
@@ -186,22 +195,22 @@ do
 	in
 	*.f)
 		case "$1" in *.f) f=".f";; *.F) f=".F";; esac
-		b=`basename $1 $f`
+		b=$(basename "$1" $f)
 		if [ $warn = 0 ]; then
-		    $F2C $F2CFLAGS $b.f 2>$s
-		    sed '/^	arg .*: here/d' $s 1>&2
+		    $F2C $F2CFLAGS "$b.f" 2>"$s"
+		    sed '/^	arg .*: here/d' "$s" 1>&2
 		else
-		    $F2C $F2CFLAGS $b.f
+		    $F2C $F2CFLAGS "$b.f"
 		fi
 		if [ $xsrc = 1 ]; then
-		    sed -e "s/$b\\.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
+		    sed -e "s/$b\\.f/$b.x/" < "$b.c" > "$b.t"; mv "$b.t" "$b.c"
 		fi
-                $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
+                $CC $CPPFLAGS -c $CFLAGS "$b.c" 2>"$s"
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
 		case $rc in 0);; *) exit 5;; esac
 		if [ $keepc = 0 ]; then
-		    rm -f $b.c
+		    rm -f "$b.c"
 		fi
 		OFILES="$OFILES $b.o"
 		case $cOPT in 1) cOPT=2;; esac
@@ -209,57 +218,57 @@ do
 		;;
 	*.F)
 		case "$1" in *.f) f=".f";; *.F) f=".F";; esac
-		b=`basename $1 $f`
-                trap "rm -f f2ctmp_$b.* ; exit 4" 0
+		b=$(basename "$1" "$f")
+                trap 'rm -f f2ctmp_$b.* ; exit 4' 0
                 sed 's/\\$/\\-/;
-                     s/^ *INCLUDE *'\(.*\)'.*$/#include "\1"/' $1 |\
+                     s/^ *INCLUDE *'\(.*\)'.*$/#include "\1"/' "$1" |\
 		 $CPP $CPPFLAGS |\
-		 egrep -v '^# ' > f2ctmp_$b.f
-                trap "rm -f f2ctmp_$b.* ; exit 4" 0
-		$F2C $F2CFLAGS f2ctmp_$b.f
+		 grep -E -v '^# ' > "f2ctmp_$b.f"
+                trap 'rm -f f2ctmp_$b.* ; exit 4' 0
+		$F2C $F2CFLAGS "f2ctmp_$b.f"
 		case $? in 0);; *) rm f2ctmp_* ; exit 5;; esac
-                rm -f f2ctmp_$b.f
-		mv f2ctmp_$b.c $b.c
-		if [ -f f2ctmp_$b.P ]; then mv f2ctmp_$b.P $b.P; fi
-		case $? in 0);; *) rm -f $b.c ; exit 5;; esac
-                trap "rm -f $s ; exit 4" 0
-                $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
+                rm -f "f2ctmp_$b.f"
+		mv "f2ctmp_$b.c" "$b.c"
+		if [ -f "f2ctmp_$b.P" ]; then mv "f2ctmp_$b.P" "$b.P"; fi
+		case $? in 0);; *) rm -f "$b.c" ; exit 5;; esac
+                trap 'rm -f $s ; exit 4' 0
+                $CC $CPPFLAGS -c $CFLAGS "$b.c" 2>$s
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
 		case $rc in 0);; *) exit 5;; esac
 		if [ $keepc = 0 ]; then
-		    rm -f $b.c
+		    rm -f "$b.c"
 		fi
 		OFILES="$OFILES $b.o"
 		case $cOPT in 1) cOPT=2;; esac
 		shift
 		;;
 	*.e)
-		b=`basename $1 .e`
-		$EFL $EFLFLAGS $1 >$b.f
+		b=$(basename "$1" .e)
+		$EFL $EFLFLAGS "$1" >"$b.f"
 		case $? in 0);; *) exit;; esac
-		$F2C $F2CFLAGS $b.f
+		$F2C $F2CFLAGS "$b.f"
 		case $? in 0);; *) exit;; esac
-                $CC -c $CFLAGS $b.c
+                $CC -c $CFLAGS "$b.c"
 		case $? in 0);; *) exit;; esac
 		OFILES="$OFILES $b.o"
-		rm $b.[cf]
+		rm "$b".[cf]
 		case $cOPT in 1) cOPT=2;; esac
 		shift
 		;;
 	*.s)
-		echo $1: 1>&2
-		OFILE=`basename $1 .s`.o
-		${AS:-/usr/bin/as} -o $OFILE $AFLAGS $1
+		echo "$1": 1>&2
+		OFILE=$(basename "$1" .s).o
+		${AS:-as} -o "$OFILE" $AFLAGS "$1"
 		case $? in 0);; *) exit;; esac
 		OFILES="$OFILES $OFILE"
 		case $cOPT in 1) cOPT=2;; esac
 		shift
 		;;
 	*.c)
-		echo $1: 1>&2
-		OFILE=`basename $1 .c`.o
-                $CC -c $CFLAGS $CPPFLAGS $1
+		echo "$1": 1>&2
+		OFILE=$(basename "$1" .c).o
+                $CC -c $CFLAGS $CPPFLAGS "$1"
 		rc=$?; case $rc in 0);; *) exit;; esac
 		OFILES="$OFILES $OFILE"
 		case $cOPT in 1) cOPT=2;; esac
@@ -290,6 +299,6 @@ do
 	esac
 done
 
-case $cOPT in 2) $CC $G -o $OUTF $OFILES -lf2c -lm;; esac
+case $cOPT in 2) $CC $G -o "$OUTF" "$OFILES" -lf2c -lm;; esac
 rc=$?
 exit $rc
