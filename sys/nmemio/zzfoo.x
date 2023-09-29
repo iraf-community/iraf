@@ -21,6 +21,7 @@ procedure t_memtest ()
 
 int	model, nerr
 pointer str, ptr
+pointer mgtfwa(),  coerce(), fwa
 
 bool	clgetb()
 
@@ -165,11 +166,23 @@ begin
 	# Note this test will leak 1024 bytes because of the error recovery.
 	call eprintf ("Testing invalid free:\t")
 	call calloc (ptr, 256, TY_REAL)
-	iferr ( call mfree (ptr, TY_INT) )
-	    call eprintf ("Detected\t\t\t\t")
-	else
-	    call eprintf ("Undetected\t\t\t\t")
-	call eprintf ("Done\n")
+call eprintf("calloc ptr %d\n");call pargi(ptr)
+fwa = coerce (ptr, TY_REAL, TY_DOUBLE)
+call eprintf("coerce ptr %d\n");call pargi(ptr)
+            
+call eprintf("1\n")
+fwa = mgtfwa (ptr, TY_REAL)
+call eprintf("2\n")
+fwa = coerce (ptr, TY_INT, TY_INT)
+#fwa = mgtfwa (ptr, TY_INT)
+call eprintf("ptr %d  fwa %d\n");call pargi(ptr); call pargi(fwa);
+call eprintf("3\n")
+
+	#iferr ( call mfree (ptr, TY_INT) )
+	#    call eprintf ("Detected\t\t\t\t")
+	#else
+	#    call eprintf ("Undetected\t\t\t\t")
+	#call eprintf ("Done\n")
 
 	call eprintf ("Testing double free:\t")
 	call calloc (ptr, 256, TY_INT)
@@ -284,8 +297,8 @@ define  F_I1		Memi[$1]
 define  F_I2		Memi[$1+1]
 define  F_L1		Meml[$1+2]
 define  F_L2		Meml[$1+3]
-define  F_R1		Memr[$1+4]
-define  F_R2		Memr[$1+5]
+define  F_R1		Memr[P2R($1+4)]
+define  F_R2		Memr[P2R($1+5)]
 define  F_D1		Memd[P2D($1+8)]
 define  F_D2		Memd[P2D($1+10)]
 define  F_I3		Memi[$1+12]
@@ -906,3 +919,30 @@ begin
 end
 
 
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<syserr.h>
+include	<config.h>
+include	<mach.h>
+
+# MGTFWA -- Given a user buffer pointer, retrieve physical address of buffer.
+# If physical address of buffer does not seem reasonable, memory has probably
+# been overwritten, a fatal error.
+
+int procedure mgtfwa (ptr, dtype)
+
+pointer	ptr, bufptr
+int	dtype
+int	locbuf, fwa
+int	coerce()
+
+begin
+	bufptr = coerce (ptr, dtype, TY_INT)
+	fwa = Memi[bufptr-5]
+	call zlocva (Memi[bufptr-5], locbuf)
+
+	if (abs (locbuf - fwa) > (6 * SZ_VMEMALIGN))
+	    call sys_panic (SYS_MCORRUPTED, "Memory fwa has been corrupted")
+
+	return (fwa)
+end
