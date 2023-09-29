@@ -311,7 +311,7 @@ begin
 
 	# Initialize INLFIT.
 	call in_initr (in, locpr (ft_func), locpr (ft_dfunc),
-	    Memr[pr_gsymp (sym, PTEQSPARVAL)], Memr[dparams],
+	    Memr[P2R(pr_gsymp (sym, PTEQSPARVAL))], Memr[dparams],
 	    nparams, Memi[plist], nfparams)
 
 	# Set INLFIT fitting parameters.

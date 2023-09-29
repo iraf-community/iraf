@@ -159,7 +159,7 @@ begin
 	do n = 1, npts {
 
 	    # Evaluate fitting equation.
-	    rval = pr_eval (code, Memr[mct_getrow (otable, n)], Memr[parval])
+	    rval = pr_eval (code, Memr[mct_getrow (otable, n)], Memr[P2R(parval)])
 
 	    # Substitute weight.
 	    if (IS_INDEFR (rval))
