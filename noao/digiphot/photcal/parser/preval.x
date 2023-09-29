@@ -75,7 +75,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -128,7 +128,7 @@ begin
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evi (caux, vdata, Memr[paux])
+		stack[sp] = pr_evi (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -311,7 +311,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -364,7 +364,7 @@ begin
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evl (caux, vdata, Memr[paux])
+		stack[sp] = pr_evl (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -547,7 +547,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -600,7 +600,7 @@ begin
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evr (caux, vdata, Memr[paux])
+		stack[sp] = pr_evr (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -783,7 +783,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -836,7 +836,7 @@ begin
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evd (caux, vdata, Memr[paux])
+		stack[sp] = pr_evd (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -1019,7 +1019,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
@@ -1072,7 +1072,7 @@ begin
 		caux = pr_gsymp (sym, PTEQRPNFIT)
 		paux = pr_gsymp (sym, PTEQSPARVAL)
 
-		stack[sp] = pr_evx (caux, vdata, Memr[paux])
+		stack[sp] = pr_evx (caux, vdata, Memr[P2R(paux)])
 
 		if (IS_INDEFR (stack[sp]))
 		    break
@@ -1254,7 +1254,7 @@ begin
 	    case PEV_NUMBER:
 		ip = ip + 1
 		sp = sp + 1
-		stack[sp] = Memr[code + ip]
+		stack[sp] = Memr[P2R(code + ip)]
 		if (IS_INDEFR (stack[sp]))
 		    break
 
