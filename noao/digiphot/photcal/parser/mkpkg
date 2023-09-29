@@ -15,7 +15,7 @@ libpkg.a:
 	        $echo "parser.x is out of date; rebuilding with XYACC:"
 	        !xyacc -d parser.y
 		$move ytab.x parser.x
-		$move ytab.h ../lib/prtoken.h
+		$move y.tab.h ../lib/prtoken.h
 	    $else
 	        $echo "parser.x is out of date; rebuild with XYACC"
 	    $endif
