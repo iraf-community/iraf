@@ -12,7 +12,7 @@ define	SZ_STDIOBUF	1024		# size of STDIN/STDOUT buffers
 define	SZ_PBBUF	1024		# default size of FIO pushback buf
 
 define	SZ_MEM		1		# size of Mem common
-define	SZ_MEMALIGN	SZ_DOUBLE	# alignment criteria for malloc
+define	SZ_MEMALIGN	8	        # align criteria for malloc (128-bit)
 define	SZ_PHYSMEM	750000		# max phys memory available to a task
 define	SZ_STACK	8192		# size of a stack segment (salloc)
 define	SZ_STKHDR	(4*SZ_POINTER)	# size of stack segment header
