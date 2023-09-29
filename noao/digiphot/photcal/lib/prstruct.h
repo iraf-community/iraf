@@ -335,7 +335,7 @@ define	PTEQ_FITCNT	Memi[PTEQ_SFITCNT($1) + $2 - 1] # fit var. counter
 # Individual access for fitting parameter symbols, values and list. The
 # second argument is the parameter number, relative to the equation.
 define	PTEQ_PAR	Memi[PTEQ_SPAR($1)    + $2 - 1] # symbol offset
-define	PTEQ_PARVAL	Memr[P2R(PTEQ_SPARVAL($1) + $2 - 1)] # value
+define	PTEQ_PARVAL	Memr[P2R(PTEQ_SPARVAL($1)) + $2 - 1] # value
 define	PTEQ_PLIST	Memi[PTEQ_SPLIST($1)  + $2 - 1] # list element
 
 # Individual access for derivative equation string offsets and codes. The
