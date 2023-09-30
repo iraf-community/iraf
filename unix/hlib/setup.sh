@@ -2,7 +2,7 @@
 
 # Allow a previously defined $iraf to be used.
 if [ -n $iraf ]; then
-    export iraf=/opt/opt/iraf/iraf/
+    export iraf=/opt/iraf/iraf/
 fi
 
 # Allow a previously defined $IRAFARCH to be used.
