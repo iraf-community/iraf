@@ -10,19 +10,14 @@
 
 # Determine CL binary to run based on how we were called.
 
-set cl_binary		= "vocl.e"
+set cl_binary		= "ecl.e"
 
 if (`echo $0 | egrep ecl` != "") then
     set cl_binary	= "ecl.e"
 
-else if (`echo $0 | egrep vo` != "") then
-    set cl_binary	= "vocl.e"
-
 else if ($#argv > 0) then
     if ("$argv[1]" == "-old" || "$argv[1]" == "-o") then
         set cl_binary	= "cl.e"
-    else if ("$argv[1]" == "-vo") then
-        set cl_binary	= "vocl.e"
     else if ("$argv[1]:e" == "c") then
 	# Workaround for autoconf scripts attempting to use this command as
 	# a valid compiler option.  On some systems (mostly Debian) a valid

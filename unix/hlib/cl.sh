@@ -12,17 +12,14 @@
 
 
 nm=${0##*/}
-cl_binary="vocl.e"
+cl_binary="ecl.e"
 
 case "$nm" in
     "cl" | "cl.sh")
-        cl_binary="vocl.e"
+        cl_binary="ecl.e"
         ;;
     "ecl" | "ecl.sh")
-        cl_binary="vocl.e"
-        ;;
-    "vocl" | "vocl.sh")
-        cl_binary="vocl.e"
+        cl_binary="ecl.e"
         ;;
     *)
 	if (( $# > 1 )); then
@@ -30,8 +27,6 @@ case "$nm" in
         	cl_binary="cl.e"
 	    elif [ $1 == "-ecl" -o $1 == "-e" ]; then
         	cl_binary="ecl.e"
-	    elif [ $1 == "-vo" ]; then
-        	cl_binary="vocl.e"
 	    elif [ ${1##*.} == "c" ]; then
 		# Workaround for autoconf scripts attempting to use this 
 		# command as a valid compiler option.  On some systems (mostly
