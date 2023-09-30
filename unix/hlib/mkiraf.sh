@@ -25,9 +25,9 @@ def=0
 defterm="xgterm"
 
 				# Paths edited by the install script.
-iraf="/iraf/iraf/" 		
-imdir="/iraf/imdir/"
-cachedir="/iraf/cache/"
+iraf="/opt/iraf/iraf/" 		
+imdir="/Users/fitz/.iraf/imdir//"
+cachedir="/Users/fitz/.iraf/cache//"
 
 
 # ------------- (end of site dependent definitions) ------------------------

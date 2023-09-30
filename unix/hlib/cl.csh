@@ -35,7 +35,7 @@ endif
 
 
 # Determine IRAF root directory (value set in install script).
-set d_iraf = "/iraf/iraf/"
+set d_iraf = "/opt/iraf/iraf/"
 if ($?iraf) then
     if (! -e $iraf) then
         echo "Warning: iraf=$iraf does not exist (check .cshrc or .login)"
