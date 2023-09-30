@@ -383,10 +383,14 @@ if [ "$iraf" == "" ]; then
         d_iraf=""
         if [ -d "/iraf/iraf" ]; then
             d_iraf="/iraf/iraf"
+        elif [ -d "/opt/iraf/iraf" ]; then
+            d_iraf="/opt/iraf/iraf"
         elif [ -d "/iraf" ]; then
             d_iraf="/iraf"
         elif [ -d "/usr/local/iraf" ]; then
             d_iraf="/usr/local/iraf"
+        elif [ -d "/opt/iraf" ]; then
+            d_iraf="/usr/iraf"
         elif [ -d "/usr/iraf" ]; then
             d_iraf="/usr/iraf"
         else
@@ -741,12 +745,12 @@ BINDIRS="$hbin $hlib $fbin $host"
 
 
 # The following file lists are partially system dependent.
-PATHFILES="mkiraf.${extn} libc/iraf.h cl.${extn} ecl.${extn} vocl.${extn} setup.sh setup.csh"
+PATHFILES="mkiraf.${extn} libc/iraf.h cl.${extn} ecl.${extn} setup.sh setup.csh"
 MODEFILES="cl.${extn} fc.${extn} mkiraf.${extn} mkfloat.${extn} mkmlist.${extn} $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.${extn}"
-LINKFILES="ecl.${extn} cl.${extn} vocl.${extn} mkiraf.${extn} mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
-LINKCMDS=(ecl cl vocl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
-LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/vocl.${extn} ${hlib}/mkiraf.${extn} ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
-CMDLINKS="ecl cl vocl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
+LINKFILES="ecl.${extn} cl.${extn} mkiraf.${extn} mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
+LINKCMDS=(ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
+LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.${extn} ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
+CMDLINKS="ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
 
 
@@ -853,7 +857,6 @@ done
 #       1) Editing the $iraf path into system files
 #       2) Creating the <iraf.h> link
 #       3) Creating the system command links
-#          Install VOClient Code
 #       4) Creating the image directory (imdir)
 #       5) Creating the cache directory (cache)
 #       6) Tape setup (modes on alloc.e and /dev tape devices)
@@ -1378,73 +1381,6 @@ if [ "$exec" == "yes" ]; then
     touch $hlib/utime
 fi
 DO_OK
-
-
-
-#=============================================================================
-# Install the VOClient Daemon code.
-#=============================================================================
-
-NEWLINE
-BOLD_ON
-ECHO "                      Installing VOClient Code"
-ECHO "                      ------------------------"
-BOLD_OFF
-
-
-ECHO -n "Creating 'voclientd' symlink ...                               "
-file1=$lbin/voclientd
-file2=$iraf/vo/java/voclientd
-
-err_seen=0
-if [ -e "$file1" ]; then
-    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
-        if [ "$exec" == "yes" ]; then
-            RM $file1
-            ln -s $file2 $file1
-        fi
-    fi
-else
-    if [ "$exec" == "yes" ]; then
-        RM -f $file1
-        ln -s $file2 $file1
-    fi
-fi
-if [ "$exec" == "no" ]; then
-    DO_OK
-elif [ "$err_seen" == 0 -a -e "$file1" ]; then
-    DO_OK
-else
-    DO_FAIL
-    err_count=$(( err_count++ ))
-fi
-
-ECHO -n "Creating 'voclient.jar' symlink ...                            "
-file1=$lbin/voclient.jar
-file2=$iraf/vo/java/voclient.jar
-
-err_seen=0
-if [ -e "$file1" ]; then
-    if [ "`$LS -l $file1 | grep $file2`" == "" ]; then
-        if [ "$exec" == "yes" ]; then
-            RM $file1
-            ln -s $file2 $file1
-        fi
-    fi
-else
-    if [ "$exec" == "yes" ]; then
-        RM -f $file1
-        ln -s $file2 $file1
-    fi
-fi
-if [ "$exec" == "no" ]; then
-    DO_OK
-elif [ "$err_seen" == 0 -a -e "$file1" ]; then
-    DO_OK
-else
-    DO_FAIL
-    err_count=$(( err_count++ ))
-fi
 
 
 #=============================================================================
