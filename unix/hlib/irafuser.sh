@@ -76,7 +76,7 @@ case "$MACH" in
     ;;
 
 *)
-    echo 'Warning in hlib$irafuser.csh: unknown platform '"$MACH"
+    echo 'Warning in hlib$irafuser.sh: unknown platform '"$MACH"
     exit 1
     ;;
 esac
@@ -103,8 +103,8 @@ fi
 export HSI_LIBS="$HSI_LIBS $HSI_OSLIBS"
 
 # Useful host command aliases.
-alias mkiraf=${hlib}mkiraf.csh
-alias mkmlist=${hlib}mkmlist.csh
+alias mkiraf=${hlib}mkiraf.sh
+alias mkmlist=${hlib}mkmlist.sh
 alias mkz="${hbin}mkpkg.e $mkzflags"
 
 alias edsym=${hbin}edsym.e
