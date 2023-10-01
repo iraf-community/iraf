@@ -976,10 +976,10 @@ begin
 		next
 	    }
 
-	    call fprintf (fd, "Help database %s created %s by %s, size=%d\n")
+	    call fprintf (fd, "Help database %s created %s by %d, size=%d\n")
 		call pargstr (Memc[fname])
 		call pargstr (Memc[date])
-		call pargstr (FI_OWNER(fi))
+		call pargl (FI_OWNER(fi))
 		call pargl (FI_SIZE(fi))
 	}
 	call fntclsb (list)
@@ -1161,7 +1161,7 @@ int	fd			#I input file
 pointer	obuf			#O receives unpacked helpdir data
 int	buflen			#O max su out
 
-int	i, nelem, nr, sz_mii_struct
+int	nelem, nr, sz_mii_struct
 pointer	op, hp
 int	mii_readi(), mii_readc()
 errchk	mii_readi, mii_readc
