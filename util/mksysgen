@@ -12,7 +12,6 @@ else
     source $iraf/unix/hlib/setup.sh
 fi
 
-
 if [ -z "$iraf" ]; then
     #/bin/echo ""
     #/bin/echo "Error:  You must have the iraf env variable defined !"
@@ -69,3 +68,5 @@ c_end=`date`
 /bin/echo ""
 /bin/echo "Start:  $c_start"
 /bin/echo "  End:  $c_end"
+
+exit 0
