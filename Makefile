@@ -22,75 +22,75 @@ all:: update
 sysgen::
 	@echo "Building the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	(util/mksysgen)
+	sh util/mksysgen
 	@echo "" ; date ; echo ""
 
 # Update (compile) recent changes.
 update::
 	@echo "Updating the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	(util/mkup)
+	sh util/mkup
 	@echo "" ; date ; echo ""
 
 # Update (compile) with debug libraries.
 updatex::
 	@echo "Updating the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	(util/mkupx)
+	sh util/mkupx
 	@echo "" ; date ; echo ""
 
 # Update with cumulative patch of entire system
 latest::
 	@echo "Updating IRAF $(RELEASE) to latest release."
 	@echo "" ; date ; echo ""
-	(util/self_update)
-	(util/iraf_update -all 2>&1 | egrep -v "unexpected end of file")
+	sh util/self_update
+	!(sh util/iraf_update -all 2>&1 | egrep -v "unexpected end of file")
 	@echo "" ; date ; echo ""
 
 # Check if system is the latest distributed version
 check_latest::
-	(util/iraf_update -list)
+	!(sh util/iraf_update -list)
 
 # Update with cumulative patch of core system
 latest_src::
 	@echo "Updating IRAF $(RELEASE) to latest source release."
 	@echo "" ; date ; echo ""
-	(util/iraf_update -src)
+	sh util/iraf_update -src
 	@echo "" ; date ; echo ""
 
 # Update with cumulative patch of core system
 latest_core::
 	@echo "Updating IRAF $(RELEASE) to core release."
 	@echo "" ; date ; echo ""
-	(util/iraf_update -core)
+	sh util/iraf_update -core
 	@echo "" ; date ; echo ""
 
 
 # Update recent changes from the repository.
 self_update::
-	(util/self_update)
+	sh util/self_update
 
 
 
 
 # Clean the IRAF tree of all binaries.
 src::
-	(util/mksrc)
+	sh util/mksrc
 pristine::
-	(util/mksrc)
+	sh util/mksrc
 
 # Clean the IRAF tree of binaries for the currently configured arch.
 clean::
-	(util/mkclean)
+	sh util/mkclean
 
 # Make only the NOAO package.
 noao::
-	(cd noao ; mkpkg -p noao)
+	sh "(cd noao ; mkpkg -p noao)"
 
 # Summarize the spool files.
 summary::
-	(mkpkg summary)
-	(chdir noao   ; mkpkg -p noao   summary)
+	sh mkpkg summary
+	sh "(chdir noao ; mkpkg -p noao summary)"
 
 
 
@@ -99,18 +99,18 @@ summary::
 # architectures
 # ----------------------------------------------------------------------
 showarch::
-	(mkpkg arch)
+	sh mkpkg arch
 generic::
-	(util/mkarch generic)
+	sh util/mkarch generic
 
 macosx::
-	(util/mkarch macosx)
+	sh util/mkarch macosx
 macintel::
-	(util/mkarch macintel)
+	sh util/mkarch macintel
 linux::
-	(util/mkarch linux)
+	sh util/mkarch linux
 linux64::
-	(util/mkarch linux64)
+	sh util/mkarch linux64
 
 
 
@@ -130,7 +130,7 @@ linux64::
 emptyrule::
 
 cleandir::
-	(util/mksrc)
+	sh util/mksrc
 
 distclean:: cleandir
 
