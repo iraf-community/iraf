@@ -17,12 +17,12 @@ procedure t_chkupdate ()
 
 char	version[SZ_FNAME], baseurl[SZ_FNAME], chkfile[SZ_LINE]
 char	netpath[SZ_LINE], arch[SZ_FNAME], tmpfile[SZ_FNAME]
-char	host[SZ_LINE], ref_file[SZ_LINE], release[SZ_LINE]
+char	ref_file[SZ_LINE], release[SZ_LINE]
 char	buf[SZ_LINE]
 pointer	reply
 bool	verbose
 long	last, reldate, ndays, info[LEN_FINFO]
-int	ip, op, fd, nread, interval, tm[LEN_TMSTRUCT]
+int	ip, op, fd, interval, tm[LEN_TMSTRUCT]
 
 int	clgeti(), envgets(), access(), open(), url_get()
 int	strlen(),  getline(), finfo()
