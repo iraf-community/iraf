@@ -159,12 +159,12 @@ loadenv (char *osfn)
 	char	lbuf[SZ_LINE+1];
 	char	pkname[SZ_FNAME+1], old_value[SZ_VALUE+1];
 	XCHAR	name[SZ_FNAME+1], value[SZ_VALUE+1];
-	FILE	*fp, *sv_fp[MAXLEV];
+	FILE	*fp = (FILE *)NULL, *sv_fp[MAXLEV];
 	int	lev=0;
 
 	extern  void ENVRESET(XCHAR *key, XCHAR *value);
 
-
+	memset (sv_fp, 0, sizeof(sv_fp));
 	if ((fp = fopen (osfn, "r")) == NULL) {
 	    printf ("envinit: cannot open `%s'\n", osfn);
 	    fflush (stdout);
@@ -177,6 +177,7 @@ loadenv (char *osfn)
 		/* End of file. */
 		if (lev > 0) {
 		    fclose (fp);
+		    sv_fp[lev] = (FILE *) NULL;
 		    fp = sv_fp[--lev];
 		    continue;
 		} else
@@ -219,13 +220,13 @@ loadenv (char *osfn)
                         /* File in iraf$extern or home$ are optional so we
                          * don't throw an error if they don't exist.
                          */
-                        if (strncmp (fname, "iraf$extern", 11) == 0 ||
-                            strncmp (fname, "home$", 5) == 0) {
-                                if (os_access (vfn2osfn(fname,0), 0, 0) == NO)
-                                    continue;
-                        } else if ((fp=fopen(vfn2osfn(fname,0), "r")) == NULL) {
-			    printf ("envinit: cannot open `%s'\n", fname);
-			    fflush (stdout);
+                        if ((fp=fopen(vfn2osfn(fname,0), "r")) == NULL) {
+                            if (strncmp (fname, "iraf$extern", 11) != 0 &&
+                                strncmp (fname, "home$", 5) != 0) {
+			    	    printf ("envinit: cannot open `%s'\n",
+					fname);
+			    	    fflush (stdout);
+                            }
 			    break;
 			}
 		    }
@@ -272,6 +273,6 @@ again:		    if (fgets (lbuf, SZ_LINE, fp) == NULL)
 		ENVRESET (name, value);
 	}
 
-	fclose (fp);
+	if (fp != NULL) fclose (fp);
 }
 #endif
