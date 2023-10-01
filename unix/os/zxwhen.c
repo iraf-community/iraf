@@ -81,15 +81,18 @@ typedef void  (*XSIGFUNC)(XINT *, XINT *);
 
 static void ex_handler (int, siginfo_t *, void *);
 /*
-static sighandler_t setsig(int, sigaction_t);
+static long setsig (int code, SIGFUNC handler);
 */
+static long setsig(int, sigaction_t);
+static int ignore_sigint = 0;
 
 
 #ifdef MACOSX
 #define _IONBF 2		/* No buffering.  */
 #define	fcancel(fp)     setvbuf(fp, NULL, _IONBF, 0);
 #else
-#define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+//#define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+#define	fcancel(fp)
 #endif
 
 
@@ -99,8 +102,6 @@ void ex_handler ( int, int, struct sigcontext * );
 void ex_handler ( int, siginfo_t *, void * );
 #endif
 
-static long setsig (int code, SIGFUNC handler);
-static int ignore_sigint = 0;
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -283,22 +284,22 @@ ZXWHEN (
 	    if (unix_exception[uex].x_vex == *sig_code) {
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (setsig (uex, vvector) == (long) SIG_IGN) {
-			    setsig (uex, SIG_IGN);
+			if (setsig (uex, (sigaction_t)vvector) == (long) SIG_IGN) {
+			    setsig (uex, (sigaction_t)SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    setsig (uex, SIG_DFL);
+			    setsig (uex, (sigaction_t)SIG_DFL);
 			else
-			    setsig (uex, vvector);
+			    setsig (uex, (sigaction_t)vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			setsig (uex, SIG_DFL);
+			setsig (uex, (sigaction_t)SIG_DFL);
 		    else
-			setsig (uex, vvector);
+			setsig (uex, (sigaction_t)vvector);
 		}
 	    }
 	}
@@ -312,7 +313,7 @@ ZXWHEN (
 static long
 setsig (
     int         code,
-    SIGFUNC	handler
+    sigaction_t	handler
 )
 {
 	struct sigaction sig;
@@ -322,7 +323,7 @@ setsig (
 #ifdef MACOSX
 	sig.sa_handler = (SIGFUNC) handler;
 #else
-	sig.sa_sigaction = (SIGFUNC) handler;
+	sig.sa_sigaction = (sigaction_t) handler;
 #endif
 	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
 	status = (long) sigaction (code, &sig, NULL);
