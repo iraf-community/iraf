@@ -180,9 +180,9 @@ end
 
 procedure fxf_zaltrr (data, npix, bscale, bzero)
 
-real data[ARB], rt
-int    npix
-double bscale, bzero
+real    data[ARB]
+int     npix
+double  bscale, bzero
 
 int i
 
