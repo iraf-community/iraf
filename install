@@ -751,7 +751,7 @@ PATHFILES="mkiraf.csh mkiraf.sh libc/iraf.h cl.sh cl.csh ecl.sh ecl.csh setup.sh
 MODEFILES="cl.sh cl.csh ecl.sh ecl.csh fc.sh fc.csh mkiraf.csh mkiraf.sh mkfloat.${extn} mkmlist.${extn} $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.sh irafarch.csh"
 LINKFILES="ecl.${extn} cl.${extn} mkiraf.csh mkiraf.sh mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
 LINKCMDS=(ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
-LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.csh ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
+LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
 CMDLINKS="ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
 
