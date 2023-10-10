@@ -16,8 +16,6 @@ int	pksize, nchars
 int	miipksize(), miinelem(), read()
 errchk	read()
 
-long	note()
-
 begin
 	pksize = miipksize (maxchars, MII_BYTE)
 	nchars = max (maxchars, pksize)
