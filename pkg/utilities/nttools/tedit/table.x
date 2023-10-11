@@ -112,7 +112,7 @@ int	dirty, numcol, numrow, numptr, iptr
 int	height, width, maxcol, clen
 pointer	sp, tabname, filename, ext, cname, tptr, tab
 
-string	notable  "Table does not exist" 
+#string	notable  "Table does not exist" 
 string	nowrite  "No write access to table" 
 string	nocols   "Column names not found in table"
 string	emptytab "Table is empty" 
