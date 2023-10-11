@@ -6,6 +6,7 @@ define	NMI_INT		32
 define	NMI_LONG	32
 define	NMI_REAL	-32
 define	NMI_DOUBLE	-64
+define	NMI_BOOL	(SZ_BOOL*8)
 
 # Name aliases for generic code.
 define	nmipaks		nmipak16
