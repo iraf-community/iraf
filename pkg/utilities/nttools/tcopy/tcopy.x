@@ -45,8 +45,6 @@ int	root_len		# number of char in input directory name
 int	numout			# number of names in output list
 bool	fitsout			# is the output just one FITS file?
 
-char	src[SZ_FNAME], extn[SZ_FNAME]
-
 int	nargs			# number of command-line arguments
 bool	in_redir, out_redir	# is input or output redirected?
 
@@ -211,7 +209,7 @@ bool	verbose		# i: print informational message
 #--
 bool	done
 int	phu_copied	# set by tbfpri and ignored
-pointer	sp, oldname, newname, tp
+pointer	sp, oldname, newname
 
 bool	use_fcopy	# true if we should copy the file with fcopy
 
