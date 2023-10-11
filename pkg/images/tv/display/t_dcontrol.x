@@ -61,7 +61,7 @@ begin
 
 	# Get device information.
 	call clgstr ("device", Memc[device], SZ_FNAME)
-	if (streq (device, stdimage)) {
+	if (streq (Memc[device], stdimage)) {
 	    if (envgets (stdimage, Memc[device], SZ_FNAME) <= 0)
 		call syserrs (SYS_ENVNF, stdimage)
 	}
