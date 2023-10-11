@@ -27,7 +27,6 @@ bool	inplace
 pointer	x, y, null, size, sp, tp, deleted, tpr
 pointer	errmsg, bad_column
 int	npix
-int	window			# note:  this is apparently not used
 int	phu_copied		# set by tbfpri and ignored
 int	tgrjmp[LEN_JUMPBUF], epa, old_onint, status
 bool	do_delete, do_quit
@@ -36,7 +35,6 @@ bool	clgetb()
 int	fstati(), scan(), strncmp(), tbpsta()
 pointer	tbtopn()
 extern	tgr_onint2()
-data	window /0/
 common	/tgrcom/ tgrjmp
 
 begin
