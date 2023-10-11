@@ -41,7 +41,7 @@ int	opstack[MAXSTACK]
 pointer	sp, rb, work, value, valstack, nxtval, colname, colval
 pointer	idstack[MAXSTACK]
 
-string	find_error  "Column name or type mismatch"
+#string	find_error  "Column name or type mismatch"
 string	stack_error "Stack overflow"
 string	oper_error  "Operator expected"
 string	ident_error "Identifier expected"
