@@ -13,7 +13,7 @@ int	list, nchars
 pointer	sp, tty, imname, im
 
 pointer	ttyodes(), immap()
-int	imtopenp(), imtgetim(), imaccess(), strlen(), strncmp()
+int	imtopenp(), imtgetim(), imaccess(), strlen()
 bool	clgetb()
 
 begin
