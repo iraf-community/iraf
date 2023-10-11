@@ -56,8 +56,7 @@ int	exists		# true if table file exists
 bool	crash
 
 int	lstart
-char	url[SZ_PATHNAME], tblname[SZ_PATHNAME]
-char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME], cosfn[SZ_PATHNAME]
+char	url[SZ_PATHNAME], tblname[SZ_PATHNAME], cnvname[SZ_PATHNAME]
 
 long	tbtbod()
 int	tbnparse(), tbttyp(), strncmp(), access()
