@@ -48,7 +48,7 @@ int	exists		# YES if the file exists
 int	blocksize
 int	nchar
 int	morekeys	# extra space (none) in primary header
-int	fnroot(), fnextn(), tbparse(), tbttyp(), vot_to_fits()
+int	fnroot(), fnextn(), tbparse(), tbttyp()
 int	access(), strncmp()
 errchk	tbferr, tbparse, tbttyp, vfn_expand_ldir
 
