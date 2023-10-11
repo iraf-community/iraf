@@ -22,7 +22,7 @@ procedure t_fcache ()
 
 char	cmd[SZ_FNAME], cache[SZ_FNAME], fname[SZ_FNAME]
 char	pattern[SZ_FNAME], src[SZ_FNAME], cname[SZ_FNAME], extn[SZ_FNAME]
-bool	verbose, in_src, exists
+bool	verbose, exists
 int	age
 
 int	strdic(), clgeti(), envgeti()
