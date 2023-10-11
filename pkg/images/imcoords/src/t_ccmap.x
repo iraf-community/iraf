@@ -1138,8 +1138,6 @@ pointer	mw, ct, coo
 int	getline(), li_get_numd(), sk_decim()
 pointer	mw_ctrand(), mw_sctran()
 
-int	sk_stati()
-
 begin
 	call smark (sp)
 	call salloc (inbuf, SZ_LINE, TY_CHAR)
