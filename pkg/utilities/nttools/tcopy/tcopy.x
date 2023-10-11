@@ -213,10 +213,9 @@ pointer	sp, oldname, newname
 
 bool	use_fcopy	# true if we should copy the file with fcopy
 
-pointer	tbtopn()
-bool	streq(), is_wholetab()
-int	tbtacc(), exists, tbttyp()	# exists is ignored
-errchk	tbfpri, tbtcpy, tbtopn
+bool	streq()
+int	tbtacc()
+errchk	tbfpri, tbtcpy
 
 begin
 	call smark (sp)
