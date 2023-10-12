@@ -79,7 +79,12 @@ int tyint	= TYLONG ;
 int tylogical	= TYLONG;
 int tylog	= TYLOGICAL;
 int typesize[NTYPES] = {
-	1, SZADDR, 1, SZSHORT, SZLONG,
+	1, SZADDR, 1, SZSHORT,
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+                2*SZLONG,
+#else /* ILP32 */
+                SZLONG,
+#endif
 #ifdef TYQUAD
 		2*SZLONG,
 #endif
