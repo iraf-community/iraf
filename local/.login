@@ -31,7 +31,7 @@ setenv SHELL 	     /bin/csh
 #setenv IRAFARCH	    `/opt/iraf/iraf/unix/hlib/irafarch.csh -actual`
 
 # Setup the iraf environment.
-setenv iraf /opt/iraf/iraf/
+setenv iraf /iraf/iraf/
 
 foreach f ($iraf/unix/hlib/irafuser.csh ~/.alias)
   if (-e $f) then
@@ -42,18 +42,14 @@ end
 
 set    prompt  = "iraf> "
 
-# Pick up C-shell definitions.
-#source ~iraf/.cshrc
-
 set cdpath  =\
-($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot /u1/x11apps/src/x11iraf /u1/x11apps/src /u3/x11iraf /local/src ~)
+($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot ~)
 
 unalias ls cd pwd rm
 
 alias c		'clear'
 alias cls	'clear;ls'
-alias ls	'ls -FCs'
-alias clw	'clear;w'
+#alias ls	'ls -FCs'
 alias pg	'less -Cqme'
 alias m		'less -Cqme'
 alias his	'history 33'
@@ -67,8 +63,3 @@ endif
 alias rsync	'rsync -avz'
 alias sp	'clear; tail -33f spool'
 
-
-# Setup for NVOSS
-#setenv NVOSS_HOME	/usr/local/nvoss/
-#setenv JAVA_HOME	/Library/java/Home//
-#source $NVOSS_HOME/bin/setup.csh
