@@ -2,7 +2,7 @@
 #	   of execution by each shell
 
 umask 022
-setenv iraf /opt/iraf/iraf/
+setenv iraf /iraf/iraf/
 setenv IRAFARCH  `$iraf/unix/hlib/irafarch.csh -actual`
 source $iraf/unix/hlib/irafuser.csh
 
@@ -17,38 +17,17 @@ setenv  LC_COLLATE	POSIX
 
 
 switch (`uname`)
-case FreeBSD:
-    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /usr/local/sbin \
-	/usr/X11R6/bin)
-    breaksw
 case Linux:
-    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /usr/local/sbin /usr/java/j2sdk/bin \
-	/usr/X11R6/bin)
+    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin \
+	/usr/local/bin /usr/local/sbin /usr/X11R6/bin)
     breaksw
 case Darwin:
-    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /opt/local/bin /usr/local/sbin \
-	/usr/local/pvm/pvm3/bin /usr/local/pvm/pvm3/lib \
-	/usr/X11R6/bin)
-    breaksw
-case SunOS:
-    set path = (. $HOME/bin /usr/local/bin \
-	/usr/openwin/bin /usr/bin /bin /sbin /usr/sbin \
-	/usr/ccs/bin /usr/dt/bin /usr/ucb \
-	/opt/SUNWjws/JWS/intel-S2/bin \
-	/opt/Summertime_98.i386/bin \
-	/opt/Summertime_98.i386/sbin \
-	/opt/Summertime_98.i386/TeX/bin \
-	/opt/Summertime_98.i386/Perl/bin \
-	/opt/Summertime_98.i386/Python/bin \
-	/opt/Summertime_97.i386/netpbm/bin)
+    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin \
+	/usr/local/bin /opt/local/bin /usr/local/sbin /usr/X11R6/bin)
     breaksw
 default:
-    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /usr/local/sbin \
-	/usr/X11R6/bin)
+    set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin \
+	/usr/local/bin /usr/local/sbin /usr/X11R6/bin)
     breaksw
 endsw
 
@@ -69,10 +48,8 @@ setenv XFILESEARCHPATH ":/usr/lib/X11/%T/%N%S:/usr/x11R6/lib/X11/%T/%N%S:"
 
 
 alias   del	'/bin/rm -f'
-alias   ls	'ls -FCs'
+#alias   ls	'ls -FCs'
 alias   m	'less'
-alias 	p	'vi + ~/_port'
-alias	mk	'mkpkg'
 alias 	po	'popd'
 alias 	pu	'pushd'
 
