@@ -1187,7 +1187,7 @@ begin
 	    # Get string buffer.
 	    op = op + nelem
 	    nelem = HD_SZSBUF(hp) # / (SZ_INT / SZ_INT32)
-	    if (mii_readc (fd, Memi[op], nelem) < nelem)
+	    if (mii_readc (fd, Memc[P2C(op)], nelem) < nelem)
 		goto readerr_
 
 	    nr = nr + ((nelem + SZ_STRUCT32-1) / SZ_STRUCT32)

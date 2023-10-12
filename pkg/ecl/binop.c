@@ -10,7 +10,7 @@
 #define import_stdio
 #include <iraf.h>
 
-#include <math.h>
+//#include <math.h>
 
 #include "config.h"
 #include "operand.h"
