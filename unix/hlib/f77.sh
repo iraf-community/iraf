@@ -43,7 +43,7 @@ set -e
 
 s=/tmp/stderr_$$
 CC=${CC_f2c:-${CC:-cc}}
-CFLAGS="-I${iraf}/unix/bin.${IRAFARCH} ${XC_CFLAGS} -w -fcommon"
+CFLAGS="-I${iraf}/unix/bin.${IRAFARCH} ${XC_CFLAGS} -w -O2 -fcommon"
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-${iraf}unix/bin/f2c.e}
@@ -102,7 +102,7 @@ do
 	-x64)	CFLAGS="$CFLAGS -mfloat64"
 		shift;;
 
-	-I)	CFLAGS="$CFLAGS -I$2"
+	-I)	-O2 CFLAGS="$CFLAGS -I$2"
 		shift 2
 		;;
 
