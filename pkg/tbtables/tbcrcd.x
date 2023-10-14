@@ -169,6 +169,8 @@ int	clen		# length in char of entire entry
 int	value		# this will be returned
 int	tbeszt()	# size in char of one element of type text
 
+int     sz
+
 begin
 	clen = COL_LEN(cptr)
 
@@ -204,7 +206,11 @@ begin
 		value = 1
 
 	default:
-	    value = clen / tbeszt (cptr)	# char string
+            sz = tbeszt (cptr)			# char string
+            if (sz > 0)
+	        value = clen / sz
+	    else
+	        value = 0
 	}
 
 	return (value)
