@@ -161,9 +161,9 @@ define	COL_TDTYPE		Memi[$1+4]	# True data type, in FITS table
 define	COL_NELEM		Memi[$1+5]	# Length of array
 define	COL_TSCAL		Memd[P2D($1+6)]	# TSCAL, if FITS table
 define	COL_TZERO		Memd[P2D($1+8)]	# TZERO, if FITS table
-define	COL_NAME	Memc[P2C($1+10)]
-define	COL_UNITS	Memc[P2C($1+10+  FULL_SZ_COLNAME/SZ_STRUCT)]
-define	COL_FMT		Memc[P2C($1+10+2*FULL_SZ_COLNAME/SZ_STRUCT)]
+define	COL_NAME	        Memc[P2C($1+10)]
+define	COL_UNITS	        Memc[P2C($1+10+  FULL_SZ_COLNAME/SZ_STRUCT)]
+define	COL_FMT		        Memc[P2C($1+10+2*FULL_SZ_COLNAME/SZ_STRUCT)]
 
 # This structure is a copy of the bytes read from or written to an
 # stsdas format table (either row or column ordered).
