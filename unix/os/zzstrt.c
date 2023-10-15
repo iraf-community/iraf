@@ -493,7 +493,9 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
                 (_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_DM);
             _FPU_SETCW(cw);
 #else
+#ifndef LINUX
 	    sfpucw_ (&fpucw);
+#endif
 #endif
 	}
 #endif
