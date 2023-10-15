@@ -6,8 +6,8 @@
 # Compiler Flags.
 
 RELEASE		= v2.18
-CFLAGS 		=
-CDEBUGFLAGS 	= -O2 -Wall
+CFLAGS 		= -O2 -Wall
+CDEBUGFLAGS 	= -g $(CFLAGS)
 BOOTSTRAPCFLAGS = 
         
 CC 		= gcc 

@@ -29,9 +29,9 @@ setenv	RANLIB	ranlib
 switch ($MACH)
   case macosx:
   case macos64:
-    setenv HSI_CF "-O -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
+    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
     setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/Wall -/m64 -/arch -//arm64"
-    setenv HSI_FF "-O -arch arm64 -m64 -DBLD_KERNEL"
+    setenv HSI_FF "-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
     setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
@@ -40,9 +40,9 @@ switch ($MACH)
     breaksw
 
   case macintel:
-    setenv HSI_CF "-O -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64"
+    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64"
     setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/m64"
-    setenv HSI_FF "-O -m64 -DMACH64 -DBLD_KERNEL"
+    setenv HSI_FF "-g -O2 -m64 -DMACH64 -DBLD_KERNEL"
     setenv HSI_LF "-m64 -DMACH64"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
@@ -51,9 +51,9 @@ switch ($MACH)
     breaksw
 
   case linux64:
-    setenv HSI_CF "-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -m64"
+    setenv HSI_CF "-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -m64"
     setenv HSI_XF "-Inolibc -/Wall -/m64 -/Wunused"
-    setenv HSI_FF "-m64 -DBLD_KERNEL"
+    setenv HSI_FF "-g -O2 -m64 -DBLD_KERNEL"
     setenv HSI_LF "-m64 "
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
@@ -63,9 +63,9 @@ switch ($MACH)
 
   case linux:
   case redhat:
-    setenv HSI_CF "-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -m32 -Wunused"
+    setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -w -m32 -Wunused"
     setenv HSI_XF "-Inolibc -w -/Wunused -/m32"
-    setenv HSI_FF "-O -DBLD_KERNEL -m32"
+    setenv HSI_FF "-O2 -DBLD_KERNEL -m32"
     setenv HSI_LF "-m32"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""

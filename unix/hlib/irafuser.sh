@@ -32,9 +32,9 @@ export	RANLIB=ranlib
 
 case "$MACH" in
   "macosx"|"macos64")
-    export HSI_CF="-O -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
     export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/Wall -/m64 -/arch -//arm64"
-    export HSI_FF="-O -arch arm64 -m64 -DBLD_KERNEL"
+    export HSI_FF="-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
     export HSI_LF="-arch arm64 -m64"
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
@@ -43,9 +43,9 @@ case "$MACH" in
     ;;
 
   "macintel")
-    export HSI_CF="-O -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64 -g"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64 -g"
     export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/m64"
-    export HSI_FF="-O -m64 -DMACH64 -DBLD_KERNEL"
+    export HSI_FF="-g -O2 -m64 -DMACH64 -DBLD_KERNEL"
     export HSI_LF="-m64 -DMACH64"
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
@@ -65,9 +65,9 @@ case "$MACH" in
     ;;
 
   "linux" | "redhat")
-    export HSI_CF="-O -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -m32 -Wunused"
+    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -m32 -Wunused"
     export HSI_XF="-Inolibc -/Wall -/m32"
-    export HSI_FF="-O -DBLD_KERNEL -m32"
+    export HSI_FF="-g -O2 -DBLD_KERNEL -m32"
     export HSI_LF="-m32"
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
