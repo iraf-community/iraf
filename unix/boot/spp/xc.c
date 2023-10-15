@@ -97,7 +97,7 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "",				/*  9  */
 		    0};				/* EOF */
 
-char *opt_flags[] = { "-O",			/*  0  */
+char *opt_flags[] = { "-O2",			/*  0  */
 		    0};				/* EOF */
 int  nopt_flags	   = 1;				/* No. optimizer flags */
 
@@ -115,7 +115,7 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "",				/*  9  */
 		    0};				/* EOF */
 
-char *opt_flags[] = { "-O",			/*  0  */
+char *opt_flags[] = { "-O2",			/*  0  */
 		    0};				/* EOF */
 int  nopt_flags	   = 1;				/* No. optimizer flags */
 
@@ -133,15 +133,9 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "",				/*  9  */
 		    0};				/* EOF */
 
-char *opt_flags[] = { "-O3",			/*  0  */
+char *opt_flags[] = { "-O2",			/*  0  */
 		    0};				/* EOF */
-
-/* As of Dec2007 there remains an unexplained optimizer bug in
-** the system which has the effect of disabling FPE handling on
-** Mac Intel/PPC systems.  For the moment, we'll disable the optimization
-** until this is better understood or fixed in future GCC versions.
-*/
-int  nopt_flags	   = 0;				/* No. optimizer flags */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
 
 #else
 #ifdef SOLARIS
