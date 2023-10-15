@@ -813,7 +813,6 @@ passflag:		    mkobject = YES;
 	    	    arglist[nargs++] = "arm64";
 	        else if (strcmp (irafarch, "macintel") == 0)
 	    	    arglist[nargs++] = "x86_64";
-	    	arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -887,7 +886,6 @@ passflag:		    mkobject = YES;
                     arglist[nargs++] = "arm64";
                 else if (strcmp (irafarch, "macintel") == 0)
                     arglist[nargs++] = "x86_64";
-                arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -991,7 +989,6 @@ passflag:		    mkobject = YES;
                     arglist[nargs++] = "arm64";
                 else if (strcmp (irafarch, "macintel") == 0)
                     arglist[nargs++] = "x86_64";
-                arglist[nargs++] = "-m64";
 	    }
 	}
 #endif
@@ -1067,7 +1064,6 @@ passflag:		    mkobject = YES;
                 arglist[nargs++] = "arm64";
             else if (strcmp (irafarch, "macintel") == 0)
                 arglist[nargs++] = "x86_64";
-            arglist[nargs++] = "-m64";
 	}
 #endif
 
