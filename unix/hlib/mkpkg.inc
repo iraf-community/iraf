@@ -11,20 +11,16 @@ $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, linux64) then
-$set	XFLAGS		= "-c -/m64"	# default XC compile flags
-$set	XVFLAGS		= "-c -/m64"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz -/m64"	# default XC link flags
-$else $ifeq (MACH, macosx) then
-$set	XFLAGS		= "-c -w -/m64"	# default XC compile flags
-$set	XVFLAGS		= "-c -w -/m64"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, macos64) then
-$set	XFLAGS		= "-c -w -/m64"	# default XC compile flags
-$set	XVFLAGS		= "-c -w -/m64"	# VOPS XC compile flags
+$set	XFLAGS		= "-c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -/O2"	# VOPS XC compile flags
+$set	LFLAGS		= "-Nz"	# default XC link flags
+$else $ifeq (MACH, macosx, macos64) then
+$set	XFLAGS		= "-c -w -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -w -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, macintel) then
-$set	XFLAGS		= "-c -w -/m64"	# default XC compile flags
-$set	XVFLAGS		= "-c -w -/m64"	# VOPS XC compile flags
+$set	XFLAGS		= "-c -w -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -w -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else
 $set	XFLAGS		= "-c -w "	# default XC compile flags
