@@ -179,7 +179,7 @@ while [ -n "$1" ] ; do
 	p_imdir=$2 ; 	shift
         ;;
     "-m"|"-mach"|"--mach")                   	# set architecture
-	mach=$2 ; 	shift
+	mach=$2 ; hmach=$2 	shift
         ;;
     "-r"|"-root"|"--root")                   	# set iraf root directory
 	p_iraf=$2 ; 	shift
