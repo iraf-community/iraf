@@ -1616,9 +1616,13 @@ run (char *task, char *argv[])
 	    enbint (SIG_DFL);
 
 	    execvp (task, argv);	/* use user PATH for search */
+
+            memset (path, 0, SZ_PATHNAME);
 	    strcpy (path, SYSBINDIR);
 	    strcat (path, task);
 	    execv  (path, argv);	/* look in SYSBINDIR */
+
+            memset (path, 0, SZ_PATHNAME);
 	    strcpy (path, LOCALBINDIR);
 	    strcat (path, task);
 	    execv  (path, argv);	/* look in LOCALBINDIR */
@@ -1882,6 +1886,7 @@ findexe (
 		;
 	    *op++ = '/';
 	    *op++ = EOS;
+            memset (path, 0, SZ_PATHNAME);
 	    strcpy (path, dp);
 	    strcat (path, prog);
 	    if (access (path, 0) != -1)
@@ -1890,6 +1895,7 @@ findexe (
 
 	/* Look in SYSBINDIR. */
 	strcpy (dp, SYSBINDIR);
+        memset (path, 0, SZ_PATHNAME);
 	strcpy (path, dp);
 	strcat (path, prog);
 
@@ -1912,6 +1918,7 @@ findexe (
 
 	/* Look in LOCALBINDIR. */
 	strcpy (dp, LOCALBINDIR);
+        memset (path, 0, SZ_PATHNAME);
 	strcpy (path, dp);
 	strcat (path, prog);
 	if (access (path, 0) != -1)
