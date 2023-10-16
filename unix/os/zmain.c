@@ -76,7 +76,7 @@ main (int argc, char *argv[])
 	char	*ip;
 
 	int	arg = 1;
-        extern int ZLOCPR (PFI proc, long *o_epa);
+        extern int ZLOCPR (PFI proc, XINT *o_epa);
 
 
 	/* The following flag must be set before calling ZZSTRT. */
