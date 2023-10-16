@@ -15,7 +15,7 @@
 .SUFFIXES: .c .o
 CC = cc
 SHELL = /bin/sh
-CFLAGS = -O -w $(HSI_CF)
+CFLAGS = -O $(HSI_CF) -w
 
 # compile, then strip unnecessary symbols
 .c.o:
