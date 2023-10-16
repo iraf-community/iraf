@@ -284,7 +284,7 @@ hashtbl (void)
 {
 	int	i, j;
 
-	for (i=j=0;  i <= MAXCH;  i++) {
+	for (i=j=0;  i < MAXCH;  i++) {
 	    if (i == CINDEX (kwtbl[j].keyw[0])) {
 		kwindex[i] = j;
 		j = min (LEN_KWTBL-1, j + kwtbl[j].nelem + 1);
