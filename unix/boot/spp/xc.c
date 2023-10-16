@@ -75,8 +75,6 @@
 #define IRAFLIB4	"libos.a"
 #define IRAFLIB5	" "
 #define IRAFLIB6	" "
-//#define IRAFLIB5	"libVO.a"
-//#define IRAFLIB6	"libcfitsio.a"
 
 #ifdef LINUX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
