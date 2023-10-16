@@ -33,12 +33,11 @@ fi
 
 # Parse the arguments.
 loop_="yes"
+arch=$1
+
 while [ "$loop_" == "yes" ]; do
-    /bin/echo "Making architecture: "$arch
-
+  /bin/echo "Making architecture: "$arch
   if [ "$#" -gt 0 ]; then
-    arch=$1
-
     if (( "$use_mkpkg"==1 )); then
         mkpkg $arch
         cd noao; mkpkg -p noao $arch; cd ../
