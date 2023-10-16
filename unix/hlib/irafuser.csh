@@ -64,7 +64,7 @@ switch ($MACH)
   case linux:
   case redhat:
     setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -m32 -Wunused"
-    setenv HSI_XF "-Inolibc -/Wunused -/m32"
+    setenv HSI_XF "-Inolibc -Wall -/Wunused -/m32"
     setenv HSI_FF "-O2 -DBLD_KERNEL -m32"
     setenv HSI_LF "-m32"
     setenv HSI_F77LIBS ""
