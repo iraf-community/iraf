@@ -151,6 +151,8 @@ switch ($MNAME)
             set hmach 		= "$IRAFARCH"
 	    if ("$mach" == "linux64") then
 		set nbits	= 64
+	    else
+		set nbits	= 32
 	    endif
 	else 
             if ("$MNAME_M" == "x86_64") then		# Linux x86_64

@@ -146,6 +146,8 @@ case "$MNAME" in
             hmach="$IRAFARCH"
 	    if [ "$mach" == "linux64" ]; then
 		nbits=64
+	    else
+		nbits=32
 	    fi
 	else 
             if [ "$MNAME_M" == "x86_64" ]; then		# Linux x86_64
