@@ -74,22 +74,25 @@ ZFINFO (
 	    static	char owner[SZ_OWNERSTR+1];
 	    struct	passwd *pw;
 
-	    if (osfile.st_uid == uid)
+	    if (osfile.st_uid == uid) {
 		strncpy ((char *)fs->fi_owner, owner, SZ_OWNERSTR);
-	    else {
+                fs->fi_owner[SZ_OWNERSTR-1] = '\0'; // ensure NULL term
+	    } else {
 		setpwent();
 		pw = getpwuid (osfile.st_uid);
 		endpwent();
 
-		if (pw == NULL)
+		if (pw == NULL) {
 		    sprintf ((char *)fs->fi_owner, "%d", osfile.st_uid);
-		else {
+                    fs->fi_owner[SZ_OWNERSTR-1] = '\0'; // ensure NULL term
+		} else {
 		    strncpy (owner, pw->pw_name, SZ_OWNERSTR);
 		    strncpy ((char *)fs->fi_owner, owner, SZ_OWNERSTR);
+                    fs->fi_owner[SZ_OWNERSTR-1] = '\0'; // ensure NULL term
 		    uid = osfile.st_uid;
 		}
 	    }
-	    ((char *)fs->fi_owner)[SZ_OWNERSTR] = EOS;
+	    ((char *)fs->fi_owner)[SZ_OWNERSTR-1] = EOS;
 	}
 
 	*status = XOK;
