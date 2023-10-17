@@ -174,8 +174,8 @@ int main (int argc, char *argv[])
 			    break;
 		    }
 
-		    if (ip == NULL && strlen(types) > 1)
-			strcat (ip, "$t");
+		    //if (ip == NULL && strlen(types) > 1)
+		    //  strcat (ip, "$t");
 		}
 
 		if (genfname[0] == EOS || strlen (types) > 1)
