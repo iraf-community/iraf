@@ -85,7 +85,7 @@ irafpath (
 	strcat (pathname, "linux64");
 #else
 #ifdef REDHAT
-	strcat (pathname, "redhat");
+	strcat (pathname, "linux");
 #else
 #ifdef LINUX
 	strcat (pathname, "linux");
