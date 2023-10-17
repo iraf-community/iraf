@@ -1230,7 +1230,7 @@ getargs (
 )
 {
 	register int	ch;
-	static	char	args[SZ_PBBUF+1];
+	static	char	args[SZ_PBBUF+3];
 	char	tokbuf[SZ_COMMAND+1];
 	int	delim;
 
