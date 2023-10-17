@@ -319,7 +319,7 @@ h_incheck (
     char  *dir 			/* where to put the file	*/
 )
 {
-	char    backup[SZ_PATHNAME+1];
+	char    backup[SZ_PATHNAME+5];
 	char    path[SZ_PATHNAME+1];
 	char	fname[SZ_PATHNAME+1];
 	char	*osfn, *ip;
@@ -428,7 +428,7 @@ h_outcheck (
 	 * alternate source for the local file, which must be preserved.
 	 */
 	if (access (fname, 0) != -1) {
-	    char    backup[SZ_PATHNAME+1];
+	    char    backup[SZ_PATHNAME+5];
 
 	    if (clobber) {
 		if (debug) {
