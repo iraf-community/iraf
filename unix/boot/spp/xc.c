@@ -278,7 +278,7 @@ char	f2cpath[SZ_FNAME] 	= "/usr/bin/f2c";
 char	g77path[SZ_FNAME] 	= "/usr/bin/g77";
 
 char	outfile[SZ_FNAME] = "";
-char	tempfile[SZ_FNAME] = "";
+char	tempfile[SZ_PATHNAME] = "";
 char	*lflags[MAXFLAG+1];
 char	*lfiles[MAXFILE+1];			/* all files		*/
 char	*hlibs[MAXFILE+1];			/* host libraries	*/
