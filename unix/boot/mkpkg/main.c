@@ -239,7 +239,7 @@ addflag:		for (op=flags;  *op;  op++)
 	/* Append any flags given on the command line to XFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_xflags[SZ_LINE+1];
+	    char   new_xflags[2*SZ_LINE+1];
 	    sprintf (new_xflags, "%s %s", getsym(XFLAGS), flags);
 	    putsym (XFLAGS, new_xflags);
 	}
@@ -247,7 +247,7 @@ addflag:		for (op=flags;  *op;  op++)
 	/* Append any flags given on the command line to XVFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_xvflags[SZ_LINE+1];
+	    char   new_xvflags[2*SZ_LINE+1];
 	    sprintf (new_xvflags, "%s %s", getsym(XVFLAGS), flags);
 	    putsym (XVFLAGS, new_xvflags);
 	}
@@ -255,7 +255,7 @@ addflag:		for (op=flags;  *op;  op++)
 	/* Append any flags given on the command line to LFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_lflags[SZ_LINE+1];
+	    char   new_lflags[2*SZ_LINE+1];
 	    sprintf (new_lflags, "%s %s", getsym(LFLAGS), flags);
 	    putsym (LFLAGS, new_lflags);
 	}
