@@ -160,7 +160,7 @@ void  	phelp (void);
 int
 main (int argc, char *argv[])
 {
-	char	lbuf[256];
+	char	lbuf[512];
 	int	nrec, nbytes;
 	char	*token;
 	FILE	*in;
