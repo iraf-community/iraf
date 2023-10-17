@@ -155,7 +155,7 @@ translate (FILE *in, FILE *out)
 	int	n1, swap_bytes;
 	int	n, nlines, length, len_buf;
 	register unsigned char *bp1, *buffer1;
-	char buf_rast [SZ_RAST];
+	char buf_rast [3*SZ_RAST];
 
 
 	swap_bytes = isSwapped ();
@@ -199,6 +199,7 @@ translate (FILE *in, FILE *out)
 
 	    /* Now copy out this line and prefix it with the control codes.
 	     */
+            memset (buf_rast, 0, 3*SZ_RAST);
 	    sprintf (buf_rast, DEV_RAST, n1);
 	    fwrite (buf_rast, SZ_RAST, 1, out);
 	    fwrite (buffer1, n1, 1, out);
