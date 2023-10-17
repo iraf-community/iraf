@@ -340,6 +340,7 @@ ZOPNND (
 	    if (np->domain == INET) {
 		/* Client side Internet domain connection. */
 		struct sockaddr_in sockaddr;
+                void *sin_addr = (void *)&sockaddr.sin_addr;
 
 		/* Get socket. */
 		if ((fd = socket (AF_INET, SOCK_STREAM, 0)) < 0)
@@ -349,7 +350,7 @@ ZOPNND (
 		bzero ((char *)&sockaddr, sizeof(sockaddr));
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
-		bcopy ((char *)&host_addr, (char *)&sockaddr.sin_addr,
+		bcopy ((const void *)&host_addr, (void *)sin_addr,
 		    sizeof(host_addr));
 
 		/* Connect to server. */
