@@ -341,11 +341,13 @@ do_include(void)
 		    root_len = 0;
 	        else
 		    root_len = p - fname[istkptr-1] + 1;
-	        strncpy (fname[istkptr], fname[istkptr-1], root_len);
+                p = (istkptr > 0 ?  &fname[istkptr-1][0] : &fname[istkptr][0]);
+                root_len = min (strlen (p), SZ_PATHNAME-1);
+                strncpy (fname[istkptr], p, root_len);
 
 	    } else {
 	        if ((p = vfn2osfn (HBIN_INCLUDES, 0))) {
-		    root_len = strlen (p);
+                    root_len = min(strlen (p), SZ_PATHNAME-1);
 	            strncpy (fname[istkptr], p, root_len);
 	        } else {
 		    --istkptr;
