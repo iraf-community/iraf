@@ -6,7 +6,7 @@
 #define	SZ_PBBUF	2048	/* push back buffer			*/
 #define	SZ_CMD		2048	/* buf for os escape			*/
 #define	SZ_IFSTACK	50	/* max $IF nesting			*/
-#define	SZ_PREDBUF	1024	/* largest $IF predicate		*/
+#define	SZ_PREDBUF	2050	/* largest $IF predicate		*/
 #define	SZ_PKGENV	256	/* pkgenv package list buffer		*/
 #define	MAX_ARGS	50	/* max args to a $IF			*/
 #define	MAX_FILES	512	/* max files in a module list		*/
