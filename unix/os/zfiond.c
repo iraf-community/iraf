@@ -375,6 +375,11 @@ ZOPNND (
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,
 		    np->path1, sizeof(sockaddr.sun_path));
+#ifdef MACOSX
+		sockaddr.sun_path[103] = '\0';  // ensure NULL termination
+#else
+		sockaddr.sun_path[107] = '\0';  // ensure NULL termination
+#endif
 
 		/* Connect to server. */
 		if (fd >= MAXOFILES || (connect (fd,
@@ -478,6 +483,11 @@ ZOPNND (
 		bzero ((char *)&sockaddr, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,np->path1,sizeof(sockaddr.sun_path));
+#ifdef MACOSX
+		sockaddr.sun_path[103] = '\0';  // ensure NULL termination
+#else
+		sockaddr.sun_path[107] = '\0';  // ensure NULL termination
+#endif
 		addrlen = sizeof(sockaddr) - sizeof(sockaddr.sun_path)
 		    + strlen(np->path1);
 
