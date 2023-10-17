@@ -19,7 +19,8 @@ c_cnvdate (
 {
 	XCHAR	buf[SZ_LINE];
 	XINT	x_maxch = SZ_LINE;
+        XLONG   _clktime = clktime;
 
-	CNVDATE (&clktime, buf, &x_maxch);
+	CNVDATE (&_clktime, buf, &x_maxch);
 	return (c_strpak (buf, outstr, maxch));
 }
