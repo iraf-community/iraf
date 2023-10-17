@@ -110,7 +110,7 @@ void
 _envinit (void)
 {
 	static	int initialized = 0;
-	char	osfn[SZ_PATHNAME+1], *hlib;
+	char	osfn[SZ_PATHNAME+16], *hlib;
 	char	irafarch[SZ_PATHNAME+1];
 
         extern  void ENVINIT(void), ENVRESET(XCHAR *key, XCHAR *value);
