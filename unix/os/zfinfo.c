@@ -92,7 +92,6 @@ ZFINFO (
 		    uid = osfile.st_uid;
 		}
 	    }
-	    ((char *)fs->fi_owner)[SZ_OWNERSTR-1] = EOS;
 	}
 
 	*status = XOK;
