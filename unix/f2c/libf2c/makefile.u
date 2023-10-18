@@ -16,11 +16,12 @@
 CC = cc
 SHELL = /bin/sh
 CFLAGS = -O $(HSI_CF) -w
+LFLAGS = $(HSI_LF) $(LFLAGS)
 
 # compile, then strip unnecessary symbols
 .c.o:
 	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
-	ld -r -x -o $*.xxx $*.o
+	ld -r -x $(LFLAGS) -o $*.xxx $*.o
 	mv $*.xxx $*.o
 ## Under Solaris (and other systems that do not understand ld -x),
 ## omit -x in the ld line above.
