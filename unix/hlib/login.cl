@@ -32,7 +32,7 @@ stty nlines=(i) ncols=(j)
 #set	stdimage	= imt800
 #set	stdimcur	= stdimage
 #set	stdplot		= lw
-#set	clobber		= no
+#set	clobber		= yes
 #set	imclobber	= no
 #set	filewait	= yes
 #set	cmbuflen	= 512000
