@@ -124,7 +124,6 @@ if (deftask ("proto"))
 tv              # image display
 utilities       # miscellaneous utilities
 noao            # optical astronomy packages
-vo              # Virtual Observatory tools
 
 prcache directory
 cache   directory page type help
@@ -147,24 +146,6 @@ if ( osfn("home$") != substr (s1, strldx("!",s1)+1, strlen(s1)) ) {
     printf ("  ***  Using global login file:  %slogin.cl\n", osfn("home$"))
 }
 ;
-
-
-#============================================================================
-# Uncomment to initialize the SAMP interface on startup.
-if (deftask ("samp") == yes) {
-  printf ("  ***  Initializing SAMP .... ")
-  if (sampHubAccess() == yes) {
-     # Enable SAMP messaaging.  Set default handlers that don't require 
-     # VO capabilities.
-     samp quiet
-     samp ("on",                                                >& "dev$null")
-#    samp ("handler", "table.load.votable", "tinfo $url",       >& "dev$null")
-#    samp ("handler", "image.load.fits", "imstat $url",         >& "dev$null")
-     samp noquiet
-     print ("on")
-  } else 
-     print ("No Hub Available\n")
-}
 
 
 #============================================================================
