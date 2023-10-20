@@ -30,7 +30,7 @@ set	cache_age	= 30
 
 # Local system defaults.
 
-set	clobber		= no
+set	clobber		= yes
 set	imclobber	= no
 set	cmbuflen	= 128000
 set	editor		= vi
