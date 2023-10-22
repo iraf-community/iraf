@@ -1492,7 +1492,7 @@ void
 do_hollerith (void)
 {
 	register char *op;
-	char	strbuf[SZ_LINE], outbuf[SZ_LINE];
+	char	strbuf[SZ_LINE], outbuf[SZ_LINE+2];
 	int	len;
 
 	/* Read the string into strbuf. */
