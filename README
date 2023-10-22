@@ -1,18 +1,18 @@
 
-	This directory contains the IRAF v2.16.1 release from NOAO.  The
+	This directory contains the IRAF v2.18 release from NOIRLab.  The
 contents of this directory include:
 
     LICENSE		Software license information
     Makefile		Top-level makefile
     README		This file
     README.install	Installation Notes
-    RELEASE.txt		IRAF v2.16.1 Release Notes
+    RELEASE.txt		IRAF v2.18 Release Notes
     bin			Symbolic link to current system architecture
     bin.generic		Generic architecture (should always be empty)
     bin.linux		32-bit Linux binaries
     bin.linux64		64-bit Linux binaries
-    bin.macintel	32-bit Mac OSX (Intel) binaries
-    bin.macosx		64-bit Mac OSX (Intel) binaries
+    bin.macintel	64-bit Mac OSX (Intel) binaries
+    bin.macosx		64-bit Mac OSX (Apple) binaries
     dev			IRAF Device definition files
     doc			IRAF System Documentation
     extern		External Packages
@@ -27,9 +27,6 @@ contents of this directory include:
     sys			IRAF Virtual Operating System (VOS) sources
     unix		Host System Interface files (Unix)
     util		Build utility scripts
-    vendor		Third-party vendor libraries (e.g. CFITSIO)
-    vo			VO External Package
-
 
   o  For Installation instructions see the 'README.install' file in 
      this directory.
@@ -37,4 +34,5 @@ contents of this directory include:
   o  For a summary of what is included in this release see the 'RELEASE.txt'
      file in this directory.
 
-  o  For problems or questions, please see http://iraf.net
+  o  For problems or questions, please see https://iraf.noirlab.edu
+
