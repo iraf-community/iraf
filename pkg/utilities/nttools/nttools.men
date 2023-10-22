@@ -42,7 +42,6 @@ Menu for the package tables.ttools
      tproject - Create new table from selected columns in a table.
        tquery - Create a new table from selected rows and columns in a table.
         tread - Browse through a table.
-       trebin - Resample a table to uniform spacing.
       tselect - Create a new table from selected rows of a table.
         tsort - Sort a table.
         tstat - Get mean, standard deviation, min, and max for a column.

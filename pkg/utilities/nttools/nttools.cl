@@ -40,7 +40,6 @@ begin
 	     tproject,
 	     tquery,
 	     tread,
-	     trebin,
 	     tselect,
 	     tsort,
 	     tstat,

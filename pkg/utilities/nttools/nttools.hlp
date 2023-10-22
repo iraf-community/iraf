@@ -51,7 +51,7 @@ Here is a list of the ttools tasks organized by function:
 	tmerge, tproduct, texpand
 
     statistics, etc:
-	thistogram, tlinear, trebin, tstat
+	thistogram, tlinear, tstat
 
     arithmetic:
 	tcalc, tunits, tintegrate

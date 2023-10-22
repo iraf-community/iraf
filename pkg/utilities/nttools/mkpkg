@@ -70,7 +70,6 @@ libpkg.a:
 	@tproduct
 	@tproject
 	@tquery
-	@trebin
 	@tselect
 	@tsort
 	@tstat

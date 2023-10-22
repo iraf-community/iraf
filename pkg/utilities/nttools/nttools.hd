@@ -26,7 +26,6 @@ $tprint		= "pkg$utilities/nttools/tprint/"
 $tproduct	= "pkg$utilities/nttools/tproduct/"
 $tproject	= "pkg$utilities/nttools/tproject/"
 $tquery		= "pkg$utilities/nttools/tquery/"
-$trebin		= "pkg$utilities/nttools/trebin/"
 $tselect	= "pkg$utilities/nttools/tselect/"
 $tsort		= "pkg$utilities/nttools/tsort/"
 $tstat		= "pkg$utilities/nttools/tstat/"
@@ -73,7 +72,6 @@ tproduct	hlp=doc$tproduct.hlp,	src=tproduct$tproduct.x
 tproject	hlp=doc$tproject.hlp,	src=tproject$tproject.x
 tquery		hlp=doc$tquery.hlp,	src=tquery$tquery.x
 tread		hlp=doc$tread.hlp,	src=tedit$tread.x
-trebin		hlp=doc$trebin.hlp,	src=trebin$trebin.x
 tselect		hlp=doc$tselect.hlp,	src=tselect$tselect.x
 tsort		hlp=doc$tsort.hlp,	src=tsort$tsort.x
 tstat		hlp=doc$tstat.hlp,	src=tstat$tstat.x
