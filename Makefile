@@ -71,13 +71,24 @@ self_update::
 	sh util/self_update
 
 
-
-
 # Clean the IRAF tree of all binaries.
 src::
 	sh util/mksrc
 pristine::
 	sh util/mksrc
+gitclean::
+	sh util/mksrc
+	@find . -type f -name \*.o -ls -exec /bin/rm -f {} \;
+	@find . -type f -name \*.a -ls -exec /bin/rm -f {} \;
+	@find . -type f -name \*.e -ls -exec /bin/rm -f {} \;
+	@find . -type f -name \*.bak -ls -exec /bin/rm -f {} \;
+	@find . -type f -name _spool\* -ls -exec /bin/rm -f {} \;
+	@find . -type f -name spool\* -ls -exec /bin/rm -f {} \;
+	@find pkg -name \*.a -ls -exec /bin/rm -f {} \;
+	@find sys -name \*.a -ls -exec /bin/rm -f {} \;
+	@find math -name \*.a -ls -exec /bin/rm -f {} \;
+	@find noao/astutil -name \*.a -ls -exec /bin/rm -f {} \;
+	@find noao/onedspec -name \*.a -ls -exec /bin/rm -f {} \;
 
 # Clean the IRAF tree of binaries for the currently configured arch.
 clean::
