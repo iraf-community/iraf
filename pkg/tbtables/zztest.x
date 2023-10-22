@@ -2,6 +2,14 @@
 task tbbnll = t_tbbnll
 
 
+# T_TBBNLL -- Test the TBNLL procedures that convert an INDEF value to a
+# char array.  The intent here is to test the effect of the 'equivalence'
+# statements on whether the values are properly aligned for the platform.
+# The input and output values should be printed as the same values.
+#
+# Compile:      xc zztest.e -ltbtables
+
+
 procedure t_tbbnll ()
 
 short	sbuf
@@ -32,7 +40,6 @@ begin
         call pbuf ("out bool", out, SZ_BOOL)
 end
 
-
 procedure pbuf (what, out, sz)
 char    what[ARB]
 char    out[ARB]
@@ -46,114 +53,4 @@ begin
             call pargc (out[i])
     }
     call eprintf ("\n")
-end
-
-
-# tbbeqd -- assign a double-precision value
-# The purpose of this is to assign the input value of type double to
-# a character output buffer.
-
-procedure tbbeqd (input, output)
-
-double	input			# i: input double-precision value
-char	output[ARB]		# o: same as input, bit for bit
-#--
-double	buf			# local copy of input
-char	cbuf[SZ_DOUBLE]		# will be copied to output
-int	i
-equivalence (buf, cbuf)
-
-begin
-        call aclrc (output, SZ_DOUBLE)
-	buf = input
-	do i = 1, SZ_DOUBLE
-	    output[i] = cbuf[i]
-end
-
-# tbbeqr -- assign a single-precision value
-# The purpose of this is to assign the input value of type real to
-# a character output buffer.
-
-procedure tbbeqr (input, output)
-
-real	input			# i: input single-precision value
-char	output[ARB]		# o: same as input, bit for bit
-#--
-real	buf			# local copy of input
-char	cbuf[SZ_REAL]		# will be copied to output
-int	i
-equivalence (buf, cbuf)
-
-begin
-        call aclrc (output, SZ_REAL)
-	buf = input
-	do i = 1, SZ_REAL
-	    output[i] = cbuf[i]
-end
-
-# tbbeqi -- assign an integer value
-# The purpose of this is to assign the input value of type integer to
-# a character output buffer.
-
-procedure tbbeqi (input, output)
-
-int	input			# i: input integer value
-char	output[ARB]		# o: same as input, bit for bit
-#--
-int	buf			# local copy of input
-char	cbuf[SZ_INT32]		# will be copied to output
-int	i
-equivalence (buf, cbuf)
-
-begin
-        call aclrc (output, SZ_INT32)
-	buf = input
-	do i = 1, SZ_INT32
-	    output[i] = cbuf[i]
-end
-
-# tbbeqs -- assign a short integer value
-# The purpose of this is to assign the input value of type short integer to
-# a character output buffer.
-
-procedure tbbeqs (input, output)
-
-short	input			# i: input integer value
-char	output[ARB]		# o: same as input, bit for bit
-#--
-short	buf			# local copy of input
-char	cbuf[SZ_SHORT]		# will be copied to output
-int	i
-equivalence (buf, cbuf)
-
-begin
-        call aclrc (output, SZ_SHORT)
-	if (SZ_SHORT == SZ_CHAR) {
-	    output[1] = input
-	} else {
-	    buf = input
-	    do i = 1, SZ_SHORT
-		output[i] = cbuf[i]
-	}
-end
-
-# tbbeqb -- assign a boolean value
-# The purpose of this is to assign the input value of type boolean to
-# a character output buffer.
-
-procedure tbbeqb (input, output)
-
-bool	input			# i: input integer value
-char	output[ARB]		# o: same as input, bit for bit
-#--
-bool	buf			# local copy of input
-char	cbuf[SZ_BOOL]		# will be copied to output
-int	i
-equivalence (buf, cbuf)
-
-begin
-        call aclrc (output, SZ_BOOL)
-	buf = input
-	do i = 1, SZ_BOOL
-	    output[i] = cbuf[i]
 end
