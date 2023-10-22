@@ -1,44 +1,5 @@
 
-task tbbeqd = t_tbbeqd,
-     tbbnll = t_tbbnll
-
-procedure t_tbbeqd ()
-
-double  in
-int     ini
-char    out[SZ_FNAME]
-int     i, sz
-
-begin
-    call aclrc (out, SZ_FNAME)
-    in = 3.141592654
-    in = 314159.2654
-    ini = 1028000
-    sz = SZ_DOUBLE
-
-    #call zzpeek (in, SZ_DOUBLE, 2)
-
-    call eprintf ("in = %g  out = :%g:\n")
-        call pargd (in); call pargstr (out)
-
-    call aclrc (out, SZ_FNAME)
-    call tbbeqd (in, out)
-    do i = 1, SZ_DOUBLE {
-        call eprintf ("d out %d: %d\n")
-            call pargi(i)
-            call pargc(out[i])
-    }
-
-    call aclrc (out, SZ_FNAME)
-    call tbbeqi (ini, out)
-    do i = 1, SZ_DOUBLE {
-        call eprintf ("i out %d: %d\n")
-            call pargi(i)
-            call pargc(out[i])
-    }
-
-    #call zzpeek (out, SZ_DOUBLE, 2)
-end
+task tbbnll = t_tbbnll
 
 
 procedure t_tbbnll ()
