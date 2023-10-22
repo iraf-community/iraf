@@ -68,7 +68,7 @@ case "$MACH" in
     export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -m32 -Wunused"
     export HSI_XF="-Inolibc -/Wall -/m32"
     export HSI_FF="-g -O2 -DBLD_KERNEL -m32"
-    export HSI_LF="-m32"
+    export HSI_LF="-Wl,-m,elf_i386 -m32"
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
     export HSI_OSLIBS=""
