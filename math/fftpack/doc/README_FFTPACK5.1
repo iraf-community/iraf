@@ -1,0 +1,55 @@
+FFTPACK 5.1 - a FORTRAN library of fast Fourier transforms
+11/18/2021
+
+Authors:  Paul N. Swarztrauber (deceased) and Richard A. Valent
+
+Version
+-------
+This FFTPACK distribution is identical with the one dated
+12/06/2011, except for this present file; thus we have not 
+changed the version mumber. It remains at 5.1.
+
+Caveats
+-------
+FFTPACK5.1 is written in Fortran77 with the exception that a few
+of its test routines use Fortran 90 intrinsics random_seed and 
+random_number.  For this reason we recommend that you build the 
+library with a Fortran 90 compiler. 
+
+The source code does not comply strictly with the Fortran 77 
+standard.  We have not compiled a list of standards violations.
+Users whose projects require strict adherence to the standard 
+should not use this package.  Users with new applications are 
+advised to use other more modern FFTs, as this library was mostly 
+written in the 1970's and 80's, and is intended for legacy 
+applications dependent on it.
+
+This distribution is intended for use on Linux and Unix systems.  
+The included Makefile is not compatible with Windows makefiles.
+
+Support
+-------
+NCAR offers no support for this package.
+
+Documentation
+-------------
+Documentation is provided in HTML format in file FFTPACK5.1.html.
+Use your browser to open the file and navigate its links to view
+the usage documentation of the user-level routines.
+
+Building the Library
+---------------------
+The included Makefile is configured to build a static library on 
+several available Linux and Unix-like operating systems having an
+available Fortran 90 compiler. The test programs use Fortran 90 
+intrinsics random_seed and random_number.
+
+Examine file make.inc to see if your OS and compiler are represented.  
+If they are not, you should modify file make.inc and the Makefile in 
+each directory (main, src and test) according to your needs.
+
+The source code is written for single precision real numbers.  If double 
+precision is desired, Makefile and make.inc must be modified with the 
+appropriate compiler options for promoting real to double precision as 
+well as promoting constants to double precision (this is often "-r8" on 
+some, but not all, compilers).

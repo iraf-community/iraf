@@ -44,6 +44,12 @@ deboor:
 	$update   libdeboor.a
 	$checkin  libdeboor.a lib$
 	;
+fftpack:
+	$echo "-------------- FFTPACK ------------------"
+	$checkout libfftpack.a lib$
+	$update   libfftpack.a
+	$checkin  libfftpack.a lib$
+	;
 gsurfit:
 	$echo "-------------- LIBGSURFIT ---------------"
 	$checkout libgsurfit.a lib$
