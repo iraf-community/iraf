@@ -15,6 +15,7 @@ mathgen:
 	$call bev
 	$call curfit
 	$call deboor
+	$call fftpack
 	$call gsurfit
 	# $call ieee
 	$call iminterp
@@ -109,6 +110,10 @@ libcurfit.a:				# Curve fitting package
 
 libdeboor.a:				# DeBoor spline package
 	@deboor
+	;
+
+libfftpack.a:				# FFTPACK v5.1 package
+	@fftpack
 	;
 
 libgsurfit.a:				# Generalized 2d surface fitting pkg
