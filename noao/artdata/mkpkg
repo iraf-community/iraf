@@ -18,7 +18,7 @@ install:
 	;
 
 artdata:
-	$set LIBS = "-lsmw -lxtools -lcurfit -liminterp -lfftpack -lllsq"
+	$set LIBS = "-lsmw -lxtools -lcurfit -liminterp"
 	$omake	x_artdata.x
 	$link	x_artdata.o libpkg.a $(LIBS) -o xx_artdata.e
 	;
