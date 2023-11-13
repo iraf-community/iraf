@@ -784,36 +784,3 @@ begin
 	ng = 0
 	call sfree (sp)
 end
-
-
-# GASDEV -- Return a normally distributed deviate with zero mean and unit
-# variance.  The method computes two deviates simultaneously.
-#
-# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-# Used by permission of the authors.
-# Copyright(c) 1986 Numerical Recipes Software.
-
-real procedure gasdev (seed)
-
-long	seed		# Seed for random numbers
-
-real	v1, v2, r, fac, urand()
-int	iset
-data	iset/0/
-
-begin
-	if (iset == 0) {
-	    repeat {
-	        v1 = 2 * urand (seed) - 1.
-	        v2 = 2 * urand (seed) - 1.
-	        r = v1 ** 2 + v2 ** 2
-	    } until ((r > 0) && (r < 1))
-	    fac = sqrt (-2. * log (r) / r)
-
-	    iset = 1
-	    return (v1 * fac)
-	} else {
-	    iset = 0
-	    return (v2 * fac)
-	}
-end
