@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit"
+	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit -lfftpack"
 	$update libpkg.a
 	$omake x_rv.x
 	$link -o xx_rv.e x_rv.o libpkg.a $(LIBS)
@@ -35,7 +35,6 @@ libpkg.a:
 	fftutil.x	rvflags.h rvpackage.h rvplots.h <math.h>
 	filtpars.x	rvcomdef.h rvfilter.h rvflags.h rvpackage.h
 	keywpars.x	rvcomdef.h rvkeywords.h rvpackage.h
-	numrep.x	<mach.h> <math.h>
 	plotpars.x	rvcomdef.h rvflags.h rvpackage.h rvplots.h
 	prepspec.x	rvflags.h rvpackage.h rvsample.h <math.h>
 	readtlist.x	rvflags.h rvpackage.h <imhdr.h>
