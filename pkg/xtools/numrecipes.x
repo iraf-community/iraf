@@ -3,8 +3,15 @@
 include	<math.h>
 include	<mach.h>
 
+# This code was copied from the 'iraf-community' repository to fix various
+# licensing issues with Numerical Recipes code.  See
+#
+#       https://github.com/iraf-community/iraf
+#
+
 # POIDEV -- Returns Poisson deviates for a given mean.
 # GASDEV -- Return a normally distributed deviate of zero mean and unit var.
+# MKSIGMA -- Random number with specified sigma distribution.
 # MR_SOLVE -- Levenberg-Marquardt nonlinear chi square minimization.
 #     MR_EVAL -- Evaluate curvature matrix.
 #     MR_INVERT -- Solve a set of linear equations using Householder transforms.
@@ -95,6 +102,41 @@ begin
 		count = 0
 	}
 	return (x)
+end
+
+
+# MKSIGMA -- A sequence of random numbers of the specified sigma and
+# starting seed is generated.
+#
+# Copyright(c) 2017 Anastasia Galkin
+# Reference: G. E. P. Box and Mervin E. Muller, A Note on the Generation of
+#            Random Normal Deviates, The Annals of Mathematical Statistics
+#            (1958), Vol. 29, No. 2 pp. 610–611
+
+procedure mksigma (sigma, seed, rannums, nnums)
+
+real	sigma		# Sigma for random numbers
+long	seed		# Seed for random numbers
+real	rannums[nnums]	# Random numbers
+int	nnums		# Number of random numbers
+
+int	i
+real	v1, v2, u1, u2, urand(), sqrt()
+
+begin
+	if (sigma > 0.) {
+	    for (i=1; i<=nnums; i=i+1) {
+	        u1 = 1. - urand (seed)
+ 	        u2 = urand (seed)
+		v1 = sqrt(-2 * log(u1)) * cos(2*PI*u2)
+		rannums[i] = v1 * sigma
+		if (i == nnums)
+		    break
+		v2 = sqrt(-2 * log(u1)) * sin(2*PI*u2)
+		i = i + 1
+		rannums[i] = v2 * sigma
+	    }
+	}
 end
 
 
@@ -284,7 +326,7 @@ pointer sp, wsave
 begin
     call smark(sp)
     call salloc(wsave, 4*N+15, TY_REAL)
-    call cffti(N, Memr[wsave])
+    call cfft1i(N, Memr[wsave])
 
     do j=1, N {
         fft1[2*j-1] = data1[j]
@@ -326,10 +368,10 @@ int j
 begin
     call smark(sp)
     call salloc(wsave, 4*N+15, TY_REAL)
-    call rffti(2*N, Memr[wsave])
+    call rfft1i(2*N, Memr[wsave])
 
     if (isign == 1) {
-        call rfftf(2*N, data, Memr[wsave])
+        call rfft1f(2*N, data, Memr[wsave])
         last = data[2*N]
         do j=2*N-1,3,-2 {
             data[j+1] = -data[j]
@@ -344,7 +386,7 @@ begin
             data[j+1] = -data[j+2]/2.0
         }
         data[2*N] = last
-        call rfftb(2*N, data, Memr[wsave])
+        call rfft1b(2*N, data, Memr[wsave])
     }
     call sfree(sp)
 
@@ -444,4 +486,3 @@ begin
 
 	call mfree (y, TY_REAL)
 end
-################################################################################
