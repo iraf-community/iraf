@@ -41,6 +41,7 @@ libxtools.a:
 	dttext.x	<ctotok.h> <ctype.h> <error.h> <finfo.h> <fset.h>\
 			<pkg/dttext.h> <time.h>
 	extrema.x	
+	gammln.c	
 	getdatatype.x	
 	gstrdetab.x	
 	gstrentab.x	
@@ -77,4 +78,5 @@ libxtools.a:
 	xtstripwhite.x	<ctype.h>
 	xtsums.x	
 	xttxtfio.x
+	numrecipes.x
 	;
