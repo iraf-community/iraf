@@ -109,40 +109,103 @@ begin
 end
 
 
-# AST_DATE_TO_JULDAY -- Convert date to Julian day.
-# This assumes dates after year 99.
+# AST_JULDAY_TO_DATE -- Convert Julian date to calendar date.
+# This procedure is taken from `eraJd2cal` of ERFA (Essential Routines
+# for Fundamental Astronomy) and converted to SPP.  ERFA is a C
+# library containing key algorithms for astronomy, and is based on the
+# `SOFA library <http://www.iausofa.org/>`_ published by the
+# International Astronomical Union (IAU).
+#
+# ERFA is intended to replicate the functionality of SOFA (aside from
+# possible bugfixes in ERFA that have not yet been included in SOFA),
+# but is licensed under a three-clause BSD license to enable its
+# compatibility with a wide range of open source licenses. Permission
+# for this release has been obtained from the SOFA board
+#
+# ERFA can be found at https://github.com/liberfa/erfa/
+#
+#  Notes:
+#
+#  1) The earliest valid date is -68569.5 (-4900 March 1).  The
+#     largest value accepted is 1e9.
+#
+#  2) The Julian Date is apportioned in any convenient way between
+#     the arguments dj1 and dj2.  For example, JD=2450123.7 could
+#     be expressed in any of these ways, among others:
+#
+#            dj1             dj2
+#
+#         2450123.7           0.0       (JD method)
+#         2451545.0       -1421.3       (J2000 method)
+#         2400000.5       50123.2       (MJD method)
+#         2450123.5           0.2       (date & time method)
+#
+#     In this implementation, dj2 is set to 0.0.
+#
+#  3) In early eras the conversion is from the "proleptic Gregorian
+#     calendar";  no account is taken of the date(s) of adoption of
+#     the Gregorian calendar, nor is the AD/BC numbering convention
+#     observed.
+#
+#  Reference:
+#
+#     Explanatory Supplement to the Astronomical Almanac,
+#     P. Kenneth Seidelmann (ed), University Science Books (1992),
+#     Section 12.92 (p604).
+#
+#  Copyright (C) 2013-2017, NumFOCUS Foundation.
+#  Derived, with permission, from the SOFA library.
+#
+#  This code was copied from the 'iraf-community' repository to fix various
+#  licensing issues with Numerical Recipes code.  See
+#
+#       https://github.com/iraf-community/iraf
+#
 
-double procedure ast_date_to_julday (year, month, day, t)
+procedure ast_julday_to_date (j, year, month, day, t)
 
-int	year			# Year
-int	month			# Month (1-12)
-int	day			# Day of month
-double	t			# Time for date (mean solar day)
+double  j,dj2                   # Julian day
+data dj2 /0./
+int     year                    # Year
+int     month                   # Month (1-12)
+int     day                     # Day of month
+double  t                       # Time for date (mean solar day)
 
-double	jd
-int	y, m, d
+long jd, l, n, i, k
+double d1, d2, f1, f2, f, d
+double mod(), nint()
 
 begin
-	if (year < 100)
-	    y = 1900 + year
-	else
-	    y = year
+        # Copy the date, big then small, and re-align to midnight.
+        if (j >= dj2) {
+          d1 = j
+          d2 = dj2
+        } else {
+          d1 = dj2
+          d2 = j
+        }
+        d2 = d2 - 0.5
 
-	if (month > 2)
-	    m = month + 1
-	else {
-	    m = month + 13
-	    y = y - 1
-	}
+        # Separate day and fraction.
+        f1 = mod(d1, 1.0)
+        f2 = mod(d2, 1.0)
+        f = mod(f1 + f2, 1.0)
+        if (f < 0.0) f = f + 1.0
+        d = nint(d1-f1) + nint(d2-f2) + nint(f1+f2-f)
+        jd = long(nint(d)) + 1
 
-	jd = int (JYEAR * y) + int (30.6001 * m) + day + 1720995
-	if (day + 31 * (m + 12 * y) >= 588829) {
-	    d = int (y / 100)
-	    m = int (y / 400)
-	    jd = jd + 2 - d + m
-	}
-	jd = jd - 0.5 + int (t * 360000. + 0.5) / 360000. / 24.
-	return (jd)
+        # Express day in Gregorian calendar.
+        l = jd + 68569
+        n = (4 * l) / 146097
+        l = l - (146097 * n + 3) / 4
+        i = (4000 * (l + 1)) / 1461001
+        l = l - ((1461 * i) / 4 - 31)
+        k = (80 * l) / 2447
+        day = int(l - (2447 * k) / 80)
+        l = k / 11
+        month = int(k + 2 - 12 * l)
+        year = int(100 * (n - 49) + i + l)
+        t = f * 24
 end
 
 
