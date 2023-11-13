@@ -169,36 +169,3 @@ begin
 	    call aaddr (rannums[i], data, data, ncols)
 	}
 end
-
-
-# MKSIGMA -- A sequence of random numbers of the specified sigma and
-# starting seed is generated.  The random number generator is modeled after
-# that in Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
-
-procedure mksigma (sigma, seed, rannums, nnums)
-
-real	sigma		# Sigma for random numbers
-long	seed		# Seed for random numbers
-real	rannums[nnums]	# Random numbers
-int	nnums		# Number of random numbers
-
-int	i
-real	v1, v2, r, fac, urand()
-
-begin
-	if (sigma > 0.) {
-	    for (i=1; i<=nnums; i=i+1) {
-		repeat {
-		    v1 = 2 * urand (seed) - 1.
-		    v2 = 2 * urand (seed) - 1.
-		    r = v1 ** 2 + v2 ** 2
-		} until ((r > 0) && (r < 1))
-		fac = sqrt (-2. * log (r) / r) * sigma
-		rannums[i] = v1 * fac
-		if (i == nnums)
-		    break
-		i = i + 1
-		rannums[i] = v2 * fac
-	    }
-	}
-end
