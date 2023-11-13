@@ -13,8 +13,8 @@ relink:
 	$update	libpkg.a
 	$omake	x_onedspec.x
 	$link	x_onedspec.o libpkg.a -lsmw\
-		-lxtools -lcurfit -lgsurfit -liminterp \
-                -lfftpack -lllsq -o xx_onedspec.e
+		-lxtools -lcurfit -lgsurfit -liminterp -lllsq \
+                -o xx_onedspec.e
 	;
 
 install:

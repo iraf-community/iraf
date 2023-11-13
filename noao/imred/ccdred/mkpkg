@@ -19,8 +19,7 @@ install:
 
 ccdred:
 	$omake	x_ccdred.x
-	$link	x_ccdred.o libpkg.a -lxtools -lcurfit -lgsurfit -lncar \
-                -lfftpack -lllsq -lgks\
+	$link	x_ccdred.o libpkg.a -lxtools -lcurfit -lgsurfit -lncar -lgks \
 		-o xx_ccdred.e
 	;
 
