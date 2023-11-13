@@ -18,7 +18,7 @@ install:
 	;
 
 artdata:
-	$set LIBS = "-lsmw -lxtools -lcurfit -liminterp"
+	$set LIBS = "-lsmw -lxtools -lcurfit -liminterp -lfftpack -lllsq"
 	$omake	x_artdata.x
 	$link	x_artdata.o libpkg.a $(LIBS) -o xx_artdata.e
 	;
@@ -28,7 +28,6 @@ libpkg.a:
 	mkheader.x	<ctype.h> <imhdr.h> <imio.h>
 	mktemplates.x	mktemplates.com <error.h> <imhdr.h> <math.h>\
 			<math/iminterp.h>
-	numrecipes.x	<math.h>
 	t_mk1dspec.x	<error.h> <imhdr.h>
 	t_mk2dspec.x	<error.h> <imhdr.h> <math/iminterp.h>
 	t_mkechelle.x	<error.h> <imhdr.h> <math.h>
