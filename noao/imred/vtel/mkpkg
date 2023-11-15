@@ -34,7 +34,6 @@ libpkg.a:
 	textim.x	 <imhdr.h> <mach.h>
 	lstsq.x	         <mach.h>
 	merge.x		"vt.h" <imhdr.h> <mach.h>
-	mrqmin.x
 	mscan.x		"vt.h" <error.h> <mach.h>
 	numeric.x	"vt.h" "numeric.h" <mach.h>
 	pimtext.x       "vt.h"
@@ -48,7 +47,6 @@ libpkg.a:
 	readss4.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
 	readsubswath.x	"vt.h" <mach.h> <fset.h>
 	readvt.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
-	rmap.x		"vt.h" "numeric.h" <imhdr.h> <mach.h>
 	syndico.x	"vt.h" "trnsfrm.inc" "syndico.h" <mach.h> <imhdr.h>\
 			<imset.h> <gset.h>
 	tcopy.x		"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
