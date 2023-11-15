@@ -1,12 +1,12 @@
 # FFTPACK v5.1 library routines
 
 update:
-        $checkout       libxtools.a lib$
-        $update         libxtools.a
-        $checkin        libxtools.a lib$
+        $checkout       libfftpack.a lib$
+        $update         libfftpack.a
+        $checkin        libfftpack.a lib$
         ;
 
-libxtools.a:
+libfftpack.a:
 	c1f2kb.f
 	c1f2kf.f
 	c1f3kb.f

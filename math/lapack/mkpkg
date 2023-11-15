@@ -1,12 +1,12 @@
 # LAPACK library routines
 
 update:
-        $checkout       libxtools.a lib$
-        $update         libxtools.a
-        $checkin        libxtools.a lib$
+        $checkout       liblapack.a lib$
+        $update         liblapack.a
+        $checkin        liblapack.a lib$
         ;
 
-libxtools.a:
+liblapack.a:
 	dgemm.f
 	dger.f
 	dgetf2.f

@@ -15,10 +15,12 @@ mathgen:
 	$call bev
 	$call curfit
 	$call deboor
+	$call fftpack
 	$call gsurfit
 	# $call ieee
 	$call iminterp
 	$call interp
+	$call lapack
 	$call llsq
 	$call nlfit
 	$call slalib
@@ -44,6 +46,12 @@ deboor:
 	$update   libdeboor.a
 	$checkin  libdeboor.a lib$
 	;
+fftpack:
+	$echo "-------------- LIBFFTPACK ---------------"
+	$checkout libfftpack.a lib$
+	$update   libfftpack.a
+	$checkin  libfftpack.a lib$
+	;
 gsurfit:
 	$echo "-------------- LIBGSURFIT ---------------"
 	$checkout libgsurfit.a lib$
@@ -67,6 +75,12 @@ interp:
 	$checkout libinterp.a lib$
 	$update   libinterp.a
 	$checkin  libinterp.a lib$
+	;
+lapack:
+	$echo "-------------- LIBLAPACK ----------------"
+	$checkout liblapack.a lib$
+	$update   liblapack.a
+	$checkin  liblapack.a lib$
 	;
 llsq:
 	$echo "-------------- LIBLLSQ ------------------"
@@ -105,6 +119,10 @@ libdeboor.a:				# DeBoor spline package
 	@deboor
 	;
 
+libfftpack.a:				# FFTPACK v5.1 library
+	@fftpack
+	;
+
 libgsurfit.a:				# Generalized 2d surface fitting pkg
 	@gsurfit
 	;
@@ -119,6 +137,10 @@ libiminterp.a:				# Image interpolation package
 
 libinterp.a:				# Obsolete version of iminterp pkg
 	@interp
+	;
+
+liblapack.a:				# Linear Algebra library
+	@lapack
 	;
 
 libllsq.a:				# Lawson and Hanson Least Squares pkg

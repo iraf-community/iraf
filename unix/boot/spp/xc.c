@@ -73,8 +73,8 @@
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
-#define IRAFLIB5	" "
-#define IRAFLIB6	" "
+#define IRAFLIB5	"libfftpack.a"
+#define IRAFLIB6	"liblapack.a"
 
 #ifdef LINUX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
@@ -1200,15 +1200,15 @@ passflag:		    mkobject = YES;
 	    if (usesharelib) {
 		arglist[nargs++] = mkfname (SHARELIB);
 		arglist[nargs++] = mkfname (IRAFLIB4);
-		//arglist[nargs++] = mkfname (IRAFLIB5);
-		//arglist[nargs++] = mkfname (IRAFLIB6);
+		arglist[nargs++] = mkfname (IRAFLIB5);
+		arglist[nargs++] = mkfname (IRAFLIB6);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
 		arglist[nargs++] = mkfname (IRAFLIB2);
 		arglist[nargs++] = mkfname (IRAFLIB3);
 		arglist[nargs++] = mkfname (IRAFLIB4);
-		//arglist[nargs++] = mkfname (IRAFLIB5);
-		//arglist[nargs++] = mkfname (IRAFLIB6);
+		arglist[nargs++] = mkfname (IRAFLIB5);
+		arglist[nargs++] = mkfname (IRAFLIB6);
 	    }
 	}
 
