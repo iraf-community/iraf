@@ -209,45 +209,6 @@ begin
 end
 
 
-# AST_JULDAY_TO_DATE -- Convert Julian date to calendar date.
-# This is taken from Numerical Receipes by Press, Flannery, Teukolsy, and
-# Vetterling.
-
-procedure ast_julday_to_date (j, year, month, day, t)
-
-double	j			# Julian day
-int	year			# Year
-int	month			# Month (1-12)
-int	day			# Day of month
-double	t			# Time for date (mean solar day)
-
-int	ja, jb, jc, jd, je
-
-begin
-	ja = nint (j)
-	t = 24. * (j - ja + 0.5)
-
-	if (ja >= 2299161) {
-	    jb = int (((ja - 1867216) - 0.25) / 36524.25)
-	    ja = ja + 1 + jb - int (jb / 4)
-	}
-
-	jb = ja + 1524
-	jc = int (6680. + ((jb - 2439870) - 122.1) / JYEAR)
-	jd = 365 * jc + int (jc / 4)
-	je = int ((jb - jd) / 30.6001)
-	day = jb - jd - int (30.6001 * je)
-	month = je - 1
-	if (month > 12)
-	    month = month - 12
-	year = jc - 4715
-	if (month > 2)
-	    year = year - 1
-	if (year < 0)
-	    year = year - 1
-end
-
-
 # AST_MST -- Mean sidereal time of the epoch at the given longitude.
 # This procedure may be used to optain Greenwich Mean Sidereal Time (GMST)
 # by setting the longitude to 0.
