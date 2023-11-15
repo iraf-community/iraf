@@ -7,7 +7,6 @@ destreak	hlp=doc$destreak.hlp,		src=vtel$destreak.x
 destreak5	hlp=doc$destreak5.hlp,		src=vtel$destreak5.cl
 readvt		hlp=doc$readvt.hlp,		src=vtel$readvt.x
 writevt		hlp=doc$writevt.hlp,		src=vtel$writevt.x
-rmap		hlp=doc$rmap.hlp,		src=vtel$rmap.x
 vtblink		hlp=doc$vtblink.hlp,		src=vtel$vtblink.cl
 quickfit	hlp=doc$quickfit.hlp,		src=vtel$quickfit.x
 merge		hlp=doc$merge.hlp,		src=vtel$merge.x
