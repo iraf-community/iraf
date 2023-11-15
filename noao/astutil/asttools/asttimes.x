@@ -109,6 +109,43 @@ begin
 end
 
 
+# AST_DATE_TO_JULDAY -- Convert date to Julian day.
+# This assumes dates after year 99.
+
+double procedure ast_date_to_julday (year, month, day, t)
+
+int     year                    # Year
+int     month                   # Month (1-12)
+int     day                     # Day of month
+double  t                       # Time for date (mean solar day)
+
+double  jd
+int     y, m, d
+
+begin
+        if (year < 100)
+            y = 1900 + year
+        else
+            y = year
+
+        if (month > 2)
+            m = month + 1
+        else {
+            m = month + 13
+            y = y - 1
+        }
+
+        jd = int (JYEAR * y) + int (30.6001 * m) + day + 1720995
+        if (day + 31 * (m + 12 * y) >= 588829) {
+            d = int (y / 100)
+            m = int (y / 400)
+            jd = jd + 2 - d + m
+        }
+        jd = jd - 0.5 + int (t * 360000. + 0.5) / 360000. / 24.
+        return (jd)
+end
+
+
 # AST_JULDAY_TO_DATE -- Convert Julian date to calendar date.
 # This procedure is taken from `eraJd2cal` of ERFA (Essential Routines
 # for Fundamental Astronomy) and converted to SPP.  ERFA is a C
