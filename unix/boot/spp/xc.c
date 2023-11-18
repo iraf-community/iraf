@@ -69,9 +69,8 @@
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
 #define IRAFLIB5	"libVOTable.a"
-#define IRAFLIB6	"libcfitsio.a"
-#define IRAFLIB7	"liblapack.a"
-#define IRAFLIB8	"libfftpack.a"
+#define IRAFLIB6	"liblapack.a"
+#define IRAFLIB7	"libfftpack.a"
 
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
@@ -819,13 +818,12 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (SHARELIB);
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
-		arglist[nargs++] = mkfname (IRAFLIB6);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
-		arglist[nargs++] = mkfname (IRAFLIB7);
+		arglist[nargs++] = mkfname (IRAFLIB6);
 		arglist[nargs++] = mkfname (IRAFLIB2);
 		arglist[nargs++] = mkfname (IRAFLIB3);
-		arglist[nargs++] = mkfname (IRAFLIB8);
+		arglist[nargs++] = mkfname (IRAFLIB7);
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
 		arglist[nargs++] = mkfname (IRAFLIB6);

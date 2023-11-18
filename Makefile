@@ -72,7 +72,7 @@ host: novos
 	$(MAKE) -C $(host) bindir=$(hbin) boot/install
 	$(MAKE) -C $(host) clean
 
-# Build vendor libs (cfitsio and libvotable)
+# Build vendor libs (libvotable)
 vendor: host
 	$(MAKE) -C $(iraf)vendor \
 	    includedir=$(iraf)include/ bindir=$(bin) install

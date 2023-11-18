@@ -1,4 +1,4 @@
-CFLAGS = $(XC_CFLAGS) -DHAVE_CFITSIO -I../cfitsio
+CFLAGS = $(XC_CFLAGS) -I../cfitsio
 
 OBJS = votParse.o votParse_f77.o votParse_spp.o votExpatCB.o	\
     votElement.o votAttr.o votStack.o votHandle.o votUtil_spp.o
