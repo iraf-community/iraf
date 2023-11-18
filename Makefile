@@ -40,7 +40,7 @@ export RANLIB = ranlib
 export CFLAGS ?= -g -O2
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 
-.PHONY: all sysgen clean test arch noao host novos core vendor bindirs bin_links config inplace starttime
+.PHONY: all sysgen clean test arch noao host novos core bindirs bin_links config inplace starttime
 
 all:: sysgen
 
@@ -72,18 +72,12 @@ host: novos
 	$(MAKE) -C $(host) bindir=$(hbin) boot/install
 	$(MAKE) -C $(host) clean
 
-# Build vendor libs (libvotable)
-vendor: host
-	$(MAKE) -C $(iraf)vendor \
-	    includedir=$(iraf)include/ bindir=$(bin) install
-	$(MAKE) -C $(iraf)vendor clean
-
 # Build the core system.
-core: host vendor
+core: host
 	$(MKPKG)
 
 # Build the NOAO package.
-noao: host vendor core
+noao: host core
 	cd $(noao) && $(MKPKG) -p noao
 
 # Run the test suite.
@@ -94,7 +88,6 @@ test:
 # by generic, xyacc and similar.
 clean:
 	$(MAKE) -C unix clean
-	$(MAKE) -C vendor clean
 	find ./local ./math ./pkg ./sys ./noao/[adfimnorst]* \
 	     -type f -name \*.\[aeo\] -exec rm -f {} \;
 	rm -f $(bin)/* noao/bin$(arch)/* $(hbin)* .build_started \

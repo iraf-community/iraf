@@ -9,9 +9,8 @@ define	CH_DELIM	20B		    # used to flag image section
 define	IMT_FILE	0		    # file list
 define	IMT_IMAGE	1		    # image list
 define	IMT_TABLE	2		    # table list (ascii file)
-define	IMT_VOTABLE	3		    # table list (XML file)
-define	IMT_URL		4		    # file URL
-define	IMT_DIR		5		    # directory
+define	IMT_URL		3		    # file URL
+define	IMT_DIR		4		    # directory
 
 define  IMT_OUTPUTS     "|none|list|file|"  # expansion options
 define  IMTY_NONE       1                   # No output
