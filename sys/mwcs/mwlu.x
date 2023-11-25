@@ -7,6 +7,15 @@
 #
 # These routines simply call the LU composition routines provided by LAPACK.
 
+#############################################################################
+#  This code was copied/derived from the 'iraf-community' repository to
+#  address known licensing issues with Numerical Recipes code.
+#
+#  Source Repository:   https://github.com/iraf-community/iraf
+#  Author:              Ole Streicher
+#############################################################################
+
+
 
 # MW_LUDECOMPOSE -- Replace an NxN matrix A by the LU decomposition of a
 # rowwise permutation of the matrix.  The LU decomposed matrix A and the
