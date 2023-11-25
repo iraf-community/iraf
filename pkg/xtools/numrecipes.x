@@ -3,11 +3,15 @@
 include	<math.h>
 include	<mach.h>
 
-# This code was copied from the 'iraf-community' repository to fix various
-# licensing issues with Numerical Recipes code.  See
+
+#############################################################################
+#  This code was copied/derived from the 'iraf-community' repository to
+#  address known licensing issues with Numerical Recipes code.
 #
-#       https://github.com/iraf-community/iraf
-#
+#  Source Repository:   https://github.com/iraf-community/iraf
+#  Author:              Ole Streicher
+#############################################################################
+
 
 # POIDEV -- Returns Poisson deviates for a given mean.
 # GASDEV -- Return a normally distributed deviate of zero mean and unit var.

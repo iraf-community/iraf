@@ -193,11 +193,14 @@ end
 #  Copyright (C) 2013-2017, NumFOCUS Foundation.
 #  Derived, with permission, from the SOFA library.
 #
-#  This code was copied from the 'iraf-community' repository to fix various
-#  licensing issues with Numerical Recipes code.  See
+#############################################################################
+#  This code was copied/derived from the 'iraf-community' repository to
+#  address known licensing issues with Numerical Recipes code.
 #
-#       https://github.com/iraf-community/iraf
-#
+#  Source Repository:   https://github.com/iraf-community/iraf
+#  Author:              Ole Streicher
+#############################################################################
+
 
 procedure ast_julday_to_date (j, year, month, day, t)
 
