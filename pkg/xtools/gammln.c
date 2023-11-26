@@ -1,13 +1,22 @@
-#define import_spp
-#include <iraf.h>
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+*/
+
+#include <math.h>
+
+double lgamma (double x);
+float lgammaf (float x);
+
 
 /* GAMMLN -- Return natural log of gamma function.
  * Argument must greater than 0.
  */
 
-XREAL gammln_ (XREAL *xx)
+float gammln_ (float *x)
 {
-  float lgammaf(float);
+        return lgammaf (*x);
+}
 
-  return lgammaf(*xx);
+double dgammn_ (double *x)
+{
+        return lgamma (*x);
 }
