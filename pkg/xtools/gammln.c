@@ -3,6 +3,7 @@
 
 #include <math.h>
 
+double lgamma (double x);
 float lgammaf (float x);
 
 
@@ -13,4 +14,9 @@ float lgammaf (float x);
 float gammln_ (float *x)
 {
         return lgammaf (*x);
+}
+
+double dgammn_ (double *x)
+{
+        return lgamma (*x);
 }
