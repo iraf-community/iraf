@@ -17,7 +17,6 @@ mathgen:
 	$call deboor
 	$call fftpack
 	$call gsurfit
-	# $call ieee
 	$call iminterp
 	$call interp
 	$call lapack
