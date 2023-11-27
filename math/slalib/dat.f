@@ -39,11 +39,11 @@
 *     :     occasion that a leap second is      :
 *     :                announced                :
 *     :                                         :
-*     :  Latest leap second:  2017 January 1    :
+*     :  Latest leap second:  2016 December 31  :
 *     :                                         :
 *     :-----------------------------------------:
 *
-*  Last revision:   5 July 2008
+*  Last revision:   7 July 2016
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
