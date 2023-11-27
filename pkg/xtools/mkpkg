@@ -46,8 +46,6 @@ libxtools.a:
 	gstrdetab.x	
 	gstrentab.x	
 	gstrsettab.x	
-        hfti.f
-        h12.f
 	imtools.x	<ctype.h> <imhdr.h>
 	intrp.f
 	isdir.x		<ctype.h> <finfo.h>
