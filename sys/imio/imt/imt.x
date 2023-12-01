@@ -329,14 +329,5 @@ begin
 	    }
 	}
 	outstr[op] = EOS
-
-	#  FIXME
-	if (envgetb ("vo_prefetch") && strncmp (outstr, "cache", 5) == 0) {
-#	    call sprintf (cfname, SZ_LINE, "%s.fits")
-	    call sprintf (cfname, SZ_LINE, "%s")
-		call pargstr (outstr)
-	    call fcwait ("cache$", cfname)
-	}
-	
 	return (op - 1)
 end
