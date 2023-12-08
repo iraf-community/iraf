@@ -13,16 +13,13 @@ repository-code: "https://github.com/iraf-community/iraf"
 url: "https://iraf-community.github.io"
 license-url: "https://github.com/iraf-community/iraf/blob/main/COPYRIGHT"
 
-# Version information
-version: "2.17"
-date-released: 2022-01-04
 identifiers:
   - type: doi
-    description: DOI for version 2.17
-    value: "10.5281/zenodo.5816744"
+    description: Concept DOI
+    value: "10.5281/zenodo.5816743"
   - type: url
     description: ASCL entry
-    value: https://ascl.net/9911.002
+    value: "https://ascl.net/9911.002"
 
 # Associated papers
 preferred-citation:
