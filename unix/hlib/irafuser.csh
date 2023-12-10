@@ -34,18 +34,18 @@ switch ($MACH)
     setenv HSI_FF "-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
     setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
+    setenv HSI_LFLAGS "-arch arm64 -m64"
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
     breaksw
 
   case macintel:
-    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64"
-    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/m64"
-    setenv HSI_FF "-g -O2 -m64 -DMACH64 -DBLD_KERNEL"
-    setenv HSI_LF "-m64 -DMACH64"
+    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -arch x86_64 -m64"
+    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/arch -//x86_64 -/m64"
+    setenv HSI_FF "-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL"
+    setenv HSI_LF "-arch x86_64 -m64 -DMACH64"
     setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
+    setenv HSI_LFLAGS "-arch x86_64 -m64"
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
     breaksw

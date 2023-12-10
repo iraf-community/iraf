@@ -43,12 +43,12 @@ case "$MACH" in
     ;;
 
   "macintel")
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -m64 -g"
-    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/m64"
-    export HSI_FF="-g -O2 -m64 -DMACH64 -DBLD_KERNEL"
-    export HSI_LF="-m64 -DMACH64"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -arch x86_64 -m64 -g"
+    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/arch -//x86_64 -/m64"
+    export HSI_FF="-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL"
+    export HSI_LF="-arch x86_64 -m64 -DMACH64"
     export HSI_F77LIBS=""
-    export HSI_LFLAGS=""
+    export HSI_LFLAGS="-arch x86_64 "
     export HSI_OSLIBS=""
     #mkzflags="lflags=-z"
     ;;
