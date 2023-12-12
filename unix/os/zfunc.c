@@ -15,20 +15,20 @@
  * functions are supported).
  */
 
-typedef int (*PFI_0)();
-typedef int (*PFI_1)(void *);
-typedef int (*PFI_2)(void *,void *);
-typedef int (*PFI_3)(void *,void *,void *);
-typedef int (*PFI_4)(void *,void *,void *,void *);
-typedef int (*PFI_5)(void *,void *,void *,void *,void *);
-typedef int (*PFI_6)(void *,void *,void *,void *,void *,void *);
-typedef int (*PFI_7)(void *,void *,void *,void *,void *,void *,void *);
-typedef int (*PFI_8)(void *,void *,void *,void *,void *,void *,void *,
-                     void *);
-typedef int (*PFI_9)(void *,void *,void *,void *,void *,void *,void *,
-                     void *,void *);
-typedef int (*PFI_A)(void *,void *,void *,void *,void *,void *,void *,
-                     void *,void *,void *);
+typedef XINT (*PFI_0)();
+typedef XINT (*PFI_1)(void *);
+typedef XINT (*PFI_2)(void *,void *);
+typedef XINT (*PFI_3)(void *,void *,void *);
+typedef XINT (*PFI_4)(void *,void *,void *,void *);
+typedef XINT (*PFI_5)(void *,void *,void *,void *,void *);
+typedef XINT (*PFI_6)(void *,void *,void *,void *,void *,void *);
+typedef XINT (*PFI_7)(void *,void *,void *,void *,void *,void *,void *);
+typedef XINT (*PFI_8)(void *,void *,void *,void *,void *,void *,void *,
+                      void *);
+typedef XINT (*PFI_9)(void *,void *,void *,void *,void *,void *,void *,
+                      void *,void *);
+typedef XINT (*PFI_A)(void *,void *,void *,void *,void *,void *,void *,
+                      void *,void *,void *);
 
 
 XINT ZFUNC0 (XINT *proc)
