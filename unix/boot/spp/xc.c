@@ -75,6 +75,7 @@
 #define IRAFLIB4	"libos.a"
 #define IRAFLIB5	"libfftpack.a"
 #define IRAFLIB6	"liblapack.a"
+#define IRAFLIB7	"libvops.a"		/* for d1mach in lapack */
 
 #ifdef LINUX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
@@ -1202,6 +1203,7 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
 		arglist[nargs++] = mkfname (IRAFLIB6);
+		arglist[nargs++] = mkfname (IRAFLIB7);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
 		arglist[nargs++] = mkfname (IRAFLIB2);
@@ -1209,6 +1211,7 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
 		arglist[nargs++] = mkfname (IRAFLIB6);
+		arglist[nargs++] = mkfname (IRAFLIB7);
 	    }
 	}
 
