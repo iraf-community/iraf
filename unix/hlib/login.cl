@@ -138,7 +138,7 @@ else {
 
 #============================================================================
 # Check for updates to the system
-chkupdate
+#chkupdate
 
 # Notify the user if we're using the global login.
 path (".") | scan (s1)
