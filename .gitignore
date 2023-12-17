@@ -5,7 +5,7 @@ _*
 */OBJS.arc.Z
 local/.ssh
 local/.history
-local/.lesshst
+local/.lesshist
 *.orig
 *.bak
 *.OLD
