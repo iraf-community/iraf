@@ -7,9 +7,13 @@ endif
 
 # Allow a previously defined $IRAFARCH to be used.
 if ( ! ( $?IRAFARCH )) then
-    setenv IRAFARCH	`$iraf/unix/hlib/irafarch.csh -actual`
+    if ( -e $iraf/unix/hlib/irafarch.csh ) then
+        setenv IRAFARCH	`$iraf/unix/hlib/irafarch.csh -actual`
+    endif
 endif
-source $iraf/unix/hlib/irafuser.csh
+if ( -e $iraf/unix/hlib/irafuser.csh ) then
+    source $iraf/unix/hlib/irafuser .csh
+endif
 
 set path = ($HOME/.iraf/bin $path)
 set cdpath  = ($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot)
