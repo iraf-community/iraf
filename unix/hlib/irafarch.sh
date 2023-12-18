@@ -45,6 +45,11 @@ if [ -z "$iraf" ]; then
 fi
 source ${iraf}/unix/hlib/util.sh
 
+# Check for bogus IRAFARCH value.
+if [ -z "$IRAFARCH" ]; then
+    unset IRAFARCH
+fi
+
 
 #----------------------------------
 # Determine platform architecture.

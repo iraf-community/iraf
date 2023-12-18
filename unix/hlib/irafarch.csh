@@ -28,6 +28,13 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 
 # set echo
 
+# Check for bogus IRAFARCH value.
+if ($?IRAFARCH) then
+    if ( "$IRAFARCH" == "") then
+        unsetenv IRAFARCH
+    endif
+endif
+
 
 ##############################################################################
 # START OF MACHDEP DEFINITIONS.
@@ -80,7 +87,6 @@ else if ($#argv == 1 && "$1" == "-current") then
 else
   if ($#argv == 0) then
     if ($?IRAFARCH) then
-  repeat_:
 	setenv MNAME     $IRAFARCH
 	setenv MNAME_M   $UNAME_M
     else
