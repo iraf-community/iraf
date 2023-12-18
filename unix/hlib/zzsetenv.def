@@ -41,7 +41,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOIRLab-IRAF V2.18DEV"
+set	version		= "NOIRLab IRAF V2.18"
 
 # System directories.
 

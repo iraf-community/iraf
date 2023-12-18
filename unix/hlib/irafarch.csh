@@ -33,7 +33,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 # START OF MACHDEP DEFINITIONS.
 ##############################################################################
 
-set VERSION		= "V2.18DEV"
+set VERSION		= "V2.18"
 set hmach 		= "INDEF"
 set nbits 		= 64
 set pipes 		= 1

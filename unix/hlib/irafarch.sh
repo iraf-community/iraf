@@ -27,6 +27,7 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/5bin:/usr/ucb:/etc:/usr/etc:$PATH
 # START OF MACHDEP DEFINITIONS.
 ##############################################################################
 
+VERSION="V2.18"
 hmach="INDEF"
 nbits=64
 pipes=1

@@ -41,7 +41,7 @@ switch ($MACH)
 
   case macintel:
     setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -arch x86_64 -m64 -mmacosx-version-min=10.9"
-    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/arch -//x86_64 -/m64 -mmacosx-version-min=10.9"
+    setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.9"
     setenv HSI_FF "-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.9"
     setenv HSI_LF "-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.9"
     setenv HSI_F77LIBS ""
