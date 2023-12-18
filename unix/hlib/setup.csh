@@ -12,7 +12,7 @@ if ( ! ( $?IRAFARCH )) then
     endif
 endif
 if ( -e $iraf/unix/hlib/irafuser.csh ) then
-    source $iraf/unix/hlib/irafuser .csh
+    source $iraf/unix/hlib/irafuser.csh
 endif
 
 set path = ($HOME/.iraf/bin $path)
