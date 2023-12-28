@@ -47,7 +47,7 @@ char	fname[ARB]				#i local filename
 pointer	reply					#u pointer to reply string
 
 char	protocol[SZ_FNAME], host[SZ_FNAME], path[SZ_BUF], emsg[SZ_PATHNAME]
-char	inurl[SZ_PATHNAME], outname[SZ_PATHNAME]
+char	inurl[SZ_BUF], outname[SZ_PATHNAME]
 int	port, stat
 pointer buf
 
@@ -58,7 +58,7 @@ define	redirect_	99
 
 begin
 	# Breakup the URL into usable pieces.
-	call strcpy (url, inurl, SZ_PATHNAME)
+	call strcpy (url, inurl, SZ_BUF)
 redirect_
 	call url_break (inurl, protocol, host, port, path)
 
@@ -74,7 +74,7 @@ redirect_
 	call strcpy (fname, outname, SZ_PATHNAME)
 
 	if (reply == NULL) {
-	    call calloc (buf, SZ_LINE, TY_CHAR)
+	    call calloc (buf, SZ_BUF, TY_CHAR)
 	    stat = url_access (host, port, path, outname, buf)
 	    if (url_redirect (stat, buf, inurl)) {     # check for a redirection
 		call mfree (buf, TY_CHAR)
@@ -125,6 +125,8 @@ begin
 		for (op=1; Memc[ip] != '\n'; op=op+1) {
 		    url[op] = Memc[ip]
 		    ip = ip + 1
+                    if (ip > (reply + SZ_BUF - 1))
+                        break
 		}
 		url[op-1] = EOS
 
@@ -250,7 +252,7 @@ begin
         # a \r\n. and then validate it will return the request correctly.
 	done = false
 	clen = -1
-	call calloc (rep, SZ_PATHNAME, TY_CHAR)
+	call calloc (rep, SZ_BUF, TY_CHAR)
         repeat {
 	    call aclrc (hd, SZ_PATHNAME)
             nchars = getline (in, hd)
@@ -273,7 +275,7 @@ begin
 	retcode = url_retcode (Memc[rep])
 
 	if (reply != NULL)
-	    call strcpy (Memc[rep], Memc[reply], SZ_PATHNAME)
+	    call strcpy (Memc[rep], Memc[reply], SZ_BUF)
 	call mfree (rep, TY_CHAR)
 	if (retcode != HTTP_OK)
 	    return (- retcode)
