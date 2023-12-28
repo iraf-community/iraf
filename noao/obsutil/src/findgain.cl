@@ -33,7 +33,7 @@ string	*fd
 begin
 	bool	err
 	file	f1, f2, z1, z2, lf1, lf2, lz1, lz2
-	file	flatdiff, zerodiff, statsfile
+	file	flatdif, zerodif, statsfile
 	real	e_per_adu, readnoise, m_f1, m_f2, m_b1, m_b2, s_fd, s_bd, junk
 	struct	images
 
