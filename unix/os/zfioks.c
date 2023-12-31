@@ -1528,7 +1528,7 @@ query:		if ((namep = ks_getpass (loginname, hostname)))
 
 	    setjmp (jmpbuf);
 	    value = time(NULL);
-	    for (i=0;  i < sizeof(jmpbuf)/sizeof(int);  i++)
+	    for (i=0;  i < (int)(sizeof(jmpbuf)/sizeof(int));  i++)
 		value ^= ((int *)jmpbuf)[i];
 	    value = (value << 13) / 1000 * 1000;
 	    if (value < 0)

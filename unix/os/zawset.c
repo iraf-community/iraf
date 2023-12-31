@@ -39,7 +39,7 @@ ZAWSET (
   XINT	*max_size 		/* max working set size, bytes		*/
 )
 {
-	int physmem=0, kb_page;
+	unsigned int physmem=0, kb_page;
 	int debug = (getenv(ENV_DEBUG) != NULL);
 	char *s;
 

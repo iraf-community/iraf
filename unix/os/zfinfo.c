@@ -76,7 +76,7 @@ ZFINFO (
 	    static	char owner[SZ_OWNERSTR+1];
 	    struct	passwd *pw;
 
-	    if (osfile.st_uid == uid) {
+	    if (osfile.st_uid == (uid_t) uid) {
 		strncpy ((char *)fs->fi_owner, owner, SZ_OWNERSTR);
                 fs->fi_owner[SZ_OWNERSTR-1] = '\0'; // ensure NULL term
 	    } else {
