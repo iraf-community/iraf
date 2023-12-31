@@ -128,7 +128,7 @@ alloc (
 		    printf ("rw access to %s is denied\n", fp->f_name);
 		return (DV_DEVINUSE);
 	    } else if (ruid && uid_executing(ruid)) {
-		if (ruid != getuid()) {
+		if ((uid_t)ruid != getuid()) {
 		    if (!statonly)
 			printf ("%s already allocated to %s\n",
 			    fp->f_name, (getpwuid(ruid))->pw_name);

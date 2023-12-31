@@ -123,7 +123,7 @@ uid_executing (int uid)
 	    sprintf (fname, "/proc/%s", direntp->d_name);
 	    if (stat (fname, &st))
 		return (0);
-	    else if (st.st_uid == uid)
+	    else if (st.st_uid == (uid_t) uid)
 		return (1);
 	}
 	(void) closedir (dirp);
