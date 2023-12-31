@@ -32,8 +32,8 @@ export	RANLIB=ranlib
 
 case "$MACH" in
   "macosx"|"macos64")
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -Wall -arch arm64 -m64"
-    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/Wall -/m64 -/arch -//arm64"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -W -Wall -Wno-unused-parameter -arch arm64 -m64"
+    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/W -/Wall -/Wno-unused-parameter -/m64 -/arch -//arm64"
     export HSI_FF="-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
     export HSI_LF="-arch arm64 -m64"
     export HSI_F77LIBS=""
@@ -43,19 +43,20 @@ case "$MACH" in
     ;;
 
   "macintel")
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -arch x86_64 -m64 -mmacosx-version-min=10.9"
-    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.9"
-    export HSI_FF="-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.9"
-    export HSI_LF="-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.9"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
+    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/W -/Wall
+-/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
+    export HSI_FF="-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.14"
+    export HSI_LF="-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.14"
     export HSI_F77LIBS=""
-    export HSI_LFLAGS="-arch x86_64 -mmacosx-version-min=10.9"
+    export HSI_LFLAGS="-arch x86_64 -mmacosx-version-min=10.14"
     export HSI_OSLIBS=""
     #mkzflags="lflags=-z"
     ;;
 
   "linux64")
-    export HSI_CF="-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -m64"
-    export HSI_XF="-Inolibc -w -/m64 -/Wunused"
+    export HSI_CF="-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -W -Wall -Wno-unused-parameter -m64"
+    export HSI_XF="-Inolibc -w -/m64 -/Wall -/W -/Wno-unused-parameter"
     export HSI_FF="-m64 -DBLD_KERNEL"
     export HSI_LF="-m64 "
     export HSI_F77LIBS=""
@@ -65,8 +66,8 @@ case "$MACH" in
     ;;
 
   "linux" | "redhat")
-    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -m32 -Wunused"
-    export HSI_XF="-Inolibc -/Wall -/m32"
+    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -W -Wall -Wno-unused-parameter -m32"
+    export HSI_XF="-Inolibc -/W -/Wall -/Wno-unused-parameter -/m32"
     export HSI_FF="-g -O2 -DBLD_KERNEL -m32"
     export HSI_LF="-Wl,-m,elf_i386 -m32"
     export HSI_F77LIBS=""
