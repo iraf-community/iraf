@@ -2,11 +2,11 @@
 
 find xpp.l -newer lexyy.c -exec rm lexyy.c \;
 if test -f lexyy.c; then\
-    $CC -c $HSI_CF lexyy.c;\
+    $CC -c $HSI_CF -Wsign-compare lexyy.c;\
 else\
     lex	-l xpp.l;\
     sed -f lex.sed lex.yy.c > lexyy.c;  rm lex.yy.c;\
-    $CC -c $HSI_CF lexyy.c;\
+    $CC -c $HSI_CF -Wsign-compare lexyy.c;\
 fi
 
 $CC -c $HSI_CF	xppmain.c xppcode.c decl.c

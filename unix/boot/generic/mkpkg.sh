@@ -4,7 +4,8 @@
 # for portability reasons.
 
 flex -o lexyy.c tok.l
-$CC -c $HSI_CF	generic.c lexyy.c yywrap.c
+$CC -c $HSI_CF	generic.c yywrap.c
+$CC -c $HSI_CF	-Wsign-compare lexyy.c 
 $CC $HSI_LF	generic.o lexyy.o yywrap.o $HSI_LIBS -o generic.e
 
 mv -f		generic.e ../../hlib
