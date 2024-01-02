@@ -31,7 +31,7 @@ os_strupk (
 	 */
 	if (maxch) {
 	    if (sizeof(char) != sizeof(XCHAR) || str != (char *)outstr) {
-		n = min (n, strlen(ip));
+		n = min ((size_t)n, strlen(ip));
 		op[n] = XEOS;
 
 		while (--n >= 0)
