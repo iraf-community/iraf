@@ -40,8 +40,7 @@ switch ($MACH)
     breaksw
 
   case macintel:
-    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -W
--Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
+    setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -W -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
     setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/W -/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
     setenv HSI_FF "-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.14"
     setenv HSI_LF "-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.14"
