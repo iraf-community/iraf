@@ -17,6 +17,6 @@ fi
 
 export PATH=$HOME/.iraf/bin:${PATH}
 
-# The world'd most obvious alias ....
+# The world's most obvious alias ....
 alias iraf="xgterm -e cl &"
 

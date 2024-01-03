@@ -18,7 +18,7 @@ endif
 set path = ($HOME/.iraf/bin $path)
 set cdpath  = ($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot)
 
-# The world'd most obvious alias ....
+# The world's most obvious alias ....
 alias iraf	"xgterm -e cl &"
 
 rehash
