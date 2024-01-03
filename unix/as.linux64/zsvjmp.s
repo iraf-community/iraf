@@ -21,7 +21,6 @@
 # This file contains the FreeBSD (x86) version of ZSVJMP.
 # Modified to remove leading underscore for ELF (Jan99).
  
-        #.globl	_zsvjmp_
         .globl	zsvjmp_
 
 	# The following has nothing to do with ZSVJMP, and is included here
@@ -33,8 +32,6 @@
 	# advantage is that references to NULL pointers are likely to cause a
 	# memory violation.
 
-	#.globl	mem_
-	#mem_	=	0
 	.globl	_mem_
 	_mem_	=	0
 
