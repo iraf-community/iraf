@@ -44,8 +44,7 @@ case "$MACH" in
 
   "macintel")
     export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
-    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/W -/Wall
--/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
+    export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/W -/Wall -/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
     export HSI_FF="-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.14"
     export HSI_LF="-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.14"
     export HSI_F77LIBS=""
