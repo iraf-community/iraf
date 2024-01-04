@@ -3,6 +3,7 @@
 contents of this directory include:
 
     LICENSE		Software license information
+    LICENSES		Third-party Software license information
     Makefile		Top-level makefile
     README		This file
     README.install	Installation Notes
