@@ -335,7 +335,7 @@ double	b[n]
 int	status
 
 begin
-	call dsgetrs('N', n, 1, a, np, indx, b, n, status)
+	call dgetrs('N', n, 1, a, np, indx, b, n, status)
 end
 
 
