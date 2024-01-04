@@ -69,13 +69,12 @@
 #define	SHIMAGE		"S.e"
 #define LIBMAIN		"libmain.o"
 #define SHARELIB	"libshare.a"
-#define IRAFLIB1	"libex.a"
-#define IRAFLIB2	"libsys.a"
-#define IRAFLIB3	"libvops.a"
-#define IRAFLIB4	"libos.a"
-#define IRAFLIB5	"libfftpack.a"
-#define IRAFLIB6	"liblapack.a"
-#define IRAFLIB7	"libvops.a"		/* for d1mach in lapack */
+#define IRAFLIB1	"libfftpack.a"
+#define IRAFLIB2	"liblapack.a"
+#define IRAFLIB3	"libex.a"
+#define IRAFLIB4	"libsys.a"
+#define IRAFLIB5	"libvops.a"
+#define IRAFLIB6	"libos.a"
 
 #ifdef LINUX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
@@ -1203,7 +1202,6 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
 		arglist[nargs++] = mkfname (IRAFLIB6);
-		arglist[nargs++] = mkfname (IRAFLIB7);
 	    } else {
 		arglist[nargs++] = mkfname (IRAFLIB1);
 		arglist[nargs++] = mkfname (IRAFLIB2);
@@ -1211,7 +1209,6 @@ passflag:		    mkobject = YES;
 		arglist[nargs++] = mkfname (IRAFLIB4);
 		arglist[nargs++] = mkfname (IRAFLIB5);
 		arglist[nargs++] = mkfname (IRAFLIB6);
-		arglist[nargs++] = mkfname (IRAFLIB7);
 	    }
 	}
 
