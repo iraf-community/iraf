@@ -5,7 +5,7 @@ include	defs
    subroutine dsdump (form)
    character form
 
-   DS_DECL(Mem, 1)
+   DS_DECL(Mem, MEMSIZE)
 
    pointer p, t, q
 

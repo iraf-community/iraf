@@ -1,7 +1,7 @@
       subroutine delete (symbol, st)
       integer symbol (100)
       integer st
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer stlu
       integer node, pred

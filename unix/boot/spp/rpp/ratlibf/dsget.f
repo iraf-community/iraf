@@ -1,6 +1,6 @@
       integer function dsget (w)
       integer w
-      integer mem( 1)
+      integer mem( 60000)
       common/cdsmem/mem
       integer p, q, l
       integer n, k, junk

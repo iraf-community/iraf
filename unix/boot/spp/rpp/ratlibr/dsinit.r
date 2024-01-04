@@ -5,7 +5,7 @@ include	defs
    subroutine dsinit (w)
    integer w
 
-   DS_DECL(Mem, 1)
+   DS_DECL(Mem, MEMSIZE)
 
    pointer t
 

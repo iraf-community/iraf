@@ -7,7 +7,7 @@ include	defs
    character sym (ARB)
    integer info (ARB)
 
-   DS_DECL(Mem, 1)
+   DS_DECL(Mem, MEMSIZE)
 
    pointer bucket, walker
    pointer dsget
