@@ -113,7 +113,7 @@ ZAWSET (
 		setrlimit (RLIMIT_RSS, &rlp);
 	    getrlimit (RLIMIT_RSS, &rlp);
 	    *old_size = working_set_size;
-	    *new_size = min(*best_size, min(max_wss,
+	    *new_size = min((rlim_t)*best_size, min(max_wss,
 		rlp.rlim_cur == RLIM_INFINITY ? max_wss : rlp.rlim_cur));
 	}
 	if (debug)
