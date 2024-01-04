@@ -1238,7 +1238,7 @@ ks_puti (int fd, int ival)
 static int
 ks_geti (int fd)
 {
-	register int value = 0;
+	int     value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
 	fd_set  rfd;
@@ -1393,8 +1393,8 @@ ks_getlogin (
   struct ksparam *ks 		/* networking parameters */
 )
 {
-	register struct irafhosts *hp;
 	register int i;
+	struct  irafhosts *hp;
 	char	userfile[SZ_PATHNAME];
 	char	sysfile[SZ_PATHNAME];
 	char	fname[SZ_PATHNAME];
