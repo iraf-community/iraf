@@ -405,11 +405,14 @@ Appendix III:  PyRAF Environment
 
     The PyRAF application in this release is based on a Python 3.8 MiniConda
 system with a minimal set of other python packages installed that may be
-useful for general astronomical scripting. Environments for both Apple and
-Intel systems are included and may be updated with additional packages with
+useful for general astronomical scripting.  Environments for both Apple and
+Intel systems are included in the PyRAF app but only the binaries appropriate
+for the current machine will be used. Installing the IRAF application creates
+convenience commands in $HOME/.iraf/bin to allow users to access this
+environment. Additional packages may be added to your PyRAF conda system with
 the command:
+		% pyraf_pip install <pkgname>
 
-    % /Applications/PyRAF.app/Contents/pyraf-v2.2.1/miniconda3/bin/pip3 install <pkgname>
 
 The PyPi package for PyRAF used here originates from the repository at
 
