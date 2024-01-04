@@ -256,6 +256,32 @@ begin
 	call sgetrf(n, n, a, np, indx, istat)
 end
 
+# ludcmd -- lower-upper decomposition
+# Double-precision version of LUDCMP
+#
+# This routine decomposes a matrix (in-place) into lower and upper
+# triangular portions.  Use lubksd to obtain a solution to A * X = B
+# or to compute the inverse of the matrix A.
+# If the matrix is singular, ISTAT is set to one.
+#
+# This routine simply calls the LU decomposition routine provided by LAPACK.
+
+procedure ludcmd (a, n, np, indx, d, istat)
+
+double  a[np,np]        # io: input a, output decomposed a
+int     n               # i: logical size of a is n x n
+int     np              # i: space allocated for a
+int     indx[n]         # o: index to be used by xt_lubksb
+double  d               # o: +1 or -1
+int     istat           # o: OK if no problem; 1 if matrix is singular
+
+begin
+        d = 1.0
+        call dgetrf(n, n, a, np, indx, istat)
+        if (istat > 0)
+           istat = 1
+end
+
 
 # Solves the set of N linear equations AX = B.  Here A is input, not
 # as the matrix of A but rather as its LU decomposition, determined by
@@ -281,6 +307,35 @@ int	status
 
 begin
 	call sgetrs('N', n, 1, a, np, indx, b, n, status)
+end
+
+
+# Double-precision version of LUBKSB.
+#
+# Solves the set of N linear equations AX = B.  Here A is input, not
+# as the matrix of A but rather as its LU decomposition, determined by
+# the routine LUDCMP.  INDX is input as the permuation vector returned
+# by LUDCMP.  B is input as the right-hand side vector B, and returns
+# with the solution vector X.  A, N, NP and INDX are not modified by
+# this routine and can be left in place for successive calls with
+# different right-hand sides B.  This routine takes into account the
+# possiblity that B will begin with many zero elements, so it is
+# efficient for use in matrix inversion.
+#
+# This routine simply calls the LU decomposition routine provided by LAPACK.
+
+procedure lubksd (a, n, np, indx, b)
+
+double	a[np,np]
+int	n
+int	np
+int	indx[n]
+double	b[n]
+
+int	status
+
+begin
+	call dsgetrs('N', n, 1, a, np, indx, b, n, status)
 end
 
 
