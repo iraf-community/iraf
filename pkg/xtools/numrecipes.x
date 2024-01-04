@@ -159,7 +159,7 @@ pointer sp, wsave
 begin
     call smark(sp)
     call salloc(wsave, 4*N+15, TY_REAL)
-    call cfft1i(N, Memr[wsave])
+    call cffti(N, Memr[wsave])
 
     do j=1, N {
         fft1[2*j-1] = data1[j]
@@ -201,10 +201,10 @@ int j
 begin
     call smark(sp)
     call salloc(wsave, 4*N+15, TY_REAL)
-    call rfft1i(2*N, Memr[wsave])
+    call rffti(2*N, Memr[wsave])
 
     if (isign == 1) {
-        call rfft1f(2*N, data, Memr[wsave])
+        call rfftf(2*N, data, Memr[wsave])
         last = data[2*N]
         do j=2*N-1,3,-2 {
             data[j+1] = -data[j]
@@ -219,7 +219,7 @@ begin
             data[j+1] = -data[j+2]/2.0
         }
         data[2*N] = last
-        call rfft1b(2*N, data, Memr[wsave])
+        call rfftb(2*N, data, Memr[wsave])
     }
     call sfree(sp)
 
