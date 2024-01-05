@@ -35,8 +35,8 @@ begin
 
 	} else if (nbits == 32) { 
 
-	    if (sizeof(dtype) < sz_align)
-	        offset = (nelem / (SZ_INT / sizeof(dtype))) + 1
+	    if (sizeof(dtype) < SZ_INT32)
+	        offset = (nelem / (SZ_INT32 / sizeof(dtype))) + 1
 	    else
 	        offset = (nelem * sizeof (dtype)) / SZB_CHAR
 	}
