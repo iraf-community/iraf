@@ -44,6 +44,9 @@ set -e
 s=/tmp/stderr_$$
 CC=${CC_f2c:-${CC:-cc}}
 CFLAGS="-I${iraf}/unix/bin.${IRAFARCH} ${XC_CFLAGS} -w -O2 -fcommon"
+if [ ${IRAFARCH} == 'macintel' ]; then
+    CFLAGS="${CFLAGS} -mmacosx-version-min=10.14"
+fi
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-${iraf}unix/bin/f2c.e}
