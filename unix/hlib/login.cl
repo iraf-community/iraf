@@ -157,6 +157,7 @@ else
 
 
 #============================================================================
+print (" ")
 print ("  The following commands or packages are currently defined:\n")
 
 keep
