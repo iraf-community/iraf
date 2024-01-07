@@ -3,76 +3,65 @@
 			Installation Instructions
 			=========================
 
-
 Distribution files:
 -------------------
 
-     The IRAF v2.16.1 system is available from the anonftp archive at
+     The NOIRLab IRAF v2.18 release is available from:
 
-	ftp://iraf.noao.edu/iraf/v216/PCIX
+	https://iraf.noirlab.edu/download/mac        # MacOS (Intel/Apple)
+	https://iraf.noirlab.edu/download/linux32    # 32-bit Linux
+	https://iraf.noirlab.edu/download/linux64    # 64-bit Linux
 
-Distribution files for supported platforms include:
-
-    iraf-src.tar.gz			# IRAF v2.16.1 source-only
-
-    iraf-all.tar.gz			# all supported binaries
-    iraf-linux.tar.gz			# 32- and 64-bit Linux binaries
-    iraf-macosx.tar.gz			# 32- and 64-bit Mac OSX binaries
-
-    iraf.lnux.x86_64.tar.gz		# 64-bit Linux binaries
-    iraf.lnux.x86.tar.gz		# 32-bit Linux binaries
-    iraf.macx.x86_64.tar.gz		# 64-bit Mac OSX (Intel) binaries
-    iraf.macx.x86.tar.gz		# 32-bit Mac OSX (Intel) binaries
-    iraf.macx.ppc.tar.gz		# 32-bit Mac OSX (PPC) binaries
-
-The advantage to installing the combined 'linux' or 'macosx' distributions
-is that on 64-bit platforms the 32-bit binaries will be available in the
-event a 64-bit bug is discovered.  By defining the IRAFARCH environment
-variable to be the name of the 32-bit system one can switch easily to the
-new architecture and continue working.
+Distribution files for supported platforms include a DMG graphical
+installer for MacOS systems or a self-extracting archive/installation for
+Linux platforms.
 
 
-To Download and Unpack teh IRAF Distribution
---------------------------------------------
+To INSTALL on a MacOS System
+----------------------------
 
-     All distribution files are built as a tarball of the toplevel
-IRAF directory, i.e. they should be unpacked in a directory the user
-creates.  This is done to simplify updates by allowing a distribution to
-overlay an existing installation.  Thus, distribution files can be unpacked
-with the command, e.g.
+  1) Download the DMG installer from the link above.
 
-	% mkdir iraf.v2161
-	% cd iraf.v2161
-	% tar zxf /<path>/iraf-<arch>.tar.gz
+  2) Open the installer window with the command:
 
-This will create a 'iraf.v2161' subdirectory containing the IRAF system.
-See below for further instructions on installing IRAF.
+                % open /<path>/NOIRLab-IRAF-v218.dmg
 
-    Note that if you are updating an existing installation, you can simply
-unpack the distribution tarball in the existing $iraf directory.
+            or double-click the icon in the Finder window.
+
+  3) Drag and drop the application icons you wish to install into 
+            the 'Applications' icon on the window.
+
+  4) Double-click the IRAF, PyRAF, XGTerm or XImtool icon in the
+            Finder 'Applications' folder to start.
+
+See the accompanying 'RELEASE.txt' document for additional information on
+MacOS installations, including note about know issues with security popups.
 
 
+To INSTALL on a Linux System
+----------------------------
 
-To Install IRAF for personal use:  
----------------------------------
+  1) Download the installation script from the appropriate link
+            above depending on whether you want the 32- or 64-bit version.
 
-  1) Download and unpack the appropriate distribution file as above.
+  2) Create a new directory for the unpacked IRAF system tree.
+            For example,
 
-  2) Execute the install script:
+                % mkdir iraf-v2.18
 
-	% ./install			# execute the install script
+  3) Go to the directory and execute the downloaded installer script.
+            Root permission is NOT required to run this install script. 
+            For example,
 
-     Answer the prompts, in most cases simply accepting the defaults will
-     be all that is needed.
+                % cd iraf-v2.18
+                % sh iraf-v218-linux64.sh
 
-     This will create a private (i.e. user) installation of the IRAF system
-  that supercedes any system installation on the machine.  Root permission
-  is NOT required to run the install script. 
+            The script will automatically unpack the distribution file and
+            run the IRAF install script to setup your environment.
 
-  IRAF is immediately available by typing
-
-	% cl			# login to IRAF from current terminal
-	% iraf			# start IRAF in an XGterm window
+  4) Start a new window that will have your new environment defined
+            and run either 'cl' or 'pyraf' to start IRAF or PyRAF
+            respectively.
 
 
 To Install IRAF for system-wide use:  
@@ -89,7 +78,7 @@ To Install IRAF for system-wide use:
 	# ./install --system		# execute the install script
 
      This will create a system installation of IRAF for all users of the
-  machine.  Root permissions are required in order to write to system
+  machine.  Root permissions ARE required in order to write to system
   directories.
 
   IRAF is immediately available by typing
@@ -98,21 +87,42 @@ To Install IRAF for system-wide use:
 	% iraf			# start IRAF in an XGterm window
 
 
-To Build From Sources:
-----------------------
+-------------------
+PyRAF Installation
+-------------------
 
-  1) Download and unpack the source distribution file:
+    Unlike the MacOS DMG installer, Linux sytstems do not have a pre-packaged
+PyRAF environment as part of the distribution.  Instead, we recommend that
+users simply install PyRAF in their existing environment using the command:
 
-	% tar zxf /<path>/iraf-src.tar.gz	# unpack tar file
-	% cd iraf.v2161				# go to the IRAF directory
+        pip3 install pyraf
 
-  2) Execute the install script to create needed links:
+The PyPi package for PyRAF used here originates from the repository at
 
-	% ./install 		# execute the install script
+        https://github.com/iraf-community/pyraf
 
-  2) Configure the system for the proper architecture and build
-
-	% make <arch>		# where <arch> is 'linux', 'macintel', etc
-	% make sysgen
+Bug reports for PyRAF errors should be reported as new Issues on that
+repository. Usage questions will be forwarded to the appropriate Help Desk as
+required.
 
 
+---------------------
+X11IRAF Installation
+---------------------
+
+    XGTerm and XImtool are included as part of this distribution and will
+be installed in the $HOME/.iraf/bin directory on Linux installations.  The
+'xgterm' and 'ximtool' commands will be available following installation 
+and setup of the user environment, e.g. a new terminal window or the command:
+
+        % source $HOME/.iraf/setup.csh          # for C-shell users
+        % source $HOME/.iraf/setup.sh           # for Bash shell users
+
+    The X11IRAF tools, i.e. XGTerm and XImtool, are provided with this
+release on as as-is basis. They were built from unaltered sources available
+from
+        https://github.com/iraf-community/x11iraf
+
+While the Help Desk may be able to provide answers to questions about using
+these tools, bug reports (and ideally, fixes) should be reported to the
+https://github.com/iraf-community repo as an new Issue on the task.
