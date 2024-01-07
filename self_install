@@ -37,3 +37,6 @@ cp x11iraf/ximtool* $HOME/.iraf/bin
 cp x11iraf/xgterm $HOME/.iraf/bin
 cp x11iraf/ism_wcspix.e $HOME/.iraf/bin
 cat x11iraf/XGterm.ad >> $HOME/.Xdefaults
+if [ ! -f $HOME/.imtoolrc ]; then
+    cp dev/imtoolrc $HOME/.imtoolrc
+fi
