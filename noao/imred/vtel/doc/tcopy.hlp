@@ -1,0 +1,56 @@
+.help tcopy Oct85 noao.imred.vtel
+.ih
+NAME
+tcopy -- Tape to tape copy
+.ih
+USAGE
+tcopy input_fd output_fd
+.ih
+PARAMETERS
+.ls input_fd
+Tape file or device name for input, e.g. "mta1600[1]" or "mtb800"
+.le
+.ls files
+List of tape file numbers or ranges delimited by commas, e.g. "1-3,5-8".
+`Files' is requested only if no file number is given in `input_fd'.
+Files will be read in ascending order, reguardless of the order of the list.
+Reading will terminate if EOT is reached, thus a list such as "1-999"
+may be used to read all the files on the tape.
+.le
+.ls output_fd
+File or device name, e.g. "mta1600[1]" or "mtb800"  If a file number is not
+given the user will be asked whether or not this is a new tape.  If it is
+a new tape the file number "1" will be used.  If it is not a new tape, i.e. 
+it already has data on it, then file number "EOT" will be used.
+.le
+.ls new_tape = no
+New tape flag.  Usage is described above.
+.le
+.ls verbose = no
+Flag to signal program that it should print information about progress while
+running.
+.le
+.ih
+DESCRIPTION
+Tcopy copies files from one tape to another reporting read errors on the
+input tape as it goes.  Tcopy, when it encounters a read error, does its
+best to get as much data as possible by validating the input buffer after
+the error, guessing its length, and writing it out to the output tape.
+.ih
+EXAMPLES
+1. To copy all the files on mta to a new tape on mtb:
+
+.nf
+	vt> tcopy mta 1-999 mtb yes
+.fi
+
+2. To copy file 5 from mta and append it to the tape on mtb:
+
+.nf
+	vt> tcopy mta1600[5] mtb no
+.fi
+
+.ih
+SEE ALSO
+t2d
+.endhelp

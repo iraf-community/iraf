@@ -1,0 +1,9 @@
+mergelist,s,h,"mergelist",,,List of files to merge
+outputimage,s,q,"carmap",,,Outputimage
+outweight,s,q,"carweight",,,Output image weights
+outabs,s,q,"carabs",,,Absolute value image
+outratio,s,q,"carratio",,,Ratio: outputimage over absolute value image
+longout,r,h,180.0,1.,360.,Longitude of center of this carrington rotation
+mapmonth,i,q,,1,12,Month of center of this carrington rotation
+mapday,i,q,,1,31,Day of center of this carrington rotation
+mapyear,i,q,,1,99,Year of center of this carrington rotation

@@ -1,0 +1,95 @@
+.help unwrap May87 noao.imred.vtel
+.ih
+NAME
+unwrap -- Filter an IRAF image; remove binary wrap-around.
+.ih
+USAGE
+unwrap listin listout
+.ih
+PARAMETERS
+.ls listin
+List of images to unwrap, this is an IRAF template.
+.le
+.ls listout
+List of output images, this is an IRAF template.  If the output list
+is the same as the input list, the unwrapping is done in-place.
+.le
+.ls threshold1 = 128
+Data jump threshold for first unwrap pass.
+.le
+.ls wrapval1 = 256
+Factor to multiply wrap value by for first unwrap pass.
+.le
+.ls threshold2 = 128
+Data jump threshold for second unwrap pass.
+.le
+.ls wrapval2 = 256
+Factor to multiply wrap value by for second unwrap pass.
+.le
+.ls cstart = 2
+Column of image to start unwrapping.  Columns are numbered from left to right.
+.le
+.ls step = 5
+Number of steps (1-5) to perform on image (unwrap1, difference, unwrap2,
+reconstruct, fixlines).
+.le
+.ls verbose = yes
+If set, program produces progress reports, etc.
+.le
+.ih
+DESCRIPTION
+Unwrap checks for binary wraparound in IRAF images.
+The algorithm consists of reading the image line by line, unwrapping
+each line, and writing the line out to another image.  The procedure
+for unwraping is a five step process.
+.ls Step one: unwrap1
+Unwrapping is accomplished by scanning the data line and looking for
+large jumps in the data values.  Large negative jumps are interpreted
+as data wrapping and large positive jumps are interpreted as data unwrapping.
+The program keeps track of the number of wraps, each data element in the
+array has wrapval1 * wrapnumber added.  This effectively unwraps an image
+in which the point to point variation in the data values is small compared
+to the variation caused by a binary wrap.
+.le
+.ls Step two: difference
+A difference image is produced from the above step one image by calculating
+the pixel to pixel difference between all of the pixels in the line.  The
+first column of the image is generally left intact so that the image can
+be reconstructed in a later step.  Step one often produces streaks in the
+image due to data variation large enough to mimic wrapping.  This step
+two difference image eliminates most of these streaks except for their
+point of origin, where the confusion occured.
+.le
+.ls Step three: unwrap2
+This is the second unwrapping step.  The image is unwrapped as in step
+one using the second set of unwrap values (threshold2, wrapval2).
+.le
+.ls Step four: reconstruct
+The original image is reconstructed from the step three image by
+adding pixel values successively to line pixels.
+.le
+.ls Step five: fixlines
+If bad lines (streaks) still can be found in the image, they are
+eliminated by replacing the line by the average of the lines above
+and below bad line.
+.le
+.ih
+EXAMPLES
+1. To unwrap an image called "continuum" and store the resulting image in
+"unwrapped", and use the default parameters, the command might be:
+
+.nf
+	vt> unwrap continuum unwrapped
+.fi
+
+2. To unwrap all the images in the directory starting with s1492 and store
+the unwrapped images in s1492*u, to start in column 31, to do four steps,
+and to see verbose output, the command might be:
+
+.nf
+	vt> unwrap s1494* s1492*//u cstart=31 step=4 v+
+.fi
+
+.ih
+SEE ALSO
+.endhelp

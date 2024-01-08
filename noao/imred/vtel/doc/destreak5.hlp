@@ -1,0 +1,43 @@
+.help destreak5 Dec85 noao.imred.vtel
+.ih
+NAME
+destreak5 -- First pass of 10830 processing
+.ih
+USAGE
+destreak5 input_root output_root
+.ih
+PARAMETERS
+.ls input_root
+Root name for input files.
+.le
+.ls output_root
+Root name of output files.
+.le
+.ih
+DESCRIPTION
+Destreak5 takes as input the 5 files from a vacuum telescope 10830
+tape and produces 5 nearly identical files but with the streaks
+removed from the solar images and with the best fit ellipse parameters
+added to the image header.  The input files are expected to be in the
+directory 'imdir' and to have the extensions '001' thru '005'.  These
+input files are expected to be mag tape images produced by T2D.  The output
+files are stored in the current directory with the same extensions.
+Destreak5 calls 'readvt','quickfit', 'destreak', and various other utilities
+and is a cl script file.
+If an input image is not found, the processing for that image is skipped and
+a message is printed telling about the missing image.
+The next step in the 10830 reduction process is 'makehelium' which produces
+the projected daily grams.
+.ih
+EXAMPLES
+1. To destreak five files with root name m1585 and store the resulting images
+with root name M1585 the command would be:
+
+.nf
+	vt> destreak5 m1585 M1585
+.fi
+
+.ih
+SEE ALSO
+readvt, destreak, quickfit
+.endhelp

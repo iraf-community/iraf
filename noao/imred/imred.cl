@@ -18,6 +18,7 @@ set	kpnocoude	= "imred$kpnocoude/"
 set	kpnoslit	= "imred$kpnoslit/"
 set	quadred		= "imred$quadred/"
 set	specred		= "imred$specred/"
+set	vtel		= "imred$vtel/"
 
 set	apextract	= "twodspec$apextract/"
 set	doecslit	= "imred$src/doecslit/"
@@ -49,5 +50,6 @@ task	kpnocoude.pkg	= "kpnocoude$kpnocoude.cl"
 task	kpnoslit.pkg	= "kpnoslit$kpnoslit.cl"
 task	quadred.pkg	= "quadred$quadred.cl"
 task	specred.pkg	= "specred$specred.cl"
+task	vtel.pkg	= "vtel$vtel.cl"
 
 clbye

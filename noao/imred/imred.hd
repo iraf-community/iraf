@@ -18,6 +18,7 @@ $kpnocoude	= "noao$imred/kpnocoude/"
 $kpnoslit	= "noao$imred/kpnoslit/"
 $quadred	= "noao$imred/quadred/"
 $specred	= "noao$imred/specred/"
+$vtel		= "noao$imred/vtel/"
 
 demos		hlp=doc$demos.hlp
 #tutor		hlp=doc$tutor.hlp,		src=tutor.cl
@@ -110,3 +111,9 @@ specred		men=specred$specred.men,
 		sys=specred$specred.hlp,
 		pkg=specred$specred.hd,
 		src=specred$specred.cl
+
+vtel		men=vtel$vtel.men,
+		hlp=..,
+		sys=vtel$vtel.hlp,
+		pkg=vtel$vtel.hd,
+		src=vtel$vtel.cl

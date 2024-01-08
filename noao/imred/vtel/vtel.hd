@@ -1,0 +1,29 @@
+# Help directory for the VACUUM package.
+
+$doc	= "./doc/"
+
+vtel		men=vtel$vtel.men,		src=vtel$vtel.cl
+destreak	hlp=doc$destreak.hlp,		src=vtel$destreak.x
+destreak5	hlp=doc$destreak5.hlp,		src=vtel$destreak5.cl
+readvt		hlp=doc$readvt.hlp,		src=vtel$readvt.x
+writevt		hlp=doc$writevt.hlp,		src=vtel$writevt.x
+rmap		hlp=doc$rmap.hlp,		src=vtel$rmap.x
+vtblink		hlp=doc$vtblink.hlp,		src=vtel$vtblink.cl
+quickfit	hlp=doc$quickfit.hlp,		src=vtel$quickfit.x
+merge		hlp=doc$merge.hlp,		src=vtel$merge.x
+dicoplot	hlp=doc$dicoplot.hlp,		src=vtel$dicoplot.x
+unwrap		hlp=doc$unwrap.hlp,		src=vtel$unwrap.x
+getsqib		hlp=doc$getsqib.hlp,		src=vtel$getsqib.x
+putsqib		hlp=doc$putsqib.hlp,		src=vtel$putsqib.x
+trim		hlp=doc$trim.hlp,		src=vtel$trim.x
+mscan		hlp=doc$mscan.hlp,		src=vtel$mscan.x
+vtexamine	hlp=doc$vtexamine.hlp,		src=vtel$vtexamine.x
+tcopy		hlp=doc$tcopy.hlp,		src=vtel$tcopy.x
+pimtext		hlp=doc$pimtext.hlp,		src=vtel$pimtext.x
+fitslogr	hlp=doc$fitslogr.hlp,		src=vtel$fitslogr.cl
+mrotlogr	hlp=doc$mrotlogr.hlp,		src=vtel$mrotlogr.cl
+makeimages	hlp=doc$makeimages.hlp,		src=vtel$makeimages.cl
+makehelium	hlp=doc$makehelium.hlp,		src=vtel$makehelium.cl
+writetape	hlp=doc$writetape.hlp,		src=vtel$writetape.cl
+syndico		hlp=doc$syndico.hlp,		src=vtel$syndico.x
+revisions	sys=Revisions

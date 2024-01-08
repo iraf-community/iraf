@@ -1,0 +1,47 @@
+.help rmap Dec84 noao.imred.vtel
+.ih
+NAME
+rmap -- Project a full disk gram into a 180x180 flat image
+.ih
+USAGE
+rmap inputimage outputimage outweight outabs
+.ih
+PARAMETERS
+.ls inputimage
+Name of image to be projected.
+.le
+.ls outputimage
+Name to give output data image.
+.le
+.ls outweight
+Name to give output weight image.
+.le
+.ls outabs
+Name to give output absolute value image.
+.le
+.ih
+DESCRIPTION
+Rmap accepts as input a full disk carrington gram in a 2048x2048 IRAF image
+and projects it into a 180x180 IRAF image such that the lines of longitude
+and latitude are straight lines.  The output is the data image, the weight
+image (which is the count of the number of pixels of the input image which
+were summed to produce the single output pixel), and the absolute value image
+which is the same as the data image except that the absolute value of each
+input pixel is taken before being summed into the output pixel.
+Rmap calculates the mean field, the mean of the absolute value of the field,
+and the number of pixels in the original gram used to make the projection.
+These three parameters are stored in the output "data" image header as
+MEAN_FLD, MEANAFLD, and NUMPIX respectively.
+.ih
+EXAMPLES
+1. To project an image called "im10830" and produce output images "im10830.d",
+"im10830.w", and "im10830.a", one would use the following command:
+
+.nf
+	vt> rmap im10830 im10830.d im10830.w im10830.a
+.fi
+
+.ih
+SEE ALSO
+readvt, quickfit, and merge.
+.endhelp

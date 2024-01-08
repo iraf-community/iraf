@@ -1,0 +1,53 @@
+.help vtblink Dec84 noao.imred.vtel
+.ih
+NAME
+vtblink -- Blink daily grams to check registration
+.ih
+USAGE
+vtblink 
+.ih
+PARAMETERS
+.ls imname1
+First image to be mapped.
+.le
+.ls imname2
+Subsequent images to be mapped
+.le
+.ls z1 = -3000.0
+Minimum grayscale intensity to be mapped during 'display'.
+.le
+.ls z2 = 3000.0
+Maximum grayscale intensity to be mapped during 'display'.
+.le
+.ih
+DESCRIPTION
+Vtblink allows the user to blink successive frames of data on the IIS.  The
+program calculates the offset between grams based on the
+longitudes for each image.  Vtblink will ask for each successive image 
+and will display it on the next (mod 4) IIS frame.
+After each image is displayed the user is put back out in the cl so that he/she
+can use any of the images$tv tasks to analyze the data.  The user returns to
+the blink program by typing 'bye' to the cl prompt.  To exit the program the
+user enters the "end" for the filename.  Images are displayed with the grayscale
+limits set by default to -3000.0 and 3000.0.  These values correspond to the
+parameters z1 and z2 which may be given on the command line.  If the user
+forgets which IIS frame contains which image, he/she can enter "stat" to the
+"next image" prompt and will get a list of which images are in which frames.
+.ih
+EXAMPLES
+1. To run vtblink with the default gray scale parameters just type:
+
+.nf
+	vt> vtblink
+.fi
+
+2. To run vtblink with gray scale parameters z1=-4000.0, z2=4000.0, the
+command would be:
+
+.nf
+	vt> vtblink z1=-4000.0 z2=4000.0
+.fi
+.ih
+SEE ALSO
+display, blink, lumatch
+.endhelp
