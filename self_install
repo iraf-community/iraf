@@ -40,3 +40,18 @@ cat x11iraf/XGterm.ad >> $HOME/.Xdefaults
 if [ ! -f $HOME/.imtoolrc ]; then
     cp dev/imtoolrc $HOME/.imtoolrc
 fi
+
+
+# Patch up the ECL binary for the appropriate Linux version.  Older systems
+# (e.g. CentOS 6.9) will use a version of the readline/ncurses/tinfo
+# libraries that are dated on newer systems to an incompatible version.
+# By default we're configured for the newer platforms, here we simply 
+# force the correct version.
+
+rm bin.linux64/ecl.e
+if [ -e /usr/lib64/libreadline.so.7 ] && [ -h /usr/lib64/libreadline.so.7 ];
+then
+    ln -s ${PWD}/bin.linux64/ecl.e-readline.7 ${PWD}/bin.linux64/ecl.e
+else
+    ln -s ${PWD}/bin.linux64/ecl.e-readline.6 ${PWD}/bin.linux64/ecl.e
+fi
