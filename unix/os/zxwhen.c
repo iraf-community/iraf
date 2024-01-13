@@ -2,6 +2,9 @@
  */
 
 #include <stdio.h>
+#ifdef __GLIBC__
+#include <stdio_ext.h>
+#endif
 #include <signal.h>
 
 #include <math.h>
@@ -32,8 +35,10 @@ int debug_sig = 0;
 /* If the OS allows, cancel any buffered output. If the OS doesn't, 
  * do nothing.
  */
-#ifdef __APPLE__
-#define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+#if defined(__APPLE__) || defined(BSD) || defined(__USE_BSD)
+#define	fcancel(fp)	(void)fpurge(fp)
+#elif defined(__GLIBC__)
+#define	fcancel(fp)     __fpurge(fp)
 #else
 #define	fcancel(fp)
 #endif
