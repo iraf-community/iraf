@@ -11,19 +11,23 @@
 #  The command used to generate the self-extracting script was of the form:
 #
 #    % makeself.sh --base64 --notemp /<path>/iraf-v2.18/. \
-#       iraf-v218-linux64.sh "NOIRLab IRAF v2.18 for 64-bit Linux" \
+#       iraf-v218-linux32.sh "NOIRLab IRAF v2.18 for 32-bit Linux" \
 #       ./self_install
 #
 
 # Initialize the environment for the current directory/mach.
 export iraf=${PWD}/
-export IRAFARCH=linux64
+if [ -d bin.linux ]; then
+    export IRAFARCH=linux
+else
+    export IRAFARCH=linux64
+fi
 export VERSION="v2.18"
 
 # Run the IRAF install script, accepting all default prompts.
 ./install \
     --term xgterm \
-    --mach linux64  <<__EOF__
+    --mach linux  <<__EOF__
 
 
 
@@ -41,17 +45,3 @@ if [ ! -f $HOME/.imtoolrc ]; then
     cp dev/imtoolrc $HOME/.imtoolrc
 fi
 
-
-# Patch up the ECL binary for the appropriate Linux version.  Older systems
-# (e.g. CentOS 6.9) will use a version of the readline/ncurses/tinfo
-# libraries that are dated on newer systems to an incompatible version.
-# By default we're configured for the newer platforms, here we simply 
-# force the correct version.
-
-rm bin.linux64/ecl.e
-if [ -e /usr/lib64/libreadline.so.7 ] && [ -h /usr/lib64/libreadline.so.7 ];
-then
-    ln -s ${PWD}/bin.linux64/ecl.e-readline.7 ${PWD}/bin.linux64/ecl.e
-else
-    ln -s ${PWD}/bin.linux64/ecl.e-readline.6 ${PWD}/bin.linux64/ecl.e
-fi
