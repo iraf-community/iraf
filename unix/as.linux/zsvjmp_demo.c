@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <setjmp.h>
 
 /*  Compile with gcc -S to get demo assembler code.  In the actual ZSVJMP we
  *  need to execute basically these three lines of code but in the context of
@@ -7,9 +8,8 @@
  *  ZDOJMP will return here, and not the parent routine).
  */
 
-zsvjmp_(buf,status)
-int *buf;
-int *status;
+void
+zsvjmp_ (int *buf, int *status)
 {
  	*status = 0;
 	buf[0] = *status;
