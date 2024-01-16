@@ -83,6 +83,7 @@ noao: host core
 # Run the test suite.
 test:
 	./test/run_tests
+	./test/run_tests -c cl.e test/cl.md
 
 # Remove all binaries built. This keeps .x files that were generated
 # by generic, xyacc and similar.
