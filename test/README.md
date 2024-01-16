@@ -9,7 +9,8 @@ The following tests are available:
  * [Preliminary Test Procedure for IRAF](testproc.md): basic functionality,
    mainly from the test procedure document written by Jeanette Barnes and 
    her "Beginner's Guide to Using IRAF",
- * [Programming interface](programming.md) for basic CL and SPP functionality,
+ * [Command Language](cl.md), and for [ECL extensions](ecl.md)
+ * [Programming interface](programming.md) for basic SPP functionality,
  * [OS specific subroutines](os.md),
  * Test from the examples in several packages:
     - [`lists`](lists.md),
