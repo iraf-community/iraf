@@ -23,12 +23,14 @@
         .globl	zsvjmp_
 
 zsvjmp_:
-	movq	%rdi, -8(%rbp)          # %rdi contains &jmpbuf
-	movq	%rsi, -16(%rbp)         # %rsi contains &status
-	movl    $0, (%rsi)              # zero the value of status
-	movq    %rsi, (%rdi)            # store address of status in jmpbuf[0]
-	addq    $8, %rdi                # change &jmpbuf[0] to &jmpbuf[1]
-	movl    $0, -16(%rbp)           # zero the second argument of jmpbuf
+        # In the x86_64, the first 6 arguments of a call are passed thru
+        # registers.  Here, %rdi is the first arg containing the address of
+        # the jmpbuf, and %rsi holds the status value.
+        movq    %rsi, (%rdi)            # Store address of status in jmpbuf[0]
+        movq    $0, (%rsi)              # Zero the value of status.  Note
+                                        # this also clears the least
+                                        # significant 4 bytes of the
+                                        # register.
+        addq    $8, %rdi                # Move &jmpbuf[0] to &jmpbuf[1]
 
-	jmp     __sigsetjmp             # use sigsetjmp to do the rest
-
+        jmp     __sigsetjmp             # use sigsetjmp to do the rest
