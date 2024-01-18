@@ -624,3 +624,11 @@ observatory = "MIRO"
         lattitude = 24.65482
         altitude = 1680
         timezone = -5.5
+
+# Submitted by Barry Rothberg 1/18/24
+observatory = "mgio-lbt"
+        name = "Large Binocular Telescope"
+        longitude = 109:53:20.62992
+        latitude = 32:42:04.71261
+        altitude = 3221.0
+        timezone = 7
