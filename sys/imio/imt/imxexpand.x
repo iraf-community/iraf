@@ -11,7 +11,6 @@ include	<ctype.h>
 include	<diropen.h>
 
 include "imx.h"
-include <votParse_spp.h>
 
 
 define      SZ_BUF          8192	# name buffer string
@@ -351,12 +350,9 @@ begin
         }
 
 
-	# Now process the file.  For ascii
-	# tables we read the URLs directly but likewise returned the
-	# cache name.
-
-	if (type == IMT_TABLE)
-	    exp = imx_table (ofname[ip], index, nimages)
+	# Now process the file.  For ascii tables we read the URLs directly
+        # but likewise returned the cache name.
+	exp = imx_table (ofname[ip], index, nimages)
 
 	call sfree (sp)
 	return (exp)
