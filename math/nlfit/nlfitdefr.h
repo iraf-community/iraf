@@ -36,16 +36,15 @@ define	NL_CHOFAC	Memi[$1+29]	# Pointer to Cholesky factorization
 
 # Access to buffers
 define	PLIST		Memi[$1]	# Parameter list
-define	OPARAM		Memr[$1]	# Original parameter vector
-define	PARAM		Memr[$1]	# Parameter vector
-define	DPARAM		Memr[$1]	# Parameter change vector
-define	ALPHA		Memr[$1]	# Alpha matrix
-define	BETA		Memr[$1]	# Beta matrix
-define	TRY		Memr[$1]	# Trial vector
-define	DERIV		Memr[$1]	# Derivatives
-define	CHOFAC		Memr[$1]	# Cholesky factorization
-define	COVAR		Memr[$1]	# Covariance matrix
-
+define	OPARAM		Memr[P2P($1)]	# Original parameter vector
+define	PARAM		Memr[P2P($1)]	# Parameter vector
+define	DPARAM		Memr[P2P($1)]	# Parameter change vector
+define	ALPHA		Memr[P2P($1)]	# Alpha matrix
+define	BETA		Memr[P2P($1)]	# Beta matrix
+define	TRY		Memr[P2P($1)]	# Trial vector
+define	DERIV		Memr[P2P($1)]	# Derivatives
+define	CHOFAC		Memr[P2P($1)]	# Cholesky factorization
+define	COVAR		Memr[P2P($1)]	# Covariance matrix
 
 # Defined constants alter for tricky problems
 define	LAMBDAMAX	1000.0
