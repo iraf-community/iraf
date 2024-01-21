@@ -460,9 +460,13 @@ startproc(Extsym *progname, int Class)
 	entries = p;
 
 	procclass = Class;
+	fprintf(diagfile, "   %s", (Class==CLMAIN ? "MAIN" : "BLOCK DATA") );
 	if(progname) {
+		fprintf(diagfile, " %s", progname->fextname);
 		procname = progname->cextname;
 		}
+	fprintf(diagfile, ":\n");
+	fflush(diagfile);
 }
 
 /* subroutine or function statement */
@@ -524,6 +528,10 @@ entrypt(int Class, int type, ftnint length, Extsym *entry, chainp args)
 
 	if(Class != CLENTRY)
 		puthead( procname = entry->cextname, Class);
+	else
+		fprintf(diagfile, "       entry ");
+	fprintf(diagfile, "   %s:\n", entry->fextname);
+	fflush(diagfile);
 	q = mkname(entry->fextname);
 	if (type == TYSUBR)
 		q->vstg = STGEXT;
@@ -1690,7 +1698,7 @@ setbound(Namep v, int nd, struct Dims *dims)
 	}
 
 	v->vdim = p = (struct Dimblock *)
-	    ckalloc( sizeof(struct Dimblock) + 2*sizeof(expptr)*(nd-1) );
+	    ckalloc( sizeof(int) + (3+2*nd)*sizeof(expptr) );
 	p->ndim = nd--;
 	p->nelt = ICON(1);
 	doin_setbound = 1;

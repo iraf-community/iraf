@@ -1,7 +1,7 @@
-From 7a58e948f0e2471e8094d4bccf37f5f1c52922ff Mon Sep 17 00:00:00 2001
+From 73c37db40e0721843820bc9943756263e5f0171a Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Thu, 1 Jun 2017 12:17:42 +0200
-Subject: Be less verbose in xpp progress output
+Subject: [PATCH 5/5] Be less verbose in xpp progress output
 
 ---
  unix/f2c/src/main.c | 4 ----
@@ -9,10 +9,10 @@ Subject: Be less verbose in xpp progress output
  2 files changed, 12 deletions(-)
 
 diff --git a/unix/f2c/src/main.c b/unix/f2c/src/main.c
-index 977113dc3..a453f8765 100644
+index 141487c96..14aa10d8e 100644
 --- a/unix/f2c/src/main.c
 +++ b/unix/f2c/src/main.c
-@@ -644,10 +644,6 @@ main(int argc, char **argv)
+@@ -667,10 +667,6 @@ main(int argc, char **argv)
  
  	if(inilex( copys(file_name) ))
  		done(1);
@@ -24,7 +24,7 @@ index 977113dc3..a453f8765 100644
  	procinit();
  	if(k = yyparse())
 diff --git a/unix/f2c/src/proc.c b/unix/f2c/src/proc.c
-index 06798d0ba..92c05edcd 100644
+index 6904df908..5df843afd 100644
 --- a/unix/f2c/src/proc.c
 +++ b/unix/f2c/src/proc.c
 @@ -460,13 +460,9 @@ startproc(Extsym *progname, int Class)
@@ -53,5 +53,5 @@ index 06798d0ba..92c05edcd 100644
  	if (type == TYSUBR)
  		q->vstg = STGEXT;
 -- 
-2.39.2
+2.43.0
 

@@ -1,7 +1,7 @@
-From 20b2aaf8503f63bf41455da18af47b202d5a328d Mon Sep 17 00:00:00 2001
+From 803f508488ee30f01f0a760dedbc21b800b84a3d Mon Sep 17 00:00:00 2001
 From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
 Date: Mon, 11 Jan 2016 20:45:51 +0000
-Subject: [PATCH] C tweaks to make f2c compileable on Debian/mipsel
+Subject: [PATCH 3/5] C tweaks to make f2c compileable on Debian/mipsel
 
 This patch was taken from the Debian version of libf2fc.
 ---
@@ -272,5 +272,5 @@ index f15fe3913..0ae635350 100644
  #ifdef __hpux
  #define IEEE0_done
 -- 
-2.40.1
+2.43.0
 

@@ -1,7 +1,7 @@
-From 0a7ef0c2125c19b052311fa6cb69a9c5cf7e0477 Mon Sep 17 00:00:00 2001
+From 7afc4cda0e04e8d094b500937e6f64b6b8ff21d3 Mon Sep 17 00:00:00 2001
 From: Ole Streicher <olebole@debian.org>
 Date: Tue, 25 Apr 2023 20:48:05 +0200
-Subject: Fix one more allocated size of Dimblock
+Subject: [PATCH 2/5] Fix one more allocated size of Dimblock
 
 This was fixed on other places, but this one remained.
 ---
@@ -9,10 +9,10 @@ This was fixed on other places, but this one remained.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/unix/f2c/src/proc.c b/unix/f2c/src/proc.c
-index 92c05edcd..5df843afd 100644
+index 06798d0ba..6904df908 100644
 --- a/unix/f2c/src/proc.c
 +++ b/unix/f2c/src/proc.c
-@@ -1690,7 +1690,7 @@ setbound(Namep v, int nd, struct Dims *dims)
+@@ -1698,7 +1698,7 @@ setbound(Namep v, int nd, struct Dims *dims)
  	}
  
  	v->vdim = p = (struct Dimblock *)
@@ -22,5 +22,5 @@ index 92c05edcd..5df843afd 100644
  	p->nelt = ICON(1);
  	doin_setbound = 1;
 -- 
-2.39.2
+2.43.0
 

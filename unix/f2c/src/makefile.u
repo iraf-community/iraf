@@ -1,9 +1,8 @@
 #	Makefile for f2c, a Fortran 77 to C converter
 
 .SUFFIXES: .c .o
-CC ?= cc
-CFLAGS = -O -w $(HSI_CF)
-LDFLAGS = $(HSI_LF)
+CC = cc
+CFLAGS = -O
 SHELL = /bin/sh
 YACC = yacc
 YFLAGS =
@@ -25,7 +24,7 @@ MALLOC =
 
 OBJECTS = $(OBJECTSd) $(MALLOC)
 
-all: f2c
+all: xsum.out f2c
 
 f2c: $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o f2c
