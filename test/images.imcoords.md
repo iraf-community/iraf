@@ -177,7 +177,7 @@ Test options: `decimals=7`
 ```
 cl> hpctran lng=50.12 lat=-33.45
 2298092 50.12 -33.45000000000001
-``` 
+```
 
 ## imcctran - Transform image header from one celestial wcs to another
 

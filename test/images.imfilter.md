@@ -115,7 +115,7 @@ cl> gradient dev$pix pix.odeg 180
 cl> imstat pix.odeg fields="image,npix,stddev,min,max"
 #               IMAGE      NPIX    STDDEV       MIN       MAX
              pix.odeg    262144     42.85    -6983.     6529.
-``` 
+```
 
 ## laplace - Laplacian filter a list of 1 or 2-D images
 
