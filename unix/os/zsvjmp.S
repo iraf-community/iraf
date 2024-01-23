@@ -148,6 +148,14 @@ zsvjmp_:
         addi    a0,a0,8
         tail    __sigsetjmp@plt
 
+#elif defined(__loongarch64)
+
+	st.d	$r5, $r4, 0
+	st.d	$zero, $r5, 0
+	addi.d	$r4, $r4, 8
+	addi.d	$r5, $zero, 0
+	b	__sigsetjmp
+
 #elif defined(__alpha__)
 
 	// $16=jmpbuf, $17=status
