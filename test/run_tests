@@ -22,7 +22,7 @@ if [ ! -d $bin -a -d ${iraf}bin ] ; then
     bin=${iraf}bin/
     unset arch IRAFARCH
 fi
-export XC_CFLAGS=-w
+export XC_CFLAGS="${XC_CFLAGS} -w"
 
 TEST_FILES=""
 IRAF_SHELLS=""

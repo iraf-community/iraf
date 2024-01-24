@@ -615,9 +615,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
 	arglist[nargs++] = "-i8";
 #endif
 
@@ -660,9 +658,7 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
 	arglist[nargs++] = "-i8";
 #endif
 
@@ -707,10 +703,6 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
-
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#endif
 
 	if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
@@ -763,9 +755,6 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#endif
 	arglist[nargs++] = "-o";
 
 	if (link_nfs) {

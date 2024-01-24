@@ -39,6 +39,7 @@ export RANLIB = ranlib
 # host tools and software are in unix/Makefile.
 export CFLAGS ?= -g -O2
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
+export XC_LFLAGS = $(LDFLAGS)
 
 .PHONY: all sysgen clean test arch noao host novos core bindirs bin_links config inplace starttime
 
