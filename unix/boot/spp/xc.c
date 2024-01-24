@@ -93,9 +93,6 @@ char *opt_flags[] = { "-O2",
 #define ispfile(str)	(getextn(str) == 'P')	/* func prototypes	*/
 
 
-int	stripexe 	= NO;
-int	notvsym 	= NO;
-int	noshsym 	= NO;
 int	errflag 	= NO;
 int	objflags 	= NO;
 int	keepfort 	= NO;
@@ -112,7 +109,6 @@ int	hostprog 	= NO;
 int	voslibs 	= YES;
 int	nolibc 		= NO;
 int	usef2c 		= YES;
-int	useg95 		= NO;
 int	userincs	= NO;
 int	host_c_main 	= NO;
 
@@ -234,7 +230,6 @@ main (int argc, char *argv[])
 	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77")))
 	    strcpy (f77comp, s);
 	usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
-	useg95 = (strncmp (f77comp, "g95", 3) == 0 ? 1 : 0);
 	if ((s = os_getenv ("XC-LINKER")) || (s = os_getenv ("XC_LINKER")))
 	    strcpy (linker, s);
 
@@ -463,12 +458,12 @@ main (int argc, char *argv[])
 			} else if (*ip == 'e') {
 			   // compatibility entry ( noedsym = YES;)
 			} else if (*ip == 't') {
-			    notvsym = YES;
+			  // compatibility entry (notvsym = YES;)
 			} else if (*ip == 'T') {
-			    noshsym = YES;
+			  // compatibility entry (noshsym = YES;)
 			} else if (*ip == 's') {
-			    stripexe = YES;
-			    goto passflag;
+			  // compatibility entry (stripexe = YES;)
+			  //   goto passflag;
 			} else if (*ip == 'N') {
 			    /* "NFS" link option.  Generate the output temp
 			     * file in /tmp during the link, then move it to

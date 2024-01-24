@@ -91,9 +91,6 @@ package.
 Disable optimization.  Opposite of -O.  Object code will be optimized
 by default.
 .le
-.ls 10 -s
-Strips all symbols and debugging information.
-.le
 .ls 10 -v
 Verbose mode.  Causes messages to be printed during execution telling
 what the \fIxc\fR program is doing.
