@@ -104,9 +104,6 @@ Suppress warnings.
 .ls 10 -x
 Compile and link for debugging.
 .le
-.ls 10 -z
-Create a non-shareable image (default).
-.le
 .ls 10 -V
 Print XC version identification.
 .le

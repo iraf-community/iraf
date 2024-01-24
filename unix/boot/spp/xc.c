@@ -60,10 +60,7 @@
 
 #define	XPP		"xpp.e"
 #define	RPP		"rpp.e"
-#define	EDSYM		"edsym.e"
-#define	SHIMAGE		"S.e"
 #define LIBMAIN		"libmain.o"
-#define SHARELIB	"libshare.a"
 #define IRAFLIB1	"libex.a"
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
@@ -100,9 +97,6 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #define isofile(str)	(getextn(str) == 'o')
 #define ispfile(str)	(getextn(str) == 'P')	/* func prototypes	*/
 
-
-int	usesharelib = NO;
-int	noedsym = YES;
 
 int	stripexe 	= NO;
 int	notvsym 	= NO;
@@ -402,7 +396,6 @@ main (int argc, char *argv[])
 		    /* Link a host program, but include the VOS libraries.
 		     */
 		    hostprog++;
-		    noedsym++;
 		    nolibc++;
 		    break;
 
@@ -471,9 +464,9 @@ main (int argc, char *argv[])
 			    if (bp - buffer >= SZ_BUFFER)
 				fatal ("Out of buffer space for options");
 			} else if (*ip == 'z') {
-			    usesharelib = NO;
+			   // compatibility entry (usesharelib = NO:)
 			} else if (*ip == 'e') {
-			    noedsym = YES;
+			   // compatibility entry ( noedsym = YES;)
 			} else if (*ip == 't') {
 			    notvsym = YES;
 			} else if (*ip == 'T') {
@@ -803,17 +796,12 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	}
 	if (voslibs) {
-	    if (usesharelib) {
-		arglist[nargs++] = mkfname (SHARELIB);
-		arglist[nargs++] = mkfname (IRAFLIB4);
-	    } else {
-		arglist[nargs++] = mkfname (IRAFLIB1);
-		arglist[nargs++] = mkfname (IRAFLIB5);
-		arglist[nargs++] = mkfname (IRAFLIB2);
-		arglist[nargs++] = mkfname (IRAFLIB3);
-		arglist[nargs++] = mkfname (IRAFLIB6);
-		arglist[nargs++] = mkfname (IRAFLIB4);
-	    }
+	    arglist[nargs++] = mkfname (IRAFLIB1);
+	    arglist[nargs++] = mkfname (IRAFLIB5);
+	    arglist[nargs++] = mkfname (IRAFLIB2);
+	    arglist[nargs++] = mkfname (IRAFLIB3);
+	    arglist[nargs++] = mkfname (IRAFLIB6);
+	    arglist[nargs++] = mkfname (IRAFLIB4);
 	}
 
 	/* Host libraries, searched after iraf libraries. */
@@ -860,33 +848,6 @@ passflag:		    mkobject = YES;
 	}
 	errflag += status;
 
-	/* If we are linking against the iraf shared library and symbol editing
-	 * has not been disabled, edit the symbol table of the new executable
-	 * to provide symbols within the shared image.
-	 */
-	if (usesharelib && !noedsym && !stripexe) {
-	    char    shlib[SZ_PATHNAME+1];
-	    char    edsym[SZ_PATHNAME+1];
-	    char    command[SZ_CMDBUF];
-
-	    /* The os_sysfile(SHIMAGE) below assumes the existence of a file
-	     * entry "S.e" in the directory containing the real shared image
-	     * "S<n>.e".  We can't easily look directly for S<n>.e because
-	     * the process symbol table and image has to be examined to
-	     * determine the shared image version number.
-	     */
-	    if (os_sysfile (SHIMAGE, shlib, SZ_PATHNAME) > 0) {
-		if (os_sysfile (EDSYM, edsym, SZ_PATHNAME) > 0) {
-		    sprintf (command, "%s %s %s", edsym, outfile, shlib);
-		    if (noshsym)
-			strcat (command, " -T");
-		    else if (notvsym)
-			strcat (command, " -t");
-		    status = sys (command);
-		}
-	    }
-	}
-	errflag += status;
 	done (errflag);
 
 	return (0);
