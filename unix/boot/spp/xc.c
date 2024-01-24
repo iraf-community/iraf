@@ -61,32 +61,27 @@
 #define	XPP		"xpp.e"
 #define	RPP		"rpp.e"
 #define LIBMAIN		"libmain.o"
-#define IRAFLIB1	"libex.a"
-#define IRAFLIB2	"libsys.a"
-#define IRAFLIB3	"libvops.a"
-#define IRAFLIB4	"libos.a"
-#define IRAFLIB5	"liblapack.a"
-#define IRAFLIB6	"libfftpack.a"
 
-char *fortlib[] = { "-lf2c",			/*  0  */
-		    "-lm",			/*  1  */
-		    "-lcurl",			/*  2  */
-		    "-lexpat",			/*  3  */
+char *iraflibs[] = { "libex.a",
+                     "liblapack.a",
+		     "libsys.a",
+		     "libvops.a",
+		     "libfftpack.a",
+		     "libos.a",
+		     NULL};
+
+char *fortlib[] = { "-lf2c",
+		    "-lm",
+		    "-lcurl",
+		    "-lexpat",
 #if (defined (__linux__) || defined (__gnu_hurd__))
-		    "-lpthread",		/*  5  */
-#else
-		    "",				/*  5  */
+		    "-lpthread",
 #endif
-		    "-lz",			/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
+		    "-lz",
+		    NULL};
 
-char *opt_flags[] = { "-O2",			/*  0  */
-		    0};				/* EOF */
-
-int  nopt_flags	   = 1;				/* No. optimizer flags */
+char *opt_flags[] = { "-O2",
+		    NULL};
 
 #define isxfile(str)	(getextn(str) == 'x')
 #define isffile(str)	(getextn(str) == 'f')
@@ -613,8 +608,9 @@ passflag:		    mkobject = YES;
 #endif
 
         if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
 	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	/* Add the user-defined flags last so they can override the 
@@ -656,8 +652,9 @@ passflag:		    mkobject = YES;
 #endif
 
         if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
-	       arglist[nargs++] = opt_flags[i];
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
+	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	/* Add the user-defined flags last so they can override the 
@@ -698,8 +695,9 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = "-c";
 
 	if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
 	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	if (! nolibc) {
@@ -796,30 +794,22 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	}
 	if (voslibs) {
-	    arglist[nargs++] = mkfname (IRAFLIB1);
-	    arglist[nargs++] = mkfname (IRAFLIB5);
-	    arglist[nargs++] = mkfname (IRAFLIB2);
-	    arglist[nargs++] = mkfname (IRAFLIB3);
-	    arglist[nargs++] = mkfname (IRAFLIB6);
-	    arglist[nargs++] = mkfname (IRAFLIB4);
+	    for (i=0; iraflibs[i] != NULL; i++) {
+	        arglist[nargs++] = mkfname (iraflibs[i]);
+	    }
 	}
 
 	/* Host libraries, searched after iraf libraries. */
-	for (i=0;  i < nhlibs;  i++)
+	for (i=0;  i < nhlibs;  i++) {
 	    arglist[nargs++] = hlibs[i];
+	}
 
 	/* The remaining system libraries depend upon which version of
 	 * the SunOS compiler we are using. 
 	 */
-	addflags (fortlib[0], arglist, &nargs);
-	addflags (fortlib[1], arglist, &nargs);
-	addflags (fortlib[2], arglist, &nargs);
-	addflags (fortlib[3], arglist, &nargs);
-	addflags (fortlib[4], arglist, &nargs);
-	addflags (fortlib[5], arglist, &nargs);
-	addflags (fortlib[6], arglist, &nargs);
-	addflags (fortlib[7], arglist, &nargs);
-	addflags (fortlib[8], arglist, &nargs);
+	for (i=0; fortlib[i] != NULL; i++) {
+	    addflags (fortlib[i], arglist, &nargs);
+	}
 	arglist[nargs] = NULL;
 
 	if (debug)
