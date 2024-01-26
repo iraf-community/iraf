@@ -1,4 +1,4 @@
-.\"                                      Hey, EMACS: -*- nroff -*-
+.\"   Hey, EMACS: -*- nroff -*-
 .TH XC "1" "June 2021" "IRAF 2.17" "IRAF commands"
 .SH NAME
 xc \- portable IRAF compile/link utility
@@ -44,9 +44,6 @@ Causes debug messages to be printed during execution.
 .B -F\fR,\fB -f
 Do not delete the Fortran translation of an SPP source file.
 .TP
-.B -g
-Generates debugging information .
-.TP
 .B -h
 Causes the executable to be linked as a host program, i.e., without
 the IRAF main and without searching the IRAF libraries, unless
@@ -84,7 +81,7 @@ besides the standard ones to include.  These must be either on the current
 directory, or in an IRAF system library (lib$ or hlib$).
 The library specification must be immediately after the option as in
 "-lxtools".  No other option may follow the 'l' option in the same
-argument as in -lxtoolsO.	
+argument as in -lxtoolsO.
 .TP
 .B -N
 Generates the output temp file in /tmp during the link, then moves it
@@ -107,7 +104,7 @@ Optimize object code produced; this is now the default, but this
 switch is still provided for backwards compatibility.
 .TP
 .B -p \fIpkgname
-Load the package environment for the named external package, e.g., 
+Load the package environment for the named external package, e.g.,
 "xc \-c \-p noao file.x".  If the same package is always specified the
 environment variable or logical name PKGENV may be defined at the host
 level to accomplish the same thing.  The package name \fImust\fR be
@@ -118,23 +115,16 @@ package.
 Disable optimization.  Opposite of \-O.  Object code will be optimized
 by default.
 .TP
-.B -s
-Strips all symbols and debugging information.
-.TP
-.B -S
-Same as \-s for VMS.
-.TP
-.B -v
-Verbose mode.  Causes messages to be printed during execution telling
-what the \fBxc\fR program is doing.
-.TP
 .B -w
-Suppress warnings.                              
+Suppress warnings. Forwarded to the compiler and linker.
 .TP
-.B -z
-Create a non-shareable image (default).
+.B -x
+Compile and link for debugging.
 .TP
-.B V
+.B -z\fR,\fB -e\fR,\fB -t\fR,\fB -T\fR,\fB -s
+Ignored. Provided for backward compatibility.
+.TP
+.B -V
 Print XC version identification.
 
 .SH SEE ALSO

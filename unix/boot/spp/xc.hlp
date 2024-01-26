@@ -16,9 +16,6 @@ Causes debug messages to be printed during execution.
 .ls 10 -F, -f
 Do not delete the Fortran translation of an SPP source file.
 .le
-.ls 10 -g
-Generates debugging information.
-.le
 .ls 10 -h
 Causes the executable to be linked as a host program, i.e., without the
 IRAF main and without searching the IRAF libraries, unless explicitly
@@ -66,7 +63,7 @@ the link down excessively.
 .ls 10 -Nh [filename]
 This tells xpp that the foreign definitions in the
 file specified should be used in preference to
-standard include files.	
+standard include files.
 .le
 .ls 10 -o
 This flag redirects the output of the compile if used in
@@ -91,15 +88,14 @@ package.
 Disable optimization.  Opposite of -O.  Object code will be optimized
 by default.
 .le
-.ls 10 -v
-Verbose mode.  Causes messages to be printed during execution telling
-what the \fIxc\fR program is doing.
-.le
 .ls 10 -w
-Suppress warnings.				
+Suppress warnings. Forwarded to the compiler and linker.
 .le
 .ls 10 -x
 Compile and link for debugging.
+.le
+.ls 10 -z, -e, -t, -T, -s
+Ignored. Provided for backward compatibility.
 .le
 .ls 10 -V
 Print XC version identification.
