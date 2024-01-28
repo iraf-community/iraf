@@ -117,7 +117,7 @@ d_newproc (
 		/* Enter argument name into the symbol table.
 		 */
 		if (d_lookup (tokstr) != NULL) {
-		    char lbuf[200];
+		    char lbuf[512];
 		    sprintf (lbuf, "%s.%s multiply declared",
 			procname, tokstr);
 		    xpp_warn (lbuf);
@@ -169,7 +169,7 @@ d_declaration (int dtype)
 		    else if (sp->s_flags & S_ARGUMENT && sp->s_dtype == UNDECL)
 			sp->s_dtype = dtype;
 		    else {
-			char lbuf[200];
+			char lbuf[512];
 			sprintf (lbuf, "%s.%s multiply declared",
 			    procname, tokstr);
 			xpp_warn (lbuf);
