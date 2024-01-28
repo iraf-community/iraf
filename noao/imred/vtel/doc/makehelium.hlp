@@ -1,0 +1,38 @@
+.help makehelium Jan86 noao.imred.vtel
+.ih
+NAME
+makehelium -- Second pass of 10830 processing
+.ih
+USAGE
+makehelium input_root output_root
+.ih
+PARAMETERS
+.ls input_root
+Root name for input files.
+.le
+.ls output_root
+Root name of output files.
+.le
+.ih
+DESCRIPTION
+Makehelium takes the files output by 'destreak5' and projects them the
+small [180x180] maps.  The input files are expected to be in the current
+directory and have the extensions '1' thru '5'.  The output files are
+stored in the current directory with the extensions 'a1', 'a2', 'a3', 'b1', etc.
+This coding scheme is the same as that used in makeimages.  Note that the
+absolute value images for 10830 grams should be thrown out since they are
+garbage.
+Makehelium calls 'rmap' and 'imdelete' and is a cl script file.
+.ih
+EXAMPLES
+1. To run makehelium on five files with root name m1585 and store the resulting
+images with root name M1585 the command would be:
+
+.nf
+	vt> makehelium m1585 M1585
+.fi
+
+.ih
+SEE ALSO
+rmap
+.endhelp

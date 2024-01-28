@@ -1,0 +1,64 @@
+.help makeimages Jan86 noao.imred.vtel
+.ih
+NAME
+makeimages -- Magnetogram batch processing script
+.ih
+USAGE
+makeimages input_root output_root
+.ih
+PARAMETERS
+.ls input_root
+Root name for input files.
+.le
+.ls output_root
+Root name of output files.
+.le
+.ih
+DESCRIPTION
+Makeimages processes 5 magnetograms from raw data tape images into projected
+small [180x180] maps.  The input images are expected be output from T2D,
+be in the current imdir, and have the extensions '001' through '005'.
+The output files are stored in the current directory with the extensions
+'a1', 'a2', 'a3', 'b1', etc.  The output image coding scheme is the following:
+
+.nf
+	On the filename extensions the first character is a letter
+	corresponding to the tape file position.
+		a = first file on tape
+		b = second
+		    .
+		    .
+		e = fifth
+
+	The second character specifies which type of image this is.
+		1 = data
+		2 = absolute value
+		3 = weights
+.fi
+
+Note: A logical directory called "scratch" must be set up before this
+program is run.  This logical directory must point to the directory
+containing the input images.  This can be set up as in the following
+example:
+
+vt> set scratch = "scr1:[recely]"
+
+where this particular directory is a VAX/VMS type name.  If the image
+files are in the user's home directory then "scratch" can be set to
+"home".
+
+Makeimages calls 'readvt', 'quickfit', 'rmap',
+'delete', and 'imdelete' and is a cl script.
+.ih
+EXAMPLES
+1. To process five magnetograms with root name m1585 and produce output images
+with the root name M1585, the command would be.
+
+.nf
+	vt> makeimages m1585 M1585
+.fi
+
+.ih
+SEE ALSO
+readvt, quickfit, rmap, delete, imdelete
+.endhelp

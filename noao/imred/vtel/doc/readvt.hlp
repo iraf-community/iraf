@@ -1,0 +1,86 @@
+.help readvt May87 noao.imred.vtel
+.ih
+NAME
+readvt -- Read vacuum telescope full disk grams
+.ih
+USAGE
+readvt input_fd files output_image
+.ih
+PARAMETERS
+.ls input_fd
+File or device template, e.g. "mta1600[1]" or "mtb800" or "junk" or "s*"
+.le
+.ls files
+List of tape file numbers or ranges delimited by commas, e.g. "1-3,5-8".
+`Files' is requested only if no file number is given in `input'.
+Files will be read in ascending order, regardless of the order of the list.
+Reading will terminate if EOT is reached, thus a list such as "1-999"
+may be used to read all the files on the tape.
+.le
+.ls output_image template
+Name to give output image.  If the input file template is not a magtape
+specification then this can be an IRAF filename template to be
+expanded into a list of files.  If the number of files in the input
+template and in the output template do not match and if the output
+template expands to one filename then that filename is used as a
+root name to which filenumbers are appended for each input file.
+i.e. "junk" becomes "junk001", "junk002", etc.  If the input template
+is a magtape without a filenumber attached, i.e. "mta", the
+output name is used as a root name and the file number is appended
+for each file read.
+.le
+.ls verbose = no
+Flag to signal program that it should produce verbose output.  This includes
+header information and progress reports.
+.le
+.ls headeronly = no
+Flag to signal the program that it should only print out header information
+and quit without reading the data.  The 'verbose' flag must be set to yes
+to use this flag since otherwise the header information will not be printed.
+This flag is used to look at headers on the tape to check dates, times
+and observation types.
+.le
+.ls robust = no
+Flag to signal program that it should ignore a wrong observation type in the
+image header.
+.le
+.ih
+DESCRIPTION
+Readvt reads any one of the grams on a vacuum telescope tape and puts the
+data into an IRAF image.  The IRAF image is 2048x2048 short integers.
+.ih
+EXAMPLES
+1. To read the second image from mta at 1600 bpi, store the image into "image1"
+and see verbose output the command would be:
+
+.nf
+	vt> readvt mta1600[2] image1 v+
+.fi
+
+2. To look at the header information of the 4th file on a tape which is on
+mtb and which was written at 1600 bpi, the command would be:
+
+.nf
+	vt> readvt mtb1600[4] v+ h+
+.fi
+
+3. To read the disk files "s001", "s002", "s003", "s004" and put the output
+images into the files "s001i", "s002i", "s003i", "s004i" without
+verbose output (assuming no other file in the directory starts with "s")
+the command would be:
+
+.nf
+	vt> readvt s* s*//i
+.fi
+
+4. To read the first five files on mta and put the output images into files
+images with root name HHH the command would be:
+
+.nf
+	vt> readvt mta 1-5 HHH
+.fi
+
+.ih
+SEE ALSO
+writevt
+.endhelp

@@ -1,0 +1,5 @@
+inputimage,s,q,,,,Input image
+outputimage,s,q,,,,Output data image
+outweight,s,q,,,,Weights image
+outabs,s,q,,,,Absolute value image
+histoname,s,q,,,,Histogram name

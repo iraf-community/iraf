@@ -15,4 +15,6 @@ update:
 	$call update@irred
 	$echo "------------------ IMRED.QUADRED -------------------"
 	$call update@quadred
+	$echo "------------------ IMRED.VTEL ----------------------"
+	$call update@vtel
 	;

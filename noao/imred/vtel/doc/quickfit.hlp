@@ -1,0 +1,59 @@
+.help quickfit Dec84 noao.imred.vtel
+.ih
+NAME
+quickfit -- Fit an ellipse to the limb for a full disk scan
+.ih
+USAGE
+quickfit image
+.ih
+PARAMETERS
+.ls image
+Name of image to be fit.
+.le
+.ls threshold = 4
+Squibby brightness threshold to use in determining limb points.
+.le
+.ls xguess = 1024
+X coordinate of center of first guess circle.
+.le
+.ls yguess = 1024
+Y coordinate of center of first guess circle.
+.le
+.ls halfwidth = 50
+Halfwidth of window centered on previous limb point to search through
+for a limb point on the current line.
+.le
+.ls rowspace = 20
+Number of rows to skip between limbpoints near center in y.
+.le
+.ls rejectcoeff = .02
+Least squares rejection coefficient.  If radius of a limbpoint is more than
+this far from the limb, where limbradius = 1.0, it is not used in the fit.
+.le
+.ih
+DESCRIPTION
+Quickfit finds the least squares best fit ellipse to the limb in a full
+disk scan.  Quickfit returns the ellipse parameters (x,y coordinates of
+the ellipse center and the x and y semidiameters), the number of limbpoints
+found, the number of limbpoints rejected, and the fraction of limb
+points rejected by the least squares routine.  This 'fraction rejected'
+allows the user to determine to some extent the goodness of the data and
+allows him or her to rerun Quickfit with different parameters to take
+this goodness into account.  Quickfit also returns the sub-earth latitude
+and longitude when in verbose mode.  The ellipse and ephemeris parameters
+are stored in the image header for future reference.
+.ih
+EXAMPLES
+1. To find the best fit ellipse for the limb in an image called "image1" and to
+see verbose output, one would use the following command:
+
+.nf
+	vt> quickfit image1 v+
+.fi
+
+This will also use the default values of rowspace, halfwidth,
+and rejectcoeff.
+
+.ih
+SEE ALSO
+.endhelp

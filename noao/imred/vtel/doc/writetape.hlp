@@ -1,0 +1,35 @@
+.help writetape Jan86 noao.imred.vtel
+.ih
+NAME
+writetape -- Write 5 grams to tape in full disk format. (Used as
+intermediate step in 10830 processing.
+.ih
+USAGE
+writetape input_root tape_name
+.ih
+PARAMETERS
+.ls getname
+Root name for input files.
+.le
+.ls getmtape
+Tape file descriptor.
+.le
+.ih
+DESCRIPTION
+Writetape takes as input five(5) full disk grams in IRAF image format
+and writes them to tape in a format identical to the original full disk
+grams produced on the vacuum telescope.  The input image names are expected
+to be the "input_root" name concatenated with the numbers "1", "2", ... "5".
+Writetape calls 'writevt' and is a cl script file.
+.ih
+EXAMPLES
+1. To write five files with root name m1585 to tape mta, the command would be:
+
+.nf
+	vt> writetape m1585 mta
+.fi
+
+.ih
+SEE ALSO
+readvt, writevt
+.endhelp

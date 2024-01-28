@@ -1,0 +1,5 @@
+heimage,s,q,,,,Helium 10830 image to be destreaked
+heout,s,q,,,,Output image
+tempim,s,q,,,,Temporary image
+verbose,b,h,no,,,Print out header data and give progress reports
+threshold,i,h,3,,,Squibby brightness threshold defining the limb

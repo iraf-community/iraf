@@ -1,0 +1,33 @@
+.help trim Jan85 noao.imred.vtel
+.ih
+NAME
+trim -- Trim the limb. Zero all pixels off the limb in a full disk image
+.ih
+USAGE
+trim inputimage threshold
+.ih
+PARAMETERS
+.ls inputimage
+Name of data image to trim.
+.le
+.ls threshold
+Squibby brightness value to use as a threshold in determining the limb.
+.le
+.ih
+DESCRIPTION
+Trim scans all the pixels in an image and sets those pixels to zero that
+contain a squibby brightness smaller than the threshold value.  This is
+done in place, that is, the input image gets modified.
+.ih
+EXAMPLES
+1. To trim a data image called 'data' with a squibby brightness threshold
+of 4 (the standard value) the command would be:
+
+.nf
+	vt> trim data 4
+.fi
+
+.ih
+SEE ALSO
+getsqib, putsqib
+.endhelp
