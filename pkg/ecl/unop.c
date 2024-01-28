@@ -294,7 +294,7 @@ unop (int opcode)
 	    break;
 	case OP_NINT:
 	    if (in_type == OT_REAL)
-		iresult = nearbyint (rval);
+		iresult = roundl (rval);
 	    else
 		iresult = ival;
 	    break;
