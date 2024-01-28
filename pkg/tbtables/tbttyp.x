@@ -95,7 +95,7 @@ char	c_sizinfo[SZ_SIZINFO * 8]
 char    cache[SZ_FNAME], src[SZ_FNAME], extn[SZ_FNAME]
 
 
-#equivalence (i_sizinfo[1], c_sizinfo[1])
+equivalence (i_sizinfo[1], c_sizinfo[1])
 int	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
 
 int     envgets()
