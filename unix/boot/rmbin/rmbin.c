@@ -134,6 +134,13 @@ rmbin (
 	char	fname[SZ_PATHNAME+1];
 	int	dp, ftype;
 
+
+        /* Hardwire an exclusion for a .git directory so we don't 
+         * unintentially delete the repo files.
+         */
+        if (strncmp (".git", dir, 4) == 0)
+            return;
+
 	if ((dp = os_diropen (dir)) == ERR) {
 	    fprintf (stderr, "cannot open directory `%s'\n", dir);
 	    fflush (stderr);
