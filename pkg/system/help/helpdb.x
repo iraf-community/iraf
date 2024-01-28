@@ -976,10 +976,10 @@ begin
 		next
 	    }
 
-	    call fprintf (fd, "Help database %s created %s by %s, size=%d\n")
+	    call fprintf (fd, "Help database %s created %s by %d, size=%d\n")
 		call pargstr (Memc[fname])
 		call pargstr (Memc[date])
-		call pargstr (FI_OWNER(fi))
+		call pargl (FI_OWNER(fi))
 		call pargl (FI_SIZE(fi))
 	}
 	call fntclsb (list)
@@ -1041,7 +1041,7 @@ begin
 	else
 	    call pargstr ("")
 	call pargstr (Memc[date])
-	call pargstr (FI_OWNER(fi))
+	call pargl (FI_OWNER(fi))
 	call pargstr (DBI_KEY(ix))
 
 	if (verbose) {
@@ -1161,7 +1161,7 @@ int	fd			#I input file
 pointer	obuf			#O receives unpacked helpdir data
 int	buflen			#O max su out
 
-int	i, nelem, nr, sz_mii_struct
+int	nelem, nr, sz_mii_struct
 pointer	op, hp
 int	mii_readi(), mii_readc()
 errchk	mii_readi, mii_readc
@@ -1187,7 +1187,7 @@ begin
 	    # Get string buffer.
 	    op = op + nelem
 	    nelem = HD_SZSBUF(hp) # / (SZ_INT / SZ_INT32)
-	    if (mii_readc (fd, Memi[op], nelem) < nelem)
+	    if (mii_readc (fd, Memc[P2C(op)], nelem) < nelem)
 		goto readerr_
 
 	    nr = nr + ((nelem + SZ_STRUCT32-1) / SZ_STRUCT32)
