@@ -24,8 +24,7 @@ bool    perim                   # I:  draw perimeter
 
 real  xcen, ycen, x, y
 real  aspect_ratio
-real  x1, x2, y1, y2, ext, xdis, ydis
-data    ext /0.0625/
+real  x1, x2, y1, y2, xdis, ydis
 real  ggetr()
 
 begin
@@ -36,7 +35,6 @@ begin
         } else {
             x1 = EDGE1;  x2 = EDGE2
             y1 = EDGE3;  y2 = EDGE4
-            
         }
         
         # If any values were specified, then replace them here.

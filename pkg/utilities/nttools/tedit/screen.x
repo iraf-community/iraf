@@ -268,7 +268,7 @@ int	win, row, col, ch
 pointer	sp, field, tab, data
 
 string	notable  "No table associated with this screen"
-string	badtype  "Illegal data type for this field"
+#string	badtype  "Illegal data type for this field"
 string	notadded "Cannot add row to read only table"
 
 bool	check_field()
