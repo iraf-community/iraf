@@ -93,7 +93,7 @@ procedure mef_wrblank (out, olines)
 int	out		#I output file descriptor
 int	olines		#I number of blank lines
 
-int	nlines, i, nbk
+int	nlines, i
 char    card[80]
 
 begin

@@ -373,7 +373,7 @@ char	ikparams[ARB]			# IKI parameters
 char	sec[ARB]			# Image section
 int	nimages				# Number of output images
 
-pointer	sp, exp, nodename, imname, listout
+pointer	sp, nodename, imname, listout
 int     dir, len, llen, nim, ip, delim, vfd, status, maxlen
 char    dirname[SZ_PATHNAME], ofname[SZ_PATHNAME], pdir[SZ_PATHNAME]
 char    fpath[SZ_PATHNAME], fname[SZ_PATHNAME]
@@ -495,7 +495,7 @@ char	buf[SZ_LINE], cfname[SZ_PATHNAME]
 
 int	open(), getline(), strlen()
 int	imx_decode_ranges()
-bool	imx_in_range(), envgetb()
+bool	imx_in_range()
 
 begin
 	call aclrc (buf, SZ_LINE)

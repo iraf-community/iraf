@@ -24,8 +24,6 @@ pointer	pl
 long	offset
 int	sz_pixel, nbytes, fd, op, step, nchars, n
 
-char	zbuf[1024]
-
 int	read()
 long	imnote()
 errchk	imerr, seek, read, pl_glpi, pl_glri

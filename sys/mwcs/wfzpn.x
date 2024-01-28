@@ -71,8 +71,8 @@ double	dec, zd1, d1, zd2, d2, zd, d, r, tol, dval
 pointer	sp, atname, atvalue, ct, mw, wp, wv, im, idb, rp
 char    compare[4]
 bool    match
-int	ctod(), strlen(), idb_nextcard(), itoc()
-pointer	wf_gsopen(), idb_open()
+int	ctod(), idb_nextcard(), itoc()
+pointer	idb_open()
 data	tol/1.0d-13/
 errchk	wf_decaxis(), mw_gwattrs()
 

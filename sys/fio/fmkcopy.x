@@ -19,7 +19,7 @@ procedure fmkcopy (oldfile, newfile)
 char	oldfile[ARB]		# file to be copied
 char	newfile[ARB]		# newfile
 
-char	url[SZ_PATHNAME], old[SZ_PATHNAME]
+char	old[SZ_PATHNAME]
 int	status, file_exists, junk
 pointer	vp, sp, oldosfn, newosfn
 int	vfnadd(), strncmp(), nowhite()

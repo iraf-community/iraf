@@ -1483,7 +1483,7 @@ int	i, j, k, l, m, trans
 pointer	sp, im, mw, sh, stack, aps, bands, str, ptr
 
 int	ctor(), open(), fscan(), nowhite(), clgwrd()
-bool	rng_elementi(), fp_equalr()
+bool	rng_elementi()
 real	clgetr(), asumr(), imgetr(), sp_logerr()
 pointer	immap(), smw_openim(), rng_open()
 

@@ -19,7 +19,7 @@ char	datatype[ARB]		#I string permits generalization to domains
 int     baf			# I Insert BEFORE or AFTER
 
 pointer	rp, sp, keyname, ua, ip
-int	fd, max_lenuserarea, curlen, buflen, nchars, piv
+int	max_lenuserarea, curlen, buflen, nchars, piv
 int	idb_kwlookup(), idb_findrecord()
 int	strlen(), idb_filstr(), nowhite()
 char	card[IDB_RECLEN+1]

@@ -17,7 +17,7 @@ pointer	procedure imxopen (template)
 char	template[ARB]		# image template
 
 int	i, sort, level, ip, ch, expand, nchars, nimages, index, type
-int	max_fnt, fnt_len, len, flen
+int	max_fnt, fnt_len, len
 pointer	listp, intmp, fnt, op, exp
 char    lfile[SZ_LINE], lexpr[SZ_LINE], likparams[SZ_LINE], lsec[SZ_LINE]
 char    lindex[SZ_LINE], lextname[SZ_LINE], lextver[SZ_LINE], elem[SZ_LINE]
@@ -26,8 +26,6 @@ pointer	imx_preproc (), imx_imexpand (), imx_fexpand ()
 pointer	imx_texpand (), imx_dexpand ()
 int	imx_filetype (), imx_parse (), imx_get_element ()
 int	fntopnb (), strlen (), strsearch()
-int	sum, fntlenb()
-bool	envgetb()
 
 define	output 	{Memc[op]=$1;op=op+1}
 define	escape 	{output('\\');output($1)}

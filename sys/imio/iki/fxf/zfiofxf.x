@@ -24,7 +24,7 @@ int	status			#O output status - i/o channel if successful
 
 pointer im, fit
 int	ip, indx, channel, strldx(), ctoi()
-bool	lscale, lzero, bfloat, fxf_fpl_equald()
+bool	lscale, lzero, fxf_fpl_equald()#, bfloat
 char    fname[SZ_PATHNAME]
 
 begin
@@ -110,8 +110,6 @@ pointer fit, im
 int	ip, pixtype, nb
 int	status, totpix, npix
 int	datasizeb, pixoffb, nb_skipped, i
-double  dtemp
-real    rtemp, rscale, roffset
 
 include <szpixtype.inc>
 
@@ -182,9 +180,9 @@ end
 
 procedure fxf_zaltrr (data, npix, bscale, bzero)
 
-real data[ARB], rt
-int    npix
-double bscale, bzero
+real    data[ARB]
+int     npix
+double  bscale, bzero
 
 int i
 

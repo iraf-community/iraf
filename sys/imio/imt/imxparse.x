@@ -30,12 +30,10 @@ char    sec[ARB]                        #o image section string
 char    ikparams[ARB]                   #o image kernel section params
 int	maxch				#i max chars in string params
 
-pointer	im
 int     nchars, ip, idx
 char	comma, lexpr[SZ_LINE], subex[SZ_LINE], name[SZ_PATHNAME]
 
 int	imx_breakout(), imx_next_expr(), imx_expr_type(), stridx()
-pointer	immap()
 
 begin
         call aclrc (expr, maxch)		# initialize
@@ -108,12 +106,6 @@ begin
 	    call strcat (sec, name, SZ_PATHNAME)
 	    call strcat ("]", name, SZ_PATHNAME)
 	}
-
-#	iferr {
-#	    im = immap (name, READ_ONLY, 0)
-#	    call imunmap (im)
-#	} then
-#	    ;
 
         return (nchars)
 end

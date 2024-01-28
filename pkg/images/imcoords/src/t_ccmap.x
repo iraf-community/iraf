@@ -1136,9 +1136,7 @@ double	lng1, lat1, lng2, lat2, x, y, z, sumx, sumy, sumz, r, pa, wterm[8]
 pointer	sp, inbuf, linebuf, field_pos
 pointer	mw, ct, coo
 int	getline(), li_get_numd(), sk_decim()
-pointer	mw_ctrand(), mw_sctran()
-
-int	sk_stati()
+pointer	mw_sctran()
 
 begin
 	call smark (sp)
