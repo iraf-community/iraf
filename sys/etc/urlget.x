@@ -47,7 +47,7 @@ char	fname[ARB]				#i local filename
 pointer	reply					#u pointer to reply string
 
 char	protocol[SZ_FNAME], host[SZ_FNAME], path[SZ_BUF], emsg[SZ_PATHNAME]
-char	inurl[SZ_LINE], outname[SZ_LINE]
+char	inurl[SZ_BUF], outname[SZ_PATHNAME]
 int	port, stat
 pointer buf
 
@@ -58,7 +58,7 @@ define	redirect_	99
 
 begin
 	# Breakup the URL into usable pieces.
-	call strcpy (url, inurl, SZ_LINE)
+	call strcpy (url, inurl, SZ_BUF)
 redirect_
 	call url_break (inurl, protocol, host, port, path)
 
@@ -125,6 +125,8 @@ begin
 		for (op=1; op <= SZ_LINE && ip <= reply + SZ_BUF && Memc[ip] != '\n' && Memc[ip] != EOS; op=op+1) {
 		    url[op] = Memc[ip]
 		    ip = ip + 1
+                    if (ip > (reply + SZ_BUF - 1))
+                        break
 		}
 		url[op-1] = EOS
 
