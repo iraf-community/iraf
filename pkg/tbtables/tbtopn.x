@@ -60,8 +60,8 @@ char	url[SZ_PATHNAME], tblname[SZ_PATHNAME]
 char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME], cosfn[SZ_PATHNAME]
 
 long	tbtbod()
-int	tbnparse(), tbttyp(), strncmp(), access(), vot_to_fits()
-bool	streq(), is_votable()
+int	tbnparse(), tbttyp(), strncmp(), access()
+bool	streq()
 
 errchk	malloc, tbuopn, tbsopn, tbctpe, tbnparse, tbttyp, vfn_expand_ldir
 
@@ -88,12 +88,6 @@ begin
 	    if (access (cnvname, 0, 0) == NO) {
                 #call fcadd ("cache$", url, "fits", tblname, SZ_PATHNAME)
                 call fcadd ("cache$", url, "", tblname, SZ_PATHNAME)
-		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
-	            if (vot_to_fits (tblname, tblname) != OK) {
-	                call error (ER_TBCONVERT, 
-			    "tbtopn: cannot convert table format")
-		    }
-		}
 	    } else
                 call strcpy (cnvname, tblname, SZ_PATHNAME)
 
@@ -114,28 +108,6 @@ begin
 	    if (access (cnvname, 0, 0) == NO) {
                 call fcadd ("cache$", tablename[lstart], "fits", tblname,
 		    SZ_PATHNAME)
-		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
-	            if (vot_to_fits (tblname, tblname) != OK) {
-	                call error (ER_TBCONVERT, 
-			    "tbtopn: cannot convert table format")
-		    }
-		}
-	    } else
-                call strcpy (cnvname, tblname, SZ_PATHNAME)
-
-	} else if (is_votable (tablename)) {
-	    call fcname ("cache$", tablename, "f", tblname, SZ_PATHNAME)
-	    call strcpy (tblname, cnvname, SZ_PATHNAME)
-	    call strcat (".fits", cnvname, SZ_PATHNAME)
-
-	    if (access (cnvname, 0, 0) == NO) {
-                call fcadd ("cache$", tablename, "fits", tblname, SZ_PATHNAME)
-		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
-                    if (vot_to_fits (tblname, cnvname) != OK) {
-                        call error (ER_TBCONVERT, 
-		            "tbtopn: cannot convert table format")
-	            }
-	        }
 	    } else
                 call strcpy (cnvname, tblname, SZ_PATHNAME)
 

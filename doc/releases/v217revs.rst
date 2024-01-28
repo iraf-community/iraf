@@ -81,8 +81,7 @@ Changes to the NOAO 2.16.1 sources include:
    an external package
    <https://iraf-community.github.io/iraf-v216/issues/90>`__. Therefore,
    no attempt was put into getting these problems fixed, and the VO
-   stuff was cut out. The VOTable functionality, however, remains
-   available
+   stuff was cut out.
 
 Detailed list of changes
 ------------------------
