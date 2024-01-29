@@ -511,7 +511,7 @@ begin
 	    if (n < 1 || n > 20) {
 		call eprintf (
 		    "WARNING: Sersic index out of allowed range (%.1f).\n")
-		    call pargi (s)
+		    call pargr (s)
 		return (NULL)
 	    }
 	    nxm = NPROF

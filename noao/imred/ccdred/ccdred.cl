@@ -5,7 +5,7 @@ set	ccdtest	= "ccdred$ccdtest/"
 
 package ccdred
 
-task	$ccdtest	= ccdtest$ccdtest.cl
+task	ccdtest.pkg	= ccdtest$ccdtest.cl
 
 task	badpiximage,
 	ccdgroups,
