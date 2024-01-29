@@ -5,8 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-//#include "../bootProto.h"
-
 
 /*
  * FNCACHE -- Maintain a cache of system logical filenames (e.g., <config.h>)
@@ -109,7 +107,7 @@ m_fninit (int debug)
 	int	total;
 
 	if (debug) {
-	    char    lname[SZ_FNAME+1];
+	    char    lname[SZ_FNAME+3];
 
 	    total = fn_hits + fn_misses;
 	    printf ("file name cache: %d hits, %d misses, %d%% of %d\n",
@@ -117,6 +115,7 @@ m_fninit (int debug)
 
 	    for (fn=fn_head;  fn != NULL;  fn=fn->dnlnk)
 		if (fn->lname[0]) {
+                    memset (&lname[0], 0, SZ_FNAME+1);
 		    sprintf (lname, "<%s>", fn->lname);
 		    printf ("%3d (%05d) %-20s => %s\n",
 			fn->nrefs, fn->chksum, lname, fn->fname);

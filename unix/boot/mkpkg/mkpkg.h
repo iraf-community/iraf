@@ -6,7 +6,7 @@
 #define	SZ_PBBUF	2048	/* push back buffer			*/
 #define	SZ_CMD		2048	/* buf for os escape			*/
 #define	SZ_IFSTACK	50	/* max $IF nesting			*/
-#define	SZ_PREDBUF	1024	/* largest $IF predicate		*/
+#define	SZ_PREDBUF	2050	/* largest $IF predicate		*/
 #define	SZ_PKGENV	256	/* pkgenv package list buffer		*/
 #define	MAX_ARGS	50	/* max args to a $IF			*/
 #define	MAX_FILES	512	/* max files in a module list		*/
@@ -193,8 +193,7 @@ struct context *push_context (register struct context *cx, char *module,
 struct context *pop_context (register struct context *cx);
 void  get_dependency_list (struct context *cx, char *module, 
                 char *dflist[], int maxfiles);
-int   up_to_date (struct context *cx, char *module, char *lname, 
-                char *dflist[], int *useobj);
+int   up_to_date (char *module, char *lname, char *dflist[], int *useobj);
 int   open_mkpkgfile (register struct context *cx);
 void  close_mkpkgfile (register struct context *cx);
 struct context *find_mkpkgfile ( struct context *head_cx, 
@@ -208,11 +207,11 @@ int   gettok (register struct context *cx, char *outstr, int maxch );
 void  do_osescape (register struct context *cx);
 void  do_ppdir (struct context *cx, char *token);
 void  do_if (struct context *cx, char *keyword);
-void  do_else (struct context *cx);
-void  do_endif (struct context *cx);
+void  do_else (void);
+void  do_endif (void);
 void  do_end (struct context *cx);
 void  do_call (struct context *cx, char *program, int  islib);
-void  do_echo (struct context *cx, char *msg);
+void  do_echo (char *msg);
 int   do_goto (struct context *cx, char *symbol);
 int   do_include (struct context *cx, char *fname);
 void  do_omake (struct context *cx, char *fname);
@@ -226,7 +225,7 @@ int   do_outcheck (struct context *cx);
 int   do_copyfile (struct context *cx);
 int   do_movefile (struct context *cx);
 void  do_delete (struct context *cx);
-void  do_purge (struct context *cx, char *dname);
+void  do_purge (char *dname);
 
 int   getcmd (register struct context *cx, char *prefix, char *cmd, int maxch);
 char *getargs (register struct context *cx);
