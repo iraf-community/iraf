@@ -18,7 +18,7 @@ set	cache_age	= 30
 
 # Local system defaults.
 
-set	clobber		= no
+set	clobber		= yes
 set	imclobber	= no
 set	cmbuflen	= 128000
 set	editor		= vi
@@ -100,8 +100,12 @@ set	xtools		= "pkg$xtools/"
 
 
 # Load definitions for any locally added external packages.
-
-set	@hlib$extern.pkg
+if (access ("hlib$extern.pkg"))
+    set @hlib$extern.pkg
+;
 if (access ("iraf$extern/.zzsetenv.def"))
-	set	@iraf$extern/.zzsetenv.def
+    set	@iraf$extern/.zzsetenv.def
+;
+if (access ("home$.iraf/zzsetenv.def"))
+    set	@home$.iraf/zzsetenv.def
 ;
