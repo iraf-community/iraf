@@ -38,7 +38,7 @@ struct _for {
 };
 
 struct	_for forstk[SZ_FORSTK];
-int	forlev;
+int	forlev = 0;
 char	*type_string;
 char	xtype_string[SZ_FNAME+1];
 char	type_char;
