@@ -50,7 +50,7 @@ The following IRAF architectures are supported:
 
 Architecture | Operating system | Supported CPU types
 -------------|------------------|---------------------------------------------
-`linux64`    | Linux 64 bit     | x86\_64, arm64, mips64, ppc64, riscv64, alpha
+`linux64`    | Linux 64 bit     | x86\_64, arm64, mips64, ppc64, riscv64, alpha, loongarch64
 `linux`      | Linux 32 bit     | i386, x32, arm, mips
 `macos64`    | macOS 64 bit     | arm64
 `macintel`   | macOS 64 bit     | x86\_64
