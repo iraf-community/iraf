@@ -168,7 +168,7 @@ lexicon (void)
 	 * mode metacharacters (they will be automatically turned on when
 	 * compute mode is entered in an expression).
 	 */
-	while (ch = input())
+	while ((ch = input()))
 	    if (ch == ' ' || ch == '\t') {
 space:		if (lexcol > 0)
 		    lhs = 0;
@@ -199,7 +199,7 @@ space:		if (lexcol > 0)
 	 * integer constants, more complex tokens as operand structures in
 	 * yylval.
 	 */
-	while (ch = input()) {
+	while ((ch = input())) {
 	    lexcol++;
 
 	    switch (ch) {
@@ -212,7 +212,7 @@ space:		if (lexcol > 0)
 		    unput (ch);
 		    goto tokout_;
 		} else {
-		    while (ch = input()) {
+		    while ((ch = input())) {
 			if (ch == ' ' || ch == '\t')
 			    continue;
 			else {
@@ -300,7 +300,7 @@ etok_:		if (!newtoken) {
 		/* ?, ?? menu commands, recognized only at beginning of stmt */
 		if (lexcol > 1) {
 		    goto deposit_;
-		} else if (ch = input()) {
+		} else if ((ch = input())) {
 		    if (ch == '?')
 			return (crackident ("??"));
 		    else {
@@ -355,7 +355,7 @@ etok_:		if (!newtoken) {
 			}
 		    }
 
-		} else if (cch = input()) {
+		} else if ((cch = input())) {
 		    clswitch = (isspace (cch) || cch == ';');
 		    if (cch == '=') {
 			unput(cch);
@@ -387,7 +387,7 @@ etok_:		if (!newtoken) {
 		}
 
 	    case '\\':
-		if (ch = input()) {
+		if ((ch = input())) {
 		    if (ch == '\n')
 			continue;
 		    else if (strchr ("&;=+-\"'\\#><()|", ch) != NULL)
@@ -408,14 +408,16 @@ etok_:		if (!newtoken) {
 		 * command, but all other escapes are passed on unmodified.
 		 */
 		while ((ch = input()) && ch != '\n') {
-		    if (ch == '\\')
-			if (ch = input()) {
+		    if (ch == '\\') {
+			if ((ch = input())) {
 			    if (ch == '\n')
 				continue;
 			    else
 				yytext[yyleng++] = '\\';
-			} else
+			} else {
 			    break;
+			}
+                    }
 		    yytext[yyleng++] = ch;
 		}
 		if (ch)
@@ -511,7 +513,7 @@ gsredir_:
 		if (!newtoken) {
 		    unput (ch);
 		    goto tokout_;
-		} else if (ch = input()) {
+		} else if ((ch = input())) {
 		    if (ch == '&')
 			return (Y_ALLPIPE);
 		    else {
