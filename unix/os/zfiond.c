@@ -683,7 +683,7 @@ ZARDND (
 	FD_SET (np->datain, &readfds);
 
 	/* Determine maximum amount of data to be read. */
-	maxread = (np->flags & F_TEXT) ? *maxbytes/sizeof(XCHAR) : *maxbytes;
+	maxread = (np->flags & F_TEXT) ?  (int)(*maxbytes/sizeof(XCHAR)) : (int)*maxbytes;
 
 	/* The following call to select shouldn't be necessary, but it
 	 * appears that, due to the way we open a FIFO with O_NDELAY, read
@@ -806,8 +806,9 @@ nd_onsig (
         /* If we get a SIGPIPE writing to a server the server has probably
          * died.  Make it look like there was an i/o error on the channel.
          */
-        if (sig == SIGPIPE && recursion++ == 0)
+        if (sig == SIGPIPE && recursion++ == 0) {
             ;
+        }
 
         if (jmpset)
             longjmp (jmpbuf, sig);

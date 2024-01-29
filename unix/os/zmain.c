@@ -161,7 +161,7 @@ ipc_:
 	 */
 	if (arg < argc) {
 	    for (nchars=0;  arg < argc;  arg++) {
-		while (nchars + strlen(argv[arg]) > len_irafcmd) {
+		while ((int)(nchars + strlen(argv[arg])) > len_irafcmd) {
 		    len_irafcmd += 1024;
 		    irafcmd = (XCHAR *) realloc ((char *)irafcmd,
 			len_irafcmd * sizeof(XCHAR));

@@ -179,6 +179,9 @@ static int   ks_getword (char **ipp, char *obuf);
 static void  ks_whosts (struct irafhosts *hp, char *filename);
 static char *ks_getpass (char *user, char *host);
 
+static int rcmd_ (char **ahost, int inport, const char *locuser,
+                  const char *remuser, const char *cmd, int *fd2p);
+
 void  pr_mask (char *str);
 
 /* ZOPNKS -- Open a connected subprocess on a remote node.  Parse the "server"
@@ -585,7 +588,7 @@ s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n",
 	     */
 	    hostp = host;
 	    dbgmsgf ("C:rexec for host=%s, user=%s\n", host, username);
-	    *chan = rcmd (&hostp, ks_rexecport(),
+	    *chan = rcmd_ (&hostp, ks_rexecport(),
 		getlogin(), username, cmd, 0);
 
 	} else if (ks.protocol == C_REXEC_CALLBACK) {
@@ -622,7 +625,7 @@ s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n",
 	    hostp = host;
 	    dbgmsgf ("rexec for host=%s, user=%s, using client port %d\n",
 		host, username, s_port);
-	    ss = rcmd (&hostp, ks_rexecport(),
+	    ss = rcmd_ (&hostp, ks_rexecport(),
 		getlogin(), username, callback_cmd, 0);
 
 	    /* Wait for the server to call us back. */
@@ -769,7 +772,7 @@ retry:
 			dbgmsgf ("C:rexec %s@%s: %s\n", username, host, command);
 
 			hostp = host;
-			fd = rcmd (&hostp, ks_rexecport(),
+			fd = rcmd_ (&hostp, ks_rexecport(),
 			    getlogin(), username, command, 0);
 
 			if (fd < 0) {
@@ -1235,7 +1238,7 @@ ks_puti (int fd, int ival)
 static int
 ks_geti (int fd)
 {
-	register int value = 0;
+	int     value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
 	fd_set  rfd;
@@ -1390,8 +1393,8 @@ ks_getlogin (
   struct ksparam *ks 		/* networking parameters */
 )
 {
-	register struct irafhosts *hp;
 	register int i;
+	struct  irafhosts *hp;
 	char	userfile[SZ_PATHNAME];
 	char	sysfile[SZ_PATHNAME];
 	char	fname[SZ_PATHNAME];
@@ -1525,7 +1528,7 @@ query:		if ((namep = ks_getpass (loginname, hostname)))
 
 	    setjmp (jmpbuf);
 	    value = time(NULL);
-	    for (i=0;  i < sizeof(jmpbuf)/sizeof(int);  i++)
+	    for (i=0;  i < (int)(sizeof(jmpbuf)/sizeof(int));  i++)
 		value ^= ((int *)jmpbuf)[i];
 	    value = (value << 13) / 1000 * 1000;
 	    if (value < 0)
@@ -1957,4 +1960,18 @@ void pr_mask (char *str)
 	    dbgmsg ("sigpending error");
 	if (sigismember (&pending, SIGCHLD))
 	    dbgmsg ("\tpr_mask: SIGCHLD pending\n"); 
+}
+
+
+/* RCMD_ -- Compat routine for deprecated system rcmd().
+ */
+static  int
+rcmd_(char **ahost, int inport, const char *locuser, const char *remuser,
+         const char *cmd, int *fd2p)
+{
+    int res = 0;
+#ifndef __APPLE__
+    res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p);
+#endif
+    return res;
 }

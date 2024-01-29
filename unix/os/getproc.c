@@ -16,7 +16,7 @@ uid_executing (int uid)
 {
 	register struct dirent *direntp;
 	register DIR *dirp;
-	char fname[256];
+	char fname[320];
 	struct stat st;
 
 	dirp = opendir ("/proc");
@@ -24,7 +24,7 @@ uid_executing (int uid)
 	    sprintf (fname, "/proc/%s", direntp->d_name);
 	    if (stat (fname, &st))
 		return (0);
-	    else if (st.st_uid == uid)
+	    else if (st.st_uid == (uid_t) uid)
 		return (1);
 	}
 	(void) closedir (dirp);
