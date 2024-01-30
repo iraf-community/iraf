@@ -93,7 +93,7 @@ The output should look like
 	   2 xfailed
 
 Note that `xfailed` (`x`) are e**x**pected **fail**ures, which one
-does not neet to worry about.
+does not need to worry about.
 
 For details of the tests, see the file [`test/README.md`](test/README.md).
 
