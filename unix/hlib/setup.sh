@@ -2,7 +2,7 @@
 
 # Allow a previously defined $iraf to be used.
 if [ -n $iraf ]; then
-    export iraf=/opt/iraf/iraf/
+    export iraf=/Applications/IRAF.app/Contents/iraf-v218/
 fi
 
 # Allow a previously defined $IRAFARCH to be used.
@@ -11,9 +11,11 @@ if [ -n $IRAFARCH ]; then
         export IRAFARCH=`$iraf/unix/hlib/irafarch.sh -actual`
     fi
 fi
-if test -f $iraf/unix/hlib/irafuser.sh; then
-    source $iraf/unix/hlib/irafuser.sh
-fi
+
+# Uncomment to define an IRAF development environment.
+#if test -f $iraf/unix/hlib/irafuser.sh; then
+#    source $iraf/unix/hlib/irafuser.sh
+#fi
 
 export PATH=$HOME/.iraf/bin:${PATH}
 
