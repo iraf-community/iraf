@@ -71,11 +71,10 @@
 #define IRAFLIB5	"liblapack.a"
 #define IRAFLIB6	"libfftpack.a"
 
-char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
-		    "-lf2c",			/*  1  */
-		    "-lm",			/*  2  */
-		    "-lcurl",			/*  3  */
-		    "-lexpat",			/*  4  */
+char *fortlib[] = { "-lf2c",			/*  0  */
+		    "-lm",			/*  1  */
+		    "-lcurl",			/*  2  */
+		    "-lexpat",			/*  3  */
 #if (defined (__linux__) || defined (__gnu_hurd__))
 		    "-lpthread",		/*  5  */
 #else
@@ -811,11 +810,9 @@ passflag:		    mkobject = YES;
 
 	/* Libraries to link against.
 	 */
-	if (hostprog) {
-	  arglist[nargs++] = mkfname (fortlib[0]);
-	} else
+	if (!hostprog) {
 	    arglist[nargs++] = mkfname (LIBMAIN);
-
+	}
 	if (voslibs) {
 	    if (usesharelib) {
 		arglist[nargs++] = mkfname (SHARELIB);
@@ -837,6 +834,7 @@ passflag:		    mkobject = YES;
 	/* The remaining system libraries depend upon which version of
 	 * the SunOS compiler we are using. 
 	 */
+	addflags (fortlib[0], arglist, &nargs);
 	addflags (fortlib[1], arglist, &nargs);
 	addflags (fortlib[2], arglist, &nargs);
 	addflags (fortlib[3], arglist, &nargs);
@@ -845,7 +843,6 @@ passflag:		    mkobject = YES;
 	addflags (fortlib[6], arglist, &nargs);
 	addflags (fortlib[7], arglist, &nargs);
 	addflags (fortlib[8], arglist, &nargs);
-	addflags (fortlib[9], arglist, &nargs);
 	arglist[nargs] = NULL;
 
 	if (debug)
