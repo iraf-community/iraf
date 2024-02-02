@@ -1,7 +1,7 @@
-From 0f5016cc248bffae9e7de3bb1c49ce446afb2eaf Mon Sep 17 00:00:00 2001
+From 52b97276f1ccc01b0bbc4e8de28a1cd816c8d354 Mon Sep 17 00:00:00 2001
 From: Mike Fitzpatrick <iraf@noao.edu>
 Date: Mon, 21 Oct 2013 16:03:18 +0200
-Subject: [PATCH 4/5] Use HSI environment when building F2C
+Subject: [PATCH] Use HSI environment when building F2C
 
 Change appeared in version 2.16.1
 ---
