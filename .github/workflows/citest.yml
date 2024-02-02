@@ -28,6 +28,10 @@ jobs:
             os: macos-latest
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
 
+          - name: macOS arm64
+            os: macos-14
+            cflags: -O2 -g -Wall -Wno-logical-op-parentheses
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
