@@ -99,13 +99,14 @@
 #define	SSLASHD	99
 #define	SBYTE	100
 
-/* #line	125	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	125	"/home/dmg/h/f2c/gram.in" */
 #include "defs.h"
 #include "p1defs.h"
 
 static int nstars;			/* Number of labels in an
 					   alternate return CALL */
 static int datagripe;
+static int lasttype;
 static int ndim;
 static int vartype;
 int new_dcl;
@@ -144,7 +145,7 @@ pop_datastack(Void) {
 	}
 
 
-/* #line	172	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	173	"/home/dmg/h/f2c/gram.in" */
 typedef union 	{
 	int ival;
 	ftnint lval;
@@ -683,15 +684,12 @@ char*	yystates[1];		/* for debugging */
 int	yynerrs = 0;		/* number of errors */
 int	yyerrflag = 0;		/* error recovery flag */
 
-extern	int	fprint(int, char*, ...);
-extern	int	sprint(char*, char*, ...);
-
 char*
 yytokname(int yyc)
 {
 	static char x[10];
 
-	if(yyc > 0 && yyc <= sizeof(yytoknames)/sizeof(yytoknames[0]))
+	if(yyc > 0 && yyc <= (int)(sizeof(yytoknames)/sizeof(yytoknames[0])))
 	if(yytoknames[yyc-1])
 		return yytoknames[yyc-1];
 	sprintf(x, "<%d>", yyc);
@@ -703,7 +701,7 @@ yystatname(int yys)
 {
 	static char x[10];
 
-	if(yys >= 0 && yys < sizeof(yystates)/sizeof(yystates[0]))
+	if(yys >= 0 && yys < (int)(sizeof(yystates)/sizeof(yystates[0])))
 	if(yystates[yys])
 		return yystates[yys];
 	sprintf(x, "<%d>\n", yys);
@@ -722,12 +720,12 @@ yylex1(void)
 		c = yytok1[0];
 		goto out;
 	}
-	if(yychar < sizeof(yytok1)/sizeof(yytok1[0])) {
+	if(yychar < (long)(sizeof(yytok1)/sizeof(yytok1[0]))) {
 		c = yytok1[yychar];
 		goto out;
 	}
 	if(yychar >= YYPRIVATE)
-		if(yychar < YYPRIVATE+sizeof(yytok2)/sizeof(yytok2[0])) {
+		if(yychar < YYPRIVATE+(long)(sizeof(yytok2)/sizeof(yytok2[0]))) {
 			c = yytok2[yychar-YYPRIVATE];
 			goto out;
 		}
@@ -750,19 +748,23 @@ out:
 	return c;
 }
 
+typedef struct { YYSTYPE yyv; int yys; } YYSTACK;
+static YYSTACK yys0[YYMAXDEPTH];
+static YYSTACK *yys = yys0, *yysend = &yys0[YYMAXDEPTH];
+
 int
 yyparse(void)
 {
-	struct
-	{
-		YYSTYPE	yyv;
-		int	yys;
-	} yys[YYMAXDEPTH], *yyp, *yypt;
+	YYSTACK *yyp, *yypt;
 	short *yyxi;
 	int yyj, yym, yystate, yyn, yyg;
 	YYSTYPE save1, save2;
 	int save3, save4;
 	long yychar;
+#ifdef Use_Malloc
+	YYSTACK *yysnew;
+	size_t yyslen, yyslen2;
+#endif
 
 	save1 = yylval;
 	save2 = yyval;
@@ -797,9 +799,23 @@ yystack:
 		printf("char %s in %s", yytokname(yychar), yystatname(yystate));
 
 	yyp++;
-	if(yyp >= &yys[YYMAXDEPTH]) { 
-		yyerror("yacc stack overflow"); 
-		goto ret1; 
+	if(yyp >= yysend) {
+#ifdef Use_Malloc
+		yyslen = yysend - yys;
+		yyslen2 = 2*yyslen;
+		if (yyslen2 < 2048)
+			yyslen2 = 2048;
+		yysnew = (YYSTACK*)Malloc(yyslen2*sizeof(YYSTACK));
+		memcpy(yysnew, yys, yyslen*sizeof(YYSTACK));
+		if (yys != yys0)
+			free(yys);
+		yys = yysnew;
+		yysend = &yysnew[yyslen2];
+		yyp = yys + yyslen;
+#else	
+		yyerror("yacc stack overflow");
+		goto ret1;
+#endif
 	}
 	yyp->yys = yystate;
 	yyp->yyv = yyval;
@@ -906,13 +922,13 @@ yyerrlab:
 	switch(yym) {
 		
 case 3:
-/* #line	220	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	221	"/home/dmg/h/f2c/gram.in" */
 {
 /* stat:   is the nonterminal for Fortran statements */
 
 		  lastwasbranch = NO; } break;
 case 5:
-/* #line	226	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	227	"/home/dmg/h/f2c/gram.in" */
 { /* forbid further statement function definitions... */
 		  if (parstate == INDATA && laststfcn != thisstno)
 			parstate = INEXEC;
@@ -933,7 +949,7 @@ case 5:
 		  freetemps();
 		} break;
 case 6:
-/* #line	246	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	247	"/home/dmg/h/f2c/gram.in" */
 { if (can_include)
 			doinclude( yypt[-0].yyv.charpval );
 		  else {
@@ -942,25 +958,25 @@ case 6:
 			}
 		} break;
 case 7:
-/* #line	254	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	255	"/home/dmg/h/f2c/gram.in" */
 { if (yypt[-2].yyv.labval)
 			lastwasbranch = NO;
 		  endcheck();
 		  endproc(); /* lastwasbranch = NO; -- set in endproc() */
 		} break;
 case 8:
-/* #line	260	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	261	"/home/dmg/h/f2c/gram.in" */
 { unclassifiable();
 
 /* flline flushes the current line, ignoring the rest of the text there */
 
 		  flline(); } break;
 case 9:
-/* #line	266	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	267	"/home/dmg/h/f2c/gram.in" */
 { flline();  needkwd = NO;  inioctl = NO;
 		  yyerrok; yyclearin; } break;
 case 10:
-/* #line	271	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	272	"/home/dmg/h/f2c/gram.in" */
 {
 		if(yystno != 0)
 			{
@@ -987,69 +1003,69 @@ case 10:
 		else    yyval.labval = thislabel = NULL;
 		} break;
 case 11:
-/* #line	299	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	300	"/home/dmg/h/f2c/gram.in" */
 {startproc(yypt[-0].yyv.extval, CLMAIN); } break;
 case 12:
-/* #line	301	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	302	"/home/dmg/h/f2c/gram.in" */
 {	warn("ignoring arguments to main program");
 			/* hashclear(); */
 			startproc(yypt[-1].yyv.extval, CLMAIN); } break;
 case 13:
-/* #line	305	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	306	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-0].yyv.extval) NO66("named BLOCKDATA");
 		  startproc(yypt[-0].yyv.extval, CLBLOCK); } break;
 case 14:
-/* #line	308	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	309	"/home/dmg/h/f2c/gram.in" */
 { entrypt(CLPROC, TYSUBR, (ftnint) 0,  yypt[-1].yyv.extval, yypt[-0].yyv.chval); } break;
 case 15:
-/* #line	310	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	311	"/home/dmg/h/f2c/gram.in" */
 { entrypt(CLPROC, TYUNKNOWN, (ftnint) 0, yypt[-1].yyv.extval, yypt[-0].yyv.chval); } break;
 case 16:
-/* #line	312	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	313	"/home/dmg/h/f2c/gram.in" */
 { entrypt(CLPROC, yypt[-4].yyv.ival, varleng, yypt[-1].yyv.extval, yypt[-0].yyv.chval); } break;
 case 17:
-/* #line	314	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	315	"/home/dmg/h/f2c/gram.in" */
 { if(parstate==OUTSIDE || procclass==CLMAIN
 			|| procclass==CLBLOCK)
 				execerr("misplaced entry statement", CNULL);
 		  entrypt(CLENTRY, 0, (ftnint) 0, yypt[-1].yyv.extval, yypt[-0].yyv.chval);
 		} break;
 case 18:
-/* #line	322	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	323	"/home/dmg/h/f2c/gram.in" */
 { newproc(); } break;
 case 19:
-/* #line	326	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	327	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = newentry(yypt[-0].yyv.namval, 1); } break;
 case 20:
-/* #line	330	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	331	"/home/dmg/h/f2c/gram.in" */
 { yyval.namval = mkname(token); } break;
 case 21:
-/* #line	333	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	334	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = NULL; } break;
 case 29:
-/* #line	351	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	352	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = 0; } break;
 case 30:
-/* #line	353	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	354	"/home/dmg/h/f2c/gram.in" */
 { NO66(" () argument list");
 		  yyval.chval = 0; } break;
 case 31:
-/* #line	356	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	357	"/home/dmg/h/f2c/gram.in" */
 {yyval.chval = yypt[-1].yyv.chval; } break;
 case 32:
-/* #line	360	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	361	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = (yypt[-0].yyv.namval ? mkchain((char *)yypt[-0].yyv.namval,CHNULL) : CHNULL ); } break;
 case 33:
-/* #line	362	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	363	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-0].yyv.namval) yypt[-2].yyv.chval = yyval.chval = mkchain((char *)yypt[-0].yyv.namval, yypt[-2].yyv.chval); } break;
 case 34:
-/* #line	366	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	367	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-0].yyv.namval->vstg!=STGUNKNOWN && yypt[-0].yyv.namval->vstg!=STGARG)
 			dclerr("name declared as argument after use", yypt[-0].yyv.namval);
 		  yypt[-0].yyv.namval->vstg = STGARG;
 		} break;
 case 35:
-/* #line	371	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	372	"/home/dmg/h/f2c/gram.in" */
 { NO66("altenate return argument");
 
 /* substars   means that '*'ed formal parameters should be replaced.
@@ -1062,7 +1078,7 @@ case 35:
 
 		  yyval.namval = 0;  substars = YES; } break;
 case 36:
-/* #line	387	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	388	"/home/dmg/h/f2c/gram.in" */
 {
 		char *s;
 		s = copyn(toklen+1, token);
@@ -1070,87 +1086,87 @@ case 36:
 		yyval.charpval = s;
 		} break;
 case 45:
-/* #line	403	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	404	"/home/dmg/h/f2c/gram.in" */
 { NO66("SAVE statement");
 		  saveall = YES; } break;
 case 46:
-/* #line	406	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	407	"/home/dmg/h/f2c/gram.in" */
 { NO66("SAVE statement"); } break;
 case 47:
-/* #line	408	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	409	"/home/dmg/h/f2c/gram.in" */
 { fmtstmt(thislabel); setfmt(thislabel); } break;
 case 48:
-/* #line	410	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	411	"/home/dmg/h/f2c/gram.in" */
 { NO66("PARAMETER statement"); } break;
 case 49:
-/* #line	414	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	415	"/home/dmg/h/f2c/gram.in" */
 { settype(yypt[-4].yyv.namval, yypt[-6].yyv.ival, yypt[-0].yyv.lval);
 		  if(ndim>0) setbound(yypt[-4].yyv.namval,ndim,dims);
 		} break;
 case 50:
-/* #line	418	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	419	"/home/dmg/h/f2c/gram.in" */
 { settype(yypt[-2].yyv.namval, yypt[-4].yyv.ival, yypt[-0].yyv.lval);
 		  if(ndim>0) setbound(yypt[-2].yyv.namval,ndim,dims);
 		} break;
 case 51:
-/* #line	422	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	423	"/home/dmg/h/f2c/gram.in" */
 { if (new_dcl == 2) {
 			err("attempt to give DATA in type-declaration");
 			new_dcl = 1;
 			}
 		} break;
 case 52:
-/* #line	429	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	430	"/home/dmg/h/f2c/gram.in" */
 { new_dcl = 2; } break;
 case 53:
-/* #line	432	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	433	"/home/dmg/h/f2c/gram.in" */
 { varleng = yypt[-0].yyv.lval; } break;
 case 54:
-/* #line	436	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	437	"/home/dmg/h/f2c/gram.in" */
 { varleng = (yypt[-0].yyv.ival<0 || ONEOF(yypt[-0].yyv.ival,M(TYLOGICAL)|M(TYLONG))
 				? 0 : typesize[yypt[-0].yyv.ival]);
 		  vartype = yypt[-0].yyv.ival; } break;
 case 55:
-/* #line	441	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ yyval.ival = TYLONG; } break;
+/* #line	442	"/home/dmg/h/f2c/gram.in" */
+{ yyval.ival = lasttype = TYLONG; } break;
 case 56:
-/* #line	442	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ yyval.ival = tyreal; } break;
+/* #line	443	"/home/dmg/h/f2c/gram.in" */
+{ yyval.ival = lasttype = tyreal; } break;
 case 57:
-/* #line	443	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ ++complex_seen; yyval.ival = tycomplex; } break;
+/* #line	444	"/home/dmg/h/f2c/gram.in" */
+{ ++complex_seen; yyval.ival = lasttype = tycomplex; } break;
 case 58:
-/* #line	444	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ yyval.ival = TYDREAL; } break;
+/* #line	445	"/home/dmg/h/f2c/gram.in" */
+{ yyval.ival = lasttype = TYDREAL; } break;
 case 59:
-/* #line	445	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ ++dcomplex_seen; NOEXT("DOUBLE COMPLEX statement"); yyval.ival = TYDCOMPLEX; } break;
+/* #line	446	"/home/dmg/h/f2c/gram.in" */
+{ ++dcomplex_seen; NOEXT("DOUBLE COMPLEX statement"); yyval.ival = lasttype = TYDCOMPLEX; } break;
 case 60:
-/* #line	446	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ yyval.ival = TYLOGICAL; } break;
+/* #line	447	"/home/dmg/h/f2c/gram.in" */
+{ yyval.ival = lasttype = TYLOGICAL; } break;
 case 61:
-/* #line	447	"/n/bopp/v5/dmg/f2c/gram.in" */
-{ NO66("CHARACTER statement"); yyval.ival = TYCHAR; } break;
+/* #line	448	"/home/dmg/h/f2c/gram.in" */
+{ NO66("CHARACTER statement"); yyval.ival = lasttype = TYCHAR; } break;
 case 62:
-/* #line	448	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	449	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = TYUNKNOWN; } break;
 case 63:
-/* #line	449	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	450	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = TYUNKNOWN; } break;
 case 64:
-/* #line	450	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	451	"/home/dmg/h/f2c/gram.in" */
 { NOEXT("AUTOMATIC statement"); yyval.ival = - STGAUTO; } break;
 case 65:
-/* #line	451	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	452	"/home/dmg/h/f2c/gram.in" */
 { NOEXT("STATIC statement"); yyval.ival = - STGBSS; } break;
 case 66:
-/* #line	452	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	453	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = TYINT1; } break;
 case 67:
-/* #line	456	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	457	"/home/dmg/h/f2c/gram.in" */
 { yyval.lval = varleng; } break;
 case 68:
-/* #line	458	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	459	"/home/dmg/h/f2c/gram.in" */
 {
 		expptr p;
 		p = yypt[-1].yyv.expval;
@@ -1167,7 +1183,8 @@ case 68:
 			else switch((int)p->constblock.Const.ci) {
 				case 1:	yyval.lval = 1; break;
 				case 2: yyval.lval = typesize[TYSHORT];	break;
-				case 4: yyval.lval = typesize[TYLONG];	break;
+				case 4: yyval.lval = lasttype == TYREAL ? typesize[TYREAL] : typesize[TYLONG];
+					break;
 				case 8: yyval.lval = typesize[TYDREAL];	break;
 				case 16: yyval.lval = typesize[TYDCOMPLEX]; break;
 				default:
@@ -1177,40 +1194,40 @@ case 68:
 			}
 		} break;
 case 69:
-/* #line	484	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	486	"/home/dmg/h/f2c/gram.in" */
 { NO66("length specification *(*)"); yyval.lval = -1; } break;
 case 70:
-/* #line	488	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	490	"/home/dmg/h/f2c/gram.in" */
 { incomm( yyval.extval = comblock("") , yypt[-0].yyv.namval ); } break;
 case 71:
-/* #line	490	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	492	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = yypt[-1].yyv.extval;  incomm(yypt[-1].yyv.extval, yypt[-0].yyv.namval); } break;
 case 72:
-/* #line	492	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	494	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = yypt[-2].yyv.extval;  incomm(yypt[-2].yyv.extval, yypt[-0].yyv.namval); } break;
 case 73:
-/* #line	494	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	496	"/home/dmg/h/f2c/gram.in" */
 { incomm(yypt[-2].yyv.extval, yypt[-0].yyv.namval); } break;
 case 74:
-/* #line	498	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	500	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = comblock(""); } break;
 case 75:
-/* #line	500	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	502	"/home/dmg/h/f2c/gram.in" */
 { yyval.extval = comblock(token); } break;
 case 76:
-/* #line	504	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	506	"/home/dmg/h/f2c/gram.in" */
 { setext(yypt[-0].yyv.namval); } break;
 case 77:
-/* #line	506	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	508	"/home/dmg/h/f2c/gram.in" */
 { setext(yypt[-0].yyv.namval); } break;
 case 78:
-/* #line	510	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	512	"/home/dmg/h/f2c/gram.in" */
 { NO66("INTRINSIC statement"); setintr(yypt[-0].yyv.namval); } break;
 case 79:
-/* #line	512	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	514	"/home/dmg/h/f2c/gram.in" */
 { setintr(yypt[-0].yyv.namval); } break;
 case 82:
-/* #line	520	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	522	"/home/dmg/h/f2c/gram.in" */
 {
 		struct Equivblock *p;
 		if(nequiv >= maxequiv)
@@ -1222,18 +1239,18 @@ case 82:
 		p->equivs = yypt[-1].yyv.eqvval;
 		} break;
 case 83:
-/* #line	533	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	535	"/home/dmg/h/f2c/gram.in" */
 { yyval.eqvval=ALLOC(Eqvchain);
 		  yyval.eqvval->eqvitem.eqvlhs = primchk(yypt[-0].yyv.expval);
 		} break;
 case 84:
-/* #line	537	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	539	"/home/dmg/h/f2c/gram.in" */
 { yyval.eqvval=ALLOC(Eqvchain);
 		  yyval.eqvval->eqvitem.eqvlhs = primchk(yypt[-0].yyv.expval);
 		  yyval.eqvval->eqvnextp = yypt[-2].yyv.eqvval;
 		} break;
 case 87:
-/* #line	548	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	550	"/home/dmg/h/f2c/gram.in" */
 { if(parstate == OUTSIDE)
 			{
 			newproc();
@@ -1247,7 +1264,7 @@ case 87:
 			}
 		} break;
 case 88:
-/* #line	563	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	565	"/home/dmg/h/f2c/gram.in" */
 { ftnint junk;
 		  if(nextdata(&junk) != NULL)
 			err("too few initializers");
@@ -1255,28 +1272,28 @@ case 88:
 		  frrpl();
 		} break;
 case 89:
-/* #line	571	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	573	"/home/dmg/h/f2c/gram.in" */
 { frchain(&datastack); curdtp = 0; } break;
 case 90:
-/* #line	573	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	575	"/home/dmg/h/f2c/gram.in" */
 { pop_datastack(); } break;
 case 91:
-/* #line	575	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	577	"/home/dmg/h/f2c/gram.in" */
 { toomanyinit = NO; } break;
 case 94:
-/* #line	580	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	582	"/home/dmg/h/f2c/gram.in" */
 { dataval(ENULL, yypt[-0].yyv.expval); } break;
 case 95:
-/* #line	582	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	584	"/home/dmg/h/f2c/gram.in" */
 { dataval(yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 97:
-/* #line	587	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	589	"/home/dmg/h/f2c/gram.in" */
 { if( yypt[-1].yyv.ival==OPMINUS && ISCONST(yypt[-0].yyv.expval) )
 			consnegop((Constp)yypt[-0].yyv.expval);
 		  yyval.expval = yypt[-0].yyv.expval;
 		} break;
 case 101:
-/* #line	599	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	601	"/home/dmg/h/f2c/gram.in" */
 { int k;
 		  yypt[-0].yyv.namval->vsave = YES;
 		  k = yypt[-0].yyv.namval->vstg;
@@ -1284,16 +1301,16 @@ case 101:
 			dclerr("can only save static variables", yypt[-0].yyv.namval);
 		} break;
 case 105:
-/* #line	613	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	615	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-2].yyv.namval->vclass == CLUNKNOWN)
 			make_param((struct Paramblock *)yypt[-2].yyv.namval, yypt[-0].yyv.expval);
 		  else dclerr("cannot make into parameter", yypt[-2].yyv.namval);
 		} break;
 case 106:
-/* #line	620	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	622	"/home/dmg/h/f2c/gram.in" */
 { if(ndim>0) setbound(yypt[-1].yyv.namval, ndim, dims); } break;
 case 107:
-/* #line	624	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	626	"/home/dmg/h/f2c/gram.in" */
 { Namep np;
 		  struct Primblock *pp = (struct Primblock *)yypt[-0].yyv.expval;
 		  int tt = yypt[-0].yyv.expval->tag;
@@ -1327,7 +1344,7 @@ case 107:
 		  yyval.chval = mkchain((char *)yypt[-0].yyv.expval, CHNULL);
 		} break;
 case 108:
-/* #line	657	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	659	"/home/dmg/h/f2c/gram.in" */
 { chainp p; struct Impldoblock *q;
 		pop_datastack();
 		q = ALLOC(Impldoblock);
@@ -1342,23 +1359,23 @@ case 108:
 		q->datalist = hookup(yypt[-3].yyv.chval, yyval.chval);
 		} break;
 case 109:
-/* #line	673	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	675	"/home/dmg/h/f2c/gram.in" */
 { if (!datastack)
 			curdtp = 0;
 		  datastack = mkchain((char *)curdtp, datastack);
 		  curdtp = yypt[-0].yyv.chval; curdtelt = 0;
 		  } break;
 case 110:
-/* #line	679	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	681	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = hookup(yypt[-2].yyv.chval, yypt[-0].yyv.chval); } break;
 case 111:
-/* #line	683	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	685	"/home/dmg/h/f2c/gram.in" */
 { ndim = 0; } break;
 case 113:
-/* #line	687	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	689	"/home/dmg/h/f2c/gram.in" */
 { ndim = 0; } break;
 case 116:
-/* #line	692	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	694	"/home/dmg/h/f2c/gram.in" */
 {
 		  if(ndim == maxdim)
 			err("too many dimensions");
@@ -1369,7 +1386,7 @@ case 116:
 		  ++ndim;
 		} break;
 case 117:
-/* #line	702	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	704	"/home/dmg/h/f2c/gram.in" */
 {
 		  if(ndim == maxdim)
 			err("too many dimensions");
@@ -1380,36 +1397,36 @@ case 117:
 		  ++ndim;
 		} break;
 case 118:
-/* #line	714	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	716	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = 0; } break;
 case 120:
-/* #line	719	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	721	"/home/dmg/h/f2c/gram.in" */
 { nstars = 1; labarray[0] = yypt[-0].yyv.labval; } break;
 case 121:
-/* #line	721	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	723	"/home/dmg/h/f2c/gram.in" */
 { if(nstars < maxlablist)  labarray[nstars++] = yypt[-0].yyv.labval; } break;
 case 122:
-/* #line	725	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	727	"/home/dmg/h/f2c/gram.in" */
 { yyval.labval = execlab( convci(toklen, token) ); } break;
 case 123:
-/* #line	729	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	731	"/home/dmg/h/f2c/gram.in" */
 { NO66("IMPLICIT statement"); } break;
 case 126:
-/* #line	735	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	737	"/home/dmg/h/f2c/gram.in" */
 { if (vartype != TYUNKNOWN)
 			dclerr("-- expected letter range",NPNULL);
 		  setimpl(vartype, varleng, 'a', 'z'); } break;
 case 127:
-/* #line	740	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	742	"/home/dmg/h/f2c/gram.in" */
 { needkwd = 1; } break;
 case 131:
-/* #line	749	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	751	"/home/dmg/h/f2c/gram.in" */
 { setimpl(vartype, varleng, yypt[-0].yyv.ival, yypt[-0].yyv.ival); } break;
 case 132:
-/* #line	751	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	753	"/home/dmg/h/f2c/gram.in" */
 { setimpl(vartype, varleng, yypt[-2].yyv.ival, yypt[-0].yyv.ival); } break;
 case 133:
-/* #line	755	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	757	"/home/dmg/h/f2c/gram.in" */
 { if(toklen!=1 || token[0]<'a' || token[0]>'z')
 			{
 			dclerr("implicit item must be single letter", NPNULL);
@@ -1418,7 +1435,7 @@ case 133:
 		  else yyval.ival = token[0];
 		} break;
 case 136:
-/* #line	769	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	771	"/home/dmg/h/f2c/gram.in" */
 {
 		if(yypt[-2].yyv.namval->vclass == CLUNKNOWN)
 			{
@@ -1431,13 +1448,13 @@ case 136:
 		else dclerr("cannot be a namelist name", yypt[-2].yyv.namval);
 		} break;
 case 137:
-/* #line	783	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	785	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.namval, CHNULL); } break;
 case 138:
-/* #line	785	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	787	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = hookup(yypt[-2].yyv.chval, mkchain((char *)yypt[-0].yyv.namval, CHNULL)); } break;
 case 139:
-/* #line	789	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	791	"/home/dmg/h/f2c/gram.in" */
 { switch(parstate)
 			{
 			case OUTSIDE:	newproc();
@@ -1459,35 +1476,35 @@ case 139:
 			}
 		} break;
 case 140:
-/* #line	811	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	813	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = 0; } break;
 case 141:
-/* #line	813	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	815	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = revchain(yypt[-0].yyv.chval); } break;
 case 142:
-/* #line	817	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	819	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, CHNULL); } break;
 case 143:
-/* #line	819	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	821	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, yypt[-2].yyv.chval); } break;
 case 145:
-/* #line	824	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	826	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = yypt[-1].yyv.expval; if (yyval.expval->tag == TPRIM)
 					paren_used(&yyval.expval->primblock); } break;
 case 149:
-/* #line	832	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	834	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(yypt[-1].yyv.ival, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 150:
-/* #line	834	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	836	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPSTAR, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 151:
-/* #line	836	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	838	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPSLASH, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 152:
-/* #line	838	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	840	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPPOWER, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 153:
-/* #line	840	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	842	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-1].yyv.ival == OPMINUS)
 			yyval.expval = mkexpr(OPNEG, yypt[-0].yyv.expval, ENULL);
 		  else {
@@ -1497,139 +1514,139 @@ case 153:
 			}
 		} break;
 case 154:
-/* #line	849	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	851	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(yypt[-1].yyv.ival, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 155:
-/* #line	851	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	853	"/home/dmg/h/f2c/gram.in" */
 { NO66(".EQV. operator");
 		  yyval.expval = mkexpr(OPEQV, yypt[-2].yyv.expval,yypt[-0].yyv.expval); } break;
 case 156:
-/* #line	854	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	856	"/home/dmg/h/f2c/gram.in" */
 { NO66(".NEQV. operator");
 		  yyval.expval = mkexpr(OPNEQV, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 157:
-/* #line	857	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	859	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPOR, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 158:
-/* #line	859	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	861	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPAND, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 159:
-/* #line	861	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	863	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPNOT, yypt[-0].yyv.expval, ENULL); } break;
 case 160:
-/* #line	863	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	865	"/home/dmg/h/f2c/gram.in" */
 { NO66("concatenation operator //");
 		  yyval.expval = mkexpr(OPCONCAT, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 161:
-/* #line	867	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	869	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPPLUS; } break;
 case 162:
-/* #line	868	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	870	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPMINUS; } break;
 case 163:
-/* #line	871	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	873	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPEQ; } break;
 case 164:
-/* #line	872	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	874	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPGT; } break;
 case 165:
-/* #line	873	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	875	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPLT; } break;
 case 166:
-/* #line	874	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	876	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPGE; } break;
 case 167:
-/* #line	875	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	877	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPLE; } break;
 case 168:
-/* #line	876	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	878	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = OPNE; } break;
 case 169:
-/* #line	880	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	882	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkprim(yypt[-0].yyv.namval, LBNULL, CHNULL); } break;
 case 170:
-/* #line	882	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	884	"/home/dmg/h/f2c/gram.in" */
 { NO66("substring operator :");
 		  yyval.expval = mkprim(yypt[-1].yyv.namval, LBNULL, yypt[-0].yyv.chval); } break;
 case 171:
-/* #line	885	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	887	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkprim(yypt[-3].yyv.namval, mklist(yypt[-1].yyv.chval), CHNULL); } break;
 case 172:
-/* #line	887	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	889	"/home/dmg/h/f2c/gram.in" */
 { NO66("substring operator :");
 		  yyval.expval = mkprim(yypt[-4].yyv.namval, mklist(yypt[-2].yyv.chval), yypt[-0].yyv.chval); } break;
 case 173:
-/* #line	892	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	894	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-3].yyv.expval, mkchain((char *)yypt[-1].yyv.expval,CHNULL)); } break;
 case 174:
-/* #line	896	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	898	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = 0; } break;
 case 176:
-/* #line	901	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	903	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-0].yyv.namval->vclass == CLPARAM)
 			yyval.expval = (expptr) cpexpr(
 				( (struct Paramblock *) (yypt[-0].yyv.namval) ) -> paramval);
 		} break;
 case 178:
-/* #line	908	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	910	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mklogcon(1); } break;
 case 179:
-/* #line	909	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	911	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mklogcon(0); } break;
 case 180:
-/* #line	910	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	912	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkstrcon(toklen, token); } break;
 case 181:
-/* #line	911	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	913	"/home/dmg/h/f2c/gram.in" */
  { yyval.expval = mkintqcon(toklen, token); } break;
 case 182:
-/* #line	912	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	914	"/home/dmg/h/f2c/gram.in" */
  { yyval.expval = mkrealcon(tyreal, token); } break;
 case 183:
-/* #line	913	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	915	"/home/dmg/h/f2c/gram.in" */
  { yyval.expval = mkrealcon(TYDREAL, token); } break;
 case 185:
-/* #line	918	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	920	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkcxcon(yypt[-3].yyv.expval,yypt[-1].yyv.expval); } break;
 case 186:
-/* #line	922	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	924	"/home/dmg/h/f2c/gram.in" */
 { NOEXT("hex constant");
 		  yyval.expval = mkbitcon(4, toklen, token); } break;
 case 187:
-/* #line	925	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	927	"/home/dmg/h/f2c/gram.in" */
 { NOEXT("octal constant");
 		  yyval.expval = mkbitcon(3, toklen, token); } break;
 case 188:
-/* #line	928	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	930	"/home/dmg/h/f2c/gram.in" */
 { NOEXT("binary constant");
 		  yyval.expval = mkbitcon(1, toklen, token); } break;
 case 190:
-/* #line	934	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	936	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = yypt[-1].yyv.expval; } break;
 case 193:
-/* #line	940	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	942	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(yypt[-1].yyv.ival, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 194:
-/* #line	942	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	944	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPSTAR, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 195:
-/* #line	944	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	946	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPSLASH, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 196:
-/* #line	946	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	948	"/home/dmg/h/f2c/gram.in" */
 { yyval.expval = mkexpr(OPPOWER, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 197:
-/* #line	948	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	950	"/home/dmg/h/f2c/gram.in" */
 { if(yypt[-1].yyv.ival == OPMINUS)
 			yyval.expval = mkexpr(OPNEG, yypt[-0].yyv.expval, ENULL);
 		  else yyval.expval = yypt[-0].yyv.expval;
 		} break;
 case 198:
-/* #line	953	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	955	"/home/dmg/h/f2c/gram.in" */
 { NO66("concatenation operator //");
 		  yyval.expval = mkexpr(OPCONCAT, yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 200:
-/* #line	958	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	960	"/home/dmg/h/f2c/gram.in" */
 {
 		if(yypt[-2].yyv.labval->labdefined)
 			execerr("no backward DO loops", CNULL);
@@ -1637,77 +1654,77 @@ case 200:
 		exdo(yypt[-2].yyv.labval->labelno, NPNULL, yypt[-0].yyv.chval);
 		} break;
 case 201:
-/* #line	965	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	967	"/home/dmg/h/f2c/gram.in" */
 {
 		exdo((int)(ctls - ctlstack - 2), NPNULL, yypt[-0].yyv.chval);
 		NOEXT("DO without label");
 		} break;
 case 202:
-/* #line	970	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	972	"/home/dmg/h/f2c/gram.in" */
 { exenddo(NPNULL); } break;
 case 203:
-/* #line	972	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	974	"/home/dmg/h/f2c/gram.in" */
 { exendif();  thiswasbranch = NO; } break;
 case 205:
-/* #line	974	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	976	"/home/dmg/h/f2c/gram.in" */
 {westart(1);} break;
 case 206:
-/* #line	975	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	977	"/home/dmg/h/f2c/gram.in" */
 { exelif(yypt[-2].yyv.expval); lastwasbranch = NO; } break;
 case 207:
-/* #line	977	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	979	"/home/dmg/h/f2c/gram.in" */
 { exelse(); lastwasbranch = NO; } break;
 case 208:
-/* #line	979	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	981	"/home/dmg/h/f2c/gram.in" */
 { exendif(); lastwasbranch = NO; } break;
 case 209:
-/* #line	983	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	985	"/home/dmg/h/f2c/gram.in" */
 { exif(yypt[-1].yyv.expval); } break;
 case 210:
-/* #line	987	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	989	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-2].yyv.namval, yypt[-0].yyv.chval); } break;
 case 212:
-/* #line	991	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	993	"/home/dmg/h/f2c/gram.in" */
 {westart(0);} break;
 case 213:
-/* #line	992	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	994	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain(CNULL, (chainp)yypt[-1].yyv.expval); } break;
 case 214:
-/* #line	996	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	998	"/home/dmg/h/f2c/gram.in" */
 { exequals((struct Primblock *)yypt[-2].yyv.expval, yypt[-0].yyv.expval); } break;
 case 215:
-/* #line	998	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1000	"/home/dmg/h/f2c/gram.in" */
 { exassign(yypt[-0].yyv.namval, yypt[-2].yyv.labval); } break;
 case 218:
-/* #line	1002	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1004	"/home/dmg/h/f2c/gram.in" */
 { inioctl = NO; } break;
 case 219:
-/* #line	1004	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1006	"/home/dmg/h/f2c/gram.in" */
 { exarif(yypt[-6].yyv.expval, yypt[-4].yyv.labval, yypt[-2].yyv.labval, yypt[-0].yyv.labval);  thiswasbranch = YES; } break;
 case 220:
-/* #line	1006	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1008	"/home/dmg/h/f2c/gram.in" */
 { excall(yypt[-0].yyv.namval, LBNULL, 0, labarray); } break;
 case 221:
-/* #line	1008	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1010	"/home/dmg/h/f2c/gram.in" */
 { excall(yypt[-2].yyv.namval, LBNULL, 0, labarray); } break;
 case 222:
-/* #line	1010	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1012	"/home/dmg/h/f2c/gram.in" */
 { if(nstars < maxlablist)
 			excall(yypt[-3].yyv.namval, mklist(revchain(yypt[-1].yyv.chval)), nstars, labarray);
 		  else
 			many("alternate returns", 'l', maxlablist);
 		} break;
 case 223:
-/* #line	1016	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1018	"/home/dmg/h/f2c/gram.in" */
 { exreturn(yypt[-0].yyv.expval);  thiswasbranch = YES; } break;
 case 224:
-/* #line	1018	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1020	"/home/dmg/h/f2c/gram.in" */
 { exstop(yypt[-2].yyv.ival, yypt[-0].yyv.expval);  thiswasbranch = yypt[-2].yyv.ival; } break;
 case 225:
-/* #line	1022	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1024	"/home/dmg/h/f2c/gram.in" */
 { yyval.labval = mklabel( convci(toklen, token) ); } break;
 case 226:
-/* #line	1026	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1028	"/home/dmg/h/f2c/gram.in" */
 { if(parstate == OUTSIDE)
 			{
 			newproc();
@@ -1715,47 +1732,47 @@ case 226:
 			}
 		} break;
 case 227:
-/* #line	1035	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1037	"/home/dmg/h/f2c/gram.in" */
 { exgoto(yypt[-0].yyv.labval);  thiswasbranch = YES; } break;
 case 228:
-/* #line	1037	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1039	"/home/dmg/h/f2c/gram.in" */
 { exasgoto(yypt[-0].yyv.namval);  thiswasbranch = YES; } break;
 case 229:
-/* #line	1039	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1041	"/home/dmg/h/f2c/gram.in" */
 { exasgoto(yypt[-4].yyv.namval);  thiswasbranch = YES; } break;
 case 230:
-/* #line	1041	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1043	"/home/dmg/h/f2c/gram.in" */
 { if(nstars < maxlablist)
 			putcmgo(putx(fixtype(yypt[-0].yyv.expval)), nstars, labarray);
 		  else
 			many("labels in computed GOTO list", 'l', maxlablist);
 		} break;
 case 233:
-/* #line	1053	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1055	"/home/dmg/h/f2c/gram.in" */
 { nstars = 0; yyval.namval = yypt[-0].yyv.namval; } break;
 case 234:
-/* #line	1057	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1059	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = yypt[-0].yyv.expval ? mkchain((char *)yypt[-0].yyv.expval,CHNULL) : CHNULL; } break;
 case 235:
-/* #line	1059	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1061	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = yypt[-0].yyv.expval ? mkchain((char *)yypt[-0].yyv.expval, yypt[-2].yyv.chval) : yypt[-2].yyv.chval; } break;
 case 237:
-/* #line	1064	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1066	"/home/dmg/h/f2c/gram.in" */
 { if(nstars < maxlablist) labarray[nstars++] = yypt[-0].yyv.labval; yyval.expval = 0; } break;
 case 238:
-/* #line	1068	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1070	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = 0; } break;
 case 239:
-/* #line	1070	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1072	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = 2; } break;
 case 240:
-/* #line	1074	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1076	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, CHNULL); } break;
 case 241:
-/* #line	1076	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1078	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = hookup(yypt[-2].yyv.chval, mkchain((char *)yypt[-0].yyv.expval,CHNULL) ); } break;
 case 242:
-/* #line	1080	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1082	"/home/dmg/h/f2c/gram.in" */
 { if(parstate == OUTSIDE)
 			{
 			newproc();
@@ -1767,123 +1784,123 @@ case 242:
 		  if(parstate < INDATA) enddcl();
 		} break;
 case 243:
-/* #line	1093	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1095	"/home/dmg/h/f2c/gram.in" */
 { intonly = YES; } break;
 case 244:
-/* #line	1097	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1099	"/home/dmg/h/f2c/gram.in" */
 { intonly = NO; } break;
 case 245:
-/* #line	1102	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1104	"/home/dmg/h/f2c/gram.in" */
 { endio(); } break;
 case 247:
-/* #line	1107	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1109	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSUNIT, yypt[-0].yyv.expval); endioctl(); } break;
 case 248:
-/* #line	1109	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1111	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSUNIT, ENULL); endioctl(); } break;
 case 249:
-/* #line	1111	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1113	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSUNIT, IOSTDERR); endioctl(); } break;
 case 251:
-/* #line	1114	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1116	"/home/dmg/h/f2c/gram.in" */
 { doio(CHNULL); } break;
 case 252:
-/* #line	1116	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1118	"/home/dmg/h/f2c/gram.in" */
 { doio(CHNULL); } break;
 case 253:
-/* #line	1118	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1120	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 254:
-/* #line	1120	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1122	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 255:
-/* #line	1122	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1124	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 256:
-/* #line	1124	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1126	"/home/dmg/h/f2c/gram.in" */
 { doio(CHNULL); } break;
 case 257:
-/* #line	1126	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1128	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 258:
-/* #line	1128	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1130	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 259:
-/* #line	1130	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1132	"/home/dmg/h/f2c/gram.in" */
 { doio(CHNULL); } break;
 case 260:
-/* #line	1132	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1134	"/home/dmg/h/f2c/gram.in" */
 { doio(revchain(yypt[-0].yyv.chval)); } break;
 case 262:
-/* #line	1139	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1141	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOBACKSPACE; } break;
 case 263:
-/* #line	1141	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1143	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOREWIND; } break;
 case 264:
-/* #line	1143	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1145	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOENDFILE; } break;
 case 266:
-/* #line	1150	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1152	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOINQUIRE; } break;
 case 267:
-/* #line	1152	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1154	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOOPEN; } break;
 case 268:
-/* #line	1154	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1156	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOCLOSE; } break;
 case 269:
-/* #line	1158	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1160	"/home/dmg/h/f2c/gram.in" */
 {
 		ioclause(IOSUNIT, ENULL);
 		ioclause(IOSFMT, yypt[-0].yyv.expval);
 		endioctl();
 		} break;
 case 270:
-/* #line	1164	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1166	"/home/dmg/h/f2c/gram.in" */
 {
 		ioclause(IOSUNIT, ENULL);
 		ioclause(IOSFMT, ENULL);
 		endioctl();
 		} break;
 case 271:
-/* #line	1172	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1174	"/home/dmg/h/f2c/gram.in" */
 {
 		  ioclause(IOSUNIT, yypt[-1].yyv.expval);
 		  endioctl();
 		} break;
 case 272:
-/* #line	1177	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1179	"/home/dmg/h/f2c/gram.in" */
 { endioctl(); } break;
 case 275:
-/* #line	1185	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1187	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSPOSITIONAL, yypt[-0].yyv.expval); } break;
 case 276:
-/* #line	1187	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1189	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSPOSITIONAL, ENULL); } break;
 case 277:
-/* #line	1189	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1191	"/home/dmg/h/f2c/gram.in" */
 { ioclause(IOSPOSITIONAL, IOSTDERR); } break;
 case 278:
-/* #line	1191	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1193	"/home/dmg/h/f2c/gram.in" */
 { ioclause(yypt[-1].yyv.ival, yypt[-0].yyv.expval); } break;
 case 279:
-/* #line	1193	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1195	"/home/dmg/h/f2c/gram.in" */
 { ioclause(yypt[-1].yyv.ival, ENULL); } break;
 case 280:
-/* #line	1195	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1197	"/home/dmg/h/f2c/gram.in" */
 { ioclause(yypt[-1].yyv.ival, IOSTDERR); } break;
 case 281:
-/* #line	1199	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1201	"/home/dmg/h/f2c/gram.in" */
 { yyval.ival = iocname(); } break;
 case 282:
-/* #line	1203	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1205	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOREAD; } break;
 case 283:
-/* #line	1207	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1209	"/home/dmg/h/f2c/gram.in" */
 { iostmt = IOWRITE; } break;
 case 284:
-/* #line	1211	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1213	"/home/dmg/h/f2c/gram.in" */
 {
 		iostmt = IOWRITE;
 		ioclause(IOSUNIT, ENULL);
@@ -1891,7 +1908,7 @@ case 284:
 		endioctl();
 		} break;
 case 285:
-/* #line	1218	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1220	"/home/dmg/h/f2c/gram.in" */
 {
 		iostmt = IOWRITE;
 		ioclause(IOSUNIT, ENULL);
@@ -1899,58 +1916,58 @@ case 285:
 		endioctl();
 		} break;
 case 286:
-/* #line	1227	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1229	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, CHNULL); } break;
 case 287:
-/* #line	1229	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1231	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, yypt[-2].yyv.chval); } break;
 case 288:
-/* #line	1233	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1235	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) yypt[-0].yyv.expval; } break;
 case 289:
-/* #line	1235	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1237	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) mkiodo(yypt[-1].yyv.chval,revchain(yypt[-3].yyv.chval)); } break;
 case 290:
-/* #line	1239	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1241	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, CHNULL); } break;
 case 291:
-/* #line	1241	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1243	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, CHNULL); } break;
 case 293:
-/* #line	1246	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1248	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, mkchain((char *)yypt[-2].yyv.expval, CHNULL) ); } break;
 case 294:
-/* #line	1248	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1250	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, mkchain((char *)yypt[-2].yyv.expval, CHNULL) ); } break;
 case 295:
-/* #line	1250	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1252	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, mkchain((char *)yypt[-2].yyv.tagval, CHNULL) ); } break;
 case 296:
-/* #line	1252	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1254	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, mkchain((char *)yypt[-2].yyv.tagval, CHNULL) ); } break;
 case 297:
-/* #line	1254	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1256	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.expval, yypt[-2].yyv.chval); } break;
 case 298:
-/* #line	1256	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1258	"/home/dmg/h/f2c/gram.in" */
 { yyval.chval = mkchain((char *)yypt[-0].yyv.tagval, yypt[-2].yyv.chval); } break;
 case 299:
-/* #line	1260	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1262	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) yypt[-0].yyv.expval; } break;
 case 300:
-/* #line	1262	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1264	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) yypt[-1].yyv.expval; } break;
 case 301:
-/* #line	1264	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1266	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) mkiodo(yypt[-1].yyv.chval, mkchain((char *)yypt[-3].yyv.expval, CHNULL) ); } break;
 case 302:
-/* #line	1266	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1268	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) mkiodo(yypt[-1].yyv.chval, mkchain((char *)yypt[-3].yyv.tagval, CHNULL) ); } break;
 case 303:
-/* #line	1268	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1270	"/home/dmg/h/f2c/gram.in" */
 { yyval.tagval = (tagptr) mkiodo(yypt[-1].yyv.chval, revchain(yypt[-3].yyv.chval)); } break;
 case 304:
-/* #line	1272	"/n/bopp/v5/dmg/f2c/gram.in" */
+/* #line	1274	"/home/dmg/h/f2c/gram.in" */
 { startioctl(); } break;
 	}
 	goto yystack;  /* stack new state and value */

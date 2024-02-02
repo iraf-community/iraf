@@ -76,6 +76,7 @@ static char *def_i2 = "";
 
 static int useshortints = NO;	/* YES => tyint = TYSHORT */
 static int uselongints = NO;	/* YES => tyint = TYLONG */
+int uselonglong = NO;		/* YES => tyint = TYLONG; adjust typesizes for 64-bit ints */
 int addftnsrc = NO;		/* Include ftn source in output */
 int usedefsforcommon = NO;	/* Use #defines for common reference */
 int forcedouble = YES;		/* force real functions to double */
@@ -104,6 +105,7 @@ int hsize;	/* for padding under -h */
 int htype;	/* for wr_equiv_init under -h */
 int trapuv;
 chainp Iargs;
+int wantfname = YES;
 
 #define f2c_entry(swit,count,type,store,size) \
 	p_entry ("-", swit, 0, count, type, store, size)
@@ -171,6 +173,8 @@ static arg_info table[] = {
     f2c_entry ("!i8const", P_NO_ARGS, P_INT, &allow_i8c, NO),
 #endif
     f2c_entry ("!i8", P_NO_ARGS, P_INT, &use_tyquad, NO),
+    f2c_entry ("I8", P_NO_ARGS, P_INT, &uselonglong, YES),
+    f2c_entry ("cf", P_NO_ARGS, P_INT, &wantfname, NO),
 #endif
 
 	/* options omitted from man pages */
@@ -241,7 +245,27 @@ set_externs(Void)
 
 /* Adjust the global flags according to the command line parameters */
 
-    if (chars_per_wd > 0) {
+
+    if (uselonglong) {
+	if (useshortints)
+		err("Can't use -I8 with -I2");
+	if (uselongints)
+		err("Can't use -I8 with -I4");
+	if (!tyioint)
+		err("Can't use -I8 with -i2");
+	if (chars_per_wd)
+		err("Can't use -I8 with -W");
+	typesize[TYADDR] = typesize[TYLONG] = typesize[TYDREAL] = typesize[TYCOMPLEX] = typesize[TYLOGICAL] = 8;
+	typesize[TYSHORT] = typesize[TYREAL] = typesize[TYLOGICAL2] = 4;
+	typesize[TYQUAD] = typesize[TYDCOMPLEX] = 16;
+	typesize[TYCILIST] = 40;
+	typesize[TYICILIST] = 48;
+	typesize[TYOLIST] = 72;
+	typesize[TYCLLIST] = 24;
+	typesize[TYALIST] = 16;
+	typesize[TYINLIST] = 208;
+	}
+    else if (chars_per_wd > 0) {
 	typesize[TYADDR] = typesize[TYLONG] = typesize[TYREAL] =
 		typesize[TYLOGICAL] = chars_per_wd;
 	typesize[TYINT1] = typesize[TYLOGICAL1] = 1;
@@ -468,7 +492,7 @@ I_args(int argc, char **a)
 		if (!(s = *a))
 			break;
 		if (*s == '-' && s[1] == 'I' && s[2]
-		  && (s[3] || s[2] != '2' && s[2] != '4'))
+		  && (s[3] || s[2] != '2' && s[2] != '4' && s[2] != '8'))
 			Iargs = mkchain(s+2, Iargs);
 		else
 			*a1++ = s;
@@ -645,8 +669,10 @@ main(int argc, char **argv)
 	if(inilex( copys(file_name) ))
 		done(1);
 	if (filename0) {
-		fprintf(diagfile, "%s:\n", file_name);
-		fflush(diagfile);
+		if (wantfname) {
+			fprintf(diagfile, "%s:\n", file_name);
+			fflush(diagfile);
+			}
 		}
 
 	procinit();

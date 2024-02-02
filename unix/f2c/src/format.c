@@ -80,7 +80,7 @@ static void proto Argdcl((FILEP, Argtypes*, char*));
 
 extern chainp assigned_fmts;
 char filename[P1_FILENAME_MAX];
-extern int gflag, sharp_line, trapuv;
+extern int gflag, sharp_line, trapuv, uselonglong;
 extern int typeconv[];
 int gflag1;
 extern char *parens;
@@ -2124,6 +2124,8 @@ do_uninit_equivs(FILE *outfile, int *did_one)
 	    if (!*did_one)
 		nice_printf (outfile, "/* System generated locals */\n");
 	    t = eqv->eqvtype;
+	    if (t == TYREAL && uselonglong)
+		t = eqv->eqvtype = TYLONG;
 	    if (last_type == t)
 		nice_printf (outfile, ", ");
 	    else {

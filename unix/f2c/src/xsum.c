@@ -231,7 +231,7 @@ main(int argc, char **argv)
 		else
 			process(s, x);
 		}
-		while(s = *++argv);
+		while((s = *++argv));
 	else {
 		process("/dev/stdin", fileno(stdin));
 		}

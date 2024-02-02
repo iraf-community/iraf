@@ -53,6 +53,7 @@ static char Blank[] = BLANKCOMMON;
 
  chainp new_procs;
  int prev_proc, proc_argchanges, proc_protochanges;
+ extern int uselonglong, wantfname;
 
  void
 #ifdef KR_headers
@@ -460,13 +461,15 @@ startproc(Extsym *progname, int Class)
 	entries = p;
 
 	procclass = Class;
-	fprintf(diagfile, "   %s", (Class==CLMAIN ? "MAIN" : "BLOCK DATA") );
-	if(progname) {
-		fprintf(diagfile, " %s", progname->fextname);
-		procname = progname->cextname;
+	if (wantfname) {
+		fprintf(diagfile, "   %s", (Class==CLMAIN ? "MAIN" : "BLOCK DATA") );
+		if(progname) {
+			fprintf(diagfile, " %s", progname->fextname);
+			procname = progname->cextname;
+			}
+		fprintf(diagfile, ":\n");
+		fflush(diagfile);
 		}
-	fprintf(diagfile, ":\n");
-	fflush(diagfile);
 }
 
 /* subroutine or function statement */
@@ -528,10 +531,12 @@ entrypt(int Class, int type, ftnint length, Extsym *entry, chainp args)
 
 	if(Class != CLENTRY)
 		puthead( procname = entry->cextname, Class);
-	else
+	else if (wantfname)
 		fprintf(diagfile, "       entry ");
-	fprintf(diagfile, "   %s:\n", entry->fextname);
-	fflush(diagfile);
+	if (wantfname) {
+		fprintf(diagfile, "   %s:\n", entry->fextname);
+		fflush(diagfile);
+		}
 	q = mkname(entry->fextname);
 	if (type == TYSUBR)
 		q->vstg = STGEXT;
@@ -1575,6 +1580,8 @@ lengtype(register int type, ftnint len)
 			case 1:	return TYLOGICAL1;
 			case 2: return TYLOGICAL2;
 			case 4: goto ret;
+			case 8: if (uselonglong)
+					return tylog;
 			}
 		break;
 
@@ -1698,7 +1705,7 @@ setbound(Namep v, int nd, struct Dims *dims)
 	}
 
 	v->vdim = p = (struct Dimblock *)
-	    ckalloc( sizeof(int) + (3+2*nd)*sizeof(expptr) );
+	    ckalloc( sizeof(struct Dimblock) + 2*sizeof(expptr)*(nd-1) );
 	p->ndim = nd--;
 	p->nelt = ICON(1);
 	doin_setbound = 1;
