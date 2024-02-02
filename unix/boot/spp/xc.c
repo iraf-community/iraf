@@ -618,6 +618,8 @@ passflag:		    mkobject = YES;
 
 #ifdef __i386__
 	arglist[nargs++] = "-m32";
+#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+	arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {
@@ -661,6 +663,8 @@ passflag:		    mkobject = YES;
 
 #ifdef __i386__
 	arglist[nargs++] = "-m32";
+#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+	arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {

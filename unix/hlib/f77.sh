@@ -5,6 +5,7 @@
 #		-c		Do not call linker, leave relocatables in *.o.
 #		-S		leave assembler output on file.s
 #		-l library	(passed to ld).
+#		-i8		Compile for 8-byte integers
 #		-u		complain about undeclared variables
 #		-w		omit all warning messages
 #		-w66		omit Fortran 66 compatibility warning messages
@@ -47,7 +48,7 @@ CFLAGS="-I${iraf}include ${XC_CFLAGS} -Wno-maybe-uninitialized -Wno-strict-alias
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-${iraf}unix/bin/f2c.e}
-F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802'}
+F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802 -cf'}
 keepc=0
 warn=1
 xsrc=0
@@ -132,6 +133,10 @@ do
 		;;
 
 	-u)	F2CFLAGS="$F2CFLAGS -u"
+		shift
+		;;
+
+	-i8)	F2CFLAGS="$F2CFLAGS -I8"
 		shift
 		;;
 
