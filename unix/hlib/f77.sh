@@ -50,7 +50,6 @@ EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-${iraf}unix/bin/f2c.e}
 F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802 -cf'}
 keepc=0
-warn=1
 xsrc=0
 rc=0
 trap 'rm -f $s ; exit $rc' 0
@@ -149,13 +148,11 @@ do
 		;;
 
 	-W*)	CFLAGS="$CFLAGS $1"
-		warn=1
 		shift 1
 		;;
 
 	-w)	F2CFLAGS="$F2CFLAGS -w"
 		CFLAGS="$CFLAGS -w"
-		warn=0
 		case $2 in -6) F2CFLAGS="$F2CFLAGS"66; shift
 			case $2 in -6) shift;; esac;; esac
 		shift
@@ -201,12 +198,7 @@ do
 	*.f)
 		case "$1" in *.f) f=".f";; *.F) f=".F";; esac
 		b=$(basename "$1" $f)
-		if [ $warn = 0 ]; then
-		    $F2C $F2CFLAGS "$b.f" 2>"$s"
-		    sed '/^	arg .*: here/d' "$s" 1>&2
-		else
-		    $F2C $F2CFLAGS "$b.f"
-		fi
+		$F2C $F2CFLAGS "$b.f"
 		if [ $xsrc = 1 ]; then
 		    sed -e "s/$b\\.f/$b.x/" < "$b.c" > "$b.t"; mv "$b.t" "$b.c"
 		fi
