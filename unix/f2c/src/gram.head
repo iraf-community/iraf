@@ -28,6 +28,7 @@ this software.
 static int nstars;			/* Number of labels in an
 					   alternate return CALL */
 static int datagripe;
+static int lasttype;
 static int ndim;
 static int vartype;
 int new_dcl;

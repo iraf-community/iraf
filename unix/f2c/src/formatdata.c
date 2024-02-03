@@ -34,6 +34,7 @@ static int memno2info Argdcl((int, Namep*));
 typedef unsigned long Ulong;
 
  extern char *initbname;
+ extern int uselonglong;
 
  void
 #ifdef KR_headers
@@ -1112,6 +1113,8 @@ wr_equiv_init(FILE *outfile, int memno, chainp *Values, int iscomm)
 			k = TYDREAL;
 			break;
 			}
+	if (uselonglong && k == TYREAL)
+		k = TYLONG;
 	type_choice[0] = k;
 
 	nice_printf(outfile, "%sstruct {\n", iscomm ? "" : "static ");

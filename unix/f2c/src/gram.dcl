@@ -45,13 +45,13 @@ typespec:  typename
 		  vartype = $1; }
 	;
 
-typename:    SINTEGER	{ $$ = TYLONG; }
-	| SREAL		{ $$ = tyreal; }
-	| SCOMPLEX	{ ++complex_seen; $$ = tycomplex; }
-	| SDOUBLE	{ $$ = TYDREAL; }
-	| SDCOMPLEX	{ ++dcomplex_seen; NOEXT("DOUBLE COMPLEX statement"); $$ = TYDCOMPLEX; }
-	| SLOGICAL	{ $$ = TYLOGICAL; }
-	| SCHARACTER	{ NO66("CHARACTER statement"); $$ = TYCHAR; }
+typename:    SINTEGER	{ $$ = lasttype = TYLONG; }
+	| SREAL		{ $$ = lasttype = tyreal; }
+	| SCOMPLEX	{ ++complex_seen; $$ = lasttype = tycomplex; }
+	| SDOUBLE	{ $$ = lasttype = TYDREAL; }
+	| SDCOMPLEX	{ ++dcomplex_seen; NOEXT("DOUBLE COMPLEX statement"); $$ = lasttype = TYDCOMPLEX; }
+	| SLOGICAL	{ $$ = lasttype = TYLOGICAL; }
+	| SCHARACTER	{ NO66("CHARACTER statement"); $$ = lasttype = TYCHAR; }
 	| SUNDEFINED	{ $$ = TYUNKNOWN; }
 	| SDIMENSION	{ $$ = TYUNKNOWN; }
 	| SAUTOMATIC	{ NOEXT("AUTOMATIC statement"); $$ = - STGAUTO; }
@@ -78,7 +78,8 @@ lengspec:
 			else switch((int)p->constblock.Const.ci) {
 				case 1:	$$ = 1; break;
 				case 2: $$ = typesize[TYSHORT];	break;
-				case 4: $$ = typesize[TYLONG];	break;
+				case 4: $$ = lasttype == TYREAL ? typesize[TYREAL] : typesize[TYLONG];
+					break;
 				case 8: $$ = typesize[TYDREAL];	break;
 				case 16: $$ = typesize[TYDCOMPLEX]; break;
 				default:

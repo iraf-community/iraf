@@ -75,11 +75,16 @@ variables in INQUIREs.  Option
 .L -I4
 confirms the default rendering of INTEGER as long int.
 .TP
+.B -I8
+Assume 8-byte integer and logical, 4-byte REAL, 8-byte double precison
+and complex, and 16-byte double complex variables.  Appropriate changes
+to f2c.h may be needed.
+.TP
 .BI -I dir
 Look for a non-absolute include file first in the directory of the
 current input file, then in directories specified by \f(CW-I\fP
 options (one directory per option).  Options
-\f(CW-I2\fP and \f(CW-I4\fP
+\f(CW-I2\fP, \f(CW-I4\fP, and \f(CW-I8\fP
 have precedence, so, e.g., a directory named \f(CW2\fP
 should be specified by \f(CW-I./2\fP .
 .TP
@@ -129,6 +134,9 @@ Do not recognize cdabs, cdcos, cdexp, cdlog, cdsin, and cdsqrt
 as synonyms for the double complex intrinsics
 zabs, zcos, zexp, zlog, zsin, and zsqrt, respectively,
 nor dreal as a synonym for dble.
+.TP
+.B -cf
+Do not report the current \f(CW.f\fP file except in error messages.
 .TP
 .BI -d dir
 Write

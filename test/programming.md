@@ -155,6 +155,30 @@ Should be zero: 0
 Should be zero: 0.
 ```
 
+## Plain FORTRAN files
+
+The xc compiler should be able to compile plain FORTRAN files (with
+FORTRAN I/O) as well. The f2c compiler used in 2.17, 2.17.1, 2.18
+cannot compile this. See [discussion
+#369](https://github.com/orgs/iraf-community/discussions/369).
+
+File: `test_io.f`
+```
+      PROGRAM TESTIO
+      OPEN (11, FILE='testio.dat')
+      WRITE (11, *) 'Hello world'
+      CLOSE (11)
+      END
+```
+
+```
+cl> softools
+cl> xc -h test_io.f
+cl> !./test_io.e
+cl> type testio.dat
+Hello world
+```
+
 ## Loop optimization
 
 This is a test for [#60](https://iraf-community.github.io/iraf-v216/issues/60).

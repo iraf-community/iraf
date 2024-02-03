@@ -70,7 +70,7 @@ to the beginning of sysdep.h (or to supply -DANSI_Libraries in the
 makefile).
 
 Alas, some systems #define __STDC__ but do not provide a true standard
-(ANSI or ISO) C environment, e.g. do not provide stdlib.h .  If yours
+(ANSI or ISO) C environment, e.g., do not provide stdlib.h .  If yours
 is such a system, then (a) you should complain loudly to your vendor
 about __STDC__ being erroneously defined, and (b) you should insert
 #undef __STDC__
@@ -175,6 +175,18 @@ File mem.c has #ifdef CRAY lines that are appropriate for machines
 with the conventional CRAY architecture, but not for "Cray" machines
 based on DEC Alpha chips, such as the T3E; on such machines, you may
 need to make a suitable adjustment, e.g., add #undef CRAY to sysdep.h.
+
+Fortran 77 assumes variables of type INTEGER and REAL occupy the same
+storage and that a DOUBLE PRECISION or COMPLEX variable occupies twice
+this storage.  The types in f2c.h need to reflect these assumptions,
+at least when EQUIVALENCE is involved.  As of 2021, most modern C and
+C++ compilers make "int" a four-byte type, i.e., (in C notation)
+sizeof(int) == 4.  Some make sizeof(long) == 4, others make
+sizeof(long) == 8.  (With the compiler originally used for f2c,
+sizeof(int) == 2 and sizeof(long) == 4.)  For compilers having
+sizeof(int) == 4 and sizeof(long) == 8, in f2c.h it suffices to change
+"long int" to "int" and is safe to change "#ifdef INTEGER_STAR_8" to
+"#if 1".
 
 
 Please send bug reports to dmg at acm.org (with " at " changed to "@").

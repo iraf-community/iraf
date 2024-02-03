@@ -27,13 +27,16 @@
 	       Option `-I4' confirms the default rendering of INTEGER
 	       as long int.
 
+	  -I8  Assume 8-byte integer and logical, 4-byte REAL, 8-byte
+	       double precison and complex, and 16-byte double complex
+	       variables.  Appropriate changes to f2c.h may be needed.
+
 	  -Idir
 	       Look for	a non-absolute include file first in the
 	       directory of the	current	input file, then in directo-
 	       ries specified by -I options (one directory per
-	       option).	 Options -I2 and -I4 have precedence, so,
-	       e.g., a directory named 2 should	be specified by	-I./2
-	       .
+	       option).	 Options -I2, -I4  and -I8 have precedence, so,
+	       e.g., a directory named 2 should	be specified by	-I./2 .
 
 	  -onetrip
 	       Compile DO loops	that are performed at least once if
@@ -54,7 +57,7 @@
 	  -A   Produce ANSI C (default,	starting 20020621).  For old-
 	       style C,	use option -K.
 
-     Page 1					     (printed 6/21/02)
+     Page 1					     (printed 1/23/24)
 
      F2C(1)		       UNIX System V			F2C(1)
 
@@ -70,6 +73,8 @@
 	       cdsqrt as synonyms for the double complex intrinsics
 	       zabs, zcos, zexp, zlog, zsin, and zsqrt,	respectively,
 	       nor dreal as a synonym for dble.
+
+	  -cf  Do not report the current .f file except in error messages.
 
 	  -ddir
 	       Write `.c' files	in directory dir instead of the	cur-
@@ -111,7 +116,7 @@
 	       rules allow rearrangement.  If the option is `-krd',
 	       use double precision temporaries	even for single-
 
-     Page 2					     (printed 6/21/02)
+     Page 2					     (printed 1/23/24)
 
      F2C(1)		       UNIX System V			F2C(1)
 
@@ -168,7 +173,7 @@
 	  -!i8 Disallow	INTEGER*8 , or,	if the option is `-!i8const',
 	       permit INTEGER*8	but do not promote integer constants
 
-     Page 3					     (printed 6/21/02)
+     Page 3					     (printed 1/23/24)
 
      F2C(1)		       UNIX System V			F2C(1)
 
@@ -218,5 +223,5 @@
 	  There	is no notation for INTEGER*8 constants.
 	  Some intrinsic functions do not yet work with	INTEGER*8 .
 
-     Page 4					     (printed 6/21/02)
+     Page 4					     (printed 1/23/24)
 

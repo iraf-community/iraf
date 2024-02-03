@@ -190,7 +190,7 @@ run_tests () {
     filename='' # File name to read in
     options=''  # Test options
     lineno=0    # line counter
-    cat "$FILE" | while read -r line ; do
+    cat "$FILE" | while IFS= read -r line ; do
 	lineno=$(( lineno + 1 ))
 	if [ "$in_code"  = 1 ] ; then
 	    if echo "$line" | grep -q '^```$' ; then
