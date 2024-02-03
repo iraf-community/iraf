@@ -15,6 +15,12 @@ spool
 spool.*
 _spool.*
 
+# Login/history files
+.*history
+.lesshst
+.viminfo
+
+
 # Object files
 *.o
 *.ko
