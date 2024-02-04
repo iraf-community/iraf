@@ -60,36 +60,28 @@
 
 #define	XPP		"xpp.e"
 #define	RPP		"rpp.e"
-#define	EDSYM		"edsym.e"
-#define	SHIMAGE		"S.e"
 #define LIBMAIN		"libmain.o"
-#define SHARELIB	"libshare.a"
-#define IRAFLIB1	"libex.a"
-#define IRAFLIB2	"libsys.a"
-#define IRAFLIB3	"libvops.a"
-#define IRAFLIB4	"libos.a"
-#define IRAFLIB5	"liblapack.a"
-#define IRAFLIB6	"libfftpack.a"
 
-char *fortlib[] = { "-lf2c",			/*  0  */
-		    "-lm",			/*  1  */
-		    "-lcurl",			/*  2  */
-		    "-lexpat",			/*  3  */
+char *iraflibs[] = { "libex.a",
+                     "liblapack.a",
+		     "libsys.a",
+		     "libvops.a",
+		     "libfftpack.a",
+		     "libos.a",
+		     NULL};
+
+char *fortlib[] = { "-lf2c",
+		    "-lm",
+		    "-lcurl",
+		    "-lexpat",
 #if (defined (__linux__) || defined (__gnu_hurd__))
-		    "-lpthread",		/*  5  */
-#else
-		    "",				/*  5  */
+		    "-lpthread",
 #endif
-		    "-lz",			/*  6  */
-		    "",				/*  7  */
-		    "",				/*  8  */
-		    "",				/*  9  */
-		    0};				/* EOF */
+		    "-lz",
+		    NULL};
 
-char *opt_flags[] = { "-O2",			/*  0  */
-		    0};				/* EOF */
-
-int  nopt_flags	   = 1;				/* No. optimizer flags */
+char *opt_flags[] = { "-O2",
+		    NULL};
 
 #define isxfile(str)	(getextn(str) == 'x')
 #define isffile(str)	(getextn(str) == 'f')
@@ -101,12 +93,6 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #define ispfile(str)	(getextn(str) == 'P')	/* func prototypes	*/
 
 
-int	usesharelib = NO;
-int	noedsym = YES;
-
-int	stripexe 	= NO;
-int	notvsym 	= NO;
-int	noshsym 	= NO;
 int	errflag 	= NO;
 int	objflags 	= NO;
 int	keepfort 	= NO;
@@ -123,7 +109,6 @@ int	hostprog 	= NO;
 int	voslibs 	= YES;
 int	nolibc 		= NO;
 int	usef2c 		= YES;
-int	useg95 		= NO;
 int	userincs	= NO;
 int	host_c_main 	= NO;
 
@@ -245,7 +230,6 @@ main (int argc, char *argv[])
 	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77")))
 	    strcpy (f77comp, s);
 	usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
-	useg95 = (strncmp (f77comp, "g95", 3) == 0 ? 1 : 0);
 	if ((s = os_getenv ("XC-LINKER")) || (s = os_getenv ("XC_LINKER")))
 	    strcpy (linker, s);
 
@@ -402,7 +386,6 @@ main (int argc, char *argv[])
 		    /* Link a host program, but include the VOS libraries.
 		     */
 		    hostprog++;
-		    noedsym++;
 		    nolibc++;
 		    break;
 
@@ -471,16 +454,16 @@ main (int argc, char *argv[])
 			    if (bp - buffer >= SZ_BUFFER)
 				fatal ("Out of buffer space for options");
 			} else if (*ip == 'z') {
-			    usesharelib = NO;
+			   // compatibility entry (usesharelib = NO:)
 			} else if (*ip == 'e') {
-			    noedsym = YES;
+			   // compatibility entry ( noedsym = YES;)
 			} else if (*ip == 't') {
-			    notvsym = YES;
+			  // compatibility entry (notvsym = YES;)
 			} else if (*ip == 'T') {
-			    noshsym = YES;
+			  // compatibility entry (noshsym = YES;)
 			} else if (*ip == 's') {
-			    stripexe = YES;
-			    goto passflag;
+			  // compatibility entry (stripexe = YES;)
+			  //   goto passflag;
 			} else if (*ip == 'N') {
 			    /* "NFS" link option.  Generate the output temp
 			     * file in /tmp during the link, then move it to
@@ -615,15 +598,14 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
 	arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
 	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	/* Add the user-defined flags last so they can override the 
@@ -660,15 +642,14 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#elif (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
 	arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
-	       arglist[nargs++] = opt_flags[i];
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
+	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	/* Add the user-defined flags last so they can override the 
@@ -708,13 +689,10 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#endif
-
 	if (optimize) {
-	    for (i=0;  i < nopt_flags;  i++)
+	    for (i=0;  opt_flags[i] != NULL;  i++) {
 	        arglist[nargs++] = opt_flags[i];
+	    }
 	}
 
 	if (! nolibc) {
@@ -763,9 +741,6 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
-#ifdef __i386__
-	arglist[nargs++] = "-m32";
-#endif
 	arglist[nargs++] = "-o";
 
 	if (link_nfs) {
@@ -814,35 +789,22 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	}
 	if (voslibs) {
-	    if (usesharelib) {
-		arglist[nargs++] = mkfname (SHARELIB);
-		arglist[nargs++] = mkfname (IRAFLIB4);
-	    } else {
-		arglist[nargs++] = mkfname (IRAFLIB1);
-		arglist[nargs++] = mkfname (IRAFLIB5);
-		arglist[nargs++] = mkfname (IRAFLIB2);
-		arglist[nargs++] = mkfname (IRAFLIB3);
-		arglist[nargs++] = mkfname (IRAFLIB6);
-		arglist[nargs++] = mkfname (IRAFLIB4);
+	    for (i=0; iraflibs[i] != NULL; i++) {
+	        arglist[nargs++] = mkfname (iraflibs[i]);
 	    }
 	}
 
 	/* Host libraries, searched after iraf libraries. */
-	for (i=0;  i < nhlibs;  i++)
+	for (i=0;  i < nhlibs;  i++) {
 	    arglist[nargs++] = hlibs[i];
+	}
 
 	/* The remaining system libraries depend upon which version of
 	 * the SunOS compiler we are using. 
 	 */
-	addflags (fortlib[0], arglist, &nargs);
-	addflags (fortlib[1], arglist, &nargs);
-	addflags (fortlib[2], arglist, &nargs);
-	addflags (fortlib[3], arglist, &nargs);
-	addflags (fortlib[4], arglist, &nargs);
-	addflags (fortlib[5], arglist, &nargs);
-	addflags (fortlib[6], arglist, &nargs);
-	addflags (fortlib[7], arglist, &nargs);
-	addflags (fortlib[8], arglist, &nargs);
+	for (i=0; fortlib[i] != NULL; i++) {
+	    addflags (fortlib[i], arglist, &nargs);
+	}
 	arglist[nargs] = NULL;
 
 	if (debug)
@@ -871,33 +833,6 @@ passflag:		    mkobject = YES;
 	}
 	errflag += status;
 
-	/* If we are linking against the iraf shared library and symbol editing
-	 * has not been disabled, edit the symbol table of the new executable
-	 * to provide symbols within the shared image.
-	 */
-	if (usesharelib && !noedsym && !stripexe) {
-	    char    shlib[SZ_PATHNAME+1];
-	    char    edsym[SZ_PATHNAME+1];
-	    char    command[SZ_CMDBUF];
-
-	    /* The os_sysfile(SHIMAGE) below assumes the existence of a file
-	     * entry "S.e" in the directory containing the real shared image
-	     * "S<n>.e".  We can't easily look directly for S<n>.e because
-	     * the process symbol table and image has to be examined to
-	     * determine the shared image version number.
-	     */
-	    if (os_sysfile (SHIMAGE, shlib, SZ_PATHNAME) > 0) {
-		if (os_sysfile (EDSYM, edsym, SZ_PATHNAME) > 0) {
-		    sprintf (command, "%s %s %s", edsym, outfile, shlib);
-		    if (noshsym)
-			strcat (command, " -T");
-		    else if (notvsym)
-			strcat (command, " -t");
-		    status = sys (command);
-		}
-	    }
-	}
-	errflag += status;
 	done (errflag);
 
 	return (0);
