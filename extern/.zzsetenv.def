@@ -1,11 +1,27 @@
-refitsutil	=/u3/iraf/iraf.v2161/extern/fitsutil/
-reguiapps	=/u3/iraf/iraf.v2161/extern/guiapps/
-remscdb	=/u3/iraf/iraf.v2161/extern/mscdb/
-remscred	=/u3/iraf/iraf.v2161/extern/mscred/
-renfextern	=/u3/iraf/iraf.v2161/extern/nfextern/
-rervsao	=/u3/iraf/iraf.v2161/extern/rvsao/
-resptable	=/u3/iraf/iraf.v2161/extern/sptable/
-restecf	=/u3/iraf/iraf.v2161/extern/stecf/
-restsdas	=/u3/iraf/iraf.v2161/extern/stsdas/
-retables	=/u3/iraf/iraf.v2161/extern/tables/
+set adccdrom	        = iraf$extern/adccdrom
+set cfh12k	        = iraf$extern/cfh12k
+set ctio	        = iraf$extern/ctio
+set deitab	        = iraf$extern/deitab
+set esowfi	        = iraf$extern/esowfi
+set finder	        = iraf$extern/finder
+set fitsutil	        = iraf$extern/fitsutil
+set gemini	        = iraf$extern/gemini
+set gmisc	        = iraf$extern/gmisc
+set guiapps	        = iraf$extern/guiapps
+set iue	                = iraf$extern/iue
+set mem0	        = iraf$extern/mem0
+set mscdb	        = iraf$extern/mscdb
+set mscred	        = iraf$extern/mscred
+set mtools	        = iraf$extern/mtools
+set nfextern	        = iraf$extern/nfextern
+set optic	        = iraf$extern/optic
+set song	        = iraf$extern/song
+set sptable	        = iraf$extern/sptable
+set sqiid	        = iraf$extern/sqiid
+set st4gem	        = iraf$extern/st4gem
+set steward	        = iraf$extern/steward
+set ucsclris	        = iraf$extern/ucsclris
+set upsqiid	        = iraf$extern/upsqiid
+set xdimsum	        = iraf$extern/xdimsum
+
 keep
