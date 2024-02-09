@@ -1106,62 +1106,61 @@ if [ "$err_seen" == 0 ]; then
 fi
 
 
-    # Create the root imdir as a public scratch directory, if not already
-    # created.
-    err_seen=0
-    if [ -d "$imdir" ]; then
-        if [ "`$LS -ld $imdir | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
-            ECHO -n 'Checking imdir permissions ...'
-            ECHO -n '                                 '
-        else
-            ECHO -n 'Setting mode for $imdir to 0777                  '
-            if [ "$exec" == "yes" ]; then
-                chmod 777 $imdir
-            fi
-        fi
+# Create the root imdir as a public scratch directory, if not already
+# created.
+err_seen=0
+if [ -d "$imdir" ]; then
+    if [ "`$LS -ld $imdir | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
+        ECHO -n 'Checking imdir permissions ...'
+        ECHO -n '                                 '
     else
-	if (( "do_system"==1 )); then
-          ECHO -n "Creating root imdir at $imdir ...                    "
-	else
-          ECHO -n 'Creating root imdir at $HOME/.iraf/imdir ...		'
-          ECHO -n '       '
-	fi
+        ECHO -n 'Setting mode for $imdir to 0777                  '
         if [ "$exec" == "yes" ]; then
-            mkdir $imdir; chmod 777 $imdir
+            chmod 777 $imdir
         fi
     fi
-    if [ "$err_seen" == 0 ]; then
-        DO_OK
-    fi
-
-
-    # Create the root cache as a public scratch directory, if not already
-    # created.
-    err_seen=0
-    if [ -d $cache ]; then
-        if [ "`$LS -ld $cache | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
-            ECHO -n 'Checking cache permissions ...'
-            ECHO -n '                                 '
-        else
-            ECHO -n 'Setting mode for $cache to 0777                  '
-            if [ "$exec" == "yes" ]; then
-                chmod 777 $cache
-            fi
-        fi
+else
+    if (( "do_system"==1 )); then
+      ECHO -n "Creating root imdir at $imdir ...                    "
     else
-	if (( "do_system"==1 )); then
-          ECHO -n "Creating root cache at $cache ...                    "
-	else
-          ECHO -n 'Creating root cache at $HOME/.iraf/cach  ...		'
-          ECHO -n '       '
-	fi
+      ECHO -n 'Creating root imdir at $HOME/.iraf/imdir ...		'
+      ECHO -n '       '
+    fi
+    if [ "$exec" == "yes" ]; then
+        mkdir $imdir; chmod 777 $imdir
+    fi
+fi
+if [ "$err_seen" == 0 ]; then
+    DO_OK
+fi
+
+# Create the root cache as a public scratch directory, if not already
+# created.
+err_seen=0
+if [ -d $cache ]; then
+    if [ "`$LS -ld $cache | grep '^.rw[xs]r.[xs]r.[xt]'`" != "" ]; then
+        ECHO -n 'Checking cache permissions ...'
+        ECHO -n '                                 '
+    else
+        ECHO -n 'Setting mode for $cache to 0777                  '
         if [ "$exec" == "yes" ]; then
-            mkdir $cache; chmod 777 $cache
+            chmod 777 $cache
         fi
     fi
-    if [ "$err_seen" == 0 ]; then
-        DO_OK
+else
+    if (( "do_system"==1 )); then
+      ECHO -n "Creating root cache at $cache ...                    "
+    else
+      ECHO -n 'Creating root cache at $HOME/.iraf/cach  ...		'
+      ECHO -n '       '
     fi
+    if [ "$exec" == "yes" ]; then
+        mkdir $cache; chmod 777 $cache
+    fi
+fi
+if [ "$err_seen" == 0 ]; then
+    DO_OK
+fi
 
 if (( "do_system"==1 )); then
     # Allow deletion of files in /tmp - needed for multiuser tape allocation.
