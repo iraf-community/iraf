@@ -857,8 +857,7 @@ done
 #       3) Creating the system command links
 #       4) Creating the image directory (imdir)
 #       5) Creating the cache directory (cache)
-#       6) Tape setup (modes on alloc.e and /dev tape devices)
-#       7) Graphics/Display file installation/setup
+#       6) Graphics/Display file installation/setup
 
 
 #=============================================================================
