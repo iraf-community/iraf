@@ -1500,7 +1500,7 @@ if [ "$do_system" == 0 ]; then
 
   # Add the setup to the user's login files.
   cfiles=("$HOME/.cshrc $HOME/.tcshrc $HOME/.login")
-  bfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
+  bfiles=("$HOME/.profile")
 
   if [ ! -e $HOME/.cshrc ]; then
       touch $HOME/.cshrc
