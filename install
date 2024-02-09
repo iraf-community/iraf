@@ -1162,16 +1162,6 @@ if [ "$err_seen" == 0 ]; then
     DO_OK
 fi
 
-if (( "do_system"==1 )); then
-    # Allow deletion of files in /tmp - needed for multiuser tape allocation.
-    ECHO -n "Reset /tmp sticky bit setting ...                              "
-    if [ "$exec" == "yes" ]; then
-        chmod -t /tmp
-    fi
-    DO_OK
-fi
-
-
 
 NEWLINE
 BOLD_ON
