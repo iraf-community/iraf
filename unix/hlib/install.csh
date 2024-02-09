@@ -1949,53 +1949,6 @@ endif
 
 
 
-# Allow deletion of files in /tmp - needed for multiuser tape allocation.
-echo -n "Reset /tmp sticky bit setting ...				"
-if ($exec == yes) then
-    chmod -t /tmp
-endif
-DO_OK
-
-# Initialize permissions of tape devices.
-if ($do_tapes) then
-echo -n "Setting tape device permissions ...				"
-    if ($exec == yes) then
-        chmod 666 $TAPES >& /dev/null
-	chown root $TAPES >& /dev/null
-    endif
-    DO_OK
-endif
-
-
-
-# Set owner=root for the device allocation task, alloc.e.
-
-echo -n "Checking alloc.e permissions ...				"
-
-set err_seen = 0
-foreach i ($BINDIRS)
-    if (-e $i/alloc.e) then
-	if ("`$LS -l $i/alloc.e | grep 'rwsr-.*root'`" == "") then
-	    if ($exec == yes) then
-		chown 0 $i/alloc.e
-		chmod u+s $i/alloc.e
-	    endif
-	endif
-	break
-    else
-	if ("$err_seen" == 0) then
-	    DO_FAIL
-	    set err_seen = 1
-            set err_count = `expr $err_count + 1`
-	endif
-	MSG  "Cannot find alloc.e executable."
-    endif
-end
-if ("$err_seen" == 0) then
-    DO_OK
-endif
-
-
 # Target for no-edit install.
 end_no_edit:
 
