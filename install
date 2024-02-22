@@ -1003,15 +1003,6 @@ for file in ${pfiles[@]}; do
             fi
             RM $TEMP >& /dev/null
 	fi
-    else
-        if (( "$err_seen"==0 )); then
-            DO_FAIL
-            err_seen=1
-            err_count=$(( err_count+1 ))
-        fi
-        MSG  "Cannot find the iraf $file file"
-        RM $TEMP >& /dev/null
-    fi
 done
 if (( "$err_seen"==0 )); then
     DO_OK
