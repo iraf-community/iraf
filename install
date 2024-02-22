@@ -986,10 +986,10 @@ if (( $do_system==0 )); then
   pfiles=("$iraf/local/.cshrc $iraf/local/.login")
 else
   ECHO -n "Editing the user .login/.cshrc paths ...                       "
-  if [ "$SHELL" == "/bin/csh" ]; then
-   pfiles=("$HOME/.cshrc $HOME/.login")
+  if [ "$SHELL" == "/bin/csh" -o "$SHELL" == "/bin/tcsh" ]; then
+   pfiles=("$HOME/.cshrc)
   else
-   pfiles=("$HOME/.bashrc $HOME/.profile $HOME/.bash_profile $HOME/.bash_login")
+   pfiles=("$HOME/.bashrc $HOME/.profile)
   fi
 fi
 for file in ${pfiles[@]}; do
