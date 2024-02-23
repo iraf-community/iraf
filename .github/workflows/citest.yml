@@ -42,10 +42,10 @@ jobs:
           if [ ${LDFLAGS} == '-m32' ] ; then
             sudo dpkg --add-architecture i386
             sudo apt-get update -y
-            sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
+            sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libedit-dev:i386 zlib1g-dev:i386
           else
             sudo apt-get update -y
-            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
+            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libedit-dev zlib1g-dev
           fi
 
       - name: Build IRAF
