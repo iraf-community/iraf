@@ -34,7 +34,7 @@ update:
 
 
 libtbtables.a:
-	$set XFLAGS 	= "-Inolibc $(XFLAGS)"
+	$set XFLAGS 	= "-Inolibc -I$(iraf)include $(XFLAGS)"
 
 	tbagt.x		<mach.h> <tbset.h> tbtables.h
 	tbapt.x		<tbset.h> tbtables.h
@@ -235,7 +235,13 @@ libtbtables.a:
 	tbnparse.x	<ctype.h> <ctotok.h> <tbset.h>
 	@selector
 
-	$echo "NOTE:  SPP FITSIO will be used for FITS tables."
-	tbfhp_f.x	<tbset.h> tbtables.h tblfits.h
-	@fitsio
+        $ifdef (SPPFITSIO)
+            $echo "NOTE:  SPP FITSIO will be used for FITS tables."
+            tbfhp_f.x   <tbset.h> tbtables.h tblfits.h
+            @fitsio
+        $else
+            $echo "NOTE:  CFITSIO will be used for FITS tables."
+            tbfxff.c    fitsio_spp.h underscore.h
+            tbfhp.x     <tbset.h> tbtables.h tblfits.h
+        $endif
 	;
