@@ -21,6 +21,8 @@ relink:
 	;
 
 install:
+	@nttools
+
 	$move	xx_utilities.e bin$x_utilities.e
 	;
 
