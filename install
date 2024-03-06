@@ -1003,7 +1003,9 @@ for file in ${pfiles[@]}; do
             fi
             RM $TEMP >& /dev/null
 	fi
+    fi
 done
+
 if (( "$err_seen"==0 )); then
     DO_OK
 fi
