@@ -45,8 +45,11 @@ while (fscan (list, s1) != EOF) {
     printf ("task  %s.pkg = %s$%s.cl\nkeep\n", s1, s1, s1)              | cl ()
 
     # Add to the helpdb string.
-    printf ("reset helpdb=%s,%s$lib/helpdb.mip\nkeep\n", 
-	envget("helpdb"), s1) 						| cl ()
+    if (access (s1//"/"//"lib/helpdb.mip") == yes) {
+        printf ("reset helpdb=%s,%s$lib/helpdb.mip\nkeep\n", 
+	    envget("helpdb"), s1) 					| cl ()
+    }
+    ;
   }
   ;
 }
