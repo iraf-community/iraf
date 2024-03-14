@@ -15,7 +15,7 @@ LS() {
 } ; export LS
 
 
-export IRAF_VERSION="V2.18"
+export IRAF_VERSION="V2.18.1"
 export V=`/bin/echo $IRAF_VERSION | cut -c2-5`
 
 export hilite=1

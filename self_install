@@ -10,8 +10,8 @@
 #
 #  The command used to generate the self-extracting script was of the form:
 #
-#    % makeself.sh --base64 --notemp /<path>/iraf-v2.18/. \
-#       iraf-v218-linux32.sh "NOIRLab IRAF v2.18 for 32-bit Linux" \
+#    % makeself.sh --base64 --notemp /<path>/iraf-v2.18.1/. \
+#       iraf-v2181-linux32.sh "NOIRLab IRAF v2.18.1 for 32-bit Linux" \
 #       ./self_install
 #
 
@@ -22,7 +22,7 @@ if [ -d bin.linux ]; then
 else
     export IRAFARCH=linux64
 fi
-export VERSION="v2.18"
+export VERSION="v2.18.1"
 
 # Run the IRAF install script, accepting all default prompts.
 ./install \

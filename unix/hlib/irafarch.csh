@@ -40,7 +40,7 @@ endif
 # START OF MACHDEP DEFINITIONS.
 ##############################################################################
 
-set VERSION		= "V2.18"
+set VERSION		= "V2.18.1"
 set hmach 		= "INDEF"
 set nbits 		= 64
 set pipes 		= 1

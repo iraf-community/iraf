@@ -1,6 +1,6 @@
 
-       NOIRLab IRAF Revision 2.18EXPORT Sun Jan  7 19:00:00 MST 2024
-      This is the EXPORT version of IRAF V2.18 supporting PC systems.
+       NOIRLab IRAF Revision 2.18.1DEV Wed Mar 13 20:08:58 MST 2024
+      This is the EXPORT version of IRAF V2.18.1 supporting PC systems.
 
   Welcome to IRAF.  To list the available commands, type ? or ??.  To get
   detailed information about a command, type `help <command>'.  To run  a

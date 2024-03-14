@@ -57,7 +57,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.18"
+set VERSION		= "V2.18.1"
 set V 			= `echo $VERSION | cut -c2-5`
 set hmach 		= "INDEF"
 set shlib 		= "no"
