@@ -132,6 +132,15 @@
 #define MACHINE PC64BIT
 #define LONGSIZE 64   
 
+#elif (defined(__arm64__) && defined(__APPLE__))
+
+/* This assumes all ARM are little endian.  In the future, it might be  */
+/* necessary to use  "if defined(__ARMEL__)"  to distinguish little from big. */
+/* (__ARMEL__ would be defined on little-endian, but not on big-endian). */
+
+#define MACHINE NATIVE
+#define BYTESWAPPED TRUE
+
 #else
 
 /*  assume machine uses the same IEEE formats as used in FITS files */
