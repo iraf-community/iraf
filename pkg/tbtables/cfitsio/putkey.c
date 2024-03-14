@@ -2267,7 +2267,7 @@ int ffphbn(fitsfile *fptr,  /* I - FITS file pointer                        */
         ffupch(tfmt);
 
         ffkeyn("TFORM", ii + 1, name, status);
-        strcpy(comm, "data format of field");
+        strcpy(comm, "data format of the field");
 
         ffbnfm(tfmt, &datatype, &repeat, &width, status);
 
