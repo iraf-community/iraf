@@ -84,7 +84,7 @@ core: host vendor
 	$(MKPKG)
 
 # Build the NOAO package.
-noao: host core
+noao: host core vendor
 	cd $(noao) && $(MKPKG) -p noao
 
 # Run the test suite.

@@ -23,7 +23,7 @@ install:
 	;
 
 trelink:
-	$set LIBS = "-lds -lncar -lgks -lxtools -ltbtables"
+	$set LIBS = "-lds -lncar -lgks -lxtools -ltbtables -lcfitsio"
 	$set XFLAGS = "$(XFLAGS) $(XF)"
 	$set LFLAGS = "$(LFLAGS) $(LF)"
 	$update libpkg.a
