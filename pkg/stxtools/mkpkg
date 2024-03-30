@@ -5,13 +5,14 @@
 # Modified to include word.x and vex*.x : B.Simon 21-May-1990
 # Modified to include copyimg.x: B.Simon 02-Mar-1992
 
-$checkout libpkg.a ../
-$update   libpkg.a
-$checkin  libpkg.a ../
-$exit
+update:
+        $checkout libstxtools.a lib$
+        $update   libstxtools.a
+        $checkin  libstxtools.a lib$
+        $purge    lib$
+        ;
 
-
-libpkg.a:
+libstxtools.a:
 	@od
 	@sp_util
 	@wcslab
