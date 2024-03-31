@@ -66,16 +66,21 @@ irafpath (char *fname)
 	if (x_status <= 0)
 	    return (fname);
 
-	/* Look first in HBIN.
-	 * Use IRAFARCH if defined.
-	 */
-	strcpy (pathname, (char *)hostdir);
-	strcat (pathname, "bin");
-	if ( (irafarch = getenv("IRAFARCH")) ) {
-	    strcat (pathname, ".");
-	    strcat (pathname, irafarch);
+	/* Look first in HBIN. Use IRAFARCH if defined. */
+	if ( (irafarch = getenv("IRAFARCH"))
+	     && (strlen(irafarch) > 0) ) {
+	  strcpy (pathname, (char *)hostdir);
+	  strcat (pathname, "bin.");
+	  strcat (pathname, irafarch);
+	  strcat (pathname, "/");
+	  strcat (pathname, fname);
+	  if (access (pathname, 0) == 0)
+	    return (pathname);
 	}
-	strcat (pathname, "/");
+
+	/* Look in HBIN. */
+	strcpy (pathname, (char *)hostdir);
+	strcat (pathname, "bin/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)
 	    return (pathname);
@@ -88,13 +93,20 @@ irafpath (char *fname)
 	    return (pathname);
 
 	/* Try BIN - use IRAFARCH if defined. */
-	strcpy (pathname, (char *)irafdir);
-	strcat (pathname, "bin");
-	if ( (irafarch = getenv("IRAFARCH")) ) {
-	    strcat (pathname, ".");
-	    strcat (pathname, irafarch);
+	if ( (irafarch = getenv("IRAFARCH"))
+	     && (strlen(irafarch) > 0) ) {
+	  strcpy (pathname, (char *)irafdir);
+	  strcat (pathname, "bin.");
+	  strcat (pathname, irafarch);
+	  strcat (pathname, "/");
+	  strcat (pathname, fname);
+	  if (access (pathname, 0) == 0)
+	    return (pathname);
 	}
-	strcat (pathname, "/");
+
+	/* Try BIN. */
+	strcpy (pathname, (char *)irafdir);
+	strcat (pathname, "bin/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)
 	    return (pathname);
