@@ -1,4 +1,4 @@
-# IRAF Release 2.17.1
+# IRAF Release 2.18
 
 [![IRAF CI test](https://github.com/iraf-community/iraf/workflows/IRAF%20CI%20test/badge.svg)](https://github.com/olebole/iraf/actions?query=workflow%3A%22IRAF+CI+test%22)
 [![GitHub release](https://img.shields.io/github/release/iraf-community/iraf.svg)](https://github.com/iraf-community/iraf/releases/latest)

@@ -2,7 +2,7 @@
 
 ## Distribution Files
 
-IRAF v2.17.1 is available from github at
+IRAF v2.18 is available from github at
 
 https://github.com/iraf-community/iraf/releases/latest/
 
@@ -36,8 +36,8 @@ The source distribution file is built as a tarball with the package
 name and version as base directory. Thus, distribution files can be
 unpacked with the command
 
-	$ tar zxf /<path>/iraf-2.17.1.tar.gz
-	$ cd iraf-2.17.1/
+	$ tar zxf /<path>/iraf-2.18.tar.gz
+	$ cd iraf-2.18/
 
 
 ## Build from Sources
