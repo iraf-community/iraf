@@ -14,8 +14,10 @@ To keep the software away from bitrotting, and to fix bugs that are in
 the package despite (or because) of its age, the iraf-community works
 on integrating the available patches into the IRAF source code.
 
-For installation instructions see the file [`INSTALL.md`](INSTALL.md)
-in this directory.
+For instructions to install from source see the file
+[`INSTALL.md`](INSTALL.md) in this directory. Installation
+instructions for binary packages on Linux or macOS can be found on the
+[Installation web page](https://iraf-community.github.io/install.html).
 
 
 ## Contributing Code, Documentation, or Feedback

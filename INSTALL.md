@@ -1,12 +1,5 @@
 # Installation Instructions
 
-## Distribution Files
-
-IRAF v2.18 is available from github at
-
-https://github.com/iraf-community/iraf/releases/latest/
-
-
 ## System Requirements and Dependencies
 
 The distributed binaries require the readline or libedit, curl, expat,
@@ -22,7 +15,7 @@ On Fedora and its derivatives (Redhat, Scientific Linux etc.)
 	$ sudo dnf install gcc make perl flex bison zlib-devel
 	$ sudo dnf install libcurl-devel expat-devel readline-devel
 
-On MacOS X, you need to have the XCode tools installed. If you
+On macOS, you need to have the XCode tools installed. If you
 haven't, you can install them with:
 
 	$ xcode-select --install
@@ -30,7 +23,11 @@ haven't, you can install them with:
 Click "Install" to download and install Xcode Command Line Tools.
 
 
-## Unpack the IRAF Distribution
+## Download and Unpack the IRAF Distribution
+
+IRAF v2.18 is available from Github at
+
+https://github.com/iraf-community/iraf/archive/refs/tags/v2.18.tar.gz
 
 The source distribution file is built as a tarball with the package
 name and version as base directory. Thus, distribution files can be
@@ -39,6 +36,8 @@ unpacked with the command
 	$ tar zxf /<path>/iraf-2.18.tar.gz
 	$ cd iraf-2.18/
 
+Alternatively, the development version can be always retrieved from
+the [Github repository](https://github.com/iraf-community/iraf).
 
 ## Build from Sources
 
