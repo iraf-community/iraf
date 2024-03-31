@@ -12,8 +12,7 @@ of problems, including major license issues and security bugs.
 
 To keep the software away from bitrotting, and to fix bugs that are in
 the package despite (or because) of its age, the iraf-community works
-on integrating the available patches into the IRAF source code. See
-[`RELEASE.md`](RELEASE.md) for the release notes.
+on integrating the available patches into the IRAF source code.
 
 For installation instructions see the file [`INSTALL.md`](INSTALL.md)
 in this directory.
