@@ -6,7 +6,7 @@ IRAF 2.17.1 Release notes
 
 The current IRAF version 2.17.1 is available from github at
 
-https://github.com/iraf-community/iraf/releases/latest/
+https://github.com/iraf-community/iraf/releases/tag/v2.17.1
 
 Changes to the NOAO 2.16.1 sources include:
 
