@@ -1,11 +1,11 @@
 # Make the wcslab package
 
-$checkout libpkg.a ../
-$update   libpkg.a
-$checkin  libpkg.a ../
+$checkout libstxtools.a ../
+$update   libstxtools.a
+$checkin  libstxtools.a ../
 $exit
 
-libpkg.a:
+libstxtools.a:
 	spchag.x
 	spdise.x
 	spmapt.x	<gset.h>

@@ -1,9 +1,9 @@
-$checkout libpkg.a ../
-$update   libpkg.a
-$checkin  libpkg.a ../
+$checkout libstxtools.a ../
+$update   libstxtools.a
+$checkin  libstxtools.a ../
 $exit
 
-libpkg.a:
+libstxtools.a:
         odget.x         "od.h"
         odmap.x         <error.h> <imhdr.h> <imio.h> <tbset.h> "od.h"
         odopep.x        "od.h"
