@@ -241,8 +241,10 @@ libtbtables.a:
             @fitsio
         $else
             $echo "NOTE:  CFITSIO will be used for FITS tables."
-            tbfxff.c    cfitsio/fitsio.h fitsio_spp.h underscore.h
             tbfhp.x     <tbset.h> tbtables.h tblfits.h
-            @cfitsio
+            !(cd $(iraf)/vendor/cfitsio && mkpkg tb_update)
+
+	    $set XFLAGS 	= "-I$(iraf)/vendor $(XFLAGS)"
+            tbfxff.c    cfitsio/fitsio.h fitsio_spp.h underscore.h
         $endif
 	;
