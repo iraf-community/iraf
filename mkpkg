@@ -16,6 +16,7 @@ mkall:
 	$echo "+"
 	$call syslibs
 	$call mathlibs
+	$call vendor
 	$ifeq (USE_SHLIB, yes) $call shlib $endif
 	# (fall through)
 relink:
@@ -42,6 +43,13 @@ sysexe:
 	$echo "====================== SYSEXE ==========================="
 	$echo "+" $echo "+"
 	$call update@sys
+	$echo "+" $echo "+"
+	;
+
+vendor:
+	$echo "====================== VENDOR ==========================="
+	$echo "+" $echo "+"
+	$call update@vendor
 	$echo "+" $echo "+"
 	;
 

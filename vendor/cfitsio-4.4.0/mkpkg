@@ -1,0 +1,142 @@
+# CFITSIO -- Update the CFITSIO library.
+
+$call update
+$exit
+
+update:
+	# cheat and use Makefile....
+	!(CFLAGS='$(HSI_CF) $(HSI_LF)'; ./configure --libdir=$(iraf)/vendor/cfitsio/bin/)
+	!make
+	!make fpack funpack
+	!make install
+	!make clean
+        !rm Makefile cfitsio.pc config.log config.status
+	;
+
+tb_update:
+        $checkout libtbtables.a iraf$pkg/tbtables
+        $update   libtbtables.a
+        $checkin  libtbtables.a iraf$pkg/tbtables
+        $purge    lib$
+        ;
+
+libtbtables.a:
+	$set XFLAGS = "-Inolibc $(XFLAGS)"
+	buffers.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	cfileio.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	checksum.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	compress.c
+	drvrfile.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	drvrmem.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	drvrnet.c	fitsio2.h
+	editcol.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	edithdu.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	eval_f.c	eval_defs.h fitsio2.h fitsio.h longnam.h drvrsmem.h \
+				eval_tab.h region.h
+	eval_l.c	eval_defs.h fitsio2.h fitsio.h longnam.h drvrsmem.h \
+				eval_tab.h
+	eval_y.c	eval_defs.h fitsio2.h fitsio.h longnam.h drvrsmem.h \
+				region.h
+	fitscore.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	fits_hcompress.c	fitsio2.h
+	fits_hdecompress.c	fitsio2.h
+	getcol.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcolb.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcold.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcole.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcoli.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcolj.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcolk.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcoll.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcols.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcolsb.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcolui.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcoluj.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getcoluk.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	getkey.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	group.c		fitsio2.h fitsio.h longnam.h drvrsmem.h group.h
+	grparser.c	fitsio.h longnam.h grparser.h
+	histo.c		fitsio2.h fitsio.h longnam.h drvrsmem.h
+	imcompress.c	fitsio2.h fitsio.h longnam.h
+	iraffits.c	
+	modkey.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	pliocomp.c
+	putcol.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolb.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcold.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcole.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcoli.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolj.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolk.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcoll.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcols.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolsb.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolu.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcolui.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcoluj.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putcoluk.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	putkey.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	quantize.c	fitsio2.h fitsio.h longnam.h
+	region.c	fitsio2.h fitsio.h longnam.h drvrsmem.h region.h
+	ricecomp.c	fitsio2.h fitsio.h longnam.h
+	scalnull.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	simplerng.c
+	swapproc.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	wcsutil.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	wcssub.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
+	zuncompress.c
+	;
+
+
+# IRAF multiple architecture support.
+# ----------------------------------------
+
+arch:					# show current float option
+showfloat:
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+generic:				# generic installation (no bin)
+	$ifnfile (bin.generic)
+	    !mkdir bin.generic
+	$endif
+	$verbose off
+	$set DIRS = "."
+	!$(hlib)/mkfloat.csh generic -d $(DIRS)
+	;
+linux:                                  # install Slackwkare Linux binaries
+	$ifnfile (bin.linux)
+	    !mkdir bin.linux
+	$endif
+        $verbose off
+        $set DIRS = "."
+        !$(hlib)/mkfloat.csh linux -d $(DIRS)
+        ;
+linux64:                                # install x86_64 binaries
+	$ifnfile (bin.linux64)
+	    !mkdir bin.linux64
+	$endif
+        $verbose off
+        $set DIRS = "."
+        !$(hlib)/mkfloat.csh linux64 -d $(DIRS)
+        ;
+macosx:                                 # install Mac OS X (Apple) binaries
+macos64:                                # install Mac OS X alt binaries
+	$ifnfile (bin.macosx)
+	    !mkdir bin.macosx
+	$endif
+        $verbose off
+        $set DIRS = "."
+        !$(hlib)/mkfloat.csh macosx -d $(DIRS)
+	$ifnfile (bin.macos64)
+            !ln -s bin.macosx bin.macos64
+	$endif
+        ;
+macintel:                               # install Mac OS X (Intel) binaries
+	$ifnfile (bin.macintel)
+	    !mkdir bin.macintel
+	$endif
+        $verbose off
+        $set DIRS = "."
+        !$(hlib)/mkfloat.csh macintel -d $(DIRS)
+        ;

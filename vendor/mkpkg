@@ -1,0 +1,12 @@
+# Make the system vendor libs.
+
+$call update
+$echo "-------------- (done) ----------------"
+$exit
+
+
+update:	
+	$echo "-------------- CFITSIO ----------------"
+	@cfitsio
+	;
+

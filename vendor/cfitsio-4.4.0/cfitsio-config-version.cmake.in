@@ -1,0 +1,20 @@
+set(PACKAGE_VERSION "@CFITSIO_VERSION@")
+
+# Check whether the requested PACKAGE_FIND_VERSION is compatible
+if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
+  set(PACKAGE_VERSION_COMPATIBLE FALSE)
+else()
+  set(PACKAGE_VERSION_COMPATIBLE TRUE)
+  if ("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
+    set(PACKAGE_VERSION_EXACT TRUE)
+  endif()
+endif()
+
+# alternate:
+#set(PACKAGE_VERSION "@version@")
+#if(NOT "${PACKAGE_FIND_VERSION}" VERSION_GREATER "@version@")
+#  set(PACKAGE_VERSION_COMPATIBLE 1) # compatible with older
+#  if("${PACKAGE_FIND_VERSION}" VERSION_EQUAL "@version@")
+#    set(PACKAGE_VERSION_EXACT 1) # exact match for this version
+#  endif()
+#endif()
