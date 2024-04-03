@@ -3,11 +3,19 @@
 include	<math.h>
 include	<mach.h>
 
+
+#############################################################################
+#  This code was copied/derived from the 'iraf-community' repository to
+#  address known licensing issues with Numerical Recipes code.
+#
+#  Source Repository:   https://github.com/iraf-community/iraf
+#  Author:              Ole Streicher
+#############################################################################
+
+
 # POIDEV -- Returns Poisson deviates for a given mean.
 # GASDEV -- Return a normally distributed deviate of zero mean and unit var.
-# MR_SOLVE -- Levenberg-Marquardt nonlinear chi square minimization.
-#     MR_EVAL -- Evaluate curvature matrix.
-#     MR_INVERT -- Solve a set of linear equations using Householder transforms.
+# MKSIGMA -- Random number with specified sigma distribution.
 # TWOFFT -- Returns the complex FFTs of two input real arrays.
 # REALFT -- Calculates the FFT of a set of 2N real valued data points.
 
@@ -98,171 +106,38 @@ begin
 end
 
 
-# MR_SOLVE -- Levenberg-Marquardt nonlinear chi square minimization.
+# MKSIGMA -- A sequence of random numbers of the specified sigma and
+# starting seed is generated.
 #
-# Use the Levenberg-Marquardt method to minimize the chi squared of a set
-# of paraemters.  The parameters being fit are indexed by the flag array.
-# To initialize the Marquardt parameter, MR, is less than zero.  After that
-# the parameter is adjusted as needed.  To finish set the parameter to zero
-# to free memory.  This procedure requires a subroutine, DERIVS, which
-# takes the derivatives of the function being fit with respect to the
-# parameters.  There is no limitation on the number of parameters or
-# data points.  For a description of the method see NUMERICAL RECIPES
-# by Press, Flannery, Teukolsky, and Vetterling, p523.
-#
-# These routines have their origin in Numerical Recipes, MRQMIN, MRQCOF,
-# but have been completely redesigned.
+# Copyright(c) 2017 Anastasia Galkin
+# Reference: G. E. P. Box and Mervin E. Muller, A Note on the Generation of
+#            Random Normal Deviates, The Annals of Mathematical Statistics
+#            (1958), Vol. 29, No. 2 pp. 610–611
 
-procedure mr_solve (x, y, npts, params, flags, np, nfit, mr, chisq)
+procedure mksigma (sigma, seed, rannums, nnums)
 
-real	x[npts]			# X data array
-real	y[npts]			# Y data array
-int	npts			# Number of data points
-real	params[np]		# Parameter array
-int	flags[np]		# Flag array indexing parameters to fit
-int	np			# Number of parameters
-int	nfit			# Number of parameters to fit
-real	mr			# MR parameter
-real	chisq			# Chi square of fit
+real	sigma		# Sigma for random numbers
+long	seed		# Seed for random numbers
+real	rannums[nnums]	# Random numbers
+int	nnums		# Number of random numbers
 
 int	i
-real	chisq1
-pointer	new, a1, a2, delta1, delta2
-
-errchk	mr_invert
+real	v1, v2, u1, u2, urand(), sqrt()
 
 begin
-	# Allocate memory and initialize.
-	if (mr < 0.) {
-	    call mfree (new, TY_REAL)
-	    call mfree (a1, TY_REAL)
-	    call mfree (a2, TY_REAL)
-	    call mfree (delta1, TY_REAL)
-	    call mfree (delta2, TY_REAL)
-
-	    call malloc (new, np, TY_REAL)
-	    call malloc (a1, nfit*nfit, TY_REAL)
-	    call malloc (a2, nfit*nfit, TY_REAL)
-	    call malloc (delta1, nfit, TY_REAL)
-	    call malloc (delta2, nfit, TY_REAL)
-
-	    call amovr (params, Memr[new], np)
-	    call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a2],
-	        Memr[delta2], nfit, chisq)
-	    mr = 0.001
-	}
-
-	# Restore last good fit and apply the Marquardt parameter.
-	call amovr (Memr[a2], Memr[a1], nfit * nfit)
-	call amovr (Memr[delta2], Memr[delta1], nfit)
-	do i = 1, nfit
-	    Memr[a1+(i-1)*(nfit+1)] = Memr[a2+(i-1)*(nfit+1)] * (1. + mr)
-
-	# Matrix solution.
-	call mr_invert (Memr[a1], Memr[delta1], nfit)
-
-	# Compute the new values and curvature matrix.
-	do i = 1, nfit
-	    Memr[new+flags[i]-1] = params[flags[i]] + Memr[delta1+i-1]
-	call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a1],
-	    Memr[delta1], nfit, chisq1)
-
-	# Check if chisq has improved.
-	if (chisq1 < chisq) {
-	    mr = 0.1 * mr
-	    chisq = chisq1
-	    call amovr (Memr[a1], Memr[a2], nfit * nfit)
-	    call amovr (Memr[delta1], Memr[delta2], nfit)
-	    call amovr (Memr[new], params, np)
-	} else
-	    mr = 10. * mr
-
-	if (mr == 0.) {
-	    call mfree (new, TY_REAL)
-	    call mfree (a1,  TY_REAL)
-	    call mfree (a2,  TY_REAL)
-	    call mfree (delta1, TY_REAL)
-	    call mfree (delta2, TY_REAL)
-	}
-end
-
-
-# MR_EVAL -- Evaluate curvature matrix.  This calls procedure DERIVS.
-
-procedure mr_eval (x, y, npts, params, flags, np, a, delta, nfit, chisq)
-
-real	x[npts]			# X data array
-real	y[npts]			# Y data array
-int	npts			# Number of data points
-real	params[np]		# Parameter array
-int	flags[np]		# Flag array indexing parameters to fit
-int	np			# Number of parameters
-real	a[nfit,nfit]		# Curvature matrix
-real	delta[nfit]		# Delta array
-int	nfit			# Number of parameters to fit
-real	chisq			# Chi square of fit
-
-int	i, j, k
-real	ymod, dy, dydpj, dydpk
-pointer	sp, dydp
-
-begin
-	call smark (sp)
-	call salloc (dydp, np, TY_REAL)
-
-	do j = 1, nfit {
-	   do k = 1, j
-	       a[j,k] = 0.
-	    delta[j] = 0.
-	}
-
-	chisq = 0.
-	do i = 1, npts {
-	    call derivs (x[i], params, ymod, Memr[dydp], np)
-	    dy = y[i] - ymod
-	    do j = 1, nfit {
-		dydpj = Memr[dydp+flags[j]-1]
-		delta[j] = delta[j] + dy * dydpj
-		do k = 1, j {
-		    dydpk = Memr[dydp+flags[k]-1]
-		    a[j,k] = a[j,k] + dydpj * dydpk
-		}
+	if (sigma > 0.) {
+	    for (i=1; i<=nnums; i=i+1) {
+	        u1 = 1. - urand (seed)
+ 	        u2 = urand (seed)
+		v1 = sqrt(-2 * log(u1)) * cos(2*PI*u2)
+		rannums[i] = v1 * sigma
+		if (i == nnums)
+		    break
+		v2 = sqrt(-2 * log(u1)) * sin(2*PI*u2)
+		i = i + 1
+		rannums[i] = v2 * sigma
 	    }
-	    chisq = chisq + dy * dy
 	}
-
-	do j = 2, nfit
-	    do k = 1, j-1
-		a[k,j] = a[j,k]
-
-	call sfree (sp)
-end
-	    
-
-# MR_INVERT -- Solve a set of linear equations using Householder transforms.
-# This calls a routine published in in "Solving Least Squares Problems",
-# by Charles L. Lawson and Richard J. Hanson, Prentice Hall, 1974.
-
-procedure mr_invert (a, b, n)
-
-real	a[n,n]		# Input matrix and returned inverse
-real	b[n]		# Input RHS vector and returned solution
-int	n		# Dimension of input matrices
-
-int	krank
-real	rnorm
-pointer	sp, h, g, ip
-
-begin
-	call smark (sp)
-	call salloc (h, n, TY_REAL)
-	call salloc (g, n, TY_REAL)
-	call salloc (ip, n, TY_INT)
-
-	call hfti (a, n, n, n, b, n, 1, 0.001, krank, rnorm,
-	    Memr[h], Memr[g], Memi[ip])
-
-	call sfree (sp)
 end
 
 
@@ -381,6 +256,32 @@ begin
 	call sgetrf(n, n, a, np, indx, istat)
 end
 
+# ludcmd -- lower-upper decomposition
+# Double-precision version of LUDCMP
+#
+# This routine decomposes a matrix (in-place) into lower and upper
+# triangular portions.  Use lubksd to obtain a solution to A * X = B
+# or to compute the inverse of the matrix A.
+# If the matrix is singular, ISTAT is set to one.
+#
+# This routine simply calls the LU decomposition routine provided by LAPACK.
+
+procedure ludcmd (a, n, np, indx, d, istat)
+
+double  a[np,np]        # io: input a, output decomposed a
+int     n               # i: logical size of a is n x n
+int     np              # i: space allocated for a
+int     indx[n]         # o: index to be used by xt_lubksb
+double  d               # o: +1 or -1
+int     istat           # o: OK if no problem; 1 if matrix is singular
+
+begin
+        d = 1.0
+        call dgetrf(n, n, a, np, indx, istat)
+        if (istat > 0)
+           istat = 1
+end
+
 
 # Solves the set of N linear equations AX = B.  Here A is input, not
 # as the matrix of A but rather as its LU decomposition, determined by
@@ -406,6 +307,35 @@ int	status
 
 begin
 	call sgetrs('N', n, 1, a, np, indx, b, n, status)
+end
+
+
+# Double-precision version of LUBKSB.
+#
+# Solves the set of N linear equations AX = B.  Here A is input, not
+# as the matrix of A but rather as its LU decomposition, determined by
+# the routine LUDCMP.  INDX is input as the permuation vector returned
+# by LUDCMP.  B is input as the right-hand side vector B, and returns
+# with the solution vector X.  A, N, NP and INDX are not modified by
+# this routine and can be left in place for successive calls with
+# different right-hand sides B.  This routine takes into account the
+# possiblity that B will begin with many zero elements, so it is
+# efficient for use in matrix inversion.
+#
+# This routine simply calls the LU decomposition routine provided by LAPACK.
+
+procedure lubksd (a, n, np, indx, b)
+
+double	a[np,np]
+int	n
+int	np
+int	indx[n]
+double	b[n]
+
+int	status
+
+begin
+	call dgetrs('N', n, 1, a, np, indx, b, n, status)
 end
 
 
@@ -444,4 +374,3 @@ begin
 
 	call mfree (y, TY_REAL)
 end
-################################################################################
