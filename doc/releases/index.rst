@@ -12,3 +12,4 @@ IRAF Release Notes
     v215revs
     v216revs
     v217revs
+    v218revs

@@ -6,7 +6,6 @@
     Makefile		Top-level makefile
     README.contents	This file
     INSTALL.md		Installation Notes
-    RELEASE.md		IRAF Release Notes
     bin			Symbolic link to current system architecture
     dev			IRAF Device definition files
     doc			IRAF System Documentation, release notes, etc
@@ -26,9 +25,6 @@
 
   o  For Installation instructions see the 'INSTALL.md' file in
      this directory.
-
-  o  For a summary of what is included in this release see the 'RELEASE.md'
-     file in this directory.
 
   o  For problems or questions, please see
      https://github.com/iraf-community/iraf/discussions and

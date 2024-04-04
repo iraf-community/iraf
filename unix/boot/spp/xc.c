@@ -72,8 +72,6 @@ char *iraflibs[] = { "libex.a",
 
 char *fortlib[] = { "-lf2c",
 		    "-lm",
-		    "-lcurl",
-		    "-lexpat",
 #if (defined (__linux__) || defined (__gnu_hurd__))
 		    "-lpthread",
 #endif

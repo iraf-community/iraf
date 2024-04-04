@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH CL "1" "April 2023" "IRAF 2.17.1" "IRAF commands"
+.TH CL "1" "April 2024" "IRAF 2.18" "IRAF commands"
 .SH NAME
 IRAFCL \- IRAF Command Language Interpreter
 .SH SYNOPSIS

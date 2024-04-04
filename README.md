@@ -1,4 +1,4 @@
-# IRAF Release 2.17.1
+# IRAF Release 2.18
 
 [![IRAF CI test](https://github.com/iraf-community/iraf/workflows/IRAF%20CI%20test/badge.svg)](https://github.com/olebole/iraf/actions?query=workflow%3A%22IRAF+CI+test%22)
 [![GitHub release](https://img.shields.io/github/release/iraf-community/iraf.svg)](https://github.com/iraf-community/iraf/releases/latest)
@@ -12,11 +12,12 @@ of problems, including major license issues and security bugs.
 
 To keep the software away from bitrotting, and to fix bugs that are in
 the package despite (or because) of its age, the iraf-community works
-on integrating the available patches into the IRAF source code. See
-[`RELEASE.md`](RELEASE.md) for the release notes.
+on integrating the available patches into the IRAF source code.
 
-For installation instructions see the file [`INSTALL.md`](INSTALL.md)
-in this directory.
+For instructions to install from source see the file
+[`INSTALL.md`](INSTALL.md) in this directory. Installation
+instructions for binary packages on Linux or macOS can be found on the
+[Installation web page](https://iraf-community.github.io/install.html).
 
 
 ## Contributing Code, Documentation, or Feedback
