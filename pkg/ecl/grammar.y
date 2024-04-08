@@ -1204,7 +1204,7 @@ arg	:	/* nothing - compile a null posargset to bump nargs */
 			     */
 			    breakout (stkop($1)->o_val.v_s, &pk, &t, &p, &f);
 			    pfp = currentask->t_pfp;
-			    if (*pk == NULL && *t == NULL &&
+			    if (*pk == '\0' && *t == '\0' &&
 				pfp && paramfind(pfp,p,0,1)) {
 
 				sprintf (pname, "%s.%s",

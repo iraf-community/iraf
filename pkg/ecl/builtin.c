@@ -270,7 +270,7 @@ cl_locate (char *task_spec, int first_only)
 	    }
 	}
 
-	if (found == NULL)
+	if (found == 0)
 	    oprintf ("%s: task not found.\n", task_spec);
 	else
 	    oprintf ("\n");

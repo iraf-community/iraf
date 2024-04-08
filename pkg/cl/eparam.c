@@ -452,7 +452,7 @@ e_repaint (void)
 		 * label columns (if desired).
 		 */
 		p = parmlist[keyid]->p_prompt;
-		if (p == NULL || *p == NULL)
+		if (p == NULL || *p == '\0')
 		    p = static_prompt;
 
 		/* e_indent_prompt (p, promptbuf, startcol); */

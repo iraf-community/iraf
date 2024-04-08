@@ -127,7 +127,7 @@ pr_connect (
 	register int	pid;
 
 	/* Connect subprocess. */
-	if ((pid = pr_pconnect (process, in, out)) == NULL)
+	if ((pid = pr_pconnect (process, in, out)) == 0)
 	    c_erract (EA_ERROR);
 
 
@@ -225,7 +225,7 @@ pr_pconnect (
 	    /* Get process slot. */
 	    for (pr=pr_tail;  pr != NULL;  pr=pr->pr_up)
 		if (!pr_busy(pr)) {
-		    if (pr->pr_pid != NULL)
+		    if (pr->pr_pid != 0)
 			pr_pdisconnect (pr);
 		    break;
 		}
@@ -239,7 +239,7 @@ pr_pconnect (
 	    if (cltrace)
 		eprintf ("\t----- connect to %s -----\n", process);
 	    intr_disable();
-	    if ((pr->pr_pid = c_propen (process, &fd_in, &fd_out)) == NULL) {
+	    if ((pr->pr_pid = c_propen (process, &fd_in, &fd_out)) == 0) {
 		intr_enable();
 		return (0);
 	    }
