@@ -1152,7 +1152,7 @@ editstring (
   int	eparam 				/* flag to indicate eparam or ehis  */
 )
 {
-	char	oldchar;		/* save old character after delete  */
+	char	oldchar = '\0';		/* save old character after delete  */
 	char    oldword[G_MAXSTRING];   /* save the deleted word            */
 	char    oldline[G_MAXSTRING];	/* save the deleted line            */
 	char	tempstr[G_MAXSTRING];

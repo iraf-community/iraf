@@ -148,7 +148,7 @@ lexicon (void)
 	char	*bkgerr = "ERROR: cannot submit background job inside {}\n";
 	register int	ch, cch;
 	register int	token;
-	int	stringtok, identifier, setlevel;
+	int	stringtok = 1, identifier = 1, setlevel = 0;
 	int	clswitch;
 	char	*op;
 

@@ -1142,8 +1142,6 @@ command	:	tasknam {
 		} BARG {
 		    inarglist = 1;
 		} args EARG {
-		    extern char *onerr_handler;
-
 		    inarglist = 0;
 		    parenlevel = 0;
 		    scanstmt = 0;
