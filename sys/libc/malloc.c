@@ -9,7 +9,7 @@
 
 /* MALLOC -- Allocate an uninitialized block of memory at least nbytes in size.
 */
-char *
+void *
 malloc (
   unsigned nbytes
 )
@@ -20,5 +20,5 @@ malloc (
 	iferr (MALLOC (&x_ptr, &x_nchars, &x_dtype))
 	    return (NULL);
 	else
-	    return ((char *)&Memc[x_ptr]);
+	    return ((void *)&Memc[x_ptr]);
 }
