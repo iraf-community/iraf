@@ -92,7 +92,7 @@ static void startup(void), shutdown(void);
 static  char *file_concat (char  *in1, char  *in2);
 
 static void onint (int *vex, int (**next_handler)(void));
-extern int yyparse();
+extern int yyparse(void);
 
 static  char *tmpfile = NULL;
 extern	char epar_cmdbuf[];

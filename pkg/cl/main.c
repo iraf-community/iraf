@@ -89,7 +89,7 @@ static void login(char *cmd), logout(void);
 static void startup(void), shutdown(void);
 
 static void onint (int *vex, int (**next_handler)(void));
-extern int yyparse();
+extern int yyparse(void);
 
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.

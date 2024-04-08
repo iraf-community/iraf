@@ -348,7 +348,7 @@ cl_error (int errtype, char *diagstr, ...)
 void 
 erract_init (void)
 {
-	char *act, *envget();
+	char *act;
 	char opt[SZ_LINE];
 
 	/* Parse the erract string to pick up new options.

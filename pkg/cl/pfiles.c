@@ -511,7 +511,7 @@ pfileread (
 		goto error_;
 
 	} else if (procscript (fp)) {
-	    extern int yyparse ();
+	    extern int yyparse (void);
 
 	    /* Parse the declarations section of a procedure script.
 	     * The procscript() call leaves us positioned to the procedure

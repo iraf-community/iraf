@@ -297,7 +297,6 @@ execnewtask (void)
 	static	struct pfile *pfp;
 
 	struct	param *pp;
-	FILE	*fopen();
 
 	if (newtask == NULL)
 	    /* if this ever happens, i don't want to know about it. */
@@ -730,7 +729,6 @@ findexe (
 	char	root[SZ_FNAME+1], root_path[SZ_PATHNAME+1];
 	char	bindir[SZ_FNAME+1], *ip = NULL, *arch = NULL;
 	char	bin_root[SZ_PATHNAME+1];
-	char   *envget();
 
 
 	memset (root, 0, SZ_FNAME);

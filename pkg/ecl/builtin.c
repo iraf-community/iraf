@@ -2013,7 +2013,7 @@ cledit (void)
 	char	oscmd[SZ_LINE], os_filelist[SZ_LINE];
 	char	osfn[SZ_PATHNAME];
 	struct	operand o;
-	char	*envget();
+	char	*envget(char *name);
 	int	n;
 
 	pfp = newtask->t_pfp;

@@ -751,7 +751,7 @@ bkg_query (
 {
 	char	bqfile[SZ_PATHNAME], qrfile[SZ_PATHNAME];
 	int	waitime, delay;
-	char	*envget(), *fgets_status;
+	char	*fgets_status;
 	FILE	*fp, *in;
 
 	if (notify())
@@ -866,7 +866,6 @@ void
 get_bkgqfiles (int bkgno, int pid, char *bkg_query_file, char *query_response_file)
 {
 	int	filecode;
-	char	*envget();
 
 	if (envget (UPARM) == NULL)
 	    cl_error (E_UERR,
