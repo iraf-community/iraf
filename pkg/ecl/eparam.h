@@ -104,5 +104,5 @@ extern struct edit_commands command[MAX_COMMANDS];
 extern char *cmdnames[MAX_COMMANDS];
 extern int numcommands;
 
-char	*enumin(), *minmax();
-char	*host_editor();
+char	*enumin(register struct param *pp), *minmax(register struct param *pp);
+char	*host_editor(char *editor);

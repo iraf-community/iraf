@@ -268,8 +268,8 @@ query (struct param *pp)
 	char	buf[SZ_PROMPTBUF+1];
 	struct	operand o;
 	int	bastype, batch, arrflag, offset=0, n_ele, max_ele, fd;
-	char	*nlp, *nextstr();
-	char	*bkg_query(), *query_status;
+	char	*nlp, *nextstr(char **pbuf, FILE *fp);
+	char	*bkg_query(char *obuf, int maxch, register struct param *pp), *query_status;
 	char	*abuf;
 
 	bastype = pp->p_type & OT_BASIC;
@@ -537,7 +537,7 @@ testval:
 char *
 nextstr (char **pbuf, FILE *fp)
 {
-	char	*p, *nxtchr();
+	char	*p, *nxtchr(char *p, FILE *fp);
 	static	char	tbuf[SZ_LINE];
 	char	quote;
 	int	cnt;

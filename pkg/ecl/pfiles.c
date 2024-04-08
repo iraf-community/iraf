@@ -30,8 +30,8 @@ extern	char *nullstr;
 extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
-long	filetime();
-static	void mapname();
+long	filetime(char *fname, char *timecode);
+static	void mapname(char *in, char *out, int maxlen);
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.

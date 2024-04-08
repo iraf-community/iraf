@@ -218,8 +218,8 @@ struct package {
 #define	PACKAGESIZ	btoi (sizeof (struct package))
 #define	TCALLSIZ	btoi (sizeof (struct task_call))
 
-struct	package *newpac(), *pacfind();
-struct	ltask *addltask(), *newltask(), *ltaskfind(), *cmdsrch();
-struct	ltask *ltasksrch(), *_ltasksrch();
-struct	task *pushtask(), *poptask();
-int	deftask(), defpac();
+struct	package *newpac(char *name, char *bin), *pacfind(char *name);
+struct	ltask *addltask(struct package *pkp, char *ptname, char *ltname, int redef), *newltask(register struct package *pkp, char *lname, char *pname, struct ltask *oldltp), *ltaskfind(struct package *pkp, char *name, int enable_abbreviations), *cmdsrch(char *pkname, char *ltname);
+struct	ltask *ltasksrch(char *pkname, char *ltname), *_ltasksrch(char *pkname, char *ltname, struct package **o_pkp);
+struct	task *pushtask(void), *poptask(void);
+int	deftask(char *task_spec), defpac(char *pkname);

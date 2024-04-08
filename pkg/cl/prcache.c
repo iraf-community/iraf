@@ -88,7 +88,7 @@ int	pr_pno = 1;			/* incremented for each connect	*/
 int	sz_prcache = 2;			/* nprocess slots in cache	*/
 struct	process pr_cache[MAXSUBPROC];
 struct	process *pr_head = NULL, *pr_tail = NULL;
-extern	char *findexe();
+extern	char *findexe(struct package *pkg, char *pkg_path);
 
 static void pr_pdisconnect (struct process *pr);
 static void pr_tohead (struct process *pr);
@@ -193,7 +193,7 @@ pr_pconnect (
 )
 {
 	struct process *pr;
-	struct	process *pr_findproc();
+	struct	process *pr_findproc(char *process);
 	struct	_finfo fi;
 	int	fd_in, fd_out;
 

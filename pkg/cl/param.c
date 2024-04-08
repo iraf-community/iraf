@@ -706,7 +706,7 @@ paramsrch (char *pkname, char *ltname, char *pname)
 {
 	register struct param *pp;
 	struct	pfile *pfp;
-	struct	param *lookup_param();
+	struct	param *lookup_param(char *pkname, char *ltname, char *pname);
 
 	/* First search for a regular parameter.  If this fails then we 
 	 * handle the case when currentask has no pfile.

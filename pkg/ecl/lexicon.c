@@ -650,7 +650,7 @@ eatwhite_:
 /* LEXINIT -- Initialize the internal state variables of the lexical analyzer,
  * e.g. when processing is interrupted by an interrupt.
  */
-int 
+void
 lexinit (void)
 {
 	if (lexmodes() && !lex_cpumodeset (currentask->t_in)) {
