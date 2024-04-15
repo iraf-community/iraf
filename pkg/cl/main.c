@@ -84,12 +84,12 @@ long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 int	logout_status = 0;	/* optional status arg to logout()	*/
 
 
-static void execute();
-static void login(), logout();
-static void startup(), shutdown();
+static void execute(int mode);
+static void login(char *cmd), logout(void);
+static void startup(void), shutdown(void);
 
 static void onint (int *vex, int (**next_handler)(void));
-extern int yyparse();
+extern int yyparse(void);
 
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.
@@ -252,7 +252,7 @@ execute (int mode)
 {
 	int	parsestat;
 	XINT	old_parhead;
-	char	*curcmd();
+	char	*curcmd(void);
 
 	alldone = 0;
 	gologout = 0;

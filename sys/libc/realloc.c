@@ -11,9 +11,9 @@
 ** allocated buffer.  If necessary the buffer is moved, preserving any
 ** data in the buffer.
 */
-char *
+void *
 realloc (
-  char	*buf,
+  void	*buf,
   unsigned newsize
 )
 {
@@ -24,5 +24,5 @@ realloc (
 	iferr (REALLOC (&x_ptr, &x_nchars, &x_dtype))
 	    return (NULL);
 	else
-	    return ((char *)&Memc[x_ptr]);
+	    return ((void *)&Memc[x_ptr]);
 }

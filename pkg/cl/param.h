@@ -200,21 +200,21 @@ struct pfile {
 #define	V_FILE		9
 
 
-char	*nextfield();		/* cracks next pfile line field		*/
-char	*makelower();		/* upper to lower, in place and return	*/
+char	*nextfield(char **pp, FILE *fp);		/* cracks next pfile line field		*/
+char	*makelower(register char *cp);		/* upper to lower, in place and return	*/
 
-struct	param *paramfind();	/* searches for a param on a given pfile*/
-struct	param *paramsrch();	/* search, make sure param is there	*/
-struct	param *lookup_param();	/* search standard path for a param	*/
-struct	param *newparam();	/* allocate and link a new param	*/
-struct	param *addparam();	/* make a new param off given pfile	*/
-struct	param *newfakeparam();	/* add a fake param to pfile		*/
-struct	pfile *pfilesrch();	/* read named pfile or ltask pfile	*/
-struct	pfile *pfileload();	/* load pfile for ltask into memory	*/
-struct	pfile *pfileread();	/* read and make params from a pfile	*/
-struct	pfile *pfilefind();	/* look for pfile with given name	*/
-struct	pfile *newpfile();	/* add a new pfile off parhead		*/
-struct	pfile *pfilecopy();	/* make an in-core copy of a pfile	*/
+struct	param *paramfind(struct pfile *pfp, char *pname, int pos, int exact);	/* searches for a param on a given pfile*/
+struct	param *paramsrch(char *pkname, char *ltname, char *pname);	/* search, make sure param is there	*/
+struct	param *lookup_param(char *pkname, char *ltname, char *pname);	/* search standard path for a param	*/
+struct	param *newparam(struct pfile *pfp);	/* allocate and link a new param	*/
+struct	param *addparam(struct pfile *pfp, char *buf, FILE *fp);	/* make a new param off given pfile	*/
+struct	param *newfakeparam(struct pfile *pfp, char *name, int pos, int type, int string_len);	/* add a fake param to pfile		*/
+struct	pfile *pfilesrch(char *pfilepath);	/* read named pfile or ltask pfile	*/
+struct	pfile *pfileload(register struct ltask *ltp);	/* load pfile for ltask into memory	*/
+struct	pfile *pfileread(struct ltask *ltp, char *pfilename, int checkmode);	/* read and make params from a pfile	*/
+struct	pfile *pfilefind(register struct ltask *ltp);	/* look for pfile with given name	*/
+struct	pfile *newpfile(struct ltask *ltp);	/* add a new pfile off parhead		*/
+struct	pfile *pfilecopy(register struct pfile *pfp);	/* make an in-core copy of a pfile	*/
 
-int	defpar();		/* determine whether param exists	*/
-int	defvar();		/* determine whether envvar exists	*/
+int	defpar(char *param_spec);		/* determine whether param exists	*/
+int	defvar(char *envvar);		/* determine whether envvar exists	*/

@@ -32,7 +32,7 @@
 extern	char *nullstr;
 extern	int cldebug;
 extern	int cltrace;
-static	void dd_f();
+static	void dd_f(char *msg, char *fname);
 
 
 /* D_STACK -- Go through the instruction stack, starting at locpc, printing

@@ -259,7 +259,7 @@ extern void putlog(struct task *tp, char *usermsg);
 /* lexicon.c */
 extern int yylex(void);
 extern int lexicon(void);
-extern int lexinit(void);
+extern void lexinit(void);
 /* lists.c */
 extern struct operand readlist(struct param *pp);
 extern void closelist(register struct param *pp);

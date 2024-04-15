@@ -20,7 +20,7 @@ struct codeentry {
 #define	SZ_CE		4	/* size of codeentry			*/
 
 
-extern void (*opcodetbl[])();
+extern void (*opcodetbl[])(memel *arg);
 
 /* manifest constant opcodes used in c_opcode.
  * value is index into opcodetbl[].

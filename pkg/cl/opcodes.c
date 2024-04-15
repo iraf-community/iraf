@@ -39,8 +39,8 @@
 extern	int cldebug;
 extern	char *nullstr;
 int	binpipe;			/* last pipe binary or text ? */
-char	*comdstr();
-extern	struct param *ppfind();		/* search task psets for param */
+char	*comdstr(char *s);
+extern	struct param *ppfind(struct pfile *pfp, char *tn, char *pn, int pos, int abbrev);		/* search task psets for param */
 
 void
 o_undefined (memel *argp)
@@ -973,7 +973,7 @@ o_doaddpipe (memel *argp)
 	char	*ltname;
 	struct	operand	o;
 	struct	ltask *ltp;
-	char	*addpipe();
+	char	*addpipe(void);
 
 	/* ADDPIPE is called immediately before REDIR and before EXEC so we
 	 * do not have to worry about storing the pipefile name in the dict.
@@ -1005,7 +1005,7 @@ o_dogetpipe (
 )
 {
 	struct	operand o;
-	char	*getpipe(), *comdstr();
+	char	*getpipe(void), *comdstr(char *s);
 
 	/* GETPIPE is called immediately before REDIRIN and before EXEC so we
 	 * do not have to worry about storing the pipefile name in the dict.

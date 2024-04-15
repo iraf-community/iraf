@@ -105,5 +105,5 @@ extern XINT pc;			/* program counter			*/
  */
 #define	coderef(x)	((struct codeentry *)&stack[x])
 
-extern char *memneed();		/* insures enough core, returns start	*/
-extern char *comdstr();		/* compile string at topd, return start	*/
+extern char *memneed(int incr);		/* insures enough core, returns start	*/
+extern char *comdstr(char *s);		/* compile string at topd, return start	*/

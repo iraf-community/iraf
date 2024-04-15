@@ -30,8 +30,8 @@ extern	char *nullstr;
 extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
-long	filetime();
-static	void mapname();
+long	filetime(char *fname, char *timecode);
+static	void mapname(char *in, char *out, int maxlen);
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
@@ -511,7 +511,7 @@ pfileread (
 		goto error_;
 
 	} else if (procscript (fp)) {
-	    extern int yyparse ();
+	    extern int yyparse (void);
 
 	    /* Parse the declarations section of a procedure script.
 	     * The procscript() call leaves us positioned to the procedure
@@ -908,10 +908,10 @@ pfilecopy (register struct pfile *pfp)
 
 		    p = parrd->a_ptr.a_s;
 		    q = qarrd->a_ptr.a_s;
-		    for (d=0;  d < size_arr;  d++) {
+		    for (d=0;  d < size_arr; d++, q++, p++) {
 			*q = memneed (btoi(len));
-			strncpy (*q++, *p++, len-1);
-			*(q+len-1) = '\0' ;
+			strncpy (*q, *p, len-1);
+			(*q)[len-1] = '\0';
 		    }
 		}
 

@@ -161,7 +161,6 @@ struct arr_desc {
 
 extern char *truestr, *falsestr;
 
-struct operand popop(), pushop();
-struct operand makeop();
-struct operand readlist();	/* read and return operand from list	*/
-struct operand sexa();		/* convert n:n:n string to sexagesimal	*/
+struct operand popop(void), pushop(struct operand *op);
+struct operand makeop(char *str, int type);
+struct operand sexa(char *);		/* convert n:n:n string to sexagesimal	*/

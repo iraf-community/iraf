@@ -326,7 +326,7 @@ binop (int opcode)
 		    first_char = o1.o_val.v_s[0];
 		    
 		    /* Null patterns match any string. */
-		    if (first_char == NULL) {
+		    if (first_char == '\0') {
 			result.o_val.v_i = 1;
 			result.o_type = OT_INT;
 			goto pushresult;
@@ -368,7 +368,7 @@ binop (int opcode)
 		    first_char = o1.o_val.v_s[0];
 		    
 		    /* Null patterns match any string. */
-		    if (first_char == NULL) {
+		    if (first_char == '\0') {
 			result.o_val.v_i = 1;
 			result.o_type = OT_INT;
 			goto pushresult;

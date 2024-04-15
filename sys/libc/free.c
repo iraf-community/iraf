@@ -12,7 +12,7 @@
 */
 void
 free (
-  char	*buf
+  void	*buf
 )
 {
 	XINT	x_ptr, x_dtype = TY_CHAR;

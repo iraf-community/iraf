@@ -266,7 +266,7 @@ cl_locate (char *task_spec, int first_only)
 	    }
 	}
 
-	if (found == NULL)
+	if (found == 0)
 	    oprintf ("%s: task not found.\n", task_spec);
 	else
 	    oprintf ("\n");
@@ -1900,7 +1900,6 @@ cledit (void)
 	char	oscmd[SZ_LINE], os_filelist[SZ_LINE];
 	char	osfn[SZ_PATHNAME];
 	struct	operand o;
-	char	*envget();
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -2100,8 +2099,8 @@ setbuiltins (register struct package *pkp)
 {
 	/* Debugging functions are in debug.c.
 	 */
-	extern void d_f(), d_l(), d_d(), d_off(), d_on(), d_p(), d_t();
-	extern void pr_listcache();
+	extern void d_f(void), d_l(void), d_d(void), d_off(void), d_on(void), d_p(void), d_t(void);
+	extern void pr_listcache(FILE *fp);
 
 	static struct builtin {
 		char	*b_name;

@@ -44,7 +44,6 @@ extern	int cldebug;
 
 extern	int inarglist;		/* set by parser when in argument list	*/
 extern	int parenlevel;		/* nesting level of parens		*/
-extern	int get_nscanval();
 extern	int do_error;		/* runtime error handling		*/
 int	pipetable[MAXPIPES];	/* for maintaining pipe temp files	*/
 int	nextpipe = 0;
@@ -1055,7 +1054,6 @@ char *
 addpipe (void)
 {
 	static	int pipecode = 0;
-	char	*pipefile();
 
 	if (pipecode == 0)
 	    pipecode = c_getpid();
@@ -1096,8 +1094,6 @@ addpipe (void)
 char *
 getpipe (void)
 {
-	char	*pipefile();
-
 	if (nextpipe == 0)
 	    cl_error (E_IERR, "Pipestack underflow");
 	return (pipefile (pipetable[nextpipe-1]));
@@ -1112,7 +1108,6 @@ void
 delpipes (register int npipes)
 {
 	register int pipe;
-	char	*pipefile();
 
 	if (npipes == 0) {
 	    while (nextpipe > 0)
@@ -1135,7 +1130,6 @@ pipefile (int pipecode)
 {
 	static	char fname[SZ_PIPEFILENAME+1];
 	char	*dir;
-	char	*envget();
 
 	/* Put pipefiles in 'pipes' or 'uparm' if defined, else use tmp.  Do
 	 * not put pipe files in current directory or pipe commands will fail

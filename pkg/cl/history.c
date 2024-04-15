@@ -769,7 +769,7 @@ int
 get_history (int record, char *command, int maxch)
 {
 	char	*recptr;
-	char	*find_history();
+	char	*find_history(int record);
 
 	if ((recptr = find_history (record)) == NULL) {
 	    *command = EOS;
@@ -884,7 +884,7 @@ show_history (FILE *fp, int max_commands)
 	char	*recptr[MAX_SHOWHIST];
 	char	cmdblk[SZ_CMDBLK+1];
 	int	record;
-	char	*find_history();
+	char	*find_history(int record);
 
 	/* Flush the "history" command so that it shows up in the history. */
 	yy_startblock (LOG);
@@ -1082,7 +1082,7 @@ putlog (
 	register char	*ip, *op, *otop;
 	register int	n;
 	char	msg[SZ_LOGBUF], job[5];
-	char	*pkg, *tname, *today();
+	char	*pkg, *tname, *today(void);
 	extern  int  bkgno;			/* job number if bkg job */
 
 	if (!keeplog())

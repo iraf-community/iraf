@@ -10,7 +10,7 @@
 /* CALLOC -- Allocate memory for NELEM elements of size ELSIZE bytes per
 ** element.  The space is initialized to all zeros.
 */
-char *
+void *
 calloc (
   unsigned int nelems,
   unsigned int elsize

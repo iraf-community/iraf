@@ -98,7 +98,7 @@ int	eh_readline 	= YES;		/* use readline() for terminal input  */
 #endif
 int	eh_longprompt 	= YES;		/* print full package name as prompt  */
 
-char	*e_tonextword(), *e_toprevword();
+char	*e_tonextword(register char *ip), *e_toprevword(char *ip, char *string);
 
 char	epar_cmdbuf[SZ_LINE];
 
@@ -463,7 +463,7 @@ e_repaint (void)
 		 * label columns (if desired).
 		 */
 		p = parmlist[keyid]->p_prompt;
-		if (p == NULL || *p == NULL)
+		if (p == NULL || *p == '\0')
 		    p = static_prompt;
 
 		/* e_indent_prompt (p, promptbuf, startcol); */
@@ -716,7 +716,7 @@ e_check_vals (
   char    *string
 )
 {
-	char *gquery();		/* declare gquery as returning a pointer  */
+	char *gquery(struct param *pp, char *string);		/* declare gquery as returning a pointer  */
 	char *errstr;		/* pointer to the error string (or 0)     */
 	char message[SZ_LINE+1];/* error message string			  */
 	int  badnews;		/* a flag if an array element is in error */
@@ -733,7 +733,7 @@ e_check_vals (
 
 	if (isarray) {
 	    char    outstring[G_MAXSTRING];
-	    char    *in, *e_getfield();
+	    char    *in, *e_getfield(register char *ip, char *outstr, int maxch);
 	    int	    first, nelem, flen;
 	    
 	    /* Get the length of the first dimension, and the starting point.
@@ -1152,7 +1152,7 @@ editstring (
   int	eparam 				/* flag to indicate eparam or ehis  */
 )
 {
-	char	oldchar;		/* save old character after delete  */
+	char	oldchar = '\0';		/* save old character after delete  */
 	char    oldword[G_MAXSTRING];   /* save the deleted word            */
 	char    oldline[G_MAXSTRING];	/* save the deleted line            */
 	char	tempstr[G_MAXSTRING];

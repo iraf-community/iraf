@@ -124,14 +124,14 @@ extern char    *c_cnvtime (long clktime, char *outstr, int maxch);
 extern char    *c_getuid (char *outstr, int maxch);
 extern char    *c_salloc (unsigned nbytes);
 extern char    *c_strpak (short *sppstr, char *cstr, int maxch);
-extern char    *calloc (unsigned int nelems, unsigned int elsize);
+extern void    *calloc (unsigned int nelems, unsigned int elsize);
 extern char    *envget (char *var);
 extern char    *fgets (char *buf, int maxch, struct _iobuf *fp);
 extern char    *gets (char *buf);
-extern char    *malloc (unsigned nbytes);
+extern void    *malloc (unsigned nbytes);
 extern char    *mktemp (char *template);
 extern char    *freadline (char *prompt);
-extern char    *realloc (char *buf, unsigned newsize);
+extern void    *realloc (void *buf, unsigned newsize);
 extern char    *sprintf (char *str, char *format, ...);
 
 extern double   atof (char *str);
@@ -285,7 +285,7 @@ extern void	c_xwhen (int exception, funcptr_t new_handler, funcptr_t *old_handle
 extern void	eprintf (char *format, ...);
 extern void	fprintf (struct _iobuf *fp, char *format, ...);
 extern void	fputs (char *str, struct _iobuf *fp);
-extern void	free (char *buf);
+extern void	free (void *buf);
 extern void	perror (char *prefix);
 extern void	printf (char *format, ...);
 extern void	setbuf (struct _iobuf *fp, char *buf);
