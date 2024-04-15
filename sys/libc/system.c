@@ -21,7 +21,7 @@ system (
 	XINT	status;
 
 	nullstr[0] = EOS;
-	ZOSCMD (cmd, nullstr, nullstr, nullstr, &status);
+	ZOSCMD ((PKCHAR *)cmd, nullstr, nullstr, nullstr, &status);
 
 	return ((int) status);
 }
