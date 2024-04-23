@@ -767,7 +767,7 @@ vm_connect (void)
 		"vmclient (%s): open server connection `%s' -> ",
 		vm_client, osfn);
 
-	ZOPNND (osfn, &acmode, &fd);
+	ZOPNND ((PKCHAR *)osfn, &acmode, &fd);
 	if (fd == XERR) {
 	    if (vm_debug)
 		fprintf (stderr, "failed\n");
