@@ -31,10 +31,6 @@ begin
 	y2 = (off2-1 - iis_xdim) / iis_xdim
 	y2 = max (y1, y2)
 
-#call eprintf ("iiswr: %d bytes at %d, x=%d, y=[%d:%d]\n")
-#call pargi(nbytes); call pargi(offset)
-#call pargi(x); call pargi(y1); call pargi(y2)
-
 	if (packit)
 	    tid = IWRITE+BYPASSIFM+BLOCKXFER+BYTE+PACKED
 	else
