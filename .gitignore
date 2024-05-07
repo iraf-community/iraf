@@ -3,9 +3,13 @@
 _*
 
 */OBJS.arc.Z
+*/*/OBJS.arc.Z
 local/.ssh
 local/.history
 local/.lesshist
+local/.login
+local/.cshrc
+local/.iraf
 *.orig
 *.bak
 *.OLD
@@ -14,12 +18,46 @@ uparm
 spool
 spool.*
 _spool.*
+zztest.x
+extern.def
+Notes.NR
 
 # Login/history files
 .*history
 .lesshst
 .viminfo
+.*.swp
 
+# External packages
+extern/.pkgs
+extern/adccdrom/
+extern/cfh12k/
+extern/ctio/
+extern/deitab/
+extern/esowfi/
+extern/finder/
+extern/fitsutil/
+extern/gemini/
+extern/gmisc/
+extern/guiapps/
+extern/iue/
+extern/mem0/
+extern/mkupdate
+extern/mscdb/
+extern/mscred/
+extern/mtools/
+extern/nfextern/
+extern/optic/
+extern/rvsao/
+extern/song/
+extern/sptable/
+extern/sqiid/
+extern/st4gem/
+extern/steward/
+extern/ucsclris/
+extern/upsqiid/
+extern/xdimsum/
+x11iraf/
 
 # Object files
 *.o
