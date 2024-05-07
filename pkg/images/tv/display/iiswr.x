@@ -24,6 +24,8 @@ begin
 	# Convert to chars and clip at the top of the display.
 	off1 = (offset - 1) / SZB_CHAR + 1
 	off2 = min (iis_xdim * iis_ydim, (offset + nbytes - 1) / SZB_CHAR) + 1
+off1 = offset
+off2 = min (iis_xdim * iis_ydim, (offset + nbytes))
 	nchars = off2 - off1
 
 	x  = 0
