@@ -13,7 +13,7 @@ MACH=$IRAFARCH
 # Set any float option switch.
 case $IRAFARCH in
     macosx)
-        float="-/arch -//i386"
+        float="-/arch -//arm64"
         ;;
     macintel)
         float="-/arch -//x86_64"

@@ -20,9 +20,9 @@ setenv MACH       $IRAFARCH
 # Get float option switch.
 switch ($IRAFARCH)
 case macosx:
-    set float = "-/arch -//i386"
+    set float = "-/arch -//arm64"
     breaksw
-case macint:
+case macintel:
     set float = "-/arch -//x86_64"
     breaksw
 case linux64:
