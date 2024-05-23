@@ -383,6 +383,7 @@ char	url[SZ_LINE], fname[SZ_FNAME]
 bool	hdr
 int	nread
 
+bool	clgetb()
 int	url_get()
 
 begin
