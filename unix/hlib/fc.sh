@@ -19,7 +19,10 @@ case $IRAFARCH in
         float="-/arch -//x86_64"
         ;;
     linux64)
-        float="-/m64"				# FIXME
+        float="-/m64"
+        ;;
+    linux)
+        float="-/m32"
         ;;
     *)
         float=""

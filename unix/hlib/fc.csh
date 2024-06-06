@@ -1,4 +1,4 @@
-#!/bin/csh -f 
+#!/bin/csh -f
 #
 # FC.CSH -- Link an IMFORT or host fortran program from IRAF.  A front end
 # to XC, the purpose of this script is to determine the IRAF architecture
@@ -26,7 +26,10 @@ case macintel:
     set float = "-/arch -//x86_64"
     breaksw
 case linux64:
-    set float = "-/m64"				# FIXME
+    set float = "-/m64"
+    breaksw
+case linux:
+    set float = "-/m32"
     breaksw
 default:
     set float = ""
