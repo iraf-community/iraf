@@ -7,6 +7,11 @@ $CC $HSI_LF	sgidispatch.o ../../hlib/libos.a $HSI_LIBS -o sgidispatch.e
 mv -f		sgidispatch.e ../../hlib
 rm		sgidispatch.o
 
+$CC -c $HSI_CF	sgidebug.c
+$CC $HSI_LF	sgidebug.o ../../hlib/libos.a $HSI_LIBS -o sgidebug.e
+mv -f		sgidebug.e ../../hlib
+rm		sgidebug.o
+
 $CC -c $HSI_CF	sgi2uimp.c
 $CC $HSI_LF	sgi2uimp.o sgiUtil.o $HSI_LIBS -o sgi2uimp.e
 mv -f		sgi2uimp.e ../../hlib
