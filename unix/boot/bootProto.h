@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <time.h>
+
 #define import_spp
 #define import_knames
 #include <iraf.h>
@@ -36,14 +38,14 @@ void 	os_putenv (char *name, char *value);
 int 	os_read (int fd, char *buf, int nbytes);
 int 	os_setfmode (char *fname, int mode);
 int 	os_setowner (char *fname, int uid, int gid);
-int 	os_setmtime (char *fname, long mtime);
+int 	os_setmtime (char *fname, time_t mtime);
 char   *os_strpak (XCHAR *sppstr, char *cstr, int maxch);
 XCHAR  *os_strupk (char *str, XCHAR *outstr, int maxch);
 char   *os_subdir (char *dir, char *subdir);
 int 	os_symlink (char *fname, char *valbuf, int maxch);
 int 	os_sysfile (char *sysfile, char *fname, int maxch);
 char   *os_irafpath (char *sysfile);
-long 	os_utime (long iraf_time);
-long 	os_itime (long unix_time);
+time_t 	os_utime (long iraf_time);
+long 	os_itime (time_t unix_time);
 int 	os_write (int fd, char *buf, int nbytes);
 char   *vfn2osfn (char *vfn, int new);

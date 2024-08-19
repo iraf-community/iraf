@@ -1,7 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#include <unistd.h>
+#include <utime.h>
 #include "bootlib.h"
 
 
@@ -12,13 +12,12 @@
 int
 os_setmtime (
   char	*fname,
-  long	mtime 
+  time_t mtime
 )
 {
-	struct	timeval tvp[2];
+	struct	utimbuf times;
 
-	tvp[0].tv_sec  = tvp[1].tv_sec  = mtime;
-	tvp[0].tv_usec = tvp[1].tv_usec = 0L;
-
-	return (utimes (vfn2osfn(fname,0), tvp));
+	times.actime = mtime;
+	times.modtime = mtime;
+	return (utime (vfn2osfn(fname, 0), &times));
 }
