@@ -19,11 +19,11 @@ static	long os_timezone(void);
  * but it probably won't matter.
  */
 time_t
-os_utime (long iraf_time)
+os_utime (time_t iraf_time)
 {
 	time_t	time_var, lst;
 
-	lst = (time_t)iraf_time;
+	lst = iraf_time;
 	
 	/* Add minutes westward from GMT */
 	time_var = lst + os_timezone();
@@ -39,7 +39,7 @@ os_utime (long iraf_time)
 /* OS_ITIME -- Convert UNIX time (gmt, epoch 1970) to IRAF time (lst, epoch
  * 1980).	[MACHDEP]
  */
-long
+time_t
 os_itime (time_t unix_time)
 {
 	struct	tm *localtime(const time_t *);
@@ -54,7 +54,7 @@ os_itime (time_t unix_time)
 	if (localtime(&gmt)->tm_isdst)
 	    time_var -= 60L * 60L;
 
-	return ((long)time_var - SECONDS_1970_TO_1980);
+	return time_var - SECONDS_1970_TO_1980;
 }
 
 
