@@ -96,9 +96,8 @@ extern int ZGTENV (PKCHAR *envvar, PKCHAR *outstr, XINT *maxch, XINT *status);
  * the system files, e.g., for testing purposes.
  */
 char *
-irafpath (
-    char  *fname		/* simple filename, no dirs */
-)
+irafpath (char *fname)
+            			/* simple filename, no dirs */
 {
 	static	char pathname[SZ_PATHNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];
@@ -108,7 +107,6 @@ irafpath (
 	XINT	sz_ulibs=SZ_ULIBSTR;
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
-
 
 	/* Search any user libraries first. */
 	strcpy ((char *)ldir, ULIB);
@@ -144,39 +142,22 @@ irafpath (
 	if (x_status <= 0)
 	    return (fname);
 
-	/* Look first in HBIN.
-	 */
+	/* Look first in HBIN. Use IRAFARCH if defined. */
+	if ( (irafarch = getenv("IRAFARCH"))
+	     && (strlen(irafarch) > 0) ) {
+	  strcpy (pathname, (char *)hostdir);
+	  strcat (pathname, "bin.");
+	  strcat (pathname, irafarch);
+	  strcat (pathname, "/");
+	  strcat (pathname, fname);
+	  if (access (pathname, 0) == 0)
+            fprintf (dbg, "irafpath returning: %s\n", pathname);
+	    return (pathname);
+	}
+
+	/* Look in HBIN. */
 	strcpy (pathname, (char *)hostdir);
-	strcat (pathname, "bin.");
-
-#ifdef LINUX64
-	strcat (pathname, "linux64");
-#else
-#ifdef LINUX
-	strcat (pathname, "linux");
-#else
-#ifdef MACOSX
-	/* Setup for cross-compilation, default to 'macintel'.
-	 */
-        if ((irafarch = getenv("IRAFARCH"))) {
-            fprintf (dbg, "irafpath IRAFARCH: %s\n", irafarch);
-            if (strcmp (irafarch, "macosx") == 0 ||
-                strcmp (irafarch, "macos64") == 0) 
-		    strcat (pathname, "macosx");
-            else if (strcmp (irafarch, "macintel") == 0) 
-		strcat (pathname, "macintel");
-            else 
-		strcat (pathname, "macintel");
-        } else {
-            fprintf (dbg, "irafpath IRAFARCH: macintel (default)s\n");
-	    strcat (pathname, "macintel");
-        }
-#endif
-#endif
-#endif
-        fprintf (dbg, "irafpath HBIN: %s\n", pathname);
-
-	strcat (pathname, "/");
+	strcat (pathname, "bin/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0) {
             fprintf (dbg, "irafpath returning: %s\n", pathname);
@@ -194,15 +175,20 @@ irafpath (
         }
 
 	/* Try BIN - use IRAFARCH if defined. */
-	if ( (irafarch = getenv("IRAFARCH")) ) {
-	    strcpy (pathname, (char *)irafdir);
-	    strcat (pathname, "bin.");
-	    strcat (pathname, irafarch);
-	    strcat (pathname, "/");
-	} else {
-	    strcpy (pathname, (char *)irafdir);
-	    strcat (pathname, "bin/");
+	if ( (irafarch = getenv("IRAFARCH"))
+	     && (strlen(irafarch) > 0) ) {
+	  strcpy (pathname, (char *)irafdir);
+	  strcat (pathname, "bin.");
+	  strcat (pathname, irafarch);
+	  strcat (pathname, "/");
+	  strcat (pathname, fname);
+	  if (access (pathname, 0) == 0)
+	    return (pathname);
 	}
+
+	/* Try BIN. */
+	strcpy (pathname, (char *)irafdir);
+	strcat (pathname, "bin/");
 	strcat (pathname, fname);
         fprintf (dbg, "irafpath BIN: %s\n", pathname);
 	if (access (pathname, 0) == 0) {
