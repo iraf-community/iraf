@@ -443,7 +443,7 @@ end
 ```
 
 ```
-cl> copy pkg$utilities/nttools/stxtools/lu* .
+cl> copy pkg$stxtools/lu* .
 cl> softools
 cl> xc -x test_ludecompose.x lubksb.f  lubksd.f  ludcmd.x  ludcmp.x
 cl> task $test_ludecompose = test_ludecompose.e
