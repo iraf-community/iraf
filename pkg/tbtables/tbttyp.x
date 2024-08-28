@@ -80,8 +80,8 @@ int	ofd, fstdfile()	# to check for STDIN, STDOUT, etc.; ofd is ignored
 bool	streq()
 
 pointer fname		# file name without trailing brackets
+pointer fullname        # input file name with ".tab" appended
 int	extname, hdu, dummy	# returned by tbparse and ignored
-pointer	tbtopn(), tp
 int	tbparse()
 
 # These are used for checking for a FITS file.
@@ -95,11 +95,9 @@ string	naxis    "NAXIS   =                "
 # These are used for checking for an STSDAS binary table.
 int	i_sizinfo[LEN_SIZINFO]	# size information record
 char	c_sizinfo[SZ_SIZINFO * 8]
-char    cache[SZ_FNAME], src[SZ_FNAME], extn[SZ_FNAME]
 equivalence (i_sizinfo[1], c_sizinfo[1])
 int	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
 
-int     envgets()
 errchk	open, read, tbparse
 
 begin
@@ -134,6 +132,20 @@ begin
 	} then {
 	    exists = NO
 	}
+
+        if (exists == NO) {
+            # Append default extension and try again.
+            call salloc (fullname, SZ_FNAME, TY_CHAR)
+            call strcpy (Memc[fname], Memc[fullname], SZ_FNAME)
+            call strcat (".tab", Memc[fullname], SZ_FNAME)
+            iferr {
+                fd = open (Memc[fullname], READ_ONLY, BINARY_FILE)
+            } then {
+                exists = NO
+            } else {
+                exists = YES
+            }
+        }
 
 	if (exists == YES) {
 
