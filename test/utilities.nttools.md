@@ -104,22 +104,22 @@ PCOUNT   i 0  size of special data area
 GCOUNT   i 1  one data group (required keyword)
 TFIELDS  i 7
 TTYPE1   t 'STARno'  label for field   1
-TFORM1   t '1J'  data format of the field: 4-byte INTEGER
+TFORM1   t '1J'  data format of field: 4-byte INTEGER
 TTYPE2   t 'X'  label for field   2
-TFORM2   t '1D'  data format of the field: 8-byte DOUBLE
+TFORM2   t '1D'  data format of field: 8-byte DOUBLE
 TUNIT2   t 'pixels'  physical unit of field
 TTYPE3   t 'Y'  label for field   3
-TFORM3   t '1D'  data format of the field: 8-byte DOUBLE
+TFORM3   t '1D'  data format of field: 8-byte DOUBLE
 TUNIT3   t 'pixels'  physical unit of field
 TTYPE4   t 'MAG'  label for field   4
-TFORM4   t '1D'  data format of the field: 8-byte DOUBLE
+TFORM4   t '1D'  data format of field: 8-byte DOUBLE
 TUNIT4   t 'magnitude'  physical unit of field
 TTYPE5   t 'SHARP'  label for field   5
-TFORM5   t '1D'  data format of the field: 8-byte DOUBLE
+TFORM5   t '1D'  data format of field: 8-byte DOUBLE
 TTYPE6   t 'ROUND'  label for field   6
-TFORM6   t '1D'  data format of the field: 8-byte DOUBLE
+TFORM6   t '1D'  data format of field: 8-byte DOUBLE
 TTYPE7   t 'STARNAME'  label for field   7
-TFORM7   t '15A'  data format of the field: ASCII Character
+TFORM7   t '15A'  data format of field: ASCII Character
 EXTNAME  t 'startable'  name of this binary table extension
 TDISP1   t 'I5'  display format
 TNULL1   i -2147483647  undefined value for column
