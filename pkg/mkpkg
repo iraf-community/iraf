@@ -12,6 +12,7 @@ update:
 	$call softools
 	$call xtools
 	$call tbtables
+	$call stxtools
 	$call dataio
 	$call images
 	$call lists
@@ -74,4 +75,8 @@ xtools:
 tbtables:
 	$echo "--------------------- TBTABLES --------------------"
 	$call update@tbtables
+	;
+stxtools:
+	$echo "--------------------- STXTOOLS --------------------"
+	$call update@stxtools
 	;

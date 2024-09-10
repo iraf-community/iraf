@@ -80,6 +80,7 @@ bin$libnlfit.a
 bin$libsgi.a
 bin$libslalib.a
 bin$libstg.a
+bin$libstxtools.a
 bin$libsurfit.a
 bin$libsys.a
 bin$libtbtables.a

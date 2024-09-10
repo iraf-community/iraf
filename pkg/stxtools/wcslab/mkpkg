@@ -1,11 +1,11 @@
 # WCSLAB 
 
-$checkout libpkg.a ../
-$update   libpkg.a
-$checkin  libpkg.a ../
+$checkout libstxtools.a ../
+$update   libstxtools.a
+$checkin  libstxtools.a ../
 $exit
 
-libpkg.a:
+libstxtools.a:
 	wlutil.x	<imio.h> <imhdr.h> <gset.h> <math.h>
 	wcslab.x	<gset.h> <imhdr.h> <mwset.h> <math.h> "wcslab.h"\
 			"wcs_desc.h"
