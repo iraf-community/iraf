@@ -33,8 +33,6 @@
 
 #if defined(__aarch64__)
 	.arch armv8-a
-#elif defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__)
-	.abiversion 2
 #elif defined (__arm__)
 	.arch	armv6
 #elif defined(__mips__) && (_MIPS_SIM == _ABIO32)
