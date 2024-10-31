@@ -405,14 +405,14 @@ psi_square|PostScript Kernel square viewport:\
         :tc=psi_def:
 psi_def|psi_land|Postscript Kernel Default 8.5x11in 300dpi Landscape:\
         :ar#0.7552:ca:ch#.02644:co#80:cw#.02:fa:fs#6:\
-        :kf=stsdas$bin($arch)/x_psikern.e:\
+        :kf=st4gem$bin($arch)/x_psikern.e:\
         :li#24:lt#4:pl:pm:se:tf#4:tn=psikern:tq#1:tx:xr#3063:xs#0.2594:\
         :yr#2313:ys#0.1959:zr#256:\
         :BO:\
         :DD=psi_def,tmp$psk,!{ mv $F psk$$.eps; }&:\
         :FB=Times-Bold:FG=Symbol:FI=Times-Italic:FR=Times-Roman:\
-        :IF=stsdas$lib/psikern_prolog.ps:\
-        :LG=stsdas$lib/invxgterm:\
+        :IF=st4gem$lib/psikern_prolog.ps:\
+        :LG=st4gem$lib/invxgterm:\
         :MF#100:PI#1.:PW#.00011:TD#.01221:TP#.001221:TS#.006104:\
         :XO#0.001:YO#0.001:
 
