@@ -138,7 +138,7 @@ ZOPNBF (
 	    zfd[fd].nbytes = 0;
 	    zfd[fd].flags = (filstat.st_mode & S_IFCHR) ? KF_NOSEEK : 0;
 	    zfd[fd].filesize = filstat.st_size;
-		zfd[fd].flags |= KF_DIRECTIO;
+	    zfd[fd].flags |= KF_DIRECTIO;
 	    *chan = fd;
 	}
 
@@ -333,33 +333,4 @@ ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue)
 int _u_fmode (int mode)
 {
 	return (mode);
-}
-
-
-/* GETSTR -- Internal routine to extract a metacharacter delimited substring
- * from a formatted string.  The metacharacter to be taken as the delimiter
- * is passed as an argument.  Any embedded whitespace between the tokens is
- * stripped.  The number of characters in the output token is returned as 
- * the function value, or zero if EOS or the delimiter is reached.
- */
-static int
-getstr (char **ipp, char *obuf, int maxch, int delim)
-{
-	register char *op, *ip = *ipp;
-	register char *otop = obuf + maxch;
-
-	while (*ip && isspace(*ip))
-	    ip++;
-	for (op=obuf;  *ip;  ip++) {
-	    if (*ip == delim) {
-		ip++;
-		break;
-	    } else if (op < otop && !isspace(*ip))
-		*op++ = *ip;
-	}
-
-	*op = '\0';
-	*ipp = ip;
-
-	return (op - obuf);
 }
