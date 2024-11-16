@@ -54,6 +54,7 @@ Architecture | Operating system | Supported CPU types
 `macosx`     | macOS 32 bit     | i386
 `freebsd64`  | FreeBSD 64 bit   | x86\_64
 `freebsd`    | FreeBSD 32 bit   | i386, arm
+`hurd64`     | GNU HURD 64 bit  | x86\_64
 `hurd`       | GNU HURD 32 bit  | i386
 
 Note that Cygwin and big endian architectures like macosx/ppc are not
