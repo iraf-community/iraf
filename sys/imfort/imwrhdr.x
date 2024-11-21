@@ -209,15 +209,15 @@ v2start_
 	    } else if (i_miiwrc (fp, IM_PIXFILE(im), SZ_V2IMPIXFILE) == ERR)
 		goto v2done_
 
-	    call oif_trim (IM_HDRFILE(im), SZ_V2IMHDRFILE)
+	    call oif_strim (IM_HDRFILE(im), SZ_V2IMHDRFILE)
 	    if (i_miiwrc (fp, IM_HDRFILE(im), SZ_V2IMHDRFILE) == ERR)
 		goto v2done_
 
-	    call oif_trim (IM_TITLE(im), SZ_V2IMTITLE)
+	    call oif_strim (IM_TITLE(im), SZ_V2IMTITLE)
 	    if (i_miiwrc (fp, IM_TITLE(im), SZ_V2IMTITLE) == ERR)
 		goto v2done_
 
-	    call oif_trim (IM_HISTORY(im), SZ_V2IMHIST)
+	    call oif_strim (IM_HISTORY(im), SZ_V2IMHIST)
 	    if (i_miiwrc (fp, IM_HISTORY(im), SZ_V2IMHIST) == ERR)
 		goto v2done_
 
@@ -238,11 +238,11 @@ v2done_
 end
 
 
-# OIF_TRIM -- Trim trailing garbage at the end of a string.  This does not
+# OIF_STRIM -- Trim trailing garbage at the end of a string.  This does not
 # affect the value of the string, but makes the contents of the output file
 # clearer when examined with file utilities.
 
-procedure oif_trim (s, nchars)
+procedure oif_strim (s, nchars)
 
 char	s[ARB]
 int	nchars
