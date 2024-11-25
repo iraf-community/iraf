@@ -245,6 +245,6 @@ libtbtables.a:
             !(cd $(iraf)/vendor/cfitsio && mkpkg tb_update)
 
 	    $set XFLAGS 	= "-I$(iraf)/vendor $(XFLAGS)"
-            tbfxff.c    cfitsio/fitsio.h fitsio_spp.h underscore.h
+            tbfxff.c    fitsio_spp.h underscore.h
         $endif
 	;
