@@ -69,7 +69,7 @@ char	output[ARB]		# o: same as input, bit for bit
 double	buf			# local copy of input
 char	cbuf[SZ_DOUBLE]		# will be copied to output
 int	i
-equivalence (buf, cbuf)
+#equivalence (buf, cbuf)
 
 begin
 	buf = input
@@ -89,7 +89,7 @@ char	output[ARB]		# o: same as input, bit for bit
 real	buf			# local copy of input
 char	cbuf[SZ_REAL]		# will be copied to output
 int	i
-equivalence (buf, cbuf)
+#equivalence (buf, cbuf)
 
 begin
 	buf = input
@@ -109,7 +109,7 @@ char	output[ARB]		# o: same as input, bit for bit
 int	buf			# local copy of input
 char	cbuf[SZ_INT32]		# will be copied to output
 int	i
-equivalence (buf, cbuf)
+#equivalence (buf, cbuf)
 
 begin
 	buf = input
@@ -129,7 +129,7 @@ char	output[ARB]		# o: same as input, bit for bit
 short	buf			# local copy of input
 char	cbuf[SZ_SHORT]		# will be copied to output
 int	i
-equivalence (buf, cbuf)
+#equivalence (buf, cbuf)
 
 begin
 	if (SZ_SHORT == SZ_CHAR) {
@@ -153,7 +153,7 @@ char	output[ARB]		# o: same as input, bit for bit
 bool	buf			# local copy of input
 char	cbuf[SZ_BOOL]		# will be copied to output
 int	i
-equivalence (buf, cbuf)
+#equivalence (buf, cbuf)
 
 begin
 	buf = input
