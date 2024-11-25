@@ -1183,7 +1183,7 @@ passflag:		    mkobject = YES;
 	/* Libraries to link against.
 	 */
 	if (!hostprog)
-	    arglist[nargs++] = mkfname (fortlib[0]);
+	    arglist[nargs++] = mkfname (LIBMAIN);
 
 	if (voslibs) {
 	    if (usesharelib) {
