@@ -9,13 +9,12 @@
 
 
 # Determine CL binary to run based on how we were called.
-
 set cl_binary		= "ecl.e"
-
 if (`echo $0 | egrep ecl` != "") then
     set cl_binary	= "ecl.e"
+endif
 
-else if ($#argv > 0) then
+if ($#argv > 0) then
     if ("$argv[1]" == "-old" || "$argv[1]" == "-o") then
         set cl_binary	= "cl.e"
     else if ("$argv[1]:e" == "c") then
@@ -92,8 +91,6 @@ else
         else
             setenv mach macosx
         endif
-    else if ("$os_mach" == "cygwin") then
-        setenv mach cygwin
     else
         set mach = `uname -s | tr '[A-Z]' '[a-z]'`
     endif
@@ -112,12 +109,9 @@ endif
 # Recent linux systems display a problem in how pointer addresses 
 # interact with the stack and can result in a segfault.  Remove the
 # stacksize limit for IRAF processes until this is better understood.
-if ("$IRAFARCH" == "redhat" || \
-    "$IRAFARCH" == "linux64" || \
-    "$IRAFARCH" == "linux") then
-	limit stacksize unlimited
+if ("$IRAFARCH" == "linux64" || "$IRAFARCH" == "linux") then
+    limit stacksize unlimited
 endif
-
 
 # Just run the CL if IRAFARCH already defined.
 if ($?IRAFARCH) then
@@ -136,11 +130,8 @@ if ($?IRAFARCH) then
     endif
 endif
 
-
 # Set the architecture to be used.
 setenv IRAFARCH   $MACH
-
-
 setenv arch 	.$IRAFARCH
 setenv IRAFBIN 	${iraf}bin$arch/
 

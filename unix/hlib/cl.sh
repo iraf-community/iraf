@@ -8,36 +8,35 @@
 # binary would be started for each command.  
 
 
+nm=${0##*/}                             # Command name
+cl_binary="ecl.e"                       # Default to ECL binary
+
 # Determine CL binary to run based on how we were called.
-
-
-nm=${0##*/}
-cl_binary="ecl.e"
-
 case "$nm" in
     "cl" | "cl.sh")
-        cl_binary="ecl.e"
+        cl_binary="cl.e"
         ;;
     "ecl" | "ecl.sh")
         cl_binary="ecl.e"
         ;;
-    *)
-	if (( $# > 1 )); then
-	    if [ $1 == "-old" -o $1 == "-o" ]; then
-        	cl_binary="cl.e"
-	    elif [ $1 == "-ecl" -o $1 == "-e" ]; then
-        	cl_binary="ecl.e"
-	    elif [ ${1##*.} == "c" ]; then
-		# Workaround for autoconf scripts attempting to use this 
-		# command as a valid compiler option.  On some systems (mostly
-		# Debian) a valid CC command can't be found and eventually 
-		# the 'cl' (lisp) compiler is tried.  It will always apparently
-		# have the conftest.c test file, so simply exit with a code to
-		# tell autoconf it won't work.
-		exit 1
-	    fi
-	fi
 esac
+
+# Allow an override argument to start a specific version.
+if (( $# > 0 )); then
+    if [ $1 == "-old" -o $1 == "-o" ]; then
+       	cl_binary="cl.e"
+    elif [ $1 == "-ecl" -o $1 == "-e" ]; then
+       	cl_binary="ecl.e"
+    elif [ ${1##*.} == "c" ]; then
+	# Workaround for autoconf scripts attempting to use this 
+	# command as a valid compiler option.  On some systems (mostly
+	# Debian) a valid CC command can't be found and eventually 
+	# the 'cl' (lisp) compiler is tried.  It will always apparently
+	# have the conftest.c test file, so simply exit with a code to
+	# tell autoconf it won't work.
+	exit 1
+    fi
+fi
 
 # Determine IRAF root directory (value set in install script).
 d_iraf="/opt/iraf/iraf/"
@@ -87,6 +86,8 @@ if [ -n "$IRAFARCH" ]; then
 else
     os_mach=`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
  
+    # Note we don't use "-actual" here to allow an environment IRAFARCH to
+    # determine the architecture.
     if [ -e $iraf/unix/hlib/irafarch.csh ]; then
         MACH=`$iraf/unix/hlib/irafarch.csh`
     else
@@ -105,8 +106,6 @@ else
         else
             export mach="macosx"
         fi
-    elif [ "$os_mach" == "cygwin" ]; then
-        export mach="cygwin"
     else
         mach=`uname -s | tr '[A-Z]' '[a-z]'`
     fi
@@ -122,16 +121,12 @@ else
     fi
 fi
 
-
 # Recent linux systems display a problem in how pointer addresses 
 # interact with the stack and can result in a segfault.  Remove the
 # stacksize limit for IRAF processes until this is better understood.
-if [ "$IRAFARCH" == "redhat" -o \
-     "$IRAFARCH" == "linux64" -o \
-     "$IRAFARCH" == "linux" ]; then
-	ulimit -s unlimited
+if [ "$IRAFARCH" == "linux64" -o "$IRAFARCH" == "linux" ]; then
+    ulimit -s unlimited
 fi
-
 
 # Just run the CL if IRAFARCH already defined.
 if [ -n "$IRAFARCH" ]; then
@@ -149,7 +144,6 @@ if [ -n "$IRAFARCH" ]; then
 	echo "$file not found"
     fi
 fi
-
 
 # Set the architecture to be used.
 export IRAFARCH=$MACH
