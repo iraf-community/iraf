@@ -17,7 +17,7 @@ if test "$IRAFARCH" != "macosx"; then
 fi
 
 
-for i in gmttolst.c irafpath.c prwait.c z*.c ;\
+for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
     do $CC -c $HSI_CF -Wall $i ;\
 done
 
