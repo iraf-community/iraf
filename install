@@ -1143,7 +1143,7 @@ else
     if (( "do_system"==1 )); then
       ECHO -n "Creating root cache at $cache ...                    "
     else
-      ECHO -n 'Creating root cache at $HOME/.iraf/cach  ...		'
+      ECHO -n 'Creating root cache at $HOME/.iraf/cache  ...		'
       ECHO -n '       '
     fi
     if [ "$exec" == "yes" ]; then
