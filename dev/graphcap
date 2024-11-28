@@ -514,7 +514,7 @@ uhplj|UNIX generic interface to Hewlett-Packard LaserJet IIIsi:\
 sgidbg|DEBUG INTERFACE:\
         :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
         :DD=eps,tmp$sgk,!{ sgidebug sgi2ueps $F -l$(XO) \
-        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgidbg$$.eps; }&:tc=sgi_apl:
 uepsf|ueps|Encapsulated Postscript file (portrait) UNIX:\
         :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
         :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
