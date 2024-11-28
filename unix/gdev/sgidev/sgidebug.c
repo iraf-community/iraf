@@ -58,18 +58,21 @@ main (int argc, char *argv[])
 	if (strcmp (&translator[ip], ".e") != 0)
 	    strcat (translator, ".e");
 	sprintf (tpath, "%s", irafpath(translator));
-        fprintf (dbg, "sgidispatch path: %s\n", tpath);
+        fprintf (dbg, "sgidispatch -- translator path: %s\n", tpath);
 
 	if (access (tpath, X_OK) == ERR) {
 	    fprintf (stderr, "Fatal (sgidispatch): unable to access SGI");
 	    fprintf (stderr, " translator `%s'\n", tpath);
 	    fflush (stderr);
 	    exit (OSOK+1);
+	} else {
+	    fprintf (dbg, "Translator `%s' exists as execitable\n", tpath);
 	}
 
 	/* Set up i/o for translator and attempt to fork.
 	 */
         fprintf (dbg, "Calling translator....\n");
+	fflush (stderr);
         fclose (dbg);
 
 	argv[argc] = 0;
