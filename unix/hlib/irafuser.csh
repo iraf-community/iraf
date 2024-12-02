@@ -106,12 +106,11 @@ alias	mkiraf	${hlib}mkiraf.sh
 alias	mkmlist	${hlib}mkmlist.sh
 alias	mkz	${hbin}mkpkg.e "$mkzflags"
 
-alias	edsym	${hbin}edsym.e
-alias	generic	${hbin}generic.e
-alias	mkpkg	${hbin}mkpkg.e
-alias	rmbin	${hbin}rmbin.e
-alias	rmfiles	${hbin}rmfiles.e
-alias	rtar	${hbin}rtar.e
-alias	wtar	${hbin}wtar.e
-alias	xc	${hbin}xc.e
-alias	xyacc	${hbin}xyacc.e
+alias	generic	${hlib}generic.sh
+alias	mkpkg	${hlib}mkpkg.sh
+alias	rmbin	${hlib}rmbin.sh
+alias	rmfiles	${hlib}rmfiles.sh
+alias	rtar	${hlib}rtar.sh
+alias	wtar	${hlib}wtar.sh
+alias	xc	${hlib}xc.sh
+alias	xyacc	${hlib}xyacc.sh
