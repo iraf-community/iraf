@@ -18,7 +18,7 @@ begin
 	nrows = TB_NROWS(tp)
 
 	status = 0
-	call fsdrow (TB_FILE(tp), max (1, nrows-ndel+1), ndel, status)
+	call fsdrow (TB_FILE(tp), max (1, nrows-ndel+1), ndel, nrows, status)
 	if (status > 0)
 	    call tbferr (status)
 
