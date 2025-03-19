@@ -1324,7 +1324,7 @@ o_fixlanguage (memel *argp)
  * then precede it with "do" but alphabetize it according to its intended name.
  */
 
-void (*opcodetbl[])() = {
+void (*opcodetbl[])(memel *arg) = {
 /*  0 */	o_undefined,
 
 /*  1 */	o_absargset,
