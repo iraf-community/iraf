@@ -441,14 +441,13 @@ do_if (struct context *cx, char	*keyword)
 	} else if (strcmp (key, "older") == 0) {
 	    /* $IFOLDER.  Check if the named file is older than any of the
 	     * listed files.  If the named file does not exist the result
-	     * is true.  If any of the listed files do not exist a warning
-	     * is printed and they are ignored.
+	     * is true.  If the named file do not exist a warning
+	     * is printed.
 	     */
 	    if (os_access (argv[1], 0,0) == NO) {
 		warns ("file `%s' not found", argv[1]);
 		bval = 1;
 	    } else if ((fdate = os_fdate(argv[0])) <= 0) {
-		warns ("file `%s' not found", argv[0]);
 		bval = 1;
 	    } else {
 		for (i=1;  i < argc;  i++) {
@@ -468,10 +467,9 @@ do_if (struct context *cx, char	*keyword)
 	    /* $IFNEWER.  Check if the named file is newer than any of the
 	     * listed files.  If the named file does not exist the result
 	     * is false.  If any of the listed files do not exist a warning
-	     * is printed and they are ignored.
+	     * is printed.
 	     */
 	    if (os_access (argv[1], 0,0) == NO) {
-		warns ("file `%s' not found", argv[1]);
 		bval = 1;
 	    } else if ((fdate = os_fdate(argv[0])) <= 0) {
 		warns ("file `%s' not found", argv[0]);
