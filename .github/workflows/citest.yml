@@ -18,19 +18,20 @@ jobs:
             os: ubuntu-latest
             cflags: -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
 
-          - name: Ubuntu 20.04 Focal i386
-            os: ubuntu-20.04
+          - name: Ubuntu 22.04 Focal i386
+            os: ubuntu-22.04
             irafarch: linux
             ldflags: -m32
             cflags: -m32 -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
 
-          - name: macOS x86_64
-            os: macos-latest
+          - name: macOS 15 Sequoia arm64
+            os: macos-15
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
 
-          - name: macOS arm64
-            os: macos-14
-            cflags: -O2 -g -Wall -Wno-logical-op-parentheses
+          - name: macOS 13 Ventura x86_64
+            os: macos-13
+            cflags: -O1 -g -Wall -Wno-logical-op-parentheses -arch x86_64
+            ldflags: -arch x86_64
 
     steps:
       - name: Checkout repository
