@@ -78,7 +78,7 @@ getlimits (
 int
 get_dim (char *pname)
 {
-	struct param *pp, *lookup_param();
+	struct param *pp;
 	char	*pk, *t, *p, *f;
 	int 	dim;
 
