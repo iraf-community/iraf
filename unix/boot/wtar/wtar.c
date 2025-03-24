@@ -543,11 +543,11 @@ copyfile (
 {
 	register char	*bp;
 	register int	i;
-	int	nbytes, nleft, blocks, fd, count, total, ch;
+	int	nbytes, nleft, blocks, fd, count, ch;
 	char	buf[TBLOCK*2];
 
 	bp = buf;
-	total = nbytes = 0;
+	nbytes = 0;
 	blocks = (fh->size + TBLOCK - 1 ) / TBLOCK;
 
 	if ((fd = os_open (fname, 0, ftype)) == ERR) {
@@ -585,7 +585,6 @@ copyfile (
 			nleft = 0;
 
 		    bp = (char *) ((long)buf + nleft);
-		    total += nbytes;
 		    nbytes = nleft;
 		}
 	    }
