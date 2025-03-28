@@ -186,7 +186,7 @@ static void  fatal (char *s);
 int
 main (int argc, char *argv[])
 {
-	int	i, j, nargs, ncomp;
+	int	i, j, nargs;
 	char	*arglist[MAXFILE+MAXFLAG+10];
 	char	*arg, *ip, *s;
 	int	status, noperands;
@@ -472,7 +472,7 @@ main (int argc, char *argv[])
 			     */
 			    link_nfs = YES;
 			} else {
-passflag:		    mkobject = YES;
+			    mkobject = YES;
 			    if (!cflagseen)
 				mktask = YES;
 			    *bp++ = *ip;
@@ -748,7 +748,6 @@ passflag:		    mkobject = YES;
 	    sprintf (tempfile, "T_%s", outfile);
 	arglist[nargs++] = tempfile;
 
-	ncomp = 0;
 	for (i=0;  i < nfiles;  i++)
 	    if (*(ip = lfiles[i]) != '-') {
 		while (*ip++ != EOS)
@@ -763,7 +762,6 @@ passflag:		    mkobject = YES;
 		    case 's':
 		    case 'e':
 			ip[1] = 'o';
-			ncomp++;
 		    }
 	    }
 

@@ -1,6 +1,5 @@
       subroutine errchk
       integer tok, lastt0, gnbtok, token(100)
-      integer ntok
       integer mktabl
       common /cdefio/ bp, buf (4096)
       integer bp
@@ -80,7 +79,6 @@
      *d0(22)/103/,serrd0(23)/44/,serrd0(24)/32/,serrd0(25)/120/,serrd0(2
      *6)/101/,serrd0(27)/114/,serrd0(28)/112/,serrd0(29)/97/,serrd0(30)/
      *100/,serrd0(31)/-2/
-      ntok = 0
       tok = 0
 23000 continue
       lastt0 = tok

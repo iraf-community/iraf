@@ -44,7 +44,7 @@ set -e
 
 s=/tmp/stderr_$$
 CC=${CC_f2c:-${CC:-cc}}
-CFLAGS="-I${iraf}include ${XC_CFLAGS} -std=gnu11 -Wno-deprecated-non-prototype -Wno-maybe-uninitialized -Wno-strict-aliasing -Wno-unknown-warning-option -fcommon"
+CFLAGS="-I${iraf}include ${XC_CFLAGS} -std=gnu11 -Wno-deprecated-non-prototype -Wno-maybe-uninitialized -Wno-strict-aliasing -Wno-unknown-warning-option -Wno-return-type -fcommon"
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-${iraf}unix/bin/f2c.e}

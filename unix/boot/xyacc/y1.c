@@ -251,7 +251,6 @@ others (void)
 {
     extern int gen_lines;
     int c, i, j;
-    int tmpline;
 
     finput = fopen (parser, "r");
     if (finput == NULL)
@@ -295,11 +294,8 @@ others (void)
 
     if (gen_lines)
 	(void) fprintf (fsppout, "# line\t1 \"%s\"\n", parser);
-    tmpline = 1;
     /* copy parser text */
     while ((c = getc (finput)) != EOF) {
-	if (c == '\n')
-	    tmpline++;
 	if (c == '$') {
 	    if ((c = getc (finput)) == 'A') {
 		/* Replace $A macro by the user declarations.

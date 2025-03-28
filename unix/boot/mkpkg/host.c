@@ -86,7 +86,7 @@ h_updatelibrary (
 )
 {
 	char	cmd[SZ_CMD+1], *args;
-	int	exit_status, baderr, npass;
+	int	exit_status, baderr;
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
 	char	libfname[SZ_PATHNAME+1];
@@ -184,10 +184,10 @@ h_updatelibrary (
 	 * are typically processed in each iteration.
 	 */
 	args  = &cmd[strlen(cmd)];
-	nleft = totfiles;
-	ndone = 0;
 
-	for (npass=0; nleft > 0; npass++) {
+	for (nleft = totfiles, ndone = 0;
+	     nleft > 0;
+	     nleft -= nfiles, ndone += nfiles) {
 
 	    /* Add as many filenames as will fit on the command line.  */
 	    nfiles = add_objects (cmd, SZ_CMD, &flist[ndone], nleft,
@@ -225,9 +225,6 @@ h_updatelibrary (
 	    /* Truncate command and repeat with the next few files.
 	     */
 	    (*args) = EOS;
-
-	    ndone += nfiles;
-	    nleft -= nfiles;
 
 	}
 
