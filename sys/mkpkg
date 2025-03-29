@@ -191,7 +191,6 @@ libcur.a:
 	;
 
 libmain.o:				# The root object module
-	$set XFLAGS = "-c $(HSI_XF)"
 	$checkout zmain.c host$os/
 	$omake	  zmain.c
 	$iffile (bin$libsys.a)		# store all binaries in BIN?
