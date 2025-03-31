@@ -1,12 +1,12 @@
-IRAF 2.18 Release Notes
-=======================
+IRAF 2.18.1 Release Notes
+=========================
 
 :Authors: IRAF Community, NOIRLab
-:Date: April 05, 2024
+:Date: April 05, 2025
 
-The current IRAF version 2.18 is available from Github at
+The current IRAF version 2.18.1 is available from Github at
 
-https://github.com/iraf-community/iraf/releases/tag/v2.18
+https://github.com/iraf-community/iraf/releases/tag/v2.18.1
 
 Changes to the version 2.17.1 include:
 
@@ -53,6 +53,27 @@ Detailed list of changes
 ------------------------
 
 This list shows all pull requests that were merged since 2.17.1.
+
+Since 2.18
+~~~~~~~~~~
+
+- Protoize CL and ECL (`#391 <https://github.com/iraf-community/iraf/pull/391>`__)
+- Fix build on Fedora-40: Use explicit pointer casts in some more places (`#396 <https://github.com/iraf-community/iraf/pull/396>`__)
+- Use time_t in bootlib (`#405 <https://github.com/iraf-community/iraf/pull/405>`__)
+- NOIRLAB: tbtables: automatically add .tab extn if necessary (`#408 <https://github.com/iraf-community/iraf/pull/408>`__)
+- NOIRLAB: Move stxtools (library) package from utilities/nttools to package root (`#406 <https://github.com/iraf-community/iraf/pull/406>`__)
+- NOIRLAB: Change stsdas to st4gem for psikern entries in graphcat (`#412 <https://github.com/iraf-community/iraf/pull/412>`__)
+- Remove VMcache client code from IRAF (`#417 <https://github.com/iraf-community/iraf/pull/417>`__)
+- Add hurd64 to the list of supported architectures (`#418 <https://github.com/iraf-community/iraf/pull/418>`__)
+- Delete gx generated files (`#433 <https://github.com/iraf-community/iraf/pull/433>`__)
+- Make IRAF compileable with gcc-15 and newer clang (`#429 <https://github.com/iraf-community/iraf/pull/429>`__)
+- Silence warnings (`#435 <https://github.com/iraf-community/iraf/pull/435>`__,
+  `#432 <https://github.com/iraf-community/iraf/pull/432>`__)
+- Prepare release  (`#434 <https://github.com/iraf-community/iraf/pull/434>`__)
+
+
+Since 2.17.1
+~~~~~~~~~~~~
 
 - Makefile install fixes found when creating the Debian package (`#315 <https://github.com/iraf-community/iraf/pull/315>`__)
 - Strip more files from the installed package (`#316 <https://github.com/iraf-community/iraf/pull/316>`__)
