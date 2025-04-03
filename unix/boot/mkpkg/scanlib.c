@@ -86,7 +86,6 @@ h_scanlibrary (char *library)
 	/* Open the UNIX archive file.
 	 */
 	if ((fp = fopen (libfname, "r")) == NULL) {
-	    printf ("warning: library `%s' not found\n", libfname);
 	    fflush (stdout);
 	    return (0);
 	}

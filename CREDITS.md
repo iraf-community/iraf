@@ -44,6 +44,8 @@ revision notes:
 # Contributors from the IRAF community
 
  * Christian Dersch
+ * Linbo He
+ * Masato Onodera
  * Ole Streicher
- * Chisato Yamauchi
  * Josef Wang
+ * Chisato Yamauchi

@@ -15,8 +15,6 @@
 
 #include "osproto.h"
 
-static int loggedin (int uid);
-
 /*
  * ZALLOC.C -- Device allocation interface.  Requires the dev$devices table,
  * which is read by the high level code before we are called.
@@ -130,7 +128,6 @@ ZDVOWN (
 	    *status = DV_DEVFREE;
 	else if (uid == getuid())
 	    *status = DV_DEVALLOC;
-	/* else if (!loggedin (uid)) */
 	else if (u_allocstat ((char *)device) == DV_DEVFREE)
 	    *status = DV_DEVFREE;
 	else {
@@ -142,38 +139,6 @@ ZDVOWN (
 	}
 
 	return (*status);
-}
-
-
-/* LOGGEDIN -- Return 1 if uid is logged in, else 0.
- */
-static int
-loggedin (int uid)
-{
-	struct	utmpx ubuf;
-	struct	passwd *pw;
-	FILE	*ufp;
-
-	if ((ufp = fopen ("/var/run/utmp", "r")) == NULL) {
-	    printf ("zdvown: cannot open /var/run/utmp\n");
-	    return (1);
-	}
-
-	if ((pw = getpwuid (uid)) == NULL) {
-	    fclose (ufp);
-	    return (0);
-	}
-
-	do {
-	    if (fread (&ubuf, sizeof (struct utmpx), 1, ufp) == (size_t) 0) {
-		fclose (ufp);
-		return (0);
-	    }
-	} while (strncmp (ubuf.ut_user, pw->pw_name, 8) != 0);
-
-	fclose (ufp);
-
-	return (1);
 }
 
 
