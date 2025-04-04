@@ -35,7 +35,8 @@ libpkg.a:
 			<math/curfit.h>
 	decod_tablst.x	<ctype.h>
 	t_lcase.x	
-	pfregres.c
+	matinv.f	
+	pfregres.f
 	pffctn.x
 	t_split.x	<mach.h>
 	t_curfit.x	<ctype.h> <error.h> <fset.h> <imhdr.h> <pkg/gtools.h>\
