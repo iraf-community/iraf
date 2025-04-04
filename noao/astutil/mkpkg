@@ -10,7 +10,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lasttools -lxtools -lcurfit -lbev"
+	$set	LIBS = "-lasttools -lxtools -lcurfit"
 
 	$update	libpkg.a
 	$omake	x_astutil.x
