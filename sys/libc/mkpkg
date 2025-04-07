@@ -10,7 +10,7 @@ $checkin  libc.a lib$
 $exit
 
 libc.a:
-	$set	XFLAGS	= "$(XFLAGS) -/Wall"
+	$set	XFLAGS	= "$(XFLAGS) -/Wall -g"
 
 	atof.c		<libc/ctype.h> <libc/libc.h> <libc/spp.h>\
 			<libc/xnames.h>
