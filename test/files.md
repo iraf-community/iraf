@@ -58,7 +58,6 @@ host$bin/xyacc.e
 
 ```
 cl> dir bin$*.a ncol=1
-bin$libbev.a
 bin$libc.a
 bin$libcur.a
 bin$libcurfit.a
