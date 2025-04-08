@@ -11,7 +11,7 @@ update:
 relink:
 	@nttools
 
-	$set	LIBS = "-lxtools -lcurfit -lbev -lgsurfit"
+	$set	LIBS = "-lxtools -lcurfit -lgsurfit"
 
 	$update	libpkg.a
 	$omake	x_utilities.x
@@ -35,6 +35,7 @@ libpkg.a:
 			<math/curfit.h>
 	decod_tablst.x	<ctype.h>
 	t_lcase.x	
+	matinv.f
 	pfregres.f
 	pffctn.x
 	t_split.x	<mach.h>

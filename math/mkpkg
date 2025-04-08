@@ -12,7 +12,6 @@ $exit
 # library, or type "mkpkg libname" in this directory, e.g. "mkpkg llsq".
 
 mathgen:
-	$call bev
 	$call curfit
 	$call deboor
 	$call gsurfit
@@ -27,12 +26,6 @@ mathgen:
 	$purge lib$
 	;
 
-bev:
-	$echo "-------------- LIBBEV -------------------"
-	$checkout libbev.a lib$
-	$update   libbev.a
-	$checkin  libbev.a lib$
-	;
 curfit:
 	$echo "-------------- LIBCURFIT ----------------"
 	$checkout libcurfit.a lib$
@@ -100,10 +93,6 @@ fftpack:
 	$checkout libfftpack.a lib$
 	$update   libfftpack.a
 	$checkin  libfftpack.a lib$
-	;
-
-libbev.a:				# Bevington routines
-	@bevington
 	;
 
 libcurfit.a:				# Curve fitting package
