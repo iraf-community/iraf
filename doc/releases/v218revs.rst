@@ -2,7 +2,7 @@ IRAF 2.18.1 Release Notes
 =========================
 
 :Authors: IRAF Community, NOIRLab
-:Date: April 05, 2025
+:Date: April 10, 2025
 
 The current IRAF version 2.18.1 is available from Github at
 
@@ -69,7 +69,9 @@ Since 2.18
 - Make IRAF compileable with gcc-15 and newer clang (`#429 <https://github.com/iraf-community/iraf/pull/429>`__)
 - Silence warnings (`#435 <https://github.com/iraf-community/iraf/pull/435>`__,
   `#432 <https://github.com/iraf-community/iraf/pull/432>`__)
-- Prepare release  (`#434 <https://github.com/iraf-community/iraf/pull/434>`__)
+- Shrink math bevington (`437 <https://github.com/iraf-community/iraf/pull/437>`__)
+- Prepare release (`#434 <https://github.com/iraf-community/iraf/pull/434>`__,
+  `#438 <https://github.com/iraf-community/iraf/pull/438>`__)
 
 
 Since 2.17.1
