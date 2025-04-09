@@ -1,7 +1,6 @@
 # Help directory file for the MATH package, a collection of mathematical
 # (numerical) packages.
 
-$bev		= "math$bevington/doc/"
 $curfit		= "math$curfit/doc/"
 $deboor		= "math$deboor/doc/"
 $gsurfit	= "math$gsurfit/doc/"
@@ -11,10 +10,6 @@ $llsq		= "math$llsq/doc/"
 $nlfit		= "math$nlfit/doc/"
 $slalib		= "math$slalib/doc/"
 $surfit		= "math$surfit/doc/"
-
-bevington	hlp = bev$bev.men,
-		sys = bev$bev.hlp,
-		pkg = bev$bev.hd
 
 curfit		hlp = curfit$curfit.men,
 		sys = curfit$curfit.hlp,
