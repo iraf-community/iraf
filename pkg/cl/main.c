@@ -63,7 +63,7 @@ int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
 
 static	funcptr_t old_onipc;	/* X_IPC handler chained to onint()	*/
-static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
+static	XINT *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
@@ -109,7 +109,7 @@ c_main (
 	 * ourselves during normal execution, but when the CL exits we are
 	 * not prepared to deal with errors occuring during shutdown.
 	 */
-	XMJBUF (&bp);  jumpcom = (long *)&Memc[bp];
+	XMJBUF (&bp);  jumpcom = (XINT *)&Memc[bp];
 	cl_amovi ((int *)jumpcom, (int *)jmp_save, LEN_JUMPBUF);
 
 	/* Init clexit() in case we have to panic stop.  */
