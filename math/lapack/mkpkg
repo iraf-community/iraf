@@ -6,6 +6,7 @@ $checkin  liblapack.a lib$
 $exit
 
 liblapack.a:
+	wrapper.c
 	dgemm.f
 	dger.f
 	dgetf2.f
