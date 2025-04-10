@@ -70,6 +70,7 @@ Since 2.18
 - Silence warnings (`#435 <https://github.com/iraf-community/iraf/pull/435>`__,
   `#432 <https://github.com/iraf-community/iraf/pull/432>`__)
 - Shrink math bevington (`437 <https://github.com/iraf-community/iraf/pull/437>`__)
+- Fix type of jumpcon in (e)cl/main.c (`439 <https://github.com/iraf-community/iraf/pull/439>`__)
 - Prepare release (`#434 <https://github.com/iraf-community/iraf/pull/434>`__,
   `#438 <https://github.com/iraf-community/iraf/pull/438>`__)
 
