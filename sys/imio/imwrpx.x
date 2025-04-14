@@ -56,17 +56,11 @@ begin
 
 
 	if (pl != NULL) {
-
-	    # Need to unpack again on 64-bit systems.
-	    if ((IM_PIXTYPE(im) == TY_INT || IM_PIXTYPE(im) == TY_LONG) &&
-		SZ_INT != SZ_INT32) {
-		    call iupk32 (buf, buf, npix)
-	    }
-
 	    # Write to a pixel list.
 	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
 	    call amovl (v, o_v, IM_MAXDIM)
 	    nchars = npix * sz_pixel
+	    #nchars = npix * sz_dtype
 
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT:
@@ -76,21 +70,38 @@ begin
 		    call pl_plps (pl, v, buf, 0, npix, PIX_SRC)
 		else {
 		    do ip = 1, nchars, sz_pixel {
-			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			call pl_plps (pl, o_v, buf[ip], 0, 1, PIX_SRC)
 			o_v[1] = o_v[1] + step
 		    }
 		}
 	    case TY_INT, TY_LONG:
+		call smark (sp)
+		call salloc (ibuf, npix*sz_dtype, TY_INT)
+
+	    	# Need to unpack again on 64-bit systems but use a 
+		# local buffer.  This is because the pixel array is
+		# index as an integer in the pl_plpi() procedure but
+		# the pixel array is stored as 32-bit integers.  On
+		# 64-bit systems this leads to skipping pixels.  The
+		# buffer passed in is a single line from imflsh() and
+		# we would corrupt the raster modifying the input 
+		# buffer directly.
+	    	if (SZ_INT != SZ_INT32)
+		    call iupk32 (buf, Memi[ibuf], npix)
+	    	else
+		    call amovc (buf, Memi[ibuf], npix*sz_pixel)
+
 		if (rlio)
-		    call pl_plri (pl, v, buf, 0, npix, PIX_SRC)
-		else if (step == 1)
-		    call pl_plpi (pl, v, buf, 0, npix, PIX_SRC)
-		else {
+		    call pl_plri (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
+		else if (step == 1) {
+		    call pl_plpi (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
+		} else {
 		    do ip = 1, nchars, sz_pixel {
-			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			call pl_plpi (pl, o_v, Memi[ibuf+ip-1], 0, 1, PIX_SRC)
 			o_v[1] = o_v[1] + step
 		    }
 		}
+		call sfree (sp)
 	    default:
 		call smark (sp)
 		call salloc (ibuf, npix, TY_INT)
