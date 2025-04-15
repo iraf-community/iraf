@@ -133,12 +133,12 @@ irafpath (char *fname)
 	/* Get the root pathnames.  */
 	strcpy ((char *)ldir, "host");
 	ZGTENV (ldir, hostdir, &x_maxch, &x_status);
-        fprintf (dbg, "irafpath host(%ld): %s\n", x_status, (char *)hostdir);
+        fprintf (dbg, "irafpath host(%d): %s\n", x_status, (char *)hostdir);
 	if (x_status <= 0)
 	    return (fname);
 	strcpy ((char *)ldir, "iraf");
 	ZGTENV (ldir, irafdir, &x_maxch, &x_status);
-        fprintf (dbg, "irafpath iraf(%ld): %s\n", x_status, (char *)irafdir);
+        fprintf (dbg, "irafpath iraf(%d): %s\n", x_status, (char *)irafdir);
 	if (x_status <= 0)
 	    return (fname);
 
