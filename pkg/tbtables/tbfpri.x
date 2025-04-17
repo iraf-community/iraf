@@ -111,8 +111,10 @@ begin
 	}
 
 	status = 0
+	ifd[1] = 0
 	ifd[2] = 0		# not needed for four-byte C pointers
-	ofd[2] = 0
+	ofd[1] = 0
+	ofd[2] = 0		# not needed for four-byte C pointers
 
 	# Get a unit number for the input file, and open the file.
 	call fsgiou (ifd, status)
