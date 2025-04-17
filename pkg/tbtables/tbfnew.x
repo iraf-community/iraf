@@ -119,6 +119,7 @@ begin
 	# Get a unit number.
 	# This call does nothing if linked with CFITSIO.  In that case,
 	# fd is output from fsopen or fsinit, and fd is actually a C pointer.
+	fd[1] = 0		# not needed for four-byte C pointers
 	fd[2] = 0		# not needed for four-byte C pointers
 	call fsgiou (fd, status)
 	if (status != 0)
