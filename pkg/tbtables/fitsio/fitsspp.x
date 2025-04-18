@@ -595,6 +595,8 @@ begin
 
 	recnum[nbuff] = (fpos / bytes_per_record)+1
         bytnum[nbuff] = mod (fpos, bytes_per_record)
+
+	call flush (fd)
 end
 
 # FTGBYT -- Read a byte sequence from a file.  The sequence may begin on any
@@ -613,6 +615,8 @@ int	fd, nbuff, fpos, nb
 int	ftread()
 include	"fitsspp.com"
 
+char	str[SZ_LINE]
+int	errget(), code
 begin
 	# Special cases.
         if (status > 0 || nbytes == 0)
@@ -637,7 +641,9 @@ begin
 	    return
 	} else if (nb != nbytes) {
 	    status = 107
-          }
+	} else {
+	    status = 0
+        }
 
 	# Update the FITSIO common to track the new file position.
 	fpos = fpos + max (0, nb)
@@ -773,6 +779,7 @@ begin
 		fsize = fsize + nc
 	}
 
+	call flush (fd)
 	call sfree (sp)
 end
 
@@ -808,8 +815,10 @@ begin
 	# buffer and we are done.
 
 	call seek (fd, start_char)
-	if (boff == 0 && mod(nbytes,SZB_CHAR) == 0)
-	    return (read (fd, obuf, nchars) * SZB_CHAR)
+	if (boff == 0 && mod(nbytes,SZB_CHAR) == 0) {
+	    nout = read (fd, obuf, nchars) * SZB_CHAR
+	    return (nout)
+	}
 
 	# Allocate intermediate buffer.
 	call smark (sp)
