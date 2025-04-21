@@ -11,18 +11,9 @@
 nm=${0##*/}                             # Command name
 cl_binary="ecl.e"                       # Default to ECL binary
 
-# Determine CL binary to run based on how we were called.
-case "$nm" in
-    "cl" | "cl.sh")
-        cl_binary="cl.e"
-        ;;
-    "ecl" | "ecl.sh")
-        cl_binary="ecl.e"
-        ;;
-esac
-
 # Allow an override argument to start a specific version.
 if (( $# > 0 )); then
+    # Determine CL binary to run based on how we were called.
     if [ $1 == "-old" -o $1 == "-o" ]; then
        	cl_binary="cl.e"
     elif [ $1 == "-ecl" -o $1 == "-e" ]; then
