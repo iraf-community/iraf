@@ -314,6 +314,24 @@ if (( $do_system==0 )); then
 
         mkdir $HOME/.iraf
         (cd $HOME/.iraf ; mkdir imdir cache bin)
+
+        f=$HOME/.iraf/envinit
+        echo "# Initialize the $iraf and environment."                    > $f
+        echo "if [ -n $iraf ]; then"                                     >> $f
+        echo "    if test -f $HOME/.iraf/setup.sh ; then"                >> $f
+        echo "        source $HOME/.iraf/setup.sh"                       >> $f
+        echo "    elif test -f /iraf/iraf/unix/hlib/setup.sh ; then"     >> $f
+        echo "        source /iraf/iraf/unix/hlib/setup.sh"              >> $f
+        echo "    elif test -f /opt/iraf/iraf/unix/hlib/setup.sh ; then" >> $f
+        echo "        source /opt/iraf/iraf/unix/hlib/setup.sh"          >> $f
+        echo "    fi"                                                    >> $f
+        echo "else"                                                      >> $f
+        echo "    source $iraf/unix/hlib/setup.sh"                       >> $f
+        echo "fi"                                                        >> $f
+        echo "if test -f $iraf/unix/hlib/irafuser.sh ; then"             >> $f
+            echo "source $iraf/unix/hlib/irafuser.sh"                    >> $f
+        echo "fi"                                                        >> $f
+
     fi
     bindir="$HOME/.iraf/bin"
 fi
@@ -750,11 +768,16 @@ BINDIRS="$hbin $hlib $fbin $host"
 PATHFILES="mkiraf.csh mkiraf.sh libc/iraf.h cl.sh cl.csh ecl.sh ecl.csh setup.sh setup.csh"
 MODEFILES="cl.sh cl.csh ecl.sh ecl.csh fc.sh fc.csh mkiraf.csh mkiraf.sh mkfloat.${extn} mkmlist.${extn} $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.sh irafarch.csh"
 LINKFILES="ecl.${extn} cl.${extn} mkiraf.csh mkiraf.sh mkmlist.${extn} generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
-LINKCMDS=(ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc)
-LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
+LINKCMDS=(ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch sgidebug wtar rpp xpp xyacc xc)
+#LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn} ${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
+LTARGETS=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn} ${hlib}/generic.${extn} ${hlib}/mkpkg.${extn} ${hlib}/rmbin.${extn} ${hlib}/rmfiles.${extn} ${hlib}/rtar.${extn} ${hlib}/sgidispatch.${extn} ${hlib}/sgidebug.${extn} ${hlib}/wtar.${extn} ${hlib}/rpp.${extn} ${hlib}/xpp.${extn} ${hlib}/xyacc.${extn} ${hlib}/xc.${extn})
 CMDLINKS="ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
 
+LINKCMDS1=(ecl cl mkiraf mkmlist)
+LINKCMDS2=(generic mkpkg rmbin rmfiles rtar sgidispatch sgidebug wtar rpp xpp xyacc xc)
+LTARGETS1=(${hlib}/ecl.${extn} ${hlib}/cl.${extn} ${hlib}/mkiraf.sh ${hlib}/mkmlist.${extn})
+LTARGETS2=(${hbin}/generic.e ${hbin}/mkpkg.e ${hbin}/rmbin.e ${hbin}/rmfiles.e ${hbin}/rtar.e ${hbin}/sgidispatch.e ${hbin}/sgidebug.e ${hbin}/wtar.e ${hbin}/rpp.e ${hbin}/xpp.e ${hbin}/xyacc.e ${hbin}/xc.e)
 
 
 #===============================================================================
@@ -989,7 +1012,7 @@ else
   if [ "$SHELL" == "/bin/csh" -o "$SHELL" == "/bin/tcsh" ]; then
    pfiles=("$HOME/.cshrc)
   else
-   pfiles=("$HOME/.bashrc $HOME/.profile)
+   pfiles=("$HOME/.bashrc $HOME/.profile $HOME/.zshrc)
   fi
 fi
 for file in ${pfiles[@]}; do
@@ -1263,12 +1286,17 @@ else			# else of 'do_system'
     fi
 
 
-    ECHO -n 'Marking system architecture ...                                '
+    ECHO -n 'Marking system root and architecture ...                       '
     if [ "$exec" == "yes" ]; then
-	if [ -e "$HOME/.iraf/arch" ]; then
-            RM $HOME/.iraf/arch
+	if [ -e "$HOME/.iraf/irafroot" ]; then
+            RM $HOME/.iraf/irafroot
 	fi
-        echo $IRAFARCH >  $HOME/.iraf/arch
+        echo ${iraf}/ >  $HOME/.iraf/irafroot
+
+	if [ -e "$HOME/.iraf/arch" ]; then
+            RM $HOME/.iraf/irafarch
+	fi
+        echo $IRAFARCH >  $HOME/.iraf/irafarch
     fi
     DO_OK
 
@@ -1514,6 +1542,7 @@ if [ "$do_system" == 0 ]; then
  	        echo "    setenv IRAFARCH $IRAFARCH"		>> $TEMP
  	        echo "    source $HOME/.iraf/setup.csh"		>> $TEMP
  	        echo "endif"					>> $TEMP
+ 	        echo "set path = ($HOME/.iraf/bin $path)""	>> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1529,6 +1558,7 @@ if [ "$do_system" == 0 ]; then
  	echo "    setenv IRAFARCH $IRAFARCH"		        >> $file
  	echo "    source $HOME/.iraf/setup.csh"			>> $file
  	echo "endif"						>> $file
+ 	echo "set path = ($HOME/.iraf/bin $path)""	        >> $file
     fi
   done
 
@@ -1551,6 +1581,7 @@ if [ "$do_system" == 0 ]; then
  	        echo "    export IRAFARCH=$IRAFARCH"		>> $TEMP
  	        echo "    source $HOME/.iraf/setup.sh"		>> $TEMP
  	        echo "fi"					>> $TEMP
+ 	        echo "export PATH $PATH:$HOME/.iraf/bin"	>> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1566,9 +1597,9 @@ if [ "$do_system" == 0 ]; then
  	echo "    export IRAFARCH=$IRAFARCH"		        >> $file
  	echo "    source $HOME/.iraf/setup.sh"			>> $file
  	echo "fi"						>> $file
+ 	echo "export PATH $PATH:$HOME/.iraf/bin"	        >> $file
     fi
   done
-
 fi
 
 
