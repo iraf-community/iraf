@@ -176,8 +176,8 @@ static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
 
 static int ks_socket (char *host, u_long addr, int port, char *mode);
-static void ks_onsig (int sig, int *arg1, int *arg2);
-static void ks_reaper (int sig, int *arg1, int *arg2);
+static void ks_onsig (int sig);
+static void ks_reaper (int sig);
 static char *ks_getpass (char *user, char *host);
 
 static int ks_getresvport (int *alport);
@@ -1066,9 +1066,7 @@ ZAWRKS (
  */
 static void
 ks_onsig (
-  int	sig,			/* signal which was trapped	*/
-  int	*arg1,			/* not used */
-  int	*arg2 			/* not used */
+  int	sig			/* signal which was trapped	*/
 )
 {
 	/* If we get a SIGPIPE writing to a server the server has probably
@@ -1086,9 +1084,7 @@ ks_onsig (
  */
 static void
 ks_reaper (
-  int     sig,                  /* signal which was trapped     */
-  int     *arg1,                /* not used */
-  int     *arg2                 /* not used */
+  int     sig                  /* signal which was trapped     */
 )
 {
         int status=0, pid=0;
