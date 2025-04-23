@@ -162,7 +162,7 @@ static	int jmpset = 0;
 static	int recursion = 0;
 extern	int errno;
 
-static void nd_onsig (int sig, int *arg1, int *arg2);
+static void nd_onsig (int sig);
 static int getstr (char **ipp, char *obuf, int maxch, int delim);
 
 
@@ -828,9 +828,7 @@ ZAWRND (
  *  */
 static void
 nd_onsig (
-  int     sig,                    /* signal which was trapped     */
-  int     *arg1,                  /* not used */
-  int     *arg2                   /* not used */
+  int     sig                    /* signal which was trapped     */
 )
 {
         /* If we get a SIGPIPE writing to a server the server has probably
