@@ -94,11 +94,7 @@ typedef	void  (*SIGFUNC)(int);
 #endif
 
 typedef	void  (*PFV)();
-#ifdef __LP64__
-typedef	long  (*PFI)();
-#else
 typedef	int   (*PFI)();
-#endif
 
 
 #ifdef SOLARIS
