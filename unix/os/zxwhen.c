@@ -74,6 +74,7 @@
 int debug_sig = 0;
 
 /*
+typedef void  (*SIGFUNC)(int);
 */
 typedef void  (*sighandler_t)(int);
 typedef void  (*sigaction_t)(int, siginfo_t *, void *);
@@ -83,7 +84,8 @@ static void ex_handler (int, siginfo_t *, void *);
 /*
 static long setsig (int code, SIGFUNC handler);
 */
-static long setsig(int, sigaction_t);
+//static long setsig(int, sigaction_t);
+static long setsig(int, void *);
 static int ignore_sigint = 0;
 
 
@@ -243,7 +245,7 @@ ZXWHEN (
 {
 	static	int first_call = 1;
 	int     vex, uex;
-	SIGFUNC	vvector;
+	void   *vvector;
 
 	extern  int  kernel_panic (char *errmsg);
 
@@ -265,13 +267,14 @@ ZXWHEN (
 	    
 	*old_epa = handler_epa[vex];
 	handler_epa[vex] = *epa;
-	vvector = (SIGFUNC) ex_handler;
+	//vvector = (SIGFUNC) ex_handler;
+	vvector = (void *) ex_handler;
 
 	/* Check for attempt to post same handler twice.  Do not return EPA
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if (*epa == (XINT) X_IGNORE)
-	    vvector = (SIGFUNC) SIG_IGN;
+	    vvector = (void *) SIG_IGN;
 	else if (*epa == *old_epa)
 	    *old_epa = (XINT) X_IGNORE;
 
@@ -284,22 +287,22 @@ ZXWHEN (
 	    if (unix_exception[uex].x_vex == *sig_code) {
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (setsig (uex, (sigaction_t)vvector) == (long) SIG_IGN) {
-			    setsig (uex, (sigaction_t)SIG_IGN);
+			if (setsig (uex, (void *)vvector) == (long) SIG_IGN) {
+			    setsig (uex, (void *)SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    setsig (uex, (sigaction_t)SIG_DFL);
+			    setsig (uex, (void *)SIG_DFL);
 			else
-			    setsig (uex, (sigaction_t)vvector);
+			    setsig (uex, (void *)vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			setsig (uex, (sigaction_t)SIG_DFL);
+			setsig (uex, (void *)SIG_DFL);
 		    else
-			setsig (uex, (sigaction_t)vvector);
+			setsig (uex, (void *)vvector);
 		}
 	    }
 	}
@@ -313,7 +316,7 @@ ZXWHEN (
 static long
 setsig (
     int         code,
-    sigaction_t	handler
+    void 	*handler
 )
 {
 	struct sigaction sig;
@@ -323,7 +326,7 @@ setsig (
 #ifdef MACOSX
 	sig.sa_handler = (SIGFUNC) handler;
 #else
-	sig.sa_sigaction = (sigaction_t) handler;
+	sig.sa_sigaction = (sigaction_t) andler;
 #endif
 	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
 	status = (long) sigaction (code, &sig, NULL);
@@ -338,7 +341,7 @@ setsig (
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-void
+static void
 ex_handler (
   int  	    unix_signal,
   siginfo_t *info,
