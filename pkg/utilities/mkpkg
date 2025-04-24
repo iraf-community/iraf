@@ -4,8 +4,6 @@ $call	relink
 $exit
 
 update:
-	@nttools
-
 	$call	relink
 	$call	install
 	;
