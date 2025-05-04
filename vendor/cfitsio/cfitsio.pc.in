@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: cfitsio
+Description: FITS File Subroutine Library
+URL: https://heasarc.gsfc.nasa.gov/fitsio/
+Version: @CFITSIO_MAJOR@.@CFITSIO_MINOR@.@CFITSIO_MICRO@
+Libs: -L${libdir} -lcfitsio
+Libs.private: @LIBS_CURL@ @LIBS@ -lm
+Cflags: -I${includedir}
