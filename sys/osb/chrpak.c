@@ -14,8 +14,8 @@
 void
 CHRPAK (
     XCHAR  *a,
-    XCHAR  *b,
     XINT   *a_off, 
+    XCHAR  *b,
     XINT   *b_off, 
     XINT   *nchars
 )
