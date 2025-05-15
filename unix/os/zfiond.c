@@ -738,11 +738,14 @@ ZAWRND (
 	register int fd = *chan;
 	register struct	fiodes *kfp = &zfd[fd];
 	register struct portal *np = get_desc (fd);
-	int nwritten, maxbytes, n;
-	char *text, *ip = (char *)buf;
+	static int nwritten, maxbytes, n;
+	static char *ip;
+	char *text;
 	char obuf[SZ_OBUF];
 	void (*sigpipe)(int);
 
+
+	ip = (char *) buf;	/* initialize */
 
 	/* Enable a signal mask to catch SIGPIPE when the server has died. 
 	 */
