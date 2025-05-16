@@ -41,7 +41,6 @@
 */
 
 #define	SZ_ERRMSG	64
-typedef	int (*PFI)();		/* pointer to function returning int	*/
 
 
 /* C_XWHEN -- Post an exception handler for an exception, or disable the
