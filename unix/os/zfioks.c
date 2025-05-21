@@ -201,11 +201,13 @@ ZOPNKS (
 	register char	*ip, *op;
 	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype=0, port=0, auth=0, s_port=0, pid=0, s=0, i=0;
+	int	proctype=0, port=0, s_port=0, pid=0, s=0, i=0;
 	struct  sockaddr_in  from;
 	char	*hostp=NULL, *cmd=NULL;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
+
+	volatile int auth = 0;
 
 
 
@@ -348,13 +350,15 @@ ZOPNKS (
 	     * client until commanded to shutdown, the connection is broken, or
 	     * an i/o error occurs.
 	     */
+	    volatile int     nsec=0;
+	    volatile int     once_only = 0;
+	    volatile int     unauth = 0;
+
 	    struct  timeval timeout;
-	    int     check, fromlen, req_port;
-	    int     nsec, fd, sig;
+	    int     check=0, fromlen=0, req_port=0;
+	    int     fd, sig;
 	    fd_set  rfd;
-	    int     once_only = 0;
 	    int     detached = 0;
-	    int     unauth = 0;
 	    int     status = 0;
 
 	    /* Get the server parameters.  These may be passed either via
