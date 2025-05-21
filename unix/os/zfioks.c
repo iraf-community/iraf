@@ -39,8 +39,8 @@
  * regular FIO drivers hence may be connected to FIO to provide a network
  * interface to the high level code.
  *
- *		zopcks		open kernel server on remote node
- *		zclcks		close kernel server
+ *		zopnks		open kernel server on remote node
+ *		zclsks		close kernel server
  *		zardks		read from the remote kernel server
  *		zawrks		write to the remote kernel server
  *		zawtks		wait for i/o
@@ -490,7 +490,7 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 		} else
 		    dbgmsg ("S:in.irafksd: connection established\n");
 
-		/* Find out where the connection is coming from. */
+		/* Find the connection's originating machine. */
 		fromlen = sizeof (from);
 		if (getpeername (fd, (struct sockaddr *)&from, 
 		    (socklen_t *)&fromlen) < 0) {
