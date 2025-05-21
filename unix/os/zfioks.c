@@ -37,8 +37,8 @@
  * regular FIO drivers hence may be connected to FIO to provide a network
  * interface to the high level code.
  *
- *		zopcks		open kernel server on remote node
- *		zclcks		close kernel server
+ *		zopnks		open kernel server on remote node
+ *		zclsks		close kernel server
  *		zardks		read from the remote kernel server
  *		zawrks		write to the remote kernel server
  *		zawtks		wait for i/o
@@ -120,30 +120,16 @@ extern	int save_prtype;
 #define	HOSTLOGIN	"dev/irafhosts"	/* system host login file	  */
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
+#define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
 
-#ifdef BSD
+#ifdef IPPORT_USERRESERVED
 #define IPPORT_USERRESERVED	5000
 #endif
 
-#ifdef POSIX
-#define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
-#else
-#define	SELWIDTH	32		/* number of bits for select	  */
-#endif
-
+#define	RSH		"ssh"		/* typical names are rsh, remsh   */
+#define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
 #define	KS_RETRY	"KS_RETRY"	/* number of connection attempts  */
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
-
-#define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#if (defined(BSD) | defined(LINUX))
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
-#else
-#ifdef SYSV
-#define	RSH		"remsh"		/* typical names are rsh, remsh   */
-#else
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
-#endif
-#endif
 
 #define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
 #define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
@@ -163,8 +149,8 @@ struct	ksparam {
 	int	protocol;		/* connect protocol		  */
 };
 
-int	debug_ks = 0;			/* print debug info on stderr	  */
-char	debug_file[64] = "";		/* debug output file if nonnull   */
+int	debug_ks = 1;			/* print debug info on stderr	  */
+char	debug_file[64] = "/tmp/ks";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
 static	jmp_buf jmpbuf;
@@ -223,11 +209,13 @@ ZOPNKS (
 	register char	*ip, *op;
 	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype=0, port=0, auth=0, s_port=0, pid=0, s=0, i=0;
+	int	proctype=0, port=0, s_port=0, pid=0, s=0, i=0;
 	struct  sockaddr_in  from;
 	char	*hostp=NULL, *cmd=NULL;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
+
+	volatile int auth = 0;
 
 
 
@@ -370,17 +358,15 @@ ZOPNKS (
 	     * client until commanded to shutdown, the connection is broken, or
 	     * an i/o error occurs.
 	     */
+	    volatile int     nsec=0;
+	    volatile int     once_only = 0;
+	    volatile int     unauth = 0;
+
 	    struct  timeval timeout;
-	    int     check, fromlen, req_port;
-	    int     nsec, fd, sig;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
+	    int     check=0, fromlen=0, req_port=0;
+	    int     fd, sig;
 	    fd_set  rfd;
-#else
-	    int     rfd;
-#endif
-	    int     once_only = 0;
 	    int     detached = 0;
-	    int     unauth = 0;
 	    int     status = 0;
 
 	    /* Get the server parameters.  These may be passed either via
@@ -488,12 +474,8 @@ d_err:		dbgmsg ("S:in.irafksd parent exit, status=%d\n", status);
 	    for (;;) {
 		timeout.tv_sec = nsec;
 		timeout.tv_usec = 0;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		FD_ZERO(&rfd);
 		FD_SET(s,&rfd);
-#else
-		rfd = (1 << s); 
-#endif
 		status = 0;
 
 		/* Wait until either we get a connection, or a previously
@@ -520,23 +502,12 @@ d_err:		dbgmsg ("S:in.irafksd parent exit, status=%d\n", status);
 		} else
 		    dbgstr ("S:in.irafksd: connection established\n");
 
-		/* Find out where the connection is coming from. */
+		/* Find the connection's originating machine. */
 		fromlen = sizeof (from);
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 		if (getpeername (fd, (struct sockaddr *)&from, 
 		    (socklen_t *)&fromlen) < 0) {
-#else
-		if (getpeername (fd, &from, (socklen_t *)&fromlen) < 0) {
-#endif
 		    fprintf (stderr, "in.irafksd: getpeername failed\n");
 		    exit (3);
-		}
-
-		/* Connection established.  Get client data. */
-		if ((s_port = ks_geti(fd)) < 0 || (check = ks_geti(fd)) < 0) {
-		    fprintf (stderr, "in.irafksd: protocol error\n");
-		    status = 1;
-		    goto s_err;
 		}
 
 		/* Verify authorization.  Shutdown if repeated unauthorized
@@ -564,8 +535,7 @@ d_err:		dbgmsg ("S:in.irafksd parent exit, status=%d\n", status);
 		}
 
 		if (pid) {					/** parent **/
-s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
-			status);
+s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n", status);
 		    ks_puti (fd, status);
 		    close (fd);
 		    if (once_only)
@@ -640,6 +610,7 @@ s_err:		    dbgmsg ("S:in.irafksd fork complete, status=%d\n",
 	    /* Get reserved port for direct communications link. */
 	    s_port = IPPORT_USERRESERVED - 1;
 	    s = ks_getresvport (&s_port);
+	    dbgmsg ("C:rexec-callback on port %d\n", s);
 	    if (s < 0)
 		goto r_err;
 
@@ -701,6 +672,7 @@ r_err:		dbgstr ("rexec-callback connect failed\n");
 	    /* Get reserved port for client. */
 	    s_port = IPPORT_USERRESERVED - 1;
 	    s = ks_getresvport (&s_port);
+	    dbgmsg ("C:default protocol on port %d\n", s);
 	    if (s < 0) {
 		status |= 01;
 		goto c_err;
@@ -831,8 +803,8 @@ retry:
 
 		    rshcmd = (s = getenv(KSRSH)) ? s : RSH;
 
-		    dbgmsg ("C:exec rsh %s -l %s `%s' in.irafksd\n",
-			host, username, cmd);
+		    dbgmsg ("C:exec %s %s -l %s `%s' in.irafksd\n",
+			rshcmd, host, username, cmd);
 		    execlp (rshcmd, rshcmd,
 			host, "-l", username, cmd, "in.irafksd", NULL);
 		    exit (1);
@@ -947,13 +919,9 @@ ZARDKS (
   XLONG	*loffset 		/* not used				*/
 )
 {
-#ifdef ANSI
-	volatile char	*op;
-	volatile int	fd, nbytes;
-#else
-	char	*op;
-	int	fd, nbytes;
-#endif
+	static  char	*op;
+	static  int	nbytes;
+	int	fd;
 	SIGFUNC	sigint, sigterm;
 	int	status = ERR;
 
@@ -1161,9 +1129,15 @@ ks_socket (
 	struct	hostent *hp;
 	int	s;
 
+
+	dbgmsg ("ks_socket: host='%s' addr=%d port=%d mode='%s'\n",
+	    host, addr, port, mode);
+
 	/* Create socket. */
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+{dbgmsg ("ks_socket:  socket() fails\n");
 	    return (ERR);
+}
 
 	/* Set socket address. */
 	bzero ((char *)&sockaddr, sizeof(sockaddr));
@@ -1175,7 +1149,9 @@ ks_socket (
 	    sockaddr.sin_addr.s_addr = htonl((long)addr);
 	} else if (*host) {
 	    if ((hp = gethostbyname (host)) == NULL)
+{dbgmsg ("ks_socket:  gethostbyname() fails\n");
 		goto failed;
+}
 	    bcopy((char *)hp->h_addr,(char *)&sockaddr.sin_addr, hp->h_length);
 	} else
 	    sockaddr.sin_addr.s_addr = INADDR_ANY;
@@ -1185,15 +1161,24 @@ ks_socket (
 	 */
 	if (strncmp (mode, "listen", 1) == 0) {
 	    if (bind (s, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)
+{dbgmsg ("ks_socket:  bind() fails\n");
 		goto failed;
+}
 	    if (listen (s, MAXCONN) < 0)
+{dbgmsg ("ks_socket:  listen() fails\n");
 		goto failed;
+}
 	} else if (strncmp (mode, "connect", 1) == 0) {
             if (connect(s,(struct sockaddr *)&sockaddr,sizeof(sockaddr)) < 0)
+{dbgmsg ("ks_socket:  connect() fails\n");
 		goto failed;
+}
 	} else
+{dbgmsg ("ks_socket:  invalid mode\n");
 	    goto failed;
+}
 
+dbgmsg ("ks_socket:  OK returns %d\n", s);
 	return (s);
 
 failed:
@@ -1221,11 +1206,7 @@ ks_getresvport (int *alport)
 
 	for (;;) {
 	    sin.sin_port = htons((u_short)*alport);
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) >= 0) {
-#else
-	    if (bind(s, (caddr_t)&sin, sizeof (sin)) >= 0) {
-#endif
 		return (s);
 	    }
 	    if (errno != EADDRINUSE) {
@@ -1269,9 +1250,16 @@ static int
 ks_puti (int fd, int ival)
 {
 	char	obuf[SZ_FNAME];
+	int	stat = 0;
 
+	dbgmsg ("ks_puti: fd=%d  ival=%d\n", fd, ival);
 	sprintf (obuf, "%d", ival);
-	return (write (fd, obuf, strlen(obuf)+1));
+
+	stat = write (fd, obuf, strlen(obuf)+1);
+	if (stat < 0)
+	    dbgmsg ("ks_puti: write() status=%d, errno=%d (%s)\n", 
+		stat, errno, strerror(errno));
+	return (stat);
 }
 
 
@@ -1284,11 +1272,7 @@ ks_geti (int fd)
 	int     value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	fd_set  rfd;
-#else
-	int     rfd;
-#endif
 	char	ch;
 
 	jmpset++;
@@ -1298,12 +1282,8 @@ ks_geti (int fd)
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
-#if defined(POSIX) || defined(LINUX) || defined(MACOSX)
 	FD_ZERO(&rfd);
 	FD_SET(fd,&rfd);
-#else
-	rfd = (1 << fd); 
-#endif
 
 	/* Read and accumulate a decimal integer.  Timeout if the client
 	 * does not respond within a reasonable period.
@@ -1315,7 +1295,7 @@ ks_geti (int fd)
 		return (ERR);
 	    }
 
-	    if ((stat = read (fd, &ch, 1)) <= 0) {
+           if ((stat = read (fd, &ch, 1)) <= 0) {
 		dbgmsg ("ks_geti: read status=%d, errno=%d (%s)\n", 
 		    stat, errno, strerror(errno));
 		jmpset = 0;
@@ -1323,10 +1303,10 @@ ks_geti (int fd)
 	    }
 
 	    if (ch) {
+		dbgmsg ("ks_geti: ch='%c'  %d  %o\n", ch, ch, ch);
 		if (isdigit(ch))
 		    value = value * 10 + (ch - '0');
 		else {
-		    dbgmsg ("ks_geti: read char=%o\n", ch);
 		    jmpset = 0;
 		    return (ERR);
 		}
@@ -1449,15 +1429,16 @@ ks_getlogin (
   struct ksparam *ks 		/* networking parameters */
 )
 {
+	static struct irafhosts *hp = (struct irafhosts *)NULL;
+	static struct	nodelist *np = (struct nodelist *)NULL;
+	static int	update = 0;
+
 	register int i;
-	struct  irafhosts *hp;
 	char	userfile[SZ_PATHNAME];
 	char	sysfile[SZ_PATHNAME];
 	char	fname[SZ_PATHNAME];
 	char	username[SZ_NAME];
 	char	*namep, *authp;
-	struct	nodelist *np;
-	int	update = 0;
 	int	auth;
 
 	/* Get path to user irafhosts file. */
