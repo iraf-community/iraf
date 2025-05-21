@@ -39,8 +39,8 @@
  * regular FIO drivers hence may be connected to FIO to provide a network
  * interface to the high level code.
  *
- *		zopcks		open kernel server on remote node
- *		zclcks		close kernel server
+ *		zopnks		open kernel server on remote node
+ *		zclsks		close kernel server
  *		zardks		read from the remote kernel server
  *		zawrks		write to the remote kernel server
  *		zawtks		wait for i/o
@@ -122,18 +122,16 @@ extern	int save_prtype;
 #define	HOSTLOGIN	"dev/irafhosts"	/* system host login file	  */
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
+#define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
 
 #ifndef IPPORT_USERRESERVED
 #define IPPORT_USERRESERVED 5000
 #endif
 
-#define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
-
+#define	RSH		"ssh"		/* typical names are rsh, remsh   */
+#define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
 #define	KS_RETRY	"KS_RETRY"	/* number of connection attempts  */
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
-
-#define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
 
 #define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
 #define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
@@ -153,8 +151,8 @@ struct	ksparam {
 	int	protocol;		/* connect protocol		  */
 };
 
-int	debug_ks = 0;			/* print debug info on stderr	  */
-char	debug_file[64] = "";		/* debug output file if nonnull   */
+int	debug_ks = 1;			/* print debug info on stderr	  */
+char	debug_file[64] = "/tmp/ks";	/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
 static	jmp_buf jmpbuf;
@@ -201,11 +199,13 @@ ZOPNKS (
 	register char	*ip, *op;
 	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype=0, port=0, auth=0, s_port=0, pid=0, s=0, i=0;
+	int	proctype=0, port=0, s_port=0, pid=0, s=0, i=0;
 	struct  sockaddr_in  from;
 	char	*hostp=NULL, *cmd=NULL;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
+
+	volatile int auth = 0;
 
 
 
@@ -348,13 +348,15 @@ ZOPNKS (
 	     * client until commanded to shutdown, the connection is broken, or
 	     * an i/o error occurs.
 	     */
+	    volatile int     nsec=0;
+	    volatile int     once_only = 0;
+	    volatile int     unauth = 0;
+
 	    struct  timeval timeout;
-	    int     check, fromlen, req_port;
-	    int     nsec, fd, sig;
+	    int     check=0, fromlen=0, req_port=0;
+	    int     fd, sig;
 	    fd_set  rfd;
-	    int     once_only = 0;
 	    int     detached = 0;
-	    int     unauth = 0;
 	    int     status = 0;
 
 	    /* Get the server parameters.  These may be passed either via
@@ -490,7 +492,7 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 		} else
 		    dbgmsg ("S:in.irafksd: connection established\n");
 
-		/* Find out where the connection is coming from. */
+		/* Find the connection's originating machine. */
 		fromlen = sizeof (from);
 		if (getpeername (fd, (struct sockaddr *)&from, 
 		    (socklen_t *)&fromlen) < 0) {
@@ -498,12 +500,12 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 		    exit (3);
 		}
 
-		/* Connection established.  Get client data. */
-		if ((s_port = ks_geti(fd)) < 0 || (check = ks_geti(fd)) < 0) {
-		    fprintf (stderr, "in.irafksd: protocol error\n");
-		    status = 1;
-		    goto s_err;
-		}
+                /* Connection established.  Get client data. */
+                if ((s_port = ks_geti(fd)) < 0 || (check = ks_geti(fd)) < 0) {
+                    fprintf (stderr, "in.irafksd: protocol error\n");
+                    status = 1;
+                    goto s_err;
+                }
 
 		/* Verify authorization.  Shutdown if repeated unauthorized
 		 * requests occur.
@@ -530,8 +532,7 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 		}
 
 		if (pid) {					/** parent **/
-s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n",
-			status);
+s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n", status);
 		    ks_puti (fd, status);
 		    close (fd);
 		    if (once_only)
@@ -606,6 +607,7 @@ s_err:		    dbgmsgf ("S:in.irafksd fork complete, status=%d\n",
 	    /* Get reserved port for direct communications link. */
 	    s_port = IPPORT_USERRESERVED - 1;
 	    s = ks_getresvport (&s_port);
+	    dbgmsgf ("C:rexec-callback on port %d\n", s);
 	    if (s < 0)
 		goto r_err;
 
@@ -667,6 +669,7 @@ r_err:		dbgmsg ("rexec-callback connect failed\n");
 	    /* Get reserved port for client. */
 	    s_port = IPPORT_USERRESERVED - 1;
 	    s = ks_getresvport (&s_port);
+	    dbgmsgf ("C:default protocol on port %d\n", s);
 	    if (s < 0) {
 		status |= 01;
 		goto c_err;
@@ -797,8 +800,8 @@ retry:
 
 		    rshcmd = (s = getenv(KSRSH)) ? s : RSH;
 
-		    dbgmsgf ("C:exec rsh %s -l %s `%s' in.irafksd\n",
-			host, username, cmd);
+		    dbgmsgf ("C:exec %s %s -l %s `%s' in.irafksd\n",
+			rshcmd, host, username, cmd);
 		    execlp (rshcmd, rshcmd,
 			host, "-l", username, cmd, "in.irafksd", NULL);
 		    exit (1);
@@ -913,13 +916,9 @@ ZARDKS (
   XLONG	*loffset 		/* not used				*/
 )
 {
-#ifdef ANSI
-	volatile char	*op;
-	volatile int	fd, nbytes;
-#else
-	char	*op;
-	int	fd, nbytes;
-#endif
+	static  char	*op;
+	static  int	nbytes;
+	int	fd;
 	void	(*sigint)(int), (*sigterm)(int);
 	int	status = ERR;
 
@@ -1122,6 +1121,10 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	struct	hostent *hp;
 	int	s;
 
+
+	dbgmsgf ("ks_socket: host='%s' addr=%d port=%d mode='%s'\n",
+	    host, addr, port, mode);
+
 	/* Create socket. */
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
 	    return (ERR);
@@ -1155,6 +1158,7 @@ ks_socket (char *host, u_long addr, int port, char *mode)
 	} else
 	    goto failed;
 
+dbgmsgf ("ks_socket:  OK returns %d\n", s);
 	return (s);
 
 failed:
@@ -1226,9 +1230,16 @@ static int
 ks_puti (int fd, int ival)
 {
 	char	obuf[SZ_FNAME];
+	int	stat = 0;
 
+	dbgmsgf ("ks_puti: fd=%d  ival=%d\n", fd, ival);
 	sprintf (obuf, "%d", ival);
-	return (write (fd, obuf, strlen(obuf)+1));
+
+	stat = write (fd, obuf, strlen(obuf)+1);
+	if (stat < 0)
+	    dbgmsgf ("ks_puti: write() status=%d, errno=%d (%s)\n", 
+		stat, errno, strerror(errno));
+	return (stat);
 }
 
 
@@ -1272,10 +1283,10 @@ ks_geti (int fd)
 	    }
 
 	    if (ch) {
+		dbgmsgf ("ks_geti: ch='%c'  %d  %o\n", ch, ch, ch);
 		if (isdigit(ch))
 		    value = value * 10 + (ch - '0');
 		else {
-		    dbgmsgf ("ks_geti: read char=%o\n", ch);
 		    jmpset = 0;
 		    return (ERR);
 		}
@@ -1393,15 +1404,16 @@ ks_getlogin (
   struct ksparam *ks 		/* networking parameters */
 )
 {
+	static struct irafhosts *hp = (struct irafhosts *)NULL;
+	static struct	nodelist *np = (struct nodelist *)NULL;
+	static int	update = 0;
+
 	register int i;
-	struct  irafhosts *hp;
 	char	userfile[SZ_PATHNAME];
 	char	sysfile[SZ_PATHNAME];
 	char	fname[SZ_PATHNAME];
 	char	username[SZ_NAME];
 	char	*namep, *authp;
-	struct	nodelist *np;
-	int	update = 0;
 	int	auth;
 
 	/* Get path to user irafhosts file. */
