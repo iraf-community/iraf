@@ -326,7 +326,7 @@ setsig (
 #ifdef MACOSX
 	sig.sa_handler = (SIGFUNC) handler;
 #else
-	sig.sa_sigaction = (sigaction_t) andler;
+	sig.sa_sigaction = (sigaction_t) handler;
 #endif
 	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
 	status = (long) sigaction (code, &sig, NULL);
