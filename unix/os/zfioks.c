@@ -502,6 +502,13 @@ d_err:		dbgmsg ("S:in.irafksd parent exit, status=%d\n", status);
 		} else
 		    dbgstr ("S:in.irafksd: connection established\n");
 
+                /* Connection established.  Get client data. */
+                if ((s_port = ks_geti(fd)) < 0 || (check = ks_geti(fd)) < 0) {
+                    fprintf (stderr, "in.irafksd: protocol error\n");
+                    status = 1;
+                    goto s_err;
+                }
+
 		/* Find the connection's originating machine. */
 		fromlen = sizeof (from);
 		if (getpeername (fd, (struct sockaddr *)&from, 
