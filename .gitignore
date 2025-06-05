@@ -21,6 +21,8 @@ _spool.*
 zztest.x
 extern.def
 Notes.NR
+fpack
+funpack
 
 # Login/history files
 .*history
