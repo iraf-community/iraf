@@ -1,0 +1,115 @@
+From 52b97276f1ccc01b0bbc4e8de28a1cd816c8d354 Mon Sep 17 00:00:00 2001
+From: Mike Fitzpatrick <iraf@noao.edu>
+Date: Mon, 21 Oct 2013 16:03:18 +0200
+Subject: [PATCH] Use HSI environment when building F2C
+
+Change appeared in version 2.16.1
+---
+ unix/f2c/libf2c/makefile.u | 21 +++++++++++----------
+ unix/f2c/src/makefile.u    |  7 ++++---
+ 2 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/unix/f2c/libf2c/makefile.u b/unix/f2c/libf2c/makefile.u
+index efe7dc0da..2f02a1ec3 100644
+--- a/unix/f2c/libf2c/makefile.u
++++ b/unix/f2c/libf2c/makefile.u
+@@ -13,15 +13,15 @@
+ # to the CFLAGS = line below.
+ 
+ .SUFFIXES: .c .o
+-CC = cc
++CC ?= cc
+ SHELL = /bin/sh
+-CFLAGS = -O
++CFLAGS = -O -w $(HSI_CF)
++LDFLAGS = $(HSI_LF)
+ 
+ # compile, then strip unnecessary symbols
+ .c.o:
+ 	$(CC) -c -DSkip_f2c_Undefs $(CFLAGS) $*.c
+-	ld -r -x -o $*.xxx $*.o
+-	mv $*.xxx $*.o
++
+ ## Under Solaris (and other systems that do not understand ld -x),
+ ## omit -x in the ld line above.
+ ## If your system does not have the ld command, comment out
+@@ -86,15 +86,15 @@ libf2c.a: $(OFILES)
+ ## arrange for $DYLD_LIBRARY_PATH to include the directory containing libf2c.so.
+ 
+ libf2c.so: $(OFILES)
+-	$(CC) -shared -o libf2c.so $(OFILES)
++	$(CC) $(LDFLAGS) -shared -o libf2c.so $(OFILES)
+ 
+ ### If your system lacks ranlib, you don't need it; see README.
+ 
+ f77vers.o: f77vers.c
+-	$(CC) -c f77vers.c
++	$(CC) $(CFLAGS) -c f77vers.c
+ 
+ i77vers.o: i77vers.c
+-	$(CC) -c i77vers.c
++	$(CC) $(CFLAGS) -c i77vers.c
+ 
+ # To get an "f2c.h" for use with "f2c -C++", first "make hadd"
+ hadd: f2c.h0 f2ch.add
+@@ -120,6 +120,7 @@ sysdep1.h: sysdep1.h0
+ # uncomment the following two lines:
+ #main.o: main.c
+ #	$(CC) -c -Donexit=on_exit -DSkip_f2c_Undefs main.c
++main.o: main.c signal1.h
+ 
+ install: libf2c.a
+ 	cp libf2c.a $(LIBDIR)
+@@ -128,13 +129,13 @@ install: libf2c.a
+ clean:
+ 	rm -f libf2c.a *.o arith.h signal1.h sysdep1.h
+ 
+-backspac.o:	fio.h
++backspac.o:	fio.h sysdep1.h
+ close.o:	fio.h
+ dfe.o:		fio.h
+ dfe.o:		fmt.h
+ due.o:		fio.h
+ endfile.o:	fio.h rawio.h
+-err.o:		fio.h rawio.h
++err.o:		fio.h rawio.h sysdep1.h
+ fmt.o:		fio.h
+ fmt.o:		fmt.h
+ iio.o:		fio.h
+@@ -165,7 +166,7 @@ signbit.o:	arith.h
+ sue.o:		fio.h
+ uio.o:		fio.h
+ uninit.o:	arith.h
+-util.o:		fio.h
++util.o:		fio.h sysdep1.h
+ wref.o:		fio.h
+ wref.o:		fmt.h
+ wref.o:		fp.h
+diff --git a/unix/f2c/src/makefile.u b/unix/f2c/src/makefile.u
+index e9f9c5e44..f4a4f1c56 100644
+--- a/unix/f2c/src/makefile.u
++++ b/unix/f2c/src/makefile.u
+@@ -1,8 +1,9 @@
+ #	Makefile for f2c, a Fortran 77 to C converter
+ 
+ .SUFFIXES: .c .o
+-CC = cc
+-CFLAGS = -O
++CC ?= cc
++CFLAGS = -O -w $(HSI_CF)
++LDFLAGS = $(HSI_LF)
+ SHELL = /bin/sh
+ YACC = yacc
+ YFLAGS =
+@@ -24,7 +25,7 @@ MALLOC =
+ 
+ OBJECTS = $(OBJECTSd) $(MALLOC)
+ 
+-all: xsum.out f2c
++all: f2c
+ 
+ f2c: $(OBJECTS)
+ 	$(CC) $(LDFLAGS) $(OBJECTS) -o f2c
+-- 
+2.43.0
+
