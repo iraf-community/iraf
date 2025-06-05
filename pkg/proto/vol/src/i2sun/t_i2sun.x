@@ -19,7 +19,7 @@ pointer	sp, tr, input, im, rfnames, clutfile, transform, cur_rf
 pointer	ulutfile, ulut, colormap, pk_colormap, lut
 int	list, lfd, rfd, nslices, stat, nimages
 int	rheader[RAS_HDR_INTS], ras_maptype, ras_maplength, frame, slice, i, j
-short	lut1, lut2
+int	lut1, lut2
 bool	use_clut, make_map
 
 pointer immap()
@@ -80,7 +80,7 @@ begin
 	# Check if there are no images.
 	nimages = imtlen (list)
 	if (nimages == 0) {
-	    call eprintf (0, "No input images to convert")
+	    call eprintf ("No input images to convert")
 	    goto wrapup_
 	}
 
