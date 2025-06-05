@@ -3,6 +3,14 @@
 find . -type f -name \*.x -exec egrep -H SZ_REAL {} \; >& _real
 find . -type f -name \*.h -exec egrep -H SZ_REAL {} \; >& _realh
 
+find . -type f -name \*.h -exec egrep -H Memr {} \; >& _z
+cat _z | egrep -v P2R >& _memr
+find . -type f -name \*.h -exec egrep -H Mems {} \; >& _z 
+cat _z | egrep -v P2S >& _mems
+find . -type f -name \*.h -exec egrep -H Memc {} \; >& _z 
+cat _z | egrep -v P2C >& _memc
+rm _z
+
 find . -type f -name \*.h -exec egrep -H SZ_INT {} \; >& _inth
 find . -type f -name \*.x -exec egrep -H SZ_INT {} \; >& _int
 
