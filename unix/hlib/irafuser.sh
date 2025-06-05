@@ -19,9 +19,9 @@ export IRAFARCH=`$iraf/unix/hlib/irafarch.sh`
             
 
 export	hostid=unix
-export	host=${iraf}unix/
-export	hlib=${iraf}unix/hlib/
-export	hbin=${iraf}unix/bin.$MACH/
+export	host=${iraf}/unix/
+export	hlib=${iraf}/unix/hlib/
+export	hbin=${iraf}/unix/bin.$MACH/
 export	tmp=/tmp/
 
 # Default to GCC for compilation.

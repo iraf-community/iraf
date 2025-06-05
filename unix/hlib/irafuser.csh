@@ -15,9 +15,9 @@ endif
             
 
 setenv	hostid	unix
-setenv	host	${iraf}unix/
-setenv	hlib	${iraf}unix/hlib/
-setenv	hbin	${iraf}unix/bin.$MACH/
+setenv	host	${iraf}/unix/
+setenv	hlib	${iraf}/unix/hlib/
+setenv	hbin	${iraf}/unix/bin.$MACH/
 setenv	tmp	/tmp/
 
 # Default to GCC for compilation.
