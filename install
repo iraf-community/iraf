@@ -1658,11 +1658,13 @@ if (( "$err_count"==0 )); then
    ECHO ""
  fi
 
- ECHO "Additional user information can be found at the IRAF.NET web site:"
+ ECHO "Additional user information can be found at the IRAF.NET or"
+ ECHO "NOIRLab IRAF Project web sites:"
  NEWLINE
- BOLD_ON ; ECHO "                   http://iraf.net" ; BOLD_OFF
+ BOLD_ON ; ECHO "              http://iraf.net" ; BOLD_OFF
+ BOLD_ON ; ECHO "              http://iraf.noirlab.edu" ; BOLD_OFF
  NEWLINE
- ECHO "Please contact http://iraf.net with any questions or problems."
+ ECHO "Please contact iraf@noirlab.edu with any questions or problems."
  NEWLINE
  NEWLINE
 
