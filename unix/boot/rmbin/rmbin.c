@@ -74,6 +74,8 @@ main (int argc, char *argv[])
 	excl[ex++] = ".txt";
 	excl[ex++] = ".fits";
 	excl[ex++] = ".fz";
+	excl[ex++] = ".tar";
+	excl[ex++] = ".tgz";
 
 	for (argno=1;  (argp = argv[argno]) != NULL;  argno++)
 	    if (*argp == '-') {
