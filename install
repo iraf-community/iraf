@@ -316,7 +316,7 @@ if (( $do_system==0 )); then
         (cd $HOME/.iraf ; mkdir imdir cache bin)
 
         f=$HOME/.iraf/envinit
-        echo "# Initialize the $iraf and environment."                    > $f
+        echo "# Initialize the $iraf path and environment."               > $f
         echo "if [ -n $iraf ]; then"                                     >> $f
         echo "    if test -f $HOME/.iraf/setup.sh ; then"                >> $f
         echo "        source $HOME/.iraf/setup.sh"                       >> $f
@@ -329,7 +329,7 @@ if (( $do_system==0 )); then
         echo "    source $iraf/unix/hlib/setup.sh"                       >> $f
         echo "fi"                                                        >> $f
         echo "if test -f $iraf/unix/hlib/irafuser.sh ; then"             >> $f
-            echo "source $iraf/unix/hlib/irafuser.sh"                    >> $f
+            echo "    source $iraf/unix/hlib/irafuser.sh"                >> $f
         echo "fi"                                                        >> $f
 
     fi
@@ -1302,7 +1302,6 @@ else			# else of 'do_system'
 
 fi			# end of 'do_system'
 
-
 # Establish the remaining symbolic links to HSI tasks.
 ECHO -n "Creating iraf command links in local bin dir ...               "
 
@@ -1601,7 +1600,6 @@ if [ "$do_system" == 0 ]; then
     fi
   done
 fi
-
 
 
 #=============================================================================
