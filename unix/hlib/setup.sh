@@ -2,17 +2,24 @@
 
 # Allow a previously defined $iraf to be used.
 if [ -n $iraf ]; then
-    export iraf=/Applications/IRAF.app/Contents/iraf-v218/
+    export iraf=/opt/iraf/iraf/
 fi
 
 # Allow a previously defined $IRAFARCH to be used.
 if [ -n $IRAFARCH ]; then
-    if test -f $iraf/unix/hlib/irafarch.sh; then
-        export IRAFARCH=`$iraf/unix/hlib/irafarch.sh -actual`
+    if test -f ${iraf}/unix/hlib/irafarch.sh; then
+        export IRAFARCH=`${iraf}/unix/hlib/irafarch.sh -actual`
     fi
 fi
 
-# Uncomment to define an IRAF development environment.
+# Define a minimal IRAF runtime environment.
+export  hostid=unix
+export  host=${iraf}/unix/
+export  hlib=${iraf}/unix/hlib/
+export  hbin=${iraf}/unix/bin.${IRAFARCH}/
+export  tmp=/tmp/
+
+# Uncomment to define a full IRAF development environment.
 #if test -f $iraf/unix/hlib/irafuser.sh; then
 #    source $iraf/unix/hlib/irafuser.sh
 #fi

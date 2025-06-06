@@ -2,17 +2,24 @@
 
 # Allow a previously defined $iraf to be used.
 if ( ! ( $?iraf )) then
-    setenv iraf	/Applications/IRAF.app/Contents/iraf-v218/
+    setenv iraf	/opt/iraf/iraf/
 endif
 
 # Allow a previously defined $IRAFARCH to be used.
 if ( ! ( $?IRAFARCH )) then
-    if ( -e $iraf/unix/hlib/irafarch.csh ) then
-        setenv IRAFARCH	`$iraf/unix/hlib/irafarch.csh -actual`
+    if ( -e ${iraf}/unix/hlib/irafarch.csh ) then
+        setenv IRAFARCH	`${iraf}/unix/hlib/irafarch.csh -actual`
     endif
 endif
 
-# Uncomment to define an IRAF development environment.
+# Define a minimal IRAF runtime environment.
+setenv  hostid  unix
+setenv  host    ${iraf}/unix/
+setenv  hlib    ${iraf}/unix/hlib/
+setenv  hbin    ${iraf}/unix/bin.${IRAFARCH}/
+setenv  tmp     /tmp/
+
+# Uncomment to define a full IRAF development environment.
 #if ( -e $iraf/unix/hlib/irafuser.csh ) then
 #    source $iraf/unix/hlib/irafuser.csh
 #endif
