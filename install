@@ -1534,15 +1534,15 @@ if [ "$do_system" == 0 ]; then
 
 	    egrep -e "iraf/setup.csh" $TEMP			>& /dev/null
             if (( $?==1 )); then
-	        echo ""						>> $TEMP
-	        echo "# Add iraf setup commands."		>> $TEMP
- 	        echo "if ( -e $HOME/.iraf/setup.csh ) then"	>> $TEMP
- 	        echo "    # Override existing settings."        >> $TEMP
- 	        echo "    setenv iraf $iraf"                    >> $TEMP
+	        echo ''						>> $TEMP
+	        echo '# Add iraf setup commands.'		>> $TEMP
+ 	        echo 'if ( -e $HOME/.iraf/setup.csh ) then'	>> $TEMP
+ 	        echo '    # Override existing settings.'        >> $TEMP
+ 	        echo "    setenv iraf ${iraf}/"                 >> $TEMP
  	        echo "    setenv IRAFARCH $IRAFARCH"		>> $TEMP
- 	        echo "    source $HOME/.iraf/setup.csh"		>> $TEMP
- 	        echo "endif"					>> $TEMP
- 	        echo "set path = ($HOME/.iraf/bin $path)""	>> $TEMP
+ 	        echo '    source $HOME/.iraf/setup.csh'		>> $TEMP
+ 	        echo 'endif'					>> $TEMP
+ 	        echo 'set path = ($HOME/.iraf/bin $path)'	>> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1550,15 +1550,15 @@ if [ "$do_system" == 0 ]; then
 	fi
     else
         RM -f $TEMP >& /dev/null
-	echo ""							 > $file
-	echo "# Add iraf setup commands"			>> $file
- 	echo "if ( -e $HOME/.iraf/setup.csh ) then"		>> $file
- 	echo "    # Override existing settings."                >> $file
- 	echo "    setenv iraf $iraf"                            >> $file
+	echo ''							 > $file
+	echo '# Add iraf setup commands'			>> $file
+ 	echo 'if ( -e $HOME/.iraf/setup.csh ) then'		>> $file
+ 	echo '    # Override existing settings.'                >> $file
+ 	echo "    setenv iraf ${iraf}/"                         >> $file
  	echo "    setenv IRAFARCH $IRAFARCH"		        >> $file
- 	echo "    source $HOME/.iraf/setup.csh"			>> $file
- 	echo "endif"						>> $file
- 	echo "set path = ($HOME/.iraf/bin $path)""	        >> $file
+ 	echo '    source $HOME/.iraf/setup.csh'			>> $file
+ 	echo 'endif'						>> $file
+ 	echo 'set path = ($HOME/.iraf/bin $path)'	        >> $file
     fi
   done
 
@@ -1573,15 +1573,15 @@ if [ "$do_system" == 0 ]; then
 
 	    egrep -e "iraf/setup.sh" $TEMP			>& /dev/null
             if (( $?==1 )); then
-	        echo ""						>> $TEMP
-	        echo "# Add iraf setup commands."		>> $TEMP
- 	        echo "if [ -e $HOME/.iraf/setup.sh ]; then"	>> $TEMP
- 	        echo "    # Override existing settings."        >> $TEMP
- 	        echo "    export iraf=$iraf"                    >> $TEMP
+	        echo ''						>> $TEMP
+	        echo '# Add iraf setup commands.'		>> $TEMP
+ 	        echo 'if [ -e $HOME/.iraf/setup.sh ]; then'	>> $TEMP
+ 	        echo '    # Override existing settings.'        >> $TEMP
+ 	        echo "    export iraf=${iraf}/"                 >> $TEMP
  	        echo "    export IRAFARCH=$IRAFARCH"		>> $TEMP
- 	        echo "    source $HOME/.iraf/setup.sh"		>> $TEMP
- 	        echo "fi"					>> $TEMP
- 	        echo "export PATH $PATH:$HOME/.iraf/bin"	>> $TEMP
+ 	        echo '    source $HOME/.iraf/setup.sh'		>> $TEMP
+ 	        echo 'fi'					>> $TEMP
+ 	        echo 'export PATH $PATH:$HOME/.iraf/bin'	>> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1589,15 +1589,15 @@ if [ "$do_system" == 0 ]; then
 	fi
     else
         RM -f $TEMP >& /dev/null
-	echo ""							 > $file
-	echo "# Add iraf setup commands."			>> $file
- 	echo "if [ -e $HOME/.iraf/setup.sh ]; then"		>> $file
- 	echo "    # Override existing settings."                >> $file
- 	echo "    export iraf=$iraf"                            >> $file
+	echo ''							 > $file
+	echo '# Add iraf setup commands.'			>> $file
+ 	echo 'if [ -e $HOME/.iraf/setup.sh ]; then'		>> $file
+ 	echo '    # Override existing settings.'                >> $file
+ 	echo "    export iraf=${iraf}/"                         >> $file
  	echo "    export IRAFARCH=$IRAFARCH"		        >> $file
- 	echo "    source $HOME/.iraf/setup.sh"			>> $file
- 	echo "fi"						>> $file
- 	echo "export PATH $PATH:$HOME/.iraf/bin"	        >> $file
+ 	echo '    source $HOME/.iraf/setup.sh'			>> $file
+ 	echo 'fi'						>> $file
+ 	echo 'export PATH $PATH:$HOME/.iraf/bin'	        >> $file
     fi
   done
 fi
