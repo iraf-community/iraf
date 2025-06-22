@@ -82,6 +82,7 @@ libsys.a:
 	prenvset.x	
 	prfilbuf.x	prc.com <config.h> <fio.h>
 	prfindpr.x	prc.com <config.h>
+        prfodpr.x       prd.com <config.h> <knet.h>
 	prgline.x	prc.com <config.h> <ctype.h> <fset.h>
 	prgredir.x	prc.com <config.h>
 	prkill.x	prd.com <config.h> <knet.h>
