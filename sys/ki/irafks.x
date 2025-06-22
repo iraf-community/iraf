@@ -12,9 +12,7 @@ include	"ki.h"
 # a remote host.
 
 define	DEBUG_FILE	"/tmp/ks.out"	# MACHDEP
-#define	DEBUG_FILE	"iraftmp:ks.out"
 define	DEBUG		NO
-#define	DEBUG		YES
 
 define	DEF_LENIOBUF	32768		# reallocated if too small
 define	SZ_TXBUF	1024		# handy text buffer
@@ -397,7 +395,8 @@ begin
 
 		if (status != ERR) {
 		    # Return the integer part of the FI structure in args 2+.
-		    do i = 1, LEN_FINFO
+		    #do i = 1, LEN_FINFO
+		    do i = 1, min (LEN_FINFO, MAX_ARGS-1)
 			p_arg[i+1] = fi[i]
 
 		    # Return the owner string in the string buffer.
