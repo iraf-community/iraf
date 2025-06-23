@@ -122,6 +122,43 @@ pr_wait (int pid)
 }
 
 
+/* PR_UPDATE -- Update the process status. Return ERR if the process is not
+ * in the process table, XOK if the process was finished, and the PID if the
+ * process is still running.
+ */
+int
+pr_update (int pid)
+{
+        register struct proctable *pr;
+        struct  proctable *pr_findpid(int pid);
+        int     error_code;
+        int     exit_status;
+
+
+        /* Lookup process in table.  Return ERR if there is no entry.
+         */
+        if ((pr = pr_findpid (pid)) == NULL)
+            return (ERR);
+
+        if (pr->pr_active == NO) {
+            return XOK;
+        }
+
+        if (waitpid (pid, &exit_status, WNOHANG) == pid) {
+            pr->pr_active = NO;
+
+            /* The integer argument to exit() is returned in the
+             * wait struct defined in <sys/wait.h>.
+             */
+            error_code = WEXITSTATUS(exit_status);
+            pr->pr_exit_status = error_code ? error_code : XOK;
+            return XOK;
+        }
+
+        return pid;
+}
+
+
 /* PR_GETIPC -- Get the codes for the IPC channels assigned to a process.
  */
 int

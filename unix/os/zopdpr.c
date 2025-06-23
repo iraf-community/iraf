@@ -122,7 +122,6 @@ ZOPDPR (
 		fcntl (fd, F_SETFD, 1);
 
 #ifdef SYSV
-	    /* nice (0, priority * 2); */
 	    nice ( priority * 2);
 #else
 	    setpriority (PRIO_PROCESS, 0, priority);
@@ -159,6 +158,72 @@ ZOPDPR (
 	*jobcode = pid;
 
 	return (XOK);
+}
+
+
+/* ZFODPR -- Fork a detached process.  In this implementation detached
+ * processes begin execution immediately, runing concurrently with the parent.
+ * "Jobcode" can be anything we want, provided it is unique.  Since detached
+ * processes run concurrently we return the pid of the child as the jobcode.
+ */
+int
+ZFODPR (void)
+{
+        int       pid;
+
+
+        /* Create child process.
+         */
+        if ((pid = fork()) == ERR)
+            return (XERR);
+
+        if (pid == 0) {
+            /* New, child process.
+             * Arrange for the local file descriptors of the parent to
+             * be closed in the child.  IRAF subprocesses do not
+             * expect to inherit any file descriptors other than
+             * stdin, stdout, and stderr.
+             */
+            struct rlimit rlim;
+            int maxfd, fd;
+
+            if (getrlimit (RLIMIT_NOFILE, &rlim))
+                maxfd = MAXOFILES;
+            else
+                maxfd = rlim.rlim_cur;
+
+            for (fd=3;  fd < min(MAXOFILES,maxfd);  fd++)
+                close (fd);
+
+        } else {
+            /* Existing, parent process.
+             * Save pid in parent's process table.  Entry cleared when
+             * pr_wait is called to wait for process to terminate.
+             */
+            pr_enter (pid, 0, 0);
+        }
+
+        return (pid);
+}
+
+
+/* ZTSDPR -- Check if a detached process exists by sending a signal.
+ *  */
+XINT
+ZTSDPR(
+  XINT  *jobcode
+)
+{
+        int     pid = *jobcode;
+        int     pr_update(int);
+
+
+        pr_update(pid);
+
+        if (kill (pid, 0) == ERR)
+            return (XERR);
+        else
+            return (XOK);
 }
 
 

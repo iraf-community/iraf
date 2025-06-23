@@ -74,7 +74,6 @@
 int debug_sig = 0;
 
 /*
-typedef void  (*SIGFUNC)(int);
 */
 typedef void  (*sighandler_t)(int);
 typedef void  (*sigaction_t)(int, siginfo_t *, void *);
@@ -84,8 +83,7 @@ static void ex_handler (int, siginfo_t *, void *);
 /*
 static long setsig (int code, SIGFUNC handler);
 */
-//static long setsig(int, sigaction_t);
-static long setsig(int, void *);
+static long setsig(int, sigaction_t);
 static int ignore_sigint = 0;
 
 
@@ -232,6 +230,7 @@ struct	_hwx hwx_exception[] = {
 };
 
 
+
 /* ZXWHEN -- Post an exception handler or turn off interrupts.  Return
  * value of old handler, so that it may be restored by the user code if
  * desired.  The function EPA's are the type of value returned by ZLOCPR.
@@ -245,7 +244,7 @@ ZXWHEN (
 {
 	static	int first_call = 1;
 	int     vex, uex;
-	void   *vvector;
+	SIGFUNC	vvector;
 
 	extern  int  kernel_panic (char *errmsg);
 
@@ -267,14 +266,13 @@ ZXWHEN (
 	    
 	*old_epa = handler_epa[vex];
 	handler_epa[vex] = *epa;
-	//vvector = (SIGFUNC) ex_handler;
-	vvector = (void *) ex_handler;
+	vvector = (SIGFUNC) ex_handler;
 
 	/* Check for attempt to post same handler twice.  Do not return EPA
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if (*epa == (XINT) X_IGNORE)
-	    vvector = (void *) SIG_IGN;
+	    vvector = (SIGFUNC) SIG_IGN;
 	else if (*epa == *old_epa)
 	    *old_epa = (XINT) X_IGNORE;
 
@@ -287,22 +285,22 @@ ZXWHEN (
 	    if (unix_exception[uex].x_vex == *sig_code) {
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (setsig (uex, (void *)vvector) == (long) SIG_IGN) {
-			    setsig (uex, (void *)SIG_IGN);
+			if (setsig (uex, (sigaction_t)vvector) == (long) SIG_IGN) {
+			    setsig (uex, (sigaction_t)SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    setsig (uex, (void *)SIG_DFL);
+			    setsig (uex, (sigaction_t)SIG_DFL);
 			else
-			    setsig (uex, (void *)vvector);
+			    setsig (uex, (sigaction_t)vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			setsig (uex, (void *)SIG_DFL);
+			setsig (uex, (sigaction_t)SIG_DFL);
 		    else
-			setsig (uex, (void *)vvector);
+			setsig (uex, (sigaction_t)vvector);
 		}
 	    }
 	}
@@ -313,10 +311,33 @@ ZXWHEN (
 
 /* SETSIG -- Post an exception handler for the given exception.
  */
+static sighandler_t
+setsig(int code, sigaction_t action)
+{
+        struct sigaction sig, old_sig;
+        int status;
+
+        sigemptyset (&sig.sa_mask);
+        if ((action != (sigaction_t)SIG_DFL)
+          && (action != (sigaction_t)SIG_IGN)) {
+          sig.sa_sigaction = action;
+          sig.sa_flags = SA_NODEFER|SA_SIGINFO;
+        } else {
+          sig.sa_handler = (sighandler_t)action;
+          sig.sa_flags = SA_NODEFER;
+        }
+        status = sigaction (code, &sig, &old_sig);
+
+        return (status == 0)? old_sig.sa_handler: NULL;
+}
+
+
+/* SETSIG -- Post an exception handler for the given exception.
+ */
 static long
-setsig (
+zzsetsig (
     int         code,
-    void 	*handler
+    sigaction_t	handler
 )
 {
 	struct sigaction sig;
@@ -341,7 +362,7 @@ setsig (
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-static void
+void
 ex_handler (
   int  	    unix_signal,
   siginfo_t *info,

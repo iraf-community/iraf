@@ -828,10 +828,10 @@ ZAWRND (
 
 
 /* ND_ONSIG -- Catch a signal.
- *  */
+ */
 static void
 nd_onsig (
-  int     sig                    /* signal which was trapped     */
+  int     sig                     /* signal which was trapped     */
 )
 {
         /* If we get a SIGPIPE writing to a server the server has probably

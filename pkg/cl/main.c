@@ -102,7 +102,6 @@ extern  int   XMJBUF (XPOINTER *bp);
 #define	BKG_QUANTUM	30	/* period(sec) bkgjob checkup		*/
 #define	MAX_INTERRUPTS	5	/* max interrupts of a task		*/
 #define	LEN_INTRSTK	10	/* max nesting of saved interrupts	*/
-typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
