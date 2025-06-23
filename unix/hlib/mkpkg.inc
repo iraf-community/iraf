@@ -7,24 +7,24 @@ $set	HOSTID		= unix		# host system name
 $set	SITEID		= noao		# site name
 
 $ifeq (MACH, linux) then
-$set	XFLAGS		= "-c"	        # default XC compile flags
-$set	XVFLAGS		= "-c"	        # VOPS XC compile flags
+$set	XFLAGS		= "-c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, linux64) then
-$set	XFLAGS		= "-c"	        # default XC compile flags
-$set	XVFLAGS		= "-c"	        # VOPS XC compile flags
+$set	XFLAGS		= "-g -c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-g -c -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"	        # default XC link flags
 $else $ifeq (MACH, macosx, macos64) then
-$set	XFLAGS		= "-c"	        # default XC compile flags
-$set	XVFLAGS		= "-c"	        # VOPS XC compile flags
+$set	XFLAGS		= "-c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, macintel) then
-$set	XFLAGS		= "-c"	        # default XC compile flags
-$set	XVFLAGS		= "-c"	        # VOPS XC compile flags
+$set	XFLAGS		= "-c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
 $else
-$set	XFLAGS		= "-c"	        # default XC compile flags
-$set	XVFLAGS		= "-c"	        # VOPS XC compile flags
+$set	XFLAGS		= "-c -/O2"	# default XC compile flags
+$set	XVFLAGS		= "-c -/O2"	# VOPS XC compile flags
 $set	LFLAGS		= "-z -/static"	# default XC link flags
 $end
 
