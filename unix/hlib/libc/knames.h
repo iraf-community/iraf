@@ -83,6 +83,7 @@
 #define	ZFMKCP		zfmkcp_
 #define	ZFMKDR		zfmkdr_
 #define	ZFNBRK		zfnbrk_
+#define	ZFODPR		zfodpr_
 #define	ZFPATH		zfpath_
 #define	ZFPROT		zfprot_
 #define ZFPOLL		zfpoll_
@@ -153,6 +154,7 @@
 #define	ZSTTTY		zsttty_
 #define	ZSVJMP		zsvjmp_
 #define	ZTSLEE		ztslee_
+#define ZTSDPR          ztsdpr_
 #define	ZWMSEC		zwmsec_
 #define	ZXGMES		zxgmes_
 #define	ZXWHEN		zxwhen_
@@ -223,6 +225,7 @@
 #define zflsty_	kflsty_
 #define zfmkcp_	kfmkcp_
 #define zfmkdr_	kfmkdr_
+#define zfodpr_ kfodpr_
 #define zfprot_	kfprot_
 #define zfrnam_	kfrnam_
 #define zfrmdr_	kfrmdr_
@@ -255,6 +258,7 @@
 #define zsttsf_	ksttsf_
 #define zstttx_	kstttx_
 #define zsttty_	ksttty_
+#define ztsdpr_ ktsdpr_
 #define zzclmt_	kzclmt_
 #define zzopmt_	kzopmt_
 #define zzrdmt_	kzrdmt_
