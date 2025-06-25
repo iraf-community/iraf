@@ -288,7 +288,10 @@ ZCLSTX (XINT *fd, XINT *status)
 	 * device.  This was necessary on the Suns and it was not clear why
 	 * a close error was occuring (errno was EPERM - not owner).
 	 */
-	*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ? XERR : XOK;
+
+        if ((*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ? XERR : XOK) == XERR)
+            if (errno == EBADF)
+                *status = XOK;
 
 	kfp->fp = NULL;
 	if (port) {
