@@ -156,6 +156,7 @@
 #define	PRENVFREE	prenve_
 #define	PRENVSET	prenvt_
 #define	PRFILBUF	prfilf_
+#define PRFODPR         prfodr_
 #define	PRKILL		prkill_
 #define	PROPCPR		propcr_
 #define	PROPDPR		propdr_

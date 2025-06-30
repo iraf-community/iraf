@@ -4,12 +4,8 @@
  */
 
 #ifndef D_libc
-#ifndef D_spp
-#ifndef import_spp
-#include "spp.h"
-#endif
-#endif
 
+#include "spp.h"
 #include <stdarg.h>
 
 #define	XCHAR		short
@@ -207,6 +203,9 @@ extern int	c_prclose (unsigned int pid);
 extern int	c_prdone (unsigned job);
 extern int	c_prenvfree (int pid, int envp);
 extern int	c_prenvset (int pid, char *envvar, char *value);
+extern unsigned int c_propdpr (char *process, char *bkgfile, char *bkgmsg);
+extern unsigned int c_prfodpr(void);
+extern unsigned int c_propen (char *process, int *in, int *out);
 extern int	c_printf (char *format);
 extern int	c_prkill (unsigned job);
 extern int	c_prredir (unsigned pid, int stream, int new_fd);
@@ -233,6 +232,8 @@ extern XINT	c_ttystati (XINT tty, int param);
 extern int	c_ungec (XINT fd, int ch);
 extern int	c_ungetline (XINT fd, char *str);
 extern int	c_write (XINT fd, char *buf, int nbytes);
+extern void     c_xwhen (int exception, PFI new_handler, PFI *old_handler);
+
 extern int	fclose (struct _iobuf *fp);
 extern int	fflush (struct _iobuf *fp);
 extern int	fgetc (struct _iobuf *fp);
@@ -327,9 +328,6 @@ extern void	vfprintf (struct _iobuf *fp, char *format, va_list argp);
 extern int	c_finfo (char *fname, struct _finfo *fi);
 #endif
 #endif
-
-typedef int (*PFI)();           /* pointer to function returning int    */
-extern void	c_xwhen (int exception, PFI new_handler, PFI *old_handler);
 
 #endif
 
