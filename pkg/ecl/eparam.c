@@ -479,7 +479,7 @@ void
 e_repaint (void)
 {
 	static	char *static_prompt = "--------- parameter array ---------";
-	char	promptbuf[MAXPROMPT];
+	/* char	promptbuf[MAXPROMPT]; */
 	char	outbuf[MAXPROMPT];
 	int	i, keylin, ll, cc;
 	char	*p;
@@ -625,7 +625,6 @@ e_drawkey (void)
 	char	valuebuf[MAXPROMPT];
 	char	tempbuf[MAXPROMPT];
 	int	offset, nchars;
-	char	*p;
 
 	e_encode_vstring (parmlist[keyid], valuebuf);
 	e_goto (1, line);
@@ -786,8 +785,7 @@ e_check_vals (char *string)
 	}
 
 	if (isarray) {
-	    char    outstring[G_MAXSTRING];
-	    char    *in, *out;
+	    char    *in, outstring[G_MAXSTRING];
 	    int	    first, nelem, flen;
 	    
 	    /* Get the length of the first dimension, and the starting point.
