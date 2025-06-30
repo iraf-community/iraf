@@ -52,7 +52,7 @@ link:
 	    $set	LIBS2 = "-lreadline -lncurses"
 	  $endif
 	$else
-	$set	LIBS2 = ""
+	  $set	LIBS2 = ""
 	$endif
 	$link	ecl.o globals.o opcodes.o libpkg.a $(LIBS) $(LIBS2)
 	;
