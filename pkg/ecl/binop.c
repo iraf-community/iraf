@@ -464,12 +464,11 @@ binop (int opcode)
                  * found.
                  */
                 {
-                    char    *ip, *cp, *fp, ch, delim, first_char;
-                    short    len, index;
+                    char    *ip, *cp, ch, delim, first_char;
+                    short    index;
 
                     iresult = 0;
                     index = 0;
-                    len = strlen (o2.o_val.v_s);
 
                     delim = o2.o_val.v_s[0];
                     first_char = o1.o_val.v_s[0];
@@ -482,7 +481,6 @@ binop (int opcode)
                         if (ch == delim) {
                             index++;
                         } else if (*ip == first_char) {
-                            fp = ip;
                             cp = o1.o_val.v_s;
                             while (*cp != EOS && *cp == *ip && *ip != delim ) {
                                 cp++; ip++;
