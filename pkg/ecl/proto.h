@@ -278,7 +278,6 @@ extern int cmain_(int *prtype, short *bkgfile, short *cmd);
 extern void clexit(void);
 extern void clshutdown(void);
 extern char *memneed(int incr);
-extern int onint(int *vex, int (**next_handler)(void));
 extern void intr_disable(void);
 extern void intr_enable(void);
 extern void intr_reset(void);
