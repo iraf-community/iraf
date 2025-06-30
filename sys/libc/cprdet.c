@@ -110,3 +110,19 @@ c_prkill (
 	else
 	    return (OK);
 }
+
+
+/* C_PRFODPR -- Fork a detached process.
+*/
+unsigned int
+c_prfodpr (
+)
+{
+        unsigned job;
+        XINT PRFODPR(void);
+
+        iferr (job = PRFODPR ())
+            return (ERR);
+        else
+            return (job);
+}
