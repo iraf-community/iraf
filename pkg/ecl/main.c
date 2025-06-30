@@ -54,7 +54,6 @@ extern  void  restor (struct task *tp);
 extern  void  iofinish (register  struct task *tp);
 extern  void  clgflush (void);
 extern  void  pr_dumpcache (int pid,  int   break_locks);
-extern  void  bkg_startup (char *bkgfile);
 extern  void  setclmodes (struct task *tp);
 extern  void  setbuiltins (register  struct package *pkp);
 extern  void  erract_init (void);
@@ -62,7 +61,7 @@ extern  void  bkg_abort (void);
 
 extern  int   compile (int opcode, ...);
 extern  int   yyparse (void);
-extern  int   onipc (int *vex, int (**next_handler) (void));
+extern  void  onipc (int *vex, PFI *next_handler);
 extern  void  bkg_spawn (char *cmd);
 extern  char *comdstr (char *s);
 
@@ -123,6 +122,7 @@ memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
 jmp_buf intenv;			/* X_INT during process jumps here	*/
+jmp_buf child_startup;          /* child processes jump here            */
 int	validerrenv;		/* stays 0 until errenv gets set	*/
 int	loggingout;		/* set while processing logout file	*/
 int	gologout;		/* set when logout() is typed		*/
@@ -177,8 +177,7 @@ c_main (
 	 */
 	startup ();
 
-	if (*prtype == PR_DETACHED) {
-	    bkg_startup ((char *)bkgfile);
+        if (setjmp (child_startup)) {
 	    cpustart = c_cputime (0L);
 	    clkstart = c_clktime (0L);
 	    execute (BACKGROUND);
@@ -259,7 +258,7 @@ startup (void)
 	/* Post exception handlers for interrupt and write to IPC with no
 	 * reader.  The remaining exceptions use the standard handler.
 	 */
-	c_xwhen (X_IPC, onipc, &old_onipc);
+	c_xwhen (X_IPC, (PFI)onipc, &old_onipc);
 	intr_reset();
 
 	/* The following is a temporary solution to an initialization problem
