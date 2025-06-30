@@ -40,6 +40,7 @@ begin
         # On child side, return immediately
         if (jobcode == NULL) {
 	    call fio_cleanup(ERR) # reset all open files
+                ;
 	    return (NULL)
 	}
 
