@@ -158,5 +158,13 @@ XCHAR   *c_sppstr(char *str);
 XCHAR   *c_strupk(char *str, short *outstr, int maxch);
 char    *c_strpak(short *sppstr, char *cstr, int maxch);
 
+
+
+#ifdef __LP64__
+typedef long  (*PFI)();        /* pointer to function returning int    */
+#else
+typedef int   (*PFI)();        /* pointer to function returning int    */
+#endif
+
 #define	D_spp
 #endif
