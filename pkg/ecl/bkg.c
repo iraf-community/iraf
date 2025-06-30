@@ -7,6 +7,7 @@
 #define import_knames
 #define import_xwhen
 #define import_ctype
+#define import_setjmp
 #include <iraf.h>
 
 #include "config.h"
@@ -51,6 +52,7 @@
  */
 
 extern int cldebug;
+extern jmp_buf child_startup;
 
 /* We need to pass the pipe file names along to the bkg cl because the name
  * of the pipe file to use is determined AT PARSE TIME, not when the file
@@ -75,6 +77,7 @@ extern  void  clexit (void);
 extern  void  delpipes (register int npipes);
 extern  void  killtask (register struct task *tp);
 extern  void  cl_error (int errtype, char *diagstr, ...);
+extern  void  pr_initcache (void);
 extern  struct task *poptask (void);
 
 void    bkg_init (char *bcs);
@@ -88,7 +91,6 @@ void    bkg_startup (char *bkgfile);
 void    bkg_abort (void);
 void    rbkgfile (char *bkgfile);
 int     bkg_jobactive (int job);
-char   *wbkgfile (int jobno, char *cmd, char *fname);
 int     bkg_wfservice (int job);
 
 
@@ -105,34 +107,6 @@ char	bkgmsg[SZ_BKGMSG+1];		/* passed to kernel		*/
 int	lastjobno;			/* last job slot used		*/
 int	bkgno;				/* job no. assigned by parent	*/
 int	ppid;				/* pid of parent CL		*/
-
-/* Template for all the junk that goes into the background status file.
- * Following this is the dictionary, then the stack.
- * TODO: avoid copying binary images of the stack and dictionary
- * areas to permit use of dynamic memory allocation.
- */
-struct bkgfilehdr {
-	int	b_magic;		/* file identification		*/
-	int	b_bkgno;		/* bkg job number of new CL	*/
-	int	b_ppid;			/* pid of parent CL		*/
-	char	b_cmd[SZ_BKCMD];	/* command entered by user	*/
-	int	b_pipetable[MAXPIPES];	/* pipefile database		*/
-	int	b_nextpipe;		/* more pipefile database	*/
-	int	b_szstack;		/* size of stack area, bytes	*/
-	int	b_szdict;		/* size of dictionary, bytes	*/
-	memel	*b_dict;		/* ptr to start of dict		*/
-	XINT	b_topd,			/* dict ptr			*/
-		b_maxd,			/* top of dict			*/
-		b_pachead,		/* head of package list		*/
-		b_parhead,		/* head of param list		*/
-		b_pc,			/* pointer to compiled metacode	*/
-		b_topos,		/* top of operand stack		*/
-		b_basos,		/* base of operand stack	*/
-		b_topcs;		/* top of control stack		*/
-	struct task *b_firstask,	/* first task struct		*/
-		*b_currentask;		/* current task struct		*/
-	struct package *b_curpack;	/* current package		*/
-};
 
 
 /* Job table.  Associate the ordinal job number with the job number returned
@@ -181,8 +155,7 @@ bkg_spawn (
 {
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
-	char	clprocess[SZ_PATHNAME];
-	char	*bkgfile;
+        int     curpid = c_getpid();
 
 	/* Find first unused slot in a circular search.
 	 */
@@ -200,21 +173,18 @@ bkg_spawn (
 	/* Write bkgfile.  Delete any dreg bkg communication files.
 	 */
 	bkg_delfiles (jobno);
-	bkgfile = wbkgfile (jobno, cmd, NULL);
 
 	/* Spawn bkg job.
 	 */
-	sprintf (clprocess, "%s%s", CLDIR, CLPROCESS);
+	//sprintf (clprocess, "%s%s", CLDIR, CLPROCESS);
 	intr_disable();
-	jobtable[jobno-1].b_jobno = stat =
-	    c_propdpr (findexe (firstask->t_curpack, clprocess),
-		bkgfile, bkgmsg);
+        jobtable[jobno-1].b_jobno = stat = c_prfodpr();
 
-	if (stat == NULL) {
-	    c_delete (bkgfile);
+	if (stat < 0) {
+	    //c_delete (bkgfile);
 	    intr_enable();
 	    cl_error (E_IERR, "cannot spawn background CL");
-	} else {
+        } else if (stat > 0) { /* parent */
 	    bk = &jobtable[jobno-1];
 	    bk->b_flags = J_RUNNING;
 	    bk->b_clock = c_clktime (0L);
@@ -222,6 +192,12 @@ bkg_spawn (
 	    strncpy (bk->b_cmd, cmd, SZ_CMD);
 	    *(bk->b_cmd+SZ_CMD) = EOS;
 	    intr_enable();
+        } else { /* child */
+            bkgno = jobno;
+            ppid = curpid;
+            currentask->t_flags = firstask->t_flags = T_BATCH;
+            pr_initcache();
+            longjmp(child_startup, 1);
 	}
 
 	eprintf ("[%d]\n", lastjobno = jobno);
@@ -467,18 +443,6 @@ bkg_delfiles (int job)
 }
 
 
-/* BKG_STARTUP -- Called by a background CL during process startup.  Read in
- * the bkgfile and restore runtime context of the parent.
- */
-void 
-bkg_startup (char *bkgfile)
-{
-	rbkgfile (bkgfile);
-	setclmodes (firstask);
-	currentask->t_flags = firstask->t_flags = T_BATCH;
-}
-
-
 /* BKG_ABORT -- Called by onint() in main.c when we get interrupted while
  * running as a bkg job.  Kill any and all background CL's WE may have
  * started, flush io, close any open pipe files, remove our job seq lock
@@ -505,170 +469,4 @@ bkg_abort (void)
 	}
 
 	fprintf (stderr, "\n[%d] killed\n", bkgno);
-}
-
-
-/* WBKGFILE -- Create a unique file, write and close the background file.
- * Jobno is the job number the new cl is to think its running for.
- * We don't use the global bkgno because that's OUR number, if we ourselves
- *   are background.
- * Return pointer to the new name.
- * No error return, but we may call error() and never return.
- */
-char *
-wbkgfile (
-    int jobno,			/* ordinal jobnumber of child	*/
-    char *cmd,			/* command to be run in bkg	*/
-    char *fname			/* filename for env file	*/
-)
-{
-	static	char *bkgwerr = "error writing background job file";
-	static	char bkgfile[SZ_PATHNAME];
-	struct	bkgfilehdr bh;
-	int	n, show_redefs=NO;
-	FILE	*fp;
-
-
-	/* If we're a normal background job no name was specified so 
-	 * create a unique uparm file.  Otherwise, use the specified
-	 * filename (e.g. for special onerr handling).
-	 */
-	if (fname == (char *)NULL)
-	    c_mktemp ("uparm$bkg", bkgfile, SZ_PATHNAME);
-	else {
-	    if (c_access (fname,0,0) == YES)
-		c_delete (fname);
-	    strncpy (bkgfile, fname, strlen(fname));
-	}
-
-	/* Open the file. */
-	if ((fp = fopen (bkgfile, "wb")) == NULL)
-	    cl_error (E_IERR, "unable to create background job file `%s'",
-		bkgfile);
-
-	for (n=0;  n < MAXPIPES;  n++)
-	    bh.b_pipetable[n] = pipetable[n];
-	bh.b_nextpipe = nextpipe;
-
-	strncpy (bh.b_cmd, cmd, SZ_BKCMD);
-
-	bh.b_magic	= BKG_MAGIC;
-	bh.b_bkgno	= jobno;
-	bh.b_ppid	= c_getpid();
-	bh.b_szstack	= STACKSIZ * BPI;
-	bh.b_szdict	= topd * BPI;
-	bh.b_dict 	= dictionary;
-	bh.b_topd 	= topd;
-	bh.b_maxd 	= maxd;
-	bh.b_parhead 	= parhead;
-	bh.b_pachead 	= pachead;
-	bh.b_pc 	= pc;
-	bh.b_topos 	= topos;
-	bh.b_basos 	= basos;
-	bh.b_topcs 	= topcs;
-	bh.b_firstask 	= firstask;
-	bh.b_currentask	= currentask;
-	bh.b_curpack 	= curpack;
-
-	/* Write the header structure, followed by the stack area and the
-	 * dictionary.
-	 */
-	if (fwrite ((char *)&bh, BKGHDRSIZ, 1, fp) == NULL)
-	    cl_error (E_IERR|E_P, bkgwerr);
-	if (fwrite ((char *)stack, STACKSIZ, BPI, fp) == NULL)
-	    cl_error (E_IERR|E_P, bkgwerr);
-	if (fwrite ((char *)dictionary, topd, BPI, fp) == NULL)
-	    cl_error (E_IERR|E_P, bkgwerr);
-
-	/* Write the environment as a sequence of SET statements in binary.
-	 * Append a blank line as a terminator.
-	 */
-	c_envlist (fileno(fp), "set ", show_redefs);
-	fputs ("\n", fp);
-
-	fclose (fp);
-	return (bkgfile);
-}
-
-
-/* RBKGFILE -- Read in and use background status file with given name.
- * Do not remove the file -- the system does that upon process termination
- * to signal the parent.  If an error occurs do not call cl_error since
- * we are called during process startup and error recovery is not yet
- * possible (a memory fault will result).
- */
-void 
-rbkgfile (char *bkgfile)
-{
-	char	set[SZ_ENVDEF];
-	struct	bkgfilehdr bh;
-	int	n;
-	FILE	*fp;
-
-
-	if ((fp = fopen (bkgfile, "rb")) == NULL) {
-	    fprintf (stderr,
-		"[B] ERROR: unable to open background job file `%s'\n",
-		bkgfile);
-	    clexit();
-	}
-
-	if (fread ((char *)&bh, BKGHDRSIZ, 1, fp) == NULL)
-	    goto abort_;
-	if (bh.b_magic != BKG_MAGIC) {
-	    fprintf (stderr, "[B] ERROR: bad magic in bkgfile '%s'\n", bkgfile);
-	    clexit();
-	}
-
-	/* The following assumes that the dictionary is statically allocated
-	 * and cannot move around.
-	 */
-	if (bh.b_dict != cl_dictbuf) {
-	    fprintf (stderr,
-		"BKG ERROR: new CL installed; logout and try again\n");
-	    clexit();
-	}
-
-	intr_disable();
-
-	for (n=0;  n < MAXPIPES;  n++)
-	    pipetable[n] = bh.b_pipetable[n];
-	nextpipe = bh.b_nextpipe;
-
-	bkgno		= bh.b_bkgno;
-	ppid		= bh.b_ppid;
-	dictionary 	= bh.b_dict;
-	topd	 	= bh.b_topd;
-	maxd 		= bh.b_maxd;
-	pachead 	= bh.b_pachead;
-	parhead 	= bh.b_parhead;
-	pc 		= bh.b_pc;
-	topos 		= bh.b_topos;
-	basos 		= bh.b_basos;
-	topcs 		= bh.b_topcs;
-	firstask 	= bh.b_firstask;
-	currentask 	= bh.b_currentask;
-	curpack 	= bh.b_curpack;
-
-	/* Read stack area and dictionary.
-	 */
-	if (fread ((char *)stack, bh.b_szstack, 1, fp) == NULL)
-	    goto abort_;
-	if (fread ((char *)dictionary, bh.b_szdict, 1, fp) == NULL)
-	    goto abort_;
-
-	/* Read and restore the environment.
-	 */
-	do {
-	    if (fgets (set, SZ_ENVDEF, fp) == NULL)
-		goto abort_;
-	} while (c_envscan (set));
-
-	intr_enable();
-	fclose (fp);
-	return;
-abort_:
-	intr_enable();
-	eprintf ("[B] ERROR: error reading background file\n");
-	clexit();
 }
