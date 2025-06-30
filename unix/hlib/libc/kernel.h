@@ -93,10 +93,6 @@ typedef	void  (*SIGFUNC)(int);
 typedef	void  (*SIGFUNC)(int);
 #endif
 
-typedef	void  (*PFV)();
-typedef	int   (*PFI)();
-
-
 #ifdef SOLARIS
 #define bzero(a,n)	memset(a,0,n)
 #define bcopy(a,b,n)	memmove(b,a,n)
