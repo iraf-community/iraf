@@ -26,6 +26,9 @@ define	exit_ 91
 begin
 	status = NO
 
+        if (fname[1] <= NULL)
+            goto exit_
+
 	# Ignore any whitespace at the beginning of the filename.
 	for (ip=1;  IS_WHITE (fname[ip]);  ip=ip+1)
 	    ;
