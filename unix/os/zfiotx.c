@@ -287,11 +287,15 @@ ZCLSTX (XINT *fd, XINT *status)
 	 * [NOTE] -- fclose errors are ignored if we are closing a terminal
 	 * device.  This was necessary on the Suns and it was not clear why
 	 * a close error was occuring (errno was EPERM - not owner).
+	 *
+	 * [NOTE] -- fclose can throw a EBADF when used from a background 
+         * process, this affects closing the env files such as zzsetenv.def
+         * only so we will ignore it for now.
 	 */
-
-        if ((*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ? XERR : XOK) == XERR)
+        if ((*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ?  XERR : XOK) == XERR) {
             if (errno == EBADF)
                 *status = XOK;
+        }
 
 	kfp->fp = NULL;
 	if (port) {
