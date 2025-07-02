@@ -17,17 +17,21 @@ if test "$IRAFARCH" != "macosx"; then
 fi
 
 
-for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
-    do $CC -c $HSI_CF -Wno-cast-function-type-mismatch -Wall $i ;\
-done
+if [ "$IRAFARCH" = "macosx" -o "$IRAFARCH" = "macintel" ]; then
+    for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
+        do $CC -c $HSI_CF -Wno-cast-function-type-mismatch -Wall $i ;\
+    done
 
-if [ "$IRAFARCH" = "macosx" ]; then
     $CC -g -c -O -DMACOSX -Wall -m64 -arch arm64 ../as/zsvjmp.s -o zsvjmp.o ;\
     ar r	libos.a *.o; 
     ranlib	libos.a
     rm -f 	zsvjmp.o zmain.o
 
 else
+    for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
+        do $CC -c $HSI_CF -Wall $i ;\
+    done
+
     rm -f       zmain.o
     ar r	libos.a *.o; 
     ranlib	libos.a
