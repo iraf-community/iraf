@@ -87,14 +87,11 @@ void    bkg_kill (int job);
 void    bkg_jobstatus (struct _iobuf *fp, int job);
 void    bkg_update (int pmsg);
 void    bkg_delfiles (int job);
-void    bkg_startup (char *bkgfile);
 void    bkg_abort (void);
-void    rbkgfile (char *bkgfile);
 int     bkg_jobactive (int job);
 int     bkg_wfservice (int job);
 
 
-#define	BKGHDRSIZ	(sizeof (struct bkgfilehdr))
 #define	SZ_CMD		40		/* command in jobs table	*/
 #define	SZ_BKCMD	80		/* command in bkg file		*/
 #define	SZ_ENVDEF	1024		/* max size environment define	*/
@@ -170,18 +167,16 @@ bkg_spawn (
 	if (jobno == lastjobno)
 	    cl_error (E_UERR, "no more background job slots");
 
-	/* Write bkgfile.  Delete any dreg bkg communication files.
+	/* Delete any dreg bkg communication files.
 	 */
 	bkg_delfiles (jobno);
 
 	/* Spawn bkg job.
 	 */
-	//sprintf (clprocess, "%s%s", CLDIR, CLPROCESS);
 	intr_disable();
         jobtable[jobno-1].b_jobno = stat = c_prfodpr();
 
 	if (stat < 0) {
-	    //c_delete (bkgfile);
 	    intr_enable();
 	    cl_error (E_IERR, "cannot spawn background CL");
         } else if (stat > 0) { /* parent */
