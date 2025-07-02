@@ -18,7 +18,7 @@ fi
 
 
 for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
-    do $CC -c $HSI_CF -Wall $i ;\
+    do $CC -c $HSI_CF -Wno-cast-function-type-mismatch -Wall $i ;\
 done
 
 if [ "$IRAFARCH" = "macosx" ]; then
