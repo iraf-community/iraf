@@ -481,7 +481,7 @@ o_indirabsset (memel *argp)
 	char	*pk, *t, *p, *f;
 	struct	pfile *pfp;
 	struct	param *pp;
-	int	type, string_len;
+	int	type, string_len=0;
 
 	pfp = newtask->t_pfp;
 	if (pfp->pf_flags & PF_FAKE) {
@@ -539,7 +539,7 @@ o_indirposset (memel *argp)
 	int pos = (int) *argp;
 	struct pfile *pfp;
 	struct param *pp;
-	int type, string_len;
+	int type, string_len=0;
 
 	pfp = newtask->t_pfp;
 	if (pfp->pf_flags & PF_FAKE) {

@@ -112,7 +112,7 @@ o_absargset (
 	    /* use full argname and always assign to value field.
 	     */
 	    struct operand o;
-	    int	string_len;
+	    int	string_len = 0;
 	    o = popop();
 	    if ((o.o_type & OT_BASIC) == OT_STRING)
 		string_len = strlen (o.o_val.v_s);
@@ -500,7 +500,7 @@ o_indirabsset (
 	char	*pk, *t, *p, *f;
 	struct	pfile *pfp;
 	struct	param *pp;
-	int	type, string_len;
+	int	type, string_len = 0;
 
 	pfp = newtask->t_pfp;
 	if (pfp->pf_flags & PF_FAKE) {
@@ -560,7 +560,7 @@ o_indirposset (
 	int pos = (int) *argp;
 	struct pfile *pfp;
 	struct param *pp;
-	int type, string_len;
+	int type, string_len = 0;
 
 	pfp = newtask->t_pfp;
 	if (pfp->pf_flags & PF_FAKE) {
@@ -780,7 +780,7 @@ o_posargset (
 	struct	pfile *pfp;
 	struct	param *pp;
 	struct	operand o;
-	int	string_len;
+	int	string_len = 0;
 
 	pfp = newtask->t_pfp;
 
