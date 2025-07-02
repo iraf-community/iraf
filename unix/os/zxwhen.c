@@ -84,10 +84,11 @@ static long setsig(int, sigaction_t);
 static int ignore_sigint = 0;
 
 
-#if defined(__APPLE__) || defined(BSD) || defined(__USE_BSD)
-#define fcancel(fp)     (void)fpurge(fp)
-#elif defined(__GLIBC__)
+#if defined(LINUX)
+#include <stdio_ext.h>
 #define fcancel(fp)     __fpurge(fp)
+#elif defined(__APPLE__) || defined(BSD) || defined(__USE_BSD)
+#define fcancel(fp)     (void)fpurge(fp)
 #else
 #define fcancel(fp)
 #endif
