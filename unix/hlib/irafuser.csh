@@ -14,8 +14,6 @@ else
     setenv MACH $IRAFARCH
 endif
 
-exit 1
-            
 
 setenv	hostid	unix
 setenv	host	${iraf}/unix/
