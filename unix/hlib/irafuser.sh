@@ -9,15 +9,20 @@ if [ ! -n "$iraf" ]; then
     exit 0
 fi
 
-
 if [ -e "$iraf/unix/hlib/util.sh" ]; then
     source $iraf/unix/hlib/util.sh
 fi
 
-export MACH=`$iraf/unix/hlib/irafarch.sh`
-export IRAFARCH=`$iraf/unix/hlib/irafarch.sh`
+if [ ! -n "$IRAFARCH" ]; then
+    export IRAFARCH=`$iraf/unix/hlib/irafarch.sh`
+    export MACH=$IRAFARCH
+fi
+if [ ! -n "$MACH" ]; then
+    export MACH=`$iraf/unix/hlib/irafarch.sh`
+else
+    export MACH=$IRAFARCH
+fi
             
-
 export	hostid=unix
 export	host=${iraf}/unix/
 export	hlib=${iraf}/unix/hlib/

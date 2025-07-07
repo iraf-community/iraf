@@ -1,17 +1,20 @@
-#!/bin/csh -f
+#!/bin/csh
 #
 # IRAF definitions for the UNIX/csh user.  The $iraf path should be defined
 # in the user's .login/.profile.
 
 
-set a = `$iraf/unix/hlib/irafarch.csh`
-if ($status == 0) then
-    setenv MACH 	 $a
-    setenv IRAFARCH  $a
-else
-    echo "Error:  "$a
-    exit 1
+if ( ! "$?IRAFARCH" ) then
+    setenv IRAFARCH `$iraf/unix/hlib/irafarch.csh`
+    setenv MACH $IRAFARCH
 endif
+if ( ! "$?MACH" ) then
+    setenv MACH `$iraf/unix/hlib/irafarch.csh`
+else
+    setenv MACH $IRAFARCH
+endif
+
+exit 1
             
 
 setenv	hostid	unix
