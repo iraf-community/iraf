@@ -14,13 +14,6 @@ mv -f		alloc.e ../hlib
 rm -f		alloc.o
 
 
-#if test "$IRAFARCH" != "macosx"; then
-#    for i in zsvjmp ;\
-#        do $CC -c $HSI_CF -Wall ../as/$i.s -o $i.o ;\
-#    done
-#fi
-
-
 if [ "$IRAFARCH" = "macosx" -o "$IRAFARCH" = "macintel" ]; then
     for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
         do $CC -c $HSI_CF -Wno-cast-function-type-mismatch -Wall $i ;\
@@ -42,9 +35,9 @@ else
 
 
     if [ "$IRAFARCH" = "linux64" ]; then
-        $CC -c $HSI_CF -Wall -m64 -arch x86_64 ../as/$i.s -o $i.o
+        $CC -c $HSI_CF -Wall -m64 ../as/zsvjmp.s -o zsvjmp.o
     else
-        $CC -c $HSI_CF -Wall -m32 -arch x86 ../as/$i.s -o $i.o
+        $CC -c $HSI_CF -Wall -m32 ../as/zsvjmp.s -o zsvjmp.o
     fi
 
     rm -f       zmain.o
