@@ -29,7 +29,6 @@ if [ "$IRAFARCH" = "macosx" -o "$IRAFARCH" = "macintel" ]; then
     if [ "$IRAFARCH" = "macosx" ]; then
         $CC -g -c -O -DMACOSX -Wall -m64 -arch arm64 ../as/zsvjmp.s -o zsvjmp.o
     else
-        #$CC -g -c -O -DMACOSX -Wall -m64 -arch x86_64 ../as/zsvjmp.s -o zsvjmp.o ;\
         $CC -g -c -O -m64 -arch x86_64 ../as/zsvjmp.s -o zsvjmp.o
     fi
     ar r	libos.a *.o; 
