@@ -235,16 +235,23 @@ libtbtables.a:
 	tbnparse.x	<ctype.h> <ctotok.h> <tbset.h>
 	@selector
 
+        # In v2.18.1 and later we use the SPP/Fortran version of FITSIO
+        # for table processing. Even though it is older and was updated with
+        # changes to CFITSIO, we avoid bug in the C version which would
+        # require data structure changes for our use having to deal with
+        # maintaining knowledge of the current file structure. 
+
+        $set SPPFITSIO = YES
         $ifdef (SPPFITSIO)
-            $echo "NOTE:  SPP FITSIO will be used for FITS tables."
-            tbfhp_f.x   <tbset.h> tbtables.h tblfits.h
-            @fitsio
+             $echo "NOTE:  SPP FITSIO will be used for FITS tables."
+             tbfhp_f.x   <tbset.h> tbtables.h tblfits.h
+             @fitsio
         $else
             $echo "NOTE:  CFITSIO will be used for FITS tables."
             tbfhp.x     <tbset.h> tbtables.h tblfits.h
             !(cd $(iraf)/vendor/cfitsio && mkpkg tb_update)
-
-	    $set XFLAGS 	= "-I$(iraf)/vendor $(XFLAGS)"
+ 
+            $set XFLAGS 	= "-I$(iraf)/vendor $(XFLAGS)"
             tbfxff.c    fitsio_spp.h underscore.h
         $endif
 	;
