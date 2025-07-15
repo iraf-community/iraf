@@ -87,6 +87,7 @@ else if ($#argv == 1 && "$1" == "-current") then
 else
   if ($#argv == 0) then
     if ($?IRAFARCH) then
+  repeat_:
 	setenv MNAME     $IRAFARCH
 	setenv MNAME_M   $UNAME_M
     else
