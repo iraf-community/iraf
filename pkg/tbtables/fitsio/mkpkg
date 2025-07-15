@@ -371,4 +371,6 @@ libtbtables.a:
 #	@$(FITSIO_HOST_DEP)
 	@unix
 	fitsspp.x	fitsspp.com
+
+        ftdbg.f
 	;
