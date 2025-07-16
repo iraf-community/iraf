@@ -141,3 +141,5 @@ if ($?IRAFARCH == 1) then
 	echo "Warning: IRAFARCH is still set in your environment to $IRAFARCH"
     endif
 endif
+
+rm -f bin.$ARCH/bin.$ARCH

@@ -140,3 +140,5 @@ if [ -n $IRAFARCH ]; then
 	/bin/echo "Warning: IRAFARCH is still in your environment to 'generic'"
     fi
 fi
+
+rm -f bin.$ARCH/bin.$ARCH
