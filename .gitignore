@@ -29,6 +29,8 @@ funpack
 .lesshst
 .viminfo
 .*.swp
+.*.swo
+.*.swn
 
 # External packages
 extern/.pkgs
