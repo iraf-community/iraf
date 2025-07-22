@@ -26,12 +26,14 @@ task	binfil,
 	text2mask 	= proto$x_proto.e
 
 task	ringavg 	= proto$ringavg.cl
+task	ghost2ms	= proto$ghost2ms.cl
 
 set	color		= "proto$color/"
 set	vol		= "proto$vol/"
 
 task	color.pkg	= color$color.cl
 task	vol.pkg		= vol$vol.cl
+
 
 hidetask	mask2text
 
