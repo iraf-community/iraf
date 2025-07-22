@@ -1,0 +1,84 @@
+.help ghost2ms Jul25 proto
+.ih
+NAME ghost2ms -- Convert Gemini/DRAGONS GHOST format to IRAF multispec format
+.ih
+USAGE ghost2ms input output
+.ih
+PARAMETERS
+.ls input
+Input GHOST file from DRAGONS.
+.le
+.ls output = ""
+Output base name.
+.le
+.ls order1 = 1
+Starting order to extract.
+.le
+.ls order2 = 33
+Ending order to extract.
+.le
+.ls version = 1
+Version to extract.
+.le
+.ls clobber = no
+Clobber existing output?
+.le
+.ls verbose = yes
+Verbose output?
+.le
+.ih
+DESCRIPTION The GHOST2MS task converts the DRAGONS-calibrated output for the
+red and blue arms on the GHOST instrument to a standard IRAF multispec format
+to permit further analysis and visualization using standard ONEDSPEC tasks.
+It makes use of a task from the artdata package to set up the echelle
+structure and then the linear spectrum WCS and the flux values are added.
+The default is to extract all the orders from extension version 1.
+
+For context: this data format is specific to the GHOST instrument. When
+reduced using DRAGONS, two different outputs are produced (for each "blue"
+and "red" arms of the spectrograph):
+
+.ls *_calibrated.fits
+Reduced spectra before stitching the orders. The flux pixels are in a 3D
+array with the first axis of size 2, one for the target, one for the sky,
+then a second axis for the wavelength direction, and finally a third axis
+with several orders. The WAVL extension contains the wavelength at each pixel
+in the wavelength-order array.
+.le
+.ls *_dragons.fits
+1D extracted spectrum. Orders have been stitched together. The algorithm
+resamples the order wavelengths to a common log-spaced scale, interpolates
+the orders to that new wavelength scale, and then averages the fluxes from
+each order with an inverse variance weighting.
+.le
+
+There are two issues here: the "*dragons.fits" file opens on "splot" but
+the wavelength solution is wrong. The DRAGONS team provided a recipe to fix
+that, so we have a file called "_dragons_irafCompatible.fits". However, many
+of our users want to normalize the spectra order-by-order, so none of those
+are good options.
+
+This task is a script and so users may copy it and modify it as desired.
+
+.ih
+EXAMPLES
+1. Compute the ring averages with labels and output to the terminal.
+
+.nf
+    # Convert the red arm calibrated frame.
+    onedspec> ghost2ms S20230416S0079_red001_calibrated.fits
+    S20230416S0079_red_calib[SCI,1][*,1:33] -> S20230416S0079_red_calib_iraf
+
+    # Convert the blue arm calibrated frame.
+    onedspec> ghost2ms S20240322S0068_blue001_calibrated.fits
+    S20240322S0068_blue_calib[SCI,1][*,1:33] -> S20240322S0068_blue_calib_iraf
+
+    # Use SPLOT to view the result.
+    onedspec> splot S20230416S0079_red_calib_iraf 1 unit=nm
+    onedspec> splot S20240322S0068_blue_calib_iraf 1 unit=nm
+.fi
+
+.ih
+SEE ALSO
+mkechelle, sapertures, imcopy
+.endhelp

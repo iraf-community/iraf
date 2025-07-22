@@ -7,6 +7,7 @@
 	   epix - Edit pixels in an image
 	 fields - Extract specified fields from a list
 	 fixpix - Fix bad pixels by linear interpolation from nearby pixels
+       ghost2ms - Convert Gemini/DRAGONS GHOST format to IRAF multispec format
 	   hfix - Fix image headers with a user specified command
 	 imcntr - Locate the center of a stellar image
    imextensions - Make a list of image extensions
