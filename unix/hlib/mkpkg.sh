@@ -49,10 +49,16 @@ if [ -e "./bin" ]; then
     fi
 fi
 
-# Check the core system binary configuration
+
+# Check the core system binary configuration and throw an error if we're in 
+# the IRAF root.  It isn't otherwise an error to compile a package if the 
+# core system isn't configure for the current arch.
+
 c_arch=$(ls -l ${iraf}/bin | cut -d '>' -f 2 | sed -e "s/ bin\.//g")
 if [ "${c_arch}" != "$IRAFARCH" ]; then
-    err=1
+    if [ $iraf == `pwd`/ ]; then
+        err=1
+    fi
 fi
 
 if [ $err -eq 1 ]; then
