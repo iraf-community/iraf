@@ -77,3 +77,5 @@ fi
 
 # Execute the binary
 ${iraf}/unix/bin.${IRAFARCH}/mkpkg.e $*
+
+/bin/rm -f bin.${IRAFARCH}/bin.${IRAFARCH}
