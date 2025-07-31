@@ -56,10 +56,6 @@ fi
 # the links correctly if pkglibs isn't set properly. This should probably be
 # addressed in the mkpkg sources but we'll simply deal with the error here.
 
-throw an error if we're in 
-# the IRAF root.  It isn't otherwise an error to compile a package if the 
-# core system isn't configure for the current arch.
-
 c_arch=$(ls -l ${iraf}/bin | cut -d '>' -f 2 | sed -e "s/ bin\.//g")
 if [ "${c_arch}" != "$IRAFARCH" ]; then
     err=1
