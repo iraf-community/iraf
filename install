@@ -1592,7 +1592,7 @@ if [ "$do_system" == 0 ]; then
                 echo "        source ${iraf}/unix/hlib/irafuser.sh"     >> $TEMP
                 echo '    fi'                                           >> $TEMP
  	        echo 'fi'					        >> $TEMP
- 	        echo 'export PATH $PATH:$HOME/.iraf/bin'	        >> $TEMP
+ 	        echo 'export PATH=$PATH:$HOME/.iraf/bin'	        >> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1612,7 +1612,7 @@ if [ "$do_system" == 0 ]; then
         echo "        source ${iraf}/unix/hlib/irafuser.sh"             >> $file
         echo '    fi'                                                   >> $file
  	echo 'fi'						        >> $file
- 	echo 'export PATH $PATH:$HOME/.iraf/bin'	                >> $file
+ 	echo 'export PATH=$PATH:$HOME/.iraf/bin'	                >> $file
     fi
   done
 fi
