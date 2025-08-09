@@ -7,6 +7,9 @@ $exit
 
 update:	
 	$echo "-------------- CFITSIO ----------------"
-	@cfitsio
+	$echo "------------ (not used) ---------------"
+	#@cfitsio
+
+	$echo "-------------- X11IRAF ----------------"
 	;
 
