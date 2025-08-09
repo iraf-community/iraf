@@ -11,7 +11,7 @@ C       This routine also sets any underflow values to zero.
 C       written by Wm Pence, HEASARC/GSFC, May 1992
 C       modified Aug 1994 to handle all IEEE special values.
 
-        integer value
+        real*4 value
 
 C       COMMON BLOCK DEFINITIONS:--------------------------------------------
         integer nb,ne
@@ -26,6 +26,9 @@ C       COMMON BLOCK DEFINITIONS:--------------------------------------------
         common/ftcpid/compid
 C       END OF COMMON BLOCK DEFINITIONS-----------------------------------
 
+        real*4  rtiny
+        parameter (rtiny = 1.17549435E-38)  ! Smallest normalized IEEE float
+
 C       COMPID specifies what type of floating point word structure
 C       is used on this machine, and determines how to test for NaNs.
 
@@ -36,30 +39,13 @@ C           3   SUN workstation, or IBM mainframe
 C          -2305843009213693952   Cray (64-bit) machine
 
         fttrnn=.false.
-	return
-
-        if (compid .eq. 1)then
-C           on the VAX we can assume that all NaNs will be set to all bits on
-C           (which is equivalent to an integer with a value of -1) because
-C           this is what the IEEE to VAX conversion MACRO program returns
-            if (value .eq. -1)fttrnn=.true.
-        else if (compid .gt. 1)then
-C           the following test works on all other machines (except Cray)
-C           the sign bit may be either 1 or 0 so have to test both possibilites.
-C           Note: overflows and infinities are also flagged as NaNs.
-            if (value .ge. 2139095039 .or. (value .lt. 0 .and. 
-     1             value .ge. -8388609))then
-                   fttrnn=.true.
-            else if ((value .gt. 0 .and. value .le. 8388608) .or.
-     1             value .le. -2139095040)then
-C                  set underflows and denormalized values to zero
-                   value=0
-            end if            
-        else
-C           branch for the Cray:  COMPID stores the negative integer
-C           which corresponds to the 3 most sig digits set to 1.   If these
-C           3 bits are set in a floating point number, then it represents
-C           a reserved value (i.e., a NaN)
-            if (value .lt. 0 .and. value .ge. compid)fttrnn=.true. 
+        if (value .ne. value) then
+            fttrnn=.true.
         end if
+
+        if (abs(value) .gt. 0 .and. abs(value) .lt. rtiny) then
+            value = 0.0
+        end if
+
+        return
         end
