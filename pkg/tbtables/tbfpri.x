@@ -37,9 +37,9 @@ int	ifd[2]		# C pointer for input (template) FITS file
 int	ofd[2]		# C pointer for output FITS file
 # These variables and equivalence statements are used to force 8-byte
 # alignment of ifd and ofd.
-#double	d_ifd, d_ofd
-#equivalence (ifd, d_ifd)
-#equivalence (ofd, d_ofd)
+double	d_ifd, d_ofd
+equivalence (ifd, d_ifd)
+equivalence (ofd, d_ofd)
 int	naxis		# NAXIS from primary header of input
 int	status		# zero is OK
 int	itype, otype	# file type based on filename extension
