@@ -100,11 +100,21 @@ fi
 /bin/echo "		Done"
 
 
-/bin/echo -n "Cleaning spool files ...."
+/bin/echo -n "Cleaning spool and misc files ...."
 if [ $exec == "yes" ]; then
-    find . -name spool\* -print -exec /bin/rm -f {} \;	>> /dev/null 2>&1
+    find . -name _spool\* -print -exec /bin/rm -f {} \;	  >> /dev/null 2>&1
+    find . -name spool\* -print -exec /bin/rm -f {} \;	  >> /dev/null 2>&1
+    find . -name \*.dylib -print -exec /bin/rm -f {} \;	  >> /dev/null 2>&1
+    find . -name \*.dSYM -print -exec /bin/rm -f {} \;	  >> /dev/null 2>&1
+    find . -name __SYMDEF\* -print -exec /bin/rm -f {} \; >> /dev/null 2>&1
+    find . -name .__SYMDEF\* -print -exec /bin/rm -f {} \;>> /dev/null 2>&1
 else
     find . -name spool\* -print 
+    find . -name _spool\* -print 
+    find . -name \*.dylib -print
+    find . -name \*.dSYM -print
+    find . -name __SYMDEF\* -print
+    find . -name .__SYMDEF\* -print
 fi
 /bin/echo "		Done"
 
