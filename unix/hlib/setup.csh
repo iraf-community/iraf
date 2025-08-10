@@ -20,9 +20,9 @@ setenv  hbin    ${iraf}/unix/bin.${IRAFARCH}/
 setenv  tmp     /tmp/
 
 # Uncomment to define a full IRAF development environment.
-#if ( -e $iraf/unix/hlib/irafuser.csh ) then
-#    source $iraf/unix/hlib/irafuser.csh
-#endif
+if ( -e $iraf/unix/hlib/irafuser.csh ) then
+    source $iraf/unix/hlib/irafuser.csh
+endif
 
 set path = ($HOME/.iraf/bin $path)
 set cdpath  = ($iraf $iraf/pkg $iraf/noao $iraf/sys $iraf/unix $iraf/unix/boot)

@@ -20,9 +20,9 @@ export  hbin=${iraf}/unix/bin.${IRAFARCH}/
 export  tmp=/tmp/
 
 # Uncomment to define a full IRAF development environment.
-#if test -f $iraf/unix/hlib/irafuser.sh; then
-#    source $iraf/unix/hlib/irafuser.sh
-#fi
+if test -f $iraf/unix/hlib/irafuser.sh; then
+    source $iraf/unix/hlib/irafuser.sh
+fi
 
 export PATH=$HOME/.iraf/bin:${PATH}
 
