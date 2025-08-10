@@ -84,6 +84,12 @@ gitclean::
 	@find . -type f -name \*.bak -ls -exec /bin/rm -f {} \;
 	@find . -type f -name _spool\* -ls -exec /bin/rm -f {} \;
 	@find . -type f -name spool\* -ls -exec /bin/rm -f {} \;
+	@find . -type f -name \*.dylib -ls -exec /bin/rm -f {} \;
+	@find . -type f -name \*.dSYM -ls -exec /bin/rm -f {} \;
+	@find . -type f -name __SYMDEF\* -ls -exec /bin/rm -f {} \;
+	@find . -type f -name .__SYMDEF\* -ls -exec /bin/rm -f {} \;
+	@find . -type f -name OBJS.arc.Z -ls -exec /bin/rm -f {} \;
+
 	@find pkg -name \*.a -ls -exec /bin/rm -f {} \;
 	@find sys -name \*.a -ls -exec /bin/rm -f {} \;
 	@find math -name \*.a -ls -exec /bin/rm -f {} \;
