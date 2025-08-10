@@ -113,6 +113,10 @@ do
 		shift 1
 		;;
 
+        -i8)    F2CFLAGS="$F2CFLAGS -I8"
+                shift
+                ;;
+
 	-m*)	CFLAGS="$CFLAGS $1"
 		shift 1
 		;;

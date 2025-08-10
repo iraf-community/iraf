@@ -824,6 +824,11 @@ passflag:		    mkobject = YES;
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
 #endif
+
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+        arglist[nargs++] = "-i8";
+#endif
+
         if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	        arglist[nargs++] = opt_flags[i];
@@ -897,6 +902,11 @@ passflag:		    mkobject = YES;
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
 #endif
+
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+        arglist[nargs++] = "-i8";
+#endif
+
         if (optimize) {
 	    for (i=0;  i < nopt_flags;  i++)
 	       arglist[nargs++] = opt_flags[i];
