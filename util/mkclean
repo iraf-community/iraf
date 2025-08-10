@@ -64,9 +64,9 @@ hmach=`$iraf/unix/hlib/irafarch.sh -actual`
 
 /bin/echo -n "Clean host directories ...."
 if [ $exec == "yes" ]; then
-    /bin/rm -f unix/bin.$arch/[agm-z]*.e unix/bin.$arch/lib[bco]*.a >> /dev/null  2>&1
+    /bin/rm -f unix/bin.$arch/[afgm-z]*.e unix/bin.$arch/lib[bcfo]*.a >> /dev/null  2>&1
 else
-    /bin/ls -l unix/bin.$arch/[agm-z]*.e unix/bin.$arch/lib[bco]*.a
+    /bin/ls -l unix/bin.$arch/[afgm-z]*.e unix/bin.$arch/lib[bcfo]*.a
 fi
 /bin/echo "		Done"
 
