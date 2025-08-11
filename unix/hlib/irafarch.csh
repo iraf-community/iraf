@@ -74,7 +74,7 @@ setenv  OSVERSION   `$uname_cmd -r | cut -c1`
 if ($#argv == 1 && "$1" == "-actual") then
     setenv MNAME     $UNAME
     setenv MNAME_M   $UNAME_M
-    unsetenv IRAFARCH
+    #unsetenv IRAFARCH
 
 else if ($#argv == 1 && "$1" == "-current") then
     setenv MNAME     `/bin/ls -lad $iraf/bin | \
