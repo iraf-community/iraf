@@ -2,7 +2,7 @@
 #	   of execution by each shell
 
 umask 022
-setenv iraf /iraf/iraf/
+setenv iraf /opt/iraf/iraf/
 setenv IRAFARCH  `$iraf/unix/hlib/irafarch.csh -actual`
 source $iraf/unix/hlib/irafuser.csh
 
@@ -47,8 +47,8 @@ endif
 setenv XFILESEARCHPATH ":/usr/lib/X11/%T/%N%S:/usr/x11R6/lib/X11/%T/%N%S:"
 
 
-alias   del	'/bin/rm -f'
-#alias   ls	'ls -FCs'
+alias   del	'/bin/rm -rf'
+alias   ls	'ls -FCs'
 alias   m	'less'
 alias 	po	'popd'
 alias 	pu	'pushd'
@@ -58,3 +58,5 @@ alias	newt	'find . \! -type d -mtime -7 -print | grep -v '\''\.[aoe]$'\'
 alias	newt2	'find . \! -type d -mtime -14 -print | grep -v '\''\.[aoe]$'\'
 alias	newt3	'find . \! -type d -mtime -21 -print | grep -v '\''\.[aoe]$'\'
 alias	newt4	'find . \! -type d -mtime -31 -print | grep -v '\''\.[aoe]$'\'
+
+alias 	setarch 'setenv IRAFARCH \!*; setenv MACH \!*;  source $hlib/setup.csh'
