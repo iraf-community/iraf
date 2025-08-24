@@ -52,12 +52,6 @@ begin
 		    next
 	    }
 
-	    if (strncmp ("http:", fname, 5) == 0) {
-		call eprintf ("Cannot delete URL `%s'\n")
-		    call pargstr (fname)
-		next
-	    }
-
 	    iferr (call deletefg (fname, btoi(allversions), btoi(subfiles)))
 		call erract (EA_WARN)
 	}
