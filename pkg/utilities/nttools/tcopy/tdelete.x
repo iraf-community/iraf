@@ -59,15 +59,6 @@ begin
 	call smark (sp)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 
-	# Check to make sure the deletion is OK
-
-	if (strncmp ("http:", file, 5) == 0) {
-	    call eprintf ("Cannot delete URL `%s'\n")
-	        call pargstr (file)
-	    call sfree (sp)
-	    return
-	}
-
 	if (verify) {
 	    if (tbtacc (file) == NO) {
 		# If table does not exist, warn user 
