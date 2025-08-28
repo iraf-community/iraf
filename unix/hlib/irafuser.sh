@@ -38,6 +38,9 @@ export	RANLIB=ranlib
 case "$MACH" in
   "macosx"|"macos64")
     export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -W -Wall -Wno-unused-parameter -arch arm64 -m64"
+    if [ -e "/opt/homebrew/opt/openssl@3/include" ]; then
+        export HSI_CF="${HSI_CF} -DUSE_SSL -I/opt/homebrew/opt/openssl@3/include"
+    fi
     export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/W -/Wall -/Wno-unused-parameter -/m64 -/arch -//arm64"
     export HSI_FF="-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
     export HSI_LF="-arch arm64 -m64"
@@ -48,7 +51,10 @@ case "$MACH" in
     ;;
 
   "macintel")
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -W -Wall -Wno-unused-parameter -arch arm64 -m64 -mmacosx-version-min=10.14"
+    if [ -e "/usr/local/opt/openssl@3/include" ]; then
+        export HSI_CF="${HSI_CF} -DUSE_SSL -I/usr/local/opt/openssl@3/include"
+    fi
     export HSI_XF="-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/W -/Wall -/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
     export HSI_FF="-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.14"
     export HSI_LF="-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.14"
@@ -56,6 +62,9 @@ case "$MACH" in
     export HSI_LFLAGS="-arch x86_64 -mmacosx-version-min=10.14"
     export HSI_OSLIBS=""
     #mkzflags="lflags=-z"
+
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14 -I/opt/homebrew/opt/openssl@3/include"
+
     ;;
 
   "linux64")
@@ -94,7 +103,7 @@ export HSI_CF="-I${HOME}/.iraf/ $HSI_CF"
 export HSI_FF="-I${HOME}/.iraf/ $HSI_FF"
 export HSI_LF="-I${HOME}/.iraf/ $HSI_LF"
 export HSI_XF="-I${HOME}/.iraf/ $HSI_XF"
-export XC_CFLAGS="-I${HOME}/.iraf/"
+export XC_CFLAGS="-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

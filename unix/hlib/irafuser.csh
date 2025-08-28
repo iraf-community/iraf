@@ -31,10 +31,13 @@ switch ($MACH)
   case macosx:
   case macos64:
     setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACH64 -Wall -W -Wno-unused-parameter -arch arm64 -m64"
+    if (-e /opt/homebrew/opt/openssl@3/include) then
+        setenv HSI_CF "${HSI_CF} -DUSE_SSL -I/opt/homebrew/opt/openssl@3/include"
+    endif
     setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACH64 -/Wall -/W -W/no-unused-parameter-/m64 -/arch -//arm64"
     setenv HSI_FF "-g -O2 -arch arm64 -m64 -DBLD_KERNEL"
-    setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_F77LIBS ""
+    setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_LFLAGS "-arch arm64 -m64"
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
@@ -42,6 +45,9 @@ switch ($MACH)
 
   case macintel:
     setenv HSI_CF "-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -Wall -W -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
+    if (-e /usr/local/opt/openssl@3/include) then
+        setenv HSI_CF "${HSI_CF} -DUSE_SSL -I/usr/local/opt/openssl@3/include"
+    endif
     setenv HSI_XF "-Inolibc -/DSYSV -/DMACOSX -/DMACINTEL -/DMACH64 -/Wall -/W -/Wno-unused-parameter -/arch -//x86_64 -/m64 -/mmacosx-version-min=10.14"
     setenv HSI_FF "-g -O2 -arch x86_64 -m64 -DMACH64 -DBLD_KERNEL -mmacosx-version-min=10.14"
     setenv HSI_LF "-arch x86_64 -m64 -DMACH64 -mmacosx-version-min=10.14"
@@ -88,7 +94,7 @@ setenv HSI_CF  	  "-I${HOME}/.iraf/ $HSI_CF"
 setenv HSI_FF  	  "-I${HOME}/.iraf/ $HSI_FF"
 setenv HSI_LF  	  "-I${HOME}/.iraf/ $HSI_LF"
 setenv HSI_XF  	  "-I${HOME}/.iraf/ $HSI_XF"
-setenv XC_CFLAGS  "-I${HOME}/.iraf/"
+setenv XC_CFLAGS  "-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

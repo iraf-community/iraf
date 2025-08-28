@@ -15,8 +15,15 @@ rm -f		alloc.o
 
 
 if [ "$IRAFARCH" = "macosx" -o "$IRAFARCH" = "macintel" ]; then
+    mflags="-Wno-cast-function-type-mismatch -Wall "
+    if [ "$IRAFARCH" = "macosx" ]; then
+        mflags="${mflags} -DUSE_SSL -I/opt/homebrew/opt/openssl@3/include"
+    else 
+        mflags="${mflags} -DUSE_SSL -I/usr/local/opt/openssl@3/include"
+    fi
+
     for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
-        do $CC -c $HSI_CF -Wno-cast-function-type-mismatch -Wall $i ;\
+        do $CC -c $HSI_CF ${mflags} $i ;\
     done
 
     if [ "$IRAFARCH" = "macosx" ]; then
@@ -32,7 +39,6 @@ else
     for i in gmttolst.c irafpath.c prwait.c  z[a-lo-z]*.c zmaloc.c zmfree.c ;\
         do $CC -c $HSI_CF -Wall $i ;\
     done
-
 
     if [ "$IRAFARCH" = "linux64" ]; then
         $CC -c $HSI_CF -Wall -m64 ../as/zsvjmp.s -o zsvjmp.o

@@ -90,8 +90,13 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lpthread",		/*  4  */
 		    "-lm",			/*  5  */
 		    "-lrt",			/*  6  */
+#ifdef USE_SSL
+		    "-lssl",			/*  7  */
+		    "-lcrypto",			/*  8  */
+#else
 		    "",				/*  7  */
 		    "",				/*  8  */
+#endif
 		    "",				/*  9  */
 		    0};				/* EOF */
 
@@ -121,10 +126,19 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #ifdef MACOSX
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
-		    "-lm",			/*  1  */
-		    "",			        /*  2  */
-		    "",			        /*  3  */
+		    "-lm",			/*  2  */
+#ifdef USE_SSL
+#ifdef MACINTEL
+		    "-L/usr/local/opt/openssl@3/lib",	 /*  3  */
+#else
+		    "-L/opt/homebrew/opt/openssl@3/lib", /*  3  */
+#endif
+		    "-lssl",			/*  3  */
+		    "-lcrypto",			/*  4  */
+#else
+		    "",				/*  3  */
 		    "",				/*  4  */
+#endif
 		    "",				/*  5  */
 		    "",				/*  6  */
 		    "",				/*  7  */
@@ -808,6 +822,10 @@ passflag:		    mkobject = YES;
 	    	    arglist[nargs++] = "x86_64";
 	    }
 	}
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+        arglist[nargs++] = "-i8";
+#endif
+
 #endif
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-m32";
@@ -823,10 +841,6 @@ passflag:		    mkobject = YES;
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
-#endif
-
-#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
-        arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {
@@ -886,7 +900,12 @@ passflag:		    mkobject = YES;
                     arglist[nargs++] = "x86_64";
 	    }
 	}
+
+#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
+        arglist[nargs++] = "-i8";
 #endif
+#endif
+
 #if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-m32";
 #endif
@@ -901,10 +920,6 @@ passflag:		    mkobject = YES;
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
-#endif
-
-#if (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8) /* ILP64 */
-        arglist[nargs++] = "-i8";
 #endif
 
         if (optimize) {
@@ -985,6 +1000,7 @@ passflag:		    mkobject = YES;
 
 #ifdef MACOSX
 	arglist[nargs++] = "-DMACOSX";
+	arglist[nargs++] = "-mmacosx-version-min=10.14";
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 arglist[nargs++] = "-arch";
