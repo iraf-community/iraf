@@ -12,7 +12,7 @@ int	maxch			#I the maximum size of the catalog description
 pointer	sp, line
 int	nlines, strfd, nchars
 bool	first_line
-int	stropen(), getline(), strncmp()
+int	stropen(), getlline(), strncmp()
 
 begin
 	call smark (sp)
@@ -32,7 +32,7 @@ begin
 	# Read in the catalog header as delimited by BEGIN CATALOG HEADER
 	# and END CATALOG HEADER strings. Skip leading blank lines.
 	repeat {
-	    nchars = getline (fd, Memc[line])
+	    nchars = getlline (fd, Memc[line], maxch)
 	    if (nchars == EOF)
 		break
 	    if (first_line) {
