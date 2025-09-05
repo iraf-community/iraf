@@ -1,16 +1,19 @@
+include <pkg/cq.h>
 include "../../lib/astrom.h"
 
 define	SZ_HDRTEXT	(5 * SZ_LINE)
 
 procedure t_agetcat()
 
-pointer	sp, output, hdrtext, str1, str2, at, cq, res, cres
-int	i, j, nfields, catlist, outlist, infd, outfd, nlines
+pointer	sp, output, hdrtext, str1, str2, at, cq, res, cres, record
+pointer flist, fld
+int	i, j, nfields, catlist, outlist, infd, outfd, nlines, nfld
 bool	standard, filter, update, verbose
 pointer	cq_map(), cq_query, cq_fquery(), at_tquery()
 int	at_rclist(), at_ocatlist(), at_catlist(), fntlenb(), cq_setcat()
 int	fntrfnb(), open(), at_rcquery(), access(), at_gcathdr()
-bool	clgetb()
+int     at_flinit(), at_field_list()
+bool	clgetb(), streq()
 errchk	open()
 
 begin
@@ -20,6 +23,8 @@ begin
 	call salloc (str1, SZ_FNAME, TY_CHAR)
 	call salloc (str2, SZ_FNAME, TY_CHAR)
 	call salloc (hdrtext, SZ_HDRTEXT, TY_CHAR)
+	call salloc (fld, SZ_FNAME, TY_CHAR)
+	call salloc (record, SZ_FNAME, TY_CHAR)
 
 	# Initalize the data structures
 	call at_aginit (at)
@@ -107,7 +112,7 @@ begin
 	    if (fntrfnb (catlist, i, Memc[str2], SZ_FNAME) == EOF)
 		break
 	    if (access (Memc[str2], READ_ONLY, TEXT_FILE) == YES) {
-		if (cq_setcat (cq, "filename@noao") <= 0) {
+		if (cq_setcat (cq, "filename@noirlab") <= 0) {
 		    if (verbose) {
 		        call printf ("Skipping catalog %s\n")
 		            call pargstr (Memc[str2])
@@ -202,6 +207,19 @@ begin
 		        break
 		    }
 		}
+
+                # Since the catalog service may return more fields than
+                # we require, enforce a filter to select only those fields
+                # in the catdb when no user-specified fields are present.
+                call aclrc (Memc[record], SZ_LINE)
+                call at_stats (at, FIELDS, Memc[record], SZ_LINE)
+                if (streq (Memc[record], "f[*]")) {
+                    call aclrc (Memc[record], SZ_LINE)
+                    flist = at_flinit (at, res)
+                    nfld = at_field_list (flist, Memc[record])
+                    call at_sets (at, FIELDS, Memc[record])
+                    filter = TRUE
+                }
 
 		# Write the output file.
 		if (filter) {

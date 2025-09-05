@@ -6,15 +6,13 @@ define	DEF_SZBUF	32768
 
 procedure t_adumpcat()
 
-pointer	sp, catalog, output, catdb, ra, dec, size
-pointer	query, qpname, qpvalue, qpunits, qpformats, str, cq, buf
-int	i, fd, ofd, nqpars, parno, nchars
-bool	done
+pointer	sp, catalog, output, catdb, ra, dec, size, url
+pointer	query, qpname, qpvalue, qpunits, qpformats, str, cq, buf, req, host
+int	i, nqpars, parno, nchars, port
 pointer	cq_map()
-int	cq_setcat(), ndopen(), open(), cq_nqpars(), cq_gqparn(), read()
-int	getline()
+int	cq_setcat(), cq_nqpars(), cq_gqparn(), url_get(), cq_fgeti(), access()
 bool	streq()
-errchk	ndopen()
+errchk  cq_fgstr()
 
 begin
 	# Allocate some working space.
@@ -30,7 +28,10 @@ begin
 	call salloc (qpunits, CQ_SZ_QPUNITS, TY_CHAR)
 	call salloc (qpformats, CQ_SZ_QPFMTS, TY_CHAR)
 	call salloc (query, SZ_LINE, TY_CHAR)
+	call salloc (url, SZ_LINE, TY_CHAR)
+	call salloc (req, SZ_LINE, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (host, SZ_LINE, TY_CHAR)
 	call salloc (buf, DEF_SZBUF, TY_CHAR)
 
 	# Get the parameters.
@@ -59,26 +60,28 @@ begin
 	    return
 	}
 
-	# Connect to the HTTP server.
-	call cq_fgwrd (cq, "address", Memc[str], SZ_LINE)
-	iferr (fd = ndopen (Memc[str], READ_WRITE)) {
-	    call eprintf ("Cannot access catalog %s at host %s\n")
-		call pargstr (Memc[catalog])
-		call pargstr (Memc[str])
-	    call cq_unmap (cq)
-	    call sfree (sp)
-	    return
-	}
-
-	# Open the output file.
-	ofd = open (Memc[output], NEW_FILE, TEXT_FILE)
 
 	# Format the query without worrying about coordinate systems,
 	# or formats. Just assume that the user types in ra, dec, and
 	# size in the form expected by the server.
-	call cq_fgstr (cq, "query", Memc[query], SZ_LINE)
+
+	iferr (call cq_fgstr (cq, "url", Memc[query], SZ_LINE)) {
+            # The address is of the form "inet:<port>:<host>:<opts>".
+	    call cq_fgwrd (cq, "host", Memc[host], SZ_LINE)
+	    call cq_fgwrd (cq, "request", Memc[str], SZ_LINE)
+	    port = cq_fgeti (cq, "port")
+            
+            call sprintf (Memc[query], SZ_LINE, "%s://%s%s")
+                if (port == 80)
+                    call pargstr ("http")
+                else
+                    call pargstr ("https")
+                call pargstr (Memc[host])
+                call pargstr (Memc[str])
+        }
+
 	nqpars = cq_nqpars (cq)
-	call sprintf (Memc[str], SZ_LINE, Memc[query])
+	call sprintf (Memc[url], SZ_LINE, Memc[query])
 	do i = 1, nqpars {
 
             # Get description of each query parameter.
@@ -113,49 +116,21 @@ begin
 		call pargstr (Memc[size])
 	    } else if (streq (Memc[qpname], "radius")) {
 		call pargstr (Memc[size])
+	    } else if (streq (Memc[qpname], "size")) {
+		call pargstr (Memc[size])
+	    } else if (streq (Memc[qpname], "sr")) {
+		call pargstr (Memc[size])
 	    } else {
 		call pargstr (Memc[qpvalue])
 	    }
 
 	}
 
-	# Send the query.
-	call fprintf (fd, "%s")
-	    call pargstr (Memc[str])
-	call flush (fd)
-	call fseti (fd, F_CANCEL, OK)
+        # Overwrite an existing output file.
+        if (access (Memc[output], 0, 0) == YES)
+            call delete (Memc[output])
 
-        # Read the reply. Skip the HTTP header assuming it ends with a \n or
-        # a \r\n.
-	call cq_fgwrd (cq, "protocol", Memc[str], SZ_LINE)
-	if (streq (Memc[str], "http")) {
-            repeat {
-                nchars = getline (fd, Memc[buf])
-                if (nchars <= 0)
-                    break
-                Memc[buf+nchars] = EOS
-            } until ((Memc[buf] == '\r' && Memc[buf+1] == '\n') ||
-                (Memc[buf] == '\n'))
-	}
-
-	# Read the reply.
-	repeat {
-	    nchars = read (fd, Memc[buf], DEF_SZBUF)
-	    if (nchars > 0) {
-		Memc[buf+nchars] = EOS
-		call write (ofd, Memc[buf], nchars)
-		done = false
-	    } else {
-		done = true
-	    }
-	} until (done)
-	call flush (ofd)
-
-	# Close the output.
-	call close (ofd)
-
-	# Close the network connection.
-	call close (fd)
+        nchars = url_get (Memc[url], Memc[output], NULL)
 
 	# Unmap the database.
 	call cq_unmap (cq)

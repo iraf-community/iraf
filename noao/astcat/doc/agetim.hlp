@@ -185,7 +185,7 @@ cl> imheader reg001.2.fits
 3. Repeat example 2 but extract data for two surveys.
 
 .nf
-cl> agetim pars default wcsedit+ imsurveys="dss1@cadc,dss2@cadc"
+cl> agetim pars default wcsedit+ imsurveys="dss2red@cds,dss2blue@cds"
 cl> display reg001.3.fits 1 fi+
 cl> imheader reg001.3.fits
 cl> display reg002.1.fits 2 fi+
