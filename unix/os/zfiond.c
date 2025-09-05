@@ -94,6 +94,8 @@ SSL *ssl        = (SSL *) NULL;
  * "sock" connection in "nonblock" mode and for read when there is no
  * pending connection or data.
  *
+ * Addiitionally, a "ssl" flag may be appended to indicate TLS/SSL transport
+ * is required, e.g. as when connecting to a HTTPS server on port 443.
  *
  * Client connections normally use mode READ_WRITE, although READ_ONLY and
  * WRITE_ONLY are permitted.  APPEND is the same as WRITE_ONLY.  A server
@@ -386,8 +388,11 @@ ZOPNND (
                         SSL_library_init ();
                         SSL_load_error_strings ();
                         OpenSSL_add_all_algorithms ();
+#ifdef MACOSX
+                        ctx = SSL_CTX_new (TLS_client_method ());
+#else
                         ctx = SSL_CTX_new (SSLv23_client_method ());
-                        //ctx = SSL_CTX_new (TLS_client_method ());
+#endif
 
                         /* Create an SSL connection and attach it to the socket.
                          * Be sure to set the SNI before attempting TLS connect.
@@ -398,7 +403,7 @@ ZOPNND (
 
                         /* Perform the SSL/TLS handshake with the server.
                          */
-                        if (SSL_connect (ssl) != 1) {
+                        if (SSL_connect (ssl) <= 0) {
                             ERR_print_errors_fp (stderr);
                             SSL_free (ssl);
                             SSL_CTX_free (ctx);
