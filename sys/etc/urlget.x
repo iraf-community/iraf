@@ -67,7 +67,8 @@ begin
 redirect_
 	call url_break (inurl, protocol, host, port, path)
 
-	# Check for a supported protocol.
+	# Check for a supported protocol (only 'http' or 'https' URIs are
+	# supported at present).
 	if (strncmp (protocol, "http", 4) != 0) {
 	    call aclrc (emsg, SZ_PATHNAME)
 	    call sprintf (emsg, SZ_PATHNAME,  "Unsupported URI protocol (%s)")
@@ -172,7 +173,7 @@ begin
 	    ip = ip + 1
 
 	# Get the host name.
-	for (i=1; url[ip] != ':' && url[ip] != '/' && url[ip] != EOS; i=i+1) {
+	for (i=1; url[ip] != ':' && url[ip] != '/' && url[ip] != '%' && url[ip] != EOS; i=i+1) {
 	    host[i] = url[ip]
 	    ip = ip + 1
 	}
@@ -243,22 +244,23 @@ begin
 	# Format the request header.
 	call aclrc (request, SZ_BUF)
         if (port == HTTPS_PORT) {
-	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.1\n")
+	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.1\r\n")
 	        call pargstr (path)
         } else {
-	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.0\n")
+	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.1\r\n")
 	        call pargstr (path)
         }
 	call strcat ("Host: ", request, SZ_BUF)
 	call strcat ( host, request, SZ_BUF)
-	call strcat ("\n", request, SZ_BUF)
-	call strcat ("Accept: */*\n", request, SZ_BUF)
-	call strcat ("User-Agent: IRAF-v2.18.1/urlget\n", request, SZ_BUF)
+	call strcat ("\r\n", request, SZ_BUF)
+	call strcat ("User-Agent: IRAF-v2.18.1/urlget\r\n", request, SZ_BUF)
+	call strcat ("Accept: */*\r\n", request, SZ_BUF)
 	call strcat ("Connection: ", request, SZ_BUF)
         if (port == HTTPS_PORT) 
-            call strcat ("close\n\n", request, SZ_BUF)
+            call strcat ("close\r\n", request, SZ_BUF)
         else
-            call strcat ("keep-alive\n\n", request, SZ_BUF)
+            call strcat ("keep-alive\r\n", request, SZ_BUF)
+	call strcat ("\r\n", request, SZ_BUF)
 
 	# Send the GET-url request to the server.
 	nchars = strlen (request)
@@ -281,10 +283,11 @@ begin
             nchars = getline (in, hd)
             if (nchars <= 0)
                 break
-	    if (strncmp (hd, "Content-Length:", 15) == 0) {
-		ip = 16
+            call strlwr (hd)
+	    if (strncmp (hd, "content-length:", 15) == 0) {
+		ip = 17
 		nchars = ctoi (hd, ip, content_length)
-	    } else if (strncmp (hd, "Transfer-Encoding:", 17) == 0) {
+	    } else if (strncmp (hd, "transfer-encoding:", 18) == 0) {
                 if (strsearch (hd, "chunked") > 0)
                     is_chunked = TRUE
             }
