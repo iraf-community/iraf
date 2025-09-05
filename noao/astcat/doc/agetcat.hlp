@@ -130,7 +130,7 @@ For each specified astrometry catalog in \fIcatalog\fR agetcat loops through the
 regions list, formats the catalog query, makes a local or remote
 connection to the catalog server using the catalog description in the
 catalog configuration file \fIcatdb\fR, and captures the results.
-Catalog names must be of the forms catalog@site, e.g. usno2@noao.
+Catalog names must be of the forms catalog@site, e.g. usnoa2@noirlab.
 Catalog names without entries in the catalog configuration file
 are skipped.
 
@@ -216,7 +216,7 @@ cl> page reg006.cat.1
 cl> page reg007.cat.1
 .fi
 
-6. Repeat example 5 but find data for two catalogs the usno2@noao and
+6. Repeat example 5 but find data for two catalogs the usnoa2@noirlab and
 gsc@cadc.
 
 .nf
@@ -228,7 +228,7 @@ page regions
 00:00:00.0 +30:00:00 10.0 10.0 
 00:00:00.0 +60:00:00 10.0 10.0 
 00:00:00.0 +90:00:00 10.0 10.0 
-cl> agetcat regions default catalogs="usno2@noao,gsc@noao"
+cl> agetcat regions default catalogs="usnoa2@noirlab,gaia_dr3@noirlab"
 .fi
 
 7. Run agetcat on a list of images containing valid FITS WCS information.

@@ -9,7 +9,7 @@ adumpim imsurvey output ra dec size
 PARAMETERS
 .ls imsurvey
 The name of the image survey to be queried. Image survey names have the form
-survey@site, e.g. "dss2@cadc". The image survey address and query format are
+survey@site, e.g. "dss2red@cds". The image survey address and query format are
 stored in a record called imsurvey in the image survey configuration file.
 .le
 .ls output
@@ -76,41 +76,34 @@ coordinate system that the size parameter is a radius in minutes.
 .nf
 cl> aslist *
 ...
-dss2@cadc
+dss2red@cds
+dss2blue@cds
 ...
 
-cl> aslist dss2@cadc verb+
+cl> aslist dss2red@cds verb+
 Scanning image surveys database astcat$lib/imdb.dat
 Listing the supported image surveys
-dss2@cadc
-wcs dss
-nwcs 10
-      wxref INDEF INDEF d pixels
-      wyref INDEF INDEF d pixels
-      wxmag INDEF 1.009 d arcsec/pixel
-      wymag INDEF 1.009 d arcsec/pixel
-      wxrot INDEF 180.0 d degrees
-      wyrot INDEF 0.0 d degrees
-     wraref OBJCTRA INDEF d hms
-    wdecref OBJCTDEC INDEF d dms
-      wproj INDEF tan c INDEF
-    wsystem INDEF J2000 c INDEF
-nkeys 13
-    observat INDEF Palomar c INDEF
-    esitelng INDEF +116:51:46.80 d degrees
-    esitelat INDEF +33:21:21.6 d degrees 
-    esitealt INDEF 1706 r meters
-     esitetz INDEF 8 r INDEF
-     emjdobs INDEF INDEF c INDEF
-    edatamin INDEF INDEF r ADU
-    edatamax INDEF INDEF r ADU
-       egain INDEF INDEF r e-/ADU
-    erdnoise INDEF INDEF r e-
-     ewavlen INDEF INDEF r angstroms
-       etemp INDEF INDEF r degrees
-      epress INDEF INDEF r mbars
+begin dss2nir@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
+nquery 5
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+protocol https
+type fits
+hskip 0
+wcs fits
 
-cl> adumpim dss2@cadc m51.fits 13:29:53.27 +47:11:48.4 10.0
+cl> adumpim dss2red@cds m51.fits 13:29:53.27 +47:11:48.4 10.0
 
 cl> imheader m51.fits
 .fi
