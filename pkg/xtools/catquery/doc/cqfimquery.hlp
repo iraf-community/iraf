@@ -31,7 +31,7 @@ survey query.
 .ih
 NOTES
 Cq_setcat with the image survey name set to the reserved record name
-"imname@noao" must be called before any image survey query is made.
+"imname@noirlab" must be called before any image survey query is made.
 
 .ih
 SEE ALSO
