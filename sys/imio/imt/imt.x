@@ -289,7 +289,6 @@ int	ip, op
 char	url[SZ_PATHNAME], cfname[SZ_PATHNAME]
 
 int	strncmp(), strlen()
-bool	envgetb()
 
 begin
 	# Check for a URL-encoded string.
