@@ -29,12 +29,8 @@ int	sz_pixel, inbounds, npix, xstep, n
 pointer	imgibf()
 int	imsinb(), imloop(), pl_p2ri(), sizeof()
 errchk	imgibf, imrdpx, imrbpx
-include <szpixtype.inc>
 
 begin
-	#sz_pixel = sizeof(IM_PIXTYPE(im))
-	#sz_pixel = max ( sizeof(dtype), sizeof(IM_PIXTYPE(im)) )
-	#sz_pixel = pix_size[IM_PIXTYPE(im)]
 	sz_pixel = sizeof(IM_PIXTYPE(im))
 	rlio = (and (IM_PLFLAGS(im), PL_RLIO+PL_FAST) == PL_RLIO)
 
