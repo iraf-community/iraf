@@ -15,7 +15,7 @@ int	list
 pointer	tty
 
 bool	clgetb()
-int	clpopns(), clgfil(), access(), btoi(), strncmp()
+int	clpopns(), clgfil(), access(), btoi()
 pointer	ttyodes()
 
 begin
