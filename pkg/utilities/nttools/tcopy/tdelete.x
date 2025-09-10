@@ -53,7 +53,7 @@ bool	doit
 pointer	sp, fname
 
 bool	clgetb(), is_wholetab()
-int	access(), tbtacc(), strncmp()
+int	access(), tbtacc()
 
 begin
 	call smark (sp)
