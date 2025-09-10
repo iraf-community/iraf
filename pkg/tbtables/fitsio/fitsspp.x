@@ -615,8 +615,6 @@ int	fd, nbuff, fpos, nb
 int	ftread()
 include	"fitsspp.com"
 
-char	str[SZ_LINE]
-int	errget(), code
 begin
 	# Special cases.
         if (status > 0 || nbytes == 0)
@@ -651,6 +649,7 @@ begin
 	recnum[nbuff] = (fpos / bytes_per_record)+1
         bytnum[nbuff] = mod (fpos, bytes_per_record)
 end
+
 
 # FTWRIT -- Write a sequence of bytes to a file at the indicated
 # position.  The sequence can begin at any byte and can be any number of
