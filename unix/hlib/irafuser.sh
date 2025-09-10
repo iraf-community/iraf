@@ -35,6 +35,7 @@ export	F77=$hlib/f77.sh
 export	F2C=$hbin/f2c.e
 export	RANLIB=ranlib
 
+
 case "$MACH" in
   "macosx"|"macos64")
     export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -W -Wall -Wno-unused-parameter -arch arm64 -m64"
@@ -51,7 +52,7 @@ case "$MACH" in
     ;;
 
   "macintel")
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACH64 -W -Wall -Wno-unused-parameter -arch arm64 -m64 -mmacosx-version-min=10.14"
+    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14"
     if [ -e "/usr/local/opt/openssl@3/include" ]; then
         export HSI_CF="${HSI_CF} -DUSE_SSL -I/usr/local/opt/openssl@3/include"
     fi
@@ -62,9 +63,6 @@ case "$MACH" in
     export HSI_LFLAGS="-arch x86_64 -mmacosx-version-min=10.14"
     export HSI_OSLIBS=""
     #mkzflags="lflags=-z"
-
-    export HSI_CF="-g -O2 -DSYSV -DMACOSX -DMACINTEL -DMACH64 -W -Wall -Wno-unused-parameter -arch x86_64 -m64 -mmacosx-version-min=10.14 -I/opt/homebrew/opt/openssl@3/include"
-
     ;;
 
   "linux64")

@@ -133,13 +133,13 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 #else
 		    "-L/opt/homebrew/opt/openssl@3/lib", /*  3  */
 #endif
-		    "-lssl",			/*  3  */
-		    "-lcrypto",			/*  4  */
+		    "-lssl",			/*  4  */
+		    "-lcrypto",			/*  5  */
 #else
 		    "",				/*  3  */
 		    "",				/*  4  */
-#endif
 		    "",				/*  5  */
+#endif
 		    "",				/*  6  */
 		    "",				/*  7  */
 		    "",				/*  8  */
