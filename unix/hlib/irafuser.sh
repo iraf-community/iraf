@@ -66,7 +66,7 @@ case "$MACH" in
     ;;
 
   "linux64")
-    export HSI_CF="-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -W -Wall -Wno-unused-parameter -m64"
+    export HSI_CF="-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -DUSE_SSL -W -Wall -Wno-unused-parameter -m64"
     export HSI_XF="-Inolibc -w -/m64 -/Wall -/W -/Wno-unused-parameter"
     export HSI_FF="-m64 -DBLD_KERNEL"
     export HSI_LF="-m64 "
@@ -77,7 +77,7 @@ case "$MACH" in
     ;;
 
   "linux" | "redhat")
-    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -W -Wall -Wno-unused-parameter -m32"
+    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DUSE_SSL -W -Wall -Wno-unused-parameter -m32"
     export HSI_XF="-Inolibc -/W -/Wall -/Wno-unused-parameter -/m32"
     export HSI_FF="-g -O2 -DBLD_KERNEL -m32"
     export HSI_LF="-Wl,-m,elf_i386 -m32"

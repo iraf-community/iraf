@@ -58,7 +58,7 @@ switch ($MACH)
     breaksw
 
   case linux64:
-    setenv HSI_CF "-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -Wall -W -Wno-unused-parameter -m64"
+    setenv HSI_CF "-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -DUSE_SSL -Wall -W -Wno-unused-parameter -m64"
     setenv HSI_XF "-Inolibc -/Wall -/W -/Wno-unused-parameter -/m64"
     setenv HSI_FF "-g -O2 -m64 -DBLD_KERNEL"
     setenv HSI_LF "-m64"
@@ -70,7 +70,7 @@ switch ($MACH)
 
   case linux:
   case redhat:
-    setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -W -Wno-unused-parameter -m32"
+    setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DUSE_SSL -Wall -W -Wno-unused-parameter -m32"
     setenv HSI_XF "-Inolibc -/Wall -/W -/Wno-unused-parameter -/m32"
     setenv HSI_FF "-O2 -DBLD_KERNEL -m32"
     setenv HSI_LF "-Wl,-m,elf_i386 -m32"
