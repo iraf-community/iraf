@@ -40,6 +40,7 @@ switch ($MACH)
     setenv HSI_LF "-arch arm64 -m64"
     setenv HSI_LFLAGS "-arch arm64 -m64"
     setenv HSI_OSLIBS ""
+    setenv XC_CFLAGS  "-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
     set    mkzflags = "'lflags=-z'"
     breaksw
 
@@ -54,6 +55,7 @@ switch ($MACH)
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS "-arch x86_64 -m64 -mmacosx-version-min=10.14"
     setenv HSI_OSLIBS ""
+    setenv XC_CFLAGS  "-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
     set    mkzflags = "'lflags=-z'"
     breaksw
 
@@ -94,7 +96,7 @@ setenv HSI_CF  	  "-I${HOME}/.iraf/ $HSI_CF"
 setenv HSI_FF  	  "-I${HOME}/.iraf/ $HSI_FF"
 setenv HSI_LF  	  "-I${HOME}/.iraf/ $HSI_LF"
 setenv HSI_XF  	  "-I${HOME}/.iraf/ $HSI_XF"
-setenv XC_CFLAGS  "-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
+setenv XC_CFLAGS  "-I${HOME}/.iraf/"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

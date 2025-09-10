@@ -48,6 +48,7 @@ case "$MACH" in
     export HSI_F77LIBS=""
     export HSI_LFLAGS=""
     export HSI_OSLIBS=""
+    export XC_CFLAGS="-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
     #mkzflags="lflags=-z"
     ;;
 
@@ -62,6 +63,7 @@ case "$MACH" in
     export HSI_F77LIBS=""
     export HSI_LFLAGS="-arch x86_64 -mmacosx-version-min=10.14"
     export HSI_OSLIBS=""
+    export XC_CFLAGS="-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
     #mkzflags="lflags=-z"
     ;;
 
@@ -101,7 +103,7 @@ export HSI_CF="-I${HOME}/.iraf/ $HSI_CF"
 export HSI_FF="-I${HOME}/.iraf/ $HSI_FF"
 export HSI_LF="-I${HOME}/.iraf/ $HSI_LF"
 export HSI_XF="-I${HOME}/.iraf/ $HSI_XF"
-export XC_CFLAGS="-I${HOME}/.iraf/ -mmacosx-version-min=10.14"
+export XC_CFLAGS="-I${HOME}/.iraf/"
 
 
 # The following determines whether or not the VOS is used for filename mapping.
