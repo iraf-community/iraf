@@ -375,6 +375,7 @@ ZOPNND (
 		        np->dataout = fd;
 		    }
 
+#ifdef USE_SSL  
 		    if (np->flags & F_SECURE) {
 		        /* Connect to server over secure connection.
                          * Initialize OpenSSL using the older v1.0 protocols for
@@ -406,6 +407,7 @@ ZOPNND (
 		            fd = ERR;
                         }
                     }
+#endif
                 }
 
 	    } else if (np->domain == UNIX) {
@@ -686,10 +688,12 @@ ZCLSND (XINT *fd, XINT *status)
 	if (np) {
 	    flags = np->flags;
 
+#ifdef USE_SSL  
             if (flags & F_SECURE) {
                 SSL_free (ssl);
                 SSL_CTX_free (ctx);
             }
+#endif
 	    if (np->datain > 0)
 		close (np->datain);
 	    if (np->dataout > 0 && np->dataout != np->datain)
