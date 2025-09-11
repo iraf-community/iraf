@@ -79,7 +79,7 @@ case "$MACH" in
     ;;
 
   "linux" | "redhat")
-    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DUSE_SSL -W -Wall -Wno-unused-parameter -m32"
+    export HSI_CF="-g -O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -W -Wall -Wno-unused-parameter -m32"
     export HSI_XF="-Inolibc -/W -/Wall -/Wno-unused-parameter -/m32"
     export HSI_FF="-g -O2 -DBLD_KERNEL -m32"
     export HSI_LF="-Wl,-m,elf_i386 -m32"

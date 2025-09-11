@@ -72,7 +72,7 @@ switch ($MACH)
 
   case linux:
   case redhat:
-    setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -DUSE_SSL -Wall -W -Wno-unused-parameter -m32"
+    setenv HSI_CF "-O2 -DLINUX -DREDHAT -DPOSIX -DSYSV -Wall -W -Wno-unused-parameter -m32"
     setenv HSI_XF "-Inolibc -/Wall -/W -/Wno-unused-parameter -/m32"
     setenv HSI_FF "-O2 -DBLD_KERNEL -m32"
     setenv HSI_LF "-Wl,-m,elf_i386 -m32"
