@@ -28,8 +28,8 @@ jobs:
             os: macos-15
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
 
-          - name: macOS 13 Ventura x86_64
-            os: macos-13
+          - name: macOS 15 Sequoia x86_64
+            os: macos-15-intel
             cflags: -O1 -g -Wall -Wno-logical-op-parentheses -arch x86_64
             ldflags: -arch x86_64
 
