@@ -384,9 +384,10 @@ ZOPNND (
                         SSL_library_init ();
                         SSL_load_error_strings ();
                         OpenSSL_add_all_algorithms ();
-#ifdef __APPLE__
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L /* OpenSSL >= 1.1.0 */
                         ctx = SSL_CTX_new (TLS_client_method ());
-#else
+#else                                     /* Legacy for older openSSL */
                         ctx = SSL_CTX_new (SSLv23_client_method ());
 #endif
 
