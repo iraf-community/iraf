@@ -11,7 +11,7 @@ if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
     source $HOME/.iraf/setup.sh
   else
-    source ../unix/hlib/setup.sh
+    source ${irafdir}/unix/hlib/setup.sh
   fi
 else
     source $iraf/unix/hlib/setup.sh
@@ -19,12 +19,23 @@ fi
 
 
 REPO=`${irafdir}/util/pkgrepo`			# get repo url
+
+# Get the manifest file from the repository.
 $irafdir/util/pkgget ${REPO}/MANIFEST
 if (( $?>0 )); then
     /bin/echo "Cannot download repository manifest file, quitting."
     exit $?
 else
-    cp MANIFEST .repo_manifest
+    mv MANIFEST .repo_manifest
+fi
+
+# Get the package list file from the repository.
+$irafdir/util/pkgget ${REPO}/REPO.PKGS
+if (( $?>0 )); then
+    /bin/echo "Cannot download repository package list file, quitting."
+    exit $?
+else
+    mv REPO.PKGS .repo_pkgs
 fi
 
 exit 0
