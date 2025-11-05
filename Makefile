@@ -39,38 +39,6 @@ updatex::
 	sh util/mkupx
 	@echo "" ; date ; echo ""
 
-# Update with cumulative patch of entire system
-latest::
-	@echo "Updating IRAF $(RELEASE) to latest release."
-	@echo "" ; date ; echo ""
-	sh util/self_update
-	!(sh util/iraf_update -all 2>&1 | egrep -v "unexpected end of file")
-	@echo "" ; date ; echo ""
-
-# Check if system is the latest distributed version
-check_latest::
-	!(sh util/iraf_update -list)
-
-# Update with cumulative patch of core system
-latest_src::
-	@echo "Updating IRAF $(RELEASE) to latest source release."
-	@echo "" ; date ; echo ""
-	sh util/iraf_update -src
-	@echo "" ; date ; echo ""
-
-# Update with cumulative patch of core system
-latest_core::
-	@echo "Updating IRAF $(RELEASE) to core release."
-	@echo "" ; date ; echo ""
-	sh util/iraf_update -core
-	@echo "" ; date ; echo ""
-
-
-# Update recent changes from the repository.
-self_update::
-	sh util/self_update
-
-
 # Clean the IRAF tree of all binaries.
 src::
 	sh util/mksrc
