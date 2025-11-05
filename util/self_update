@@ -34,7 +34,8 @@ if [ -e /tmp/util.tgz ]; then
 fi
 
 # Get the latest script distribution.
-./fget -o /tmp/util.tgz ${REPO}/util-universal.tar.gz
+./pkgget ${REPO}/util-universal.tar.gz
+mv util-universal.tar.gz /tmp/util.tgz
 
 # Go to iraf root, unpack and clean up.  Using the IRAF root gives us
 # the chance to update the toplevel Makefile or other build scripts in

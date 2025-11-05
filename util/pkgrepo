@@ -3,9 +3,10 @@
 #  PKGREPO - Get the repository base URI, either from the environment
 #  variable 'IRAF_REPO' or the default.
 
+base_url="https://gitlab.com/nsf-noirlab/csdc/usngo/iraf/"
 
 if [ -z "$IRAF_REPO" ]; then
-   /bin/echo "ftp://iraf.noao.edu/iraf/v216/REPO"
+   /bin/echo ${base_url}"iraf-distros/-/raw/main/iraf-v218/extern"
 else
    /bin/echo $IRAF_REPO
 fi

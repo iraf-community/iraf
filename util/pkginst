@@ -34,7 +34,7 @@ fi
  
 
 # Get any dependency package names.
-deps=`grep ^$pkg .repo_desc | awk '{printf("%s\n",$2)}' | sed -e 's/,/ /g'`
+deps=`grep ^$pkg REPO.DESC | awk '{printf("%s\n",$2)}' | sed -e 's/,/ /g'`
 pkg_dep=""
 for d in ${deps[@]}; do 
    if [ "$d" != "none" ]; then
@@ -51,7 +51,10 @@ list=`/bin/echo $pkg_dep $pkg|awk 'BEGIN {RS=" |\n";}{print $1;}'|sort|uniq`
 dep=("$pkg_dep" "$pkg")
 for ip in ${dep[@]}; do
 
-  pfile=`grep \ $ip\  .repo_manifest | grep ${arch}\  | head -1 | awk '{printf("%s\n",$4)}'`
+  pfile=`grep $ip .repo_manifest | grep -e "-${arch}.tar.gz"  | head -1 | awk '{printf("%s\n",$2)}'`
+  if [ -z "$pfile" ]; then
+    pfile="${ip}-src.tar.gz"
+  fi
 
   /bin/echo $pfile | grep src.tar.gz  >> /dev/null 2>&1
   if (( $?==0 )); then

@@ -5,6 +5,7 @@
 
 pkg=""
 all=no
+force=no
 list_only=no
 
 if (( $#<1 )); then
@@ -15,6 +16,9 @@ else
       case "$1" in
       "-all")                          # clean all package .s
         all=yes
+	;;
+      "-force")                        # force package reinstall
+        force=yes
 	;;
       "-list")                         # list packages needing updating
         list_only=yes
@@ -38,7 +42,7 @@ if [ -z "$iraf" ]; then
   if [ -e "$HOME/.iraf/setup.sh" ]; then
     source $HOME/.iraf/setup.sh
   else
-    source ../unix/hlib/setup.sh
+    source ${irafdir}/unix/hlib/setup.sh
   fi
 else
     source $iraf/unix/hlib/setup.sh
@@ -53,19 +57,19 @@ else
 fi
 
 /bin/echo "Updating repository data ...."
-../util/pkginit                                # init repository information
+$irafdir/util/pkginit                             # init repository information
 
 # Check for a self-update.
 if [ "$pkg" == "-self" ]; then
     /bin/echo "Updating utility scripts ...."
     /bin/rm -f /tmp/util.tgz
-    ../util/pkgget ${REPO}/util-universal.tar.gz /tmp/util.tgz
-    (cd ../util; tar zxf /tmp/util.tgz; /bin/rm -f /tmp/util.tgz)
+    ${irafdir}/util/pkgget ${REPO}/util-universal.tar.gz /tmp/util.tgz
+    (cd ${irafdir}; tar zxf /tmp/util.tgz; /bin/rm -f /tmp/util.tgz)
     /bin/echo "Done"
     exit 0
 fi
  
-# Check for a extern update.
+# Check for a extern configure script update.
 if [ "$pkg" == "-config" ]; then
     /bin/echo "Updating config script ...."
     ../util/pkgget ${REPO}/config-universal configure
@@ -85,6 +89,10 @@ for ip in ${pkgs[@]}; do
      pd=`grep $ip $ip/.installed | awk '{printf("%s\n", $1)}'`
      rd=`grep $ip .repo_manifest | head -1 | awk '{printf("%s\n", $3)}'`
 
+     if [ "$force" == "yes" ]; then
+        rd=9999999999
+     fi
+
      alist=`(cd $ip; ls -1 .inst*.* | sed -e "s/\.installed\.//g")`
 
      if (( $rd>$pd )); then
@@ -97,7 +105,7 @@ for ip in ${pkgs[@]}; do
 	 else
 	    if [ "$all" == "yes" -o "$ip" == "$pkg" ]; then
               /bin/echo "Updating package '$ip' for '$a' ...."
-              ../util/pkginst $ip
+              ${irafdir}/util/pkginst $ip
 	    fi
 	 fi
        done
@@ -111,7 +119,9 @@ for ip in ${pkgs[@]}; do
      fi
 
   else
-     printf "Package %-12s is not installed ....\n" $ip
+     if [ "$all" == "yes" -o "$ip" == "$pkg" ]; then
+         printf "Package %-12s is not installed ....\n" $ip
+     fi
   fi
 
   ${irafdir}/util/pkgenv -init

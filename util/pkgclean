@@ -16,7 +16,7 @@ init=no
 # Process cmdline flags.
 while [ -n "$1" ]; do
     case "$1" in
-    "-all")                          # clean all package .s
+    "-all")                          # clean all packages
         all=yes
 	;;
     "-init")                         # init all packages
@@ -40,7 +40,7 @@ if [ "$all" == "yes" ]; then
         mkdir $p
 
         /bin/echo "" > .installed
-        /bin/echo "" > .zzexport .def=
+        #/bin/echo "" > .zzexport
       fi
     done
   fi
@@ -57,7 +57,8 @@ elif [ "$init" == "yes" ]; then
   /bin/rm -rf Makefile    >> /dev/null 2>&1
   /bin/rm -rf .installed  >> /dev/null 2>&1
   /bin/rm -rf .repo*      >> /dev/null 2>&1
-  /bin/echo "" > .zzexport .def=
+  #/bin/echo "" > .zzexport
+  cp Makefile.tmpl Makefile
 
 else
    if [ -e $pkg ]; then
