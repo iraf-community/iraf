@@ -1,6 +1,6 @@
 
-       NOIRLab IRAF Revision 2.18.1DEV Wed Mar 13 20:08:58 MST 2024
-      This is the EXPORT version of IRAF V2.18.1 supporting PC systems.
+       NOIRLab IRAF Revision 2.18.1EXPORT Thu Nov  6 11:32:08 MST 2025
+      This is the EXPORT version of IRAF V2.18.1 supporting PC systems
 
   Welcome to IRAF.  To list the available commands, type ? or ??.  To get
   detailed information about a command, type `help <command>'.  To run  a
@@ -10,9 +10,9 @@
   For general inquiries, feedback,  and installation  issues,  please use
   one of the email addresses listed  below.  Bugs  within  the  code  can
   also be reported through  GitLab issues.  Specific questions about data
-  reduction using the  GEMINI package  should be submitted to  the Gemini
-  External Helpdesk.
+  reduction using the  GEMINI package should be submitted to the external
+  Gemini Helpdesk (https://www.gemini.edu/observing/helpdesk).
 
-  Contact:  iraf@noirlab.edu  or  usngo@noirlab.edu 
+  Contact Us:    iraf@noirlab.edu  or  usngo@noirlab.edu 
 
 

@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.18DEV Oct 2023"
+    logver = "NOIRLab IRAF V2.18.1 Nov 2025"
 
 set     home            = "iraf$local/"
 set     imdir           = "HDR$/"
