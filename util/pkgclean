@@ -40,7 +40,6 @@ if [ "$all" == "yes" ]; then
         mkdir $p
 
         /bin/echo "" > .installed
-        #/bin/echo "" > .zzexport
       fi
     done
   fi
@@ -57,7 +56,6 @@ elif [ "$init" == "yes" ]; then
   /bin/rm -rf Makefile    >> /dev/null 2>&1
   /bin/rm -rf .installed  >> /dev/null 2>&1
   /bin/rm -rf .repo*      >> /dev/null 2>&1
-  #/bin/echo "" > .zzexport
   cp Makefile.tmpl Makefile
 
 else
