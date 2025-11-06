@@ -6,15 +6,23 @@
 Distribution files:
 -------------------
 
-     The NOIRLab IRAF v2.18 release is available from:
+     The NOIRLab IRAF v2.18.1 release is available in to forms:
 
-	https://iraf.noirlab.edu/download/mac        # MacOS (Intel/Apple)
-	https://iraf.noirlab.edu/download/linux32    # 32-bit Linux
-	https://iraf.noirlab.edu/download/linux64    # 64-bit Linux
+    1) Distribution files for supported platforms include a DMG graphical
+       installer for MacOS systems or a self-extracting archive/installation
+       for Linux platforms:
 
-Distribution files for supported platforms include a DMG graphical
-installer for MacOS systems or a self-extracting archive/installation for
-Linux platforms.
+	   https://iraf.noirlab.edu/download/mac        # MacOS (Intel/Apple)
+	   https://iraf.noirlab.edu/download/linux32    # 32-bit Linux
+	   https://iraf.noirlab.edu/download/linux64    # 64-bit Linux
+
+    2) The GitLab repository containing individual compressed tar files that
+       make up a distribution are available from:
+
+           https://gitlab.com/nsf-noirlab/csdc/usngo/iraf/iraf-distros
+
+Full installation instructions are in the README files, below we cover only
+the installation using the platform installers.
 
 
 To INSTALL on a MacOS System
@@ -24,67 +32,90 @@ To INSTALL on a MacOS System
 
   2) Open the installer window with the command:
 
-                % open /<path>/NOIRLab-IRAF-v218.dmg
+                % open /<path>/NOIRLab-IRAF-v2181.dmg
 
             or double-click the icon in the Finder window.
 
-  3) Drag and drop the application icons you wish to install into 
-            the 'Applications' icon on the window.
+    Note: If the DMG installer was downloaded using a web browser, you may
+    see security popups when installing or launching the applications. These
+    can be avoided in several ways:
 
-  4) Double-click the IRAF, PyRAF, XGTerm or XImtool icon in the
-            Finder 'Applications' folder to start.
+    a) Once the DMG is downloaded, remove the quarantine attribute before opening
+       the image with the following command:
+
+            % xattr -c NOIRLab-IRAF-v2.181.dmg
+
+    b) Download the appropriate file using cURL instead of a web browser, e.g.:
+
+        % curl -OL % https://gitlab.com/api/v4/projects/52167765/packages/generic/iraf-mac/2.18/NOIRLab-IRAF-v2.181.dmg
+        % curl -OL % https://gitlab.com/api/v4/projects/52167765/packages/generic/iraf-linux/2.18/iraf-v2181-linux64.sh
+        % curl -OL % https://gitlab.com/api/v4/projects/52167765/packages/generic/iraf-linux/2.18/iraf-v2181-linux32.sh
+
+  3) Drag and drop the application icons you wish to install into the
+     'Applications' icon on the window.
+
+  4) Double-click the IRAF, PyRAF, XGTerm or XImtool icon in the Finder
+     'Applications' folder to start.
 
 See the accompanying 'RELEASE.txt' document for additional information on
-MacOS installations, including note about know issues with security popups.
+MacOS installations, including note about known issues with security popups.
 
 
 To INSTALL on a Linux System
 ----------------------------
 
-  1) Download the installation script from the appropriate link
-            above depending on whether you want the 32- or 64-bit version.
+  1) Download the installation script from the appropriate link above
+     depending on whether you want the 32- or 64-bit version.
 
   2) Create a new directory for the unpacked IRAF system tree.
-            For example,
+     For example,
 
                 % mkdir iraf-v2.18
 
   3) Go to the directory and execute the downloaded installer script.
-            Root permission is NOT required to run this install script. 
-            For example,
+     Root permission is NOT required to run this install script. 
+     For example,
 
                 % cd iraf-v2.18
-                % sh iraf-v218-linux64.sh
+                % sh iraf-v2181-linux64.sh
 
-            The script will automatically unpack the distribution file and
-            run the IRAF install script to setup your environment.
+     The script will automatically unpack the distribution file and
+     run the IRAF install script to setup your personal environment.
 
   4) Start a new window that will have your new environment defined
-            and run either 'cl' or 'pyraf' to start IRAF or PyRAF
-            respectively.
+     and run either 'cl' or 'pyraf' to start IRAF or PyRAF respectively.
 
 
 To Install IRAF for system-wide use:  
 ------------------------------------
 
+    The default installation assumes a single-user system (e.g. laptop)
+and will create the necessary links and files in the user's $HOME directory
+and startup files.  For shared machines, a system installation to create
+a single IRAF instance for all users is required.  
+
+    To do a system-wide install:
+
   1) Download and unpack the appropriate distribution file as above.
 
   2) Execute the install script with root permissions:
 
-	% sudo ./install --system	# execute the install script
+	    % sudo ./install --system	    # execute the install script
 
 	or as the 'root' user:
 
-	# ./install --system		# execute the install script
+	    # ./install --system	    # execute the install script
 
      This will create a system installation of IRAF for all users of the
   machine.  Root permissions ARE required in order to write to system
-  directories.
+  directories. Note that on MacOS systems the root system directories are
+  not generally writable and so /opt or /usr/local should be used for the
+  IRAF install paths.
 
-  IRAF is immediately available by typing
+  IRAF is then immediately available by typing:
 
-	% cl			# login to IRAF from current terminal
-	% iraf			# start IRAF in an XGterm window
+	    % cl		    # login to IRAF from current terminal
+	    % iraf		    # start IRAF in an XGterm window
 
 
 -------------------
@@ -102,8 +133,8 @@ The PyPi package for PyRAF used here originates from the repository at
         https://github.com/iraf-community/pyraf
 
 Bug reports for PyRAF errors should be reported as new Issues on that
-repository. Usage questions will be forwarded to the appropriate Help Desk as
-required.
+repository. Usage questions will be forwarded to the appropriate HelpDesk
+as required.
 
 
 ---------------------
@@ -126,3 +157,4 @@ from
 While the Help Desk may be able to provide answers to questions about using
 these tools, bug reports (and ideally, fixes) should be reported to the
 https://github.com/iraf-community repo as an new Issue on the task.
+
