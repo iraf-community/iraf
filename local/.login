@@ -28,7 +28,7 @@ setenv TAPE 	     /dev/nrsa0
 setenv SHELL 	     /bin/csh
 
 # Uncomment for IRAF admin/prog definitions.
-#setenv IRAFARCH	    `/opt/iraf/iraf/unix/hlib/irafarch.csh -actual`
+setenv IRAFARCH	    `/iraf/iraf/unix/hlib/irafarch.csh -actual`
 
 # Setup the iraf environment.
 setenv iraf /iraf/iraf/
