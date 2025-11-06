@@ -4,7 +4,7 @@
 
 
     The IRAF v2.18 release is a product of the Community Science and Data
-Center (CSDC) and US National Gemini Office (US-NGO) at NSF's NOIRLab. It's
+Center (CSDC) and US National Gemini Office (US-NGO) at NSF's NOIRLab. Its
 purpose is to upgrade the IRAF-based Gemini reduction software to provide a
 fully supported system capable of running natively on modern hardware. This
 work includes
