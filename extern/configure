@@ -41,7 +41,7 @@ cat << MAKE_TEMP_END		> Makefile
 
 # Compiler Flags.
 
-RELEASE		= v2.16
+RELEASE		= v2.18.1
         
 all:: update
 
@@ -120,22 +120,24 @@ fi
 
 /bin/echo ""
 /bin/echo ""
-/bin/echo "    To install packages, use 'ls' to list the currently available"
-/bin/echo "    packages from the IRAF repository.  For each package you wish"
-/bin/echo "    to install, use the command:"
+/bin/echo "  To install packages, use 'ls' to list the currently available"
+/bin/echo "  packages from the IRAF repository.  For each package you wish"
+/bin/echo "  to install, use the command:"
 /bin/echo ""
 /bin/echo "      make <pkg>"
 /bin/echo ""
-/bin/echo "    The package will be loaded dynamically the next time you start"
-/bin/echo "    the CL session."
+/bin/echo "  The package will be loaded dynamically the next time you start"
+/bin/echo "  the CL session."
 /bin/echo ""
-/bin/echo "    Use the commmands:"
+/bin/echo "  Use the commmands:"
 /bin/echo ""
-/bin/echo "      make update	# to update pkgs to the latest repository version"
-/bin/echo "      make check	# to list available updates"
-/bin/echo "      make clean	# to delete installed all packages"
-/bin/echo "      make init    	# restore to pre-configure state"
-/bin/echo "      make <pkg>	# to force a re-install of named <pkg>"
+/bin/echo "    make install_all	# install all packages from repository"
+/bin/echo "    make list    	# list packages available from repository"
+/bin/echo "    make update	# update pkgs to the latest repository version"
+/bin/echo "    make check	# list available updates"
+/bin/echo "    make clean	# delete installed all packages"
+/bin/echo "    make init    	# restore to pre-configure state"
+/bin/echo "    make <pkg>	# force a re-install of named <pkg>"
 /bin/echo ""
 /bin/echo ""
 

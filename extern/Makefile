@@ -1,0 +1,55 @@
+#
+#  Makefile for IRAF external package installation/maintenance.
+#
+# ---------------------------------------------------------------------------
+
+# Compiler Flags.
+
+RELEASE		= v2.18.1
+        
+all:: update
+
+# Update recent changes from the repository.
+update::
+	@./configure -noclean
+	@../util/pkgupdate -all
+
+# Install all available packages for this platform.
+install_all::
+	@../util/pkgall
+
+# List packages available on the repository.
+list::
+	@cat .repo_pkgs
+
+# Print the status of all packages (e.g. 'current', 'not installed', or
+# 'needs updating')
+status::
+	@../util/pkgupdate -all -list
+
+# Clean the IRAF tree of binaries for the currently configured arch.
+init::
+	@../util/pkgclean -init
+
+# Remove all package code but leave the structure in place.
+clean::
+	@../util/pkgclean -all
+
+# Restore the dynamic package directory to its distribution state.
+distclean::
+	@../util/pkgclean -init
+
+# Check to see which installed packages could be updated.
+check::
+	@../util/pkgupdate -list
+
+# Update recent changes from the repository.
+self_update::
+	@../util/pkgupdate -self
+	@./configure -noclean
+
+# Update recent changes from the repository.
+config_update::
+	@../util/pkgupdate -config
+
+
