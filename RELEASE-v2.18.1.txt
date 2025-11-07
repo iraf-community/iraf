@@ -1,0 +1,730 @@
+
+                   NOIRLab IRAF v2.18.1 for MacOS/Linux
+                        Release: November 4, 2025
+
+
+    The IRAF v2.18.1 release is a product of the Community Science and Data
+Center (CSDC), the US National Gemini Office (US-NGO) and the Gemini
+Observatory at NSF's NOIRLab. This release is primarily a bugfix and feature
+update to the earlier IRAF v2.18 in order to support GEMINI data reduction
+and recent platform updates.  This release provides a fully supported system
+capable of running natively on modern hardware. 
+
+    The focus of the v2.18.1 work includes:
+
+    •   64-bit ports of the GEMINI package and its dependency tasks (primarily
+        those from the STSDAS package),
+    •   Upgrades to the core IRAF system and all other external packages to
+        fix any platform and licensing problems,
+    •   The establishment of fully supported Help Desk and distribution systems
+        for the IRAF user community.
+
+    The project provides a bridge solution until the new DRAGONS software is
+available for all facility instruments and modes, as well as additional
+benefits to the wider IRAF community.
+
+    For GEMINI package tasks, early results show a 10-20X speedup of
+reductions using the native 64-bit software compared to the virtualized
+32-bit solutions now in use. Results are even better on new Apple M1/M2
+platforms where the additional overhead of Intel CPU emulation can be
+eliminated.
+
+
+Contact Us:  iraf@noirlab.edu   or   usngo@noirlab.edu
+
+—————————————————————————————————————————————————————————————————————————————
+
+  Contents
+    System Requirement
+        Dependencies
+        Before You Begin
+    Quick Start Guide
+
+    What’s New
+        Major Core System Changes
+        Major External Package Changes
+        Support for Gemini Data Reduction
+        Availability of some STSDAS Tasks
+
+    What’s Included
+    Installing the Applications
+        Configuring the Applications
+    Known Problems
+    License Problem Mitigation Performed
+    Acknowledgements
+
+    Appendix I:  External packages
+        New or Updated Packages
+        General Reduction and Utility Packages
+        Instrument-specific Packages
+        Miscellaneous Utility packages
+    Appendix II:  XGTerm and XImtool Binaries
+    Appendix III:  PyRAF Environment
+    
+—————————————————————————————————————————————————————————————————————————————
+
+===================
+System Requirements
+===================
+
+    •    Intel or Apple Silicon (M1/M2) based Mac
+    •    OS X 10.15 (Catalina) or later
+
+   Dependencies
+    •    XQuartz must be installed before using the X11IRAF tools or XTerm
+         for IRAF graphics display. An XQuartz installer package is included
+         in the DMG ‘Extras’ folder.
+    •    IRAF must be installed before PyRAF can be run.
+    •    IRAF must be launched at least once from the /Applications folder
+         before the command-line tools can be used. Similarly, the command-
+         ine IRAF or PyRAF commands should be run from a new terminal window
+         following installation in the /Applications folder.
+    •    Applications cannot be launched from the DMG image.
+
+  Before You Begin
+    •    To initialize the user environment setup files and to create the
+         links making terminal commands such as ‘cl’ or ‘pyraf’ available,
+         either the IRAF or PyRAF application must be launched at least once
+         from the /Applications folder or Finder.
+    •    Once the applications are installed (and started at least once), the
+         familiar commands such as ‘cl’ and ‘mkiraf’ will only be available
+         to new shells that pick up the new environment setup. Users have
+         the option of:
+    ▪    Starting a new terminal window to use these commands rather than use
+         existing open windows, or
+    ▪    Manually reinitialize an existing shell environment with a command
+         such as
+                    % source ~/.login
+
+         This will read the $HOME/.iraf/setup.sh script created when the
+         /Applications/IRAF.app was first opened.
+
+=================
+Quick Start Guide
+=================
+
+    To install the applications:
+
+    •    Double-click the downloaded DMG installer to mount it
+    •    Drag-and-Drop the application icons into the ‘Applications’ folder
+    •    Double-click the IRAF/PyRAF/XGTerm/XImtool icon in the Applications
+         folder to start it. 
+    •    Starting the IRAF or PyRAF application will initialize your user
+         environment to use these tasks from the command-line.
+    •    Starting any of the apps will also start Quartz first if necessary. 
+         See below for information on configuring the startup preferences.
+
+    To start IRAF/PyRAF from a running terminal window:
+
+    •    Type ‘cl’ or ‘pyraf’ to start the desired command shell. Either
+         task may be used from a MacOS Terminal window, however CL graphics
+         require that you start from an XGterm or XTerm window.
+    •    Starting in this way uses the global login.cl file stored in the
+         $HOME/.iraf directory. This may be edited as needed or the ‘mkiraf’
+         command can be used to create a new login.cl in the current directory.
+
+    To use the PyRAF Python environment:
+
+    •    The PyRAF application has its own MiniConda installation and does
+         not install directly to the system Python environment. As such,
+         special commands are required to access and update this environment:
+
+            pyraf           Start the PyRAF command interpreter.
+            pyraf_python    Start the Python interpreter used by PyRAF.
+            pyraf_pip       Run the PyRAF environment ‘pip’ command to
+                            install new packages.
+
+==========
+What’s New
+==========
+
+    The IRAF v2.18.1 system is primarily a platform update release and
+functionally is the same as the earlier v2.16 systems last released in 2013.
+The most significant update is a port of the system to Apple M1/M2 systems
+and the upgrade of the GEMINI reduction package.
+
+    For users, the most noticeable change will be improved speed of tasks
+using native binaries. GEMINI users will see up to 20X better performance in
+reducing data using the native 64-bit binaries over the virtualized 32-bit
+version.
+
+    For developers, these updates mean that the system will once again build
+easily on modern MacOS and Linux platforms. Self-installers and Git repo
+access will also greatly simplify installation and updates for users and
+developers.
+
+Major Core System Changes:
+--------------------------
+
+    - Numerous bug fixes to the TBTABLES and NTTOOLS package found in Gemini
+      testing when using FITS Binary Tables.
+    - The URLGET task and network driver now support https connections
+      (on all 64-bit platforms only)
+    - Environment definition of IRAFARCH as an override to the system
+      configuration was fixed.
+    - MKPKG changes to warn when package and system are different archs
+    - INDEF handling by the TBTABLES libraries was fixed
+    - Updated to use CFITSIO v4.4.0.  The core system no longer uses
+      CFITSIO although the same  v4.4.0 sources are available in the
+      iraf$vendor/ directory.
+    - Background jobs in the CL now work again
+    - Fixed a segvio in the CL/ECL when doing 'flpr'
+    - Added a new 16K frame buffer to the lib$imtoolrc and dev$graphcap files
+    - Bug fixes to PLIO mask handling causing errors in IMEDIT
+    - Fixed problems reported with ":.snap" not producing output
+    - The LBT observatory was added to the noao$lib/obsdb.dat file
+
+    New Task:
+        - Added the GHOST2MS task to the PROTO package.  This task will
+          convert output of a DRAGONS-reduced GHOST file to an IRAF
+          compatible multispec format.
+
+Major External Package Changes:
+-------------------------------
+
+    All external packages were updated to clean up compilation warnings and
+general bug fixes as well as to standardize the structure of all packages.
+
+The following packages had additional changes of note:
+
+    FITSUTIL
+        - Updated to use CFITSIO v4.4.0.  The core system no longer uses
+          CFITSIO although the same  v4.4.0 sources are available in the
+          iraf$vendor/ directory.
+    
+    GEMINI
+        - Updated to GEMINI v1.17. See the gemini_v117_rev.txt for details.
+          This includes:
+            1) Verified support for 64-bit.
+            2) GMOS package:
+                - Support for a new GMOS-N R400 grating.
+                - Updated LUT files
+            3) GNIRS package:
+                - Support for the refurbished GNIRS in the form of new BPMs
+                - Updated LUT files
+                - Updates for GNIRS IFU
+            4) F2 package:
+                - Updated lookup table, f2offsets.fits
+                - Updated LUT files
+            5) Updates for test data files
+
+        - CL and PyRAF outputs are now compatible
+        - Fixed a bug in the GFCUBE task causing a segvio
+        - The CL rounds up, PyRAF rounds down. Scripts were changed globally
+          to use nint() in place of int() for rounding.
+        - A zero-day but in GSEXTRACT for growing apwidth in file lists was
+          fixed
+        - Fixed an old pyraf bug where stridx always return INDEF if either
+          argument is INDEF. Replaced with a != "INDEF".
+        - 64-bit fix for GFUNEXWL failing with segvio on startup
+        - Removed non-ascii char from comment line 205 in GMSKCREATE script
+
+    IUETOOLS
+        - The package was renamed from IUE
+    
+    MSCRED
+        - The MSCGETCAT task was Updated to use working data svcs at NOIRLab
+        - Core system NTTOOLS versions of tasks are not used in place of local
+          versions or older TTOOLS codes.
+        _ The TABLES dependency was removed from all tasks and are now resolved
+          with NTTOOLS tasks.
+        - Replaced gammaln() function with non-NR double precision version
+    
+    NFEXTERN
+        - Updates to use working catalog services from NOIRLab 
+        - Package version of TBTABLES was sync'd to core system but is only
+          compiled when not available from core IRAF.
+        - Forced use of SPPFITSIO when building tables libraries.
+        - Replaced gammaln() function with non-NR double precision version
+    
+    RVSAO
+        - Updated to RVSAO 2.8.5
+    
+    SPTABLE
+        - Fixed a segmentation error on XONEDSPEC caused by a type clash.
+        - Added a new default table format option for (wave,flux,error) to the
+          sptable$lib/sptabledb.dat file
+        - Removed duplicate FFT routines to use non-NR version in pkg$xtools
+        - Removed NR version of gasdev(), use pkg$xtools
+        - Replaced sptable$src/mwcs with non-NR code from sys$mwcs
+    
+    ST4GEM
+        New Package Ports:
+
+                HST_CALIB
+                ISOPHOTE
+                NEBULAR
+                SPFITPKG
+                SYNPHOT
+
+        - Removed redundant NTTOOLS, TBTABLES and STXTOOLS
+        - Package version of TBTABLES was sync'd to core system but is only
+          compiled when not available from core IRAF.
+        - Removed CFITSIO from package as no-longer used
+        - First commit of libiraf77 and libuttables libraries
+        - Remove the APPLIB code as no-longer used and to avoid conflicting
+          routines in the FFTPACK lib
+        - Added SGRAPH task as ISOPHOTE dependency
+        - Added missing psets for SGRAPH
+        - Added missing data file for forward/inverse tasks in FOURIER
+          package
+        - Aadded XY2RD, XYZTOIM and XYZTABLE tasks to IMGTOOLS
+        - Removed conflicting license file
+    
+    STECF
+        - First release of the ST-ECF package with the following mods:
+            - removed IMPOL package
+            - removed the SPEPSF task
+            - moved IRAF77 to ST4GEM package
+            - require ST4GEM environment to build
+        - Fixed a bug in FMTCHKA()
+        - Numerical Recipes changes included:
+            - replaced routines for LUDCMP and LUBKSB
+            - replaced NORDEV() and RAN1() funcs with VOPS and XTOOLS
+              alternatives
+            - replace the RAN1() function with VOPS urand()
+            - replaced MDIAN1() routine, removed SORT()
+    
+
+Support for Gemini Data Reduction
+---------------------------------
+
+    The primary driver for this release is the port of the GEMINI data
+reduction package to support native 64-bit binaries, greatly speeding up the
+time taken for reducing Gemini data that still require IRAF tasks. As part
+of this, dependent tasks from the STSDAS and TABLES packages were extracted
+to a new ST4GEM external package. Other than minor changes required to use
+ST4GEM instead of STSDAS, the GEMINI tasks themselves were not changed.
+
+Availability of some STSDAS tasks
+---------------------------------
+
+    The ST4GEM package is exclusively comprised of STSDAS tasks used by the
+GEMINI package but could be expanded to include 64-bit ports of other
+tasks/packages if needed. While some tasks had equivalents in the core
+system, porting the STSDAS task minimized any changes that may have lead to
+bugs or changes being introduced in the GEMINI results.
+
+    For users, this package brings back the IGI plotting tool and PSIKERN
+postscript graphics kernel as well as other utility tasks for header editing
+fitting and image tools.
+
+    For developers, table manipulation and graphics libraries (e.g. stxtools,
+gflib/gilib and tbtables) used by some external packages are once again
+available.
+
+
+==================
+What’s Included
+==================
+
+This installer contains the following software for both Apple and Intel
+systems:
+
+    •    IRAF v2.18.1 — An update of the IRAF core system including a port
+         to Apple silicon systems.
+    •    27 External Packages —  Updates and new binaries for all publicly
+         available external packages, including the 64-bit GEMINI package
+         and new ST4GEM support package.
+    •    PyRAF v2.2.3 - A self-contained Python 3.13.5 environment to run
+         the PyRAF command shell. A limited number of other astronomy-related
+         packages are included, this environment can be extended by the user
+         as needed.
+    •    XGTerm/XImtool — The X11IRAF tools for graphics and image display.
+    
+    Additionally,
+
+    •    A ‘Docs’ folder containing PDF copies of all the available IRAF
+         cookbooks.
+    •    The ‘Extras’ folder contains Gemini tutorials and cookbooks.
+
+==============================
+Installing the Applications
+==============================
+
+To manually install IRAF or other Applications on a Mac, follow these
+instructions: 
+
+    1  Double-click the NOIRLab-IRAF-v2.18.1.dmg disk image file to mount it
+       on the desktop
+    2  Double-click the NOIRLab-IRAF-v2.18.1 volume
+    3  Drag and Drop each of the desired application icons to the
+       ‘Applications’ folder in the Finder window 
+
+  Note:  If the DMG installer was downloaded using a web browser, you may
+         see security popups when installing or launching the applications.
+         These can be avoided in several ways:
+
+         1) Once the DMG is downloaded, remove the quarantine attribute
+            before opening the image with the following command:
+
+              % xattr -c NOIRLab-IRAF-v2.18.1.dmg
+
+         2) Download the DMG file using cURL instead of a web browser, e.g.
+
+              % curl -OL
+              % https://iraf.noirlab.edu/download/mac/NOIRLab-IRAF-v2.18.1.dmg
+
+
+===============================
+Configuring the Applications
+===============================
+
+    The applications in the MacOS DMG distribution have a limited set of
+configurable options to set user preferences. These options are beyond what
+can be configured using the standard IRAF or X11 methods. To accomplish this,
+the IRAF or PyRAF apps must be executed at least once in order to initialize
+the startup environment created in the $HOME/.iraf/initrc file. This file is
+a Bourne-shell script used by each of the application startup scripts and can
+be used to pass options into the startup process.
+
+    To configure your application environment simply edit the
+‘$HOME/.iraf/initrc’ file with your favorite editor and modify any desired
+settings. Options that can be changed include:
+
+    cmd_shell        The IRAF command shell to be used. Values may be ‘cl’
+                     or ‘pyraf’
+    start_dir        The starting directory for an IRAF session. This defaults
+                     to the user’s home directory.
+
+    terminal         The graphics terminal to start for an IRAF or PyRAF
+                     session. Values may be ‘xterm’ or ‘xgterm’.
+    bg_color         Terminal window background color.
+    fg_color         Terminal window foreground color.
+    nrows            Terminal window number of rows (height).
+    ncols            Terminal window number of columns (width).
+    font_name        Terminal window font name.
+
+    xim_bg           XImtool window background color
+    xim_fg           XImtool window foreground color
+    xim_width        XImtool window width (pixels)
+    xim_height       XImtool window height (pixels)
+    xim_toolbar      Display XImtool ToolBar on open (true | false)
+    xim_panelbar     Display XImtool PanelBar on open (true | false)
+
+
+=================
+Known Problems
+=================
+
+    Although the core IRAF system and external package have undergone testing,
+bugs are always expected in a new release and will be handled in future patch
+releases or thru the Help Desk. Bugs found in the earlier v2.16.1 release,
+and subsequently by the iraf-community release, have been fixed in this
+release as part of the platform upgrade work with the following exceptions:
+
+  1) Background jobs in the CL
+
+    Description: Some recent operating systems use a Position Independent
+    Code model that breaks the forking of backgrounds jobs by the CL
+    preventing results from being returned properly to the parent CL. Work
+    done in the iraf-community release appears to fix this problem, however
+    the changes required were still under review at the time of this release.
+    Resolution:
+
+    This problem will be fixed in the next patch release.
+
+
+=======================================
+License Problem Mitigation Performed
+=======================================
+
+    The use of Numerical Recipes (NR) algorithms in the original IRAF system
+was legitimately raised as a licensing issue for the distribution of IRAF
+according to the Numerical Recipes licensing terms. This has been detailed on
+the IRAF-Community site at:
+
+       https://iraf-community.github.io/iraf-v216/license-problems.html
+
+    This release addresses each of those files both in the core system and
+where they appear in external packages distributed as part of this release.
+Specific changes are documented as part of the repository change history and
+in numerous ‘Issues’ attached to the repository itself.
+
+In general, Numerical Recipes code changes were addressed in one of the
+following ways:
+
+    •    Unused code was removed from the system.
+    •    Individual NR procedures were replaced by public domain or properly
+         licensed equivalents. This was most often done by adopting the same
+         code changes made in the iraf-community v2.17 distribution in order
+         to avoid future disputes on proper licenses. In-line code comments
+         identify and acknowledge these changes.
+    •    Repeated use of a disputed procedure in multiple packages was
+         consolidated to a single implementation in a core library where
+         possible.
+    •    The use of the FFTPACK and LAPACK libraries to provide the needed
+         Fourier and Linear Algebra procedures was adopted from the
+         iraf-community distribution.
+    •    Code derived from the ‘iraf64’ project was re-implemented with a
+         faster algorithm, eliminating any problematic code.
+    •    The assembly code procedure ‘zsvjmp.s’ was re-implemented from
+         scratch for each platform.
+    •    All applicable licenses are available from the top-level LICENSES
+         directory.
+
+
+===================
+Acknowledgements
+===================
+
+    This work is supported by NOIRLab, which is managed by the Association of
+Universities for Research in Astronomy (AURA) under a cooperative agreement
+with the National Science Foundation. In particular, US NGO staff were
+critical in science testing the new GEMINI package to ensure proper results.
+We are grateful to our colleagues at Gemini for useful discussions and
+internal access to their package test environment.
+
+    This project also benefited greatly from the earlier work’ done by the
+‘iraf-community’ (https://iraf-community.guithub.io) project to identify and
+fix bugs in the system. Their replacements to the Numerical Recipes code with
+open-source equivalents were adopted almost in their entirety in this
+release.
+
+
+=================================
+Appendix I:  External Packages
+=================================
+
+    The NOIRLab IRAF v2.18.1 release comes with all available (i.e. public
+packages with no outstanding licensing issues) external packages pre-installed.
+Individual packages may still be downloaded from the repositories or updated
+by users as described in the package README files. Additional packages may be
+added in future updates.
+
+    External packages have not been tested as extensively as the core system,
+however they have also not been modified as part of this release, just
+recompiled. Please contact the help desk with any issues.
+
+This release includes the following packages:
+
+  New or Updated Packages:
+     gemini      Gemini data reduction package
+     st4gem      A subset of STSDAS tasks for use by the GEMINI package
+
+  General Reduction and Utility Packages:
+     ctio        CTIO utilities and tasks
+     fitsutil    FITS utility tasks
+     gmisc       Miscellaneous Gemini related Tasks
+     guiapps     IRAF GUI applications package
+     mem0        MEM0 image deconvolution package
+     mscdb       MSCRED database directory files for use with NOAO Mosaic Data
+     mscred      CCD mosaic reduction package
+     nfextern    NEWFIRM/IR reduction package
+     rvsao       A package to obtain radial velocities from spectra (from SAO)
+     sptable     Tools to deal with spectra stored as tables
+     xdimsum     Experimental Deep Infrared Mosaicing Software (DIMSUM variant)
+
+  Instrument-specific Packages:
+     cfh12k      CFH 12K mosaic reduction package
+     deitab      DEIMOS table format tools
+     esowfi      ESO WFO mosaic reduction package
+     iue         Tools for IUE data
+     optic       Utilities for the ESO OPTIC instrument
+     song        Stellar Oscillations Network Group package (Coude Feed data)
+     sqiid       SQIID instrument reduction package
+     stecf       ST-ECF tasks for HST data
+     ucsclris    Mask design tools for the Keck LRIS instrument
+     upsqiid     Updated package for SQIID instrument reduction
+
+  Miscellaneous Utility Packages:
+     adccdrom    IRAF tools for accessing the ADC CD-ROM
+     finder      FINDER astrometry tools
+     mtools      Various utilities from Jeff Munn
+     steward     A suite of IRAF based packages developed at Steward Observatory
+
+
+============================================
+Appendix II:  XGTerm and XImtool Binaries
+============================================
+
+    The X11IRAF tools, i.e. XGTerm and XImtool, are provided with this
+release on as as-is basis. They were built from unaltered sources available
+from
+        https://github.com/iraf-community/x11iraf
+
+While the Help Desk may be able to provide answers to questions about using
+these tools, bug reports (and ideally, fixes) should be reported to the
+https://github.com/iraf-community repo as an new Issue on the task.
+
+===================================
+Appendix III:  PyRAF Environment
+===================================
+
+    The PyRAF application in this release is based on a Python 3.13.5
+MiniConda system with a minimal set of other python packages installed that
+may be useful for general astronomical scripting.  Environments for both
+Apple and Intel systems are included in the PyRAF app but only the binaries
+appropriate for the current machine will be used. Installing the IRAF
+application creates convenience commands in $HOME/.iraf/bin to allow users to
+access this environment. Additional packages may be added to your PyRAF conda
+system with the command:
+
+		% pyraf_pip install <pkgname>
+
+The PyPi package for PyRAF used here originates from the repository at
+
+        https://github.com/iraf-community/pyraf
+
+Bug reports for PyRAF errors should be reported as new Issues on that
+repository. Usage questions will be forwarded to the appropriate Help Desk as
+required.
+
+——————————————————————————————————————————————————————————————————————————————
+
+The base environment was built with the following packages:
+  Base Miniconda version:         Miniconda3-py38_23.1.0-1-MacOSX
+
+  Additional Packages Installed:
+     astrocalc         astroml           astroplan       astropy
+     astropy-healpix   astropy-helpers   astroquery      fitsio
+     ginga             h5py              httplib2        ipython
+     matplotlib        numpy             pandas          passlib
+     pathlib           photutils         pyraf           pyvo
+     pyds9             speclite          specutils
+
+    A complete manifest of the environment is:
+
+# Name                    Version                   Build  Channel
+appnope                   0.1.3                    pypi_0    pypi
+asdf                      2.15.0                   pypi_0    pypi
+asdf-astropy              0.4.0                    pypi_0    pypi
+asdf-coordinates-schemas  0.2.0                    pypi_0    pypi
+asdf-standard             1.0.3                    pypi_0    pypi
+asdf-transform-schemas    0.4.0                    pypi_0    pypi
+asdf-unit-schemas         0.1.0                    pypi_0    pypi
+asdf-wcs-schemas          0.3.0                    pypi_0    pypi
+astrocalc                 0.4.2                    pypi_0    pypi
+astroimtools              0.3                      pypi_0    pypi
+astroml                   1.0.2.post1              pypi_0    pypi
+astroplan                 0.9.1                    pypi_0    pypi
+astropy                   5.2.2                    pypi_0    pypi
+astropy-healpix           0.7                      pypi_0    pypi
+astropy-helpers           4.0.1                    pypi_0    pypi
+astroquery                0.4.6                    pypi_0    pypi
+asttokens                 2.4.1                    pypi_0    pypi
+attrs                     23.1.0                   pypi_0    pypi
+backcall                  0.2.0                    pypi_0    pypi
+beautifulsoup4            4.12.2                   pypi_0    pypi
+brotlipy                  0.7.0           py38h1a28f6b_1002
+ca-certificates           2023.01.10           hca03da5_0
+certifi                   2022.12.7        py38hca03da5_0
+cffi                      1.15.1           py38h80987f9_3
+charset-normalizer        2.0.4              pyhd3eb1b0_0
+conda                     23.1.0           py38hca03da5_0
+conda-content-trust       0.1.3            py38hca03da5_0
+conda-package-handling    2.0.2            py38hca03da5_0
+conda-package-streaming   0.7.0            py38hca03da5_0
+configobj                 5.0.8                    pypi_0    pypi
+contourpy                 1.1.1                    pypi_0    pypi
+cryptography              38.0.4           py38h834c97f_0
+cycler                    0.12.1                   pypi_0    pypi
+decorator                 5.1.1                    pypi_0    pypi
+docopt                    0.6.2                    pypi_0    pypi
+docutils                  0.20.1                   pypi_0    pypi
+exceptiongroup            1.2.0                    pypi_0    pypi
+executing                 2.0.1                    pypi_0    pypi
+fitsio                    1.2.1                    pypi_0    pypi
+fonttools                 4.47.0                   pypi_0    pypi
+fundamentals              2.6.1                    pypi_0    pypi
+future                    0.18.3                   pypi_0    pypi
+ginga                     4.1.1                    pypi_0    pypi
+gwcs                      0.18.3                   pypi_0    pypi
+h5py                      3.10.0                   pypi_0    pypi
+html5lib                  1.1                      pypi_0    pypi
+httplib2                  0.22.0                   pypi_0    pypi
+idna                      3.4              py38hca03da5_0
+imexam                    0.9.1                    pypi_0    pypi
+importlib-metadata        7.0.1                    pypi_0    pypi
+importlib-resources       6.1.1                    pypi_0    pypi
+iniconfig                 2.0.0                    pypi_0    pypi
+ipython                   8.12.3                   pypi_0    pypi
+jaraco-classes            3.3.0                    pypi_0    pypi
+jedi                      0.19.1                   pypi_0    pypi
+jmespath                  1.0.1                    pypi_0    pypi
+joblib                    1.3.2                    pypi_0    pypi
+jsonschema                4.17.3                   pypi_0    pypi
+keyring                   24.3.0                   pypi_0    pypi
+kiwisolver                1.4.5                    pypi_0    pypi
+libcxx                    14.0.6               h848a8c0_0
+libffi                    3.4.2                hca03da5_6
+lockfile                  0.12.2                   pypi_0    pypi
+matplotlib                3.7.4                    pypi_0    pypi
+matplotlib-inline         0.1.6                    pypi_0    pypi
+more-itertools            10.1.0                   pypi_0    pypi
+ncurses                   6.4                  h313beb8_0
+ndcube                    2.1.4                    pypi_0    pypi
+numpy                     1.24.4                   pypi_0    pypi
+openssl                   1.1.1s               h1a28f6b_0
+packaging                 23.2                     pypi_0    pypi
+pandas                    2.0.3                    pypi_0    pypi
+parso                     0.8.3                    pypi_0    pypi
+passlib                   1.7.4                    pypi_0    pypi
+pathlib                   1.0.1                    pypi_0    pypi
+pexpect                   4.9.0                    pypi_0    pypi
+photutils                 1.8.0                    pypi_0    pypi
+pickleshare               0.7.5                    pypi_0    pypi
+pillow                    10.1.0                   pypi_0    pypi
+pip                       23.3.2                   pypi_0    pypi
+pkgutil-resolve-name      1.3.10                   pypi_0    pypi
+pluggy                    1.0.0            py38hca03da5_1
+prompt-toolkit            3.0.43                   pypi_0    pypi
+psutil                    5.9.7                    pypi_0    pypi
+ptyprocess                0.7.0                    pypi_0    pypi
+pure-eval                 0.2.2                    pypi_0    pypi
+pycosat                   0.6.4            py38h1a28f6b_0
+pycparser                 2.21               pyhd3eb1b0_0
+pyds9                     1.8.1                    pypi_0    pypi
+pyerfa                    2.0.0.3                  pypi_0    pypi
+pygments                  2.17.2                   pypi_0    pypi
+pyopenssl                 22.0.0             pyhd3eb1b0_0
+pyparsing                 3.1.1                    pypi_0    pypi
+pyraf                     2.2.1                    pypi_0    pypi
+pyrsistent                0.20.0                   pypi_0    pypi
+pysocks                   1.7.1            py38hca03da5_0
+pytest                    7.4.3                    pypi_0    pypi
+pytest-astropy-header     0.2.2                    pypi_0    pypi
+python                    3.8.16               hc0d8a6c_2
+python-daemon             3.0.1                    pypi_0    pypi
+python-dateutil           2.8.2                    pypi_0    pypi
+python.app                3                py38h1a28f6b_0
+pytz                      2023.3.post1             pypi_0    pypi
+pyvo                      1.5                      pypi_0    pypi
+pyyaml                    6.0.1                    pypi_0    pypi
+qtpy                      2.4.1                    pypi_0    pypi
+readline                  8.2                  h1a28f6b_0
+requests                  2.28.1           py38hca03da5_0
+ruamel.yaml               0.17.21          py38h1a28f6b_0
+ruamel.yaml.clib          0.2.6            py38h1a28f6b_1
+scikit-learn              1.3.2                    pypi_0    pypi
+scipy                     1.10.1                   pypi_0    pypi
+semantic-version          2.10.0                   pypi_0    pypi
+setuptools                65.6.3           py38hca03da5_0
+six                       1.16.0             pyhd3eb1b0_1
+soupsieve                 2.5                      pypi_0    pypi
+speclite                  0.17                     pypi_0    pypi
+specutils                 1.12.0                   pypi_0    pypi
+sqlite                    3.40.1               h7a7dc30_0
+stack-data                0.6.3                    pypi_0    pypi
+threadpoolctl             3.2.0                    pypi_0    pypi
+tk                        8.6.12               hb8d0fd4_0
+tomli                     2.0.1                    pypi_0    pypi
+toolz                     0.12.0           py38hca03da5_0
+tqdm                      4.64.1           py38hca03da5_0
+traitlets                 5.14.0                   pypi_0    pypi
+typing-extensions         4.9.0                    pypi_0    pypi
+tzdata                    2023.4                   pypi_0    pypi
+urllib3                   1.26.14          py38hca03da5_0
+wcwidth                   0.2.12                   pypi_0    pypi
+webencodings              0.5.1                    pypi_0    pypi
+wheel                     0.37.1             pyhd3eb1b0_0
+xz                        5.2.10               h80987f9_1
+zipp                      3.17.0                   pypi_0    pypi
+zlib                      1.2.13               h5a0b063_0
+zstandard                 0.18.0           py38h1a28f6b_0
+
+
+
+Copyright 2023-2024 Association of Universities for Research in Astronomy 
+
+
