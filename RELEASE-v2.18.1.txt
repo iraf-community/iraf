@@ -1,6 +1,6 @@
 
                    NOIRLab IRAF v2.18.1 for MacOS/Linux
-                        Release: November 4, 2025
+                        Release: November 6, 2025
 
 
     The IRAF v2.18.1 release is a product of the Community Science and Data
@@ -35,10 +35,15 @@ Contact Us:  iraf@noirlab.edu   or   usngo@noirlab.edu
 —————————————————————————————————————————————————————————————————————————————
 
   Contents
-    System Requirement
-        Dependencies
-        Before You Begin
-    Quick Start Guide
+    MacOS Systems
+        System Requirements
+            Dependencies
+            Before You Begin
+        Quick Start Guide
+    Linux Systems
+        System Requirements
+            Dependencies
+            Before You Begin
 
     What’s New
         Major Core System Changes
@@ -47,7 +52,7 @@ Contact Us:  iraf@noirlab.edu   or   usngo@noirlab.edu
         Availability of some STSDAS Tasks
 
     What’s Included
-    Installing the Applications
+    Installing the Mac Applications
         Configuring the Applications
     Known Problems
     License Problem Mitigation Performed
@@ -63,14 +68,37 @@ Contact Us:  iraf@noirlab.edu   or   usngo@noirlab.edu
     
 —————————————————————————————————————————————————————————————————————————————
 
-===================
-System Requirements
-===================
+=========================
+Linux Systems
+=========================
 
+System Requirements
+    •    Any "recent" 32-bit or 64-bit Linux distribution.
+
+Dependencies
+    •    X11 is required to run the XGTerm and XImtool tasks.
+    •    If installed, the most recent PyRAF will support Python versions
+         up until v3.13.
+
+Before You Begin
+    •    The system defaults to use 'xgterm' as the preferred terminal
+         type.  If you use 'xterm' as your terminal, either re-run MKIRAF
+         to recreate the login.cl file or interactively use the commands:
+
+            ecl> stty xtermjh
+            ecl> gflush
+
+    •    DS9 and PyRAF must be installed separately by the user if desired.
+
+=========================
+MacOS Systems
+=========================
+
+System Requirements
     •    Intel or Apple Silicon (M1/M2) based Mac
     •    OS X 10.15 (Catalina) or later
 
-   Dependencies
+Dependencies
     •    XQuartz must be installed before using the X11IRAF tools or XTerm
          for IRAF graphics display. An XQuartz installer package is included
          in the DMG ‘Extras’ folder.
@@ -81,7 +109,7 @@ System Requirements
          following installation in the /Applications folder.
     •    Applications cannot be launched from the DMG image.
 
-  Before You Begin
+Before You Begin
     •    To initialize the user environment setup files and to create the
          links making terminal commands such as ‘cl’ or ‘pyraf’ available,
          either the IRAF or PyRAF application must be launched at least once
@@ -99,9 +127,9 @@ System Requirements
          This will read the $HOME/.iraf/setup.sh script created when the
          /Applications/IRAF.app was first opened.
 
-=================
-Quick Start Guide
-=================
+=======================
+MacOS Quick Start Guide
+=======================
 
     To install the applications:
 
@@ -318,8 +346,8 @@ available.
 What’s Included
 ==================
 
-This installer contains the following software for both Apple and Intel
-systems:
+The MacOS DMG installer contains the following software for both Apple and
+Intel systems:
 
     •    IRAF v2.18.1 — An update of the IRAF core system including a port
          to Apple silicon systems.
@@ -338,9 +366,9 @@ systems:
          cookbooks.
     •    The ‘Extras’ folder contains Gemini tutorials and cookbooks.
 
-==============================
-Installing the Applications
-==============================
+===============================
+Installing the Mac Applications
+===============================
 
 To manually install IRAF or other Applications on a Mac, follow these
 instructions: 
@@ -362,8 +390,8 @@ instructions:
 
          2) Download the DMG file using cURL instead of a web browser, e.g.
 
-              % curl -OL
-              % https://iraf.noirlab.edu/download/mac/NOIRLab-IRAF-v2.18.1.dmg
+              % curl -OL \
+                https://iraf.noirlab.edu/download/mac/NOIRLab-IRAF-v2.18.1.dmg
 
 
 ===============================
@@ -394,6 +422,8 @@ settings. Options that can be changed include:
     nrows            Terminal window number of rows (height).
     ncols            Terminal window number of columns (width).
     font_name        Terminal window font name.
+    scrollbar        Show Terminal scrollbar (true | false)
+    xg_xrm           Arbitrary resource strings for Terminal
 
     xim_bg           XImtool window background color
     xim_fg           XImtool window foreground color
@@ -401,6 +431,7 @@ settings. Options that can be changed include:
     xim_height       XImtool window height (pixels)
     xim_toolbar      Display XImtool ToolBar on open (true | false)
     xim_panelbar     Display XImtool PanelBar on open (true | false)
+    xim_xrm          Arbitrary resource strings for XImtool
 
 
 =================
@@ -409,20 +440,8 @@ Known Problems
 
     Although the core IRAF system and external package have undergone testing,
 bugs are always expected in a new release and will be handled in future patch
-releases or thru the Help Desk. Bugs found in the earlier v2.16.1 release,
-and subsequently by the iraf-community release, have been fixed in this
-release as part of the platform upgrade work with the following exceptions:
-
-  1) Background jobs in the CL
-
-    Description: Some recent operating systems use a Position Independent
-    Code model that breaks the forking of backgrounds jobs by the CL
-    preventing results from being returned properly to the parent CL. Work
-    done in the iraf-community release appears to fix this problem, however
-    the changes required were still under review at the time of this release.
-    Resolution:
-
-    This problem will be fixed in the next patch release.
+releases or thru the Help Desk. Bugs found in the earlier v2.18 release
+have been fixed in this release as part of the platform upgrade work.
 
 
 =======================================
