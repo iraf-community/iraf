@@ -26,7 +26,7 @@ done
 
 
 /bin/echo "Initializing repository data ...."
-$iraf/util/pkginit		    # init repository information
+$iraf/util/pkginit		# init repository information
 
 
 # Create the template Makefile.
