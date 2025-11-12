@@ -1536,14 +1536,14 @@ if [ "$do_system" == 0 ]; then
 	        echo ''						        >> $TEMP
 	        echo '# Add iraf setup commands.'		        >> $TEMP
  	        echo 'if ( -e $HOME/.iraf/setup.csh ) then'	        >> $TEMP
- 	        echo '    source $HOME/.iraf/setup.csh'		        >> $TEMP
+ 	        echo '   source $HOME/.iraf/setup.csh'		        >> $TEMP
  	        echo 'else'                                             >> $TEMP
- 	        echo '    # Default to installation settings.'          >> $TEMP
- 	        echo "    setenv iraf ${iraf}/"                         >> $TEMP
- 	        echo "    setenv IRAFARCH $IRAFARCH"		        >> $TEMP
-                echo "    if ( -e ${iraf}/unix/hlib/irafuser.sh ) then" >> $TEMP
-                echo "        source ${iraf}/unix/hlib/irafuser.sh"     >> $TEMP
-                echo '    endif'                                        >> $TEMP
+ 	        echo '   # Default to installation settings.'           >> $TEMP
+ 	        echo "   setenv iraf ${iraf}/"                          >> $TEMP
+ 	        echo "   setenv IRAFARCH $IRAFARCH"		        >> $TEMP
+                echo "   if ( -e ${iraf}/unix/hlib/irafuser.csh ) then" >> $TEMP
+                echo "       source ${iraf}/unix/hlib/irafuser.csh"     >> $TEMP
+                echo '   endif'                                         >> $TEMP
  	        echo 'endif'					        >> $TEMP
  	        echo 'set path = ($HOME/.iraf/bin $path)'	        >> $TEMP
 		cp $file ${file}.bak
@@ -1556,14 +1556,14 @@ if [ "$do_system" == 0 ]; then
 	echo ''							         > $file
 	echo '# Add iraf setup commands'			        >> $file
  	echo 'if ( -e $HOME/.iraf/setup.csh ) then'		        >> $file
- 	echo '    source $HOME/.iraf/setup.csh'			        >> $file
+ 	echo '   source $HOME/.iraf/setup.csh'			        >> $file
  	echo 'else'                                                     >> $file
- 	echo '    # Default to installation settings.'                  >> $file
- 	echo "    setenv iraf ${iraf}/"                                 >> $file
- 	echo "    setenv IRAFARCH $IRAFARCH"		                >> $file
-        echo "    if ( -e ${iraf}/unix/hlib/irafuser.sh ) then"         >> $file
-        echo "        source ${iraf}/unix/hlib/irafuser.sh"             >> $file
-        echo '    endif'                                                >> $file
+ 	echo '   # Default to installation settings.'                   >> $file
+ 	echo "   setenv iraf ${iraf}/"                                  >> $file
+ 	echo "   setenv IRAFARCH $IRAFARCH"		                >> $file
+        echo "   if ( -e ${iraf}/unix/hlib/irafuser.sh ) then"          >> $file
+        echo "       source ${iraf}/unix/hlib/irafuser.sh"              >> $file
+        echo '   endif'                                                 >> $file
  	echo 'endif'						        >> $file
  	echo 'set path = ($HOME/.iraf/bin $path)'	                >> $file
     fi
