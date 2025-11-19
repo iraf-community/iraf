@@ -23,6 +23,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <pwd.h>
 
 #define	import_kernel
 #define	import_knames
@@ -204,7 +205,6 @@ ZOPNND (
 		*chan = XERR;
 		return (XERR);
 	}
-
 	/* Expand any %d fields in the network address to the UID. */
 	sprintf (osfn, (char *)pk_osfn, getuid(), getuid());
 
@@ -428,11 +428,6 @@ ZOPNND (
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,
 		    np->path1, sizeof(sockaddr.sun_path));
-#ifdef MACOSX
-		sockaddr.sun_path[103] = '\0';  // ensure NULL termination
-#else
-		sockaddr.sun_path[107] = '\0';  // ensure NULL termination
-#endif
 
 		/* Connect to server. */
 		if (fd >= MAXOFILES || (connect (fd,
@@ -816,16 +811,17 @@ ZARDND (
 #endif
 	}
 
-
-	if ((n = nbytes) > 0 && 
-            (np->flags & F_TEXT || !is_http_header(buf,nbytes))) {
+        /* Convert text to SPP chars if necessary.
+         */
+        if ((n = nbytes) > 0) {
+            if (np->flags & F_TEXT) {
 	        op = (XCHAR *) buf;
 	        op[n] = XEOS;
 	        for (ip = (char *)buf;  --n >= 0;  )
 		    op[n] = ip[n];
 	        nbytes *= sizeof(XCHAR);
+            }
 	}
-
 	kfp->nbytes = nbytes;
 
 	return (nbytes);
@@ -1044,7 +1040,7 @@ is_http_header (
 	register XCHAR *ip = (XCHAR *)buf;
 	register char *op = (char *)obuf;
 	register int nb = nbytes / sizeof(XCHAR);
-        static char *http = "HTTP/1";
+        static char *http = "HTTP";
 
 	while (--nb >= 0)
 	    *op++ = *ip++;
