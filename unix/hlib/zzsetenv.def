@@ -103,4 +103,4 @@ set	xtools		= "pkg$xtools/"
 # Load definitions for any locally added external packages.
 set     @hlib$extern.pkg
 set     @iraf$extern/.zzsetenv.def
-set     @home$.iraf/zzsetenv.def
+#set     @home$.iraf/zzsetenv.def
