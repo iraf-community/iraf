@@ -3,6 +3,7 @@
 #  PKGALL -- Install all available packages.
 
 
+/bin/rm -f .installed
 if [ -e ".repo_pkgs" ]; then
     p=`cat .repo_pkgs`
     for f in ${p[@]} ; do

@@ -80,12 +80,12 @@ for ip in ${dep[@]}; do
 
     tar zxf $pfile
     /bin/rm -f $pfile
-    /bin/echo `date +%s`"  " ${ip}.${arch} > $ip/.installed.${arch}
-    /bin/echo `date +%s`"  " $ip > $ip/.installed	
+    /bin/echo `date +%s`"  " ${ip}.${arch}      > $ip/.installed.${arch}
+    /bin/echo `date +%s`"  " $ip                > $ip/.installed
 
     if (( $src_only>0 )); then
       /bin/echo    " [SOURCE ONLY]"
-      /bin/echo `date +%s`"  " $ip > $ip/.src_only
+      /bin/echo `date +%s`"  " $ip              > $ip/.src_only
     else
       /bin/echo    " [OK]"
     fi
