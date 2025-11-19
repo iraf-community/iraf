@@ -8,20 +8,30 @@ Distribution files:
 
 The NOIRLab IRAF v2.18.1 release is available in several forms:
 
-    1) Distribution files for supported platforms include a DMG graphical
-       installer for MacOS systems and self-extracting archive/installation
-       scripts for Linux platforms:
+    1) A "self-installer" script for all supported platforms can be 
+       downloaded from the website at:
+
+	   https://iraf.noirlab.edu/download/iraf_install.sh
+
+           Option 1: Install IRAF in a currently empty directory:
+
+                    % sh /<path>/iraf_install.sh
+
+           Option 2: Install IRAF in a new empty directory:
+
+                    % sh /<path>/iraf_install.sh <directory_path>
+
+    2) Distribution files for supported platforms include a DMG graphical
+       installer for MacOS systems (Coming Soon!):
 
 	   https://iraf.noirlab.edu/download/mac        # MacOS (Intel/Apple)
-	   https://iraf.noirlab.edu/download/linux32    # 32-bit Linux
-	   https://iraf.noirlab.edu/download/linux64    # 64-bit Linux
 
-    2) The GitLab repository containing individual compressed tar files that
+    3) The GitLab repository containing individual compressed tar files that
        make up a distribution are available from:
 
            https://gitlab.com/nsf-noirlab/csdc/usngo/iraf/iraf-distros
 
-    3) Git repositories of full systems (including external packages and
+    4) Git repositories of full systems (including external packages and
        binaries can be downloaded by cloning the following repos:
 
            https://gitlab.com/nsf-noirlab/csdc/usngo/iraf/iraf-macosx
@@ -33,8 +43,11 @@ The NOIRLab IRAF v2.18.1 release is available in several forms:
        (LFS) and so 'git-lfs' must be available on the local machine for
        a complete download.
 
-Full installation instructions are in the README files, below we cover only
-the installation using the platform installers.
+           NOTE: Once cloned, the "install" script must be run before the
+       system can be used.
+
+Full installation instructions are in the README.install files, below we
+cover only the installation using methods other than the self-installer.
 
 
 To INSTALL on a MacOS System

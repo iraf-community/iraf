@@ -8,8 +8,6 @@
 
 
 clean=1
-irafdir=`pwd`/../util
-
 
 # Process cmdline flags.
 while [ -n "$1" ]; do
@@ -28,7 +26,7 @@ done
 
 
 /bin/echo "Initializing repository data ...."
-$irafdir/pkginit				# init repository information
+$iraf/util/pkginit		# init repository information
 
 
 # Create the template Makefile.
