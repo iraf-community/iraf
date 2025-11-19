@@ -155,9 +155,9 @@ _ev_loadcache (char *fname)
 
 	if ((home = getenv ("HOME"))) {
 	    memset (hpath, 0, SZ_PATHNAME);
-	    sprintf (hpath, "%s/.iraf.h", home);
+	    sprintf (hpath, "%s/.iraf/iraf.h", home);
 	    if ((fp = fopen (hpath, "r")) == NULL) {
-		/*  No personal $HOME/.iraf.h file, try the system request.
+		/*  No personal $HOME/.iraf/iraf.h file, try the system request.
 		 */
 		if ((fp = fopen (fname, "r")) == NULL) {
 	            fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
