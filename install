@@ -1012,7 +1012,7 @@ else
   if [ "$SHELL" == "/bin/csh" -o "$SHELL" == "/bin/tcsh" ]; then
    pfiles=("$HOME/.cshrc)
   else
-   pfiles=("$HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.zshrc)
+   pfiles=("$HOME/.bashrc $HOME/.bash_profile $HOME/.profile $HOME/.zshrc $HOME/.zprofile)
   fi
 fi
 for file in ${pfiles[@]}; do
@@ -1520,7 +1520,7 @@ if [ "$do_system" == 0 ]; then
 
   # Add the setup to the user's login files.
   cfiles=("$HOME/.cshrc $HOME/.tcshrc $HOME/.login")
-  bfiles=("$HOME/.profile $HOME/.bash_profile $HOME/.zshrc")
+  bfiles=("$HOME/.profile $HOME/.bash_profile $HOME/.zshrc $HOME/.zprofile")
 
   if [ ! -e $HOME/.cshrc ]; then
       touch $HOME/.cshrc
