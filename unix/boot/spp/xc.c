@@ -129,12 +129,14 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lm",			/*  2  */
 #ifdef USE_SSL
 #ifdef MACINTEL
-		    "-L/usr/local/opt/openssl@3/lib",	 /*  3  */
+		    "/usr/local/opt/openssl@3/lib/libssl.a",	    /*  3  */
+		    "/usr/local/opt/openssl@3/lib/libcrypto.a",	    /*  4  */
+		    "",				                    /*  5  */
 #else
-		    "-L/opt/homebrew/opt/openssl@3/lib", /*  3  */
+		    "/opt/homebrew/opt/openssl@3/lib/libssl.a",     /*  3  */
+		    "/opt/homebrew/opt/openssl@3/lib/libcrypto.a",  /*  4  */
+		    "",				                    /*  5  */
 #endif
-		    "-lssl",			/*  4  */
-		    "-lcrypto",			/*  5  */
 #else
 		    "",				/*  3  */
 		    "",				/*  4  */
