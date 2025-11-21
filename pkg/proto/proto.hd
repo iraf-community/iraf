@@ -28,6 +28,7 @@ fields		hlp =doc$fields.hlp,	src = fields.x
 hfix		hlp =doc$hfix.hlp,	src = t_hfix.x
 imcntr		hlp =doc$imcntr.hlp,	src = t_imcntr.x
 fixpix		hlp =doc$fixpix.hlp,	src = t_fixpix.x
+ghost2ms	hlp =doc$ghost2ms.hlp,	src = ghost2ms.cl
 imextensions	hlp =doc$imextensions.hlp, src = t_imext.x
 imscale		hlp =doc$imscale.hlp,	src = t_imscale.x
 interp		hlp =doc$interp.hlp,	src = interp.x
