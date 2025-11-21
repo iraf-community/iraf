@@ -12,7 +12,7 @@
  * negative values.
  */
 void
-CHRPAK (XCHAR *a, XCHAR *a_off, PKCHAR *b, XINT *b_off, XINT *nchars)
+CHRPAK (XCHAR *a, XINT *a_off, PKCHAR *b, XINT *b_off, XINT *nchars)
 {
 	register XCHAR	*ip;
 	register unsigned char *op;
