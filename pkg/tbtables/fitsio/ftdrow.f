@@ -1,5 +1,5 @@
 C--------------------------------------------------------------------------
-        subroutine ftdrow(iunit,frow,nrows,status)
+        subroutine ftdrow(iunit,frow,nrows,onrows,status)
 
 C       delete NROWS rows from a table, beginning with row FROW
 
@@ -7,12 +7,13 @@ C       iunit   i  Fortran I/O unit number
 C       frow    i  row number after which the new rows will be inserted.
 C                  Specify  0 to add rows to the beginning of the table.
 C       nrows   i  number of rows to add to the table (must be greater than 0)
+C       onrows  i  original number of rows in table
 C       status  i  returned error status (0=ok)
 
         integer iunit,frow,nrows,status
 
 C       COMMON BLOCK DEFINITIONS:--------------------------------------------
-        integer nf,nb,ne
+        integer nf,nb,ne,onrows
         parameter (nb = 20)
         parameter (nf = 3000)
         parameter (ne = 200)
@@ -48,6 +49,7 @@ C       test that the CHDU is an ASCII table or BINTABLE
 C       get current size of the table
         call ftgkyj(iunit,'NAXIS1',naxis1,comm,status)
         call ftgkyj(iunit,'NAXIS2',naxis2,comm,status)
+        naxis2 = onrows
 
         if (nrows .lt. 0)then
                  status=306

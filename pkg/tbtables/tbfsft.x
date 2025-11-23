@@ -45,7 +45,7 @@ begin
 	    }
 	    # Delete rows at end.
 	    status = 0
-	    call fsdrow (TB_FILE(tp), nrows-abs_shift+1, abs_shift, status)
+	    call fsdrow (TB_FILE(tp), nrows-abs_shift+1, abs_shift, nrows, status)
 	    if (status > 0)
 		call tbferr (status)
 

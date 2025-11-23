@@ -54,10 +54,12 @@ C       END OF COMMON BLOCK DEFINITIONS-----------------------------------
 
         integer bufdim
         parameter (bufdim = 100)
+        real    rbuffer(bufdim)
         integer buffer(bufdim),bytpix,bstart,tcode,i4null,nulchk,incre
         integer ibuff,i1,ntodo,itodo,repeat,rstart,estart,maxpix,ival
         integer offset,rskip,dstart,begcol,lenrow
         integer*2 i2null
+        integer*2 sbuffer(bufdim)
         character*1 i1null
         real rval
         double precision scale,zero,dval
@@ -223,9 +225,9 @@ C       read the data from FITS file, doing datatype conversion and scaling
         if (tcode .eq. 21)then
 C               column data type is I (I*2)
 C               read the data and do any machine dependent data conversion
-                call ftgi2b(iunit,itodo,incre,buffer,status)
+                call ftgi2b(iunit,itodo,incre,sbuffer,status)
 C               check for null values, and do scaling and datatype conversion
-                call fti2r8(buffer,itodo,scale,zero,tofits,
+                call fti2r8(sbuffer,itodo,scale,zero,tofits,
      &          nulchk,i2null,nulval,flgval(i1),anynul,array(i1),status)
         else if (tcode .eq. 41)then
 C               column data type is J (I*4)
@@ -237,9 +239,9 @@ C               check for null values, and do scaling and datatype conversion
         else if (tcode .eq. 42)then
 C               column data type is E (R*4)
 C               read the data and do any machine dependent data conversion
-                call ftgr4b(iunit,itodo,incre,buffer,status)
+                call ftgr4b(iunit,itodo,incre,rbuffer,status)
 C               check for null values, and do scaling and datatype conversion
-                call ftr4r8(buffer,itodo,scale,zero,tofits,
+                call ftr4r8(rbuffer,itodo,scale,zero,tofits,
      &          nulchk,nulval,flgval(i1),anynul,array(i1),status)
         else if (tcode .eq. 82)then
 C               column data type is D (R*8)

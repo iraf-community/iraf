@@ -86,9 +86,10 @@ int	extver		# value of EXTVER from existing header, or -1
 int	ncols		# number of columns, but min of 1 (for allocating space)
 int	nrows		# dummy number of rows
 int	nfields		# number of columns to define
+int	ival		# undefined value for int, short, bool
 int	vsize		# size of area for variable-length data (zero)
 int	i
-int	ival		# undefined value for int, short, bool
+int	nextn		# number of extensions in the file
 int	ttype0, tform0, tunit0	# offsets into 2-D char arrays
 int	tdtype		# "true" data type, i.e. not scaled by tscal, tzero
 char	dtype_c		# data type char:  'D', 'E', 'J', 'I', 'L', 'A'
@@ -119,6 +120,7 @@ begin
 	# Get a unit number.
 	# This call does nothing if linked with CFITSIO.  In that case,
 	# fd is output from fsopen or fsinit, and fd is actually a C pointer.
+	fd[1] = 0		# not needed for four-byte C pointers
 	fd[2] = 0		# not needed for four-byte C pointers
 	call fsgiou (fd, status)
 	if (status != 0)
@@ -134,6 +136,22 @@ begin
 
 	    TB_FILE(tp) = fd[1]
 	    TB_FILE2(tp) = fd[2]
+
+	    # Find out how many extensions there currently are in the file.
+	    done = false
+	    hdu = 0				# incremented in the loop
+	    nextn = 0				# set in the loop
+	    while (!done) {
+		# Move forward one HDU.
+		hdu = hdu + 1
+		call fsmahd (fd, hdu+1, hdutype, status)
+		if (status != 0) {		# we've reached EOF
+		    status = 0
+		    call ftcmsg()
+		    done = true
+		    nextn = hdu
+	        }
+	    }
 
 	    # If overwrite=yes, find the specified extension and delete it.
 	    # Then move to the previous hdu and set a flag (append=false)
@@ -152,11 +170,25 @@ begin
 		    call fsdhdu (fd, hdutype, status)
 		    if (status != 0)
 			call tbferr (status)
-		    # move to previous hdu, fitsio number (hdu-1) + 1
-		    call fsmahd (fd, hdu, hdutype, status)
-		    if (status != 0)
-			call tbferr (status)
-		    append = false
+
+                    # ORIGINAL CODE -- In this version the FITS file can
+                    # become corrupted when overwriting a bintable.  This
+                    # wasn't fully diagnosed but appeared to be related to 
+                    # the structure not properly tracking the offsets with
+                    # the actual FIO file position.  As a workaround, we
+                    # will simply append the overwritten extension rather 
+                    # than overwrite in-place.
+
+		    ## move to previous hdu, fitsio number (hdu-1) + 1
+		    #call fsmahd (fd, hdu, hdutype, status)
+		    #if (status != 0) {
+		    #	call tbferr (status)
+		    #}
+		    #append = false
+
+		    # ###############################
+		    append = true
+		    # ###############################
 		}
 
 	    } else {
@@ -169,19 +201,8 @@ begin
 		if (status != 0)
 		    call tbferr (status)
 
-		# Find out how many extensions there currently are in the file.
-		done = false
-		hdu = 0				# incremented in the loop
-		while (!done) {
-		    # Move forward one HDU.
-		    hdu = hdu + 1
-		    call fsmahd (fd, hdu+1, hdutype, status)
-		    if (status != 0) {		# we've reached EOF
-			status = 0
-			call ftcmsg()
-			done = true
-		    }
-		}
+		call fsmahd (fd, nextn, hdutype, status)
+
 		# Return to the primary header, and update NEXTEND to the
 		# value it should be after we add a new extension.
 		call fsmahd (fd, 1, hdutype, status)
@@ -191,7 +212,7 @@ begin
 		call mfree (comment, TY_CHAR)
 		if (naxis == 0) {
 		    call fsukyj (fd, "NEXTEND",
-			hdu, "number of extensions in file", status)
+			nextn, "number of extensions in file", status)
 		    if (status != 0)
 			call tbferr (status)
 		}
