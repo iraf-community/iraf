@@ -260,6 +260,8 @@ imt56|imtwttm|11K frame buffer:cn#56:xr#11000:yr#11000:\
 imt57|imtwttm|12K frame buffer:cn#57:xr#12000:yr#12000:\
         :LC:BS@:z0#1:zr#200:DD=node!imtool,,12000,12000:tc=iism70:
 
+imt60|16K frame buffer:cn#60:xr#16000:yr#16000:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,16000,16000:tc=iism70:
 
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
