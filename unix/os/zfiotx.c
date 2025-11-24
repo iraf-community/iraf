@@ -248,8 +248,15 @@ ZCLSTX (XINT *fd, XINT *status)
 	 * [NOTE] -- fclose errors are ignored if we are closing a terminal
 	 * device.  This was necessary on the Suns and it was not clear why
 	 * a close error was occuring (errno was EPERM - not owner).
+	 *
+	 * [NOTE] -- fclose can throw a EBADF when used from a background 
+         * process, this affects closing the env files such as zzsetenv.def
+         * only so we will ignore it for now.
 	 */
-	*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ? XERR : XOK;
+        if ((*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ?  XERR : XOK) == XERR) {
+            if (errno == EBADF)
+                *status = XOK;
+        }
 
 	kfp->fp = NULL;
 	if (port) {
@@ -287,8 +294,11 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 	register XCHAR *op;
 	register int ch, maxch = *maxchars;
 	register struct	fiodes *kfp;
+	static XCHAR *abuf;
 	struct ttyport *port;
 	int nbytes, ntrys;
+
+	abuf = buf;
 
 	if (maxch <= 0) {
 	    *status = 0;
@@ -335,7 +345,7 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 	    ntrys = MAX_TRYS;
 	    do {
 		clearerr (fp);
-		op = buf;
+		op = abuf;
 		errno = 0;
 		while (*op++ = ch = getc(fp), ch != EOF) {
 		    if (--maxch <= 0 || ch == NEWLINE)
@@ -345,7 +355,7 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 		if (errno == EINTR)
 		    fcancel (fp);
 #endif
-	    } while (errno == EINTR && op-1 == buf && --ntrys >= 0);
+	    } while (errno == EINTR && op-1 == abuf && --ntrys >= 0);
 
 	    *op = XEOS;
 	    nbytes = *maxchars - maxch;
@@ -373,7 +383,7 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 		ch = *data;
 		goto outch;
 	    } else {
-		*buf = XEOS;
+		*abuf = XEOS;
 		*status = 0;
 		return (*status);
 	    }
@@ -420,7 +430,7 @@ ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 
 	    /* Clear parity bit just in case raw mode is used.
 	     */
-outch:	    op = buf;
+outch:	    op = abuf;
 	    if (ch == EOF) {
 		*op++ = ch;
 		nbytes = 0;
