@@ -216,10 +216,10 @@ begin
 #		    if (fmt == NO && day == day1)
 #			call imastr (im, Memc[utm_key], Memc[ut_hms])
 #		    else if (dtm_encode (Memc[datestr], SZ_FNAME,
-#			year, month, day, utmid, 2, 0) > 0)
+#			year, month, day, ut_mid, 2, 0) > 0)
 #			call imastr (im, Memc[utm_key], Memc[datestr])
 		    if (dtm_encode (Memc[datestr], SZ_FNAME,
-			year, month, day, utmid, 2, 0) > 0)
+			year, month, day, ut_mid, 2, 0) > 0)
 			call imastr (im, Memc[utm_key], Memc[datestr])
 		}
 	    }

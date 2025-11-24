@@ -55,6 +55,5 @@ begin
 	}
 
 	# Remove the temporary row
-
 	call tbrdel (tp, ndx, ndx)
 end
