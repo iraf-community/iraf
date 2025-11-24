@@ -75,7 +75,7 @@ For each input image aimfind determines the region of the sky covered
 by the image, formats the appropriate catalog query, makes a local or remote
 connection to the catalog server using the catalog description in the
 catalog configuration file \fIcatdb\fR, and captures the results.
-Catalog names must be of the form catalog@site, e.g. lan92@noao.
+Catalog names must be of the form catalog@site, e.g. usnoa2@noirlab.
 
 If \fIfilter\fR = yes, the captured results are filtered using the
 values of the parameters in the filtering parameter set \fIafiltpars\fR.

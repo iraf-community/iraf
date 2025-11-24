@@ -12,7 +12,7 @@ int	maxch			#I the maximum buffer size
 int	recptr			#U the current record pointer
 
 int	nchars
-int	getline()
+int	getlline()
 
 begin
 	# The record is outside the record data range.
@@ -33,7 +33,7 @@ begin
 
 	case CQ_STEXT, CQ_BTEXT:
 	    call seek (CQ_RFD(res), Meml[CQ_RINDEX(res)+recptr])
-	    nchars = getline (CQ_RFD(res), buf)
+	    nchars = getlline (CQ_RFD(res), buf, maxch)
 	    recptr = recptr + 1
 	    return (nchars)
 
@@ -53,7 +53,7 @@ int	maxch			#I the maximum buffer size
 int	recptr			#I the record to be extracted
 
 int	nchars
-int	getline()
+int	getlline()
 
 begin
 	# Check for out-of-bounds record requests.
@@ -74,7 +74,7 @@ begin
 
 	case CQ_STEXT, CQ_BTEXT:
 	    call seek (CQ_RFD(res), Meml[CQ_RINDEX(res)+recptr-1])
-	    nchars = getline (CQ_RFD(res), buf)
+	    nchars = getlline (CQ_RFD(res), buf, maxch)
 	    return (nchars)
 
 	default:

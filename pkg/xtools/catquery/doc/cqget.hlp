@@ -74,11 +74,11 @@ The cqget routines must be error checked to avoid task termination.
 .ih
 EXAMPLES
 
-Sample catalog configuration file  record.
+Sample catalog configuration file record.
 
 .nf
-begin usno2@noao
-address inet:80:www.noao.edu:text
+begin usnoa2@noirlab
+address inet:80:www.noirlab.edu:text
 query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
 \n\n
 nquery 4
