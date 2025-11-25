@@ -41,35 +41,25 @@ nm=${0##*/}
 
 cl_binary="${bin}ecl.e"
 
-case "$nm" in
-    "cl" | "cl.sh")
-        cl_binary="${bin}cl.e"
-        ;;
-    "ecl" | "ecl.sh" | "irafcl" | "irafcl.sh")
-        cl_binary="${bin}ecl.e"
-        ;;
-    "vocl" | "vocl.sh")
-        cl_binary="${bin}vocl.e"
-        ;;
-esac
-
 iraf_version=$(grep version\\s  ${iraf}unix/hlib/zzsetenv.def | \
 		   cut -d\" -f2 | cut -d\  -f-3)
 
-while getopts "h?Vcexf:" opt; do
+cmdline=""
+
+while getopts "h?Voxf:c:" opt; do
     case "$opt" in
     h|\?)
 	echo 'IRAF Command Language Interpreter'
 	echo ''
 	echo 'Usage:'
-	echo '    irafcl [-V|-e|-c] [-x] [-f file]'
+	echo '    irafcl [-V|-o] [-x] [-f file] | [-c cmd]'
 	echo ''
 	echo 'Arguments:'
 	echo '    -V        print version and exit'
-	echo '    -e        force ecl'
-	echo '    -c        force classic cl'
+	echo '    -o        force classic cl'
 	echo '    -x        start in new xgterm (xterm if xgterm is not installed)'
 	echo '    -f file   start with file'
+	echo '    -c cmd    execute command (may be repeated) and exit'
 	echo ''
 	exit 0
         ;;
@@ -77,10 +67,7 @@ while getopts "h?Vcexf:" opt; do
         echo "${iraf_version}"
 	exit 0
         ;;
-    e)
-	cl_binary=${irafbin}ecl.e
-	;;
-    c)
+    o)
 	cl_binary=${irafbin}cl.e
 	;;
     x)
@@ -89,8 +76,22 @@ while getopts "h?Vcexf:" opt; do
     f)
 	script=$OPTARG
 	;;
+    c)
+	if [ -z "$cmdline" ] ; then
+	    cmdline="$OPTARG"
+	else
+	    cmdline="${cmdline}"'\n'"$OPTARG"
+	fi
+	;;
     esac
 done
+
+if [ "${cmdline}" ] ; then
+    cmdline="${cmdline}"'\n'"logout"
+    script=$(mktemp -t irafcl.XXXXXX) || exit 1
+    trap 'rm -f "$script"' EXIT
+    echo "$cmdline" > "$script"
+fi
 
 # Workaround for autoconf scripts attempting to use this command as a
 # valid compiler option.  On some systems (mostly Debian) a valid CC
@@ -130,6 +131,10 @@ fi
 
 if [ -z "${script}" ] ; then
     exec ${cl_binary}
-else
+elif [ -z "${cmdline}" ] ; then
     exec ${cl_binary} -f "${script}"
+else
+    # If a command line was specified, we can't do exec because
+    # we need to remove the script with the trap afterwards
+    ${cl_binary} -f "${script}"
 fi
