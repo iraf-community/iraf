@@ -3,11 +3,11 @@
 .SH NAME
 IRAFCL \- IRAF Command Language Interpreter
 .SH SYNOPSIS
-irafcl [\fB\,\-V\fR|\fB\-c\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR]
+irafcl [\fB\,\-V\fR|\fB\-o\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR] | [\fB\,-c \fICOMMAND\/\fR]
 
-ecl [\fB\,\-V\fR|\fB\-c\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR]
+ecl [\fB\,\-V\fR|\fB\-o\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR] | [\fB\,-c \fICOMMAND\/\fR]
 
-cl [\fB\,\-V\fR|\fB\-c\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR]
+cl [\fB\,\-V\fR|\fB\-o\fR|\fB\-e\/\fR] [\fB\,-f \fIFILE\/\fR] | [\fB\,-c \fICOMMAND\/\fR]
 .SH DESCRIPTION
 \fBirafcl\fR, \fBecl\fR or \fBcl\fR starts up the command language
 interpreter for IRAF, the Image Reduction and Analysis Facility.  It
@@ -25,10 +25,7 @@ interpreter is \fBirafcl\fR, which defaults to \fBECL\fR behaviour.
 \fB\-V\fR
 Show version of program.
 .TP
-\fB\-e\fR
-Force enhanced CL (command line editing etc.)
-.TP
-\fB\-c\fR
+\fB\-o\fR
 Force classic CL
 .TP
 \fB\-x\fR
@@ -36,5 +33,8 @@ Start in a new xgterm (or xterm if xgterm is not available)
 .TP
 \fB\-f\fR \fI\,FILE\/\fR
 Start with executing FILE
+.TP
+\fB\-c\fR \fI\,COMMAND\/\fR
+Execute specified COMMAND (may be repeated) and exit.
 .SH AUTHOR
 Created by Ole Streicher for the IRAF community

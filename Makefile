@@ -34,6 +34,7 @@ export F2C = $(hbin)f2c.e
 export MKPKG = $(hbin)mkpkg.e
 export XC = $(hbin)xc.e
 export RANLIB = ranlib
+export CL = $(hlib)irafcl.sh
 
 # General compiler flags. Compiler flags specific to the build of the
 # host tools and software are in unix/Makefile.
@@ -47,7 +48,7 @@ all:: sysgen
 
 # Do a full sysgen, which consists on the host binaries, the core
 # system, and the NOAO package.
-sysgen: starttime host core noao
+sysgen: starttime host core noao helpdb ttydata
 	@echo "============== IRAF build was successful! ==============="
 	@echo
 	@echo "Start: $(shell date -r .build_started)"
@@ -76,6 +77,20 @@ host: novos
 # Build the core system.
 core: host
 	$(MKPKG)
+
+# Create the help database
+helpdb: core
+	$(CL) -c 'softools' \
+	  -c 'mkhelpdb helpdir=lib$$root.hd helpdb=lib$$helpdb.mip' \
+	  -c 'mkhelpdb helpdir=noao$$lib/root.hd helpdb=noao$$lib/helpdb.mip'
+	test -f lib/helpdb.mip -a -f noao/lib/helpdb.mip
+
+# Create the termcap+graphcap caches
+ttydata: core
+	$(CL) -c 'softools' \
+	  -c 'mkttydata xgterm,xterm,vt640,vt240 dev$$graphcap dev$$cacheg.dat' \
+	  -c 'mkttydata xgterm,xterm,vt640,vt100,vt240,text dev$$termcap dev$$cachet.dat'
+	test -f dev/cacheg.dat -a -f dev/cachet.dat
 
 # Build the NOAO package.
 noao: host core

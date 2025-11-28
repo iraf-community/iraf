@@ -2,7 +2,6 @@
 
 $clio		= "./clio/doc/"
 $dbio		= "./dbio/doc/"
-$debug		= "./debug/doc/"
 $fio		= "./fio/doc/"
 $fmtio		= "./fmtio/doc/"
 $gio		= "./gio/doc/"
@@ -22,9 +21,6 @@ clio		hlp = clio$clio.men,		sys = clio$clio.hlp,
 
 dbio		hlp = dbio$dbio.men,		sys = dbio$dbio.hlp,
 		pkg = dbio$dbio.hd
-
-debug		hlp = debug$debug.men,		sys = debug$debug.hlp,
-		pkg = debug$debug.hd
 
 fio		hlp = fio$fio.men,		sys = fio$fio.hlp,
 		pkg = fio$fio.hd
