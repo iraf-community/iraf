@@ -25,5 +25,4 @@ begin
 
 	do irow = 1, numrow
 		Memi[rowptr+irow-1] = irow
-
 end

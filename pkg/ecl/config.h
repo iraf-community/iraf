@@ -14,7 +14,7 @@
  *   this can be fixed.
  */
 #define	STACKSIZ	256000
-#define	DICTSIZE	1024000
+#define	DICTSIZE	8192000
 #define	MEMINCR		4096
 
 typedef unsigned long memel;	/* type for dictionary, stack, etc.	*/
