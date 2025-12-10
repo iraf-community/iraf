@@ -265,15 +265,15 @@ begin
 
 	        	# Reallocate the output string if needed.
 	        	if ((op_end - op) < SZ_FNAME || op >= op_end) {
-		    	    sz_out = sz_out + SZ_FNT
-		    	    len = (op - out - 1)
+		    	    sz_out = sz_out + SZ_FNT + 1
+		    	    len = (op - out + 1)
 
 		    	    call calloc (op_start, sz_out, TY_CHAR)
 			    call amovc (Memc[out], Memc[op_start], len)
 			    for (op=op_start; Memc[op] != EOS; )
 				op = op + 1
 
-		    	    op_end = op_start + sz_out
+		    	    op_end = op_start + sz_out - 1
 			    call mfree (out, TY_CHAR)
 		    	    out = op_start
 	        	}
