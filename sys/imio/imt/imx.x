@@ -42,7 +42,7 @@ begin
 
 
 	fnt_len = 0 						# initialize    
-	max_fnt = SZ_FNT
+        max_fnt = max(strlen(Memc[intmp]),SZ_FNT)
 	call calloc (fnt, max_fnt, TY_CHAR)
 
 	# Sorting is disabled as input and output templates, derived from the
