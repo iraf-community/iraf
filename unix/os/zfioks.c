@@ -917,13 +917,8 @@ ZARDKS (
   XLONG	*loffset 		/* not used				*/
 )
 {
-#ifdef ANSI
 	volatile char	*op;
 	volatile int	fd, nbytes;
-#else
-	char	*op;
-	int	fd, nbytes;
-#endif
 	void	(*sigint)(int), (*sigterm)(int);
 	int	status = ERR;
 
