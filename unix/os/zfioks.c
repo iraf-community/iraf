@@ -133,7 +133,7 @@ extern	int save_prtype;
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
 
 #define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
+#define	RSH		"ssh"		/* typical names are rsh, remsh   */
 
 #define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
 #define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
