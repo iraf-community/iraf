@@ -158,7 +158,7 @@ char	debug_file[64] = "";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
 static	jmp_buf jmpbuf;
-static	int jmpset = 0;
+static	volatile sig_atomic_t jmpset = 0;
 static	int recursion = 0;
 static	int parent = -1;
 static	void (*old_sigcld)(int);
