@@ -1,4 +1,4 @@
-record,s,a,"dss2@cadc",,,"Database record name"
+record,s,a,"dss2red@cds",,,"Database record name"
 image,s,a,"",,,"Output image name"
 ra,s,a,"12:12:12.00",,,"Ra in hours"
 dec,s,a,"+12:12:12.0",,,"Dec in degrees"
