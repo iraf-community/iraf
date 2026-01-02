@@ -283,10 +283,10 @@ ZFLSTX (XINT *fd, XINT *status)
 int
 ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 {
-	register FILE *fp;
-	register XCHAR *op;
-	register int ch, maxch = *maxchars;
-	register struct	fiodes *kfp;
+	FILE *fp;
+	volatile XCHAR *op;
+	int ch, maxch = *maxchars;
+	struct	fiodes *kfp;
 	struct ttyport *port;
 	int nbytes, ntrys;
 
