@@ -79,7 +79,7 @@ struct ttyport {
 #define	CTRLC	3
 extern	int errno;
 static	jmp_buf jmpbuf;
-static	int tty_getraw = 0;	/* raw getc in progress */
+static	volatile sig_atomic_t tty_getraw = 0;	/* raw getc in progress */
 static	struct sigaction sigint, sigterm;
 static	struct sigaction sigtstp, sigcont;
 static	struct sigaction oldact;
