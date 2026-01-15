@@ -33,12 +33,16 @@
 
 
 # Initialize script variables.
+shopt -s expand_aliases
 
 if [ ! -n "$iraf" ]; then
     export iraf=$PWD
 fi
 if [ -e "$iraf/unix/hlib/util.sh" ]; then
     source $iraf/unix/hlib/util.sh
+else
+    echo "Error: The 'iraf' environment variable may be incorrect, quitting"
+    exit 1
 fi
 if [ -e "${iraf}/unix/hlib/irafarch.sh" ]; then
   mach=`${iraf}/unix/hlib/irafarch.sh	`	# current platform architecture
@@ -344,7 +348,7 @@ clear
 NEWLINE
 BOLD_ON; 
 ECHO "		===================================="
-ECHO "		       IRAF "$VERSION" Installation"
+ECHO "		   IRAF "$VERSION" Installation"
 ECHO "		===================================="
 BOLD_OFF
 NEWLINE
@@ -1509,6 +1513,11 @@ if [ "$do_system" == 0 ]; then
   fi
   cd $HOME/.iraf
   ECHO -n "Creating global login.cl and uparm directory ....              "
+  if [ -e "$HOME/.iraf/login.cl" ]; then
+      # Backup any existing login{user}.cl files first.
+      cp $HOME/.iraf/login.cl  $HOME/.iraf/login.cl.old
+      cp $HOME/.iraf/loginuser.cl  $HOME/.iraf/loginuser.cl.old
+  fi
   $iraf/unix/hlib/mkiraf.sh --default --init --term=$myterm  >& /dev/null
   if [ -e "$HOME/.iraf/login.cl" ]; then
       DO_OK
@@ -1520,7 +1529,7 @@ if [ "$do_system" == 0 ]; then
 
   # Add the setup to the user's login files.
   cfiles=("$HOME/.cshrc $HOME/.tcshrc $HOME/.login")
-  bfiles=("$HOME/.profile $HOME/.bash_profile $HOME/.zshrc $HOME/.zprofile")
+  bfiles=("$HOME/.profile $HOME/.bash_profile $HOME/.bashrc $HOME/.zshrc $HOME/.zprofile")
 
   if [ ! -e $HOME/.cshrc ]; then
       touch $HOME/.cshrc
@@ -1534,6 +1543,7 @@ if [ "$do_system" == 0 ]; then
 	    egrep -e "iraf/setup.csh" $TEMP			    >& /dev/null
             if (( $?==1 )); then
 	        echo ''						        >> $TEMP
+	        echo '# >>>> IRAF initializations >>>>'	                >> $TEMP
 	        echo '# Add iraf setup commands.'		        >> $TEMP
  	        echo 'if ( -e $HOME/.iraf/setup.csh ) then'	        >> $TEMP
  	        echo '   source $HOME/.iraf/setup.csh'		        >> $TEMP
@@ -1546,6 +1556,8 @@ if [ "$do_system" == 0 ]; then
                 echo '   endif'                                         >> $TEMP
  	        echo 'endif'					        >> $TEMP
  	        echo 'set path = ($HOME/.iraf/bin $path)'	        >> $TEMP
+	        echo '# <<<< IRAF initializations <<<<'                 >> $TEMP
+	        echo ''						        >> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1554,6 +1566,7 @@ if [ "$do_system" == 0 ]; then
     else
         RM -f $TEMP >& /dev/null
 	echo ''							         > $file
+	echo '# >>>> IRAF initializations >>>>'	                        >> $file
 	echo '# Add iraf setup commands'			        >> $file
  	echo 'if ( -e $HOME/.iraf/setup.csh ) then'		        >> $file
  	echo '   source $HOME/.iraf/setup.csh'			        >> $file
@@ -1566,6 +1579,8 @@ if [ "$do_system" == 0 ]; then
         echo '   endif'                                                 >> $file
  	echo 'endif'						        >> $file
  	echo 'set path = ($HOME/.iraf/bin $path)'	                >> $file
+	echo '# <<<< IRAF initializations <<<<'                         >> $file
+	echo ''						                >> $file
     fi
   done
 
@@ -1581,6 +1596,7 @@ if [ "$do_system" == 0 ]; then
 	    egrep -e "iraf/setup.sh" $TEMP			    >& /dev/null
             if (( $?==1 )); then
 	        echo ''						        >> $TEMP
+	        echo '# >>>> IRAF initializations >>>>'	                >> $TEMP
 	        echo '# Add iraf setup commands.'		        >> $TEMP
  	        echo 'if [ -e $HOME/.iraf/setup.sh ]; then'	        >> $TEMP
  	        echo '    source $HOME/.iraf/setup.sh'		        >> $TEMP
@@ -1593,6 +1609,8 @@ if [ "$do_system" == 0 ]; then
                 echo '    fi'                                           >> $TEMP
  	        echo 'fi'					        >> $TEMP
  	        echo 'export PATH=$PATH:$HOME/.iraf/bin'	        >> $TEMP
+	        echo '# <<<< IRAF initializations <<<<'	                >> $TEMP
+	        echo ''							>> $TEMP
 		cp $file ${file}.bak
                 PUT $TEMP $file
             fi
@@ -1601,6 +1619,7 @@ if [ "$do_system" == 0 ]; then
     else
         RM -f $TEMP >& /dev/null
 	echo ''							         > $file
+	        echo '# >>>> IRAF initializations >>>>' 	        >> $file
 	echo '# Add iraf setup commands.'			        >> $file
  	echo 'if [ -e $HOME/.iraf/setup.sh ]; then'		        >> $file
  	echo '    source $HOME/.iraf/setup.sh'			        >> $file
@@ -1613,6 +1632,8 @@ if [ "$do_system" == 0 ]; then
         echo '    fi'                                                   >> $file
  	echo 'fi'						        >> $file
  	echo 'export PATH=$PATH:$HOME/.iraf/bin'	                >> $file
+	echo '# <<<< IRAF initializations <<<<'	                        >> $file
+	echo ''							        >> $file
     fi
   done
 fi
@@ -1656,7 +1677,9 @@ if (( "$err_count"==0 )); then
    ECHO "    To begin using IRAF you can simply type"
    ECHO ""
    ECHO -n '          % ';
-   BOLD_ON; ECHO    'source ~/.login    '; BOLD_OFF
+   BOLD_ON; ECHO    'source ~/.login          # for C-shells'; BOLD_OFF
+   ECHO -n '          % ';
+   BOLD_ON; ECHO    'source ~/.bash_profile   # for Bourne shells'; BOLD_OFF
    ECHO -n '          % ';
    BOLD_ON; ECHO    'cl    '; BOLD_OFF
    ECHO ""
