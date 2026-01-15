@@ -4,9 +4,9 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf		= "/opt/iraf/iraf"
-set	imdir		= "/opt/iraf/imdirs"
-set	cachedir	= "/opt/iraf/cache"
+set	iraf		= "/opt/iraf/iraf/"
+set	imdir		= "/opt/iraf/imdir/"
+set	cachedir	= "/opt/iraf/cache/"
 set	ttymsg  =\
 "Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
 
