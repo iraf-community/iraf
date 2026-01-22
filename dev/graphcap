@@ -513,6 +513,10 @@ uhplj|UNIX generic interface to Hewlett-Packard LaserJet IIIsi:\
         :DD=uhplj,tmp$sgk,!{ sgidispatch sgi2uhplj $F \
         -l$(XO) -b$(YO) -w$(PX) -h$(PY) $F | lpr ; rm $F; }&:\
         :tc=sgi_hplaserjet3:
+sgidbg|DEBUG INTERFACE:\
+        :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
+        :DD=eps,tmp$sgk,!{ sgidebug sgi2ueps $F -l$(XO) \
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
 uepsf|ueps|Encapsulated Postscript file (portrait) UNIX:\
         :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
         :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
@@ -544,7 +548,6 @@ sgi_image_format|Generic raster file format specification:\
 	:kf=bin$x_sgikern.e:tn=sgikern:\
 	:ar#.75:xr#640:yr#480:PX#640:PY#480:XW#640:YW#480:\
 	:BI:MF#1:YF:NB#8:LO#1:LS#0:XO#0:YO#0:
-
 
 # The following 2 entries submitted by Joe Harrington, MIT Planetary
 # Science Group <jh@athena.mit.edu>.  The first entry writes a PostScript
