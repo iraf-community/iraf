@@ -39,6 +39,6 @@ $special "sys$fmtio/":		evvexpr.x	$(XBIG)	;
 $set    XNL     = '& "$xc -c -/NL400 &"'
 $special "math$slalib/":        obs.f           $(XNL)  ;
 
-$set    XNOALIAS     = '& "$xc -c -/no-strict-aliasing &"'
+$set    XNOALIAS     = '& "$xc -c -/Wno-strict-aliasing &"'
 $special "sys$libc/":        gets.c           $(XNOALIAS)  ;
 $special "sys$libc/":        puts.c           $(XNOALIAS)  ;
