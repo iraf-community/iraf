@@ -49,7 +49,13 @@ link:
 	  $ifeq (MACH, linux) then
 	    $set	LIBS2 = "-/L/usr/lib32 -lreadline -lncurses"
 	  $else
-	    $set	LIBS2 = "-lreadline -lncurses"
+	    $ifeq (MACH, linux64) then
+	      $set	LIBS2 = "/lib/x86_64-linux-gnu/libreadline.a \
+                                 /lib/x86_64-linux-gnu/libncurses.a \
+                                 /lib/x86_64-linux-gnu/libtinfo.a"
+	    $else
+	      $set	LIBS2 = "-lreadline -lncurses"
+	    $endif
 	  $endif
 	$else
 	  $set	LIBS2 = ""
