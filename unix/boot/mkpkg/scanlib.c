@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <sys/stat.h>
 
 #include <ar.h>
 #ifdef MACOSX
@@ -74,6 +75,7 @@ h_scanlibrary (char *library)
 	int	len=0;
 #endif
 	FILE	*fp;
+        struct  stat library_stat;
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
@@ -94,6 +96,10 @@ h_scanlibrary (char *library)
 	    fflush (stdout);
 	    return (0);
 	}
+
+        /* Get the file date.
+         */
+        stat (libfname, &library_stat);
 
 	if (debug) {
 	    printf ("scan unix archive %s:\n", libfname);
@@ -206,6 +212,12 @@ h_scanlibrary (char *library)
 #endif
 	        /* Get module date.  */
 	        sscanf (arf.ar_date, "%ld", &fdate);
+
+                /* Use the library date if module date not found.
+                 */
+                if (fdate == 0) {
+                    fdate = library_stat.st_mtime;
+                }
 
 	        /* Insert entry into symbol table. */
 	        mlb_setdate (modname, fdate);
