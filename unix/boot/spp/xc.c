@@ -91,8 +91,15 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lm",			/*  5  */
 		    "-lrt",			/*  6  */
 #ifdef USE_SSL
+#ifdef LINUX64
+                    /* MACHDEP */
+		    "/lib/x86_64-linux-gnu/libssl.a",	        /*  7  */
+		    "/lib/x86_64-linux-gnu/libcrypto.a",	/*  8  */
+                    /* MACHDEP */
+#else
 		    "-lssl",			/*  7  */
 		    "-lcrypto",			/*  8  */
+#endif
 #else
 		    "",				/*  7  */
 		    "",				/*  8  */
