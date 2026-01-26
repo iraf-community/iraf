@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  MKPKG -- Make a package or the core system.
 
@@ -29,7 +29,7 @@ if [ -e "./bin" ]; then
     # In a package/system directory with a 'bin'.  Since we may be
     # reconfiguring the architecture, check the calling arguments first.
 
-    last_arg=${!#}
+    last_arg="${!#}"
     arg_is_arch "${last_arg}"
     if [ $is_arch -eq 1 ]; then
         # We are resetting the architecture so simply execute the binary.
