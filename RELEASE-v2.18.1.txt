@@ -48,6 +48,7 @@ Contact Us:  iraf@noirlab.edu   or   usngo@noirlab.edu
     What’s New
         Major Core System Changes
         Major External Package Changes
+        Distribution Update Changes (1/28/26)
         Support for Gemini Data Reduction
         Availability of some STSDAS Tasks
 
@@ -313,6 +314,41 @@ The following packages had additional changes of note:
             - replace the RAN1() function with VOPS urand()
             - replaced MDIAN1() routine, removed SORT()
     
+
+Distribution Update Changes (1/28/26)
+--------------------------------------
+
+    Distribution files were updated without a version bump on 1/28/26
+to address the following post-release issues:
+
+    Install Script
+        - Various install script changes to replace any iraf definitions
+          from a previous installation in the user's startup files (e.g.
+          .cshrc or .profile).
+        - Better support for 'zsh' environments on MacOS
+        - General cleanup of the environment definitions
+
+    ST4GEM
+        - Package definitions for a local NTTOOLS package were removed.
+
+    Shared Libraries
+        - The original v2.18.1 release was built under an older Scientific
+          Linux system in hopes of broader compatability, however this
+          introduced problems on some of the newer Linux distributions where
+          shared library issues were seen. This update fixes that by use
+          of static libraries where necessary.  In particular,
+
+            - The ECL now uses a static libreadline.a, libncurses.a and
+              libterminfo.a to support the up-arrow history feature.
+            - All 'linux64' binaries now use static libssl.a and libcrypto.a
+              linked into all binaries because of the HSI network driver.
+
+    Linux Build
+        - Some newer linux distributions have a GCC compiler that now complains
+          about some code structures previously allowed.  These have been
+          fixed.
+
+
 
 Support for Gemini Data Reduction
 ---------------------------------
