@@ -71,6 +71,9 @@ char *iraflibs[] = { "libex.a",
 		     NULL};
 
 char *fortlib[] = { "-lf2c",
+#ifdef USE_SYSTEM_BLAS
+		    "-lopenblas",
+#endif
 		    "-lm",
 #if (defined (__linux__) || defined (__gnu_hurd__))
 		    "-lpthread",

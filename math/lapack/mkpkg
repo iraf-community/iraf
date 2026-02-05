@@ -7,6 +7,7 @@ $exit
 
 liblapack.a:
 	wrapper.c
+$ifeq(USE_SYSTEM_BLAS, no)
 	dgemm.f
 	dger.f
 	dgetf2.f
@@ -28,4 +29,5 @@ liblapack.a:
 	sscal.f
 	sswap.f
 	strsm.f
+$endif
 	;

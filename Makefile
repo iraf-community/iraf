@@ -42,6 +42,13 @@ export CFLAGS ?= -g -O2
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 export XC_LFLAGS = $(LDFLAGS)
 
+# Whether to use the system openBLAS library.
+export USE_SYSTEM_BLAS ?= no
+ifeq ($(USE_SYSTEM_BLAS), yes)
+XC_CFLAGS += -DUSE_SYSTEM_BLAS
+XC_LFLAGS += -lopenblas
+endif
+
 .PHONY: all sysgen clean test arch noao host novos core bindirs bin_links config inplace starttime
 
 all:: sysgen

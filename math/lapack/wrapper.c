@@ -35,6 +35,16 @@
 #define DGETRS dgetrs_
 
 /* Declaring LAPACK functions */
+#ifdef USE_SYSTEM_BLAS
+extern void SGETRF (int* m, int* n, float* a, int* lda, int* ipiv,
+                    int* info);
+extern void SGETRS (char* trans, int* n, int* nrhs, float* a, int* lda, 
+                    int* ipiv, float* b, int* ldb, int* info);
+extern void DGETRF (int* m, int* n, double* a, int* lda, int* ipiv,
+                    int* info);
+extern void DGETRS (char* trans, int* n, int* nrhs, double* a, int* lda, 
+                    int* ipiv, double* b, int* ldb, int* info);
+#else
 extern int  SGETRF (XINT* m, XINT* n, XREAL* a, XINT* lda, XINT* ipiv,
                     XINT* info);
 extern int  SGETRS (char* trans, XINT* n, XINT* nrhs, XREAL* a, XINT* lda,
@@ -43,9 +53,15 @@ extern int  DGETRF (XINT* m, XINT* n, XDOUBLE* a, XINT* lda, XINT* ipiv,
                     XINT* info);
 extern int  DGETRS (char* trans, XINT* n, XINT* nrhs, XDOUBLE* a, XINT* lda,
                     XINT* ipiv, XDOUBLE* b, XINT* ldb, XINT* info);
+#endif
 
 /* Consts */
+#ifdef USE_SYSTEM_BLAS
+static const int c__1 = 1;
+#else
 static const XINT c__1 = 1;
+#endif
+
 static const char c__N = 'N';
 
 /* ----------------------------------------------------------------------------
@@ -74,12 +90,30 @@ int LUDCMP(XREAL* a, XINT* n, XINT* np, XINT* indx, XREAL* d)
  *   real    d               # o: +1 or -1
  */
 {
+#ifdef USE_SYSTEM_BLAS
+    int istat;
+    int* N = malloc(sizeof(int));
+    *N = *n;
+    int* NP = malloc(sizeof(int));
+    *NP = *np;
+    int* INDX = malloc(*n * sizeof(int));
+#else
     XINT istat;
     XINT* N = n;
     XINT* NP = np;
     XINT* INDX = indx;
+#endif
+
     *d = 1.0;
     SGETRF(N, N, a, NP, INDX, &istat);
+#ifdef USE_SYSTEM_BLAS
+    for (int i = 0; i < *n; i++) {
+        indx[i] = INDX[i];
+    }
+    free(INDX);
+    free(NP);
+    free(N);
+#endif
     ZZEPRO();
     return 0;
 }
@@ -105,12 +139,31 @@ int LUDCMD (XDOUBLE* a, XINT* n, XINT* np, XINT* indx, XDOUBLE* d, XINT* istat)
  *   int     istat           # o: OK if no problem; 1 if matrix is singular
  */
 {
+#ifdef USE_SYSTEM_BLAS
+    int* ISTAT = malloc(sizeof(int));
+    int* N = malloc(sizeof(int));
+    *N = *n;
+    int* NP = malloc(sizeof(int));
+    *NP = *np;
+    int* INDX = malloc(*n * sizeof(int));
+#else
     XINT* ISTAT = istat;
     XINT* N = n;
     XINT* NP = np;
     XINT* INDX = indx;
+#endif
     *d = 1.0;
     DGETRF(N, N, a, NP, INDX, ISTAT);
+#ifdef USE_SYSTEM_BLAS
+    for (int i = 0; i < *n; i++) {
+        indx[i] = INDX[i];
+    }
+    free(INDX);
+    *istat = *ISTAT;
+    free(ISTAT);
+    free(N);
+    free(NP);
+#endif
     if (*istat > 0) {
         *istat = 1;
     }
@@ -140,12 +193,29 @@ int LUBKSB (XREAL* a, XINT* n, XINT* np, XINT* indx, XREAL* b)
  *   real    b[n]            # io: input b, output x in equation ax = b
  */
 {
+#ifdef USE_SYSTEM_BLAS
+    int status;
+    int* N = malloc(sizeof(int));
+    *N = *n;
+    int* NP = malloc(sizeof(int));
+    *NP = *np;
+    int* INDX = malloc(*n * sizeof(int));
+    for (int i = 0; i < *n; i++) {
+        INDX[i] = indx[i];
+    }
+#else
     XINT status;
     XINT* N = n;
     XINT* NP = np;
     XINT* INDX = indx;
     XINT  c__1 = 1;
+#endif
     SGETRS(&c__N, N, &c__1, a, NP, INDX, b, N, &status);
+#ifdef USE_SYSTEM_BLAS
+    free (INDX);
+    free (NP);
+    free (N);
+#endif
     ZZEPRO();
     return 0;
 }
@@ -174,11 +244,28 @@ int LUBKSD (XDOUBLE* a, XINT* n, XINT* np, XINT* indx, XDOUBLE* b)
  *   double  b[n]            # io: input b, output x in equation ax = b
  */
 {
+#ifdef USE_SYSTEM_BLAS
+    int  status;
+    int* N = malloc(sizeof(int));
+    *N = *n;
+    int* NP = malloc(sizeof(int));
+    *NP = *np;
+    int* INDX = malloc(*n * sizeof(int));
+    for (int i = 0; i < *n; i++) {
+        INDX[i] = indx[i];
+    }
+#else
     XINT  status;
     XINT* N = n;
     XINT* NP = np;
     XINT* INDX = indx;
+#endif
     DGETRS(&c__N, N, &c__1, a, NP, INDX, b, N, &status);
+#ifdef USE_SYSTEM_BLAS
+    free (INDX);
+    free (NP);
+    free (N);
+#endif
     ZZEPRO();
     return 0;
 }
@@ -198,12 +285,26 @@ memset(y, 0, (*n) * (*n) * sizeof(float));
 for (int i = 0; i < *n; i++) {
     y[i*(*n+1)] = 1.0;
 }
+#ifdef USE_SYSTEM_BLAS
+    int* ipiv = malloc(*n * sizeof(int));
+    int* N = malloc(sizeof(int));
+    *N = *n;
+    int* NP = malloc(sizeof(int));
+    *NP = *np;
+    int istat;
+#else
     XINT* ipiv = malloc(*n * sizeof(XINT));
     XINT* N = n;
     XINT* NP = np;
     XINT  istat;
+#endif
     SGETRF(N, N, a, NP, ipiv, &istat);
     SGETRS(&c__N, N, N, a, NP, ipiv, y, N, &istat);
+#ifdef USE_SYSTEM_BLAS
+    free(ipiv);
+    free(NP);
+    free(N);
+#endif
     free(y);
     ZZEPRO();
     return 0;
