@@ -47,6 +47,7 @@ host$bin/sgi2uimp.e
 host$bin/sgi2uptx.e
 host$bin/sgi2uqms.e
 host$bin/sgi2xbm.e
+host$bin/sgidebug.e
 host$bin/sgidispatch.e
 host$bin/wtar.e
 host$bin/xc.e
