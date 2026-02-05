@@ -5,6 +5,7 @@ define	FIRST_FD	10		# first open file descriptor
 define	LAST_FD		4096		# number of file descriptors
 define	PSIOCTRL	9		# the last pseudofile (see etc$prpsio.x)
 define	FBUF_ALLOC	vmalloc		# call to allocate file buffer
+#define	FBUF_ALLOC	malloc		# call to allocate file buffer
 define	LEN_DEVTBL	150		# FIO device table (7 cells/device)
 define	LEN_RANDBUF	8		# bufsize = LEN_RANDBUF * blksize
 define	LEN_SEQBUF	8		# bufsize = LEN_SEQBUF * optbufsize
