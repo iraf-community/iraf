@@ -158,6 +158,7 @@ pfileload (
 )
 {
 	static	long sys_ftime = 0;
+	static	int sys_ftime_initialized = 0;
 	register struct	task *tp;
 	register struct	param *pp;
 	char	usr_pfile[SZ_FNAME+1];
@@ -253,14 +254,27 @@ epset_:
 	 * modification time of pkg pfile.  Look for a .par version of the
 	 * pkg pfile, and if not found, a .cl version (procedure script).
 	 */
-	usr_ftime = filetime (usr_pfile, "c");
+	{
+	    struct _finfo fi;
+	    if (c_finfo (usr_pfile, &fi) == ERR)
+		usr_ftime = 0;
+	    else
+		usr_ftime = fi.fi_ctime;
+	}
 	c_fnldir (ltp->lt_pname, pkgdir, SZ_FNAME);
 
 	mkpfilename (pkg_pfile, pkgdir, pkname, ltname, ".par");
-	if ((pkg_ftime = filetime (pkg_pfile, "m")) <= 0) {
-	    mkpfilename (pkg_pfile, pkgdir, pkname, ltname, ".cl");
-	    if ((pkg_ftime = filetime (pkg_pfile, "m")) <= 0)
-		cl_error (E_UERR, e_nopfile, ltname);
+	{
+	    struct _finfo fi;
+	    if (c_finfo (pkg_pfile, &fi) == ERR) {
+		mkpfilename (pkg_pfile, pkgdir, pkname, ltname, ".cl");
+		if (c_finfo (pkg_pfile, &fi) == ERR)
+		    cl_error (E_UERR, e_nopfile, ltname);
+		else
+		    pkg_ftime = fi.fi_mtime;
+	    } else {
+		pkg_ftime = fi.fi_mtime;
+	    }
 	}
 
 	/* Get the date when the iraf system was last installed or updated.
@@ -269,15 +283,16 @@ epset_:
 	 * may actually be newer than the date of system update/install but
 	 * that is harmless.
 	 */
-	if (sys_ftime <= 0)
+	if (!sys_ftime_initialized) {
 	    sys_ftime = filetime ("hlib$utime", "m");
+	    sys_ftime_initialized = 1;
+	}
 
 	/* If the system was installed more recently than the package pfile
 	 * was modified, use the system modify time instead.
 	 */
-	if (sys_ftime > 0)
-	    if (sys_ftime > pkg_ftime)
-		pkg_ftime = sys_ftime;
+	if (sys_ftime_initialized && sys_ftime > pkg_ftime)
+	    pkg_ftime = sys_ftime;
 
 	if (usr_ftime > 0) {
 	    /* We have a user (UPARM) version of the pfile.  If it is newer
