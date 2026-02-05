@@ -39,8 +39,8 @@
  * regular FIO drivers hence may be connected to FIO to provide a network
  * interface to the high level code.
  *
- *		zopcks		open kernel server on remote node
- *		zclcks		close kernel server
+ *		zopnks		open kernel server on remote node
+ *		zclsks		close kernel server
  *		zardks		read from the remote kernel server
  *		zawrks		write to the remote kernel server
  *		zawtks		wait for i/o
@@ -133,7 +133,7 @@ extern	int save_prtype;
 #define	KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
 
 #define	KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#define	RSH		"rsh"		/* typical names are rsh, remsh   */
+#define	RSH		"ssh"		/* typical names are rsh, remsh   */
 
 #define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
 #define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
@@ -158,7 +158,7 @@ char	debug_file[64] = "";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
 static	jmp_buf jmpbuf;
-static	int jmpset = 0;
+static	volatile sig_atomic_t jmpset = 0;
 static	int recursion = 0;
 static	int parent = -1;
 static	void (*old_sigcld)(int);
@@ -201,11 +201,13 @@ ZOPNKS (
 	register char	*ip, *op;
 	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype=0, port=0, auth=0, s_port=0, pid=0, s=0, i=0;
+	int	proctype=0, port=0, s_port=0, pid=0, s=0, i=0;
 	struct  sockaddr_in  from;
 	char	*hostp=NULL, *cmd=NULL;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
+
+	volatile int auth = 0;
 
 
 
@@ -348,13 +350,15 @@ ZOPNKS (
 	     * client until commanded to shutdown, the connection is broken, or
 	     * an i/o error occurs.
 	     */
+	    volatile int     nsec=0;
+	    volatile int     once_only = 0;
+	    volatile int     unauth = 0;
+
 	    struct  timeval timeout;
-	    int     check, fromlen, req_port;
-	    int     nsec, fd, sig;
+	    int     check=0, fromlen=0, req_port=0;
+	    int     fd, sig;
 	    fd_set  rfd;
-	    int     once_only = 0;
 	    int     detached = 0;
-	    int     unauth = 0;
 	    int     status = 0;
 
 	    /* Get the server parameters.  These may be passed either via
@@ -490,7 +494,7 @@ d_err:		dbgmsgf ("S:in.irafksd parent exit, status=%d\n", status);
 		} else
 		    dbgmsg ("S:in.irafksd: connection established\n");
 
-		/* Find out where the connection is coming from. */
+		/* Find the connection's originating machine. */
 		fromlen = sizeof (from);
 		if (getpeername (fd, (struct sockaddr *)&from, 
 		    (socklen_t *)&fromlen) < 0) {
@@ -913,13 +917,8 @@ ZARDKS (
   XLONG	*loffset 		/* not used				*/
 )
 {
-#ifdef ANSI
 	volatile char	*op;
 	volatile int	fd, nbytes;
-#else
-	char	*op;
-	int	fd, nbytes;
-#endif
 	void	(*sigint)(int), (*sigterm)(int);
 	int	status = ERR;
 
