@@ -80,17 +80,21 @@ while getopts "h?Voxf:c:" opt; do
 	if [ -z "$cmdline" ] ; then
 	    cmdline="$OPTARG"
 	else
-	    cmdline="${cmdline}"'\n'"$OPTARG"
+	    cmdline="${cmdline}
+$OPTARG"
 	fi
 	;;
     esac
 done
 
 if [ "${cmdline}" ] ; then
-    cmdline="${cmdline}"'\n'"logout"
+    cmdline="${cmdline}
+logout"
     script=$(mktemp -t irafcl.XXXXXX) || exit 1
     trap 'rm -f "$script"' EXIT
-    echo "$cmdline" > "$script"
+    cat << EOF > "$script"
+$cmdline
+EOF
 fi
 
 # Workaround for autoconf scripts attempting to use this command as a
