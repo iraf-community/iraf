@@ -11,6 +11,7 @@ jobs:
       CFLAGS: ${{ matrix.cflags }}
       LDFLAGS: ${{ matrix.ldflags }}
       USE_SYSTEM_BLAS: ${{ matrix.use_system_blas }}
+      USE_APPLE_ACCELERATE: ${{ matrix.use_apple_accelerate }}
 
     strategy:
       matrix:
@@ -30,14 +31,15 @@ jobs:
           - name: macOS 15 Sequoia arm64
             os: macos-15
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
-            ldflags: -L/opt/homebrew/opt/openblas/lib -Wl,-no_warn_duplicate_libraries
             use_system_blas: yes
+            use_apple_accelerate: yes
 
           - name: macOS 15 Sequoia x86_64
             os: macos-15-intel
             cflags: -O1 -g -Wall -Wno-logical-op-parentheses -arch x86_64
-            ldflags: -arch x86_64 -L/usr/local/opt/openblas/lib -Wl,-no_warn_duplicate_libraries
+            ldflags: -arch x86_64
             use_system_blas: yes
+            use_apple_accelerate: yes
 
     steps:
       - name: Checkout repository
@@ -52,14 +54,8 @@ jobs:
             sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
           else
             sudo apt-get update -y
-            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev libopenblas-dev
+            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev libopenblas64-dev
           fi
-
-      - name: Setup dependencies on macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install openblas
 
       - name: Build IRAF
         run: |
