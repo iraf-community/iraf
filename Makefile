@@ -42,6 +42,25 @@ export CFLAGS ?= -g -O2
 export XC_CFLAGS = $(CPPFLAGS) $(CFLAGS)
 export XC_LFLAGS = $(LDFLAGS)
 
+# Whether to use the system BLAS/LAPACK library.
+export USE_SYSTEM_BLAS ?= no
+ifeq ($(USE_SYSTEM_BLAS), yes)
+XC_CFLAGS += -DUSE_SYSTEM_BLAS
+ifeq ($(shell $(hlib)irafarch.sh -nbits), 64)
+XC_CFLAGS += -DIRAF_USE_ILP64
+BLAS_LIBS ?= -lopenblas64
+else
+BLAS_LIBS ?= -lopenblas
+endif
+ifeq ($(USE_APPLE_ACCELERATE), yes)
+XC_CFLAGS += -DUSE_APPLE_ACCELERATE
+BLAS_LIBS = -framework Accelerate
+else
+XC_CFLAGS += -DXC_LIBS="\"$(BLAS_LIBS)\""
+endif
+XC_LFLAGS += $(BLAS_LIBS)
+endif
+
 .PHONY: all sysgen clean test arch noao host novos core bindirs bin_links config inplace starttime
 
 all:: sysgen
