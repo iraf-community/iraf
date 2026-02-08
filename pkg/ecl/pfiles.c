@@ -30,7 +30,7 @@ extern	char *nullstr;
 extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
-long	filetime(char *fname, char *timecode);
+int	fileexists(char *fname);
 static	void mapname(char *in, char *out, int maxlen);
 
 
@@ -157,13 +157,11 @@ pfileload (
     register struct ltask *ltp		/* ltask descriptor */
 )
 {
-	static	long sys_ftime = 0;
 	register struct	task *tp;
 	register struct	param *pp;
 	char	usr_pfile[SZ_FNAME+1];
 	char	pkg_pfile[SZ_FNAME+1];
 	char	pkgdir[SZ_FNAME+1];
-	long	usr_ftime, pkg_ftime;
 	char	*ltname, *pkname;
 	struct	pfile *pfp;
 	char	*sval;
@@ -249,49 +247,26 @@ epset_:
 	    if ((pfp = pfileread (ltp, usr_pfile, 1)) != NULL)
 		return (pfp);
 
-	/* Get modification (creation) time of usr pfile and filename and
-	 * modification time of pkg pfile.  Look for a .par version of the
-	 * pkg pfile, and if not found, a .cl version (procedure script).
+	/* Get filename pkg pfile.  Look for a .par version of the pkg
+	 * pfile, and if not found, a .cl version (procedure script).
 	 */
-	usr_ftime = filetime (usr_pfile, "c");
 	c_fnldir (ltp->lt_pname, pkgdir, SZ_FNAME);
-
 	mkpfilename (pkg_pfile, pkgdir, pkname, ltname, ".par");
-	if ((pkg_ftime = filetime (pkg_pfile, "m")) <= 0) {
+	if (! fileexists (pkg_pfile)) {
 	    mkpfilename (pkg_pfile, pkgdir, pkname, ltname, ".cl");
-	    if ((pkg_ftime = filetime (pkg_pfile, "m")) <= 0)
+	    if (! fileexists (pkg_pfile))
 		cl_error (E_UERR, e_nopfile, ltname);
 	}
 
-	/* Get the date when the iraf system was last installed or updated.
-	 * This is indicated by the modify time of the special file hlib$utime,
-	 * which is touched during the system installation process.  The file
-	 * may actually be newer than the date of system update/install but
-	 * that is harmless.
-	 */
-	if (sys_ftime <= 0)
-	    sys_ftime = filetime ("hlib$utime", "m");
-
-	/* If the system was installed more recently than the package pfile
-	 * was modified, use the system modify time instead.
-	 */
-	if (sys_ftime > 0)
-	    if (sys_ftime > pkg_ftime)
-		pkg_ftime = sys_ftime;
-
-	if (usr_ftime > 0) {
-	    /* We have a user (UPARM) version of the pfile.  If it is newer
-	     * than the pkg pfile, use it, else read the pkg pfile and merge
-	     * the param values from the user pfile into the new pkg pfile.
+	if (fileexists (usr_pfile)) {
+	    /* We have a user (UPARM) version of the pfile. Read the
+	     * pkg pfile and merge the param values from the user
+	     * pfile into the new pkg pfile.
 	     */
-	    if (usr_ftime>pkg_ftime && (pfp=pfileread(ltp,usr_pfile,1)) != NULL)
-		ltp->lt_flags |= LT_UPFOK;
-	    else {
-		if ((pfp = pfileread (ltp, pkg_pfile, 0)) == NULL)
-		    cl_error (E_UERR, e_badpfile, pkg_pfile);
-		pfilemerge (pfp, usr_pfile);
-		strcpy (pfp->pf_pfilename, usr_pfile);
-	    }
+	    if ((pfp = pfileread (ltp, pkg_pfile, 0)) == NULL)
+	        cl_error (E_UERR, e_badpfile, pkg_pfile);
+	    pfilemerge (pfp, usr_pfile);
+	    strcpy (pfp->pf_pfilename, usr_pfile);
 	} else {
 	    /* No user pfile; read pkg pfile.
 	     */
@@ -800,29 +775,17 @@ mapname (char *in, char *out, int maxlen)
 }
 
 
-/* FILETIME -- Get the time of creation or of last modify of a file.  If the
- * file does not exist or cannot be accessed zero is returned.
+/* FILEEXISTS -- Check if the file exists. Returns YES (1)
+   if the file exists and can be accessed, and NO (0) it not.
  */
-long
-filetime (
-    char *fname,			/* file name		*/
-    char *timecode		/* "c" or "m"		*/
+int
+fileexists (
+    char *fname			/* file name		*/
 )
 {
 	struct	_finfo fi;
 
-	if (c_finfo (fname, &fi) == ERR)
-	    return (0L);
-	else {
-	    switch (*timecode) {
-	    case 'c':
-		return (fi.fi_ctime);
-	    case 'm':
-		return (fi.fi_mtime);
-	    default:
-		return (0L);
-	    }
-	}
+	return (c_finfo (fname, &fi) == OK);
 }
 
 
