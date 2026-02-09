@@ -301,6 +301,7 @@ pfilemerge (
 	XINT	save_topd;
 	struct	pfile *opf;
 	struct	ltask *ltp;
+	int	n_len=0, o_len=0; /* length of new and old parameter set */
 
 	if (cldebug)
 	    eprintf ("pfilemerge, task %s, pfile %s\n",
@@ -314,8 +315,10 @@ pfilemerge (
 	/* For each parameter in the old pfile, locate the corresponding
 	 * parameter in the new pfile and copy the value.  No other fields
 	 * of the parameter structure are copied.
+	 * Also, count the number of parameters in opf.
 	 */
-	for (n_pp = NULL, o_pp = opf->pf_pp;  o_pp;  o_pp = o_pp->p_np) {
+	for (n_pp = NULL, o_pp = opf->pf_pp;
+	     o_pp;  o_pp = o_pp->p_np, o_len++) {
 	    /* Circular search, starting at position of last parameter.
 	     */
 	    n_pp = ((l_pp = n_pp) != NULL) ? n_pp->p_np : npf->pf_pp;
@@ -329,12 +332,12 @@ pfilemerge (
 	    }
 
 	    /* If parameter not in new param set or the datatypes do not
-	     * match, skip this parameter.
+	     * match, skip this parameter and mark the param set as updated
 	     */
-	    if (n_pp == l_pp)
+	    if ((n_pp == l_pp) || (n_pp->p_type != o_pp->p_type)) {
+	        npf->pf_flags |= PF_UPDATE;
 		continue;
-	    if (n_pp->p_type != o_pp->p_type)
-		continue;
+	    }
 
 	    bastype = (n_pp->p_type & OT_BASIC);
 
@@ -381,7 +384,13 @@ pfilemerge (
 	    }
 	}
 
-	npf->pf_flags |= PF_UPDATE;
+	/* Count the number of parameters in the loaded par set. Mark
+	 * as updated if old and new param sets have a different number of
+	 * parameters.
+	 */
+	for (n_pp = npf->pf_pp;  n_pp;  n_pp = n_pp->p_np, n_len++) ;
+	if (n_len != o_len)
+	    npf->pf_flags |= PF_UPDATE;
 
 	/* Unlink scratch pfile descriptor and return dictionary space.
 	 */
