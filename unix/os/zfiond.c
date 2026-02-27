@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <pwd.h>
 
 #define	import_kernel
 #define	import_knames
@@ -24,7 +25,17 @@
 #define import_spp
 #include <iraf.h>
 
+
 #include "osproto.h"
+
+/* Flag is set in hlib$libc/kernel.h */
+#ifdef USE_SSL  
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
+SSL_CTX *ctx    = (SSL_CTX *) NULL;
+SSL *ssl        = (SSL *) NULL;
+#endif
 
 /*
  * ZFIOND -- This driver provides a FIO-compatible interface to network or
@@ -81,6 +92,8 @@
  * "sock" connection in "nonblock" mode and for read when there is no
  * pending connection or data.
  *
+ * Addiitionally, a "ssl" flag may be appended to indicate TLS/SSL transport
+ * is required, e.g. as when connecting to a HTTPS server on port 443.
  *
  * Client connections normally use mode READ_WRITE, although READ_ONLY and
  * WRITE_ONLY are permitted.  APPEND is the same as WRITE_ONLY.  A server
@@ -136,6 +149,7 @@
 #define	F_DEL1		00010
 #define	F_DEL2		00020
 #define	F_NODELAY	00040
+#define	F_SECURE	00100
 
 /* Network portal descriptor. */
 struct portal {
@@ -160,6 +174,7 @@ extern	int errno;
 static	int getstr(char **ipp, char *obuf, int maxch, int delim);
 
 static void nd_onsig (int sig);
+static int is_http_header (XCHAR *buf, XINT nbytes);
 
 
 /* ZOPNND -- Open a network device.
@@ -172,91 +187,90 @@ ZOPNND (
 )
 {
 	register int fd;
-	    register struct portal *np, *s_np = (struct portal *) NULL;
-	    unsigned short host_port = 0;
-	    in_addr_t host_addr = 0;
-	    char osfn[SZ_NAME*2];
-	    char flag[SZ_NAME];
-	    char *ip;
+	register struct portal *np, *s_np = (struct portal *) NULL;
+	unsigned short host_port = 0;
+	in_addr_t host_addr = 0;
+	char osfn[SZ_NAME*2];
+	char flag[SZ_NAME];
+	char *ip;
+	char port_str[SZ_NAME];
+	char host_str[SZ_NAME];
+	unsigned short port;
 
-	    /* Get network device descriptor. */
-	    if (!(np = (struct portal *) calloc (1, sizeof(struct portal)))) {
+	/* Get network device descriptor. */
+	if (!(np = (struct portal *) calloc (1, sizeof(struct portal)))) {
 		*chan = XERR;
 		return (XERR);
-	    }
+	}
+	/* Expand any %d fields in the network address to the UID. */
+	sprintf (osfn, (char *)pk_osfn, getuid(), getuid());
 
-	    /* Expand any %d fields in the network address to the UID. */
-	    sprintf (osfn, (char *)pk_osfn, getuid(), getuid());
-
-	    /* Parse the network filename to determine the domain type and
-	     * network address.
+	/* Parse the network filename to determine the domain type and
+	 * network address.
+	 */
+	if (strncmp (osfn, "inet:", 5) == 0) {
+	    /* Internet connection.
 	     */
-	    if (strncmp (osfn, "inet:", 5) == 0) {
-		/* Internet connection.
-		 */
-		char port_str[SZ_NAME];
-		char host_str[SZ_NAME];
-		unsigned short port;
-		struct servent *sv;
-		struct hostent *hp;
+	    struct servent *sv;
+	    struct hostent *hp;
 
-		/* Get port number.  This may be specified either as a service
-		 * name or as a decimal port number.
-		 */
-		ip = osfn + 5;
-		if (getstr (&ip, port_str, SZ_NAME, ':') <= 0)
-		    goto err;
-		if (isdigit (port_str[0])) {
-		    port = atoi (port_str);
-		    host_port = htons (port);
-		} else if ((sv = getservbyname(port_str,"tcp"))) {
-		    host_port = sv->s_port;
-		} else
-		    goto err;
+	    /* Get port number.  This may be specified either as a service
+	     * name or as a decimal port number.
+	     */
+	    ip = osfn + 5;
+	    if (getstr (&ip, port_str, SZ_NAME, ':') <= 0)
+	        goto err;
+	    if (isdigit (port_str[0])) {
+	        port = atoi (port_str);
+	        host_port = htons (port);
+	    } else if ((sv = getservbyname(port_str,"tcp"))) {
+	        host_port = sv->s_port;
+	    } else
+	        goto err;
 
-		/* Get host address.  This may be specified either has a host
-		 * name or as an Internet address in dot notation.  If no host
-		 * name is specified default to the local host.
-		 */
-		if (getstr (&ip, host_str, SZ_NAME, ':') <= 0)
-		    strcpy (host_str, "localhost");
-		if (isdigit (host_str[0])) {
-		    host_addr = inet_addr (host_str);
-		    if (host_addr == INADDR_NONE)
-			goto err;
-		} else if ((hp = gethostbyname(host_str))) {
- 		    memcpy (&host_addr, hp->h_addr_list[0], sizeof(host_addr));
-		} else
-		    goto err;
+	    /* Get host address.  This may be specified either has a host
+	     * name or as an Internet address in dot notation.  If no host
+	     * name is specified default to the local host.
+	     */
+	    if (getstr (&ip, host_str, SZ_NAME, ':') <= 0)
+	        strcpy (host_str, "localhost");
+	    if (isdigit (host_str[0])) {
+	        host_addr = inet_addr (host_str);
+	        if ((int)host_addr == -1)
+	    	goto err;
+	    } else if ((hp = gethostbyname(host_str))) {
+	        memcpy ((char *)&host_addr, hp->h_addr, sizeof(host_addr));
+	    } else
+	        goto err;
 
-		np->domain = INET;
+	    np->domain = INET;
 
-	    } else if (strncmp (osfn, "unix:", 5) == 0) {
-		/* Unix domain socket connection.
-		 */
-		ip = osfn + 5;
-		if (!getstr (&ip, np->path1, SZ_NAME, ':'))
-		    goto err;
-		np->domain = UNIX;
+	} else if (strncmp (osfn, "unix:", 5) == 0) {
+	    /* Unix domain socket connection.
+	     */
+	    ip = osfn + 5;
+	    if (!getstr (&ip, np->path1, SZ_NAME, ':'))
+	        goto err;
+	    np->domain = UNIX;
 
-	    } else if (strncmp (osfn, "sock:", 5) == 0) {
-		/* Open (accept) a client connection on an existing, open
-		 * server socket.
-		 */
-		char chan_str[SZ_NAME];
-		int channel;
+	} else if (strncmp (osfn, "sock:", 5) == 0) {
+	    /* Open (accept) a client connection on an existing, open
+	     * server socket.
+	     */
+	    char chan_str[SZ_NAME];
+	    int channel;
 
-		/* Get the channel of the server socket. */
-		ip = osfn + 5;
-		if (getstr (&ip, chan_str, SZ_NAME, ':') <= 0)
-		    goto err;
-		if (isdigit (chan_str[0]))
-		    channel = atoi (chan_str);
-		else
-		    goto err;
+	    /* Get the channel of the server socket. */
+	    ip = osfn + 5;
+	    if (getstr (&ip, chan_str, SZ_NAME, ':') <= 0)
+	        goto err;
+	    if (isdigit (chan_str[0]))
+	        channel = atoi (chan_str);
+	    else
+	        goto err;
 
-		/* Get the server portal descriptor. */
-		s_np = get_desc(channel);
+	    /* Get the server portal descriptor. */
+	    s_np = get_desc(channel);
 	    if (!(s_np->flags & F_SERVER))
 		goto err;
 
@@ -296,6 +310,9 @@ ZOPNND (
 		np->flags |= F_TEXT;
 	    if (strcmp (flag, "binary") == 0)
 		np->flags &= ~F_TEXT;
+	    if (strcmp (flag, "ssl") == 0)
+		//np->flags |= F_SECURE|F_TEXT;
+		np->flags |= F_SECURE;
 
 	    /* Check for nonblocking i/o or connections. */
 	    if (strcmp (flag, "nonblock") == 0)
@@ -347,15 +364,52 @@ ZOPNND (
 		sockaddr.sin_port = host_port;
 		memcpy (&sockaddr.sin_addr, &host_addr, sizeof(host_addr));
 
-		/* Connect to server. */
-		if (fd >= MAXOFILES || (connect (fd,
+		if (!(np->flags & F_NONBLOCK)) {
+		    /* Connect to server over simple connection. */
+		    if (fd >= MAXOFILES || (connect (fd,
 			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)) {
-		    close (fd);
-		    fd = ERR;
-		} else {
-		    np->datain = fd;
-		    np->dataout = fd;
-		}
+		            close (fd);
+		            fd = ERR;
+		    } else {
+		        np->datain = fd;
+		        np->dataout = fd;
+		    }
+
+#ifdef USE_SSL  
+		    if (np->flags & F_SECURE) {
+		        /* Connect to server over secure connection.
+                         * Initialize OpenSSL using the older v1.0 protocols for
+                         * compatability.
+                         */
+                        SSL_library_init ();
+                        SSL_load_error_strings ();
+                        OpenSSL_add_all_algorithms ();
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L /* OpenSSL >= 1.1.0 */
+                        ctx = SSL_CTX_new (TLS_client_method ());
+#else                                     /* Legacy for older openSSL */
+                        ctx = SSL_CTX_new (SSLv23_client_method ());
+#endif
+
+                        /* Create an SSL connection and attach it to the socket.
+                         * Be sure to set the SNI before attempting TLS connect.
+                         */
+                        ssl = SSL_new (ctx);
+                        SSL_set_tlsext_host_name(ssl, host_str);
+                        SSL_set_fd (ssl, fd);
+
+                        /* Perform the SSL/TLS handshake with the server.
+                         */
+                        if (SSL_connect (ssl) <= 0) {
+                            ERR_print_errors_fp (stderr);
+                            SSL_free (ssl);
+                            SSL_CTX_free (ctx);
+                            close (fd);
+		            fd = ERR;
+                        }
+                    }
+#endif
+                }
 
 	    } else if (np->domain == UNIX) {
 		/* Client side Unix domain socket connection. */
@@ -635,6 +689,12 @@ ZCLSND (XINT *fd, XINT *status)
 	if (np) {
 	    flags = np->flags;
 
+#ifdef USE_SSL  
+            if (flags & F_SECURE) {
+                SSL_free (ssl);
+                SSL_CTX_free (ctx);
+            }
+#endif
 	    if (np->datain > 0)
 		close (np->datain);
 	    if (np->dataout > 0 && np->dataout != np->datain)
@@ -697,26 +757,50 @@ ZARDND (
 	     timeout.tv_sec = 0;
 	     timeout.tv_usec = 0;
 	     if (select (MAXSEL, &readfds, NULL, NULL, &timeout))
-	         nbytes = read (np->datain, (char *)buf, maxread);
+#ifdef USE_SSL
+                 if (np->flags & F_SECURE) {
+	             nbytes = SSL_read (ssl, (char *)buf, maxread);
+                 } else {
+#endif
+	             nbytes = read (np->datain, (char *)buf, maxread);
+#ifdef USE_SSL
+                 }
+#endif
 	     else
 		 nbytes = XERR;
 	 } else {
-	    if (np->domain == FIFO && np->datain < MAXSEL) {
-	        select (MAXSEL, &readfds, NULL, NULL, NULL);
-	        nbytes = read (np->datain, (char *)buf, maxread);
-	    } else {
-	        nbytes = read (np->datain, (char *)buf, maxread);
-	    }
+#ifdef USE_SSL
+            if (np->flags & F_SECURE) {
+	        if (np->domain == FIFO && np->datain < MAXSEL) {
+	            select (MAXSEL, &readfds, NULL, NULL, NULL);
+	            nbytes = SSL_read (ssl, (char *)buf, maxread);
+	        } else {
+	            nbytes = SSL_read (ssl, (char *)buf, maxread);
+	        }
+            } else {
+#endif
+	        if (np->domain == FIFO && np->datain < MAXSEL) {
+	            select (MAXSEL, &readfds, NULL, NULL, NULL);
+	            nbytes = read (np->datain, (char *)buf, maxread);
+	        } else {
+	            nbytes = read (np->datain, (char *)buf, maxread);
+	        }
+#ifdef USE_SSL
+            }
+#endif
 	}
 
-	if ((n = nbytes) > 0 && (np->flags & F_TEXT)) {
-	    op = (XCHAR *) buf;
-	    op[n] = XEOS;
-	    for (ip = (char *)buf;  --n >= 0;  )
-		op[n] = ip[n];
-	    nbytes *= sizeof(XCHAR);
+        /* Convert text to SPP chars if necessary.
+         */
+        if ((n = nbytes) > 0) {
+            if (np->flags & F_TEXT) {
+	        op = (XCHAR *) buf;
+	        op[n] = XEOS;
+	        for (ip = (char *)buf;  --n >= 0;  )
+		    op[n] = ip[n];
+	        nbytes *= sizeof(XCHAR);
+            }
 	}
-
 	kfp->nbytes = nbytes;
 
 	return (nbytes);
@@ -738,11 +822,13 @@ ZAWRND (
 	register int fd = *chan;
 	register struct	fiodes *kfp = &zfd[fd];
 	register struct portal *np = get_desc (fd);
-	int nwritten, maxbytes, n;
-	char *text, *ip = (char *)buf;
-	char obuf[SZ_OBUF];
+	static int nwritten, maxbytes, n;
+	static char *ip;
+	static char *text;
+	static char obuf[SZ_OBUF];
 	void (*sigpipe)(int);
 
+	ip = (char *) buf;	/* initialize */
 
 	/* Enable a signal mask to catch SIGPIPE when the server has died. 
 	 */
@@ -755,7 +841,7 @@ ZAWRND (
 	    if (maxbytes)
 		n = min (maxbytes, n);
 
-	    if (np->flags & F_TEXT) {
+	    if (np->flags & F_TEXT || is_http_header (buf, *nbytes)) {
 		register XCHAR *ipp = (XCHAR *)ip;
 		register char *op = (char *)obuf;
 		register int nbytes = n / sizeof(XCHAR);
@@ -766,10 +852,22 @@ ZAWRND (
 
 		jmpset++;
 		if (setjmp (jmpbuf) == 0) {
-		    if ((n = write(np->dataout, text, n / sizeof(XCHAR))) < 0) {
-		        nwritten = ERR;
-		        break;
-	            }
+#ifdef USE_SSL
+                    if (np->flags & F_SECURE) {
+		        if ((n = SSL_write(ssl,text,n/sizeof(XCHAR))) <= 0) {
+                            ERR_print_errors_fp(stderr);
+		            nwritten = ERR;
+		            break;
+	                }
+                    } else {
+#endif
+		        if ((n=write(np->dataout,text,n/sizeof(XCHAR))) < 0) {
+		            nwritten = ERR;
+		            break;
+	                }
+#ifdef USE_SSL
+                    }
+#endif
 		} else {
 		    nwritten = ERR;
 		    break;
@@ -779,11 +877,23 @@ ZAWRND (
 
 	    } else {
 		text = ip;
-		if ((n = write (np->dataout, text, n)) < 0) {
-		    nwritten = ERR;
-		    break;
+#ifdef USE_SSL
+                if (np->flags & F_SECURE) {
+		    if ((n = SSL_write (ssl, text, n)) < 0) {
+                        ERR_print_errors_fp(stderr);
+		        nwritten = ERR;
+		        break;
+	            }
+                } else {
+#endif
+		    if ((n = write (np->dataout, text, n)) < 0) {
+		        nwritten = ERR;
+		        break;
+	            }
 	        }
+#ifdef USE_SSL
 	    }
+#endif
 	}
 
 	/* Restore the signal mask. */
@@ -896,4 +1006,23 @@ getstr (char **ipp, char *obuf, int maxch, int delim)
 	*ipp = ip;
 
 	return (op - obuf);
+}
+
+
+static int
+is_http_header (
+  XCHAR	*buf,			/* buffer containing data       */
+  XINT	nbytes		        /* nbytes of data               */
+)
+{
+	static char obuf[SZ_OBUF];
+	register XCHAR *ip = (XCHAR *)buf;
+	register char *op = (char *)obuf;
+	register int nb = nbytes / sizeof(XCHAR);
+        static char *http = "HTTP";
+
+	while (--nb >= 0)
+	    *op++ = *ip++;
+
+        return (strstr(obuf,http) || strstr((char *)buf,http) ? 1 : 0);
 }

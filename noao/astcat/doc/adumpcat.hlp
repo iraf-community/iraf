@@ -9,7 +9,7 @@ adumpcat catalog output ra dec size
 PARAMETERS
 .ls catalog
 The name of the catalog to be queried. Catalog names have the form
-catalog@site, e.g. "usno2@noao". The catalog address and query format are
+catalog@site, e.g. "usnoa2@noirlab". The catalog address and query format are
 stored in a record called catalog in  the catalog configuration file.
 .le
 .ls output
@@ -74,74 +74,40 @@ HTML markup as shown below.
 .nf
 cl> aclist *
 ...
-usno2@noao
+usnoa2@noirlab
 ...
 
-cl> aclist usno2@noao verb+
+cl> aclist usnoa2@noirlab verb+
 Scanning catalog database astcat$lib/catdb.dat
 Listing the supported catalogs
-usno2@noao
-nquery 4
-    ra 00:00:00.00 hours %0.2h
-    dec 00:00:00.0 degrees %0.1h
-    hwidth 5.0 minutes %0.1f
-    qsystem J2000.0 INDEF %s
+usnoa2@noirlab
+nquery 3
+    ra 0.0 degrees %0.6f
+    dec 0.0 degrees %0.6f
+    sr 0.05 degrees %0.1f
 nheader 1
     csystem J2000.0
-nfields 4
-    ra 1 0 d hours %12.3h
-    dec 2 0 d degrees %12.2h
-    mag1 3 0 r INDEF %4.1f
-    mag2 4 0 r INDEF %4.1f
+nfields 5
+    id 1  15  INDEF %15.15s
+    ra 17  12 degrees %12.5f
+    dec 30  11 degrees %11.5f
+    magb 72  6 INDEF %6.4f
+    magr 79  6 INDEF %6.4f
 
-cl> adumpcat usno2@noao2 m51.res 13:29:53.27 +47:11:48.4 10.0
+cl> adumpcat usnoa2@noirlab m51.res 13:29:53.27 47:11:48.4 10.0
 
 cl> page m51.res
 
-HTTP/1.1 200 OK^M
-Date: Mon, 27 Mar 2000 20:59:46 GMT^M
-Server: Apache/1.2.6^M
-Connection: close^M
-Content-Type: text/html^M
-^M
-
-<HTML><HEAD><TITLE>USNO search results</TITLE><BODY>
-<body bgcolor="#FFF9E6"><H1>USNO extraction (00:00:00.0 :00:00:00)</H1><P>
-Output columns are RA, DEC, Red mag. (E/F) , and Blue mag. (O/J)<P>
-<P><H2>Region number  Z= 825 RA(           0:       60000)  SPD(    32339999:
- 32460000)</H2><P>
- 00:00:01.443   -0:06:57.52  13.5  15.2<BR>
- 00:00:01.574   -0:05:33.26  16.1  18.0<BR>
- ...
- 00:00:39.326   -0:00:47.83  14.6  16.9<BR>
- 00:00:39.650   -0:02:02.64  18.8  19.4<BR>
-<P><H2>Region number  Z= 825 RA(   129539999:   129600000)  SPD(    32339999:
- 32460000)</H2><P>
- 23:59:20.351   -0:09:34.07  18.3  19.5<BR>
- 23:59:21.065   -0:01:18.44  17.4  19.1<BR>
-...
- 23:59:59.737   -0:03:54.75  10.5  12.4<BR>
- 23:59:59.930   -0:01:57.84  18.1  18.6<BR>
-<P><H2>Region number  Z= 900 RA(           0:       60000)  SPD(    32400000:
- 32460000)</H2><P>
- 00:00:00.503    0:06:07.90  18.0  19.5<BR>
- 00:00:02.568    0:05:07.93  18.3  19.4<BR>
-...
- 00:00:39.056    0:02:11.91  18.4  19.2<BR>
- 00:00:39.978    0:09:54.59  18.6  19.5<BR>
-<P><H2>Region number  Z= 900 RA(   129539999:   129600000)  SPD(    32400000:
-32460000)</H2><P>
- 23:59:21.198    0:07:43.82  18.7  19.3<BR>
- 23:59:21.364    0:08:05.09  18.4  19.6<BR>
-...
- 23:59:57.729    0:03:36.13  18.0  19.2<BR>
- 23:59:59.460    0:08:42.02  19.2  19.7<BR>
-<HR><P><P> Found       193 Entries<P><HR>
-<address>
-  Central Computer Services, National Optical Astronomy Observatories,
-  950 N. Cherry Ave., P.O. Box 26732,
-  Tucson, AZ  85726, Phone: 520-318-8000, FAX: 520-318-8360
-  <P>Updated: 04Aug1998</address></body></html>
++---------------+------------+-----------+---------+---------+---------+ ....
+| id            | raj2000    | dej2000   | htm9    | nest256 | ring256 | ....
++---------------+------------+-----------+---------+---------+---------+ ....
+| 1350-18887518 | 359.424648 | 45.007714 | 3375119 | 218966  | 115678  | ....
+| 1350-18888231 | 359.434314 | 45.006792 | 3375119 | 218966  | 115678  | ....
+| 1350-18885607 | 359.400464 | 45.022678 | 3375119 | 218966  | 115678  | ....
+| 1350-18886666 | 359.413564 | 45.018995 | 3375119 | 218966  | 115678  | ....
+       :              :             :         :         :        :        :
+       :              :             :         :         :        :        :
+       :              :             :         :         :        :        :
 .fi
 
 .ih
