@@ -73,10 +73,10 @@ begin
 	else
 	    unitscale = 1
 	for (ns=o1; ns<=o2; ns += 1) {
-	    printf ("%s[AWAV,%d][1,%d]\n", in, nver, ns) | scan (awav)
+	    printf ("%s[AWAV,%d][1,%d:%d]\n", in, nver, ns, ns) | scan (awav)
 	    listpix (awav) |& match ("Warn", stop+) | scan (w1, w1)
 	    w1 *= unitscale
-	    printf ("%s[AWAV,%d][%d,%d]\n", in, nver, ndisp, ns) | scan (awav)
+	    printf ("%s[AWAV,%d][%d,%d:%d]\n", in, nver, ndisp, ns, ns) | scan (awav)
 	    listpix (awav) |& match ("Warn", stop+) | scan (w2, w2)
 	    w2 *= unitscale
 	    dw = (w2 - w1) / (ndisp - 1)
@@ -94,8 +94,8 @@ begin
 	    theta=INDEF, order=order, wavelength=5007.49, dispersion=2.61,
 	    cf=590., cgmm=226., cblaze=4.53, ctheta=-11.97, corder=1,
 	    cwavelength=6700., cdispersion=70., rv=0., z=no,
-	    continuum=1000., temperature=5700., lines="", nrandom=k,
-	    peak=-0.5, sigma=0.5, seed=i, >& "dev$null")
+	    continuum=1000., temperature=5700., lines="", nrandom=0,
+	    peak=-0.5, sigma=0.5, seed=1, >& "dev$null")
 
 	# Update the dispersion to the input.
 	sapertures (out, apertures="", apidtable=out//".aptable",
