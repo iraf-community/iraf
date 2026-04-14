@@ -1,6 +1,9 @@
 #{ Package script task for the PROTO package.
 
 images
+noao
+artdata
+onedspec
 
 package proto
 
