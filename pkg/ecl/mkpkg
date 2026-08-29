@@ -39,13 +39,8 @@ relink:
 		<libc/iraf_stdio.h> config.h construct.h errs.h\
 		grammar.h mem.h opcodes.h operand.h param.h task.h
 link:
-	$set	LIBS = "-lc -lcur -lds -lstg"
-	$ifeq (MACH, macosx, macintel, macos64) then
-	  $set	LIBS2 = "-ledit"
-	$else
-	  $set	LIBS2 = "-lreadline"
-	$endif
-	$link	ecl.o globals.o opcodes.o libpkg.a $(LIBS) $(LIBS2)
+	$set	LIBS = "-lc -lcur -lds -lstg -ledit"
+	$link	ecl.o globals.o opcodes.o libpkg.a $(LIBS)
 	;
 
 install:
