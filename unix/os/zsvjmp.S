@@ -1,5 +1,5 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy
- * Inc. (comment block, alpha, i386)
+ * Inc. (comment block, alpha, i386, powerpc, m68k)
  * Copyright(c) 2008 Chisato Yamauchi (C-SODA/ISAS/JAXA) (amd64),
  * Copyright(c) 2014 David Kuehling <dvdkhlng AT posteo TOD de> (mips)
  * Copyright(c) 2014 John Long <codeblue@inbox.lv> (s390x)
@@ -33,8 +33,6 @@
 
 #if defined(__aarch64__)
 	.arch armv8-a
-#elif defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__)
-	.abiversion 2
 #elif defined (__arm__)
 	.arch	armv6
 #elif defined(__mips__) && (_MIPS_SIM == _ABIO32)
@@ -229,6 +227,45 @@ zsvjmp_:
 	la $t9, __sigsetjmp
 	j $t9
 	//  note: no delay slot, filled by GAS
+
+#elif defined(__powerpc__)
+
+	// R3 = buf, R4 = &status
+	li	11,0			// r11 = 0
+	stw	11,0(4)			// set *status to zero
+	stw	4,0(3)			// store &status in buf[0]
+	addi	3,3,4			// reference buf[1] for sigsetjmp
+	li	4,0			// zero signal mask for sigsetjmp
+#if defined(__APPLE__)
+	b	_sigsetjmp
+#else
+	b	__sigsetjmp
+#endif
+
+#elif defined(__m68k__)
+
+	move.l 8(%sp),%a1
+	clr.l (%a1)
+	move.l 4(%sp),%a0
+	move.l %a1,(%a0)+
+	clr.l 8(%sp)
+	move.l %a0,4(%sp)
+	jra __sigsetjmp
+
+#elif defined(__hppa__)
+
+	.PROC
+	.CALLINFO		// We don't need a frame
+	.ENTRY
+	copy %r25,%r28
+	stw %r0,0(%r25)		// *status = 0
+	ldo 4(%r26),%r26	// arg0++
+	ldi 0,%r25
+	b __sigsetjmp
+	stw %r28,-4(%r26)	// ((long **)buf)[0] = status;
+	nop			// will never be reached
+	.EXIT
+	.PROCEND
 
 #else
 #error "Unsupported CPU type"
