@@ -71,6 +71,11 @@ char *iraflibs[] = { "libex.a",
 		     NULL};
 
 char *fortlib[] = { "-lf2c",
+#ifdef USE_APPLE_ACCELERATE
+		    "-framework Accelerate",
+#elif defined(USE_SYSTEM_BLAS) && defined(XC_LIBS)
+		    XC_LIBS,
+#endif
 		    "-lm",
 #if (defined (__linux__) || defined (__gnu_hurd__))
 		    "-lpthread",
