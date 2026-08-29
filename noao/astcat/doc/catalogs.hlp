@@ -26,7 +26,7 @@ THE CATALOG CONFIGURATION FILE
 The catalog configuration file specifies the network address, the query
 format, and the output format for each supported catalog server. Each catalog
 server record is accessed via a record name of the form catalog@site,
-e.g. "usno2@noao". Adding support for a new catalog server requires adding
+e.g. "usnoa2@noirlab". Adding support for a new catalog server requires adding
 a new record to the configuration file. Responding to changes in the behavior
 of a supported catalog server requires editing the existing record.  In 
 either case no modification of the compiled code should be required.
@@ -221,7 +221,7 @@ Create a new configuration file by making a copy of the existing one.
 
 .ls [2]
 Determine a unique name for the catalog server. This name should be short and
-have the form catalog@site, e.g. "usno2@noao". Existing names can be
+have the form catalog@site, e.g. "usnoa2@noirlab". Existing names can be
 reviewed with the aclist task.
 .le
 

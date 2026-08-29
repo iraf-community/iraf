@@ -54,9 +54,9 @@ begin
 	print ("Initialize the ASTCAT package")
 	print ("")
 
-	astcat.catalogs = "usno2@noao"
+	astcat.catalogs = "usnoa2@noirlab"
 	astcat.catdb = "astcat$lib/catdb.dat"
-	astcat.imsurveys = "dss2@cadc"
+	astcat.imsurveys = "dss2red@cds"
 	astcat.imdb = "astcat$lib/imdb.dat"
 
 	# Unlearning tasks and psets. Ran into a problem with doing
@@ -141,7 +141,7 @@ begin
 	    print ("", >> tastlog)
 	    type (tcatfile, map_cc+, device="terminal", >> tastlog)
 	    print ("", >> tastlog)
-	    afiltcat (tcatfile, tcatfile, catalogs="filename@noao", standard+,
+	    afiltcat (tcatfile, tcatfile, catalogs="filename@noirlab", standard+,
 	        filter+, fsort="mag1", update-, verbose+, catdb=")_.catdb",
 		>> tastlog)
 	    print ("", >> tastlog)
@@ -248,7 +248,7 @@ begin
 	    if (access (tcatfile)) {
 		delete (tcatfile, verify-)
 	    }
-	    aimfind (timage, tcatfile, imfile="", catalogs="usno2@noao",
+	    aimfind (timage, tcatfile, imfile="", catalogs="usnoa2@noirlab",
 	        standard+, filter-, append-, update-, verbose+,
 		catdb=")_.catdb", >> tastlog)
 	}

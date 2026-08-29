@@ -3,7 +3,7 @@
 
 # Miscellaneous definitions mostly concerning buffer sizes.
 
-#define CQ_SZ_LINE    SZ_LINE           # The text storage size in chars
+define CQ_SZ_LINE    (8*SZ_LINE)        # The text storage size in chars
 define CQ_SZFNAME    (1+SZ_FNAME) / 2   # The file name storage size in structs
 define CQ_SZLINE     (1+SZ_LINE) / 2    # The text storage size in structs
 define CQ_ALLOC       20		# The record allocation block size

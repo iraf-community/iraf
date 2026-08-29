@@ -1,4 +1,4 @@
-export HSI_CF = $(XC_CFLAGS) -I$(hlib)libc -D_GNU_SOURCE
+export HSI_CF = $(XC_CFLAGS) -I$(hlib)libc -D_GNU_SOURCE -DUSE_SSL
 export HSI_XF = -x -Inolibc -/Wall -/O2
 export HSI_FF = -g -DBLD_KERNEL -O2
 export HSI_LF = $(LDFLAGS)

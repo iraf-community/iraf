@@ -9,6 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CFLAGS: ${{ matrix.cflags }}
+      CPPFLAGS: ${{ matrix.cppflags }}
       LDFLAGS: ${{ matrix.ldflags }}
 
     strategy:
@@ -27,6 +28,8 @@ jobs:
           - name: macOS 15 Sequoia arm64
             os: macos-15
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
+            cppflags: -I/opt/homebrew/opt/openssl@3/include
+            ldflags: -L/opt/homebrew/opt/openssl@3/lib
 
           - name: macOS 15 Sequoia x86_64
             os: macos-15-intel
@@ -43,10 +46,10 @@ jobs:
           if [ ${LDFLAGS} == '-m32' ] ; then
             sudo dpkg --add-architecture i386
             sudo apt-get update -y
-            sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
+            sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
           else
             sudo apt-get update -y
-            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
+            sudo apt-get install -y build-essential libcurl4-openssl-dev libssl-dev libexpat1-dev libreadline-dev zlib1g-dev
           fi
 
       - name: Build IRAF

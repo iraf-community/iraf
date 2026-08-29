@@ -129,7 +129,7 @@ begin
 	    do i = 1, cq_stati (cq, CQNRECS) {
 		if (cq_locaten (cq, i, Memc[catname], SZ_FNAME) != i)
 		    next
-		if (streq (Memc[catname], "filename@noao"))
+		if (streq (Memc[catname], "filename@noirlab"))
 		    next
                 call fprintf (strfd, "%s,")
                     call pargstr (Memc[catname])

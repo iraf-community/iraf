@@ -62,7 +62,7 @@ begin
 	call smark (sp)
 	call salloc (sexpr, FL_SZ_EXPR, TY_CHAR)
 	call salloc (sfield, FL_SZ_EXPR, TY_CHAR)
-	call salloc (record, SZ_LINE, TY_CHAR)
+	call salloc (record, CQ_MAX_LINE, TY_CHAR)
 	call salloc (raname, FL_SZ_EXPR, TY_CHAR)
 	call salloc (decname, FL_SZ_EXPR, TY_CHAR)
 
@@ -73,7 +73,7 @@ begin
 	    ct = mw_sctran (mwim, "world", "logical", 03B)
 
 	# Determine whether it is necessary to reformat.
-	call at_stats (at, FIELDS, Memc[record], SZ_LINE)
+	call at_stats (at, FIELDS, Memc[record], CQ_MAX_LINE)
 	if (streq (Memc[record], "f[*]") && outcoo == NULL) {
 
 	    # The field list is NULL.
@@ -155,7 +155,7 @@ begin
 	    if (flist == NULL) {
 
 		# Copy the record.
-	        nchars = cq_grecord (res, Memc[record], SZ_LINE,
+	        nchars = cq_grecord (res, Memc[record], CQ_MAX_LINE,
 		    Memi[sindex+i-1])
 
 	    } else {
@@ -201,7 +201,7 @@ begin
 		}
 
 		# Reformat the record.
-		nchars = at_mkrecord (flist, res, Memc[record], SZ_LINE,
+		nchars = at_mkrecord (flist, res, Memc[record], CQ_MAX_LINE,
 		    Memi[sindex+i-1], rafield, decfield, oraval, odecval,
 		    xpfield, ypfield, xpval, ypval) 
 
@@ -264,7 +264,7 @@ begin
 	call smark (sp)
 	call salloc (sexpr, FL_SZ_EXPR, TY_CHAR)
 	call salloc (sfield, FL_SZ_EXPR, TY_CHAR)
-	call salloc (record, SZ_LINE, TY_CHAR)
+	call salloc (record, CQ_MAX_LINE, TY_CHAR)
 	call salloc (raname, FL_SZ_EXPR, TY_CHAR)
 	call salloc (decname, FL_SZ_EXPR, TY_CHAR)
 
@@ -275,7 +275,7 @@ begin
 	    ct = mw_sctran (mwim, "world", "logical", 03B)
 
 	# Determine whether it is necessary to reformat.
-	call at_stats (at, FIELDS, Memc[record], SZ_LINE)
+	call at_stats (at, FIELDS, Memc[record], CQ_MAX_LINE)
 	if (streq (Memc[record], "f[*]") && outcoo == NULL) {
 
 	    # The field list is NULL.
@@ -357,7 +357,7 @@ begin
 	    if (flist == NULL) {
 
 		# Copy the record.
-	        nchars = cq_grecord (res, Memc[record], SZ_LINE,
+	        nchars = cq_grecord (res, Memc[record], CQ_MAX_LINE,
 		    Memi[sindex+i-1])
 
 	    } else {
@@ -400,7 +400,7 @@ begin
 		}
 
 		# Reformat the record.
-		nchars = at_mkrecord (flist, res, Memc[record], SZ_LINE,
+		nchars = at_mkrecord (flist, res, Memc[record], CQ_MAX_LINE,
 		    Memi[sindex+i-1], rafield, decfield, oraval, odecval,
 		    xpfield, ypfield, xpval, ypval) 
 
@@ -438,7 +438,7 @@ begin
 end
 
 
-# AT_FCATHDR -- Write the filtered catalog header
+# AT_WFCATHDR -- Write the filtered catalog header
 
 int procedure at_wfcathdr (fd, at, res, fl)
 
@@ -459,7 +459,7 @@ begin
         # Allocate working space.
         call smark (sp)
         call salloc (catname, SZ_FNAME, TY_CHAR)
-        call salloc (qpnames, SZ_LINE, TY_CHAR)
+        call salloc (qpnames, CQ_MAX_LINE, TY_CHAR)
         call salloc (qpvalues, SZ_LINE, TY_CHAR)
         call salloc (qpunits, SZ_LINE, TY_CHAR)
         call salloc (fname, CQ_SZ_QPNAME, TY_CHAR)
@@ -557,6 +557,28 @@ begin
 	call sfree (sp)
 
 	return (nlines)
+end
+
+
+int procedure at_field_list (fl, fnames)
+
+pointer	fl			#I the output field list descriptor
+char    fnames[SZ_LINE]         #O comma-delimited list of field names
+
+int     i, len, nfields
+int     strlen
+
+begin
+        nfields = FL_NFIELDS(fl)
+        do i = 0, nfields-1 {
+            call strcat (Memc[FL_FNAMES(fl)+i*(CQ_SZ_QPNAME+1)],
+                fnames, CQ_MAX_LINE)
+            call strcat (",", fnames, CQ_MAX_LINE)
+        }
+        len = strlen (fnames)
+        fnames[len] = EOS
+
+        return (nfields)
 end
 
 
@@ -1187,91 +1209,91 @@ int	gstrcpy(), strlen
 
 begin
 	call smark (sp)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	call salloc (str1, CQ_MAX_LINE, TY_CHAR)
+	call salloc (str2, CQ_MAX_LINE, TY_CHAR)
 
 	# Set the new output field expressions to INDEF and retrieve the
 	# original user fields value.
-	call at_stats (at, FIELDS, Memc[str1], SZ_LINE)
+	call at_stats (at, FIELDS, Memc[str1], CQ_MAX_LINE)
 	op1 = strlen (Memc[str1])
 	op2 = 0
 	do i = 1, nfields {
 	    if (i == 1) {
-		op2 = op2 + gstrcpy ("INDEF", Memc[str2+op2], SZ_LINE - op2) 
+		op2 = op2 + gstrcpy ("INDEF", Memc[str2+op2], CQ_MAX_LINE - op2) 
 	    } else {
-		op2 = op2 + gstrcpy (",", Memc[str2+op2], SZ_LINE - op2) 
-		op2 = op2 + gstrcpy ("INDEF", Memc[str2+op2], SZ_LINE - op2) 
+		op2 = op2 + gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2) 
+		op2 = op2 + gstrcpy ("INDEF", Memc[str2+op2], CQ_MAX_LINE - op2) 
 	    }
 	}
 
 	# Construct the new output fields string.
 	if (append) {
-	    op1 = op1 + gstrcpy (",", Memc[str1+op1], SZ_LINE - op1)
-	    op1 = op1 + gstrcpy (Memc[str2], Memc[str1+op1], SZ_LINE - op1)
+	    op1 = op1 + gstrcpy (",", Memc[str1+op1], CQ_MAX_LINE - op1)
+	    op1 = op1 + gstrcpy (Memc[str2], Memc[str1+op1], CQ_MAX_LINE - op1)
 	    call at_sets (at, FIELDS, Memc[str1])
 	} else {
-	    op2 = op 2+ gstrcpy (",", Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], SZ_LINE - op2)
+	    op2 = op 2+ gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], CQ_MAX_LINE - op2)
 	    call at_sets (at, FIELDS, Memc[str2])
 	}
 
 	# Construct the new field names.
-	call at_stats (at, FNAMES, Memc[str1], SZ_LINE)
+	call at_stats (at, FNAMES, Memc[str1], CQ_MAX_LINE)
 	op1 = strlen (Memc[str1])
 	op2 = 0
 	if (append) {
-	    op1 = op1 + gstrcpy (",", Memc[str1+op1], SZ_LINE - op1)
-	    op1 = op1 + gstrcpy (nfnames, Memc[str1+op1], SZ_LINE - op1)
+	    op1 = op1 + gstrcpy (",", Memc[str1+op1], CQ_MAX_LINE - op1)
+	    op1 = op1 + gstrcpy (nfnames, Memc[str1+op1], CQ_MAX_LINE - op1)
 	    call at_sets (at, FNAMES, Memc[str1])
 	} else {
-	    op2 = op2 + gstrcpy (nfnames, Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (",", Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], SZ_LINE - op2)
+	    op2 = op2 + gstrcpy (nfnames, Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], CQ_MAX_LINE - op2)
 	    call at_sets (at, FNAMES, Memc[str2])
 	}
 
 	# Construct the new field types.
-	call at_stats (at, FNTYPES, Memc[str1], SZ_LINE)
+	call at_stats (at, FNTYPES, Memc[str1], CQ_MAX_LINE)
 	op1 = strlen (Memc[str1])
 	op2 = 0
 	if (append) {
-	    op1 = op1 + gstrcpy (",", Memc[str1+op1], SZ_LINE - op1)
-	    op1 = op1 + gstrcpy (nftypes, Memc[str1+op1], SZ_LINE - op1)
+	    op1 = op1 + gstrcpy (",", Memc[str1+op1], CQ_MAX_LINE - op1)
+	    op1 = op1 + gstrcpy (nftypes, Memc[str1+op1], CQ_MAX_LINE - op1)
 	    call at_sets (at, FNTYPES, Memc[str1])
 	} else {
-	    op2 = op2 + gstrcpy (nftypes, Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (",", Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], SZ_LINE - op2)
+	    op2 = op2 + gstrcpy (nftypes, Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], CQ_MAX_LINE - op2)
 	    call at_sets (at, FNTYPES, Memc[str2])
 	}
 
 	# Construct the new field units.
-	call at_stats (at, FNUNITS, Memc[str1], SZ_LINE)
+	call at_stats (at, FNUNITS, Memc[str1], CQ_MAX_LINE)
 	op1 = strlen (Memc[str1])
 	op2 = 0
 	if (append) {
-	    op1 = op1 + gstrcpy (",", Memc[str1+op1], SZ_LINE - op1)
-	    op1 = op1 + gstrcpy (nfunits, Memc[str1+op1], SZ_LINE - op1)
+	    op1 = op1 + gstrcpy (",", Memc[str1+op1], CQ_MAX_LINE - op1)
+	    op1 = op1 + gstrcpy (nfunits, Memc[str1+op1], CQ_MAX_LINE - op1)
 	    call at_sets (at, FNUNITS, Memc[str1])
 	} else {
-	    op2 = op2 + gstrcpy (nfunits, Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (",", Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], SZ_LINE - op2)
+	    op2 = op2 + gstrcpy (nfunits, Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], CQ_MAX_LINE - op2)
 	    call at_sets (at, FNUNITS, Memc[str2])
 	}
 
 	# Construct the new field units.
-	call at_stats (at, FNFORMATS, Memc[str1], SZ_LINE)
+	call at_stats (at, FNFORMATS, Memc[str1], CQ_MAX_LINE)
 	op1 = strlen (Memc[str1])
 	op2 = 0
 	if (append) {
-	    op1 = op1 + gstrcpy (",", Memc[str1+op1], SZ_LINE - op1)
-	    op1 = op1 + gstrcpy (nformats, Memc[str1+op1], SZ_LINE - op1)
+	    op1 = op1 + gstrcpy (",", Memc[str1+op1], CQ_MAX_LINE - op1)
+	    op1 = op1 + gstrcpy (nformats, Memc[str1+op1], CQ_MAX_LINE - op1)
 	    call at_sets (at, FNFORMATS, Memc[str1])
 	} else {
-	    op2 = op2 + gstrcpy (nformats, Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (",", Memc[str2+op2], SZ_LINE - op2)
-	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], SZ_LINE - op2)
+	    op2 = op2 + gstrcpy (nformats, Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (",", Memc[str2+op2], CQ_MAX_LINE - op2)
+	    op2 = op2 + gstrcpy (Memc[str1], Memc[str2+op2], CQ_MAX_LINE - op2)
 	    call at_sets (at, FNFORMATS, Memc[str2])
 	}
 
@@ -1292,16 +1314,19 @@ pointer	res			#I results descriptor
 
 pointer	sp, fields
 pointer	fl
+pointer	fn
 int	nexpr, nfields
 int	at_flelist(), at_flranges()
 
 begin
 	# Get some working space.
 	call smark (sp)
-	call salloc (fields, SZ_LINE, TY_CHAR)
+	call salloc (fields, CQ_MAX_LINE, TY_CHAR)
+	call salloc (fn, CQ_MAX_LINE, TY_CHAR)
 
 	# Get the user field list.
-	call at_stats (at, FIELDS, Memc[fields], SZ_LINE)
+	call at_stats (at, FIELDS, Memc[fields], CQ_MAX_LINE)
+	call at_stats (at, FNAMES, Memc[fn], CQ_MAX_LINE)
 
 	# Allocate the field list descriptor.
 	call calloc (fl, FL_FLENGTH, TY_STRUCT)
@@ -1643,7 +1668,7 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (fnames, SZ_LINE, TY_CHAR)
+	call salloc (fnames, CQ_MAX_LINE, TY_CHAR)
 	call salloc (fntypes, SZ_LINE, TY_CHAR)
 	call salloc (fnunits, SZ_LINE, TY_CHAR)
 	call salloc (fnfmts, SZ_LINE, TY_CHAR)
@@ -1657,7 +1682,7 @@ begin
 
 	# Get the user parameters defining the names, types, units, and
 	# formats of the new fields.
-	call at_stats (at, FNAMES, Memc[fnames], SZ_LINE)
+	call at_stats (at, FNAMES, Memc[fnames], CQ_MAX_LINE)
 	call at_stats (at, FNTYPES, Memc[fntypes], SZ_LINE)
 	call at_stats (at, FNUNITS, Memc[fnunits], SZ_LINE)
 	call at_stats (at, FNFORMATS, Memc[fnfmts], SZ_LINE)
