@@ -482,9 +482,9 @@ observatory = "aries"
 	altitude = 1950.
 	timezone = -5.5
 
-# Submitted by Eduardo Fernández Lajús 10/28/05
+# Submitted by Eduardo FernÃ¡ndez LajÃºs 10/28/05
 observatory = "oalp"                                                            
-        name = 'Observatorio Astronómico de La Plata'                           
+        name = 'Observatorio AstronÃ³mico de La Plata'                           
         longitude = 57:55:56.2782                                               
         latitude = -34:54:24.3040                                               
         altitude = 20.                                                          
