@@ -1,12 +1,12 @@
-IRAF 2.18.1 Release Notes
+IRAF 2.18.2 Release Notes
 =========================
 
 :Authors: IRAF Community, NOIRLab
-:Date: April 10, 2025
+:Date: September 01, 2026
 
-The current IRAF version 2.18.1 is available from Github at
+The current IRAF version 2.18.2 is available from Github at
 
-https://github.com/iraf-community/iraf/releases/tag/v2.18.1
+https://github.com/iraf-community/iraf/releases/tag/v2.18.2
 
 Changes to the version 2.17.1 include:
 
@@ -53,6 +53,27 @@ Detailed list of changes
 ------------------------
 
 This list shows all pull requests that were merged since 2.17.1.
+
+Since 2.18.1
+~~~~~~~~~~~~
+
+- NOIRLAB: Add GHOST2MS task to the PROTO package (`#448 <https://github.com/iraf-community/iraf/pull/448>`__)
+- NOIRLAB: TBTABLES bugfixes found in Gemini testing when using FITS Binary Tables (`#450 <https://github.com/iraf-community/iraf/pull/450>`__)
+- NOIRLAB: Add a new 16K frame buffer (`#452 <https://github.com/iraf-community/iraf/pull/452>`__)
+- Use ssh by default to call remote kernel (with contributions from NOIRLAB) (`#453 <https://github.com/iraf-community/iraf/pull/453>`__)
+- Changes in unix/os/zfiotx (inspired by NOIRLAB) (`#454 <https://github.com/iraf-community/iraf/pull/454>`__)
+- NOIRLAB: Bug fixes to PLIO mask handling causing errors in IMEDIT (`#455 <https://github.com/iraf-community/iraf/pull/455>`__)
+- NOIRLAB: Fix invalid use of errstr (`#456 <https://github.com/iraf-community/iraf/pull/456>`__)
+- Fix argument type of a_off in CHRPAK (`#457 <https://github.com/iraf-community/iraf/pull/457>`__)
+- NOIRLAB: minor bugfixes and cleanups (`#459 <https://github.com/iraf-community/iraf/pull/459>`__)
+- Allow irafcl/ecl/cl shell script to execute a single command line (`#461 <https://github.com/iraf-community/iraf/pull/461>`__)
+- Remove duplicate main.x file (`#462 <https://github.com/iraf-community/iraf/pull/462>`__)
+- Remove helpdbfrom sources (`#463 <https://github.com/iraf-community/iraf/pull/463>`__)
+- Unconditionally merge user and package parfiles (`#466 <https://github.com/iraf-community/iraf/pull/466>`__)
+- NOIRLAB: minor bugfix in proto package (`#468 <https://github.com/iraf-community/iraf/pull/468>`__)
+- Replace remaining index() with strchr() in mkpkg (`#470 <https://github.com/iraf-community/iraf/pull/470>`__)
+- Obey  $TMPDIR in f77.sh (`#471 <https://github.com/iraf-community/iraf/pull/471>`__)
+
 
 Since 2.18
 ~~~~~~~~~~
