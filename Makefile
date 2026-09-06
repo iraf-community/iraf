@@ -184,8 +184,8 @@ inplace: config binary_links
 # *Warning*: Calling this directly will remove all source files from
 #            your source directory.
 strip: noao/bin/x_quad.e
-	cd $(DESTDIR)$(iraf) && $(hostid)/bin/rmfiles.e -f $(hostid)/hlib/strip.iraf
-	cd $(DESTDIR)$(iraf)/noao && ../$(hostid)/bin/rmfiles.e -f lib/strip.noao
+	cd $(DESTDIR)$(iraf) && $(hostid)/bin/rmfiles.e -p -f $(hostid)/hlib/strip.iraf
+	cd $(DESTDIR)$(iraf)/noao && ../$(hostid)/bin/rmfiles.e -p -f lib/strip.noao
 
 prefix ?= /usr/local
 
