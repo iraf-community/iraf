@@ -74,6 +74,7 @@ Since 2.18.1
 - Replace remaining index() with strchr() in mkpkg (`#470 <https://github.com/iraf-community/iraf/pull/470>`__)
 - Obey  $TMPDIR in f77.sh (`#471 <https://github.com/iraf-community/iraf/pull/471>`__)
 - Fix file permissions and encoding (`#475 <https://github.com/iraf-community/iraf/pull/475>`__)
+- Recursively remove empty directories with rmfiles -p option (`#476 <https://github.com/iraf-community/iraf/pull/476>`__)
 
 
 Since 2.18

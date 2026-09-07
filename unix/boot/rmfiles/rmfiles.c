@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#define	NOKNET
 #define import_spp
 #define import_knames
 #include <iraf.h>
@@ -20,15 +21,17 @@
 int	verbose;		/* print names of deleted files		*/
 int	execute;		/* permission to delete files		*/
 int	debug;			/* print debugging info			*/
+int	prune;			/* delete empty directories		*/
 
 extern	char *vfn2osfn(char *, int);
 
 
 extern int  ZZSTRT (void);
 extern int  ZZSTOP (void);
+extern int  ZFRMDR (PKCHAR *, XINT *);
 
 static void rmfiles (char *prog, int oneliner);
-static void stripdir (char *dir, char *path, char *extnlist[], int mode);
+static int  stripdir (char *dir, char *path, char *extnlist[], int mode);
 static int  got_one (char *fname, char *extnlist[]);
 
 
@@ -36,12 +39,13 @@ static int  got_one (char *fname, char *extnlist[]);
  * RMFILES -- Delete all files with the listed extensions in the listed
  * directory trees.
  *
- *	rmfiles [-dnv] [-f progfile] dir action extns
+ *	rmfiles [-dnvp] [-f progfile] dir action extns
  *
  *		-d		debug
  *		-n		no execute; do not delete files
  *		-v		print names of files as they are deleted
  *		-f progfile	name of file containing program script
+ *		-p		remove empty directories
  *		dir		root directory of tree to be pruned
  *		action		one of "-all", "-allbut", "-only"
  *		extns		extensions of files to be deleted
@@ -63,6 +67,7 @@ int main (int argc, char *argv[])
 	verbose = 0;
 	execute = 1;
 	debug   = 0;
+	prune   = 0;
 
 	for (argno=1;  (argp = argv[argno]) != NULL;  argno++)
 	    if (*argp == '-') {
@@ -70,6 +75,9 @@ int main (int argc, char *argv[])
 		    switch (*argp) {
 		    case 'd':
 			debug++;
+			break;
+		    case 'p':			/* prune empty directories	*/
+			prune = 1;
 			break;
 		    case 'n':			/* no execute		*/
 			execute = 0;
@@ -110,7 +118,7 @@ int main (int argc, char *argv[])
 	ZZSTOP();
 	exit (OSOK);
 help_:
- 	fprintf (stderr, "rmfiles [-dnv] [-p prog] [progfile]\n");
+	fprintf (stderr, "rmfiles [-dnvp] [-f progfile] [prog]\n");
 	ZZSTOP();
 	exit (OSOK+1);
 
@@ -268,7 +276,7 @@ rmfiles (
  * on the mode, which can be ALL, ALLBUT, or ONLY.  We chdir to each directory
  * to minimize path searches.
  */
-static void
+static int
 stripdir (
     char  *dir, 		/* start with this directory		*/
     char  *path, 		/* pathname of current directory	*/
@@ -279,13 +287,14 @@ stripdir (
 	char	oldpath[SZ_PATHNAME+1];
 	char	newpath[SZ_PATHNAME+1];
 	char	fname[SZ_PATHNAME+1];
-	int	deleteit, dp;
+	int	deleteit, dp, empty;
+	XINT	status;
 
 	/* Hardwire an exclusion for a .git directory so we don't
 	 * unintentially delete the repo files.
 	 */
 	if (strncmp (".git", dir, 4) == 0)
-	    return;
+	    return (NO);
 
 	if (debug) {
 	    fprintf (stderr, "stripdir %s%s\n", path, dir);
@@ -295,7 +304,7 @@ stripdir (
 	if ((dp = os_diropen (dir)) == ERR) {
 	    fprintf (stderr, "cannot open subdirectory `%s'\n", dir);
 	    fflush (stderr);
-	    return;
+	    return (NO);
 	}
 
 	os_fpathname ("", oldpath, SZ_PATHNAME);
@@ -308,14 +317,16 @@ stripdir (
 		os_dirclose (dp);
 		fprintf (stderr, "cannot change directory to `%s'\n", newpath);
 		fflush (stderr);
-		return;
+		return (NO);
 	    }
 
 	/* Scan through the directory.
 	 */
+	empty = YES;
 	while (os_gfdir (dp, fname, SZ_PATHNAME) > 0) {
 	    if (os_filetype (fname) == DIRECTORY_FILE) {
-		stripdir (fname, newpath, extnlist, mode);
+		if (stripdir (fname, newpath, extnlist, mode) == NO)
+		    empty = NO;
 		continue;
 	    } else if (mode == ALL) {
 		deleteit = YES;
@@ -325,8 +336,10 @@ stripdir (
 		    deleteit = !deleteit;
 	    }
 
-	    if (!deleteit)
+	    if (!deleteit) {
+		empty = NO;
 		continue;
+	    }
 		
 	    if (verbose) {
 		printf ("%s%s\n", newpath, fname);
@@ -337,6 +350,7 @@ stripdir (
 		if (os_delete (fname) == ERR) {
 		    fprintf (stderr, "cannot delete `%s'\n", fname);
 		    fflush (stderr);
+		    empty = NO;
 		}
 	    }
 	}
@@ -351,6 +365,25 @@ stripdir (
 	    }
 
 	os_dirclose (dp);
+
+	/* Remove the directory if it is empty and pruning was requested.
+	 */
+	if (prune && empty && strcmp (dir, ".") != 0) {
+		if (verbose) {
+		    printf ("%s\n", newpath);
+		    fflush (stdout);
+		}
+
+		if (execute) {
+		    if (ZFRMDR ((PKCHAR *)dir, &status) == XERR) {
+			fprintf (stderr, "cannot delete `%s`\n", newpath);
+			fflush (stderr);
+			return (NO);
+		    }
+		}
+	}
+
+	return (empty);
 }
 
 
