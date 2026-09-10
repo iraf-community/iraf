@@ -123,14 +123,12 @@ plot            # graphics tasks
 dataio          # data conversions, import export
 lists           # list processing
 
-# The if(deftask...) is needed for V2.9 compatibility.
-if (deftask ("proto"))
-    proto       # prototype or ad hoc tasks
-
 tv              # image display
 utilities       # miscellaneous utilities
-if (deftask ("noao"))
+if (deftask ("noao")) {
     noao        # optical astronomy packages
+    proto       # prototype or ad hoc tasks
+}
 ;
 prcache directory
 cache   directory page type help

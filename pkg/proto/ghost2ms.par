@@ -1,0 +1,7 @@
+input,f,h,"",,,"Input GHOST file from DRAGONS"
+output,s,ql,"",,,"Output base name"
+order1,i,ql,1,,,"Starting order to extract"
+order2,i,ql,33,,,"Ending order to extract"
+version,i,ql,1,,,"Version to extract"
+clobber,b,ql,no,,,"Clobber existing output?"
+verbose,b,ql,yes,,,"Verbose output?"
