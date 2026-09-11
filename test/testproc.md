@@ -38,8 +38,6 @@ cl> package
     nttools
     utilities
     proto
-    onedspec
-    artdata
     noao
     imutil
     immatch
