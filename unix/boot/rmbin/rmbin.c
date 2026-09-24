@@ -51,7 +51,7 @@ main (int argc, char *argv[])
 {
 	char	path[SZ_PATHNAME+1];
 	char	*argp;
-	int	argno, i;
+	int	argno, i, ex;
 
 	ZZSTRT();
 
@@ -66,6 +66,16 @@ main (int argc, char *argv[])
 	recurse = 0;
 	verbose = 0;
 	execute = 1;
+
+        ex = 0;
+	excl[ex++] = ".ppt";     /* special files we always exclude */
+	excl[ex++] = ".doc";
+	excl[ex++] = ".docx";
+	excl[ex++] = ".txt";
+	excl[ex++] = ".fits";
+	excl[ex++] = ".fz";
+	excl[ex++] = ".tar";
+	excl[ex++] = ".tgz";
 
 	for (argno=1;  (argp = argv[argno]) != NULL;  argno++)
 	    if (*argp == '-') {
@@ -88,11 +98,10 @@ main (int argc, char *argv[])
 			break;
 
 		    case 'e':			/* exclude listed files	*/
-			i = 0;
 			argno++;
 			while (argv[argno] != NULL && *(argv[argno]) == '.' &&
 			    *(argv[argno]+1) != EOS)
-			    excl[i++] = argv[argno++];
+			    excl[ex++] = argv[argno++];
 			--argno;
 			break;
 
