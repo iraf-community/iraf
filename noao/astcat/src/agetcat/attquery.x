@@ -22,7 +22,7 @@ pointer	res, ccoo, mw
 int	i, fd, strfd, stat, units
 pointer	cq_fquery()
 int	cq_rstati(), at_rcregion(), open(), strlen(), cq_hinfo(), sk_decwcs()
-int	stropen(), getline(), strdic(), cq_gvald(), cq_grecord(), sk_stati()
+int	stropen(), getlline(), strdic(), cq_gvald(), cq_grecord(), sk_stati()
 bool	streq()
 
 begin
@@ -51,7 +51,7 @@ begin
 	call salloc (raname, CQ_SZ_FNAME, TY_CHAR)
 	call salloc (decname, CQ_SZ_FNAME, TY_CHAR)
 	call salloc (funits, CQ_SZ_FUNITS, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (line, CQ_MAX_LINE, TY_CHAR)
 
 	# Open the catalog coordinate system.
         if (cq_hinfo (cres, "csystem", Memc[csystem], SZ_FNAME) <= 0)
@@ -76,7 +76,7 @@ begin
 	# Write the file header to the temporary results file.
 	strfd = stropen (hdrtext, strlen(hdrtext), READ_ONLY) 
 	call fprintf (fd, "# BEGIN CATALOG HEADER\n")
-	while (getline (strfd, Memc[line]) != EOF) {
+	while (getlline (strfd, Memc[line], CQ_MAX_LINE) != EOF) {
 	    call fprintf (fd, "# %s")
 		call pargstr (Memc[line])
 	}
@@ -164,7 +164,7 @@ begin
                 next
 
 	    # Record has been selected.
-	    if (cq_grecord (cres, Memc[line], SZ_LINE, i) <= 0)
+	    if (cq_grecord (cres, Memc[line], CQ_MAX_LINE, i) <= 0)
 		next
 	    call putline (fd, Memc[line])
 	}

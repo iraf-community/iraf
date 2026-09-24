@@ -1,4 +1,4 @@
-record,s,a,"usno2@noao",,,"Database record name"
+record,s,a,"usnoa2@noirlab",,,"Database record name"
 ra,s,a,"12:12:12.00",,,"Ra in hours"
 dec,s,a,"+12:12:12.0",,,"Dec in degrees"
 width,r,a,10.0,,,Width in minutes

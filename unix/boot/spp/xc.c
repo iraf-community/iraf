@@ -76,6 +76,10 @@ char *fortlib[] = { "-lf2c",
 		    "-lpthread",
 #endif
 		    "-lz",
+#ifdef USE_SSL
+		    "-lssl",
+		    "-lcrypto",
+#endif	    
 		    NULL};
 
 char *opt_flags[] = { "-O2",

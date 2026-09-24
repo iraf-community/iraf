@@ -8,7 +8,7 @@ acatpars,pset,h,"",,,"The default catalog format parameters"
 
 # The astrometric catalog parameters.
 
-catalogs,s,h,filename@noao,,,"The input astrometric catalog"
+catalogs,s,h,filename@noirlab,,,"The input astrometric catalog"
 
 # The output catalog filtering parameters.
 

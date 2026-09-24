@@ -22,7 +22,7 @@ THE CATALOG CONFIGURATION FILE
 A record in the catalog configuration file specifies the network address,
 the query format, and the output format of each supported catalog server.
 Catalog server records names have the form "catalog@site",
-e.g. "usno2@noao". Adding support for a new catalog server or responding
+e.g. "usnoa2@noirlab". Adding support for a new catalog server or responding
 to changes in the behavior of an already supported server requires either adding
 a new record to the configuration file or changing an existing record in
 the configuration file. It does not require changing the catalog
@@ -30,7 +30,7 @@ access code.
 
 The catalog server network address tells the catalog access code where
 and how to connect to the network. Each network address has the syntax
-"domain:port:address:flags" e.g. "inet:80:www.noao.edu:text".
+"domain:port:address:flags" e.g. "inet:80:www.noirlab.edu:text".
 
 The query format specifies the form of the query server string, and the
 names, default values, units, and format of the query parameters. A set of
@@ -60,8 +60,8 @@ as blocked text.
 .nf
 Example 1: Accessing the catalog as simple text.
 
-begin susno2@noao
-address inet:80:www.noao.edu:text
+begin susno2@noirlab
+address inet:80:www.noirlab.edu:text
 query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
 \n\n
 nquery 4
@@ -87,8 +87,8 @@ nfields 4
 .nf
 Example 2: Accessing the catalog as blocked text.
 
-begin busno2@noao
-address inet:80:www.noao.edu:text
+begin busno2@noirlab
+address inet:80:www.noirlab.edu:text
 query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
 \n\n
 nquery   4
@@ -127,7 +127,7 @@ the catalog.
 The \fIaddress\fR keyword  "domain", "port", and "flags" fields are almost
 always "inet", "80", and "text" respectively, so in most cases the only
 address keyword field that has to be filled in is the address
-field "www.noao.edu" in this case.
+field "www.noirlab.edu" in this case.
 
 The \fIquery\fR keyword defines the query command whose form is server
 dependent. The query parameter values are encoded via the %-s formatting

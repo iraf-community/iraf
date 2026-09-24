@@ -8,7 +8,7 @@ double	dval1
 real	width
 pointer	cq, sp, reclist, res
 int	i, ip, catno, nqpars, parno, ftype, nfields
-char	database[SZ_FNAME], record[SZ_LINE], ra[SZ_FNAME], dec[SZ_FNAME]
+char	database[SZ_FNAME], record[CQ_MAX_LINE], ra[SZ_FNAME], dec[SZ_FNAME]
 char	str[SZ_FNAME], catalog[SZ_LINE], imname[SZ_LINE]
 char	qpname[CQ_SZ_QPNAME], qkname[CQ_SZ_QPNAME], qpvalue[CQ_SZ_QPVALUE]
 char	qpunits[CQ_SZ_QPUNITS], qpformats[CQ_SZ_QPFMTS]
@@ -22,7 +22,7 @@ bool	streq()
 
 begin
 	# Get the database and record names.
-	call clgstr ("record", record, SZ_LINE)
+	call clgstr ("record", record, CQ_MAX_LINE)
 	call clgstr ("image", imname, SZ_LINE)
 	call clgstr ("ra", ra, SZ_FNAME)
 	call clgstr ("dec", dec, SZ_FNAME)

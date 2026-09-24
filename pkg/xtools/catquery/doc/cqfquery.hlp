@@ -34,8 +34,8 @@ a catalog query. The calling program must supply the catalog format
 description. A sample catalog file and catalog description are shown below.
 .ih
 NOTES
-Cq_setcat with the catalog name set to the reserved record name "filename@noao"
-must be called before any catalog file query is made.
+Cq_setcat with the catalog name set to the reserved record name
+"filename@noirlab" must be called before any catalog file query is made.
 
 A sample catalog file is shown below.
 

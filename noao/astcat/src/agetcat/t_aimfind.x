@@ -137,7 +137,7 @@ begin
 
 	    # Set the catalog.
 	    if (access (Memc[catalog], READ_ONLY, TEXT_FILE) == YES) {
-		if (cq_setcat (cq, "filename@noao") <= 0) {
+		if (cq_setcat (cq, "filename@noirlab") <= 0) {
 		    if (verbose) {
 		        call printf ("Skipping catalog %s\n")
 		            call pargstr (Memc[catalog])
