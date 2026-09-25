@@ -1,9 +1,12 @@
 #{ Package script task for the PROTO package.
 
 images
-noao
-artdata
-onedspec
+if (deftask ("noao")) {
+   noao
+   artdata
+   onedspec
+}
+;
 
 package proto
 
@@ -29,7 +32,8 @@ task	binfil,
 	text2mask 	= proto$x_proto.e
 
 task	ringavg 	= proto$ringavg.cl
-task	ghost2ms	= proto$ghost2ms.cl
+if (deftask ("noao"))
+    task	ghost2ms	= proto$ghost2ms.cl
 
 set	color		= "proto$color/"
 set	vol		= "proto$vol/"
