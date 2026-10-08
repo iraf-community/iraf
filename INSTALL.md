@@ -2,16 +2,15 @@
 
 ## System Requirements and Dependencies
 
-The distributed binaries require the readline or libedit, and zlib
-libraries to be installed.
+The distributed binaries require the libedit and zlib libraries to be installed.
 
 On Debian and its derivatives (Ubuntu, Mint, Devuan, Raspbian etc.):
 
-	$ sudo apt install gcc make bison flex zlib1g-dev libreadline-dev
+	$ sudo apt install gcc make bison flex zlib1g-dev libedit-dev
 
 On Fedora and its derivatives (Redhat, Scientific Linux etc.)
 
-	$ sudo dnf install gcc make perl flex bison zlib-devel readline-devel
+	$ sudo dnf install gcc make perl flex bison zlib-devel libedit-devel
 
 On macOS, you need to have the XCode tools installed. If you
 haven't, you can install them with:
