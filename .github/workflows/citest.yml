@@ -10,6 +10,8 @@ jobs:
     env:
       CFLAGS: ${{ matrix.cflags }}
       LDFLAGS: ${{ matrix.ldflags }}
+      USE_SYSTEM_BLAS: ${{ matrix.use_system_blas }}
+      USE_APPLE_ACCELERATE: ${{ matrix.use_apple_accelerate }}
 
     strategy:
       matrix:
@@ -17,21 +19,27 @@ jobs:
           - name: Ubuntu latest x86_64
             os: ubuntu-latest
             cflags: -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
+            use_system_blas: yes
 
           - name: Ubuntu 22.04 Focal i386
             os: ubuntu-22.04
             irafarch: linux
             ldflags: -m32
             cflags: -m32 -O2 -g -Wall -Wno-stringop-truncation -Wno-unused-result -Wno-format-overflow -Wno-parentheses
+            use_system_blas: no
 
           - name: macOS 15 Sequoia arm64
             os: macos-15
             cflags: -O2 -g -Wall -Wno-logical-op-parentheses
+            use_system_blas: yes
+            use_apple_accelerate: yes
 
           - name: macOS 15 Sequoia x86_64
             os: macos-15-intel
             cflags: -O1 -g -Wall -Wno-logical-op-parentheses -arch x86_64
             ldflags: -arch x86_64
+            use_system_blas: yes
+            use_apple_accelerate: yes
 
     steps:
       - name: Checkout repository
@@ -46,7 +54,7 @@ jobs:
             sudo apt-get install -y gcc-multilib libcurl4-openssl-dev:i386 libexpat1-dev:i386 libreadline-dev:i386 zlib1g-dev:i386
           else
             sudo apt-get update -y
-            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev
+            sudo apt-get install -y build-essential libcurl4-openssl-dev libexpat1-dev libreadline-dev zlib1g-dev libopenblas64-dev
           fi
 
       - name: Build IRAF

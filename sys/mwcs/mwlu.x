@@ -27,10 +27,11 @@ double	a[ndim,ndim]		#U matrix to be inverted; inverted matrix
 int	ix[ndim]		#O vector describing row permutation
 int	ndim			#I dimension of square matrix
 
+double	d
 int	status
 
 begin
-	call dgetrf(ndim, ndim, a, ndim, ix, status)
+	call ludcmd (a, ndim, ndim, ix, d, status)
 end
 
 
@@ -47,8 +48,6 @@ int	ix[ndim]		#I permutation vector for A
 double	b[ndim]			#U rhs vector; solution vector
 int	ndim			#I dimension of system
 
-int	status
-
 begin
-	call dgetrs('N', ndim, 1, a, ndim, ix, b, ndim, status)
+	call lubksd (a, ndim, ndim, ix, b)
 end
