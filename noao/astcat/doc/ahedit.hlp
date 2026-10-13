@@ -135,7 +135,7 @@ cl> ahedit @imlist dss1@cadc hupdate- wcsedit+ hdredit-
 2. Repeat the previous example but actually do the edits.
 
 .nf
-cl> ahedit @imlist dss2@cadc hupdate+ wcsedit+ hdredit-
+cl> ahedit @imlist dss2red@cds hupdate+ wcsedit+ hdredit-
 .fi
 
 3. Repeat the previous example but get the current WCS stats from the user

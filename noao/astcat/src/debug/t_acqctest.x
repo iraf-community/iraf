@@ -11,7 +11,7 @@ pointer	cq, sp, reclist, res
 int	i, ip, catno, nqpars, parno, nres, recptr, nchars, foffset, fsize
 int	ftype, nfields, ival1, ival2
 short	sval1, sval2
-char	database[SZ_FNAME], record[SZ_LINE], ra[SZ_FNAME], dec[SZ_FNAME]
+char	database[SZ_FNAME], record[CQ_MAX_LINE], ra[SZ_FNAME], dec[SZ_FNAME]
 char	str[SZ_FNAME], catalog[SZ_LINE]
 char	qpname[CQ_SZ_QPNAME], qpvalue[CQ_SZ_QPVALUE], qpunits[CQ_SZ_QPUNITS]
 char	qpformats[CQ_SZ_QPFMTS]
@@ -27,7 +27,7 @@ bool	streq()
 
 begin
 	# Get the database and record names.
-	call clgstr ("record", record, SZ_LINE)
+	call clgstr ("record", record, CQ_MAX_LINE)
 	call clgstr ("ra", ra, SZ_FNAME)
 	call clgstr ("dec", dec, SZ_FNAME)
 	width = clgetr ("width")
@@ -227,7 +227,7 @@ begin
 	# Loop through and print the records.
 	recptr = 0
 	while (recptr < nres) {
-	    nchars = cq_gnrecord (res, record, SZ_LINE, recptr)
+	    nchars = cq_gnrecord (res, record, CQ_MAX_LINE, recptr)
 	    if (nchars == EOF)
 		break
 	    call printf ("record %4d %4d %s")
@@ -238,21 +238,21 @@ begin
 
 	# Find and print records at random.
 	record[1] = EOS
-	nchars = cq_grecord (res, record, SZ_LINE, 1)
+	nchars = cq_grecord (res, record, CQ_MAX_LINE, 1)
 	call printf ("\nrecord %4d %4d %s")
 	    call pargi (1)
 	    call pargi (nchars)
 	    call pargstr (record)
 
 	record[1] = EOS
-	nchars = cq_grecord (res, record, SZ_LINE, (1 + nres) / 2)
+	nchars = cq_grecord (res, record, CQ_MAX_LINE, (1 + nres) / 2)
 	call printf ("record %4d %4d %s")
 	    call pargi ((1 + nres) / 2)
 	    call pargi (nchars)
 	    call pargstr (record)
 	
 	record[1] = EOS
-	nchars = cq_grecord (res, record, SZ_LINE, nres)
+	nchars = cq_grecord (res, record, CQ_MAX_LINE, nres)
 	call printf ("record %4d %4d %s")
 	    call pargi (nres)
 	    call pargi (nchars)

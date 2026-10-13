@@ -20,6 +20,10 @@ define	CQ_SZ_QPFMTS	11
 
 define	CQ_MAX_NFIELDS	100
 
+# The maximum length of a line in the query result.
+
+define	CQ_MAX_LINE	(CQ_MAX_NFIELDS*SZ_FNAME)
+
 # The catalog access results parameter definitions
 
 define	CQRCATDB	1   # the catalog database file

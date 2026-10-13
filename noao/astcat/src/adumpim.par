@@ -1,4 +1,4 @@
-imsurvey,s,a,dss2@cadc,,,"The input image survey"
+imsurvey,s,a,dss2red@cds,,,"The input image survey"
 output,s,a,"",,,"The output image"
 ra,s,a,"00:00:00.0",,,"The field center ra / longitude"
 dec,s,a,"+00:00:00",,,"The field center dec / latitude"

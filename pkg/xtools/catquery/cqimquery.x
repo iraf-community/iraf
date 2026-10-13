@@ -55,8 +55,8 @@ char	url[SZ_PATHNAME], addr[SZ_LINE], query[SZ_LINE], buf[SZ_LINE]
 int	cc, fd, outfd, nchars, ip, op
 bool	done
 pointer	cq_irinit()
-int	ndopen(), strlen(), open(), read(), getline(), url_get()
-errchk	ndopen(), awriteb(), open(), read(), getline()
+int	ndopen(), strlen(), open(), read(), getlline(), url_get()
+errchk	ndopen(), awriteb(), open(), read(), getlline()
 
 begin
 	# Check that the current catalog is defined.
@@ -166,7 +166,7 @@ begin
 		;
 	    case CQ_HHTTP:
                 repeat {
-                    nchars = getline (fd, Memc[inbuf])
+                    nchars = getlline (fd, Memc[inbuf], DEF_SZ_INBUF)
                     if (nchars <= 0)
                         break
 		    Memc[inbuf+nchars] = EOS

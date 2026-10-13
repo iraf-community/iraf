@@ -3,7 +3,7 @@
 # evalute an existing wcs, compute an initial guess wcs, find and locate 
 # objects, compute a plate solution, and update the image header.
 
-begin imname@noao
+begin imname@noirlab
 address
 query
 nquery 0
@@ -12,95 +12,240 @@ wcs none
 nwcs 0
 nkeys 0
 
-begin ndwfs@noao
-address inet:80:archive.noao.edu:text
-query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=%-s&decwidth=%-s&filters=Bw HTTP/1.0\n\n
+
+# The following image services are example image cutouts available from 
+# various HiPS services at CDS in Stasbourg.  Other HiPS services with 
+# additional data are listed at:
+#
+#               https://aladin.cds.unistra.fr/hips/list
+#
+# These may have different APIs and so configurations will need to be
+# modified appropriately.
+#
+# Acknowledgement:
+#       If you use data from these services in your work, CDS requests that
+# be cited with the following acknowledgement:
+#
+#       "This research made use of hips2fits*, a service provided by CDS."
+#
+#    * https://alasky.cds.unistra.fr/hips-image-services/hips2fits
+
+begin dss2nir@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=DSS2/NIR&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
 nquery 5
-    ra 14:28:07.00 hours %0.2h
-    dec 34:55:00.0 degrees %0.1h
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
     xwidth 10.0 minutes %0.1f
     ywidth 10.0 minutes %0.1f
-    qsystem J2000.0 INDEF %s
-protocol http
+protocol https
 type fits
 hskip 0
 wcs fits
 
-begin dss1@cadc
-address inet:80:cadcwww.hia.nrc.ca:text
-query  GET /cadcbin/dss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+begin dss2blue@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=DSS2/blue&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=DSS2/blue&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=DSS2/blue&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
 nquery 5
-    ra 00:00:00.00 hours %0.2h
-    dec +00:00:00.0 degrees %0.1h
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
     xwidth 10.0 minutes %0.1f
     ywidth 10.0 minutes %0.1f
-    qsystem J2000.0 INDEF %s
-protocol http
+protocol https
 type fits
 hskip 0
-wcs dss
-nwcs 10
-    wxref INDEF INDEF d pixels
-    wyref INDEF INDEF d pixels
-    wxmag INDEF 1.701 d arcsec/pixel
-    wymag INDEF 1.701 d arcsec/pixel
-    wxrot INDEF 180.0 d degrees
-    wyrot INDEF 0.0 d degrees
-    wraref OBJCTRA INDEF d hms
-    wdecref OBJCTDEC INDEF d dms
-    wproj INDEF tan c INDEF
-    wsystem INDEF J2000 c INDEF
-nkeys 13
-    observat INDEF Palomar c INDEF
-    esitelng INDEF +116:51:46.80 d degrees
-    esitelat INDEF +33:21:21.6 d degrees
-    esitealt INDEF 1706 r meters
-    esitetz INDEF 8 r INDEF
-    emjdobs INDEF INDEF d INDEF
-    edatamin INDEF INDEF r ADU
-    edatamax INDEF INDEF r ADU
-    egain INDEF INDEF r e-/ADU
-    erdnoise INDEF INDEF r e-
-    ewavlen INDEF INDEF r angstroms
-    etemp INDEF INDEF r degrees
-    epress INDEF INDEF r mbars
+wcs fits
 
-
-begin dss2@cadc
-address inet:80:cadcwww.hia.nrc.ca:text
-query  GET /cadcbin/xdss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+begin dss2red@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=DSS2/red&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=DSS2/red&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=DSS2/red&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
 nquery 5
-    ra 00:00:00.00 hours %0.2h
-    dec +00:00:00.0 degrees %0.1h
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
     xwidth 10.0 minutes %0.1f
     ywidth 10.0 minutes %0.1f
-    qsystem J2000.0 INDEF %s
-protocol http
+protocol https
 type fits
 hskip 0
-wcs dss
-nwcs 10
-    wxref INDEF INDEF d pixels
-    wyref INDEF INDEF d pixels
-    wxmag INDEF 1.009 d arcsec/pixel
-    wymag INDEF 1.009 d arcsec/pixel
-    wxrot INDEF 180.0 d degrees
-    wyrot INDEF 0.0 d degrees
-    wraref OBJCTRA INDEF d hms
-    wdecref OBJCTDEC INDEF d dms
-    wproj INDEF tan c INDEF
-    wsystem INDEF J2000 c INDEF
-nkeys 13
-    observat INDEF Palomar c INDEF
-    esitelng INDEF +116:51:46.80 d degrees
-    esitelat INDEF +33:21:21.6 d degrees 
-    esitealt INDEF 1706 r meters
-    esitetz INDEF 8 r INDEF
-    emjdobs INDEF INDEF c INDEF
-    edatamin INDEF INDEF r ADU
-    edatamax INDEF INDEF r ADU
-    egain INDEF INDEF r e-/ADU
-    erdnoise INDEF INDEF r e-
-    ewavlen INDEF INDEF r angstroms
-    etemp INDEF INDEF r degrees
-    epress INDEF INDEF r mbars
+wcs fits
+
+
+begin 2mass_h@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=2MASS/H&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=2MASS/H&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=2MASS/H&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
+nquery 5
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+protocol https
+type fits
+hskip 0
+wcs fits
+
+begin 2mass_j@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=2MASS/J&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=2MASS/J&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=2MASS/J&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
+nquery 5
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+protocol https
+type fits
+hskip 0
+wcs fits
+
+begin 2mass_k@cds
+url https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=2MASS/K&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+request /hips-image-services/hips2fits?hips=2MASS/K&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+address inet:443:alasky.cds.unistra.fr:text:ssl
+host alasky.cds.unistra.fr
+port 443
+request /hips-image-services/hips2fits?hips=2MASS/K&ra=%-s&dec=%-s&fov=%-s&width=256&height=256&projection=TAN
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=256&decwidth=256&filters=Bw
+HTTP/1.1\nHost: alasky.cds.unistra.fr\n
+nquery 5
+    ra 0.0 degrees %0.2h
+    dec 0.0 degrees %0.1h
+    fov 0.05 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+protocol https
+type fits
+hskip 0
+wcs fits
+
+
+
+# ==========================================================================
+# The following services are original to the package but no longer working.
+# They are left here as examples for how to write a configuration only.
+#  
+#  begin ndwfs@noao
+#  address inet:80:archive.noao.edu:text
+#  query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=%-s&decwidth=%-s&filters=Bw HTTP/1.0\n\n
+#  nquery 5
+#      ra 14:28:07.00 hours %0.2h
+#      dec 34:55:00.0 degrees %0.1h
+#      xwidth 10.0 minutes %0.1f
+#      ywidth 10.0 minutes %0.1f
+#      qsystem J2000.0 INDEF %s
+#  protocol http
+#  type fits
+#  hskip 0
+#  wcs fits
+#  
+#  begin dss1@cadc
+#  address inet:80:cadcwww.hia.nrc.ca:text
+#  query  GET /cadcbin/dss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+#  nquery 5
+#      ra 00:00:00.00 hours %0.2h
+#      dec +00:00:00.0 degrees %0.1h
+#      xwidth 10.0 minutes %0.1f
+#      ywidth 10.0 minutes %0.1f
+#      qsystem J2000.0 INDEF %s
+#  protocol http
+#  type fits
+#  hskip 0
+#  wcs dss
+#  nwcs 10
+#      wxref INDEF INDEF d pixels
+#      wyref INDEF INDEF d pixels
+#      wxmag INDEF 1.701 d arcsec/pixel
+#      wymag INDEF 1.701 d arcsec/pixel
+#      wxrot INDEF 180.0 d degrees
+#      wyrot INDEF 0.0 d degrees
+#      wraref OBJCTRA INDEF d hms
+#      wdecref OBJCTDEC INDEF d dms
+#      wproj INDEF tan c INDEF
+#      wsystem INDEF J2000 c INDEF
+#  nkeys 13
+#      observat INDEF Palomar c INDEF
+#      esitelng INDEF +116:51:46.80 d degrees
+#      esitelat INDEF +33:21:21.6 d degrees
+#      esitealt INDEF 1706 r meters
+#      esitetz INDEF 8 r INDEF
+#      emjdobs INDEF INDEF d INDEF
+#      edatamin INDEF INDEF r ADU
+#      edatamax INDEF INDEF r ADU
+#      egain INDEF INDEF r e-/ADU
+#      erdnoise INDEF INDEF r e-
+#      ewavlen INDEF INDEF r angstroms
+#      etemp INDEF INDEF r degrees
+#      epress INDEF INDEF r mbars
+#  
+#  
+#  begin dss2@cadc
+#  address inet:80:cadcwww.hia.nrc.ca:text
+#  query  GET /cadcbin/xdss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+#  nquery 5
+#      ra 00:00:00.00 hours %0.2h
+#      dec +00:00:00.0 degrees %0.1h
+#      xwidth 10.0 minutes %0.1f
+#      ywidth 10.0 minutes %0.1f
+#      qsystem J2000.0 INDEF %s
+#  protocol http
+#  type fits
+#  hskip 0
+#  wcs dss
+#  nwcs 10
+#      wxref INDEF INDEF d pixels
+#      wyref INDEF INDEF d pixels
+#      wxmag INDEF 1.009 d arcsec/pixel
+#      wymag INDEF 1.009 d arcsec/pixel
+#      wxrot INDEF 180.0 d degrees
+#      wyrot INDEF 0.0 d degrees
+#      wraref OBJCTRA INDEF d hms
+#      wdecref OBJCTDEC INDEF d dms
+#      wproj INDEF tan c INDEF
+#      wsystem INDEF J2000 c INDEF
+#  nkeys 13
+#      observat INDEF Palomar c INDEF
+#      esitelng INDEF +116:51:46.80 d degrees
+#      esitelat INDEF +33:21:21.6 d degrees 
+#      esitealt INDEF 1706 r meters
+#      esitetz INDEF 8 r INDEF
+#      emjdobs INDEF INDEF c INDEF
+#      edatamin INDEF INDEF r ADU
+#      edatamax INDEF INDEF r ADU
+#      egain INDEF INDEF r e-/ADU
+#      erdnoise INDEF INDEF r e-
+#      ewavlen INDEF INDEF r angstroms
+#      etemp INDEF INDEF r degrees
+#      epress INDEF INDEF r mbars

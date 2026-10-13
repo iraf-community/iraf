@@ -25,7 +25,7 @@ The default input astrometry file format parameters. The acatpars parameters
 are used only if the input astrometry file does not have a header. Type
 "help acatpars" for a detailed description of the acatpars parameters.
 .le
-.ls catalogs = "filename@noao"
+.ls catalogs = "filename@noirlab"
 The dummy input catalog name. Afiltcat task users should leave this
 parameter at its default setting.
 .le

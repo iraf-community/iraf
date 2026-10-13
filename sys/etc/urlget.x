@@ -30,15 +30,20 @@ define	HTTP_NOTIMP	501			# Not Implemented
 define	HTTP_OVERLOAD	502			# Service Temporarily Overloaded
 define	HTTP_GWTIMEOUT	503			# Gateway Timeout
 
-define 	SZ_BUF		8192			# download buffer
+define  HTTP_PORT        80                     # default HTTP port
+define  HTTPS_PORT      443                     # default HTTPS port
 
-define 	DBG_HDRS	FALSE
+define 	SZ_BUF	       32768			# download buffer
+
+define 	DBG_HDRS       FALSE
 
 
 
 # URL_GET -- Do an HTTP GET on the given URL, save the results to the named
-# file.  If a 'reply' pointer is given, return the request reply string (must
-# be allocated at least 8192 chars).
+# file.  If a 'reply' pointer is given, return the request reply header string
+# This must be allocated at least SZ_PATHNAME and the caller is responsible
+# for freeing the pointer.  If reply is NULL, an internal buffer is used and
+# no reply header is returned..
 
 int procedure url_get (url, fname, reply)
 
@@ -51,7 +56,7 @@ char	inurl[SZ_BUF], outname[SZ_PATHNAME]
 int	port, stat
 pointer buf
 
-int	url_access(), strcmp()
+int	url_access(), strncmp()
 bool	url_redirect()
 
 define	redirect_	99
@@ -62,8 +67,9 @@ begin
 redirect_
 	call url_break (inurl, protocol, host, port, path)
 
-	# Check for a supported protocol.
-	if (strcmp (protocol, "http") != 0) {
+	# Check for a supported protocol (only 'http' or 'https' URIs are
+	# supported at present).
+	if (strncmp (protocol, "http", 4) != 0) {
 	    call aclrc (emsg, SZ_PATHNAME)
 	    call sprintf (emsg, SZ_PATHNAME,  "Unsupported URI protocol (%s)")
 		call pargstr (protocol)
@@ -148,14 +154,14 @@ procedure url_break (url, protocol, host, port, path)
 char	url[SZ_BUF]			#i url to parse
 char	protocol[ARB]			#o URL protocol (only HTTP, for now)
 char	host[ARB]			#o host name
-int	port				#o server port (if specified, or 80)
+int	port				#o server port (if specified or default)
 char    path[ARB]			#o path part of URL, including args
 
 int	i, nch, ip
-int	ctoi()
+int	ctoi(), strncmp()
 
 begin
-	port = 80				# set default port number
+	port = HTTP_PORT		# set default port number
 
 	# Pull out the protocol part of the URL.
 	for (ip=1; url[ip] != ':'; ip = ip + 1)
@@ -167,7 +173,7 @@ begin
 	    ip = ip + 1
 
 	# Get the host name.
-	for (i=1; url[ip] != ':' && url[ip] != '/' && url[ip] != EOS; i=i+1) {
+	for (i=1; url[ip] != ':' && url[ip] != '/' && url[ip] != '%' && url[ip] != EOS; i=i+1) {
 	    host[i] = url[ip]
 	    ip = ip + 1
 	}
@@ -179,10 +185,15 @@ begin
 	}
 
 	# Extract a port number of specified
-	if (url[ip] == ':') {
-	    ip = ip + 1
-	    nch = ctoi (url, ip, port)
-	}
+        if (strncmp (protocol, "https", 5) == 0) {
+            port = HTTPS_PORT
+        } else {
+	    if (url[ip] == ':') {
+	        ip = ip + 1
+	        nch = ctoi (url, ip, port)
+	    } else
+                port = HTTP_PORT
+        }
 
 	# Get the remaining path.
 	for (i=1; url[ip] != EOS; i = i + 1) {
@@ -201,22 +212,27 @@ char	host[ARB]				#i host name
 int	port					#i server port number
 char	path[ARB]				#i resource path
 char	fname[ARB]				#i saved file path
-pointer	reply					#i reply buffer
+pointer	reply					#i reply header buffer
 
 pointer	rep
-int	in, out, nchars, totchars, retcode, clen, ip
+int	in, out, nchars, totchars, retcode, ip, content_length, nbytes
 char	buf[SZ_BUF], netpath[SZ_PATHNAME], request[SZ_BUF], hd[SZ_LINE]
-bool	done
+bool	is_chunked, done
 
-int	open(), access(), ndopen(), getline(), read(), strlen(), ctoi()
-int	strncmp(), url_retcode()
+int	open(), access(), ndopen(), getline(), strlen(), ctoi()
+int	strncmp(), strsearch(), fstdfile(), url_retcode()
+int     read(), url_chunk_size(), url_read_chunk()
 
 begin
 	# Connect to server on the given host.
 	call sprintf (netpath, SZ_PATHNAME, "inet:%d:%s:%s")
 	    call pargi (port)
 	    call pargstr (host)
-	    call pargstr ("text")
+            if (port == HTTPS_PORT)
+	        #call pargstr ("binary:ssl")
+	        call pargstr ("text:ssl")
+            else
+	        call pargstr ("text")
 
 	iferr (in = ndopen (netpath, READ_WRITE)) {
 	    call eprintf ("cannot access host '%s:%d'\n")
@@ -227,14 +243,24 @@ begin
 
 	# Format the request header.
 	call aclrc (request, SZ_BUF)
-	call sprintf (request, SZ_BUF, "GET %s HTTP/1.0\n")
-	    call pargstr (path)
-	call strcat ("Accept: */*\n", request, SZ_BUF)
-	call strcat ("User-Agent: IRAF/urlget\n", request, SZ_BUF)
+        if (port == HTTPS_PORT) {
+	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.1\r\n")
+	        call pargstr (path)
+        } else {
+	    call sprintf (request, SZ_BUF, "GET %s HTTP/1.1\r\n")
+	        call pargstr (path)
+        }
 	call strcat ("Host: ", request, SZ_BUF)
 	call strcat ( host, request, SZ_BUF)
-	call strcat ("\n", request, SZ_BUF)
-	call strcat ("Connection: keep-alive\n\n", request, SZ_BUF)
+	call strcat ("\r\n", request, SZ_BUF)
+	call strcat ("User-Agent: IRAF-v2.18.1/urlget\r\n", request, SZ_BUF)
+	call strcat ("Accept: */*\r\n", request, SZ_BUF)
+	call strcat ("Connection: ", request, SZ_BUF)
+        if (port == HTTPS_PORT) 
+            call strcat ("close\r\n", request, SZ_BUF)
+        else
+            call strcat ("keep-alive\r\n", request, SZ_BUF)
+	call strcat ("\r\n", request, SZ_BUF)
 
 	# Send the GET-url request to the server.
 	nchars = strlen (request)
@@ -248,30 +274,35 @@ begin
 		call pargstr (request)
 	}
 
-        # Read the reply. Read the HTTP header assuming it ends with a \n or
-        # a \r\n. and then validate it will return the request correctly.
-	done = false
-	clen = -1
+        # Read the HTTP header assuming it ends with a '\n' or a '\r\n'. 
+	content_length = -1
+        is_chunked = FALSE
 	call calloc (rep, SZ_BUF, TY_CHAR)
         repeat {
 	    call aclrc (hd, SZ_LINE)
             nchars = getline (in, hd)
             if (nchars <= 0)
                 break
-	    call strcat (hd, Memc[rep], SZ_LINE)
-	    if (strncmp (hd, "Content-Length:", 15) == 0) {
-		ip = 16
-		nchars = ctoi (hd, ip, clen)
-	    }
-        } until ((hd[1] == '\r' && hd[2] == '\n') || (hd[1] == '\n'))
+            call strlwr (hd)
+	    if (strncmp (hd, "content-length:", 15) == 0) {
+		ip = 17
+		nchars = ctoi (hd, ip, content_length)
+	    } else if (strncmp (hd, "transfer-encoding:", 18) == 0) {
+                if (strsearch (hd, "chunked") > 0)
+                    is_chunked = TRUE
+            }
+
+	    call strcat (hd, Memc[rep], SZ_PATHNAME)
+        } until ((hd[1] == '\r' && hd[2] == '\n') || hd[1] == '\n')
 
 	if (DBG_HDRS) {
-	    call eprintf ("reply: %s\nclen = %d\n")
+	    call eprintf ("reply: ---------------------\n%s\n")
 		call pargstr (Memc[rep])
-		call pargi(clen)
+            call eprintf ("content_length = %d\n=========================\n")
+		call pargi(content_length)
 	}
 
-	# Make sure we have a valid file.
+	# Make sure we have a valid HTTP response, i.e. a HTTP_OK return code..
 	retcode = url_retcode (Memc[rep])
 
 	if (reply != NULL)
@@ -280,30 +311,57 @@ begin
 	if (retcode != HTTP_OK)
 	    return (- retcode)
 
-
 	# Open the named output file.
-	if (access (fname, 0, 0) == YES)
-	    call syserrs (SYS_FCLOBBER, fname)
-	iferr (out = open (fname, NEW_FILE, TEXT_FILE))
-	    call syserrs (SYS_FOPEN, fname)
+        if (fstdfile (fname, out) == NO) {
+	    if (access (fname, 0, 0) == YES)
+	        call syserrs (SYS_FCLOBBER, fname)
+	    iferr (out = open (fname, NEW_FILE, TEXT_FILE))
+	        call syserrs (SYS_FOPEN, fname)
+        }
 
-	# Now read the resource and save it to the named file.
+        # Process the reponse data.  If the reply contains a Content-Length
+        # header we will know how many bytes to read and proceed immediately.
+        # For streaming or dynamic data, the size is not always known and so
+        # the data may be returned in a 'chunked' Transfer-Encoding format.
+        # 
+        # Chunked data consist of a text line terminated with a '\r\n'
+        # containing a hex-encoded number of data bytes in the chunk,
+        # optionaly followed by a 'comment' describing the chunk.  The
+        # data ends when a zero-sized chunk header is found and the data
+        # stream is followed by an empty line.  In text mode all lines are
+        # terminated by a '\r\n' sequence, in binary mode we process bytes
+        # directly.
+
 	totchars = 0
-	done = false
-	repeat {
-	    call aclrc (buf, SZ_BUF)
-	    nchars = read (in, buf, SZ_BUF)
-	    if (nchars > 0) {
-		call write (out, buf, nchars)
-		call flush (out)
-		totchars = totchars + nchars
-		done = false
-	    } else
-		done = true
+	done = FALSE
 
-	    if (clen > 0 && totchars >= clen)
-		break
-	} until (done)
+        if (is_chunked) {
+	    # Transfer is chunkec and of unknown size, so process each chunk
+            # until the end of data.
+            repeat {
+                nbytes = url_chunk_size (in)
+                if (nbytes <= 0)
+                    done = TRUE
+
+                if (! done)
+                    totchars = totchars +  url_read_chunk (in, out, nbytes)
+
+                # Eat the trailing line.
+                # The data chunk is always terminated by a '\r\n" sequence
+                # indicating the end-of-data, read this and continue until we
+                # get a zero size.
+                nchars = read (in, buf, 2)
+            } until (done)
+
+            # Read any (optional) trailing metadata.
+            repeat {
+                nbytes = getline (in, buf)
+            } until (nbytes <= 0)
+
+        } else {
+	    # Now read the resource and save it to the named file.
+            totchars = url_read_chunk (in, out, content_length)
+        }
 
 	call close (in)				# clean up
 	call close (out)
@@ -329,8 +387,8 @@ begin
 end
 
 
-#  URL_ERRCODE - Convert between an HTTP return code and the equivalent
-#  syserr() code value.
+# URL_ERRCODE -- Convert between an HTTP return code and the equivalent
+# syserr() code value.
 
 int procedure url_errcode (code)
 
@@ -383,4 +441,91 @@ begin
 	}
 
 	return (code)
+end
+
+
+# URL_CHUNK_SIZE -- Return the size of the next data chunk as defined by
+# the encoded transfer header line. The size in hex is optionally followed 
+# by a comment describing the chunk (or other extension) delimited by a ';'
+# which we ignore.  The line is terminated by a '\r\n' sequence.
+
+int procedure url_chunk_size (in)
+
+int	in                                      # input descriptor
+
+int     nchars, ip
+char	buf[SZ_BUF]
+long    lval
+
+int     getline(), stridxs(), strlen(), gctol()
+
+begin
+        # Get the size of the chunk to read as the first line in the chunk.
+        call aclrc (buf, SZ_BUF)
+        nchars = getline (in, buf)
+        if (nchars <= 0)                        # EOF
+            return (nchars)
+
+        ip = stridxs (";: ", buf)               # look for extensions
+        if (ip > 0) {
+            # Contains an optional comment we need to truncate at the 
+            # deimiter.  We append an 'X' to indicate a hexaecimal value
+            # on the size.
+            buf[ip] = 'X'
+            buf[ip+1] = EOS
+        } else {
+            # No comment but delete the trailing '\r\n' from the line and
+            # append an 'X' to indicate a hexaecimal value on the size.
+            buf[strlen(buf)-1] = 'X'
+            buf[strlen(buf)] = EOS
+        }
+
+        # Convert the hex size value to decimal and return as the number of
+        # bytes to be read.
+        ip = 1
+        if (buf[1] != EOS && buf[1] != NULL) {
+            nchars = gctol (buf, ip, lval, 16)
+            return (int(lval))
+        } else
+            return (0)
+end
+
+
+# URL_READ_CHUNK -- Read the next data chunk as the specified number of bytes
+# and write the result to the output file descriptor. Use a dynamically
+# allocated buffer for each chunk since the size will be variable.  
+
+int procedure url_read_chunk (in, out, nbytes)
+
+int	in                                      # input file descriptor
+int     out                                     # output file descriptor
+int     nbytes                                  # number of bytes to process
+
+pointer buf
+int     nchars, totchars
+
+int     read()
+
+begin
+        # Allocate the data buffer to be processed.
+        call malloc (buf, nbytes, TY_CHAR)
+
+	# Now read the resource and write it to the output descriptor.
+        totchars = 0
+	while (totchars <= nbytes) {
+            call aclrc (Memc[buf], nbytes)
+	    nchars = read (in, Memc[buf], nbytes - totchars)
+
+            if (nchars > 0) {
+	        call write (out, Memc[buf], nchars)
+	        call flush (out)
+            }
+
+	    totchars = totchars + nchars
+            if (totchars >= nbytes)
+                break
+	}
+
+        call mfree (buf, TY_CHAR)
+        return (totchars)
 end

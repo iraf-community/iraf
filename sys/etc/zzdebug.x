@@ -395,11 +395,11 @@ begin
 
 	nread = url_get (url, fname, reply)
 
-	call eprintf ("File '%s', downloaded %d bytes.\n")
-	    call pargstr (fname)
-	    call pargi (nread)
-
-	if (hdr)
+	if (hdr) {
+	    call eprintf ("File '%s', downloaded %d bytes.\n")
+	        call pargstr (fname)
+	        call pargi (nread)
 	    call eprintf (Memc[reply])
+        }
 	call mfree (reply, TY_CHAR)
 end

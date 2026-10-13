@@ -13,13 +13,13 @@ pointer	procedure cq_query (cq)
 
 pointer	cq			#I the catalog database descriptor
 
-pointer	cc, res, inbuf, line, sp, spfname
-char    url[SZ_PATHNAME], addr[SZ_LINE], query[SZ_LINE], buf[SZ_LINE]
-int	j, fd, nchars, nlines, nrecs, szindex, ip, op
+pointer	cc, res, inbuf, line, sp, spfname, dlname
+char    url[SZ_PATHNAME]
+int	i, j, fd, nchars, nlines, nrecs, szindex
 bool	done
 long	note()
 pointer	cq_rinit()
-int	ndopen(), strlen(), read(), open(), getline(), fstati(), url_get()
+int	ndopen(), strlen(), read(), open(), getlline(), fstati(), url_get()
 errchk	ndopen(), fprintf(), areadb(), awriteb(), open(), read()
 
 begin
@@ -31,61 +31,50 @@ begin
 	cc = CQ_CAT(cq)
 
 
-        if (0<1&& USE_URLGET) {
+        if (USE_URLGET) {
             # Initialize the image results structure.
 	    res = cq_rinit (cq)
 
-            call strcpy (CQ_ADDRESS(cc), buf, SZ_LINE)
-            for (ip=1; buf[ip] != ':'; ip=ip+1) ;       # skip 'inet:'
-            ip = ip + 1
-            for (    ; buf[ip] != ':'; ip=ip+1) ;       # skip '80:'
-            ip = ip + 1
-            for (op=1; buf[ip] != ':'; ip=ip+1) {
-                addr[op] = buf[ip]
-                op = op + 1
-            }
-            addr[op] = EOS
-
-            call strcpy (CQ_RQUERY(res), buf, SZ_LINE)
-            for (op=1; !IS_WHITE(buf[op+4]); op=op+1)
-                query[op] = buf[op+4]
-            query[op] = EOS
-
-            call sprintf (url, SZ_LINE, "http://%s%s")
-                call pargstr (addr)
-                call pargstr (query)
+            call cq_get_url (cc, CQ_ADDRESS(cc), CQ_QUERY(cc), url)
 
             iferr {
 	        call smark (sp)
 	        call salloc (spfname, SZ_FNAME, TY_CHAR)
-
-                call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+                call salloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 
 	        # Open the output spool file.
-	        call mktemp ("query", Memc[spfname], SZ_FNAME)
+	        call mktemp ("query_dl", Memc[dlname], SZ_FNAME)
+	        call mktemp ("query_sp", Memc[spfname], SZ_FNAME)
 
-                if (url_get (url, Memc[spfname], inbuf) < 0)
+                # Download the resource to the spool filename.
+                if (url_get (url, Memc[dlname], inbuf) < 0)
                     call error (0, "Cannot access url")
 
-	        fd = open (Memc[spfname], READ_ONLY, TEXT_FILE)
+                # Read the file into the result file..
+	        fd = open (Memc[dlname], READ_ONLY, TEXT_FILE)
 	        CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
 	        repeat {
 	 	    call aclrc (Memc[inbuf], DEF_SZ_INBUF)
 	            nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
 	            if (nchars > 0) {
 		        Memc[inbuf+nchars] = EOS
+                        for (i=0; i < nchars; i=i+1) {
+                            if (Memc[inbuf+i] == '|')
+                                Memc[inbuf+i] = ' '
+                        }
 	                call write (CQ_RFD(res), Memc[inbuf], nchars)
 		        done = false
 	            } else
 	                done = true
 	        } until (done)
-	        call flush (CQ_RFD(res))
-		call close (fd)
 
+	        # Cleanup.
+	        call flush (CQ_RFD(res))
 	        CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
 	        call seek (CQ_RFD(res), BOF)
+                call close(fd)
+                call delete (Memc[dlname])
 
-                call mfree (inbuf, TY_CHAR)
 		call sfree (sp)
 
             } then {
@@ -134,7 +123,7 @@ begin
 		    ;
 	        case CQ_HHTTP:
 	            repeat {
-	                nchars = getline (fd, Memc[inbuf])
+	                nchars = getlline (fd, Memc[inbuf], DEF_SZ_INBUF)
 	                if (nchars <= 0)
 		            break
 		        Memc[inbuf+nchars] = EOS
@@ -181,13 +170,13 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    call malloc (line, CQ_MAX_LINE, TY_CHAR)
 	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
 	    repeat {
 		Meml[CQ_RINDEX(res)+nrecs] = note (CQ_RFD(res)) 
-		nchars = getline (CQ_RFD(res), Memc[line])
+		nchars = getlline (CQ_RFD(res), Memc[line], CQ_MAX_LINE)
 		if (nchars == EOF)
 		    break
 		nlines = nlines + 1
@@ -238,6 +227,69 @@ begin
 end
 
 
+# CQ_GET_URL -- Parse the config data to construct a request URL
+
+procedure cq_get_url (cat, address, query, url)
+
+pointer cat                     #I catalog pointer
+char    address[ARB]            #I config 'address' value
+char    query[ARB]              #I config 'query' value
+char    url[SZ_LINE]            #O request url
+
+char    host[SZ_LINE], request[SZ_LINE], buf[SZ_LINE]
+char    value[CQ_SZ_QPVALUE]
+int     i, nch, ip, op, port
+int     ctoi(), cq_wrdstr()
+
+begin
+        call aclrc (host, SZ_LINE)
+        call aclrc (request, SZ_LINE)
+        call aclrc (url, SZ_LINE)
+
+        # Parse the address string of the form "inet:<port>:<host>:<opts"
+        call aclrc (buf, SZ_LINE)
+        call strcpy (address, buf, SZ_LINE)
+
+        ip = 6                                      # skip 'inet:'
+        nch = ctoi (buf, ip, port)                  # get the port number
+
+        ip = ip + 1                                 # extract host name
+        for (op=1; buf[ip] != ':' && ip < SZ_LINE; ip=ip+1) {
+            host[op] = buf[ip]
+            op = op + 1
+        }
+
+        # Extract the query request string.
+        call aclrc (buf, SZ_LINE)
+        call strcpy (query, buf, SZ_LINE)
+        for (op=1; !IS_WHITE(buf[op+4]); op=op+1)   # skip 'GET'
+            buf[op] = query[op+4]
+        buf[op] = EOS
+
+        # Format it with the parameters.
+        for (ip=1; !IS_WHITE(buf[ip]) && ip < SZ_LINE; ip=ip+1) 
+            ;
+        buf[ip] = EOS
+
+	call sprintf (request, SZ_LINE, buf)
+	do i = 1, CQ_NQPARS(cat) {
+            call aclrc (value, CQ_SZ_QPVALUE)
+	    if (cq_wrdstr (i, value, CQ_SZ_QPVALUE,
+	        Memc[CQ_PQPVALUES(cat)]) <= 0)
+		    next
+	    call pargstr (value)
+	}
+
+        # Put it all together into a URL.
+        if (port == 80)
+            call strcpy ("http://", url, SZ_LINE)
+        else
+            call strcpy ("https://", url, SZ_LINE)
+        call strcat (host, url, SZ_LINE)
+        call strcat (request, url, SZ_LINE)
+end
+
+
 # CQ_FQUERY -- Treat a catalog file file as thought it were the results
 # of a query. The catalog file file name and file description are passed
 # to the routine as arguments.
@@ -253,7 +305,7 @@ int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
 pointer	cq_frinit()
 long	note()
-int	access(), open(), read(), fstati(), getline()
+int	access(), open(), read(), fstati(), getlline()
 errchk	open(), read()
 
 begin
@@ -332,14 +384,14 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    call malloc (line, CQ_MAX_LINE, TY_CHAR)
 	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
 	    call seek (CQ_RFD(res), BOF)
 	    repeat {
 		Meml[CQ_RINDEX(res)+nrecs] = note (CQ_RFD(res)) 
-		nchars = getline (CQ_RFD(res), Memc[line])
+		nchars = getlline (CQ_RFD(res), Memc[line], CQ_MAX_LINE)
 		if (nchars == EOF)
 		    break
 		nlines = nlines + 1

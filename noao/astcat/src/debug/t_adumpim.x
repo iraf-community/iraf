@@ -10,15 +10,13 @@ define	DEF_SZBUF	28800
 procedure t_adumpim()
 
 pointer	sp, imsurvey, output, ra, dec, size, imdb, query, buf, str
-pointer	qpname, qpvalue, qpunits, qpformats, cq
-int	i, fd, ofd, nqpars, parno, nchars
-bool	done
+pointer	qpname, qpvalue, qpunits, qpformats, cq, url, host
+int	i, nqpars, parno, nchars, port
 
 pointer	cq_map()
-int	cq_setcat(), ndopen(), open(), cq_nqpars(), cq_gqparn(), strlen()
-int	getline(), read()
+int	cq_setcat(), cq_nqpars(), cq_gqparn(),	url_get(), access(), cq_fgeti()
 bool	streq()
-errchk	cq_fgeti()
+errchk	cq_fgeti(), cg_fgstr()
 
 begin
 	# Allocate some working space.
@@ -63,30 +61,27 @@ begin
 	    return
 	}
 
-	# Connect to the HTTP server.
-	call cq_fgwrd (cq, "address", Memc[str], SZ_LINE)
-	iferr (fd = ndopen (Memc[str], READ_WRITE)) {
-	    call eprintf ("Cannot access image server %s at host %s\n")
-		call pargstr (Memc[imsurvey])
-		call pargstr (Memc[str])
-	    call cq_unmap (cq)
-	    call sfree (sp)
-	    return
-	}
-
-	# Open the output file.
-        #ofd = open (Memc[output], NEW_FILE, BINARY_FILE)
-        ofd = open (Memc[output], NEW_FILE, TEXT_FILE)
 
         # Format the query without worrying about coordinate systems,
         # or formats. Just assume that the user types in ra, dec, and
-        # size in the form expected by the server.
+        # fov in the form expected by the server.
+        iferr (call cq_fgstr (cq, "url", Memc[query], SZ_LINE)) {
+            call cq_fgwrd (cq, "host", Memc[host], SZ_LINE)
+            call cq_fgwrd (cq, "request", Memc[str], SZ_LINE)
+            port = cq_fgeti (cq, "port")
 
-        call cq_fgstr (cq, "query", Memc[query], SZ_LINE)
+            call sprintf (Memc[query], SZ_LINE, "%s://%s%s")
+                if (port == 80)
+                    call pargstr ("http")
+                else
+                    call pargstr ("https")
+                call pargstr (Memc[host])
+                call pargstr (Memc[str])
+        }
+
         nqpars = cq_nqpars (cq)
-        call sprintf (Memc[str], SZ_LINE, Memc[query])
+        call sprintf (Memc[url], SZ_LINE, Memc[query])
         do i = 1, nqpars {
-
             # Get description of each query parameter.
             parno = cq_gqparn (cq, i, Memc[qpname], CQ_SZ_QPNAME,
                 Memc[qpvalue], CQ_SZ_QPVALUE, Memc[qpunits], CQ_SZ_QPUNITS,
@@ -103,58 +98,26 @@ begin
                 call pargstr (Memc[size])
             } else if (streq (Memc[qpname], "ywidth")) {
                 call pargstr (Memc[size])
+            } else if (streq (Memc[qpname], "width")) {
+                call pargstr (Memc[size])
+            } else if (streq (Memc[qpname], "height")) {
+                call pargstr (Memc[size])
             } else if (streq (Memc[qpname], "radius")) {
+                call pargstr (Memc[size])
+            } else if (streq (Memc[qpname], "fov")) {
                 call pargstr (Memc[size])
             } else {
                 call pargstr (Memc[qpvalue])
             }
-
         }
 
-	# Send the query. Note that since the communication mode and output
-	# file type are binary the command must be converted from IRAF chars
-	# type byte chars. Leave as text for now since it works for FITS
-	# files.
+        # Overwrite an existing output file.
+        if (access (Memc[output], 0, 0) == YES)
+            call delete (Memc[output])
 
-        nchars = strlen (Memc[str])
-        #call chrpak (Memc[str], 1, Memc[str], 1, nchars)
-        #call awriteb (fd, Memc[str], nchars, 1)
-        #nread = awaitb (fd)
-	call write (fd, Memc[str], nchars)
-	call flush (fd)
-	call fseti (fd, F_CANCEL, OK)
-
-	# Read the reply. Skip the HTTP header assuming it ends with a \n or
-	# a \r\n.
-        call cq_fgstr (cq, "protocol", Memc[str], SZ_LINE)
-	if (streq (Memc[str], "http")) {
-	    repeat {
-	        nchars = getline (fd, Memc[buf])
-	        if (nchars <= 0)
-		    break
-	        Memc[buf+nchars] = EOS
-	    } until ((Memc[buf] == '\r' && Memc[buf+1] == '\n') ||
-	        (Memc[buf] == '\n'))
-	}
-
-	repeat {
-	    nchars = read (fd, Memc[buf], DEF_SZBUF)
-	    if (nchars > 0) {
-		Memc[buf+nchars] = EOS
-		call write (ofd, Memc[buf], nchars)
-		done = false
-	    } else {
-		done =true
-	    }
-	 } until (done)
-
-	call flush (ofd)
-
-	# Close the output image.
-	call close (ofd)
-
-	# Close the network connection.
-	call close (fd)
+call eprintf("url: '%s'\nout: '%s'\n");
+call pargstr(Memc[url]);call pargstr(Memc[output])
+        nchars = url_get (Memc[url], Memc[output], NULL)
 
 	# Unmap the database.
 	call cq_unmap (cq)
